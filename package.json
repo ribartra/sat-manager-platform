@@ -9,7 +9,8 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "prisma:validate": "prisma validate",
-    "quality": "npm run prisma:validate && npm run lint && npm run typecheck && npm run build",
+    "prisma:generate": "prisma generate",
+    "quality": "npm run prisma:validate && npm run prisma:generate && npm run lint && npm run typecheck && npm run build",
     "db:seed": "tsx prisma/seed.ts",
     "db:reset": "prisma migrate reset --force && tsx prisma/seed.ts",
     "db:backup": "node scripts/backup-db.mjs"

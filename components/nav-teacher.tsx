@@ -30,7 +30,7 @@ export function NavTeacher({ userName, role }: NavTeacherProps) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const visibleLinks = role === "ADMIN"
-    ? [...links, { href: "/admin/programs", label: "Admin Programs", icon: BookOpen }, { href: "/admin/teachers", label: "Teachers", icon: Users }]
+    ? [...links, { href: "/admin/programs", label: "Admin Programs", icon: BookOpen }, { href: "/admin/teachers", label: "Teachers", icon: Users }, { href: "/admin/users", label: "Accounts", icon: Users }]
     : links;
 
   return (

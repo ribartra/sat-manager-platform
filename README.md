@@ -170,6 +170,7 @@ npm run db:seed
 ```
 
 Seed credentials:
+- Admin: `admin@sat.com` / `admin123`
 - Teacher: `teacher@sat.com` / `teacher123`
 - Students: `student1@sat.com` … `student4@sat.com` / `student123`
 
@@ -243,6 +244,15 @@ Route protection is enforced in each layout:
 - `app/page.tsx` — redirects based on role
 
 Next proxy is only used for CORS headers and lightweight API request events, avoiding database/auth work in the Edge runtime.
+
+### Account validation
+
+Every user has a validation status:
+- `PENDING` — account exists but cannot access role portals yet
+- `APPROVED` — account can use the platform
+- `REJECTED` — account remains blocked after review
+
+Accounts created through emailed invite/authorization links are approved automatically when the token is consumed, because the email link validates ownership of the mailbox. Manually created accounts default to `PENDING` and must be reviewed by an admin at `/admin/users`.
 
 ## Scripts
 

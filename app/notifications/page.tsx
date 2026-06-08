@@ -1,14 +1,14 @@
-import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { formatDate } from "@/lib/utils";
+import { requireApprovedSession } from "@/lib/rbac";
 
 export const dynamic = "force-dynamic";
 
 export default async function NotificationsPage() {
-  const session = await auth();
-  if (!session) redirect("/login");
+  const session = await requireApprovedSession();
+  if (!session) redirect("/auth/pending-validation");
 
   const notifications = await prisma.notification.findMany({
     where: { userId: session.user.id },

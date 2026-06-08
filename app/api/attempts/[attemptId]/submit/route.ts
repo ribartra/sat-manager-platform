@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { notifyTeachers } from "@/lib/notifications";
+import { requireApprovedSession } from "@/lib/rbac";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ attemptId: string }> }) {
-  const session = await auth();
+  const session = await requireApprovedSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { attemptId } = await params;

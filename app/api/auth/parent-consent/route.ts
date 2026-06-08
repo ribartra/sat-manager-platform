@@ -44,6 +44,8 @@ export async function POST(req: NextRequest) {
         role: "PARENT",
         passwordHash,
         active: true,
+        validationStatus: "APPROVED",
+        validationReviewedAt: consentAt,
       },
       create: {
         name: invite.parentName ?? invite.parentEmail,
@@ -52,6 +54,8 @@ export async function POST(req: NextRequest) {
         role: "PARENT",
         passwordHash,
         active: true,
+        validationStatus: "APPROVED",
+        validationReviewedAt: consentAt,
       },
     }),
     prisma.inviteToken.update({

@@ -30,6 +30,8 @@ export async function POST(req: NextRequest) {
         passwordHash: hash,
         role: "STUDENT",
         active: true,
+        validationStatus: "APPROVED",
+        validationReviewedAt: new Date(),
       },
     });
     await tx.programEnrollment.create({
@@ -47,6 +49,8 @@ export async function POST(req: NextRequest) {
           phone: invite.parentPhone ?? null,
           role: "PARENT",
           active: true,
+          validationStatus: "APPROVED",
+          validationReviewedAt: new Date(),
         },
         create: {
           name: invite.parentName ?? invite.parentEmail,
@@ -54,6 +58,8 @@ export async function POST(req: NextRequest) {
           phone: invite.parentPhone ?? null,
           role: "PARENT",
           active: true,
+          validationStatus: "APPROVED",
+          validationReviewedAt: new Date(),
         },
       });
       await tx.parentStudent.upsert({

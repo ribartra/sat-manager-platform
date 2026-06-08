@@ -1,12 +1,16 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import prisma from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
 export default async function ParentLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
   if (!session) redirect("/login");
+  const user = await prisma.user.findUnique({ where: { id: session.user.id }, select: { active: true, validationStatus: true } });
+  if (!user?.active) redirect("/login");
+  if (user.validationStatus !== "APPROVED") redirect("/auth/pending-validation");
   if (session.user.role !== "PARENT") redirect("/");
   return (
     <div className="min-h-screen bg-gray-50">

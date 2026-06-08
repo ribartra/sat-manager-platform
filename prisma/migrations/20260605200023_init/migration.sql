@@ -8,6 +8,9 @@ CREATE TABLE "User" (
     "role" TEXT NOT NULL DEFAULT 'STUDENT',
     "startDate" DATETIME,
     "active" BOOLEAN NOT NULL DEFAULT true,
+    "validationStatus" TEXT NOT NULL DEFAULT 'PENDING',
+    "validationReviewedAt" DATETIME,
+    "validationReviewedById" TEXT,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL
 );

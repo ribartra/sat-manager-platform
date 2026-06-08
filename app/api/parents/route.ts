@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
   const parent = await prisma.user.upsert({
     where: { email },
     update: { name, phone: phone || null, role: "PARENT", passwordHash },
-    create: { name, email, phone: phone || null, role: "PARENT", passwordHash, active: true },
+    create: { name, email, phone: phone || null, role: "PARENT", passwordHash, active: true, validationStatus: "PENDING" },
   });
   await prisma.parentStudent.deleteMany({ where: { parentId: parent.id } });
   await Promise.all((studentIds as string[]).map((studentId) => prisma.parentStudent.create({ data: { parentId: parent.id, studentId, authorizedAt: new Date() } })));

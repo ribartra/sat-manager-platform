@@ -10,17 +10,32 @@ const adapter = new PrismaBetterSqlite3({ url });
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
+  const adminHash = await bcrypt.hash("admin123", 10);
+  await prisma.user.upsert({
+    where: { email: "admin@sat.com" },
+    update: { active: true, validationStatus: "APPROVED" },
+    create: {
+      name: "SAT Admin",
+      email: "admin@sat.com",
+      passwordHash: adminHash,
+      role: "ADMIN",
+      active: true,
+      validationStatus: "APPROVED",
+    },
+  });
+
   // Teacher
   const teacherHash = await bcrypt.hash("teacher123", 10);
   const teacher = await prisma.user.upsert({
     where: { email: "teacher@sat.com" },
-    update: {},
+    update: { active: true, validationStatus: "APPROVED" },
     create: {
       name: "SAT Teacher",
       email: "teacher@sat.com",
       passwordHash: teacherHash,
       role: "TEACHER",
       active: true,
+      validationStatus: "APPROVED",
     },
   });
 
@@ -47,7 +62,7 @@ async function main() {
     ["Ana Torres", "Luis Mora", "Sofia Rea", "Carlos Vera"].map((name, i) =>
       prisma.user.upsert({
         where: { email: `student${i + 1}@sat.com` },
-        update: {},
+        update: { active: true, validationStatus: "APPROVED" },
         create: {
           name,
           email: `student${i + 1}@sat.com`,
@@ -56,6 +71,7 @@ async function main() {
           phone: `+51 9${i}0000000`,
           startDate: new Date("2026-04-01"),
           active: true,
+          validationStatus: "APPROVED",
         },
       })
     )
@@ -313,6 +329,7 @@ async function main() {
   }
 
   console.log("✅ Seed complete");
+  console.log("Admin: admin@sat.com / admin123");
   console.log("Teacher: teacher@sat.com / teacher123");
   console.log("Students: student1@sat.com ... student4@sat.com / student123");
 }
