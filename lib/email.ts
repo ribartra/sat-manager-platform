@@ -8,7 +8,7 @@ type EmailPayload = {
 };
 
 function smtpConfigured() {
-  return Boolean(process.env.EMAIL_HOST && process.env.EMAIL_FROM);
+  return Boolean(process.env.EMAIL_HOST && process.env.EMAIL_FROM && process.env.EMAIL_USER && process.env.EMAIL_PASS);
 }
 
 function escapeHtml(value: string) {
@@ -32,14 +32,14 @@ export async function sendTransactionalEmail(payload: EmailPayload) {
   }
 
   const port = Number(process.env.EMAIL_PORT || 587);
-  const user = process.env.EMAIL_USER;
-  const pass = process.env.EMAIL_PASS;
-
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
     port,
     secure: port === 465,
-    auth: user && pass ? { user, pass } : undefined,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
   });
 
   try {

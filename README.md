@@ -141,16 +141,23 @@ AUTH_SECRET="change-this-to-a-random-string"
 AUTH_URL="http://localhost:3000"
 CORS_ALLOWED_ORIGINS="http://localhost:3000,https://your-frontend-domain.com"
 
-# Required for email flows (invite / password reset)
+# Required for email flows via Brevo SMTP (invite / parent consent / password reset)
+# EMAIL_FROM must be a sender verified in Brevo.
 EMAIL_FROM="noreply@yourdomain.com"
-EMAIL_HOST="smtp.yourdomain.com"
+EMAIL_HOST="smtp-relay.brevo.com"
 EMAIL_PORT="587"
-EMAIL_USER="..."
-EMAIL_PASS="..."
+EMAIL_USER="your-brevo-smtp-login"
+EMAIL_PASS="your-brevo-smtp-key"
 BACKUP_DIR="./backups"
 ```
 
 Use `.env.example` as the non-secret reference for local or deployment configuration.
+
+Brevo setup notes:
+- Create or use a verified sender/domain in Brevo and set it as `EMAIL_FROM`.
+- Use the SMTP login and SMTP key from Brevo, not your Brevo account password.
+- Port `587` uses STARTTLS; the app automatically uses SSL only for port `465`.
+- If SMTP variables are missing, email sending is skipped and the generated link is logged for local development.
 
 ### Database
 
