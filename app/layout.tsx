@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthSessionProvider } from "@/components/session-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "SAT Practice Platform",
@@ -18,6 +19,7 @@ export default function RootLayout({
     <html lang="en" className="h-full">
       <body className="min-h-full bg-white text-gray-900 antialiased">
         <AuthSessionProvider>{children}</AuthSessionProvider>
+        <Toaster />
       </body>
     </html>
   );

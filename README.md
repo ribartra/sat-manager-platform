@@ -12,6 +12,9 @@ Web application for managing SAT prep: teachers create content, assign practice 
 | Database | SQLite via `better-sqlite3` (driver adapter) |
 | ORM | Prisma 7 (TypeScript-first client, no binary engine) |
 | Styling | Tailwind CSS v4 |
+| UI foundation | Custom shadcn-style primitives, Radix UI, class-variance-authority, lucide-react |
+| Forms / tables | React Hook Form, Zod, TanStack Table |
+| Notifications | Sonner |
 | Math rendering | KaTeX / react-katex |
 | Runtime | Node.js 24 |
 
@@ -70,7 +73,7 @@ sat-web/
 │   ├── generated/prisma/   # Prisma 7 generated TypeScript client (do not edit)
 │   └── page.tsx            # Root redirect (→ /teacher or /student based on role)
 ├── components/
-│   ├── ui/                 # Badge, Button, Card, Input, Select, Textarea
+│   ├── ui/                 # Reusable UI primitives (forms, table, dialog, tabs, etc.)
 │   ├── math-content.tsx    # LaTeX renderer (KaTeX)
 │   ├── nav-teacher.tsx
 │   └── nav-student.tsx
@@ -122,6 +125,12 @@ Key enums (stored as strings in SQLite):
 npm install
 ```
 
+For CI or clean reproducible installs, prefer:
+
+```bash
+npm ci
+```
+
 ### Environment
 
 Create `.env` in the project root:
@@ -140,6 +149,8 @@ EMAIL_USER="..."
 EMAIL_PASS="..."
 BACKUP_DIR="./backups"
 ```
+
+Use `.env.example` as the non-secret reference for local or deployment configuration.
 
 ### Database
 
@@ -234,6 +245,19 @@ Next proxy is only used for CORS headers and lightweight API request events, avo
 | `npm run build` | Production build |
 | `npm run start` | Start production server |
 | `npm run lint` | Run ESLint |
+| `npm run typecheck` | Run TypeScript without emitting files |
+| `npm run prisma:validate` | Validate Prisma schema/configuration |
+| `npm run quality` | Run Prisma validation, lint, typecheck, and build |
 | `npm run db:seed` | Seed the database |
 | `npm run db:reset` | Drop, re-migrate, and re-seed the database |
 | `npm run db:backup` | Copy the SQLite database to `BACKUP_DIR` |
+
+## Professionalization Plan
+
+The post-MVP hardening plan lives in [`PROFESSIONALIZATION_PLAN.md`](./PROFESSIONALIZATION_PLAN.md). It tracks repository hygiene, CI, UI foundation, functional quality gates, product polish, and production readiness.
+
+Current quality gate:
+
+```bash
+npm run quality
+```
