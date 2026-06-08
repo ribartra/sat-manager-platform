@@ -1,0 +1,22 @@
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import Link from "next/link";
+
+export const dynamic = "force-dynamic";
+
+export default async function ParentLayout({ children }: { children: React.ReactNode }) {
+  const session = await auth();
+  if (!session) redirect("/login");
+  if (session.user.role !== "PARENT") redirect("/");
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <nav className="border-b border-gray-200 bg-white px-4 py-3">
+        <div className="mx-auto flex max-w-5xl items-center justify-between">
+          <span className="text-sm font-semibold text-blue-700">SAT Parent Portal</span>
+          <Link href="/notifications" className="text-sm text-gray-600 hover:text-blue-600">Notifications</Link>
+        </div>
+      </nav>
+      {children}
+    </div>
+  );
+}

@@ -1,0 +1,402 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  phone        String?
+  passwordHash String?
+  role         String    @default("STUDENT") // STUDENT | TEACHER | ADMIN
+  startDate    DateTime?
+  active       Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  groups      GroupMembership[]
+  assignments Assignment[]
+  attempts    Attempt[]
+  resetTokens    PasswordResetToken[]
+  auditLogs   AuditLog[]
+  parentLinks ParentStudent[] @relation("ParentLinks")
+  childLinks  ParentStudent[] @relation("ChildLinks")
+  notifications Notification[]
+  fullTestAssignments FullPracticeTestAssignment[]
+  fullTestAttempts FullPracticeTestAttempt[]
+  programTeachingAssignments ProgramTeacher[]
+  programEnrollments ProgramEnrollment[]
+}
+
+model Program {
+  id             String    @id @default(cuid())
+  name           String
+  contractEndsAt DateTime?
+  active         Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  teachers    ProgramTeacher[]
+  enrollments ProgramEnrollment[]
+  invites     InviteToken[]
+}
+
+model ProgramTeacher {
+  programId  String
+  teacherId  String
+  assignedAt DateTime @default(now())
+  active     Boolean  @default(true)
+
+  program Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+  teacher User    @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  @@id([programId, teacherId])
+}
+
+model ProgramEnrollment {
+  programId  String
+  studentId  String
+  enrolledAt DateTime @default(now())
+  active     Boolean  @default(true)
+
+  program Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+  student User    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@id([programId, studentId])
+}
+
+model Group {
+  id        String   @id @default(cuid())
+  name      String
+  schedule  String?
+  createdAt DateTime @default(now())
+  members   GroupMembership[]
+}
+
+model GroupMembership {
+  userId  String
+  groupId String
+  user    User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group   Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  @@id([userId, groupId])
+}
+
+model Section {
+  id      String   @id @default(cuid())
+  name    String   @unique
+  label   String
+  domains Domain[]
+}
+
+model Domain {
+  id        String  @id @default(cuid())
+  name      String
+  sectionId String
+  section   Section @relation(fields: [sectionId], references: [id])
+  topics    Topic[]
+}
+
+model Topic {
+  id        String   @id @default(cuid())
+  name      String
+  domainId  String
+  domain    Domain   @relation(fields: [domainId], references: [id])
+  subskills Subskill[]
+  questions Question[]
+  practiceSets PracticeSet[]
+  materials StudyMaterial[]
+}
+
+model Subskill {
+  id      String @id @default(cuid())
+  name    String
+  topicId String
+  topic   Topic  @relation(fields: [topicId], references: [id])
+  questions Question[]
+}
+
+model Question {
+  id            String   @id @default(cuid())
+  stem          String
+  stimulus      String?
+  type          String   @default("MC") // MC | NUMERIC
+  difficulty    String   @default("EASY") // EASY | MEDIUM | HARD
+  correctAnswer String
+  explanation   String?
+  topicId       String
+  subskillId    String?
+  status        String   @default("DRAFT") // DRAFT | PUBLISHED | ARCHIVED
+  imageUrl      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  topic    Topic     @relation(fields: [topicId], references: [id])
+  subskill Subskill? @relation(fields: [subskillId], references: [id])
+  options  QuestionOption[]
+  setItems PracticeSetQuestion[]
+  answers  AttemptAnswer[]
+  fullTestItems FullPracticeTestQuestion[]
+}
+
+model QuestionOption {
+  id         String   @id @default(cuid())
+  questionId String
+  label      String   // A | B | C | D
+  text       String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+model PracticeSet {
+  id                    String   @id @default(cuid())
+  name                  String
+  topicId               String
+  difficulty            String   @default("EASY")
+  status                String   @default("DRAFT") // DRAFT | PUBLISHED | BLOCKED | ARCHIVED
+  explanationVisibility String   @default("HIDDEN") // IMMEDIATE | AFTER_FINISH | HIDDEN
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  topic       Topic               @relation(fields: [topicId], references: [id])
+  questions   PracticeSetQuestion[]
+  assignments Assignment[]
+}
+
+model PracticeSetQuestion {
+  practiceSetId String
+  questionId    String
+  order         Int
+  practiceSet   PracticeSet @relation(fields: [practiceSetId], references: [id], onDelete: Cascade)
+  question      Question    @relation(fields: [questionId], references: [id])
+  @@id([practiceSetId, questionId])
+}
+
+model Assignment {
+  id            String    @id @default(cuid())
+  practiceSetId String
+  studentId     String
+  assignedById  String?
+  dueDate       DateTime?
+  unlockAt      DateTime?
+  locked        Boolean   @default(false)
+  status        String    @default("PENDING")
+  createdAt     DateTime  @default(now())
+
+  practiceSet PracticeSet @relation(fields: [practiceSetId], references: [id])
+  student     User        @relation(fields: [studentId], references: [id])
+  attempts    Attempt[]
+  unlockRequests UnlockRequest[]
+}
+
+model Attempt {
+  id              String    @id @default(cuid())
+  assignmentId    String?
+  studentId       String
+  practiceSetId   String
+  attemptNumber   Int       @default(1)
+  startedAt       DateTime  @default(now())
+  submittedAt     DateTime?
+  totalTime       Int?
+  status          String    @default("IN_PROGRESS") // IN_PROGRESS | SUBMITTED | INVALIDATED
+  currentQuestion Int       @default(0)
+  teacherComment  String?
+
+  assignment Assignment? @relation(fields: [assignmentId], references: [id])
+  student    User        @relation(fields: [studentId], references: [id])
+  answers    AttemptAnswer[]
+}
+
+model AttemptAnswer {
+  id              String  @id @default(cuid())
+  attemptId       String
+  questionId      String
+  answer          String?
+  isCorrect       Boolean?
+  timeSpent       Int?
+  markedForReview Boolean @default(false)
+  note            String?
+  eliminatedOptions String?
+
+  attempt  Attempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id])
+  @@unique([attemptId, questionId])
+}
+
+model InviteToken {
+  id        String    @id @default(cuid())
+  email     String
+  name      String
+  phone     String?
+  startDate DateTime?
+  invitedById String?
+  programId String?
+  parentName String?
+  parentEmail String?
+  parentPhone String?
+  parentConsentToken String? @unique
+  parentConsentAt DateTime?
+  parentConsentIp String?
+  token     String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  program   Program?  @relation(fields: [programId], references: [id], onDelete: SetNull)
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  token     String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String
+  action     String
+  targetType String?
+  targetId   String?
+  metadata   String?
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id])
+}
+
+model UnlockRequest {
+  id           String    @id @default(cuid())
+  assignmentId String
+  studentId    String
+  status       String    @default("PENDING") // PENDING | APPROVED | DENIED
+  createdAt    DateTime  @default(now())
+  resolvedAt   DateTime?
+  assignment   Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  body      String?
+  href      String?
+  readAt    DateTime?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ParentStudent {
+  parentId  String
+  studentId String
+  authorizedAt DateTime?
+  parent    User @relation("ParentLinks", fields: [parentId], references: [id], onDelete: Cascade)
+  student   User @relation("ChildLinks", fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@id([parentId, studentId])
+}
+
+model FullPracticeTest {
+  id             String   @id @default(cuid())
+  name           String
+  status         String   @default("DRAFT") // DRAFT | PUBLISHED | ARCHIVED
+  reviewEnabled  Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  modules        FullPracticeTestModule[]
+  assignments    FullPracticeTestAssignment[]
+  attempts       FullPracticeTestAttempt[]
+}
+
+model FullPracticeTestModule {
+  id        String @id @default(cuid())
+  testId    String
+  name      String
+  section   String // RW | MATH
+  order     Int
+  timeLimit Int
+  test      FullPracticeTest @relation(fields: [testId], references: [id], onDelete: Cascade)
+  questions FullPracticeTestQuestion[]
+}
+
+model FullPracticeTestQuestion {
+  moduleId   String
+  questionId String
+  order      Int
+  module     FullPracticeTestModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  question   Question               @relation(fields: [questionId], references: [id])
+
+  @@id([moduleId, questionId])
+}
+
+model FullPracticeTestAssignment {
+  id          String    @id @default(cuid())
+  testId      String
+  studentId   String
+  assignedById String?
+  dueDate     DateTime?
+  status      String    @default("PENDING")
+  createdAt   DateTime  @default(now())
+  test        FullPracticeTest @relation(fields: [testId], references: [id])
+  student     User             @relation(fields: [studentId], references: [id])
+  attempts    FullPracticeTestAttempt[]
+}
+
+model FullPracticeTestAttempt {
+  id             String    @id @default(cuid())
+  testId         String
+  assignmentId   String?
+  studentId      String
+  startedAt      DateTime  @default(now())
+  submittedAt    DateTime?
+  status         String    @default("IN_PROGRESS")
+  currentModule  Int       @default(0)
+  currentQuestion Int      @default(0)
+  rwScore        Int?
+  mathScore      Int?
+  totalScore     Int?
+  timeExpiredEvents Int    @default(0)
+  extraTimeUsed  Int       @default(0)
+  test           FullPracticeTest @relation(fields: [testId], references: [id])
+  assignment     FullPracticeTestAssignment? @relation(fields: [assignmentId], references: [id])
+  student        User @relation(fields: [studentId], references: [id])
+  answers        FullPracticeTestAnswer[]
+}
+
+model FullPracticeTestAnswer {
+  id              String @id @default(cuid())
+  attemptId       String
+  moduleId        String
+  questionId      String
+  answer          String?
+  isCorrect       Boolean?
+  timeSpent       Int?
+  attempt         FullPracticeTestAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+
+  @@unique([attemptId, questionId])
+}
+
+model FullPracticeTestScoreConversion {
+  id        String @id @default(cuid())
+  section   String // RW | MATH
+  rawCorrect Int
+  score     Int
+
+  @@unique([section, rawCorrect])
+}
+
+model StudyMaterial {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  body        String?
+  url         String?
+  topicId     String?
+  status      String   @default("PUBLISHED") // DRAFT | PUBLISHED | ARCHIVED
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  topic Topic? @relation(fields: [topicId], references: [id], onDelete: SetNull)
+}
