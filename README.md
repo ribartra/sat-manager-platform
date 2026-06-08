@@ -1,280 +1,385 @@
 # SAT Practice Platform
 
-Web application for managing SAT prep: teachers create content, assign practice sets, and monitor students; students work through timed practice sets and review results.
+Plataforma web de preparación SAT para instituciones. Los profesores crean contenido, asignan sets de práctica y tests completos, y monitorean el progreso de sus estudiantes. Los estudiantes trabajan sus asignaciones con un player cronometrado. Los padres pueden ver el avance de sus hijos.
 
-## Tech Stack
+## Stack
 
-| Layer | Technology |
+| Capa | Tecnología |
 |---|---|
-| Framework | Next.js 16.2 (App Router, webpack dev/build) |
-| Language | TypeScript 5 |
-| Auth | NextAuth v5 (beta) — JWT strategy, Credentials provider |
-| Database | SQLite via `better-sqlite3` (driver adapter) |
-| ORM | Prisma 7 (TypeScript-first client, no binary engine) |
-| Styling | Tailwind CSS v4 |
-| UI foundation | Custom shadcn-style primitives, Radix UI, class-variance-authority, lucide-react |
-| Forms / tables | React Hook Form, Zod, TanStack Table |
-| Notifications | Sonner |
-| Math rendering | KaTeX / react-katex |
+| Framework | Next.js 16.2 — App Router, webpack |
+| Lenguaje | TypeScript 5, React 19 |
+| Auth | NextAuth v5-beta (JWT, Credentials provider) |
+| Base de datos | SQLite · `better-sqlite3` · driver adapter |
+| ORM | Prisma 7 (cliente TypeScript, sin binario de engine) |
+| Estilos | Tailwind CSS v4 |
+| UI | Radix UI + class-variance-authority + lucide-react |
+| Tablas | TanStack Table v8 |
+| Formularios | React Hook Form + Zod v4 |
+| Notificaciones UI | Sonner |
+| Matemáticas | KaTeX / react-katex |
+| Email | Nodemailer (Brevo SMTP) |
 | Runtime | Node.js 24 |
 
-## Features
+## Roles
 
-### Teacher portal (`/teacher`)
-- **Dashboard** — student roster with last-active date, pending assignments, avg score, and inactive-student alerts
-- **Student detail** — view full assignment history, toggle active/inactive, impersonate student view
-- **Assign** — send a practice set to a student with optional due date and locked flag
-- **Question bank** (`/teacher/questions`) — browse, filter (topic / difficulty / status), create and edit MC and numeric questions with LaTeX support
-- **Subskills** (`/teacher/subskills`) — maintain topic subskills for filtering and question classification
-- **Content map** (`/teacher/content`) — tree view of Sections → Domains → Topics → Practice Sets with published/draft counts
-- **Practice set editor** — create/edit practice sets, order questions, publish/draft/archive, and control explanation visibility
-- **Attempt detail** — inspect student answers and reopen or invalidate submitted attempts
-- **Groups** (`/teacher/groups`) — create groups/cycles, add and remove members
-- **Parents** (`/teacher/parents`) — create parent accounts and link students
-- **Full Practice Tests** (`/teacher/full-tests`) — create four-module SAT-style tests and assign them to students/groups
-- **Full Test scoring** (`/teacher/full-tests/scoring`) — upload RW/Math raw-score conversion rows for SAT-style scoring
-- **Invite flow** — generate invite tokens sent by email; students self-activate via token link
-- **Bulk import** (`/admin/import`) — import questions from CSV for content loading
-- **Reports** — generate student reports and download a PDF summary
+| Rol | Acceso |
+|---|---|
+| `STUDENT` | Portal `/student` — práctica, resultados, historial, tests completos |
+| `TEACHER` | Portal `/teacher` — gestión de contenido, grupos, estudiantes, asignaciones |
+| `ADMIN` | Rutas `/admin` + todo lo del teacher — usuarios, programas, importación |
+| `PARENT` | Portal `/parent` — dashboard de progreso del estudiante vinculado |
 
-### Student portal (`/student`)
-- **Dashboard** — stats (sets completed, avg score, pending count), active assignments with due dates, recent results
-- **Practice player** — timed, question-by-question player with autosave, flag-for-review, numeric free-response and MC modes, pause/resume
-- **Results review** — per-question breakdown with explanations (visibility controlled per set: IMMEDIATE / AFTER_FINISH / HIDDEN)
-- **History** — paginated list of all submitted attempts
-- **Content map** — browse practice sets by topic and difficulty for self-directed practice
-- **Full Practice Tests** — take assigned four-module tests with module timers, pause/continue, Math calculator, and SAT-style section scores
-- **Notifications** — see internal notifications for assignments, unlocks, due-related activity, and completed practice
+---
 
-### Parent portal (`/parent`)
-- View linked student progress dashboards and recent practice summary
+## Ciclo de vida del usuario
 
-### Auth flows
-- Login with email/password
-- Forgot password → reset via email token
-- Student invitation → activation with token
-- Change password from the user menu
+### Alta de estudiante (flujo de invitación)
 
-## Project Structure
+```
+Profesor → POST /api/students/invite
+  ↓
+  Crea InviteToken (expira en 7 días)
+  Envía email al estudiante → /auth/activate?token=…
+  Si hay datos de padre: crea parentConsentToken → email a padre → /auth/parent-consent?token=…
+
+Padre → GET/POST /api/auth/parent-consent
+  ↓
+  Verifica token, crea usuario PARENT (o vincula existente)
+  Guarda parentConsentAt + IP
+
+Estudiante → GET /api/auth/invite-info?token=…
+  ↓
+  Si se requiere consentimiento parental y aún no fue dado: bloqueado
+  Si ok: retorna nombre/email del invite
+
+Estudiante → POST /api/auth/activate
+  ↓
+  Crea User (STUDENT, validationStatus=APPROVED, active=true)
+  Crea ProgramEnrollment
+  Si hay padre: crea ParentStudent con authorizedAt=parentConsentAt
+  Marca InviteToken.usedAt
+```
+
+### Alta de profesor
+
+El admin crea el usuario manualmente o el profesor se registra. El acceso queda bloqueado hasta que el admin apruebe: `POST /api/admin/users/{userId}/validation` con `validationStatus=APPROVED`.
+
+### Login y control de acceso
+
+```
+POST /api/auth/[...nextauth] (Credentials)
+  ↓
+  Verifica: user existe, passwordHash válido, active=true
+  JWT token: { id, email, role, validationStatus }
+
+En cada request a ruta protegida (layout):
+  session nula          → redirect /login
+  validationStatus≠APPROVED → redirect /auth/pending-validation
+  active=false          → redirect /login
+  role incorrecto       → redirect al portal correcto
+```
+
+No hay `middleware.ts`. La protección está en los layouts de cada grupo de rutas.
+
+### Recuperación de contraseña
+
+```
+POST /api/auth/forgot-password → crea PasswordResetToken (1h) → email con /auth/reset-password?token=…
+POST /api/auth/reset-password  → verifica token, actualiza passwordHash, marca usedAt
+POST /api/auth/change-password → requiere sesión activa, valida contraseña actual
+```
+
+---
+
+## Ciclo de vida de una evaluación (Practice Set)
+
+### 1. Asignación
+
+El profesor envía `POST /api/assignments` con `{ studentIds, practiceSetIds, dueDate, unlockAt, locked }`. Se crean registros `Assignment` y se notifica a cada estudiante.
+
+Si el assignment tiene `locked=true`, el estudiante puede pedir desbloqueo: `POST /api/unlock-requests`. El profesor aprueba/rechaza con `POST /api/unlock-requests/{requestId}`.
+
+### 2. Inicio del intento
+
+El estudiante entra a `/student/practice/[setId]?assignmentId={id}`.  
+El servidor busca un `Attempt` en estado `IN_PROGRESS`; si no existe, crea uno nuevo:
+
+```
+Attempt {
+  status: IN_PROGRESS
+  attemptNumber: count_previos + 1
+  currentQuestion: 0
+  startedAt: now
+}
+```
+
+### 3. Autosave
+
+Cada cambio dispara `POST /api/attempts/{attemptId}/autosave` con:
+- `answers` — mapa `{ questionId → respuesta }`
+- `currentQuestion`, `totalTime`, `timeSpentByQuestion`
+- `markedQuestionIds`, `notes`, `eliminatedOptions`
+
+Hace upsert de cada `AttemptAnswer` (unique en `attemptId + questionId`). No puntúa aún.
+
+### 4. Envío y puntuación
+
+`POST /api/attempts/{attemptId}/submit`:
+1. Carga todas las preguntas del set con su `correctAnswer`
+2. Por cada respuesta: compara (trim + uppercase) → `isCorrect = true/false`
+3. Preguntas sin responder → `isCorrect = false`
+4. Actualiza `Attempt`: `status=SUBMITTED, submittedAt=now, totalTime`
+5. Actualiza `Assignment.status = COMPLETED`
+6. Notifica a todos los profesores
+
+### 5. Resultados
+
+`/student/results/[attemptId]` muestra score, porcentaje, tiempo y revisión por pregunta según `explanationVisibility`:
+
+| Valor | Comportamiento |
+|---|---|
+| `IMMEDIATE` | Explicaciones visibles mientras practica |
+| `AFTER_FINISH` | Visibles al ver resultados |
+| `HIDDEN` | Nunca visibles para el estudiante |
+
+El profesor puede ver el intento en `/teacher/students/{id}/attempts/{attemptId}` y puede:
+- Agregar comentario: `POST /api/attempts/{attemptId}/comment`
+- Reabrir: `POST /api/attempts/{attemptId}/reopen` → `status=IN_PROGRESS`
+- Invalidar: `POST /api/attempts/{attemptId}/invalidate` → `status=INVALIDATED`
+
+---
+
+## Ciclo de vida de un Full Practice Test
+
+### Estructura
+
+Un test completo tiene 4 módulos fijos (orden, tiempos estándar SAT):
+
+| Módulo | Sección | Tiempo |
+|---|---|---|
+| RW Module 1 | Reading & Writing | 32 min |
+| RW Module 2 | Reading & Writing | 32 min |
+| Math Module 1 | Math | 35 min |
+| Math Module 2 | Math | 35 min |
+
+### Flujo
+
+```
+Profesor → POST /api/full-practice-tests
+  Crea FullPracticeTest + 4 módulos + FullPracticeTestQuestion por módulo
+
+Profesor → POST /api/full-practice-tests/{testId}/assign
+  Crea FullPracticeTestAssignment por estudiante → notificación
+
+Estudiante → /student/full-tests/{assignmentId}
+  Busca o crea FullPracticeTestAttempt { status=IN_PROGRESS, currentModule=0 }
+  Módulos con timer, navegación entre preguntas, calculadora en módulos Math
+
+Envío → POST /api/full-practice-tests/attempts/{attemptId}/submit
+  Puntúa respuestas por sección (RW y Math por separado)
+  Aplica tabla FullPracticeTestScoreConversion → escala 200–800
+  Guarda rwScore, mathScore, totalScore=rwScore+mathScore
+
+Resultados → /student/full-tests/results/{attemptId}
+  Cards: RW Score / Math Score / Total
+  Si reviewEnabled: revisión por módulo y pregunta
+```
+
+La tabla de conversión se gestiona en `/teacher/full-tests/scoring`.
+
+---
+
+## Modelo de datos (resumen)
+
+```
+User (STUDENT | TEACHER | ADMIN | PARENT)
+  ├── ProgramEnrollment → Program
+  ├── GroupMembership → Group
+  ├── Assignment → PracticeSet → PracticeSetQuestion → Question
+  │     └── Attempt → AttemptAnswer
+  │           └── UnlockRequest
+  ├── FullPracticeTestAssignment → FullPracticeTest
+  │     └── FullPracticeTestAttempt → FullPracticeTestAnswer
+  ├── ParentStudent (link PARENT ↔ STUDENT)
+  ├── Notification
+  └── AuditLog
+
+Section → Domain → Topic → Subskill
+                         → Question → QuestionOption
+                         → PracticeSet
+                         → FullPracticeTestModule → FullPracticeTestQuestion
+                         → StudyMaterial
+```
+
+**Enums** (strings en SQLite):
+- `User.role`: `STUDENT` | `TEACHER` | `ADMIN` | `PARENT`
+- `User.validationStatus`: `PENDING` | `APPROVED` | `REJECTED`
+- `Question.type`: `MC` | `NUMERIC`
+- `Question.difficulty` / `PracticeSet.difficulty`: `EASY` | `MEDIUM` | `HARD`
+- `Question.status` / `PracticeSet.status`: `DRAFT` | `PUBLISHED` | `ARCHIVED` (sets también: `BLOCKED`)
+- `PracticeSet.explanationVisibility`: `IMMEDIATE` | `AFTER_FINISH` | `HIDDEN`
+- `Attempt.status`: `IN_PROGRESS` | `SUBMITTED` | `INVALIDATED`
+- `FullPracticeTestAttempt.status`: `IN_PROGRESS` | `SUBMITTED`
+
+---
+
+## Estructura del proyecto
 
 ```
 sat-web/
 ├── app/
-│   ├── (auth)/             # Login, forgot-password, reset-password, activation pages
-│   ├── (teacher)/          # Teacher-only pages (layout enforces TEACHER/ADMIN role)
-│   ├── (student)/          # Student pages (layout enforces auth)
-│   ├── api/                # REST API routes
-│   │   ├── assignments/    # CRUD for assignments
-│   │   ├── attempts/       # Autosave and submit
-│   │   ├── auth/           # Invite info, activate, forgot/reset password
-│   │   ├── groups/         # Group and membership management
-│   │   ├── questions/      # Question creation
-│   │   └── students/       # Toggle active status
-│   ├── generated/prisma/   # Prisma 7 generated TypeScript client (do not edit)
-│   └── page.tsx            # Root redirect (→ /teacher or /student based on role)
+│   ├── (auth)/                     # Login, activación, recuperación de contraseña
+│   ├── (teacher)/teacher/          # Portal profesor (TEACHER | ADMIN)
+│   │   ├── page.tsx                # Dashboard — roster de estudiantes
+│   │   ├── students/               # Lista, detalle, edición, asignación, report
+│   │   ├── questions/              # Banco de preguntas, crear/editar
+│   │   ├── practice-sets/          # Crear/editar sets de práctica
+│   │   ├── content/                # Mapa de contenido (Sección→Dominio→Tema)
+│   │   ├── groups/                 # Grupos y ciclos
+│   │   ├── parents/                # Padres vinculados
+│   │   ├── materials/              # Materiales de estudio
+│   │   ├── full-tests/             # Tests completos + scoring
+│   │   ├── programs/               # Programas
+│   │   ├── subskills/              # Subhabilidades por tema
+│   │   └── compare/                # Comparación entre estudiantes
+│   ├── (student)/student/          # Portal estudiante
+│   │   ├── page.tsx                # Dashboard — pendientes y resultados recientes
+│   │   ├── practice/[setId]/       # Player de practice set + autosave
+│   │   ├── results/[attemptId]/    # Revisión de intento
+│   │   ├── history/                # Historial de intentos
+│   │   ├── content-map/            # Exploración por tema y dificultad
+│   │   ├── materials/              # Materiales de estudio
+│   │   └── full-tests/             # Tests completos (player + resultados)
+│   ├── (parent)/parent/            # Portal padre — dashboard de progreso
+│   ├── admin/                      # Gestión de usuarios, programas, importación
+│   ├── notifications/              # Notificaciones
+│   ├── api/                        # API routes (ver sección de API)
+│   ├── generated/prisma/           # Cliente Prisma 7 generado (no editar)
+│   └── page.tsx                    # Redirect raíz según rol
 ├── components/
-│   ├── ui/                 # Reusable UI primitives (forms, table, dialog, tabs, etc.)
-│   ├── math-content.tsx    # LaTeX renderer (KaTeX)
+│   ├── ui/                         # Primitivos (Button, Input, Badge, Card, Dialog, Table, …)
+│   ├── math-content.tsx            # Renderer KaTeX
 │   ├── nav-teacher.tsx
 │   └── nav-student.tsx
 ├── lib/
-│   ├── auth.ts             # NextAuth config + handlers
-│   ├── prisma.ts           # PrismaClient singleton (better-sqlite3 driver adapter)
-│   └── utils.ts            # Shared helpers (formatDate, scorePercent, etc.)
+│   ├── auth.ts                     # Config NextAuth + handlers + signIn/signOut
+│   ├── prisma.ts                   # Singleton PrismaClient (driver adapter SQLite)
+│   ├── email.ts                    # Nodemailer + templates de email
+│   └── utils.ts                    # Helpers: formatDate, scorePercent, formatTime, cn
 ├── prisma/
-│   ├── schema.prisma       # Database schema
-│   ├── seed.ts             # Dev seed data
-│   └── migrations/         # SQL migration history
-├── proxy.ts                # CORS headers for API routes
-└── next.config.ts          # serverExternalPackages for native modules
+│   ├── schema.prisma
+│   ├── seed.ts
+│   └── migrations/
+└── next.config.ts                  # serverExternalPackages
 ```
 
-## Data Model (summary)
-
-```
-User (STUDENT | TEACHER | ADMIN)
-  └── GroupMembership → Group
-  └── Assignment → PracticeSet → PracticeSetQuestion → Question
-  └── Attempt → AttemptAnswer
-  └── FullPracticeTestAssignment → FullPracticeTestAttempt → FullPracticeTestAnswer
-
-ParentStudent links PARENT users to STUDENT users.
-
-Section → Domain → Topic → Question
-                         → PracticeSet
-                         → FullPracticeTestModule
-```
-
-Key enums (stored as strings in SQLite):
-- `User.role`: `STUDENT` | `TEACHER` | `ADMIN`
-- `Question.type`: `MC` | `NUMERIC`
-- `Question.difficulty` / `PracticeSet.difficulty`: `EASY` | `MEDIUM` | `HARD`
-- `Question.status` / `PracticeSet.status`: `DRAFT` | `PUBLISHED` | `ARCHIVED` (sets also: `BLOCKED`)
-- `PracticeSet.explanationVisibility`: `IMMEDIATE` | `AFTER_FINISH` | `HIDDEN`
-- `Attempt.status`: `IN_PROGRESS` | `SUBMITTED` | `INVALIDATED`
+---
 
 ## Setup
 
-### Prerequisites
+### Requisitos
 - Node.js 24+
 - npm
 
-### Install
+### Instalación
 
 ```bash
 npm install
-```
-
-For CI or clean reproducible installs, prefer:
-
-```bash
+# o para CI / instalación reproducible:
 npm ci
 ```
 
-### Environment
+### Variables de entorno
 
-Create `.env` in the project root:
+Crea `.env` en la raíz (ver `.env.example` como referencia):
 
 ```env
 DATABASE_URL="file:./dev.db"
-AUTH_SECRET="change-this-to-a-random-string"
+AUTH_SECRET="cambia-esto-por-un-string-aleatorio-largo"
 AUTH_URL="http://localhost:3000"
-CORS_ALLOWED_ORIGINS="http://localhost:3000,https://your-frontend-domain.com"
+CORS_ALLOWED_ORIGINS="http://localhost:3000"
 
-# Required for email flows via Brevo SMTP (invite / parent consent / password reset)
-# EMAIL_FROM must be a sender verified in Brevo.
-EMAIL_FROM="noreply@yourdomain.com"
+# Email (Brevo SMTP — requerido para invitaciones y recuperación de contraseña)
+EMAIL_FROM="noreply@tudominio.com"
 EMAIL_HOST="smtp-relay.brevo.com"
 EMAIL_PORT="587"
-EMAIL_USER="your-brevo-smtp-login"
-EMAIL_PASS="your-brevo-smtp-key"
+EMAIL_USER="tu-login-smtp-brevo"
+EMAIL_PASS="tu-clave-smtp-brevo"
+
 BACKUP_DIR="./backups"
 ```
 
-Use `.env.example` as the non-secret reference for local or deployment configuration.
+**Notas de email:**
+- El sender en `EMAIL_FROM` debe estar verificado en Brevo.
+- Puerto 587 usa STARTTLS; puerto 465 activa SSL automáticamente.
+- Si no hay variables de email configuradas, los links se imprimen en consola en lugar de enviarse (útil para desarrollo local).
 
-Brevo setup notes:
-- Create or use a verified sender/domain in Brevo and set it as `EMAIL_FROM`.
-- Use the SMTP login and SMTP key from Brevo, not your Brevo account password.
-- Port `587` uses STARTTLS; the app automatically uses SSL only for port `465`.
-- If SMTP variables are missing, email sending is skipped and the generated link is logged for local development.
-
-### Database
+### Base de datos
 
 ```bash
-# Run migrations
+# Ejecutar migraciones
 npx prisma migrate deploy
 
-# Seed development data (creates teacher + 4 students + sample content)
+# Poblar con datos de prueba
 npm run db:seed
 ```
 
-Seed credentials:
+Credenciales del seed:
 - Admin: `admin@sat.com` / `admin123`
-- Teacher: `teacher@sat.com` / `teacher123`
-- Students: `student1@sat.com` … `student4@sat.com` / `student123`
+- Profesor: `teacher@sat.com` / `teacher123`
+- Estudiantes: `student1@sat.com` … `student4@sat.com` / `student123`
 
-To reset and re-seed from scratch:
-
+Para resetear y re-sembrar desde cero:
 ```bash
 npm run db:reset
 ```
 
-### Development server
+### Servidor de desarrollo
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Abre [http://localhost:3000](http://localhost:3000). La raíz redirige automáticamente según el rol del usuario autenticado.
 
-## Known Issues / Configuration Notes
-
-### Native module bundling / SWC
-
-`better-sqlite3` is a native C++ addon and must be excluded explicitly in `next.config.ts`:
-
-```ts
-serverExternalPackages: [
-  "better-sqlite3",
-  "@prisma/adapter-better-sqlite3",
-  "@prisma/client",
-  "bcryptjs",
-],
-```
-
-The project uses the native Next SWC package for Linux (`@next/swc-linux-x64-gnu`). Do not force the WASM SWC fallback in local scripts; in this environment it caused unstable build workers.
-
-### API CORS
-
-API routes under `/api/*` are covered by `proxy.ts`. Allowed origins come from:
-- `CORS_ALLOWED_ORIGINS` as a comma-separated list
-- `AUTH_URL`
-- `http://localhost:3000` and `http://127.0.0.1:3000` outside production
-
-Because the app uses cookie-based auth, CORS does not use `*`; each allowed origin is echoed explicitly with credentials enabled.
-
-### Frontend / Backend Security Boundary
-
-This is a full-stack Next.js app:
-- frontend: pages and client components under `app/**` and `components/**`
-- backend: API routes under `app/api/**`, server components, Prisma, and auth utilities
-
-Client components never receive database credentials, SMTP credentials, `AUTH_SECRET`, or password hashes. Browser actions call backend endpoints with the session cookie, and backend routes re-check authentication, role, ownership, lock state, and attempt ownership before writing data. Teacher/admin endpoints explicitly require `TEACHER` or `ADMIN`.
-
-### Backups and Observability
-
-SQLite backups can be created with:
-
-```bash
-npm run db:backup
-```
-
-Set `BACKUP_DIR` to control the destination directory. The app emits structured JSON logs for CORS blocks and backup creation. Critical teacher/admin actions are also stored in `AuditLog`.
-
-### Prisma 7 generated client location
-
-The generated client lives in `app/generated/prisma/` (configured in `schema.prisma`). This is inside Next.js's `app/` directory, which Turbopack treats specially. If requests hang on startup, check that `serverExternalPackages` is correct and the `.next/` cache is clean (`rm -rf .next`).
-
-### Route protection
-
-Route protection is enforced in each layout:
-- `app/(teacher)/layout.tsx` — requires TEACHER or ADMIN role
-- `app/(student)/layout.tsx` — requires any authenticated session
-- `app/page.tsx` — redirects based on role
-
-Next proxy is only used for CORS headers and lightweight API request events, avoiding database/auth work in the Edge runtime.
-
-### Account validation
-
-Every user has a validation status:
-- `PENDING` — account exists but cannot access role portals yet
-- `APPROVED` — account can use the platform
-- `REJECTED` — account remains blocked after review
-
-Accounts created through emailed invite/authorization links are approved automatically when the token is consumed, because the email link validates ownership of the mailbox. Manually created accounts default to `PENDING` and must be reviewed by an admin at `/admin/users`.
+---
 
 ## Scripts
 
-| Command | Description |
+| Comando | Descripción |
 |---|---|
-| `npm run dev` | Start dev server with webpack |
-| `npm run build` | Production build |
-| `npm run start` | Start production server |
-| `npm run lint` | Run ESLint |
-| `npm run typecheck` | Run TypeScript without emitting files |
-| `npm run prisma:validate` | Validate Prisma schema/configuration |
-| `npm run quality` | Run Prisma validation, lint, typecheck, and build |
-| `npm run db:seed` | Seed the database |
-| `npm run db:reset` | Drop, re-migrate, and re-seed the database |
-| `npm run db:backup` | Copy the SQLite database to `BACKUP_DIR` |
+| `npm run dev` | Servidor de desarrollo |
+| `npm run build` | Build de producción |
+| `npm run start` | Servidor de producción |
+| `npm run lint` | ESLint |
+| `npm run db:seed` | Poblar la base de datos |
+| `npm run db:reset` | Drop + migrate + seed |
 
-## Professionalization Plan
+---
 
-The post-MVP hardening plan lives in [`PROFESSIONALIZATION_PLAN.md`](./PROFESSIONALIZATION_PLAN.md). It tracks repository hygiene, CI, UI foundation, functional quality gates, product polish, and production readiness.
+## Notas de arquitectura
 
-Current quality gate:
+### Sin `middleware.ts`
+No se usa middleware de Next.js. La protección de rutas está en los layouts de cada grupo:
+- `app/(teacher)/layout.tsx` — requiere rol `TEACHER` o `ADMIN`
+- `app/(student)/layout.tsx` — requiere sesión activa
+- `app/(parent)/layout.tsx` — requiere rol `PARENT`
+- Cada layout también verifica `validationStatus=APPROVED`
 
-```bash
-npm run quality
+Esto evita incompatibilidades del Edge Runtime con `better-sqlite3` y NextAuth en Node.js 24.
+
+### `serverExternalPackages`
+`next.config.ts` excluye del bundling de Turbopack los paquetes nativos:
+```ts
+serverExternalPackages: ["better-sqlite3", "@prisma/adapter-better-sqlite3", "@prisma/client", "bcryptjs"]
 ```
+Sin esto, el servidor cae silenciosamente al recibir la primera request.
+
+### Cliente Prisma 7
+El cliente generado vive en `app/generated/prisma/` (configurado en `schema.prisma`). Usa el nuevo generador `provider = "prisma-client"` (TypeScript nativo, sin binario de engine). El singleton en `lib/prisma.ts` usa `@prisma/adapter-better-sqlite3` como driver adapter.
+
+### Renderizado dinámico
+Todos los layouts con auth tienen `export const dynamic = "force-dynamic"` para garantizar comprobación de sesión en cada request (sin caché estática).
+
+### Sesión JWT
+NextAuth usa estrategia JWT (sin tabla de sesiones en DB). El token contiene `{ id, email, role, validationStatus }` y se almacena en cookie httpOnly.
