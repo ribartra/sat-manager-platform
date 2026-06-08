@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import crypto from "crypto";
+import { absoluteAppUrl, sendPasswordResetEmail } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   const { email } = await req.json();
@@ -16,9 +17,8 @@ export async function POST(req: NextRequest) {
     data: { userId: user.id, token, expiresAt },
   });
 
-  // In production: send email with the token
-  // For now, log it so it can be used in dev
-  console.log(`[RESET] Token for ${email}: /auth/reset-password?token=${token}`);
+  const resetUrl = absoluteAppUrl(`/auth/reset-password?token=${token}`);
+  await sendPasswordResetEmail(email, user.name, resetUrl);
 
   return NextResponse.json({ ok: true });
 }

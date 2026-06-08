@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
+import { absoluteAppUrl, sendParentConsentEmail, sendStudentInviteEmail } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
@@ -46,9 +47,12 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  const inviteUrl = `/auth/activate?token=${token}`;
-  const parentConsentUrl = parentConsentToken ? `/auth/parent-consent?token=${parentConsentToken}` : null;
-  console.log(`[INVITE] ${email}: ${inviteUrl}`);
-  if (parentConsentUrl) console.log(`[PARENT CONSENT] ${parentEmail}: ${parentConsentUrl}`);
+  const inviteUrl = absoluteAppUrl(`/auth/activate?token=${token}`);
+  const parentConsentUrl = parentConsentToken ? absoluteAppUrl(`/auth/parent-consent?token=${parentConsentToken}`) : null;
+  await sendStudentInviteEmail(email, name, inviteUrl);
+  if (parentConsentUrl && parentEmail) {
+    await sendParentConsentEmail(parentEmail, parentName || null, name, parentConsentUrl);
+  }
+
   return NextResponse.json({ ok: true, inviteUrl, parentConsentUrl });
 }
