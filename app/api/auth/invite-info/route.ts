@@ -11,12 +11,13 @@ export async function GET(req: NextRequest) {
   }
 
   return NextResponse.json({
+    role: invite.role,
     name: invite.name,
     email: invite.email,
     phone: invite.phone,
     startDate: invite.startDate?.toISOString().slice(0, 10) ?? null,
     programName: invite.program?.name ?? null,
-    requiresParentConsent: Boolean(invite.parentEmail),
+    requiresParentConsent: !invite.isMinor && Boolean(invite.parentEmail),
     parentConsentApproved: Boolean(invite.parentConsentAt),
   });
 }

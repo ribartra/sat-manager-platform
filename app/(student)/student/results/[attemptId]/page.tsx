@@ -1,11 +1,13 @@
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { formatDate, formatTime, scorePercent } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { MathContent } from "@/components/math-content";
+import { QuestionMedia } from "@/components/question-media";
 import { CheckCircle, XCircle, MinusCircle, ChevronLeft, RotateCcw } from "lucide-react";
+import { parseSnapshot, PracticeSetSnapshot, QuestionSnapshot } from "@/lib/attempt-snapshots";
 
 interface PageProps {
   params: Promise<{ attemptId: string }>;
@@ -14,7 +16,8 @@ interface PageProps {
 export default async function ResultsPage({ params }: PageProps) {
   const { attemptId } = await params;
   const session = await auth();
-  const userId = session!.user.id;
+  if (!session) redirect("/login");
+  const userId = session.user.id;
 
   const attempt = await prisma.attempt.findFirst({
     where: { id: attemptId, studentId: userId, status: "SUBMITTED" },
@@ -40,25 +43,32 @@ export default async function ResultsPage({ params }: PageProps) {
   if (!attempt) notFound();
 
   const practiceSet = attempt.assignment?.practiceSet;
+  const practiceSetSnapshot = parseSnapshot<PracticeSetSnapshot>(attempt.practiceSetSnapshot);
   const psQuestions = await prisma.practiceSetQuestion.findMany({
     where: { practiceSetId: attempt.practiceSetId },
     orderBy: { order: "asc" },
   });
 
-  const totalQuestions = psQuestions.length;
+  const snapshotQuestionOrder = practiceSetSnapshot?.questions?.map((question) => question.id) ?? [];
+  const totalQuestions = snapshotQuestionOrder.length || psQuestions.length;
   const correct = attempt.answers.filter((a) => a.isCorrect).length;
   const incorrect = attempt.answers.filter((a) => !a.isCorrect && a.answer !== null).length;
   const unanswered = totalQuestions - correct - incorrect;
   const pct = scorePercent(correct, totalQuestions);
 
-  // Check if explanations are visible
-  const psDetail = await prisma.practiceSet.findUnique({ where: { id: attempt.practiceSetId } });
-  const showExplanations = psDetail?.explanationVisibility !== "HIDDEN";
+  const explanationVisibility =
+    practiceSetSnapshot?.explanationVisibility ?? practiceSet?.explanationVisibility ?? "HIDDEN";
+  const canRevealSolutions =
+    explanationVisibility === "IMMEDIATE" ||
+    (explanationVisibility === "AFTER_FINISH" && attempt.status === "SUBMITTED");
 
   const answersMap: Record<string, typeof attempt.answers[0]> = {};
   attempt.answers.forEach((a) => { answersMap[a.questionId] = a; });
 
-  const orderedAnswers = psQuestions.map((psq) => answersMap[psq.questionId]).filter(Boolean);
+  const orderedQuestionIds = snapshotQuestionOrder.length
+    ? snapshotQuestionOrder
+    : psQuestions.map((psq) => psq.questionId);
+  const orderedAnswers = orderedQuestionIds.map((questionId) => answersMap[questionId]).filter(Boolean);
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
@@ -72,7 +82,7 @@ export default async function ResultsPage({ params }: PageProps) {
       {/* Score header */}
       <div className="rounded-xl border border-gray-200 bg-white p-6 mb-6">
         <h1 className="text-lg font-semibold text-gray-900 mb-1">
-          {practiceSet?.name ?? "Practice Set"}
+          {practiceSetSnapshot?.name ?? practiceSet?.name ?? "Practice Set"}
         </h1>
         <p className="text-xs text-gray-400 mb-4">
           Attempt #{attempt.attemptNumber} · {attempt.submittedAt ? formatDate(attempt.submittedAt) : ""}
@@ -105,7 +115,7 @@ export default async function ResultsPage({ params }: PageProps) {
 
         <div className="mt-5 flex items-center gap-3">
           <Link
-            href={`/student/practice/${attempt.practiceSetId}${attempt.assignmentId ? `?assignmentId=${attempt.assignmentId}` : ""}`}
+            href={attempt.assignmentId ? `/student/practice/assignment/${attempt.assignmentId}` : "/student/practice-sets"}
             className="flex items-center gap-1.5 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
           >
             <RotateCcw size={14} /> Try Again
@@ -127,27 +137,45 @@ export default async function ResultsPage({ params }: PageProps) {
       )}
 
       {/* Per-question review */}
-      {showExplanations && (
-        <div>
-          <h2 className="text-base font-semibold text-gray-900 mb-3">Question Review</h2>
-          <div className="space-y-4">
-            {orderedAnswers.map((ans, i) => {
-              if (!ans) return null;
-              const { question } = ans;
-              const isUnanswered = !ans.answer;
-              const isCorrect = ans.isCorrect;
+      <div>
+        <h2 className="text-base font-semibold text-gray-900 mb-3">Question Review</h2>
+        {!canRevealSolutions && (
+          <p className="mb-3 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-500">
+            Correct answers and explanations are hidden for this Practice Set.
+          </p>
+        )}
+        <div className="space-y-4">
+          {orderedAnswers.map((ans, i) => {
+            if (!ans) return null;
+            const snapshot = parseSnapshot<QuestionSnapshot>(ans.questionSnapshot);
+            const question = snapshot ?? ans.question;
+            const options = snapshot?.options ?? ans.question.options;
+            const topicName = snapshot?.topic?.name ?? ans.question.topic.name;
+            const isUnanswered = !ans.answer;
+            const isCorrect = ans.isCorrect;
+            const statusClass = !canRevealSolutions
+              ? isUnanswered
+                ? "border-gray-200 bg-gray-50"
+                : "border-blue-100 bg-blue-50"
+              : isCorrect
+              ? "border-green-200 bg-green-50"
+              : isUnanswered
+              ? "border-gray-200 bg-gray-50"
+              : "border-red-200 bg-red-50";
 
-              return (
-                <div key={ans.id} className={`rounded-lg border p-4 ${isCorrect ? "border-green-200 bg-green-50" : isUnanswered ? "border-gray-200 bg-gray-50" : "border-red-200 bg-red-50"}`}>
+            return (
+              <div key={ans.id} className={`rounded-lg border p-4 ${statusClass}`}>
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium text-gray-500">Q{i + 1}</span>
                       {isUnanswered ? (
                         <MinusCircle size={16} className="text-gray-400" />
-                      ) : isCorrect ? (
+                      ) : canRevealSolutions && isCorrect ? (
                         <CheckCircle size={16} className="text-green-600" />
-                      ) : (
+                      ) : canRevealSolutions ? (
                         <XCircle size={16} className="text-red-500" />
+                      ) : (
+                        <span className="h-4 w-4 rounded-full border border-blue-300 bg-white" />
                       )}
                     </div>
                     <div className="flex items-center gap-2">
@@ -157,19 +185,27 @@ export default async function ResultsPage({ params }: PageProps) {
                       {ans.timeSpent !== null && (
                         <span className="text-xs text-gray-500">{formatTime(ans.timeSpent)}</span>
                       )}
-                      <span className="text-xs text-gray-500">{question.topic.name}</span>
+                      <span className="text-xs text-gray-500">{topicName}</span>
                     </div>
                   </div>
 
                   <MathContent content={question.stem} className="text-sm text-gray-800 mb-3" />
+                  <QuestionMedia imageUrl={question.imageUrl} alt={`Question ${i + 1} image`} className="mb-3" />
 
                   {question.type === "MC" && (
                     <div className="space-y-1 mb-3">
-                      {question.options.map((opt) => {
+                      {options.map((opt) => {
                         const studentPick = ans.answer === opt.label;
-                        const isRight = question.correctAnswer === opt.label;
+                        const isRight = canRevealSolutions && question.correctAnswer === opt.label;
+                        const optionClass = isRight
+                          ? "bg-green-100 text-green-800"
+                          : studentPick && canRevealSolutions
+                          ? "bg-red-100 text-red-700 line-through"
+                          : studentPick
+                          ? "bg-blue-100 text-blue-800"
+                          : "text-gray-600";
                         return (
-                          <div key={opt.label} className={`flex items-center gap-2 text-sm px-2 py-1 rounded ${isRight ? "bg-green-100 text-green-800" : studentPick && !isRight ? "bg-red-100 text-red-700 line-through" : "text-gray-600"}`}>
+                          <div key={opt.label} className={`flex items-center gap-2 text-sm px-2 py-1 rounded ${optionClass}`}>
                             <span className="font-medium w-4">{opt.label})</span>
                             <MathContent content={opt.text} />
                           </div>
@@ -179,7 +215,7 @@ export default async function ResultsPage({ params }: PageProps) {
                   )}
 
                   {isUnanswered && (
-                    <p className="text-xs text-gray-400 italic">Unanswered — no explanation shown</p>
+                    <p className="text-xs text-gray-400 italic">Unanswered - no explanation shown</p>
                   )}
 
                   {(ans.markedForReview || ans.note || ans.eliminatedOptions) && (
@@ -192,7 +228,7 @@ export default async function ResultsPage({ params }: PageProps) {
                     </div>
                   )}
 
-                  {!isUnanswered && question.explanation && (
+                  {canRevealSolutions && !isUnanswered && question.explanation && (
                     <div className="mt-2 pt-2 border-t border-gray-200">
                       <p className="text-xs font-medium text-gray-500 mb-1">Explanation</p>
                       <MathContent content={question.explanation} className="text-sm text-gray-700" />
@@ -200,10 +236,9 @@ export default async function ResultsPage({ params }: PageProps) {
                   )}
                 </div>
               );
-            })}
-          </div>
+          })}
         </div>
-      )}
+      </div>
     </div>
   );
 }

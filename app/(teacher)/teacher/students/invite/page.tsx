@@ -12,11 +12,12 @@ export default function InviteStudentPage() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [startDate, setStartDate] = useState("");
+  const [isMinor, setIsMinor] = useState(false);
   const [parentName, setParentName] = useState("");
   const [parentEmail, setParentEmail] = useState("");
   const [parentPhone, setParentPhone] = useState("");
   const [inviteUrl, setInviteUrl] = useState("");
-  const [parentConsentUrl, setParentConsentUrl] = useState("");
+  const [parentInviteUrl, setParentInviteUrl] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -34,12 +35,12 @@ export default function InviteStudentPage() {
     e.preventDefault();
     setError("");
     setInviteUrl("");
-    setParentConsentUrl("");
+    setParentInviteUrl("");
     setLoading(true);
     const res = await fetch("/api/students/invite", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, phone, startDate, programId, parentName, parentEmail, parentPhone }),
+      body: JSON.stringify({ name, email, phone, startDate, programId, isMinor, parentName, parentEmail, parentPhone }),
     });
     const data = await res.json();
     setLoading(false);
@@ -48,7 +49,7 @@ export default function InviteStudentPage() {
       return;
     }
     setInviteUrl(data.inviteUrl);
-    setParentConsentUrl(data.parentConsentUrl ?? "");
+    setParentInviteUrl(data.parentInviteUrl ?? "");
   }
 
   return (
@@ -90,41 +91,70 @@ export default function InviteStudentPage() {
           <label className="mb-1 block text-sm font-medium text-gray-700">Start date</label>
           <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
         </div>
+
         <div className="border-t border-gray-200 pt-4">
-          <h2 className="mb-3 text-sm font-semibold text-gray-900">Parent / guardian authorization</h2>
-          <div className="space-y-3">
+          <label className="flex items-center gap-2 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={isMinor}
+              onChange={(e) => setIsMinor(e.target.checked)}
+              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <span className="text-sm font-medium text-gray-700">Student is a minor (under 18)</span>
+          </label>
+          <p className="mt-1 text-xs text-gray-500 ml-6">
+            If checked, the parent will also receive an invitation to create their own account.
+          </p>
+        </div>
+
+        {isMinor && (
+          <div className="rounded-md border border-blue-200 bg-blue-50 p-4 space-y-3">
+            <h2 className="text-sm font-semibold text-blue-900">Parent / guardian account</h2>
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">Parent name</label>
               <Input value={parentName} onChange={(e) => setParentName(e.target.value)} />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Parent email</label>
-              <Input type="email" value={parentEmail} onChange={(e) => setParentEmail(e.target.value)} />
+              <label className="mb-1 block text-sm font-medium text-gray-700">
+                Parent email <span className="text-red-500">*</span>
+              </label>
+              <Input
+                type="email"
+                value={parentEmail}
+                onChange={(e) => setParentEmail(e.target.value)}
+                required={isMinor}
+              />
             </div>
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">Parent phone</label>
               <Input value={parentPhone} onChange={(e) => setParentPhone(e.target.value)} />
             </div>
           </div>
-        </div>
+        )}
+
         {error && <p className="text-sm text-red-600">{error}</p>}
         <Button type="submit" disabled={loading}>{loading ? "Creating..." : "Create Invite"}</Button>
       </form>
+
       {inviteUrl && (
-        <div className="mt-5 rounded-lg border border-green-200 bg-green-50 p-4">
-          <p className="text-sm font-medium text-green-900">Invite created</p>
-          {parentConsentUrl && (
-            <>
-              <p className="mt-2 text-xs font-medium text-green-900">Send this authorization link to the parent first:</p>
-              <Link href={parentConsentUrl} className="mt-1 block break-all text-sm text-blue-700 underline">
-                {parentConsentUrl}
+        <div className="mt-5 rounded-lg border border-green-200 bg-green-50 p-4 space-y-4">
+          <p className="text-sm font-semibold text-green-900">Invites created</p>
+
+          <div>
+            <p className="text-xs font-medium text-green-900">Student activation link:</p>
+            <Link href={inviteUrl} className="mt-1 block break-all text-sm text-blue-700 underline">
+              {inviteUrl}
+            </Link>
+          </div>
+
+          {parentInviteUrl && (
+            <div>
+              <p className="text-xs font-medium text-green-900">Parent account creation link:</p>
+              <Link href={parentInviteUrl} className="mt-1 block break-all text-sm text-blue-700 underline">
+                {parentInviteUrl}
               </Link>
-            </>
+            </div>
           )}
-          <p className="mt-3 text-xs font-medium text-green-900">Student activation link:</p>
-          <Link href={inviteUrl} className="mt-2 block break-all text-sm text-blue-700 underline">
-            {inviteUrl}
-          </Link>
         </div>
       )}
     </div>

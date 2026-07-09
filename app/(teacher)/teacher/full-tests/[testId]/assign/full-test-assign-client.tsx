@@ -33,7 +33,7 @@ export function FullTestAssignClient({ testId, students, groups }: { testId: str
         <Select value={groupId} onChange={(e) => setGroupId(e.target.value)}>{groups.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}</Select>
       )}
       <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
-      <Button onClick={assign}>Assign Full Test</Button>
+      <Button onClick={assign}>Assign Exam</Button>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/rbac";
+import { notify } from "@/lib/notify";
 
 interface RouteContext {
   params: Promise<{ teacherId: string }>;
@@ -27,6 +28,19 @@ export async function POST(_req: Request, { params }: RouteContext) {
       targetId: teacherId,
     },
   });
+
+  if (updated.active) {
+    await notify(teacherId, {
+      title: "Account activated",
+      body: "Your teacher account has been activated. You can now access the platform.",
+      href: "/teacher",
+    }).catch(() => {});
+  } else {
+    await notify(teacherId, {
+      title: "Account deactivated",
+      body: "Your teacher account has been deactivated. Contact an administrator for more information.",
+    }).catch(() => {});
+  }
 
   return NextResponse.json({ active: updated.active });
 }

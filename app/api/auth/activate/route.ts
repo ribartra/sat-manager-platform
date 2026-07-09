@@ -10,15 +10,65 @@ export async function POST(req: NextRequest) {
   if (!invite || invite.usedAt || invite.expiresAt < new Date()) {
     return NextResponse.json({ error: "This invitation link is invalid or has expired." }, { status: 400 });
   }
-  if (!invite.programId || !invite.program?.active) {
+
+  const hash = await bcrypt.hash(password, 10);
+
+  // Parent account creation flow
+  if (invite.role === "PARENT") {
+    const existingUser = await prisma.user.findUnique({ where: { email: invite.email } });
+    if (existingUser) {
+      return NextResponse.json({ error: "An account with this email already exists." }, { status: 409 });
+    }
+
+    await prisma.$transaction(async (tx) => {
+      const parent = await tx.user.create({
+        data: {
+          name: invite.name,
+          email: invite.email,
+          phone: invite.phone ?? null,
+          passwordHash: hash,
+          role: "PARENT",
+          active: true,
+          validationStatus: "APPROVED",
+          validationReviewedAt: new Date(),
+        },
+      });
+
+      // Link to student if they already activated their account
+      if (invite.linkedStudentEmail) {
+        const student = await tx.user.findUnique({ where: { email: invite.linkedStudentEmail } });
+        if (student) {
+          await tx.parentStudent.upsert({
+            where: { parentId_studentId: { parentId: parent.id, studentId: student.id } },
+            update: { authorizedAt: new Date() },
+            create: { parentId: parent.id, studentId: student.id, authorizedAt: new Date() },
+          });
+        }
+      }
+
+      await tx.inviteToken.update({ where: { id: invite.id }, data: { usedAt: new Date() } });
+    });
+
+    return NextResponse.json({ ok: true });
+  }
+
+  // Student account creation flow
+  const now = new Date();
+  const programAvailable =
+    invite.program?.active &&
+    invite.program.startDate <= now &&
+    (invite.program.endDate === null || invite.program.endDate > now);
+
+  if (!invite.programId || !programAvailable) {
     return NextResponse.json({ error: "This invitation is not linked to an active program." }, { status: 400 });
   }
-  if (invite.parentEmail && !invite.parentConsentAt) {
+
+  // Old consent-only flow: block if parent consent not yet recorded (non-minor invites with consent token)
+  if (!invite.isMinor && invite.parentEmail && !invite.parentConsentAt) {
     return NextResponse.json({ error: "A parent or guardian must authorize this enrollment before activation." }, { status: 403 });
   }
 
   const programId = invite.programId;
-  const hash = await bcrypt.hash(password, 10);
 
   await prisma.$transaction(async (tx) => {
     const user = await tx.user.create({
@@ -38,10 +88,25 @@ export async function POST(req: NextRequest) {
       data: {
         programId,
         studentId: user.id,
+        status: "APPROVED",
         active: true,
       },
     });
-    if (invite.parentEmail) {
+
+    // Minor flow: link to parent if their account already exists
+    if (invite.isMinor && invite.parentEmail) {
+      const parent = await tx.user.findUnique({ where: { email: invite.parentEmail } });
+      if (parent) {
+        await tx.parentStudent.upsert({
+          where: { parentId_studentId: { parentId: parent.id, studentId: user.id } },
+          update: { authorizedAt: new Date() },
+          create: { parentId: parent.id, studentId: user.id, authorizedAt: new Date() },
+        });
+      }
+    }
+
+    // Old consent-only flow: upsert parent account (no password)
+    if (!invite.isMinor && invite.parentEmail) {
       const parent = await tx.user.upsert({
         where: { email: invite.parentEmail },
         update: {
@@ -68,8 +133,8 @@ export async function POST(req: NextRequest) {
         create: { parentId: parent.id, studentId: user.id, authorizedAt: invite.parentConsentAt },
       });
     }
+
     await tx.inviteToken.update({ where: { id: invite.id }, data: { usedAt: new Date() } });
-    return user;
   });
 
   return NextResponse.json({ ok: true });

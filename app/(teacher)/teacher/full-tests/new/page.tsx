@@ -1,6 +1,15 @@
 import prisma from "@/lib/prisma";
 import { FullTestEditor } from "./full-test-editor-client";
 
+function plainMathLabel(content: string, maxLength: number) {
+  const label = content
+    .replace(/\$\$([\s\S]+?)\$\$/g, "$1")
+    .replace(/\\\[([\s\S]+?)\\\]/g, "$1")
+    .replace(/\$([^$\n]+?)\$/g, "$1")
+    .replace(/\\\(([\s\S]+?)\\\)/g, "$1");
+  return label.length > maxLength ? `${label.slice(0, maxLength)}...` : label;
+}
+
 export default async function NewFullTestPage() {
   const questions = await prisma.question.findMany({
     where: { status: "PUBLISHED" },
@@ -10,11 +19,13 @@ export default async function NewFullTestPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
-      <h1 className="mb-6 text-xl font-semibold text-gray-900">New Full Practice Test</h1>
+      <h1 className="mb-6 text-xl font-semibold text-gray-900">New Exam</h1>
       <FullTestEditor
         questions={questions.map((q) => ({
           id: q.id,
-          label: `${q.topic.domain.section.name === "MATH" ? "MATH" : "RW"} · ${q.difficulty} · ${q.stem.slice(0, 100)}`,
+          label: `${q.topic.domain.section.name === "MATH" ? "MATH" : "RW"} · ${q.difficulty} · ${plainMathLabel(q.stem, 100)}`,
+          stem: q.stem,
+          difficulty: q.difficulty,
           section: q.topic.domain.section.name === "MATH" ? "MATH" : "RW",
         }))}
       />

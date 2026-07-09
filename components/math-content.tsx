@@ -1,35 +1,51 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import katex from "katex";
+import { cn } from "@/lib/utils";
 
 interface MathContentProps {
   content: string;
   className?: string;
 }
 
+const mathTokenPattern = /(\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\$[^$\n]+?\$|\\\([\s\S]+?\\\))/g;
+
+function parseMathToken(token: string) {
+  if (token.startsWith("$$") && token.endsWith("$$")) {
+    return { math: token.slice(2, -2), displayMode: true };
+  }
+  if (token.startsWith("\\[") && token.endsWith("\\]")) {
+    return { math: token.slice(2, -2), displayMode: true };
+  }
+  if (token.startsWith("$") && token.endsWith("$")) {
+    return { math: token.slice(1, -1), displayMode: false };
+  }
+  if (token.startsWith("\\(") && token.endsWith("\\)")) {
+    return { math: token.slice(2, -2), displayMode: false };
+  }
+  return null;
+}
+
 export function MathContent({ content, className }: MathContentProps) {
-  const ref = useRef<HTMLDivElement>(null);
+  const parts = content.split(mathTokenPattern).filter(Boolean);
 
-  useEffect(() => {
-    if (!ref.current) return;
-    const el = ref.current;
+  return (
+    <div className={cn("math-content whitespace-pre-wrap", className)}>
+      {parts.map((part, index) => {
+        const token = parseMathToken(part);
+        if (!token) return <span key={index}>{part}</span>;
 
-    // Replace $...$ with rendered KaTeX inline
-    el.innerHTML = content.replace(/\$([^$]+)\$/g, (_, math) => {
-      try {
-        return katex.renderToString(math, { throwOnError: false, displayMode: false });
-      } catch {
-        return `$${math}$`;
-      }
-    }).replace(/\$\$([^$]+)\$\$/g, (_, math) => {
-      try {
-        return katex.renderToString(math, { throwOnError: false, displayMode: true });
-      } catch {
-        return `$$${math}$$`;
-      }
-    });
-  }, [content]);
-
-  return <div ref={ref} className={className} />;
+        try {
+          const html = katex.renderToString(token.math, {
+            throwOnError: false,
+            displayMode: token.displayMode,
+          });
+          const Tag = token.displayMode ? "div" : "span";
+          return <Tag key={index} dangerouslySetInnerHTML={{ __html: html }} />;
+        } catch {
+          return <span key={index}>{part}</span>;
+        }
+      })}
+    </div>
+  );
 }

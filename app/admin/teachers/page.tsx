@@ -14,8 +14,8 @@ export default async function AdminTeachersPage() {
     orderBy: { name: "asc" },
     include: {
       programTeachingAssignments: {
-        include: { program: { include: { enrollments: { where: { active: true }, select: { studentId: true } } } } },
-        where: { active: true },
+        include: { program: { include: { enrollments: { where: { active: true, status: "APPROVED" }, select: { studentId: true } } } } },
+        where: { endDate: null },
       },
     },
   });

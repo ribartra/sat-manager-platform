@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
+import { teacherProgramEnrollmentScope } from "@/lib/program-scope";
 
 interface RouteContext {
   params: Promise<{ attemptId: string }>;
@@ -13,6 +14,19 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
   }
 
   const { attemptId } = await params;
+  const programScope =
+    session.user.role === "TEACHER"
+      ? teacherProgramEnrollmentScope(session.user.id)
+      : undefined;
+  const attempt = await prisma.attempt.findFirst({
+    where: {
+      id: attemptId,
+      ...(programScope ? { student: { programEnrollments: programScope } } : {}),
+    },
+    select: { id: true },
+  });
+  if (!attempt) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
   const { comment } = await req.json();
   const teacherComment = typeof comment === "string" ? comment.trim() : "";
 

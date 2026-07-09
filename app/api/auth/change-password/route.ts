@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { notify } from "@/lib/notify";
 
 export async function POST(req: NextRequest) {
   const session = await auth();
@@ -20,6 +21,11 @@ export async function POST(req: NextRequest) {
 
   const passwordHash = await bcrypt.hash(newPassword, 10);
   await prisma.user.update({ where: { id: user.id }, data: { passwordHash } });
+
+  await notify(user.id, {
+    title: "Password changed",
+    body: "Your password was updated successfully. If you did not make this change, contact support immediately.",
+  }).catch(() => {});
 
   return NextResponse.json({ ok: true });
 }

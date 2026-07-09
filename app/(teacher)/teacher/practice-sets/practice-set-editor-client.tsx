@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { ArrowDown, ArrowUp, X } from "lucide-react";
+import { MathContent } from "@/components/math-content";
 
 interface TopicInfo {
   id: string;
@@ -34,6 +35,15 @@ interface PracticeSetInitial {
   questionIds?: string[];
 }
 
+function plainMathLabel(content: string, maxLength: number) {
+  const label = content
+    .replace(/\$\$([\s\S]+?)\$\$/g, "$1")
+    .replace(/\\\[([\s\S]+?)\\\]/g, "$1")
+    .replace(/\$([^$\n]+?)\$/g, "$1")
+    .replace(/\\\(([\s\S]+?)\\\)/g, "$1");
+  return label.length > maxLength ? `${label.slice(0, maxLength)}...` : label;
+}
+
 export function PracticeSetEditor({
   topics,
   questions,
@@ -51,6 +61,7 @@ export function PracticeSetEditor({
   const [explanationVisibility, setExplanationVisibility] = useState(initial?.explanationVisibility ?? "AFTER_FINISH");
   const [questionIds, setQuestionIds] = useState<string[]>(initial?.questionIds ?? []);
   const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState<string[]>([]);
 
   const availableQuestions = useMemo(
     () => questions.filter((q) => q.topicId === topicId && !questionIds.includes(q.id)),
@@ -67,11 +78,17 @@ export function PracticeSetEditor({
 
   async function save() {
     setSaving(true);
+    setErrors([]);
     const body = { name, topicId, difficulty, status, explanationVisibility, questionIds };
     const url = initial?.id ? `/api/practice-sets/${initial.id}` : "/api/practice-sets";
     const method = initial?.id ? "PUT" : "POST";
-    await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    const response = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     setSaving(false);
+    if (!response.ok) {
+      const payload = await response.json().catch(() => null);
+      setErrors(Array.isArray(payload?.errors) ? payload.errors : [payload?.error ?? "Unable to save Practice Set."]);
+      return;
+    }
     router.push(`/teacher/content/${topicId}`);
     router.refresh();
   }
@@ -133,7 +150,7 @@ export function PracticeSetEditor({
             <div key={q.id} className="flex items-center gap-3 px-4 py-3">
               <span className="w-6 text-xs font-medium text-gray-400">{index + 1}</span>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-gray-900">{q.stem.replace(/\$[^$]+\$/g, "[math]")}</p>
+                <MathContent content={q.stem} className="line-clamp-2 text-sm font-medium text-gray-900" />
                 <div className="mt-1 flex items-center gap-2">
                   <Badge variant={q.difficulty === "EASY" ? "easy" : q.difficulty === "MEDIUM" ? "medium" : "hard"}>{q.difficulty}</Badge>
                   <Badge variant="default">{q.type}</Badge>
@@ -160,10 +177,23 @@ export function PracticeSetEditor({
           <option value="">Select a published question...</option>
           {availableQuestions.map((q) => (
             <option key={q.id} value={q.id}>
-              {q.difficulty} / {q.type} / {q.stem.slice(0, 90)}
+              {q.difficulty} / {q.type} / {plainMathLabel(q.stem, 90)}
             </option>
           ))}
         </Select>
+      </div>
+
+      <div className="flex items-center gap-3">
+        {errors.length > 0 && (
+          <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+            <p className="font-medium">Fix these issues before saving:</p>
+            <ul className="mt-1 list-disc pl-5">
+              {errors.map((error) => (
+                <li key={error}>{error}</li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
       <div className="flex items-center gap-3">

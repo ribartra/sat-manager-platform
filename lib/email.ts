@@ -108,6 +108,32 @@ export async function sendParentConsentEmail(to: string, parentName: string | nu
   });
 }
 
+export async function sendParentInviteEmail(to: string, parentName: string | null, studentName: string, inviteUrl: string) {
+  const displayName = parentName || "Parent/Guardian";
+  const safeParent = escapeHtml(displayName);
+  const safeStudent = escapeHtml(studentName);
+  const safeUrl = escapeHtml(inviteUrl);
+
+  return sendTransactionalEmail({
+    to,
+    subject: "Create your SAT Practice parent account",
+    text: [
+      `Hello ${displayName},`,
+      "",
+      `${studentName} has been invited to SAT Practice. Create your parent account to follow their progress and approve their enrollment:`,
+      inviteUrl,
+      "",
+      "This link expires in 7 days.",
+    ].join("\n"),
+    html: `
+      <p>Hello ${safeParent},</p>
+      <p>${safeStudent} has been invited to SAT Practice. Create your parent account to follow their progress and approve their enrollment:</p>
+      <p><a href="${safeUrl}">${safeUrl}</a></p>
+      <p>This link expires in 7 days.</p>
+    `,
+  });
+}
+
 export async function sendPasswordResetEmail(to: string, name: string, resetUrl: string) {
   const safeName = escapeHtml(name);
   const safeUrl = escapeHtml(resetUrl);

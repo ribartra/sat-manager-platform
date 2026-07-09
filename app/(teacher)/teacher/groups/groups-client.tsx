@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
-import { Plus, UserMinus, UserPlus } from "lucide-react";
+import { Plus, Tag, UserMinus, UserPlus } from "lucide-react";
 
 interface Member { id: string; name: string; email: string }
 interface Group { id: string; name: string; schedule: string | null; members: Member[] }
@@ -16,6 +16,7 @@ export function GroupsClient({ groups: initialGroups, students }: { groups: Grou
   const [newName, setNewName] = useState("");
   const [newSchedule, setNewSchedule] = useState("");
   const [creating, setCreating] = useState(false);
+  const [showAllAvailable, setShowAllAvailable] = useState<Record<string, boolean>>({});
 
   async function createGroup() {
     if (!newName.trim()) return;
@@ -74,6 +75,10 @@ export function GroupsClient({ groups: initialGroups, students }: { groups: Grou
       {groups.map((group) => {
         const membersSet = new Set(group.members.map((m) => m.id));
         const available = students.filter((s) => !membersSet.has(s.id));
+        const MAX_VISIBLE = 5;
+        const showAll = showAllAvailable[group.id] ?? false;
+        const visibleAvailable = showAll ? available : available.slice(0, MAX_VISIBLE);
+        const hiddenCount = available.length - MAX_VISIBLE;
 
         return (
           <Card key={group.id}>
@@ -109,7 +114,7 @@ export function GroupsClient({ groups: initialGroups, students }: { groups: Grou
                 <div className="border-t border-gray-100 pt-3">
                   <p className="text-xs font-medium text-gray-500 mb-2">Add student</p>
                   <div className="flex flex-wrap gap-2">
-                    {available.map((s) => (
+                    {visibleAvailable.map((s) => (
                       <button
                         key={s.id}
                         onClick={() => addMember(group.id, s.id)}
@@ -118,6 +123,14 @@ export function GroupsClient({ groups: initialGroups, students }: { groups: Grou
                         <UserPlus size={10} /> {s.name}
                       </button>
                     ))}
+                    {!showAll && hiddenCount > 0 && (
+                      <button
+                        onClick={() => setShowAllAvailable((prev) => ({ ...prev, [group.id]: true }))}
+                        className="flex items-center gap-1 text-xs rounded-full border border-dashed border-gray-300 px-3 py-1 text-gray-500 hover:bg-gray-50 transition-colors"
+                      >
+                        <Tag size={10} /> View all ({hiddenCount} more)
+                      </button>
+                    )}
                   </div>
                 </div>
               )}

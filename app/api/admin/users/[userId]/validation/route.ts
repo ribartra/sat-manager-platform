@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/rbac";
+import { notify } from "@/lib/notify";
 
 interface RouteContext {
   params: Promise<{ userId: string }>;
@@ -22,7 +23,10 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     return NextResponse.json({ error: "Administrators cannot revoke their own validation." }, { status: 400 });
   }
 
-  const target = await prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
+  const target = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, name: true, role: true },
+  });
   if (!target) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
   const reviewed = validationStatus !== "PENDING";
@@ -44,6 +48,19 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       targetId: userId,
     },
   });
+
+  if (validationStatus === "APPROVED") {
+    await notify(userId, {
+      title: "Account approved",
+      body: "Your account has been approved. You can now access the platform.",
+      href: "/login",
+    }).catch(() => {});
+  } else if (validationStatus === "REJECTED") {
+    await notify(userId, {
+      title: "Account not approved",
+      body: "Your account registration could not be approved. Contact support if you have questions.",
+    }).catch(() => {});
+  }
 
   return NextResponse.json(updated);
 }

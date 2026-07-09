@@ -4,25 +4,46 @@ import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { MathContent } from "@/components/math-content";
 
 const template = `topicId,difficulty,type,status,stem,correctAnswer,optionA,optionB,optionC,optionD,stimulus,explanation
 TOPIC_ID,EASY,MC,DRAFT,Which value satisfies 2x+6=14?,C,x=2,x=3,x=4,x=5,,Subtract 6 then divide by 2.`;
 
-function parseRows(csv: string) {
-  const lines = csv.split(/\r?\n/).filter((line) => line.trim());
-  const [headersLine, ...rows] = lines;
-  const headers = headersLine.split(",").map((h) => h.trim());
-  return rows.map((row) => {
-    const values = row.split(",").map((v) => v.trim());
-    return Object.fromEntries(headers.map((h, i) => [h, values[i] ?? ""]));
-  });
+interface PreviewRow {
+  rowNumber: number;
+  topicId: string;
+  stem: string;
+  type: string;
+  status: string;
+  valid: boolean;
+  errors: string[];
 }
 
 export function BulkImportClient({ topics }: { topics: { id: string; label: string }[] }) {
   const [csv, setCsv] = useState(template);
   const [loading, setLoading] = useState(false);
+  const [previewLoading, setPreviewLoading] = useState(false);
   const [result, setResult] = useState<{ created: number; errors: string[] } | null>(null);
-  const [preview, setPreview] = useState<Record<string, string>[]>([]);
+  const [preview, setPreview] = useState<{
+    totalRows: number;
+    validRows: number;
+    invalidRows: number;
+    rows: PreviewRow[];
+  } | null>(null);
+  const [previewSource, setPreviewSource] = useState("");
+
+  async function previewAndValidate() {
+    setPreviewLoading(true);
+    setResult(null);
+    const res = await fetch("/api/admin/import", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ csv, dryRun: true }),
+    });
+    setPreview(await res.json());
+    setPreviewSource(csv);
+    setPreviewLoading(false);
+  }
 
   async function submit() {
     setLoading(true);
@@ -40,21 +61,38 @@ export function BulkImportClient({ topics }: { topics: { id: string; label: stri
       <div className="col-span-2 space-y-4">
         <Textarea value={csv} onChange={(e) => setCsv(e.target.value)} rows={14} className="font-mono text-xs" />
         <div className="flex items-center gap-3">
-          <Button variant="secondary" onClick={() => setPreview(parseRows(csv))}>Preview & Validate</Button>
-          <Button onClick={submit} disabled={loading || preview.length === 0}>{loading ? "Importing..." : "Import Previewed Rows"}</Button>
+          <Button variant="secondary" onClick={previewAndValidate} disabled={previewLoading}>
+            {previewLoading ? "Validating..." : "Preview & Validate"}
+          </Button>
+          <Button onClick={submit} disabled={loading || !preview || previewSource !== csv}>
+            {loading ? "Importing..." : "Import Previewed Rows"}
+          </Button>
           <Link href="/teacher/questions" className="text-sm text-blue-600 hover:underline">Back to Question Bank</Link>
         </div>
-        {preview.length > 0 && (
+        {preview && (
           <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
+            <div className="border-b border-gray-100 px-3 py-2 text-xs text-gray-600">
+              Rows: {preview.totalRows} · Valid: {preview.validRows} · Invalid: {preview.invalidRows}
+            </div>
             <table className="w-full text-xs">
-              <thead><tr className="bg-gray-50"><th className="px-3 py-2 text-left">Topic ID</th><th className="px-3 py-2 text-left">Stem</th><th className="px-3 py-2 text-left">Type</th><th className="px-3 py-2 text-left">Status</th></tr></thead>
+              <thead><tr className="bg-gray-50"><th className="px-3 py-2 text-left">Row</th><th className="px-3 py-2 text-left">Topic ID</th><th className="px-3 py-2 text-left">Stem</th><th className="px-3 py-2 text-left">Type</th><th className="px-3 py-2 text-left">Status</th><th className="px-3 py-2 text-left">Validation</th></tr></thead>
               <tbody>
-                {preview.map((row, index) => (
-                  <tr key={index} className="border-t border-gray-100">
+                {preview.rows.map((row) => (
+                  <tr key={row.rowNumber} className="border-t border-gray-100">
+                    <td className="px-3 py-2 font-mono text-gray-500">{row.rowNumber}</td>
                     <td className="px-3 py-2 font-mono text-gray-500">{row.topicId}</td>
-                    <td className="px-3 py-2 text-gray-800">{row.stem}</td>
+                    <td className="px-3 py-2 text-gray-800">
+                      <MathContent content={row.stem} className="line-clamp-2" />
+                    </td>
                     <td className="px-3 py-2">{row.type}</td>
                     <td className="px-3 py-2">{row.status}</td>
+                    <td className="px-3 py-2">
+                      {row.valid ? (
+                        <span className="text-green-700">OK</span>
+                      ) : (
+                        <span className="text-red-600">{row.errors.join(" ")}</span>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>

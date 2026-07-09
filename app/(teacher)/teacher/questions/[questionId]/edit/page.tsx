@@ -35,6 +35,8 @@ export default async function EditQuestionPage({ params }: PageProps) {
           stem: question.stem,
           stimulus: question.stimulus ?? "",
           explanation: question.explanation ?? "",
+          imageUrl: question.imageUrl ?? "",
+          supportsGraph: question.supportsGraph,
           correctAnswer: question.correctAnswer,
           status: question.status,
           options: question.options.map((o) => ({ label: o.label, text: o.text })),

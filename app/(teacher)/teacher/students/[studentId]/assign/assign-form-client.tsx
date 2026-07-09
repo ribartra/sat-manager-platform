@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { Tag } from "lucide-react";
 
 interface PracticeSetInfo {
   id: string;
@@ -18,10 +19,15 @@ interface PracticeSetInfo {
   alreadyAssigned: boolean;
 }
 
+interface GroupMember {
+  id: string;
+  name: string;
+}
+
 interface GroupInfo {
   id: string;
   name: string;
-  memberIds: string[];
+  members: GroupMember[];
 }
 
 interface AssignFormProps {
@@ -42,6 +48,7 @@ export function AssignForm({ studentId, practiceSets, groups }: AssignFormProps)
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [showAllMembers, setShowAllMembers] = useState(false);
 
   const filtered = practiceSets.filter((ps) =>
     !search ||
@@ -64,7 +71,7 @@ export function AssignForm({ studentId, practiceSets, groups }: AssignFormProps)
   async function handleAssign() {
     if (selected.size === 0) return;
     const group = groups.find((g) => g.id === groupId);
-    const studentIds = target === "group" ? group?.memberIds ?? [] : [studentId];
+    const studentIds = target === "group" ? group?.members.map((m) => m.id) ?? [] : [studentId];
     if (studentIds.length === 0) return;
     setLoading(true);
     await fetch("/api/assignments", {
@@ -88,25 +95,50 @@ export function AssignForm({ studentId, practiceSets, groups }: AssignFormProps)
     <div className="space-y-6">
       <div className="rounded-lg border border-gray-200 bg-white p-4">
         <label className="mb-2 block text-sm font-medium text-gray-700">Assign to</label>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 flex-wrap">
           <label className="flex items-center gap-2 text-sm text-gray-700">
             <input type="radio" checked={target === "student"} onChange={() => setTarget("student")} />
             This student
           </label>
           <label className="flex items-center gap-2 text-sm text-gray-700">
-            <input type="radio" checked={target === "group"} onChange={() => setTarget("group")} disabled={groups.length === 0} />
+            <input type="radio" checked={target === "group"} onChange={() => { setTarget("group"); setShowAllMembers(false); }} disabled={groups.length === 0} />
             Group
           </label>
           {target === "group" && (
-            <Select value={groupId} onChange={(e) => setGroupId(e.target.value)} className="max-w-xs">
+            <Select value={groupId} onChange={(e) => { setGroupId(e.target.value); setShowAllMembers(false); }} className="max-w-xs">
               {groups.map((g) => (
                 <option key={g.id} value={g.id}>
-                  {g.name} ({g.memberIds.length} students)
+                  {g.name} ({g.members.length} students)
                 </option>
               ))}
             </Select>
           )}
         </div>
+        {target === "group" && (() => {
+          const group = groups.find((g) => g.id === groupId);
+          if (!group || group.members.length === 0) return <p className="mt-2 text-xs text-gray-400">This group has no members yet.</p>;
+          const MAX = 5;
+          const visible = showAllMembers ? group.members : group.members.slice(0, MAX);
+          const hiddenCount = group.members.length - MAX;
+          return (
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {visible.map((m) => (
+                <span key={m.id} className="inline-flex items-center text-xs bg-blue-50 text-blue-700 border border-blue-200 rounded-full px-2.5 py-0.5">
+                  {m.name}
+                </span>
+              ))}
+              {!showAllMembers && hiddenCount > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setShowAllMembers(true)}
+                  className="inline-flex items-center gap-1 text-xs bg-gray-100 text-gray-600 border border-gray-200 rounded-full px-2.5 py-0.5 hover:bg-gray-200 transition-colors"
+                >
+                  <Tag size={10} /> View all ({hiddenCount} more)
+                </button>
+              )}
+            </div>
+          );
+        })()}
       </div>
 
       {/* Practice set selector */}

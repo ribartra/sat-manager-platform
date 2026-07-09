@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardBody } from "@/components/ui/card";
 import { ChevronLeft, Eye } from "lucide-react";
 import { StudentDetailActions } from "./actions-client";
+import { refreshAssignmentStates } from "@/lib/assignments";
 
 interface PageProps {
   params: Promise<{ studentId: string }>;
@@ -15,15 +16,19 @@ interface PageProps {
 export default async function StudentDetailPage({ params }: PageProps) {
   const { studentId } = await params;
   const session = await auth();
+  const now = new Date();
+  await refreshAssignmentStates(now);
   const programScope =
     session?.user.role === "TEACHER"
       ? {
           some: {
+            status: "APPROVED",
             active: true,
             program: {
-              teachers: { some: { teacherId: session.user.id, active: true, teacher: { active: true } } },
+              teachers: { some: { teacherId: session.user.id, endDate: null, teacher: { active: true } } },
               active: true,
-              OR: [{ contractEndsAt: null }, { contractEndsAt: { gt: new Date() } }],
+              startDate: { lte: now },
+              OR: [{ endDate: null }, { endDate: { gt: now } }],
             },
           },
         }
@@ -33,7 +38,7 @@ export default async function StudentDetailPage({ params }: PageProps) {
     where: { id: studentId, role: "STUDENT", ...(programScope ? { programEnrollments: programScope } : {}) },
     include: {
       groups: { include: { group: true } },
-      programEnrollments: { include: { program: true }, where: { active: true } },
+      programEnrollments: { include: { program: true }, where: { active: true, status: "APPROVED" } },
     },
   });
 
@@ -53,7 +58,7 @@ export default async function StudentDetailPage({ params }: PageProps) {
   });
 
   const assignments = await prisma.assignment.findMany({
-    where: { studentId, status: { in: ["PENDING", "IN_PROGRESS"] } },
+    where: { studentId, status: { in: ["PENDING", "IN_PROGRESS", "OVERDUE"] } },
     include: { practiceSet: { include: { topic: true } } },
     orderBy: { createdAt: "desc" },
   });

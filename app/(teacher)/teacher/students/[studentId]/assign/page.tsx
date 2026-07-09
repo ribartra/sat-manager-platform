@@ -12,15 +12,18 @@ interface PageProps {
 export default async function AssignPage({ params }: PageProps) {
   const { studentId } = await params;
   const session = await auth();
+  const now = new Date();
   const programScope =
     session?.user.role === "TEACHER"
       ? {
           some: {
+            status: "APPROVED",
             active: true,
             program: {
-              teachers: { some: { teacherId: session.user.id, active: true, teacher: { active: true } } },
+              teachers: { some: { teacherId: session.user.id, endDate: null, teacher: { active: true } } },
               active: true,
-              OR: [{ contractEndsAt: null }, { contractEndsAt: { gt: new Date() } }],
+              startDate: { lte: now },
+              OR: [{ endDate: null }, { endDate: { gt: now } }],
             },
           },
         }
@@ -47,7 +50,7 @@ export default async function AssignPage({ params }: PageProps) {
   const assignedIds = new Set(existing.map((a) => a.practiceSetId));
 
   const groups = await prisma.group.findMany({
-    include: { members: { select: { userId: true } } },
+    include: { members: { include: { user: { select: { name: true } } } } },
   });
 
   return (
@@ -78,7 +81,7 @@ export default async function AssignPage({ params }: PageProps) {
         groups={groups.map((g) => ({
           id: g.id,
           name: g.name,
-          memberIds: g.members.map((m) => m.userId),
+          members: g.members.map((m) => ({ id: m.userId, name: m.user.name })),
         }))}
       />
     </div>

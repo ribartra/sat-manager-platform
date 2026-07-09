@@ -11,10 +11,13 @@ export default async function FullTestsPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-gray-900">Full Practice Tests</h1>
+        <div>
+          <h1 className="text-xl font-semibold text-gray-900">Exams</h1>
+          <p className="mt-1 text-sm text-gray-500">Full Practice Tests with SAT-style modules and score conversion.</p>
+        </div>
         <div className="flex items-center gap-2">
           <Link href="/teacher/full-tests/scoring" className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Scoring Table</Link>
-          <Link href="/teacher/full-tests/new" className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">New Full Test</Link>
+          <Link href="/teacher/full-tests/new" className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">New Exam</Link>
         </div>
       </div>
       <div className="rounded-lg border border-gray-200 bg-white">
@@ -30,7 +33,7 @@ export default async function FullTestsPage() {
             </div>
           </div>
         ))}
-        {tests.length === 0 && <div className="p-10 text-center text-sm text-gray-400">No full tests yet.</div>}
+        {tests.length === 0 && <div className="p-10 text-center text-sm text-gray-400">No Exams yet.</div>}
       </div>
     </div>
   );

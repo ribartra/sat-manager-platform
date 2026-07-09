@@ -15,10 +15,13 @@ model User {
   passwordHash String?
   role         String    @default("STUDENT") // STUDENT | TEACHER | ADMIN
   startDate    DateTime?
+  avatarUrl    String?
+  birthDate    DateTime?
   active       Boolean   @default(true)
   validationStatus       String    @default("PENDING") // PENDING | APPROVED | REJECTED
   validationReviewedAt   DateTime?
   validationReviewedById String?
+  lastActiveAt DateTime?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
@@ -37,12 +40,14 @@ model User {
 }
 
 model Program {
-  id             String    @id @default(cuid())
-  name           String
-  contractEndsAt DateTime?
-  active         Boolean   @default(true)
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id        String    @id @default(cuid())
+  name      String
+  startDate DateTime  @default(now())
+  endDate   DateTime?
+  active    Boolean   @default(true)
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   teachers    ProgramTeacher[]
   enrollments ProgramEnrollment[]
@@ -50,10 +55,10 @@ model Program {
 }
 
 model ProgramTeacher {
-  programId  String
-  teacherId  String
-  assignedAt DateTime @default(now())
-  active     Boolean  @default(true)
+  programId String
+  teacherId String
+  startDate DateTime  @default(now())
+  endDate   DateTime?
 
   program Program @relation(fields: [programId], references: [id], onDelete: Cascade)
   teacher User    @relation(fields: [teacherId], references: [id], onDelete: Cascade)
@@ -65,7 +70,10 @@ model ProgramEnrollment {
   programId  String
   studentId  String
   enrolledAt DateTime @default(now())
+  status     String   @default("APPROVED") // PENDING | APPROVED | REJECTED
   active     Boolean  @default(true)
+  parentApprovalStatus  String?    // null = not required | PENDING | APPROVED | REJECTED
+  parentApprovedAt      DateTime?
 
   program Program @relation(fields: [programId], references: [id], onDelete: Cascade)
   student User    @relation(fields: [studentId], references: [id], onDelete: Cascade)
@@ -135,6 +143,7 @@ model Question {
   subskillId    String?
   status        String   @default("DRAFT") // DRAFT | PUBLISHED | ARCHIVED
   imageUrl      String?
+  supportsGraph Boolean  @default(false)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -200,6 +209,7 @@ model Attempt {
   assignmentId    String?
   studentId       String
   practiceSetId   String
+  practiceSetSnapshot String?
   attemptNumber   Int       @default(1)
   startedAt       DateTime  @default(now())
   submittedAt     DateTime?
@@ -217,6 +227,7 @@ model AttemptAnswer {
   id              String  @id @default(cuid())
   attemptId       String
   questionId      String
+  questionSnapshot String?
   answer          String?
   isCorrect       Boolean?
   timeSpent       Int?
@@ -231,15 +242,18 @@ model AttemptAnswer {
 
 model InviteToken {
   id        String    @id @default(cuid())
+  role      String    @default("STUDENT") // STUDENT | PARENT
   email     String
   name      String
   phone     String?
   startDate DateTime?
   invitedById String?
   programId String?
+  isMinor   Boolean   @default(false)
   parentName String?
   parentEmail String?
   parentPhone String?
+  linkedStudentEmail String? // parent token: student email to link after activation
   parentConsentToken String? @unique
   parentConsentAt DateTime?
   parentConsentIp String?
@@ -356,6 +370,7 @@ model FullPracticeTestAttempt {
   status         String    @default("IN_PROGRESS")
   currentModule  Int       @default(0)
   currentQuestion Int      @default(0)
+  moduleTimerState String?
   rwScore        Int?
   mathScore      Int?
   totalScore     Int?

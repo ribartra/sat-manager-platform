@@ -3,16 +3,20 @@ import { PrismaClient } from "@/app/generated/prisma/client";
 
 type PrismaClientType = InstanceType<typeof PrismaClient>;
 
-const globalForPrisma = globalThis as unknown as { prisma: PrismaClientType };
-
 function createPrisma(): PrismaClientType {
   const url = process.env.DATABASE_URL ?? "file:./dev.db";
   const adapter = new PrismaBetterSqlite3({ url });
   return new PrismaClient({ adapter } as never);
 }
 
-export const prisma: PrismaClientType = globalForPrisma.prisma ?? createPrisma();
+// In production: singleton to avoid exhausting the connection pool.
+// In development: always fresh so HMR never serves a stale generated client
+// after `prisma generate` (SQLite handles multiple connections fine).
+const globalForPrisma = globalThis as unknown as { prisma?: PrismaClientType };
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+export const prisma: PrismaClientType =
+  process.env.NODE_ENV === "production"
+    ? (globalForPrisma.prisma ??= createPrisma())
+    : createPrisma();
 
 export default prisma;

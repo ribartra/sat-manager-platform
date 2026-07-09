@@ -3,9 +3,13 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { MathContent } from "@/components/math-content";
+import { QuestionMedia } from "@/components/question-media";
 import { formatDate, formatTime, scorePercent } from "@/lib/utils";
 import { ChevronLeft } from "lucide-react";
 import { AttemptActions } from "./attempt-actions-client";
+import { parseSnapshot, PracticeSetSnapshot, QuestionSnapshot } from "@/lib/attempt-snapshots";
+import { auth } from "@/lib/auth";
+import { teacherProgramEnrollmentScope } from "@/lib/program-scope";
 
 interface PageProps {
   params: Promise<{ studentId: string; attemptId: string }>;
@@ -13,8 +17,18 @@ interface PageProps {
 
 export default async function TeacherAttemptDetailPage({ params }: PageProps) {
   const { studentId, attemptId } = await params;
+  const session = await auth();
+  const programScope =
+    session?.user.role === "TEACHER"
+      ? teacherProgramEnrollmentScope(session.user.id)
+      : undefined;
+
   const attempt = await prisma.attempt.findFirst({
-    where: { id: attemptId, studentId },
+    where: {
+      id: attemptId,
+      studentId,
+      ...(programScope ? { student: { programEnrollments: programScope } } : {}),
+    },
     include: {
       student: true,
       answers: { include: { question: { include: { topic: true } } } },
@@ -23,6 +37,7 @@ export default async function TeacherAttemptDetailPage({ params }: PageProps) {
   });
 
   if (!attempt) notFound();
+  const practiceSetSnapshot = parseSnapshot<PracticeSetSnapshot>(attempt.practiceSetSnapshot);
 
   const psQuestions = await prisma.practiceSetQuestion.findMany({
     where: { practiceSetId: attempt.practiceSetId },
@@ -30,8 +45,12 @@ export default async function TeacherAttemptDetailPage({ params }: PageProps) {
     orderBy: { order: "asc" },
   });
   const answersByQuestion = new Map(attempt.answers.map((a) => [a.questionId, a]));
+  const orderedQuestionIds = practiceSetSnapshot?.questions?.length
+    ? practiceSetSnapshot.questions.map((question) => question.id)
+    : psQuestions.map((item) => item.questionId);
+  const liveQuestionsById = new Map(psQuestions.map((item) => [item.questionId, item]));
   const correct = attempt.answers.filter((a) => a.isCorrect).length;
-  const total = psQuestions.length;
+  const total = orderedQuestionIds.length;
   const pct = scorePercent(correct, total);
 
   return (
@@ -41,7 +60,7 @@ export default async function TeacherAttemptDetailPage({ params }: PageProps) {
           <ChevronLeft size={14} /> {attempt.student.name}
         </Link>
         <span>/</span>
-        <span className="font-medium text-gray-900">{attempt.assignment?.practiceSet.name ?? "Practice Set"}</span>
+        <span className="font-medium text-gray-900">{practiceSetSnapshot?.name ?? attempt.assignment?.practiceSet.name ?? "Practice Set"}</span>
       </div>
 
       <div className="mb-6 flex items-start justify-between rounded-lg border border-gray-200 bg-white p-5">
@@ -81,19 +100,25 @@ export default async function TeacherAttemptDetailPage({ params }: PageProps) {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {psQuestions.map((item, index) => {
-              const ans = answersByQuestion.get(item.questionId);
+            {orderedQuestionIds.map((questionId, index) => {
+              const item = liveQuestionsById.get(questionId);
+              const ans = answersByQuestion.get(questionId);
+              const snapshot = parseSnapshot<QuestionSnapshot>(ans?.questionSnapshot);
+              const question = snapshot ?? item?.question;
+              if (!question) return null;
+              const topicName = snapshot?.topic?.name ?? item?.question.topic.name ?? "—";
               return (
-                <tr key={item.questionId}>
+                <tr key={questionId}>
                   <td className="px-4 py-3 text-gray-500">{index + 1}</td>
                   <td className="max-w-md px-4 py-3">
-                    <MathContent content={item.question.stem} className="text-sm text-gray-800" />
-                    <p className="mt-1 text-xs text-gray-400">{item.question.topic.name} · {item.question.difficulty}</p>
+                    <MathContent content={question.stem} className="text-sm text-gray-800" />
+                    <QuestionMedia imageUrl={question.imageUrl} alt={`Question ${index + 1} image`} className="mt-2" />
+                    <p className="mt-1 text-xs text-gray-400">{topicName} · {question.difficulty}</p>
                   </td>
                   <td className="px-4 py-3 text-gray-700">{ans?.answer ?? "Blank"}</td>
                   <td className="px-4 py-3">
                     {ans?.answer ? (
-                      ans.isCorrect ? <span className="text-green-600">Correct</span> : <span className="text-red-600">Wrong ({item.question.correctAnswer})</span>
+                      ans.isCorrect ? <span className="text-green-600">Correct</span> : <span className="text-red-600">Wrong ({question.correctAnswer})</span>
                     ) : (
                       <span className="text-gray-400">Unanswered</span>
                     )}

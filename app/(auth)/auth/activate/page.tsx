@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 interface InviteInfo {
+  role: string;
   name: string;
   email: string;
   phone?: string;
@@ -76,12 +77,20 @@ export default function ActivatePage() {
     );
   }
 
+  const isParent = invite.role === "PARENT";
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="w-full max-w-sm">
         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-          <h1 className="text-lg font-semibold text-gray-900 mb-1">Welcome, {invite.name}!</h1>
-          <p className="text-sm text-gray-500 mb-5">Set a password to activate your account.</p>
+          <h1 className="text-lg font-semibold text-gray-900 mb-1">
+            {isParent ? `Hello, ${invite.name}!` : `Welcome, ${invite.name}!`}
+          </h1>
+          <p className="text-sm text-gray-500 mb-5">
+            {isParent
+              ? "Create your parent account to follow your child's progress and approve their enrollment."
+              : "Set a password to activate your account."}
+          </p>
           {invite.requiresParentConsent && !invite.parentConsentApproved && (
             <div className="mb-5 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
               Parent or guardian authorization is still pending. You can set your password after authorization is recorded.
@@ -98,13 +107,13 @@ export default function ActivatePage() {
                 <Input value={invite.phone} disabled />
               </div>
             )}
-            {invite.startDate && (
+            {!isParent && invite.startDate && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Start date</label>
                 <Input value={invite.startDate} disabled />
               </div>
             )}
-            {invite.programName && (
+            {!isParent && invite.programName && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Program</label>
                 <Input value={invite.programName} disabled />
@@ -131,8 +140,12 @@ export default function ActivatePage() {
               />
             </div>
             {error && <p className="text-sm text-red-600">{error}</p>}
-            <Button type="submit" className="w-full" disabled={loading || (invite.requiresParentConsent && !invite.parentConsentApproved)}>
-              {loading ? "Activating..." : "Activate Account"}
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={loading || (!isParent && invite.requiresParentConsent && !invite.parentConsentApproved)}
+            >
+              {loading ? "Activating..." : isParent ? "Create Account" : "Activate Account"}
             </Button>
           </form>
         </div>

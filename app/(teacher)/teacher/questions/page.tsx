@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { Plus, Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { MathContent } from "@/components/math-content";
 
 interface SearchParams { topic?: string; difficulty?: string; status?: string }
 
@@ -86,7 +87,7 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
             {questions.map((q) => (
               <tr key={q.id} className="hover:bg-gray-50">
                 <td className="px-4 py-3 max-w-xs">
-                  <p className="text-sm text-gray-800 truncate">{q.stem.replace(/\$[^$]+\$/g, "[math]")}</p>
+                  <MathContent content={q.stem} className="line-clamp-2 text-sm text-gray-800" />
                 </td>
                 <td className="px-4 py-3">
                   <p className="text-xs text-gray-500">{q.topic.domain.section.label}</p>

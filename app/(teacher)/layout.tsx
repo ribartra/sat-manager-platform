@@ -9,13 +9,16 @@ export default async function TeacherLayout({ children }: { children: React.Reac
   const session = await auth();
   if (!session) redirect("/login");
   if (!["TEACHER", "ADMIN"].includes(session.user.role)) redirect("/student");
-  const user = await prisma.user.findUnique({ where: { id: session.user.id }, select: { active: true, validationStatus: true } });
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { active: true, validationStatus: true, avatarUrl: true },
+  });
   if (!user?.active) redirect("/login");
   if (user.validationStatus !== "APPROVED") redirect("/auth/pending-validation");
 
   return (
     <div className="min-h-screen flex flex-col">
-      <NavTeacher userName={session.user.name} role={session.user.role} />
+      <NavTeacher userName={session.user.name} avatarUrl={user.avatarUrl} role={session.user.role} />
       <main className="flex-1 bg-gray-50">{children}</main>
     </div>
   );

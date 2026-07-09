@@ -9,12 +9,18 @@ export function AttemptActions({ attemptId, initialComment }: { attemptId: strin
   const router = useRouter();
   const [loading, setLoading] = useState<"reopen" | "invalidate" | null>(null);
   const [comment, setComment] = useState(initialComment ?? "");
+  const [actionReason, setActionReason] = useState("");
   const [savingComment, setSavingComment] = useState(false);
 
   async function run(action: "reopen" | "invalidate") {
     setLoading(action);
-    await fetch(`/api/attempts/${attemptId}/${action}`, { method: "POST" });
+    await fetch(`/api/attempts/${attemptId}/${action}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reason: actionReason }),
+    });
     setLoading(null);
+    setActionReason("");
     router.refresh();
   }
 
@@ -39,6 +45,12 @@ export function AttemptActions({ attemptId, initialComment }: { attemptId: strin
           {loading === "invalidate" ? "Invalidating..." : "Invalidate"}
         </Button>
       </div>
+      <Textarea
+        value={actionReason}
+        onChange={(event) => setActionReason(event.target.value)}
+        placeholder="Optional reason for reopen/invalidate (saved in audit log)"
+        rows={2}
+      />
       <Textarea
         value={comment}
         onChange={(event) => setComment(event.target.value)}

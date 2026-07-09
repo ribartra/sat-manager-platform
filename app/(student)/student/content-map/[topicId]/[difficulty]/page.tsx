@@ -6,6 +6,7 @@ import { formatDate, scorePercent } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Lock, ChevronLeft } from "lucide-react";
 import { UnlockRequestButton } from "./unlock-request-client";
+import { refreshAssignmentStates } from "@/lib/assignments";
 
 interface PageProps {
   params: Promise<{ topicId: string; difficulty: string }>;
@@ -16,6 +17,7 @@ export default async function TopicPracticeSetsPage({ params }: PageProps) {
   const session = await auth();
   const userId = session!.user.id;
   const diffUpper = difficulty.toUpperCase() as "EASY" | "MEDIUM" | "HARD";
+  await refreshAssignmentStates();
 
   const topic = await prisma.topic.findUnique({
     where: { id: topicId },
@@ -127,7 +129,7 @@ export default async function TopicPracticeSetsPage({ params }: PageProps) {
                         Review
                       </Link>
                       <Link
-                        href={`/student/practice/${ps.id}?assignmentId=${assignment.id}`}
+                        href={`/student/practice/assignment/${assignment.id}`}
                         className="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700"
                       >
                         Try Again
@@ -135,7 +137,7 @@ export default async function TopicPracticeSetsPage({ params }: PageProps) {
                     </div>
                   ) : (
                     <Link
-                      href={`/student/practice/${ps.id}?assignmentId=${assignment!.id}`}
+                      href={`/student/practice/assignment/${assignment!.id}`}
                       className="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700"
                     >
                       Start →

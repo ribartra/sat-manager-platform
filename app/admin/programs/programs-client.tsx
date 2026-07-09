@@ -1,44 +1,614 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 
-export function ProgramsClient({ teachers }: { teachers: { id: string; name: string; email: string }[] }) {
+type Teacher = { id: string; name: string; email: string };
+
+type Enrollment = {
+  studentId: string;
+  status: string;
+  active: boolean;
+  enrolledAt: string;
+  student: { id: string; name: string };
+};
+
+type ProgramTeacher = {
+  programId: string;
+  teacherId: string;
+  startDate: string;
+  endDate: string | null;
+  teacher: { id: string; name: string; email: string };
+};
+
+type Program = {
+  id: string;
+  name: string;
+  startDate: string;
+  endDate: string | null;
+  active: boolean;
+  deletedAt: string | null;
+  teachers: ProgramTeacher[];
+  enrollments: Enrollment[];
+};
+
+function programStatus(p: Pick<Program, "active" | "deletedAt" | "startDate" | "endDate">) {
+  if (p.deletedAt) return "deleted";
+  const now = new Date();
+  if (!p.active) return "inactive";
+  if (new Date(p.startDate) > now) return "scheduled";
+  if (p.endDate && new Date(p.endDate) <= now) return "closed";
+  return "active";
+}
+
+const STATUS_VARIANT: Record<string, "success" | "warning" | "danger" | "info" | "default"> = {
+  active: "success",
+  scheduled: "info",
+  closed: "warning",
+  inactive: "danger",
+  deleted: "danger",
+};
+
+const STATUS_LABEL: Record<string, string> = {
+  active: "Active",
+  scheduled: "Scheduled",
+  closed: "Closed",
+  inactive: "Inactive",
+  deleted: "Deleted",
+};
+
+const ENROLLMENT_VARIANT: Record<string, "success" | "warning" | "danger"> = {
+  APPROVED: "success",
+  PENDING: "warning",
+  REJECTED: "danger",
+};
+
+function fmt(d: string) {
+  return d.slice(0, 10);
+}
+
+// ─── Create Program Form ──────────────────────────────────────────────────────
+
+function CreateProgramForm({
+  teachers,
+  onDone,
+}: {
+  teachers: Teacher[];
+  onDone: () => void;
+}) {
   const router = useRouter();
   const [name, setName] = useState("");
   const [teacherId, setTeacherId] = useState("");
-  const [contractEndsAt, setContractEndsAt] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [saving, setSaving] = useState(false);
 
-  async function submit(event: FormEvent) {
-    event.preventDefault();
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
     setSaving(true);
     await fetch("/api/programs", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, teacherId, contractEndsAt: contractEndsAt || null }),
+      body: JSON.stringify({
+        name,
+        teacherId,
+        startDate: startDate || null,
+        endDate: endDate || null,
+      }),
     });
-    setName("");
-    setTeacherId("");
-    setContractEndsAt("");
     setSaving(false);
+    onDone();
     router.refresh();
   }
 
   return (
-    <form onSubmit={submit} className="mb-6 grid gap-3 rounded-lg border border-gray-200 bg-white p-4 md:grid-cols-[1fr_1fr_180px_auto]">
-      <Input value={name} onChange={(event) => setName(event.target.value)} placeholder="Program name" required />
-      <Select value={teacherId} onChange={(event) => setTeacherId(event.target.value)} required>
-        <option value="">Select teacher</option>
-        {teachers.map((teacher) => (
-          <option key={teacher.id} value={teacher.id}>{teacher.name} · {teacher.email}</option>
-        ))}
-      </Select>
-      <Input type="date" value={contractEndsAt} onChange={(event) => setContractEndsAt(event.target.value)} />
-      <Button type="submit" disabled={saving}>{saving ? "Saving..." : "Create"}</Button>
+    <form onSubmit={submit} className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
+      <h3 className="mb-3 text-sm font-semibold text-blue-900">New Program</h3>
+      <div className="grid gap-3 md:grid-cols-[1fr_1fr_150px_150px_auto_auto]">
+        <Input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Program name"
+          required
+        />
+        <Select value={teacherId} onChange={(e) => setTeacherId(e.target.value)} required>
+          <option value="">Select teacher</option>
+          {teachers.map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.name} · {t.email}
+            </option>
+          ))}
+        </Select>
+        <Input
+          type="date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+        />
+        <Input
+          type="date"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+        />
+        <Button type="submit" disabled={saving}>
+          {saving ? "Saving..." : "Create"}
+        </Button>
+        <Button type="button" variant="ghost" onClick={onDone}>
+          Cancel
+        </Button>
+      </div>
     </form>
+  );
+}
+
+// ─── Edit Program Form (inline, admin) ───────────────────────────────────────
+
+function EditProgramForm({
+  program,
+  teachers,
+  onDone,
+}: {
+  program: Program;
+  teachers: Teacher[];
+  onDone: () => void;
+}) {
+  const router = useRouter();
+  const [name, setName] = useState(program.name);
+  const [startDate, setStartDate] = useState(program.startDate.slice(0, 10));
+  const [endDate, setEndDate] = useState(program.endDate?.slice(0, 10) ?? "");
+  const [active, setActive] = useState(program.active);
+  const [saving, setSaving] = useState(false);
+  const [newTeacherId, setNewTeacherId] = useState("");
+  const [teacherLoading, setTeacherLoading] = useState<string | null>(null);
+
+  const activeTeachers = program.teachers.filter((t) => !t.endDate);
+  const availableTeachers = teachers.filter(
+    (t) => !activeTeachers.some((at) => at.teacherId === t.id)
+  );
+
+  async function save(e: React.FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    await fetch(`/api/programs/${program.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name,
+        startDate,
+        endDate: endDate || null,
+        active,
+      }),
+    });
+    setSaving(false);
+    onDone();
+    router.refresh();
+  }
+
+  async function removeTeacher(teacherId: string) {
+    setTeacherLoading(teacherId);
+    await fetch(`/api/programs/${program.id}/teachers/${teacherId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "remove" }),
+    });
+    setTeacherLoading(null);
+    router.refresh();
+  }
+
+  async function addTeacher() {
+    if (!newTeacherId) return;
+    setTeacherLoading("add");
+    await fetch(`/api/programs/${program.id}/teachers/${newTeacherId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "add" }),
+    });
+    setNewTeacherId("");
+    setTeacherLoading(null);
+    router.refresh();
+  }
+
+  return (
+    <form onSubmit={save} className="space-y-4">
+      <div className="grid gap-3 md:grid-cols-[1fr_140px_140px_auto_auto_auto]">
+        <Input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Program name"
+          required
+        />
+        <Input
+          type="date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+        />
+        <Input
+          type="date"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+        />
+        <label className="flex items-center gap-1.5 text-sm text-gray-700 whitespace-nowrap">
+          <input
+            type="checkbox"
+            checked={active}
+            onChange={(e) => setActive(e.target.checked)}
+          />
+          Active
+        </label>
+        <Button type="submit" size="sm" disabled={saving}>
+          {saving ? "Saving..." : "Save"}
+        </Button>
+        <Button type="button" size="sm" variant="ghost" onClick={onDone}>
+          Cancel
+        </Button>
+      </div>
+
+      <div className="border-t border-gray-200 pt-3">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+          Teachers
+        </p>
+        <div className="space-y-1.5">
+          {activeTeachers.map((t) => (
+            <div
+              key={t.teacherId}
+              className="flex items-center justify-between rounded bg-white px-3 py-1.5 border border-gray-100"
+            >
+              <span className="text-sm">
+                {t.teacher.name}{" "}
+                <span className="text-gray-400 text-xs">({t.teacher.email})</span>
+              </span>
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                className="h-6 px-2 text-red-600 hover:bg-red-50"
+                onClick={() => removeTeacher(t.teacherId)}
+                disabled={teacherLoading === t.teacherId}
+              >
+                {teacherLoading === t.teacherId ? "..." : "Remove"}
+              </Button>
+            </div>
+          ))}
+          {availableTeachers.length > 0 && (
+            <div className="flex items-center gap-2 pt-1">
+              <Select
+                value={newTeacherId}
+                onChange={(e) => setNewTeacherId(e.target.value)}
+              >
+                <option value="">Assign teacher…</option>
+                {availableTeachers.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.name}
+                  </option>
+                ))}
+              </Select>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={addTeacher}
+                disabled={!newTeacherId || teacherLoading === "add"}
+              >
+                {teacherLoading === "add" ? "..." : "Assign"}
+              </Button>
+            </div>
+          )}
+          {activeTeachers.length === 0 && availableTeachers.length === 0 && (
+            <p className="text-xs text-gray-400">No active teachers available.</p>
+          )}
+        </div>
+      </div>
+    </form>
+  );
+}
+
+// ─── Enrollment Row ───────────────────────────────────────────────────────────
+
+function EnrollmentRow({
+  programId,
+  enrollment,
+}: {
+  programId: string;
+  enrollment: Enrollment;
+}) {
+  const router = useRouter();
+  const [loading, setLoading] = useState<string | null>(null);
+
+  async function act(action: string) {
+    setLoading(action);
+    await fetch(`/api/programs/${programId}/enrollments/${enrollment.studentId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action }),
+    });
+    setLoading(null);
+    router.refresh();
+  }
+
+  return (
+    <div className="flex items-center justify-between py-2">
+      <div className="flex items-center gap-3">
+        <span className="text-sm font-medium text-gray-800">
+          {enrollment.student.name}
+        </span>
+        <Badge variant={ENROLLMENT_VARIANT[enrollment.status]}>
+          {enrollment.status}
+        </Badge>
+        <span className="text-xs text-gray-400">{fmt(enrollment.enrolledAt)}</span>
+      </div>
+      <div className="flex gap-1">
+        {enrollment.status === "PENDING" && (
+          <>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-7 px-2 text-green-700 hover:bg-green-50"
+              onClick={() => act("approve")}
+              disabled={!!loading}
+            >
+              {loading === "approve" ? "..." : "Approve"}
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-7 px-2 text-red-600 hover:bg-red-50"
+              onClick={() => act("reject")}
+              disabled={!!loading}
+            >
+              {loading === "reject" ? "..." : "Reject"}
+            </Button>
+          </>
+        )}
+        {enrollment.status === "APPROVED" && enrollment.active && (
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-7 px-2 text-gray-500 hover:bg-gray-100"
+            onClick={() => act("remove")}
+            disabled={!!loading}
+          >
+            {loading === "remove" ? "..." : "Remove"}
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Admin Client ────────────────────────────────────────────────────────
+
+export function AdminProgramsClient({
+  programs,
+  teachers,
+}: {
+  programs: Program[];
+  teachers: Teacher[];
+}) {
+  const router = useRouter();
+  const [showCreate, setShowCreate] = useState(false);
+  const [showDeleted, setShowDeleted] = useState(false);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [loadingId, setLoadingId] = useState<string | null>(null);
+
+  const hasDeleted = programs.some((p) => !!p.deletedAt);
+  const visible = programs.filter((p) => showDeleted || !p.deletedAt);
+
+  async function softDelete(id: string) {
+    setLoadingId(id);
+    await fetch(`/api/programs/${id}`, { method: "DELETE" });
+    setLoadingId(null);
+    router.refresh();
+  }
+
+  async function restore(id: string) {
+    setLoadingId(id);
+    await fetch(`/api/programs/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ restore: true }),
+    });
+    setLoadingId(null);
+    router.refresh();
+  }
+
+  function toggleExpand(id: string) {
+    setExpandedId((prev) => (prev === id ? null : id));
+    setEditingId(null);
+  }
+
+  function toggleEdit(id: string) {
+    setEditingId((prev) => (prev === id ? null : id));
+    setExpandedId(null);
+  }
+
+  return (
+    <div>
+      <div className="mb-4 flex justify-end">
+        {!showCreate && (
+          <Button size="sm" onClick={() => setShowCreate(true)}>
+            + New Program
+          </Button>
+        )}
+      </div>
+
+      {showCreate && (
+        <CreateProgramForm teachers={teachers} onDone={() => setShowCreate(false)} />
+      )}
+
+      {hasDeleted && (
+        <button
+          className="mb-3 text-xs text-gray-400 underline hover:text-gray-600"
+          onClick={() => setShowDeleted((v) => !v)}
+        >
+          {showDeleted ? "Hide deleted programs" : "Show deleted programs"}
+        </button>
+      )}
+
+      <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-gray-200 bg-gray-50">
+              <th className="px-4 py-3 text-left font-medium text-gray-500">Program</th>
+              <th className="px-4 py-3 text-left font-medium text-gray-500">Teacher</th>
+              <th className="px-4 py-3 text-left font-medium text-gray-500">Period</th>
+              <th className="px-4 py-3 text-center font-medium text-gray-500">Status</th>
+              <th className="px-4 py-3 text-right font-medium text-gray-500">Students</th>
+              <th className="px-4 py-3 text-right font-medium text-gray-500">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {visible.map((program) => {
+              const status = programStatus(program);
+              const isEditing = editingId === program.id;
+              const isExpanded = expandedId === program.id;
+              const isDeleted = !!program.deletedAt;
+              const activeTeachers = program.teachers.filter((t) => !t.endDate);
+              const approvedCount = program.enrollments.filter(
+                (e) => e.status === "APPROVED" && e.active
+              ).length;
+              const pendingCount = program.enrollments.filter(
+                (e) => e.status === "PENDING"
+              ).length;
+
+              return (
+                <React.Fragment key={program.id}>
+                  <tr
+                    className={`border-t border-gray-100 ${
+                      isEditing || isExpanded ? "bg-amber-50/40" : isDeleted ? "opacity-60" : ""
+                    }`}
+                  >
+                    <td className="px-4 py-3">
+                      <p
+                        className={`font-medium ${
+                          isDeleted ? "line-through text-gray-400" : "text-gray-900"
+                        }`}
+                      >
+                        {program.name}
+                      </p>
+                      {pendingCount > 0 && (
+                        <span className="text-xs text-amber-600">
+                          {pendingCount} pending
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-xs text-gray-600">
+                      {activeTeachers.length > 0
+                        ? activeTeachers.map((t) => t.teacher.name).join(", ")
+                        : <span className="text-gray-400">—</span>}
+                    </td>
+                    <td className="px-4 py-3 text-gray-600">
+                      {fmt(program.startDate)}
+                      <span className="mx-1 text-gray-300">→</span>
+                      {program.endDate ? (
+                        fmt(program.endDate)
+                      ) : (
+                        <span className="text-gray-400">∞</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <Badge variant={STATUS_VARIANT[status]}>{STATUS_LABEL[status]}</Badge>
+                    </td>
+                    <td className="px-4 py-3 text-right text-gray-600">{approvedCount}</td>
+                    <td className="px-4 py-3 text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        {!isDeleted && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-7 px-2"
+                            onClick={() => toggleEdit(program.id)}
+                          >
+                            {isEditing ? "Close" : "Edit"}
+                          </Button>
+                        )}
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 px-2 text-gray-400"
+                          onClick={() => toggleExpand(program.id)}
+                        >
+                          {isExpanded ? "▲" : "▼"}
+                        </Button>
+                        {!isDeleted ? (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-7 px-2 text-red-500 hover:bg-red-50"
+                            onClick={() => softDelete(program.id)}
+                            disabled={loadingId === program.id}
+                          >
+                            {loadingId === program.id ? "..." : "Delete"}
+                          </Button>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-7 px-2 text-blue-600 hover:bg-blue-50"
+                            onClick={() => restore(program.id)}
+                            disabled={loadingId === program.id}
+                          >
+                            {loadingId === program.id ? "..." : "Restore"}
+                          </Button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+
+                  {isEditing && (
+                    <tr>
+                      <td
+                        colSpan={6}
+                        className="border-t border-amber-200 bg-amber-50 px-4 py-4"
+                      >
+                        <EditProgramForm
+                          program={program}
+                          teachers={teachers}
+                          onDone={() => setEditingId(null)}
+                        />
+                      </td>
+                    </tr>
+                  )}
+
+                  {isExpanded && !isEditing && (
+                    <tr>
+                      <td
+                        colSpan={6}
+                        className="border-t border-gray-100 bg-gray-50 px-4 py-3"
+                      >
+                        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                          Enrollments
+                        </p>
+                        {program.enrollments.length === 0 ? (
+                          <p className="py-2 text-xs text-gray-400">
+                            No enrollment records yet.
+                          </p>
+                        ) : (
+                          <div className="divide-y divide-gray-100">
+                            {program.enrollments.map((e) => (
+                              <EnrollmentRow
+                                key={e.studentId}
+                                programId={program.id}
+                                enrollment={e}
+                              />
+                            ))}
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              );
+            })}
+          </tbody>
+        </table>
+        {visible.length === 0 && (
+          <p className="py-10 text-center text-sm text-gray-400">No programs.</p>
+        )}
+      </div>
+    </div>
   );
 }

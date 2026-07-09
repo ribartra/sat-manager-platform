@@ -15,7 +15,7 @@ export default async function AssignFullTestPage({ params }: PageProps) {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
-      <h1 className="mb-6 text-xl font-semibold text-gray-900">Assign: {test.name}</h1>
+      <h1 className="mb-6 text-xl font-semibold text-gray-900">Assign Exam: {test.name}</h1>
       <FullTestAssignClient
         testId={testId}
         students={students.map((s) => ({ id: s.id, name: s.name }))}

@@ -1,0 +1,1 @@
+ALTER TABLE "Question" ADD COLUMN "supportsGraph" BOOLEAN NOT NULL DEFAULT false;

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireApprovedSession } from "@/lib/rbac";
+import { markUserActive } from "@/lib/activity";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ attemptId: string }> }) {
   const session = await requireApprovedSession();
@@ -14,10 +15,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ att
   });
   if (!attempt) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  await prisma.attempt.update({
-    where: { id: attemptId },
-    data: { currentQuestion, totalTime },
-  });
+  await Promise.all([
+    prisma.attempt.update({
+      where: { id: attemptId },
+      data: { currentQuestion, totalTime },
+    }),
+    markUserActive(session.user.id),
+  ]);
 
   // Upsert each answer
   if (answers && typeof answers === "object") {

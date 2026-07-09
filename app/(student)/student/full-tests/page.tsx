@@ -14,7 +14,10 @@ export default async function StudentFullTestsPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="mb-6 text-xl font-semibold text-gray-900">Full Practice Tests</h1>
+      <div className="mb-6">
+        <h1 className="text-xl font-semibold text-gray-900">Exams</h1>
+        <p className="mt-1 text-sm text-gray-500">Full Practice Tests with SAT-style modules and scoring.</p>
+      </div>
       <div className="space-y-3">
         {assignments.map((assignment) => {
           const attempt = assignment.attempts[0];
@@ -37,7 +40,7 @@ export default async function StudentFullTestsPage() {
             </div>
           );
         })}
-        {assignments.length === 0 && <div className="rounded-lg border border-gray-200 bg-white p-10 text-center text-sm text-gray-400">No full tests assigned.</div>}
+        {assignments.length === 0 && <div className="rounded-lg border border-gray-200 bg-white p-10 text-center text-sm text-gray-400">No Exams assigned.</div>}
       </div>
     </div>
   );
