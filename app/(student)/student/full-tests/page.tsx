@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { formatDate } from "@/lib/utils";
 
 export default async function StudentFullTestsPage() {
@@ -22,7 +23,7 @@ export default async function StudentFullTestsPage() {
         {assignments.map((assignment) => {
           const attempt = assignment.attempts[0];
           return (
-            <div key={assignment.id} className="flex items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-3">
+            <Card key={assignment.id} className="flex items-center justify-between px-4 py-3">
               <div>
                 <p className="text-sm font-medium text-gray-900">{assignment.test.name}</p>
                 <p className="text-xs text-gray-500">{assignment.dueDate ? `Due ${formatDate(assignment.dueDate)}` : "No due date"}</p>
@@ -37,10 +38,10 @@ export default async function StudentFullTestsPage() {
                   </Link>
                 )}
               </div>
-            </div>
+            </Card>
           );
         })}
-        {assignments.length === 0 && <div className="rounded-lg border border-gray-200 bg-white p-10 text-center text-sm text-gray-400">No Exams assigned.</div>}
+        {assignments.length === 0 && <Card padding="lg" className="text-center text-sm text-gray-400">No Exams assigned.</Card>}
       </div>
     </div>
   );

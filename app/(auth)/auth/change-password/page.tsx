@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
 export default function ChangePasswordPage() {
@@ -40,7 +41,7 @@ export default function ChangePasswordPage() {
   return (
     <div className="mx-auto max-w-sm px-4 py-10">
       <h1 className="mb-5 text-xl font-semibold text-gray-900">Change Password</h1>
-      <form onSubmit={submit} className="space-y-4 rounded-lg border border-gray-200 bg-white p-6">
+      <Card as="form" onSubmit={submit} padding="lg" className="space-y-4">
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">Current password</label>
           <Input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} required />
@@ -58,7 +59,7 @@ export default function ChangePasswordPage() {
         <Button type="submit" disabled={loading} className="w-full">
           {loading ? "Saving..." : "Save Password"}
         </Button>
-      </form>
+      </Card>
     </div>
   );
 }

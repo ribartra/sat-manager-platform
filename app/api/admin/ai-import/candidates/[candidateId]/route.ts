@@ -1,0 +1,64 @@
+import { NextRequest, NextResponse } from "next/server";
+import { requireTeacherOrAdmin } from "@/lib/rbac";
+import prisma from "@/lib/prisma";
+
+interface RouteContext {
+  params: Promise<{ candidateId: string }>;
+}
+
+const allowedStatuses = new Set(["NEEDS_REVIEW", "READY", "REVIEWED", "REJECTED"]);
+
+export async function PATCH(req: NextRequest, { params }: RouteContext) {
+  const session = await requireTeacherOrAdmin();
+  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+  const { candidateId } = await params;
+  const body = (await req.json().catch(() => ({}))) as {
+    status?: string;
+    stem?: string | null;
+    stimulus?: string | null;
+    optionsJson?: string | null;
+    correctAnswer?: string | null;
+    explanation?: string | null;
+    section?: string | null;
+    domainName?: string | null;
+    topicName?: string | null;
+    subskillName?: string | null;
+    difficulty?: string | null;
+    type?: string;
+  };
+
+  if (body.status && !allowedStatuses.has(body.status)) {
+    return NextResponse.json({ error: "Invalid status." }, { status: 400 });
+  }
+
+  const candidate = await prisma.ingestQuestionCandidate.update({
+    where: { id: candidateId },
+    data: {
+      ...(body.status ? { status: body.status } : {}),
+      ...(body.stem !== undefined ? { stem: body.stem || null } : {}),
+      ...(body.stimulus !== undefined ? { stimulus: body.stimulus || null } : {}),
+      ...(body.optionsJson !== undefined ? { optionsJson: body.optionsJson || null } : {}),
+      ...(body.correctAnswer !== undefined ? { correctAnswer: body.correctAnswer || null } : {}),
+      ...(body.explanation !== undefined ? { explanation: body.explanation || null } : {}),
+      ...(body.section !== undefined ? { section: body.section || null } : {}),
+      ...(body.domainName !== undefined ? { domainName: body.domainName || null } : {}),
+      ...(body.topicName !== undefined ? { topicName: body.topicName || null } : {}),
+      ...(body.subskillName !== undefined ? { subskillName: body.subskillName || null } : {}),
+      ...(body.difficulty !== undefined ? { difficulty: body.difficulty || null } : {}),
+      ...(body.type ? { type: body.type } : {}),
+    },
+  });
+
+  await prisma.auditLog.create({
+    data: {
+      userId: session.user.id,
+      action: "UPDATE_AI_IMPORT_CANDIDATE",
+      targetType: "IngestQuestionCandidate",
+      targetId: candidateId,
+      metadata: JSON.stringify(body),
+    },
+  });
+
+  return NextResponse.json(candidate);
+}

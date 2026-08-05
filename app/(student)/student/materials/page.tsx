@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import Link from "next/link";
+import { Card } from "@/components/ui/card";
 import { MathContent } from "@/components/math-content";
 
 export default async function StudentMaterialsPage() {
@@ -14,7 +15,7 @@ export default async function StudentMaterialsPage() {
       <h1 className="mb-6 text-2xl font-semibold text-gray-900">Study Materials</h1>
       <div className="space-y-4">
         {materials.map((material) => (
-          <article key={material.id} className="rounded-lg border border-gray-200 bg-white p-5">
+          <Card as="article" key={material.id} padding="md">
             <div className="mb-2 flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-base font-semibold text-gray-900">{material.title}</h2>
@@ -32,12 +33,12 @@ export default async function StudentMaterialsPage() {
             </div>
             {material.description && <p className="mb-3 text-sm text-gray-600">{material.description}</p>}
             {material.body && <MathContent content={material.body} className="text-sm text-gray-800" />}
-          </article>
+          </Card>
         ))}
         {materials.length === 0 && (
-          <div className="rounded-lg border border-dashed border-gray-300 bg-white p-8 text-center text-sm text-gray-500">
+          <Card padding="lg" className="border-dashed text-center text-sm text-gray-500">
             No study materials have been published yet.
-          </div>
+          </Card>
         )}
       </div>
     </div>

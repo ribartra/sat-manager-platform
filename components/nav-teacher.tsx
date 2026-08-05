@@ -8,6 +8,7 @@ import {
   Users, UsersRound, UserCheck, FolderOpen, Map, FileText, HelpCircle,
   Layers, ClipboardList, BarChart2, BookOpen, ShieldCheck, FolderCog, GraduationCap,
   UserCog, ChevronDown, ChevronRight, KeyRound, LogOut, Camera, Menu, X,
+  Settings,
 } from "lucide-react";
 import { useRef, useState } from "react";
 import { NotificationBell } from "@/components/notification-bell";
@@ -23,6 +24,8 @@ interface NavTeacherProps {
   userName: string;
   avatarUrl?: string | null;
   role?: string;
+  showTeacherPrograms?: boolean;
+  showTeacherGroups?: boolean;
 }
 
 interface NavLink {
@@ -49,6 +52,7 @@ const teacherGroups: (NavGroup | NavDirect)[] = [
     icon: Users,
     links: [
       { href: "/teacher", label: "Students", icon: Users },
+      { href: "/teacher/analytics", label: "Student Analytics", icon: BarChart2 },
       { href: "/teacher/groups", label: "Groups", icon: UsersRound },
       { href: "/teacher/parents", label: "Parents", icon: UserCheck },
     ],
@@ -73,7 +77,6 @@ const teacherGroups: (NavGroup | NavDirect)[] = [
     icon: ClipboardList,
     links: [
       { href: "/teacher/practice-sets", label: "Practice Sets", icon: BookOpen },
-      { href: "/teacher/analytics", label: "Analytics", icon: BarChart2 },
       { href: "/teacher/full-tests", label: "Exams", icon: ClipboardList },
       { href: "/teacher/compare", label: "Compare", icon: BarChart2 },
     ],
@@ -85,8 +88,13 @@ const adminGroup: NavGroup = {
   icon: ShieldCheck,
   links: [
     { href: "/admin/programs", label: "Programs", icon: FolderCog },
+    { href: "/teacher/groups", label: "Groups", icon: UsersRound },
     { href: "/admin/teachers", label: "Teachers", icon: GraduationCap },
     { href: "/admin/users", label: "Accounts", icon: UserCog },
+    { href: "/admin/taxonomy", label: "Taxonomy", icon: Layers },
+    { href: "/admin/import/ai", label: "AI Import", icon: FileText },
+    { href: "/admin/logs", label: "Audit Log", icon: FileText },
+    { href: "/admin/settings", label: "Settings", icon: Settings },
   ],
 };
 
@@ -116,9 +124,28 @@ function initExpanded(items: (NavGroup | NavDirect)[], pathname: string): Record
   return state;
 }
 
-export function NavTeacher({ userName, avatarUrl: initialAvatarUrl, role }: NavTeacherProps) {
+export function NavTeacher({
+  userName,
+  avatarUrl: initialAvatarUrl,
+  role,
+  showTeacherPrograms = false,
+  showTeacherGroups = false,
+}: NavTeacherProps) {
   const pathname = usePathname();
-  const navItems = role === "ADMIN" ? [...teacherGroups, adminGroup] : teacherGroups;
+  const visibleTeacherGroups = showTeacherPrograms
+    ? teacherGroups
+    : teacherGroups.filter((item) => !("href" in item && item.href === "/teacher/programs"));
+  const visibleTeacherItems = visibleTeacherGroups.map((item) => {
+    if (!("links" in item) || item.label !== "Students") return item;
+    return {
+      ...item,
+      links:
+        role !== "ADMIN" && showTeacherGroups
+          ? item.links
+          : item.links.filter((link) => link.href !== "/teacher/groups"),
+    };
+  });
+  const navItems = role === "ADMIN" ? [...visibleTeacherItems, adminGroup] : visibleTeacherItems;
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl);

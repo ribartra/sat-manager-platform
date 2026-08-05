@@ -14,11 +14,12 @@ export async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
   if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const { name, status, moduleQuestionIds } = await req.json();
+  const { name, status, moduleQuestionIds, reviewEnabled } = await req.json();
+  const targetStatus = status ?? "DRAFT";
   const normalizedModules = Array.from({ length: 4 }, (_, index) => (moduleQuestionIds?.[index] ?? []) as string[]);
   const questionIds = [...new Set(normalizedModules.flat())];
   const questions = await prisma.question.findMany({
-    where: { id: { in: questionIds }, status: "PUBLISHED" },
+    where: { id: { in: questionIds }, ...(targetStatus === "PUBLISHED" ? { status: "PUBLISHED" } : {}) },
     include: { topic: { include: { domain: { include: { section: true } } } } },
   });
   const questionSections = new Map(
@@ -28,7 +29,7 @@ export async function POST(req: NextRequest) {
     ])
   );
   const validation = validateFullPracticeTestStructure({
-    status: status ?? "DRAFT",
+    status: targetStatus,
     moduleQuestionIds: normalizedModules,
     questionSections,
   });
@@ -40,6 +41,7 @@ export async function POST(req: NextRequest) {
     data: {
       name,
       status: status ?? "DRAFT",
+      reviewEnabled: reviewEnabled ?? true,
       modules: {
         create: MODULES.map((module, order) => ({
           ...module,

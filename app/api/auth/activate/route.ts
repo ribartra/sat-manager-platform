@@ -1,14 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { checkRateLimit, rateLimitKey, rateLimitResponse } from "@/lib/rate-limit";
+import { hashPublicToken } from "@/lib/token-security";
 
 export async function POST(req: NextRequest) {
   const { token, password } = await req.json();
   if (!token || !password) return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+  const limited = checkRateLimit(rateLimitKey(req, "activate", token.slice(0, 12)), 10, 15 * 60 * 1000);
+  if (!limited.allowed) return rateLimitResponse(limited.resetAt);
 
-  const invite = await prisma.inviteToken.findUnique({ where: { token }, include: { program: true } });
+  const tokenHash = hashPublicToken(token);
+  const invite = await prisma.inviteToken.findFirst({
+    where: { OR: [{ tokenHash }, { token }] },
+    include: { program: true },
+  });
   if (!invite || invite.usedAt || invite.expiresAt < new Date()) {
     return NextResponse.json({ error: "This invitation link is invalid or has expired." }, { status: 400 });
+  }
+  if (!invite.tokenHash) {
+    await prisma.inviteToken.update({ where: { id: invite.id }, data: { tokenHash, token: `hashed:${tokenHash}` } });
   }
 
   const hash = await bcrypt.hash(password, 10);
@@ -63,11 +74,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "This invitation is not linked to an active program." }, { status: 400 });
   }
 
-  // Old consent-only flow: block if parent consent not yet recorded (non-minor invites with consent token)
-  if (!invite.isMinor && invite.parentEmail && !invite.parentConsentAt) {
-    return NextResponse.json({ error: "A parent or guardian must authorize this enrollment before activation." }, { status: 403 });
-  }
-
   const programId = invite.programId;
 
   await prisma.$transaction(async (tx) => {
@@ -93,20 +99,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Minor flow: link to parent if their account already exists
-    if (invite.isMinor && invite.parentEmail) {
-      const parent = await tx.user.findUnique({ where: { email: invite.parentEmail } });
-      if (parent) {
-        await tx.parentStudent.upsert({
-          where: { parentId_studentId: { parentId: parent.id, studentId: user.id } },
-          update: { authorizedAt: new Date() },
-          create: { parentId: parent.id, studentId: user.id, authorizedAt: new Date() },
-        });
-      }
-    }
-
-    // Old consent-only flow: upsert parent account (no password)
-    if (!invite.isMinor && invite.parentEmail) {
+    if (invite.parentEmail) {
       const parent = await tx.user.upsert({
         where: { email: invite.parentEmail },
         update: {
@@ -129,8 +122,8 @@ export async function POST(req: NextRequest) {
       });
       await tx.parentStudent.upsert({
         where: { parentId_studentId: { parentId: parent.id, studentId: user.id } },
-        update: { authorizedAt: invite.parentConsentAt },
-        create: { parentId: parent.id, studentId: user.id, authorizedAt: invite.parentConsentAt },
+        update: { authorizedAt: new Date() },
+        create: { parentId: parent.id, studentId: user.id, authorizedAt: new Date() },
       });
     }
 

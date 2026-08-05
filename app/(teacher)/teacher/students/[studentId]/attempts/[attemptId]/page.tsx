@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { MathContent } from "@/components/math-content";
 import { QuestionMedia } from "@/components/question-media";
 import { formatDate, formatTime, scorePercent } from "@/lib/utils";
@@ -33,6 +34,7 @@ export default async function TeacherAttemptDetailPage({ params }: PageProps) {
       student: true,
       answers: { include: { question: { include: { topic: true } } } },
       assignment: { include: { practiceSet: true } },
+      pauses: true,
     },
   });
 
@@ -52,6 +54,7 @@ export default async function TeacherAttemptDetailPage({ params }: PageProps) {
   const correct = attempt.answers.filter((a) => a.isCorrect).length;
   const total = orderedQuestionIds.length;
   const pct = scorePercent(correct, total);
+  const pauseSeconds = attempt.pauses.reduce((sum, pause) => sum + (pause.durationSeconds ?? 0), 0);
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
@@ -63,11 +66,12 @@ export default async function TeacherAttemptDetailPage({ params }: PageProps) {
         <span className="font-medium text-gray-900">{practiceSetSnapshot?.name ?? attempt.assignment?.practiceSet.name ?? "Practice Set"}</span>
       </div>
 
-      <div className="mb-6 flex items-start justify-between rounded-lg border border-gray-200 bg-white p-5">
+      <Card padding="md" className="mb-6 flex items-start justify-between">
         <div>
           <h1 className="text-xl font-semibold text-gray-900">Attempt #{attempt.attemptNumber}</h1>
           <p className="mt-1 text-sm text-gray-500">
             {attempt.submittedAt ? formatDate(attempt.submittedAt) : "Not submitted"} · {attempt.totalTime ? formatTime(attempt.totalTime) : "No time"}
+            {attempt.pauses.length > 0 ? ` · Paused ${attempt.pauses.length}x (${formatTime(pauseSeconds)})` : ""}
           </p>
           <div className="mt-3 flex items-center gap-2">
             <Badge variant={attempt.status === "SUBMITTED" ? "success" : attempt.status === "INVALIDATED" ? "danger" : "warning"}>
@@ -79,16 +83,16 @@ export default async function TeacherAttemptDetailPage({ params }: PageProps) {
           </div>
         </div>
         <AttemptActions attemptId={attempt.id} initialComment={attempt.teacherComment} />
-      </div>
+      </Card>
 
       {attempt.teacherComment && (
-        <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
+        <Card variant="info" padding="md" className="mb-6 text-sm text-blue-900">
           <p className="mb-1 font-medium">Teacher comment</p>
           <p>{attempt.teacherComment}</p>
-        </div>
+        </Card>
       )}
 
-      <div className="rounded-lg border border-gray-200 bg-white">
+      <Card>
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50">
@@ -129,7 +133,7 @@ export default async function TeacherAttemptDetailPage({ params }: PageProps) {
             })}
           </tbody>
         </table>
-      </div>
+      </Card>
     </div>
   );
 }

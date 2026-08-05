@@ -1,10 +1,22 @@
+import { auth } from "@/lib/auth";
+import { getFeatureSetting } from "@/lib/app-settings";
 import prisma from "@/lib/prisma";
+import { redirect } from "next/navigation";
 import { GroupsClient } from "./groups-client";
+import { studentAccessWhereFor } from "@/lib/program-scope";
 
 export default async function GroupsPage() {
+  const session = await auth();
+  if (!session) redirect("/login");
+  if (session.user.role !== "ADMIN") {
+    const enabled = await getFeatureSetting("TEACHER_GROUP_MANAGEMENT");
+    if (!enabled) redirect("/teacher");
+  }
+
   const groups = await prisma.group.findMany({
     include: {
       members: {
+        where: { user: { active: true, validationStatus: "APPROVED" } },
         include: { user: { select: { id: true, name: true, email: true } } },
       },
     },
@@ -12,7 +24,7 @@ export default async function GroupsPage() {
   });
 
   const students = await prisma.user.findMany({
-    where: { role: "STUDENT", active: true },
+    where: studentAccessWhereFor(session.user),
     select: { id: true, name: true, email: true },
     orderBy: { name: "asc" },
   });

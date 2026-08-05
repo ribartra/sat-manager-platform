@@ -56,12 +56,12 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/report/page.tsx",
-    requires: ["Score Progress Over Time", "scoreTrend", "Progress by Difficulty", "QuestionMedia", "Weak Topics", "Teacher Comments"],
-    label: "Reporte individual incluye tendencia temporal, dificultad, media, temas debiles y comentarios",
+    requires: ["Score Progress Over Time", "scoreTrend", "Progress by Difficulty", "QuestionMedia", "Weak Skills", "Teacher Comments"],
+    label: "Reporte individual incluye tendencia temporal, dificultad, media, skills debiles y comentarios",
   },
   {
     file: "app/api/reports/students/[studentId]/pdf/route.ts",
-    requires: ["makeReportPdf", "Helvetica-Bold", "Score Progress Over Time", "Progress by Difficulty", "Question Media URLs", "Weak Topics", "Teacher Comments"],
+    requires: ["makeReportPdf", "Helvetica-Bold", "Score Progress Over Time", "Progress by Difficulty", "Question Media URLs", "Weak Skills", "Teacher Comments", "parseReportAreas", "areas"],
     label: "PDF presentable incluye secciones, paginacion y resumen enriquecido",
   },
   {
@@ -106,8 +106,8 @@ const checks = [
   },
   {
     file: "app/(student)/student/full-tests/results/[attemptId]/page.tsx",
-    requires: ["By Module", "By Difficulty", "By Topic", "timeSpent", "StatsPanel"],
-    label: "Resultados FPT muestran review por modulo, topic, dificultad y tiempo",
+    requires: ["By Module", "By Difficulty", "By Skill", "timeSpent", "StatsPanel"],
+    label: "Resultados FPT muestran review por modulo, skill, dificultad y tiempo",
   },
 ];
 

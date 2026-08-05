@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import prisma from "@/lib/prisma";
+import { getFeatureSetting } from "@/lib/app-settings";
 import { notifyMany } from "@/lib/notify";
 
 function ageInYears(birthDate: Date): number {
   const now = new Date();
   let age = now.getFullYear() - birthDate.getFullYear();
-  const m = now.getMonth() - birthDate.getMonth();
-  if (m < 0 || (m === 0 && now.getDate() < birthDate.getDate())) age--;
+  const monthDiff = now.getMonth() - birthDate.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birthDate.getDate())) age--;
   return age;
 }
 
@@ -15,6 +16,15 @@ function ageInYears(birthDate: Date): number {
 export async function POST(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const enabled = await getFeatureSetting("STUDENT_SELF_ENROLLMENT");
+  if (!enabled) {
+    await params;
+    return NextResponse.json(
+      { error: "Student enrollment requests are disabled. A teacher or administrator must enroll the student." },
+      { status: 410 }
+    );
+  }
 
   if (!["STUDENT", "PARENT"].includes(session.user.role)) {
     return NextResponse.json({ error: "Only students or parents can request enrollment." }, { status: 403 });
@@ -45,22 +55,17 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
     return NextResponse.json({ error: "This program is not currently available for enrollment." }, { status: 400 });
   }
 
-  // Determine if student is a minor with linked parents
   const student = await prisma.user.findUnique({
     where: { id: studentId },
-    include: {
-      childLinks: { select: { parentId: true } },
-    },
+    include: { childLinks: { select: { parentId: true } } },
   });
 
   let parentApprovalStatus: string | null = null;
   let parentIds: string[] = [];
 
   if (student?.birthDate && ageInYears(student.birthDate) < 18) {
-    parentIds = student.childLinks.map((l) => l.parentId);
-    if (parentIds.length > 0) {
-      parentApprovalStatus = "PENDING";
-    }
+    parentIds = student.childLinks.map((link) => link.parentId);
+    if (parentIds.length > 0) parentApprovalStatus = "PENDING";
   }
 
   const existing = await prisma.programEnrollment.findUnique({
@@ -74,14 +79,13 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
     if (existing.status === "PENDING") {
       return NextResponse.json({ error: "You already have a pending enrollment request." }, { status: 409 });
     }
-    // Rejected: allow re-request
     await prisma.programEnrollment.update({
       where: { programId_studentId: { programId: id, studentId } },
       data: {
         status: "PENDING",
         active: false,
         enrolledAt: new Date(),
-        parentApprovalStatus: parentApprovalStatus ?? null,
+        parentApprovalStatus,
         parentApprovedAt: null,
       },
     });
@@ -92,7 +96,7 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
         studentId,
         status: "PENDING",
         active: false,
-        parentApprovalStatus: parentApprovalStatus ?? null,
+        parentApprovalStatus,
       },
     });
   }
@@ -101,21 +105,16 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
     data: { userId: studentId, action: "REQUEST_ENROLLMENT", targetType: "Program", targetId: id },
   });
 
-  const studentName = session.user.name;
-
   if (parentApprovalStatus === "PENDING") {
-    // Notify parents first; teachers notified once parent approves
     await notifyMany(parentIds, {
       title: "Enrollment consent required",
-      body: `${studentName} has requested to join ${program.name}. Your approval is required before the teacher can confirm enrollment.`,
+      body: `${session.user.name} has requested to join ${program.name}. Your approval is required before the teacher can confirm enrollment.`,
       href: "/student",
     }).catch(() => {});
   } else {
-    // No parental consent needed — notify teachers directly
-    const teacherIds = program.teachers.map((t) => t.teacherId);
-    await notifyMany(teacherIds, {
+    await notifyMany(program.teachers.map((teacher) => teacher.teacherId), {
       title: "New enrollment request",
-      body: `${studentName} has requested to join ${program.name}.`,
+      body: `${session.user.name} has requested to join ${program.name}.`,
       href: "/teacher/programs",
     }).catch(() => {});
   }

@@ -4,6 +4,7 @@ import { useState, FormEvent, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 interface InviteInfo {
   role: string;
@@ -62,9 +63,9 @@ export default function ActivatePage() {
   if (tokenError) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm max-w-sm text-center">
+        <Card padding="lg" className="max-w-sm text-center">
           <p className="text-red-600 font-medium">This invitation link is invalid or has expired.</p>
-        </div>
+        </Card>
       </div>
     );
   }
@@ -82,7 +83,7 @@ export default function ActivatePage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="w-full max-w-sm">
-        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+        <Card padding="lg">
           <h1 className="text-lg font-semibold text-gray-900 mb-1">
             {isParent ? `Hello, ${invite.name}!` : `Welcome, ${invite.name}!`}
           </h1>
@@ -148,7 +149,7 @@ export default function ActivatePage() {
               {loading ? "Activating..." : isParent ? "Create Account" : "Activate Account"}
             </Button>
           </form>
-        </div>
+        </Card>
       </div>
     </div>
   );

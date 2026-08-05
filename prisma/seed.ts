@@ -3,10 +3,15 @@ import { PrismaClient } from "../app/generated/prisma/client.js";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const { PrismaBetterSqlite3 } = require("@prisma/adapter-better-sqlite3");
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 
 const url = process.env.DATABASE_URL ?? "file:./prisma/dev.db";
 const adapter = new PrismaBetterSqlite3({ url });
 const prisma = new PrismaClient({ adapter });
+
+function hashSeedToken(token: string) {
+  return crypto.createHash("sha256").update(token).digest("hex");
+}
 
 async function main() {
   // ─── ADMIN ───────────────────────────────────────────────────────────────────
@@ -23,6 +28,29 @@ async function main() {
       validationStatus: "APPROVED",
     },
   });
+
+  await Promise.all([
+    prisma.appSetting.upsert({
+      where: { key: "STUDENT_UNLOCK_REQUESTS" },
+      update: { value: "false" },
+      create: { key: "STUDENT_UNLOCK_REQUESTS", value: "false" },
+    }),
+    prisma.appSetting.upsert({
+      where: { key: "STUDENT_SELF_ENROLLMENT" },
+      update: { value: "false" },
+      create: { key: "STUDENT_SELF_ENROLLMENT", value: "false" },
+    }),
+    prisma.appSetting.upsert({
+      where: { key: "TEACHER_PROGRAM_MANAGEMENT" },
+      update: { value: "false" },
+      create: { key: "TEACHER_PROGRAM_MANAGEMENT", value: "false" },
+    }),
+    prisma.appSetting.upsert({
+      where: { key: "TEACHER_GROUP_MANAGEMENT" },
+      update: { value: "false" },
+      create: { key: "TEACHER_GROUP_MANAGEMENT", value: "false" },
+    }),
+  ]);
 
   // ─── TEACHERS ────────────────────────────────────────────────────────────────
   const teacherHash = await bcrypt.hash("teacher123", 10);
@@ -116,7 +144,7 @@ async function main() {
   // ─── STUDENTS (estados intermedios, sin programa) ─────────────────────────────
 
   // Alumno recién registrado — validación PENDIENTE (esperando aprobación del admin)
-  const studentPending = await prisma.user.upsert({
+  await prisma.user.upsert({
     where: { email: "student.pending@sat.com" },
     update: {},
     create: {
@@ -145,47 +173,6 @@ async function main() {
     },
   });
 
-  // Alumno aprobado pero AÚN SIN INSCRIBIRSE a ningún programa
-  // (verá la lista de programas disponibles y podrá solicitar inscripción)
-  await prisma.user.upsert({
-    where: { email: "student.noenroll@sat.com" },
-    update: {},
-    create: {
-      name: "Diego Fuentes",
-      email: "student.noenroll@sat.com",
-      passwordHash: studentHash,
-      role: "STUDENT",
-      phone: "+51 960000000",
-      active: true,
-      validationStatus: "APPROVED",
-    },
-  });
-
-  // Alumno con solicitud de inscripción PENDIENTE (esperando aprobación del teacher/admin)
-  const studentEnrollPending = await prisma.user.upsert({
-    where: { email: "student.enrollpending@sat.com" },
-    update: {},
-    create: {
-      name: "Lucía Paredes",
-      email: "student.enrollpending@sat.com",
-      passwordHash: studentHash,
-      role: "STUDENT",
-      phone: "+51 970000000",
-      active: true,
-      validationStatus: "APPROVED",
-    },
-  });
-  await prisma.programEnrollment.upsert({
-    where: { programId_studentId: { programId: defaultProgram.id, studentId: studentEnrollPending.id } },
-    update: {},
-    create: {
-      programId: defaultProgram.id,
-      studentId: studentEnrollPending.id,
-      status: "PENDING",
-      active: false,
-    },
-  });
-
   // ─── PADRES ───────────────────────────────────────────────────────────────────
   const parentHash = await bcrypt.hash("parent123", 10);
 
@@ -208,156 +195,6 @@ async function main() {
     update: { authorizedAt: new Date("2026-04-01") },
     create: { parentId: parent.id, studentId: students[0].id, authorizedAt: new Date("2026-04-01") },
   });
-
-  // Padre pendiente de validación, sin alumno vinculado aún
-  await prisma.user.upsert({
-    where: { email: "parent.pending@sat.com" },
-    update: {},
-    create: {
-      name: "Jorge Mora",
-      email: "parent.pending@sat.com",
-      passwordHash: parentHash,
-      role: "PARENT",
-      phone: "+51 990000000",
-      active: true,
-      validationStatus: "PENDING",
-    },
-  });
-
-  // Vinculación padre pendiente → alumno Marco Díaz
-  await prisma.parentStudent.upsert({
-    where: { parentId_studentId: { parentId: parent.id, studentId: studentPending.id } },
-    update: {},
-    create: { parentId: parent.id, studentId: studentPending.id, authorizedAt: null },
-  });
-
-  // ─── MENOR DE EDAD + PADRE ───────────────────────────────────────────────────
-  //
-  // Caso: Carlos Mendoza (16 años) solicita inscripción.
-  // Su padre Pedro Mendoza debe aprobar primero; luego el profesor aprueba.
-  // Se crean DOS variantes:
-  //   (A) student.minor — esperando aprobación del padre (parentApprovalStatus = PENDING)
-  //   (B) student.minor2 — padre ya aprobó, esperando al profesor (parentApprovalStatus = APPROVED)
-
-  const studentMinorA = await prisma.user.upsert({
-    where: { email: "student.minor@sat.com" },
-    update: { active: true, validationStatus: "APPROVED" },
-    create: {
-      name: "Carlos Mendoza",
-      email: "student.minor@sat.com",
-      passwordHash: studentHash,
-      role: "STUDENT",
-      phone: "+51 910000000",
-      birthDate: new Date("2009-06-01"), // 16 años en 2026
-      active: true,
-      validationStatus: "APPROVED",
-    },
-  });
-
-  const studentMinorB = await prisma.user.upsert({
-    where: { email: "student.minor2@sat.com" },
-    update: { active: true, validationStatus: "APPROVED" },
-    create: {
-      name: "Valeria Cano",
-      email: "student.minor2@sat.com",
-      passwordHash: studentHash,
-      role: "STUDENT",
-      phone: "+51 911000000",
-      birthDate: new Date("2010-03-15"), // 16 años en 2026
-      active: true,
-      validationStatus: "APPROVED",
-    },
-  });
-
-  // Padre de Carlos y Valeria
-  const parentMinor = await prisma.user.upsert({
-    where: { email: "parent.minor@sat.com" },
-    update: { active: true, validationStatus: "APPROVED" },
-    create: {
-      name: "Pedro Mendoza",
-      email: "parent.minor@sat.com",
-      passwordHash: parentHash,
-      role: "PARENT",
-      phone: "+51 912000000",
-      active: true,
-      validationStatus: "APPROVED",
-    },
-  });
-
-  await Promise.all([
-    prisma.parentStudent.upsert({
-      where: { parentId_studentId: { parentId: parentMinor.id, studentId: studentMinorA.id } },
-      update: {},
-      create: { parentId: parentMinor.id, studentId: studentMinorA.id, authorizedAt: new Date("2026-01-10") },
-    }),
-    prisma.parentStudent.upsert({
-      where: { parentId_studentId: { parentId: parentMinor.id, studentId: studentMinorB.id } },
-      update: {},
-      create: { parentId: parentMinor.id, studentId: studentMinorB.id, authorizedAt: new Date("2026-01-10") },
-    }),
-  ]);
-
-  // Inscripción A: esperando aprobación del padre
-  await prisma.programEnrollment.upsert({
-    where: { programId_studentId: { programId: defaultProgram.id, studentId: studentMinorA.id } },
-    update: {},
-    create: {
-      programId: defaultProgram.id,
-      studentId: studentMinorA.id,
-      status: "PENDING",
-      active: false,
-      parentApprovalStatus: "PENDING",
-    },
-  });
-
-  // Inscripción B: padre aprobó, esperando al profesor
-  await prisma.programEnrollment.upsert({
-    where: { programId_studentId: { programId: defaultProgram.id, studentId: studentMinorB.id } },
-    update: {},
-    create: {
-      programId: defaultProgram.id,
-      studentId: studentMinorB.id,
-      status: "PENDING",
-      active: false,
-      parentApprovalStatus: "APPROVED",
-      parentApprovedAt: new Date("2026-06-09"),
-    },
-  });
-
-  // ─── GRUPOS ───────────────────────────────────────────────────────────────────
-  const groupA = await prisma.group.upsert({
-    where: { id: "group-a" },
-    update: {},
-    create: { id: "group-a", name: "Group A", schedule: "Monday/Wednesday 9am" },
-  });
-  const groupB = await prisma.group.upsert({
-    where: { id: "group-b" },
-    update: {},
-    create: { id: "group-b", name: "Group B", schedule: "Tuesday/Thursday 3pm" },
-  });
-
-  await Promise.all([
-    prisma.groupMembership.upsert({
-      where: { userId_groupId: { userId: students[0].id, groupId: groupA.id } },
-      update: {},
-      create: { userId: students[0].id, groupId: groupA.id },
-    }),
-    prisma.groupMembership.upsert({
-      where: { userId_groupId: { userId: students[1].id, groupId: groupA.id } },
-      update: {},
-      create: { userId: students[1].id, groupId: groupA.id },
-    }),
-    prisma.groupMembership.upsert({
-      where: { userId_groupId: { userId: students[2].id, groupId: groupB.id } },
-      update: {},
-      create: { userId: students[2].id, groupId: groupB.id },
-    }),
-    prisma.groupMembership.upsert({
-      where: { userId_groupId: { userId: students[3].id, groupId: groupB.id } },
-      update: {},
-      create: { userId: students[3].id, groupId: groupB.id },
-    }),
-  ]);
 
   // ─── TAXONOMÍA ACADÉMICA ──────────────────────────────────────────────────────
   const mathSection = await prisma.section.upsert({
@@ -388,30 +225,48 @@ async function main() {
   const topicDefs: Record<string, { id: string; name: string }[]> = {
     "dom-algebra": [
       { id: "top-lineq", name: "Linear Equations" },
+      { id: "top-lineq-one-var", name: "Linear Equations in One Variable" },
+      { id: "top-lineq-two-var", name: "Linear Equations in Two Variables" },
       { id: "top-syseq", name: "Systems of Equations" },
+      { id: "top-systems-two-linear", name: "Systems of Two Linear Equations" },
       { id: "top-ineq", name: "Inequalities" },
+      { id: "top-linineq", name: "Linear Inequalities" },
       { id: "top-linfn", name: "Linear Functions" },
     ],
     "dom-advmath": [
+      { id: "top-equivalent-expressions", name: "Equivalent Expressions" },
+      { id: "top-nonlinear-equations", name: "Nonlinear Equations" },
       { id: "top-quadfn", name: "Quadratic Functions" },
+      { id: "top-nonlinfn", name: "Nonlinear Functions" },
       { id: "top-poly", name: "Polynomials" },
       { id: "top-expfn", name: "Exponential Functions" },
       { id: "top-radeq", name: "Radical Equations" },
     ],
     "dom-psda": [
       { id: "top-ratprop", name: "Ratios and Proportions" },
+      { id: "top-ratios-rates-units", name: "Ratios, Rates, Proportions, and Units" },
       { id: "top-pct", name: "Percentages" },
       { id: "top-stats", name: "Statistics" },
+      { id: "top-one-var-data", name: "One-Variable Data" },
+      { id: "top-data-mean", name: "One-Variable Data: Distributions and Measures" },
+      { id: "top-two-var-data", name: "Two-Variable Data" },
+      { id: "top-inference-margin", name: "Inference and Margin of Error" },
+      { id: "top-statistical-claims", name: "Statistical Claims" },
       { id: "top-prob", name: "Probability" },
     ],
     "dom-geotrig": [
       { id: "top-circles", name: "Circles" },
       { id: "top-tri", name: "Triangles" },
+      { id: "top-lines-angles-triangles", name: "Lines, Angles, and Triangles" },
+      { id: "top-area-volume", name: "Area and Volume" },
+      { id: "top-right-tri-trig", name: "Right Triangles and Trigonometry" },
       { id: "top-trig", name: "Trigonometry" },
       { id: "top-vol", name: "Volume and Area" },
     ],
     "dom-info": [
       { id: "top-central", name: "Central Ideas" },
+      { id: "top-central-details", name: "Central Ideas and Details" },
+      { id: "top-command-evidence", name: "Command of Evidence" },
       { id: "top-textev", name: "Textual Evidence" },
       { id: "top-infer", name: "Inferences" },
       { id: "top-cross", name: "Cross-Text Connections" },
@@ -419,6 +274,7 @@ async function main() {
     "dom-craft": [
       { id: "top-wic", name: "Words in Context" },
       { id: "top-texstr", name: "Text Structure" },
+      { id: "top-text-structure-purpose", name: "Text Structure and Purpose" },
       { id: "top-authpur", name: "Author Purpose" },
     ],
     "dom-expr": [
@@ -428,6 +284,11 @@ async function main() {
     "dom-sec": [
       { id: "top-bound", name: "Boundaries" },
       { id: "top-fss", name: "Form, Structure, and Sense" },
+    ],
+  };
+  const subskillDefs: Record<string, { id: string; name: string }[]> = {
+    "top-nonlinfn": [
+      { id: "sub-nonlin-transform-recip", name: "Function transformations / Reciprocal functions" },
     ],
   };
 
@@ -440,8 +301,78 @@ async function main() {
       )
     );
   }
+  for (const [topicId, defs] of Object.entries(subskillDefs)) {
+    await Promise.all(
+      defs.map((subskill) =>
+        prisma.subskill.upsert({
+          where: { id: subskill.id },
+          update: { name: subskill.name, topicId },
+          create: { id: subskill.id, name: subskill.name, topicId },
+        })
+      )
+    );
+  }
+
+  const allSections = [mathSection, rwSection];
+  await Promise.all(
+    allSections.map((section, index) =>
+      prisma.taxonomyNode.upsert({
+        where: { id: `tax-area-${section.id}` },
+        update: { name: section.name, label: section.label, type: "AREA", parentId: null, sortOrder: index, active: true },
+        create: { id: `tax-area-${section.id}`, name: section.name, label: section.label, type: "AREA", sortOrder: index, active: true },
+      })
+    )
+  );
+  await Promise.all(
+    allDomains.map((domain, index) =>
+      prisma.taxonomyNode.upsert({
+        where: { id: `tax-topic-${domain.id}` },
+        update: { name: domain.name, label: domain.name, type: "DOMAIN", parentId: `tax-area-${domain.sectionId}`, sortOrder: index, active: true },
+        create: { id: `tax-topic-${domain.id}`, name: domain.name, label: domain.name, type: "DOMAIN", parentId: `tax-area-${domain.sectionId}`, sortOrder: index, active: true },
+      })
+    )
+  );
+  const seededTopics = await prisma.topic.findMany({ include: { subskills: true } });
+  await Promise.all(
+    seededTopics.map((topic, index) =>
+      prisma.taxonomyNode.upsert({
+        where: { id: `tax-skill-${topic.id}` },
+        update: { name: topic.name, label: topic.name, type: "SKILL", parentId: `tax-topic-${topic.domainId}`, sortOrder: index, active: true },
+        create: { id: `tax-skill-${topic.id}`, name: topic.name, label: topic.name, type: "SKILL", parentId: `tax-topic-${topic.domainId}`, sortOrder: index, active: true },
+      })
+    )
+  );
+  await Promise.all(
+    seededTopics.map((topic) =>
+      prisma.topic.update({
+        where: { id: topic.id },
+        data: { taxonomyNodeId: `tax-skill-${topic.id}` },
+      })
+    )
+  );
+  const seededSubskills = seededTopics.flatMap((topic) => topic.subskills.map((subskill) => ({ ...subskill, topicId: topic.id })));
+  await Promise.all(
+    seededSubskills.map((subskill, index) =>
+      prisma.taxonomyNode.upsert({
+        where: { id: `tax-subskill-${subskill.id}` },
+        update: { name: subskill.name, label: subskill.name, type: "SUBSKILL", parentId: `tax-skill-${subskill.topicId}`, sortOrder: index, active: true },
+        create: { id: `tax-subskill-${subskill.id}`, name: subskill.name, label: subskill.name, type: "SUBSKILL", parentId: `tax-skill-${subskill.topicId}`, sortOrder: index, active: true },
+      })
+    )
+  );
+  await Promise.all(
+    seededSubskills.map((subskill) =>
+      prisma.subskill.update({
+        where: { id: subskill.id },
+        data: { taxonomyNodeId: `tax-subskill-${subskill.id}` },
+      })
+    )
+  );
+
+  const seedDemoAcademicContent = process.env.SEED_DEMO_ACADEMIC_CONTENT === "true";
 
   // ─── PREGUNTAS Y PRACTICE SETS ───────────────────────────────────────────────
+  if (seedDemoAcademicContent) {
   const seedPracticeIds = {
     qLineq1: "0f9b47a1-5f5c-45bb-9df1-0a7f1db3d111",
     qLineq2: "7b26dd75-9ae2-46fc-8bfb-d7e0e4c9f222",
@@ -454,8 +385,10 @@ async function main() {
     anaPs1Assignment: "8559bf63-78d4-42da-b9d1-c2f1f61b7111",
     luisPs1Assignment: "24ddf2fb-358e-4760-8df9-cfc27f997222",
     anaPs2Assignment: "6bcbb7d8-7bcf-4a42-9bbb-39c264565333",
-    anaPs2UnlockRequest: "1e7d1e54-2bec-4a20-9359-c5a56944c444",
+    anaPs3Assignment: "2b9316bb-c9f3-42bc-9601-cc4d89778444",
     anaPs1SubmittedAttempt: "03841e9d-b94e-48fe-9d06-5a8d83e08555",
+    anaPs3SubmittedAttempt: "2dddf7c0-4516-4f78-8da8-46575f851666",
+    luisPs1SubmittedAttempt: "5ed61ec5-57f7-4f3a-b56f-6b8d4f0c9777",
   };
 
   const q1 = await prisma.question.upsert({
@@ -576,24 +509,22 @@ async function main() {
       assignedById: teacher.id, dueDate: new Date("2026-06-01"), status: "PENDING", locked: false,
     },
   });
-  const anaLockedAssignment = await prisma.assignment.upsert({
+  await prisma.assignment.upsert({
     where: { id: seedPracticeIds.anaPs2Assignment },
-    update: { status: "PENDING", locked: true },
+    update: { status: "PENDING", locked: false, unlockAt: null },
     create: {
       id: seedPracticeIds.anaPs2Assignment,
       practiceSetId: ps2.id, studentId: students[0].id,
-      assignedById: teacher.id, status: "PENDING", locked: true,
+      assignedById: teacher.id, status: "PENDING", locked: false,
     },
   });
-
-  await prisma.unlockRequest.upsert({
-    where: { id: seedPracticeIds.anaPs2UnlockRequest },
-    update: { status: "PENDING", resolvedAt: null },
+  await prisma.assignment.upsert({
+    where: { id: seedPracticeIds.anaPs3Assignment },
+    update: { status: "COMPLETED", locked: false, unlockAt: null },
     create: {
-      id: seedPracticeIds.anaPs2UnlockRequest,
-      assignmentId: anaLockedAssignment.id,
-      studentId: students[0].id,
-      status: "PENDING",
+      id: seedPracticeIds.anaPs3Assignment,
+      practiceSetId: ps3.id, studentId: students[0].id,
+      assignedById: teacher.id, dueDate: new Date("2026-06-22"), status: "COMPLETED", locked: false,
     },
   });
 
@@ -613,6 +544,8 @@ async function main() {
     [q1.id, JSON.stringify({ id: q1.id, stem: q1.stem, stimulus: q1.stimulus, type: q1.type, difficulty: q1.difficulty, correctAnswer: q1.correctAnswer, explanation: q1.explanation, topic: { id: "top-lineq", name: "Linear Equations" }, options: [{ label: "A", text: "$x = 2$" }, { label: "B", text: "$x = 3$" }, { label: "C", text: "$x = 4$" }, { label: "D", text: "$x = 5$" }] })],
     [q2.id, JSON.stringify({ id: q2.id, stem: q2.stem, stimulus: q2.stimulus, type: q2.type, difficulty: q2.difficulty, correctAnswer: q2.correctAnswer, explanation: q2.explanation, topic: { id: "top-lineq", name: "Linear Equations" } })],
     [q3.id, JSON.stringify({ id: q3.id, stem: q3.stem, stimulus: q3.stimulus, type: q3.type, difficulty: q3.difficulty, correctAnswer: q3.correctAnswer, explanation: q3.explanation, topic: { id: "top-lineq", name: "Linear Equations" }, options: [{ label: "A", text: "$y = 2x + 4$" }, { label: "B", text: "$y = -2x + 4$" }, { label: "C", text: "$y = -2x - 4$" }, { label: "D", text: "$y = 2x - 4$" }] })],
+    [q4.id, JSON.stringify({ id: q4.id, stem: q4.stem, stimulus: q4.stimulus, type: q4.type, difficulty: q4.difficulty, correctAnswer: q4.correctAnswer, explanation: q4.explanation, topic: { id: "top-lineq", name: "Linear Equations" }, options: [{ label: "A", text: "$y = -2x + 8$" }, { label: "B", text: "$y = 2x + 8$" }, { label: "C", text: "$y = -2x - 8$" }, { label: "D", text: "$y = 4x + 8$" }] })],
+    [q5.id, JSON.stringify({ id: q5.id, stem: q5.stem, stimulus: q5.stimulus, type: q5.type, difficulty: q5.difficulty, correctAnswer: q5.correctAnswer, explanation: q5.explanation, topic: { id: "top-lineq", name: "Linear Equations" } })],
   ]);
 
   const anaSubmittedAttempt = await prisma.attempt.upsert({
@@ -658,6 +591,96 @@ async function main() {
     data: { status: "COMPLETED" },
   });
 
+  const ps3Snapshot = JSON.stringify({
+    id: ps3.id,
+    name: "Linear Equations — Easy #2",
+    difficulty: "EASY",
+    explanationVisibility: "AFTER_FINISH",
+    topic: { id: "top-lineq", name: "Linear Equations" },
+    questions: [
+      { id: q1.id, order: 1 },
+      { id: q2.id, order: 2 },
+    ],
+  });
+  const anaSecondAttempt = await prisma.attempt.upsert({
+    where: { id: seedPracticeIds.anaPs3SubmittedAttempt },
+    update: {
+      status: "SUBMITTED",
+      submittedAt: new Date("2026-06-18T14:30:00Z"),
+      totalTime: 280,
+      teacherComment: "Ready to move into medium Linear Equations. Keep using graph checks for line questions.",
+      practiceSetSnapshot: ps3Snapshot,
+    },
+    create: {
+      id: seedPracticeIds.anaPs3SubmittedAttempt,
+      assignmentId: seedPracticeIds.anaPs3Assignment,
+      studentId: students[0].id,
+      practiceSetId: ps3.id,
+      practiceSetSnapshot: ps3Snapshot,
+      attemptNumber: 1,
+      status: "SUBMITTED",
+      submittedAt: new Date("2026-06-18T14:30:00Z"),
+      totalTime: 280,
+      teacherComment: "Ready to move into medium Linear Equations. Keep using graph checks for line questions.",
+    },
+  });
+  await Promise.all([
+    prisma.attemptAnswer.upsert({
+      where: { attemptId_questionId: { attemptId: anaSecondAttempt.id, questionId: q1.id } },
+      update: { answer: "C", isCorrect: true, timeSpent: 100, questionSnapshot: questionSnapshots.get(q1.id) },
+      create: { attemptId: anaSecondAttempt.id, questionId: q1.id, answer: "C", isCorrect: true, timeSpent: 100, questionSnapshot: questionSnapshots.get(q1.id) },
+    }),
+    prisma.attemptAnswer.upsert({
+      where: { attemptId_questionId: { attemptId: anaSecondAttempt.id, questionId: q2.id } },
+      update: { answer: "3", isCorrect: true, timeSpent: 85, questionSnapshot: questionSnapshots.get(q2.id) },
+      create: { attemptId: anaSecondAttempt.id, questionId: q2.id, answer: "3", isCorrect: true, timeSpent: 85, questionSnapshot: questionSnapshots.get(q2.id) },
+    }),
+  ]);
+
+  const luisSubmittedAttempt = await prisma.attempt.upsert({
+    where: { id: seedPracticeIds.luisPs1SubmittedAttempt },
+    update: {
+      status: "SUBMITTED",
+      submittedAt: new Date("2026-06-20T18:00:00Z"),
+      totalTime: 510,
+      teacherComment: "Needs targeted review on translating line information into equations.",
+      practiceSetSnapshot: ps1Snapshot,
+    },
+    create: {
+      id: seedPracticeIds.luisPs1SubmittedAttempt,
+      assignmentId: seedPracticeIds.luisPs1Assignment,
+      studentId: students[1].id,
+      practiceSetId: ps1.id,
+      practiceSetSnapshot: ps1Snapshot,
+      attemptNumber: 1,
+      status: "SUBMITTED",
+      submittedAt: new Date("2026-06-20T18:00:00Z"),
+      totalTime: 510,
+      teacherComment: "Needs targeted review on translating line information into equations.",
+    },
+  });
+  await Promise.all([
+    prisma.attemptAnswer.upsert({
+      where: { attemptId_questionId: { attemptId: luisSubmittedAttempt.id, questionId: q1.id } },
+      update: { answer: "B", isCorrect: false, timeSpent: 150, questionSnapshot: questionSnapshots.get(q1.id) },
+      create: { attemptId: luisSubmittedAttempt.id, questionId: q1.id, answer: "B", isCorrect: false, timeSpent: 150, questionSnapshot: questionSnapshots.get(q1.id) },
+    }),
+    prisma.attemptAnswer.upsert({
+      where: { attemptId_questionId: { attemptId: luisSubmittedAttempt.id, questionId: q2.id } },
+      update: { answer: "3", isCorrect: true, timeSpent: 130, questionSnapshot: questionSnapshots.get(q2.id) },
+      create: { attemptId: luisSubmittedAttempt.id, questionId: q2.id, answer: "3", isCorrect: true, timeSpent: 130, questionSnapshot: questionSnapshots.get(q2.id) },
+    }),
+    prisma.attemptAnswer.upsert({
+      where: { attemptId_questionId: { attemptId: luisSubmittedAttempt.id, questionId: q3.id } },
+      update: { answer: "A", isCorrect: false, timeSpent: 170, questionSnapshot: questionSnapshots.get(q3.id) },
+      create: { attemptId: luisSubmittedAttempt.id, questionId: q3.id, answer: "A", isCorrect: false, timeSpent: 170, questionSnapshot: questionSnapshots.get(q3.id) },
+    }),
+  ]);
+  await prisma.assignment.update({
+    where: { id: seedPracticeIds.luisPs1Assignment },
+    data: { status: "COMPLETED", locked: false },
+  });
+
   await prisma.auditLog.upsert({
     where: { id: "audit-seed-transition-note" },
     update: {},
@@ -670,8 +693,75 @@ async function main() {
       metadata: JSON.stringify({
         sameLevelTarget: ps3.id,
         nextDifficultyTarget: ps2.id,
-        note: "Submit a valid >=70% attempt on the first easy linear-equations Practice Set to auto-create/unlock Easy #2; >=75% attempts should not bypass Ana's manual lock on Medium #1.",
+        note: "Practice Set unlocks are driven by the configured percentage rule by default. Demo data keeps Medium #1 visible as the next unlocked step after Ana completes Easy #2.",
       }),
+    },
+  });
+  } else {
+    await prisma.auditLog.upsert({
+      where: { id: "audit-seed-ai-import-content-required" },
+      update: {},
+      create: {
+        id: "audit-seed-ai-import-content-required",
+        userId: admin.id,
+        action: "SEED_ACADEMIC_CONTENT_DISABLED",
+        targetType: "AIImport",
+        targetId: defaultProgram.id,
+        metadata: JSON.stringify({
+          note: "Seed no longer creates synthetic questions, Practice Sets, assignments, attempts, or Full Practice Tests by default. Promote reviewed AI Import candidates to create official academic content.",
+          enableLegacyDemoContentWith: "SEED_DEMO_ACADEMIC_CONTENT=true",
+        }),
+      },
+    });
+  }
+
+  // ─── INVITACIÓN PENDIENTE DE ALUMNO CON PADRE ────────────────────────────────
+  const demoInviteToken = "demo-student-invite-2026";
+  const demoInviteTokenHash = hashSeedToken(demoInviteToken);
+  await prisma.user.deleteMany({
+    where: { email: { in: ["student.invited@sat.com", "parent.invited@sat.com"] } },
+  });
+  await prisma.inviteToken.upsert({
+    where: { id: "invite-seed-student-with-parent" },
+    update: {
+      role: "STUDENT",
+      name: "Mateo Rivera",
+      email: "student.invited@sat.com",
+      phone: "+51 970000000",
+      startDate: new Date("2026-07-29"),
+      invitedById: teacher.id,
+      programId: defaultProgram.id,
+      isMinor: true,
+      parentName: "Elena Rivera",
+      parentEmail: "parent.invited@sat.com",
+      parentPhone: "+51 971000000",
+      linkedStudentEmail: null,
+      parentConsentToken: null,
+      parentConsentTokenHash: null,
+      parentConsentAt: null,
+      parentConsentIp: null,
+      token: `hashed:${demoInviteTokenHash}`,
+      tokenHash: demoInviteTokenHash,
+      expiresAt: new Date("2026-12-31T23:59:59Z"),
+      usedAt: null,
+    },
+    create: {
+      id: "invite-seed-student-with-parent",
+      role: "STUDENT",
+      name: "Mateo Rivera",
+      email: "student.invited@sat.com",
+      phone: "+51 970000000",
+      startDate: new Date("2026-07-29"),
+      invitedById: teacher.id,
+      programId: defaultProgram.id,
+      isMinor: true,
+      parentName: "Elena Rivera",
+      parentEmail: "parent.invited@sat.com",
+      parentPhone: "+51 971000000",
+      parentConsentTokenHash: null,
+      token: `hashed:${demoInviteTokenHash}`,
+      tokenHash: demoInviteTokenHash,
+      expiresAt: new Date("2026-12-31T23:59:59Z"),
     },
   });
 
@@ -721,6 +811,7 @@ async function main() {
     }
   }
 
+  if (seedDemoAcademicContent) {
   async function createMockQuestion({
     id,
     section,
@@ -1005,6 +1096,7 @@ async function main() {
       }),
     },
   });
+  }
 
   // ─── RESUMEN ──────────────────────────────────────────────────────────────────
   console.log("\n✅  Seed completo\n");
@@ -1017,7 +1109,6 @@ async function main() {
   console.log("");
   console.log("PARENT");
   console.log("  parent@sat.com         / parent123     (APPROVED) — vinculado a Ana Torres");
-  console.log("  parent.pending@sat.com / parent123     (PENDING)  — sin alumno aprobado");
   console.log("");
   console.log("STUDENT");
   console.log("  student1@sat.com       / student123    (APPROVED) — inscrito en SAT Core");
@@ -1026,13 +1117,10 @@ async function main() {
   console.log("  student4@sat.com       / student123    (APPROVED) — inscrito en SAT Core");
   console.log("  student.pending@sat.com/ student123    (PENDING)  — sin programa");
   console.log("  student.rejected@sat.com/student123   (REJECTED)  — cuenta rechazada");
-  console.log("  student.noenroll@sat.com/student123   (APPROVED)  — aprobado, sin inscribirse");
-  console.log("  student.enrollpending@ / student123   (APPROVED)  — solicitud inscripción PENDING");
   console.log("");
-  console.log("MENORES (inscripción requiere aprobación del padre)");
-  console.log("  student.minor@sat.com  / student123   (APPROVED, 16 años) — esperando padre");
-  console.log("  student.minor2@sat.com / student123   (APPROVED, 16 años) — padre aprobó, esperando profesor");
-  console.log("  parent.minor@sat.com   / parent123    (APPROVED) — padre de Carlos y Valeria");
+  console.log("INVITE FLOW");
+  console.log("  Mateo Rivera           / pendiente     — /auth/activate?token=demo-student-invite-2026");
+  console.log("  Padre asociado         / Elena Rivera   — se crea al aceptar la invitación del alumno");
 }
 
 main()

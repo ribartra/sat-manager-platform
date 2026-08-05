@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { getFeatureSetting } from "@/lib/app-settings";
 import { redirect } from "next/navigation";
 import { TeacherProgramsClient } from "./programs-client";
 
@@ -9,6 +10,10 @@ export default async function TeacherProgramsPage() {
   const session = await auth();
   if (!session) redirect("/login");
   if (!["TEACHER", "ADMIN"].includes(session.user.role)) redirect("/student");
+  if (session.user.role === "TEACHER") {
+    const enabled = await getFeatureSetting("TEACHER_PROGRAM_MANAGEMENT");
+    if (!enabled) redirect("/teacher");
+  }
 
   const programs = await prisma.program.findMany({
     where:

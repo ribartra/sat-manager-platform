@@ -99,6 +99,26 @@ const checks = [
     requires: ["requireAdmin", "role: \"TEACHER\""],
     label: "Program teacher assignment is admin-only",
   },
+  {
+    file: "app/api/parents/route.ts",
+    requires: ["requireTeacherOrAdmin", "studentAccessWhereFor", "LINK_PARENT_STUDENT", "UNLINK_PARENT_STUDENT", "UPDATE_PARENT"],
+    label: "Parent management is teacher/admin scoped and audited",
+  },
+  {
+    file: "app/api/groups/route.ts",
+    requires: ["requireTeacherOrAdmin", "TEACHER_GROUP_MANAGEMENT", "Teacher group management is disabled"],
+    label: "Group creation is gated by admin-configured teacher permission",
+  },
+  {
+    file: "app/api/groups/[groupId]/members/route.ts",
+    requires: ["requireTeacherOrAdmin", "TEACHER_GROUP_MANAGEMENT", "Teacher group management is disabled"],
+    label: "Group membership add is gated by admin-configured teacher permission",
+  },
+  {
+    file: "app/api/assignments/route.ts",
+    requires: ["sourceGroupId", "TEACHER_GROUP_MANAGEMENT", "Teacher group assignment is disabled"],
+    label: "Practice Set group assignment is gated by admin-configured teacher permission",
+  },
 ];
 
 let hasFailures = false;

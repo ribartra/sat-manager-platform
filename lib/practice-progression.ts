@@ -92,39 +92,38 @@ export async function applyPracticeProgression({ studentId, practiceSetId, score
   });
   if (!current) return;
 
-  if (scorePercent >= 70) {
-    const sameLevelSets = await prisma.practiceSet.findMany({
-      where: {
-        topicId: current.topicId,
-        difficulty: current.difficulty,
-        status: "PUBLISHED",
-      },
-      orderBy: [{ createdAt: "asc" }, { name: "asc" }],
-      select: { id: true },
-    });
-    const currentIndex = sameLevelSets.findIndex((practiceSet) => practiceSet.id === current.id);
-    const nextSameLevel = currentIndex >= 0 ? sameLevelSets[currentIndex + 1] : null;
-    if (nextSameLevel) {
-      await ensureUnlockedAssignment(studentId, nextSameLevel.id, "SAME_LEVEL_70");
-    }
+  if (scorePercent < 75) return;
+
+  const sameLevelSets = await prisma.practiceSet.findMany({
+    where: {
+      topicId: current.topicId,
+      difficulty: current.difficulty,
+      status: "PUBLISHED",
+    },
+    orderBy: [{ createdAt: "asc" }, { name: "asc" }],
+    select: { id: true },
+  });
+  const currentIndex = sameLevelSets.findIndex((practiceSet) => practiceSet.id === current.id);
+  const nextSameLevel = currentIndex >= 0 ? sameLevelSets[currentIndex + 1] : null;
+  if (nextSameLevel) {
+    await ensureUnlockedAssignment(studentId, nextSameLevel.id, "SAME_LEVEL_75");
+    return;
   }
 
-  if (scorePercent >= 75) {
-    const currentDifficultyIndex = DIFFICULTY_ORDER.indexOf(current.difficulty);
-    const nextDifficulty = DIFFICULTY_ORDER[currentDifficultyIndex + 1];
-    if (!nextDifficulty) return;
+  const currentDifficultyIndex = DIFFICULTY_ORDER.indexOf(current.difficulty);
+  const nextDifficulty = DIFFICULTY_ORDER[currentDifficultyIndex + 1];
+  if (!nextDifficulty) return;
 
-    const nextDifficultySet = await prisma.practiceSet.findFirst({
-      where: {
-        topicId: current.topicId,
-        difficulty: nextDifficulty,
-        status: "PUBLISHED",
-      },
-      orderBy: [{ createdAt: "asc" }, { name: "asc" }],
-      select: { id: true },
-    });
-    if (nextDifficultySet) {
-      await ensureUnlockedAssignment(studentId, nextDifficultySet.id, "NEXT_DIFFICULTY_75");
-    }
+  const nextDifficultySet = await prisma.practiceSet.findFirst({
+    where: {
+      topicId: current.topicId,
+      difficulty: nextDifficulty,
+      status: "PUBLISHED",
+    },
+    orderBy: [{ createdAt: "asc" }, { name: "asc" }],
+    select: { id: true },
+  });
+  if (nextDifficultySet) {
+    await ensureUnlockedAssignment(studentId, nextDifficultySet.id, "NEXT_DIFFICULTY_AFTER_LEVEL_COMPLETE_75");
   }
 }

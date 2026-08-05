@@ -76,7 +76,7 @@ function validateRows(rows: CsvRow[]) {
     const type = row.type || "MC";
     const status = row.status || "DRAFT";
     const options = ["A", "B", "C", "D"]
-      .map((label) => ({ label, text: row[`option${label}`] }))
+      .map((label) => ({ label, text: row[`option${label}`], imageUrl: row[`option${label}ImageUrl`] || null }))
       .filter((option) => option.text);
 
     if (!row.topicId) errors.push("topicId is required.");
@@ -146,7 +146,7 @@ export async function POST(req: NextRequest) {
       }
 
       const options = ["A", "B", "C", "D"]
-        .map((label) => ({ label, text: row[`option${label}`] }))
+        .map((label) => ({ label, text: row[`option${label}`], imageUrl: row[`option${label}ImageUrl`] || null }))
         .filter((option) => option.text);
       const type = row.type || "MC";
       const status = row.status || "DRAFT";

@@ -3,11 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { MathContent } from "@/components/math-content";
 
-const template = `topicId,difficulty,type,status,stem,correctAnswer,optionA,optionB,optionC,optionD,stimulus,explanation
-TOPIC_ID,EASY,MC,DRAFT,Which value satisfies 2x+6=14?,C,x=2,x=3,x=4,x=5,,Subtract 6 then divide by 2.`;
+const template = `topicId,difficulty,type,status,stem,correctAnswer,optionA,optionB,optionC,optionD,optionAImageUrl,optionBImageUrl,optionCImageUrl,optionDImageUrl,stimulus,explanation,imageUrl
+TOPIC_ID,EASY,MC,DRAFT,Which value satisfies 2x+6=14?,C,x=2,x=3,x=4,x=5,,,,,,Subtract 6 then divide by 2.,`;
 
 interface PreviewRow {
   rowNumber: number;
@@ -70,12 +71,12 @@ export function BulkImportClient({ topics }: { topics: { id: string; label: stri
           <Link href="/teacher/questions" className="text-sm text-blue-600 hover:underline">Back to Question Bank</Link>
         </div>
         {preview && (
-          <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
+          <Card className="overflow-hidden">
             <div className="border-b border-gray-100 px-3 py-2 text-xs text-gray-600">
               Rows: {preview.totalRows} · Valid: {preview.validRows} · Invalid: {preview.invalidRows}
             </div>
             <table className="w-full text-xs">
-              <thead><tr className="bg-gray-50"><th className="px-3 py-2 text-left">Row</th><th className="px-3 py-2 text-left">Topic ID</th><th className="px-3 py-2 text-left">Stem</th><th className="px-3 py-2 text-left">Type</th><th className="px-3 py-2 text-left">Status</th><th className="px-3 py-2 text-left">Validation</th></tr></thead>
+              <thead><tr className="bg-gray-50"><th className="px-3 py-2 text-left">Row</th><th className="px-3 py-2 text-left">Skill ID (topicId)</th><th className="px-3 py-2 text-left">Stem</th><th className="px-3 py-2 text-left">Type</th><th className="px-3 py-2 text-left">Status</th><th className="px-3 py-2 text-left">Validation</th></tr></thead>
               <tbody>
                 {preview.rows.map((row) => (
                   <tr key={row.rowNumber} className="border-t border-gray-100">
@@ -97,21 +98,21 @@ export function BulkImportClient({ topics }: { topics: { id: string; label: stri
                 ))}
               </tbody>
             </table>
-          </div>
+          </Card>
         )}
         {result && (
-          <div className="rounded-lg border border-gray-200 bg-white p-4">
+          <Card padding="md">
             <p className="text-sm font-medium text-gray-900">Created: {result.created}</p>
             {result.errors.length > 0 && (
               <ul className="mt-2 space-y-1 text-sm text-red-600">
                 {result.errors.map((error) => <li key={error}>{error}</li>)}
               </ul>
             )}
-          </div>
+          </Card>
         )}
       </div>
-      <div className="rounded-lg border border-gray-200 bg-white p-4">
-        <h2 className="mb-3 text-sm font-semibold text-gray-900">Topic IDs</h2>
+      <Card padding="md">
+        <h2 className="mb-3 text-sm font-semibold text-gray-900">Skill IDs</h2>
         <div className="max-h-96 space-y-2 overflow-y-auto">
           {topics.map((topic) => (
             <div key={topic.id}>
@@ -120,7 +121,7 @@ export function BulkImportClient({ topics }: { topics: { id: string; label: stri
             </div>
           ))}
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

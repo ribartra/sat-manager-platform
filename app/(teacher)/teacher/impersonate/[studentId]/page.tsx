@@ -101,7 +101,7 @@ export default async function ImpersonateStudentPage({ params }: PageProps) {
           <h2 className="mb-3 text-base font-semibold text-gray-900">Assigned to Student</h2>
           <div className="space-y-2">
             {assignments.map((a) => (
-              <div key={a.id} className="flex items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-3">
+              <Card key={a.id} className="flex items-center justify-between px-4 py-3">
                 <div>
                   <p className="text-sm font-medium text-gray-900">{a.practiceSet.name}</p>
                   <p className="mt-0.5 text-xs text-gray-500">
@@ -110,9 +110,9 @@ export default async function ImpersonateStudentPage({ params }: PageProps) {
                   </p>
                 </div>
                 <Badge variant={a.status === "IN_PROGRESS" ? "warning" : "info"}>{a.status}</Badge>
-              </div>
+              </Card>
             ))}
-            {assignments.length === 0 && <div className="rounded-lg border border-gray-200 bg-white p-8 text-center text-sm text-gray-400">No active assignments.</div>}
+            {assignments.length === 0 && <Card padding="lg" className="text-center text-sm text-gray-400">No active assignments.</Card>}
           </div>
         </section>
 
@@ -123,7 +123,7 @@ export default async function ImpersonateStudentPage({ params }: PageProps) {
               const correct = a.answers.filter((ans) => ans.isCorrect).length;
               const pct = scorePercent(correct, a.answers.length);
               return (
-                <div key={a.id} className="flex items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-3">
+                <Card key={a.id} className="flex items-center justify-between px-4 py-3">
                   <div>
                     <p className="text-sm font-medium text-gray-900">{a.assignment?.practiceSet.name ?? "Practice Set"}</p>
                     <p className="mt-0.5 text-xs text-gray-500">{a.submittedAt ? formatDate(a.submittedAt) : "—"}</p>
@@ -133,10 +133,10 @@ export default async function ImpersonateStudentPage({ params }: PageProps) {
                     <span className="text-sm font-semibold text-blue-700">{pct}%</span>
                     <CheckCircle size={14} className="text-green-600" />
                   </div>
-                </div>
+                </Card>
               );
             })}
-            {recentAttempts.length === 0 && <div className="rounded-lg border border-gray-200 bg-white p-8 text-center text-sm text-gray-400">No submitted attempts.</div>}
+            {recentAttempts.length === 0 && <Card padding="lg" className="text-center text-sm text-gray-400">No submitted attempts.</Card>}
           </div>
         </section>
       </div>

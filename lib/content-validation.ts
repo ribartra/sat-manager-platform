@@ -13,7 +13,7 @@ interface QuestionPayload {
   explanation?: string | null;
   correctAnswer?: string;
   status?: string;
-  options?: { label: string; text: string }[];
+  options?: { label: string; text: string; imageUrl?: string | null }[];
 }
 
 interface PracticeSetPayload {

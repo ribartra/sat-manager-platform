@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { AssignForm } from "./assign-form-client";
+import { getFeatureSetting } from "@/lib/app-settings";
+import { studentAccessWhereFor } from "@/lib/program-scope";
 
 interface PageProps {
   params: Promise<{ studentId: string }>;
@@ -13,24 +15,14 @@ export default async function AssignPage({ params }: PageProps) {
   const { studentId } = await params;
   const session = await auth();
   const now = new Date();
-  const programScope =
-    session?.user.role === "TEACHER"
-      ? {
-          some: {
-            status: "APPROVED",
-            active: true,
-            program: {
-              teachers: { some: { teacherId: session.user.id, endDate: null, teacher: { active: true } } },
-              active: true,
-              startDate: { lte: now },
-              OR: [{ endDate: null }, { endDate: { gt: now } }],
-            },
-          },
-        }
-      : undefined;
+  const teacherGroupManagementEnabled =
+    session?.user.role === "ADMIN" || (await getFeatureSetting("TEACHER_GROUP_MANAGEMENT"));
+  const studentWhere = session
+    ? studentAccessWhereFor(session.user, now)
+    : { role: "STUDENT", active: true, validationStatus: "APPROVED" };
 
   const student = await prisma.user.findFirst({
-    where: { id: studentId, role: "STUDENT", ...(programScope ? { programEnrollments: programScope } : {}) },
+    where: { id: studentId, ...studentWhere },
   });
   if (!student) notFound();
 
@@ -49,9 +41,16 @@ export default async function AssignPage({ params }: PageProps) {
   });
   const assignedIds = new Set(existing.map((a) => a.practiceSetId));
 
-  const groups = await prisma.group.findMany({
-    include: { members: { include: { user: { select: { name: true } } } } },
-  });
+  const groups = teacherGroupManagementEnabled
+    ? await prisma.group.findMany({
+        include: {
+          members: {
+            where: { user: { active: true, validationStatus: "APPROVED" } },
+            include: { user: { select: { name: true } } },
+          },
+        },
+      })
+    : [];
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
@@ -83,6 +82,7 @@ export default async function AssignPage({ params }: PageProps) {
           name: g.name,
           members: g.members.map((m) => ({ id: m.userId, name: m.user.name })),
         }))}
+        groupAssignmentEnabled={teacherGroupManagementEnabled}
       />
     </div>
   );

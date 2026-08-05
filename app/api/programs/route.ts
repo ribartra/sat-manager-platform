@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { getFeatureSetting } from "@/lib/app-settings";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import { auth } from "@/lib/auth";
 
@@ -58,10 +59,15 @@ export async function GET() {
   return NextResponse.json({ programs });
 }
 
-// POST /api/programs — Teacher or Admin creates a program
+// POST /api/programs — Admin by default; teachers only when enabled by admin.
 export async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
   if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+  if (session.user.role === "TEACHER") {
+    const enabled = await getFeatureSetting("TEACHER_PROGRAM_MANAGEMENT");
+    if (!enabled) return NextResponse.json({ error: "Teacher program management is disabled." }, { status: 403 });
+  }
 
   const { name, teacherId, startDate, endDate } = await req.json();
   if (!name) return NextResponse.json({ error: "Name is required." }, { status: 400 });

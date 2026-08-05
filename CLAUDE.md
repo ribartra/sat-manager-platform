@@ -1,0 +1,79 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## What this is
+
+SAT preparation platform: a Next.js 16 (App Router, webpack) web app backed by SQLite/Prisma, plus a standalone FastAPI service (`ingest_service/`) for AI-assisted document ingestion (PDF/DOCX/ZIP → OCR → staging → review → promotion). Four role-based portals: Admin, Teacher, Student, Parent. Most product docs and the README are in Spanish; `README.md` is the authoritative functional spec.
+
+## Commands
+
+```bash
+npm run dev                # Next dev server (webpack) on :3000
+npm run build              # Production build (webpack)
+npm run lint               # eslint
+npm run typecheck          # tsc --noEmit
+npm run quality            # Full gate: prisma validate+generate, lint, typecheck, qa:p0/authz/edge, build
+
+npm run db:seed            # Seed demo data (tsx prisma/seed.ts)
+npm run db:reset           # migrate reset --force + reseed
+npm run prisma:generate    # Regenerate client (REQUIRED after schema.prisma changes)
+
+# Static QA gates — grep-based assertions over source, not runtime tests:
+node scripts/verify-p0.mjs         # npm run qa:p0
+node scripts/verify-authz.mjs      # npm run qa:authz
+node scripts/verify-edge-cases.mjs # npm run qa:edge
+```
+
+There is no Jest/Vitest suite. The `qa:*` scripts assert that specific security/correctness patterns (snapshots, RBAC scoping, status guards) are present in given files by string-matching them. When you touch a file these scripts reference, keep the asserted patterns intact or the gate fails. `npm run quality` is the CI-equivalent check (see `.github/workflows/ci.yml`).
+
+Docker: `docker-compose.yml` runs `web` (:3000) and `ingest-service` (:8000) sharing the project via bind mount and the same SQLite `dev.db`.
+
+## Architecture
+
+**Prisma client is generated to `app/generated/prisma/`, not `@prisma/client`.** Import from `@/app/generated/prisma/client`. Always run `prisma:generate` after editing `prisma/schema.prisma`. `lib/prisma.ts` wires the `better-sqlite3` adapter and is a singleton in prod but fresh-per-call in dev (so HMR never serves a stale generated client).
+
+**No `middleware.ts` for route protection — this is deliberate.** `better-sqlite3` + Prisma adapter require Node runtime, not Edge. Auth/RBAC is enforced server-side in layouts and route handlers via helpers in `lib/rbac.ts`: `requireAdmin()`, `requireTeacherOrAdmin()`, `requireApprovedSession()`. These return `null` (not throw) when access is denied — callers must handle that. They also re-check `active` and `validationStatus === "APPROVED"` against the DB, not just the JWT.
+
+**Teacher data access is program-scoped.** A teacher may only see students/attempts in programs they belong to. Scoping lives in `lib/program-scope.ts` (e.g. `teacherProgramEnrollmentScope`). Any new teacher-facing query over student data must apply this scope; the `qa:authz`/`qa:p0` gates check for it in specific routes.
+
+**Auth** (`lib/auth.ts`, `lib/auth.config.ts`): NextAuth v5 beta, Credentials provider, JWT session strategy. Session carries `id`, `email`, `role`, `validationStatus`. Login is rate-limited via `lib/rate-limit.ts`. `AUTH_SECRET` is required in production (throws otherwise).
+
+**Attempts use immutable snapshots.** On submit, the attempt stores `practiceSetSnapshot` / `questionSnapshot` (and full-test equivalents) so later edits to questions/sets don't change historical results. Submit requires the attempt to be `IN_PROGRESS`. Results rendering respects `canRevealSolutions` / `explanationVisibility`. See `lib/attempt-snapshots.ts`, `lib/full-test-scoring.ts`, `lib/full-test-progress.ts`.
+
+**Taxonomy — source of truth vs. current implementation (they diverge; know both).**
+
+Authoritative hierarchy (per product owner):
+```
+Section/Subject → Domain → Skill/Subskill → Topic → Difficulty → Practice Set → Question
+```
+Here **Topic is one level BELOW Skill** (a Skill groups several Topics); `Topic` is NOT a synonym for Skill. `difficulty` (EASY/MEDIUM/HARD) is a `Question`/`PracticeSet` attribute, not an academic node.
+
+Current code/DB do **not** yet match this:
+- `TaxonomyNode` models only `AREA → DOMAIN → SKILL → SUBSKILL` — there is no `TOPIC` node under skill.
+- The legacy `Topic` table is linked 1:1 to `SKILL` nodes (46 topics ↔ 46 SKILL nodes, same names via `taxonomyNodeId`), so in practice today **`Topic` occupies the Skill slot**. `Subskill` is effectively unused (1 row).
+- Questions, sets, materials, reports and ingest all group by that `Topic` table, i.e. "topic" currently means "skill".
+
+So when you read `topic` in code, it is really the skill level. Aligning the model to the source of truth (adding a real Topic level below Skill) is open work — see README "Taxonomía Académica". See `lib/taxonomy.ts`, `prisma/seed.ts`.
+
+### AI ingestion (two layers)
+
+1. **Next.js** (`app/admin/import/ai`, `app/api/admin/ai-import/*`) — upload, batching, review wizard, incidents, promotion.
+2. **FastAPI** (`ingest_service/app/main.py`) — extract text/images (pdfplumber, python-docx), OCR via Mistral (`mistral-ocr-latest`), build staging records, emit progress events.
+
+Ingestion **never writes directly to official questions.** Documents land in `Ingest*` staging tables, get reviewed/corrected in the wizard, and only approved content is promoted (`lib/ingest-promotion.ts`) into real `Question`/`PracticeSet`/`FullPracticeTest` rows, copying approved images into `public/uploads/questions` and recording `IngestPromotionArtifact` for traceability. Web↔FastAPI calls are authenticated with `INTERNAL_INGEST_TOKEN` (`lib/internal-ingest.ts`).
+
+**Secrets are encrypted at rest.** The Mistral API key is stored as an `AppSetting` (`MISTRAL_API_KEY_ENCRYPTED`), AES-256-GCM encrypted with `SECRET_ENCRYPTION_KEY`, keeping only a SHA-256 fingerprint + last 4 chars. `MISTRAL_API_KEY` env var is a fallback. Managed at `/admin/settings`. See `lib/secret-settings.ts`.
+
+## Layout conventions
+
+- Route groups: `app/(auth)`, `app/(student)`, `app/(teacher)`, `app/(parent)` for portal layouts; `app/admin/*` and `app/api/*` for admin pages and route handlers.
+- Domain logic lives in `lib/*.ts` (one file per concern: assignments, scoring, notifications, rbac, taxonomy, program-scope, etc.). Prefer extending these over inlining logic in route handlers.
+- Path alias: `@/*` → repo root.
+- UI: Tailwind CSS v4, Radix UI primitives, lucide-react, React Hook Form + Zod, TanStack Table, KaTeX for math.
+
+## Environment & data
+
+- Copy `.env.example` → `.env`. Key vars: `DATABASE_URL`, `AUTH_SECRET`, `SECRET_ENCRYPTION_KEY`, `INTERNAL_INGEST_TOKEN`, `AI_INGEST_SERVICE_URL`, `CORS_ALLOWED_ORIGINS`, `MISTRAL_*`, `EMAIL_*` (Brevo SMTP via nodemailer), `NEXT_PUBLIC_CALCULATOR_*`/`NEXT_PUBLIC_DESMOS_*` (embedded calculators).
+- Seed demo logins (`prisma/seed.ts`): `admin@sat.com` / `admin123`, `teacher…` / `teacher123`, `student1@sat.com` etc. / `student123`. Includes users in PENDING/REJECTED states to exercise validation flows.
+- DB backup/restore: `npm run db:backup` / `npm run db:restore` (→ `./backups`).

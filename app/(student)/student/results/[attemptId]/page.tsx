@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { formatDate, formatTime, scorePercent } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { MathContent } from "@/components/math-content";
 import { QuestionMedia } from "@/components/question-media";
 import { CheckCircle, XCircle, MinusCircle, ChevronLeft, RotateCcw } from "lucide-react";
@@ -37,6 +38,7 @@ export default async function ResultsPage({ params }: PageProps) {
           practiceSet: { include: { topic: true } },
         },
       },
+      pauses: true,
     },
   });
 
@@ -55,6 +57,8 @@ export default async function ResultsPage({ params }: PageProps) {
   const incorrect = attempt.answers.filter((a) => !a.isCorrect && a.answer !== null).length;
   const unanswered = totalQuestions - correct - incorrect;
   const pct = scorePercent(correct, totalQuestions);
+  const completedPauses = attempt.pauses.filter((pause) => pause.durationSeconds !== null);
+  const pauseSeconds = completedPauses.reduce((sum, pause) => sum + (pause.durationSeconds ?? 0), 0);
 
   const explanationVisibility =
     practiceSetSnapshot?.explanationVisibility ?? practiceSet?.explanationVisibility ?? "HIDDEN";
@@ -113,6 +117,13 @@ export default async function ResultsPage({ params }: PageProps) {
           </div>
         </div>
 
+        {attempt.pauses.length > 0 && (
+          <p className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+            Paused {attempt.pauses.length} time{attempt.pauses.length === 1 ? "" : "s"}
+            {pauseSeconds > 0 ? ` · total pause time ${formatTime(pauseSeconds)}` : ""}
+          </p>
+        )}
+
         <div className="mt-5 flex items-center gap-3">
           <Link
             href={attempt.assignmentId ? `/student/practice/assignment/${attempt.assignmentId}` : "/student/practice-sets"}
@@ -130,10 +141,10 @@ export default async function ResultsPage({ params }: PageProps) {
       </div>
 
       {attempt.teacherComment && (
-        <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
+        <Card variant="info" padding="md" className="mb-6 text-sm text-blue-900">
           <p className="mb-1 font-medium">Teacher comment</p>
           <p>{attempt.teacherComment}</p>
-        </div>
+        </Card>
       )}
 
       {/* Per-question review */}
@@ -164,7 +175,7 @@ export default async function ResultsPage({ params }: PageProps) {
               : "border-red-200 bg-red-50";
 
             return (
-              <div key={ans.id} className={`rounded-lg border p-4 ${statusClass}`}>
+              <Card key={ans.id} padding="md" className={statusClass}>
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium text-gray-500">Q{i + 1}</span>
@@ -205,12 +216,15 @@ export default async function ResultsPage({ params }: PageProps) {
                           ? "bg-blue-100 text-blue-800"
                           : "text-gray-600";
                         return (
-                          <div key={opt.label} className={`flex items-center gap-2 text-sm px-2 py-1 rounded ${optionClass}`}>
+                          <div key={opt.label} className={`flex items-start gap-2 text-sm px-2 py-1 rounded ${optionClass}`}>
                             <span className="font-medium w-4">{opt.label})</span>
-                            <MathContent content={opt.text} />
+                            <span className="min-w-0 flex-1">
+                              <MathContent content={opt.text} />
+                              <QuestionMedia imageUrl={opt.imageUrl} alt={`Option ${opt.label} image`} className="mt-2" />
+                            </span>
                           </div>
-                        );
-                      })}
+            );
+          })}
                     </div>
                   )}
 
@@ -234,7 +248,7 @@ export default async function ResultsPage({ params }: PageProps) {
                       <MathContent content={question.explanation} className="text-sm text-gray-700" />
                     </div>
                   )}
-                </div>
+              </Card>
               );
           })}
         </div>

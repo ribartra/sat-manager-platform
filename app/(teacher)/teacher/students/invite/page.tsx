@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
 export default function InviteStudentPage() {
@@ -17,7 +18,6 @@ export default function InviteStudentPage() {
   const [parentEmail, setParentEmail] = useState("");
   const [parentPhone, setParentPhone] = useState("");
   const [inviteUrl, setInviteUrl] = useState("");
-  const [parentInviteUrl, setParentInviteUrl] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -35,7 +35,6 @@ export default function InviteStudentPage() {
     e.preventDefault();
     setError("");
     setInviteUrl("");
-    setParentInviteUrl("");
     setLoading(true);
     const res = await fetch("/api/students/invite", {
       method: "POST",
@@ -49,7 +48,6 @@ export default function InviteStudentPage() {
       return;
     }
     setInviteUrl(data.inviteUrl);
-    setParentInviteUrl(data.parentInviteUrl ?? "");
   }
 
   return (
@@ -58,22 +56,31 @@ export default function InviteStudentPage() {
         <Link href="/teacher" className="text-sm text-blue-600 hover:underline">← Students</Link>
         <h1 className="mt-3 text-xl font-semibold text-gray-900">Invite Student</h1>
       </div>
-      <form onSubmit={submit} className="space-y-4 rounded-lg border border-gray-200 bg-white p-6">
+      <Card as="form" onSubmit={submit} padding="lg" className="space-y-4">
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">Program</label>
-          <select
-            value={programId}
-            onChange={(e) => setProgramId(e.target.value)}
-            className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            required
-          >
-            <option value="">Select a program</option>
-            {programs.map((program) => (
-              <option key={program.id} value={program.id}>
-                {program.name} · {program.teachers.map((pt) => pt.teacher.name).join(", ")}
-              </option>
-            ))}
-          </select>
+          {programs.length === 1 ? (
+            <>
+              <input type="hidden" value={programId} />
+              <div className="rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700">
+                {programs[0].name}
+              </div>
+            </>
+          ) : (
+            <select
+              value={programId}
+              onChange={(e) => setProgramId(e.target.value)}
+              className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              required
+            >
+              <option value="">Select a program</option>
+              {programs.map((program) => (
+                <option key={program.id} value={program.id}>
+                  {program.name} · {program.teachers.map((pt) => pt.teacher.name).join(", ")}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">Name</label>
@@ -103,7 +110,7 @@ export default function InviteStudentPage() {
             <span className="text-sm font-medium text-gray-700">Student is a minor (under 18)</span>
           </label>
           <p className="mt-1 text-xs text-gray-500 ml-6">
-            If checked, the parent will also receive an invitation to create their own account.
+            If checked, parent information will be linked when the student accepts the invitation.
           </p>
         </div>
 
@@ -134,11 +141,11 @@ export default function InviteStudentPage() {
 
         {error && <p className="text-sm text-red-600">{error}</p>}
         <Button type="submit" disabled={loading}>{loading ? "Creating..." : "Create Invite"}</Button>
-      </form>
+      </Card>
 
       {inviteUrl && (
-        <div className="mt-5 rounded-lg border border-green-200 bg-green-50 p-4 space-y-4">
-          <p className="text-sm font-semibold text-green-900">Invites created</p>
+        <Card variant="success" padding="md" className="mt-5 space-y-4">
+          <p className="text-sm font-semibold text-green-900">Invite created</p>
 
           <div>
             <p className="text-xs font-medium text-green-900">Student activation link:</p>
@@ -146,16 +153,7 @@ export default function InviteStudentPage() {
               {inviteUrl}
             </Link>
           </div>
-
-          {parentInviteUrl && (
-            <div>
-              <p className="text-xs font-medium text-green-900">Parent account creation link:</p>
-              <Link href={parentInviteUrl} className="mt-1 block break-all text-sm text-blue-700 underline">
-                {parentInviteUrl}
-              </Link>
-            </div>
-          )}
-        </div>
+        </Card>
       )}
     </div>
   );

@@ -1,6 +1,7 @@
 interface SnapshotOption {
   label: string;
   text: string;
+  imageUrl?: string | null;
 }
 
 interface SnapshotQuestion {
@@ -109,6 +110,7 @@ export function buildQuestionSnapshot(item: {
     options: item.question.options?.map((option) => ({
       label: option.label,
       text: option.text,
+      imageUrl: option.imageUrl ?? null,
     })),
     topic: item.question.topic,
   };

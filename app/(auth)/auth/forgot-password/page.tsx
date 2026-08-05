@@ -3,6 +3,7 @@
 import { useState, FormEvent } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import Link from "next/link";
 
 export default function ForgotPasswordPage() {
@@ -25,7 +26,7 @@ export default function ForgotPasswordPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="w-full max-w-sm">
-        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+        <Card padding="lg">
           <h1 className="text-lg font-semibold text-gray-900 mb-1">Reset your password</h1>
           <p className="text-sm text-gray-500 mb-5">
             Enter your email and we&apos;ll send you a reset link.
@@ -55,7 +56,7 @@ export default function ForgotPasswordPage() {
               ← Back to login
             </Link>
           </div>
-        </div>
+        </Card>
       </div>
     </div>
   );

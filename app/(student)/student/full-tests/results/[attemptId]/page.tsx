@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { formatTime, scorePercent } from "@/lib/utils";
 import { MathContent } from "@/components/math-content";
+import { Card } from "@/components/ui/card";
 
 interface PageProps { params: Promise<{ attemptId: string }> }
 
@@ -11,7 +12,7 @@ export default async function FullTestResultsPage({ params }: PageProps) {
   const session = await auth();
   const attempt = await prisma.fullPracticeTestAttempt.findFirst({
     where: { id: attemptId, studentId: session!.user.id },
-    include: { test: { include: { modules: { include: { questions: { include: { question: { include: { topic: { include: { domain: true } } } } }, orderBy: { order: "asc" } } }, orderBy: { order: "asc" } } } }, answers: true },
+    include: { test: { include: { modules: { include: { questions: { include: { question: { include: { topic: { include: { domain: true } } } } }, orderBy: { order: "asc" } } }, orderBy: { order: "asc" } } } }, answers: true, pauses: true },
   });
   if (!attempt) notFound();
 
@@ -43,29 +44,31 @@ export default async function FullTestResultsPage({ params }: PageProps) {
     }
     return { id: module.id, name: module.name, correct, total, time };
   });
+  const pauseSeconds = attempt.pauses.reduce((sum, pause) => sum + (pause.durationSeconds ?? 0), 0);
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
       <h1 className="mb-6 text-xl font-semibold text-gray-900">Results: {attempt.test.name}</h1>
       <div className="grid grid-cols-3 gap-4">
-        <div className="rounded-lg border border-gray-200 bg-white p-5 text-center"><p className="text-3xl font-bold">{attempt.rwScore ?? "—"}</p><p className="text-xs text-gray-500">Reading & Writing</p></div>
-        <div className="rounded-lg border border-gray-200 bg-white p-5 text-center"><p className="text-3xl font-bold">{attempt.mathScore ?? "—"}</p><p className="text-xs text-gray-500">Math</p></div>
-        <div className="rounded-lg border border-gray-200 bg-white p-5 text-center"><p className="text-3xl font-bold">{attempt.totalScore ?? "—"}</p><p className="text-xs text-gray-500">Total</p></div>
+        <Card padding="md" className="text-center"><p className="text-3xl font-bold">{attempt.rwScore ?? "—"}</p><p className="text-xs text-gray-500">Reading & Writing</p></Card>
+        <Card padding="md" className="text-center"><p className="text-3xl font-bold">{attempt.mathScore ?? "—"}</p><p className="text-xs text-gray-500">Math</p></Card>
+        <Card padding="md" className="text-center"><p className="text-3xl font-bold">{attempt.totalScore ?? "—"}</p><p className="text-xs text-gray-500">Total</p></Card>
       </div>
-      <div className="mt-6 rounded-lg border border-gray-200 bg-white p-5 text-sm text-gray-600">
+      <Card padding="md" className="mt-6 text-sm text-gray-600">
         Time expired events: {attempt.timeExpiredEvents} · Extra time used: {attempt.extraTimeUsed}s
-      </div>
+        {attempt.pauses.length > 0 ? ` · Paused ${attempt.pauses.length}x (${formatTime(pauseSeconds)})` : ""}
+      </Card>
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         <StatsPanel title="By Module" rows={moduleStats.map((stat) => ({ label: stat.name, ...stat }))} />
         <StatsPanel title="By Difficulty" rows={[...difficultyStats.entries()].map(([label, stat]) => ({ label, ...stat }))} />
       </div>
       <div className="mt-6">
-        <StatsPanel title="By Topic" rows={[...topicStats.entries()].map(([label, stat]) => ({ label, ...stat }))} />
+        <StatsPanel title="By Skill" rows={[...topicStats.entries()].map(([label, stat]) => ({ label, ...stat }))} />
       </div>
       {attempt.test.reviewEnabled && (
         <div className="mt-6 space-y-5">
           {attempt.test.modules.map((module) => (
-            <div key={module.id} className="rounded-lg border border-gray-200 bg-white p-5">
+            <Card key={module.id} padding="md">
               <h2 className="mb-3 text-sm font-semibold text-gray-900">{module.name}</h2>
               <div className="space-y-2">
                 {module.questions.map((item, index) => {
@@ -88,7 +91,7 @@ export default async function FullTestResultsPage({ params }: PageProps) {
                   );
                 })}
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       )}
@@ -98,7 +101,7 @@ export default async function FullTestResultsPage({ params }: PageProps) {
 
 function StatsPanel({ title, rows }: { title: string; rows: { label: string; correct: number; total: number; time: number }[] }) {
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-5">
+    <Card padding="md">
       <h2 className="mb-3 text-sm font-semibold text-gray-900">{title}</h2>
       <div className="space-y-3">
         {rows.map((row) => {
@@ -114,6 +117,6 @@ function StatsPanel({ title, rows }: { title: string; rows: { label: string; cor
           );
         })}
       </div>
-    </div>
+    </Card>
   );
 }

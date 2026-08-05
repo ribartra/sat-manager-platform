@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 
@@ -80,7 +81,7 @@ function CreateProgramForm({ onDone }: { onDone: () => void }) {
   }
 
   return (
-    <form onSubmit={submit} className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
+    <Card as="form" onSubmit={submit} variant="info" padding="md" className="mb-6">
       <h3 className="mb-3 text-sm font-semibold text-blue-900">New Program</h3>
       <div className="grid gap-3 md:grid-cols-[1fr_150px_150px_auto_auto]">
         <Input
@@ -106,7 +107,7 @@ function CreateProgramForm({ onDone }: { onDone: () => void }) {
           Cancel
         </Button>
       </div>
-    </form>
+    </Card>
   );
 }
 
@@ -339,7 +340,7 @@ export function TeacherProgramsClient({ programs }: { programs: Program[] }) {
     <div>
       {/* Pending enrollment requests summary */}
       {allPending.length > 0 && (
-        <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4">
+        <Card variant="warning" padding="md" className="mb-6">
           <h2 className="mb-3 text-sm font-semibold text-amber-900">
             Pending Enrollment Requests
           </h2>
@@ -353,7 +354,7 @@ export function TeacherProgramsClient({ programs }: { programs: Program[] }) {
               />
             ))}
           </div>
-        </div>
+        </Card>
       )}
 
       {/* Create button */}
@@ -367,7 +368,7 @@ export function TeacherProgramsClient({ programs }: { programs: Program[] }) {
       {showCreate && <CreateProgramForm onDone={() => setShowCreate(false)} />}
 
       {/* Programs table */}
-      <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
+      <Card className="overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50">
@@ -487,7 +488,7 @@ export function TeacherProgramsClient({ programs }: { programs: Program[] }) {
         {programs.length === 0 && (
           <p className="py-10 text-center text-sm text-gray-400">No programs yet.</p>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

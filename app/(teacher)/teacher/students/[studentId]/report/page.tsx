@@ -4,9 +4,10 @@ import Link from "next/link";
 import { formatDate, formatTime, scorePercent } from "@/lib/utils";
 import { parseSnapshot, PracticeSetSnapshot, QuestionSnapshot } from "@/lib/attempt-snapshots";
 import { auth } from "@/lib/auth";
-import { teacherProgramEnrollmentScope } from "@/lib/program-scope";
+import { studentAccessWhereFor } from "@/lib/program-scope";
 import { QuestionMedia } from "@/components/question-media";
 import { MathContent } from "@/components/math-content";
+import { Card } from "@/components/ui/card";
 
 interface PageProps {
   params: Promise<{ studentId: string }>;
@@ -15,15 +16,13 @@ interface PageProps {
 export default async function StudentReportPage({ params }: PageProps) {
   const { studentId } = await params;
   const session = await auth();
-  const programScope =
-    session?.user.role === "TEACHER"
-      ? teacherProgramEnrollmentScope(session.user.id)
-      : undefined;
+  const studentWhere = session
+    ? studentAccessWhereFor(session.user)
+    : { role: "STUDENT", active: true, validationStatus: "APPROVED" };
   const student = await prisma.user.findFirst({
     where: {
       id: studentId,
-      role: "STUDENT",
-      ...(programScope ? { programEnrollments: programScope } : {}),
+      ...studentWhere,
     },
   });
   if (!student) notFound();
@@ -109,27 +108,27 @@ export default async function StudentReportPage({ params }: PageProps) {
           <Link href={`/teacher/students/${studentId}`} className="text-sm text-blue-600 hover:underline">← Student</Link>
           <h1 className="mt-2 text-xl font-semibold text-gray-900">Individual Report: {student.name}</h1>
         </div>
-        <Link href={`/api/reports/students/${studentId}/pdf`} className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
+        <Link href={`/api/reports/students/${studentId}/pdf?areas=mathematics,reading,writing`} className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
           Download PDF
         </Link>
       </div>
 
       <div className="mb-6 grid gap-4 md:grid-cols-5">
-        <div className="rounded-lg border border-gray-200 bg-white p-4"><p className="text-2xl font-bold">{attempts.length}</p><p className="text-xs text-gray-500">Completed attempts</p></div>
-        <div className="rounded-lg border border-gray-200 bg-white p-4"><p className="text-2xl font-bold">{formatTime(totalTime)}</p><p className="text-xs text-gray-500">Practice time</p></div>
-        <div className="rounded-lg border border-gray-200 bg-white p-4"><p className="text-2xl font-bold">{topicStats.size}</p><p className="text-xs text-gray-500">Topics practiced</p></div>
-        <div className="rounded-lg border border-gray-200 bg-white p-4"><p className="text-2xl font-bold">{avgScore !== null ? `${avgScore}%` : "-"}</p><p className="text-xs text-gray-500">Average score</p></div>
-        <div className="rounded-lg border border-gray-200 bg-white p-4"><p className="text-2xl font-bold">{lastValidAttempt ? `${lastValidAttempt.score}%` : "-"}</p><p className="text-xs text-gray-500">Last valid score</p></div>
+        <Card padding="md"><p className="text-2xl font-bold">{attempts.length}</p><p className="text-xs text-gray-500">Completed attempts</p></Card>
+        <Card padding="md"><p className="text-2xl font-bold">{formatTime(totalTime)}</p><p className="text-xs text-gray-500">Practice time</p></Card>
+        <Card padding="md"><p className="text-2xl font-bold">{topicStats.size}</p><p className="text-xs text-gray-500">Skills practiced</p></Card>
+        <Card padding="md"><p className="text-2xl font-bold">{avgScore !== null ? `${avgScore}%` : "-"}</p><p className="text-xs text-gray-500">Average score</p></Card>
+        <Card padding="md"><p className="text-2xl font-bold">{lastValidAttempt ? `${lastValidAttempt.score}%` : "-"}</p><p className="text-xs text-gray-500">Last valid score</p></Card>
       </div>
 
       <div className="mb-6 grid gap-6 lg:grid-cols-2">
-        <ProgressPanel title="Progress by Topic" stats={topicStats} />
+        <ProgressPanel title="Progress by Skill" stats={topicStats} />
         <ProgressPanel title="Progress by Difficulty" stats={difficultyStats} />
       </div>
 
       {weakTopics.length > 0 && (
-        <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4">
-          <h2 className="mb-3 text-sm font-semibold text-amber-900">Weak Topics</h2>
+        <Card variant="warning" padding="md" className="mb-6">
+          <h2 className="mb-3 text-sm font-semibold text-amber-900">Weak Skills</h2>
           <div className="grid gap-3 md:grid-cols-3">
             {weakTopics.map((topic) => (
               <div key={topic.topic} className="rounded-md border border-amber-100 bg-white px-3 py-2">
@@ -139,10 +138,10 @@ export default async function StudentReportPage({ params }: PageProps) {
               </div>
             ))}
           </div>
-        </div>
+        </Card>
       )}
 
-      <div className="mb-6 rounded-lg border border-gray-200 bg-white p-4">
+      <Card padding="md" className="mb-6">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-sm font-semibold text-gray-900">Score Progress Over Time</h2>
           {scoreTrend.length > 1 && (
@@ -180,9 +179,9 @@ export default async function StudentReportPage({ params }: PageProps) {
         ) : (
           <p className="text-sm text-gray-400">No submitted attempts yet.</p>
         )}
-      </div>
+      </Card>
 
-      <div className="mb-6 rounded-lg border border-gray-200 bg-white p-4">
+      <Card padding="md" className="mb-6">
         <h2 className="mb-3 text-sm font-semibold text-gray-900">Recent Attempts</h2>
         <div className="overflow-hidden rounded-md border border-gray-100">
           <table className="w-full text-sm">
@@ -209,10 +208,10 @@ export default async function StudentReportPage({ params }: PageProps) {
             </tbody>
           </table>
         </div>
-      </div>
+      </Card>
 
       {teacherComments.length > 0 && (
-        <div className="mb-6 rounded-lg border border-gray-200 bg-white p-4">
+        <Card padding="md" className="mb-6">
           <h2 className="mb-3 text-sm font-semibold text-gray-900">Teacher Comments</h2>
           <div className="space-y-3">
             {teacherComments.map((entry) => (
@@ -225,11 +224,11 @@ export default async function StudentReportPage({ params }: PageProps) {
               </div>
             ))}
           </div>
-        </div>
+        </Card>
       )}
 
       {mediaQuestions.size > 0 && (
-        <div className="rounded-lg border border-gray-200 bg-white p-4">
+        <Card padding="md">
           <h2 className="mb-3 text-sm font-semibold text-gray-900">Question Media Referenced</h2>
           <div className="grid gap-4 md:grid-cols-2">
             {[...mediaQuestions.values()].slice(0, 6).map((question) => (
@@ -240,7 +239,7 @@ export default async function StudentReportPage({ params }: PageProps) {
               </div>
             ))}
           </div>
-        </div>
+        </Card>
       )}
     </div>
   );
@@ -248,7 +247,7 @@ export default async function StudentReportPage({ params }: PageProps) {
 
 function ProgressPanel({ title, stats }: { title: string; stats: Map<string, { correct: number; total: number; time: number }> }) {
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-4">
+    <Card padding="md">
       <h2 className="mb-3 text-sm font-semibold text-gray-900">{title}</h2>
       <div className="space-y-3">
         {[...stats.entries()].map(([label, stat]) => {
@@ -265,6 +264,6 @@ function ProgressPanel({ title, stats }: { title: string; stats: Map<string, { c
         })}
         {stats.size === 0 && <p className="text-sm text-gray-400">No submitted attempts yet.</p>}
       </div>
-    </div>
+    </Card>
   );
 }

@@ -91,7 +91,7 @@ export function NavStudent({
       {!hasActiveEnrollment && (
         <div className="bg-blue-50 border-b border-blue-100 px-4 py-2 text-center">
           <p className="text-xs text-blue-700">
-            You are not enrolled in an active program yet. Request enrollment to access the full platform.
+            You are not enrolled in an active program yet. Your teacher or administrator must enroll you.
           </p>
         </div>
       )}

@@ -6,6 +6,7 @@ import { MathContent } from "@/components/math-content";
 import { MathToolPanel } from "@/components/math-tool-panel";
 import { QuestionMedia } from "@/components/question-media";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { formatTime } from "@/lib/utils";
@@ -14,7 +15,7 @@ import type { GraphArtifact } from "@/lib/question-graph";
 import { Flag, ChevronLeft, ChevronRight, List, Pause, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface Option { label: string; text: string }
+interface Option { label: string; text: string; imageUrl?: string | null }
 interface Question {
   id: string;
   stem: string;
@@ -77,7 +78,8 @@ export function PracticeSetPlayer({
 
   useEffect(() => {
     questionStartTime.current = Date.now();
-  }, []);
+    void fetch(`/api/attempts/${attemptId}/resume`, { method: "POST" });
+  }, [attemptId]);
 
   // Timer
   useEffect(() => {
@@ -199,6 +201,7 @@ export function PracticeSetPlayer({
 
   const handlePauseExit = async () => {
     await saveProgress(answers, current);
+    await fetch(`/api/attempts/${attemptId}/pause`, { method: "POST" });
     router.push(`/student/content-map`);
   };
 
@@ -338,7 +341,10 @@ export function PracticeSetPlayer({
                   >
                     {opt.label}
                   </span>
-                  <MathContent content={opt.text} className="text-gray-800" />
+                  <span className="min-w-0 flex-1">
+                    <MathContent content={opt.text} className="text-gray-800" />
+                    <QuestionMedia imageUrl={opt.imageUrl} alt={`Option ${opt.label} image`} className="mt-2" />
+                  </span>
                 </button>
                 <button
                   type="button"
@@ -364,7 +370,7 @@ export function PracticeSetPlayer({
             </div>
           )}
 
-          <div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
+          <Card variant="subtle" padding="sm">
             <label className="mb-1 block text-xs font-medium text-gray-500">Personal note</label>
             <Textarea
               value={notes[question.id] ?? ""}
@@ -372,7 +378,7 @@ export function PracticeSetPlayer({
               placeholder="Add a private note for review"
               rows={3}
             />
-          </div>
+          </Card>
         </div>
       </div>
 

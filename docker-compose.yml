@@ -1,0 +1,33 @@
+services:
+  web:
+    image: node:24-slim
+    working_dir: /app
+    command: sh -c "npm install && npm run dev"
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: file:./dev.db
+      AI_INGEST_SERVICE_URL: http://ingest-service:8000
+      AUTH_SECRET: ${AUTH_SECRET:-sat-platform-dev-secret-change-in-production}
+      SECRET_ENCRYPTION_KEY: ${SECRET_ENCRYPTION_KEY:-}
+      INTERNAL_INGEST_TOKEN: ${INTERNAL_INGEST_TOKEN:-sat-platform-dev-internal-token-change}
+    volumes:
+      - .:/app
+    depends_on:
+      - ingest-service
+
+  ingest-service:
+    build:
+      context: .
+      dockerfile: ingest_service/Dockerfile
+    working_dir: /app
+    environment:
+      DATABASE_URL: file:./dev.db
+      AUTH_SECRET: ${AUTH_SECRET:-sat-platform-dev-secret-change-in-production}
+      SECRET_ENCRYPTION_KEY: ${SECRET_ENCRYPTION_KEY:-}
+      INTERNAL_INGEST_TOKEN: ${INTERNAL_INGEST_TOKEN:-sat-platform-dev-internal-token-change}
+      MISTRAL_API_KEY: ${MISTRAL_API_KEY:-}
+      MISTRAL_OCR_MODEL: ${MISTRAL_OCR_MODEL:-mistral-ocr-latest}
+      MISTRAL_STRUCTURING_MODEL: ${MISTRAL_STRUCTURING_MODEL:-mistral-large-latest}
+    volumes:
+      - .:/app

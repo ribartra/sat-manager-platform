@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
+import { Card } from "@/components/ui/card";
 import { MathContent } from "@/components/math-content";
 import { QuestionMedia } from "@/components/question-media";
 import {
@@ -23,6 +24,7 @@ interface TopicInfo {
   name: string;
   sectionLabel: string;
   domainName: string;
+  taxonomyLabel: string;
   subskills: { id: string; name: string }[];
 }
 
@@ -39,7 +41,13 @@ interface QuestionData {
   supportsGraph?: boolean;
   correctAnswer?: string;
   status?: string;
-  options?: { label: string; text: string }[];
+  options?: { label: string; text: string; imageUrl?: string | null }[];
+}
+
+interface SourceContext {
+  ingestCandidateId?: string;
+  batchId?: string;
+  sourceFileId?: string;
 }
 
 type FormulaTarget =
@@ -85,7 +93,7 @@ function splitFormulaParts(content: string) {
   return content.split(formulaPattern).filter(Boolean);
 }
 
-export function QuestionEditor({ topics, initial }: { topics: TopicInfo[]; initial?: QuestionData }) {
+export function QuestionEditor({ topics, initial, sourceContext }: { topics: TopicInfo[]; initial?: QuestionData; sourceContext?: SourceContext }) {
   const router = useRouter();
   const [topicId, setTopicId] = useState(initial?.topicId ?? "");
   const [subskillId, setSubskillId] = useState(initial?.subskillId ?? "");
@@ -122,6 +130,10 @@ export function QuestionEditor({ topics, initial }: { topics: TopicInfo[]; initi
 
   function updateOption(label: string, text: string) {
     setOptions((prev) => prev.map((o) => (o.label === label ? { ...o, text } : o)));
+  }
+
+  function updateOptionImage(label: string, imageUrl: string) {
+    setOptions((prev) => prev.map((o) => (o.label === label ? { ...o, imageUrl } : o)));
   }
 
   function getTargetValue(target: FormulaTarget) {
@@ -290,6 +302,7 @@ export function QuestionEditor({ topics, initial }: { topics: TopicInfo[]; initi
       correctAnswer,
       status,
       options: type === "MC" ? options : [],
+      ingestCandidateId: sourceContext?.ingestCandidateId,
     };
     const url = initial?.id ? `/api/questions/${initial.id}` : "/api/questions";
     const method = initial?.id ? "PUT" : "POST";
@@ -305,16 +318,16 @@ export function QuestionEditor({ topics, initial }: { topics: TopicInfo[]; initi
 
   return (
     <div className="space-y-6">
-      {/* Topic + Metadata */}
+      {/* Skill + Metadata */}
       <div className="grid grid-cols-3 gap-4">
         <div className="col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Topic *</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Skill *</label>
           <Select value={topicId} onChange={(e) => setTopicId(e.target.value)} required>
-            <option value="">Select a topic...</option>
+            <option value="">Select a skill...</option>
             {["Mathematics", "Reading & Writing"].map((section) => (
               <optgroup key={section} label={section}>
                 {topics.filter((t) => t.sectionLabel === section).map((t) => (
-                  <option key={t.id} value={t.id}>{t.domainName} / {t.name}</option>
+                  <option key={t.id} value={t.id}>{t.taxonomyLabel}</option>
                 ))}
               </optgroup>
             ))}
@@ -361,7 +374,7 @@ export function QuestionEditor({ topics, initial }: { topics: TopicInfo[]; initi
       </div>
 
       {isMathQuestion && (
-        <label className="flex items-start gap-3 rounded-lg border border-gray-200 bg-white p-3">
+        <Card as="label" padding="sm" className="flex items-start gap-3">
           <input
             type="checkbox"
             checked={supportsGraph}
@@ -374,7 +387,7 @@ export function QuestionEditor({ topics, initial }: { topics: TopicInfo[]; initi
               Use this only when the question should preload graph data into the calculator or local renderer.
             </span>
           </span>
-        </label>
+        </Card>
       )}
 
       {/* Stimulus */}
@@ -425,17 +438,17 @@ export function QuestionEditor({ topics, initial }: { topics: TopicInfo[]; initi
           <label className="block text-sm font-medium text-gray-700 mb-2">Answer Choices</label>
           <div className="space-y-2">
             {options.map((opt) => (
-              <div key={opt.label} className="flex items-center gap-3">
+              <div key={opt.label} className="grid grid-cols-[auto_1.5rem_1fr_auto] items-start gap-3">
                 <input
                   type="radio"
                   name="correct"
                   value={opt.label}
                   checked={correctAnswer === opt.label}
                   onChange={(e) => setCorrectAnswer(e.target.value)}
-                  className="text-blue-600"
+                  className="mt-3 text-blue-600"
                 />
-                <span className="font-mono text-sm font-medium w-6 text-gray-600">{opt.label})</span>
-                <div className="min-w-0 flex-1">
+                <span className="mt-3 font-mono text-sm font-medium text-gray-600">{opt.label})</span>
+                <div className="min-w-0 space-y-2">
                   {renderVisualMathField({
                     target: { kind: "option", label: `Option ${opt.label}`, optionLabel: opt.label },
                     value: opt.text,
@@ -443,6 +456,13 @@ export function QuestionEditor({ topics, initial }: { topics: TopicInfo[]; initi
                     rows: 2,
                     placeholder: `Option ${opt.label}...`,
                   })}
+                  <Input
+                    value={opt.imageUrl ?? ""}
+                    onChange={(e) => updateOptionImage(opt.label, e.target.value)}
+                    placeholder={`Option ${opt.label} image URL (optional)`}
+                    className="text-xs"
+                  />
+                  <QuestionMedia imageUrl={opt.imageUrl} className="bg-white" />
                 </div>
                 {renderFormulaButton({ kind: "option", label: `Option ${opt.label}`, optionLabel: opt.label })}
               </div>
@@ -479,7 +499,7 @@ export function QuestionEditor({ topics, initial }: { topics: TopicInfo[]; initi
 
       {/* Preview toggle */}
       {stem && (
-        <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+        <Card variant="info" padding="md">
           <button
             type="button"
             onClick={() => setPreview(!preview)}
@@ -507,7 +527,10 @@ export function QuestionEditor({ topics, initial }: { topics: TopicInfo[]; initi
                     {options.map((option) => (
                       <div key={option.label} className="flex gap-2 text-sm text-gray-800">
                         <span className="w-5 shrink-0 font-medium">{option.label})</span>
-                        {option.text ? <MathContent content={option.text} /> : <span className="text-gray-300">Empty</span>}
+                        <span className="min-w-0 flex-1">
+                          {option.text ? <MathContent content={option.text} /> : <span className="text-gray-300">Empty</span>}
+                          <QuestionMedia imageUrl={option.imageUrl} className="mt-2" />
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -521,7 +544,7 @@ export function QuestionEditor({ topics, initial }: { topics: TopicInfo[]; initi
               )}
             </div>
           )}
-        </div>
+        </Card>
       )}
 
       {/* Actions */}

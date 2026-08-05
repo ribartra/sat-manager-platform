@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { scorePercent } from "@/lib/utils";
+import { Card } from "@/components/ui/card";
 
 export default async function ParentDashboardPage() {
   const session = await auth();
@@ -20,11 +21,11 @@ export default async function ParentDashboardPage() {
             return sum + scorePercent(correct, a.answers.length);
           }, 0) / attempts.length) : null;
           return (
-            <div key={link.studentId} className="rounded-lg border border-gray-200 bg-white p-5">
+            <Card key={link.studentId} padding="md">
               <h2 className="text-base font-semibold text-gray-900">{link.student.name}</h2>
               <p className="mt-2 text-sm text-gray-600">Recent attempts: {attempts.length}</p>
               <p className="text-sm text-gray-600">Average score: {avg !== null ? `${avg}%` : "—"}</p>
-            </div>
+            </Card>
           );
         })}
       </div>

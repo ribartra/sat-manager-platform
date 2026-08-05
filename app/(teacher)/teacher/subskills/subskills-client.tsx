@@ -3,13 +3,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 
 interface TopicInfo {
   id: string;
   label: string;
-  subskills: { id: string; name: string }[];
+  subskills: { id: string; name: string; label: string }[];
 }
 
 export function SubskillsClient({ topics }: { topics: TopicInfo[] }) {
@@ -36,8 +37,8 @@ export function SubskillsClient({ topics }: { topics: TopicInfo[] }) {
 
   return (
     <div className="space-y-5">
-      <div className="rounded-lg border border-gray-200 bg-white p-4">
-        <label className="mb-1 block text-sm font-medium text-gray-700">Topic</label>
+      <Card padding="md">
+        <label className="mb-1 block text-sm font-medium text-gray-700">Skill</label>
         <Select value={topicId} onChange={(e) => setTopicId(e.target.value)}>
           {topics.map((topic) => <option key={topic.id} value={topic.id}>{topic.label}</option>)}
         </Select>
@@ -45,16 +46,16 @@ export function SubskillsClient({ topics }: { topics: TopicInfo[] }) {
           <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="New subskill name" />
           <Button onClick={create}>Add</Button>
         </div>
-      </div>
-      <div className="rounded-lg border border-gray-200 bg-white">
+      </Card>
+      <Card>
         {(topic?.subskills ?? []).map((subskill) => (
           <div key={subskill.id} className="flex items-center justify-between border-b border-gray-100 px-4 py-3 last:border-b-0">
-            <span className="text-sm text-gray-800">{subskill.name}</span>
+            <span className="text-sm text-gray-800">{subskill.label}</span>
             <button onClick={() => remove(subskill.id)} className="text-xs text-red-600 hover:underline">Delete</button>
           </div>
         ))}
         {(!topic || topic.subskills.length === 0) && <div className="p-8 text-center text-sm text-gray-400">No subskills yet.</div>}
-      </div>
+      </Card>
     </div>
   );
 }

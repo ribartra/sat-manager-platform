@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 interface Props {
   student: { id: string; name: string };
@@ -36,7 +37,7 @@ export function ParentApprovalCard({ student, enrollment }: Props) {
 
   if (done) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white px-4 py-3">
+      <Card className="px-4 py-3">
         <p className="text-sm text-gray-600">
           {done === "approve" ? (
             <span className="text-green-700 font-medium">
@@ -48,12 +49,12 @@ export function ParentApprovalCard({ student, enrollment }: Props) {
             </span>
           )}
         </p>
-      </div>
+      </Card>
     );
   }
 
   return (
-    <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 flex items-center justify-between gap-4">
+    <Card variant="warning" className="flex items-center justify-between gap-4 px-4 py-3">
       <div>
         <p className="text-sm font-medium text-amber-900">
           {student.name} → {enrollment.program.name}
@@ -85,6 +86,6 @@ export function ParentApprovalCard({ student, enrollment }: Props) {
           {loading === "reject" ? "..." : "Reject"}
         </Button>
       </div>
-    </div>
+    </Card>
   );
 }

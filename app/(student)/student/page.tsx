@@ -134,9 +134,9 @@ export default async function StudentDashboard() {
           </div>
           <div className="space-y-2">
             {assignments.map((a) => (
-              <div
+              <Card
                 key={a.id}
-                className="flex items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-3"
+                className="flex items-center justify-between px-4 py-3"
               >
                 <div>
                   <p className="text-sm font-medium text-gray-900">{a.practiceSet.name}</p>
@@ -161,7 +161,7 @@ export default async function StudentDashboard() {
                     {a.status === "IN_PROGRESS" ? "Continue →" : "Start →"}
                   </Link>
                 </div>
-              </div>
+              </Card>
             ))}
           </div>
         </section>
@@ -177,9 +177,9 @@ export default async function StudentDashboard() {
               const total = a.answers.length;
               const pct = scorePercent(correct, total);
               return (
-                <div
+                <Card
                   key={a.id}
-                  className="flex items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-3"
+                  className="flex items-center justify-between px-4 py-3"
                 >
                   <div>
                     <p className="text-sm font-medium text-gray-900">
@@ -203,7 +203,7 @@ export default async function StudentDashboard() {
                       <CheckCircle size={12} /> Review
                     </Link>
                   </div>
-                </div>
+                </Card>
               );
             })}
           </div>
@@ -211,11 +211,11 @@ export default async function StudentDashboard() {
       )}
 
       {assignments.length === 0 && recentAttempts.length === 0 && (
-        <div className="text-center py-16 text-gray-400">
+        <Card padding="lg" className="py-16 text-center text-gray-400">
           <BookOpen size={40} className="mx-auto mb-3" />
           <p className="font-medium">No assignments yet</p>
           <p className="text-sm mt-1">Your teacher will assign practice sets soon.</p>
-        </div>
+        </Card>
       )}
     </div>
   );
@@ -283,9 +283,9 @@ async function ParentDashboard({ parentId, parentName }: { parentId: string; par
         ) : (
           <div className="space-y-3">
             {children.map((link) => (
-              <div
+              <Card
                 key={link.student.id}
-                className="rounded-lg border border-gray-200 bg-white px-4 py-3"
+                className="px-4 py-3"
               >
                 <p className="text-sm font-medium text-gray-900">{link.student.name}</p>
                 <p className="text-xs text-gray-500 mt-0.5">{link.student.email}</p>
@@ -317,7 +317,7 @@ async function ParentDashboard({ parentId, parentName }: { parentId: string; par
                 ) : (
                   <p className="text-xs text-gray-400 mt-1">No enrollments yet.</p>
                 )}
-              </div>
+              </Card>
             ))}
           </div>
         )}

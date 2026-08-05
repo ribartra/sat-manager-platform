@@ -16,7 +16,18 @@ export function GroupsClient({ groups: initialGroups, students }: { groups: Grou
   const [newName, setNewName] = useState("");
   const [newSchedule, setNewSchedule] = useState("");
   const [creating, setCreating] = useState(false);
+  const [editingGroupId, setEditingGroupId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editSchedule, setEditSchedule] = useState("");
   const [showAllAvailable, setShowAllAvailable] = useState<Record<string, boolean>>({});
+  const [groupSearch, setGroupSearch] = useState("");
+  const [studentSearch, setStudentSearch] = useState("");
+
+  const visibleGroups = groups.filter((group) => {
+    const term = groupSearch.trim().toLowerCase();
+    if (!term) return true;
+    return group.name.toLowerCase().includes(term) || group.members.some((member) => member.name.toLowerCase().includes(term) || member.email.toLowerCase().includes(term));
+  });
 
   async function createGroup() {
     if (!newName.trim()) return;
@@ -47,6 +58,39 @@ export function GroupsClient({ groups: initialGroups, students }: { groups: Grou
     router.refresh();
   }
 
+  function startEdit(group: Group) {
+    setEditingGroupId(group.id);
+    setEditName(group.name);
+    setEditSchedule(group.schedule ?? "");
+  }
+
+  async function saveGroup(groupId: string) {
+    const response = await fetch(`/api/groups/${groupId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: editName, schedule: editSchedule }),
+    });
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      window.alert(data.error || "Could not update group.");
+      return;
+    }
+    setEditingGroupId(null);
+    router.refresh();
+  }
+
+  async function deleteGroup(groupId: string) {
+    if (!window.confirm("Delete this group? Members will be unlinked from the group.")) return;
+    const response = await fetch(`/api/groups/${groupId}`, { method: "DELETE" });
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      window.alert(data.error || "Could not delete group.");
+      return;
+    }
+    setGroups((prev) => prev.filter((group) => group.id !== groupId));
+    router.refresh();
+  }
+
   return (
     <div className="space-y-6">
       {/* Create group */}
@@ -71,10 +115,28 @@ export function GroupsClient({ groups: initialGroups, students }: { groups: Grou
         </CardBody>
       </Card>
 
+      <div className="flex flex-wrap gap-3">
+        <Input
+          value={groupSearch}
+          onChange={(event) => setGroupSearch(event.target.value)}
+          placeholder="Search group or member..."
+          className="max-w-sm"
+        />
+        <Input
+          value={studentSearch}
+          onChange={(event) => setStudentSearch(event.target.value)}
+          placeholder="Search student to add..."
+          className="max-w-sm"
+        />
+      </div>
+
       {/* Groups list */}
-      {groups.map((group) => {
+      {visibleGroups.map((group) => {
         const membersSet = new Set(group.members.map((m) => m.id));
-        const available = students.filter((s) => !membersSet.has(s.id));
+        const available = students.filter((s) => {
+          const term = studentSearch.trim().toLowerCase();
+          return !membersSet.has(s.id) && (!term || s.name.toLowerCase().includes(term) || s.email.toLowerCase().includes(term));
+        });
         const MAX_VISIBLE = 5;
         const showAll = showAllAvailable[group.id] ?? false;
         const visibleAvailable = showAll ? available : available.slice(0, MAX_VISIBLE);
@@ -85,10 +147,32 @@ export function GroupsClient({ groups: initialGroups, students }: { groups: Grou
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="font-semibold text-gray-900">{group.name}</h2>
-                  {group.schedule && <p className="text-xs text-gray-500 mt-0.5">{group.schedule}</p>}
+                  {editingGroupId === group.id ? (
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      <Input value={editName} onChange={(event) => setEditName(event.target.value)} placeholder="Group name" />
+                      <Input value={editSchedule} onChange={(event) => setEditSchedule(event.target.value)} placeholder="Schedule" />
+                    </div>
+                  ) : (
+                    <>
+                      <h2 className="font-semibold text-gray-900">{group.name}</h2>
+                      {group.schedule && <p className="text-xs text-gray-500 mt-0.5">{group.schedule}</p>}
+                    </>
+                  )}
                 </div>
-                <span className="text-xs text-gray-400">{group.members.length} student{group.members.length !== 1 ? "s" : ""}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-400">{group.members.length} student{group.members.length !== 1 ? "s" : ""}</span>
+                  {editingGroupId === group.id ? (
+                    <>
+                      <Button size="sm" variant="secondary" onClick={() => saveGroup(group.id)}>Save</Button>
+                      <Button size="sm" variant="ghost" onClick={() => setEditingGroupId(null)}>Cancel</Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button size="sm" variant="ghost" onClick={() => startEdit(group)}>Edit</Button>
+                      <Button size="sm" variant="ghost" onClick={() => deleteGroup(group.id)}>Delete</Button>
+                    </>
+                  )}
+                </div>
               </div>
             </CardHeader>
             <CardBody>
@@ -139,8 +223,10 @@ export function GroupsClient({ groups: initialGroups, students }: { groups: Grou
         );
       })}
 
-      {groups.length === 0 && (
-        <p className="text-sm text-gray-400 text-center py-8">No groups yet. Create your first one above.</p>
+      {visibleGroups.length === 0 && (
+        <p className="text-sm text-gray-400 text-center py-8">
+          {groups.length === 0 ? "No groups yet. Create your first one above." : "No groups match the current search."}
+        </p>
       )}
     </div>
   );

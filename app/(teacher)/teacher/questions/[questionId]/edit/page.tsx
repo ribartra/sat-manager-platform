@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { QuestionEditor } from "../../question-editor-client";
+import { buildTaxonomyTree, taxonomyPathLabel } from "@/lib/taxonomy";
 
 interface PageProps {
   params: Promise<{ questionId: string }>;
@@ -9,16 +10,18 @@ interface PageProps {
 export default async function EditQuestionPage({ params }: PageProps) {
   const { questionId } = await params;
 
-  const [question, topics] = await Promise.all([
+  const [question, topics, taxonomyNodes] = await Promise.all([
     prisma.question.findUnique({
       where: { id: questionId },
       include: { options: { orderBy: { label: "asc" } } },
     }),
     prisma.topic.findMany({
-      include: { domain: { include: { section: true } }, subskills: true },
+      include: { taxonomyNode: true, domain: { include: { section: true } }, subskills: true },
       orderBy: { name: "asc" },
     }),
+    prisma.taxonomyNode.findMany({ where: { active: true }, orderBy: [{ sortOrder: "asc" }, { label: "asc" }] }),
   ]);
+  const { byId } = buildTaxonomyTree(taxonomyNodes);
 
   if (!question) notFound();
 
@@ -39,13 +42,14 @@ export default async function EditQuestionPage({ params }: PageProps) {
           supportsGraph: question.supportsGraph,
           correctAnswer: question.correctAnswer,
           status: question.status,
-          options: question.options.map((o) => ({ label: o.label, text: o.text })),
+          options: question.options.map((o) => ({ label: o.label, text: o.text, imageUrl: o.imageUrl })),
         }}
         topics={topics.map((t) => ({
           id: t.id,
           name: t.name,
           sectionLabel: t.domain.section.label,
           domainName: t.domain.name,
+          taxonomyLabel: taxonomyPathLabel(t.taxonomyNodeId, byId, `${t.domain.section.label} / ${t.domain.name} / ${t.name}`),
           subskills: t.subskills,
         }))}
       />

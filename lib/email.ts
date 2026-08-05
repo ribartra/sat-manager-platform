@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { getSmtpConfig } from "@/lib/smtp-settings";
 
 type EmailPayload = {
   to: string;
@@ -6,10 +7,6 @@ type EmailPayload = {
   text: string;
   html?: string;
 };
-
-function smtpConfigured() {
-  return Boolean(process.env.EMAIL_HOST && process.env.EMAIL_FROM && process.env.EMAIL_USER && process.env.EMAIL_PASS);
-}
 
 function escapeHtml(value: string) {
   return value
@@ -26,35 +23,35 @@ export function absoluteAppUrl(path: string) {
 }
 
 export async function sendTransactionalEmail(payload: EmailPayload) {
-  if (!smtpConfigured()) {
+  const config = await getSmtpConfig();
+  if (!config.configured) {
     console.log(`[EMAIL:SKIPPED] SMTP not configured. ${payload.to}: ${payload.subject}\n${payload.text}`);
-    return { sent: false, reason: "SMTP_NOT_CONFIGURED" };
+    return { sent: false, reason: "SMTP_NOT_CONFIGURED" as const };
   }
 
-  const port = Number(process.env.EMAIL_PORT || 587);
   const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port,
-    secure: port === 465,
+    host: config.host!,
+    port: config.port,
+    secure: config.port === 465,
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
+      user: config.user!,
+      pass: config.pass!,
     },
   });
 
   try {
     await transporter.sendMail({
-      from: process.env.EMAIL_FROM,
+      from: config.from!,
       to: payload.to,
       subject: payload.subject,
       text: payload.text,
       html: payload.html,
     });
 
-    return { sent: true };
+    return { sent: true as const };
   } catch (error) {
     console.error("[EMAIL:FAILED]", error);
-    return { sent: false, reason: "SEND_FAILED" };
+    return { sent: false, reason: "SEND_FAILED" as const };
   }
 }
 
@@ -130,6 +127,41 @@ export async function sendParentInviteEmail(to: string, parentName: string | nul
       <p>${safeStudent} has been invited to SAT Practice. Create your parent account to follow their progress and approve their enrollment:</p>
       <p><a href="${safeUrl}">${safeUrl}</a></p>
       <p>This link expires in 7 days.</p>
+    `,
+  });
+}
+
+export async function sendParentReportEmail(
+  to: string,
+  parentName: string | null,
+  studentName: string,
+  reportUrl: string,
+  sectionsLabel: string
+) {
+  const displayName = parentName || "Parent/Guardian";
+  const safeParent = escapeHtml(displayName);
+  const safeStudent = escapeHtml(studentName);
+  const safeUrl = escapeHtml(reportUrl);
+  const safeSections = escapeHtml(sectionsLabel);
+
+  return sendTransactionalEmail({
+    to,
+    subject: `${studentName}'s SAT Practice progress report`,
+    text: [
+      `Hello ${displayName},`,
+      "",
+      `Your child's teacher has shared a progress report for ${studentName} (${sectionsLabel}).`,
+      "Open this single-use link to view it:",
+      reportUrl,
+      "",
+      "The link activates the first time you open it and stays available for 7 days after that.",
+    ].join("\n"),
+    html: `
+      <p>Hello ${safeParent},</p>
+      <p>Your child's teacher has shared a progress report for <strong>${safeStudent}</strong> (${safeSections}).</p>
+      <p>Open this single-use link to view it:</p>
+      <p><a href="${safeUrl}">${safeUrl}</a></p>
+      <p>The link activates the first time you open it and stays available for 7 days after that.</p>
     `,
   });
 }

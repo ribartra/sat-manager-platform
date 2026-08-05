@@ -4,13 +4,14 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { MathContent } from "@/components/math-content";
 import { MathToolPanel } from "@/components/math-tool-panel";
+import { QuestionMedia } from "@/components/question-media";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatTime } from "@/lib/utils";
 import type { CalculatorConfig } from "@/lib/calculator-config";
 import type { GraphArtifact } from "@/lib/question-graph";
 
-interface ModuleQuestion { id: string; stem: string; stimulus: string | null; type: string; options: { label: string; text: string }[]; graphArtifacts: GraphArtifact[] }
+interface ModuleQuestion { id: string; stem: string; stimulus: string | null; type: string; options: { label: string; text: string; imageUrl?: string | null }[]; graphArtifacts: GraphArtifact[] }
 interface TestModule { id: string; name: string; section: string; timeLimit: number; questions: ModuleQuestion[] }
 
 export function FullTestPlayer({
@@ -57,7 +58,8 @@ export function FullTestPlayer({
 
   useEffect(() => {
     questionStartTime.current = Date.now();
-  }, []);
+    void fetch(`/api/full-practice-tests/attempts/${attemptId}/resume`, { method: "POST" });
+  }, [attemptId]);
 
   const recordQuestionTime = useCallback(() => {
     const currentQuestion = modules[moduleIndex]?.questions[questionIndex];
@@ -152,7 +154,7 @@ export function FullTestPlayer({
     <div className="flex h-screen flex-col bg-white">
       <div className="flex items-center justify-between border-b border-gray-200 px-6 py-3">
         <div><p className="text-sm font-semibold text-gray-900">{testName}</p><p className="text-xs text-gray-500">{currentModule.name} · Question {questionIndex + 1}/{currentModule.questions.length}</p></div>
-        <div className="flex items-center gap-4"><span className="text-xs text-gray-400">{saving === "saving" ? "Saving..." : saving === "saved" ? "Saved" : ""}</span><span className={remaining === 0 ? "text-red-600" : "text-gray-900"}>{remaining === 0 ? `Extra ${formatTime(extraTimeUsed)}` : formatTime(remaining)}</span><Button variant="secondary" size="sm" onClick={async () => { await saveProgress(); router.push("/student/full-tests"); }}>Pause & Exit</Button></div>
+        <div className="flex items-center gap-4"><span className="text-xs text-gray-400">{saving === "saving" ? "Saving..." : saving === "saved" ? "Saved" : ""}</span><span className={remaining === 0 ? "text-red-600" : "text-gray-900"}>{remaining === 0 ? `Extra ${formatTime(extraTimeUsed)}` : formatTime(remaining)}</span><Button variant="secondary" size="sm" onClick={async () => { await saveProgress(); await fetch(`/api/full-practice-tests/attempts/${attemptId}/pause`, { method: "POST" }); router.push("/student/full-tests"); }}>Pause & Exit</Button></div>
       </div>
       <div className="grid flex-1 grid-cols-2 overflow-hidden">
         <div className="overflow-y-auto border-r border-gray-200 bg-gray-50 p-6">{question.stimulus ? <MathContent content={question.stimulus} /> : <p className="text-sm text-gray-400">No passage.</p>}</div>
@@ -162,6 +164,7 @@ export function FullTestPlayer({
           {question.type === "MC" ? question.options.map((option) => (
             <button key={option.label} onClick={() => { const nextAnswers = { ...answers, [question.id]: option.label }; setAnswers(nextAnswers); void saveProgress(nextAnswers); }} className={`mb-2 block w-full rounded border px-4 py-3 text-left text-sm ${answers[question.id] === option.label ? "border-blue-500 bg-blue-50" : "border-gray-200"}`}>
               <strong>{option.label})</strong> <MathContent content={option.text} />
+              <QuestionMedia imageUrl={option.imageUrl} alt={`Option ${option.label} image`} className="mt-2" />
             </button>
           )) : <Input value={answers[question.id] ?? ""} onChange={(e) => { const nextAnswers = { ...answers, [question.id]: e.target.value }; setAnswers(nextAnswers); void saveProgress(nextAnswers); }} placeholder="Numeric answer" />}
         </div>

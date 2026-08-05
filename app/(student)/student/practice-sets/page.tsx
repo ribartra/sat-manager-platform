@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { formatDate, scorePercent } from "@/lib/utils";
 import { refreshAssignmentStates } from "@/lib/assignments";
 
@@ -21,7 +22,6 @@ export default async function StudentPracticeSetsPage() {
       attempts: {
         include: { answers: true },
         orderBy: { startedAt: "desc" },
-        take: 1,
       },
     },
     orderBy: [{ status: "asc" }, { dueDate: "asc" }, { createdAt: "desc" }],
@@ -32,7 +32,7 @@ export default async function StudentPracticeSetsPage() {
       <div className="mb-6 flex items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-gray-900">Practice Sets</h1>
-          <p className="mt-1 text-sm text-gray-500">Assigned topic practice, separate from Exams.</p>
+          <p className="mt-1 text-sm text-gray-500">Assigned skill practice, separate from Exams.</p>
         </div>
         <Link href="/student/content-map" className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
           Content Map
@@ -41,16 +41,17 @@ export default async function StudentPracticeSetsPage() {
 
       <div className="space-y-3">
         {assignments.map((assignment) => {
-          const attempt = assignment.attempts[0];
-          const correct = attempt?.answers.filter((answer) => answer.isCorrect).length ?? 0;
-          const total = attempt?.answers.length ?? assignment.practiceSet.questions.length;
-          const pct = attempt?.status === "SUBMITTED" ? scorePercent(correct, total) : null;
+          const inProgressAttempt = assignment.attempts.find((item) => item.status === "IN_PROGRESS");
+          const submittedAttempt = assignment.attempts.find((item) => item.status === "SUBMITTED");
+          const correct = submittedAttempt?.answers.filter((answer) => answer.isCorrect).length ?? 0;
+          const total = submittedAttempt?.answers.length ?? assignment.practiceSet.questions.length;
+          const pct = submittedAttempt ? scorePercent(correct, total) : null;
           const locked =
             assignment.locked ||
             (assignment.unlockAt !== null && assignment.unlockAt > new Date());
 
           return (
-            <div key={assignment.id} className="flex items-center justify-between gap-4 rounded-lg border border-gray-200 bg-white px-4 py-3">
+            <Card key={assignment.id} className="flex items-center justify-between gap-4 px-4 py-3">
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium text-gray-900">{assignment.practiceSet.name}</p>
                 <p className="mt-0.5 text-xs text-gray-500">
@@ -68,21 +69,25 @@ export default async function StudentPracticeSetsPage() {
                 {pct !== null && <span className="text-sm font-medium text-gray-800">{pct}%</span>}
                 {locked ? (
                   <span className="rounded-md border border-gray-200 px-3 py-1.5 text-sm text-gray-400">Locked</span>
-                ) : attempt?.status === "SUBMITTED" ? (
-                  <Link href={`/student/results/${attempt.id}`} className="text-sm font-medium text-blue-600 hover:underline">Review</Link>
+                ) : inProgressAttempt ? (
+                  <Link href={`/student/practice/assignment/${assignment.id}`} className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700">
+                    Resume
+                  </Link>
+                ) : submittedAttempt ? (
+                  <Link href={`/student/results/${submittedAttempt.id}`} className="text-sm font-medium text-blue-600 hover:underline">Review</Link>
                 ) : (
                   <Link href={`/student/practice/assignment/${assignment.id}`} className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700">
-                    {attempt ? "Continue" : "Start"}
+                    Start
                   </Link>
                 )}
               </div>
-            </div>
+            </Card>
           );
         })}
         {assignments.length === 0 && (
-          <div className="rounded-lg border border-gray-200 bg-white p-10 text-center text-sm text-gray-400">
+          <Card padding="lg" className="text-center text-sm text-gray-400">
             No Practice Sets assigned yet.
-          </div>
+          </Card>
         )}
       </div>
     </div>

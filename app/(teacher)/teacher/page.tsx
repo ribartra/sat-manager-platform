@@ -2,11 +2,13 @@ import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardBody } from "@/components/ui/card";
 import { AlertTriangle, UserPlus } from "lucide-react";
 import { UnlockRequestActions } from "./unlock-request-actions-client";
 import { auth } from "@/lib/auth";
+import { getFeatureSetting } from "@/lib/app-settings";
 import { refreshAssignmentStates } from "@/lib/assignments";
-import { teacherProgramEnrollmentScope } from "@/lib/program-scope";
+import { studentAccessWhereFor, teacherProgramEnrollmentScope } from "@/lib/program-scope";
 import { getStudentLastActiveMap } from "@/lib/activity";
 
 interface PageProps {
@@ -36,7 +38,9 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
       : undefined;
   const params = await searchParams;
   const search = params.q?.trim() ?? "";
-  const groupId = params.group || "";
+  const teacherGroupManagementEnabled =
+    session?.user.role === "ADMIN" || (await getFeatureSetting("TEACHER_GROUP_MANAGEMENT"));
+  const groupId = teacherGroupManagementEnabled ? params.group || "" : "";
   const topicId = params.topic || "";
   const difficulty = params.difficulty || "";
   const fromDate = parseDateParam(params.from);
@@ -48,8 +52,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
   const hasAttemptFilter = topicId || difficulty || fromDate || toDate;
 
   const studentWhere = {
-    role: "STUDENT",
-    ...(programScope ? { programEnrollments: programScope } : {}),
+    ...(session ? studentAccessWhereFor(session.user, now) : { role: "STUDENT", active: true, validationStatus: "APPROVED" }),
     ...(search
       ? {
           OR: [
@@ -58,8 +61,10 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
           ],
         }
       : {}),
-    ...(groupId ? { groups: { some: { groupId } } } : {}),
+    ...(teacherGroupManagementEnabled && groupId ? { groups: { some: { groupId } } } : {}),
   };
+
+  const studentUnlockRequestsEnabled = await getFeatureSetting("STUDENT_UNLOCK_REQUESTS");
 
   const [students, groups, topics, lastActiveMap] = await Promise.all([
     prisma.user.findMany({
@@ -99,7 +104,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
       },
       orderBy: { name: "asc" },
     }),
-    prisma.group.findMany({ orderBy: { name: "asc" } }),
+    teacherGroupManagementEnabled ? prisma.group.findMany({ orderBy: { name: "asc" } }) : Promise.resolve([]),
     prisma.topic.findMany({
       include: { domain: { include: { section: true } } },
       orderBy: { name: "asc" },
@@ -112,21 +117,33 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
       where: {
         dueDate: { lt: new Date() },
         status: { in: ["PENDING", "IN_PROGRESS"] },
-        ...(programScope ? { student: { programEnrollments: programScope } } : {}),
+        student: {
+          active: true,
+          validationStatus: "APPROVED",
+          ...(programScope ? { programEnrollments: programScope } : {}),
+        },
       },
       include: { student: true, practiceSet: true },
       take: 5,
       orderBy: { dueDate: "asc" },
     }),
-    prisma.unlockRequest.findMany({
-      where: {
-        status: "PENDING",
-        ...(programScope ? { assignment: { student: { programEnrollments: programScope } } } : {}),
-      },
-      include: { assignment: { include: { student: true, practiceSet: true } } },
-      orderBy: { createdAt: "desc" },
-      take: 5,
-    }),
+    studentUnlockRequestsEnabled
+      ? prisma.unlockRequest.findMany({
+          where: {
+            status: "PENDING",
+            assignment: {
+              student: {
+                active: true,
+                validationStatus: "APPROVED",
+                ...(programScope ? { programEnrollments: programScope } : {}),
+              },
+            },
+          },
+          include: { assignment: { include: { student: true, practiceSet: true } } },
+          orderBy: { createdAt: "desc" },
+          take: 5,
+        })
+      : Promise.resolve([]),
   ]);
 
   const fiveDaysAgo = new Date();
@@ -173,7 +190,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
         </Link>
       </div>
 
-      <form className="mb-5 grid gap-3 rounded-lg border border-gray-200 bg-white p-4 md:grid-cols-6">
+      <Card as="form" padding="md" className="mb-5 grid gap-3 md:grid-cols-6">
         <label className="text-xs font-medium text-gray-600 md:col-span-2">
           Search
           <input
@@ -183,17 +200,19 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
             className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900"
           />
         </label>
-        <label className="text-xs font-medium text-gray-600">
-          Group
-          <select name="group" defaultValue={groupId} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900">
-            <option value="">All</option>
-            {groups.map((group) => (
-              <option key={group.id} value={group.id}>
-                {group.name}
-              </option>
-            ))}
-          </select>
-        </label>
+        {teacherGroupManagementEnabled && (
+          <label className="text-xs font-medium text-gray-600">
+            Group
+            <select name="group" defaultValue={groupId} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900">
+              <option value="">All</option>
+              {groups.map((group) => (
+                <option key={group.id} value={group.id}>
+                  {group.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
         <label className="text-xs font-medium text-gray-600">
           Topic
           <select name="topic" defaultValue={topicId} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900">
@@ -230,58 +249,62 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
             Clear
           </Link>
         </div>
-      </form>
+      </Card>
 
       {/* Alerts */}
       {(inactiveStudents.length > 0 || overdueAssignments.length > 0 || unlockRequests.length > 0) && (
-        <div className="mb-5 flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-200 px-4 py-3">
-          <AlertTriangle size={16} className="text-amber-600 shrink-0" />
-          <div className="text-sm text-amber-800">
-            {inactiveStudents.length > 0 && <p><strong>{inactiveStudents.length} student{inactiveStudents.length > 1 ? "s" : ""}</strong> haven&apos;t practiced in 5+ days: {inactiveStudents.map((s) => s.name).join(", ")}</p>}
-            {overdueAssignments.length > 0 && <p><strong>{overdueAssignments.length}</strong> overdue assignment{overdueAssignments.length > 1 ? "s" : ""} need attention.</p>}
-            {unlockRequests.length > 0 && <p><strong>{unlockRequests.length}</strong> pending unlock request{unlockRequests.length > 1 ? "s" : ""}.</p>}
+        <Card variant="warning" padding="sm" className="mb-5">
+          <div className="flex items-center gap-2">
+            <AlertTriangle size={16} className="shrink-0 text-amber-600" />
+            <div className="text-sm text-amber-800">
+              {inactiveStudents.length > 0 && <p><strong>{inactiveStudents.length} student{inactiveStudents.length > 1 ? "s" : ""}</strong> haven&apos;t practiced in 5+ days: {inactiveStudents.map((s) => s.name).join(", ")}</p>}
+              {overdueAssignments.length > 0 && <p><strong>{overdueAssignments.length}</strong> overdue assignment{overdueAssignments.length > 1 ? "s" : ""} need attention.</p>}
+              {unlockRequests.length > 0 && <p><strong>{unlockRequests.length}</strong> pending unlock request{unlockRequests.length > 1 ? "s" : ""}.</p>}
+            </div>
           </div>
-        </div>
+        </Card>
       )}
 
       {lowPerformance.length > 0 && (
         <div className="mb-5 grid gap-3 md:grid-cols-3">
           {lowPerformance.map((bucket) => (
-            <div key={bucket.label} className="rounded-lg border border-red-100 bg-red-50 px-4 py-3">
+            <Card key={bucket.label} variant="danger" padding="sm">
               <p className="text-xs font-medium text-red-700">Low performance</p>
               <p className="mt-1 truncate text-sm font-semibold text-gray-900">{bucket.label}</p>
               <p className="mt-1 text-xs text-gray-600">
                 {bucket.score}% avg · {bucket.attempts} attempt{bucket.attempts !== 1 ? "s" : ""}
               </p>
-            </div>
+            </Card>
           ))}
         </div>
       )}
 
       {/* Students table */}
       {unlockRequests.length > 0 && (
-        <div className="mb-6 rounded-lg border border-gray-200 bg-white p-4">
-          <h2 className="mb-3 text-sm font-semibold text-gray-900">Unlock Requests</h2>
-          <div className="space-y-2">
-            {unlockRequests.map((request) => (
-              <div key={request.id} className="flex items-center justify-between border-b border-gray-100 pb-2 last:border-b-0 last:pb-0">
-                <p className="text-sm text-gray-700">
-                  <strong>{request.assignment.student.name}</strong> requested <strong>{request.assignment.practiceSet.name}</strong>
-                </p>
-                <UnlockRequestActions requestId={request.id} />
-              </div>
-            ))}
-          </div>
-        </div>
+        <Card className="mb-6">
+          <CardBody className="p-4">
+            <h2 className="mb-3 text-sm font-semibold text-gray-900">Unlock Requests</h2>
+            <div className="space-y-2">
+              {unlockRequests.map((request) => (
+                <div key={request.id} className="flex items-center justify-between border-b border-gray-100 pb-2 last:border-b-0 last:pb-0">
+                  <p className="text-sm text-gray-700">
+                    <strong>{request.assignment.student.name}</strong> requested <strong>{request.assignment.practiceSet.name}</strong>
+                  </p>
+                  <UnlockRequestActions requestId={request.id} />
+                </div>
+              ))}
+            </div>
+          </CardBody>
+        </Card>
       )}
 
       {/* Students table */}
-      <div className="rounded-lg border border-gray-200 bg-white overflow-hidden">
+      <Card className="overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200">
               <th className="px-4 py-3 text-left font-medium text-gray-500">Name</th>
-              <th className="px-4 py-3 text-left font-medium text-gray-500">Group</th>
+              {teacherGroupManagementEnabled && <th className="px-4 py-3 text-left font-medium text-gray-500">Group</th>}
               <th className="px-4 py-3 text-left font-medium text-gray-500">Last Active</th>
               <th className="px-4 py-3 text-right font-medium text-gray-500">Pending</th>
               <th className="px-4 py-3 text-right font-medium text-gray-500">Avg Score</th>
@@ -293,7 +316,9 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
             {students.map((student) => {
               const lastActiveAt = lastActiveMap.get(student.id);
               const inactive = !lastActiveAt || lastActiveAt < fiveDaysAgo;
-              const groups = student.groups.map((gm) => gm.group.name).join(", ");
+              const studentGroups = teacherGroupManagementEnabled
+                ? student.groups.map((gm) => gm.group.name).join(", ")
+                : "";
               const programs = student.programEnrollments.map((pe) => pe.program.name).join(", ");
 
               const avgScore = student.attempts.length
@@ -314,7 +339,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
                     <p className="text-xs text-gray-400">{student.email}</p>
                     <p className="text-xs text-gray-400">Programs: {programs || "—"}</p>
                   </td>
-                  <td className="px-4 py-3 text-gray-500">{groups || "—"}</td>
+                  {teacherGroupManagementEnabled && <td className="px-4 py-3 text-gray-500">{studentGroups || "—"}</td>}
                   <td className="px-4 py-3 text-gray-500">
                     {lastActiveAt ? (
                       <span className={inactive ? "text-amber-600" : ""}>
@@ -348,9 +373,14 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
                     </Badge>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <Link href={`/teacher/students/${student.id}`} className="text-xs text-blue-600 hover:underline">
-                      View →
-                    </Link>
+                    <div className="flex justify-end gap-3">
+                      <Link href={`/teacher/analytics?studentId=${student.id}`} className="text-xs text-blue-600 hover:underline">
+                        Analytics
+                      </Link>
+                      <Link href={`/teacher/students/${student.id}`} className="text-xs text-blue-600 hover:underline">
+                        View →
+                      </Link>
+                    </div>
                   </td>
                 </tr>
               );
@@ -363,7 +393,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
             <p>No students yet. Invite your first student.</p>
           </div>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

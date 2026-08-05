@@ -4,8 +4,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { formatDate, scorePercent } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { Lock, ChevronLeft } from "lucide-react";
-import { UnlockRequestButton } from "./unlock-request-client";
 import { refreshAssignmentStates } from "@/lib/assignments";
 
 interface PageProps {
@@ -34,8 +34,7 @@ export default async function TopicPracticeSetsPage({ params }: PageProps) {
         include: {
           unlockRequests: { where: { status: "PENDING" }, select: { id: true } },
           attempts: {
-            where: { status: "SUBMITTED" },
-            orderBy: { submittedAt: "desc" },
+            orderBy: { startedAt: "desc" },
             include: { answers: true },
           },
         },
@@ -77,7 +76,8 @@ export default async function TopicPracticeSetsPage({ params }: PageProps) {
             const assignment = ps.assignments[0];
             const scheduledLocked = assignment?.unlockAt ? assignment.unlockAt > new Date() : false;
             const locked = !assignment || assignment.locked || scheduledLocked;
-            const lastAttempt = assignment?.attempts[0];
+            const inProgressAttempt = assignment?.attempts.find((attempt) => attempt.status === "IN_PROGRESS");
+            const lastAttempt = assignment?.attempts.find((attempt) => attempt.status === "SUBMITTED");
             const attemptCount = assignment?.attempts.length ?? 0;
 
             const correct = lastAttempt?.answers.filter((a) => a.isCorrect).length ?? 0;
@@ -85,9 +85,9 @@ export default async function TopicPracticeSetsPage({ params }: PageProps) {
             const pct = lastAttempt ? scorePercent(correct, total) : null;
 
             return (
-              <div
+              <Card
                 key={ps.id}
-                className="rounded-lg border border-gray-200 bg-white px-5 py-4"
+                className="px-5 py-4"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
@@ -116,10 +116,15 @@ export default async function TopicPracticeSetsPage({ params }: PageProps) {
                         <Lock size={14} />
                         <span>{scheduledLocked && assignment?.unlockAt ? `Unlocks ${formatDate(assignment.unlockAt)}` : "Locked"}</span>
                       </div>
-                      {assignment && (
-                        <UnlockRequestButton assignmentId={assignment.id} requested={assignment.unlockRequests.length > 0} />
-                      )}
+                      {assignment?.unlockRequests.length ? <span>Pending teacher review</span> : null}
                     </div>
+                  ) : inProgressAttempt ? (
+                    <Link
+                      href={`/student/practice/assignment/${assignment.id}`}
+                      className="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700"
+                    >
+                      Resume
+                    </Link>
                   ) : lastAttempt ? (
                     <div className="flex items-center gap-2">
                       <Link
@@ -132,7 +137,7 @@ export default async function TopicPracticeSetsPage({ params }: PageProps) {
                         href={`/student/practice/assignment/${assignment.id}`}
                         className="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700"
                       >
-                        Try Again
+                        Start
                       </Link>
                     </div>
                   ) : (
@@ -140,11 +145,11 @@ export default async function TopicPracticeSetsPage({ params }: PageProps) {
                       href={`/student/practice/assignment/${assignment!.id}`}
                       className="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700"
                     >
-                      Start →
+                      Start
                     </Link>
                   )}
                 </div>
-              </div>
+              </Card>
             );
           })}
         </div>

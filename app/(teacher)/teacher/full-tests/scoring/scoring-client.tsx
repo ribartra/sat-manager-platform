@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 
 export function ScoringClient({ initialCsv }: { initialCsv: string }) {
@@ -68,7 +69,7 @@ export function ScoringClient({ initialCsv }: { initialCsv: string }) {
         </Button>
       </div>
       {preview.length > 0 && (
-        <div className="rounded-lg border border-gray-200 bg-white p-3">
+        <Card padding="sm">
           <p className="mb-2 text-xs font-medium text-gray-500">Preview: {preview.length} valid rows</p>
           <div className="grid grid-cols-3 gap-2 text-xs">
             {preview.slice(0, 18).map((row) => (
@@ -77,23 +78,23 @@ export function ScoringClient({ initialCsv }: { initialCsv: string }) {
               </div>
             ))}
           </div>
-        </div>
+        </Card>
       )}
       {warnings.length > 0 && (
-        <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+        <Card variant="warning" padding="sm" className="text-sm text-amber-800">
           <p className="font-medium">Warnings</p>
           <ul className="mt-1 list-disc pl-5">
             {warnings.map((warning) => <li key={warning}>{warning}</li>)}
           </ul>
-        </div>
+        </Card>
       )}
       {errors.length > 0 && (
-        <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+        <Card variant="danger" padding="sm" className="text-sm text-red-700">
           <p className="font-medium">Fix these rows before saving:</p>
           <ul className="mt-1 list-disc pl-5">
             {errors.map((error) => <li key={error}>{error}</li>)}
           </ul>
-        </div>
+        </Card>
       )}
       {saved !== null && <p className="text-sm text-green-600">Saved {saved} rows.</p>}
     </div>

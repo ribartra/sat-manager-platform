@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { formatDate } from "@/lib/utils";
 import { requireApprovedSession } from "@/lib/rbac";
+import { Card } from "@/components/ui/card";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +20,7 @@ export default async function NotificationsPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
       <h1 className="mb-6 text-xl font-semibold text-gray-900">Notifications</h1>
-      <div className="rounded-lg border border-gray-200 bg-white">
+      <Card>
         {notifications.map((n) => (
           <Link
             key={n.id}
@@ -34,7 +35,7 @@ export default async function NotificationsPage() {
           </Link>
         ))}
         {notifications.length === 0 && <div className="p-10 text-center text-sm text-gray-400">No notifications yet.</div>}
-      </div>
+      </Card>
     </div>
   );
 }

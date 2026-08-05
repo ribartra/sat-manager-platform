@@ -18,13 +18,16 @@
     "db:reset": "prisma migrate reset --force && tsx prisma/seed.ts",
     "db:backup": "node scripts/backup-db.mjs",
     "db:restore": "node scripts/restore-db.mjs",
-    "notifications:generate": "tsx scripts/generate-notifications.ts"
+    "db:align-ingest-taxonomy": "node scripts/align-ingest-taxonomy.mjs",
+    "notifications:generate": "tsx scripts/generate-notifications.ts",
+    "sample:promote": "tsx scripts/promote-ingest-sample.ts",
+    "demo:verify": "tsx scripts/verify-client-demo.ts"
   },
   "dependencies": {
-    "@auth/prisma-adapter": "^2.11.2",
+    "@auth/prisma-adapter": "^2.11.3",
     "@hookform/resolvers": "^5.4.0",
-    "@prisma/adapter-better-sqlite3": "^7.8.0",
-    "@prisma/client": "^7.8.0",
+    "@prisma/adapter-better-sqlite3": "^7.9.0",
+    "@prisma/client": "^7.9.0",
     "@radix-ui/react-dialog": "^1.1.16",
     "@radix-ui/react-dropdown-menu": "^2.1.17",
     "@radix-ui/react-label": "^2.1.9",
@@ -44,10 +47,10 @@
     "dotenv": "^17.4.2",
     "katex": "^0.17.0",
     "lucide-react": "^1.17.0",
-    "next": "16.2.7",
-    "next-auth": "^5.0.0-beta.31",
-    "nodemailer": "^8.0.10",
-    "prisma": "^7.8.0",
+    "next": "^16.2.11",
+    "next-auth": "^5.0.0-beta.32",
+    "nodemailer": "^9.0.3",
+    "prisma": "^7.9.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-hook-form": "^7.78.0",
@@ -57,14 +60,14 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@next/swc-linux-x64-gnu": "^16.2.7",
+    "@next/swc-linux-x64-gnu": "^16.2.11",
     "@tailwindcss/oxide-linux-x64-gnu": "^4.3.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.7",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "^16.2.11",
     "lightningcss-linux-x64-gnu": "^1.32.0",
     "tailwindcss": "^4",
     "tsx": "^4.22.4",
@@ -72,6 +75,15 @@
   },
   "overrides": {
     "@hono/node-server": "1.19.14",
-    "postcss": "8.5.15"
+    "find-my-way": "9.7.0",
+    "minimatch@3.1.5": {
+      "brace-expansion": "1.1.16"
+    },
+    "minimatch@10.2.5": {
+      "brace-expansion": "5.0.8"
+    },
+    "postcss": "8.5.23",
+    "sharp": "0.35.3",
+    "valibot": "1.4.2"
   }
 }

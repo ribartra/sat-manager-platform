@@ -7,10 +7,12 @@ import { Button } from "@/components/ui/button";
 export function UserValidationActions({
   userId,
   currentStatus,
+  active,
   isSelf,
 }: {
   userId: string;
   currentStatus: string;
+  active: boolean;
   isSelf: boolean;
 }) {
   const router = useRouter();
@@ -27,8 +29,20 @@ export function UserValidationActions({
     router.refresh();
   }
 
+  async function toggleActive() {
+    setLoadingStatus("ACTIVE");
+    const response = await fetch(`/api/admin/users/${userId}/toggle-active`, { method: "POST" });
+    const data = await response.json().catch(() => ({}));
+    setLoadingStatus(null);
+    if (!response.ok) window.alert(data.error || "Could not update access.");
+    router.refresh();
+  }
+
   return (
-    <div className="flex justify-end gap-2">
+    <div className="flex flex-wrap justify-end gap-2">
+      <Button variant="secondary" size="sm" onClick={toggleActive} disabled={Boolean(loadingStatus) || isSelf}>
+        {loadingStatus === "ACTIVE" ? "Saving..." : active ? "Disable" : "Enable"}
+      </Button>
       {currentStatus !== "APPROVED" && (
         <Button size="sm" onClick={() => updateStatus("APPROVED")} disabled={Boolean(loadingStatus)}>
           {loadingStatus === "APPROVED" ? "Saving..." : "Approve"}

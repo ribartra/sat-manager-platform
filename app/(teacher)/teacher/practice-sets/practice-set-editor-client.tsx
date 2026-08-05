@@ -6,14 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { ArrowDown, ArrowUp, X } from "lucide-react";
 import { MathContent } from "@/components/math-content";
+import { ImportQuestionnaireButton } from "@/components/import-questionnaire-button";
 
 interface TopicInfo {
   id: string;
   name: string;
   domainName: string;
   sectionLabel: string;
+  taxonomyLabel: string;
 }
 
 interface QuestionInfo {
@@ -62,11 +65,31 @@ export function PracticeSetEditor({
   const [questionIds, setQuestionIds] = useState<string[]>(initial?.questionIds ?? []);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
+  const [topicSearch, setTopicSearch] = useState("");
+  const [questionSearch, setQuestionSearch] = useState("");
 
   const availableQuestions = useMemo(
     () => questions.filter((q) => q.topicId === topicId && !questionIds.includes(q.id)),
     [questions, questionIds, topicId]
   );
+  const visibleTopics = useMemo(() => {
+    const term = topicSearch.trim().toLowerCase();
+    const filtered = term
+      ? topics.filter((topic) =>
+          [topic.sectionLabel, topic.domainName, topic.name].some((value) => value.toLowerCase().includes(term))
+        )
+      : topics;
+    const selected = topics.find((topic) => topic.id === topicId);
+    return selected && !filtered.some((topic) => topic.id === selected.id) ? [selected, ...filtered] : filtered;
+  }, [topicId, topicSearch, topics]);
+  const visibleAvailableQuestions = useMemo(() => {
+    const term = questionSearch.trim().toLowerCase();
+    if (!term) return availableQuestions;
+    return availableQuestions.filter((question) =>
+      [question.difficulty, question.type, question.status, plainMathLabel(question.stem, 300)]
+        .some((value) => value.toLowerCase().includes(term))
+    );
+  }, [availableQuestions, questionSearch]);
 
   function moveQuestion(index: number, direction: -1 | 1) {
     const next = [...questionIds];
@@ -96,20 +119,42 @@ export function PracticeSetEditor({
   const selectedQuestions = questionIds
     .map((id) => questions.find((q) => q.id === id))
     .filter((q): q is QuestionInfo => Boolean(q));
+  const selectedTopic = topics.find((topic) => topic.id === topicId);
 
   return (
     <div className="space-y-6">
+      <Card padding="md" className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p className="text-xs font-medium uppercase text-gray-400">PDF/DOCX Import</p>
+          <h2 className="text-sm font-semibold text-gray-900">Create a review batch for this Practice Set</h2>
+          <p className="mt-1 text-xs text-gray-500">Upload the question file plus any answer or explanation files, then review extracted questions before promotion.</p>
+        </div>
+        <ImportQuestionnaireButton
+          mode="PRACTICE_SET"
+          defaultName={name || "Practice Set PDF import"}
+          topicName={selectedTopic?.name}
+          domainName={selectedTopic?.domainName}
+          difficulty={difficulty}
+        />
+      </Card>
+
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">Name</label>
           <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Linear Equations Easy #1" />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">Topic</label>
+          <label className="mb-1 block text-sm font-medium text-gray-700">Skill</label>
+          <Input
+            value={topicSearch}
+            onChange={(event) => setTopicSearch(event.target.value)}
+            placeholder="Search skill..."
+            className="mb-2 text-sm"
+          />
           <Select value={topicId} onChange={(e) => setTopicId(e.target.value)}>
-            {topics.map((t) => (
+            {visibleTopics.map((t) => (
               <option key={t.id} value={t.id}>
-                {t.sectionLabel} / {t.domainName} / {t.name}
+                {t.taxonomyLabel}
               </option>
             ))}
           </Select>
@@ -141,7 +186,7 @@ export function PracticeSetEditor({
         </div>
       </div>
 
-      <div className="rounded-lg border border-gray-200 bg-white">
+      <Card>
         <div className="border-b border-gray-200 px-4 py-3">
           <h2 className="text-sm font-semibold text-gray-900">Questions ({selectedQuestions.length})</h2>
         </div>
@@ -169,13 +214,19 @@ export function PracticeSetEditor({
           ))}
           {selectedQuestions.length === 0 && <div className="px-4 py-8 text-center text-sm text-gray-400">No questions selected.</div>}
         </div>
-      </div>
+      </Card>
 
       <div>
         <label className="mb-1 block text-sm font-medium text-gray-700">Add question</label>
+        <Input
+          value={questionSearch}
+          onChange={(event) => setQuestionSearch(event.target.value)}
+          placeholder="Search question..."
+          className="mb-2 text-sm"
+        />
         <Select value="" onChange={(e) => e.target.value && setQuestionIds((ids) => [...ids, e.target.value])}>
           <option value="">Select a published question...</option>
-          {availableQuestions.map((q) => (
+          {visibleAvailableQuestions.map((q) => (
             <option key={q.id} value={q.id}>
               {q.difficulty} / {q.type} / {plainMathLabel(q.stem, 90)}
             </option>
@@ -185,14 +236,14 @@ export function PracticeSetEditor({
 
       <div className="flex items-center gap-3">
         {errors.length > 0 && (
-          <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          <Card variant="danger" padding="sm" className="text-sm text-red-700">
             <p className="font-medium">Fix these issues before saving:</p>
             <ul className="mt-1 list-disc pl-5">
               {errors.map((error) => (
                 <li key={error}>{error}</li>
               ))}
             </ul>
-          </div>
+          </Card>
         )}
       </div>
 

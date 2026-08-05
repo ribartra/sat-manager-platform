@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { getFeatureSetting } from "@/lib/app-settings";
 import { requireTeacherOrAdmin, requireAdmin } from "@/lib/rbac";
 import { notifyMany } from "@/lib/notify";
 
@@ -10,6 +11,11 @@ export async function GET(
 ) {
   const session = await requireTeacherOrAdmin();
   if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+  if (session.user.role === "TEACHER") {
+    const enabled = await getFeatureSetting("TEACHER_PROGRAM_MANAGEMENT");
+    if (!enabled) return NextResponse.json({ error: "Teacher program management is disabled." }, { status: 403 });
+  }
 
   const { id } = await params;
 

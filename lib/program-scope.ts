@@ -15,11 +15,13 @@ export function teacherProgramEnrollmentScope(teacherId: string, now = new Date(
 
 export function studentAccessWhereFor(user: { id: string; role: string }, now = new Date()) {
   if (user.role === "ADMIN") {
-    return { role: "STUDENT" };
+    return { role: "STUDENT", active: true, validationStatus: "APPROVED" };
   }
 
   return {
     role: "STUDENT",
+    active: true,
+    validationStatus: "APPROVED",
     programEnrollments: teacherProgramEnrollmentScope(user.id, now),
   };
 }

@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 interface ConsentInfo {
   studentName: string;
@@ -60,9 +61,9 @@ export default function ParentConsentPage() {
   if (error) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <div className="max-w-sm rounded-lg border border-gray-200 bg-white p-6 text-center shadow-sm">
+        <Card padding="lg" className="max-w-sm text-center">
           <p className="font-medium text-red-600">{error}</p>
-        </div>
+        </Card>
       </div>
     );
   }
@@ -77,7 +78,7 @@ export default function ParentConsentPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+      <Card padding="lg" className="w-full max-w-md">
         <h1 className="mb-2 text-lg font-semibold text-gray-900">Parent Authorization</h1>
         <p className="mb-5 text-sm text-gray-500">
           {info.parentName ?? info.parentEmail}, please authorize this SAT Practice account enrollment.
@@ -123,7 +124,7 @@ export default function ParentConsentPage() {
             </Button>
           </form>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

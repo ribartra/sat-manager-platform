@@ -43,6 +43,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ att
   });
 
   const existingAnswers = new Map(attempt.answers.map((answer) => [answer.questionId, answer]));
+  const allowedQuestionIds = new Set(psQuestions.map((item) => item.questionId));
   const questionSnapshotMap = new Map(
     psQuestions.map((item) => {
       const existing = existingAnswers.get(item.questionId);
@@ -68,7 +69,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ att
 
   // Score each answer
   await Promise.all(
-    Object.entries(answers as Record<string, string>).map(([questionId, answer]) => {
+    Object.entries(answers as Record<string, string>).filter(([questionId]) => allowedQuestionIds.has(questionId)).map(([questionId, answer]) => {
       const snapshot = questionSnapshotMap.get(questionId);
       const correct = snapshot?.correctAnswer;
       const isCorrect = correct !== undefined && answer.trim().toUpperCase() === correct.trim().toUpperCase();

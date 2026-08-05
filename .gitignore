@@ -20,6 +20,7 @@
 # production
 /build
 /backups
+/.private
 
 # local database/runtime state
 /dev.db
@@ -31,6 +32,14 @@
 # misc
 .DS_Store
 *.pem
+
+# large binaries / local data dumps (keep out of git; GitHub rejects >100MB)
+*.zip
+/tmp_inspect_pages/
+
+# python build artifacts (ingest_service)
+__pycache__/
+*.pyc
 
 # debug
 npm-debug.log*

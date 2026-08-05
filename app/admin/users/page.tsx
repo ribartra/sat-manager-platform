@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/rbac";
 import { UserValidationActions } from "./user-validation-actions-client";
@@ -12,11 +14,25 @@ function validationBadge(status: string) {
   return <Badge variant="warning">Pending</Badge>;
 }
 
-export default async function AdminUsersPage() {
+interface PageProps {
+  searchParams: Promise<{ q?: string }>;
+}
+
+export default async function AdminUsersPage({ searchParams }: PageProps) {
   const session = await requireAdmin();
   if (!session) redirect("/teacher");
+  const params = await searchParams;
+  const q = params.q?.trim() ?? "";
 
   const users = await prisma.user.findMany({
+    where: q
+      ? {
+          OR: [
+            { name: { contains: q } },
+            { email: { contains: q } },
+          ],
+        }
+      : undefined,
     orderBy: [{ createdAt: "desc" }],
     select: {
       id: true,
@@ -42,7 +58,11 @@ export default async function AdminUsersPage() {
       <p className="mb-6 text-sm text-gray-500">
         Review manually created or otherwise unverified accounts. Accounts created through emailed invite links are approved automatically when the link is consumed.
       </p>
-      <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
+      <form className="mb-4 flex max-w-xl gap-2">
+        <Input name="q" defaultValue={q} placeholder="Search user or email..." />
+        <button className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">Search</button>
+      </form>
+      <Card className="overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50">
@@ -70,13 +90,13 @@ export default async function AdminUsersPage() {
                   {user.validationReviewedAt ? user.validationReviewedAt.toLocaleString("en-US") : "-"}
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <UserValidationActions userId={user.id} currentStatus={user.validationStatus} isSelf={user.id === session.user.id} />
+                  <UserValidationActions userId={user.id} currentStatus={user.validationStatus} active={user.active} isSelf={user.id === session.user.id} />
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-      </div>
+      </Card>
     </div>
   );
 }

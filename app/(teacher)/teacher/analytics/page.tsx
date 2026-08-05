@@ -2,207 +2,203 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
-import { teacherProgramEnrollmentScope } from "@/lib/program-scope";
-import { formatTime } from "@/lib/utils";
-import { MathContent } from "@/components/math-content";
+import { studentAccessWhereFor } from "@/lib/program-scope";
+import { formatDate, formatTime, scorePercent } from "@/lib/utils";
+import { Card } from "@/components/ui/card";
+
+interface PageProps {
+  searchParams: Promise<{ studentId?: string; q?: string }>;
+}
 
 interface Bucket {
+  key: string;
   label: string;
+  section: string;
+  difficulty: string;
   correct: number;
   total: number;
   totalTime: number;
   timed: number;
 }
 
-export default async function TeacherAnalyticsPage() {
+export default async function TeacherAnalyticsPage({ searchParams }: PageProps) {
   const session = await requireTeacherOrAdmin();
   if (!session) notFound();
+  const params = await searchParams;
+  const q = params.q?.trim() ?? "";
+  const studentScope = studentAccessWhereFor(session.user);
 
-  const answerWhere =
-    session.user.role === "ADMIN"
-      ? { attempt: { status: "SUBMITTED" } }
-      : {
-          attempt: {
-            status: "SUBMITTED",
-            student: { programEnrollments: teacherProgramEnrollmentScope(session.user.id) },
-          },
-        };
-
-  const answers = await prisma.attemptAnswer.findMany({
-    where: answerWhere,
-    include: {
-      question: {
-        include: {
-          topic: { include: { domain: { include: { section: true } } } },
-        },
-      },
-      attempt: {
-        select: {
-          id: true,
-          studentId: true,
-          submittedAt: true,
-        },
-      },
-    },
-    orderBy: { attempt: { submittedAt: "desc" } },
+  const students = await prisma.user.findMany({
+    where: studentScope,
+    orderBy: { name: "asc" },
+    select: { id: true, name: true, lastActiveAt: true },
   });
+  const filteredStudents = students.filter((student) => !q || student.name.toLowerCase().includes(q.toLowerCase()));
+  const selectableStudents =
+    params.studentId && students.some((student) => student.id === params.studentId) && !filteredStudents.some((student) => student.id === params.studentId)
+      ? [students.find((student) => student.id === params.studentId)!, ...filteredStudents]
+      : filteredStudents;
+  const selectedStudentId = params.studentId && students.some((student) => student.id === params.studentId)
+    ? params.studentId
+    : filteredStudents[0]?.id ?? students[0]?.id;
 
-  const byQuestion = new Map<string, Bucket & { id: string; topic: string; difficulty: string }>();
-  const byTopic = new Map<string, Bucket>();
-  const byDifficulty = new Map<string, Bucket>();
+  const answers = selectedStudentId
+    ? await prisma.attemptAnswer.findMany({
+        where: {
+          attempt: { studentId: selectedStudentId, status: "SUBMITTED" },
+        },
+        include: {
+          question: {
+            include: {
+              subskill: true,
+              topic: { include: { domain: { include: { section: true } } } },
+            },
+          },
+          attempt: {
+            select: {
+              id: true,
+              submittedAt: true,
+              totalTime: true,
+              assignment: { select: { practiceSet: { select: { name: true } } } },
+            },
+          },
+        },
+        orderBy: { attempt: { submittedAt: "desc" } },
+      })
+    : [];
+
+  const selectedStudent = students.find((student) => student.id === selectedStudentId);
+  const nowMs = new Date().getTime();
+  const staleStudents = students.filter((student) => {
+    if (!student.lastActiveAt) return true;
+    return nowMs - student.lastActiveAt.getTime() >= 5 * 24 * 60 * 60 * 1000;
+  });
+  const buckets = new Map<string, Bucket>();
 
   for (const answer of answers) {
-    const isCorrect = answer.isCorrect === true;
-    const timeSpent = answer.timeSpent ?? 0;
-    const questionLabel = answer.question.stem;
-    const topicLabel = `${answer.question.topic.domain.section.label} / ${answer.question.topic.name}`;
-
-    const questionBucket =
-      byQuestion.get(answer.questionId) ??
-      {
-        id: answer.questionId,
-        label: questionLabel,
-        topic: topicLabel,
-        difficulty: answer.question.difficulty,
-        correct: 0,
-        total: 0,
-        totalTime: 0,
-        timed: 0,
-      };
-    questionBucket.total += 1;
-    if (isCorrect) questionBucket.correct += 1;
-    if (timeSpent > 0) {
-      questionBucket.totalTime += timeSpent;
-      questionBucket.timed += 1;
+    const section = answer.question.topic.domain.section.label;
+    const subtopic = answer.question.subskill?.name ?? answer.question.topic.name;
+    const key = `${section}:${subtopic}:${answer.question.difficulty}`;
+    const bucket = buckets.get(key) ?? {
+      key,
+      label: subtopic,
+      section,
+      difficulty: answer.question.difficulty,
+      correct: 0,
+      total: 0,
+      totalTime: 0,
+      timed: 0,
+    };
+    bucket.total += 1;
+    if (answer.isCorrect) bucket.correct += 1;
+    if (answer.timeSpent) {
+      bucket.totalTime += answer.timeSpent;
+      bucket.timed += 1;
     }
-    byQuestion.set(answer.questionId, questionBucket);
-
-    for (const [map, key] of [
-      [byTopic, topicLabel],
-      [byDifficulty, answer.question.difficulty],
-    ] as const) {
-      const bucket = map.get(key) ?? { label: key, correct: 0, total: 0, totalTime: 0, timed: 0 };
-      bucket.total += 1;
-      if (isCorrect) bucket.correct += 1;
-      if (timeSpent > 0) {
-        bucket.totalTime += timeSpent;
-        bucket.timed += 1;
-      }
-      map.set(key, bucket);
-    }
+    buckets.set(key, bucket);
   }
 
-  const hardestQuestions = Array.from(byQuestion.values())
-    .filter((bucket) => bucket.total >= 1)
-    .sort((a, b) => {
-      const aMiss = (a.total - a.correct) / a.total;
-      const bMiss = (b.total - b.correct) / b.total;
-      return bMiss - aMiss || b.total - a.total;
-    })
-    .slice(0, 20);
-  const topicRows = Array.from(byTopic.values()).sort((a, b) => a.correct / a.total - b.correct / b.total);
-  const difficultyRows = Array.from(byDifficulty.values()).sort((a, b) => a.label.localeCompare(b.label));
+  const weakSubtopics = [...buckets.values()]
+    .filter((bucket) => bucket.total > 0)
+    .sort((a, b) => scorePercent(a.correct, a.total) - scorePercent(b.correct, b.total) || b.total - a.total)
+    .slice(0, 12);
+  const correct = answers.filter((answer) => answer.isCorrect).length;
+  const avgAccuracy = answers.length ? scorePercent(correct, answers.length) : null;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
-      <div className="mb-6">
-        <h1 className="text-xl font-semibold text-gray-900">Question Analytics</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Submitted Practice Set answers by question, topic and difficulty.
-        </p>
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-semibold text-gray-900">Student Analytics</h1>
+          <p className="mt-1 text-sm text-gray-500">Individual progress, weak skills and reinforcement focus.</p>
+        </div>
+        <form className="flex flex-wrap gap-2">
+          <input
+            name="q"
+            defaultValue={q}
+            placeholder="Search student..."
+            className="rounded-md border border-gray-300 px-3 py-2 text-sm"
+          />
+          <select name="studentId" defaultValue={selectedStudentId ?? ""} className="rounded-md border border-gray-300 px-3 py-2 text-sm">
+            {selectableStudents.map((student) => (
+              <option key={student.id} value={student.id}>{student.name}</option>
+            ))}
+          </select>
+          <button className="ml-2 rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700">View</button>
+        </form>
       </div>
 
-      <div className="mb-6 grid grid-cols-3 gap-4">
+      <div className="mb-6 grid grid-cols-4 gap-4">
+        <Metric label="Student" value={selectedStudent?.name ?? "-"} />
         <Metric label="Answers" value={answers.length.toString()} />
-        <Metric label="Questions Seen" value={byQuestion.size.toString()} />
-        <Metric
-          label="Average Accuracy"
-          value={
-            answers.length
-              ? `${Math.round((answers.filter((answer) => answer.isCorrect).length / answers.length) * 100)}%`
-              : "-"
-          }
-        />
+        <Metric label="Average Accuracy" value={avgAccuracy !== null ? `${avgAccuracy}%` : "-"} />
+        <Metric label="Inactive 5+ Days" value={staleStudents.length.toString()} />
       </div>
 
       <section className="mb-8">
-        <h2 className="mb-3 text-base font-semibold text-gray-900">Most Missed Questions</h2>
-        <div className="overflow-hidden rounded-md border border-gray-200 bg-white">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-base font-semibold text-gray-900">Skills With Most Errors</h2>
+          <Link href="/teacher/compare" className="text-sm text-blue-600 hover:underline">Compare students</Link>
+        </div>
+        <Card className="overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 text-xs uppercase text-gray-500">
               <tr>
-                <th className="px-4 py-3 text-left">Question</th>
-                <th className="px-4 py-3 text-left">Topic</th>
+                <th className="px-4 py-3 text-left">Skill</th>
+                <th className="px-4 py-3 text-left">Area</th>
                 <th className="px-4 py-3 text-left">Difficulty</th>
                 <th className="px-4 py-3 text-right">Accuracy</th>
                 <th className="px-4 py-3 text-right">Avg Time</th>
+                <th className="px-4 py-3 text-left">Reinforcement</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {hardestQuestions.map((bucket) => (
-                <tr key={bucket.id}>
-                  <td className="px-4 py-3">
-                    <Link href={`/teacher/questions/${bucket.id}/edit`} className="font-medium text-gray-800 hover:text-blue-700">
-                      <MathContent content={bucket.label} className="line-clamp-2" />
-                    </Link>
-                    <p className="mt-0.5 text-xs text-gray-400">{bucket.total - bucket.correct} missed of {bucket.total}</p>
-                  </td>
-                  <td className="px-4 py-3 text-gray-500">{bucket.topic}</td>
-                  <td className="px-4 py-3 text-gray-500">{bucket.difficulty}</td>
-                  <td className="px-4 py-3 text-right font-medium text-gray-800">{Math.round((bucket.correct / bucket.total) * 100)}%</td>
-                  <td className="px-4 py-3 text-right text-gray-500">{bucket.timed ? formatTime(Math.round(bucket.totalTime / bucket.timed)) : "-"}</td>
-                </tr>
-              ))}
+              {weakSubtopics.map((bucket) => {
+                const pct = scorePercent(bucket.correct, bucket.total);
+                return (
+                  <tr key={bucket.key}>
+                    <td className="px-4 py-3 font-medium text-gray-800">{bucket.label}</td>
+                    <td className="px-4 py-3 text-gray-500">{bucket.section}</td>
+                    <td className="px-4 py-3 text-gray-500">{bucket.difficulty}</td>
+                    <td className="px-4 py-3 text-right font-medium text-gray-800">{pct}% ({bucket.correct}/{bucket.total})</td>
+                    <td className="px-4 py-3 text-right text-gray-500">{bucket.timed ? formatTime(Math.round(bucket.totalTime / bucket.timed)) : "-"}</td>
+                    <td className="px-4 py-3 text-gray-600">{recommendation(bucket.label, pct)}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
-          {hardestQuestions.length === 0 && <p className="py-10 text-center text-sm text-gray-400">No submitted answers yet.</p>}
-        </div>
+          {weakSubtopics.length === 0 && <p className="py-10 text-center text-sm text-gray-400">No submitted answers for this student yet.</p>}
+        </Card>
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Breakdown title="By Topic" rows={topicRows} />
-        <Breakdown title="By Difficulty" rows={difficultyRows} />
-      </div>
+      <section>
+        <h2 className="mb-3 text-base font-semibold text-gray-900">Students inactive for 5+ days</h2>
+        <Card>
+          {staleStudents.slice(0, 12).map((student) => (
+            <div key={student.id} className="flex items-center justify-between border-b border-gray-100 px-4 py-3 text-sm last:border-b-0">
+              <span className="font-medium text-gray-800">{student.name}</span>
+              <span className="text-gray-500">{student.lastActiveAt ? formatDate(student.lastActiveAt) : "No activity"}</span>
+            </div>
+          ))}
+          {staleStudents.length === 0 && <p className="p-6 text-center text-sm text-gray-400">All students have recent activity.</p>}
+        </Card>
+      </section>
     </div>
   );
 }
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-md border border-gray-200 bg-white p-4">
+    <Card padding="md">
       <p className="text-xs font-medium uppercase text-gray-400">{label}</p>
-      <p className="mt-1 text-2xl font-semibold text-gray-900">{value}</p>
-    </div>
+      <p className="mt-1 truncate text-2xl font-semibold text-gray-900">{value}</p>
+    </Card>
   );
 }
 
-function Breakdown({ title, rows }: { title: string; rows: Bucket[] }) {
-  return (
-    <section>
-      <h2 className="mb-3 text-base font-semibold text-gray-900">{title}</h2>
-      <div className="overflow-hidden rounded-md border border-gray-200 bg-white">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-xs uppercase text-gray-500">
-            <tr>
-              <th className="px-4 py-3 text-left">Segment</th>
-              <th className="px-4 py-3 text-right">Accuracy</th>
-              <th className="px-4 py-3 text-right">Answers</th>
-              <th className="px-4 py-3 text-right">Avg Time</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {rows.map((row) => (
-              <tr key={row.label}>
-                <td className="px-4 py-3 font-medium text-gray-800">{row.label}</td>
-                <td className="px-4 py-3 text-right text-gray-700">{Math.round((row.correct / row.total) * 100)}%</td>
-                <td className="px-4 py-3 text-right text-gray-500">{row.total}</td>
-                <td className="px-4 py-3 text-right text-gray-500">{row.timed ? formatTime(Math.round(row.totalTime / row.timed)) : "-"}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {rows.length === 0 && <p className="py-10 text-center text-sm text-gray-400">No data yet.</p>}
-      </div>
-    </section>
-  );
+function recommendation(label: string, pct: number) {
+  if (pct < 50) return `Re-teach ${label} and assign Easy targeted practice.`;
+  if (pct < 75) return `Review mistakes in ${label} before moving difficulty.`;
+  return `Monitor ${label}; assign a short reinforcement set.`;
 }

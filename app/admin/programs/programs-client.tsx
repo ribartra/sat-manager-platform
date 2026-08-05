@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
@@ -86,6 +87,15 @@ function CreateProgramForm({
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [saving, setSaving] = useState(false);
+  const [teacherSearch, setTeacherSearch] = useState("");
+  const visibleTeachers = useMemo(() => {
+    const term = teacherSearch.trim().toLowerCase();
+    const filtered = term
+      ? teachers.filter((teacher) => teacher.name.toLowerCase().includes(term) || teacher.email.toLowerCase().includes(term))
+      : teachers;
+    const selected = teachers.find((teacher) => teacher.id === teacherId);
+    return selected && !filtered.some((teacher) => teacher.id === selected.id) ? [selected, ...filtered] : filtered;
+  }, [teacherId, teacherSearch, teachers]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -106,18 +116,23 @@ function CreateProgramForm({
   }
 
   return (
-    <form onSubmit={submit} className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
+    <Card as="form" onSubmit={submit} variant="info" padding="md" className="mb-6">
       <h3 className="mb-3 text-sm font-semibold text-blue-900">New Program</h3>
-      <div className="grid gap-3 md:grid-cols-[1fr_1fr_150px_150px_auto_auto]">
+      <div className="grid gap-3 md:grid-cols-[1fr_1fr_1fr_150px_150px_auto_auto]">
         <Input
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Program name"
           required
         />
+        <Input
+          value={teacherSearch}
+          onChange={(event) => setTeacherSearch(event.target.value)}
+          placeholder="Search teacher..."
+        />
         <Select value={teacherId} onChange={(e) => setTeacherId(e.target.value)} required>
           <option value="">Select teacher</option>
-          {teachers.map((t) => (
+          {visibleTeachers.map((t) => (
             <option key={t.id} value={t.id}>
               {t.name} · {t.email}
             </option>
@@ -140,7 +155,7 @@ function CreateProgramForm({
           Cancel
         </Button>
       </div>
-    </form>
+    </Card>
   );
 }
 
@@ -163,11 +178,21 @@ function EditProgramForm({
   const [saving, setSaving] = useState(false);
   const [newTeacherId, setNewTeacherId] = useState("");
   const [teacherLoading, setTeacherLoading] = useState<string | null>(null);
+  const [teacherSearch, setTeacherSearch] = useState("");
 
   const activeTeachers = program.teachers.filter((t) => !t.endDate);
   const availableTeachers = teachers.filter(
     (t) => !activeTeachers.some((at) => at.teacherId === t.id)
   );
+  const availableTeacherTerm = teacherSearch.trim().toLowerCase();
+  const availableTeacherMatches = availableTeacherTerm
+    ? availableTeachers.filter((teacher) => teacher.name.toLowerCase().includes(availableTeacherTerm) || teacher.email.toLowerCase().includes(availableTeacherTerm))
+    : availableTeachers;
+  const selectedAvailableTeacher = availableTeachers.find((teacher) => teacher.id === newTeacherId);
+  const visibleAvailableTeachers =
+    selectedAvailableTeacher && !availableTeacherMatches.some((teacher) => teacher.id === selectedAvailableTeacher.id)
+      ? [selectedAvailableTeacher, ...availableTeacherMatches]
+      : availableTeacherMatches;
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
@@ -273,15 +298,20 @@ function EditProgramForm({
             </div>
           ))}
           {availableTeachers.length > 0 && (
-            <div className="flex items-center gap-2 pt-1">
+            <div className="grid gap-2 pt-1 md:grid-cols-[1fr_1fr_auto]">
+              <Input
+                value={teacherSearch}
+                onChange={(event) => setTeacherSearch(event.target.value)}
+                placeholder="Search teacher..."
+              />
               <Select
                 value={newTeacherId}
                 onChange={(e) => setNewTeacherId(e.target.value)}
               >
                 <option value="">Assign teacher…</option>
-                {availableTeachers.map((t) => (
+                {visibleAvailableTeachers.map((t) => (
                   <option key={t.id} value={t.id}>
-                    {t.name}
+                    {t.name} · {t.email}
                   </option>
                 ))}
               </Select>
@@ -393,9 +423,18 @@ export function AdminProgramsClient({
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [programSearch, setProgramSearch] = useState("");
 
   const hasDeleted = programs.some((p) => !!p.deletedAt);
-  const visible = programs.filter((p) => showDeleted || !p.deletedAt);
+  const visible = programs.filter((p) => {
+    const term = programSearch.trim().toLowerCase();
+    const matchesSearch =
+      !term ||
+      p.name.toLowerCase().includes(term) ||
+      p.teachers.some((teacher) => teacher.teacher.name.toLowerCase().includes(term) || teacher.teacher.email.toLowerCase().includes(term)) ||
+      p.enrollments.some((enrollment) => enrollment.student.name.toLowerCase().includes(term));
+    return (showDeleted || !p.deletedAt) && matchesSearch;
+  });
 
   async function softDelete(id: string) {
     setLoadingId(id);
@@ -427,7 +466,13 @@ export function AdminProgramsClient({
 
   return (
     <div>
-      <div className="mb-4 flex justify-end">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <Input
+          value={programSearch}
+          onChange={(event) => setProgramSearch(event.target.value)}
+          placeholder="Search program, teacher or student..."
+          className="max-w-sm"
+        />
         {!showCreate && (
           <Button size="sm" onClick={() => setShowCreate(true)}>
             + New Program
@@ -448,7 +493,7 @@ export function AdminProgramsClient({
         </button>
       )}
 
-      <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
+      <Card className="overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50">
@@ -608,7 +653,7 @@ export function AdminProgramsClient({
         {visible.length === 0 && (
           <p className="py-10 text-center text-sm text-gray-400">No programs.</p>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

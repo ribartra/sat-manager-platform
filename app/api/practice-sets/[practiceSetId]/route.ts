@@ -7,6 +7,60 @@ interface RouteContext {
   params: Promise<{ practiceSetId: string }>;
 }
 
+const allowedStatuses = new Set(["DRAFT", "PUBLISHED", "BLOCKED", "ARCHIVED"]);
+
+export async function PATCH(req: NextRequest, { params }: RouteContext) {
+  const session = await requireTeacherOrAdmin();
+  if (!session) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const { practiceSetId } = await params;
+  const body = (await req.json().catch(() => ({}))) as { status?: string };
+  if (!body.status || !allowedStatuses.has(body.status)) {
+    return NextResponse.json({ error: "Invalid Practice Set status." }, { status: 400 });
+  }
+
+  const practiceSet = await prisma.practiceSet.findUnique({
+    where: { id: practiceSetId },
+    include: { questions: { include: { question: { select: { id: true, status: true, topicId: true } } } } },
+  });
+  if (!practiceSet) return NextResponse.json({ error: "Practice Set not found." }, { status: 404 });
+
+  const questionIds = practiceSet.questions.map((item) => item.questionId);
+  const validationErrors = validatePracticeSetPayload({
+    name: practiceSet.name,
+    topicId: practiceSet.topicId,
+    difficulty: practiceSet.difficulty,
+    status: body.status,
+    explanationVisibility: practiceSet.explanationVisibility,
+    questionIds,
+  });
+  if (body.status === "PUBLISHED") {
+    if (practiceSet.questions.some((item) => item.question.status !== "PUBLISHED")) validationErrors.push("All questions must be published before publishing a Practice Set.");
+    if (practiceSet.questions.some((item) => item.question.topicId !== practiceSet.topicId)) validationErrors.push("All questions in a Practice Set must belong to the selected topic.");
+  }
+  if (validationErrors.length > 0) {
+    return NextResponse.json({ error: "Validation failed.", errors: validationErrors }, { status: 400 });
+  }
+
+  const updated = await prisma.practiceSet.update({
+    where: { id: practiceSetId },
+    data: { status: body.status },
+  });
+  await prisma.auditLog.create({
+    data: {
+      userId: session.user.id,
+      action: body.status === "PUBLISHED" ? "PUBLISH_PRACTICE_SET" : body.status === "ARCHIVED" ? "ARCHIVE_PRACTICE_SET" : body.status === "BLOCKED" ? "BLOCK_PRACTICE_SET" : "DRAFT_PRACTICE_SET",
+      targetType: "PracticeSet",
+      targetId: practiceSetId,
+      metadata: JSON.stringify({ previousStatus: practiceSet.status, status: body.status }),
+    },
+  });
+
+  return NextResponse.json(updated);
+}
+
 export async function PUT(req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
   if (!session) {
@@ -69,6 +123,38 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
         explanationVisibility,
         questionCount: Array.isArray(questionIds) ? questionIds.length : 0,
       }),
+    },
+  });
+
+  return NextResponse.json({ ok: true });
+}
+
+export async function DELETE(_req: NextRequest, { params }: RouteContext) {
+  const session = await requireTeacherOrAdmin();
+  if (!session) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const { practiceSetId } = await params;
+  const [practiceSet, assignments, groupAssignments, attempts] = await Promise.all([
+    prisma.practiceSet.findUnique({ where: { id: practiceSetId } }),
+    prisma.assignment.count({ where: { practiceSetId } }),
+    prisma.groupAssignment.count({ where: { practiceSetId } }),
+    prisma.attempt.count({ where: { practiceSetId } }),
+  ]);
+  if (!practiceSet) return NextResponse.json({ error: "Practice Set not found." }, { status: 404 });
+  if (assignments > 0 || groupAssignments > 0 || attempts > 0) {
+    return NextResponse.json({ error: "Archive this Practice Set instead. Sets with assignments or attempts cannot be deleted." }, { status: 409 });
+  }
+
+  await prisma.practiceSet.delete({ where: { id: practiceSetId } });
+  await prisma.auditLog.create({
+    data: {
+      userId: session.user.id,
+      action: "DELETE_PRACTICE_SET",
+      targetType: "PracticeSet",
+      targetId: practiceSetId,
+      metadata: JSON.stringify({ previousStatus: practiceSet.status }),
     },
   });
 

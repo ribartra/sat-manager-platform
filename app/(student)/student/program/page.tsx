@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
-import { EnrollRequestButton } from "./enroll-request-button";
+import { Card } from "@/components/ui/card";
 import { FolderOpen, Clock, CheckCircle, BookOpen } from "lucide-react";
 
 export default async function StudentProgramPage() {
@@ -63,25 +63,7 @@ export default async function StudentProgramPage() {
     return <PendingView program={pendingEnrollment.program} requestedAt={pendingEnrollment.enrolledAt} />;
   }
 
-  // Approved but not enrolled — show available programs
-  const availablePrograms = await prisma.program.findMany({
-    where: {
-      active: true,
-      startDate: { lte: now },
-      OR: [{ endDate: null }, { endDate: { gt: now } }],
-      enrollments: { none: { studentId } },
-    },
-    include: {
-      teachers: {
-        where: { endDate: null },
-        include: { teacher: { select: { name: true } } },
-      },
-      enrollments: { where: { status: "APPROVED", active: true }, select: { studentId: true } },
-    },
-    orderBy: { name: "asc" },
-  });
-
-  return <NoProgramView programs={availablePrograms} />;
+  return <NoProgramView />;
 }
 
 // ─── Sub-views ────────────────────────────────────────────────────────────────
@@ -105,7 +87,7 @@ function EnrolledView({ enrollment }: { enrollment: Enrollment }) {
   const teachers = program.teachers.map((t) => t.teacher.name).join(", ") || "—";
   return (
     <div className="mx-auto max-w-xl px-4 py-12">
-      <div className="rounded-lg border border-green-200 bg-white p-8">
+      <Card variant="success" padding="lg">
         <div className="flex items-center gap-3 mb-6">
           <div className="rounded-full bg-green-100 p-2.5">
             <CheckCircle size={20} className="text-green-600" />
@@ -140,7 +122,7 @@ function EnrolledView({ enrollment }: { enrollment: Enrollment }) {
             <dd className="font-medium text-gray-800">{program.enrollments.length}</dd>
           </div>
         </dl>
-      </div>
+      </Card>
     </div>
   );
 }
@@ -148,7 +130,7 @@ function EnrolledView({ enrollment }: { enrollment: Enrollment }) {
 function PendingView({ program, requestedAt }: { program: { name: string }; requestedAt: Date }) {
   return (
     <div className="mx-auto max-w-xl px-4 py-12">
-      <div className="rounded-lg border border-amber-200 bg-white p-8 text-center">
+      <Card variant="warning" padding="lg" className="text-center">
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-amber-100">
           <Clock size={24} className="text-amber-600" />
         </div>
@@ -161,56 +143,31 @@ function PendingView({ program, requestedAt }: { program: { name: string }; requ
         <p className="text-xs text-gray-400">
           Request submitted on {requestedAt.toISOString().slice(0, 10)}
         </p>
-      </div>
+      </Card>
     </div>
   );
 }
 
-function NoProgramView({ programs }: { programs: Program[] }) {
+function NoProgramView() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-12">
       <div className="mb-8 text-center">
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-100">
           <FolderOpen size={24} className="text-blue-600" />
         </div>
-        <h1 className="text-xl font-semibold text-gray-900">Join a Program</h1>
+        <h1 className="text-xl font-semibold text-gray-900">No active program</h1>
         <p className="mt-1 text-sm text-gray-500">
-          Select a program and request enrollment. Your teacher will approve your request.
+          Your teacher or administrator must enroll you before program content is available.
         </p>
       </div>
 
-      {programs.length > 0 ? (
-        <div className="space-y-3">
-          {programs.map((program) => {
-            const teachers = program.teachers.map((t) => t.teacher.name).join(", ") || "—";
-            return (
-              <div
-                key={program.id}
-                className="rounded-lg border border-gray-200 bg-white p-5 flex items-center justify-between gap-4"
-              >
-                <div className="min-w-0">
-                  <p className="font-semibold text-gray-900">{program.name}</p>
-                  <p className="text-sm text-gray-500 mt-0.5">Teacher: {teachers}</p>
-                  <p className="text-xs text-gray-400 mt-0.5">
-                    {program.startDate.toISOString().slice(0, 10)}
-                    {program.endDate ? ` – ${program.endDate.toISOString().slice(0, 10)}` : " · No end date"}
-                    {" · "}{program.enrollments.length} student{program.enrollments.length !== 1 ? "s" : ""}
-                  </p>
-                </div>
-                <EnrollRequestButton programId={program.id} />
-              </div>
-            );
-          })}
-        </div>
-      ) : (
-        <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-10 text-center">
-          <BookOpen size={32} className="mx-auto mb-3 text-gray-300" />
-          <p className="font-medium text-gray-500">No programs available right now</p>
-          <p className="text-sm text-gray-400 mt-1">
-            Ask your teacher or administrator to enroll you directly, or check back later.
-          </p>
-        </div>
-      )}
+      <Card variant="subtle" padding="lg" className="border-dashed text-center">
+        <BookOpen size={32} className="mx-auto mb-3 text-gray-300" />
+        <p className="font-medium text-gray-500">Waiting for teacher enrollment</p>
+        <p className="text-sm text-gray-400 mt-1">
+          Program access, assignments and unlocks are managed by the teacher.
+        </p>
+      </Card>
     </div>
   );
 }

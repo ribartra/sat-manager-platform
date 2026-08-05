@@ -37,6 +37,14 @@ model User {
   fullTestAttempts FullPracticeTestAttempt[]
   programTeachingAssignments ProgramTeacher[]
   programEnrollments ProgramEnrollment[]
+  parentAccessTokensCreated ParentAccessToken[] @relation("ParentAccessCreatedBy")
+  parentAccessTokensForStudent ParentAccessToken[] @relation("ParentAccessStudent")
+}
+
+model AppSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
 }
 
 model Program {
@@ -87,6 +95,7 @@ model Group {
   schedule  String?
   createdAt DateTime @default(now())
   members   GroupMembership[]
+  assignments GroupAssignment[]
 }
 
 model GroupMembership {
@@ -95,6 +104,21 @@ model GroupMembership {
   user    User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   group   Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
   @@id([userId, groupId])
+}
+
+model GroupAssignment {
+  groupId       String
+  practiceSetId String
+  assignedById  String?
+  dueDate       DateTime?
+  unlockAt      DateTime?
+  locked        Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  group       Group       @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  practiceSet PracticeSet @relation(fields: [practiceSetId], references: [id], onDelete: Cascade)
+
+  @@id([groupId, practiceSetId])
 }
 
 model Section {
@@ -116,19 +140,48 @@ model Topic {
   id        String   @id @default(cuid())
   name      String
   domainId  String
+  taxonomyNodeId String?
   domain    Domain   @relation(fields: [domainId], references: [id])
+  taxonomyNode TaxonomyNode? @relation(fields: [taxonomyNodeId], references: [id], onDelete: SetNull)
   subskills Subskill[]
   questions Question[]
   practiceSets PracticeSet[]
   materials StudyMaterial[]
+
+  @@index([taxonomyNodeId])
 }
 
 model Subskill {
   id      String @id @default(cuid())
   name    String
   topicId String
+  taxonomyNodeId String?
   topic   Topic  @relation(fields: [topicId], references: [id])
+  taxonomyNode TaxonomyNode? @relation(fields: [taxonomyNodeId], references: [id], onDelete: SetNull)
   questions Question[]
+
+  @@index([taxonomyNodeId])
+}
+
+model TaxonomyNode {
+  id        String   @id @default(cuid())
+  name      String
+  label     String
+  type      String   // AREA | DOMAIN | SKILL | SUBSKILL
+  parentId  String?
+  sortOrder Int      @default(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  parent    TaxonomyNode?  @relation("TaxonomyTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children  TaxonomyNode[] @relation("TaxonomyTree")
+  topics    Topic[]
+  subskills Subskill[]
+
+  @@index([parentId])
+  @@index([type])
+  @@unique([parentId, type, name])
 }
 
 model Question {
@@ -160,6 +213,7 @@ model QuestionOption {
   questionId String
   label      String   // A | B | C | D
   text       String
+  imageUrl   String?
   question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 }
 
@@ -176,6 +230,7 @@ model PracticeSet {
   topic       Topic               @relation(fields: [topicId], references: [id])
   questions   PracticeSetQuestion[]
   assignments Assignment[]
+  groupAssignments GroupAssignment[]
 }
 
 model PracticeSetQuestion {
@@ -221,6 +276,17 @@ model Attempt {
   assignment Assignment? @relation(fields: [assignmentId], references: [id])
   student    User        @relation(fields: [studentId], references: [id])
   answers    AttemptAnswer[]
+  pauses     AttemptPause[]
+}
+
+model AttemptPause {
+  id              String    @id @default(cuid())
+  attemptId       String
+  pausedAt        DateTime  @default(now())
+  resumedAt       DateTime?
+  durationSeconds Int?
+
+  attempt Attempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
 }
 
 model AttemptAnswer {
@@ -255,9 +321,11 @@ model InviteToken {
   parentPhone String?
   linkedStudentEmail String? // parent token: student email to link after activation
   parentConsentToken String? @unique
+  parentConsentTokenHash String? @unique
   parentConsentAt DateTime?
   parentConsentIp String?
   token     String    @unique
+  tokenHash String?   @unique
   expiresAt DateTime
   usedAt    DateTime?
   program   Program?  @relation(fields: [programId], references: [id], onDelete: SetNull)
@@ -267,6 +335,7 @@ model PasswordResetToken {
   id        String    @id @default(cuid())
   userId    String
   token     String    @unique
+  tokenHash String?   @unique
   expiresAt DateTime
   usedAt    DateTime?
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -312,6 +381,22 @@ model ParentStudent {
   student   User @relation("ChildLinks", fields: [studentId], references: [id], onDelete: Cascade)
 
   @@id([parentId, studentId])
+}
+
+model ParentAccessToken {
+  id          String    @id @default(cuid())
+  studentId   String
+  createdById String
+  parentId    String?   // associated parent the report link was shared with
+  areas       String?   // CSV of report areas included: mathematics,reading,writing
+  tokenHash   String    @unique
+  expiresAt   DateTime  // activation deadline: link must be opened before this
+  usedAt      DateTime? // first-open timestamp; the 7-day access window starts here
+  revokedAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  student   User @relation("ParentAccessStudent", fields: [studentId], references: [id], onDelete: Cascade)
+  createdBy User @relation("ParentAccessCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
 }
 
 model FullPracticeTest {
@@ -380,6 +465,17 @@ model FullPracticeTestAttempt {
   assignment     FullPracticeTestAssignment? @relation(fields: [assignmentId], references: [id])
   student        User @relation(fields: [studentId], references: [id])
   answers        FullPracticeTestAnswer[]
+  pauses         FullPracticeTestPause[]
+}
+
+model FullPracticeTestPause {
+  id              String    @id @default(cuid())
+  attemptId       String
+  pausedAt        DateTime  @default(now())
+  resumedAt       DateTime?
+  durationSeconds Int?
+
+  attempt FullPracticeTestAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
 }
 
 model FullPracticeTestAnswer {
@@ -417,4 +513,262 @@ model StudyMaterial {
   updatedAt   DateTime @updatedAt
 
   topic Topic? @relation(fields: [topicId], references: [id], onDelete: SetNull)
+}
+
+model IngestBatch {
+  id                 String   @id
+  name               String
+  basePath           String
+  status             String   @default("PENDING") // PENDING | SCANNING | PROCESSING | COMPLETED | FAILED
+  totalFiles         Int      @default(0)
+  totalPages         Int      @default(0)
+  filesProcessed     Int      @default(0)
+  pagesProcessed     Int      @default(0)
+  candidatesDetected Int      @default(0)
+  errorCount         Int      @default(0)
+  lastError          String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model IngestSourceFile {
+  id           String   @id
+  batchId      String
+  path         String
+  relativePath String
+  hash         String
+  extension    String
+  contentType  String   @default("UNKNOWN") // FULL_PRACTICE_TEST | PRACTICE_SET | UNKNOWN
+  sourceKind   String   @default("UNKNOWN") // MOCK_EXAM | PRACTICE_EXERCISE | ANSWER_KEY | ANSWER_EXPLANATION | UNKNOWN
+  section      String?
+  domainName   String?
+  topicName    String?
+  difficulty   String?
+  difficultySource String?
+  practiceSetVariant String?
+  testNumber   Int?
+  isAnswerFile Boolean  @default(false)
+  isExplanationFile Boolean @default(false)
+  isQuestionSource Boolean @default(true)
+  metadataWarningsJson String?
+  status       String   @default("PENDING")
+  pageCount    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([batchId])
+  @@index([hash])
+}
+
+model IngestPageArtifact {
+  id             String   @id
+  batchId        String
+  sourceFileId   String
+  pageNumber     Int
+  method         String   @default("UNPROCESSED") // PDF_TEXT | DOCX_TEXT | MISTRAL_OCR | OCR_REQUIRED | FAILED
+  textDensity    Float    @default(0)
+  extractedText  String?
+  layoutJson     String?
+  contentHash    String?
+  requiresOcr    Boolean  @default(false)
+  status         String   @default("PENDING")
+  warning        String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([sourceFileId, pageNumber])
+  @@index([batchId])
+  @@index([contentHash])
+}
+
+model IngestImageArtifact {
+  id             String   @id
+  batchId        String
+  sourceFileId   String
+  pageArtifactId String?
+  pageNumber     Int
+  imageIndex     Int
+  imageId        String?
+  origin         String   @default("PDFPLUMBER") // PDFPLUMBER | MISTRAL_OCR
+  bboxJson       String?
+  mimeType       String?
+  base64Data     String?
+  fileUrl        String?
+  width          Int?
+  height         Int?
+  contentHash    String?
+  status         String   @default("AVAILABLE")
+  createdAt      DateTime @default(now())
+
+  @@unique([sourceFileId, pageNumber, imageIndex, origin])
+  @@index([batchId])
+  @@index([sourceFileId])
+  @@index([pageArtifactId])
+  @@index([contentHash])
+}
+
+model IngestOcrCache {
+  id           String   @id
+  contentHash  String
+  model        String
+  responseJson String
+  text         String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([contentHash, model])
+}
+
+model IngestQuestionCandidate {
+  id             String   @id
+  batchId        String
+  sourceFileId   String
+  pageArtifactId String?
+  questionNumber Int?
+  questionExternalId String?
+  testNumber     Int?
+  moduleLabel    String?
+  sourceLabel    String?
+  contentType    String?
+  section        String?
+  domainName     String?
+  topicName      String?
+  subskillName   String?
+  difficulty     String?
+  difficultySource String?
+  practiceSetVariant String?
+  type           String   @default("MC")
+  stem           String?
+  stimulus       String?
+  optionsJson    String?
+  correctAnswer  String?
+  explanation    String?
+  answerSource   String?
+  rawJson        String
+  confidence     Float    @default(0)
+  warningsJson   String?
+  status         String   @default("NEEDS_REVIEW") // NEEDS_REVIEW | READY | REVIEWED | REJECTED
+  officialQuestionId String?
+  promotionStatus String @default("NOT_PROMOTED") // NOT_PROMOTED | EDITING | PROMOTED | REJECTED
+  promotedAt     DateTime?
+  promotedById   String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([batchId])
+  @@index([sourceFileId])
+  @@index([status])
+  @@index([officialQuestionId])
+  @@index([promotionStatus])
+}
+
+model IngestCandidateImageLink {
+  id              String   @id
+  batchId         String
+  candidateId     String
+  imageArtifactId String
+  targetType      String   @default("STEM") // STEM | STIMULUS | OPTION | OPTION_BLOCK | ANSWER_FIELD | EXPLANATION | PAGE_CONTEXT
+  optionLabel     String?
+  sortOrder       Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([candidateId, imageArtifactId, targetType, optionLabel])
+  @@index([batchId])
+  @@index([candidateId])
+  @@index([imageArtifactId])
+}
+
+model IngestReviewSession {
+  id              String   @id
+  batchId         String
+  sourceFileId    String?
+  currentStep     String   @default("FILES") // FILES | PAGES | QUESTIONS | ANSWERS | IMAGES | FINAL
+  status          String   @default("IN_PROGRESS") // IN_PROGRESS | COMPLETED
+  progressJson    String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([batchId])
+  @@index([sourceFileId])
+}
+
+model IngestJobEvent {
+  id                      String   @id
+  batchId                 String
+  sourceFileId            String?
+  pageArtifactId          String?
+  jobType                 String   @default("PROCESS") // PROCESS | RETRY_OCR | REPAIR
+  status                  String   @default("RUNNING") // STARTED | RUNNING | COMPLETED | FAILED
+  message                 String
+  processedFiles          Int      @default(0)
+  processedPages          Int      @default(0)
+  totalFilesKnown         Int      @default(0)
+  totalPagesKnown         Int      @default(0)
+  estimatedRemainingPages Float    @default(0)
+  estimatedSecondsRemaining Int    @default(0)
+  secondsPerPage          Float    @default(60)
+  avgPagesPerFile         Float    @default(0)
+  metadataJson            String?
+  createdAt               DateTime @default(now())
+
+  @@index([batchId])
+  @@index([sourceFileId])
+  @@index([jobType])
+  @@index([status])
+}
+
+model IngestPromotionArtifact {
+  id           String   @id
+  batchId      String
+  sourceFileId String?
+  artifactType String // QUESTION | PRACTICE_SET | FULL_PRACTICE_TEST
+  artifactId   String
+  groupKey     String
+  createdById  String?
+  createdAt    DateTime @default(now())
+
+  @@unique([batchId, artifactType, groupKey])
+  @@index([batchId])
+  @@index([sourceFileId])
+  @@index([artifactType])
+  @@index([artifactId])
+}
+
+model IngestAnswerCandidate {
+  id             String   @id
+  batchId        String
+  sourceFileId   String
+  pageArtifactId String?
+  questionNumber Int?
+  questionExternalId String?
+  testNumber     Int?
+  section        String?
+  moduleLabel    String?
+  answer         String?
+  explanation    String?
+  rawText        String?
+  confidence     Float    @default(0)
+  createdAt      DateTime @default(now())
+
+  @@index([batchId])
+  @@index([sourceFileId])
+}
+
+model IngestIncident {
+  id             String   @id
+  batchId        String
+  sourceFileId   String?
+  pageArtifactId String?
+  severity       String   @default("WARNING") // INFO | WARNING | ERROR
+  code           String
+  message        String
+  decision       String?
+  action         String?
+  status         String   @default("OPEN") // OPEN | RESOLVED
+  contextHash    String   @unique
+  createdAt      DateTime @default(now())
+
+  @@index([batchId])
+  @@index([severity])
 }

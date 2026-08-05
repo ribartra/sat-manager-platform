@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
 interface StudentEditInfo {
@@ -44,7 +45,7 @@ export function EditStudentForm({ student }: { student: StudentEditInfo }) {
   }
 
   return (
-    <form onSubmit={submit} className="space-y-4 rounded-lg border border-gray-200 bg-white p-6">
+    <Card as="form" onSubmit={submit} padding="lg" className="space-y-4">
       <div>
         <label className="mb-1 block text-sm font-medium text-gray-700">Name</label>
         <Input value={name} onChange={(e) => setName(e.target.value)} required />
@@ -70,6 +71,6 @@ export function EditStudentForm({ student }: { student: StudentEditInfo }) {
         <Button type="submit" disabled={loading}>{loading ? "Saving..." : "Save Student"}</Button>
         <Button type="button" variant="secondary" onClick={() => router.back()}>Cancel</Button>
       </div>
-    </form>
+    </Card>
   );
 }

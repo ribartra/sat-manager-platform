@@ -4,6 +4,7 @@ import { useState, FormEvent } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import Link from "next/link";
 
 export default function ResetPasswordPage() {
@@ -36,7 +37,7 @@ export default function ResetPasswordPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="w-full max-w-sm">
-        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+        <Card padding="lg">
           <h1 className="text-lg font-semibold text-gray-900 mb-1">Set new password</h1>
           <form onSubmit={handleSubmit} className="space-y-4 mt-4">
             <div>
@@ -65,7 +66,7 @@ export default function ResetPasswordPage() {
           <div className="mt-4 text-center">
             <Link href="/login" className="text-sm text-blue-600 hover:underline">← Back to login</Link>
           </div>
-        </div>
+        </Card>
       </div>
     </div>
   );

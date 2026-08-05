@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { formatDate } from "@/lib/utils";
+import { Card } from "@/components/ui/card";
 
 const ACTION_LABELS: Record<string, string> = {
   CREATE_PROGRAM: "Created program",
@@ -29,6 +30,10 @@ const ACTION_LABELS: Record<string, string> = {
   ASSIGN_FULL_PRACTICE_TEST: "Assigned Exam",
   APPROVE_UNLOCK_REQUEST: "Approved unlock request",
   DENY_UNLOCK_REQUEST: "Denied unlock request",
+  CREATE_PARENT_ACCESS_LINK: "Created parent access link",
+  UPDATE_PARENT: "Updated parent",
+  LINK_PARENT_STUDENT: "Linked parent and student",
+  UNLINK_PARENT_STUDENT: "Unlinked parent and student",
 };
 
 export default async function AdminLogsPage() {
@@ -47,7 +52,7 @@ export default async function AdminLogsPage() {
       <h1 className="mb-1 text-xl font-semibold text-gray-900">Audit Log</h1>
       <p className="mb-6 text-sm text-gray-500">Last 200 system events, newest first.</p>
 
-      <div className="rounded-lg border border-gray-200 bg-white overflow-hidden">
+      <Card className="overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50">
@@ -84,7 +89,7 @@ export default async function AdminLogsPage() {
         {logs.length === 0 && (
           <p className="py-10 text-center text-sm text-gray-400">No events recorded yet.</p>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

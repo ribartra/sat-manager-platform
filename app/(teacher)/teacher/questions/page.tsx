@@ -1,31 +1,66 @@
 import prisma from "@/lib/prisma";
 import Link from "next/link";
-import { Plus, Pencil } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { MathContent } from "@/components/math-content";
+import { QuestionActions } from "./question-actions-client";
+import { cn } from "@/lib/utils";
+import { activeTaxonomySection, buildTaxonomyTree, matchesTaxonomySection, taxonomyPathLabel, TAXONOMY_SECTION_TABS } from "@/lib/taxonomy";
 
-interface SearchParams { topic?: string; difficulty?: string; status?: string }
+interface SearchParams { section?: string; topic?: string; difficulty?: string; status?: string }
+
+function tabHref(section: string, filters: SearchParams) {
+  const params = new URLSearchParams();
+  params.set("section", section);
+  if (filters.difficulty) params.set("difficulty", filters.difficulty);
+  if (filters.status) params.set("status", filters.status);
+  return `/teacher/questions?${params.toString()}`;
+}
 
 export default async function QuestionBankPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const filters = await searchParams;
+  const activeSection = activeTaxonomySection(filters.section);
+
+  const [taxonomyNodes, topics] = await Promise.all([
+    prisma.taxonomyNode.findMany({ where: { active: true }, orderBy: [{ sortOrder: "asc" }, { label: "asc" }] }),
+    prisma.topic.findMany({
+      include: { taxonomyNode: true, domain: { include: { section: true } } },
+      orderBy: { name: "asc" },
+    }),
+  ]);
+  const { roots, byId } = buildTaxonomyTree(taxonomyNodes);
+  const rootByNodeId = new Map<string, (typeof roots)[number]>();
+  for (const node of byId.values()) {
+    let current = node;
+    while (current.parentId && byId.has(current.parentId)) current = byId.get(current.parentId)!;
+    rootByNodeId.set(node.id, current);
+  }
+  const visibleTopics = topics.filter((topic) => {
+    if (topic.taxonomyNodeId) {
+      const root = rootByNodeId.get(topic.taxonomyNodeId);
+      if (root) return matchesTaxonomySection(root, activeSection);
+    }
+    return matchesTaxonomySection(topic.domain.section, activeSection);
+  });
+  const visibleTopicIds = new Set(visibleTopics.map((topic) => topic.id));
+  const selectedTopicId = filters.topic && visibleTopicIds.has(filters.topic) ? filters.topic : undefined;
 
   const questions = await prisma.question.findMany({
     where: {
-      topicId: filters.topic || undefined,
+      topicId: selectedTopicId || { in: [...visibleTopicIds] },
       difficulty: (filters.difficulty as string | undefined) || undefined,
       status: (filters.status as string | undefined) || undefined,
     },
     include: {
       topic: { include: { domain: { include: { section: true } } } },
+      subskill: true,
       setItems: { select: { practiceSetId: true } },
+      fullTestItems: { select: { moduleId: true } },
+      answers: { select: { id: true } },
     },
     orderBy: { createdAt: "desc" },
     take: 100,
-  });
-
-  const topics = await prisma.topic.findMany({
-    include: { domain: { include: { section: true } } },
-    orderBy: { name: "asc" },
   });
 
   return (
@@ -45,12 +80,32 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
         </div>
       </div>
 
+      <div className="mb-5 flex gap-2 border-b border-gray-200">
+        {TAXONOMY_SECTION_TABS.map((tab) => (
+          <Link
+            key={tab.key}
+            href={tabHref(tab.key, filters)}
+            className={cn(
+              "border-b-2 px-3 py-2 text-sm font-medium",
+              activeSection === tab.key
+                ? "border-blue-600 text-blue-700"
+                : "border-transparent text-gray-500 hover:text-gray-800"
+            )}
+          >
+            {tab.label}
+          </Link>
+        ))}
+      </div>
+
       {/* Filters */}
       <form className="flex items-center gap-3 mb-5">
-        <select name="topic" defaultValue={filters.topic ?? ""} className="rounded-md border border-gray-300 px-3 py-1.5 text-sm">
-          <option value="">All topics</option>
-          {topics.map((t) => (
-            <option key={t.id} value={t.id}>{t.domain.section.label} / {t.name}</option>
+        <input type="hidden" name="section" value={activeSection} />
+        <select name="topic" defaultValue={selectedTopicId ?? ""} className="rounded-md border border-gray-300 px-3 py-1.5 text-sm">
+          <option value="">All skills</option>
+          {visibleTopics.map((t) => (
+            <option key={t.id} value={t.id}>
+              {taxonomyPathLabel(t.taxonomyNodeId, byId, `${t.domain.section.label} / ${t.domain.name} / ${t.name}`)}
+            </option>
           ))}
         </select>
         <select name="difficulty" defaultValue={filters.difficulty ?? ""} className="rounded-md border border-gray-300 px-3 py-1.5 text-sm">
@@ -70,17 +125,17 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
         </button>
       </form>
 
-      <div className="rounded-lg border border-gray-200 bg-white overflow-hidden">
+      <Card className="overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200">
               <th className="px-4 py-3 text-left font-medium text-gray-500">Question</th>
-              <th className="px-4 py-3 text-left font-medium text-gray-500">Topic</th>
+              <th className="px-4 py-3 text-left font-medium text-gray-500">Skill / Subskill</th>
               <th className="px-4 py-3 text-left font-medium text-gray-500">Difficulty</th>
               <th className="px-4 py-3 text-left font-medium text-gray-500">Type</th>
               <th className="px-4 py-3 text-left font-medium text-gray-500">Status</th>
               <th className="px-4 py-3 text-right font-medium text-gray-500">Used in</th>
-              <th className="px-4 py-3" />
+              <th className="px-4 py-3 text-right font-medium text-gray-500">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -90,8 +145,9 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
                   <MathContent content={q.stem} className="line-clamp-2 text-sm text-gray-800" />
                 </td>
                 <td className="px-4 py-3">
-                  <p className="text-xs text-gray-500">{q.topic.domain.section.label}</p>
+                  <p className="text-xs text-gray-500">{q.topic.domain.section.label} / {q.topic.domain.name}</p>
                   <p className="text-sm text-gray-700">{q.topic.name}</p>
+                  {q.subskill && <p className="text-xs text-gray-500">{q.subskill.name}</p>}
                 </td>
                 <td className="px-4 py-3">
                   <Badge variant={q.difficulty === "EASY" ? "easy" : q.difficulty === "MEDIUM" ? "medium" : "hard"}>
@@ -107,12 +163,14 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
                   </Badge>
                 </td>
                 <td className="px-4 py-3 text-right text-gray-500">
-                  {new Set(q.setItems.map((s) => s.practiceSetId)).size} sets
+                  {new Set(q.setItems.map((s) => s.practiceSetId)).size + q.fullTestItems.length} uses
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <Link href={`/teacher/questions/${q.id}/edit`} className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline">
-                    <Pencil size={12} /> Edit
-                  </Link>
+                  <QuestionActions
+                    questionId={q.id}
+                    status={q.status}
+                    usedCount={new Set(q.setItems.map((s) => s.practiceSetId)).size + q.fullTestItems.length + q.answers.length}
+                  />
                 </td>
               </tr>
             ))}
@@ -123,7 +181,7 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
             <p>No questions found. Create your first one.</p>
           </div>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

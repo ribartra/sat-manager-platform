@@ -15,6 +15,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ att
   });
   if (!attempt) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
+  const allowedQuestions = await prisma.practiceSetQuestion.findMany({
+    where: { practiceSetId: attempt.practiceSetId },
+    select: { questionId: true },
+  });
+  const allowedQuestionIds = new Set(allowedQuestions.map((item) => item.questionId));
+
   await Promise.all([
     prisma.attempt.update({
       where: { id: attemptId },
@@ -26,7 +32,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ att
   // Upsert each answer
   if (answers && typeof answers === "object") {
     await Promise.all(
-      Object.entries(answers).map(([questionId, answer]) =>
+      Object.entries(answers)
+        .filter(([questionId]) => allowedQuestionIds.has(questionId))
+        .map(([questionId, answer]) =>
         prisma.attemptAnswer.upsert({
           where: { attemptId_questionId: { attemptId, questionId } },
           update: {
@@ -62,7 +70,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ att
 
   if (metadataQuestionIds.size > 0) {
     await Promise.all(
-      Array.from(metadataQuestionIds).map((questionId) =>
+      Array.from(metadataQuestionIds)
+        .filter((questionId) => allowedQuestionIds.has(questionId))
+        .map((questionId) =>
         prisma.attemptAnswer.upsert({
           where: { attemptId_questionId: { attemptId, questionId } },
           update: {
@@ -88,7 +98,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ att
 
   if (timeSpentByQuestion && typeof timeSpentByQuestion === "object") {
     await Promise.all(
-      Object.entries(timeSpentByQuestion).map(([questionId, timeSpent]) =>
+      Object.entries(timeSpentByQuestion)
+        .filter(([questionId]) => allowedQuestionIds.has(questionId))
+        .map(([questionId, timeSpent]) =>
         prisma.attemptAnswer.upsert({
           where: { attemptId_questionId: { attemptId, questionId } },
           update: { timeSpent: Number(timeSpent) || 0 },

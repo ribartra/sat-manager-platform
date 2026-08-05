@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft, Plus, Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 
 interface PageProps {
   params: Promise<{ topicId: string }>;
@@ -62,14 +63,14 @@ export default async function TopicContentPage({ params }: PageProps) {
       </div>
 
       {topic.practiceSets.length === 0 ? (
-        <div className="text-center py-12 text-gray-400 rounded-lg border border-gray-200 bg-white">
+        <Card padding="lg" className="py-12 text-center text-gray-400">
           <p>No practice sets for this topic yet.</p>
           <Link href={`/teacher/practice-sets/new?topicId=${topicId}`} className="mt-2 inline-block text-sm text-blue-600 hover:underline">
             Create the first one →
           </Link>
-        </div>
+        </Card>
       ) : (
-        <div className="rounded-lg border border-gray-200 bg-white overflow-hidden">
+        <Card className="overflow-hidden">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
@@ -106,7 +107,7 @@ export default async function TopicContentPage({ params }: PageProps) {
               ))}
             </tbody>
           </table>
-        </div>
+        </Card>
       )}
     </div>
   );

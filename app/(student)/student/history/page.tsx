@@ -3,15 +3,31 @@ import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { formatDate, formatTime, scorePercent } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 
 interface PageProps {
   searchParams: Promise<{
+    area?: string;
     section?: string;
     topic?: string;
     difficulty?: string;
     from?: string;
     to?: string;
   }>;
+}
+
+const AREA_TABS = [
+  { key: "mathematics", label: "Mathematics" },
+  { key: "reading", label: "Reading" },
+  { key: "writing", label: "Writing" },
+] as const;
+
+function matchesArea(section: { name: string; label: string }, area: string) {
+  const text = `${section.name} ${section.label}`.toLowerCase();
+  if (area === "mathematics") return text.includes("math");
+  if (area === "reading") return text.includes("reading");
+  if (area === "writing") return text.includes("writing");
+  return true;
 }
 
 function parseDateParam(value?: string, endOfDay = false) {
@@ -24,20 +40,27 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
   const session = await auth();
   const userId = session!.user.id;
   const params = await searchParams;
+  const requestedArea = AREA_TABS.some((tab) => tab.key === params.area) ? params.area! : "mathematics";
+  const sections = await prisma.section.findMany({
+    include: { domains: { include: { topics: { orderBy: { name: "asc" } } } } },
+    orderBy: { label: "asc" },
+  });
+  const areaSectionIds = sections.filter((section) => matchesArea(section, requestedArea)).map((section) => section.id);
   const sectionId = params.section || "";
+  const effectiveSectionIds = sectionId ? [sectionId] : areaSectionIds;
   const topicId = params.topic || "";
   const difficulty = params.difficulty || "";
   const fromDate = parseDateParam(params.from);
   const toDate = parseDateParam(params.to, true);
 
   const practiceSetFilter = {
-    ...(sectionId ? { topic: { domain: { sectionId } } } : {}),
+    ...(effectiveSectionIds.length ? { topic: { domain: { sectionId: { in: effectiveSectionIds } } } } : {}),
     ...(topicId ? { topicId } : {}),
     ...(difficulty ? { difficulty } : {}),
   };
-  const hasPracticeSetFilter = sectionId || topicId || difficulty;
+  const hasPracticeSetFilter = effectiveSectionIds.length || topicId || difficulty;
 
-  const [attempts, sections, topics] = await Promise.all([
+  const [attempts, topics] = await Promise.all([
     prisma.attempt.findMany({
       where: {
         studentId: userId,
@@ -70,18 +93,14 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
       },
       orderBy: { submittedAt: "desc" },
     }),
-    prisma.section.findMany({
-      include: { domains: { include: { topics: { orderBy: { name: "asc" } } } } },
-      orderBy: { label: "asc" },
-    }),
     prisma.topic.findMany({
-      where: sectionId ? { domain: { sectionId } } : {},
+      where: sectionId ? { domain: { sectionId } } : { domain: { sectionId: { in: effectiveSectionIds } } },
       include: { domain: { include: { section: true } } },
       orderBy: { name: "asc" },
     }),
   ]);
 
-  // Aggregate progress by topic
+  // Aggregate progress by skill
   const topicStats: Record<string, { name: string; correct: number; total: number; count: number }> = {};
   attempts.forEach((a) => {
     const topic = a.assignment?.practiceSet.topic;
@@ -96,8 +115,24 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
       <h1 className="text-2xl font-semibold text-gray-900 mb-6">My History</h1>
+      <div className="mb-5 flex gap-2 border-b border-gray-200">
+        {AREA_TABS.map((tab) => (
+          <Link
+            key={tab.key}
+            href={`/student/history?area=${tab.key}`}
+            className={`border-b-2 px-3 py-2 text-sm font-medium ${
+              requestedArea === tab.key
+                ? "border-blue-600 text-blue-700"
+                : "border-transparent text-gray-500 hover:text-gray-800"
+            }`}
+          >
+            {tab.label}
+          </Link>
+        ))}
+      </div>
 
-      <form className="mb-5 grid gap-3 rounded-lg border border-gray-200 bg-white p-4 md:grid-cols-5">
+      <Card as="form" padding="md" className="mb-5 grid gap-3 md:grid-cols-5">
+        <input type="hidden" name="area" value={requestedArea} />
         <label className="text-xs font-medium text-gray-600">
           Section
           <select name="section" defaultValue={sectionId} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900">
@@ -145,20 +180,20 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
             Clear
           </Link>
         </div>
-      </form>
+      </Card>
 
       {attempts.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
+        <Card padding="lg" className="py-16 text-center text-gray-400">
           <p>No completed practice sets match the current filters.</p>
           <Link href="/student/content-map" className="mt-2 inline-block text-sm text-blue-600 hover:underline">
             Browse Content Map →
           </Link>
-        </div>
+        </Card>
       ) : (
         <div className="grid grid-cols-3 gap-6">
           {/* Left: history table */}
           <div className="col-span-2">
-            <div className="rounded-lg border border-gray-200 bg-white overflow-hidden">
+            <Card className="overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-gray-50 border-b border-gray-200">
@@ -211,17 +246,17 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
                   })}
                 </tbody>
               </table>
-            </div>
+            </Card>
           </div>
 
-          {/* Right: progress by topic */}
+          {/* Right: progress by skill */}
           <div>
-            <h2 className="text-sm font-semibold text-gray-900 mb-3">Progress by Topic</h2>
+            <h2 className="text-sm font-semibold text-gray-900 mb-3">Progress by Skill</h2>
             <div className="space-y-3">
               {Object.values(topicStats).map((ts) => {
                 const avg = Math.round((ts.correct / ts.total) * 100);
                 return (
-                  <div key={ts.name} className="rounded-lg border border-gray-200 bg-white p-3">
+                  <Card key={ts.name} padding="sm">
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-xs font-medium text-gray-700 truncate">{ts.name}</span>
                       <span className={`text-xs font-semibold ${avg >= 80 ? "text-green-600" : avg >= 60 ? "text-yellow-600" : "text-red-500"}`}>
@@ -235,7 +270,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
                       />
                     </div>
                     <p className="text-xs text-gray-400 mt-1">{ts.count} set{ts.count !== 1 ? "s" : ""}</p>
-                  </div>
+                  </Card>
                 );
               })}
             </div>

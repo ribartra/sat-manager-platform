@@ -1,12 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { checkRateLimit, rateLimitKey, rateLimitResponse } from "@/lib/rate-limit";
+import { hashPublicToken } from "@/lib/token-security";
+
+async function findInviteByParentConsentToken(token: string) {
+  const parentConsentTokenHash = hashPublicToken(token);
+  const invite = await prisma.inviteToken.findFirst({
+    where: { OR: [{ parentConsentTokenHash }, { parentConsentToken: token }] },
+  });
+  if (invite && !invite.parentConsentTokenHash) {
+    await prisma.inviteToken.update({
+      where: { id: invite.id },
+      data: { parentConsentTokenHash, parentConsentToken: `hashed:${parentConsentTokenHash}` },
+    });
+  }
+  return invite;
+}
 
 export async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get("token");
   if (!token) return NextResponse.json({ error: "Missing token" }, { status: 400 });
+  const limited = checkRateLimit(rateLimitKey(req, "parent-consent-info", token.slice(0, 12)), 20, 15 * 60 * 1000);
+  if (!limited.allowed) return rateLimitResponse(limited.resetAt);
 
-  const invite = await prisma.inviteToken.findUnique({ where: { parentConsentToken: token } });
+  const invite = await findInviteByParentConsentToken(token);
   if (!invite || invite.usedAt || invite.expiresAt < new Date() || !invite.parentEmail) {
     return NextResponse.json({ error: "Invalid or expired authorization link" }, { status: 400 });
   }
@@ -23,11 +41,13 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const { token, password } = await req.json();
   if (!token) return NextResponse.json({ error: "Missing token" }, { status: 400 });
+  const limited = checkRateLimit(rateLimitKey(req, "parent-consent", token.slice(0, 12)), 10, 15 * 60 * 1000);
+  if (!limited.allowed) return rateLimitResponse(limited.resetAt);
   if (!password || typeof password !== "string" || password.length < 6) {
     return NextResponse.json({ error: "Password must be at least 6 characters." }, { status: 400 });
   }
 
-  const invite = await prisma.inviteToken.findUnique({ where: { parentConsentToken: token } });
+  const invite = await findInviteByParentConsentToken(token);
   if (!invite || invite.usedAt || invite.expiresAt < new Date() || !invite.parentEmail) {
     return NextResponse.json({ error: "Invalid or expired authorization link" }, { status: 400 });
   }

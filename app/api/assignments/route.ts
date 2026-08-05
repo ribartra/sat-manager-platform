@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getFeatureSetting } from "@/lib/app-settings";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { notifyUser } from "@/lib/notifications";
@@ -10,7 +11,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const { studentIds, practiceSetIds, dueDate, unlockAt, locked } = await req.json();
+  const { studentIds, practiceSetIds, dueDate, unlockAt, locked, sourceGroupId } = await req.json();
+  if (sourceGroupId && session.user.role !== "ADMIN") {
+    const enabled = await getFeatureSetting("TEACHER_GROUP_MANAGEMENT");
+    if (!enabled) return NextResponse.json({ error: "Teacher group assignment is disabled." }, { status: 403 });
+  }
+
   const requestedStudentIds = Array.isArray(studentIds) ? studentIds.filter((id) => typeof id === "string") : [];
   const requestedPracticeSetIds = Array.isArray(practiceSetIds) ? practiceSetIds.filter((id) => typeof id === "string") : [];
 
@@ -45,7 +51,41 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Only published practice sets can be assigned." }, { status: 400 });
   }
 
+  if (sourceGroupId) {
+    const group = await prisma.group.findUnique({
+      where: { id: sourceGroupId },
+      include: { members: { select: { userId: true } } },
+    });
+    if (!group) return NextResponse.json({ error: "Group not found." }, { status: 404 });
+    const groupMemberIds = new Set(group.members.map((member) => member.userId));
+    if (requestedStudentIds.some((studentId) => !groupMemberIds.has(studentId))) {
+      return NextResponse.json({ error: "Group assignment can only target current group members." }, { status: 400 });
+    }
+  }
+
   const results = [];
+  if (sourceGroupId) {
+    for (const practiceSetId of requestedPracticeSetIds) {
+      await prisma.groupAssignment.upsert({
+        where: { groupId_practiceSetId: { groupId: sourceGroupId, practiceSetId } },
+        update: {
+          assignedById: session.user.id,
+          dueDate: dueDate ? new Date(dueDate) : null,
+          unlockAt: unlockAt ? new Date(unlockAt) : null,
+          locked: locked ?? false,
+        },
+        create: {
+          groupId: sourceGroupId,
+          practiceSetId,
+          assignedById: session.user.id,
+          dueDate: dueDate ? new Date(dueDate) : null,
+          unlockAt: unlockAt ? new Date(unlockAt) : null,
+          locked: locked ?? false,
+        },
+      });
+    }
+  }
+
   for (const studentId of requestedStudentIds) {
     for (const practiceSetId of requestedPracticeSetIds) {
       const existing = await prisma.assignment.findFirst({
@@ -76,7 +116,7 @@ export async function POST(req: NextRequest) {
             action: "ASSIGN_PRACTICE_SET",
             targetType: "Assignment",
             targetId: a.id,
-            metadata: JSON.stringify({ studentId, practiceSetId, dueDate, unlockAt, locked: locked ?? false }),
+            metadata: JSON.stringify({ studentId, practiceSetId, dueDate, unlockAt, locked: locked ?? false, sourceGroupId: sourceGroupId ?? null }),
           },
         });
         results.push(a as never);

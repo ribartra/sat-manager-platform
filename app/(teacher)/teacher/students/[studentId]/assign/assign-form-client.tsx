@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
@@ -34,9 +35,10 @@ interface AssignFormProps {
   studentId: string;
   practiceSets: PracticeSetInfo[];
   groups: GroupInfo[];
+  groupAssignmentEnabled: boolean;
 }
 
-export function AssignForm({ studentId, practiceSets, groups }: AssignFormProps) {
+export function AssignForm({ studentId, practiceSets, groups, groupAssignmentEnabled }: AssignFormProps) {
   const router = useRouter();
   const [target, setTarget] = useState<"student" | "group">("student");
   const [groupId, setGroupId] = useState(groups[0]?.id ?? "");
@@ -71,7 +73,8 @@ export function AssignForm({ studentId, practiceSets, groups }: AssignFormProps)
   async function handleAssign() {
     if (selected.size === 0) return;
     const group = groups.find((g) => g.id === groupId);
-    const studentIds = target === "group" ? group?.members.map((m) => m.id) ?? [] : [studentId];
+    const useGroup = groupAssignmentEnabled && target === "group";
+    const studentIds = useGroup ? group?.members.map((m) => m.id) ?? [] : [studentId];
     if (studentIds.length === 0) return;
     setLoading(true);
     await fetch("/api/assignments", {
@@ -80,9 +83,9 @@ export function AssignForm({ studentId, practiceSets, groups }: AssignFormProps)
       body: JSON.stringify({
         studentIds,
         practiceSetIds: [...selected],
+        sourceGroupId: useGroup ? groupId : null,
         dueDate: dueDate || null,
         unlockAt: unlockAt || null,
-        explanationVisibility: explVisibility,
         locked: lockOnAssign,
       }),
     });
@@ -93,17 +96,19 @@ export function AssignForm({ studentId, practiceSets, groups }: AssignFormProps)
 
   return (
     <div className="space-y-6">
-      <div className="rounded-lg border border-gray-200 bg-white p-4">
+      <Card padding="md">
         <label className="mb-2 block text-sm font-medium text-gray-700">Assign to</label>
         <div className="flex items-center gap-4 flex-wrap">
           <label className="flex items-center gap-2 text-sm text-gray-700">
             <input type="radio" checked={target === "student"} onChange={() => setTarget("student")} />
             This student
           </label>
-          <label className="flex items-center gap-2 text-sm text-gray-700">
-            <input type="radio" checked={target === "group"} onChange={() => { setTarget("group"); setShowAllMembers(false); }} disabled={groups.length === 0} />
-            Group
-          </label>
+          {groupAssignmentEnabled && (
+            <label className="flex items-center gap-2 text-sm text-gray-700">
+              <input type="radio" checked={target === "group"} onChange={() => { setTarget("group"); setShowAllMembers(false); }} disabled={groups.length === 0} />
+              Group
+            </label>
+          )}
           {target === "group" && (
             <Select value={groupId} onChange={(e) => { setGroupId(e.target.value); setShowAllMembers(false); }} className="max-w-xs">
               {groups.map((g) => (
@@ -139,7 +144,7 @@ export function AssignForm({ studentId, practiceSets, groups }: AssignFormProps)
             </div>
           );
         })()}
-      </div>
+      </Card>
 
       {/* Practice set selector */}
       <div>
@@ -152,7 +157,7 @@ export function AssignForm({ studentId, practiceSets, groups }: AssignFormProps)
             className="w-48 text-xs"
           />
         </div>
-        <div className="rounded-lg border border-gray-200 bg-white overflow-hidden max-h-80 overflow-y-auto">
+        <Card className="max-h-80 overflow-y-auto overflow-hidden">
           {filtered.map((ps) => (
             <label
               key={ps.id}
@@ -179,7 +184,7 @@ export function AssignForm({ studentId, practiceSets, groups }: AssignFormProps)
               {target === "student" && ps.alreadyAssigned && <span className="text-xs text-gray-400">Assigned</span>}
             </label>
           ))}
-        </div>
+        </Card>
         <p className="text-xs text-gray-400 mt-1">{selected.size} selected</p>
       </div>
 

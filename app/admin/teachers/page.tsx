@@ -2,15 +2,34 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { TeacherToggle } from "./teacher-toggle-client";
 
-export default async function AdminTeachersPage() {
+interface PageProps {
+  searchParams: Promise<{ q?: string }>;
+}
+
+export default async function AdminTeachersPage({ searchParams }: PageProps) {
   const session = await auth();
   if (!session) redirect("/login");
   if (session.user.role !== "ADMIN") redirect("/teacher");
+  const params = await searchParams;
+  const q = params.q?.trim() ?? "";
 
   const teachers = await prisma.user.findMany({
-    where: { role: "TEACHER" },
+    where: {
+      role: "TEACHER",
+      ...(q
+        ? {
+            OR: [
+              { name: { contains: q } },
+              { email: { contains: q } },
+              { programTeachingAssignments: { some: { program: { name: { contains: q } } } } },
+            ],
+          }
+        : {}),
+    },
     orderBy: { name: "asc" },
     include: {
       programTeachingAssignments: {
@@ -24,7 +43,11 @@ export default async function AdminTeachersPage() {
     <div className="mx-auto max-w-5xl px-4 py-8">
       <h1 className="mb-2 text-xl font-semibold text-gray-900">Teachers</h1>
       <p className="mb-6 text-sm text-gray-500">Enable or disable teacher access and review assigned programs.</p>
-      <div className="rounded-lg border border-gray-200 bg-white">
+      <form className="mb-4 flex max-w-xl gap-2">
+        <Input name="q" defaultValue={q} placeholder="Search teacher or program..." />
+        <button className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">Search</button>
+      </form>
+      <Card className="overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50">
@@ -56,7 +79,7 @@ export default async function AdminTeachersPage() {
             ))}
           </tbody>
         </table>
-      </div>
+      </Card>
     </div>
   );
 }

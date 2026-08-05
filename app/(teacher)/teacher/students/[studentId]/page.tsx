@@ -8,6 +8,8 @@ import { Card, CardBody } from "@/components/ui/card";
 import { ChevronLeft, Eye } from "lucide-react";
 import { StudentDetailActions } from "./actions-client";
 import { refreshAssignmentStates } from "@/lib/assignments";
+import { getFeatureSetting } from "@/lib/app-settings";
+import { studentAccessWhereFor } from "@/lib/program-scope";
 
 interface PageProps {
   params: Promise<{ studentId: string }>;
@@ -18,24 +20,14 @@ export default async function StudentDetailPage({ params }: PageProps) {
   const session = await auth();
   const now = new Date();
   await refreshAssignmentStates(now);
-  const programScope =
-    session?.user.role === "TEACHER"
-      ? {
-          some: {
-            status: "APPROVED",
-            active: true,
-            program: {
-              teachers: { some: { teacherId: session.user.id, endDate: null, teacher: { active: true } } },
-              active: true,
-              startDate: { lte: now },
-              OR: [{ endDate: null }, { endDate: { gt: now } }],
-            },
-          },
-        }
-      : undefined;
+  const teacherGroupManagementEnabled =
+    session?.user.role === "ADMIN" || (await getFeatureSetting("TEACHER_GROUP_MANAGEMENT"));
+  const studentWhere = session
+    ? studentAccessWhereFor(session.user, now)
+    : { role: "STUDENT", active: true, validationStatus: "APPROVED" };
 
   const student = await prisma.user.findFirst({
-    where: { id: studentId, role: "STUDENT", ...(programScope ? { programEnrollments: programScope } : {}) },
+    where: { id: studentId, ...studentWhere },
     include: {
       groups: { include: { group: true } },
       programEnrollments: { include: { program: true }, where: { active: true, status: "APPROVED" } },
@@ -79,7 +71,7 @@ export default async function StudentDetailPage({ params }: PageProps) {
         )
       : null;
 
-  // Progress by topic
+  // Progress by skill
   const topicStats: Record<string, { name: string; correct: number; total: number; count: number }> = {};
   attempts.forEach((a) => {
     const topic = a.assignment?.practiceSet.topic;
@@ -106,11 +98,20 @@ export default async function StudentDetailPage({ params }: PageProps) {
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">{student.name}</h1>
           <p className="text-sm text-gray-500 mt-0.5">
-            {student.email} · {student.phone ?? "—"} · Groups: {student.groups.map((g) => g.group.name).join(", ") || "—"}
+            {student.email} · {student.phone ?? "—"}
+            {teacherGroupManagementEnabled && (
+              <> · Groups: {student.groups.map((g) => g.group.name).join(", ") || "—"}</>
+            )}
             {" · "}Programs: {student.programEnrollments.map((e) => e.program.name).join(", ") || "—"}
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <Link
+            href={`/teacher/analytics?studentId=${studentId}`}
+            className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            Analytics
+          </Link>
           <Link
             href={`/teacher/impersonate/${studentId}`}
             className="flex items-center gap-1.5 rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
@@ -160,7 +161,7 @@ export default async function StudentDetailPage({ params }: PageProps) {
         {/* History */}
         <div className="col-span-2">
           <h2 className="text-base font-semibold text-gray-900 mb-3">Practice History</h2>
-          <div className="rounded-lg border border-gray-200 bg-white overflow-hidden">
+          <Card className="overflow-hidden">
             {attempts.length === 0 ? (
               <div className="text-center py-10 text-gray-400 text-sm">No completed attempts yet.</div>
             ) : (
@@ -207,17 +208,17 @@ export default async function StudentDetailPage({ params }: PageProps) {
                 </tbody>
               </table>
             )}
-          </div>
+          </Card>
         </div>
 
-        {/* Progress by topic */}
+        {/* Progress by skill */}
         <div>
-          <h2 className="text-base font-semibold text-gray-900 mb-3">By Topic</h2>
+          <h2 className="text-base font-semibold text-gray-900 mb-3">By Skill</h2>
           <div className="space-y-2">
             {Object.values(topicStats).map((ts) => {
               const avg = Math.round((ts.correct / ts.total) * 100);
               return (
-                <div key={ts.name} className="rounded-lg border border-gray-200 bg-white p-3">
+                <Card key={ts.name} padding="sm">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs font-medium text-gray-700 truncate">{ts.name}</span>
                     <span className={`text-xs font-semibold ${avg >= 80 ? "text-green-600" : avg >= 60 ? "text-yellow-600" : "text-red-500"}`}>
@@ -228,7 +229,7 @@ export default async function StudentDetailPage({ params }: PageProps) {
                     <div className={`h-full rounded-full ${avg >= 80 ? "bg-green-400" : avg >= 60 ? "bg-yellow-400" : "bg-red-400"}`} style={{ width: `${avg}%` }} />
                   </div>
                   <p className="text-xs text-gray-400 mt-1">{ts.count} sets · {ts.correct}/{ts.total}</p>
-                </div>
+                </Card>
               );
             })}
             {Object.keys(topicStats).length === 0 && (
@@ -242,7 +243,7 @@ export default async function StudentDetailPage({ params }: PageProps) {
               <h2 className="text-sm font-semibold text-gray-900 mb-2">Active Assignments</h2>
               <div className="space-y-2">
                 {assignments.map((a) => (
-                  <div key={a.id} className="rounded-lg border border-gray-200 bg-white p-3">
+                  <Card key={a.id} padding="sm">
                     <p className="text-xs font-medium text-gray-800">{a.practiceSet.name}</p>
                     <div className="flex items-center gap-2 mt-1">
                       <Badge variant={a.status === "IN_PROGRESS" ? "warning" : "info"}>
@@ -253,7 +254,7 @@ export default async function StudentDetailPage({ params }: PageProps) {
                         <span className="text-xs text-gray-400">Due {formatDate(a.dueDate)}</span>
                       )}
                     </div>
-                  </div>
+                  </Card>
                 ))}
               </div>
             </div>

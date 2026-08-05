@@ -1,9 +1,21 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
+import { getFeatureSetting } from "@/lib/app-settings";
+import { requireTeacherOrAdmin } from "@/lib/rbac";
+import { studentAccessWhereFor } from "@/lib/program-scope";
 import { scorePercent } from "@/lib/utils";
+import { Card } from "@/components/ui/card";
 
 export default async function TeacherComparePage() {
+  const session = await requireTeacherOrAdmin();
+  if (!session) notFound();
+  const now = new Date();
+  const teacherGroupManagementEnabled =
+    session?.user.role === "ADMIN" || (await getFeatureSetting("TEACHER_GROUP_MANAGEMENT"));
+
   const students = await prisma.user.findMany({
-    where: { role: "STUDENT" },
+    where: studentAccessWhereFor(session.user, now),
     orderBy: { name: "asc" },
     include: {
       groups: { include: { group: true } },
@@ -39,7 +51,9 @@ export default async function TeacherComparePage() {
     return {
       id: student.id,
       name: student.name,
-      groups: student.groups.map((membership) => membership.group.name).join(", ") || "No group",
+      groups: teacherGroupManagementEnabled
+        ? student.groups.map((membership) => membership.group.name).join(", ") || "No group"
+        : "",
       attempts: student.attempts.length,
       total,
       pct: scorePercent(correct, total),
@@ -50,25 +64,31 @@ export default async function TeacherComparePage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
       <h1 className="mb-2 text-xl font-semibold text-gray-900">Private Student Comparison</h1>
-      <p className="mb-6 text-sm text-gray-500">Teacher-only comparison by student, group, score and weakest topic.</p>
+      <p className="mb-6 text-sm text-gray-500">
+        Teacher-only comparison by student, score and weakest skill.
+      </p>
 
-      <div className="rounded-lg border border-gray-200 bg-white">
+      <Card className="overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50">
               <th className="px-4 py-3 text-left font-medium text-gray-500">Student</th>
-              <th className="px-4 py-3 text-left font-medium text-gray-500">Group</th>
+              {teacherGroupManagementEnabled && <th className="px-4 py-3 text-left font-medium text-gray-500">Group</th>}
               <th className="px-4 py-3 text-right font-medium text-gray-500">Attempts</th>
               <th className="px-4 py-3 text-right font-medium text-gray-500">Answered</th>
               <th className="px-4 py-3 text-right font-medium text-gray-500">Avg score</th>
-              <th className="px-4 py-3 text-left font-medium text-gray-500">Weakest topic</th>
+              <th className="px-4 py-3 text-left font-medium text-gray-500">Weakest skill</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {rows.map((row) => (
               <tr key={row.id}>
-                <td className="px-4 py-3 font-medium text-gray-900">{row.name}</td>
-                <td className="px-4 py-3 text-gray-600">{row.groups}</td>
+                <td className="px-4 py-3 font-medium text-gray-900">
+                  <Link href={`/teacher/analytics?studentId=${row.id}`} className="hover:text-blue-700 hover:underline">
+                    {row.name}
+                  </Link>
+                </td>
+                {teacherGroupManagementEnabled && <td className="px-4 py-3 text-gray-600">{row.groups}</td>}
                 <td className="px-4 py-3 text-right text-gray-600">{row.attempts}</td>
                 <td className="px-4 py-3 text-right text-gray-600">{row.total}</td>
                 <td className="px-4 py-3 text-right font-semibold text-gray-900">{row.pct}%</td>
@@ -79,7 +99,7 @@ export default async function TeacherComparePage() {
             ))}
           </tbody>
         </table>
-      </div>
+      </Card>
     </div>
   );
 }

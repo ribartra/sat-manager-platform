@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
+import { Card } from "@/components/ui/card";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +21,7 @@ export default async function PendingValidationPage() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-      <section className="w-full max-w-md rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+      <Card as="section" padding="lg" className="w-full max-w-md">
         <p className="mb-2 text-sm font-semibold uppercase text-blue-700">Account validation</p>
         <h1 className="text-xl font-semibold text-gray-950">
           {rejected ? "Account not approved" : "Your account is pending review"}
@@ -38,7 +39,7 @@ export default async function PendingValidationPage() {
         <a href="/login" className="mt-5 inline-flex text-sm font-medium text-blue-700 hover:underline">
           Back to login
         </a>
-      </section>
+      </Card>
     </main>
   );
 }
