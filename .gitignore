@@ -29,6 +29,9 @@
 *.db-shm
 *.db-wal
 
+# dev.db se versiona vía Git LFS (repo privado); WAL/SHM siguen ignorados
+!/dev.db
+
 # misc
 .DS_Store
 *.pem
