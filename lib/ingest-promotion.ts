@@ -125,7 +125,16 @@ export function resolveTopicFromCandidate(candidate: CandidateForDraft, topics: 
     if (sectionTerm) {
       const sectionName = normalize(item.domain.section.name);
       const sectionLabel = normalize(item.domain.section.label);
-      return sectionName === sectionTerm || sectionLabel === sectionTerm;
+      // Acepta el código interno de la ingesta ("RW"/"MATH") además del nombre/label
+      // oficial, para que el candidato resuelva sin importar cómo quedó guardada la sección.
+      const accepted = new Set([sectionName, sectionLabel]);
+      if (sectionName.includes("reading") || sectionLabel.includes("reading")) {
+        accepted.add("rw").add("r and w").add("reading and writing");
+      }
+      if (sectionName.includes("math") || sectionLabel.includes("math")) {
+        accepted.add("math");
+      }
+      return accepted.has(sectionTerm);
     }
     return true;
   });

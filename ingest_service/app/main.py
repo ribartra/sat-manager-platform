@@ -2118,6 +2118,34 @@ def clean_ingested_question_text(value: str) -> str:
     return value.strip()
 
 
+# Artefactos que la extracción de PDF suele dejar dentro del contenido de la pregunta:
+# la línea del Question ID y la cabecera "Assessment Test / SAT ... | Domain | Skill | Difficulty".
+QUESTION_ID_LINE_RE = re.compile(r"(?im)^\s*(?:Question\s+ID|ID)\s*:?\s*[A-Fa-f0-9]{6,}\s*$")
+QUESTION_ID_INLINE_RE = re.compile(r"(?i)\b(?:Question\s+ID|ID)\s*:?\s*[A-Fa-f0-9]{6,}\b")
+ASSESSMENT_HEADER_RE = re.compile(r"(?im)^\s*(?:Assessment Test\s+Domain\s+Skill\s+Difficulty|SAT (?:Math|Reading and Writing)\b.*)$")
+
+
+def strip_question_id(value: str | None) -> str:
+    """Remove leaked 'Question ID: xxxx' markers from a stem/text."""
+    if not value:
+        return ""
+    value = QUESTION_ID_LINE_RE.sub("", value)
+    value = QUESTION_ID_INLINE_RE.sub("", value)
+    return re.sub(r"\n{3,}", "\n\n", value).strip()
+
+
+def extract_rationale(text: str | None) -> str | None:
+    """The ANS page dump = header + stem + options + 'Correct Answer' + Rationale.
+    Store only the Rationale (the real explanation) when present, minus header/ID leaks."""
+    if not text:
+        return None
+    marker = re.search(r"\bRationale\b", text, re.IGNORECASE)
+    body = text[marker.end():] if marker else text
+    body = ASSESSMENT_HEADER_RE.sub("", body)
+    body = strip_question_id(body)
+    return body or None
+
+
 def extract_options_and_stem(text: str) -> tuple[list[dict[str, str]], str]:
     matches = list(OPTION_RE.finditer(text))
     if not matches:
@@ -2258,7 +2286,7 @@ def make_candidate_from_text(
     module_context = cleaned[: q_match.start()] if q_match else cleaned[:300]
     modules = detect_full_test_modules(module_context) if meta["contentType"] == "FULL_PRACTICE_TEST" else []
     module_label = module_label_override or (modules[-1] if modules else None)
-    stem = stem_text[:2500] if not is_answer_file else None
+    stem = strip_question_id(stem_text)[:2500] if not is_answer_file else None
     confidence = 0.55
     warnings: list[str] = []
     if not stem:
@@ -2305,7 +2333,7 @@ def make_candidate_from_text(
         "stem": stem,
         "optionsJson": json.dumps(options if options else [{"label": label, "text": ""} for label in ["A", "B", "C", "D"]]) if options or image_backed_options else None,
         "correctAnswer": correct_answer,
-        "explanation": cleaned[:3000] if is_answer_file else None,
+        "explanation": (extract_rationale(cleaned) or cleaned)[:3000] if is_answer_file else None,
         "rawJson": json.dumps(raw),
         "confidence": max(0.05, min(0.95, confidence)),
         "warningsJson": json.dumps(warnings),
@@ -2949,7 +2977,7 @@ def insert_answer_candidates(
             meta["section"],
             None,
             answer,
-            text[:3000] if bool(meta["isAnswerFile"]) else None,
+            (extract_rationale(text) or text)[:3000] if bool(meta["isAnswerFile"]) else None,
             text[:3000],
             0.9 if question_external_id else 0.75 if question_number else 0.5,
         )
