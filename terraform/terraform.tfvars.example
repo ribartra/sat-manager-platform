@@ -1,0 +1,22 @@
+# Copy to terraform.tfvars and fill in. Do NOT commit terraform.tfvars.
+project_id = "my-gcp-project"
+region     = "us-central1"
+zone       = "us-central1-a"
+domain     = "sat.example.com"
+
+# Image tag to run (build & push it first with deploy/build-and-push.sh).
+image_tag = "latest"
+
+# SMTP relay (non-secret parts). Password goes in email_pass below.
+email_from = "noreply@example.com"
+email_host = "smtp-relay.brevo.com"
+email_port = 587
+email_user = "your-brevo-login"
+
+# Secrets — generate strong random values:
+#   openssl rand -base64 48
+auth_secret           = "REPLACE-ME"
+secret_encryption_key = "REPLACE-ME"
+internal_ingest_token = "REPLACE-ME"
+mistral_api_key       = "" # optional; can also be set later in Admin -> Settings
+email_pass            = "" # SMTP key/password

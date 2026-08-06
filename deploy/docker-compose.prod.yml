@@ -1,0 +1,62 @@
+# Production stack for the single-VM deployment. Rendered onto the VM by
+# Terraform (pulled from the config bucket by deploy/vm-startup.sh).
+#
+# Variable substitution comes from /data/stack/.env (REGISTRY, TAG, DOMAIN).
+# Secret + config env comes from /data/app.env (rendered from Secret Manager).
+#
+# Shared, persisted paths live on the attached data disk mounted at /data:
+#   /data/db       -> SQLite dev.db (+ -wal/-shm) shared by web and ingest
+#   /data/uploads  -> public/uploads (served same-origin by the web app)
+#   /data/private  -> .private/uploads/ingest (staging images)
+name: sat-platform
+
+services:
+  web:
+    image: ${REGISTRY}/web:${TAG:-latest}
+    restart: unless-stopped
+    env_file:
+      - /data/app.env
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: file:/db/dev.db
+      AI_INGEST_SERVICE_URL: http://ingest-service:8000
+      INGEST_PUBLIC_UPLOAD_ROOT: /app/.private/uploads/ingest
+    volumes:
+      - /data/db:/db
+      - /data/uploads:/app/public/uploads
+      - /data/private:/app/.private
+    depends_on:
+      - ingest-service
+    expose:
+      - "3000"
+
+  ingest-service:
+    image: ${REGISTRY}/ingest:${TAG:-latest}
+    restart: unless-stopped
+    env_file:
+      - /data/app.env
+    environment:
+      DATABASE_URL: file:/db/dev.db
+      INGEST_PUBLIC_UPLOAD_ROOT: /app/.private/uploads/ingest
+    volumes:
+      - /data/db:/db
+      - /data/private:/app/.private
+    # Internal only — never published to the host. Reachable by web at
+    # http://ingest-service:8000 over the compose network.
+    expose:
+      - "8000"
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    environment:
+      DOMAIN: ${DOMAIN}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /data/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - /data/caddy/data:/data
+      - /data/caddy/config:/config
+    depends_on:
+      - web

@@ -1,0 +1,12 @@
+# Reverse proxy + automatic HTTPS (Let's Encrypt) for the web app.
+# DOMAIN is injected via the compose `caddy` service environment.
+{$DOMAIN} {
+	encode zstd gzip
+
+	# Match the app's large-upload path (ZIP/PDF ingest up to 256 MB).
+	request_body {
+		max_size 256MB
+	}
+
+	reverse_proxy web:3000
+}

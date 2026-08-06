@@ -1,0 +1,19 @@
+.git
+node_modules
+.next
+# Runtime data — never bake into the image (they live on the VM's data disk).
+dev.db
+dev.db-*
+prisma/dev.db
+.private
+public/uploads
+backups
+files_to_load
+# Local/infra artifacts.
+terraform
+tmp_inspect_pages
+scripts/ingest_patch
+.env
+.env.*
+!.env.example
+npm-debug.log*
