@@ -7,15 +7,6 @@ locals {
   ]
 
   registry = "${var.region}-docker.pkg.dev/${var.project_id}/${google_artifact_registry_repository.repo.repository_id}"
-
-  # secret suffix => value
-  secrets = {
-    "auth-secret"           = var.auth_secret
-    "secret-encryption-key" = var.secret_encryption_key
-    "internal-ingest-token" = var.internal_ingest_token
-    "mistral-api-key"       = var.mistral_api_key
-    "email-pass"            = var.email_pass
-  }
 }
 
 resource "google_project_service" "enabled" {
@@ -71,21 +62,17 @@ resource "google_storage_bucket_object" "caddyfile" {
 }
 
 # --- secrets -----------------------------------------------------------------
+# Containers only. Values are added out-of-band (deploy/load-secrets.sh) so they
+# never touch Terraform state. No google_secret_manager_secret_version here.
 resource "google_secret_manager_secret" "s" {
-  for_each  = local.secrets
-  secret_id = "${var.name_prefix}-${each.key}"
+  for_each  = toset(var.secret_names)
+  secret_id = "${var.name_prefix}-${each.value}"
 
   replication {
     auto {}
   }
 
   depends_on = [google_project_service.enabled]
-}
-
-resource "google_secret_manager_secret_version" "v" {
-  for_each    = local.secrets
-  secret      = google_secret_manager_secret.s[each.key].id
-  secret_data = each.value
 }
 
 # --- VM service account + least-privilege IAM --------------------------------
@@ -218,7 +205,7 @@ resource "google_compute_instance" "vm" {
   depends_on = [
     google_storage_bucket_object.compose,
     google_storage_bucket_object.caddyfile,
-    google_secret_manager_secret_version.v,
+    google_secret_manager_secret.s,
     google_project_iam_member.secret_accessor,
     google_storage_bucket_iam_member.bucket_rw,
     google_artifact_registry_repository_iam_member.registry_reader,

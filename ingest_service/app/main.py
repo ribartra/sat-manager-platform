@@ -174,8 +174,13 @@ def db_path() -> str:
 
 
 def conn() -> sqlite3.Connection:
-    connection = sqlite3.connect(db_path())
+    # timeout = busy_timeout: wait for the web process's write lock on the shared
+    # dev.db instead of raising SQLITE_BUSY immediately. WAL is set by the web app
+    # and persists at the DB-file level; NORMAL synchronous keeps writes cheap.
+    connection = sqlite3.connect(db_path(), timeout=5.0)
     connection.row_factory = sqlite3.Row
+    connection.execute("PRAGMA busy_timeout=5000")
+    connection.execute("PRAGMA synchronous=NORMAL")
     return connection
 
 

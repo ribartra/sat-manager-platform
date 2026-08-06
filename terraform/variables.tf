@@ -28,14 +28,14 @@ variable "domain" {
 
 variable "machine_type" {
   type        = string
-  default     = "e2-small"
-  description = "VM size. e2-small (2 GB) is the safe minimum for build+ingest; e2-micro risks OOM."
+  default     = "e2-medium"
+  description = "VM size. e2-medium (4 GB) is the recommended default: OCR ingest runs pdfplumber/Pillow on 256 MB inputs and 2 GB risks OOM. Drop to e2-small only for a demo with light, off-hours ingest."
 }
 
 variable "data_disk_gb" {
   type        = number
-  default     = 20
-  description = "Persistent data disk size (holds dev.db, uploads, staging)."
+  default     = 50
+  description = "Persistent data disk size (holds dev.db+WAL, uploads, staging, Docker data-root, local backups). 50 GB is the recommended default; 20 GB only if Docker images and ZIP/staging stay small."
 }
 
 variable "image_tag" {
@@ -62,26 +62,15 @@ variable "email_user" {
   default = ""
 }
 
-# --- secrets (stored in Secret Manager; never printed) -----------------------
-variable "auth_secret" {
-  type      = string
-  sensitive = true
-}
-variable "secret_encryption_key" {
-  type      = string
-  sensitive = true
-}
-variable "internal_ingest_token" {
-  type      = string
-  sensitive = true
-}
-variable "mistral_api_key" {
-  type      = string
-  sensitive = true
-  default   = ""
-}
-variable "email_pass" {
-  type      = string
-  sensitive = true
-  default   = ""
+# --- secrets ------------------------------------------------------------------
+# Secret *values* are deliberately NOT Terraform variables: anything passed to
+# Terraform is written to the state file in plaintext (marking a variable
+# `sensitive` only hides it from CLI output, not from state). Terraform creates
+# empty Secret Manager containers here; load the values out-of-band after apply
+# with `deploy/load-secrets.sh` (uses `gcloud secrets versions add`). See
+# DEPLOY_GCP.md → "Manejo de secretos".
+variable "secret_names" {
+  type        = list(string)
+  default     = ["auth-secret", "secret-encryption-key", "internal-ingest-token", "mistral-api-key", "email-pass"]
+  description = "Secret Manager container names (suffixes) created empty by Terraform; values are loaded post-apply."
 }

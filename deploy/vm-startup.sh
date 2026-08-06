@@ -1,6 +1,7 @@
 #!/bin/bash
 # VM startup script (Terraform template). Placeholders like ${DOMAIN} are filled
-# by templatefile() at apply time; bash $VARS and $(...) survive to runtime.
+# by templatefile() at apply time; bash $VARS ($${...}) and $(...) survive to
+# runtime. Safe to re-run: `sudo google_metadata_script_runner startup`.
 set -euo pipefail
 
 REGION="${REGION}"
@@ -23,17 +24,36 @@ fi
 mkdir -p "$MOUNT"
 grep -q "$MOUNT" /etc/fstab || echo "$DATA_DISK $MOUNT ext4 discard,defaults,nofail 0 2" >> /etc/fstab
 mount -a
-mkdir -p /data/db /data/uploads /data/private/uploads/ingest /data/caddy/data /data/caddy/config /data/stack
+mkdir -p /data/db /data/uploads /data/private/uploads/ingest \
+         /data/caddy/data /data/caddy/config /data/stack /data/docker /data/backups-local
 
-# --- 2) docker + registry auth -----------------------------------------------
+# --- 2) docker (data-root + logs on the data disk) + registry auth -----------
+# Point Docker's storage at the big data disk so images/layers/logs never fill
+# the 20 GB boot disk, and cap container log growth.
+mkdir -p /etc/docker
+cat > /etc/docker/daemon.json <<'DJSON'
+{
+  "data-root": "/data/docker",
+  "log-driver": "json-file",
+  "log-opts": { "max-size": "20m", "max-file": "5" }
+}
+DJSON
 if ! command -v docker >/dev/null 2>&1; then
   log "installing docker"
   curl -fsSL https://get.docker.com | sh
 fi
+systemctl restart docker
 gcloud auth configure-docker "$${REGION}-docker.pkg.dev" --quiet
 
 # sqlite3 for online DB backups
 command -v sqlite3 >/dev/null 2>&1 || (apt-get update && apt-get install -y --no-install-recommends sqlite3)
+
+# --- 2b) Cloud Ops Agent (logs + metrics; logging.logWriter alone does nothing)
+if ! systemctl is-active --quiet google-cloud-ops-agent 2>/dev/null; then
+  log "installing Cloud Ops Agent"
+  curl -fsSL https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh | bash -s -- --also-install || \
+    log "ops agent install failed (non-fatal)"
+fi
 
 # --- 3) pull stack config from the config bucket -----------------------------
 gsutil cp "gs://$${CONFIG_BUCKET}/stack/docker-compose.prod.yml" /data/stack/docker-compose.yml
@@ -51,14 +71,28 @@ fi
   gsutil -m rsync -r "gs://$${CONFIG_BUCKET}/seed/private" /data/private 2>/dev/null || true
 
 # --- 5) render runtime env from Secret Manager -------------------------------
+# Values are loaded out-of-band (deploy/load-secrets.sh), so on a first boot
+# they may not exist yet. Wait for the required ones instead of failing hard.
 umask 077
-sv() { gcloud secrets versions access latest --secret="$${PREFIX}-$1"; }
+sv() { gcloud secrets versions access latest --secret="$${PREFIX}-$1" 2>/dev/null; }
+
+wait_secs=0
+until sv auth-secret >/dev/null && sv secret-encryption-key >/dev/null && sv internal-ingest-token >/dev/null; do
+  if [ "$wait_secs" -ge 600 ]; then
+    log "ERROR: required secrets missing after 10min. Run deploy/load-secrets.sh, then:"
+    log "  sudo google_metadata_script_runner startup"
+    exit 1
+  fi
+  log "waiting for secrets to be loaded (deploy/load-secrets.sh)... $${wait_secs}s"
+  sleep 20; wait_secs=$((wait_secs + 20))
+done
+
 {
   echo "AUTH_URL=https://$${DOMAIN}"
   echo "AUTH_SECRET=$(sv auth-secret)"
   echo "SECRET_ENCRYPTION_KEY=$(sv secret-encryption-key)"
   echo "INTERNAL_INGEST_TOKEN=$(sv internal-ingest-token)"
-  echo "MISTRAL_API_KEY=$(sv mistral-api-key)"
+  echo "MISTRAL_API_KEY=$(sv mistral-api-key || true)"
   echo "MISTRAL_OCR_MODEL=mistral-ocr-latest"
   echo "MISTRAL_STRUCTURING_MODEL=mistral-large-latest"
   echo "CORS_ALLOWED_ORIGINS=https://$${DOMAIN}"
@@ -66,7 +100,7 @@ sv() { gcloud secrets versions access latest --secret="$${PREFIX}-$1"; }
   echo "EMAIL_HOST=${EMAIL_HOST}"
   echo "EMAIL_PORT=${EMAIL_PORT}"
   echo "EMAIL_USER=${EMAIL_USER}"
-  echo "EMAIL_PASS=$(sv email-pass)"
+  echo "EMAIL_PASS=$(sv email-pass || true)"
 } > /data/app.env
 
 cat > /data/stack/.env <<EOF
@@ -76,17 +110,21 @@ DOMAIN=$${DOMAIN}
 EOF
 chmod 600 /data/stack/.env
 
-# --- 6) daily SQLite backup to the config bucket -----------------------------
+# --- 6) SQLite backup every 6h to the config bucket --------------------------
+# RPO target ~6h. Uses sqlite3 .backup (safe on a live WAL DB), keeps a local
+# copy for fast restore, and prunes local copies older than 3 days.
 cat > /usr/local/bin/sat-db-backup.sh <<BK
 #!/bin/bash
 set -e
 ts=\$(date +%F-%H%M)
-sqlite3 /data/db/dev.db ".backup /tmp/dev-\$ts.db"
-gsutil cp "/tmp/dev-\$ts.db" "gs://$${CONFIG_BUCKET}/backups/dev-\$ts.db"
-rm -f "/tmp/dev-\$ts.db"
+sqlite3 /data/db/dev.db ".backup /data/backups-local/dev-\$ts.db"
+gsutil cp "/data/backups-local/dev-\$ts.db" "gs://$${CONFIG_BUCKET}/backups/dev-\$ts.db"
+find /data/backups-local -name 'dev-*.db' -mtime +3 -delete
 BK
 chmod +x /usr/local/bin/sat-db-backup.sh
-ln -sf /usr/local/bin/sat-db-backup.sh /etc/cron.daily/sat-db-backup
+cat > /etc/cron.d/sat-db-backup <<'CRON'
+0 */6 * * * root /usr/local/bin/sat-db-backup.sh >> /var/log/sat-db-backup.log 2>&1
+CRON
 
 # --- 7) launch the stack -----------------------------------------------------
 cd /data/stack
