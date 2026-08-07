@@ -68,3 +68,6 @@ next-env.d.ts
 
 # User uploads (dev only)
 public/uploads/
+
+# Local-only prod-image validation stack (not for deploy)
+.local-stack/

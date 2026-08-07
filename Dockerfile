@@ -44,6 +44,12 @@ FROM node:24-slim AS runner
 WORKDIR /app
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3000
 
+# Prisma's engines probe for libssl at startup; node:24-slim ships without it and
+# prints an OpenSSL warning on every `migrate deploy`. Install it (small layer).
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends openssl ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
+
 COPY --from=build /app/package.json /app/package-lock.json ./
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/.next ./.next

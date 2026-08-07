@@ -69,7 +69,10 @@ async function gcsBucket(): Promise<GcsBucket> {
     bucketPromise = (async () => {
       // Casting the specifier to `string` keeps `tsc` from resolving the module
       // types, so typecheck passes even when the optional package is absent.
-      const mod = (await import("@google-cloud/storage" as string)) as {
+      // `webpackIgnore` stops `next build` (webpack) from statically resolving —
+      // and failing on — this optional dependency; it stays a runtime import that
+      // only runs when STORAGE_DRIVER=gcs (the VM deploy uses local-disk storage).
+      const mod = (await import(/* webpackIgnore: true */ "@google-cloud/storage" as string)) as {
         Storage: new () => { bucket: (name: string) => GcsBucket };
       };
       return new mod.Storage().bucket(BUCKET);

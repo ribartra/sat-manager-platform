@@ -5,7 +5,16 @@ import prisma from "@/lib/prisma";
 import { markUserActive } from "@/lib/activity";
 import { checkRateLimit } from "@/lib/rate-limit";
 
-if (process.env.NODE_ENV === "production" && !process.env.AUTH_SECRET && !process.env.NEXTAUTH_SECRET) {
+// Enforce AUTH_SECRET at runtime, but NOT during `next build`: the build
+// evaluates this module while collecting page data, and secrets are (correctly)
+// absent then — they're injected at container start via /data/app.env. NEXT_PHASE
+// is "phase-production-build" only during the build.
+if (
+  process.env.NODE_ENV === "production" &&
+  process.env.NEXT_PHASE !== "phase-production-build" &&
+  !process.env.AUTH_SECRET &&
+  !process.env.NEXTAUTH_SECRET
+) {
   throw new Error("AUTH_SECRET is required in production.");
 }
 
