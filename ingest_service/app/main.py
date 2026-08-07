@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Any
 
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from app.practice_repair import assign_sequential_numbers, parse_practice_block
 import pdfplumber
 from docx import Document
 from fastapi import BackgroundTasks, FastAPI, File, Form, HTTPException, Request, UploadFile
@@ -2283,9 +2284,20 @@ def make_candidate_from_text(
     if meta["contentType"] == "FULL_PRACTICE_TEST" and not q_match and not external_match:
         return None
     correct_answer = extract_correct_answer(cleaned)
-    options, stem_text = extract_options_and_stem(cleaned)
     image_refs = markdown_image_refs(cleaned)
-    image_backed_options = bool(image_refs and not options and IMAGE_BACKED_CHOICE_RE.search(cleaned))
+    # Los bloques de práctica (con "Question ID") tienen una estructura de
+    # marcadores regular (Question → enunciado → Answer → A-D → Correct Answer →
+    # Rationale). El parser genérico dejaba la cabecera dentro del enunciado y
+    # confundía el artículo "A student…" con la alternativa A, así que para ellos
+    # usamos el parser por marcadores.
+    practice = parse_practice_block(cleaned) if external_match and not bool(meta["isAnswerFile"]) else None
+    if practice is not None:
+        options = practice["options"]
+        stem_text = practice["stem"]
+        image_backed_options = practice["image_backed"] or bool(image_refs and not options and IMAGE_BACKED_CHOICE_RE.search(cleaned))
+    else:
+        options, stem_text = extract_options_and_stem(cleaned)
+        image_backed_options = bool(image_refs and not options and IMAGE_BACKED_CHOICE_RE.search(cleaned))
     question_number = question_number_override if question_number_override is not None else int(q_match.group(1)) if q_match else None
     is_answer_file = bool(meta["isAnswerFile"])
     module_context = cleaned[: q_match.start()] if q_match else cleaned[:300]
@@ -3911,11 +3923,13 @@ def repair_batch(batch_id: str) -> dict[str, int]:
         modules_normalized = normalize_full_test_candidate_modules(db, batch_id)
         extra_practice_removed = remove_full_test_extra_practice_candidates(db, batch_id)
         enriched = enrich_candidates_from_answers(db, batch_id)
+        renumbered = assign_sequential_numbers(db, batch_id)
         incident_reconciliation = reconcile_ingest_incidents(db, batch_id)
         recalc_batch(db, batch_id)
         return {
             "pages": len(pages),
             "candidates": candidates,
+            "renumbered": renumbered,
             "answers": answers,
             "images": images,
             "imageLinks": image_links,
@@ -4080,6 +4094,7 @@ def rehydrate_full_test_docx_sources(
         modules_normalized = normalize_full_test_candidate_modules(db, batch_id, source_file_id)
         extra_practice_removed = remove_full_test_extra_practice_candidates(db, batch_id, source_file_id)
         enriched = enrich_candidates_from_answers(db, batch_id)
+        assign_sequential_numbers(db, batch_id)
         incident_reconciliation = reconcile_ingest_incidents(db, batch_id)
         recalc_batch(db, batch_id)
         log_ingest_job_event(
