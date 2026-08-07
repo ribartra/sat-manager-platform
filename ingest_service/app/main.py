@@ -2291,9 +2291,11 @@ def make_candidate_from_text(
     # confundía el artículo "A student…" con la alternativa A, así que para ellos
     # usamos el parser por marcadores.
     practice = parse_practice_block(cleaned) if external_match and not bool(meta["isAnswerFile"]) else None
+    practice_stimulus = None
     if practice is not None:
         options = practice["options"]
         stem_text = practice["stem"]
+        practice_stimulus = practice["stimulus"]
         image_backed_options = practice["image_backed"] or bool(image_refs and not options and IMAGE_BACKED_CHOICE_RE.search(cleaned))
     else:
         options, stem_text = extract_options_and_stem(cleaned)
@@ -2348,6 +2350,7 @@ def make_candidate_from_text(
         "practiceSetVariant": meta["practiceSetVariant"],
         "type": "MC" if options or image_backed_options else "NUMERIC",
         "stem": stem,
+        "stimulus": practice_stimulus,
         "optionsJson": json.dumps(options if options else [{"label": label, "text": ""} for label in ["A", "B", "C", "D"]]) if options or image_backed_options else None,
         "correctAnswer": correct_answer,
         "explanation": (extract_rationale(cleaned) or cleaned)[:3000] if is_answer_file else None,
@@ -2423,6 +2426,7 @@ def remove_full_test_extra_practice_candidates(db: sqlite3.Connection, batch_id:
 
 
 def insert_candidate(db: sqlite3.Connection, candidate: dict[str, Any]) -> None:
+    candidate.setdefault("stimulus", None)  # no todos los builders separan estímulo
     if candidate.get("questionExternalId"):
         duplicate = db.execute(
             """
@@ -2448,9 +2452,9 @@ def insert_candidate(db: sqlite3.Connection, candidate: dict[str, Any]) -> None:
     db.execute(
         """
         INSERT INTO IngestQuestionCandidate
-          (id, batchId, sourceFileId, pageArtifactId, questionNumber, questionExternalId, testNumber, moduleLabel, sourceLabel, contentType, section, domainName, topicName, difficulty, difficultySource, practiceSetVariant, type, stem, optionsJson, correctAnswer, explanation, rawJson, confidence, warningsJson, status, updatedAt)
+          (id, batchId, sourceFileId, pageArtifactId, questionNumber, questionExternalId, testNumber, moduleLabel, sourceLabel, contentType, section, domainName, topicName, difficulty, difficultySource, practiceSetVariant, type, stem, stimulus, optionsJson, correctAnswer, explanation, rawJson, confidence, warningsJson, status, updatedAt)
         VALUES
-          (:id, :batchId, :sourceFileId, :pageArtifactId, :questionNumber, :questionExternalId, :testNumber, :moduleLabel, :sourceLabel, :contentType, :section, :domainName, :topicName, :difficulty, :difficultySource, :practiceSetVariant, :type, :stem, :optionsJson, :correctAnswer, :explanation, :rawJson, :confidence, :warningsJson, :status, :updatedAt)
+          (:id, :batchId, :sourceFileId, :pageArtifactId, :questionNumber, :questionExternalId, :testNumber, :moduleLabel, :sourceLabel, :contentType, :section, :domainName, :topicName, :difficulty, :difficultySource, :practiceSetVariant, :type, :stem, :stimulus, :optionsJson, :correctAnswer, :explanation, :rawJson, :confidence, :warningsJson, :status, :updatedAt)
         """,
         {**candidate, "updatedAt": now_iso()},
     )

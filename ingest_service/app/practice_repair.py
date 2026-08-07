@@ -51,12 +51,62 @@ STOP_LINE = re.compile(r"(?im)^\s*#*\s*(?:Correct\s+Answer|Rationale|Question\s+
 OPTION_LINE = re.compile(r"(?im)^\s*[×✕✖※*•\-]?\s*([A-D])[.)]\s*(.*)$")
 NAV_LINE = re.compile(r"(?im)^\s*(?:PREV\.?\s+QUESTION|NEXT\s+QUESTION|COME?\s+BACK\s+LATER)\s*$")
 
+# Estímulo de R&W: el enunciado arranca con un pasaje ("Text 1", "Text 2",
+# "Passage", "The following text…") y termina en un prompt reconocible. El campo
+# `stimulus` de la BD existe justo para separar el pasaje de la consigna.
+STIMULUS_START = re.compile(
+    r"(?im)^[*#\s]*(?:Text\s+\d+|Passage\s+\d+|The\s+following\s+text|The\s+following\s+passage)\b"
+)
+# Líneas que típicamente inician la consigna (prompt) de una pregunta de R&W.
+PROMPT_LEAD = re.compile(
+    r"(?i)^\s*(?:As\s+used\s+in\b"
+    r"|Based\s+on\b"
+    r"|According\s+to\b"
+    r"|Which\s+(?:choice|finding|quotation|statement|detail|of\s+the\s+following)\b"
+    r"|What\s+(?:is|does|can|was|choice)\b"
+    r"|Why\s+(?:does|did|is)\b"
+    r"|How\s+(?:does|did|is)\b"
+    r"|The\s+(?:author|student|writer|researchers?|passage)\b.*\?"
+    r"|Wh(?:ich|at|y|o)\b.*\?)"
+)
+
 
 def _collapse(value: str) -> str:
     value = NAV_LINE.sub("", value)
     value = re.sub(r"[ \t]+\n", "\n", value)
     value = re.sub(r"\n{3,}", "\n\n", value)
     return value.strip()
+
+
+def split_stimulus_and_prompt(stem_text: str) -> tuple[str | None, str]:
+    """Separa el estímulo (pasaje R&W) de la consigna (prompt).
+
+    Solo actúa cuando el enunciado arranca con un marcador de pasaje
+    (``Text 1``/``Passage``/``The following text``). Busca el inicio del prompt
+    (última línea con un lead-in conocido o, en su defecto, la última línea que
+    termina en «?»). Si no encuentra un prompt confiable, devuelve
+    ``(None, stem_text)`` — nunca empeora el enunciado.
+    """
+    if not stem_text or not STIMULUS_START.match(stem_text.lstrip()):
+        return None, stem_text
+    lines = stem_text.split("\n")
+    prompt_start: int | None = None
+    for i in range(len(lines) - 1, -1, -1):
+        if lines[i].strip() and PROMPT_LEAD.match(lines[i]):
+            prompt_start = i
+            break
+    if prompt_start is None:
+        for i in range(len(lines) - 1, -1, -1):
+            if lines[i].strip().endswith("?"):
+                prompt_start = i
+                break
+    if prompt_start is None or prompt_start == 0:
+        return None, stem_text
+    stimulus = _collapse("\n".join(lines[:prompt_start]))
+    prompt = _collapse("\n".join(lines[prompt_start:]))
+    if not stimulus or not prompt:
+        return None, stem_text
+    return stimulus[:4000], prompt
 
 
 def parse_practice_block(text: str) -> dict[str, Any] | None:
@@ -136,9 +186,12 @@ def parse_practice_block(text: str) -> dict[str, Any] | None:
     if not stem and not options:
         return None
 
+    stimulus, stem = split_stimulus_and_prompt(stem)
+
     image_backed = bool(options) and all(not o["text"] for o in options)
     return {
         "stem": stem[:2500],
+        "stimulus": stimulus,
         "options": options,
         "image_backed": image_backed,
         "type": "MC" if options else "NUMERIC",
@@ -192,7 +245,7 @@ def repair_in_place(db_path: str, *, dry_run: bool = True, limit: int | None = N
     rows = conn.execute(
         """
         SELECT c.id, c.sourceFileId, c.questionNumber, c.questionExternalId, c.stem,
-               c.optionsJson, c.type, c.status, c.rawJson,
+               c.stimulus, c.optionsJson, c.type, c.status, c.rawJson,
                p.pageNumber AS pageNumber, c.rowid AS rid
         FROM IngestQuestionCandidate c
         LEFT JOIN IngestPageArtifact p ON p.id = c.pageArtifactId
@@ -207,6 +260,7 @@ def repair_in_place(db_path: str, *, dry_run: bool = True, limit: int | None = N
         "stemChanged": 0,
         "optionsChanged": 0,
         "typeChanged": 0,
+        "stimulusChanged": 0,
         "imageBacked": 0,
         "unparsed": 0,
     }
@@ -235,6 +289,7 @@ def repair_in_place(db_path: str, *, dry_run: bool = True, limit: int | None = N
         stats["parsed"] += 1
 
         new_stem = parsed["stem"] or None
+        new_stimulus = parsed["stimulus"] or None
         new_opts = parsed["options"]
         new_opts_json = json.dumps(new_opts, ensure_ascii=False) if new_opts else None
         new_type = parsed["type"]
@@ -245,15 +300,18 @@ def repair_in_place(db_path: str, *, dry_run: bool = True, limit: int | None = N
         changed_stem = (new_stem or "") != (row["stem"] or "")
         changed_opts = (new_opts_json or "") != (old_opts_json or "")
         changed_type = new_type != row["type"]
+        changed_stimulus = (new_stimulus or "") != (row["stimulus"] or "")
         if changed_stem:
             stats["stemChanged"] += 1
         if changed_opts:
             stats["optionsChanged"] += 1
         if changed_type:
             stats["typeChanged"] += 1
+        if changed_stimulus:
+            stats["stimulusChanged"] += 1
 
-        if changed_stem or changed_opts or changed_type:
-            field_updates.append((new_stem, new_opts_json, new_type, row["id"]))
+        if changed_stem or changed_opts or changed_type or changed_stimulus:
+            field_updates.append((new_stem, new_stimulus, new_opts_json, new_type, row["id"]))
             if len(samples) < 6 and changed_stem:
                 samples.append(
                     {
@@ -271,7 +329,7 @@ def repair_in_place(db_path: str, *, dry_run: bool = True, limit: int | None = N
         cur = conn.cursor()
         assign_sequential_numbers(conn)  # misma lógica que usa el pipeline
         cur.executemany(
-            "UPDATE IngestQuestionCandidate SET stem = ?, optionsJson = ?, type = ?, updatedAt = datetime('now') WHERE id = ?",
+            "UPDATE IngestQuestionCandidate SET stem = ?, stimulus = ?, optionsJson = ?, type = ?, updatedAt = datetime('now') WHERE id = ?",
             field_updates,
         )
         conn.commit()
