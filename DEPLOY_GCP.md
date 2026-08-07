@@ -103,43 +103,56 @@ Evitar Load Balancer ya ahorra la primera regla de reenvío (~$18/mo).
 
 ## Runbook
 
+Se despliega en **dos fases** a propósito: la VM arranca en cuanto Terraform la crea, así que
+primero se crean el bucket, el registry y los contenedores de secretos; se suben imágenes,
+secretos y la BD semilla; y **solo entonces** se crea la VM. Así se evita que el primer
+arranque falle por falta de imágenes/secretos/seed.
+
 ```bash
-# 1) Infra (crea contenedores de secretos vacíos; NO pone valores en el estado)
+# ── FASE A — infra base SIN la VM (bucket, Artifact Registry, contenedores de secretos) ──
 cd terraform
 cp terraform.tfvars.example terraform.tfvars   # sin secretos: solo project/domain/sizing
 terraform init
-terraform apply
+terraform apply \
+  -target=google_storage_bucket.data \
+  -target=google_artifact_registry_repository.repo \
+  -target=google_secret_manager_secret.s
 
-# 2) Cargar los VALORES de los secretos fuera del estado de Terraform
+# ── FASE B — secretos, imágenes y BD semilla (ANTES de crear la VM) ──
 cd ..
+# 1) Valores de secretos, fuera del estado de Terraform (idempotente; no re-genera
+#    secret-encryption-key). Pasa MISTRAL_API_KEY / EMAIL_PASS si aplica.
 PROJECT=<project_id> PREFIX=sat deploy/load-secrets.sh
-#   genera auth/encryption/ingest si no los pasas; idempotente (no re-genera
-#   secret-encryption-key en re-ejecución). Pasa MISTRAL_API_KEY / EMAIL_PASS si aplica.
 
-# 3) Imágenes con tag inmutable (usa los outputs de terraform)
+# 2) Imágenes con tag inmutable
 TAG=$(git rev-parse --short HEAD)
 REGION=us-central1 PROJECT=<project_id> REPO=sat-images TAG=$TAG deploy/build-and-push.sh
-#   fija image_tag=$TAG en tfvars y re-aplica para clavar la versión (recomendado),
-#   o con image_tag="latest": en la VM `cd /data/stack && docker compose pull && up -d`.
 
-# 4) (opcional) Sembrar datos actuales al bucket ANTES del primer arranque
-gsutil cp dev.db                gs://<bucket>/seed/dev.db
-gsutil -m rsync -r public/uploads gs://<bucket>/seed/uploads
-gsutil -m rsync -r .private        gs://<bucket>/seed/private
+# 3) BD de producción — REQUERIDA (el chain de migraciones no es replayable desde vacío)
+DATABASE_URL="file:./prisma/prod.db" npm run db:init:prod
+gsutil cp prisma/prod.db gs://<project_id>-sat-data/seed/dev.db
+#    (opcional) uploads/staging previos:
+# gsutil -m rsync -r public/uploads gs://<project_id>-sat-data/seed/uploads
+# gsutil -m rsync -r .private        gs://<project_id>-sat-data/seed/private
 
-# 5) DNS: A record del dominio -> output static_ip. Caddy emite el cert solo.
+# ── FASE C — crear la VM (imágenes, secretos y seed ya existen) ──
+cd terraform
+# fija image_tag=$TAG en terraform.tfvars para clavar la versión, luego:
+terraform apply
 
-# 6) Acceso a la VM
+# ── Post: DNS + acceso ──
+# A record del dominio -> output static_ip. Caddy emite el cert solo (necesita el DNS resuelto).
 gcloud compute ssh sat-vm --zone us-central1-a --tunnel-through-iap
 ```
 
-Si la VM arrancó **antes** de que existieran los valores de los secretos, el startup
-espera hasta 10 min; tras cargarlos re-dispara el arranque:
+Si por lo que sea la VM arrancó antes de tiempo, el startup es reintentable: una vez subidos
+imágenes/secretos/seed, re-dispáralo:
 `gcloud compute ssh sat-vm --tunnel-through-iap --command='sudo google_metadata_script_runner startup'`.
 
-`dev.db` se versiona en el repo vía Git LFS, pero **la BD viva de producción es
-`/data/db/dev.db` en el disco de la VM**. El `seed/dev.db` del bucket solo se usa en el
-primer arranque (si el disco está vacío).
+**El seed `gs://<bucket>/seed/dev.db` es obligatorio** y se usa solo en el primer arranque (si
+el disco está vacío). La BD viva de producción es `/data/db/dev.db` en el disco de la VM. El
+`dev.db` de la raíz del repo (Git LFS) es el **demo**, no el de producción — para prod usa el
+que construye `npm run db:init:prod`.
 
 ## Operación
 

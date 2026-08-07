@@ -59,11 +59,14 @@ fi
 gsutil cp "gs://$${CONFIG_BUCKET}/stack/docker-compose.prod.yml" /data/stack/docker-compose.yml
 gsutil cp "gs://$${CONFIG_BUCKET}/stack/Caddyfile" /data/caddy/Caddyfile
 
-# --- 4) first-boot seeding (optional) ----------------------------------------
+# --- 4) first-boot seeding (REQUIRED) ----------------------------------------
+# A prebuilt DB is mandatory: the migration chain is NOT replayable from empty
+# (see DEPLOY_GCP.md), so `migrate deploy` cannot bootstrap an empty file. The
+# operator builds it locally with `npm run db:init:prod` and uploads it.
 if [ ! -f /data/db/dev.db ]; then
   gsutil -q stat "gs://$${CONFIG_BUCKET}/seed/dev.db" && \
     gsutil cp "gs://$${CONFIG_BUCKET}/seed/dev.db" /data/db/dev.db || \
-    log "no seed DB found (migrations will create schema on first web start)"
+    log "WARNING: no seed DB at gs://$${CONFIG_BUCKET}/seed/dev.db"
 fi
 [ -z "$(ls -A /data/uploads 2>/dev/null)" ] && \
   gsutil -m rsync -r "gs://$${CONFIG_BUCKET}/seed/uploads" /data/uploads 2>/dev/null || true
@@ -89,6 +92,9 @@ done
 
 {
   echo "AUTH_URL=https://$${DOMAIN}"
+  # NextAuth v5 sits behind Caddy: without this it rejects the proxied Host
+  # with UntrustedHost and login fails.
+  echo "AUTH_TRUST_HOST=true"
   echo "AUTH_SECRET=$(sv auth-secret)"
   echo "SECRET_ENCRYPTION_KEY=$(sv secret-encryption-key)"
   echo "INTERNAL_INGEST_TOKEN=$(sv internal-ingest-token)"
@@ -127,6 +133,15 @@ cat > /etc/cron.d/sat-db-backup <<'CRON'
 CRON
 
 # --- 7) launch the stack -----------------------------------------------------
+# Refuse to launch against an empty DB: the web entrypoint's `migrate deploy`
+# would fail on the non-replayable chain and leave a corrupt/partial schema.
+if [ ! -f /data/db/dev.db ]; then
+  log "ERROR: no database at /data/db/dev.db — a prebuilt DB is required."
+  log "  build:  DATABASE_URL=file:./prisma/prod.db npm run db:init:prod"
+  log "  upload: gsutil cp prisma/prod.db gs://$${CONFIG_BUCKET}/seed/dev.db"
+  log "  retry:  sudo google_metadata_script_runner startup"
+  exit 1
+fi
 cd /data/stack
 docker compose --env-file /data/stack/.env pull
 docker compose --env-file /data/stack/.env up -d
