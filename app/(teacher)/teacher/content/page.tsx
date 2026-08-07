@@ -2,10 +2,15 @@ import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { buildTaxonomyTree, type TaxonomyTreeNode } from "@/lib/taxonomy";
+import { activeTaxonomySection, buildTaxonomyTree, matchesTaxonomySection, TAXONOMY_SECTION_TABS, type TaxonomyTreeNode } from "@/lib/taxonomy";
 import { cn } from "@/lib/utils";
 
-export default async function TeacherContentPage() {
+function tabHref(section: string) {
+  return `/teacher/content?section=${section}`;
+}
+
+export default async function TeacherContentPage({ searchParams }: { searchParams: Promise<{ section?: string }> }) {
+  const activeSection = activeTaxonomySection((await searchParams).section);
   const [taxonomyNodes, topics] = await Promise.all([
     prisma.taxonomyNode.findMany({
       where: { active: true },
@@ -47,6 +52,10 @@ export default async function TeacherContentPage() {
     },
     orderBy: { name: "asc" },
   });
+
+  const visibleRoots = roots.filter((node) => matchesTaxonomySection(node, activeSection));
+  const visibleLegacy = legacySections.filter((section) => matchesTaxonomySection(section, activeSection));
+  const hasContent = visibleRoots.length > 0 || visibleLegacy.length > 0;
 
   const countByStatus = (sets: { status: string }[]) => ({
     published: sets.filter((s) => s.status === "PUBLISHED").length,
@@ -118,9 +127,30 @@ export default async function TeacherContentPage() {
         </Link>
       </div>
 
-      {roots.length > 0
-        ? roots.map((node) => renderNode(node))
-        : legacySections.map((section) => (
+      <div className="mb-5 flex gap-2 border-b border-gray-200">
+        {TAXONOMY_SECTION_TABS.map((tab) => (
+          <Link
+            key={tab.key}
+            href={tabHref(tab.key)}
+            className={cn(
+              "border-b-2 px-3 py-2 text-sm font-medium",
+              activeSection === tab.key
+                ? "border-blue-600 text-blue-700"
+                : "border-transparent text-gray-500 hover:text-gray-800"
+            )}
+          >
+            {tab.label}
+          </Link>
+        ))}
+      </div>
+
+      {!hasContent && (
+        <div className="py-12 text-center text-sm text-gray-400">No hay contenido en esta sección todavía.</div>
+      )}
+
+      {visibleRoots.length > 0
+        ? visibleRoots.map((node) => renderNode(node))
+        : visibleLegacy.map((section) => (
         <div key={section.id} className="mb-8">
           <h2 className="text-lg font-semibold text-gray-900 mb-3 pb-2 border-b border-gray-200">
             {section.label}
