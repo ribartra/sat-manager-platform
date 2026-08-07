@@ -188,11 +188,26 @@ primer arranque (si el disco está vacío).
 
 Estos puntos son de la app, no de GCP, pero conviene resolverlos antes de abrir al público:
 
-- **No cargar usuarios/contraseñas demo.** El `prisma/seed.ts` actual siembra cuentas de
-  prueba con contraseñas públicas del README (`admin@sat.com/admin123`, etc.). Para prod hace
-  falta un seed separado (`db:seed:prod`) que cargue **solo** taxonomía, tablas de scoring,
-  configuración base y un admin con contraseña aleatoria/invitación — sin intentos, alumnos ni
-  preguntas demo. **Pendiente.**
+- **No cargar usuarios/contraseñas demo.** El `prisma/seed.ts` (demo) siembra cuentas de prueba
+  con contraseñas públicas. Para prod usa el **seed de producción**, que carga **solo** taxonomía,
+  tablas de scoring, configuración base y **un** admin — sin alumnos, profesores, preguntas,
+  intentos ni mocks. El contenido académico entra vía AI Import.
+
+  ```bash
+  # Construye un DB de producción limpio y usable (schema + taxonomía + scores + settings + admin).
+  DATABASE_URL="file:./prisma/prod.db" npm run db:init:prod
+  #  → la contraseña del admin se genera y se escribe en .secrets/prod-admin-credentials.txt
+  #    (texto plano, gitignored). O inyecta la tuya:
+  #    PROD_ADMIN_EMAIL=admin@tudominio.com PROD_ADMIN_PASSWORD=... npm run db:init:prod
+
+  # Embarca ese DB como seed del despliegue (primer arranque de la VM):
+  gsutil cp prisma/prod.db gs://<bucket>/seed/dev.db
+  ```
+
+  `db:init:prod` materializa el schema con `migrate diff` (el chain de migraciones no es
+  replayable desde cero) y marca las migraciones como aplicadas, así el `migrate deploy` del
+  arranque queda no-op. `db:seed:prod` (solo seed, idempotente) sirve para re-sembrar/rotar el
+  admin sobre un DB existente (`PROD_ADMIN_RESET=true` para resetear su contraseña).
 - **Taxonomía.** Existe la divergencia conocida `Topic` ↔ `Skill` (ver README/CLAUDE.md). Antes
   de cargar volumen grande de contenido conviene decidir: implementar el nivel `Topic` real bajo
   `Skill`, o congelar el modelo actual renombrando `Topic`→`Skill` en la UI y documentarlo. **Pendiente.**

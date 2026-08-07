@@ -1,0 +1,195 @@
+import type { PrismaClient } from "../app/generated/prisma/client.js";
+
+// Canonical academic taxonomy (Section → Domain → Topic[=Skill] → Subskill) plus
+// the parallel TaxonomyNode tree. Shared by both the demo seed (prisma/seed.ts)
+// and the production seed (prisma/seed.prod.ts) so there is a single source of
+// truth. See CLAUDE.md "Taxonomía" for the Topic↔Skill divergence this encodes.
+export async function seedTaxonomy(prisma: PrismaClient): Promise<void> {
+  const mathSection = await prisma.section.upsert({
+    where: { name: "MATH" },
+    update: {},
+    create: { name: "MATH", label: "Mathematics" },
+  });
+  const rwSection = await prisma.section.upsert({
+    where: { name: "READING_WRITING" },
+    update: {},
+    create: { name: "READING_WRITING", label: "Reading & Writing" },
+  });
+
+  const mathDomains = await Promise.all([
+    prisma.domain.upsert({ where: { id: "dom-algebra" }, update: {}, create: { id: "dom-algebra", name: "Algebra", sectionId: mathSection.id } }),
+    prisma.domain.upsert({ where: { id: "dom-advmath" }, update: {}, create: { id: "dom-advmath", name: "Advanced Math", sectionId: mathSection.id } }),
+    prisma.domain.upsert({ where: { id: "dom-psda" }, update: {}, create: { id: "dom-psda", name: "Problem Solving and Data Analysis", sectionId: mathSection.id } }),
+    prisma.domain.upsert({ where: { id: "dom-geotrig" }, update: {}, create: { id: "dom-geotrig", name: "Geometry and Trigonometry", sectionId: mathSection.id } }),
+  ]);
+
+  const rwDomains = await Promise.all([
+    prisma.domain.upsert({ where: { id: "dom-info" }, update: {}, create: { id: "dom-info", name: "Information and Ideas", sectionId: rwSection.id } }),
+    prisma.domain.upsert({ where: { id: "dom-craft" }, update: {}, create: { id: "dom-craft", name: "Craft and Structure", sectionId: rwSection.id } }),
+    prisma.domain.upsert({ where: { id: "dom-expr" }, update: {}, create: { id: "dom-expr", name: "Expression of Ideas", sectionId: rwSection.id } }),
+    prisma.domain.upsert({ where: { id: "dom-sec" }, update: {}, create: { id: "dom-sec", name: "Standard English Conventions", sectionId: rwSection.id } }),
+  ]);
+
+  const topicDefs: Record<string, { id: string; name: string }[]> = {
+    "dom-algebra": [
+      { id: "top-lineq", name: "Linear Equations" },
+      { id: "top-lineq-one-var", name: "Linear Equations in One Variable" },
+      { id: "top-lineq-two-var", name: "Linear Equations in Two Variables" },
+      { id: "top-syseq", name: "Systems of Equations" },
+      { id: "top-systems-two-linear", name: "Systems of Two Linear Equations" },
+      { id: "top-ineq", name: "Inequalities" },
+      { id: "top-linineq", name: "Linear Inequalities" },
+      { id: "top-linfn", name: "Linear Functions" },
+    ],
+    "dom-advmath": [
+      { id: "top-equivalent-expressions", name: "Equivalent Expressions" },
+      { id: "top-nonlinear-equations", name: "Nonlinear Equations" },
+      { id: "top-quadfn", name: "Quadratic Functions" },
+      { id: "top-nonlinfn", name: "Nonlinear Functions" },
+      { id: "top-poly", name: "Polynomials" },
+      { id: "top-expfn", name: "Exponential Functions" },
+      { id: "top-radeq", name: "Radical Equations" },
+    ],
+    "dom-psda": [
+      { id: "top-ratprop", name: "Ratios and Proportions" },
+      { id: "top-ratios-rates-units", name: "Ratios, Rates, Proportions, and Units" },
+      { id: "top-pct", name: "Percentages" },
+      { id: "top-stats", name: "Statistics" },
+      { id: "top-one-var-data", name: "One-Variable Data" },
+      { id: "top-data-mean", name: "One-Variable Data: Distributions and Measures" },
+      { id: "top-two-var-data", name: "Two-Variable Data" },
+      { id: "top-inference-margin", name: "Inference and Margin of Error" },
+      { id: "top-statistical-claims", name: "Statistical Claims" },
+      { id: "top-prob", name: "Probability" },
+    ],
+    "dom-geotrig": [
+      { id: "top-circles", name: "Circles" },
+      { id: "top-tri", name: "Triangles" },
+      { id: "top-lines-angles-triangles", name: "Lines, Angles, and Triangles" },
+      { id: "top-area-volume", name: "Area and Volume" },
+      { id: "top-right-tri-trig", name: "Right Triangles and Trigonometry" },
+      { id: "top-trig", name: "Trigonometry" },
+      { id: "top-vol", name: "Volume and Area" },
+    ],
+    "dom-info": [
+      { id: "top-central", name: "Central Ideas" },
+      { id: "top-central-details", name: "Central Ideas and Details" },
+      { id: "top-command-evidence", name: "Command of Evidence" },
+      { id: "top-textev", name: "Textual Evidence" },
+      { id: "top-infer", name: "Inferences" },
+      { id: "top-cross", name: "Cross-Text Connections" },
+    ],
+    "dom-craft": [
+      { id: "top-wic", name: "Words in Context" },
+      { id: "top-texstr", name: "Text Structure" },
+      { id: "top-text-structure-purpose", name: "Text Structure and Purpose" },
+      { id: "top-authpur", name: "Author Purpose" },
+    ],
+    "dom-expr": [
+      { id: "top-rhet", name: "Rhetorical Synthesis" },
+      { id: "top-trans", name: "Transitions" },
+    ],
+    "dom-sec": [
+      { id: "top-bound", name: "Boundaries" },
+      { id: "top-fss", name: "Form, Structure, and Sense" },
+    ],
+  };
+  const subskillDefs: Record<string, { id: string; name: string }[]> = {
+    "top-nonlinfn": [
+      { id: "sub-nonlin-transform-recip", name: "Function transformations / Reciprocal functions" },
+    ],
+  };
+
+  const allDomains = [...mathDomains, ...rwDomains];
+  for (const domain of allDomains) {
+    const defs = topicDefs[domain.id] ?? [];
+    await Promise.all(
+      defs.map((t) =>
+        prisma.topic.upsert({ where: { id: t.id }, update: {}, create: { id: t.id, name: t.name, domainId: domain.id } })
+      )
+    );
+  }
+  for (const [topicId, defs] of Object.entries(subskillDefs)) {
+    await Promise.all(
+      defs.map((subskill) =>
+        prisma.subskill.upsert({
+          where: { id: subskill.id },
+          update: { name: subskill.name, topicId },
+          create: { id: subskill.id, name: subskill.name, topicId },
+        })
+      )
+    );
+  }
+
+  const allSections = [mathSection, rwSection];
+  await Promise.all(
+    allSections.map((section, index) =>
+      prisma.taxonomyNode.upsert({
+        where: { id: `tax-area-${section.id}` },
+        update: { name: section.name, label: section.label, type: "AREA", parentId: null, sortOrder: index, active: true },
+        create: { id: `tax-area-${section.id}`, name: section.name, label: section.label, type: "AREA", sortOrder: index, active: true },
+      })
+    )
+  );
+  await Promise.all(
+    allDomains.map((domain, index) =>
+      prisma.taxonomyNode.upsert({
+        where: { id: `tax-topic-${domain.id}` },
+        update: { name: domain.name, label: domain.name, type: "DOMAIN", parentId: `tax-area-${domain.sectionId}`, sortOrder: index, active: true },
+        create: { id: `tax-topic-${domain.id}`, name: domain.name, label: domain.name, type: "DOMAIN", parentId: `tax-area-${domain.sectionId}`, sortOrder: index, active: true },
+      })
+    )
+  );
+  const seededTopics = await prisma.topic.findMany({ include: { subskills: true } });
+  await Promise.all(
+    seededTopics.map((topic, index) =>
+      prisma.taxonomyNode.upsert({
+        where: { id: `tax-skill-${topic.id}` },
+        update: { name: topic.name, label: topic.name, type: "SKILL", parentId: `tax-topic-${topic.domainId}`, sortOrder: index, active: true },
+        create: { id: `tax-skill-${topic.id}`, name: topic.name, label: topic.name, type: "SKILL", parentId: `tax-topic-${topic.domainId}`, sortOrder: index, active: true },
+      })
+    )
+  );
+  await Promise.all(
+    seededTopics.map((topic) =>
+      prisma.topic.update({
+        where: { id: topic.id },
+        data: { taxonomyNodeId: `tax-skill-${topic.id}` },
+      })
+    )
+  );
+  const seededSubskills = seededTopics.flatMap((topic) => topic.subskills.map((subskill) => ({ ...subskill, topicId: topic.id })));
+  await Promise.all(
+    seededSubskills.map((subskill, index) =>
+      prisma.taxonomyNode.upsert({
+        where: { id: `tax-subskill-${subskill.id}` },
+        update: { name: subskill.name, label: subskill.name, type: "SUBSKILL", parentId: `tax-skill-${subskill.topicId}`, sortOrder: index, active: true },
+        create: { id: `tax-subskill-${subskill.id}`, name: subskill.name, label: subskill.name, type: "SUBSKILL", parentId: `tax-skill-${subskill.topicId}`, sortOrder: index, active: true },
+      })
+    )
+  );
+  await Promise.all(
+    seededSubskills.map((subskill) =>
+      prisma.subskill.update({
+        where: { id: subskill.id },
+        data: { taxonomyNodeId: `tax-subskill-${subskill.id}` },
+      })
+    )
+  );
+}
+
+// SAT raw→scaled score conversion tables for Full Practice Tests. Production-safe
+// (no synthetic questions), required for FPT scoring. Shared by both seeds.
+export async function seedScoreConversions(prisma: PrismaClient): Promise<void> {
+  for (const section of ["RW", "MATH"] as const) {
+    const maxRaw = section === "RW" ? 54 : 44;
+    for (let rawCorrect = 0; rawCorrect <= maxRaw; rawCorrect += 1) {
+      const score = Math.round((200 + (rawCorrect / maxRaw) * 600) / 10) * 10;
+      await prisma.fullPracticeTestScoreConversion.upsert({
+        where: { section_rawCorrect: { section, rawCorrect } },
+        update: { score },
+        create: { section, rawCorrect, score },
+      });
+    }
+  }
+}
