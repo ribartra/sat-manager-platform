@@ -54,7 +54,6 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
     },
     include: {
       topic: { include: { domain: { include: { section: true } } } },
-      subskill: true,
       setItems: { select: { practiceSetId: true } },
       fullTestItems: { select: { moduleId: true } },
       answers: { select: { id: true } },
@@ -130,7 +129,7 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200">
               <th className="px-4 py-3 text-left font-medium text-gray-500">Question</th>
-              <th className="px-4 py-3 text-left font-medium text-gray-500">Skill / Subskill</th>
+              <th className="px-4 py-3 text-left font-medium text-gray-500">Skill</th>
               <th className="px-4 py-3 text-left font-medium text-gray-500">Difficulty</th>
               <th className="px-4 py-3 text-left font-medium text-gray-500">Type</th>
               <th className="px-4 py-3 text-left font-medium text-gray-500">Status</th>
@@ -147,7 +146,6 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
                 <td className="px-4 py-3">
                   <p className="text-xs text-gray-500">{q.topic.domain.section.label} / {q.topic.domain.name}</p>
                   <p className="text-sm text-gray-700">{q.topic.name}</p>
-                  {q.subskill && <p className="text-xs text-gray-500">{q.subskill.name}</p>}
                 </td>
                 <td className="px-4 py-3">
                   <Badge variant={q.difficulty === "EASY" ? "easy" : q.difficulty === "MEDIUM" ? "medium" : "hard"}>
