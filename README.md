@@ -538,6 +538,50 @@ Si no hay SMTP válido, los flujos de email imprimen enlaces en consola para des
 
 ---
 
+## Correo electrónico (SMTP)
+
+El envío es **SMTP genérico** vía Nodemailer (`lib/email.ts`), así que sirve cualquier
+proveedor (Brevo, SendGrid, Mailgun, Amazon SES, Gmail…). El default sugerido es
+**Brevo**. La conexión TLS es implícita solo en el puerto `465`; en `587` se usa STARTTLS.
+
+### Cómo configurarlo (dos métodos)
+
+Se puede configurar de dos formas; **la BD tiene prioridad sobre el entorno, campo por
+campo** (`lib/smtp-settings.ts`):
+
+1. **Desde la app — `/admin/settings`, sección SMTP** (recomendado en producción).
+   Se guarda en la tabla `AppSetting`; la **contraseña se cifra en reposo**
+   (AES-256-GCM). Campos: host, puerto, usuario, remitente (`from`) y contraseña.
+2. **Por variables de entorno** (fallback), como en la sección anterior:
+   `EMAIL_FROM`, `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USER`, `EMAIL_PASS`.
+
+El SMTP se considera **configurado** solo cuando hay host, usuario, remitente y
+contraseña. Si falta alguno, los correos no fallan: se omiten y el enlace se imprime en
+consola (`[EMAIL:SKIPPED]`), útil en desarrollo.
+
+### Pasos con Brevo
+
+1. Crear cuenta en Brevo y **verificar el remitente/dominio** de `EMAIL_FROM` (obligatorio,
+   o el proveedor rechaza el envío).
+2. En Brevo → **SMTP & API → SMTP**: copiar el **login SMTP** (un email) y generar una
+   **SMTP key** (⚠️ es distinta de la API key).
+3. Usar `smtp-relay.brevo.com` y puerto `587`.
+4. Cargar esos datos en `/admin/settings` **o** en el `.env`.
+
+### Qué correos envía
+
+Invitación de alumno, consentimiento de padre/tutor, invitación de padre, **reporte de
+progreso al padre** y restablecimiento de contraseña (`lib/email.ts`).
+
+### En producción (deploy GCP)
+
+`EMAIL_PASS` es secreto y va a **Secret Manager** (`email-pass`, cargado por
+`deploy/load-secrets.sh`); el resto de `EMAIL_*` no son secretos y se renderizan a
+`/data/app.env` desde variables de Terraform (`deploy/vm-startup.sh`). Alternativamente,
+puede dejarse todo sin configurar en el deploy y ajustarse luego desde `/admin/settings`.
+
+---
+
 ## Scripts
 
 | Comando | Descripción |
