@@ -30,6 +30,7 @@ export function TaxonomyPicker({
   required = false,
   allowAll = false,
   fixedSection,
+  stacked = false,
   className,
 }: {
   topics: TaxonomyPickerTopic[];
@@ -38,6 +39,8 @@ export function TaxonomyPicker({
   required?: boolean;
   allowAll?: boolean;
   fixedSection?: string;
+  /** Stack the selects vertically (for narrow columns) instead of side by side. */
+  stacked?: boolean;
   className?: string;
 }) {
   const selected = topics.find((t) => t.id === value);
@@ -63,7 +66,7 @@ export function TaxonomyPicker({
   const labelCls = "block text-sm font-medium text-gray-700 mb-1";
 
   return (
-    <div className={cn("grid gap-3", fixedSection ? "grid-cols-2" : "grid-cols-3", className)}>
+    <div className={cn("grid gap-3", stacked ? "grid-cols-1" : fixedSection ? "grid-cols-2" : "grid-cols-3", className)}>
       {!fixedSection && (
         <div>
           <label className={labelCls}>Section{req ? " *" : ""}</label>

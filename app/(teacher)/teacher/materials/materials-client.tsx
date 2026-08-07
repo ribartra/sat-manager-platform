@@ -99,7 +99,7 @@ export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; 
           <Input value={url} onChange={(event) => setUrl(event.target.value)} placeholder="Reference URL or file link" />
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">Skill (optional)</label>
-            <TaxonomyPicker topics={topics} value={topicId} onChange={setTopicId} />
+            <TaxonomyPicker topics={topics} value={topicId} onChange={setTopicId} stacked />
             <p className="mt-1 text-xs text-gray-400">Leave empty for a general material.</p>
           </div>
           <Select value={status} onChange={(event) => setStatusValue(event.target.value)}>
