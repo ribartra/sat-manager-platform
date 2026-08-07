@@ -7,11 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
+import { TaxonomyPicker, type TaxonomyPickerTopic } from "@/components/taxonomy-picker";
 
-interface TopicOption {
-  id: string;
-  name: string;
-}
+type TopicOption = TaxonomyPickerTopic;
 
 interface MaterialRow {
   id: string;
@@ -21,7 +19,7 @@ interface MaterialRow {
   url: string | null;
   status: string;
   topicId: string | null;
-  topic: { name: string } | null;
+  topic: { name: string; domainName: string; sectionLabel: string } | null;
 }
 
 export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; materials: MaterialRow[] }) {
@@ -99,12 +97,11 @@ export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; 
           <Input value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Title" />
           <Input value={description} onChange={(event) => setDescription(event.target.value)} placeholder="Short description" />
           <Input value={url} onChange={(event) => setUrl(event.target.value)} placeholder="Reference URL or file link" />
-          <Select value={topicId} onChange={(event) => setTopicId(event.target.value)}>
-            <option value="">No skill</option>
-            {topics.map((topic) => (
-              <option key={topic.id} value={topic.id}>{topic.name}</option>
-            ))}
-          </Select>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Skill (optional)</label>
+            <TaxonomyPicker topics={topics} value={topicId} onChange={setTopicId} />
+            <p className="mt-1 text-xs text-gray-400">Leave empty for a general material.</p>
+          </div>
           <Select value={status} onChange={(event) => setStatusValue(event.target.value)}>
             <option value="DRAFT">Draft</option>
             <option value="PUBLISHED">Published</option>
@@ -142,7 +139,16 @@ export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; 
                   <p className="text-xs text-gray-500">{material.description}</p>
                   {material.url && <p className="text-xs text-blue-600">{material.url}</p>}
                 </td>
-                <td className="px-4 py-3 text-gray-600">{material.topic?.name ?? "General"}</td>
+                <td className="px-4 py-3">
+                  {material.topic ? (
+                    <>
+                      <p className="text-xs text-gray-500">{material.topic.sectionLabel} · {material.topic.domainName}</p>
+                      <p className="text-sm text-gray-700">{material.topic.name}</p>
+                    </>
+                  ) : (
+                    <span className="text-sm text-gray-400">General</span>
+                  )}
+                </td>
                 <td className="px-4 py-3 text-gray-600">{material.status}</td>
                 <td className="px-4 py-3 text-right">
                   <div className="flex flex-wrap justify-end gap-2">
