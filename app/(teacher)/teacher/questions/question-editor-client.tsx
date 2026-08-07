@@ -10,6 +10,7 @@ import { Select } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { MathContent } from "@/components/math-content";
 import { QuestionMedia } from "@/components/question-media";
+import { TaxonomyPicker } from "@/components/taxonomy-picker";
 import {
   Dialog,
   DialogContent,
@@ -95,29 +96,10 @@ function splitFormulaParts(content: string) {
 
 export function QuestionEditor({ topics, initial, sourceContext }: { topics: TopicInfo[]; initial?: QuestionData; sourceContext?: SourceContext }) {
   const router = useRouter();
-  const initialTopic = initial?.topicId ? topics.find((t) => t.id === initial.topicId) : undefined;
-  const [sectionLabel, setSectionLabel] = useState(initialTopic?.sectionLabel ?? "");
-  const [domainName, setDomainName] = useState(initialTopic?.domainName ?? "");
   const [topicId, setTopicId] = useState(initial?.topicId ?? "");
   // Subskill is hidden in the editor (unused in the source taxonomy); keep any
   // stored value so saving an existing question doesn't wipe it.
   const [subskillId] = useState(initial?.subskillId ?? "");
-
-  // Cascading taxonomy pickers (Section -> Domain -> Skill), derived from topics.
-  const sectionOptions = useMemo(() => {
-    const set = new Set(topics.map((t) => t.sectionLabel));
-    const preferred = ["Mathematics", "Reading & Writing"];
-    return [...preferred.filter((s) => set.has(s)), ...[...set].filter((s) => !preferred.includes(s))];
-  }, [topics]);
-  const domainOptions = useMemo(
-    () => Array.from(new Set(topics.filter((t) => t.sectionLabel === sectionLabel).map((t) => t.domainName))),
-    [topics, sectionLabel]
-  );
-  const skillOptions = useMemo(
-    () => topics.filter((t) => t.sectionLabel === sectionLabel && t.domainName === domainName),
-    [topics, sectionLabel, domainName]
-  );
-
   const [difficulty, setDifficulty] = useState(initial?.difficulty ?? "EASY");
   const [type, setType] = useState(initial?.type ?? "MC");
   const [stem, setStem] = useState(initial?.stem ?? "");
@@ -340,61 +322,15 @@ export function QuestionEditor({ topics, initial, sourceContext }: { topics: Top
   return (
     <div className="space-y-6">
       {/* Skill + Metadata */}
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Section *</label>
-          <Select
-            value={sectionLabel}
-            onChange={(e) => {
-              setSectionLabel(e.target.value);
-              setDomainName("");
-              setTopicId("");
-            }}
-            required
-          >
-            <option value="">Select a section...</option>
-            {sectionOptions.map((s) => (
-              <option key={s} value={s}>{s}</option>
-            ))}
-          </Select>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Domain *</label>
-          <Select
-            value={domainName}
-            onChange={(e) => {
-              setDomainName(e.target.value);
-              setTopicId("");
-            }}
-            required
-            disabled={!sectionLabel}
-          >
-            <option value="">{sectionLabel ? "Select a domain..." : "Select a section first"}</option>
-            {domainOptions.map((d) => (
-              <option key={d} value={d}>{d}</option>
-            ))}
-          </Select>
-        </div>
-      </div>
+      <TaxonomyPicker topics={topics} value={topicId} onChange={setTopicId} required />
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Skill *</label>
-          <Select value={topicId} onChange={(e) => setTopicId(e.target.value)} required disabled={!domainName}>
-            <option value="">{domainName ? "Select a skill..." : "Select a domain first"}</option>
-            {skillOptions.map((t) => (
-              <option key={t.id} value={t.id}>{t.name}</option>
-            ))}
-          </Select>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Difficulty</label>
-          <Select value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
-            <option value="EASY">Easy</option>
-            <option value="MEDIUM">Medium</option>
-            <option value="HARD">Hard</option>
-          </Select>
-        </div>
+      <div className="max-w-xs">
+        <label className="block text-sm font-medium text-gray-700 mb-1">Difficulty</label>
+        <Select value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
+          <option value="EASY">Easy</option>
+          <option value="MEDIUM">Medium</option>
+          <option value="HARD">Hard</option>
+        </Select>
       </div>
 
       <div className="grid grid-cols-2 gap-4">

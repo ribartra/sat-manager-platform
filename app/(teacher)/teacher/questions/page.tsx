@@ -6,7 +6,8 @@ import { Card } from "@/components/ui/card";
 import { MathContent } from "@/components/math-content";
 import { QuestionActions } from "./question-actions-client";
 import { cn } from "@/lib/utils";
-import { activeTaxonomySection, buildTaxonomyTree, matchesTaxonomySection, taxonomyPathLabel, TAXONOMY_SECTION_TABS } from "@/lib/taxonomy";
+import { activeTaxonomySection, buildTaxonomyTree, matchesTaxonomySection, TAXONOMY_SECTION_TABS } from "@/lib/taxonomy";
+import { QuestionsFilter } from "./questions-filter-client";
 
 interface SearchParams { section?: string; topic?: string; difficulty?: string; status?: string }
 
@@ -97,32 +98,19 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
       </div>
 
       {/* Filters */}
-      <form className="flex items-center gap-3 mb-5">
-        <input type="hidden" name="section" value={activeSection} />
-        <select name="topic" defaultValue={selectedTopicId ?? ""} className="rounded-md border border-gray-300 px-3 py-1.5 text-sm">
-          <option value="">All skills</option>
-          {visibleTopics.map((t) => (
-            <option key={t.id} value={t.id}>
-              {taxonomyPathLabel(t.taxonomyNodeId, byId, `${t.domain.section.label} / ${t.domain.name} / ${t.name}`)}
-            </option>
-          ))}
-        </select>
-        <select name="difficulty" defaultValue={filters.difficulty ?? ""} className="rounded-md border border-gray-300 px-3 py-1.5 text-sm">
-          <option value="">All difficulties</option>
-          <option value="EASY">Easy</option>
-          <option value="MEDIUM">Medium</option>
-          <option value="HARD">Hard</option>
-        </select>
-        <select name="status" defaultValue={filters.status ?? ""} className="rounded-md border border-gray-300 px-3 py-1.5 text-sm">
-          <option value="">All statuses</option>
-          <option value="PUBLISHED">Published</option>
-          <option value="DRAFT">Draft</option>
-          <option value="ARCHIVED">Archived</option>
-        </select>
-        <button type="submit" className="rounded-md bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-200">
-          Filter
-        </button>
-      </form>
+      <QuestionsFilter
+        section={activeSection}
+        sectionLabel={visibleTopics[0]?.domain.section.label ?? (activeSection === "math" ? "Mathematics" : "Reading & Writing")}
+        topics={visibleTopics.map((t) => ({
+          id: t.id,
+          name: t.name,
+          sectionLabel: t.domain.section.label,
+          domainName: t.domain.name,
+        }))}
+        initialTopicId={selectedTopicId}
+        initialDifficulty={filters.difficulty}
+        initialStatus={filters.status}
+      />
 
       <Card className="overflow-hidden">
         <table className="w-full text-sm">

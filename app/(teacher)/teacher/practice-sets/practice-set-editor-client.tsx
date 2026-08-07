@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/card";
 import { ArrowDown, ArrowUp, X } from "lucide-react";
 import { MathContent } from "@/components/math-content";
 import { ImportQuestionnaireButton } from "@/components/import-questionnaire-button";
+import { TaxonomyPicker } from "@/components/taxonomy-picker";
 
 interface TopicInfo {
   id: string;
@@ -65,23 +66,12 @@ export function PracticeSetEditor({
   const [questionIds, setQuestionIds] = useState<string[]>(initial?.questionIds ?? []);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
-  const [topicSearch, setTopicSearch] = useState("");
   const [questionSearch, setQuestionSearch] = useState("");
 
   const availableQuestions = useMemo(
     () => questions.filter((q) => q.topicId === topicId && !questionIds.includes(q.id)),
     [questions, questionIds, topicId]
   );
-  const visibleTopics = useMemo(() => {
-    const term = topicSearch.trim().toLowerCase();
-    const filtered = term
-      ? topics.filter((topic) =>
-          [topic.sectionLabel, topic.domainName, topic.name].some((value) => value.toLowerCase().includes(term))
-        )
-      : topics;
-    const selected = topics.find((topic) => topic.id === topicId);
-    return selected && !filtered.some((topic) => topic.id === selected.id) ? [selected, ...filtered] : filtered;
-  }, [topicId, topicSearch, topics]);
   const visibleAvailableQuestions = useMemo(() => {
     const term = questionSearch.trim().toLowerCase();
     if (!term) return availableQuestions;
@@ -143,21 +133,9 @@ export function PracticeSetEditor({
           <label className="mb-1 block text-sm font-medium text-gray-700">Name</label>
           <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Linear Equations Easy #1" />
         </div>
-        <div>
+        <div className="col-span-2">
           <label className="mb-1 block text-sm font-medium text-gray-700">Skill</label>
-          <Input
-            value={topicSearch}
-            onChange={(event) => setTopicSearch(event.target.value)}
-            placeholder="Search skill..."
-            className="mb-2 text-sm"
-          />
-          <Select value={topicId} onChange={(e) => setTopicId(e.target.value)}>
-            {visibleTopics.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.taxonomyLabel}
-              </option>
-            ))}
-          </Select>
+          <TaxonomyPicker topics={topics} value={topicId} onChange={setTopicId} required />
         </div>
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">Difficulty</label>
