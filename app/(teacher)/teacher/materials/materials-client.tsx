@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { TaxonomyPicker, type TaxonomyPickerTopic } from "@/components/taxonomy-picker";
+import { cn } from "@/lib/utils";
 
 type TopicOption = TaxonomyPickerTopic;
 
@@ -33,11 +34,25 @@ interface MaterialRow {
   topic: { name: string; domainName: string; sectionLabel: string } | null;
 }
 
+type SectionKey = "math" | "rw" | "general";
+
+const TABS: { key: SectionKey; label: string }[] = [
+  { key: "math", label: "Math" },
+  { key: "rw", label: "R&W" },
+  { key: "general", label: "General" },
+];
+
 const STATUS_VARIANT: Record<string, "success" | "warning" | "default"> = {
   PUBLISHED: "success",
   DRAFT: "warning",
   ARCHIVED: "default",
 };
+
+function sectionKeyOf(sectionLabel: string | null | undefined): SectionKey {
+  if (sectionLabel === "Mathematics") return "math";
+  if (sectionLabel === "Reading & Writing") return "rw";
+  return "general";
+}
 
 function SkillLine({ topic }: { topic: MaterialRow["topic"] }) {
   if (!topic) return <span className="text-xs text-gray-400">General</span>;
@@ -51,6 +66,8 @@ function SkillLine({ topic }: { topic: MaterialRow["topic"] }) {
 
 export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; materials: MaterialRow[] }) {
   const router = useRouter();
+
+  // Form / modal state
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [body, setBody] = useState("");
@@ -61,6 +78,39 @@ export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; 
   const [saving, setSaving] = useState(false);
   const [editorOpen, setEditorOpen] = useState(false);
   const [viewing, setViewing] = useState<MaterialRow | null>(null);
+
+  // Tabs + filters
+  const [activeTab, setActiveTab] = useState<SectionKey>("math");
+  const [skillFilter, setSkillFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+
+  const counts = useMemo(() => {
+    const c: Record<SectionKey, number> = { math: 0, rw: 0, general: 0 };
+    for (const m of materials) c[sectionKeyOf(m.topic?.sectionLabel)]++;
+    return c;
+  }, [materials]);
+
+  const sectionLabel = activeTab === "math" ? "Mathematics" : "Reading & Writing";
+  const sectionTopics = useMemo(
+    () => topics.filter((t) => sectionKeyOf(t.sectionLabel) === activeTab),
+    [topics, activeTab]
+  );
+
+  const visibleMaterials = useMemo(
+    () =>
+      materials.filter((m) => {
+        if (sectionKeyOf(m.topic?.sectionLabel) !== activeTab) return false;
+        if (activeTab !== "general" && skillFilter && m.topicId !== skillFilter) return false;
+        if (statusFilter && m.status !== statusFilter) return false;
+        return true;
+      }),
+    [materials, activeTab, skillFilter, statusFilter]
+  );
+
+  function selectTab(key: SectionKey) {
+    setActiveTab(key);
+    setSkillFilter("");
+  }
 
   function resetForm() {
     setEditingId(null);
@@ -132,21 +182,59 @@ export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; 
 
   return (
     <div>
-      <div className="mb-5 flex items-center justify-between">
-        <p className="text-sm text-gray-500">{materials.length} material{materials.length === 1 ? "" : "s"}</p>
+      <div className="mb-4 flex items-center justify-end">
         <Button onClick={openNew} className="flex items-center gap-1.5">
           <Plus size={15} /> New material
         </Button>
       </div>
 
-      {materials.length === 0 ? (
+      <div className="mb-5 flex gap-2 border-b border-gray-200">
+        {TABS.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => selectTab(tab.key)}
+            className={cn(
+              "border-b-2 px-3 py-2 text-sm font-medium",
+              activeTab === tab.key ? "border-blue-600 text-blue-700" : "border-transparent text-gray-500 hover:text-gray-800"
+            )}
+          >
+            {tab.label} <span className="text-xs text-gray-400">({counts[tab.key]})</span>
+          </button>
+        ))}
+      </div>
+
+      <div className="mb-5 flex flex-wrap items-end gap-3">
+        {activeTab !== "general" && (
+          <div className="min-w-[280px] flex-1">
+            <TaxonomyPicker
+              key={activeTab}
+              topics={sectionTopics}
+              value={skillFilter}
+              onChange={setSkillFilter}
+              allowAll
+              fixedSection={sectionLabel}
+            />
+          </div>
+        )}
+        <div>
+          <label className="mb-1 block text-sm font-medium text-gray-700">Status</label>
+          <Select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="text-sm">
+            <option value="">All statuses</option>
+            <option value="PUBLISHED">Published</option>
+            <option value="DRAFT">Draft</option>
+            <option value="ARCHIVED">Archived</option>
+          </Select>
+        </div>
+      </div>
+
+      {visibleMaterials.length === 0 ? (
         <Card padding="lg" className="py-16 text-center text-gray-400">
-          <p>No study materials yet.</p>
-          <button onClick={openNew} className="mt-2 text-sm text-blue-600 hover:underline">Create the first one →</button>
+          <p>No materials in this view.</p>
+          <button onClick={openNew} className="mt-2 text-sm text-blue-600 hover:underline">Create one →</button>
         </Card>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {materials.map((material) => (
+          {visibleMaterials.map((material) => (
             <Card key={material.id} padding="md" className="flex flex-col">
               <div className="mb-2 flex items-start justify-between gap-2">
                 <SkillLine topic={material.topic} />
