@@ -118,17 +118,27 @@ class IngestConfig:
     mistral_api_key: str | None
     ocr_model: str
     structuring_model: str
+    force_ocr_source_kinds: frozenset[str]
 
     @classmethod
     def from_env(cls) -> "IngestConfig":
         database_url = os.getenv("DATABASE_URL", "file:./dev.db")
         db_api_key, _summary = load_mistral_api_key_from_db(database_url)
+        # PDFs cuyo texto vectorial (mate/opciones) pdfplumber no extrae confiablemente
+        # se fuerzan a OCR. Incluye práctica porque la prosa da una densidad engañosa
+        # que suprimiría el OCR y perdería la mate y las alternativas. Opt-out por env.
+        force_ocr_kinds = frozenset(
+            kind.strip().upper()
+            for kind in os.getenv("INGEST_FORCE_OCR_SOURCE_KINDS", "MOCK_EXAM,PRACTICE_EXERCISE").split(",")
+            if kind.strip()
+        )
         return cls(
             database_url=database_url,
             text_density_threshold=int(os.getenv("INGEST_TEXT_DENSITY_THRESHOLD", "120")),
             mistral_api_key=db_api_key or os.getenv("MISTRAL_API_KEY") or None,
             ocr_model=os.getenv("MISTRAL_OCR_MODEL", "mistral-ocr-latest"),
             structuring_model=os.getenv("MISTRAL_STRUCTURING_MODEL", "mistral-large-latest"),
+            force_ocr_source_kinds=force_ocr_kinds,
         )
 
 
@@ -136,6 +146,7 @@ CONFIG = IngestConfig.from_env()
 TEXT_DENSITY_THRESHOLD = CONFIG.text_density_threshold
 OCR_MODEL = CONFIG.ocr_model
 STRUCTURING_MODEL = CONFIG.structuring_model
+FORCE_OCR_SOURCE_KINDS = CONFIG.force_ocr_source_kinds
 
 
 class BatchCreate(BaseModel):
@@ -4731,7 +4742,7 @@ def _process_batch(batch_id: str) -> None:
                     started_processed_pages=started_processed_pages,
                 )
                 db.commit()
-                force_ocr = path.suffix.lower() == ".pdf" and source["sourceKind"] == "MOCK_EXAM"
+                force_ocr = path.suffix.lower() == ".pdf" and source["sourceKind"] in FORCE_OCR_SOURCE_KINDS
                 extracted = extract_docx(path) if path.suffix.lower() == ".docx" else extract_pdf_text(path, force_ocr=force_ocr)
                 db.execute(
                     "UPDATE IngestSourceFile SET pageCount = ?, status = 'PROCESSING', updatedAt = ? WHERE id = ?",
