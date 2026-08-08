@@ -9,6 +9,7 @@ import { formatDate, formatTime, scorePercent } from "@/lib/utils";
 import { ChevronLeft } from "lucide-react";
 import { AttemptActions } from "./attempt-actions-client";
 import { parseSnapshot, PracticeSetSnapshot, QuestionSnapshot } from "@/lib/attempt-snapshots";
+import { formatCorrectAnswer } from "@/lib/answer-grading";
 import { auth } from "@/lib/auth";
 import { teacherProgramEnrollmentScope } from "@/lib/program-scope";
 
@@ -122,7 +123,7 @@ export default async function TeacherAttemptDetailPage({ params }: PageProps) {
                   <td className="px-4 py-3 text-gray-700">{ans?.answer ?? "Blank"}</td>
                   <td className="px-4 py-3">
                     {ans?.answer ? (
-                      ans.isCorrect ? <span className="text-green-600">Correct</span> : <span className="text-red-600">Wrong ({question.correctAnswer})</span>
+                      ans.isCorrect ? <span className="text-green-600">Correct</span> : <span className="text-red-600">Wrong ({formatCorrectAnswer(question.correctAnswer)})</span>
                     ) : (
                       <span className="text-gray-400">Unanswered</span>
                     )}

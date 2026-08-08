@@ -4,6 +4,7 @@ import { notifyTeachers } from "@/lib/notifications";
 import { requireApprovedSession } from "@/lib/rbac";
 import { markUserActive } from "@/lib/activity";
 import { scaledScore } from "@/lib/full-test-scoring";
+import { isAnswerCorrect } from "@/lib/answer-grading";
 
 interface RouteContext {
   params: Promise<{ attemptId: string }>;
@@ -27,7 +28,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
   for (const testModule of modules) {
     for (const item of testModule.questions) {
       const answer = (answers?.[item.questionId] ?? "") as string;
-      const isCorrect = Boolean(answer) && answer.trim().toUpperCase() === item.question.correctAnswer.trim().toUpperCase();
+      const isCorrect = isAnswerCorrect(answer, item.question.correctAnswer, item.question.type);
       if (testModule.section === "MATH") {
         mathTotal += 1;
         if (isCorrect) mathCorrect += 1;

@@ -9,6 +9,7 @@ import { MathContent } from "@/components/math-content";
 import { QuestionMedia } from "@/components/question-media";
 import { CheckCircle, XCircle, MinusCircle, ChevronLeft, RotateCcw } from "lucide-react";
 import { parseSnapshot, PracticeSetSnapshot, QuestionSnapshot } from "@/lib/attempt-snapshots";
+import { formatCorrectAnswer } from "@/lib/answer-grading";
 
 interface PageProps {
   params: Promise<{ attemptId: string }>;
@@ -225,6 +226,17 @@ export default async function ResultsPage({ params }: PageProps) {
                           </div>
             );
           })}
+                    </div>
+                  )}
+
+                  {question.type === "NUMERIC" && (
+                    <div className="mb-3 flex flex-wrap gap-4 text-sm">
+                      <span className="text-gray-600">Your answer: <span className="font-medium text-gray-900">{ans.answer || "—"}</span></span>
+                      {canRevealSolutions && (
+                        <span className={isCorrect ? "text-green-700" : "text-red-700"}>
+                          Correct answer: <span className="font-medium">{formatCorrectAnswer(question.correctAnswer)}</span>
+                        </span>
+                      )}
                     </div>
                   )}
 

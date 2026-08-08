@@ -11,6 +11,7 @@ import {
 } from "@/lib/attempt-snapshots";
 import { applyPracticeProgression } from "@/lib/practice-progression";
 import { markUserActive } from "@/lib/activity";
+import { isAnswerCorrect } from "@/lib/answer-grading";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ attemptId: string }> }) {
   const session = await requireApprovedSession();
@@ -71,8 +72,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ att
   await Promise.all(
     Object.entries(answers as Record<string, string>).filter(([questionId]) => allowedQuestionIds.has(questionId)).map(([questionId, answer]) => {
       const snapshot = questionSnapshotMap.get(questionId);
-      const correct = snapshot?.correctAnswer;
-      const isCorrect = correct !== undefined && answer.trim().toUpperCase() === correct.trim().toUpperCase();
+      const isCorrect = isAnswerCorrect(answer, snapshot?.correctAnswer, snapshot?.type ?? "MC");
       if (isCorrect) correctCount += 1;
       const existing = existingAnswers.get(questionId);
       return prisma.attemptAnswer.upsert({
