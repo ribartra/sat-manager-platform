@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { formatTime, scorePercent } from "@/lib/utils";
 import { MathContent } from "@/components/math-content";
+import { QuestionMedia } from "@/components/question-media";
 import { Card } from "@/components/ui/card";
 
 interface PageProps { params: Promise<{ attemptId: string }> }
@@ -12,7 +13,7 @@ export default async function FullTestResultsPage({ params }: PageProps) {
   const session = await auth();
   const attempt = await prisma.fullPracticeTestAttempt.findFirst({
     where: { id: attemptId, studentId: session!.user.id },
-    include: { test: { include: { modules: { include: { questions: { include: { question: { include: { topic: { include: { domain: true } } } } }, orderBy: { order: "asc" } } }, orderBy: { order: "asc" } } } }, answers: true, pauses: true },
+    include: { test: { include: { modules: { include: { questions: { include: { question: { include: { topic: { include: { domain: true } }, options: { orderBy: { label: "asc" } } } } }, orderBy: { order: "asc" } } }, orderBy: { order: "asc" } } } }, answers: true, pauses: true },
   });
   if (!attempt) notFound();
 
@@ -80,7 +81,18 @@ export default async function FullTestResultsPage({ params }: PageProps) {
                           <span className="shrink-0">Q{index + 1}.</span>
                           <MathContent content={item.question.stem} className="line-clamp-2" />
                         </div>
-                        <p className="text-xs text-gray-500">{item.question.topic.domain.name} · {item.question.topic.name} · {item.question.difficulty}</p>
+                        <QuestionMedia imageUrl={item.question.imageUrl} alt={`Question ${index + 1} image`} className="mt-2 max-w-sm" />
+                        {item.question.options.some((option) => option.imageUrl) && (
+                          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                            {item.question.options.filter((option) => option.imageUrl).map((option) => (
+                              <div key={option.id}>
+                                <span className="text-xs font-medium text-gray-500">{option.label}</span>
+                                <QuestionMedia imageUrl={option.imageUrl} alt={`Option ${option.label} image`} className="max-w-[12rem]" />
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        <p className="mt-1 text-xs text-gray-500">{item.question.topic.domain.name} · {item.question.topic.name} · {item.question.difficulty}</p>
                       </div>
                       <div className="text-right">
                         <p className={answer?.isCorrect ? "text-green-600" : "text-red-600"}>{answer?.isCorrect ? "Correct" : "Wrong"}</p>
