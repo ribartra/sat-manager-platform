@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -100,7 +101,6 @@ type ReviewSession = {
   status: string;
 };
 
-const steps = ["PAGES", "QUESTIONS", "ANSWERS", "IMAGES", "FINAL"];
 const targetTypes = [
   { value: "STEM", label: "Imagen de enunciado" },
   { value: "STIMULUS", label: "Imagen de estímulo" },
@@ -225,14 +225,48 @@ function PageTextPreview({ page }: { page: PageArtifact }) {
   );
 }
 
-function FieldPreview({ label, value }: { label: string; value: string | null }) {
-  if (!value?.trim()) return null;
+// Collapsible section shell for the single-view review layout.
+function Section({
+  title,
+  subtitle,
+  defaultOpen = true,
+  children,
+}: {
+  title: string;
+  subtitle?: ReactNode;
+  defaultOpen?: boolean;
+  children: ReactNode;
+}) {
   return (
-    <section className="rounded-md border border-gray-200 bg-white p-3">
-      <p className="mb-2 text-xs font-medium uppercase text-gray-400">{label}</p>
-      <MathContent content={value} className="max-h-44 overflow-auto text-sm leading-6 text-gray-800" />
-    </section>
+    <details open={defaultOpen} className="group rounded-lg border border-gray-200 bg-white">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-4 py-3 text-sm font-semibold text-gray-900">
+        <span className="flex flex-wrap items-center gap-2">
+          {title}
+          {subtitle && <span className="text-xs font-normal text-gray-400">{subtitle}</span>}
+        </span>
+        <ChevronDown className="h-4 w-4 shrink-0 text-gray-400 transition group-open:rotate-180" />
+      </summary>
+      <div className="border-t border-gray-100 p-4">{children}</div>
+    </details>
   );
+}
+
+// True when the candidate's options are resolved (numeric, an OCR'd block, or
+// four option texts/images). Mirrors the pending rule used in the sets index.
+function optionsResolvedFor(
+  type: string,
+  optionsJson: string | null,
+  links: { targetType: string; optionLabel: string | null }[],
+): boolean {
+  if ((type ?? "MC") === "NUMERIC") return true;
+  if (links.some((link) => link.targetType === "OPTION_BLOCK")) return true;
+  const textCount = parseOptions(optionsJson).filter(
+    (option: { text?: string }) => typeof option?.text === "string" && option.text.trim(),
+  ).length;
+  const imageLetters = new Set(
+    links.filter((link) => link.targetType === "OPTION" && link.optionLabel).map((link) => link.optionLabel),
+  ).size;
+  return textCount + imageLetters >= 4;
 }
 
 export function FileReviewClient({
@@ -257,7 +291,6 @@ export function FileReviewClient({
   incidents: Incident[];
 }) {
   const router = useRouter();
-  const [step, setStep] = useState(reviewSession.currentStep || "QUESTIONS");
   const [selectedId, setSelectedId] = useState(candidates[0]?.id ?? "");
   const selected = candidates.find((candidate) => candidate.id === selectedId) ?? candidates[0] ?? null;
   const [draft, setDraft] = useState<Candidate | null>(selected);
@@ -306,24 +339,38 @@ export function FileReviewClient({
     list.push(slotLabel(link.targetType, link.optionLabel));
     assignmentsByImage.set(link.imageArtifactId, list);
   }
+  const isMc = (draft?.type ?? "MC") !== "NUMERIC";
+  const optsResolved = draft ? optionsResolvedFor(draft.type, draft.optionsJson, selectedLinks) : false;
+  // Links on non-board targets (answer field, explanation, page context…).
+  const otherLinks = selectedLinks.filter((link) => !["STEM", "OPTION", "STIMULUS"].includes(link.targetType));
 
-  async function updateSession(nextStep: string, candidateId = selectedId) {
-    setStep(nextStep);
+  async function persistCandidate(candidateId = selectedId) {
     await fetch(`/api/admin/ai-import/batches/${batchId}/review-session`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         sourceFileId: file.id,
-        currentStep: nextStep,
+        currentStep: "REVIEW",
         progressJson: JSON.stringify({ candidateId }),
       }),
     });
   }
 
+  async function completeReview() {
+    await fetch(`/api/admin/ai-import/batches/${batchId}/review-session`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sourceFileId: file.id, currentStep: "REVIEW", status: "COMPLETED" }),
+    });
+    router.refresh();
+  }
+
   function selectCandidate(candidate: Candidate) {
     setSelectedId(candidate.id);
     setDraft(candidate);
-    void updateSession(step, candidate.id);
+    setActiveSlot(null);
+    setMessage(null);
+    void persistCandidate(candidate.id);
   }
 
   async function saveCandidate(status?: string) {
@@ -463,411 +510,391 @@ export function FileReviewClient({
         <Card padding="none" className="overflow-hidden">
           <div className="border-b border-gray-100 px-3 py-2 text-xs font-medium uppercase text-gray-500">Questions</div>
           <div className="max-h-[620px] overflow-auto">
-            {candidates.map((candidate) => (
-              <button
-                key={candidate.id}
-                type="button"
-                onClick={() => selectCandidate(candidate)}
-                className={`block w-full border-b border-gray-100 px-3 py-3 text-left text-sm ${candidate.id === selected?.id ? "bg-blue-50" : "hover:bg-gray-50"}`}
-              >
-                <span className="font-medium">Q{candidate.questionNumber ?? "?"}</span>
-                <span className="ml-2 text-xs text-gray-500">{candidate.status}</span>
-                <span className="ml-2 text-xs text-blue-600">{candidate.promotionStatus}</span>
-                <span className="mt-1 block truncate text-xs text-gray-500">{candidate.questionExternalId ?? candidate.topicName ?? "No ID"}</span>
-              </button>
-            ))}
-            {candidates.length === 0 && <p className="px-3 py-6 text-sm text-gray-400">No questions detected in this file.</p>}
+            {candidates.map((candidate) => {
+              const cLinks = linksByCandidate.get(candidate.id) ?? [];
+              const resolved = optionsResolvedFor(candidate.type, candidate.optionsJson, cLinks);
+              const state = candidate.status === "REJECTED"
+                ? { dot: "bg-gray-300", label: "descartada" }
+                : !candidate.correctAnswer
+                ? { dot: "bg-amber-500", label: "sin respuesta" }
+                : !resolved
+                ? { dot: "bg-amber-500", label: "faltan opciones" }
+                : { dot: "bg-green-500", label: "listo" };
+              return (
+                <button
+                  key={candidate.id}
+                  type="button"
+                  onClick={() => selectCandidate(candidate)}
+                  className={`block w-full border-b border-gray-100 px-3 py-3 text-left text-sm ${candidate.id === selected?.id ? "bg-blue-50" : "hover:bg-gray-50"}`}
+                >
+                  <span className="flex items-center gap-2">
+                    <span className={`h-2 w-2 shrink-0 rounded-full ${state.dot}`} aria-hidden />
+                    <span className="font-medium">Q{candidate.questionNumber ?? "?"}</span>
+                    <span className="text-xs text-gray-400">{state.label}</span>
+                  </span>
+                  <span className="mt-1 block truncate text-xs text-gray-500">{candidate.questionExternalId ?? candidate.topicName ?? "sin ID"}</span>
+                </button>
+              );
+            })}
+            {candidates.length === 0 && <p className="px-3 py-6 text-sm text-gray-400">No hay preguntas detectadas en este archivo.</p>}
           </div>
         </Card>
       </aside>
 
       <main className="space-y-4">
-        <div className="flex flex-wrap gap-2">
-          {steps.map((item) => (
-            <Button key={item} type="button" variant={step === item ? "primary" : "secondary"} size="sm" onClick={() => updateSession(item)}>
-              {item}
-            </Button>
-          ))}
-        </div>
-
-        {incidents.length > 0 && (
-          <Card padding="md">
-            <p className="text-xs font-medium uppercase text-gray-500">Open checks</p>
-            <div className="mt-2 grid gap-2">
-              {incidents.slice(0, 5).map((incident) => (
-                <div key={incident.id} className="rounded-md border border-gray-200 bg-gray-50 px-3 py-2">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Badge variant={badgeVariant(incident.severity)}>{incident.severity}</Badge>
-                    <Badge variant={badgeVariant(incident.status)}>{incidentResolution(incident)}</Badge>
-                    <CopyableTruncatedText value={incident.code} className="max-w-64 text-xs font-medium text-gray-800" />
-                    <span className="text-xs text-gray-400">{incident.status}</span>
-                  </div>
-                  <p className="mt-1 line-clamp-2 text-sm text-gray-600">{incident.message}</p>
-                  {(incident.decision || incident.action) && (
-                    <p className="mt-1 line-clamp-2 text-xs text-gray-500">{incident.decision || incident.action}</p>
+        {selected && draft ? (
+          <>
+            {/* Sticky context + actions bar (shared across all sections). */}
+            <div className="sticky top-0 z-10 rounded-lg border border-gray-200 bg-white/95 px-4 py-3 shadow-sm backdrop-blur">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 className="text-base font-semibold text-gray-900">Q{draft.questionNumber ?? "—"}</h2>
+                  <span className="text-xs text-gray-500">{draft.questionExternalId ?? "sin ID"} · {Math.round(draft.confidence * 100)}%</span>
+                  <Badge variant={badgeVariant(draft.status)}>{draft.status}</Badge>
+                  <Badge variant={badgeVariant(draft.promotionStatus)}>{draft.promotionStatus}</Badge>
+                  {draft.section && <Badge>{draft.section}</Badge>}
+                  {draft.difficulty && <Badge>{draft.difficulty}</Badge>}
+                  {draft.topicName && (
+                    <span className="max-w-[180px] truncate text-xs text-gray-500" title={draft.topicName}>{draft.topicName}</span>
                   )}
-                </div>
-              ))}
-            </div>
-          </Card>
-        )}
-
-        {step === "PAGES" && (
-          <Card padding="none" className="overflow-hidden">
-            <div className="border-b border-gray-100 px-4 py-3 text-sm font-semibold text-gray-900">Pages and extracted text</div>
-            <div className="divide-y divide-gray-100">
-              {pages.map((page) => (
-                <div key={page.id} className="grid gap-3 px-4 py-4 lg:grid-cols-[140px_1fr]">
-                  <div className="text-sm text-gray-600">
-                    Page {page.pageNumber}
-                    <p className="text-xs text-gray-400">{page.method}</p>
-                  </div>
-                  <PageTextPreview page={page} />
-                </div>
-              ))}
-            </div>
-          </Card>
-        )}
-
-        {selected && draft && step !== "PAGES" && (
-          <section className="grid gap-4 lg:grid-cols-[1fr_340px]">
-            <Card padding="md">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-xs uppercase text-gray-400">Question candidate</p>
-                  <h2 className="mt-1 text-lg font-semibold text-gray-900">Question {draft.questionNumber ?? "without number"}</h2>
-                  <p className="mt-1 text-xs text-gray-500">
-                    {draft.questionExternalId ?? "No external ID"} · {Math.round(draft.confidence * 100)}% confidence
-                  </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   {candidates.length > 1 && (
-                    <Button type="button" variant="secondary" onClick={() => setMergeOpen(true)}>
-                      Fusionar con otra pregunta
-                    </Button>
+                    <Button type="button" variant="secondary" size="sm" onClick={() => setMergeOpen(true)}>Fusionar</Button>
                   )}
-                  <Button type="button" onClick={() => saveCandidate("REVIEWED")} disabled={saving}>
-                    Mark Reviewed
-                  </Button>
+                  {draft.officialQuestionId ? (
+                    <Link href={`/teacher/questions/${draft.officialQuestionId}/edit`} className="text-xs font-medium text-blue-700 hover:underline">
+                      Abrir oficial
+                    </Link>
+                  ) : (
+                    <Button type="button" variant="secondary" size="sm" onClick={() => openQuestionEditor(draft.id)}>Abrir en editor</Button>
+                  )}
+                  <Button type="button" variant="ghost" size="sm" onClick={() => saveCandidate("REJECTED")} disabled={saving}>Rechazar</Button>
+                  <Button type="button" variant="secondary" size="sm" onClick={() => saveCandidate()} disabled={saving}>Guardar</Button>
+                  <Button type="button" size="sm" onClick={() => saveCandidate("REVIEWED")} disabled={saving}>Marcar revisada</Button>
                 </div>
               </div>
-              <div className="mt-4 flex flex-wrap items-center gap-2 rounded-md border border-blue-100 bg-blue-50 px-3 py-2 text-sm">
-                <span className="text-blue-900">Promotion: {draft.promotionStatus}</span>
-                {draft.officialQuestionId ? (
-                  <Link href={`/teacher/questions/${draft.officialQuestionId}/edit`} className="font-medium text-blue-700 hover:underline">
-                    Open official question
-                  </Link>
-                ) : (
-                  <Button type="button" size="sm" onClick={() => openQuestionEditor(draft.id)}>
-                    Open in Question Editor
-                  </Button>
-                )}
-              </div>
+              {message && <p className="mt-2 text-xs text-gray-600">{message}</p>}
+            </div>
 
-              <div className="mt-5 grid gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant={badgeVariant(draft.status)}>{draft.status}</Badge>
-                  {draft.section && <Badge>{draft.section}</Badge>}
-                  {draft.difficulty && <Badge>{draft.difficulty}</Badge>}
-                  {draft.topicName && <CopyableTruncatedText value={draft.topicName} className="max-w-72 text-xs text-gray-600" />}
+            {incidents.length > 0 && (
+              <Section title="Verificaciones abiertas" subtitle={String(incidents.length)} defaultOpen={false}>
+                <div className="grid gap-2">
+                  {incidents.slice(0, 8).map((incident) => (
+                    <div key={incident.id} className="rounded-md border border-gray-200 bg-gray-50 px-3 py-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge variant={badgeVariant(incident.severity)}>{incident.severity}</Badge>
+                        <Badge variant={badgeVariant(incident.status)}>{incidentResolution(incident)}</Badge>
+                        <CopyableTruncatedText value={incident.code} className="max-w-64 text-xs font-medium text-gray-800" />
+                        <span className="text-xs text-gray-400">{incident.status}</span>
+                      </div>
+                      <p className="mt-1 line-clamp-2 text-sm text-gray-600">{incident.message}</p>
+                      {(incident.decision || incident.action) && (
+                        <p className="mt-1 line-clamp-2 text-xs text-gray-500">{incident.decision || incident.action}</p>
+                      )}
+                    </div>
+                  ))}
                 </div>
-                <FieldPreview label="Readable stem" value={stripMarkdownImageRefs(draft.stem)} />
-                <FieldPreview label="Readable stimulus" value={stripMarkdownImageRefs(draft.stimulus)} />
-                {parseOptions(draft.optionsJson).length > 0 && (
-                  <section className="rounded-md border border-gray-200 bg-white p-3">
-                    <p className="mb-2 text-xs font-medium uppercase text-gray-400">Readable options</p>
+              </Section>
+            )}
+
+            {/* SECTION: Pregunta — editor + vista renderizada en vivo. */}
+            <Section title="Pregunta" subtitle={isMc ? "opción múltiple" : "respuesta numérica"}>
+              <div className="grid gap-4 lg:grid-cols-2">
+                <div className="grid gap-3">
+                  <label className="grid gap-1">
+                    <span className="text-xs font-medium text-gray-500">Enunciado</span>
+                    <textarea value={stripMarkdownImageRefs(draft.stem)} onChange={(event) => setDraft({ ...draft, stem: event.target.value })} className="min-h-32 rounded-md border border-gray-300 px-3 py-2 text-sm" />
+                  </label>
+                  {(isMc || draft.stimulus) && (
+                    <label className="grid gap-1">
+                      <span className="text-xs font-medium text-gray-500">Estímulo</span>
+                      <textarea value={stripMarkdownImageRefs(draft.stimulus)} onChange={(event) => setDraft({ ...draft, stimulus: event.target.value })} className="min-h-20 rounded-md border border-gray-300 px-3 py-2 text-sm" />
+                    </label>
+                  )}
+                  {isMc && (
+                    <label className="grid gap-1">
+                      <span className="text-xs font-medium text-gray-500">Opciones (JSON)</span>
+                      <textarea value={draft.optionsJson ?? ""} onChange={(event) => setDraft({ ...draft, optionsJson: event.target.value })} className="min-h-28 rounded-md border border-gray-300 px-3 py-2 font-mono text-xs" />
+                    </label>
+                  )}
+                  <div className="grid gap-3 md:grid-cols-2">
+                    <label className="grid gap-1">
+                      <span className="text-xs font-medium text-gray-500">Dificultad</span>
+                      <Input value={draft.difficulty ?? ""} onChange={(event) => setDraft({ ...draft, difficulty: event.target.value })} />
+                    </label>
+                    <label className="grid gap-1">
+                      <span className="text-xs font-medium text-gray-500">Skill</span>
+                      <Input value={draft.topicName ?? ""} onChange={(event) => setDraft({ ...draft, topicName: event.target.value })} />
+                    </label>
+                  </div>
+                  {parseWarnings(draft.warningsJson).length > 0 && <p className="text-sm text-amber-700">{parseWarnings(draft.warningsJson).join(" ")}</p>}
+                </div>
+                <div className="grid content-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
+                  <p className="text-xs font-medium uppercase text-gray-400">Vista renderizada</p>
+                  {stripMarkdownImageRefs(draft.stem) ? (
+                    <MathContent content={stripMarkdownImageRefs(draft.stem)} className="text-sm leading-6 text-gray-800" />
+                  ) : (
+                    <p className="text-xs text-gray-400">Sin enunciado.</p>
+                  )}
+                  {stripMarkdownImageRefs(draft.stimulus) && (
+                    <MathContent content={stripMarkdownImageRefs(draft.stimulus)} className="text-sm leading-6 text-gray-700" />
+                  )}
+                  {isMc && parseOptions(draft.optionsJson).length > 0 && (
                     <div className="grid gap-2">
                       {parseOptions(draft.optionsJson).map((option: { label?: string; text?: string }) => (
-                        <div key={option.label ?? option.text} className="rounded-md border border-gray-200 px-3 py-2">
+                        <div key={option.label ?? option.text} className="rounded-md border border-gray-200 bg-white px-3 py-2">
                           <span className="mr-2 font-medium text-gray-900">{option.label}</span>
                           <MathContent content={option.text ?? ""} className="inline text-sm text-gray-800" />
                         </div>
                       ))}
                     </div>
-                  </section>
-                )}
-                <FieldPreview label="Readable explanation" value={stripMarkdownImageRefs(draft.explanation)} />
+                  )}
+                </div>
               </div>
+            </Section>
 
-              <div className="mt-5 grid gap-4">
-                <label className="grid gap-1">
-                  <span className="text-xs font-medium text-gray-500">Stem</span>
-                  <textarea value={stripMarkdownImageRefs(draft.stem)} onChange={(event) => setDraft({ ...draft, stem: event.target.value })} className="min-h-32 rounded-md border border-gray-300 px-3 py-2 text-sm" />
-                </label>
-                <label className="grid gap-1">
-                  <span className="text-xs font-medium text-gray-500">Stimulus</span>
-                  <textarea value={stripMarkdownImageRefs(draft.stimulus)} onChange={(event) => setDraft({ ...draft, stimulus: event.target.value })} className="min-h-20 rounded-md border border-gray-300 px-3 py-2 text-sm" />
-                </label>
-                <label className="grid gap-1">
-                  <span className="text-xs font-medium text-gray-500">Options JSON</span>
-                  <textarea value={draft.optionsJson ?? ""} onChange={(event) => setDraft({ ...draft, optionsJson: event.target.value })} className="min-h-28 rounded-md border border-gray-300 px-3 py-2 font-mono text-xs" />
-                </label>
-                <div className="grid gap-3 md:grid-cols-3">
+            {/* SECTION: Respuesta y explicación. */}
+            <Section title="Respuesta y explicación" subtitle={draft.correctAnswer ? undefined : "sin respuesta"}>
+              <div className="grid gap-4 lg:grid-cols-[1fr_260px]">
+                <div className="grid content-start gap-3">
                   <label className="grid gap-1">
-                    <span className="text-xs font-medium text-gray-500">Answer</span>
+                    <span className="text-xs font-medium text-gray-500">Respuesta correcta</span>
                     <Input value={draft.correctAnswer ?? ""} onChange={(event) => setDraft({ ...draft, correctAnswer: event.target.value })} />
                   </label>
                   <label className="grid gap-1">
-                    <span className="text-xs font-medium text-gray-500">Difficulty</span>
-                    <Input value={draft.difficulty ?? ""} onChange={(event) => setDraft({ ...draft, difficulty: event.target.value })} />
+                    <span className="text-xs font-medium text-gray-500">Explicación</span>
+                    <textarea value={stripMarkdownImageRefs(draft.explanation)} onChange={(event) => setDraft({ ...draft, explanation: event.target.value })} className="min-h-28 rounded-md border border-gray-300 px-3 py-2 text-sm" />
                   </label>
-                  <label className="grid gap-1">
-                    <span className="text-xs font-medium text-gray-500">Skill</span>
-                    <Input value={draft.topicName ?? ""} onChange={(event) => setDraft({ ...draft, topicName: event.target.value })} />
-                  </label>
+                  {stripMarkdownImageRefs(draft.explanation) && (
+                    <div className="rounded-md border border-gray-200 bg-gray-50 p-3">
+                      <p className="mb-1 text-xs font-medium uppercase text-gray-400">Vista renderizada</p>
+                      <MathContent content={stripMarkdownImageRefs(draft.explanation)} className="max-h-56 overflow-auto text-sm leading-6 text-gray-800" />
+                    </div>
+                  )}
                 </div>
-                <label className="grid gap-1">
-                  <span className="text-xs font-medium text-gray-500">Explanation</span>
-                  <textarea value={stripMarkdownImageRefs(draft.explanation)} onChange={(event) => setDraft({ ...draft, explanation: event.target.value })} className="min-h-24 rounded-md border border-gray-300 px-3 py-2 text-sm" />
-                </label>
-                {parseWarnings(draft.warningsJson).length > 0 && <p className="text-sm text-amber-700">{parseWarnings(draft.warningsJson).join(" ")}</p>}
-                <div className="flex gap-2">
-                  <Button type="button" onClick={() => saveCandidate()} disabled={saving}>
-                    Save
-                  </Button>
-                  <Button type="button" variant="secondary" onClick={() => saveCandidate("REJECTED")} disabled={saving}>
-                    Reject
-                  </Button>
+                <div>
+                  <p className="text-xs font-medium uppercase text-gray-500">Sugerencias de respuesta</p>
+                  <div className="mt-2 space-y-2">
+                    {answersForQuestion.map((answer) => (
+                      <button
+                        key={answer.id}
+                        type="button"
+                        onClick={() => setDraft({ ...draft, correctAnswer: answer.answer ?? draft.correctAnswer, explanation: answer.explanation ?? draft.explanation })}
+                        className="block w-full rounded-md border border-gray-200 px-3 py-2 text-left text-sm hover:bg-gray-50"
+                      >
+                        <span className="font-medium">{answer.answer ?? "Sin respuesta"}</span>
+                        <span className="ml-2 text-xs text-gray-400">{Math.round(answer.confidence * 100)}%</span>
+                      </button>
+                    ))}
+                    {answersForQuestion.length === 0 && <p className="text-sm text-gray-400">No hay sugerencias para esta pregunta.</p>}
+                  </div>
                 </div>
               </div>
-            </Card>
+            </Section>
 
-            <div className="space-y-4">
-              <Card padding="md">
-                <p className="text-xs font-medium uppercase text-gray-500">Answer candidates</p>
-                <div className="mt-2 space-y-2">
-                  {answersForQuestion.map((answer) => (
+            {/* SECTION: Imágenes — tablero A-D + grilla. */}
+            <Section title="Imágenes" subtitle={`${selectedLinks.length} enlazadas`}>
+              <p className="text-xs text-gray-500">
+                Elige una ranura y luego una imagen de abajo, o usa los botones de cada imagen. Cada ranura guarda una sola imagen.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {imageSlots.map((slot) => {
+                  const link = linkForSlot(slot.targetType, slot.optionLabel);
+                  const image = link ? images.find((item) => item.id === link.imageArtifactId) : undefined;
+                  const src = image ? imageSrc(image) : null;
+                  const isActive = activeSlot?.targetType === slot.targetType && (activeSlot?.optionLabel ?? null) === slot.optionLabel;
+                  return (
                     <button
-                      key={answer.id}
+                      key={`${slot.targetType}-${slot.optionLabel ?? ""}`}
                       type="button"
-                      onClick={() => setDraft({ ...draft, correctAnswer: answer.answer ?? draft.correctAnswer, explanation: answer.explanation ?? draft.explanation })}
-                      className="block w-full rounded-md border border-gray-200 px-3 py-2 text-left text-sm hover:bg-gray-50"
+                      onClick={() => setActiveSlot(isActive ? null : slot)}
+                      className={`flex w-28 flex-col items-center gap-1 rounded-md border p-2 text-center transition ${
+                        isActive ? "border-blue-500 ring-2 ring-blue-200" : link ? "border-blue-200 bg-blue-50" : "border-dashed border-gray-300"
+                      }`}
                     >
-                      <span className="font-medium">{answer.answer ?? "No answer"}</span>
-                      <span className="ml-2 text-xs text-gray-400">{Math.round(answer.confidence * 100)}%</span>
-                    </button>
-                  ))}
-                  {answersForQuestion.length === 0 && <p className="text-sm text-gray-400">No answer candidates for this question.</p>}
-                </div>
-              </Card>
-
-              <Card padding="md">
-                <p className="text-xs font-medium uppercase text-gray-500">Imágenes enlazadas</p>
-                <p className="mt-1 text-xs text-gray-400">Ve al paso IMAGES para asignar por ranura (Enunciado / A-D / Estímulo).</p>
-                {selectedLinks.length > 0 ? (
-                  <div className="mt-3 grid gap-2">
-                    {selectedLinks.map((link) => {
-                      const image = images.find((item) => item.id === link.imageArtifactId);
-                      const src = image ? imageSrc(image) : null;
-                      return (
-                        <div key={link.id} className="rounded-md border border-blue-100 bg-blue-50 p-2">
-                          <div className="mb-2 flex items-center justify-between gap-2">
-                            <Badge variant="info">{slotLabel(link.targetType, link.optionLabel)}</Badge>
-                            <span className="text-xs text-gray-500">p.{image?.pageNumber ?? "?"}</span>
-                            <Button type="button" variant="ghost" size="sm" onClick={() => unlinkImage(link.id)}>Quitar</Button>
-                          </div>
-                          <div className="h-28 overflow-hidden rounded bg-white">
-                            {src ? (
-                              // eslint-disable-next-line @next/next/no-img-element
-                              <img src={src} alt={slotLabel(link.targetType, link.optionLabel)} className="h-full w-full object-contain" />
-                            ) : (
-                              <div className="flex h-full items-center justify-center text-xs text-gray-400">Sin vista previa</div>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <p className="mt-3 text-sm text-gray-400">Aún no hay imágenes enlazadas.</p>
-                )}
-              </Card>
-            </div>
-          </section>
-        )}
-
-        {step === "IMAGES" && selected && (
-          <Card padding="md">
-            {/* Integrated assignment board: one slot per enunciado / opción / estímulo. */}
-            <p className="text-xs font-medium uppercase text-gray-500">Asignación de imágenes</p>
-            <p className="mt-1 text-xs text-gray-500">
-              Elige una ranura y luego una imagen de abajo, o usa los botones de cada imagen. Cada ranura guarda una sola
-              imagen.
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {imageSlots.map((slot) => {
-                const link = linkForSlot(slot.targetType, slot.optionLabel);
-                const image = link ? images.find((item) => item.id === link.imageArtifactId) : undefined;
-                const src = image ? imageSrc(image) : null;
-                const isActive = activeSlot?.targetType === slot.targetType && (activeSlot?.optionLabel ?? null) === slot.optionLabel;
-                return (
-                  <button
-                    key={`${slot.targetType}-${slot.optionLabel ?? ""}`}
-                    type="button"
-                    onClick={() => setActiveSlot(isActive ? null : slot)}
-                    className={`flex w-28 flex-col items-center gap-1 rounded-md border p-2 text-center transition ${
-                      isActive ? "border-blue-500 ring-2 ring-blue-200" : link ? "border-blue-200 bg-blue-50" : "border-dashed border-gray-300"
-                    }`}
-                  >
-                    <span className="text-xs font-semibold text-gray-800">{slot.label}</span>
-                    <div className="flex h-16 w-full items-center justify-center overflow-hidden rounded bg-white">
-                      {src ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={src} alt={slot.label} className="h-full w-full object-contain" />
-                      ) : (
-                        <span className="text-[10px] text-gray-400">sin imagen</span>
-                      )}
-                    </div>
-                    {link ? (
-                      <span
-                        role="button"
-                        tabIndex={0}
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          void clearSlot(slot.targetType, slot.optionLabel);
-                        }}
-                        onKeyDown={(event) => {
-                          if (event.key === "Enter" || event.key === " ") {
+                      <span className="text-xs font-semibold text-gray-800">{slot.label}</span>
+                      <div className="flex h-16 w-full items-center justify-center overflow-hidden rounded bg-white">
+                        {src ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={src} alt={slot.label} className="h-full w-full object-contain" />
+                        ) : (
+                          <span className="text-[10px] text-gray-400">sin imagen</span>
+                        )}
+                      </div>
+                      {link ? (
+                        <span
+                          role="button"
+                          tabIndex={0}
+                          onClick={(event) => {
                             event.stopPropagation();
                             void clearSlot(slot.targetType, slot.optionLabel);
-                          }
-                        }}
-                        className="text-[10px] text-red-600 hover:underline"
-                      >
-                        Quitar
-                      </span>
-                    ) : (
-                      <span className="text-[10px] text-gray-400">{isActive ? "elige imagen ↓" : "vacío"}</span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
-            {message && <p className="mt-3 text-xs text-gray-600">{message}</p>}
-
-            <PdfPageCropper
-              className="mt-4"
-              candidateId={selected.id}
-              sourceFileId={file.id}
-              pageNumbers={pages.map((page) => page.pageNumber)}
-              onAssigned={() => router.refresh()}
-              onOcrText={applyCropOcr}
-            />
-
-            <div className="mt-4 flex items-center justify-between">
-              <p className="text-xs font-medium uppercase text-gray-500">Imágenes extraídas ({images.length})</p>
-              {activeSlot && (
-                <span className="text-xs text-blue-700">
-                  Asignando a <strong>{activeSlot.label}</strong>
-                </span>
-              )}
-            </div>
-            <div className="mt-2 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-              {images.map((image) => {
-                const assignments = assignmentsByImage.get(image.id) ?? [];
-                return (
-                  <div key={image.id} className={`rounded-md border p-2 ${assignments.length ? "border-blue-300 bg-blue-50" : "border-gray-200"}`}>
-                    <div className="relative h-40 overflow-hidden rounded bg-gray-100">
-                      {imageSrc(image) ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={imageSrc(image) ?? ""} alt={`Imagen extraída página ${image.pageNumber}`} className="h-full w-full object-contain" />
+                          }}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter" || event.key === " ") {
+                              event.stopPropagation();
+                              void clearSlot(slot.targetType, slot.optionLabel);
+                            }
+                          }}
+                          className="text-[10px] text-red-600 hover:underline"
+                        >
+                          Quitar
+                        </span>
                       ) : (
-                        <div className="flex h-full items-center justify-center text-xs text-gray-400">Sin vista previa</div>
+                        <span className="text-[10px] text-gray-400">{isActive ? "elige imagen ↓" : "vacío"}</span>
                       )}
-                    </div>
-                    <div className="mt-2 flex items-center justify-between gap-2">
-                      <span className="text-xs text-gray-500">p.{image.pageNumber} · {image.origin}</span>
-                      {assignments.length > 0 && (
-                        <div className="flex flex-wrap justify-end gap-1">
-                          {assignments.map((label) => (
-                            <Badge key={label} variant="info">{label}</Badge>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    {activeSlot && (
-                      <Button type="button" size="sm" className="mt-2 w-full" onClick={() => assignToSlot(image.id, activeSlot.targetType, activeSlot.optionLabel)}>
-                        Asignar a {activeSlot.label}
-                      </Button>
-                    )}
-                    <div className="mt-2 flex flex-wrap gap-1">
-                      {imageSlots.map((slot) => {
-                        const occupies = linkForSlot(slot.targetType, slot.optionLabel)?.imageArtifactId === image.id;
-                        const chip = slot.targetType === "STEM" ? "Enun." : slot.targetType === "STIMULUS" ? "Est." : slot.optionLabel;
-                        return (
-                          <button
-                            key={`${image.id}-${slot.targetType}-${slot.optionLabel ?? ""}`}
-                            type="button"
-                            onClick={() => assignToSlot(image.id, slot.targetType, slot.optionLabel)}
-                            className={`rounded border px-2 py-0.5 text-xs ${occupies ? "border-blue-500 bg-blue-500 text-white" : "border-gray-300 text-gray-600 hover:bg-gray-50"}`}
-                          >
-                            {chip}
-                          </button>
-                        );
-                      })}
-                      <Button type="button" size="sm" variant="ghost" onClick={() => parseOptionImage(image.id)} disabled={parsingImageId === image.id}>
-                        {parsingImageId === image.id ? "OCR…" : "OCR A-D"}
-                      </Button>
-                    </div>
-                  </div>
-                );
-              })}
-              {images.length === 0 && <p className="text-sm text-gray-400">Aún no hay imágenes extraídas para este archivo.</p>}
-            </div>
-
-            {/* Advanced: less-common targets (answer field, explanation, options block, page context). */}
-            <details className="mt-4 rounded-md border border-gray-200 p-3">
-              <summary className="cursor-pointer text-xs font-medium text-gray-600">Destinos avanzados</summary>
-              <div className="mt-3 grid gap-3 md:grid-cols-[1fr_120px]">
-                <select value={targetType} onChange={(event) => setTargetType(event.target.value)} className="rounded-md border border-gray-300 px-3 py-2 text-sm">
-                  {targetTypes.filter((t) => !["STEM", "OPTION", "STIMULUS"].includes(t.value)).map((target) => (
-                    <option key={target.value} value={target.value}>{target.label}</option>
-                  ))}
-                </select>
-                <Input value={optionLabel} onChange={(event) => setOptionLabel(event.target.value.toUpperCase())} placeholder="Letra" disabled={targetType !== "OPTION"} />
+                    </button>
+                  );
+                })}
               </div>
-              <p className="mt-2 text-xs text-gray-500">Elige el destino y pulsa “Enlazar aquí” en una imagen. Usa “Bloque de opciones (OCR)” para extraer A-D como texto.</p>
-              <div className="mt-2 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
-                {images.map((image) => (
-                  <Button key={`adv-${image.id}`} type="button" size="sm" variant="secondary" onClick={() => linkImage(image.id)}>
-                    Enlazar p.{image.pageNumber} → {targetLabel(targetType)}
-                  </Button>
-                ))}
-              </div>
-            </details>
-          </Card>
-        )}
 
-        {step === "FINAL" && (
-          <Card padding="md">
-            <p className="text-sm text-gray-700">
-              Reviewed {candidates.filter((candidate) => candidate.status === "REVIEWED").length} of {candidates.length} questions.
-            </p>
-            <Button className="mt-3" type="button" onClick={() => updateSession("FINAL").then(() => fetch(`/api/admin/ai-import/batches/${batchId}/review-session`, {
-              method: "PATCH",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ sourceFileId: file.id, currentStep: "FINAL", status: "COMPLETED" }),
-            }).then(() => router.refresh()))}>
-              Complete File Review
-            </Button>
-          </Card>
-        )}
-
-        {step === "QUESTIONS" && selected && (
-          <Card padding="md">
-            <p className="text-xs font-medium uppercase text-gray-500">Rendered options quick view</p>
-            <div className="mt-2 grid gap-2">
-              {parseOptions(selected.optionsJson).map((option: { label?: string; text?: string }) => (
-                <div key={option.label ?? option.text} className="rounded-md border border-gray-200 px-3 py-2 text-sm">
-                  <span className="mr-2 font-medium">{option.label}</span>
-                  <MathContent content={option.text ?? ""} className="inline text-sm text-gray-800" />
+              {otherLinks.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {otherLinks.map((link) => {
+                    const image = images.find((item) => item.id === link.imageArtifactId);
+                    return (
+                      <span key={link.id} className="inline-flex items-center gap-2 rounded-md border border-gray-200 bg-gray-50 px-2 py-1 text-xs text-gray-600">
+                        {slotLabel(link.targetType, link.optionLabel)} · p.{image?.pageNumber ?? "?"}
+                        <button type="button" onClick={() => unlinkImage(link.id)} className="text-red-600 hover:underline">Quitar</button>
+                      </span>
+                    );
+                  })}
                 </div>
-              ))}
-              {parseOptions(selected.optionsJson).length === 0 && <p className="text-sm text-gray-400">No options detected for this candidate.</p>}
-            </div>
+              )}
+
+              <PdfPageCropper
+                className="mt-4"
+                candidateId={selected.id}
+                sourceFileId={file.id}
+                pageNumbers={pages.map((page) => page.pageNumber)}
+                onAssigned={() => router.refresh()}
+                onOcrText={applyCropOcr}
+              />
+
+              <div className="mt-4 flex items-center justify-between">
+                <p className="text-xs font-medium uppercase text-gray-500">Imágenes extraídas ({images.length})</p>
+                {activeSlot && (
+                  <span className="text-xs text-blue-700">
+                    Asignando a <strong>{activeSlot.label}</strong>
+                  </span>
+                )}
+              </div>
+              <div className="mt-2 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                {images.map((image) => {
+                  const assignments = assignmentsByImage.get(image.id) ?? [];
+                  return (
+                    <div key={image.id} className={`rounded-md border p-2 ${assignments.length ? "border-blue-300 bg-blue-50" : "border-gray-200"}`}>
+                      <div className="relative h-40 overflow-hidden rounded bg-gray-100">
+                        {imageSrc(image) ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={imageSrc(image) ?? ""} alt={`Imagen extraída página ${image.pageNumber}`} className="h-full w-full object-contain" />
+                        ) : (
+                          <div className="flex h-full items-center justify-center text-xs text-gray-400">Sin vista previa</div>
+                        )}
+                      </div>
+                      <div className="mt-2 flex items-center justify-between gap-2">
+                        <span className="text-xs text-gray-500">p.{image.pageNumber} · {image.origin}</span>
+                        {assignments.length > 0 && (
+                          <div className="flex flex-wrap justify-end gap-1">
+                            {assignments.map((label) => (
+                              <Badge key={label} variant="info">{label}</Badge>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      {activeSlot && (
+                        <Button type="button" size="sm" className="mt-2 w-full" onClick={() => assignToSlot(image.id, activeSlot.targetType, activeSlot.optionLabel)}>
+                          Asignar a {activeSlot.label}
+                        </Button>
+                      )}
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {imageSlots.map((slot) => {
+                          const occupies = linkForSlot(slot.targetType, slot.optionLabel)?.imageArtifactId === image.id;
+                          const chip = slot.targetType === "STEM" ? "Enun." : slot.targetType === "STIMULUS" ? "Est." : slot.optionLabel;
+                          return (
+                            <button
+                              key={`${image.id}-${slot.targetType}-${slot.optionLabel ?? ""}`}
+                              type="button"
+                              onClick={() => assignToSlot(image.id, slot.targetType, slot.optionLabel)}
+                              className={`rounded border px-2 py-0.5 text-xs ${occupies ? "border-blue-500 bg-blue-500 text-white" : "border-gray-300 text-gray-600 hover:bg-gray-50"}`}
+                            >
+                              {chip}
+                            </button>
+                          );
+                        })}
+                        <Button type="button" size="sm" variant="ghost" onClick={() => parseOptionImage(image.id)} disabled={parsingImageId === image.id}>
+                          {parsingImageId === image.id ? "OCR…" : "OCR A-D"}
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+                {images.length === 0 && <p className="text-sm text-gray-400">Aún no hay imágenes extraídas para este archivo.</p>}
+              </div>
+
+              <details className="mt-4 rounded-md border border-gray-200 p-3">
+                <summary className="cursor-pointer text-xs font-medium text-gray-600">Destinos avanzados</summary>
+                <div className="mt-3 grid gap-3 md:grid-cols-[1fr_120px]">
+                  <select value={targetType} onChange={(event) => setTargetType(event.target.value)} className="rounded-md border border-gray-300 px-3 py-2 text-sm">
+                    {targetTypes.filter((t) => !["STEM", "OPTION", "STIMULUS"].includes(t.value)).map((target) => (
+                      <option key={target.value} value={target.value}>{target.label}</option>
+                    ))}
+                  </select>
+                  <Input value={optionLabel} onChange={(event) => setOptionLabel(event.target.value.toUpperCase())} placeholder="Letra" disabled={targetType !== "OPTION"} />
+                </div>
+                <p className="mt-2 text-xs text-gray-500">Elige el destino y pulsa “Enlazar” en una imagen. Usa “Bloque de opciones (OCR)” para extraer A-D como texto.</p>
+                <div className="mt-2 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+                  {images.map((image) => (
+                    <Button key={`adv-${image.id}`} type="button" size="sm" variant="secondary" onClick={() => linkImage(image.id)}>
+                      Enlazar p.{image.pageNumber} → {targetLabel(targetType)}
+                    </Button>
+                  ))}
+                </div>
+              </details>
+            </Section>
+
+            {/* SECTION: Finalizar — checklist + completar. */}
+            <Section title="Finalizar" defaultOpen={false}>
+              <ul className="grid gap-1 text-sm">
+                <li className={draft.correctAnswer ? "text-green-700" : "text-amber-700"}>
+                  {draft.correctAnswer ? "✓" : "✗"} Respuesta asignada
+                </li>
+                <li className={optsResolved ? "text-green-700" : "text-amber-700"}>
+                  {optsResolved ? "✓" : "✗"} {isMc ? "Opciones resueltas (texto o imagen A-D)" : "Respuesta numérica (N/A opciones)"}
+                </li>
+                <li className={draft.status === "REVIEWED" ? "text-green-700" : "text-gray-500"}>
+                  {draft.status === "REVIEWED" ? "✓" : "•"} Marcada como revisada
+                </li>
+              </ul>
+              <p className="mt-3 text-sm text-gray-700">
+                Revisadas {candidates.filter((candidate) => candidate.status === "REVIEWED").length} de {candidates.length} · Estado del archivo: {reviewSession.status}
+              </p>
+              <Button className="mt-3" type="button" onClick={() => void completeReview()}>
+                Completar revisión del archivo
+              </Button>
+            </Section>
+          </>
+        ) : (
+          <Card padding="md">
+            <p className="text-sm text-gray-400">Selecciona una pregunta en la lista de la izquierda.</p>
           </Card>
         )}
+
+        {/* SECTION: Páginas del archivo (contexto). */}
+        <Section title="Páginas y texto extraído" subtitle={`${pages.length} páginas`} defaultOpen={false}>
+          <div className="divide-y divide-gray-100">
+            {pages.map((page) => (
+              <div key={page.id} className="grid gap-3 py-4 lg:grid-cols-[140px_1fr]">
+                <div className="text-sm text-gray-600">
+                  Página {page.pageNumber}
+                  <p className="text-xs text-gray-400">{page.method}</p>
+                </div>
+                <PageTextPreview page={page} />
+              </div>
+            ))}
+            {pages.length === 0 && <p className="py-4 text-sm text-gray-400">No hay páginas registradas.</p>}
+          </div>
+        </Section>
       </main>
 
       {mergeOpen && selected && (
