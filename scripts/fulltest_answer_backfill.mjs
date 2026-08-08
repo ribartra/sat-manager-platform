@@ -130,11 +130,17 @@ while (i > 0 && j > 0) {
 
 // --- 3) proponer respuesta por candidato: por SU módulo real (índice) + questionNumber ---
 function letterOrNum(v) { return /^[A-D]$/i.test(v) ? v.toUpperCase() : v; }
+// colisiones (módulo, nº): dos candidatos con la misma clave = numeración duplicada
+// (p.ej. dos preguntas reales OCR-numeradas igual). No se puede saber a cuál pertenece
+// la respuesta -> se omiten ambos.
+const keyCount = {};
+for (const c of cands) { const k = modIdx(c.mod) + "|" + c.qn; keyCount[k] = (keyCount[k] || 0) + 1; }
 const proposals = cands.map(c => {
   const mi = modIdx(c.mod);
-  const val = mi != null && answerByIdx[mi] ? answerByIdx[mi][c.qn] : null;
+  const collision = keyCount[mi + "|" + c.qn] > 1;
+  const val = !collision && mi != null && answerByIdx[mi] ? answerByIdx[mi][c.qn] : null;
   const desc = A.find(d => modIdx(d.mod) === mi && d.qn === c.qn);
-  return { c, mi, val: val ? letterOrNum(val) : null, desc, ambiguous: mi == null };
+  return { c, mi, val: val ? letterOrNum(val) : null, desc, ambiguous: mi == null || collision };
 });
 
 console.log("\nq# | mod | tipo | resp | descripción DOCX :: enunciado candidato");
