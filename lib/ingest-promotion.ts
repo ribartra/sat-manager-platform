@@ -116,6 +116,18 @@ export function normalizeIngestDifficulty(value: string | null | undefined) {
 }
 
 export function resolveTopicFromCandidate(candidate: CandidateForDraft, topics: TopicWithRelations[]) {
+  // Full Practice Tests carry no per-question skill — the only classification is
+  // (test number, Math/R&W). Route their questions to the section's Full Practice
+  // Test placeholder topic so they can be promoted without a real skill node.
+  if (normalize(candidate.domainName) === "full practice test") {
+    const wantsMath = normalize(candidate.section).includes("math");
+    const placeholder = topics.find((item) => {
+      if (normalize(item.domain.name) !== "full practice test") return false;
+      return normalize(item.domain.section.name).includes("math") === wantsMath;
+    });
+    if (placeholder) return { topicId: placeholder.id, subskillId: "" };
+  }
+
   const topicTerm = normalize(candidate.topicName);
   const domainTerm = normalize(candidate.domainName);
   const sectionTerm = normalize(candidate.section);
