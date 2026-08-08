@@ -87,46 +87,66 @@ function scoreOverlap(stemSig, block) {
   return s;
 }
 
-// --- candidatos objetivo: del PDF, NEEDS_REVIEW, sin respuesta ---
-const cands = db.prepare(`
-  SELECT c.id, c.questionNumber qn, c.moduleLabel mod, c.type, c.stem, c.optionsJson,
-         (SELECT count(*) FROM IngestImageArtifact i WHERE i.sourceFileId=c.sourceFileId) hasImgs
+// TODOS los candidatos del PDF (para anclar la alineación con la secuencia completa,
+// aunque ya tengan respuesta) y el subconjunto objetivo (sin respuesta, a escribir).
+const allCands = db.prepare(`
+  SELECT c.id, c.questionNumber qn, c.moduleLabel mod, c.type, c.stem, c.correctAnswer ans
   FROM IngestQuestionCandidate c
-  WHERE c.sourceFileId=? AND c.status='NEEDS_REVIEW' AND (c.correctAnswer IS NULL OR c.correctAnswer='')
-  ORDER BY c.questionNumber`).all(PDF_SRC);
-console.log(`candidatos sin respuesta: ${cands.length}\n`);
+  WHERE c.sourceFileId=? ORDER BY c.questionNumber`).all(PDF_SRC);
+const cands = allCands.filter(c => c.ans == null || c.ans === "");
+console.log(`candidatos: ${allCands.length} totales, ${cands.length} sin respuesta\n`);
 
-// --- 2) alineación MONÓTONA descripciones(A) ↔ bloques de respuesta(B) ---
-// Ambas listas están en el MISMO orden; algunos bloques pueden faltar. DP tipo
-// Needleman-Wunsch que empareja cada bloque con una descripción respetando el orden
-// y permitiendo saltar descripciones (huecos). Score = solape de firma desc↔explicación.
-const A = descs;                     // 44 descripciones numeradas
-const B = blocks;                    // 40 bloques de respuesta
-const descSig = A.map(d => signature(d.text));
-const GAP = 0;                       // saltar una descripción no cuesta (hay huecos reales)
+// módulo → índice 0/1 (robusto a "1" vs "2"/"2A"/"2B"): 1.º módulo=0, resto=1
+function modIdx(label) { if (label == null || label === "") return null; return /^\s*1\b/.test(String(label)) ? 0 : 1; }
+
+// --- 2) elegir ANCLA de alineación ---
+// Preferimos las descripciones numeradas del DOCX. Pero algunos DOCX (p.ej. T8 Math)
+// INTERPOLAN descripciones y respuestas, así que la sección de descripciones queda
+// truncada (< candidatos). En ese caso anclamos en los ENUNCIADOS de los candidatos
+// (mismo orden por módulo+nº, con ecuaciones que reaparecen en las explicaciones).
+const candsByMod = { 0: allCands.filter(c => modIdx(c.mod) === 0).length, 1: allCands.filter(c => modIdx(c.mod) === 1).length };
+const descsEnough = descs.length >= allCands.length * 0.7 && descs.filter(d => modIdx(d.mod) === 1).length > 0 === candsByMod[1] > 0;
+let A;
+if (descsEnough) {
+  A = descs;                          // ancla = descripciones numeradas del DOCX
+  console.log(`ancla: descripciones DOCX (${descs.length})`);
+} else {
+  // ancla = TODOS los candidatos (ordenados por módulo, nº); texto = enunciado.
+  // Incluir los ya-respondidos preserva la secuencia completa para alinear vs los bloques.
+  A = [...allCands]
+    .filter(c => modIdx(c.mod) != null)
+    .sort((a, b) => (modIdx(a.mod) - modIdx(b.mod)) || (a.qn - b.qn))
+    .map(c => ({ mod: c.mod, qn: c.qn, text: c.stem || "" }));
+  console.log(`ancla: enunciados de TODOS los candidatos (${A.length}) — descripciones DOCX insuficientes (${descs.length})`);
+}
+
+// --- alineación MONÓTONA ancla(A) ↔ bloques de respuesta(B) (Needleman-Wunsch) ---
+const B = blocks;
+const aSig = A.map(d => signature(d.text));
+const GAP = 0;                       // saltar un ancla no cuesta (hay huecos reales)
 const NEG = -1;                      // emparejar sin ningún solape penaliza levemente
 const dp = Array.from({ length: A.length + 1 }, () => new Float64Array(B.length + 1));
 const bt = Array.from({ length: A.length + 1 }, () => new Int8Array(B.length + 1));
-for (let i = 1; i <= A.length; i++) dp[i][0] = dp[i - 1][0] + GAP;             // saltar desc
-for (let j = 1; j <= B.length; j++) dp[0][j] = -1e9;                          // todo bloque debe emparejarse
-for (let i = 1; i <= A.length; i++) {
-  for (let j = 1; j <= B.length; j++) {
-    const sc = scoreOverlap(descSig[i - 1], B[j - 1]) || NEG;
-    const match = dp[i - 1][j - 1] + sc;   // empareja A[i-1] con B[j-1]
-    const skipA = dp[i - 1][j] + GAP;      // A[i-1] no tiene bloque (hueco)
-    if (match >= skipA) { dp[i][j] = match; bt[i][j] = 1; }
-    else { dp[i][j] = skipA; bt[i][j] = 2; }
+for (let ii = 1; ii <= A.length; ii++) dp[ii][0] = dp[ii - 1][0] + GAP;
+for (let jj = 1; jj <= B.length; jj++) dp[0][jj] = -1e9;
+for (let ii = 1; ii <= A.length; ii++) {
+  for (let jj = 1; jj <= B.length; jj++) {
+    const sc = scoreOverlap(aSig[ii - 1], B[jj - 1]) || NEG;
+    const match = dp[ii - 1][jj - 1] + sc;
+    const skipA = dp[ii - 1][jj] + GAP;
+    if (match >= skipA) { dp[ii][jj] = match; bt[ii][jj] = 1; }
+    else { dp[ii][jj] = skipA; bt[ii][jj] = 2; }
   }
 }
-// módulo → índice 0/1 (robusto a "1" vs "2"/"2A"/"2B"): 1.º módulo=0, resto=1
-function modIdx(label) { if (label == null || label === "") return null; return /^\s*1\b/.test(String(label)) ? 0 : 1; }
-// backtrack -> answerByIdx[modIdx][qn] = value
-const answerByIdx = { 0: {}, 1: {} };
+// backtrack -> alignedByIdx[modIdx][qn] = {value, expl} (expl para validar)
+const alignedByIdx = { 0: {}, 1: {} };
 let i = A.length, j = B.length;
 while (i > 0 && j > 0) {
-  if (bt[i][j] === 1) { const d = A[i - 1]; const mi = modIdx(d.mod); if (mi != null) answerByIdx[mi][d.qn] = B[j - 1].value; i--; j--; }
+  if (bt[i][j] === 1) { const d = A[i - 1]; const mi = modIdx(d.mod); if (mi != null && alignedByIdx[mi][d.qn] === undefined) alignedByIdx[mi][d.qn] = { value: B[j - 1].value, expl: B[j - 1].expl }; i--; j--; }
   else i--;
 }
+const answerByIdx = { 0: {}, 1: {} };
+for (const mi of [0, 1]) for (const qn of Object.keys(alignedByIdx[mi])) answerByIdx[mi][qn] = alignedByIdx[mi][qn].value;
 
 // --- 3) proponer respuesta por candidato: por SU módulo real (índice) + questionNumber ---
 function letterOrNum(v) { return /^[A-D]$/i.test(v) ? v.toUpperCase() : v; }
@@ -135,20 +155,26 @@ function letterOrNum(v) { return /^[A-D]$/i.test(v) ? v.toUpperCase() : v; }
 // la respuesta -> se omiten ambos.
 const keyCount = {};
 for (const c of cands) { const k = modIdx(c.mod) + "|" + c.qn; keyCount[k] = (keyCount[k] || 0) + 1; }
+// gate de confianza por fila: la explicación emparejada debe solapar con el enunciado
+// de ESTA pregunta (números/ecuaciones). Los misalineados (bloque de otra pregunta)
+// puntúan bajo -> se descartan. Umbral configurable con --self (default 3).
+const MIN_SELF = Number(argval("--self") || 3);
 const proposals = cands.map(c => {
   const mi = modIdx(c.mod);
   const collision = keyCount[mi + "|" + c.qn] > 1;
-  const val = !collision && mi != null && answerByIdx[mi] ? answerByIdx[mi][c.qn] : null;
-  const desc = A.find(d => modIdx(d.mod) === mi && d.qn === c.qn);
-  return { c, mi, val: val ? letterOrNum(val) : null, desc, ambiguous: mi == null || collision };
+  const aligned = !collision && mi != null && alignedByIdx[mi] ? alignedByIdx[mi][c.qn] : null;
+  const self = aligned ? scoreOverlap(signature(c.stem || ""), { expl: aligned.expl }) : 0;
+  const confident = aligned && self >= MIN_SELF;
+  return { c, mi, val: confident ? letterOrNum(aligned.value) : null, rawVal: aligned ? aligned.value : null, expl: aligned ? aligned.expl : null, self, confident, ambiguous: mi == null || collision };
 });
 
-console.log("\nq# | mod | tipo | resp | descripción DOCX :: enunciado candidato");
-console.log("-".repeat(118));
+console.log("\nq# | mod | tipo | resp | slf | enunciado candidato :: explicación emparejada (validar)");
+console.log("-".repeat(122));
 for (const p of proposals) {
   const stem = (p.c.stem || "").replace(/\s+/g, " ").slice(0, 38);
-  const dtext = p.desc ? p.desc.text.slice(0, 42) : (p.ambiguous ? "(módulo nulo: no seguro)" : "(sin descripción)");
-  console.log(`${String(p.c.qn).padStart(2)} | ${String(p.c.mod||"-").padEnd(3)} | ${p.c.type.padEnd(7)} | ${(p.val || "??").padEnd(5)} | ${dtext} :: ${stem}`);
+  const expl = p.expl ? p.expl.replace(/\s+/g, " ").slice(0, 44) : (p.ambiguous ? "(ambiguo)" : "(sin emparejar)");
+  const flag = p.val ? "" : (p.rawVal ? ` [descartado ${p.rawVal}: baja conf]` : "");
+  console.log(`${String(p.c.qn).padStart(2)} | ${String(p.c.mod||"-").padEnd(3)} | ${p.c.type.padEnd(7)} | ${(p.val || "??").padEnd(5)} | ${String(p.self).padStart(3)} | ${stem} :: ${expl}${flag}`);
 }
 const good = proposals.filter(p => p.val);
 const bad = proposals.filter(p => !p.val);
