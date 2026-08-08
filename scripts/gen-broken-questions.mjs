@@ -26,8 +26,11 @@ function analyze(id) {
   if (!q.difficulty) { issues.push('sin dificultad'); blocking = true; }
   if (q.type === 'MC') {
     const hasImg = !!q.imageUrl || q.nImg > 0;
+    const hasButtons = q.nOpts >= 4; // 4 botones A–D clickeables presentes
     if (q.nOpts === 0 && !hasImg) { issues.push('MC sin opciones ni imagen (opciones no recuperadas del OCR)'); blocking = true; }
-    else if (q.nText < 4 && hasImg) { issues.push(`opciones dentro de la imagen — faltan botones A–D / transcribir (${q.nText}/4 texto)`); blocking = true; }
+    // image-backed contestable: la imagen del stem muestra las opciones y hay 4 botones A–D
+    else if (hasImg && hasButtons) { if (q.nText < 4) issues.push(`_opciones en imagen (${q.nText}/4 con texto); contestable vía imagen + botones A–D_`); }
+    else if (hasImg && !hasButtons) { issues.push(`opciones en imagen pero faltan botones A–D (${q.nOpts} de 4)`); blocking = true; }
     else if (q.nText < 4) { issues.push(`opciones de texto incompletas (${q.nText}/4)`); blocking = true; }
     if ((q.correctAnswer || '').trim() && !AD.has((q.correctAnswer || '').trim())) { issues.push(`respuesta MC no es A–D ("${q.correctAnswer}")`); blocking = true; }
   }

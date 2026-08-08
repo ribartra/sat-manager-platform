@@ -11,7 +11,7 @@ import { formatTime } from "@/lib/utils";
 import type { CalculatorConfig } from "@/lib/calculator-config";
 import type { GraphArtifact } from "@/lib/question-graph";
 
-interface ModuleQuestion { id: string; stem: string; stimulus: string | null; type: string; options: { label: string; text: string; imageUrl?: string | null }[]; graphArtifacts: GraphArtifact[] }
+interface ModuleQuestion { id: string; stem: string; stimulus: string | null; type: string; imageUrl?: string | null; options: { label: string; text: string; imageUrl?: string | null }[]; graphArtifacts: GraphArtifact[] }
 interface TestModule { id: string; name: string; section: string; timeLimit: number; questions: ModuleQuestion[] }
 
 export function FullTestPlayer({
@@ -161,6 +161,7 @@ export function FullTestPlayer({
         <div className="overflow-y-auto p-6">
           <MathToolPanel config={calculatorConfig} context="full-test" graphArtifacts={question.graphArtifacts} enabled={currentModule.section === "MATH"} />
           <MathContent content={question.stem} className="mb-5 text-sm text-gray-900" />
+          <QuestionMedia imageUrl={question.imageUrl} alt={`Question ${question.id} image`} className="mb-5" />
           {question.type === "MC" ? question.options.map((option) => (
             <button key={option.label} onClick={() => { const nextAnswers = { ...answers, [question.id]: option.label }; setAnswers(nextAnswers); void saveProgress(nextAnswers); }} className={`mb-2 block w-full rounded border px-4 py-3 text-left text-sm ${answers[question.id] === option.label ? "border-blue-500 bg-blue-50" : "border-gray-200"}`}>
               <strong>{option.label})</strong> <MathContent content={option.text} />

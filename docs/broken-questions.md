@@ -4,9 +4,9 @@
 
 ## Resumen
 
-- **Practice Sets:** 91 total · 35 sin problemas (PUBLISHED) · 56 con problemas · **346** preguntas con problemas.
-- **Full Practice Tests:** 10 total (todos DRAFT) · **493** preguntas con problemas.
-- **Total preguntas con problemas: 839**.
+- **Practice Sets:** 91 total · 35 sin problemas (PUBLISHED) · 56 con problemas · **342** preguntas con problemas.
+- **Full Practice Tests:** 10 total (todos DRAFT) · **257** preguntas con problemas.
+- **Total preguntas con problemas: 599**.
 
 ## Qué significa cada "falta"
 
@@ -22,165 +22,77 @@
 ## Full Practice Tests
 
 ### Imported Test 1
-*DRAFT* · 98 preguntas · **76 con problemas**
+*DRAFT* · 98 preguntas · **26 con problemas**
 
-**Reading & Writing Module 1** — 27 preguntas, 27 con problemas:
+**Reading & Writing Module 1** — 27 preguntas, 4 con problemas:
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
-| 1 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | As used in the text, what does the word "recognize" most nearly mean? |
-| 2 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which choice completes the text with the most logical and precise word? [energy  |
-| 3 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which choice completes the text with the most logical and precise word? [Ronald  |
 | 4 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which choice completes the text with the most logical and precise word or phrase |
-| 5 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which choice best states the main purpose of the text? [Dickens / Gradgrind] |
-| 6 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which choice best describes the primary purpose of the text? [Henry James / A Li |
 | 7 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which choice best states the main idea of the text? [Stevenson / Villon and Taba |
-| 8 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which choice best states the main idea of the text? [Bret Harte / tourist in Ger |
-| 9 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which choice most effectively uses a quotation from Hamlet to illustrate this cl |
-| 10 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which choice best describes data from the graph to complete the statement? [tick |
-| 11 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which statement, if true, would most directly support the scientist's claim? [Dr |
-| 12 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which choice most logically completes the text? [game developers / self-publishi |
 | 13 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which choice most logically completes the text? [Stephen Hawking / Einstein / qu |
-| 14 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which choice completes the text so that it conforms to the conventions of Standa |
-| 15 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which choice completes the text so that it conforms to the conventions of Standa |
-| 16 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which choice completes the sentence so that it conforms to the conventions of St |
-| 17 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which choice completes the text so that it conforms to the conventions of Standa |
-| 18 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which choice completes the text so that it conforms to the conventions of Standa |
 | 19 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which choice completes the text so that it conforms to the conventions of Standa |
-| 20 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which choice completes the sentence so that it conforms to the conventions of St |
-| 21 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which choice completes the text with the most logical transition? [St. Louis Gen |
-| 22 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which choice completes the text with the most logical transition? [mosquitoes /  |
-| 23 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which choice completes the text with the most logical transition? [higher educat |
-| 24 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which choice completes the text with the most logical transition? [judo / France |
-| 25 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | The student wants to describe a link between the Red Sea tonguesole and some oth |
-| 26 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | The student wants to provide a brief description of the age of the KMTR station. |
-| 27 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | The student wants to convey the effectiveness of the polio vaccine in the US by  |
 
-**Reading & Writing Module 2** — 27 preguntas, 27 con problemas:
+**Reading & Writing Module 2** — 27 preguntas, 11 con problemas:
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
-| 1 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which choice completes the text with the most logical and precise word or phrase |
-| 2 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which choice completes the text with the most logical and precise word or phrase |
-| 3 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which choice completes the text with the most logical and precise word or phrase |
-| 4 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which choice completes the text with the most logical and precise word or phrase |
-| 5 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which choice completes the text with the most logical and precise word or phrase |
 | 6 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which choice completes the text with the most logical and precise word or phrase |
-| 7 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which choice best describes the function of the third sentence in the text as a  |
-| 8 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which choice best describes the overall structure of the text? [Thomas Hardy / A |
 | 9 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Based on the texts, how would the author of Text 2 most likely respond to the di |
-| 10 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which choice best states the main idea of the text? [Rob Roy / Frank Osbaldiston |
-| 11 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | According to the text, what is true about Farfrae? [Thomas Hardy / Mayor of Cast |
-| 12 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which choice most effectively uses data from the graph to complete the text? [CD |
-| 13 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which quotation from 'This Lime-Tree Bower My Prison' most effectively illustrat |
-| 14 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which quotation from "Ashes of Life" most effectively illustrates the claim? [Mi |
 | 15 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which choice most logically completes the text? [lower back pain / objectives ad |
 | 16 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which choice most logically completes the text? [Descartes / rationalists / empi |
-| 17 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which choice completes the text so that it conforms to the conventions of Standa |
-| 18 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which choice completes the text so that it conforms to the conventions of Standa |
 | 19 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which choice completes the text so that it conforms to the conventions of Standa |
 | 20 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which choice completes the text so that it conforms to the conventions of Standa |
 | 21 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which choice completes the text so that it conforms to the conventions of Standa |
-| 22 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which choice completes the text so that it conforms to the conventions of Standa |
 | 23 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which choice completes the text so that it conforms to the conventions of Standa |
 | 24 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which choice completes the text with the most logical transition? [public transi |
 | 25 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which choice completes the text with the most logical transition? [St. Joseph At |
 | 26 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | The student wants to convey a specific consequence of suffering damage to the PC |
-| 27 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | The student wants to refer to Route 330 as a local resident would and mention wh |
 
-**Math Module 1** — 22 preguntas, 12 con problemas:
+**Math Module 1** — 22 preguntas, 6 con problemas:
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
-| 2 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 2. A lemonade stand sells small and large cups. Small cups are sold for $2.25, a |
-| 3 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 3. In triangle $BMD$, the measure of angle $M$ is $38^\circ$ and the measure of  |
-| 4 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 4. Of the 52,000 seats in a baseball stadium, 44,200 are in foul territory. Out  |
 | 5 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 5. $$\begin{aligned} 0.1a - 0.1b &= 1.2 \\ \frac{1}{5}a - \frac{1}{2}b &= \frac{ |
 | 6 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 6. Ryan started a tutoring company. The total amount paid by a client monthly, i |
-| 10 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 10. $$\frac{\sqrt{x^2-9}}{a} = 1$$ In the given equation, $x < 0$ and $a = 4$. W |
 | 12 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 12. In May 2022, 1,200 people were randomly polled in a district with an expecte |
 | 13 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 13. $$4x^4 + 20x^2y + 25y^2$$ Which of the following is equivalent to the given  |
 | 15 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 15. Iodine-131 is a radioisotope used in medicine. It has a half-life of about 8 |
-| 17 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 17. $2(12x - 5) = 3(mx - 4)$ In the given equation, $m$ is a constant. If the eq |
 | 19 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 19. Jupiter travels a distance of approximately 4.9 billion (or 10⁹) kilometers  |
-| 20 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 20. If (5ᵇ)³ᵃ = 25, what is the value of 36ab? |
 
-**Math Module 2** — 22 preguntas, 10 con problemas:
+**Math Module 2** — 22 preguntas, 5 con problemas:
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
 | 4 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 4. Which of the following is equivalent to $x^{0.6} \cdot x^{\frac{1}{20}}$ for  |
-| 5 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 5. $3.5a - 4.25b = -14.25$ $4.25a - 3.5b = -9$ The solution to the given system  |
 | 7 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 7. The table shows the distribution of coffee preferences among the 27 members o |
-| 9 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 9. The height of a cone is three times its diameter. The base of the cone is a c |
 | 10 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 10. A formula used for compound interest is $A = P(1 + \frac{r}{n})^{nt}$. Which |
-| 11 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 11. A parking garage charges $11 on weekdays and $15 on weekends. If the garage  |
-| 14 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 14. The graph of line $$q$$ is perpendicular to the line $$2x - 4y = 11$$ and co |
 | 18 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 18. The equation $ax + b = cx + d$ relates the positive numbers $a, b, c, d$, an |
-| 19 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 19. Wendy spent $174.40 on a bulk supply of pens. Each box of pens costs $25. A  |
 | 20 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 20. $$f(x) = -200(3)^x$$ $$g(x) = -200(3)^{x+a}$$ In the equations given, $a$ is |
 
 ### Imported Test 10 (partial 74/98)
-*DRAFT* · 74 preguntas · **36 con problemas**
+*DRAFT* · 74 preguntas · **4 con problemas**
 
-**Reading & Writing Module 1** — 27 preguntas, 13 con problemas:
+**Reading & Writing Module 1** — 27 preguntas, sin problemas ✅
 
-| # | Tipo | Falta | Enunciado |
-|---|---|---|---|
-| 3 | MC | respuesta MC no es A–D ("3. B") | In the 17th century, it was still widely believed that insects spontaneously eme |
-| 4 | MC | respuesta MC no es A–D ("4. C") | 4. Which choice completes the text with the most logical and precise word or phr |
-| 5 | MC | respuesta MC no es A–D ("5. A") | Many people in India consider street dogs a nuisance and a source of rabies infe |
-| 6 | MC | respuesta MC no es A–D ("6 D") | 6. Which choice best states the main purpose of the text? |
-| 9 | MC | respuesta MC no es A–D ("9. D") | In explaining the evolution of fungi from aquatic to land-bound organisms, biolo |
-| 11 | MC | respuesta MC no es A–D ("11. D") | # **Relative Abundance of Bacteria on Common Kitchen Surfaces** [tbl-0.html](tbl |
-| 12 | MC | respuesta MC no es A–D ("12. B") | In 1901, Greek divers discovered an artifact that would soon be known as the “An |
-| 22 | MC | respuesta MC no es A–D ("22. A") | Political scientists have several competing theories about what compels a voter  |
-| 23 | MC | respuesta MC no es A–D ("23. D") | 23. Which choice completes the text with the most logical transition? |
-| 24 | MC | respuesta MC no es A–D ("24. B") | notes: - According to the United States Geological Survey (USGS), amphibian popu |
-| 25 | MC | respuesta MC no es A–D ("25. A") | - In Franz Kafka's 1913 short story "The Judgment," a young clerk named Georg Be |
-| 26 | MC | respuesta MC no es A–D ("26. B") | While researching a topic, a student has taken the following notes: - Director R |
-| 27 | MC | respuesta MC no es A–D ("27. C") | While researching a topic, a student has taken the following notes: - The En-Ged |
-
-**Reading & Writing Module 2** — 24 preguntas, 9 con problemas:
+**Reading & Writing Module 2** — 24 preguntas, 1 con problemas:
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
-| 3 | MC | respuesta MC no es A–D ("5. D") | The following text comes from Polybius' second-century work *Histories*. In my f |
-| 4 | MC | respuesta MC no es A–D ("6. B") | 6. Which choice best describes the function of the underlined portion in the tex |
-| 5 | MC | respuesta MC no es A–D ("7. C") | The following text is from Josephus's first-century work *The Wars of the Jews*, |
-| 6 | MC | respuesta MC no es A–D ("8 C") | The following text comes from Theodore Roosevelt's 1910 speech "Citizenship in a |
-| 7 | MC | respuesta MC no es A–D ("9 B") | 9. Based on the texts, what would the author of Text 2 likely say about Text 1's |
-| 11 | MC | respuesta MC no es A–D ("14. A") | ### Weight of Maize Plants in Grams After Seeding [tbl-0.html](tbl-0.html) |
-| 12 | MC | respuesta MC no es A–D ("15. B") | Scholars have long debated the Rosetta Stone's purpose and why it contains three |
-| 23 | MC | respuesta MC no es A–D ("26. A") | William S. Baring-Gould's biography of Sir Arthur Conan Doyle conveys mixed feel |
 | 24 | MC | opciones de texto incompletas (2/4); respuesta MC no es A–D ("27. B") | 27. The student wants to make and support a generalization about why Russia's go |
 
-**Math Module 1** — 1 preguntas, 1 con problemas:
+**Math Module 1** — 1 preguntas, sin problemas ✅
+
+**Math Module 2** — 22 preguntas, 3 con problemas:
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
-| 1 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | # **Test 10 Innovator** **Math Module 1** 1. Scott works at a job for four hours |
-
-**Math Module 2** — 22 preguntas, 13 con problemas:
-
-| # | Tipo | Falta | Enunciado |
-|---|---|---|---|
-| 1 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 1. The center point of circle $Q$ when graphed in the $xy$-plane is $(4, 6)$. Th |
-| 2 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 2. $3x - x(7 - 8) + 12 = 4x - (6x + 18)$ In the given equation, what is the valu |
-| 3 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 3. The equation for line p is 5x - 8y = 40. Line q is perpendicular to line p an |
-| 4 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | 4. The graph shows how much money f(x) Maya saves over x months. What is the bes |
-| 6 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | 6. A number of racecar racers continuously go around a track. The scatterplot sh |
-| 7 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 7. The diagonal of a rectangle is 26 meters. The width of the rectangle is 10 me |
-| 8 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 8. Martha wants to know what dances are popular on social media platforms she us |
 | 11 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 11. The histogram shows the data collected from set X. Data set Y takes all the  |
-| 13 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | 13. The graph of $y = f(x)$ is graphed on the $xy$-plane. The equation of $f(x)$ |
 | 14 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 14. Function $g$ is defined by the equation $g(x) = 8(\frac{1}{4})^x$. If $h(x)  |
 | 15 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 15. [tbl-0.html](tbl-0.html) The table above shows several values of the functio |
-| 20 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 20. A quadratic equation with a leading coefficient of 1 intersects the $x$-axis |
-| 22 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 22. Two similar cylinders, Cylinder $A$ and Cylinder $B$, have volumes, in cubic |
 
 ### Imported Test 2
-*DRAFT* · 98 preguntas · **43 con problemas**
+*DRAFT* · 98 preguntas · **28 con problemas**
 
 **Reading & Writing Module 1** — 27 preguntas, 13 con problemas:
 
@@ -220,100 +132,29 @@
 | 24 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 24. Which choice completes the text with the most logical transition? ☒ A Otherw |
 | 25 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 25. Which choice completes the text with the most logical transition? ☒ A in oth |
 
-**Math Module 1** — 22 preguntas, 10 con problemas:
+**Math Module 1** — 22 preguntas, sin problemas ✅
 
-| # | Tipo | Falta | Enunciado |
-|---|---|---|---|
-| 3 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 3. If $3x - y = 11$ and $2x - 2y = 2$, what is the value of $x + y$? |
-| 7 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 7. What is the value when 80 is increased by 200%? |
-| 8 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 8. The radius of a right cylinder is 6 inches, and the length of its height is t |
-| 9 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 9. The circle shown has center O. If the measure of angle DRE is 35°, what is th |
-| 11 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 11. 4cx - 4 = x - 4 In the given equation, c is a constant. If the equation has  |
-| 13 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 13. The complete graph of the function $f$ in the $xy$-plane is shown. For how m |
-| 15 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 15. $$f(x) = 3x^2 + 13x - 30$$ The given equation can be written in the form $$f |
-| 16 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 16. $$V(t) = 25(0.88)^{\frac{1}{3}}$$ The given equation models the value that r |
-| 21 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 21. $ABC$ is a right triangle, where angle $B$ is $90^\circ$ and angle $C$ is $3 |
-| 22 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 22. The table shows the average weekly bread sales at Max's Bakery. [tbl-0.html] |
-
-**Math Module 2** — 22 preguntas, 5 con problemas:
-
-| # | Tipo | Falta | Enunciado |
-|---|---|---|---|
-| 6 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 6. The chart shows the average cost of housing, in dollars per square foot, in N |
-| 16 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 16. $$y \geq 2(x - 3)^2 + 5$$ $$y \leq x + 3$$ If $(a, b)$ is a solution to the  |
-| 18 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 18. DATA SET J DATA SET K Which of the statements best compares the means and st |
-| 19 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 19. What is the circumference of the circle with an equation of $$x^{2} + 6x + y |
-| 20 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 20. In the triangle shown, $\angle ABC = 90^{\circ}$. Line segment $BD$ is shown |
+**Math Module 2** — 22 preguntas, sin problemas ✅
 
 ### Imported Test 3
-*DRAFT* · 98 preguntas · **42 con problemas**
+*DRAFT* · 98 preguntas · **1 con problemas**
 
-**Reading & Writing Module 1** — 27 preguntas, 18 con problemas:
+**Reading & Writing Module 1** — 27 preguntas, 1 con problemas:
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
-| 1 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | ## Innovator Test 3 ### Module 1 Reading and Writing The number of people in the |
-| 2 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 2. As used in the text, what does the word "foreign" most nearly mean? x A Contr |
-| 3 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | Breaking from a tendency of Irish authors to be immensely critical of life in Ir |
-| 4 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 4. Which choice completes the text with the most logical and precise word or phr |
-| 5 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 5. What is the main purpose of the text? ☒ A It casts doubt on the existence of  |
-| 6 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | The following text is from George Eliot's 1866 novel *Felix Holt, The Radical*.  |
-| 7 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 7. Which choice best states the main idea of the text? ☐ A Aunt Esther uses her  |
-| 8 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | The following text is from Alice Moore Dunbar-Nelson's short story "In Our Neigh |
-| 9 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 9. Which choice best states the main idea of the text? A The captain is confiden |
-| 10 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | Born in 1857, American artist Arthur Wesley Dow believed that painters needed to |
-| 11 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 11. Which choice most effectively uses data from the table to complete the state |
-| 12 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | "To Autumn" is a short poem written by John Keats in the early 1800s. Addressing |
 | 13 | MC | opciones de texto incompletas (3/4) | 13. Which choice most logically completes the text? |
-| 20 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | The nomadic herders of ancient Mongolia have long been a subject of fascination  |
-| 21 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 21. Which choice completes the text so that it conforms to the conventions of St |
-| 22 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 22. Which choice completes the text so that it conforms to the conventions of St |
-| 23 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | *Guernica*, an oil painting, is one of Pablo Picasso's masterpieces and arguably |
-| 24 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 24. Which choice completes the text with the most logical transition? ☒ A For ex |
 
-**Reading & Writing Module 2** — 27 preguntas, 13 con problemas:
+**Reading & Writing Module 2** — 27 preguntas, sin problemas ✅
 
-| # | Tipo | Falta | Enunciado |
-|---|---|---|---|
-| 3 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | Casual patrons of Italian restaurants in the United States may be surprised to f |
-| 4 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 4. Which choice completes the text with the most logical and precise word or phr |
-| 5 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | In 2018, archaeobotanist Amaia Arranz-Otaegui conducted research in the Jordania |
-| 6 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 6. Which choice completes the text with the most logical and precise word or phr |
-| 7 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | French-American blues musician Jersey Julie is known for her unique mix of Delta |
-| 8 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 8. Which choice best describes the function of the underlined sentence in the te |
-| 9 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | # **Text 1** Chromosomes were unknown in 1834 when Gregor Mendel proposed his cl |
-| 15 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | When students enroll into college, they are faced with the weighty decision to s |
-| 16 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 16. Which choice most logically completes the text? ☐ A have a profound effect o |
-| 21 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | Julene Johnson, a faculty member at the University of California, has investigat |
-| 22 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 22. Which choice completes the text so that it conforms to the conventions of St |
-| 23 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | Toni Morrison's 1987 novel *Beloved* secured the novelist's reputation as a lead |
-| 24 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 24. Which choice completes the text with the most logical transition? ☒ A Even s |
+**Math Module 1** — 22 preguntas, sin problemas ✅
 
-**Math Module 1** — 22 preguntas, 8 con problemas:
-
-| # | Tipo | Falta | Enunciado |
-|---|---|---|---|
-| 5 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 5. In right triangle $$ABC$$, angle $$B$$ has a measure of $$90^\circ$$, the lon |
-| 6 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 6. $$-5x + 40kx = 120$$ In the given equation, $$k$$ is a constant. The equation |
-| 7 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 7. If $f(3) = -1$ and $f(4) = -3$, what is the $x$-intercept for the line repres |
-| 9 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 9. What is the value of $x - y$ if $3y - 2x = 16$ and $5x + y = -6$? |
-| 14 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 14. What is the equation of the graph? |
-| 15 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 15. $$x = 3^{y-1} + \frac{5}{3}$$ What is the $x$-intercept of the given equatio |
-| 16 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 16. A random sample of 500 residents of Sunset Beach was asked how they planned  |
-| 19 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 19. What is the length of the minor arc AB, given that the diameter of the circl |
-
-**Math Module 2** — 22 preguntas, 3 con problemas:
-
-| # | Tipo | Falta | Enunciado |
-|---|---|---|---|
-| 1 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | ## MATH MODULE 2 HARD 1. Given that $2(x + 4) = 18$, what is the value of $x + 6 |
-| 16 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 16. The function $g$ is defined by $g(x) = a^x - b$, where $a$ and $b$ are const |
-| 20 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 20. A sample of dried yellow pine has a density of 420 kilograms per cubic meter |
+**Math Module 2** — 22 preguntas, sin problemas ✅
 
 ### Imported Test 4 (partial 96/98)
-*DRAFT* · 96 preguntas · **63 con problemas**
+*DRAFT* · 96 preguntas · **49 con problemas**
 
-**Reading & Writing Module 1** — 27 preguntas, 22 con problemas:
+**Reading & Writing Module 1** — 27 preguntas, 21 con problemas:
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
@@ -325,7 +166,6 @@
 | 6 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | The following is adapted from the first chapter of Ann Radcliffe's 1794 gothic n |
 | 8 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | The following text is from the opening letter of Mary Shelley's 1818 novel *Fran |
 | 9 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | The following text is adapted from the opening letter of Samuel Richardson's 174 |
-| 10 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | The shift in the faculty at most institutions over the past half century has bee |
 | 11 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | NASA's Juno spacecraft has been orbiting Jupiter since 2016, collecting data on  |
 | 12 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | Some argue that differences between laws regarding automobile safety in differen |
 | 13 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 13. Which choice most logically completes the text? ☐ A providing a highly order |
@@ -364,42 +204,29 @@
 | 22 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 23. Which choice completes the text with the most logical transition? ☒ A Second |
 | 25 | MC | opciones de texto incompletas (3/4) | 27. The student wants to emphasize the impressive size and longevity of Pando. W |
 
-**Math Module 1** — 22 preguntas, 12 con problemas:
+**Math Module 1** — 22 preguntas, 4 con problemas:
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
 | 1 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | ## INNOVATOR TEST 4 ### MATH MODULE 1 1. $$-6x + 3 < y$$ $$y < x + 6$$ If $(x, y |
-| 2 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 2. If $x = 9$, what is the value of $x + 23$? |
-| 3 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 3. Tires are tested by sampling 24 tires from each batch of 600 tires. If 87.5%  |
-| 4 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 4. A square has a side length of 16 centimeters. What is the area, in square cen |
-| 5 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 5. Right triangles $ABC$ and $DEF$ are similar, where $A$ corresponds to $D$. An |
 | 6 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 6. In a project for business class, Bobby launched a website with pop culture co |
 | 7 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 7. Which expression is equivalent to $$(5xy + 3x)(x - 2y)$$? |
 | 9 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 9. Data set X: 4, 5, 10, 10, 13, 15, 20 Data set X is listed above. Which of the |
-| 10 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 10. $$-5x + 40kx = 120$$ In the given equation, $k$ is a constant. The equation  |
-| 11 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 11. If $7(x - 11) = -17$, what is the value of $x$? |
-| 16 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 16. [tbl-0.html](tbl-0.html) A teacher asked the students in two of his classes  |
-| 17 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 17. The expression $$\frac{40}{8x+56}$$ is equivalent to $$\frac{5}{x+k}$$, wher |
 
-**Math Module 2** — 22 preguntas, 10 con problemas:
+**Math Module 2** — 22 preguntas, 5 con problemas:
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
-| 4 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 4. $$3(x - 2) - 2(x - 1) = -x + 2(x + 2) - 8$$ How many solutions does the given |
-| 5 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 5. $$f(x + 3) = \sqrt{x^3} + 17$$ For the given function, what is the value of $ |
-| 6 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 6. Theresa invested in a company, and the value of her investment increased by 9 |
 | 7 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 7. Which of the following expressions can equal $-1$ for some value of $a$? |
-| 8 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 8. $$\frac{m}{n} = 3$$ $$6(n - 4) = m$$ Given the system of equations above, wha |
 | 10 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 10. Which expression is equivalent to $$\frac{x+4}{2x+2} + \frac{5}{x+1}$$? |
 | 13 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 13. The function $f(x) = mx + b$ and the function $g(x) = nx + b$ are defined fo |
 | 15 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 15. The first term in a sequence is 21. Each term after the first term is 1.5 ti |
 | 16 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 16. [tbl-0.html](tbl-0.html) The table above shows the distribution of test scor |
-| 21 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 21. The point $(a, a)$ satisfies the linear inequality $y \leq mx + 1$, and $a > |
 
 ### Imported Test 5
-*DRAFT* · 98 preguntas · **62 con problemas**
+*DRAFT* · 98 preguntas · **40 con problemas**
 
-**Reading & Writing Module 1** — 27 preguntas, 18 con problemas:
+**Reading & Writing Module 1** — 27 preguntas, 17 con problemas:
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
@@ -411,7 +238,6 @@
 | 6 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | The following paragraph is from the 1749 novel *The History* of Tom Jones, a Fou |
 | 7 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | # **Text 1** According to Nicole Kay Peterson of Iowa State University, the evol |
 | 11 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | "A Haunted House" is a 1921 short story written by Virginia Woolf. One of the ke |
-| 12 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | Cost to deliver 1 MBtu As people have become increasingly conscious of their imp |
 | 13 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | In the midst of the Romantic period, authors such as Jane Austen and Charlotte B |
 | 14 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 14. Which choice most logically completes the text? ☐ A it can still sometimes b |
 | 15 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | A UNESCO World Heritage Site, the Redwood National and State Parks in Northern C |
@@ -441,48 +267,27 @@
 | 24 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | Even Marcel Duchamp's skeptics—who hesitate to attribute talent to him—agree it  |
 | 25 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 25. Which choice completes the text with the most logical transition? ☒ A Howeve |
 
-**Math Module 1** — 22 preguntas, 14 con problemas:
+**Math Module 1** — 22 preguntas, 6 con problemas:
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
 | 1 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | ## INNOVATOR TEST 5 MATH ### MODULE 1 1. A tree-cutting service has a price plan |
 | 5 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 5. Which of the following systems of equations has no solutions? |
-| 6 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 6. A rectangular solid has a square base with edges of length 23 inches and a he |
-| 8 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 8. The graph of the function $f(x)$ is shown. What value(s) of $x$ satisfy $f(x) |
-| 9 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 9. The graph of $g(x)$ is shown. What is the value of $g(6)$? |
 | 12 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 12. As part of a mark-recapture study, a random sample of cricket frogs was sele |
-| 13 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 13. The possible values of a number $w$ are at least 38 less than twice another  |
 | 14 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 14. $$F = \frac{Gm_1m_2}{r^2}$$ The equation above defines the force, in newtons |
 | 15 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 15. The graph of a line in the $xy$-plane contains the points $(-3, -14)$ and $( |
-| 16 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 16. A local aquarium is going to increase the volume of its cylindrical tank by  |
-| 17 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 17. Right triangle MNO has side lengths given by the following: MN = 24, NO = 45 |
-| 18 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 18. Mario is cutting a pipe that is 66 inches long into three pieces. The second |
-| 20 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 20. $$y = 2x^2 - 12x + 14$$ $$y = -4$$ The given system of equations has exactly |
 | 21 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 21. A researcher models the population of lizards on an island using the equatio |
 
-**Math Module 2** — 22 preguntas, 16 con problemas:
+**Math Module 2** — 22 preguntas, 3 con problemas:
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
 | 1 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | # MODULE 2 1. $$h(t) = 80,000(1 - \frac{12}{100})^t$$ Leonardo just bought a new |
 | 2 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 2. $$y = -\frac{2}{3}x + 4$$ $$y = -\frac{2}{3}x - 11$$ At how many points do th |
-| 4 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 4. From 1994 to 1995, the amount of money, in dollars, a company earns grew by 6 |
-| 5 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 5. If $$\frac{p}{q} = \frac{4}{3}$$, what is the value of $$\frac{12q}{p}$$? |
-| 6 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 6. The exponential function $$f$$ is defined by $$f(x) = 11 \cdot b^x$$, where $ |
-| 7 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 7. What is the sum of all values of $b$ that satisfy the equation $3b^2 - 2b - 4 |
-| 8 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 8. $f(x) = mx + 4$ $g(x) = \frac{1}{2}x - 5$ If $f(2) = g(4)$, what is the value |
-| 9 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | 9. Note: Figure not drawn to scale. Triangles $ABC$ and $XYZ$ are shown. If $\fr |
-| 10 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 10. $$(ax + 4)(3x + b) = 18x^2 + cx + 12$$ If the equation is defined for all va |
-| 13 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 13. Square $ABCD$ has an area of 100 square units. If $E, F, G$ and $H$ are all  |
-| 15 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 15. The variables $x$ and $y$ are related such that each time $x$ increases by 4 |
-| 16 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | 16. Which of the following inequalities represents the shaded region in the give |
-| 19 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | 19. Mr. Kim collected the homework from his students and made a graph to show ho |
 | 20 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 20. A circle graphed on the coordinate plane is centered at the origin, labeled  |
-| 21 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 21. The force of gravity on Earth is 9.8 meters per second squared. The gravitat |
-| 22 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 22. $A$ is the first of six consecutive odd integers. If the product of 12 and t |
 
 ### Imported Test 6 (partial 97/98)
-*DRAFT* · 97 preguntas · **59 con problemas**
+*DRAFT* · 97 preguntas · **35 con problemas**
 
 **Reading & Writing Module 1** — 27 preguntas, 17 con problemas:
 
@@ -525,46 +330,22 @@
 | 24 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | Judge Sweet of the Southern District of New York ruled that genes are not patent |
 | 25 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 25. Which choice completes the text with the most logical transition? ☒ A Howeve |
 
-**Math Module 1** — 21 preguntas, 13 con problemas:
+**Math Module 1** — 21 preguntas, 2 con problemas:
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
-| 1 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | ## INNOVATOR TEST 6 MATH MODULE 1 1. The price $p$ for renting a boat for $h$ ho |
-| 2 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 2. The linear function $f(x) = \frac{5}{2}x + b$ is true for all values of $x$.  |
-| 4 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 5. [tbl-0.html](tbl-0.html) Katy is rolling a 4-sided die and determined the per |
-| 8 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 9. What is the length of the hypotenuse, in feet, of a right triangle with legs  |
-| 9 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 10. $$2x^{2} + 6x - 18 = 0$$ What is the sum of the solutions of the given equat |
-| 10 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 11. $$2x - 3y = 9$$ $$ax - 5y = 3$$ For what value of a will the above system of |
 | 11 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 12. Which of the following is equivalent to the expression $x^3 - 4x^2 + 8x - 32 |
-| 12 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 13. The graph shows the sales of ice cream at a store and the average daily temp |
-| 13 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | 14. For the function $y = f(x)$ shown, which of the following equations could be |
-| 15 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 16. A rectangular prism has a height of $h$ inches. The width is half of the hei |
 | 18 | MC | respuesta MC no es A–D ("1") | 19. $y^2 + 36 = x$ $15y = x$ If $(x, y)$ is a solution to the given system of eq |
-| 19 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 20. $$\frac{3x}{4} + 0.325 = 3.2x - \frac{17}{8}$$ What is the solution to the g |
-| 21 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 22. The function $f(n) = 4 + (n - 1)9$ and the function $g(n) = -2 + (n - 1)(10) |
 
-**Math Module 2** — 22 preguntas, 15 con problemas:
+**Math Module 2** — 22 preguntas, 2 con problemas:
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
-| 2 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 2. The graph of linear function g(x) is shown above. What is the value of g(2)? |
-| 4 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 4. An antique grandfather clock chimes every hour. At one o'clock it chimes once |
-| 5 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 5. $$f(T) = \frac{9}{5}T + 32$$ The given function $$f(T)$$ determines the tempe |
-| 6 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 6. $$3x + 2y = 8$$ $$2x - 3y = 1$$ What is the solution $$(x, y)$$ to the given  |
-| 7 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 7. The game store sells both board games and figurines. Board games sell for $40 |
-| 8 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 8. A study asked voluntary participants to record the number of cups of water th |
-| 11 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 11. $$(x - 4)^2 + (y + 6)^2 = 576$$ The given equation represents a circle in th |
 | 12 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 12. In a data set, the mean is 10, the median is 10, the middle three values are |
-| 13 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 13. Triangle $A$ and triangle $B$ are similar right triangles. The hypotenuse of |
-| 14 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 14. $9(2x + 3) - 10(x + 1) = 12(x - 1) - 2(2x + 5)$ How many distinct real solut |
-| 16 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 16. $$\frac{(x+2)(x^2-3x-28)}{x-7}$$ The given expression is equivalent to the e |
-| 18 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 18. For the function $f(x) = a^x + b$, where $a > 0$, $f(1) = 12$ and $f(2) = 24 |
 | 19 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 19. The gravity on Mercury is 3.7 meters per second squared, or $3.7 \frac{m}{s^ |
-| 20 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 20. Given the linear function $f(x) = ax + b$ and the quadratic function $g(x) = |
-| 21 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 21. The height, in meters, of a projectile launched from a cliff after $t$ secon |
 
 ### Imported Test 7 (partial 96/98)
-*DRAFT* · 96 preguntas · **56 con problemas**
+*DRAFT* · 96 preguntas · **41 con problemas**
 
 **Reading & Writing Module 1** — 27 preguntas, 19 con problemas:
 
@@ -590,7 +371,7 @@
 | 23 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | There are two approaches to rid canines of heartworm disease: the “fast-kill met |
 | 24 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 24. Which choice completes the text with the most logical transition? ✗ A In oth |
 
-**Reading & Writing Module 2** — 25 preguntas, 14 con problemas:
+**Reading & Writing Module 2** — 25 preguntas, 13 con problemas:
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
@@ -599,7 +380,6 @@
 | 3 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | Recent studies have documented that the presence of sea otters contributes to ec |
 | 4 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 6. Which choice best states the function of the underlined portion in the text a |
 | 9 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | Functional MRI is a neuroimaging technique that measures the magnetic properties |
-| 10 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (2/4 texto) | Isothiocyanates (ITCs) are natural compounds produced by plants such as nasturti |
 | 14 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | While Formula One drivers receive trophies, sponsorship deals, and name recognit |
 | 15 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 17. Which choice completes the text so that it conforms to the conventions of St |
 | 16 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | Saba Island, nestled in a hazardous stretch of sea, has become a popular tourist |
@@ -609,41 +389,27 @@
 | 21 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | The 1973 oil crisis exposed American automakers as vulnerable, ossified, and com |
 | 22 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 24. Which choice completes the text with the most logical transition? ☒ A Conver |
 
-**Math Module 1** — 22 preguntas, 11 con problemas:
+**Math Module 1** — 22 preguntas, 3 con problemas:
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
-| 8 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 8. The function $f$ is defined by $f(x) = 9x + 36$. The graph of $y = f(x)$ in t |
-| 10 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 10. If $14p - 22 \geq -10$, what is the maximum possible value of $11 - 7p$? |
 | 11 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 11. A soccer coach wants to purchase new uniforms for his 22 players. The athlet |
-| 13 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 13. What is the diameter of a circle with the equation $$(x - 3)^2 + (y + 5)^2 = |
-| 14 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 14. $$y = -x^2 + 12x + 10$$ The given equation relates the variables x and y. Fo |
-| 16 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 16. A circle is inscribed in a square, as shown. What is the area of the shaded  |
-| 17 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 17. [tbl-0.html](tbl-0.html) Humans can have one of four blood types: A, B, AB,  |
 | 18 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 18. [tbl-0.html](tbl-0.html) The table shows select values for the function \( f |
-| 19 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 19. Note: Figure not drawn to scale In the figure shown, the length of BC is 6 c |
 | 20 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 20. $$-12x^2 - bx - 12 = 0$$ In the given equation, $b$ is a constant. For which |
-| 22 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 22. The functions $f(x)$ and $g(x)$ are graphed on the $xy$-plane shown. If $g(2 |
 
-**Math Module 2** — 22 preguntas, 12 con problemas:
+**Math Module 2** — 22 preguntas, 6 con problemas:
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
-| 2 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 2. The graph of line $q$ is shown above. Line $r$ is perpendicular to line $q$.  |
-| 3 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 3. $$nA = 360$$ The above equation shows the relationship between the measure $A |
-| 4 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 4. For the linear function $g(x)$, $g(2.6) = 11$ and $g(5) = 3.8$. When graphed  |
 | 6 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 6. Harold prepared a sample of bacteria. A strain of virus killed 30 percent of  |
-| 10 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 10. Mrs. Brennan wants to buy $x$ computers for her company and has a budget of  |
 | 11 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 11. $$f(x) = x(x - 14) + 70 - k$$ In the given function, $k$ is an integer const |
-| 12 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 12. A professional football team practices 6 days a week in the preseason. A wat |
 | 14 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 14. In the $xy$-plane, a parabola has a vertex of $(3, -10)$ and intersects the  |
 | 16 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 16. Which expression is equivalent to $\frac{1}{\frac{1}{x+5} + \frac{1}{x-2}}$? |
 | 19 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 19. $$0.6x^2 - 1.5x + 2.01 = 0$$ How many distinct real solutions does the given |
-| 20 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (3/4 texto) | 20. A regular hexagon is inscribed in a rectangle as shown. The perimeter of the |
 | 21 | NUMERIC | respuesta numérica inválida ("It is given that has two distinct values such that") | 21. The function $g(x)$ is defined as $g(x) = (x^2 + bx + c)(x + a)$, where $a,  |
 
 ### Imported Test 8 (partial 6/98)
-*DRAFT* · 6 preguntas · **5 con problemas**
+*DRAFT* · 6 preguntas · **3 con problemas**
 
 **Reading & Writing Module 1** — 1 preguntas, 1 con problemas:
 
@@ -657,12 +423,7 @@
 |---|---|---|---|
 | 1 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | ## READING AND WRITING MODULE 2 (HARDER) Conservation efforts to preserve the Gr |
 
-**Math Module 1** — 2 preguntas, 2 con problemas:
-
-| # | Tipo | Falta | Enunciado |
-|---|---|---|---|
-| 1 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | # INNOVATOR TEST 8 ## MATH MODULE 1 1. The equation for a circle is $$(x - 1)^2  |
-| 2 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 5. In a bag of 20 treats, 8 are chocolate, 9 are lollipops, and the rest are gum |
+**Math Module 1** — 2 preguntas, sin problemas ✅
 
 **Math Module 2** — 2 preguntas, 1 con problemas:
 
@@ -671,7 +432,7 @@
 | 2 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 5. A circle in the $xy$-plane has its center at $(-3, 7)$, and the point $(1, 7) |
 
 ### Imported Test 9
-*DRAFT* · 98 preguntas · **51 con problemas**
+*DRAFT* · 98 preguntas · **30 con problemas**
 
 **Reading & Writing Module 1** — 27 preguntas, 17 con problemas:
 
@@ -695,7 +456,7 @@
 | 22 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 22. Which choice completes the text with the most logical transition? ☒ A Curren |
 | 25 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | While researching a topic, a student has taken the following notes: - NASA scien |
 
-**Reading & Writing Module 2** — 27 preguntas, 12 con problemas:
+**Reading & Writing Module 2** — 27 preguntas, 11 con problemas:
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
@@ -703,7 +464,6 @@
 | 4 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 4. Which choice completes the text with the most logical and precise word or phr |
 | 8 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | The following text is from the 1954 *Brown v. Board of Education* ruling, author |
 | 10 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | During its peak from the 1950s to the 1970s, Brutalist architecture embraced an  |
-| 12 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | Oxygen Production and Light Intensity Huesemann and colleagues studied the impac |
 | 16 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | A 2023 study by Nadine Dijkstra and Stephen Fleming examined people's ability to |
 | 17 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 17. Which choice completes the text so that it conforms to the conventions of St |
 | 18 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | Inspired to design a prosthetic arm that was both affordable and functional, Ben |
@@ -712,37 +472,17 @@
 | 23 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 23 Which choice completes the text with the most logical transition? The landloc |
 | 24 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 24. Which choice completes the text with the most logical transition? ☐ A Grante |
 
-**Math Module 1** — 22 preguntas, 9 con problemas:
+**Math Module 1** — 22 preguntas, 1 con problemas:
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
-| 2 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 2. The graph of the function $f(x)$ is shown. What value(s) of $x$ satisfy $f(x) |
-| 11 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 11. Let $f(x) = 3x - 7$ and $g(x) = -2x + 5$. What is the value of $3f(4) - g(4) |
-| 13 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | 13. The scatterplot shows the comparison for the time and the cost to hire a per |
 | 14 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 14. A small bakery shop sells only brownies and cupcakes. Each cupcake costs $5  |
-| 17 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 17. A circle in the $xy$-plane has its center at $(-2, 5)$. Line $l$ is tangent  |
-| 18 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 18. Two identical spheres, each with a volume of $972\pi$ cubic inches, fit perf |
-| 20 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | 20. The graph of $y = g(x)$ is shown on the $xy$-plane. If $a$ is a constant and |
-| 21 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | 21. The polynomial function $f(x) = ax^4 + bx^3 + cx^2 + dx + e$, where $a, b, c |
-| 22 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | 22. The graph of the function $g(x) - 5$ is shown. Which equation defines the fu |
 
-**Math Module 2** — 22 preguntas, 13 con problemas:
+**Math Module 2** — 22 preguntas, 1 con problemas:
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
-| 4 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 4. $$y > \frac{1}{5}x + \frac{1}{2}$$ $$y \leq -2x + 2$$ The given system of ine |
-| 6 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 6. The function $h(t) = -4.9t^2 + 14.7t + 19.6$ determines the height of a canno |
-| 7 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | 7. The function $p(t)$ gives the population of bees, in thousands, in a park ove |
-| 8 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 8. The circumference of a circle is equal to $w\pi$ feet, and the area of a circ |
-| 9 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 9. $$4^2 = 2^{x-4}$$ What value of $x$ satisfies the given equation? |
 | 11 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 11. $$27x^2 + kx + 12 = 0$$ In the given equation, $k$ is a constant. For which  |
-| 13 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 13. $$9x - 8y = -26$$ $$5x - 6y = -30$$ The coordinate point $(x, y)$ is the sol |
-| 14 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 14. Note: Figure not drawn to scale. In the figure shown, what is the length of  |
-| 15 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 15. Mr. Corbin recently had his students take a physics test. He made a mistake  |
-| 16 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 16. In the $xy$-plane, the graph of $y = 4x^2 - 48x + 44$ intersects the line $y |
-| 17 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 17. $$\frac{2x^2}{x^2-4} + \frac{7x}{x+2} = \frac{-2}{x-2}$$ What value of $x$ s |
-| 20 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | 20. A ramen restaurant tracked how many orders they received during the first 6  |
-| 21 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 21. Circle $A$ is centered at the origin with a radius of $R$. Circle $B$ has a  |
 
 ---
 
@@ -799,11 +539,10 @@
 | 11 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | The given equation relates the distinct positive real numbers , , and . Which eq |
 
 ### Advanced Math - Nonlinear Equations - MEDIUM
-*DRAFT* · 31 preguntas · **18 con problemas**
+*DRAFT* · 31 preguntas · **16 con problemas**
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
-| 1 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | C. D. |
 | 3 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | $$38x^2 = 38(9)$$ What is the negative solution to the given equation? |
 | 5 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | The given equation relates the positive numbers , , and . Which equation correct |
 | 8 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | $$\frac{55}{x+6} = x$$ What is the positive solution to the given equation? |
@@ -816,7 +555,6 @@
 | 18 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | The given equation relates the numbers and , where is not equal to and . Which e |
 | 19 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | The speed of sound in dry air, v, can be modeled by the formula , where T is the |
 | 20 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | In the equation above, a is a constant and . If the equation has two integer sol |
-| 21 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | $$y = x^2 + 1.7$$ $$y = 1.7 - x$$ Which graph represents the given system of equ |
 | 23 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | The given equation relates the numbers , , and . Which equation correctly expres |
 | 24 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | In the xy-plane, what is the y-coordinate of the point of intersection of the gr |
 | 25 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | An oceanographer uses the equation to model the speed s, in knots, of an ocean w |
@@ -972,7 +710,7 @@
 | 26 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | y 50 40 30 Number of sweatshirts 20 10 x O 20 40 60 80 100 Number of T-shirts Th |
 
 ### Algebra - Linear Functions - EASY
-*DRAFT* · 23 preguntas · **13 con problemas**
+*DRAFT* · 23 preguntas · **12 con problemas**
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
@@ -988,7 +726,6 @@
 | 17 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Oxygen gas is placed inside a tank with a constant volume. The graph shows the e |
 | 20 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | If $y = 5x + 10$, what is the value of $y$ when $x = 8$? |
 | 22 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | For the linear function , the graph of in the xy-plane has a slope of and passes |
-| 23 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Which of the following is the graph of the equation $y=2x-5$ in the xy-plane? |
 
 ### Algebra - Linear Functions - HARD
 *DRAFT* · 17 preguntas · **10 con problemas**
@@ -1359,13 +1096,12 @@
 | 6 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | The table summarizes the distribution of age and assigned group for participants |
 
 ### Problem Solving and Data Analysis - Probability - MEDIUM
-*DRAFT* · 11 preguntas · **7 con problemas**
+*DRAFT* · 11 preguntas · **6 con problemas**
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
 | 1 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Prices of 14 Different Cars Priced at no more Priced greater Type of car Total t |
 | 2 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Eye color Coat color Deep blue Light brown Total Cream-tortoiseshell 16 16 32 Ch |
-| 3 | MC | opciones dentro de la imagen — faltan botones A–D / transcribir (0/4 texto) | Human Resources Accounting Bachelor’s degree 4 3 Master’s degree 2 6 The table a |
 | 6 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | United States Presidents from 1789 to 2015 Ages Number 40–44 2 45–49 7 50–54 13  |
 | 7 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | For a science project, Anka recorded whether it rained each weekday and weekend  |
 | 9 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | If 1,200 customers register for new accounts at a social media website every day |

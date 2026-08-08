@@ -54,6 +54,7 @@ export default async function FullTestPlayerPage({ params }: PageProps) {
           stem: item.question.stem,
           stimulus: item.question.stimulus,
           type: item.question.type,
+          imageUrl: item.question.imageUrl,
           options: item.question.options,
           graphArtifacts: item.question.supportsGraph ? extractQuestionGraphArtifacts(item.question) : [],
         })),
