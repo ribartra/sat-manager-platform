@@ -2697,12 +2697,9 @@ def normalize_full_test_candidate_modules(db: sqlite3.Connection, batch_id: str,
     sources = db.execute(f"SELECT id, relativePath FROM IngestSourceFile WHERE {where}", params).fetchall()
     updated = 0
     for source in sources:
-        modules = detect_full_test_modules(source["relativePath"])
-        if len(modules) < 2:
-            continue
         candidates = db.execute(
             """
-            SELECT q.id, q.moduleLabel
+            SELECT q.id, q.moduleLabel, q.questionNumber
             FROM IngestQuestionCandidate q
             LEFT JOIN IngestPageArtifact p ON p.id = q.pageArtifactId
             WHERE q.batchId = ? AND q.sourceFileId = ?
@@ -2712,11 +2709,38 @@ def normalize_full_test_candidate_modules(db: sqlite3.Connection, batch_id: str,
         ).fetchall()
         if len(candidates) < 2:
             continue
+        # Módulos: preferir hints del path; si no hay (archivo combinado sin "Module N"
+        # en el nombre, p.ej. ".../MATH/Test 10 Innov. Math.pdf"), derivarlos de las
+        # etiquetas que la detección por OCR SÍ resolvió en algunos candidatos. Así se
+        # normalizan las combinaciones donde solo el encabezado de un módulo fue legible.
+        modules = detect_full_test_modules(source["relativePath"])
+        if len(modules) < 2:
+            seen: list[str] = []
+            for candidate in candidates:
+                label = candidate["moduleLabel"]
+                if label and label not in seen:
+                    seen.append(label)
+            if len(seen) >= 2:
+                modules = seen[:2]
+        if len(modules) < 2:
+            continue
+        # (module, questionNumber) ya ocupados por candidatos con etiqueta: evita crear
+        # duplicados y desambigua los interpolados por orden de página (una pregunta cuyo
+        # módulo "preferido" por posición ya tiene ese número va al otro módulo).
+        taken: set[tuple[str, Any]] = {
+            (c["moduleLabel"], c["questionNumber"]) for c in candidates if c["moduleLabel"]
+        }
         midpoint = len(candidates) // 2
         for index, candidate in enumerate(candidates):
             if candidate["moduleLabel"]:
                 continue
-            module_label = modules[0] if index < midpoint else modules[-1]
+            preferred = modules[0] if index < midpoint else modules[-1]
+            other = modules[-1] if preferred == modules[0] else modules[0]
+            qn = candidate["questionNumber"]
+            module_label = preferred
+            if (preferred, qn) in taken and (other, qn) not in taken:
+                module_label = other
+            taken.add((module_label, qn))
             db.execute(
                 "UPDATE IngestQuestionCandidate SET moduleLabel = ?, updatedAt = ? WHERE id = ?",
                 (module_label, now_iso(), candidate["id"]),
