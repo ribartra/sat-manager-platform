@@ -47,8 +47,8 @@ function parseHeaderless(raw) {
   let body = t.split(/#+\s*Rationale\b/i)[0];
   body = body.split(/Correct Answer\s*[:：]/i)[0];
 
-  // marcadores de opción al inicio de línea: A. / A)  (tolera ## y * previos)
-  const markerRe = /(?:^|\n)[ \t]*#{0,6}\s*(?:\*\s*)?([A-D])[.)]\s+/g;
+  // marcadores de opción al inicio de línea: A. / A)  (tolera ## y viñetas -, *, •, – previas)
+  const markerRe = /(?:^|\n)[ \t]*#{0,6}\s*(?:[-*•–]\s*)?([A-D])[.)]\s+/g;
   const markers = [];
   let m;
   while ((m = markerRe.exec(body))) {
