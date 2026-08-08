@@ -424,6 +424,14 @@ export default async function AiImportPage({ searchParams }: PageProps) {
           <p className="mt-1 max-w-3xl text-sm text-gray-500">
             Work through staging in order: load files, process extraction, recover OCR issues, review candidates and promote clean drafts.
           </p>
+          {selectedBatchId && (
+            <a
+              href={`/admin/import/ai/sets?batch=${selectedBatchId}`}
+              className="mt-3 inline-flex items-center gap-1 rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
+            >
+              <FileSearch className="h-3.5 w-3.5" /> Conjuntos por revisar
+            </a>
+          )}
         </div>
         {selectedBatch && (
           <div className="min-w-0 rounded-lg border border-gray-200 bg-white px-4 py-3 text-right shadow-sm">
