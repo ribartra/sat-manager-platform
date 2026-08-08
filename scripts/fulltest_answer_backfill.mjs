@@ -46,10 +46,14 @@ const ansSection = start >= 0 ? docxTxt.slice(start) : docxTxt;
 // descripciones: segmentar por marcadores de módulo, luego "Qn. texto"
 const modMarks = [...descSection.matchAll(/MODULE\s*(\d)[AB]?\s*[—\-–][^\n]*/gi)].map(mm => ({ mod: mm[1], at: mm.index }));
 function moduleAt(pos) { let mod = "1"; for (const mk of modMarks) if (pos >= mk.at) mod = mk.mod; return mod; }
-const descs = [];
-for (const mm of descSection.matchAll(/\bQ(\d+)\.\s*([\s\S]*?)(?=\bQ\d+\.|MODULE\s*\d|$)/g)) {
-  descs.push({ mod: moduleAt(mm.index), qn: Number(mm[1]), text: mm[2].replace(/\s+/g, " ").trim() });
-}
+// acepta ambos formatos de encabezado de descripción: "Q1." y "Question 1:"
+const heads = [...descSection.matchAll(/(?:^|\n)\s*(?:Question\s+|Q)(\d+)\s*[.:]\s*/gi)]
+  .map(mm => ({ qn: Number(mm[1]), at: mm.index, from: mm.index + mm[0].length }));
+const descs = heads.map((h, i) => ({
+  mod: moduleAt(h.at),
+  qn: h.qn,
+  text: descSection.slice(h.from, i + 1 < heads.length ? heads[i + 1].at : descSection.length).replace(/\s+/g, " ").trim(),
+}));
 console.log(`descripciones numeradas: ${descs.length} (${descs.filter(d => d.mod === "1").length} en módulo 1)`);
 
 // bloques de respuesta: secuencia valor + explicación
@@ -114,34 +118,36 @@ for (let i = 1; i <= A.length; i++) {
     else { dp[i][j] = skipA; bt[i][j] = 2; }
   }
 }
-// backtrack -> answerByQ[mod][qn] = value
-const answerByQ = {};
+// módulo → índice 0/1 (robusto a "1" vs "2"/"2A"/"2B"): 1.º módulo=0, resto=1
+function modIdx(label) { if (label == null || label === "") return null; return /^\s*1\b/.test(String(label)) ? 0 : 1; }
+// backtrack -> answerByIdx[modIdx][qn] = value
+const answerByIdx = { 0: {}, 1: {} };
 let i = A.length, j = B.length;
 while (i > 0 && j > 0) {
-  if (bt[i][j] === 1) { const d = A[i - 1]; (answerByQ[d.mod] ||= {})[d.qn] = B[j - 1].value; i--; j--; }
+  if (bt[i][j] === 1) { const d = A[i - 1]; const mi = modIdx(d.mod); if (mi != null) answerByIdx[mi][d.qn] = B[j - 1].value; i--; j--; }
   else i--;
 }
 
-// --- 3) proponer respuesta por candidato via su questionNumber (== Qn de módulo 1) ---
+// --- 3) proponer respuesta por candidato: por SU módulo real (índice) + questionNumber ---
 function letterOrNum(v) { return /^[A-D]$/i.test(v) ? v.toUpperCase() : v; }
 const proposals = cands.map(c => {
-  const mod = "1"; // estos candidatos NEEDS_REVIEW son módulo 1 (verificado por stems)
-  const val = answerByQ[mod] ? answerByQ[mod][c.qn] : null;
-  const desc = A.find(d => d.mod === mod && d.qn === c.qn);
-  return { c, val: val ? letterOrNum(val) : null, desc };
+  const mi = modIdx(c.mod);
+  const val = mi != null && answerByIdx[mi] ? answerByIdx[mi][c.qn] : null;
+  const desc = A.find(d => modIdx(d.mod) === mi && d.qn === c.qn);
+  return { c, mi, val: val ? letterOrNum(val) : null, desc, ambiguous: mi == null };
 });
 
-console.log("\nq# | tipo | resp | descripción DOCX (Qn) :: enunciado candidato");
+console.log("\nq# | mod | tipo | resp | descripción DOCX :: enunciado candidato");
 console.log("-".repeat(118));
 for (const p of proposals) {
-  const stem = (p.c.stem || "").replace(/\s+/g, " ").slice(0, 40);
-  const dtext = p.desc ? p.desc.text.slice(0, 46) : "(sin descripción)";
-  console.log(`${String(p.c.qn).padStart(2)} | ${p.c.type.padEnd(7)} | ${(p.val || "??").padEnd(5)} | ${dtext} :: ${stem}`);
+  const stem = (p.c.stem || "").replace(/\s+/g, " ").slice(0, 38);
+  const dtext = p.desc ? p.desc.text.slice(0, 42) : (p.ambiguous ? "(módulo nulo: no seguro)" : "(sin descripción)");
+  console.log(`${String(p.c.qn).padStart(2)} | ${String(p.c.mod||"-").padEnd(3)} | ${p.c.type.padEnd(7)} | ${(p.val || "??").padEnd(5)} | ${dtext} :: ${stem}`);
 }
 const good = proposals.filter(p => p.val);
 const bad = proposals.filter(p => !p.val);
-console.log(`\nmódulo 1 alineado: ${Object.keys(answerByQ["1"] || {}).length}/22 preguntas con respuesta`);
-console.log(`candidatos: ${good.length} con respuesta propuesta, ${bad.length} sin (${bad.map(p => "q" + p.c.qn).join(", ")})`);
+console.log(`\nmódulos alineados: idx0=${Object.keys(answerByIdx[0]).length}, idx1=${Object.keys(answerByIdx[1]).length}`);
+console.log(`candidatos: ${good.length} con respuesta propuesta, ${bad.length} sin (${bad.map(p => "q" + p.c.qn + (p.ambiguous ? "*" : "")).join(", ")})   (* = módulo nulo, no seguro)`);
 
 if (APPLY) {
   const now = new Date().toISOString();
@@ -149,16 +155,20 @@ if (APPLY) {
   const upMC = db.prepare(`UPDATE IngestQuestionCandidate SET correctAnswer=?, type='MC', updatedAt=? WHERE id=?`);
   const upNum = db.prepare(`UPDATE IngestQuestionCandidate SET correctAnswer=?, updatedAt=? WHERE id=?`);
   let n = 0, retyped = 0;
+  let skipped = 0;
   const tx = db.transaction(() => {
     for (const p of good) {
       const isLetter = /^[A-D]$/.test(p.val);
+      // guard: una MC solo puede llevar respuesta A-D; un valor numérico en una MC es
+      // señal de desalineación/parse malo -> no escribir (contenido calificado).
+      if (p.c.type === "MC" && !isLetter) { skipped++; continue; }
       if (isLetter && p.c.type !== "MC") { upMC.run(p.val, now, p.c.id); retyped++; }
       else upNum.run(p.val, now, p.c.id);
       n++;
     }
   });
   tx();
-  console.log(`\n[APPLY] correctAnswer seteado en ${n} candidatos (${retyped} re-tipados NUMERIC→MC por respuesta de letra).`);
+  console.log(`\n[APPLY] correctAnswer seteado en ${n} candidatos (${retyped} re-tipados NUMERIC→MC; ${skipped} MC con valor no-A–D omitidas por seguridad).`);
 } else {
   console.log("\n(dry-run) valida la tabla; usa --apply para escribir.");
 }
