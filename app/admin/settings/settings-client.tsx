@@ -148,7 +148,7 @@ export function SettingsClient({
               <p>Status: {mistralKey.configured ? "Configured" : "Not configured"}</p>
               {mistralKey.last4 && <p>Last 4: {mistralKey.last4}</p>}
               {mistralKey.sha256 && <p className="break-all">SHA-256: {mistralKey.sha256}</p>}
-              {mistralKey.updatedAt && <p>Updated: {new Date(mistralKey.updatedAt).toLocaleString()}</p>}
+              {mistralKey.updatedAt && <p suppressHydrationWarning>Updated: {new Date(mistralKey.updatedAt).toLocaleString()}</p>}
             </div>
           </div>
           <div className="grid gap-3 md:grid-cols-[1fr_auto]">
@@ -181,7 +181,7 @@ export function SettingsClient({
               · Source: {smtp.source}
             </p>
             <p>Used for invites, parent consent, password resets and shared parent reports. Password stored encrypted; DB values override EMAIL_* env vars.</p>
-            {smtp.passwordConfigured && smtp.passwordLast4 && <p>Password on file (last 4: {smtp.passwordLast4}){smtp.updatedAt ? ` · updated ${new Date(smtp.updatedAt).toLocaleString()}` : ""}</p>}
+            {smtp.passwordConfigured && smtp.passwordLast4 && <p suppressHydrationWarning>Password on file (last 4: {smtp.passwordLast4}){smtp.updatedAt ? ` · updated ${new Date(smtp.updatedAt).toLocaleString()}` : ""}</p>}
           </div>
           <div className="grid gap-3 md:grid-cols-2">
             <label className="grid gap-1 text-xs text-gray-600">
