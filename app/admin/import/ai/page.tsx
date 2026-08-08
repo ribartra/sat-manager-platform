@@ -345,6 +345,8 @@ export default async function AiImportPage({ searchParams }: PageProps) {
   const autoRefresh = Boolean(selectedBatch && (processBlocked || latestEvent?.status === "RUNNING" || latestEvent?.status === "STARTED"));
   const practiceCandidatesBySource = new Map<string, typeof practiceCandidates>();
   for (const candidate of practiceCandidates) {
+    // Merged-away / rejected candidates no longer count toward the set.
+    if (candidate.status === "REJECTED" || candidate.promotionStatus === "REJECTED") continue;
     const group = practiceCandidatesBySource.get(candidate.sourceFileId) ?? [];
     group.push(candidate);
     practiceCandidatesBySource.set(candidate.sourceFileId, group);
@@ -379,6 +381,7 @@ export default async function AiImportPage({ searchParams }: PageProps) {
   const fullTestByNumber = new Map<number, typeof fullTestCandidates>();
   for (const candidate of fullTestCandidates) {
     if (!candidate.testNumber) continue;
+    if (candidate.status === "REJECTED" || candidate.promotionStatus === "REJECTED") continue;
     const group = fullTestByNumber.get(candidate.testNumber) ?? [];
     group.push(candidate);
     fullTestByNumber.set(candidate.testNumber, group);

@@ -64,7 +64,7 @@ export default async function AiImportSetsPage({ searchParams }: PageProps) {
     }),
     prisma.ingestQuestionCandidate.findMany({
       where: { batchId: selectedBatchId, contentType: { in: ["PRACTICE_SET", "FULL_PRACTICE_TEST"] } },
-      select: { id: true, sourceFileId: true, type: true, correctAnswer: true, optionsJson: true, promotionStatus: true },
+      select: { id: true, sourceFileId: true, type: true, correctAnswer: true, optionsJson: true, promotionStatus: true, status: true },
     }),
     prisma.ingestCandidateImageLink.findMany({
       where: { batchId: selectedBatchId },
@@ -89,6 +89,8 @@ export default async function AiImportSetsPage({ searchParams }: PageProps) {
   const byFile = new Map<string, { total: number; sinResp: number; faltanOpt: number; promoted: number }>();
   for (const candidate of candidates) {
     if (!candidate.sourceFileId) continue;
+    // Merged-away / rejected candidates no longer count toward the file.
+    if (candidate.status === "REJECTED" || candidate.promotionStatus === "REJECTED") continue;
     const stat = byFile.get(candidate.sourceFileId) ?? { total: 0, sinResp: 0, faltanOpt: 0, promoted: 0 };
     stat.total += 1;
     if (candidate.promotionStatus === "PROMOTED") stat.promoted += 1;

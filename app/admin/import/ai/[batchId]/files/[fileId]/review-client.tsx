@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { CopyableTruncatedText } from "@/components/ui/copyable-truncated-text";
 import { MathContent } from "@/components/math-content";
 import { PdfPageCropper, type CropTarget, type CropOcrResult } from "@/app/admin/import/ai/_components/pdf-page-cropper";
+import { MergeDialog } from "./merge-dialog";
 
 type SourceFile = {
   id: string;
@@ -259,6 +260,7 @@ export function FileReviewClient({
   const [message, setMessage] = useState<string | null>(null);
   const [targetType, setTargetType] = useState("STEM");
   const [optionLabel, setOptionLabel] = useState("");
+  const [mergeOpen, setMergeOpen] = useState(false);
 
   const linksByCandidate = useMemo(() => {
     const map = new Map<string, ImageLink[]>();
@@ -480,9 +482,16 @@ export function FileReviewClient({
                     {draft.questionExternalId ?? "No external ID"} · {Math.round(draft.confidence * 100)}% confidence
                   </p>
                 </div>
-                <Button type="button" onClick={() => saveCandidate("REVIEWED")} disabled={saving}>
-                  Mark Reviewed
-                </Button>
+                <div className="flex flex-wrap items-center gap-2">
+                  {candidates.length > 1 && (
+                    <Button type="button" variant="secondary" onClick={() => setMergeOpen(true)}>
+                      Fusionar con otra pregunta
+                    </Button>
+                  )}
+                  <Button type="button" onClick={() => saveCandidate("REVIEWED")} disabled={saving}>
+                    Mark Reviewed
+                  </Button>
+                </div>
               </div>
               <div className="mt-4 flex flex-wrap items-center gap-2 rounded-md border border-blue-100 bg-blue-50 px-3 py-2 text-sm">
                 <span className="text-blue-900">Promotion: {draft.promotionStatus}</span>
@@ -702,6 +711,22 @@ export function FileReviewClient({
           </Card>
         )}
       </main>
+
+      {mergeOpen && selected && (
+        <MergeDialog
+          open={mergeOpen}
+          onClose={() => setMergeOpen(false)}
+          candidates={candidates}
+          imageLinks={imageLinks}
+          images={images}
+          initialCandidateId={selected.id}
+          onMerged={(survivorId) => {
+            setMergeOpen(false);
+            setSelectedId(survivorId);
+            router.refresh();
+          }}
+        />
+      )}
     </div>
   );
 }
