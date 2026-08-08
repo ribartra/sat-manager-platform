@@ -1794,6 +1794,48 @@ def infer_full_test_metadata_from_pages(db: sqlite3.Connection, batch_id: str, s
     return {"fullTestContentInferred": inferred, "fullTestContentUnresolved": unresolved}
 
 
+def extract_docx_images(doc: Any) -> list[dict[str, Any]]:
+    """Embedded images (word/media/*) in document order, inline and anchored.
+
+    Some mock-exam modules are exported as DOCX where every question is a full-page
+    screenshot: the DOCX text layer is almost empty and the real content lives in
+    these images. We pull them (base64 + mime) so the pipeline can OCR them like
+    PDF pages.
+    """
+    from docx.oxml.ns import qn
+
+    images: list[dict[str, Any]] = []
+    rels = doc.part.rels
+    for blip in doc.element.body.iter(qn("a:blip")):
+        rid = blip.get(qn("r:embed")) or blip.get(qn("r:link"))
+        if not rid:
+            continue
+        rel = rels.get(rid)
+        if rel is None or "image" not in (getattr(rel, "reltype", "") or ""):
+            continue
+        try:
+            blob = rel.target_part.blob
+        except Exception:
+            continue
+        if not blob:
+            continue
+        content_type = getattr(rel.target_part, "content_type", "") or "image/png"
+        extension = (content_type.split("/")[-1].split("+")[0] or "png").lower()
+        try:
+            name = rel.target_ref.split("/")[-1]
+        except Exception:
+            name = f"image{len(images) + 1}.{extension}"
+        images.append(
+            {
+                "base64": base64.b64encode(blob).decode("utf-8"),
+                "mime": content_type,
+                "ext": extension,
+                "name": name,
+            }
+        )
+    return images
+
+
 def extract_docx(path: Path) -> list[dict[str, Any]]:
     doc = Document(path)
     chunks: list[str] = []
@@ -1809,11 +1851,33 @@ def extract_docx(path: Path) -> list[dict[str, Any]]:
                 chunks.append(" | ".join(cells))
         tables.append(table_rows)
     text = "\n".join(chunks)
+    images = extract_docx_images(doc)
+
+    # Image-only DOCX (question modules exported as page screenshots): emit one page
+    # per embedded image and route each through the same OCR path used for PDF pages.
+    meaningful_text = len(re.sub(r"\s+", "", text))
+    if len(images) >= 3 and meaningful_text < max(200, 40 * len(images)):
+        pages: list[dict[str, Any]] = []
+        for index, image in enumerate(images, start=1):
+            pages.append(
+                {
+                    "page": index,
+                    "text": "",
+                    "density": 0,
+                    "requiresOcr": True,
+                    "ocrImage": {"base64": image["base64"], "mimeType": image["mime"], "ext": image["ext"]},
+                    "layout": {"imageCount": 1, "docxImageOnly": True, "docxImages": [image]},
+                }
+            )
+        return pages
+
     layout = {
-        "imageCount": 0,
+        "imageCount": len(images),
         "docxTables": tables,
         "docxExplanationBlocks": docx_explanation_blocks(doc, tables),
     }
+    if images:
+        layout["docxImages"] = images
     return [{"page": 1, "text": text, "density": len(text), "layout": layout}]
 
 
@@ -2002,6 +2066,10 @@ def cached_ocr(db: sqlite3.Connection, content_hash: str) -> str | None:
 
 def run_mistral_ocr(path: Path, page_number: int) -> tuple[str | None, dict[str, Any]]:
     return MistralOcrClient(IngestConfig.from_env()).process_page(path, page_number)
+
+
+def run_mistral_ocr_image(image_base64: str, mime_type: str | None = None) -> tuple[str | None, dict[str, Any]]:
+    return MistralOcrClient(IngestConfig.from_env()).process_image_base64(image_base64, mime_type)
 
 
 QUESTION_ID_RE = re.compile(r"(?:Question\s+ID:?|ID:)\s*([A-Fa-f0-9]{8})", re.IGNORECASE)
@@ -2553,6 +2621,48 @@ def insert_image_artifacts(
             ),
         )
         inserted += 1
+    for image in (layout or {}).get("docxImages") or []:
+        # Best-effort: a single bad/undecodable image or a filesystem write error
+        # must not abort processing of the whole source file.
+        try:
+            image_id = new_id("img")
+            image_bytes, _ext = decode_base64_image(image.get("base64"))
+            file_url = None
+            content_hash = None
+            width = None
+            height = None
+            if image_bytes:
+                file_url, content_hash = save_ingest_image(batch_id, image_id, image_bytes, image.get("ext") or "png")
+                try:
+                    with Image.open(BytesIO(image_bytes)) as loaded:
+                        width, height = loaded.size
+                except Exception:
+                    width = height = None
+            db.execute(
+                """
+                INSERT OR IGNORE INTO IngestImageArtifact
+                  (id, batchId, sourceFileId, pageArtifactId, pageNumber, imageIndex, imageId, origin, bboxJson, mimeType, fileUrl, width, height, contentHash, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 'DOCX_MEDIA', ?, ?, ?, ?, ?, ?, 'AVAILABLE')
+                """,
+                (
+                    image_id,
+                    batch_id,
+                    source_file_id,
+                    page_artifact_id,
+                    page_number,
+                    inserted,
+                    image.get("name"),
+                    None,
+                    image.get("mime") or "image/png",
+                    file_url,
+                    width,
+                    height,
+                    content_hash,
+                ),
+            )
+            inserted += 1
+        except Exception:
+            continue
     image_index = 0
     for page in (ocr_payload or {}).get("pages") or []:
         for image in page.get("images") or []:
@@ -4525,12 +4635,14 @@ def _process_batch(batch_id: str) -> None:
                         continue
                     content_hash = text_hash(page.get("text", ""), f"{source['hash']}:{page['page']}")
                     is_blank_page = bool(page.get("blankPage"))
-                    method = "DOCX_TEXT" if path.suffix.lower() == ".docx" else "BLANK_PAGE" if is_blank_page else "PDF_TEXT"
+                    suffix = path.suffix.lower()
+                    docx_ocr_image = page.get("ocrImage") if suffix == ".docx" else None
+                    method = "DOCX_TEXT" if suffix == ".docx" and not docx_ocr_image else "BLANK_PAGE" if is_blank_page else "PDF_TEXT"
                     text = page.get("text", "") or ""
                     requires_ocr = bool(page.get("requiresOcr"))
                     warning = page.get("warning")
                     ocr_payload = None
-                    if requires_ocr and path.suffix.lower() == ".pdf":
+                    if requires_ocr and (suffix == ".pdf" or docx_ocr_image):
                         cached = cached_ocr(db, content_hash)
                         if cached is not None:
                             text = cached
@@ -4541,8 +4653,11 @@ def _process_batch(batch_id: str) -> None:
                             ).fetchone()
                             if cache_row:
                                 ocr_payload = json.loads(cache_row["responseJson"])
+                        elif docx_ocr_image:
+                            ocr_text, payload = run_mistral_ocr_image(docx_ocr_image["base64"], docx_ocr_image.get("mimeType"))
                         else:
                             ocr_text, payload = run_mistral_ocr(path, int(page["page"]))
+                        if cached is None:
                             if ocr_text:
                                 text = ocr_text
                                 method = "MISTRAL_OCR"
