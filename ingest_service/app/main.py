@@ -4542,6 +4542,124 @@ def parse_candidate_option_image(candidate_id: str, image_artifact_id: str) -> d
         return {"candidateId": candidate_id, "imageArtifactId": image_artifact_id, "options": options, "text": text, "status": status}
 
 
+def _normalize_match_text(value: str | None) -> str:
+    return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9 ]+", " ", (value or "").lower())).strip()
+
+
+def link_docx_full_test_candidate_images(db: sqlite3.Connection, batch_id: str, source_file_id: str | None = None) -> int:
+    """Attach the OCR'd page screenshot to each image-only mock DOCX candidate.
+
+    Candidates for image-only FULL_PRACTICE_TEST DOCX come from the answer spine and
+    carry a prompt but no options/passage (those live inside the page screenshots).
+    Here we match each candidate's prompt to the page whose OCR text contains it and
+    link that page's image as STEM so promotion renders the full question image.
+    Idempotent: skips candidates that already have a STEM link.
+    """
+    source_filter = "AND f.extension = 'docx' AND f.contentType = 'FULL_PRACTICE_TEST'"
+    params: list[Any] = [batch_id]
+    if source_file_id:
+        source_filter += " AND f.id = ?"
+        params.append(source_file_id)
+    sources = db.execute(
+        f"SELECT f.id, f.testNumber, f.section FROM IngestSourceFile f WHERE f.batchId = ? AND f.isQuestionSource = 1 {source_filter}",
+        params,
+    ).fetchall()
+    linked = 0
+    for source in sources:
+        pages = db.execute(
+            """
+            SELECT p.id AS pageId, p.extractedText,
+                   (SELECT i.id FROM IngestImageArtifact i WHERE i.pageArtifactId = p.id ORDER BY i.imageIndex LIMIT 1) AS imageId
+            FROM IngestPageArtifact p
+            WHERE p.sourceFileId = ? AND p.status = 'COMPLETED'
+            ORDER BY p.pageNumber
+            """,
+            (source["id"],),
+        ).fetchall()
+        page_index = [(p["pageId"], p["imageId"], _normalize_match_text(p["extractedText"])) for p in pages if p["imageId"]]
+        if not page_index:
+            continue
+        # Candidates for this test/section that still lack a STEM image link.
+        candidates = db.execute(
+            """
+            SELECT q.id, q.stem, q.moduleLabel, q.questionNumber
+            FROM IngestQuestionCandidate q
+            WHERE q.batchId = ? AND q.contentType = 'FULL_PRACTICE_TEST'
+              AND q.testNumber IS ? AND q.section IS ?
+              AND NOT EXISTS (
+                SELECT 1 FROM IngestCandidateImageLink l
+                WHERE l.candidateId = q.id AND l.targetType = 'STEM'
+              )
+            ORDER BY q.moduleLabel, q.questionNumber
+            """,
+            (batch_id, source["testNumber"], source["section"]),
+        ).fetchall()
+        used_pages: set[str] = set()
+
+        def _hint_tokens(stem: str | None) -> set[str]:
+            # The answer-DOCX prompt carries a "[proper-noun / topic hint]" tail whose
+            # distinctive tokens (names, places) usually appear in the passage OCR.
+            match = re.search(r"\[([^\]]*)\]", stem or "")
+            if not match:
+                return set()
+            return {t for t in _normalize_match_text(match.group(1)).split(" ") if len(t) > 3}
+
+        def _prompt_head(stem: str | None) -> str:
+            return _normalize_match_text(re.split(r"\[", stem or "", maxsplit=1)[0])
+
+        unlinked = 0
+        for candidate in candidates:
+            best_page = None
+            # Signal 1: exact prompt substring, but only trust it when it hits a single
+            # page (generic prompts like "Which choice completes the text" repeat, so an
+            # ambiguous multi-page hit is discarded).
+            prompt = _prompt_head(candidate["stem"])
+            if len(prompt) >= 25:
+                hits = [(pid, iid) for pid, iid, pn in page_index if pid not in used_pages and prompt in pn]
+                if len(hits) == 1:
+                    best_page = hits[0]
+            # Signal 2: distinctive hint tokens with a unique, strictly-best page.
+            if not best_page:
+                tokens = _hint_tokens(candidate["stem"])
+                if len(tokens) >= 2:
+                    scored = sorted(
+                        ((sum(1 for t in tokens if t in pn), pid, iid) for pid, iid, pn in page_index if pid not in used_pages),
+                        key=lambda row: row[0],
+                        reverse=True,
+                    )
+                    if scored and scored[0][0] >= 2 and (len(scored) < 2 or scored[0][0] > scored[1][0]):
+                        best_page = (scored[0][1], scored[0][2])
+            if not best_page:
+                unlinked += 1
+                continue
+            page_id, image_id = best_page
+            used_pages.add(page_id)
+            db.execute(
+                """
+                INSERT OR IGNORE INTO IngestCandidateImageLink
+                  (id, batchId, candidateId, imageArtifactId, targetType, optionLabel, sortOrder, createdAt, updatedAt)
+                VALUES (?, ?, ?, ?, 'STEM', NULL, 0, ?, ?)
+                """,
+                (new_id("cil"), batch_id, candidate["id"], image_id, now_iso(), now_iso()),
+            )
+            linked += 1
+
+        # Candidates we couldn't confidently match keep their prompt/answer but need a
+        # human to attach the right page image in the wizard — flag instead of guessing.
+        if unlinked:
+            log_ingest_incident(
+                db,
+                batch_id=batch_id,
+                source_file_id=source["id"],
+                severity="WARNING",
+                code="DOCX_FULL_TEST_IMAGE_LINK_PENDING",
+                message=f"{unlinked} TEST {source['testNumber']} {source['section']} questions from the image-only DOCX could not be auto-linked to a page image.",
+                decision="These candidates keep prompt/answer but have no STEM image; their passage/options live in an unassigned page screenshot.",
+                action="Assign the correct page image to each in the review wizard before promotion.",
+            )
+    return linked
+
+
 def _process_batch(batch_id: str) -> None:
     with conn() as db:
         batch = db.execute("SELECT * FROM IngestBatch WHERE id = ?", (batch_id,)).fetchone()
@@ -4863,6 +4981,7 @@ def _process_batch(batch_id: str) -> None:
         normalize_full_test_candidate_modules(db, batch_id)
         remove_full_test_extra_practice_candidates(db, batch_id)
         enrich_candidates_from_answers(db, batch_id)
+        link_docx_full_test_candidate_images(db, batch_id)
         reconcile_ingest_incidents(db, batch_id)
         recalc_batch(db, batch_id, "FAILED" if errors else None)
         log_ingest_job_event(
