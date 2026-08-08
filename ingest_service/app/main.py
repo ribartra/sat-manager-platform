@@ -23,7 +23,7 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from app.practice_repair import assign_sequential_numbers, parse_practice_block
 import pdfplumber
 from docx import Document
-from fastapi import BackgroundTasks, FastAPI, File, Form, HTTPException, Request, UploadFile
+from fastapi import BackgroundTasks, FastAPI, File, Form, HTTPException, Request, Response, UploadFile
 from fastapi.responses import JSONResponse
 from mistralai.client import Mistral
 from PIL import Image, ImageStat
@@ -819,6 +819,145 @@ def crop_pdf_image(path: Path, page_number: int, bbox: dict[str, Any]) -> tuple[
             return output.getvalue(), cropped.width, cropped.height
     except Exception:
         return None, None, None
+
+
+def render_pdf_page_jpeg(path: Path, page_number: int, dpi: int = 150) -> tuple[bytes | None, float | None, float | None]:
+    """Renderiza una página completa a JPEG para mostrarla en el navegador (cropper).
+    Devuelve (bytes, page.width, page.height) en puntos PDF para mapear coords."""
+    try:
+        with pdfplumber.open(path) as pdf:
+            if page_number < 1 or page_number > len(pdf.pages):
+                return None, None, None
+            page = pdf.pages[page_number - 1]
+            image = page.to_image(resolution=dpi).original.convert("RGB")
+            output = BytesIO()
+            image.save(output, format="JPEG", quality=85, optimize=True)
+            return output.getvalue(), float(page.width), float(page.height)
+    except Exception:
+        return None, None, None
+
+
+def crop_pdf_region_normalized(
+    path: Path, page_number: int, bbox_norm: dict[str, Any]
+) -> tuple[bytes | None, int | None, int | None, dict[str, float] | None]:
+    """Recorta una región dada en coordenadas NORMALIZADAS [0,1] (esquina sup-izq
+    = 0,0), convirtiéndolas a puntos PDF con page.width/height. Independiente de
+    DPI/zoom del navegador. Devuelve (jpeg, w_px, h_px, puntos_pdf)."""
+    try:
+        with pdfplumber.open(path) as pdf:
+            if page_number < 1 or page_number > len(pdf.pages):
+                return None, None, None, None
+            page = pdf.pages[page_number - 1]
+            pw, ph = float(page.width), float(page.height)
+            clamp = lambda v: max(0.0, min(1.0, float(v)))
+            x0 = clamp(bbox_norm.get("x0", 0)) * pw
+            y0 = clamp(bbox_norm.get("y0", 0)) * ph
+            x1 = clamp(bbox_norm.get("x1", 1)) * pw
+            y1 = clamp(bbox_norm.get("y1", 1)) * ph
+            if x1 - x0 < 1.0 or y1 - y0 < 1.0:
+                return None, None, None, None
+            cropped = page.crop((x0, y0, x1, y1)).to_image(resolution=180).original.convert("RGB")
+            output = BytesIO()
+            cropped.save(output, format="JPEG", quality=90, optimize=True)
+            return output.getvalue(), cropped.width, cropped.height, {"x0": x0, "top": y0, "x1": x1, "bottom": y1}
+    except Exception:
+        return None, None, None, None
+
+
+CROP_TARGET_TYPES = {"STEM", "STIMULUS", "OPTION", "OPTION_BLOCK", "ANSWER_FIELD", "EXPLANATION", "PAGE_CONTEXT"}
+
+
+def crop_candidate_region(
+    candidate_id: str,
+    page_number: int,
+    bbox_norm: dict[str, Any],
+    mode: str,
+    target_type: str,
+    option_label: str | None,
+) -> dict[str, Any]:
+    """Recorta una región del PDF de un candidato y la trabaja según `mode`:
+    ASSIGN → guarda el recorte como IngestImageArtifact (origin MANUAL_CROP) y crea
+    el IngestCandidateImageLink al target. OCR → transcribe el recorte y devuelve el
+    texto (y opciones A-D si target es OPTION_BLOCK) para revisión en el front; NO
+    modifica el candidato."""
+    mode = (mode or "").upper()
+    target_type = (target_type or "").upper()
+    option_label = option_label.upper() if option_label else None
+    if mode not in {"ASSIGN", "OCR"}:
+        raise HTTPException(status_code=400, detail="mode must be ASSIGN or OCR.")
+    if target_type not in CROP_TARGET_TYPES:
+        raise HTTPException(status_code=400, detail="Invalid targetType.")
+    if target_type == "OPTION" and not option_label:
+        raise HTTPException(status_code=400, detail="optionLabel is required for OPTION target.")
+    with conn() as db:
+        init_db()
+        candidate = db.execute("SELECT * FROM IngestQuestionCandidate WHERE id = ?", (candidate_id,)).fetchone()
+        if not candidate:
+            raise HTTPException(status_code=404, detail="Candidate not found.")
+        source = db.execute("SELECT * FROM IngestSourceFile WHERE id = ?", (candidate["sourceFileId"],)).fetchone()
+        if not source:
+            raise HTTPException(status_code=404, detail="Source file not found.")
+        path = resolve_existing_source_path(source["path"])
+        if not path.exists() or path.suffix.lower() != ".pdf":
+            raise HTTPException(status_code=400, detail="Source PDF is not available for cropping.")
+        image_bytes, w_px, h_px, points = crop_pdf_region_normalized(path, page_number, bbox_norm)
+        if not image_bytes:
+            raise HTTPException(status_code=400, detail="Could not render the selected region.")
+        image_id = new_id("img")
+        file_url, content_hash = save_ingest_image(candidate["batchId"], image_id, image_bytes, "jpg")
+        next_index = db.execute(
+            "SELECT COALESCE(MAX(imageIndex), -1) + 1 FROM IngestImageArtifact WHERE sourceFileId = ? AND pageNumber = ? AND origin = 'MANUAL_CROP'",
+            (source["id"], page_number),
+        ).fetchone()[0]
+        bbox_json = json.dumps({"normalized": bbox_norm, "points": points, "renderedWidth": w_px, "renderedHeight": h_px})
+        db.execute(
+            """
+            INSERT INTO IngestImageArtifact
+              (id, batchId, sourceFileId, pageArtifactId, pageNumber, imageIndex, imageId, origin, bboxJson, mimeType, fileUrl, width, height, contentHash, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'MANUAL_CROP', ?, 'image/jpeg', ?, ?, ?, ?, 'AVAILABLE')
+            """,
+            (image_id, candidate["batchId"], source["id"], candidate["pageArtifactId"], page_number, next_index, image_id, bbox_json, file_url, w_px, h_px, content_hash),
+        )
+        result: dict[str, Any] = {"candidateId": candidate_id, "imageArtifactId": image_id, "fileUrl": file_url, "pageNumber": page_number, "mode": mode}
+        if mode == "ASSIGN":
+            db.execute(
+                """
+                INSERT OR IGNORE INTO IngestCandidateImageLink
+                  (id, batchId, candidateId, imageArtifactId, targetType, optionLabel, sortOrder, createdAt, updatedAt)
+                VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?)
+                """,
+                (new_id("imglink"), candidate["batchId"], candidate_id, image_id, target_type, option_label if target_type == "OPTION" else None, now_iso(), now_iso()),
+            )
+            log_ingest_job_event(
+                db,
+                batch_id=candidate["batchId"],
+                source_file_id=source["id"],
+                page_artifact_id=candidate["pageArtifactId"],
+                job_type="MANUAL_CROP_ASSIGN",
+                status="COMPLETED",
+                message=f"Assigned cropped region to {target_type}{('/' + option_label) if option_label else ''} for candidate {candidate_id}.",
+                metadata={"imageArtifactId": image_id, "targetType": target_type, "optionLabel": option_label},
+            )
+            result["assigned"] = {"targetType": target_type, "optionLabel": option_label if target_type == "OPTION" else None}
+        else:  # OCR
+            text, payload = run_mistral_ocr_image(base64.b64encode(image_bytes).decode("utf-8"), "image/jpeg")
+            result["text"] = text
+            if payload.get("warning"):
+                result["warning"] = payload["warning"]
+            if target_type == "OPTION_BLOCK":
+                result["options"] = extract_options_from_image_ocr(text or "")
+            log_ingest_job_event(
+                db,
+                batch_id=candidate["batchId"],
+                source_file_id=source["id"],
+                page_artifact_id=candidate["pageArtifactId"],
+                job_type="MANUAL_CROP_OCR",
+                status="COMPLETED",
+                message=f"OCR'd cropped region ({target_type}) for candidate {candidate_id}.",
+                metadata={"imageArtifactId": image_id, "targetType": target_type, "chars": len(text or "")},
+            )
+        db.commit()
+        return result
 
 
 def detect_difficulty_and_variant(value: str) -> tuple[str | None, str | None]:
@@ -5215,3 +5354,45 @@ def parse_candidate_option_image_endpoint(candidate_id: str, payload: dict[str, 
     if not image_artifact_id:
         raise HTTPException(status_code=400, detail="imageArtifactId is required.")
     return parse_candidate_option_image(candidate_id, str(image_artifact_id))
+
+
+@app.get("/sources/{source_file_id}/pages/{page_number}/image")
+def render_source_page_image(source_file_id: str, page_number: int, dpi: int = 150) -> Response:
+    dpi = max(72, min(300, dpi))
+    with conn() as db:
+        source = db.execute("SELECT * FROM IngestSourceFile WHERE id = ?", (source_file_id,)).fetchone()
+    if not source:
+        raise HTTPException(status_code=404, detail="Source file not found.")
+    path = resolve_existing_source_path(source["path"])
+    if not path.exists() or path.suffix.lower() != ".pdf":
+        raise HTTPException(status_code=400, detail="Source is not a PDF that can be rendered.")
+    image_bytes, page_width, page_height = render_pdf_page_jpeg(path, page_number, dpi)
+    if not image_bytes:
+        raise HTTPException(status_code=404, detail="Could not render the requested page.")
+    return Response(
+        content=image_bytes,
+        media_type="image/jpeg",
+        headers={
+            "X-Page-Width": str(page_width),
+            "X-Page-Height": str(page_height),
+            "Cache-Control": "private, max-age=300",
+        },
+    )
+
+
+@app.post("/candidates/{candidate_id}/crop-region")
+def crop_candidate_region_endpoint(candidate_id: str, payload: dict[str, Any]) -> dict[str, Any]:
+    page_number = payload.get("pageNumber")
+    if page_number is None:
+        raise HTTPException(status_code=400, detail="pageNumber is required.")
+    bbox = payload.get("bbox")
+    if not isinstance(bbox, dict):
+        raise HTTPException(status_code=400, detail="bbox {x0,y0,x1,y1} (normalized) is required.")
+    return crop_candidate_region(
+        candidate_id,
+        int(page_number),
+        bbox,
+        str(payload.get("mode", "ASSIGN")),
+        str(payload.get("targetType", "PAGE_CONTEXT")),
+        payload.get("optionLabel"),
+    )

@@ -11,6 +11,7 @@ import { CopyableTruncatedText } from "@/components/ui/copyable-truncated-text";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { MathContent } from "@/components/math-content";
+import { PdfPageCropper, type CropTarget, type CropOcrResult } from "@/app/admin/import/ai/_components/pdf-page-cropper";
 
 const MAX_UPLOAD_BYTES = 256 * 1024 * 1024;
 const targetTypes = [
@@ -412,6 +413,14 @@ export function AiImportWorkflowClient({
     setImageLinks((current) => current.filter((link) => link.id !== linkId));
   }
 
+  async function refreshImageLinks() {
+    if (!selectedCandidateId) return;
+    const refreshed = await fetch(`/api/admin/ai-import/candidates/${selectedCandidateId}/image-links`)
+      .then((response) => (response.ok ? response.json() : []))
+      .catch(() => []);
+    setImageLinks(Array.isArray(refreshed) ? refreshed : []);
+  }
+
   async function parseOptionImage(imageArtifactId: string) {
     if (!draft) return;
     setParsingImageId(imageArtifactId);
@@ -592,6 +601,7 @@ export function AiImportWorkflowClient({
               parsingImageId={parsingImageId}
               saving={saving}
               message={message}
+              onCropAssigned={refreshImageLinks}
             />
           </div>
           <BulkPromoteQuestionsBar
@@ -946,6 +956,7 @@ function QuestionStagingEditor({
   parsingImageId,
   saving,
   message,
+  onCropAssigned,
 }: {
   draft: CandidateSummary | null;
   setDraft: (draft: CandidateSummary) => void;
@@ -965,13 +976,36 @@ function QuestionStagingEditor({
   parsingImageId: string | null;
   saving: boolean;
   message: string | null;
+  onCropAssigned: () => void;
 }) {
   if (!draft) {
     return <div className="rounded-md border border-gray-200 p-8 text-center text-sm text-gray-400">Select a detected question to review.</div>;
   }
+  const activeDraft = draft;
 
   function updateOption(index: number, patch: Partial<OptionRow>) {
     setOptionRows(optionRows.map((row, rowIndex) => rowIndex === index ? { ...row, ...patch } : row));
+  }
+
+  function applyCropOcr(target: CropTarget, result: CropOcrResult) {
+    const text = (result.text ?? "").trim();
+    if (target.targetType === "OPTION_BLOCK" && result.options && result.options.length === 4) {
+      setOptionRows(result.options.map((option) => ({ label: option.label, text: option.text })));
+      setDraft({ ...activeDraft, type: "MC" });
+    } else if (target.targetType === "OPTION" && target.optionLabel) {
+      const index = optionRows.findIndex((row) => (row.label || "").toUpperCase() === target.optionLabel);
+      if (index >= 0) setOptionRows(optionRows.map((row, i) => (i === index ? { ...row, text } : row)));
+      else setOptionRows([...optionRows, { label: target.optionLabel, text }]);
+      setDraft({ ...activeDraft, type: "MC" });
+    } else if (target.targetType === "STEM") {
+      setDraft({ ...activeDraft, stem: text });
+    } else if (target.targetType === "STIMULUS") {
+      setDraft({ ...activeDraft, stimulus: text });
+    } else if (target.targetType === "EXPLANATION") {
+      setDraft({ ...activeDraft, explanation: text });
+    } else if (target.targetType === "ANSWER_FIELD") {
+      setDraft({ ...activeDraft, correctAnswer: text });
+    }
   }
 
   return (
@@ -1128,6 +1162,16 @@ function QuestionStagingEditor({
           ))}
           {images.length === 0 && <p className="text-sm text-gray-400">No extracted images for this question file.</p>}
         </div>
+        {activeDraft.sourceFileId && (
+          <PdfPageCropper
+            className="mt-4 border-t border-gray-100 pt-4"
+            candidateId={activeDraft.id}
+            sourceFileId={activeDraft.sourceFileId}
+            pageNumbers={images.map((image) => image.pageNumber)}
+            onAssigned={onCropAssigned}
+            onOcrText={applyCropOcr}
+          />
+        )}
       </div>
     </section>
   );

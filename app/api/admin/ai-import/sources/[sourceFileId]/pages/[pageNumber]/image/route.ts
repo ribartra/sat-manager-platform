@@ -1,0 +1,46 @@
+import { NextRequest, NextResponse } from "next/server";
+import { requireTeacherOrAdmin } from "@/lib/rbac";
+import prisma from "@/lib/prisma";
+import { ingestAuthHeaders, ingestUrl } from "@/lib/internal-ingest";
+
+interface RouteContext {
+  params: Promise<{ sourceFileId: string; pageNumber: string }>;
+}
+
+// Renders a source PDF page to JPEG for the crop tool. Proxies the ingest service
+// (which reads the PDF from disk) so the internal token never reaches the browser.
+export async function GET(req: NextRequest, { params }: RouteContext) {
+  const session = await requireTeacherOrAdmin();
+  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+  const { sourceFileId, pageNumber } = await params;
+  const pageNum = Number(pageNumber);
+  if (!Number.isInteger(pageNum) || pageNum < 1) {
+    return NextResponse.json({ error: "Invalid page number." }, { status: 400 });
+  }
+
+  const source = await prisma.ingestSourceFile.findUnique({ where: { id: sourceFileId }, select: { id: true } });
+  if (!source) return NextResponse.json({ error: "Source file not found." }, { status: 404 });
+
+  const dpiParam = Number(req.nextUrl.searchParams.get("dpi"));
+  const dpi = Number.isFinite(dpiParam) && dpiParam > 0 ? Math.min(300, Math.max(72, Math.round(dpiParam))) : 150;
+
+  const response = await fetch(ingestUrl(`/sources/${sourceFileId}/pages/${pageNum}/image?dpi=${dpi}`), {
+    headers: ingestAuthHeaders(),
+  });
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    return NextResponse.json({ error: data.detail || "Could not render page." }, { status: response.status });
+  }
+
+  const buffer = await response.arrayBuffer();
+  return new NextResponse(buffer, {
+    status: 200,
+    headers: {
+      "Content-Type": "image/jpeg",
+      "Cache-Control": "private, max-age=300",
+      "X-Page-Width": response.headers.get("X-Page-Width") ?? "",
+      "X-Page-Height": response.headers.get("X-Page-Height") ?? "",
+    },
+  });
+}

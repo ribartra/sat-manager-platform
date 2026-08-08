@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { CopyableTruncatedText } from "@/components/ui/copyable-truncated-text";
 import { MathContent } from "@/components/math-content";
+import { PdfPageCropper, type CropTarget, type CropOcrResult } from "@/app/admin/import/ai/_components/pdf-page-cropper";
 
 type SourceFile = {
   id: string;
@@ -359,6 +360,29 @@ export function FileReviewClient({
     router.refresh();
   }
 
+  function applyCropOcr(target: CropTarget, result: CropOcrResult) {
+    if (!draft) return;
+    const text = (result.text ?? "").trim();
+    if (target.targetType === "OPTION_BLOCK" && result.options && result.options.length === 4) {
+      setDraft({ ...draft, type: "MC", optionsJson: JSON.stringify(result.options) });
+    } else if (target.targetType === "OPTION" && target.optionLabel) {
+      const opts = parseOptions(draft.optionsJson) as { label?: string; text?: string }[];
+      const map = new Map(opts.map((o) => [(o.label ?? "").toUpperCase(), o.text ?? ""]));
+      map.set(target.optionLabel, text);
+      const ordered = ["A", "B", "C", "D"].map((label) => ({ label, text: map.get(label) ?? "" }));
+      setDraft({ ...draft, type: "MC", optionsJson: JSON.stringify(ordered) });
+    } else if (target.targetType === "STEM") {
+      setDraft({ ...draft, stem: text });
+    } else if (target.targetType === "STIMULUS") {
+      setDraft({ ...draft, stimulus: text });
+    } else if (target.targetType === "EXPLANATION") {
+      setDraft({ ...draft, explanation: text });
+    } else if (target.targetType === "ANSWER_FIELD") {
+      setDraft({ ...draft, correctAnswer: text });
+    }
+    setMessage("Texto de OCR aplicado al borrador. Ve al paso QUESTIONS para revisar y Guardar.");
+  }
+
   async function openQuestionEditor(candidateId: string) {
     await fetch(`/api/admin/ai-import/candidates/${candidateId}/mark-editing`, { method: "POST" });
     window.location.href = `/teacher/questions/new?ingestCandidateId=${candidateId}`;
@@ -611,6 +635,14 @@ export function FileReviewClient({
             </div>
             <p className="mt-2 text-xs text-gray-500">Use Options block to OCR for A-D choices. Use Answer field for blank lines or response boxes.</p>
             {message && <p className="mt-2 text-xs text-gray-600">{message}</p>}
+            <PdfPageCropper
+              className="mt-4"
+              candidateId={selected.id}
+              sourceFileId={file.id}
+              pageNumbers={pages.map((page) => page.pageNumber)}
+              onAssigned={() => router.refresh()}
+              onOcrText={applyCropOcr}
+            />
             <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               {images.map((image) => (
                 <div key={image.id} className={`rounded-md border p-2 ${linkedImageIds.has(image.id) ? "border-blue-300 bg-blue-50" : "border-gray-200"}`}>
