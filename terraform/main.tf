@@ -115,7 +115,7 @@ resource "google_project_iam_member" "metric_writer" {
 # --- networking --------------------------------------------------------------
 resource "google_compute_address" "ip" {
   name       = "${var.name_prefix}-ip"
-  region     = var.region
+  region     = var.vm_region
   depends_on = [google_project_service.enabled]
 }
 
@@ -150,7 +150,7 @@ resource "google_compute_firewall" "ssh_iap" {
 resource "google_compute_disk" "data" {
   name = "${var.name_prefix}-data"
   type = "pd-balanced"
-  zone = var.zone
+  zone = var.vm_zone
   size = var.data_disk_gb
 }
 
@@ -158,7 +158,7 @@ resource "google_compute_disk" "data" {
 resource "google_compute_instance" "vm" {
   name         = "${var.name_prefix}-vm"
   machine_type = var.machine_type
-  zone         = var.zone
+  zone         = var.vm_zone
   tags         = ["${var.name_prefix}-web"]
 
   boot_disk {

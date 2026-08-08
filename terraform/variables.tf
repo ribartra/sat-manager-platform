@@ -15,6 +15,22 @@ variable "zone" {
   description = "Zone for the VM and data disk."
 }
 
+# Compute region/zone may differ from the storage region (`region`) to work
+# around zonal capacity shortages. Bucket, Artifact Registry and secrets stay in
+# `region`; the IP, data disk and VM live in `vm_region`/`vm_zone`. The VM pulls
+# images and reads the seed cross-region (same project, minor egress).
+variable "vm_region" {
+  type        = string
+  default     = "us-central1"
+  description = "Region for the VM's external static IP. Defaults to `region`; override to relocate compute."
+}
+
+variable "vm_zone" {
+  type        = string
+  default     = "us-central1-a"
+  description = "Zone for the VM and data disk. Override together with vm_region to relocate compute."
+}
+
 variable "name_prefix" {
   type        = string
   default     = "sat"
