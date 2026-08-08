@@ -2432,6 +2432,16 @@ def make_candidate_from_text(
 def make_candidates_from_text(text: str, meta: sqlite3.Row, page_id: str | None, default_module_label: str | None = None) -> list[dict[str, Any]]:
     if bool(meta["isAnswerFile"]):
         return []
+    # Image-only mock-exam DOCX: question modules are page screenshots that do NOT
+    # segment reliably per image (one question spans passage/question/table images;
+    # many pages are tables or lone options). Do not create per-image candidates;
+    # the canonical, correctly-numbered candidates come from the answer-DOCX spine
+    # (create_missing_full_test_candidates_from_docx_answers). The OCR'd images stay
+    # as linkable page context.
+    meta_keys = meta.keys() if hasattr(meta, "keys") else []
+    extension = str((meta["extension"] if "extension" in meta_keys else "") or "").lower()
+    if meta["contentType"] == "FULL_PRACTICE_TEST" and extension == "docx":
+        return []
     if meta["contentType"] == "FULL_PRACTICE_TEST" and re.search(r"\bEXTRA\s+PRACTICE\b", text, re.IGNORECASE):
         return []
     return [
