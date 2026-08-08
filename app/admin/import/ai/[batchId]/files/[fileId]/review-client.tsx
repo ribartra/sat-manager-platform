@@ -102,13 +102,13 @@ type ReviewSession = {
 
 const steps = ["PAGES", "QUESTIONS", "ANSWERS", "IMAGES", "FINAL"];
 const targetTypes = [
-  { value: "STEM", label: "Question image" },
-  { value: "STIMULUS", label: "Stimulus image" },
-  { value: "OPTION", label: "Single option image" },
-  { value: "OPTION_BLOCK", label: "Options block to OCR" },
-  { value: "ANSWER_FIELD", label: "Answer field / blank line" },
-  { value: "EXPLANATION", label: "Explanation image" },
-  { value: "PAGE_CONTEXT", label: "Page context" },
+  { value: "STEM", label: "Imagen de enunciado" },
+  { value: "STIMULUS", label: "Imagen de estímulo" },
+  { value: "OPTION", label: "Imagen de una opción" },
+  { value: "OPTION_BLOCK", label: "Bloque de opciones (OCR)" },
+  { value: "ANSWER_FIELD", label: "Campo de respuesta" },
+  { value: "EXPLANATION", label: "Imagen de explicación" },
+  { value: "PAGE_CONTEXT", label: "Contexto de página" },
 ];
 const questionLinePattern = /^(?:question|q)\s*\.?\s*\d+[:.)\s-]/i;
 
@@ -145,6 +145,12 @@ function stripMarkdownImageRefs(value: string | null | undefined) {
 
 function targetLabel(value: string) {
   return targetTypes.find((target) => target.value === value)?.label ?? value;
+}
+
+// Human label for the concrete slot a link occupies, e.g. "Opción A".
+function slotLabel(targetType: string, optionLabel: string | null) {
+  if (targetType === "OPTION") return `Opción ${optionLabel ?? "?"}`;
+  return targetLabel(targetType);
 }
 
 function textStats(value: string | null) {
@@ -258,9 +264,10 @@ export function FileReviewClient({
   const [saving, setSaving] = useState(false);
   const [parsingImageId, setParsingImageId] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
-  const [targetType, setTargetType] = useState("STEM");
+  const [targetType, setTargetType] = useState("ANSWER_FIELD");
   const [optionLabel, setOptionLabel] = useState("");
   const [mergeOpen, setMergeOpen] = useState(false);
+  const [activeSlot, setActiveSlot] = useState<{ targetType: string; optionLabel: string | null; label: string } | null>(null);
 
   const linksByCandidate = useMemo(() => {
     const map = new Map<string, ImageLink[]>();
@@ -273,10 +280,32 @@ export function FileReviewClient({
   }, [imageLinks]);
 
   const selectedLinks = selected ? linksByCandidate.get(selected.id) ?? [] : [];
-  const linkedImageIds = new Set(selectedLinks.map((link) => link.imageArtifactId));
   const answersForQuestion = selected?.questionNumber
     ? answers.filter((answer) => answer.questionNumber === selected.questionNumber)
     : [];
+
+  // Option letters for this candidate (from parsed options, else A–D for MC).
+  const optionLetters = (() => {
+    const opts = parseOptions(selected?.optionsJson ?? null) as { label?: string }[];
+    const letters = opts.map((opt) => (opt.label ?? "").toUpperCase()).filter(Boolean);
+    return letters.length ? letters : ["A", "B", "C", "D"];
+  })();
+  // The concrete assignment slots shown in the board.
+  const imageSlots: { targetType: string; optionLabel: string | null; label: string }[] = [
+    { targetType: "STEM", optionLabel: null, label: "Enunciado" },
+    ...optionLetters.map((letter) => ({ targetType: "OPTION", optionLabel: letter, label: `Opción ${letter}` })),
+    { targetType: "STIMULUS", optionLabel: null, label: "Estímulo" },
+  ];
+  function linkForSlot(tType: string, oLabel: string | null) {
+    return selectedLinks.find((link) => link.targetType === tType && (link.optionLabel ?? null) === (oLabel ?? null));
+  }
+  // imageId → list of slot labels it currently occupies.
+  const assignmentsByImage = new Map<string, string[]>();
+  for (const link of selectedLinks) {
+    const list = assignmentsByImage.get(link.imageArtifactId) ?? [];
+    list.push(slotLabel(link.targetType, link.optionLabel));
+    assignmentsByImage.set(link.imageArtifactId, list);
+  }
 
   async function updateSession(nextStep: string, candidateId = selectedId) {
     setStep(nextStep);
@@ -339,6 +368,35 @@ export function FileReviewClient({
   async function unlinkImage(linkId: string) {
     if (!selected) return;
     await fetch(`/api/admin/ai-import/candidates/${selected.id}/image-links?linkId=${linkId}`, { method: "DELETE" });
+    router.refresh();
+  }
+
+  // Assign an image to a concrete slot (enunciado / opción X / estímulo…).
+  // A slot holds exactly one image, so any current occupant is cleared first.
+  async function assignToSlot(imageId: string, tType: string, oLabel: string | null) {
+    if (!selected) return;
+    const occupants = selectedLinks.filter(
+      (link) => link.targetType === tType && (link.optionLabel ?? null) === (oLabel ?? null)
+    );
+    for (const occupant of occupants) {
+      await fetch(`/api/admin/ai-import/candidates/${selected.id}/image-links?linkId=${occupant.id}`, { method: "DELETE" });
+    }
+    await fetch(`/api/admin/ai-import/candidates/${selected.id}/image-links`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ imageArtifactId: imageId, targetType: tType, optionLabel: oLabel }),
+    });
+    router.refresh();
+  }
+
+  async function clearSlot(tType: string, oLabel: string | null) {
+    if (!selected) return;
+    const occupants = selectedLinks.filter(
+      (link) => link.targetType === tType && (link.optionLabel ?? null) === (oLabel ?? null)
+    );
+    for (const occupant of occupants) {
+      await fetch(`/api/admin/ai-import/candidates/${selected.id}/image-links?linkId=${occupant.id}`, { method: "DELETE" });
+    }
     router.refresh();
   }
 
@@ -594,56 +652,100 @@ export function FileReviewClient({
               </Card>
 
               <Card padding="md">
-                <p className="text-xs font-medium uppercase text-gray-500">Linked images</p>
-                <div className="mt-3 space-y-2">
-	                  {selectedLinks.map((link) => {
-	                    const image = images.find((item) => item.id === link.imageArtifactId);
-	                    return (
-	                      <div key={link.id} className="flex items-center justify-between gap-2 rounded-md border border-gray-200 p-2">
-		                        <span className="text-xs text-gray-600">{targetLabel(link.targetType)}{link.optionLabel ? ` ${link.optionLabel}` : ""} · p.{image?.pageNumber ?? "?"}</span>
-	                        <Button type="button" variant="ghost" size="sm" onClick={() => unlinkImage(link.id)}>Remove</Button>
-	                      </div>
-	                    );
-	                  })}
-	                  {selectedLinks.length === 0 && <p className="text-sm text-gray-400">No images linked yet.</p>}
-	                </div>
-	                {selectedLinks.length > 0 && (
-	                  <div className="mt-3 grid gap-2">
-	                    {selectedLinks.map((link) => {
-	                      const image = images.find((item) => item.id === link.imageArtifactId);
-	                      const src = image ? imageSrc(image) : null;
-	                      return (
-	                        <div key={`${link.id}-preview`} className="rounded-md border border-blue-100 bg-blue-50 p-2">
-		                          <p className="mb-2 text-xs font-medium text-blue-900">{targetLabel(link.targetType)}{link.optionLabel ? ` ${link.optionLabel}` : ""} linked image</p>
-	                          <div className="h-28 overflow-hidden rounded bg-white">
-	                            {src ? (
-	                              // eslint-disable-next-line @next/next/no-img-element
-	                              <img src={src} alt={`${link.targetType} linked image`} className="h-full w-full object-contain" />
-	                            ) : (
-	                              <div className="flex h-full items-center justify-center text-xs text-gray-400">No preview</div>
-	                            )}
-	                          </div>
-	                        </div>
-	                      );
-	                    })}
-	                  </div>
-	                )}
-	              </Card>
+                <p className="text-xs font-medium uppercase text-gray-500">Imágenes enlazadas</p>
+                <p className="mt-1 text-xs text-gray-400">Ve al paso IMAGES para asignar por ranura (Enunciado / A-D / Estímulo).</p>
+                {selectedLinks.length > 0 ? (
+                  <div className="mt-3 grid gap-2">
+                    {selectedLinks.map((link) => {
+                      const image = images.find((item) => item.id === link.imageArtifactId);
+                      const src = image ? imageSrc(image) : null;
+                      return (
+                        <div key={link.id} className="rounded-md border border-blue-100 bg-blue-50 p-2">
+                          <div className="mb-2 flex items-center justify-between gap-2">
+                            <Badge variant="info">{slotLabel(link.targetType, link.optionLabel)}</Badge>
+                            <span className="text-xs text-gray-500">p.{image?.pageNumber ?? "?"}</span>
+                            <Button type="button" variant="ghost" size="sm" onClick={() => unlinkImage(link.id)}>Quitar</Button>
+                          </div>
+                          <div className="h-28 overflow-hidden rounded bg-white">
+                            {src ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img src={src} alt={slotLabel(link.targetType, link.optionLabel)} className="h-full w-full object-contain" />
+                            ) : (
+                              <div className="flex h-full items-center justify-center text-xs text-gray-400">Sin vista previa</div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="mt-3 text-sm text-gray-400">Aún no hay imágenes enlazadas.</p>
+                )}
+              </Card>
             </div>
           </section>
         )}
 
         {step === "IMAGES" && selected && (
           <Card padding="md">
-            <div className="grid gap-3 md:grid-cols-[1fr_120px_80px]">
-              <select value={targetType} onChange={(event) => setTargetType(event.target.value)} className="rounded-md border border-gray-300 px-3 py-2 text-sm">
-                {targetTypes.map((target) => <option key={target.value} value={target.value}>{target.label}</option>)}
-              </select>
-              <Input value={optionLabel} onChange={(event) => setOptionLabel(event.target.value.toUpperCase())} placeholder="Option" disabled={targetType !== "OPTION"} />
-              <span className="self-center text-xs text-gray-500">{images.length} images</span>
+            {/* Integrated assignment board: one slot per enunciado / opción / estímulo. */}
+            <p className="text-xs font-medium uppercase text-gray-500">Asignación de imágenes</p>
+            <p className="mt-1 text-xs text-gray-500">
+              Elige una ranura y luego una imagen de abajo, o usa los botones de cada imagen. Cada ranura guarda una sola
+              imagen.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {imageSlots.map((slot) => {
+                const link = linkForSlot(slot.targetType, slot.optionLabel);
+                const image = link ? images.find((item) => item.id === link.imageArtifactId) : undefined;
+                const src = image ? imageSrc(image) : null;
+                const isActive = activeSlot?.targetType === slot.targetType && (activeSlot?.optionLabel ?? null) === slot.optionLabel;
+                return (
+                  <button
+                    key={`${slot.targetType}-${slot.optionLabel ?? ""}`}
+                    type="button"
+                    onClick={() => setActiveSlot(isActive ? null : slot)}
+                    className={`flex w-28 flex-col items-center gap-1 rounded-md border p-2 text-center transition ${
+                      isActive ? "border-blue-500 ring-2 ring-blue-200" : link ? "border-blue-200 bg-blue-50" : "border-dashed border-gray-300"
+                    }`}
+                  >
+                    <span className="text-xs font-semibold text-gray-800">{slot.label}</span>
+                    <div className="flex h-16 w-full items-center justify-center overflow-hidden rounded bg-white">
+                      {src ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={src} alt={slot.label} className="h-full w-full object-contain" />
+                      ) : (
+                        <span className="text-[10px] text-gray-400">sin imagen</span>
+                      )}
+                    </div>
+                    {link ? (
+                      <span
+                        role="button"
+                        tabIndex={0}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          void clearSlot(slot.targetType, slot.optionLabel);
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.stopPropagation();
+                            void clearSlot(slot.targetType, slot.optionLabel);
+                          }
+                        }}
+                        className="text-[10px] text-red-600 hover:underline"
+                      >
+                        Quitar
+                      </span>
+                    ) : (
+                      <span className="text-[10px] text-gray-400">{isActive ? "elige imagen ↓" : "vacío"}</span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
-            <p className="mt-2 text-xs text-gray-500">Use Options block to OCR for A-D choices. Use Answer field for blank lines or response boxes.</p>
-            {message && <p className="mt-2 text-xs text-gray-600">{message}</p>}
+
+            {message && <p className="mt-3 text-xs text-gray-600">{message}</p>}
+
             <PdfPageCropper
               className="mt-4"
               candidateId={selected.id}
@@ -652,32 +754,88 @@ export function FileReviewClient({
               onAssigned={() => router.refresh()}
               onOcrText={applyCropOcr}
             />
-            <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-              {images.map((image) => (
-                <div key={image.id} className={`rounded-md border p-2 ${linkedImageIds.has(image.id) ? "border-blue-300 bg-blue-50" : "border-gray-200"}`}>
-                  <div className="relative h-40 overflow-hidden rounded bg-gray-100">
-                    {imageSrc(image) ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={imageSrc(image) ?? ""} alt={`Extracted image page ${image.pageNumber}`} className="h-full w-full object-contain" />
-                    ) : (
-                      <div className="flex h-full items-center justify-center text-xs text-gray-400">No preview</div>
-                    )}
-                  </div>
-	                  <div className="mt-2 flex items-center justify-between gap-2">
-	                    <span className="text-xs text-gray-500">p.{image.pageNumber} · {image.origin}</span>
-	                    <div className="flex flex-wrap justify-end gap-2">
-	                      <Button type="button" size="sm" variant="secondary" onClick={() => linkImage(image.id)}>Link</Button>
-	                      {targetType === "OPTION_BLOCK" && (
-	                        <Button type="button" size="sm" variant="secondary" onClick={() => parseOptionImage(image.id)} disabled={parsingImageId === image.id}>
-	                          {parsingImageId === image.id ? "Parsing..." : "OCR Options"}
-	                        </Button>
-	                      )}
-	                    </div>
-	                  </div>
-                </div>
-              ))}
-              {images.length === 0 && <p className="text-sm text-gray-400">No extracted images for this file yet.</p>}
+
+            <div className="mt-4 flex items-center justify-between">
+              <p className="text-xs font-medium uppercase text-gray-500">Imágenes extraídas ({images.length})</p>
+              {activeSlot && (
+                <span className="text-xs text-blue-700">
+                  Asignando a <strong>{activeSlot.label}</strong>
+                </span>
+              )}
             </div>
+            <div className="mt-2 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              {images.map((image) => {
+                const assignments = assignmentsByImage.get(image.id) ?? [];
+                return (
+                  <div key={image.id} className={`rounded-md border p-2 ${assignments.length ? "border-blue-300 bg-blue-50" : "border-gray-200"}`}>
+                    <div className="relative h-40 overflow-hidden rounded bg-gray-100">
+                      {imageSrc(image) ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={imageSrc(image) ?? ""} alt={`Imagen extraída página ${image.pageNumber}`} className="h-full w-full object-contain" />
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-xs text-gray-400">Sin vista previa</div>
+                      )}
+                    </div>
+                    <div className="mt-2 flex items-center justify-between gap-2">
+                      <span className="text-xs text-gray-500">p.{image.pageNumber} · {image.origin}</span>
+                      {assignments.length > 0 && (
+                        <div className="flex flex-wrap justify-end gap-1">
+                          {assignments.map((label) => (
+                            <Badge key={label} variant="info">{label}</Badge>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    {activeSlot && (
+                      <Button type="button" size="sm" className="mt-2 w-full" onClick={() => assignToSlot(image.id, activeSlot.targetType, activeSlot.optionLabel)}>
+                        Asignar a {activeSlot.label}
+                      </Button>
+                    )}
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {imageSlots.map((slot) => {
+                        const occupies = linkForSlot(slot.targetType, slot.optionLabel)?.imageArtifactId === image.id;
+                        const chip = slot.targetType === "STEM" ? "Enun." : slot.targetType === "STIMULUS" ? "Est." : slot.optionLabel;
+                        return (
+                          <button
+                            key={`${image.id}-${slot.targetType}-${slot.optionLabel ?? ""}`}
+                            type="button"
+                            onClick={() => assignToSlot(image.id, slot.targetType, slot.optionLabel)}
+                            className={`rounded border px-2 py-0.5 text-xs ${occupies ? "border-blue-500 bg-blue-500 text-white" : "border-gray-300 text-gray-600 hover:bg-gray-50"}`}
+                          >
+                            {chip}
+                          </button>
+                        );
+                      })}
+                      <Button type="button" size="sm" variant="ghost" onClick={() => parseOptionImage(image.id)} disabled={parsingImageId === image.id}>
+                        {parsingImageId === image.id ? "OCR…" : "OCR A-D"}
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+              {images.length === 0 && <p className="text-sm text-gray-400">Aún no hay imágenes extraídas para este archivo.</p>}
+            </div>
+
+            {/* Advanced: less-common targets (answer field, explanation, options block, page context). */}
+            <details className="mt-4 rounded-md border border-gray-200 p-3">
+              <summary className="cursor-pointer text-xs font-medium text-gray-600">Destinos avanzados</summary>
+              <div className="mt-3 grid gap-3 md:grid-cols-[1fr_120px]">
+                <select value={targetType} onChange={(event) => setTargetType(event.target.value)} className="rounded-md border border-gray-300 px-3 py-2 text-sm">
+                  {targetTypes.filter((t) => !["STEM", "OPTION", "STIMULUS"].includes(t.value)).map((target) => (
+                    <option key={target.value} value={target.value}>{target.label}</option>
+                  ))}
+                </select>
+                <Input value={optionLabel} onChange={(event) => setOptionLabel(event.target.value.toUpperCase())} placeholder="Letra" disabled={targetType !== "OPTION"} />
+              </div>
+              <p className="mt-2 text-xs text-gray-500">Elige el destino y pulsa “Enlazar aquí” en una imagen. Usa “Bloque de opciones (OCR)” para extraer A-D como texto.</p>
+              <div className="mt-2 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+                {images.map((image) => (
+                  <Button key={`adv-${image.id}`} type="button" size="sm" variant="secondary" onClick={() => linkImage(image.id)}>
+                    Enlazar p.{image.pageNumber} → {targetLabel(targetType)}
+                  </Button>
+                ))}
+              </div>
+            </details>
           </Card>
         )}
 
