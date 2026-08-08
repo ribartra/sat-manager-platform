@@ -119,3 +119,117 @@ cp dev.db /tmp/dev.db.bak
 # 4) ROLLBACK
 cp -f /tmp/dev.db.bak dev.db && rm -f dev.db-wal dev.db-shm
 ```
+
+---
+
+# Auditoría de la lista "Review" (caso por caso) — 2026-08-07
+
+## Cobertura y completitud del staging (2549 candidatos, 1 batch)
+
+**Practice Sets — 91 conjuntos, 30 skills, agrupación limpia** (0 archivos con topic o
+dificultad mezclados):
+
+- **29/30 skills tienen Easy + Medium + Hard completos.**
+- **1 incompleto:** `Math · Problem Solving · One-Variable Data: Distributions and Measures`
+  → solo HARD (20), sin Easy/Medium. Parece nombre de skill duplicado/partido de
+  "One-Variable Data" (que sí tiene E/M/H). Revisar taxonomía.
+
+**Calidad de las 1607 preguntas de práctica** (parse preciso del `optionsJson`):
+
+| Estado | # | Nota |
+|---|---|---|
+| MC con 4 opciones de texto (OK) | 1114 | bien formadas |
+| NUMERIC (sin opciones, correcto) | 178 | bien formadas |
+| **MC image-backed (opciones vacías)** | **290** | ⚠️ todo MATH: las opciones son tablas/gráficos no transcritos |
+| MC con <4 opciones de texto | 20 | parciales |
+| MC con menos de 4 opciones | 5 | revisar |
+
+**Full Practice Tests — 5/10 exactos** (esperado RW1=27 RW2=27 M1=22 M2=22):
+TEST 2, 3, 4, 5, 9 OK · TEST 1 sin R&W (0/0) · TEST 6 sobra Math (23/23) ·
+TEST 7 RW2=25 · TEST 8 Math1=24 · TEST 10 RW2=25.
+
+## De dónde sale la lista al pulsar "Review"
+
+No hay endpoint REST dedicado. La lista la arma el server component
+`app/admin/import/ai/page.tsx`:
+
+```ts
+prisma.ingestQuestionCandidate.findMany({
+  where: { batchId }, orderBy: [{ status: "asc" }, { confidence: "desc" }], take: 300,
+})
+```
+
+El diálogo "Review Staging Content" (`ai-import-client.tsx`) filtra esa prop en cliente.
+`GET /api/admin/ai-import/batches` solo devuelve conteos por batch, **no** candidatos.
+
+⚠️ **Limitación de diseño: `take: 300` sobre 2549.** Como ordena `status asc`, la lista =
+**148 NEEDS_REVIEW + 152 READY de mayor confianza**. El diálogo **nunca alcanza** la mayor
+parte del contenido READY de práctica; solo se ve lo problemático + un puñado de READY.
+
+## Veredicto de los 300 casos de la lista
+
+(Clasificación completa fila-a-fila en `docs/ingest-review-list-analysis.csv`.)
+
+| Veredicto | # | Significado |
+|---|---|---|
+| OK | 20 | promovible sin tocar |
+| MINOR | 105 | promovible con warning/ajuste menor |
+| BLOCKED | 156 | no promovible: sin respuesta u opciones-imagen vacías |
+| BROKEN | 19 | fragmento sin Question ID / stem roto |
+
+### Los 148 NEEDS_REVIEW
+
+**A) Full tests sin respuesta detectada (121)** — problema dominante; el answer key no cruzó:
+
+| Test | Sin respuesta | Nota |
+|---|---|---|
+| **TEST 8** (Math+R&W) | **94 / 100** | test casi entero sin respuestas |
+| TEST 10 | 22 / 96 | Math 21 + R&W 1 |
+| TEST 6 | 3 / 100 | |
+| TEST 4 | 2 / 98 | |
+| TEST 1,2,3,5,7,9 | 0 | ✅ respuestas cruzaron |
+
+Muchos con `Answer field image detected; treated as numeric response visual` → la respuesta
+del ANS es **imagen**, el OCR no la resolvió (mismo patrón image-backed, del lado respuesta).
+
+**B) Fragmentos/otros de práctica (27):**
+- **Equivalent Expressions: 7** → `NO_QUESTION_ID` + sin respuesta = basura de segmentación → fusionar/rechazar.
+- One-Variable Data: Distributions and Measures 2, Linear Functions 2 → sin respuesta.
+- Resto (Command of Evidence 3, Area and Volume 1, Ratios 2, …) **sí tienen respuesta**;
+  están en NEEDS_REVIEW por flag de imagen/opciones, no por rotura.
+
+### Los 152 READY (los que sí promoverían)
+
+| | # | Efecto al promover |
+|---|---|---|
+| Limpios | 71 | bien (51 solo con warning informativo) |
+| Opciones-imagen vacías (MC) | 33 | MC sin alternativas visibles |
+| Respuesta MC no A–D | 20 | tipo/respuesta mal (probable NUMERIC mal etiquetado) |
+| NUMERIC con respuesta no numérica | 21 | respuesta inválida |
+| Opciones parciales (<4) | 5 | incompleta |
+| Opciones duplicadas | 2 | revisar |
+
+### Ruido: warnings obsoletos
+
+`"Correct answer not detected."` figura en **92 candidatos READY que SÍ tienen respuesta**
+(se enriqueció después desde el ANS pero **el warning nunca se limpió**). El wizard muestra
+alarmas rojas ya falsas → sensación de "no mejora" aunque el dato esté bien.
+**Es bug de limpieza de warnings, no de contenido.**
+
+## Acciones pendientes priorizadas (STANDBY — documentado, NO ejecutado)
+
+1. **Limpiar warnings obsoletos** tras enriquecimiento (`Correct answer not detected` cuando
+   ya hay `correctAnswer`). Alto impacto, bajo riesgo.
+2. **Destopar/paginar** la lista de Review (`take: 300` → paginación o filtro server-side);
+   hoy es imposible triar los 2549 desde la UI.
+3. **Re-cruzar answer key de TEST 8 y TEST 10** (respuestas como imagen en el ANS → OCR/transcripción).
+4. **290 opciones-imagen** de práctica (frente #2 ya conocido).
+5. **Rechazar/fusionar** los 7 fragmentos de Equivalent Expressions y demás sin Question ID.
+
+## Producción
+
+El staging **reparado** (parser estructural: numeración 1..N/archivo, enunciados limpios,
+opciones separadas, estímulo R&W) se empujó a `https://satsol.org` el 2026-08-07 con
+`deploy/push-db-to-cloud.sh` (backup de prod previa en `gs://…/backups/pre-push-*`). Verificado
+en la VM: 0 fugas de cabecera, 1607 numeradas, 101 con estímulo, `Question=0` (promoción sigue
+en STANDBY). Los puntos de arriba aplican igual a prod (mismo staging).
