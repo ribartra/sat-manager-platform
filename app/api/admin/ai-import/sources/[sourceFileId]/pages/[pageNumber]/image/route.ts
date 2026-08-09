@@ -19,16 +19,37 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
     return NextResponse.json({ error: "Invalid page number." }, { status: 400 });
   }
 
-  const source = await prisma.ingestSourceFile.findUnique({ where: { id: sourceFileId }, select: { id: true } });
+  const source = await prisma.ingestSourceFile.findUnique({ where: { id: sourceFileId }, select: { id: true, extension: true } });
   if (!source) return NextResponse.json({ error: "Source file not found." }, { status: 404 });
+
+  // The FastAPI renderer only handles PDFs (pdfplumber). For a DOCX source (or if
+  // the PDF render fails) fall back to the per-page image already extracted at
+  // ingest (IngestImageArtifact), so the crop tool at least shows the page.
+  async function extractedPageFallback() {
+    const img = await prisma.ingestImageArtifact.findFirst({
+      where: { sourceFileId, pageNumber: pageNum },
+      orderBy: { imageIndex: "asc" },
+      select: { fileUrl: true },
+    });
+    if (img?.fileUrl) return NextResponse.redirect(new URL(img.fileUrl, req.nextUrl.origin));
+    return null;
+  }
 
   const dpiParam = Number(req.nextUrl.searchParams.get("dpi"));
   const dpi = Number.isFinite(dpiParam) && dpiParam > 0 ? Math.min(300, Math.max(72, Math.round(dpiParam))) : 150;
+
+  if ((source.extension ?? "").toLowerCase() !== "pdf") {
+    const fallback = await extractedPageFallback();
+    if (fallback) return fallback;
+    return NextResponse.json({ error: "No hay imagen de página para este archivo." }, { status: 404 });
+  }
 
   const response = await fetch(ingestUrl(`/sources/${sourceFileId}/pages/${pageNum}/image?dpi=${dpi}`), {
     headers: ingestAuthHeaders(),
   });
   if (!response.ok) {
+    const fallback = await extractedPageFallback();
+    if (fallback) return fallback;
     const data = await response.json().catch(() => ({}));
     return NextResponse.json({ error: data.detail || "Could not render page." }, { status: response.status });
   }

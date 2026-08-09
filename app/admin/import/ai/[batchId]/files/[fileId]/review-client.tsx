@@ -22,6 +22,7 @@ type SourceFile = {
   topicName: string | null;
   difficulty: string | null;
   status: string;
+  extension: string | null;
 };
 
 type PageArtifact = {
@@ -805,6 +806,7 @@ export function FileReviewClient({
                 pageNumbers={pages.map((page) => page.pageNumber)}
                 onAssigned={() => router.refresh()}
                 onOcrText={applyCropOcr}
+                sourceIsPdf={(file.extension ?? "").toLowerCase() === "pdf"}
               />
 
               <div className="mt-4 flex items-center justify-between">

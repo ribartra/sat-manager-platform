@@ -139,6 +139,7 @@ export default async function AiImportFileReviewPage({ params }: PageProps) {
           topicName: file.topicName,
           difficulty: file.difficulty,
           status: file.status,
+          extension: file.extension,
         }}
         reviewSession={{ currentStep: reviewSession.currentStep, status: reviewSession.status }}
         assignTargets={assignTargets}

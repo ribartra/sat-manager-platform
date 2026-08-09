@@ -43,6 +43,10 @@ interface PdfPageCropperProps {
   onAssigned?: () => void;
   onOcrText?: (target: CropTarget, result: CropOcrResult) => void;
   className?: string;
+  // Region crop (ASSIGN/OCR) needs a real PDF (pdfplumber). For DOCX sources the
+  // page can still be viewed, but region tools are disabled with a pointer to the
+  // gallery. Defaults to true so PDF callers are unaffected.
+  sourceIsPdf?: boolean;
 }
 
 function normalizeRect(a: { x: number; y: number }, b: { x: number; y: number }): Rect {
@@ -62,6 +66,7 @@ export function PdfPageCropper({
   onAssigned,
   onOcrText,
   className,
+  sourceIsPdf = true,
 }: PdfPageCropperProps) {
   const uniquePages = Array.from(new Set(pageNumbers.filter((n) => Number.isInteger(n) && n > 0))).sort((a, b) => a - b);
   const initialPage = defaultPageNumber && uniquePages.includes(defaultPageNumber) ? defaultPageNumber : uniquePages[0] ?? 1;
@@ -114,7 +119,7 @@ export function PdfPageCropper({
 
   const hasSelection = !!rect;
   const needsOption = targetType === "OPTION";
-  const canSubmit = hasSelection && (!needsOption || !!optionLabel);
+  const canSubmit = sourceIsPdf && hasSelection && (!needsOption || !!optionLabel);
 
   async function submit(mode: "ASSIGN" | "OCR") {
     if (!rect || !canSubmit) return;
@@ -157,7 +162,23 @@ export function PdfPageCropper({
       </Button>
 
       {open && (
-        <div className="mt-3 space-y-3 rounded-md border border-gray-200 p-3">
+        <div
+          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 p-4 sm:p-8"
+          role="dialog"
+          aria-modal="true"
+          onMouseDown={(e) => { if (e.target === e.currentTarget) setOpen(false); }}
+        >
+        <div className="my-auto w-full max-w-3xl space-y-3 rounded-lg border border-gray-200 bg-white p-4 shadow-xl">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-gray-900">Recortar desde el PDF</h3>
+            <button type="button" onClick={() => setOpen(false)} className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600" aria-label="Cerrar">✕</button>
+          </div>
+          {!sourceIsPdf && (
+            <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+              Este archivo es un DOCX: puedes ver la página, pero el recorte por región (Asignar/OCR) solo está
+              disponible para PDF. Para DOCX usa la <strong>Galería de imágenes</strong> y asigna la página completa.
+            </p>
+          )}
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs text-gray-500">Página</span>
             <Button type="button" size="sm" variant="ghost" onClick={() => changePage(pageNumber - 1)} disabled={pageNumber <= 1 || busy !== null}>
@@ -249,6 +270,7 @@ export function PdfPageCropper({
           </div>
 
           {message && <p className="text-xs text-gray-600">{message}</p>}
+        </div>
         </div>
       )}
     </div>
