@@ -206,6 +206,26 @@ function optionsToJson(options: OptionRow[]) {
   })));
 }
 
+// Signature of the persisted-relevant content of a candidate. Used to detect
+// unsaved edits: the on-screen draft is never auto-persisted — only Save (PATCH)
+// writes to the DB — so we compare this signature against the last saved one.
+function candidateContentSignature(draft: CandidateSummary | null, optionsJson: string) {
+  if (!draft) return "";
+  return JSON.stringify({
+    stem: draft.stem ?? "",
+    stimulus: draft.stimulus ?? "",
+    options: optionsJson,
+    correctAnswer: draft.correctAnswer ?? "",
+    explanation: draft.explanation ?? "",
+    section: draft.section ?? "",
+    domainName: draft.domainName ?? "",
+    topicName: draft.topicName ?? "",
+    subskillName: draft.subskillName ?? "",
+    difficulty: draft.difficulty ?? "",
+    type: draft.type ?? "",
+  });
+}
+
 function matches(value: string | null | undefined, query: string) {
   if (!query) return true;
   return (value ?? "").toLowerCase().includes(query.toLowerCase());
@@ -279,6 +299,9 @@ export function AiImportWorkflowClient({
   const [selectedCandidateId, setSelectedCandidateId] = useState(candidates[0]?.id ?? "");
   const [draft, setDraft] = useState<CandidateSummary | null>(candidates[0] ?? null);
   const [optionRows, setOptionRows] = useState<OptionRow[]>(parseOptions(candidates[0]?.optionsJson ?? null));
+  const [savedSignature, setSavedSignature] = useState<string>(() =>
+    candidateContentSignature(candidates[0] ?? null, optionsToJson(parseOptions(candidates[0]?.optionsJson ?? null))),
+  );
   const [imageLinks, setImageLinks] = useState<ImageLinkSummary[]>([]);
   const [targetType, setTargetType] = useState("STEM");
   const [optionLabel, setOptionLabel] = useState("A");
@@ -336,7 +359,9 @@ export function AiImportWorkflowClient({
   function selectCandidate(candidate: CandidateSummary) {
     setSelectedCandidateId(candidate.id);
     setDraft(candidate);
-    setOptionRows(parseOptions(candidate.optionsJson));
+    const rows = parseOptions(candidate.optionsJson);
+    setOptionRows(rows);
+    setSavedSignature(candidateContentSignature(candidate, optionsToJson(rows)));
     setMessage(null);
   }
 
@@ -400,6 +425,7 @@ export function AiImportWorkflowClient({
       return;
     }
     setDraft(data);
+    setSavedSignature(candidateContentSignature(data, optionsToJson(optionRows)));
     setMessage(status ? `Question marked ${status}.` : "Question saved.");
     router.refresh();
   }
@@ -611,6 +637,7 @@ export function AiImportWorkflowClient({
               parsingImageId={parsingImageId}
               saving={saving}
               message={message}
+              dirty={candidateContentSignature(draft, optionsToJson(optionRows)) !== savedSignature}
               onCropAssigned={refreshImageLinks}
               cropImageSource={draft?.sourceFileId ? cropImageSources[draft.sourceFileId] ?? null : null}
             />
@@ -967,6 +994,7 @@ function QuestionStagingEditor({
   parsingImageId,
   saving,
   message,
+  dirty,
   onCropAssigned,
   cropImageSource,
 }: {
@@ -988,6 +1016,7 @@ function QuestionStagingEditor({
   parsingImageId: string | null;
   saving: boolean;
   message: string | null;
+  dirty: boolean;
   onCropAssigned: () => void;
   cropImageSource: { imageSourceFileId: string; pageNumbers: number[] } | null;
 }) {
@@ -1035,6 +1064,11 @@ function QuestionStagingEditor({
               <Badge variant={badgeVariant(draft.status)}>{draft.status}</Badge>
               <Badge variant={badgeVariant(draft.promotionStatus)}>{draft.promotionStatus}</Badge>
               <span className="text-xs text-gray-500">{Math.round(draft.confidence * 100)}% confidence</span>
+              {dirty && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+                  <span className="h-1.5 w-1.5 rounded-full bg-amber-500" /> Sin guardar
+                </span>
+              )}
             </div>
           </div>
           <Link href={`/teacher/questions/new?ingestCandidateId=${draft.id}`} className="rounded-md border border-blue-200 px-3 py-2 text-xs font-medium text-blue-700 hover:bg-blue-50">
@@ -1097,11 +1131,18 @@ function QuestionStagingEditor({
             <RenderedMathPreview label="Rendered explanation" value={draft.explanation} />
             <textarea value={stripMarkdownImageRefs(draft.explanation)} onChange={(event) => setDraft({ ...draft, explanation: event.target.value })} className="min-h-24 rounded-md border border-gray-300 px-3 py-2 text-sm" />
           </label>
-          <div className="flex flex-wrap items-center gap-2">
-            <Button type="button" onClick={() => saveDraft()} disabled={saving}>Save</Button>
+          <div className={`flex flex-wrap items-center gap-2 rounded-md border p-3 transition-colors ${dirty ? "border-amber-300 bg-amber-50" : "border-gray-200 bg-gray-50"}`}>
+            <Button type="button" onClick={() => saveDraft()} disabled={saving || !dirty}>
+              {saving ? "Guardando…" : dirty ? "Guardar cambios" : "Guardado"}
+            </Button>
             <Button type="button" variant="secondary" onClick={() => saveDraft("REVIEWED")} disabled={saving}>Mark Reviewed</Button>
             <Button type="button" variant="secondary" onClick={() => saveDraft("REJECTED")} disabled={saving}>Reject</Button>
-            {message && <span className="text-xs text-gray-500">{message}</span>}
+            <span className="text-xs text-gray-600">
+              {dirty
+                ? "El OCR y las ediciones solo cambian el borrador en pantalla. Pulsa Guardar para escribir en la base de datos."
+                : "Sin cambios pendientes."}
+            </span>
+            {message && <span className="text-xs text-gray-500">· {message}</span>}
           </div>
         </div>
       </div>

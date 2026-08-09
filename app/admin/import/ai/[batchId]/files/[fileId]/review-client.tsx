@@ -133,6 +133,26 @@ function parseOptions(value: string | null) {
   }
 }
 
+// Signature of the persisted-relevant fields — used to flag unsaved edits.
+// OCR/crop and manual edits only mutate the on-screen draft; nothing reaches
+// the DB until Guardar (PATCH) runs.
+function candidateSignature(draft: Candidate | null) {
+  if (!draft) return "";
+  return JSON.stringify({
+    stem: draft.stem ?? "",
+    stimulus: draft.stimulus ?? "",
+    optionsJson: draft.optionsJson ?? "",
+    correctAnswer: draft.correctAnswer ?? "",
+    explanation: draft.explanation ?? "",
+    section: draft.section ?? "",
+    domainName: draft.domainName ?? "",
+    topicName: draft.topicName ?? "",
+    subskillName: draft.subskillName ?? "",
+    difficulty: draft.difficulty ?? "",
+    type: draft.type ?? "",
+  });
+}
+
 function parseWarnings(value: string | null) {
   if (!value) return [];
   try {
@@ -327,6 +347,7 @@ export function FileReviewClient({
   const [selectedId, setSelectedId] = useState(candidates[0]?.id ?? "");
   const selected = candidates.find((candidate) => candidate.id === selectedId) ?? candidates[0] ?? null;
   const [draft, setDraft] = useState<Candidate | null>(selected);
+  const [savedSignature, setSavedSignature] = useState<string>(() => candidateSignature(selected));
   const [saving, setSaving] = useState(false);
   const [parsingImageId, setParsingImageId] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -378,6 +399,7 @@ export function FileReviewClient({
     list.push(slotLabel(link.targetType, link.optionLabel));
     assignmentsByImage.set(link.imageArtifactId, list);
   }
+  const dirty = candidateSignature(draft) !== savedSignature;
   const isMc = (draft?.type ?? "MC") !== "NUMERIC";
   const optsResolved = draft ? optionsResolvedFor(draft.type, draft.optionsJson, selectedLinks) : false;
   // Links on non-board targets (answer field, explanation, page context…).
@@ -407,6 +429,7 @@ export function FileReviewClient({
   function selectCandidate(candidate: Candidate) {
     setSelectedId(candidate.id);
     setDraft(candidate);
+    setSavedSignature(candidateSignature(candidate));
     setActiveSlot(null);
     setMessage(null);
     void persistCandidate(candidate.id);
@@ -434,6 +457,8 @@ export function FileReviewClient({
       }),
     });
     setSaving(false);
+    setSavedSignature(candidateSignature({ ...draft, status: status ?? draft.status }));
+    setMessage(status ? `Guardado y marcado ${status}.` : "Cambios guardados en la base de datos.");
     router.refresh();
   }
 
@@ -532,7 +557,7 @@ export function FileReviewClient({
     } else if (target.targetType === "ANSWER_FIELD") {
       setDraft({ ...draft, correctAnswer: text });
     }
-    setMessage("Texto de OCR aplicado al borrador. Ve al paso QUESTIONS para revisar y Guardar.");
+    setMessage("Texto de OCR aplicado al borrador. Pulsa Guardar para escribir en la base de datos.");
   }
 
   async function openQuestionEditor(candidateId: string) {
@@ -602,6 +627,11 @@ export function FileReviewClient({
                   {draft.topicName && (
                     <span className="max-w-[180px] truncate text-xs text-gray-500" title={draft.topicName}>{draft.topicName}</span>
                   )}
+                  {dirty && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+                      <span className="h-1.5 w-1.5 rounded-full bg-amber-500" /> Sin guardar
+                    </span>
+                  )}
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   {candidates.length > 1 && (
@@ -615,11 +645,17 @@ export function FileReviewClient({
                     <Button type="button" variant="secondary" size="sm" onClick={() => openQuestionEditor(draft.id)}>Abrir en editor</Button>
                   )}
                   <Button type="button" variant="ghost" size="sm" onClick={() => saveCandidate("REJECTED")} disabled={saving}>Rechazar</Button>
-                  <Button type="button" variant="secondary" size="sm" onClick={() => saveCandidate()} disabled={saving}>Guardar</Button>
-                  <Button type="button" size="sm" onClick={() => saveCandidate("REVIEWED")} disabled={saving}>Marcar revisada</Button>
+                  <Button type="button" variant={dirty ? "primary" : "secondary"} size="sm" onClick={() => saveCandidate()} disabled={saving || !dirty}>
+                    {saving ? "Guardando…" : dirty ? "Guardar cambios" : "Guardado"}
+                  </Button>
+                  <Button type="button" variant="secondary" size="sm" onClick={() => saveCandidate("REVIEWED")} disabled={saving}>Marcar revisada</Button>
                 </div>
               </div>
-              {message && <p className="mt-2 text-xs text-gray-600">{message}</p>}
+              <p className={`mt-2 text-xs ${dirty ? "text-amber-700" : "text-gray-500"}`}>
+                {dirty
+                  ? "El OCR del recorte y las ediciones solo cambian el borrador en pantalla. Pulsa Guardar para escribir en la base de datos."
+                  : message ?? "Sin cambios pendientes."}
+              </p>
             </div>
 
             {incidents.length > 0 && (
