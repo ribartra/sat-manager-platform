@@ -13,6 +13,14 @@ pasajes), no desde el docx de preguntas. Resultado: `stimulus` vacío y `stem` =
 Corrección adicional: el primer piloto (match difuso por texto) había contaminado M1 con pasajes de M2B;
 se rehízo con el mapa posicional autoritativo. Audit: `RECOVER_RW_STIMULUS` / `RECOVER_RW_STIMULUS_POSITIONAL`.
 
+**Test 1 también perdió las opciones.** Como se promovió de las explicaciones, el texto de las alternativas
+nunca se capturó: `QuestionOption` existía con `text` vacío (39) o faltaba (15) → el UI mostraba "sin
+alternativas" (el `correctAnswer` sí estaba). Se recuperaron los textos A–D desde el mismo docx de preguntas
+por el mismo mapa posicional (extrayendo las opciones de cada página-ancla): **33/54** con 4 opciones limpias;
+20 quedan vacías (su página OCR es tabla/fragmento, el mismo grupo sin estímulo). Audit:
+`RECOVER_RW_OPTIONS_POSITIONAL`. Esto es exclusivo de Test 1 — Tests 2–10 vienen del PDF de preguntas y ya
+traían `QuestionOption` con texto (54/54 verificado).
+
 ### B) Tests 2–10 — promovidos del PDF correcto, pero mal parseados
 Estos **sí** se promovieron desde el PDF de preguntas correcto (`isQuestionSource=1`), cuyo OCR traía
 pasaje + prompt (`N. …`) + opciones separados por marcadores `NEXT/PREV QUESTION`. **La ingesta fue la
