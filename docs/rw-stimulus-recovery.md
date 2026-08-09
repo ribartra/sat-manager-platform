@@ -1,5 +1,11 @@
 # Recuperación de estímulo (pasaje) en R&W de los Full Practice Tests
 
+> **Estado (2026-08-09).** R&W de los 10 full tests. **Estímulo: 410/481.** Opciones: OK en Tests 2–10 +
+> 35/54 en Test 1. Prompt (stem) y `correctAnswer`: completos. Etiquetado de módulo en el UI de revisión
+> corregido (M1/M2B, ya no aparecen "dos Q1"). **Pendiente: ~71 estímulos** en páginas OCR tipo tabla/gráfico
+> (requieren re-OCR con visión o recorte de imagen) o sin confirmar por validación. Todos los cambios de datos
+> se hicieron WAL-safe con `integrity_check` ok y quedaron auditados en `AuditLog`.
+
 **Contexto.** Las preguntas de Reading & Writing de los 10 mock tests se promovieron con el campo
 `Question.stimulus` vacío. Hay **dos defectos distintos** según de qué archivo se promovió cada test.
 
