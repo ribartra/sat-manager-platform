@@ -864,6 +864,66 @@ def crop_pdf_region_normalized(
         return None, None, None, None
 
 
+def crop_image_region_normalized(
+    image_path: Path, bbox_norm: dict[str, Any]
+) -> tuple[bytes | None, int | None, int | None, dict[str, float] | None]:
+    """Recorta una región NORMALIZADA [0,1] de una imagen de página ya extraída
+    (p. ej. el screenshot de un DOCX). Equivalente a crop_pdf_region_normalized
+    pero con Pillow, para fuentes que no son PDF. Coord (0,0)=esquina sup-izq."""
+    try:
+        with Image.open(image_path) as im:
+            im = im.convert("RGB")
+            W, H = im.width, im.height
+            clamp = lambda v: max(0.0, min(1.0, float(v)))
+            x0 = int(round(clamp(bbox_norm.get("x0", 0)) * W))
+            y0 = int(round(clamp(bbox_norm.get("y0", 0)) * H))
+            x1 = int(round(clamp(bbox_norm.get("x1", 1)) * W))
+            y1 = int(round(clamp(bbox_norm.get("y1", 1)) * H))
+            if x1 - x0 < 2 or y1 - y0 < 2:
+                return None, None, None, None
+            cropped = im.crop((x0, y0, x1, y1))
+            output = BytesIO()
+            cropped.save(output, format="JPEG", quality=90, optimize=True)
+            return output.getvalue(), cropped.width, cropped.height, {"x0": float(x0), "top": float(y0), "x1": float(x1), "bottom": float(y1)}
+    except Exception:
+        return None, None, None, None
+
+
+def resolve_asset_disk_path(file_url: str | None) -> Path | None:
+    """Mapea un fileUrl (/api/admin/ai-import/assets/<batch>/<file>) al archivo en
+    disco bajo PUBLIC_UPLOAD_ROOT, con guard de traversal."""
+    if not file_url:
+        return None
+    prefix = PUBLIC_UPLOAD_URL_PREFIX + "/"
+    if not file_url.startswith(prefix):
+        return None
+    rel = file_url[len(prefix):]
+    parts = rel.split("/")
+    if len(parts) != 2 or not parts[0] or not parts[1]:
+        return None
+    root = PUBLIC_UPLOAD_ROOT.resolve()
+    candidate = (root / parts[0] / parts[1]).resolve()
+    if not str(candidate).startswith(f"{root}{os.sep}"):
+        return None
+    return candidate if candidate.exists() else None
+
+
+def find_page_image_disk_path(db: Any, source_file_id: str, page_number: int) -> Path | None:
+    """Devuelve la imagen de página completa (no un recorte manual) más grande
+    para (sourceFileId, pageNumber), para poder recortar DOCX por región."""
+    rows = db.execute(
+        "SELECT fileUrl, COALESCE(width,0) w, COALESCE(height,0) h FROM IngestImageArtifact "
+        "WHERE sourceFileId = ? AND pageNumber = ? AND origin <> 'MANUAL_CROP' "
+        "ORDER BY (w*h) DESC, imageIndex ASC",
+        (source_file_id, page_number),
+    ).fetchall()
+    for row in rows:
+        p = resolve_asset_disk_path(row["fileUrl"])
+        if p:
+            return p
+    return None
+
+
 CROP_TARGET_TYPES = {"STEM", "STIMULUS", "OPTION", "OPTION_BLOCK", "ANSWER_FIELD", "EXPLANATION", "PAGE_CONTEXT"}
 
 
@@ -898,9 +958,16 @@ def crop_candidate_region(
         if not source:
             raise HTTPException(status_code=404, detail="Source file not found.")
         path = resolve_existing_source_path(source["path"])
-        if not path.exists() or path.suffix.lower() != ".pdf":
-            raise HTTPException(status_code=400, detail="Source PDF is not available for cropping.")
-        image_bytes, w_px, h_px, points = crop_pdf_region_normalized(path, page_number, bbox_norm)
+        if path.exists() and path.suffix.lower() == ".pdf":
+            image_bytes, w_px, h_px, points = crop_pdf_region_normalized(path, page_number, bbox_norm)
+        else:
+            # Non-PDF source (e.g. a DOCX of page screenshots): crop the already-
+            # extracted full-page image with Pillow, so region ASSIGN/OCR behaves
+            # the same as for PDFs.
+            page_image = find_page_image_disk_path(db, source["id"], page_number)
+            if not page_image:
+                raise HTTPException(status_code=400, detail="No hay imagen de página para recortar en este archivo.")
+            image_bytes, w_px, h_px, points = crop_image_region_normalized(page_image, bbox_norm)
         if not image_bytes:
             raise HTTPException(status_code=400, detail="Could not render the selected region.")
         image_id = new_id("img")
@@ -5388,17 +5455,35 @@ def render_source_page_image(source_file_id: str, page_number: int, dpi: int = 1
     if not source:
         raise HTTPException(status_code=404, detail="Source file not found.")
     path = resolve_existing_source_path(source["path"])
-    if not path.exists() or path.suffix.lower() != ".pdf":
-        raise HTTPException(status_code=400, detail="Source is not a PDF that can be rendered.")
-    image_bytes, page_width, page_height = render_pdf_page_jpeg(path, page_number, dpi)
-    if not image_bytes:
-        raise HTTPException(status_code=404, detail="Could not render the requested page.")
+    if path.exists() and path.suffix.lower() == ".pdf":
+        image_bytes, page_width, page_height = render_pdf_page_jpeg(path, page_number, dpi)
+        if not image_bytes:
+            raise HTTPException(status_code=404, detail="Could not render the requested page.")
+        return Response(
+            content=image_bytes,
+            media_type="image/jpeg",
+            headers={
+                "X-Page-Width": str(page_width),
+                "X-Page-Height": str(page_height),
+                "Cache-Control": "private, max-age=300",
+            },
+        )
+    # Non-PDF (e.g. DOCX): serve the extracted full-page image so the crop tool
+    # can display and crop it just like a PDF page.
+    with conn() as db:
+        page_image = find_page_image_disk_path(db, source_file_id, page_number)
+    if not page_image:
+        raise HTTPException(status_code=400, detail="No page image available for this source.")
+    data = page_image.read_bytes()
+    with Image.open(BytesIO(data)) as im:
+        w, h = im.width, im.height
+    media = "image/png" if page_image.suffix.lower() == ".png" else "image/jpeg"
     return Response(
-        content=image_bytes,
-        media_type="image/jpeg",
+        content=data,
+        media_type=media,
         headers={
-            "X-Page-Width": str(page_width),
-            "X-Page-Height": str(page_height),
+            "X-Page-Width": str(w),
+            "X-Page-Height": str(h),
             "Cache-Control": "private, max-age=300",
         },
     )

@@ -119,7 +119,7 @@ export function PdfPageCropper({
 
   const hasSelection = !!rect;
   const needsOption = targetType === "OPTION";
-  const canSubmit = sourceIsPdf && hasSelection && (!needsOption || !!optionLabel);
+  const canSubmit = hasSelection && (!needsOption || !!optionLabel);
 
   async function submit(mode: "ASSIGN" | "OCR") {
     if (!rect || !canSubmit) return;
@@ -174,9 +174,9 @@ export function PdfPageCropper({
             <button type="button" onClick={() => setOpen(false)} className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600" aria-label="Cerrar">✕</button>
           </div>
           {!sourceIsPdf && (
-            <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
-              Este archivo es un DOCX: puedes ver la página, pero el recorte por región (Asignar/OCR) solo está
-              disponible para PDF. Para DOCX usa la <strong>Galería de imágenes</strong> y asigna la página completa.
+            <p className="rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-600">
+              Fuente DOCX: el recorte se hace sobre la imagen de página extraída. Funciona igual — arrastra la
+              región y usa Asignar u OCR.
             </p>
           )}
           <div className="flex flex-wrap items-center gap-2">
