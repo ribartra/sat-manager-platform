@@ -5,8 +5,8 @@
 ## Resumen
 
 - **Practice Sets:** 91 total · 72 sin problemas (PUBLISHED) · 19 con problemas · **32** preguntas con problemas.
-- **Full Practice Tests:** 10 total (todos DRAFT) · **255** preguntas con problemas.
-- **Total preguntas con problemas: 287**.
+- **Full Practice Tests:** 10 total (todos DRAFT) · **253** preguntas con problemas.
+- **Total preguntas con problemas: 285**.
 
 ## Qué significa cada "falta"
 
@@ -22,14 +22,12 @@
 ## Full Practice Tests
 
 ### Imported Test 1
-*DRAFT* · 98 preguntas · **24 con problemas**
+*DRAFT* · 98 preguntas · **22 con problemas**
 
-**Reading & Writing Module 1** — 27 preguntas, 4 con problemas:
+**Reading & Writing Module 1** — 27 preguntas, 2 con problemas:
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
-| 4 | MC | opciones en imagen pero faltan botones A–D (0 de 4) | Which choice completes the text with the most logical and precise word or phrase |
-| 7 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which choice best states the main idea of the text? [Stevenson / Villon and Taba |
 | 12 | MC | opciones de texto incompletas (0/4) | Which choice most logically completes the text? [game developers / self-publishi |
 | 19 | MC | opciones en imagen pero faltan botones A–D (0 de 4) | Which choice completes the text so that it conforms to the conventions of Standa |
 
