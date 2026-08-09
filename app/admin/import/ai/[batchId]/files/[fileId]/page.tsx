@@ -5,6 +5,8 @@ import { Card } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { computeCropImageSources } from "@/lib/ingest-crop-source";
+import { computeSetRows } from "@/lib/ingest-sets.server";
+import { ConjuntoRail } from "@/app/admin/import/ai/_components/conjunto-rail";
 import { FileReviewClient } from "./review-client";
 
 export const dynamic = "force-dynamic";
@@ -110,15 +112,25 @@ export default async function AiImportFileReviewPage({ params }: PageProps) {
 
   // Resolve which source to crop from — this file if it has renderable pages,
   // otherwise a sibling in the batch that does (e.g. Test 1 R&W images live in the
-  // questions DOCX while the candidates come from the answers DOCX).
-  const cropImageSource = (await computeCropImageSources(batchId))[file.id] ?? null;
+  // questions DOCX while the candidates come from the answers DOCX). Also load the
+  // batch's conjunto rows for the navigation rail.
+  const [cropImageSourceMap, setRows] = await Promise.all([
+    computeCropImageSources(batchId),
+    computeSetRows(batchId),
+  ]);
+  const cropImageSource = cropImageSourceMap[file.id] ?? null;
 
   const estimatedPages = pages.length || file.pageCount || 0;
   const secondsPerPage = latestEvent?.secondsPerPage && latestEvent.secondsPerPage > 0 ? latestEvent.secondsPerPage : 60;
   const estimatedSeconds = Math.ceil(estimatedPages * secondsPerPage);
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6 px-4 py-8">
+    <div className="mx-auto grid max-w-[100rem] gap-6 px-4 py-8 lg:grid-cols-[300px_minmax(0,1fr)]">
+      <div className="lg:sticky lg:top-4 lg:self-start">
+        <ConjuntoRail rows={setRows} batchId={batchId} currentFileId={file.id} />
+      </div>
+
+      <div className="min-w-0 space-y-6">
       <div className="flex items-center justify-between gap-3">
         <div>
           <Link href={`/admin/import/ai?batch=${batchId}`} className="text-sm text-blue-600 hover:underline">
@@ -218,6 +230,7 @@ export default async function AiImportFileReviewPage({ params }: PageProps) {
           action: incident.action,
         }))}
       />
+      </div>
     </div>
   );
 }

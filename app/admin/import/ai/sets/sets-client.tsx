@@ -6,24 +6,9 @@ import { ArrowLeft, ScissorsSquare, Search } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { filterSetRows, type SetRow, type SetSectionFilter, type SetTypeFilter } from "@/lib/ingest-sets";
 
-export interface SetRow {
-  sourceFileId: string;
-  batchId: string;
-  relativePath: string;
-  title: string;
-  contentType: string;
-  section: string | null;
-  difficulty: string | null;
-  testNumber: number | null;
-  status: string;
-  total: number;
-  answerable: number;
-  pending: number;
-  sinResp: number;
-  faltanOpt: number;
-  promoted: number;
-}
+export type { SetRow };
 
 interface SetsIndexClientProps {
   rows: SetRow[];
@@ -31,8 +16,8 @@ interface SetsIndexClientProps {
   batches: { id: string; name: string }[];
 }
 
-type TypeFilter = "ALL" | "PRACTICE_SET" | "FULL_PRACTICE_TEST";
-type SectionFilter = "ALL" | "RW" | "MATH";
+type TypeFilter = SetTypeFilter;
+type SectionFilter = SetSectionFilter;
 
 const SECTION_TABS: { value: SectionFilter; label: string }[] = [
   { value: "ALL", label: "Todas" },
@@ -56,32 +41,10 @@ export function SetsIndexClient({ rows, batchId, batches }: SetsIndexClientProps
   const [sectionFilter, setSectionFilter] = useState<SectionFilter>("ALL");
   const [onlyPending, setOnlyPending] = useState(true);
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    const matched = rows.filter((row) => {
-      if (typeFilter !== "ALL" && row.contentType !== typeFilter) return false;
-      if (sectionFilter !== "ALL" && (row.section ?? "") !== sectionFilter) return false;
-      if (onlyPending && row.pending === 0) return false;
-      if (!q) return true;
-      const haystack = [row.title, row.relativePath, row.section, row.difficulty, row.testNumber ? `test ${row.testNumber}` : null]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
-      return haystack.includes(q);
-    });
-    // Full tests first, ordered TEST 1 → TEST 10; R&W before Math within a test;
-    // practice sets (no testNumber) after, most-pending first.
-    return matched.sort((a, b) => {
-      const ta = a.testNumber ?? Number.POSITIVE_INFINITY;
-      const tb = b.testNumber ?? Number.POSITIVE_INFINITY;
-      if (ta !== tb) return ta - tb;
-      const sa = a.section === "MATH" ? 1 : 0;
-      const sb = b.section === "MATH" ? 1 : 0;
-      if (sa !== sb) return sa - sb;
-      if (b.pending !== a.pending) return b.pending - a.pending;
-      return a.title.localeCompare(b.title);
-    });
-  }, [rows, query, typeFilter, sectionFilter, onlyPending]);
+  const filtered = useMemo(
+    () => filterSetRows(rows, { query, type: typeFilter, section: sectionFilter, onlyPending }),
+    [rows, query, typeFilter, sectionFilter, onlyPending],
+  );
 
   const totals = useMemo(() => {
     return filtered.reduce(
