@@ -896,35 +896,39 @@ export function FileReviewClient({
           </Card>
         )}
 
-        {/* SECTION: Galería de todas las imágenes extraídas (independiente de candidatos).
-            Se abre por defecto cuando el archivo no tiene candidatos (p. ej. un docx de puras
-            capturas), que es justo cuando el tablero de recorte por-candidato no muestra nada. */}
-        <Section title="Galería de imágenes extraídas" subtitle={`${images.length} imágenes`} defaultOpen={candidates.length === 0}>
-          {images.length === 0 ? (
-            <p className="py-4 text-sm text-gray-400">No hay imágenes extraídas en este archivo.</p>
-          ) : (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-              {images.map((image) => {
-                const src = imageSrc(image);
-                return (
-                  <figure key={image.id} className="overflow-hidden rounded-md border border-gray-200">
-                    {src ? (
-                      <a href={src} target="_blank" rel="noreferrer" className="block bg-gray-50" title={`${image.origin} · página ${image.pageNumber}`}>
-                        <img src={src} alt={`Página ${image.pageNumber} imagen ${image.imageIndex}`} className="h-40 w-full object-contain" loading="lazy" />
-                      </a>
-                    ) : (
-                      <div className="flex h-40 items-center justify-center text-xs text-gray-400">sin vista previa</div>
-                    )}
-                    <figcaption className="flex items-center justify-between gap-2 px-2 py-1 text-xs text-gray-500">
-                      <span>Pág. {image.pageNumber}{typeof image.imageIndex === "number" ? ` · #${image.imageIndex}` : ""}</span>
-                      {image.width && image.height ? <span className="shrink-0 text-gray-400">{image.width}×{image.height}</span> : null}
-                    </figcaption>
-                  </figure>
-                );
-              })}
-            </div>
-          )}
-        </Section>
+        {/* SECTION: Galería de todas las imágenes extraídas del archivo.
+            Solo cuando NO hay candidato seleccionado — al seleccionar uno, el tablero de la
+            sección "Imágenes" ya muestra la grilla "Imágenes extraídas" (con asignación), así
+            evitamos la sección duplicada. Cubre el caso de un archivo sin candidatos (docx de
+            capturas), donde ese tablero no aparece. */}
+        {!selected && (
+          <Section title="Galería de imágenes extraídas" subtitle={`${images.length} imágenes`} defaultOpen={candidates.length === 0}>
+            {images.length === 0 ? (
+              <p className="py-4 text-sm text-gray-400">No hay imágenes extraídas en este archivo.</p>
+            ) : (
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                {images.map((image) => {
+                  const src = imageSrc(image);
+                  return (
+                    <figure key={image.id} className="overflow-hidden rounded-md border border-gray-200">
+                      {src ? (
+                        <a href={src} target="_blank" rel="noreferrer" className="block bg-gray-50" title={`${image.origin} · página ${image.pageNumber}`}>
+                          <img src={src} alt={`Página ${image.pageNumber} imagen ${image.imageIndex}`} className="h-40 w-full object-contain" loading="lazy" />
+                        </a>
+                      ) : (
+                        <div className="flex h-40 items-center justify-center text-xs text-gray-400">sin vista previa</div>
+                      )}
+                      <figcaption className="flex items-center justify-between gap-2 px-2 py-1 text-xs text-gray-500">
+                        <span>Pág. {image.pageNumber}{typeof image.imageIndex === "number" ? ` · #${image.imageIndex}` : ""}</span>
+                        {image.width && image.height ? <span className="shrink-0 text-gray-400">{image.width}×{image.height}</span> : null}
+                      </figcaption>
+                    </figure>
+                  );
+                })}
+              </div>
+            )}
+          </Section>
+        )}
 
         {/* SECTION: Páginas del archivo (contexto). */}
         <Section title="Páginas y texto extraído" subtitle={`${pages.length} páginas`} defaultOpen={false}>
