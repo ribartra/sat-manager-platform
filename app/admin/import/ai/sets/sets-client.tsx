@@ -32,20 +32,35 @@ interface SetsIndexClientProps {
 }
 
 type TypeFilter = "ALL" | "PRACTICE_SET" | "FULL_PRACTICE_TEST";
+type SectionFilter = "ALL" | "RW" | "MATH";
+
+const SECTION_TABS: { value: SectionFilter; label: string }[] = [
+  { value: "ALL", label: "Todas" },
+  { value: "RW", label: "R&W" },
+  { value: "MATH", label: "Math" },
+];
 
 function contentLabel(contentType: string) {
   return contentType === "FULL_PRACTICE_TEST" ? "Full test" : "Practice set";
 }
 
+function sectionLabel(section: string | null) {
+  if (section === "MATH") return "Math";
+  if (section === "RW") return "R&W";
+  return section;
+}
+
 export function SetsIndexClient({ rows, batchId, batches }: SetsIndexClientProps) {
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("ALL");
+  const [sectionFilter, setSectionFilter] = useState<SectionFilter>("ALL");
   const [onlyPending, setOnlyPending] = useState(true);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return rows.filter((row) => {
+    const matched = rows.filter((row) => {
       if (typeFilter !== "ALL" && row.contentType !== typeFilter) return false;
+      if (sectionFilter !== "ALL" && (row.section ?? "") !== sectionFilter) return false;
       if (onlyPending && row.pending === 0) return false;
       if (!q) return true;
       const haystack = [row.title, row.relativePath, row.section, row.difficulty, row.testNumber ? `test ${row.testNumber}` : null]
@@ -54,7 +69,19 @@ export function SetsIndexClient({ rows, batchId, batches }: SetsIndexClientProps
         .toLowerCase();
       return haystack.includes(q);
     });
-  }, [rows, query, typeFilter, onlyPending]);
+    // Full tests first, ordered TEST 1 → TEST 10; R&W before Math within a test;
+    // practice sets (no testNumber) after, most-pending first.
+    return matched.sort((a, b) => {
+      const ta = a.testNumber ?? Number.POSITIVE_INFINITY;
+      const tb = b.testNumber ?? Number.POSITIVE_INFINITY;
+      if (ta !== tb) return ta - tb;
+      const sa = a.section === "MATH" ? 1 : 0;
+      const sb = b.section === "MATH" ? 1 : 0;
+      if (sa !== sb) return sa - sb;
+      if (b.pending !== a.pending) return b.pending - a.pending;
+      return a.title.localeCompare(b.title);
+    });
+  }, [rows, query, typeFilter, sectionFilter, onlyPending]);
 
   const totals = useMemo(() => {
     return filtered.reduce(
@@ -118,6 +145,23 @@ export function SetsIndexClient({ rows, batchId, batches }: SetsIndexClientProps
         </Card>
       </div>
 
+      <div className="flex flex-wrap items-center gap-1 border-b border-gray-200">
+        {SECTION_TABS.map((tab) => (
+          <button
+            key={tab.value}
+            type="button"
+            onClick={() => setSectionFilter(tab.value)}
+            className={`-mb-px border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
+              sectionFilter === tab.value
+                ? "border-blue-600 text-blue-700"
+                : "border-transparent text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative min-w-64 flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
@@ -164,7 +208,7 @@ export function SetsIndexClient({ rows, batchId, batches }: SetsIndexClientProps
                     <p className="truncate font-medium text-gray-900" title={row.title}>{row.title}</p>
                     <p className="truncate text-xs text-gray-400" title={row.relativePath}>{row.relativePath}</p>
                     <div className="mt-1 flex flex-wrap gap-1">
-                      {row.section && <Badge variant="default">{row.section}</Badge>}
+                      {row.section && <Badge variant="default">{sectionLabel(row.section)}</Badge>}
                       {row.difficulty && <Badge variant="default">{row.difficulty}</Badge>}
                       {row.testNumber && <Badge variant="info">Test {row.testNumber}</Badge>}
                       {row.promoted > 0 && <Badge variant="success">{row.promoted} oficiales</Badge>}
