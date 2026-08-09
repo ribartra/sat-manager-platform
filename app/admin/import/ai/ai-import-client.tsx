@@ -147,6 +147,7 @@ type AiImportWorkflowProps = {
   images: ImageArtifactSummary[];
   practiceSets: PracticeSetSummary[];
   fullTests: FullTestSummary[];
+  cropImageSources: Record<string, { imageSourceFileId: string; pageNumbers: number[] }>;
   counts: {
     ocrPending: number;
     openIncidents: number;
@@ -262,6 +263,7 @@ export function AiImportWorkflowClient({
   images,
   practiceSets,
   fullTests,
+  cropImageSources,
   counts,
 }: AiImportWorkflowProps) {
   const router = useRouter();
@@ -610,6 +612,7 @@ export function AiImportWorkflowClient({
               saving={saving}
               message={message}
               onCropAssigned={refreshImageLinks}
+              cropImageSource={draft?.sourceFileId ? cropImageSources[draft.sourceFileId] ?? null : null}
             />
           </div>
           <BulkPromoteQuestionsBar
@@ -965,6 +968,7 @@ function QuestionStagingEditor({
   saving,
   message,
   onCropAssigned,
+  cropImageSource,
 }: {
   draft: CandidateSummary | null;
   setDraft: (draft: CandidateSummary) => void;
@@ -985,6 +989,7 @@ function QuestionStagingEditor({
   saving: boolean;
   message: string | null;
   onCropAssigned: () => void;
+  cropImageSource: { imageSourceFileId: string; pageNumbers: number[] } | null;
 }) {
   if (!draft) {
     return <div className="rounded-md border border-gray-200 p-8 text-center text-sm text-gray-400">Select a detected question to review.</div>;
@@ -1176,6 +1181,8 @@ function QuestionStagingEditor({
             candidateId={activeDraft.id}
             sourceFileId={activeDraft.sourceFileId}
             pageNumbers={images.map((image) => image.pageNumber)}
+            imageSourceFileId={cropImageSource?.imageSourceFileId}
+            imagePageNumbers={cropImageSource?.pageNumbers}
             onAssigned={onCropAssigned}
             onOcrText={applyCropOcr}
           />

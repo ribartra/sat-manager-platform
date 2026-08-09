@@ -291,6 +291,7 @@ export function FileReviewClient({
   imageLinks,
   incidents,
   assignTargets = [],
+  cropImageSource = null,
 }: {
   batchId: string;
   file: SourceFile;
@@ -302,6 +303,7 @@ export function FileReviewClient({
   imageLinks: ImageLink[];
   incidents: Incident[];
   assignTargets?: { questionId: string; label: string }[];
+  cropImageSource?: { imageSourceFileId: string; pageNumbers: number[] } | null;
 }) {
   const router = useRouter();
   const [galleryAssign, setGalleryAssign] = useState<{ imageId: string; questionId: string } | null>(null);
@@ -804,9 +806,10 @@ export function FileReviewClient({
                 candidateId={selected.id}
                 sourceFileId={file.id}
                 pageNumbers={pages.map((page) => page.pageNumber)}
+                imageSourceFileId={cropImageSource?.imageSourceFileId}
+                imagePageNumbers={cropImageSource?.pageNumbers}
                 onAssigned={() => router.refresh()}
                 onOcrText={applyCropOcr}
-                sourceIsPdf={(file.extension ?? "").toLowerCase() === "pdf"}
               />
 
               <div className="mt-4 flex items-center justify-between">

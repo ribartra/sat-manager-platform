@@ -15,6 +15,9 @@ interface CropBody {
   mode?: string;
   targetType?: string;
   optionLabel?: string | null;
+  // Optional sibling source to crop pixels from (same batch as the candidate).
+  // Used when the candidate's own source has no page images (e.g. Test 1 R&W).
+  imageSourceFileId?: string | null;
 }
 
 // Crops a region of the candidate's source PDF and either ASSIGNs it (creates an
@@ -48,6 +51,20 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
   const candidate = await prisma.ingestQuestionCandidate.findUnique({ where: { id: candidateId } });
   if (!candidate) return NextResponse.json({ error: "Candidate not found." }, { status: 404 });
 
+  // Validate the sibling image source (if any) lives in the same batch before
+  // trusting the client-supplied id.
+  let imageSourceFileId: string | null = null;
+  if (body.imageSourceFileId && body.imageSourceFileId !== candidate.sourceFileId) {
+    const imageSource = await prisma.ingestSourceFile.findUnique({
+      where: { id: body.imageSourceFileId },
+      select: { batchId: true },
+    });
+    if (!imageSource || imageSource.batchId !== candidate.batchId) {
+      return NextResponse.json({ error: "Invalid image source." }, { status: 400 });
+    }
+    imageSourceFileId = body.imageSourceFileId;
+  }
+
   const response = await fetch(ingestUrl(`/candidates/${candidateId}/crop-region`), {
     method: "POST",
     headers: ingestAuthHeaders({ "Content-Type": "application/json" }),
@@ -57,6 +74,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       mode,
       targetType,
       optionLabel: body.optionLabel ?? null,
+      imageSourceFileId,
     }),
   });
   const data = await response.json().catch(() => ({}));

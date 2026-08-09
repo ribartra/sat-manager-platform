@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { computeCropImageSources } from "@/lib/ingest-crop-source";
 import { FileReviewClient } from "./review-client";
 
 export const dynamic = "force-dynamic";
@@ -107,6 +108,11 @@ export default async function AiImportFileReviewPage({ params }: PageProps) {
     }
   }
 
+  // Resolve which source to crop from — this file if it has renderable pages,
+  // otherwise a sibling in the batch that does (e.g. Test 1 R&W images live in the
+  // questions DOCX while the candidates come from the answers DOCX).
+  const cropImageSource = (await computeCropImageSources(batchId))[file.id] ?? null;
+
   const estimatedPages = pages.length || file.pageCount || 0;
   const secondsPerPage = latestEvent?.secondsPerPage && latestEvent.secondsPerPage > 0 ? latestEvent.secondsPerPage : 60;
   const estimatedSeconds = Math.ceil(estimatedPages * secondsPerPage);
@@ -143,6 +149,7 @@ export default async function AiImportFileReviewPage({ params }: PageProps) {
         }}
         reviewSession={{ currentStep: reviewSession.currentStep, status: reviewSession.status }}
         assignTargets={assignTargets}
+        cropImageSource={cropImageSource}
         pages={pages.map((page) => ({
           id: page.id,
           pageNumber: page.pageNumber,

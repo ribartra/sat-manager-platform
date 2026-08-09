@@ -909,12 +909,15 @@ def resolve_asset_disk_path(file_url: str | None) -> Path | None:
 
 
 def find_page_image_disk_path(db: Any, source_file_id: str, page_number: int) -> Path | None:
-    """Devuelve la imagen de página completa (no un recorte manual) más grande
-    para (sourceFileId, pageNumber), para poder recortar DOCX por región."""
+    """Devuelve la imagen de página completa (no un recorte manual) para
+    (sourceFileId, pageNumber), para poder recortar DOCX por región. Ordena por
+    imageIndex ASC para coincidir con la imagen que muestra el visor (el fallback
+    de la ruta Next usa el mismo criterio), de modo que las coords normalizadas
+    del recorte mapeen sobre la misma imagen."""
     rows = db.execute(
         "SELECT fileUrl, COALESCE(width,0) w, COALESCE(height,0) h FROM IngestImageArtifact "
         "WHERE sourceFileId = ? AND pageNumber = ? AND origin <> 'MANUAL_CROP' "
-        "ORDER BY (w*h) DESC, imageIndex ASC",
+        "ORDER BY imageIndex ASC",
         (source_file_id, page_number),
     ).fetchall()
     for row in rows:
@@ -934,6 +937,7 @@ def crop_candidate_region(
     mode: str,
     target_type: str,
     option_label: str | None,
+    image_source_file_id: str | None = None,
 ) -> dict[str, Any]:
     """Recorta una región del PDF de un candidato y la trabaja según `mode`:
     ASSIGN → guarda el recorte como IngestImageArtifact (origin MANUAL_CROP) y crea
@@ -957,14 +961,28 @@ def crop_candidate_region(
         source = db.execute("SELECT * FROM IngestSourceFile WHERE id = ?", (candidate["sourceFileId"],)).fetchone()
         if not source:
             raise HTTPException(status_code=404, detail="Source file not found.")
-        path = resolve_existing_source_path(source["path"])
+        # The pixels may come from a *sibling* source in the same batch — e.g. Test 1
+        # R&W keeps candidates in the answer-explanations DOCX (no page images) while
+        # the passages/figures live in the questions DOCX. The reviewer selects which
+        # source to view; we crop from that one but still link the crop to this
+        # candidate. The artifact stays recorded under the candidate's own source so
+        # it shows up in that file's image board.
+        image_source = source
+        if image_source_file_id and image_source_file_id != source["id"]:
+            alt = db.execute("SELECT * FROM IngestSourceFile WHERE id = ?", (image_source_file_id,)).fetchone()
+            if not alt:
+                raise HTTPException(status_code=404, detail="Image source file not found.")
+            if alt["batchId"] != candidate["batchId"]:
+                raise HTTPException(status_code=400, detail="Image source must belong to the same batch.")
+            image_source = alt
+        path = resolve_existing_source_path(image_source["path"])
         if path.exists() and path.suffix.lower() == ".pdf":
             image_bytes, w_px, h_px, points = crop_pdf_region_normalized(path, page_number, bbox_norm)
         else:
             # Non-PDF source (e.g. a DOCX of page screenshots): crop the already-
             # extracted full-page image with Pillow, so region ASSIGN/OCR behaves
             # the same as for PDFs.
-            page_image = find_page_image_disk_path(db, source["id"], page_number)
+            page_image = find_page_image_disk_path(db, image_source["id"], page_number)
             if not page_image:
                 raise HTTPException(status_code=400, detail="No hay imagen de página para recortar en este archivo.")
             image_bytes, w_px, h_px, points = crop_image_region_normalized(page_image, bbox_norm)
@@ -5497,6 +5515,7 @@ def crop_candidate_region_endpoint(candidate_id: str, payload: dict[str, Any]) -
     bbox = payload.get("bbox")
     if not isinstance(bbox, dict):
         raise HTTPException(status_code=400, detail="bbox {x0,y0,x1,y1} (normalized) is required.")
+    image_source_file_id = payload.get("imageSourceFileId")
     return crop_candidate_region(
         candidate_id,
         int(page_number),
@@ -5504,4 +5523,5 @@ def crop_candidate_region_endpoint(candidate_id: str, payload: dict[str, Any]) -
         str(payload.get("mode", "ASSIGN")),
         str(payload.get("targetType", "PAGE_CONTEXT")),
         payload.get("optionLabel"),
+        str(image_source_file_id) if image_source_file_id else None,
     )

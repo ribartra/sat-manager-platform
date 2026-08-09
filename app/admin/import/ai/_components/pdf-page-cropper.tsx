@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -43,10 +44,12 @@ interface PdfPageCropperProps {
   onAssigned?: () => void;
   onOcrText?: (target: CropTarget, result: CropOcrResult) => void;
   className?: string;
-  // Region crop (ASSIGN/OCR) needs a real PDF (pdfplumber). For DOCX sources the
-  // page can still be viewed, but region tools are disabled with a pointer to the
-  // gallery. Defaults to true so PDF callers are unaffected.
-  sourceIsPdf?: boolean;
+  // When the candidate's own source has no renderable pages, the pixels come from
+  // a sibling source in the same batch (e.g. Test 1 R&W: candidates in the answer
+  // DOCX, images in the questions DOCX). When set, the viewer renders and crops
+  // that source instead. Defaults to `sourceFileId` / `pageNumbers`.
+  imageSourceFileId?: string;
+  imagePageNumbers?: number[];
 }
 
 function normalizeRect(a: { x: number; y: number }, b: { x: number; y: number }): Rect {
@@ -66,9 +69,13 @@ export function PdfPageCropper({
   onAssigned,
   onOcrText,
   className,
-  sourceIsPdf = true,
+  imageSourceFileId,
+  imagePageNumbers,
 }: PdfPageCropperProps) {
-  const uniquePages = Array.from(new Set(pageNumbers.filter((n) => Number.isInteger(n) && n > 0))).sort((a, b) => a - b);
+  // The source we actually render/crop — a sibling image source when provided.
+  const effectiveSourceId = imageSourceFileId || sourceFileId;
+  const effectivePages = imagePageNumbers && imagePageNumbers.length ? imagePageNumbers : pageNumbers;
+  const uniquePages = Array.from(new Set(effectivePages.filter((n) => Number.isInteger(n) && n > 0))).sort((a, b) => a - b);
   const initialPage = defaultPageNumber && uniquePages.includes(defaultPageNumber) ? defaultPageNumber : uniquePages[0] ?? 1;
 
   const [open, setOpen] = useState(false);
@@ -82,6 +89,23 @@ export function PdfPageCropper({
 
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const dragStart = useRef<{ x: number; y: number } | null>(null);
+
+  // Lock body scroll + close on Escape while the modal is open. Rendering through a
+  // portal to <body> keeps the overlay viewport-fixed even if an ancestor sets a
+  // transform/filter/contain (which would otherwise trap position:fixed).
+  useEffect(() => {
+    if (!open) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
 
   // change page and reset selection/error (avoids setState-in-effect)
   function changePage(next: number) {
@@ -135,6 +159,7 @@ export function PdfPageCropper({
           mode,
           targetType,
           optionLabel: needsOption ? optionLabel.toUpperCase() : null,
+          imageSourceFileId: effectiveSourceId,
         }),
       });
       const data = await response.json().catch(() => ({}));
@@ -155,28 +180,22 @@ export function PdfPageCropper({
     }
   }
 
-  return (
-    <div className={className}>
-      <Button type="button" size="sm" variant="secondary" onClick={() => setOpen((v) => !v)}>
-        {open ? "Cerrar recorte de PDF" : "Recortar desde el PDF"}
-      </Button>
-
-      {open && (
-        <div
-          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 p-4 sm:p-8"
-          role="dialog"
-          aria-modal="true"
-          onMouseDown={(e) => { if (e.target === e.currentTarget) setOpen(false); }}
-        >
+  const modal = open ? (
+    <div
+      className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-black/50 p-4 sm:p-8"
+      role="dialog"
+      aria-modal="true"
+      onMouseDown={(e) => { if (e.target === e.currentTarget) setOpen(false); }}
+    >
         <div className="my-auto w-full max-w-3xl space-y-3 rounded-lg border border-gray-200 bg-white p-4 shadow-xl">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-gray-900">Recortar desde el PDF</h3>
+            <h3 className="text-sm font-semibold text-gray-900">Recortar región de la página</h3>
             <button type="button" onClick={() => setOpen(false)} className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600" aria-label="Cerrar">✕</button>
           </div>
-          {!sourceIsPdf && (
-            <p className="rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-600">
-              Fuente DOCX: el recorte se hace sobre la imagen de página extraída. Funciona igual — arrastra la
-              región y usa Asignar u OCR.
+          {imageSourceFileId && imageSourceFileId !== sourceFileId && (
+            <p className="rounded-md border border-blue-100 bg-blue-50 px-3 py-2 text-xs text-blue-700">
+              Este archivo no trae imágenes de página propias; se está mostrando la fuente de imágenes del mismo
+              lote. Navega las páginas, arrastra la región y usa Asignar u OCR.
             </p>
           )}
           <div className="flex flex-wrap items-center gap-2">
@@ -229,7 +248,7 @@ export function PdfPageCropper({
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={`/api/admin/ai-import/sources/${sourceFileId}/pages/${pageNumber}/image?dpi=150`}
+              src={`/api/admin/ai-import/sources/${effectiveSourceId}/pages/${pageNumber}/image?dpi=150`}
               alt={`Página ${pageNumber}`}
               className="block w-full"
               draggable={false}
@@ -271,8 +290,19 @@ export function PdfPageCropper({
 
           {message && <p className="text-xs text-gray-600">{message}</p>}
         </div>
-        </div>
+    </div>
+  ) : null;
+
+  const hasPages = uniquePages.length > 0;
+  return (
+    <div className={className}>
+      <Button type="button" size="sm" variant="secondary" onClick={() => setOpen((v) => !v)} disabled={!hasPages}>
+        {open ? "Cerrar recorte" : "Recortar región de la página"}
+      </Button>
+      {!hasPages && (
+        <span className="ml-2 text-xs text-gray-400">No hay páginas con imagen para recortar en este lote.</span>
       )}
+      {modal && typeof document !== "undefined" ? createPortal(modal, document.body) : null}
     </div>
   );
 }

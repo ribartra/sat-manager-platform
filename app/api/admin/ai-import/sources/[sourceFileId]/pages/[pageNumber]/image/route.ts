@@ -27,7 +27,9 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
   // ingest (IngestImageArtifact), so the crop tool at least shows the page.
   async function extractedPageFallback() {
     const img = await prisma.ingestImageArtifact.findFirst({
-      where: { sourceFileId, pageNumber: pageNum },
+      // Exclude manual crops and order by imageIndex asc so the displayed page image
+      // matches the one the ingest service crops from (find_page_image_disk_path).
+      where: { sourceFileId, pageNumber: pageNum, origin: { not: "MANUAL_CROP" } },
       orderBy: { imageIndex: "asc" },
       select: { fileUrl: true },
     });

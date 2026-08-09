@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { CopyableTruncatedText } from "@/components/ui/copyable-truncated-text";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { computeCropImageSources } from "@/lib/ingest-crop-source";
 import { AiImportWorkflowClient, IngestAutoRefresh } from "./ai-import-client";
 
 export const dynamic = "force-dynamic";
@@ -323,6 +324,10 @@ export default async function AiImportPage({ searchParams }: PageProps) {
       ])
     : [[], [], [], 0, [], [], [], [], 0, [], [], [], [], [], 0, 0, 0, 0, 0];
 
+  // Which source each candidate should crop from (own file, or a sibling that has
+  // page images — e.g. Test 1 R&W). Keyed by source file id.
+  const cropImageSources = selectedBatchId ? await computeCropImageSources(selectedBatchId) : {};
+
   const openIncidents = incidents.filter((incident) => incident.status !== "RESOLVED");
   const currentOpenIncidents = openIncidentCount ?? openIncidents.length;
   const ocrRequiredTotal = ocrRequiredBySource.reduce((sum, row) => sum + row._count._all, 0);
@@ -568,6 +573,7 @@ export default async function AiImportPage({ searchParams }: PageProps) {
           stateVariant: state.variant,
         }))}
         fullTests={fullTestSummaries}
+        cropImageSources={cropImageSources}
         counts={{
           ocrPending: ocrRequiredTotal,
           openIncidents: currentOpenIncidents,
