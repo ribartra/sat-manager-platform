@@ -40,25 +40,38 @@ riesgo de derivar).
 
 ## Estado por test
 
-| Test | Archivo fuente de promoción | Defecto | RW | Con estímulo | Split aplicado | Short-stem (pendiente OCR) |
-|-----:|------------------------------|:------:|---:|-------------:|---------------:|---------------------------:|
-| 1  | `Test1 RW Answer Explanations.docx` (equivocado) | A | 54 | 38 | — (posicional) | 16 |
-| 2  | `INNOVATOR TEST 2 R&W MOD 1 REV.pdf` | B | 54 | 32 | 32 | 22 |
-| 3  | `INNOV test 3 R&W mod. 1 and 2B.pdf` | B | 54 | 31 | 31 | 23 |
-| 4  | `INNOVATOR TEST 4 RW MOD 1 &2 REV.pdf` | B | 52 | 33 | 33 | 19 |
-| 5  | `INNOVATOR TEST 5 RW MOD 1&2.pdf` | B | 54 | 37 | 37 | 17 |
-| 6  | `INNOVATOR TEST 6 RW.pdf` | B | 54 | 33 | 33 | 21 |
-| 7  | `Test 7 RW.pdf` | B | 52 | 34 | 34 | 18 |
-| 8  | `TEST 8 R&W MOD 1 AND 2.pdf` (solo 2/98 promovidas) | B | 2 | 2 | 2 | 0 |
-| 9  | `TEST 9 RW MOD 1, 2, REV PDF.pdf` | B | 54 | 34 | 34 | 20 |
-| 10 | `INNOVATORS TEST 10 RW 1, 2B.pdf` (parcial 74/98) | B | 51 | 29 | 29 | 22 |
+La recuperación se hizo en tres fases: **split** del stem (fase B1), **recuperación short-stem por OCR**
+(fase B2) y, para Test 1, **mapeo posicional** de estímulo y opciones (fase A).
 
-**Totales.** 481 preguntas R&W promovidas · **303 con estímulo** tras esta fase (38 de Test 1 + 265 por split)
-· **178 short-stem** pendientes de la pasada OCR.
+| Test | Archivo fuente de promoción | Def. | RW | Estímulo (split + OCR) | Pendiente |
+|-----:|------------------------------|:---:|---:|:----------------------:|----------:|
+| 1  | `Test1 RW Answer Explanations.docx` (equivocado) | A | 54 | 38 (posicional) | 16 |
+| 2  | `INNOVATOR TEST 2 R&W MOD 1 REV.pdf` | B | 54 | 49 (32+17) | 5 |
+| 3  | `INNOV test 3 R&W mod. 1 and 2B.pdf` | B | 54 | 42 (31+11) | 12 |
+| 4  | `INNOVATOR TEST 4 RW MOD 1 &2 REV.pdf` | B | 52 | 49 (33+16) | 3 |
+| 5  | `INNOVATOR TEST 5 RW MOD 1&2.pdf` | B | 54 | 53 (37+16) | 1 |
+| 6  | `INNOVATOR TEST 6 RW.pdf` | B | 54 | 42 (33+9) | 12 |
+| 7  | `Test 7 RW.pdf` | B | 52 | 47 (34+13) | 5 |
+| 8  | `TEST 8 R&W MOD 1 AND 2.pdf` (solo 2/98 promovidas) | B | 2 | 2 | 0 |
+| 9  | `TEST 9 RW MOD 1, 2, REV PDF.pdf` | B | 54 | 49 (34+15) | 5 |
+| 10 | `INNOVATORS TEST 10 RW 1, 2B.pdf` (parcial 74/98) | B | 51 | 39 (29+10) | 12 |
+
+**Totales.** 481 preguntas R&W · **410 con estímulo** (38 Test 1 + 265 split + 107 OCR short-stem) ·
+**71 pendientes**.
+
+### Fase B2 — recuperación short-stem por OCR (generalizada, `RECOVER_RW_STIMULUS_SHORTSTEM`)
+Las preguntas short-stem (prompt sin pasaje) se recuperan re-parseando el OCR del PDF de cada test con un
+parser único: ancla por número `N.` (→ orden de módulo `N-1`), pasaje = cola del bloque anterior tras la
+última opción. **Clave de seguridad: se valida por prompt** — solo se escribe si el prompt parseado coincide
+con el stem actual; si el parser deriva (preguntas con gráfico/tabla), el prompt no coincide y se **descarta**
+(18 casos así, no escritos). Maneja marcadores en negrita, viñetas, overflow, y limpia fugas del valor de
+la opción D previa (`![img]`/`[tbl]` se descartan). Recuperó **107/481**. Los **71 restantes** son: ~55 en
+páginas OCR tipo tabla/gráfico (sin texto de pasaje → requieren re-OCR con visión o imagen) + ~16 descartados
+por validación (drift no confirmado). Un caso minoritario puede conservar una opción-fragmento inicial.
 
 ## Pendiente
-- **Short-stem (≈178)**: recuperar el pasaje del OCR del propio PDF de cada test, validando por-pregunta
-  (número de prompt como ancla; verificar que el pasaje no derive en preguntas con gráfico/tabla).
+- **~71 estímulos**: ~55 en páginas tabla/gráfico (re-OCR con visión o recorte de imagen) + ~16 sin confirmar
+  por validación de prompt (revisión manual).
 - **Underline/gráficos**: preguntas de "underlined sentence" y de tabla/gráfico pueden requerir la imagen o
   el marcado de subrayado; el texto del pasaje quedó, pero el subrayado no lo preserva el OCR.
 - **Promoción incompleta**: Test 8 (2/98), Test 10 (74/98), Tests 4/6/7 con 1–2 preguntas faltantes — track
