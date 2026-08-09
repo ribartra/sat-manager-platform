@@ -1,9 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+import { useCallback, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 // Reusable "crop from a PDF page" tool for the ingest review surfaces (batch
 // dashboard + per-file wizard). Renders a source page, lets the reviewer drag a
@@ -92,23 +92,6 @@ export function PdfPageCropper({
   const imgRef = useRef<HTMLImageElement | null>(null);
   const dragStart = useRef<{ x: number; y: number } | null>(null);
 
-  // Lock body scroll + close on Escape while the modal is open. Rendering through a
-  // portal to <body> keeps the overlay viewport-fixed even if an ancestor sets a
-  // transform/filter/contain (which would otherwise trap position:fixed).
-  useEffect(() => {
-    if (!open) return;
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = prevOverflow;
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [open]);
-
   // change page and reset selection/error (avoids setState-in-effect)
   function changePage(next: number) {
     setPageNumber(Math.max(1, next));
@@ -185,18 +168,26 @@ export function PdfPageCropper({
     }
   }
 
-  const modal = open ? (
-    <div
-      className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-black/50 p-4 sm:p-8"
-      role="dialog"
-      aria-modal="true"
-      onMouseDown={(e) => { if (e.target === e.currentTarget) setOpen(false); }}
-    >
-        <div className="my-auto w-full max-w-3xl select-none space-y-3 rounded-lg border border-gray-200 bg-white p-4 shadow-xl">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-gray-900">Recortar región de la página</h3>
-            <button type="button" onClick={() => setOpen(false)} className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600" aria-label="Cerrar">✕</button>
-          </div>
+  const hasPages = uniquePages.length > 0;
+  return (
+    <div className={className}>
+      <Button type="button" size="sm" variant="secondary" onClick={() => setOpen(true)} disabled={!hasPages}>
+        Recortar región de la página
+      </Button>
+      {!hasPages && (
+        <span className="ml-2 text-xs text-gray-400">No hay páginas con imagen para recortar en este lote.</span>
+      )}
+
+      {/* Nested Radix Dialog: when launched from inside another modal (the review
+          dialog), Radix makes this the active layer — correct focus, pointer-events
+          and stacking — instead of a body-portaled div that the parent modal makes
+          inert. Also works standalone in the per-file wizard. */}
+      <Dialog open={open} onOpenChange={(next) => { setOpen(next); if (!next) setRect(null); }}>
+        <DialogContent className="max-h-[92vh] max-w-3xl select-none gap-3 overflow-auto">
+          <DialogHeader>
+            <DialogTitle className="text-sm">Recortar región de la página</DialogTitle>
+            <DialogDescription className="sr-only">Elige una página, arrastra la región y usa Asignar u OCR.</DialogDescription>
+          </DialogHeader>
           {imageSourceFileId && imageSourceFileId !== sourceFileId && (
             <p className="rounded-md border border-blue-100 bg-blue-50 px-3 py-2 text-xs text-blue-700">
               Este archivo no trae imágenes propias; se muestran las imágenes de página del archivo de origen del
@@ -328,20 +319,8 @@ export function PdfPageCropper({
           </div>
 
           {message && <p className="text-xs text-gray-600">{message}</p>}
-        </div>
-    </div>
-  ) : null;
-
-  const hasPages = uniquePages.length > 0;
-  return (
-    <div className={className}>
-      <Button type="button" size="sm" variant="secondary" onClick={() => setOpen((v) => !v)} disabled={!hasPages}>
-        {open ? "Cerrar recorte" : "Recortar región de la página"}
-      </Button>
-      {!hasPages && (
-        <span className="ml-2 text-xs text-gray-400">No hay páginas con imagen para recortar en este lote.</span>
-      )}
-      {modal && typeof document !== "undefined" ? createPortal(modal, document.body) : null}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
