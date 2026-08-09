@@ -87,6 +87,14 @@ type CandidateSummary = {
   warningsJson: string | null;
 };
 
+// Full-test files bundle modules that each restart numbering at 1, so prefix the
+// module (M1/M2B) to tell two identically-numbered questions apart. Practice sets
+// have no module label → plain "Q<n>".
+function qLabel(moduleLabel: string | null, questionNumber: number | null) {
+  const q = `Q${questionNumber ?? "?"}`;
+  return moduleLabel ? `M${moduleLabel} · ${q}` : q;
+}
+
 type ImageArtifactSummary = {
   id: string;
   sourceFileId: string | null;
@@ -557,7 +565,7 @@ export function AiImportWorkflowClient({
                             onClick={() => selectCandidate(candidate)}
                             className="min-w-0 text-left font-medium text-gray-900 hover:text-blue-700"
                           >
-                            Q{candidate.questionNumber ?? "?"}
+                            {qLabel(candidate.moduleLabel, candidate.questionNumber)}
                           </button>
                         </div>
                         <div className="flex gap-1">
@@ -1014,7 +1022,7 @@ function QuestionStagingEditor({
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-xs uppercase text-gray-400">Question Editor</p>
-            <h3 className="mt-1 text-base font-semibold text-gray-900">Question {draft.questionNumber ?? "without number"}</h3>
+            <h3 className="mt-1 text-base font-semibold text-gray-900">{draft.moduleLabel ? `Module ${draft.moduleLabel} · ` : ""}Question {draft.questionNumber ?? "without number"}</h3>
             <div className="mt-2 flex flex-wrap gap-2">
               <Badge variant={badgeVariant(draft.status)}>{draft.status}</Badge>
               <Badge variant={badgeVariant(draft.promotionStatus)}>{draft.promotionStatus}</Badge>

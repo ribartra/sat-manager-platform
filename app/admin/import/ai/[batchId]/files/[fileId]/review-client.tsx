@@ -58,10 +58,20 @@ type Candidate = {
 type AnswerCandidate = {
   id: string;
   questionNumber: number | null;
+  moduleLabel: string | null;
   answer: string | null;
   explanation: string | null;
   confidence: number;
 };
+
+// A full-test file bundles several modules whose question numbers each restart
+// at 1 (e.g. Module 1 has Q1–Q27 and Module 2B has Q1–Q27). Prefix the module so
+// the two are distinguishable instead of showing two "Q1", two "Q2", … Practice
+// sets carry no module → plain "Q<n>".
+function qLabel(moduleLabel: string | null, questionNumber: number | null) {
+  const q = `Q${questionNumber ?? "?"}`;
+  return moduleLabel ? `M${moduleLabel} · ${q}` : q;
+}
 
 type ImageArtifact = {
   id: string;
@@ -314,7 +324,13 @@ export function FileReviewClient({
 
   const selectedLinks = selected ? linksByCandidate.get(selected.id) ?? [] : [];
   const answersForQuestion = selected?.questionNumber
-    ? answers.filter((answer) => answer.questionNumber === selected.questionNumber)
+    ? answers.filter(
+        (answer) =>
+          answer.questionNumber === selected.questionNumber &&
+          // Only cross-check the module when both sides carry one, so answers
+          // from Module 2B don't attach to Module 1's identically-numbered Q.
+          (!selected.moduleLabel || !answer.moduleLabel || answer.moduleLabel === selected.moduleLabel),
+      )
     : [];
 
   // Option letters for this candidate (from parsed options, else A–D for MC).
@@ -529,7 +545,7 @@ export function FileReviewClient({
                 >
                   <span className="flex items-center gap-2">
                     <span className={`h-2 w-2 shrink-0 rounded-full ${state.dot}`} aria-hidden />
-                    <span className="font-medium">Q{candidate.questionNumber ?? "?"}</span>
+                    <span className="font-medium">{qLabel(candidate.moduleLabel, candidate.questionNumber)}</span>
                     <span className="text-xs text-gray-400">{state.label}</span>
                   </span>
                   <span className="mt-1 block truncate text-xs text-gray-500">{candidate.questionExternalId ?? candidate.topicName ?? "sin ID"}</span>
@@ -548,7 +564,7 @@ export function FileReviewClient({
             <div className="sticky top-0 z-10 rounded-lg border border-gray-200 bg-white/95 px-4 py-3 shadow-sm backdrop-blur">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h2 className="text-base font-semibold text-gray-900">Q{draft.questionNumber ?? "—"}</h2>
+                  <h2 className="text-base font-semibold text-gray-900">{qLabel(draft.moduleLabel, draft.questionNumber)}</h2>
                   <span className="text-xs text-gray-500">{draft.questionExternalId ?? "sin ID"} · {Math.round(draft.confidence * 100)}%</span>
                   <Badge variant={badgeVariant(draft.status)}>{draft.status}</Badge>
                   <Badge variant={badgeVariant(draft.promotionStatus)}>{draft.promotionStatus}</Badge>

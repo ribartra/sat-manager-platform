@@ -56,11 +56,13 @@ export default async function AiImportFileReviewPage({ params }: PageProps) {
     }),
     prisma.ingestQuestionCandidate.findMany({
       where: { batchId, sourceFileId: fileId },
-      orderBy: [{ questionNumber: "asc" }, { createdAt: "asc" }],
+      // moduleLabel first so a full test's modules don't interleave (each module
+      // restarts numbering at 1); practice sets have a null label and fall through.
+      orderBy: [{ moduleLabel: "asc" }, { questionNumber: "asc" }, { createdAt: "asc" }],
     }),
     prisma.ingestAnswerCandidate.findMany({
       where: { batchId, sourceFileId: fileId },
-      orderBy: [{ questionNumber: "asc" }, { createdAt: "asc" }],
+      orderBy: [{ moduleLabel: "asc" }, { questionNumber: "asc" }, { createdAt: "asc" }],
       take: 200,
     }),
     prisma.ingestImageArtifact.findMany({
@@ -147,6 +149,7 @@ export default async function AiImportFileReviewPage({ params }: PageProps) {
         answers={answers.map((answer) => ({
           id: answer.id,
           questionNumber: answer.questionNumber,
+          moduleLabel: answer.moduleLabel,
           answer: answer.answer,
           explanation: answer.explanation,
           confidence: answer.confidence,
