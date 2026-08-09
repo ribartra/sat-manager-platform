@@ -509,8 +509,14 @@ export function FileReviewClient({
   function applyCropOcr(target: CropTarget, result: CropOcrResult) {
     if (!draft) return;
     const text = (result.text ?? "").trim();
-    if (target.targetType === "OPTION_BLOCK" && result.options && result.options.length === 4) {
-      setDraft({ ...draft, type: "MC", optionsJson: JSON.stringify(result.options) });
+    if (target.targetType === "OPTION_BLOCK" && result.options && result.options.length) {
+      // Merge parsed options over the existing rows so a partial OCR (2–3 of 4)
+      // still fills what it found and leaves the rest for the reviewer.
+      const existing = parseOptions(draft.optionsJson) as { label?: string; text?: string }[];
+      const map = new Map(existing.map((o) => [(o.label ?? "").toUpperCase(), o.text ?? ""]));
+      for (const o of result.options) map.set((o.label ?? "").toUpperCase(), o.text ?? "");
+      const ordered = ["A", "B", "C", "D"].map((label) => ({ label, text: map.get(label) ?? "" }));
+      setDraft({ ...draft, type: "MC", optionsJson: JSON.stringify(ordered) });
     } else if (target.targetType === "OPTION" && target.optionLabel) {
       const opts = parseOptions(draft.optionsJson) as { label?: string; text?: string }[];
       const map = new Map(opts.map((o) => [(o.label ?? "").toUpperCase(), o.text ?? ""]));

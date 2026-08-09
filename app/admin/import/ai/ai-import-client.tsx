@@ -1002,8 +1002,11 @@ function QuestionStagingEditor({
 
   function applyCropOcr(target: CropTarget, result: CropOcrResult) {
     const text = (result.text ?? "").trim();
-    if (target.targetType === "OPTION_BLOCK" && result.options && result.options.length === 4) {
-      setOptionRows(result.options.map((option) => ({ label: option.label, text: option.text })));
+    if (target.targetType === "OPTION_BLOCK" && result.options && result.options.length) {
+      // Merge over existing rows so a partial OCR (2–3 of 4) still fills what it found.
+      const map = new Map(optionRows.map((row) => [(row.label || "").toUpperCase(), row.text || ""]));
+      for (const option of result.options) map.set((option.label || "").toUpperCase(), option.text || "");
+      setOptionRows(["A", "B", "C", "D"].map((label) => ({ label, text: map.get(label) ?? "" })));
       setDraft({ ...activeDraft, type: "MC" });
     } else if (target.targetType === "OPTION" && target.optionLabel) {
       const index = optionRows.findIndex((row) => (row.label || "").toUpperCase() === target.optionLabel);

@@ -2478,33 +2478,122 @@ def extract_options_and_stem(text: str) -> tuple[list[dict[str, str]], str]:
     return options, stem
 
 
+# ── Canonical A–D option-block parser ────────────────────────────────────────
+# Shared robust pipeline used by the crop-OCR path and the option-image OCR. It
+# tolerates every option-marker variant seen across the ingested sources:
+#   • leading strike / checkbox / bullet glyphs:  ✕ A)   ☐ B.   • C)
+#   • markdown emphasis around the letter:        **A)**   __B__   *C*
+#   • optional punctuation after the letter:      A) / A. / A: / A、
+#     (or none, when a glyph or emphasis already marks the letter)
+#   • multi-line option text (continuation lines are appended to the option)
+#   • markdown table rows:                        | A | administer |
+#   • single-line inline runs:                    A) x  B) y  C) z  D) w
+# A contiguous run starting at A is required (A→B→C→D), which guards against
+# matching stray capitals in prose. All parsers return options in A→D order.
+_OPT_STRIKE = "×✕✖✗☒☐✓✔"
+_OPT_BULLET = "•▪◦※–\\-"
+_OPT_EMPH = r"(?:\*\*|__|\*|_)"
+_OPT_PUNCT_RE = re.compile(
+    rf"^\s*(?:[{_OPT_STRIKE}{_OPT_BULLET}]\s*)?{_OPT_EMPH}?\s*([A-D])\s*{_OPT_EMPH}?\s*[\).:：．、]\s*(.*)$",
+    re.IGNORECASE,
+)
+_OPT_MARKED_RE = re.compile(
+    rf"^\s*(?:[{_OPT_STRIKE}{_OPT_BULLET}]\s*{_OPT_EMPH}?|{_OPT_EMPH})\s*([A-D])\s*{_OPT_EMPH}?\s+(.*)$",
+    re.IGNORECASE,
+)
+_OPT_TABLE_RE = re.compile(
+    rf"^\s*\|?\s*(?:[{_OPT_STRIKE}{_OPT_BULLET}]\s*)?{_OPT_EMPH}?\s*([A-D])\s*{_OPT_EMPH}?\s*\|\s*(.*?)\s*\|?\s*$",
+    re.IGNORECASE,
+)
+_OPT_INLINE_RE = re.compile(
+    rf"(?:^|\s|\|)(?:[{_OPT_STRIKE}{_OPT_BULLET}]\s*)?{_OPT_EMPH}?\s*([A-D])\s*{_OPT_EMPH}?\s*[\).:]\s+(.+?)"
+    rf"(?=(?:\s(?:[{_OPT_STRIKE}{_OPT_BULLET}]\s*)?{_OPT_EMPH}?\s*[A-D]\s*{_OPT_EMPH}?\s*[\).:]\s+)|$)",
+    re.IGNORECASE | re.DOTALL,
+)
+_OPT_NAV_RE = re.compile(r"(?i)^\s*(?:PREV\.?\s+QUESTION|NEXT\s+QUESTION|COME?\s+BACK\s+LATER)\s*$")
+_OPT_STOP_RE = re.compile(r"(?i)^\s*#*\s*(?:Correct\s+Answer|Rationale|Question\s+Difficulty)\b")
+
+
+def _strip_emphasis(value: str) -> str:
+    """Drop markdown emphasis markers while preserving math asterisks (e.g. 3*x)."""
+    value = value.replace("**", "").replace("__", "")
+    value = re.sub(r"(?<![\w*])\*(?!\s)", "", value)  # opening *
+    value = re.sub(r"(?<!\s)\*(?![\w*])", "", value)  # closing *
+    return value.strip()
+
+
+def _option_start(line: str) -> tuple[str, str] | None:
+    for pattern in (_OPT_TABLE_RE, _OPT_PUNCT_RE, _OPT_MARKED_RE):
+        match = pattern.match(line)
+        if match:
+            return match.group(1).upper(), (match.group(2) or "").strip()
+    return None
+
+
+def parse_option_block(text: str) -> list[dict[str, str]]:
+    """Line-based A–D parser with multi-line continuation and a contiguous-run guard."""
+    if not text:
+        return []
+    lines = [line.rstrip() for line in text.replace("\r", "").split("\n")]
+    start = next((i for i, line in enumerate(lines) if (st := _option_start(line)) and st[0] == "A"), None)
+    if start is None:
+        return []
+    order = ["A", "B", "C", "D"]
+    options: list[dict[str, str]] = []
+    current: dict[str, str] | None = None
+    expected = 0
+    for line in lines[start:]:
+        if _OPT_STOP_RE.match(line):
+            break
+        started = _option_start(line)
+        if started:
+            label, rest = started
+            if expected < len(order) and label == order[expected]:
+                current = {"label": label, "text": rest}
+                options.append(current)
+                expected += 1
+                continue
+            if label in {opt["label"] for opt in options}:  # repeated label → run ended
+                break
+        if current is not None and line.strip() and not _OPT_NAV_RE.match(line):
+            current["text"] = f"{current['text']} {line.strip()}".strip()
+    cleaned = [
+        {"label": opt["label"], "text": strip_question_id(clean_ingested_question_text(_strip_emphasis(" ".join(opt["text"].split()))))[:2000]}
+        for opt in options
+    ]
+    return cleaned if len(cleaned) >= 2 else []
+
+
+def _parse_inline_options(text: str) -> list[dict[str, str]]:
+    """Options crammed onto one line: 'A) x B) y C) z D) w'."""
+    seen: dict[str, str] = {}
+    for match in _OPT_INLINE_RE.finditer(text or ""):
+        label = match.group(1).upper()
+        if label not in seen:
+            seen[label] = strip_question_id(clean_ingested_question_text(_strip_emphasis(" ".join(match.group(2).split()))))[:2000]
+    ordered = [{"label": label, "text": seen[label]} for label in ["A", "B", "C", "D"] if label in seen]
+    return ordered if len(ordered) >= 2 else []
+
+
 def extract_options_from_image_ocr(text: str) -> list[dict[str, str]]:
-    options, _stem = extract_options_and_stem(text)
-    if len(options) == 4:
-        return options
-    lines = [line.strip() for line in text.splitlines() if line.strip()]
-    parsed: list[dict[str, str]] = []
-    for index, label in enumerate(["A", "B", "C", "D"]):
-        start = None
-        for line_index, line in enumerate(lines):
-            if re.match(rf"^[×✕✖※*•-]?\s*{label}[\).]?\s+", line, re.IGNORECASE):
-                start = line_index
-                break
-        if start is None:
-            continue
-        end = len(lines)
-        for next_label in ["A", "B", "C", "D"][index + 1 :]:
-            for line_index in range(start + 1, len(lines)):
-                if re.match(rf"^[×✕✖※*•-]?\s*{next_label}[\).]?\s+", lines[line_index], re.IGNORECASE):
-                    end = line_index
-                    break
-            if end != len(lines):
-                break
-        text_block = " ".join(lines[start:end])
-        text_block = re.sub(rf"^[×✕✖※*•-]?\s*{label}[\).]?\s+", "", text_block, flags=re.IGNORECASE).strip()
-        if text_block:
-            parsed.append({"label": label, "text": clean_ingested_question_text(text_block)[:2000]})
-    return parsed if len(parsed) == 4 else []
+    """Best-effort A–D extraction from OCR'd text (crop OCR + option-image OCR).
+
+    Runs the robust block parser plus the table/regex/inline fallbacks and returns
+    the most complete set (a full A–D run wins). May return 2–3 options so the
+    reviewer can complete the rest; callers that require exactly 4 still check len."""
+    text = text or ""
+    best: list[dict[str, str]] = []
+    for parsed in (
+        parse_option_block(text),
+        parse_docx_answer_table_options(text),
+        extract_options_and_stem(text)[0],
+        _parse_inline_options(text),
+    ):
+        if len(parsed) > len(best):
+            best = parsed
+        if len(best) == 4:
+            break
+    return best
 
 
 def normalize_module_label(value: str | None, descriptor: str | None = None) -> str | None:
