@@ -156,9 +156,15 @@ const checks = [
       "TEACHER_GROUP_MANAGEMENT",
       "value: \"false\"",
       "SEED_DEMO_ACADEMIC_CONTENT",
-      "SEED_ACADEMIC_CONTENT_DISABLED",
-      "Promote reviewed AI Import candidates",
+      "sin contenido demo",
       "fullPracticeTestScoreConversion.upsert",
+    ],
+    // Academic content must NOT be synthesized by the essential seed — demo
+    // generation is parked in prisma/seed.demo.ts behind SEED_DEMO_ACADEMIC_CONTENT.
+    forbids: [
+      "prisma.question.create",
+      "prisma.practiceSet.create",
+      "prisma.fullPracticeTest.create",
     ],
     label: "Seed QA deja permisos apagados y no crea contenido academico sintetico por defecto",
   },
@@ -225,13 +231,15 @@ let hasFailures = false;
 
 for (const check of checks) {
   const content = await readFile(path.join(root, check.file), "utf8");
-  const missing = check.requires.filter((needle) => !content.includes(needle));
-  if (missing.length === 0) {
+  const missing = (check.requires ?? []).filter((needle) => !content.includes(needle));
+  const forbidden = (check.forbids ?? []).filter((needle) => content.includes(needle));
+  if (missing.length === 0 && forbidden.length === 0) {
     console.log(`PASS - ${check.label}`);
   } else {
     hasFailures = true;
     console.error(`FAIL - ${check.label}`);
     for (const needle of missing) console.error(`  missing: ${needle}`);
+    for (const needle of forbidden) console.error(`  forbidden present: ${needle}`);
   }
 }
 
