@@ -12,6 +12,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from "@/components/ui/input";
 import { MathContent } from "@/components/math-content";
 import { PdfPageCropper, type CropTarget, type CropOcrResult } from "@/app/admin/import/ai/_components/pdf-page-cropper";
+import { ConjuntoRail } from "@/app/admin/import/ai/_components/conjunto-rail";
+import type { SetRow } from "@/lib/ingest-sets";
 
 const MAX_UPLOAD_BYTES = 256 * 1024 * 1024;
 const targetTypes = [
@@ -148,6 +150,7 @@ type AiImportWorkflowProps = {
   practiceSets: PracticeSetSummary[];
   fullTests: FullTestSummary[];
   cropImageSources: Record<string, { imageSourceFileId: string; pageNumbers: number[] }>;
+  setRows: SetRow[];
   counts: {
     ocrPending: number;
     openIncidents: number;
@@ -284,6 +287,7 @@ export function AiImportWorkflowClient({
   practiceSets,
   fullTests,
   cropImageSources,
+  setRows,
   counts,
 }: AiImportWorkflowProps) {
   const router = useRouter();
@@ -295,8 +299,8 @@ export function AiImportWorkflowClient({
   const [incidentStatus, setIncidentStatus] = useState("OPEN");
   const [candidateQuery, setCandidateQuery] = useState("");
   const [candidateStatus, setCandidateStatus] = useState("ALL");
-  const [candidateType, setCandidateType] = useState("ALL");
   const [selectedCandidateId, setSelectedCandidateId] = useState(candidates[0]?.id ?? "");
+  const [selectedConjuntoId, setSelectedConjuntoId] = useState<string>(candidates[0]?.sourceFileId ?? "");
   const [draft, setDraft] = useState<CandidateSummary | null>(candidates[0] ?? null);
   const [optionRows, setOptionRows] = useState<OptionRow[]>(parseOptions(candidates[0]?.optionsJson ?? null));
   const [savedSignature, setSavedSignature] = useState<string>(() =>
@@ -338,8 +342,7 @@ export function AiImportWorkflowClient({
   const filteredCandidates = candidates.filter((candidate) => {
     const source = candidate.sourceFileId ? fileById.get(candidate.sourceFileId) : undefined;
     return matches(candidateHaystack(candidate, source), candidateQuery)
-      && (candidateStatus === "ALL" || candidate.status === candidateStatus || candidate.promotionStatus === candidateStatus)
-      && (candidateType === "ALL" || candidate.contentType === candidateType);
+      && (candidateStatus === "ALL" || candidate.status === candidateStatus || candidate.promotionStatus === candidateStatus);
   });
   const promotableFilteredCandidates = filteredCandidates.filter((candidate) =>
     ["READY", "REVIEWED"].includes(candidate.status)
@@ -347,6 +350,11 @@ export function AiImportWorkflowClient({
     && Boolean(candidate.stem)
     && Boolean(candidate.correctAnswer)
   );
+  // The Review modal lists the questions of the conjunto selected in the rail;
+  // bulk promotion below stays batch-wide (uses filteredCandidates).
+  const visibleCandidates = selectedConjuntoId
+    ? filteredCandidates.filter((candidate) => candidate.sourceFileId === selectedConjuntoId)
+    : filteredCandidates;
 
   const nearbyImages = images.filter((image) => {
     if (!draft) return false;
@@ -363,6 +371,13 @@ export function AiImportWorkflowClient({
     setOptionRows(rows);
     setSavedSignature(candidateContentSignature(candidate, optionsToJson(rows)));
     setMessage(null);
+  }
+
+  function selectConjunto(sourceFileId: string) {
+    setSelectedConjuntoId(sourceFileId);
+    // Jump the editor to the first question of the chosen conjunto.
+    const first = candidates.find((candidate) => candidate.sourceFileId === sourceFileId);
+    if (first) selectCandidate(first);
   }
 
   function toggleCandidate(candidateId: string, checked: boolean) {
@@ -556,25 +571,28 @@ export function AiImportWorkflowClient({
       </Dialog>
 
       <Dialog open={openStep === "Review"} onOpenChange={(open) => !open && setOpenStep(null)}>
-        <DialogContent className="max-h-[92vh] max-w-7xl overflow-auto">
+        <DialogContent className="max-h-[92vh] max-w-[100rem] overflow-auto">
           <DialogHeader>
             <DialogTitle>Review Staging Content</DialogTitle>
-            <DialogDescription>Filter files, incidents and detected questions. Edit candidate questions before official promotion.</DialogDescription>
+            <DialogDescription>Elige un conjunto, revisa sus preguntas y edítalas antes de promover a oficial.</DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 xl:grid-cols-[360px_1fr]">
+          <div className={`grid gap-4 ${selectedBatchId && setRows.length > 0 ? "xl:grid-cols-[240px_320px_minmax(0,1fr)]" : "xl:grid-cols-[360px_minmax(0,1fr)]"}`}>
+            {selectedBatchId && setRows.length > 0 && (
+              <ConjuntoRail rows={setRows} batchId={selectedBatchId} currentFileId={selectedConjuntoId} onSelect={selectConjunto} />
+            )}
             <div className="space-y-4">
               <section className="rounded-md border border-gray-200">
                 <div className="border-b border-gray-100 p-3">
-                  <p className="text-sm font-semibold text-gray-900">Detected Questions</p>
+                  <p className="text-sm font-semibold text-gray-900">Preguntas del conjunto</p>
+                  {selectedConjuntoId && (
+                    <p className="mt-0.5 truncate text-xs text-gray-500" title={setRows.find((row) => row.sourceFileId === selectedConjuntoId)?.title}>
+                      {setRows.find((row) => row.sourceFileId === selectedConjuntoId)?.title ?? ""}
+                    </p>
+                  )}
                   <FilterBar query={candidateQuery} setQuery={setCandidateQuery} status={candidateStatus} setStatus={setCandidateStatus} statusOptions={["ALL", "NEEDS_REVIEW", "READY", "REVIEWED", "REJECTED", "PROMOTED", "EDITING"]} placeholder="Search question, topic or file" />
-                  <select value={candidateType} onChange={(event) => setCandidateType(event.target.value)} className="mt-2 w-full rounded-md border border-gray-300 px-3 py-2 text-sm">
-                    <option value="ALL">All content</option>
-                    <option value="PRACTICE_SET">Practice Sets</option>
-                    <option value="FULL_PRACTICE_TEST">Full Practice Tests</option>
-                  </select>
                 </div>
                 <div className="max-h-[560px] divide-y divide-gray-100 overflow-auto">
-                  {filteredCandidates.map((candidate) => (
+                  {visibleCandidates.map((candidate) => (
                     <div
                       key={candidate.id}
                       className={`p-3 text-sm ${candidate.id === selectedCandidateId ? "bg-blue-50" : ""}`}
@@ -614,7 +632,7 @@ export function AiImportWorkflowClient({
                       <CopyableTruncatedText value={candidate.sourceFileId ? fileById.get(candidate.sourceFileId)?.relativePath : ""} fallback="No source" className="mt-1 max-w-full text-xs text-gray-400" />
                     </div>
                   ))}
-                  {filteredCandidates.length === 0 && <p className="p-6 text-center text-sm text-gray-400">No matching questions.</p>}
+                  {visibleCandidates.length === 0 && <p className="p-6 text-center text-sm text-gray-400">No hay preguntas en este conjunto para el filtro actual.</p>}
                 </div>
               </section>
             </div>

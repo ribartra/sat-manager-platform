@@ -11,6 +11,10 @@ interface ConjuntoRailProps {
   rows: SetRow[];
   batchId: string;
   currentFileId: string;
+  // Link-mode (default): each conjunto navigates to its per-file review page.
+  // Select-mode: pass onSelect to keep selection in-place (used inside the
+  // wizard Review modal, where navigating away would close the modal).
+  onSelect?: (sourceFileId: string) => void;
 }
 
 const SECTION_TABS: { value: SetSectionFilter; label: string }[] = [
@@ -30,13 +34,13 @@ function sectionLabel(section: string | null) {
 // search) so a reviewer can filter and jump between conjuntos without leaving the
 // review view. Selecting a conjunto is a normal server navigation to another
 // fileId — the workspace then lists that set's questions.
-export function ConjuntoRail({ rows, batchId, currentFileId }: ConjuntoRailProps) {
+export function ConjuntoRail({ rows, batchId, currentFileId, onSelect }: ConjuntoRailProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<SetTypeFilter>("ALL");
   const [sectionFilter, setSectionFilter] = useState<SetSectionFilter>("ALL");
   const [onlyPending, setOnlyPending] = useState(false);
-  const activeRef = useRef<HTMLAnchorElement | null>(null);
+  const activeRef = useRef<HTMLElement | null>(null);
 
   const filtered = useMemo(
     () => filterSetRows(rows, { query, type: typeFilter, section: sectionFilter, onlyPending }),
@@ -132,16 +136,11 @@ export function ConjuntoRail({ rows, batchId, currentFileId }: ConjuntoRailProps
       <div className="min-h-0 flex-1 divide-y divide-gray-50 overflow-y-auto">
         {filtered.map((row) => {
           const active = row.sourceFileId === currentFileId;
-          return (
-            <Link
-              key={row.sourceFileId}
-              ref={active ? activeRef : undefined}
-              href={`/admin/import/ai/${batchId}/files/${row.sourceFileId}`}
-              className={`block px-3 py-2.5 text-sm transition-colors ${
-                active ? "bg-blue-50 ring-1 ring-inset ring-blue-200" : "hover:bg-gray-50"
-              }`}
-              aria-current={active ? "true" : undefined}
-            >
+          const className = `block w-full text-left px-3 py-2.5 text-sm transition-colors ${
+            active ? "bg-blue-50 ring-1 ring-inset ring-blue-200" : "hover:bg-gray-50"
+          }`;
+          const inner = (
+            <>
               <p className={`truncate font-medium ${active ? "text-blue-800" : "text-gray-900"}`} title={row.title}>
                 {row.title}
               </p>
@@ -155,6 +154,31 @@ export function ConjuntoRail({ rows, batchId, currentFileId }: ConjuntoRailProps
                   <Badge variant="success">Completo</Badge>
                 )}
               </div>
+            </>
+          );
+          if (onSelect) {
+            return (
+              <button
+                key={row.sourceFileId}
+                type="button"
+                ref={active ? (el) => { activeRef.current = el; } : undefined}
+                onClick={() => onSelect(row.sourceFileId)}
+                className={className}
+                aria-current={active ? "true" : undefined}
+              >
+                {inner}
+              </button>
+            );
+          }
+          return (
+            <Link
+              key={row.sourceFileId}
+              ref={active ? (el) => { activeRef.current = el; } : undefined}
+              href={`/admin/import/ai/${batchId}/files/${row.sourceFileId}`}
+              className={className}
+              aria-current={active ? "true" : undefined}
+            >
+              {inner}
             </Link>
           );
         })}
