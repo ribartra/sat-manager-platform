@@ -289,6 +289,7 @@ export function FileReviewClient({
   images,
   imageLinks,
   incidents,
+  assignTargets = [],
 }: {
   batchId: string;
   file: SourceFile;
@@ -299,8 +300,27 @@ export function FileReviewClient({
   images: ImageArtifact[];
   imageLinks: ImageLink[];
   incidents: Incident[];
+  assignTargets?: { questionId: string; label: string }[];
 }) {
   const router = useRouter();
+  const [galleryAssign, setGalleryAssign] = useState<{ imageId: string; questionId: string } | null>(null);
+  const [assigning, setAssigning] = useState(false);
+
+  async function assignGalleryImage(imageArtifactId: string, questionId: string) {
+    if (!questionId) return;
+    setAssigning(true);
+    const res = await fetch(`/api/admin/ai-import/attach-question-image`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ imageArtifactId, questionId }),
+    });
+    setAssigning(false);
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) { setMessage(data.error || "No se pudo asignar la imagen."); return; }
+    setGalleryAssign(null);
+    setMessage(`Imagen asignada a ${assignTargets.find((t) => t.questionId === questionId)?.label ?? "la pregunta"}.`);
+    router.refresh();
+  }
   const [selectedId, setSelectedId] = useState(candidates[0]?.id ?? "");
   const selected = candidates.find((candidate) => candidate.id === selectedId) ?? candidates[0] ?? null;
   const [draft, setDraft] = useState<Candidate | null>(selected);
@@ -922,6 +942,28 @@ export function FileReviewClient({
                         <span>Pág. {image.pageNumber}{typeof image.imageIndex === "number" ? ` · #${image.imageIndex}` : ""}</span>
                         {image.width && image.height ? <span className="shrink-0 text-gray-400">{image.width}×{image.height}</span> : null}
                       </figcaption>
+                      {assignTargets.length > 0 && (
+                        <div className="flex items-center gap-1 border-t border-gray-100 px-2 py-1.5">
+                          <select
+                            value={galleryAssign?.imageId === image.id ? galleryAssign.questionId : ""}
+                            onChange={(e) => setGalleryAssign({ imageId: image.id, questionId: e.target.value })}
+                            className="min-w-0 flex-1 rounded border border-gray-300 px-1 py-1 text-xs"
+                          >
+                            <option value="">Asignar a…</option>
+                            {assignTargets.map((t) => (
+                              <option key={t.questionId} value={t.questionId}>{t.label}</option>
+                            ))}
+                          </select>
+                          <button
+                            type="button"
+                            disabled={assigning || galleryAssign?.imageId !== image.id || !galleryAssign?.questionId}
+                            onClick={() => galleryAssign && assignGalleryImage(image.id, galleryAssign.questionId)}
+                            className="shrink-0 rounded bg-blue-600 px-2 py-1 text-xs font-medium text-white disabled:opacity-40"
+                          >
+                            OK
+                          </button>
+                        </div>
+                      )}
                     </figure>
                   );
                 })}

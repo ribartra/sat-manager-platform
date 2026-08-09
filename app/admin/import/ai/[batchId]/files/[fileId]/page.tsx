@@ -83,6 +83,30 @@ export default async function AiImportFileReviewPage({ params }: PageProps) {
         orderBy: [{ candidateId: "asc" }, { sortOrder: "asc" }],
       })
     : [];
+  // Promoted questions of the matching full test — offered as targets when assigning
+  // an extracted image to a question from the gallery (a full-test question source
+  // often has images but no candidates, so there's no per-candidate board to use).
+  let assignTargets: { questionId: string; label: string }[] = [];
+  if (file.contentType === "FULL_PRACTICE_TEST" && file.testNumber != null) {
+    const tests = await prisma.fullPracticeTest.findMany({ select: { id: true, name: true } });
+    const match = tests.find((t) => {
+      const m = t.name.match(/test\s*0*(\d+)/i);
+      return m && Number(m[1]) === file.testNumber;
+    });
+    if (match) {
+      const wantSection = file.section ? (file.section.toUpperCase().includes("MATH") ? "MATH" : "RW") : null;
+      const ftqs = await prisma.fullPracticeTestQuestion.findMany({
+        where: { module: { testId: match.id, ...(wantSection ? { section: wantSection } : {}) } },
+        orderBy: [{ module: { order: "asc" } }, { order: "asc" }],
+        select: { order: true, questionId: true, module: { select: { name: true, section: true } } },
+      });
+      assignTargets = ftqs.map((r) => {
+        const mod = r.module.name.replace(/Reading\s*&?\s*Writing\s*/i, "").replace(/Mathematics?\s*/i, "").trim() || r.module.section;
+        return { questionId: r.questionId, label: `${mod} · Q${r.order + 1}` };
+      });
+    }
+  }
+
   const estimatedPages = pages.length || file.pageCount || 0;
   const secondsPerPage = latestEvent?.secondsPerPage && latestEvent.secondsPerPage > 0 ? latestEvent.secondsPerPage : 60;
   const estimatedSeconds = Math.ceil(estimatedPages * secondsPerPage);
@@ -117,6 +141,7 @@ export default async function AiImportFileReviewPage({ params }: PageProps) {
           status: file.status,
         }}
         reviewSession={{ currentStep: reviewSession.currentStep, status: reviewSession.status }}
+        assignTargets={assignTargets}
         pages={pages.map((page) => ({
           id: page.id,
           pageNumber: page.pageNumber,

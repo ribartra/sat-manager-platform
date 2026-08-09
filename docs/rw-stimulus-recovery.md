@@ -1,10 +1,11 @@
 # Recuperación de estímulo (pasaje) en R&W de los Full Practice Tests
 
 > **Estado (2026-08-09).** R&W de los 10 full tests. **Estímulo: 410/481.** Opciones: OK en Tests 2–10 +
-> 35/54 en Test 1. Prompt (stem) y `correctAnswer`: completos. Etiquetado de módulo en el UI de revisión
-> corregido (M1/M2B, ya no aparecen "dos Q1"). **Pendiente: ~71 estímulos** en páginas OCR tipo tabla/gráfico
-> (requieren re-OCR con visión o recorte de imagen) o sin confirmar por validación. Todos los cambios de datos
-> se hicieron WAL-safe con `integrity_check` ok y quedaron auditados en `AuditLog`.
+> 35/54 en Test 1. Prompt (stem) y `correctAnswer`: completos. Test 1 imágenes: **47/54** (adjuntadas del docx).
+> Etiquetado de módulo en el UI de revisión corregido (M1/M2B, ya no aparecen "dos Q1") y el review ahora tiene
+> **galería de imágenes** con asignación directa imagen→pregunta. **Pendiente: ~71 estímulos** en páginas OCR
+> tipo tabla/gráfico (requieren re-OCR con visión o recorte de imagen) o sin confirmar por validación. Todos los
+> cambios de datos se hicieron WAL-safe con `integrity_check` ok y quedaron auditados en `AuditLog`.
 
 **Contexto.** Las preguntas de Reading & Writing de los 10 mock tests se promovieron con el campo
 `Question.stimulus` vacío. Hay **dos defectos distintos** según de qué archivo se promovió cada test.
@@ -108,3 +109,30 @@ marcado de subrayado; el texto del pasaje (cuando se recuperó) quedó, pero el 
 > causa; ver el detalle por-pregunta en el `AuditLog` (`metadata`) y en los scripts de recuperación.
 - **Promoción incompleta**: Test 8 (2/98), Test 10 (74/98), Tests 4/6/7 con 1–2 preguntas faltantes — track
   aparte de completar promoción.
+
+## Imágenes de Test 1 (fuente de datos separada)
+
+Test 1 tiene una complicación extra: las **preguntas/candidatos** salieron del archivo de explicaciones
+(`src_e2205b…`), pero las **imágenes** viven en el docx de preguntas `Test 1 Module 1, 2B R&W.docx`
+(`src_2637…`), que es una serie de **capturas** (67 imágenes `DOCX_MEDIA`, 0 candidatos). El wizard asigna
+imágenes **por candidato dentro del mismo archivo**, así que no podía cruzar de un archivo a otro.
+
+- **Adjuntadas (8, audit `ATTACH_QUESTION_IMAGE`/`ATTACH_RW_PAGE_IMAGE`)**: solo preguntas **imagen-pura**
+  (sin `stimulus` ni opciones) con mapeo de **confianza ALTA** = una única página sin ancla en el hueco de una
+  pregunta entre dos anclas numeradas: **M1 Q4, Q19 · M2B Q6, Q9, Q15, Q16, Q19, Q20**. Test 1 `imageUrl`
+  39 → **47/54**. La imagen privada (`.private/uploads/ingest/<batch>/`) se materializa a
+  `public/uploads/questions/` (igual que en la promoción).
+- **Pendientes de asignación manual (mapeo ambiguo, 2 páginas)**: **M1 Q7 · M2B Q24, Q26** — resolver con la
+  galería del review.
+- **Q12 — imagen mal asignada, corregida (audit `CLEAR_MISASSIGNED_QUESTION_IMAGE`)**: Q12 es una pregunta de
+  completar texto (no de gráfico) y tenía adjunta la captura de **Q13** (`pn17`), heredada de la promoción. Se
+  **quitó** (`imageUrl → NULL`); no se propagó a Q13 (que ya tiene su texto y tampoco es de gráfico).
+- **Q12 texto — no recuperable**: su pasaje no está en el OCR (página tabla), y en el docx solo hay 2 de 4
+  opciones como viñetas **sin letra** → no se puede mapear a A–D con certeza. Requiere re-OCR con visión.
+
+### Herramienta nueva: galería de imágenes en el review
+El review del archivo (`/admin/import/ai/<batch>/files/<fileId>`) ahora tiene una **"Galería de imágenes
+extraídas"** que lista todas las imágenes del archivo aunque no haya candidatos. Para archivos full-test,
+cada miniatura ofrece un selector **"Asignar a… (M1/M2B · Q<n>)"** que fija `Question.imageUrl` directamente
+(endpoint `POST /api/admin/ai-import/attach-question-image`, audit `ATTACH_QUESTION_IMAGE_FROM_GALLERY`). Con
+esto se resuelven manualmente los mapeos ambiguos (Q7, Q24, Q26) y cualquier corrección de imagen.
