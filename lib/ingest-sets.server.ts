@@ -57,43 +57,59 @@ export async function computeSetRows(batchId: string): Promise<SetRow[]> {
     }
   }
 
-  const byFile = new Map<string, { total: number; sinResp: number; faltanOpt: number; promoted: number }>();
+  const byFile = new Map<string, { total: number; sinResp: number; faltanOpt: number; pending: number; promoted: number }>();
   for (const candidate of candidates) {
     if (!candidate.sourceFileId) continue;
     // Merged-away / rejected candidates no longer count toward the file.
     if (candidate.status === "REJECTED" || candidate.promotionStatus === "REJECTED") continue;
-    const stat = byFile.get(candidate.sourceFileId) ?? { total: 0, sinResp: 0, faltanOpt: 0, promoted: 0 };
+    const stat = byFile.get(candidate.sourceFileId) ?? { total: 0, sinResp: 0, faltanOpt: 0, pending: 0, promoted: 0 };
     stat.total += 1;
     if (candidate.promotionStatus === "PROMOTED") stat.promoted += 1;
     const optionsResolved =
       candidate.type === "NUMERIC" ||
       optionBlock.has(candidate.id) ||
       textOptionCount(candidate.optionsJson) + (optionLetters.get(candidate.id)?.size ?? 0) >= 4;
-    if (!candidate.correctAnswer) {
-      stat.sinResp += 1;
-    } else if (!optionsResolved) {
-      stat.faltanOpt += 1;
-    }
+    // Missing answer and missing options are independent problems — a question
+    // can have both. Count each sub-metric on its own, but count the candidate
+    // once toward `pending` so the badge total isn't inflated by double-flags.
+    const needsAnswer = !candidate.correctAnswer;
+    const needsOptions = candidate.type !== "NUMERIC" && !optionsResolved;
+    if (needsAnswer) stat.sinResp += 1;
+    if (needsOptions) stat.faltanOpt += 1;
+    if (needsAnswer || needsOptions) stat.pending += 1;
     byFile.set(candidate.sourceFileId, stat);
+  }
+
+  // Two source files in the same batch can carry the same topicName (e.g. a
+  // Full Test's "… R&W.docx" and its "… Answer Explanations.docx" both named
+  // "TEST N READING AND WRITING"). Left as-is the rail shows two identical
+  // rows; disambiguate the colliding ones with their file name so a reviewer
+  // can tell which conjunto actually holds the questions.
+  const titleCounts = new Map<string, number>();
+  for (const source of sources) {
+    const base = source.topicName || source.relativePath.split("/").at(-1) || "Conjunto";
+    titleCounts.set(base, (titleCounts.get(base) ?? 0) + 1);
   }
 
   return sources
     .map((source) => {
-      const stat = byFile.get(source.id) ?? { total: 0, sinResp: 0, faltanOpt: 0, promoted: 0 };
-      const pending = stat.sinResp + stat.faltanOpt;
+      const stat = byFile.get(source.id) ?? { total: 0, sinResp: 0, faltanOpt: 0, pending: 0, promoted: 0 };
+      const fileName = source.relativePath.split("/").at(-1) || "Conjunto";
+      const base = source.topicName || fileName;
+      const title = source.topicName && (titleCounts.get(base) ?? 0) > 1 ? `${base} · ${fileName}` : base;
       return {
         sourceFileId: source.id,
         batchId,
         relativePath: source.relativePath,
-        title: source.topicName || source.relativePath.split("/").at(-1) || "Conjunto",
+        title,
         contentType: source.contentType ?? "PRACTICE_SET",
         section: source.section,
         difficulty: source.difficulty,
         testNumber: source.testNumber,
         status: source.status,
         total: stat.total,
-        answerable: stat.total - pending,
-        pending,
+        answerable: stat.total - stat.pending,
+        pending: stat.pending,
         sinResp: stat.sinResp,
         faltanOpt: stat.faltanOpt,
         promoted: stat.promoted,
