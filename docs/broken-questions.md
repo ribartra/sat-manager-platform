@@ -1,6 +1,6 @@
 # Preguntas con problemas por conjunto
 
-> Generado 2026-08-09 desde `dev.db`. "Problema" = la pregunta no es contestable por un alumno o no cumple la validación de publicación. La leyenda de faltantes está al pie.
+> Generado 2026-08-09 desde `dev.db`. "Problema" = la pregunta no es contestable por un alumno o no cumple la validación de publicación. **Solo se listan pendientes**: módulos, tests y practice sets sin problemas se omiten. La leyenda de faltantes está al pie.
 
 ## Resumen
 
@@ -69,15 +69,11 @@
 ### Imported Test 10 (partial 74/98)
 *DRAFT* · 74 preguntas · **4 con problemas**
 
-**Reading & Writing Module 1** — 27 preguntas, sin problemas ✅
-
 **Reading & Writing Module 2** — 24 preguntas, 1 con problemas:
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
 | 24 | MC | opciones de texto incompletas (2/4); respuesta MC no es A–D ("27. B") | 27. The student wants to make and support a generalization about why Russia's go |
-
-**Math Module 1** — 1 preguntas, sin problemas ✅
 
 **Math Module 2** — 22 preguntas, 3 con problemas:
 
@@ -128,10 +124,6 @@
 | 24 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 24. Which choice completes the text with the most logical transition? ☒ A Otherw |
 | 25 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 25. Which choice completes the text with the most logical transition? ☒ A in oth |
 
-**Math Module 1** — 22 preguntas, sin problemas ✅
-
-**Math Module 2** — 22 preguntas, sin problemas ✅
-
 ### Imported Test 3
 *DRAFT* · 98 preguntas · **1 con problemas**
 
@@ -140,12 +132,6 @@
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
 | 13 | MC | opciones de texto incompletas (3/4) | 13. Which choice most logically completes the text? |
-
-**Reading & Writing Module 2** — 27 preguntas, sin problemas ✅
-
-**Math Module 1** — 22 preguntas, sin problemas ✅
-
-**Math Module 2** — 22 preguntas, sin problemas ✅
 
 ### Imported Test 4 (partial 96/98)
 *DRAFT* · 96 preguntas · **49 con problemas**
@@ -418,8 +404,6 @@
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
 | 1 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | Which choice completes the text with the most logical and precise word or phrase |
-
-**Math Module 1** — 2 preguntas, sin problemas ✅
 
 **Math Module 2** — 2 preguntas, 1 con problemas:
 

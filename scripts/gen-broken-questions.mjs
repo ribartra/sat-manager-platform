@@ -45,7 +45,7 @@ function analyze(id) {
 const out = [];
 out.push('# Preguntas con problemas por conjunto');
 out.push('');
-out.push(`> Generado ${new Date().toISOString().slice(0, 10)} desde \`dev.db\`. "Problema" = la pregunta no es contestable por un alumno o no cumple la validación de publicación. La leyenda de faltantes está al pie.`);
+out.push(`> Generado ${new Date().toISOString().slice(0, 10)} desde \`dev.db\`. "Problema" = la pregunta no es contestable por un alumno o no cumple la validación de publicación. **Solo se listan pendientes**: módulos, tests y practice sets sin problemas se omiten. La leyenda de faltantes está al pie.`);
 out.push('');
 
 // ---------- PRACTICE SETS ----------
@@ -89,6 +89,7 @@ for (const ft of fts) {
     const probs = [];
     for (const m of mq) { const a = analyze(m.questionId); if (a.blocking) probs.push({ n: m.order + 1, a }); }
     testProblems += probs.length; ftBrokenQ += probs.length;
+    // Solo pendientes: los módulos sin problemas se omiten por completo.
     if (probs.length) {
       modReport.push(`**${mod.name}** — ${mq.length} preguntas, ${probs.length} con problemas:`);
       modReport.push('');
@@ -99,11 +100,10 @@ for (const ft of fts) {
         modReport.push(`| ${p.n} | ${p.a.q.type} | ${bi.join('; ')} | ${preview(p.a.q.stem) || '_(vacío)_'} |`);
       }
       modReport.push('');
-    } else {
-      modReport.push(`**${mod.name}** — ${mq.length} preguntas, sin problemas ✅`);
-      modReport.push('');
     }
   }
+  // Solo pendientes: los tests completamente limpios no aparecen.
+  if (testProblems === 0) continue;
   ftSections.push(`### ${ft.name}\n*${ft.status}* · ${testTotal} preguntas · **${testProblems} con problemas**\n\n${modReport.join('\n')}`);
 }
 
