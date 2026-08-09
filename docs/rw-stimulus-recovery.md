@@ -75,10 +75,36 @@ la opción D previa (`![img]`/`[tbl]` se descartan). Recuperó **107/481**. Los 
 páginas OCR tipo tabla/gráfico (sin texto de pasaje → requieren re-OCR con visión o imagen) + ~16 descartados
 por validación (drift no confirmado). Un caso minoritario puede conservar una opción-fragmento inicial.
 
-## Pendiente
-- **~71 estímulos**: ~55 en páginas tabla/gráfico (re-OCR con visión o recorte de imagen) + ~16 sin confirmar
-  por validación de prompt (revisión manual).
-- **Underline/gráficos**: preguntas de "underlined sentence" y de tabla/gráfico pueden requerir la imagen o
-  el marcado de subrayado; el texto del pasaje quedó, pero el subrayado no lo preserva el OCR.
+## Pendiente — lista concreta y causa
+
+**71 estímulos + 19 opciones (Test 1).** Causas:
+- **`TBL/IMG`** (53) — la página OCR del pasaje es un placeholder `[tbl-0.html]` / `![img]` (o, en Test 1,
+  el docx no trae el pasaje): **no hay texto que recuperar** → requiere re-OCR con visión o recorte de imagen.
+- **`DRIFT`** (16) — el parser sí obtuvo un pasaje pero la **validación por prompt falló** (preguntas con
+  gráfico/tabla desplazan la secuencia); se descartó por seguridad → revisión manual o recuperación dirigida.
+- **`REVISAR`** (2) — hay pasaje parseable pero el limpiador de fuga de opción lo dejó < 40 chars; recuperable
+  con una pasada afinada.
+
+| Test | Estímulos pendientes (causa) |
+|-----:|------------------------------|
+| 1  | `TBL/IMG` (16): M1 Q4,Q7,Q12,Q19,Q24 · M2B Q6,Q9,Q15,Q16,Q18,Q19,Q20,Q22,Q23,Q24,Q26 |
+| 2  | `TBL/IMG`: M1 Q1,Q2,Q4 · `DRIFT`: M2B Q10,Q27 |
+| 3  | `TBL/IMG` (12): M1 Q4,Q5,Q7,Q9,Q11,Q13,Q15,Q16,Q18,Q19,Q21,Q22 |
+| 4  | `DRIFT`: M1 Q25 · M2B Q16,Q25 |
+| 5  | `TBL/IMG`: M1 Q14 |
+| 6  | `TBL/IMG` (12): M1 Q15,Q17,Q19,Q20,Q21,Q23,Q25 · M2B Q17,Q19,Q21,Q23,Q25 |
+| 7  | `TBL/IMG`: M1 Q10 · M2B Q2,Q15 · `DRIFT`: M2B Q4,Q7 |
+| 8  | — (sin pendientes; solo 2/98 promovidas) |
+| 9  | `TBL/IMG`: M1 Q16,Q22 · M2B Q15,Q23 · `DRIFT`: M2B Q27 |
+| 10 | `REVISAR`: M1 Q6,Q23 · `DRIFT`: M1 Q26,Q27 · M2B Q4,Q7,Q11,Q14,Q16,Q24 · `TBL/IMG`: M2B Q2,Q9 |
+
+**Opciones — Test 1 (19 sin texto)**: M1 Q4,Q6,Q7,Q9,Q12,Q19,Q24,Q27 · M2B Q6,Q9,Q15,Q16,Q18,Q19,Q20,Q22,Q23,Q24,Q26
+(mismo grupo `TBL/IMG`; Tests 2–10 ya tienen opciones del PDF). El `correctAnswer` está completo en todas.
+
+**Otras pistas**: preguntas de "underlined sentence" y de tabla/gráfico pueden requerir además la imagen o el
+marcado de subrayado; el texto del pasaje (cuando se recuperó) quedó, pero el subrayado no lo preserva el OCR.
+
+> Reproducir esta lista: el parser generalizado (`RECOVER_RW_STIMULUS_SHORTSTEM`) clasifica cada pendiente por
+> causa; ver el detalle por-pregunta en el `AuditLog` (`metadata`) y en los scripts de recuperación.
 - **Promoción incompleta**: Test 8 (2/98), Test 10 (74/98), Tests 4/6/7 con 1–2 preguntas faltantes — track
   aparte de completar promoción.
