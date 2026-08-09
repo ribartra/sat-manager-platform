@@ -1029,8 +1029,12 @@ def crop_candidate_region(
             result["text"] = text
             if payload.get("warning"):
                 result["warning"] = payload["warning"]
-            if target_type == "OPTION_BLOCK":
-                result["options"] = extract_options_from_image_ocr(text or "")
+            # Always attempt A–D parsing so the reviewer can assign the OCR to the
+            # options block even if the pre-crop target wasn't OPTION_BLOCK (the
+            # destination field is now chosen after OCR, in the review panel).
+            options = extract_options_from_image_ocr(text or "")
+            if options:
+                result["options"] = options
             log_ingest_job_event(
                 db,
                 batch_id=candidate["batchId"],

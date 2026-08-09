@@ -20,6 +20,17 @@ export const CROP_TARGETS = [
   { value: "PAGE_CONTEXT", label: "Contexto de página" },
 ] as const;
 
+// Destination fields the OCR'd text can be assigned to (no PAGE_CONTEXT — the
+// OCR text always lands in a concrete draft field).
+export const OCR_TARGETS = [
+  { value: "STEM", label: "Enunciado" },
+  { value: "STIMULUS", label: "Estímulo" },
+  { value: "OPTION_BLOCK", label: "Bloque de opciones (A–D)" },
+  { value: "OPTION", label: "Opción individual" },
+  { value: "EXPLANATION", label: "Explicación" },
+  { value: "ANSWER_FIELD", label: "Respuesta correcta" },
+] as const;
+
 export interface CropTarget {
   targetType: string;
   optionLabel: string | null;
@@ -87,6 +98,14 @@ export function PdfPageCropper({
   const [message, setMessage] = useState<string | null>(null);
   const [pageError, setPageError] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
+
+  // OCR review: the crop OCR result is staged here (NOT auto-applied) so the
+  // reviewer can see the detected text, edit it and choose the destination field
+  // before it overwrites anything.
+  const [ocr, setOcr] = useState<CropOcrResult | null>(null);
+  const [ocrText, setOcrText] = useState("");
+  const [ocrTarget, setOcrTarget] = useState("STEM");
+  const [ocrOptionLabel, setOcrOptionLabel] = useState("");
 
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const imgRef = useRef<HTMLImageElement | null>(null);
@@ -160,12 +179,39 @@ export function PdfPageCropper({
         setRect(null);
         onAssigned?.();
       } else {
-        onOcrText?.({ targetType, optionLabel: needsOption ? optionLabel.toUpperCase() : null }, { text: data.text ?? null, options: data.options });
-        setMessage(data.text ? "OCR aplicado al campo (revisa y guarda)." : data.warning || "El OCR no devolvió texto.");
+        // Stage the OCR result for review — do NOT auto-apply/overwrite. The
+        // reviewer edits the text, picks the destination field and confirms.
+        const detected = data.text ?? "";
+        setOcr({ text: detected, options: data.options });
+        setOcrText(detected);
+        setOcrTarget(targetType === "PAGE_CONTEXT" ? "STEM" : targetType);
+        setOcrOptionLabel(needsOption ? optionLabel.toUpperCase() : "");
+        setMessage(
+          data.options?.length
+            ? `OCR listo: ${data.options.length} opción(es) detectada(s). Revisa, elige el campo y asigna.`
+            : detected
+              ? "OCR listo. Revisa el texto, elige el campo y asigna."
+              : data.warning || "El OCR no devolvió texto.",
+        );
       }
     } finally {
       setBusy(null);
     }
+  }
+
+  const ocrNeedsOption = ocrTarget === "OPTION";
+  const canApplyOcr = !!ocr && (ocrNeedsOption ? !!ocrOptionLabel : ocrTarget === "OPTION_BLOCK" ? !!ocr.options?.length : !!ocrText.trim());
+
+  // Apply the reviewed OCR to the chosen destination field, then clear the panel.
+  function applyOcr() {
+    if (!ocr || !canApplyOcr) return;
+    onOcrText?.(
+      { targetType: ocrTarget, optionLabel: ocrNeedsOption ? ocrOptionLabel.toUpperCase() : null },
+      { text: ocrText, options: ocr.options },
+    );
+    const label = OCR_TARGETS.find((t) => t.value === ocrTarget)?.label ?? ocrTarget;
+    setMessage(`Asignado a: ${label}${ocrNeedsOption ? ` ${ocrOptionLabel.toUpperCase()}` : ""}. Revisa y guarda.`);
+    setOcr(null);
   }
 
   const hasPages = uniquePages.length > 0;
@@ -182,7 +228,7 @@ export function PdfPageCropper({
           dialog), Radix makes this the active layer — correct focus, pointer-events
           and stacking — instead of a body-portaled div that the parent modal makes
           inert. Also works standalone in the per-file wizard. */}
-      <Dialog open={open} onOpenChange={(next) => { setOpen(next); if (!next) setRect(null); }}>
+      <Dialog open={open} onOpenChange={(next) => { setOpen(next); if (!next) { setRect(null); setOcr(null); } }}>
         <DialogContent className="max-h-[92vh] max-w-3xl select-none gap-3 overflow-auto">
           <DialogHeader>
             <DialogTitle className="text-sm">Recortar región de la página</DialogTitle>
@@ -317,6 +363,62 @@ export function PdfPageCropper({
             )}
             {needsOption && !optionLabel && <span className="text-xs text-amber-600">Indica la letra (A–D).</span>}
           </div>
+
+          {/* OCR review: shown after OCR — edit the detected text, choose the field, then assign. */}
+          {ocr && (
+            <div className="space-y-2 rounded-md border border-blue-200 bg-blue-50/60 p-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase text-blue-800">Texto detectado (OCR)</span>
+                <button type="button" onClick={() => setOcr(null)} className="text-xs text-gray-500 hover:text-gray-700 hover:underline">Descartar</button>
+              </div>
+
+              {ocr.options && ocr.options.length > 0 && (
+                <div className="rounded border border-blue-100 bg-white p-2 text-xs text-gray-700">
+                  <span className="font-medium text-gray-500">Opciones detectadas:</span>
+                  <ul className="mt-1 space-y-0.5">
+                    {ocr.options.map((o) => (
+                      <li key={o.label}><span className="font-semibold">{o.label}.</span> {o.text || <em className="text-gray-400">(vacío)</em>}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <textarea
+                value={ocrText}
+                onChange={(e) => setOcrText(e.target.value)}
+                rows={4}
+                className="w-full rounded-md border border-gray-300 p-2 text-sm"
+                placeholder="Texto detectado…"
+              />
+
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs text-gray-600">Asignar a</span>
+                <select
+                  value={ocrTarget}
+                  onChange={(e) => setOcrTarget(e.target.value)}
+                  className="rounded-md border border-gray-300 px-2 py-1 text-sm"
+                >
+                  {OCR_TARGETS.map((t) => (
+                    <option key={t.value} value={t.value}>{t.label}</option>
+                  ))}
+                </select>
+                {ocrNeedsOption && (
+                  <Input
+                    value={ocrOptionLabel}
+                    onChange={(e) => setOcrOptionLabel(e.target.value.toUpperCase().slice(0, 1))}
+                    placeholder="A–D"
+                    className="w-16"
+                  />
+                )}
+                <Button type="button" size="sm" onClick={applyOcr} disabled={!canApplyOcr}>
+                  Asignar al campo
+                </Button>
+                {ocrTarget === "OPTION_BLOCK" && !ocr.options?.length && (
+                  <span className="text-xs text-amber-600">No se detectaron opciones A–D en este recorte.</span>
+                )}
+              </div>
+            </div>
+          )}
 
           {message && <p className="text-xs text-gray-600">{message}</p>}
         </DialogContent>
