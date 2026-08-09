@@ -86,8 +86,10 @@ export function PdfPageCropper({
   const [busy, setBusy] = useState<null | "ASSIGN" | "OCR">(null);
   const [message, setMessage] = useState<string | null>(null);
   const [pageError, setPageError] = useState(false);
+  const [imgLoaded, setImgLoaded] = useState(false);
 
   const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const imgRef = useRef<HTMLImageElement | null>(null);
   const dragStart = useRef<{ x: number; y: number } | null>(null);
 
   // Lock body scroll + close on Escape while the modal is open. Rendering through a
@@ -112,10 +114,13 @@ export function PdfPageCropper({
     setPageNumber(Math.max(1, next));
     setRect(null);
     setPageError(false);
+    setImgLoaded(false);
   }
 
+  // Measure against the IMAGE element (not the scroll container) so the normalized
+  // coords are correct even when the image is scaled or the box is scrolled.
   const pointFromEvent = useCallback((event: React.MouseEvent) => {
-    const el = wrapperRef.current;
+    const el = imgRef.current;
     if (!el) return { x: 0, y: 0 };
     const bounds = el.getBoundingClientRect();
     const x = (event.clientX - bounds.left) / bounds.width;
@@ -187,17 +192,44 @@ export function PdfPageCropper({
       aria-modal="true"
       onMouseDown={(e) => { if (e.target === e.currentTarget) setOpen(false); }}
     >
-        <div className="my-auto w-full max-w-3xl space-y-3 rounded-lg border border-gray-200 bg-white p-4 shadow-xl">
+        <div className="my-auto w-full max-w-3xl select-none space-y-3 rounded-lg border border-gray-200 bg-white p-4 shadow-xl">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold text-gray-900">Recortar región de la página</h3>
             <button type="button" onClick={() => setOpen(false)} className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600" aria-label="Cerrar">✕</button>
           </div>
           {imageSourceFileId && imageSourceFileId !== sourceFileId && (
             <p className="rounded-md border border-blue-100 bg-blue-50 px-3 py-2 text-xs text-blue-700">
-              Este archivo no trae imágenes de página propias; se está mostrando la fuente de imágenes del mismo
-              lote. Navega las páginas, arrastra la región y usa Asignar u OCR.
+              Este archivo no trae imágenes propias; se muestran las imágenes de página del archivo de origen del
+              mismo lote. Elige la página en la tira de miniaturas, arrastra la región y usa Asignar u OCR.
             </p>
           )}
+
+          {/* Array of per-page images: pick the page to crop from. */}
+          {uniquePages.length > 1 && (
+            <div className="flex gap-2 overflow-x-auto rounded border border-gray-200 bg-gray-50 p-2">
+              {uniquePages.map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => changePage(p)}
+                  disabled={busy !== null}
+                  title={`Página ${p}`}
+                  className={`relative shrink-0 overflow-hidden rounded border-2 ${p === pageNumber ? "border-blue-500 ring-2 ring-blue-200" : "border-transparent hover:border-gray-300"}`}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={`/api/admin/ai-import/sources/${effectiveSourceId}/pages/${p}/image?dpi=60`}
+                    alt={`Página ${p}`}
+                    loading="lazy"
+                    draggable={false}
+                    className="h-16 w-auto max-w-[130px] bg-white object-contain"
+                  />
+                  <span className="absolute bottom-0 right-0 bg-black/60 px-1 text-[10px] leading-tight text-white">{p}</span>
+                </button>
+              ))}
+            </div>
+          )}
+
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs text-gray-500">Página</span>
             <Button type="button" size="sm" variant="ghost" onClick={() => changePage(pageNumber - 1)} disabled={pageNumber <= 1 || busy !== null}>
@@ -234,43 +266,50 @@ export function PdfPageCropper({
           </div>
 
           <p className="text-xs text-gray-500">
-            Arrastra sobre la página para seleccionar la región. Luego <strong>Asignar</strong> (guarda la imagen y la enlaza) u{" "}
+            Arrastra sobre la imagen para seleccionar la región. Luego <strong>Asignar</strong> (guarda la imagen y la enlaza) u{" "}
             <strong>OCR</strong> (transcribe a texto para revisar).
           </p>
 
-          <div
-            ref={wrapperRef}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
-            className="relative max-h-[560px] cursor-crosshair select-none overflow-auto rounded border border-gray-300 bg-gray-50"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={`/api/admin/ai-import/sources/${effectiveSourceId}/pages/${pageNumber}/image?dpi=150`}
-              alt={`Página ${pageNumber}`}
-              className="block w-full"
-              draggable={false}
-              onError={() => setPageError(true)}
-              onLoad={() => setPageError(false)}
-            />
-            {pageError && (
-              <div className="absolute inset-0 flex items-center justify-center bg-gray-50 text-xs text-gray-400">
-                No se pudo cargar la página {pageNumber}.
-              </div>
-            )}
-            {rect && (
-              <div
-                className="pointer-events-none absolute border-2 border-blue-500 bg-blue-400/20"
-                style={{
-                  left: `${rect.x0 * 100}%`,
-                  top: `${rect.y0 * 100}%`,
-                  width: `${(rect.x1 - rect.x0) * 100}%`,
-                  height: `${(rect.y1 - rect.y0) * 100}%`,
-                }}
+          <div className="max-h-[60vh] overflow-auto rounded border border-gray-300 bg-gray-100">
+            <div
+              ref={wrapperRef}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
+              className="relative inline-block cursor-crosshair select-none align-top"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                ref={imgRef}
+                src={`/api/admin/ai-import/sources/${effectiveSourceId}/pages/${pageNumber}/image?dpi=150`}
+                alt={`Página ${pageNumber}`}
+                className="block max-w-full select-none"
+                draggable={false}
+                onDragStart={(e) => e.preventDefault()}
+                onError={() => { setPageError(true); setImgLoaded(false); }}
+                onLoad={() => { setPageError(false); setImgLoaded(true); }}
               />
-            )}
+              {!imgLoaded && !pageError && (
+                <div className="flex h-40 min-w-[280px] items-center justify-center text-xs text-gray-400">Cargando página {pageNumber}…</div>
+              )}
+              {pageError && (
+                <div className="flex h-40 min-w-[280px] items-center justify-center text-xs text-gray-400">
+                  No se pudo cargar la página {pageNumber}.
+                </div>
+              )}
+              {rect && imgLoaded && (
+                <div
+                  className="pointer-events-none absolute border-2 border-blue-500 bg-blue-400/20"
+                  style={{
+                    left: `${rect.x0 * 100}%`,
+                    top: `${rect.y0 * 100}%`,
+                    width: `${(rect.x1 - rect.x0) * 100}%`,
+                    height: `${(rect.y1 - rect.y0) * 100}%`,
+                  }}
+                />
+              )}
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
