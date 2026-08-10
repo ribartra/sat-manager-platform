@@ -1,12 +1,12 @@
 # Preguntas con problemas por conjunto
 
-> Generado 2026-08-09 desde `dev.db`. "Problema" = la pregunta no es contestable por un alumno o no cumple la validación de publicación. **Solo se listan pendientes**: módulos, tests y practice sets sin problemas se omiten. La leyenda de faltantes está al pie.
+> Generado 2026-08-10 desde `dev.db`. "Problema" = la pregunta no es contestable por un alumno o no cumple la validación de publicación. **Solo se listan pendientes**: módulos, tests y practice sets sin problemas se omiten. La leyenda de faltantes está al pie.
 
 ## Resumen
 
 - **Practice Sets:** 91 total · 72 sin problemas (PUBLISHED) · 19 con problemas · **32** preguntas con problemas.
-- **Full Practice Tests:** 10 total (todos DRAFT) · **253** preguntas con problemas.
-- **Total preguntas con problemas: 285**.
+- **Full Practice Tests:** 10 total (todos DRAFT) · **240** preguntas con problemas.
+- **Total preguntas con problemas: 272**.
 
 ## Qué significa cada "falta"
 
@@ -22,28 +22,7 @@
 ## Full Practice Tests
 
 ### Imported Test 1
-*DRAFT* · 98 preguntas · **22 con problemas**
-
-**Reading & Writing Module 1** — 27 preguntas, 2 con problemas:
-
-| # | Tipo | Falta | Enunciado |
-|---|---|---|---|
-| 12 | MC | opciones de texto incompletas (0/4) | Which choice most logically completes the text? [game developers / self-publishi |
-| 19 | MC | opciones en imagen pero faltan botones A–D (0 de 4) | Which choice completes the text so that it conforms to the conventions of Standa |
-
-**Reading & Writing Module 2** — 27 preguntas, 9 con problemas:
-
-| # | Tipo | Falta | Enunciado |
-|---|---|---|---|
-| 6 | MC | opciones en imagen pero faltan botones A–D (0 de 4) | Which choice completes the text with the most logical and precise word or phrase |
-| 9 | MC | opciones en imagen pero faltan botones A–D (0 de 4) | Based on the texts, how would the author of Text 2 most likely respond to the di |
-| 15 | MC | opciones en imagen pero faltan botones A–D (0 de 4) | Which choice most logically completes the text? [lower back pain / objectives ad |
-| 16 | MC | opciones en imagen pero faltan botones A–D (0 de 4) | Which choice most logically completes the text? [Descartes / rationalists / empi |
-| 19 | MC | opciones en imagen pero faltan botones A–D (0 de 4) | Which choice completes the text so that it conforms to the conventions of Standa |
-| 20 | MC | opciones en imagen pero faltan botones A–D (0 de 4) | Which choice completes the text so that it conforms to the conventions of Standa |
-| 23 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which choice completes the text so that it conforms to the conventions of Standa |
-| 24 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which choice completes the text with the most logical transition? [public transi |
-| 26 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | The student wants to convey a specific consequence of suffering damage to the PC |
+*DRAFT* · 98 preguntas · **11 con problemas**
 
 **Math Module 1** — 22 preguntas, 6 con problemas:
 
@@ -84,14 +63,12 @@
 | 15 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 15. [tbl-0.html](tbl-0.html) The table above shows several values of the functio |
 
 ### Imported Test 2
-*DRAFT* · 98 preguntas · **28 con problemas**
+*DRAFT* · 98 preguntas · **26 con problemas**
 
-**Reading & Writing Module 1** — 27 preguntas, 13 con problemas:
+**Reading & Writing Module 1** — 27 preguntas, 11 con problemas:
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
-| 1 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which choice completes the text with the most logical and precise word or phrase |
-| 2 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | As used in the text, what does the word "conceal" most nearly mean? [James Fenim |
 | 7 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | Which choice best states the main idea of the text? |
 | 8 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 8. Which choice best states the main idea of the text? ☐ A Giant anteaters live  |
 | 9 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | Based on the text, how does Bartleby respond to the narrator's request to examin |
