@@ -23,6 +23,7 @@
     "db:align-ingest-taxonomy": "node scripts/align-ingest-taxonomy.mjs",
     "notifications:generate": "tsx scripts/generate-notifications.ts",
     "sample:promote": "tsx scripts/promote-ingest-sample.ts",
+    "reconcile:promoted": "tsx scripts/reconcile-promoted-candidates.ts",
     "demo:verify": "tsx scripts/verify-client-demo.ts"
   },
   "dependencies": {

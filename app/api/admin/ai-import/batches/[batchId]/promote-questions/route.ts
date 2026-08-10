@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import {
   buildQuestionDraft,
   materializeOfficialImageUrl,
+  reconcileOfficialUpdate,
 } from "@/lib/ingest-promotion";
 import { validateQuestionPayload } from "@/lib/content-validation";
 
@@ -14,6 +15,13 @@ interface RouteContext {
 
 type CandidatePayload = {
   candidateIds?: unknown;
+  /**
+   * When true, candidates already PROMOTED are re-synced into their official
+   * question (guarded, never degrading) instead of being skipped — this is how
+   * edits a reviewer makes AFTER promotion reach the live question. WAL-safe:
+   * the write goes through the app, not an external process.
+   */
+  resync?: unknown;
 };
 
 export async function POST(req: NextRequest, { params }: RouteContext) {
@@ -27,6 +35,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     : [];
   if (candidateIds.length === 0) return NextResponse.json({ error: "candidateIds is required." }, { status: 400 });
   if (candidateIds.length > 250) return NextResponse.json({ error: "Promote at most 250 questions at a time." }, { status: 413 });
+  const resync = body.resync === true;
 
   const [candidates, topics, rawLinks] = await Promise.all([
     prisma.ingestQuestionCandidate.findMany({
@@ -55,15 +64,19 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
   }
 
   const promoted: string[] = [];
+  const resynced: { candidateId: string; questionId: string; changed: string[] }[] = [];
   const skipped: { candidateId: string; reason: string }[] = [];
   const errors: { candidateId: string; reason: string }[] = [];
 
   for (const candidate of candidates) {
-    if (candidate.promotionStatus === "PROMOTED" && candidate.officialQuestionId) {
+    const alreadyPromoted = candidate.promotionStatus === "PROMOTED" && candidate.officialQuestionId;
+    if (alreadyPromoted && !resync) {
       skipped.push({ candidateId: candidate.id, reason: "Already promoted." });
       continue;
     }
-    if (!["READY", "REVIEWED"].includes(candidate.status)) {
+    // First-time promotion still requires READY/REVIEWED; a re-sync applies to an
+    // already-promoted candidate whatever its current review status.
+    if (!alreadyPromoted && !["READY", "REVIEWED"].includes(candidate.status)) {
       skipped.push({ candidateId: candidate.id, reason: "Candidate must be READY or REVIEWED." });
       continue;
     }
@@ -98,6 +111,55 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
           }))
         )
       : [];
+
+    // Re-sync path: the candidate is already promoted; reconcile its draft into
+    // the existing official question without degrading any field.
+    if (alreadyPromoted) {
+      const official = await prisma.question.findUnique({
+        where: { id: candidate.officialQuestionId! },
+        include: { options: { select: { label: true, text: true, imageUrl: true } } },
+      });
+      if (!official) {
+        skipped.push({ candidateId: candidate.id, reason: "Official question missing; cannot re-sync." });
+        continue;
+      }
+      const draftForReconcile = {
+        ...draft,
+        imageUrl: officialImageUrl ?? "",
+        options: officialOptions.length ? officialOptions : draft.options,
+      };
+      const result = reconcileOfficialUpdate(draftForReconcile, {
+        stem: official.stem,
+        stimulus: official.stimulus,
+        explanation: official.explanation,
+        correctAnswer: official.correctAnswer,
+        imageUrl: official.imageUrl,
+        options: official.options,
+      });
+      if (result.changed.length === 0) {
+        skipped.push({ candidateId: candidate.id, reason: "Already in sync." });
+        continue;
+      }
+      await prisma.$transaction(async (tx) => {
+        if (Object.keys(result.questionData).length > 0) {
+          await tx.question.update({ where: { id: official.id }, data: result.questionData });
+        }
+        if (result.replaceOptions) {
+          await tx.questionOption.deleteMany({ where: { questionId: official.id } });
+          await tx.questionOption.createMany({
+            data: result.replaceOptions.map((option) => ({
+              id: `opt_${randomUUID().replace(/-/g, "")}`,
+              questionId: official.id,
+              label: option.label,
+              text: option.text,
+              imageUrl: option.imageUrl,
+            })),
+          });
+        }
+      });
+      resynced.push({ candidateId: candidate.id, questionId: official.id, changed: result.changed });
+      continue;
+    }
 
     const question = await prisma.$transaction(async (tx) => {
       const created = await tx.question.create({
@@ -165,9 +227,17 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       action: "PROMOTE_AI_IMPORT_QUESTIONS",
       targetType: "IngestBatch",
       targetId: batchId,
-      metadata: JSON.stringify({ requested: candidateIds.length, promoted: promoted.length, skipped: skipped.length, errors: errors.length }),
+      metadata: JSON.stringify({ requested: candidateIds.length, promoted: promoted.length, resynced: resynced.length, skipped: skipped.length, errors: errors.length }),
     },
   });
 
-  return NextResponse.json({ promoted: promoted.length, skipped: skipped.length, errors, questionIds: promoted, skippedItems: skipped });
+  return NextResponse.json({
+    promoted: promoted.length,
+    resynced: resynced.length,
+    skipped: skipped.length,
+    errors,
+    questionIds: promoted,
+    resyncedItems: resynced,
+    skippedItems: skipped,
+  });
 }

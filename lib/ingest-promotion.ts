@@ -208,6 +208,110 @@ export function buildQuestionDraft({
   };
 }
 
+export type QuestionDraft = ReturnType<typeof buildQuestionDraft>;
+
+type OfficialOptionSnapshot = { label: string; text: string | null; imageUrl: string | null };
+export type OfficialQuestionSnapshot = {
+  stem: string | null;
+  stimulus: string | null;
+  explanation: string | null;
+  correctAnswer: string | null;
+  imageUrl: string | null;
+  options: OfficialOptionSnapshot[];
+};
+
+export type ReconcileResult = {
+  changed: string[];
+  questionData: Record<string, unknown>;
+  /** null = leave options untouched; array = delete+recreate with these */
+  replaceOptions: { label: string; text: string; imageUrl: string | null }[] | null;
+};
+
+const LATEX_PATTERN = /\$|\\\(|\\\[|\\frac|\\sqrt/;
+const OPTION_JUNK_PATTERN = /\]\(|---\s*$|\btbl-\d/;
+const hasLatex = (value: string | null | undefined) => LATEX_PATTERN.test(value ?? "");
+const normalizeSpace = (value: string | null | undefined) => stripMarkdownImageRefs(value).replace(/\s+/g, " ").trim();
+const isValidAnswerShape = (value: string) =>
+  /^[A-D](\|[A-D])*$/.test(value) || /^[-0-9][-0-9.,/|\s]*$/.test(value);
+
+/**
+ * Reconcile an already-promoted official question against a fresh draft built
+ * from the (possibly edited-after-promotion) candidate. STRICTLY additive /
+ * corrective — it never degrades official data:
+ *  - stimulus/explanation: fill only when official is empty.
+ *  - stem: fill when empty, or restore LaTeX the official stem lost (candidate
+ *    has `$…$`/`\(…\)`, official does not) — never replace a richer plain stem.
+ *  - imageUrl: fill only when official has none.
+ *  - correctAnswer: set only when the draft answer is a valid MC/numeric shape
+ *    and differs (never blanks a value).
+ *  - options (MC): replace only when the draft has 4 clean A–D text options
+ *    (no images), the official set is degraded (fewer than 4 texts or carries
+ *    leaked markdown-link junk), and official has no option images to protect.
+ * Returns the exact field/option changes so callers can apply them in a tx.
+ */
+export function reconcileOfficialUpdate(draft: QuestionDraft, official: OfficialQuestionSnapshot): ReconcileResult {
+  const changed: string[] = [];
+  const questionData: Record<string, unknown> = {};
+
+  const draftStimulus = (draft.stimulus ?? "").trim();
+  if (draftStimulus && !normalizeSpace(official.stimulus)) {
+    questionData.stimulus = draftStimulus;
+    changed.push("stimulus");
+  }
+
+  const draftExplanation = (draft.explanation ?? "").trim();
+  if (draftExplanation && !normalizeSpace(official.explanation)) {
+    questionData.explanation = draftExplanation;
+    changed.push("explanation");
+  }
+
+  const draftStem = (draft.stem ?? "").trim();
+  if (
+    draftStem &&
+    normalizeSpace(draftStem) !== normalizeSpace(official.stem) &&
+    (!normalizeSpace(official.stem) || (hasLatex(draftStem) && !hasLatex(official.stem)))
+  ) {
+    questionData.stem = draftStem;
+    changed.push("stem");
+  }
+
+  if (draft.imageUrl && !official.imageUrl) {
+    questionData.imageUrl = draft.imageUrl;
+    changed.push("imageUrl");
+  }
+
+  const draftAnswer = (draft.correctAnswer ?? "").trim();
+  if (draftAnswer && draftAnswer !== (official.correctAnswer ?? "") && isValidAnswerShape(draftAnswer)) {
+    questionData.correctAnswer = draftAnswer;
+    changed.push("correctAnswer");
+  }
+
+  let replaceOptions: ReconcileResult["replaceOptions"] = null;
+  if (draft.type === "MC") {
+    const labels = ["A", "B", "C", "D"] as const;
+    const draftByLabel = new Map(draft.options.map((option) => [option.label, option]));
+    const draftClean4 = labels.every((label) => {
+      const option = draftByLabel.get(label);
+      return Boolean(option && option.text && option.text.trim() && !option.imageUrl);
+    });
+    const officialByLabel = new Map(official.options.map((option) => [option.label, option]));
+    const officialTextCount = official.options.filter((option) => option.text && option.text.trim()).length;
+    const officialHasImage = official.options.some((option) => option.imageUrl);
+    const officialJunk = official.options.some((option) => OPTION_JUNK_PATTERN.test(option.text ?? ""));
+    const differs = labels.some((label) => {
+      const draftOption = draftByLabel.get(label);
+      const officialOption = officialByLabel.get(label);
+      return !officialOption || normalizeSpace(officialOption.text) !== normalizeSpace(draftOption?.text);
+    });
+    if (draftClean4 && differs && !officialHasImage && (officialTextCount < 4 || officialJunk)) {
+      replaceOptions = labels.map((label) => ({ label, text: draftByLabel.get(label)!.text, imageUrl: null }));
+      changed.push("options");
+    }
+  }
+
+  return { changed, questionData, replaceOptions };
+}
+
 export async function loadCandidateQuestionDraft(candidateId: string) {
   const [candidate, topics, rawLinks] = await Promise.all([
     prisma.ingestQuestionCandidate.findUnique({ where: { id: candidateId } }),
