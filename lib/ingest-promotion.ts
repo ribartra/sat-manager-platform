@@ -84,6 +84,39 @@ export function sanitizeExplanation(value: string | null | undefined): string {
   return lines.slice(start).join("\n").replace(/\n{3,}/g, "\n\n").trim();
 }
 
+// The same title/module boilerplate also leaked into the STEM of the FIRST
+// question of each module (e.g. "## INNOVATOR TEST 6\nMATH MODULE 1\n\n1. ...").
+// These header lines (markdown "#" is ignored) must never lead a stem; strip them
+// from the top up to the numbered question, keeping everything real. A normal
+// stem — which starts with its question text/number — is returned unchanged.
+const STEM_HEADER_LINE = [
+  /^(?:INNOVATOR\s+)?TEST\s+\d+\b/i,
+  /^TEST\s+\d+\s+INNOVATOR\b/i,
+  /^(?:MATH\s+)?MODULE\s+\w+/i,
+  /^Math\s+Module\s+\w+/i,
+  /^Reading\s*(?:and|&)\s*Writing\b/i,
+  /^(?:MATH|READING(?:\s*(?:and|&)\s*WRITING)?|R\s*&\s*W)\s*$/i,
+];
+
+export function sanitizeStem(value: string | null | undefined): string {
+  const text = (value ?? "").replace(/\r\n/g, "\n");
+  if (!text.trim()) return "";
+  const lines = text.split("\n");
+  let start = 0;
+  while (start < lines.length) {
+    const line = lines[start].replace(/^#+\s*/, "").trim();
+    if (line === "" || STEM_HEADER_LINE.some((re) => re.test(line))) {
+      start += 1;
+      continue;
+    }
+    break;
+  }
+  const cleaned = lines.slice(start).join("\n").replace(/\n{3,}/g, "\n\n").trim();
+  // Never let the guard empty a stem: if stripping consumed everything (e.g. a
+  // stem that was ONLY a header), fall back to the original trimmed text.
+  return cleaned || text.trim();
+}
+
 function imageUrlOrBase64(image: ImageLinkForDraft["image"]) {
   if (image.fileUrl) return image.fileUrl;
   if (!image.base64Data) return null;
@@ -287,7 +320,7 @@ export function buildQuestionDraft({
     subskillId: resolved.subskillId,
     difficulty: normalizeIngestDifficulty(candidate.difficulty),
     type: candidate.type === "NUMERIC" ? "NUMERIC" : "MC",
-    stem: stripMarkdownImageRefs(candidate.stem),
+    stem: sanitizeStem(stripMarkdownImageRefs(candidate.stem)),
     stimulus: stripMarkdownImageRefs(candidate.stimulus),
     explanation: sanitizeExplanation(stripMarkdownImageRefs(candidate.explanation)),
     imageUrl: questionImage,
