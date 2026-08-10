@@ -59,7 +59,10 @@ function FieldDot({ state, label }: { state: FieldState; label: string }) {
 
 function CompletenessBar({ row }: { row: ConjuntoRow }) {
   const total = row.total || 1;
-  const seg = (n: number, cls: string) => (n > 0 ? <span className={cls} style={{ width: `${(n / total) * 100}%` }} /> : null);
+  // A single flagged question must stay visible: clamp each present segment to a
+  // minimum width so a mostly-green bar can't hide one "revisar" and read as done.
+  const seg = (n: number, cls: string) =>
+    n > 0 ? <span className={cls} style={{ width: `${Math.max((n / total) * 100, 6)}%`, minWidth: 4 }} /> : null;
   return (
     <span className="flex h-2 w-full min-w-24 overflow-hidden rounded-full bg-gray-100">
       {seg(row.complete, "bg-emerald-500")}
@@ -68,6 +71,17 @@ function CompletenessBar({ row }: { row: ConjuntoRow }) {
     </span>
   );
 }
+
+// Worst-state accent so a whole conjunto row reads as its true status at a glance
+// (rose if any revisar, amber if any atención, emerald only when fully complete).
+function worstLevel(row: ConjuntoRow): "crit" | "warn" | "ok" {
+  return row.revisar > 0 ? "crit" : row.atencion > 0 ? "warn" : "ok";
+}
+const STRIPE: Record<"crit" | "warn" | "ok", string> = {
+  crit: "border-l-rose-500",
+  warn: "border-l-amber-500",
+  ok: "border-l-emerald-500",
+};
 
 function statusPill(level: QuestionStatusRow["level"]) {
   if (level === "crit") return <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[11px] font-semibold text-rose-700">Revisar</span>;
@@ -247,7 +261,7 @@ export function SetsIndexClient({ rows, batchId, batches }: SetsIndexClientProps
           const open = expanded.has(row.key);
           const pending = row.revisar + row.atencion;
           return (
-            <Card key={row.key} padding="none" className="overflow-hidden">
+            <Card key={row.key} padding="none" className={`overflow-hidden border-l-4 ${STRIPE[worstLevel(row)]}`}>
               <div className="flex flex-wrap items-center gap-4 px-4 py-3">
                 <button type="button" onClick={() => toggle(row.key)} className="flex min-w-0 flex-1 items-start gap-2 text-left" aria-expanded={open}>
                   {open ? <ChevronDown className="mt-1 h-4 w-4 shrink-0 text-gray-400" /> : <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-gray-400" />}

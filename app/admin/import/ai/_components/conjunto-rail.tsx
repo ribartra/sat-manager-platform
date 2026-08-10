@@ -33,7 +33,9 @@ function sectionLabel(section: string | null) {
 // Slim completeness bar: green complete · amber atención · red revisar.
 function CompletenessBar({ row }: { row: ConjuntoRow }) {
   const total = row.total || 1;
-  const seg = (n: number, cls: string) => (n > 0 ? <span className={cls} style={{ width: `${(n / total) * 100}%` }} /> : null);
+  // Keep a single flagged question visible instead of a hairline lost in green.
+  const seg = (n: number, cls: string) =>
+    n > 0 ? <span className={cls} style={{ width: `${Math.max((n / total) * 100, 6)}%`, minWidth: 4 }} /> : null;
   return (
     <span className="mt-1 flex h-1.5 w-full overflow-hidden rounded-full bg-gray-100" title={`${row.complete} completas · ${row.atencion} atención · ${row.revisar} revisar`}>
       {seg(row.complete, "bg-emerald-500")}
