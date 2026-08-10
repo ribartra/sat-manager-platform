@@ -5,8 +5,8 @@
 ## Resumen
 
 - **Practice Sets:** 91 total · 72 sin problemas (PUBLISHED) · 19 con problemas · **32** preguntas con problemas.
-- **Full Practice Tests:** 10 total (todos DRAFT) · **240** preguntas con problemas.
-- **Total preguntas con problemas: 272**.
+- **Full Practice Tests:** 10 total (todos DRAFT) · **238** preguntas con problemas.
+- **Total preguntas con problemas: 270**.
 
 ## Qué significa cada "falta"
 
@@ -246,9 +246,9 @@
 | 20 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 20. A circle graphed on the coordinate plane is centered at the origin, labeled  |
 
 ### Imported Test 6 (partial 97/98)
-*DRAFT* · 97 preguntas · **35 con problemas**
+*DRAFT* · 97 preguntas · **33 con problemas**
 
-**Reading & Writing Module 1** — 27 preguntas, 17 con problemas:
+**Reading & Writing Module 1** — 27 preguntas, 15 con problemas:
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
@@ -262,8 +262,6 @@
 | 11 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | Which choice most effectively uses data from the table to complete the statement |
 | 18 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | Which choice completes the text so that it conforms to the conventions of Standa |
 | 19 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 19. Which choice completes the text so that it conforms to the conventions of St |
-| 20 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which choice completes the text so that it conforms to the conventions of Standa |
-| 21 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which choice completes the text so that it conforms to the conventions of Standa |
 | 22 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | Which choice completes the text with the most logical transition? |
 | 23 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 23. Which choice completes the text with the most logical transition? ☒ A Unfort |
 | 24 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | Which choice completes the text with the most logical transition? |
@@ -481,14 +479,14 @@
 |---|---|---|---|
 | 4 | MC | respuesta MC no es A–D ("42") | ID: a9084ca4 Question 4 The given function models the number of advertisements a |
 | 8 | MC | respuesta MC no es A–D ("8") | ID: 4dd4efcf Question 8 In the given quadratic function, and are constants. The  |
-| 9 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR); respuesta MC no es A–D ("8") | ID: 35e05e19 Question 9 A park ranger hung squirrel houses each in the shape of  |
+| 9 | MC | respuesta MC no es A–D ("8") | A park ranger hung squirrel houses each in the shape of a right rectangular pris |
 
 ### Advanced Math - Nonlinear Functions - MEDIUM
 *DRAFT* · 34 preguntas · **1 con problemas**
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
-| 31 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which of the following is the graph in the xy-plane of the given equation? |
+| 31 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | $$y = 4(2^x)$$ Which of the following is the graph in the xy-plane of the given  |
 
 ### Algebra - Linear Equations in Two Variables - EASY
 *DRAFT* · 31 preguntas · **6 con problemas**
@@ -496,25 +494,25 @@
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
 | 1 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | Correct Answer: D Rationale Choice D is correct. It’s given that the graph shows |
-| 2 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which table gives three values of and their corresponding values of for the give |
-| 11 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which table gives three values of and their corresponding values of for the give |
-| 14 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | For the given equation, which table gives three values of and their correspondin |
-| 19 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | The graph shows the linear relationship between and . Which table gives three va |
-| 22 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which table gives three values of and their corresponding values of for the give |
+| 2 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | $$y = x + 4$$ Which table gives three values of $x$ and their corresponding valu |
+| 11 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | $$y = -4x + 40$$ Which table gives three values of $x$ and their corresponding v |
+| 14 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | $$7x - 4y = -84$$ For the given equation, which table gives three values of $x$  |
+| 19 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | The graph shows the linear relationship between $x$ and $y$. Which table gives t |
+| 22 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | $$y = 70x + 8$$ Which table gives three values of $x$ and their corresponding va |
 
 ### Algebra - Linear Equations in Two Variables - HARD
 *DRAFT* · 21 preguntas · **1 con problemas**
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
-| 13 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | In the equation above, a and b are constants and . Which of the following could  |
+| 13 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | $$ax + by = b$$ In the equation above, a and b are constants and $0 < a < b$. Wh |
 
 ### Algebra - Linear Inequalities - MEDIUM
 *DRAFT* · 13 preguntas · **1 con problemas**
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
-| 7 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | For which of the following tables are all the values of and their corresponding  |
+| 7 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | $$y > 7x - 4$$ For which of the following tables are all the values of $x$ and t |
 
 ### Algebra - Systems of Two Linear Equations - HARD
 *DRAFT* · 14 preguntas · **2 con problemas**
@@ -581,7 +579,7 @@
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
-| 2 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR); respuesta MC no es A–D ("9") | The scatterplot shows the relationship between two variables, and . An equation  |
+| 2 | MC | respuesta MC no es A–D ("9") | The scatterplot shows the relationship between two variables, $x$ and $y$. An eq |
 | 16 | MC | opciones de texto incompletas (3/4) | Each of the following frequency tables represents a data set. Which data set has |
 
 ### Problem Solving and Data Analysis - Two-Variable Data - MEDIUM (partial 10/11)
