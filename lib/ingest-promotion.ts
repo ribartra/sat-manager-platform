@@ -48,6 +48,42 @@ function stripMarkdownImageRefs(value: string | null | undefined) {
   return (value ?? "").replace(MARKDOWN_IMAGE_PATTERN, "").replace(/\n{3,}/g, "\n\n").trim();
 }
 
+// Leading boilerplate from the answer-explanation docx (title page + module
+// headers) that some ingests captured into the FIRST question's explanation,
+// e.g. "INNOVATOR TEST 9 / Math — Answer Explanations / MATH MODULE 1 (22
+// Questions)". Drops those leading lines up to the first real explanation line so
+// the header never lands in an official Question. Only strips from the top; a
+// normal explanation (which never starts with these) is returned unchanged.
+const EXPLANATION_HEADER_LINE = [
+  /^(?:INNOVATOR\s+)?TEST\s+\d+\s+INNOVATOR\b/i,
+  /^INNOVATOR\s+TEST\s+\d+\b/i,
+  /^TEST\s+\d+\s+INNOVATOR\b/i,
+  /^(?:Math|Reading\s*(?:and|&)\s*Writing)\s*[—–-]\s*Answer\s+Explanations\b/i,
+  /^Answer\s+Explanations\b/i,
+  /^MATH\s+MODULE\b/i,
+  /^MODULE\s+\d/i,
+  /^Math\s+Module\s+\d\s*\|/i,
+  /Module\s*2A/i,
+  /\(\s*\d+\s+Questions?\s*\)/i,
+  /^Solution\s*$/i,
+];
+
+export function sanitizeExplanation(value: string | null | undefined): string {
+  const text = (value ?? "").replace(/\r\n/g, "\n");
+  if (!text.trim()) return "";
+  const lines = text.split("\n");
+  let start = 0;
+  while (start < lines.length) {
+    const line = lines[start].trim();
+    if (line === "" || EXPLANATION_HEADER_LINE.some((re) => re.test(line))) {
+      start += 1;
+      continue;
+    }
+    break;
+  }
+  return lines.slice(start).join("\n").replace(/\n{3,}/g, "\n\n").trim();
+}
+
 function imageUrlOrBase64(image: ImageLinkForDraft["image"]) {
   if (image.fileUrl) return image.fileUrl;
   if (!image.base64Data) return null;
@@ -253,7 +289,7 @@ export function buildQuestionDraft({
     type: candidate.type === "NUMERIC" ? "NUMERIC" : "MC",
     stem: stripMarkdownImageRefs(candidate.stem),
     stimulus: stripMarkdownImageRefs(candidate.stimulus),
-    explanation: stripMarkdownImageRefs(candidate.explanation),
+    explanation: sanitizeExplanation(stripMarkdownImageRefs(candidate.explanation)),
     imageUrl: questionImage,
     supportsGraph: false,
     correctAnswer: candidate.correctAnswer ?? "",
