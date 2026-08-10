@@ -2486,6 +2486,7 @@ def extract_options_and_stem(text: str) -> tuple[list[dict[str, str]], str]:
 # Shared robust pipeline used by the crop-OCR path and the option-image OCR. It
 # tolerates every option-marker variant seen across the ingested sources:
 #   • leading strike / checkbox / bullet glyphs:  ✕ A)   ☐ B.   • C)
+#   • several stacked leading glyphs at once:      - ✕ **A**   (md bullet + strike)
 #   • markdown emphasis around the letter:        **A)**   __B__   *C*
 #   • optional punctuation after the letter:      A) / A. / A: / A、
 #     (or none, when a glyph or emphasis already marks the letter)
@@ -2498,20 +2499,20 @@ _OPT_STRIKE = "×✕✖✗☒☐✓✔"
 _OPT_BULLET = "•▪◦※–\\-"
 _OPT_EMPH = r"(?:\*\*|__|\*|_)"
 _OPT_PUNCT_RE = re.compile(
-    rf"^\s*(?:[{_OPT_STRIKE}{_OPT_BULLET}]\s*)?{_OPT_EMPH}?\s*([A-D])\s*{_OPT_EMPH}?\s*[\).:：．、]\s*(.*)$",
+    rf"^\s*(?:[{_OPT_STRIKE}{_OPT_BULLET}]\s*)*{_OPT_EMPH}?\s*([A-D])\s*{_OPT_EMPH}?\s*[\).:：．、]\s*(.*)$",
     re.IGNORECASE,
 )
 _OPT_MARKED_RE = re.compile(
-    rf"^\s*(?:[{_OPT_STRIKE}{_OPT_BULLET}]\s*{_OPT_EMPH}?|{_OPT_EMPH})\s*([A-D])\s*{_OPT_EMPH}?\s+(.*)$",
+    rf"^\s*(?:(?:[{_OPT_STRIKE}{_OPT_BULLET}]\s*)+{_OPT_EMPH}?|{_OPT_EMPH})\s*([A-D])\s*{_OPT_EMPH}?\s+(.*)$",
     re.IGNORECASE,
 )
 _OPT_TABLE_RE = re.compile(
-    rf"^\s*\|?\s*(?:[{_OPT_STRIKE}{_OPT_BULLET}]\s*)?{_OPT_EMPH}?\s*([A-D])\s*{_OPT_EMPH}?\s*\|\s*(.*?)\s*\|?\s*$",
+    rf"^\s*\|?\s*(?:[{_OPT_STRIKE}{_OPT_BULLET}]\s*)*{_OPT_EMPH}?\s*([A-D])\s*{_OPT_EMPH}?\s*\|\s*(.*?)\s*\|?\s*$",
     re.IGNORECASE,
 )
 _OPT_INLINE_RE = re.compile(
-    rf"(?:^|\s|\|)(?:[{_OPT_STRIKE}{_OPT_BULLET}]\s*)?{_OPT_EMPH}?\s*([A-D])\s*{_OPT_EMPH}?\s*[\).:]\s+(.+?)"
-    rf"(?=(?:\s(?:[{_OPT_STRIKE}{_OPT_BULLET}]\s*)?{_OPT_EMPH}?\s*[A-D]\s*{_OPT_EMPH}?\s*[\).:]\s+)|$)",
+    rf"(?:^|\s|\|)(?:[{_OPT_STRIKE}{_OPT_BULLET}]\s*)*{_OPT_EMPH}?\s*([A-D])\s*{_OPT_EMPH}?\s*[\).:]\s+(.+?)"
+    rf"(?=(?:\s(?:[{_OPT_STRIKE}{_OPT_BULLET}]\s*)*{_OPT_EMPH}?\s*[A-D]\s*{_OPT_EMPH}?\s*[\).:]\s+)|$)",
     re.IGNORECASE | re.DOTALL,
 )
 _OPT_NAV_RE = re.compile(r"(?i)^\s*(?:PREV\.?\s+QUESTION|NEXT\s+QUESTION|COME?\s+BACK\s+LATER)\s*$")
