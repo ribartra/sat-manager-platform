@@ -2485,7 +2485,7 @@ def extract_options_and_stem(text: str) -> tuple[list[dict[str, str]], str]:
 # ── Canonical A–D option-block parser ────────────────────────────────────────
 # Shared robust pipeline used by the crop-OCR path and the option-image OCR. It
 # tolerates every option-marker variant seen across the ingested sources:
-#   • leading strike / checkbox / bullet glyphs:  ✕ A)   ☐ B.   • C)
+#   • leading strike / checkbox / star / bullet glyphs:  ✕ A)  ☐ B.  ★ C)  • D)
 #   • several stacked leading glyphs at once:      - ✕ **A**   (md bullet + strike)
 #   • markdown emphasis around the letter:        **A)**   __B__   *C*
 #   • optional punctuation after the letter:      A) / A. / A: / A、
@@ -2495,7 +2495,7 @@ def extract_options_and_stem(text: str) -> tuple[list[dict[str, str]], str]:
 #   • single-line inline runs:                    A) x  B) y  C) z  D) w
 # A contiguous run starting at A is required (A→B→C→D), which guards against
 # matching stray capitals in prose. All parsers return options in A→D order.
-_OPT_STRIKE = "×✕✖✗☒☐✓✔"
+_OPT_STRIKE = "×✕✖✗☒☐✓✔★☆✦✧✩⭐"
 _OPT_BULLET = "•▪◦※–\\-"
 _OPT_EMPH = r"(?:\*\*|__|\*|_)"
 _OPT_PUNCT_RE = re.compile(

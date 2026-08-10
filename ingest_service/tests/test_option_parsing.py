@@ -37,6 +37,20 @@ def test_stacked_bullet_and_strike_markers():
     assert "QUESTION" not in options[3]["text"]
 
 
+def test_stacked_star_markers():
+    """`- ★ **A**` (md bullet + star selection glyph) must parse all four."""
+    text = (
+        "- ★ **A** doctors give prescriptions that can reduce patients' pain.\n"
+        "- ★ **B** many patients care more about their normal activities.\n"
+        "- ★ **C** physical therapists prioritize long-term treatment plans.\n"
+        "- ★ **D** doctors prefer to prescribe pain-relieving medication."
+    )
+    options = extract_options_from_image_ocr(text)
+    assert [o["label"] for o in options] == ["A", "B", "C", "D"]
+    assert options[0]["text"].startswith("doctors give prescriptions")
+    assert "★" not in options[0]["text"]
+
+
 def test_single_strike_marker_still_parses():
     text = "✕ A) administer\n✕ B) divert\n✕ C) remit\n✕ D) reimburse"
     options = parse_option_block(text)
