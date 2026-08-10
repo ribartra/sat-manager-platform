@@ -3,7 +3,7 @@
 import { useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Plus, Trash2, Braces } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -182,6 +182,133 @@ function targetLabel(value: string) {
 function slotLabel(targetType: string, optionLabel: string | null) {
   if (targetType === "OPTION") return `Opción ${optionLabel ?? "?"}`;
   return targetLabel(targetType);
+}
+
+// Editable options table (replaces the raw JSON textarea). Fully controlled by
+// the draft: rows are derived from `optionsJson` each render and every edit
+// serializes straight back through onChange, so the stored shape stays the
+// canonical [{label,text}]. Marking a row correct writes the letter to
+// correctAnswer in the SAME update (one setDraft) to keep them in sync. A "JSON"
+// escape hatch stays available for repair / bulk paste, and auto-opens when the
+// stored JSON is malformed so no data is silently dropped.
+function OptionsEditor({
+  optionsJson,
+  correctAnswer,
+  onChange,
+}: {
+  optionsJson: string | null;
+  correctAnswer: string | null;
+  onChange: (partial: { optionsJson?: string; correctAnswer?: string }) => void;
+}) {
+  const raw = optionsJson ?? "";
+  const parsed = parseOptions(optionsJson) as { label?: string; text?: string }[];
+  const rows = parsed.map((o, i) => ({ label: (o.label ?? String.fromCharCode(65 + i)).toUpperCase(), text: o.text ?? "" }));
+  const jsonInvalid = raw.trim() !== "" && raw.trim() !== "[]" && rows.length === 0;
+  const [showRaw, setShowRaw] = useState(jsonInvalid);
+  const correct = (correctAnswer ?? "").trim().toUpperCase();
+
+  const commit = (next: { label: string; text: string }[], nextCorrect?: string) =>
+    onChange({ optionsJson: JSON.stringify(next), ...(nextCorrect !== undefined ? { correctAnswer: nextCorrect } : {}) });
+
+  const setText = (i: number, text: string) => commit(rows.map((o, idx) => (idx === i ? { ...o, text } : o)));
+  const setLabel = (i: number, value: string) => {
+    const label = value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 2);
+    const prev = rows[i].label;
+    const next = rows.map((o, idx) => (idx === i ? { ...o, label } : o));
+    commit(next, prev && prev === correct ? label : undefined);
+  };
+  const remove = (i: number) => commit(rows.filter((_, idx) => idx !== i));
+  const add = () => {
+    const used = new Set(rows.map((o) => o.label));
+    let letter = "";
+    for (let c = 65; c <= 90; c++) {
+      if (!used.has(String.fromCharCode(c))) { letter = String.fromCharCode(c); break; }
+    }
+    commit([...rows, { label: letter || String.fromCharCode(65 + rows.length), text: "" }]);
+  };
+  const seedAD = () => commit(["A", "B", "C", "D"].map((l) => ({ label: l, text: "" })));
+
+  return (
+    <div className="grid gap-1">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-medium text-gray-500">Opciones</span>
+        <button
+          type="button"
+          onClick={() => setShowRaw((v) => !v)}
+          className={`inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] font-medium ${showRaw ? "bg-gray-800 text-white" : "text-gray-500 hover:bg-gray-100"}`}
+          title="Editar JSON en crudo"
+        >
+          <Braces className="h-3 w-3" /> JSON
+        </button>
+      </div>
+
+      {showRaw ? (
+        <>
+          {jsonInvalid && <p className="text-xs text-rose-600">JSON inválido — corrígelo aquí; la tabla se rehabilita al ser válido.</p>}
+          <textarea
+            value={raw}
+            onChange={(event) => onChange({ optionsJson: event.target.value })}
+            className="min-h-28 rounded-md border border-gray-300 px-3 py-2 font-mono text-xs"
+          />
+        </>
+      ) : (
+        <div className="grid gap-1.5">
+          {rows.length === 0 && (
+            <div className="flex items-center gap-2 rounded-md border border-dashed border-gray-300 px-3 py-2 text-xs text-gray-500">
+              Sin opciones.
+              <button type="button" onClick={seedAD} className="font-medium text-blue-600 hover:underline">Crear A–D</button>
+            </div>
+          )}
+          {rows.map((option, i) => {
+            const isCorrect = correct !== "" && option.label === correct;
+            return (
+              <div
+                key={i}
+                className={`flex items-center gap-2 rounded-md border px-2 py-1.5 ${isCorrect ? "border-emerald-300 bg-emerald-50" : "border-gray-200"}`}
+              >
+                <button
+                  type="button"
+                  onClick={() => commit(rows, option.label)}
+                  title="Marcar como respuesta correcta"
+                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[10px] font-bold transition-colors ${
+                    isCorrect ? "border-emerald-500 bg-emerald-500 text-white" : "border-gray-300 text-transparent hover:border-emerald-400"
+                  }`}
+                >
+                  ✓
+                </button>
+                <input
+                  value={option.label}
+                  onChange={(event) => setLabel(i, event.target.value)}
+                  className="w-9 shrink-0 rounded border border-gray-300 px-1 py-1 text-center text-xs font-semibold uppercase"
+                  aria-label="Etiqueta de la opción"
+                />
+                <input
+                  value={option.text}
+                  onChange={(event) => setText(i, event.target.value)}
+                  placeholder="Texto de la opción (KaTeX $…$)"
+                  className="min-w-0 flex-1 rounded border border-gray-300 px-2 py-1 text-sm"
+                  aria-label="Texto de la opción"
+                />
+                <button
+                  type="button"
+                  onClick={() => remove(i)}
+                  title="Eliminar opción"
+                  className="shrink-0 rounded p-1 text-gray-400 hover:bg-rose-50 hover:text-rose-600"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            );
+          })}
+          {rows.length > 0 && (
+            <button type="button" onClick={add} className="mt-0.5 inline-flex w-fit items-center gap-1 text-xs font-medium text-blue-600 hover:underline">
+              <Plus className="h-3.5 w-3.5" /> Agregar opción
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
 }
 
 function textStats(value: string | null) {
@@ -392,11 +519,13 @@ export function FileReviewClient({
   function linkForSlot(tType: string, oLabel: string | null) {
     return selectedLinks.find((link) => link.targetType === tType && (link.optionLabel ?? null) === (oLabel ?? null));
   }
-  // imageId → list of slot labels it currently occupies.
-  const assignmentsByImage = new Map<string, string[]>();
+  // imageId → the slots it currently occupies. Keyed by link id, not label:
+  // one image can legitimately hold several links with the same slot label
+  // (e.g. two OPTION_BLOCK crops), which would collide on a label-based React key.
+  const assignmentsByImage = new Map<string, { id: string; label: string }[]>();
   for (const link of selectedLinks) {
     const list = assignmentsByImage.get(link.imageArtifactId) ?? [];
-    list.push(slotLabel(link.targetType, link.optionLabel));
+    list.push({ id: link.id, label: slotLabel(link.targetType, link.optionLabel) });
     assignmentsByImage.set(link.imageArtifactId, list);
   }
   const dirty = candidateSignature(draft) !== savedSignature;
@@ -694,10 +823,11 @@ export function FileReviewClient({
                     </label>
                   )}
                   {isMc && (
-                    <label className="grid gap-1">
-                      <span className="text-xs font-medium text-gray-500">Opciones (JSON)</span>
-                      <textarea value={draft.optionsJson ?? ""} onChange={(event) => setDraft({ ...draft, optionsJson: event.target.value })} className="min-h-28 rounded-md border border-gray-300 px-3 py-2 font-mono text-xs" />
-                    </label>
+                    <OptionsEditor
+                      optionsJson={draft.optionsJson}
+                      correctAnswer={draft.correctAnswer}
+                      onChange={(partial) => setDraft({ ...draft, ...partial })}
+                    />
                   )}
                   <div className="grid gap-3 md:grid-cols-2">
                     <label className="grid gap-1">
@@ -879,8 +1009,8 @@ export function FileReviewClient({
                         <span className="text-xs text-gray-500">p.{image.pageNumber} · {image.origin}</span>
                         {assignments.length > 0 && (
                           <div className="flex flex-wrap justify-end gap-1">
-                            {assignments.map((label) => (
-                              <Badge key={label} variant="info">{label}</Badge>
+                            {assignments.map((assignment) => (
+                              <Badge key={assignment.id} variant="info">{assignment.label}</Badge>
                             ))}
                           </div>
                         )}
