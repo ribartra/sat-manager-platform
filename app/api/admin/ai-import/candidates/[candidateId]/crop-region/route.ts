@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { ingestAuthHeaders, ingestUrl } from "@/lib/internal-ingest";
+import { propagateAssignedImageToOfficial } from "@/lib/ingest-promotion";
 
 interface RouteContext {
   params: Promise<{ candidateId: string }>;
@@ -82,6 +83,19 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     return NextResponse.json({ error: data.detail || "Could not process the crop." }, { status: response.status });
   }
 
+  // If this candidate is already promoted, mirror an ASSIGNed image onto the
+  // official Question/QuestionOption so the change is visible to students and the
+  // conjunto completeness view (which read official rows, not candidate links).
+  let officialPropagation: Awaited<ReturnType<typeof propagateAssignedImageToOfficial>> | null = null;
+  if (mode === "ASSIGN" && data.imageArtifactId) {
+    officialPropagation = await propagateAssignedImageToOfficial({
+      candidateId,
+      imageArtifactId: data.imageArtifactId,
+      targetType,
+      optionLabel: body.optionLabel ?? null,
+    }).catch(() => null);
+  }
+
   await prisma.auditLog.create({
     data: {
       userId: session.user.id,
@@ -93,9 +107,11 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
         targetType,
         optionLabel: body.optionLabel ?? null,
         imageArtifactId: data.imageArtifactId ?? null,
+        officialPropagated: officialPropagation?.propagated ?? false,
+        officialTarget: officialPropagation?.target ?? null,
       }),
     },
   });
 
-  return NextResponse.json(data);
+  return NextResponse.json({ ...data, officialPropagation });
 }

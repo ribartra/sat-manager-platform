@@ -55,6 +55,60 @@ function imageUrlOrBase64(image: ImageLinkForDraft["image"]) {
   return `data:${image.mimeType || "image/jpeg"};base64,${image.base64Data}`;
 }
 
+// When a reviewer crop-assigns an image to a candidate whose question is ALREADY
+// promoted, the assignment only writes an IngestCandidateImageLink — the official
+// Question/QuestionOption that students (and the conjunto completeness view) read
+// stays unchanged, so the set keeps showing "sin opciones" / "revisar". This
+// propagates a just-assigned crop to the official row: STEM → Question.imageUrl,
+// OPTION → the matching QuestionOption.imageUrl (marking the question MC). Other
+// targets (OCR/text ones) have no official image slot and are skipped. Safe to
+// call for non-promoted candidates — it no-ops.
+export async function propagateAssignedImageToOfficial(args: {
+  candidateId: string;
+  imageArtifactId: string;
+  targetType: string;
+  optionLabel?: string | null;
+}): Promise<{ propagated: boolean; reason?: string; target?: string; imageUrl?: string }> {
+  const { candidateId, imageArtifactId, targetType } = args;
+  const target = (targetType || "").toUpperCase();
+  const optionLabel = (args.optionLabel ?? "").toUpperCase() || null;
+
+  if (target !== "STEM" && target !== "OPTION") return { propagated: false, reason: "unsupported-target" };
+  if (target === "OPTION" && !optionLabel) return { propagated: false, reason: "missing-option-label" };
+
+  const candidate = await prisma.ingestQuestionCandidate.findUnique({
+    where: { id: candidateId },
+    select: { officialQuestionId: true },
+  });
+  if (!candidate?.officialQuestionId) return { propagated: false, reason: "not-promoted" };
+  const questionId = candidate.officialQuestionId;
+
+  const artifact = await prisma.ingestImageArtifact.findUnique({
+    where: { id: imageArtifactId },
+    select: { fileUrl: true, base64Data: true, mimeType: true },
+  });
+  if (!artifact) return { propagated: false, reason: "artifact-not-found" };
+
+  const publicUrl = await materializeOfficialImageUrl(imageUrlOrBase64(artifact));
+  if (!publicUrl) return { propagated: false, reason: "materialize-failed" };
+
+  if (target === "STEM") {
+    await prisma.question.update({ where: { id: questionId }, data: { imageUrl: publicUrl } });
+    return { propagated: true, target, imageUrl: publicUrl };
+  }
+
+  // OPTION: update the matching option row (create it if the promoted question has
+  // none for this label), and ensure the question reads as MC.
+  const existing = await prisma.questionOption.findFirst({ where: { questionId, label: optionLabel! }, select: { id: true } });
+  if (existing) {
+    await prisma.questionOption.update({ where: { id: existing.id }, data: { imageUrl: publicUrl } });
+  } else {
+    await prisma.questionOption.create({ data: { questionId, label: optionLabel!, text: "", imageUrl: publicUrl } });
+  }
+  await prisma.question.update({ where: { id: questionId }, data: { type: "MC" } });
+  return { propagated: true, target: `OPTION ${optionLabel}`, imageUrl: publicUrl };
+}
+
 export async function materializeOfficialImageUrl(imageUrl: string | null | undefined) {
   if (!imageUrl) return null;
   const match = PRIVATE_ASSET_PATTERN.exec(imageUrl);
