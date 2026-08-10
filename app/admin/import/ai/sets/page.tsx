@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
-import { computeSetRows } from "@/lib/ingest-sets.server";
+import { computeConjuntos } from "@/lib/ingest-sets.server";
 import { SetsIndexClient } from "./sets-client";
 
 export const dynamic = "force-dynamic";
@@ -39,7 +39,7 @@ export default async function AiImportSetsPage({ searchParams }: PageProps) {
     );
   }
 
-  const rows = await computeSetRows(selectedBatchId);
+  const rows = await computeConjuntos(selectedBatchId);
 
   return (
     <SetsIndexClient

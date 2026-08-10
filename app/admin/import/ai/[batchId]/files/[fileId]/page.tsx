@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { computeCropImageSources } from "@/lib/ingest-crop-source";
-import { computeSetRows } from "@/lib/ingest-sets.server";
+import { computeConjuntos } from "@/lib/ingest-sets.server";
 import { ConjuntoRail } from "@/app/admin/import/ai/_components/conjunto-rail";
 import { FileReviewClient } from "./review-client";
 
@@ -116,9 +116,13 @@ export default async function AiImportFileReviewPage({ params }: PageProps) {
   // batch's conjunto rows for the navigation rail.
   const [cropImageSourceMap, setRows] = await Promise.all([
     computeCropImageSources(batchId),
-    computeSetRows(batchId),
+    computeConjuntos(batchId),
   ]);
   const cropImageSource = cropImageSourceMap[file.id] ?? null;
+  // The conjunto this file belongs to — shown as context so the reviewer sees
+  // the whole set (question + answer + explanation files) and its completeness.
+  const conjunto = setRows.find((row) => row.fileIds.includes(file.id)) ?? null;
+  const ROLE_LABEL: Record<string, string> = { QUESTION: "Preguntas", ANSWER: "Respuestas", EXPLANATION: "Explicaciones", OTHER: "Otro" };
 
   const estimatedPages = pages.length || file.pageCount || 0;
   const secondsPerPage = latestEvent?.secondsPerPage && latestEvent.secondsPerPage > 0 ? latestEvent.secondsPerPage : 60;
@@ -145,6 +149,43 @@ export default async function AiImportFileReviewPage({ params }: PageProps) {
           <p className="mt-1 text-xs text-gray-500">{estimatedPages} pages · {secondsPerPage.toFixed(1)} sec/page</p>
         </Card>
       </div>
+
+      {conjunto && (
+        <Card padding="md">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-xs uppercase text-gray-400">Conjunto</p>
+              <p className="truncate text-base font-semibold text-gray-900" title={conjunto.title}>{conjunto.title}</p>
+            </div>
+            <div className="flex flex-col items-end gap-1">
+              <span className="flex h-2 w-40 overflow-hidden rounded-full bg-gray-100" title={`${conjunto.complete} completas · ${conjunto.atencion} atención · ${conjunto.revisar} revisar`}>
+                {conjunto.complete > 0 && <span className="bg-emerald-500" style={{ width: `${(conjunto.complete / (conjunto.total || 1)) * 100}%` }} />}
+                {conjunto.atencion > 0 && <span className="bg-amber-500" style={{ width: `${(conjunto.atencion / (conjunto.total || 1)) * 100}%` }} />}
+                {conjunto.revisar > 0 && <span className="bg-rose-500" style={{ width: `${(conjunto.revisar / (conjunto.total || 1)) * 100}%` }} />}
+              </span>
+              <span className="text-xs text-gray-500">
+                {conjunto.total} preguntas · <span className="text-rose-600">{conjunto.revisar} revisar</span> · <span className="text-amber-600">{conjunto.atencion} atención</span>
+              </span>
+            </div>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {conjunto.files.map((f) => (
+              <span
+                key={f.id}
+                className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-1 text-xs ${f.id === file.id ? "border-blue-300 bg-blue-50 text-blue-800" : "border-gray-200 text-gray-600"}`}
+                title={`${ROLE_LABEL[f.role]} · ${f.nQ} preguntas · ${f.nA} respuestas`}
+              >
+                <span className={`h-1.5 w-1.5 rounded-full ${f.role === "QUESTION" ? "bg-blue-500" : f.role === "ANSWER" ? "bg-emerald-500" : f.role === "EXPLANATION" ? "bg-violet-500" : "bg-gray-300"}`} />
+                <span className="font-medium">{ROLE_LABEL[f.role]}</span>
+                <span className="truncate max-w-[16rem] text-gray-400">{f.name}</span>
+              </span>
+            ))}
+          </div>
+          <Link href={`/admin/import/ai/sets?batch=${batchId}`} className="mt-3 inline-block text-xs text-blue-600 hover:underline">
+            Ver todos los conjuntos y el detalle por pregunta →
+          </Link>
+        </Card>
+      )}
 
       <FileReviewClient
         batchId={batchId}

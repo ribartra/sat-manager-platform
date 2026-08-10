@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { MathContent } from "@/components/math-content";
 import { PdfPageCropper, type CropTarget, type CropOcrResult } from "@/app/admin/import/ai/_components/pdf-page-cropper";
 import { ConjuntoRail } from "@/app/admin/import/ai/_components/conjunto-rail";
-import type { SetRow } from "@/lib/ingest-sets";
+import type { ConjuntoRow } from "@/lib/ingest-sets";
 
 const MAX_UPLOAD_BYTES = 256 * 1024 * 1024;
 const targetTypes = [
@@ -150,7 +150,7 @@ type AiImportWorkflowProps = {
   practiceSets: PracticeSetSummary[];
   fullTests: FullTestSummary[];
   cropImageSources: Record<string, { imageSourceFileId: string; pageNumbers: number[] }>;
-  setRows: SetRow[];
+  setRows: ConjuntoRow[];
   counts: {
     ocrPending: number;
     openIncidents: number;
@@ -300,7 +300,9 @@ export function AiImportWorkflowClient({
   const [candidateQuery, setCandidateQuery] = useState("");
   const [candidateStatus, setCandidateStatus] = useState("ALL");
   const [selectedCandidateId, setSelectedCandidateId] = useState(candidates[0]?.id ?? "");
-  const [selectedConjuntoId, setSelectedConjuntoId] = useState<string>(candidates[0]?.sourceFileId ?? "");
+  const [selectedConjuntoKey, setSelectedConjuntoKey] = useState<string>(
+    () => setRows.find((row) => candidates[0]?.sourceFileId && row.fileIds.includes(candidates[0].sourceFileId))?.key ?? "",
+  );
   const [draft, setDraft] = useState<CandidateSummary | null>(candidates[0] ?? null);
   const [optionRows, setOptionRows] = useState<OptionRow[]>(parseOptions(candidates[0]?.optionsJson ?? null));
   const [savedSignature, setSavedSignature] = useState<string>(() =>
@@ -350,10 +352,15 @@ export function AiImportWorkflowClient({
     && Boolean(candidate.stem)
     && Boolean(candidate.correctAnswer)
   );
-  // The Review modal lists the questions of the conjunto selected in the rail;
-  // bulk promotion below stays batch-wide (uses filteredCandidates).
-  const visibleCandidates = selectedConjuntoId
-    ? filteredCandidates.filter((candidate) => candidate.sourceFileId === selectedConjuntoId)
+  // The Review modal lists the questions of the conjunto selected in the rail.
+  // A conjunto spans several files (question + answer + explanations), so match
+  // against all of the conjunto's file ids. Bulk promotion below stays batch-wide.
+  const selectedConjunto = useMemo(
+    () => setRows.find((row) => row.key === selectedConjuntoKey) ?? null,
+    [setRows, selectedConjuntoKey],
+  );
+  const visibleCandidates = selectedConjunto
+    ? filteredCandidates.filter((candidate) => candidate.sourceFileId && selectedConjunto.fileIds.includes(candidate.sourceFileId))
     : filteredCandidates;
 
   const nearbyImages = images.filter((image) => {
@@ -373,10 +380,10 @@ export function AiImportWorkflowClient({
     setMessage(null);
   }
 
-  function selectConjunto(sourceFileId: string) {
-    setSelectedConjuntoId(sourceFileId);
-    // Jump the editor to the first question of the chosen conjunto.
-    const first = candidates.find((candidate) => candidate.sourceFileId === sourceFileId);
+  function selectConjunto(row: ConjuntoRow) {
+    setSelectedConjuntoKey(row.key);
+    // Jump the editor to the first question of the chosen conjunto (any of its files).
+    const first = candidates.find((candidate) => candidate.sourceFileId && row.fileIds.includes(candidate.sourceFileId));
     if (first) selectCandidate(first);
   }
 
@@ -578,15 +585,15 @@ export function AiImportWorkflowClient({
           </DialogHeader>
           <div className={`grid gap-4 ${selectedBatchId && setRows.length > 0 ? "xl:grid-cols-[240px_320px_minmax(0,1fr)]" : "xl:grid-cols-[360px_minmax(0,1fr)]"}`}>
             {selectedBatchId && setRows.length > 0 && (
-              <ConjuntoRail rows={setRows} batchId={selectedBatchId} currentFileId={selectedConjuntoId} onSelect={selectConjunto} />
+              <ConjuntoRail rows={setRows} batchId={selectedBatchId} currentFileId={draft?.sourceFileId ?? ""} onSelect={selectConjunto} />
             )}
             <div className="space-y-4">
               <section className="rounded-md border border-gray-200">
                 <div className="border-b border-gray-100 p-3">
                   <p className="text-sm font-semibold text-gray-900">Preguntas del conjunto</p>
-                  {selectedConjuntoId && (
-                    <p className="mt-0.5 truncate text-xs text-gray-500" title={setRows.find((row) => row.sourceFileId === selectedConjuntoId)?.title}>
-                      {setRows.find((row) => row.sourceFileId === selectedConjuntoId)?.title ?? ""}
+                  {selectedConjunto && (
+                    <p className="mt-0.5 truncate text-xs text-gray-500" title={selectedConjunto.title}>
+                      {selectedConjunto.title}
                     </p>
                   )}
                   <FilterBar query={candidateQuery} setQuery={setCandidateQuery} status={candidateStatus} setStatus={setCandidateStatus} statusOptions={["ALL", "NEEDS_REVIEW", "READY", "REVIEWED", "REJECTED", "PROMOTED", "EDITING"]} placeholder="Search question, topic or file" />

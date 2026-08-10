@@ -1,11 +1,21 @@
 import "server-only";
 import prisma from "@/lib/prisma";
-import type { SetRow } from "@/lib/ingest-sets";
+import {
+  classifyQuestion,
+  type ConjuntoFile,
+  type ConjuntoFileRole,
+  type ConjuntoRow,
+  type QuestionContent,
+  type QuestionStatusRow,
+} from "@/lib/ingest-sets";
 
-// computeSetRows consolidates every conjunto in a batch with its
-// pending-question breakdown. Shared by the standalone index
-// (app/admin/import/ai/sets) and the conjunto rail embedded in the per-file
-// review workspace (app/admin/import/ai/[batchId]/files/[fileId]).
+// computeConjuntos groups a batch's source files into logical conjuntos — the
+// set of files that together make one set (a Full Practice Test section, or a
+// Practice Set + its answer key) — and reports live per-question completeness
+// for each, using the promoted official Question when available (what students
+// see) and falling back to the staging candidate otherwise. Shared by the
+// standalone index (app/admin/import/ai/sets), the conjunto rail, and the
+// per-file review workspace.
 
 function textOptionCount(optionsJson: string | null): number {
   if (!optionsJson) return 0;
@@ -18,32 +28,69 @@ function textOptionCount(optionsJson: string | null): number {
   }
 }
 
-export async function computeSetRows(batchId: string): Promise<SetRow[]> {
-  const [sources, candidates, imageLinks] = await Promise.all([
+function sectionKind(section: string | null | undefined): string | null {
+  if (!section) return null;
+  return section.toUpperCase().includes("MATH") ? "MATH" : "RW";
+}
+
+function fileName(relativePath: string): string {
+  return relativePath.split("/").at(-1) || relativePath;
+}
+
+function fileRole(f: { isQuestionSource: boolean; isAnswerFile: boolean; isExplanationFile: boolean; sourceKind: string | null }): ConjuntoFileRole {
+  if (f.isExplanationFile || f.sourceKind === "ANSWER_EXPLANATION") return "EXPLANATION";
+  if (f.isAnswerFile || f.sourceKind === "ANSWER_KEY") return "ANSWER";
+  if (f.isQuestionSource) return "QUESTION";
+  return "OTHER";
+}
+
+export async function computeConjuntos(batchId: string): Promise<ConjuntoRow[]> {
+  const [sources, candidates, answerCounts, imageLinks] = await Promise.all([
     prisma.ingestSourceFile.findMany({
       where: { batchId, contentType: { in: ["PRACTICE_SET", "FULL_PRACTICE_TEST"] } },
       select: {
         id: true,
         relativePath: true,
         contentType: true,
+        sourceKind: true,
         section: true,
         topicName: true,
         difficulty: true,
+        practiceSetVariant: true,
         testNumber: true,
         status: true,
+        isQuestionSource: true,
+        isAnswerFile: true,
+        isExplanationFile: true,
       },
     }),
     prisma.ingestQuestionCandidate.findMany({
       where: { batchId, contentType: { in: ["PRACTICE_SET", "FULL_PRACTICE_TEST"] } },
-      select: { id: true, sourceFileId: true, type: true, correctAnswer: true, optionsJson: true, promotionStatus: true, status: true },
+      select: {
+        id: true,
+        sourceFileId: true,
+        questionNumber: true,
+        moduleLabel: true,
+        section: true,
+        type: true,
+        correctAnswer: true,
+        optionsJson: true,
+        stem: true,
+        stimulus: true,
+        explanation: true,
+        promotionStatus: true,
+        officialQuestionId: true,
+        status: true,
+      },
     }),
+    prisma.ingestAnswerCandidate.groupBy({ by: ["sourceFileId"], where: { batchId }, _count: { _all: true } }),
     prisma.ingestCandidateImageLink.findMany({
       where: { batchId },
       select: { candidateId: true, targetType: true, optionLabel: true },
     }),
   ]);
 
-  // Per-candidate image coverage: an OPTION_BLOCK link resolves all four
+  // Per-candidate option-image coverage: an OPTION_BLOCK link resolves all four
   // options; individual OPTION links each cover one letter.
   const optionBlock = new Set<string>();
   const optionLetters = new Map<string, Set<string>>();
@@ -57,63 +104,221 @@ export async function computeSetRows(batchId: string): Promise<SetRow[]> {
     }
   }
 
-  const byFile = new Map<string, { total: number; sinResp: number; faltanOpt: number; pending: number; promoted: number }>();
-  for (const candidate of candidates) {
-    if (!candidate.sourceFileId) continue;
-    // Merged-away / rejected candidates no longer count toward the file.
-    if (candidate.status === "REJECTED" || candidate.promotionStatus === "REJECTED") continue;
-    const stat = byFile.get(candidate.sourceFileId) ?? { total: 0, sinResp: 0, faltanOpt: 0, pending: 0, promoted: 0 };
-    stat.total += 1;
-    if (candidate.promotionStatus === "PROMOTED") stat.promoted += 1;
-    const optionsResolved =
-      candidate.type === "NUMERIC" ||
-      optionBlock.has(candidate.id) ||
-      textOptionCount(candidate.optionsJson) + (optionLetters.get(candidate.id)?.size ?? 0) >= 4;
-    // Missing answer and missing options are independent problems — a question
-    // can have both. Count each sub-metric on its own, but count the candidate
-    // once toward `pending` so the badge total isn't inflated by double-flags.
-    const needsAnswer = !candidate.correctAnswer;
-    const needsOptions = candidate.type !== "NUMERIC" && !optionsResolved;
-    if (needsAnswer) stat.sinResp += 1;
-    if (needsOptions) stat.faltanOpt += 1;
-    if (needsAnswer || needsOptions) stat.pending += 1;
-    byFile.set(candidate.sourceFileId, stat);
+  // Official content for promoted candidates (what students actually see).
+  const officialIds = candidates
+    .filter((c) => c.promotionStatus === "PROMOTED" && c.officialQuestionId)
+    .map((c) => c.officialQuestionId as string);
+  // `in: []` returns nothing, so an empty officialIds is a cheap no-op query.
+  const [officialQuestions, officialOptions] = await Promise.all([
+    prisma.question.findMany({
+      where: { id: { in: officialIds } },
+      select: { id: true, stem: true, stimulus: true, explanation: true, type: true, correctAnswer: true },
+    }),
+    prisma.questionOption.findMany({ where: { questionId: { in: officialIds } }, select: { questionId: true, text: true, imageUrl: true } }),
+  ]);
+  const officialById = new Map(officialQuestions.map((q) => [q.id, q]));
+  const officialOptCounts = new Map<string, { text: number; img: number }>();
+  for (const o of officialOptions) {
+    const c = officialOptCounts.get(o.questionId) ?? { text: 0, img: 0 };
+    if (o.text && o.text.trim()) c.text += 1;
+    if (o.imageUrl) c.img += 1;
+    officialOptCounts.set(o.questionId, c);
   }
 
-  // Two source files in the same batch can carry the same topicName (e.g. a
-  // Full Test's "… R&W.docx" and its "… Answer Explanations.docx" both named
-  // "TEST N READING AND WRITING"). Left as-is the rail shows two identical
-  // rows; disambiguate the colliding ones with their file name so a reviewer
-  // can tell which conjunto actually holds the questions.
-  const titleCounts = new Map<string, number>();
-  for (const source of sources) {
-    const base = source.topicName || source.relativePath.split("/").at(-1) || "Conjunto";
-    titleCounts.set(base, (titleCounts.get(base) ?? 0) + 1);
+  const answersByFile = new Map(answerCounts.map((a) => [a.sourceFileId, a._count._all] as const));
+  const questionsByFile = new Map<string, number>();
+  for (const c of candidates) {
+    if (!c.sourceFileId) continue;
+    if (c.status === "REJECTED" || c.promotionStatus === "REJECTED") continue;
+    questionsByFile.set(c.sourceFileId, (questionsByFile.get(c.sourceFileId) ?? 0) + 1);
   }
 
-  return sources
-    .map((source) => {
-      const stat = byFile.get(source.id) ?? { total: 0, sinResp: 0, faltanOpt: 0, pending: 0, promoted: 0 };
-      const fileName = source.relativePath.split("/").at(-1) || "Conjunto";
-      const base = source.topicName || fileName;
-      const title = source.topicName && (titleCounts.get(base) ?? 0) > 1 ? `${base} · ${fileName}` : base;
-      return {
-        sourceFileId: source.id,
-        batchId,
-        relativePath: source.relativePath,
-        title,
-        contentType: source.contentType ?? "PRACTICE_SET",
-        section: source.section,
-        difficulty: source.difficulty,
-        testNumber: source.testNumber,
-        status: source.status,
-        total: stat.total,
-        answerable: stat.total - stat.pending,
-        pending: stat.pending,
-        sinResp: stat.sinResp,
-        faltanOpt: stat.faltanOpt,
-        promoted: stat.promoted,
-      };
-    })
-    .sort((a, b) => b.pending - a.pending || a.relativePath.localeCompare(b.relativePath));
+  // Which sections a full test actually has (from its question/sectioned files),
+  // so a section-less shared answer key attaches to those instead of forming an
+  // empty phantom conjunto.
+  const testSections = new Map<number, Set<string>>();
+  for (const s of sources) {
+    if (s.testNumber == null) continue;
+    const sk = sectionKind(s.section);
+    if (!sk) continue;
+    const set = testSections.get(s.testNumber) ?? new Set<string>();
+    set.add(sk);
+    testSections.set(s.testNumber, set);
+  }
+
+  // A file can belong to more than one conjunto (a whole-test answer key with no
+  // section attaches to every section of its test). Question-source files always
+  // resolve to a single, definite section key.
+  const keysFor = (s: (typeof sources)[number]): string[] => {
+    if (s.testNumber != null) {
+      const sk = sectionKind(s.section);
+      if (sk) return [`FULL|${s.testNumber}|${sk}`];
+      const secs = [...(testSections.get(s.testNumber) ?? [])];
+      return secs.length ? secs.map((x) => `FULL|${s.testNumber}|${x}`) : [`FULL|${s.testNumber}|?`];
+    }
+    return [`PRACTICE|${sectionKind(s.section) ?? "?"}|${s.topicName ?? ""}|${s.difficulty ?? ""}|${s.practiceSetVariant ?? ""}`];
+  };
+
+  const groups = new Map<string, (typeof sources)[number][]>();
+  for (const s of sources) {
+    for (const key of keysFor(s)) {
+      const arr = groups.get(key) ?? [];
+      arr.push(s);
+      groups.set(key, arr);
+    }
+  }
+
+  // Bucket non-rejected question candidates by their file's (single) conjunto key.
+  const candidateKeyByFile = new Map<string, string>();
+  for (const s of sources) candidateKeyByFile.set(s.id, keysFor(s)[0]);
+  const candidatesByKey = new Map<string, typeof candidates>();
+  for (const c of candidates) {
+    if (!c.sourceFileId) continue;
+    if (c.status === "REJECTED" || c.promotionStatus === "REJECTED") continue;
+    const key = candidateKeyByFile.get(c.sourceFileId);
+    if (!key) continue;
+    const arr = candidatesByKey.get(key) ?? [];
+    arr.push(c);
+    candidatesByKey.set(key, arr);
+  }
+
+  const rows: ConjuntoRow[] = [];
+  for (const [key, files] of groups) {
+    const isFull = key.startsWith("FULL|");
+    const parts = key.split("|");
+    const testNumber = isFull ? Number(parts[1]) : null;
+    const section = (isFull ? parts[2] : parts[1]) === "?" ? null : (isFull ? parts[2] : parts[1]);
+    const contentType = isFull ? "FULL_PRACTICE_TEST" : "PRACTICE_SET";
+    const difficulty = files.find((f) => f.difficulty)?.difficulty ?? null;
+    const topicName = files.find((f) => f.topicName)?.topicName ?? null;
+    const variant = files.find((f) => f.practiceSetVariant)?.practiceSetVariant ?? null;
+
+    const conjFiles: ConjuntoFile[] = files
+      .map((f) => ({
+        id: f.id,
+        name: fileName(f.relativePath),
+        role: fileRole(f),
+        nQ: questionsByFile.get(f.id) ?? 0,
+        nA: answersByFile.get(f.id) ?? 0,
+      }))
+      .sort((a, b) => (a.role === "QUESTION" ? -1 : b.role === "QUESTION" ? 1 : 0) || b.nQ - a.nQ);
+
+    // Primary = the question-source file with the most question candidates;
+    // fallback to whichever file carries candidates, else the first file.
+    const primary =
+      [...conjFiles].sort((a, b) => (b.role === "QUESTION" ? 1 : 0) - (a.role === "QUESTION" ? 1 : 0) || b.nQ - a.nQ)[0] ??
+      conjFiles[0];
+
+    const title =
+      testNumber != null
+        ? `Test ${testNumber}${section ? ` · ${section === "MATH" ? "Math" : "R&W"}` : ""}`
+        : [topicName || primary?.name || "Conjunto", difficulty, variant ? `v${variant}` : null].filter(Boolean).join(" · ");
+
+    const questions: QuestionStatusRow[] = [];
+    let complete = 0,
+      atencion = 0,
+      revisar = 0,
+      sinEnunciado = 0,
+      sinEstimulo = 0,
+      sinOpciones = 0,
+      sinResp = 0,
+      sinExpl = 0,
+      promoted = 0;
+
+    for (const c of candidatesByKey.get(key) ?? []) {
+      const isPromoted = c.promotionStatus === "PROMOTED" && !!c.officialQuestionId;
+      const official = isPromoted ? officialById.get(c.officialQuestionId as string) : undefined;
+      if (isPromoted) promoted += 1;
+
+      let content: QuestionContent;
+      if (official) {
+        const oc = officialOptCounts.get(official.id) ?? { text: 0, img: 0 };
+        content = {
+          type: official.type,
+          correctAnswer: official.correctAnswer,
+          stemLen: (official.stem ?? "").trim().length,
+          stimLen: (official.stimulus ?? "").trim().length,
+          optTextCount: oc.text,
+          optImgCount: oc.img,
+          hasExpl: !!(official.explanation && official.explanation.trim()),
+          section: section ?? sectionKind(c.section),
+        };
+      } else {
+        const optImg = optionBlock.has(c.id) ? 4 : optionLetters.get(c.id)?.size ?? 0;
+        content = {
+          type: c.type,
+          correctAnswer: c.correctAnswer,
+          stemLen: (c.stem ?? "").trim().length,
+          stimLen: (c.stimulus ?? "").trim().length,
+          optTextCount: textOptionCount(c.optionsJson),
+          optImgCount: optImg,
+          hasExpl: !!(c.explanation && c.explanation.trim()),
+          section: section ?? sectionKind(c.section),
+        };
+      }
+
+      const cls = classifyQuestion(content);
+      if (cls.level === "crit") revisar += 1;
+      else if (cls.level === "warn") atencion += 1;
+      else complete += 1;
+      if (cls.fields.enunciado === "crit") sinEnunciado += 1;
+      if (cls.fields.estimulo === "warn") sinEstimulo += 1;
+      if (cls.fields.opciones === "crit") sinOpciones += 1;
+      if (cls.fields.respuesta === "crit") sinResp += 1;
+      if (cls.fields.explicacion === "info") sinExpl += 1;
+
+      questions.push({
+        candidateId: c.id,
+        sourceFileId: c.sourceFileId as string,
+        questionNumber: c.questionNumber,
+        moduleLabel: c.moduleLabel,
+        type: content.type,
+        answer: content.correctAnswer ?? "",
+        promoted: isPromoted,
+        level: cls.level,
+        fields: cls.fields,
+        notes: cls.notes,
+      });
+    }
+
+    questions.sort(
+      (a, b) =>
+        (a.moduleLabel ?? "").localeCompare(b.moduleLabel ?? "") ||
+        (a.questionNumber ?? 0) - (b.questionNumber ?? 0),
+    );
+
+    rows.push({
+      key,
+      batchId,
+      primaryFileId: primary?.id ?? files[0].id,
+      title,
+      contentType,
+      section,
+      difficulty,
+      testNumber,
+      files: conjFiles,
+      fileIds: files.map((f) => f.id),
+      total: questions.length,
+      complete,
+      atencion,
+      revisar,
+      sinEnunciado,
+      sinEstimulo,
+      sinOpciones,
+      sinResp,
+      sinExpl,
+      promoted,
+      questions,
+    });
+  }
+
+  return rows.sort((a, b) => {
+    const ta = a.testNumber ?? Number.POSITIVE_INFINITY;
+    const tb = b.testNumber ?? Number.POSITIVE_INFINITY;
+    if (ta !== tb) return ta - tb;
+    const sa = a.section === "MATH" ? 1 : 0;
+    const sb = b.section === "MATH" ? 1 : 0;
+    if (sa !== sb) return sa - sb;
+    return a.title.localeCompare(b.title);
+  });
 }

@@ -6,7 +6,7 @@ import { CopyableTruncatedText } from "@/components/ui/copyable-truncated-text";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { computeCropImageSources } from "@/lib/ingest-crop-source";
-import { computeSetRows } from "@/lib/ingest-sets.server";
+import { computeConjuntos } from "@/lib/ingest-sets.server";
 import { AiImportWorkflowClient, IngestAutoRefresh } from "./ai-import-client";
 
 export const dynamic = "force-dynamic";
@@ -330,7 +330,7 @@ export default async function AiImportPage({ searchParams }: PageProps) {
   const cropImageSources = selectedBatchId ? await computeCropImageSources(selectedBatchId) : {};
 
   // Conjunto rows for the Review step's conjunto rail (same data as /sets).
-  const setRows = selectedBatchId ? await computeSetRows(selectedBatchId) : [];
+  const setRows = selectedBatchId ? await computeConjuntos(selectedBatchId) : [];
 
   const openIncidents = incidents.filter((incident) => incident.status !== "RESOLVED");
   const currentOpenIncidents = openIncidentCount ?? openIncidents.length;

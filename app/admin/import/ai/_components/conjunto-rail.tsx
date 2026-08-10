@@ -5,16 +5,17 @@ import Link from "next/link";
 import { PanelLeftClose, PanelLeftOpen, Search } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { filterSetRows, type SetRow, type SetSectionFilter, type SetTypeFilter } from "@/lib/ingest-sets";
+import { filterConjuntos, type ConjuntoRow, type SetSectionFilter, type SetTypeFilter } from "@/lib/ingest-sets";
 
 interface ConjuntoRailProps {
-  rows: SetRow[];
+  rows: ConjuntoRow[];
   batchId: string;
+  // The file currently open in the workspace; its conjunto is highlighted.
   currentFileId: string;
-  // Link-mode (default): each conjunto navigates to its per-file review page.
-  // Select-mode: pass onSelect to keep selection in-place (used inside the
-  // wizard Review modal, where navigating away would close the modal).
-  onSelect?: (sourceFileId: string) => void;
+  // Link-mode (default): each conjunto navigates to its primary file's review page.
+  // Select-mode: pass onSelect to keep selection in-place (used inside the wizard
+  // Review modal, where navigating away would close the modal).
+  onSelect?: (row: ConjuntoRow) => void;
 }
 
 const SECTION_TABS: { value: SetSectionFilter; label: string }[] = [
@@ -29,11 +30,22 @@ function sectionLabel(section: string | null) {
   return section;
 }
 
-// Conjunto navigation rail shown inside the per-file review workspace. Mirrors
-// the filters of the standalone /sets index (section tabs, type, solo-pendientes,
-// search) so a reviewer can filter and jump between conjuntos without leaving the
-// review view. Selecting a conjunto is a normal server navigation to another
-// fileId — the workspace then lists that set's questions.
+// Slim completeness bar: green complete · amber atención · red revisar.
+function CompletenessBar({ row }: { row: ConjuntoRow }) {
+  const total = row.total || 1;
+  const seg = (n: number, cls: string) => (n > 0 ? <span className={cls} style={{ width: `${(n / total) * 100}%` }} /> : null);
+  return (
+    <span className="mt-1 flex h-1.5 w-full overflow-hidden rounded-full bg-gray-100" title={`${row.complete} completas · ${row.atencion} atención · ${row.revisar} revisar`}>
+      {seg(row.complete, "bg-emerald-500")}
+      {seg(row.atencion, "bg-amber-500")}
+      {seg(row.revisar, "bg-rose-500")}
+    </span>
+  );
+}
+
+// Conjunto navigation rail shown inside the per-file review workspace and the
+// dashboard Review modal. A conjunto is the group of files that form one set;
+// selecting one lists that set's questions. Mirrors the /sets filters.
 export function ConjuntoRail({ rows, batchId, currentFileId, onSelect }: ConjuntoRailProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [query, setQuery] = useState("");
@@ -43,16 +55,15 @@ export function ConjuntoRail({ rows, batchId, currentFileId, onSelect }: Conjunt
   const activeRef = useRef<HTMLElement | null>(null);
 
   const filtered = useMemo(
-    () => filterSetRows(rows, { query, type: typeFilter, section: sectionFilter, onlyPending }),
+    () => filterConjuntos(rows, { query, type: typeFilter, section: sectionFilter, onlyPending }),
     [rows, query, typeFilter, sectionFilter, onlyPending],
   );
 
-  // Keep the conjunto being reviewed visible when the rail first renders.
   useEffect(() => {
     activeRef.current?.scrollIntoView({ block: "nearest" });
   }, []);
 
-  const totalPending = useMemo(() => rows.reduce((acc, row) => acc + row.pending, 0), [rows]);
+  const totalPending = useMemo(() => rows.reduce((acc, row) => acc + row.revisar + row.atencion, 0), [rows]);
 
   if (collapsed) {
     return (
@@ -76,7 +87,7 @@ export function ConjuntoRail({ rows, batchId, currentFileId, onSelect }: Conjunt
           <p className="text-sm font-semibold text-gray-900">Conjuntos</p>
           <p className="text-xs text-gray-400">
             {filtered.length} de {rows.length}
-            {totalPending > 0 ? ` · ${totalPending} pendientes` : ""}
+            {totalPending > 0 ? ` · ${totalPending} por revisar` : ""}
           </p>
         </div>
         <button
@@ -135,10 +146,11 @@ export function ConjuntoRail({ rows, batchId, currentFileId, onSelect }: Conjunt
 
       <div className="min-h-0 flex-1 divide-y divide-gray-50 overflow-y-auto">
         {filtered.map((row) => {
-          const active = row.sourceFileId === currentFileId;
+          const active = row.fileIds.includes(currentFileId);
           const className = `block w-full text-left px-3 py-2.5 text-sm transition-colors ${
             active ? "bg-blue-50 ring-1 ring-inset ring-blue-200" : "hover:bg-gray-50"
           }`;
+          const pending = row.revisar + row.atencion;
           const inner = (
             <>
               <p className={`truncate font-medium ${active ? "text-blue-800" : "text-gray-900"}`} title={row.title}>
@@ -147,22 +159,21 @@ export function ConjuntoRail({ rows, batchId, currentFileId, onSelect }: Conjunt
               <div className="mt-1 flex flex-wrap items-center gap-1">
                 {row.section && <Badge variant="default">{sectionLabel(row.section)}</Badge>}
                 {row.difficulty && <Badge variant="default">{row.difficulty}</Badge>}
-                {row.testNumber && <Badge variant="info">Test {row.testNumber}</Badge>}
-                {row.pending > 0 ? (
-                  <Badge variant="warning">{row.pending} pend.</Badge>
-                ) : (
-                  <Badge variant="success">Completo</Badge>
-                )}
+                <span className="text-xs text-gray-400">{row.files.length} arch.</span>
+                {row.revisar > 0 && <Badge variant="warning">{row.revisar} revisar</Badge>}
+                {row.revisar === 0 && row.atencion > 0 && <Badge variant="warning">{row.atencion} atención</Badge>}
+                {pending === 0 && row.total > 0 && <Badge variant="success">Completo</Badge>}
               </div>
+              <CompletenessBar row={row} />
             </>
           );
           if (onSelect) {
             return (
               <button
-                key={row.sourceFileId}
+                key={row.key}
                 type="button"
                 ref={active ? (el) => { activeRef.current = el; } : undefined}
-                onClick={() => onSelect(row.sourceFileId)}
+                onClick={() => onSelect(row)}
                 className={className}
                 aria-current={active ? "true" : undefined}
               >
@@ -172,9 +183,9 @@ export function ConjuntoRail({ rows, batchId, currentFileId, onSelect }: Conjunt
           }
           return (
             <Link
-              key={row.sourceFileId}
+              key={row.key}
               ref={active ? (el) => { activeRef.current = el; } : undefined}
-              href={`/admin/import/ai/${batchId}/files/${row.sourceFileId}`}
+              href={`/admin/import/ai/${batchId}/files/${row.primaryFileId}`}
               className={className}
               aria-current={active ? "true" : undefined}
             >
