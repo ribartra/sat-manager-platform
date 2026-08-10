@@ -5,8 +5,8 @@
 ## Resumen
 
 - **Practice Sets:** 91 total · 72 sin problemas (PUBLISHED) · 19 con problemas · **32** preguntas con problemas.
-- **Full Practice Tests:** 10 total (todos DRAFT) · **238** preguntas con problemas.
-- **Total preguntas con problemas: 270**.
+- **Full Practice Tests:** 10 total (todos DRAFT) · **242** preguntas con problemas.
+- **Total preguntas con problemas: 274**.
 
 ## Qué significa cada "falta"
 
@@ -245,60 +245,64 @@
 | 2 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 2. $$y = -\frac{2}{3}x + 4$$ $$y = -\frac{2}{3}x - 11$$ At how many points do th |
 | 20 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 20. A circle graphed on the coordinate plane is centered at the origin, labeled  |
 
-### Imported Test 6 (partial 97/98)
-*DRAFT* · 97 preguntas · **33 con problemas**
+### Imported Test 6
+*DRAFT* · 98 preguntas · **37 con problemas**
 
 **Reading & Writing Module 1** — 27 preguntas, 15 con problemas:
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
-| 1 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | Which choice completes the text with the most logical and precise word or phrase |
-| 2 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 2. Which choice completes the text with the most logical and precise word or phr |
-| 3 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | Which choice completes the text with the most logical and precise word or phrase |
-| 4 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 4. Which choice best describes the overall structure of the text? ☒ A It critici |
-| 5 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | Based on the texts, how would the author of Text 2 most likely respond to the cl |
-| 6 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 6. Which choice best states the main idea of the text? ☒ A Walter decides to dem |
+| 1 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which choice completes the text with the most logical and precise word or phrase |
+| 2 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 2. Which choice completes the text with the most logical and precise word or phr |
+| 3 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which choice completes the text with the most logical and precise word or phrase |
+| 4 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 4. Which choice best describes the overall structure of the text? ☒ A It critici |
+| 5 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Based on the texts, how would the author of Text 2 most likely respond to the cl |
+| 6 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 6. Which choice best states the main idea of the text? ☒ A Walter decides to dem |
 | 9 | MC | opciones de texto incompletas (3/4) | Which choice best describes data from the table that support Trozzi and her team |
-| 11 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | Which choice most effectively uses data from the table to complete the statement |
-| 18 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | Which choice completes the text so that it conforms to the conventions of Standa |
-| 19 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 19. Which choice completes the text so that it conforms to the conventions of St |
-| 22 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | Which choice completes the text with the most logical transition? |
-| 23 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 23. Which choice completes the text with the most logical transition? ☒ A Unfort |
-| 24 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | Which choice completes the text with the most logical transition? |
-| 25 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 25. Which choice completes the text with the most logical transition? ☒ A For in |
-| 26 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | The student wants to emphasize the importance of sleep quality for elderly adult |
+| 11 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which choice most effectively uses data from the table to complete the statement |
+| 18 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which choice completes the text so that it conforms to the conventions of Standa |
+| 19 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 19. Which choice completes the text so that it conforms to the conventions of St |
+| 22 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which choice completes the text with the most logical transition? |
+| 23 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 23. Which choice completes the text with the most logical transition? ☒ A Unfort |
+| 24 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which choice completes the text with the most logical transition? |
+| 25 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 25. Which choice completes the text with the most logical transition? ☒ A For in |
+| 26 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | The student wants to emphasize the importance of sleep quality for elderly adult |
 
 **Reading & Writing Module 2** — 27 preguntas, 14 con problemas:
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
-| 1 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | Which choice completes the text with the most logical and precise word or phrase |
-| 2 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 2. Which choice completes the text with the most logical and precise word or phr |
-| 3 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | Which choice completes the text with the most logical and precise word or phrase |
-| 4 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 4. Which choice completes the text with the most logical and precise word or phr |
-| 5 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | Which choice completes the text with the most logical and precise word or phrase |
-| 6 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 6. Which choice best states the main purpose of the text? ☐ A To exemplify the d |
-| 9 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | According to the text, in what way was the oil shortage connected to stagflation |
-| 14 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | Which choice best describes data from the table that support the researcher's co |
-| 20 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | Which choice completes the text so that it conforms to the conventions of Standa |
-| 21 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | 21. Which choice completes the text so that it conforms to the conventions of St |
-| 22 | NUMERIC | tipo mal detectado: es MC (respuesta D) marcada como NUMERIC — faltan opciones A–D | Which choice completes the text so that it conforms to the conventions of Standa |
-| 23 | NUMERIC | tipo mal detectado: es MC (respuesta A) marcada como NUMERIC — faltan opciones A–D | 23. Which choice completes the text with the most logical transition? ☐ A Furthe |
-| 24 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | Which choice completes the text with the most logical transition? |
-| 25 | NUMERIC | tipo mal detectado: es MC (respuesta C) marcada como NUMERIC — faltan opciones A–D | 25. Which choice completes the text with the most logical transition? ☒ A Howeve |
+| 1 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which choice completes the text with the most logical and precise word or phrase |
+| 2 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 2. Which choice completes the text with the most logical and precise word or phr |
+| 3 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which choice completes the text with the most logical and precise word or phrase |
+| 4 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 4. Which choice completes the text with the most logical and precise word or phr |
+| 5 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which choice completes the text with the most logical and precise word or phrase |
+| 6 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 6. Which choice best states the main purpose of the text? ☐ A To exemplify the d |
+| 9 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | According to the text, in what way was the oil shortage connected to stagflation |
+| 14 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which choice best describes data from the table that support the researcher's co |
+| 20 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which choice completes the text so that it conforms to the conventions of Standa |
+| 21 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 21. Which choice completes the text so that it conforms to the conventions of St |
+| 22 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which choice completes the text so that it conforms to the conventions of Standa |
+| 23 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 23. Which choice completes the text with the most logical transition? ☐ A Furthe |
+| 24 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | Which choice completes the text with the most logical transition? |
+| 25 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 25. Which choice completes the text with the most logical transition? ☒ A Howeve |
 
-**Math Module 1** — 21 preguntas, 2 con problemas:
-
-| # | Tipo | Falta | Enunciado |
-|---|---|---|---|
-| 11 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 12. Which of the following is equivalent to the expression $x^3 - 4x^2 + 8x - 32 |
-| 18 | MC | respuesta MC no es A–D ("1") | 19. $y^2 + 36 = x$ $15y = x$ If $(x, y)$ is a solution to the given system of eq |
-
-**Math Module 2** — 22 preguntas, 2 con problemas:
+**Math Module 1** — 22 preguntas, 2 con problemas:
 
 | # | Tipo | Falta | Enunciado |
 |---|---|---|---|
-| 12 | NUMERIC | tipo mal detectado: es MC (respuesta B) marcada como NUMERIC — faltan opciones A–D | 12. In a data set, the mean is 10, the median is 10, the middle three values are |
+| 12 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 12. Which of the following is equivalent to the expression $x^3 - 4x^2 + 8x - 32 |
+| 21 | MC | opciones en imagen pero faltan botones A–D (0 de 4) | 21. [tbl-0.html](tbl-0.html) The values for two functions $f(x)$ and $g(x)$ are  |
+
+**Math Module 2** — 22 preguntas, 6 con problemas:
+
+| # | Tipo | Falta | Enunciado |
+|---|---|---|---|
+| 3 | MC | opciones en imagen pero faltan botones A–D (0 de 4) | 3. A system of linear equations is graphed above. What is the y value of the sol |
+| 9 | MC | opciones en imagen pero faltan botones A–D (0 de 4) | 9. A bag of candy contains a certain percentage of chocolate bars. Of the chocol |
+| 12 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 12. In a data set, the mean is 10, the median is 10, the middle three values are |
+| 15 | MC | opciones en imagen pero faltan botones A–D (0 de 4) | 15. A line with the equation $12x - 5y = 30$ passes through the points $(0, p)$  |
+| 17 | MC | opciones en imagen pero faltan botones A–D (0 de 4) | 17. $$|3x - 4| = x + 12$$ The given equation has two solutions, $p$ and $q$. Wha |
 | 19 | MC | MC sin opciones ni imagen (opciones no recuperadas del OCR) | 19. The gravity on Mercury is 3.7 meters per second squared, or $3.7 \frac{m}{s^ |
 
 ### Imported Test 7 (partial 96/98)
