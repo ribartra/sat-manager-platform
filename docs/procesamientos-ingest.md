@@ -59,6 +59,7 @@ siempre **WAL-safe**: `docker compose stop web` → apply → `wal_checkpoint(TR
 | [`sat-digital-estructura-vs-plataforma.md`](sat-digital-estructura-vs-plataforma.md) | Spec Digital SAT (98 Q, tiempos) vs comportamiento del Full Test player |
 | [`practice-sets-easy-recovery.md`](practice-sets-easy-recovery.md) | Auditoría Practice Sets EASY Math+R&W (planes agentes 2026-08-11) |
 | [`practice-sets-medium-recovery.md`](practice-sets-medium-recovery.md) | Auditoría + APPLY Practice Sets MEDIUM Math+R&W (2026-08-11) |
+| [`practice-sets-hard-recovery.md`](practice-sets-hard-recovery.md) | Auditoría + APPLY Practice Sets HARD Math+R&W (2026-08-11) |
 
 Contratos de agentes (scratchpad, no docs):
 
