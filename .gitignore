@@ -71,3 +71,6 @@ public/uploads/
 
 # Local-only prod-image validation stack (not for deploy)
 .local-stack/
+
+# Throwaway ingest/diagnostic scripts and plans
+scratchpad/

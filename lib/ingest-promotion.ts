@@ -98,8 +98,31 @@ const STEM_HEADER_LINE = [
   /^(?:MATH|READING(?:\s*(?:and|&)\s*WRITING)?|R\s*&\s*W)\s*$/i,
 ];
 
-export function sanitizeStem(value: string | null | undefined): string {
+// R&W OCR frequently glued the WHOLE ☒/☐ A–D answer block onto the END of the stem:
+// the enunciado parses fine, but the alternatives were never split out of it (they live
+// in their own option column/rows). Strip that trailing block from the stem — keep only
+// the question text before the first A–D marker. Requires a clean, in-order A,B,C(,D)
+// run so a stray glyph in a passage can't truncate a real stem; never empties the stem.
+export function stripEmbeddedOptionBlock(value: string | null | undefined): string {
   const text = (value ?? "").replace(/\r\n/g, "\n");
+  if (!text.trim()) return "";
+  const re = /[☒☐]\s*([A-D])\b[.)]?[ \t]*/g;
+  const markers: { label: string; start: number }[] = [];
+  let match: RegExpExecArray | null;
+  while ((match = re.exec(text))) markers.push({ label: match[1].toUpperCase(), start: match.index });
+  if (markers.length !== 3 && markers.length !== 4) return text.trim();
+  const seq = markers.map((marker) => marker.label).join("");
+  if (seq !== "ABC" && seq !== "ABCD") return text.trim();
+  const head = text
+    .slice(0, markers[0].start)
+    .replace(/[ \t]+$/g, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+  return head || text.trim();
+}
+
+export function sanitizeStem(value: string | null | undefined): string {
+  const text = stripEmbeddedOptionBlock(value).replace(/\r\n/g, "\n");
   if (!text.trim()) return "";
   const lines = text.split("\n");
   let start = 0;
