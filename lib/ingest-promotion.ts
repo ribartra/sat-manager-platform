@@ -147,14 +147,13 @@ function imageUrlOrBase64(image: ImageLinkForDraft["image"]) {
   return `data:${image.mimeType || "image/jpeg"};base64,${image.base64Data}`;
 }
 
-// When a reviewer crop-assigns an image to a candidate whose question is ALREADY
-// promoted, the assignment only writes an IngestCandidateImageLink — the official
-// Question/QuestionOption that students (and the conjunto completeness view) read
-// stays unchanged, so the set keeps showing "sin opciones" / "revisar". This
-// propagates a just-assigned crop to the official row: STEM → Question.imageUrl,
-// OPTION → the matching QuestionOption.imageUrl (marking the question MC). Other
-// targets (OCR/text ones) have no official image slot and are skipped. Safe to
-// call for non-promoted candidates — it no-ops.
+// When a reviewer assigns an image to a candidate whose question is ALREADY
+// promoted (crop-region OR image-links UI), the write lands on
+// IngestCandidateImageLink — the official Question/QuestionOption that students
+// (and the conjunto completeness view) read stays unchanged unless we mirror it.
+// STEM/STIMULUS → Question.imageUrl; OPTION → matching QuestionOption.imageUrl
+// (marking the question MC). Other targets have no official image slot and are
+// skipped. Safe to call for non-promoted candidates — it no-ops.
 export async function propagateAssignedImageToOfficial(args: {
   candidateId: string;
   imageArtifactId: string;
@@ -165,7 +164,9 @@ export async function propagateAssignedImageToOfficial(args: {
   const target = (targetType || "").toUpperCase();
   const optionLabel = (args.optionLabel ?? "").toUpperCase() || null;
 
-  if (target !== "STEM" && target !== "OPTION") return { propagated: false, reason: "unsupported-target" };
+  if (target !== "STEM" && target !== "STIMULUS" && target !== "OPTION") {
+    return { propagated: false, reason: "unsupported-target" };
+  }
   if (target === "OPTION" && !optionLabel) return { propagated: false, reason: "missing-option-label" };
 
   const candidate = await prisma.ingestQuestionCandidate.findUnique({
@@ -184,7 +185,7 @@ export async function propagateAssignedImageToOfficial(args: {
   const publicUrl = await materializeOfficialImageUrl(imageUrlOrBase64(artifact));
   if (!publicUrl) return { propagated: false, reason: "materialize-failed" };
 
-  if (target === "STEM") {
+  if (target === "STEM" || target === "STIMULUS") {
     await prisma.question.update({ where: { id: questionId }, data: { imageUrl: publicUrl } });
     return { propagated: true, target, imageUrl: publicUrl };
   }

@@ -4,7 +4,8 @@
 > contenido de los mock tests (Test 1, 8, 10 hechos por esta vía) recuperando enunciados, estímulos,
 > opciones, respuestas, explicaciones e imágenes que la OCR dejó incompletos, y promoviéndolo al
 > contenido oficial. El estado por-test vive en las notas de memoria (`test8/10-completion-progress`) y
-> en `docs/INGEST_PROMOCION_ESTADO.md` / `docs/rw-stimulus-recovery.md`.
+> en `docs/INGEST_PROMOCION_ESTADO.md` / `docs/rw-stimulus-recovery.md` /
+> **`docs/procesamientos-ingest.md`** (inventario global de campañas aplicadas).
 
 ## Por qué hace falta una estrategia (y no un solo script)
 

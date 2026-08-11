@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "crypto";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
+import { propagateAssignedImageToOfficial } from "@/lib/ingest-promotion";
 
 interface RouteContext {
   params: Promise<{ candidateId: string }>;
@@ -95,17 +96,33 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
         },
       });
 
+  // Mirror onto the official Question when already promoted — same path as
+  // crop-region. Without this, the UI "asignar imagen" only updates staging and
+  // conjuntos keep showing the gap.
+  const officialPropagation = await propagateAssignedImageToOfficial({
+    candidateId,
+    imageArtifactId: image.id,
+    targetType,
+    optionLabel: body.optionLabel ?? null,
+  }).catch(() => null);
+
   await prisma.auditLog.create({
     data: {
       userId: session.user.id,
       action: "LINK_AI_IMPORT_IMAGE",
       targetType: "IngestQuestionCandidate",
       targetId: candidateId,
-      metadata: JSON.stringify({ imageArtifactId: image.id, targetType, optionLabel: body.optionLabel }),
+      metadata: JSON.stringify({
+        imageArtifactId: image.id,
+        targetType,
+        optionLabel: body.optionLabel,
+        officialPropagated: officialPropagation?.propagated ?? false,
+        officialTarget: officialPropagation?.target ?? null,
+      }),
     },
   });
 
-  return NextResponse.json(link);
+  return NextResponse.json({ ...link, officialPropagation });
 }
 
 export async function DELETE(req: NextRequest, { params }: RouteContext) {

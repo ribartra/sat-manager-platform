@@ -10,6 +10,12 @@
 > `lib/ingest-sets.server.ts` (`computeConjuntos`), `lib/ingest-promotion.ts`
 > (`sanitizeStem`, `sanitizeExplanation`, `buildQuestionDraft`),
 > `ingest_service/app/practice_repair.py`, `lib/answer-grading.ts`.
+>
+> Inventario de **procesamientos ya aplicados** (campañas, scripts, residuales):
+> [`docs/procesamientos-ingest.md`](docs/procesamientos-ingest.md).
+>
+> Estructura del **Digital SAT** (preguntas, tiempos, módulos) y paridad con el player:
+> [`docs/sat-digital-estructura-vs-plataforma.md`](docs/sat-digital-estructura-vs-plataforma.md).
 
 ---
 
