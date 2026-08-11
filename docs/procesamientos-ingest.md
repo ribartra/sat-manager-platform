@@ -192,16 +192,17 @@ Estos quedan en el runtime; no son one-shots.
 
 ## 4. Residuales conocidos (aún pendientes)
 
-No bloquean la **composición** 98/98 de módulos, pero sí la calidad contestable / publicación.
+No bloquean la **composición** 98/98 de módulos. Actualizado 2026-08-11 tras
+fix de preguntas creadas (T7/T10 Q1–Q2) y spillovers de opción D.
 
 | Ítem | Severidad | Notas |
 |------|-----------|-------|
-| T4 RW `2:27` | warn · opciones **3/4** | Falta D; OCR de esa página corta en C. Requiere crop/OCR del PDF |
-| T9 Math `2B:4` | opciones = gráficas | Ans `B` OK; falta enlazar 4 `QuestionOption.imageUrl` vía crop-assign |
-| Estímulos R&W residuales (tabla/gráfico) | warn | Lista histórica en [rw-stimulus-recovery](rw-stimulus-recovery.md) §pendiente; muchos ya mitigados en T6–10 |
-| Practice Sets parciales | variable | Ver [broken-questions](broken-questions.md) (p. ej. Equivalent Expressions EASY 18/21) |
+| Figuras Math / CoE graph `imageUrl` en practice sets | warn calidad | No bloquea contestar; ver docs practice-sets-*-recovery |
+| Estímulos R&W residuales (tabla/gráfico) en FT | warn | Lista histórica en [rw-stimulus-recovery](rw-stimulus-recovery.md); WiC/SEC embebidos son OK |
 | `broken-questions.md` | doc | Snapshot **2026-08-10**; regenerar antes de usarlo como backlog vivo |
-| Fix image-links (código) | repo | Cambio local de propagación puede estar sin commit si no se pidió |
+| T4 RW `2:27` opción D | — | **Cerrado** (pág. 37 OCR) |
+| T9 Math `2B:4` option images | — | **Cerrado** (4 `imageUrl` presentes) |
+| T7/T10 Q1–Q2 creadas | — | **Cerrado**: contenido vs ANS OK; T10 expl + T7 metadata + trim D-spill (2026-08-11) |
 
 ---
 
