@@ -3,6 +3,7 @@ import { randomUUID } from "crypto";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { materializeOfficialImageUrl } from "@/lib/ingest-promotion";
+import { cleanupOfficialQuestionPlaceholders } from "@/lib/ingest-image-cleanup";
 
 // Attach an extracted ingest image directly to a promoted Question.
 // Used by the file-review image gallery to assign a page screenshot to a
@@ -40,6 +41,7 @@ export async function POST(req: NextRequest) {
   if (!imageUrl) return NextResponse.json({ error: "Could not resolve image data" }, { status: 400 });
 
   await prisma.question.update({ where: { id: questionId }, data: { imageUrl } });
+  await cleanupOfficialQuestionPlaceholders(questionId).catch(() => null);
   await prisma.auditLog.create({
     data: {
       id: `img_${randomUUID().replace(/-/g, "")}`,

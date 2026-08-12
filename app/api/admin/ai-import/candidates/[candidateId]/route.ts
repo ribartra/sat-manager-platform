@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
+import { stripIngestImagePlaceholders } from "@/lib/ingest-text-sanitize";
+import { cleanupOfficialQuestionPlaceholders } from "@/lib/ingest-image-cleanup";
 
 interface RouteContext {
   params: Promise<{ candidateId: string }>;
@@ -36,11 +38,13 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
     where: { id: candidateId },
     data: {
       ...(body.status ? { status: body.status } : {}),
-      ...(body.stem !== undefined ? { stem: body.stem || null } : {}),
-      ...(body.stimulus !== undefined ? { stimulus: body.stimulus || null } : {}),
+      ...(body.stem !== undefined ? { stem: stripIngestImagePlaceholders(body.stem) || null } : {}),
+      ...(body.stimulus !== undefined ? { stimulus: stripIngestImagePlaceholders(body.stimulus) || null } : {}),
       ...(body.optionsJson !== undefined ? { optionsJson: body.optionsJson || null } : {}),
       ...(body.correctAnswer !== undefined ? { correctAnswer: body.correctAnswer || null } : {}),
-      ...(body.explanation !== undefined ? { explanation: body.explanation || null } : {}),
+      ...(body.explanation !== undefined
+        ? { explanation: stripIngestImagePlaceholders(body.explanation) || null }
+        : {}),
       ...(body.section !== undefined ? { section: body.section || null } : {}),
       ...(body.domainName !== undefined ? { domainName: body.domainName || null } : {}),
       ...(body.topicName !== undefined ? { topicName: body.topicName || null } : {}),
@@ -49,6 +53,22 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
       ...(body.type ? { type: body.type } : {}),
     },
   });
+
+  if (candidate.officialQuestionId) {
+    const officialPatch: { stem?: string; stimulus?: string | null; explanation?: string | null } = {};
+    if (body.stem !== undefined) officialPatch.stem = stripIngestImagePlaceholders(body.stem) || candidate.stem || "";
+    if (body.stimulus !== undefined) officialPatch.stimulus = stripIngestImagePlaceholders(body.stimulus) || null;
+    if (body.explanation !== undefined) {
+      officialPatch.explanation = stripIngestImagePlaceholders(body.explanation) || null;
+    }
+    if (Object.keys(officialPatch).length > 0) {
+      await prisma.question.update({
+        where: { id: candidate.officialQuestionId },
+        data: officialPatch,
+      });
+    }
+    await cleanupOfficialQuestionPlaceholders(candidate.officialQuestionId).catch(() => null);
+  }
 
   await prisma.auditLog.create({
     data: {

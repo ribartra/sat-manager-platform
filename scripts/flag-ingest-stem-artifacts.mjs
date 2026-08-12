@@ -17,7 +17,8 @@ import path from "path";
 
 const DB_PATH = path.resolve("dev.db");
 const MD_IMAGE_RE = /!\[[^\]]*]\([^)]*\)/;
-const MARKUP_RE = /<table\b|<\/?(?:html|body|div|td|tr|th|thead|tbody)\b|\[tbl-\d+\.html\]/i;
+const HTML_MARKUP_RE = /<table\b|<\/?(?:html|body|div|td|tr|th|thead|tbody)\b/i;
+const TBL_ASSET_RE = /\[tbl-\d+\.html\]/i;
 
 const MSG_MARKUP =
   "This question has a table or messy formatting. Clean up the text or attach the image.";
@@ -80,11 +81,14 @@ const hasStemLink = db.prepare(`
 const planned = [];
 for (const c of candidates) {
   const blob = `${c.stem || ""}\n${c.stimulus || ""}\n${c.optionsJson || ""}`;
-  const hasMarkup = MARKUP_RE.test(blob);
+  const hasHtml = HTML_MARKUP_RE.test(blob);
+  const hasTbl = TBL_ASSET_RE.test(blob);
   const hasMd = MD_IMAGE_RE.test(blob);
   const linked = !!hasStemLink.get(c.id);
-  const imageGap = hasMd && !linked;
-  const leftoverMd = hasMd; // leftover markdown image in text always needs attention
+  // tbl / markdown leftovers are fine once a STEM image is attached; real HTML is not.
+  const hasMarkup = hasHtml || (hasTbl && !linked);
+  const imageGap = (hasMd || hasTbl) && !linked;
+  const leftoverMd = hasMd && !linked;
   if (!hasMarkup && !leftoverMd && !imageGap) continue;
 
   const reasons = [];

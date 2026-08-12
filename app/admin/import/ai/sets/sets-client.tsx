@@ -89,7 +89,15 @@ function statusPill(level: QuestionStatusRow["level"]) {
   return <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">Complete</span>;
 }
 
-function QuestionTable({ questions }: { questions: QuestionStatusRow[] }) {
+function QuestionTable({
+  questions,
+  batchId,
+  reviewFileId,
+}: {
+  questions: QuestionStatusRow[];
+  batchId: string;
+  reviewFileId: string;
+}) {
   if (questions.length === 0) return <p className="px-4 py-6 text-center text-xs text-gray-400">No questions in this Extracted Test.</p>;
   return (
     <div className="overflow-x-auto">
@@ -111,7 +119,12 @@ function QuestionTable({ questions }: { questions: QuestionStatusRow[] }) {
           {questions.map((q) => (
             <tr key={q.candidateId} className={q.level === "crit" ? "bg-rose-50/50" : q.level === "warn" ? "bg-amber-50/40" : ""}>
               <td className="whitespace-nowrap px-3 py-1.5 font-mono font-semibold text-gray-800">
-                #{q.questionNumber ?? "?"} <span className="font-normal text-gray-400">M{q.moduleLabel ?? "?"}</span>
+                <Link
+                  href={`/admin/import/ai/${batchId}/files/${reviewFileId}?candidate=${q.candidateId}`}
+                  className="text-blue-700 hover:underline"
+                >
+                  #{q.questionNumber ?? "?"} <span className="font-normal text-gray-400">M{q.moduleLabel ?? "?"}</span>
+                </Link>
                 {q.promoted && <span className="ml-1 text-emerald-500" title="Promovida a oficial">●</span>}
               </td>
               <td className="px-2 py-1.5"><span className={`rounded px-1.5 py-0.5 font-mono ${q.type === "NUMERIC" ? "bg-sky-100 text-sky-700" : "bg-gray-100 text-gray-600"}`}>{q.type === "NUMERIC" ? "NUM" : "MC"}</span></td>
@@ -301,7 +314,11 @@ export function SetsIndexClient({ rows, batchId, batches }: SetsIndexClientProps
                   <ScissorsSquare className="h-3.5 w-3.5" /> Review / crop
                 </Link>
               </div>
-              {open && <div className="border-t border-gray-100 bg-gray-50/50"><QuestionTable questions={row.questions} /></div>}
+              {open && (
+                <div className="border-t border-gray-100 bg-gray-50/50">
+                  <QuestionTable questions={row.questions} batchId={row.batchId} reviewFileId={row.primaryFileId} />
+                </div>
+              )}
             </Card>
           );
         })}

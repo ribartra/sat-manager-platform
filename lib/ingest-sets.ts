@@ -10,19 +10,67 @@ export type FieldState = "ok" | "crit" | "warn" | "info" | "na";
 export interface StemArtifacts {
   hasEmbeddedMarkup: boolean;
   hasUnresolvedMarkdownImage: boolean;
+  /** OCR leftover `[tbl-N.html]` table-asset placeholder */
+  hasTableAssetPlaceholder: boolean;
 }
 
 const HTML_TABLE_RE = /<table\b/i;
 const HTML_TAG_RE = /<\/?(?:html|body|div|td|tr|th|thead|tbody)\b/i;
 const TBL_ASSET_RE = /\[tbl-\d+\.html\]/i;
 const MD_IMAGE_RE = /!\[[^\]]*]\([^)]*\)/;
+/** Figure/graph/table cues that usually need a STEM image even without markdown leftovers. */
+const FIGURE_HINT_RE =
+  /!\[[^\]]*]\([^)]*\)|\[tbl-\d+\.html\]|\[[^\]]*(?:graph|figure|chart|histogram|scatter)[^\]]*\]|(?:in the (?:figure|graph|table|chart)|shown in the (?:figure|graph)|see the (?:figure|graph))/i;
 
 /** Detect HTML/table assets and leftover markdown images in OCR/parsed text. */
 export function detectStemArtifacts(text: string | null | undefined): StemArtifacts {
   const value = text ?? "";
+  const hasTableAssetPlaceholder = TBL_ASSET_RE.test(value);
   return {
-    hasEmbeddedMarkup: HTML_TABLE_RE.test(value) || HTML_TAG_RE.test(value) || TBL_ASSET_RE.test(value),
+    // Real HTML in the stem is always messy for students; tbl placeholders are handled separately.
+    hasEmbeddedMarkup: HTML_TABLE_RE.test(value) || HTML_TAG_RE.test(value),
     hasUnresolvedMarkdownImage: MD_IMAGE_RE.test(value),
+    hasTableAssetPlaceholder,
+  };
+}
+
+export function textNeedsAttachedImage(text: string | null | undefined): boolean {
+  return FIGURE_HINT_RE.test(text ?? "");
+}
+
+/** Single builder so Extracted Test rail and file review sidebar stay in sync. */
+export function buildQuestionContent(input: {
+  type: string | null | undefined;
+  correctAnswer: string | null | undefined;
+  stem: string | null | undefined;
+  stimulus: string | null | undefined;
+  explanation: string | null | undefined;
+  section: string | null | undefined;
+  optTextCount: number;
+  optImgCount: number;
+  hasStemImageLink: boolean;
+}): QuestionContent {
+  const combined = `${input.stem ?? ""}\n${input.stimulus ?? ""}`;
+  const artifacts = detectStemArtifacts(combined);
+  const section = input.section?.toUpperCase().includes("MATH")
+    ? "MATH"
+    : input.section
+      ? "RW"
+      : null;
+  return {
+    type: input.type ?? "MC",
+    correctAnswer: input.correctAnswer ?? null,
+    stemLen: (input.stem ?? "").trim().length,
+    stimLen: (input.stimulus ?? "").trim().length,
+    optTextCount: input.optTextCount,
+    optImgCount: input.optImgCount,
+    hasExpl: !!(input.explanation && input.explanation.trim()),
+    section,
+    hasEmbeddedMarkup: artifacts.hasEmbeddedMarkup,
+    hasUnresolvedMarkdownImage: artifacts.hasUnresolvedMarkdownImage,
+    hasTableAssetPlaceholder: artifacts.hasTableAssetPlaceholder,
+    hasStemImageLink: input.hasStemImageLink,
+    needsAttachedImage: textNeedsAttachedImage(combined),
   };
 }
 
@@ -35,12 +83,16 @@ export interface QuestionContent {
   optImgCount: number;
   hasExpl: boolean;
   section: string | null; // "RW" | "MATH" | null
-  /** HTML table / tags / [tbl-N.html] in stem or stimulus */
+  /** HTML table / tags in stem or stimulus */
   hasEmbeddedMarkup?: boolean;
   /** Markdown image still present in stem/stimulus text */
   hasUnresolvedMarkdownImage?: boolean;
+  /** Leftover `[tbl-N.html]` placeholder from table extraction */
+  hasTableAssetPlaceholder?: boolean;
   /** Candidate (or official) already has a STEM image link / imageUrl */
   hasStemImageLink?: boolean;
+  /** Text implies a figure/graph/table that needs an attached image */
+  needsAttachedImage?: boolean;
 }
 
 export interface QuestionClassification {
@@ -74,10 +126,24 @@ export function classifyQuestion(c: QuestionContent): QuestionClassification {
     notes.push("Question has a table or messy formatting");
   }
 
-  // Leftover markdown image in stem/stimulus — only pending if no STEM image is linked yet.
-  if (stem !== "crit" && c.hasUnresolvedMarkdownImage && !c.hasStemImageLink) {
+  // Table-asset placeholder without an attached STEM image (with image, the table is the picture).
+  if (stem !== "crit" && c.hasTableAssetPlaceholder && !c.hasStemImageLink) {
     stem = "warn";
-    notes.push("Question image is not attached");
+    if (!notes.includes("Question has a table or messy formatting")) {
+      notes.push("Question has a table or messy formatting");
+    }
+  }
+
+  // Image required (markdown leftover or figure/graph cue) but not attached yet.
+  if (
+    stem !== "crit" &&
+    !c.hasStemImageLink &&
+    (c.hasUnresolvedMarkdownImage || c.needsAttachedImage || c.hasTableAssetPlaceholder)
+  ) {
+    stem = "warn";
+    if (!notes.includes("Question image is not attached")) {
+      notes.push("Question image is not attached");
+    }
   }
 
   const hasAnswer = !!(c.correctAnswer && c.correctAnswer.trim());

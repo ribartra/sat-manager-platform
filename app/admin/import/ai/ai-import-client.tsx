@@ -14,6 +14,7 @@ import { MathContent } from "@/components/math-content";
 import { PdfPageCropper, type CropTarget, type CropOcrResult } from "@/app/admin/import/ai/_components/pdf-page-cropper";
 import { ExtractedTestRail } from "@/app/admin/import/ai/_components/extracted-test-rail";
 import type { ExtractedTestRow } from "@/lib/ingest-sets";
+import { stripIngestImagePlaceholders } from "@/lib/ingest-text-sanitize";
 
 const MAX_UPLOAD_BYTES = 256 * 1024 * 1024;
 const targetTypes = [
@@ -255,7 +256,7 @@ function imageSrc(image: Pick<ImageArtifactSummary, "fileUrl" | "base64Data" | "
 }
 
 function stripMarkdownImageRefs(value: string | null | undefined) {
-  return (value ?? "").replace(/!\[[^\]]*]\([^)]+\)/g, "").replace(/\n{3,}/g, "\n\n").trim();
+  return stripIngestImagePlaceholders(value);
 }
 
 function targetLabel(value: string) {

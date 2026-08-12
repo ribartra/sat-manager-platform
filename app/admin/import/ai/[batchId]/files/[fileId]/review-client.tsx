@@ -13,12 +13,14 @@ import { MathContent } from "@/components/math-content";
 import { PdfPageCropper, type CropTarget, type CropOcrResult } from "@/app/admin/import/ai/_components/pdf-page-cropper";
 import { MergeDialog } from "./merge-dialog";
 import {
+  buildQuestionContent,
   classifyQuestion,
-  detectStemArtifacts,
   optionsFieldResolved,
   questionSidebarState,
-  type QuestionContent,
+  type QuestionClassification,
+  type QuestionStatusRow,
 } from "@/lib/ingest-sets";
+import { stripIngestImagePlaceholders } from "@/lib/ingest-text-sanitize";
 
 type SourceFile = {
   id: string;
@@ -178,7 +180,7 @@ function imageSrc(image: Pick<ImageArtifact, "fileUrl" | "base64Data" | "mimeTyp
 }
 
 function stripMarkdownImageRefs(value: string | null | undefined) {
-  return (value ?? "").replace(/!\[[^\]]*]\([^)]+\)/g, "").replace(/\n{3,}/g, "\n\n").trim();
+  return stripIngestImagePlaceholders(value);
 }
 
 function targetLabel(value: string) {
@@ -359,11 +361,11 @@ function sectionKind(section: string | null | undefined): string | null {
   return section.toUpperCase().includes("MATH") ? "MATH" : "RW";
 }
 
-/** Build classifier input from a candidate + its image links (same rules as /sets). */
+/** Build classifier input from a candidate + its image links (same builder as /sets). */
 function questionContentFromCandidate(
   candidate: Pick<Candidate, "type" | "correctAnswer" | "stem" | "stimulus" | "explanation" | "optionsJson" | "section">,
   links: { targetType: string; optionLabel: string | null }[],
-): QuestionContent {
+) {
   const textCount = parseOptions(candidate.optionsJson).filter(
     (option: { text?: string }) => typeof option?.text === "string" && option.text.trim(),
   ).length;
@@ -371,21 +373,27 @@ function questionContentFromCandidate(
   const imageLetters = new Set(
     links.filter((link) => link.targetType === "OPTION" && link.optionLabel).map((link) => (link.optionLabel ?? "").toUpperCase()),
   ).size;
-  const combined = `${candidate.stem ?? ""}\n${candidate.stimulus ?? ""}`;
-  const artifacts = detectStemArtifacts(combined);
-  return {
+  return buildQuestionContent({
     type: candidate.type ?? "MC",
     correctAnswer: candidate.correctAnswer,
-    stemLen: (candidate.stem ?? "").trim().length,
-    stimLen: (candidate.stimulus ?? "").trim().length,
+    stem: candidate.stem,
+    stimulus: candidate.stimulus,
+    explanation: candidate.explanation,
+    section: sectionKind(candidate.section),
     optTextCount: textCount,
     optImgCount: hasBlock ? 4 : imageLetters,
-    hasExpl: !!(candidate.explanation && candidate.explanation.trim()),
-    section: sectionKind(candidate.section),
-    hasEmbeddedMarkup: artifacts.hasEmbeddedMarkup,
-    hasUnresolvedMarkdownImage: artifacts.hasUnresolvedMarkdownImage,
     hasStemImageLink: links.some((link) => link.targetType === "STEM"),
-  };
+  });
+}
+
+/** Recover candidate id from incident messages that cite `cand_…`. */
+function candidateIdFromIncidentMessage(message: string): string | null {
+  const match = message.match(/\b(cand_[a-z0-9]+)\b/i);
+  return match ? match[1] : null;
+}
+
+function classificationFromStatus(row: QuestionStatusRow): QuestionClassification {
+  return { level: row.level, fields: row.fields, notes: row.notes };
 }
 
 function PageTextPreview({ page }: { page: PageArtifact }) {
@@ -463,6 +471,8 @@ export function FileReviewClient({
   images,
   imageLinks,
   incidents,
+  questionStatuses = [],
+  initialCandidateId = null,
   assignTargets = [],
   cropImageSource = null,
   candidateScope = null,
@@ -476,6 +486,9 @@ export function FileReviewClient({
   images: ImageArtifact[];
   imageLinks: ImageLink[];
   incidents: Incident[];
+  /** Same rows as Extracted Test rail /sets — single source of truth for sidebar dots. */
+  questionStatuses?: QuestionStatusRow[];
+  initialCandidateId?: string | null;
   assignTargets?: { questionId: string; label: string }[];
   cropImageSource?: { imageSourceFileId: string; pageNumbers: number[] } | null;
   candidateScope?: { kind: "extracted-test"; title: string; hostFiles: string | null } | null;
@@ -483,6 +496,18 @@ export function FileReviewClient({
   const router = useRouter();
   const [galleryAssign, setGalleryAssign] = useState<{ imageId: string; questionId: string } | null>(null);
   const [assigning, setAssigning] = useState(false);
+  const [onlyPending, setOnlyPending] = useState(false);
+
+  const statusById = useMemo(() => {
+    const map = new Map<string, QuestionStatusRow>();
+    for (const row of questionStatuses) map.set(row.candidateId, row);
+    return map;
+  }, [questionStatuses]);
+
+  const pendingStatuses = useMemo(
+    () => questionStatuses.filter((row) => row.level === "crit" || row.level === "warn"),
+    [questionStatuses],
+  );
 
   async function assignGalleryImage(imageArtifactId: string, questionId: string) {
     if (!questionId) return;
@@ -499,7 +524,11 @@ export function FileReviewClient({
     setMessage(`Image assigned to ${assignTargets.find((t) => t.questionId === questionId)?.label ?? "the question"}.`);
     router.refresh();
   }
-  const [selectedId, setSelectedId] = useState(candidates[0]?.id ?? "");
+  const initialId =
+    (initialCandidateId && candidates.some((c) => c.id === initialCandidateId) && initialCandidateId) ||
+    candidates[0]?.id ||
+    "";
+  const [selectedId, setSelectedId] = useState(initialId);
   const selected = candidates.find((candidate) => candidate.id === selectedId) ?? candidates[0] ?? null;
   const [draft, setDraft] = useState<Candidate | null>(selected);
   const [savedSignature, setSavedSignature] = useState<string>(() => candidateSignature(selected));
@@ -558,10 +587,44 @@ export function FileReviewClient({
   }
   const dirty = candidateSignature(draft) !== savedSignature;
   const isMc = (draft?.type ?? "MC") !== "NUMERIC";
-  const draftCls = draft ? classifyQuestion(questionContentFromCandidate(draft, selectedLinks)) : null;
+  // Live draft while editing; otherwise prefer Extracted Test status (official when promoted).
+  const draftCls = draft
+    ? dirty || !statusById.has(draft.id)
+      ? classifyQuestion(questionContentFromCandidate(draft, selectedLinks))
+      : classificationFromStatus(statusById.get(draft.id)!)
+    : null;
   const optsResolved = draftCls ? optionsFieldResolved(draftCls.fields, draft?.type ?? "MC") : false;
   // Links on non-board targets (answer field, explanation, page context…).
   const otherLinks = selectedLinks.filter((link) => !["STEM", "OPTION", "STIMULUS"].includes(link.targetType));
+
+  const sidebarCandidates = useMemo(() => {
+    const ranked = [...candidates].sort((a, b) => {
+      const la = statusById.get(a.id)?.level ?? "ok";
+      const lb = statusById.get(b.id)?.level ?? "ok";
+      const rank = (level: string) => (level === "crit" ? 0 : level === "warn" ? 1 : 2);
+      const d = rank(la) - rank(lb);
+      if (d !== 0) return d;
+      return (
+        (a.moduleLabel ?? "").localeCompare(b.moduleLabel ?? "") ||
+        (a.questionNumber ?? 0) - (b.questionNumber ?? 0)
+      );
+    });
+    if (!onlyPending) return ranked;
+    return ranked.filter((c) => {
+      const level = statusById.get(c.id)?.level;
+      return level === "crit" || level === "warn";
+    });
+  }, [candidates, statusById, onlyPending]);
+
+  const openIncidents = useMemo(() => {
+    return incidents
+      .filter((incident) => incident.status !== "RESOLVED")
+      .map((incident) => {
+        const candidateId = candidateIdFromIncidentMessage(incident.message);
+        const linked = candidateId ? candidates.find((c) => c.id === candidateId) : null;
+        return { incident, candidateId, linked };
+      });
+  }, [incidents, candidates]);
 
   async function persistCandidate(candidateId = selectedId) {
     await fetch(`/api/admin/ai-import/batches/${batchId}/review-session`, {
@@ -591,6 +654,11 @@ export function FileReviewClient({
     setActiveSlot(null);
     setMessage(null);
     void persistCandidate(candidate.id);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.set("candidate", candidate.id);
+      window.history.replaceState(null, "", url.toString());
+    }
   }
 
   async function saveCandidate(status?: string) {
@@ -738,6 +806,11 @@ export function FileReviewClient({
         <Card padding="none" className="overflow-hidden">
           <div className="border-b border-gray-100 px-3 py-2 text-xs font-medium uppercase text-gray-500">
             Questions{candidates.length > 0 ? ` · ${candidates.length}` : ""}
+            {pendingStatuses.length > 0 && (
+              <span className="ml-1 font-normal normal-case text-amber-700">
+                · {pendingStatuses.length} pending
+              </span>
+            )}
           </div>
           {candidateScope && (
             <p className="border-b border-amber-100 bg-amber-50 px-3 py-2 text-[11px] leading-4 text-amber-900">
@@ -745,10 +818,54 @@ export function FileReviewClient({
               {candidateScope.hostFiles ? <strong>{candidateScope.hostFiles}</strong> : "a sibling file"} — shown here so you can attach images and edit.
             </p>
           )}
+          {pendingStatuses.length > 0 && (
+            <div className="border-b border-amber-100 bg-amber-50/60 px-3 py-2">
+              <p className="text-[11px] font-medium text-amber-900">Jump to pending</p>
+              <div className="mt-1.5 flex flex-wrap gap-1">
+                {pendingStatuses.slice(0, 24).map((row) => {
+                  const cand = candidates.find((c) => c.id === row.candidateId);
+                  if (!cand) return null;
+                  return (
+                    <button
+                      key={row.candidateId}
+                      type="button"
+                      onClick={() => selectCandidate(cand)}
+                      className={`rounded border px-1.5 py-0.5 text-[11px] font-medium ${
+                        row.level === "crit"
+                          ? "border-rose-200 bg-rose-50 text-rose-800"
+                          : "border-amber-200 bg-white text-amber-900"
+                      } ${selectedId === row.candidateId ? "ring-1 ring-blue-400" : ""}`}
+                      title={row.notes.join(" · ") || undefined}
+                    >
+                      {qLabel(row.moduleLabel, row.questionNumber)}
+                    </button>
+                  );
+                })}
+                {pendingStatuses.length > 24 && (
+                  <span className="text-[11px] text-amber-700">+{pendingStatuses.length - 24} more</span>
+                )}
+              </div>
+            </div>
+          )}
+          <div className="border-b border-gray-100 px-3 py-2">
+            <label className="flex items-center gap-2 text-[11px] text-gray-600">
+              <input
+                type="checkbox"
+                checked={onlyPending}
+                onChange={(event) => setOnlyPending(event.target.checked)}
+                className="h-3.5 w-3.5 rounded border-gray-300"
+              />
+              Only pending
+            </label>
+          </div>
           <div className="max-h-[620px] overflow-auto">
-            {candidates.map((candidate) => {
+            {sidebarCandidates.map((candidate) => {
+              const status = statusById.get(candidate.id);
               const cLinks = linksByCandidate.get(candidate.id) ?? [];
-              const cls = classifyQuestion(questionContentFromCandidate(candidate, cLinks));
+              const cls =
+                status && !(candidate.id === selectedId && dirty)
+                  ? classificationFromStatus(status)
+                  : classifyQuestion(questionContentFromCandidate(candidate, cLinks));
               const state = questionSidebarState(cls, { rejected: candidate.status === "REJECTED" });
               return (
                 <button
@@ -769,10 +886,12 @@ export function FileReviewClient({
                 </button>
               );
             })}
-            {candidates.length === 0 && (
+            {sidebarCandidates.length === 0 && (
               <p className="px-3 py-6 text-sm text-gray-400">
-                No questions in this Extracted Test yet.
-                {assignTargets.length > 0
+                {onlyPending
+                  ? "No pending questions in this Extracted Test."
+                  : "No questions in this Extracted Test yet."}
+                {!onlyPending && assignTargets.length > 0
                   ? " You can still assign images from the gallery to official questions below."
                   : ""}
               </p>
@@ -828,14 +947,28 @@ export function FileReviewClient({
               </p>
             </div>
 
-            {incidents.length > 0 && (
-              <Section title="Open checks" subtitle={String(incidents.length)} defaultOpen={false}>
+            {openIncidents.length > 0 && (
+              <Section title="Open checks" subtitle={String(openIncidents.length)} defaultOpen={openIncidents.length > 0 && pendingStatuses.length === 0}>
+                <p className="mb-3 text-[11px] text-gray-500">
+                  Checks tied to a question open that question. Set-level checks are not a specific Q — they do not turn sidebar dots amber/red.
+                </p>
                 <div className="grid gap-2">
-                  {incidents.slice(0, 8).map((incident) => (
+                  {openIncidents.slice(0, 12).map(({ incident, linked }) => (
                     <div key={incident.id} className="rounded-md border border-gray-200 bg-gray-50 px-3 py-2">
                       <div className="flex flex-wrap items-center gap-2">
                         <Badge variant={badgeVariant(incident.severity)}>{incident.severity}</Badge>
                         <Badge variant={badgeVariant(incident.status)}>{incidentResolution(incident)}</Badge>
+                        {linked ? (
+                          <button
+                            type="button"
+                            onClick={() => selectCandidate(linked)}
+                            className="rounded border border-blue-200 bg-blue-50 px-1.5 py-0.5 text-[11px] font-medium text-blue-800 hover:bg-blue-100"
+                          >
+                            {qLabel(linked.moduleLabel, linked.questionNumber)}
+                          </button>
+                        ) : (
+                          <span className="rounded bg-gray-200 px-1.5 py-0.5 text-[11px] text-gray-600">Set-level</span>
+                        )}
                         <CopyableTruncatedText value={incident.code} className="max-w-64 text-xs font-medium text-gray-800" />
                         <span className="text-xs text-gray-400">{incident.status}</span>
                       </div>

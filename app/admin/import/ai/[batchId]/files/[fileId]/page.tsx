@@ -13,6 +13,7 @@ export const dynamic = "force-dynamic";
 
 interface PageProps {
   params: Promise<{ batchId: string; fileId: string }>;
+  searchParams: Promise<{ candidate?: string }>;
 }
 
 function formatDuration(seconds: number) {
@@ -24,12 +25,13 @@ function formatDuration(seconds: number) {
   return rest ? `${hours}h ${rest}m` : `${hours}h`;
 }
 
-export default async function AiImportFileReviewPage({ params }: PageProps) {
+export default async function AiImportFileReviewPage({ params, searchParams }: PageProps) {
   const session = await auth();
   if (!session) redirect("/login");
   if (!["TEACHER", "ADMIN"].includes(session.user.role)) redirect("/student");
 
   const { batchId, fileId } = await params;
+  const { candidate: candidateParam } = await searchParams;
   const [batch, file, reviewSession, latestEvent] = await Promise.all([
     prisma.ingestBatch.findUnique({ where: { id: batchId } }),
     prisma.ingestSourceFile.findFirst({ where: { id: fileId, batchId } }),
@@ -211,6 +213,32 @@ export default async function AiImportFileReviewPage({ params }: PageProps) {
               </Link>
             ))}
           </div>
+          {(extractedTest.needsReview > 0 || extractedTest.attention > 0) && (
+            <div className="mt-3 rounded-md border border-amber-200 bg-amber-50/70 px-3 py-2">
+              <p className="text-[11px] font-medium text-amber-900">
+                Pending questions (same status as the sidebar · {extractedTest.needsReview + extractedTest.attention})
+              </p>
+              <div className="mt-1.5 flex flex-wrap gap-1">
+                {extractedTest.questions
+                  .filter((q) => q.level === "crit" || q.level === "warn")
+                  .slice(0, 40)
+                  .map((q) => (
+                    <Link
+                      key={q.candidateId}
+                      href={`/admin/import/ai/${batchId}/files/${file.id}?candidate=${q.candidateId}`}
+                      className={`rounded border px-1.5 py-0.5 text-[11px] font-medium ${
+                        q.level === "crit"
+                          ? "border-rose-200 bg-rose-50 text-rose-800"
+                          : "border-amber-200 bg-white text-amber-900"
+                      }`}
+                      title={q.notes.join(" · ") || undefined}
+                    >
+                      {q.moduleLabel ? `M${q.moduleLabel} · Q${q.questionNumber ?? "?"}` : `Q${q.questionNumber ?? "?"}`}
+                    </Link>
+                  ))}
+              </div>
+            </div>
+          )}
           <Link href={`/admin/import/ai/sets?batch=${batchId}`} className="mt-3 inline-block text-xs text-blue-600 hover:underline">
             View all Extracted Tests and per-question detail →
           </Link>
@@ -300,6 +328,8 @@ export default async function AiImportFileReviewPage({ params }: PageProps) {
           optionLabel: link.optionLabel,
           sortOrder: link.sortOrder,
         }))}
+        questionStatuses={extractedTest?.questions ?? []}
+        initialCandidateId={candidateParam ?? null}
         incidents={incidents.map((incident) => ({
           id: incident.id,
           severity: incident.severity,

@@ -8,6 +8,8 @@ import {
   fullTestSectionFromCandidate,
   fullTestTopicIdFor,
 } from "@/lib/full-test-modules";
+import { stripIngestImagePlaceholders } from "@/lib/ingest-text-sanitize";
+import { cleanupOfficialQuestionPlaceholders } from "@/lib/ingest-image-cleanup";
 
 type TopicWithRelations = {
   id: string;
@@ -50,10 +52,9 @@ const DIFFICULTY_MAP: Record<string, string> = {
 };
 
 const PRIVATE_ASSET_PATTERN = /^\/api\/admin\/ai-import\/assets\/(batch_[a-f0-9]+)\/(img_[a-f0-9]+-[a-f0-9]+\.(?:jpg|jpeg|png|webp))$/i;
-const MARKDOWN_IMAGE_PATTERN = /!\[[^\]]*]\([^)]+\)/g;
 
 function stripMarkdownImageRefs(value: string | null | undefined) {
-  return (value ?? "").replace(MARKDOWN_IMAGE_PATTERN, "").replace(/\n{3,}/g, "\n\n").trim();
+  return stripIngestImagePlaceholders(value);
 }
 
 // Leading boilerplate from the answer-explanation docx (title page + module
@@ -195,6 +196,7 @@ export async function propagateAssignedImageToOfficial(args: {
 
   if (target === "STEM" || target === "STIMULUS") {
     await prisma.question.update({ where: { id: questionId }, data: { imageUrl: publicUrl } });
+    await cleanupOfficialQuestionPlaceholders(questionId).catch(() => null);
     return { propagated: true, target, imageUrl: publicUrl };
   }
 

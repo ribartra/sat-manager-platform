@@ -1,12 +1,11 @@
 import "server-only";
 import prisma from "@/lib/prisma";
 import {
+  buildQuestionContent,
   classifyQuestion,
-  detectStemArtifacts,
   type ExtractedTestFile,
   type ExtractedTestFileRole,
   type ExtractedTestRow,
-  type QuestionContent,
   type QuestionStatusRow,
 } from "@/lib/ingest-sets";
 
@@ -230,42 +229,34 @@ export async function computeExtractedTests(batchId: string): Promise<ExtractedT
       const official = isPromoted ? officialById.get(c.officialQuestionId as string) : undefined;
       if (isPromoted) promoted += 1;
 
-      let content: QuestionContent;
-      if (official) {
-        const oc = officialOptCounts.get(official.id) ?? { text: 0, img: 0 };
-        const combined = `${official.stem ?? ""}\n${official.stimulus ?? ""}`;
-        const artifacts = detectStemArtifacts(combined);
-        content = {
-          type: official.type,
-          correctAnswer: official.correctAnswer,
-          stemLen: (official.stem ?? "").trim().length,
-          stimLen: (official.stimulus ?? "").trim().length,
-          optTextCount: oc.text,
-          optImgCount: oc.img,
-          hasExpl: !!(official.explanation && official.explanation.trim()),
-          section: section ?? sectionKind(c.section),
-          hasEmbeddedMarkup: artifacts.hasEmbeddedMarkup,
-          hasUnresolvedMarkdownImage: artifacts.hasUnresolvedMarkdownImage,
-          hasStemImageLink: !!(official.imageUrl && official.imageUrl.trim()) || stemImageLinks.has(c.id),
-        };
-      } else {
-        const optImg = optionBlock.has(c.id) ? 4 : (optionLetters.get(c.id)?.size ?? 0);
-        const combined = `${c.stem ?? ""}\n${c.stimulus ?? ""}`;
-        const artifacts = detectStemArtifacts(combined);
-        content = {
-          type: c.type,
-          correctAnswer: c.correctAnswer,
-          stemLen: (c.stem ?? "").trim().length,
-          stimLen: (c.stimulus ?? "").trim().length,
-          optTextCount: textOptionCount(c.optionsJson),
-          optImgCount: optImg,
-          hasExpl: !!(c.explanation && c.explanation.trim()),
-          section: section ?? sectionKind(c.section),
-          hasEmbeddedMarkup: artifacts.hasEmbeddedMarkup,
-          hasUnresolvedMarkdownImage: artifacts.hasUnresolvedMarkdownImage,
-          hasStemImageLink: stemImageLinks.has(c.id),
-        };
-      }
+      // Prefer official content when promoted so rail /sets / file review share one truth.
+      const content = official
+        ? (() => {
+            const oc = officialOptCounts.get(official.id) ?? { text: 0, img: 0 };
+            return buildQuestionContent({
+              type: official.type,
+              correctAnswer: official.correctAnswer,
+              stem: official.stem,
+              stimulus: official.stimulus,
+              explanation: official.explanation,
+              section: section ?? sectionKind(c.section),
+              optTextCount: oc.text,
+              optImgCount: oc.img,
+              hasStemImageLink:
+                !!(official.imageUrl && official.imageUrl.trim()) || stemImageLinks.has(c.id),
+            });
+          })()
+        : buildQuestionContent({
+            type: c.type,
+            correctAnswer: c.correctAnswer,
+            stem: c.stem,
+            stimulus: c.stimulus,
+            explanation: c.explanation,
+            section: section ?? sectionKind(c.section),
+            optTextCount: textOptionCount(c.optionsJson),
+            optImgCount: optionBlock.has(c.id) ? 4 : (optionLetters.get(c.id)?.size ?? 0),
+            hasStemImageLink: stemImageLinks.has(c.id),
+          });
 
       const cls = classifyQuestion(content);
       if (cls.level === "crit") needsReview += 1;

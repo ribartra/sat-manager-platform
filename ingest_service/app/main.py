@@ -2747,6 +2747,8 @@ def make_candidate_from_text(
     modules = detect_full_test_modules(module_context) if meta["contentType"] == "FULL_PRACTICE_TEST" else []
     module_label = module_label_override or (modules[-1] if modules else None)
     stem = strip_question_id(stem_text)[:2500] if not is_answer_file else None
+    stem = repair_ingest_ocr_artifacts(stem)
+    practice_stimulus = repair_ingest_ocr_artifacts(practice_stimulus)
     confidence = 0.55
     warnings: list[str] = []
     if not stem:
@@ -3149,8 +3151,31 @@ def insert_image_artifacts(
 
 
 MARKDOWN_IMAGE_PATTERN = re.compile(r"!\[[^\]]*]\(([^)]+)\)")
+TBL_ASSET_PATTERN = re.compile(r"\[tbl-\d+\.html\](?:\([^)]*\))?", re.IGNORECASE)
+BLANK_TBL_BLEED_PATTERN = re.compile(
+    r"(_____)(\s*\[tbl-\d+\.html\](?:\([^)]*\))?[\s\S]*)$",
+    re.IGNORECASE,
+)
+ORPHAN_TRAILING_TBL_PATTERN = re.compile(
+    r"([.?!])\s*\[tbl-\d+\.html\](?:\([^)]*\))?\s*$",
+    re.IGNORECASE,
+)
+FIGURE_BRACKET_PLACEHOLDER_PATTERN = re.compile(
+    r"\[[^\]]*(?:graph|figure|chart|histogram|scatter(?:\s*plot)?|table)[^\]]*\]",
+    re.IGNORECASE,
+)
+# Real HTML in student-facing text. Table-asset placeholders are handled separately
+# and cleared once a STEM image is linked.
+HTML_MARKUP_PATTERN = re.compile(
+    r"<table\b|</?(?:html|body|div|td|tr|th|thead|tbody)\b",
+    re.IGNORECASE,
+)
 EMBEDDED_MARKUP_PATTERN = re.compile(
     r"<table\b|</?(?:html|body|div|td|tr|th|thead|tbody)\b|\[tbl-\d+\.html\]",
+    re.IGNORECASE,
+)
+OBSOLETE_IMAGE_WARNING_RE = re.compile(
+    r"missing an attached image|Unresolved image|Stem/stimulus image|image that still needs|image refs|table or messy formatting|Clean up the text or attach the image",
     re.IGNORECASE,
 )
 
@@ -3159,18 +3184,61 @@ def detect_embedded_markup(value: str | None) -> bool:
     return bool(value and EMBEDDED_MARKUP_PATTERN.search(value))
 
 
+def detect_html_markup(value: str | None) -> bool:
+    return bool(value and HTML_MARKUP_PATTERN.search(value))
+
+
+def detect_table_asset_placeholder(value: str | None) -> bool:
+    return bool(value and TBL_ASSET_PATTERN.search(value))
+
+
 def markdown_image_refs(value: str | None) -> list[str]:
     if not value:
         return []
     return [Path(match.group(1)).name.lower() for match in MARKDOWN_IMAGE_PATTERN.finditer(value)]
 
 
-def strip_markdown_image_refs(value: str | None) -> str | None:
+def repair_blank_table_bleed(value: str | None) -> str | None:
+    """Drop false [tbl-N.html] injected after a _____ blank (and any following bleed)."""
     if value is None:
         return None
-    cleaned = MARKDOWN_IMAGE_PATTERN.sub("", value)
+    cleaned = BLANK_TBL_BLEED_PATTERN.sub(r"\1", value)
     cleaned = re.sub(r"\n{3,}", "\n\n", cleaned).strip()
     return cleaned or None
+
+
+def repair_orphan_trailing_table_placeholder(value: str | None) -> str | None:
+    """Drop a lone trailing [tbl-N.html] after sentence-ending punctuation."""
+    if value is None:
+        return None
+    cleaned = ORPHAN_TRAILING_TBL_PATTERN.sub(r"\1", value)
+    cleaned = re.sub(r"\n{3,}", "\n\n", cleaned).strip()
+    return cleaned or None
+
+
+def repair_ingest_ocr_artifacts(value: str | None) -> str | None:
+    return repair_orphan_trailing_table_placeholder(repair_blank_table_bleed(value))
+
+
+def strip_markdown_image_refs(value: str | None) -> str | None:
+    """Strip ![…](…), [tbl-N.html], and figure-bracket leftovers from stem/stimulus/explanation."""
+    if value is None:
+        return None
+    cleaned = repair_ingest_ocr_artifacts(value) or ""
+    cleaned = MARKDOWN_IMAGE_PATTERN.sub("", cleaned)
+    cleaned = TBL_ASSET_PATTERN.sub("", cleaned)
+    cleaned = FIGURE_BRACKET_PLACEHOLDER_PATTERN.sub("", cleaned)
+    cleaned = re.sub(r"[ \t]+\n", "\n", cleaned)
+    cleaned = re.sub(r"\n{3,}", "\n\n", cleaned).strip()
+    return cleaned or None
+
+
+def clear_obsolete_image_warnings(warnings: list[Any]) -> list[str]:
+    return [
+        warning
+        for warning in warnings
+        if isinstance(warning, str) and not OBSOLETE_IMAGE_WARNING_RE.search(warning)
+    ]
 
 
 def link_markdown_images_for_page(db: sqlite3.Connection, batch_id: str, page_artifact_id: str) -> int:
@@ -3281,35 +3349,93 @@ def link_markdown_images_for_page(db: sqlite3.Connection, batch_id: str, page_ar
         cleaned_stem = strip_markdown_image_refs(candidate["stem"])
         cleaned_stimulus = strip_markdown_image_refs(candidate["stimulus"])
         cleaned_explanation = strip_markdown_image_refs(candidate["explanation"])
+
+        linked_row = db.execute(
+            """
+            SELECT 1 FROM IngestCandidateImageLink
+            WHERE candidateId = ? AND targetType IN ('STEM', 'OPTION', 'OPTION_BLOCK', 'STIMULUS', 'ANSWER_FIELD')
+            LIMIT 1
+            """,
+            (candidate["id"],),
+        ).fetchone()
+        stem_linked = db.execute(
+            """
+            SELECT 1 FROM IngestCandidateImageLink
+            WHERE candidateId = ? AND targetType = 'STEM'
+            LIMIT 1
+            """,
+            (candidate["id"],),
+        ).fetchone()
+
+        # Once a STEM image is linked, drop obsolete image/table-placeholder warnings.
+        warnings_changed = False
+        next_warnings_json = None
+        if stem_linked:
+            try:
+                warnings = json.loads(
+                    db.execute(
+                        "SELECT warningsJson FROM IngestQuestionCandidate WHERE id = ?",
+                        (candidate["id"],),
+                    ).fetchone()["warningsJson"]
+                    or "[]"
+                )
+                if not isinstance(warnings, list):
+                    warnings = []
+            except Exception:
+                warnings = []
+            cleared = clear_obsolete_image_warnings(warnings)
+            leftover_html = detect_html_markup(
+                "\n".join(
+                    part
+                    for part in [cleaned_stem or "", cleaned_stimulus or "", cleaned_options_json or ""]
+                    if part
+                )
+            )
+            if leftover_html:
+                note = "This question has a table or messy formatting. Clean up the text or attach the image."
+                if note not in cleared:
+                    cleared.append(note)
+            if cleared != warnings:
+                warnings_changed = True
+                next_warnings_json = json.dumps(cleared)
+
         if (
             cleaned_stem != candidate["stem"]
             or cleaned_stimulus != candidate["stimulus"]
             or cleaned_explanation != candidate["explanation"]
             or cleaned_options_json != candidate["optionsJson"]
+            or warnings_changed
         ):
             db.execute(
                 """
                 UPDATE IngestQuestionCandidate
-                SET stem = ?, stimulus = ?, explanation = ?, optionsJson = ?, updatedAt = ?
+                SET stem = ?, stimulus = ?, explanation = ?, optionsJson = ?, warningsJson = COALESCE(?, warningsJson), updatedAt = ?
                 WHERE id = ?
                 """,
-                (cleaned_stem, cleaned_stimulus, cleaned_explanation, cleaned_options_json, now_iso(), candidate["id"]),
+                (
+                    cleaned_stem,
+                    cleaned_stimulus,
+                    cleaned_explanation,
+                    cleaned_options_json,
+                    next_warnings_json,
+                    now_iso(),
+                    candidate["id"],
+                ),
             )
 
-        # Image refs in the original stem that never got a STEM / OPTION(_BLOCK) link.
-        had_image_refs = bool(stem_refs) or bool(markdown_image_refs(candidate["stimulus"]))
+        # Image / table placeholders that never got a STEM / OPTION(_BLOCK) link.
+        had_image_refs = (
+            bool(stem_refs)
+            or bool(markdown_image_refs(candidate["stimulus"]))
+            or detect_table_asset_placeholder(candidate["stem"] or "")
+            or detect_table_asset_placeholder(candidate["stimulus"] or "")
+        )
         if had_image_refs:
-            linked_row = db.execute(
-                """
-                SELECT 1 FROM IngestCandidateImageLink
-                WHERE candidateId = ? AND targetType IN ('STEM', 'OPTION', 'OPTION_BLOCK', 'STIMULUS', 'ANSWER_FIELD')
-                LIMIT 1
-                """,
-                (candidate["id"],),
-            ).fetchone()
             leftover_md = bool(
                 MARKDOWN_IMAGE_PATTERN.search(cleaned_stem or "")
                 or MARKDOWN_IMAGE_PATTERN.search(cleaned_stimulus or "")
+                or TBL_ASSET_PATTERN.search(cleaned_stem or "")
+                or TBL_ASSET_PATTERN.search(cleaned_stimulus or "")
             )
             if not linked_row or leftover_md:
                 warnings = []
