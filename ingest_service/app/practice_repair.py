@@ -201,7 +201,7 @@ def parse_practice_block(text: str) -> dict[str, Any] | None:
 def assign_sequential_numbers(conn: sqlite3.Connection, batch_id: str | None = None) -> int:
     """Numera 1..N (por archivo, en orden de documento) los candidatos de práctica.
 
-    «Cada conjunto (Question/ANS/explanation) reúne preguntas desde el 1». Solo
+    «Cada Extracted Test (Question/ANS/explanation) reúne preguntas desde el 1». Solo
     afecta candidatos con ``questionExternalId`` (los de práctica); los mock exams
     conservan su número real. Devuelve cuántas filas cambiaron.
     """

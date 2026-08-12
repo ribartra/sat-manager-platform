@@ -318,6 +318,3 @@ export async function computeExtractedTests(batchId: string): Promise<ExtractedT
     return a.title.localeCompare(b.title);
   });
 }
-
-/** @deprecated Use computeExtractedTests */
-export const computeConjuntos = computeExtractedTests;

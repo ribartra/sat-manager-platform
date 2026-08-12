@@ -1,4 +1,4 @@
-// Genera docs/broken-questions.md: por cada conjunto (PracticeSet y FullPracticeTest)
+// Genera docs/broken-questions.md: por cada Practice Set y Full Practice Test
 // lista las preguntas con problemas y qué les falta para ser contestables/publicables.
 // Solo lectura de dev.db.
 import Database from 'better-sqlite3';
@@ -43,7 +43,7 @@ function analyze(id) {
 }
 
 const out = [];
-out.push('# Preguntas con problemas por conjunto');
+out.push('# Preguntas con problemas por set / Full Practice Test');
 out.push('');
 out.push(`> Generado ${new Date().toISOString().slice(0, 10)} desde \`dev.db\`. "Problema" = la pregunta no es contestable por un alumno o no cumple la validación de publicación. **Solo se listan pendientes**: módulos, tests y practice sets sin problemas se omiten. La leyenda de faltantes está al pie.`);
 out.push('');

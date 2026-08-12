@@ -12,9 +12,9 @@
 > **Actualizado 2026-08-12:** Full Practice Tests 1–10 ensamblados; Practice Sets
 > también promovidos en campañas posteriores. Ver `procesamientos-ingest.md`.
 
-## Modelo de "conjunto" (archivo de pregunta + archivo ANS/explanation)
+## Modelo de Extracted Test (archivo de pregunta + archivo ANS/explanation)
 
-El "conjunto" no es una entidad explícita: se **infiere por carpeta + nombre de archivo**
+Un **Extracted Test** no es una entidad explícita en BD: se **infiere por carpeta + nombre de archivo**
 (`ingest_service/app/main.py::infer_metadata`). Verificado a nivel de archivo:
 
 | Tipo | Archivo de preguntas | Archivo de respuestas | Pareo |
@@ -28,11 +28,11 @@ El "conjunto" no es una entidad explícita: se **infiere por carpeta + nombre de
 - **Unidad de promoción**:
   - Practice Set → **1 `sourceFileId`** (el archivo de preguntas), ordenado por `questionNumber`.
   - Full Test → **1 `testNumber`** (4 módulos: RW1, RW2, Math1, Math2).
-- **Cómo importar un conjunto**: subir ambos archivos al mismo batch/carpeta
+- **Cómo importar un Extracted Test**: subir ambos archivos al mismo batch/carpeta
   (`/batches/upload-sources` o `/batches/upload-zip`). La misma carpeta hace que Q y ANS
   compartan Section/Domain/Skill/Difficulty; el enriquecimiento los enlaza.
 - **Punto débil**: todo depende del layout de rutas (`PRACTICE EXERCISES/…`,
-  `MOCK EXAMS/TEST N/…`) y de que el ANS comparta Question ID (práctica). Un conjunto fuera de
+  `MOCK EXAMS/TEST N/…`) y de que el ANS comparta Question ID (práctica). Un Extracted Test fuera de
   ese layout, o un ANS sin Question ID, cae a heurística de *fallback* y hay que revisar la
   taxonomía/pareo a mano.
 
@@ -71,7 +71,7 @@ Promocionables con `allowPartial`, pero conviene revisar TEST 1 y los sobre-cont
 
 ## Smoke-test de promoción (ejecutado y revertido)
 
-Prueba end-to-end **real** vía HTTP (sesión ADMIN) sobre un conjunto limpio:
+Prueba end-to-end **real** vía HTTP (sesión ADMIN) sobre un Extracted Test limpio:
 `PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/ONE VARIABLE DATA/One Var. Data HARD.pdf`
 (4 preguntas: 3 NUMERIC + 1 MC).
 
@@ -133,7 +133,7 @@ cp -f /tmp/dev.db.bak dev.db && rm -f dev.db-wal dev.db-shm
 
 ## Cobertura y completitud del staging (2549 candidatos, 1 batch)
 
-**Practice Sets — 91 conjuntos, 30 skills, agrupación limpia** (0 archivos con topic o
+**Practice Sets — 91 Extracted Tests, 30 skills, agrupación limpia** (0 archivos con topic o
 dificultad mezclados):
 
 - **29/30 skills tienen Easy + Medium + Hard completos.**

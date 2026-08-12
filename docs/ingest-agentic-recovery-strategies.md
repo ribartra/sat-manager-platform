@@ -60,12 +60,12 @@ Estas gobiernan cada escritura; no son negociables.
 
 ## Patrón 0 — Diagnóstico empírico antes de "arreglar"
 
-Ante un síntoma de UI ("veo conjuntos verdes que también dicen revisar"), primero se **comprueba con
+Ante un síntoma de UI ("veo Extracted Tests verdes que también dicen needs review"), primero se **comprueba con
 datos** si es bug de query o contenido real, en vez de asumir. Concretamente: contar cuántas filas están
 "verde pero marcadas" (fue 0 → no había bug de query) y correr `npm run reconcile:promoted` (dio 0 → no
 había ediciones sin propagar). Conclusión: las banderas eran **huecos de contenido reales**, y la causa
 perceptual era una barra casi-verde que ocultaba un segmento rojo diminuto. Arreglo real: ancho mínimo por
-segmento + franja de peor-estado en la barra de completitud (`sets-client.tsx`, `conjunto-rail.tsx`).
+segmento + franja de peor-estado en la barra de completitud (`sets-client.tsx`, `extracted-test-rail.tsx`).
 
 **Regla:** cuantificar el síntoma primero; el arreglo se decide por lo que muestran los datos, no por la
 primera hipótesis.
@@ -192,7 +192,7 @@ Para cada test / sección, en orden de mayor a menor automatizabilidad:
 7. **Verificación**: recuento final por sección (MC con 4 opc, NUMERIC, sin-explicación=0, con-imagen) +
    `integrity_check ok`; actualizar la nota de memoria de progreso del test.
 
-Cada escritura es WAL-safe y auditada. El contenido oficial es lo que ven el `/sets` (vista de conjuntos)
+Cada escritura es WAL-safe y auditada. El contenido oficial es lo que ven el `/sets` (vista de Extracted Tests)
 y los alumnos, así que escribir directo al oficial promovido es suficiente; el candidato se sincroniza para
 trazabilidad.
 

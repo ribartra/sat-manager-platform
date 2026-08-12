@@ -1,4 +1,4 @@
-# Preguntas con problemas por conjunto
+# Preguntas con problemas por set / Full Practice Test
 
 > Generado 2026-08-10 desde `dev.db`. "Problema" = la pregunta no es contestable por un alumno o no cumple la validación de publicación. **Solo se listan pendientes**: módulos, tests y practice sets sin problemas se omiten. La leyenda de faltantes está al pie.
 

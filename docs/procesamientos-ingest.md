@@ -24,7 +24,7 @@ Todos los `Imported Test 1…10` están en **DRAFT** con la misma forma canónic
 
 **Metadata estandarizada (2026-08-12):** skill Topic `M1`/`M2` · difficulty M1=`EASY` /
 M2=`HARD` en las 980 preguntas de Imported Test 1–10 (backfill
-`scripts/backfill-fulltest-module-skills.ts`). Staging sigue en **2 conjuntos**
+`scripts/backfill-fulltest-module-skills.ts`). Staging sigue en **2 Extracted Tests**
 (R&W+Math); Promote ensambla **4 grupos** SAT. Flujo completo:
 [`fpt-ingest-to-standardized.md`](fpt-ingest-to-standardized.md). Ver también
 [`sat-digital-estructura-vs-plataforma.md`](sat-digital-estructura-vs-plataforma.md).
@@ -33,17 +33,17 @@ M2=`HARD` en las 980 preguntas de Imported Test 1–10 (backfill
 break configurable (`breakMinutes`, default 10), auto-advance al acabar el tiempo del
 módulo, timer rojo ≤60s.
 
-Conjuntos de staging (candidatos `FULL_PRACTICE_TEST`, no rechazados):
+Extracted Tests de staging (candidatos `FULL_PRACTICE_TEST`, no rechazados):
 
 | Sección | Por test | Promovidos |
 |---------|---------:|-----------:|
 | R&W | 54 (27+27) | 54/54 |
 | Math | 44 (22+22) | 44/44 |
 
-> **Nota UI.** En la vista de conjuntos, `revisar` = solo críticos (`classifyQuestion`
-> level `crit`: sin enunciado / sin respuesta / MC sin opciones). La lista de preguntas
-> también marca `warn` (p. ej. opciones parciales 3/4, sin estímulo). Por eso un conjunto
-> puede mostrar **2 revisiones** y la lista **3 alertas**.
+> **Nota UI.** En la vista de Extracted Tests, `needs review` = solo críticos (`classifyQuestion`
+> level `crit`: missing stem / missing answer / MC missing options). La lista de preguntas
+> también marca `warn` (p. ej. opciones parciales 3/4, missing stimulus). Por eso un Extracted Test
+> puede mostrar **2 reviews** y la lista **3 alertas**.
 
 ### Archivos de trabajo (no versionar)
 
@@ -89,11 +89,11 @@ Contratos de agentes (scratchpad, no docs):
 Orden aproximado cronológico / por dependencia. Cada fila = un procesamiento **ya
 aplicado** (salvo columna Pendiente).
 
-### 2.1 Infra de conjuntos y completitud (producto)
+### 2.1 Infra de Extracted Tests y completitud (producto)
 
 | ID | Qué | Resultado | Commits / artefactos |
 |----|-----|-----------|----------------------|
-| C-SETS | Conjuntos como grupos lógicos de archivos + rail en review | UI de completitud por conjunto (`revisar`/`atención`/`complete`) | `d982c53`, `ce9914c`, `0309f05`, `06d968b` |
+| C-SETS | Extracted Tests como grupos lógicos de archivos + rail en review | UI de completitud por Extracted Test (`needs review`/`attention`/`complete`) | `d982c53`, `ce9914c`, `0309f05`, `06d968b` |
 | C-CLASS | `classifyQuestion` única fuente de verdad | Rail, lista y artefacto de review alineados | `lib/ingest-sets.ts` |
 
 ### 2.2 R&W — estímulo y opciones (T1–10, fase temprana)
@@ -177,7 +177,7 @@ Contenido recuperado T10 `2B:1` / `2B:2` (desde PNG del PDF, no OCR de texto):
 | `2B:1` | B | A energizing · B inefficacious · C varied · D synthetic |
 | `2B:2` | A | A incensed · B dispassionate · C delirious · D bemused |
 
-Asociación a archivos del conjunto:
+Asociación a archivos del Extracted Test:
 
 - `sourceFileId` = PDF `INNOVATORS TEST 10 RW 1, 2B.pdf`
 - `pageArtifactId` = página 19
@@ -196,7 +196,7 @@ Estos quedan en el runtime; no son one-shots.
 | `sanitizeExplanation` | Limpia headers de dump de explicaciones | idem |
 | `buildQuestionDraft` | Draft oficial desde candidato + image links | idem |
 | `propagateAssignedImageToOfficial` | Copia imagen asignada (STEM/STIMULUS/OPTION…) al oficial | idem |
-| `computeConjuntos` | Agrupa archivos → filas de completitud | `lib/ingest-sets.server.ts` |
+| `computeExtractedTests` | Agrupa archivos → filas de completitud | `lib/ingest-sets.server.ts` |
 | `classifyQuestion` | crit/warn/ok por campos | `lib/ingest-sets.ts` |
 | Crop + OCR de región | Recorte unificado PDF/DOCX | rutas `crop-region`, docs crop-assign |
 | Parser canónico A–D (crop OCR) | Opciones desde texto OCR de crop | commits `67d24a7`+ |
@@ -263,7 +263,7 @@ No bloquean la **composición** 98/98 de módulos. Actualizado 2026-08-12
 2. Dry-run del script (`MODE` distinto de `APPLY`).
 3. Apply WAL-safe (parar solo `web`).
 4. `PRAGMA integrity_check` → `ok`.
-5. Verificar composición de módulo (empieza en Q1, tamaño 27/27/22/22) y conteo de conjunto.
+5. Verificar composición de módulo (empieza en Q1, tamaño 27/27/22/22) y conteo de Extracted Test.
 6. Documentar aquí (§2 nueva fila) + detalle en el doc temático si aplica.
 7. Commit/`dev.db` **solo si el usuario lo pide**.
 
@@ -273,7 +273,7 @@ No bloquean la **composición** 98/98 de módulos. Actualizado 2026-08-12
 
 | Síntoma | Causa típica | Procesamiento |
 |---------|--------------|---------------|
-| Conjunto 2 crit / lista 3 alertas | crit = sin respuesta; warn = opciones parciales | T4-ANS + residual `2:27` |
+| Extracted Test 2 crit / lista 3 alertas | crit = sin respuesta; warn = opciones parciales | T4-ANS + residual `2:27` |
 | Módulo empieza en Q3 | Preguntas ausentes del staging (página imagen) | T10-Q12 |
 | Stem muestra A–D duplicados | OCR pegó bloque ☒/☐ en stem | STEM-OPTBLK |
 | Imagen en review pero no en alumno | `image-links` sin propagar | IMG-PROP-LINK |

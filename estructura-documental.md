@@ -106,12 +106,12 @@ correcta** del docx contra `QuestionOption[letter].text` de la BD (ver §6.3).
 
 ---
 
-## 2. CONJUNTO **MATH** — estructura y extracción por campo
+## 2. Extracted Test **MATH** — estructura y extracción por campo
 
 Módulos `1` y `2`/`2B`, ~22 preguntas cada uno (44/test). Tipos: `MC` (4 opciones) y
 `NUMERIC` (grid-in, sin opciones). **Sin estímulo** (campo n/a).
 
-### 2.1 Archivos del conjunto
+### 2.1 Archivos del Extracted Test
 - **QUESTION** (`MOCK_EXAM` PDF): stems como texto; **opciones MC frecuentemente como
   imagen** (screenshot del bloque A–D) → `![img-N.jpeg]` en `rawJson.text`.
 - **ANSWER_KEY**: grid o posicional (§1.2).
@@ -172,12 +172,12 @@ Módulos `1` y `2`/`2B`, ~22 preguntas cada uno (44/test). Tipos: `MC` (4 opcion
 
 ---
 
-## 3. CONJUNTO **R&W** — estructura y extracción por campo
+## 3. Extracted Test **R&W** — estructura y extracción por campo
 
 Módulos `1` y `2`/`2B`, 27 preguntas cada uno (54/test). **~100% MC** (4 opciones de texto).
 Campo central adicional: **estímulo** (pasaje). `NUMERIC` en R&W = mislabel.
 
-### 3.1 Archivos del conjunto
+### 3.1 Archivos del Extracted Test
 - **QUESTION** (`MOCK_EXAM` PDF/DOCX): `rawJson.text` con la anatomía de §3.2. Caso especial
   **DOCX image-only** (T1): pasajes como screenshots.
 - **ANSWER_KEY** y/o **ANSWER_EXPLANATION**: §1.2 / §1.3.
@@ -256,8 +256,8 @@ distribuyó explicaciones a las preguntas vacías con COALESCE + gate `parsed==o
 
 ## 4. Lógica de parseo **generalizable**
 
-### 4.1 Contrato de extractor por campo (por conjunto)
-Un parser generalizado debería exponer, por conjunto, funciones puras:
+### 4.1 Contrato de extractor por campo (por Extracted Test)
+Un parser generalizado debería exponer, por Extracted Test, funciones puras:
 ```
 extractStem(candidate)         -> string      (sanitizeStem)
 extractStimulus(candidate,ctx) -> string|null (rawText block | anchor/neighbor | image-OCR)

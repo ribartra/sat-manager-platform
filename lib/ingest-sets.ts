@@ -165,8 +165,3 @@ export function filterExtractedTests(
     return a.title.localeCompare(b.title);
   });
 }
-
-/** @deprecated Use ExtractedTestRow */
-export type ConjuntoRow = ExtractedTestRow;
-/** @deprecated Use filterExtractedTests */
-export const filterConjuntos = filterExtractedTests;
