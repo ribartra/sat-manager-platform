@@ -12,6 +12,7 @@ files_to_load
 # Local/infra artifacts.
 terraform
 tmp_inspect_pages
+scratchpad
 scripts/ingest_patch
 .env
 .env.*
