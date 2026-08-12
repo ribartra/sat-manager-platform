@@ -465,6 +465,7 @@ export function FileReviewClient({
   incidents,
   assignTargets = [],
   cropImageSource = null,
+  candidateScope = null,
 }: {
   batchId: string;
   file: SourceFile;
@@ -477,6 +478,7 @@ export function FileReviewClient({
   incidents: Incident[];
   assignTargets?: { questionId: string; label: string }[];
   cropImageSource?: { imageSourceFileId: string; pageNumbers: number[] } | null;
+  candidateScope?: { kind: "extracted-test"; title: string; hostFiles: string | null } | null;
 }) {
   const router = useRouter();
   const [galleryAssign, setGalleryAssign] = useState<{ imageId: string; questionId: string } | null>(null);
@@ -734,7 +736,15 @@ export function FileReviewClient({
           <CopyableTruncatedText value={file.relativePath} className="mt-3 max-w-full text-xs text-gray-500" />
         </Card>
         <Card padding="none" className="overflow-hidden">
-          <div className="border-b border-gray-100 px-3 py-2 text-xs font-medium uppercase text-gray-500">Questions</div>
+          <div className="border-b border-gray-100 px-3 py-2 text-xs font-medium uppercase text-gray-500">
+            Questions{candidates.length > 0 ? ` · ${candidates.length}` : ""}
+          </div>
+          {candidateScope && (
+            <p className="border-b border-amber-100 bg-amber-50 px-3 py-2 text-[11px] leading-4 text-amber-900">
+              This file has the images/pages. Questions for <strong>{candidateScope.title}</strong> were staged from{" "}
+              {candidateScope.hostFiles ? <strong>{candidateScope.hostFiles}</strong> : "a sibling file"} — shown here so you can attach images and edit.
+            </p>
+          )}
           <div className="max-h-[620px] overflow-auto">
             {candidates.map((candidate) => {
               const cLinks = linksByCandidate.get(candidate.id) ?? [];
@@ -759,7 +769,14 @@ export function FileReviewClient({
                 </button>
               );
             })}
-            {candidates.length === 0 && <p className="px-3 py-6 text-sm text-gray-400">No questions detected in this file.</p>}
+            {candidates.length === 0 && (
+              <p className="px-3 py-6 text-sm text-gray-400">
+                No questions in this Extracted Test yet.
+                {assignTargets.length > 0
+                  ? " You can still assign images from the gallery to official questions below."
+                  : ""}
+              </p>
+            )}
           </div>
         </Card>
       </aside>

@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { computeCropImageSources } from "@/lib/ingest-crop-source";
-import { computeExtractedTests } from "@/lib/ingest-sets.server";
+import { computeExtractedTests, resolveExtractedTestScope } from "@/lib/ingest-sets.server";
 import { ExtractedTestRail } from "@/app/admin/import/ai/_components/extracted-test-rail";
 import { FileReviewClient } from "./review-client";
 
@@ -52,21 +52,35 @@ export default async function AiImportFileReviewPage({ params }: PageProps) {
 
   if (!batch || !file) redirect("/admin/import/ai");
 
+  // Extracted Test grouping + crop siblings first — candidates for FPT/PS often
+  // live on the answer/explanation file while images live on the question file.
+  const [cropImageSourceMap, setRows] = await Promise.all([
+    computeCropImageSources(batchId),
+    computeExtractedTests(batchId),
+  ]);
+  const scope = resolveExtractedTestScope(setRows, fileId);
+  const candidateFileIds = scope.candidateSourceFileIds;
+  const answerFileIds = scope.extractedTest?.fileIds ?? [fileId];
+
   const [pages, candidates, answers, images, incidents] = await Promise.all([
     prisma.ingestPageArtifact.findMany({
       where: { batchId, sourceFileId: fileId },
       orderBy: { pageNumber: "asc" },
     }),
     prisma.ingestQuestionCandidate.findMany({
-      where: { batchId, sourceFileId: fileId },
+      where: {
+        batchId,
+        sourceFileId: { in: candidateFileIds },
+        NOT: { OR: [{ status: "REJECTED" }, { promotionStatus: "REJECTED" }] },
+      },
       // moduleLabel first so a full test's modules don't interleave (each module
       // restarts numbering at 1); practice sets have a null label and fall through.
       orderBy: [{ moduleLabel: "asc" }, { questionNumber: "asc" }, { createdAt: "asc" }],
     }),
     prisma.ingestAnswerCandidate.findMany({
-      where: { batchId, sourceFileId: fileId },
+      where: { batchId, sourceFileId: { in: answerFileIds } },
       orderBy: [{ moduleLabel: "asc" }, { questionNumber: "asc" }, { createdAt: "asc" }],
-      take: 200,
+      take: 400,
     }),
     prisma.ingestImageArtifact.findMany({
       where: { batchId, sourceFileId: fileId },
@@ -74,7 +88,7 @@ export default async function AiImportFileReviewPage({ params }: PageProps) {
       take: 300,
     }),
     prisma.ingestIncident.findMany({
-      where: { batchId, sourceFileId: fileId },
+      where: { batchId, sourceFileId: { in: answerFileIds } },
       orderBy: [{ status: "asc" }, { severity: "asc" }, { createdAt: "desc" }],
       take: 100,
     }),
@@ -112,17 +126,17 @@ export default async function AiImportFileReviewPage({ params }: PageProps) {
 
   // Resolve which source to crop from — this file if it has renderable pages,
   // otherwise a sibling in the batch that does (e.g. Test 1 R&W images live in the
-  // questions DOCX while the candidates come from the answers DOCX). Also load the
-  // batch's Extracted Test rows for the navigation rail.
-  const [cropImageSourceMap, setRows] = await Promise.all([
-    computeCropImageSources(batchId),
-    computeExtractedTests(batchId),
-  ]);
+  // questions DOCX while the candidates come from the answers DOCX).
   const cropImageSource = cropImageSourceMap[file.id] ?? null;
   // The Extracted Test this file belongs to — shown as context so the reviewer sees
   // the whole set (question + answer + explanation files) and its completeness.
-  const extractedTest = setRows.find((row) => row.fileIds.includes(file.id)) ?? null;
+  const extractedTest = scope.extractedTest;
   const ROLE_LABEL: Record<string, string> = { QUESTION: "Questions", ANSWER: "Answers", EXPLANATION: "Explanations", OTHER: "Other" };
+  const questionsHost =
+    extractedTest?.files
+      .filter((f) => f.nQ > 0)
+      .map((f) => f.name)
+      .join(", ") ?? null;
 
   const estimatedPages = pages.length || file.pageCount || 0;
   const secondsPerPage = latestEvent?.secondsPerPage && latestEvent.secondsPerPage > 0 ? latestEvent.secondsPerPage : 60;
@@ -170,15 +184,17 @@ export default async function AiImportFileReviewPage({ params }: PageProps) {
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
             {extractedTest.files.map((f) => (
-              <span
+              <Link
                 key={f.id}
-                className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-1 text-xs ${f.id === file.id ? "border-blue-300 bg-blue-50 text-blue-800" : "border-gray-200 text-gray-600"}`}
+                href={`/admin/import/ai/${batchId}/files/${f.id}`}
+                className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-1 text-xs hover:bg-gray-50 ${f.id === file.id ? "border-blue-300 bg-blue-50 text-blue-800" : "border-gray-200 text-gray-600"}`}
                 title={`${ROLE_LABEL[f.role]} · ${f.nQ} questions · ${f.nA} answers`}
               >
                 <span className={`h-1.5 w-1.5 rounded-full ${f.role === "QUESTION" ? "bg-blue-500" : f.role === "ANSWER" ? "bg-emerald-500" : f.role === "EXPLANATION" ? "bg-violet-500" : "bg-gray-300"}`} />
                 <span className="font-medium">{ROLE_LABEL[f.role]}</span>
                 <span className="truncate max-w-[16rem] text-gray-400">{f.name}</span>
-              </span>
+                {f.nQ > 0 && <span className="text-gray-400">· {f.nQ}q</span>}
+              </Link>
             ))}
           </div>
           <Link href={`/admin/import/ai/sets?batch=${batchId}`} className="mt-3 inline-block text-xs text-blue-600 hover:underline">
@@ -203,6 +219,15 @@ export default async function AiImportFileReviewPage({ params }: PageProps) {
         reviewSession={{ currentStep: reviewSession.currentStep, status: reviewSession.status }}
         assignTargets={assignTargets}
         cropImageSource={cropImageSource}
+        candidateScope={
+          scope.scopedFromSiblings
+            ? {
+                kind: "extracted-test",
+                title: extractedTest?.title ?? "Extracted Test",
+                hostFiles: questionsHost,
+              }
+            : null
+        }
         pages={pages.map((page) => ({
           id: page.id,
           pageNumber: page.pageNumber,

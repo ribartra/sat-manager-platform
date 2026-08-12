@@ -332,3 +332,38 @@ export async function computeExtractedTests(batchId: string): Promise<ExtractedT
     return a.title.localeCompare(b.title);
   });
 }
+
+/**
+ * Candidates + answers for the file review UI, scoped to the whole Extracted Test
+ * when this file belongs to one. Question images often live on the QUESTION DOCX
+ * while staging rows live on ANSWER_EXPLANATION — reviewers must see the same
+ * question list on either file.
+ */
+export function resolveExtractedTestScope(
+  setRows: ExtractedTestRow[],
+  fileId: string,
+): {
+  extractedTest: ExtractedTestRow | null;
+  candidateSourceFileIds: string[];
+  ownQuestionCount: number;
+  scopedFromSiblings: boolean;
+} {
+  const extractedTest = setRows.find((row) => row.fileIds.includes(fileId)) ?? null;
+  if (!extractedTest) {
+    return {
+      extractedTest: null,
+      candidateSourceFileIds: [fileId],
+      ownQuestionCount: 0,
+      scopedFromSiblings: false,
+    };
+  }
+  const ownQuestionCount = extractedTest.files.find((f) => f.id === fileId)?.nQ ?? 0;
+  const idsWithQuestions = extractedTest.files.filter((f) => f.nQ > 0).map((f) => f.id);
+  const candidateSourceFileIds = idsWithQuestions.length > 0 ? idsWithQuestions : extractedTest.fileIds;
+  return {
+    extractedTest,
+    candidateSourceFileIds,
+    ownQuestionCount,
+    scopedFromSiblings: ownQuestionCount === 0 && candidateSourceFileIds.some((id) => id !== fileId),
+  };
+}
