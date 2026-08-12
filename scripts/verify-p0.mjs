@@ -96,7 +96,7 @@ const checks = [
   },
   {
     file: "app/(student)/student/full-tests/[assignmentId]/player-client.tsx",
-    requires: ["savedAnswers", "savedModule", "savedTimerState", "recordQuestionTime", "timeSpentByQuestion", "Pause & Exit"],
+    requires: ["savedAnswers", "savedModule", "savedProgressState", "recordQuestionTime", "timeSpentByQuestion", "Pause & Exit"],
     label: "Player FPT reanuda respuestas, posicion, timer y tiempos por pregunta",
   },
   {

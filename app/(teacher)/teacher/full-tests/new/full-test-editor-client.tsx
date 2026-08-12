@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -99,7 +100,7 @@ export function FullTestEditor({
         <p className="mt-1">
           4 grupos: RW M1/M2 (32 min) + Math M1/M2 (35 min). Las 2 primeras preguntas de cada módulo son pretest
           (no puntúan; el alumno no las distingue). Conversión de score en{" "}
-          <a className="text-blue-600 hover:underline" href="/teacher/full-tests/scoring">/teacher/full-tests/scoring</a>
+          <Link className="text-blue-600 hover:underline" href="/teacher/full-tests/scoring">/teacher/full-tests/scoring</Link>
           {" "}(raw operativo RW 0–50 · Math 0–40).
         </p>
       </Card>
