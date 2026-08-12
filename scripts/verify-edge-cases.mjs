@@ -98,16 +98,17 @@ const checks = [
   {
     file: "app/(student)/student/full-tests/[assignmentId]/player-client.tsx",
     requires: [
-      "savedTimerState",
-      "moduleTimerState: timerState.current",
+      "savedProgressState",
+      "moduleTimerState",
       "setExpiredEvents((count) => count + 1)",
-      "setExtraTimeUsed((extra) => extra + 1)",
-      "remaining === 0 ? `Extra",
+      "advanceAfterModule",
+      "phase === \"BREAK\"",
+      "remaining <= 60",
       "Pause & Exit",
       "MathToolPanel",
       "context=\"full-test\"",
     ],
-    label: "Full Practice Test persiste timers por modulo, time expired y overtime sin auto-submit",
+    label: "Full Practice Test: timers por modulo, auto-advance, break y timer rojo <=1min",
   },
   {
     file: "components/math-tool-panel.tsx",
@@ -144,8 +145,9 @@ const checks = [
       "timeExpiredEvents: timeExpiredEvents ?? 0",
       "extraTimeUsed: extraTimeUsed ?? 0",
       "status: \"IN_PROGRESS\"",
+      "!item.isPretest",
     ],
-    label: "Submit FPT calcula puntaje SAT y guarda eventos de tiempo",
+    label: "Submit FPT calcula puntaje SAT operativo (excluye pretest) y guarda eventos de tiempo",
   },
   {
     file: "prisma/seed.ts",

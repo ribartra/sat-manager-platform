@@ -1,9 +1,16 @@
+> **Estado (2026-08-12).** Documento histórico (2026-08-07) + **actualización de realidad**.
+> Los 10 Imported Tests ya están promovidos (98/98 DRAFT). Flujo canónico actual:
+> [`fpt-ingest-to-standardized.md`](fpt-ingest-to-standardized.md).
+> El texto original debajo se conserva como auditoría; **no** usar la afirmación
+> “promoción en STANDBY / contenido oficial en 0” como estado vigente.
+
 # Ingesta → Promoción: estado, viabilidad y trabajo pendiente
 
 > Evaluación al **2026-08-07** sobre el batch `batch_e877446f45e144eda0a1e4199465e3d2`
-> (`SAT files_to_load ingest`, 2 549 candidatos). La **promoción sigue en STANDBY**:
-> el contenido oficial (`Question`, `PracticeSet`, `FullPracticeTest`) está en 0 y así se queda
-> hasta decidir promover en serio. Este documento registra qué funcionaría y qué falta.
+> (`SAT files_to_load ingest`, 2 549 candidatos). ~~La **promoción sigue en STANDBY**:
+> el contenido oficial (`Question`, `PracticeSet`, `FullPracticeTest`) está en 0~~
+> **Actualizado 2026-08-12:** Full Practice Tests 1–10 ensamblados; Practice Sets
+> también promovidos en campañas posteriores. Ver `procesamientos-ingest.md`.
 
 ## Modelo de "conjunto" (archivo de pregunta + archivo ANS/explanation)
 

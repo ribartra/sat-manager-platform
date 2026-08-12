@@ -22,6 +22,17 @@ Todos los `Imported Test 1…10` están en **DRAFT** con la misma forma canónic
 |------|------:|------:|--------:|--------:|------:|
 | 1–10 | 27 @Q1 | 27 @Q1 | 22 @Q1 | 22 @Q1 | **98/98** |
 
+**Metadata estandarizada (2026-08-12):** skill Topic `M1`/`M2` · difficulty M1=`EASY` /
+M2=`HARD` en las 980 preguntas de Imported Test 1–10 (backfill
+`scripts/backfill-fulltest-module-skills.ts`). Staging sigue en **2 conjuntos**
+(R&W+Math); Promote ensambla **4 grupos** SAT. Flujo completo:
+[`fpt-ingest-to-standardized.md`](fpt-ingest-to-standardized.md). Ver también
+[`sat-digital-estructura-vs-plataforma.md`](sat-digital-estructura-vs-plataforma.md).
+
+**Paridad player (2026-08-12):** pretest `order<2` por módulo (raw RW≤50 / Math≤40),
+break configurable (`breakMinutes`, default 10), auto-advance al acabar el tiempo del
+módulo, timer rojo ≤60s.
+
 Conjuntos de staging (candidatos `FULL_PRACTICE_TEST`, no rechazados):
 
 | Sección | Por test | Promovidos |
@@ -62,6 +73,7 @@ siempre **WAL-safe**: `docker compose stop web` → apply → `wal_checkpoint(TR
 | [`practice-sets-hard-recovery.md`](practice-sets-hard-recovery.md) | Auditoría + APPLY Practice Sets HARD Math+R&W (2026-08-11) |
 | [`practice-sets-image-observations.md`](practice-sets-image-observations.md) | **Backlog vivo**: PS sin imagen asociada (tabla/gráfico/figura) — 154 Q al 2026-08-12 |
 | [`practice-sets-difficulty-completeness.md`](practice-sets-difficulty-completeness.md) | Completitud EASY/MEDIUM/HARD por skill (Topic) — 2026-08-12 |
+| [`fpt-ingest-to-standardized.md`](fpt-ingest-to-standardized.md) | Flujo staging → FPT estandarizado (estados, pretest, break, score) |
 
 Contratos de agentes (scratchpad, no docs):
 

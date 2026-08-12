@@ -2,27 +2,22 @@ import { NextResponse } from "next/server";
 import { randomUUID } from "crypto";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
+import {
+  FULL_TEST_EXPECTED_COUNTS,
+  FULL_TEST_MODULES,
+  difficultyFromFullTestModuleKey,
+  fullTestModuleBuckets,
+  fullTestTopicIdFor,
+  moduleIndexForCandidate,
+  moduleKeyFromOrder,
+  type FullTestSection,
+} from "@/lib/full-test-modules";
 
 interface RouteContext {
   params: Promise<{ batchId: string }>;
 }
 
-const MODULES = [
-  { name: "Reading & Writing Module 1", section: "RW", timeLimit: 32 * 60 },
-  { name: "Reading & Writing Module 2", section: "RW", timeLimit: 32 * 60 },
-  { name: "Math Module 1", section: "MATH", timeLimit: 35 * 60 },
-  { name: "Math Module 2", section: "MATH", timeLimit: 35 * 60 },
-];
-
-function moduleIndexForCandidate(candidate: { section: string | null; moduleLabel: string | null }) {
-  const section = (candidate.section ?? "").toUpperCase().includes("RW") ? "RW" : (candidate.section ?? "").toUpperCase().includes("READ") ? "RW" : "MATH";
-  const label = (candidate.moduleLabel ?? "").toUpperCase();
-  const secondModule = /\b2\b|MOD\s*2|MODULE\s*2|2B/.test(label);
-  if (section === "RW") return secondModule ? 1 : 0;
-  return secondModule ? 3 : 2;
-}
-
-const EXPECTED_MODULE_COUNTS = [27, 27, 22, 22];
+const EXPECTED_MODULE_COUNTS = FULL_TEST_EXPECTED_COUNTS;
 
 export async function POST(req: Request, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
@@ -46,7 +41,9 @@ export async function POST(req: Request, { params }: RouteContext) {
     },
     orderBy: [{ testNumber: "asc" }, { moduleLabel: "asc" }, { questionNumber: "asc" }, { createdAt: "asc" }],
   });
-  if (candidates.length === 0) return NextResponse.json({ error: "No promoted Full Practice Test questions found for this test." }, { status: 400 });
+  if (candidates.length === 0) {
+    return NextResponse.json({ error: "No promoted Full Practice Test questions found for this test." }, { status: 400 });
+  }
 
   const questionIds = candidates.map((candidate) => candidate.officialQuestionId).filter((id): id is string => Boolean(id));
   if (new Set(questionIds).size !== questionIds.length) {
@@ -56,8 +53,12 @@ export async function POST(req: Request, { params }: RouteContext) {
     where: { id: { in: questionIds } },
     include: { topic: { include: { domain: { include: { section: true } } } } },
   });
-  if (questions.length !== questionIds.length) return NextResponse.json({ error: "Some promoted questions no longer exist." }, { status: 400 });
-  const sectionByQuestion = new Map(questions.map((question) => [question.id, question.topic.domain.section.name === "MATH" ? "MATH" : "RW"]));
+  if (questions.length !== questionIds.length) {
+    return NextResponse.json({ error: "Some promoted questions no longer exist." }, { status: 400 });
+  }
+  const sectionByQuestion = new Map(
+    questions.map((question) => [question.id, question.topic.domain.section.name === "MATH" ? "MATH" : "RW"]),
+  );
 
   const moduleQuestionIds: string[][] = [[], [], [], []];
   for (const candidate of candidates) {
@@ -67,7 +68,10 @@ export async function POST(req: Request, { params }: RouteContext) {
     const expectedSection = index >= 2 ? "MATH" : "RW";
     const actualSection = sectionByQuestion.get(questionId);
     if (actualSection !== expectedSection) {
-      return NextResponse.json({ error: `Question ${questionId} belongs to ${actualSection}, but target module requires ${expectedSection}.` }, { status: 400 });
+      return NextResponse.json(
+        { error: `Question ${questionId} belongs to ${actualSection}, but target module requires ${expectedSection}.` },
+        { status: 400 },
+      );
     }
     moduleQuestionIds[index].push(questionId);
   }
@@ -75,13 +79,18 @@ export async function POST(req: Request, { params }: RouteContext) {
   const moduleCounts = moduleQuestionIds.map((ids) => ids.length);
   const missingByModule = moduleCounts.map((count, index) => Math.max(EXPECTED_MODULE_COUNTS[index] - count, 0));
   const partial = missingByModule.some((missing) => missing > 0);
+  const modules = fullTestModuleBuckets(moduleCounts);
   if (partial && !body.allowPartial) {
-    return NextResponse.json({
-      error: "This Full Practice Test is partial. Confirm allowPartial to create/update a draft with promoted questions only.",
-      moduleCounts,
-      missingByModule,
-      partial,
-    }, { status: 409 });
+    return NextResponse.json(
+      {
+        error: "This Full Practice Test is partial. Confirm allowPartial to create/update a draft with promoted questions only.",
+        moduleCounts,
+        missingByModule,
+        modules,
+        partial,
+      },
+      { status: 409 },
+    );
   }
 
   const testNumber = body.testNumber;
@@ -92,6 +101,20 @@ export async function POST(req: Request, { params }: RouteContext) {
   const testName = `Imported Test ${testNumber}${partial ? ` (partial ${moduleCounts.reduce((sum, count) => sum + count, 0)}/${EXPECTED_MODULE_COUNTS.reduce((sum, count) => sum + count, 0)})` : ""}`;
 
   const test = await prisma.$transaction(async (tx) => {
+    // Stamp M1/M2 skill + EASY/HARD before wiring so the draft exam is standardized.
+    for (let order = 0; order < 4; order++) {
+      const moduleKey = moduleKeyFromOrder(order);
+      const section: FullTestSection = order >= 2 ? "MATH" : "RW";
+      const topicId = fullTestTopicIdFor(section, moduleKey);
+      const difficulty = difficultyFromFullTestModuleKey(moduleKey);
+      const ids = moduleQuestionIds[order] ?? [];
+      if (ids.length === 0) continue;
+      await tx.question.updateMany({
+        where: { id: { in: ids } },
+        data: { topicId, difficulty },
+      });
+    }
+
     if (existingArtifact) {
       const existingModules = await tx.fullPracticeTestModule.findMany({ where: { testId: existingArtifact.artifactId } });
       for (const testModule of existingModules) {
@@ -104,7 +127,9 @@ export async function POST(req: Request, { params }: RouteContext) {
       for (const testModule of existingModules) {
         const ids = moduleQuestionIds[testModule.order] ?? [];
         for (const [order, questionId] of ids.entries()) {
-          await tx.fullPracticeTestQuestion.create({ data: { moduleId: testModule.id, questionId, order } });
+          await tx.fullPracticeTestQuestion.create({
+            data: { moduleId: testModule.id, questionId, order, isPretest: order < 2 },
+          });
         }
       }
       return tx.fullPracticeTest.findUniqueOrThrow({ where: { id: existingArtifact.artifactId } });
@@ -115,10 +140,18 @@ export async function POST(req: Request, { params }: RouteContext) {
         name: testName,
         status: "DRAFT",
         modules: {
-          create: MODULES.map((module, order) => ({
-            ...module,
+          create: FULL_TEST_MODULES.map((module, order) => ({
+            name: module.name,
+            section: module.section,
+            timeLimit: module.timeLimit,
             order,
-            questions: { create: moduleQuestionIds[order].map((questionId, qOrder) => ({ questionId, order: qOrder })) },
+            questions: {
+              create: moduleQuestionIds[order].map((questionId, qOrder) => ({
+                questionId,
+                order: qOrder,
+                isPretest: qOrder < 2,
+              })),
+            },
           })),
         },
       },
@@ -137,15 +170,31 @@ export async function POST(req: Request, { params }: RouteContext) {
     return created;
   });
 
+  // Align staging difficulty / topicName with the standardized modules (best-effort).
+  for (const candidate of candidates) {
+    if (!candidate.officialQuestionId) continue;
+    const index = moduleIndexForCandidate(candidate);
+    const moduleKey = moduleKeyFromOrder(index);
+    const difficulty = difficultyFromFullTestModuleKey(moduleKey);
+    await prisma.ingestQuestionCandidate.update({
+      where: { id: candidate.id },
+      data: {
+        difficulty,
+        topicName: moduleKey,
+        updatedAt: new Date(),
+      },
+    });
+  }
+
   await prisma.auditLog.create({
     data: {
       userId: session.user.id,
       action: "PROMOTE_AI_IMPORT_FULL_TEST",
       targetType: "FullPracticeTest",
       targetId: test.id,
-      metadata: JSON.stringify({ batchId, testNumber, questionCount: questionIds.length, moduleCounts, missingByModule, partial }),
+      metadata: JSON.stringify({ batchId, testNumber, questionCount: questionIds.length, moduleCounts, missingByModule, modules, partial }),
     },
   });
 
-  return NextResponse.json({ test, moduleCounts, missingByModule, partial });
+  return NextResponse.json({ test, moduleCounts, missingByModule, modules, partial });
 }

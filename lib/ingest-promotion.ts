@@ -2,6 +2,12 @@ import prisma from "@/lib/prisma";
 import crypto from "crypto";
 import { mkdir, readFile, writeFile } from "fs/promises";
 import path from "path";
+import {
+  difficultyFromFullTestModuleLabel,
+  fullTestModuleKeyFromLabel,
+  fullTestSectionFromCandidate,
+  fullTestTopicIdFor,
+} from "@/lib/full-test-modules";
 
 type TopicWithRelations = {
   id: string;
@@ -25,6 +31,8 @@ type CandidateForDraft = {
   domainName: string | null;
   topicName: string | null;
   subskillName: string | null;
+  moduleLabel?: string | null;
+  contentType?: string | null;
 };
 
 type ImageLinkForDraft = {
@@ -262,17 +270,37 @@ export function normalizeIngestDifficulty(value: string | null | undefined) {
   return DIFFICULTY_MAP[key] ?? "EASY";
 }
 
+function isFullPracticeTestCandidate(candidate: CandidateForDraft) {
+  return (
+    normalize(candidate.domainName) === "full practice test" ||
+    normalize(candidate.contentType) === "full_practice_test"
+  );
+}
+
 export function resolveTopicFromCandidate(candidate: CandidateForDraft, topics: TopicWithRelations[]) {
-  // Full Practice Tests carry no per-question skill — the only classification is
-  // (test number, Math/R&W). Route their questions to the section's Full Practice
-  // Test placeholder topic so they can be promoted without a real skill node.
-  if (normalize(candidate.domainName) === "full practice test") {
-    const wantsMath = normalize(candidate.section).includes("math");
-    const placeholder = topics.find((item) => {
+  // Full Practice Tests: skill = M1 | M2 under Domain "Full Practice Test"
+  // (section Math / R&W). Prefer stable ids from ensure-fulltest-topics; fall back
+  // to name match, then legacy section-only placeholders.
+  if (isFullPracticeTestCandidate(candidate)) {
+    const section = fullTestSectionFromCandidate(candidate.section);
+    const moduleKey = fullTestModuleKeyFromLabel(candidate.moduleLabel);
+    const preferredId = fullTestTopicIdFor(section, moduleKey);
+    const byId = topics.find((item) => item.id === preferredId);
+    if (byId) return { topicId: byId.id, subskillId: "" };
+
+    const wantsMath = section === "MATH";
+    const byName = topics.find((item) => {
+      if (normalize(item.domain.name) !== "full practice test") return false;
+      if (normalize(item.domain.section.name).includes("math") !== wantsMath) return false;
+      return normalize(item.name) === normalize(moduleKey);
+    });
+    if (byName) return { topicId: byName.id, subskillId: "" };
+
+    const legacy = topics.find((item) => {
       if (normalize(item.domain.name) !== "full practice test") return false;
       return normalize(item.domain.section.name).includes("math") === wantsMath;
     });
-    if (placeholder) return { topicId: placeholder.id, subskillId: "" };
+    if (legacy) return { topicId: legacy.id, subskillId: "" };
   }
 
   const topicTerm = normalize(candidate.topicName);
@@ -339,10 +367,14 @@ export function buildQuestionDraft({
     };
   });
 
+  const difficulty = isFullPracticeTestCandidate(candidate)
+    ? difficultyFromFullTestModuleLabel(candidate.moduleLabel)
+    : normalizeIngestDifficulty(candidate.difficulty);
+
   return {
     topicId: resolved.topicId,
     subskillId: resolved.subskillId,
-    difficulty: normalizeIngestDifficulty(candidate.difficulty),
+    difficulty,
     type: candidate.type === "NUMERIC" ? "NUMERIC" : "MC",
     stem: sanitizeStem(stripMarkdownImageRefs(candidate.stem)),
     stimulus: stripMarkdownImageRefs(candidate.stimulus),

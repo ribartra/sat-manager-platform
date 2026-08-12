@@ -16,30 +16,51 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
 
   const { attemptId } = await params;
   const { answers, timeSpentByQuestion, timeExpiredEvents, extraTimeUsed } = await req.json();
-  const attempt = await prisma.fullPracticeTestAttempt.findFirst({ where: { id: attemptId, studentId: session.user.id, status: "IN_PROGRESS" } });
+  const attempt = await prisma.fullPracticeTestAttempt.findFirst({
+    where: { id: attemptId, studentId: session.user.id, status: "IN_PROGRESS" },
+  });
   if (!attempt) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const modules = await prisma.fullPracticeTestModule.findMany({
     where: { testId: attempt.testId },
-    include: { questions: { include: { question: true } } },
+    include: { questions: { include: { question: true }, orderBy: { order: "asc" } } },
+    orderBy: { order: "asc" },
   });
 
-  let rwCorrect = 0, rwTotal = 0, mathCorrect = 0, mathTotal = 0;
+  let rwCorrect = 0;
+  let rwTotal = 0;
+  let mathCorrect = 0;
+  let mathTotal = 0;
   for (const testModule of modules) {
     for (const item of testModule.questions) {
       const answer = (answers?.[item.questionId] ?? "") as string;
       const isCorrect = isAnswerCorrect(answer, item.question.correctAnswer, item.question.type);
-      if (testModule.section === "MATH") {
-        mathTotal += 1;
-        if (isCorrect) mathCorrect += 1;
-      } else {
-        rwTotal += 1;
-        if (isCorrect) rwCorrect += 1;
+      // Grade every item for review, but only operative (non-pretest) count toward raw/scaled.
+      if (!item.isPretest) {
+        if (testModule.section === "MATH") {
+          mathTotal += 1;
+          if (isCorrect) mathCorrect += 1;
+        } else {
+          rwTotal += 1;
+          if (isCorrect) rwCorrect += 1;
+        }
       }
       await prisma.fullPracticeTestAnswer.upsert({
         where: { attemptId_questionId: { attemptId, questionId: item.questionId } },
-        update: { moduleId: testModule.id, answer: answer || null, isCorrect, timeSpent: timeSpentByQuestion?.[item.questionId] ?? undefined },
-        create: { attemptId, moduleId: testModule.id, questionId: item.questionId, answer: answer || null, isCorrect, timeSpent: timeSpentByQuestion?.[item.questionId] ?? undefined },
+        update: {
+          moduleId: testModule.id,
+          answer: answer || null,
+          isCorrect,
+          timeSpent: timeSpentByQuestion?.[item.questionId] ?? undefined,
+        },
+        create: {
+          attemptId,
+          moduleId: testModule.id,
+          questionId: item.questionId,
+          answer: answer || null,
+          isCorrect,
+          timeSpent: timeSpentByQuestion?.[item.questionId] ?? undefined,
+        },
       });
     }
   }
@@ -50,12 +71,33 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
   await Promise.all([
     prisma.fullPracticeTestAttempt.update({
       where: { id: attemptId },
-      data: { status: "SUBMITTED", submittedAt, rwScore, mathScore, totalScore: rwScore + mathScore, timeExpiredEvents: timeExpiredEvents ?? 0, extraTimeUsed: extraTimeUsed ?? 0 },
+      data: {
+        status: "SUBMITTED",
+        submittedAt,
+        rwScore,
+        mathScore,
+        totalScore: rwScore + mathScore,
+        timeExpiredEvents: timeExpiredEvents ?? 0,
+        extraTimeUsed: extraTimeUsed ?? 0,
+      },
     }),
     markUserActive(session.user.id, submittedAt),
   ]);
-  if (attempt.assignmentId) await prisma.fullPracticeTestAssignment.update({ where: { id: attempt.assignmentId }, data: { status: "COMPLETED" } });
-  await notifyTeachers("Exam completed", `${session.user.name} completed an Exam.`, `/student/full-tests/results/${attemptId}`);
+  if (attempt.assignmentId) {
+    await prisma.fullPracticeTestAssignment.update({
+      where: { id: attempt.assignmentId },
+      data: { status: "COMPLETED" },
+    });
+  }
+  await notifyTeachers(
+    "Exam completed",
+    `${session.user.name} completed an Exam.`,
+    `/student/full-tests/results/${attemptId}`,
+  );
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({
+    ok: true,
+    raw: { rwCorrect, rwTotal, mathCorrect, mathTotal },
+    scores: { rwScore, mathScore, totalScore: rwScore + mathScore },
+  });
 }

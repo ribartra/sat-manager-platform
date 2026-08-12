@@ -697,8 +697,11 @@ export function AiImportWorkflowClient({
           </DialogHeader>
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-gray-200 p-4">
             <div>
-              <p className="text-sm font-semibold text-gray-900">Full Practice Tests</p>
-              <p className="text-xs text-gray-500">{fullTests.length} tests detected from promoted/imported staging candidates.</p>
+              <p className="text-sm font-semibold text-gray-900">Full Practice Tests (SAT estandarizado)</p>
+              <p className="text-xs text-gray-500">
+                {fullTests.length} tests · staging se revisa en 2 conjuntos (R&amp;W + Math); al promover se ensamblan 4 grupos
+                (RW M1/M2 · Math M1/M2) con timers 32/32/35/35 y score por sección.
+              </p>
             </div>
           </div>
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
@@ -707,20 +710,30 @@ export function AiImportWorkflowClient({
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-sm font-semibold text-gray-900">Full Practice Test {test.testNumber}</p>
-                    <p className="mt-1 text-xs text-gray-500">{test.promoted}/{test.total} official questions</p>
+                    <p className="mt-1 text-xs text-gray-500">
+                      {test.promoted}/{test.total} official · 2 conjuntos → 4 grupos SAT
+                    </p>
+                    <p className="mt-0.5 text-[11px] text-gray-400">M1 = EASY · M2 = HARD (skill M1/M2)</p>
                   </div>
                   <Badge variant={test.artifactId ? "success" : test.promoted > 0 ? "warning" : "default"}>
                     {test.artifactId ? "Draft Created" : test.promoted > 0 ? "Ready Draft" : "No Official"}
                   </Badge>
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
-                  {["RW M1", "RW M2", "Math M1", "Math M2"].map((label, index) => (
-                    <MiniStat
-                      key={label}
-                      label={label}
-                      value={`${test.modulePromoted[index] ?? 0}/${test.moduleCounts[index] ?? 0}`}
-                      warning={(test.missingByModule[index] ?? 0) > 0}
-                    />
+                  {[
+                    { label: "RW M1", hint: "32 min · EASY" },
+                    { label: "RW M2", hint: "32 min · HARD" },
+                    { label: "Math M1", hint: "35 min · EASY" },
+                    { label: "Math M2", hint: "35 min · HARD" },
+                  ].map((item, index) => (
+                    <div key={item.label}>
+                      <MiniStat
+                        label={item.label}
+                        value={`${test.modulePromoted[index] ?? 0}/${test.moduleCounts[index] ?? 0}`}
+                        warning={(test.missingByModule[index] ?? 0) > 0}
+                      />
+                      <p className="mt-0.5 text-center text-[10px] text-gray-400">{item.hint}</p>
+                    </div>
                   ))}
                 </div>
                 <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -1541,14 +1554,25 @@ export function PromoteFullTestButton({ batchId, testNumber, partial = false }: 
     });
     const data = await response.json().catch(() => ({}));
     setLoading(false);
-    setMessage(response.ok ? `Draft exam ready: ${(data.moduleCounts ?? []).join("/")}.` : data.error ?? "Could not create draft exam.");
+    if (response.ok) {
+      const modules = Array.isArray(data.modules)
+        ? data.modules
+            .map((m: { moduleKey?: string; section?: string; count?: number; expected?: number }) =>
+              `${m.section} ${m.moduleKey} ${m.count ?? 0}/${m.expected ?? "?"}`,
+            )
+            .join(" · ")
+        : (data.moduleCounts ?? []).join("/");
+      setMessage(`FPT estandarizado listo (4 grupos): ${modules}`);
+    } else {
+      setMessage(data.error ?? "Could not create draft exam.");
+    }
     router.refresh();
   }
 
   return (
     <div className="flex flex-wrap items-center gap-2">
       <Button type="button" variant="secondary" onClick={promote} disabled={loading}>
-        {loading ? "Creating..." : partial ? "Create Partial Full Test" : "Create Draft Full Test"}
+        {loading ? "Creating..." : partial ? "Create Partial Full Test" : "Ensamblar FPT (4 grupos)"}
       </Button>
       {message && <span className="text-xs text-gray-500">{message}</span>}
     </div>

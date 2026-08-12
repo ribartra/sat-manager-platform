@@ -39,6 +39,7 @@ export default async function EditFullTestPage({ params }: PageProps) {
           name: test.name,
           status: test.status,
           reviewEnabled: test.reviewEnabled,
+          breakMinutes: test.breakMinutes,
           moduleQuestionIds: test.modules.map((module) => module.questions.map((item) => item.questionId)),
         }}
         questions={questions.map((q) => ({

@@ -31,8 +31,21 @@ export default async function FullTestsPage() {
                 <Badge variant={test.status === "PUBLISHED" ? "success" : test.status === "ARCHIVED" ? "default" : "warning"}>{test.status}</Badge>
               </div>
               <p className="mt-1 text-xs text-gray-500">
-                {test.modules.length} modules · {test.modules.reduce((sum, m) => sum + m.questions.length, 0)} questions · {test.assignments.length} assignments · {test.attempts.length} attempts · review {test.reviewEnabled ? "on" : "off"}
+                {test.modules.length} grupos · {test.modules.reduce((sum, m) => sum + m.questions.length, 0)} preguntas · break{" "}
+                {test.breakMinutes} min · {test.assignments.length} assignments · {test.attempts.length} attempts · review{" "}
+                {test.reviewEnabled ? "on" : "off"}
               </p>
+              <div className="mt-2 flex flex-wrap gap-1">
+                {test.modules
+                  .slice()
+                  .sort((a, b) => a.order - b.order)
+                  .map((module) => (
+                    <span key={module.id} className="rounded border border-gray-200 px-1.5 py-0.5 text-[10px] text-gray-600">
+                      {module.name.replace("Reading & Writing ", "RW ").replace("Module ", "M")} · {module.questions.length}Q ·{" "}
+                      {Math.round(module.timeLimit / 60)}m
+                    </span>
+                  ))}
+              </div>
             </div>
             <FullTestActions testId={test.id} status={test.status} hasAssignments={test.assignments.length > 0} hasAttempts={test.attempts.length > 0} />
           </div>

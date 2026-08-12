@@ -2,19 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { validateFullPracticeTestStructure } from "@/lib/full-test-validation";
-
-const MODULES = [
-  { name: "Reading & Writing Module 1", section: "RW", timeLimit: 32 * 60 },
-  { name: "Reading & Writing Module 2", section: "RW", timeLimit: 32 * 60 },
-  { name: "Math Module 1", section: "MATH", timeLimit: 35 * 60 },
-  { name: "Math Module 2", section: "MATH", timeLimit: 35 * 60 },
-];
+import { FULL_TEST_MODULES } from "@/lib/full-test-modules";
 
 export async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
   if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const { name, status, moduleQuestionIds, reviewEnabled } = await req.json();
+  const { name, status, moduleQuestionIds, reviewEnabled, breakMinutes } = await req.json();
   const targetStatus = status ?? "DRAFT";
   const normalizedModules = Array.from({ length: 4 }, (_, index) => (moduleQuestionIds?.[index] ?? []) as string[]);
   const questionIds = [...new Set(normalizedModules.flat())];
@@ -37,17 +31,27 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Validation failed.", errors: validation.errors, warnings: validation.warnings }, { status: 400 });
   }
 
+  const resolvedBreak =
+    Number.isInteger(breakMinutes) && breakMinutes >= 0 ? Number(breakMinutes) : 10;
+
   const test = await prisma.fullPracticeTest.create({
     data: {
       name,
       status: status ?? "DRAFT",
       reviewEnabled: reviewEnabled ?? true,
+      breakMinutes: resolvedBreak,
       modules: {
-        create: MODULES.map((module, order) => ({
-          ...module,
+        create: FULL_TEST_MODULES.map((module, order) => ({
+          name: module.name,
+          section: module.section,
+          timeLimit: module.timeLimit,
           order,
           questions: {
-            create: normalizedModules[order].map((questionId, qOrder) => ({ questionId, order: qOrder })),
+            create: normalizedModules[order].map((questionId, qOrder) => ({
+              questionId,
+              order: qOrder,
+              isPretest: qOrder < 2,
+            })),
           },
         })),
       },

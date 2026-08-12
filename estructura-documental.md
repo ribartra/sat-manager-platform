@@ -25,7 +25,13 @@ Un **conjunto** = el **grupo de archivos fuente** que juntos arman un set, no un
 
 - **Full Practice Test** → clave de agrupación `(testNumber, section)`. Cada sección
   (`RW`, `MATH`) es un conjunto de ~54 (R&W) / ~44 (Math) preguntas, con módulos `1` y
-  `2`/`2B`.
+  `2`/`2B`. En revisión se trabajan **2 conjuntos** por test; al **ensamblar** el FPT
+  estandarizado (`promote-full-test`) pasan a **4 grupos** SAT:
+  RW M1 · RW M2 · Math M1 · Math M2 (tiempos 32/32/35/35; score 200–800 por sección).
+  Metadata de ítems al promover / re-ensamblar: skill Topic `M1` o `M2` bajo Domain
+  `Full Practice Test`, difficulty **M1=EASY** / **M2=HARD** (contenido fijo tipo 2B,
+  no routing adaptativo). Ver `lib/full-test-modules.ts` y
+  `scripts/ensure-fulltest-topics.mjs`.
 - **Practice Set** → clave `(section, topicName, difficulty, practiceSetVariant)`.
 - **Roles de archivo** dentro del conjunto (`IngestSourceFile`):
   - `QUESTION` (`isQuestionSource=1`, `sourceKind=MOCK_EXAM` / `PRACTICE_EXERCISE`) — **archivo

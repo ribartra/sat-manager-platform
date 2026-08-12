@@ -404,6 +404,8 @@ model FullPracticeTest {
   name           String
   status         String   @default("DRAFT") // DRAFT | PUBLISHED | ARCHIVED
   reviewEnabled  Boolean  @default(true)
+  /// Break between RW Module 2 and Math Module 1 (minutes). 0 = no break.
+  breakMinutes   Int      @default(10)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   modules        FullPracticeTestModule[]
@@ -426,6 +428,8 @@ model FullPracticeTestQuestion {
   moduleId   String
   questionId String
   order      Int
+  /// First two questions per module (order 0,1) are pretest and do not count toward raw score.
+  isPretest  Boolean @default(false)
   module     FullPracticeTestModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   question   Question               @relation(fields: [questionId], references: [id])
 

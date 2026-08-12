@@ -30,11 +30,16 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
   if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { testId } = await params;
-  const body = (await req.json().catch(() => ({}))) as { status?: string; name?: string; reviewEnabled?: boolean };
+  const body = (await req.json().catch(() => ({}))) as {
+    status?: string;
+    name?: string;
+    reviewEnabled?: boolean;
+    breakMinutes?: number;
+  };
   const test = await prisma.fullPracticeTest.findUnique({ where: { id: testId } });
   if (!test) return NextResponse.json({ error: "Exam not found." }, { status: 404 });
 
-  const data: { status?: string; name?: string; reviewEnabled?: boolean } = {};
+  const data: { status?: string; name?: string; reviewEnabled?: boolean; breakMinutes?: number } = {};
   if (body.status !== undefined) {
     if (!allowedStatuses.has(body.status)) return NextResponse.json({ error: "Invalid status." }, { status: 400 });
     const validation = await validateStructureForStatus(testId, body.status);
@@ -49,6 +54,12 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
     data.name = name;
   }
   if (body.reviewEnabled !== undefined) data.reviewEnabled = Boolean(body.reviewEnabled);
+  if (body.breakMinutes !== undefined) {
+    if (!Number.isInteger(body.breakMinutes) || body.breakMinutes < 0) {
+      return NextResponse.json({ error: "breakMinutes must be a non-negative integer." }, { status: 400 });
+    }
+    data.breakMinutes = body.breakMinutes;
+  }
   if (Object.keys(data).length === 0) return NextResponse.json({ error: "No changes provided." }, { status: 400 });
 
   const updated = await prisma.fullPracticeTest.update({ where: { id: testId }, data });
@@ -70,7 +81,7 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
   if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { testId } = await params;
-  const { name, status, moduleQuestionIds, reviewEnabled } = await req.json();
+  const { name, status, moduleQuestionIds, reviewEnabled, breakMinutes } = await req.json();
   const targetStatus = status ?? "DRAFT";
   const previous = await prisma.fullPracticeTest.findUnique({ where: { id: testId } });
   if (!previous) return NextResponse.json({ error: "Exam not found." }, { status: 404 });
@@ -91,13 +102,26 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
     return NextResponse.json({ error: "Validation failed.", errors: validation.errors, warnings: validation.warnings }, { status: 400 });
   }
 
+  const resolvedBreak =
+    Number.isInteger(breakMinutes) && breakMinutes >= 0 ? Number(breakMinutes) : previous.breakMinutes;
+
   const modules = await prisma.fullPracticeTestModule.findMany({ where: { testId }, orderBy: { order: "asc" } });
   await prisma.$transaction([
     ...modules.map((testModule) => prisma.fullPracticeTestQuestion.deleteMany({ where: { moduleId: testModule.id } })),
-    prisma.fullPracticeTest.update({ where: { id: testId }, data: { name: name.trim(), status: targetStatus, reviewEnabled: reviewEnabled ?? previous.reviewEnabled } }),
+    prisma.fullPracticeTest.update({
+      where: { id: testId },
+      data: {
+        name: name.trim(),
+        status: targetStatus,
+        reviewEnabled: reviewEnabled ?? previous.reviewEnabled,
+        breakMinutes: resolvedBreak,
+      },
+    }),
     ...modules.flatMap((testModule, moduleIndex) =>
       normalizedModules[moduleIndex].map((questionId, order) =>
-        prisma.fullPracticeTestQuestion.create({ data: { moduleId: testModule.id, questionId, order } }),
+        prisma.fullPracticeTestQuestion.create({
+          data: { moduleId: testModule.id, questionId, order, isPretest: order < 2 },
+        }),
       ),
     ),
   ]);

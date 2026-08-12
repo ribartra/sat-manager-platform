@@ -118,7 +118,7 @@ async function main() {
   // Datos reales de scoring, NO demo: se conservan siempre para poder puntuar
   // los Full Practice Tests que se promuevan desde ingesta.
   for (const section of ["RW", "MATH"] as const) {
-    const maxRaw = section === "RW" ? 54 : 44;
+    const maxRaw = section === "RW" ? 50 : 40;
     for (let rawCorrect = 0; rawCorrect <= maxRaw; rawCorrect += 1) {
       const score = Math.round((200 + (rawCorrect / maxRaw) * 600) / 10) * 10;
       await prisma.fullPracticeTestScoreConversion.upsert({

@@ -7,6 +7,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { computeCropImageSources } from "@/lib/ingest-crop-source";
 import { computeConjuntos } from "@/lib/ingest-sets.server";
+import { FULL_TEST_EXPECTED_COUNTS, moduleIndexForCandidate } from "@/lib/full-test-modules";
 import { AiImportWorkflowClient, IngestAutoRefresh } from "./ai-import-client";
 
 export const dynamic = "force-dynamic";
@@ -206,14 +207,10 @@ function practiceSetState({
 }
 
 function fullTestModuleIndex(section: string | null, moduleLabel: string | null) {
-  const normalizedSection = (section ?? "").toUpperCase().includes("RW") || (section ?? "").toUpperCase().includes("READ") ? "RW" : "MATH";
-  const label = (moduleLabel ?? "").toUpperCase();
-  const secondModule = /\b2\b|2B|MODULE\s*2|MOD\s*2/.test(label);
-  if (normalizedSection === "RW") return secondModule ? 1 : 0;
-  return secondModule ? 3 : 2;
+  return moduleIndexForCandidate({ section, moduleLabel });
 }
 
-const fullTestExpectedCounts = [27, 27, 22, 22];
+const fullTestExpectedCounts = FULL_TEST_EXPECTED_COUNTS;
 
 export default async function AiImportPage({ searchParams }: PageProps) {
   const session = await auth();

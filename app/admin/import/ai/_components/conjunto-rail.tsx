@@ -161,6 +161,7 @@ export function ConjuntoRail({ rows, batchId, currentFileId, onSelect }: Conjunt
               <div className="mt-1 flex flex-wrap items-center gap-1">
                 {row.section && <Badge variant="default">{sectionLabel(row.section)}</Badge>}
                 {row.difficulty && <Badge variant="default">{row.difficulty}</Badge>}
+                <span className="text-xs text-gray-400">{row.total} Q</span>
                 <span className="text-xs text-gray-400">{row.files.length} arch.</span>
                 {row.revisar > 0 && <Badge variant="warning">{row.revisar} revisar</Badge>}
                 {row.revisar === 0 && row.atencion > 0 && <Badge variant="warning">{row.atencion} atención</Badge>}

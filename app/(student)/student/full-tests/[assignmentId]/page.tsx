@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { FullTestPlayer } from "./player-client";
-import { getFullTestTimerState } from "@/lib/full-test-progress";
+import { getFullTestProgressState } from "@/lib/full-test-progress";
 import { getPublicCalculatorConfig } from "@/lib/calculator-config";
 import { extractQuestionGraphArtifacts } from "@/lib/question-graph";
 
@@ -17,7 +17,12 @@ export default async function FullTestPlayerPage({ params }: PageProps) {
       test: {
         include: {
           modules: {
-            include: { questions: { include: { question: { include: { options: { orderBy: { label: "asc" } } } } }, orderBy: { order: "asc" } } },
+            include: {
+              questions: {
+                include: { question: { include: { options: { orderBy: { label: "asc" } } } } },
+                orderBy: { order: "asc" },
+              },
+            },
             orderBy: { order: "asc" },
           },
         },
@@ -37,13 +42,14 @@ export default async function FullTestPlayerPage({ params }: PageProps) {
       include: { answers: true },
     });
   }
-  const savedTimerState = await getFullTestTimerState(attempt.id);
+  const savedProgressState = await getFullTestProgressState(attempt.id, assignment.test.modules.length);
 
   return (
     <FullTestPlayer
       attemptId={attempt.id}
       assignmentId={assignment.id}
       testName={assignment.test.name}
+      breakMinutes={assignment.test.breakMinutes}
       modules={assignment.test.modules.map((module) => ({
         id: module.id,
         name: module.name,
@@ -65,7 +71,7 @@ export default async function FullTestPlayerPage({ params }: PageProps) {
       savedQuestion={attempt.currentQuestion}
       savedExpiredEvents={attempt.timeExpiredEvents}
       savedExtraTimeUsed={attempt.extraTimeUsed}
-      savedTimerState={savedTimerState}
+      savedProgressState={savedProgressState}
       calculatorConfig={getPublicCalculatorConfig()}
     />
   );

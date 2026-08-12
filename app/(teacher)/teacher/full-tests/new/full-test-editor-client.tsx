@@ -22,6 +22,7 @@ export function FullTestEditor({
     name?: string;
     status?: string;
     reviewEnabled?: boolean;
+    breakMinutes?: number;
     moduleQuestionIds?: string[][];
   };
 }) {
@@ -29,6 +30,7 @@ export function FullTestEditor({
   const [name, setName] = useState(initial?.name ?? "");
   const [status, setStatus] = useState(initial?.status ?? "DRAFT");
   const [reviewEnabled, setReviewEnabled] = useState(initial?.reviewEnabled ?? true);
+  const [breakMinutes, setBreakMinutes] = useState(initial?.breakMinutes ?? 10);
   const [moduleQuestionIds, setModuleQuestionIds] = useState<string[][]>(initial?.moduleQuestionIds ?? [[], [], [], []]);
   const [moduleSearches, setModuleSearches] = useState<string[]>(["", "", "", ""]);
   const [saving, setSaving] = useState(false);
@@ -51,7 +53,7 @@ export function FullTestEditor({
     const response = await fetch(initial?.id ? `/api/full-practice-tests/${initial.id}` : "/api/full-practice-tests", {
       method: initial?.id ? "PUT" : "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, status, reviewEnabled, moduleQuestionIds }),
+      body: JSON.stringify({ name, status, reviewEnabled, breakMinutes, moduleQuestionIds }),
     });
     const data = await response.json().catch(() => null);
     setSaving(false);
@@ -82,9 +84,28 @@ export function FullTestEditor({
           <input type="checkbox" checked={reviewEnabled} onChange={(event) => setReviewEnabled(event.target.checked)} />
           Show review after submit
         </label>
+        <label className="flex flex-col gap-1 text-sm text-gray-700">
+          <span>Break R&amp;W → Math (minutes, 0 = off)</span>
+          <Input
+            type="number"
+            min={0}
+            value={breakMinutes}
+            onChange={(e) => setBreakMinutes(Math.max(0, Number(e.target.value) || 0))}
+          />
+        </label>
       </div>
+      <Card padding="sm" className="text-xs text-gray-600">
+        <p className="font-medium text-gray-800">Política SAT (fija)</p>
+        <p className="mt-1">
+          4 grupos: RW M1/M2 (32 min) + Math M1/M2 (35 min). Las 2 primeras preguntas de cada módulo son pretest
+          (no puntúan; el alumno no las distingue). Conversión de score en{" "}
+          <a className="text-blue-600 hover:underline" href="/teacher/full-tests/scoring">/teacher/full-tests/scoring</a>
+          {" "}(raw operativo RW 0–50 · Math 0–40).
+        </p>
+      </Card>
       {modules.map((module, index) => {
         const section = index >= 2 ? "MATH" : "RW";
+        const moduleKey = index % 2 === 0 ? "M1" : "M2";
         const questionSearch = moduleSearches[index].trim().toLowerCase();
         const visibleQuestions = questions.filter((question) =>
           question.section === section &&
@@ -94,7 +115,13 @@ export function FullTestEditor({
         return (
           <Card key={module} padding="md">
             <div className="mb-2 flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-gray-900">{module}</h2>
+              <div>
+                <h2 className="text-sm font-semibold text-gray-900">{module}</h2>
+                <p className="text-xs text-gray-500">
+                  Skill {moduleKey} · {moduleKey === "M1" ? "EASY" : "HARD"} · pretest Q1–Q2 ·{" "}
+                  {index < 2 ? "32" : "35"} min
+                </p>
+              </div>
               <span className={moduleQuestionIds[index].length === expectedCounts[index] ? "text-xs text-green-700" : "text-xs text-amber-700"}>
                 {moduleQuestionIds[index].length}/{expectedCounts[index]} questions
               </span>

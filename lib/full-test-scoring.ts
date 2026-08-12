@@ -2,6 +2,9 @@ import prisma from "@/lib/prisma";
 
 export type SatSection = "RW" | "MATH";
 
+/** Operative (scored) item caps after excluding 2 pretest per module. */
+export const OPERATIVE_RAW_MAX = { RW: 50, MATH: 40 } as const;
+
 export interface ScoreConversionInput {
   section: string;
   rawCorrect: number;
@@ -67,6 +70,11 @@ export function validateScoreConversions(inputRows: ScoreConversionInput[]): Val
     if (sectionRows[0].rawCorrect !== 0) {
       warnings.push(`${section}: no rawCorrect 0 row; low raw scores may be extrapolated.`);
     }
+    const maxExpected = OPERATIVE_RAW_MAX[section];
+    const maxConfigured = sectionRows[sectionRows.length - 1]?.rawCorrect ?? 0;
+    if (maxConfigured < maxExpected) {
+      warnings.push(`${section}: max rawCorrect ${maxConfigured} < operative max ${maxExpected}.`);
+    }
     for (let index = 1; index < sectionRows.length; index += 1) {
       if (sectionRows[index].score < sectionRows[index - 1].score) {
         errors.push(`${section}: scores must be non-decreasing as rawCorrect increases.`);
@@ -78,6 +86,10 @@ export function validateScoreConversions(inputRows: ScoreConversionInput[]): Val
   return { rows, errors, warnings };
 }
 
+/**
+ * Convert raw correct (operative items only) to a 200–800 section score.
+ * `total` should be the operative count (typically 50 RW / 40 Math).
+ */
 export async function scaledScore(section: SatSection, correct: number, total: number) {
   const rows = await prisma.fullPracticeTestScoreConversion.findMany({
     where: { section },

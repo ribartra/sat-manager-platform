@@ -272,6 +272,7 @@ export function SetsIndexClient({ rows, batchId, batches }: SetsIndexClientProps
                       {row.difficulty && <Badge variant="default">{row.difficulty}</Badge>}
                       {row.testNumber && <Badge variant="info">Test {row.testNumber}</Badge>}
                       {row.section && <Badge variant="default">{sectionLabel(row.section)}</Badge>}
+                      <Badge variant="default">{row.total} preguntas</Badge>
                       {row.promoted > 0 && <Badge variant="success">{row.promoted} oficiales</Badge>}
                     </span>
                     <span className="mt-1 flex flex-wrap gap-1.5 text-[11px] text-gray-400">

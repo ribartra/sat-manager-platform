@@ -44,8 +44,12 @@ export default async function StudentPracticeSetsPage() {
           const inProgressAttempt = assignment.attempts.find((item) => item.status === "IN_PROGRESS");
           const submittedAttempt = assignment.attempts.find((item) => item.status === "SUBMITTED");
           const correct = submittedAttempt?.answers.filter((answer) => answer.isCorrect).length ?? 0;
-          const total = submittedAttempt?.answers.length ?? assignment.practiceSet.questions.length;
-          const pct = submittedAttempt ? scorePercent(correct, total) : null;
+          const total = assignment.practiceSet.questions.length;
+          const pct = submittedAttempt ? scorePercent(correct, submittedAttempt.answers.length || total) : null;
+          const inProgressAnswered = inProgressAttempt
+            ? inProgressAttempt.answers.filter((answer) => Boolean((answer.answer ?? "").trim())).length
+            : 0;
+          const inProgressPct = inProgressAttempt ? scorePercent(inProgressAnswered, total) : null;
           const locked =
             assignment.locked ||
             (assignment.unlockAt !== null && assignment.unlockAt > new Date());
@@ -58,6 +62,12 @@ export default async function StudentPracticeSetsPage() {
                   {assignment.practiceSet.topic.domain.section.label} / {assignment.practiceSet.topic.domain.name} / {assignment.practiceSet.topic.name}
                   {assignment.dueDate ? <span className="ml-2 text-amber-600">Due {formatDate(assignment.dueDate)}</span> : null}
                 </p>
+                {inProgressAttempt && (
+                  <p className="mt-1 text-xs text-gray-600">
+                    Progreso {inProgressPct}% ({inProgressAnswered}/{total}) · Pregunta{" "}
+                    {Math.min(inProgressAttempt.currentQuestion + 1, Math.max(total, 1))} de {total}
+                  </p>
+                )}
               </div>
               <div className="flex shrink-0 items-center gap-2">
                 <Badge variant={assignment.practiceSet.difficulty === "EASY" ? "easy" : assignment.practiceSet.difficulty === "MEDIUM" ? "medium" : "hard"}>

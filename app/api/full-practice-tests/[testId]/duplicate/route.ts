@@ -22,6 +22,7 @@ export async function POST(_req: Request, { params }: RouteContext) {
       name: `${test.name} Copy`,
       status: "DRAFT",
       reviewEnabled: test.reviewEnabled,
+      breakMinutes: test.breakMinutes,
       modules: {
         create: test.modules.map((module) => ({
           name: module.name,
@@ -29,7 +30,11 @@ export async function POST(_req: Request, { params }: RouteContext) {
           order: module.order,
           timeLimit: module.timeLimit,
           questions: {
-            create: module.questions.map((item) => ({ questionId: item.questionId, order: item.order })),
+            create: module.questions.map((item) => ({
+              questionId: item.questionId,
+              order: item.order,
+              isPretest: item.isPretest || item.order < 2,
+            })),
           },
         })),
       },

@@ -182,7 +182,7 @@ export async function seedTaxonomy(prisma: PrismaClient): Promise<void> {
 // (no synthetic questions), required for FPT scoring. Shared by both seeds.
 export async function seedScoreConversions(prisma: PrismaClient): Promise<void> {
   for (const section of ["RW", "MATH"] as const) {
-    const maxRaw = section === "RW" ? 54 : 44;
+    const maxRaw = section === "RW" ? 50 : 40;
     for (let rawCorrect = 0; rawCorrect <= maxRaw; rawCorrect += 1) {
       const score = Math.round((200 + (rawCorrect / maxRaw) * 600) / 10) * 10;
       await prisma.fullPracticeTestScoreConversion.upsert({

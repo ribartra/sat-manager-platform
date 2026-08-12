@@ -78,17 +78,24 @@ Los Full Practice Tests importados (`Imported Test 1…10`) y la plantilla al cr
 | Calculadora en Math | Todo el Math | `MathToolPanel` habilitado si `section === "MATH"` | ✅ |
 | Score sección | 200–800 | `FullPracticeTestScoreConversion` + fallback lineal | ✅* |
 | Score total | suma de secciones | `rwScore + mathScore` | ✅ |
+| Skill / difficulty por módulo | (oficial: adaptativo) | Topic `M1`/`M2` · M1=EASY · M2=HARD | ⚠️ (fijo) |
 
 \* La conversión raw→scaled es **configurable** por admin/teacher (`FullPracticeTestScoreConversion`). Si no hay filas, hay fallback aproximado lineal 200–800 — no es la tabla secreta de College Board.
+
+**Metadata de ítems (mocks Innovators, 2026-08-12):** cada pregunta de FT lleva skill Topic
+`M1` o `M2` (Domain `Full Practice Test`, por sección) y difficulty **EASY** (Module 1) /
+**HARD** (Module 2 / etiqueta fuente `2B`). Es clasificación de **contenido fijo**, no
+adaptatividad en runtime. Helpers: `lib/full-test-modules.ts`; seed de topics:
+`scripts/ensure-fulltest-topics.mjs`; backfill: `scripts/backfill-fulltest-module-skills.ts`.
 
 Constantes de plantilla (código):
 
 ```ts
-// app/api/full-practice-tests/route.ts (y promote-full-test)
-{ name: "Reading & Writing Module 1", section: "RW",   timeLimit: 32 * 60 },
-{ name: "Reading & Writing Module 2", section: "RW",   timeLimit: 32 * 60 },
-{ name: "Math Module 1",             section: "MATH", timeLimit: 35 * 60 },
-{ name: "Math Module 2",             section: "MATH", timeLimit: 35 * 60 },
+// lib/full-test-modules.ts (usado por create + promote-full-test)
+{ name: "Reading & Writing Module 1", section: "RW",   moduleKey: "M1", timeLimit: 32 * 60 },
+{ name: "Reading & Writing Module 2", section: "RW",   moduleKey: "M2", timeLimit: 32 * 60 },
+{ name: "Math Module 1",             section: "MATH", moduleKey: "M1", timeLimit: 35 * 60 },
+{ name: "Math Module 2",             section: "MATH", moduleKey: "M2", timeLimit: 35 * 60 },
 ```
 
 Los mocks Innovators en `dev.db` respetan esta plantilla (verificado 2026-08-11: todos los tests 1–10 en **98/98**, módulos desde Q1).
@@ -105,7 +112,7 @@ Leyenda: ✅ alineado · ⚠️ parcial / distinto a propósito · ❌ no implem
 |----------------|--------------------|------------|:------:|
 | 4 módulos, 98 ítems, tiempos 32/32/35/35 | Sí | Sí | ✅ |
 | Etiqueta de módulo “2B” en materiales mock | En forms oficiales el alumno ve Module 1/2; “2B” es etiqueta de **ruta más difícil** del M2 adaptativo | En staging/ingesta a menudo `moduleLabel=2B` = “Module 2 del PDF”; el FT lo nombra “Reading & Writing Module 2” | ⚠️ |
-| Ítems pretest (2 por módulo, no puntúan) | Sí, mezclados | **No** hay marca pretest: las 27/22 cuentan todas al raw score | ❌ |
+| Ítems pretest (2 por módulo, no puntúan) | Sí, mezclados | **Sí**: primeras 2 por módulo (`isPretest`); alumno no ve marca; raw RW≤50 / Math≤40 | ✅ |
 | Banco adaptativo (dos versiones de M2) | Sí | Un solo set fijo de preguntas por módulo | ❌ |
 | Routing M1 → M2 fácil/difícil | Sí | No: siempre el mismo Module 2 | ❌ |
 
@@ -115,10 +122,10 @@ Leyenda: ✅ alineado · ⚠️ parcial / distinto a propósito · ❌ no implem
 
 | Comportamiento | Oficial | Plataforma | Estado |
 |----------------|---------|------------|:------:|
-| Reloj por módulo | Sí | Sí (`remaining` + `moduleTimerState[]`) | ✅ |
-| Al llegar a 0: avance forzado al siguiente módulo | Sí (Bluebook mueve solo) | **No**: el reloj llega a 0, cuenta `timeExpiredEvents` y sigue en **“Extra time”** (`extraTimeUsed`) hasta que el alumno pulse Next/Submit | ⚠️ |
-| No arrastrar tiempo entre módulos | Sí | Sí (cada módulo tiene su slot en `moduleTimerState`) | ✅ |
-| Break de 10 min entre R&W y Math | Sí | **No** hay pantalla/timer de break; al terminar RW M2 el Next pasa directo a Math M1 | ❌ |
+| Reloj por módulo | Sí | Sí (`remaining` + progress state) | ✅ |
+| Al llegar a 0: avance forzado al siguiente módulo | Sí (Bluebook mueve solo) | **Sí**: autosave + auto-advance (o break / submit) | ✅ |
+| No arrastrar tiempo entre módulos | Sí | Sí (cada módulo tiene su slot) | ✅ |
+| Break de 10 min entre R&W y Math | Sí | **Sí**: pantalla break con `breakMinutes` (default 10; no suma a sección) | ✅ |
 | Pausar y salir a mitad | En centro: controlado por proctor / Bluebook | **Pause & Exit** con `FullPracticeTestPause` + resume | ⚠️ (útil en práctica; no es paridad de centro) |
 
 ### 3.3 Navegación dentro del módulo
@@ -142,7 +149,7 @@ Leyenda: ✅ alineado · ⚠️ parcial / distinto a propósito · ❌ no implem
 
 | Comportamiento | Oficial | Plataforma | Estado |
 |----------------|---------|------------|:------:|
-| Raw = aciertos en ítems **operativos** | Pretest excluidos | Todas las preguntas del módulo cuentan | ⚠️ |
+| Raw = aciertos en ítems **operativos** | Pretest excluidos | Pretest (`order` 0–1) excluidos del raw/scaled | ✅ |
 | Escala 200–800 por sección | Equating / forms | Tabla `FullPracticeTestScoreConversion` o fallback lineal | ⚠️ |
 | Total = RW + Math | Sí | Sí | ✅ |
 | Penalización por incorrecta | No (desde el SAT moderno) | No | ✅ |
@@ -161,15 +168,14 @@ Leyenda: ✅ alineado · ⚠️ parcial / distinto a propósito · ❌ no implem
 
 ## 4. Resumen ejecutivo
 
-**Lo que ya está “SAT-shaped” (estructura):**
+**Lo que ya está “SAT-shaped” (estructura + pacing):**
 
 - 98 preguntas · 4 módulos · tiempos 32/32/35/35 · orden R&W→Math · MC+NUMERIC · calculadora en Math · scores 200–800 + total.
+- Pretest 2/módulo (silencioso) · break 10 min configurable · auto-advance al timeout · timer rojo ≤1 min.
 
 **Lo que es práctica / LMS, no Bluebook:**
 
-- Sin adaptatividad ni pretest.
-- Sin break de 10 min.
-- Timer “blando” (extra time en vez de avance forzado).
+- Sin adaptatividad (un solo Module 2 fijo).
 - Navegación lineal (Next), con Pause & Exit.
 - Conversión de score editable (no equating oficial).
 
@@ -178,15 +184,15 @@ tratar los Full Practice Tests como **mocks de contenido y pacing por módulo** 
 
 ---
 
-## 5. Checklist de paridad (si se quiere acercar más al oficial)
+## 5. Checklist de paridad
 
-Prioridad sugerida si el producto pide “más fiel a Bluebook”:
+1. ~~**Avance automático** al agotar el tiempo del módulo~~ ✅ (2026-08-12)
+2. ~~**Break de 10 min** entre RW M2 y Math M1~~ ✅ (`breakMinutes`)
+3. **Navegación intra-módulo** (previous + grid de preguntas + flag) — pendiente
+4. (Mayor) **Routing adaptativo** o al menos dos bancos de M2 — pendiente
+5. ~~Marca **pretest** excluida del raw score~~ ✅ (`isPretest`, raw 50/40)
 
-1. **Avance automático** al agotar el tiempo del módulo (hoy solo marca expired + extra time).
-2. **Break de 10 min** entre RW M2 y Math M1 (pantalla bloqueada con countdown).
-3. **Navegación intra-módulo** (previous + grid de preguntas + flag).
-4. (Mayor) **Routing adaptativo** o al menos dos bancos de M2 (fácil/difícil) con selección por umbral de M1.
-5. (Mayor) Marca **pretest** excluida del raw score (o documentar explícitamente que los 27/22 son todos operativos en nuestros mocks).
+Flujo ingest → FPT: [`fpt-ingest-to-standardized.md`](fpt-ingest-to-standardized.md).
 
 ---
 
@@ -196,8 +202,14 @@ Prioridad sugerida si el producto pide “más fiel a Bluebook”:
 |--------------|-----|
 | Este archivo | Spec oficial ↔ comportamiento plataforma |
 | [`procesamientos-ingest.md`](procesamientos-ingest.md) | Cómo se llenó el contenido de los 10 mocks |
+| [`fpt-ingest-to-standardized.md`](fpt-ingest-to-standardized.md) | Flujo staging → FPT + estados + pretest/break |
 | [`../estructura-documental.md`](../estructura-documental.md) | Estructura de **archivos** de ingesta (no del examen en vivo) |
-| `prisma/schema.prisma` → `FullPracticeTest*` | Modelo de datos |
+| `prisma/schema.prisma` → `FullPracticeTest*` | Modelo de datos (`breakMinutes`, `isPretest`) |
 | `prisma/seed.demo.ts` | Seed con `32*60` / `35*60` y 27/22 |
-| `lib/full-test-scoring.ts` | Conversión raw → scaled |
-| `lib/full-test-progress.ts` | Persistencia de `moduleTimerState` |
+| `lib/full-test-modules.ts` | Plantilla 4 módulos + M1/M2 difficulty/topic helpers |
+| `lib/full-test-scoring.ts` | Conversión raw operativo → scaled (RW≤50 / Math≤40) |
+| `lib/full-test-progress.ts` | Timers + fase BREAK |
+| `lib/attempt-progress.ts` | % / posición PS y FPT |
+| `scripts/ensure-fulltest-topics.mjs` | Topics placeholder M1/M2 (+ legacy) |
+| `scripts/backfill-fulltest-module-skills.ts` | Reasigna skill/difficulty por módulo en Imported Tests |
+| `scripts/backfill-fulltest-pretest.ts` | Marca isPretest order&lt;2 |
