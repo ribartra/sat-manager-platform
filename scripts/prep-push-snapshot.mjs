@@ -129,10 +129,18 @@ if (CONTENT_FILTER === "ps-fpt-only") {
     .run(now).changes;
 
   let archivedQuestions = 0;
+  let publishedKeptQuestions = 0;
   const allQuestions = db.prepare("SELECT id, status FROM Question").all();
   const archiveQ = db.prepare("UPDATE Question SET status = 'ARCHIVED', updatedAt = ? WHERE id = ?");
+  const publishQ = db.prepare("UPDATE Question SET status = 'PUBLISHED', updatedAt = ? WHERE id = ?");
   for (const question of allQuestions) {
-    if (keepQuestions.has(question.id)) continue;
+    if (keepQuestions.has(question.id)) {
+      if (question.status !== "PUBLISHED") {
+        publishQ.run(now, question.id);
+        publishedKeptQuestions += 1;
+      }
+      continue;
+    }
     if (question.status === "ARCHIVED") continue;
     archiveQ.run(now, question.id);
     archivedQuestions += 1;
@@ -163,7 +171,7 @@ if (CONTENT_FILTER === "ps-fpt-only") {
   console.log(`CONTENT_FILTER=ps-fpt-only (solo snapshot):`);
   console.log(`  keep PracticeSet PUBLISHED=${keepPs.size} · archived other=${archivedPs}`);
   console.log(`  keep FullPracticeTest PUBLISHED=${keepFpt.size} · archived other=${archivedFpt}`);
-  console.log(`  keep Question in those=${keepQuestions.size} · archived other=${archivedQuestions}`);
+  console.log(`  keep Question in those=${keepQuestions.size} · forced PUBLISHED=${publishedKeptQuestions} · archived other=${archivedQuestions}`);
   console.log(`  StudyMaterial archived=${archivedMaterials}`);
   console.log(`  IngestQuestionCandidate rejected=${rejectedCandidates}`);
 } else if (CONTENT_FILTER) {
