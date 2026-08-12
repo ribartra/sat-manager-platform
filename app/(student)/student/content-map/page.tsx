@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ChevronRight, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
-import { activeTaxonomySection, buildTaxonomyTree, matchesTaxonomySection, TAXONOMY_SECTION_TABS, type TaxonomyTreeNode } from "@/lib/taxonomy";
+import { academicTopicWhere, activeTaxonomySection, buildTaxonomyTree, matchesTaxonomySection, TAXONOMY_SECTION_TABS, type TaxonomyTreeNode } from "@/lib/taxonomy";
 
 const DIFFICULTIES = ["EASY", "MEDIUM", "HARD"] as const;
 
@@ -24,6 +24,7 @@ export default async function ContentMapPage({ searchParams }: PageProps) {
       orderBy: [{ sortOrder: "asc" }, { label: "asc" }],
     }),
     prisma.topic.findMany({
+      where: academicTopicWhere,
       include: {
         taxonomyNode: true,
         practiceSets: {

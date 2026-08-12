@@ -1,9 +1,11 @@
 import prisma from "@/lib/prisma";
+import { academicTopicWhere } from "@/lib/taxonomy";
 import { MaterialsClient } from "./materials-client";
 
 export default async function TeacherMaterialsPage() {
   const [topics, materials] = await Promise.all([
     prisma.topic.findMany({
+      where: academicTopicWhere,
       orderBy: { name: "asc" },
       include: { domain: { include: { section: true } } },
     }),

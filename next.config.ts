@@ -36,7 +36,18 @@ const nextConfig: NextConfig = {
     "@prisma/adapter-better-sqlite3",
     "@prisma/client",
     "bcryptjs",
+    "@google-cloud/storage",
   ],
+  async rewrites() {
+    // Serve question media via Node handler (GCS + disk fallback). Public/ still
+    // wins when a file exists on disk; GCS-only objects hit this route.
+    return [
+      {
+        source: "/uploads/questions/:path*",
+        destination: "/api/media/questions/:path*",
+      },
+    ];
+  },
 };
 
 export default nextConfig;

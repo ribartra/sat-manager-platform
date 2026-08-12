@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { PracticeSetEditor } from "../../practice-set-editor-client";
-import { buildTaxonomyTree, taxonomyPathLabel } from "@/lib/taxonomy";
+import { academicTopicWhere, buildTaxonomyTree, taxonomyPathLabel } from "@/lib/taxonomy";
 
 interface PageProps {
   params: Promise<{ practiceSetId: string }>;
@@ -14,9 +14,9 @@ export default async function EditPracticeSetPage({ params }: PageProps) {
       where: { id: practiceSetId },
       include: { questions: { orderBy: { order: "asc" } } },
     }),
-    prisma.topic.findMany({ include: { taxonomyNode: true, domain: { include: { section: true } } }, orderBy: { name: "asc" } }),
+    prisma.topic.findMany({ where: academicTopicWhere, include: { taxonomyNode: true, domain: { include: { section: true } } }, orderBy: { name: "asc" } }),
     prisma.taxonomyNode.findMany({ where: { active: true }, orderBy: [{ sortOrder: "asc" }, { label: "asc" }] }),
-    prisma.question.findMany({ where: { status: { in: ["PUBLISHED", "DRAFT"] } }, orderBy: { createdAt: "desc" } }),
+    prisma.question.findMany({ where: { status: { in: ["PUBLISHED", "DRAFT"] }, topic: academicTopicWhere }, orderBy: { createdAt: "desc" } }),
   ]);
   const { byId } = buildTaxonomyTree(taxonomyNodes);
 

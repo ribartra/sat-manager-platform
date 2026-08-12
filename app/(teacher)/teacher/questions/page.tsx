@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { MathContent } from "@/components/math-content";
 import { QuestionActions } from "./question-actions-client";
 import { cn } from "@/lib/utils";
-import { activeTaxonomySection, buildTaxonomyTree, matchesTaxonomySection, TAXONOMY_SECTION_TABS } from "@/lib/taxonomy";
+import { academicTopicWhere, activeTaxonomySection, buildTaxonomyTree, matchesTaxonomySection, TAXONOMY_SECTION_TABS } from "@/lib/taxonomy";
 import { QuestionsFilter } from "./questions-filter-client";
 
 interface SearchParams { section?: string; topic?: string; difficulty?: string; status?: string }
@@ -26,6 +26,7 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
   const [taxonomyNodes, topics] = await Promise.all([
     prisma.taxonomyNode.findMany({ where: { active: true }, orderBy: [{ sortOrder: "asc" }, { label: "asc" }] }),
     prisma.topic.findMany({
+      where: academicTopicWhere,
       include: { taxonomyNode: true, domain: { include: { section: true } } },
       orderBy: { name: "asc" },
     }),

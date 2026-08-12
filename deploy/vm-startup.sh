@@ -6,6 +6,7 @@ set -euo pipefail
 
 REGION="${REGION}"
 CONFIG_BUCKET="${CONFIG_BUCKET}"
+PROJECT_ID="${PROJECT_ID}"
 REGISTRY="${REGISTRY}"
 TAG="${TAG}"
 DOMAIN="${DOMAIN}"
@@ -107,6 +108,9 @@ done
   echo "EMAIL_PORT=${EMAIL_PORT}"
   echo "EMAIL_USER=${EMAIL_USER}"
   echo "EMAIL_PASS=$(sv email-pass || true)"
+  # Runtime media bucket (same project data bucket; objects under media/questions/).
+  echo "GCS_BUCKET=$${CONFIG_BUCKET}"
+  echo "GCS_PROJECT_ID=$${PROJECT_ID}"
 } > /data/app.env
 
 cat > /data/stack/.env <<EOF

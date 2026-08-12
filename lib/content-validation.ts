@@ -43,9 +43,16 @@ export function validateQuestionPayload(payload: QuestionPayload) {
 
     if (type === "MC") {
       const options = payload.options ?? [];
-      const byLabel = new Map(options.map((option) => [option.label, option.text?.trim()]));
+      const byLabel = new Map(
+        options.map((option) => [
+          option.label,
+          Boolean(option.text?.trim() || option.imageUrl?.trim()),
+        ])
+      );
       for (const label of MC_LABELS) {
-        if (!byLabel.get(label)) errors.push(`Option ${label} is required to publish.`);
+        if (!byLabel.get(label)) {
+          errors.push(`Option ${label} must have text or an image to publish.`);
+        }
       }
       if (payload.correctAnswer && !MC_LABELS.includes(payload.correctAnswer)) {
         errors.push("Correct answer for multiple choice must be A, B, C or D.");

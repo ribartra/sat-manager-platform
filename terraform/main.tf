@@ -189,6 +189,7 @@ resource "google_compute_instance" "vm" {
     startup-script = templatefile("${path.module}/../deploy/vm-startup.sh", {
       REGION        = var.region
       CONFIG_BUCKET = google_storage_bucket.data.name
+      PROJECT_ID    = var.project_id
       REGISTRY      = local.registry
       TAG           = var.image_tag
       DOMAIN        = var.domain

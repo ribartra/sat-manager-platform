@@ -1,10 +1,11 @@
 import prisma from "@/lib/prisma";
 import { SubskillsClient } from "./subskills-client";
-import { buildTaxonomyTree, taxonomyPathLabel } from "@/lib/taxonomy";
+import { academicTopicWhere, buildTaxonomyTree, taxonomyPathLabel } from "@/lib/taxonomy";
 
 export default async function SubskillsPage() {
   const [topics, taxonomyNodes] = await Promise.all([
     prisma.topic.findMany({
+      where: academicTopicWhere,
       include: { taxonomyNode: true, domain: { include: { section: true } }, subskills: { include: { taxonomyNode: true }, orderBy: { name: "asc" } } },
       orderBy: { name: "asc" },
     }),

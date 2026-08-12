@@ -2,7 +2,7 @@ import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { activeTaxonomySection, buildTaxonomyTree, matchesTaxonomySection, TAXONOMY_SECTION_TABS, type TaxonomyTreeNode } from "@/lib/taxonomy";
+import { academicTopicWhere, activeTaxonomySection, buildTaxonomyTree, matchesTaxonomySection, TAXONOMY_SECTION_TABS, type TaxonomyTreeNode } from "@/lib/taxonomy";
 import { cn } from "@/lib/utils";
 
 function tabHref(section: string) {
@@ -17,6 +17,7 @@ export default async function TeacherContentPage({ searchParams }: { searchParam
       orderBy: [{ sortOrder: "asc" }, { label: "asc" }],
     }),
     prisma.topic.findMany({
+      where: academicTopicWhere,
       include: {
         taxonomyNode: true,
         practiceSets: {
@@ -145,7 +146,7 @@ export default async function TeacherContentPage({ searchParams }: { searchParam
       </div>
 
       {!hasContent && (
-        <div className="py-12 text-center text-sm text-gray-400">No hay contenido en esta sección todavía.</div>
+        <div className="py-12 text-center text-sm text-gray-400">No content in this section yet.</div>
       )}
 
       {visibleRoots.length > 0

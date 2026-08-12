@@ -1,4 +1,14 @@
 services:
+  # Local GCS emulator (same @google-cloud/storage client as production).
+  # Web talks to it at http://gcs:4443; host scripts use http://localhost:4443.
+  gcs:
+    image: fsouza/fake-gcs-server
+    command: ["-scheme", "http", "-port", "4443", "-external-url", "http://localhost:4443", "-backend", "filesystem", "-data", "/data"]
+    ports:
+      - "4443:4443"
+    volumes:
+      - gcs-data:/data
+
   web:
     image: node:24-slim
     working_dir: /app
@@ -11,10 +21,15 @@ services:
       AUTH_SECRET: ${AUTH_SECRET:-sat-platform-dev-secret-change-in-production}
       SECRET_ENCRYPTION_KEY: ${SECRET_ENCRYPTION_KEY:-}
       INTERNAL_INGEST_TOKEN: ${INTERNAL_INGEST_TOKEN:-sat-platform-dev-internal-token-change}
+      GCS_BUCKET: ${GCS_BUCKET:-sat-media-local}
+      GCS_API_ENDPOINT: http://gcs:4443
+      GCS_PROJECT_ID: sat-local
+      STORAGE_EMULATOR_HOST: http://gcs:4443
     volumes:
       - .:/app
     depends_on:
       - ingest-service
+      - gcs
 
   ingest-service:
     build:
@@ -36,3 +51,6 @@ services:
       - .:/app
       # Live-mount app code over the image copy so PDF-render fixes apply without rebuild.
       - ./ingest_service/app:/service/app
+
+volumes:
+  gcs-data:

@@ -5,6 +5,18 @@ export const TAXONOMY_SECTION_TABS = [
 
 export type TaxonomySectionKey = (typeof TAXONOMY_SECTION_TABS)[number]["key"];
 
+/** Domain used only for Full Practice Test module skills (M1/M2) — not an academic SAT skill. */
+export const FULL_PRACTICE_TEST_DOMAIN_NAME = "Full Practice Test";
+
+/** Prisma `where` fragment: exclude FPT placeholder/module topics from skill pickers. */
+export const academicTopicWhere = {
+  domain: { name: { not: FULL_PRACTICE_TEST_DOMAIN_NAME } },
+} as const;
+
+export function isAcademicSkillTopic(topic: { domain?: { name?: string | null } | null }) {
+  return (topic.domain?.name ?? "").trim() !== FULL_PRACTICE_TEST_DOMAIN_NAME;
+}
+
 export type TaxonomyNodeBase = {
   id: string;
   name: string;

@@ -21,6 +21,9 @@ services:
       DATABASE_URL: file:/db/dev.db
       AI_INGEST_SERVICE_URL: http://ingest-service:8000
       INGEST_PUBLIC_UPLOAD_ROOT: /app/.private/uploads/ingest
+      # GCS_BUCKET / GCS_PROJECT_ID come from /data/app.env (vm-startup).
+      # Dual-write keeps /data/uploads populated during the migration window.
+      GCS_DUAL_WRITE_DISK: "true"
     volumes:
       - /data/db:/db
       - /data/uploads:/app/public/uploads

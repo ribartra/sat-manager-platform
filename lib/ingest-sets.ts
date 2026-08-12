@@ -153,11 +153,9 @@ export function classifyQuestion(c: QuestionContent): QuestionClassification {
   let options: FieldState;
   if (!isMC) {
     options = "na";
-  } else if (c.optTextCount >= 4) {
+  } else if (c.optTextCount >= 4 || c.optImgCount >= 4) {
+    // Text or image-backed A–D both count as complete (graph choices often have empty text).
     options = "ok";
-  } else if (c.optImgCount >= 4) {
-    options = "info";
-    notes.push("Answer choices are only in images");
   } else if (c.optTextCount > 0 || c.optImgCount > 0) {
     options = "warn";
     notes.push("Some answer choices are incomplete");

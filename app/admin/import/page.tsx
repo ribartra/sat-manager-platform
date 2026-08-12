@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { BulkImportClient } from "./bulk-import-client";
+import { academicTopicWhere } from "@/lib/taxonomy";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +12,7 @@ export default async function BulkImportPage() {
   if (!["TEACHER", "ADMIN"].includes(session.user.role)) redirect("/student");
 
   const topics = await prisma.topic.findMany({
+    where: academicTopicWhere,
     include: { domain: { include: { section: true } } },
     orderBy: { name: "asc" },
   });

@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { QuestionEditor } from "../../question-editor-client";
-import { buildTaxonomyTree, taxonomyPathLabel } from "@/lib/taxonomy";
+import { academicTopicWhere, buildTaxonomyTree, taxonomyPathLabel } from "@/lib/taxonomy";
 
 interface PageProps {
   params: Promise<{ questionId: string }>;
@@ -16,6 +16,7 @@ export default async function EditQuestionPage({ params }: PageProps) {
       include: { options: { orderBy: { label: "asc" } } },
     }),
     prisma.topic.findMany({
+      where: academicTopicWhere,
       include: { taxonomyNode: true, domain: { include: { section: true } }, subskills: true },
       orderBy: { name: "asc" },
     }),

@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma";
 import { QuestionEditor } from "../question-editor-client";
 import { loadCandidateQuestionDraft } from "@/lib/ingest-promotion";
-import { buildTaxonomyTree, taxonomyPathLabel } from "@/lib/taxonomy";
+import { academicTopicWhere, buildTaxonomyTree, taxonomyPathLabel } from "@/lib/taxonomy";
 
 interface PageProps {
   searchParams: Promise<{ ingestCandidateId?: string }>;
@@ -11,8 +11,9 @@ export default async function NewQuestionPage({ searchParams }: PageProps) {
   const { ingestCandidateId } = await searchParams;
   const [topics, taxonomyNodes, ingestDraft] = await Promise.all([
     prisma.topic.findMany({
-    include: { taxonomyNode: true, domain: { include: { section: true } }, subskills: true },
-    orderBy: { name: "asc" },
+      where: academicTopicWhere,
+      include: { taxonomyNode: true, domain: { include: { section: true } }, subskills: true },
+      orderBy: { name: "asc" },
     }),
     prisma.taxonomyNode.findMany({ where: { active: true }, orderBy: [{ sortOrder: "asc" }, { label: "asc" }] }),
     ingestCandidateId ? loadCandidateQuestionDraft(ingestCandidateId) : null,

@@ -89,11 +89,11 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       prisma.fullPracticeTestAnswer.count({ where: { questionId: officialId } }),
     ]);
     if (!official) {
-      warnings.push("La pregunta oficial del source ya no existe; se omitió la limpieza.");
+      warnings.push("The source official question no longer exists; cleanup was skipped.");
     } else if (official.status !== "DRAFT") {
-      warnings.push(`La pregunta oficial del source no es DRAFT (${official.status}); no se eliminó.`);
+      warnings.push(`The source official question is not DRAFT (${official.status}); it was not deleted.`);
     } else if (attemptRefs > 0 || fullTestRefs > 0) {
-      warnings.push("La pregunta oficial del source tiene intentos asociados; no se eliminó.");
+      warnings.push("The source official question has associated attempts; it was not deleted.");
     } else {
       cleanedOfficialQuestionId = officialId;
     }

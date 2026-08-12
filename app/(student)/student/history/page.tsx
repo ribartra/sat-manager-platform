@@ -9,6 +9,7 @@ import {
   cumulativeAverageSeries,
   resolvePracticeSetAttemptScore,
 } from "@/lib/practice-set-scoring";
+import { FULL_PRACTICE_TEST_DOMAIN_NAME } from "@/lib/taxonomy";
 
 interface PageProps {
   searchParams: Promise<{
@@ -99,7 +100,9 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
       orderBy: { submittedAt: "desc" },
     }),
     prisma.topic.findMany({
-      where: sectionId ? { domain: { sectionId } } : { domain: { sectionId: { in: effectiveSectionIds } } },
+      where: sectionId
+        ? { domain: { sectionId, name: { not: FULL_PRACTICE_TEST_DOMAIN_NAME } } }
+        : { domain: { sectionId: { in: effectiveSectionIds }, name: { not: FULL_PRACTICE_TEST_DOMAIN_NAME } } },
       include: { domain: { include: { section: true } } },
       orderBy: { name: "asc" },
     }),

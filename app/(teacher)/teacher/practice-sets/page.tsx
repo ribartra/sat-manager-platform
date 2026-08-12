@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Plus } from "lucide-react";
 import { PracticeSetActions } from "./practice-set-actions-client";
 import { PracticeSetsFilter } from "./practice-sets-filter-client";
-import { activeTaxonomySection, buildTaxonomyTree, matchesTaxonomySection, TAXONOMY_SECTION_TABS } from "@/lib/taxonomy";
+import { academicTopicWhere, activeTaxonomySection, buildTaxonomyTree, matchesTaxonomySection, TAXONOMY_SECTION_TABS } from "@/lib/taxonomy";
 import { cn } from "@/lib/utils";
 
 interface SearchParams { section?: string; topic?: string; difficulty?: string; status?: string }
@@ -24,7 +24,7 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
 
   const [taxonomyNodes, topics] = await Promise.all([
     prisma.taxonomyNode.findMany({ where: { active: true }, orderBy: [{ sortOrder: "asc" }, { label: "asc" }] }),
-    prisma.topic.findMany({ include: { taxonomyNode: true, domain: { include: { section: true } } }, orderBy: { name: "asc" } }),
+    prisma.topic.findMany({ where: academicTopicWhere, include: { taxonomyNode: true, domain: { include: { section: true } } }, orderBy: { name: "asc" } }),
   ]);
   const { roots, byId } = buildTaxonomyTree(taxonomyNodes);
   const rootByNodeId = new Map<string, (typeof roots)[number]>();

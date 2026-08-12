@@ -4,7 +4,8 @@
 //
 // Criteria for a publishable Question:
 //   topic + difficulty + stem + correctAnswer, AND
-//   NUMERIC, or MC with >=4 TEXT options and correctAnswer in A-D.
+//   NUMERIC, or MC with correctAnswer in A-D and >=4 options that each have
+//   text and/or imageUrl (graph-choice items often have empty text + imageUrl).
 // (Explanation is NOT required — it doesn't block answering; it only enriches
 //  the post-finish review.)
 // A PracticeSet is published only when ALL its questions are publishable.
@@ -22,14 +23,20 @@ const db = new Database(url.startsWith("file:") ? url.slice(5) : url);
 const AD = new Set(["A", "B", "C", "D"]);
 const qs = db.prepare(`
   SELECT q.id, q.type, q.difficulty, q.correctAnswer, q.stem, q.topicId,
-         (SELECT count(*) FROM QuestionOption o WHERE o.questionId=q.id AND o.text IS NOT NULL AND o.text<>'') nText
+         (SELECT count(*) FROM QuestionOption o WHERE o.questionId=q.id AND o.text IS NOT NULL AND o.text<>'') nText,
+         (SELECT count(*) FROM QuestionOption o WHERE o.questionId=q.id AND o.imageUrl IS NOT NULL AND o.imageUrl<>'') nOptImg,
+         (SELECT count(*) FROM QuestionOption o
+           WHERE o.questionId=q.id
+             AND ((o.text IS NOT NULL AND o.text<>'') OR (o.imageUrl IS NOT NULL AND o.imageUrl<>''))) nPresent
   FROM Question q WHERE q.status='DRAFT'
 `).all();
 const publishableQ = new Set();
 for (const q of qs) {
   if (!(q.topicId && q.difficulty && (q.stem || "").trim() && (q.correctAnswer || "").trim())) continue;
   if (q.type === "NUMERIC") { publishableQ.add(q.id); continue; }
-  if (q.nText >= 4 && AD.has((q.correctAnswer || "").trim())) publishableQ.add(q.id);
+  if (AD.has((q.correctAnswer || "").trim()) && (q.nPresent >= 4 || q.nText >= 4 || q.nOptImg >= 4)) {
+    publishableQ.add(q.id);
+  }
 }
 
 const sets = db.prepare("SELECT id, name FROM PracticeSet WHERE status='DRAFT'").all();

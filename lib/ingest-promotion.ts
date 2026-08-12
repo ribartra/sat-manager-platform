@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
 import crypto from "crypto";
-import { mkdir, readFile, writeFile } from "fs/promises";
+import { readFile } from "fs/promises";
 import path from "path";
 import {
   difficultyFromFullTestModuleLabel,
@@ -225,11 +225,9 @@ export async function materializeOfficialImageUrl(imageUrl: string | null | unde
   const data = await readFile(sourcePath);
   const extension = path.extname(fileName).toLowerCase() || ".jpg";
   const digest = crypto.createHash("sha256").update(data).digest("hex").slice(0, 24);
-  const publicDir = path.join(process.cwd(), "public", "uploads", "questions");
   const publicName = `${digest}${extension}`;
-  await mkdir(publicDir, { recursive: true });
-  await writeFile(path.join(publicDir, publicName), data);
-  return `/uploads/questions/${publicName}`;
+  const { putQuestionImage } = await import("@/lib/object-storage");
+  return putQuestionImage(publicName, data);
 }
 
 function normalize(value: string | null | undefined) {

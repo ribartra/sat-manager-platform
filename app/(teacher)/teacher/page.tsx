@@ -10,6 +10,7 @@ import { getFeatureSetting } from "@/lib/app-settings";
 import { refreshAssignmentStates } from "@/lib/assignments";
 import { studentAccessWhereFor, teacherProgramEnrollmentScope } from "@/lib/program-scope";
 import { getStudentLastActiveMap } from "@/lib/activity";
+import { academicTopicWhere } from "@/lib/taxonomy";
 
 interface PageProps {
   searchParams: Promise<{
@@ -106,6 +107,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
     }),
     teacherGroupManagementEnabled ? prisma.group.findMany({ orderBy: { name: "asc" } }) : Promise.resolve([]),
     prisma.topic.findMany({
+      where: academicTopicWhere,
       include: { domain: { include: { section: true } } },
       orderBy: { name: "asc" },
     }),

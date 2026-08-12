@@ -71,7 +71,7 @@ const checks = [
     requires: [
       "const MC_LABELS = [\"A\", \"B\", \"C\", \"D\"]",
       "for (const label of MC_LABELS)",
-      "Option ${label} is required to publish.",
+      "Option ${label} must have text or an image to publish.",
       "Correct answer for multiple choice must be A, B, C or D.",
       "At least one published question is required to publish.",
       "Practice Set cannot contain duplicate questions.",
