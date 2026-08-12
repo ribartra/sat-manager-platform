@@ -61,6 +61,7 @@ siempre **WAL-safe**: `docker compose stop web` → apply → `wal_checkpoint(TR
 | [`practice-sets-medium-recovery.md`](practice-sets-medium-recovery.md) | Auditoría + APPLY Practice Sets MEDIUM Math+R&W (2026-08-11) |
 | [`practice-sets-hard-recovery.md`](practice-sets-hard-recovery.md) | Auditoría + APPLY Practice Sets HARD Math+R&W (2026-08-11) |
 | [`practice-sets-image-observations.md`](practice-sets-image-observations.md) | **Backlog vivo**: PS sin imagen asociada (tabla/gráfico/figura) — 154 Q al 2026-08-12 |
+| [`practice-sets-difficulty-completeness.md`](practice-sets-difficulty-completeness.md) | Completitud EASY/MEDIUM/HARD por skill (Topic) — 2026-08-12 |
 
 Contratos de agentes (scratchpad, no docs):
 
