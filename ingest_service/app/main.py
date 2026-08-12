@@ -974,8 +974,8 @@ def crop_candidate_region(
         # R&W keeps candidates in the answer-explanations DOCX (no page images) while
         # the passages/figures live in the questions DOCX. The reviewer selects which
         # source to view; we crop from that one but still link the crop to this
-        # candidate. The artifact stays recorded under the candidate's own source so
-        # it shows up in that file's image board.
+        # candidate. Store the artifact under the image source (pixel file) so the
+        # question DOCX gallery/preview can resolve it after refresh.
         image_source = source
         if image_source_file_id and image_source_file_id != source["id"]:
             alt = db.execute("SELECT * FROM IngestSourceFile WHERE id = ?", (image_source_file_id,)).fetchone()
@@ -1025,9 +1025,18 @@ def crop_candidate_region(
                 action="Try attaching the image again. If it keeps failing, check disk space or permissions.",
             )
             raise HTTPException(status_code=500, detail="Crop image did not save correctly.")
+        artifact_source_id = image_source["id"]
+        page_artifact_id = candidate["pageArtifactId"]
+        if artifact_source_id != source["id"]:
+            sibling_page = db.execute(
+                "SELECT id FROM IngestPageArtifact WHERE sourceFileId = ? AND pageNumber = ?",
+                (artifact_source_id, page_number),
+            ).fetchone()
+            if sibling_page:
+                page_artifact_id = sibling_page["id"]
         next_index = db.execute(
             "SELECT COALESCE(MAX(imageIndex), -1) + 1 FROM IngestImageArtifact WHERE sourceFileId = ? AND pageNumber = ? AND origin = 'MANUAL_CROP'",
-            (source["id"], page_number),
+            (artifact_source_id, page_number),
         ).fetchone()[0]
         bbox_json = json.dumps({"normalized": bbox_norm, "points": points, "renderedWidth": w_px, "renderedHeight": h_px})
         db.execute(
@@ -1036,7 +1045,7 @@ def crop_candidate_region(
               (id, batchId, sourceFileId, pageArtifactId, pageNumber, imageIndex, imageId, origin, bboxJson, mimeType, fileUrl, width, height, contentHash, status)
             VALUES (?, ?, ?, ?, ?, ?, ?, 'MANUAL_CROP', ?, 'image/jpeg', ?, ?, ?, ?, 'AVAILABLE')
             """,
-            (image_id, candidate["batchId"], source["id"], candidate["pageArtifactId"], page_number, next_index, image_id, bbox_json, file_url, w_px, h_px, content_hash),
+            (image_id, candidate["batchId"], artifact_source_id, page_artifact_id, page_number, next_index, image_id, bbox_json, file_url, w_px, h_px, content_hash),
         )
         result: dict[str, Any] = {"candidateId": candidate_id, "imageArtifactId": image_id, "fileUrl": file_url, "pageNumber": page_number, "mode": mode}
         if mode == "ASSIGN":

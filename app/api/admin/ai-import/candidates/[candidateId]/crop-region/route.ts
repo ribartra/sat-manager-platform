@@ -3,6 +3,7 @@ import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { ingestAuthHeaders, ingestUrl } from "@/lib/internal-ingest";
 import { propagateAssignedImageToOfficial } from "@/lib/ingest-promotion";
+import { cleanupAfterStemImageAssigned } from "@/lib/ingest-image-cleanup";
 
 interface RouteContext {
   params: Promise<{ candidateId: string }>;
@@ -94,6 +95,9 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       targetType,
       optionLabel: body.optionLabel ?? null,
     }).catch(() => null);
+    if (targetType === "STEM" || targetType === "STIMULUS") {
+      await cleanupAfterStemImageAssigned(candidateId).catch(() => null);
+    }
   }
 
   await prisma.auditLog.create({

@@ -62,7 +62,7 @@ export default async function AiImportFileReviewPage({ params }: PageProps) {
   const candidateFileIds = scope.candidateSourceFileIds;
   const answerFileIds = scope.extractedTest?.fileIds ?? [fileId];
 
-  const [pages, candidates, answers, images, incidents] = await Promise.all([
+  const [pages, candidates, answers, fileImages, incidents] = await Promise.all([
     prisma.ingestPageArtifact.findMany({
       where: { batchId, sourceFileId: fileId },
       orderBy: { pageNumber: "asc" },
@@ -100,6 +100,20 @@ export default async function AiImportFileReviewPage({ params }: PageProps) {
         orderBy: [{ candidateId: "asc" }, { sortOrder: "asc" }],
       })
     : [];
+
+  // Crops for sibling-scoped candidates are often stored under the answer file;
+  // include those artifacts so STEM slots can resolve previews on the question DOCX.
+  const linkedImageIds = [...new Set(candidateLinks.map((link) => link.imageArtifactId))];
+  const missingLinkedIds = linkedImageIds.filter((id) => !fileImages.some((image) => image.id === id));
+  const linkedImages =
+    missingLinkedIds.length > 0
+      ? await prisma.ingestImageArtifact.findMany({
+          where: { batchId, id: { in: missingLinkedIds } },
+        })
+      : [];
+  const images = [...fileImages, ...linkedImages].sort(
+    (a, b) => (a.pageNumber ?? 0) - (b.pageNumber ?? 0) || (a.imageIndex ?? 0) - (b.imageIndex ?? 0),
+  );
   // Promoted questions of the matching full test — offered as targets when assigning
   // an extracted image to a question from the gallery (a full-test question source
   // often has images but no candidates, so there's no per-candidate board to use).

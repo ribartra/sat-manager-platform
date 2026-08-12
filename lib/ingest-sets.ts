@@ -74,8 +74,8 @@ export function classifyQuestion(c: QuestionContent): QuestionClassification {
     notes.push("Question has a table or messy formatting");
   }
 
-  // Leftover markdown image in stem/stimulus text (link missing or strip incomplete).
-  if (stem !== "crit" && c.hasUnresolvedMarkdownImage) {
+  // Leftover markdown image in stem/stimulus — only pending if no STEM image is linked yet.
+  if (stem !== "crit" && c.hasUnresolvedMarkdownImage && !c.hasStemImageLink) {
     stem = "warn";
     notes.push("Question image is not attached");
   }
