@@ -40,6 +40,12 @@ PUBLIC_UPLOAD_ROOT = Path(os.getenv("INGEST_PUBLIC_UPLOAD_ROOT", "/app/.private/
 PUBLIC_UPLOAD_URL_PREFIX = "/api/admin/ai-import/assets"
 MISTRAL_API_KEY_SETTING = "MISTRAL_API_KEY_ENCRYPTED"
 
+# pdfplumber/pypdfium2 is not safe under concurrent to_image() calls in the
+# uvicorn threadpool: parallel page-thumbnail requests segfault the process
+# (exit 139) and leave subsequent renders returning None/404. Serialize all
+# PDF rasterization in this process.
+_PDF_RENDER_LOCK = threading.RLock()
+
 
 def database_path_from_url(database_url: str) -> str:
     if database_url.startswith("file:"):
@@ -806,35 +812,37 @@ def decode_base64_image(value: str | None) -> tuple[bytes | None, str]:
 
 
 def crop_pdf_image(path: Path, page_number: int, bbox: dict[str, Any]) -> tuple[bytes | None, int | None, int | None]:
-    try:
-        with pdfplumber.open(path) as pdf:
-            page = pdf.pages[page_number - 1]
-            x0 = float(bbox.get("x0") if bbox.get("x0") is not None else bbox.get("top_left_x"))
-            top = float(bbox.get("top") if bbox.get("top") is not None else bbox.get("top_left_y"))
-            x1 = float(bbox.get("x1") if bbox.get("x1") is not None else bbox.get("bottom_right_x"))
-            bottom = float(bbox.get("bottom") if bbox.get("bottom") is not None else bbox.get("bottom_right_y"))
-            cropped = page.crop((x0, top, x1, bottom)).to_image(resolution=180).original.convert("RGB")
-            output = BytesIO()
-            cropped.save(output, format="JPEG", quality=90, optimize=True)
-            return output.getvalue(), cropped.width, cropped.height
-    except Exception:
-        return None, None, None
+    with _PDF_RENDER_LOCK:
+        try:
+            with pdfplumber.open(path) as pdf:
+                page = pdf.pages[page_number - 1]
+                x0 = float(bbox.get("x0") if bbox.get("x0") is not None else bbox.get("top_left_x"))
+                top = float(bbox.get("top") if bbox.get("top") is not None else bbox.get("top_left_y"))
+                x1 = float(bbox.get("x1") if bbox.get("x1") is not None else bbox.get("bottom_right_x"))
+                bottom = float(bbox.get("bottom") if bbox.get("bottom") is not None else bbox.get("bottom_right_y"))
+                cropped = page.crop((x0, top, x1, bottom)).to_image(resolution=180).original.convert("RGB")
+                output = BytesIO()
+                cropped.save(output, format="JPEG", quality=90, optimize=True)
+                return output.getvalue(), cropped.width, cropped.height
+        except Exception:
+            return None, None, None
 
 
 def render_pdf_page_jpeg(path: Path, page_number: int, dpi: int = 150) -> tuple[bytes | None, float | None, float | None]:
     """Renderiza una página completa a JPEG para mostrarla en el navegador (cropper).
     Devuelve (bytes, page.width, page.height) en puntos PDF para mapear coords."""
-    try:
-        with pdfplumber.open(path) as pdf:
-            if page_number < 1 or page_number > len(pdf.pages):
-                return None, None, None
-            page = pdf.pages[page_number - 1]
-            image = page.to_image(resolution=dpi).original.convert("RGB")
-            output = BytesIO()
-            image.save(output, format="JPEG", quality=85, optimize=True)
-            return output.getvalue(), float(page.width), float(page.height)
-    except Exception:
-        return None, None, None
+    with _PDF_RENDER_LOCK:
+        try:
+            with pdfplumber.open(path) as pdf:
+                if page_number < 1 or page_number > len(pdf.pages):
+                    return None, None, None
+                page = pdf.pages[page_number - 1]
+                image = page.to_image(resolution=dpi).original.convert("RGB")
+                output = BytesIO()
+                image.save(output, format="JPEG", quality=85, optimize=True)
+                return output.getvalue(), float(page.width), float(page.height)
+        except Exception:
+            return None, None, None
 
 
 def crop_pdf_region_normalized(
@@ -843,25 +851,26 @@ def crop_pdf_region_normalized(
     """Recorta una región dada en coordenadas NORMALIZADAS [0,1] (esquina sup-izq
     = 0,0), convirtiéndolas a puntos PDF con page.width/height. Independiente de
     DPI/zoom del navegador. Devuelve (jpeg, w_px, h_px, puntos_pdf)."""
-    try:
-        with pdfplumber.open(path) as pdf:
-            if page_number < 1 or page_number > len(pdf.pages):
-                return None, None, None, None
-            page = pdf.pages[page_number - 1]
-            pw, ph = float(page.width), float(page.height)
-            clamp = lambda v: max(0.0, min(1.0, float(v)))
-            x0 = clamp(bbox_norm.get("x0", 0)) * pw
-            y0 = clamp(bbox_norm.get("y0", 0)) * ph
-            x1 = clamp(bbox_norm.get("x1", 1)) * pw
-            y1 = clamp(bbox_norm.get("y1", 1)) * ph
-            if x1 - x0 < 1.0 or y1 - y0 < 1.0:
-                return None, None, None, None
-            cropped = page.crop((x0, y0, x1, y1)).to_image(resolution=180).original.convert("RGB")
-            output = BytesIO()
-            cropped.save(output, format="JPEG", quality=90, optimize=True)
-            return output.getvalue(), cropped.width, cropped.height, {"x0": x0, "top": y0, "x1": x1, "bottom": y1}
-    except Exception:
-        return None, None, None, None
+    with _PDF_RENDER_LOCK:
+        try:
+            with pdfplumber.open(path) as pdf:
+                if page_number < 1 or page_number > len(pdf.pages):
+                    return None, None, None, None
+                page = pdf.pages[page_number - 1]
+                pw, ph = float(page.width), float(page.height)
+                clamp = lambda v: max(0.0, min(1.0, float(v)))
+                x0 = clamp(bbox_norm.get("x0", 0)) * pw
+                y0 = clamp(bbox_norm.get("y0", 0)) * ph
+                x1 = clamp(bbox_norm.get("x1", 1)) * pw
+                y1 = clamp(bbox_norm.get("y1", 1)) * ph
+                if x1 - x0 < 1.0 or y1 - y0 < 1.0:
+                    return None, None, None, None
+                cropped = page.crop((x0, y0, x1, y1)).to_image(resolution=180).original.convert("RGB")
+                output = BytesIO()
+                cropped.save(output, format="JPEG", quality=90, optimize=True)
+                return output.getvalue(), cropped.width, cropped.height, {"x0": x0, "top": y0, "x1": x1, "bottom": y1}
+        except Exception:
+            return None, None, None, None
 
 
 def crop_image_region_normalized(

@@ -60,6 +60,7 @@ siempre **WAL-safe**: `docker compose stop web` → apply → `wal_checkpoint(TR
 | [`practice-sets-easy-recovery.md`](practice-sets-easy-recovery.md) | Auditoría Practice Sets EASY Math+R&W (planes agentes 2026-08-11) |
 | [`practice-sets-medium-recovery.md`](practice-sets-medium-recovery.md) | Auditoría + APPLY Practice Sets MEDIUM Math+R&W (2026-08-11) |
 | [`practice-sets-hard-recovery.md`](practice-sets-hard-recovery.md) | Auditoría + APPLY Practice Sets HARD Math+R&W (2026-08-11) |
+| [`practice-sets-image-observations.md`](practice-sets-image-observations.md) | **Backlog vivo**: PS sin imagen asociada (tabla/gráfico/figura) — 154 Q al 2026-08-12 |
 
 Contratos de agentes (scratchpad, no docs):
 
@@ -192,12 +193,13 @@ Estos quedan en el runtime; no son one-shots.
 
 ## 4. Residuales conocidos (aún pendientes)
 
-No bloquean la **composición** 98/98 de módulos. Actualizado 2026-08-11 tras
-fix de preguntas creadas (T7/T10 Q1–Q2) y spillovers de opción D.
+No bloquean la **composición** 98/98 de módulos. Actualizado 2026-08-12
+(inventario PS de imagen + residual FT T5 MATH 1:10).
 
 | Ítem | Severidad | Notas |
 |------|-----------|-------|
-| Figuras Math / CoE graph `imageUrl` en practice sets | warn calidad | No bloquea contestar; ver docs practice-sets-*-recovery |
+| Figuras/tablas sin `imageUrl` en **Practice Sets** | warn calidad | **154** preguntas (EASY 47 / MEDIUM 55 / HARD 52) en 47 sets — lista completa en [practice-sets-image-observations](practice-sets-image-observations.md) (+ JSON hermano). No bloquea contestar. |
+| FT T5 MATH `1:10` | warn | Tabla 2 vías grade/team (`[tbl-0]`) sin imagen; resto de FT visuales de la pasada 2026-08-12 ya OK |
 | Estímulos R&W residuales (tabla/gráfico) en FT | warn | Lista histórica en [rw-stimulus-recovery](rw-stimulus-recovery.md); WiC/SEC embebidos son OK |
 | `broken-questions.md` | doc | Snapshot **2026-08-10**; regenerar antes de usarlo como backlog vivo |
 | T4 RW `2:27` opción D | — | **Cerrado** (pág. 37 OCR) |

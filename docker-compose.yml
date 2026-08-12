@@ -34,3 +34,5 @@ services:
       MISTRAL_STRUCTURING_MODEL: ${MISTRAL_STRUCTURING_MODEL:-mistral-large-latest}
     volumes:
       - .:/app
+      # Live-mount app code over the image copy so PDF-render fixes apply without rebuild.
+      - ./ingest_service/app:/service/app

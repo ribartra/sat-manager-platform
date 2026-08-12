@@ -241,9 +241,11 @@ export function PdfPageCropper({
             </p>
           )}
 
-          {/* Array of per-page images: pick the page to crop from. */}
+          {/* Page picker. Avoid loading every page as a thumbnail image at once —
+              concurrent pdfplumber renders segfault the ingest process. Numbers
+              only; the main viewer loads the selected page. */}
           {uniquePages.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto rounded border border-gray-200 bg-gray-50 p-2">
+            <div className="flex flex-wrap gap-1.5 rounded border border-gray-200 bg-gray-50 p-2">
               {uniquePages.map((p) => (
                 <button
                   key={p}
@@ -251,17 +253,13 @@ export function PdfPageCropper({
                   onClick={() => changePage(p)}
                   disabled={busy !== null}
                   title={`Página ${p}`}
-                  className={`relative shrink-0 overflow-hidden rounded border-2 ${p === pageNumber ? "border-blue-500 ring-2 ring-blue-200" : "border-transparent hover:border-gray-300"}`}
+                  className={`min-w-8 rounded px-2 py-1 text-xs font-medium ${
+                    p === pageNumber
+                      ? "bg-blue-600 text-white"
+                      : "bg-white text-gray-700 ring-1 ring-gray-200 hover:bg-gray-100"
+                  }`}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={`/api/admin/ai-import/sources/${effectiveSourceId}/pages/${p}/image?dpi=60`}
-                    alt={`Página ${p}`}
-                    loading="lazy"
-                    draggable={false}
-                    className="h-16 w-auto max-w-[130px] bg-white object-contain"
-                  />
-                  <span className="absolute bottom-0 right-0 bg-black/60 px-1 text-[10px] leading-tight text-white">{p}</span>
+                  {p}
                 </button>
               ))}
             </div>
