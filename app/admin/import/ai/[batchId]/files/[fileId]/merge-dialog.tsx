@@ -49,23 +49,23 @@ export type MergeImageArtifact = {
 type FieldKey = "stem" | "stimulus" | "optionsJson" | "correctAnswer" | "explanation" | "difficulty" | "topicName";
 
 const FIELDS: { key: FieldKey; label: string; multiline: boolean; mono?: boolean; math?: boolean }[] = [
-  { key: "stem", label: "Enunciado", multiline: true, math: true },
-  { key: "stimulus", label: "Estímulo", multiline: true, math: true },
-  { key: "optionsJson", label: "Opciones (JSON)", multiline: true, mono: true },
-  { key: "correctAnswer", label: "Respuesta", multiline: false },
-  { key: "explanation", label: "Explicación", multiline: true, math: true },
-  { key: "difficulty", label: "Dificultad", multiline: false },
+  { key: "stem", label: "Stem", multiline: true, math: true },
+  { key: "stimulus", label: "Stimulus", multiline: true, math: true },
+  { key: "optionsJson", label: "Options (JSON)", multiline: true, mono: true },
+  { key: "correctAnswer", label: "Answer", multiline: false },
+  { key: "explanation", label: "Explanation", multiline: true, math: true },
+  { key: "difficulty", label: "Difficulty", multiline: false },
   { key: "topicName", label: "Skill", multiline: false },
 ];
 
 const IMAGE_TARGETS = [
-  { value: "STEM", label: "Imagen de enunciado" },
-  { value: "STIMULUS", label: "Imagen de estímulo" },
-  { value: "OPTION", label: "Imagen de una opción" },
-  { value: "OPTION_BLOCK", label: "Bloque de opciones" },
-  { value: "ANSWER_FIELD", label: "Campo de respuesta" },
-  { value: "EXPLANATION", label: "Imagen de explicación" },
-  { value: "PAGE_CONTEXT", label: "Contexto de página" },
+  { value: "STEM", label: "Stem image" },
+  { value: "STIMULUS", label: "Stimulus image" },
+  { value: "OPTION", label: "Option image" },
+  { value: "OPTION_BLOCK", label: "Options block" },
+  { value: "ANSWER_FIELD", label: "Answer field" },
+  { value: "EXPLANATION", label: "Explanation image" },
+  { value: "PAGE_CONTEXT", label: "Page context" },
 ];
 
 function imageSrc(image: MergeImageArtifact | undefined) {
@@ -78,7 +78,7 @@ function imageSrc(image: MergeImageArtifact | undefined) {
 function labelFor(candidate: MergeCandidate) {
   const num = candidate.questionNumber != null ? `Q${candidate.questionNumber}` : "Q?";
   const snippet = (candidate.stem ?? candidate.questionExternalId ?? "").replace(/[\n\r]/g, " ").slice(0, 40);
-  return `${num} · ${snippet || "sin texto"}`;
+  return `${num} · ${snippet || "no text"}`;
 }
 
 type Choice = "A" | "B" | "custom";
@@ -201,13 +201,13 @@ export function MergeDialog({ open, onClose, candidates, imageLinks, images, ini
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(data?.error ?? "No se pudo fusionar.");
+        setError(data?.error ?? "Could not merge.");
         setSubmitting(false);
         return;
       }
       onMerged(survivorCand.id, Array.isArray(data?.warnings) ? data.warnings : []);
     } catch {
-      setError("Error de red al fusionar.");
+      setError("Network error while merging.");
       setSubmitting(false);
     }
   }
@@ -216,22 +216,22 @@ export function MergeDialog({ open, onClose, candidates, imageLinks, images, ini
     <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
       <DialogContent className="max-h-[90vh] max-w-5xl overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Fusionar preguntas detectadas</DialogTitle>
+          <DialogTitle>Merge detected questions</DialogTitle>
           <DialogDescription>
-            Resuelve cada componente eligiendo un lado o una copia personalizada. La pregunta sobreviviente conserva el
-            resultado consolidado; la otra se retira.
+            Resolve each field by picking a side or a custom value. The surviving question keeps the
+            consolidated result; the other is retired.
           </DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-3 rounded-md border border-gray-200 bg-gray-50 p-3 sm:grid-cols-2">
           <label className="grid gap-1 text-sm">
-            <span className="text-xs font-medium text-gray-500">Fusionar con</span>
+            <span className="text-xs font-medium text-gray-500">Merge with</span>
             <select
               value={otherId}
               onChange={(e) => setOtherId(e.target.value)}
               className="rounded-md border border-gray-300 px-3 py-2 text-sm"
             >
-              {others.length === 0 && <option value="">No hay otras preguntas</option>}
+              {others.length === 0 && <option value="">No other questions</option>}
               {others.map((c) => (
                 <option key={c.id} value={c.id}>
                   {labelFor(c)}
@@ -240,13 +240,13 @@ export function MergeDialog({ open, onClose, candidates, imageLinks, images, ini
             </select>
           </label>
           <div className="grid gap-1 text-sm">
-            <span className="text-xs font-medium text-gray-500">¿Cuál sobrevive?</span>
+            <span className="text-xs font-medium text-gray-500">Which survives?</span>
             <div className="flex gap-2">
               <Button type="button" size="sm" variant={survivor === "A" ? "primary" : "secondary"} onClick={() => setSurvivor("A")}>
-                Izquierda: {candA.questionNumber != null ? `Q${candA.questionNumber}` : "Q?"}
+                Left: {candA.questionNumber != null ? `Q${candA.questionNumber}` : "Q?"}
               </Button>
               <Button type="button" size="sm" variant={survivor === "B" ? "primary" : "secondary"} onClick={() => setSurvivor("B")} disabled={!candB}>
-                Derecha: {candB?.questionNumber != null ? `Q${candB.questionNumber}` : "Q?"}
+                Right: {candB?.questionNumber != null ? `Q${candB.questionNumber}` : "Q?"}
               </Button>
             </div>
           </div>
@@ -256,10 +256,10 @@ export function MergeDialog({ open, onClose, candidates, imageLinks, images, ini
           <>
             <div className="grid grid-cols-2 gap-3 text-xs font-medium">
               <div className="rounded bg-blue-50 px-3 py-1.5 text-blue-900">
-                Izquierda · {labelFor(candA)} {survivor === "A" && <Badge variant="success">sobrevive</Badge>}
+                Left · {labelFor(candA)} {survivor === "A" && <Badge variant="success">survives</Badge>}
               </div>
               <div className="rounded bg-amber-50 px-3 py-1.5 text-amber-900">
-                Derecha · {labelFor(candB)} {survivor === "B" && <Badge variant="success">sobrevive</Badge>}
+                Right · {labelFor(candB)} {survivor === "B" && <Badge variant="success">survives</Badge>}
               </div>
             </div>
 
@@ -281,7 +281,7 @@ export function MergeDialog({ open, onClose, candidates, imageLinks, images, ini
                             variant={c === opt ? "primary" : "secondary"}
                             onClick={() => setChoice((prev) => ({ ...prev, [field.key]: opt }))}
                           >
-                            {opt === "A" ? "Izq." : opt === "B" ? "Der." : "Personalizado"}
+                            {opt === "A" ? "Left" : opt === "B" ? "Right" : "Custom"}
                           </Button>
                         ))}
                       </div>
@@ -323,12 +323,12 @@ export function MergeDialog({ open, onClose, candidates, imageLinks, images, ini
 
             {combinedLinks.length > 0 && (
               <div className="rounded-md border border-gray-200 p-3">
-                <p className="mb-2 text-sm font-semibold text-gray-800">Imágenes de ambas fuentes</p>
+                <p className="mb-2 text-sm font-semibold text-gray-800">Images from both sources</p>
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   {combinedLinks.map((link) => {
                     const image = images.find((img) => img.id === link.imageArtifactId);
                     const src = imageSrc(image);
-                    const fromSide = link.candidateId === candA.id ? "Izq." : "Der.";
+                    const fromSide = link.candidateId === candA.id ? "Left" : "Right";
                     const t = imgTarget[link.id] ?? { targetType: link.targetType, optionLabel: link.optionLabel ?? "" };
                     return (
                       <div key={link.id} className={`rounded-md border p-2 ${imgInclude[link.id] ? "border-blue-300 bg-blue-50" : "border-gray-200 opacity-60"}`}>
@@ -337,7 +337,7 @@ export function MergeDialog({ open, onClose, candidates, imageLinks, images, ini
                             // eslint-disable-next-line @next/next/no-img-element
                             <img src={src} alt={`p.${image?.pageNumber ?? "?"}`} className="h-full w-full object-contain" />
                           ) : (
-                            <div className="flex h-full items-center justify-center text-xs text-gray-400">Sin vista previa</div>
+                            <div className="flex h-full items-center justify-center text-xs text-gray-400">No preview</div>
                           )}
                         </div>
                         <label className="mt-2 flex items-center gap-2 text-xs text-gray-700">
@@ -347,7 +347,7 @@ export function MergeDialog({ open, onClose, candidates, imageLinks, images, ini
                             onChange={(e) => setImgInclude((prev) => ({ ...prev, [link.id]: e.target.checked }))}
                             className="h-4 w-4 rounded border-gray-300"
                           />
-                          Incluir · <span className="text-gray-400">{fromSide} p.{image?.pageNumber ?? "?"}</span>
+                          Include · <span className="text-gray-400">{fromSide} p.{image?.pageNumber ?? "?"}</span>
                         </label>
                         <select
                           value={t.targetType}
@@ -380,22 +380,22 @@ export function MergeDialog({ open, onClose, candidates, imageLinks, images, ini
             {sourceCand && sourceCand.promotionStatus === "PROMOTED" && sourceCand.officialQuestionId && (
               <label className="flex items-center gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
                 <input type="checkbox" checked={cleanup} onChange={(e) => setCleanup(e.target.checked)} className="h-4 w-4 rounded border-gray-300" />
-                Eliminar también la pregunta oficial huérfana ya promovida (solo si es borrador sin intentos).
+                Also delete the orphaned official question already promoted (only if it is a draft with no attempts).
               </label>
             )}
 
             {error && <p className="text-sm text-red-600">{error}</p>}
           </>
         ) : (
-          <p className="text-sm text-gray-500">No hay otra pregunta en este archivo para fusionar.</p>
+          <p className="text-sm text-gray-500">No other question in this file to merge with.</p>
         )}
 
         <DialogFooter>
           <Button type="button" variant="secondary" onClick={onClose} disabled={submitting}>
-            Cancelar
+            Cancel
           </Button>
           <Button type="button" onClick={handleMerge} disabled={submitting || !candB}>
-            {submitting ? "Fusionando…" : `Fusionar en ${survivorCand?.questionNumber != null ? `Q${survivorCand.questionNumber}` : "Q?"}`}
+            {submitting ? "Merging…" : `Merge into ${survivorCand?.questionNumber != null ? `Q${survivorCand.questionNumber}` : "Q?"}`}
           </Button>
         </DialogFooter>
       </DialogContent>

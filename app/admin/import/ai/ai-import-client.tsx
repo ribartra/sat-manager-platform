@@ -12,8 +12,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from "@/components/ui/input";
 import { MathContent } from "@/components/math-content";
 import { PdfPageCropper, type CropTarget, type CropOcrResult } from "@/app/admin/import/ai/_components/pdf-page-cropper";
-import { ConjuntoRail } from "@/app/admin/import/ai/_components/conjunto-rail";
-import type { ConjuntoRow } from "@/lib/ingest-sets";
+import { ExtractedTestRail } from "@/app/admin/import/ai/_components/extracted-test-rail";
+import type { ExtractedTestRow } from "@/lib/ingest-sets";
 
 const MAX_UPLOAD_BYTES = 256 * 1024 * 1024;
 const targetTypes = [
@@ -150,7 +150,7 @@ type AiImportWorkflowProps = {
   practiceSets: PracticeSetSummary[];
   fullTests: FullTestSummary[];
   cropImageSources: Record<string, { imageSourceFileId: string; pageNumbers: number[] }>;
-  setRows: ConjuntoRow[];
+  setRows: ExtractedTestRow[];
   counts: {
     ocrPending: number;
     openIncidents: number;
@@ -300,7 +300,7 @@ export function AiImportWorkflowClient({
   const [candidateQuery, setCandidateQuery] = useState("");
   const [candidateStatus, setCandidateStatus] = useState("ALL");
   const [selectedCandidateId, setSelectedCandidateId] = useState(candidates[0]?.id ?? "");
-  const [selectedConjuntoKey, setSelectedConjuntoKey] = useState<string>(
+  const [selectedExtractedTestKey, setSelectedExtractedTestKey] = useState<string>(
     () => setRows.find((row) => candidates[0]?.sourceFileId && row.fileIds.includes(candidates[0].sourceFileId))?.key ?? "",
   );
   const [draft, setDraft] = useState<CandidateSummary | null>(candidates[0] ?? null);
@@ -352,15 +352,15 @@ export function AiImportWorkflowClient({
     && Boolean(candidate.stem)
     && Boolean(candidate.correctAnswer)
   );
-  // The Review modal lists the questions of the conjunto selected in the rail.
-  // A conjunto spans several files (question + answer + explanations), so match
-  // against all of the conjunto's file ids. Bulk promotion below stays batch-wide.
-  const selectedConjunto = useMemo(
-    () => setRows.find((row) => row.key === selectedConjuntoKey) ?? null,
-    [setRows, selectedConjuntoKey],
+  // The Review modal lists questions for the Extracted Test selected in the rail.
+  // An Extracted Test spans several files (question + answer + explanations), so match
+  // against all of its file ids. Bulk promotion below stays batch-wide.
+  const selectedExtractedTest = useMemo(
+    () => setRows.find((row) => row.key === selectedExtractedTestKey) ?? null,
+    [setRows, selectedExtractedTestKey],
   );
-  const visibleCandidates = selectedConjunto
-    ? filteredCandidates.filter((candidate) => candidate.sourceFileId && selectedConjunto.fileIds.includes(candidate.sourceFileId))
+  const visibleCandidates = selectedExtractedTest
+    ? filteredCandidates.filter((candidate) => candidate.sourceFileId && selectedExtractedTest.fileIds.includes(candidate.sourceFileId))
     : filteredCandidates;
 
   const nearbyImages = images.filter((image) => {
@@ -380,9 +380,9 @@ export function AiImportWorkflowClient({
     setMessage(null);
   }
 
-  function selectConjunto(row: ConjuntoRow) {
-    setSelectedConjuntoKey(row.key);
-    // Jump the editor to the first question of the chosen conjunto (any of its files).
+  function selectExtractedTest(row: ExtractedTestRow) {
+    setSelectedExtractedTestKey(row.key);
+    // Jump the editor to the first question of the chosen Extracted Test (any of its files).
     const first = candidates.find((candidate) => candidate.sourceFileId && row.fileIds.includes(candidate.sourceFileId));
     if (first) selectCandidate(first);
   }
@@ -581,19 +581,19 @@ export function AiImportWorkflowClient({
         <DialogContent className="max-h-[92vh] max-w-[100rem] overflow-auto">
           <DialogHeader>
             <DialogTitle>Review Staging Content</DialogTitle>
-            <DialogDescription>Elige un conjunto, revisa sus preguntas y edítalas antes de promover a oficial.</DialogDescription>
+            <DialogDescription>Choose an Extracted Test, review its questions, and edit them before promoting to official content.</DialogDescription>
           </DialogHeader>
           <div className={`grid gap-4 ${selectedBatchId && setRows.length > 0 ? "xl:grid-cols-[240px_320px_minmax(0,1fr)]" : "xl:grid-cols-[360px_minmax(0,1fr)]"}`}>
             {selectedBatchId && setRows.length > 0 && (
-              <ConjuntoRail rows={setRows} batchId={selectedBatchId} currentFileId={draft?.sourceFileId ?? ""} onSelect={selectConjunto} />
+              <ExtractedTestRail rows={setRows} batchId={selectedBatchId} currentFileId={draft?.sourceFileId ?? ""} onSelect={selectExtractedTest} />
             )}
             <div className="space-y-4">
               <section className="rounded-md border border-gray-200">
                 <div className="border-b border-gray-100 p-3">
-                  <p className="text-sm font-semibold text-gray-900">Preguntas del conjunto</p>
-                  {selectedConjunto && (
-                    <p className="mt-0.5 truncate text-xs text-gray-500" title={selectedConjunto.title}>
-                      {selectedConjunto.title}
+                  <p className="text-sm font-semibold text-gray-900">Questions in this Extracted Test</p>
+                  {selectedExtractedTest && (
+                    <p className="mt-0.5 truncate text-xs text-gray-500" title={selectedExtractedTest.title}>
+                      {selectedExtractedTest.title}
                     </p>
                   )}
                   <FilterBar query={candidateQuery} setQuery={setCandidateQuery} status={candidateStatus} setStatus={setCandidateStatus} statusOptions={["ALL", "NEEDS_REVIEW", "READY", "REVIEWED", "REJECTED", "PROMOTED", "EDITING"]} placeholder="Search question, topic or file" />
@@ -639,7 +639,7 @@ export function AiImportWorkflowClient({
                       <CopyableTruncatedText value={candidate.sourceFileId ? fileById.get(candidate.sourceFileId)?.relativePath : ""} fallback="No source" className="mt-1 max-w-full text-xs text-gray-400" />
                     </div>
                   ))}
-                  {visibleCandidates.length === 0 && <p className="p-6 text-center text-sm text-gray-400">No hay preguntas en este conjunto para el filtro actual.</p>}
+                  {visibleCandidates.length === 0 && <p className="p-6 text-center text-sm text-gray-400">No questions in this Extracted Test for the current filter.</p>}
                 </div>
               </section>
             </div>
@@ -697,10 +697,10 @@ export function AiImportWorkflowClient({
           </DialogHeader>
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-gray-200 p-4">
             <div>
-              <p className="text-sm font-semibold text-gray-900">Full Practice Tests (SAT estandarizado)</p>
+              <p className="text-sm font-semibold text-gray-900">Full Practice Tests (standardized SAT)</p>
               <p className="text-xs text-gray-500">
-                {fullTests.length} tests · staging se revisa en 2 conjuntos (R&amp;W + Math); al promover se ensamblan 4 grupos
-                (RW M1/M2 · Math M1/M2) con timers 32/32/35/35 y score por sección.
+                {fullTests.length} tests · staging review uses 2 Extracted Tests (R&amp;W + Math); promote assembles 4 groups
+                (RW M1/M2 · Math M1/M2) with timers 32/32/35/35 and section scores.
               </p>
             </div>
           </div>
@@ -711,7 +711,7 @@ export function AiImportWorkflowClient({
                   <div>
                     <p className="text-sm font-semibold text-gray-900">Full Practice Test {test.testNumber}</p>
                     <p className="mt-1 text-xs text-gray-500">
-                      {test.promoted}/{test.total} official · 2 conjuntos → 4 grupos SAT
+                      {test.promoted}/{test.total} official · 2 Extracted Tests → 4 SAT groups
                     </p>
                     <p className="mt-0.5 text-[11px] text-gray-400">M1 = EASY · M2 = HARD (skill M1/M2)</p>
                   </div>
@@ -1104,7 +1104,7 @@ function QuestionStagingEditor({
               <span className="text-xs text-gray-500">{Math.round(draft.confidence * 100)}% confidence</span>
               {dirty && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
-                  <span className="h-1.5 w-1.5 rounded-full bg-amber-500" /> Sin guardar
+                  <span className="h-1.5 w-1.5 rounded-full bg-amber-500" /> Unsaved
                 </span>
               )}
             </div>
@@ -1171,14 +1171,14 @@ function QuestionStagingEditor({
           </label>
           <div className={`flex flex-wrap items-center gap-2 rounded-md border p-3 transition-colors ${dirty ? "border-amber-300 bg-amber-50" : "border-gray-200 bg-gray-50"}`}>
             <Button type="button" onClick={() => saveDraft()} disabled={saving || !dirty}>
-              {saving ? "Guardando…" : dirty ? "Guardar cambios" : "Guardado"}
+              {saving ? "Saving…" : dirty ? "Save changes" : "Saved"}
             </Button>
             <Button type="button" variant="secondary" onClick={() => saveDraft("REVIEWED")} disabled={saving}>Mark Reviewed</Button>
             <Button type="button" variant="secondary" onClick={() => saveDraft("REJECTED")} disabled={saving}>Reject</Button>
             <span className="text-xs text-gray-600">
               {dirty
-                ? "El OCR y las ediciones solo cambian el borrador en pantalla. Pulsa Guardar para escribir en la base de datos."
-                : "Sin cambios pendientes."}
+                ? "OCR and edits only change the on-screen draft. Click Save to write to the database."
+                : "No pending changes."}
             </span>
             {message && <span className="text-xs text-gray-500">· {message}</span>}
           </div>
@@ -1562,7 +1562,7 @@ export function PromoteFullTestButton({ batchId, testNumber, partial = false }: 
             )
             .join(" · ")
         : (data.moduleCounts ?? []).join("/");
-      setMessage(`FPT estandarizado listo (4 grupos): ${modules}`);
+      setMessage(`Standardized FPT ready (4 groups): ${modules}`);
     } else {
       setMessage(data.error ?? "Could not create draft exam.");
     }
@@ -1572,7 +1572,7 @@ export function PromoteFullTestButton({ batchId, testNumber, partial = false }: 
   return (
     <div className="flex flex-wrap items-center gap-2">
       <Button type="button" variant="secondary" onClick={promote} disabled={loading}>
-        {loading ? "Creating..." : partial ? "Create Partial Full Test" : "Ensamblar FPT (4 grupos)"}
+        {loading ? "Creating..." : partial ? "Create Partial Full Test" : "Assemble FPT (4 groups)"}
       </Button>
       {message && <span className="text-xs text-gray-500">{message}</span>}
     </div>

@@ -31,7 +31,7 @@ export default async function FullTestsPage() {
                 <Badge variant={test.status === "PUBLISHED" ? "success" : test.status === "ARCHIVED" ? "default" : "warning"}>{test.status}</Badge>
               </div>
               <p className="mt-1 text-xs text-gray-500">
-                {test.modules.length} grupos · {test.modules.reduce((sum, m) => sum + m.questions.length, 0)} preguntas · break{" "}
+                {test.modules.length} groups · {test.modules.reduce((sum, m) => sum + m.questions.length, 0)} questions · break{" "}
                 {test.breakMinutes} min · {test.assignments.length} assignments · {test.attempts.length} attempts · review{" "}
                 {test.reviewEnabled ? "on" : "off"}
               </p>

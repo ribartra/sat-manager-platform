@@ -2,20 +2,16 @@ import "server-only";
 import prisma from "@/lib/prisma";
 import {
   classifyQuestion,
-  type ConjuntoFile,
-  type ConjuntoFileRole,
-  type ConjuntoRow,
+  type ExtractedTestFile,
+  type ExtractedTestFileRole,
+  type ExtractedTestRow,
   type QuestionContent,
   type QuestionStatusRow,
 } from "@/lib/ingest-sets";
 
-// computeConjuntos groups a batch's source files into logical conjuntos — the
-// set of files that together make one set (a Full Practice Test section, or a
-// Practice Set + its answer key) — and reports live per-question completeness
-// for each, using the promoted official Question when available (what students
-// see) and falling back to the staging candidate otherwise. Shared by the
-// standalone index (app/admin/import/ai/sets), the conjunto rail, and the
-// per-file review workspace.
+// Groups a batch's source files into ExtractedTest rows — the set of files that
+// together make one staging unit (Full Practice Test section, or Practice Set +
+// answer key) — with live per-question completeness.
 
 function textOptionCount(optionsJson: string | null): number {
   if (!optionsJson) return 0;
@@ -37,14 +33,19 @@ function fileName(relativePath: string): string {
   return relativePath.split("/").at(-1) || relativePath;
 }
 
-function fileRole(f: { isQuestionSource: boolean; isAnswerFile: boolean; isExplanationFile: boolean; sourceKind: string | null }): ConjuntoFileRole {
+function fileRole(f: {
+  isQuestionSource: boolean;
+  isAnswerFile: boolean;
+  isExplanationFile: boolean;
+  sourceKind: string | null;
+}): ExtractedTestFileRole {
   if (f.isExplanationFile || f.sourceKind === "ANSWER_EXPLANATION") return "EXPLANATION";
   if (f.isAnswerFile || f.sourceKind === "ANSWER_KEY") return "ANSWER";
   if (f.isQuestionSource) return "QUESTION";
   return "OTHER";
 }
 
-export async function computeConjuntos(batchId: string): Promise<ConjuntoRow[]> {
+export async function computeExtractedTests(batchId: string): Promise<ExtractedTestRow[]> {
   const [sources, candidates, answerCounts, imageLinks] = await Promise.all([
     prisma.ingestSourceFile.findMany({
       where: { batchId, contentType: { in: ["PRACTICE_SET", "FULL_PRACTICE_TEST"] } },
@@ -90,8 +91,6 @@ export async function computeConjuntos(batchId: string): Promise<ConjuntoRow[]> 
     }),
   ]);
 
-  // Per-candidate option-image coverage: an OPTION_BLOCK link resolves all four
-  // options; individual OPTION links each cover one letter.
   const optionBlock = new Set<string>();
   const optionLetters = new Map<string, Set<string>>();
   for (const link of imageLinks) {
@@ -104,17 +103,18 @@ export async function computeConjuntos(batchId: string): Promise<ConjuntoRow[]> 
     }
   }
 
-  // Official content for promoted candidates (what students actually see).
   const officialIds = candidates
     .filter((c) => c.promotionStatus === "PROMOTED" && c.officialQuestionId)
     .map((c) => c.officialQuestionId as string);
-  // `in: []` returns nothing, so an empty officialIds is a cheap no-op query.
   const [officialQuestions, officialOptions] = await Promise.all([
     prisma.question.findMany({
       where: { id: { in: officialIds } },
       select: { id: true, stem: true, stimulus: true, explanation: true, type: true, correctAnswer: true },
     }),
-    prisma.questionOption.findMany({ where: { questionId: { in: officialIds } }, select: { questionId: true, text: true, imageUrl: true } }),
+    prisma.questionOption.findMany({
+      where: { questionId: { in: officialIds } },
+      select: { questionId: true, text: true, imageUrl: true },
+    }),
   ]);
   const officialById = new Map(officialQuestions.map((q) => [q.id, q]));
   const officialOptCounts = new Map<string, { text: number; img: number }>();
@@ -133,9 +133,6 @@ export async function computeConjuntos(batchId: string): Promise<ConjuntoRow[]> 
     questionsByFile.set(c.sourceFileId, (questionsByFile.get(c.sourceFileId) ?? 0) + 1);
   }
 
-  // Which sections a full test actually has (from its question/sectioned files),
-  // so a section-less shared answer key attaches to those instead of forming an
-  // empty phantom conjunto.
   const testSections = new Map<number, Set<string>>();
   for (const s of sources) {
     if (s.testNumber == null) continue;
@@ -146,9 +143,6 @@ export async function computeConjuntos(batchId: string): Promise<ConjuntoRow[]> 
     testSections.set(s.testNumber, set);
   }
 
-  // A file can belong to more than one conjunto (a whole-test answer key with no
-  // section attaches to every section of its test). Question-source files always
-  // resolve to a single, definite section key.
   const keysFor = (s: (typeof sources)[number]): string[] => {
     if (s.testNumber != null) {
       const sk = sectionKind(s.section);
@@ -156,7 +150,9 @@ export async function computeConjuntos(batchId: string): Promise<ConjuntoRow[]> 
       const secs = [...(testSections.get(s.testNumber) ?? [])];
       return secs.length ? secs.map((x) => `FULL|${s.testNumber}|${x}`) : [`FULL|${s.testNumber}|?`];
     }
-    return [`PRACTICE|${sectionKind(s.section) ?? "?"}|${s.topicName ?? ""}|${s.difficulty ?? ""}|${s.practiceSetVariant ?? ""}`];
+    return [
+      `PRACTICE|${sectionKind(s.section) ?? "?"}|${s.topicName ?? ""}|${s.difficulty ?? ""}|${s.practiceSetVariant ?? ""}`,
+    ];
   };
 
   const groups = new Map<string, (typeof sources)[number][]>();
@@ -168,7 +164,6 @@ export async function computeConjuntos(batchId: string): Promise<ConjuntoRow[]> 
     }
   }
 
-  // Bucket non-rejected question candidates by their file's (single) conjunto key.
   const candidateKeyByFile = new Map<string, string>();
   for (const s of sources) candidateKeyByFile.set(s.id, keysFor(s)[0]);
   const candidatesByKey = new Map<string, typeof candidates>();
@@ -182,18 +177,18 @@ export async function computeConjuntos(batchId: string): Promise<ConjuntoRow[]> 
     candidatesByKey.set(key, arr);
   }
 
-  const rows: ConjuntoRow[] = [];
+  const rows: ExtractedTestRow[] = [];
   for (const [key, files] of groups) {
     const isFull = key.startsWith("FULL|");
     const parts = key.split("|");
     const testNumber = isFull ? Number(parts[1]) : null;
-    const section = (isFull ? parts[2] : parts[1]) === "?" ? null : (isFull ? parts[2] : parts[1]);
+    const section = (isFull ? parts[2] : parts[1]) === "?" ? null : isFull ? parts[2] : parts[1];
     const contentType = isFull ? "FULL_PRACTICE_TEST" : "PRACTICE_SET";
     const difficulty = files.find((f) => f.difficulty)?.difficulty ?? null;
     const topicName = files.find((f) => f.topicName)?.topicName ?? null;
     const variant = files.find((f) => f.practiceSetVariant)?.practiceSetVariant ?? null;
 
-    const conjFiles: ConjuntoFile[] = files
+    const extractedFiles: ExtractedTestFile[] = files
       .map((f) => ({
         id: f.id,
         name: fileName(f.relativePath),
@@ -203,27 +198,28 @@ export async function computeConjuntos(batchId: string): Promise<ConjuntoRow[]> 
       }))
       .sort((a, b) => (a.role === "QUESTION" ? -1 : b.role === "QUESTION" ? 1 : 0) || b.nQ - a.nQ);
 
-    // Primary = the question-source file with the most question candidates;
-    // fallback to whichever file carries candidates, else the first file.
     const primary =
-      [...conjFiles].sort((a, b) => (b.role === "QUESTION" ? 1 : 0) - (a.role === "QUESTION" ? 1 : 0) || b.nQ - a.nQ)[0] ??
-      conjFiles[0];
+      [...extractedFiles].sort(
+        (a, b) => (b.role === "QUESTION" ? 1 : 0) - (a.role === "QUESTION" ? 1 : 0) || b.nQ - a.nQ,
+      )[0] ?? extractedFiles[0];
 
     const title =
       testNumber != null
         ? `Test ${testNumber}${section ? ` · ${section === "MATH" ? "Math" : "R&W"}` : ""}`
-        : [topicName || primary?.name || "Conjunto", difficulty, variant ? `v${variant}` : null].filter(Boolean).join(" · ");
+        : [topicName || primary?.name || "Extracted Test", difficulty, variant ? `v${variant}` : null]
+            .filter(Boolean)
+            .join(" · ");
 
     const questions: QuestionStatusRow[] = [];
-    let complete = 0,
-      atencion = 0,
-      revisar = 0,
-      sinEnunciado = 0,
-      sinEstimulo = 0,
-      sinOpciones = 0,
-      sinResp = 0,
-      sinExpl = 0,
-      promoted = 0;
+    let complete = 0;
+    let attention = 0;
+    let needsReview = 0;
+    let missingStem = 0;
+    let missingStimulus = 0;
+    let missingOptions = 0;
+    let missingAnswer = 0;
+    let missingExplanation = 0;
+    let promoted = 0;
 
     for (const c of candidatesByKey.get(key) ?? []) {
       const isPromoted = c.promotionStatus === "PROMOTED" && !!c.officialQuestionId;
@@ -244,7 +240,7 @@ export async function computeConjuntos(batchId: string): Promise<ConjuntoRow[]> 
           section: section ?? sectionKind(c.section),
         };
       } else {
-        const optImg = optionBlock.has(c.id) ? 4 : optionLetters.get(c.id)?.size ?? 0;
+        const optImg = optionBlock.has(c.id) ? 4 : (optionLetters.get(c.id)?.size ?? 0);
         content = {
           type: c.type,
           correctAnswer: c.correctAnswer,
@@ -258,14 +254,14 @@ export async function computeConjuntos(batchId: string): Promise<ConjuntoRow[]> 
       }
 
       const cls = classifyQuestion(content);
-      if (cls.level === "crit") revisar += 1;
-      else if (cls.level === "warn") atencion += 1;
+      if (cls.level === "crit") needsReview += 1;
+      else if (cls.level === "warn") attention += 1;
       else complete += 1;
-      if (cls.fields.enunciado === "crit") sinEnunciado += 1;
-      if (cls.fields.estimulo === "warn") sinEstimulo += 1;
-      if (cls.fields.opciones === "crit") sinOpciones += 1;
-      if (cls.fields.respuesta === "crit") sinResp += 1;
-      if (cls.fields.explicacion === "info") sinExpl += 1;
+      if (cls.fields.stem === "crit") missingStem += 1;
+      if (cls.fields.stimulus === "warn") missingStimulus += 1;
+      if (cls.fields.options === "crit") missingOptions += 1;
+      if (cls.fields.answer === "crit") missingAnswer += 1;
+      if (cls.fields.explanation === "info") missingExplanation += 1;
 
       questions.push({
         candidateId: c.id,
@@ -296,17 +292,17 @@ export async function computeConjuntos(batchId: string): Promise<ConjuntoRow[]> 
       section,
       difficulty,
       testNumber,
-      files: conjFiles,
+      files: extractedFiles,
       fileIds: files.map((f) => f.id),
       total: questions.length,
       complete,
-      atencion,
-      revisar,
-      sinEnunciado,
-      sinEstimulo,
-      sinOpciones,
-      sinResp,
-      sinExpl,
+      attention,
+      needsReview,
+      missingStem,
+      missingStimulus,
+      missingOptions,
+      missingAnswer,
+      missingExplanation,
       promoted,
       questions,
     });
@@ -322,3 +318,6 @@ export async function computeConjuntos(batchId: string): Promise<ConjuntoRow[]> 
     return a.title.localeCompare(b.title);
   });
 }
+
+/** @deprecated Use computeExtractedTests */
+export const computeConjuntos = computeExtractedTests;

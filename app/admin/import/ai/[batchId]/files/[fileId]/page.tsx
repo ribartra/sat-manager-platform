@@ -5,8 +5,8 @@ import { Card } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { computeCropImageSources } from "@/lib/ingest-crop-source";
-import { computeConjuntos } from "@/lib/ingest-sets.server";
-import { ConjuntoRail } from "@/app/admin/import/ai/_components/conjunto-rail";
+import { computeExtractedTests } from "@/lib/ingest-sets.server";
+import { ExtractedTestRail } from "@/app/admin/import/ai/_components/extracted-test-rail";
 import { FileReviewClient } from "./review-client";
 
 export const dynamic = "force-dynamic";
@@ -113,16 +113,16 @@ export default async function AiImportFileReviewPage({ params }: PageProps) {
   // Resolve which source to crop from — this file if it has renderable pages,
   // otherwise a sibling in the batch that does (e.g. Test 1 R&W images live in the
   // questions DOCX while the candidates come from the answers DOCX). Also load the
-  // batch's conjunto rows for the navigation rail.
+  // batch's Extracted Test rows for the navigation rail.
   const [cropImageSourceMap, setRows] = await Promise.all([
     computeCropImageSources(batchId),
-    computeConjuntos(batchId),
+    computeExtractedTests(batchId),
   ]);
   const cropImageSource = cropImageSourceMap[file.id] ?? null;
-  // The conjunto this file belongs to — shown as context so the reviewer sees
+  // The Extracted Test this file belongs to — shown as context so the reviewer sees
   // the whole set (question + answer + explanation files) and its completeness.
-  const conjunto = setRows.find((row) => row.fileIds.includes(file.id)) ?? null;
-  const ROLE_LABEL: Record<string, string> = { QUESTION: "Preguntas", ANSWER: "Respuestas", EXPLANATION: "Explicaciones", OTHER: "Otro" };
+  const extractedTest = setRows.find((row) => row.fileIds.includes(file.id)) ?? null;
+  const ROLE_LABEL: Record<string, string> = { QUESTION: "Questions", ANSWER: "Answers", EXPLANATION: "Explanations", OTHER: "Other" };
 
   const estimatedPages = pages.length || file.pageCount || 0;
   const secondsPerPage = latestEvent?.secondsPerPage && latestEvent.secondsPerPage > 0 ? latestEvent.secondsPerPage : 60;
@@ -131,7 +131,7 @@ export default async function AiImportFileReviewPage({ params }: PageProps) {
   return (
     <div className="mx-auto grid max-w-[100rem] gap-6 px-4 py-8 lg:grid-cols-[300px_minmax(0,1fr)]">
       <div className="lg:sticky lg:top-4 lg:self-start">
-        <ConjuntoRail rows={setRows} batchId={batchId} currentFileId={file.id} />
+        <ExtractedTestRail rows={setRows} batchId={batchId} currentFileId={file.id} />
       </div>
 
       <div className="min-w-0 space-y-6">
@@ -150,30 +150,30 @@ export default async function AiImportFileReviewPage({ params }: PageProps) {
         </Card>
       </div>
 
-      {conjunto && (
+      {extractedTest && (
         <Card padding="md">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-xs uppercase text-gray-400">Conjunto</p>
-              <p className="truncate text-base font-semibold text-gray-900" title={conjunto.title}>{conjunto.title}</p>
+              <p className="text-xs uppercase text-gray-400">Extracted Test</p>
+              <p className="truncate text-base font-semibold text-gray-900" title={extractedTest.title}>{extractedTest.title}</p>
             </div>
             <div className="flex flex-col items-end gap-1">
-              <span className="flex h-2 w-40 overflow-hidden rounded-full bg-gray-100" title={`${conjunto.complete} completas · ${conjunto.atencion} atención · ${conjunto.revisar} revisar`}>
-                {conjunto.complete > 0 && <span className="bg-emerald-500" style={{ width: `${(conjunto.complete / (conjunto.total || 1)) * 100}%` }} />}
-                {conjunto.atencion > 0 && <span className="bg-amber-500" style={{ width: `${(conjunto.atencion / (conjunto.total || 1)) * 100}%` }} />}
-                {conjunto.revisar > 0 && <span className="bg-rose-500" style={{ width: `${(conjunto.revisar / (conjunto.total || 1)) * 100}%` }} />}
+              <span className="flex h-2 w-40 overflow-hidden rounded-full bg-gray-100" title={`${extractedTest.complete} complete · ${extractedTest.attention} attention · ${extractedTest.needsReview} review`}>
+                {extractedTest.complete > 0 && <span className="bg-emerald-500" style={{ width: `${(extractedTest.complete / (extractedTest.total || 1)) * 100}%` }} />}
+                {extractedTest.attention > 0 && <span className="bg-amber-500" style={{ width: `${(extractedTest.attention / (extractedTest.total || 1)) * 100}%` }} />}
+                {extractedTest.needsReview > 0 && <span className="bg-rose-500" style={{ width: `${(extractedTest.needsReview / (extractedTest.total || 1)) * 100}%` }} />}
               </span>
               <span className="text-xs text-gray-500">
-                {conjunto.total} preguntas · <span className="text-rose-600">{conjunto.revisar} revisar</span> · <span className="text-amber-600">{conjunto.atencion} atención</span>
+                {extractedTest.total} questions · <span className="text-rose-600">{extractedTest.needsReview} review</span> · <span className="text-amber-600">{extractedTest.attention} attention</span>
               </span>
             </div>
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
-            {conjunto.files.map((f) => (
+            {extractedTest.files.map((f) => (
               <span
                 key={f.id}
                 className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-1 text-xs ${f.id === file.id ? "border-blue-300 bg-blue-50 text-blue-800" : "border-gray-200 text-gray-600"}`}
-                title={`${ROLE_LABEL[f.role]} · ${f.nQ} preguntas · ${f.nA} respuestas`}
+                title={`${ROLE_LABEL[f.role]} · ${f.nQ} questions · ${f.nA} answers`}
               >
                 <span className={`h-1.5 w-1.5 rounded-full ${f.role === "QUESTION" ? "bg-blue-500" : f.role === "ANSWER" ? "bg-emerald-500" : f.role === "EXPLANATION" ? "bg-violet-500" : "bg-gray-300"}`} />
                 <span className="font-medium">{ROLE_LABEL[f.role]}</span>
@@ -182,7 +182,7 @@ export default async function AiImportFileReviewPage({ params }: PageProps) {
             ))}
           </div>
           <Link href={`/admin/import/ai/sets?batch=${batchId}`} className="mt-3 inline-block text-xs text-blue-600 hover:underline">
-            Ver todos los conjuntos y el detalle por pregunta →
+            View all Extracted Tests and per-question detail →
           </Link>
         </Card>
       )}

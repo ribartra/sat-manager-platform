@@ -64,8 +64,8 @@ export default async function StudentPracticeSetsPage() {
                 </p>
                 {inProgressAttempt && (
                   <p className="mt-1 text-xs text-gray-600">
-                    Progreso {inProgressPct}% ({inProgressAnswered}/{total}) · Pregunta{" "}
-                    {Math.min(inProgressAttempt.currentQuestion + 1, Math.max(total, 1))} de {total}
+                    Progress {inProgressPct}% ({inProgressAnswered}/{total}) · Question{" "}
+                    {Math.min(inProgressAttempt.currentQuestion + 1, Math.max(total, 1))} of {total}
                   </p>
                 )}
               </div>

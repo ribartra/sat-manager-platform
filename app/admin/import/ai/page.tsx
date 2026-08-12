@@ -6,7 +6,7 @@ import { CopyableTruncatedText } from "@/components/ui/copyable-truncated-text";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { computeCropImageSources } from "@/lib/ingest-crop-source";
-import { computeConjuntos } from "@/lib/ingest-sets.server";
+import { computeExtractedTests } from "@/lib/ingest-sets.server";
 import { FULL_TEST_EXPECTED_COUNTS, moduleIndexForCandidate } from "@/lib/full-test-modules";
 import { AiImportWorkflowClient, IngestAutoRefresh } from "./ai-import-client";
 
@@ -326,8 +326,8 @@ export default async function AiImportPage({ searchParams }: PageProps) {
   // page images — e.g. Test 1 R&W). Keyed by source file id.
   const cropImageSources = selectedBatchId ? await computeCropImageSources(selectedBatchId) : {};
 
-  // Conjunto rows for the Review step's conjunto rail (same data as /sets).
-  const setRows = selectedBatchId ? await computeConjuntos(selectedBatchId) : [];
+  // Extracted Test rows for the Review step rail (same data as /sets).
+  const setRows = selectedBatchId ? await computeExtractedTests(selectedBatchId) : [];
 
   const openIncidents = incidents.filter((incident) => incident.status !== "RESOLVED");
   const currentOpenIncidents = openIncidentCount ?? openIncidents.length;
@@ -438,7 +438,7 @@ export default async function AiImportPage({ searchParams }: PageProps) {
               href={`/admin/import/ai/sets?batch=${selectedBatchId}`}
               className="mt-3 inline-flex items-center gap-1 rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
             >
-              <FileSearch className="h-3.5 w-3.5" /> Conjuntos por revisar
+              <FileSearch className="h-3.5 w-3.5" /> Extracted Tests to review
             </a>
           )}
         </div>

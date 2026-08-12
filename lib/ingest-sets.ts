@@ -1,13 +1,9 @@
-// Client-safe types + pure logic for ingest "conjuntos". A conjunto is the
-// GROUP of source files that together make one set: at minimum a question file
-// plus an answer and/or explanations file (a Full Practice Test section, or a
-// Practice Set + its answer key). The server-side computation lives in
-// lib/ingest-sets.server.ts; this module is importable from client components
-// (the sets index, the review rail) because it has no prisma / server-only dep.
-//
-// `classifyQuestion` is the single source of truth for per-question completeness,
-// shared by the server rows, the client drill-down, and the standalone review
-// artifact, so the three can never drift.
+// Client-safe types + pure logic for ingest Extracted Tests.
+// An ExtractedTest is the GROUP of source files that together make one staging
+// unit: at minimum a question file plus an answer and/or explanations file
+// (a Full Practice Test section, or a Practice Set + its answer key). It is NOT
+// an IngestQuestionCandidate — candidates live inside the ExtractedTest.
+// Server-side computation: lib/ingest-sets.server.ts.
 
 export type FieldState = "ok" | "crit" | "warn" | "info" | "na";
 
@@ -25,75 +21,73 @@ export interface QuestionContent {
 export interface QuestionClassification {
   level: "ok" | "warn" | "crit";
   fields: {
-    enunciado: FieldState;
-    estimulo: FieldState;
-    opciones: FieldState;
-    respuesta: FieldState;
-    explicacion: FieldState;
+    stem: FieldState;
+    stimulus: FieldState;
+    options: FieldState;
+    answer: FieldState;
+    explanation: FieldState;
   };
   notes: string[];
 }
 
-// Mirror of the review artifact's rules. crit = unusable for a student (no stem /
-// no answer / MC with no options); warn = needs recovery work (missing passage,
-// partial options); info = present but worth noting (options as image, no
-// explanation). `level` escalates to the worst field; info never raises it.
+// crit = unusable for a student; warn = needs recovery; info = worth noting.
+// `level` escalates to the worst field; info never raises it.
 export function classifyQuestion(c: QuestionContent): QuestionClassification {
   const notes: string[] = [];
   const isMC = c.type === "MC";
 
-  const enunciado: FieldState = c.stemLen > 0 ? "ok" : "crit";
-  if (enunciado === "crit") notes.push("sin enunciado");
+  const stem: FieldState = c.stemLen > 0 ? "ok" : "crit";
+  if (stem === "crit") notes.push("missing stem");
 
   const hasAnswer = !!(c.correctAnswer && c.correctAnswer.trim());
-  const respuesta: FieldState = hasAnswer ? "ok" : "crit";
-  if (respuesta === "crit") notes.push("sin respuesta");
+  const answer: FieldState = hasAnswer ? "ok" : "crit";
+  if (answer === "crit") notes.push("missing answer");
 
-  let opciones: FieldState;
+  let options: FieldState;
   if (!isMC) {
-    opciones = "na";
+    options = "na";
   } else if (c.optTextCount >= 4) {
-    opciones = "ok";
+    options = "ok";
   } else if (c.optImgCount >= 4) {
-    opciones = "info";
-    notes.push("opciones en imagen");
+    options = "info";
+    notes.push("options as images");
   } else if (c.optTextCount > 0 || c.optImgCount > 0) {
-    opciones = "warn";
-    notes.push(`opciones parciales (${c.optTextCount} texto / ${c.optImgCount} img)`);
+    options = "warn";
+    notes.push(`partial options (${c.optTextCount} text / ${c.optImgCount} img)`);
   } else {
-    opciones = "crit";
-    notes.push("sin opciones");
+    options = "crit";
+    notes.push("missing options");
   }
 
-  let estimulo: FieldState;
+  let stimulus: FieldState;
   if (c.section === "RW") {
-    estimulo = c.stimLen > 0 ? "ok" : "warn";
-    if (estimulo === "warn") notes.push("sin estímulo");
+    stimulus = c.stimLen > 0 ? "ok" : "warn";
+    if (stimulus === "warn") notes.push("missing stimulus");
   } else {
-    estimulo = "na";
+    stimulus = "na";
   }
 
-  const explicacion: FieldState = c.hasExpl ? "ok" : "info";
-  if (explicacion === "info") notes.push("sin explicación");
+  const explanation: FieldState = c.hasExpl ? "ok" : "info";
+  if (explanation === "info") notes.push("missing explanation");
 
-  const states = [enunciado, respuesta, opciones, estimulo, explicacion];
+  const states = [stem, answer, options, stimulus, explanation];
   const level: QuestionClassification["level"] = states.includes("crit")
     ? "crit"
     : states.includes("warn")
       ? "warn"
       : "ok";
 
-  return { level, fields: { enunciado, estimulo, opciones, respuesta, explicacion }, notes };
+  return { level, fields: { stem, stimulus, options, answer, explanation }, notes };
 }
 
-export type ConjuntoFileRole = "QUESTION" | "ANSWER" | "EXPLANATION" | "OTHER";
+export type ExtractedTestFileRole = "QUESTION" | "ANSWER" | "EXPLANATION" | "OTHER";
 
-export interface ConjuntoFile {
+export interface ExtractedTestFile {
   id: string;
   name: string;
-  role: ConjuntoFileRole;
-  nQ: number; // question candidates on this file
-  nA: number; // answer candidates on this file
+  role: ExtractedTestFileRole;
+  nQ: number;
+  nA: number;
 }
 
 export interface QuestionStatusRow {
@@ -109,26 +103,26 @@ export interface QuestionStatusRow {
   notes: string[];
 }
 
-export interface ConjuntoRow {
+export interface ExtractedTestRow {
   key: string;
   batchId: string;
   primaryFileId: string;
   title: string;
   contentType: string; // FULL_PRACTICE_TEST | PRACTICE_SET
-  section: string | null; // RW | MATH | null
+  section: string | null;
   difficulty: string | null;
   testNumber: number | null;
-  files: ConjuntoFile[];
+  files: ExtractedTestFile[];
   fileIds: string[];
   total: number;
   complete: number;
-  atencion: number;
-  revisar: number;
-  sinEnunciado: number;
-  sinEstimulo: number;
-  sinOpciones: number;
-  sinResp: number;
-  sinExpl: number;
+  attention: number;
+  needsReview: number;
+  missingStem: number;
+  missingStimulus: number;
+  missingOptions: number;
+  missingAnswer: number;
+  missingExplanation: number;
   promoted: number;
   questions: QuestionStatusRow[];
 }
@@ -143,13 +137,12 @@ export interface SetFilterState {
   onlyPending: boolean;
 }
 
-// Shared filter + sort used by the full-page index and the review rail so the
-// two can never drift. Full tests first (TEST 1 → TEST 10, R&W before Math),
-// then practice sets ordered by most to review. "Pending" = anything not fully
-// complete (revisar + atención).
-export function filterConjuntos(rows: ConjuntoRow[], { query, type, section, onlyPending }: SetFilterState): ConjuntoRow[] {
+export function filterExtractedTests(
+  rows: ExtractedTestRow[],
+  { query, type, section, onlyPending }: SetFilterState,
+): ExtractedTestRow[] {
   const q = query.trim().toLowerCase();
-  const pending = (row: ConjuntoRow) => row.revisar + row.atencion;
+  const pending = (row: ExtractedTestRow) => row.needsReview + row.attention;
   const matched = rows.filter((row) => {
     if (type !== "ALL" && row.contentType !== type) return false;
     if (section !== "ALL" && (row.section ?? "") !== section) return false;
@@ -172,3 +165,8 @@ export function filterConjuntos(rows: ConjuntoRow[], { query, type, section, onl
     return a.title.localeCompare(b.title);
   });
 }
+
+/** @deprecated Use ExtractedTestRow */
+export type ConjuntoRow = ExtractedTestRow;
+/** @deprecated Use filterExtractedTests */
+export const filterConjuntos = filterExtractedTests;

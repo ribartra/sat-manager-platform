@@ -9,7 +9,7 @@
 
 | Capa | Cantidad |
 |------|----------|
-| Conjuntos staging `FULL\|N\|RW` + `FULL\|N\|MATH` | **20** (Tests 1–10) |
+| Extracted Tests staging `FULL\|N\|RW` + `FULL\|N\|MATH` | **20** (Tests 1–10) |
 | Candidatos no rechazados | **980** (54 R&W + 44 Math × 10) |
 | `FullPracticeTest` Imported | **10** DRAFT, **98/98** cada uno |
 | Topics skill | `M1` / `M2` (Domain `Full Practice Test`) · M1=EASY · M2=HARD |
@@ -29,9 +29,9 @@ No existe un enum `STANDARDIZED`. El FPT “estandarizado” es el resultado de 
 ## Pipeline
 
 ```text
-Archivos MOCK (2 conjuntos/test: RW + Math)
+Archivos MOCK (2 Extracted Tests/test: RW + Math)
   → IngestQuestionCandidate (testNumber, section, moduleLabel)
-  → Review (conjuntos FULL|N|RW|MATH)
+  → Review (Extracted Tests FULL|N|RW|MATH)
   → promote-questions → Question (skill M1/M2, difficulty EASY/HARD)
   → promote-full-test → FullPracticeTest + 4 FullPracticeTestModule
        · order 0/1: RW M1/M2 (32 min) · order 2/3: Math M1/M2 (35 min)
@@ -50,7 +50,7 @@ Archivos MOCK (2 conjuntos/test: RW + Math)
 
 `POST …/promote-full-test` solo usa candidatos ya `PROMOTED` del `testNumber`.
 Reparte en 4 buckets (27/27/22/22), re-estampa metadata, crea/actualiza draft e
-`IngestPromotionArtifact`. Staging **sigue** en 2 conjuntos; el ensamble es el
+`IngestPromotionArtifact`. Staging **sigue** en 2 Extracted Tests; el ensamble es el
 paso que materializa los 4 grupos del player.
 
 ## Comportamiento SAT en producto

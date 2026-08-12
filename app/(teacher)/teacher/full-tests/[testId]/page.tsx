@@ -56,7 +56,7 @@ export default async function FullTestDetailPage({ params }: PageProps) {
             </Badge>
           </div>
           <p className="mt-1 text-sm text-gray-500">
-            4 grupos SAT · {questionCount} preguntas ({pretestCount} pretest operativos excluidos del raw) · break{" "}
+            4 SAT groups · {questionCount} questions ({pretestCount} pretest items excluded from raw score) · break{" "}
             {test.breakMinutes} min · review {test.reviewEnabled ? "on" : "off"}
           </p>
           <p className="mt-1 text-xs text-gray-400">
@@ -69,7 +69,7 @@ export default async function FullTestDetailPage({ params }: PageProps) {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button asChild variant="secondary">
-            <Link href={`/teacher/full-tests/${test.id}/edit`}>Edit / opciones</Link>
+            <Link href={`/teacher/full-tests/${test.id}/edit`}>Edit / options</Link>
           </Button>
           {test.status === "PUBLISHED" ? (
             <Button asChild>
@@ -94,7 +94,7 @@ export default async function FullTestDetailPage({ params }: PageProps) {
                 {module.section} · skill {moduleKey} · {Math.round(module.timeLimit / 60)} min
               </p>
               <p className="mt-2 text-lg font-semibold text-gray-900">{module.questions.length} Q</p>
-              <p className="text-[11px] text-gray-400">{pretest} pretest (no puntúan)</p>
+              <p className="text-[11px] text-gray-400">{pretest} pretest (do not score)</p>
             </Card>
           );
         })}

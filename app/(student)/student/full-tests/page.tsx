@@ -77,7 +77,7 @@ export default async function StudentFullTestsPage() {
                   {progress && (
                     <div className="mt-2 space-y-1">
                       <p className="text-xs text-gray-700">
-                        Progreso {progress.percent}% ({progress.answered}/{progress.total}) · {progress.positionLabel}
+                        Progress {progress.percent}% ({progress.answered}/{progress.total}) · {progress.positionLabel}
                       </p>
                       <div className="grid gap-1 sm:grid-cols-2">
                         {progress.modules.map((module) => (

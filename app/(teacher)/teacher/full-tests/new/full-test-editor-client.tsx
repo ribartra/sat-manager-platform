@@ -86,7 +86,7 @@ export function FullTestEditor({
           Show review after submit
         </label>
         <label className="flex flex-col gap-1 text-sm text-gray-700">
-          <span>Break R&amp;W → Math (minutes, 0 = off)</span>
+          <span>Break R&W → Math (minutes, 0 = off)</span>
           <Input
             type="number"
             min={0}
@@ -96,12 +96,12 @@ export function FullTestEditor({
         </label>
       </div>
       <Card padding="sm" className="text-xs text-gray-600">
-        <p className="font-medium text-gray-800">Política SAT (fija)</p>
+        <p className="font-medium text-gray-800">SAT policy (fixed)</p>
         <p className="mt-1">
-          4 grupos: RW M1/M2 (32 min) + Math M1/M2 (35 min). Las 2 primeras preguntas de cada módulo son pretest
-          (no puntúan; el alumno no las distingue). Conversión de score en{" "}
+          4 groups: RW M1/M2 (32 min) + Math M1/M2 (35 min). The first 2 questions of each module are pretest
+          (they do not score; students cannot tell which). Score conversion at{" "}
           <Link className="text-blue-600 hover:underline" href="/teacher/full-tests/scoring">/teacher/full-tests/scoring</Link>
-          {" "}(raw operativo RW 0–50 · Math 0–40).
+          {" "}(operative raw RW 0–50 · Math 0–40).
         </p>
       </Card>
       {modules.map((module, index) => {

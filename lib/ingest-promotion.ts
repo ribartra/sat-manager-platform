@@ -158,7 +158,7 @@ function imageUrlOrBase64(image: ImageLinkForDraft["image"]) {
 // When a reviewer assigns an image to a candidate whose question is ALREADY
 // promoted (crop-region OR image-links UI), the write lands on
 // IngestCandidateImageLink — the official Question/QuestionOption that students
-// (and the conjunto completeness view) read stays unchanged unless we mirror it.
+// (and the Extracted Test completeness view) read stays unchanged unless we mirror it.
 // STEM/STIMULUS → Question.imageUrl; OPTION → matching QuestionOption.imageUrl
 // (marking the question MC). Other targets have no official image slot and are
 // skipped. Safe to call for non-promoted candidates — it no-ops.

@@ -11,24 +11,24 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 // either ASSIGN the crop as an image (link to stem/option/…) or OCR it to text.
 
 export const CROP_TARGETS = [
-  { value: "STEM", label: "Enunciado (imagen)" },
-  { value: "STIMULUS", label: "Estímulo" },
-  { value: "OPTION", label: "Opción individual" },
-  { value: "OPTION_BLOCK", label: "Bloque de opciones (OCR A–D)" },
-  { value: "ANSWER_FIELD", label: "Campo de respuesta" },
-  { value: "EXPLANATION", label: "Explicación" },
-  { value: "PAGE_CONTEXT", label: "Contexto de página" },
+  { value: "STEM", label: "Stem (image)" },
+  { value: "STIMULUS", label: "Stimulus" },
+  { value: "OPTION", label: "Single option" },
+  { value: "OPTION_BLOCK", label: "Options block (OCR A–D)" },
+  { value: "ANSWER_FIELD", label: "Answer field" },
+  { value: "EXPLANATION", label: "Explanation" },
+  { value: "PAGE_CONTEXT", label: "Page context" },
 ] as const;
 
 // Destination fields the OCR'd text can be assigned to (no PAGE_CONTEXT — the
 // OCR text always lands in a concrete draft field).
 export const OCR_TARGETS = [
-  { value: "STEM", label: "Enunciado" },
-  { value: "STIMULUS", label: "Estímulo" },
-  { value: "OPTION_BLOCK", label: "Bloque de opciones (A–D)" },
-  { value: "OPTION", label: "Opción individual" },
-  { value: "EXPLANATION", label: "Explicación" },
-  { value: "ANSWER_FIELD", label: "Respuesta correcta" },
+  { value: "STEM", label: "Stem" },
+  { value: "STIMULUS", label: "Stimulus" },
+  { value: "OPTION_BLOCK", label: "Options block (A–D)" },
+  { value: "OPTION", label: "Single option" },
+  { value: "EXPLANATION", label: "Explanation" },
+  { value: "ANSWER_FIELD", label: "Correct answer" },
 ] as const;
 
 export interface CropTarget {
@@ -188,10 +188,10 @@ export function PdfPageCropper({
         setOcrOptionLabel(needsOption ? optionLabel.toUpperCase() : "");
         setMessage(
           data.options?.length
-            ? `OCR listo: ${data.options.length} opción(es) detectada(s). Revisa, elige el campo y asigna.`
+            ? `OCR ready: ${data.options.length} option(s) detected. Review, pick a field, and assign.`
             : detected
-              ? "OCR listo. Revisa el texto, elige el campo y asigna."
-              : data.warning || "El OCR no devolvió texto.",
+              ? "OCR ready. Review the text, pick a field, and assign."
+              : data.warning || "OCR returned no text.",
         );
       }
     } finally {
@@ -218,10 +218,10 @@ export function PdfPageCropper({
   return (
     <div className={className}>
       <Button type="button" size="sm" variant="secondary" onClick={() => setOpen(true)} disabled={!hasPages}>
-        Recortar región de la página
+        Crop page region
       </Button>
       {!hasPages && (
-        <span className="ml-2 text-xs text-gray-400">No hay páginas con imagen para recortar en este lote.</span>
+        <span className="ml-2 text-xs text-gray-400">No pages with images to crop in this batch.</span>
       )}
 
       {/* Nested Radix Dialog: when launched from inside another modal (the review
@@ -231,13 +231,13 @@ export function PdfPageCropper({
       <Dialog open={open} onOpenChange={(next) => { setOpen(next); if (!next) { setRect(null); setOcr(null); } }}>
         <DialogContent className="max-h-[92vh] max-w-3xl select-none gap-3 overflow-auto">
           <DialogHeader>
-            <DialogTitle className="text-sm">Recortar región de la página</DialogTitle>
-            <DialogDescription className="sr-only">Elige una página, arrastra la región y usa Asignar u OCR.</DialogDescription>
+            <DialogTitle className="text-sm">Crop page region</DialogTitle>
+            <DialogDescription className="sr-only">Pick a page, drag a region, then Assign or OCR.</DialogDescription>
           </DialogHeader>
           {imageSourceFileId && imageSourceFileId !== sourceFileId && (
             <p className="rounded-md border border-blue-100 bg-blue-50 px-3 py-2 text-xs text-blue-700">
-              Este archivo no trae imágenes propias; se muestran las imágenes de página del archivo de origen del
-              mismo lote. Elige la página en la tira de miniaturas, arrastra la región y usa Asignar u OCR.
+              This file has no images of its own; page images from the source file in the same
+              batch are shown. Pick a page in the thumbnail strip, drag a region, then Assign or OCR.
             </p>
           )}
 
@@ -252,7 +252,7 @@ export function PdfPageCropper({
                   type="button"
                   onClick={() => changePage(p)}
                   disabled={busy !== null}
-                  title={`Página ${p}`}
+                  title={`Page ${p}`}
                   className={`min-w-8 rounded px-2 py-1 text-xs font-medium ${
                     p === pageNumber
                       ? "bg-blue-600 text-white"
@@ -266,7 +266,7 @@ export function PdfPageCropper({
           )}
 
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs text-gray-500">Página</span>
+            <span className="text-xs text-gray-500">Page</span>
             <Button type="button" size="sm" variant="ghost" onClick={() => changePage(pageNumber - 1)} disabled={pageNumber <= 1 || busy !== null}>
               ‹
             </Button>
@@ -301,8 +301,8 @@ export function PdfPageCropper({
           </div>
 
           <p className="text-xs text-gray-500">
-            Arrastra sobre la imagen para seleccionar la región. Luego <strong>Asignar</strong> (guarda la imagen y la enlaza) u{" "}
-            <strong>OCR</strong> (transcribe a texto para revisar).
+            Drag on the image to select a region. Then <strong>Assign</strong> (saves and links the image) or{" "}
+            <strong>OCR</strong> (transcribe to text for review).
           </p>
 
           <div className="max-h-[60vh] overflow-auto rounded border border-gray-300 bg-gray-100">
@@ -318,7 +318,7 @@ export function PdfPageCropper({
               <img
                 ref={imgRef}
                 src={`/api/admin/ai-import/sources/${effectiveSourceId}/pages/${pageNumber}/image?dpi=150`}
-                alt={`Página ${pageNumber}`}
+                alt={`Page ${pageNumber}`}
                 className="block max-w-full select-none"
                 draggable={false}
                 onDragStart={(e) => e.preventDefault()}
@@ -326,11 +326,11 @@ export function PdfPageCropper({
                 onLoad={() => { setPageError(false); setImgLoaded(true); }}
               />
               {!imgLoaded && !pageError && (
-                <div className="flex h-40 min-w-[280px] items-center justify-center text-xs text-gray-400">Cargando página {pageNumber}…</div>
+                <div className="flex h-40 min-w-[280px] items-center justify-center text-xs text-gray-400">Loading page {pageNumber}…</div>
               )}
               {pageError && (
                 <div className="flex h-40 min-w-[280px] items-center justify-center text-xs text-gray-400">
-                  No se pudo cargar la página {pageNumber}.
+                  Could not load page {pageNumber}.
                 </div>
               )}
               {rect && imgLoaded && (
@@ -349,33 +349,33 @@ export function PdfPageCropper({
 
           <div className="flex flex-wrap items-center gap-2">
             <Button type="button" size="sm" onClick={() => submit("ASSIGN")} disabled={!canSubmit || busy !== null}>
-              {busy === "ASSIGN" ? "Asignando…" : "Asignar recorte"}
+              {busy === "ASSIGN" ? "Assigning…" : "Assign crop"}
             </Button>
             <Button type="button" size="sm" variant="secondary" onClick={() => submit("OCR")} disabled={!canSubmit || busy !== null}>
-              {busy === "OCR" ? "OCR…" : "OCR del recorte"}
+              {busy === "OCR" ? "OCR…" : "OCR crop"}
             </Button>
             {rect && (
               <Button type="button" size="sm" variant="ghost" onClick={() => setRect(null)} disabled={busy !== null}>
-                Limpiar selección
+                Clear selection
               </Button>
             )}
-            {needsOption && !optionLabel && <span className="text-xs text-amber-600">Indica la letra (A–D).</span>}
+            {needsOption && !optionLabel && <span className="text-xs text-amber-600">Enter the letter (A–D).</span>}
           </div>
 
           {/* OCR review: shown after OCR — edit the detected text, choose the field, then assign. */}
           {ocr && (
             <div className="space-y-2 rounded-md border border-blue-200 bg-blue-50/60 p-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase text-blue-800">Texto detectado (OCR)</span>
-                <button type="button" onClick={() => setOcr(null)} className="text-xs text-gray-500 hover:text-gray-700 hover:underline">Descartar</button>
+                <span className="text-xs font-semibold uppercase text-blue-800">Detected text (OCR)</span>
+                <button type="button" onClick={() => setOcr(null)} className="text-xs text-gray-500 hover:text-gray-700 hover:underline">Dismiss</button>
               </div>
 
               {ocr.options && ocr.options.length > 0 && (
                 <div className="rounded border border-blue-100 bg-white p-2 text-xs text-gray-700">
-                  <span className="font-medium text-gray-500">Opciones detectadas:</span>
+                  <span className="font-medium text-gray-500">Detected options:</span>
                   <ul className="mt-1 space-y-0.5">
                     {ocr.options.map((o) => (
-                      <li key={o.label}><span className="font-semibold">{o.label}.</span> {o.text || <em className="text-gray-400">(vacío)</em>}</li>
+                      <li key={o.label}><span className="font-semibold">{o.label}.</span> {o.text || <em className="text-gray-400">(empty)</em>}</li>
                     ))}
                   </ul>
                 </div>
@@ -386,11 +386,11 @@ export function PdfPageCropper({
                 onChange={(e) => setOcrText(e.target.value)}
                 rows={4}
                 className="w-full rounded-md border border-gray-300 p-2 text-sm"
-                placeholder="Texto detectado…"
+                placeholder="Detected text…"
               />
 
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs text-gray-600">Asignar a</span>
+                <span className="text-xs text-gray-600">Assign to</span>
                 <select
                   value={ocrTarget}
                   onChange={(e) => setOcrTarget(e.target.value)}
@@ -409,10 +409,10 @@ export function PdfPageCropper({
                   />
                 )}
                 <Button type="button" size="sm" onClick={applyOcr} disabled={!canApplyOcr}>
-                  Asignar al campo
+                  Assign to field
                 </Button>
                 {ocrTarget === "OPTION_BLOCK" && !ocr.options?.length && (
-                  <span className="text-xs text-amber-600">No se detectaron opciones A–D en este recorte.</span>
+                  <span className="text-xs text-amber-600">No A–D options detected in this crop.</span>
                 )}
               </div>
             </div>

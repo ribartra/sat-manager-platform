@@ -113,13 +113,13 @@ type ReviewSession = {
 };
 
 const targetTypes = [
-  { value: "STEM", label: "Imagen de enunciado" },
-  { value: "STIMULUS", label: "Imagen de estímulo" },
-  { value: "OPTION", label: "Imagen de una opción" },
-  { value: "OPTION_BLOCK", label: "Bloque de opciones (OCR)" },
-  { value: "ANSWER_FIELD", label: "Campo de respuesta" },
-  { value: "EXPLANATION", label: "Imagen de explicación" },
-  { value: "PAGE_CONTEXT", label: "Contexto de página" },
+  { value: "STEM", label: "Stem image" },
+  { value: "STIMULUS", label: "Stimulus image" },
+  { value: "OPTION", label: "Option image" },
+  { value: "OPTION_BLOCK", label: "Options block (OCR)" },
+  { value: "ANSWER_FIELD", label: "Answer field" },
+  { value: "EXPLANATION", label: "Explanation image" },
+  { value: "PAGE_CONTEXT", label: "Page context" },
 ];
 const questionLinePattern = /^(?:question|q)\s*\.?\s*\d+[:.)\s-]/i;
 
@@ -135,7 +135,7 @@ function parseOptions(value: string | null) {
 
 // Signature of the persisted-relevant fields — used to flag unsaved edits.
 // OCR/crop and manual edits only mutate the on-screen draft; nothing reaches
-// the DB until Guardar (PATCH) runs.
+// the DB until Save (PATCH) runs.
 function candidateSignature(draft: Candidate | null) {
   if (!draft) return "";
   return JSON.stringify({
@@ -178,9 +178,9 @@ function targetLabel(value: string) {
   return targetTypes.find((target) => target.value === value)?.label ?? value;
 }
 
-// Human label for the concrete slot a link occupies, e.g. "Opción A".
+// Human label for the concrete slot a link occupies, e.g. "Option A".
 function slotLabel(targetType: string, optionLabel: string | null) {
-  if (targetType === "OPTION") return `Opción ${optionLabel ?? "?"}`;
+  if (targetType === "OPTION") return `Option ${optionLabel ?? "?"}`;
   return targetLabel(targetType);
 }
 
@@ -231,12 +231,12 @@ function OptionsEditor({
   return (
     <div className="grid gap-1">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-medium text-gray-500">Opciones</span>
+        <span className="text-xs font-medium text-gray-500">Options</span>
         <button
           type="button"
           onClick={() => setShowRaw((v) => !v)}
           className={`inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] font-medium ${showRaw ? "bg-gray-800 text-white" : "text-gray-500 hover:bg-gray-100"}`}
-          title="Editar JSON en crudo"
+          title="Edit raw JSON"
         >
           <Braces className="h-3 w-3" /> JSON
         </button>
@@ -244,7 +244,7 @@ function OptionsEditor({
 
       {showRaw ? (
         <>
-          {jsonInvalid && <p className="text-xs text-rose-600">JSON inválido — corrígelo aquí; la tabla se rehabilita al ser válido.</p>}
+          {jsonInvalid && <p className="text-xs text-rose-600">Invalid JSON — fix it here; the table re-enables once valid.</p>}
           <textarea
             value={raw}
             onChange={(event) => onChange({ optionsJson: event.target.value })}
@@ -255,8 +255,8 @@ function OptionsEditor({
         <div className="grid gap-1.5">
           {rows.length === 0 && (
             <div className="flex items-center gap-2 rounded-md border border-dashed border-gray-300 px-3 py-2 text-xs text-gray-500">
-              Sin opciones.
-              <button type="button" onClick={seedAD} className="font-medium text-blue-600 hover:underline">Crear A–D</button>
+              No options.
+              <button type="button" onClick={seedAD} className="font-medium text-blue-600 hover:underline">Create A–D</button>
             </div>
           )}
           {rows.map((option, i) => {
@@ -269,7 +269,7 @@ function OptionsEditor({
                 <button
                   type="button"
                   onClick={() => commit(rows, option.label)}
-                  title="Marcar como respuesta correcta"
+                  title="Mark as correct answer"
                   className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[10px] font-bold transition-colors ${
                     isCorrect ? "border-emerald-500 bg-emerald-500 text-white" : "border-gray-300 text-transparent hover:border-emerald-400"
                   }`}
@@ -280,19 +280,19 @@ function OptionsEditor({
                   value={option.label}
                   onChange={(event) => setLabel(i, event.target.value)}
                   className="w-9 shrink-0 rounded border border-gray-300 px-1 py-1 text-center text-xs font-semibold uppercase"
-                  aria-label="Etiqueta de la opción"
+                  aria-label="Option label"
                 />
                 <input
                   value={option.text}
                   onChange={(event) => setText(i, event.target.value)}
-                  placeholder="Texto de la opción (KaTeX $…$)"
+                  placeholder="Option text (KaTeX $…$)"
                   className="min-w-0 flex-1 rounded border border-gray-300 px-2 py-1 text-sm"
-                  aria-label="Texto de la opción"
+                  aria-label="Option text"
                 />
                 <button
                   type="button"
                   onClick={() => remove(i)}
-                  title="Eliminar opción"
+                  title="Remove option"
                   className="shrink-0 rounded p-1 text-gray-400 hover:bg-rose-50 hover:text-rose-600"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
@@ -302,7 +302,7 @@ function OptionsEditor({
           })}
           {rows.length > 0 && (
             <button type="button" onClick={add} className="mt-0.5 inline-flex w-fit items-center gap-1 text-xs font-medium text-blue-600 hover:underline">
-              <Plus className="h-3.5 w-3.5" /> Agregar opción
+              <Plus className="h-3.5 w-3.5" /> Add option
             </button>
           )}
         </div>
@@ -468,7 +468,7 @@ export function FileReviewClient({
     const data = await res.json().catch(() => ({}));
     if (!res.ok) { setMessage(data.error || "No se pudo asignar la imagen."); return; }
     setGalleryAssign(null);
-    setMessage(`Imagen asignada a ${assignTargets.find((t) => t.questionId === questionId)?.label ?? "la pregunta"}.`);
+    setMessage(`Image assigned to ${assignTargets.find((t) => t.questionId === questionId)?.label ?? "the question"}.`);
     router.refresh();
   }
   const [selectedId, setSelectedId] = useState(candidates[0]?.id ?? "");
@@ -512,9 +512,9 @@ export function FileReviewClient({
   })();
   // The concrete assignment slots shown in the board.
   const imageSlots: { targetType: string; optionLabel: string | null; label: string }[] = [
-    { targetType: "STEM", optionLabel: null, label: "Enunciado" },
-    ...optionLetters.map((letter) => ({ targetType: "OPTION", optionLabel: letter, label: `Opción ${letter}` })),
-    { targetType: "STIMULUS", optionLabel: null, label: "Estímulo" },
+    { targetType: "STEM", optionLabel: null, label: "Stem" },
+    ...optionLetters.map((letter) => ({ targetType: "OPTION", optionLabel: letter, label: `Option ${letter}` })),
+    { targetType: "STIMULUS", optionLabel: null, label: "Stimulus" },
   ];
   function linkForSlot(tType: string, oLabel: string | null) {
     return selectedLinks.find((link) => link.targetType === tType && (link.optionLabel ?? null) === (oLabel ?? null));
@@ -611,7 +611,7 @@ export function FileReviewClient({
     router.refresh();
   }
 
-  // Assign an image to a concrete slot (enunciado / opción X / estímulo…).
+  // Assign an image to a concrete slot (stem / option X / stimulus…).
   // A slot holds exactly one image, so any current occupant is cleared first.
   async function assignToSlot(imageId: string, tType: string, oLabel: string | null) {
     if (!selected) return;
@@ -686,7 +686,7 @@ export function FileReviewClient({
     } else if (target.targetType === "ANSWER_FIELD") {
       setDraft({ ...draft, correctAnswer: text });
     }
-    setMessage("Texto de OCR aplicado al borrador. Pulsa Guardar para escribir en la base de datos.");
+    setMessage("OCR text applied to the draft. Click Save to write to the database.");
   }
 
   async function openQuestionEditor(candidateId: string) {
@@ -713,12 +713,12 @@ export function FileReviewClient({
               const cLinks = linksByCandidate.get(candidate.id) ?? [];
               const resolved = optionsResolvedFor(candidate.type, candidate.optionsJson, cLinks);
               const state = candidate.status === "REJECTED"
-                ? { dot: "bg-gray-300", label: "descartada" }
+                ? { dot: "bg-gray-300", label: "rejected" }
                 : !candidate.correctAnswer
-                ? { dot: "bg-amber-500", label: "sin respuesta" }
+                ? { dot: "bg-amber-500", label: "missing answer" }
                 : !resolved
-                ? { dot: "bg-amber-500", label: "faltan opciones" }
-                : { dot: "bg-green-500", label: "listo" };
+                ? { dot: "bg-amber-500", label: "missing options" }
+                : { dot: "bg-green-500", label: "ready" };
               return (
                 <button
                   key={candidate.id}
@@ -731,11 +731,11 @@ export function FileReviewClient({
                     <span className="font-medium">{qLabel(candidate.moduleLabel, candidate.questionNumber)}</span>
                     <span className="text-xs text-gray-400">{state.label}</span>
                   </span>
-                  <span className="mt-1 block truncate text-xs text-gray-500">{candidate.questionExternalId ?? candidate.topicName ?? "sin ID"}</span>
+                  <span className="mt-1 block truncate text-xs text-gray-500">{candidate.questionExternalId ?? candidate.topicName ?? "no ID"}</span>
                 </button>
               );
             })}
-            {candidates.length === 0 && <p className="px-3 py-6 text-sm text-gray-400">No hay preguntas detectadas en este archivo.</p>}
+            {candidates.length === 0 && <p className="px-3 py-6 text-sm text-gray-400">No questions detected in this file.</p>}
           </div>
         </Card>
       </aside>
@@ -748,7 +748,7 @@ export function FileReviewClient({
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex flex-wrap items-center gap-2">
                   <h2 className="text-base font-semibold text-gray-900">{qLabel(draft.moduleLabel, draft.questionNumber)}</h2>
-                  <span className="text-xs text-gray-500">{draft.questionExternalId ?? "sin ID"} · {Math.round(draft.confidence * 100)}%</span>
+                  <span className="text-xs text-gray-500">{draft.questionExternalId ?? "no ID"} · {Math.round(draft.confidence * 100)}%</span>
                   <Badge variant={badgeVariant(draft.status)}>{draft.status}</Badge>
                   <Badge variant={badgeVariant(draft.promotionStatus)}>{draft.promotionStatus}</Badge>
                   {draft.section && <Badge>{draft.section}</Badge>}
@@ -758,37 +758,37 @@ export function FileReviewClient({
                   )}
                   {dirty && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
-                      <span className="h-1.5 w-1.5 rounded-full bg-amber-500" /> Sin guardar
+                      <span className="h-1.5 w-1.5 rounded-full bg-amber-500" /> Unsaved
                     </span>
                   )}
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   {candidates.length > 1 && (
-                    <Button type="button" variant="secondary" size="sm" onClick={() => setMergeOpen(true)}>Fusionar</Button>
+                    <Button type="button" variant="secondary" size="sm" onClick={() => setMergeOpen(true)}>Merge</Button>
                   )}
                   {draft.officialQuestionId ? (
                     <Link href={`/teacher/questions/${draft.officialQuestionId}/edit`} className="text-xs font-medium text-blue-700 hover:underline">
-                      Abrir oficial
+                      Open official
                     </Link>
                   ) : (
-                    <Button type="button" variant="secondary" size="sm" onClick={() => openQuestionEditor(draft.id)}>Abrir en editor</Button>
+                    <Button type="button" variant="secondary" size="sm" onClick={() => openQuestionEditor(draft.id)}>Open in editor</Button>
                   )}
-                  <Button type="button" variant="ghost" size="sm" onClick={() => saveCandidate("REJECTED")} disabled={saving}>Rechazar</Button>
+                  <Button type="button" variant="ghost" size="sm" onClick={() => saveCandidate("REJECTED")} disabled={saving}>Reject</Button>
                   <Button type="button" variant={dirty ? "primary" : "secondary"} size="sm" onClick={() => saveCandidate()} disabled={saving || !dirty}>
-                    {saving ? "Guardando…" : dirty ? "Guardar cambios" : "Guardado"}
+                    {saving ? "Saving…" : dirty ? "Save changes" : "Saved"}
                   </Button>
-                  <Button type="button" variant="secondary" size="sm" onClick={() => saveCandidate("REVIEWED")} disabled={saving}>Marcar revisada</Button>
+                  <Button type="button" variant="secondary" size="sm" onClick={() => saveCandidate("REVIEWED")} disabled={saving}>Mark reviewed</Button>
                 </div>
               </div>
               <p className={`mt-2 text-xs ${dirty ? "text-amber-700" : "text-gray-500"}`}>
                 {dirty
-                  ? "El OCR del recorte y las ediciones solo cambian el borrador en pantalla. Pulsa Guardar para escribir en la base de datos."
-                  : message ?? "Sin cambios pendientes."}
+                  ? "Crop OCR and edits only change the on-screen draft. Click Save to write to the database."
+                  : message ?? "No pending changes."}
               </p>
             </div>
 
             {incidents.length > 0 && (
-              <Section title="Verificaciones abiertas" subtitle={String(incidents.length)} defaultOpen={false}>
+              <Section title="Open checks" subtitle={String(incidents.length)} defaultOpen={false}>
                 <div className="grid gap-2">
                   {incidents.slice(0, 8).map((incident) => (
                     <div key={incident.id} className="rounded-md border border-gray-200 bg-gray-50 px-3 py-2">
@@ -808,17 +808,17 @@ export function FileReviewClient({
               </Section>
             )}
 
-            {/* SECTION: Pregunta — editor + vista renderizada en vivo. */}
-            <Section title="Pregunta" subtitle={isMc ? "opción múltiple" : "respuesta numérica"}>
+            {/* SECTION: Question — editor + live rendered preview. */}
+            <Section title="Question" subtitle={isMc ? "multiple choice" : "numeric response"}>
               <div className="grid gap-4 lg:grid-cols-2">
                 <div className="grid gap-3">
                   <label className="grid gap-1">
-                    <span className="text-xs font-medium text-gray-500">Enunciado</span>
+                    <span className="text-xs font-medium text-gray-500">Stem</span>
                     <textarea value={stripMarkdownImageRefs(draft.stem)} onChange={(event) => setDraft({ ...draft, stem: event.target.value })} className="min-h-32 rounded-md border border-gray-300 px-3 py-2 text-sm" />
                   </label>
                   {(isMc || draft.stimulus) && (
                     <label className="grid gap-1">
-                      <span className="text-xs font-medium text-gray-500">Estímulo</span>
+                      <span className="text-xs font-medium text-gray-500">Stimulus</span>
                       <textarea value={stripMarkdownImageRefs(draft.stimulus)} onChange={(event) => setDraft({ ...draft, stimulus: event.target.value })} className="min-h-20 rounded-md border border-gray-300 px-3 py-2 text-sm" />
                     </label>
                   )}
@@ -831,7 +831,7 @@ export function FileReviewClient({
                   )}
                   <div className="grid gap-3 md:grid-cols-2">
                     <label className="grid gap-1">
-                      <span className="text-xs font-medium text-gray-500">Dificultad</span>
+                      <span className="text-xs font-medium text-gray-500">Difficulty</span>
                       <Input value={draft.difficulty ?? ""} onChange={(event) => setDraft({ ...draft, difficulty: event.target.value })} />
                     </label>
                     <label className="grid gap-1">
@@ -842,11 +842,11 @@ export function FileReviewClient({
                   {parseWarnings(draft.warningsJson).length > 0 && <p className="text-sm text-amber-700">{parseWarnings(draft.warningsJson).join(" ")}</p>}
                 </div>
                 <div className="grid content-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
-                  <p className="text-xs font-medium uppercase text-gray-400">Vista renderizada</p>
+                  <p className="text-xs font-medium uppercase text-gray-400">Rendered preview</p>
                   {stripMarkdownImageRefs(draft.stem) ? (
                     <MathContent content={stripMarkdownImageRefs(draft.stem)} className="text-sm leading-6 text-gray-800" />
                   ) : (
-                    <p className="text-xs text-gray-400">Sin enunciado.</p>
+                    <p className="text-xs text-gray-400">No stem.</p>
                   )}
                   {stripMarkdownImageRefs(draft.stimulus) && (
                     <MathContent content={stripMarkdownImageRefs(draft.stimulus)} className="text-sm leading-6 text-gray-700" />
@@ -865,27 +865,27 @@ export function FileReviewClient({
               </div>
             </Section>
 
-            {/* SECTION: Respuesta y explicación. */}
-            <Section title="Respuesta y explicación" subtitle={draft.correctAnswer ? undefined : "sin respuesta"}>
+            {/* SECTION: Answer and explanation. */}
+            <Section title="Answer and explanation" subtitle={draft.correctAnswer ? undefined : "missing answer"}>
               <div className="grid gap-4 lg:grid-cols-[1fr_260px]">
                 <div className="grid content-start gap-3">
                   <label className="grid gap-1">
-                    <span className="text-xs font-medium text-gray-500">Respuesta correcta</span>
+                    <span className="text-xs font-medium text-gray-500">Correct answer</span>
                     <Input value={draft.correctAnswer ?? ""} onChange={(event) => setDraft({ ...draft, correctAnswer: event.target.value })} />
                   </label>
                   <label className="grid gap-1">
-                    <span className="text-xs font-medium text-gray-500">Explicación</span>
+                    <span className="text-xs font-medium text-gray-500">Explanation</span>
                     <textarea value={stripMarkdownImageRefs(draft.explanation)} onChange={(event) => setDraft({ ...draft, explanation: event.target.value })} className="min-h-28 rounded-md border border-gray-300 px-3 py-2 text-sm" />
                   </label>
                   {stripMarkdownImageRefs(draft.explanation) && (
                     <div className="rounded-md border border-gray-200 bg-gray-50 p-3">
-                      <p className="mb-1 text-xs font-medium uppercase text-gray-400">Vista renderizada</p>
+                      <p className="mb-1 text-xs font-medium uppercase text-gray-400">Rendered preview</p>
                       <MathContent content={stripMarkdownImageRefs(draft.explanation)} className="max-h-56 overflow-auto text-sm leading-6 text-gray-800" />
                     </div>
                   )}
                 </div>
                 <div>
-                  <p className="text-xs font-medium uppercase text-gray-500">Sugerencias de respuesta</p>
+                  <p className="text-xs font-medium uppercase text-gray-500">Answer suggestions</p>
                   <div className="mt-2 space-y-2">
                     {answersForQuestion.map((answer) => (
                       <button
@@ -894,20 +894,20 @@ export function FileReviewClient({
                         onClick={() => setDraft({ ...draft, correctAnswer: answer.answer ?? draft.correctAnswer, explanation: answer.explanation ?? draft.explanation })}
                         className="block w-full rounded-md border border-gray-200 px-3 py-2 text-left text-sm hover:bg-gray-50"
                       >
-                        <span className="font-medium">{answer.answer ?? "Sin respuesta"}</span>
+                        <span className="font-medium">{answer.answer ?? "No answer"}</span>
                         <span className="ml-2 text-xs text-gray-400">{Math.round(answer.confidence * 100)}%</span>
                       </button>
                     ))}
-                    {answersForQuestion.length === 0 && <p className="text-sm text-gray-400">No hay sugerencias para esta pregunta.</p>}
+                    {answersForQuestion.length === 0 && <p className="text-sm text-gray-400">No suggestions for this question.</p>}
                   </div>
                 </div>
               </div>
             </Section>
 
-            {/* SECTION: Imágenes — tablero A-D + grilla. */}
-            <Section title="Imágenes" subtitle={`${selectedLinks.length} enlazadas`}>
+            {/* SECTION: Images — A–D board + grid. */}
+            <Section title="Images" subtitle={`${selectedLinks.length} linked`}>
               <p className="text-xs text-gray-500">
-                Elige una ranura y luego una imagen de abajo, o usa los botones de cada imagen. Cada ranura guarda una sola imagen.
+                Pick a slot, then an image below, or use each image’s buttons. Each slot keeps a single image.
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
                 {imageSlots.map((slot) => {
@@ -930,7 +930,7 @@ export function FileReviewClient({
                           // eslint-disable-next-line @next/next/no-img-element
                           <img src={src} alt={slot.label} className="h-full w-full object-contain" />
                         ) : (
-                          <span className="text-[10px] text-gray-400">sin imagen</span>
+                          <span className="text-[10px] text-gray-400">no image</span>
                         )}
                       </div>
                       {link ? (
@@ -949,10 +949,10 @@ export function FileReviewClient({
                           }}
                           className="text-[10px] text-red-600 hover:underline"
                         >
-                          Quitar
+                          Remove
                         </span>
                       ) : (
-                        <span className="text-[10px] text-gray-400">{isActive ? "elige imagen ↓" : "vacío"}</span>
+                        <span className="text-[10px] text-gray-400">{isActive ? "pick image ↓" : "empty"}</span>
                       )}
                     </button>
                   );
@@ -966,7 +966,7 @@ export function FileReviewClient({
                     return (
                       <span key={link.id} className="inline-flex items-center gap-2 rounded-md border border-gray-200 bg-gray-50 px-2 py-1 text-xs text-gray-600">
                         {slotLabel(link.targetType, link.optionLabel)} · p.{image?.pageNumber ?? "?"}
-                        <button type="button" onClick={() => unlinkImage(link.id)} className="text-red-600 hover:underline">Quitar</button>
+                        <button type="button" onClick={() => unlinkImage(link.id)} className="text-red-600 hover:underline">Remove</button>
                       </span>
                     );
                   })}
@@ -985,10 +985,10 @@ export function FileReviewClient({
               />
 
               <div className="mt-4 flex items-center justify-between">
-                <p className="text-xs font-medium uppercase text-gray-500">Imágenes extraídas ({images.length})</p>
+                <p className="text-xs font-medium uppercase text-gray-500">Extracted images ({images.length})</p>
                 {activeSlot && (
                   <span className="text-xs text-blue-700">
-                    Asignando a <strong>{activeSlot.label}</strong>
+                    Assigning to <strong>{activeSlot.label}</strong>
                   </span>
                 )}
               </div>
@@ -1000,9 +1000,9 @@ export function FileReviewClient({
                       <div className="relative h-40 overflow-hidden rounded bg-gray-100">
                         {imageSrc(image) ? (
                           // eslint-disable-next-line @next/next/no-img-element
-                          <img src={imageSrc(image) ?? ""} alt={`Imagen extraída página ${image.pageNumber}`} className="h-full w-full object-contain" />
+                          <img src={imageSrc(image) ?? ""} alt={`Extracted image page ${image.pageNumber}`} className="h-full w-full object-contain" />
                         ) : (
-                          <div className="flex h-full items-center justify-center text-xs text-gray-400">Sin vista previa</div>
+                          <div className="flex h-full items-center justify-center text-xs text-gray-400">No preview</div>
                         )}
                       </div>
                       <div className="mt-2 flex items-center justify-between gap-2">
@@ -1017,13 +1017,13 @@ export function FileReviewClient({
                       </div>
                       {activeSlot && (
                         <Button type="button" size="sm" className="mt-2 w-full" onClick={() => assignToSlot(image.id, activeSlot.targetType, activeSlot.optionLabel)}>
-                          Asignar a {activeSlot.label}
+                          Assign to {activeSlot.label}
                         </Button>
                       )}
                       <div className="mt-2 flex flex-wrap gap-1">
                         {imageSlots.map((slot) => {
                           const occupies = linkForSlot(slot.targetType, slot.optionLabel)?.imageArtifactId === image.id;
-                          const chip = slot.targetType === "STEM" ? "Enun." : slot.targetType === "STIMULUS" ? "Est." : slot.optionLabel;
+                          const chip = slot.targetType === "STEM" ? "Stem" : slot.targetType === "STIMULUS" ? "Stim." : slot.optionLabel;
                           return (
                             <button
                               key={`${image.id}-${slot.targetType}-${slot.optionLabel ?? ""}`}
@@ -1042,11 +1042,11 @@ export function FileReviewClient({
                     </div>
                   );
                 })}
-                {images.length === 0 && <p className="text-sm text-gray-400">Aún no hay imágenes extraídas para este archivo.</p>}
+                {images.length === 0 && <p className="text-sm text-gray-400">No extracted images for this file yet.</p>}
               </div>
 
               <details className="mt-4 rounded-md border border-gray-200 p-3">
-                <summary className="cursor-pointer text-xs font-medium text-gray-600">Destinos avanzados</summary>
+                <summary className="cursor-pointer text-xs font-medium text-gray-600">Advanced targets</summary>
                 <div className="mt-3 grid gap-3 md:grid-cols-[1fr_120px]">
                   <select value={targetType} onChange={(event) => setTargetType(event.target.value)} className="rounded-md border border-gray-300 px-3 py-2 text-sm">
                     {targetTypes.filter((t) => !["STEM", "OPTION", "STIMULUS"].includes(t.value)).map((target) => (
@@ -1055,11 +1055,11 @@ export function FileReviewClient({
                   </select>
                   <Input value={optionLabel} onChange={(event) => setOptionLabel(event.target.value.toUpperCase())} placeholder="Letra" disabled={targetType !== "OPTION"} />
                 </div>
-                <p className="mt-2 text-xs text-gray-500">Elige el destino y pulsa “Enlazar” en una imagen. Usa “Bloque de opciones (OCR)” para extraer A-D como texto.</p>
+                <p className="mt-2 text-xs text-gray-500">Choose a target and click “Link” on an image. Use “Options block (OCR)” to extract A–D as text.</p>
                 <div className="mt-2 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
                   {images.map((image) => (
                     <Button key={`adv-${image.id}`} type="button" size="sm" variant="secondary" onClick={() => linkImage(image.id)}>
-                      Enlazar p.{image.pageNumber} → {targetLabel(targetType)}
+                      Link p.{image.pageNumber} → {targetLabel(targetType)}
                     </Button>
                   ))}
                 </div>
@@ -1070,20 +1070,20 @@ export function FileReviewClient({
             <Section title="Finalizar" defaultOpen={false}>
               <ul className="grid gap-1 text-sm">
                 <li className={draft.correctAnswer ? "text-green-700" : "text-amber-700"}>
-                  {draft.correctAnswer ? "✓" : "✗"} Respuesta asignada
+                  {draft.correctAnswer ? "✓" : "✗"} Answer assigned
                 </li>
                 <li className={optsResolved ? "text-green-700" : "text-amber-700"}>
-                  {optsResolved ? "✓" : "✗"} {isMc ? "Opciones resueltas (texto o imagen A-D)" : "Respuesta numérica (N/A opciones)"}
+                  {optsResolved ? "✓" : "✗"} {isMc ? "Options resolved (text or A–D images)" : "Numeric answer (N/A options)"}
                 </li>
                 <li className={draft.status === "REVIEWED" ? "text-green-700" : "text-gray-500"}>
-                  {draft.status === "REVIEWED" ? "✓" : "•"} Marcada como revisada
+                  {draft.status === "REVIEWED" ? "✓" : "•"} Marked as reviewed
                 </li>
               </ul>
               <p className="mt-3 text-sm text-gray-700">
                 Revisadas {candidates.filter((candidate) => candidate.status === "REVIEWED").length} de {candidates.length} · Estado del archivo: {reviewSession.status}
               </p>
               <Button className="mt-3" type="button" onClick={() => void completeReview()}>
-                Completar revisión del archivo
+                Complete file review
               </Button>
             </Section>
           </>
@@ -1093,15 +1093,15 @@ export function FileReviewClient({
           </Card>
         )}
 
-        {/* SECTION: Galería de todas las imágenes extraídas del archivo.
-            Solo cuando NO hay candidato seleccionado — al seleccionar uno, el tablero de la
-            sección "Imágenes" ya muestra la grilla "Imágenes extraídas" (con asignación), así
-            evitamos la sección duplicada. Cubre el caso de un archivo sin candidatos (docx de
-            capturas), donde ese tablero no aparece. */}
+        {/* SECTION: Gallery of all extracted images for the file.
+            Only when NO candidate is selected — with a selection, the Images section
+            already shows the extracted-images grid (with assignment), so we avoid a
+            duplicate. Covers files with no candidates (screenshot docx) where that board
+            does not appear. */}
         {!selected && (
-          <Section title="Galería de imágenes extraídas" subtitle={`${images.length} imágenes`} defaultOpen={candidates.length === 0}>
+          <Section title="Extracted image gallery" subtitle={`${images.length} images`} defaultOpen={candidates.length === 0}>
             {images.length === 0 ? (
-              <p className="py-4 text-sm text-gray-400">No hay imágenes extraídas en este archivo.</p>
+              <p className="py-4 text-sm text-gray-400">No extracted images in this file.</p>
             ) : (
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
                 {images.map((image) => {
@@ -1109,14 +1109,15 @@ export function FileReviewClient({
                   return (
                     <figure key={image.id} className="overflow-hidden rounded-md border border-gray-200">
                       {src ? (
-                        <a href={src} target="_blank" rel="noreferrer" className="block bg-gray-50" title={`${image.origin} · página ${image.pageNumber}`}>
-                          <img src={src} alt={`Página ${image.pageNumber} imagen ${image.imageIndex}`} className="h-40 w-full object-contain" loading="lazy" />
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <a href={src} target="_blank" rel="noreferrer" className="block bg-gray-50" title={`${image.origin} · page ${image.pageNumber}`}>
+                          <img src={src} alt={`Page ${image.pageNumber} image ${image.imageIndex}`} className="h-40 w-full object-contain" loading="lazy" />
                         </a>
                       ) : (
-                        <div className="flex h-40 items-center justify-center text-xs text-gray-400">sin vista previa</div>
+                        <div className="flex h-40 items-center justify-center text-xs text-gray-400">no preview</div>
                       )}
                       <figcaption className="flex items-center justify-between gap-2 px-2 py-1 text-xs text-gray-500">
-                        <span>Pág. {image.pageNumber}{typeof image.imageIndex === "number" ? ` · #${image.imageIndex}` : ""}</span>
+                        <span>p.{image.pageNumber}{typeof image.imageIndex === "number" ? ` · #${image.imageIndex}` : ""}</span>
                         {image.width && image.height ? <span className="shrink-0 text-gray-400">{image.width}×{image.height}</span> : null}
                       </figcaption>
                       {assignTargets.length > 0 && (
@@ -1126,7 +1127,7 @@ export function FileReviewClient({
                             onChange={(e) => setGalleryAssign({ imageId: image.id, questionId: e.target.value })}
                             className="min-w-0 flex-1 rounded border border-gray-300 px-1 py-1 text-xs"
                           >
-                            <option value="">Asignar a…</option>
+                            <option value="">Assign to…</option>
                             {assignTargets.map((t) => (
                               <option key={t.questionId} value={t.questionId}>{t.label}</option>
                             ))}
@@ -1149,19 +1150,19 @@ export function FileReviewClient({
           </Section>
         )}
 
-        {/* SECTION: Páginas del archivo (contexto). */}
-        <Section title="Páginas y texto extraído" subtitle={`${pages.length} páginas`} defaultOpen={false}>
+        {/* SECTION: File pages (context). */}
+        <Section title="Pages and extracted text" subtitle={`${pages.length} pages`} defaultOpen={false}>
           <div className="divide-y divide-gray-100">
             {pages.map((page) => (
               <div key={page.id} className="grid gap-3 py-4 lg:grid-cols-[140px_1fr]">
                 <div className="text-sm text-gray-600">
-                  Página {page.pageNumber}
+                  Page {page.pageNumber}
                   <p className="text-xs text-gray-400">{page.method}</p>
                 </div>
                 <PageTextPreview page={page} />
               </div>
             ))}
-            {pages.length === 0 && <p className="py-4 text-sm text-gray-400">No hay páginas registradas.</p>}
+            {pages.length === 0 && <p className="py-4 text-sm text-gray-400">No pages recorded.</p>}
           </div>
         </Section>
       </main>

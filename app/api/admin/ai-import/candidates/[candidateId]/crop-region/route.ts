@@ -85,7 +85,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
 
   // If this candidate is already promoted, mirror an ASSIGNed image onto the
   // official Question/QuestionOption so the change is visible to students and the
-  // conjunto completeness view (which read official rows, not candidate links).
+  // Extracted Test completeness view (which read official rows, not candidate links).
   let officialPropagation: Awaited<ReturnType<typeof propagateAssignedImageToOfficial>> | null = null;
   if (mode === "ASSIGN" && data.imageArtifactId) {
     officialPropagation = await propagateAssignedImageToOfficial({

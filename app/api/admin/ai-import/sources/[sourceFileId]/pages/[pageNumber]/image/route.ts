@@ -43,7 +43,7 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
   if ((source.extension ?? "").toLowerCase() !== "pdf") {
     const fallback = await extractedPageFallback();
     if (fallback) return fallback;
-    return NextResponse.json({ error: "No hay imagen de página para este archivo." }, { status: 404 });
+    return NextResponse.json({ error: "No page image is available for this file." }, { status: 404 });
   }
 
   const response = await fetch(ingestUrl(`/sources/${sourceFileId}/pages/${pageNum}/image?dpi=${dpi}`), {

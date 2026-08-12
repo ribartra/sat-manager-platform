@@ -98,7 +98,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
 
   // Mirror onto the official Question when already promoted — same path as
   // crop-region. Without this, the UI "asignar imagen" only updates staging and
-  // conjuntos keep showing the gap.
+  // Extracted Tests keep showing the gap.
   const officialPropagation = await propagateAssignedImageToOfficial({
     candidateId,
     imageArtifactId: image.id,

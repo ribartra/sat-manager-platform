@@ -7,29 +7,29 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
-  filterConjuntos,
-  type ConjuntoRow,
+  filterExtractedTests,
+  type ExtractedTestRow,
   type FieldState,
   type QuestionStatusRow,
   type SetSectionFilter,
   type SetTypeFilter,
 } from "@/lib/ingest-sets";
 
-export type { ConjuntoRow };
+export type { ExtractedTestRow };
 
 interface SetsIndexClientProps {
-  rows: ConjuntoRow[];
+  rows: ExtractedTestRow[];
   batchId: string;
   batches: { id: string; name: string }[];
 }
 
 const SECTION_TABS: { value: SetSectionFilter; label: string }[] = [
-  { value: "ALL", label: "Todas" },
+  { value: "ALL", label: "All" },
   { value: "RW", label: "R&W" },
   { value: "MATH", label: "Math" },
 ];
 
-const ROLE_LABEL: Record<string, string> = { QUESTION: "Preguntas", ANSWER: "Respuestas", EXPLANATION: "Explicaciones", OTHER: "Otro" };
+const ROLE_LABEL: Record<string, string> = { QUESTION: "Questions", ANSWER: "Answers", EXPLANATION: "Explanations", OTHER: "Other" };
 
 function contentLabel(contentType: string) {
   return contentType === "FULL_PRACTICE_TEST" ? "Full test" : "Practice set";
@@ -48,7 +48,7 @@ const DOT: Record<FieldState, string> = {
   na: "bg-gray-200",
 };
 function FieldDot({ state, label }: { state: FieldState; label: string }) {
-  const title = `${label}: ${state === "na" ? "no aplica" : state === "ok" ? "ok" : state === "info" ? "nota" : state === "warn" ? "atención" : "falta"}`;
+  const title = `${label}: ${state === "na" ? "n/a" : state === "ok" ? "ok" : state === "info" ? "note" : state === "warn" ? "attention" : "missing"}`;
   return (
     <span className="inline-flex items-center gap-1 text-[11px] text-gray-500" title={title}>
       <span className={`h-2 w-2 rounded-full ${DOT[state]}`} />
@@ -57,25 +57,25 @@ function FieldDot({ state, label }: { state: FieldState; label: string }) {
   );
 }
 
-function CompletenessBar({ row }: { row: ConjuntoRow }) {
+function CompletenessBar({ row }: { row: ExtractedTestRow }) {
   const total = row.total || 1;
   // A single flagged question must stay visible: clamp each present segment to a
-  // minimum width so a mostly-green bar can't hide one "revisar" and read as done.
+  // minimum width so a mostly-green bar can't hide one "review" item and read as done.
   const seg = (n: number, cls: string) =>
     n > 0 ? <span className={cls} style={{ width: `${Math.max((n / total) * 100, 6)}%`, minWidth: 4 }} /> : null;
   return (
     <span className="flex h-2 w-full min-w-24 overflow-hidden rounded-full bg-gray-100">
       {seg(row.complete, "bg-emerald-500")}
-      {seg(row.atencion, "bg-amber-500")}
-      {seg(row.revisar, "bg-rose-500")}
+      {seg(row.attention, "bg-amber-500")}
+      {seg(row.needsReview, "bg-rose-500")}
     </span>
   );
 }
 
-// Worst-state accent so a whole conjunto row reads as its true status at a glance
-// (rose if any revisar, amber if any atención, emerald only when fully complete).
-function worstLevel(row: ConjuntoRow): "crit" | "warn" | "ok" {
-  return row.revisar > 0 ? "crit" : row.atencion > 0 ? "warn" : "ok";
+// Worst-state accent so a whole Extracted Test row reads as its true status at a glance
+// (rose if any needs review, amber if any attention, emerald only when fully complete).
+function worstLevel(row: ExtractedTestRow): "crit" | "warn" | "ok" {
+  return row.needsReview > 0 ? "crit" : row.attention > 0 ? "warn" : "ok";
 }
 const STRIPE: Record<"crit" | "warn" | "ok", string> = {
   crit: "border-l-rose-500",
@@ -84,27 +84,27 @@ const STRIPE: Record<"crit" | "warn" | "ok", string> = {
 };
 
 function statusPill(level: QuestionStatusRow["level"]) {
-  if (level === "crit") return <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[11px] font-semibold text-rose-700">Revisar</span>;
-  if (level === "warn") return <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-700">Atención</span>;
-  return <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">Completa</span>;
+  if (level === "crit") return <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[11px] font-semibold text-rose-700">Review</span>;
+  if (level === "warn") return <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-700">Attention</span>;
+  return <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">Complete</span>;
 }
 
 function QuestionTable({ questions }: { questions: QuestionStatusRow[] }) {
-  if (questions.length === 0) return <p className="px-4 py-6 text-center text-xs text-gray-400">Sin preguntas en este conjunto.</p>;
+  if (questions.length === 0) return <p className="px-4 py-6 text-center text-xs text-gray-400">No questions in this Extracted Test.</p>;
   return (
     <div className="overflow-x-auto">
       <table className="w-full min-w-[760px] text-xs">
         <thead>
           <tr className="border-b border-gray-100 bg-gray-50 text-left uppercase tracking-wide text-gray-400">
-            <th className="px-3 py-2">Pregunta</th>
-            <th className="px-2 py-2">Tipo</th>
-            <th className="px-2 py-2">Resp.</th>
-            <th className="px-2 py-2">Enunciado</th>
-            <th className="px-2 py-2">Estímulo</th>
-            <th className="px-2 py-2">Opciones</th>
+            <th className="px-3 py-2">Question</th>
+            <th className="px-2 py-2">Type</th>
+            <th className="px-2 py-2">Ans.</th>
+            <th className="px-2 py-2">Stem</th>
+            <th className="px-2 py-2">Stimulus</th>
+            <th className="px-2 py-2">Options</th>
             <th className="px-2 py-2">Expl.</th>
-            <th className="px-2 py-2">Estado</th>
-            <th className="px-3 py-2">Observaciones</th>
+            <th className="px-2 py-2">Status</th>
+            <th className="px-3 py-2">Notes</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-50">
@@ -116,10 +116,10 @@ function QuestionTable({ questions }: { questions: QuestionStatusRow[] }) {
               </td>
               <td className="px-2 py-1.5"><span className={`rounded px-1.5 py-0.5 font-mono ${q.type === "NUMERIC" ? "bg-sky-100 text-sky-700" : "bg-gray-100 text-gray-600"}`}>{q.type === "NUMERIC" ? "NUM" : "MC"}</span></td>
               <td className={`px-2 py-1.5 font-mono ${q.answer ? "text-gray-800" : "text-rose-600"}`}>{q.answer || "—"}</td>
-              <td className="px-2 py-1.5"><FieldDot state={q.fields.enunciado} label="" /></td>
-              <td className="px-2 py-1.5"><FieldDot state={q.fields.estimulo} label="" /></td>
-              <td className="px-2 py-1.5"><FieldDot state={q.fields.opciones} label="" /></td>
-              <td className="px-2 py-1.5"><FieldDot state={q.fields.explicacion} label="" /></td>
+              <td className="px-2 py-1.5"><FieldDot state={q.fields.stem} label="" /></td>
+              <td className="px-2 py-1.5"><FieldDot state={q.fields.stimulus} label="" /></td>
+              <td className="px-2 py-1.5"><FieldDot state={q.fields.options} label="" /></td>
+              <td className="px-2 py-1.5"><FieldDot state={q.fields.explanation} label="" /></td>
               <td className="px-2 py-1.5">{statusPill(q.level)}</td>
               <td className="px-3 py-1.5 text-gray-500">{q.notes.join(" · ")}</td>
             </tr>
@@ -138,7 +138,7 @@ export function SetsIndexClient({ rows, batchId, batches }: SetsIndexClientProps
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
 
   const filtered = useMemo(
-    () => filterConjuntos(rows, { query, type: typeFilter, section: sectionFilter, onlyPending }),
+    () => filterExtractedTests(rows, { query, type: typeFilter, section: sectionFilter, onlyPending }),
     [rows, query, typeFilter, sectionFilter, onlyPending],
   );
 
@@ -147,12 +147,12 @@ export function SetsIndexClient({ rows, batchId, batches }: SetsIndexClientProps
       filtered.reduce(
         (acc, row) => {
           acc.total += row.total;
-          acc.revisar += row.revisar;
-          acc.atencion += row.atencion;
+          acc.needsReview += row.needsReview;
+          acc.attention += row.attention;
           acc.complete += row.complete;
           return acc;
         },
-        { total: 0, revisar: 0, atencion: 0, complete: 0 },
+        { total: 0, needsReview: 0, attention: 0, complete: 0 },
       ),
     [filtered],
   );
@@ -171,13 +171,13 @@ export function SetsIndexClient({ rows, batchId, batches }: SetsIndexClientProps
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <Link href={`/admin/import/ai?batch=${batchId}`} className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline">
-            <ArrowLeft className="h-3.5 w-3.5" /> Volver al lote
+            <ArrowLeft className="h-3.5 w-3.5" /> Back to batch
           </Link>
-          <h1 className="mt-2 text-2xl font-semibold text-gray-900">Conjuntos por revisar</h1>
+          <h1 className="mt-2 text-2xl font-semibold text-gray-900">Extracted Tests to review</h1>
           <p className="mt-1 text-sm text-gray-500">
-            Un conjunto agrupa los archivos que forman un set — preguntas + respuestas y/o explicaciones. Expande uno para ver
-            el estado de cada pregunta (enunciado, estímulo, opciones, respuesta, explicación) y usa <strong>Revisar / recortar</strong>
-            para abrir el archivo de preguntas.
+            An Extracted Test groups the source files for one set — questions plus answers and/or explanations. Expand a row to see
+            each question status (stem, stimulus, options, answer, explanation) and use <strong>Review / crop</strong>
+            to open the question file.
           </p>
         </div>
         {batches.length > 1 && (
@@ -199,20 +199,20 @@ export function SetsIndexClient({ rows, batchId, batches }: SetsIndexClientProps
 
       <div className="grid gap-3 sm:grid-cols-4">
         <Card padding="md">
-          <p className="text-xs uppercase text-gray-400">Conjuntos</p>
+          <p className="text-xs uppercase text-gray-400">Extracted Tests</p>
           <p className="mt-1 text-2xl font-semibold text-gray-900">{filtered.length}</p>
         </Card>
         <Card padding="md">
-          <p className="text-xs uppercase text-gray-400">Preguntas</p>
+          <p className="text-xs uppercase text-gray-400">Questions</p>
           <p className="mt-1 text-2xl font-semibold text-gray-900">{totals.total}</p>
         </Card>
         <Card padding="md">
-          <p className="text-xs uppercase text-gray-400">A revisar</p>
-          <p className="mt-1 text-2xl font-semibold text-rose-600">{totals.revisar}</p>
+          <p className="text-xs uppercase text-gray-400">Needs review</p>
+          <p className="mt-1 text-2xl font-semibold text-rose-600">{totals.needsReview}</p>
         </Card>
         <Card padding="md">
-          <p className="text-xs uppercase text-gray-400">Atención</p>
-          <p className="mt-1 text-2xl font-semibold text-amber-600">{totals.atencion}</p>
+          <p className="text-xs uppercase text-gray-400">Attention</p>
+          <p className="mt-1 text-2xl font-semibold text-amber-600">{totals.attention}</p>
         </Card>
       </div>
 
@@ -237,7 +237,7 @@ export function SetsIndexClient({ rows, batchId, batches }: SetsIndexClientProps
           <Input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Buscar conjunto, archivo, sección o test…"
+            placeholder="Search Extracted Test, file, section, or test…"
             className="pl-9"
           />
         </div>
@@ -246,20 +246,20 @@ export function SetsIndexClient({ rows, batchId, batches }: SetsIndexClientProps
           onChange={(event) => setTypeFilter(event.target.value as SetTypeFilter)}
           className="rounded-md border border-gray-300 px-3 py-2 text-sm"
         >
-          <option value="ALL">Todos los tipos</option>
+          <option value="ALL">All types</option>
           <option value="PRACTICE_SET">Practice sets</option>
           <option value="FULL_PRACTICE_TEST">Full practice tests</option>
         </select>
         <label className="flex items-center gap-2 text-sm text-gray-700">
           <input type="checkbox" checked={onlyPending} onChange={(event) => setOnlyPending(event.target.checked)} className="h-4 w-4 rounded border-gray-300" />
-          Solo con pendientes
+          Only with pending items
         </label>
       </div>
 
       <div className="space-y-3">
         {filtered.map((row) => {
           const open = expanded.has(row.key);
-          const pending = row.revisar + row.atencion;
+          const pending = row.needsReview + row.attention;
           return (
             <Card key={row.key} padding="none" className={`overflow-hidden border-l-4 ${STRIPE[worstLevel(row)]}`}>
               <div className="flex flex-wrap items-center gap-4 px-4 py-3">
@@ -272,12 +272,12 @@ export function SetsIndexClient({ rows, batchId, batches }: SetsIndexClientProps
                       {row.difficulty && <Badge variant="default">{row.difficulty}</Badge>}
                       {row.testNumber && <Badge variant="info">Test {row.testNumber}</Badge>}
                       {row.section && <Badge variant="default">{sectionLabel(row.section)}</Badge>}
-                      <Badge variant="default">{row.total} preguntas</Badge>
+                      <Badge variant="default">{row.total} questions</Badge>
                       {row.promoted > 0 && <Badge variant="success">{row.promoted} oficiales</Badge>}
                     </span>
                     <span className="mt-1 flex flex-wrap gap-1.5 text-[11px] text-gray-400">
                       {row.files.map((f) => (
-                        <span key={f.id} title={`${ROLE_LABEL[f.role]} · ${f.nQ} preguntas · ${f.nA} respuestas`} className="inline-flex items-center gap-1 rounded border border-gray-200 px-1.5 py-0.5">
+                        <span key={f.id} title={`${ROLE_LABEL[f.role]} · ${f.nQ} questions · ${f.nA} answers`} className="inline-flex items-center gap-1 rounded border border-gray-200 px-1.5 py-0.5">
                           <span className={`h-1.5 w-1.5 rounded-full ${f.role === "QUESTION" ? "bg-blue-500" : f.role === "ANSWER" ? "bg-emerald-500" : f.role === "EXPLANATION" ? "bg-violet-500" : "bg-gray-300"}`} />
                           {f.name}
                         </span>
@@ -288,7 +288,7 @@ export function SetsIndexClient({ rows, batchId, batches }: SetsIndexClientProps
                 <div className="flex w-40 shrink-0 flex-col gap-1">
                   <CompletenessBar row={row} />
                   <span className="text-[11px] text-gray-500">
-                    <span className="text-emerald-600">{row.complete} ok</span> · <span className="text-amber-600">{row.atencion} at.</span> · <span className="text-rose-600">{row.revisar} rev.</span>
+                    <span className="text-emerald-600">{row.complete} ok</span> · <span className="text-amber-600">{row.attention} at.</span> · <span className="text-rose-600">{row.needsReview} rev.</span>
                   </span>
                 </div>
                 <div className="shrink-0">
@@ -298,7 +298,7 @@ export function SetsIndexClient({ rows, batchId, batches }: SetsIndexClientProps
                   href={`/admin/import/ai/${row.batchId}/files/${row.primaryFileId}`}
                   className="inline-flex shrink-0 items-center gap-1 rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
                 >
-                  <ScissorsSquare className="h-3.5 w-3.5" /> Revisar / recortar
+                  <ScissorsSquare className="h-3.5 w-3.5" /> Review / crop
                 </Link>
               </div>
               {open && <div className="border-t border-gray-100 bg-gray-50/50"><QuestionTable questions={row.questions} /></div>}
@@ -306,7 +306,7 @@ export function SetsIndexClient({ rows, batchId, batches }: SetsIndexClientProps
           );
         })}
         {filtered.length === 0 && (
-          <Card padding="lg"><p className="text-center text-sm text-gray-400">No hay conjuntos que coincidan con el filtro.</p></Card>
+          <Card padding="lg"><p className="text-center text-sm text-gray-400">No Extracted Tests match this filter.</p></Card>
         )}
       </div>
     </div>

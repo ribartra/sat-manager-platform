@@ -1,13 +1,13 @@
-# Estructura documental de los conjuntos de ingesta — Math y R&W
+# Estructura documental de los Extracted Tests de ingesta — Math y R&W
 
 > Referencia para **generalizar parsers**. Documenta, por sección (Math / R&W), la
-> estructura documental de los archivos de cada conjunto, sus características
+> estructura documental de los archivos de cada Extracted Test, sus características
 > independientes, y qué lógica de extracción cubre mejor cada campo. Sintetiza las
 > consideraciones y los scripts de corrección aplicados durante la recuperación de
 > contenido (Tests 1–10).
 >
 > Fuentes de verdad en código: `lib/ingest-sets.ts` (`classifyQuestion`),
-> `lib/ingest-sets.server.ts` (`computeConjuntos`), `lib/ingest-promotion.ts`
+> `lib/ingest-sets.server.ts` (`computeExtractedTests`), `lib/ingest-promotion.ts`
 > (`sanitizeStem`, `sanitizeExplanation`, `buildQuestionDraft`),
 > `ingest_service/app/practice_repair.py`, `lib/answer-grading.ts`.
 >
@@ -19,13 +19,14 @@
 
 ---
 
-## 0. Modelo de conjunto (recordatorio)
+## 0. Modelo de Extracted Test (recordatorio)
 
-Un **conjunto** = el **grupo de archivos fuente** que juntos arman un set, no un archivo.
+Un **Extracted Test** = el **grupo de archivos fuente** que juntos arman un set, no un archivo.
+(No es un `IngestQuestionCandidate`; los candidatos viven *dentro* del Extracted Test.)
 
 - **Full Practice Test** → clave de agrupación `(testNumber, section)`. Cada sección
-  (`RW`, `MATH`) es un conjunto de ~54 (R&W) / ~44 (Math) preguntas, con módulos `1` y
-  `2`/`2B`. En revisión se trabajan **2 conjuntos** por test; al **ensamblar** el FPT
+  (`RW`, `MATH`) es un Extracted Test de ~54 (R&W) / ~44 (Math) preguntas, con módulos `1` y
+  `2`/`2B`. En revisión se trabajan **2 Extracted Tests** por test; al **ensamblar** el FPT
   estandarizado (`promote-full-test`) pasan a **4 grupos** SAT:
   RW M1 · RW M2 · Math M1 · Math M2 (tiempos 32/32/35/35; score 200–800 por sección).
   Metadata de ítems al promover / re-ensamblar: skill Topic `M1` o `M2` bajo Domain
@@ -33,7 +34,7 @@ Un **conjunto** = el **grupo de archivos fuente** que juntos arman un set, no un
   no routing adaptativo). Ver `lib/full-test-modules.ts` y
   `scripts/ensure-fulltest-topics.mjs`.
 - **Practice Set** → clave `(section, topicName, difficulty, practiceSetVariant)`.
-- **Roles de archivo** dentro del conjunto (`IngestSourceFile`):
+- **Roles de archivo** dentro del Extracted Test (`IngestSourceFile`):
   - `QUESTION` (`isQuestionSource=1`, `sourceKind=MOCK_EXAM` / `PRACTICE_EXERCISE`) — **archivo
     primario**; aquí viven los `IngestQuestionCandidate`.
   - `ANSWER` (`isAnswerFile=1`, `sourceKind=ANSWER_KEY`) — la clave de respuestas.
@@ -52,13 +53,13 @@ Un **conjunto** = el **grupo de archivos fuente** que juntos arman un set, no un
 
 | Campo | ok | atención (warn) | revisar (crit) | info | n/a |
 |---|---|---|---|---|---|
-| **enunciado** (stem) | tiene texto | — | vacío | — | — |
-| **estímulo** (pasaje) | hay pasaje | vacío (solo R&W) | — | — | Math |
-| **opciones** (MC) | ≥4 textos | parciales (1–3) | 0 y sin imágenes | ≥4 imágenes | NUMERIC |
-| **respuesta** | hay `correctAnswer` | — | vacío | — | — |
-| **explicación** | existe | — | — | ausente | — |
+| **stem** (enunciado) | tiene texto | — | vacío | — | — |
+| **stimulus** (pasaje) | hay pasaje | vacío (solo R&W) | — | — | Math |
+| **options** (MC) | ≥4 textos | parciales (1–3) | 0 y sin imágenes | ≥4 imágenes | NUMERIC |
+| **answer** | hay `correctAnswer` | — | vacío | — | — |
+| **explanation** | existe | — | — | ausente | — |
 
-`level` escala al peor; `info` nunca lo baja. **NUMERIC** ⇒ `opciones = n/a`. Respuesta
+`level` escala al peor; `info` nunca lo baja. **NUMERIC** ⇒ `options = n/a`. Respuesta
 NUMERIC multi-valor se guarda **pipe-delimited** (`"2|6"`, `"7|8|13"`); comparación SIEMPRE
 vía `lib/answer-grading.ts` (`isAnswerCorrect`), nunca `===` crudo.
 

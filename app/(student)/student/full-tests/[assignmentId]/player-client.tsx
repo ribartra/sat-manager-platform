@@ -301,14 +301,14 @@ export function FullTestPlayer({
         <p className="text-sm font-semibold text-gray-900">{testName}</p>
         <h1 className="mt-3 text-2xl font-semibold text-gray-900">Break</h1>
         <p className="mt-2 max-w-md text-center text-sm text-gray-500">
-          Descanso de {breakMinutes} minutos entre Reading &amp; Writing y Math. Este tiempo no suma al
-          reloj de las secciones.
+          {breakMinutes}-minute break between Reading & Writing and Math. This time does not add to
+          section clocks.
         </p>
         <p className={`mt-8 text-4xl font-semibold tabular-nums ${breakRemaining <= 60 ? "text-red-600" : "text-gray-900"}`}>
           {formatTime(breakRemaining)}
         </p>
         <p className="mt-4 text-xs text-gray-400">
-          {saving === "saving" ? "Saving..." : saving === "saved" ? "Saved" : "Al acabar el break continuarás con Math Module 1."}
+          {saving === "saving" ? "Saving..." : saving === "saved" ? "Saved" : "When the break ends you continue with Math Module 1."}
         </p>
         <Button
           className="mt-8"

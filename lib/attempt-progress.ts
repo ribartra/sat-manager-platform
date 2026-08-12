@@ -33,7 +33,7 @@ export function practiceAttemptProgress(input: {
   const percent = progressPercent(answered, total);
   const positionLabel =
     input.status === "IN_PROGRESS"
-      ? `Pregunta ${Math.min(input.currentQuestion + 1, Math.max(total, 1))} de ${total}`
+      ? `Question ${Math.min(input.currentQuestion + 1, Math.max(total, 1))} of ${total}`
       : null;
   return { answered, total, percent, positionLabel };
 }
@@ -82,9 +82,9 @@ export function fullTestAttemptProgress(input: {
   let positionLabel: string | null = null;
   if (input.status === "IN_PROGRESS") {
     if (input.phase === "BREAK") {
-      positionLabel = "Descanso (break) entre R&W y Math";
+      positionLabel = "Break between R&W and Math";
     } else if (current) {
-      positionLabel = `${current.name} · Pregunta ${Math.min(input.currentQuestion + 1, Math.max(current.total, 1))} de ${current.total}`;
+      positionLabel = `${current.name} · Question ${Math.min(input.currentQuestion + 1, Math.max(current.total, 1))} of ${current.total}`;
     }
   }
   return {
