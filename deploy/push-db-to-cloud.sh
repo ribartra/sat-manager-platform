@@ -28,7 +28,7 @@
 #   PROJECT, BUCKET, ZONE, VM, LOCAL_DB, DOMAIN
 # Saneo (se pasan a prep-push-snapshot.mjs):
 #   PROD_ADMIN_EMAIL, PROD_ADMIN_PASSWORD, DISABLE_EMAILS, ROTATE_EMAILS,
-#   PURGE_ENCRYPTED
+#   PURGE_ENCRYPTED, CONTENT_FILTER (=ps-fpt-only para solo PS/FPT publicados)
 # ─────────────────────────────────────────────────────────────────────────────
 set -euo pipefail
 
@@ -86,7 +86,7 @@ SNAP="$WORK/dev.db"
 
 # ── 1) Snapshot saneado ──────────────────────────────────────────────────────
 log "Preparando snapshot saneado..."
-OUT="$SNAP" node scripts/prep-push-snapshot.mjs | tee "$WORK/prep.log"
+SRC="$LOCAL_DB" OUT="$SNAP" node scripts/prep-push-snapshot.mjs | tee "$WORK/prep.log"
 [ -f "$SNAP" ] || die "El preparador no generó $SNAP"
 
 # Guarda credenciales impresas por el preparador (líneas 'CREDENTIAL <email> <pw>').

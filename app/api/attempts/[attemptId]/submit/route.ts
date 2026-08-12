@@ -12,6 +12,7 @@ import {
 import { applyPracticeProgression } from "@/lib/practice-progression";
 import { markUserActive } from "@/lib/activity";
 import { isAnswerCorrect } from "@/lib/answer-grading";
+import { scorePracticeSetAttempt } from "@/lib/practice-set-scoring";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ attemptId: string }> }) {
   const session = await requireApprovedSession();
@@ -145,10 +146,25 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ att
   );
 
   const submittedAt = new Date();
+  const sectionMeta = psQuestions[0]?.practiceSet.topic.domain.section ?? null;
+  const scored = await scorePracticeSetAttempt({
+    correct: correctCount,
+    total: psQuestions.length,
+    section: sectionMeta,
+  });
+
   await Promise.all([
     prisma.attempt.update({
       where: { id: attemptId },
-      data: { status: "SUBMITTED", submittedAt, totalTime, practiceSetSnapshot },
+      data: {
+        status: "SUBMITTED",
+        submittedAt,
+        totalTime,
+        practiceSetSnapshot,
+        scorePercent: scored.scorePercent,
+        scaledScore: scored.scaledScore,
+        scoreSection: scored.scoreSection,
+      },
     }),
     markUserActive(session.user.id, submittedAt),
   ]);
@@ -166,7 +182,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ att
   await applyPracticeProgression({
     studentId: session.user.id,
     practiceSetId: attempt.practiceSetId,
-    scorePercent: psQuestions.length > 0 ? Math.round((correctCount / psQuestions.length) * 100) : 0,
+    scorePercent: scored.scorePercent,
   });
 
   return NextResponse.json({ ok: true });

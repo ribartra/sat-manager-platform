@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { scorePercent } from "@/lib/utils";
 import { parseSnapshot, PracticeSetSnapshot, QuestionSnapshot } from "@/lib/attempt-snapshots";
 import { teacherProgramEnrollmentScope } from "@/lib/program-scope";
+import { averageScaledScores, resolvePracticeSetAttemptScore } from "@/lib/practice-set-scoring";
 
 interface RouteContext {
   params: Promise<{ studentId: string }>;
@@ -183,11 +184,23 @@ export async function GET(_req: Request, { params }: RouteContext) {
       take: 20,
     });
     const totalTime = attempts.reduce((sum, attempt) => sum + (attempt.totalTime ?? 0), 0);
-    const scores = attempts.map((attempt) => {
-      const correct = attempt.answers.filter((a) => a.isCorrect).length;
-      return scorePercent(correct, attempt.answers.length);
-    });
-    const avgScore = scores.length ? Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length) : null;
+    const scores = await Promise.all(
+      attempts.map(async (attempt) => {
+        const correct = attempt.answers.filter((a) => a.isCorrect).length;
+        const sat = await resolvePracticeSetAttemptScore({
+          scorePercent: attempt.scorePercent,
+          scaledScore: attempt.scaledScore,
+          scoreSection: attempt.scoreSection,
+          correct,
+          total: attempt.answers.length,
+          section: attempt.answers[0]?.question.topic.domain.section ?? null,
+        });
+        return sat;
+      }),
+    );
+    const avgScore = scores.length ? Math.round(scores.reduce((sum, score) => sum + score.scorePercent, 0) / scores.length) : null;
+    const rwAvg = averageScaledScores(scores.filter((s) => s.scoreSection === "RW").map((s) => s.scaledScore));
+    const mathAvg = averageScaledScores(scores.filter((s) => s.scoreSection === "MATH").map((s) => s.scaledScore));
     const topicStats = new Map<string, { correct: number; total: number }>();
     const difficultyStats = new Map<string, { correct: number; total: number }>();
     const mediaUrls = new Set<string>();
@@ -215,13 +228,19 @@ export async function GET(_req: Request, { params }: RouteContext) {
     lines.push({ text: AREA_CONFIG[selectedArea].label, size: 16, bold: true, gapBefore: 24 });
     lines.push({ text: `Completed attempts: ${attempts.length}` });
     lines.push({ text: `Average score: ${avgScore !== null ? `${avgScore}%` : "N/A"}` });
+    lines.push({ text: `SAT R&W average: ${rwAvg ?? "N/A"}` });
+    lines.push({ text: `SAT Math average: ${mathAvg ?? "N/A"}` });
     lines.push({ text: `Practice time: ${Math.round(totalTime / 60)} minutes` });
     lines.push({ text: "Recent Attempts", size: 13, bold: true, gapBefore: 18 });
-    attempts.forEach((attempt) => {
-      const correct = attempt.answers.filter((a) => a.isCorrect).length;
+    for (let i = 0; i < attempts.length; i += 1) {
+      const attempt = attempts[i];
+      const sat = scores[i];
       const snapshot = parseSnapshot<PracticeSetSnapshot>(attempt.practiceSetSnapshot);
-      lines.push({ text: `${snapshot?.name ?? attempt.assignment?.practiceSet.name ?? "Practice Set"}: ${correct}/${attempt.answers.length} (${scorePercent(correct, attempt.answers.length)}%)` });
-    });
+      const correct = attempt.answers.filter((a) => a.isCorrect).length;
+      lines.push({
+        text: `${snapshot?.name ?? attempt.assignment?.practiceSet.name ?? "Practice Set"}: ${correct}/${attempt.answers.length} (${sat.scorePercent}%) · SAT ${sat.scaledScore}`,
+      });
+    }
     lines.push({ text: "Score Progress Over Time", size: 13, bold: true, gapBefore: 18 });
     [...attempts].reverse().forEach((attempt, index) => {
       const correct = attempt.answers.filter((a) => a.isCorrect).length;

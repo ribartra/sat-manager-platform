@@ -4,6 +4,11 @@ import Link from "next/link";
 import { formatDate, formatTime, scorePercent } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import {
+  averageScaledScores,
+  cumulativeAverageSeries,
+  resolvePracticeSetAttemptScore,
+} from "@/lib/practice-set-scoring";
 
 interface PageProps {
   searchParams: Promise<{
@@ -112,6 +117,33 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
     topicStats[topic.id].count += 1;
   });
 
+  const scoredAttempts = await Promise.all(
+    attempts.map(async (a) => {
+      const correct = a.answers.filter((ans) => ans.isCorrect).length;
+      const total = a.answers.length;
+      const sat = await resolvePracticeSetAttemptScore({
+        scorePercent: a.scorePercent,
+        scaledScore: a.scaledScore,
+        scoreSection: a.scoreSection,
+        correct,
+        total,
+        section: a.assignment?.practiceSet.topic.domain.section ?? null,
+      });
+      return { attempt: a, correct, total, sat };
+    }),
+  );
+
+  const rwScores = scoredAttempts.filter((row) => row.sat.scoreSection === "RW");
+  const mathScores = scoredAttempts.filter((row) => row.sat.scoreSection === "MATH");
+  const rwAvg = averageScaledScores(rwScores.map((row) => row.sat.scaledScore));
+  const mathAvg = averageScaledScores(mathScores.map((row) => row.sat.scaledScore));
+  const rwSeries = cumulativeAverageSeries(
+    rwScores.map((row) => ({ scaledScore: row.sat.scaledScore, submittedAt: row.attempt.submittedAt })),
+  );
+  const mathSeries = cumulativeAverageSeries(
+    mathScores.map((row) => ({ scaledScore: row.sat.scaledScore, submittedAt: row.attempt.submittedAt })),
+  );
+
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
       <h1 className="text-2xl font-semibold text-gray-900 mb-6">My History</h1>
@@ -192,7 +224,50 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
       ) : (
         <div className="grid grid-cols-3 gap-6">
           {/* Left: history table */}
-          <div className="col-span-2">
+          <div className="col-span-2 space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <Card padding="md">
+                <p className="text-xs text-gray-500">SAT R&amp;W average</p>
+                <p className="text-2xl font-semibold text-gray-900">{rwAvg ?? "—"}</p>
+                <p className="text-xs text-gray-400">{rwScores.length} attempt{rwScores.length === 1 ? "" : "s"}</p>
+              </Card>
+              <Card padding="md">
+                <p className="text-xs text-gray-500">SAT Math average</p>
+                <p className="text-2xl font-semibold text-gray-900">{mathAvg ?? "—"}</p>
+                <p className="text-xs text-gray-400">{mathScores.length} attempt{mathScores.length === 1 ? "" : "s"}</p>
+              </Card>
+            </div>
+            {(rwSeries.length > 1 || mathSeries.length > 1) && (
+              <Card padding="md">
+                <p className="mb-2 text-sm font-medium text-gray-900">Score over time (cumulative average)</p>
+                <div className="grid gap-2 text-xs text-gray-600 sm:grid-cols-2">
+                  {rwSeries.length > 0 && (
+                    <div>
+                      <p className="mb-1 font-medium text-gray-800">Reading &amp; Writing</p>
+                      <ul className="space-y-0.5">
+                        {rwSeries.slice(-6).map((point, index) => (
+                          <li key={`rw-${index}`}>
+                            {point.at ? formatDate(point.at) : "—"}: {point.score} → avg {point.average}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {mathSeries.length > 0 && (
+                    <div>
+                      <p className="mb-1 font-medium text-gray-800">Math</p>
+                      <ul className="space-y-0.5">
+                        {mathSeries.slice(-6).map((point, index) => (
+                          <li key={`math-${index}`}>
+                            {point.at ? formatDate(point.at) : "—"}: {point.score} → avg {point.average}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </Card>
+            )}
             <Card className="overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
@@ -206,10 +281,8 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {attempts.map((a) => {
-                    const correct = a.answers.filter((ans) => ans.isCorrect).length;
-                    const total = a.answers.length;
-                    const pct = scorePercent(correct, total);
+                  {scoredAttempts.map(({ attempt: a, correct, total, sat }) => {
+                    const pct = sat.scorePercent;
                     const ps = a.assignment?.practiceSet;
                     return (
                       <tr key={a.id} className="hover:bg-gray-50">
@@ -229,6 +302,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
                           <span className={`ml-2 text-xs font-semibold ${pct >= 80 ? "text-green-600" : pct >= 60 ? "text-yellow-600" : "text-red-500"}`}>
                             {pct}%
                           </span>
+                          <p className="text-xs text-gray-500">SAT {sat.scoreSection === "MATH" ? "Math" : "R&W"} {sat.scaledScore}</p>
                         </td>
                         <td className="px-4 py-3 text-right text-gray-500">
                           {a.totalTime ? formatTime(a.totalTime) : "—"}

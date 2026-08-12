@@ -10,6 +10,7 @@ import { StudentDetailActions } from "./actions-client";
 import { refreshAssignmentStates } from "@/lib/assignments";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { studentAccessWhereFor } from "@/lib/program-scope";
+import { averageScaledScores, resolvePracticeSetAttemptScore } from "@/lib/practice-set-scoring";
 
 interface PageProps {
   params: Promise<{ studentId: string }>;
@@ -58,18 +59,31 @@ export default async function StudentDetailPage({ params }: PageProps) {
   // Stats
   const totalSets = attempts.length;
   const totalTime = attempts.reduce((s, a) => s + (a.totalTime ?? 0), 0);
+  const scoredAttempts = await Promise.all(
+    attempts.map(async (a) => {
+      const correct = a.answers.filter((ans) => ans.isCorrect).length;
+      const total = a.answers.length;
+      const sat = await resolvePracticeSetAttemptScore({
+        scorePercent: a.scorePercent,
+        scaledScore: a.scaledScore,
+        scoreSection: a.scoreSection,
+        correct,
+        total,
+        section: a.assignment?.practiceSet.topic.domain.section ?? null,
+      });
+      return { attempt: a, correct, total, sat };
+    }),
+  );
   const avgScore =
-    totalSets > 0
-      ? Math.round(
-          attempts.reduce((sum, a) => {
-            const c = a.answers.filter((ans) => ans.isCorrect).length;
-            const t = a.answers.length;
-            return sum + (t > 0 ? c / t : 0);
-          }, 0) /
-            totalSets *
-            100
-        )
+    scoredAttempts.length > 0
+      ? Math.round(scoredAttempts.reduce((sum, row) => sum + row.sat.scorePercent, 0) / scoredAttempts.length)
       : null;
+  const rwAvg = averageScaledScores(
+    scoredAttempts.filter((row) => row.sat.scoreSection === "RW").map((row) => row.sat.scaledScore),
+  );
+  const mathAvg = averageScaledScores(
+    scoredAttempts.filter((row) => row.sat.scoreSection === "MATH").map((row) => row.sat.scaledScore),
+  );
 
   // Progress by skill
   const topicStats: Record<string, { name: string; correct: number; total: number; count: number }> = {};
@@ -141,10 +155,12 @@ export default async function StudentDetailPage({ params }: PageProps) {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 gap-4 mb-8 md:grid-cols-3 lg:grid-cols-6">
         {[
           { label: "Sets completed", value: totalSets },
-          { label: "Avg score", value: avgScore !== null ? `${avgScore}%` : "—" },
+          { label: "Avg %", value: avgScore !== null ? `${avgScore}%` : "—" },
+          { label: "SAT R&W avg", value: rwAvg ?? "—" },
+          { label: "SAT Math avg", value: mathAvg ?? "—" },
           { label: "Total time", value: totalTime > 0 ? formatTime(totalTime) : "—" },
           { label: "Pending tasks", value: assignments.length },
         ].map(({ label, value }) => (
@@ -176,10 +192,8 @@ export default async function StudentDetailPage({ params }: PageProps) {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {attempts.map((a) => {
-                    const correct = a.answers.filter((ans) => ans.isCorrect).length;
-                    const total = a.answers.length;
-                    const pct = scorePercent(correct, total);
+                  {scoredAttempts.map(({ attempt: a, correct, total, sat }) => {
+                    const pct = sat.scorePercent;
                     return (
                       <tr key={a.id} className="hover:bg-gray-50">
                         <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
@@ -193,6 +207,7 @@ export default async function StudentDetailPage({ params }: PageProps) {
                           <span className={`ml-1 text-xs font-semibold ${pct >= 80 ? "text-green-600" : pct >= 60 ? "text-yellow-600" : "text-red-500"}`}>
                             ({pct}%)
                           </span>
+                          <p className="text-xs text-gray-500">SAT {sat.scoreSection === "MATH" ? "Math" : "R&W"} {sat.scaledScore}</p>
                         </td>
                         <td className="px-4 py-3 text-right text-gray-500">
                           {a.totalTime ? formatTime(a.totalTime) : "—"}

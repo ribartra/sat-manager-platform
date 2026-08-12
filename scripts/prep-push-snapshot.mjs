@@ -16,6 +16,9 @@
 //   PROD_ADMIN_PASSWORD contraseña del admin de prod
 //   DISABLE_EMAILS      CSV de emails a deshabilitar (active=0)
 //   ROTATE_EMAILS       CSV de emails cuya contraseña se rota (se imprime la nueva)
+//   CONTENT_FILTER      "ps-fpt-only" — en el snapshot (no en SRC): deja asignables solo
+//                       PracticeSet/FullPracticeTest PUBLISHED; archiva el resto;
+//                       rechaza candidatos de ingest; archiva StudyMaterial.
 //
 // Imprime un resumen y, al final, líneas `CREDENTIAL <email> <password>` para que
 // el orquestador las capture. NUNCA envía correos ni toca la BD origen.
@@ -31,6 +34,7 @@ const PROD_ADMIN_EMAIL = process.env.PROD_ADMIN_EMAIL?.trim().toLowerCase() || n
 const PROD_ADMIN_PASSWORD = process.env.PROD_ADMIN_PASSWORD || null;
 const DISABLE_EMAILS = (process.env.DISABLE_EMAILS || "").split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
 const ROTATE_EMAILS = (process.env.ROTATE_EMAILS || "").split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
+const CONTENT_FILTER = (process.env.CONTENT_FILTER || "").trim().toLowerCase();
 
 if (!fs.existsSync(SRC)) {
   console.error(`SRC no existe: ${SRC}`);
@@ -90,15 +94,95 @@ for (const email of ROTATE_EMAILS) {
   creds.push([email, pw]);
 }
 
+if (CONTENT_FILTER === "ps-fpt-only") {
+  const now = nowIso();
+  const keepPs = new Set(
+    db.prepare("SELECT id FROM PracticeSet WHERE status = 'PUBLISHED'").all().map((row) => row.id),
+  );
+  const keepFpt = new Set(
+    db.prepare("SELECT id FROM FullPracticeTest WHERE status = 'PUBLISHED'").all().map((row) => row.id),
+  );
+  const keepQuestions = new Set();
+  for (const id of keepPs) {
+    for (const row of db.prepare("SELECT questionId FROM PracticeSetQuestion WHERE practiceSetId = ?").all(id)) {
+      keepQuestions.add(row.questionId);
+    }
+  }
+  for (const id of keepFpt) {
+    for (const row of db
+      .prepare(
+        `SELECT fq.questionId AS questionId
+         FROM FullPracticeTestQuestion fq
+         JOIN FullPracticeTestModule m ON m.id = fq.moduleId
+         WHERE m.testId = ?`,
+      )
+      .all(id)) {
+      keepQuestions.add(row.questionId);
+    }
+  }
+
+  const archivedPs = db
+    .prepare("UPDATE PracticeSet SET status = 'ARCHIVED', updatedAt = ? WHERE status != 'PUBLISHED'")
+    .run(now).changes;
+  const archivedFpt = db
+    .prepare("UPDATE FullPracticeTest SET status = 'ARCHIVED', updatedAt = ? WHERE status != 'PUBLISHED'")
+    .run(now).changes;
+
+  let archivedQuestions = 0;
+  const allQuestions = db.prepare("SELECT id, status FROM Question").all();
+  const archiveQ = db.prepare("UPDATE Question SET status = 'ARCHIVED', updatedAt = ? WHERE id = ?");
+  for (const question of allQuestions) {
+    if (keepQuestions.has(question.id)) continue;
+    if (question.status === "ARCHIVED") continue;
+    archiveQ.run(now, question.id);
+    archivedQuestions += 1;
+  }
+
+  let archivedMaterials = 0;
+  try {
+    archivedMaterials = db
+      .prepare("UPDATE StudyMaterial SET status = 'ARCHIVED', updatedAt = ? WHERE status != 'ARCHIVED'")
+      .run(now).changes;
+  } catch {
+    archivedMaterials = 0;
+  }
+
+  let rejectedCandidates = 0;
+  try {
+    rejectedCandidates = db
+      .prepare(
+        `UPDATE IngestQuestionCandidate
+         SET status = 'REJECTED', promotionStatus = 'REJECTED', updatedAt = ?
+         WHERE status != 'REJECTED' OR promotionStatus != 'REJECTED'`,
+      )
+      .run(now).changes;
+  } catch {
+    rejectedCandidates = 0;
+  }
+
+  console.log(`CONTENT_FILTER=ps-fpt-only (solo snapshot):`);
+  console.log(`  keep PracticeSet PUBLISHED=${keepPs.size} · archived other=${archivedPs}`);
+  console.log(`  keep FullPracticeTest PUBLISHED=${keepFpt.size} · archived other=${archivedFpt}`);
+  console.log(`  keep Question in those=${keepQuestions.size} · archived other=${archivedQuestions}`);
+  console.log(`  StudyMaterial archived=${archivedMaterials}`);
+  console.log(`  IngestQuestionCandidate rejected=${rejectedCandidates}`);
+} else if (CONTENT_FILTER) {
+  console.error(`Aviso: CONTENT_FILTER desconocido '${CONTENT_FILTER}' (ignorado). Usa ps-fpt-only.`);
+}
+
 db.pragma("wal_checkpoint(TRUNCATE)");
 db.exec("VACUUM;");
 
 const users = db.prepare("SELECT role,count(*) c FROM User GROUP BY role").all();
+const psCounts = db.prepare("SELECT status,count(*) c FROM PracticeSet GROUP BY status").all();
+const fptCounts = db.prepare("SELECT status,count(*) c FROM FullPracticeTest GROUP BY status").all();
 db.close();
 
 const sizeMb = (fs.statSync(OUT).size / 1e6).toFixed(1);
 console.log(`\n── snapshot saneado ──`);
 console.log(`OUT: ${OUT} (${sizeMb} MB)`);
 console.log(`Usuarios: ${JSON.stringify(users)}`);
+console.log(`PracticeSet: ${JSON.stringify(psCounts)}`);
+console.log(`FullPracticeTest: ${JSON.stringify(fptCounts)}`);
 // Líneas que captura el orquestador (fáciles de grep):
 for (const [email, pw] of creds) console.log(`CREDENTIAL ${email} ${pw}`);

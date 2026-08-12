@@ -272,6 +272,12 @@ model Attempt {
   status          String    @default("IN_PROGRESS") // IN_PROGRESS | SUBMITTED | INVALIDATED
   currentQuestion Int       @default(0)
   teacherComment  String?
+  /// Percent correct 0–100 at submit (also drives the 75% unlock rule).
+  scorePercent    Int?
+  /// Estimated SAT section score 200–800 (Practice Set → section curve).
+  scaledScore     Int?
+  /// RW | MATH — section used for scaledScore.
+  scoreSection    String?
 
   assignment Assignment? @relation(fields: [assignmentId], references: [id])
   student    User        @relation(fields: [studentId], references: [id])

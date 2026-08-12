@@ -8,6 +8,7 @@ import { studentAccessWhereFor } from "@/lib/program-scope";
 import { QuestionMedia } from "@/components/question-media";
 import { MathContent } from "@/components/math-content";
 import { Card } from "@/components/ui/card";
+import { averageScaledScores, resolvePracticeSetAttemptScore } from "@/lib/practice-set-scoring";
 
 interface PageProps {
   params: Promise<{ studentId: string }>;
@@ -29,28 +30,49 @@ export default async function StudentReportPage({ params }: PageProps) {
 
   const attempts = await prisma.attempt.findMany({
     where: { studentId, status: "SUBMITTED" },
-    include: { answers: { include: { question: { include: { topic: true } } } }, assignment: { include: { practiceSet: true } } },
+    include: {
+      answers: { include: { question: { include: { topic: true } } } },
+      assignment: { include: { practiceSet: { include: { topic: { include: { domain: { include: { section: true } } } } } } } },
+    },
     orderBy: { submittedAt: "desc" },
   });
 
   const totalTime = attempts.reduce((sum, attempt) => sum + (attempt.totalTime ?? 0), 0);
-  const scoredAttempts = attempts.map((attempt) => {
-    const correct = attempt.answers.filter((answer) => answer.isCorrect).length;
-    const total = attempt.answers.length;
-    const snapshot = parseSnapshot<PracticeSetSnapshot>(attempt.practiceSetSnapshot);
-    return {
-      id: attempt.id,
-      name: snapshot?.name ?? attempt.assignment?.practiceSet.name ?? "Practice Set",
-      submittedAt: attempt.submittedAt,
-      totalTime: attempt.totalTime ?? 0,
-      correct,
-      total,
-      score: scorePercent(correct, total),
-    };
-  });
+  const scoredAttempts = await Promise.all(
+    attempts.map(async (attempt) => {
+      const correct = attempt.answers.filter((answer) => answer.isCorrect).length;
+      const total = attempt.answers.length;
+      const snapshot = parseSnapshot<PracticeSetSnapshot>(attempt.practiceSetSnapshot);
+      const sat = await resolvePracticeSetAttemptScore({
+        scorePercent: attempt.scorePercent,
+        scaledScore: attempt.scaledScore,
+        scoreSection: attempt.scoreSection,
+        correct,
+        total,
+        section: attempt.assignment?.practiceSet.topic.domain.section ?? null,
+      });
+      return {
+        id: attempt.id,
+        name: snapshot?.name ?? attempt.assignment?.practiceSet.name ?? "Practice Set",
+        submittedAt: attempt.submittedAt,
+        totalTime: attempt.totalTime ?? 0,
+        correct,
+        total,
+        score: sat.scorePercent,
+        scaledScore: sat.scaledScore,
+        scoreSection: sat.scoreSection,
+      };
+    }),
+  );
   const avgScore = scoredAttempts.length
     ? Math.round(scoredAttempts.reduce((sum, attempt) => sum + attempt.score, 0) / scoredAttempts.length)
     : null;
+  const rwAvg = averageScaledScores(
+    scoredAttempts.filter((row) => row.scoreSection === "RW").map((row) => row.scaledScore),
+  );
+  const mathAvg = averageScaledScores(
+    scoredAttempts.filter((row) => row.scoreSection === "MATH").map((row) => row.scaledScore),
+  );
   const lastValidAttempt = scoredAttempts[0] ?? null;
   const scoreTrend = [...scoredAttempts].reverse();
   const topicStats = new Map<string, { correct: number; total: number; time: number }>();
@@ -113,12 +135,14 @@ export default async function StudentReportPage({ params }: PageProps) {
         </Link>
       </div>
 
-      <div className="mb-6 grid gap-4 md:grid-cols-5">
+      <div className="mb-6 grid gap-4 md:grid-cols-3 lg:grid-cols-7">
         <Card padding="md"><p className="text-2xl font-bold">{attempts.length}</p><p className="text-xs text-gray-500">Completed attempts</p></Card>
         <Card padding="md"><p className="text-2xl font-bold">{formatTime(totalTime)}</p><p className="text-xs text-gray-500">Practice time</p></Card>
         <Card padding="md"><p className="text-2xl font-bold">{topicStats.size}</p><p className="text-xs text-gray-500">Skills practiced</p></Card>
-        <Card padding="md"><p className="text-2xl font-bold">{avgScore !== null ? `${avgScore}%` : "-"}</p><p className="text-xs text-gray-500">Average score</p></Card>
-        <Card padding="md"><p className="text-2xl font-bold">{lastValidAttempt ? `${lastValidAttempt.score}%` : "-"}</p><p className="text-xs text-gray-500">Last valid score</p></Card>
+        <Card padding="md"><p className="text-2xl font-bold">{avgScore !== null ? `${avgScore}%` : "-"}</p><p className="text-xs text-gray-500">Average %</p></Card>
+        <Card padding="md"><p className="text-2xl font-bold">{rwAvg ?? "-"}</p><p className="text-xs text-gray-500">SAT R&W avg</p></Card>
+        <Card padding="md"><p className="text-2xl font-bold">{mathAvg ?? "-"}</p><p className="text-xs text-gray-500">SAT Math avg</p></Card>
+        <Card padding="md"><p className="text-2xl font-bold">{lastValidAttempt ? `${lastValidAttempt.score}%` : "-"}</p><p className="text-xs text-gray-500">Last valid %</p></Card>
       </div>
 
       <div className="mb-6 grid gap-6 lg:grid-cols-2">
@@ -146,7 +170,7 @@ export default async function StudentReportPage({ params }: PageProps) {
           <h2 className="text-sm font-semibold text-gray-900">Score Progress Over Time</h2>
           {scoreTrend.length > 1 && (
             <span className="text-xs text-gray-500">
-              {scoreTrend[0].score}% to {scoreTrend[scoreTrend.length - 1].score}%
+              SAT {scoreTrend[0].scaledScore} to {scoreTrend[scoreTrend.length - 1].scaledScore}
             </span>
           )}
         </div>
@@ -155,11 +179,11 @@ export default async function StudentReportPage({ params }: PageProps) {
             <div className="flex h-40 items-end gap-2 border-b border-l border-gray-200 px-2 pt-3">
               {scoreTrend.map((attempt, index) => (
                 <div key={attempt.id} className="flex min-w-10 flex-1 flex-col items-center justify-end gap-1">
-                  <div className="text-[10px] font-medium text-gray-600">{attempt.score}%</div>
+                  <div className="text-[10px] font-medium text-gray-600">{attempt.scaledScore}</div>
                   <div
                     className="w-full rounded-t bg-blue-500"
-                    style={{ height: `${Math.max(attempt.score, 4)}%` }}
-                    title={`${attempt.name}: ${attempt.score}%`}
+                    style={{ height: `${Math.max((attempt.scaledScore - 200) / 6, 4)}%` }}
+                    title={`${attempt.name}: ${attempt.score}% · SAT ${attempt.scaledScore}`}
                   />
                   <div className="text-[10px] text-gray-400">#{index + 1}</div>
                 </div>
@@ -170,7 +194,7 @@ export default async function StudentReportPage({ params }: PageProps) {
                 <div key={attempt.id} className="flex items-center justify-between rounded-md bg-gray-50 px-3 py-2 text-xs">
                   <span className="truncate text-gray-700">#{index + 1} {attempt.name}</span>
                   <span className="shrink-0 font-medium text-gray-900">
-                    {attempt.score}% {attempt.submittedAt ? `on ${formatDate(attempt.submittedAt)}` : ""}
+                    {attempt.score}% · SAT {attempt.scaledScore} {attempt.submittedAt ? `on ${formatDate(attempt.submittedAt)}` : ""}
                   </span>
                 </div>
               ))}
