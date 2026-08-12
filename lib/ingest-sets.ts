@@ -7,6 +7,25 @@
 
 export type FieldState = "ok" | "crit" | "warn" | "info" | "na";
 
+export interface StemArtifacts {
+  hasEmbeddedMarkup: boolean;
+  hasUnresolvedMarkdownImage: boolean;
+}
+
+const HTML_TABLE_RE = /<table\b/i;
+const HTML_TAG_RE = /<\/?(?:html|body|div|td|tr|th|thead|tbody)\b/i;
+const TBL_ASSET_RE = /\[tbl-\d+\.html\]/i;
+const MD_IMAGE_RE = /!\[[^\]]*]\([^)]*\)/;
+
+/** Detect HTML/table assets and leftover markdown images in OCR/parsed text. */
+export function detectStemArtifacts(text: string | null | undefined): StemArtifacts {
+  const value = text ?? "";
+  return {
+    hasEmbeddedMarkup: HTML_TABLE_RE.test(value) || HTML_TAG_RE.test(value) || TBL_ASSET_RE.test(value),
+    hasUnresolvedMarkdownImage: MD_IMAGE_RE.test(value),
+  };
+}
+
 export interface QuestionContent {
   type: string; // "MC" | "NUMERIC"
   correctAnswer: string | null;
@@ -16,6 +35,12 @@ export interface QuestionContent {
   optImgCount: number;
   hasExpl: boolean;
   section: string | null; // "RW" | "MATH" | null
+  /** HTML table / tags / [tbl-N.html] in stem or stimulus */
+  hasEmbeddedMarkup?: boolean;
+  /** Markdown image still present in stem/stimulus text */
+  hasUnresolvedMarkdownImage?: boolean;
+  /** Candidate (or official) already has a STEM image link / imageUrl */
+  hasStemImageLink?: boolean;
 }
 
 export interface QuestionClassification {
@@ -30,14 +55,30 @@ export interface QuestionClassification {
   notes: string[];
 }
 
+export interface QuestionSidebarState {
+  dot: string;
+  label: string;
+}
+
 // crit = unusable for a student; warn = needs recovery; info = worth noting.
 // `level` escalates to the worst field; info never raises it.
 export function classifyQuestion(c: QuestionContent): QuestionClassification {
   const notes: string[] = [];
   const isMC = c.type === "MC";
 
-  const stem: FieldState = c.stemLen > 0 ? "ok" : "crit";
+  let stem: FieldState = c.stemLen > 0 ? "ok" : "crit";
   if (stem === "crit") notes.push("missing stem");
+
+  if (stem !== "crit" && c.hasEmbeddedMarkup) {
+    stem = "warn";
+    notes.push("embedded HTML or table in stem");
+  }
+
+  // Leftover markdown image in stem/stimulus text (link missing or strip incomplete).
+  if (stem !== "crit" && c.hasUnresolvedMarkdownImage) {
+    stem = "warn";
+    notes.push("stem image not linked");
+  }
 
   const hasAnswer = !!(c.correctAnswer && c.correctAnswer.trim());
   const answer: FieldState = hasAnswer ? "ok" : "crit";
@@ -78,6 +119,23 @@ export function classifyQuestion(c: QuestionContent): QuestionClassification {
       : "ok";
 
   return { level, fields: { stem, stimulus, options, answer, explanation }, notes };
+}
+
+/** Sidebar / checklist label from classification (and optional rejected status). */
+export function questionSidebarState(
+  cls: QuestionClassification,
+  opts?: { rejected?: boolean },
+): QuestionSidebarState {
+  if (opts?.rejected) return { dot: "bg-gray-300", label: "rejected" };
+  if (cls.level === "crit") return { dot: "bg-rose-500", label: "needs review" };
+  if (cls.level === "warn") return { dot: "bg-amber-500", label: "attention" };
+  return { dot: "bg-green-500", label: "ready" };
+}
+
+/** MC options count as resolved when ok or info (image-backed). */
+export function optionsFieldResolved(fields: QuestionClassification["fields"], type: string): boolean {
+  if (type === "NUMERIC") return true;
+  return fields.options === "ok" || fields.options === "info" || fields.options === "na";
 }
 
 export type ExtractedTestFileRole = "QUESTION" | "ANSWER" | "EXPLANATION" | "OTHER";

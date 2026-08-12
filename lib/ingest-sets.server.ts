@@ -2,6 +2,7 @@ import "server-only";
 import prisma from "@/lib/prisma";
 import {
   classifyQuestion,
+  detectStemArtifacts,
   type ExtractedTestFile,
   type ExtractedTestFileRole,
   type ExtractedTestRow,
@@ -93,8 +94,11 @@ export async function computeExtractedTests(batchId: string): Promise<ExtractedT
 
   const optionBlock = new Set<string>();
   const optionLetters = new Map<string, Set<string>>();
+  const stemImageLinks = new Set<string>();
   for (const link of imageLinks) {
-    if (link.targetType === "OPTION_BLOCK") {
+    if (link.targetType === "STEM") {
+      stemImageLinks.add(link.candidateId);
+    } else if (link.targetType === "OPTION_BLOCK") {
       optionBlock.add(link.candidateId);
     } else if (link.targetType === "OPTION" && link.optionLabel) {
       const set = optionLetters.get(link.candidateId) ?? new Set<string>();
@@ -109,7 +113,7 @@ export async function computeExtractedTests(batchId: string): Promise<ExtractedT
   const [officialQuestions, officialOptions] = await Promise.all([
     prisma.question.findMany({
       where: { id: { in: officialIds } },
-      select: { id: true, stem: true, stimulus: true, explanation: true, type: true, correctAnswer: true },
+      select: { id: true, stem: true, stimulus: true, explanation: true, type: true, correctAnswer: true, imageUrl: true },
     }),
     prisma.questionOption.findMany({
       where: { questionId: { in: officialIds } },
@@ -229,6 +233,8 @@ export async function computeExtractedTests(batchId: string): Promise<ExtractedT
       let content: QuestionContent;
       if (official) {
         const oc = officialOptCounts.get(official.id) ?? { text: 0, img: 0 };
+        const combined = `${official.stem ?? ""}\n${official.stimulus ?? ""}`;
+        const artifacts = detectStemArtifacts(combined);
         content = {
           type: official.type,
           correctAnswer: official.correctAnswer,
@@ -238,9 +244,14 @@ export async function computeExtractedTests(batchId: string): Promise<ExtractedT
           optImgCount: oc.img,
           hasExpl: !!(official.explanation && official.explanation.trim()),
           section: section ?? sectionKind(c.section),
+          hasEmbeddedMarkup: artifacts.hasEmbeddedMarkup,
+          hasUnresolvedMarkdownImage: artifacts.hasUnresolvedMarkdownImage,
+          hasStemImageLink: !!(official.imageUrl && official.imageUrl.trim()) || stemImageLinks.has(c.id),
         };
       } else {
         const optImg = optionBlock.has(c.id) ? 4 : (optionLetters.get(c.id)?.size ?? 0);
+        const combined = `${c.stem ?? ""}\n${c.stimulus ?? ""}`;
+        const artifacts = detectStemArtifacts(combined);
         content = {
           type: c.type,
           correctAnswer: c.correctAnswer,
@@ -250,6 +261,9 @@ export async function computeExtractedTests(batchId: string): Promise<ExtractedT
           optImgCount: optImg,
           hasExpl: !!(c.explanation && c.explanation.trim()),
           section: section ?? sectionKind(c.section),
+          hasEmbeddedMarkup: artifacts.hasEmbeddedMarkup,
+          hasUnresolvedMarkdownImage: artifacts.hasUnresolvedMarkdownImage,
+          hasStemImageLink: stemImageLinks.has(c.id),
         };
       }
 

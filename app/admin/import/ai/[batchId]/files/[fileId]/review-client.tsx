@@ -12,6 +12,13 @@ import { CopyableTruncatedText } from "@/components/ui/copyable-truncated-text";
 import { MathContent } from "@/components/math-content";
 import { PdfPageCropper, type CropTarget, type CropOcrResult } from "@/app/admin/import/ai/_components/pdf-page-cropper";
 import { MergeDialog } from "./merge-dialog";
+import {
+  classifyQuestion,
+  detectStemArtifacts,
+  optionsFieldResolved,
+  questionSidebarState,
+  type QuestionContent,
+} from "@/lib/ingest-sets";
 
 type SourceFile = {
   id: string;
@@ -340,8 +347,45 @@ function incidentResolution(incident: Incident) {
   if (incident.code === "FULL_TEST_ANSWER_KEY_MISSING") return "Needs source file";
   if (incident.code === "FULL_TEST_DUPLICATE_SOURCE") return incident.status === "RESOLVED" ? "Duplicate ignored" : "Review duplicate";
   if (incident.code === "FULL_TEST_SECTION_UNRESOLVED" && incident.status !== "RESOLVED") return "Cannot auto-resolve";
+  if (incident.code === "STEM_EMBEDDED_HTML_OR_TABLE") return "Remove HTML/table from stem";
+  if (incident.code === "CANDIDATE_IMAGE_LINK_INCOMPLETE") return "Link stem/option images";
+  if (incident.code === "CANDIDATE_IMAGE_ASSIGN_FAILED") return "Re-assign crop image";
   if (incident.status === "RESOLVED") return "Auto-resolved";
   return "Review source";
+}
+
+function sectionKind(section: string | null | undefined): string | null {
+  if (!section) return null;
+  return section.toUpperCase().includes("MATH") ? "MATH" : "RW";
+}
+
+/** Build classifier input from a candidate + its image links (same rules as /sets). */
+function questionContentFromCandidate(
+  candidate: Pick<Candidate, "type" | "correctAnswer" | "stem" | "stimulus" | "explanation" | "optionsJson" | "section">,
+  links: { targetType: string; optionLabel: string | null }[],
+): QuestionContent {
+  const textCount = parseOptions(candidate.optionsJson).filter(
+    (option: { text?: string }) => typeof option?.text === "string" && option.text.trim(),
+  ).length;
+  const hasBlock = links.some((link) => link.targetType === "OPTION_BLOCK");
+  const imageLetters = new Set(
+    links.filter((link) => link.targetType === "OPTION" && link.optionLabel).map((link) => (link.optionLabel ?? "").toUpperCase()),
+  ).size;
+  const combined = `${candidate.stem ?? ""}\n${candidate.stimulus ?? ""}`;
+  const artifacts = detectStemArtifacts(combined);
+  return {
+    type: candidate.type ?? "MC",
+    correctAnswer: candidate.correctAnswer,
+    stemLen: (candidate.stem ?? "").trim().length,
+    stimLen: (candidate.stimulus ?? "").trim().length,
+    optTextCount: textCount,
+    optImgCount: hasBlock ? 4 : imageLetters,
+    hasExpl: !!(candidate.explanation && candidate.explanation.trim()),
+    section: sectionKind(candidate.section),
+    hasEmbeddedMarkup: artifacts.hasEmbeddedMarkup,
+    hasUnresolvedMarkdownImage: artifacts.hasUnresolvedMarkdownImage,
+    hasStemImageLink: links.some((link) => link.targetType === "STEM"),
+  };
 }
 
 function PageTextPreview({ page }: { page: PageArtifact }) {
@@ -409,24 +453,6 @@ function Section({
   );
 }
 
-// True when the candidate's options are resolved (numeric, an OCR'd block, or
-// four option texts/images). Mirrors the pending rule used in the sets index.
-function optionsResolvedFor(
-  type: string,
-  optionsJson: string | null,
-  links: { targetType: string; optionLabel: string | null }[],
-): boolean {
-  if ((type ?? "MC") === "NUMERIC") return true;
-  if (links.some((link) => link.targetType === "OPTION_BLOCK")) return true;
-  const textCount = parseOptions(optionsJson).filter(
-    (option: { text?: string }) => typeof option?.text === "string" && option.text.trim(),
-  ).length;
-  const imageLetters = new Set(
-    links.filter((link) => link.targetType === "OPTION" && link.optionLabel).map((link) => link.optionLabel),
-  ).size;
-  return textCount + imageLetters >= 4;
-}
-
 export function FileReviewClient({
   batchId,
   file,
@@ -466,7 +492,7 @@ export function FileReviewClient({
     });
     setAssigning(false);
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) { setMessage(data.error || "No se pudo asignar la imagen."); return; }
+    if (!res.ok) { setMessage(data.error || "Could not assign the image."); return; }
     setGalleryAssign(null);
     setMessage(`Image assigned to ${assignTargets.find((t) => t.questionId === questionId)?.label ?? "the question"}.`);
     router.refresh();
@@ -530,7 +556,8 @@ export function FileReviewClient({
   }
   const dirty = candidateSignature(draft) !== savedSignature;
   const isMc = (draft?.type ?? "MC") !== "NUMERIC";
-  const optsResolved = draft ? optionsResolvedFor(draft.type, draft.optionsJson, selectedLinks) : false;
+  const draftCls = draft ? classifyQuestion(questionContentFromCandidate(draft, selectedLinks)) : null;
+  const optsResolved = draftCls ? optionsFieldResolved(draftCls.fields, draft?.type ?? "MC") : false;
   // Links on non-board targets (answer field, explanation, page context…).
   const otherLinks = selectedLinks.filter((link) => !["STEM", "OPTION", "STIMULUS"].includes(link.targetType));
 
@@ -587,7 +614,7 @@ export function FileReviewClient({
     });
     setSaving(false);
     setSavedSignature(candidateSignature({ ...draft, status: status ?? draft.status }));
-    setMessage(status ? `Guardado y marcado ${status}.` : "Cambios guardados en la base de datos.");
+    setMessage(status ? `Saved and marked ${status}.` : "Changes saved to the database.");
     router.refresh();
   }
 
@@ -711,14 +738,8 @@ export function FileReviewClient({
           <div className="max-h-[620px] overflow-auto">
             {candidates.map((candidate) => {
               const cLinks = linksByCandidate.get(candidate.id) ?? [];
-              const resolved = optionsResolvedFor(candidate.type, candidate.optionsJson, cLinks);
-              const state = candidate.status === "REJECTED"
-                ? { dot: "bg-gray-300", label: "rejected" }
-                : !candidate.correctAnswer
-                ? { dot: "bg-amber-500", label: "missing answer" }
-                : !resolved
-                ? { dot: "bg-amber-500", label: "missing options" }
-                : { dot: "bg-green-500", label: "ready" };
+              const cls = classifyQuestion(questionContentFromCandidate(candidate, cLinks));
+              const state = questionSidebarState(cls, { rejected: candidate.status === "REJECTED" });
               return (
                 <button
                   key={candidate.id}
@@ -1053,7 +1074,7 @@ export function FileReviewClient({
                       <option key={target.value} value={target.value}>{target.label}</option>
                     ))}
                   </select>
-                  <Input value={optionLabel} onChange={(event) => setOptionLabel(event.target.value.toUpperCase())} placeholder="Letra" disabled={targetType !== "OPTION"} />
+                  <Input value={optionLabel} onChange={(event) => setOptionLabel(event.target.value.toUpperCase())} placeholder="Letter" disabled={targetType !== "OPTION"} />
                 </div>
                 <p className="mt-2 text-xs text-gray-500">Choose a target and click “Link” on an image. Use “Options block (OCR)” to extract A–D as text.</p>
                 <div className="mt-2 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
@@ -1066,21 +1087,30 @@ export function FileReviewClient({
               </details>
             </Section>
 
-            {/* SECTION: Finalizar — checklist + completar. */}
-            <Section title="Finalizar" defaultOpen={false}>
+            {/* SECTION: Finish — checklist + complete. */}
+            <Section title="Finish" defaultOpen={false}>
               <ul className="grid gap-1 text-sm">
+                <li className={draftCls && draftCls.fields.stem !== "crit" && draftCls.fields.stem !== "warn" ? "text-green-700" : "text-amber-700"}>
+                  {draftCls && draftCls.fields.stem !== "crit" && draftCls.fields.stem !== "warn" ? "✓" : "✗"} Stem ready
+                </li>
                 <li className={draft.correctAnswer ? "text-green-700" : "text-amber-700"}>
                   {draft.correctAnswer ? "✓" : "✗"} Answer assigned
                 </li>
                 <li className={optsResolved ? "text-green-700" : "text-amber-700"}>
                   {optsResolved ? "✓" : "✗"} {isMc ? "Options resolved (text or A–D images)" : "Numeric answer (N/A options)"}
                 </li>
+                {draftCls?.notes.includes("embedded HTML or table in stem") && (
+                  <li className="text-amber-700">✗ Embedded HTML or table in stem</li>
+                )}
+                {draftCls?.notes.includes("stem image not linked") && (
+                  <li className="text-amber-700">✗ Stem image not linked</li>
+                )}
                 <li className={draft.status === "REVIEWED" ? "text-green-700" : "text-gray-500"}>
                   {draft.status === "REVIEWED" ? "✓" : "•"} Marked as reviewed
                 </li>
               </ul>
               <p className="mt-3 text-sm text-gray-700">
-                Revisadas {candidates.filter((candidate) => candidate.status === "REVIEWED").length} de {candidates.length} · Estado del archivo: {reviewSession.status}
+                Reviewed {candidates.filter((candidate) => candidate.status === "REVIEWED").length} of {candidates.length} · File status: {reviewSession.status}
               </p>
               <Button className="mt-3" type="button" onClick={() => void completeReview()}>
                 Complete file review
@@ -1089,7 +1119,7 @@ export function FileReviewClient({
           </>
         ) : (
           <Card padding="md">
-            <p className="text-sm text-gray-400">Selecciona una pregunta en la lista de la izquierda.</p>
+            <p className="text-sm text-gray-400">Select a question from the list on the left.</p>
           </Card>
         )}
 
@@ -1109,9 +1139,11 @@ export function FileReviewClient({
                   return (
                     <figure key={image.id} className="overflow-hidden rounded-md border border-gray-200">
                       {src ? (
-                        // eslint-disable-next-line @next/next/no-img-element
                         <a href={src} target="_blank" rel="noreferrer" className="block bg-gray-50" title={`${image.origin} · page ${image.pageNumber}`}>
-                          <img src={src} alt={`Page ${image.pageNumber} image ${image.imageIndex}`} className="h-40 w-full object-contain" loading="lazy" />
+                          {
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={src} alt={`Page ${image.pageNumber} image ${image.imageIndex}`} className="h-40 w-full object-contain" loading="lazy" />
+                          }
                         </a>
                       ) : (
                         <div className="flex h-40 items-center justify-center text-xs text-gray-400">no preview</div>

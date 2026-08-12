@@ -993,12 +993,38 @@ def crop_candidate_region(
             # the same as for PDFs.
             page_image = find_page_image_disk_path(db, image_source["id"], page_number)
             if not page_image:
-                raise HTTPException(status_code=400, detail="No hay imagen de página para recortar en este archivo.")
+                raise HTTPException(status_code=400, detail="No page image is available to crop for this file.")
             image_bytes, w_px, h_px, points = crop_image_region_normalized(page_image, bbox_norm)
-        if not image_bytes:
+        if not image_bytes or len(image_bytes) < 32:
+            log_ingest_incident(
+                db,
+                batch_id=candidate["batchId"],
+                source_file_id=source["id"],
+                page_artifact_id=candidate["pageArtifactId"],
+                severity="WARNING",
+                code="CANDIDATE_IMAGE_ASSIGN_FAILED",
+                message=f"Crop for candidate {candidate_id} produced empty or invalid image bytes.",
+                decision="The selected region did not yield a usable image artifact.",
+                action="Retry the crop with a larger region or a different page source.",
+            )
             raise HTTPException(status_code=400, detail="Could not render the selected region.")
         image_id = new_id("img")
         file_url, content_hash = save_ingest_image(candidate["batchId"], image_id, image_bytes, "jpg")
+        # Verify the file actually landed on disk before claiming success.
+        saved_path = resolve_asset_disk_path(file_url)
+        if not saved_path or not saved_path.exists() or saved_path.stat().st_size < 32:
+            log_ingest_incident(
+                db,
+                batch_id=candidate["batchId"],
+                source_file_id=source["id"],
+                page_artifact_id=candidate["pageArtifactId"],
+                severity="WARNING",
+                code="CANDIDATE_IMAGE_ASSIGN_FAILED",
+                message=f"Crop image for candidate {candidate_id} failed to persist on disk.",
+                decision="save_ingest_image returned a URL but the file is missing or empty.",
+                action="Retry the crop assign; check upload disk permissions if it persists.",
+            )
+            raise HTTPException(status_code=500, detail="Crop image did not save correctly.")
         next_index = db.execute(
             "SELECT COALESCE(MAX(imageIndex), -1) + 1 FROM IngestImageArtifact WHERE sourceFileId = ? AND pageNumber = ? AND origin = 'MANUAL_CROP'",
             (source["id"], page_number),
@@ -2728,7 +2754,18 @@ def make_candidate_from_text(
         confidence -= 0.1
     elif image_refs and not options:
         warnings.append("Answer field image detected; treated as numeric response visual.")
-    status = "READY" if stem and correct_answer and (len(options) == 4 or not options) and not image_backed_options else "NEEDS_REVIEW"
+    markup_blob = "\n".join(
+        part for part in [cleaned, stem or "", practice_stimulus or "", json.dumps(options) if options else ""] if part
+    )
+    has_markup = detect_embedded_markup(markup_blob)
+    if has_markup:
+        warnings.append("Embedded HTML or table detected in question text; needs recovery or image assignment.")
+        confidence -= 0.1
+    status = (
+        "READY"
+        if stem and correct_answer and (len(options) == 4 or not options) and not image_backed_options and not has_markup
+        else "NEEDS_REVIEW"
+    )
     raw = {
         "text": cleaned,
         "structuringModel": STRUCTURING_MODEL,
@@ -2874,6 +2911,23 @@ def insert_candidate(db: sqlite3.Connection, candidate: dict[str, Any]) -> None:
         """,
         {**candidate, "updatedAt": now_iso()},
     )
+    markup_blob = "\n".join(
+        part
+        for part in [candidate.get("stem") or "", candidate.get("stimulus") or "", candidate.get("optionsJson") or ""]
+        if part
+    )
+    if detect_embedded_markup(markup_blob):
+        log_ingest_incident(
+            db,
+            batch_id=candidate["batchId"],
+            source_file_id=candidate["sourceFileId"],
+            page_artifact_id=candidate.get("pageArtifactId"),
+            severity="WARNING",
+            code="STEM_EMBEDDED_HTML_OR_TABLE",
+            message=f"Candidate {candidate['id']} contains embedded HTML or a table asset in stem/options text.",
+            decision="OCR left HTML/table markup in the question body; students cannot use this as plain text.",
+            action="Replace with transcribed text or assign a STEM/OPTION image, then clear the markup.",
+        )
 
 
 def normalize_full_test_candidate_modules(db: sqlite3.Connection, batch_id: str, source_file_id: str | None = None) -> int:
@@ -3086,6 +3140,14 @@ def insert_image_artifacts(
 
 
 MARKDOWN_IMAGE_PATTERN = re.compile(r"!\[[^\]]*]\(([^)]+)\)")
+EMBEDDED_MARKUP_PATTERN = re.compile(
+    r"<table\b|</?(?:html|body|div|td|tr|th|thead|tbody)\b|\[tbl-\d+\.html\]",
+    re.IGNORECASE,
+)
+
+
+def detect_embedded_markup(value: str | None) -> bool:
+    return bool(value and EMBEDDED_MARKUP_PATTERN.search(value))
 
 
 def markdown_image_refs(value: str | None) -> list[str]:
@@ -3224,6 +3286,61 @@ def link_markdown_images_for_page(db: sqlite3.Connection, batch_id: str, page_ar
                 """,
                 (cleaned_stem, cleaned_stimulus, cleaned_explanation, cleaned_options_json, now_iso(), candidate["id"]),
             )
+
+        # Image refs in the original stem that never got a STEM / OPTION(_BLOCK) link.
+        had_image_refs = bool(stem_refs) or bool(markdown_image_refs(candidate["stimulus"]))
+        if had_image_refs:
+            linked_row = db.execute(
+                """
+                SELECT 1 FROM IngestCandidateImageLink
+                WHERE candidateId = ? AND targetType IN ('STEM', 'OPTION', 'OPTION_BLOCK', 'STIMULUS', 'ANSWER_FIELD')
+                LIMIT 1
+                """,
+                (candidate["id"],),
+            ).fetchone()
+            leftover_md = bool(
+                MARKDOWN_IMAGE_PATTERN.search(cleaned_stem or "")
+                or MARKDOWN_IMAGE_PATTERN.search(cleaned_stimulus or "")
+            )
+            if not linked_row or leftover_md:
+                warnings = []
+                try:
+                    warnings = json.loads(
+                        db.execute(
+                            "SELECT warningsJson FROM IngestQuestionCandidate WHERE id = ?",
+                            (candidate["id"],),
+                        ).fetchone()["warningsJson"]
+                        or "[]"
+                    )
+                    if not isinstance(warnings, list):
+                        warnings = []
+                except Exception:
+                    warnings = []
+                note = "Stem/stimulus image was not linked to an artifact; assign the image in review."
+                if note not in warnings:
+                    warnings.append(note)
+                db.execute(
+                    """
+                    UPDATE IngestQuestionCandidate
+                    SET status = 'NEEDS_REVIEW', warningsJson = ?, updatedAt = ?
+                    WHERE id = ?
+                    """,
+                    (json.dumps(warnings), now_iso(), candidate["id"]),
+                )
+                log_ingest_incident(
+                    db,
+                    batch_id=batch_id,
+                    source_file_id=db.execute(
+                        "SELECT sourceFileId FROM IngestPageArtifact WHERE id = ?",
+                        (page_artifact_id,),
+                    ).fetchone()["sourceFileId"],
+                    page_artifact_id=page_artifact_id,
+                    severity="WARNING",
+                    code="CANDIDATE_IMAGE_LINK_INCOMPLETE",
+                    message=f"Candidate {candidate['id']} still has unresolved image refs after auto-link.",
+                    decision="Markdown image refs were present but no usable STEM/OPTION image link was saved.",
+                    action="Assign the correct page/crop image in the review wizard before promotion.",
+                )
     return linked
 
 

@@ -171,11 +171,11 @@ export function PdfPageCropper({
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        setMessage(data.error || "No se pudo procesar el recorte.");
+        setMessage(data.error || "Could not process crop.");
         return;
       }
       if (mode === "ASSIGN") {
-        setMessage("Recorte asignado.");
+        setMessage("Crop assigned.");
         setRect(null);
         onAssigned?.();
       } else {
@@ -210,7 +210,7 @@ export function PdfPageCropper({
       { text: ocrText, options: ocr.options },
     );
     const label = OCR_TARGETS.find((t) => t.value === ocrTarget)?.label ?? ocrTarget;
-    setMessage(`Asignado a: ${label}${ocrNeedsOption ? ` ${ocrOptionLabel.toUpperCase()}` : ""}. Revisa y guarda.`);
+    setMessage(`Assigned to: ${label}${ocrNeedsOption ? ` ${ocrOptionLabel.toUpperCase()}` : ""}. Review and save.`);
     setOcr(null);
   }
 
