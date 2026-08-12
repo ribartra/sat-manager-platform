@@ -753,6 +753,9 @@ export function FileReviewClient({
                     <span className="text-xs text-gray-400">{state.label}</span>
                   </span>
                   <span className="mt-1 block truncate text-xs text-gray-500">{candidate.questionExternalId ?? candidate.topicName ?? "no ID"}</span>
+                  {cls.notes.length > 0 && candidate.status !== "REJECTED" && (
+                    <span className="mt-1 block text-[11px] leading-4 text-amber-700">{cls.notes.slice(0, 2).join(" · ")}</span>
+                  )}
                 </button>
               );
             })}

@@ -24,6 +24,7 @@
     "notifications:generate": "tsx scripts/generate-notifications.ts",
     "sample:promote": "tsx scripts/promote-ingest-sample.ts",
     "reconcile:promoted": "tsx scripts/reconcile-promoted-candidates.ts",
+    "ingest:flag-stem-artifacts": "node scripts/flag-ingest-stem-artifacts.mjs",
     "demo:verify": "tsx scripts/verify-client-demo.ts"
   },
   "dependencies": {
