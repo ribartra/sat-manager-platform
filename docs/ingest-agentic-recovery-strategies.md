@@ -211,5 +211,5 @@ trazabilidad.
 ## Notas de memoria relacionadas
 
 `taxonomy-source-of-truth`, `devdb-wal-checkpoint-corruption`, `ingest-practice-candidate-repair`,
-`answer-key-recovery`, `rw-stimulus-wrong-source`, `conjunto-model`, `mc-option-image-recovery`,
+`answer-key-recovery`, `rw-stimulus-wrong-source`, `extracted-test-model`, `mc-option-image-recovery`,
 `test6-math-refine-and-rw-typefix`, `test8-completion-progress`, `test10-completion-progress`.

@@ -370,6 +370,6 @@ WAL-safe con guardas. Nunca escritores SQLite concurrentes.
 - **Math T1–T10**: recuperación de opciones-imagen + answer-key + explicaciones aplicada en
   sesiones previas; secciones Math de T3/T6 a 0 huecos.
 
-Ver memorias del proyecto: `conjunto-model`, `mc-option-image-recovery`,
+Ver memorias del proyecto: `extracted-test-model`, `mc-option-image-recovery`,
 `answer-key-recovery`, `rw-recovery-and-t2-answer-shift`, `explanation-header-dump-defect`,
 `ingest-practice-candidate-repair`, `devdb-wal-checkpoint-corruption`.
