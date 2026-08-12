@@ -347,9 +347,9 @@ function incidentResolution(incident: Incident) {
   if (incident.code === "FULL_TEST_ANSWER_KEY_MISSING") return "Needs source file";
   if (incident.code === "FULL_TEST_DUPLICATE_SOURCE") return incident.status === "RESOLVED" ? "Duplicate ignored" : "Review duplicate";
   if (incident.code === "FULL_TEST_SECTION_UNRESOLVED" && incident.status !== "RESOLVED") return "Cannot auto-resolve";
-  if (incident.code === "STEM_EMBEDDED_HTML_OR_TABLE") return "Remove HTML/table from stem";
-  if (incident.code === "CANDIDATE_IMAGE_LINK_INCOMPLETE") return "Link stem/option images";
-  if (incident.code === "CANDIDATE_IMAGE_ASSIGN_FAILED") return "Re-assign crop image";
+  if (incident.code === "STEM_EMBEDDED_HTML_OR_TABLE") return "Clean up table or formatting";
+  if (incident.code === "CANDIDATE_IMAGE_LINK_INCOMPLETE") return "Attach the missing image";
+  if (incident.code === "CANDIDATE_IMAGE_ASSIGN_FAILED") return "Try attaching the image again";
   if (incident.status === "RESOLVED") return "Auto-resolved";
   return "Review source";
 }
@@ -679,7 +679,7 @@ export function FileReviewClient({
     const data = await response.json().catch(() => ({}));
     setParsingImageId(null);
     if (!response.ok || !Array.isArray(data.options) || data.options.length !== 4) {
-      setMessage(data.error || data.warning || "Could not parse A-D options from this image.");
+      setMessage(data.error || data.warning || "Could not read A–D answer choices from this image.");
       return;
     }
     setDraft({ ...selected, type: "MC", optionsJson: JSON.stringify(data.options), status: data.status ?? selected.status });
@@ -1094,19 +1094,19 @@ export function FileReviewClient({
             <Section title="Finish" defaultOpen={false}>
               <ul className="grid gap-1 text-sm">
                 <li className={draftCls && draftCls.fields.stem !== "crit" && draftCls.fields.stem !== "warn" ? "text-green-700" : "text-amber-700"}>
-                  {draftCls && draftCls.fields.stem !== "crit" && draftCls.fields.stem !== "warn" ? "✓" : "✗"} Stem ready
+                  {draftCls && draftCls.fields.stem !== "crit" && draftCls.fields.stem !== "warn" ? "✓" : "✗"} Question text ready
                 </li>
                 <li className={draft.correctAnswer ? "text-green-700" : "text-amber-700"}>
-                  {draft.correctAnswer ? "✓" : "✗"} Answer assigned
+                  {draft.correctAnswer ? "✓" : "✗"} Correct answer set
                 </li>
                 <li className={optsResolved ? "text-green-700" : "text-amber-700"}>
-                  {optsResolved ? "✓" : "✗"} {isMc ? "Options resolved (text or A–D images)" : "Numeric answer (N/A options)"}
+                  {optsResolved ? "✓" : "✗"} {isMc ? "Answer choices ready" : "Numeric answer (no choices needed)"}
                 </li>
-                {draftCls?.notes.includes("embedded HTML or table in stem") && (
-                  <li className="text-amber-700">✗ Embedded HTML or table in stem</li>
+                {draftCls?.notes.includes("Question has a table or messy formatting") && (
+                  <li className="text-amber-700">✗ Question has a table or messy formatting</li>
                 )}
-                {draftCls?.notes.includes("stem image not linked") && (
-                  <li className="text-amber-700">✗ Stem image not linked</li>
+                {draftCls?.notes.includes("Question image is not attached") && (
+                  <li className="text-amber-700">✗ Question image is not attached</li>
                 )}
                 <li className={draft.status === "REVIEWED" ? "text-green-700" : "text-gray-500"}>
                   {draft.status === "REVIEWED" ? "✓" : "•"} Marked as reviewed

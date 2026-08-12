@@ -1003,9 +1003,9 @@ def crop_candidate_region(
                 page_artifact_id=candidate["pageArtifactId"],
                 severity="WARNING",
                 code="CANDIDATE_IMAGE_ASSIGN_FAILED",
-                message=f"Crop for candidate {candidate_id} produced empty or invalid image bytes.",
-                decision="The selected region did not yield a usable image artifact.",
-                action="Retry the crop with a larger region or a different page source.",
+                message="Could not save the selected image crop.",
+                decision="The selected area did not produce a usable image.",
+                action="Try again with a larger area or a different page.",
             )
             raise HTTPException(status_code=400, detail="Could not render the selected region.")
         image_id = new_id("img")
@@ -1020,9 +1020,9 @@ def crop_candidate_region(
                 page_artifact_id=candidate["pageArtifactId"],
                 severity="WARNING",
                 code="CANDIDATE_IMAGE_ASSIGN_FAILED",
-                message=f"Crop image for candidate {candidate_id} failed to persist on disk.",
-                decision="save_ingest_image returned a URL but the file is missing or empty.",
-                action="Retry the crop assign; check upload disk permissions if it persists.",
+                message="Could not save the selected image crop.",
+                decision="The image file did not save correctly.",
+                action="Try attaching the image again. If it keeps failing, check disk space or permissions.",
             )
             raise HTTPException(status_code=500, detail="Crop image did not save correctly.")
         next_index = db.execute(
@@ -2741,25 +2741,25 @@ def make_candidate_from_text(
     confidence = 0.55
     warnings: list[str] = []
     if not stem:
-        warnings.append("Answer/explanation source; question stem is not confirmed.")
+        warnings.append("This may be an answer key page; confirm the question text.")
         confidence -= 0.2
     if not correct_answer:
-        warnings.append("Correct answer not detected.")
+        warnings.append("The correct answer is missing.")
         confidence -= 0.15
     if len(options) not in {0, 4}:
-        warnings.append("Option count is not A-D.")
+        warnings.append("Answer choices are incomplete (need A–D).")
         confidence -= 0.1
     if image_backed_options:
-        warnings.append("Choices appear to be image-backed; manual transcription or option image assignment is required.")
+        warnings.append("Answer choices are only in images. Type them in or attach each choice image.")
         confidence -= 0.1
     elif image_refs and not options:
-        warnings.append("Answer field image detected; treated as numeric response visual.")
+        warnings.append("Answer looks like an image; check that the numeric answer is set.")
     markup_blob = "\n".join(
         part for part in [cleaned, stem or "", practice_stimulus or "", json.dumps(options) if options else ""] if part
     )
     has_markup = detect_embedded_markup(markup_blob)
     if has_markup:
-        warnings.append("Embedded HTML or table detected in question text; needs recovery or image assignment.")
+        warnings.append("This question has a table or messy formatting. Clean up the text or attach the image.")
         confidence -= 0.1
     status = (
         "READY"
@@ -2924,9 +2924,9 @@ def insert_candidate(db: sqlite3.Connection, candidate: dict[str, Any]) -> None:
             page_artifact_id=candidate.get("pageArtifactId"),
             severity="WARNING",
             code="STEM_EMBEDDED_HTML_OR_TABLE",
-            message=f"Candidate {candidate['id']} contains embedded HTML or a table asset in stem/options text.",
-            decision="OCR left HTML/table markup in the question body; students cannot use this as plain text.",
-            action="Replace with transcribed text or assign a STEM/OPTION image, then clear the markup.",
+            message="This question has a table or messy formatting.",
+            decision="Students should not see a table or messy formatting in the question text.",
+            action="Clean up the text or attach the correct image in review.",
         )
 
 
@@ -3316,7 +3316,7 @@ def link_markdown_images_for_page(db: sqlite3.Connection, batch_id: str, page_ar
                         warnings = []
                 except Exception:
                     warnings = []
-                note = "Stem/stimulus image was not linked to an artifact; assign the image in review."
+                note = "This question is missing an attached image. Attach it in review."
                 if note not in warnings:
                     warnings.append(note)
                 db.execute(
@@ -3337,9 +3337,9 @@ def link_markdown_images_for_page(db: sqlite3.Connection, batch_id: str, page_ar
                     page_artifact_id=page_artifact_id,
                     severity="WARNING",
                     code="CANDIDATE_IMAGE_LINK_INCOMPLETE",
-                    message=f"Candidate {candidate['id']} still has unresolved image refs after auto-link.",
-                    decision="Markdown image refs were present but no usable STEM/OPTION image link was saved.",
-                    action="Assign the correct page/crop image in the review wizard before promotion.",
+                    message="This question is missing an attached image.",
+                    decision="The question still needs its image attached.",
+                    action="Attach the correct image in review before using this question.",
                 )
     return linked
 
@@ -4981,14 +4981,18 @@ def parse_candidate_option_image(candidate_id: str, image_artifact_id: str) -> d
                 page_artifact_id=candidate["pageArtifactId"],
                 severity="WARNING",
                 code="OPTION_IMAGE_OCR_UNRESOLVED",
-                message=f"Could not parse A-D options from image {image_artifact_id} for candidate {candidate_id}.",
-                decision="The image OCR completed, but did not produce four reliable option rows.",
-                action="Review the linked option image manually and transcribe A-D options in the staging editor.",
+                message="Could not read A–D answer choices from this image.",
+                decision="The image was read, but four clear answer choices were not found.",
+                action="Type the A–D choices in by hand, or attach a clearer image.",
             )
             db.commit()
-            return {"candidateId": candidate_id, "imageArtifactId": image_artifact_id, "options": [], "text": text, "warning": payload.get("warning") or "A-D options not detected."}
+            return {"candidateId": candidate_id, "imageArtifactId": image_artifact_id, "options": [], "text": text, "warning": payload.get("warning") or "Could not read A–D answer choices from this image."}
 
-        warnings = [warning for warning in json.loads(candidate["warningsJson"] or "[]") if "image-backed" not in str(warning)]
+        warnings = [
+            warning
+            for warning in json.loads(candidate["warningsJson"] or "[]")
+            if "only in images" not in str(warning).lower() and "image-backed" not in str(warning).lower()
+        ]
         status = "READY" if candidate["correctAnswer"] else "NEEDS_REVIEW"
         db.execute(
             """

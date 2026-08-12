@@ -67,22 +67,22 @@ export function classifyQuestion(c: QuestionContent): QuestionClassification {
   const isMC = c.type === "MC";
 
   let stem: FieldState = c.stemLen > 0 ? "ok" : "crit";
-  if (stem === "crit") notes.push("missing stem");
+  if (stem === "crit") notes.push("Question text is missing");
 
   if (stem !== "crit" && c.hasEmbeddedMarkup) {
     stem = "warn";
-    notes.push("embedded HTML or table in stem");
+    notes.push("Question has a table or messy formatting");
   }
 
   // Leftover markdown image in stem/stimulus text (link missing or strip incomplete).
   if (stem !== "crit" && c.hasUnresolvedMarkdownImage) {
     stem = "warn";
-    notes.push("stem image not linked");
+    notes.push("Question image is not attached");
   }
 
   const hasAnswer = !!(c.correctAnswer && c.correctAnswer.trim());
   const answer: FieldState = hasAnswer ? "ok" : "crit";
-  if (answer === "crit") notes.push("missing answer");
+  if (answer === "crit") notes.push("Answer is missing");
 
   let options: FieldState;
   if (!isMC) {
@@ -91,25 +91,25 @@ export function classifyQuestion(c: QuestionContent): QuestionClassification {
     options = "ok";
   } else if (c.optImgCount >= 4) {
     options = "info";
-    notes.push("options as images");
+    notes.push("Answer choices are only in images");
   } else if (c.optTextCount > 0 || c.optImgCount > 0) {
     options = "warn";
-    notes.push(`partial options (${c.optTextCount} text / ${c.optImgCount} img)`);
+    notes.push("Some answer choices are incomplete");
   } else {
     options = "crit";
-    notes.push("missing options");
+    notes.push("Answer choices are missing");
   }
 
   let stimulus: FieldState;
   if (c.section === "RW") {
     stimulus = c.stimLen > 0 ? "ok" : "warn";
-    if (stimulus === "warn") notes.push("missing stimulus");
+    if (stimulus === "warn") notes.push("Passage is missing");
   } else {
     stimulus = "na";
   }
 
   const explanation: FieldState = c.hasExpl ? "ok" : "info";
-  if (explanation === "info") notes.push("missing explanation");
+  if (explanation === "info") notes.push("Explanation is missing");
 
   const states = [stem, answer, options, stimulus, explanation];
   const level: QuestionClassification["level"] = states.includes("crit")

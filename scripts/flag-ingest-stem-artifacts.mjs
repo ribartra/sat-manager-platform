@@ -20,9 +20,9 @@ const MD_IMAGE_RE = /!\[[^\]]*]\([^)]*\)/;
 const MARKUP_RE = /<table\b|<\/?(?:html|body|div|td|tr|th|thead|tbody)\b|\[tbl-\d+\.html\]/i;
 
 const MSG_MARKUP =
-  "Embedded HTML or table in stem — replace with plain text or assign a STEM image, then clear the markup.";
+  "This question has a table or messy formatting. Clean up the text or attach the image.";
 const MSG_IMAGE =
-  "Unresolved image in stem (markdown ![…] still present or image not linked) — assign STEM/OPTION image in review.";
+  "This question is missing an attached image. Attach it in review.";
 
 const apply = process.argv.includes("--apply");
 const confirmStopped = process.argv.includes("--confirm-server-stopped");
@@ -93,8 +93,8 @@ for (const c of candidates) {
 
   const warnings = parseWarnings(c.warningsJson);
   const toAdd = [];
-  if (hasMarkup && !warnings.some((w) => w.includes("Embedded HTML or table"))) toAdd.push(MSG_MARKUP);
-  if ((leftoverMd || imageGap) && !warnings.some((w) => w.includes("Unresolved image"))) toAdd.push(MSG_IMAGE);
+  if (hasMarkup && !warnings.some((w) => /table or messy formatting/i.test(w) || /Embedded HTML/i.test(w))) toAdd.push(MSG_MARKUP);
+  if ((leftoverMd || imageGap) && !warnings.some((w) => /missing an attached image|image that still needs|Unresolved image|Stem\/stimulus image/i.test(w))) toAdd.push(MSG_IMAGE);
 
   const needsStatus = c.status !== "NEEDS_REVIEW";
   const needsWarnings = toAdd.length > 0;
@@ -160,7 +160,7 @@ const tx = db.transaction(() => {
     updateCand.run(JSON.stringify(p.nextWarnings), p.id);
     updated += 1;
     if (p.reasons.includes("markup")) {
-      const message = `Candidate ${p.id} contains embedded HTML or a table asset in stem/options text.`;
+      const message = `This question has a table or messy formatting (${p.label}).`;
       const contextHash = textHash([p.batchId, p.sourceFileId || "", p.pageArtifactId || "", "WARNING", "STEM_EMBEDDED_HTML_OR_TABLE", message].join("|"));
       const info = insertIncident.run({
         id: newId("inc"),
@@ -170,14 +170,14 @@ const tx = db.transaction(() => {
         severity: "WARNING",
         code: "STEM_EMBEDDED_HTML_OR_TABLE",
         message,
-        decision: "OCR left HTML/table markup in the question body; students cannot use this as plain text.",
-        action: "Replace with transcribed text or assign a STEM image, then clear the markup.",
+        decision: "Students should not see a table or messy formatting in the question text.",
+        action: "Clean up the text or attach the correct image in review.",
         contextHash,
       });
       incidents += info.changes;
     }
     if (p.reasons.includes("image")) {
-      const message = `Candidate ${p.id} still has unresolved image refs in stem/stimulus.`;
+      const message = `This question is missing an attached image (${p.label}).`;
       const contextHash = textHash([p.batchId, p.sourceFileId || "", p.pageArtifactId || "", "WARNING", "CANDIDATE_IMAGE_LINK_INCOMPLETE", message].join("|"));
       const info = insertIncident.run({
         id: newId("inc"),
@@ -187,8 +187,8 @@ const tx = db.transaction(() => {
         severity: "WARNING",
         code: "CANDIDATE_IMAGE_LINK_INCOMPLETE",
         message,
-        decision: "Markdown image refs remain or no STEM/OPTION image link was saved.",
-        action: "Assign the correct page/crop image in the review wizard before relying on this question.",
+        decision: "The question still needs its image attached.",
+        action: "Attach the correct image in review before using this question.",
         contextHash,
       });
       incidents += info.changes;
