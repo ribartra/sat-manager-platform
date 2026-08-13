@@ -258,7 +258,7 @@ export default async function StudentReportPage({ params }: PageProps) {
             {[...mediaQuestions.values()].slice(0, 6).map((question) => (
               <div key={question.imageUrl} className="rounded-md border border-gray-100 p-3">
                 <QuestionMedia imageUrl={question.imageUrl} alt={question.stem} />
-                <MathContent content={question.stem} className="mt-2 line-clamp-2 text-xs text-gray-700" />
+                <MathContent content={question.stem} className="mt-2 max-h-24 overflow-auto text-xs text-gray-700" />
                 <p className="mt-1 text-xs text-gray-400">{question.topic} · {question.difficulty}</p>
               </div>
             ))}

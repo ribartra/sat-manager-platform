@@ -57,6 +57,90 @@ export function stripMarkdownImages(value: string | null | undefined): string {
   return stripIngestImagePlaceholders(value);
 }
 
+// College Board / practice-PDF chrome that OCR often leaves at the top of
+// stem/stimulus/explanation: "Question ID: ab12cd34", bare "# Question",
+// "Assessment Test Domain Skill Difficulty", trailing "**Answer**".
+const CB_QUESTION_ID_LINE =
+  /^(?:\*{1,2}|_{1,2}|#+\s*)?\s*(?:Question\s+ID|ID)\s*:?\s*[A-Fa-f0-9]{6,}\s*(?:\*{1,2}|_{1,2})?\s*$/i;
+/** Leading "ID: ab12cd34 " / "**Question ID: …** " prefix on an otherwise real line. */
+const CB_QUESTION_ID_PREFIX =
+  /^(?:\*{1,2}|_{1,2}|#+\s*)?\s*(?:Question\s+ID|ID)\s*:?\s*[A-Fa-f0-9]{6,}\s*(?:\*{1,2}|_{1,2})?\s*/i;
+const CB_QUESTION_ID_INLINE = /\bQuestion\s+ID\s*:?\s*[A-Fa-f0-9]{6,}\b/gi;
+const CB_BARE_QUESTION_LABEL =
+  /^(?:#+\s*)?(?:\*{1,2}|_{1,2})?\s*Question(?:\s+\d+)?\s*(?:\*{1,2}|_{1,2})?\s*$/i;
+const CB_ASSESSMENT_HEADER = /^Assessment\s+Test\s+Domain\s+Skill\s+Difficulty\s*$/i;
+const CB_SAT_TAXONOMY_HEADER = /^SAT\s+(?:Math|Reading\s+and\s+Writing)\b/i;
+const CB_ANSWER_LABEL = /^(?:#+\s*)?(?:\*{1,2}|_{1,2})?\s*Answer\s*(?:\*{1,2}|_{1,2})?\s*$/i;
+/** Jump to real rationale — avoid bare "Correct Answer:" / empty "Rationale" OCR stubs. */
+const CB_RATIONALE_START = /^(?:Choice\s+[A-D]\s+is\s+correct|The\s+correct\s+answer\s+is)/i;
+
+function isCollegeBoardMetaLine(line: string): boolean {
+  const trimmed = line.replace(/^#+\s*/, "").trim();
+  if (!trimmed) return true;
+  return (
+    CB_QUESTION_ID_LINE.test(trimmed) ||
+    CB_BARE_QUESTION_LABEL.test(trimmed) ||
+    CB_ASSESSMENT_HEADER.test(trimmed) ||
+    CB_SAT_TAXONOMY_HEADER.test(trimmed)
+  );
+}
+
+/**
+ * Remove leaked Question-ID / Assessment / bare "Question" chrome from
+ * student-facing text. Safe for stem, stimulus, and explanation.
+ */
+export function stripCollegeBoardMetaHeaders(value: string | null | undefined): string {
+  if (!value) return "";
+  let text = value.replace(/\r\n/g, "\n");
+
+  // Prefer cutting explanations down to the real rationale when present.
+  const lines = text.split("\n");
+  const rationaleIdx = lines.findIndex((line) => CB_RATIONALE_START.test(line.trim()));
+  if (rationaleIdx > 0) {
+    const sliced = lines.slice(rationaleIdx).join("\n").trim();
+    // Only cut when there is a real rationale body (not an empty stub).
+    if (sliced.length >= 40) text = sliced;
+  }
+
+  const kept: string[] = [];
+  let strippingLead = true;
+  for (const line of text.split("\n")) {
+    const trimmed = line.trim();
+    if (strippingLead && isCollegeBoardMetaLine(line)) continue;
+    strippingLead = false;
+    if (CB_QUESTION_ID_LINE.test(trimmed) || CB_BARE_QUESTION_LABEL.test(trimmed) || CB_ASSESSMENT_HEADER.test(trimmed)) {
+      continue;
+    }
+    if (CB_ANSWER_LABEL.test(trimmed)) {
+      // Trailing practice-PDF "**Answer**" (and anything after) is not part of the stem.
+      break;
+    }
+    const cleanedLine = line
+      .replace(CB_QUESTION_ID_PREFIX, "")
+      .replace(CB_QUESTION_ID_INLINE, "")
+      .replace(/\*{4,}/g, "")
+      .replace(/\*\*\s*\*\*/g, "")
+      .replace(/[ \t]+$/g, "");
+    if (!cleanedLine.trim() && !line.trim()) {
+      kept.push("");
+      continue;
+    }
+    if (!cleanedLine.trim()) continue;
+    // After stripping a leading "ID: hex", the remainder may be a lone "Question 7".
+    if (CB_BARE_QUESTION_LABEL.test(cleanedLine.trim())) continue;
+    kept.push(cleanedLine);
+  }
+
+  const out = kept
+    .join("\n")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+  // OCR sometimes leaves a lone "Rationale" marker with no body.
+  if (/^rationale\.?$/i.test(out)) return "";
+  return out;
+}
+
 export function clearObsoleteImageWarnings(warnings: string[]): string[] {
   return warnings.filter((warning) => !OBSOLETE_IMAGE_WARNING_RE.test(warning));
 }

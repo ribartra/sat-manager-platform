@@ -72,7 +72,17 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
     where: { id: questionId },
     select: { status: true, topicId: true, difficulty: true, type: true },
   });
-  const validationErrors = validateQuestionPayload({ topicId, difficulty, type, stem, explanation, correctAnswer, status, options });
+  const validationErrors = validateQuestionPayload({
+    topicId,
+    difficulty,
+    type,
+    stem,
+    explanation,
+    imageUrl,
+    correctAnswer,
+    status,
+    options,
+  });
   if (validationErrors.length > 0) {
     return NextResponse.json({ error: "Validation failed.", errors: validationErrors }, { status: 400 });
   }
@@ -106,10 +116,12 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
         type === "MC"
           ? {
               create: officialOptions
-                .filter((o: { text: string }) => o.text)
-                .map((o: { label: string; text: string; imageUrl?: string | null }) => ({
+                .filter((o: { text?: string; imageUrl?: string | null }) =>
+                  Boolean(o.text?.trim() || o.imageUrl?.trim()),
+                )
+                .map((o: { label: string; text?: string; imageUrl?: string | null }) => ({
                   label: o.label,
-                  text: o.text,
+                  text: o.text ?? "",
                   imageUrl: o.imageUrl || null,
                 })),
             }

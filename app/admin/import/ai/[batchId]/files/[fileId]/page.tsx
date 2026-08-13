@@ -6,6 +6,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { computeCropImageSources } from "@/lib/ingest-crop-source";
 import { computeExtractedTests, resolveExtractedTestScope } from "@/lib/ingest-sets.server";
+import { reconcileWarningsJson } from "@/lib/ingest-warnings";
 import { ExtractedTestRail } from "@/app/admin/import/ai/_components/extracted-test-rail";
 import { FileReviewClient } from "./review-client";
 
@@ -297,7 +298,9 @@ export default async function AiImportFileReviewPage({ params, searchParams }: P
           status: candidate.status,
           officialQuestionId: candidate.officialQuestionId,
           promotionStatus: candidate.promotionStatus,
-          warningsJson: candidate.warningsJson,
+          warningsJson: reconcileWarningsJson(candidate.warningsJson, {
+            correctAnswer: candidate.correctAnswer,
+          }).json,
         }))}
         answers={answers.map((answer) => ({
           id: answer.id,

@@ -2477,20 +2477,37 @@ def clean_ingested_question_text(value: str) -> str:
 
 # Artefactos que la extracción de PDF suele dejar dentro del contenido de la pregunta:
 # la línea del Question ID y la cabecera "Assessment Test / SAT ... | Domain | Skill | Difficulty".
-QUESTION_ID_LINE_RE = re.compile(r"(?im)^\s*(?:Question\s+ID|ID)\s*:?\s*[A-Fa-f0-9]{6,}\s*$")
-QUESTION_ID_INLINE_RE = re.compile(r"(?i)\b(?:Question\s+ID|ID)\s*:?\s*[A-Fa-f0-9]{6,}\b")
-ASSESSMENT_HEADER_RE = re.compile(r"(?im)^\s*(?:Assessment Test\s+Domain\s+Skill\s+Difficulty|SAT (?:Math|Reading and Writing)\b.*)$")
+QUESTION_ID_LINE_RE = re.compile(
+    r"(?im)^\s*(?:\*{1,2}|_{1,2}|#+\s*)?\s*(?:Question\s+ID|ID)\s*:?\s*[A-Fa-f0-9]{6,}\s*(?:\*{1,2}|_{1,2})?\s*$"
+)
+QUESTION_ID_PREFIX_RE = re.compile(
+    r"(?im)^(?:\*{1,2}|_{1,2}|#+\s*)?\s*(?:Question\s+ID|ID)\s*:?\s*[A-Fa-f0-9]{6,}\s*(?:\*{1,2}|_{1,2})?\s*"
+)
+QUESTION_ID_INLINE_RE = re.compile(r"(?i)\bQuestion\s+ID\s*:?\s*[A-Fa-f0-9]{6,}\b")
+BARE_QUESTION_LABEL_RE = re.compile(
+    r"(?im)^\s*(?:#+\s*)?(?:\*{1,2}|_{1,2})?\s*Question(?:\s+\d+)?\s*(?:\*{1,2}|_{1,2})?\s*$"
+)
+ANSWER_LABEL_RE = re.compile(r"(?im)^\s*(?:#+\s*)?(?:\*{1,2}|_{1,2})?\s*Answer\s*(?:\*{1,2}|_{1,2})?\s*$")
+ASSESSMENT_HEADER_RE = re.compile(
+    r"(?im)^\s*(?:Assessment Test\s+Domain\s+Skill\s+Difficulty|SAT (?:Math|Reading and Writing)\b.*)$"
+)
 
 
 def strip_question_id(value: str | None) -> str:
-    """Remove leaked 'Question ID: xxxx' markers from a stem/text."""
+    """Remove leaked 'Question ID: xxxx' / bare '# Question' / trailing '**Answer**' chrome."""
     if not value:
         return ""
     value = QUESTION_ID_LINE_RE.sub("", value)
+    value = QUESTION_ID_PREFIX_RE.sub("", value)
+    value = BARE_QUESTION_LABEL_RE.sub("", value)
+    value = ASSESSMENT_HEADER_RE.sub("", value)
     value = QUESTION_ID_INLINE_RE.sub("", value)
+    # Drop trailing practice-PDF Answer label (and anything after it).
+    answer_match = ANSWER_LABEL_RE.search(value)
+    if answer_match:
+        value = value[: answer_match.start()]
+    value = re.sub(r"\*{4,}", "", value)
     return re.sub(r"\n{3,}", "\n\n", value).strip()
-
-
 def extract_rationale(text: str | None) -> str | None:
     """The ANS page dump = header + stem + options + 'Correct Answer' + Rationale.
     Store only the Rationale (the real explanation) when present, minus header/ID leaks."""

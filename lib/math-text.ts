@@ -1,0 +1,162 @@
+/**
+ * Shared math/prose text helpers for MathContent and editor toolbars.
+ * Markers (outside math tokens):
+ *   **bold**  → <strong>
+ *   ++under++ → <u>
+ * Inside math, editors wrap with \textbf{…} / \underline{…}.
+ */
+
+export const MATH_TOKEN_PATTERN =
+  /(\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\$[^$\n]+?\$|\\\([\s\S]+?\\\))/g;
+
+const ALIGNED_ENV_RE = /\\begin\{aligned\*?\}|\\begin\{align\*?\}/;
+const AMP_EQ_RE = /&=/;
+
+export type MathToken = {
+  kind: "math";
+  raw: string;
+  math: string;
+  displayMode: boolean;
+};
+
+export type ProseSegment =
+  | { kind: "text"; text: string }
+  | { kind: "bold"; text: string }
+  | { kind: "underline"; text: string };
+
+export type ContentPart = MathToken | { kind: "prose"; segments: ProseSegment[] };
+
+export function parseMathToken(token: string): MathToken | null {
+  if (token.startsWith("$$") && token.endsWith("$$")) {
+    return { kind: "math", raw: token, math: token.slice(2, -2), displayMode: true };
+  }
+  if (token.startsWith("\\[") && token.endsWith("\\]")) {
+    return { kind: "math", raw: token, math: token.slice(2, -2), displayMode: true };
+  }
+  if (token.startsWith("$") && token.endsWith("$")) {
+    return { kind: "math", raw: token, math: token.slice(1, -1), displayMode: false };
+  }
+  if (token.startsWith("\\(") && token.endsWith("\\)")) {
+    return { kind: "math", raw: token, math: token.slice(2, -2), displayMode: false };
+  }
+  return null;
+}
+
+/**
+ * If a display-math body uses &= but is not already in an align/aligned
+ * environment, wrap it so KaTeX can render systems of equations.
+ */
+export function normalizeDisplayMathBody(math: string): string {
+  const body = math.trim();
+  if (!body) return body;
+  if (!AMP_EQ_RE.test(body)) return body;
+  if (ALIGNED_ENV_RE.test(body)) return body;
+  return `\\begin{aligned} ${body} \\end{aligned}`;
+}
+
+export function normalizeMathToken(token: MathToken): MathToken {
+  if (!token.displayMode) return token;
+  const next = normalizeDisplayMathBody(token.math);
+  if (next === token.math) return token;
+  return { ...token, math: next };
+}
+
+/** Split prose into text / bold / underline segments (no nesting). */
+export function parseProseSegments(prose: string): ProseSegment[] {
+  if (!prose) return [];
+  const pattern = /(\*\*[\s\S]+?\*\*|\+\+[\s\S]+?\+\+)/g;
+  const parts = prose.split(pattern).filter((part) => part.length > 0);
+  const segments: ProseSegment[] = [];
+  for (const part of parts) {
+    if (part.startsWith("**") && part.endsWith("**") && part.length >= 4) {
+      segments.push({ kind: "bold", text: part.slice(2, -2) });
+    } else if (part.startsWith("++") && part.endsWith("++") && part.length >= 4) {
+      segments.push({ kind: "underline", text: part.slice(2, -2) });
+    } else {
+      segments.push({ kind: "text", text: part });
+    }
+  }
+  return segments;
+}
+
+/** Tokenize full content into math blocks + prose (with markup segments). */
+export function tokenizeMathContent(content: string): ContentPart[] {
+  const parts = String(content ?? "").split(MATH_TOKEN_PATTERN).filter((part) => part.length > 0);
+  return parts.map((part) => {
+    const math = parseMathToken(part);
+    if (math) return normalizeMathToken(math);
+    return { kind: "prose" as const, segments: parseProseSegments(part) };
+  });
+}
+
+/**
+ * Wrap a selection in a textarea value.
+ * - Inside a math token ($…$ / $$…$$ / \[…\] / \(...\)): use LaTeX command.
+ * - Otherwise: use prose markers **…** / ++…++.
+ */
+export function wrapTextFormat(
+  value: string,
+  selectionStart: number,
+  selectionEnd: number,
+  format: "bold" | "underline",
+): { next: string; selectionStart: number; selectionEnd: number } {
+  const start = Math.max(0, Math.min(selectionStart, selectionEnd, value.length));
+  const end = Math.max(0, Math.max(selectionStart, selectionEnd, start));
+  const selected = value.slice(start, end) || (format === "bold" ? "text" : "text");
+  const inMath = isInsideMathToken(value, start, end);
+
+  let wrapped: string;
+  if (inMath) {
+    const cmd = format === "bold" ? "\\textbf" : "\\underline";
+    wrapped = `${cmd}{${selected}}`;
+  } else {
+    const marker = format === "bold" ? "**" : "++";
+    // Avoid double-wrapping the same markers.
+    if (
+      (format === "bold" && selected.startsWith("**") && selected.endsWith("**")) ||
+      (format === "underline" && selected.startsWith("++") && selected.endsWith("++"))
+    ) {
+      wrapped = selected;
+    } else {
+      wrapped = `${marker}${selected}${marker}`;
+    }
+  }
+
+  const next = value.slice(0, start) + wrapped + value.slice(end);
+  return {
+    next,
+    selectionStart: start,
+    selectionEnd: start + wrapped.length,
+  };
+}
+
+function isInsideMathToken(value: string, start: number, end: number): boolean {
+  MATH_TOKEN_PATTERN.lastIndex = 0;
+  let match: RegExpExecArray | null;
+  const re = new RegExp(MATH_TOKEN_PATTERN.source, "g");
+  while ((match = re.exec(value))) {
+    const tokenStart = match.index;
+    const tokenEnd = tokenStart + match[0].length;
+    // Selection fully inside the math body (not straddling delimiters).
+    if (start >= tokenStart && end <= tokenEnd) return true;
+  }
+  return false;
+}
+
+/** Repair a full stem/stimulus string: normalize display math with &=. */
+export function repairMathContent(content: string | null | undefined): string {
+  if (!content) return "";
+  return content
+    .split(MATH_TOKEN_PATTERN)
+    .map((part) => {
+      const token = parseMathToken(part);
+      if (!token) return part;
+      const normalized = normalizeMathToken(token);
+      if (!normalized.displayMode) return part;
+      if (normalized.math === token.math) return part;
+      // Prefer $$…$$ when original used $$; keep \[…\] otherwise.
+      if (part.startsWith("$$")) return `$$${normalized.math}$$`;
+      return `\\[${normalized.math}\\]`;
+    })
+    .join("");
+}

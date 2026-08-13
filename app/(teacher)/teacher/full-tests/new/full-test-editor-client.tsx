@@ -146,7 +146,7 @@ export function FullTestEditor({
                     <span className="mb-0.5 block text-[10px] font-medium uppercase text-gray-400">
                       {question.section} · {question.difficulty}
                     </span>
-                    <MathContent content={question.stem} className="line-clamp-2" />
+                    <MathContent content={question.stem} className="max-h-28 overflow-auto text-sm" />
                   </li>
                 );
               })}

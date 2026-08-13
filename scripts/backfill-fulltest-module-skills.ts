@@ -40,7 +40,9 @@ async function main() {
   }
 
   const tests = await prisma.fullPracticeTest.findMany({
-    where: { name: { startsWith: "Imported Test" } },
+    where: {
+      OR: [{ name: { startsWith: "TEST " } }, { name: { startsWith: "Imported Test" } }],
+    },
     include: {
       modules: {
         orderBy: { order: "asc" },

@@ -55,6 +55,11 @@ async function main() {
       update: { value: "false" },
       create: { key: "TEACHER_GROUP_MANAGEMENT", value: "false" },
     }),
+    prisma.appSetting.upsert({
+      where: { key: "QUESTION_GRAPH_VISUALIZATION" },
+      update: { value: "false" },
+      create: { key: "QUESTION_GRAPH_VISUALIZATION", value: "false" },
+    }),
   ]);
 
   // ─── TEACHERS ────────────────────────────────────────────────────────────────

@@ -3,6 +3,7 @@ import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { stripIngestImagePlaceholders } from "@/lib/ingest-text-sanitize";
 import { cleanupOfficialQuestionPlaceholders } from "@/lib/ingest-image-cleanup";
+import { reconcileWarningsJson } from "@/lib/ingest-warnings";
 
 interface RouteContext {
   params: Promise<{ candidateId: string }>;
@@ -34,6 +35,18 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
     return NextResponse.json({ error: "Invalid status." }, { status: 400 });
   }
 
+  const existing = await prisma.ingestQuestionCandidate.findUnique({
+    where: { id: candidateId },
+    select: { warningsJson: true, correctAnswer: true },
+  });
+  if (!existing) return NextResponse.json({ error: "Candidate not found." }, { status: 404 });
+
+  const nextAnswer =
+    body.correctAnswer !== undefined ? body.correctAnswer || null : existing.correctAnswer;
+  const reconciledWarnings = reconcileWarningsJson(existing.warningsJson, {
+    correctAnswer: nextAnswer,
+  });
+
   const candidate = await prisma.ingestQuestionCandidate.update({
     where: { id: candidateId },
     data: {
@@ -51,6 +64,7 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
       ...(body.subskillName !== undefined ? { subskillName: body.subskillName || null } : {}),
       ...(body.difficulty !== undefined ? { difficulty: body.difficulty || null } : {}),
       ...(body.type ? { type: body.type } : {}),
+      warningsJson: reconciledWarnings.json,
     },
   });
 

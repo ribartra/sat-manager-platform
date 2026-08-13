@@ -8,7 +8,7 @@ import {
   fullTestSectionFromCandidate,
   fullTestTopicIdFor,
 } from "@/lib/full-test-modules";
-import { stripIngestImagePlaceholders } from "@/lib/ingest-text-sanitize";
+import { stripCollegeBoardMetaHeaders, stripIngestImagePlaceholders } from "@/lib/ingest-text-sanitize";
 import { cleanupOfficialQuestionPlaceholders } from "@/lib/ingest-image-cleanup";
 
 type TopicWithRelations = {
@@ -78,7 +78,7 @@ const EXPLANATION_HEADER_LINE = [
 ];
 
 export function sanitizeExplanation(value: string | null | undefined): string {
-  const text = (value ?? "").replace(/\r\n/g, "\n");
+  const text = stripCollegeBoardMetaHeaders(value).replace(/\r\n/g, "\n");
   if (!text.trim()) return "";
   const lines = text.split("\n");
   let start = 0;
@@ -131,7 +131,7 @@ export function stripEmbeddedOptionBlock(value: string | null | undefined): stri
 }
 
 export function sanitizeStem(value: string | null | undefined): string {
-  const text = stripEmbeddedOptionBlock(value).replace(/\r\n/g, "\n");
+  const text = stripCollegeBoardMetaHeaders(stripEmbeddedOptionBlock(value)).replace(/\r\n/g, "\n");
   if (!text.trim()) return "";
   const lines = text.split("\n");
   let start = 0;
@@ -147,6 +147,11 @@ export function sanitizeStem(value: string | null | undefined): string {
   // Never let the guard empty a stem: if stripping consumed everything (e.g. a
   // stem that was ONLY a header), fall back to the original trimmed text.
   return cleaned || text.trim();
+}
+
+/** Stimulus uses the same College Board chrome strip as stems. */
+export function sanitizeStimulus(value: string | null | undefined): string {
+  return stripCollegeBoardMetaHeaders(value);
 }
 
 function imageUrlOrBase64(image: ImageLinkForDraft["image"]) {
@@ -377,7 +382,7 @@ export function buildQuestionDraft({
     difficulty,
     type: candidate.type === "NUMERIC" ? "NUMERIC" : "MC",
     stem: sanitizeStem(stripMarkdownImageRefs(candidate.stem)),
-    stimulus: stripMarkdownImageRefs(candidate.stimulus),
+    stimulus: sanitizeStimulus(stripMarkdownImageRefs(candidate.stimulus)),
     explanation: sanitizeExplanation(stripMarkdownImageRefs(candidate.explanation)),
     imageUrl: questionImage,
     supportsGraph: false,

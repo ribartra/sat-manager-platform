@@ -71,6 +71,7 @@ const checks = [
     requires: [
       "const MC_LABELS = [\"A\", \"B\", \"C\", \"D\"]",
       "for (const label of MC_LABELS)",
+      "Question stem text or image is required to publish.",
       "Option ${label} must have text or an image to publish.",
       "Correct answer for multiple choice must be A, B, C or D.",
       "At least one published question is required to publish.",
@@ -157,6 +158,7 @@ const checks = [
       "STUDENT_SELF_ENROLLMENT",
       "TEACHER_PROGRAM_MANAGEMENT",
       "TEACHER_GROUP_MANAGEMENT",
+      "QUESTION_GRAPH_VISUALIZATION",
       "value: \"false\"",
       "SEED_DEMO_ACADEMIC_CONTENT",
       "sin contenido demo",

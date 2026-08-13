@@ -11,6 +11,7 @@ interface QuestionPayload {
   type?: string;
   stem?: string;
   explanation?: string | null;
+  imageUrl?: string | null;
   correctAnswer?: string;
   status?: string;
   options?: { label: string; text: string; imageUrl?: string | null }[];
@@ -37,7 +38,8 @@ export function validateQuestionPayload(payload: QuestionPayload) {
   if (status === "PUBLISHED") {
     if (!payload.topicId) errors.push("Topic is required to publish.");
     if (!payload.difficulty) errors.push("Difficulty is required to publish.");
-    if (!payload.stem?.trim()) errors.push("Question stem is required to publish.");
+    const hasStemContent = Boolean(payload.stem?.trim() || payload.imageUrl?.trim());
+    if (!hasStemContent) errors.push("Question stem text or image is required to publish.");
     if (!payload.correctAnswer?.trim()) errors.push("Correct answer is required to publish.");
     if (!payload.explanation?.trim()) errors.push("Explanation is required to publish.");
 

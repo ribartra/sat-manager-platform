@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { QuestionEditor } from "../../question-editor-client";
+import { getFeatureSetting } from "@/lib/app-settings";
 import { academicTopicWhere, buildTaxonomyTree, taxonomyPathLabel } from "@/lib/taxonomy";
 
 interface PageProps {
@@ -10,7 +11,7 @@ interface PageProps {
 export default async function EditQuestionPage({ params }: PageProps) {
   const { questionId } = await params;
 
-  const [question, topics, taxonomyNodes] = await Promise.all([
+  const [question, topics, taxonomyNodes, showGraphOption] = await Promise.all([
     prisma.question.findUnique({
       where: { id: questionId },
       include: { options: { orderBy: { label: "asc" } } },
@@ -21,6 +22,7 @@ export default async function EditQuestionPage({ params }: PageProps) {
       orderBy: { name: "asc" },
     }),
     prisma.taxonomyNode.findMany({ where: { active: true }, orderBy: [{ sortOrder: "asc" }, { label: "asc" }] }),
+    getFeatureSetting("QUESTION_GRAPH_VISUALIZATION"),
   ]);
   const { byId } = buildTaxonomyTree(taxonomyNodes);
 
@@ -30,6 +32,7 @@ export default async function EditQuestionPage({ params }: PageProps) {
     <div className="mx-auto max-w-3xl px-4 py-8">
       <h1 className="mb-6 text-xl font-semibold text-gray-900">Edit Question</h1>
       <QuestionEditor
+        showGraphOption={showGraphOption}
         initial={{
           id: question.id,
           topicId: question.topicId,

@@ -173,7 +173,7 @@ export function PracticeSetEditor({
             <div key={q.id} className="flex items-center gap-3 px-4 py-3">
               <span className="w-6 text-xs font-medium text-gray-400">{index + 1}</span>
               <div className="min-w-0 flex-1">
-                <MathContent content={q.stem} className="line-clamp-2 text-sm font-medium text-gray-900" />
+                <MathContent content={q.stem} className="max-h-28 overflow-auto text-sm font-medium text-gray-900" />
                 <div className="mt-1 flex items-center gap-2">
                   <Badge variant={q.difficulty === "EASY" ? "easy" : q.difficulty === "MEDIUM" ? "medium" : "hard"}>{q.difficulty}</Badge>
                   <Badge variant="default">{q.type}</Badge>

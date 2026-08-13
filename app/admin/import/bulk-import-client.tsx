@@ -83,7 +83,7 @@ export function BulkImportClient({ topics }: { topics: { id: string; label: stri
                     <td className="px-3 py-2 font-mono text-gray-500">{row.rowNumber}</td>
                     <td className="px-3 py-2 font-mono text-gray-500">{row.topicId}</td>
                     <td className="px-3 py-2 text-gray-800">
-                      <MathContent content={row.stem} className="line-clamp-2" />
+                      <MathContent content={row.stem} className="max-h-28 overflow-auto text-sm" />
                     </td>
                     <td className="px-3 py-2">{row.type}</td>
                     <td className="px-3 py-2">{row.status}</td>

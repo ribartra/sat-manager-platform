@@ -21,6 +21,12 @@ export const FEATURE_SETTINGS = {
     description: "Allow teachers to create groups, manage memberships, and assign work by group.",
     defaultValue: false,
   },
+  QUESTION_GRAPH_VISUALIZATION: {
+    label: "Question graph visualization option",
+    description:
+      "Show the “Enable graph visualization” checkbox in the question editor (Math). When off, the option stays hidden; existing supportsGraph values are unchanged.",
+    defaultValue: false,
+  },
 } as const;
 
 export type FeatureSettingKey = keyof typeof FEATURE_SETTINGS;

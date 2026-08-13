@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { QuestionEditor } from "../question-editor-client";
+import { getFeatureSetting } from "@/lib/app-settings";
 import { loadCandidateQuestionDraft } from "@/lib/ingest-promotion";
 import { academicTopicWhere, buildTaxonomyTree, taxonomyPathLabel } from "@/lib/taxonomy";
 
@@ -9,7 +10,7 @@ interface PageProps {
 
 export default async function NewQuestionPage({ searchParams }: PageProps) {
   const { ingestCandidateId } = await searchParams;
-  const [topics, taxonomyNodes, ingestDraft] = await Promise.all([
+  const [topics, taxonomyNodes, ingestDraft, showGraphOption] = await Promise.all([
     prisma.topic.findMany({
       where: academicTopicWhere,
       include: { taxonomyNode: true, domain: { include: { section: true } }, subskills: true },
@@ -17,6 +18,7 @@ export default async function NewQuestionPage({ searchParams }: PageProps) {
     }),
     prisma.taxonomyNode.findMany({ where: { active: true }, orderBy: [{ sortOrder: "asc" }, { label: "asc" }] }),
     ingestCandidateId ? loadCandidateQuestionDraft(ingestCandidateId) : null,
+    getFeatureSetting("QUESTION_GRAPH_VISUALIZATION"),
   ]);
   const { byId } = buildTaxonomyTree(taxonomyNodes);
 
@@ -24,6 +26,7 @@ export default async function NewQuestionPage({ searchParams }: PageProps) {
     <div className="mx-auto max-w-3xl px-4 py-8">
       <h1 className="text-xl font-semibold text-gray-900 mb-6">New Question</h1>
       <QuestionEditor
+        showGraphOption={showGraphOption}
         initial={ingestDraft?.initial}
         sourceContext={
           ingestDraft

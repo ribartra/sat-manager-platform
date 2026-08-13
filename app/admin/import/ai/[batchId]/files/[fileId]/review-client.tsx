@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChevronDown, Plus, Trash2, Braces } from "lucide-react";
@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { CopyableTruncatedText } from "@/components/ui/copyable-truncated-text";
 import { MathContent } from "@/components/math-content";
+import { TextFormatToolbar } from "@/components/text-format-toolbar";
 import { PdfPageCropper, type CropTarget, type CropOcrResult } from "@/app/admin/import/ai/_components/pdf-page-cropper";
 import { MergeDialog } from "./merge-dialog";
 import {
@@ -21,6 +22,38 @@ import {
   type QuestionStatusRow,
 } from "@/lib/ingest-sets";
 import { stripIngestImagePlaceholders } from "@/lib/ingest-text-sanitize";
+import {
+  isIngestWarningInfo,
+  reconcileWarningsJson,
+} from "@/lib/ingest-warnings";
+
+function DraftFormattedTextarea({
+  label,
+  value,
+  onChange,
+  className,
+}: {
+  label: string;
+  value: string;
+  onChange: (next: string) => void;
+  className?: string;
+}) {
+  const ref = useRef<HTMLTextAreaElement>(null);
+  return (
+    <label className="grid gap-1">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="text-xs font-medium text-gray-500">{label}</span>
+        <TextFormatToolbar getInput={() => ref.current} value={value} onChange={onChange} />
+      </div>
+      <textarea
+        ref={ref}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className={className ?? "min-h-28 rounded-md border border-gray-300 px-3 py-2 text-sm"}
+      />
+    </label>
+  );
+}
 
 type SourceFile = {
   id: string;
@@ -162,14 +195,8 @@ function candidateSignature(draft: Candidate | null) {
   });
 }
 
-function parseWarnings(value: string | null) {
-  if (!value) return [];
-  try {
-    const parsed = JSON.parse(value);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
+function parseWarnings(value: string | null, correctAnswer?: string | null) {
+  return reconcileWarningsJson(value, { correctAnswer }).list;
 }
 
 function imageSrc(image: Pick<ImageArtifact, "fileUrl" | "base64Data" | "mimeType">) {
@@ -214,6 +241,8 @@ function OptionsEditor({
   const rows = parsed.map((o, i) => ({ label: (o.label ?? String.fromCharCode(65 + i)).toUpperCase(), text: o.text ?? "" }));
   const jsonInvalid = raw.trim() !== "" && raw.trim() !== "[]" && rows.length === 0;
   const [showRaw, setShowRaw] = useState(jsonInvalid);
+  const [activeOption, setActiveOption] = useState(0);
+  const optionRefs = useRef<Record<number, HTMLInputElement | null>>({});
   const correct = (correctAnswer ?? "").trim().toUpperCase();
 
   const commit = (next: { label: string; text: string }[], nextCorrect?: string) =>
@@ -236,19 +265,29 @@ function OptionsEditor({
     commit([...rows, { label: letter || String.fromCharCode(65 + rows.length), text: "" }]);
   };
   const seedAD = () => commit(["A", "B", "C", "D"].map((l) => ({ label: l, text: "" })));
+  const activeText = rows[activeOption]?.text ?? "";
 
   return (
     <div className="grid gap-1">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="text-xs font-medium text-gray-500">Options</span>
-        <button
-          type="button"
-          onClick={() => setShowRaw((v) => !v)}
-          className={`inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] font-medium ${showRaw ? "bg-gray-800 text-white" : "text-gray-500 hover:bg-gray-100"}`}
-          title="Edit raw JSON"
-        >
-          <Braces className="h-3 w-3" /> JSON
-        </button>
+        <div className="flex flex-wrap items-center gap-1.5">
+          {!showRaw && rows.length > 0 && (
+            <TextFormatToolbar
+              getInput={() => optionRefs.current[activeOption] ?? null}
+              value={activeText}
+              onChange={(next) => setText(activeOption, next)}
+            />
+          )}
+          <button
+            type="button"
+            onClick={() => setShowRaw((v) => !v)}
+            className={`inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] font-medium ${showRaw ? "bg-gray-800 text-white" : "text-gray-500 hover:bg-gray-100"}`}
+            title="Edit raw JSON"
+          >
+            <Braces className="h-3 w-3" /> JSON
+          </button>
+        </div>
       </div>
 
       {showRaw ? (
@@ -292,9 +331,13 @@ function OptionsEditor({
                   aria-label="Option label"
                 />
                 <input
+                  ref={(node) => {
+                    optionRefs.current[i] = node;
+                  }}
                   value={option.text}
+                  onFocus={() => setActiveOption(i)}
                   onChange={(event) => setText(i, event.target.value)}
-                  placeholder="Option text (KaTeX $…$)"
+                  placeholder="Option text (KaTeX $…$ / ++underline++)"
                   className="min-w-0 flex-1 rounded border border-gray-300 px-2 py-1 text-sm"
                   aria-label="Option text"
                 />
@@ -383,6 +426,7 @@ function questionContentFromCandidate(
     optTextCount: textCount,
     optImgCount: hasBlock ? 4 : imageLetters,
     hasStemImageLink: links.some((link) => link.targetType === "STEM"),
+    hasStimulusImageLink: links.some((link) => link.targetType === "STIMULUS"),
   });
 }
 
@@ -986,15 +1030,19 @@ export function FileReviewClient({
             <Section title="Question" subtitle={isMc ? "multiple choice" : "numeric response"}>
               <div className="grid gap-4 lg:grid-cols-2">
                 <div className="grid gap-3">
-                  <label className="grid gap-1">
-                    <span className="text-xs font-medium text-gray-500">Stem</span>
-                    <textarea value={stripMarkdownImageRefs(draft.stem)} onChange={(event) => setDraft({ ...draft, stem: event.target.value })} className="min-h-32 rounded-md border border-gray-300 px-3 py-2 text-sm" />
-                  </label>
+                  <DraftFormattedTextarea
+                    label="Stem"
+                    value={stripMarkdownImageRefs(draft.stem)}
+                    onChange={(stem) => setDraft({ ...draft, stem })}
+                    className="min-h-32 rounded-md border border-gray-300 px-3 py-2 text-sm"
+                  />
                   {(isMc || draft.stimulus) && (
-                    <label className="grid gap-1">
-                      <span className="text-xs font-medium text-gray-500">Stimulus</span>
-                      <textarea value={stripMarkdownImageRefs(draft.stimulus)} onChange={(event) => setDraft({ ...draft, stimulus: event.target.value })} className="min-h-20 rounded-md border border-gray-300 px-3 py-2 text-sm" />
-                    </label>
+                    <DraftFormattedTextarea
+                      label="Stimulus"
+                      value={stripMarkdownImageRefs(draft.stimulus)}
+                      onChange={(stimulus) => setDraft({ ...draft, stimulus })}
+                      className="min-h-20 rounded-md border border-gray-300 px-3 py-2 text-sm"
+                    />
                   )}
                   {isMc && (
                     <OptionsEditor
@@ -1013,7 +1061,18 @@ export function FileReviewClient({
                       <Input value={draft.topicName ?? ""} onChange={(event) => setDraft({ ...draft, topicName: event.target.value })} />
                     </label>
                   </div>
-                  {parseWarnings(draft.warningsJson).length > 0 && <p className="text-sm text-amber-700">{parseWarnings(draft.warningsJson).join(" ")}</p>}
+                  {(() => {
+                    const notes = parseWarnings(draft.warningsJson, draft.correctAnswer);
+                    if (notes.length === 0) return null;
+                    const warnings = notes.filter((note) => !isIngestWarningInfo(note));
+                    const info = notes.filter((note) => isIngestWarningInfo(note));
+                    return (
+                      <div className="space-y-1 text-sm">
+                        {warnings.length > 0 && <p className="text-amber-700">{warnings.join(" ")}</p>}
+                        {info.length > 0 && <p className="text-gray-500">{info.join(" ")}</p>}
+                      </div>
+                    );
+                  })()}
                 </div>
                 <div className="grid content-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
                   <p className="text-xs font-medium uppercase text-gray-400">Rendered preview</p>
@@ -1047,10 +1106,12 @@ export function FileReviewClient({
                     <span className="text-xs font-medium text-gray-500">Correct answer</span>
                     <Input value={draft.correctAnswer ?? ""} onChange={(event) => setDraft({ ...draft, correctAnswer: event.target.value })} />
                   </label>
-                  <label className="grid gap-1">
-                    <span className="text-xs font-medium text-gray-500">Explanation</span>
-                    <textarea value={stripMarkdownImageRefs(draft.explanation)} onChange={(event) => setDraft({ ...draft, explanation: event.target.value })} className="min-h-28 rounded-md border border-gray-300 px-3 py-2 text-sm" />
-                  </label>
+                  <DraftFormattedTextarea
+                    label="Explanation"
+                    value={stripMarkdownImageRefs(draft.explanation)}
+                    onChange={(explanation) => setDraft({ ...draft, explanation })}
+                    className="min-h-28 rounded-md border border-gray-300 px-3 py-2 text-sm"
+                  />
                   {stripMarkdownImageRefs(draft.explanation) && (
                     <div className="rounded-md border border-gray-200 bg-gray-50 p-3">
                       <p className="mb-1 text-xs font-medium uppercase text-gray-400">Rendered preview</p>
@@ -1244,7 +1305,7 @@ export function FileReviewClient({
             <Section title="Finish" defaultOpen={false}>
               <ul className="grid gap-1 text-sm">
                 <li className={draftCls && draftCls.fields.stem !== "crit" && draftCls.fields.stem !== "warn" ? "text-green-700" : "text-amber-700"}>
-                  {draftCls && draftCls.fields.stem !== "crit" && draftCls.fields.stem !== "warn" ? "✓" : "✗"} Question text ready
+                  {draftCls && draftCls.fields.stem !== "crit" && draftCls.fields.stem !== "warn" ? "✓" : "✗"} Question content ready (text or image)
                 </li>
                 <li className={draft.correctAnswer ? "text-green-700" : "text-amber-700"}>
                   {draft.correctAnswer ? "✓" : "✗"} Correct answer set

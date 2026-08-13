@@ -13,7 +13,17 @@ export async function POST(req: NextRequest) {
 
   const data = await req.json();
   const { topicId, subskillId, difficulty, type, stem, stimulus, explanation, imageUrl, supportsGraph, correctAnswer, status, options, ingestCandidateId } = data;
-  const validationErrors = validateQuestionPayload({ topicId, difficulty, type, stem, explanation, correctAnswer, status, options });
+  const validationErrors = validateQuestionPayload({
+    topicId,
+    difficulty,
+    type,
+    stem,
+    explanation,
+    imageUrl,
+    correctAnswer,
+    status,
+    options,
+  });
   if (validationErrors.length > 0) {
     return NextResponse.json({ error: "Validation failed.", errors: validationErrors }, { status: 400 });
   }
@@ -49,11 +59,13 @@ export async function POST(req: NextRequest) {
         correctAnswer,
         status,
         options: type === "MC" ? {
-          create: officialOptions.filter((o: { text: string }) => o.text).map((o: { label: string; text: string; imageUrl?: string | null }) => ({
-            label: o.label,
-            text: o.text,
-            imageUrl: o.imageUrl || null,
-          })),
+          create: officialOptions
+            .filter((o: { text?: string; imageUrl?: string | null }) => Boolean(o.text?.trim() || o.imageUrl?.trim()))
+            .map((o: { label: string; text?: string; imageUrl?: string | null }) => ({
+              label: o.label,
+              text: o.text ?? "",
+              imageUrl: o.imageUrl || null,
+            })),
         } : undefined,
       },
     });

@@ -38,3 +38,12 @@ body {
 .math-content .katex {
   font-size: 1em;
 }
+
+.math-content u {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.math-content strong {
+  font-weight: 600;
+}

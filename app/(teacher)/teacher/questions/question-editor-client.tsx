@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, Sigma, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { MathContent } from "@/components/math-content";
+import { TextFormatToolbar } from "@/components/text-format-toolbar";
 import { QuestionMedia } from "@/components/question-media";
 import { TaxonomyPicker } from "@/components/taxonomy-picker";
 import {
@@ -94,7 +95,18 @@ function splitFormulaParts(content: string) {
   return content.split(formulaPattern).filter(Boolean);
 }
 
-export function QuestionEditor({ topics, initial, sourceContext }: { topics: TopicInfo[]; initial?: QuestionData; sourceContext?: SourceContext }) {
+export function QuestionEditor({
+  topics,
+  initial,
+  sourceContext,
+  showGraphOption = false,
+}: {
+  topics: TopicInfo[];
+  initial?: QuestionData;
+  sourceContext?: SourceContext;
+  /** Admin feature flag: QUESTION_GRAPH_VISUALIZATION */
+  showGraphOption?: boolean;
+}) {
   const router = useRouter();
   const [topicId, setTopicId] = useState(initial?.topicId ?? "");
   // Subskill is hidden in the editor (unused in the source taxonomy); keep any
@@ -127,9 +139,16 @@ export function QuestionEditor({ topics, initial, sourceContext }: { topics: Top
   const [formulaDisplayMode, setFormulaDisplayMode] = useState(false);
   const [formulaOriginal, setFormulaOriginal] = useState<string | null>(null);
   const [sourceOpen, setSourceOpen] = useState<Record<string, boolean>>({});
+  const fieldRefs = useRef<Record<string, HTMLTextAreaElement | null>>({});
 
   const selectedTopic = useMemo(() => topics.find((topic) => topic.id === topicId), [topicId, topics]);
   const isMathQuestion = selectedTopic?.sectionLabel === "Mathematics";
+
+  function bindFieldRef(key: string) {
+    return (node: HTMLTextAreaElement | null) => {
+      fieldRefs.current[key] = node;
+    };
+  }
 
   function updateOption(label: string, text: string) {
     setOptions((prev) => prev.map((o) => (o.label === label ? { ...o, text } : o)));
@@ -190,18 +209,26 @@ export function QuestionEditor({ topics, initial, sourceContext }: { topics: Top
     setTargetValue(target, current.replace(formula, "").replace(/\s{2,}/g, " ").trim());
   }
 
-  function renderFormulaButton(target: FormulaTarget) {
-    if (!isMathQuestion) return null;
-    return (
-      <Button type="button" variant="secondary" size="sm" onClick={() => openFormulaModal(target)}>
-        <Sigma size={14} />
-        Formula
-      </Button>
-    );
-  }
-
   function targetKey(target: FormulaTarget) {
     return target.kind === "option" ? `${target.kind}-${target.optionLabel}` : target.kind;
+  }
+
+  function renderFieldToolbar(target: FormulaTarget) {
+    const key = targetKey(target);
+    return (
+      <TextFormatToolbar
+        getInput={() => fieldRefs.current[key] ?? null}
+        value={getTargetValue(target)}
+        onChange={(next) => setTargetValue(target, next)}
+      >
+        {isMathQuestion ? (
+          <Button type="button" variant="secondary" size="sm" onClick={() => openFormulaModal(target)}>
+            <Sigma size={14} />
+            Formula
+          </Button>
+        ) : null}
+      </TextFormatToolbar>
+    );
   }
 
   function renderVisualMathField({
@@ -222,7 +249,15 @@ export function QuestionEditor({ topics, initial, sourceContext }: { topics: Top
     const showSource = sourceOpen[key] ?? !hasFormula;
 
     if (!hasFormula) {
-      return <Textarea value={value} onChange={(e) => onChange(e.target.value)} rows={rows} placeholder={placeholder} />;
+      return (
+        <Textarea
+          ref={bindFieldRef(key)}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          rows={rows}
+          placeholder={placeholder}
+        />
+      );
     }
 
     return (
@@ -234,7 +269,7 @@ export function QuestionEditor({ topics, initial, sourceContext }: { topics: Top
               if (!isFormula) {
                 return (
                   <span key={`${part}-${index}`} className="whitespace-pre-wrap text-gray-800">
-                    {part}
+                    <MathContent content={part} className="inline text-sm" />
                   </span>
                 );
               }
@@ -278,6 +313,7 @@ export function QuestionEditor({ topics, initial, sourceContext }: { topics: Top
         </button>
         {showSource && (
           <Textarea
+            ref={bindFieldRef(key)}
             value={value}
             onChange={(e) => onChange(e.target.value)}
             rows={rows}
@@ -351,7 +387,7 @@ export function QuestionEditor({ topics, initial, sourceContext }: { topics: Top
         </div>
       </div>
 
-      {isMathQuestion && (
+      {isMathQuestion && showGraphOption && (
         <Card as="label" padding="sm" className="flex items-start gap-3">
           <input
             type="checkbox"
@@ -372,10 +408,12 @@ export function QuestionEditor({ topics, initial, sourceContext }: { topics: Top
       <div>
         <div className="mb-1 flex items-center justify-between gap-3">
           <label className="block text-sm font-medium text-gray-700">Stimulus / Passage (optional)</label>
-          {renderFormulaButton({ kind: "stimulus", label: "Stimulus / Passage" })}
+          {renderFieldToolbar({ kind: "stimulus", label: "Stimulus / Passage" })}
         </div>
         <p className="text-xs text-gray-400 mb-1">
-          {isMathQuestion ? "Use the Formula button to insert rendered math." : "Will appear in left column of player."}
+          {isMathQuestion
+            ? "Bold/Underline wrap selection; Formula inserts LaTeX. Prose: **bold** / ++underline++."
+            : "Select text then Bold/Underline (++phrase++). Appears in the left column of the player."}
         </p>
         {renderVisualMathField({
           target: { kind: "stimulus", label: "Stimulus / Passage" },
@@ -399,7 +437,7 @@ export function QuestionEditor({ topics, initial, sourceContext }: { topics: Top
       <div>
         <div className="mb-1 flex items-center justify-between gap-3">
           <label className="block text-sm font-medium text-gray-700">Question Stem *</label>
-          {renderFormulaButton({ kind: "stem", label: "Question Stem" })}
+          {renderFieldToolbar({ kind: "stem", label: "Question Stem" })}
         </div>
         {renderVisualMathField({
           target: { kind: "stem", label: "Question Stem" },
@@ -442,7 +480,7 @@ export function QuestionEditor({ topics, initial, sourceContext }: { topics: Top
                   />
                   <QuestionMedia imageUrl={opt.imageUrl} className="bg-white" />
                 </div>
-                {renderFormulaButton({ kind: "option", label: `Option ${opt.label}`, optionLabel: opt.label })}
+                {renderFieldToolbar({ kind: "option", label: `Option ${opt.label}`, optionLabel: opt.label })}
               </div>
             ))}
             <p className="text-xs text-gray-400">Select the radio button next to the correct answer.</p>
@@ -464,7 +502,7 @@ export function QuestionEditor({ topics, initial, sourceContext }: { topics: Top
       <div>
         <div className="mb-1 flex items-center justify-between gap-3">
           <label className="block text-sm font-medium text-gray-700">Explanation</label>
-          {renderFormulaButton({ kind: "explanation", label: "Explanation" })}
+          {renderFieldToolbar({ kind: "explanation", label: "Explanation" })}
         </div>
         {renderVisualMathField({
           target: { kind: "explanation", label: "Explanation" },

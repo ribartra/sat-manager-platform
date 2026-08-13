@@ -94,9 +94,12 @@ export async function computeExtractedTests(batchId: string): Promise<ExtractedT
   const optionBlock = new Set<string>();
   const optionLetters = new Map<string, Set<string>>();
   const stemImageLinks = new Set<string>();
+  const stimulusImageLinks = new Set<string>();
   for (const link of imageLinks) {
     if (link.targetType === "STEM") {
       stemImageLinks.add(link.candidateId);
+    } else if (link.targetType === "STIMULUS") {
+      stimulusImageLinks.add(link.candidateId);
     } else if (link.targetType === "OPTION_BLOCK") {
       optionBlock.add(link.candidateId);
     } else if (link.targetType === "OPTION" && link.optionLabel) {
@@ -244,6 +247,7 @@ export async function computeExtractedTests(batchId: string): Promise<ExtractedT
               optImgCount: oc.img,
               hasStemImageLink:
                 !!(official.imageUrl && official.imageUrl.trim()) || stemImageLinks.has(c.id),
+              hasStimulusImageLink: stimulusImageLinks.has(c.id),
             });
           })()
         : buildQuestionContent({
@@ -256,6 +260,7 @@ export async function computeExtractedTests(batchId: string): Promise<ExtractedT
             optTextCount: textOptionCount(c.optionsJson),
             optImgCount: optionBlock.has(c.id) ? 4 : (optionLetters.get(c.id)?.size ?? 0),
             hasStemImageLink: stemImageLinks.has(c.id),
+            hasStimulusImageLink: stimulusImageLinks.has(c.id),
           });
 
       const cls = classifyQuestion(content);

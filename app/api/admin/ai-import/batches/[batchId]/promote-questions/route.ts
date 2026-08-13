@@ -80,11 +80,6 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       skipped.push({ candidateId: candidate.id, reason: "Candidate must be READY or REVIEWED." });
       continue;
     }
-    if (!candidate.stem || !candidate.correctAnswer) {
-      skipped.push({ candidateId: candidate.id, reason: "Candidate needs stem and answer." });
-      continue;
-    }
-
     const imageLinks = (linksByCandidate.get(candidate.id) ?? []).map((link) => ({
       targetType: link.targetType,
       optionLabel: link.optionLabel,
@@ -95,6 +90,15 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
         mimeType: imageById.get(link.imageArtifactId)?.mimeType ?? null,
       },
     }));
+    const hasStemImage = imageLinks.some((link) => link.targetType === "STEM");
+    if ((!candidate.stem?.trim() && !hasStemImage) || !candidate.correctAnswer) {
+      skipped.push({
+        candidateId: candidate.id,
+        reason: "Candidate needs stem (text or image) and answer.",
+      });
+      continue;
+    }
+
     const draft = buildQuestionDraft({ candidate, topics, imageLinks });
     const validationErrors = validateQuestionPayload(draft);
     if (validationErrors.length > 0) {

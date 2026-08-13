@@ -70,6 +70,7 @@ async function main() {
       "STUDENT_SELF_ENROLLMENT",
       "TEACHER_PROGRAM_MANAGEMENT",
       "TEACHER_GROUP_MANAGEMENT",
+      "QUESTION_GRAPH_VISUALIZATION",
     ].map((key) =>
       prisma.appSetting.upsert({
         where: { key },

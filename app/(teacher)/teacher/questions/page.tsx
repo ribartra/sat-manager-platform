@@ -130,7 +130,7 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
             {questions.map((q) => (
               <tr key={q.id} className="hover:bg-gray-50">
                 <td className="px-4 py-3 max-w-xs">
-                  <MathContent content={q.stem} className="line-clamp-2 text-sm text-gray-800" />
+                  <MathContent content={q.stem} className="max-h-28 overflow-auto text-sm text-gray-800" />
                 </td>
                 <td className="px-4 py-3">
                   <p className="text-xs text-gray-500">{q.topic.domain.section.label} / {q.topic.domain.name}</p>

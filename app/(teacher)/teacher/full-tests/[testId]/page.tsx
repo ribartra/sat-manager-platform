@@ -134,7 +134,7 @@ export default async function FullTestDetailPage({ params }: PageProps) {
                         <Badge variant="default">{item.question.type}</Badge>
                         <Badge variant="default">{item.question.topic.name}</Badge>
                       </div>
-                      <MathContent content={item.question.stem} className="line-clamp-2 text-sm text-gray-800" />
+                      <MathContent content={item.question.stem} className="max-h-28 overflow-auto text-sm text-gray-800" />
                     </div>
                   ))}
                   {module.questions.length === 0 && (

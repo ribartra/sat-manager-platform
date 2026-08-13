@@ -79,7 +79,7 @@ export default async function FullTestResultsPage({ params }: PageProps) {
                       <div className="min-w-0">
                         <div className="flex gap-1 font-medium text-gray-800">
                           <span className="shrink-0">Q{index + 1}.</span>
-                          <MathContent content={item.question.stem} className="line-clamp-2" />
+                          <MathContent content={item.question.stem} className="max-h-28 overflow-auto text-sm" />
                         </div>
                         <QuestionMedia imageUrl={item.question.imageUrl} alt={`Question ${index + 1} image`} className="mt-2 max-w-sm" />
                         {item.question.options.some((option) => option.imageUrl) && (

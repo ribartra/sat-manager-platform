@@ -98,7 +98,8 @@ export async function POST(req: Request, { params }: RouteContext) {
   const existingArtifact = await prisma.ingestPromotionArtifact.findUnique({
     where: { batchId_artifactType_groupKey: { batchId, artifactType: "FULL_PRACTICE_TEST", groupKey } },
   });
-  const testName = `Imported Test ${testNumber}${partial ? ` (partial ${moduleCounts.reduce((sum, count) => sum + count, 0)}/${EXPECTED_MODULE_COUNTS.reduce((sum, count) => sum + count, 0)})` : ""}`;
+  // Canonical display name for standardized SAT exams (no "Imported" / partial suffix).
+  const testName = `TEST ${testNumber}`;
 
   const test = await prisma.$transaction(async (tx) => {
     // Stamp M1/M2 skill + EASY/HARD before wiring so the draft exam is standardized.

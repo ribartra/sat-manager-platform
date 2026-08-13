@@ -49,6 +49,7 @@ export function buildQuestionContent(input: {
   optTextCount: number;
   optImgCount: number;
   hasStemImageLink: boolean;
+  hasStimulusImageLink?: boolean;
 }): QuestionContent {
   const combined = `${input.stem ?? ""}\n${input.stimulus ?? ""}`;
   const artifacts = detectStemArtifacts(combined);
@@ -70,6 +71,7 @@ export function buildQuestionContent(input: {
     hasUnresolvedMarkdownImage: artifacts.hasUnresolvedMarkdownImage,
     hasTableAssetPlaceholder: artifacts.hasTableAssetPlaceholder,
     hasStemImageLink: input.hasStemImageLink,
+    hasStimulusImageLink: Boolean(input.hasStimulusImageLink),
     needsAttachedImage: textNeedsAttachedImage(combined),
   };
 }
@@ -91,6 +93,8 @@ export interface QuestionContent {
   hasTableAssetPlaceholder?: boolean;
   /** Candidate (or official) already has a STEM image link / imageUrl */
   hasStemImageLink?: boolean;
+  /** Candidate already has a STIMULUS image link */
+  hasStimulusImageLink?: boolean;
   /** Text implies a figure/graph/table that needs an attached image */
   needsAttachedImage?: boolean;
 }
@@ -114,12 +118,15 @@ export interface QuestionSidebarState {
 
 // crit = unusable for a student; warn = needs recovery; info = worth noting.
 // `level` escalates to the worst field; info never raises it.
+// Text OR an attached image counts as content for stem / stimulus / options.
 export function classifyQuestion(c: QuestionContent): QuestionClassification {
   const notes: string[] = [];
   const isMC = c.type === "MC";
+  const hasStemContent = c.stemLen > 0 || Boolean(c.hasStemImageLink);
+  const hasStimulusContent = c.stimLen > 0 || Boolean(c.hasStimulusImageLink);
 
-  let stem: FieldState = c.stemLen > 0 ? "ok" : "crit";
-  if (stem === "crit") notes.push("Question text is missing");
+  let stem: FieldState = hasStemContent ? "ok" : "crit";
+  if (stem === "crit") notes.push("Question content is missing (text or image)");
 
   if (stem !== "crit" && c.hasEmbeddedMarkup) {
     stem = "warn";
@@ -164,13 +171,8 @@ export function classifyQuestion(c: QuestionContent): QuestionClassification {
     notes.push("Answer choices are missing");
   }
 
-  let stimulus: FieldState;
-  if (c.section === "RW") {
-    stimulus = c.stimLen > 0 ? "ok" : "warn";
-    if (stimulus === "warn") notes.push("Passage is missing");
-  } else {
-    stimulus = "na";
-  }
+  // Stimulus/passage is optional. When present as text or image, mark ok; otherwise na.
+  const stimulus: FieldState = hasStimulusContent ? "ok" : "na";
 
   const explanation: FieldState = c.hasExpl ? "ok" : "info";
   if (explanation === "info") notes.push("Explanation is missing");
