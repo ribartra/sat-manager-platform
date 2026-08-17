@@ -139,8 +139,10 @@ export default function InviteStudentPage() {
           </div>
         )}
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        <Button type="submit" disabled={loading}>{loading ? "Creating..." : "Create Invite"}</Button>
+        {error && <p className="text-sm text-red-600" role="alert">{error}</p>}
+        <Button type="submit" disabled={loading || !programId}>
+          {loading ? "Creating..." : "Create Invite"}
+        </Button>
       </Card>
 
       {inviteUrl && (

@@ -33,14 +33,14 @@ export default async function StudentLayout({ children }: { children: React.Reac
   }));
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex min-h-screen flex-col">
       <NavStudent
         userName={session.user.name}
         avatarUrl={user.avatarUrl}
         isImpersonated={isImpersonated}
         hasActiveEnrollment={hasActiveEnrollment}
       />
-      <main className="flex-1">{children}</main>
+      <main className="flex min-h-0 flex-1 flex-col">{children}</main>
     </div>
   );
 }

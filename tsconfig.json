@@ -31,5 +31,5 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules", "scratchpad"]
+  "exclude": ["node_modules", "scratchpad", "e2e", "playwright.config.ts"]
 }
