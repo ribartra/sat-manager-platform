@@ -34,13 +34,18 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
     select: { id: true, name: true, lastActiveAt: true },
   });
   const filteredStudents = students.filter((student) => !q || student.name.toLowerCase().includes(q.toLowerCase()));
-  const selectableStudents =
+  // Keep the currently selected student visible even if the search filter excludes them.
+  const matchedStudents =
     params.studentId && students.some((student) => student.id === params.studentId) && !filteredStudents.some((student) => student.id === params.studentId)
       ? [students.find((student) => student.id === params.studentId)!, ...filteredStudents]
       : filteredStudents;
+  // Never render an empty student dropdown when the teacher has students:
+  // if search yields no matches, fall back to the full list and show a hint.
+  const searchHadNoMatches = Boolean(q) && filteredStudents.length === 0 && students.length > 0;
+  const selectableStudents = matchedStudents.length > 0 ? matchedStudents : students;
   const selectedStudentId = params.studentId && students.some((student) => student.id === params.studentId)
     ? params.studentId
-    : filteredStudents[0]?.id ?? students[0]?.id;
+    : selectableStudents[0]?.id;
 
   const answers = selectedStudentId
     ? await prisma.attemptAnswer.findMany({
@@ -112,19 +117,48 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
           <h1 className="text-xl font-semibold text-gray-900">Student Analytics</h1>
           <p className="mt-1 text-sm text-gray-500">Individual progress, weak skills and reinforcement focus.</p>
         </div>
-        <form className="flex flex-wrap gap-2">
-          <input
-            name="q"
-            defaultValue={q}
-            placeholder="Search student..."
-            className="rounded-md border border-gray-300 px-3 py-2 text-sm"
-          />
-          <select name="studentId" defaultValue={selectedStudentId ?? ""} className="rounded-md border border-gray-300 px-3 py-2 text-sm">
-            {selectableStudents.map((student) => (
-              <option key={student.id} value={student.id}>{student.name}</option>
-            ))}
-          </select>
-          <button className="ml-2 rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700">View</button>
+        <form method="get" className="flex flex-col items-stretch gap-1 sm:items-end">
+          <div className="flex flex-wrap items-end gap-2">
+            <label className="flex min-w-[10rem] flex-1 flex-col gap-1 text-xs font-medium text-gray-500">
+              Search
+              <input
+                name="q"
+                defaultValue={q}
+                placeholder="Type a student name..."
+                className="rounded-md border border-gray-300 px-3 py-2 text-sm font-normal text-gray-900"
+              />
+            </label>
+            <label className="flex min-w-[14rem] flex-1 flex-col gap-1 text-xs font-medium text-gray-500">
+              Student
+              <select
+                name="studentId"
+                defaultValue={selectedStudentId ?? ""}
+                className="rounded-md border border-gray-300 px-3 py-2 text-sm font-normal text-gray-900"
+                aria-label="Select a student to view analytics"
+              >
+                {students.length === 0 ? (
+                  <option value="">No students available</option>
+                ) : (
+                  selectableStudents.map((student) => (
+                    <option key={student.id} value={student.id}>
+                      {student.name.trim() || "Unnamed student"}
+                    </option>
+                  ))
+                )}
+              </select>
+            </label>
+            <button
+              type="submit"
+              className="rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            >
+              View
+            </button>
+          </div>
+          {searchHadNoMatches && (
+            <p className="text-xs text-amber-700">
+              No students match “{q}”. Showing the full student list below.
+            </p>
+          )}
         </form>
       </div>
 
