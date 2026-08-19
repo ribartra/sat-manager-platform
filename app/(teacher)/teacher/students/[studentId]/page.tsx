@@ -2,7 +2,8 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { formatDate, formatTime, scorePercent } from "@/lib/utils";
+import { formatDate, formatTime } from "@/lib/utils";
+import { scoreBandTextClass, scoreBandBarClass } from "@/lib/score-band";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody } from "@/components/ui/card";
 import { ChevronLeft, Eye } from "lucide-react";
@@ -10,7 +11,7 @@ import { StudentDetailActions } from "./actions-client";
 import { refreshAssignmentStates } from "@/lib/assignments";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { studentAccessWhereFor } from "@/lib/program-scope";
-import { averageScaledScores, resolvePracticeSetAttemptScore } from "@/lib/practice-set-scoring";
+import { resolvePracticeSetAttemptScore } from "@/lib/practice-set-scoring";
 
 interface PageProps {
   params: Promise<{ studentId: string }>;
@@ -78,12 +79,15 @@ export default async function StudentDetailPage({ params }: PageProps) {
     scoredAttempts.length > 0
       ? Math.round(scoredAttempts.reduce((sum, row) => sum + row.sat.scorePercent, 0) / scoredAttempts.length)
       : null;
-  const rwAvg = averageScaledScores(
-    scoredAttempts.filter((row) => row.sat.scoreSection === "RW").map((row) => row.sat.scaledScore),
-  );
-  const mathAvg = averageScaledScores(
-    scoredAttempts.filter((row) => row.sat.scoreSection === "MATH").map((row) => row.sat.scaledScore),
-  );
+
+  const examAttempts = await prisma.fullPracticeTestAttempt.findMany({
+    where: { studentId, status: "SUBMITTED" },
+    include: {
+      test: { select: { name: true } },
+    },
+    orderBy: { submittedAt: "desc" },
+    take: 20,
+  });
 
   // Progress by skill
   const topicStats: Record<string, { name: string; correct: number; total: number; count: number }> = {};
@@ -155,18 +159,16 @@ export default async function StudentDetailPage({ params }: PageProps) {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 gap-4 mb-8 md:grid-cols-3 lg:grid-cols-6">
+      <div className="grid grid-cols-2 gap-4 mb-8 md:grid-cols-4">
         {[
           { label: "Sets completed", value: totalSets },
-          { label: "Avg %", value: avgScore !== null ? `${avgScore}%` : "—" },
-          { label: "SAT R&W avg", value: rwAvg ?? "—" },
-          { label: "SAT Math avg", value: mathAvg ?? "—" },
+          { label: "Avg %", value: avgScore !== null ? `${avgScore}%` : "—", className: scoreBandTextClass(avgScore) },
           { label: "Total time", value: totalTime > 0 ? formatTime(totalTime) : "—" },
           { label: "Pending tasks", value: assignments.length },
-        ].map(({ label, value }) => (
+        ].map(({ label, value, className }) => (
           <Card key={label}>
             <CardBody>
-              <p className="text-2xl font-bold text-gray-900">{value}</p>
+              <p className={`text-2xl font-bold ${className ?? "text-gray-900"}`}>{value}</p>
               <p className="text-xs text-gray-500 mt-0.5">{label}</p>
             </CardBody>
           </Card>
@@ -175,7 +177,8 @@ export default async function StudentDetailPage({ params }: PageProps) {
 
       <div className="grid grid-cols-3 gap-6">
         {/* History */}
-        <div className="col-span-2">
+        <div className="col-span-2 space-y-6">
+          <div>
           <h2 className="text-base font-semibold text-gray-900 mb-3">Practice History</h2>
           <Card className="overflow-hidden">
             {attempts.length === 0 ? (
@@ -204,10 +207,9 @@ export default async function StudentDetailPage({ params }: PageProps) {
                         </td>
                         <td className="px-4 py-3 text-right">
                           <span className="font-medium">{correct}/{total}</span>
-                          <span className={`ml-1 text-xs font-semibold ${pct >= 80 ? "text-green-600" : pct >= 60 ? "text-yellow-600" : "text-red-500"}`}>
+                          <span className={`ml-1 text-xs font-semibold ${scoreBandTextClass(pct)}`}>
                             ({pct}%)
                           </span>
-                          <p className="text-xs text-gray-500">SAT {sat.scoreSection === "MATH" ? "Math" : "R&W"} {sat.scaledScore}</p>
                         </td>
                         <td className="px-4 py-3 text-right text-gray-500">
                           {a.totalTime ? formatTime(a.totalTime) : "—"}
@@ -224,6 +226,43 @@ export default async function StudentDetailPage({ params }: PageProps) {
               </table>
             )}
           </Card>
+          </div>
+
+          <div>
+            <h2 className="text-base font-semibold text-gray-900 mb-3">Exam History</h2>
+            <Card className="overflow-hidden">
+              {examAttempts.length === 0 ? (
+                <div className="text-center py-10 text-gray-400 text-sm">No completed full practice tests yet.</div>
+              ) : (
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-gray-50 border-b border-gray-200">
+                      <th className="px-4 py-2.5 text-left font-medium text-gray-500">Date</th>
+                      <th className="px-4 py-2.5 text-left font-medium text-gray-500">Exam</th>
+                      <th className="px-4 py-2.5 text-right font-medium text-gray-500">SAT Total</th>
+                      <th className="px-4 py-2.5 text-right font-medium text-gray-500">R&amp;W</th>
+                      <th className="px-4 py-2.5 text-right font-medium text-gray-500">Math</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {examAttempts.map((exam) => (
+                      <tr key={exam.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
+                          {exam.submittedAt ? formatDate(exam.submittedAt) : "—"}
+                        </td>
+                        <td className="px-4 py-3 font-medium text-gray-900">
+                          {exam.test.name}
+                        </td>
+                        <td className="px-4 py-3 text-right font-semibold text-gray-900">{exam.totalScore ?? "—"}</td>
+                        <td className="px-4 py-3 text-right text-gray-700">{exam.rwScore ?? "—"}</td>
+                        <td className="px-4 py-3 text-right text-gray-700">{exam.mathScore ?? "—"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </Card>
+          </div>
         </div>
 
         {/* Progress by skill */}
@@ -236,12 +275,12 @@ export default async function StudentDetailPage({ params }: PageProps) {
                 <Card key={ts.name} padding="sm">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs font-medium text-gray-700 truncate">{ts.name}</span>
-                    <span className={`text-xs font-semibold ${avg >= 80 ? "text-green-600" : avg >= 60 ? "text-yellow-600" : "text-red-500"}`}>
+                    <span className={`text-xs font-semibold ${scoreBandTextClass(avg)}`}>
                       {avg}%
                     </span>
                   </div>
                   <div className="h-1.5 w-full rounded-full bg-gray-100">
-                    <div className={`h-full rounded-full ${avg >= 80 ? "bg-green-400" : avg >= 60 ? "bg-yellow-400" : "bg-red-400"}`} style={{ width: `${avg}%` }} />
+                    <div className={`h-full rounded-full ${scoreBandBarClass(avg)}`} style={{ width: `${avg}%` }} />
                   </div>
                   <p className="text-xs text-gray-400 mt-1">{ts.count} sets · {ts.correct}/{ts.total}</p>
                 </Card>

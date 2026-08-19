@@ -60,6 +60,11 @@ async function main() {
       update: { value: "false" },
       create: { key: "QUESTION_GRAPH_VISUALIZATION", value: "false" },
     }),
+    prisma.appSetting.upsert({
+      where: { key: "MATERIALS_MODULE" },
+      update: { value: "false" },
+      create: { key: "MATERIALS_MODULE", value: "false" },
+    }),
   ]);
 
   // ─── TEACHERS ────────────────────────────────────────────────────────────────

@@ -71,6 +71,7 @@ async function main() {
       "TEACHER_PROGRAM_MANAGEMENT",
       "TEACHER_GROUP_MANAGEMENT",
       "QUESTION_GRAPH_VISUALIZATION",
+      "MATERIALS_MODULE",
     ].map((key) =>
       prisma.appSetting.upsert({
         where: { key },

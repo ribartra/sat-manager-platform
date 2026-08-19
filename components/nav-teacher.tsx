@@ -26,6 +26,7 @@ interface NavTeacherProps {
   role?: string;
   showTeacherPrograms?: boolean;
   showTeacherGroups?: boolean;
+  showMaterials?: boolean;
 }
 
 interface NavLink {
@@ -130,20 +131,25 @@ export function NavTeacher({
   role,
   showTeacherPrograms = false,
   showTeacherGroups = false,
+  showMaterials = false,
 }: NavTeacherProps) {
   const pathname = usePathname();
   const visibleTeacherGroups = showTeacherPrograms
     ? teacherGroups
     : teacherGroups.filter((item) => !("href" in item && item.href === "/teacher/programs"));
   const visibleTeacherItems = visibleTeacherGroups.map((item) => {
-    if (!("links" in item) || item.label !== "Students") return item;
-    return {
-      ...item,
-      links:
+    if (!("links" in item)) return item;
+    let links = item.links;
+    if (item.label === "Students") {
+      links =
         role !== "ADMIN" && showTeacherGroups
-          ? item.links
-          : item.links.filter((link) => link.href !== "/teacher/groups"),
-    };
+          ? links
+          : links.filter((link) => link.href !== "/teacher/groups");
+    }
+    if (item.label === "Content" && !showMaterials) {
+      links = links.filter((link) => link.href !== "/teacher/materials");
+    }
+    return { ...item, links };
   });
   const navItems = role === "ADMIN" ? [...visibleTeacherItems, adminGroup] : visibleTeacherItems;
 

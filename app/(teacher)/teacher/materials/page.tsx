@@ -1,8 +1,12 @@
 import prisma from "@/lib/prisma";
+import { notFound } from "next/navigation";
 import { academicTopicWhere } from "@/lib/taxonomy";
 import { MaterialsClient } from "./materials-client";
+import { getFeatureSetting } from "@/lib/app-settings";
 
 export default async function TeacherMaterialsPage() {
+  if (!(await getFeatureSetting("MATERIALS_MODULE"))) notFound();
+
   const [topics, materials] = await Promise.all([
     prisma.topic.findMany({
       where: academicTopicWhere,

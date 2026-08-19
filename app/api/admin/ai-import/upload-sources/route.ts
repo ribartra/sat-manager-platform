@@ -9,6 +9,7 @@ export const maxDuration = 300;
 const MAX_UPLOAD_BYTES = 256 * 1024 * 1024;
 const ALLOWED_EXTENSIONS = [".pdf", ".docx"];
 const ALLOWED_CONTENT_TYPES = new Set(["PRACTICE_SET", "FULL_PRACTICE_TEST"]);
+const ALLOWED_ROLES = new Set(["QUESTION", "ANSWER", "EXPLANATION", "ANSWER_EXPLANATION"]);
 
 function hasAllowedExtension(fileName: string) {
   return ALLOWED_EXTENSIONS.some((extension) => fileName.toLowerCase().endsWith(extension));
@@ -25,6 +26,7 @@ export async function POST(req: NextRequest) {
 
   const formData = await req.formData();
   const files = formData.getAll("files").filter((file): file is File => file instanceof File);
+  const roles = formData.getAll("roles").map((value) => String(value).toUpperCase());
   const contentType = String(formData.get("contentType") || "PRACTICE_SET").toUpperCase();
   const name = String(formData.get("name") || "Questionnaire PDF/DOCX ingest");
 
@@ -33,6 +35,12 @@ export async function POST(req: NextRequest) {
   }
   if (files.length === 0) {
     return NextResponse.json({ error: "Select at least one PDF or DOCX file." }, { status: 400 });
+  }
+  if (roles.length > 0 && roles.length !== files.length) {
+    return NextResponse.json({ error: "Each uploaded file needs a role (Questions or Answers/Explanations)." }, { status: 400 });
+  }
+  if (roles.some((role) => !ALLOWED_ROLES.has(role))) {
+    return NextResponse.json({ error: "Invalid file role." }, { status: 400 });
   }
 
   const totalSize = files.reduce((sum, file) => sum + file.size, 0);
@@ -52,6 +60,7 @@ export async function POST(req: NextRequest) {
     if (typeof value === "string" && value.trim()) upstream.set(key, value.trim());
   }
   for (const file of files) upstream.append("files", file, file.name);
+  for (const role of roles) upstream.append("roles", role);
 
   const res = await fetch(ingestUrl("/batches/upload-sources"), {
     method: "POST",
@@ -73,6 +82,7 @@ export async function POST(req: NextRequest) {
         contentType,
         name,
         fileCount: files.length,
+        roles,
         totalSize,
         source: "QUESTIONNAIRE_EDITOR",
       }),

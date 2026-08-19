@@ -22,6 +22,7 @@ export default async function AdminSectionLayout({ children }: { children: React
     session.user.role === "ADMIN" || (await getFeatureSetting("TEACHER_PROGRAM_MANAGEMENT"));
   const showTeacherGroups =
     session.user.role === "ADMIN" || (await getFeatureSetting("TEACHER_GROUP_MANAGEMENT"));
+  const showMaterials = await getFeatureSetting("MATERIALS_MODULE");
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -31,6 +32,7 @@ export default async function AdminSectionLayout({ children }: { children: React
         role={session.user.role}
         showTeacherPrograms={showTeacherPrograms}
         showTeacherGroups={showTeacherGroups}
+        showMaterials={showMaterials}
       />
       <main className="flex-1 bg-gray-50">{children}</main>
     </div>

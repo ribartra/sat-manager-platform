@@ -361,23 +361,26 @@ export function FullTestPlayer({
           </Button>
         </div>
       </div>
-      <div className="grid flex-1 grid-cols-2 overflow-hidden">
-        <div className="overflow-y-auto border-r border-gray-200 bg-gray-50 p-6">
+      <div className="grid flex-1 grid-cols-1 overflow-hidden md:grid-cols-2">
+        <div className="space-y-4 overflow-y-auto border-r border-gray-200 bg-gray-50 p-6">
           {question.stimulus ? (
-            <MathContent content={question.stimulus} />
+            <MathContent content={question.stimulus} className="prose prose-base max-w-none text-gray-800" />
           ) : (
             <p className="text-sm text-gray-400">No passage.</p>
           )}
+          <div className="border-t border-gray-200 pt-4">
+            <MathContent content={question.stem} className="text-base font-medium text-gray-900 md:text-lg" />
+            <QuestionMedia imageUrl={question.imageUrl} alt={`Question ${question.id} image`} className="mt-4" />
+          </div>
         </div>
         <div className="overflow-y-auto p-6">
+          <p className="mb-3 text-xs font-medium uppercase tracking-wide text-gray-500">Answer choices</p>
           <MathToolPanel
             config={calculatorConfig}
             context="full-test"
             graphArtifacts={question.graphArtifacts}
             enabled={currentModule.section === "MATH"}
           />
-          <MathContent content={question.stem} className="mb-5 text-sm text-gray-900" />
-          <QuestionMedia imageUrl={question.imageUrl} alt={`Question ${question.id} image`} className="mb-5" />
           {question.type === "MC" ? (
             question.options.map((option) => (
               <button

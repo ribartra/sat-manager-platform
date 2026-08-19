@@ -1,9 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
+import { getFeatureSetting } from "@/lib/app-settings";
 
 interface RouteContext {
   params: Promise<{ materialId: string }>;
+}
+
+async function requireMaterialsEnabled() {
+  if (!(await getFeatureSetting("MATERIALS_MODULE"))) {
+    return NextResponse.json({ error: "Materials module is disabled." }, { status: 403 });
+  }
+  return null;
 }
 
 export async function PATCH(req: NextRequest, { params }: RouteContext) {
@@ -11,6 +19,8 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
   if (!session) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
+  const disabled = await requireMaterialsEnabled();
+  if (disabled) return disabled;
 
   const { materialId } = await params;
   const { title, description, body, url, topicId, status } = await req.json();
@@ -45,6 +55,8 @@ export async function DELETE(_req: NextRequest, { params }: RouteContext) {
   if (!session) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
+  const disabled = await requireMaterialsEnabled();
+  if (disabled) return disabled;
 
   const { materialId } = await params;
   const material = await prisma.studyMaterial.findUnique({ where: { id: materialId } });

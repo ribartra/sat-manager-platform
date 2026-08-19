@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
+import { getFeatureSetting } from "@/lib/app-settings";
 
 interface RouteContext {
   params: Promise<{ materialId: string }>;
@@ -9,6 +10,9 @@ interface RouteContext {
 export async function POST(_req: Request, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
   if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!(await getFeatureSetting("MATERIALS_MODULE"))) {
+    return NextResponse.json({ error: "Materials module is disabled." }, { status: 403 });
+  }
 
   const { materialId } = await params;
   const material = await prisma.studyMaterial.findUnique({ where: { id: materialId } });

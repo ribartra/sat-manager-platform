@@ -269,32 +269,28 @@ export function PracticeSetPlayer({
         </div>
       </div>
 
-      {/* Two-column player — scrolls inside; bottom bar stays pinned */}
+      {/* Two-column player — left: stimulus + stem; right: alternatives */}
       <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden md:grid-cols-2">
-        {/* Left: stimulus */}
-        <div className="hidden min-h-0 overflow-y-auto border-r border-gray-200 bg-gray-50 p-4 md:block md:p-5">
+        {/* Left: stimulus + enunciado */}
+        <div className="min-h-0 space-y-4 overflow-y-auto border-r border-gray-200 bg-gray-50 p-4 md:p-6">
           {question.stimulus ? (
-            <MathContent content={question.stimulus} className="prose prose-sm max-w-none leading-relaxed text-gray-800" />
+            <MathContent content={question.stimulus} className="prose prose-base max-w-none leading-relaxed text-gray-800" />
           ) : (
-            <div className="flex h-full items-center justify-center text-sm text-gray-300">
-              No reading passage for this question
-            </div>
+            <p className="text-sm text-gray-400">No reading passage for this question.</p>
           )}
-        </div>
-
-        {/* Right: question + answers */}
-        <div className="flex min-h-0 flex-col gap-4 overflow-y-auto p-4 md:p-5">
-          {question.stimulus && (
-            <div className="rounded-md border border-gray-200 bg-gray-50 p-3 md:hidden">
-              <MathContent content={question.stimulus} className="prose prose-sm max-w-none leading-relaxed text-gray-800" />
-            </div>
-          )}
-          <MathToolPanel config={calculatorConfig} context="practice-set" graphArtifacts={question.graphArtifacts} enabled={showCalculator} />
-          <div className="flex items-start justify-between gap-4">
+          <div className="border-t border-gray-200 pt-4">
             <MathContent
               content={question.stem}
-              className="flex-1 text-sm leading-relaxed text-gray-900"
+              className="text-base font-medium leading-relaxed text-gray-900 md:text-lg"
             />
+            <QuestionMedia imageUrl={question.imageUrl} alt={`Question ${current + 1} image`} className="mt-4" />
+          </div>
+        </div>
+
+        {/* Right: alternatives */}
+        <div className="flex min-h-0 flex-col gap-4 overflow-y-auto p-4 md:p-6">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Answer choices</p>
             <button
               onClick={() => toggleMarked(question.id)}
               className={cn(
@@ -308,18 +304,17 @@ export function PracticeSetPlayer({
               Mark
             </button>
           </div>
-
-          <QuestionMedia imageUrl={question.imageUrl} alt={`Question ${current + 1} image`} />
+          <MathToolPanel config={calculatorConfig} context="practice-set" graphArtifacts={question.graphArtifacts} enabled={showCalculator} />
 
           {question.type === "MC" ? (
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               {question.options.map((opt) => {
                 const isEliminated = eliminated[question.id]?.has(opt.label);
                 return (
                 <div
                   key={opt.label}
                   className={cn(
-                    "flex items-start gap-2 rounded-lg border px-3 py-2.5 text-sm transition-colors",
+                    "flex items-start gap-2 rounded-lg border px-3 py-3 text-sm transition-colors",
                     answers[question.id] === opt.label
                       ? "border-blue-500 bg-blue-50"
                       : "border-gray-200 hover:border-gray-300 hover:bg-gray-50",
@@ -335,7 +330,7 @@ export function PracticeSetPlayer({
                 >
                   <span
                     className={cn(
-                      "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-xs font-medium",
+                      "mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-xs font-medium",
                       answers[question.id] === opt.label
                         ? "border-blue-500 bg-blue-500 text-white"
                         : "border-gray-300 text-gray-500"
@@ -344,7 +339,7 @@ export function PracticeSetPlayer({
                     {opt.label}
                   </span>
                   <span className="min-w-0 flex-1">
-                    <MathContent content={opt.text} className="text-gray-800" />
+                    <MathContent content={opt.text} className="text-base text-gray-800" />
                     <QuestionMedia imageUrl={opt.imageUrl} alt={`Option ${opt.label} image`} className="mt-2" />
                   </span>
                 </button>

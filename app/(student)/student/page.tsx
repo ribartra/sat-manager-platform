@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { formatDate, scorePercent } from "@/lib/utils";
+import { scoreBandTextClass } from "@/lib/score-band";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody } from "@/components/ui/card";
 import { Clock, BookOpen, TrendingUp, CheckCircle } from "lucide-react";
@@ -192,7 +193,7 @@ export default async function StudentDashboard() {
                   <div className="flex items-center gap-3">
                     <span className="text-sm font-medium text-gray-900">{correct}/{total}</span>
                     <span
-                      className={`text-sm font-semibold ${pct >= 80 ? "text-green-600" : pct >= 60 ? "text-yellow-600" : "text-red-600"}`}
+      className={`text-sm font-semibold ${scoreBandTextClass(pct)}`}
                     >
                       {pct}%
                     </span>

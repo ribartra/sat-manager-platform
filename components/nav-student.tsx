@@ -18,6 +18,7 @@ interface NavStudentProps {
   avatarUrl?: string | null;
   isImpersonated?: boolean;
   hasActiveEnrollment?: boolean;
+  showMaterials?: boolean;
   onExitImpersonation?: () => void;
 }
 
@@ -39,6 +40,7 @@ export function NavStudent({
   avatarUrl: initialAvatarUrl,
   isImpersonated,
   hasActiveEnrollment = true,
+  showMaterials = false,
   onExitImpersonation,
 }: NavStudentProps) {
   const pathname = usePathname();
@@ -48,7 +50,9 @@ export function NavStudent({
   const [mobileOpen, setMobileOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const links = hasActiveEnrollment ? fullLinks : restrictedLinks;
+  const links = (hasActiveEnrollment ? fullLinks : restrictedLinks).filter(
+    (link) => showMaterials || link.href !== "/student/materials",
+  );
 
   function isActive(href: string, exact = false) {
     if (exact) return pathname === href;

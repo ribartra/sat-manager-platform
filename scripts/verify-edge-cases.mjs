@@ -159,6 +159,7 @@ const checks = [
       "TEACHER_PROGRAM_MANAGEMENT",
       "TEACHER_GROUP_MANAGEMENT",
       "QUESTION_GRAPH_VISUALIZATION",
+      "MATERIALS_MODULE",
       "value: \"false\"",
       "SEED_DEMO_ACADEMIC_CONTENT",
       "sin contenido demo",

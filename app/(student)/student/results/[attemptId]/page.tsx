@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { formatDate, formatTime, scorePercent } from "@/lib/utils";
+import { scoreBandTextClass } from "@/lib/score-band";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { MathContent } from "@/components/math-content";
@@ -10,7 +11,6 @@ import { QuestionMedia } from "@/components/question-media";
 import { CheckCircle, XCircle, MinusCircle, ChevronLeft, RotateCcw } from "lucide-react";
 import { parseSnapshot, PracticeSetSnapshot, QuestionSnapshot } from "@/lib/attempt-snapshots";
 import { formatCorrectAnswer } from "@/lib/answer-grading";
-import { resolvePracticeSetAttemptScore } from "@/lib/practice-set-scoring";
 
 interface PageProps {
   params: Promise<{ attemptId: string }>;
@@ -76,14 +76,7 @@ export default async function ResultsPage({ params }: PageProps) {
     : psQuestions.map((psq) => psq.questionId);
   const orderedAnswers = orderedQuestionIds.map((questionId) => answersMap[questionId]).filter(Boolean);
 
-  const sat = await resolvePracticeSetAttemptScore({
-    scorePercent: attempt.scorePercent,
-    scaledScore: attempt.scaledScore,
-    scoreSection: attempt.scoreSection,
-    correct,
-    total: totalQuestions,
-    section: practiceSet?.topic.domain.section ?? null,
-  });
+  const displayPct = typeof attempt.scorePercent === "number" ? attempt.scorePercent : pct;
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
@@ -103,20 +96,16 @@ export default async function ResultsPage({ params }: PageProps) {
           Attempt #{attempt.attemptNumber} · {attempt.submittedAt ? formatDate(attempt.submittedAt) : ""}
         </p>
 
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div className="text-center">
             <p className="text-3xl font-bold text-gray-900">{correct}/{totalQuestions}</p>
             <p className="text-xs text-gray-500 mt-0.5">Correct</p>
           </div>
           <div className="text-center">
-            <p className={`text-3xl font-bold ${pct >= 80 ? "text-green-600" : pct >= 60 ? "text-yellow-600" : "text-red-600"}`}>
-              {sat.scorePercent}%
+            <p className={`text-3xl font-bold ${scoreBandTextClass(displayPct)}`}>
+              {displayPct}%
             </p>
             <p className="text-xs text-gray-500 mt-0.5">Percent</p>
-          </div>
-          <div className="text-center">
-            <p className="text-3xl font-bold text-gray-900">{sat.scaledScore}</p>
-            <p className="text-xs text-gray-500 mt-0.5">SAT {sat.scoreSection === "MATH" ? "Math" : "R&W"}</p>
           </div>
           <div className="text-center">
             <p className="text-3xl font-bold text-gray-900">{attempt.totalTime ? formatTime(attempt.totalTime) : "—"}</p>

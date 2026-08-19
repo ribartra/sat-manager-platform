@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import { studentAccessWhereFor } from "@/lib/program-scope";
 import { formatDate, formatTime, scorePercent } from "@/lib/utils";
+import { scoreBandTextClass } from "@/lib/score-band";
 import { Card } from "@/components/ui/card";
 
 interface PageProps {
@@ -165,7 +166,11 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
       <div className="mb-6 grid grid-cols-4 gap-4">
         <Metric label="Student" value={selectedStudent?.name ?? "-"} />
         <Metric label="Answers" value={answers.length.toString()} />
-        <Metric label="Average Accuracy" value={avgAccuracy !== null ? `${avgAccuracy}%` : "-"} />
+        <Metric
+          label="Average Accuracy"
+          value={avgAccuracy !== null ? `${avgAccuracy}%` : "-"}
+          valueClassName={avgAccuracy !== null ? scoreBandTextClass(avgAccuracy) : undefined}
+        />
         <Metric label="Inactive 5+ Days" value={staleStudents.length.toString()} />
       </div>
 
@@ -194,7 +199,7 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
                     <td className="px-4 py-3 font-medium text-gray-800">{bucket.label}</td>
                     <td className="px-4 py-3 text-gray-500">{bucket.section}</td>
                     <td className="px-4 py-3 text-gray-500">{bucket.difficulty}</td>
-                    <td className="px-4 py-3 text-right font-medium text-gray-800">{pct}% ({bucket.correct}/{bucket.total})</td>
+                    <td className={`px-4 py-3 text-right font-medium ${scoreBandTextClass(pct)}`}>{pct}% ({bucket.correct}/{bucket.total})</td>
                     <td className="px-4 py-3 text-right text-gray-500">{bucket.timed ? formatTime(Math.round(bucket.totalTime / bucket.timed)) : "-"}</td>
                     <td className="px-4 py-3 text-gray-600">{recommendation(bucket.label, pct)}</td>
                   </tr>
@@ -222,11 +227,11 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
   );
 }
 
-function Metric({ label, value }: { label: string; value: string }) {
+function Metric({ label, value, valueClassName }: { label: string; value: string; valueClassName?: string }) {
   return (
     <Card padding="md">
       <p className="text-xs font-medium uppercase text-gray-400">{label}</p>
-      <p className="mt-1 truncate text-2xl font-semibold text-gray-900">{value}</p>
+      <p className={`mt-1 truncate text-2xl font-semibold ${valueClassName ?? "text-gray-900"}`}>{value}</p>
     </Card>
   );
 }

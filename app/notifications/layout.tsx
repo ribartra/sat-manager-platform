@@ -24,6 +24,7 @@ export default async function NotificationsLayout({ children }: { children: Reac
       session.user.role === "ADMIN" || (await getFeatureSetting("TEACHER_PROGRAM_MANAGEMENT"));
     const showTeacherGroups =
       session.user.role === "ADMIN" || (await getFeatureSetting("TEACHER_GROUP_MANAGEMENT"));
+    const showMaterials = await getFeatureSetting("MATERIALS_MODULE");
 
     return (
       <div className="min-h-screen flex flex-col">
@@ -33,6 +34,7 @@ export default async function NotificationsLayout({ children }: { children: Reac
           role={session.user.role}
           showTeacherPrograms={showTeacherPrograms}
           showTeacherGroups={showTeacherGroups}
+          showMaterials={showMaterials}
         />
         <main className="flex-1 bg-gray-50">{children}</main>
       </div>
@@ -52,6 +54,7 @@ export default async function NotificationsLayout({ children }: { children: Reac
         },
       },
     }));
+    const showMaterials = await getFeatureSetting("MATERIALS_MODULE");
 
     return (
       <div className="min-h-screen flex flex-col">
@@ -59,6 +62,7 @@ export default async function NotificationsLayout({ children }: { children: Reac
           userName={session.user.name}
           avatarUrl={user.avatarUrl}
           hasActiveEnrollment={hasActiveEnrollment}
+          showMaterials={showMaterials}
         />
         <main className="flex-1">{children}</main>
       </div>

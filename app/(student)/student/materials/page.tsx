@@ -1,9 +1,13 @@
 import prisma from "@/lib/prisma";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { MathContent } from "@/components/math-content";
+import { getFeatureSetting } from "@/lib/app-settings";
 
 export default async function StudentMaterialsPage() {
+  if (!(await getFeatureSetting("MATERIALS_MODULE"))) notFound();
+
   const materials = await prisma.studyMaterial.findMany({
     where: { status: "PUBLISHED" },
     orderBy: { updatedAt: "desc" },

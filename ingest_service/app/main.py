@@ -5686,6 +5686,24 @@ def safe_upload_filename(filename: str) -> str:
     return cleaned or f"source-{uuid.uuid4().hex}.pdf"
 
 
+def role_tagged_filename(filename: str, role: str | None) -> str:
+    """Prefix filenames so infer_metadata picks the intended sourceKind."""
+    safe = safe_upload_filename(filename)
+    if not role:
+        return safe
+    normalized = role.strip().upper()
+    stem = Path(safe).stem
+    suffix = Path(safe).suffix
+    if normalized == "ANSWER_EXPLANATION":
+        return f"Answers Explanations - {stem}{suffix}"
+    if normalized == "ANSWER":
+        return f"Answers - {stem}{suffix}"
+    if normalized == "EXPLANATION":
+        return f"Explanations - {stem}{suffix}"
+    # QUESTION / unknown: keep original name (avoid answer/expl tokens when possible)
+    return safe
+
+
 def upload_staging_path(root: Path, content_type: str, filename: str, difficulty: str | None, topic_name: str | None, domain_name: str | None, test_number: int | None) -> Path:
     safe_name = safe_upload_filename(filename)
     if content_type == "FULL_PRACTICE_TEST":
@@ -5711,6 +5729,7 @@ async def upload_source_batch(
     domainName: str | None = Form(None),
     testNumber: int | None = Form(None),
     files: list[UploadFile] = File(...),
+    roles: list[str] | None = Form(None),
 ) -> dict[str, Any]:
     content_length = request.headers.get("content-length")
     if content_length and int(content_length) > MAX_UPLOAD_BYTES + 1024 * 1024:
@@ -5722,6 +5741,13 @@ async def upload_source_batch(
         raise HTTPException(status_code=400, detail="Upload at least one PDF or DOCX source file.")
     if len(files) > MAX_SOURCE_FILES:
         raise HTTPException(status_code=413, detail=f"Too many source files. Maximum allowed is {MAX_SOURCE_FILES}.")
+
+    role_list = [str(role).strip().upper() for role in (roles or [])]
+    if role_list and len(role_list) != len(files):
+        raise HTTPException(status_code=400, detail="roles must align 1:1 with uploaded files.")
+    allowed_roles = {"QUESTION", "ANSWER", "EXPLANATION", "ANSWER_EXPLANATION"}
+    if any(role not in allowed_roles for role in role_list):
+        raise HTTPException(status_code=400, detail="Invalid file role.")
 
     upload_id = new_id("upload")
     upload_dir = (UPLOAD_ROOT / upload_id).resolve()
@@ -5735,7 +5761,9 @@ async def upload_source_batch(
             filename = file.filename or ""
             if not filename.lower().endswith((".pdf", ".docx")):
                 raise HTTPException(status_code=400, detail=f"Unsupported file type: {filename or 'unnamed file'}")
-            target = upload_staging_path(staging_dir, normalized_content_type, filename, difficulty, topicName, domainName, testNumber).resolve()
+            role = role_list[index - 1] if role_list else None
+            tagged_name = role_tagged_filename(filename, role)
+            target = upload_staging_path(staging_dir, normalized_content_type, tagged_name, difficulty, topicName, domainName, testNumber).resolve()
             if not target.is_relative_to(staging_dir.resolve()):
                 raise HTTPException(status_code=400, detail=f"Unsafe file name: {filename}")
             if target.exists():
@@ -5753,7 +5781,7 @@ async def upload_source_batch(
             await file.close()
 
     result = create_batch_from_path(name, staging_dir)
-    return {**result, "uploadId": upload_id, "uploadedBytes": total_size, "uploadedFiles": saved, "contentType": normalized_content_type}
+    return {**result, "uploadId": upload_id, "uploadedBytes": total_size, "uploadedFiles": saved, "contentType": normalized_content_type, "roles": role_list}
 
 
 @app.post("/batches/upload-zip")

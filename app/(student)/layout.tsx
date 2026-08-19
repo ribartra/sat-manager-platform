@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { NavStudent } from "@/components/nav-student";
 import prisma from "@/lib/prisma";
+import { getFeatureSetting } from "@/lib/app-settings";
 
 export const dynamic = "force-dynamic";
 
@@ -31,6 +32,7 @@ export default async function StudentLayout({ children }: { children: React.Reac
       },
     },
   }));
+  const showMaterials = await getFeatureSetting("MATERIALS_MODULE");
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -39,6 +41,7 @@ export default async function StudentLayout({ children }: { children: React.Reac
         avatarUrl={user.avatarUrl}
         isImpersonated={isImpersonated}
         hasActiveEnrollment={hasActiveEnrollment}
+        showMaterials={showMaterials}
       />
       <main className="flex min-h-0 flex-1 flex-col">{children}</main>
     </div>

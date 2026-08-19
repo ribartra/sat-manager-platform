@@ -4,7 +4,6 @@ import prisma from "@/lib/prisma";
 import { scorePercent } from "@/lib/utils";
 import { parseSnapshot, PracticeSetSnapshot, QuestionSnapshot } from "@/lib/attempt-snapshots";
 import { teacherProgramEnrollmentScope } from "@/lib/program-scope";
-import { averageScaledScores, resolvePracticeSetAttemptScore } from "@/lib/practice-set-scoring";
 
 interface RouteContext {
   params: Promise<{ studentId: string }>;
@@ -184,23 +183,13 @@ export async function GET(_req: Request, { params }: RouteContext) {
       take: 20,
     });
     const totalTime = attempts.reduce((sum, attempt) => sum + (attempt.totalTime ?? 0), 0);
-    const scores = await Promise.all(
-      attempts.map(async (attempt) => {
-        const correct = attempt.answers.filter((a) => a.isCorrect).length;
-        const sat = await resolvePracticeSetAttemptScore({
-          scorePercent: attempt.scorePercent,
-          scaledScore: attempt.scaledScore,
-          scoreSection: attempt.scoreSection,
-          correct,
-          total: attempt.answers.length,
-          section: attempt.answers[0]?.question.topic.domain.section ?? null,
-        });
-        return sat;
-      }),
-    );
-    const avgScore = scores.length ? Math.round(scores.reduce((sum, score) => sum + score.scorePercent, 0) / scores.length) : null;
-    const rwAvg = averageScaledScores(scores.filter((s) => s.scoreSection === "RW").map((s) => s.scaledScore));
-    const mathAvg = averageScaledScores(scores.filter((s) => s.scoreSection === "MATH").map((s) => s.scaledScore));
+    const scores = attempts.map((attempt) => {
+      const correct = attempt.answers.filter((a) => a.isCorrect).length;
+      return typeof attempt.scorePercent === "number"
+        ? attempt.scorePercent
+        : scorePercent(correct, attempt.answers.length);
+    });
+    const avgScore = scores.length ? Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length) : null;
     const topicStats = new Map<string, { correct: number; total: number }>();
     const difficultyStats = new Map<string, { correct: number; total: number }>();
     const mediaUrls = new Set<string>();
@@ -225,20 +214,18 @@ export async function GET(_req: Request, { params }: RouteContext) {
       }
     }
 
-    lines.push({ text: AREA_CONFIG[selectedArea].label, size: 16, bold: true, gapBefore: 24 });
+    lines.push({ text: `Practice — ${AREA_CONFIG[selectedArea].label}`, size: 16, bold: true, gapBefore: 24 });
     lines.push({ text: `Completed attempts: ${attempts.length}` });
     lines.push({ text: `Average score: ${avgScore !== null ? `${avgScore}%` : "N/A"}` });
-    lines.push({ text: `SAT R&W average: ${rwAvg ?? "N/A"}` });
-    lines.push({ text: `SAT Math average: ${mathAvg ?? "N/A"}` });
     lines.push({ text: `Practice time: ${Math.round(totalTime / 60)} minutes` });
-    lines.push({ text: "Recent Attempts", size: 13, bold: true, gapBefore: 18 });
+    lines.push({ text: "Recent Practice Attempts", size: 13, bold: true, gapBefore: 18 });
     for (let i = 0; i < attempts.length; i += 1) {
       const attempt = attempts[i];
-      const sat = scores[i];
+      const pct = scores[i];
       const snapshot = parseSnapshot<PracticeSetSnapshot>(attempt.practiceSetSnapshot);
       const correct = attempt.answers.filter((a) => a.isCorrect).length;
       lines.push({
-        text: `${snapshot?.name ?? attempt.assignment?.practiceSet.name ?? "Practice Set"}: ${correct}/${attempt.answers.length} (${sat.scorePercent}%) · SAT ${sat.scaledScore}`,
+        text: `${snapshot?.name ?? attempt.assignment?.practiceSet.name ?? "Practice Set"}: ${correct}/${attempt.answers.length} (${pct}%)`,
       });
     }
     lines.push({ text: "Score Progress Over Time", size: 13, bold: true, gapBefore: 18 });
@@ -279,6 +266,24 @@ export async function GET(_req: Request, { params }: RouteContext) {
         const label = snapshot?.name ?? attempt.assignment?.practiceSet.name ?? "Practice Set";
         lines.push({ text: `${label}: ${attempt.teacherComment}` });
       }
+    }
+  }
+
+  const examAttempts = await prisma.fullPracticeTestAttempt.findMany({
+    where: { studentId, status: "SUBMITTED" },
+    include: { test: { select: { name: true } } },
+    orderBy: { submittedAt: "desc" },
+    take: 20,
+  });
+  lines.push({ text: "Exams (Full Practice Tests)", size: 16, bold: true, gapBefore: 28 });
+  if (examAttempts.length === 0) {
+    lines.push({ text: "No submitted exams yet." });
+  } else {
+    for (const exam of examAttempts) {
+      const date = exam.submittedAt ? exam.submittedAt.toISOString().slice(0, 10) : "No date";
+      lines.push({
+        text: `${exam.test.name} (${date}): SAT Total ${exam.totalScore ?? "N/A"} · R&W ${exam.rwScore ?? "N/A"} · Math ${exam.mathScore ?? "N/A"}`,
+      });
     }
   }
 

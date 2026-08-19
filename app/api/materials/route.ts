@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
+import { getFeatureSetting } from "@/lib/app-settings";
 
 export async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
   if (!session) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  if (!(await getFeatureSetting("MATERIALS_MODULE"))) {
+    return NextResponse.json({ error: "Materials module is disabled." }, { status: 403 });
   }
 
   const { title, description, body, url, topicId, status } = await req.json();

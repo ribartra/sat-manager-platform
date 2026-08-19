@@ -155,6 +155,28 @@ export function findPromotedEasyPracticeSet(options?: {
   }
 }
 
+export function createApprovedStudent(input: { email: string; name: string; password: string }) {
+  const db = openDb();
+  try {
+    const existing = db.prepare(`SELECT id FROM User WHERE email = ?`).get(input.email) as { id: string } | undefined;
+    const hash = bcrypt.hashSync(input.password, 10);
+    if (existing) {
+      db.prepare(
+        `UPDATE User SET name = ?, passwordHash = ?, role = 'STUDENT', validationStatus = 'APPROVED', active = 1 WHERE id = ?`
+      ).run(input.name, hash, existing.id);
+      return existing.id;
+    }
+    const id = `e2e_stu_${crypto.randomBytes(8).toString("hex")}`;
+    db.prepare(
+      `INSERT INTO User (id, name, email, passwordHash, role, active, validationStatus, createdAt, updatedAt)
+       VALUES (?, ?, ?, ?, 'STUDENT', 1, 'APPROVED', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`
+    ).run(id, input.name, input.email, hash);
+    return id;
+  } finally {
+    db.close();
+  }
+}
+
 /**
  * Mirrors POST /api/parents/access-links token creation so e2e can open
  * /parent/access?token=… without depending on SMTP delivery of the raw token.

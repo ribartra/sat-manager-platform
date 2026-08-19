@@ -27,6 +27,12 @@ export const FEATURE_SETTINGS = {
       "Show the “Enable graph visualization” checkbox in the question editor (Math). When off, the option stays hidden; existing supportsGraph values are unchanged.",
     defaultValue: false,
   },
+  MATERIALS_MODULE: {
+    label: "Study Materials module",
+    description:
+      "Show Materials in Student and Teacher navigation and allow access to materials pages/APIs. When off (default), Materials stays hidden for both roles; data is preserved.",
+    defaultValue: false,
+  },
 } as const;
 
 export type FeatureSettingKey = keyof typeof FEATURE_SETTINGS;
