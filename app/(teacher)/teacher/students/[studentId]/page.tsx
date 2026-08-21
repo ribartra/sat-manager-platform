@@ -112,10 +112,10 @@ export default async function StudentDetailPage({ params }: PageProps) {
       </div>
 
       {/* Header */}
-      <div className="flex items-start justify-between mb-6">
+      <div className="mb-6 space-y-4">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">{student.name}</h1>
-          <p className="text-sm text-gray-500 mt-0.5">
+          <p className="mt-0.5 text-sm text-gray-500">
             {student.email} · {student.phone ?? "—"}
             {teacherGroupManagementEnabled && (
               <> · Groups: {student.groups.map((g) => g.group.name).join(", ") || "—"}</>
@@ -123,34 +123,41 @@ export default async function StudentDetailPage({ params }: PageProps) {
             {" · "}Programs: {student.programEnrollments.map((e) => e.program.name).join(", ") || "—"}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href={`/teacher/students/${studentId}/assign`}
+            className="inline-flex h-9 items-center justify-center rounded-md bg-blue-600 px-3 text-sm font-medium text-white hover:bg-blue-700"
+          >
+            + Assign Practice
+          </Link>
+          <Link
+            href={`/teacher/students/${studentId}/assign-exam`}
+            className="inline-flex h-9 items-center justify-center rounded-md border border-blue-600 px-3 text-sm font-medium text-blue-700 hover:bg-blue-50"
+          >
+            + Assign Exam
+          </Link>
           <Link
             href={`/teacher/analytics?studentId=${studentId}`}
-            className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="inline-flex h-9 items-center justify-center rounded-md border border-gray-300 bg-white px-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
             Analytics
           </Link>
           <Link
             href={`/teacher/impersonate/${studentId}`}
-            className="flex items-center gap-1.5 rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-gray-300 bg-white px-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
             <Eye size={14} /> View as Student
           </Link>
           <Link
-            href={`/teacher/students/${studentId}/assign`}
-            className="flex items-center gap-1.5 rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"
-          >
-            + Assign Practice Set
-          </Link>
-          <Link
             href={`/teacher/students/${studentId}/edit`}
-            className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="inline-flex h-9 items-center justify-center rounded-md border border-gray-300 bg-white px-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
             Edit Student
           </Link>
           <Link
             href={`/teacher/students/${studentId}/report`}
-            className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="inline-flex h-9 items-center justify-center rounded-md border border-gray-300 bg-white px-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
             Report
           </Link>
@@ -159,17 +166,17 @@ export default async function StudentDetailPage({ params }: PageProps) {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 gap-4 mb-8 md:grid-cols-4">
+      <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4">
         {[
           { label: "Sets completed", value: totalSets },
           { label: "Avg %", value: avgScore !== null ? `${avgScore}%` : "—", className: scoreBandTextClass(avgScore) },
           { label: "Total time", value: totalTime > 0 ? formatTime(totalTime) : "—" },
           { label: "Pending tasks", value: assignments.length },
         ].map(({ label, value, className }) => (
-          <Card key={label}>
-            <CardBody>
-              <p className={`text-2xl font-bold ${className ?? "text-gray-900"}`}>{value}</p>
-              <p className="text-xs text-gray-500 mt-0.5">{label}</p>
+          <Card key={label} className="h-full">
+            <CardBody className="flex h-full min-h-[88px] flex-col justify-center">
+              <p className={`text-2xl font-bold leading-none ${className ?? "text-gray-900"}`}>{value}</p>
+              <p className="mt-2 text-xs text-gray-500">{label}</p>
             </CardBody>
           </Card>
         ))}

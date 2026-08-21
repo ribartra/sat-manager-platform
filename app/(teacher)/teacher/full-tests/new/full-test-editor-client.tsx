@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
-import { MathContent } from "@/components/math-content";
+import { QuestionListItem } from "@/components/question-list-item";
 import { ImportQuestionnaireButton } from "@/components/import-questionnaire-button";
 
 const modules = ["Reading & Writing Module 1", "Reading & Writing Module 2", "Math Module 1", "Math Module 2"];
@@ -17,7 +17,17 @@ export function FullTestEditor({
   questions,
   initial,
 }: {
-  questions: { id: string; label: string; stem: string; difficulty: string; section: string }[];
+  questions: {
+    id: string;
+    label: string;
+    stem: string;
+    difficulty: string;
+    section: string;
+    type?: string;
+    imageUrl?: string | null;
+    stimulus?: string | null;
+    optionImageUrls?: string[];
+  }[];
   initial?: {
     id?: string;
     name?: string;
@@ -137,16 +147,25 @@ export function FullTestEditor({
               <option value="">Add question...</option>
               {visibleQuestions.map((q) => <option key={q.id} value={q.id}>{q.label}</option>)}
             </Select>
-            <ul className="mt-3 space-y-1 text-xs text-gray-600">
-              {moduleQuestionIds[index].map((id) => {
+            <ul className="mt-3 space-y-2 text-xs text-gray-600">
+              {moduleQuestionIds[index].map((id, qIndex) => {
                 const question = questions.find((q) => q.id === id);
                 if (!question) return null;
                 return (
-                  <li key={id} className="rounded border border-gray-100 px-2 py-1">
-                    <span className="mb-0.5 block text-[10px] font-medium uppercase text-gray-400">
-                      {question.section} · {question.difficulty}
-                    </span>
-                    <MathContent content={question.stem} className="max-h-28 overflow-auto text-sm" />
+                  <li key={id} className="rounded border border-gray-100 px-3 py-2">
+                    <QuestionListItem
+                      question={question}
+                      href={`/teacher/questions/${question.id}/edit`}
+                      indexLabel={<span className="text-xs font-medium text-gray-400">Q{qIndex + 1}</span>}
+                      meta={
+                        <>
+                          <span className="text-[10px] font-medium uppercase text-gray-400">
+                            {question.section} · {question.difficulty}
+                            {question.type ? ` · ${question.type}` : ""}
+                          </span>
+                        </>
+                      }
+                    />
                   </li>
                 );
               })}

@@ -5,6 +5,7 @@ import { requireApprovedSession } from "@/lib/rbac";
 import { markUserActive } from "@/lib/activity";
 import { scaledScore } from "@/lib/full-test-scoring";
 import { isAnswerCorrect } from "@/lib/answer-grading";
+import { writeAudit } from "@/lib/audit";
 
 interface RouteContext {
   params: Promise<{ attemptId: string }>;
@@ -94,6 +95,18 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     `${session.user.name} completed an Exam.`,
     `/student/full-tests/results/${attemptId}`,
   );
+
+  await writeAudit({
+    userId: session.user.id,
+    action: "FPT_ATTEMPT_SUBMITTED",
+    targetType: "FullPracticeTestAttempt",
+    targetId: attemptId,
+    outcome: "success",
+    metadata: {
+      testId: attempt.testId,
+      scores: { rwScore, mathScore, totalScore: rwScore + mathScore },
+    },
+  });
 
   return NextResponse.json({
     ok: true,

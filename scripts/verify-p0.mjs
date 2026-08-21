@@ -41,8 +41,13 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/questions/question-editor-client.tsx",
-    requires: ["imageUrl", "QuestionMedia"],
-    label: "Editor permite capturar y previsualizar media",
+    requires: ["imageUrl", "QuestionImageField", "QuestionPlayerPreview", "View as player"],
+    label: "Editor permite capturar y previsualizar media como player",
+  },
+  {
+    file: "components/question-player-preview.tsx",
+    requires: ["QuestionMedia", "imageUrl", "Answer choices", "View as player"],
+    label: "Preview de editor replica layout del player",
   },
   {
     file: "lib/activity.ts",

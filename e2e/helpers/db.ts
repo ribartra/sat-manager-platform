@@ -210,3 +210,87 @@ export function createParentAccessToken(input: {
     db.close();
   }
 }
+
+/**
+ * Seed a minor-student invite where the student already activated (usedAt set)
+ * but parent consent is still pending — reproduces the prior “invalid link” bug.
+ */
+export function createUsedInviteWithPendingParentConsent(input: {
+  studentEmail: string;
+  studentName: string;
+  parentEmail: string;
+  parentName: string;
+  invitedById: string;
+  programId: string;
+}) {
+  const db = openDb();
+  try {
+    const inviteToken = crypto.randomBytes(32).toString("hex");
+    const inviteTokenHash = crypto.createHash("sha256").update(inviteToken).digest("hex");
+    const consentToken = crypto.randomBytes(32).toString("hex");
+    const consentTokenHash = crypto.createHash("sha256").update(consentToken).digest("hex");
+    const id = `e2e_inv_${crypto.randomBytes(8).toString("hex")}`;
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+    const usedAt = new Date().toISOString();
+    db.prepare(
+      `INSERT INTO InviteToken (
+         id, role, email, name, invitedById, programId, isMinor,
+         parentName, parentEmail, parentConsentToken, parentConsentTokenHash,
+         token, tokenHash, expiresAt, usedAt
+       ) VALUES (?, 'STUDENT', ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?)`
+    ).run(
+      id,
+      input.studentEmail,
+      input.studentName,
+      input.invitedById,
+      input.programId,
+      input.parentName,
+      input.parentEmail,
+      `hashed:${consentTokenHash}`,
+      consentTokenHash,
+      `hashed:${inviteTokenHash}`,
+      inviteTokenHash,
+      expiresAt,
+      usedAt
+    );
+    return {
+      id,
+      inviteToken,
+      consentToken,
+      consentUrlPath: `/auth/parent-consent?token=${consentToken}`,
+    };
+  } finally {
+    db.close();
+  }
+}
+
+export function countAuditActions(actions: string[], sinceIso?: string) {
+  const db = openDb();
+  try {
+    const placeholders = actions.map(() => "?").join(",");
+    const rows = sinceIso
+      ? (db
+          .prepare(
+            `SELECT action, COUNT(*) as c FROM AuditLog WHERE action IN (${placeholders}) AND createdAt >= ? GROUP BY action`
+          )
+          .all(...actions, sinceIso) as Array<{ action: string; c: number }>)
+      : (db
+          .prepare(`SELECT action, COUNT(*) as c FROM AuditLog WHERE action IN (${placeholders}) GROUP BY action`)
+          .all(...actions) as Array<{ action: string; c: number }>);
+    return Object.fromEntries(rows.map((r) => [r.action, r.c]));
+  } finally {
+    db.close();
+  }
+}
+
+export function findActiveProgramId() {
+  const db = openDb();
+  try {
+    const row = db
+      .prepare(`SELECT id FROM Program WHERE active = 1 ORDER BY createdAt ASC LIMIT 1`)
+      .get() as { id: string } | undefined;
+    return row?.id ?? null;
+  } finally {
+    db.close();
+  }
+}

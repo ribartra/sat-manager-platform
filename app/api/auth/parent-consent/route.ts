@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { checkRateLimit, rateLimitKey, rateLimitResponse } from "@/lib/rate-limit";
 import { hashPublicToken } from "@/lib/token-security";
+import { captureCaughtError, writeAudit } from "@/lib/audit";
 
 async function findInviteByParentConsentToken(token: string) {
   const parentConsentTokenHash = hashPublicToken(token);
@@ -18,6 +19,18 @@ async function findInviteByParentConsentToken(token: string) {
   return invite;
 }
 
+function consentLinkFailureReason(invite: {
+  expiresAt: Date;
+  parentEmail: string | null;
+} | null): "not_found" | "no_parent_email" | "expired" | null {
+  if (!invite) return "not_found";
+  if (!invite.parentEmail) return "no_parent_email";
+  if (invite.expiresAt < new Date()) return "expired";
+  // Note: do NOT reject when invite.usedAt is set — the student may activate
+  // first; the parent must still be able to set their password / record consent.
+  return null;
+}
+
 export async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get("token");
   if (!token) return NextResponse.json({ error: "Missing token" }, { status: 400 });
@@ -25,9 +38,33 @@ export async function GET(req: NextRequest) {
   if (!limited.allowed) return rateLimitResponse(limited.resetAt);
 
   const invite = await findInviteByParentConsentToken(token);
-  if (!invite || invite.usedAt || invite.expiresAt < new Date() || !invite.parentEmail) {
+  const failReason = consentLinkFailureReason(invite);
+  if (failReason || !invite?.parentEmail) {
+    await writeAudit({
+      action: "PARENT_CONSENT_VIEW_FAILED",
+      targetType: "InviteToken",
+      targetId: invite?.id ?? token.slice(0, 12),
+      outcome: "failure",
+      metadata: {
+        reason: failReason ?? "no_parent_email",
+        usedAt: invite?.usedAt?.toISOString() ?? null,
+      },
+    });
     return NextResponse.json({ error: "Invalid or expired authorization link" }, { status: 400 });
   }
+
+  await writeAudit({
+    action: "PARENT_CONSENT_VIEWED",
+    targetType: "InviteToken",
+    targetId: invite.id,
+    outcome: "success",
+    metadata: {
+      parentEmail: invite.parentEmail,
+      studentEmail: invite.email,
+      alreadyApproved: Boolean(invite.parentConsentAt),
+      studentActivated: Boolean(invite.usedAt),
+    },
+  });
 
   return NextResponse.json({
     studentName: invite.name,
@@ -47,55 +84,91 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Password must be at least 6 characters." }, { status: 400 });
   }
 
-  const invite = await findInviteByParentConsentToken(token);
-  if (!invite || invite.usedAt || invite.expiresAt < new Date() || !invite.parentEmail) {
-    return NextResponse.json({ error: "Invalid or expired authorization link" }, { status: 400 });
-  }
+  try {
+    const invite = await findInviteByParentConsentToken(token);
+    const failReason = consentLinkFailureReason(invite);
+    if (failReason || !invite?.parentEmail) {
+      await writeAudit({
+        action: "PARENT_CONSENT_VIEW_FAILED",
+        targetType: "InviteToken",
+        targetId: invite?.id ?? token.slice(0, 12),
+        outcome: "failure",
+        metadata: {
+          reason: failReason ?? "no_parent_email",
+          phase: "submit",
+        },
+      });
+      return NextResponse.json({ error: "Invalid or expired authorization link" }, { status: 400 });
+    }
 
-  const passwordHash = await bcrypt.hash(password, 10);
-  const consentAt = new Date();
+    const passwordHash = await bcrypt.hash(password, 10);
+    const consentAt = new Date();
+    const parentEmail = invite.parentEmail;
 
-  await prisma.$transaction([
-    prisma.user.upsert({
-      where: { email: invite.parentEmail },
-      update: {
-        name: invite.parentName ?? invite.parentEmail,
-        phone: invite.parentPhone ?? null,
-        role: "PARENT",
-        passwordHash,
-        active: true,
-        validationStatus: "APPROVED",
-        validationReviewedAt: consentAt,
-      },
-      create: {
-        name: invite.parentName ?? invite.parentEmail,
-        email: invite.parentEmail,
-        phone: invite.parentPhone ?? null,
-        role: "PARENT",
-        passwordHash,
-        active: true,
-        validationStatus: "APPROVED",
-        validationReviewedAt: consentAt,
-      },
-    }),
-    prisma.inviteToken.update({
-      where: { id: invite.id },
-      data: {
-        parentConsentAt: consentAt,
-        parentConsentIp: req.headers.get("x-forwarded-for") ?? req.headers.get("x-real-ip"),
-      },
-    }),
-  ]);
+    const parent = await prisma.$transaction(async (tx) => {
+      const upserted = await tx.user.upsert({
+        where: { email: parentEmail },
+        update: {
+          name: invite.parentName ?? parentEmail,
+          phone: invite.parentPhone ?? null,
+          role: "PARENT",
+          passwordHash,
+          active: true,
+          validationStatus: "APPROVED",
+          validationReviewedAt: consentAt,
+        },
+        create: {
+          name: invite.parentName ?? parentEmail,
+          email: parentEmail,
+          phone: invite.parentPhone ?? null,
+          role: "PARENT",
+          passwordHash,
+          active: true,
+          validationStatus: "APPROVED",
+          validationReviewedAt: consentAt,
+        },
+      });
 
-  await prisma.auditLog.create({
-    data: {
-      userId: invite.invitedById ?? (await prisma.user.findUniqueOrThrow({ where: { email: invite.parentEmail } })).id,
+      await tx.inviteToken.update({
+        where: { id: invite.id },
+        data: {
+          parentConsentAt: consentAt,
+          parentConsentIp: req.headers.get("x-forwarded-for") ?? req.headers.get("x-real-ip"),
+        },
+      });
+
+      // If the student already activated, ensure ParentStudent link exists.
+      const student = await tx.user.findUnique({ where: { email: invite.email } });
+      if (student) {
+        await tx.parentStudent.upsert({
+          where: { parentId_studentId: { parentId: upserted.id, studentId: student.id } },
+          update: { authorizedAt: consentAt },
+          create: { parentId: upserted.id, studentId: student.id, authorizedAt: consentAt },
+        });
+      }
+
+      return upserted;
+    });
+
+    await writeAudit({
+      userId: parent.id,
       action: "PARENT_CONSENT_RECORDED",
       targetType: "InviteToken",
       targetId: invite.id,
-      metadata: JSON.stringify({ parentEmail: invite.parentEmail, studentEmail: invite.email }),
-    },
-  });
+      outcome: "success",
+      metadata: {
+        parentEmail,
+        studentEmail: invite.email,
+        studentAlreadyActivated: Boolean(invite.usedAt),
+        invitedById: invite.invitedById,
+      },
+    });
 
-  return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    await captureCaughtError("auth.parent-consent", error, {
+      metadata: { tokenPrefix: String(token).slice(0, 8) },
+    });
+    return NextResponse.json({ error: "Authorization failed." }, { status: 500 });
+  }
 }

@@ -375,7 +375,19 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
                     </Badge>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <div className="flex justify-end gap-3">
+                    <div className="flex flex-wrap justify-end gap-x-3 gap-y-1">
+                      <Link
+                        href={`/teacher/students/${student.id}/assign`}
+                        className="text-xs font-medium text-blue-600 hover:underline"
+                      >
+                        Assign Practice
+                      </Link>
+                      <Link
+                        href={`/teacher/students/${student.id}/assign-exam`}
+                        className="text-xs font-medium text-blue-600 hover:underline"
+                      >
+                        Assign Exam
+                      </Link>
                       <Link href={`/teacher/analytics?studentId=${student.id}`} className="text-xs text-blue-600 hover:underline">
                         Analytics
                       </Link>

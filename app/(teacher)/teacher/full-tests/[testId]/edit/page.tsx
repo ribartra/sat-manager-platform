@@ -24,7 +24,10 @@ export default async function EditFullTestPage({ params }: PageProps) {
     }),
     prisma.question.findMany({
       where: { status: { in: ["PUBLISHED", "DRAFT"] } },
-      include: { topic: { include: { domain: { include: { section: true } } } } },
+      include: {
+        topic: { include: { domain: { include: { section: true } } } },
+        options: { select: { imageUrl: true }, where: { imageUrl: { not: null } } },
+      },
       orderBy: { createdAt: "desc" },
     }),
   ]);
@@ -47,7 +50,11 @@ export default async function EditFullTestPage({ params }: PageProps) {
           label: `${q.topic.domain.section.name === "MATH" ? "MATH" : "RW"} · ${q.difficulty} · ${plainMathLabel(q.stem, 100)}`,
           stem: q.stem,
           difficulty: q.difficulty,
+          type: q.type,
           section: q.topic.domain.section.name === "MATH" ? "MATH" : "RW",
+          imageUrl: q.imageUrl,
+          stimulus: q.stimulus,
+          optionImageUrls: q.options.map((o) => o.imageUrl).filter((u): u is string => Boolean(u)),
         }))}
       />
     </div>

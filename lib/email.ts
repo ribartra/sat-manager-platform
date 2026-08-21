@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { getSmtpConfig } from "@/lib/smtp-settings";
+import { captureCaughtError, writeAudit } from "@/lib/audit";
 
 type EmailPayload = {
   to: string;
@@ -18,8 +19,22 @@ function escapeHtml(value: string) {
 }
 
 export function absoluteAppUrl(path: string) {
-  const baseUrl = process.env.AUTH_URL || "http://localhost:3000";
-  return new URL(path, baseUrl).toString();
+  const configured = process.env.AUTH_URL?.trim();
+  if (!configured) {
+    if (process.env.NODE_ENV === "production" && process.env.NEXT_PHASE !== "phase-production-build") {
+      // Never silently emit localhost links in production emails.
+      void writeAudit({
+        action: "EMAIL_URL_MISCONFIGURED",
+        targetType: "AppSetting",
+        targetId: "AUTH_URL",
+        outcome: "failure",
+        metadata: { path },
+      });
+      throw new Error("AUTH_URL is required in production to build absolute email links.");
+    }
+    return new URL(path, "http://localhost:3000").toString();
+  }
+  return new URL(path, configured).toString();
 }
 
 export async function sendTransactionalEmail(payload: EmailPayload) {
@@ -50,7 +65,9 @@ export async function sendTransactionalEmail(payload: EmailPayload) {
 
     return { sent: true as const };
   } catch (error) {
-    console.error("[EMAIL:FAILED]", error);
+    await captureCaughtError("email.send", error, {
+      metadata: { to: payload.to, subject: payload.subject },
+    });
     return { sent: false, reason: "SEND_FAILED" as const };
   }
 }
@@ -151,7 +168,7 @@ export async function sendParentReportEmail(
       `Hello ${displayName},`,
       "",
       `Your child's teacher has shared a progress report for ${studentName} (${sectionsLabel}).`,
-      "Open this single-use link to view it:",
+      "Open this link to view it:",
       reportUrl,
       "",
       "The link activates the first time you open it and stays available for 7 days after that.",
@@ -159,7 +176,7 @@ export async function sendParentReportEmail(
     html: `
       <p>Hello ${safeParent},</p>
       <p>Your child's teacher has shared a progress report for <strong>${safeStudent}</strong> (${safeSections}).</p>
-      <p>Open this single-use link to view it:</p>
+      <p>Open this link to view it:</p>
       <p><a href="${safeUrl}">${safeUrl}</a></p>
       <p>The link activates the first time you open it and stays available for 7 days after that.</p>
     `,

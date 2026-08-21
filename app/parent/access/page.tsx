@@ -1,25 +1,57 @@
-import crypto from "crypto";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { formatDate, scorePercent } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { accessWindow, areasLabel, parseAreas, sectionMatchesAreas } from "@/lib/parent-access";
+import { hashPublicToken } from "@/lib/token-security";
+import { writeAudit } from "@/lib/audit";
 
 interface PageProps {
   searchParams: Promise<{ token?: string }>;
 }
 
-function hashToken(token: string) {
-  return crypto.createHash("sha256").update(token).digest("hex");
+type AccessFailReason = "missing" | "unknown" | "expired" | "revoked";
+
+function failMessage(reason: AccessFailReason): string {
+  switch (reason) {
+    case "missing":
+      return "This report link is missing a token.";
+    case "unknown":
+      return "This report link is invalid.";
+    case "revoked":
+      return "This report link has been revoked.";
+    case "expired":
+      return "This report link has expired.";
+  }
+}
+
+async function AccessDenied({ reason, tokenPrefix }: { reason: AccessFailReason; tokenPrefix?: string }) {
+  await writeAudit({
+    action: "PARENT_REPORT_OPEN_FAILED",
+    targetType: "ParentAccessToken",
+    targetId: tokenPrefix ?? reason,
+    outcome: "failure",
+    metadata: { reason, tokenPrefix },
+  });
+
+  return (
+    <div className="mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center px-4 py-8 text-center">
+      <h1 className="text-lg font-semibold text-gray-900">Unable to open report</h1>
+      <p className="mt-2 text-sm text-red-600">{failMessage(reason)}</p>
+      <p className="mt-3 text-sm text-gray-500">Ask the teacher to share a new link if you still need access.</p>
+      <Link href="/login" className="mt-6 text-sm text-blue-600 hover:underline">
+        Return to login
+      </Link>
+    </div>
+  );
 }
 
 export default async function ParentTemporaryAccessPage({ searchParams }: PageProps) {
   const { token } = await searchParams;
-  if (!token) notFound();
+  if (!token) return <AccessDenied reason="missing" />;
 
   const access = await prisma.parentAccessToken.findUnique({
-    where: { tokenHash: hashToken(token) },
+    where: { tokenHash: hashPublicToken(token) },
     include: {
       student: {
         include: {
@@ -37,16 +69,36 @@ export default async function ParentTemporaryAccessPage({ searchParams }: PagePr
     },
   });
 
-  if (!access) notFound();
+  if (!access) return <AccessDenied reason="unknown" tokenPrefix={token.slice(0, 8)} />;
+
+  if (access.revokedAt) {
+    return <AccessDenied reason="revoked" tokenPrefix={access.id} />;
+  }
 
   const wasActivated = Boolean(access.usedAt);
   const state = accessWindow(access);
-  if (!state.active) notFound();
+  if (!state.active) {
+    return <AccessDenied reason="expired" tokenPrefix={access.id} />;
+  }
 
   // First open activates the link and starts the 7-day access window.
   if (!wasActivated) {
     await prisma.parentAccessToken.update({ where: { id: access.id }, data: { usedAt: new Date() } });
   }
+
+  await writeAudit({
+    userId: access.parentId ?? access.createdById,
+    action: "PARENT_REPORT_OPENED",
+    targetType: "ParentAccessToken",
+    targetId: access.id,
+    outcome: "success",
+    metadata: {
+      studentId: access.studentId,
+      firstOpen: !wasActivated,
+      areas: access.areas,
+      effectiveExpiresAt: state.effectiveExpiresAt.toISOString(),
+    },
+  });
 
   const areas = parseAreas(access.areas);
   const allAreas = areas.length === 3;

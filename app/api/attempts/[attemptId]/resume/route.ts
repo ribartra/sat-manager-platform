@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireApprovedSession } from "@/lib/rbac";
+import { writeAudit } from "@/lib/audit";
 
 interface RouteContext {
   params: Promise<{ attemptId: string }>;
@@ -28,6 +29,14 @@ export async function POST(_req: Request, { params }: RouteContext) {
   const updated = await prisma.attemptPause.update({
     where: { id: pause.id },
     data: { resumedAt, durationSeconds },
+  });
+  await writeAudit({
+    userId: session.user.id,
+    action: "ATTEMPT_RESUMED",
+    targetType: "Attempt",
+    targetId: attemptId,
+    outcome: "info",
+    metadata: { durationSeconds },
   });
   return NextResponse.json({ ok: true, resumed: true, pause: updated });
 }

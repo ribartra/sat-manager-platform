@@ -5,6 +5,7 @@ import { FullTestPlayer } from "./player-client";
 import { getFullTestProgressState } from "@/lib/full-test-progress";
 import { getPublicCalculatorConfig } from "@/lib/calculator-config";
 import { extractQuestionGraphArtifacts } from "@/lib/question-graph";
+import { writeAudit } from "@/lib/audit";
 
 interface PageProps { params: Promise<{ assignmentId: string }> }
 
@@ -40,6 +41,23 @@ export default async function FullTestPlayerPage({ params }: PageProps) {
     attempt = await prisma.fullPracticeTestAttempt.findUniqueOrThrow({
       where: { id: created.id },
       include: { answers: true },
+    });
+    await writeAudit({
+      userId: session!.user.id,
+      action: "FPT_ATTEMPT_STARTED",
+      targetType: "FullPracticeTestAttempt",
+      targetId: attempt.id,
+      outcome: "success",
+      metadata: { testId: assignment.testId, assignmentId: assignment.id },
+    });
+  } else {
+    await writeAudit({
+      userId: session!.user.id,
+      action: "FPT_ATTEMPT_RESUMED",
+      targetType: "FullPracticeTestAttempt",
+      targetId: attempt.id,
+      outcome: "info",
+      metadata: { testId: assignment.testId, assignmentId: assignment.id },
     });
   }
   const savedProgressState = await getFullTestProgressState(attempt.id, assignment.test.modules.length);

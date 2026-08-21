@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MathContent } from "@/components/math-content";
+import { QuestionListItem, toQuestionListMedia } from "@/components/question-list-item";
 import { fullTestAttemptProgress } from "@/lib/attempt-progress";
 import { parseFullTestProgressState } from "@/lib/full-test-progress";
 import { moduleKeyFromOrder } from "@/lib/full-test-modules";
@@ -21,7 +21,14 @@ export default async function FullTestDetailPage({ params }: PageProps) {
       modules: {
         include: {
           questions: {
-            include: { question: { include: { topic: { include: { domain: { include: { section: true } } } } } } },
+            include: {
+              question: {
+                include: {
+                  topic: { include: { domain: { include: { section: true } } } },
+                  options: { select: { imageUrl: true }, where: { imageUrl: { not: null } } },
+                },
+              },
+            },
             orderBy: { order: "asc" },
           },
         },
@@ -118,23 +125,28 @@ export default async function FullTestDetailPage({ params }: PageProps) {
                 <CardBody className="divide-y divide-gray-100 p-0">
                   {module.questions.map((item, index) => (
                     <div key={item.questionId} className="px-5 py-3">
-                      <div className="mb-1 flex flex-wrap items-center gap-2">
-                        <span className="text-xs font-medium text-gray-400">Q{index + 1}</span>
-                        <Badge
-                          variant={
-                            item.question.difficulty === "EASY"
-                              ? "easy"
-                              : item.question.difficulty === "MEDIUM"
-                                ? "medium"
-                                : "hard"
-                          }
-                        >
-                          {item.question.difficulty}
-                        </Badge>
-                        <Badge variant="default">{item.question.type}</Badge>
-                        <Badge variant="default">{item.question.topic.name}</Badge>
-                      </div>
-                      <MathContent content={item.question.stem} className="max-h-28 overflow-auto text-sm text-gray-800" />
+                      <QuestionListItem
+                        question={toQuestionListMedia(item.question)}
+                        href={`/teacher/questions/${item.question.id}/edit`}
+                        indexLabel={<span className="text-xs font-medium text-gray-400">Q{index + 1}</span>}
+                        meta={
+                          <>
+                            <Badge
+                              variant={
+                                item.question.difficulty === "EASY"
+                                  ? "easy"
+                                  : item.question.difficulty === "MEDIUM"
+                                    ? "medium"
+                                    : "hard"
+                              }
+                            >
+                              {item.question.difficulty}
+                            </Badge>
+                            <Badge variant="default">{item.question.type}</Badge>
+                            <Badge variant="default">{item.question.topic.name}</Badge>
+                          </>
+                        }
+                      />
                     </div>
                   ))}
                   {module.questions.length === 0 && (

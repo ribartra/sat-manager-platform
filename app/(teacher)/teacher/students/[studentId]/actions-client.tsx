@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { UserCheck, UserX } from "lucide-react";
 
 export function StudentDetailActions({ studentId, isActive }: { studentId: string; isActive: boolean }) {
@@ -17,15 +16,14 @@ export function StudentDetailActions({ studentId, isActive }: { studentId: strin
   }
 
   return (
-    <Button
-      variant={isActive ? "secondary" : "secondary"}
-      size="sm"
+    <button
+      type="button"
       onClick={toggleActive}
       disabled={loading}
-      className="flex items-center gap-1.5"
+      className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-gray-300 bg-white px-3 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
     >
       {isActive ? <UserX size={14} /> : <UserCheck size={14} />}
-      {isActive ? "Deactivate" : "Activate"}
-    </Button>
+      {loading ? "…" : isActive ? "Deactivate" : "Activate"}
+    </button>
   );
 }

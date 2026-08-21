@@ -9,6 +9,7 @@ import {
 } from "@/lib/attempt-snapshots";
 import { getPublicCalculatorConfig } from "@/lib/calculator-config";
 import { extractQuestionGraphArtifacts } from "@/lib/question-graph";
+import { writeAudit } from "@/lib/audit";
 
 interface PracticePlayerInput {
   setId: string;
@@ -107,7 +108,26 @@ export async function renderPracticePlayer({ setId, assignmentId }: PracticePlay
       where: { id: attempt.id },
       include: { answers: true },
     });
-  } else if (!attempt.practiceSetSnapshot) {
+    await writeAudit({
+      userId,
+      action: "ATTEMPT_STARTED",
+      targetType: "Attempt",
+      targetId: attempt.id,
+      outcome: "success",
+      metadata: { practiceSetId: setId, assignmentId: assignmentId ?? null, attemptNumber: attempt.attemptNumber },
+    });
+  } else {
+    await writeAudit({
+      userId,
+      action: "ATTEMPT_RESUMED",
+      targetType: "Attempt",
+      targetId: attempt.id,
+      outcome: "info",
+      metadata: { practiceSetId: setId, assignmentId: assignmentId ?? null },
+    });
+  }
+
+  if (attempt && !attempt.practiceSetSnapshot) {
     await prisma.attempt.update({
       where: { id: attempt.id },
       data: { practiceSetSnapshot },

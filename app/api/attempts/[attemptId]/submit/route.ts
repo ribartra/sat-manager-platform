@@ -13,6 +13,7 @@ import { applyPracticeProgression } from "@/lib/practice-progression";
 import { markUserActive } from "@/lib/activity";
 import { isAnswerCorrect } from "@/lib/answer-grading";
 import { scorePracticeSetAttempt } from "@/lib/practice-set-scoring";
+import { writeAudit } from "@/lib/audit";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ attemptId: string }> }) {
   const session = await requireApprovedSession();
@@ -183,6 +184,19 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ att
     studentId: session.user.id,
     practiceSetId: attempt.practiceSetId,
     scorePercent: scored.scorePercent,
+  });
+
+  await writeAudit({
+    userId: session.user.id,
+    action: "ATTEMPT_SUBMITTED",
+    targetType: "Attempt",
+    targetId: attemptId,
+    outcome: "success",
+    metadata: {
+      practiceSetId: attempt.practiceSetId,
+      scorePercent: scored.scorePercent,
+      scaledScore: scored.scaledScore,
+    },
   });
 
   return NextResponse.json({ ok: true });

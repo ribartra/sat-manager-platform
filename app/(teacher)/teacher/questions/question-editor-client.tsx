@@ -10,7 +10,8 @@ import { Select } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { MathContent } from "@/components/math-content";
 import { TextFormatToolbar } from "@/components/text-format-toolbar";
-import { QuestionMedia } from "@/components/question-media";
+import { QuestionImageField } from "@/components/question-image-field";
+import { QuestionPlayerPreview } from "@/components/question-player-preview";
 import { TaxonomyPicker } from "@/components/taxonomy-picker";
 import {
   Dialog,
@@ -424,14 +425,12 @@ export function QuestionEditor({
         })}
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Image URL (optional)</label>
-        <Input
-          value={imageUrl ?? ""}
-          onChange={(e) => setImageUrl(e.target.value)}
-          placeholder="https://..."
-        />
-      </div>
+      <QuestionImageField
+        label="Question image (optional)"
+        value={imageUrl ?? ""}
+        onChange={setImageUrl}
+        placeholder="/uploads/questions/..."
+      />
 
       {/* Question stem */}
       <div>
@@ -472,13 +471,13 @@ export function QuestionEditor({
                     rows: 2,
                     placeholder: `Option ${opt.label}...`,
                   })}
-                  <Input
+                  <QuestionImageField
+                    label={`Option ${opt.label} image (optional)`}
                     value={opt.imageUrl ?? ""}
-                    onChange={(e) => updateOptionImage(opt.label, e.target.value)}
-                    placeholder={`Option ${opt.label} image URL (optional)`}
-                    className="text-xs"
+                    onChange={(next) => updateOptionImage(opt.label, next)}
+                    placeholder="/uploads/questions/..."
+                    compact
                   />
-                  <QuestionMedia imageUrl={opt.imageUrl} className="bg-white" />
                 </div>
                 {renderFieldToolbar({ kind: "option", label: `Option ${opt.label}`, optionLabel: opt.label })}
               </div>
@@ -513,55 +512,37 @@ export function QuestionEditor({
         })}
       </div>
 
-      {/* Preview toggle */}
-      {stem && (
-        <Card variant="info" padding="md">
+      {/* View as player — same layout as student practice player */}
+      <div className="space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <button
             type="button"
             onClick={() => setPreview(!preview)}
             className="text-sm font-medium text-blue-700 hover:underline"
           >
-            {preview ? "Hide preview" : "Show rendered preview →"}
+            {preview ? "Hide player view" : "View as player →"}
           </button>
-          {preview && (
-            <div className="mt-3 space-y-2">
-              {stimulus && (
-                <div>
-                  <p className="text-xs font-medium text-gray-500 mb-1">Stimulus</p>
-                  <MathContent content={stimulus} className="text-sm text-gray-800 bg-white p-3 rounded border" />
-                </div>
-              )}
-              <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Question</p>
-                <MathContent content={stem} className="text-sm text-gray-800 bg-white p-3 rounded border" />
-                <QuestionMedia imageUrl={imageUrl} className="mt-2 bg-white" />
+          {preview && explanation.trim() && (
+            <details className="text-sm text-gray-600">
+              <summary className="cursor-pointer select-none text-xs font-medium text-gray-500 hover:text-gray-700">
+                Show explanation (teacher only)
+              </summary>
+              <div className="mt-2 rounded-md border border-gray-200 bg-gray-50 p-3">
+                <MathContent content={explanation} className="text-sm text-gray-800" />
               </div>
-              {type === "MC" && options.some((option) => option.text.trim()) && (
-                <div>
-                  <p className="text-xs font-medium text-gray-500 mb-1">Answer Choices</p>
-                  <div className="space-y-2 rounded border bg-white p-3">
-                    {options.map((option) => (
-                      <div key={option.label} className="flex gap-2 text-sm text-gray-800">
-                        <span className="w-5 shrink-0 font-medium">{option.label})</span>
-                        <span className="min-w-0 flex-1">
-                          {option.text ? <MathContent content={option.text} /> : <span className="text-gray-300">Empty</span>}
-                          <QuestionMedia imageUrl={option.imageUrl} className="mt-2" />
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {explanation && (
-                <div>
-                  <p className="text-xs font-medium text-gray-500 mb-1">Explanation</p>
-                  <MathContent content={explanation} className="text-sm text-gray-800 bg-white p-3 rounded border" />
-                </div>
-              )}
-            </div>
+            </details>
           )}
-        </Card>
-      )}
+        </div>
+        {preview && (
+          <QuestionPlayerPreview
+            stem={stem}
+            stimulus={stimulus}
+            imageUrl={imageUrl}
+            type={type}
+            options={options}
+          />
+        )}
+      </div>
 
       {/* Actions */}
       {errors.length > 0 && (

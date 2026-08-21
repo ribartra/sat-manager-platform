@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { validateQuestionPayload } from "@/lib/content-validation";
+import { captureCaughtError } from "@/lib/audit";
 
 type CsvRow = Record<string, string>;
 
@@ -167,6 +168,10 @@ export async function POST(req: NextRequest) {
       });
       created += 1;
     } catch (error) {
+      await captureCaughtError("admin.import.row", error, {
+        userId: session.user.id,
+        metadata: { rowNumber: validated.rowNumber },
+      });
       errors.push(`Row ${validated.rowNumber}: ${error instanceof Error ? error.message : "Import failed."}`);
     }
   }

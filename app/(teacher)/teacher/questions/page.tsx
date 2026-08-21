@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { MathContent } from "@/components/math-content";
+import { QuestionListItem, toQuestionListMedia } from "@/components/question-list-item";
 import { QuestionActions } from "./question-actions-client";
 import { cn } from "@/lib/utils";
 import { academicTopicWhere, activeTaxonomySection, buildTaxonomyTree, matchesTaxonomySection, TAXONOMY_SECTION_TABS } from "@/lib/taxonomy";
@@ -59,6 +59,7 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
       setItems: { select: { practiceSetId: true } },
       fullTestItems: { select: { moduleId: true } },
       answers: { select: { id: true } },
+      options: { select: { imageUrl: true }, where: { imageUrl: { not: null } } },
     },
     orderBy: { createdAt: "desc" },
     take: 100,
@@ -98,7 +99,6 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
         ))}
       </div>
 
-      {/* Filters */}
       <QuestionsFilter
         section={activeSection}
         sectionLabel={visibleTopics[0]?.domain.section.label ?? (activeSection === "math" ? "Mathematics" : "Reading & Writing")}
@@ -127,10 +127,16 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {questions.map((q) => (
+            {questions.map((q) => {
+              const editHref = `/teacher/questions/${q.id}/edit`;
+              return (
               <tr key={q.id} className="hover:bg-gray-50">
-                <td className="px-4 py-3 max-w-xs">
-                  <MathContent content={q.stem} className="max-h-28 overflow-auto text-sm text-gray-800" />
+                <td className="px-4 py-3 max-w-md">
+                  <QuestionListItem
+                    href={editHref}
+                    question={toQuestionListMedia(q)}
+                    stemClassName="group-hover:text-gray-950"
+                  />
                 </td>
                 <td className="px-4 py-3">
                   <p className="text-xs text-gray-500">{q.topic.domain.section.label} / {q.topic.domain.name}</p>
@@ -160,7 +166,8 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
                   />
                 </td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
         </table>
         {questions.length === 0 && (

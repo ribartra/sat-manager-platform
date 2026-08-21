@@ -3,90 +3,159 @@ import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { formatDate } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
+import {
+  AUDIT_ACTION_LABELS,
+  actionCategory,
+  formatAuditPayload,
+  humanizeAction,
+  outcomeFromMetadata,
+  type AuditCategory,
+} from "@/lib/audit-catalog";
+import { AuditPayload } from "@/components/admin/audit-payload";
 
-const ACTION_LABELS: Record<string, string> = {
-  CREATE_PROGRAM: "Created program",
-  UPDATE_PROGRAM: "Updated program",
-  APPROVE_ENROLLMENT: "Approved enrollment",
-  REJECT_ENROLLMENT: "Rejected enrollment",
-  REMOVE_ENROLLMENT: "Removed student",
-  REQUEST_ENROLLMENT: "Requested enrollment",
-  ADD_PROGRAM_TEACHER: "Added teacher to program",
-  REMOVE_PROGRAM_TEACHER: "Removed teacher from program",
-  INVALIDATE_ATTEMPT: "Invalidated attempt",
-  REOPEN_ATTEMPT: "Reopened attempt",
-  COMMENT_ATTEMPT: "Commented attempt",
-  CREATE_QUESTION: "Created question",
-  UPDATE_QUESTION: "Updated question",
-  PUBLISH_QUESTION: "Published question",
-  ARCHIVE_QUESTION: "Archived question",
-  CREATE_PRACTICE_SET: "Created Practice Set",
-  UPDATE_PRACTICE_SET: "Updated Practice Set",
-  PUBLISH_PRACTICE_SET: "Published Practice Set",
-  ARCHIVE_PRACTICE_SET: "Archived Practice Set",
-  IMPORT_QUESTIONS: "Imported questions",
-  IMPERSONATE_STUDENT_VIEW: "Viewed as student",
-  ASSIGN_PRACTICE_SET: "Assigned Practice Set",
-  ASSIGN_FULL_PRACTICE_TEST: "Assigned Exam",
-  APPROVE_UNLOCK_REQUEST: "Approved unlock request",
-  DENY_UNLOCK_REQUEST: "Denied unlock request",
-  CREATE_PARENT_ACCESS_LINK: "Created parent access link",
-  UPDATE_PARENT: "Updated parent",
-  LINK_PARENT_STUDENT: "Linked parent and student",
-  UNLINK_PARENT_STUDENT: "Unlinked parent and student",
-};
+interface PageProps {
+  searchParams: Promise<{ cat?: string }>;
+}
 
-export default async function AdminLogsPage() {
+const TABS: { id: string; label: string; match?: AuditCategory }[] = [
+  { id: "all", label: "All" },
+  { id: "auth", label: "Auth", match: "Auth" },
+  { id: "users", label: "Users", match: "Users" },
+  { id: "attempts", label: "Attempts", match: "Attempts" },
+  { id: "content", label: "Content", match: "Content" },
+  { id: "import", label: "Import", match: "Import" },
+  { id: "programs", label: "Programs", match: "Programs" },
+  { id: "errors", label: "Errors", match: "Errors" },
+  { id: "other", label: "Other", match: "Other" },
+];
+
+function outcomeBadge(outcome: "success" | "failure" | "info" | null) {
+  if (!outcome) return null;
+  const styles =
+    outcome === "success"
+      ? "bg-emerald-50 text-emerald-700"
+      : outcome === "failure"
+        ? "bg-rose-50 text-rose-700"
+        : "bg-sky-50 text-sky-700";
+  return (
+    <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium uppercase ${styles}`}>
+      {outcome}
+    </span>
+  );
+}
+
+export default async function AdminLogsPage({ searchParams }: PageProps) {
   const session = await auth();
   if (!session) redirect("/login");
   if (session.user.role !== "ADMIN") redirect("/teacher");
 
+  const { cat } = await searchParams;
+  const category = cat?.toLowerCase() ?? "all";
+  const tab = TABS.find((t) => t.id === category) ?? TABS[0];
+
   const logs = await prisma.auditLog.findMany({
     include: { user: { select: { name: true, email: true, role: true } } },
     orderBy: { createdAt: "desc" },
-    take: 200,
+    take: 500,
   });
 
+  const filtered = (
+    tab.id === "all" ? logs : logs.filter((log) => actionCategory(log.action) === tab.match)
+  ).slice(0, 250);
+
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8">
+    <div className="mx-auto max-w-6xl px-4 py-8">
       <h1 className="mb-1 text-xl font-semibold text-gray-900">Audit Log</h1>
-      <p className="mb-6 text-sm text-gray-500">Last 200 system events, newest first.</p>
+      <p className="mb-4 text-sm text-gray-500">
+        Latest system events with full payload. Unknown codes are humanized automatically.
+      </p>
+
+      <div className="mb-4 flex flex-wrap gap-2">
+        {TABS.map((item) => {
+          const active = tab.id === item.id;
+          const href = item.id === "all" ? "/admin/logs" : `/admin/logs?cat=${item.id}`;
+          return (
+            <a
+              key={item.id}
+              href={href}
+              className={`rounded-md px-3 py-1.5 text-xs font-medium ${
+                active ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+            >
+              {item.label}
+            </a>
+          );
+        })}
+      </div>
 
       <Card className="overflow-hidden">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-gray-200 bg-gray-50">
-              <th className="px-4 py-3 text-left font-medium text-gray-500">When</th>
-              <th className="px-4 py-3 text-left font-medium text-gray-500">Who</th>
-              <th className="px-4 py-3 text-left font-medium text-gray-500">Action</th>
-              <th className="px-4 py-3 text-left font-medium text-gray-500">Target</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {logs.map((log) => (
-              <tr key={log.id} className="hover:bg-gray-50">
-                <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{formatDate(log.createdAt)}</td>
-                <td className="px-4 py-3">
-                  <p className="font-medium text-gray-800">{log.user.name}</p>
-                  <p className="text-xs text-gray-400">{log.user.role}</p>
-                </td>
-                <td className="px-4 py-3 text-gray-700">
-                  {ACTION_LABELS[log.action] ?? log.action}
-                </td>
-                <td className="px-4 py-3 text-gray-500 text-xs">
-                  {log.targetType && <span className="font-medium">{log.targetType}</span>}
-                  {log.targetId && <span className="ml-1 text-gray-400 font-mono">{log.targetId.slice(0, 20)}</span>}
-                  {log.metadata && (
-                    <pre className="mt-0.5 text-gray-400 text-[10px] overflow-hidden max-w-xs truncate">
-                      {log.metadata}
-                    </pre>
-                  )}
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[720px] text-sm">
+            <thead>
+              <tr className="border-b border-gray-200 bg-gray-50">
+                <th className="px-4 py-3 text-left font-medium text-gray-500">When</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-500">Who</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-500">Event</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-500">Target / payload</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-        {logs.length === 0 && (
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {filtered.map((log) => {
+                const categoryLabel = actionCategory(log.action);
+                const label = humanizeAction(log.action);
+                const outcome = outcomeFromMetadata(log.metadata);
+                const payload = formatAuditPayload(log.metadata);
+                const uncatalogued = !(log.action in AUDIT_ACTION_LABELS);
+
+                return (
+                  <tr key={log.id} className="align-top hover:bg-gray-50">
+                    <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
+                      <p>{formatDate(log.createdAt)}</p>
+                      <p className="mt-0.5 font-mono text-[10px] text-gray-400">
+                        {log.createdAt.toISOString().replace("T", " ").slice(0, 19)} UTC
+                      </p>
+                    </td>
+                    <td className="px-4 py-3">
+                      {log.user ? (
+                        <>
+                          <p className="font-medium text-gray-800">{log.user.name}</p>
+                          <p className="text-xs text-gray-400">{log.user.role}</p>
+                          <p className="text-[10px] text-gray-400">{log.user.email}</p>
+                        </>
+                      ) : (
+                        <>
+                          <p className="font-medium text-gray-800">Anonymous / System</p>
+                          <p className="text-xs text-gray-400">—</p>
+                        </>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-gray-800">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <span className="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] uppercase text-gray-500">
+                          {categoryLabel}
+                        </span>
+                        {outcomeBadge(outcome)}
+                        {uncatalogued && (
+                          <span className="rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">
+                            new
+                          </span>
+                        )}
+                      </div>
+                      <p className="mt-1 font-medium text-gray-900">{label}</p>
+                      <p className="mt-0.5 font-mono text-[10px] text-gray-400" title="Internal event code">
+                        {log.action}
+                      </p>
+                    </td>
+                    <td className="px-4 py-3">
+                      <AuditPayload payload={payload} targetType={log.targetType} targetId={log.targetId} />
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+        {filtered.length === 0 && (
           <p className="py-10 text-center text-sm text-gray-400">No events recorded yet.</p>
         )}
       </Card>

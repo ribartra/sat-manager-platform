@@ -8,7 +8,7 @@ import { Select } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { ArrowDown, ArrowUp, X } from "lucide-react";
-import { MathContent } from "@/components/math-content";
+import { QuestionListItem } from "@/components/question-list-item";
 import { ImportQuestionnaireButton } from "@/components/import-questionnaire-button";
 import { TaxonomyPicker } from "@/components/taxonomy-picker";
 
@@ -27,6 +27,9 @@ interface QuestionInfo {
   difficulty: string;
   type: string;
   status: string;
+  imageUrl?: string | null;
+  stimulus?: string | null;
+  optionImageUrls?: string[];
 }
 
 interface PracticeSetInitial {
@@ -170,14 +173,20 @@ export function PracticeSetEditor({
         </div>
         <div className="divide-y divide-gray-100">
           {selectedQuestions.map((q, index) => (
-            <div key={q.id} className="flex items-center gap-3 px-4 py-3">
-              <span className="w-6 text-xs font-medium text-gray-400">{index + 1}</span>
+            <div key={q.id} className="flex items-start gap-3 px-4 py-3">
+              <span className="mt-1 w-6 text-xs font-medium text-gray-400">{index + 1}</span>
               <div className="min-w-0 flex-1">
-                <MathContent content={q.stem} className="max-h-28 overflow-auto text-sm font-medium text-gray-900" />
-                <div className="mt-1 flex items-center gap-2">
-                  <Badge variant={q.difficulty === "EASY" ? "easy" : q.difficulty === "MEDIUM" ? "medium" : "hard"}>{q.difficulty}</Badge>
-                  <Badge variant="default">{q.type}</Badge>
-                </div>
+                <QuestionListItem
+                  question={q}
+                  href={`/teacher/questions/${q.id}/edit`}
+                  meta={
+                    <>
+                      <Badge variant={q.difficulty === "EASY" ? "easy" : q.difficulty === "MEDIUM" ? "medium" : "hard"}>{q.difficulty}</Badge>
+                      <Badge variant="default">{q.type}</Badge>
+                    </>
+                  }
+                  stemClassName="font-medium text-gray-900"
+                />
               </div>
               <Button variant="ghost" size="sm" onClick={() => moveQuestion(index, -1)} disabled={index === 0}>
                 <ArrowUp size={14} />
