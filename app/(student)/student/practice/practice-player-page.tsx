@@ -10,6 +10,7 @@ import {
 import { getPublicCalculatorConfig } from "@/lib/calculator-config";
 import { extractQuestionGraphArtifacts } from "@/lib/question-graph";
 import { writeAudit } from "@/lib/audit";
+import { withSqliteRetry } from "@/lib/sqlite-retry";
 
 interface PracticePlayerInput {
   setId: string;
@@ -21,7 +22,7 @@ export async function renderPracticePlayer({ setId, assignmentId }: PracticePlay
   if (!session) redirect("/login");
   const userId = session.user.id;
 
-  const practiceSet = await prisma.practiceSet.findUnique({
+  const practiceSet = await withSqliteRetry(() => prisma.practiceSet.findUnique({
     where: { id: setId },
     include: {
       topic: { include: { domain: { include: { section: true } } } },
@@ -37,15 +38,15 @@ export async function renderPracticePlayer({ setId, assignmentId }: PracticePlay
         orderBy: { order: "asc" },
       },
     },
-  });
+  }));
 
   if (!practiceSet || practiceSet.status !== "PUBLISHED") notFound();
 
   if (session.user.role === "STUDENT") {
     if (!assignmentId) redirect("/student");
-    const assignment = await prisma.assignment.findFirst({
+    const assignment = await withSqliteRetry(() => prisma.assignment.findFirst({
       where: { id: assignmentId, studentId: userId, practiceSetId: setId, locked: false },
-    });
+    }));
     if (!assignment || (assignment.unlockAt && assignment.unlockAt > new Date())) redirect("/student");
   }
 
@@ -63,17 +64,17 @@ export async function renderPracticePlayer({ setId, assignmentId }: PracticePlay
     questionSnapshot: stringifySnapshot(buildQuestionSnapshot(item)),
   }));
 
-  let attempt = await prisma.attempt.findFirst({
+  let attempt = await withSqliteRetry(() => prisma.attempt.findFirst({
     where: { studentId: userId, practiceSetId: setId, assignmentId: assignmentId ?? null, status: "IN_PROGRESS" },
     include: { answers: true },
     orderBy: { startedAt: "desc" },
-  });
+  }));
 
   if (!attempt) {
-    const prevAttempts = await prisma.attempt.count({
+    const prevAttempts = await withSqliteRetry(() => prisma.attempt.count({
       where: { studentId: userId, practiceSetId: setId },
-    });
-    attempt = await prisma.attempt.create({
+    }));
+    attempt = await withSqliteRetry(() => prisma.attempt.create({
       data: {
         studentId: userId,
         practiceSetId: setId,
@@ -84,30 +85,31 @@ export async function renderPracticePlayer({ setId, assignmentId }: PracticePlay
         currentQuestion: 0,
       },
       include: { answers: true },
-    });
+    }));
+    const createdAttemptId = attempt.id;
     await Promise.all(
       questionSnapshots.map((snapshot) =>
-        prisma.attemptAnswer.upsert({
-          where: { attemptId_questionId: { attemptId: attempt!.id, questionId: snapshot.questionId } },
+      withSqliteRetry(() => prisma.attemptAnswer.upsert({
+          where: { attemptId_questionId: { attemptId: createdAttemptId, questionId: snapshot.questionId } },
           update: { questionSnapshot: snapshot.questionSnapshot },
           create: {
-            attemptId: attempt!.id,
+            attemptId: createdAttemptId,
             questionId: snapshot.questionId,
             questionSnapshot: snapshot.questionSnapshot,
           },
-        })
+      }))
       )
     );
     if (assignmentId) {
-      await prisma.assignment.update({
+      await withSqliteRetry(() => prisma.assignment.update({
         where: { id: assignmentId },
         data: { status: "IN_PROGRESS" },
-      });
+      }));
     }
-    attempt = await prisma.attempt.findUniqueOrThrow({
-      where: { id: attempt.id },
+    attempt = await withSqliteRetry(() => prisma.attempt.findUniqueOrThrow({
+      where: { id: createdAttemptId },
       include: { answers: true },
-    });
+    }));
     await writeAudit({
       userId,
       action: "ATTEMPT_STARTED",
@@ -127,28 +129,31 @@ export async function renderPracticePlayer({ setId, assignmentId }: PracticePlay
     });
   }
 
-  if (attempt && !attempt.practiceSetSnapshot) {
-    await prisma.attempt.update({
-      where: { id: attempt.id },
+  if (!attempt) throw new Error("Practice attempt could not be initialized.");
+
+  if (!attempt.practiceSetSnapshot) {
+    const activeAttemptId = attempt.id;
+    await withSqliteRetry(() => prisma.attempt.update({
+      where: { id: activeAttemptId },
       data: { practiceSetSnapshot },
-    });
+    }));
     await Promise.all(
       questionSnapshots.map((snapshot) =>
-        prisma.attemptAnswer.upsert({
-          where: { attemptId_questionId: { attemptId: attempt!.id, questionId: snapshot.questionId } },
+        withSqliteRetry(() => prisma.attemptAnswer.upsert({
+          where: { attemptId_questionId: { attemptId: activeAttemptId, questionId: snapshot.questionId } },
           update: { questionSnapshot: snapshot.questionSnapshot },
           create: {
-            attemptId: attempt!.id,
+            attemptId: activeAttemptId,
             questionId: snapshot.questionId,
             questionSnapshot: snapshot.questionSnapshot,
           },
-        })
+        }))
       )
     );
-    attempt = await prisma.attempt.findUniqueOrThrow({
-      where: { id: attempt.id },
+    attempt = await withSqliteRetry(() => prisma.attempt.findUniqueOrThrow({
+      where: { id: activeAttemptId },
       include: { answers: true },
-    });
+    }));
   }
 
   const savedAnswers: Record<string, string> = {};

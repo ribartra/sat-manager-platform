@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireApprovedSession } from "@/lib/rbac";
 import { markUserActive } from "@/lib/activity";
+import { withSqliteRetry } from "@/lib/sqlite-retry";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ attemptId: string }> }) {
   const session = await requireApprovedSession();
@@ -10,22 +11,22 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ att
   const { attemptId } = await params;
   const { answers, currentQuestion, totalTime, timeSpentByQuestion, markedQuestionIds, notes, eliminatedOptions } = await req.json();
 
-  const attempt = await prisma.attempt.findFirst({
+  const attempt = await withSqliteRetry(() => prisma.attempt.findFirst({
     where: { id: attemptId, studentId: session.user.id, status: "IN_PROGRESS" },
-  });
+  }));
   if (!attempt) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const allowedQuestions = await prisma.practiceSetQuestion.findMany({
+  const allowedQuestions = await withSqliteRetry(() => prisma.practiceSetQuestion.findMany({
     where: { practiceSetId: attempt.practiceSetId },
     select: { questionId: true },
-  });
+  }));
   const allowedQuestionIds = new Set(allowedQuestions.map((item) => item.questionId));
 
   await Promise.all([
-    prisma.attempt.update({
+    withSqliteRetry(() => prisma.attempt.update({
       where: { id: attemptId },
       data: { currentQuestion, totalTime },
-    }),
+    })),
     markUserActive(session.user.id),
   ]);
 
@@ -35,7 +36,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ att
       Object.entries(answers)
         .filter(([questionId]) => allowedQuestionIds.has(questionId))
         .map(([questionId, answer]) =>
-        prisma.attemptAnswer.upsert({
+        withSqliteRetry(() => prisma.attemptAnswer.upsert({
           where: { attemptId_questionId: { attemptId, questionId } },
           update: {
             answer: answer as string,
@@ -57,7 +58,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ att
               ? JSON.stringify(eliminatedOptions[questionId])
               : undefined,
           },
-        })
+        }))
       )
     );
   }
@@ -73,7 +74,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ att
       Array.from(metadataQuestionIds)
         .filter((questionId) => allowedQuestionIds.has(questionId))
         .map((questionId) =>
-        prisma.attemptAnswer.upsert({
+          withSqliteRetry(() => prisma.attemptAnswer.upsert({
           where: { attemptId_questionId: { attemptId, questionId } },
           update: {
             markedForReview: Array.isArray(markedQuestionIds) ? markedQuestionIds.includes(questionId) : undefined,
@@ -91,7 +92,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ att
               ? JSON.stringify(eliminatedOptions[questionId])
               : undefined,
           },
-        })
+          }))
       )
     );
   }
@@ -101,11 +102,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ att
       Object.entries(timeSpentByQuestion)
         .filter(([questionId]) => allowedQuestionIds.has(questionId))
         .map(([questionId, timeSpent]) =>
-        prisma.attemptAnswer.upsert({
+        withSqliteRetry(() => prisma.attemptAnswer.upsert({
           where: { attemptId_questionId: { attemptId, questionId } },
           update: { timeSpent: Number(timeSpent) || 0 },
           create: { attemptId, questionId, timeSpent: Number(timeSpent) || 0 },
-        })
+        }))
       )
     );
   }

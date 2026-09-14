@@ -15,6 +15,7 @@ import { Flag, ChevronLeft, ChevronRight, List, Pause, Send } from "lucide-react
 import { cn } from "@/lib/utils";
 import { SaveIndicator, type SaveStatus } from "@/components/sat";
 import { exitPlayerOnAuthLoss, isAuthFailureStatus } from "@/lib/player-session-exit";
+import { fetchWithTransientRetry } from "@/lib/transient-fetch";
 
 interface Option { label: string; text: string; imageUrl?: string | null }
 interface Question {
@@ -80,7 +81,7 @@ export function PracticeSetPlayer({
   useEffect(() => {
     questionStartTime.current = Date.now();
     void (async () => {
-      const response = await fetch(`/api/attempts/${attemptId}/resume`, { method: "POST" });
+      const response = await fetchWithTransientRetry(`/api/attempts/${attemptId}/resume`, { method: "POST" });
       if (isAuthFailureStatus(response.status)) {
         await exitPlayerOnAuthLoss({ pauseUrl: `/api/attempts/${attemptId}/pause` });
       }
@@ -126,7 +127,7 @@ export function PracticeSetPlayer({
       };
       setSaving("saving");
       try {
-        const response = await fetch(`/api/attempts/${attemptId}/autosave`, {
+        const response = await fetchWithTransientRetry(`/api/attempts/${attemptId}/autosave`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -152,7 +153,7 @@ export function PracticeSetPlayer({
       const raw = localStorage.getItem(offlineKey);
       if (!raw) return;
       try {
-        const response = await fetch(`/api/attempts/${attemptId}/autosave`, {
+        const response = await fetchWithTransientRetry(`/api/attempts/${attemptId}/autosave`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: raw,
@@ -231,7 +232,7 @@ export function PracticeSetPlayer({
 
     setSubmitting(true);
     const timeSpentSnapshot = recordCurrentQuestionTime();
-    const response = await fetch(`/api/attempts/${attemptId}/submit`, {
+    const response = await fetchWithTransientRetry(`/api/attempts/${attemptId}/submit`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

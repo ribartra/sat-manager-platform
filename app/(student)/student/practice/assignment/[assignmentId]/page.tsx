@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { withSqliteRetry } from "@/lib/sqlite-retry";
 import { notFound, redirect } from "next/navigation";
 import { renderPracticePlayer } from "../../practice-player-page";
 
@@ -12,13 +13,13 @@ export default async function PracticeAssignmentPlayerPage({ params }: PageProps
   const session = await auth();
   if (!session) redirect("/login");
 
-  const assignment = await prisma.assignment.findFirst({
+  const assignment = await withSqliteRetry(() => prisma.assignment.findFirst({
     where: {
       id: assignmentId,
       ...(session.user.role === "STUDENT" ? { studentId: session.user.id } : {}),
     },
     select: { id: true, practiceSetId: true },
-  });
+  }));
 
   if (!assignment) notFound();
 
