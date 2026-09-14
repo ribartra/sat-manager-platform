@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
@@ -30,7 +31,7 @@ export default async function StudentFullTestsPage() {
   });
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
+    <PageShell>
       <div className="mb-6">
         <h1 className="text-xl font-semibold text-gray-900">Exams</h1>
         <p className="mt-1 text-sm text-gray-500">Full Practice Tests with SAT-style modules and scoring.</p>
@@ -61,7 +62,7 @@ export default async function StudentFullTestsPage() {
                   <p className="text-sm font-medium text-gray-900">{assignment.test.name}</p>
                   <p className="text-xs text-gray-500">
                     {assignment.dueDate ? `Due ${formatDate(assignment.dueDate)}` : "No due date"} · break{" "}
-                    {assignment.test.breakMinutes} min
+                    {assignment.test.breakMinutes > 0 ? `${assignment.test.breakMinutes} min` : "No break"}
                   </p>
                   <div className="mt-2 flex flex-wrap gap-1">
                     {assignment.test.modules.map((module) => (
@@ -119,6 +120,6 @@ export default async function StudentFullTestsPage() {
           </Card>
         )}
       </div>
-    </div>
+    </PageShell>
   );
 }

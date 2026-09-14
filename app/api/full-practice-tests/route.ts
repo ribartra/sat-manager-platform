@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
+import { fullTestEditorFieldIssues } from "@/contracts/full-test";
 import { validateFullPracticeTestStructure } from "@/lib/full-test-validation";
 import { FULL_TEST_MODULES } from "@/lib/full-test-modules";
 
@@ -27,12 +28,21 @@ export async function POST(req: NextRequest) {
     moduleQuestionIds: normalizedModules,
     questionSections,
   });
+  validation.errors.push(
+    ...fullTestEditorFieldIssues({
+      name,
+      status: targetStatus,
+      reviewEnabled: reviewEnabled ?? true,
+      breakMinutes: Number.isInteger(breakMinutes) && breakMinutes >= 0 ? breakMinutes : 0,
+      moduleQuestionIds: normalizedModules,
+    }),
+  );
   if (validation.errors.length > 0) {
-    return NextResponse.json({ error: "Validation failed.", errors: validation.errors, warnings: validation.warnings }, { status: 400 });
+    return NextResponse.json({ error: "Validation failed.", errors: [...new Set(validation.errors)], warnings: validation.warnings }, { status: 400 });
   }
 
   const resolvedBreak =
-    Number.isInteger(breakMinutes) && breakMinutes >= 0 ? Number(breakMinutes) : 10;
+    Number.isInteger(breakMinutes) && breakMinutes >= 0 ? Number(breakMinutes) : 0;
 
   const test = await prisma.fullPracticeTest.create({
     data: {

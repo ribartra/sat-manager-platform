@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { getFeatureSetting } from "@/lib/app-settings";
@@ -9,17 +10,13 @@ export const dynamic = "force-dynamic";
 export default async function TeacherProgramsPage() {
   const session = await auth();
   if (!session) redirect("/login");
-  if (!["TEACHER", "ADMIN"].includes(session.user.role)) redirect("/student");
-  if (session.user.role === "TEACHER") {
-    const enabled = await getFeatureSetting("TEACHER_PROGRAM_MANAGEMENT");
-    if (!enabled) redirect("/teacher");
-  }
+  if (session.user.role === "ADMIN") redirect("/admin/programs");
+  if (session.user.role !== "TEACHER") redirect("/student");
+  const enabled = await getFeatureSetting("TEACHER_PROGRAM_MANAGEMENT");
+  if (!enabled) redirect("/teacher");
 
   const programs = await prisma.program.findMany({
-    where:
-      session.user.role === "TEACHER"
-        ? { deletedAt: null, teachers: { some: { teacherId: session.user.id, endDate: null } } }
-        : { deletedAt: null },
+    where: { deletedAt: null, teachers: { some: { teacherId: session.user.id, endDate: null } } },
     include: {
       enrollments: {
         include: { student: { select: { id: true, name: true } } },
@@ -47,12 +44,12 @@ export default async function TeacherProgramsPage() {
   }));
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8">
+    <PageShell>
       <h1 className="mb-1 text-xl font-semibold text-gray-900">Programs</h1>
       <p className="mb-6 text-sm text-gray-500">
         Programs you teach. Leave end date blank for indefinite programs.
       </p>
       <TeacherProgramsClient programs={serialized} />
-    </div>
+    </PageShell>
   );
 }

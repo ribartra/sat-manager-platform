@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import { studentAccessWhereFor } from "@/lib/program-scope";
@@ -19,7 +20,7 @@ export default async function EditStudentPage({ params }: PageProps) {
   if (!student) notFound();
 
   return (
-    <div className="mx-auto max-w-xl px-4 py-8">
+    <PageShell width="narrow">
       <h1 className="mb-6 text-xl font-semibold text-gray-900">Edit Student</h1>
       <EditStudentForm
         student={{
@@ -31,6 +32,6 @@ export default async function EditStudentPage({ params }: PageProps) {
           active: student.active,
         }}
       />
-    </div>
+    </PageShell>
   );
 }

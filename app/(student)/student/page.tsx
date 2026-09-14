@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
@@ -6,9 +7,10 @@ import { formatDate, scorePercent } from "@/lib/utils";
 import { scoreBandTextClass } from "@/lib/score-band";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody } from "@/components/ui/card";
-import { Clock, BookOpen, TrendingUp, CheckCircle } from "lucide-react";
+import { Clock, BookOpen, TrendingUp, CheckCircle, ClipboardList } from "lucide-react";
 import { ParentApprovalCard } from "./parent-approval-card";
 import { refreshAssignmentStates } from "@/lib/assignments";
+import { difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
 
 export default async function StudentDashboard() {
   const session = await auth();
@@ -38,7 +40,7 @@ export default async function StudentDashboard() {
     if (!activeEnrollment) redirect("/student/program");
   }
 
-  const [assignments, recentAttempts, stats] = await Promise.all([
+  const [assignments, examAssignments, recentAttempts, stats] = await Promise.all([
     prisma.assignment.findMany({
       where: {
         studentId: userId,
@@ -47,6 +49,18 @@ export default async function StudentDashboard() {
         OR: [{ unlockAt: null }, { unlockAt: { lte: new Date() } }],
       },
       include: { practiceSet: { include: { topic: { include: { domain: { include: { section: true } } } } } } },
+      orderBy: [{ dueDate: "asc" }, { createdAt: "desc" }],
+      take: 10,
+    }),
+    prisma.fullPracticeTestAssignment.findMany({
+      where: {
+        studentId: userId,
+        status: { in: ["PENDING", "IN_PROGRESS", "OVERDUE"] },
+      },
+      include: {
+        test: { select: { id: true, name: true, breakMinutes: true } },
+        attempts: { orderBy: { startedAt: "desc" }, take: 1 },
+      },
       orderBy: [{ dueDate: "asc" }, { createdAt: "desc" }],
       take: 10,
     }),
@@ -81,7 +95,7 @@ export default async function StudentDashboard() {
       : null;
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
+    <PageShell>
       <div className="mb-6">
         <h1 className="text-2xl font-semibold text-gray-900">
           Hello, {session!.user.name.split(" ")[0]}!
@@ -90,7 +104,7 @@ export default async function StudentDashboard() {
       </div>
 
       {/* Stats row */}
-      <div className="grid grid-cols-3 gap-4 mb-8">
+      <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4">
         <Card>
           <CardBody className="flex items-center gap-3">
             <div className="rounded-full bg-blue-100 p-2">
@@ -124,33 +138,41 @@ export default async function StudentDashboard() {
             </div>
           </CardBody>
         </Card>
+        <Card>
+          <CardBody className="flex items-center gap-3">
+            <div className="rounded-full bg-violet-100 p-2">
+              <ClipboardList size={16} className="text-violet-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-gray-900">{examAssignments.length}</p>
+              <p className="text-xs text-gray-500">Pending Exams</p>
+            </div>
+          </CardBody>
+        </Card>
       </div>
 
-      {/* Pending assignments */}
+      {/* Pending Practice Sets */}
       {assignments.length > 0 && (
         <section className="mb-8">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-base font-semibold text-gray-900">Assigned Practice Sets</h2>
-            <Link href="/student/practice-sets" className="text-sm text-blue-600 hover:underline">View all</Link>
+            <Link href="/student/practice-sets" className="text-sm text-blue-600 hover:underline">
+              View all
+            </Link>
           </div>
           <div className="space-y-2">
             {assignments.map((a) => (
-              <Card
-                key={a.id}
-                className="flex items-center justify-between px-4 py-3"
-              >
+              <Card key={a.id} className="flex items-center justify-between px-4 py-3">
                 <div>
                   <p className="text-sm font-medium text-gray-900">{a.practiceSet.name}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">
+                  <p className="mt-0.5 text-xs text-gray-500">
                     {a.practiceSet.topic.domain.section.label} · {a.practiceSet.topic.name}
-                    {a.dueDate && (
-                      <span className="ml-2 text-amber-600">Due: {formatDate(a.dueDate)}</span>
-                    )}
+                    {a.dueDate && <span className="ml-2 text-amber-600">Due: {formatDate(a.dueDate)}</span>}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge variant={a.practiceSet.difficulty === "EASY" ? "easy" : a.practiceSet.difficulty === "MEDIUM" ? "medium" : "hard"}>
-                    {a.practiceSet.difficulty}
+                  <Badge variant={difficultyBadgeVariant(a.practiceSet.difficulty)}>
+                    {difficultyLabel(a.practiceSet.difficulty)}
                   </Badge>
                   <Badge variant={a.status === "IN_PROGRESS" ? "warning" : "info"}>
                     {a.status === "IN_PROGRESS" ? "In Progress" : "Pending"}
@@ -168,35 +190,70 @@ export default async function StudentDashboard() {
         </section>
       )}
 
+      {/* Pending Exams */}
+      {examAssignments.length > 0 && (
+        <section className="mb-8">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-base font-semibold text-gray-900">Assigned Exams</h2>
+            <Link href="/student/full-tests" className="text-sm text-blue-600 hover:underline">
+              View all
+            </Link>
+          </div>
+          <div className="space-y-2">
+            {examAssignments.map((assignment) => {
+              const attempt = assignment.attempts[0];
+              const inProgress = attempt?.status === "IN_PROGRESS";
+              return (
+                <Card key={assignment.id} className="flex items-center justify-between px-4 py-3">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">{assignment.test.name}</p>
+                    <p className="mt-0.5 text-xs text-gray-500">
+                      Full Practice Test · {assignment.test.breakMinutes > 0 ? `break ${assignment.test.breakMinutes} min` : "no break"}
+                      {assignment.dueDate && (
+                        <span className="ml-2 text-amber-600">Due: {formatDate(assignment.dueDate)}</span>
+                      )}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={inProgress ? "warning" : "info"}>{inProgress ? "In Progress" : "Pending"}</Badge>
+                    <Link
+                      href={`/student/full-tests/${assignment.id}`}
+                      className="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700"
+                    >
+                      {inProgress ? "Continue →" : "Start →"}
+                    </Link>
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       {/* Recent results */}
       {recentAttempts.length > 0 && (
         <section>
-          <h2 className="text-base font-semibold text-gray-900 mb-3">Recent Results</h2>
+          <h2 className="mb-3 text-base font-semibold text-gray-900">Recent Results</h2>
           <div className="space-y-2">
             {recentAttempts.map((a) => {
               const correct = a.answers.filter((ans) => ans.isCorrect).length;
               const total = a.answers.length;
               const pct = scorePercent(correct, total);
               return (
-                <Card
-                  key={a.id}
-                  className="flex items-center justify-between px-4 py-3"
-                >
+                <Card key={a.id} className="flex items-center justify-between px-4 py-3">
                   <div>
                     <p className="text-sm font-medium text-gray-900">
                       {a.assignment?.practiceSet.name ?? "Practice Set"}
                     </p>
-                    <p className="text-xs text-gray-500 mt-0.5">
+                    <p className="mt-0.5 text-xs text-gray-500">
                       {a.submittedAt ? formatDate(a.submittedAt) : "—"}
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-sm font-medium text-gray-900">{correct}/{total}</span>
-                    <span
-      className={`text-sm font-semibold ${scoreBandTextClass(pct)}`}
-                    >
-                      {pct}%
+                    <span className="text-sm font-medium text-gray-900">
+                      {correct}/{total}
                     </span>
+                    <span className={`text-sm font-semibold ${scoreBandTextClass(pct)}`}>{pct}%</span>
                     <Link
                       href={`/student/results/${a.id}`}
                       className="flex items-center gap-1 text-xs text-blue-600 hover:underline"
@@ -211,14 +268,14 @@ export default async function StudentDashboard() {
         </section>
       )}
 
-      {assignments.length === 0 && recentAttempts.length === 0 && (
+      {assignments.length === 0 && examAssignments.length === 0 && recentAttempts.length === 0 && (
         <Card padding="lg" className="py-16 text-center text-gray-400">
           <BookOpen size={40} className="mx-auto mb-3" />
           <p className="font-medium">No assignments yet</p>
-          <p className="text-sm mt-1">Your teacher will assign practice sets soon.</p>
+          <p className="mt-1 text-sm">Your teacher will assign practice sets and exams soon.</p>
         </Card>
       )}
-    </div>
+    </PageShell>
   );
 }
 
@@ -250,7 +307,7 @@ async function ParentDashboard({ parentId, parentName }: { parentId: string; par
   );
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8">
+    <PageShell width="narrow">
       <div className="mb-6">
         <h1 className="text-2xl font-semibold text-gray-900">
           Hello, {parentName.split(" ")[0]}!
@@ -323,6 +380,6 @@ async function ParentDashboard({ parentId, parentName }: { parentId: string; par
           </div>
         )}
       </section>
-    </div>
+    </PageShell>
   );
 }

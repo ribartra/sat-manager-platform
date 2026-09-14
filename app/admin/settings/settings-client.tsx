@@ -1,15 +1,34 @@
 "use client";
 
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { FormSection } from "@/components/sat";
+import {
+  mistralKeySchema,
+  smtpSettingsSchema,
+  type MistralKeyInput,
+  type SmtpSettingsInput,
+} from "@/contracts/admin";
 
 type Setting = {
   key: string;
   label: string;
   description: string;
+  owner?: string;
+  expiresAt?: string | null;
   value: boolean;
 };
 
@@ -43,41 +62,67 @@ export function SettingsClient({
 }) {
   const router = useRouter();
   const [loadingKey, setLoadingKey] = useState<string | null>(null);
-  const [apiKey, setApiKey] = useState("");
-  const [secretLoading, setSecretLoading] = useState(false);
   const [secretMessage, setSecretMessage] = useState<string | null>(null);
-
-  const [smtpHost, setSmtpHost] = useState(smtp.host ?? "");
-  const [smtpPort, setSmtpPort] = useState(smtp.port ? String(smtp.port) : "587");
-  const [smtpUser, setSmtpUser] = useState(smtp.user ?? "");
-  const [smtpFrom, setSmtpFrom] = useState(smtp.from ?? "");
-  const [smtpPassword, setSmtpPassword] = useState("");
-  const [smtpLoading, setSmtpLoading] = useState(false);
-  const [smtpTesting, setSmtpTesting] = useState(false);
   const [smtpMessage, setSmtpMessage] = useState<string | null>(null);
+  const [smtpTesting, setSmtpTesting] = useState(false);
 
-  async function saveSmtp() {
-    setSmtpLoading(true);
+  const mistralForm = useForm<MistralKeyInput>({
+    resolver: zodResolver(mistralKeySchema),
+    defaultValues: { apiKey: "" },
+  });
+
+  const smtpForm = useForm<SmtpSettingsInput>({
+    resolver: zodResolver(smtpSettingsSchema),
+    defaultValues: {
+      host: smtp.host ?? "",
+      port: smtp.port ? String(smtp.port) : "587",
+      user: smtp.user ?? "",
+      from: smtp.from ?? "",
+      password: "",
+    },
+  });
+
+  async function onSaveMistral(values: MistralKeyInput) {
+    setSecretMessage(null);
+    const response = await fetch("/api/admin/settings/mistral-key", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ apiKey: values.apiKey }),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      setSecretMessage(data.error || "Could not update Mistral key.");
+      return;
+    }
+    mistralForm.reset({ apiKey: "" });
+    setSecretMessage(`Mistral key updated. SHA-256 ${String(data.sha256 ?? "").slice(0, 12)}...`);
+    router.refresh();
+  }
+
+  async function onSaveSmtp(values: SmtpSettingsInput) {
     setSmtpMessage(null);
     const response = await fetch("/api/admin/settings/smtp", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        host: smtpHost,
-        port: smtpPort,
-        user: smtpUser,
-        from: smtpFrom,
-        password: smtpPassword,
+        host: values.host,
+        port: values.port,
+        user: values.user,
+        from: values.from,
+        password: values.password ?? "",
       }),
     });
     const data = await response.json().catch(() => ({}));
-    setSmtpLoading(false);
     if (!response.ok) {
       setSmtpMessage(data.error || "Could not save SMTP settings.");
       return;
     }
-    setSmtpPassword("");
-    setSmtpMessage(data.configured ? "SMTP settings saved. Email sending is configured." : "Saved, but some required fields are still missing.");
+    smtpForm.setValue("password", "");
+    setSmtpMessage(
+      data.configured
+        ? "SMTP settings saved. Email sending is configured."
+        : "Saved, but some required fields are still missing.",
+    );
     router.refresh();
   }
 
@@ -113,66 +158,56 @@ export function SettingsClient({
     router.refresh();
   }
 
-  async function saveMistralKey() {
-    setSecretLoading(true);
-    setSecretMessage(null);
-    const response = await fetch("/api/admin/settings/mistral-key", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ apiKey }),
-    });
-    const data = await response.json().catch(() => ({}));
-    setSecretLoading(false);
-    if (!response.ok) {
-      setSecretMessage(data.error || "Could not update Mistral key.");
-      return;
-    }
-    setApiKey("");
-    setSecretMessage(`Mistral key updated. SHA-256 ${String(data.sha256 ?? "").slice(0, 12)}...`);
-    router.refresh();
-  }
-
   return (
     <div className="space-y-6">
       <Card className="overflow-hidden">
-        <div className="border-b border-gray-100 px-4 py-3">
-          <h2 className="text-sm font-semibold text-gray-900">Integrations</h2>
+        <div className="border-b border-border px-4 py-3">
+          <h2 className="text-sm font-semibold text-foreground">Integrations</h2>
         </div>
         <div className="grid gap-4 px-4 py-4">
           <div>
-            <p className="text-sm font-medium text-gray-900">Mistral OCR API key</p>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="text-sm font-medium text-foreground">Mistral OCR API key</p>
+            <p className="mt-1 text-xs text-muted-foreground">
               Stored encrypted in the database. SHA-256 is kept as a fingerprint; the raw key is never shown again.
             </p>
-            <div className="mt-2 grid gap-1 text-xs text-gray-500">
+            <div className="mt-2 grid gap-1 text-xs text-muted-foreground">
               <p>Status: {mistralKey.configured ? "Configured" : "Not configured"}</p>
-              {mistralKey.last4 && <p>Last 4: {mistralKey.last4}</p>}
-              {mistralKey.sha256 && <p className="break-all">SHA-256: {mistralKey.sha256}</p>}
-              {mistralKey.updatedAt && <p suppressHydrationWarning>Updated: {new Date(mistralKey.updatedAt).toLocaleString()}</p>}
+              {mistralKey.last4 ? <p>Last 4: {mistralKey.last4}</p> : null}
+              {mistralKey.sha256 ? <p className="break-all">SHA-256: {mistralKey.sha256}</p> : null}
+              {mistralKey.updatedAt ? (
+                <p suppressHydrationWarning>Updated: {new Date(mistralKey.updatedAt).toLocaleString()}</p>
+              ) : null}
             </div>
           </div>
-          <div className="grid gap-3 md:grid-cols-[1fr_auto]">
-            <Input
-              type="password"
-              value={apiKey}
-              onChange={(event) => setApiKey(event.target.value)}
-              placeholder="Paste new Mistral API key"
-              autoComplete="off"
-            />
-            <Button type="button" onClick={saveMistralKey} disabled={secretLoading || !apiKey.trim()}>
-              {secretLoading ? "Saving..." : "Save Key"}
-            </Button>
-          </div>
-          {secretMessage && <p className="text-sm text-gray-600">{secretMessage}</p>}
+          <Form {...mistralForm}>
+            <form onSubmit={mistralForm.handleSubmit(onSaveMistral)} className="grid gap-3 md:grid-cols-[1fr_auto]" noValidate>
+              <FormField
+                control={mistralForm.control}
+                name="apiKey"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input type="password" placeholder="Paste new Mistral API key" autoComplete="off" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" disabled={mistralForm.formState.isSubmitting}>
+                {mistralForm.formState.isSubmitting ? "Saving..." : "Save Key"}
+              </Button>
+            </form>
+          </Form>
+          {secretMessage ? <p className="text-sm text-muted-foreground">{secretMessage}</p> : null}
         </div>
       </Card>
 
       <Card className="overflow-hidden">
-        <div className="border-b border-gray-100 px-4 py-3">
-          <h2 className="text-sm font-semibold text-gray-900">Email (SMTP)</h2>
+        <div className="border-b border-border px-4 py-3">
+          <h2 className="text-sm font-semibold text-foreground">Email (SMTP)</h2>
         </div>
         <div className="grid gap-4 px-4 py-4">
-          <div className="grid gap-1 text-xs text-gray-500">
+          <div className="grid gap-1 text-xs text-muted-foreground">
             <p>
               Status:{" "}
               <span className={smtp.configured ? "font-medium text-green-700" : "font-medium text-amber-700"}>
@@ -180,61 +215,129 @@ export function SettingsClient({
               </span>{" "}
               · Source: {smtp.source}
             </p>
-            <p>Used for invites, parent consent, password resets and shared parent reports. Password stored encrypted; DB values override EMAIL_* env vars.</p>
-            {smtp.passwordConfigured && smtp.passwordLast4 && <p suppressHydrationWarning>Password on file (last 4: {smtp.passwordLast4}){smtp.updatedAt ? ` · updated ${new Date(smtp.updatedAt).toLocaleString()}` : ""}</p>}
+            <p>
+              Used for invites, parent consent, password resets and shared parent reports. Password stored encrypted; DB
+              values override EMAIL_* env vars.
+            </p>
+            {smtp.passwordConfigured && smtp.passwordLast4 ? (
+              <p suppressHydrationWarning>
+                Password on file (last 4: {smtp.passwordLast4}
+                {smtp.updatedAt ? ` · updated ${new Date(smtp.updatedAt).toLocaleString()}` : ""})
+              </p>
+            ) : null}
           </div>
-          <div className="grid gap-3 md:grid-cols-2">
-            <label className="grid gap-1 text-xs text-gray-600">
-              SMTP host
-              <Input value={smtpHost} onChange={(e) => setSmtpHost(e.target.value)} placeholder="smtp-relay.brevo.com" autoComplete="off" />
-            </label>
-            <label className="grid gap-1 text-xs text-gray-600">
-              Port
-              <Input value={smtpPort} onChange={(e) => setSmtpPort(e.target.value)} placeholder="587" inputMode="numeric" autoComplete="off" />
-            </label>
-            <label className="grid gap-1 text-xs text-gray-600">
-              SMTP user / login
-              <Input value={smtpUser} onChange={(e) => setSmtpUser(e.target.value)} placeholder="your-brevo-smtp-login" autoComplete="off" />
-            </label>
-            <label className="grid gap-1 text-xs text-gray-600">
-              From address
-              <Input value={smtpFrom} onChange={(e) => setSmtpFrom(e.target.value)} placeholder="noreply@yourdomain.com" autoComplete="off" />
-            </label>
-            <label className="grid gap-1 text-xs text-gray-600 md:col-span-2">
-              Password / SMTP key {smtp.passwordConfigured && <span className="text-gray-400">(leave blank to keep current)</span>}
-              <Input type="password" value={smtpPassword} onChange={(e) => setSmtpPassword(e.target.value)} placeholder="Paste SMTP key" autoComplete="off" />
-            </label>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button type="button" onClick={saveSmtp} disabled={smtpLoading}>
-              {smtpLoading ? "Saving..." : "Save SMTP"}
-            </Button>
-            <Button type="button" variant="secondary" onClick={testSmtp} disabled={smtpTesting}>
-              {smtpTesting ? "Sending..." : "Send test email"}
-            </Button>
-          </div>
-          {smtpMessage && <p className="text-sm text-gray-600">{smtpMessage}</p>}
+          <Form {...smtpForm}>
+            <form onSubmit={smtpForm.handleSubmit(onSaveSmtp)} className="space-y-4" noValidate>
+              <FormSection>
+                <div className="grid gap-3 md:grid-cols-2">
+                  <FormField
+                    control={smtpForm.control}
+                    name="host"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>SMTP host</FormLabel>
+                        <FormControl>
+                          <Input placeholder="smtp-relay.brevo.com" autoComplete="off" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={smtpForm.control}
+                    name="port"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Port</FormLabel>
+                        <FormControl>
+                          <Input placeholder="587" inputMode="numeric" autoComplete="off" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={smtpForm.control}
+                    name="user"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>SMTP user / login</FormLabel>
+                        <FormControl>
+                          <Input placeholder="your-brevo-smtp-login" autoComplete="off" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={smtpForm.control}
+                    name="from"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>From address</FormLabel>
+                        <FormControl>
+                          <Input placeholder="noreply@yourdomain.com" autoComplete="off" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={smtpForm.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem className="md:col-span-2">
+                        <FormLabel>
+                          Password / SMTP key{" "}
+                          {smtp.passwordConfigured ? (
+                            <span className="text-muted-foreground">(leave blank to keep current)</span>
+                          ) : null}
+                        </FormLabel>
+                        <FormControl>
+                          <Input type="password" placeholder="Paste SMTP key" autoComplete="off" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </FormSection>
+              <div className="flex flex-wrap gap-2">
+                <Button type="submit" disabled={smtpForm.formState.isSubmitting}>
+                  {smtpForm.formState.isSubmitting ? "Saving..." : "Save SMTP"}
+                </Button>
+                <Button type="button" variant="secondary" onClick={testSmtp} disabled={smtpTesting}>
+                  {smtpTesting ? "Sending..." : "Send test email"}
+                </Button>
+              </div>
+            </form>
+          </Form>
+          {smtpMessage ? <p className="text-sm text-muted-foreground">{smtpMessage}</p> : null}
         </div>
       </Card>
 
       <Card className="overflow-hidden">
-        <div className="border-b border-gray-100 px-4 py-3">
-          <h2 className="text-sm font-semibold text-gray-900">Feature flags</h2>
+        <div className="border-b border-border px-4 py-3">
+          <h2 className="text-sm font-semibold text-foreground">Feature flags</h2>
         </div>
-        <div className="divide-y divide-gray-100">
+        <div className="divide-y divide-border">
           {settings.map((setting) => (
             <div key={setting.key} className="flex items-center justify-between gap-4 px-4 py-4">
               <div>
-                <p className="text-sm font-medium text-gray-900">{setting.label}</p>
-                <p className="mt-1 text-xs text-gray-500">{setting.description}</p>
-                <p className="mt-1 text-xs text-gray-400">{setting.key}</p>
+                <p className="text-sm font-medium text-foreground">{setting.label}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{setting.description}</p>
+                <p className="mt-1 text-xs text-muted-foreground/80">
+                  {setting.key}
+                  {setting.owner ? ` · owner: ${setting.owner}` : ""}
+                  {setting.expiresAt ? ` · expires: ${setting.expiresAt}` : ""}
+                </p>
               </div>
               <button
                 type="button"
                 onClick={() => toggle(setting)}
                 disabled={loadingKey === setting.key}
                 className={`relative h-6 w-11 rounded-full transition ${
-                  setting.value ? "bg-blue-600" : "bg-gray-300"
+                  setting.value ? "bg-primary" : "bg-gray-300"
                 } disabled:opacity-60`}
                 aria-label={`Toggle ${setting.label}`}
               >

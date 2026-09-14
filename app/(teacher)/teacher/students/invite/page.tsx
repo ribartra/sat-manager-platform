@@ -1,5 +1,6 @@
 "use client";
 
+import { PageShell } from "@/components/sat";
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -51,7 +52,7 @@ export default function InviteStudentPage() {
   }
 
   return (
-    <div className="mx-auto max-w-xl px-4 py-8">
+    <PageShell width="narrow">
       <div className="mb-6">
         <Link href="/teacher" className="text-sm text-blue-600 hover:underline">← Students</Link>
         <h1 className="mt-3 text-xl font-semibold text-gray-900">Invite Student</h1>
@@ -157,6 +158,6 @@ export default function InviteStudentPage() {
           </div>
         </Card>
       )}
-    </div>
+    </PageShell>
   );
 }

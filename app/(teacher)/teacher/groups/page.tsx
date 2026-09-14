@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import { getFeatureSetting } from "@/lib/app-settings";
 import prisma from "@/lib/prisma";
@@ -30,7 +31,7 @@ export default async function GroupsPage() {
   });
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
+    <PageShell>
       <h1 className="text-2xl font-semibold text-gray-900 mb-6">Groups & Cycles</h1>
       <GroupsClient
         groups={groups.map((g) => ({
@@ -41,6 +42,6 @@ export default async function GroupsPage() {
         }))}
         students={students}
       />
-    </div>
+    </PageShell>
   );
 }

@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
@@ -101,7 +102,7 @@ export default async function StudentDetailPage({ params }: PageProps) {
   });
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8">
+    <PageShell>
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
         <Link href="/teacher" className="hover:text-blue-600 flex items-center gap-1">
@@ -322,6 +323,6 @@ export default async function StudentDetailPage({ params }: PageProps) {
           )}
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 }

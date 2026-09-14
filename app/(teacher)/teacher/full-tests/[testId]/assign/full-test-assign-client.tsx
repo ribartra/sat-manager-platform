@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
+import { StudentPicker } from "@/components/student-picker";
+import { cn } from "@/lib/utils";
 
 export function FullTestAssignClient({
   testId,
@@ -23,22 +25,19 @@ export function FullTestAssignClient({
   const [studentId, setStudentId] = useState(students[0]?.id ?? "");
   const [groupId, setGroupId] = useState(groups[0]?.id ?? "");
   const [dueDate, setDueDate] = useState("");
-  const [studentSearch, setStudentSearch] = useState("");
   const [groupSearch, setGroupSearch] = useState("");
+  const [groupOpen, setGroupOpen] = useState(false);
 
-  const visibleStudents = useMemo(() => {
-    const term = studentSearch.trim().toLowerCase();
-    const filtered = term ? students.filter((student) => student.name.toLowerCase().includes(term)) : students;
-    const selected = students.find((student) => student.id === studentId);
-    return selected && !filtered.some((student) => student.id === selected.id) ? [selected, ...filtered] : filtered;
-  }, [studentId, studentSearch, students]);
-
+  const selectedGroup = groups.find((group) => group.id === groupId);
   const visibleGroups = useMemo(() => {
     const term = groupSearch.trim().toLowerCase();
     const filtered = term ? groups.filter((group) => group.name.toLowerCase().includes(term)) : groups;
-    const selected = groups.find((group) => group.id === groupId);
-    return selected && !filtered.some((group) => group.id === selected.id) ? [selected, ...filtered] : filtered;
-  }, [groupId, groupSearch, groups]);
+    return selectedGroup && !filtered.some((group) => group.id === selectedGroup.id)
+      ? [selectedGroup, ...filtered]
+      : filtered;
+  }, [groupSearch, groups, selectedGroup]);
+
+  const groupInputValue = groupOpen || groupSearch.trim() ? groupSearch : selectedGroup?.name ?? "";
 
   async function assign() {
     const group = groups.find((g) => g.id === groupId);
@@ -58,18 +57,56 @@ export function FullTestAssignClient({
         {groupAssignmentEnabled && <option value="group">Group</option>}
       </Select>
       {target === "student" ? (
-        <div className="space-y-2">
-          <Input value={studentSearch} onChange={(event) => setStudentSearch(event.target.value)} placeholder="Search student..." />
-          <Select value={studentId} onChange={(e) => setStudentId(e.target.value)}>
-            {visibleStudents.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-          </Select>
-        </div>
+        <StudentPicker mode="single" students={students} value={studentId} onChange={setStudentId} />
       ) : (
-        <div className="space-y-2">
-          <Input value={groupSearch} onChange={(event) => setGroupSearch(event.target.value)} placeholder="Search group..." />
-          <Select value={groupId} onChange={(e) => setGroupId(e.target.value)}>
-            {visibleGroups.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
-          </Select>
+        <div className="relative space-y-2">
+          <p className="text-xs font-medium text-gray-500">Group</p>
+          <Input
+            value={groupInputValue}
+            placeholder="Search group..."
+            className="text-sm"
+            onFocus={() => {
+              setGroupOpen(true);
+              setGroupSearch("");
+            }}
+            onBlur={() => {
+              window.setTimeout(() => {
+                setGroupOpen(false);
+                setGroupSearch("");
+              }, 150);
+            }}
+            onChange={(event) => {
+              setGroupSearch(event.target.value);
+              setGroupOpen(true);
+            }}
+          />
+          {groupOpen ? (
+            <ul className="absolute z-20 mt-1 max-h-52 w-full overflow-y-auto rounded-md border border-gray-200 bg-white py-1 shadow-sm">
+              {visibleGroups.length === 0 ? (
+                <li className="px-3 py-2 text-sm text-gray-400">No groups match the current search.</li>
+              ) : (
+                visibleGroups.map((group) => (
+                  <li key={group.id}>
+                    <button
+                      type="button"
+                      className={cn(
+                        "flex w-full items-center px-3 py-2 text-left text-sm",
+                        group.id === groupId ? "font-medium text-blue-700" : "text-gray-800 hover:bg-gray-50",
+                      )}
+                      onMouseDown={(event) => event.preventDefault()}
+                      onClick={() => {
+                        setGroupId(group.id);
+                        setGroupSearch(group.name);
+                        setGroupOpen(false);
+                      }}
+                    >
+                      {group.name}
+                    </button>
+                  </li>
+                ))
+              )}
+            </ul>
+          ) : null}
         </div>
       )}
       <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />

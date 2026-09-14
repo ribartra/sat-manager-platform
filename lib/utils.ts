@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { difficultyChipClass } from "@/lib/domain-meta";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -25,12 +26,7 @@ export function scorePercent(correct: number, total: number): number {
 }
 
 export function difficultyColor(difficulty: string): string {
-  switch (difficulty) {
-    case "EASY": return "text-green-600 bg-green-50";
-    case "MEDIUM": return "text-yellow-600 bg-yellow-50";
-    case "HARD": return "text-red-600 bg-red-50";
-    default: return "text-gray-600 bg-gray-50";
-  }
+  return difficultyChipClass(difficulty);
 }
 
 export function statusColor(status: string): string {

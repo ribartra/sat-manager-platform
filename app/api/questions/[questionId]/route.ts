@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
+import { questionEditorIssues } from "@/contracts/question";
 import { validateQuestionPayload } from "@/lib/content-validation";
 import { materializeOfficialImageUrl } from "@/lib/ingest-promotion";
 
@@ -72,7 +73,7 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
     where: { id: questionId },
     select: { status: true, topicId: true, difficulty: true, type: true },
   });
-  const validationErrors = validateQuestionPayload({
+  const validationErrors = questionEditorIssues({
     topicId,
     difficulty,
     type,

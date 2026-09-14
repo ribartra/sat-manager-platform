@@ -1,13 +1,19 @@
-import Link from "next/link";
+import { PageShell, PageHeader, PageContent } from "@/components/sat";
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { QuestionListItem, toQuestionListMedia } from "@/components/question-list-item";
 import { fullTestAttemptProgress } from "@/lib/attempt-progress";
 import { parseFullTestProgressState } from "@/lib/full-test-progress";
 import { moduleKeyFromOrder } from "@/lib/full-test-modules";
+import {
+  difficultyBadgeVariant,
+  difficultyLabel,
+  fullTestStatusBadgeVariant,
+  fullTestStatusLabel,
+} from "@/lib/domain-meta";
+import { FullTestActions } from "../full-test-actions-client";
 
 interface PageProps {
   params: Promise<{ testId: string }>;
@@ -53,43 +59,26 @@ export default async function FullTestDetailPage({ params }: PageProps) {
   );
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
-      <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-xl font-semibold text-gray-900">{test.name}</h1>
-            <Badge variant={test.status === "PUBLISHED" ? "success" : test.status === "ARCHIVED" ? "default" : "warning"}>
-              {test.status}
+    <PageShell width="wide">
+      <PageHeader
+        title={test.name}
+        description={`4 SAT groups · ${questionCount} questions (${pretestCount} pretest) · ${test.breakMinutes > 0 ? `break ${test.breakMinutes} min` : "no break"} · review ${test.reviewEnabled ? "on" : "off"} · score conversion on /teacher/full-tests/scoring`}
+        actions={
+          <div className="flex flex-col items-end gap-2">
+            <Badge variant={fullTestStatusBadgeVariant(test.status)}>
+              {fullTestStatusLabel(test.status)}
             </Badge>
+            <FullTestActions
+              testId={test.id}
+              status={test.status}
+              hasAssignments={test.assignments.length > 0}
+              hasAttempts={test.attempts.length > 0}
+              variant="detail"
+            />
           </div>
-          <p className="mt-1 text-sm text-gray-500">
-            4 SAT groups · {questionCount} questions ({pretestCount} pretest items excluded from raw score) · break{" "}
-            {test.breakMinutes} min · review {test.reviewEnabled ? "on" : "off"}
-          </p>
-          <p className="mt-1 text-xs text-gray-400">
-            Score conversion:{" "}
-            <Link href="/teacher/full-tests/scoring" className="text-blue-600 hover:underline">
-              /teacher/full-tests/scoring
-            </Link>{" "}
-            (RW 0–50 · Math 0–40)
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Button asChild variant="secondary">
-            <Link href={`/teacher/full-tests/${test.id}/edit`}>Edit / options</Link>
-          </Button>
-          {test.status === "PUBLISHED" ? (
-            <Button asChild>
-              <Link href={`/teacher/full-tests/${test.id}/assign`}>Assign</Link>
-            </Button>
-          ) : (
-            <Button type="button" disabled title="Publish the exam before assigning.">
-              Assign
-            </Button>
-          )}
-        </div>
-      </div>
-
+        }
+      />
+      <PageContent>
       <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {test.modules.map((module) => {
           const moduleKey = moduleKeyFromOrder(module.order);
@@ -131,16 +120,8 @@ export default async function FullTestDetailPage({ params }: PageProps) {
                         indexLabel={<span className="text-xs font-medium text-gray-400">Q{index + 1}</span>}
                         meta={
                           <>
-                            <Badge
-                              variant={
-                                item.question.difficulty === "EASY"
-                                  ? "easy"
-                                  : item.question.difficulty === "MEDIUM"
-                                    ? "medium"
-                                    : "hard"
-                              }
-                            >
-                              {item.question.difficulty}
+                            <Badge variant={difficultyBadgeVariant(item.question.difficulty)}>
+                              {difficultyLabel(item.question.difficulty)}
                             </Badge>
                             <Badge variant="default">{item.question.type}</Badge>
                             <Badge variant="default">{item.question.topic.name}</Badge>
@@ -232,6 +213,7 @@ export default async function FullTestDetailPage({ params }: PageProps) {
           </Card>
         </aside>
       </div>
-    </div>
+      </PageContent>
+    </PageShell>
   );
 }

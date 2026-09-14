@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
@@ -48,7 +49,7 @@ export default async function FullTestResultsPage({ params }: PageProps) {
   const pauseSeconds = attempt.pauses.reduce((sum, pause) => sum + (pause.durationSeconds ?? 0), 0);
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
+    <PageShell width="narrow">
       <h1 className="mb-6 text-xl font-semibold text-gray-900">Results: {attempt.test.name}</h1>
       <div className="grid grid-cols-3 gap-4">
         <Card padding="md" className="text-center"><p className="text-3xl font-bold">{attempt.rwScore ?? "—"}</p><p className="text-xs text-gray-500">Reading & Writing</p></Card>
@@ -107,7 +108,7 @@ export default async function FullTestResultsPage({ params }: PageProps) {
           ))}
         </div>
       )}
-    </div>
+    </PageShell>
   );
 }
 

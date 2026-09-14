@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
@@ -5,12 +6,16 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { formatDate, scorePercent } from "@/lib/utils";
 import { refreshAssignmentStates } from "@/lib/assignments";
+import { difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
+import { redirect } from "next/navigation";
+import { withSqliteRetry } from "@/lib/sqlite-retry";
 
 export default async function StudentPracticeSetsPage() {
   const session = await auth();
+  if (!session) redirect("/login");
   await refreshAssignmentStates();
 
-  const assignments = await prisma.assignment.findMany({
+  const assignments = await withSqliteRetry(() => prisma.assignment.findMany({
     where: { studentId: session!.user.id },
     include: {
       practiceSet: {
@@ -25,10 +30,10 @@ export default async function StudentPracticeSetsPage() {
       },
     },
     orderBy: [{ status: "asc" }, { dueDate: "asc" }, { createdAt: "desc" }],
-  });
+  }));
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8">
+    <PageShell>
       <div className="mb-6 flex items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-gray-900">Practice Sets</h1>
@@ -70,8 +75,8 @@ export default async function StudentPracticeSetsPage() {
                 )}
               </div>
               <div className="flex shrink-0 items-center gap-2">
-                <Badge variant={assignment.practiceSet.difficulty === "EASY" ? "easy" : assignment.practiceSet.difficulty === "MEDIUM" ? "medium" : "hard"}>
-                  {assignment.practiceSet.difficulty}
+                <Badge variant={difficultyBadgeVariant(assignment.practiceSet.difficulty)}>
+                  {difficultyLabel(assignment.practiceSet.difficulty)}
                 </Badge>
                 <Badge variant={assignment.status === "COMPLETED" ? "success" : assignment.status === "OVERDUE" ? "danger" : "warning"}>
                   {assignment.status}
@@ -100,6 +105,6 @@ export default async function StudentPracticeSetsPage() {
           </Card>
         )}
       </div>
-    </div>
+    </PageShell>
   );
 }

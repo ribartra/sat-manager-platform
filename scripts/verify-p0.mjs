@@ -56,8 +56,13 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/page.tsx",
-    requires: ["getStudentLastActiveMap", "lastActiveMap", "Last Active"],
-    label: "Dashboard docente usa lastActiveAt real",
+    requires: ["getStudentLastActiveMap", "lastActiveMap", "TeacherStudentsTable"],
+    label: "Dashboard docente usa lastActiveAt real y DataTable de estudiantes",
+  },
+  {
+    file: "app/(teacher)/teacher/students-table-client.tsx",
+    requires: ["Last Active", "lastActiveLabel", "lastActiveTone"],
+    label: "Tabla de estudiantes expone columna Last Active",
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/report/page.tsx",

@@ -41,6 +41,8 @@ export function QuestionPlayerPreview({
     });
   }
 
+  const hasPassage = Boolean(stimulus?.trim());
+
   return (
     <div className={cn("overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm", className)}>
       <div className="flex items-center justify-between gap-3 border-b border-gray-200 bg-white px-4 py-2.5">
@@ -51,14 +53,22 @@ export function QuestionPlayerPreview({
         <span className="shrink-0 font-mono text-xs text-gray-400">Preview only</span>
       </div>
 
-      <div className="grid min-h-[28rem] grid-cols-1 overflow-hidden md:grid-cols-2">
-        <div className="min-h-0 space-y-4 overflow-y-auto border-r border-gray-200 bg-gray-50 p-4 md:p-6">
-          {stimulus?.trim() ? (
-            <MathContent content={stimulus} className="prose prose-base max-w-none leading-relaxed text-gray-800" />
-          ) : (
-            <p className="text-sm text-gray-400">No reading passage for this question.</p>
+      <div
+        className={cn(
+          "grid min-h-[28rem] overflow-hidden",
+          hasPassage ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]",
+        )}
+      >
+        <div
+          className={cn(
+            "min-h-0 space-y-4 overflow-y-auto p-4 md:p-6",
+            hasPassage ? "border-r border-gray-200 bg-gray-50" : "border-r border-gray-200",
           )}
-          <div className="border-t border-gray-200 pt-4">
+        >
+          {hasPassage ? (
+            <MathContent content={stimulus!} className="prose prose-base max-w-none leading-relaxed text-gray-800" />
+          ) : null}
+          <div className={cn(hasPassage && "border-t border-gray-200 pt-4")}>
             {stem.trim() ? (
               <MathContent content={stem} className="text-base font-medium leading-relaxed text-gray-900 md:text-lg" />
             ) : (

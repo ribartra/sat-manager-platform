@@ -1,41 +1,14 @@
-import prisma from "@/lib/prisma";
+import { PageShell } from "@/components/sat";
 import { FullTestEditor } from "./full-test-editor-client";
-
-function plainMathLabel(content: string, maxLength: number) {
-  const label = content
-    .replace(/\$\$([\s\S]+?)\$\$/g, "$1")
-    .replace(/\\\[([\s\S]+?)\\\]/g, "$1")
-    .replace(/\$([^$\n]+?)\$/g, "$1")
-    .replace(/\\\(([\s\S]+?)\\\)/g, "$1");
-  return label.length > maxLength ? `${label.slice(0, maxLength)}...` : label;
-}
+import { findQuestionsWithOptionMediaAndSection } from "@/lib/question-list-media-query";
 
 export default async function NewFullTestPage() {
-  const questions = await prisma.question.findMany({
-    where: { status: "PUBLISHED" },
-    include: {
-      topic: { include: { domain: { include: { section: true } } } },
-      options: { select: { imageUrl: true }, where: { imageUrl: { not: null } } },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  const questions = await findQuestionsWithOptionMediaAndSection({ status: "PUBLISHED" });
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8">
+    <PageShell>
       <h1 className="mb-6 text-xl font-semibold text-gray-900">New Exam</h1>
-      <FullTestEditor
-        questions={questions.map((q) => ({
-          id: q.id,
-          label: `${q.topic.domain.section.name === "MATH" ? "MATH" : "RW"} · ${q.difficulty} · ${plainMathLabel(q.stem, 100)}`,
-          stem: q.stem,
-          difficulty: q.difficulty,
-          type: q.type,
-          section: q.topic.domain.section.name === "MATH" ? "MATH" : "RW",
-          imageUrl: q.imageUrl,
-          stimulus: q.stimulus,
-          optionImageUrls: q.options.map((o) => o.imageUrl).filter((u): u is string => Boolean(u)),
-        }))}
-      />
-    </div>
+      <FullTestEditor questions={questions} />
+    </PageShell>
   );
 }

@@ -20,6 +20,11 @@ import {
 } from "@/components/ui/dialog";
 import { TaxonomyPicker, type TaxonomyPickerTopic } from "@/components/taxonomy-picker";
 import { cn } from "@/lib/utils";
+import {
+  contentStatusOptions,
+  questionStatusBadgeVariant,
+  questionStatusLabel,
+} from "@/lib/domain-meta";
 
 type TopicOption = TaxonomyPickerTopic;
 
@@ -41,12 +46,6 @@ const TABS: { key: SectionKey; label: string }[] = [
   { key: "rw", label: "R&W" },
   { key: "general", label: "General" },
 ];
-
-const STATUS_VARIANT: Record<string, "success" | "warning" | "default"> = {
-  PUBLISHED: "success",
-  DRAFT: "warning",
-  ARCHIVED: "default",
-};
 
 function sectionKeyOf(sectionLabel: string | null | undefined): SectionKey {
   if (sectionLabel === "Mathematics") return "math";
@@ -156,19 +155,11 @@ export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; 
     router.refresh();
   }
 
-  async function setStatus(materialId: string, next: string) {
-    await fetch(`/api/materials/${materialId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: next }),
-    });
-    router.refresh();
-  }
-
   async function duplicateMaterial(materialId: string) {
     const response = await fetch(`/api/materials/${materialId}/duplicate`, { method: "POST" });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) window.alert(data.error || "Could not duplicate material.");
+    else setViewing(null);
     router.refresh();
   }
 
@@ -220,9 +211,11 @@ export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; 
           <label className="mb-1 block text-sm font-medium text-gray-700">Status</label>
           <Select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="text-sm">
             <option value="">All statuses</option>
-            <option value="PUBLISHED">Published</option>
-            <option value="DRAFT">Draft</option>
-            <option value="ARCHIVED">Archived</option>
+            {contentStatusOptions().map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
           </Select>
         </div>
       </div>
@@ -238,7 +231,9 @@ export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; 
             <Card key={material.id} padding="md" className="flex flex-col">
               <div className="mb-2 flex items-start justify-between gap-2">
                 <SkillLine topic={material.topic} />
-                <Badge variant={STATUS_VARIANT[material.status] ?? "default"}>{material.status}</Badge>
+                <Badge variant={questionStatusBadgeVariant(material.status)}>
+                  {questionStatusLabel(material.status)}
+                </Badge>
               </div>
               <h3 className="text-sm font-semibold text-gray-900">{material.title}</h3>
               {material.description && <p className="mt-1 line-clamp-2 text-xs text-gray-500">{material.description}</p>}
@@ -249,18 +244,8 @@ export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; 
               )}
 
               <div className="mt-4 flex flex-wrap items-center gap-1.5 border-t border-gray-100 pt-3">
-                <Button variant="secondary" size="sm" onClick={() => setViewing(material)}>Ver</Button>
+                <Button variant="secondary" size="sm" onClick={() => setViewing(material)}>View</Button>
                 <Button variant="ghost" size="sm" onClick={() => openEdit(material)}>Edit</Button>
-                {material.status !== "PUBLISHED" && (
-                  <Button variant="ghost" size="sm" onClick={() => setStatus(material.id, "PUBLISHED")}>Publish</Button>
-                )}
-                {material.status !== "DRAFT" && (
-                  <Button variant="ghost" size="sm" onClick={() => setStatus(material.id, "DRAFT")}>Draft</Button>
-                )}
-                {material.status !== "ARCHIVED" && (
-                  <Button variant="ghost" size="sm" onClick={() => setStatus(material.id, "ARCHIVED")}>Archive</Button>
-                )}
-                <Button variant="ghost" size="sm" onClick={() => duplicateMaterial(material.id)}>Duplicate</Button>
                 <Button variant="ghost" size="sm" onClick={() => deleteMaterial(material.id)}>Delete</Button>
               </div>
             </Card>
@@ -287,9 +272,11 @@ export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; 
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">Status</label>
               <Select value={status} onChange={(e) => setStatusValue(e.target.value)}>
-                <option value="DRAFT">Draft</option>
-                <option value="PUBLISHED">Published</option>
-                <option value="ARCHIVED">Archived</option>
+                {contentStatusOptions().map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
               </Select>
             </div>
             <Textarea value={body} onChange={(e) => setBody(e.target.value)} placeholder="Theory notes or instructions" rows={8} />
@@ -310,7 +297,9 @@ export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; 
             <>
               <DialogHeader>
                 <div className="flex items-center gap-2">
-                  <Badge variant={STATUS_VARIANT[viewing.status] ?? "default"}>{viewing.status}</Badge>
+                  <Badge variant={questionStatusBadgeVariant(viewing.status)}>
+                    {questionStatusLabel(viewing.status)}
+                  </Badge>
                   <SkillLine topic={viewing.topic} />
                 </div>
                 <DialogTitle className="mt-1">{viewing.title}</DialogTitle>
@@ -332,7 +321,24 @@ export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; 
                 <p className="text-sm text-gray-400">No content body.</p>
               )}
               <DialogFooter>
-                <Button variant="secondary" onClick={() => { const m = viewing; setViewing(null); if (m) openEdit(m); }}>Edit</Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    if (viewing) void duplicateMaterial(viewing.id);
+                  }}
+                >
+                  Duplicate
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    const m = viewing;
+                    setViewing(null);
+                    if (m) openEdit(m);
+                  }}
+                >
+                  Edit
+                </Button>
                 <Button onClick={() => setViewing(null)}>Close</Button>
               </DialogFooter>
             </>

@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
@@ -64,7 +65,7 @@ export default async function AdminLogsPage({ searchParams }: PageProps) {
   ).slice(0, 250);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
+    <PageShell width="wide">
       <h1 className="mb-1 text-xl font-semibold text-gray-900">Audit Log</h1>
       <p className="mb-4 text-sm text-gray-500">
         Latest system events with full payload. Unknown codes are humanized automatically.
@@ -159,6 +160,6 @@ export default async function AdminLogsPage({ searchParams }: PageProps) {
           <p className="py-10 text-center text-sm text-gray-400">No events recorded yet.</p>
         )}
       </Card>
-    </div>
+    </PageShell>
   );
 }

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "crypto";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
-import { validateQuestionPayload } from "@/lib/content-validation";
+import { questionEditorIssues } from "@/contracts/question";
 import { materializeOfficialImageUrl } from "@/lib/ingest-promotion";
 
 export async function POST(req: NextRequest) {
@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
 
   const data = await req.json();
   const { topicId, subskillId, difficulty, type, stem, stimulus, explanation, imageUrl, supportsGraph, correctAnswer, status, options, ingestCandidateId } = data;
-  const validationErrors = validateQuestionPayload({
+  const validationErrors = questionEditorIssues({
     topicId,
     difficulty,
     type,

@@ -13,6 +13,8 @@ export async function GET() {
       key,
       label: config.label,
       description: config.description,
+      owner: config.owner,
+      expiresAt: config.expiresAt,
       value: values[key as keyof typeof FEATURE_SETTINGS],
     })),
   });

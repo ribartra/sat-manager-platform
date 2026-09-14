@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
@@ -86,7 +87,7 @@ function EnrolledView({ enrollment }: { enrollment: Enrollment }) {
   const { program } = enrollment;
   const teachers = program.teachers.map((t) => t.teacher.name).join(", ") || "—";
   return (
-    <div className="mx-auto max-w-xl px-4 py-12">
+    <PageShell width="narrow">
       <Card variant="success" padding="lg">
         <div className="flex items-center gap-3 mb-6">
           <div className="rounded-full bg-green-100 p-2.5">
@@ -123,13 +124,13 @@ function EnrolledView({ enrollment }: { enrollment: Enrollment }) {
           </div>
         </dl>
       </Card>
-    </div>
+    </PageShell>
   );
 }
 
 function PendingView({ program, requestedAt }: { program: { name: string }; requestedAt: Date }) {
   return (
-    <div className="mx-auto max-w-xl px-4 py-12">
+    <PageShell width="narrow">
       <Card variant="warning" padding="lg" className="text-center">
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-amber-100">
           <Clock size={24} className="text-amber-600" />
@@ -144,13 +145,13 @@ function PendingView({ program, requestedAt }: { program: { name: string }; requ
           Request submitted on {requestedAt.toISOString().slice(0, 10)}
         </p>
       </Card>
-    </div>
+    </PageShell>
   );
 }
 
 function NoProgramView() {
   return (
-    <div className="mx-auto max-w-2xl px-4 py-12">
+    <PageShell width="narrow">
       <div className="mb-8 text-center">
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-100">
           <FolderOpen size={24} className="text-blue-600" />
@@ -168,6 +169,6 @@ function NoProgramView() {
           Program access, assignments and unlocks are managed by the teacher.
         </p>
       </Card>
-    </div>
+    </PageShell>
   );
 }

@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -9,6 +10,8 @@ import { studentAccessWhereFor } from "@/lib/program-scope";
 import { QuestionMedia } from "@/components/question-media";
 import { MathContent } from "@/components/math-content";
 import { Card } from "@/components/ui/card";
+import { DifficultyAccuracyChart, MockSectionChart, TopicDifficultyChart } from "@/components/progress-charts";
+import { aggregateDifficultyMetrics, aggregateTopicDifficultyMetrics, type MockSectionMetric } from "@/lib/progress-analytics";
 
 interface PageProps {
   params: Promise<{ studentId: string }>;
@@ -67,6 +70,7 @@ export default async function StudentReportPage({ params }: PageProps) {
   const scoreTrend = [...scoredAttempts].reverse();
   const topicStats = new Map<string, { correct: number; total: number; time: number }>();
   const difficultyStats = new Map<string, { correct: number; total: number; time: number }>();
+  const progressRows: Array<{ topic: string; difficulty: string; correct: boolean; timeSeconds: number }> = [];
   const mediaQuestions = new Map<string, { stem: string; imageUrl: string; topic: string; difficulty: string }>();
 
   for (const attempt of attempts) {
@@ -80,6 +84,12 @@ export default async function StudentReportPage({ params }: PageProps) {
       topicStats.set(key, stat);
 
       const difficulty = snapshot?.difficulty ?? answer.question.difficulty;
+      progressRows.push({
+        topic: key,
+        difficulty,
+        correct: Boolean(answer.isCorrect),
+        timeSeconds: answer.timeSpent ?? 0,
+      });
       const difficultyStat = difficultyStats.get(difficulty) ?? { correct: 0, total: 0, time: 0 };
       difficultyStat.total += 1;
       if (answer.isCorrect) difficultyStat.correct += 1;
@@ -112,9 +122,18 @@ export default async function StudentReportPage({ params }: PageProps) {
         comment: attempt.teacherComment!,
       };
     });
+  const difficultyMetrics = aggregateDifficultyMetrics(progressRows);
+  const topicDifficultyMetrics = aggregateTopicDifficultyMetrics(progressRows);
+  const mockMetrics: MockSectionMetric[] = examAttempts.map((exam) => ({
+    label: exam.test.name,
+    submittedAt: exam.submittedAt?.toISOString() ?? null,
+    mathScore: exam.mathScore,
+    rwScore: exam.rwScore,
+    totalScore: exam.totalScore,
+  }));
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
+    <PageShell>
       <div className="mb-6 flex items-center justify-between">
         <div>
           <Link href={`/teacher/students/${studentId}`} className="text-sm text-blue-600 hover:underline">← Student</Link>
@@ -141,6 +160,11 @@ export default async function StudentReportPage({ params }: PageProps) {
             </p>
             <p className="text-xs text-gray-500">Last valid %</p>
           </Card>
+        </div>
+
+        <div className="mb-6 grid gap-6 lg:grid-cols-2">
+          <DifficultyAccuracyChart metrics={difficultyMetrics} />
+          <TopicDifficultyChart metrics={topicDifficultyMetrics} />
         </div>
 
         <div className="mb-6 grid gap-6 lg:grid-cols-2">
@@ -271,6 +295,9 @@ export default async function StudentReportPage({ params }: PageProps) {
 
       <section>
         <h2 className="mb-4 text-lg font-semibold text-gray-900">Exams (Full Practice Tests)</h2>
+        <div className="mb-6">
+          <MockSectionChart metrics={mockMetrics} />
+        </div>
         <Card padding="md">
           {examAttempts.length === 0 ? (
             <p className="text-sm text-gray-400">No submitted exams yet.</p>
@@ -302,7 +329,7 @@ export default async function StudentReportPage({ params }: PageProps) {
           )}
         </Card>
       </section>
-    </div>
+    </PageShell>
   );
 }
 

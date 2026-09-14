@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
@@ -144,7 +145,7 @@ export default async function ContentMapPage({ searchParams }: PageProps) {
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
+    <PageShell>
       <h1 className="text-2xl font-semibold text-gray-900 mb-6">Content Map</h1>
       <div className="mb-6 flex gap-2 border-b border-gray-200">
         {TAXONOMY_SECTION_TABS.map((tab) => (
@@ -244,6 +245,6 @@ export default async function ContentMapPage({ searchParams }: PageProps) {
           </div>
         </div>
       ))}
-    </div>
+    </PageShell>
   );
 }

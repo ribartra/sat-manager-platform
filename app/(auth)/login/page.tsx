@@ -1,12 +1,24 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import Link from "next/link";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { FormSection } from "@/components/sat";
+import { loginSchema, type LoginInput } from "@/contracts/auth";
 
 function isLocalCallbackUrl(value: string) {
   return value.startsWith("/") && !value.startsWith("//");
@@ -27,78 +39,95 @@ async function resolvePostLoginUrl(callbackUrl: string) {
 export default function LoginPage() {
   const router = useRouter();
   const params = useSearchParams();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [serverError, setServerError] = useState("");
+
+  const form = useForm<LoginInput>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: "", password: "" },
+  });
 
   const callbackUrl = params.get("callbackUrl") || "/";
+  const reason = params.get("reason");
+  const reasonMessage =
+    reason === "idle"
+      ? "Your session ended after 10 minutes of inactivity. Please sign in again."
+      : reason === "session"
+        ? "Your session is no longer valid. Please sign in again."
+        : "";
 
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-
+  async function onSubmit(values: LoginInput) {
+    setServerError("");
     const res = await signIn("credentials", {
-      email,
-      password,
+      email: values.email,
+      password: values.password,
       redirect: false,
     });
 
-    setLoading(false);
-
     if (res?.error) {
-      setError("Invalid email or password.");
-    } else {
-      router.replace(await resolvePostLoginUrl(callbackUrl));
+      setServerError("Invalid email or password.");
+      return;
     }
+    router.replace(await resolvePostLoginUrl(callbackUrl));
   }
 
+  const loading = form.formState.isSubmitting;
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="flex min-h-screen items-center justify-center bg-muted">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-3 h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center">
-            <span className="text-white font-bold text-sm">SAT</span>
+          <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-primary">
+            <span className="text-sm font-bold text-primary-foreground">SAT</span>
           </div>
-          <h1 className="text-xl font-semibold text-gray-900">SAT Practice Platform</h1>
-          <p className="mt-1 text-sm text-gray-500">Sign in to your account</p>
+          <h1 className="text-xl font-semibold text-foreground">SAT Practice Platform</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Sign in to your account</p>
         </div>
 
         <Card padding="lg">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-              <Input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                required
-                autoFocus
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-              <Input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-              />
-            </div>
-            {error && <p className="text-sm text-red-600">{error}</p>}
-            <Button type="submit" className="w-full" disabled={loading} size="lg">
-              {loading ? "Signing in..." : "Log In"}
-            </Button>
-          </form>
+          {reasonMessage ? (
+            <p className="mb-4 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+              {reasonMessage}
+            </p>
+          ) : null}
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" noValidate>
+              <FormSection>
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input type="email" placeholder="you@example.com" autoFocus {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="••••••••" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </FormSection>
+              {serverError ? <p className="text-sm text-destructive">{serverError}</p> : null}
+              <Button type="submit" className="w-full" disabled={loading} size="lg">
+                {loading ? "Signing in..." : "Log In"}
+              </Button>
+            </form>
+          </Form>
 
           <div className="mt-4 text-center">
-            <Link
-              href="/auth/forgot-password"
-              className="text-sm text-blue-600 hover:underline"
-            >
+            <Link href="/auth/forgot-password" className="text-sm text-primary hover:underline">
               Forgot your password?
             </Link>
           </div>

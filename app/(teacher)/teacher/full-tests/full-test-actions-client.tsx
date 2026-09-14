@@ -11,9 +11,17 @@ type FullTestActionsProps = {
   status: string;
   hasAssignments: boolean;
   hasAttempts: boolean;
+  /** list = View/Edit/Delete; detail = Edit + secondary lifecycle actions */
+  variant?: "list" | "detail";
 };
 
-export function FullTestActions({ testId, status, hasAssignments, hasAttempts }: FullTestActionsProps) {
+export function FullTestActions({
+  testId,
+  status,
+  hasAssignments,
+  hasAttempts,
+  variant = "list",
+}: FullTestActionsProps) {
   const router = useRouter();
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
   const canDelete = !hasAssignments && !hasAttempts;
@@ -48,25 +56,50 @@ export function FullTestActions({ testId, status, hasAssignments, hasAttempts }:
   async function remove() {
     if (!canDelete) return;
     if (!window.confirm("Delete this draft exam? This cannot be undone.")) return;
-    await request("delete", `/api/full-practice-tests/${testId}`, { method: "DELETE" });
+    const data = await request("delete", `/api/full-practice-tests/${testId}`, { method: "DELETE" });
+    if (data && variant === "detail") router.push("/teacher/full-tests");
+  }
+
+  if (variant === "list") {
+    return (
+      <div className="flex flex-wrap items-center justify-end gap-2">
+        <Button asChild variant="ghost" size="sm">
+          <Link href={`/teacher/full-tests/${testId}`}>
+            <Eye size={14} />
+            View
+          </Link>
+        </Button>
+        <Button asChild variant="ghost" size="sm">
+          <Link href={`/teacher/full-tests/${testId}/edit`}>
+            <Edit size={14} />
+            Edit
+          </Link>
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={remove}
+          disabled={!canDelete || Boolean(loadingAction)}
+          title={canDelete ? "Delete exam" : "Archive exams with assignments or attempts."}
+        >
+          <Trash2 size={14} />
+          Delete
+        </Button>
+      </div>
+    );
   }
 
   return (
     <div className="flex flex-wrap items-center justify-end gap-2">
-      <Button asChild variant="ghost" size="sm">
-        <Link href={`/teacher/full-tests/${testId}`}>
-          <Eye size={14} />
-          View
-        </Link>
-      </Button>
-      <Button asChild variant="ghost" size="sm">
+      <Button asChild variant="secondary" size="sm">
         <Link href={`/teacher/full-tests/${testId}/edit`}>
           <Edit size={14} />
           Edit
         </Link>
       </Button>
       {canAssign ? (
-        <Button asChild variant="secondary" size="sm">
+        <Button asChild size="sm">
           <Link href={`/teacher/full-tests/${testId}/assign`}>
             <Send size={14} />
             Assign
@@ -79,18 +112,36 @@ export function FullTestActions({ testId, status, hasAssignments, hasAttempts }:
         </Button>
       )}
       {status !== "PUBLISHED" && (
-        <Button type="button" variant="ghost" size="sm" onClick={() => changeStatus("PUBLISHED")} disabled={Boolean(loadingAction)}>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => changeStatus("PUBLISHED")}
+          disabled={Boolean(loadingAction)}
+        >
           <UploadCloud size={14} />
           Publish
         </Button>
       )}
       {status !== "DRAFT" && (
-        <Button type="button" variant="ghost" size="sm" onClick={() => changeStatus("DRAFT")} disabled={Boolean(loadingAction)}>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => changeStatus("DRAFT")}
+          disabled={Boolean(loadingAction)}
+        >
           Draft
         </Button>
       )}
       {status !== "ARCHIVED" && (
-        <Button type="button" variant="ghost" size="sm" onClick={() => changeStatus("ARCHIVED")} disabled={Boolean(loadingAction)}>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => changeStatus("ARCHIVED")}
+          disabled={Boolean(loadingAction)}
+        >
           <Archive size={14} />
           Archive
         </Button>
@@ -99,7 +150,14 @@ export function FullTestActions({ testId, status, hasAssignments, hasAttempts }:
         <Copy size={14} />
         Duplicate
       </Button>
-      <Button type="button" variant="ghost" size="sm" onClick={remove} disabled={!canDelete || Boolean(loadingAction)} title={canDelete ? "Delete exam" : "Archive exams with assignments or attempts."}>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        onClick={remove}
+        disabled={!canDelete || Boolean(loadingAction)}
+        title={canDelete ? "Delete exam" : "Archive exams with assignments or attempts."}
+      >
         <Trash2 size={14} />
         Delete
       </Button>

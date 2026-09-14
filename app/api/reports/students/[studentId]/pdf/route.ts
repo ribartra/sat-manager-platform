@@ -4,18 +4,26 @@ import prisma from "@/lib/prisma";
 import { scorePercent } from "@/lib/utils";
 import { parseSnapshot, PracticeSetSnapshot, QuestionSnapshot } from "@/lib/attempt-snapshots";
 import { teacherProgramEnrollmentScope } from "@/lib/program-scope";
+import { narrativeForAccuracy } from "@/lib/progress-analytics";
+import { READING_DOMAINS, WRITING_DOMAINS } from "@/lib/parent-access";
 
 interface RouteContext {
   params: Promise<{ studentId: string }>;
 }
 
 type PdfLine = { text: string; size?: number; bold?: boolean; gapBefore?: number };
+type PdfChart = {
+  kind: "barChart";
+  title: string;
+  rows: Array<{ label: string; value: number | null; max: number; detail: string }>;
+};
+type PdfItem = PdfLine | PdfChart;
 type ReportArea = "mathematics" | "reading" | "writing";
 
-const AREA_CONFIG: Record<ReportArea, { label: string; aliases: string[] }> = {
-  mathematics: { label: "Mathematics", aliases: ["math", "mathematics"] },
-  reading: { label: "Reading", aliases: ["information", "craft", "reading"] },
-  writing: { label: "Writing", aliases: ["expression", "standard english", "writing"] },
+const AREA_CONFIG: Record<ReportArea, { label: string }> = {
+  mathematics: { label: "Mathematics" },
+  reading: { label: "Reading" },
+  writing: { label: "Writing" },
 };
 
 function pdfEscape(value: string) {
@@ -40,12 +48,23 @@ function wrapText(value: string, maxChars = 92) {
   return lines;
 }
 
-function makeReportPdf(lines: PdfLine[]) {
-  const pages: PdfLine[][] = [];
-  let currentPage: PdfLine[] = [];
+function makeReportPdf(lines: PdfItem[]) {
+  const pages: PdfItem[][] = [];
+  let currentPage: PdfItem[] = [];
   let y = 748;
 
   for (const line of lines) {
+    if ("kind" in line) {
+      const chartHeight = 30 + line.rows.length * 18;
+      if (y < chartHeight + 24) {
+        pages.push(currentPage);
+        currentPage = [];
+        y = 748;
+      }
+      currentPage.push(line);
+      y -= chartHeight;
+      continue;
+    }
     const wrapped = wrapText(line.text).map((text, index) => ({
       ...line,
       text,
@@ -77,6 +96,22 @@ function makeReportPdf(lines: PdfLine[]) {
       `BT /F1 8 Tf 520 775 Td (${pageIndex + 1}/${pages.length}) Tj ET`,
     ];
     for (const line of pageLines) {
+      if ("kind" in line) {
+        commands.push(`BT /F2 11 Tf 50 ${cursorY} Td (${pdfEscape(line.title)}) Tj ET`);
+        cursorY -= 18;
+        for (const row of line.rows) {
+          const max = Math.max(1, row.max);
+          const ratio = row.value === null ? 0 : Math.max(0, Math.min(1, row.value / max));
+          const label = row.label.length > 40 ? `${row.label.slice(0, 37)}...` : row.label;
+          commands.push(`BT /F1 8 Tf 50 ${cursorY} Td (${pdfEscape(label)}) Tj ET`);
+          commands.push(`0.92 0.94 0.97 rg 205 ${cursorY - 2} 250 8 re f`);
+          if (ratio > 0) commands.push(`0.18 0.43 0.78 rg 205 ${cursorY - 2} ${Math.round(250 * ratio)} 8 re f`);
+          commands.push(`BT /F1 8 Tf 465 ${cursorY} Td (${pdfEscape(row.value === null ? "N/A" : `${row.value} · ${row.detail}`)}) Tj ET`);
+          cursorY -= 18;
+        }
+        cursorY -= 12;
+        continue;
+      }
       cursorY -= line.gapBefore ?? 0;
       const font = line.bold ? "F2" : "F1";
       const size = line.size ?? 10;
@@ -132,11 +167,11 @@ function areaPracticeSetWhere(area: ReportArea) {
     };
   }
 
-  const aliases = AREA_CONFIG[area].aliases;
+  const domainNames = area === "reading" ? [...READING_DOMAINS] : [...WRITING_DOMAINS];
   return {
     topic: {
       domain: {
-        OR: aliases.map((alias) => ({ name: { contains: alias } })),
+        name: { in: domainNames },
       },
     },
   };
@@ -163,7 +198,7 @@ export async function GET(_req: Request, { params }: RouteContext) {
   });
   if (!student) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const lines: PdfLine[] = [
+  const lines: PdfItem[] = [
     { text: "SAT Practice Report", size: 20, bold: true },
     { text: `Student: ${student.name}`, size: 12, bold: true, gapBefore: 14 },
     { text: `Report types: ${sectionId ? "Selected section" : areas.map((area) => AREA_CONFIG[area].label).join(", ")}` },
@@ -192,6 +227,7 @@ export async function GET(_req: Request, { params }: RouteContext) {
     const avgScore = scores.length ? Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length) : null;
     const topicStats = new Map<string, { correct: number; total: number }>();
     const difficultyStats = new Map<string, { correct: number; total: number }>();
+    const topicDifficultyStats = new Map<string, { topic: string; difficulty: string; correct: number; total: number }>();
     const mediaUrls = new Set<string>();
 
     for (const attempt of attempts) {
@@ -201,14 +237,19 @@ export async function GET(_req: Request, { params }: RouteContext) {
         const difficulty = snapshot?.difficulty ?? answer.question.difficulty;
         const topicStat = topicStats.get(topic) ?? { correct: 0, total: 0 };
         const difficultyStat = difficultyStats.get(difficulty) ?? { correct: 0, total: 0 };
+        const topicDifficultyKey = `${topic}:${difficulty}`;
+        const topicDifficultyStat = topicDifficultyStats.get(topicDifficultyKey) ?? { topic, difficulty, correct: 0, total: 0 };
         topicStat.total += 1;
         difficultyStat.total += 1;
         if (answer.isCorrect) {
           topicStat.correct += 1;
           difficultyStat.correct += 1;
+          topicDifficultyStat.correct += 1;
         }
         topicStats.set(topic, topicStat);
         difficultyStats.set(difficulty, difficultyStat);
+        topicDifficultyStat.total += 1;
+        topicDifficultyStats.set(topicDifficultyKey, topicDifficultyStat);
         const imageUrl = snapshot?.imageUrl ?? answer.question.imageUrl;
         if (imageUrl) mediaUrls.add(imageUrl);
       }
@@ -218,6 +259,7 @@ export async function GET(_req: Request, { params }: RouteContext) {
     lines.push({ text: `Completed attempts: ${attempts.length}` });
     lines.push({ text: `Average score: ${avgScore !== null ? `${avgScore}%` : "N/A"}` });
     lines.push({ text: `Practice time: ${Math.round(totalTime / 60)} minutes` });
+    lines.push({ text: narrativeForAccuracy(avgScore, AREA_CONFIG[selectedArea].label), gapBefore: 8 });
     lines.push({ text: "Recent Practice Attempts", size: 13, bold: true, gapBefore: 18 });
     for (let i = 0; i < attempts.length; i += 1) {
       const attempt = attempts[i];
@@ -244,6 +286,29 @@ export async function GET(_req: Request, { params }: RouteContext) {
     for (const [difficulty, stat] of difficultyStats.entries()) {
       lines.push({ text: `${difficulty}: ${stat.correct}/${stat.total} (${scorePercent(stat.correct, stat.total)}%)` });
     }
+    lines.push({
+      kind: "barChart",
+      title: "Accuracy by difficulty",
+      rows: [...difficultyStats.entries()].map(([difficulty, stat]) => ({
+        label: difficulty,
+        value: scorePercent(stat.correct, stat.total),
+        max: 100,
+        detail: `${stat.correct}/${stat.total}`,
+      })),
+    });
+    lines.push({
+      kind: "barChart",
+      title: "Progress by topic and difficulty",
+      rows: [...topicDifficultyStats.values()]
+        .sort((a, b) => scorePercent(a.correct, a.total) - scorePercent(b.correct, b.total))
+        .slice(0, 12)
+        .map((stat) => ({
+          label: `${stat.topic} · ${stat.difficulty}`,
+          value: scorePercent(stat.correct, stat.total),
+          max: 100,
+          detail: `${stat.correct}/${stat.total}`,
+        })),
+    });
     if (mediaUrls.size > 0) {
       lines.push({ text: "Question Media URLs", size: 13, bold: true, gapBefore: 18 });
       for (const url of [...mediaUrls].slice(0, 8)) lines.push({ text: url });
@@ -276,9 +341,18 @@ export async function GET(_req: Request, { params }: RouteContext) {
     take: 20,
   });
   lines.push({ text: "Exams (Full Practice Tests)", size: 16, bold: true, gapBefore: 28 });
+  lines.push({ text: "Full tests report Mathematics and Reading & Writing separately. Reading and Writing are not inferred from the combined RW score." });
   if (examAttempts.length === 0) {
     lines.push({ text: "No submitted exams yet." });
   } else {
+    lines.push({
+      kind: "barChart",
+      title: "Full Practice Test progress by section",
+      rows: examAttempts.slice(0, 12).flatMap((exam) => [
+        { label: `${exam.test.name} · Math`, value: exam.mathScore, max: 800, detail: "Math" },
+        { label: `${exam.test.name} · Reading & Writing`, value: exam.rwScore, max: 800, detail: "RW" },
+      ]),
+    });
     for (const exam of examAttempts) {
       const date = exam.submittedAt ? exam.submittedAt.toISOString().slice(0, 10) : "No date";
       lines.push({

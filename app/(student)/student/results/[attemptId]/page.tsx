@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
@@ -11,6 +12,7 @@ import { QuestionMedia } from "@/components/question-media";
 import { CheckCircle, XCircle, MinusCircle, ChevronLeft, RotateCcw } from "lucide-react";
 import { parseSnapshot, PracticeSetSnapshot, QuestionSnapshot } from "@/lib/attempt-snapshots";
 import { formatCorrectAnswer } from "@/lib/answer-grading";
+import { difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
 
 interface PageProps {
   params: Promise<{ attemptId: string }>;
@@ -79,7 +81,7 @@ export default async function ResultsPage({ params }: PageProps) {
   const displayPct = typeof attempt.scorePercent === "number" ? attempt.scorePercent : pct;
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
+    <PageShell width="narrow">
       {/* Back */}
       <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
         <Link href="/student/history" className="hover:text-blue-600 flex items-center gap-1">
@@ -194,8 +196,8 @@ export default async function ResultsPage({ params }: PageProps) {
                       )}
                     </div>
                     <div className="flex items-center gap-2">
-                      <Badge variant={question.difficulty === "EASY" ? "easy" : question.difficulty === "MEDIUM" ? "medium" : "hard"}>
-                        {question.difficulty}
+                      <Badge variant={difficultyBadgeVariant(question.difficulty)}>
+                        {difficultyLabel(question.difficulty)}
                       </Badge>
                       {ans.timeSpent !== null && (
                         <span className="text-xs text-gray-500">{formatTime(ans.timeSpent)}</span>
@@ -268,6 +270,6 @@ export default async function ResultsPage({ params }: PageProps) {
           })}
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 }

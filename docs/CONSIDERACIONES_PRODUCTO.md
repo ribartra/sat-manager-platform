@@ -1,7 +1,18 @@
-# Consideraciones SATSOL — backlog acordado
+# Consideraciones SATSOL — backlog de producto acordado
+
+> **Navegación de documentos**
+>
+> | Doc | Rol |
+> |-----|-----|
+> | Este archivo | **Backlog de producto** — decisiones de negocio y requisitos funcionales (antes `consideraciones.md` en la raíz) |
+> | [`CONSIDERACIONES_UI.md`](CONSIDERACIONES_UI.md) | **Backlog UI/DS** — capas de design system, forms, tables, nav |
+> | [`UI_SYSTEM_DESIGN.md`](UI_SYSTEM_DESIGN.md) | **AS-IS** — inventario de pantallas |
+> | [`propuesta-reformulacion-sat.md`](../propuesta-reformulacion-sat.md) | **TO-BE** — arquitectura objetivo |
+>
+> Este doc **no** se sustituye por CONSIDERACIONES_UI: son tracks distintos (producto vs reformulación UI).
 
 Documento de trabajo tras revisión de la reunión y aclaración de inconsistencias.
-Actualizado: **2026-08-18**.
+Actualizado: **2026-08-18** (restaurado a `docs/` el **2026-08-26** tras borrado accidental de la copia en raíz).
 
 ---
 

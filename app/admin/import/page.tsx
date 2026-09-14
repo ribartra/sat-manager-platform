@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
@@ -18,7 +19,7 @@ export default async function BulkImportPage() {
   });
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
+    <PageShell>
       <h1 className="mb-2 text-xl font-semibold text-gray-900">Bulk Import Questions</h1>
       <p className="mb-6 text-sm text-gray-500">Paste CSV rows, preview the required topic IDs below, then import as draft or published questions.</p>
       <BulkImportClient
@@ -27,6 +28,6 @@ export default async function BulkImportPage() {
           label: `${t.domain.section.label} / ${t.domain.name} / ${t.name}`,
         }))}
       />
-    </div>
+    </PageShell>
   );
 }

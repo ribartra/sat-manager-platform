@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -15,7 +16,7 @@ export default async function StudentMaterialsPage() {
   });
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
+    <PageShell>
       <h1 className="mb-6 text-2xl font-semibold text-gray-900">Study Materials</h1>
       <div className="space-y-4">
         {materials.map((material) => (
@@ -45,6 +46,6 @@ export default async function StudentMaterialsPage() {
           </Card>
         )}
       </div>
-    </div>
+    </PageShell>
   );
 }

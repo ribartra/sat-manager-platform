@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
-import { validatePracticeSetPayload } from "@/lib/content-validation";
+import { practiceSetEditorIssues } from "@/contracts/practice-set";
 
 export async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   }
 
   const { name, topicId, difficulty, status, explanationVisibility, questionIds } = await req.json();
-  const validationErrors = validatePracticeSetPayload({ name, topicId, difficulty, status, explanationVisibility, questionIds });
+  const validationErrors = practiceSetEditorIssues({ name, topicId, difficulty, status, explanationVisibility, questionIds });
   if ((status || "DRAFT") === "PUBLISHED" && Array.isArray(questionIds) && questionIds.length > 0) {
     const questions = await prisma.question.findMany({
       where: { id: { in: questionIds } },

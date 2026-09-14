@@ -46,13 +46,18 @@ const checks = [
     requires: [
       "localStorage.setItem(offlineKey",
       "window.addEventListener(\"online\", syncOffline)",
-      "Saved offline",
+      "SaveIndicator",
       "timeSpentByQuestion",
       "markedQuestionIds",
       "eliminatedOptions",
       "Submit this Practice Set with",
     ],
     label: "Player Practice Set cubre autosave offline, reconexion, tiempo y confirmacion con blanks",
+  },
+  {
+    file: "components/sat/save-indicator.tsx",
+    requires: ["Saved locally", "Saving…", "Sync problem", "SaveStatus"],
+    label: "SaveIndicator unifica copy de persistencia (Saved locally)",
   },
   {
     file: "lib/practice-progression.ts",
@@ -109,8 +114,10 @@ const checks = [
       "Pause & Exit",
       "MathToolPanel",
       "context=\"full-test\"",
+      "localStorage.setItem(offlineKey",
+      "SaveIndicator",
     ],
-    label: "Full Practice Test: timers por modulo, auto-advance, break y timer rojo <=1min",
+    label: "Full Practice Test: timers por modulo, auto-advance, break, timer rojo <=1min y offline parity",
   },
   {
     file: "components/math-tool-panel.tsx",

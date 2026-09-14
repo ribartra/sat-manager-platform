@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { TaxonomyClient } from "./taxonomy-client";
 
@@ -7,7 +8,7 @@ export default async function AdminTaxonomyPage() {
   });
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8">
+    <PageShell>
       <h1 className="mb-2 text-xl font-semibold text-gray-900">Taxonomy</h1>
       <p className="mb-6 text-sm text-gray-500">Academic hierarchy used by the content map, question bank, and import review.</p>
       <TaxonomyClient nodes={nodes.map((node) => ({
@@ -19,6 +20,6 @@ export default async function AdminTaxonomyPage() {
         sortOrder: node.sortOrder,
         active: node.active,
       }))} />
-    </div>
+    </PageShell>
   );
 }

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { randomUUID } from "crypto";
 import { redirect } from "next/navigation";
 import { Card } from "@/components/ui/card";
+import { PageShell } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { computeCropImageSources } from "@/lib/ingest-crop-source";
@@ -160,7 +161,10 @@ export default async function AiImportFileReviewPage({ params, searchParams }: P
   const estimatedSeconds = Math.ceil(estimatedPages * secondsPerPage);
 
   return (
-    <div className="mx-auto grid max-w-[100rem] gap-6 px-4 py-8 lg:grid-cols-[300px_minmax(0,1fr)]">
+    <PageShell
+      width="full"
+      className="grid max-w-[100rem] gap-6 lg:grid-cols-[300px_minmax(0,1fr)]"
+    >
       <div className="lg:sticky lg:top-4 lg:self-start">
         <ExtractedTestRail rows={setRows} batchId={batchId} currentFileId={file.id} />
       </div>
@@ -344,6 +348,6 @@ export default async function AiImportFileReviewPage({ params, searchParams }: P
         }))}
       />
       </div>
-    </div>
+    </PageShell>
   );
 }

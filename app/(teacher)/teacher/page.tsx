@@ -1,7 +1,7 @@
+import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { formatDate } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardBody } from "@/components/ui/card";
 import { AlertTriangle, UserPlus } from "lucide-react";
 import { UnlockRequestActions } from "./unlock-request-actions-client";
@@ -11,6 +11,8 @@ import { refreshAssignmentStates } from "@/lib/assignments";
 import { studentAccessWhereFor, teacherProgramEnrollmentScope } from "@/lib/program-scope";
 import { getStudentLastActiveMap } from "@/lib/activity";
 import { academicTopicWhere } from "@/lib/taxonomy";
+import { difficultyOptions } from "@/lib/domain-meta";
+import { TeacherStudentsTable, type TeacherStudentRow } from "./students-table-client";
 
 interface PageProps {
   searchParams: Promise<{
@@ -50,7 +52,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
     ...(topicId ? { topicId } : {}),
     ...(difficulty ? { difficulty } : {}),
   };
-  const hasAttemptFilter = topicId || difficulty || fromDate || toDate;
+  const hasAttemptFilter = Boolean(topicId || difficulty || fromDate || toDate);
 
   const studentWhere = {
     ...(session ? studentAccessWhereFor(session.user, now) : { role: "STUDENT", active: true, validationStatus: "APPROVED" }),
@@ -181,7 +183,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
     .slice(0, 3);
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8">
+    <PageShell>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-semibold text-gray-900">Students</h1>
         <Link
@@ -230,9 +232,11 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
           Difficulty
           <select name="difficulty" defaultValue={difficulty} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900">
             <option value="">All</option>
-            <option value="EASY">Easy</option>
-            <option value="MEDIUM">Medium</option>
-            <option value="HARD">Hard</option>
+            {difficultyOptions().map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
           </select>
         </label>
         <label className="text-xs font-medium text-gray-600">
@@ -301,113 +305,45 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
       )}
 
       {/* Students table */}
-      <Card className="overflow-hidden">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-gray-50 border-b border-gray-200">
-              <th className="px-4 py-3 text-left font-medium text-gray-500">Name</th>
-              {teacherGroupManagementEnabled && <th className="px-4 py-3 text-left font-medium text-gray-500">Group</th>}
-              <th className="px-4 py-3 text-left font-medium text-gray-500">Last Active</th>
-              <th className="px-4 py-3 text-right font-medium text-gray-500">Pending</th>
-              <th className="px-4 py-3 text-right font-medium text-gray-500">Avg Score</th>
-              <th className="px-4 py-3 text-left font-medium text-gray-500">Status</th>
-              <th className="px-4 py-3" />
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {students.map((student) => {
-              const lastActiveAt = lastActiveMap.get(student.id);
-              const inactive = !lastActiveAt || lastActiveAt < fiveDaysAgo;
-              const studentGroups = teacherGroupManagementEnabled
-                ? student.groups.map((gm) => gm.group.name).join(", ")
-                : "";
-              const programs = student.programEnrollments.map((pe) => pe.program.name).join(", ");
+      <TeacherStudentsTable
+        showGroups={teacherGroupManagementEnabled}
+        rows={students.map((student): TeacherStudentRow => {
+          const lastActiveAt = lastActiveMap.get(student.id);
+          const inactive = !lastActiveAt || lastActiveAt < fiveDaysAgo;
+          const studentGroups = teacherGroupManagementEnabled
+            ? student.groups.map((gm) => gm.group.name).join(", ")
+            : "";
+          const programs = student.programEnrollments.map((pe) => pe.program.name).join(", ");
+          const avgScore = student.attempts.length
+            ? Math.round(
+                (student.attempts.reduce((sum, attempt) => {
+                  const correct = attempt.answers.filter((a) => a.isCorrect).length;
+                  return sum + correct / Math.max(attempt.answers.length, 1);
+                }, 0) /
+                  student.attempts.length) *
+                  100,
+              )
+            : null;
 
-              const avgScore = student.attempts.length
-                ? Math.round(
-                    (student.attempts.reduce((sum, attempt) => {
-                      const correct = attempt.answers.filter((a) => a.isCorrect).length;
-                      return sum + correct / Math.max(attempt.answers.length, 1);
-                    }, 0) /
-                      student.attempts.length) *
-                      100
-                  )
-                : null;
-
-              return (
-                <tr key={student.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3">
-                    <p className="font-medium text-gray-900">{student.name}</p>
-                    <p className="text-xs text-gray-400">{student.email}</p>
-                    <p className="text-xs text-gray-400">Programs: {programs || "—"}</p>
-                  </td>
-                  {teacherGroupManagementEnabled && <td className="px-4 py-3 text-gray-500">{studentGroups || "—"}</td>}
-                  <td className="px-4 py-3 text-gray-500">
-                    {lastActiveAt ? (
-                      <span className={inactive ? "text-amber-600" : ""}>
-                        {formatDate(lastActiveAt)}
-                        {inactive && " ⚠"}
-                      </span>
-                    ) : (
-                      <span className="text-red-400">Never</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    {student.assignments.length > 0 ? (
-                      <Badge variant="warning">{student.assignments.length}</Badge>
-                    ) : (
-                      <span className="text-gray-400">—</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    {avgScore !== null ? (
-                      <span className={`font-medium ${avgScore >= 80 ? "text-green-600" : avgScore >= 60 ? "text-yellow-600" : "text-red-500"}`}>
-                        {avgScore}%
-                        {hasAttemptFilter && <span className="ml-1 text-xs font-normal text-gray-400">filtered</span>}
-                      </span>
-                    ) : (
-                      <span className="text-gray-400">—</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
-                    <Badge variant={student.active ? "success" : "danger"}>
-                      {student.active ? "Active" : "Inactive"}
-                    </Badge>
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <div className="flex flex-wrap justify-end gap-x-3 gap-y-1">
-                      <Link
-                        href={`/teacher/students/${student.id}/assign`}
-                        className="text-xs font-medium text-blue-600 hover:underline"
-                      >
-                        Assign Practice
-                      </Link>
-                      <Link
-                        href={`/teacher/students/${student.id}/assign-exam`}
-                        className="text-xs font-medium text-blue-600 hover:underline"
-                      >
-                        Assign Exam
-                      </Link>
-                      <Link href={`/teacher/analytics?studentId=${student.id}`} className="text-xs text-blue-600 hover:underline">
-                        Analytics
-                      </Link>
-                      <Link href={`/teacher/students/${student.id}`} className="text-xs text-blue-600 hover:underline">
-                        View →
-                      </Link>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-
-        {students.length === 0 && (
-          <div className="text-center py-12 text-gray-400">
-            <p>No students yet. Invite your first student.</p>
-          </div>
-        )}
-      </Card>
-    </div>
+          return {
+            id: student.id,
+            name: student.name,
+            email: student.email,
+            programsLabel: programs || "—",
+            groupsLabel: teacherGroupManagementEnabled ? studentGroups || "—" : null,
+            lastActiveLabel: lastActiveAt
+              ? `${formatDate(lastActiveAt)}${inactive ? " ⚠" : ""}`
+              : "Never",
+            lastActiveTone: !lastActiveAt ? "never" : inactive ? "warn" : "ok",
+            pendingCount: student.assignments.length,
+            avgScoreLabel: avgScore !== null ? `${avgScore}%` : "—",
+            avgScoreTone:
+              avgScore === null ? "none" : avgScore >= 80 ? "high" : avgScore >= 60 ? "mid" : "low",
+            avgScoreFiltered: avgScore !== null && hasAttemptFilter,
+            active: student.active,
+          };
+        })}
+      />
+    </PageShell>
   );
 }

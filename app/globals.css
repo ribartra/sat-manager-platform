@@ -1,9 +1,69 @@
 @import "tailwindcss";
 @import "katex/dist/katex.min.css";
 
+/*
+  SAT design tokens (reference → semantic).
+  New UI should prefer semantic utilities (bg-background, text-foreground,
+  bg-primary, border-border, text-muted-foreground) over raw gray/blue.
+  Existing screens may keep legacy utilities until migrated.
+*/
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Reference */
+  --sat-white: #ffffff;
+  --sat-black: #0a0a0a;
+  --sat-gray-50: #f9fafb;
+  --sat-gray-100: #f3f4f6;
+  --sat-gray-200: #e5e7eb;
+  --sat-gray-400: #9ca3af;
+  --sat-gray-500: #6b7280;
+  --sat-gray-700: #374151;
+  --sat-gray-900: #171717;
+  --sat-blue-600: #2563eb;
+  --sat-blue-700: #1d4ed8;
+  --sat-red-600: #dc2626;
+  --sat-green-600: #16a34a;
+  --sat-amber-600: #d97706;
+
+  /* Semantic */
+  --background: var(--sat-white);
+  --foreground: var(--sat-gray-900);
+  --muted: var(--sat-gray-50);
+  --muted-foreground: var(--sat-gray-500);
+  --border: var(--sat-gray-200);
+  --primary: var(--sat-blue-600);
+  --primary-foreground: var(--sat-white);
+  --primary-hover: var(--sat-blue-700);
+  --destructive: var(--sat-red-600);
+  --destructive-foreground: var(--sat-white);
+  --success: var(--sat-green-600);
+  --warning: var(--sat-amber-600);
+  --ring: var(--sat-blue-600);
+
+  /* Layout */
+  --sat-page-narrow: 42rem;
+  --sat-page-default: 64rem;
+  --sat-page-wide: 72rem;
+  --sat-page-pad-x: 1rem;
+  --sat-page-pad-y: 2rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-ring: var(--ring);
+  --spacing-page-narrow: var(--sat-page-narrow);
+  --spacing-page-default: var(--sat-page-default);
+  --spacing-page-wide: var(--sat-page-wide);
 }
 
 body {
@@ -23,7 +83,7 @@ body {
 .player-stimulus {
   overflow-y: auto;
   padding: 1.5rem;
-  border-right: 1px solid #e5e7eb;
+  border-right: 1px solid var(--border);
 }
 
 .player-question {

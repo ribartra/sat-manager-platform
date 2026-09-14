@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { SubskillsClient } from "./subskills-client";
 import { academicTopicWhere, buildTaxonomyTree, taxonomyPathLabel } from "@/lib/taxonomy";
@@ -14,7 +15,7 @@ export default async function SubskillsPage() {
   const { byId } = buildTaxonomyTree(taxonomyNodes);
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
+    <PageShell>
       <h1 className="mb-6 text-xl font-semibold text-gray-900">Subskills</h1>
       <SubskillsClient
         topics={topics.map((topic) => ({
@@ -27,6 +28,6 @@ export default async function SubskillsPage() {
           })),
         }))}
       />
-    </div>
+    </PageShell>
   );
 }

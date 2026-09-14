@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { NavTeacher } from "@/components/nav-teacher";
 import { auth } from "@/lib/auth";
-import { getFeatureSetting } from "@/lib/app-settings";
+import { getFeatureFlagValues } from "@/lib/feature-flags";
 import prisma from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -18,11 +18,7 @@ export default async function AdminSectionLayout({ children }: { children: React
   if (!user?.active) redirect("/login");
   if (user.validationStatus !== "APPROVED") redirect("/auth/pending-validation");
 
-  const showTeacherPrograms =
-    session.user.role === "ADMIN" || (await getFeatureSetting("TEACHER_PROGRAM_MANAGEMENT"));
-  const showTeacherGroups =
-    session.user.role === "ADMIN" || (await getFeatureSetting("TEACHER_GROUP_MANAGEMENT"));
-  const showMaterials = await getFeatureSetting("MATERIALS_MODULE");
+  const flags = await getFeatureFlagValues({ role: session.user.role, userId: session.user.id });
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -30,9 +26,7 @@ export default async function AdminSectionLayout({ children }: { children: React
         userName={session.user.name}
         avatarUrl={user.avatarUrl}
         role={session.user.role}
-        showTeacherPrograms={showTeacherPrograms}
-        showTeacherGroups={showTeacherGroups}
-        showMaterials={showMaterials}
+        flags={flags}
       />
       <main className="flex-1 bg-gray-50">{children}</main>
     </div>

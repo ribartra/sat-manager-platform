@@ -4,12 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
-import {
-  Users, UsersRound, UserCheck, FolderOpen, Map, FileText, HelpCircle,
-  Layers, ClipboardList, BarChart2, BookOpen, ShieldCheck, FolderCog, GraduationCap,
-  UserCog, ChevronDown, ChevronRight, KeyRound, LogOut, Camera, Menu, X,
-  Settings,
-} from "lucide-react";
+import { ChevronDown, ChevronRight, KeyRound, LogOut, Camera, Menu, X } from "lucide-react";
 import { useRef, useState } from "react";
 import { NotificationBell } from "@/components/notification-bell";
 import { Avatar } from "@/components/avatar";
@@ -19,106 +14,33 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import type { FeatureSettingKey } from "@/lib/app-settings";
+import {
+  groupIsActive,
+  isResolvedNavGroup,
+  linkIsActive,
+  resolveTeacherNav,
+  type ResolvedNavEntry,
+} from "@/lib/nav-config";
 
 interface NavTeacherProps {
   userName: string;
   avatarUrl?: string | null;
   role?: string;
+  /** Platform feature flags (UI visibility only — not authorization). */
+  flags?: Partial<Record<FeatureSettingKey, boolean>>;
+  /** @deprecated Prefer `flags.TEACHER_PROGRAM_MANAGEMENT` */
   showTeacherPrograms?: boolean;
+  /** @deprecated Prefer `flags.TEACHER_GROUP_MANAGEMENT` */
   showTeacherGroups?: boolean;
+  /** @deprecated Prefer `flags.MATERIALS_MODULE` */
   showMaterials?: boolean;
 }
 
-interface NavLink {
-  href: string;
-  label: string;
-  icon: React.ElementType;
-}
-
-interface NavGroup {
-  label: string;
-  icon: React.ElementType;
-  links: NavLink[];
-}
-
-interface NavDirect {
-  href: string;
-  label: string;
-  icon: React.ElementType;
-}
-
-const teacherGroups: (NavGroup | NavDirect)[] = [
-  {
-    label: "Students",
-    icon: Users,
-    links: [
-      { href: "/teacher", label: "Students", icon: Users },
-      { href: "/teacher/analytics", label: "Student Analytics", icon: BarChart2 },
-      { href: "/teacher/groups", label: "Groups", icon: UsersRound },
-      { href: "/teacher/parents", label: "Parents", icon: UserCheck },
-    ],
-  },
-  {
-    href: "/teacher/programs",
-    label: "Programs",
-    icon: FolderOpen,
-  },
-  {
-    label: "Content",
-    icon: FileText,
-    links: [
-      { href: "/teacher/content", label: "Content Map", icon: Map },
-      { href: "/teacher/materials", label: "Materials", icon: FileText },
-      { href: "/teacher/questions", label: "Questions", icon: HelpCircle },
-      { href: "/teacher/subskills", label: "Subskills", icon: Layers },
-    ],
-  },
-  {
-    label: "Assessments",
-    icon: ClipboardList,
-    links: [
-      { href: "/teacher/practice-sets", label: "Practice Sets", icon: BookOpen },
-      { href: "/teacher/full-tests", label: "Exams", icon: ClipboardList },
-      { href: "/teacher/compare", label: "Compare", icon: BarChart2 },
-    ],
-  },
-];
-
-const adminGroup: NavGroup = {
-  label: "Admin",
-  icon: ShieldCheck,
-  links: [
-    { href: "/admin/programs", label: "Programs", icon: FolderCog },
-    { href: "/teacher/groups", label: "Groups", icon: UsersRound },
-    { href: "/admin/teachers", label: "Teachers", icon: GraduationCap },
-    { href: "/admin/users", label: "Accounts", icon: UserCog },
-    { href: "/admin/taxonomy", label: "Taxonomy", icon: Layers },
-    { href: "/admin/import/ai", label: "AI Import", icon: FileText },
-    { href: "/admin/logs", label: "Audit Log", icon: FileText },
-    { href: "/admin/settings", label: "Settings", icon: Settings },
-  ],
-};
-
-function isNavGroup(item: NavGroup | NavDirect): item is NavGroup {
-  return "links" in item;
-}
-
-function groupIsActive(group: NavGroup, pathname: string): boolean {
-  return group.links.some((l) =>
-    l.href === "/teacher" ? pathname === l.href : pathname === l.href || pathname.startsWith(l.href + "/")
-  );
-}
-
-function linkIsActive(href: string, pathname: string): boolean {
-  return href === "/teacher"
-    ? pathname === href
-    : pathname === href || pathname.startsWith(href + "/");
-}
-
-function initExpanded(items: (NavGroup | NavDirect)[], pathname: string): Record<string, boolean> {
+function initExpanded(items: ResolvedNavEntry[], pathname: string): Record<string, boolean> {
   const state: Record<string, boolean> = {};
   for (const item of items) {
-    if (isNavGroup(item)) {
+    if (isResolvedNavGroup(item)) {
       state[item.label] = groupIsActive(item, pathname);
     }
   }
@@ -129,37 +51,26 @@ export function NavTeacher({
   userName,
   avatarUrl: initialAvatarUrl,
   role,
-  showTeacherPrograms = false,
-  showTeacherGroups = false,
-  showMaterials = false,
+  flags,
+  showTeacherPrograms,
+  showTeacherGroups,
+  showMaterials,
 }: NavTeacherProps) {
   const pathname = usePathname();
-  const visibleTeacherGroups = showTeacherPrograms
-    ? teacherGroups
-    : teacherGroups.filter((item) => !("href" in item && item.href === "/teacher/programs"));
-  const visibleTeacherItems = visibleTeacherGroups.map((item) => {
-    if (!("links" in item)) return item;
-    let links = item.links;
-    if (item.label === "Students") {
-      links =
-        role !== "ADMIN" && showTeacherGroups
-          ? links
-          : links.filter((link) => link.href !== "/teacher/groups");
-    }
-    if (item.label === "Content" && !showMaterials) {
-      links = links.filter((link) => link.href !== "/teacher/materials");
-    }
-    return { ...item, links };
-  });
-  const navItems = role === "ADMIN" ? [...visibleTeacherItems, adminGroup] : visibleTeacherItems;
+  const resolvedFlags: Partial<Record<FeatureSettingKey, boolean>> = {
+    TEACHER_PROGRAM_MANAGEMENT: flags?.TEACHER_PROGRAM_MANAGEMENT ?? showTeacherPrograms ?? false,
+    TEACHER_GROUP_MANAGEMENT: flags?.TEACHER_GROUP_MANAGEMENT ?? showTeacherGroups ?? false,
+    MATERIALS_MODULE: flags?.MATERIALS_MODULE ?? showMaterials ?? false,
+  };
+  const navItems = resolveTeacherNav({ role, flags: resolvedFlags });
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl);
   const [uploading, setUploading] = useState(false);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
-    () => initExpanded(navItems, pathname)
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(() =>
+    initExpanded(navItems, pathname),
   );
   const closeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -200,19 +111,15 @@ export function NavTeacher({
 
   return (
     <TooltipProvider delayDuration={500}>
-      {/* ── Desktop nav ─────────────────────────────────────────────────── */}
       <nav className="border-b border-gray-200 bg-white">
         <div className="mx-auto max-w-6xl px-4">
           <div className="flex h-14 items-center justify-between">
-
-            {/* Left: brand + desktop links */}
             <div className="flex items-center gap-5">
               <span className="font-semibold text-gray-800 text-sm shrink-0">SAT Platform</span>
 
-              {/* Desktop nav — hidden below lg */}
               <div className="hidden lg:flex items-center gap-0.5">
                 {navItems.map((item) => {
-                  if (!isNavGroup(item)) {
+                  if (!isResolvedNavGroup(item)) {
                     const active = linkIsActive(item.href, pathname);
                     return (
                       <Tooltip key={item.href}>
@@ -221,7 +128,7 @@ export function NavTeacher({
                             href={item.href}
                             className={cn(
                               "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
-                              active ? "text-gray-900" : "text-gray-400 hover:text-gray-700"
+                              active ? "text-gray-900" : "text-gray-400 hover:text-gray-700",
                             )}
                           >
                             <item.icon size={14} />
@@ -249,7 +156,7 @@ export function NavTeacher({
                         aria-expanded={isOpen}
                         className={cn(
                           "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors outline-none",
-                          active ? "text-gray-900" : "text-gray-400 hover:text-gray-700"
+                          active ? "text-gray-900" : "text-gray-400 hover:text-gray-700",
                         )}
                       >
                         <item.icon size={14} />
@@ -268,7 +175,7 @@ export function NavTeacher({
                           onMouseLeave={onGroupLeave}
                         >
                           {item.links.map((link) => {
-                            const linkActive = linkIsActive(link.href, pathname);
+                            const linkActive = linkIsActive(link.href, pathname, link.exact);
                             return (
                               <Link
                                 key={link.href}
@@ -277,7 +184,7 @@ export function NavTeacher({
                                 onClick={() => setOpenGroup(null)}
                                 className={cn(
                                   "flex w-full cursor-pointer select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-gray-100",
-                                  linkActive ? "text-gray-900 font-medium" : "text-gray-500"
+                                  linkActive ? "text-gray-900 font-medium" : "text-gray-500",
                                 )}
                               >
                                 <link.icon
@@ -296,11 +203,9 @@ export function NavTeacher({
               </div>
             </div>
 
-            {/* Right: bell + user menu + hamburger */}
             <div className="flex items-center gap-1">
               <NotificationBell />
 
-              {/* User menu — always visible */}
               <div className="relative">
                 <button
                   onClick={() => setMenuOpen(!menuOpen)}
@@ -313,7 +218,10 @@ export function NavTeacher({
                 {menuOpen && (
                   <div className="absolute right-0 mt-1 w-52 rounded-md border border-gray-200 bg-white shadow-lg z-10">
                     <button
-                      onClick={() => { setMenuOpen(false); fileInputRef.current?.click(); }}
+                      onClick={() => {
+                        setMenuOpen(false);
+                        fileInputRef.current?.click();
+                      }}
                       disabled={uploading}
                       className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50"
                     >
@@ -321,7 +229,9 @@ export function NavTeacher({
                       {uploading ? "Uploading..." : "Change photo"}
                     </button>
                     <button
-                      onClick={() => { window.location.href = "/auth/change-password"; }}
+                      onClick={() => {
+                        window.location.href = "/auth/change-password";
+                      }}
                       className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
                     >
                       <KeyRound size={14} />
@@ -338,7 +248,6 @@ export function NavTeacher({
                 )}
               </div>
 
-              {/* Hamburger — visible below lg */}
               <button
                 onClick={() => setMobileOpen(true)}
                 className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-700 transition-colors"
@@ -351,34 +260,25 @@ export function NavTeacher({
         </div>
       </nav>
 
-      {/* ── Mobile drawer ────────────────────────────────────────────────── */}
       {mobileOpen && (
-        <div
-          className="fixed inset-0 bg-black/30 z-40 lg:hidden"
-          onClick={closeMobile}
-        />
+        <div className="fixed inset-0 bg-black/30 z-40 lg:hidden" onClick={closeMobile} />
       )}
       <div
         className={cn(
           "fixed top-0 right-0 h-full w-72 bg-white shadow-xl z-50 flex flex-col transition-transform duration-200 ease-in-out lg:hidden",
-          mobileOpen ? "translate-x-0" : "translate-x-full"
+          mobileOpen ? "translate-x-0" : "translate-x-full",
         )}
       >
-        {/* Drawer header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
           <span className="font-semibold text-gray-800 text-sm">SAT Platform</span>
-          <button
-            onClick={closeMobile}
-            className="p-1.5 rounded-md text-gray-400 hover:text-gray-700"
-          >
+          <button onClick={closeMobile} className="p-1.5 rounded-md text-gray-400 hover:text-gray-700">
             <X size={18} />
           </button>
         </div>
 
-        {/* Drawer nav */}
         <div className="flex-1 overflow-y-auto py-2">
           {navItems.map((item) => {
-            if (!isNavGroup(item)) {
+            if (!isResolvedNavGroup(item)) {
               const active = linkIsActive(item.href, pathname);
               return (
                 <Link
@@ -387,7 +287,7 @@ export function NavTeacher({
                   onClick={closeMobile}
                   className={cn(
                     "flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-colors",
-                    active ? "text-gray-900" : "text-gray-500 hover:text-gray-800"
+                    active ? "text-gray-900" : "text-gray-500 hover:text-gray-800",
                   )}
                 >
                   <item.icon size={16} className={active ? "text-gray-700" : "text-gray-400"} />
@@ -405,7 +305,7 @@ export function NavTeacher({
                   onClick={() => toggleExpanded(item.label)}
                   className={cn(
                     "flex w-full items-center justify-between px-4 py-2.5 text-sm font-medium transition-colors",
-                    active ? "text-gray-900" : "text-gray-500 hover:text-gray-800"
+                    active ? "text-gray-900" : "text-gray-500 hover:text-gray-800",
                   )}
                 >
                   <span className="flex items-center gap-3">
@@ -414,16 +314,13 @@ export function NavTeacher({
                   </span>
                   <ChevronRight
                     size={14}
-                    className={cn(
-                      "text-gray-400 transition-transform",
-                      expanded && "rotate-90"
-                    )}
+                    className={cn("text-gray-400 transition-transform", expanded && "rotate-90")}
                   />
                 </button>
                 {expanded && (
                   <div className="pl-9 pb-1">
                     {item.links.map((link) => {
-                      const linkActive = linkIsActive(link.href, pathname);
+                      const linkActive = linkIsActive(link.href, pathname, link.exact);
                       return (
                         <Link
                           key={link.href}
@@ -431,9 +328,7 @@ export function NavTeacher({
                           onClick={closeMobile}
                           className={cn(
                             "flex items-center gap-2.5 px-3 py-2 text-sm rounded-md transition-colors",
-                            linkActive
-                              ? "text-gray-900 font-medium"
-                              : "text-gray-500 hover:text-gray-800"
+                            linkActive ? "text-gray-900 font-medium" : "text-gray-500 hover:text-gray-800",
                           )}
                         >
                           <link.icon size={14} className={linkActive ? "text-gray-700" : "text-gray-400"} />
@@ -448,14 +343,16 @@ export function NavTeacher({
           })}
         </div>
 
-        {/* Drawer footer */}
         <div className="border-t border-gray-100 px-4 py-3 space-y-1">
           <div className="flex items-center gap-2 px-1 py-1.5 mb-1">
             <Avatar name={userName} avatarUrl={avatarUrl} size="sm" />
             <span className="text-sm font-medium text-gray-700 truncate">{userName}</span>
           </div>
           <button
-            onClick={() => { closeMobile(); fileInputRef.current?.click(); }}
+            onClick={() => {
+              closeMobile();
+              fileInputRef.current?.click();
+            }}
             disabled={uploading}
             className="flex w-full items-center gap-2 px-2 py-2 text-sm text-gray-500 hover:text-gray-800 rounded-md hover:bg-gray-50 disabled:opacity-50"
           >
@@ -463,7 +360,9 @@ export function NavTeacher({
             {uploading ? "Uploading..." : "Change photo"}
           </button>
           <button
-            onClick={() => { window.location.href = "/auth/change-password"; }}
+            onClick={() => {
+              window.location.href = "/auth/change-password";
+            }}
             className="flex w-full items-center gap-2 px-2 py-2 text-sm text-gray-500 hover:text-gray-800 rounded-md hover:bg-gray-50"
           >
             <KeyRound size={14} />

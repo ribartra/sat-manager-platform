@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import { redirect } from "next/navigation";
 import { FEATURE_SETTINGS, getFeatureSettings } from "@/lib/app-settings";
 import { requireAdmin } from "@/lib/rbac";
@@ -21,17 +22,19 @@ export default async function AdminSettingsPage() {
     key,
     label: config.label,
     description: config.description,
+    owner: config.owner,
+    expiresAt: config.expiresAt,
     value: values[key as keyof typeof FEATURE_SETTINGS],
   }));
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
+    <PageShell>
       <h1 className="mb-1 text-xl font-semibold text-gray-900">Platform Settings</h1>
       <p className="mb-6 text-sm text-gray-500">
         Enable optional workflows by role. Defaults keep student unlock requests,
         student self-enrollment, and teacher program management disabled.
       </p>
       <SettingsClient settings={settings} mistralKey={secretSummary(mistralSetting?.value)} smtp={smtp} />
-    </div>
+    </PageShell>
   );
 }

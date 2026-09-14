@@ -9,6 +9,7 @@ import { Select } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Tag } from "lucide-react";
+import { explanationVisibilityOptions, difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
 
 interface PracticeSetInfo {
   id: string;
@@ -178,9 +179,7 @@ export function AssignForm({ studentId, practiceSets, groups, groupAssignmentEna
                 <p className="text-sm font-medium text-gray-900 truncate">{ps.name}</p>
                 <p className="text-xs text-gray-500">{ps.sectionLabel} · {ps.topicName} · {ps.questionCount} questions</p>
               </div>
-              <Badge variant={ps.difficulty === "EASY" ? "easy" : ps.difficulty === "MEDIUM" ? "medium" : "hard"}>
-                {ps.difficulty}
-              </Badge>
+              <Badge variant={difficultyBadgeVariant(ps.difficulty)}>{difficultyLabel(ps.difficulty)}</Badge>
               {target === "student" && ps.alreadyAssigned && <span className="text-xs text-gray-400">Assigned</span>}
             </label>
           ))}
@@ -201,9 +200,11 @@ export function AssignForm({ studentId, practiceSets, groups, groupAssignmentEna
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Explanation Visibility</label>
           <Select value={explVisibility} onChange={(e) => setExplVisibility(e.target.value)}>
-            <option value="IMMEDIATE">Show immediately</option>
-            <option value="AFTER_FINISH">Show after finish</option>
-            <option value="HIDDEN">Hidden</option>
+            {explanationVisibilityOptions().map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
           </Select>
         </div>
       </div>

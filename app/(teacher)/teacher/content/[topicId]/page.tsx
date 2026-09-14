@@ -1,9 +1,12 @@
+import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft, Plus, Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
+import { taxonomySectionKeyFromLabel } from "@/lib/taxonomy";
 
 interface PageProps {
   params: Promise<{ topicId: string }>;
@@ -28,6 +31,10 @@ export default async function TopicContentPage({ params }: PageProps) {
 
   if (!topic) notFound();
 
+  const sectionKey = taxonomySectionKeyFromLabel(topic.domain.section.label);
+  const sectionHref = `/teacher/content?section=${sectionKey}`;
+  const domainHref = `${sectionHref}&domain=${encodeURIComponent(topic.domain.name)}`;
+
   const statusBadge = (status: string) => {
     const map: Record<string, "success" | "warning" | "danger" | "default"> = {
       PUBLISHED: "success",
@@ -39,17 +46,21 @@ export default async function TopicContentPage({ params }: PageProps) {
   };
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
+    <PageShell>
       <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-        <Link href="/teacher/content" className="hover:text-blue-600 flex items-center gap-1">
+        <Link href={sectionHref} className="flex items-center gap-1 hover:text-blue-600">
           <ChevronLeft size={14} /> Content
         </Link>
         <span>/</span>
-        <span>{topic.domain.section.label}</span>
+        <Link href={sectionHref} className="hover:text-blue-600">
+          {topic.domain.section.label}
+        </Link>
         <span>/</span>
-        <span>{topic.domain.name}</span>
+        <Link href={domainHref} className="hover:text-blue-600">
+          {topic.domain.name}
+        </Link>
         <span>/</span>
-        <span className="text-gray-900 font-medium">{topic.name}</span>
+        <span className="font-medium text-gray-900">{topic.name}</span>
       </div>
 
       <div className="flex items-center justify-between mb-5">
@@ -87,8 +98,8 @@ export default async function TopicContentPage({ params }: PageProps) {
                 <tr key={ps.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3 font-medium text-gray-900">{ps.name}</td>
                   <td className="px-4 py-3">
-                    <Badge variant={ps.difficulty === "EASY" ? "easy" : ps.difficulty === "MEDIUM" ? "medium" : "hard"}>
-                      {ps.difficulty}
+                    <Badge variant={difficultyBadgeVariant(ps.difficulty)}>
+                      {difficultyLabel(ps.difficulty)}
                     </Badge>
                   </td>
                   <td className="px-4 py-3 text-right text-gray-500">{ps.questions.length}</td>
@@ -109,6 +120,6 @@ export default async function TopicContentPage({ params }: PageProps) {
           </table>
         </Card>
       )}
-    </div>
+    </PageShell>
   );
 }

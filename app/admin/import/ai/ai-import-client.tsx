@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { CheckCircle2, FileArchive, FileSearch, RefreshCcw, Search, UploadCloud } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,8 +12,10 @@ import { CopyableTruncatedText } from "@/components/ui/copyable-truncated-text";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { MathContent } from "@/components/math-content";
+import { FormattedTextField } from "@/components/formatted-text-field";
 import { PdfPageCropper, type CropTarget, type CropOcrResult } from "@/app/admin/import/ai/_components/pdf-page-cropper";
 import { ExtractedTestRail } from "@/app/admin/import/ai/_components/extracted-test-rail";
+import { queryKeys } from "@/lib/query-keys";
 import type { ExtractedTestRow } from "@/lib/ingest-sets";
 import { stripIngestImagePlaceholders } from "@/lib/ingest-text-sanitize";
 
@@ -261,20 +264,6 @@ function stripMarkdownImageRefs(value: string | null | undefined) {
 
 function targetLabel(value: string) {
   return targetTypes.find((target) => target.value === value)?.label ?? value;
-}
-
-function RenderedMathPreview({ label, value }: { label: string; value: string | null | undefined }) {
-  const content = stripMarkdownImageRefs(value);
-  return (
-    <div className="rounded-md border border-gray-200 bg-gray-50 p-3">
-      <p className="mb-2 text-xs font-medium uppercase text-gray-400">{label}</p>
-      {content ? (
-        <MathContent content={content} className="max-h-48 overflow-auto text-sm leading-6 text-gray-800" />
-      ) : (
-        <p className="text-sm text-gray-400">Empty</p>
-      )}
-    </div>
-  );
 }
 
 export function AiImportWorkflowClient({
@@ -1115,18 +1104,22 @@ function QuestionStagingEditor({
           </Link>
         </div>
         <div className="mt-4 grid gap-3">
-          <div className="grid gap-3 lg:grid-cols-2">
-            <RenderedMathPreview label="Rendered stem" value={draft.stem} />
-            <RenderedMathPreview label="Rendered stimulus" value={draft.stimulus} />
-          </div>
-          <label className="grid gap-1">
-            <span className="text-xs font-medium text-gray-500">Stem</span>
-            <textarea value={stripMarkdownImageRefs(draft.stem)} onChange={(event) => setDraft({ ...draft, stem: event.target.value })} className="min-h-28 rounded-md border border-gray-300 px-3 py-2 text-sm" />
-          </label>
-          <label className="grid gap-1">
-            <span className="text-xs font-medium text-gray-500">Stimulus</span>
-            <textarea value={stripMarkdownImageRefs(draft.stimulus)} onChange={(event) => setDraft({ ...draft, stimulus: event.target.value })} className="min-h-20 rounded-md border border-gray-300 px-3 py-2 text-sm" />
-          </label>
+          <FormattedTextField
+            label="Stem"
+            value={stripMarkdownImageRefs(draft.stem)}
+            onChange={(stem) => setDraft({ ...draft, stem })}
+            rows={5}
+            formatPreview={stripMarkdownImageRefs}
+          />
+          <FormattedTextField
+            label="Stimulus"
+            value={stripMarkdownImageRefs(draft.stimulus)}
+            onChange={(stimulus) => setDraft({ ...draft, stimulus })}
+            rows={4}
+            formatPreview={stripMarkdownImageRefs}
+            collapsible={!draft.stimulus?.trim()}
+            collapseLabel="Add stimulus"
+          />
           <div className="grid gap-2">
             <p className="text-xs font-medium text-gray-500">Options</p>
             <div className="grid gap-2 rounded-md border border-gray-200 bg-gray-50 p-3">
@@ -1165,11 +1158,13 @@ function QuestionStagingEditor({
               </select>
             </label>
           </div>
-          <label className="grid gap-1">
-            <span className="text-xs font-medium text-gray-500">Explanation</span>
-            <RenderedMathPreview label="Rendered explanation" value={draft.explanation} />
-            <textarea value={stripMarkdownImageRefs(draft.explanation)} onChange={(event) => setDraft({ ...draft, explanation: event.target.value })} className="min-h-24 rounded-md border border-gray-300 px-3 py-2 text-sm" />
-          </label>
+          <FormattedTextField
+            label="Explanation"
+            value={stripMarkdownImageRefs(draft.explanation)}
+            onChange={(explanation) => setDraft({ ...draft, explanation })}
+            rows={4}
+            formatPreview={stripMarkdownImageRefs}
+          />
           <div className={`flex flex-wrap items-center gap-2 rounded-md border p-3 transition-colors ${dirty ? "border-amber-300 bg-amber-50" : "border-gray-200 bg-gray-50"}`}>
             <Button type="button" onClick={() => saveDraft()} disabled={saving || !dirty}>
               {saving ? "Saving…" : dirty ? "Save changes" : "Saved"}
@@ -1426,14 +1421,38 @@ export function AiImportActions({ selectedBatchId }: { selectedBatchId?: string 
   );
 }
 
-export function IngestAutoRefresh({ enabled, intervalMs = 8000 }: { enabled: boolean; intervalMs?: number }) {
+export function IngestAutoRefresh({
+  batchId,
+  enabled,
+  intervalMs = 8000,
+}: {
+  batchId?: string;
+  enabled: boolean;
+  intervalMs?: number;
+}) {
   const router = useRouter();
+  const previousFingerprint = useRef<string | null>(null);
+
+  const { data } = useQuery({
+    queryKey: queryKeys.aiImport.batchProgress(batchId ?? ""),
+    queryFn: async () => {
+      const response = await fetch(`/api/admin/ai-import/batches/${batchId}/progress`);
+      if (!response.ok) throw new Error("Unable to load batch progress.");
+      return response.json() as Promise<{ fingerprint: string }>;
+    },
+    enabled: Boolean(enabled && batchId),
+    refetchInterval: enabled && batchId ? intervalMs : false,
+    staleTime: Math.floor(intervalMs / 2),
+  });
 
   useEffect(() => {
-    if (!enabled) return;
-    const timer = window.setInterval(() => router.refresh(), intervalMs);
-    return () => window.clearInterval(timer);
-  }, [enabled, intervalMs, router]);
+    const fingerprint = data?.fingerprint;
+    if (!fingerprint) return;
+    if (previousFingerprint.current && previousFingerprint.current !== fingerprint) {
+      router.refresh();
+    }
+    previousFingerprint.current = fingerprint;
+  }, [data?.fingerprint, router]);
 
   return null;
 }

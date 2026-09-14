@@ -35,12 +35,36 @@ export function activeTaxonomySection(value: string | undefined | null): Taxonom
   return TAXONOMY_SECTION_TABS.some((tab) => tab.key === value) ? (value as TaxonomySectionKey) : "math";
 }
 
+/** Map a section display label (e.g. "Mathematics") to the content-map tab key. */
+export function taxonomySectionKeyFromLabel(label: string | null | undefined): TaxonomySectionKey {
+  return isMathTaxonomyLabel({ name: label ?? "", label: label ?? "" }) ? "math" : "rw";
+}
+
 export function isMathTaxonomyLabel(value: { name: string; label: string }) {
   return `${value.name} ${value.label}`.toLowerCase().includes("math");
 }
 
 export function matchesTaxonomySection(value: { name: string; label: string }, section: TaxonomySectionKey) {
   return section === "math" ? isMathTaxonomyLabel(value) : !isMathTaxonomyLabel(value);
+}
+
+/** Case-insensitive match for domain deep-links (`?domain=Algebra`). */
+export function matchesTaxonomyDomainName(
+  value: { name?: string | null; label?: string | null },
+  domain: string | null | undefined
+) {
+  const needle = domain?.trim().toLowerCase();
+  if (!needle) return true;
+  return [value.name, value.label].some((part) => (part ?? "").trim().toLowerCase() === needle);
+}
+
+/** Stable DOM id for a domain heading (scroll / deep-link anchors). */
+export function taxonomyDomainAnchorId(name: string) {
+  return `domain-${name
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")}`;
 }
 
 export function buildTaxonomyTree<T extends TaxonomyNodeBase>(nodes: T[]) {

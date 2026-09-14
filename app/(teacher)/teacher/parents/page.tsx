@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { studentAccessWhereFor } from "@/lib/program-scope";
@@ -23,7 +24,7 @@ export default async function ParentsPage() {
       );
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8">
+    <PageShell>
       <h1 className="mb-6 text-xl font-semibold text-gray-900">Parents</h1>
       <ParentsClient
         parents={visibleParents.map((p) => ({
@@ -37,6 +38,6 @@ export default async function ParentsPage() {
         }))}
         students={students.map((s) => ({ id: s.id, name: s.name }))}
       />
-    </div>
+    </PageShell>
   );
 }

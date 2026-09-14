@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
+import { difficultyOptions } from "@/lib/domain-meta";
 
 const MAX_UPLOAD_BYTES = 256 * 1024 * 1024;
 
@@ -193,9 +194,11 @@ export function ImportQuestionnaireButton({ mode, defaultName, topicName, domain
                   <label className="grid gap-1">
                     <span className="text-xs font-medium text-gray-500">Difficulty hint</span>
                     <Select value={selectedDifficulty} onChange={(event) => setSelectedDifficulty(event.target.value)}>
-                      <option value="EASY">Easy</option>
-                      <option value="MEDIUM">Medium</option>
-                      <option value="HARD">Hard</option>
+                      {difficultyOptions().map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
                     </Select>
                   </label>
                 </div>
@@ -209,7 +212,7 @@ export function ImportQuestionnaireButton({ mode, defaultName, topicName, domain
               <div className="grid gap-4 lg:grid-cols-2">
                 <FileTray
                   title="Questions"
-                  hint="File type: Preguntas. Upload the questionnaire PDF/DOCX with stems, stimuli and options."
+                  hint="File type: Questions. Upload the questionnaire PDF/DOCX with stems, stimuli and options."
                   required
                   files={questionFiles}
                   disabled={loading}
@@ -217,7 +220,7 @@ export function ImportQuestionnaireButton({ mode, defaultName, topicName, domain
                 />
                 <FileTray
                   title="Answers / Explanations"
-                  hint="File type: Respuestas, Explicaciones, or Respuestas con explicaciones (one document)."
+                  hint="File type: Answers, Explanations, or Answers with explanations (one document)."
                   files={answerFiles}
                   disabled={loading}
                   onChange={setAnswerFiles}
@@ -237,8 +240,8 @@ export function ImportQuestionnaireButton({ mode, defaultName, topicName, domain
                       onChange={(event) => setAnswerTrayKind(event.target.value as "ANSWERS" | "EXPLANATIONS")}
                       className="mb-2"
                     >
-                      <option value="ANSWERS">Respuestas (answer key only)</option>
-                      <option value="EXPLANATIONS">Explicaciones (explanations only)</option>
+                      <option value="ANSWERS">Answers (answer key only)</option>
+                      <option value="EXPLANATIONS">Explanations (explanations only)</option>
                     </Select>
                   )}
                 </FileTray>

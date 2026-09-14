@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
@@ -42,7 +43,7 @@ export default async function AssignExamPage({ params }: PageProps) {
   const assignedIds = new Set(existing.map((row) => row.testId));
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
+    <PageShell width="narrow">
       <div className="mb-6 flex items-center gap-2 text-sm text-gray-500">
         <Link href={`/teacher/students/${studentId}`} className="flex items-center gap-1 hover:text-blue-600">
           <ChevronLeft size={14} /> {student.name}
@@ -63,6 +64,6 @@ export default async function AssignExamPage({ params }: PageProps) {
           alreadyAssigned: assignedIds.has(exam.id),
         }))}
       />
-    </div>
+    </PageShell>
   );
 }

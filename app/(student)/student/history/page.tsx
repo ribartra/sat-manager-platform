@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
@@ -6,6 +7,8 @@ import { scoreBandTextClass, scoreBandBarClass } from "@/lib/score-band";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { FULL_PRACTICE_TEST_DOMAIN_NAME } from "@/lib/taxonomy";
+import { difficultyOptions } from "@/lib/domain-meta";
+import { classifyPracticeSetArea, practiceSetAreaLabel, READING_DOMAINS, WRITING_DOMAINS } from "@/lib/parent-access";
 
 interface PageProps {
   searchParams: Promise<{
@@ -49,18 +52,29 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
   });
   const areaSectionIds = sections.filter((section) => matchesArea(section, requestedArea)).map((section) => section.id);
   const sectionId = params.section || "";
-  const effectiveSectionIds = sectionId ? [sectionId] : areaSectionIds;
+  const effectiveSectionIds = sectionId
+    ? (areaSectionIds.includes(sectionId) ? [sectionId] : [])
+    : areaSectionIds;
   const topicId = params.topic || "";
   const difficulty = params.difficulty || "";
   const fromDate = parseDateParam(params.from);
   const toDate = parseDateParam(params.to, true);
 
+  const areaDomainNames = requestedArea === "reading"
+    ? [...READING_DOMAINS]
+    : requestedArea === "writing"
+      ? [...WRITING_DOMAINS]
+      : undefined;
+  const topicDomainFilter = {
+    ...(effectiveSectionIds.length ? { sectionId: { in: effectiveSectionIds } } : {}),
+    ...(areaDomainNames ? { name: { in: areaDomainNames } } : {}),
+  };
   const practiceSetFilter = {
-    ...(effectiveSectionIds.length ? { topic: { domain: { sectionId: { in: effectiveSectionIds } } } } : {}),
+    ...(sectionId || effectiveSectionIds.length || areaDomainNames ? { topic: { domain: topicDomainFilter } } : {}),
     ...(topicId ? { topicId } : {}),
     ...(difficulty ? { difficulty } : {}),
   };
-  const hasPracticeSetFilter = effectiveSectionIds.length || topicId || difficulty;
+  const hasPracticeSetFilter = sectionId || effectiveSectionIds.length || topicId || difficulty;
 
   const [attempts, topics] = await Promise.all([
     prisma.attempt.findMany({
@@ -96,9 +110,12 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
       orderBy: { submittedAt: "desc" },
     }),
     prisma.topic.findMany({
-      where: sectionId
-        ? { domain: { sectionId, name: { not: FULL_PRACTICE_TEST_DOMAIN_NAME } } }
-        : { domain: { sectionId: { in: effectiveSectionIds }, name: { not: FULL_PRACTICE_TEST_DOMAIN_NAME } } },
+      where: {
+        domain: {
+          ...(sectionId ? { sectionId } : { sectionId: { in: effectiveSectionIds } }),
+          ...(areaDomainNames ? { name: { in: areaDomainNames } } : { name: { not: FULL_PRACTICE_TEST_DOMAIN_NAME } }),
+        },
+      },
       include: { domain: { include: { section: true } } },
       orderBy: { name: "asc" },
     }),
@@ -136,7 +153,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
   });
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
+    <PageShell>
       <h1 className="text-2xl font-semibold text-gray-900 mb-6">My History</h1>
       <div className="mb-5 flex gap-2 border-b border-gray-200">
         {AREA_TABS.map((tab) => (
@@ -160,7 +177,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
           Section
           <select name="section" defaultValue={sectionId} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900">
             <option value="">All</option>
-            {sections.map((section) => (
+            {sections.filter((section) => areaSectionIds.includes(section.id)).map((section) => (
               <option key={section.id} value={section.id}>
                 {section.label}
               </option>
@@ -182,9 +199,11 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
           Difficulty
           <select name="difficulty" defaultValue={difficulty} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900">
             <option value="">All</option>
-            <option value="EASY">Easy</option>
-            <option value="MEDIUM">Medium</option>
-            <option value="HARD">Hard</option>
+            {difficultyOptions().map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
           </select>
         </label>
         <label className="text-xs font-medium text-gray-600">
@@ -250,6 +269,13 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
                 <tbody className="divide-y divide-gray-100">
                   {scoredAttempts.map(({ attempt: a, correct, total, pct }) => {
                     const ps = a.assignment?.practiceSet;
+                    const areaLabel = ps
+                      ? practiceSetAreaLabel(classifyPracticeSetArea({
+                          sectionName: ps.topic.domain.section.name,
+                          sectionLabel: ps.topic.domain.section.label,
+                          domainName: ps.topic.domain.name,
+                        }))
+                      : null;
                     return (
                       <tr key={a.id} className="hover:bg-gray-50">
                         <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
@@ -258,7 +284,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
                         <td className="px-4 py-3">
                           <p className="font-medium text-gray-900">{ps?.name ?? "—"}</p>
                           <p className="text-xs text-gray-400">
-                            {ps?.topic.domain.section.label}
+                            {areaLabel ?? ps?.topic.domain.section.label ?? "—"}
                             {ps?.topic.name ? ` · ${ps.topic.name}` : ""}
                             {ps?.difficulty ? ` · ${ps.difficulty}` : ""}
                           </p>
@@ -316,6 +342,6 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
           </div>
         </div>
       )}
-    </div>
+    </PageShell>
   );
 }

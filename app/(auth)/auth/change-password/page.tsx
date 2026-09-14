@@ -1,65 +1,109 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { FormSection, PageHeader, PageShell } from "@/components/sat";
+import { changePasswordSchema, type ChangePasswordInput } from "@/contracts/auth";
 
 export default function ChangePasswordPage() {
   const router = useRouter();
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
-  const [error, setError] = useState("");
+  const [serverError, setServerError] = useState("");
   const [success, setSuccess] = useState(false);
-  const [loading, setLoading] = useState(false);
 
-  async function submit(e: FormEvent) {
-    e.preventDefault();
-    setError("");
-    if (newPassword !== confirm) {
-      setError("Passwords do not match.");
-      return;
-    }
-    setLoading(true);
+  const form = useForm<ChangePasswordInput>({
+    resolver: zodResolver(changePasswordSchema),
+    defaultValues: { currentPassword: "", newPassword: "", confirm: "" },
+  });
+
+  async function onSubmit(values: ChangePasswordInput) {
+    setServerError("");
     const res = await fetch("/api/auth/change-password", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ currentPassword, newPassword }),
+      body: JSON.stringify({
+        currentPassword: values.currentPassword,
+        newPassword: values.newPassword,
+      }),
     });
     const data = await res.json();
-    setLoading(false);
     if (!res.ok) {
-      setError(data.error ?? "Could not change password.");
+      setServerError(data.error ?? "Could not change password.");
       return;
     }
     setSuccess(true);
     setTimeout(() => router.back(), 900);
   }
 
+  const loading = form.formState.isSubmitting;
+
   return (
-    <div className="mx-auto max-w-sm px-4 py-10">
-      <h1 className="mb-5 text-xl font-semibold text-gray-900">Change Password</h1>
-      <Card as="form" onSubmit={submit} padding="lg" className="space-y-4">
-        <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">Current password</label>
-          <Input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} required />
-        </div>
-        <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">New password</label>
-          <Input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
-        </div>
-        <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">Confirm new password</label>
-          <Input type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} required />
-        </div>
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        {success && <p className="text-sm text-green-600">Password updated.</p>}
-        <Button type="submit" disabled={loading} className="w-full">
-          {loading ? "Saving..." : "Save Password"}
-        </Button>
+    <PageShell width="narrow" density="comfortable">
+      <PageHeader title="Change Password" />
+      <Card padding="lg">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" noValidate>
+            <FormSection>
+              <FormField
+                control={form.control}
+                name="currentPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Current password</FormLabel>
+                    <FormControl>
+                      <Input type="password" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="newPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>New password</FormLabel>
+                    <FormControl>
+                      <Input type="password" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="confirm"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirm new password</FormLabel>
+                    <FormControl>
+                      <Input type="password" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </FormSection>
+            {serverError ? <p className="text-sm text-destructive">{serverError}</p> : null}
+            {success ? <p className="text-sm text-success">Password updated.</p> : null}
+            <Button type="submit" disabled={loading} className="w-full">
+              {loading ? "Saving..." : "Save Password"}
+            </Button>
+          </form>
+        </Form>
       </Card>
-    </div>
+    </PageShell>
   );
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
+import { practiceSetEditorIssues } from "@/contracts/practice-set";
 import { validatePracticeSetPayload } from "@/lib/content-validation";
 
 interface RouteContext {
@@ -73,7 +74,7 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
     where: { id: practiceSetId },
     select: { status: true, topicId: true, difficulty: true },
   });
-  const validationErrors = validatePracticeSetPayload({ name, topicId, difficulty, status, explanationVisibility, questionIds });
+  const validationErrors = practiceSetEditorIssues({ name, topicId, difficulty, status, explanationVisibility, questionIds });
   if ((status || "DRAFT") === "PUBLISHED" && Array.isArray(questionIds) && questionIds.length > 0) {
     const questions = await prisma.question.findMany({
       where: { id: { in: questionIds } },

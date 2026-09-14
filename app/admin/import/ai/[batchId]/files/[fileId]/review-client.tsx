@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { CopyableTruncatedText } from "@/components/ui/copyable-truncated-text";
 import { MathContent } from "@/components/math-content";
+import { FormattedTextField } from "@/components/formatted-text-field";
 import { TextFormatToolbar } from "@/components/text-format-toolbar";
 import { PdfPageCropper, type CropTarget, type CropOcrResult } from "@/app/admin/import/ai/_components/pdf-page-cropper";
 import { MergeDialog } from "./merge-dialog";
@@ -26,34 +27,6 @@ import {
   isIngestWarningInfo,
   reconcileWarningsJson,
 } from "@/lib/ingest-warnings";
-
-function DraftFormattedTextarea({
-  label,
-  value,
-  onChange,
-  className,
-}: {
-  label: string;
-  value: string;
-  onChange: (next: string) => void;
-  className?: string;
-}) {
-  const ref = useRef<HTMLTextAreaElement>(null);
-  return (
-    <label className="grid gap-1">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <span className="text-xs font-medium text-gray-500">{label}</span>
-        <TextFormatToolbar getInput={() => ref.current} value={value} onChange={onChange} />
-      </div>
-      <textarea
-        ref={ref}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className={className ?? "min-h-28 rounded-md border border-gray-300 px-3 py-2 text-sm"}
-      />
-    </label>
-  );
-}
 
 type SourceFile = {
   id: string;
@@ -1026,75 +999,57 @@ export function FileReviewClient({
               </Section>
             )}
 
-            {/* SECTION: Question — editor + live rendered preview. */}
+            {/* SECTION: Question — editor with live preview per field. */}
             <Section title="Question" subtitle={isMc ? "multiple choice" : "numeric response"}>
-              <div className="grid gap-4 lg:grid-cols-2">
-                <div className="grid gap-3">
-                  <DraftFormattedTextarea
-                    label="Stem"
-                    value={stripMarkdownImageRefs(draft.stem)}
-                    onChange={(stem) => setDraft({ ...draft, stem })}
-                    className="min-h-32 rounded-md border border-gray-300 px-3 py-2 text-sm"
+              <div className="grid gap-3">
+                <FormattedTextField
+                  label="Stem"
+                  value={stripMarkdownImageRefs(draft.stem)}
+                  onChange={(stem) => setDraft({ ...draft, stem })}
+                  rows={6}
+                  formatPreview={stripMarkdownImageRefs}
+                  textareaClassName="min-h-32"
+                />
+                {(isMc || draft.stimulus) && (
+                  <FormattedTextField
+                    label="Stimulus"
+                    value={stripMarkdownImageRefs(draft.stimulus)}
+                    onChange={(stimulus) => setDraft({ ...draft, stimulus })}
+                    rows={4}
+                    formatPreview={stripMarkdownImageRefs}
+                    collapsible={!draft.stimulus?.trim()}
+                    collapseLabel="Add stimulus"
                   />
-                  {(isMc || draft.stimulus) && (
-                    <DraftFormattedTextarea
-                      label="Stimulus"
-                      value={stripMarkdownImageRefs(draft.stimulus)}
-                      onChange={(stimulus) => setDraft({ ...draft, stimulus })}
-                      className="min-h-20 rounded-md border border-gray-300 px-3 py-2 text-sm"
-                    />
-                  )}
-                  {isMc && (
-                    <OptionsEditor
-                      optionsJson={draft.optionsJson}
-                      correctAnswer={draft.correctAnswer}
-                      onChange={(partial) => setDraft({ ...draft, ...partial })}
-                    />
-                  )}
-                  <div className="grid gap-3 md:grid-cols-2">
-                    <label className="grid gap-1">
-                      <span className="text-xs font-medium text-gray-500">Difficulty</span>
-                      <Input value={draft.difficulty ?? ""} onChange={(event) => setDraft({ ...draft, difficulty: event.target.value })} />
-                    </label>
-                    <label className="grid gap-1">
-                      <span className="text-xs font-medium text-gray-500">Skill</span>
-                      <Input value={draft.topicName ?? ""} onChange={(event) => setDraft({ ...draft, topicName: event.target.value })} />
-                    </label>
-                  </div>
-                  {(() => {
-                    const notes = parseWarnings(draft.warningsJson, draft.correctAnswer);
-                    if (notes.length === 0) return null;
-                    const warnings = notes.filter((note) => !isIngestWarningInfo(note));
-                    const info = notes.filter((note) => isIngestWarningInfo(note));
-                    return (
-                      <div className="space-y-1 text-sm">
-                        {warnings.length > 0 && <p className="text-amber-700">{warnings.join(" ")}</p>}
-                        {info.length > 0 && <p className="text-gray-500">{info.join(" ")}</p>}
-                      </div>
-                    );
-                  })()}
+                )}
+                {isMc && (
+                  <OptionsEditor
+                    optionsJson={draft.optionsJson}
+                    correctAnswer={draft.correctAnswer}
+                    onChange={(partial) => setDraft({ ...draft, ...partial })}
+                  />
+                )}
+                <div className="grid gap-3 md:grid-cols-2">
+                  <label className="grid gap-1">
+                    <span className="text-xs font-medium text-gray-500">Difficulty</span>
+                    <Input value={draft.difficulty ?? ""} onChange={(event) => setDraft({ ...draft, difficulty: event.target.value })} />
+                  </label>
+                  <label className="grid gap-1">
+                    <span className="text-xs font-medium text-gray-500">Skill</span>
+                    <Input value={draft.topicName ?? ""} onChange={(event) => setDraft({ ...draft, topicName: event.target.value })} />
+                  </label>
                 </div>
-                <div className="grid content-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
-                  <p className="text-xs font-medium uppercase text-gray-400">Rendered preview</p>
-                  {stripMarkdownImageRefs(draft.stem) ? (
-                    <MathContent content={stripMarkdownImageRefs(draft.stem)} className="text-sm leading-6 text-gray-800" />
-                  ) : (
-                    <p className="text-xs text-gray-400">No stem.</p>
-                  )}
-                  {stripMarkdownImageRefs(draft.stimulus) && (
-                    <MathContent content={stripMarkdownImageRefs(draft.stimulus)} className="text-sm leading-6 text-gray-700" />
-                  )}
-                  {isMc && parseOptions(draft.optionsJson).length > 0 && (
-                    <div className="grid gap-2">
-                      {parseOptions(draft.optionsJson).map((option: { label?: string; text?: string }) => (
-                        <div key={option.label ?? option.text} className="rounded-md border border-gray-200 bg-white px-3 py-2">
-                          <span className="mr-2 font-medium text-gray-900">{option.label}</span>
-                          <MathContent content={option.text ?? ""} className="inline text-sm text-gray-800" />
-                        </div>
-                      ))}
+                {(() => {
+                  const notes = parseWarnings(draft.warningsJson, draft.correctAnswer);
+                  if (notes.length === 0) return null;
+                  const warnings = notes.filter((note) => !isIngestWarningInfo(note));
+                  const info = notes.filter((note) => isIngestWarningInfo(note));
+                  return (
+                    <div className="space-y-1 text-sm">
+                      {warnings.length > 0 && <p className="text-amber-700">{warnings.join(" ")}</p>}
+                      {info.length > 0 && <p className="text-gray-500">{info.join(" ")}</p>}
                     </div>
-                  )}
-                </div>
+                  );
+                })()}
               </div>
             </Section>
 
@@ -1106,18 +1061,13 @@ export function FileReviewClient({
                     <span className="text-xs font-medium text-gray-500">Correct answer</span>
                     <Input value={draft.correctAnswer ?? ""} onChange={(event) => setDraft({ ...draft, correctAnswer: event.target.value })} />
                   </label>
-                  <DraftFormattedTextarea
+                  <FormattedTextField
                     label="Explanation"
                     value={stripMarkdownImageRefs(draft.explanation)}
                     onChange={(explanation) => setDraft({ ...draft, explanation })}
-                    className="min-h-28 rounded-md border border-gray-300 px-3 py-2 text-sm"
+                    rows={5}
+                    formatPreview={stripMarkdownImageRefs}
                   />
-                  {stripMarkdownImageRefs(draft.explanation) && (
-                    <div className="rounded-md border border-gray-200 bg-gray-50 p-3">
-                      <p className="mb-1 text-xs font-medium uppercase text-gray-400">Rendered preview</p>
-                      <MathContent content={stripMarkdownImageRefs(draft.explanation)} className="max-h-56 overflow-auto text-sm leading-6 text-gray-800" />
-                    </div>
-                  )}
                 </div>
                 <div>
                   <p className="text-xs font-medium uppercase text-gray-500">Answer suggestions</p>

@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { academicTopicWhere } from "@/lib/taxonomy";
@@ -20,7 +21,7 @@ export default async function TeacherMaterialsPage() {
   ]);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
+    <PageShell width="wide">
       <h1 className="mb-2 text-xl font-semibold text-gray-900">Study Materials</h1>
       <p className="mb-6 text-sm text-gray-500">Publish theory notes and support links for students.</p>
       <MaterialsClient
@@ -43,6 +44,6 @@ export default async function TeacherMaterialsPage() {
             : null,
         }))}
       />
-    </div>
+    </PageShell>
   );
 }

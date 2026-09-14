@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { QuestionEditor } from "../question-editor-client";
 import { getFeatureSetting } from "@/lib/app-settings";
@@ -23,7 +24,7 @@ export default async function NewQuestionPage({ searchParams }: PageProps) {
   const { byId } = buildTaxonomyTree(taxonomyNodes);
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
+    <PageShell width="narrow">
       <h1 className="text-xl font-semibold text-gray-900 mb-6">New Question</h1>
       <QuestionEditor
         showGraphOption={showGraphOption}
@@ -46,6 +47,6 @@ export default async function NewQuestionPage({ searchParams }: PageProps) {
           subskills: t.subskills,
         }))}
       />
-    </div>
+    </PageShell>
   );
 }

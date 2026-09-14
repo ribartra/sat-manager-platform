@@ -1,3 +1,4 @@
+import { PageShell, PageHeader, PageContent } from "@/components/sat";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
@@ -6,9 +7,12 @@ import { studentAccessWhereFor } from "@/lib/program-scope";
 import { formatDate, formatTime, scorePercent } from "@/lib/utils";
 import { scoreBandTextClass } from "@/lib/score-band";
 import { Card } from "@/components/ui/card";
+import { AnalyticsStudentFilter } from "./analytics-student-filter";
+import { DifficultyAccuracyChart, MockSectionChart, TopicDifficultyChart } from "@/components/progress-charts";
+import { aggregateDifficultyMetrics, aggregateTopicDifficultyMetrics } from "@/lib/progress-analytics";
 
 interface PageProps {
-  searchParams: Promise<{ studentId?: string; q?: string }>;
+  searchParams: Promise<{ studentId?: string }>;
 }
 
 interface Bucket {
@@ -26,7 +30,6 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
   const session = await requireTeacherOrAdmin();
   if (!session) notFound();
   const params = await searchParams;
-  const q = params.q?.trim() ?? "";
   const studentScope = studentAccessWhereFor(session.user);
 
   const students = await prisma.user.findMany({
@@ -34,19 +37,10 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
     orderBy: { name: "asc" },
     select: { id: true, name: true, lastActiveAt: true },
   });
-  const filteredStudents = students.filter((student) => !q || student.name.toLowerCase().includes(q.toLowerCase()));
-  // Keep the currently selected student visible even if the search filter excludes them.
-  const matchedStudents =
-    params.studentId && students.some((student) => student.id === params.studentId) && !filteredStudents.some((student) => student.id === params.studentId)
-      ? [students.find((student) => student.id === params.studentId)!, ...filteredStudents]
-      : filteredStudents;
-  // Never render an empty student dropdown when the teacher has students:
-  // if search yields no matches, fall back to the full list and show a hint.
-  const searchHadNoMatches = Boolean(q) && filteredStudents.length === 0 && students.length > 0;
-  const selectableStudents = matchedStudents.length > 0 ? matchedStudents : students;
-  const selectedStudentId = params.studentId && students.some((student) => student.id === params.studentId)
-    ? params.studentId
-    : selectableStudents[0]?.id;
+  const selectedStudentId =
+    params.studentId && students.some((student) => student.id === params.studentId)
+      ? params.studentId
+      : students[0]?.id;
 
   const answers = selectedStudentId
     ? await prisma.attemptAnswer.findMany({
@@ -74,16 +68,31 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
     : [];
 
   const selectedStudent = students.find((student) => student.id === selectedStudentId);
+  const examAttempts = selectedStudentId
+    ? await prisma.fullPracticeTestAttempt.findMany({
+        where: { studentId: selectedStudentId, status: "SUBMITTED" },
+        include: { test: { select: { name: true } } },
+        orderBy: { submittedAt: "asc" },
+        take: 20,
+      })
+    : [];
   const nowMs = new Date().getTime();
   const staleStudents = students.filter((student) => {
     if (!student.lastActiveAt) return true;
     return nowMs - student.lastActiveAt.getTime() >= 5 * 24 * 60 * 60 * 1000;
   });
   const buckets = new Map<string, Bucket>();
+  const progressRows: Array<{ topic: string; difficulty: string; correct: boolean; timeSeconds: number }> = [];
 
   for (const answer of answers) {
     const section = answer.question.topic.domain.section.label;
     const subtopic = answer.question.subskill?.name ?? answer.question.topic.name;
+    progressRows.push({
+      topic: answer.question.topic.name,
+      difficulty: answer.question.difficulty,
+      correct: Boolean(answer.isCorrect),
+      timeSeconds: answer.timeSpent ?? 0,
+    });
     const key = `${section}:${subtopic}:${answer.question.difficulty}`;
     const bucket = buckets.get(key) ?? {
       key,
@@ -110,59 +119,22 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
     .slice(0, 12);
   const correct = answers.filter((answer) => answer.isCorrect).length;
   const avgAccuracy = answers.length ? scorePercent(correct, answers.length) : null;
+  const difficultyMetrics = aggregateDifficultyMetrics(progressRows);
+  const topicDifficultyMetrics = aggregateTopicDifficultyMetrics(progressRows);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-semibold text-gray-900">Student Analytics</h1>
-          <p className="mt-1 text-sm text-gray-500">Individual progress, weak skills and reinforcement focus.</p>
-        </div>
-        <form method="get" className="flex flex-col items-stretch gap-1 sm:items-end">
-          <div className="flex flex-wrap items-end gap-2">
-            <label className="flex min-w-[10rem] flex-1 flex-col gap-1 text-xs font-medium text-gray-500">
-              Search
-              <input
-                name="q"
-                defaultValue={q}
-                placeholder="Type a student name..."
-                className="rounded-md border border-gray-300 px-3 py-2 text-sm font-normal text-gray-900"
-              />
-            </label>
-            <label className="flex min-w-[14rem] flex-1 flex-col gap-1 text-xs font-medium text-gray-500">
-              Student
-              <select
-                name="studentId"
-                defaultValue={selectedStudentId ?? ""}
-                className="rounded-md border border-gray-300 px-3 py-2 text-sm font-normal text-gray-900"
-                aria-label="Select a student to view analytics"
-              >
-                {students.length === 0 ? (
-                  <option value="">No students available</option>
-                ) : (
-                  selectableStudents.map((student) => (
-                    <option key={student.id} value={student.id}>
-                      {student.name.trim() || "Unnamed student"}
-                    </option>
-                  ))
-                )}
-              </select>
-            </label>
-            <button
-              type="submit"
-              className="rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"
-            >
-              View
-            </button>
-          </div>
-          {searchHadNoMatches && (
-            <p className="text-xs text-amber-700">
-              No students match “{q}”. Showing the full student list below.
-            </p>
-          )}
-        </form>
-      </div>
-
+    <PageShell>
+      <PageHeader
+        title="Student Analytics"
+        description="Individual progress, weak skills and reinforcement focus."
+        actions={
+          <AnalyticsStudentFilter
+            students={students.map((student) => ({ id: student.id, name: student.name }))}
+            selectedStudentId={selectedStudentId ?? ""}
+          />
+        }
+      />
+      <PageContent>
       <div className="mb-6 grid grid-cols-4 gap-4">
         <Metric label="Student" value={selectedStudent?.name ?? "-"} />
         <Metric label="Answers" value={answers.length.toString()} />
@@ -172,6 +144,11 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
           valueClassName={avgAccuracy !== null ? scoreBandTextClass(avgAccuracy) : undefined}
         />
         <Metric label="Inactive 5+ Days" value={staleStudents.length.toString()} />
+      </div>
+
+      <div className="mb-8 grid gap-6 lg:grid-cols-2">
+        <DifficultyAccuracyChart metrics={difficultyMetrics} />
+        <TopicDifficultyChart metrics={topicDifficultyMetrics} />
       </div>
 
       <section className="mb-8">
@@ -212,6 +189,17 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
       </section>
 
       <section>
+        <div className="mb-8">
+          <MockSectionChart
+            metrics={examAttempts.map((exam) => ({
+              label: exam.test.name,
+              submittedAt: exam.submittedAt?.toISOString() ?? null,
+              mathScore: exam.mathScore,
+              rwScore: exam.rwScore,
+              totalScore: exam.totalScore,
+            }))}
+          />
+        </div>
         <h2 className="mb-3 text-base font-semibold text-gray-900">Students inactive for 5+ days</h2>
         <Card>
           {staleStudents.slice(0, 12).map((student) => (
@@ -223,7 +211,8 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
           {staleStudents.length === 0 && <p className="p-6 text-center text-sm text-gray-400">All students have recent activity.</p>}
         </Card>
       </section>
-    </div>
+      </PageContent>
+    </PageShell>
   );
 }
 

@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
@@ -62,7 +63,7 @@ export default async function TeacherComparePage() {
   });
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
+    <PageShell>
       <h1 className="mb-2 text-xl font-semibold text-gray-900">Private Student Comparison</h1>
       <p className="mb-6 text-sm text-gray-500">
         Teacher-only comparison by student, score and weakest skill.
@@ -100,6 +101,6 @@ export default async function TeacherComparePage() {
           </tbody>
         </table>
       </Card>
-    </div>
+    </PageShell>
   );
 }

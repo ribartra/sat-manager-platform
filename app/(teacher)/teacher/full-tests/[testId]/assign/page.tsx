@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { FullTestAssignClient } from "./full-test-assign-client";
@@ -29,7 +30,7 @@ export default async function AssignFullTestPage({ params }: PageProps) {
   if (!test) notFound();
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
+    <PageShell width="narrow">
       <h1 className="mb-6 text-xl font-semibold text-gray-900">Assign Exam: {test.name}</h1>
       <FullTestAssignClient
         testId={testId}
@@ -37,6 +38,6 @@ export default async function AssignFullTestPage({ params }: PageProps) {
         groups={groups.map((g) => ({ id: g.id, name: g.name, memberIds: g.members.map((m) => m.userId) }))}
         groupAssignmentEnabled={teacherGroupManagementEnabled}
       />
-    </div>
+    </PageShell>
   );
 }

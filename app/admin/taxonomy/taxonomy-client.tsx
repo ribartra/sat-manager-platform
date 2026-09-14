@@ -1,16 +1,30 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { FormSection } from "@/components/sat";
+import {
+  createTaxonomyNodeSchema,
+  taxonomyNodeTypes,
+  type CreateTaxonomyNodeInput,
+} from "@/contracts/admin";
 import { buildTaxonomyTree, taxonomyPathLabel, type TaxonomyNodeBase, type TaxonomyTreeNode } from "@/lib/taxonomy";
 import { cn } from "@/lib/utils";
-
-const NODE_TYPES = ["AREA", "DOMAIN", "SKILL", "SUBSKILL"];
 
 interface TaxonomyClientProps {
   nodes: TaxonomyNodeBase[];
@@ -18,22 +32,24 @@ interface TaxonomyClientProps {
 
 export function TaxonomyClient({ nodes }: TaxonomyClientProps) {
   const router = useRouter();
-  const [parentId, setParentId] = useState("");
-  const [type, setType] = useState("SKILL");
-  const [name, setName] = useState("");
-  const [saving, setSaving] = useState(false);
   const { roots, byId } = useMemo(() => buildTaxonomyTree(nodes), [nodes]);
+  const form = useForm<CreateTaxonomyNodeInput>({
+    resolver: zodResolver(createTaxonomyNodeSchema),
+    defaultValues: { parentId: "", type: "SKILL", name: "" },
+  });
 
-  async function createNode() {
-    if (!name.trim()) return;
-    setSaving(true);
+  async function onCreate(values: CreateTaxonomyNodeInput) {
     await fetch("/api/admin/taxonomy/nodes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, label: name, type, parentId: parentId || null }),
+      body: JSON.stringify({
+        name: values.name,
+        label: values.name,
+        type: values.type,
+        parentId: values.parentId || null,
+      }),
     });
-    setSaving(false);
-    setName("");
+    form.reset({ parentId: values.parentId, type: values.type, name: "" });
     router.refresh();
   }
 
@@ -82,34 +98,73 @@ export function TaxonomyClient({ nodes }: TaxonomyClientProps) {
     );
   }
 
+  const saving = form.formState.isSubmitting;
+
   return (
     <div className="grid gap-5 lg:grid-cols-[320px_1fr]">
       <Card padding="md" className="h-fit">
         <h2 className="mb-4 text-sm font-semibold text-gray-900">Add Node</h2>
-        <div className="space-y-3">
-          <div>
-            <label className="mb-1 block text-xs font-medium text-gray-500">Parent</label>
-            <Select value={parentId} onChange={(event) => setParentId(event.target.value)}>
-              <option value="">Root</option>
-              {nodes.map((node) => (
-                <option key={node.id} value={node.id}>
-                  {taxonomyPathLabel(node.id, byId, node.label)}
-                </option>
-              ))}
-            </Select>
-          </div>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-gray-500">Type</label>
-            <Select value={type} onChange={(event) => setType(event.target.value)}>
-              {NODE_TYPES.map((item) => <option key={item} value={item}>{item}</option>)}
-            </Select>
-          </div>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-gray-500">Name</label>
-            <Input value={name} onChange={(event) => setName(event.target.value)} placeholder="Node name" />
-          </div>
-          <Button onClick={createNode} disabled={saving || !name.trim()} className="w-full">Add</Button>
-        </div>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onCreate)} className="space-y-3" noValidate>
+            <FormSection>
+              <FormField
+                control={form.control}
+                name="parentId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-medium text-gray-500">Parent</FormLabel>
+                    <FormControl>
+                      <Select {...field}>
+                        <option value="">Root</option>
+                        {nodes.map((node) => (
+                          <option key={node.id} value={node.id}>
+                            {taxonomyPathLabel(node.id, byId, node.label)}
+                          </option>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-medium text-gray-500">Type</FormLabel>
+                    <FormControl>
+                      <Select {...field}>
+                        {taxonomyNodeTypes.map((item) => (
+                          <option key={item} value={item}>
+                            {item}
+                          </option>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-medium text-gray-500">Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Node name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </FormSection>
+            <Button type="submit" disabled={saving} className="w-full">
+              {saving ? "Adding..." : "Add"}
+            </Button>
+          </form>
+        </Form>
       </Card>
       <Card className="overflow-hidden">
         {roots.map((node) => renderNode(node))}

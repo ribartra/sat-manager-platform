@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Bell } from "lucide-react";
+import { queryKeys } from "@/lib/query-keys";
 
 type Notification = {
   id: string;
@@ -12,6 +14,13 @@ type Notification = {
   readAt: string | null;
   createdAt: string;
 };
+
+async function fetchNotifications(): Promise<Notification[]> {
+  const res = await fetch("/api/notifications");
+  if (!res.ok) throw new Error("Unable to load notifications.");
+  const data = await res.json();
+  return data.notifications ?? [];
+}
 
 function timeAgo(dateStr: string) {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -70,18 +79,30 @@ function NotificationItem({
 
 export function NotificationBell() {
   const [open, setOpen] = useState(false);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const queryClient = useQueryClient();
 
-  // Initial fetch for unread badge count
-  useEffect(() => {
-    fetch("/api/notifications")
-      .then((r) => r.json())
-      .then((d) => setNotifications(d.notifications ?? []));
-  }, []);
+  const { data: notifications = [], isFetching, refetch } = useQuery({
+    queryKey: queryKeys.notifications.all,
+    queryFn: fetchNotifications,
+    staleTime: 30_000,
+    refetchInterval: 60_000,
+    refetchOnWindowFocus: true,
+  });
 
-  // Close on outside click
+  const markRead = useMutation({
+    mutationFn: async () => {
+      const res = await fetch("/api/notifications", { method: "PATCH" });
+      if (!res.ok) throw new Error("Unable to mark notifications as read.");
+    },
+    onSuccess: () => {
+      const now = new Date().toISOString();
+      queryClient.setQueryData<Notification[]>(queryKeys.notifications.all, (prev) =>
+        (prev ?? []).map((n) => ({ ...n, readAt: n.readAt ?? now })),
+      );
+    },
+  });
+
   useEffect(() => {
     function onMouseDown(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) {
@@ -94,23 +115,17 @@ export function NotificationBell() {
 
   async function toggle() {
     if (!open) {
-      setLoading(true);
-      const res = await fetch("/api/notifications");
-      const data = await res.json();
-      const fetched: Notification[] = data.notifications ?? [];
-      setNotifications(fetched);
-      setLoading(false);
-
-      // Mark all unread as read
+      const result = await refetch();
+      const fetched = result.data ?? [];
       if (fetched.some((n) => !n.readAt)) {
-        fetch("/api/notifications", { method: "PATCH" });
-        setNotifications(fetched.map((n) => ({ ...n, readAt: n.readAt ?? new Date().toISOString() })));
+        markRead.mutate();
       }
     }
     setOpen((v) => !v);
   }
 
   const unreadCount = notifications.filter((n) => !n.readAt).length;
+  const loading = open && isFetching && notifications.length === 0;
 
   return (
     <div ref={ref} className="relative">

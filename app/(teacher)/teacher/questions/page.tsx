@@ -1,15 +1,16 @@
+import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { Plus } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
-import { QuestionListItem, toQuestionListMedia } from "@/components/question-list-item";
-import { QuestionActions } from "./question-actions-client";
 import { cn } from "@/lib/utils";
 import { academicTopicWhere, activeTaxonomySection, buildTaxonomyTree, matchesTaxonomySection, TAXONOMY_SECTION_TABS } from "@/lib/taxonomy";
 import { QuestionsFilter } from "./questions-filter-client";
+import { loadOptionImageUrlsByQuestionId } from "@/lib/question-list-media-query";
+import { QuestionsTable, type QuestionBankRow } from "./questions-table-client";
 
 interface SearchParams { section?: string; topic?: string; difficulty?: string; status?: string }
+
+const TOPIC_IN_CHUNK = 400;
 
 function tabHref(section: string, filters: SearchParams) {
   const params = new URLSearchParams();
@@ -45,12 +46,18 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
     }
     return matchesTaxonomySection(topic.domain.section, activeSection);
   });
-  const visibleTopicIds = new Set(visibleTopics.map((topic) => topic.id));
-  const selectedTopicId = filters.topic && visibleTopicIds.has(filters.topic) ? filters.topic : undefined;
+  const visibleTopicIds = [...new Set(visibleTopics.map((topic) => topic.id))];
+  const selectedTopicId = filters.topic && visibleTopicIds.includes(filters.topic) ? filters.topic : undefined;
+
+  const topicFilter = selectedTopicId
+    ? selectedTopicId
+    : visibleTopicIds.length <= TOPIC_IN_CHUNK
+      ? { in: visibleTopicIds }
+      : { in: visibleTopicIds.slice(0, TOPIC_IN_CHUNK) };
 
   const questions = await prisma.question.findMany({
     where: {
-      topicId: selectedTopicId || { in: [...visibleTopicIds] },
+      topicId: topicFilter,
       difficulty: (filters.difficulty as string | undefined) || undefined,
       status: (filters.status as string | undefined) || undefined,
     },
@@ -59,14 +66,14 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
       setItems: { select: { practiceSetId: true } },
       fullTestItems: { select: { moduleId: true } },
       answers: { select: { id: true } },
-      options: { select: { imageUrl: true }, where: { imageUrl: { not: null } } },
     },
     orderBy: { createdAt: "desc" },
     take: 100,
   });
+  const optionImages = await loadOptionImageUrlsByQuestionId(questions.map((q) => q.id));
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8">
+    <PageShell>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-semibold text-gray-900">Question Bank</h1>
         <div className="flex items-center gap-2">
@@ -113,69 +120,27 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
         initialStatus={filters.status}
       />
 
-      <Card className="overflow-hidden">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-gray-50 border-b border-gray-200">
-              <th className="px-4 py-3 text-left font-medium text-gray-500">Question</th>
-              <th className="px-4 py-3 text-left font-medium text-gray-500">Skill</th>
-              <th className="px-4 py-3 text-left font-medium text-gray-500">Difficulty</th>
-              <th className="px-4 py-3 text-left font-medium text-gray-500">Type</th>
-              <th className="px-4 py-3 text-left font-medium text-gray-500">Status</th>
-              <th className="px-4 py-3 text-right font-medium text-gray-500">Used in</th>
-              <th className="px-4 py-3 text-right font-medium text-gray-500">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {questions.map((q) => {
-              const editHref = `/teacher/questions/${q.id}/edit`;
-              return (
-              <tr key={q.id} className="hover:bg-gray-50">
-                <td className="px-4 py-3 max-w-md">
-                  <QuestionListItem
-                    href={editHref}
-                    question={toQuestionListMedia(q)}
-                    stemClassName="group-hover:text-gray-950"
-                  />
-                </td>
-                <td className="px-4 py-3">
-                  <p className="text-xs text-gray-500">{q.topic.domain.section.label} / {q.topic.domain.name}</p>
-                  <p className="text-sm text-gray-700">{q.topic.name}</p>
-                </td>
-                <td className="px-4 py-3">
-                  <Badge variant={q.difficulty === "EASY" ? "easy" : q.difficulty === "MEDIUM" ? "medium" : "hard"}>
-                    {q.difficulty}
-                  </Badge>
-                </td>
-                <td className="px-4 py-3">
-                  <Badge variant="default">{q.type}</Badge>
-                </td>
-                <td className="px-4 py-3">
-                  <Badge variant={q.status === "PUBLISHED" ? "success" : q.status === "DRAFT" ? "warning" : "default"}>
-                    {q.status}
-                  </Badge>
-                </td>
-                <td className="px-4 py-3 text-right text-gray-500">
-                  {new Set(q.setItems.map((s) => s.practiceSetId)).size + q.fullTestItems.length} uses
-                </td>
-                <td className="px-4 py-3 text-right">
-                  <QuestionActions
-                    questionId={q.id}
-                    status={q.status}
-                    usedCount={new Set(q.setItems.map((s) => s.practiceSetId)).size + q.fullTestItems.length + q.answers.length}
-                  />
-                </td>
-              </tr>
-              );
-            })}
-          </tbody>
-        </table>
-        {questions.length === 0 && (
-          <div className="text-center py-12 text-gray-400">
-            <p>No questions found. Create your first one.</p>
-          </div>
-        )}
-      </Card>
-    </div>
+      <QuestionsTable
+        rows={questions.map((q): QuestionBankRow => {
+          const setUses = new Set(q.setItems.map((s) => s.practiceSetId)).size;
+          const fullUses = q.fullTestItems.length;
+          return {
+            id: q.id,
+            stem: q.stem,
+            imageUrl: q.imageUrl,
+            stimulus: q.stimulus,
+            optionImageUrls: optionImages.get(q.id) ?? [],
+            skillSection: q.topic.domain.section.label,
+            skillDomain: q.topic.domain.name,
+            skillName: q.topic.name,
+            difficulty: q.difficulty,
+            type: q.type,
+            status: q.status,
+            uses: setUses + fullUses,
+            usedCount: setUses + fullUses + q.answers.length,
+          };
+        })}
+      />
+    </PageShell>
   );
 }

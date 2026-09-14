@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import { redirect } from "next/navigation";
 import { Activity, AlertTriangle, CheckCircle2, Clock3, FileSearch, RefreshCcw } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -424,8 +425,8 @@ export default async function AiImportPage({ searchParams }: PageProps) {
     };
   });
   return (
-    <div className="mx-auto max-w-7xl space-y-6 px-4 py-8">
-      <IngestAutoRefresh enabled={autoRefresh} />
+    <PageShell width="wide" className="space-y-6">
+      <IngestAutoRefresh batchId={selectedBatchId} enabled={autoRefresh} />
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Admin / AI Import</p>
@@ -654,6 +655,6 @@ export default async function AiImportPage({ searchParams }: PageProps) {
           <p className="text-sm text-gray-500">Create a batch from files_to_load or upload a ZIP to scan PDF/DOCX files into staging.</p>
         </Card>
       )}
-    </div>
+    </PageShell>
   );
 }

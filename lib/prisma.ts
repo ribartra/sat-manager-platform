@@ -12,12 +12,6 @@ function createPrisma(): PrismaClientType {
   // covers both the web and ingest processes.
   const adapter = new PrismaBetterSqlite3({ url, timeout: 5000 } as never);
   const client: PrismaClientType = new PrismaClient({ adapter } as never);
-  void client
-    .$executeRawUnsafe("PRAGMA journal_mode=WAL")
-    .then(() => client.$executeRawUnsafe("PRAGMA synchronous=NORMAL"))
-    .catch(() => {
-      /* pragmas are best-effort; a read-only replica or :memory: may reject them */
-    });
   return client;
 }
 

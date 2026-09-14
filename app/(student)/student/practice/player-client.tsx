@@ -13,6 +13,8 @@ import type { CalculatorConfig } from "@/lib/calculator-config";
 import type { GraphArtifact } from "@/lib/question-graph";
 import { Flag, ChevronLeft, ChevronRight, List, Pause, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SaveIndicator, type SaveStatus } from "@/components/sat";
+import { exitPlayerOnAuthLoss, isAuthFailureStatus } from "@/lib/player-session-exit";
 
 interface Option { label: string; text: string; imageUrl?: string | null }
 interface Question {
@@ -66,7 +68,7 @@ export function PracticeSetPlayer({
   );
   const [elapsed, setElapsed] = useState(savedTime);
   const [showNav, setShowNav] = useState(false);
-  const [saving, setSaving] = useState<"idle" | "saving" | "saved" | "offline">("idle");
+  const [saving, setSaving] = useState<SaveStatus>("idle");
   const [submitting, setSubmitting] = useState(false);
   const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const questionStartTime = useRef<number | null>(null);
@@ -77,7 +79,12 @@ export function PracticeSetPlayer({
 
   useEffect(() => {
     questionStartTime.current = Date.now();
-    void fetch(`/api/attempts/${attemptId}/resume`, { method: "POST" });
+    void (async () => {
+      const response = await fetch(`/api/attempts/${attemptId}/resume`, { method: "POST" });
+      if (isAuthFailureStatus(response.status)) {
+        await exitPlayerOnAuthLoss({ pauseUrl: `/api/attempts/${attemptId}/pause` });
+      }
+    })();
   }, [attemptId]);
 
   // Timer
@@ -124,6 +131,10 @@ export function PracticeSetPlayer({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
+        if (isAuthFailureStatus(response.status)) {
+          await exitPlayerOnAuthLoss({ pauseUrl: `/api/attempts/${attemptId}/pause` });
+          return;
+        }
         if (!response.ok) throw new Error("Autosave failed");
         localStorage.removeItem(offlineKey);
         setSaving("saved");
@@ -146,6 +157,10 @@ export function PracticeSetPlayer({
           headers: { "Content-Type": "application/json" },
           body: raw,
         });
+        if (isAuthFailureStatus(response.status)) {
+          await exitPlayerOnAuthLoss({ pauseUrl: `/api/attempts/${attemptId}/pause` });
+          return;
+        }
         if (response.ok) {
           localStorage.removeItem(offlineKey);
           setSaving("saved");
@@ -228,6 +243,10 @@ export function PracticeSetPlayer({
         eliminatedOptions: Object.fromEntries(Object.entries(eliminated).map(([id, labels]) => [id, Array.from(labels)])),
       }),
     });
+    if (isAuthFailureStatus(response.status)) {
+      await exitPlayerOnAuthLoss({ pauseUrl: `/api/attempts/${attemptId}/pause` });
+      return;
+    }
     if (!response.ok) {
       setSubmitting(false);
       window.alert("Submit failed. Please try again.");
@@ -243,6 +262,8 @@ export function PracticeSetPlayer({
       ? "text-yellow-600"
       : "text-red-600";
 
+  const hasPassage = Boolean(question.stimulus?.trim());
+
   return (
     <div className="flex h-[calc(100dvh-3.5rem)] max-h-[calc(100dvh-3.5rem)] flex-col overflow-hidden bg-white">
       {/* Top bar */}
@@ -250,7 +271,7 @@ export function PracticeSetPlayer({
         <div className="flex min-w-0 items-center gap-3">
           <span className="truncate text-sm font-medium text-gray-900 max-w-[12rem] sm:max-w-xs">{setName}</span>
           <span className="shrink-0 text-xs text-gray-500">
-            Question {current + 1} of {questions.length}
+            <span className="text-base font-bold text-gray-900">Question {current + 1}</span><span className="text-xs text-gray-500"> of {questions.length}</span>
           </span>
         </div>
         <div className="flex shrink-0 items-center gap-3">
@@ -263,22 +284,26 @@ export function PracticeSetPlayer({
           <span className={cn("font-mono text-sm font-medium", timerColor)}>
             {formatTime(elapsed)}
           </span>
-          <span className="hidden text-xs text-gray-400 sm:inline">
-            {saving === "saving" ? "Saving..." : saving === "saved" ? "Saved" : saving === "offline" ? "Saved offline" : ""}
-          </span>
+          <SaveIndicator className="hidden sm:inline" status={saving} />
         </div>
       </div>
 
       {/* Two-column player — left: stimulus + stem; right: alternatives */}
       <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden md:grid-cols-2">
         {/* Left: stimulus + enunciado */}
-        <div className="min-h-0 space-y-4 overflow-y-auto border-r border-gray-200 bg-gray-50 p-4 md:p-6">
-          {question.stimulus ? (
-            <MathContent content={question.stimulus} className="prose prose-base max-w-none leading-relaxed text-gray-800" />
-          ) : (
-            <p className="text-sm text-gray-400">No reading passage for this question.</p>
+        <div
+          className={cn(
+            "min-h-0 space-y-4 overflow-y-auto border-r border-gray-200 p-4 md:p-6",
+            hasPassage && "bg-gray-50",
           )}
-          <div className="border-t border-gray-200 pt-4">
+        >
+          {hasPassage ? (
+            <MathContent
+              content={question.stimulus!}
+              className="prose prose-base max-w-none leading-relaxed text-gray-800"
+            />
+          ) : null}
+          <div className={cn(hasPassage && "border-t border-gray-200 pt-4")}>
             <MathContent
               content={question.stem}
               className="text-base font-medium leading-relaxed text-gray-900 md:text-lg"

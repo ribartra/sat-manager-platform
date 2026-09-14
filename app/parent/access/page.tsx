@@ -2,7 +2,14 @@ import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { formatDate, scorePercent } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
-import { accessWindow, areasLabel, parseAreas, sectionMatchesAreas } from "@/lib/parent-access";
+import {
+  accessWindow,
+  areasLabel,
+  classifyPracticeSetArea,
+  parseAreas,
+  practiceSetAreaLabel,
+  practiceSetMatchesArea,
+} from "@/lib/parent-access";
 import { hashPublicToken } from "@/lib/token-security";
 import { writeAudit } from "@/lib/audit";
 
@@ -105,8 +112,14 @@ export default async function ParentTemporaryAccessPage({ searchParams }: PagePr
 
   const attempts = access.student.attempts
     .filter((attempt) => {
-      const sectionLabel = attempt.assignment?.practiceSet.topic.domain.section.label ?? null;
-      return sectionLabel ? sectionMatchesAreas(sectionLabel, areas) : allAreas;
+      const taxonomy = attempt.assignment?.practiceSet.topic.domain;
+      const section = taxonomy?.section;
+      if (!taxonomy || !section) return allAreas;
+      return areas.some((area) => practiceSetMatchesArea({
+        sectionName: section.name,
+        sectionLabel: section.label,
+        domainName: taxonomy.name,
+      }, area));
     })
     .slice(0, 10);
 
@@ -138,7 +151,11 @@ export default async function ParentTemporaryAccessPage({ searchParams }: PagePr
                 <div>
                   <p className="text-sm font-medium text-gray-900">{attempt.assignment?.practiceSet.name ?? "Practice Set"}</p>
                   <p className="mt-0.5 text-xs text-gray-500">
-                    {attempt.assignment?.practiceSet.topic.domain.section.label} · {attempt.assignment?.practiceSet.topic.name}
+                    {practiceSetAreaLabel(classifyPracticeSetArea({
+                      sectionName: attempt.assignment?.practiceSet.topic.domain.section.name,
+                      sectionLabel: attempt.assignment?.practiceSet.topic.domain.section.label,
+                      domainName: attempt.assignment?.practiceSet.topic.domain.name,
+                    })) ?? attempt.assignment?.practiceSet.topic.domain.section.label} · {attempt.assignment?.practiceSet.topic.name}
                   </p>
                 </div>
                 <div className="text-right">

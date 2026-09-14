@@ -7,10 +7,12 @@ import { MathToolPanel } from "@/components/math-tool-panel";
 import { QuestionMedia } from "@/components/question-media";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { formatTime } from "@/lib/utils";
+import { formatTime, cn } from "@/lib/utils";
 import type { CalculatorConfig } from "@/lib/calculator-config";
 import type { GraphArtifact } from "@/lib/question-graph";
 import type { FullTestProgressState, FullTestTimerPhase } from "@/lib/full-test-progress";
+import { LoadingState, SaveIndicator, type SaveStatus } from "@/components/sat";
+import { exitPlayerOnAuthLoss, isAuthFailureStatus } from "@/lib/player-session-exit";
 
 interface ModuleQuestion {
   id: string;
@@ -75,8 +77,9 @@ export function FullTestPlayer({
   const [expiredEvents, setExpiredEvents] = useState(savedExpiredEvents);
   const [extraTimeUsed] = useState(savedExtraTimeUsed);
   const [answers, setAnswers] = useState<Record<string, string>>(savedAnswers);
-  const [saving, setSaving] = useState<"idle" | "saving" | "saved">("idle");
+  const [saving, setSaving] = useState<SaveStatus>("idle");
   const [advancing, setAdvancing] = useState(false);
+  const offlineKey = `sat-fpt-autosave:${attemptId}`;
   const currentModule = modules[moduleIndex];
   const question = currentModule?.questions[questionIndex];
   const expiredRecorded = useRef(false);
@@ -112,7 +115,14 @@ export function FullTestPlayer({
 
   useEffect(() => {
     questionStartTime.current = Date.now();
-    void fetch(`/api/full-practice-tests/attempts/${attemptId}/resume`, { method: "POST" });
+    void (async () => {
+      const response = await fetch(`/api/full-practice-tests/attempts/${attemptId}/resume`, { method: "POST" });
+      if (isAuthFailureStatus(response.status)) {
+        await exitPlayerOnAuthLoss({
+          pauseUrl: `/api/full-practice-tests/attempts/${attemptId}/pause`,
+        });
+      }
+    })();
   }, [attemptId]);
 
   const recordQuestionTime = useCallback(() => {
@@ -147,32 +157,76 @@ export function FullTestPlayer({
       }
       const timeSpentSnapshot = recordQuestionTime();
       const moduleTimerState = buildProgressPayload(progressOverrides);
+      const payload = {
+        answers: nextAnswers,
+        currentModule: nextModule,
+        currentQuestion: nextQuestion,
+        timeExpiredEvents: expiredEvents,
+        extraTimeUsed,
+        moduleTimerState,
+        timeSpentByQuestion: timeSpentSnapshot,
+      };
       setSaving("saving");
-      await fetch(`/api/full-practice-tests/attempts/${attemptId}/autosave`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          answers: nextAnswers,
-          currentModule: nextModule,
-          currentQuestion: nextQuestion,
-          timeExpiredEvents: expiredEvents,
-          extraTimeUsed,
-          moduleTimerState,
-          timeSpentByQuestion: timeSpentSnapshot,
-        }),
-      });
-      setSaving("saved");
-      setTimeout(() => setSaving("idle"), 1500);
+      try {
+        const response = await fetch(`/api/full-practice-tests/attempts/${attemptId}/autosave`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (isAuthFailureStatus(response.status)) {
+          await exitPlayerOnAuthLoss({
+            pauseUrl: `/api/full-practice-tests/attempts/${attemptId}/pause`,
+          });
+          return;
+        }
+        if (!response.ok) throw new Error("Autosave failed");
+        localStorage.removeItem(offlineKey);
+        setSaving("saved");
+        setTimeout(() => setSaving("idle"), 1500);
+      } catch {
+        localStorage.setItem(offlineKey, JSON.stringify(payload));
+        setSaving("offline");
+      }
     },
-    [attemptId, buildProgressPayload, expiredEvents, extraTimeUsed, recordQuestionTime],
+    [attemptId, buildProgressPayload, expiredEvents, extraTimeUsed, offlineKey, recordQuestionTime],
   );
+
+  useEffect(() => {
+    const syncOffline = async () => {
+      const raw = localStorage.getItem(offlineKey);
+      if (!raw) return;
+      try {
+        const response = await fetch(`/api/full-practice-tests/attempts/${attemptId}/autosave`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: raw,
+        });
+        if (isAuthFailureStatus(response.status)) {
+          await exitPlayerOnAuthLoss({
+            pauseUrl: `/api/full-practice-tests/attempts/${attemptId}/pause`,
+          });
+          return;
+        }
+        if (response.ok) {
+          localStorage.removeItem(offlineKey);
+          setSaving("saved");
+          setTimeout(() => setSaving("idle"), 1500);
+        }
+      } catch {
+        setSaving("offline");
+      }
+    };
+    window.addEventListener("online", syncOffline);
+    void syncOffline();
+    return () => window.removeEventListener("online", syncOffline);
+  }, [attemptId, offlineKey]);
 
   const submit = useCallback(async () => {
     if (phaseRef.current === "MODULE") {
       timerState.current[moduleIndexRef.current] = remainingRef.current;
     }
     const timeSpentSnapshot = recordQuestionTime();
-    await fetch(`/api/full-practice-tests/attempts/${attemptId}/submit`, {
+    const response = await fetch(`/api/full-practice-tests/attempts/${attemptId}/submit`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -182,6 +236,12 @@ export function FullTestPlayer({
         extraTimeUsed,
       }),
     });
+    if (isAuthFailureStatus(response.status)) {
+      await exitPlayerOnAuthLoss({
+        pauseUrl: `/api/full-practice-tests/attempts/${attemptId}/pause`,
+      });
+      return;
+    }
     router.push(`/student/full-tests/results/${attemptId}`);
   }, [attemptId, expiredEvents, extraTimeUsed, recordQuestionTime, router]);
 
@@ -307,8 +367,12 @@ export function FullTestPlayer({
         <p className={`mt-8 text-4xl font-semibold tabular-nums ${breakRemaining <= 60 ? "text-red-600" : "text-gray-900"}`}>
           {formatTime(breakRemaining)}
         </p>
-        <p className="mt-4 text-xs text-gray-400">
-          {saving === "saving" ? "Saving..." : saving === "saved" ? "Saved" : "When the break ends you continue with Math Module 1."}
+        <p className="mt-4 text-xs text-muted-foreground">
+          {saving !== "idle" ? (
+            <SaveIndicator status={saving} />
+          ) : (
+            "When the break ends you continue with Math Module 1."
+          )}
         </p>
         <Button
           className="mt-8"
@@ -329,8 +393,10 @@ export function FullTestPlayer({
   }
 
   if (!question) {
-    return <div className="flex h-screen items-center justify-center text-sm text-gray-500">Loading…</div>;
+    return <LoadingState className="h-screen" label="Loading…" />;
   }
+
+  const hasPassage = Boolean(question.stimulus?.trim());
 
   return (
     <div className="flex h-screen flex-col bg-white">
@@ -338,13 +404,11 @@ export function FullTestPlayer({
         <div>
           <p className="text-sm font-semibold text-gray-900">{testName}</p>
           <p className="text-xs text-gray-500">
-            {currentModule.name} · Question {questionIndex + 1}/{currentModule.questions.length}
+            {currentModule.name} · <span className="text-base font-bold text-gray-900">Question {questionIndex + 1}</span><span className="text-xs text-gray-500">/{currentModule.questions.length}</span>
           </p>
         </div>
         <div className="flex items-center gap-4">
-          <span className="text-xs text-gray-400">
-            {saving === "saving" ? "Saving..." : saving === "saved" ? "Saved" : ""}
-          </span>
+          <SaveIndicator status={saving} />
           <span className={`tabular-nums ${timerIsRed ? "text-red-600" : "text-gray-900"}`}>
             {formatTime(remaining)}
           </span>
@@ -362,13 +426,16 @@ export function FullTestPlayer({
         </div>
       </div>
       <div className="grid flex-1 grid-cols-1 overflow-hidden md:grid-cols-2">
-        <div className="space-y-4 overflow-y-auto border-r border-gray-200 bg-gray-50 p-6">
-          {question.stimulus ? (
-            <MathContent content={question.stimulus} className="prose prose-base max-w-none text-gray-800" />
-          ) : (
-            <p className="text-sm text-gray-400">No passage.</p>
+        <div
+          className={cn(
+            "space-y-4 overflow-y-auto border-r border-gray-200 p-6",
+            hasPassage && "bg-gray-50",
           )}
-          <div className="border-t border-gray-200 pt-4">
+        >
+          {hasPassage ? (
+            <MathContent content={question.stimulus!} className="prose prose-base max-w-none text-gray-800" />
+          ) : null}
+          <div className={cn(hasPassage && "border-t border-gray-200 pt-4")}>
             <MathContent content={question.stem} className="text-base font-medium text-gray-900 md:text-lg" />
             <QuestionMedia imageUrl={question.imageUrl} alt={`Question ${question.id} image`} className="mt-4" />
           </div>

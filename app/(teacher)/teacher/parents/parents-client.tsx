@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Edit, FileDown, Link2, Plus } from "lucide-react";
+import { StudentPicker } from "@/components/student-picker";
 
 type Student = { id: string; name: string };
 type Parent = { id: string; name: string; email: string; phone: string; students: Student[] };
@@ -35,14 +36,13 @@ export function ParentsClient({ parents, students }: { parents: Parent[]; studen
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [selectedStudentIds, setSelectedStudentIds] = useState<Set<string>>(new Set());
+  const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
   const [studentId, setStudentId] = useState(students[0]?.id ?? "");
   const [shareStatus, setShareStatus] = useState<string | null>(null);
   const [sharing, setSharing] = useState(false);
   const [reportAreas, setReportAreas] = useState<Set<string>>(allAreas);
   const [parentSearch, setParentSearch] = useState("");
   const [studentSearch, setStudentSearch] = useState("");
-  const [reportStudentSearch, setReportStudentSearch] = useState("");
 
   const sortedParents = useMemo(() => parents.slice().sort((a, b) => a.name.localeCompare(b.name)), [parents]);
   const filteredParents = useMemo(() => {
@@ -59,13 +59,12 @@ export function ParentsClient({ parents, students }: { parents: Parent[]; studen
     setName("");
     setEmail("");
     setPhone("");
-    setSelectedStudentIds(new Set());
+    setSelectedStudentIds([]);
     setStudentId(students[0]?.id ?? "");
     setShareStatus(null);
     setReportAreas(allAreas());
     setActiveParent(null);
     setStudentSearch("");
-    setReportStudentSearch("");
   }
 
   function closeModal() {
@@ -83,7 +82,7 @@ export function ParentsClient({ parents, students }: { parents: Parent[]; studen
     setName(parent.name);
     setEmail(parent.email);
     setPhone(parent.phone);
-    setSelectedStudentIds(new Set(parent.students.map((student) => student.id)));
+    setSelectedStudentIds(parent.students.map((student) => student.id));
     setModal("edit");
   }
 
@@ -100,7 +99,7 @@ export function ParentsClient({ parents, students }: { parents: Parent[]; studen
     await fetch("/api/parents", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, phone, studentIds: [...selectedStudentIds] }),
+      body: JSON.stringify({ name, email, phone, studentIds: selectedStudentIds }),
     });
     closeModal();
     router.refresh();
@@ -118,7 +117,7 @@ export function ParentsClient({ parents, students }: { parents: Parent[]; studen
         name,
         email,
         phone,
-        studentIds: [...selectedStudentIds],
+        studentIds: selectedStudentIds,
       }),
     });
     closeModal();
@@ -171,14 +170,6 @@ export function ParentsClient({ parents, students }: { parents: Parent[]; studen
   }
 
   const reportStudents = activeParent?.students.length ? activeParent.students : students;
-  const filteredReportMatches = reportStudents.filter((student) =>
-    !reportStudentSearch.trim() || student.name.toLowerCase().includes(reportStudentSearch.trim().toLowerCase())
-  );
-  const selectedReportStudent = reportStudents.find((student) => student.id === studentId);
-  const filteredReportStudents =
-    selectedReportStudent && !filteredReportMatches.some((student) => student.id === selectedReportStudent.id)
-      ? [selectedReportStudent, ...filteredReportMatches]
-      : filteredReportMatches;
 
   return (
     <div className="space-y-4">
@@ -242,12 +233,14 @@ export function ParentsClient({ parents, students }: { parents: Parent[]; studen
               <DialogDescription>Create a parent record and select the students associated to this parent.</DialogDescription>
             </DialogHeader>
             <ParentFields name={name} email={email} phone={phone} setName={setName} setEmail={setEmail} setPhone={setPhone} />
-            <StudentCheckboxes
+            <StudentPicker
+              mode="multi"
+              label="Associated students"
               students={students}
-              selected={selectedStudentIds}
-              search={studentSearch}
-              onSearch={setStudentSearch}
+              value={selectedStudentIds}
               onChange={setSelectedStudentIds}
+              search={studentSearch}
+              onSearchChange={setStudentSearch}
             />
             <DialogFooter>
               <Button type="button" variant="secondary" onClick={closeModal}>Cancel</Button>
@@ -265,12 +258,14 @@ export function ParentsClient({ parents, students }: { parents: Parent[]; studen
               <DialogDescription>Update parent information and student associations in one place.</DialogDescription>
             </DialogHeader>
             <ParentFields name={name} email={email} phone={phone} setName={setName} setEmail={setEmail} setPhone={setPhone} />
-            <StudentCheckboxes
+            <StudentPicker
+              mode="multi"
+              label="Associated students"
               students={students}
-              selected={selectedStudentIds}
-              search={studentSearch}
-              onSearch={setStudentSearch}
+              value={selectedStudentIds}
               onChange={setSelectedStudentIds}
+              search={studentSearch}
+              onSearchChange={setStudentSearch}
             />
             <DialogFooter>
               <Button type="button" variant="secondary" onClick={closeModal}>Cancel</Button>
@@ -290,14 +285,12 @@ export function ParentsClient({ parents, students }: { parents: Parent[]; studen
                 {activeParent ? ` (${activeParent.email})` : ""}. Or download the PDF.
               </DialogDescription>
             </DialogHeader>
-            <Input
-              value={reportStudentSearch}
-              onChange={(event) => setReportStudentSearch(event.target.value)}
-              placeholder="Search student..."
+            <StudentPicker
+              mode="single"
+              students={reportStudents}
+              value={studentId}
+              onChange={setStudentId}
             />
-            <select value={studentId} onChange={(e) => setStudentId(e.target.value)} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm">
-              {filteredReportStudents.map((student) => <option key={student.id} value={student.id}>{student.name}</option>)}
-            </select>
             <div className="flex flex-wrap gap-4">
               {REPORT_GROUPS.map((group) => (
                 <label key={group.key} className="flex items-center gap-1.5 text-sm text-gray-600">
@@ -347,49 +340,6 @@ function ParentFields({
       <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Parent name" required />
       <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="parent@example.com" required />
       <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Phone" />
-    </div>
-  );
-}
-
-function StudentCheckboxes({
-  students,
-  selected,
-  search,
-  onSearch,
-  onChange,
-}: {
-  students: Student[];
-  selected: Set<string>;
-  search: string;
-  onSearch: (value: string) => void;
-  onChange: (next: Set<string>) => void;
-}) {
-  const filteredStudents = students.filter((student) =>
-    !search.trim() || student.name.toLowerCase().includes(search.trim().toLowerCase())
-  );
-
-  return (
-    <div className="rounded-md border border-gray-200 p-3">
-      <p className="mb-2 text-xs font-medium text-gray-500">Associated students</p>
-      <Input value={search} onChange={(event) => onSearch(event.target.value)} placeholder="Search student..." className="mb-3 text-sm" />
-      <div className="max-h-52 space-y-1 overflow-y-auto">
-        {filteredStudents.map((student) => (
-          <label key={student.id} className="flex items-center gap-2 text-sm text-gray-700">
-            <input
-              type="checkbox"
-              checked={selected.has(student.id)}
-              onChange={(e) => {
-                const next = new Set(selected);
-                if (e.target.checked) next.add(student.id);
-                else next.delete(student.id);
-                onChange(next);
-              }}
-            />
-            {student.name}
-          </label>
-        ))}
-        {filteredStudents.length === 0 && <p className="text-sm text-gray-400">No students match the current search.</p>}
-      </div>
     </div>
   );
 }

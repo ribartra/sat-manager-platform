@@ -1,8 +1,10 @@
+import { PageShell, PageHeader, PageContent } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { FullTestActions } from "./full-test-actions-client";
+import { fullTestStatusBadgeVariant, fullTestStatusLabel } from "@/lib/domain-meta";
 
 export default async function FullTestsPage() {
   const tests = await prisma.fullPracticeTest.findMany({
@@ -11,47 +13,62 @@ export default async function FullTestsPage() {
   });
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8">
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold text-gray-900">Exams</h1>
-          <p className="mt-1 text-sm text-gray-500">Full Practice Tests with SAT-style modules and score conversion.</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Link href="/teacher/full-tests/scoring" className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Scoring Table</Link>
-          <Link href="/teacher/full-tests/new" className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">New Exam</Link>
-        </div>
-      </div>
-      <Card>
-        {tests.map((test) => (
-          <div key={test.id} className="grid gap-3 border-b border-gray-100 px-4 py-3 last:border-b-0 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <p className="truncate text-sm font-medium text-gray-900" title={test.name}>{test.name}</p>
-                <Badge variant={test.status === "PUBLISHED" ? "success" : test.status === "ARCHIVED" ? "default" : "warning"}>{test.status}</Badge>
+    <PageShell>
+      <PageHeader
+        title="Exams"
+        description="Full Practice Tests with SAT-style modules and score conversion."
+        actions={
+          <>
+            <Link
+              href="/teacher/full-tests/scoring"
+              className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              Scoring Table
+            </Link>
+            <Link
+              href="/teacher/full-tests/new"
+              className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            >
+              New Exam
+            </Link>
+          </>
+        }
+      />
+      <PageContent>
+        <Card>
+          {tests.map((test) => {
+            const questionCount = test.modules.reduce((sum, m) => sum + m.questions.length, 0);
+            return (
+              <div
+                key={test.id}
+                className="grid gap-3 border-b border-gray-100 px-4 py-3 last:border-b-0 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center"
+              >
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="truncate text-sm font-medium text-gray-900" title={test.name}>
+                      {test.name}
+                    </p>
+                    <Badge variant={fullTestStatusBadgeVariant(test.status)}>
+                      {fullTestStatusLabel(test.status)}
+                    </Badge>
+                  </div>
+                  <p className="mt-1 text-xs text-gray-500">
+                    {questionCount} questions · {test.assignments.length} assignments
+                  </p>
+                </div>
+                <FullTestActions
+                  testId={test.id}
+                  status={test.status}
+                  hasAssignments={test.assignments.length > 0}
+                  hasAttempts={test.attempts.length > 0}
+                  variant="list"
+                />
               </div>
-              <p className="mt-1 text-xs text-gray-500">
-                {test.modules.length} groups · {test.modules.reduce((sum, m) => sum + m.questions.length, 0)} questions · break{" "}
-                {test.breakMinutes} min · {test.assignments.length} assignments · {test.attempts.length} attempts · review{" "}
-                {test.reviewEnabled ? "on" : "off"}
-              </p>
-              <div className="mt-2 flex flex-wrap gap-1">
-                {test.modules
-                  .slice()
-                  .sort((a, b) => a.order - b.order)
-                  .map((module) => (
-                    <span key={module.id} className="rounded border border-gray-200 px-1.5 py-0.5 text-[10px] text-gray-600">
-                      {module.name.replace("Reading & Writing ", "RW ").replace("Module ", "M")} · {module.questions.length}Q ·{" "}
-                      {Math.round(module.timeLimit / 60)}m
-                    </span>
-                  ))}
-              </div>
-            </div>
-            <FullTestActions testId={test.id} status={test.status} hasAssignments={test.assignments.length > 0} hasAttempts={test.attempts.length > 0} />
-          </div>
-        ))}
-        {tests.length === 0 && <div className="p-10 text-center text-sm text-gray-400">No Exams yet.</div>}
-      </Card>
-    </div>
+            );
+          })}
+          {tests.length === 0 && <div className="p-10 text-center text-sm text-gray-400">No Exams yet.</div>}
+        </Card>
+      </PageContent>
+    </PageShell>
   );
 }

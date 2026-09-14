@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -18,7 +19,7 @@ export default async function NotificationsPage() {
   });
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
+    <PageShell width="narrow">
       <h1 className="mb-6 text-xl font-semibold text-gray-900">Notifications</h1>
       <Card>
         {notifications.map((n) => (
@@ -36,6 +37,6 @@ export default async function NotificationsPage() {
         ))}
         {notifications.length === 0 && <div className="p-10 text-center text-sm text-gray-400">No notifications yet.</div>}
       </Card>
-    </div>
+    </PageShell>
   );
 }

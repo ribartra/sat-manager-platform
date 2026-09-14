@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
+import { fullTestEditorFieldIssues } from "@/contracts/full-test";
 import { validateFullPracticeTestStructure } from "@/lib/full-test-validation";
 
 interface RouteContext {
@@ -96,10 +97,18 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
     questions.map((question) => [question.id, question.topic.domain.section.name === "MATH" ? "MATH" : "RW"]),
   );
   const validation = validateFullPracticeTestStructure({ status: targetStatus, moduleQuestionIds: normalizedModules, questionSections });
-  if (!name?.trim()) validation.errors.push("Name is required.");
-  if (!allowedStatuses.has(targetStatus)) validation.errors.push("Invalid status.");
+  validation.errors.push(
+    ...fullTestEditorFieldIssues({
+      name,
+      status: targetStatus,
+      reviewEnabled: reviewEnabled ?? previous.reviewEnabled,
+      breakMinutes:
+        Number.isInteger(breakMinutes) && breakMinutes >= 0 ? breakMinutes : previous.breakMinutes,
+      moduleQuestionIds: normalizedModules,
+    }),
+  );
   if (validation.errors.length > 0) {
-    return NextResponse.json({ error: "Validation failed.", errors: validation.errors, warnings: validation.warnings }, { status: 400 });
+    return NextResponse.json({ error: "Validation failed.", errors: [...new Set(validation.errors)], warnings: validation.warnings }, { status: 400 });
   }
 
   const resolvedBreak =

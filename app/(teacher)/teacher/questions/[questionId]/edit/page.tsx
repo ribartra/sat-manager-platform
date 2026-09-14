@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { QuestionEditor } from "../../question-editor-client";
@@ -29,7 +30,7 @@ export default async function EditQuestionPage({ params }: PageProps) {
   if (!question) notFound();
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
+    <PageShell width="narrow">
       <h1 className="mb-6 text-xl font-semibold text-gray-900">Edit Question</h1>
       <QuestionEditor
         showGraphOption={showGraphOption}
@@ -57,6 +58,6 @@ export default async function EditQuestionPage({ params }: PageProps) {
           subskills: t.subskills,
         }))}
       />
-    </div>
+    </PageShell>
   );
 }

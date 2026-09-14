@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
@@ -56,12 +57,12 @@ export default async function AdminProgramsPage() {
   }));
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8">
+    <PageShell>
       <h1 className="mb-1 text-xl font-semibold text-gray-900">Programs Master</h1>
       <p className="mb-6 text-sm text-gray-500">
         Manage programs, teachers, and enrollment requests. Leave end date blank for indefinite programs.
       </p>
       <AdminProgramsClient programs={serialized} teachers={teachers} />
-    </div>
+    </PageShell>
   );
 }

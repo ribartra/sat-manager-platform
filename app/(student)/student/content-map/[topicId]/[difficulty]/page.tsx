@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
@@ -46,7 +47,7 @@ export default async function TopicPracticeSetsPage({ params }: PageProps) {
   const diffColor = { EASY: "easy", MEDIUM: "medium", HARD: "hard" } as const;
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
+    <PageShell width="narrow">
       <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
         <Link href="/student/content-map" className="hover:text-blue-600 flex items-center gap-1">
           <ChevronLeft size={14} /> Content Map
@@ -154,6 +155,6 @@ export default async function TopicPracticeSetsPage({ params }: PageProps) {
           })}
         </div>
       )}
-    </div>
+    </PageShell>
   );
 }

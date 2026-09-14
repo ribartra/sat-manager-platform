@@ -1,16 +1,32 @@
+import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { academicTopicWhere, activeTaxonomySection, buildTaxonomyTree, matchesTaxonomySection, TAXONOMY_SECTION_TABS, type TaxonomyTreeNode } from "@/lib/taxonomy";
+import {
+  academicTopicWhere,
+  activeTaxonomySection,
+  buildTaxonomyTree,
+  matchesTaxonomyDomainName,
+  matchesTaxonomySection,
+  taxonomyDomainAnchorId,
+  TAXONOMY_SECTION_TABS,
+  type TaxonomyTreeNode,
+} from "@/lib/taxonomy";
 import { cn } from "@/lib/utils";
 
 function tabHref(section: string) {
   return `/teacher/content?section=${section}`;
 }
 
-export default async function TeacherContentPage({ searchParams }: { searchParams: Promise<{ section?: string }> }) {
-  const activeSection = activeTaxonomySection((await searchParams).section);
+export default async function TeacherContentPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ section?: string; domain?: string }>;
+}) {
+  const params = await searchParams;
+  const activeSection = activeTaxonomySection(params.section);
+  const domainFilter = params.domain?.trim() || null;
   const [taxonomyNodes, topics] = await Promise.all([
     prisma.taxonomyNode.findMany({
       where: { active: true },
@@ -38,24 +54,43 @@ export default async function TeacherContentPage({ searchParams }: { searchParam
   const legacySections = taxonomyNodes.length
     ? []
     : await prisma.section.findMany({
-    include: {
-      domains: {
         include: {
-          topics: {
+          domains: {
             include: {
-              practiceSets: {
-                select: { id: true, status: true, difficulty: true },
+              topics: {
+                include: {
+                  practiceSets: {
+                    select: { id: true, status: true, difficulty: true },
+                  },
+                },
               },
             },
           },
         },
-      },
-    },
-    orderBy: { name: "asc" },
-  });
+        orderBy: { name: "asc" },
+      });
 
-  const visibleRoots = roots.filter((node) => matchesTaxonomySection(node, activeSection));
-  const visibleLegacy = legacySections.filter((section) => matchesTaxonomySection(section, activeSection));
+  const visibleRoots = roots
+    .filter((node) => matchesTaxonomySection(node, activeSection))
+    .map((root) => {
+      if (!domainFilter) return root;
+      return {
+        ...root,
+        children: root.children.filter((child) => matchesTaxonomyDomainName(child, domainFilter)),
+      };
+    })
+    .filter((root) => !domainFilter || root.children.length > 0);
+
+  const visibleLegacy = legacySections
+    .filter((section) => matchesTaxonomySection(section, activeSection))
+    .map((section) => ({
+      ...section,
+      domains: domainFilter
+        ? section.domains.filter((domain) => matchesTaxonomyDomainName(domain, domainFilter))
+        : section.domains,
+    }))
+    .filter((section) => !domainFilter || section.domains.length > 0);
+
   const hasContent = visibleRoots.length > 0 || visibleLegacy.length > 0;
 
   const countByStatus = (sets: { status: string }[]) => ({
@@ -99,12 +134,18 @@ export default async function TeacherContentPage({ searchParams }: { searchParam
 
   function renderNode(node: TaxonomyTreeNode, depth = 0) {
     const nodeTopics = topicsByNodeId.get(node.id) ?? [];
+    const isDomainHeading = depth === 1;
     return (
-      <div key={node.id} className={depth === 0 ? "mb-8" : "mt-4"}>
+      <div key={node.id} className={depth === 0 ? "mb-8" : "mt-4"} id={isDomainHeading ? taxonomyDomainAnchorId(node.label) : undefined}>
         {depth === 0 ? (
           <h2 className="mb-3 border-b border-gray-200 pb-2 text-lg font-semibold text-gray-900">{node.label}</h2>
         ) : (
-          <h3 className={cn("mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-gray-500", depth > 1 && "normal-case tracking-normal text-gray-600")}>
+          <h3
+            className={cn(
+              "mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-gray-500",
+              depth > 1 && "normal-case tracking-normal text-gray-600"
+            )}
+          >
             {node.label}
           </h3>
         )}
@@ -117,7 +158,7 @@ export default async function TeacherContentPage({ searchParams }: { searchParam
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8">
+    <PageShell>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-semibold text-gray-900">Content Map</h1>
         <Link
@@ -145,62 +186,72 @@ export default async function TeacherContentPage({ searchParams }: { searchParam
         ))}
       </div>
 
+      {domainFilter ? (
+        <p className="mb-4 text-sm text-gray-500">
+          Showing domain <span className="font-medium text-gray-800">{domainFilter}</span>
+          {" · "}
+          <Link href={tabHref(activeSection)} className="text-blue-600 hover:underline">
+            Clear filter
+          </Link>
+        </p>
+      ) : null}
+
       {!hasContent && (
-        <div className="py-12 text-center text-sm text-gray-400">No content in this section yet.</div>
+        <div className="py-12 text-center text-sm text-gray-400">
+          {domainFilter ? "No content for this domain in the selected section." : "No content in this section yet."}
+        </div>
       )}
 
       {visibleRoots.length > 0
         ? visibleRoots.map((node) => renderNode(node))
         : visibleLegacy.map((section) => (
-        <div key={section.id} className="mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-3 pb-2 border-b border-gray-200">
-            {section.label}
-          </h2>
-          {section.domains.map((domain) => (
-            <div key={domain.id} className="mb-4">
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 px-1">
-                {domain.name}
-              </h3>
-              <div className="space-y-1">
-                {domain.topics.map((topic) => {
-                  const counts = countByStatus(topic.practiceSets);
-                  const byDiff = ["EASY", "MEDIUM", "HARD"].map((d) => ({
-                    d,
-                    count: topic.practiceSets.filter((ps) => ps.difficulty === d && ps.status === "PUBLISHED").length,
-                    draft: topic.practiceSets.filter((ps) => ps.difficulty === d && ps.status === "DRAFT").length,
-                  }));
+            <div key={section.id} className="mb-8">
+              <h2 className="mb-3 border-b border-gray-200 pb-2 text-lg font-semibold text-gray-900">{section.label}</h2>
+              {section.domains.map((domain) => (
+                <div key={domain.id} id={taxonomyDomainAnchorId(domain.name)} className="mb-4">
+                  <h3 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-gray-500">{domain.name}</h3>
+                  <div className="space-y-1">
+                    {domain.topics.map((topic) => {
+                      const counts = countByStatus(topic.practiceSets);
+                      const byDiff = ["EASY", "MEDIUM", "HARD"].map((d) => ({
+                        d,
+                        count: topic.practiceSets.filter((ps) => ps.difficulty === d && ps.status === "PUBLISHED").length,
+                        draft: topic.practiceSets.filter((ps) => ps.difficulty === d && ps.status === "DRAFT").length,
+                      }));
 
-                  return (
-                    <Card
-                      as={Link}
-                      key={topic.id}
-                      href={`/teacher/content/${topic.id}`}
-                      className="flex items-center justify-between px-4 py-3 transition-colors hover:bg-gray-50"
-                    >
-                      <span className="text-sm font-medium text-gray-800">{topic.name}</span>
-                      <div className="flex items-center gap-3">
-                        {byDiff.map(({ d, count, draft }) =>
-                          count + draft > 0 ? (
-                            <span key={d} className="text-xs text-gray-500">
-                              <span className={d === "EASY" ? "text-green-600" : d === "MEDIUM" ? "text-yellow-600" : "text-red-600"}>
-                                {d.charAt(0) + d.slice(1).toLowerCase()}
-                              </span>
-                              : {count} pub{draft > 0 ? ` / ${draft} draft` : ""}
-                            </span>
-                          ) : null
-                        )}
-                        {counts.total === 0 && (
-                          <span className="text-xs text-gray-400">No sets yet</span>
-                        )}
-                      </div>
-                    </Card>
-                  );
-                })}
-              </div>
+                      return (
+                        <Card
+                          as={Link}
+                          key={topic.id}
+                          href={`/teacher/content/${topic.id}`}
+                          className="flex items-center justify-between px-4 py-3 transition-colors hover:bg-gray-50"
+                        >
+                          <span className="text-sm font-medium text-gray-800">{topic.name}</span>
+                          <div className="flex items-center gap-3">
+                            {byDiff.map(({ d, count, draft }) =>
+                              count + draft > 0 ? (
+                                <span key={d} className="text-xs text-gray-500">
+                                  <span
+                                    className={
+                                      d === "EASY" ? "text-green-600" : d === "MEDIUM" ? "text-yellow-600" : "text-red-600"
+                                    }
+                                  >
+                                    {d.charAt(0) + d.slice(1).toLowerCase()}
+                                  </span>
+                                  : {count} pub{draft > 0 ? ` / ${draft} draft` : ""}
+                                </span>
+                              ) : null
+                            )}
+                            {counts.total === 0 && <span className="text-xs text-gray-400">No sets yet</span>}
+                          </div>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
             </div>
           ))}
-        </div>
-      ))}
-    </div>
+    </PageShell>
   );
 }

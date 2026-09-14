@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -58,7 +59,7 @@ export default async function TeacherAttemptDetailPage({ params }: PageProps) {
   const pauseSeconds = attempt.pauses.reduce((sum, pause) => sum + (pause.durationSeconds ?? 0), 0);
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8">
+    <PageShell>
       <div className="mb-6 flex items-center gap-2 text-sm text-gray-500">
         <Link href={`/teacher/students/${studentId}`} className="flex items-center gap-1 hover:text-blue-600">
           <ChevronLeft size={14} /> {attempt.student.name}
@@ -135,6 +136,6 @@ export default async function TeacherAttemptDetailPage({ params }: PageProps) {
           </tbody>
         </table>
       </Card>
-    </div>
+    </PageShell>
   );
 }

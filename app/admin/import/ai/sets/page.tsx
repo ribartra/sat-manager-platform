@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
@@ -28,13 +29,13 @@ export default async function AiImportSetsPage({ searchParams }: PageProps) {
 
   if (!selectedBatchId) {
     return (
-      <div className="mx-auto max-w-4xl px-4 py-10">
+      <PageShell>
         <h1 className="text-2xl font-semibold text-gray-900">Extracted Tests to review</h1>
         <p className="mt-2 text-sm text-gray-500">No ingest batches yet.</p>
         <Link href="/admin/import/ai" className="mt-4 inline-block text-sm text-blue-600 hover:underline">
           Go to AI Import
         </Link>
-      </div>
+      </PageShell>
     );
   }
 

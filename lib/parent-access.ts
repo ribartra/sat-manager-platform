@@ -7,7 +7,12 @@ export const PARENT_ACTIVATION_DEADLINE_DAYS = 7;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 export type ReportArea = "mathematics" | "reading" | "writing";
+export type PracticeSetArea = ReportArea | "reading_writing";
 const ALL_AREAS: ReportArea[] = ["mathematics", "reading", "writing"];
+
+/** SAT domains used to distinguish the two R&W skill families. */
+export const READING_DOMAINS = ["Information and Ideas", "Craft and Structure"] as const;
+export const WRITING_DOMAINS = ["Expression of Ideas", "Standard English Conventions"] as const;
 
 export function parseAreas(csv: string | null | undefined): ReportArea[] {
   if (!csv) return [...ALL_AREAS];
@@ -34,6 +39,50 @@ export function areasLabel(areas: ReportArea[]): string {
   if (hasMath) return "Mathematics";
   if (hasRW) return "Reading & Writing";
   return "All sections";
+}
+
+function normalizeTaxonomyName(value: string | null | undefined): string {
+  return String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ");
+}
+
+/** Classify a Practice Set without changing the official SAT RW section. */
+export function classifyPracticeSetArea(input: {
+  sectionName?: string | null;
+  sectionLabel?: string | null;
+  domainName?: string | null;
+}): PracticeSetArea | null {
+  const section = normalizeTaxonomyName(`${input.sectionName ?? ""} ${input.sectionLabel ?? ""}`);
+  const domain = normalizeTaxonomyName(input.domainName);
+
+  if (section.includes("math")) return "mathematics";
+  if (domain === "full practice test") return "reading_writing";
+  if (READING_DOMAINS.some((name) => domain === normalizeTaxonomyName(name))) return "reading";
+  if (WRITING_DOMAINS.some((name) => domain === normalizeTaxonomyName(name))) return "writing";
+  if (section.includes("reading & writing") || section.includes("reading and writing")) return "reading_writing";
+  return null;
+}
+
+/** Whether a Practice Set classification belongs in a selected report area. */
+export function practiceSetMatchesArea(
+  input: Parameters<typeof classifyPracticeSetArea>[0],
+  area: ReportArea,
+): boolean {
+  const classification = classifyPracticeSetArea(input);
+  if (classification === "mathematics") return area === "mathematics";
+  if (classification === "reading") return area === "reading";
+  if (classification === "writing") return area === "writing";
+  return classification === "reading_writing" && (area === "reading" || area === "writing");
+}
+
+export function practiceSetAreaLabel(classification: PracticeSetArea | null): string | null {
+  if (classification === "mathematics") return "Mathematics";
+  if (classification === "reading") return "Reading";
+  if (classification === "writing") return "Writing";
+  if (classification === "reading_writing") return "Reading & Writing";
+  return null;
 }
 
 /** Whether a data-model section label is included by the selected areas. */

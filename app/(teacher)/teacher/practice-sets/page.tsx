@@ -1,10 +1,9 @@
+import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
 import { Plus } from "lucide-react";
-import { PracticeSetActions } from "./practice-set-actions-client";
 import { PracticeSetsFilter } from "./practice-sets-filter-client";
+import { PracticeSetsTable, type PracticeSetRow } from "./practice-sets-table-client";
 import { academicTopicWhere, activeTaxonomySection, buildTaxonomyTree, matchesTaxonomySection, TAXONOMY_SECTION_TABS } from "@/lib/taxonomy";
 import { cn } from "@/lib/utils";
 
@@ -57,18 +56,8 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
     orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
   });
 
-  const statusVariant = (status: string) => {
-    const map: Record<string, "success" | "warning" | "danger" | "default"> = {
-      PUBLISHED: "success",
-      DRAFT: "warning",
-      BLOCKED: "danger",
-      ARCHIVED: "default",
-    };
-    return map[status] ?? "default";
-  };
-
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
+    <PageShell width="wide">
       <div className="mb-6 flex items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-gray-900">Practice Sets</h1>
@@ -108,46 +97,21 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
         initialStatus={filters.status}
       />
 
-      <Card className="overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-xs uppercase text-gray-500">
-            <tr>
-              <th className="px-4 py-3 text-left">Practice Set</th>
-              <th className="px-4 py-3 text-left">Skill</th>
-              <th className="px-4 py-3 text-left">Difficulty</th>
-              <th className="px-4 py-3 text-right">Questions</th>
-              <th className="px-4 py-3 text-right">Assignments</th>
-              <th className="px-4 py-3 text-left">Status</th>
-              <th className="px-4 py-3 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {practiceSets.map((practiceSet) => (
-              <tr key={practiceSet.id} className="hover:bg-gray-50">
-                <td className="px-4 py-3 font-medium text-gray-900">{practiceSet.name}</td>
-                <td className="px-4 py-3">
-                  <p className="text-xs text-gray-500">{practiceSet.topic.domain.section.label} / {practiceSet.topic.domain.name}</p>
-                  <p className="text-sm text-gray-700">{practiceSet.topic.name}</p>
-                </td>
-                <td className="px-4 py-3">
-                  <Badge variant={practiceSet.difficulty === "EASY" ? "easy" : practiceSet.difficulty === "MEDIUM" ? "medium" : "hard"}>
-                    {practiceSet.difficulty}
-                  </Badge>
-                </td>
-                <td className="px-4 py-3 text-right text-gray-500">{practiceSet.questions.length}</td>
-                <td className="px-4 py-3 text-right text-gray-500">{practiceSet.assignments.length}</td>
-                <td className="px-4 py-3">
-                  <Badge variant={statusVariant(practiceSet.status)}>{practiceSet.status}</Badge>
-                </td>
-                <td className="px-4 py-3 text-right">
-                  <PracticeSetActions practiceSetId={practiceSet.id} status={practiceSet.status} assignmentCount={practiceSet.assignments.length} />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {practiceSets.length === 0 && <div className="p-10 text-center text-sm text-gray-400">No Practice Sets yet.</div>}
-      </Card>
-    </div>
+      <PracticeSetsTable
+        rows={practiceSets.map(
+          (practiceSet): PracticeSetRow => ({
+            id: practiceSet.id,
+            name: practiceSet.name,
+            skillSection: practiceSet.topic.domain.section.label,
+            skillDomain: practiceSet.topic.domain.name,
+            skillName: practiceSet.topic.name,
+            difficulty: practiceSet.difficulty,
+            questionCount: practiceSet.questions.length,
+            assignmentCount: practiceSet.assignments.length,
+            status: practiceSet.status,
+          }),
+        )}
+      />
+    </PageShell>
   );
 }

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Select } from "@/components/ui/select";
 import { TaxonomyPicker, type TaxonomyPickerTopic } from "@/components/taxonomy-picker";
+import { difficultyOptions, practiceSetStatusOptions } from "@/lib/domain-meta";
 
 export function PracticeSetsFilter({
   section,
@@ -41,16 +42,19 @@ export function PracticeSetsFilter({
       <div className="flex items-center gap-3">
         <Select value={difficulty} onChange={(e) => setDifficulty(e.target.value)} className="text-sm">
           <option value="">All difficulties</option>
-          <option value="EASY">Easy</option>
-          <option value="MEDIUM">Medium</option>
-          <option value="HARD">Hard</option>
+          {difficultyOptions().map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
         </Select>
         <Select value={status} onChange={(e) => setStatus(e.target.value)} className="text-sm">
           <option value="">All statuses</option>
-          <option value="PUBLISHED">Published</option>
-          <option value="DRAFT">Draft</option>
-          <option value="BLOCKED">Blocked</option>
-          <option value="ARCHIVED">Archived</option>
+          {practiceSetStatusOptions().map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
         </Select>
         <button type="submit" className="rounded-md bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-200">
           Filter

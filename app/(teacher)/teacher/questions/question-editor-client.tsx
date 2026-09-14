@@ -1,15 +1,17 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { Pencil, Sigma, Trash2 } from "lucide-react";
+import { Copy, Sigma } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { MathContent } from "@/components/math-content";
-import { TextFormatToolbar } from "@/components/text-format-toolbar";
+import { FormattedTextField } from "@/components/formatted-text-field";
 import { QuestionImageField } from "@/components/question-image-field";
 import { QuestionPlayerPreview } from "@/components/question-player-preview";
 import { TaxonomyPicker } from "@/components/taxonomy-picker";
@@ -21,6 +23,26 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { FormSection } from "@/components/sat";
+import {
+  difficultyOptions,
+  questionStatusOptions,
+  questionTypeOptions,
+} from "@/lib/domain-meta";
+import { validateQuestionPayload } from "@/lib/content-validation";
+import {
+  DEFAULT_MC_OPTIONS,
+  questionEditorSchema,
+  type QuestionEditorInput,
+} from "@/contracts/question";
 
 interface TopicInfo {
   id: string;
@@ -59,9 +81,6 @@ type FormulaTarget =
   | { kind: "explanation"; label: string }
   | { kind: "option"; label: string; optionLabel: string };
 
-const formulaPattern = /(\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\$[^$\n]+?\$|\\\([\s\S]+?\\\))/g;
-const formulaExactPattern = /^(\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\$[^$\n]+?\$|\\\([\s\S]+?\\\))$/;
-
 function convertPlainTextToLatex(value: string) {
   return value
     .trim()
@@ -84,16 +103,15 @@ function wrapFormula(latex: string, displayMode: boolean) {
   return displayMode ? `$$${clean}$$` : `$${clean}$`;
 }
 
-function formulaLabel(formula: string) {
-  return formula.replace(/^\$\$|\$\$$/g, "").replace(/^\$|\$$/g, "").replace(/^\\\[|\\\]$/g, "").replace(/^\\\(|\\\)$/g, "");
-}
-
-function isDisplayFormula(formula: string) {
-  return (formula.startsWith("$$") && formula.endsWith("$$")) || (formula.startsWith("\\[") && formula.endsWith("\\]"));
-}
-
-function splitFormulaParts(content: string) {
-  return content.split(formulaPattern).filter(Boolean);
+function normalizeOptions(options?: QuestionData["options"]) {
+  if (!options?.length) {
+    return DEFAULT_MC_OPTIONS.map((option) => ({ ...option }));
+  }
+  return options.map((option) => ({
+    label: option.label,
+    text: option.text ?? "",
+    imageUrl: option.imageUrl ?? "",
+  }));
 }
 
 export function QuestionEditor({
@@ -109,37 +127,45 @@ export function QuestionEditor({
   showGraphOption?: boolean;
 }) {
   const router = useRouter();
-  const [topicId, setTopicId] = useState(initial?.topicId ?? "");
   // Subskill is hidden in the editor (unused in the source taxonomy); keep any
   // stored value so saving an existing question doesn't wipe it.
-  const [subskillId] = useState(initial?.subskillId ?? "");
-  const [difficulty, setDifficulty] = useState(initial?.difficulty ?? "EASY");
-  const [type, setType] = useState(initial?.type ?? "MC");
-  const [stem, setStem] = useState(initial?.stem ?? "");
-  const [stimulus, setStimulus] = useState(initial?.stimulus ?? "");
-  const [explanation, setExplanation] = useState(initial?.explanation ?? "");
-  const [imageUrl, setImageUrl] = useState(initial?.imageUrl ?? "");
-  const [supportsGraph, setSupportsGraph] = useState(initial?.supportsGraph ?? false);
-  const [correctAnswer, setCorrectAnswer] = useState(initial?.correctAnswer ?? "");
-  const [status, setStatus] = useState(initial?.status ?? "DRAFT");
-  const [options, setOptions] = useState(
-    initial?.options ?? [
-      { label: "A", text: "" },
-      { label: "B", text: "" },
-      { label: "C", text: "" },
-      { label: "D", text: "" },
-    ]
-  );
+  const preservedSubskillId = initial?.subskillId ?? "";
+
+  const form = useForm<QuestionEditorInput>({
+    resolver: zodResolver(questionEditorSchema),
+    defaultValues: {
+      topicId: initial?.topicId ?? "",
+      subskillId: preservedSubskillId || null,
+      difficulty: (initial?.difficulty as QuestionEditorInput["difficulty"]) ?? "EASY",
+      type: (initial?.type as QuestionEditorInput["type"]) ?? "MC",
+      stem: initial?.stem ?? "",
+      stimulus: initial?.stimulus ?? "",
+      explanation: initial?.explanation ?? "",
+      imageUrl: initial?.imageUrl ?? "",
+      supportsGraph: initial?.supportsGraph ?? false,
+      correctAnswer: initial?.correctAnswer ?? "",
+      status: (initial?.status as QuestionEditorInput["status"]) ?? "DRAFT",
+      options: normalizeOptions(initial?.options),
+    },
+  });
+
+  const topicId = form.watch("topicId");
+  const type = form.watch("type");
+  const stem = form.watch("stem");
+  const stimulus = form.watch("stimulus") ?? "";
+  const explanation = form.watch("explanation") ?? "";
+  const imageUrl = form.watch("imageUrl") ?? "";
+  const supportsGraph = form.watch("supportsGraph") ?? false;
+  const correctAnswer = form.watch("correctAnswer");
+  const options = form.watch("options");
+
   const [preview, setPreview] = useState(Boolean(initial?.stem));
-  const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [formulaOpen, setFormulaOpen] = useState(false);
   const [formulaTarget, setFormulaTarget] = useState<FormulaTarget | null>(null);
   const [formulaPlainText, setFormulaPlainText] = useState("");
   const [formulaLatex, setFormulaLatex] = useState("");
   const [formulaDisplayMode, setFormulaDisplayMode] = useState(false);
-  const [formulaOriginal, setFormulaOriginal] = useState<string | null>(null);
-  const [sourceOpen, setSourceOpen] = useState<Record<string, boolean>>({});
   const fieldRefs = useRef<Record<string, HTMLTextAreaElement | null>>({});
 
   const selectedTopic = useMemo(() => topics.find((topic) => topic.id === topicId), [topicId, topics]);
@@ -152,24 +178,28 @@ export function QuestionEditor({
   }
 
   function updateOption(label: string, text: string) {
-    setOptions((prev) => prev.map((o) => (o.label === label ? { ...o, text } : o)));
+    const next = form.getValues("options").map((option) => (option.label === label ? { ...option, text } : option));
+    form.setValue("options", next, { shouldDirty: true, shouldValidate: false });
   }
 
-  function updateOptionImage(label: string, imageUrl: string) {
-    setOptions((prev) => prev.map((o) => (o.label === label ? { ...o, imageUrl } : o)));
+  function updateOptionImage(label: string, nextImageUrl: string) {
+    const next = form.getValues("options").map((option) =>
+      option.label === label ? { ...option, imageUrl: nextImageUrl } : option,
+    );
+    form.setValue("options", next, { shouldDirty: true, shouldValidate: false });
   }
 
   function getTargetValue(target: FormulaTarget) {
-    if (target.kind === "stem") return stem;
-    if (target.kind === "stimulus") return stimulus;
-    if (target.kind === "explanation") return explanation;
-    return options.find((option) => option.label === target.optionLabel)?.text ?? "";
+    if (target.kind === "stem") return form.getValues("stem");
+    if (target.kind === "stimulus") return form.getValues("stimulus") ?? "";
+    if (target.kind === "explanation") return form.getValues("explanation") ?? "";
+    return form.getValues("options").find((option) => option.label === target.optionLabel)?.text ?? "";
   }
 
   function setTargetValue(target: FormulaTarget, value: string) {
-    if (target.kind === "stem") setStem(value);
-    if (target.kind === "stimulus") setStimulus(value);
-    if (target.kind === "explanation") setExplanation(value);
+    if (target.kind === "stem") form.setValue("stem", value, { shouldDirty: true });
+    if (target.kind === "stimulus") form.setValue("stimulus", value, { shouldDirty: true });
+    if (target.kind === "explanation") form.setValue("explanation", value, { shouldDirty: true });
     if (target.kind === "option") updateOption(target.optionLabel, value);
   }
 
@@ -178,16 +208,6 @@ export function QuestionEditor({
     setFormulaPlainText("");
     setFormulaLatex("");
     setFormulaDisplayMode(false);
-    setFormulaOriginal(null);
-    setFormulaOpen(true);
-  }
-
-  function editFormula(target: FormulaTarget, formula: string) {
-    setFormulaTarget(target);
-    setFormulaPlainText("");
-    setFormulaLatex(formulaLabel(formula));
-    setFormulaDisplayMode(isDisplayFormula(formula));
-    setFormulaOriginal(formula);
     setFormulaOpen(true);
   }
 
@@ -195,159 +215,41 @@ export function QuestionEditor({
     if (!formulaTarget || !formulaLatex.trim()) return;
     const nextFormula = wrapFormula(formulaLatex, formulaDisplayMode);
     const current = getTargetValue(formulaTarget);
-    if (formulaOriginal) {
-      setTargetValue(formulaTarget, current.replace(formulaOriginal, nextFormula));
-      setFormulaOpen(false);
-      return;
-    }
     const separator = current && !/\s$/.test(current) ? " " : "";
     setTargetValue(formulaTarget, `${current}${separator}${nextFormula}`);
     setFormulaOpen(false);
   }
 
-  function deleteFormula(target: FormulaTarget, formula: string) {
-    const current = getTargetValue(target);
-    setTargetValue(target, current.replace(formula, "").replace(/\s{2,}/g, " ").trim());
-  }
-
-  function targetKey(target: FormulaTarget) {
-    return target.kind === "option" ? `${target.kind}-${target.optionLabel}` : target.kind;
-  }
-
-  function renderFieldToolbar(target: FormulaTarget) {
-    const key = targetKey(target);
+  function formulaToolbar(target: FormulaTarget) {
+    if (!isMathQuestion) return null;
     return (
-      <TextFormatToolbar
-        getInput={() => fieldRefs.current[key] ?? null}
-        value={getTargetValue(target)}
-        onChange={(next) => setTargetValue(target, next)}
-      >
-        {isMathQuestion ? (
-          <Button type="button" variant="secondary" size="sm" onClick={() => openFormulaModal(target)}>
-            <Sigma size={14} />
-            Formula
-          </Button>
-        ) : null}
-      </TextFormatToolbar>
+      <Button type="button" variant="secondary" size="sm" onClick={() => openFormulaModal(target)}>
+        <Sigma size={14} />
+        Formula
+      </Button>
     );
   }
 
-  function renderVisualMathField({
-    target,
-    value,
-    onChange,
-    rows,
-    placeholder,
-  }: {
-    target: FormulaTarget;
-    value: string;
-    onChange: (value: string) => void;
-    rows: number;
-    placeholder: string;
-  }) {
-    const hasFormula = isMathQuestion && formulaExactPattern.test(value.split(formulaPattern).find((part) => formulaExactPattern.test(part)) ?? "");
-    const key = targetKey(target);
-    const showSource = sourceOpen[key] ?? !hasFormula;
-
-    if (!hasFormula) {
-      return (
-        <Textarea
-          ref={bindFieldRef(key)}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          rows={rows}
-          placeholder={placeholder}
-        />
-      );
-    }
-
-    return (
-      <div className="space-y-2">
-        <div className="min-h-20 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm">
-          <div className="flex flex-wrap items-center gap-1.5">
-            {splitFormulaParts(value).map((part, index) => {
-              const isFormula = formulaExactPattern.test(part);
-              if (!isFormula) {
-                return (
-                  <span key={`${part}-${index}`} className="whitespace-pre-wrap text-gray-800">
-                    <MathContent content={part} className="inline text-sm" />
-                  </span>
-                );
-              }
-              return (
-                <span
-                  key={`${part}-${index}`}
-                  className="group inline-flex items-center gap-1 rounded-md border border-blue-100 bg-blue-50 px-2 py-1 text-gray-900"
-                >
-                  <MathContent content={part} className="text-sm" />
-                  <span className="ml-1 hidden items-center gap-0.5 group-hover:inline-flex">
-                    <button
-                      type="button"
-                      onClick={() => editFormula(target, part)}
-                      className="rounded p-1 text-gray-400 hover:bg-white hover:text-blue-700"
-                      aria-label={`Edit formula ${formulaLabel(part)}`}
-                      title="Edit formula"
-                    >
-                      <Pencil size={13} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => deleteFormula(target, part)}
-                      className="rounded p-1 text-gray-400 hover:bg-white hover:text-red-600"
-                      aria-label={`Delete formula ${formulaLabel(part)}`}
-                      title="Delete formula"
-                    >
-                      <Trash2 size={13} />
-                    </button>
-                  </span>
-                </span>
-              );
-            })}
-          </div>
-        </div>
-        <button
-          type="button"
-          onClick={() => setSourceOpen((prev) => ({ ...prev, [key]: !showSource }))}
-          className="text-xs font-medium text-blue-700 hover:underline"
-        >
-          {showSource ? "Hide source text" : "Edit source text"}
-        </button>
-        {showSource && (
-          <Textarea
-            ref={bindFieldRef(key)}
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            rows={rows}
-            placeholder={placeholder}
-            className="font-mono text-xs"
-          />
-        )}
-      </div>
-    );
-  }
-
-  async function handleSave() {
-    setSaving(true);
+  async function onSubmit(values: QuestionEditorInput) {
     setErrors([]);
     const body = {
-      topicId,
-      subskillId: subskillId || null,
-      difficulty,
-      type,
-      stem,
-      stimulus,
-      explanation,
-      imageUrl,
-      supportsGraph: isMathQuestion && supportsGraph,
-      correctAnswer,
-      status,
-      options: type === "MC" ? options : [],
+      topicId: values.topicId,
+      subskillId: preservedSubskillId || null,
+      difficulty: values.difficulty,
+      type: values.type,
+      stem: values.stem,
+      stimulus: values.stimulus,
+      explanation: values.explanation,
+      imageUrl: values.imageUrl,
+      supportsGraph: isMathQuestion && values.supportsGraph,
+      correctAnswer: values.correctAnswer,
+      status: values.status,
+      options: values.type === "MC" ? values.options : [],
       ingestCandidateId: sourceContext?.ingestCandidateId,
     };
     const url = initial?.id ? `/api/questions/${initial.id}` : "/api/questions";
     const method = initial?.id ? "PUT" : "POST";
     const response = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-    setSaving(false);
     if (!response.ok) {
       const payload = await response.json().catch(() => null);
       setErrors(Array.isArray(payload?.errors) ? payload.errors : [payload?.error ?? "Unable to save question."]);
@@ -356,293 +258,381 @@ export function QuestionEditor({
     router.push("/teacher/questions");
   }
 
+  function onInvalid() {
+    setErrors(validateQuestionPayload(form.getValues()));
+  }
+
+  const saving = form.formState.isSubmitting;
+  const canSave = Boolean(stem?.trim() && topicId && correctAnswer?.trim());
+  const [duplicating, setDuplicating] = useState(false);
+
+  async function duplicateQuestion() {
+    if (!initial?.id) return;
+    setDuplicating(true);
+    const response = await fetch(`/api/questions/${initial.id}/duplicate`, { method: "POST" });
+    const data = await response.json().catch(() => ({}));
+    setDuplicating(false);
+    if (!response.ok) {
+      window.alert(data.errors?.join("\n") || data.error || "Unable to duplicate.");
+      return;
+    }
+    if (data?.question?.id) router.push(`/teacher/questions/${data.question.id}/edit`);
+  }
+
   return (
-    <div className="space-y-6">
-      {/* Skill + Metadata */}
-      <TaxonomyPicker topics={topics} value={topicId} onChange={setTopicId} required />
-
-      <div className="max-w-xs">
-        <label className="block text-sm font-medium text-gray-700 mb-1">Difficulty</label>
-        <Select value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
-          <option value="EASY">Easy</option>
-          <option value="MEDIUM">Medium</option>
-          <option value="HARD">Hard</option>
-        </Select>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Question Type</label>
-          <Select value={type} onChange={(e) => setType(e.target.value)}>
-            <option value="MC">Multiple Choice (A/B/C/D)</option>
-            <option value="NUMERIC">Numeric Input</option>
-          </Select>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-          <Select value={status} onChange={(e) => setStatus(e.target.value)}>
-            <option value="DRAFT">Draft</option>
-            <option value="PUBLISHED">Published</option>
-            <option value="ARCHIVED">Archived</option>
-          </Select>
-        </div>
-      </div>
-
-      {isMathQuestion && showGraphOption && (
-        <Card as="label" padding="sm" className="flex items-start gap-3">
-          <input
-            type="checkbox"
-            checked={supportsGraph}
-            onChange={(event) => setSupportsGraph(event.target.checked)}
-            className="mt-1 rounded border-gray-300"
-          />
-          <span>
-            <span className="block text-sm font-medium text-gray-800">Enable graph visualization</span>
-            <span className="mt-0.5 block text-xs text-gray-500">
-              Use this only when the question should preload graph data into the calculator or local renderer.
-            </span>
-          </span>
-        </Card>
-      )}
-
-      {/* Stimulus */}
-      <div>
-        <div className="mb-1 flex items-center justify-between gap-3">
-          <label className="block text-sm font-medium text-gray-700">Stimulus / Passage (optional)</label>
-          {renderFieldToolbar({ kind: "stimulus", label: "Stimulus / Passage" })}
-        </div>
-        <p className="text-xs text-gray-400 mb-1">
-          {isMathQuestion
-            ? "Bold/Underline wrap selection; Formula inserts LaTeX. Prose: **bold** / ++underline++."
-            : "Select text then Bold/Underline (++phrase++). Appears in the left column of the player."}
-        </p>
-        {renderVisualMathField({
-          target: { kind: "stimulus", label: "Stimulus / Passage" },
-          value: stimulus,
-          onChange: setStimulus,
-          rows: 4,
-          placeholder: "Reading passage, graph description, or any context...",
-        })}
-      </div>
-
-      <QuestionImageField
-        label="Question image (optional)"
-        value={imageUrl ?? ""}
-        onChange={setImageUrl}
-        placeholder="/uploads/questions/..."
-      />
-
-      {/* Question stem */}
-      <div>
-        <div className="mb-1 flex items-center justify-between gap-3">
-          <label className="block text-sm font-medium text-gray-700">Question Stem *</label>
-          {renderFieldToolbar({ kind: "stem", label: "Question Stem" })}
-        </div>
-        {renderVisualMathField({
-          target: { kind: "stem", label: "Question Stem" },
-          value: stem,
-          onChange: setStem,
-          rows: 3,
-          placeholder: "e.g. Which value of x satisfies...",
-        })}
-      </div>
-
-      {/* Answer choices */}
-      {type === "MC" ? (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Answer Choices</label>
-          <div className="space-y-2">
-            {options.map((opt) => (
-              <div key={opt.label} className="grid grid-cols-[auto_1.5rem_1fr_auto] items-start gap-3">
-                <input
-                  type="radio"
-                  name="correct"
-                  value={opt.label}
-                  checked={correctAnswer === opt.label}
-                  onChange={(e) => setCorrectAnswer(e.target.value)}
-                  className="mt-3 text-blue-600"
-                />
-                <span className="mt-3 font-mono text-sm font-medium text-gray-600">{opt.label})</span>
-                <div className="min-w-0 space-y-2">
-                  {renderVisualMathField({
-                    target: { kind: "option", label: `Option ${opt.label}`, optionLabel: opt.label },
-                    value: opt.text,
-                    onChange: (value) => updateOption(opt.label, value),
-                    rows: 2,
-                    placeholder: `Option ${opt.label}...`,
-                  })}
-                  <QuestionImageField
-                    label={`Option ${opt.label} image (optional)`}
-                    value={opt.imageUrl ?? ""}
-                    onChange={(next) => updateOptionImage(opt.label, next)}
-                    placeholder="/uploads/questions/..."
-                    compact
-                  />
-                </div>
-                {renderFieldToolbar({ kind: "option", label: `Option ${opt.label}`, optionLabel: opt.label })}
-              </div>
-            ))}
-            <p className="text-xs text-gray-400">Select the radio button next to the correct answer.</p>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} className="space-y-6" noValidate>
+        {initial?.id ? (
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <Button type="button" variant="ghost" size="sm" onClick={duplicateQuestion} disabled={duplicating}>
+              <Copy size={14} />
+              Duplicate
+            </Button>
           </div>
-        </div>
-      ) : (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Correct Numeric Answer</label>
-          <Input
-            value={correctAnswer}
-            onChange={(e) => setCorrectAnswer(e.target.value)}
-            placeholder="e.g. 3 or 0.5"
-            className="w-40"
-          />
-        </div>
-      )}
-
-      {/* Explanation */}
-      <div>
-        <div className="mb-1 flex items-center justify-between gap-3">
-          <label className="block text-sm font-medium text-gray-700">Explanation</label>
-          {renderFieldToolbar({ kind: "explanation", label: "Explanation" })}
-        </div>
-        {renderVisualMathField({
-          target: { kind: "explanation", label: "Explanation" },
-          value: explanation,
-          onChange: setExplanation,
-          rows: 3,
-          placeholder: "Step-by-step solution...",
-        })}
-      </div>
-
-      {/* View as player — same layout as student practice player */}
-      <div className="space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <button
-            type="button"
-            onClick={() => setPreview(!preview)}
-            className="text-sm font-medium text-blue-700 hover:underline"
-          >
-            {preview ? "Hide player view" : "View as player →"}
-          </button>
-          {preview && explanation.trim() && (
-            <details className="text-sm text-gray-600">
-              <summary className="cursor-pointer select-none text-xs font-medium text-gray-500 hover:text-gray-700">
-                Show explanation (teacher only)
-              </summary>
-              <div className="mt-2 rounded-md border border-gray-200 bg-gray-50 p-3">
-                <MathContent content={explanation} className="text-sm text-gray-800" />
-              </div>
-            </details>
-          )}
-        </div>
-        {preview && (
-          <QuestionPlayerPreview
-            stem={stem}
-            stimulus={stimulus}
-            imageUrl={imageUrl}
-            type={type}
-            options={options}
-          />
-        )}
-      </div>
-
-      {/* Actions */}
-      {errors.length > 0 && (
-        <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-          <p className="font-medium">Fix these issues before saving:</p>
-          <ul className="mt-1 list-disc pl-5">
-            {errors.map((error) => (
-              <li key={error}>{error}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      <div className="flex items-center gap-3">
-        <Button onClick={handleSave} disabled={saving || !stem || !topicId || !correctAnswer}>
-          {saving ? "Saving..." : initial?.id ? "Update Question" : "Create Question"}
-        </Button>
-        <Button variant="secondary" onClick={() => router.back()}>Cancel</Button>
-      </div>
-
-      <Dialog open={formulaOpen} onOpenChange={setFormulaOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Insert Math Formula</DialogTitle>
-            <DialogDescription>
-              Convert plain math text into LaTeX, review the rendered output, then {formulaOriginal ? "update" : "insert"} it in {formulaTarget?.label ?? "the field"}.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Plain math text</label>
-              <Textarea
-                value={formulaPlainText}
-                onChange={(event) => {
-                  const next = event.target.value;
-                  setFormulaPlainText(next);
-                  setFormulaLatex(convertPlainTextToLatex(next));
-                }}
-                rows={6}
-                placeholder="Examples: x^2 + 3x = 10, sqrt(x+1), 1/2, theta >= 30"
-              />
-              <div className="mt-2 flex flex-wrap gap-2">
-                {["x^2 + 3x = 10", "sqrt(x+1)", "1/2", "theta >= 30", "y = mx + b"].map((example) => (
-                  <button
-                    key={example}
-                    type="button"
-                    onClick={() => {
-                      setFormulaPlainText(example);
-                      setFormulaLatex(convertPlainTextToLatex(example));
-                    }}
-                    className="rounded border border-gray-200 px-2 py-1 text-xs text-gray-600 hover:bg-gray-50"
-                  >
-                    {example}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">LaTeX</label>
-              <Textarea
-                value={formulaLatex}
-                onChange={(event) => setFormulaLatex(event.target.value)}
-                rows={6}
-                placeholder="LaTeX output..."
-                className="font-mono text-sm"
-              />
-              <label className="mt-3 flex items-center gap-2 text-sm text-gray-700">
-                <input
-                  type="checkbox"
-                  checked={formulaDisplayMode}
-                  onChange={(event) => setFormulaDisplayMode(event.target.checked)}
-                  className="rounded border-gray-300"
-                />
-                Display formula on its own line
-              </label>
-            </div>
-          </div>
-
-          <div className="rounded-md border border-gray-200 bg-gray-50 p-3">
-            <p className="mb-2 text-xs font-medium uppercase text-gray-400">Rendered preview</p>
-            {formulaLatex.trim() ? (
-              <MathContent content={wrapFormula(formulaLatex, formulaDisplayMode)} className="text-sm text-gray-900" />
-            ) : (
-              <p className="text-sm text-gray-400">Enter plain math text or LaTeX to preview it.</p>
+        ) : null}
+        <FormSection title="Classification">
+          <FormField
+            control={form.control}
+            name="topicId"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <TaxonomyPicker topics={topics} value={field.value} onChange={field.onChange} required />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
             )}
+          />
+
+          <div className="max-w-xs">
+            <FormField
+              control={form.control}
+              name="difficulty"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Difficulty</FormLabel>
+                  <FormControl>
+                    <Select {...field}>
+                      {difficultyOptions().map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
 
-          <DialogFooter>
-            <Button type="button" variant="secondary" onClick={() => setFormulaOpen(false)}>
-              Cancel
-            </Button>
-            <Button type="button" onClick={insertFormula} disabled={!formulaLatex.trim()}>
-              <Sigma size={14} />
-              {formulaOriginal ? "Update Formula" : "Insert Formula"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Question Type</FormLabel>
+                  <FormControl>
+                    <Select {...field}>
+                      {questionTypeOptions().map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Status</FormLabel>
+                  <FormControl>
+                    <Select {...field}>
+                      {questionStatusOptions().map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {isMathQuestion && showGraphOption ? (
+            <FormField
+              control={form.control}
+              name="supportsGraph"
+              render={({ field }) => (
+                <FormItem>
+                  <Card as="label" padding="sm" className="flex items-start gap-3">
+                    <input
+                      type="checkbox"
+                      checked={field.value}
+                      onChange={(event) => field.onChange(event.target.checked)}
+                      onBlur={field.onBlur}
+                      ref={field.ref}
+                      name={field.name}
+                      className="mt-1 rounded border-gray-300"
+                    />
+                    <span>
+                      <span className="block text-sm font-medium text-gray-800">Enable graph visualization</span>
+                      <span className="mt-0.5 block text-xs text-gray-500">
+                        Use this only when the question should preload graph data into the calculator or local renderer.
+                      </span>
+                    </span>
+                  </Card>
+                </FormItem>
+              )}
+            />
+          ) : null}
+        </FormSection>
+
+        <FormSection title="Content">
+          <FormattedTextField
+            label="Stimulus / Passage (optional)"
+            value={stimulus}
+            onChange={(value) => form.setValue("stimulus", value, { shouldDirty: true })}
+            rows={4}
+            placeholder="Reading passage, graph description, or any context..."
+            hint={
+              isMathQuestion
+                ? "Bold/Underline wrap selection; Formula inserts LaTeX."
+                : "Select text then Bold/Underline. Appears in the left column of the player."
+            }
+            collapsible
+            collapseLabel="Add passage"
+            onInputRef={bindFieldRef("stimulus")}
+            toolbarExtra={formulaToolbar({ kind: "stimulus", label: "Stimulus / Passage" })}
+          />
+
+          <QuestionImageField
+            label="Question image (optional)"
+            value={imageUrl}
+            onChange={(next) => form.setValue("imageUrl", next, { shouldDirty: true })}
+            placeholder="/uploads/questions/..."
+          />
+
+          <FormattedTextField
+            label="Question Stem *"
+            value={stem}
+            onChange={(value) => form.setValue("stem", value, { shouldDirty: true })}
+            rows={3}
+            placeholder="e.g. Which value of x satisfies..."
+            onInputRef={bindFieldRef("stem")}
+            toolbarExtra={formulaToolbar({ kind: "stem", label: "Question Stem" })}
+          />
+
+          {type === "MC" ? (
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-700">Answer Choices</label>
+              <div className="space-y-3">
+                {options.map((opt) => (
+                  <div key={opt.label} className="grid grid-cols-[auto_1.5rem_1fr] items-start gap-3">
+                    <input
+                      type="radio"
+                      name="correct"
+                      value={opt.label}
+                      checked={correctAnswer === opt.label}
+                      onChange={(e) => form.setValue("correctAnswer", e.target.value, { shouldDirty: true })}
+                      className="mt-8 text-blue-600"
+                    />
+                    <span className="mt-8 font-mono text-sm font-medium text-gray-600">{opt.label})</span>
+                    <div className="min-w-0 space-y-2">
+                      <FormattedTextField
+                        label={`Option ${opt.label}`}
+                        value={opt.text}
+                        onChange={(value) => updateOption(opt.label, value)}
+                        rows={2}
+                        placeholder={`Option ${opt.label}...`}
+                        onInputRef={bindFieldRef(`option-${opt.label}`)}
+                        toolbarExtra={formulaToolbar({
+                          kind: "option",
+                          label: `Option ${opt.label}`,
+                          optionLabel: opt.label,
+                        })}
+                      />
+                      <QuestionImageField
+                        label={`Option ${opt.label} image (optional)`}
+                        value={opt.imageUrl ?? ""}
+                        onChange={(next) => updateOptionImage(opt.label, next)}
+                        placeholder="/uploads/questions/..."
+                        compact
+                      />
+                    </div>
+                  </div>
+                ))}
+                <p className="text-xs text-gray-400">Select the radio button next to the correct answer.</p>
+              </div>
+            </div>
+          ) : (
+            <FormField
+              control={form.control}
+              name="correctAnswer"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Correct Numeric Answer</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="e.g. 3 or 0.5" className="w-40" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
+
+          <FormattedTextField
+            label="Explanation"
+            value={explanation}
+            onChange={(value) => form.setValue("explanation", value, { shouldDirty: true })}
+            rows={3}
+            placeholder="Step-by-step solution..."
+            onInputRef={bindFieldRef("explanation")}
+            toolbarExtra={formulaToolbar({ kind: "explanation", label: "Explanation" })}
+          />
+        </FormSection>
+
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <button
+              type="button"
+              onClick={() => setPreview(!preview)}
+              className="text-sm font-medium text-blue-700 hover:underline"
+            >
+              {preview ? "Hide player view" : "View as player →"}
+            </button>
+            {preview && explanation.trim() ? (
+              <details className="text-sm text-gray-600">
+                <summary className="cursor-pointer select-none text-xs font-medium text-gray-500 hover:text-gray-700">
+                  Show explanation (teacher only)
+                </summary>
+                <div className="mt-2 rounded-md border border-gray-200 bg-gray-50 p-3">
+                  <MathContent content={explanation} className="text-sm text-gray-800" />
+                </div>
+              </details>
+            ) : null}
+          </div>
+          {preview ? (
+            <QuestionPlayerPreview
+              stem={stem}
+              stimulus={stimulus}
+              imageUrl={imageUrl}
+              type={type}
+              options={options}
+            />
+          ) : null}
+        </div>
+
+        {errors.length > 0 ? (
+          <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+            <p className="font-medium">Fix these issues before saving:</p>
+            <ul className="mt-1 list-disc pl-5">
+              {errors.map((error) => (
+                <li key={error}>{error}</li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+
+        <div className="flex items-center gap-3">
+          <Button type="submit" disabled={saving || !canSave}>
+            {saving ? "Saving..." : initial?.id ? "Update Question" : "Create Question"}
+          </Button>
+          <Button type="button" variant="secondary" onClick={() => router.back()}>
+            Cancel
+          </Button>
+        </div>
+
+        <Dialog open={formulaOpen} onOpenChange={setFormulaOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Insert Math Formula</DialogTitle>
+              <DialogDescription>
+                Convert plain math text into LaTeX, review the rendered output, then insert it in{" "}
+                {formulaTarget?.label ?? "the field"}.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">Plain math text</label>
+                <Textarea
+                  value={formulaPlainText}
+                  onChange={(event) => {
+                    const next = event.target.value;
+                    setFormulaPlainText(next);
+                    setFormulaLatex(convertPlainTextToLatex(next));
+                  }}
+                  rows={6}
+                  placeholder="Examples: x^2 + 3x = 10, sqrt(x+1), 1/2, theta >= 30"
+                />
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {["x^2 + 3x = 10", "sqrt(x+1)", "1/2", "theta >= 30", "y = mx + b"].map((example) => (
+                    <button
+                      key={example}
+                      type="button"
+                      onClick={() => {
+                        setFormulaPlainText(example);
+                        setFormulaLatex(convertPlainTextToLatex(example));
+                      }}
+                      className="rounded border border-gray-200 px-2 py-1 text-xs text-gray-600 hover:bg-gray-50"
+                    >
+                      {example}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">LaTeX</label>
+                <Textarea
+                  value={formulaLatex}
+                  onChange={(event) => setFormulaLatex(event.target.value)}
+                  rows={6}
+                  placeholder="LaTeX output..."
+                  className="font-mono text-sm"
+                />
+                <label className="mt-3 flex items-center gap-2 text-sm text-gray-700">
+                  <input
+                    type="checkbox"
+                    checked={formulaDisplayMode}
+                    onChange={(event) => setFormulaDisplayMode(event.target.checked)}
+                    className="rounded border-gray-300"
+                  />
+                  Display formula on its own line
+                </label>
+              </div>
+            </div>
+
+            <div className="rounded-md border border-gray-200 bg-gray-50 p-3">
+              <p className="mb-2 text-xs font-medium uppercase text-gray-400">Rendered preview</p>
+              {formulaLatex.trim() ? (
+                <MathContent content={wrapFormula(formulaLatex, formulaDisplayMode)} className="text-sm text-gray-900" />
+              ) : (
+                <p className="text-sm text-gray-400">Enter plain math text or LaTeX to preview it.</p>
+              )}
+            </div>
+
+            <DialogFooter>
+              <Button type="button" variant="secondary" onClick={() => setFormulaOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="button" onClick={insertFormula} disabled={!formulaLatex.trim()}>
+                <Sigma size={14} />
+                Insert Formula
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </form>
+    </Form>
   );
 }

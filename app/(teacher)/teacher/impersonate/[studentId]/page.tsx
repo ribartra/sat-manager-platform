@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import { studentAccessWhereFor } from "@/lib/program-scope";
@@ -70,7 +71,7 @@ export default async function ImpersonateStudentPage({ params }: PageProps) {
           </Link>
         </div>
       </div>
-      <div className="mx-auto max-w-4xl px-4 py-8">
+      <PageShell>
         <div className="mb-6">
           <h1 className="text-2xl font-semibold text-gray-900">Hello, {student.name.split(" ")[0]}!</h1>
           <p className="mt-0.5 text-sm text-gray-500">Read-only student dashboard</p>
@@ -139,7 +140,7 @@ export default async function ImpersonateStudentPage({ params }: PageProps) {
             {recentAttempts.length === 0 && <Card padding="lg" className="text-center text-sm text-gray-400">No submitted attempts.</Card>}
           </div>
         </section>
-      </div>
+      </PageShell>
     </div>
   );
 }

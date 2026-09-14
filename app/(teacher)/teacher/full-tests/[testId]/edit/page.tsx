@@ -1,18 +1,11 @@
+import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { FullTestEditor } from "../../new/full-test-editor-client";
+import { findQuestionsWithOptionMediaAndSection } from "@/lib/question-list-media-query";
 
 interface PageProps {
   params: Promise<{ testId: string }>;
-}
-
-function plainMathLabel(content: string, maxLength: number) {
-  const label = content
-    .replace(/\$\$([\s\S]+?)\$\$/g, "$1")
-    .replace(/\\\[([\s\S]+?)\\\]/g, "$1")
-    .replace(/\$([^$\n]+?)\$/g, "$1")
-    .replace(/\\\(([\s\S]+?)\\\)/g, "$1");
-  return label.length > maxLength ? `${label.slice(0, maxLength)}...` : label;
 }
 
 export default async function EditFullTestPage({ params }: PageProps) {
@@ -22,19 +15,12 @@ export default async function EditFullTestPage({ params }: PageProps) {
       where: { id: testId },
       include: { modules: { include: { questions: { orderBy: { order: "asc" } } }, orderBy: { order: "asc" } } },
     }),
-    prisma.question.findMany({
-      where: { status: { in: ["PUBLISHED", "DRAFT"] } },
-      include: {
-        topic: { include: { domain: { include: { section: true } } } },
-        options: { select: { imageUrl: true }, where: { imageUrl: { not: null } } },
-      },
-      orderBy: { createdAt: "desc" },
-    }),
+    findQuestionsWithOptionMediaAndSection({ status: { in: ["PUBLISHED", "DRAFT"] } }),
   ]);
   if (!test) notFound();
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8">
+    <PageShell>
       <h1 className="mb-6 text-xl font-semibold text-gray-900">Edit Exam</h1>
       <FullTestEditor
         initial={{
@@ -45,18 +31,8 @@ export default async function EditFullTestPage({ params }: PageProps) {
           breakMinutes: test.breakMinutes,
           moduleQuestionIds: test.modules.map((module) => module.questions.map((item) => item.questionId)),
         }}
-        questions={questions.map((q) => ({
-          id: q.id,
-          label: `${q.topic.domain.section.name === "MATH" ? "MATH" : "RW"} · ${q.difficulty} · ${plainMathLabel(q.stem, 100)}`,
-          stem: q.stem,
-          difficulty: q.difficulty,
-          type: q.type,
-          section: q.topic.domain.section.name === "MATH" ? "MATH" : "RW",
-          imageUrl: q.imageUrl,
-          stimulus: q.stimulus,
-          optionImageUrls: q.options.map((o) => o.imageUrl).filter((u): u is string => Boolean(u)),
-        }))}
+        questions={questions}
       />
-    </div>
+    </PageShell>
   );
 }
