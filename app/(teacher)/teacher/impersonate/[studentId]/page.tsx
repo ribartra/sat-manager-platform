@@ -8,6 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardBody } from "@/components/ui/card";
 import { formatDate, scorePercent } from "@/lib/utils";
 import { BookOpen, CheckCircle, Clock, TrendingUp } from "lucide-react";
+import { withSqliteRetry } from "@/lib/sqlite-retry";
+
+export const dynamic = "force-dynamic";
 
 interface PageProps {
   params: Promise<{ studentId: string }>;
@@ -18,35 +21,69 @@ export default async function ImpersonateStudentPage({ params }: PageProps) {
   if (!session) notFound();
 
   const { studentId } = await params;
-  const student = await prisma.user.findFirst({
-    where: { id: studentId, ...studentAccessWhereFor(session.user) },
-  });
-  if (!student) notFound();
+  const student = await withSqliteRetry(() => prisma.user.findUnique({
+    where: { id: studentId },
+    select: { id: true, name: true, role: true, active: true, validationStatus: true },
+  }));
+  if (!student || student.role !== "STUDENT") notFound();
 
-  await prisma.auditLog.create({
-    data: {
-      userId: session.user.id,
-      action: "IMPERSONATE_STUDENT_VIEW",
-      targetType: "User",
-      targetId: student.id,
-      metadata: JSON.stringify({ studentEmail: student.email }),
-    },
-  });
+  const inTeacherScope =
+    session.user.role === "ADMIN" ||
+    Boolean(
+      await withSqliteRetry(() => prisma.user.findFirst({
+        where: { id: studentId, ...studentAccessWhereFor(session.user) },
+        select: { id: true },
+      })),
+    );
+
+  if (!inTeacherScope) {
+    return (
+      <PageShell width="narrow">
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-6 text-center">
+          <h1 className="text-lg font-semibold text-amber-900">Student view is not available</h1>
+          <p className="mt-2 text-sm text-amber-800">
+            This student is not currently assigned to one of your active programs.
+          </p>
+          <Link href="/teacher/students" className="mt-5 inline-flex text-sm font-medium text-amber-900 underline">
+            Back to Students
+          </Link>
+        </div>
+      </PageShell>
+    );
+  }
+
+  try {
+    await withSqliteRetry(() => prisma.auditLog.create({
+      data: {
+        userId: session.user.id,
+        action: "IMPERSONATE_STUDENT_VIEW",
+        targetType: "User",
+        targetId: student.id,
+        metadata: JSON.stringify({}),
+      },
+    }));
+  } catch (error) {
+    console.warn("[student-view] audit write failed", {
+      studentId,
+      teacherId: session.user.id,
+      error: error instanceof Error ? error.message : "unknown_error",
+    });
+  }
 
   const [assignments, recentAttempts, stats] = await Promise.all([
-    prisma.assignment.findMany({
+    withSqliteRetry(() => prisma.assignment.findMany({
       where: { studentId, locked: false, status: { in: ["PENDING", "IN_PROGRESS"] } },
       include: { practiceSet: { include: { topic: { include: { domain: { include: { section: true } } } } } } },
       orderBy: [{ dueDate: "asc" }, { createdAt: "desc" }],
       take: 10,
-    }),
-    prisma.attempt.findMany({
+    })),
+    withSqliteRetry(() => prisma.attempt.findMany({
       where: { studentId, status: "SUBMITTED" },
       include: { answers: true, assignment: { include: { practiceSet: { include: { topic: true } } } } },
       orderBy: { submittedAt: "desc" },
       take: 5,
-    }),
-    prisma.attempt.aggregate({ where: { studentId, status: "SUBMITTED" }, _count: { id: true } }),
+    })),
+    withSqliteRetry(() => prisma.attempt.aggregate({ where: { studentId, status: "SUBMITTED" }, _count: { id: true } })),
   ]);
 
   const avgScore =

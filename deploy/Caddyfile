@@ -8,5 +8,9 @@
 		max_size 256MB
 	}
 
-	reverse_proxy web:3000
+	reverse_proxy web:3000 {
+		# Keep transient container restarts from surfacing as a 502 to the browser.
+		lb_try_duration 10s
+		lb_try_interval 250ms
+	}
 }
