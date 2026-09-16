@@ -4,6 +4,11 @@ const nextConfig: NextConfig = {
   experimental: {
     proxyClientMaxBodySize: "256mb",
   },
+  // Docker image builds can SIGSEGV during Next's embedded tsc under memory pressure.
+  // CI/local `npm run typecheck` remains the source of truth.
+  typescript: {
+    ignoreBuildErrors: process.env.DOCKER_BUILD === "1",
+  },
   async headers() {
     const csp = [
       "default-src 'self'",

@@ -9,6 +9,7 @@ WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 # Cap heap so Next/tsc do not SIGSEGV under constrained Docker builders.
 ENV NODE_OPTIONS=--max-old-space-size=6144
+ENV DOCKER_BUILD=1
 
 # NEXT_PUBLIC_* are inlined at build time, so they must be present here.
 ARG NEXT_PUBLIC_CALCULATOR_PROVIDER=desmos_sat
