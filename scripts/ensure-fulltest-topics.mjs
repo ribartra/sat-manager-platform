@@ -37,7 +37,7 @@ const topics = [
 ];
 
 const upsertDomain = db.prepare(
-  "INSERT INTO Domain (id, name, sectionId) VALUES (?, ?, ?) ON CONFLICT(id) DO UPDATE SET name=excluded.name, sectionId=excluded.sectionId",
+  "INSERT INTO Domain (id, name, sectionId, practiceArea) VALUES (?, ?, ?, NULL) ON CONFLICT(id) DO UPDATE SET name=excluded.name, sectionId=excluded.sectionId, practiceArea=NULL",
 );
 const upsertTopic = db.prepare(
   "INSERT INTO Topic (id, name, domainId, taxonomyNodeId) VALUES (?, ?, ?, NULL) ON CONFLICT(id) DO UPDATE SET name=excluded.name, domainId=excluded.domainId",

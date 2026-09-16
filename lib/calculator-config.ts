@@ -42,7 +42,7 @@ export function getPublicCalculatorConfig(): CalculatorConfig {
     geogebraUrl: process.env.NEXT_PUBLIC_GEOGEBRA_URL ?? "https://www.geogebra.org/calculator",
     geogebraDeployUrl: process.env.NEXT_PUBLIC_GEOGEBRA_DEPLOY_URL ?? "https://www.geogebra.org/apps/deployggb.js",
     geogebraAppName: process.env.NEXT_PUBLIC_GEOGEBRA_APP_NAME ?? "graphing",
-    enabledInPracticeSets: boolFromEnv(process.env.NEXT_PUBLIC_CALCULATOR_PRACTICE_SETS, true),
-    enabledInFullTests: boolFromEnv(process.env.NEXT_PUBLIC_CALCULATOR_FULL_TESTS, true),
+    enabledInPracticeSets: boolFromEnv(process.env.NEXT_PUBLIC_CALCULATOR_PRACTICE_SETS, false),
+    enabledInFullTests: boolFromEnv(process.env.NEXT_PUBLIC_CALCULATOR_FULL_TESTS, false),
   };
 }

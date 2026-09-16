@@ -13,6 +13,7 @@ import { refreshAssignmentStates } from "@/lib/assignments";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { studentAccessWhereFor } from "@/lib/program-scope";
 import { resolvePracticeSetAttemptScore } from "@/lib/practice-set-scoring";
+import { practiceAreaLabel } from "@/lib/practice-area";
 
 interface PageProps {
   params: Promise<{ studentId: string }>;
@@ -54,7 +55,13 @@ export default async function StudentDetailPage({ params }: PageProps) {
 
   const assignments = await prisma.assignment.findMany({
     where: { studentId, status: { in: ["PENDING", "IN_PROGRESS", "OVERDUE"] } },
-    include: { practiceSet: { include: { topic: true } } },
+    include: { practiceSet: { include: { topic: { include: { domain: true } } } } },
+    orderBy: { createdAt: "desc" },
+  });
+
+  const examAssignments = await prisma.fullPracticeTestAssignment.findMany({
+    where: { studentId, status: { in: ["PENDING", "IN_PROGRESS", "OVERDUE"] } },
+    include: { test: { select: { id: true, name: true } } },
     orderBy: { createdAt: "desc" },
   });
 
@@ -118,6 +125,9 @@ export default async function StudentDetailPage({ params }: PageProps) {
           <h1 className="text-2xl font-semibold text-gray-900">{student.name}</h1>
           <p className="mt-0.5 text-sm text-gray-500">
             {student.email} · {student.phone ?? "—"}
+            {student.startDate && (
+              <> · Start date: {formatDate(student.startDate)}</>
+            )}
             {teacherGroupManagementEnabled && (
               <> · Groups: {student.groups.map((g) => g.group.name).join(", ") || "—"}</>
             )}
@@ -172,7 +182,7 @@ export default async function StudentDetailPage({ params }: PageProps) {
           { label: "Sets completed", value: totalSets },
           { label: "Avg %", value: avgScore !== null ? `${avgScore}%` : "—", className: scoreBandTextClass(avgScore) },
           { label: "Total time", value: totalTime > 0 ? formatTime(totalTime) : "—" },
-          { label: "Pending tasks", value: assignments.length },
+          { label: "Pending tasks", value: assignments.length + examAssignments.length },
         ].map(({ label, value, className }) => (
           <Card key={label} className="h-full">
             <CardBody className="flex h-full min-h-[88px] flex-col justify-center">
@@ -300,25 +310,44 @@ export default async function StudentDetailPage({ params }: PageProps) {
           </div>
 
           {/* Active assignments */}
-          {assignments.length > 0 && (
-            <div className="mt-5">
-              <h2 className="text-sm font-semibold text-gray-900 mb-2">Active Assignments</h2>
-              <div className="space-y-2">
-                {assignments.map((a) => (
-                  <Card key={a.id} padding="sm">
-                    <p className="text-xs font-medium text-gray-800">{a.practiceSet.name}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Badge variant={a.status === "IN_PROGRESS" ? "warning" : "info"}>
-                        {a.status}
-                      </Badge>
-                      {a.locked && <Badge variant="danger">Locked</Badge>}
-                      {a.dueDate && (
-                        <span className="text-xs text-gray-400">Due {formatDate(a.dueDate)}</span>
-                      )}
-                    </div>
-                  </Card>
-                ))}
-              </div>
+          {(assignments.length > 0 || examAssignments.length > 0) && (
+            <div className="mt-5 space-y-4">
+              {assignments.length > 0 && (
+                <div>
+                  <h2 className="mb-2 text-sm font-semibold text-gray-900">Active Practice Sets</h2>
+                  <div className="space-y-2">
+                    {assignments.map((a) => (
+                      <Card key={a.id} padding="sm">
+                        <p className="text-xs font-medium text-gray-800">{a.practiceSet.name}</p>
+                        <p className="mt-0.5 text-[11px] text-gray-400">
+                          {practiceAreaLabel(a.practiceSet.topic.domain.practiceArea)} · {a.practiceSet.topic.name}
+                        </p>
+                        <div className="mt-1 flex items-center gap-2">
+                          <Badge variant={a.status === "IN_PROGRESS" ? "warning" : "info"}>{a.status}</Badge>
+                          {a.locked && <Badge variant="danger">Locked</Badge>}
+                          {a.dueDate && <span className="text-xs text-gray-400">Due {formatDate(a.dueDate)}</span>}
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {examAssignments.length > 0 && (
+                <div>
+                  <h2 className="mb-2 text-sm font-semibold text-[var(--sat-area-mocks)]">Active Full Practice Tests</h2>
+                  <div className="space-y-2">
+                    {examAssignments.map((a) => (
+                      <Card key={a.id} padding="sm">
+                        <p className="text-xs font-medium text-gray-800">{a.test.name}</p>
+                        <div className="mt-1 flex items-center gap-2">
+                          <Badge variant={a.status === "IN_PROGRESS" ? "warning" : "info"}>{a.status}</Badge>
+                          {a.dueDate && <span className="text-xs text-gray-400">Due {formatDate(a.dueDate)}</span>}
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

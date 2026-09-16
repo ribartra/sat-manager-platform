@@ -2,13 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { validateScoreConversions } from "@/lib/full-test-scoring";
+import { getFeatureSetting } from "@/lib/app-settings";
 
 export async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
   if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { rows, dryRun } = await req.json();
-  const validation = validateScoreConversions(rows ?? []);
+  const excludePretest = await getFeatureSetting("FPT_PRETEST_EXCLUSION");
+  const validation = validateScoreConversions(rows ?? [], { excludePretest });
   if (dryRun) {
     return NextResponse.json({
       valid: validation.errors.length === 0,

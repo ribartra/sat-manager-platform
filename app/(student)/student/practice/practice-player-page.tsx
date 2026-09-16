@@ -8,6 +8,7 @@ import {
   stringifySnapshot,
 } from "@/lib/attempt-snapshots";
 import { getPublicCalculatorConfig } from "@/lib/calculator-config";
+import { getFeatureSetting } from "@/lib/app-settings";
 import { extractQuestionGraphArtifacts } from "@/lib/question-graph";
 import { writeAudit } from "@/lib/audit";
 import { withSqliteRetry } from "@/lib/sqlite-retry";
@@ -15,9 +16,18 @@ import { withSqliteRetry } from "@/lib/sqlite-retry";
 interface PracticePlayerInput {
   setId: string;
   assignmentId?: string;
+  feedbackMode?: "IMMEDIATE" | "AFTER_SET";
+  previewMode?: boolean;
+  exitHref?: string;
 }
 
-export async function renderPracticePlayer({ setId, assignmentId }: PracticePlayerInput) {
+export async function renderPracticePlayer({
+  setId,
+  assignmentId,
+  feedbackMode = "AFTER_SET",
+  previewMode = false,
+  exitHref,
+}: PracticePlayerInput) {
   const session = await auth();
   if (!session) redirect("/login");
   const userId = session.user.id;
@@ -40,14 +50,61 @@ export async function renderPracticePlayer({ setId, assignmentId }: PracticePlay
     },
   }));
 
-  if (!practiceSet || practiceSet.status !== "PUBLISHED") notFound();
+  if (!practiceSet) notFound();
+  // Teacher preview may open drafts; students only get published sets.
+  if (!previewMode && practiceSet.status !== "PUBLISHED") notFound();
 
-  if (session.user.role === "STUDENT") {
+  if (!previewMode && session.user.role === "STUDENT") {
     if (!assignmentId) redirect("/student");
     const assignment = await withSqliteRetry(() => prisma.assignment.findFirst({
       where: { id: assignmentId, studentId: userId, practiceSetId: setId, locked: false },
     }));
     if (!assignment || (assignment.unlockAt && assignment.unlockAt > new Date())) redirect("/student");
+  }
+
+  const questions = practiceSet.questions.map((item) => ({
+    id: item.question.id,
+    stem: item.question.stem,
+    stimulus: item.question.stimulus,
+    imageUrl: item.question.imageUrl,
+    type: item.question.type,
+    difficulty: item.question.difficulty,
+    options: item.question.options,
+    graphArtifacts: item.question.supportsGraph ? extractQuestionGraphArtifacts(item.question) : [],
+    ...(feedbackMode === "IMMEDIATE" || previewMode
+      ? {
+          correctAnswer: item.question.correctAnswer,
+          explanation: item.question.explanation,
+        }
+      : {}),
+  }));
+
+  const calculatorEnabled =
+    practiceSet.topic.domain.section.name === "MATH" &&
+    (await getFeatureSetting("CALCULATOR_PRACTICE_SETS"));
+
+  if (previewMode) {
+    return (
+      <PracticeSetPlayer
+        practiceSetId={setId}
+        assignmentId={null}
+        attemptId="preview"
+        questions={questions}
+        savedAnswers={{}}
+        savedMarked={[]}
+        savedNotes={{}}
+        savedEliminated={{}}
+        savedQuestion={0}
+        savedTime={0}
+        savedTimeSpent={{}}
+        setName={practiceSet.name}
+        showCalculator={calculatorEnabled}
+        calculatorConfig={getPublicCalculatorConfig()}
+        feedbackMode={feedbackMode}
+        previewMode
+        exitHref={exitHref ?? `/teacher/practice-sets/${setId}/edit`}
+      />
+    );
   }
 
   const practiceSetSnapshot = stringifySnapshot(
@@ -175,17 +232,6 @@ export async function renderPracticePlayer({ setId, assignmentId }: PracticePlay
     }
   });
 
-  const questions = practiceSet.questions.map((item) => ({
-    id: item.question.id,
-    stem: item.question.stem,
-    stimulus: item.question.stimulus,
-    imageUrl: item.question.imageUrl,
-    type: item.question.type,
-    difficulty: item.question.difficulty,
-    options: item.question.options,
-    graphArtifacts: item.question.supportsGraph ? extractQuestionGraphArtifacts(item.question) : [],
-  }));
-
   return (
     <PracticeSetPlayer
       practiceSetId={setId}
@@ -200,8 +246,9 @@ export async function renderPracticePlayer({ setId, assignmentId }: PracticePlay
       savedTime={attempt.totalTime ?? 0}
       savedTimeSpent={savedTimeSpent}
       setName={practiceSet.name}
-      showCalculator={practiceSet.topic.domain.section.name === "MATH"}
+      showCalculator={calculatorEnabled}
       calculatorConfig={getPublicCalculatorConfig()}
+      feedbackMode={feedbackMode}
     />
   );
 }

@@ -5,7 +5,7 @@ import { scorePercent } from "@/lib/utils";
 import { parseSnapshot, PracticeSetSnapshot, QuestionSnapshot } from "@/lib/attempt-snapshots";
 import { teacherProgramEnrollmentScope } from "@/lib/program-scope";
 import { narrativeForAccuracy } from "@/lib/progress-analytics";
-import { READING_DOMAINS, WRITING_DOMAINS } from "@/lib/parent-access";
+import { practiceAreaFromReportArea } from "@/lib/practice-area";
 
 interface RouteContext {
   params: Promise<{ studentId: string }>;
@@ -21,7 +21,7 @@ type PdfItem = PdfLine | PdfChart;
 type ReportArea = "mathematics" | "reading" | "writing";
 
 const AREA_CONFIG: Record<ReportArea, { label: string }> = {
-  mathematics: { label: "Mathematics" },
+  mathematics: { label: "Math" },
   reading: { label: "Reading" },
   writing: { label: "Writing" },
 };
@@ -152,26 +152,10 @@ function parseReportAreas(value: string | null, legacyArea: string) {
 }
 
 function areaPracticeSetWhere(area: ReportArea) {
-  if (area === "mathematics") {
-    return {
-      topic: {
-        domain: {
-          section: {
-            OR: [
-              { name: { contains: "MATH" } },
-              { label: { contains: "Math" } },
-            ],
-          },
-        },
-      },
-    };
-  }
-
-  const domainNames = area === "reading" ? [...READING_DOMAINS] : [...WRITING_DOMAINS];
   return {
     topic: {
       domain: {
-        name: { in: domainNames },
+        practiceArea: practiceAreaFromReportArea(area),
       },
     },
   };
@@ -225,17 +209,19 @@ export async function GET(_req: Request, { params }: RouteContext) {
         : scorePercent(correct, attempt.answers.length);
     });
     const avgScore = scores.length ? Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length) : null;
-    const topicStats = new Map<string, { correct: number; total: number }>();
+    const topicStats = new Map<string, { correct: number; total: number; attempts: Set<string> }>();
     const difficultyStats = new Map<string, { correct: number; total: number }>();
     const topicDifficultyStats = new Map<string, { topic: string; difficulty: string; correct: number; total: number }>();
     const mediaUrls = new Set<string>();
 
     for (const attempt of attempts) {
+      const topicsInAttempt = new Set<string>();
       for (const answer of attempt.answers) {
         const snapshot = parseSnapshot<QuestionSnapshot>(answer.questionSnapshot);
         const topic = snapshot?.topic?.name ?? answer.question.topic.name;
         const difficulty = snapshot?.difficulty ?? answer.question.difficulty;
-        const topicStat = topicStats.get(topic) ?? { correct: 0, total: 0 };
+        topicsInAttempt.add(topic);
+        const topicStat = topicStats.get(topic) ?? { correct: 0, total: 0, attempts: new Set<string>() };
         const difficultyStat = difficultyStats.get(difficulty) ?? { correct: 0, total: 0 };
         const topicDifficultyKey = `${topic}:${difficulty}`;
         const topicDifficultyStat = topicDifficultyStats.get(topicDifficultyKey) ?? { topic, difficulty, correct: 0, total: 0 };
@@ -252,6 +238,9 @@ export async function GET(_req: Request, { params }: RouteContext) {
         topicDifficultyStats.set(topicDifficultyKey, topicDifficultyStat);
         const imageUrl = snapshot?.imageUrl ?? answer.question.imageUrl;
         if (imageUrl) mediaUrls.add(imageUrl);
+      }
+      for (const topic of topicsInAttempt) {
+        topicStats.get(topic)?.attempts.add(attempt.id);
       }
     }
 
@@ -280,7 +269,9 @@ export async function GET(_req: Request, { params }: RouteContext) {
     });
     lines.push({ text: "Progress by Skill", size: 13, bold: true, gapBefore: 18 });
     for (const [topic, stat] of topicStats.entries()) {
-      lines.push({ text: `${topic}: ${stat.correct}/${stat.total} (${scorePercent(stat.correct, stat.total)}%)` });
+      lines.push({
+        text: `${topic}: ${stat.correct}/${stat.total} (${scorePercent(stat.correct, stat.total)}%) · ${stat.attempts.size} attempt${stat.attempts.size === 1 ? "" : "s"}`,
+      });
     }
     lines.push({ text: "Progress by Difficulty", size: 13, bold: true, gapBefore: 18 });
     for (const [difficulty, stat] of difficultyStats.entries()) {
@@ -340,8 +331,8 @@ export async function GET(_req: Request, { params }: RouteContext) {
     orderBy: { submittedAt: "desc" },
     take: 20,
   });
-  lines.push({ text: "Exams (Full Practice Tests)", size: 16, bold: true, gapBefore: 28 });
-  lines.push({ text: "Full tests report Mathematics and Reading & Writing separately. Reading and Writing are not inferred from the combined RW score." });
+  lines.push({ text: "Mocks (Full Practice Tests)", size: 16, bold: true, gapBefore: 28 });
+  lines.push({ text: "Mocks report Reading & Writing and Math as SAT sections. They are not mixed with Practice Exercises." });
   if (examAttempts.length === 0) {
     lines.push({ text: "No submitted exams yet." });
   } else {

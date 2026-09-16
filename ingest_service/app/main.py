@@ -1217,8 +1217,10 @@ PRACTICE_SKILL_MAP = {
     "text structure and purpose": "Text Structure and Purpose",
     "words in context": "Words in Context",
     "boundaries": "Boundaries",
-    "structure and form structure and sense": "Form, Structure, and Sense",
-    "structure and grammar": "Form, Structure, and Sense",
+    "structure and form structure and sense": "Grammar and Structure",
+    "structure and grammar": "Grammar and Structure",
+    "form structure and sense": "Grammar and Structure",
+    "grammar and structure": "Grammar and Structure",
     "student notes": "Rhetorical Synthesis",
     "transitions": "Transitions",
 }
@@ -1234,7 +1236,8 @@ READING_SKILL_DOMAIN_MAP = {
 
 WRITING_SKILL_DOMAIN_MAP = {
     "Boundaries": "Standard English Conventions",
-    "Form, Structure, and Sense": "Standard English Conventions",
+    "Grammar and Structure": "Standard English Conventions",
+    "Form, Structure, and Sense": "Standard English Conventions",  # legacy alias
     "Rhetorical Synthesis": "Expression of Ideas",
     "Transitions": "Expression of Ideas",
 }

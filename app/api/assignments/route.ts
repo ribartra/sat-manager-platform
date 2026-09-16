@@ -11,7 +11,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const { studentIds, practiceSetIds, dueDate, unlockAt, locked, sourceGroupId } = await req.json();
+  const { studentIds, practiceSetIds, dueDate, unlockAt, locked, sourceGroupId, feedbackMode } = await req.json();
+  const resolvedFeedbackMode = feedbackMode === "IMMEDIATE" ? "IMMEDIATE" : "AFTER_SET";
   if (sourceGroupId && session.user.role !== "ADMIN") {
     const enabled = await getFeatureSetting("TEACHER_GROUP_MANAGEMENT");
     if (!enabled) return NextResponse.json({ error: "Teacher group assignment is disabled." }, { status: 403 });
@@ -100,6 +101,7 @@ export async function POST(req: NextRequest) {
             dueDate: dueDate ? new Date(dueDate) : null,
             unlockAt: unlockAt ? new Date(unlockAt) : null,
             locked: locked ?? false,
+            feedbackMode: resolvedFeedbackMode,
             status: "PENDING",
           },
         });
@@ -116,7 +118,15 @@ export async function POST(req: NextRequest) {
             action: "ASSIGN_PRACTICE_SET",
             targetType: "Assignment",
             targetId: a.id,
-            metadata: JSON.stringify({ studentId, practiceSetId, dueDate, unlockAt, locked: locked ?? false, sourceGroupId: sourceGroupId ?? null }),
+            metadata: JSON.stringify({
+              studentId,
+              practiceSetId,
+              dueDate,
+              unlockAt,
+              locked: locked ?? false,
+              feedbackMode: resolvedFeedbackMode,
+              sourceGroupId: sourceGroupId ?? null,
+            }),
           },
         });
         results.push(a as never);

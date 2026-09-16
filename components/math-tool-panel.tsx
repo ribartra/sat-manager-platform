@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
 import type { CalculatorConfig, CalculatorProvider } from "@/lib/calculator-config";
 import type { GraphArtifact } from "@/lib/question-graph";
 import { MathContent } from "@/components/math-content";
@@ -26,11 +26,21 @@ interface MathToolPanelProps {
   config: CalculatorConfig;
   context: "practice-set" | "full-test";
   graphArtifacts?: GraphArtifact[];
+  /** Product on/off from Admin Settings (server). */
   enabled?: boolean;
   className?: string;
 }
 
 type DesmosExpression = { id: string; latex: string; sliderBounds?: Record<string, string> };
+
+const EXTERNAL_PROVIDERS = new Set<CalculatorProvider>([
+  "desmos_sat",
+  "desmos_api",
+  "geogebra",
+  "geogebra_api",
+]);
+
+const IFRAME_LOAD_TIMEOUT_MS = 8000;
 
 function scriptAlreadyLoaded(src: string) {
   return Boolean(document.querySelector(`script[src="${src}"]`));
@@ -66,27 +76,60 @@ function geogebraCommand(artifact: GraphArtifact, index: number) {
   return artifact.kind === "point" ? `${name} = ${expression}` : `${name}: ${expression}`;
 }
 
-export function MathToolPanel({ config, context, graphArtifacts = [], enabled = true, className = "" }: MathToolPanelProps) {
-  const allowed =
-    enabled &&
-    config.provider !== "none" &&
-    (context === "practice-set" ? config.enabledInPracticeSets : config.enabledInFullTests);
+function useOnlineStatus() {
+  const [online, setOnline] = useState(true);
+  useEffect(() => {
+    const sync = () => setOnline(typeof navigator !== "undefined" ? navigator.onLine : true);
+    sync();
+    window.addEventListener("online", sync);
+    window.addEventListener("offline", sync);
+    return () => {
+      window.removeEventListener("online", sync);
+      window.removeEventListener("offline", sync);
+    };
+  }, []);
+  return online;
+}
+
+export function MathToolPanel({ config, graphArtifacts = [], enabled = true, className = "" }: MathToolPanelProps) {
+  const online = useOnlineStatus();
+  // Product gate is Admin → `enabled`. Env provider URLs remain in config; ignore legacy env on/off.
+  const allowed = enabled && config.provider !== "none";
   const provider = effectiveProvider(config);
   const artifacts = graphArtifacts;
   const needsQuestionGraphData = provider === "desmos_api" || provider === "geogebra_api" || provider === "local_2d";
+  const externalUnavailable = EXTERNAL_PROVIDERS.has(provider) && !online;
 
   if (!allowed) return null;
+  if (externalUnavailable) return null;
   if (needsQuestionGraphData && artifacts.length === 0) return null;
 
+  let body: ReactNode = null;
+  if (provider === "desmos_api") {
+    body = <DesmosApiPanel key={`desmos-api-${config.desmosApiUrl}`} config={config} artifacts={artifacts} />;
+  } else if (provider === "desmos_sat") {
+    body = <IframePanel key={config.desmosSatUrl} title="Graphing calculator" src={config.desmosSatUrl} />;
+  } else if (provider === "geogebra") {
+    body = <IframePanel key={config.geogebraUrl} title="GeoGebra calculator" src={config.geogebraUrl} />;
+  } else if (provider === "geogebra_api") {
+    body = <GeoGebraApiPanel key={`ggb-${config.geogebraDeployUrl}`} config={config} artifacts={artifacts} />;
+  } else if (provider === "local_2d") {
+    body = <Local2DPanel artifacts={artifacts} />;
+  } else if (provider === "local_3d") {
+    body = <Local3DPanel />;
+  }
+
+  if (!body && artifacts.length === 0) return null;
+
+  // Panels apply their own margin only when visible; failed CDN returns null with no gap.
   return (
-    <div className={className || "mb-4"}>
-      {graphArtifacts.length > 0 && <GraphArtifactList artifacts={graphArtifacts} />}
-      {provider === "desmos_api" && <DesmosApiPanel config={config} artifacts={artifacts} />}
-      {provider === "desmos_sat" && <IframePanel title="Graphing calculator" src={config.desmosSatUrl} />}
-      {provider === "geogebra" && <IframePanel title="GeoGebra calculator" src={config.geogebraUrl} />}
-      {provider === "geogebra_api" && <GeoGebraApiPanel config={config} artifacts={artifacts} />}
-      {provider === "local_2d" && <Local2DPanel artifacts={artifacts} />}
-      {provider === "local_3d" && <Local3DPanel />}
+    <div className={className || undefined}>
+      {artifacts.length > 0 ? (
+        <div className="mb-2">
+          <GraphArtifactList artifacts={artifacts} />
+        </div>
+      ) : null}
+      {body}
     </div>
   );
 }
@@ -108,20 +151,37 @@ function GraphArtifactList({ artifacts }: { artifacts: GraphArtifact[] }) {
 }
 
 function IframePanel({ title, src }: { title: string; src: string }) {
+  const [status, setStatus] = useState<"loading" | "ready" | "failed">("loading");
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setStatus((current) => (current === "loading" ? "failed" : current));
+    }, IFRAME_LOAD_TIMEOUT_MS);
+    return () => window.clearTimeout(timer);
+  }, [src]);
+
+  if (status === "failed") return null;
+
   return (
     <iframe
       title={title}
       src={src}
       sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
       referrerPolicy="no-referrer"
-      className="h-64 w-full rounded border border-gray-200 bg-white"
+      onLoad={() => setStatus("ready")}
+      onError={() => setStatus("failed")}
+      className={
+        status === "ready"
+          ? "mb-4 h-64 w-full rounded border border-gray-200 bg-white"
+          : "pointer-events-none absolute h-0 w-0 opacity-0"
+      }
     />
   );
 }
 
 function DesmosApiPanel({ config, artifacts }: { config: CalculatorConfig; artifacts: GraphArtifact[] }) {
   const hostRef = useRef<HTMLDivElement>(null);
-  const [failed, setFailed] = useState(false);
+  const [status, setStatus] = useState<"loading" | "ready" | "failed">("loading");
   const scriptUrl = `${config.desmosApiUrl}?apiKey=${encodeURIComponent(config.desmosApiKey ?? "")}`;
 
   useEffect(() => {
@@ -130,15 +190,21 @@ function DesmosApiPanel({ config, artifacts }: { config: CalculatorConfig; artif
 
     loadScript(scriptUrl)
       .then(() => {
-        if (cancelled || !hostRef.current || !window.Desmos) return;
+        if (cancelled || !hostRef.current || !window.Desmos) {
+          if (!cancelled) setStatus("failed");
+          return;
+        }
         calculator = new window.Desmos.GraphingCalculator(hostRef.current, {
           expressions: true,
           keypad: true,
           settingsMenu: false,
         });
         calculator.setExpressions?.(desmosExpressions(artifacts));
+        setStatus("ready");
       })
-      .catch(() => setFailed(true));
+      .catch(() => {
+        if (!cancelled) setStatus("failed");
+      });
 
     return () => {
       cancelled = true;
@@ -146,19 +212,31 @@ function DesmosApiPanel({ config, artifacts }: { config: CalculatorConfig; artif
     };
   }, [artifacts, scriptUrl]);
 
-  if (failed) return <Local2DPanel artifacts={artifacts} />;
-  return <div ref={hostRef} className="h-64 w-full rounded border border-gray-200 bg-white" />;
+  if (status === "failed") return null;
+  return (
+    <div
+      ref={hostRef}
+      className={
+        status === "ready"
+          ? "mb-4 h-64 w-full rounded border border-gray-200 bg-white"
+          : "h-0 w-full overflow-hidden"
+      }
+    />
+  );
 }
 
 function GeoGebraApiPanel({ config, artifacts }: { config: CalculatorConfig; artifacts: GraphArtifact[] }) {
   const id = useId().replace(/:/g, "");
-  const [failed, setFailed] = useState(false);
+  const [status, setStatus] = useState<"loading" | "ready" | "failed">("loading");
 
   useEffect(() => {
     let cancelled = false;
     loadScript(config.geogebraDeployUrl)
       .then(() => {
-        if (cancelled || !window.GGBApplet) return;
+        if (cancelled || !window.GGBApplet) {
+          if (!cancelled) setStatus("failed");
+          return;
+        }
         const applet = new window.GGBApplet(
           {
             appName: config.geogebraAppName,
@@ -169,20 +247,37 @@ function GeoGebraApiPanel({ config, artifacts }: { config: CalculatorConfig; art
             showMenuBar: false,
             appletOnLoad(api: { evalCommand?: (command: string) => void }) {
               artifacts.forEach((artifact, index) => api.evalCommand?.(geogebraCommand(artifact, index)));
+              if (!cancelled) setStatus("ready");
             },
           },
           true
         );
         applet.inject(id);
+        window.setTimeout(() => {
+          if (!cancelled) {
+            setStatus((current) => (current === "loading" ? "failed" : current));
+          }
+        }, IFRAME_LOAD_TIMEOUT_MS);
       })
-      .catch(() => setFailed(true));
+      .catch(() => {
+        if (!cancelled) setStatus("failed");
+      });
     return () => {
       cancelled = true;
     };
   }, [artifacts, config.geogebraAppName, config.geogebraDeployUrl, id]);
 
-  if (failed) return <Local2DPanel artifacts={artifacts} />;
-  return <div id={id} className="h-64 w-full overflow-hidden rounded border border-gray-200 bg-white" />;
+  if (status === "failed") return null;
+  return (
+    <div
+      id={id}
+      className={
+        status === "ready"
+          ? "mb-4 h-64 w-full overflow-hidden rounded border border-gray-200 bg-white"
+          : "h-0 w-full overflow-hidden"
+      }
+    />
+  );
 }
 
 function parsePoint(latex: string) {
@@ -262,7 +357,7 @@ function Local2DPanel({ artifacts }: { artifacts: GraphArtifact[] }) {
   }, [artifacts]);
 
   return (
-    <div className="rounded border border-gray-200 bg-white p-3">
+    <div className="mb-4 rounded border border-gray-200 bg-white p-3">
       <canvas ref={canvasRef} width={760} height={210} className="h-52 w-full rounded bg-white" />
     </div>
   );
@@ -283,7 +378,7 @@ function Local3DPanel() {
   }, []);
 
   return (
-    <div className="relative h-64 overflow-hidden rounded border border-gray-200 bg-white [perspective:720px]">
+    <div className="relative mb-4 h-64 overflow-hidden rounded border border-gray-200 bg-white [perspective:720px]">
       <div className="absolute left-1/2 top-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 [transform-style:preserve-3d] [transform:rotateX(62deg)_rotateZ(42deg)]">
         {points.map((point, index) => (
           <span

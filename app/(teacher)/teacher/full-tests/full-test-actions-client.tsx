@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Archive, Copy, Edit, Eye, Send, Trash2, UploadCloud } from "lucide-react";
+import { Archive, Copy, Edit, Eye, Play, Send, Trash2, UploadCloud } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type FullTestActionsProps = {
@@ -70,6 +70,12 @@ export function FullTestActions({
           </Link>
         </Button>
         <Button asChild variant="ghost" size="sm">
+          <Link href={`/teacher/full-tests/${testId}/preview`}>
+            <Play size={14} />
+            Preview
+          </Link>
+        </Button>
+        <Button asChild variant="ghost" size="sm">
           <Link href={`/teacher/full-tests/${testId}/edit`}>
             <Edit size={14} />
             Edit
@@ -92,6 +98,12 @@ export function FullTestActions({
 
   return (
     <div className="flex flex-wrap items-center justify-end gap-2">
+      <Button asChild variant="secondary" size="sm">
+        <Link href={`/teacher/full-tests/${testId}/preview`}>
+          <Play size={14} />
+          Preview
+        </Link>
+      </Button>
       <Button asChild variant="secondary" size="sm">
         <Link href={`/teacher/full-tests/${testId}/edit`}>
           <Edit size={14} />

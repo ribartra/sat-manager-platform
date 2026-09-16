@@ -231,13 +231,12 @@ export function FullTestEditor({
         <Card padding="sm" className="text-xs text-gray-600">
           <p className="font-medium text-gray-800">SAT policy (fixed)</p>
           <p className="mt-1">
-            4 groups: RW M1/M2 (32 min) + Math M1/M2 (35 min). The first 2 questions of each module are pretest
-            (they do not score; students cannot tell which). Score conversion at{" "}
+            4 groups: RW M1/M2 (32 min) + Math M1/M2 (35 min). Pretest exclusion follows Admin Settings
+            (raw caps RW 0–54 / Math 0–44 when all count; 0–50 / 0–40 when pretest is excluded). Score conversion at{" "}
             <Link className="text-blue-600 hover:underline" href="/teacher/full-tests/scoring">
               /teacher/full-tests/scoring
             </Link>
-            {" "}
-            (operative raw RW 0–50 · Math 0–40).
+            .
           </p>
         </Card>
 
@@ -260,7 +259,7 @@ export function FullTestEditor({
                 <div>
                   <h2 className="text-sm font-semibold text-gray-900">{module.name}</h2>
                   <p className="text-xs text-gray-500">
-                    Skill {moduleKey} · {moduleKey === "M1" ? "EASY" : "HARD"} · pretest Q1–Q2 ·{" "}
+                    Skill {moduleKey} · {moduleKey === "M1" ? "EASY" : "HARD"} ·{" "}
                     {Math.round(module.timeLimit / 60)} min
                   </p>
                 </div>

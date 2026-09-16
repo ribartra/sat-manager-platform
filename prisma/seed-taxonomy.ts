@@ -17,17 +17,49 @@ export async function seedTaxonomy(prisma: PrismaClient): Promise<void> {
   });
 
   const mathDomains = await Promise.all([
-    prisma.domain.upsert({ where: { id: "dom-algebra" }, update: {}, create: { id: "dom-algebra", name: "Algebra", sectionId: mathSection.id } }),
-    prisma.domain.upsert({ where: { id: "dom-advmath" }, update: {}, create: { id: "dom-advmath", name: "Advanced Math", sectionId: mathSection.id } }),
-    prisma.domain.upsert({ where: { id: "dom-psda" }, update: {}, create: { id: "dom-psda", name: "Problem Solving and Data Analysis", sectionId: mathSection.id } }),
-    prisma.domain.upsert({ where: { id: "dom-geotrig" }, update: {}, create: { id: "dom-geotrig", name: "Geometry and Trigonometry", sectionId: mathSection.id } }),
+    prisma.domain.upsert({
+      where: { id: "dom-algebra" },
+      update: { name: "Algebra", practiceArea: "MATH", sectionId: mathSection.id },
+      create: { id: "dom-algebra", name: "Algebra", sectionId: mathSection.id, practiceArea: "MATH" },
+    }),
+    prisma.domain.upsert({
+      where: { id: "dom-advmath" },
+      update: { name: "Advanced Math", practiceArea: "MATH", sectionId: mathSection.id },
+      create: { id: "dom-advmath", name: "Advanced Math", sectionId: mathSection.id, practiceArea: "MATH" },
+    }),
+    prisma.domain.upsert({
+      where: { id: "dom-psda" },
+      update: { name: "Problem Solving and Data Analysis", practiceArea: "MATH", sectionId: mathSection.id },
+      create: { id: "dom-psda", name: "Problem Solving and Data Analysis", sectionId: mathSection.id, practiceArea: "MATH" },
+    }),
+    prisma.domain.upsert({
+      where: { id: "dom-geotrig" },
+      update: { name: "Geometry and Trigonometry", practiceArea: "MATH", sectionId: mathSection.id },
+      create: { id: "dom-geotrig", name: "Geometry and Trigonometry", sectionId: mathSection.id, practiceArea: "MATH" },
+    }),
   ]);
 
   const rwDomains = await Promise.all([
-    prisma.domain.upsert({ where: { id: "dom-info" }, update: {}, create: { id: "dom-info", name: "Information and Ideas", sectionId: rwSection.id } }),
-    prisma.domain.upsert({ where: { id: "dom-craft" }, update: {}, create: { id: "dom-craft", name: "Craft and Structure", sectionId: rwSection.id } }),
-    prisma.domain.upsert({ where: { id: "dom-expr" }, update: {}, create: { id: "dom-expr", name: "Expression of Ideas", sectionId: rwSection.id } }),
-    prisma.domain.upsert({ where: { id: "dom-sec" }, update: {}, create: { id: "dom-sec", name: "Standard English Conventions", sectionId: rwSection.id } }),
+    prisma.domain.upsert({
+      where: { id: "dom-info" },
+      update: { name: "Information and Ideas", practiceArea: "READING", sectionId: rwSection.id },
+      create: { id: "dom-info", name: "Information and Ideas", sectionId: rwSection.id, practiceArea: "READING" },
+    }),
+    prisma.domain.upsert({
+      where: { id: "dom-craft" },
+      update: { name: "Craft and Structure", practiceArea: "READING", sectionId: rwSection.id },
+      create: { id: "dom-craft", name: "Craft and Structure", sectionId: rwSection.id, practiceArea: "READING" },
+    }),
+    prisma.domain.upsert({
+      where: { id: "dom-expr" },
+      update: { name: "Expression of Ideas", practiceArea: "WRITING", sectionId: rwSection.id },
+      create: { id: "dom-expr", name: "Expression of Ideas", sectionId: rwSection.id, practiceArea: "WRITING" },
+    }),
+    prisma.domain.upsert({
+      where: { id: "dom-sec" },
+      update: { name: "Standard English Conventions", practiceArea: "WRITING", sectionId: rwSection.id },
+      create: { id: "dom-sec", name: "Standard English Conventions", sectionId: rwSection.id, practiceArea: "WRITING" },
+    }),
   ]);
 
   const topicDefs: Record<string, { id: string; name: string }[]> = {
@@ -91,7 +123,7 @@ export async function seedTaxonomy(prisma: PrismaClient): Promise<void> {
     ],
     "dom-sec": [
       { id: "top-bound", name: "Boundaries" },
-      { id: "top-fss", name: "Form, Structure, and Sense" },
+      { id: "top-fss", name: "Grammar and Structure" },
     ],
   };
   const subskillDefs: Record<string, { id: string; name: string }[]> = {
@@ -105,7 +137,11 @@ export async function seedTaxonomy(prisma: PrismaClient): Promise<void> {
     const defs = topicDefs[domain.id] ?? [];
     await Promise.all(
       defs.map((t) =>
-        prisma.topic.upsert({ where: { id: t.id }, update: {}, create: { id: t.id, name: t.name, domainId: domain.id } })
+        prisma.topic.upsert({
+          where: { id: t.id },
+          update: { name: t.name, domainId: domain.id },
+          create: { id: t.id, name: t.name, domainId: domain.id },
+        })
       )
     );
   }
@@ -182,7 +218,7 @@ export async function seedTaxonomy(prisma: PrismaClient): Promise<void> {
 // (no synthetic questions), required for FPT scoring. Shared by both seeds.
 export async function seedScoreConversions(prisma: PrismaClient): Promise<void> {
   for (const section of ["RW", "MATH"] as const) {
-    const maxRaw = section === "RW" ? 50 : 40;
+    const maxRaw = section === "RW" ? 54 : 44;
     for (let rawCorrect = 0; rawCorrect <= maxRaw; rawCorrect += 1) {
       const score = Math.round((200 + (rawCorrect / maxRaw) * 600) / 10) * 10;
       await prisma.fullPracticeTestScoreConversion.upsert({

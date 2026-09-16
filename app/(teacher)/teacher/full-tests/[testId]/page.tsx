@@ -53,16 +53,12 @@ export default async function FullTestDetailPage({ params }: PageProps) {
   if (!test) notFound();
 
   const questionCount = test.modules.reduce((sum, module) => sum + module.questions.length, 0);
-  const pretestCount = test.modules.reduce(
-    (sum, module) => sum + module.questions.filter((item) => item.isPretest).length,
-    0,
-  );
 
   return (
     <PageShell width="wide">
       <PageHeader
         title={test.name}
-        description={`4 SAT groups · ${questionCount} questions (${pretestCount} pretest) · ${test.breakMinutes > 0 ? `break ${test.breakMinutes} min` : "no break"} · review ${test.reviewEnabled ? "on" : "off"} · score conversion on /teacher/full-tests/scoring`}
+        description={`4 SAT groups · ${questionCount} questions · ${test.breakMinutes > 0 ? `break ${test.breakMinutes} min` : "no break"} · review ${test.reviewEnabled ? "on" : "off"} · score conversion on /teacher/full-tests/scoring`}
         actions={
           <div className="flex flex-col items-end gap-2">
             <Badge variant={fullTestStatusBadgeVariant(test.status)}>
@@ -82,7 +78,6 @@ export default async function FullTestDetailPage({ params }: PageProps) {
       <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {test.modules.map((module) => {
           const moduleKey = moduleKeyFromOrder(module.order);
-          const pretest = module.questions.filter((item) => item.isPretest).length;
           return (
             <Card key={module.id} padding="md">
               <p className="text-sm font-semibold text-gray-900">{module.name}</p>
@@ -90,7 +85,7 @@ export default async function FullTestDetailPage({ params }: PageProps) {
                 {module.section} · skill {moduleKey} · {Math.round(module.timeLimit / 60)} min
               </p>
               <p className="mt-2 text-lg font-semibold text-gray-900">{module.questions.length} Q</p>
-              <p className="text-[11px] text-gray-400">{pretest} pretest (do not score)</p>
+              <p className="text-[11px] text-gray-400">Pretest exclusion follows Admin Settings</p>
             </Card>
           );
         })}

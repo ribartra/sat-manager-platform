@@ -45,6 +45,30 @@ export const FEATURE_SETTINGS = {
     owner: "product",
     expiresAt: null as string | null,
   },
+  FPT_PRETEST_EXCLUSION: {
+    label: "Exclude Full Practice Test pretest questions from score",
+    description:
+      "When on, questions marked as pretest (typically the first 2 per module) do not count toward R&W/Math raw or scaled scores. When off (default), every question counts.",
+    defaultValue: false,
+    owner: "product",
+    expiresAt: null as string | null,
+  },
+  CALCULATOR_PRACTICE_SETS: {
+    label: "External graphing calculator in Practice Sets",
+    description:
+      "When on, Math Practice players may load the external graphing calculator (Desmos/GeoGebra per env). When off (default), no calculator panel is shown. If the CDN fails or the browser is offline, the panel hides automatically.",
+    defaultValue: false,
+    owner: "product",
+    expiresAt: null as string | null,
+  },
+  CALCULATOR_FULL_TESTS: {
+    label: "External graphing calculator in Full Practice Tests",
+    description:
+      "When on, Math modules in Full Practice Tests may load the external graphing calculator (Desmos/GeoGebra per env). When off (default), no calculator panel is shown. If the CDN fails or the browser is offline, the panel hides automatically.",
+    defaultValue: false,
+    owner: "product",
+    expiresAt: null as string | null,
+  },
 } as const;
 
 export type FeatureSettingKey = keyof typeof FEATURE_SETTINGS;

@@ -2,8 +2,18 @@ import prisma from "@/lib/prisma";
 
 export type SatSection = "RW" | "MATH";
 
-/** Operative (scored) item caps after excluding 2 pretest per module. */
-export const OPERATIVE_RAW_MAX = { RW: 50, MATH: 40 } as const;
+/** Caps when every question counts (FPT_PRETEST_EXCLUSION off — default). */
+export const FULL_RAW_MAX = { RW: 54, MATH: 44 } as const;
+
+/** Caps when pretest items are excluded from score (FPT_PRETEST_EXCLUSION on). */
+export const PRETEST_EXCLUDED_RAW_MAX = { RW: 50, MATH: 40 } as const;
+
+/** @deprecated Prefer FULL_RAW_MAX / PRETEST_EXCLUDED_RAW_MAX; defaults to full (all questions). */
+export const OPERATIVE_RAW_MAX = FULL_RAW_MAX;
+
+export function rawMaxForPretestExclusion(excludePretest: boolean) {
+  return excludePretest ? PRETEST_EXCLUDED_RAW_MAX : FULL_RAW_MAX;
+}
 
 export interface ScoreConversionInput {
   section: string;
@@ -27,11 +37,15 @@ function isSatSection(value: string): value is SatSection {
   return value === "RW" || value === "MATH";
 }
 
-export function validateScoreConversions(inputRows: ScoreConversionInput[]): ValidatedScoreConversions {
+export function validateScoreConversions(
+  inputRows: ScoreConversionInput[],
+  options?: { excludePretest?: boolean },
+): ValidatedScoreConversions {
   const errors: string[] = [];
   const warnings: string[] = [];
   const rows: ScoreConversionRow[] = [];
   const seen = new Set<string>();
+  const rawMax = rawMaxForPretestExclusion(Boolean(options?.excludePretest));
 
   inputRows.forEach((input, index) => {
     const rowNumber = index + 1;
@@ -70,10 +84,10 @@ export function validateScoreConversions(inputRows: ScoreConversionInput[]): Val
     if (sectionRows[0].rawCorrect !== 0) {
       warnings.push(`${section}: no rawCorrect 0 row; low raw scores may be extrapolated.`);
     }
-    const maxExpected = OPERATIVE_RAW_MAX[section];
+    const maxExpected = rawMax[section];
     const maxConfigured = sectionRows[sectionRows.length - 1]?.rawCorrect ?? 0;
     if (maxConfigured < maxExpected) {
-      warnings.push(`${section}: max rawCorrect ${maxConfigured} < operative max ${maxExpected}.`);
+      warnings.push(`${section}: max rawCorrect ${maxConfigured} < expected max ${maxExpected}.`);
     }
     for (let index = 1; index < sectionRows.length; index += 1) {
       if (sectionRows[index].score < sectionRows[index - 1].score) {
@@ -87,8 +101,8 @@ export function validateScoreConversions(inputRows: ScoreConversionInput[]): Val
 }
 
 /**
- * Convert raw correct (operative items only) to a 200–800 section score.
- * `total` should be the operative count (typically 50 RW / 40 Math).
+ * Convert raw correct to a 200–800 section score.
+ * `total` should match the counted items for the active pretest setting.
  */
 export async function scaledScore(section: SatSection, correct: number, total: number) {
   const rows = await prisma.fullPracticeTestScoreConversion.findMany({

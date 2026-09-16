@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Play, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function PracticeSetActions({
@@ -33,6 +33,12 @@ export function PracticeSetActions({
 
   return (
     <div className="flex flex-wrap items-center justify-end gap-2">
+      <Button asChild variant="ghost" size="sm">
+        <Link href={`/teacher/practice-sets/${practiceSetId}/preview`}>
+          <Play size={14} />
+          Preview
+        </Link>
+      </Button>
       <Button asChild variant="ghost" size="sm">
         <Link href={`/teacher/practice-sets/${practiceSetId}/edit`}>
           <Edit size={14} />

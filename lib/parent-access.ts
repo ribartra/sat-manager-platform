@@ -2,17 +2,26 @@
 // Semantics: the link must be first opened before `expiresAt` (activation
 // deadline). The first open records `usedAt`; from then the report stays
 // available for PARENT_ACCESS_WINDOW_DAYS.
+import {
+  READING_DOMAIN_NAMES,
+  WRITING_DOMAIN_NAMES,
+  practiceAreaFromReportArea,
+  resolvePracticeArea,
+  type ReportAreaKey,
+} from "@/lib/practice-area";
+
 export const PARENT_ACCESS_WINDOW_DAYS = 7;
 export const PARENT_ACTIVATION_DEADLINE_DAYS = 7;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-export type ReportArea = "mathematics" | "reading" | "writing";
+export type ReportArea = ReportAreaKey;
 export type PracticeSetArea = ReportArea | "reading_writing";
 const ALL_AREAS: ReportArea[] = ["mathematics", "reading", "writing"];
 
-/** SAT domains used to distinguish the two R&W skill families. */
-export const READING_DOMAINS = ["Information and Ideas", "Craft and Structure"] as const;
-export const WRITING_DOMAINS = ["Expression of Ideas", "Standard English Conventions"] as const;
+/** @deprecated Prefer Domain.practiceArea; kept for ingest/legacy fallbacks. */
+export const READING_DOMAINS = READING_DOMAIN_NAMES;
+/** @deprecated Prefer Domain.practiceArea; kept for ingest/legacy fallbacks. */
+export const WRITING_DOMAINS = WRITING_DOMAIN_NAMES;
 
 export function parseAreas(csv: string | null | undefined): ReportArea[] {
   if (!csv) return [...ALL_AREAS];
@@ -48,19 +57,22 @@ function normalizeTaxonomyName(value: string | null | undefined): string {
     .replace(/\s+/g, " ");
 }
 
-/** Classify a Practice Set without changing the official SAT RW section. */
+/** Classify a Practice Set using persisted practiceArea when available. */
 export function classifyPracticeSetArea(input: {
+  practiceArea?: string | null;
   sectionName?: string | null;
   sectionLabel?: string | null;
   domainName?: string | null;
 }): PracticeSetArea | null {
-  const section = normalizeTaxonomyName(`${input.sectionName ?? ""} ${input.sectionLabel ?? ""}`);
   const domain = normalizeTaxonomyName(input.domainName);
-
-  if (section.includes("math")) return "mathematics";
   if (domain === "full practice test") return "reading_writing";
-  if (READING_DOMAINS.some((name) => domain === normalizeTaxonomyName(name))) return "reading";
-  if (WRITING_DOMAINS.some((name) => domain === normalizeTaxonomyName(name))) return "writing";
+
+  const resolved = resolvePracticeArea(input);
+  if (resolved === "MATH") return "mathematics";
+  if (resolved === "READING") return "reading";
+  if (resolved === "WRITING") return "writing";
+
+  const section = normalizeTaxonomyName(`${input.sectionName ?? ""} ${input.sectionLabel ?? ""}`);
   if (section.includes("reading & writing") || section.includes("reading and writing")) return "reading_writing";
   return null;
 }
@@ -78,7 +90,7 @@ export function practiceSetMatchesArea(
 }
 
 export function practiceSetAreaLabel(classification: PracticeSetArea | null): string | null {
-  if (classification === "mathematics") return "Mathematics";
+  if (classification === "mathematics") return "Math";
   if (classification === "reading") return "Reading";
   if (classification === "writing") return "Writing";
   if (classification === "reading_writing") return "Reading & Writing";
@@ -90,6 +102,11 @@ export function sectionMatchesAreas(sectionLabel: string | null | undefined, are
   const isMath = /math/i.test(sectionLabel ?? "");
   if (isMath) return areas.includes("mathematics");
   return areas.includes("reading") || areas.includes("writing");
+}
+
+/** Prisma-friendly practice area for a report area key. */
+export function persistedPracticeAreaForReport(area: ReportArea) {
+  return practiceAreaFromReportArea(area);
 }
 
 export type AccessWindow = { active: boolean; effectiveExpiresAt: Date };

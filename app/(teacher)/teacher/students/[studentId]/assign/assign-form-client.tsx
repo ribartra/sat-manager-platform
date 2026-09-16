@@ -47,6 +47,7 @@ export function AssignForm({ studentId, practiceSets, groups, groupAssignmentEna
   const [dueDate, setDueDate] = useState("");
   const [unlockAt, setUnlockAt] = useState("");
   const [explVisibility, setExplVisibility] = useState("AFTER_FINISH");
+  const [feedbackMode, setFeedbackMode] = useState<"AFTER_SET" | "IMMEDIATE">("AFTER_SET");
   const [lockOnAssign, setLockOnAssign] = useState(false);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
@@ -88,6 +89,7 @@ export function AssignForm({ studentId, practiceSets, groups, groupAssignmentEna
         dueDate: dueDate || null,
         unlockAt: unlockAt || null,
         locked: lockOnAssign,
+        feedbackMode,
       }),
     });
     setLoading(false);
@@ -198,6 +200,16 @@ export function AssignForm({ studentId, practiceSets, groups, groupAssignmentEna
           <Input type="date" value={unlockAt} onChange={(e) => setUnlockAt(e.target.value)} />
         </div>
         <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Feedback mode</label>
+          <Select value={feedbackMode} onChange={(e) => setFeedbackMode(e.target.value as "AFTER_SET" | "IMMEDIATE")}>
+            <option value="AFTER_SET">After set (default) — no Check until submit</option>
+            <option value="IMMEDIATE">Immediate — Check after each answer</option>
+          </Select>
+          <p className="mt-1 text-xs text-gray-400">
+            Applies to the whole Practice Set for this assignment. Mocks never use Immediate.
+          </p>
+        </div>
+        <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Explanation Visibility</label>
           <Select value={explVisibility} onChange={(e) => setExplVisibility(e.target.value)}>
             {explanationVisibilityOptions().map((opt) => (
@@ -206,6 +218,9 @@ export function AssignForm({ studentId, practiceSets, groups, groupAssignmentEna
               </option>
             ))}
           </Select>
+          <p className="mt-1 text-xs text-gray-400">
+            Set-level content visibility (legacy). Feedback mode above controls the Check button.
+          </p>
         </div>
       </div>
 

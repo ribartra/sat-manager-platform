@@ -23,6 +23,14 @@
   --sat-red-600: #dc2626;
   --sat-green-600: #16a34a;
   --sat-amber-600: #d97706;
+  --sat-orange-600: #ea580c;
+  --sat-mustard-600: #c4a035;
+
+  /* Practice / Mock area colors (Analytics, History, Reports) */
+  --sat-area-math: #0ea5e9; /* sky blue */
+  --sat-area-reading: #c4a035; /* mustard */
+  --sat-area-writing: #16a34a; /* green */
+  --sat-area-mocks: #ea580c; /* orange */
 
   /* Semantic */
   --background: var(--sat-white);

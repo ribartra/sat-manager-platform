@@ -2,22 +2,25 @@
 
 import { useRouter } from "next/navigation";
 import { StudentPicker } from "@/components/student-picker";
+import { buildAreaHref, type AreaTabKey } from "@/lib/practice-area";
 
 export function AnalyticsStudentFilter({
   students,
   selectedStudentId,
+  area = "math",
 }: {
   students: { id: string; name: string }[];
   selectedStudentId: string;
+  area?: AreaTabKey;
 }) {
   const router = useRouter();
 
   function selectStudent(nextId: string) {
     if (!nextId) {
-      router.push("/teacher/analytics");
+      router.push(buildAreaHref("/teacher/analytics", area));
       return;
     }
-    router.push(`/teacher/analytics?studentId=${encodeURIComponent(nextId)}`);
+    router.push(buildAreaHref("/teacher/analytics", area, { studentId: nextId }));
   }
 
   return (

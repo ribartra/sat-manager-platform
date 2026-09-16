@@ -65,6 +65,21 @@ async function main() {
       update: { value: "false" },
       create: { key: "MATERIALS_MODULE", value: "false" },
     }),
+    prisma.appSetting.upsert({
+      where: { key: "FPT_PRETEST_EXCLUSION" },
+      update: { value: "false" },
+      create: { key: "FPT_PRETEST_EXCLUSION", value: "false" },
+    }),
+    prisma.appSetting.upsert({
+      where: { key: "CALCULATOR_PRACTICE_SETS" },
+      update: { value: "false" },
+      create: { key: "CALCULATOR_PRACTICE_SETS", value: "false" },
+    }),
+    prisma.appSetting.upsert({
+      where: { key: "CALCULATOR_FULL_TESTS" },
+      update: { value: "false" },
+      create: { key: "CALCULATOR_FULL_TESTS", value: "false" },
+    }),
   ]);
 
   // ─── TEACHERS ────────────────────────────────────────────────────────────────

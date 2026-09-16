@@ -6,3 +6,4 @@ export { SaveIndicator, type SaveStatus } from "./save-indicator";
 export { DataTable, type DataTableResponsiveStrategy, type DataTableColumnMeta } from "./data-table";
 export { FilterBar } from "./filter-bar";
 export { FormSection } from "./form-section";
+export { PracticeAreaTabs } from "./practice-area-tabs";

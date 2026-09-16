@@ -6,6 +6,7 @@ import { markUserActive } from "@/lib/activity";
 import { scaledScore } from "@/lib/full-test-scoring";
 import { isAnswerCorrect } from "@/lib/answer-grading";
 import { writeAudit } from "@/lib/audit";
+import { getFeatureSetting } from "@/lib/app-settings";
 
 interface RouteContext {
   params: Promise<{ attemptId: string }>;
@@ -22,6 +23,8 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
   });
   if (!attempt) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
+  const excludePretest = await getFeatureSetting("FPT_PRETEST_EXCLUSION");
+
   const modules = await prisma.fullPracticeTestModule.findMany({
     where: { testId: attempt.testId },
     include: { questions: { include: { question: true }, orderBy: { order: "asc" } } },
@@ -36,8 +39,8 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     for (const item of testModule.questions) {
       const answer = (answers?.[item.questionId] ?? "") as string;
       const isCorrect = isAnswerCorrect(answer, item.question.correctAnswer, item.question.type);
-      // Grade every item for review, but only operative (non-pretest) count toward raw/scaled.
-      if (!item.isPretest) {
+      const countsTowardScore = !excludePretest || !item.isPretest;
+      if (countsTowardScore) {
         if (testModule.section === "MATH") {
           mathTotal += 1;
           if (isCorrect) mathCorrect += 1;

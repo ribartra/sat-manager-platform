@@ -46,6 +46,9 @@ export function FullTestPlayer({
   savedExtraTimeUsed,
   savedProgressState,
   calculatorConfig,
+  showCalculator = false,
+  previewMode = false,
+  exitHref = "/teacher/full-tests",
 }: {
   attemptId: string;
   assignmentId: string;
@@ -60,6 +63,10 @@ export function FullTestPlayer({
   savedExtraTimeUsed: number;
   savedProgressState: FullTestProgressState | null;
   calculatorConfig: CalculatorConfig;
+  /** Admin CALCULATOR_FULL_TESTS ∩ Math — passed from server. */
+  showCalculator?: boolean;
+  previewMode?: boolean;
+  exitHref?: string;
 }) {
   const router = useRouter();
   const breakSecondsTotal = Math.max(0, breakMinutes) * 60;
@@ -79,6 +86,7 @@ export function FullTestPlayer({
   const [answers, setAnswers] = useState<Record<string, string>>(savedAnswers);
   const [saving, setSaving] = useState<SaveStatus>("idle");
   const [advancing, setAdvancing] = useState(false);
+  const [confirmSubmitModule, setConfirmSubmitModule] = useState(false);
   const offlineKey = `sat-fpt-autosave:${attemptId}`;
   const currentModule = modules[moduleIndex];
   const question = currentModule?.questions[questionIndex];
@@ -115,6 +123,7 @@ export function FullTestPlayer({
 
   useEffect(() => {
     questionStartTime.current = Date.now();
+    if (previewMode) return;
     void (async () => {
       const response = await fetch(`/api/full-practice-tests/attempts/${attemptId}/resume`, { method: "POST" });
       if (isAuthFailureStatus(response.status)) {
@@ -123,7 +132,7 @@ export function FullTestPlayer({
         });
       }
     })();
-  }, [attemptId]);
+  }, [attemptId, previewMode]);
 
   const recordQuestionTime = useCallback(() => {
     const currentQuestion = modules[moduleIndexRef.current]?.questions[questionIndexRef.current];
@@ -166,6 +175,10 @@ export function FullTestPlayer({
         moduleTimerState,
         timeSpentByQuestion: timeSpentSnapshot,
       };
+      if (previewMode) {
+        setSaving("idle");
+        return;
+      }
       setSaving("saving");
       try {
         const response = await fetch(`/api/full-practice-tests/attempts/${attemptId}/autosave`, {
@@ -188,10 +201,11 @@ export function FullTestPlayer({
         setSaving("offline");
       }
     },
-    [attemptId, buildProgressPayload, expiredEvents, extraTimeUsed, offlineKey, recordQuestionTime],
+    [attemptId, buildProgressPayload, expiredEvents, extraTimeUsed, offlineKey, previewMode, recordQuestionTime],
   );
 
   useEffect(() => {
+    if (previewMode) return;
     const syncOffline = async () => {
       const raw = localStorage.getItem(offlineKey);
       if (!raw) return;
@@ -219,9 +233,14 @@ export function FullTestPlayer({
     window.addEventListener("online", syncOffline);
     void syncOffline();
     return () => window.removeEventListener("online", syncOffline);
-  }, [attemptId, offlineKey]);
+  }, [attemptId, offlineKey, previewMode]);
 
   const submit = useCallback(async () => {
+    if (previewMode) {
+      window.alert("Preview only — exam is not scored or saved.");
+      router.push(exitHref);
+      return;
+    }
     if (phaseRef.current === "MODULE") {
       timerState.current[moduleIndexRef.current] = remainingRef.current;
     }
@@ -243,7 +262,7 @@ export function FullTestPlayer({
       return;
     }
     router.push(`/student/full-tests/results/${attemptId}`);
-  }, [attemptId, expiredEvents, extraTimeUsed, recordQuestionTime, router]);
+  }, [attemptId, exitHref, expiredEvents, extraTimeUsed, previewMode, recordQuestionTime, router]);
 
   const enterModule = useCallback(
     async (nextModule: number) => {
@@ -350,44 +369,55 @@ export function FullTestPlayer({
       void saveProgress(answers, moduleIndex, nextQuestion);
       return;
     }
-    void advanceAfterModule();
+    setConfirmSubmitModule(true);
+  }
+
+  async function confirmFinishModule() {
+    setConfirmSubmitModule(false);
+    await advanceAfterModule();
   }
 
   const timerIsRed = phase === "MODULE" && remaining <= 60;
+  const unansweredInModule = currentModule
+    ? currentModule.questions.filter((q) => !answers[q.id]).length
+    : 0;
+  const isLastQuestionOfModule = Boolean(currentModule) && questionIndex === currentModule.questions.length - 1;
 
   if (phase === "BREAK") {
     return (
       <div className="flex h-screen flex-col items-center justify-center bg-white px-6">
         <p className="text-sm font-semibold text-gray-900">{testName}</p>
-        <h1 className="mt-3 text-2xl font-semibold text-gray-900">Break</h1>
+        <h1 className="mt-3 text-2xl font-semibold text-gray-900">Practice Test Break</h1>
         <p className="mt-2 max-w-md text-center text-sm text-gray-500">
-          {breakMinutes}-minute break between Reading & Writing and Math. This time does not add to
-          section clocks.
+          Optional {breakMinutes}-minute break between Reading & Writing and Math. You can resume immediately.
         </p>
         <p className={`mt-8 text-4xl font-semibold tabular-nums ${breakRemaining <= 60 ? "text-red-600" : "text-gray-900"}`}>
           {formatTime(breakRemaining)}
         </p>
-        <p className="mt-4 text-xs text-muted-foreground">
-          {saving !== "idle" ? (
-            <SaveIndicator status={saving} />
-          ) : (
-            "When the break ends you continue with Math Module 1."
-          )}
-        </p>
-        <Button
-          className="mt-8"
-          variant="secondary"
-          onClick={async () => {
-            await saveProgress(answers, moduleIndex, questionIndex, {
-              phase: "BREAK",
-              breakRemaining,
-            });
-            await fetch(`/api/full-practice-tests/attempts/${attemptId}/pause`, { method: "POST" });
-            router.push("/student/full-tests");
-          }}
-        >
-          Pause & Exit
-        </Button>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <Button
+            onClick={() => {
+              void enterModule(RW_M2_INDEX + 1);
+            }}
+          >
+            Resume Testing
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={async () => {
+              await saveProgress(answers, moduleIndex, questionIndex, {
+                phase: "BREAK",
+                breakRemaining,
+              });
+              if (!previewMode) {
+                await fetch(`/api/full-practice-tests/attempts/${attemptId}/pause`, { method: "POST" });
+              }
+              router.push(previewMode ? exitHref : "/student/full-tests");
+            }}
+          >
+            Pause & Exit
+          </Button>
+        </div>
       </div>
     );
   }
@@ -400,15 +430,23 @@ export function FullTestPlayer({
 
   return (
     <div className="flex h-screen flex-col bg-white">
+      {previewMode && (
+        <div className="flex items-center justify-between border-b border-amber-200 bg-amber-50 px-6 py-2 text-sm text-amber-900">
+          <span className="font-medium">Preview only — not scored. No student attempt is created.</span>
+          <button type="button" className="underline" onClick={() => router.push(exitHref)}>
+            Exit preview
+          </button>
+        </div>
+      )}
       <div className="flex items-center justify-between border-b border-gray-200 px-6 py-3">
         <div>
           <p className="text-sm font-semibold text-gray-900">{testName}</p>
-          <p className="text-xs text-gray-500">
-            {currentModule.name} · <span className="text-base font-bold text-gray-900">Question {questionIndex + 1}</span><span className="text-xs text-gray-500">/{currentModule.questions.length}</span>
+          <p className="text-xs tabular-nums text-gray-500">
+            {currentModule.name} · {questionIndex + 1} of {currentModule.questions.length}
           </p>
         </div>
         <div className="flex items-center gap-4">
-          <SaveIndicator status={saving} />
+          {!previewMode && <SaveIndicator status={saving} />}
           <span className={`tabular-nums ${timerIsRed ? "text-red-600" : "text-gray-900"}`}>
             {formatTime(remaining)}
           </span>
@@ -417,11 +455,13 @@ export function FullTestPlayer({
             size="sm"
             onClick={async () => {
               await saveProgress();
-              await fetch(`/api/full-practice-tests/attempts/${attemptId}/pause`, { method: "POST" });
-              router.push("/student/full-tests");
+              if (!previewMode) {
+                await fetch(`/api/full-practice-tests/attempts/${attemptId}/pause`, { method: "POST" });
+              }
+              router.push(previewMode ? exitHref : "/student/full-tests");
             }}
           >
-            Pause & Exit
+            {previewMode ? "Exit preview" : "Pause & Exit"}
           </Button>
         </div>
       </div>
@@ -440,13 +480,16 @@ export function FullTestPlayer({
             <QuestionMedia imageUrl={question.imageUrl} alt={`Question ${question.id} image`} className="mt-4" />
           </div>
         </div>
-        <div className="overflow-y-auto p-6">
-          <p className="mb-3 text-xs font-medium uppercase tracking-wide text-gray-500">Answer choices</p>
+        <div className="overflow-y-auto p-5 md:p-6">
+          <div className="mb-3 flex items-baseline gap-2">
+            <span className="text-4xl font-bold leading-none tabular-nums text-gray-900">{questionIndex + 1}</span>
+            <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Answer choices</p>
+          </div>
           <MathToolPanel
             config={calculatorConfig}
             context="full-test"
             graphArtifacts={question.graphArtifacts}
-            enabled={currentModule.section === "MATH"}
+            enabled={showCalculator && currentModule.section === "MATH"}
           />
           {question.type === "MC" ? (
             question.options.map((option) => (
@@ -457,12 +500,17 @@ export function FullTestPlayer({
                   setAnswers(nextAnswers);
                   void saveProgress(nextAnswers);
                 }}
-                className={`mb-2 block w-full rounded border px-4 py-3 text-left text-sm ${
-                  answers[question.id] === option.label ? "border-blue-500 bg-blue-50" : "border-gray-200"
+                className={`mb-2 flex min-h-[3.75rem] w-full items-center gap-3 rounded-lg border px-4 py-4 text-left text-base ${
+                  answers[question.id] === option.label ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-gray-300"
                 }`}
               >
-                <strong>{option.label})</strong> <MathContent content={option.text} />
-                <QuestionMedia imageUrl={option.imageUrl} alt={`Option ${option.label} image`} className="mt-2" />
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-gray-300 text-sm font-semibold text-gray-600">
+                  {option.label}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <MathContent content={option.text} className="leading-snug text-gray-800" />
+                  <QuestionMedia imageUrl={option.imageUrl} alt={`Option ${option.label} image`} className="mt-2" />
+                </span>
               </button>
             ))
           ) : (
@@ -480,11 +528,36 @@ export function FullTestPlayer({
       </div>
       <div className="flex justify-end border-t border-gray-200 px-6 py-3">
         <Button onClick={next} disabled={advancing}>
-          {moduleIndex === modules.length - 1 && questionIndex === currentModule.questions.length - 1
-            ? "Submit"
+          {isLastQuestionOfModule
+            ? moduleIndex === modules.length - 1
+              ? "Finish"
+              : "Finish"
             : "Next"}
         </Button>
       </div>
+      {confirmSubmitModule && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
+            <h2 className="text-lg font-semibold text-gray-900">Submit Module?</h2>
+            <p className="mt-2 text-sm text-gray-600">
+              Submit <strong>{currentModule.name}</strong> with {formatTime(remaining)} remaining.
+            </p>
+            {unansweredInModule > 0 && (
+              <p className="mt-2 text-sm text-amber-700">
+                {unansweredInModule} question{unansweredInModule === 1 ? "" : "s"} unanswered in this module.
+              </p>
+            )}
+            <div className="mt-5 flex justify-end gap-2">
+              <Button type="button" variant="secondary" onClick={() => setConfirmSubmitModule(false)}>
+                Go Back
+              </Button>
+              <Button type="button" onClick={() => void confirmFinishModule()} disabled={advancing}>
+                Submit Module
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

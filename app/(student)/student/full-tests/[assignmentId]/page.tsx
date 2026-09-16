@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { FullTestPlayer } from "./player-client";
 import { getFullTestProgressState } from "@/lib/full-test-progress";
 import { getPublicCalculatorConfig } from "@/lib/calculator-config";
+import { getFeatureSetting } from "@/lib/app-settings";
 import { extractQuestionGraphArtifacts } from "@/lib/question-graph";
 import { writeAudit } from "@/lib/audit";
 
@@ -61,6 +62,7 @@ export default async function FullTestPlayerPage({ params }: PageProps) {
     });
   }
   const savedProgressState = await getFullTestProgressState(attempt.id, assignment.test.modules.length);
+  const showCalculator = await getFeatureSetting("CALCULATOR_FULL_TESTS");
 
   return (
     <FullTestPlayer
@@ -91,6 +93,7 @@ export default async function FullTestPlayerPage({ params }: PageProps) {
       savedExtraTimeUsed={attempt.extraTimeUsed}
       savedProgressState={savedProgressState}
       calculatorConfig={getPublicCalculatorConfig()}
+      showCalculator={showCalculator}
     />
   );
 }

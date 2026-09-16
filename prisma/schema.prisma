@@ -121,6 +121,13 @@ model GroupAssignment {
   @@id([groupId, practiceSetId])
 }
 
+/// Practice Exercises area (Math / Reading / Writing). Distinct from mock sections RW|MATH.
+enum PracticeArea {
+  MATH
+  READING
+  WRITING
+}
+
 model Section {
   id      String   @id @default(cuid())
   name    String   @unique
@@ -129,11 +136,15 @@ model Section {
 }
 
 model Domain {
-  id        String  @id @default(cuid())
-  name      String
-  sectionId String
-  section   Section @relation(fields: [sectionId], references: [id])
-  topics    Topic[]
+  id           String        @id @default(cuid())
+  name         String
+  sectionId    String
+  /// Persisted practice classification. Null only for non-academic placeholders (e.g. Full Practice Test).
+  practiceArea PracticeArea?
+  section      Section       @relation(fields: [sectionId], references: [id])
+  topics       Topic[]
+
+  @@index([practiceArea])
 }
 
 model Topic {
@@ -251,6 +262,8 @@ model Assignment {
   unlockAt      DateTime?
   locked        Boolean   @default(false)
   status        String    @default("PENDING")
+  /// Per-assignment practice feedback: IMMEDIATE (Check per question) | AFTER_SET (only after submit).
+  feedbackMode  String    @default("AFTER_SET")
   createdAt     DateTime  @default(now())
 
   practiceSet PracticeSet @relation(fields: [practiceSetId], references: [id])
