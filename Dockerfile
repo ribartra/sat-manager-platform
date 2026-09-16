@@ -7,11 +7,13 @@
 FROM node:24-slim AS build
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
+# Cap heap so Next/tsc do not SIGSEGV under constrained Docker builders.
+ENV NODE_OPTIONS=--max-old-space-size=6144
 
 # NEXT_PUBLIC_* are inlined at build time, so they must be present here.
 ARG NEXT_PUBLIC_CALCULATOR_PROVIDER=desmos_sat
-ARG NEXT_PUBLIC_CALCULATOR_PRACTICE_SETS=true
-ARG NEXT_PUBLIC_CALCULATOR_FULL_TESTS=true
+ARG NEXT_PUBLIC_CALCULATOR_PRACTICE_SETS=false
+ARG NEXT_PUBLIC_CALCULATOR_FULL_TESTS=false
 ARG NEXT_PUBLIC_DESMOS_API_KEY=
 ARG NEXT_PUBLIC_DESMOS_API_URL=https://www.desmos.com/api/v1.12/calculator.js
 ARG NEXT_PUBLIC_DESMOS_SAT_URL=https://www.desmos.com/testing/sat/calculator
