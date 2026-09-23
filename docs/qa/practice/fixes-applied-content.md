@@ -1,0 +1,433 @@
+# Fixes aplicados — recovery-map (2026-09-23T06:06:38.849Z)
+
+Specs: `/tmp/claude-1000/-home-turista-Descargas-Github-sat-manager-platform/d30b86b4-f1c4-46b9-8d72-8b9fea94d0e9/scratchpad/practice-fixes-content`. Backup previo en `backups/devdb-preapply-*`. Dev server detenido. Raw better-sqlite3 + WAL checkpoint.
+
+- **Equivalent Expressions MEDIUM p14** (advanced) stem: `Which of the following is equivalent to the expression above?` → `$$x^{2} + 6x + 4$$ Which of the following is equivalent to the expression above?`
+- **Equivalent Expressions MEDIUM p14** (advanced) opt A: `(x + 3) + 5` → `$(x + 3)^{2} + 5$`
+- **Equivalent Expressions MEDIUM p14** (advanced) opt B: `(x + 3) 2 – 5` → `$(x + 3)^{2} - 5$`
+- **Equivalent Expressions MEDIUM p14** (advanced) opt C: `(x – 3) 2 + 5` → `$(x - 3)^{2} + 5$`
+- **Equivalent Expressions MEDIUM p14** (advanced) opt D: `(x – 3) 2 – 5` → `$(x - 3)^{2} - 5$`
+- **Equivalent Expressions MEDIUM p22** (advanced) stem: `~~২~~ √ *x* ³ *y* ⁵ Which of the following expressions is equivalent to the expr` → `$$\sqrt[3]{x^{3}y^{6}}$$ Which of the following expressions is equivalent to the`
+- **Equivalent Expressions MEDIUM p22** (advanced) opt A: `*y* ²` → `$y^{2}$`
+- **Equivalent Expressions MEDIUM p22** (advanced) opt B: `*xy* ²` → `$xy^{2}$`
+- **Equivalent Expressions MEDIUM p22** (advanced) opt C: `*y* ³` → `$y^{3}$`
+- **Equivalent Expressions MEDIUM p22** (advanced) opt D: `*xy* ³` → `$xy^{3}$`
+- **Nonlinear Equations EASY p5** (advanced) stem: `What is one possible solution to the given equation?` → `$$|x - 2| = 9$$ What is one possible solution to the given equation?`
+- **Nonlinear Equations EASY p8** (advanced) stem: `If is a solution to the system of equations above, which of the following is a p` → `$$x + y = 12$$ $$y = x^{2}$$ If $(x, y)$ is a solution to the system of equation`
+- **Nonlinear Equations EASY p14** (advanced) stem: `How many distinct real solutions are there to the given equation?` → `$$3x^{2} - 15x + 18 = 0$$ How many distinct real solutions are there to the give`
+- **Nonlinear Equations EASY p7** (advanced) image STEM <= file `neq-easy-p7-graph.png` → `/uploads/questions/95ca162df3b202db7049d2b1.png` (was `null`)
+- **Nonlinear Equations EASY p12** (advanced) image STEM <= file `neq-easy-p12-graph.png` → `/uploads/questions/95acb04330e053cf394a51b5.png` (was `null`)
+- **Nonlinear Equations MEDIUM p1** (advanced) stem: `In the equation above, a and c are positive constants. How many times does the g` → `$$y = ax^{2} - c$$ In the equation above, a and c are positive constants. How ma`
+- **Nonlinear Equations MEDIUM p3** (advanced) stem: `When the equations above are graphed in the xy-plane, what are the coordinates (` → `$$y = x^{2} - 1$$ $$y = 3$$ When the equations above are graphed in the xy-plane`
+- **Nonlinear Equations MEDIUM p3** (advanced) opt A: `and` → `$(2, 3)$ and $(-2, 3)$`
+- **Nonlinear Equations MEDIUM p3** (advanced) opt B: `and` → `$(2, 4)$ and $(-2, 4)$`
+- **Nonlinear Equations MEDIUM p3** (advanced) opt C: `and` → `$(3, 8)$ and $(-3, 8)$`
+- **Nonlinear Equations MEDIUM p3** (advanced) opt D: `and` → `$(\sqrt{2}, 3)$ and $(-\sqrt{2}, 3)$`
+- **Nonlinear Equations MEDIUM p8** (advanced) stem: `If (x, y) is a solution of the system of equations above and x > 0, what is the ` → `$$y = x^{2}$$ $$2y + 6 = 2(x + 3)$$ If (x, y) is a solution of the system of equ`
+- **Nonlinear Equations MEDIUM p13** (advanced) stem: `A solution to the given system of equations is . Which of the following is a pos` → `$$x^{2} = 6x + y$$ $$y = -6x + 36$$ A solution to the given system of equations `
+- **Nonlinear Equations MEDIUM p19** (advanced) stem: `In the equation above, a is a constant and . If the equation has two integer sol` → `$$x^{2} - ax + 12 = 0$$ In the equation above, a is a constant and $a > 0$. If t`
+- **Nonlinear Equations MEDIUM p24** (advanced) stem: `In the xy-plane, what is the y-coordinate of the point of intersection of the gr` → `In the xy-plane, what is the y-coordinate of the point of intersection of the gr`
+- **Nonlinear Equations MEDIUM p26** (advanced) stem: `If the ordered pair satisfies the system of equations above, what is one possibl` → `$$y = x^{2} - 4x + 4$$ $$y = 4 - x$$ If the ordered pair $(x, y)$ satisfies the `
+- **Nonlinear Equations MEDIUM p30** (advanced) stem: `If is a solution to the system of equations above, which of the following could ` → `$$y = x + 1$$ $$y = x^{2} + x$$ If $(x, y)$ is a solution to the system of equat`
+- **Nonlinear Equations MEDIUM p31** (advanced) image STEM <= img_9aef5d5f28f04078b7ee13052c7687ab → `/uploads/questions/767d91472c6af9729697834e.jpg` (was `null`)
+- **Nonlinear Equations MEDIUM p20** (advanced) image STEM cleared (was `/uploads/questions/d7bde6563bdad25cd1cfa1a4.jpg`)
+- **Nonlinear Functions EASY p10** (advanced) image STEM <= file `nf-easy-p10-graph.png` → `/uploads/questions/5391c4340ea3b25b6b1aa6ae.png` (was `null`)
+- **Nonlinear Functions EASY p10** (advanced) stem: `y 10 9 8 7 6 5 4 3 2 1 x O 1 2 3 4 5 6 7 8 9 10 The graph shows a marble's heigh` → `The graph shows a marble's height above the ground $y$, in inches, $x$ seconds a`
+- **Nonlinear Functions EASY p10** (advanced) opt A: `The marble's height was inches above the ground seconds afte` → `The marble's height was 0 inches above the ground 8 seconds `
+- **Nonlinear Functions EASY p10** (advanced) opt B: `The marble's height was inches above the ground when it star` → `The marble's height was 8 inches above the ground when it st`
+- **Nonlinear Functions EASY p10** (advanced) opt C: `The marble's minimum height was inches above the ground.` → `The marble's minimum height was 0 inches above the ground.`
+- **Nonlinear Functions EASY p10** (advanced) opt D: `The marble's minimum height was inches above the ground.` → `The marble's minimum height was 8 inches above the ground.`
+- **Nonlinear Functions EASY p11** (advanced) stem: `The function gives a company’s predicted annual revenue, in dollars, years after` → `The function $f(x) = 240{,}000(1.22)^{x}$ gives a company’s predicted annual rev`
+- **Nonlinear Functions EASY p11** (advanced) opt A: `years after the company started selling jewelry online, its ` → `5 years after the company started selling jewelry online, it`
+- **Nonlinear Functions EASY p11** (advanced) opt B: `years after the company started selling jewelry online, its ` → `5 years after the company started selling jewelry online, it`
+- **Nonlinear Functions EASY p11** (advanced) opt C: `When the company’s predicted annual revenue is approximately` → `When the company’s predicted annual revenue is approximately`
+- **Nonlinear Functions EASY p11** (advanced) opt D: `When the company’s predicted annual revenue is approximately` → `When the company’s predicted annual revenue is approximately`
+- **Nonlinear Functions EASY p12** (advanced) image STEM <= img_906843933c32443d90e7a2d8b582ad43 → `/uploads/questions/adceb40330be7e7ced32908f.jpg` (was `null`)
+- **Nonlinear Functions EASY p14** (advanced) stem: `The function f is defined above. What is the value of ?` → `$$f(x) = (x + 0.25x)(50 - x)$$ The function f is defined above. What is the valu`
+- **Nonlinear Functions EASY p15** (advanced) image STEM <= file `nf-easy-p15-graph.png` → `/uploads/questions/155203e7eaf3d5ec7ec9dd81.png` (was `null`)
+- **Nonlinear Functions EASY p15** (advanced) stem: `The graph of the polynomial function , where , is shown. The y-intercept of the ` → `The graph of the polynomial function $f$, where $y = f(x)$, is shown. The y-inte`
+- **Nonlinear Functions EASY p17** (advanced) image STEM <= file `nf-easy-p17-graph.png` → `/uploads/questions/860a31031e900296ef89b85e.png` (was `null`)
+- **Nonlinear Functions EASY p17** (advanced) stem: `The graph of is shown in the xy-plane. The value of is an integer. What is the v` → `The graph of $y = f(x)$ is shown in the xy-plane. The value of $f(0)$ is an inte`
+- **Nonlinear Functions EASY p18** (advanced) stem: `The given equation models a company’s scheduled deliveries over months, where is` → `$$y = -\frac{1}{4}x^{2} + 2x + 29$$ The given equation models a company’s schedu`
+- **Nonlinear Functions EASY p18** (advanced) opt A: `At the end of May , the estimated number of scheduled delive` → `At the end of May 2012, the estimated number of scheduled de`
+- **Nonlinear Functions EASY p18** (advanced) opt B: `At the end of May , the estimated number of scheduled delive` → `At the end of May 2012, the estimated number of scheduled de`
+- **Nonlinear Functions EASY p18** (advanced) opt C: `At the end of June , the estimated number of scheduled deliv` → `At the end of June 2012, the estimated number of scheduled d`
+- **Nonlinear Functions EASY p18** (advanced) opt D: `At the end of June , the estimated number of scheduled deliv` → `At the end of June 2012, the estimated number of scheduled d`
+- **Nonlinear Functions HARD p4** (advanced) opt A: `The minimum estimated number of advertisements the company s` → `The minimum estimated number of advertisements the company s`
+- **Nonlinear Functions HARD p4** (advanced) opt B: `The minimum estimated number of advertisements the company s` → `The minimum estimated number of advertisements the company s`
+- **Nonlinear Functions HARD p4** (advanced) opt C: `The estimated number of advertisements the company sent to i` → `The estimated number of advertisements the company sent to i`
+- **Nonlinear Functions HARD p4** (advanced) opt D: `The estimated number of advertisements the company sent to i` → `The estimated number of advertisements the company sent to i`
+- **Nonlinear Functions HARD p7** (advanced) image STEM <= file `nf-hard-p7-table.png` → `/uploads/questions/0fb2820e6b48babf25da1926.png` (was `null`)
+- **Nonlinear Functions HARD p7** (advanced) stem: `Growth of a Culture of Bacteria Number of bacteria per Day milliliter at end of ` → `A culture of bacteria is growing at an exponential rate, as shown in the table a`
+- **Nonlinear Functions HARD p15** (advanced) image STEM <= file `nf-hard-p15-graph.png` → `/uploads/questions/12072415a67e2af6a7df0223.png` (was `null`)
+- **Nonlinear Functions HARD p16** (advanced) image STEM <= file `nf-hard-p16-table.png` → `/uploads/questions/ffbacf8b7b0807e6a1b654db.png` (was `null`)
+- **Nonlinear Functions HARD p28** (advanced) stem: `The function h is defined above, where a, b, and c are integer constants. If the` → `$$h(x) = x^{3} + ax^{2} + bx + c$$ The function h is defined above, where a, b, `
+- **Nonlinear Functions HARD p31** (advanced) stem: `The quadratic function above models the height above the ground h, in feet, of a` → `$$h(x) = -16x^{2} + 100x + 10$$ The quadratic function above models the height a`
+- **Nonlinear Functions HARD seq33 (source p34)** (advanced) stem: `The functions and are defined by the given equations, where . Which of the follo` → `The functions $g$ and $h$ are defined by the given equations, where $x \geq 0$. `
+- **Nonlinear Functions MEDIUM p1** (advanced) stem: `An entomologist recommended a program to reduce a certain invasive beetle popula` → `$$f(x) = 4{,}000(0.75)^{x}$$ An entomologist recommended a program to reduce a c`
+- **Nonlinear Functions MEDIUM p1** (advanced) opt A: `The estimated initial beetle population for this species and` → `The estimated initial beetle population for this species and`
+- **Nonlinear Functions MEDIUM p1** (advanced) opt B: `The estimated beetle population for this species and area ye` → `The estimated beetle population for this species and area 7 `
+- **Nonlinear Functions MEDIUM p1** (advanced) opt C: `The estimated percent decrease in the beetle population for ` → `The estimated percent decrease in the beetle population for `
+- **Nonlinear Functions MEDIUM p1** (advanced) opt D: `The estimated percent decrease in the beetle population for ` → `The estimated percent decrease in the beetle population for `
+- **Nonlinear Functions MEDIUM p3** (advanced) stem: `The function S above models the annual salary, in dollars, of an employee n year` → `$$S(n) = 38{,}000a^{n}$$ The function S above models the annual salary, in dolla`
+- **Nonlinear Functions MEDIUM p4** (advanced) stem: `The equation above estimates the global data traffic D, in terabytes, for the ye` → `$$D = 5{,}640(1.9)^{t}$$ The equation above estimates the global data traffic D,`
+- **Nonlinear Functions MEDIUM p5** (advanced) image STEM <= file `nf-med-p5-graph.png` → `/uploads/questions/b12454412340cf8caeb197aa.png` (was `null`)
+- **Nonlinear Functions MEDIUM p7** (advanced) stem: `For the given function , the graph of in the xy-plane passes through the point ,` → `$$f(x) = x^{5} + 9x + 17$$ For the given function $f$, the graph of $y = f(x)$ i`
+- **Nonlinear Functions MEDIUM p9** (advanced) stem: `If the given function is graphed in the xy-plane, where , what is the x-coordina` → `$$f(x) = (x + 6)(x - 4)$$ If the given function $f$ is graphed in the xy-plane, `
+- **Nonlinear Functions MEDIUM p12** (advanced) stem: `The height, in feet, of an object x seconds after it is thrown straight up in th` → `The height, in feet, of an object x seconds after it is thrown straight up in th`
+- **Nonlinear Functions MEDIUM p17** (advanced) stem: `The equation gives the estimated number of employees at a restaurant, where is t` → `The equation $E(t) = 5(1.8)^{t}$ gives the estimated number of employees at a re`
+- **Nonlinear Functions MEDIUM p19** (advanced) image STEM <= file `nf-med-p19-table.png` → `/uploads/questions/f05ffd96661fa578c99be61e.png` (was `null`)
+- **Nonlinear Functions MEDIUM p22** (advanced) stem: `The function above models the height h, in feet, of an object above ground t sec` → `$$h(t) = -16t^{2} + 110t + 72$$ The function above models the height h, in feet,`
+- **Nonlinear Functions MEDIUM p23** (advanced) stem: `The function N defined above can be used to model the number of species of brach` → `$$N(d) = 115(0.90)^{d}$$ The function N defined above can be used to model the n`
+- **Nonlinear Functions MEDIUM p26** (advanced) stem: `An engineer wanted to identify the best angle for a cooling fan in an engine in ` → `$$f(\theta) = -0.28(\theta - 27)^{2} + 880$$ An engineer wanted to identify the `
+- **Nonlinear Functions MEDIUM p29** (advanced) image STEM <= file `nf-med-p29-table.png` → `/uploads/questions/b8b8d9ee067a75893eb383c5.png` (was `null`)
+- **LinEq 1-Var EASY seq17** (algebra) stem: `In the given equation, k is a constant. If the equation has infinitely many solu` → `$$6x + k = 6x + 5$$ In the given equation, k is a constant. If the equation has `
+- **LinEq 1-Var MEDIUM seq1** (algebra) stem: `A company that creates and sells tape dispensers calculates its monthly profit, ` → `A company that creates and sells tape dispensers calculates its monthly profit, `
+- **LinEq 1-Var MEDIUM seq1** (algebra) opt A: `The monthly sales revenue, in dollars, from selling tape dis` → `The monthly sales revenue, in dollars, from selling $x$ tape`
+- **LinEq 1-Var MEDIUM seq1** (algebra) opt D: `The monthly cost, in dollars, of creating tape dispensers` → `The monthly cost, in dollars, of creating $x$ tape dispenser`
+- **LinEq 1-Var MEDIUM seq3** (algebra) stem: `A tree had a height of 6 feet when it was planted. The equation above can be use` → `$$2n + 6 = 14$$ A tree had a height of 6 feet when it was planted. The equation `
+- **LinEq 1-Var MEDIUM seq4** (algebra) stem: `In the given equation, is a constant. If the equation has infinitely many soluti` → `$$2x + 16 = a(x + 8)$$ In the given equation, $a$ is a constant. If the equation`
+- **LinEq 1-Var MEDIUM seq5** (algebra) stem: `In the given equation, b is a constant. If the equation has no solution, what is` → `$$(b - 2)x = 8$$ In the given equation, b is a constant. If the equation has no `
+- **LinEq 1-Var MEDIUM seq7** (algebra) stem: `In the equation above, a and b are constants. If the equation has infinitely man` → `$$a(3 - x) - b = -1 - 2x$$ In the equation above, a and b are constants. If the `
+- **LinEq 1-Var MEDIUM seq7** (algebra) opt A: `and` → `$a = 2$ and $b = 1$`
+- **LinEq 1-Var MEDIUM seq7** (algebra) opt B: `and` → `$a = 2$ and $b = 7$`
+- **LinEq 1-Var MEDIUM seq7** (algebra) opt C: `and` → `$a = -2$ and $b = 5$`
+- **LinEq 1-Var MEDIUM seq7** (algebra) opt D: `and` → `$a = -2$ and $b = -5$`
+- **LinEq 1-Var MEDIUM seq12** (algebra) stem: `A museum rents tablets to visitors. The museum earns revenue of for each tablet ` → `A museum rents tablets to visitors. The museum earns revenue of \(\$14\) for eac`
+- **LinEq 1-Var HARD seq2** (algebra) stem: `If , the value of is between which of the following pairs of values?` → `If $\frac{x-5}{7} = \frac{x-5}{9}$, the value of $x - 5$ is between which of the`
+- **LinEq 1-Var HARD seq2** (algebra) opt A: `and` → `$-9$ and $-7$`
+- **LinEq 1-Var HARD seq2** (algebra) opt B: `and` → `$-3$ and $3$`
+- **LinEq 1-Var HARD seq2** (algebra) opt C: `and` → `$4.5$ and $5.5$`
+- **LinEq 1-Var HARD seq2** (algebra) opt D: `and` → `$6.75$ and $9.25$`
+- **LinEq 1-Var HARD seq4** (algebra) stem: `The equation , where a and b are constants, has no solutions. Which of the follo` → `The equation $9x + 5 = a(x + b)$, where a and b are constants, has no solutions.`
+- **LinEq 1-Var HARD seq5** (algebra) stem: `If , the value of is between which of the following pairs of values?` → `If $\frac{x+6}{3} = \frac{x+6}{13}$, the value of $x + 6$ is between which of th`
+- **LinEq 1-Var HARD seq5** (algebra) opt A: `and` → `$-7$ and $-3$`
+- **LinEq 1-Var HARD seq5** (algebra) opt B: `and` → `$-2$ and $2$`
+- **LinEq 1-Var HARD seq5** (algebra) opt C: `and` → `$2$ and $7$`
+- **LinEq 1-Var HARD seq5** (algebra) opt D: `and` → `$8$ and $13$`
+- **LinEq 1-Var HARD seq7** (algebra) stem: `In the given equation, is a constant. The equation has no solution. What is the ` → `$$3(kx + 13) = \frac{48}{17}x + 36$$ In the given equation, $k$ is a constant. T`
+- **LinEq 1-Var HARD seq8** (algebra) stem: `How many solutions does the equation have?` → `How many solutions does the equation $10(15x - 9) = -15(6 - 10x)$ have?`
+- **LinEq 1-Var HARD seq12** (algebra) stem: `In the given equation, and are constants, and . If the equation has infinitely m` → `$$\frac{12x + 28}{4} - \frac{s}{13} = r(x - 8)$$ In the given equation, $s$ and `
+- **LinIneq EASY seq2** (algebra) stem: `A rectangle has length and width . The inequality gives the possible values of a` → `$$2\ell + 2w \leq 27$$ A rectangle has length $\ell$ and width $w$. The inequali`
+- **LinIneq EASY seq2** (algebra) opt A: `If the rectangle has length and width , its perimeter is les` → `If the rectangle has length $3$ and width $8$, its perimeter`
+- **LinIneq EASY seq2** (algebra) opt B: `If the rectangle has length and width , its perimeter is les` → `If the rectangle has length $8$ and width $3$, its perimeter`
+- **LinIneq EASY seq2** (algebra) opt C: `If the rectangle has length and width , its perimeter is gre` → `If the rectangle has length $3$ and width $8$, its perimeter`
+- **LinIneq EASY seq2** (algebra) opt D: `If the rectangle has length and width , its perimeter is gre` → `If the rectangle has length $8$ and width $3$, its perimeter`
+- **LinIneq EASY seq7** (algebra) stem: `Which of the following ordered pairs satisfies the inequality ? 1. 2. 3.` → `Which of the following ordered pairs $(x, y)$ satisfies the inequality $5x - 3y `
+- **LinIneq HARD seq3** (algebra) stem: `Anthony will spend at most to purchase small cheese pizzas and large cheese pizz` → `\(11x + 14y \leq 115\) Anthony will spend at most \(\$115\) to purchase \(x\) sm`
+- **LinIneq HARD seq5** (algebra) stem: `The formula above is Ohm’s law for an electric circuit with current I, in ampere` → `$$I = \frac{V}{R}$$ The formula above is Ohm’s law for an electric circuit with `
+- **LinIneq HARD seq7** (algebra) stem: `A number is at most less than times the value of . If the value of is , what is ` → `A number $x$ is at most $2$ less than $3$ times the value of $y$. If the value o`
+- **LinFunc EASY seq7** (algebra) image STEM <= img_da289420562a499ba0793a19b4c4f806 → `/uploads/questions/56ea19ac7ed897a87b9ef916.jpg` (was `null`)
+- **LinFunc EASY seq9** (algebra) stem: `Marisol drove 3 hours from City A to City B. The equation below estimates the di` → `Marisol drove 3 hours from City A to City B. The equation below estimates the di`
+- **LinFunc EASY seq10** (algebra) stem: `In science class, Diego conducted an experiment to learn about evaporation. Dieg` → `In science class, Diego conducted an experiment to learn about evaporation. Dieg`
+- **LinFunc EASY seq10** (algebra) opt A: `The estimated height, , of the fluid at the start of the exp` → `The estimated height, in cm, of the fluid at the start of th`
+- **LinFunc EASY seq10** (algebra) opt B: `The estimated height, , of the fluid at the end of the exper` → `The estimated height, in cm, of the fluid at the end of the `
+- **LinFunc EASY seq10** (algebra) opt C: `The estimated change in the height, , of the fluid each day` → `The estimated change in the height, in cm, of the fluid each`
+- **LinFunc EASY seq11** (algebra) stem: `In the equation above, T represents Brittany’s total take-home pay, in dollars, ` → `\(T = 1{,}000 + 18h\) In the equation above, T represents Brittany’s total take-`
+- **LinFunc EASY seq15** (algebra) stem: `The buildings of a shopping center are designed to allow water to drain from the` → `$$\begin{array}{c|c} \text{Area (square feet)} & \text{Water (gallons)} \\ \hlin`
+- **LinFunc EASY seq17** (algebra) image STEM <= file `linfunc-easy-p17.png` → `/uploads/questions/424c64f5fa4651881cfb8201.png` (was `null`)
+- **LinFunc EASY seq19** (algebra) stem: `The population of snow leopards in a certain area can be modeled by the function` → `$$P(t) = 250 + 10t$$ The population of snow leopards in a certain area can be mo`
+- **LinFunc HARD seq2** (algebra) stem: `The equation gives the corresponding temperature , in degrees Fahrenheit, of any` → `The equation $h = \frac{9(v - 273.15)}{5} + 32$ gives the corresponding temperat`
+- **LinFunc HARD seq4** (algebra) stem: `An object hangs from a spring. The formula relates the length , in centimeters, ` → `An object hangs from a spring. The formula $\ell = 30 + 2w$ relates the length $`
+- **LinFunc HARD seq5** (algebra) stem: `The table above shows some values of x and their corresponding values $f(x)$ for` → `$$\begin{array}{c|c|c|c|c} x & -11 & -10 & -9 & -8 \\ \hline f(x) & 21 & 18 & 15`
+- **LinFunc HARD seq8** (algebra) stem: `For the function , for all values of , where is a positive constant. If , what i` → `For the function $f$, $f(cx) = x - 8$ for all values of $x$, where $c$ is a posi`
+- **LinFunc HARD seq11** (algebra) stem: `For the linear function $f$, the table shows three values of $x$ and their corre` → `$$\begin{array}{c|c} x & f(x) \\ \hline 1 & -64 \\ 2 & 0 \\ 3 & 64 \end{array}$$`
+- **LinFunc HARD seq12** (algebra) stem: `According to data provided by the US Department of Energy, the average price per` → `According to data provided by the US Department of Energy, the average price per`
+- **LinFunc HARD seq13** (algebra) stem: `The functions and are defined as and . If the function is defined as , what is t` → `The functions $f$ and $g$ are defined as $f(x) = \frac{1}{4}x - 9$ and $g(x) = \`
+- **LinFunc HARD seq16** (algebra) stem: `The table shows two values of and their corresponding values of . The graph of t` → `$$\begin{array}{c|c} x & y \\ \hline -12 & -45 \\ 6 & 45 \end{array}$$ The table`
+- **Systems EASY seq1** (algebra) stem: `In the given system of equations, a is a constant. If the system has infinitely ` → `$$2x + 7y = 9$$ $$8x + 28y = a$$ In the given system of equations, a is a consta`
+- **Systems EASY seq8** (algebra) stem: `If is the solution to the given system of equations, what is the value of y ?` → `$$x + y = 20$$ $$2(x + y) + 3y = 85$$ If $(x, y)$ is the solution to the given s`
+- **Systems EASY seq11** (algebra) image STEM <= file `systems-easy-p11.png` → `/uploads/questions/6642ac7f564cd24022625507.png` (was `null`)
+- **Systems EASY seq14** (algebra) image STEM <= img_21d87a7c103643c8ada2d995ec52fbdb → `/uploads/questions/30d355a8daaeb5379008d611.jpg` (was `null`)
+- **Systems HARD seq2** (algebra) stem: `In the given system of equations, is a constant. If the system has no solution, ` → `$$\frac{3}{2}y - \frac{1}{4}x = \frac{2}{3} - \frac{3}{2}y$$ $$\frac{1}{2}x + \f`
+- **Systems HARD seq3** (algebra) stem: `In the given system of equations, is a constant. If the system has no solution, ` → `$$4x - 6y = 10y + 2$$ $$ty = \frac{1}{2} + 2x$$ In the given system of equations`
+- **Systems HARD seq13** (algebra) stem: `In the given system of equations, is a constant. In the xy-plane, the graphs of ` → `$$-x - wy = -337$$ $$2x - wy = 47$$ In the given system of equations, $w$ is a c`
+- **LinIneq MEDIUM seq4** (algebra) stem: `Which point ( , ) is a solution to the given inequality in the -plane?` → `$$y < -4x + 4$$ Which point $(x, y)$ is a solution to the given inequality in th`
+- **LinIneq MEDIUM seq4** (algebra) opt A: `( , )` → `$(-4, 0)$`
+- **LinIneq MEDIUM seq4** (algebra) opt B: `( , )` → `$(0, 5)$`
+- **LinIneq MEDIUM seq4** (algebra) opt C: `( , )` → `$(2, 1)$`
+- **LinIneq MEDIUM seq4** (algebra) opt D: `( , )` → `$(2, -1)$`
+- **LinIneq MEDIUM seq10** (algebra) stem: `Which of the following ordered pairs (x, y) satisfies the system of inequalities` → `$$y \leq 3x + 1$$ $$x - y > 1$$ Which of the following ordered pairs (x, y) sati`
+- **LinIneq MEDIUM seq13** (algebra) stem: `An event planner is planning a party. It costs the event planner a onetime fee o` → `An event planner is planning a party. It costs the event planner a onetime fee o`
+- **LinIneq MEDIUM seq11** (algebra) opt D: `25,000 > \frac{4,332}{2,712}t` → `$25{,}000 > \frac{4{,}332}{2{,}712}t$`
+- **LinEq 2-Var EASY seq3** (algebra) stem: `A shipping company charged a customer $25 to ship some small boxes and some larg` → `\(3a + 4b = 25\) A shipping company charged a customer \(\$25\) to ship some sma`
+- **LinEq 2-Var EASY seq4** (algebra) stem: `The equation above relates the number of minutes, x, Maria spends running each d` → `$$x + y = 75$$ The equation above relates the number of minutes, x, Maria spends`
+- **LinEq 2-Var EASY seq6** (algebra) stem: `A total of paper straws of equal length were used to construct two types of poly` → `A total of $364$ paper straws of equal length were used to construct two types o`
+- **LinEq 2-Var EASY seq6** (algebra) opt A: `If triangles were constructed, then rectangles were construc` → `If $24$ triangles were constructed, then $73$ rectangles wer`
+- **LinEq 2-Var EASY seq6** (algebra) opt B: `If triangles were constructed, then paper straws were used.` → `If $24$ triangles were constructed, then $73$ paper straws w`
+- **LinEq 2-Var EASY seq6** (algebra) opt C: `If triangles were constructed, then rectangles were construc` → `If $73$ triangles were constructed, then $24$ rectangles wer`
+- **LinEq 2-Var EASY seq6** (algebra) opt D: `If triangles were constructed, then paper straws were used.` → `If $73$ triangles were constructed, then $24$ paper straws w`
+- **LinEq 2-Var EASY seq7** (algebra) stem: `The equation models the relationship between the number of different pieces of m` → `The equation $y = 0.1x$ models the relationship between the number of different `
+- **LinEq 2-Var EASY seq8** (algebra) image STEM <= img_1b65e58dcec94bdc8743d5296013f718 → `/uploads/questions/bc31c64f241aa2ab936430d5.jpg` (was `null`)
+- **LinEq 2-Var EASY seq11 (p11, Mario)** (algebra) stem: `Mario purchased 4 binders that cost x dollars each and 3 notebooks that cost y d` → `$$4x + 3y = 24$$ Mario purchased 4 binders that cost x dollars each and 3 notebo`
+- **LinEq 2-Var EASY seq15** (algebra) stem: `The table shows three values of $x$ and their corresponding values of $y$. There` → `$$\begin{array}{c|c} x & y \\ \hline 0 & 18 \\ 1 & 13 \\ 2 & 8 \end{array}$$ The`
+- **LinEq 2-Var EASY seq18** (algebra) image STEM <= file `lineq2-easy-p18.png` → `/uploads/questions/546b89e1cbdfffcf099aeaf4.png` (was `null`)
+- **LinEq 2-Var EASY seq19** (algebra) stem: `The table above shows some pairs of x values and y values. Which of the followin` → `$$\begin{array}{c|c} x & y \\ \hline 1 & 5 \\ 2 & 7 \\ 3 & 9 \\ 4 & 11 \end{arra`
+- **LinEq 2-Var EASY seq23** (algebra) image STEM <= file `lineq2-easy-p24.png` → `/uploads/questions/6e6325ce320968bab9d420ff.png` (was `null`)
+- **LinEq 2-Var EASY seq24** (algebra) stem: `In the equation above, F represents the total amount of money, in dollars, a foo` → `$$F = 2.50x + 7.00y$$ In the equation above, F represents the total amount of mo`
+- **LinEq 2-Var EASY seq28** (algebra) image STEM <= file `lineq2-easy-p29.png` → `/uploads/questions/e3aaa327e6b674ab49a18059.png` (was `null`)
+- **LinEq 2-Var EASY seq29** (algebra) stem: `The y-intercept of the graph of in the xy-plane is . What is the value of ?` → `The y-intercept of the graph of $y = -6x - 32$ in the xy-plane is $(0, y)$. What`
+- **LinEq 2-Var EASY seq30** (algebra) image STEM <= img_abc6a7b5454e47509fd1a20d791693b0 → `/uploads/questions/bbb7e28d9633dbb6d1075b1a.jpg` (was `null`)
+- **LinFunc MEDIUM seq3** (algebra) stem: `A team of workers has been moving cargo off of a ship. The equation below models` → `A team of workers has been moving cargo off of a ship. The equation below models`
+- **LinFunc MEDIUM seq4** (algebra) stem: `In the xy-plane, line has a slope of and a y-intercept of . What is the x-coordi` → `In the xy-plane, line $k$ has a slope of $5$ and a y-intercept of $(0, -35)$. Wh`
+- **LinFunc MEDIUM seq5** (algebra) stem: `The table gives the average time t, in minutes, it takes Carly to travel a certa` → `$$\begin{array}{c|c} \text{Distance (kilometers)} & \text{Average time (minutes)`
+- **LinFunc MEDIUM seq6** (algebra) image STEM <= file `linfunc-med-p6.png` → `/uploads/questions/6e217b2a6c07ace9bf50b1a2.png` (was `null`)
+- **LinFunc MEDIUM seq6** (algebra) stem: `The graph of the function , where , gives the total cost , in dollars, for a cer` → `The graph of the function $f$, where $y = f(x)$, gives the total cost $y$, in do`
+- **LinFunc MEDIUM seq6** (algebra) opt A: `Each game costs .` → `Each game costs \(\$25\).`
+- **LinFunc MEDIUM seq6** (algebra) opt B: `The video game system costs .` → `The video game system costs \(\$100\).`
+- **LinFunc MEDIUM seq6** (algebra) opt C: `The video game system costs .` → `The video game system costs \(\$25\).`
+- **LinFunc MEDIUM seq6** (algebra) opt D: `Each game costs .` → `Each game costs \(\$100\).`
+- **LinFunc MEDIUM seq10** (algebra) image STEM <= img_e13dc56a147342a5b7a0e56bac90b033 → `/uploads/questions/f22c1aab831795d51bfd1338.jpg` (was `null`)
+- **LinFunc MEDIUM seq10** (algebra) stem: `Some values of the linear function f are shown in the table above. What is the v` → `Some values of the linear function f are shown in the table above. What is the v`
+- **LinFunc MEDIUM seq12** (algebra) image STEM <= img_720a4189f0d04e768b83bfa775f07a7f → `/uploads/questions/b1505babc7980b6790ca33e0.jpg` (was `null`)
+- **LinFunc MEDIUM seq13** (algebra) image STEM <= img_3f50f09032f24a29b6fb49e421f65a09 → `/uploads/questions/47f87cf5a266a126bbd941a2.jpg` (was `null`)
+- **LinFunc MEDIUM seq14** (algebra) stem: `The function f is defined by , where m and b are constants. If and , what is the` → `The function f is defined by $f(x) = mx + b$, where m and b are constants. If $f`
+- **LinFunc MEDIUM seq16** (algebra) stem: `The equation above represents the speed y, in feet per second, of Sheila’s bicyc` → `$$y = 18 - 5x$$ The equation above represents the speed y, in feet per second, o`
+- **LinFunc MEDIUM seq17** (algebra) stem: `For the linear function g, the table shows four values of x and their correspond` → `$$\begin{array}{c|c} x & g(x) \\ \hline 1 & 54 \\ 2 & 51 \\ 3 & 48 \\ 4 & 45 \en`
+- **LinFunc MEDIUM seq19** (algebra) image STEM <= img_61ba67deada74053bb421f6fd2df06bf → `/uploads/questions/fae89421db5cfd656f04e675.jpg` (was `null`)
+- **LinFunc MEDIUM seq20** (algebra) stem: `The function is defined by . What is the -coordinate of the -intercept of the gr` → `The function $f$ is defined by $f(x) = -9x + 9$. What is the $y$-coordinate of t`
+- **LinFunc MEDIUM seq22** (algebra) stem: `A company’s total cost , in dollars, to produce x shirts is given by the functio` → `\(c(x) = mx + 500\) A company’s total cost \(c(x)\), in dollars, to produce x sh`
+- **LinEq 2-Var HARD seq1** (algebra) stem: `The table shows two values of $x$ and their corresponding values of $y$. In the ` → `$$\begin{array}{c|c} x & y \\ \hline -18 & -48 \\ 7 & 52 \end{array}$$ The table`
+- **LinEq 2-Var HARD seq4** (algebra) stem: `The line with the equation is graphed in the xy‑plane. What is the x-coordinate ` → `The line with the equation $\frac{4}{5}x + \frac{1}{3}y = 1$ is graphed in the x`
+- **LinEq 2-Var HARD seq6** (algebra) stem: `At a school fair, students can win colored tokens that are worth a different num` → `$$5G + 45R = 380$$ At a school fair, students can win colored tokens that are wo`
+- **LinEq 2-Var HARD seq7** (algebra) image STEM <= file `lineq2-hard-p7.png` → `/uploads/questions/e3a6214b7836338356589c55.png` (was `null`)
+- **LinEq 2-Var HARD seq7** (algebra) stem: `Line is shown in the xy-plane. Line (not shown) is perpendicular to line . What ` → `Line $k$ is shown in the xy-plane. Line $j$ (not shown) is perpendicular to line`
+- **LinEq 2-Var HARD seq8** (algebra) image STEM cleared (was `/uploads/questions/59dc29fb96c77f4424b2c9f9.jpg`)
+- **LinEq 2-Var HARD seq8** (algebra) stem: `x y 3 7 k 11 12 n The table above shows the coordinates of three points on a lin` → `$$\begin{array}{c|c} x & y \\ \hline 3 & 7 \\ k & 11 \\ 12 & n \end{array}$$ The`
+- **LinEq 2-Var HARD seq9** (algebra) stem: `The graph of is translated down units in the xy-plane. What is the x-coordinate ` → `The graph of $9x - 10y = 19$ is translated down $4$ units in the xy-plane. What `
+- **LinEq 2-Var HARD seq15** (algebra) stem: `In the xy-plane, line passes through the point and is parallel to the line repre` → `In the xy-plane, line $\ell$ passes through the point $(0, 0)$ and is parallel t`
+- **LinEq 2-Var HARD seq16** (algebra) stem: `In the xy-plane, line has a slope of and an x-intercept of . What is the y-coord` → `In the xy-plane, line $p$ has a slope of $-\frac{5}{3}$ and an x-intercept of $(`
+- **LinEq 2-Var HARD seq17** (algebra) stem: `In the xy-plane, line k intersects the y-axis at the point and passes through th` → `In the xy-plane, line k intersects the y-axis at the point $(0, -6)$ and passes `
+- **LinEq 2-Var HARD seq18** (algebra) stem: `Line is defined by . Line is perpendicular to line in the xy-plane. What is the ` → `Line $p$ is defined by $4y + 8x = 6$. Line $r$ is perpendicular to line $p$ in t`
+- **LinEq 2-Var HARD seq19** (algebra) stem: `For line $h$, the table shows three values of $x$ and their corresponding values` → `$$\begin{array}{c|c} x & y \\ \hline 18 & 130 \\ 23 & 160 \\ 26 & 178 \end{array`
+- **LinEq 2-Var MED seq1** (algebra) stem: `Line is defined by . Line is perpendicular to line in the xy-plane. What is the ` → `Line $k$ is defined by $y = -\frac{17}{3}x + 5$. Line $j$ is perpendicular to li`
+- **LinEq 2-Var MED seq2** (algebra) image STEM <= file `lineq2-med-p2.png` → `/uploads/questions/819eab21b24cf9f451264333.png` (was `null`)
+- **LinEq 2-Var MED seq2** (algebra) stem: `The graph in the xy-plane models the possible combinations of length , , and wid` → `The graph in the xy-plane models the possible combinations of length $x$, in met`
+- **LinEq 2-Var MED seq2** (algebra) opt A: `The length is less than the perimeter, and the width is less` → `The length is $10 \text{ m}$ less than the perimeter, and th`
+- **LinEq 2-Var MED seq2** (algebra) opt B: `The length is , and the width is .` → `The length is $10 \text{ m}$, and the width is $8 \text{ m}$`
+- **LinEq 2-Var MED seq2** (algebra) opt C: `The length is , and the width is .` → `The length is $8 \text{ m}$, and the width is $10 \text{ m}$`
+- **LinEq 2-Var MED seq2** (algebra) opt D: `The length is less than the perimeter, and the width is less` → `The length is $8 \text{ m}$ less than the perimeter, and the`
+- **LinEq 2-Var MED seq3** (algebra) stem: `Isabel ordered topsoil and crushed stone, which cost a total of , for her garden` → `\(24.5x + 24.75y = 641\) Isabel ordered topsoil and crushed stone, which cost a `
+- **LinEq 2-Var MED seq4** (algebra) stem: `The equation represents the number of blue tiles, , and the number of green tile` → `The equation $7g + 7b = 840$ represents the number of blue tiles, $b$, and the n`
+- **LinEq 2-Var MED seq8** (algebra) stem: `On a 210-mile trip, Cameron drove at an average speed of 60 miles per hour for t` → `On a 210-mile trip, Cameron drove at an average speed of 60 miles per hour for t`
+- **LinEq 2-Var MED seq9** (algebra) stem: `The table shows three values of $x$ and their corresponding values of $y$. Which` → `$$\begin{array}{c|c|c|c} x & 1 & 2 & 3 \\ \hline y & 11 & 16 & 21 \end{array}$$ `
+- **LinEq 2-Var MED seq10** (algebra) stem: `The table shows four values of $x$ and their corresponding values of $y$. There ` → `$$\begin{array}{c|c} x & y \\ \hline -6 & 65 \\ -3 & 56 \\ 3 & 38 \\ 6 & 29 \end`
+- **LinEq 2-Var MED seq13** (algebra) stem: `Lily made cups of jam. Lily then filled small containers and large containers wi` → `Lily made $36$ cups of jam. Lily then filled $x$ small containers and $y$ large `
+- **LinEq 2-Var MED seq19** (algebra) stem: `What is the slope of the graph of $y={\tfrac {5\pi }{13}}-23$ in the *xy*-plane?` → `What is the slope of the graph of $y=\frac{5x}{13}-23$ in the *xy*-plane?`
+- **LinEq 2-Var MED seq20** (algebra) stem: `Figure A and figure B are both regular polygons. The sum of the perimeter of fig` → `Figure A and figure B are both regular polygons. The sum of the perimeter of fig`
+- **LinEq 2-Var MED seq20** (algebra) opt A: `Each side of figure B has a length of inches.` → `Each side of figure B has a length of $6$ inches.`
+- **LinEq 2-Var MED seq20** (algebra) opt B: `The number of sides of figure B is .` → `The number of sides of figure B is $6$.`
+- **LinEq 2-Var MED seq20** (algebra) opt C: `Each side of figure A has a length of inches.` → `Each side of figure A has a length of $6$ inches.`
+- **LinEq 2-Var MED seq20** (algebra) opt D: `The number of sides of figure A is .` → `The number of sides of figure A is $6$.`
+- **LinEq 2-Var MED seq21** (algebra) stem: `The table shows three values of x and their corresponding values of y, where n i` → `$$\begin{array}{c|c} x & y \\ \hline -6 & n+184 \\ -3 & n+92 \\ 0 & n \end{array`
+- **LinEq 2-Var MED seq22** (algebra) stem: `A neighborhood consists of a -hectare park and a -hectare residential area. The ` → `A neighborhood consists of a $2$-hectare park and a $35$-hectare residential are`
+- **LinEq 2-Var MED seq25** (algebra) stem: `A line in the xy-plane has a slope of and passes through the point . The equatio` → `A line in the xy-plane has a slope of $9$ and passes through the point $(0, -5)$`
+- **LinEq 2-Var MED seq26** (algebra) image STEM <= file `lineq2-med-p26.png` → `/uploads/questions/f7cd1330bd4e4c913dcb0d79.png` (was `null`)
+- **LinEq 2-Var MED seq26** (algebra) stem: `Number of sweatshirts The graph models the relationship between the number of T-` → `The graph models the relationship between the number of T-shirts, $x$, and the n`
+- **Systems 2-Lin MED seq3** (algebra) image STEM <= img_c073f3cb4d954e418ed90be9dd389f72 → `/uploads/questions/4251e241d253394b7ea5544e.jpg` (was `null`)
+- **Systems 2-Lin MED seq3** (algebra) stem: `Which of the following systems of equations has the same solution as the system ` → `Which of the following systems of equations has the same solution as the system `
+- **Systems 2-Lin MED seq3** (algebra) opt A: `$$x = \frac{3}{2}$$` → `$$y = 0$$ $$x = \frac{3}{2}$$`
+- **Systems 2-Lin MED seq6** (algebra) stem: `One of the two equations in a system of linear equations is given. The system ha` → `$$y = \frac{2}{7}x + 3$$ One of the two equations in a system of linear equation`
+- **Systems 2-Lin MED seq11** (algebra) stem: `In the xy-plane, the graph of intersects the graph of at the point . What is the` → `In the xy-plane, the graph of $y = x + 3$ intersects the graph of $y = 2x - 6$ a`
+- **Systems 2-Lin MED seq12** (algebra) stem: `If the system of equations above has solution , what is the value of ?` → `$$4x + 5y = 100$$ $$5x + 4y = 62$$ If the system of equations above has solution`
+- **Circles EASY seq2** (geometry) image STEM <= img_3c2e1a959fd443bc89f643d7c448f434 → `/uploads/questions/19d83a4a953eba3aa2acf2ef.jpg` (was `null`)
+- **Circles EASY seq2** (geometry) stem: `The circle above with center O has a circumference of 36. What is the length of ` → `The circle above with center O has a circumference of 36. What is the length of `
+- **Circles HARD seq12** (geometry) image STEM <= img_cc48d32590e94f9aa89d07177efbf146 → `/uploads/questions/7556902e577c44bb863052e8.jpg` (was `null`)
+- **Circles HARD seq15** (geometry) image STEM <= img_c633007fcc564b0badb2c55f602eaa52 → `/uploads/questions/fba50cba6836df69842ac943.jpg` (was `null`)
+- **Circles MEDIUM seq3** (geometry) image STEM <= img_dea6f49749d04254975407b0827955d5 → `/uploads/questions/a8a9b4391afacfadf661c173.jpg` (was `null`)
+- **Circles MEDIUM seq7** (geometry) stem: `The number of radians in a 720-degree angle can be written as , where a is a con` → `The number of radians in a 720-degree angle can be written as $a\pi$, where a is`
+- **Area and Volume EASY seq2** (geometry) stem: `The figure shows the lengths, in centimeters (cm), of the edges of a right recta` → `The figure shows the lengths, in centimeters (cm), of the edges of a right recta`
+- **Area and Volume EASY seq9** (geometry) image STEM <= file `av-easy-seq9-table.png` → `/uploads/questions/02873ed45186dfc888d56bc5.png` (was `null`)
+- **Area and Volume EASY seq11** (geometry) stem: `A right rectangular prism has a length of meters, a width of meters, and a heigh` → `A right rectangular prism has a length of $11$ meters, a width of $8$ meters, an`
+- **Area and Volume HARD seq3** (geometry) image STEM <= file `av-hard-seq3-graph.png` → `/uploads/questions/0bdb3d092b9c8333bb4e7223.png` (was `null`)
+- **Area and Volume HARD seq11** (geometry) image STEM <= file `av-hard-seq11-graph.png` → `/uploads/questions/0f36986f2c59d4fb10e60041.png` (was `null`)
+- **Area and Volume MEDIUM seq2** (geometry) image STEM <= img_6bf61f4fc4024a078855054301997c75 → `/uploads/questions/2358624aa7c77e18361b02fc.jpg` (was `null`)
+- **Area and Volume MEDIUM seq11** (geometry) stem: `A right circular cylinder has a volume of . If the height of the cylinder is 5, ` → `A right circular cylinder has a volume of $45\pi$. If the height of the cylinder`
+- **Area and Volume MEDIUM seq13** (geometry) image STEM <= file `av-med-seq13-graph.png` → `/uploads/questions/461c7ee4a91cadcb2b05ebfd.png` (was `null`)
+- **Lines Angles Triangles EASY seq2** (geometry) image STEM <= img_a6cfbe6b4c13449eb6c6bc4ea13fe2d1 → `/uploads/questions/9d2fc40b2bc87f25b455796a.jpg` (was `null`)
+- **Lines Angles Triangles EASY seq2** (geometry) stem: `In the given triangle, and has a measure of . What is the value of x ?` → `In the given triangle, $AB = AC$ and $\angle ABC$ has a measure of $67^{\circ}$.`
+- **Lines Angles Triangles EASY seq3** (geometry) image STEM <= img_9cf09fdeb5f249b2a3510c9645707b4d → `/uploads/questions/69c4193f766161d0f1378c37.jpg` (was `null`)
+- **Lines Angles Triangles EASY seq3** (geometry) stem: `In the figure above, lines and m are parallel, , and . What is the value of x ?` → `In the figure above, lines $\ell$ and m are parallel, $y = 20$, and $z = 60$. Wh`
+- **Lines Angles Triangles EASY seq6** (geometry) image STEM <= file `lat-easy-seq6-fig.png` → `/uploads/questions/bedb1cf93a5350989cb89f2e.png` (was `null`)
+- **Lines Angles Triangles EASY seq8** (geometry) image STEM <= img_0141e96d6efc411b98bec5f7fca3b749 → `/uploads/questions/5c1b46a81aaf0393de76f6ed.jpg` (was `null`)
+- **Lines Angles Triangles EASY seq8** (geometry) stem: `In the figure above, intersects at C. If , what is the value of y ?` → `In the figure above, $\overline{AD}$ intersects $\overline{BE}$ at C. If $x = 10`
+- **Lines Angles Triangles EASY seq10** (geometry) image STEM <= img_6e9ef9e511cd48e4a97ef978353e454b → `/uploads/questions/ac1f77cade5a2f2f21f2b3cc.jpg` (was `null`)
+- **Lines Angles Triangles EASY seq10** (geometry) stem: `In the figure, three lines intersect at point P. If and , what is the value of z` → `In the figure, three lines intersect at point P. If $x = 65$ and $y = 75$, what `
+- **Lines Angles Triangles EASY seq17** (geometry) image STEM <= img_58e5c842690e43acb276e206157f7b84 → `/uploads/questions/000663bb8eeb7b3d22ca01dd.jpg` (was `null`)
+- **Lines Angles Triangles EASY seq17** (geometry) stem: `In the given figure, extends to point D. If the measure of is equal to the measu` → `In the given figure, $\overline{AC}$ extends to point D. If the measure of $\ang`
+- **Lines Angles Triangles EASY seq11** (geometry) stem: `In the figure above, lines and k are parallel. What is the value of a ?` → `In the figure above, lines $\ell$ and k are parallel. What is the value of a ?`
+- **Lines Angles Triangles HARD seq3** (geometry) image STEM <= img_fda70f32a7ca4d32b906b3a204be3dd1 → `/uploads/questions/7d3e4c332ddde20ab663f81a.jpg` (was `null`)
+- **Lines Angles Triangles HARD seq8** (geometry) image STEM <= file `lat-hard-seq8-fig.png` → `/uploads/questions/51943807a6097197330ed840.png` (was `null`)
+- **Lines Angles Triangles HARD seq10** (geometry) image STEM <= img_937f250073c84dfd9f9dd45b9d61d9af → `/uploads/questions/598cd0c0dc04832500531360.jpg` (was `null`)
+- **Lines Angles Triangles HARD seq1** (geometry) image STEM <= file `lat-hard-seq1-fig.png` → `/uploads/questions/531f249d6a0d5869d90e4550.png` (was `null`)
+- **Lines Angles Triangles MEDIUM seq1** (geometry) image STEM <= img_e2cd4b70375a4c1b8cd04b6ca93da701 → `/uploads/questions/d5b943fb2c9f7bc6ba713405.jpg` (was `null`)
+- **Lines Angles Triangles MEDIUM seq1** (geometry) stem: `In the figure above, , , and are parallel. Points B and E lie on and , respectiv` → `In the figure above, $\overline{AF}$, $\overline{BE}$, and $\overline{CD}$ are p`
+- **Lines Angles Triangles MEDIUM seq3** (geometry) image STEM <= img_5460034aa77041f3839e1a170a3eba58 → `/uploads/questions/b88060a0b9addc7bff72ac74.jpg` (was `null`)
+- **Lines Angles Triangles MEDIUM seq6** (geometry) stem: `In triangle , the measure of angle is and the measure of angle is . In triangle ` → `In triangle $DEF$, the measure of angle $D$ is $47^{\circ}$ and the measure of a`
+- **Lines Angles Triangles MEDIUM seq6** (geometry) opt A: `The measure of angle` → `The measure of angle $F$`
+- **Lines Angles Triangles MEDIUM seq6** (geometry) opt B: `The measure of angle` → `The measure of angle $T$`
+- **Lines Angles Triangles MEDIUM seq6** (geometry) opt C: `The measure of angle and the measure of angle` → `The measure of angle $F$ and the measure of angle $T$`
+- **Lines Angles Triangles MEDIUM seq9** (geometry) stem: `Triangles and are congruent, where corresponds to , and and are right angles. Th` → `Triangles $ABC$ and $DEF$ are congruent, where $A$ corresponds to $D$, and $B$ a`
+- **Lines Angles Triangles MEDIUM seq10** (geometry) image STEM <= img_5ba3c66e0bd34a7ea6d7eb4d5ec4df93 → `/uploads/questions/176b130e74fe554a2d533942.jpg` (was `null`)
+- **Lines Angles Triangles MEDIUM seq10** (geometry) stem: `Triangle ABC and triangle DEF are shown. The relationship between the side lengt` → `Triangle ABC and triangle DEF are shown. The relationship between the side lengt`
+- **Right Triangles and Trig EASY seq1** (geometry) stem: `Triangle $ABC$ is similar to triangle $DEF$, where angle $A$ corresponds to angl` → `Triangle $ABC$ is similar to triangle $DEF$, where angle $A$ corresponds to angl`
+- **Right Triangles and Trig EASY seq1** (geometry) opt A: `$\frac{1}{2\pi}$` → `$\frac{1}{22}$`
+- **Right Triangles and Trig EASY seq1** (geometry) opt B: `$\frac{1}{2\pi}$` → `$\frac{1}{23}$`
+- **Right Triangles and Trig EASY seq1** (geometry) opt C: `$\frac{2\pi}{2\pi}$` → `$\frac{21}{22}$`
+- **Right Triangles and Trig EASY seq1** (geometry) opt D: `$\frac{2\pi}{2\pi}$` → `$\frac{22}{23}$`
+- **Right Triangles and Trig EASY seq3** (geometry) image STEM <= file `rt-easy-seq3-fig.png` → `/uploads/questions/31c93bd1967d00f95d59f279.png` (was `null`)
+- **Right Triangles and Trig HARD seq1** (geometry) stem: `A triangle with angle measures 30°, 60°, and 90° has a perimeter of . What is th` → `A triangle with angle measures 30°, 60°, and 90° has a perimeter of $18 + 6\sqrt`
+- **Right Triangles and Trig HARD seq14** (geometry) image STEM <= img_bbe6dd255f9841b18886b5c0ecde9b2a → `/uploads/questions/3912532304516c6166d5be5b.jpg` (was `null`)
+- **Right Triangles and Trig MEDIUM seq8** (geometry) image STEM <= file `rt-med-seq8-fig.png` → `/uploads/questions/3bd531740f45ac6ce8eca3f0.png` (was `null`)
+- **Inference EASY seq2** (psda-1) stem: `A company designs and makes handbags. To estimate the mean weight of the handbag` → `A company designs and makes handbags. To estimate the mean weight of the handbag`
+- **Inference EASY seq2** (psda-1) opt A: `The mean weight of all handbags made by the company on that ` → `The mean weight of all handbags made by the company on that `
+- **Inference EASY seq2** (psda-1) opt B: `The actual weights of all handbags made by the company on th` → `The actual weights of all handbags made by the company on th`
+- **Inference EASY seq2** (psda-1) opt C: `The actual weights of all handbags from the sample are betwe` → `The actual weights of all handbags from the sample are betwe`
+- **Inference EASY seq2** (psda-1) opt D: `The mean weight of all handbags made by the company on that ` → `The mean weight of all handbags made by the company on that `
+- **Inference HARD seq1** (psda-1) image STEM <= file `ih-p1-poll.png` → `/uploads/questions/7cd914598e811276c8125896.png` (was `null`)
+- **Inference MEDIUM seq2** (psda-1) stem: `To estimate the proportion of a population that has a certain characteristic, a ` → `To estimate the proportion of a population that has a certain characteristic, a `
+- **Inference MEDIUM seq2** (psda-1) opt A: `It is plausible that the proportion is between and .` → `It is plausible that the proportion is between 0.45 and 0.53`
+- **Inference MEDIUM seq2** (psda-1) opt B: `It is plausible that the proportion is less than .` → `It is plausible that the proportion is less than 0.45.`
+- **Inference MEDIUM seq2** (psda-1) opt C: `The proportion is exactly .` → `The proportion is exactly 0.49.`
+- **Inference MEDIUM seq2** (psda-1) opt D: `It is plausible that the proportion is greater than .` → `It is plausible that the proportion is greater than 0.53.`
+- **Inference MEDIUM seq5** (psda-1) stem: `A sample consisting of adults who own televisions was selected at random for a s` → `A sample consisting of 720 adults who own televisions was selected at random for`
+- **Inference MEDIUM seq5** (psda-1) opt A: `More than of all adults who own televisions use their televi` → `More than 35.41% of all adults who own televisions use their`
+- **Inference MEDIUM seq5** (psda-1) opt B: `Between and of all adults who own televisions use their tele` → `Between 28.59% and 35.41% of all adults who own televisions `
+- **Inference MEDIUM seq6** (psda-1) stem: `A company fills boxes with approximately pounds of oranges. To test the accuracy` → `A company fills boxes with approximately 23 pounds of oranges. To test the accur`
+- **Inference MEDIUM seq6** (psda-1) opt A: `Plausible values for the average weight of all boxes of oran` → `Plausible values for the average weight of all boxes of oran`
+- **Inference MEDIUM seq6** (psda-1) opt B: `Plausible values for the average weight of all boxes of oran` → `Plausible values for the average weight of all boxes of oran`
+- **Inference MEDIUM seq6** (psda-1) opt C: `The average weight of all boxes of oranges filled by the com` → `The average weight of all boxes of oranges filled by the com`
+- **Inference MEDIUM seq6** (psda-1) opt D: `The average weight of all boxes of oranges filled by the com` → `The average weight of all boxes of oranges filled by the com`
+- **Inference MEDIUM seq7** (psda-1) stem: `A company that produces socks wants to estimate the percent of the socks produce` → `A company that produces socks wants to estimate the percent of the socks produce`
+- **Inference MEDIUM seq7** (psda-1) opt A: `of the socks are defective.` → `3.62% of the socks are defective.`
+- **Inference MEDIUM seq7** (psda-1) opt B: `It is plausible that between and of the socks are defective.` → `It is plausible that between 8.38% and 15.62% of the socks a`
+- **Inference MEDIUM seq7** (psda-1) opt C: `of the socks are defective.` → `12% of the socks are defective.`
+- **Inference MEDIUM seq7** (psda-1) opt D: `It is plausible that more than of the socks are defective.` → `It is plausible that more than 15.62% of the socks are defec`
+- **Inference MEDIUM seq10** (psda-1) stem: `Based on a random sample from a population, a researcher estimated that the mean` → `Based on a random sample from a population, a researcher estimated that the mean`
+- **Inference MEDIUM seq10** (psda-1) opt A: `It is plausible that the actual mean value of the variable f` → `It is plausible that the actual mean value of the variable f`
+- **Inference MEDIUM seq10** (psda-1) opt B: `It is not possible that the mean value of the variable for t` → `It is not possible that the mean value of the variable for t`
+- **Inference MEDIUM seq10** (psda-1) opt C: `Every value of the variable in the population is between and` → `Every value of the variable in the population is between 19.`
+- **Inference MEDIUM seq10** (psda-1) opt D: `The mean value of the variable for the population is .` → `The mean value of the variable for the population is 20.5.`
+- **One-Var EASY seq2** (psda-1) stem: `, , , , , , , , Which frequency table correctly represents the data listed?` → `$$4, 4, 4, 4, 8, 8, 8, 13, 13$$ Which frequency table correctly represents the d`
+- **One-Var EASY seq2** (psda-1) opt A: `Number Frequency` → `$$\begin{array}{|c|c|}\hline \text{Number} & \text{Frequency`
+- **One-Var EASY seq2** (psda-1) opt B: `Number Frequency` → `$$\begin{array}{|c|c|}\hline \text{Number} & \text{Frequency`
+- **One-Var EASY seq2** (psda-1) opt C: `Number Frequency` → `$$\begin{array}{|c|c|}\hline \text{Number} & \text{Frequency`
+- **One-Var EASY seq2** (psda-1) opt D: `Number Frequency` → `$$\begin{array}{|c|c|}\hline \text{Number} & \text{Frequency`
+- **One-Var EASY seq3** (psda-1) stem: `Data set A and data set B each contain 5 numbers. If the mean of data set A is e` → `Data set A: 72, 73, 73, 76, 76 Data set B: 61, 64, 74, 85, $x$ Data set A and da`
+- **One-Var EASY seq7** (psda-1) stem: `Which of the following statements correctly compares the means of data set A and` → `Data set A: 1, 2, 3, 4, 5, 6, 7 Data set B: 1, 1, 2, 2, 3, 3, 4 Which of the fol`
+- **One-Var EASY seq8** (psda-1) image STEM <= img_c02360cf9aca4f2e8a5af09944cd8020 → `/uploads/questions/68975eb8351d44329cca4241.jpg` (was `null`)
+- **One-Var EASY seq15** (psda-1) image STEM <= file `ove-p15-bar.png` → `/uploads/questions/4553f3b2b74b8135306f0f2d.png` (was `null`)
+- **One-Var EASY seq16** (psda-1) image STEM <= file `ove-p16-bar.png` → `/uploads/questions/a1d2a553dc2195325d9790e9.png` (was `null`)
+- **One-Var EASY seq16** (psda-1) stem: `The bar graph shows the distribution of books collected by different groups for ` → `The bar graph shows the distribution of 414 books collected by 10 different grou`
+- **One-Var HARD seq3** (psda-1) image STEM <= img_cab973349a204596820942c7747c847f → `/uploads/questions/6a21a545f5b9627c8b609b6d.jpg` (was `null`)
+- **One-Var HARD seq4** (psda-1) stem: `Data set A consists of the heights of objects and has a mean of meters. Data set` → `Data set A consists of the heights of 75 objects and has a mean of 25 meters. Da`
+- **One-Var MEDIUM seq1** (psda-1) image STEM <= file `ovm-p1-hist.png` → `/uploads/questions/682c8f7d62ad217fca318ba4.png` (was `null`)
+- **One-Var MEDIUM seq4** (psda-1) stem: `If a is the mean and b is the median of nine consecutive integers, what is the v` → `If a is the mean and b is the median of nine consecutive integers, what is the v`
+- **One-Var MEDIUM seq5** (psda-1) stem: `Which of the following statements about the means and medians of data set A and ` → `Data set A: 5, 5, 5, 5, 5, 5, 5, 5, 5 Data set B: 5, 5, 5, 5, 5, 5, 5, 5, 5, 100`
+- **One-Var MEDIUM seq9** (psda-1) image STEM <= file `ovm-p9-dot.png` → `/uploads/questions/d687bcff0cd1c86197998d0c.png` (was `null`)
+- **One-Var MEDIUM seq9** (psda-1) stem: `Data set A has values and is represented by the dot plot shown. Data set B is cr` → `Data set A has 15 values and is represented by the dot plot shown. Data set B is`
+- **Distributions HARD seq1** (psda-1) image STEM <= file `dm-p1-box.png` → `/uploads/questions/5da69950204f94fd2268124f.png` (was `null`)
+- **Distributions HARD seq2** (psda-1) image STEM <= file `dm-p2-scatter.png` → `/uploads/questions/7bf8066e371ccf2fc9c02df6.png` (was `null`)
+- **Distributions HARD seq4** (psda-1) image STEM <= file `dm-p4-scatter.png` → `/uploads/questions/3a1792584816c9a4e649a4e5.png` (was `null`)
+- **Distributions HARD seq5** (psda-1) image STEM <= file `dm-p5-table.png` → `/uploads/questions/6e24985ebdedba3485f67991.png` (was `null`)
+- **Distributions HARD seq5** (psda-1) stem: `Value Data set A frequency Data set B frequency Data set A and data set B each c` → `Data set A and data set B each consist of 27 values. The table shows the frequen`
+- **Distributions HARD seq7** (psda-1) image STEM <= img_da58c791db2345eaba8f208005a1e5f4 → `/uploads/questions/256934f30c7752cc8de3604b.jpg` (was `null`)
+- **Distributions HARD seq7** (psda-1) stem: `The scatterplot above shows the federal-mandated minimum wage every 10 years bet` → `The scatterplot above shows the federal-mandated minimum wage every 10 years bet`
+- **Distributions HARD seq8** (psda-1) image STEM <= file `dm-p8-box.png` → `/uploads/questions/cbb85940814a29ffb3bd08be.png` (was `null`)
+- **Distributions HARD seq9** (psda-1) image STEM <= file `dm-p9-dot.png` → `/uploads/questions/532626380c9066a834e452e2.png` (was `null`)
+- **Distributions HARD seq10** (psda-1) image STEM <= file `dm-p10-table.png` → `/uploads/questions/b55dcb889c8c0bf0ba64061b.png` (was `null`)
+- **Distributions HARD seq10** (psda-1) stem: `Weight (pounds) Frequency The frequency table summarizes a data set of the weigh` → `The frequency table summarizes a data set of the weights, rounded to the nearest`
+- **Distributions HARD seq11** (psda-1) image STEM <= file `dm-p11-table.png` → `/uploads/questions/0635c68bffbfc00e7bfe5d8b.png` (was `null`)
+- **Distributions HARD seq12** (psda-1) image STEM <= file `dm-p12-hist.png` → `/uploads/questions/4d3d7ea18674221b1223f7f8.png` (was `null`)
+- **Distributions HARD seq15** (psda-1) image STEM <= img_9b4a497286ae4e8ca42e14b524b6f7d7 → `/uploads/questions/e539937413291902d4228035.jpg` (was `null`)
+- **Distributions HARD seq16** (psda-1) image STEM <= file `dm-p16-dot.png` → `/uploads/questions/c3e0fe746f866206fafe1829.png` (was `null`)
+- **Distributions HARD seq16** (psda-1) stem: `The dot plot represents a data set of the number of bursts for eruptions of a st` → `The dot plot represents a data set of the number of bursts for 13 eruptions of a`
+- **Distributions HARD seq17** (psda-1) stem: `Each of the following frequency tables represents a data set. Which data set has` → `Each of the following frequency tables represents a data set. Which data set has`
+- **Distributions HARD seq17** (psda-1) opt A: `Value Frequency\n70 4\n80 5\n90 6\n100 7` → `$$\begin{array}{|c|c|}\hline \text{Value} & \text{Frequency}`
+- **Distributions HARD seq17** (psda-1) opt B: `Value Frequency\n70 6\n80 6\n90 6\n100 6` → `$$\begin{array}{|c|c|}\hline \text{Value} & \text{Frequency}`
+- **Distributions HARD seq17** (psda-1) opt C: `Value Frequency\n70 7\n80 6\n90 6\n100 7` → `$$\begin{array}{|c|c|}\hline \text{Value} & \text{Frequency}`
+- **Distributions HARD seq17** (psda-1) opt D: `Value Frequency\n70 8\n80 5\n90 5\n100 8` → `$$\begin{array}{|c|c|}\hline \text{Value} & \text{Frequency}`
+- **Distributions HARD seq19** (psda-1) image STEM <= file `dm-p20-scatter.png` → `/uploads/questions/78b00ab414ebeb49a855c090.png` (was `null`)
+- **Distributions HARD seq19** (psda-1) stem: `The scatterplot shows the relationship between the length of time , in hours, a ` → `The scatterplot shows the relationship between the length of time $y$, in hours,`
+- **Percentages MEDIUM seq2** (psda-1) image STEM <= file `pm-p2-table.png` → `/uploads/questions/6afc675fead146892a5aef45.png` (was `null`)
+- **Percentages MEDIUM seq2** (psda-1) stem: `The table summarizes the number of objects in each group. Number of Group object` → `The table summarizes the number of objects in each group. The number of objects `
+- **Percentages MEDIUM seq6** (psda-1) stem: `In a group, % of the items are red. Of all the red items in the group, % also ha` → `In a group, 40% of the items are red. Of all the red items in the group, 30% als`
+- **Percentages MEDIUM seq6** (psda-1) opt A: `%` → `10%`
+- **Percentages MEDIUM seq6** (psda-1) opt B: `%` → `12%`
+- **Percentages MEDIUM seq6** (psda-1) opt C: `%` → `70%`
+- **Percentages MEDIUM seq6** (psda-1) opt D: `%` → `75%`
+- **Percentages MEDIUM seq8** (psda-1) stem: `An insurance company offers a series of three information sessions. people atten` → `An insurance company offers a series of three information sessions. 1,250 people`
+- **Percentages HARD seq2** (psda-1) stem: `According to a set of standards, a certain type of substance can contain a maxim` → `According to a set of standards, a certain type of substance can contain a maxim`
+- **Percentages HARD seq2** (PSDA (Percentages)) correctAnswer: `0014` → `0.0014|.0014`  (ANS: Correct Answer: .0014 (0.001% x 140 g); stored 0014 lost the leading 0.)
+- **Percentages HARD seq5** (psda-1) stem: `A reseller buys certain books for a purchase price of dollars each and then mark` → `A reseller buys certain books for a purchase price of 5.00 dollars each and then`
+- **Percentages HARD seq7** (psda-1) image STEM <= img_119c63027cb3413d9491545df116d39f → `/uploads/questions/dccaf794793bcd13bd87c65f.jpg` (was `null`)
+- **Percentages HARD seq7** (psda-1) stem: `The line graph shows the total amount of snow, in inches, recorded each year in ` → `The line graph shows the total amount of snow, in inches, recorded each year in `
+- **Probability EASY seq2** (Probability) image STEM <= file `pe-p2.png` → `/uploads/questions/8fc1a8f98607bb66d40d298c.png` (was `null`)
+- **Probability EASY seq5** (Probability) image STEM <= file `pe-p5.png` → `/uploads/questions/22630d77daeb787f8bc9d129.png` (was `null`)
+- **Probability EASY seq7** (Probability) image STEM <= file `pe-p7.png` → `/uploads/questions/f30aca04b2b150044e9b8073.png` (was `null`)
+- **Probability EASY seq8** (Probability) image STEM <= file `pe-p8.png` → `/uploads/questions/58b8abc77ae290c541eaf1e2.png` (was `null`)
+- **Probability EASY seq9** (Probability) image STEM <= file `pe-p9.png` → `/uploads/questions/9ede82256c8fc9ea1a2229b0.png` (was `null`)
+- **Probability EASY seq10** (Probability) image STEM <= file `pe-p10.png` → `/uploads/questions/5f0d2c5b5c90a37a68b1b4a1.png` (was `null`)
+- **Probability EASY seq11** (Probability) image STEM <= file `pe-p11.png` → `/uploads/questions/e28eb853bccabfb7297e7270.png` (was `null`)
+- **Probability HARD seq1** (Probability) image STEM <= file `ph-p1.png` → `/uploads/questions/e87e1b31adad7f8e5bd32b8a.png` (was `null`)
+- **Probability HARD seq1** (Probability) stem: `Blood type Rhesus factor A B AB O 33 9 3 37 7 2 1 x Human blood can be classifie` → `Human blood can be classified into four common blood types—A, B, AB, and O. It i`
+- **Probability HARD seq3** (Probability) image STEM <= file `ph-p3.png` → `/uploads/questions/bb75d6b4e6210a989aa36062.png` (was `null`)
+- **Probability HARD seq3** (Probability) stem: `The table summarizes the distribution of age and assigned group for participants` → `The table summarizes the distribution of age and assigned group for 90 participa`
+- **Probability HARD seq5** (Probability) image STEM <= file `ph-p5.png` → `/uploads/questions/aa5ec56a6f4ab6c80246a932.png` (was `null`)
+- **Probability HARD seq5** (Probability) stem: `Site A Site B Total Tulip Daffodil Total The table shows the distribution of two` → `The table shows the distribution of two types of flowers at two different sites.`
+- **Probability HARD seq6** (Probability) image STEM <= file `ph-p6.png` → `/uploads/questions/d045778c34dde1a6864236c3.png` (was `null`)
+- **Probability MEDIUM seq1** (Probability) image STEM <= file `pm-p1.png` → `/uploads/questions/a22a62b830bb46025c936d67.png` (was `null`)
+- **Probability MEDIUM seq2** (Probability) image STEM <= file `pm-p2.png` → `/uploads/questions/1e6c5d6149061afa991add36.png` (was `null`)
+- **Probability MEDIUM seq3** (Probability) image STEM <= file `pm-p3.png` → `/uploads/questions/4b159ff4f4ba28aa957b5c91.png` (was `/uploads/questions/2d58920d83e1e9e04d2c1c27.jpg`)
+- **Probability MEDIUM seq4** (Probability) stem: `A box contains red pens and blue pens. If one of these pens is selected at rando` → `A box contains 13 red pens and 37 blue pens. If one of these pens is selected at`
+- **Probability MEDIUM seq5** (Probability) stem: `Penguin Exhibit Type of penguin Male Female Total Chinstrap 41 59 100 Emperor 8 ` → `Penguin Exhibit Type of penguin Male Female Total Chinstrap 41 59 100 Emperor 8 `
+- **Probability MEDIUM seq6** (Probability) image STEM <= file `pm-p6.png` → `/uploads/questions/26f7ffe6417bf29f8490035e.png` (was `null`)
+- **Probability MEDIUM seq7** (Probability) image STEM <= file `pm-p7.png` → `/uploads/questions/ea5baa9b8cf2e05d07597fa7.png` (was `null`)
+- **Probability MEDIUM seq8** (Probability) stem: `At a conference, there are a total of attendees. Each attendee is assigned to ei` → `At a conference, there are a total of 275 attendees. Each attendee is assigned t`
+- **Probability MEDIUM seq10** (Probability) stem: `Each vertex of a -sided polygon is labeled with one of the letters through , wit` → `Each vertex of a 14-sided polygon is labeled with one of the 14 letters $A$ thro`
+- **Probability MEDIUM seq11** (Probability) image STEM <= file `pm-p11.png` → `/uploads/questions/c1cc674df1f30b5041cbc5e0.png` (was `null`)
+- **Ratios EASY seq7** (Ratios, Rates, Proportions, and Units) stem: `The ratio of t to u is 1 to 2, and . What is the value of u ?` → `The ratio of t to u is 1 to 2, and $t = 10$. What is the value of u ?`
+- **Ratios EASY seq14** (Ratios, Rates, Proportions, and Units) stem: `The weight of an object on Venus is approximately of its weight on Earth. The we` → `The weight of an object on Venus is approximately $\frac{9}{10}$ of its weight o`
+- **Ratios MEDIUM seq1** (Ratios, Rates, Proportions, and Units) stem: `A competition consisted of four different events. One participant completed the ` → `A competition consisted of four different events. One participant completed the `
+- **Ratios MEDIUM seq10** (Ratios, Rates, Proportions, and Units) stem: `Tanya earns $13.50 per hour at her part-time job. When she works 2 hours, she ea` → `Tanya earns \(\$13.50\) per hour at her part-time job. When she works z hours, s`
+- **Ratios HARD seq4** (Ratios, Rates, Proportions, and Units) stem: `To study the moisture content in a group of trees, samples from the trunk of eac` → `To study the moisture content in a group of trees, samples from the trunk of eac`
+- **Ratios HARD seq6** (Ratios, Rates, Proportions, and Units) stem: `If $\frac{6n}{b} = 6.7$ and $\frac{n}{bn} = 26.8$, what is the value of $n$?` → `If $\frac{4a}{b} = 6.7$ and $\frac{a}{bn} = 26.8$, what is the value of $n$?`
+- **Stat Claims HARD seq2** (Statistical Claims) image STEM <= file `sh-p2.png` → `/uploads/questions/3e3300ac281449d6aaa211cf.png` (was `null`)
+- **Stat Claims HARD seq2** (Statistical Claims) stem: `A trivia tournament organizer wanted to study the relationship between the numbe` → `A trivia tournament organizer wanted to study the relationship between the numbe`
+- **Stat Claims HARD seq2** (Statistical Claims) opt A: `All trivia teams in the tournament that scored or more point` → `All trivia teams in the tournament that scored 14 or more po`
+- **Stat Claims HARD seq2** (Statistical Claims) opt B: `The trivia teams in the sample` → `The 55 trivia teams in the sample`
+- **Stat Claims HARD seq2** (Statistical Claims) opt C: `The trivia teams in the sample that practiced for at least h` → `The 40 trivia teams in the sample that practiced for at leas`
+- **Stat Claims HARD seq6** (Statistical Claims) stem: `For a baobab tree habitat in South Africa, a scientist randomly selected baobab ` → `For a baobab tree habitat in South Africa, a scientist randomly selected 50 baob`
+- **Stat Claims HARD seq6** (Statistical Claims) opt A: `All the baobab trees that were selected in this habitat` → `All the 50 baobab trees that were selected in this habitat`
+- **Stat Claims HARD seq6** (Statistical Claims) opt B: `All the baobab trees that were years old in this habitat` → `All the baobab trees that were 19 years old in this habitat`
+- **Stat Claims HARD seq6** (Statistical Claims) opt C: `All the baobab trees that were years old in South Africa` → `All the baobab trees that were 17 years old in South Africa`
+- **Stat Claims HARD seq6** (Statistical Claims) opt D: `All the baobab trees that were years old in this habitat` → `All the baobab trees that were 17 years old in this habitat`
+- **TVD EASY seq3** (Two-Variable Data) image STEM <= img_3bc1716851c3409eb47861a42ded08f7 → `/uploads/questions/7a1270726151e82e77e884f5.jpg` (was `null`)
+- **TVD EASY seq6** (Two-Variable Data) image STEM <= img_6158bc3dba5d4fe6b926353ba3f0f844 → `/uploads/questions/daeef0ccd3e6f214795db363.jpg` (was `null`)
+- **TVD EASY seq13** (Two-Variable Data) image STEM <= img_73d8f764bdbe47b8ada81e549ccb0823 → `/uploads/questions/09f6c80b4d2b17a1241f191e.jpg` (was `null`)
+- **TVD MEDIUM seq1** (Two-Variable Data) image STEM <= file `tm-p1.png` → `/uploads/questions/172a8cd2d4e1dbc9bab1df39.png` (was `null`)
+- **TVD MEDIUM seq2** (Two-Variable Data) image STEM <= img_ff3ee501fbb44ad4a953dc2a0e03cc11 → `/uploads/questions/40ec0632078b32e22d835600.jpg` (was `null`)
+- **TVD MEDIUM seq4** (Two-Variable Data) image STEM <= img_76b30cd3c6e7494a8de13b0d2b580856 → `/uploads/questions/0b589ba14080ce4f574b1a94.jpg` (was `null`)
+- **TVD MEDIUM seq5** (Two-Variable Data) image STEM <= img_913a3bc5b9f343f189792311b914f9e7 → `/uploads/questions/a96792bdb9bfa80dccfd5f77.jpg` (was `null`)
+- **TVD MEDIUM seq6** (Two-Variable Data) image STEM <= img_0251b05ae9ff470e856af93e38c3ee64 → `/uploads/questions/464c908e645e48fb71395d09.jpg` (was `null`)
+- **TVD MEDIUM seq8** (Two-Variable Data) image STEM <= file `tm-p8.png` → `/uploads/questions/f1cbb15ab6bc4aba4b69d067.png` (was `null`)
+- **TVD MEDIUM seq9** (Two-Variable Data) image STEM <= img_ed9d1f6795c74b2da4be27590fa30847 → `/uploads/questions/9c1383c25bc4ba824250d1f9.jpg` (was `null`)
+- **TVD MEDIUM seq9** (Two-Variable Data) stem: `The scatterplot shows the relationship between two variables, x and y. A line of` → `The scatterplot shows the relationship between two variables, x and y. A line of`
+- **TVD MEDIUM seq10** (Two-Variable Data) stem: `Which of the following is true about the values of and for ?` → `Which of the following is true about the values of $2^{x}$ and $2x+2$ for $x>0$?`
+- **TVD MEDIUM seq10** (Two-Variable Data) opt A: `For all , it is true that .` → `For all $x>0$, it is true that $2^{x}<2x+2$.`
+- **TVD MEDIUM seq10** (Two-Variable Data) opt B: `For all , it is true that .` → `For all $x>0$, it is true that $2^{x}>2x+2$.`
+- **TVD MEDIUM seq10** (Two-Variable Data) opt C: `There is a constant c such that if , then , but if , then .` → `There is a constant c such that if $0<x<c$, then $2^{x}<2x+2`
+- **TVD MEDIUM seq10** (Two-Variable Data) opt D: `There is a constant c such that if , then , but if , then .` → `There is a constant c such that if $0<x<c$, then $2^{x}>2x+2`
+- **TVD MEDIUM seq11** (Two-Variable Data) image STEM <= file `tm-p11.png` → `/uploads/questions/8b70ca833109e57c88b9427a.png` (was `null`)
+- **TVD HARD seq3** (Two-Variable Data) image STEM <= img_0e577c95796d4649b2e072270d851ef8 → `/uploads/questions/a14f51cdfcaf9d98283ea093.jpg` (was `null`)
+- **TVD HARD seq4** (Two-Variable Data) image STEM <= img_65245cc8fdfe498fbabf7dbc7c178d72 → `/uploads/questions/59ebf7f5a4231bc534be660f.jpg` (was `null`)
+
+## No aplicados (revisar manual)
+- DEFERRED **Nonlinear Functions HARD seq35 (source p36)** (advanced) — Findings qid mismatch: this qid is source p36 (ID 1a722d7d, p(x)=((x-c)^2+160)/(2c)); published stem/options already complete and key D verified (c=8, p(12)=11). No fix needed. The p34 g/h defect described in the findings belongs to qid cmsjrnxbl01ebqmt1id28edpg (spec provided separately). artifactIds=[]
+- DEFERRED **LinEq 2-Var EASY seq0** (algebra) — Same fragment/duplicate of seq18 (see broken_question entry). Changing the type is moot if the record is removed. artifactIds=[]
+- DEFERRED **LinEq 2-Var EASY seq11** (algebra) — The finding named the wrong qid. This qid is the p12 fertilizer question, which is complete and correct (key B). The Mario-binders question on p11 is qid cmsjrnyz6023wqmt1nicwdbbq; its fix is in a separate entry. artifactIds=[]
+- DEFERRED **LinEq 2-Var EASY seq0** (algebra) — This record is a fragment: its stem is the rationale that spills onto source p19, which continues the p18 question (Question ID 4acd05cd). That same question is already published complete as seq18 cmsjrnyzw0247qmt1z4q6h0bj (same graph, same 4 tables, key D). Rebuilding this one as MC would put a duplicate in the set. Recommend removing/archiving it from the set, not repairing it. artifactIds=[]
+
+## WAL
+checkpoint: `[{"busy":0,"log":0,"checkpointed":0}]`
+integrity: `[{"integrity_check":"ok"}]`
