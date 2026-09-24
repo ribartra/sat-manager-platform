@@ -1,0 +1,131 @@
+# Fixes aplicados — recovery-map (2026-09-24T07:46:37.695Z)
+
+Specs: `scratchpad/reading-fixes`. Backup previo en `backups/devdb-preapply-*`. Dev server detenido. Raw better-sqlite3 + WAL checkpoint.
+
+- **TextStruct EASY seq5** (undefined) explanation: `` → `Choice C is the best answer because it most accurately describes the function of`
+- **TextStruct HARD seq4** (undefined) explanation: `` → `Choice D is the best answer because it most accurately describes the main purpos`
+- **TextStruct HARD seq7** (undefined) explanation: `` → `Choice C is the best answer because it most accurately describes the main purpos`
+- **TextStruct HARD seq8** (undefined) explanation: `` → `Choice B is the best answer because it most accurately describes the overall str`
+- **TextStruct HARD seq13** (undefined) explanation: `` → `Choice B is the best answer because it most accurately describes the main purpos`
+- **TextStruct MEDIUM seq7** (undefined) explanation: `` → `Choice D is the best answer because it most accurately describes the function of`
+- **TextStruct MEDIUM seq9** (undefined) explanation: `` → `Choice A is the best answer because it most accurately describes the main purpos`
+- **TextStruct MEDIUM seq17** (undefined) explanation: `` → `Choice D is the best answer because it best describes the overall structure of t`
+- **WiC EASY seq7** (undefined) explanation: `` → `Choice B is the best answer because it most logically completes the text’s discu`
+- **WiC EASY seq40** (undefined) explanation: `` → `Choice A is the best answer because as used in the text, "sheltering" most nearl`
+- **WiC HARD seq5** (undefined) explanation: `` → `Choice B is the best answer because it most logically completes the text’s discu`
+- **WiC HARD seq17** (undefined) explanation: `` → `Choice C is the best answer because it most logically completes the text’s discu`
+- **WiC HARD seq24** (undefined) explanation: `` → `Choice B is the best answer because it most logically and precisely completes th`
+- **WiC HARD seq48** (undefined) explanation: `` → `Choice C is the best answer because it most logically completes the text’s discu`
+- **WiC HARD seq53** (undefined) explanation: `` → `Choice A is the best answer because it most logically completes the text’s discu`
+- **WiC HARD seq54** (undefined) explanation: `` → `Choice C is the best answer because it most logically completes the text’s discu`
+- **WiC MEDIUM seq11** (undefined) explanation: `` → `Choice C is the best answer because it most logically completes the text’s discu`
+- **WiC MEDIUM seq44** (undefined) explanation: `` → `Choice B is the best answer because it most logically completes the text’s discu`
+- **CentralIdeas EASY seq7** (undefined) explanation: `` → `Choice A is the best answer because it presents a statement about Veronica Wawer`
+- **CentralIdeas HARD seq10** (undefined) explanation: `` → `Choice A is the best answer because it most accurately states the main idea of t`
+- **CentralIdeas HARD seq12** (undefined) explanation: `` → `Choice A is the best answer because it presents a statement about Alfagali and o`
+- **CentralIdeas HARD seq13** (undefined) explanation: `` → `Choice C is the best answer because it presents a conclusion about the role of f`
+- **CentralIdeas MEDIUM seq7** (undefined) explanation: `` → `Choice A is the best answer because it presents a statement about how historians`
+- **CoE EASY seq4** (undefined) image STEM <= file `cmsjro19x02xjqmt1vj8tnuk2-04.jpg` → `/uploads/questions/85e9d97e0bcf4f1a9a67f97b.jpg` (was `null`)
+- **CoE EASY seq4** (undefined) explanation: `` → `Choice A is the best answer. The claim is that when winds are stronger than fore`
+- **CoE EASY seq4** (undefined) stimulus: `200 175 150 125 100 75 50 25 0 )hWM fo sdnasuoht ni( yticirtcelE Amount of Addit` → `Amount of Additional Electricity Wind Turbines Could Generate When Winds Were St`
+- **CoE EASY seq12** (undefined) image STEM <= file `cmsjro1ap02ynqmt1m2v68i5x-12.jpg` → `/uploads/questions/829ba293d634b006f516bbac.jpg` (was `null`)
+- **CoE EASY seq12** (undefined) explanation: `` → `Choice A is the best answer. The claim is that measurements such as total area c`
+- **CoE EASY seq12** (undefined) stimulus: `50 40 30 20 10 0 )mk erauqs( aerA Area of Three Glaciers in the 2016 Swiss Glaci` → `Area of Three Glaciers in the 2016 Swiss Glacier Inventory To monitor changes to`
+- **CoE EASY seq16** (undefined) image STEM <= file `cmsjro1b302z7qmt1nd9d0vfo-16.jpg` → `/uploads/questions/5f79f27930163918d13300e5.jpg` (was `null`)
+- **CoE EASY seq16** (undefined) explanation: `` → `Choice A is the best answer. By comparing the number of investigative articles i`
+- **CoE EASY seq16** (undefined) stimulus: `1,750 1,500 1,250 1,000 750 500 250 0 selcitra fo rebmuN Investigative Articles ` → `Investigative Articles Published in the Albuquerque Journal from 2010 to 2019 In`
+- **CoE EASY seq19** (undefined) explanation: `` → `Choice D is the best answer because the quotation directly illustrates Patty try`
+- **CoE EASY seq24** (undefined) image STEM <= file `cmsjro1c0030bqmt1vdkehstr-24.jpg` → `/uploads/questions/d9aa1a5e069709fb29c48f8e.jpg` (was `null`)
+- **CoE EASY seq24** (undefined) explanation: `` → `Choice B is the best answer. Pacaya had a deformation rate of almost 3.5 centime`
+- **CoE EASY seq24** (undefined) stimulus: `3.5 3.0 2.5 2.0 1.5 1.0 0.5 0 etar noitamrofeD )htnom rep sretemitnec( Deformati` → `Deformation Rate of Five Volcanoes When magma moves underneath a volcano, it cau`
+- **CoE EASY seq25** (undefined) explanation: `` → `Choice C is the best answer because it presents a detail that, if true, would mo`
+- **CoE EASY seq36** (undefined) explanation: `` → `Choice B is the best answer because it presents a finding that, if true, would s`
+- **CoE HARD seq2** (undefined) explanation: `` → `Choice B is the best answer because it presents a statement that, if true, would`
+- **CoE HARD seq3** (undefined) explanation: `` → `Choice D is the best answer because it presents a statement that would support H`
+- **CoE HARD seq17** (undefined) explanation: `` → `Choice D is the best answer because it presents a finding that, if true, would s`
+- **CoE HARD seq18** (undefined) explanation: `` → `Choice B is the best answer because it presents a finding that, if true, would m`
+- **CoE HARD seq19** (undefined) explanation: `` → `Choice C is the best answer because it effectively completes the text’s discussi`
+- **CoE HARD seq23** (undefined) explanation: `` → `Choice B is the best answer because it presents a finding that, if true, would m`
+- **CoE HARD seq27** (undefined) explanation: `` → `Choice C is the best answer because it presents a finding that, if true, would m`
+- **CoE HARD seq29** (undefined) explanation: `` → `Choice D is the best answer because it describes data from the table that suppor`
+- **CoE HARD seq30** (undefined) explanation: `` → `Choice D is the best answer. This critic challenges the claim by arguing that A `
+- **CoE HARD seq31** (undefined) explanation: `` → `Choice A is the best answer. The table provides evidence that the words for corn`
+- **CoE HARD seq34** (undefined) explanation: `` → `Choice A is the best answer because it presents a finding that, if true, would s`
+- **CoE HARD seq35** (undefined) explanation: `` → `Choice B is the best answer because it presents a finding that would best suppor`
+- **CoE HARD seq36** (undefined) explanation: `` → `Choice C is the best answer because it presents a finding that, if true, would s`
+- **CoE MEDIUM seq3** (undefined) explanation: `` → `Choice B is the best answer because it presents a finding that, if true, would m`
+- **CoE MEDIUM seq6** (undefined) image STEM <= file `cmsjro29j03hgqmt1pedgajtu-07.jpg` → `/uploads/questions/97dd006f4a82eaa0e4343467.jpg` (was `null`)
+- **CoE MEDIUM seq6** (undefined) explanation: `` → `Choice B is the best answer. Campfires typically reach over 400°C, so human arti`
+- **CoE MEDIUM seq6** (undefined) stimulus: `700 600 500 400 300 200 100 0 )C°( erutarepmeT Estimated Temperatures to which E` → `Estimated Temperatures to which Evron Quarry Artifacts Were Exposed Flint artifa`
+- **CoE MEDIUM seq10** (undefined) explanation: `` → `Choice D is the best answer because it most effectively uses data from the table`
+- **CoE MEDIUM seq26** (undefined) explanation: `` → `Choice C is the best answer because it effectively uses data from the table to c`
+- **CoE MEDIUM seq27** (undefined) image STEM <= file `cmsjro2cb03kdqmt1q2ameh4p-28.jpg` → `/uploads/questions/e89076d0a5ed3531d828763f.jpg` (was `null`)
+- **CoE MEDIUM seq27** (undefined) explanation: `` → `Choice B is the best answer because it describes data from the graph that suppor`
+- **CoE MEDIUM seq27** (undefined) stimulus: `45 40 35 30 25 20 15 10 5 0 )erca rep sdnuop( dleiY Cantaloupe Yield 2017 2018 2` → `Cantaloupe Yield To test the effects of a nitrogen fertilizer on cantaloupe prod`
+- **CoE MEDIUM seq29** (undefined) explanation: `` → `Choice A is the best answer because it presents a finding that, if true, would m`
+- **CoE MEDIUM seq32** (undefined) explanation: `` → `Choice D is the best answer because it presents the quotation that most effectiv`
+- **XText EASY seq15** (undefined) explanation: `` → `Choice A is the best answer. Text 1 is extremely positive about Strassburg’s tea`
+- **XText HARD seq2** (undefined) explanation: `` → `Choice D is the best answer. The author of Text 2 acknowledges that nanohybrids `
+- **XText HARD seq4** (undefined) explanation: `` → `Choice D is the best answer. Ishii and O’Mahony were trying to isolate the pure `
+- **XText HARD seq6** (undefined) explanation: `` → `Choice D is the best answer because it reflects how the author of Text 1 would m`
+- **XText HARD seq7** (undefined) explanation: `` → `Choice A is the best answer because it provides a statement about the descriptio`
+- **XText HARD seq9** (undefined) explanation: `` → `Choice C is the best answer because it reflects how the author of Text 2 would m`
+- **XText HARD seq10** (undefined) explanation: `` → `Choice B is the best answer. Both texts are critical of The Guns of August, but `
+- **XText HARD seq11** (undefined) explanation: `` → `Choice D is the best answer because it accurately describes how the author of Te`
+- **XText HARD seq12** (undefined) explanation: `` → `Choice B is the best answer. Text 1 introduces Wang and colleagues’ study and it`
+- **XText MEDIUM seq1** (undefined) explanation: `` → `Choice B is the best answer. Author 1 describes the puzzle that physicists still`
+- **XText MEDIUM seq6** (undefined) explanation: `` → `Choice D is the best answer. According to the author of Text 1, Moore’s definiti`
+- **XText MEDIUM seq9** (undefined) explanation: `` → `Choice A is the best answer. Text 2 describes how the Svalbard polar bears have `
+- **Inf EASY seq8** (undefined) explanation: `` → `Choice A is the best answer because it presents the conclusion that most logical`
+- **Inf HARD seq1** (undefined) explanation: `` → `Choice B is the best answer because it presents the conclusion that most logical`
+- **Inf HARD seq2** (undefined) explanation: `` → `Choice D is the best answer because it most logically completes the text’s discu`
+- **Inf HARD seq4** (undefined) explanation: `` → `Choice D is the best answer because it most logically completes the text’s discu`
+- **Inf HARD seq5** (undefined) explanation: `` → `Choice A is the best answer because it most logically completes the text’s discu`
+- **Inf HARD seq6** (undefined) explanation: `` → `Choice A is the best answer because it most logically completes the text’s discu`
+- **Inf HARD seq8** (undefined) explanation: `` → `Choice C is the best answer because it presents the inference that most logicall`
+- **Inf HARD seq21** (undefined) explanation: `` → `Choice D is the best answer because it most logically completes the discussion a`
+- **Inf HARD seq23** (undefined) explanation: `` → `Choice A is the best answer because it most logically completes the text’s discu`
+- **Inf HARD seq24** (undefined) explanation: `` → `Choice C is the best answer because it most logically completes the text. The te`
+- **Inf HARD seq25** (undefined) explanation: `` → `Choice C is the best answer because it logically completes the text’s discussion`
+- **Inf MEDIUM seq4** (undefined) explanation: `` → `Choice D is the best answer because it most logically completes the text’s discu`
+- **Inf MEDIUM seq7** (undefined) explanation: `` → `Choice A is the best answer because it most logically completes the text’s discu`
+- **Inf MEDIUM seq10** (undefined) explanation: `` → `Choice B is the best answer because it presents the conclusion that most logical`
+- **Inf MEDIUM seq13** (undefined) explanation: `` → `Choice D is the best answer because it logically completes the text’s discussion`
+- **CoE EASY seq9** (undefined) image STEM <= file `cmsjro1af02y8qmt1cz0wfhfw-09.jpg` → `/uploads/questions/2d4ce3e0774bc73e39a72678.jpg` (was `null`)
+- **CoE EASY seq9** (undefined) stimulus: `400 300 200 100 0 noitcudorp reppoc ylraeY )sdnuop fo snoillim ni( Copper Produc` → `Copper Production for Three States, 1889-1909 Copper had been mined in the US fo`
+- **CoE EASY seq21** (undefined) image STEM <= file `cmsjro1bn02zwqmt1mddhcob3-21.jpg` → `/uploads/questions/0dcf76efb1363f3b272b263e.jpg` (was `null`)
+- **CoE EASY seq21** (undefined) stimulus: `40 30 20 10 0 hsif gnuoy laudividni fo rebmuN Number of Young Fish Collected at ` → `Number of Young Fish Collected at Mangrove Sites in the Egyptian Red Sea During `
+- **CoE HARD seq1** (undefined) image STEM <= file `cmsjro1h2032fqmt10ig9of9m-01.jpg` → `/uploads/questions/8736b7c7a55bbc64f1635052.jpg` (was `null`)
+- **CoE HARD seq1** (undefined) stimulus: `1,300 1,200 1,100 1,000 900 800 700 600 500 400 300 200 100 0 seitilapicinum fo ` → `Municipalities’ Responses to Inquiries about Potential Incentives for Firm In th`
+- **CoE HARD seq4** (undefined) image STEM <= file `cmsjro1hi032uqmt19pia9uok-04.jpg` → `/uploads/questions/3a08badef7ec8ba4f3c65dd8.jpg` (was `null`)
+- **CoE HARD seq4** (undefined) stimulus: `12 11 10 9 8 7 6 5 4 3 2 1 0 )syad( emiT Banana Ripening Time at Different Tempe` → `Banana Ripening Time at Different Temperatures with and without Ethylene Treatme`
+- **CoE HARD seq7** (undefined) image STEM <= file `cmsjro1i00339qmt1ec3zgdif-07.jpg` → `/uploads/questions/9438aaf519651ba59698c830.jpg` (was `null`)
+- **CoE HARD seq7** (undefined) stimulus: `180 160 140 120 100 80 60 40 20 0 enilesab fo % sa peels MER morf ecnereffid nae` → `Fur Seal REM Sleep on Land after an Extended Period in Water Research suggests t`
+- **CoE HARD seq8** (undefined) image STEM <= file `cmsjro1i7033eqmt1to9sai8l-08.jpg` → `/uploads/questions/18beffda2613343be147da6d.jpg` (was `null`)
+- **CoE HARD seq8** (undefined) stimulus: `90 80 70 60 50 40 30 20 10 0 dezylana setis lla fo egatnecreP Home Heating Needs` → `Home Heating Needs Met with Subsurface Thermal Pollution for Two Temperature Con`
+- **CoE HARD seq16** (undefined) image STEM <= file `cmsjro1j9034hqmt1rtqkziil-17.jpg` → `/uploads/questions/663bcddbde0aa64056b0bdb3.jpg` (was `null`)
+- **CoE HARD seq16** (undefined) stimulus: `35 30 25 20 15 10 5 0 ega egairram naideM Median Ages of First Marriage for Men ` → `Median Ages of First Marriage for Men and Women in the United States and in Engl`
+- **CoE HARD seq21** (undefined) image STEM <= file `cmsjro1jt0356qmt1nerolyji-22.jpg` → `/uploads/questions/1f328e65d3c16ad30a3762eb.jpg` (was `null`)
+- **CoE HARD seq21** (undefined) stimulus: `250 200 150 100 50 0 smargonan( level dicA )thgiew yrd fo marg rep Jasmonic and ` → `Jasmonic and Salicylic Acid Levels in Tomato Plants In tomato plants, herbivory `
+- **CoE HARD seq24** (undefined) image STEM <= file `cmsjro1k3035jqmt1dg5cwyxv-26.jpg` → `/uploads/questions/5a16c7021281d82716658d58.jpg` (was `null`)
+- **CoE HARD seq24** (undefined) stimulus: `550 500 450 400 350 300 250 200 150 100 50 0 )smarg( thgieW Weight of Three Aeri` → `Weight of Three Aerial Robots Aerial robots vary considerably in their holding f`
+- **CoE MEDIUM seq2** (undefined) image STEM <= file `cmsjro28z03gxqmt1tjx58bkm-02.jpg` → `/uploads/questions/ba0b04307a80cb9f6c6215cf.jpg` (was `null`)
+- **CoE MEDIUM seq2** (undefined) stimulus: `7 6 5 4 3 2 1 0 gnitar naem ’stnapicitraP )evitisop erom = seulav rehgih ;9–1( P` → `Participants’ Responses to Three Review Conditions To understand how expressions`
+- **CoE MEDIUM seq4** (undefined) image STEM <= file `cmsjro29903h6qmt1v50via14-05.jpg` → `/uploads/questions/5c6e6ade0a4532d535999a85.jpg` (was `null`)
+- **CoE MEDIUM seq4** (undefined) stimulus: `100 90 80 70 60 50 40 30 20 10 0 )%( detanimreg sdeeS Seed Germination with and ` → `Seed Germination with and without H₂S Treatment In high concentrations, hydrogen`
+- **CoE MEDIUM seq15** (undefined) image STEM <= file `cmsjro2ar03ipqmt16xm5xh5j-16.jpg` → `/uploads/questions/1927df7540c12601435acfaa.jpg` (was `null`)
+- **CoE MEDIUM seq15** (undefined) stimulus: `200 160 120 80 40 0 syaD Days per Winter That Lakes Have Surface Ice 1 6 8 0 – –` → `Days per Winter That Lakes Have Surface Ice It is common for freshwater lakes ne`
+- **CoE MEDIUM seq16** (undefined) image STEM <= file `cmsjro2aw03iuqmt1cs6rep55-17.jpg` → `/uploads/questions/b4c4be6388016181fab215d7.jpg` (was `null`)
+- **CoE MEDIUM seq16** (undefined) stimulus: `100 90 80 70 60 50 40 30 20 10 0 noitalupop fo tnecreP seitic ni gnivil Urban Po` → `Urban Population of Algeria, France, Japan, and Nigeria The share of the world’s`
+- **CoE MEDIUM seq21** (undefined) image STEM <= file `cmsjro2bj03jjqmt1l16vdo5d-22.jpg` → `/uploads/questions/f5b1ae5d78726654f1000c92.jpg` (was `null`)
+- **CoE MEDIUM seq21** (undefined) stimulus: `5 4 3 2 1 0 ,noitubirtnoc on = 0( gnitaR )noitubirtnoc hgih = 5 Average Ratings ` → `Average Ratings of Urban Agriculture’s Contribution to Various Social or Ecologi`
+- **CoE MEDIUM seq22** (undefined) image STEM <= file `cmsjro2bo03joqmt1ezs9707c-23.jpg` → `/uploads/questions/31aba37bf0de075712362d96.jpg` (was `null`)
+- **CoE MEDIUM seq22** (undefined) stimulus: `1,500 1,000 500 0 skaerb maeb fo rebmuN Number of Infrared Beam Breaks by Mice T` → `Number of Infrared Beam Breaks by Mice Treated with CNO or Saline, by Sex To inv`
+- **CoE MEDIUM seq24** (undefined) image STEM <= file `cmsjro2bx03jyqmt1xw0nfdmw-25.jpg` → `/uploads/questions/c335d6a61905c2c56737eb54.jpg` (was `null`)
+- **CoE MEDIUM seq24** (undefined) stimulus: `90 80 70 60 50 40 30 20 10 0 dellatsni ylwen fo tnecreP senibrut Rotor Diameters` → `Rotor Diameters of Newly Installed Wind Turbines in the United States, 2011–2021`
+- **CoE MEDIUM seq28** (undefined) image STEM <= file `cmsjro2cf03kiqmt1bs26p3rj-29.jpg` → `/uploads/questions/a120dce51d66d9517fbfe68f.jpg` (was `null`)
+- **CoE MEDIUM seq28** (undefined) stimulus: `600 550 500 450 400 350 300 250 200 150 100 50 0 snoitseggus fo rebmuN Suggestio` → `Suggestions for Improving a University Gabrielle Adams and colleagues reviewed s`
+
+## WAL
+checkpoint: `[{"busy":0,"log":0,"checkpointed":0}]`
+integrity: `[{"integrity_check":"ok"}]`
