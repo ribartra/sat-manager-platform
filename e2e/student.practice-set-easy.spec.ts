@@ -148,20 +148,31 @@ test.describe.serial("Incremental — Tutor → Alumno → Practice Set EASY", (
     const ps = ctx.practiceSet!;
 
     await loginAs(page, E2E.teacherEmail, E2E.teacherPassword);
-    await page.goto(`/teacher/students/${ctx.studentId}`);
+    await page.goto(`/teacher/students/${ctx.studentId}?area=math`);
     await expect(page.getByRole("heading", { name: student.name })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Math", exact: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Full Practice Tests", exact: true })).toBeVisible();
 
     // Completed attempt appears (no longer empty state).
-    await expect(page.getByText(/No completed attempts yet/i)).toHaveCount(0);
+    await expect(page.getByText(/No completed .*attempts yet/i)).toHaveCount(0);
     await expect(
       page.getByText(new RegExp(ps.name.split(" - ")[0] || "Circles|Attempt|Completed|%", "i")).first()
     ).toBeVisible({ timeout: 20_000 });
 
+    // Full Practice Tests tab must not list Practice Sets.
+    await page.getByRole("link", { name: "Full Practice Tests", exact: true }).click();
+    await expect(page).toHaveURL(/area=mocks/);
+    await expect(page.getByText(ps.name)).toHaveCount(0);
+    await expect(page.getByRole("columnheader", { name: "R&W" })).toBeVisible();
+
     // Optional: open report for a progress summary.
-    await page.goto(`/teacher/students/${ctx.studentId}/report`);
+    await page.goto(`/teacher/students/${ctx.studentId}/report?area=math`);
+    await expect(page.getByRole("link", { name: "Full Practice Tests", exact: true })).toBeVisible();
     await expect(page.getByText(/Completed attempts|Recent Attempts|Average/i).first()).toBeVisible({
       timeout: 20_000,
     });
+    await page.getByRole("link", { name: "Full Practice Tests", exact: true }).click();
+    await expect(page.getByText(ps.name)).toHaveCount(0);
   });
 });
 

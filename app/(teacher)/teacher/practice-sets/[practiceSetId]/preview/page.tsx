@@ -3,18 +3,18 @@ import { requireTeacherOrAdmin } from "@/lib/rbac";
 import { renderPracticePlayer } from "@/app/(student)/student/practice/practice-player-page";
 
 interface PageProps {
-  params: Promise<{ setId: string }>;
+  params: Promise<{ practiceSetId: string }>;
 }
 
 export default async function PracticeSetPreviewPage({ params }: PageProps) {
   const session = await requireTeacherOrAdmin();
   if (!session) notFound();
-  const { setId } = await params;
+  const { practiceSetId } = await params;
 
   return renderPracticePlayer({
-    setId,
+    setId: practiceSetId,
     feedbackMode: "AFTER_SET",
     previewMode: true,
-    exitHref: `/teacher/practice-sets/${setId}/edit`,
+    exitHref: `/teacher/practice-sets/${practiceSetId}/edit`,
   });
 }

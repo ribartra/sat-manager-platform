@@ -12,6 +12,7 @@ import { QuestionMedia } from "@/components/question-media";
 import { CheckCircle, XCircle, MinusCircle, ChevronLeft, RotateCcw } from "lucide-react";
 import { parseSnapshot, PracticeSetSnapshot, QuestionSnapshot } from "@/lib/attempt-snapshots";
 import { formatCorrectAnswer } from "@/lib/answer-grading";
+import { resolveQuestionType } from "@/lib/question-type";
 import { difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
 
 interface PageProps {
@@ -166,7 +167,8 @@ export default async function ResultsPage({ params }: PageProps) {
             if (!ans) return null;
             const snapshot = parseSnapshot<QuestionSnapshot>(ans.questionSnapshot);
             const question = snapshot ?? ans.question;
-            const options = snapshot?.options ?? ans.question.options;
+            const options = snapshot?.options?.length ? snapshot.options : ans.question.options;
+            const responseType = resolveQuestionType(question.type, options);
             const topicName = snapshot?.topic?.name ?? ans.question.topic.name;
             const isUnanswered = !ans.answer;
             const isCorrect = ans.isCorrect;
@@ -209,9 +211,9 @@ export default async function ResultsPage({ params }: PageProps) {
                   <MathContent content={question.stem} className="text-sm text-gray-800 mb-3" />
                   <QuestionMedia imageUrl={question.imageUrl} alt={`Question ${i + 1} image`} className="mb-3" />
 
-                  {question.type === "MC" && (
+                  {responseType === "MC" && (
                     <div className="space-y-1 mb-3">
-                      {options.map((opt) => {
+                      {options.filter((opt) => opt.text.trim()).map((opt) => {
                         const studentPick = ans.answer === opt.label;
                         const isRight = canRevealSolutions && question.correctAnswer === opt.label;
                         const optionClass = isRight
@@ -226,7 +228,6 @@ export default async function ResultsPage({ params }: PageProps) {
                             <span className="font-medium w-4">{opt.label})</span>
                             <span className="min-w-0 flex-1">
                               <MathContent content={opt.text} />
-                              <QuestionMedia imageUrl={opt.imageUrl} alt={`Option ${opt.label} image`} className="mt-2" />
                             </span>
                           </div>
             );
@@ -234,7 +235,7 @@ export default async function ResultsPage({ params }: PageProps) {
                     </div>
                   )}
 
-                  {question.type === "NUMERIC" && (
+                  {responseType === "NUMERIC" && (
                     <div className="mb-3 flex flex-wrap gap-4 text-sm">
                       <span className="text-gray-600">Your answer: <span className="font-medium text-gray-900">{ans.answer || "—"}</span></span>
                       {canRevealSolutions && (

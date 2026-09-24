@@ -6,6 +6,7 @@ import { MathContent } from "@/components/math-content";
 import { QuestionMedia } from "@/components/question-media";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { questionResponseLabel, resolveQuestionType } from "@/lib/question-type";
 
 export type PlayerPreviewOption = {
   label: string;
@@ -42,6 +43,7 @@ export function QuestionPlayerPreview({
   }
 
   const hasPassage = Boolean(stimulus?.trim());
+  const responseType = resolveQuestionType(type, options);
 
   return (
     <div className={cn("overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm", className)}>
@@ -80,7 +82,7 @@ export function QuestionPlayerPreview({
 
         <div className="flex min-h-0 flex-col gap-4 overflow-y-auto p-4 md:p-6">
           <div className="flex items-center justify-between gap-3">
-            <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Answer choices</p>
+            <p className="text-xs font-medium uppercase tracking-wide text-gray-500">{questionResponseLabel(responseType)}</p>
             <button
               type="button"
               onClick={() => setMarked((v) => !v)}
@@ -94,9 +96,9 @@ export function QuestionPlayerPreview({
             </button>
           </div>
 
-          {type === "MC" ? (
+          {responseType === "MC" ? (
             <div className="space-y-2.5">
-              {options.map((opt) => {
+              {options.filter((opt) => opt.text.trim()).map((opt) => {
                 const isEliminated = eliminated.has(opt.label);
                 return (
                   <div
@@ -126,7 +128,6 @@ export function QuestionPlayerPreview({
                         ) : (
                           <span className="text-gray-300">Empty</span>
                         )}
-                        <QuestionMedia imageUrl={opt.imageUrl || null} alt={`Option ${opt.label} image`} className="mt-2" />
                       </span>
                     </button>
                     <button

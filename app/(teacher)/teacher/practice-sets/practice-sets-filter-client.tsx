@@ -7,14 +7,14 @@ import { TaxonomyPicker, type TaxonomyPickerTopic } from "@/components/taxonomy-
 import { difficultyOptions, practiceSetStatusOptions } from "@/lib/domain-meta";
 
 export function PracticeSetsFilter({
-  section,
+  area,
   sectionLabel,
   topics,
   initialTopicId,
   initialDifficulty,
   initialStatus,
 }: {
-  section: string;
+  area: string;
   sectionLabel: string;
   topics: TaxonomyPickerTopic[];
   initialTopicId?: string;
@@ -29,7 +29,7 @@ export function PracticeSetsFilter({
   function apply(e: React.FormEvent) {
     e.preventDefault();
     const params = new URLSearchParams();
-    params.set("section", section);
+    params.set("area", area);
     if (topicId) params.set("topic", topicId);
     if (difficulty) params.set("difficulty", difficulty);
     if (status) params.set("status", status);

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { notifyUser } from "@/lib/notifications";
@@ -22,6 +23,9 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
   let created = 0;
   const test = await prisma.fullPracticeTest.findUnique({ where: { id: testId } });
   if (!test) return NextResponse.json({ error: "Exam not found." }, { status: 404 });
+  if (test.status !== "PUBLISHED") {
+    return NextResponse.json({ error: "Only published exams can be assigned." }, { status: 400 });
+  }
 
   const allowedStudents = await prisma.user.findMany({
     where: { id: { in: requestedStudentIds }, ...studentAccessWhereFor(session.user) },
@@ -32,13 +36,17 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     return NextResponse.json({ error: "One or more students are outside your program scope." }, { status: 403 });
   }
 
+  const touchedStudentIds = new Set<string>();
   for (const studentId of requestedStudentIds) {
     const existing = await prisma.fullPracticeTestAssignment.findFirst({ where: { testId, studentId } });
-    if (existing) continue;
+    if (existing) {
+      touchedStudentIds.add(studentId);
+      continue;
+    }
     const assignment = await prisma.fullPracticeTestAssignment.create({
       data: { testId, studentId, assignedById: session.user.id, dueDate: dueDate ? new Date(dueDate) : null },
     });
-    await notifyUser(studentId, "Exam assigned", test.name, "/student/full-tests");
+    await notifyUser(studentId, "Exam assigned", test.name, "/student/content-map?area=mocks");
     await prisma.auditLog.create({
       data: {
         userId: session.user.id,
@@ -49,6 +57,16 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       },
     });
     created += 1;
+    touchedStudentIds.add(studentId);
   }
+
+  revalidatePath("/student");
+  revalidatePath("/student/content-map");
+  for (const studentId of touchedStudentIds) {
+    revalidatePath(`/teacher/students/${studentId}`);
+    revalidatePath(`/teacher/impersonate/${studentId}`);
+  }
+  revalidatePath(`/teacher/full-tests/${testId}`);
+
   return NextResponse.json({ created });
 }

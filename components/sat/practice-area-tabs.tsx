@@ -26,16 +26,18 @@ export function PracticeAreaTabs({
   const tabs = includeMocks ? AREA_TABS_WITH_MOCKS : PRACTICE_AREA_TABS;
 
   return (
-    <div className={`mb-5 flex flex-wrap gap-2 border-b border-gray-200 ${className ?? ""}`}>
-      {tabs.map((tab) => (
-        <Link
-          key={tab.key}
-          href={buildAreaHref(basePath, tab.key, preserve)}
-          className={areaTabLinkClass(tab.key, active === tab.key)}
-        >
-          {tab.label}
-        </Link>
-      ))}
-    </div>
+    <nav aria-label="Practice area" className={`-mx-1 mb-5 overflow-x-auto border-b border-gray-200 ${className ?? ""}`}>
+      <div className="flex min-w-max gap-1 px-1">
+        {tabs.map((tab) => (
+          <Link
+            key={tab.key}
+            href={buildAreaHref(basePath, tab.key, preserve)}
+            className={`${areaTabLinkClass(tab.key, active === tab.key)} whitespace-nowrap`}
+          >
+            {tab.label}
+          </Link>
+        ))}
+      </div>
+    </nav>
   );
 }

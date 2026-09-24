@@ -37,6 +37,16 @@ export function cleanupE2eUsers(emailPrefix = "e2e.") {
       );
       db.prepare(`DELETE FROM Attempt WHERE studentId = ?`).run(user.id);
       db.prepare(`DELETE FROM Assignment WHERE studentId = ? OR assignedById = ?`).run(user.id, user.id);
+      db.prepare(
+        `DELETE FROM FullPracticeTestAnswer WHERE attemptId IN (
+          SELECT id FROM FullPracticeTestAttempt WHERE studentId = ?
+        )`
+      ).run(user.id);
+      db.prepare(`DELETE FROM FullPracticeTestAttempt WHERE studentId = ?`).run(user.id);
+      db.prepare(`DELETE FROM FullPracticeTestAssignment WHERE studentId = ? OR assignedById = ?`).run(
+        user.id,
+        user.id
+      );
       db.prepare(`DELETE FROM ProgramEnrollment WHERE studentId = ?`).run(user.id);
       db.prepare(`DELETE FROM Notification WHERE userId = ?`).run(user.id);
       db.prepare(`DELETE FROM AuditLog WHERE userId = ?`).run(user.id);
@@ -172,6 +182,41 @@ export function createApprovedStudent(input: { email: string; name: string; pass
        VALUES (?, ?, ?, ?, 'STUDENT', 1, 'APPROVED', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`
     ).run(id, input.name, input.email, hash);
     return id;
+  } finally {
+    db.close();
+  }
+}
+
+/** Enroll a student in a program so teacher scope (ProgramTeacher) can see them. */
+export function enrollStudentInProgram(
+  studentId: string,
+  programId = process.env.E2E_PROGRAM_ID || "program-sat-core"
+) {
+  const db = openDb();
+  try {
+    const program = db.prepare(`SELECT id FROM Program WHERE id = ?`).get(programId) as { id: string } | undefined;
+    if (!program) {
+      throw new Error(`Program ${programId} not found — seed the DB before e2e`);
+    }
+    db.prepare(
+      `INSERT INTO ProgramEnrollment (programId, studentId, enrolledAt, active, status)
+       VALUES (?, ?, CURRENT_TIMESTAMP, 1, 'APPROVED')
+       ON CONFLICT(programId, studentId) DO UPDATE SET active = 1, status = 'APPROVED'`
+    ).run(programId, studentId);
+    return { programId, studentId };
+  } finally {
+    db.close();
+  }
+}
+
+export function findPublishedFullPracticeTest() {
+  const db = openDb();
+  try {
+    return db
+      .prepare(
+        `SELECT id, name FROM FullPracticeTest WHERE status = 'PUBLISHED' ORDER BY name ASC LIMIT 1`
+      )
+      .get() as { id: string; name: string } | undefined;
   } finally {
     db.close();
   }

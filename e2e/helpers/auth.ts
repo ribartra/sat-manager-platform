@@ -5,7 +5,8 @@ export async function loginAs(page: Page, email: string, password: string) {
   await page.locator('input[type="email"]').fill(email);
   await page.locator('input[type="password"]').fill(password);
   await page.getByRole("button", { name: "Log In" }).click();
-  await expect(page).not.toHaveURL(/\/login(\?|$)/, { timeout: 20_000 });
+  // Cold Next.js compiles (e.g. first /student after assign) can exceed 20s.
+  await expect(page).not.toHaveURL(/\/login(\?|$)/, { timeout: 60_000 });
 }
 
 export async function logoutViaClear(page: Page) {

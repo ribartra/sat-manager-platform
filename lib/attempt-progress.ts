@@ -82,7 +82,7 @@ export function fullTestAttemptProgress(input: {
   let positionLabel: string | null = null;
   if (input.status === "IN_PROGRESS") {
     if (input.phase === "BREAK") {
-      positionLabel = "Break between R&W and Math";
+      positionLabel = "Optional break";
     } else if (current) {
       positionLabel = `${current.name} · Question ${Math.min(input.currentQuestion + 1, Math.max(current.total, 1))} of ${current.total}`;
     }

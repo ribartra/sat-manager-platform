@@ -13,6 +13,7 @@ import {
   fullTestStatusBadgeVariant,
   fullTestStatusLabel,
 } from "@/lib/domain-meta";
+import { resolveQuestionType } from "@/lib/question-type";
 import { FullTestActions } from "../full-test-actions-client";
 
 interface PageProps {
@@ -31,7 +32,7 @@ export default async function FullTestDetailPage({ params }: PageProps) {
               question: {
                 include: {
                   topic: { include: { domain: { include: { section: true } } } },
-                  options: { select: { imageUrl: true }, where: { imageUrl: { not: null } } },
+                  options: { select: { text: true, imageUrl: true } },
                 },
               },
             },
@@ -58,7 +59,7 @@ export default async function FullTestDetailPage({ params }: PageProps) {
     <PageShell width="wide">
       <PageHeader
         title={test.name}
-        description={`4 SAT groups · ${questionCount} questions · ${test.breakMinutes > 0 ? `break ${test.breakMinutes} min` : "no break"} · review ${test.reviewEnabled ? "on" : "off"} · score conversion on /teacher/full-tests/scoring`}
+        description={`4 SAT groups · ${questionCount} questions · ${test.breakMinutes > 0 ? "optional break" : "no break"} · review ${test.reviewEnabled ? "on" : "off"} · score conversion on /teacher/full-tests/scoring`}
         actions={
           <div className="flex flex-col items-end gap-2">
             <Badge variant={fullTestStatusBadgeVariant(test.status)}>
@@ -118,7 +119,7 @@ export default async function FullTestDetailPage({ params }: PageProps) {
                             <Badge variant={difficultyBadgeVariant(item.question.difficulty)}>
                               {difficultyLabel(item.question.difficulty)}
                             </Badge>
-                            <Badge variant="default">{item.question.type}</Badge>
+                            <Badge variant="default">{resolveQuestionType(item.question.type, item.question.options)}</Badge>
                             <Badge variant="default">{item.question.topic.name}</Badge>
                           </>
                         }

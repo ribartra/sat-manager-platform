@@ -28,6 +28,9 @@ export function FullTestAssignClient({
   const [groupSearch, setGroupSearch] = useState("");
   const [groupOpen, setGroupOpen] = useState(false);
 
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const selectedGroup = groups.find((group) => group.id === groupId);
   const visibleGroups = useMemo(() => {
     const term = groupSearch.trim().toLowerCase();
@@ -42,12 +45,37 @@ export function FullTestAssignClient({
   async function assign() {
     const group = groups.find((g) => g.id === groupId);
     const studentIds = groupAssignmentEnabled && target === "group" ? group?.memberIds ?? [] : [studentId];
-    await fetch(`/api/full-practice-tests/${testId}/assign`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ studentIds, dueDate }),
-    });
-    router.push("/teacher/full-tests");
+    if (studentIds.length === 0) {
+      setError("Select at least one student.");
+      return;
+    }
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch(`/api/full-practice-tests/${testId}/assign`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ studentIds, dueDate: dueDate || null }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Failed to assign exam.");
+      const created = Number(data.created) || 0;
+      if (created === 0) {
+        setError("No new exams were assigned (they may already be assigned).");
+        setLoading(false);
+        return;
+      }
+      const firstStudentId = studentIds[0];
+      router.push(
+        firstStudentId
+          ? `/teacher/students/${firstStudentId}?area=mocks`
+          : "/teacher/practice-sets?area=mocks"
+      );
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to assign exam.");
+      setLoading(false);
+    }
   }
 
   return (
@@ -110,7 +138,10 @@ export function FullTestAssignClient({
         </div>
       )}
       <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
-      <Button onClick={assign}>Assign Exam</Button>
+      {error && <p className="text-sm text-rose-600">{error}</p>}
+      <Button onClick={assign} disabled={loading}>
+        {loading ? "Assigning..." : "Assign Exam"}
+      </Button>
     </Card>
   );
 }

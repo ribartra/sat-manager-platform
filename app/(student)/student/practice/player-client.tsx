@@ -17,6 +17,7 @@ import { SaveIndicator, type SaveStatus } from "@/components/sat";
 import { exitPlayerOnAuthLoss, isAuthFailureStatus } from "@/lib/player-session-exit";
 import { fetchWithTransientRetry } from "@/lib/transient-fetch";
 import { isAnswerCorrect } from "@/lib/answer-grading";
+import { questionResponseLabel, resolveQuestionType } from "@/lib/question-type";
 
 interface Option { label: string; text: string; imageUrl?: string | null }
 interface Question {
@@ -87,6 +88,7 @@ export function PracticeSetPlayer({
   const timeSpentByQuestion = useRef<Record<string, number>>({ ...savedTimeSpent });
 
   const question = questions[current];
+  const responseType = question ? resolveQuestionType(question.type, question.options) : "NUMERIC";
   const offlineKey = `sat-autosave:${attemptId}`;
 
   useEffect(() => {
@@ -207,7 +209,7 @@ export function PracticeSetPlayer({
     if (!immediateFeedback || !question) return;
     const selected = answers[question.id];
     if (!selected) return;
-    const ok = isAnswerCorrect(selected, question.correctAnswer, question.type);
+    const ok = isAnswerCorrect(selected, question.correctAnswer, resolveQuestionType(question.type, question.options));
     setChecked((prev) => ({ ...prev, [question.id]: { isCorrect: ok } }));
   };
 
@@ -362,7 +364,7 @@ export function PracticeSetPlayer({
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-baseline gap-2">
               <span className="text-4xl font-bold leading-none tabular-nums text-gray-900">{current + 1}</span>
-              <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Answer choices</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-gray-500">{questionResponseLabel(responseType)}</p>
             </div>
             <button
               onClick={() => toggleMarked(question.id)}
@@ -379,15 +381,15 @@ export function PracticeSetPlayer({
           </div>
           <MathToolPanel config={calculatorConfig} context="practice-set" graphArtifacts={question.graphArtifacts} enabled={showCalculator} />
 
-          {question.type === "MC" ? (
+          {responseType === "MC" ? (
             <div className="space-y-2">
-              {question.options.map((opt) => {
+              {question.options.filter((opt) => opt.text.trim()).map((opt) => {
                 const isEliminated = eliminated[question.id]?.has(opt.label);
                 const checkResult = checked[question.id];
                 const selected = answers[question.id] === opt.label;
                 const isCorrectChoice =
                   Boolean(checkResult) &&
-                  isAnswerCorrect(opt.label, question.correctAnswer, question.type);
+                  isAnswerCorrect(opt.label, question.correctAnswer, responseType);
                 const isWrongSelected = Boolean(checkResult) && selected && !checkResult.isCorrect;
                 return (
                 <div
@@ -423,7 +425,6 @@ export function PracticeSetPlayer({
                   </span>
                   <span className="min-w-0 flex-1">
                     <MathContent content={opt.text} className="text-base leading-snug text-gray-800 md:text-[1.05rem]" />
-                    <QuestionMedia imageUrl={opt.imageUrl} alt={`Option ${opt.label} image`} className="mt-2" />
                   </span>
                 </button>
                 <button

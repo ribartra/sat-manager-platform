@@ -12,6 +12,7 @@ import {
 import { applyPracticeProgression } from "@/lib/practice-progression";
 import { markUserActive } from "@/lib/activity";
 import { isAnswerCorrect } from "@/lib/answer-grading";
+import { resolveQuestionType } from "@/lib/question-type";
 import { scorePracticeSetAttempt } from "@/lib/practice-set-scoring";
 import { writeAudit } from "@/lib/audit";
 
@@ -47,6 +48,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ att
 
   const existingAnswers = new Map(attempt.answers.map((answer) => [answer.questionId, answer]));
   const allowedQuestionIds = new Set(psQuestions.map((item) => item.questionId));
+  const questionById = new Map(psQuestions.map((item) => [item.questionId, item.question]));
   const questionSnapshotMap = new Map(
     psQuestions.map((item) => {
       const existing = existingAnswers.get(item.questionId);
@@ -74,7 +76,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ att
   await Promise.all(
     Object.entries(answers as Record<string, string>).filter(([questionId]) => allowedQuestionIds.has(questionId)).map(([questionId, answer]) => {
       const snapshot = questionSnapshotMap.get(questionId);
-      const isCorrect = isAnswerCorrect(answer, snapshot?.correctAnswer, snapshot?.type ?? "MC");
+      const storedQuestion = questionById.get(questionId);
+      const isCorrect = isAnswerCorrect(
+        answer,
+        snapshot?.correctAnswer,
+        resolveQuestionType(snapshot?.type ?? storedQuestion?.type ?? "MC", snapshot?.options?.length ? snapshot.options : storedQuestion?.options),
+      );
       if (isCorrect) correctCount += 1;
       const existing = existingAnswers.get(questionId);
       return prisma.attemptAnswer.upsert({

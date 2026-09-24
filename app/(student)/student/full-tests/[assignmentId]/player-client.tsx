@@ -11,6 +11,7 @@ import { formatTime, cn } from "@/lib/utils";
 import type { CalculatorConfig } from "@/lib/calculator-config";
 import type { GraphArtifact } from "@/lib/question-graph";
 import type { FullTestProgressState, FullTestTimerPhase } from "@/lib/full-test-progress";
+import { questionResponseLabel, resolveQuestionType } from "@/lib/question-type";
 import { LoadingState, SaveIndicator, type SaveStatus } from "@/components/sat";
 import { exitPlayerOnAuthLoss, isAuthFailureStatus } from "@/lib/player-session-exit";
 
@@ -70,17 +71,22 @@ export function FullTestPlayer({
 }) {
   const router = useRouter();
   const breakSecondsTotal = Math.max(0, breakMinutes) * 60;
+  const restoringUsableBreak = savedProgressState?.phase === "BREAK" && breakSecondsTotal > 0;
+  const initialModuleIndex = savedProgressState?.phase === "BREAK" && breakSecondsTotal === 0
+    ? RW_M2_INDEX + 1
+    : savedModule;
+  const initialQuestionIndex = savedProgressState?.phase === "BREAK" && breakSecondsTotal === 0 ? 0 : savedQuestion;
   const initialTimers =
     savedProgressState?.timers?.length === modules.length
       ? savedProgressState.timers
       : modules.map((module) => module.timeLimit);
-  const [phase, setPhase] = useState<FullTestTimerPhase>(savedProgressState?.phase === "BREAK" ? "BREAK" : "MODULE");
+  const [phase, setPhase] = useState<FullTestTimerPhase>(restoringUsableBreak ? "BREAK" : "MODULE");
   const [breakRemaining, setBreakRemaining] = useState(
-    savedProgressState?.phase === "BREAK" ? savedProgressState.breakRemaining : breakSecondsTotal,
+    restoringUsableBreak ? savedProgressState.breakRemaining : breakSecondsTotal,
   );
-  const [moduleIndex, setModuleIndex] = useState(savedModule);
-  const [questionIndex, setQuestionIndex] = useState(savedQuestion);
-  const [remaining, setRemaining] = useState(initialTimers[savedModule] ?? modules[0]?.timeLimit ?? 0);
+  const [moduleIndex, setModuleIndex] = useState(initialModuleIndex);
+  const [questionIndex, setQuestionIndex] = useState(initialQuestionIndex);
+  const [remaining, setRemaining] = useState(initialTimers[initialModuleIndex] ?? modules[0]?.timeLimit ?? 0);
   const [expiredEvents, setExpiredEvents] = useState(savedExpiredEvents);
   const [extraTimeUsed] = useState(savedExtraTimeUsed);
   const [answers, setAnswers] = useState<Record<string, string>>(savedAnswers);
@@ -387,10 +393,8 @@ export function FullTestPlayer({
     return (
       <div className="flex h-screen flex-col items-center justify-center bg-white px-6">
         <p className="text-sm font-semibold text-gray-900">{testName}</p>
-        <h1 className="mt-3 text-2xl font-semibold text-gray-900">Practice Test Break</h1>
-        <p className="mt-2 max-w-md text-center text-sm text-gray-500">
-          Optional {breakMinutes}-minute break between Reading & Writing and Math. You can resume immediately.
-        </p>
+        <h1 className="mt-3 text-2xl font-semibold text-gray-900">Optional break</h1>
+        <p className="mt-2 max-w-md text-center text-sm text-gray-500">Take a break or skip it to continue.</p>
         <p className={`mt-8 text-4xl font-semibold tabular-nums ${breakRemaining <= 60 ? "text-red-600" : "text-gray-900"}`}>
           {formatTime(breakRemaining)}
         </p>
@@ -400,7 +404,7 @@ export function FullTestPlayer({
               void enterModule(RW_M2_INDEX + 1);
             }}
           >
-            Resume Testing
+            Skip break
           </Button>
           <Button
             variant="secondary"
@@ -427,6 +431,7 @@ export function FullTestPlayer({
   }
 
   const hasPassage = Boolean(question.stimulus?.trim());
+  const responseType = resolveQuestionType(question.type, question.options);
 
   return (
     <div className="flex h-screen flex-col bg-white">
@@ -483,7 +488,7 @@ export function FullTestPlayer({
         <div className="overflow-y-auto p-5 md:p-6">
           <div className="mb-3 flex items-baseline gap-2">
             <span className="text-4xl font-bold leading-none tabular-nums text-gray-900">{questionIndex + 1}</span>
-            <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Answer choices</p>
+            <p className="text-xs font-medium uppercase tracking-wide text-gray-500">{questionResponseLabel(responseType)}</p>
           </div>
           <MathToolPanel
             config={calculatorConfig}
@@ -491,8 +496,8 @@ export function FullTestPlayer({
             graphArtifacts={question.graphArtifacts}
             enabled={showCalculator && currentModule.section === "MATH"}
           />
-          {question.type === "MC" ? (
-            question.options.map((option) => (
+          {responseType === "MC" ? (
+            question.options.filter((option) => option.text.trim()).map((option) => (
               <button
                 key={option.label}
                 onClick={() => {
@@ -509,7 +514,6 @@ export function FullTestPlayer({
                 </span>
                 <span className="min-w-0 flex-1">
                   <MathContent content={option.text} className="leading-snug text-gray-800" />
-                  <QuestionMedia imageUrl={option.imageUrl} alt={`Option ${option.label} image`} className="mt-2" />
                 </span>
               </button>
             ))

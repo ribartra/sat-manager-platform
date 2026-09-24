@@ -46,7 +46,7 @@ const checks = [
   },
   {
     file: "components/question-player-preview.tsx",
-    requires: ["QuestionMedia", "imageUrl", "Answer choices", "View as player"],
+    requires: ["QuestionMedia", "imageUrl", "questionResponseLabel", "View as player"],
     label: "Preview de editor replica layout del player",
   },
   {
@@ -56,8 +56,8 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/page.tsx",
-    requires: ["getStudentLastActiveMap", "lastActiveMap", "TeacherStudentsTable"],
-    label: "Dashboard docente usa lastActiveAt real y DataTable de estudiantes",
+    requires: ["areaActivity", "lastActiveAt", "TeacherStudentsTable"],
+    label: "Dashboard docente usa ultima actividad por area y DataTable de estudiantes",
   },
   {
     file: "app/(teacher)/teacher/students-table-client.tsx",
@@ -66,7 +66,7 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/report/page.tsx",
-    requires: ["Score Progress Over Time", "scoreTrend", "Progress by Difficulty", "QuestionMedia", "Weak Skills", "Teacher Comments"],
+    requires: ["TopicDifficultyTrend", "topicTrend", "Progress by Difficulty", "QuestionMedia", "Weak Skills", "Teacher Comments"],
     label: "Reporte individual incluye tendencia temporal, dificultad, media, skills debiles y comentarios",
   },
   {

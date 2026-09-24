@@ -119,7 +119,7 @@ export function FullTestEditor({
       setWarnings(data?.warnings ?? []);
       return;
     }
-    router.push("/teacher/full-tests");
+    router.push("/teacher/practice-sets?area=mocks");
     router.refresh();
   }
 

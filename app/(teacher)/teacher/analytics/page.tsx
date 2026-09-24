@@ -59,7 +59,6 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
           include: {
             question: {
               include: {
-                subskill: true,
                 topic: { include: { domain: { include: { section: true } } } },
               },
             },
@@ -81,7 +80,16 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
     selectedStudentId && area === "mocks"
       ? await prisma.fullPracticeTestAttempt.findMany({
           where: { studentId: selectedStudentId, status: "SUBMITTED" },
-          include: { test: { select: { name: true } } },
+          include: {
+            answers: true,
+            test: {
+              include: {
+                modules: {
+                  include: { questions: { include: { question: { include: { topic: true } } } } },
+                },
+              },
+            },
+          },
           orderBy: { submittedAt: "asc" },
           take: 20,
         })
@@ -92,16 +100,17 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
     return nowMs - student.lastActiveAt.getTime() >= 5 * 24 * 60 * 60 * 1000;
   });
   const buckets = new Map<string, Bucket>();
-  const progressRows: Array<{ topic: string; difficulty: string; correct: boolean; timeSeconds: number }> = [];
+  const progressRows: Array<{ topic: string; difficulty: string; correct: boolean; timeSeconds: number; attemptId: string }> = [];
 
   for (const answer of answers) {
     const areaLabel = practiceAreaLabel(answer.question.topic.domain.practiceArea);
-    const subtopic = answer.question.subskill?.name ?? answer.question.topic.name;
+    const subtopic = answer.question.topic.name;
     progressRows.push({
       topic: answer.question.topic.name,
       difficulty: answer.question.difficulty,
       correct: Boolean(answer.isCorrect),
       timeSeconds: answer.timeSpent ?? 0,
+      attemptId: answer.attempt.id,
     });
     const key = `${areaLabel}:${subtopic}:${answer.question.difficulty}`;
     const bucket = buckets.get(key) ?? {
@@ -131,12 +140,29 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
   const avgAccuracy = answers.length ? scorePercent(correct, answers.length) : null;
   const difficultyMetrics = aggregateDifficultyMetrics(progressRows);
   const topicDifficultyMetrics = aggregateTopicDifficultyMetrics(progressRows);
+  const mockProgressRows = examAttempts.flatMap((exam) => {
+    const questions = new Map(
+      exam.test.modules.flatMap((module) => module.questions).map((item) => [item.questionId, item.question]),
+    );
+    return exam.answers.map((answer) => {
+      const question = questions.get(answer.questionId);
+      return {
+        topic: question?.topic.name ?? "Unclassified topic",
+        difficulty: question?.difficulty ?? "UNSPECIFIED",
+        correct: Boolean(answer.isCorrect),
+        timeSeconds: answer.timeSpent ?? 0,
+        attemptId: exam.id,
+      };
+    });
+  });
+  const mockDifficultyMetrics = aggregateDifficultyMetrics(mockProgressRows);
+  const mockTopicDifficultyMetrics = aggregateTopicDifficultyMetrics(mockProgressRows);
 
   return (
     <PageShell>
       <PageHeader
         title="Student Analytics"
-        description="Individual progress by Math, Reading, Writing, or Mocks."
+        description="Individual progress by Math, Reading, Writing, or Full Practice Tests."
         actions={
           <AnalyticsStudentFilter
             students={students.map((student) => ({ id: student.id, name: student.name }))}
@@ -153,23 +179,28 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
       />
 
       {area === "mocks" ? (
-        <MocksAnalyticsPanel examAttempts={examAttempts} selectedStudentName={selectedStudent?.name} />
+        <MocksAnalyticsPanel
+          examAttempts={examAttempts}
+          difficultyMetrics={mockDifficultyMetrics}
+          topicDifficultyMetrics={mockTopicDifficultyMetrics}
+          selectedStudentName={selectedStudent?.name}
+        />
       ) : (
         <>
-          <div className="mb-6 grid grid-cols-4 gap-4">
+          <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
             <Metric label="Student" value={selectedStudent?.name ?? "-"} />
             <Metric label="Answers" value={answers.length.toString()} />
+            <Metric label="Attempts" value={new Set(answers.map((answer) => answer.attempt.id)).size.toString()} />
             <Metric
               label="Average Accuracy"
               value={avgAccuracy !== null ? `${avgAccuracy}%` : "-"}
               valueClassName={avgAccuracy !== null ? scoreBandTextClass(avgAccuracy) : undefined}
             />
-            <Metric label="Inactive 5+ Days" value={staleStudents.length.toString()} />
           </div>
 
           <div className="mb-8 grid gap-6 lg:grid-cols-2">
-            <DifficultyAccuracyChart metrics={difficultyMetrics} />
-            <TopicDifficultyChart metrics={topicDifficultyMetrics} />
+            <DifficultyAccuracyChart metrics={difficultyMetrics} area={area} />
+            <TopicDifficultyChart metrics={topicDifficultyMetrics} area={area} />
           </div>
 
           <section className="mb-8">
@@ -212,21 +243,22 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
               )}
             </Card>
           </section>
-
-          <section>
-            <h2 className="mb-3 text-base font-semibold text-gray-900">Students inactive for 5+ days</h2>
-            <Card>
-              {staleStudents.slice(0, 12).map((student) => (
-                <div key={student.id} className="flex items-center justify-between border-b border-gray-100 px-4 py-3 text-sm last:border-b-0">
-                  <span className="font-medium text-gray-800">{student.name}</span>
-                  <span className="text-gray-500">{student.lastActiveAt ? formatDate(student.lastActiveAt) : "No activity"}</span>
-                </div>
-              ))}
-              {staleStudents.length === 0 && <p className="p-6 text-center text-sm text-gray-400">All students have recent activity.</p>}
-            </Card>
-          </section>
         </>
       )}
+
+      <section className="mt-8">
+        <h2 className="mb-3 text-base font-semibold text-gray-900">Students inactive for 5+ days</h2>
+        <p className="mb-3 text-xs text-gray-500">Roster-wide signal (not scoped to the active area tab).</p>
+        <Card>
+          {staleStudents.slice(0, 12).map((student) => (
+            <div key={student.id} className="flex items-center justify-between border-b border-gray-100 px-4 py-3 text-sm last:border-b-0">
+              <span className="font-medium text-gray-800">{student.name}</span>
+              <span className="text-gray-500">{student.lastActiveAt ? formatDate(student.lastActiveAt) : "No activity"}</span>
+            </div>
+          ))}
+          {staleStudents.length === 0 && <p className="p-6 text-center text-sm text-gray-400">All students have recent activity.</p>}
+        </Card>
+      </section>
       </PageContent>
     </PageShell>
   );
@@ -234,32 +266,38 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
 
 function MocksAnalyticsPanel({
   examAttempts,
+  difficultyMetrics,
+  topicDifficultyMetrics,
   selectedStudentName,
 }: {
   examAttempts: Array<{
     id: string;
-    test: { name: string };
+    test: { name: string; modules: Array<{ questions: Array<{ questionId: string; question: { difficulty: string; topic: { name: string } } }> }> };
+    answers: Array<{ questionId: string; isCorrect: boolean | null; timeSpent: number | null }>;
     submittedAt: Date | null;
     mathScore: number | null;
     rwScore: number | null;
     totalScore: number | null;
   }>;
+  difficultyMetrics: ReturnType<typeof aggregateDifficultyMetrics>;
+  topicDifficultyMetrics: ReturnType<typeof aggregateTopicDifficultyMetrics>;
   selectedStudentName?: string;
 }) {
   return (
     <>
       <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
         <Metric label="Student" value={selectedStudentName ?? "-"} />
-        <Metric label="Mocks completed" value={examAttempts.length.toString()} />
+        <Metric label="Exams completed" value={examAttempts.length.toString()} />
         <Metric
           label="Latest total"
           value={examAttempts.length ? String(examAttempts[examAttempts.length - 1]?.totalScore ?? "-") : "-"}
         />
-        <Metric label="Area" value="Mocks" valueClassName="text-[var(--sat-area-mocks)]" />
+        <Metric label="Area" value="Full Practice Tests" valueClassName="text-[var(--sat-area-mocks)]" />
       </div>
       <div className="mb-8">
         <MockSectionChart
           metrics={examAttempts.map((exam) => ({
+            attempts: 1,
             label: exam.test.name,
             submittedAt: exam.submittedAt?.toISOString() ?? null,
             mathScore: exam.mathScore,
@@ -267,6 +305,10 @@ function MocksAnalyticsPanel({
             totalScore: exam.totalScore,
           }))}
         />
+      </div>
+      <div className="mb-8 grid gap-6 lg:grid-cols-2">
+        <DifficultyAccuracyChart metrics={difficultyMetrics} area="mocks" />
+        <TopicDifficultyChart metrics={topicDifficultyMetrics} area="mocks" />
       </div>
       {examAttempts.length === 0 && (
         <Card padding="lg" className="py-12 text-center text-sm text-gray-400">

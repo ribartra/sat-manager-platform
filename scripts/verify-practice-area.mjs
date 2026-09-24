@@ -23,27 +23,47 @@ async function assertSourcePatterns() {
     {
       file: "components/sat/practice-area-tabs.tsx",
       requires: ["AREA_TABS_WITH_MOCKS", "buildAreaHref"],
-      label: "tabs compartidos Math/Reading/Writing/Mocks",
+      label: "tabs compartidos Math/Reading/Writing/Full Practice Tests",
+    },
+    {
+      file: "lib/practice-area.ts",
+      requires: ['label: "Full Practice Tests"', 'key: "mocks"'],
+      label: "4ª pestaña Full Practice Tests (key mocks)",
     },
     {
       file: "app/(teacher)/teacher/analytics/page.tsx",
-      requires: ["PracticeAreaTabs", "practiceArea", "mocks"],
+      requires: ["PracticeAreaTabs", "practiceArea", "mocks", "Roster-wide signal"],
       label: "Analytics filtra por practiceArea",
     },
     {
       file: "app/(student)/student/history/page.tsx",
       requires: ["PracticeAreaTabs", "practiceArea", 'area === "mocks"'],
-      label: "History sin Section redundante y con Mocks",
+      label: "History sin Section redundante y con Full Practice Tests",
     },
     {
       file: "app/(teacher)/teacher/students/[studentId]/report/page.tsx",
-      requires: ["PracticeAreaTabs", "practiceArea", "attempt", "Mocks"],
+      requires: ["PracticeAreaTabs", "practiceArea", "attempt", "Full Practice Tests"],
       label: "Report individual con tabs y conteo de attempts",
     },
     {
+      file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
+      requires: ["PracticeAreaTabs", "practiceArea", 'area === "mocks"', "activeAreaTab"],
+      label: "View Student con 4 tabs y filtro por área",
+    },
+    {
+      file: "app/(teacher)/teacher/impersonate/[studentId]/page.tsx",
+      requires: ["PracticeAreaTabs", "practiceArea", 'area === "mocks"', "activeAreaTab"],
+      label: "Impersonate Assigned con 4 tabs",
+    },
+    {
+      file: "app/(student)/student/page.tsx",
+      requires: ["PracticeAreaTabs", "practiceArea", 'area === "mocks"', "activeAreaTab"],
+      label: "Student Home con 4 tabs y filtro por área",
+    },
+    {
       file: "app/api/reports/students/[studentId]/pdf/route.ts",
-      requires: ["practiceAreaFromReportArea", "Mocks (Full Practice Tests)", "attempt"],
-      label: "PDF separa Practice areas y Mocks",
+      requires: ["practiceAreaFromReportArea", "Full Practice Tests", "attempt"],
+      label: "PDF separa Practice areas y Full Practice Tests",
     },
     {
       file: "prisma/seed-taxonomy.ts",

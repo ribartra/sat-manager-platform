@@ -1,4 +1,4 @@
-import { PageShell } from "@/components/sat";
+import { PageShell, PracticeAreaTabs } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { formatDate } from "@/lib/utils";
@@ -9,19 +9,22 @@ import { auth } from "@/lib/auth";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { refreshAssignmentStates } from "@/lib/assignments";
 import { studentAccessWhereFor, teacherProgramEnrollmentScope } from "@/lib/program-scope";
-import { getStudentLastActiveMap } from "@/lib/activity";
 import { academicTopicWhere } from "@/lib/taxonomy";
 import { difficultyOptions } from "@/lib/domain-meta";
 import { TeacherStudentsTable, type TeacherStudentRow } from "./students-table-client";
+import { activeAreaTab, practiceAreaFromTab } from "@/lib/practice-area";
 
 interface PageProps {
   searchParams: Promise<{
     q?: string;
+    area?: string;
     group?: string;
     topic?: string;
     difficulty?: string;
     from?: string;
     to?: string;
+    incorporatedFrom?: string;
+    incorporatedTo?: string;
   }>;
 }
 
@@ -41,16 +44,19 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
       : undefined;
   const params = await searchParams;
   const search = params.q?.trim() ?? "";
+  const area = activeAreaTab(params.area, "math");
+  const practiceArea = practiceAreaFromTab(area);
   const teacherGroupManagementEnabled =
     session?.user.role === "ADMIN" || (await getFeatureSetting("TEACHER_GROUP_MANAGEMENT"));
   const groupId = teacherGroupManagementEnabled ? params.group || "" : "";
   const topicId = params.topic || "";
   const difficulty = params.difficulty || "";
-  const fromDate = parseDateParam(params.from);
-  const toDate = parseDateParam(params.to, true);
+  const fromDate = parseDateParam(params.incorporatedFrom ?? params.from);
+  const toDate = parseDateParam(params.incorporatedTo ?? params.to, true);
   const practiceSetFilter = {
     ...(topicId ? { topicId } : {}),
     ...(difficulty ? { difficulty } : {}),
+    ...(practiceArea ? { topic: { domain: { practiceArea } } } : {}),
   };
   const hasAttemptFilter = Boolean(topicId || difficulty || fromDate || toDate);
 
@@ -65,11 +71,19 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
         }
       : {}),
     ...(teacherGroupManagementEnabled && groupId ? { groups: { some: { groupId } } } : {}),
+    ...(fromDate || toDate
+      ? {
+          startDate: {
+            ...(fromDate ? { gte: fromDate } : {}),
+            ...(toDate ? { lte: toDate } : {}),
+          },
+        }
+      : {}),
   };
 
   const studentUnlockRequestsEnabled = await getFeatureSetting("STUDENT_UNLOCK_REQUESTS");
 
-  const [students, groups, topics, lastActiveMap] = await Promise.all([
+  const [students, groups, topics] = await Promise.all([
     prisma.user.findMany({
       where: studentWhere,
       include: {
@@ -78,15 +92,8 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
         attempts: {
           where: {
             status: "SUBMITTED",
-            ...(fromDate || toDate
-              ? {
-                  submittedAt: {
-                    ...(fromDate ? { gte: fromDate } : {}),
-                    ...(toDate ? { lte: toDate } : {}),
-                  },
-                }
-              : {}),
-            ...(topicId || difficulty
+            ...(area === "mocks" ? { id: "__no_practice_attempt__" } : {}),
+            ...(area !== "mocks" && (topicId || difficulty || practiceArea)
               ? {
                   assignment: {
                     practiceSet: practiceSetFilter,
@@ -102,25 +109,47 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
           },
         },
         assignments: {
-          where: { status: { in: ["PENDING", "OVERDUE"] } },
+          where: {
+            status: { in: ["PENDING", "OVERDUE"] },
+            ...(area === "mocks" ? { id: "__no_practice_assignment__" } : {}),
+            ...(area !== "mocks" && practiceArea ? { practiceSet: { topic: { domain: { practiceArea } } } } : {}),
+          },
+        },
+        fullTestAttempts: {
+          where: {
+            status: "SUBMITTED",
+            ...(area === "mocks" ? {} : { id: "__no_full_test_attempt__" }),
+          },
+          orderBy: { submittedAt: "desc" },
+          take: 20,
+          include: { answers: true, test: { select: { name: true } } },
+        },
+        fullTestAssignments: {
+          where: {
+            status: { in: ["PENDING", "OVERDUE"] },
+            ...(area === "mocks" ? {} : { id: "__no_full_test_assignment__" }),
+          },
         },
       },
       orderBy: { name: "asc" },
     }),
     teacherGroupManagementEnabled ? prisma.group.findMany({ orderBy: { name: "asc" } }) : Promise.resolve([]),
     prisma.topic.findMany({
-      where: academicTopicWhere,
+      where: {
+        AND: [academicTopicWhere, ...(practiceArea ? [{ domain: { practiceArea } }] : [])],
+      },
       include: { domain: { include: { section: true } } },
       orderBy: { name: "asc" },
     }),
-    getStudentLastActiveMap(),
   ]);
 
-  const [overdueAssignments, unlockRequests] = await Promise.all([
+  const [overdueAssignments, overdueFullTestAssignments, unlockRequests] = await Promise.all([
     prisma.assignment.findMany({
       where: {
         dueDate: { lt: new Date() },
         status: { in: ["PENDING", "IN_PROGRESS"] },
+        ...(area === "mocks" ? { id: "__no_practice_overdue__" } : {}),
+        ...(area !== "mocks" && practiceArea ? { practiceSet: { topic: { domain: { practiceArea } } } } : {}),
         student: {
           active: true,
           validationStatus: "APPROVED",
@@ -131,11 +160,28 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
       take: 5,
       orderBy: { dueDate: "asc" },
     }),
+    prisma.fullPracticeTestAssignment.findMany({
+      where: {
+        status: { in: ["PENDING", "IN_PROGRESS"] },
+        dueDate: { lt: new Date() },
+        ...(area === "mocks" ? {} : { id: "__no_full_test_overdue__" }),
+        student: {
+          active: true,
+          validationStatus: "APPROVED",
+          ...(programScope ? { programEnrollments: programScope } : {}),
+        },
+      },
+      include: { student: true, test: true },
+      take: 5,
+      orderBy: { dueDate: "asc" },
+    }),
     studentUnlockRequestsEnabled
       ? prisma.unlockRequest.findMany({
           where: {
             status: "PENDING",
+            ...(area === "mocks" ? { id: "__no_unlock_request__" } : {}),
             assignment: {
+              ...(practiceArea ? { practiceSet: { topic: { domain: { practiceArea } } } } : {}),
               student: {
                 active: true,
                 validationStatus: "APPROVED",
@@ -153,12 +199,31 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
   const fiveDaysAgo = new Date();
   fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
   const inactiveStudents = students.filter((s) => {
-    const lastActiveAt = lastActiveMap.get(s.id);
+    const areaActivity = area === "mocks"
+      ? s.fullTestAttempts.map((attempt) => attempt.submittedAt).filter((value): value is Date => Boolean(value))
+      : s.attempts.map((attempt) => attempt.submittedAt).filter((value): value is Date => Boolean(value));
+    const lastActiveAt = areaActivity.sort((a, b) => b.getTime() - a.getTime())[0];
     if (!lastActiveAt) return true;
     return lastActiveAt < fiveDaysAgo;
   });
   const performanceBuckets = new Map<string, { label: string; correct: number; total: number; attempts: number }>();
   for (const student of students) {
+    if (area === "mocks") {
+      for (const attempt of student.fullTestAttempts) {
+        const key = `full-test:${attempt.testId}`;
+        const bucket = performanceBuckets.get(key) ?? {
+          label: `${attempt.test.name} · Full Practice Test`,
+          correct: 0,
+          total: 0,
+          attempts: 0,
+        };
+        bucket.correct += attempt.answers.filter((answer) => answer.isCorrect).length;
+        bucket.total += attempt.answers.length;
+        bucket.attempts += 1;
+        performanceBuckets.set(key, bucket);
+      }
+      continue;
+    }
     for (const attempt of student.attempts) {
       const practiceSet = attempt.assignment?.practiceSet;
       if (!practiceSet) continue;
@@ -183,8 +248,8 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
     .slice(0, 3);
 
   return (
-    <PageShell>
-      <div className="flex items-center justify-between mb-6">
+    <PageShell width="wide" density="compact" className="space-y-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-semibold text-gray-900">Students</h1>
         <Link
           href="/teacher/students/invite"
@@ -194,7 +259,14 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
         </Link>
       </div>
 
-      <Card as="form" padding="md" className="mb-5 grid gap-3 md:grid-cols-6">
+      <PracticeAreaTabs
+        basePath="/teacher"
+        active={area}
+        preserve={{ q: search, group: groupId, topic: topicId, difficulty, incorporatedFrom: params.incorporatedFrom ?? params.from, incorporatedTo: params.incorporatedTo ?? params.to }}
+      />
+
+      <Card as="form" padding="md" className="grid gap-3 md:grid-cols-6">
+        <input type="hidden" name="area" value={area} />
         <label className="text-xs font-medium text-gray-600 md:col-span-2">
           Search
           <input
@@ -217,54 +289,54 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
             </select>
           </label>
         )}
+        {area !== "mocks" && (
+          <>
+            <label className="text-xs font-medium text-gray-600">
+              Topic
+              <select name="topic" defaultValue={topicId} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900">
+                <option value="">All</option>
+                {topics.map((topic) => (
+                  <option key={topic.id} value={topic.id}>{topic.name}</option>
+                ))}
+              </select>
+            </label>
+            <label className="text-xs font-medium text-gray-600">
+              Difficulty
+              <select name="difficulty" defaultValue={difficulty} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900">
+                <option value="">All</option>
+                {difficultyOptions().map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            </label>
+          </>
+        )}
         <label className="text-xs font-medium text-gray-600">
-          Topic
-          <select name="topic" defaultValue={topicId} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900">
-            <option value="">All</option>
-            {topics.map((topic) => (
-              <option key={topic.id} value={topic.id}>
-                {topic.name}
-              </option>
-            ))}
-          </select>
+          Incorporated from
+          <input name="incorporatedFrom" type="date" defaultValue={params.incorporatedFrom || params.from || ""} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900" />
         </label>
         <label className="text-xs font-medium text-gray-600">
-          Difficulty
-          <select name="difficulty" defaultValue={difficulty} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900">
-            <option value="">All</option>
-            {difficultyOptions().map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="text-xs font-medium text-gray-600">
-          From
-          <input name="from" type="date" defaultValue={params.from || ""} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900" />
-        </label>
-        <label className="text-xs font-medium text-gray-600">
-          To
-          <input name="to" type="date" defaultValue={params.to || ""} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900" />
+          Incorporated to
+          <input name="incorporatedTo" type="date" defaultValue={params.incorporatedTo || params.to || ""} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900" />
         </label>
         <div className="flex items-center gap-2 md:col-span-6">
           <button type="submit" className="rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700">
             Apply filters
           </button>
-          <Link href="/teacher" className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+          <Link href={`/teacher?area=${area}`} className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
             Clear
           </Link>
         </div>
       </Card>
 
       {/* Alerts */}
-      {(inactiveStudents.length > 0 || overdueAssignments.length > 0 || unlockRequests.length > 0) && (
+      {(inactiveStudents.length > 0 || overdueAssignments.length > 0 || overdueFullTestAssignments.length > 0 || unlockRequests.length > 0) && (
         <Card variant="warning" padding="sm" className="mb-5">
           <div className="flex items-center gap-2">
             <AlertTriangle size={16} className="shrink-0 text-amber-600" />
             <div className="text-sm text-amber-800">
               {inactiveStudents.length > 0 && <p><strong>{inactiveStudents.length} student{inactiveStudents.length > 1 ? "s" : ""}</strong> haven&apos;t practiced in 5+ days: {inactiveStudents.map((s) => s.name).join(", ")}</p>}
-              {overdueAssignments.length > 0 && <p><strong>{overdueAssignments.length}</strong> overdue assignment{overdueAssignments.length > 1 ? "s" : ""} need attention.</p>}
+              {(overdueAssignments.length > 0 || overdueFullTestAssignments.length > 0) && <p><strong>{overdueAssignments.length + overdueFullTestAssignments.length}</strong> overdue assignment{overdueAssignments.length + overdueFullTestAssignments.length > 1 ? "s" : ""} need attention.</p>}
               {unlockRequests.length > 0 && <p><strong>{unlockRequests.length}</strong> pending unlock request{unlockRequests.length > 1 ? "s" : ""}.</p>}
             </div>
           </div>
@@ -308,13 +380,27 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
       <TeacherStudentsTable
         showGroups={teacherGroupManagementEnabled}
         rows={students.map((student): TeacherStudentRow => {
-          const lastActiveAt = lastActiveMap.get(student.id);
+          const areaActivity = area === "mocks"
+            ? student.fullTestAttempts.map((attempt) => attempt.submittedAt).filter((value): value is Date => Boolean(value))
+            : student.attempts.map((attempt) => attempt.submittedAt).filter((value): value is Date => Boolean(value));
+          const lastActiveAt = areaActivity.sort((a, b) => b.getTime() - a.getTime())[0];
           const inactive = !lastActiveAt || lastActiveAt < fiveDaysAgo;
           const studentGroups = teacherGroupManagementEnabled
             ? student.groups.map((gm) => gm.group.name).join(", ")
             : "";
           const programs = student.programEnrollments.map((pe) => pe.program.name).join(", ");
-          const avgScore = student.attempts.length
+          const avgScore = area === "mocks"
+            ? student.fullTestAttempts.length
+              ? Math.round(
+                  (student.fullTestAttempts.reduce((sum, attempt) => {
+                    const correct = attempt.answers.filter((answer) => answer.isCorrect).length;
+                    return sum + correct / Math.max(attempt.answers.length, 1);
+                  }, 0) /
+                    student.fullTestAttempts.length) *
+                  100,
+                )
+              : null
+            : student.attempts.length
             ? Math.round(
                 (student.attempts.reduce((sum, attempt) => {
                   const correct = attempt.answers.filter((a) => a.isCorrect).length;
@@ -335,7 +421,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
               ? `${formatDate(lastActiveAt)}${inactive ? " ⚠" : ""}`
               : "Never",
             lastActiveTone: !lastActiveAt ? "never" : inactive ? "warn" : "ok",
-            pendingCount: student.assignments.length,
+            pendingCount: area === "mocks" ? student.fullTestAssignments.length : student.assignments.length,
             avgScoreLabel: avgScore !== null ? `${avgScore}%` : "—",
             avgScoreTone:
               avgScore === null ? "none" : avgScore >= 80 ? "high" : avgScore >= 60 ? "mid" : "low",

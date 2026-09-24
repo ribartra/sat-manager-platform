@@ -42,7 +42,7 @@ test.describe("consideraciones smoke", () => {
     await expect(page.getByRole("heading", { name: "Import questions from PDF/DOCX" })).toBeVisible();
     await expect(page.getByText("Answers / Explanations").first()).toBeVisible();
     await expect(page.getByText("Choose file").first()).toBeVisible();
-    await expect(page.getByText(/answers with explanations/i)).toBeVisible();
+    await expect(page.getByText(/answers with explanations/i).first()).toBeVisible();
   });
 
   test("Student history does not show practice SAT averages", async ({ page }) => {
@@ -51,5 +51,10 @@ test.describe("consideraciones smoke", () => {
     await expect(page.getByRole("heading", { name: "My History" })).toBeVisible();
     await expect(page.getByText("SAT R&W average")).toHaveCount(0);
     await expect(page.getByText("SAT Math average")).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Math", exact: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Reading", exact: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Writing", exact: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Full Practice Tests", exact: true })).toBeVisible();
+    await expect(page.locator('label:text-is("Section")')).toHaveCount(0);
   });
 });

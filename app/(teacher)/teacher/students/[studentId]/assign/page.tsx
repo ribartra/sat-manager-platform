@@ -7,13 +7,16 @@ import { ChevronLeft } from "lucide-react";
 import { AssignForm } from "./assign-form-client";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { studentAccessWhereFor } from "@/lib/program-scope";
+import { resolvePracticeArea } from "@/lib/practice-area";
 
 interface PageProps {
   params: Promise<{ studentId: string }>;
+  searchParams: Promise<{ area?: string }>;
 }
 
-export default async function AssignPage({ params }: PageProps) {
-  const { studentId } = await params;
+export default async function AssignPage({ params, searchParams }: PageProps) {
+  const [{ studentId }, query] = await Promise.all([params, searchParams]);
+  const initialArea = ["math", "reading", "writing"].includes(query.area ?? "") ? query.area as "math" | "reading" | "writing" : "all";
   const session = await auth();
   const now = new Date();
   const teacherGroupManagementEnabled =
@@ -74,7 +77,12 @@ export default async function AssignPage({ params }: PageProps) {
           name: ps.name,
           difficulty: ps.difficulty,
           topicName: ps.topic.name,
-          sectionLabel: ps.topic.domain.section.label,
+          practiceArea: resolvePracticeArea({
+            practiceArea: ps.topic.domain.practiceArea,
+            sectionName: ps.topic.domain.section.name,
+            sectionLabel: ps.topic.domain.section.label,
+            domainName: ps.topic.domain.name,
+          }),
           questionCount: ps.questions.length,
           alreadyAssigned: assignedIds.has(ps.id),
         }))}
@@ -84,6 +92,7 @@ export default async function AssignPage({ params }: PageProps) {
           members: g.members.map((m) => ({ id: m.userId, name: m.user.name })),
         }))}
         groupAssignmentEnabled={teacherGroupManagementEnabled}
+        initialArea={initialArea}
       />
     </PageShell>
   );

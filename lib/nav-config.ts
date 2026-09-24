@@ -121,13 +121,6 @@ export const TEACHER_NAV: TeacherNavEntryDef[] = [
         feature: "MATERIALS_MODULE",
       },
       { id: "teacher.content.questions", label: "Questions", href: "/teacher/questions", icon: HelpCircle },
-      {
-        id: "teacher.content.subskills",
-        label: "Subskills",
-        href: "/teacher/subskills",
-        icon: Layers,
-        hideForAdmin: true,
-      },
     ],
   },
   {
@@ -135,8 +128,7 @@ export const TEACHER_NAV: TeacherNavEntryDef[] = [
     label: "Assessments",
     icon: ClipboardList,
     links: [
-      { id: "teacher.assessments.practice-sets", label: "Practice Sets", href: "/teacher/practice-sets", icon: BookOpen },
-      { id: "teacher.assessments.exams", label: "Exams", href: "/teacher/full-tests", icon: ClipboardList },
+      { id: "teacher.assessments.practice-sets", label: "Practice & Exams", href: "/teacher/practice-sets", icon: BookOpen },
       { id: "teacher.assessments.compare", label: "Compare", href: "/teacher/compare", icon: BarChart2 },
     ],
   },
@@ -160,7 +152,6 @@ export const ADMIN_NAV_GROUP: NavGroupDef = {
 
 export const STUDENT_NAV_ENROLLED: NavLinkDef[] = [
   { id: "student.home", label: "Home", href: "/student", icon: Home, exact: true },
-  { id: "student.practice-sets", label: "Practice Sets", href: "/student/practice-sets", icon: BookOpen },
   { id: "student.content-map", label: "Content Map", href: "/student/content-map", icon: Map },
   {
     id: "student.materials",
@@ -169,7 +160,6 @@ export const STUDENT_NAV_ENROLLED: NavLinkDef[] = [
     icon: BookOpen,
     feature: "MATERIALS_MODULE",
   },
-  { id: "student.exams", label: "Exams", href: "/student/full-tests", icon: ClipboardList },
   { id: "student.history", label: "History", href: "/student/history", icon: Clock },
 ];
 

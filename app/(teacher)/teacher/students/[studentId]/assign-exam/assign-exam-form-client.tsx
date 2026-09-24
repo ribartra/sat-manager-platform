@@ -72,7 +72,7 @@ export function AssignExamForm({
         return;
       }
       setDone(true);
-      window.setTimeout(() => router.push(`/teacher/students/${studentId}`), 1000);
+      window.setTimeout(() => router.push(`/teacher/students/${studentId}?area=mocks`), 1000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to assign exam.");
       setLoading(false);

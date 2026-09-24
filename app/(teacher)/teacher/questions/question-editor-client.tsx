@@ -43,6 +43,7 @@ import {
   questionEditorSchema,
   type QuestionEditorInput,
 } from "@/contracts/question";
+import { resolveQuestionType } from "@/lib/question-type";
 
 interface TopicInfo {
   id: string;
@@ -158,6 +159,8 @@ export function QuestionEditor({
   const supportsGraph = form.watch("supportsGraph") ?? false;
   const correctAnswer = form.watch("correctAnswer");
   const options = form.watch("options");
+  const effectiveType = resolveQuestionType(type, options);
+  const missingMultipleChoiceOptions = type === "MC" && effectiveType === "NUMERIC";
 
   const [preview, setPreview] = useState(Boolean(initial?.stem));
   const [errors, setErrors] = useState<string[]>([]);
@@ -320,6 +323,11 @@ export function QuestionEditor({
                       ))}
                     </Select>
                   </FormControl>
+                  {missingMultipleChoiceOptions ? (
+                    <p className="text-xs text-amber-700">
+                      Add at least two answer choices. Until then, the player uses a numeric answer field.
+                    </p>
+                  ) : null}
                   <FormMessage />
                 </FormItem>
               )}

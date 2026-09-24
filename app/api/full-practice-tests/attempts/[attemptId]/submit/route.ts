@@ -7,6 +7,7 @@ import { scaledScore } from "@/lib/full-test-scoring";
 import { isAnswerCorrect } from "@/lib/answer-grading";
 import { writeAudit } from "@/lib/audit";
 import { getFeatureSetting } from "@/lib/app-settings";
+import { resolveQuestionType } from "@/lib/question-type";
 
 interface RouteContext {
   params: Promise<{ attemptId: string }>;
@@ -27,7 +28,12 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
 
   const modules = await prisma.fullPracticeTestModule.findMany({
     where: { testId: attempt.testId },
-    include: { questions: { include: { question: true }, orderBy: { order: "asc" } } },
+    include: {
+      questions: {
+        include: { question: { include: { options: true } } },
+        orderBy: { order: "asc" },
+      },
+    },
     orderBy: { order: "asc" },
   });
 
@@ -38,7 +44,11 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
   for (const testModule of modules) {
     for (const item of testModule.questions) {
       const answer = (answers?.[item.questionId] ?? "") as string;
-      const isCorrect = isAnswerCorrect(answer, item.question.correctAnswer, item.question.type);
+      const isCorrect = isAnswerCorrect(
+        answer,
+        item.question.correctAnswer,
+        resolveQuestionType(item.question.type, item.question.options),
+      );
       const countsTowardScore = !excludePretest || !item.isPretest;
       if (countsTowardScore) {
         if (testModule.section === "MATH") {

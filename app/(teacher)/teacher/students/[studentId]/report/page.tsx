@@ -11,7 +11,8 @@ import { QuestionMedia } from "@/components/question-media";
 import { MathContent } from "@/components/math-content";
 import { Card } from "@/components/ui/card";
 import { DifficultyAccuracyChart, MockSectionChart, TopicDifficultyChart } from "@/components/progress-charts";
-import { aggregateDifficultyMetrics, aggregateTopicDifficultyMetrics, type MockSectionMetric } from "@/lib/progress-analytics";
+import { aggregateDifficultyMetrics, aggregateTopicDifficultyMetrics, aggregateTopicDifficultyTrend, type MockSectionMetric } from "@/lib/progress-analytics";
+import { TopicDifficultyTrend } from "@/components/topic-difficulty-trend";
 import {
   activeAreaTab,
   practiceAreaFromTab,
@@ -44,17 +45,54 @@ export default async function StudentReportPage({ params, searchParams }: PagePr
 
   const examAttempts = await prisma.fullPracticeTestAttempt.findMany({
     where: { studentId, status: "SUBMITTED" },
-    include: { test: { select: { name: true } } },
+    include: {
+      answers: true,
+      test: {
+        include: {
+          modules: {
+            include: {
+              questions: {
+                include: {
+                  question: { include: { topic: { include: { domain: true } } } },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     orderBy: { submittedAt: "desc" },
   });
 
   const mockMetrics: MockSectionMetric[] = examAttempts.map((exam) => ({
+    attempts: 1,
     label: exam.test.name,
     submittedAt: exam.submittedAt?.toISOString() ?? null,
     mathScore: exam.mathScore,
     rwScore: exam.rwScore,
     totalScore: exam.totalScore,
   }));
+  const mockProgressRows = examAttempts.flatMap((exam) => {
+    const questions = new Map(
+      exam.test.modules.flatMap((module) => module.questions).map((item) => [item.questionId, item.question]),
+    );
+    return exam.answers.filter((answer) => Boolean(answer.answer?.trim())).map((answer) => {
+      const question = questions.get(answer.questionId);
+      return {
+        topic: question ? `${question.topic.domain.name} / ${question.topic.name}` : "Unclassified topic",
+        difficulty: question?.difficulty ?? "UNSPECIFIED",
+        correct: Boolean(answer.isCorrect),
+        timeSeconds: answer.timeSpent ?? 0,
+        attemptId: exam.id,
+      };
+    });
+  });
+  const mockDifficultyMetrics = aggregateDifficultyMetrics(mockProgressRows);
+  const mockTopicDifficultyMetrics = aggregateTopicDifficultyMetrics(mockProgressRows);
+  const mockTopicTrend = aggregateTopicDifficultyTrend(
+    mockProgressRows,
+    examAttempts.map((exam) => ({ id: exam.id, label: exam.test.name, submittedAt: exam.submittedAt })),
+  );
 
   const pdfHref = `/api/reports/students/${studentId}/pdf?areas=mathematics,reading,writing`;
 
@@ -74,41 +112,52 @@ export default async function StudentReportPage({ params, searchParams }: PagePr
         </div>
         <PracticeAreaTabs basePath={`/teacher/students/${studentId}/report`} active={area} />
         <section>
-          <h2 className="mb-4 text-lg font-semibold text-[var(--sat-area-mocks)]">Mocks</h2>
+          <h2 className="mb-4 text-lg font-semibold text-[var(--sat-area-mocks)]">Full Practice Tests</h2>
           <div className="mb-6 grid gap-4 md:grid-cols-3">
             <Card padding="md">
               <p className="text-2xl font-bold">{examAttempts.length}</p>
-              <p className="text-xs text-gray-500">Completed mocks</p>
+              <p className="text-xs text-gray-500">Completed exams</p>
             </Card>
             <Card padding="md">
               <p className="text-2xl font-bold">{examAttempts[0]?.totalScore ?? "-"}</p>
               <p className="text-xs text-gray-500">Latest total score</p>
             </Card>
             <Card padding="md">
-              <p className="text-2xl font-bold text-[var(--sat-area-mocks)]">Mocks</p>
-              <p className="text-xs text-gray-500">Full Practice Tests only</p>
+              <p className="text-2xl font-bold text-[var(--sat-area-mocks)]">FPT</p>
+              <p className="text-xs text-gray-500">R&amp;W and Math scores only</p>
             </Card>
           </div>
           <div className="mb-6">
             <MockSectionChart metrics={mockMetrics} />
           </div>
+          <div className="mb-6 grid gap-6 lg:grid-cols-2">
+            <DifficultyAccuracyChart metrics={mockDifficultyMetrics} area="mocks" />
+            <TopicDifficultyChart metrics={mockTopicDifficultyMetrics} area="mocks" />
+          </div>
+          <div className="mb-6">
+            <TopicDifficultyTrend topics={Object.keys(mockTopicTrend)} pointsByTopic={mockTopicTrend} />
+          </div>
           <Card padding="md">
-            {examAttempts.length === 0 ? (
-              <p className="text-sm text-gray-400">No submitted exams yet.</p>
-            ) : (
-              <div className="overflow-hidden rounded-md border border-gray-100">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="bg-gray-50 text-left text-xs font-medium text-gray-500">
-                      <th className="px-3 py-2">Exam</th>
-                      <th className="px-3 py-2">Date</th>
-                      <th className="px-3 py-2 text-right">SAT Total</th>
-                      <th className="px-3 py-2 text-right">R&amp;W</th>
-                      <th className="px-3 py-2 text-right">Math</th>
+            <div className="overflow-hidden rounded-md border border-gray-100">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-gray-50 text-left text-xs font-medium text-gray-500">
+                    <th className="px-3 py-2">Exam</th>
+                    <th className="px-3 py-2">Date</th>
+                    <th className="px-3 py-2 text-right">SAT Total</th>
+                    <th className="px-3 py-2 text-right">R&amp;W</th>
+                    <th className="px-3 py-2 text-right">Math</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {examAttempts.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="px-3 py-6 text-center text-sm text-gray-400">
+                        No submitted exams yet.
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {examAttempts.map((exam) => (
+                  ) : (
+                    examAttempts.map((exam) => (
                       <tr key={exam.id}>
                         <td className="px-3 py-2 font-medium text-gray-800">{exam.test.name}</td>
                         <td className="px-3 py-2 text-gray-500">{exam.submittedAt ? formatDate(exam.submittedAt) : "-"}</td>
@@ -116,11 +165,11 @@ export default async function StudentReportPage({ params, searchParams }: PagePr
                         <td className="px-3 py-2 text-right text-gray-700">{exam.rwScore ?? "—"}</td>
                         <td className="px-3 py-2 text-right text-gray-700">{exam.mathScore ?? "—"}</td>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           </Card>
         </section>
       </PageShell>
@@ -161,19 +210,15 @@ export default async function StudentReportPage({ params, searchParams }: PagePr
       score,
     };
   });
-  const avgScore = scoredAttempts.length
-    ? Math.round(scoredAttempts.reduce((sum, attempt) => sum + attempt.score, 0) / scoredAttempts.length)
-    : null;
-  const lastValidAttempt = scoredAttempts[0] ?? null;
-  const scoreTrend = [...scoredAttempts].reverse();
   const topicStats = new Map<string, TopicStat>();
-  const difficultyStats = new Map<string, { correct: number; total: number; time: number }>();
-  const progressRows: Array<{ topic: string; difficulty: string; correct: boolean; timeSeconds: number }> = [];
+  const difficultyStats = new Map<string, { correct: number; total: number; time: number; attempts: Set<string> }>();
+  const progressRows: Array<{ topic: string; difficulty: string; correct: boolean; timeSeconds: number; attemptId: string }> = [];
   const mediaQuestions = new Map<string, { stem: string; imageUrl: string; topic: string; difficulty: string }>();
 
   for (const attempt of attempts) {
     const topicsInAttempt = new Set<string>();
     for (const answer of attempt.answers) {
+      if (answer.answer === null) continue;
       const snapshot = parseSnapshot<QuestionSnapshot>(answer.questionSnapshot);
       const key = snapshot?.topic?.name ?? answer.question.topic.name;
       topicsInAttempt.add(key);
@@ -189,11 +234,13 @@ export default async function StudentReportPage({ params, searchParams }: PagePr
         difficulty,
         correct: Boolean(answer.isCorrect),
         timeSeconds: answer.timeSpent ?? 0,
-      });
-      const difficultyStat = difficultyStats.get(difficulty) ?? { correct: 0, total: 0, time: 0 };
+        attemptId: attempt.id,
+    });
+      const difficultyStat = difficultyStats.get(difficulty) ?? { correct: 0, total: 0, time: 0, attempts: new Set<string>() };
       difficultyStat.total += 1;
       if (answer.isCorrect) difficultyStat.correct += 1;
       difficultyStat.time += answer.timeSpent ?? 0;
+      difficultyStat.attempts.add(attempt.id);
       difficultyStats.set(difficulty, difficultyStat);
 
       const imageUrl = snapshot?.imageUrl ?? answer.question.imageUrl;
@@ -232,6 +279,13 @@ export default async function StudentReportPage({ params, searchParams }: PagePr
     });
   const difficultyMetrics = aggregateDifficultyMetrics(progressRows);
   const topicDifficultyMetrics = aggregateTopicDifficultyMetrics(progressRows);
+  const topicTrend = aggregateTopicDifficultyTrend(
+    progressRows,
+    scoredAttempts.map((attempt) => ({ id: attempt.id, label: attempt.name, submittedAt: attempt.submittedAt })),
+  );
+  const difficultyPanelStats = new Map(
+    [...difficultyStats.entries()].map(([label, stat]) => [label, { ...stat, attempts: stat.attempts.size }]),
+  );
   const attemptSumByTopic = [...topicStats.values()].reduce((sum, stat) => sum + stat.attempts, 0);
   const areaTitle = practiceAreaLabel(practiceArea);
 
@@ -253,7 +307,7 @@ export default async function StudentReportPage({ params, searchParams }: PagePr
 
       <section className="mb-10">
         <h2 className="mb-4 text-lg font-semibold text-gray-900">Practice — {areaTitle}</h2>
-        <div className="mb-6 grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+        <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
           <Card padding="md">
             <p className="text-2xl font-bold">{attempts.length}</p>
             <p className="text-xs text-gray-500">Completed attempts</p>
@@ -266,16 +320,20 @@ export default async function StudentReportPage({ params, searchParams }: PagePr
             <p className="text-2xl font-bold">{topicStats.size}</p>
             <p className="text-xs text-gray-500">Skills practiced</p>
           </Card>
-          <Card padding="md">
-            <p className={`text-2xl font-bold ${scoreBandTextClass(avgScore)}`}>{avgScore !== null ? `${avgScore}%` : "-"}</p>
-            <p className="text-xs text-gray-500">Average %</p>
-          </Card>
-          <Card padding="md">
-            <p className={`text-2xl font-bold ${scoreBandTextClass(lastValidAttempt?.score)}`}>
-              {lastValidAttempt ? `${lastValidAttempt.score}%` : "-"}
-            </p>
-            <p className="text-xs text-gray-500">Last valid %</p>
-          </Card>
+          {([
+            ["EASY", "Average Easy", "text-green-600"],
+            ["MEDIUM", "Average Medium", "text-amber-600"],
+            ["HARD", "Average Hard", "text-red-600"],
+          ] as const).map(([difficulty, label, color]) => {
+            const metric = difficultyMetrics.find((item) => item.difficulty === difficulty);
+            const accuracy = metric ? scorePercent(metric.correct, metric.total) : null;
+            return (
+              <Card key={difficulty} padding="md">
+                <p className={`text-2xl font-bold ${color}`}>{accuracy === null ? "—" : `${accuracy}%`}</p>
+                <p className="text-xs text-gray-500">{label}{metric ? ` · ${metric.correct}/${metric.total}` : ""}</p>
+              </Card>
+            );
+          })}
         </div>
         {attempts.length > 0 && attemptSumByTopic !== attempts.length && (
           <p className="mb-4 text-xs text-gray-500">
@@ -284,13 +342,13 @@ export default async function StudentReportPage({ params, searchParams }: PagePr
         )}
 
         <div className="mb-6 grid gap-6 lg:grid-cols-2">
-          <DifficultyAccuracyChart metrics={difficultyMetrics} />
-          <TopicDifficultyChart metrics={topicDifficultyMetrics} />
+          <DifficultyAccuracyChart metrics={difficultyMetrics} area={area} />
+          <TopicDifficultyChart metrics={topicDifficultyMetrics} area={area} />
         </div>
 
         <div className="mb-6 grid gap-6 lg:grid-cols-2">
           <ProgressPanel title="Progress by Skill" stats={topicStats} showAttempts />
-          <ProgressPanel title="Progress by Difficulty" stats={difficultyStats} />
+          <ProgressPanel title="Progress by Difficulty" stats={difficultyPanelStats} showAttempts />
         </div>
 
         {weakTopics.length > 0 && (
@@ -312,47 +370,9 @@ export default async function StudentReportPage({ params, searchParams }: PagePr
           </Card>
         )}
 
-        <Card padding="md" className="mb-6">
-          <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-gray-900">Score Progress Over Time (%)</h3>
-            {scoreTrend.length > 1 && (
-              <span className="text-xs text-gray-500">
-                {scoreTrend[0].score}% to {scoreTrend[scoreTrend.length - 1].score}%
-              </span>
-            )}
-          </div>
-          {scoreTrend.length > 0 ? (
-            <div className="space-y-3">
-              <div className="flex h-40 items-end gap-2 border-b border-l border-gray-200 px-2 pt-3">
-                {scoreTrend.map((attempt, index) => (
-                  <div key={attempt.id} className="flex min-w-10 flex-1 flex-col items-center justify-end gap-1">
-                    <div className={`text-[10px] font-medium ${scoreBandTextClass(attempt.score)}`}>{attempt.score}%</div>
-                    <div
-                      className={`w-full rounded-t ${scoreBandBarClass(attempt.score)}`}
-                      style={{ height: `${Math.max(attempt.score, 4)}%` }}
-                      title={`${attempt.name}: ${attempt.score}%`}
-                    />
-                    <div className="text-[10px] text-gray-400">#{index + 1}</div>
-                  </div>
-                ))}
-              </div>
-              <div className="grid gap-2 md:grid-cols-2">
-                {scoreTrend.map((attempt, index) => (
-                  <div key={attempt.id} className="flex items-center justify-between rounded-md bg-gray-50 px-3 py-2 text-xs">
-                    <span className="truncate text-gray-700">
-                      #{index + 1} {attempt.name}
-                    </span>
-                    <span className={`shrink-0 font-medium ${scoreBandTextClass(attempt.score)}`}>
-                      {attempt.score}% {attempt.submittedAt ? `on ${formatDate(attempt.submittedAt)}` : ""}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <p className="text-sm text-gray-400">No submitted {areaTitle.toLowerCase()} practice attempts yet.</p>
-          )}
-        </Card>
+        <div className="mb-6">
+          <TopicDifficultyTrend topics={Object.keys(topicTrend)} pointsByTopic={topicTrend} />
+        </div>
 
         <Card padding="md" className="mb-6">
           <h3 className="mb-3 text-sm font-semibold text-gray-900">Recent Practice Attempts</h3>

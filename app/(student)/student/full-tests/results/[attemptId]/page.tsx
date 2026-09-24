@@ -52,20 +52,20 @@ export default async function FullTestResultsPage({ params }: PageProps) {
     <PageShell width="narrow">
       <h1 className="mb-6 text-xl font-semibold text-gray-900">Results: {attempt.test.name}</h1>
       <div className="grid grid-cols-3 gap-4">
-        <Card padding="md" className="text-center"><p className="text-3xl font-bold">{attempt.rwScore ?? "—"}</p><p className="text-xs text-gray-500">Reading & Writing</p></Card>
-        <Card padding="md" className="text-center"><p className="text-3xl font-bold">{attempt.mathScore ?? "—"}</p><p className="text-xs text-gray-500">Math</p></Card>
-        <Card padding="md" className="text-center"><p className="text-3xl font-bold">{attempt.totalScore ?? "—"}</p><p className="text-xs text-gray-500">Total</p></Card>
+        <Card padding="md" className="text-center"><p className="text-3xl font-bold text-[var(--sat-area-mocks)]">{attempt.rwScore ?? "—"}</p><p className="text-xs text-gray-500">Reading & Writing</p></Card>
+        <Card padding="md" className="text-center"><p className="text-3xl font-bold text-[var(--sat-area-math)]">{attempt.mathScore ?? "—"}</p><p className="text-xs text-gray-500">Math</p></Card>
+        <Card padding="md" className="text-center"><p className="text-3xl font-bold text-[var(--sat-area-mocks)]">{attempt.totalScore ?? "—"}</p><p className="text-xs text-gray-500">Total</p></Card>
       </div>
       <Card padding="md" className="mt-6 text-sm text-gray-600">
         Time expired events: {attempt.timeExpiredEvents} · Extra time used: {attempt.extraTimeUsed}s
         {attempt.pauses.length > 0 ? ` · Paused ${attempt.pauses.length}x (${formatTime(pauseSeconds)})` : ""}
       </Card>
       <div className="mt-6 grid gap-4 md:grid-cols-2">
-        <StatsPanel title="By Module" rows={moduleStats.map((stat) => ({ label: stat.name, ...stat }))} />
-        <StatsPanel title="By Difficulty" rows={[...difficultyStats.entries()].map(([label, stat]) => ({ label, ...stat }))} />
+        <StatsPanel title="By Module" rows={moduleStats.map((stat) => ({ label: stat.name, ...stat }))} color="mocks" />
+        <StatsPanel title="By Difficulty" rows={[...difficultyStats.entries()].map(([label, stat]) => ({ label, ...stat }))} color="mocks" />
       </div>
       <div className="mt-6">
-        <StatsPanel title="By Skill" rows={[...topicStats.entries()].map(([label, stat]) => ({ label, ...stat }))} />
+        <StatsPanel title="By Skill" rows={[...topicStats.entries()].map(([label, stat]) => ({ label, ...stat }))} color="mocks" />
       </div>
       {attempt.test.reviewEnabled && (
         <div className="mt-6 space-y-5">
@@ -83,16 +83,6 @@ export default async function FullTestResultsPage({ params }: PageProps) {
                           <MathContent content={item.question.stem} className="max-h-28 overflow-auto text-sm" />
                         </div>
                         <QuestionMedia imageUrl={item.question.imageUrl} alt={`Question ${index + 1} image`} className="mt-2 max-w-sm" />
-                        {item.question.options.some((option) => option.imageUrl) && (
-                          <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                            {item.question.options.filter((option) => option.imageUrl).map((option) => (
-                              <div key={option.id}>
-                                <span className="text-xs font-medium text-gray-500">{option.label}</span>
-                                <QuestionMedia imageUrl={option.imageUrl} alt={`Option ${option.label} image`} className="max-w-[12rem]" />
-                              </div>
-                            ))}
-                          </div>
-                        )}
                         <p className="mt-1 text-xs text-gray-500">{item.question.topic.domain.name} · {item.question.topic.name} · {item.question.difficulty}</p>
                       </div>
                       <div className="text-right">
@@ -112,7 +102,7 @@ export default async function FullTestResultsPage({ params }: PageProps) {
   );
 }
 
-function StatsPanel({ title, rows }: { title: string; rows: { label: string; correct: number; total: number; time: number }[] }) {
+function StatsPanel({ title, rows, color }: { title: string; rows: { label: string; correct: number; total: number; time: number }[]; color: "mocks" }) {
   return (
     <Card padding="md">
       <h2 className="mb-3 text-sm font-semibold text-gray-900">{title}</h2>
@@ -125,7 +115,7 @@ function StatsPanel({ title, rows }: { title: string; rows: { label: string; cor
                 <span className="font-medium text-gray-800">{row.label}</span>
                 <span className="shrink-0 text-gray-600">{row.correct}/{row.total} · {pct}% · {formatTime(row.time)}</span>
               </div>
-              <div className="h-2 rounded-full bg-gray-100"><div className="h-2 rounded-full bg-blue-500" style={{ width: `${pct}%` }} /></div>
+              <div className="h-2 rounded-full bg-gray-100"><div className="h-2 rounded-full" style={{ width: `${pct}%`, backgroundColor: `var(--sat-area-${color})` }} /></div>
             </div>
           );
         })}

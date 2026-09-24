@@ -16,7 +16,7 @@ interface PracticeSetInfo {
   name: string;
   difficulty: string;
   topicName: string;
-  sectionLabel: string;
+  practiceArea: string | null;
   questionCount: number;
   alreadyAssigned: boolean;
 }
@@ -37,9 +37,10 @@ interface AssignFormProps {
   practiceSets: PracticeSetInfo[];
   groups: GroupInfo[];
   groupAssignmentEnabled: boolean;
+  initialArea: "all" | "math" | "reading" | "writing";
 }
 
-export function AssignForm({ studentId, practiceSets, groups, groupAssignmentEnabled }: AssignFormProps) {
+export function AssignForm({ studentId, practiceSets, groups, groupAssignmentEnabled, initialArea }: AssignFormProps) {
   const router = useRouter();
   const [target, setTarget] = useState<"student" | "group">("student");
   const [groupId, setGroupId] = useState(groups[0]?.id ?? "");
@@ -50,14 +51,14 @@ export function AssignForm({ studentId, practiceSets, groups, groupAssignmentEna
   const [feedbackMode, setFeedbackMode] = useState<"AFTER_SET" | "IMMEDIATE">("AFTER_SET");
   const [lockOnAssign, setLockOnAssign] = useState(false);
   const [search, setSearch] = useState("");
+  const [area, setArea] = useState<AssignFormProps["initialArea"]>(initialArea);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [showAllMembers, setShowAllMembers] = useState(false);
 
   const filtered = practiceSets.filter((ps) =>
-    !search ||
-    ps.name.toLowerCase().includes(search.toLowerCase()) ||
-    ps.topicName.toLowerCase().includes(search.toLowerCase())
+    (area === "all" || ps.practiceArea?.toLowerCase() === area) &&
+    (!search || ps.name.toLowerCase().includes(search.toLowerCase()) || ps.topicName.toLowerCase().includes(search.toLowerCase()))
   );
 
   function toggleSelect(id: string) {
@@ -100,6 +101,21 @@ export function AssignForm({ studentId, practiceSets, groups, groupAssignmentEna
   return (
     <div className="space-y-6">
       <Card padding="md">
+        <div className="mb-4 grid gap-3 sm:grid-cols-[12rem_1fr] sm:items-end">
+          <label className="text-sm font-medium text-gray-700">
+            Practice area
+            <Select value={area} onChange={(event) => setArea(event.target.value as AssignFormProps["initialArea"])} className="mt-1">
+              <option value="all">All areas</option>
+              <option value="math">Math</option>
+              <option value="reading">Reading</option>
+              <option value="writing">Writing</option>
+            </Select>
+          </label>
+          <label className="text-sm font-medium text-gray-700">
+            Search practice
+            <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Practice set or topic" className="mt-1" />
+          </label>
+        </div>
         <label className="mb-2 block text-sm font-medium text-gray-700">Assign to</label>
         <div className="flex items-center gap-4 flex-wrap">
           <label className="flex items-center gap-2 text-sm text-gray-700">
@@ -153,12 +169,6 @@ export function AssignForm({ studentId, practiceSets, groups, groupAssignmentEna
       <div>
         <div className="flex items-center justify-between mb-2">
           <label className="text-sm font-medium text-gray-700">Select Practice Sets</label>
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search..."
-            className="w-48 text-xs"
-          />
         </div>
         <Card className="max-h-80 overflow-y-auto overflow-hidden">
           {filtered.map((ps) => (
@@ -179,12 +189,13 @@ export function AssignForm({ studentId, practiceSets, groups, groupAssignmentEna
               />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">{ps.name}</p>
-                <p className="text-xs text-gray-500">{ps.sectionLabel} · {ps.topicName} · {ps.questionCount} questions</p>
+                <p className="text-xs text-gray-500">{ps.practiceArea ?? "Unclassified"} · {ps.topicName} · {ps.questionCount} questions</p>
               </div>
               <Badge variant={difficultyBadgeVariant(ps.difficulty)}>{difficultyLabel(ps.difficulty)}</Badge>
               {target === "student" && ps.alreadyAssigned && <span className="text-xs text-gray-400">Assigned</span>}
             </label>
           ))}
+          {filtered.length === 0 && <p className="px-4 py-8 text-center text-sm text-gray-400">No practice sets in this area.</p>}
         </Card>
         <p className="text-xs text-gray-400 mt-1">{selected.size} selected</p>
       </div>

@@ -15,16 +15,27 @@ type PdfLine = { text: string; size?: number; bold?: boolean; gapBefore?: number
 type PdfChart = {
   kind: "barChart";
   title: string;
-  rows: Array<{ label: string; value: number | null; max: number; detail: string }>;
+  rows: Array<{ label: string; value: number | null; max: number; detail: string; color?: "math" | "reading" | "writing" | "mocks" }>;
 };
 type PdfItem = PdfLine | PdfChart;
 type ReportArea = "mathematics" | "reading" | "writing";
+
+const PDF_AREA_COLORS = {
+  math: "0.06 0.65 0.89",
+  reading: "0.77 0.63 0.21",
+  writing: "0.09 0.64 0.29",
+  mocks: "0.92 0.35 0.05",
+} as const;
 
 const AREA_CONFIG: Record<ReportArea, { label: string }> = {
   mathematics: { label: "Math" },
   reading: { label: "Reading" },
   writing: { label: "Writing" },
 };
+
+function pdfColorForArea(area: ReportArea): "math" | "reading" | "writing" {
+  return area === "mathematics" ? "math" : area;
+}
 
 function pdfEscape(value: string) {
   return value.replace(/[\\()]/g, "\\$&");
@@ -105,7 +116,10 @@ function makeReportPdf(lines: PdfItem[]) {
           const label = row.label.length > 40 ? `${row.label.slice(0, 37)}...` : row.label;
           commands.push(`BT /F1 8 Tf 50 ${cursorY} Td (${pdfEscape(label)}) Tj ET`);
           commands.push(`0.92 0.94 0.97 rg 205 ${cursorY - 2} 250 8 re f`);
-          if (ratio > 0) commands.push(`0.18 0.43 0.78 rg 205 ${cursorY - 2} ${Math.round(250 * ratio)} 8 re f`);
+          if (ratio > 0) {
+            const color = PDF_AREA_COLORS[row.color ?? "math"];
+            commands.push(`${color} rg 205 ${cursorY - 2} ${Math.round(250 * ratio)} 8 re f`);
+          }
           commands.push(`BT /F1 8 Tf 465 ${cursorY} Td (${pdfEscape(row.value === null ? "N/A" : `${row.value} · ${row.detail}`)}) Tj ET`);
           cursorY -= 18;
         }
@@ -210,8 +224,8 @@ export async function GET(_req: Request, { params }: RouteContext) {
     });
     const avgScore = scores.length ? Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length) : null;
     const topicStats = new Map<string, { correct: number; total: number; attempts: Set<string> }>();
-    const difficultyStats = new Map<string, { correct: number; total: number }>();
-    const topicDifficultyStats = new Map<string, { topic: string; difficulty: string; correct: number; total: number }>();
+    const difficultyStats = new Map<string, { correct: number; total: number; attempts: Set<string> }>();
+    const topicDifficultyStats = new Map<string, { topic: string; difficulty: string; correct: number; total: number; attempts: Set<string> }>();
     const mediaUrls = new Set<string>();
 
     for (const attempt of attempts) {
@@ -222,11 +236,13 @@ export async function GET(_req: Request, { params }: RouteContext) {
         const difficulty = snapshot?.difficulty ?? answer.question.difficulty;
         topicsInAttempt.add(topic);
         const topicStat = topicStats.get(topic) ?? { correct: 0, total: 0, attempts: new Set<string>() };
-        const difficultyStat = difficultyStats.get(difficulty) ?? { correct: 0, total: 0 };
+        const difficultyStat = difficultyStats.get(difficulty) ?? { correct: 0, total: 0, attempts: new Set<string>() };
         const topicDifficultyKey = `${topic}:${difficulty}`;
-        const topicDifficultyStat = topicDifficultyStats.get(topicDifficultyKey) ?? { topic, difficulty, correct: 0, total: 0 };
+        const topicDifficultyStat = topicDifficultyStats.get(topicDifficultyKey) ?? { topic, difficulty, correct: 0, total: 0, attempts: new Set<string>() };
         topicStat.total += 1;
         difficultyStat.total += 1;
+        difficultyStat.attempts.add(attempt.id);
+        topicDifficultyStat.attempts.add(attempt.id);
         if (answer.isCorrect) {
           topicStat.correct += 1;
           difficultyStat.correct += 1;
@@ -275,7 +291,7 @@ export async function GET(_req: Request, { params }: RouteContext) {
     }
     lines.push({ text: "Progress by Difficulty", size: 13, bold: true, gapBefore: 18 });
     for (const [difficulty, stat] of difficultyStats.entries()) {
-      lines.push({ text: `${difficulty}: ${stat.correct}/${stat.total} (${scorePercent(stat.correct, stat.total)}%)` });
+      lines.push({ text: `${difficulty}: ${stat.correct}/${stat.total} (${scorePercent(stat.correct, stat.total)}%) · ${stat.attempts.size} attempt${stat.attempts.size === 1 ? "" : "s"}` });
     }
     lines.push({
       kind: "barChart",
@@ -284,7 +300,8 @@ export async function GET(_req: Request, { params }: RouteContext) {
         label: difficulty,
         value: scorePercent(stat.correct, stat.total),
         max: 100,
-        detail: `${stat.correct}/${stat.total}`,
+        detail: `${stat.correct}/${stat.total} · ${stat.attempts.size} attempt${stat.attempts.size === 1 ? "" : "s"}`,
+        color: pdfColorForArea(selectedArea),
       })),
     });
     lines.push({
@@ -297,7 +314,8 @@ export async function GET(_req: Request, { params }: RouteContext) {
           label: `${stat.topic} · ${stat.difficulty}`,
           value: scorePercent(stat.correct, stat.total),
           max: 100,
-          detail: `${stat.correct}/${stat.total}`,
+          detail: `${stat.correct}/${stat.total} · ${stat.attempts.size} attempt${stat.attempts.size === 1 ? "" : "s"}`,
+          color: pdfColorForArea(selectedArea),
         })),
     });
     if (mediaUrls.size > 0) {
@@ -331,8 +349,8 @@ export async function GET(_req: Request, { params }: RouteContext) {
     orderBy: { submittedAt: "desc" },
     take: 20,
   });
-  lines.push({ text: "Mocks (Full Practice Tests)", size: 16, bold: true, gapBefore: 28 });
-  lines.push({ text: "Mocks report Reading & Writing and Math as SAT sections. They are not mixed with Practice Exercises." });
+  lines.push({ text: "Full Practice Tests", size: 16, bold: true, gapBefore: 28 });
+  lines.push({ text: "Full Practice Tests report Reading & Writing and Math as SAT sections. They are not mixed with Practice Exercises." });
   if (examAttempts.length === 0) {
     lines.push({ text: "No submitted exams yet." });
   } else {
@@ -340,8 +358,8 @@ export async function GET(_req: Request, { params }: RouteContext) {
       kind: "barChart",
       title: "Full Practice Test progress by section",
       rows: examAttempts.slice(0, 12).flatMap((exam) => [
-        { label: `${exam.test.name} · Math`, value: exam.mathScore, max: 800, detail: "Math" },
-        { label: `${exam.test.name} · Reading & Writing`, value: exam.rwScore, max: 800, detail: "RW" },
+        { label: `${exam.test.name} · Math`, value: exam.mathScore, max: 800, detail: "Math", color: "math" },
+        { label: `${exam.test.name} · Reading & Writing`, value: exam.rwScore, max: 800, detail: "RW", color: "mocks" },
       ]),
     });
     for (const exam of examAttempts) {

@@ -214,7 +214,7 @@ const checks = [
     requires: [
       "Skills With Most Errors",
       "selectedStudentId",
-      "subskill",
+      "topic.name",
       "recommendation",
       "studentAccessWhereFor",
       "timeSpent",
