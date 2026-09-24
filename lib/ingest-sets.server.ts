@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import {
   buildQuestionContent,
   classifyQuestion,
+  reviewLevelFromStatus,
   type ExtractedTestFile,
   type ExtractedTestFileRole,
   type ExtractedTestRow,
@@ -264,8 +265,13 @@ export async function computeExtractedTests(batchId: string): Promise<ExtractedT
           });
 
       const cls = classifyQuestion(content);
-      if (cls.level === "crit") needsReview += 1;
-      else if (cls.level === "warn") attention += 1;
+      // Pending is governed by the CURATED candidate status (what the file-review
+      // UI sets), so the review stays coherent with the QA truth instead of the
+      // noisy completeness heuristic. classifyQuestion is kept only for the advisory
+      // per-field dots/notes (missingStem/…) shown to guide the correction.
+      const level = reviewLevelFromStatus(c.status, c.promotionStatus);
+      if (level === "crit") needsReview += 1;
+      else if (level === "warn") attention += 1;
       else complete += 1;
       if (cls.fields.stem === "crit") missingStem += 1;
       if (cls.fields.stimulus === "warn") missingStimulus += 1;
@@ -281,7 +287,7 @@ export async function computeExtractedTests(batchId: string): Promise<ExtractedT
         type: content.type,
         answer: content.correctAnswer ?? "",
         promoted: isPromoted,
-        level: cls.level,
+        level,
         fields: cls.fields,
         notes: cls.notes,
       });

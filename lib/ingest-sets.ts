@@ -187,6 +187,23 @@ export function classifyQuestion(c: QuestionContent): QuestionClassification {
   return { level, fields: { stem, stimulus, options, answer, explanation }, notes };
 }
 
+/**
+ * Review "pending" level from the CURATED candidate status (the human review
+ * state that the file-review UI sets via "Mark reviewed" / "Reject"), not from the
+ * completeness heuristic. This is what drives the pending counts/filter so the
+ * review stays coherent with the QA truth: NEEDS_REVIEW = must correct;
+ * EDITING = in progress; READY / REVIEWED = done. REJECTED candidates are filtered
+ * out upstream. `classifyQuestion` remains only as an advisory per-field signal.
+ */
+export function reviewLevelFromStatus(
+  status: string | null | undefined,
+  promotionStatus?: string | null,
+): "ok" | "warn" | "crit" {
+  if (status === "NEEDS_REVIEW") return "crit";
+  if (promotionStatus === "EDITING") return "warn";
+  return "ok";
+}
+
 /** Sidebar / checklist label from classification (and optional rejected status). */
 export function questionSidebarState(
   cls: QuestionClassification,
