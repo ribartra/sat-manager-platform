@@ -51,6 +51,14 @@ export default async function TeacherContentPage({
     items.push(topic);
     topicsByNodeId.set(topic.taxonomyNodeId, items);
   }
+  // Hide topics with no practice sets (e.g. taxonomy duplicates, full-test placeholders,
+  // and topics without source material) so the Content Map only lists topics that have content.
+  const topicHasSets = (t: (typeof topics)[number]) => t.practiceSets.length > 0;
+  function subtreeHasSets(node: TaxonomyTreeNode): boolean {
+    const own = (topicsByNodeId.get(node.id) ?? []).some(topicHasSets);
+    return own || node.children.some(subtreeHasSets);
+  }
+
   const legacySections = taxonomyNodes.length
     ? []
     : await prisma.section.findMany({
@@ -79,7 +87,8 @@ export default async function TeacherContentPage({
         children: root.children.filter((child) => matchesTaxonomyDomainName(child, domainFilter)),
       };
     })
-    .filter((root) => !domainFilter || root.children.length > 0);
+    .filter((root) => !domainFilter || root.children.length > 0)
+    .filter((root) => subtreeHasSets(root));
 
   const visibleLegacy = legacySections
     .filter((section) => matchesTaxonomySection(section, activeSection))
@@ -93,14 +102,7 @@ export default async function TeacherContentPage({
 
   const hasContent = visibleRoots.length > 0 || visibleLegacy.length > 0;
 
-  const countByStatus = (sets: { status: string }[]) => ({
-    published: sets.filter((s) => s.status === "PUBLISHED").length,
-    draft: sets.filter((s) => s.status === "DRAFT").length,
-    total: sets.length,
-  });
-
   function renderTopicRow(topic: (typeof topics)[number]) {
-    const counts = countByStatus(topic.practiceSets);
     const byDiff = ["EASY", "MEDIUM", "HARD"].map((d) => ({
       d,
       count: topic.practiceSets.filter((ps) => ps.difficulty === d && ps.status === "PUBLISHED").length,
@@ -126,14 +128,16 @@ export default async function TeacherContentPage({
               </span>
             ) : null
           )}
-          {counts.total === 0 && <span className="text-xs text-gray-400">No sets yet</span>}
         </div>
       </Card>
     );
   }
 
   function renderNode(node: TaxonomyTreeNode, depth = 0) {
-    const nodeTopics = topicsByNodeId.get(node.id) ?? [];
+    const nodeTopics = (topicsByNodeId.get(node.id) ?? []).filter(topicHasSets);
+    const childNodes = node.children.map((child) => renderNode(child, depth + 1)).filter(Boolean);
+    // Skip any node whose entire subtree has no practice sets (no empty headings left behind).
+    if (nodeTopics.length === 0 && childNodes.length === 0) return null;
     const isDomainHeading = depth === 1;
     return (
       <div key={node.id} className={depth === 0 ? "mb-8" : "mt-4"} id={isDomainHeading ? taxonomyDomainAnchorId(node.label) : undefined}>
@@ -151,7 +155,7 @@ export default async function TeacherContentPage({
         )}
         <div className={cn("space-y-1", depth > 0 && "pl-3")}>
           {nodeTopics.map((topic) => renderTopicRow(topic))}
-          {node.children.map((child) => renderNode(child, depth + 1))}
+          {childNodes}
         </div>
       </div>
     );
@@ -207,12 +211,13 @@ export default async function TeacherContentPage({
         : visibleLegacy.map((section) => (
             <div key={section.id} className="mb-8">
               <h2 className="mb-3 border-b border-gray-200 pb-2 text-lg font-semibold text-gray-900">{section.label}</h2>
-              {section.domains.map((domain) => (
+              {section.domains
+                .filter((domain) => domain.topics.some((t) => t.practiceSets.length > 0))
+                .map((domain) => (
                 <div key={domain.id} id={taxonomyDomainAnchorId(domain.name)} className="mb-4">
                   <h3 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-gray-500">{domain.name}</h3>
                   <div className="space-y-1">
-                    {domain.topics.map((topic) => {
-                      const counts = countByStatus(topic.practiceSets);
+                    {domain.topics.filter((topic) => topic.practiceSets.length > 0).map((topic) => {
                       const byDiff = ["EASY", "MEDIUM", "HARD"].map((d) => ({
                         d,
                         count: topic.practiceSets.filter((ps) => ps.difficulty === d && ps.status === "PUBLISHED").length,
@@ -242,7 +247,6 @@ export default async function TeacherContentPage({
                                 </span>
                               ) : null
                             )}
-                            {counts.total === 0 && <span className="text-xs text-gray-400">No sets yet</span>}
                           </div>
                         </Card>
                       );
