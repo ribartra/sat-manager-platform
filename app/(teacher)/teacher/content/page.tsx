@@ -1,32 +1,39 @@
-import { PageShell } from "@/components/sat";
+import { PageShell, PracticeAreaTabs } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Plus } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import {
   academicTopicWhere,
-  activeTaxonomySection,
   buildTaxonomyTree,
   matchesTaxonomyDomainName,
-  matchesTaxonomySection,
   taxonomyDomainAnchorId,
-  TAXONOMY_SECTION_TABS,
   type TaxonomyTreeNode,
 } from "@/lib/taxonomy";
+import {
+  activeAreaTab,
+  buildAreaHref,
+  practiceAreaFromTab,
+  practiceAreaLabel,
+  resolvePracticeArea,
+} from "@/lib/practice-area";
 import { cn } from "@/lib/utils";
-
-function tabHref(section: string) {
-  return `/teacher/content?section=${section}`;
-}
 
 export default async function TeacherContentPage({
   searchParams,
 }: {
-  searchParams: Promise<{ section?: string; domain?: string }>;
+  searchParams: Promise<{ area?: string; section?: string; domain?: string }>;
 }) {
   const params = await searchParams;
-  const activeSection = activeTaxonomySection(params.section);
+  // Navigation is by practice area: Math / Reading / Writing / Full Practice Tests.
+  const area = activeAreaTab(params.area ?? params.section, "math");
+  // "Full Practice Tests" is an exam surface, not a practice-set area.
+  if (area === "mocks") redirect("/teacher/full-tests");
+  const activeArea = practiceAreaFromTab(area); // MATH | READING | WRITING (mocks handled above)
+  const areaLabel = practiceAreaLabel(activeArea);
   const domainFilter = params.domain?.trim() || null;
+
   const [taxonomyNodes, topics] = await Promise.all([
     prisma.taxonomyNode.findMany({
       where: { active: true },
@@ -36,6 +43,7 @@ export default async function TeacherContentPage({
       where: academicTopicWhere,
       include: {
         taxonomyNode: true,
+        domain: { select: { practiceArea: true, name: true } },
         practiceSets: {
           select: { id: true, status: true, difficulty: true },
         },
@@ -51,12 +59,14 @@ export default async function TeacherContentPage({
     items.push(topic);
     topicsByNodeId.set(topic.taxonomyNodeId, items);
   }
-  // Hide topics with no practice sets (e.g. taxonomy duplicates, full-test placeholders,
-  // and topics without source material) so the Content Map only lists topics that have content.
-  const topicHasSets = (t: (typeof topics)[number]) => t.practiceSets.length > 0;
-  function subtreeHasSets(node: TaxonomyTreeNode): boolean {
-    const own = (topicsByNodeId.get(node.id) ?? []).some(topicHasSets);
-    return own || node.children.some(subtreeHasSets);
+  // Show only topics of the active practice area that have practice sets; empty topics,
+  // other-area topics, and now-empty section/domain headings are hidden (recursive).
+  const topicVisible = (t: (typeof topics)[number]) =>
+    t.practiceSets.length > 0 &&
+    resolvePracticeArea({ practiceArea: t.domain?.practiceArea, domainName: t.domain?.name }) === activeArea;
+  function subtreeVisible(node: TaxonomyTreeNode): boolean {
+    const own = (topicsByNodeId.get(node.id) ?? []).some(topicVisible);
+    return own || node.children.some(subtreeVisible);
   }
 
   const legacySections = taxonomyNodes.length
@@ -79,7 +89,6 @@ export default async function TeacherContentPage({
       });
 
   const visibleRoots = roots
-    .filter((node) => matchesTaxonomySection(node, activeSection))
     .map((root) => {
       if (!domainFilter) return root;
       return {
@@ -88,17 +97,25 @@ export default async function TeacherContentPage({
       };
     })
     .filter((root) => !domainFilter || root.children.length > 0)
-    .filter((root) => subtreeHasSets(root));
+    .filter((root) => subtreeVisible(root));
 
   const visibleLegacy = legacySections
-    .filter((section) => matchesTaxonomySection(section, activeSection))
     .map((section) => ({
       ...section,
-      domains: domainFilter
-        ? section.domains.filter((domain) => matchesTaxonomyDomainName(domain, domainFilter))
-        : section.domains,
+      domains: section.domains
+        .filter(
+          (domain) =>
+            resolvePracticeArea({
+              practiceArea: domain.practiceArea,
+              sectionName: section.name,
+              sectionLabel: section.label,
+              domainName: domain.name,
+            }) === activeArea
+        )
+        .filter((domain) => !domainFilter || matchesTaxonomyDomainName(domain, domainFilter))
+        .filter((domain) => domain.topics.some((t) => t.practiceSets.length > 0)),
     }))
-    .filter((section) => !domainFilter || section.domains.length > 0);
+    .filter((section) => section.domains.length > 0);
 
   const hasContent = visibleRoots.length > 0 || visibleLegacy.length > 0;
 
@@ -134,15 +151,15 @@ export default async function TeacherContentPage({
   }
 
   function renderNode(node: TaxonomyTreeNode, depth = 0) {
-    const nodeTopics = (topicsByNodeId.get(node.id) ?? []).filter(topicHasSets);
+    const nodeTopics = (topicsByNodeId.get(node.id) ?? []).filter(topicVisible);
     const childNodes = node.children.map((child) => renderNode(child, depth + 1)).filter(Boolean);
-    // Skip any node whose entire subtree has no practice sets (no empty headings left behind).
+    // Skip any node whose entire subtree has no visible topics (no empty headings left behind).
     if (nodeTopics.length === 0 && childNodes.length === 0) return null;
     const isDomainHeading = depth === 1;
     return (
       <div key={node.id} className={depth === 0 ? "mb-8" : "mt-4"} id={isDomainHeading ? taxonomyDomainAnchorId(node.label) : undefined}>
         {depth === 0 ? (
-          <h2 className="mb-3 border-b border-gray-200 pb-2 text-lg font-semibold text-gray-900">{node.label}</h2>
+          <h2 className="mb-3 border-b border-gray-200 pb-2 text-lg font-semibold text-gray-900">{areaLabel}</h2>
         ) : (
           <h3
             className={cn(
@@ -173,28 +190,13 @@ export default async function TeacherContentPage({
         </Link>
       </div>
 
-      <div className="mb-5 flex gap-2 border-b border-gray-200">
-        {TAXONOMY_SECTION_TABS.map((tab) => (
-          <Link
-            key={tab.key}
-            href={tabHref(tab.key)}
-            className={cn(
-              "border-b-2 px-3 py-2 text-sm font-medium",
-              activeSection === tab.key
-                ? "border-blue-600 text-blue-700"
-                : "border-transparent text-gray-500 hover:text-gray-800"
-            )}
-          >
-            {tab.label}
-          </Link>
-        ))}
-      </div>
+      <PracticeAreaTabs basePath="/teacher/content" active={area} />
 
       {domainFilter ? (
         <p className="mb-4 text-sm text-gray-500">
           Showing domain <span className="font-medium text-gray-800">{domainFilter}</span>
           {" · "}
-          <Link href={tabHref(activeSection)} className="text-blue-600 hover:underline">
+          <Link href={buildAreaHref("/teacher/content", area)} className="text-blue-600 hover:underline">
             Clear filter
           </Link>
         </p>
@@ -202,7 +204,7 @@ export default async function TeacherContentPage({
 
       {!hasContent && (
         <div className="py-12 text-center text-sm text-gray-400">
-          {domainFilter ? "No content for this domain in the selected section." : "No content in this section yet."}
+          {domainFilter ? "No content for this domain in the selected area." : "No content in this area yet."}
         </div>
       )}
 
@@ -210,10 +212,8 @@ export default async function TeacherContentPage({
         ? visibleRoots.map((node) => renderNode(node))
         : visibleLegacy.map((section) => (
             <div key={section.id} className="mb-8">
-              <h2 className="mb-3 border-b border-gray-200 pb-2 text-lg font-semibold text-gray-900">{section.label}</h2>
-              {section.domains
-                .filter((domain) => domain.topics.some((t) => t.practiceSets.length > 0))
-                .map((domain) => (
+              <h2 className="mb-3 border-b border-gray-200 pb-2 text-lg font-semibold text-gray-900">{areaLabel}</h2>
+              {section.domains.map((domain) => (
                 <div key={domain.id} id={taxonomyDomainAnchorId(domain.name)} className="mb-4">
                   <h3 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-gray-500">{domain.name}</h3>
                   <div className="space-y-1">

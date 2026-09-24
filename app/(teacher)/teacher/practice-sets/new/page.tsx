@@ -2,6 +2,7 @@ import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { PracticeSetEditor } from "../practice-set-editor-client";
 import { academicTopicWhere, buildTaxonomyTree, taxonomyPathLabel } from "@/lib/taxonomy";
+import { domainSectionLabel } from "@/lib/practice-area";
 import { findQuestionsWithOptionMedia } from "@/lib/question-list-media-query";
 
 interface PageProps {
@@ -26,7 +27,7 @@ export default async function NewPracticeSetPage({ searchParams }: PageProps) {
           id: t.id,
           name: t.name,
           domainName: t.domain.name,
-          sectionLabel: t.domain.section.label,
+          sectionLabel: domainSectionLabel({ practiceArea: t.domain.practiceArea, sectionName: t.domain.section.name, sectionLabel: t.domain.section.label, domainName: t.domain.name }),
           taxonomyLabel: taxonomyPathLabel(t.taxonomyNodeId, byId, `${t.domain.section.label} / ${t.domain.name} / ${t.name}`),
         }))}
         questions={questions}

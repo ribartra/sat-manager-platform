@@ -39,17 +39,26 @@ interface MaterialRow {
   topic: { name: string; domainName: string; sectionLabel: string } | null;
 }
 
-type SectionKey = "math" | "rw" | "general";
+type SectionKey = "math" | "reading" | "writing" | "general";
 
 const TABS: { key: SectionKey; label: string }[] = [
   { key: "math", label: "Math" },
-  { key: "rw", label: "R&W" },
+  { key: "reading", label: "Reading" },
+  { key: "writing", label: "Writing" },
   { key: "general", label: "General" },
 ];
 
+const SECTION_LABEL_BY_TAB: Record<SectionKey, string> = {
+  math: "Mathematics",
+  reading: "Reading",
+  writing: "Writing",
+  general: "",
+};
+
 function sectionKeyOf(sectionLabel: string | null | undefined): SectionKey {
   if (sectionLabel === "Mathematics") return "math";
-  if (sectionLabel === "Reading & Writing") return "rw";
+  if (sectionLabel === "Reading") return "reading";
+  if (sectionLabel === "Writing") return "writing";
   return "general";
 }
 
@@ -84,12 +93,12 @@ export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; 
   const [statusFilter, setStatusFilter] = useState("");
 
   const counts = useMemo(() => {
-    const c: Record<SectionKey, number> = { math: 0, rw: 0, general: 0 };
+    const c: Record<SectionKey, number> = { math: 0, reading: 0, writing: 0, general: 0 };
     for (const m of materials) c[sectionKeyOf(m.topic?.sectionLabel)]++;
     return c;
   }, [materials]);
 
-  const sectionLabel = activeTab === "math" ? "Mathematics" : "Reading & Writing";
+  const sectionLabel = SECTION_LABEL_BY_TAB[activeTab];
   const sectionTopics = useMemo(
     () => topics.filter((t) => sectionKeyOf(t.sectionLabel) === activeTab),
     [topics, activeTab]

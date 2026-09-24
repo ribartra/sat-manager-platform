@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Lock, ChevronLeft } from "lucide-react";
 import { refreshAssignmentStates } from "@/lib/assignments";
+import { practiceAreaLabel, resolvePracticeArea } from "@/lib/practice-area";
 
 interface PageProps {
   params: Promise<{ topicId: string; difficulty: string }>;
@@ -53,7 +54,12 @@ export default async function TopicPracticeSetsPage({ params }: PageProps) {
           <ChevronLeft size={14} /> Content Map
         </Link>
         <span>/</span>
-        <span>{topic.domain.section.label}</span>
+        <span>{practiceAreaLabel(resolvePracticeArea({
+          practiceArea: topic.domain.practiceArea,
+          sectionName: topic.domain.section.name,
+          sectionLabel: topic.domain.section.label,
+          domainName: topic.domain.name,
+        }))}</span>
         <span>/</span>
         <span>{topic.domain.name}</span>
         <span>/</span>

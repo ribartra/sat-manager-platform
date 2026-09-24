@@ -1,52 +1,87 @@
-import { PageShell } from "@/components/sat";
+import { PageShell, PracticeAreaTabs } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { Plus } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { PracticeSetsFilter } from "./practice-sets-filter-client";
 import { PracticeSetsTable, type PracticeSetRow } from "./practice-sets-table-client";
-import { academicTopicWhere, activeTaxonomySection, buildTaxonomyTree, matchesTaxonomySection, TAXONOMY_SECTION_TABS } from "@/lib/taxonomy";
-import { cn } from "@/lib/utils";
+import { FullTestActions } from "../full-tests/full-test-actions-client";
+import { fullTestStatusBadgeVariant, fullTestStatusLabel } from "@/lib/domain-meta";
+import { activeAreaTab, practiceAreaFromTab, practiceAreaLabel } from "@/lib/practice-area";
+import { academicTopicWhere } from "@/lib/taxonomy";
 
-interface SearchParams { section?: string; topic?: string; difficulty?: string; status?: string }
+interface SearchParams {
+  area?: string;
+  section?: string;
+  topic?: string;
+  difficulty?: string;
+  status?: string;
+}
 
-function tabHref(section: string, filters: SearchParams) {
-  const params = new URLSearchParams();
-  params.set("section", section);
-  if (filters.difficulty) params.set("difficulty", filters.difficulty);
-  if (filters.status) params.set("status", filters.status);
-  return `/teacher/practice-sets?${params.toString()}`;
+function tabPreserve(filters: SearchParams) {
+  return { topic: filters.topic, difficulty: filters.difficulty, status: filters.status };
 }
 
 export default async function TeacherPracticeSetsPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const filters = await searchParams;
-  const activeSection = activeTaxonomySection(filters.section);
+  const area = activeAreaTab(filters.area ?? filters.section, "math");
+  const practiceArea = practiceAreaFromTab(area);
 
-  const [taxonomyNodes, topics] = await Promise.all([
-    prisma.taxonomyNode.findMany({ where: { active: true }, orderBy: [{ sortOrder: "asc" }, { label: "asc" }] }),
-    prisma.topic.findMany({ where: academicTopicWhere, include: { taxonomyNode: true, domain: { include: { section: true } } }, orderBy: { name: "asc" } }),
-  ]);
-  const { roots, byId } = buildTaxonomyTree(taxonomyNodes);
-  const rootByNodeId = new Map<string, (typeof roots)[number]>();
-  for (const node of byId.values()) {
-    let current = node;
-    while (current.parentId && byId.has(current.parentId)) current = byId.get(current.parentId)!;
-    rootByNodeId.set(node.id, current);
+  if (area === "mocks") {
+    const tests = await prisma.fullPracticeTest.findMany({
+      include: { modules: { include: { questions: true } }, assignments: true, attempts: true },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return (
+      <PageShell width="wide" density="compact" className="space-y-4">
+        <header className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h1 className="text-xl font-semibold text-gray-900">Practice &amp; Exams</h1>
+            <p className="mt-1 text-sm text-gray-500">Manage practice content and Full Practice Tests in one place.</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Link href="/teacher/full-tests/scoring" className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Scoring Table</Link>
+            <Link href="/teacher/full-tests/new" className="inline-flex items-center gap-1.5 rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"><Plus size={14} /> New Exam</Link>
+          </div>
+        </header>
+        <PracticeAreaTabs basePath="/teacher/practice-sets" active={area} preserve={tabPreserve(filters)} />
+        <Card>
+          {tests.map((test) => {
+            const questionCount = test.modules.reduce((sum, module) => sum + module.questions.length, 0);
+            return (
+              <div key={test.id} className="grid gap-3 border-b border-gray-100 px-4 py-3 last:border-b-0 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="truncate text-sm font-medium text-gray-900" title={test.name}>{test.name}</p>
+                    <Badge variant={fullTestStatusBadgeVariant(test.status)}>{fullTestStatusLabel(test.status)}</Badge>
+                  </div>
+                  <p className="mt-1 text-xs text-gray-500">{questionCount} questions · {test.assignments.length} assignments</p>
+                </div>
+                <FullTestActions testId={test.id} status={test.status} hasAssignments={test.assignments.length > 0} hasAttempts={test.attempts.length > 0} variant="list" />
+              </div>
+            );
+          })}
+          {tests.length === 0 && <div className="p-10 text-center text-sm text-gray-400">No Exams yet.</div>}
+        </Card>
+      </PageShell>
+    );
   }
-  const visibleTopics = topics.filter((topic) => {
-    if (topic.taxonomyNodeId) {
-      const root = rootByNodeId.get(topic.taxonomyNodeId);
-      if (root) return matchesTaxonomySection(root, activeSection);
-    }
-    return matchesTaxonomySection(topic.domain.section, activeSection);
-  });
-  const visibleTopicIds = new Set(visibleTopics.map((topic) => topic.id));
-  const selectedTopicId = filters.topic && visibleTopicIds.has(filters.topic) ? filters.topic : undefined;
 
+  const topicWhere = practiceArea ? { AND: [academicTopicWhere, { domain: { practiceArea } }] } : academicTopicWhere;
+  const topics = await prisma.topic.findMany({
+    where: topicWhere,
+    include: { domain: { include: { section: true } } },
+    orderBy: { name: "asc" },
+  });
+  const topicIds = topics.map((topic) => topic.id);
+  const selectedTopicId = filters.topic && topicIds.includes(filters.topic) ? filters.topic : undefined;
   const practiceSets = await prisma.practiceSet.findMany({
     where: {
-      topicId: selectedTopicId || { in: [...visibleTopicIds] },
-      difficulty: (filters.difficulty as string | undefined) || undefined,
-      status: (filters.status as string | undefined) || undefined,
+      topicId: selectedTopicId || { in: topicIds },
+      difficulty: filters.difficulty || undefined,
+      status: filters.status || undefined,
     },
     include: {
       topic: { include: { domain: { include: { section: true } } } },
@@ -55,62 +90,40 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
     },
     orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
   });
+  // Practice areas are shown separately (Math / Reading / Writing); "Reading & Writing"
+  // stays only in exam/full-test surfaces.
+  const sectionLabel = practiceArea === "MATH" ? "Mathematics" : practiceAreaLabel(practiceArea);
 
   return (
-    <PageShell width="wide">
-      <div className="mb-6 flex items-center justify-between gap-4">
+    <PageShell width="wide" density="compact" className="space-y-4">
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-gray-900">Practice Sets</h1>
-          <p className="mt-1 text-sm text-gray-500">Skill practice assignments, separate from Exams.</p>
+          <h1 className="text-xl font-semibold text-gray-900">Practice &amp; Exams</h1>
+          <p className="mt-1 text-sm text-gray-500">Manage practice content and Full Practice Tests in one place.</p>
         </div>
-        <Link href="/teacher/practice-sets/new" className="inline-flex items-center gap-1.5 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
-          <Plus size={14} /> New Practice Set
-        </Link>
-      </div>
-
-      <div className="mb-5 flex gap-2 border-b border-gray-200">
-        {TAXONOMY_SECTION_TABS.map((tab) => (
-          <Link
-            key={tab.key}
-            href={tabHref(tab.key, filters)}
-            className={cn(
-              "border-b-2 px-3 py-2 text-sm font-medium",
-              activeSection === tab.key ? "border-blue-600 text-blue-700" : "border-transparent text-gray-500 hover:text-gray-800"
-            )}
-          >
-            {tab.label}
-          </Link>
-        ))}
-      </div>
-
+        <Link href="/teacher/practice-sets/new" className="inline-flex items-center gap-1.5 self-start rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"><Plus size={14} /> New Practice Set</Link>
+      </header>
+      <PracticeAreaTabs basePath="/teacher/practice-sets" active={area} preserve={tabPreserve(filters)} />
       <PracticeSetsFilter
-        section={activeSection}
-        sectionLabel={visibleTopics[0]?.domain.section.label ?? (activeSection === "math" ? "Mathematics" : "Reading & Writing")}
-        topics={visibleTopics.map((t) => ({
-          id: t.id,
-          name: t.name,
-          sectionLabel: t.domain.section.label,
-          domainName: t.domain.name,
-        }))}
+        area={area}
+        sectionLabel={sectionLabel}
+        topics={topics.map((topic) => ({ id: topic.id, name: topic.name, sectionLabel, domainName: topic.domain.name }))}
         initialTopicId={selectedTopicId}
         initialDifficulty={filters.difficulty}
         initialStatus={filters.status}
       />
-
       <PracticeSetsTable
-        rows={practiceSets.map(
-          (practiceSet): PracticeSetRow => ({
-            id: practiceSet.id,
-            name: practiceSet.name,
-            skillSection: practiceSet.topic.domain.section.label,
-            skillDomain: practiceSet.topic.domain.name,
-            skillName: practiceSet.topic.name,
-            difficulty: practiceSet.difficulty,
-            questionCount: practiceSet.questions.length,
-            assignmentCount: practiceSet.assignments.length,
-            status: practiceSet.status,
-          }),
-        )}
+        rows={practiceSets.map((practiceSet): PracticeSetRow => ({
+          id: practiceSet.id,
+          name: practiceSet.name,
+          skillSection: sectionLabel,
+          skillDomain: practiceSet.topic.domain.name,
+          skillName: practiceSet.topic.name,
+          difficulty: practiceSet.difficulty,
+          questionCount: practiceSet.questions.length,
+          assignmentCount: practiceSet.assignments.length,
+          status: practiceSet.status,
+        }))}
       />
     </PageShell>
   );

@@ -1,6 +1,6 @@
 /**
  * Canonical Practice area classification (Math / Reading / Writing) and
- * report/analytics tab keys including Mocks (Full Practice Tests).
+ * report/analytics tab keys including Full Practice Tests (`mocks` URL key).
  *
  * Source of truth for practice content is Domain.practiceArea (persisted).
  * Heuristic domain-name lists remain only as a fallback for null rows.
@@ -9,7 +9,7 @@
 export const PRACTICE_AREAS = ["MATH", "READING", "WRITING"] as const;
 export type PracticeAreaCode = (typeof PRACTICE_AREAS)[number];
 
-/** URL / UI tab keys for practice + mocks. */
+/** URL / UI tab keys for practice + Full Practice Tests. */
 export const AREA_TAB_KEYS = ["math", "reading", "writing", "mocks"] as const;
 export type AreaTabKey = (typeof AREA_TAB_KEYS)[number];
 
@@ -21,7 +21,7 @@ export const PRACTICE_AREA_TABS = [
 
 export const AREA_TABS_WITH_MOCKS = [
   ...PRACTICE_AREA_TABS,
-  { key: "mocks" as const, label: "Mocks", practiceArea: null },
+  { key: "mocks" as const, label: "Full Practice Tests", practiceArea: null },
 ];
 
 /** Legacy report-area keys used by parent tokens / PDF query params. */
@@ -44,6 +44,9 @@ export function isAreaTabKey(value: string | null | undefined): value is AreaTab
 }
 
 export function activeAreaTab(value: string | null | undefined, fallback: AreaTabKey = "math"): AreaTabKey {
+  // Legacy pages used `rw` for a combined Reading & Writing tab. Reading is
+  // the safest destination now that the combined surface is split in two.
+  if (value === "rw") return "reading";
   return isAreaTabKey(value) ? value : fallback;
 }
 
@@ -66,6 +69,29 @@ export function practiceAreaLabel(area: PracticeAreaCode | null | undefined): st
   if (area === "READING") return "Reading";
   if (area === "WRITING") return "Writing";
   return "Unclassified";
+}
+
+/**
+ * Section-style label used to GROUP practice content in pickers, tables and
+ * breadcrumbs (Math uses the long form "Mathematics" to match SECTION_ORDER).
+ * Reading and Writing are surfaced separately; the combined "Reading & Writing"
+ * label is reserved for exam/full-test surfaces.
+ */
+export function practiceSectionLabel(area: PracticeAreaCode | null | undefined): string {
+  if (area === "MATH") return "Mathematics";
+  if (area === "READING") return "Reading";
+  if (area === "WRITING") return "Writing";
+  return "Unclassified";
+}
+
+/** Convenience: resolve a topic's domain to its practice section label in one call. */
+export function domainSectionLabel(input: {
+  practiceArea?: PracticeAreaCode | string | null;
+  sectionName?: string | null;
+  sectionLabel?: string | null;
+  domainName?: string | null;
+}): string {
+  return practiceSectionLabel(resolvePracticeArea(input));
 }
 
 export function reportAreaFromTab(tab: Exclude<AreaTabKey, "mocks">): ReportAreaKey {
@@ -155,7 +181,17 @@ export function resolvePracticeArea(input: {
 
 /** Prisma where clause for practice content in a given area. */
 export function practiceAreaDomainWhere(area: PracticeAreaCode) {
-  return { practiceArea: area };
+  const fallbackNames = area === "MATH"
+    ? MATH_DOMAIN_NAMES
+    : area === "READING"
+      ? READING_DOMAIN_NAMES
+      : WRITING_DOMAIN_NAMES;
+  return {
+    OR: [
+      { practiceArea: area },
+      { practiceArea: null, name: { in: [...fallbackNames] } },
+    ],
+  };
 }
 
 export function practiceAreaTopicWhere(area: PracticeAreaCode) {

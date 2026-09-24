@@ -6,7 +6,7 @@ import { ChevronLeft, Plus, Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
-import { taxonomySectionKeyFromLabel } from "@/lib/taxonomy";
+import { practiceAreaLabel, resolvePracticeArea, tabFromPracticeArea } from "@/lib/practice-area";
 
 interface PageProps {
   params: Promise<{ topicId: string }>;
@@ -31,8 +31,15 @@ export default async function TopicContentPage({ params }: PageProps) {
 
   if (!topic) notFound();
 
-  const sectionKey = taxonomySectionKeyFromLabel(topic.domain.section.label);
-  const sectionHref = `/teacher/content?section=${sectionKey}`;
+  const area = resolvePracticeArea({
+    practiceArea: topic.domain.practiceArea,
+    sectionName: topic.domain.section.name,
+    sectionLabel: topic.domain.section.label,
+    domainName: topic.domain.name,
+  });
+  const areaKey = tabFromPracticeArea(area) ?? "math";
+  const areaLabel = practiceAreaLabel(area);
+  const sectionHref = `/teacher/content?area=${areaKey}`;
   const domainHref = `${sectionHref}&domain=${encodeURIComponent(topic.domain.name)}`;
 
   const statusBadge = (status: string) => {
@@ -53,7 +60,7 @@ export default async function TopicContentPage({ params }: PageProps) {
         </Link>
         <span>/</span>
         <Link href={sectionHref} className="hover:text-blue-600">
-          {topic.domain.section.label}
+          {areaLabel}
         </Link>
         <span>/</span>
         <Link href={domainHref} className="hover:text-blue-600">

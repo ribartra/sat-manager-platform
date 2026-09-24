@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { QuestionEditor } from "../../question-editor-client";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { academicTopicWhere, buildTaxonomyTree, taxonomyPathLabel } from "@/lib/taxonomy";
+import { domainSectionLabel } from "@/lib/practice-area";
 
 interface PageProps {
   params: Promise<{ questionId: string }>;
@@ -52,7 +53,7 @@ export default async function EditQuestionPage({ params }: PageProps) {
         topics={topics.map((t) => ({
           id: t.id,
           name: t.name,
-          sectionLabel: t.domain.section.label,
+          sectionLabel: domainSectionLabel({ practiceArea: t.domain.practiceArea, sectionName: t.domain.section.name, sectionLabel: t.domain.section.label, domainName: t.domain.name }),
           domainName: t.domain.name,
           taxonomyLabel: taxonomyPathLabel(t.taxonomyNodeId, byId, `${t.domain.section.label} / ${t.domain.name} / ${t.name}`),
           subskills: t.subskills,

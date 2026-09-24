@@ -1,51 +1,47 @@
-import { PageShell } from "@/components/sat";
+import { PageShell, PracticeAreaTabs } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Plus } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { academicTopicWhere, activeTaxonomySection, buildTaxonomyTree, matchesTaxonomySection, TAXONOMY_SECTION_TABS } from "@/lib/taxonomy";
+import { academicTopicWhere } from "@/lib/taxonomy";
+import {
+  activeAreaTab,
+  domainSectionLabel,
+  practiceAreaFromTab,
+  practiceSectionLabel,
+  resolvePracticeArea,
+} from "@/lib/practice-area";
 import { QuestionsFilter } from "./questions-filter-client";
 import { loadOptionImageUrlsByQuestionId } from "@/lib/question-list-media-query";
 import { QuestionsTable, type QuestionBankRow } from "./questions-table-client";
+import { resolveQuestionType } from "@/lib/question-type";
 
-interface SearchParams { section?: string; topic?: string; difficulty?: string; status?: string }
+interface SearchParams { area?: string; section?: string; topic?: string; difficulty?: string; status?: string }
 
 const TOPIC_IN_CHUNK = 400;
 
-function tabHref(section: string, filters: SearchParams) {
-  const params = new URLSearchParams();
-  params.set("section", section);
-  if (filters.difficulty) params.set("difficulty", filters.difficulty);
-  if (filters.status) params.set("status", filters.status);
-  return `/teacher/questions?${params.toString()}`;
-}
-
 export default async function QuestionBankPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const filters = await searchParams;
-  const activeSection = activeTaxonomySection(filters.section);
+  const area = activeAreaTab(filters.area ?? filters.section, "math");
+  // "Full Practice Tests" is an exam surface, not a question-bank area.
+  if (area === "mocks") redirect("/teacher/full-tests");
+  const practiceArea = practiceAreaFromTab(area);
+  const sectionLabel = practiceSectionLabel(practiceArea);
 
-  const [taxonomyNodes, topics] = await Promise.all([
-    prisma.taxonomyNode.findMany({ where: { active: true }, orderBy: [{ sortOrder: "asc" }, { label: "asc" }] }),
-    prisma.topic.findMany({
-      where: academicTopicWhere,
-      include: { taxonomyNode: true, domain: { include: { section: true } } },
-      orderBy: { name: "asc" },
-    }),
-  ]);
-  const { roots, byId } = buildTaxonomyTree(taxonomyNodes);
-  const rootByNodeId = new Map<string, (typeof roots)[number]>();
-  for (const node of byId.values()) {
-    let current = node;
-    while (current.parentId && byId.has(current.parentId)) current = byId.get(current.parentId)!;
-    rootByNodeId.set(node.id, current);
-  }
-  const visibleTopics = topics.filter((topic) => {
-    if (topic.taxonomyNodeId) {
-      const root = rootByNodeId.get(topic.taxonomyNodeId);
-      if (root) return matchesTaxonomySection(root, activeSection);
-    }
-    return matchesTaxonomySection(topic.domain.section, activeSection);
+  const topics = await prisma.topic.findMany({
+    where: academicTopicWhere,
+    include: { domain: { include: { section: true } } },
+    orderBy: { name: "asc" },
   });
+  const visibleTopics = topics.filter(
+    (t) =>
+      resolvePracticeArea({
+        practiceArea: t.domain.practiceArea,
+        sectionName: t.domain.section.name,
+        sectionLabel: t.domain.section.label,
+        domainName: t.domain.name,
+      }) === practiceArea
+  );
   const visibleTopicIds = [...new Set(visibleTopics.map((topic) => topic.id))];
   const selectedTopicId = filters.topic && visibleTopicIds.includes(filters.topic) ? filters.topic : undefined;
 
@@ -63,6 +59,7 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
     },
     include: {
       topic: { include: { domain: { include: { section: true } } } },
+      options: { select: { text: true, imageUrl: true } },
       setItems: { select: { practiceSetId: true } },
       fullTestItems: { select: { moduleId: true } },
       answers: { select: { id: true } },
@@ -89,30 +86,24 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
         </div>
       </div>
 
-      <div className="mb-5 flex gap-2 border-b border-gray-200">
-        {TAXONOMY_SECTION_TABS.map((tab) => (
-          <Link
-            key={tab.key}
-            href={tabHref(tab.key, filters)}
-            className={cn(
-              "border-b-2 px-3 py-2 text-sm font-medium",
-              activeSection === tab.key
-                ? "border-blue-600 text-blue-700"
-                : "border-transparent text-gray-500 hover:text-gray-800"
-            )}
-          >
-            {tab.label}
-          </Link>
-        ))}
-      </div>
+      <PracticeAreaTabs
+        basePath="/teacher/questions"
+        active={area}
+        preserve={{ difficulty: filters.difficulty, status: filters.status }}
+      />
 
       <QuestionsFilter
-        section={activeSection}
-        sectionLabel={visibleTopics[0]?.domain.section.label ?? (activeSection === "math" ? "Mathematics" : "Reading & Writing")}
+        area={area}
+        sectionLabel={sectionLabel}
         topics={visibleTopics.map((t) => ({
           id: t.id,
           name: t.name,
-          sectionLabel: t.domain.section.label,
+          sectionLabel: domainSectionLabel({
+            practiceArea: t.domain.practiceArea,
+            sectionName: t.domain.section.name,
+            sectionLabel: t.domain.section.label,
+            domainName: t.domain.name,
+          }),
           domainName: t.domain.name,
         }))}
         initialTopicId={selectedTopicId}
@@ -130,11 +121,16 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
             imageUrl: q.imageUrl,
             stimulus: q.stimulus,
             optionImageUrls: optionImages.get(q.id) ?? [],
-            skillSection: q.topic.domain.section.label,
+            skillSection: domainSectionLabel({
+              practiceArea: q.topic.domain.practiceArea,
+              sectionName: q.topic.domain.section.name,
+              sectionLabel: q.topic.domain.section.label,
+              domainName: q.topic.domain.name,
+            }),
             skillDomain: q.topic.domain.name,
             skillName: q.topic.name,
             difficulty: q.difficulty,
-            type: q.type,
+            type: resolveQuestionType(q.type, q.options),
             status: q.status,
             uses: setUses + fullUses,
             usedCount: setUses + fullUses + q.answers.length,
