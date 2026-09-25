@@ -15,6 +15,9 @@ function renderProseSegments(segments: ProseSegment[], keyPrefix: string) {
     if (segment.kind === "bold") {
       return <strong key={key}>{segment.text}</strong>;
     }
+    if (segment.kind === "italic") {
+      return <em key={key}>{segment.text}</em>;
+    }
     if (segment.kind === "underline") {
       return <u key={key}>{segment.text}</u>;
     }

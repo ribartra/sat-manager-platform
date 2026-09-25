@@ -22,9 +22,23 @@ export type MathToken = {
 export type ProseSegment =
   | { kind: "text"; text: string }
   | { kind: "bold"; text: string }
+  | { kind: "italic"; text: string }
   | { kind: "underline"; text: string };
 
 export type ContentPart = MathToken | { kind: "prose"; segments: ProseSegment[] };
+
+/**
+ * A single-`$…$` token whose body is English prose is almost always currency
+ * ("$500 million … $10"), not math: two currency signs on a line get captured as
+ * one token and KaTeX would strip its spaces ("500millionand…"). Treat such a
+ * token as prose so the `$` render literally with spaces intact. Real inline math
+ * ($x$, $k^4+5=21$, $\frac{1}{2}$) has LaTeX markup or no multi-word prose.
+ */
+function isProseDollarBody(body: string): boolean {
+  if (/[\\^_{}]/.test(body)) return false; // LaTeX markup → real math
+  if (!/\s/.test(body)) return false; // no spaces → math token
+  return (body.match(/[A-Za-z]{3,}/g) || []).length >= 2; // ≥2 real words → prose/currency
+}
 
 export function parseMathToken(token: string): MathToken | null {
   if (token.startsWith("$$") && token.endsWith("$$")) {
@@ -33,7 +47,8 @@ export function parseMathToken(token: string): MathToken | null {
   if (token.startsWith("\\[") && token.endsWith("\\]")) {
     return { kind: "math", raw: token, math: token.slice(2, -2), displayMode: true };
   }
-  if (token.startsWith("$") && token.endsWith("$")) {
+  if (token.startsWith("$") && token.endsWith("$") && !token.startsWith("$$")) {
+    if (isProseDollarBody(token.slice(1, -1))) return null; // currency/prose, not math
     return { kind: "math", raw: token, math: token.slice(1, -1), displayMode: false };
   }
   if (token.startsWith("\\(") && token.endsWith("\\)")) {
@@ -61,10 +76,11 @@ export function normalizeMathToken(token: MathToken): MathToken {
   return { ...token, math: next };
 }
 
-/** Split prose into text / bold / underline segments (no nesting). */
+/** Split prose into text / bold / italic / underline segments (no nesting). */
 export function parseProseSegments(prose: string): ProseSegment[] {
   if (!prose) return [];
-  const pattern = /(\*\*[\s\S]+?\*\*|\+\+[\s\S]+?\+\+)/g;
+  // Order matters: **bold** and ++under++ before single *italic* so ** isn't split as *.
+  const pattern = /(\*\*[\s\S]+?\*\*|\+\+[\s\S]+?\+\+|\*(?!\*)[^*\n]+?\*)/g;
   const parts = prose.split(pattern).filter((part) => part.length > 0);
   const segments: ProseSegment[] = [];
   for (const part of parts) {
@@ -72,6 +88,13 @@ export function parseProseSegments(prose: string): ProseSegment[] {
       segments.push({ kind: "bold", text: part.slice(2, -2) });
     } else if (part.startsWith("++") && part.endsWith("++") && part.length >= 4) {
       segments.push({ kind: "underline", text: part.slice(2, -2) });
+    } else if (
+      part.startsWith("*") &&
+      part.endsWith("*") &&
+      !part.startsWith("**") &&
+      part.length >= 3
+    ) {
+      segments.push({ kind: "italic", text: part.slice(1, -1) });
     } else {
       segments.push({ kind: "text", text: part });
     }
