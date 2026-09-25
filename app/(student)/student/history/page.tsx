@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { formatDate, formatTime, scorePercent } from "@/lib/utils";
-import { scoreBandTextClass, scoreBandBarClass } from "@/lib/score-band";
+import { scoreBandTextClass } from "@/lib/score-band";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { difficultyOptions } from "@/lib/domain-meta";
@@ -332,7 +332,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
                         <span className={`shrink-0 text-xs font-semibold ${scoreBandTextClass(avg)}`}>{avg}%</span>
                       </div>
                       <div className="h-1.5 w-full rounded-full bg-gray-100">
-                        <div className={`h-full rounded-full ${scoreBandBarClass(avg)}`} style={{ width: `${avg}%` }} />
+                        <div className="h-full rounded-full bg-slate-400" style={{ width: `${avg}%` }} />
                       </div>
                       <p className="mt-1 text-xs text-gray-500">
                         {ts.count} attempt{ts.count !== 1 ? "s" : ""}

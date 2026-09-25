@@ -212,7 +212,7 @@ const checks = [
   {
     file: "app/(teacher)/teacher/analytics/page.tsx",
     requires: [
-      "Skills With Most Errors",
+      "Skill performance by difficulty",
       "selectedStudentId",
       "topic.name",
       "recommendation",

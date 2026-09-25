@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import { studentAccessWhereFor } from "@/lib/program-scope";
-import { formatDate, formatTime, scorePercent } from "@/lib/utils";
+import { formatTime, scorePercent } from "@/lib/utils";
 import { scoreBandTextClass } from "@/lib/score-band";
 import { Card } from "@/components/ui/card";
 import { AnalyticsStudentFilter } from "./analytics-student-filter";
@@ -42,7 +42,7 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
   const students = await prisma.user.findMany({
     where: studentScope,
     orderBy: { name: "asc" },
-    select: { id: true, name: true, lastActiveAt: true },
+    select: { id: true, name: true },
   });
   const selectedStudentId =
     params.studentId && students.some((student) => student.id === params.studentId)
@@ -75,7 +75,6 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
         })
       : [];
 
-  const selectedStudent = students.find((student) => student.id === selectedStudentId);
   const examAttempts =
     selectedStudentId && area === "mocks"
       ? await prisma.fullPracticeTestAttempt.findMany({
@@ -94,11 +93,6 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
           take: 20,
         })
       : [];
-  const nowMs = new Date().getTime();
-  const staleStudents = students.filter((student) => {
-    if (!student.lastActiveAt) return true;
-    return nowMs - student.lastActiveAt.getTime() >= 5 * 24 * 60 * 60 * 1000;
-  });
   const buckets = new Map<string, Bucket>();
   const progressRows: Array<{ topic: string; difficulty: string; correct: boolean; timeSeconds: number; attemptId: string }> = [];
 
@@ -138,6 +132,11 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
     .slice(0, 12);
   const correct = answers.filter((answer) => answer.isCorrect).length;
   const avgAccuracy = answers.length ? scorePercent(correct, answers.length) : null;
+  const attemptCount = new Set(answers.map((answer) => answer.attempt.id)).size;
+  const timedAnswers = answers.filter((answer) => answer.timeSpent);
+  const avgResponseTime = timedAnswers.length
+    ? Math.round(timedAnswers.reduce((sum, answer) => sum + (answer.timeSpent ?? 0), 0) / timedAnswers.length)
+    : null;
   const difficultyMetrics = aggregateDifficultyMetrics(progressRows);
   const topicDifficultyMetrics = aggregateTopicDifficultyMetrics(progressRows);
   const mockProgressRows = examAttempts.flatMap((exam) => {
@@ -159,16 +158,24 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
   const mockTopicDifficultyMetrics = aggregateTopicDifficultyMetrics(mockProgressRows);
 
   return (
-    <PageShell>
+    <PageShell width="wide">
       <PageHeader
         title="Student Analytics"
         description="Individual progress by Math, Reading, Writing, or Full Practice Tests."
         actions={
-          <AnalyticsStudentFilter
-            students={students.map((student) => ({ id: student.id, name: student.name }))}
-            selectedStudentId={selectedStudentId ?? ""}
-            area={area}
-          />
+          <div className="flex flex-wrap items-end gap-2">
+            <AnalyticsStudentFilter
+              students={students.map((student) => ({ id: student.id, name: student.name }))}
+              selectedStudentId={selectedStudentId ?? ""}
+              area={area}
+            />
+            <Link
+              href="/teacher/compare"
+              className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-blue-600 hover:bg-gray-50"
+            >
+              Compare students
+            </Link>
+          </div>
         }
       />
       <PageContent>
@@ -183,41 +190,45 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
           examAttempts={examAttempts}
           difficultyMetrics={mockDifficultyMetrics}
           topicDifficultyMetrics={mockTopicDifficultyMetrics}
-          selectedStudentName={selectedStudent?.name}
         />
       ) : (
         <>
           <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
-            <Metric label="Student" value={selectedStudent?.name ?? "-"} />
-            <Metric label="Answers" value={answers.length.toString()} />
-            <Metric label="Attempts" value={new Set(answers.map((answer) => answer.attempt.id)).size.toString()} />
+            <Metric label="Questions answered" value={answers.length.toString()} />
             <Metric
-              label="Average Accuracy"
+              label="Accuracy"
               value={avgAccuracy !== null ? `${avgAccuracy}%` : "-"}
               valueClassName={avgAccuracy !== null ? scoreBandTextClass(avgAccuracy) : undefined}
+              sub={answers.length ? `${correct} of ${answers.length} correct` : undefined}
             />
+            <Metric label="Practice attempts" value={attemptCount.toString()} />
+            <Metric label="Avg response time" value={avgResponseTime !== null ? formatTime(avgResponseTime) : "-"} />
           </div>
 
-          <div className="mb-8 grid gap-6 lg:grid-cols-2">
-            <DifficultyAccuracyChart metrics={difficultyMetrics} area={area} />
-            <TopicDifficultyChart metrics={topicDifficultyMetrics} area={area} />
+          <div className="mb-6">
+            <DifficultyAccuracyChart metrics={difficultyMetrics} />
+          </div>
+          <div className="mb-8">
+            <TopicDifficultyChart metrics={topicDifficultyMetrics} />
           </div>
 
           <section className="mb-8">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-base font-semibold text-gray-900">Skills With Most Errors</h2>
-              <Link href="/teacher/compare" className="text-sm text-blue-600 hover:underline">Compare students</Link>
+            <div className="mb-3">
+              <h2 className="text-base font-semibold text-gray-900">Skill performance by difficulty</h2>
+              <p className="mt-0.5 text-xs text-gray-500">Lowest-accuracy skills for this student, ranked by difficulty.</p>
             </div>
             <Card className="overflow-hidden">
-              <table className="w-full text-sm">
+              <div className="overflow-x-auto">
+              <table className="w-full min-w-[44rem] text-sm">
                 <thead className="bg-gray-50 text-xs uppercase text-gray-500">
                   <tr>
                     <th className="px-4 py-3 text-left">Skill</th>
                     <th className="px-4 py-3 text-left">Area</th>
                     <th className="px-4 py-3 text-left">Difficulty</th>
                     <th className="px-4 py-3 text-right">Accuracy</th>
-                    <th className="px-4 py-3 text-right">Avg Time</th>
+                    <th className="px-4 py-3 text-right">Avg time</th>
                     <th className="px-4 py-3 text-left">Reinforcement</th>
+                    <th className="px-4 py-3" />
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -231,13 +242,21 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
                         <td className={`px-4 py-3 text-right font-medium ${scoreBandTextClass(pct)}`}>{pct}% ({bucket.correct}/{bucket.total})</td>
                         <td className="px-4 py-3 text-right text-gray-500">{bucket.timed ? formatTime(Math.round(bucket.totalTime / bucket.timed)) : "-"}</td>
                         <td className="px-4 py-3 text-gray-600">{recommendation(bucket.label, pct)}</td>
+                        <td className="px-4 py-3 text-right">
+                          {selectedStudentId && (
+                            <Link href={`/teacher/students/${selectedStudentId}/assign`} className="whitespace-nowrap text-xs font-medium text-blue-600 hover:underline">
+                              Assign practice
+                            </Link>
+                          )}
+                        </td>
                       </tr>
                     );
                   })}
                 </tbody>
               </table>
+              </div>
               {weakSubtopics.length === 0 && (
-                <p className="py-10 text-center text-sm text-gray-400">
+                <p className="py-10 text-center text-sm text-gray-500">
                   No submitted {practiceAreaLabel(practiceArea).toLowerCase()} answers for this student yet.
                 </p>
               )}
@@ -246,19 +265,6 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
         </>
       )}
 
-      <section className="mt-8">
-        <h2 className="mb-3 text-base font-semibold text-gray-900">Students inactive for 5+ days</h2>
-        <p className="mb-3 text-xs text-gray-500">Roster-wide signal (not scoped to the active area tab).</p>
-        <Card>
-          {staleStudents.slice(0, 12).map((student) => (
-            <div key={student.id} className="flex items-center justify-between border-b border-gray-100 px-4 py-3 text-sm last:border-b-0">
-              <span className="font-medium text-gray-800">{student.name}</span>
-              <span className="text-gray-500">{student.lastActiveAt ? formatDate(student.lastActiveAt) : "No activity"}</span>
-            </div>
-          ))}
-          {staleStudents.length === 0 && <p className="p-6 text-center text-sm text-gray-400">All students have recent activity.</p>}
-        </Card>
-      </section>
       </PageContent>
     </PageShell>
   );
@@ -268,7 +274,6 @@ function MocksAnalyticsPanel({
   examAttempts,
   difficultyMetrics,
   topicDifficultyMetrics,
-  selectedStudentName,
 }: {
   examAttempts: Array<{
     id: string;
@@ -281,18 +286,17 @@ function MocksAnalyticsPanel({
   }>;
   difficultyMetrics: ReturnType<typeof aggregateDifficultyMetrics>;
   topicDifficultyMetrics: ReturnType<typeof aggregateTopicDifficultyMetrics>;
-  selectedStudentName?: string;
 }) {
   return (
     <>
-      <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
-        <Metric label="Student" value={selectedStudentName ?? "-"} />
+      <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-3">
         <Metric label="Exams completed" value={examAttempts.length.toString()} />
         <Metric
           label="Latest total"
           value={examAttempts.length ? String(examAttempts[examAttempts.length - 1]?.totalScore ?? "-") : "-"}
+          valueClassName="text-[var(--sat-area-mocks)]"
         />
-        <Metric label="Area" value="Full Practice Tests" valueClassName="text-[var(--sat-area-mocks)]" />
+        <Metric label="Assessment type" value="Full Practice Tests" />
       </div>
       <div className="mb-8">
         <MockSectionChart
@@ -306,9 +310,11 @@ function MocksAnalyticsPanel({
           }))}
         />
       </div>
-      <div className="mb-8 grid gap-6 lg:grid-cols-2">
-        <DifficultyAccuracyChart metrics={difficultyMetrics} area="mocks" />
-        <TopicDifficultyChart metrics={topicDifficultyMetrics} area="mocks" />
+      <div className="mb-6">
+        <DifficultyAccuracyChart metrics={difficultyMetrics} />
+      </div>
+      <div className="mb-8">
+        <TopicDifficultyChart metrics={topicDifficultyMetrics} />
       </div>
       {examAttempts.length === 0 && (
         <Card padding="lg" className="py-12 text-center text-sm text-gray-400">
@@ -319,11 +325,12 @@ function MocksAnalyticsPanel({
   );
 }
 
-function Metric({ label, value, valueClassName }: { label: string; value: string; valueClassName?: string }) {
+function Metric({ label, value, valueClassName, sub }: { label: string; value: string; valueClassName?: string; sub?: string }) {
   return (
     <Card padding="md">
-      <p className="text-xs font-medium uppercase text-gray-400">{label}</p>
+      <p className="text-xs font-medium uppercase text-gray-500">{label}</p>
       <p className={`mt-1 truncate text-2xl font-semibold ${valueClassName ?? "text-gray-900"}`}>{value}</p>
+      {sub ? <p className="mt-0.5 text-xs text-gray-500">{sub}</p> : null}
     </Card>
   );
 }
