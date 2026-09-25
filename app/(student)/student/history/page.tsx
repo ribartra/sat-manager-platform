@@ -103,7 +103,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
             <tbody className="divide-y divide-gray-100">
               {examAttempts.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-12 text-center text-gray-400">
+                  <td colSpan={6} className="px-4 py-12 text-center text-gray-500">
                     <p>No completed Full Practice Tests match the current filters.</p>
                     <Link href="/student/content-map?area=mocks" className="mt-2 inline-block text-sm text-blue-600 hover:underline">
                       View assigned exams →
@@ -235,7 +235,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
           <h1 className="text-2xl font-semibold text-gray-900">My History</h1>
           <p className="mt-0.5 text-sm text-gray-500">Review your {practiceAreaLabel(practiceArea).toLowerCase()} practice and find your next focus area.</p>
         </div>
-        <p className="text-xs text-gray-400">{attempts.length} completed set{attempts.length === 1 ? "" : "s"}</p>
+        <p className="text-xs text-gray-500">{attempts.length} completed set{attempts.length === 1 ? "" : "s"}</p>
       </header>
       <PracticeAreaTabs basePath="/student/history" active={area} />
 
@@ -280,12 +280,12 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
           <Link href={`/student/history?area=${area}`} className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
             Clear
           </Link>
-          <span className="text-xs text-gray-400">Filters apply to submitted practice sets.</span>
+          <span className="text-xs text-gray-500">Filters apply to submitted practice sets.</span>
         </div>
       </Card>
 
       {attempts.length === 0 ? (
-        <Card padding="lg" className="py-14 text-center text-gray-400">
+        <Card padding="lg" className="py-14 text-center text-gray-500">
           <p>No completed {practiceAreaLabel(practiceArea).toLowerCase()} practice sets match the current filters.</p>
           <Link href="/student/content-map" className="mt-2 inline-block text-sm text-blue-600 hover:underline">
             Browse Content Map →
@@ -293,82 +293,82 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
         </Card>
       ) : (
         <div className="space-y-4">
-          <div className="grid gap-4 xl:grid-cols-[minmax(0,1.7fr)_minmax(18rem,0.85fr)]">
-            <div className="min-w-0 space-y-4">
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                <Card padding="sm">
-                  <p className="text-xs text-gray-500">Average score</p>
-                  <p className={`mt-1 text-2xl font-semibold ${scoreBandTextClass(avgPct)}`}>{avgPct !== null ? `${avgPct}%` : "—"}</p>
-                  <p className="mt-0.5 text-xs text-gray-400">Across submitted sets</p>
-                </Card>
-                <Card padding="sm">
-                  <p className="text-xs text-gray-500">Completed</p>
-                  <p className="mt-1 text-2xl font-semibold text-gray-900">{scoredAttempts.length}</p>
-                  <p className="mt-0.5 text-xs text-gray-400">Practice set{scoredAttempts.length === 1 ? "" : "s"}</p>
-                </Card>
-                <Card padding="sm" className="col-span-2 sm:col-span-1">
-                  <p className="text-xs text-gray-500">Latest score</p>
-                  <p className={`mt-1 text-2xl font-semibold ${scoreBandTextClass(historyRows[0]?.pct ?? null)}`}>
-                    {historyRows[0] ? `${historyRows[0].pct}%` : "—"}
-                  </p>
-                  <p className="mt-0.5 text-xs text-gray-400">Most recent submission</p>
-                </Card>
-              </div>
-              <div className="grid gap-4 lg:grid-cols-2">
-              <DifficultyAccuracyChart metrics={difficultyMetrics} area={area} />
-              <TopicDifficultyChart metrics={topicDifficultyMetrics} area={area} />
-              </div>
-              {pctSeries.length > 1 && (
-                <Card padding="sm">
-                  <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                    <p className="text-sm font-medium text-gray-900">Score over time</p>
-                    <p className="text-xs text-gray-400">Cumulative average · last {Math.min(pctSeries.length, 8)} submissions</p>
-                  </div>
-                  <ul className="mt-3 grid gap-x-4 gap-y-1 text-xs text-gray-600 sm:grid-cols-2 lg:grid-cols-4">
-                    {pctSeries.slice(-8).map((point, index) => (
-                      <li key={`pct-${index}`} className="truncate">
-                        {point.at ? formatDate(point.at) : "—"}: {point.score}% <span className="text-gray-400">→ avg {point.average}%</span>
-                      </li>
-                    ))}
-                  </ul>
-                </Card>
-              )}
-            </div>
+          {/* Row 1 — key stats (full width) */}
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <Card padding="sm">
+              <p className="text-xs text-gray-500">Average score</p>
+              <p className={`mt-1 text-2xl font-semibold ${scoreBandTextClass(avgPct)}`}>{avgPct !== null ? `${avgPct}%` : "—"}</p>
+              <p className="mt-0.5 text-xs text-gray-500">Across submitted sets</p>
+            </Card>
+            <Card padding="sm">
+              <p className="text-xs text-gray-500">Completed</p>
+              <p className="mt-1 text-2xl font-semibold text-gray-900">{scoredAttempts.length}</p>
+              <p className="mt-0.5 text-xs text-gray-500">Practice set{scoredAttempts.length === 1 ? "" : "s"}</p>
+            </Card>
+            <Card padding="sm" className="col-span-2 sm:col-span-1">
+              <p className="text-xs text-gray-500">Latest score</p>
+              <p className={`mt-1 text-2xl font-semibold ${scoreBandTextClass(historyRows[0]?.pct ?? null)}`}>
+                {historyRows[0] ? `${historyRows[0].pct}%` : "—"}
+              </p>
+              <p className="mt-0.5 text-xs text-gray-500">Most recent submission</p>
+            </Card>
+          </div>
 
-            <section className="min-w-0">
-              <div className="mb-3 flex items-end justify-between gap-3">
-                <div>
-                  <h2 className="text-sm font-semibold text-gray-900">Progress by Skill</h2>
-                  <p className="mt-0.5 text-xs text-gray-400">Accuracy across your submitted answers</p>
-                </div>
+          {/* Row 2 — average by difficulty + progress by skill */}
+          <div className="grid gap-4 lg:grid-cols-2">
+            <DifficultyAccuracyChart metrics={difficultyMetrics} area={area} />
+            <section className="min-w-0 rounded-md border border-gray-200 bg-white p-4 shadow-sm">
+              <div className="mb-4">
+                <h2 className="text-sm font-semibold text-gray-900">Progress by skill</h2>
+                <p className="mt-1 text-xs text-gray-500">Accuracy across your submitted answers</p>
               </div>
-              <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-1">
-              {Object.values(topicStats).map((ts) => {
-                const avg = Math.round((ts.correct / ts.total) * 100);
-                return (
-                  <Card key={ts.name} padding="sm" className="min-w-0">
-                    <div className="mb-1 flex items-center justify-between">
-                      <span className="truncate text-xs font-medium text-gray-700">{ts.name}</span>
-                      <span className={`text-xs font-semibold ${scoreBandTextClass(avg)}`}>{avg}%</span>
+              <div className="grid max-h-80 gap-x-4 gap-y-3 overflow-y-auto pr-1 sm:grid-cols-2">
+                {Object.values(topicStats).map((ts) => {
+                  const avg = Math.round((ts.correct / ts.total) * 100);
+                  return (
+                    <div key={ts.name} className="min-w-0">
+                      <div className="mb-1 flex items-center justify-between gap-2">
+                        <span className="truncate text-xs font-medium text-gray-700" title={ts.name}>{ts.name}</span>
+                        <span className={`shrink-0 text-xs font-semibold ${scoreBandTextClass(avg)}`}>{avg}%</span>
+                      </div>
+                      <div className="h-1.5 w-full rounded-full bg-gray-100">
+                        <div className={`h-full rounded-full ${scoreBandBarClass(avg)}`} style={{ width: `${avg}%` }} />
+                      </div>
+                      <p className="mt-1 text-xs text-gray-500">
+                        {ts.count} attempt{ts.count !== 1 ? "s" : ""}
+                      </p>
                     </div>
-                    <div className="h-1.5 w-full rounded-full bg-gray-100">
-                      <div className={`h-full rounded-full ${scoreBandBarClass(avg)}`} style={{ width: `${avg}%` }} />
-                    </div>
-                    <p className="mt-1 text-xs text-gray-400">
-                      {ts.count} attempt{ts.count !== 1 ? "s" : ""}
-                    </p>
-                  </Card>
-                );
-              })}
+                  );
+                })}
               </div>
             </section>
           </div>
+
+          {/* Row 3 — progress by topic and difficulty (full width: tabular data needs room) */}
+          <TopicDifficultyChart metrics={topicDifficultyMetrics} area={area} />
+
+          {/* Row 4 — score over time (full width) */}
+          {pctSeries.length > 1 && (
+            <Card padding="sm">
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm font-medium text-gray-900">Score over time</p>
+                <p className="text-xs text-gray-500">Cumulative average · last {Math.min(pctSeries.length, 8)} submissions</p>
+              </div>
+              <ul className="mt-3 grid gap-x-4 gap-y-1 text-xs text-gray-600 sm:grid-cols-2 lg:grid-cols-4">
+                {pctSeries.slice(-8).map((point, index) => (
+                  <li key={`pct-${index}`} className="whitespace-nowrap">
+                    {point.at ? formatDate(point.at) : "—"}: {point.score}% <span className="text-gray-500">→ avg {point.average}%</span>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          )}
 
           <section aria-labelledby="history-results-heading">
             <div className="mb-3 flex items-end justify-between gap-3">
               <div>
                 <h2 id="history-results-heading" className="text-sm font-semibold text-gray-900">Practice history</h2>
-                <p className="mt-0.5 text-xs text-gray-400">Open any submission to review each question.</p>
+                <p className="mt-0.5 text-xs text-gray-500">Open any submission to review each question.</p>
               </div>
             </div>
 
@@ -393,7 +393,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
                         </td>
                         <td className="px-4 py-3">
                           <p className="font-medium text-gray-900">{ps?.name ?? "—"}</p>
-                          <p className="text-xs text-gray-400">
+                          <p className="text-xs text-gray-500">
                             {areaLabel ?? "—"}
                             {ps?.topic.name ? ` · ${ps.topic.name}` : ""}
                             {ps?.difficulty ? ` · ${ps.difficulty}` : ""}
@@ -421,7 +421,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium text-gray-900">{ps?.name ?? "—"}</p>
-                      <p className="mt-0.5 truncate text-xs text-gray-400">
+                      <p className="mt-0.5 truncate text-xs text-gray-500">
                         {areaLabel ?? "—"}
                         {ps?.topic.name ? ` · ${ps.topic.name}` : ""}
                         {ps?.difficulty ? ` · ${ps.difficulty}` : ""}
