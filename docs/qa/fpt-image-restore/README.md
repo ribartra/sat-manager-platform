@@ -102,10 +102,24 @@ Las 10 explicaciones con borrador ("Wait — …", "Hmm — key says…") detect
 
 Barrido posterior: 0 explicaciones con borrador en todo el banco (FPT y practice).
 
+## Opciones duplicadas en el enunciado (aplicado 2026-09-28, dev.db + prod)
+La lista de opciones del UI viejo ("✗ A …", "☑ A …", "x A …" o sin marca) quedó capturada dentro del `stem` al
+ingerir; las opciones ya existen como `QuestionOption`, así que el alumno las veía dos veces. Specs en
+`stem-options/specs/stem-options.json` (21 ops / 20 preguntas), auditoría en `stem-options/applied.md`; backup local
+`backups/devdb-preapply-fptstemopts-20260928-091323.bak`, backup de filas en prod
+`/data/db/backups/fptstemopts-rows-backup-20260928.json`. Drift check previo 0/20; prod == local 20/20; `quick_check` ok.
+- **19 enunciados** recortados hasta la pregunta: T2 M2 Q19; T3 RW M1 Q2, Q9, Q21, Q22; T4 RW M1 Q6, Q11; T4 RW M2 Q8;
+  T5 M1 Q12; T5 RW M1 Q20; T7 RW M1 Q24; T7 M2 Q19, Q20; T8 RW M1 Q5, Q6, Q15; T9 RW M1 Q11, Q25; T10 M2 Q11.
+  En T8 RW M1 Q5 y Q15 el enunciado además repetía el pasaje (Q5 incluso arrastraba el pasaje de Q6) → también quitado.
+- **2 pasajes** que empezaban con una opción colada: T7 RW M1 Q24 ("Consequently, Divergent evolution…") y
+  T4 RW M1 Q22 ("Likewise, When crafting…").
+- Barrido posterior: 0 enunciados con marcas de opción. Los "hits" de opciones cortas en enunciados de Math
+  (p. ej. "8" dentro de "8. If 4x + 16 = 24…") son falsos positivos.
+
 ## Pendiente detectado (no tocado)
-Otros 7 enunciados FPT traen las opciones de respuesta pegadas en el texto del enunciado ("✗ A …"), igual que tenía
-T2 M2 Q18: `cmsjrntgh006qqmt1kcr9rxh8` (T2 M2 Q19), `cmsjrnu7e00hcqmt1l368ga84`, `cmsjrnuhu00irqmt1y4592ec4`,
-`cmsjrnumx00k8qmt1qcvbkuhl`, `cmsjrnv2500pcqmt1x83duysn`, `cmsjrnwq60191qmt141m6qsvf`, `cmsojfksi003r18pp9dfz4mvz`.
+- **35 preguntas R&W FPT repiten el pasaje completo dentro del enunciado** (además de tenerlo en `stimulus`):
+  31 del Test 8, 2 del Test 10, 1 del Test 5 y 1 del Test 9. El alumno ve el texto dos veces.
+- T9 RW M1 Q11 (`cmsjrny0701rrqmt1am7guns9`): el pasaje parece truncado ("…collisions with the pole situated on").
 
 ## Producción (aplicado 2026-09-28)
 - **Drift check** (SSH, solo lectura, huella sha1 de stem/stimulus/clave/explicación/tipo/estado/opciones): 22/22
