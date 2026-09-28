@@ -15,7 +15,12 @@ import {
 } from "@/lib/practice-area";
 import { classifyPracticeSetArea, practiceSetAreaLabel } from "@/lib/parent-access";
 import { DifficultyAccuracyChart, TopicDifficultyChart } from "@/components/progress-charts";
-import { aggregateDifficultyMetrics, aggregateTopicDifficultyMetrics } from "@/lib/progress-analytics";
+import { TopicDifficultyTrend } from "@/components/topic-difficulty-trend";
+import {
+  aggregateDifficultyMetrics,
+  aggregateTopicDifficultyMetrics,
+  aggregateTopicDifficultyTrend,
+} from "@/lib/progress-analytics";
 
 interface PageProps {
   searchParams: Promise<{
@@ -67,7 +72,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
     return (
       <PageShell width="wide" density="compact" className="space-y-4">
         <h1 className="text-2xl font-semibold text-gray-900">My History</h1>
-        <PracticeAreaTabs basePath="/student/history" active={area} />
+        <PracticeAreaTabs basePath="/student/history" active={area} preserve={{ from: params.from, to: params.to }} />
         <Card as="form" padding="sm" className="grid gap-3 md:grid-cols-3">
           <input type="hidden" name="area" value={area} />
           <label className="text-xs font-medium text-gray-600">
@@ -146,13 +151,25 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
         assignment: {
           practiceSet: {
             ...(practiceArea ? { topic: { domain: { practiceArea } } } : {}),
-            ...(topicId ? { topicId } : {}),
-            ...(difficulty ? { difficulty } : {}),
           },
         },
+        // Filters apply at the QUESTION level (the dimension every chart aggregates on),
+        // not the practice-set level — otherwise picking a difficulty/topic never filters.
+        ...(topicId || difficulty
+          ? {
+              answers: {
+                some: {
+                  question: {
+                    ...(topicId ? { topicId } : {}),
+                    ...(difficulty ? { difficulty } : {}),
+                  },
+                },
+              },
+            }
+          : {}),
       },
       include: {
-        answers: { include: { question: { select: { difficulty: true, topic: { select: { name: true } } } } } },
+        answers: { include: { question: { select: { difficulty: true, topicId: true, topic: { select: { id: true, name: true } } } } } },
         assignment: {
           include: {
             practiceSet: {
@@ -170,31 +187,14 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
     }),
   ]);
 
-  const topicStats: Record<string, { name: string; correct: number; total: number; count: number }> = {};
-  attempts.forEach((a) => {
-    const topic = a.assignment?.practiceSet.topic;
-    if (!topic) return;
-    if (!topicStats[topic.id]) topicStats[topic.id] = { name: topic.name, correct: 0, total: 0, count: 0 };
-    const correct = a.answers.filter((ans) => ans.isCorrect).length;
-    topicStats[topic.id].correct += correct;
-    topicStats[topic.id].total += a.answers.length;
-    topicStats[topic.id].count += 1;
-  });
+  // Selected filters apply per answer, at the question level (consistent with the charts).
+  const answerMatchesFilters = (answer: (typeof attempts)[number]["answers"][number]) =>
+    (!difficulty || answer.question.difficulty === difficulty) &&
+    (!topicId || answer.question.topicId === topicId);
 
-  const scoredAttempts = attempts.map((a) => {
-    const correct = a.answers.filter((ans) => ans.isCorrect).length;
-    const total = a.answers.length;
-    const pct = typeof a.scorePercent === "number" ? a.scorePercent : scorePercent(correct, total);
-    return { attempt: a, correct, total, pct };
-  });
-
-  const avgPct =
-    scoredAttempts.length > 0
-      ? Math.round(scoredAttempts.reduce((sum, row) => sum + row.pct, 0) / scoredAttempts.length)
-      : null;
-
+  // Per-question rows for every chart/stat — already narrowed to the selected difficulty/topic.
   const progressRows = attempts.flatMap((attempt) =>
-    attempt.answers.map((answer) => ({
+    attempt.answers.filter(answerMatchesFilters).map((answer) => ({
       topic: answer.question.topic.name,
       difficulty: answer.question.difficulty,
       correct: Boolean(answer.isCorrect),
@@ -205,12 +205,44 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
   const difficultyMetrics = aggregateDifficultyMetrics(progressRows);
   const topicDifficultyMetrics = aggregateTopicDifficultyMetrics(progressRows);
 
-  const chronological = [...scoredAttempts].reverse();
-  const pctSeries = chronological.map((row, index) => {
-    const slice = chronological.slice(0, index + 1);
-    const average = Math.round(slice.reduce((sum, item) => sum + item.pct, 0) / slice.length);
-    return { at: row.attempt.submittedAt, score: row.pct, average };
+  // "Progress by skill" grouped by the QUESTION topic (so it honors the topic filter),
+  // not the practice-set topic as before.
+  const topicStats: Record<string, { name: string; correct: number; total: number; attemptIds: Set<string> }> = {};
+  attempts.forEach((a) => {
+    a.answers.filter(answerMatchesFilters).forEach((ans) => {
+      const topic = ans.question.topic;
+      if (!topicStats[topic.id]) topicStats[topic.id] = { name: topic.name, correct: 0, total: 0, attemptIds: new Set() };
+      topicStats[topic.id].total += 1;
+      if (ans.isCorrect) topicStats[topic.id].correct += 1;
+      topicStats[topic.id].attemptIds.add(a.id);
+    });
   });
+
+  // History table + "Latest score" keep the FULL per-attempt score (a submission log).
+  const scoredAttempts = attempts.map((a) => {
+    const correct = a.answers.filter((ans) => ans.isCorrect).length;
+    const total = a.answers.length;
+    const pct = typeof a.scorePercent === "number" ? a.scorePercent : scorePercent(correct, total);
+    return { attempt: a, correct, total, pct };
+  });
+
+  // Headline accuracy is question-weighted over the filtered rows, so it reflects the selection.
+  const answeredTotal = progressRows.length;
+  const answeredCorrect = progressRows.filter((row) => row.correct).length;
+  const avgPct = answeredTotal > 0 ? Math.round((answeredCorrect / answeredTotal) * 100) : null;
+
+  // Per-difficulty progression (fixes the "everything merges into one line"): 3 lines per attempt.
+  const trendAttempts = [...scoredAttempts]
+    .map(({ attempt: a }) => ({
+      id: a.id,
+      label: a.assignment?.practiceSet.name ?? "Practice set",
+      submittedAt: a.submittedAt,
+    }));
+  const topicTrend = aggregateTopicDifficultyTrend(
+    progressRows.map((row) => ({ topic: row.topic, difficulty: row.difficulty, correct: row.correct, attemptId: row.attemptId })),
+    trendAttempts,
+  );
+  const trendTopics = Object.keys(topicTrend);
 
   const historyRows = scoredAttempts.map(({ attempt: a, correct, total, pct }) => {
     const ps = a.assignment?.practiceSet;
@@ -237,7 +269,11 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
         </div>
         <p className="text-xs text-gray-500">{attempts.length} completed set{attempts.length === 1 ? "" : "s"}</p>
       </header>
-      <PracticeAreaTabs basePath="/student/history" active={area} />
+      <PracticeAreaTabs
+        basePath="/student/history"
+        active={area}
+        preserve={{ difficulty: difficulty || undefined, from: params.from, to: params.to }}
+      />
 
       <Card as="form" padding="sm" className="space-y-3">
         <input type="hidden" name="area" value={area} />
@@ -280,7 +316,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
           <Link href={`/student/history?area=${area}`} className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
             Clear
           </Link>
-          <span className="text-xs text-gray-500">Filters apply to submitted practice sets.</span>
+          <span className="text-xs text-gray-500">Filters apply per question (difficulty and skill).</span>
         </div>
       </Card>
 
@@ -296,9 +332,12 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
           {/* Row 1 — key stats (full width) */}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             <Card padding="sm">
-              <p className="text-xs text-gray-500">Average score</p>
+              <p className="text-xs text-gray-500">Average accuracy</p>
               <p className={`mt-1 text-2xl font-semibold ${scoreBandTextClass(avgPct)}`}>{avgPct !== null ? `${avgPct}%` : "—"}</p>
-              <p className="mt-0.5 text-xs text-gray-500">Across submitted sets</p>
+              <p className="mt-0.5 text-xs text-gray-500">
+                {answeredCorrect}/{answeredTotal} answered question{answeredTotal === 1 ? "" : "s"}
+                {difficulty ? ` · ${difficulty.toLowerCase()}` : ""}
+              </p>
             </Card>
             <Card padding="sm">
               <p className="text-xs text-gray-500">Completed</p>
@@ -335,7 +374,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
                         <div className="h-full rounded-full bg-slate-400" style={{ width: `${avg}%` }} />
                       </div>
                       <p className="mt-1 text-xs text-gray-500">
-                        {ts.count} attempt{ts.count !== 1 ? "s" : ""}
+                        {ts.attemptIds.size} attempt{ts.attemptIds.size !== 1 ? "s" : ""}
                       </p>
                     </div>
                   );
@@ -347,21 +386,9 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
           {/* Row 3 — progress by topic and difficulty (full width: tabular data needs room) */}
           <TopicDifficultyChart metrics={topicDifficultyMetrics} area={area} />
 
-          {/* Row 4 — score over time (full width) */}
-          {pctSeries.length > 1 && (
-            <Card padding="sm">
-              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-sm font-medium text-gray-900">Score over time</p>
-                <p className="text-xs text-gray-500">Cumulative average · last {Math.min(pctSeries.length, 8)} submissions</p>
-              </div>
-              <ul className="mt-3 grid gap-x-4 gap-y-1 text-xs text-gray-600 sm:grid-cols-2 lg:grid-cols-4">
-                {pctSeries.slice(-8).map((point, index) => (
-                  <li key={`pct-${index}`} className="whitespace-nowrap">
-                    {point.at ? formatDate(point.at) : "—"}: {point.score}% <span className="text-gray-500">→ avg {point.average}%</span>
-                  </li>
-                ))}
-              </ul>
-            </Card>
+          {/* Row 4 — progression by difficulty over time (full width) */}
+          {trendTopics.length > 0 && scoredAttempts.length > 1 && (
+            <TopicDifficultyTrend topics={trendTopics} pointsByTopic={topicTrend} />
           )}
 
           <section aria-labelledby="history-results-heading">

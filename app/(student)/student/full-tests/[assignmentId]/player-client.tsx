@@ -14,6 +14,7 @@ import type { FullTestProgressState, FullTestTimerPhase } from "@/lib/full-test-
 import { questionResponseLabel, resolveQuestionType } from "@/lib/question-type";
 import { LoadingState, SaveIndicator, type SaveStatus } from "@/components/sat";
 import { exitPlayerOnAuthLoss, isAuthFailureStatus } from "@/lib/player-session-exit";
+import { ChevronLeft, List } from "lucide-react";
 
 interface ModuleQuestion {
   id: string;
@@ -93,6 +94,7 @@ export function FullTestPlayer({
   const [saving, setSaving] = useState<SaveStatus>("idle");
   const [advancing, setAdvancing] = useState(false);
   const [confirmSubmitModule, setConfirmSubmitModule] = useState(false);
+  const [showNav, setShowNav] = useState(false);
   const offlineKey = `sat-fpt-autosave:${attemptId}`;
   const currentModule = modules[moduleIndex];
   const question = currentModule?.questions[questionIndex];
@@ -378,6 +380,22 @@ export function FullTestPlayer({
     setConfirmSubmitModule(true);
   }
 
+  // Back within the CURRENT module only (Digital SAT rule: no returning to a submitted module).
+  function previous() {
+    if (phase === "BREAK" || advancing || questionIndex === 0) return;
+    const prevQuestion = questionIndex - 1;
+    setQuestionIndex(prevQuestion);
+    void saveProgress(answers, moduleIndex, prevQuestion);
+  }
+
+  function goToQuestion(target: number) {
+    if (phase === "BREAK" || advancing) return;
+    if (target < 0 || target > currentModule.questions.length - 1) return;
+    setQuestionIndex(target);
+    void saveProgress(answers, moduleIndex, target);
+    setShowNav(false);
+  }
+
   async function confirmFinishModule() {
     setConfirmSubmitModule(false);
     await advanceAfterModule();
@@ -530,15 +548,56 @@ export function FullTestPlayer({
           )}
         </div>
       </div>
-      <div className="flex justify-end border-t border-gray-200 px-6 py-3">
+      <div className="flex items-center justify-between border-t border-gray-200 px-6 py-3">
+        <Button variant="ghost" size="sm" onClick={previous} disabled={advancing || questionIndex === 0}>
+          <ChevronLeft size={16} className="mr-1" /> Back
+        </Button>
+        <Button variant="secondary" size="sm" onClick={() => setShowNav((value) => !value)}>
+          <List size={14} className="mr-1" /> Questions
+        </Button>
         <Button onClick={next} disabled={advancing}>
-          {isLastQuestionOfModule
-            ? moduleIndex === modules.length - 1
-              ? "Finish"
-              : "Finish"
-            : "Next"}
+          {isLastQuestionOfModule ? "Finish" : "Next"}
         </Button>
       </div>
+      {showNav && (
+        <div
+          className="fixed inset-0 z-40 flex items-end justify-center bg-black/20"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Question navigator"
+          onClick={() => setShowNav(false)}
+        >
+          <div className="w-full max-w-md rounded-t-xl bg-white p-5 shadow-xl" onClick={(event) => event.stopPropagation()}>
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="font-semibold text-gray-900">{currentModule.name}</h3>
+              <button type="button" onClick={() => setShowNav(false)} className="text-gray-400 hover:text-gray-600">✕</button>
+            </div>
+            <div className="mb-4 grid grid-cols-8 gap-2">
+              {currentModule.questions.map((q, i) => (
+                <button
+                  key={q.id}
+                  onClick={() => goToQuestion(i)}
+                  className={cn(
+                    "h-9 w-9 rounded border text-xs font-medium transition-colors",
+                    i === questionIndex
+                      ? "border-blue-500 bg-blue-500 text-white"
+                      : answers[q.id]
+                        ? "border-green-400 bg-green-50 text-green-700"
+                        : "border-gray-200 text-gray-600 hover:bg-gray-50",
+                  )}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+            <div className="flex items-center gap-4 text-xs text-gray-500">
+              <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded border border-green-400 bg-green-100" /> Answered</span>
+              <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded border border-gray-200 bg-white" /> Unanswered</span>
+            </div>
+            <p className="mt-3 text-xs text-gray-400">You can review questions within this module only.</p>
+          </div>
+        </div>
+      )}
       {confirmSubmitModule && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
