@@ -116,10 +116,29 @@ ingerir; las opciones ya existen como `QuestionOption`, así que el alumno las v
 - Barrido posterior: 0 enunciados con marcas de opción. Los "hits" de opciones cortas en enunciados de Math
   (p. ej. "8" dentro de "8. If 4x + 16 = 24…") son falsos positivos.
 
+## Pasaje duplicado en el enunciado (aplicado 2026-09-28, dev.db + prod)
+Specs en `stem-passage/specs/stem-passage.json` (41 ops / 37 preguntas), auditoría en `stem-passage/applied.md`; backup
+local `backups/devdb-preapply-fptstempassage-20260928-092117.bak`, backup de filas en prod
+`/data/db/backups/fptstempassage-rows-backup-20260928.json`. Drift check previo 0/37; prod == local 37/37; `quick_check` ok.
+- **35 enunciados R&W** (31 T8, 2 T10, 1 T5, 1 T9) que repetían el pasaje ya guardado en `stimulus` → solo la pregunta.
+  En T8 RW M1 Q20, Q22 y M2 Q14 el enunciado arrastraba además el pasaje de **otra** pregunta (Q21/Q23/Q15, que ya lo
+  tienen en su propio `stimulus`).
+- **Enunciado sin pregunta**, transcrita de la captura fuente: T8 RW M1 Q3 (el enunciado era solo el pasaje),
+  T9 RW M2 Q27, T10 RW M1 Q26 y Q27 (el enunciado era solo parte de las notas).
+- **Opción A corrupta** en esas 3 preguntas de notas (T9 M2 Q27, T10 M1 Q26, Q27): contenía el resto de las notas
+  (la etiqueta "A" se comió el artículo "A …"). Opción A real transcrita de la fuente (PDF T9 p.36, T10 p.17–18).
+  Las claves (B, B, C) no cambian.
+- **T9 RW M1 Q11**: pasaje truncado en "…the pole situated on" → completado con "the turbine base." (confianza media: la
+  captura fuente también está cortada, pero la línea parcial y la explicación oficial —"the pole, which is situated at
+  the turbine base"— coinciden).
+- **T1 RW M1 Q6**: el pasaje contenía la UI ("PREV. QUESTION NEXT QUESTION"), la pregunta y las opciones A–C → cortado
+  tras la nota al pie; enunciado reemplazado por la pregunta original ("Which choice best states the main purpose of the text?").
+- Barrido posterior: 0 enunciados que repitan el pasaje, 0 textos de UI en pasaje/enunciado.
+
 ## Pendiente detectado (no tocado)
-- **35 preguntas R&W FPT repiten el pasaje completo dentro del enunciado** (además de tenerlo en `stimulus`):
-  31 del Test 8, 2 del Test 10, 1 del Test 5 y 1 del Test 9. El alumno ve el texto dos veces.
-- T9 RW M1 Q11 (`cmsjrny0701rrqmt1am7guns9`): el pasaje parece truncado ("…collisions with the pole situated on").
+- **48 enunciados FPT R&W** (45 del Test 1, 3 del Test 2) terminan en una etiqueta interna visible para el alumno,
+  p. ej. "Which choice … text?  [Sydney Carton / Stryver / indifference]" (parecen marcas de desambiguación de la
+  ingesta/promoción). Además, varios de esos enunciados parafrasean la pregunta en vez de usar el texto fuente.
 
 ## Producción (aplicado 2026-09-28)
 - **Drift check** (SSH, solo lectura, huella sha1 de stem/stimulus/clave/explicación/tipo/estado/opciones): 22/22
