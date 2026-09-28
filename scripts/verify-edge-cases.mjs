@@ -210,10 +210,10 @@ const checks = [
     label: "Seed QA deja permisos apagados y no crea contenido academico sintetico por defecto",
   },
   {
-    file: "app/(teacher)/teacher/analytics/page.tsx",
+    file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
     requires: [
       "Skill performance by difficulty",
-      "selectedStudentId",
+      "StudentSwitcher",
       "topic.name",
       "recommendation",
       "studentAccessWhereFor",

@@ -7,10 +7,23 @@ import { requireTeacherOrAdmin } from "@/lib/rbac";
 import { studentAccessWhereFor } from "@/lib/program-scope";
 import { scorePercent } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
+import { isAnsweredAnswer } from "@/lib/weighted-score";
+import { buildProgressHref, progressFiltersFromParams } from "@/lib/progress-filters";
 
-export default async function TeacherComparePage() {
+interface PageProps {
+  searchParams: Promise<{
+    area?: string;
+    topic?: string;
+    difficulty?: string;
+    from?: string;
+    to?: string;
+  }>;
+}
+
+export default async function TeacherComparePage({ searchParams }: PageProps) {
   const session = await requireTeacherOrAdmin();
   if (!session) notFound();
+  const filters = progressFiltersFromParams(await searchParams);
   const now = new Date();
   const teacherGroupManagementEnabled =
     session?.user.role === "ADMIN" || (await getFeatureSetting("TEACHER_GROUP_MANAGEMENT"));
@@ -31,7 +44,7 @@ export default async function TeacherComparePage() {
   });
 
   const rows = students.map((student) => {
-    const submittedAnswers = student.attempts.flatMap((attempt) => attempt.answers);
+    const submittedAnswers = student.attempts.flatMap((attempt) => attempt.answers).filter(isAnsweredAnswer);
     const correct = submittedAnswers.filter((answer) => answer.isCorrect).length;
     const total = submittedAnswers.length;
     const byTopic = new Map<string, { correct: number; total: number }>();
@@ -85,7 +98,7 @@ export default async function TeacherComparePage() {
             {rows.map((row) => (
               <tr key={row.id}>
                 <td className="px-4 py-3 font-medium text-gray-900">
-                  <Link href={`/teacher/analytics?studentId=${row.id}`} className="hover:text-blue-700 hover:underline">
+                  <Link href={performanceHref(buildProgressHref(`/teacher/students/${row.id}`, filters))} className="hover:text-blue-700 hover:underline">
                     {row.name}
                   </Link>
                 </td>
@@ -103,4 +116,9 @@ export default async function TeacherComparePage() {
       </Card>
     </PageShell>
   );
+}
+
+/** Student page, Performance tab. */
+function performanceHref(href: string) {
+  return `${href}${href.includes("?") ? "&" : "?"}view=performance`;
 }

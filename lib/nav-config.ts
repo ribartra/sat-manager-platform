@@ -87,7 +87,6 @@ export const TEACHER_NAV: TeacherNavEntryDef[] = [
     icon: Users,
     links: [
       { id: "teacher.students.list", label: "Students", href: "/teacher", icon: Users },
-      { id: "teacher.students.analytics", label: "Student Analytics", href: "/teacher/analytics", icon: BarChart2 },
       {
         id: "teacher.students.groups",
         label: "Groups",
@@ -227,4 +226,32 @@ export function linkIsActive(href: string, pathname: string, exact = false): boo
 
 export function groupIsActive(group: ResolvedNavGroup, pathname: string): boolean {
   return group.links.some((link) => linkIsActive(link.href, pathname, link.exact));
+}
+
+export function hrefWithArea(href: string, area: string | null | undefined): string {
+  if (!area || !["math", "reading", "writing", "mocks"].includes(area)) return href;
+  const areaAware = [
+    "/student",
+    "/student/content-map",
+    "/student/history",
+    "/student/materials",
+    "/teacher",
+    "/teacher/content",
+    "/teacher/questions",
+    "/teacher/practice-sets",
+    "/teacher/compare",
+  ];
+  const url = new URL(href, "http://sat.local");
+  if (!areaAware.includes(url.pathname)) return href;
+  if (!url.searchParams.has("area")) url.searchParams.set("area", area);
+  return `${url.pathname}?${url.searchParams.toString()}`;
+}
+
+export function isPlayerPath(pathname: string): boolean {
+  return [
+    /^\/student\/practice\/assignment\/[^/]+$/,
+    /^\/student\/full-tests\/[^/]+$/,
+    /^\/teacher\/practice-sets\/[^/]+\/preview$/,
+    /^\/teacher\/full-tests\/[^/]+\/preview$/,
+  ].some((pattern) => pattern.test(pathname));
 }

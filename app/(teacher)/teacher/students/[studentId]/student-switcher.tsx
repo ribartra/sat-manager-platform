@@ -2,26 +2,19 @@
 
 import { useRouter } from "next/navigation";
 import { StudentPicker } from "@/components/student-picker";
-import { buildAreaHref, type AreaTabKey } from "@/lib/practice-area";
 
-export function AnalyticsStudentFilter({
+/** Jump to another student's page keeping the current tab, area and filters. */
+export function StudentSwitcher({
   students,
   selectedStudentId,
-  area = "math",
+  query,
 }: {
   students: { id: string; name: string }[];
   selectedStudentId: string;
-  area?: AreaTabKey;
+  /** Query string (without "?") to carry over to the other student. */
+  query: string;
 }) {
   const router = useRouter();
-
-  function selectStudent(nextId: string) {
-    if (!nextId) {
-      router.push(buildAreaHref("/teacher/analytics", area));
-      return;
-    }
-    router.push(buildAreaHref("/teacher/analytics", area, { studentId: nextId }));
-  }
 
   return (
     <div className="min-w-[16rem] sm:max-w-xs">
@@ -30,7 +23,11 @@ export function AnalyticsStudentFilter({
         label="Student"
         students={students}
         value={selectedStudentId}
-        onChange={selectStudent}
+        onChange={(nextId) => {
+          if (nextId && nextId !== selectedStudentId) {
+            router.push(`/teacher/students/${nextId}${query ? `?${query}` : ""}`);
+          }
+        }}
         emptyLabel="No students match the current search."
       />
     </div>

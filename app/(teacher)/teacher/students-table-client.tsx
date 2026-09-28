@@ -31,9 +31,11 @@ const SCORE_CLASS = {
 export function TeacherStudentsTable({
   rows,
   showGroups,
+  filterQuery = "",
 }: {
   rows: TeacherStudentRow[];
   showGroups: boolean;
+  filterQuery?: string;
 }) {
   const columns = useMemo<ColumnDef<TeacherStudentRow>[]>(() => {
     const cols: ColumnDef<TeacherStudentRow>[] = [
@@ -118,14 +120,8 @@ export function TeacherStudentsTable({
         meta: { priority: "high", align: "right" },
         cell: ({ row }) => (
           <div className="flex flex-wrap justify-end gap-x-3 gap-y-1">
-            <Link
-              href={`/teacher/analytics?studentId=${row.original.id}`}
-              className="text-xs text-primary hover:underline"
-            >
-              Analytics
-            </Link>
-            <Link href={`/teacher/students/${row.original.id}`} className="text-xs text-primary hover:underline">
-              View →
+            <Link href={`/teacher/students/${row.original.id}${filterQuery ? `?${filterQuery}` : ""}`} className="text-xs text-primary hover:underline">
+              Open →
             </Link>
           </div>
         ),
@@ -133,7 +129,7 @@ export function TeacherStudentsTable({
     );
 
     return cols;
-  }, [showGroups]);
+  }, [filterQuery, showGroups]);
 
   return (
     <DataTable

@@ -32,8 +32,8 @@ async function assertSourcePatterns() {
     },
     {
       file: "app/(teacher)/teacher/analytics/page.tsx",
-      requires: ["PracticeAreaTabs", "practiceArea", "mocks", "Roster-wide signal"],
-      label: "Analytics filtra por practiceArea",
+      requires: ["studentAccessWhereFor", "view=performance", "redirect"],
+      label: "Analytics redirige a la pestana Performance del alumno (misma area y filtros)",
     },
     {
       file: "app/(student)/student/history/page.tsx",
@@ -42,8 +42,8 @@ async function assertSourcePatterns() {
     },
     {
       file: "app/(teacher)/teacher/students/[studentId]/report/page.tsx",
-      requires: ["PracticeAreaTabs", "practiceArea", "attempt", "Full Practice Tests"],
-      label: "Report individual con tabs y conteo de attempts",
+      requires: ["view=performance", "redirect", "progressFiltersFromParams"],
+      label: "Report individual redirige a la pagina del alumno conservando filtros",
     },
     {
       file: "app/(teacher)/teacher/students/[studentId]/page.tsx",

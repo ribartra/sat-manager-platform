@@ -65,9 +65,9 @@ const checks = [
     label: "Tabla de estudiantes expone columna Last Active",
   },
   {
-    file: "app/(teacher)/teacher/students/[studentId]/report/page.tsx",
-    requires: ["aggregateTopicDifficultyMetrics", "Average score", "Total time", "PerformanceBreakdown", "Weak Skills", "Teacher Comments"],
-    label: "Reporte individual incluye score ponderado, dificultad, skills debiles y comentarios",
+    file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
+    requires: ["aggregateTopicDifficultyMetrics", "Average score", "Total time", "PerformanceBreakdown", "Skill performance by difficulty", "Teacher Comments", "Download PDF"],
+    label: "Pagina del alumno (ex reporte individual) incluye score ponderado, dificultad, skills debiles, comentarios y PDF",
   },
   {
     file: "lib/weighted-score.ts",
