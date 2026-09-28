@@ -149,6 +149,21 @@ Specs en `stem-tags/specs/stem-tags.json` (49 ops), auditoría en `stem-tags/app
   cursiva, y "This Lime-Tree Bower My Prison" con comillas dobles (T1 M2 Q13).
 - Barrido posterior: 0 enunciados con etiqueta `[…]` final en todo el banco.
 
+## Número de pregunta al inicio del enunciado (aplicado 2026-09-28, dev.db + prod)
+Specs en `stem-numbers/specs/stem-numbers.json` (634 ops), auditoría en `stem-numbers/applied.md`; backup local
+`backups/devdb-preapply-fptstemnumbers-20260928-093632.bak`, backup de filas en prod
+`/data/db/backups/fptstemnumbers-rows-backup-20260928.json`.
+- **634 enunciados FPT** (todos PUBLISHED; Math de los 10 tests y R&W de T2–T10) empezaban con la numeración de la
+  fuente (`"12. …"` o `"12.\n\n…"`). Patrón `^\s*\d{1,3}\s*[.)]` seguido de espacio o salto de línea (no toca
+  decimales como `0.6x`). **En los 634 el número = posición en el módulo** (`order + 1`), así que era numeración,
+  no contenido. Se quitó el número y el espacio o salto que lo seguía; el resto del enunciado no cambió.
+  Ningún enunciado quedó vacío. Ningún código depende del prefijo (la UI numera por posición).
+- Prod: la guarda es sobre `stem`; 634/634 actualizadas; contenido prod == local 634/634; `quick_check` ok.
+- Diferencia previa (no causada aquí): 4 preguntas (`cmsjrntwp00c3…`, `cmsnffuz3001x…`, `cmsjrnwy501bh…`,
+  `cmsjrnwyd01bn…`) tienen en prod un `imageUrl` con otro nombre que en local, desde el push del 2026-09-24 (prod
+  re-subió esas imágenes). Enunciado y resto del contenido idénticos.
+- Barrido posterior: 0 enunciados que empiecen por "N." / "N)".
+
 ## Producción (aplicado 2026-09-28)
 - **Drift check** (SSH, solo lectura, huella sha1 de stem/stimulus/clave/explicación/tipo/estado/opciones): 22/22
   idénticas a la baseline local; las 22 con `imageUrl` NULL en prod.
