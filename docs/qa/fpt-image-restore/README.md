@@ -65,12 +65,24 @@ Barrido posterior: 13 preguntas Math sin imagen siguen con alguna palabra clave,
   T1 M2 Q14, T2 M2 Q21, T6 M1 Q8, T7 M1 Q21, T8 M1 Q19, T8 M2 Q10, T9 M2 Q13, T10 M1 Q9.
 - T4 M2 Q9 (círculo en la fuente) no referencia la figura y se resuelve con el texto.
 
-## Hallazgos laterales (no tocados)
-- **T3 Math M2 Q21** `cmsjrnvck00soqmt1vn0qou8q`: la explicación contradice la clave de respuesta ("Wait — answer key says 42…").
-- **Texto de UI colado en el enunciado** ("COME BACK LATER" / botones): T2 M2 Q3 `cmsjrnta4004eqmt1bd0xl02p`,
-  T3 M1 Q2 `cmsjrntqd009nqmt1mxv3m4lx`, T3 M1 Q11 `cmsjrntsr00bdqmt193hd8bwy`, T3 M1 Q13
-  `cmsjrntta00btqmt13xdrew8r`, T10 RW M1 Q15 `cmsjrnt130025qmt1mq5k6kky`.
+## Seguimiento aplicado (2026-09-28, dev.db + prod)
+Specs en `followups/specs/text-fixes.json`, auditoría en `followups/applied.md`; backup local
+`backups/devdb-preapply-fptfollowups-20260928-085738.bak`, backup de filas en prod
+`/data/db/backups/fptfollowups-rows-backup-20260928.json`. Drift check previo 6/6; prod == local 6/6 después.
+- **T3 Math M2 Q21** `cmsjrnvck00soqmt1vn0qou8q`: la **clave −21 es correcta** (clave oficial `ANS Key Test 3.docx`,
+  MATH 2B "EXTRA 21. −21"; el "42" pertenece a otra pregunta). El borrador venía del propio
+  `Test3 Math Answer Explan_.docx`; explicación reescrita (suma de raíces: b = −24·7/8 = −21).
+- **Texto de UI colado** eliminado: T2 M2 Q3, T3 M1 Q2, T3 M1 Q11, T3 M1 Q13 (sufijo "➤/■ COME BACK LATER" en el
+  enunciado) y T10 RW M1 Q15 (el pasaje empezaba con "advancements and for ➤ COME BACK LATER", cola de la respuesta
+  de Q14; ahora empieza en "In 2021…"). Quedan 0 FPT con "COME BACK".
 - Excel `docs/qa/preguntas-pendientes-consistencia.xlsx` (hoja Imágenes): las 22 filas marcadas "¿Necesita figura? = Sí" con la acción.
+
+## Pendiente detectado (no tocado)
+10 explicaciones más contienen borrador del autor ("Wait — …", "Hmm — key says…"; 1 falso positivo "wait for the bus"
+excluido): `cmsjrntg7006kqmt10mtirx79`, `cmsjrnu8j00htqmt1iahai9w7`, `cmsjrnulh00joqmt1laiwfyta`,
+`cmsjrnuve00n3qmt1y8ftlknw`, `cmsjrnv2800pdqmt16ka7tqk6`, `cmsjrnvaj00s0qmt17wksnibl`, `cmsjrnvw400y7qmt1r47em8md`,
+`cmsjrnvzm00zsqmt1zrot3nj8`, `cmsjrnwpi018pqmt1yrd5m4an`, `cmsjrnwxx01bfqmt1dqsbjcuh`. Algunas cuestionan la clave
+("Hmm — key says −1"), así que cada una requiere contrastar con la clave oficial antes de reescribir.
 
 ## Producción (aplicado 2026-09-28)
 - **Drift check** (SSH, solo lectura, huella sha1 de stem/stimulus/clave/explicación/tipo/estado/opciones): 22/22

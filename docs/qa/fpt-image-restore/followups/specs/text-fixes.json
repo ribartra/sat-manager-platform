@@ -1,0 +1,68 @@
+[
+ {
+  "qid": "cmsjrnta4004eqmt1bd0xl02p",
+  "loc": "TEST 2 Math M2 Q3",
+  "test": "TEST 2",
+  "type": "text",
+  "field": "stem",
+  "new": "3. $y - 7 = 3^x - 5$\n\nWhat is the $y$-intercept for the given equation?",
+  "confidence": "high",
+  "defect": "leaked_ui_text",
+  "evidence": "Trailing legacy-UI button text ('COME BACK LATER') captured at ingest; removed, rest of stem unchanged"
+ },
+ {
+  "qid": "cmsjrntqd009nqmt1mxv3m4lx",
+  "loc": "TEST 3 Math M1 Q2",
+  "test": "TEST 3",
+  "type": "text",
+  "field": "stem",
+  "new": "2.\n\n$$3(x - 2) + 5y = 2$$\n\n$$y = -2(x - 5)$$\n\nThe solution to the given system of equations is $$(x, y)$$. What is the value of $$y$$?",
+  "confidence": "high",
+  "defect": "leaked_ui_text",
+  "evidence": "Trailing legacy-UI button text ('COME BACK LATER') captured at ingest; removed, rest of stem unchanged"
+ },
+ {
+  "qid": "cmsjrntsr00bdqmt193hd8bwy",
+  "loc": "TEST 3 Math M1 Q11",
+  "test": "TEST 3",
+  "type": "text",
+  "field": "stem",
+  "new": "11. If $$\\frac{3x}{4y}$$ is equal to 18, what is the value of $$\\frac{9x}{12y}$$?",
+  "confidence": "high",
+  "defect": "leaked_ui_text",
+  "evidence": "Trailing legacy-UI button text ('COME BACK LATER') captured at ingest; removed, rest of stem unchanged"
+ },
+ {
+  "qid": "cmsjrntta00btqmt13xdrew8r",
+  "loc": "TEST 3 Math M1 Q13",
+  "test": "TEST 3",
+  "type": "text",
+  "field": "stem",
+  "new": "13.\n\n$$3|x - 4| = 6$$\n\nWhat is one possible positive solution to the given equation?",
+  "confidence": "high",
+  "defect": "leaked_ui_text",
+  "evidence": "Trailing legacy-UI button text ('COME BACK LATER') captured at ingest; removed, rest of stem unchanged"
+ },
+ {
+  "qid": "cmsjrnt130025qmt1mq5k6kky",
+  "loc": "TEST 10 RW M1 Q15",
+  "test": "TEST 10",
+  "type": "text",
+  "field": "stimulus",
+  "new": "In 2021, archaeologist Zahi Hawass uncovered an ancient metropolis in Luxor, Egypt, that he called the “lost golden _____ the fact it had been buried for more than three thousand years, many artifacts were so well preserved that archaeologists could make out the insignia marking Amenhotep III’s reign.",
+  "confidence": "high",
+  "defect": "boundary_contamination",
+  "evidence": "Stimulus began with 'advancements and for ➤ COME BACK LATER' = tail of Q14's answer + UI text; passage starts at 'In 2021'"
+ },
+ {
+  "qid": "cmsjrnvck00soqmt1vn0qou8q",
+  "loc": "TEST 3 Math M2 Q21",
+  "test": "TEST 3",
+  "type": "text",
+  "field": "explanation",
+  "confidence": "high",
+  "defect": "broken_explanation",
+  "new": "Answer | Solution\n-21 | The table shows $f(-\\frac{15}{8}) = 0$ and $f(\\frac{11}{4}) = 0$, so $x = -\\frac{15}{8}$ and $x = \\frac{11}{4}$ are the zeros of $f$. For $f(x) = ax^2 + bx + c$, the sum of the zeros equals $-\\frac{b}{a}$. The sum is $-\\frac{15}{8} + \\frac{11}{4} = -\\frac{15}{8} + \\frac{22}{8} = \\frac{7}{8}$, so $-\\frac{b}{24} = \\frac{7}{8}$ and $b = -24 \\cdot \\frac{7}{8} = -21$.",
+  "evidence": "Source explanation docx contained a draft ('Wait — answer key says 42… flagging for review'); official ANS Key Test 3 MATH 2B 'EXTRA 21. -21' confirms key -21 (42 belongs to another item); explanation rewritten from the sum-of-roots derivation"
+ }
+]
