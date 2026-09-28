@@ -11,6 +11,7 @@
 //
 // Usage: node apply-math-alignment-fixes.cjs <db> <ops.json> [--apply] [--backup=<rows.json>]
 // Local dev.db: stop the Next dev server first (WAL safety) and take a file backup.
+/* eslint-disable @typescript-eslint/no-require-imports -- plain CommonJS so it also runs inside the prod container */
 const Database = require("better-sqlite3");
 const fs = require("node:fs");
 

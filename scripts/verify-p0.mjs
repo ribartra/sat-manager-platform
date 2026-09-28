@@ -66,13 +66,18 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/report/page.tsx",
-    requires: ["TopicDifficultyTrend", "topicTrend", "Progress by Difficulty", "QuestionMedia", "Weak Skills", "Teacher Comments"],
-    label: "Reporte individual incluye tendencia temporal, dificultad, media, skills debiles y comentarios",
+    requires: ["aggregateTopicDifficultyMetrics", "Average score", "Total time", "PerformanceBreakdown", "Weak Skills", "Teacher Comments"],
+    label: "Reporte individual incluye score ponderado, dificultad, skills debiles y comentarios",
+  },
+  {
+    file: "lib/weighted-score.ts",
+    requires: ["summarizeAllQuestionAnswers", "sumAttemptElapsedTime", "blank answers count in the denominator"],
+    label: "Accounting de score usa todas las preguntas y tiempo total de intentos",
   },
   {
     file: "app/api/reports/students/[studentId]/pdf/route.ts",
-    requires: ["makeReportPdf", "Helvetica-Bold", "Score Progress Over Time", "Progress by Difficulty", "Question Media URLs", "Weak Skills", "Teacher Comments", "parseReportAreas", "areas"],
-    label: "PDF presentable incluye secciones, paginacion y resumen enriquecido",
+    requires: ["makeReportPdf", "Helvetica-Bold", "Average score", "Progress by Difficulty", "Question Media URLs", "Weak Skills", "Teacher Comments", "parseReportAreas", "areas"],
+    label: "PDF presentable incluye score ponderado, secciones, paginacion y resumen enriquecido",
   },
   {
     file: "scripts/verify-authz.mjs",
@@ -116,8 +121,8 @@ const checks = [
   },
   {
     file: "app/(student)/student/full-tests/results/[attemptId]/page.tsx",
-    requires: ["By Module", "By Difficulty", "By Skill", "timeSpent", "StatsPanel"],
-    label: "Resultados FPT muestran review por modulo, skill, dificultad y tiempo",
+    requires: ["By Module", "By Skill", "including blanks", "timeSpent", "StatsPanel"],
+    label: "Resultados FPT muestran review por modulo, skill y preguntas absolutas",
   },
 ];
 

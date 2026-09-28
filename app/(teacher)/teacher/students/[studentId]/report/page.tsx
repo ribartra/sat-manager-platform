@@ -3,34 +3,51 @@ import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { formatDate, formatTime, scorePercent } from "@/lib/utils";
-import { scoreBandTextClass, scoreBandBarClass } from "@/lib/score-band";
+import { scoreBandTextClass } from "@/lib/score-band";
 import { parseSnapshot, PracticeSetSnapshot, QuestionSnapshot } from "@/lib/attempt-snapshots";
 import { auth } from "@/lib/auth";
 import { studentAccessWhereFor } from "@/lib/program-scope";
-import { QuestionMedia } from "@/components/question-media";
-import { MathContent } from "@/components/math-content";
 import { Card } from "@/components/ui/card";
-import { DifficultyAccuracyChart, MockSectionChart, TopicDifficultyChart } from "@/components/progress-charts";
-import { aggregateDifficultyMetrics, aggregateTopicDifficultyMetrics, aggregateTopicDifficultyTrend, type MockSectionMetric } from "@/lib/progress-analytics";
+import { MockSectionChart } from "@/components/progress-charts";
+import { PerformanceBreakdown } from "@/components/performance-breakdown";
+import { ProgressFilters } from "@/components/progress-filters";
 import { TopicDifficultyTrend } from "@/components/topic-difficulty-trend";
+import { aggregateDifficultyMetrics, aggregateTopicDifficultyMetrics, type MockSectionMetric } from "@/lib/progress-analytics";
+import { sumAttemptElapsedTime, summarizeAllQuestionAnswers } from "@/lib/weighted-score";
+import { aggregateTopicDifficultyTrend } from "@/lib/progress-analytics";
+import { buildProgressHref, progressDateWhere, progressFiltersFromParams } from "@/lib/progress-filters";
 import {
-  activeAreaTab,
   practiceAreaFromTab,
   practiceAreaLabel,
 } from "@/lib/practice-area";
 
 interface PageProps {
   params: Promise<{ studentId: string }>;
-  searchParams: Promise<{ area?: string }>;
+  searchParams: Promise<{ area?: string; topic?: string; difficulty?: string; from?: string; to?: string }>;
 }
 
-type TopicStat = { correct: number; total: number; time: number; attempts: number; attemptIds: Set<string> };
+type TopicStat = { correct: number; total: number; attempts: number; attemptIds: Set<string> };
+type ReportQuestionRow = {
+  questionId: string;
+  topicId: string;
+  topicName: string;
+  difficulty: string;
+  answer: string | null;
+  isCorrect: boolean;
+  attemptId: string;
+  imageUrl: string | null;
+  stem: string;
+};
 
 export default async function StudentReportPage({ params, searchParams }: PageProps) {
   const { studentId } = await params;
   const query = await searchParams;
-  const area = activeAreaTab(query.area, "math");
+  const filters = progressFiltersFromParams(query);
+  const area = filters.area;
   const practiceArea = practiceAreaFromTab(area);
+  const topicId = filters.topic ?? "";
+  const difficulty = filters.difficulty ?? "";
+  const dateFilter = progressDateWhere(filters);
   const session = await auth();
   const studentWhere = session
     ? studentAccessWhereFor(session.user)
@@ -43,8 +60,16 @@ export default async function StudentReportPage({ params, searchParams }: PagePr
   });
   if (!student) notFound();
 
+  const topics = practiceArea
+    ? await prisma.topic.findMany({
+        where: { domain: { practiceArea } },
+        select: { id: true, name: true },
+        orderBy: { name: "asc" },
+      })
+    : [];
+
   const examAttempts = await prisma.fullPracticeTestAttempt.findMany({
-    where: { studentId, status: "SUBMITTED" },
+    where: { studentId, status: "SUBMITTED", ...dateFilter },
     include: {
       answers: true,
       test: {
@@ -57,6 +82,7 @@ export default async function StudentReportPage({ params, searchParams }: PagePr
                 },
               },
             },
+            orderBy: { order: "asc" },
           },
         },
       },
@@ -72,36 +98,41 @@ export default async function StudentReportPage({ params, searchParams }: PagePr
     rwScore: exam.rwScore,
     totalScore: exam.totalScore,
   }));
-  const mockProgressRows = examAttempts.flatMap((exam) => {
-    const questions = new Map(
-      exam.test.modules.flatMap((module) => module.questions).map((item) => [item.questionId, item.question]),
-    );
-    return exam.answers.filter((answer) => Boolean(answer.answer?.trim())).map((answer) => {
-      const question = questions.get(answer.questionId);
-      return {
-        topic: question ? `${question.topic.domain.name} / ${question.topic.name}` : "Unclassified topic",
-        difficulty: question?.difficulty ?? "UNSPECIFIED",
-        correct: Boolean(answer.isCorrect),
-        timeSeconds: answer.timeSpent ?? 0,
-        attemptId: exam.id,
-      };
-    });
-  });
-  const mockDifficultyMetrics = aggregateDifficultyMetrics(mockProgressRows);
-  const mockTopicDifficultyMetrics = aggregateTopicDifficultyMetrics(mockProgressRows);
-  const mockTopicTrend = aggregateTopicDifficultyTrend(
-    mockProgressRows,
-    examAttempts.map((exam) => ({ id: exam.id, label: exam.test.name, submittedAt: exam.submittedAt })),
+  const mockProgressRows = examAttempts.flatMap((exam) =>
+    exam.test.modules.flatMap((module) => {
+      const answersByQuestion = new Map(exam.answers.map((answer) => [answer.questionId, answer]));
+      const section = module.section === "RW" ? "Reading & Writing" : "Math";
+      return module.questions.map((item) => {
+        const answer = answersByQuestion.get(item.questionId);
+        return {
+          topic: section,
+          difficulty: module.name,
+          correct: answer?.isCorrect === true,
+          timeSeconds: answer?.timeSpent ?? 0,
+          attemptId: exam.id,
+          attemptLabel: exam.test.name,
+          submittedAt: exam.submittedAt,
+        };
+      });
+    }),
   );
-
-  const pdfHref = `/api/reports/students/${studentId}/pdf?areas=mathematics,reading,writing`;
+  const mockModuleMetrics = aggregateDifficultyMetrics(mockProgressRows);
+  const mockSectionModuleMetrics = aggregateTopicDifficultyMetrics(mockProgressRows);
+  const mockModules = [...new Set(mockProgressRows.map((row) => row.difficulty))];
+  const pdfParams = new URLSearchParams({
+    areas: area === "math" ? "mathematics" : area === "reading" || area === "writing" ? area : "mathematics,reading,writing",
+  });
+  for (const key of ["topic", "difficulty", "from", "to"] as const) {
+    if (filters[key]) pdfParams.set(key, filters[key]!);
+  }
+  const pdfHref = `/api/reports/students/${studentId}/pdf?${pdfParams.toString()}`;
 
   if (area === "mocks") {
     return (
       <PageShell>
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <Link href={`/teacher/students/${studentId}`} className="text-sm text-blue-600 hover:underline">
+            <Link href={buildProgressHref(`/teacher/students/${studentId}`, filters)} className="text-sm text-blue-600 hover:underline">
               ← Student
             </Link>
             <h1 className="mt-2 text-xl font-semibold text-gray-900">Individual Report: {student.name}</h1>
@@ -110,7 +141,8 @@ export default async function StudentReportPage({ params, searchParams }: PagePr
             Download PDF
           </Link>
         </div>
-        <PracticeAreaTabs basePath={`/teacher/students/${studentId}/report`} active={area} />
+        <PracticeAreaTabs basePath={`/teacher/students/${studentId}/report`} active={area} preserve={{ difficulty: filters.difficulty, from: filters.from, to: filters.to }} />
+        <ProgressFilters action={`/teacher/students/${studentId}/report`} filters={filters} topics={[]} />
         <section>
           <h2 className="mb-4 text-lg font-semibold text-[var(--sat-area-mocks)]">Full Practice Tests</h2>
           <div className="mb-6 grid gap-4 md:grid-cols-3">
@@ -130,12 +162,15 @@ export default async function StudentReportPage({ params, searchParams }: PagePr
           <div className="mb-6">
             <MockSectionChart metrics={mockMetrics} />
           </div>
-          <div className="mb-6 grid gap-6 lg:grid-cols-2">
-            <DifficultyAccuracyChart metrics={mockDifficultyMetrics} area="mocks" />
-            <TopicDifficultyChart metrics={mockTopicDifficultyMetrics} area="mocks" />
-          </div>
           <div className="mb-6">
-            <TopicDifficultyTrend topics={Object.keys(mockTopicTrend)} pointsByTopic={mockTopicTrend} />
+            <PerformanceBreakdown
+              title="Performance by section and module"
+              rowLabel="Section"
+              dimensionLabel="module"
+              dimensions={mockModules}
+              summaryMetrics={mockModuleMetrics}
+              detailMetrics={mockSectionModuleMetrics}
+            />
           </div>
           <Card padding="md">
             <div className="overflow-hidden rounded-md border border-gray-100">
@@ -180,6 +215,7 @@ export default async function StudentReportPage({ params, searchParams }: PagePr
     where: {
       studentId,
       status: "SUBMITTED",
+      ...dateFilter,
       assignment: {
         practiceSet: {
           topic: { domain: { practiceArea: practiceArea! } },
@@ -188,76 +224,92 @@ export default async function StudentReportPage({ params, searchParams }: PagePr
     },
     include: {
       answers: { include: { question: { include: { topic: true } } } },
-      assignment: { include: { practiceSet: { include: { topic: { include: { domain: { include: { section: true } } } } } } } },
+      assignment: {
+        include: {
+          practiceSet: {
+            include: {
+              topic: { include: { domain: { include: { section: true } } } },
+              questions: { include: { question: { include: { topic: true } } } },
+            },
+          },
+        },
+      },
     },
     orderBy: { submittedAt: "desc" },
   });
 
-  const totalTime = attempts.reduce((sum, attempt) => sum + (attempt.totalTime ?? 0), 0);
-  const scoredAttempts = attempts.map((attempt) => {
-    const correct = attempt.answers.filter((answer) => answer.isCorrect).length;
-    const total = attempt.answers.length;
+  const buildQuestionRows = (attempt: (typeof attempts)[number]): ReportQuestionRow[] => {
+    const answersByQuestion = new Map(attempt.answers.map((answer) => [answer.questionId, answer]));
+    const practiceQuestions = attempt.assignment?.practiceSet.questions ?? [];
+    const questionSources = practiceQuestions.length
+      ? practiceQuestions.map((item) => ({ questionId: item.questionId, question: item.question, answer: answersByQuestion.get(item.questionId) }))
+      : attempt.answers.map((answer) => ({ questionId: answer.questionId, question: answer.question, answer }));
+
+    return questionSources.map(({ questionId, question, answer }) => {
+      const snapshot = parseSnapshot<QuestionSnapshot>(answer?.questionSnapshot);
+      return {
+        questionId,
+        topicId: snapshot?.topic?.id ?? question.topicId,
+        topicName: snapshot?.topic?.name ?? question.topic.name,
+        difficulty: snapshot?.difficulty ?? question.difficulty,
+        answer: answer?.answer ?? null,
+        isCorrect: answer?.isCorrect === true,
+        attemptId: attempt.id,
+        imageUrl: snapshot?.imageUrl ?? question.imageUrl ?? null,
+        stem: snapshot?.stem ?? question.stem,
+      };
+    });
+  };
+  const questionRowsByAttempt = attempts.map(buildQuestionRows);
+  const questionMatchesFilters = (row: ReportQuestionRow) =>
+    (!topicId || row.topicId === topicId) &&
+    (!difficulty || row.difficulty === difficulty);
+  const matchingQuestionRows = questionRowsByAttempt.map((rows) => rows.filter(questionMatchesFilters));
+  const scoredAttempts = attempts.map((attempt, index) => {
+    const rows = matchingQuestionRows[index] ?? [];
+    const score = summarizeAllQuestionAnswers(rows);
     const snapshot = parseSnapshot<PracticeSetSnapshot>(attempt.practiceSetSnapshot);
-    const score =
-      typeof attempt.scorePercent === "number" ? attempt.scorePercent : scorePercent(correct, total);
     return {
       id: attempt.id,
       name: snapshot?.name ?? attempt.assignment?.practiceSet.name ?? "Practice Set",
       submittedAt: attempt.submittedAt,
       totalTime: attempt.totalTime ?? 0,
-      correct,
-      total,
-      score,
+      correct: score.correct,
+      total: score.total,
+      score: score.percent,
     };
   });
+  const visibleAttempts = scoredAttempts;
+  const elapsedTime = sumAttemptElapsedTime(visibleAttempts);
   const topicStats = new Map<string, TopicStat>();
-  const difficultyStats = new Map<string, { correct: number; total: number; time: number; attempts: Set<string> }>();
-  const progressRows: Array<{ topic: string; difficulty: string; correct: boolean; timeSeconds: number; attemptId: string }> = [];
-  const mediaQuestions = new Map<string, { stem: string; imageUrl: string; topic: string; difficulty: string }>();
+  const attemptDetailById = new Map(scoredAttempts.map((attempt) => [attempt.id, attempt]));
+  const progressRows: Array<{ topic: string; difficulty: string; correct: boolean; attemptId: string; attemptLabel: string; submittedAt: Date | null }> = [];
 
-  for (const attempt of attempts) {
+  for (const rows of matchingQuestionRows) {
     const topicsInAttempt = new Set<string>();
-    for (const answer of attempt.answers) {
-      if (answer.answer === null) continue;
-      const snapshot = parseSnapshot<QuestionSnapshot>(answer.questionSnapshot);
-      const key = snapshot?.topic?.name ?? answer.question.topic.name;
+    for (const row of rows) {
+      const key = row.topicName;
       topicsInAttempt.add(key);
-      const stat = topicStats.get(key) ?? { correct: 0, total: 0, time: 0, attempts: 0, attemptIds: new Set<string>() };
+      const stat = topicStats.get(key) ?? { correct: 0, total: 0, attempts: 0, attemptIds: new Set<string>() };
       stat.total += 1;
-      if (answer.isCorrect) stat.correct += 1;
-      stat.time += answer.timeSpent ?? 0;
+      if (row.isCorrect) stat.correct += 1;
       topicStats.set(key, stat);
 
-      const difficulty = snapshot?.difficulty ?? answer.question.difficulty;
       progressRows.push({
         topic: key,
-        difficulty,
-        correct: Boolean(answer.isCorrect),
-        timeSeconds: answer.timeSpent ?? 0,
-        attemptId: attempt.id,
-    });
-      const difficultyStat = difficultyStats.get(difficulty) ?? { correct: 0, total: 0, time: 0, attempts: new Set<string>() };
-      difficultyStat.total += 1;
-      if (answer.isCorrect) difficultyStat.correct += 1;
-      difficultyStat.time += answer.timeSpent ?? 0;
-      difficultyStat.attempts.add(attempt.id);
-      difficultyStats.set(difficulty, difficultyStat);
-
-      const imageUrl = snapshot?.imageUrl ?? answer.question.imageUrl;
-      if (imageUrl && !mediaQuestions.has(imageUrl)) {
-        mediaQuestions.set(imageUrl, {
-          stem: snapshot?.stem ?? answer.question.stem,
-          imageUrl,
-          topic: key,
-          difficulty,
-        });
-      }
+        difficulty: row.difficulty,
+        correct: row.isCorrect,
+        attemptId: row.attemptId,
+        attemptLabel: attemptDetailById.get(row.attemptId)?.name ?? "Practice set",
+        submittedAt: attemptDetailById.get(row.attemptId)?.submittedAt ?? null,
+      });
     }
     for (const topic of topicsInAttempt) {
       const stat = topicStats.get(topic);
       if (!stat) continue;
-      if (!stat.attemptIds.has(attempt.id)) {
-        stat.attemptIds.add(attempt.id);
+      const attemptId = rows[0]?.attemptId;
+      if (attemptId && !stat.attemptIds.has(attemptId)) {
+        stat.attemptIds.add(attemptId);
         stat.attempts += 1;
       }
     }
@@ -279,21 +331,22 @@ export default async function StudentReportPage({ params, searchParams }: PagePr
     });
   const difficultyMetrics = aggregateDifficultyMetrics(progressRows);
   const topicDifficultyMetrics = aggregateTopicDifficultyMetrics(progressRows);
+  const trendAttempts = scoredAttempts
+    .filter((attempt) => attempt.total > 0)
+    .map((attempt) => ({ id: attempt.id, label: attempt.name, submittedAt: attempt.submittedAt }));
   const topicTrend = aggregateTopicDifficultyTrend(
-    progressRows,
-    scoredAttempts.map((attempt) => ({ id: attempt.id, label: attempt.name, submittedAt: attempt.submittedAt })),
+    progressRows.map((row) => ({ topic: row.topic, difficulty: row.difficulty, correct: row.correct, attemptId: row.attemptId })),
+    trendAttempts,
   );
-  const difficultyPanelStats = new Map(
-    [...difficultyStats.entries()].map(([label, stat]) => [label, { ...stat, attempts: stat.attempts.size }]),
-  );
-  const attemptSumByTopic = [...topicStats.values()].reduce((sum, stat) => sum + stat.attempts, 0);
+  const trendTopics = Object.keys(topicTrend);
   const areaTitle = practiceAreaLabel(practiceArea);
+  const overallScore = summarizeAllQuestionAnswers(matchingQuestionRows.flat());
 
   return (
     <PageShell>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <Link href={`/teacher/students/${studentId}`} className="text-sm text-blue-600 hover:underline">
+            <Link href={buildProgressHref(`/teacher/students/${studentId}`, filters)} className="text-sm text-blue-600 hover:underline">
             ← Student
           </Link>
           <h1 className="mt-2 text-xl font-semibold text-gray-900">Individual Report: {student.name}</h1>
@@ -303,53 +356,51 @@ export default async function StudentReportPage({ params, searchParams }: PagePr
         </Link>
       </div>
 
-      <PracticeAreaTabs basePath={`/teacher/students/${studentId}/report`} active={area} />
+        <PracticeAreaTabs basePath={`/teacher/students/${studentId}/report`} active={area} preserve={{ difficulty: filters.difficulty, from: filters.from, to: filters.to }} />
+      <ProgressFilters action={`/teacher/students/${studentId}/report`} filters={filters} topics={topics} />
 
       <section className="mb-10">
         <h2 className="mb-4 text-lg font-semibold text-gray-900">Practice — {areaTitle}</h2>
-        <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
+        <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
           <Card padding="md">
-            <p className="text-2xl font-bold">{attempts.length}</p>
-            <p className="text-xs text-gray-500">Completed attempts</p>
+            <p className="text-2xl font-bold">{visibleAttempts.length}</p>
+            <p className="text-xs text-gray-500">Submitted attempts</p>
           </Card>
           <Card padding="md">
-            <p className="text-2xl font-bold">{formatTime(totalTime)}</p>
-            <p className="text-xs text-gray-500">Practice time</p>
+            <p className="text-2xl font-bold">{formatTime(elapsedTime)}</p>
+            <p className="text-xs text-gray-500">Total time</p>
+          </Card>
+          <Card padding="md">
+            <p className={`text-2xl font-bold ${scoreBandTextClass(overallScore.percent)}`}>{overallScore.percent === null ? "—" : `${overallScore.percent}%`}</p>
+            <p className="text-xs text-gray-500">Average score · {overallScore.correct} correct of {overallScore.total} questions</p>
           </Card>
           <Card padding="md">
             <p className="text-2xl font-bold">{topicStats.size}</p>
             <p className="text-xs text-gray-500">Skills practiced</p>
           </Card>
-          {([
-            ["EASY", "Average Easy", "text-green-600"],
-            ["MEDIUM", "Average Medium", "text-amber-600"],
-            ["HARD", "Average Hard", "text-red-600"],
-          ] as const).map(([difficulty, label, color]) => {
-            const metric = difficultyMetrics.find((item) => item.difficulty === difficulty);
-            const accuracy = metric ? scorePercent(metric.correct, metric.total) : null;
-            return (
-              <Card key={difficulty} padding="md">
-                <p className={`text-2xl font-bold ${color}`}>{accuracy === null ? "—" : `${accuracy}%`}</p>
-                <p className="text-xs text-gray-500">{label}{metric ? ` · ${metric.correct}/${metric.total}` : ""}</p>
-              </Card>
-            );
-          })}
         </div>
-        {attempts.length > 0 && attemptSumByTopic !== attempts.length && (
-          <p className="mb-4 text-xs text-gray-500">
-            Topic attempt counts ({attemptSumByTopic}) can exceed completed sets ({attempts.length}) when a set covers multiple skills.
-          </p>
+
+        <div className="mb-6">
+          <PerformanceBreakdown
+            title="Performance by skill and difficulty"
+            rowLabel="Skill"
+            dimensionLabel="difficulty"
+            dimensions={difficulty ? [difficulty] : ["EASY", "MEDIUM", "HARD"]}
+            summaryMetrics={difficultyMetrics}
+            detailMetrics={topicDifficultyMetrics}
+          />
+        </div>
+
+        {topicId && difficulty && trendTopics.length > 0 && trendAttempts.length > 0 && (
+          <div className="mb-6">
+            <TopicDifficultyTrend
+              topics={trendTopics}
+              pointsByTopic={topicTrend}
+              selectedTopic={topics.find((topic) => topic.id === topicId)?.name ?? trendTopics[0]}
+              selectedDifficulty={difficulty}
+            />
+          </div>
         )}
-
-        <div className="mb-6 grid gap-6 lg:grid-cols-2">
-          <DifficultyAccuracyChart metrics={difficultyMetrics} area={area} />
-          <TopicDifficultyChart metrics={topicDifficultyMetrics} area={area} />
-        </div>
-
-        <div className="mb-6 grid gap-6 lg:grid-cols-2">
-          <ProgressPanel title="Progress by Skill" stats={topicStats} showAttempts />
-          <ProgressPanel title="Progress by Difficulty" stats={difficultyPanelStats} showAttempts />
-        </div>
 
         {weakTopics.length > 0 && (
           <Card variant="warning" padding="md" className="mb-6">
@@ -359,7 +410,7 @@ export default async function StudentReportPage({ params, searchParams }: PagePr
                 <div key={topic.topic} className="rounded-md border border-amber-100 bg-white px-3 py-2">
                   <p className="text-sm font-medium text-gray-900">{topic.topic}</p>
                   <p className={`mt-1 text-xs font-semibold ${scoreBandTextClass(topic.score)}`}>
-                    {topic.correct}/{topic.total} correct · {topic.score}% · {topic.attempts} attempt{topic.attempts === 1 ? "" : "s"}
+                    {topic.score}% accuracy · {topic.correct} correct of {topic.total} questions
                   </p>
                   <p className="mt-2 text-xs text-amber-800">
                     Assign targeted practice and review missed explanations before advancing difficulty.
@@ -370,10 +421,6 @@ export default async function StudentReportPage({ params, searchParams }: PagePr
           </Card>
         )}
 
-        <div className="mb-6">
-          <TopicDifficultyTrend topics={Object.keys(topicTrend)} pointsByTopic={topicTrend} />
-        </div>
-
         <Card padding="md" className="mb-6">
           <h3 className="mb-3 text-sm font-semibold text-gray-900">Recent Practice Attempts</h3>
           <div className="overflow-hidden rounded-md border border-gray-100">
@@ -383,21 +430,21 @@ export default async function StudentReportPage({ params, searchParams }: PagePr
                   <th className="px-3 py-2">Practice Set</th>
                   <th className="px-3 py-2">Date</th>
                   <th className="px-3 py-2 text-right">Score</th>
-                  <th className="px-3 py-2 text-right">Time</th>
+                  <th className="px-3 py-2 text-right">Elapsed</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {scoredAttempts.slice(0, 8).map((attempt) => (
+                {visibleAttempts.slice(0, 8).map((attempt) => (
                   <tr key={attempt.id}>
                     <td className="px-3 py-2 font-medium text-gray-800">{attempt.name}</td>
                     <td className="px-3 py-2 text-gray-500">{attempt.submittedAt ? formatDate(attempt.submittedAt) : "-"}</td>
-                    <td className={`px-3 py-2 text-right font-medium ${scoreBandTextClass(attempt.score)}`}>
-                      {attempt.correct}/{attempt.total} · {attempt.score}%
+                    <td className={`px-3 py-2 text-right font-medium ${attempt.score !== null ? scoreBandTextClass(attempt.score) : "text-gray-500"}`}>
+                      {attempt.score !== null ? `${attempt.score}% · ${attempt.correct} correct of ${attempt.total} questions` : "—"}
                     </td>
                     <td className="px-3 py-2 text-right text-gray-500">{formatTime(attempt.totalTime)}</td>
                   </tr>
                 ))}
-                {scoredAttempts.length === 0 && (
+                {visibleAttempts.length === 0 && (
                   <tr>
                     <td colSpan={4} className="px-3 py-3 text-sm text-gray-400">
                       No submitted attempts yet.
@@ -426,59 +473,7 @@ export default async function StudentReportPage({ params, searchParams }: PagePr
           </Card>
         )}
 
-        {mediaQuestions.size > 0 && (
-          <Card padding="md">
-            <h3 className="mb-3 text-sm font-semibold text-gray-900">Question Media Referenced</h3>
-            <div className="grid gap-4 md:grid-cols-2">
-              {[...mediaQuestions.values()].slice(0, 6).map((question) => (
-                <div key={question.imageUrl} className="rounded-md border border-gray-100 p-3">
-                  <QuestionMedia imageUrl={question.imageUrl} alt={question.stem} />
-                  <MathContent content={question.stem} className="mt-2 max-h-24 overflow-auto text-xs text-gray-700" />
-                  <p className="mt-1 text-xs text-gray-400">
-                    {question.topic} · {question.difficulty}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </Card>
-        )}
       </section>
     </PageShell>
-  );
-}
-
-function ProgressPanel({
-  title,
-  stats,
-  showAttempts = false,
-}: {
-  title: string;
-  stats: Map<string, { correct: number; total: number; time: number; attempts?: number }>;
-  showAttempts?: boolean;
-}) {
-  return (
-    <Card padding="md">
-      <h3 className="mb-3 text-sm font-semibold text-gray-900">{title}</h3>
-      <div className="space-y-3">
-        {[...stats.entries()].map(([label, stat]) => {
-          const pct = scorePercent(stat.correct, stat.total);
-          return (
-            <div key={label}>
-              <div className="mb-1 flex items-center justify-between text-sm">
-                <span className="font-medium text-gray-800">{label}</span>
-                <span className={scoreBandTextClass(pct)}>
-                  {stat.correct}/{stat.total} · {pct}% · {formatTime(stat.time)}
-                  {showAttempts && typeof stat.attempts === "number" ? ` · ${stat.attempts} attempt${stat.attempts === 1 ? "" : "s"}` : ""}
-                </span>
-              </div>
-              <div className="h-2 rounded-full bg-gray-100">
-                <div className={`h-2 rounded-full ${scoreBandBarClass(pct)}`} style={{ width: `${pct}%` }} />
-              </div>
-            </div>
-          );
-        })}
-        {stats.size === 0 && <p className="text-sm text-gray-400">No submitted attempts yet.</p>}
-      </div>
-    </Card>
   );
 }
