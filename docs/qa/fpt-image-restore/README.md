@@ -135,10 +135,19 @@ local `backups/devdb-preapply-fptstempassage-20260928-092117.bak`, backup de fil
   tras la nota al pie; enunciado reemplazado por la pregunta original ("Which choice best states the main purpose of the text?").
 - Barrido posterior: 0 enunciados que repitan el pasaje, 0 textos de UI en pasaje/enunciado.
 
-## Pendiente detectado (no tocado)
-- **48 enunciados FPT R&W** (45 del Test 1, 3 del Test 2) terminan en una etiqueta interna visible para el alumno,
-  p. ej. "Which choice … text?  [Sydney Carton / Stryver / indifference]" (parecen marcas de desambiguación de la
-  ingesta/promoción). Además, varios de esos enunciados parafrasean la pregunta en vez de usar el texto fuente.
+## Etiquetas internas en el enunciado + cotejo con la fuente (aplicado 2026-09-28, dev.db + prod)
+Specs en `stem-tags/specs/stem-tags.json` (49 ops), auditoría en `stem-tags/applied.md`; backup local
+`backups/devdb-preapply-fptstemtags-20260928-093306.bak`, backup de filas en prod
+`/data/db/backups/fptstemtags-rows-backup-20260928.json`. Drift check previo 0/49; prod == local 49/49; `quick_check` ok.
+- **49 etiquetas quitadas** (46 T1, 3 T2): marcas de desambiguación de la ingesta al final del enunciado, con "/"
+  ("[Sydney Carton / Stryver / indifference]") o sin ella ("[New Historicism]"). Ningún código depende de ellas.
+- **Cotejo completo con la fuente** de los 108 enunciados R&W de T1 (docx, 64 capturas `word/media/image1..64`) y T2
+  (PDF, 36 págs.): **todos coinciden** con la pregunta original. "most logical and precise word?" y "completes the
+  sentence" son literales de la fuente, no paráfrasis. El único enunciado parafraseado era T1 RW M1 Q6, ya
+  restaurado en el lote anterior.
+- Formato alineado con la fuente en 3 enunciados: *Hamlet* (T1 M1 Q9) y *A Tale of Two Cities* (T2 M2 Q14) en
+  cursiva, y "This Lime-Tree Bower My Prison" con comillas dobles (T1 M2 Q13).
+- Barrido posterior: 0 enunciados con etiqueta `[…]` final en todo el banco.
 
 ## Producción (aplicado 2026-09-28)
 - **Drift check** (SSH, solo lectura, huella sha1 de stem/stimulus/clave/explicación/tipo/estado/opciones): 22/22
