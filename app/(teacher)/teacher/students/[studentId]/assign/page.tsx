@@ -8,10 +8,11 @@ import { AssignForm } from "./assign-form-client";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { studentAccessWhereFor } from "@/lib/program-scope";
 import { resolvePracticeArea } from "@/lib/practice-area";
+import { refreshAssignmentStates } from "@/lib/assignments";
 
 interface PageProps {
   params: Promise<{ studentId: string }>;
-  searchParams: Promise<{ area?: string }>;
+  searchParams: Promise<{ area?: string; domain?: string; topic?: string; difficulty?: string; sets?: string }>;
 }
 
 export default async function AssignPage({ params, searchParams }: PageProps) {
@@ -39,11 +40,12 @@ export default async function AssignPage({ params, searchParams }: PageProps) {
     orderBy: { createdAt: "asc" },
   });
 
+  await refreshAssignmentStates(now);
   const existing = await prisma.assignment.findMany({
     where: { studentId },
-    select: { practiceSetId: true },
+    select: { practiceSetId: true, status: true, dueDate: true },
   });
-  const assignedIds = new Set(existing.map((a) => a.practiceSetId));
+  const assignmentBySet = new Map(existing.map((a) => [a.practiceSetId, a]));
 
   const groups = teacherGroupManagementEnabled
     ? await prisma.group.findMany({
@@ -77,6 +79,9 @@ export default async function AssignPage({ params, searchParams }: PageProps) {
           name: ps.name,
           difficulty: ps.difficulty,
           topicName: ps.topic.name,
+          topicId: ps.topicId,
+          domainId: ps.topic.domain.id,
+          domainName: ps.topic.domain.name,
           practiceArea: resolvePracticeArea({
             practiceArea: ps.topic.domain.practiceArea,
             sectionName: ps.topic.domain.section.name,
@@ -84,7 +89,12 @@ export default async function AssignPage({ params, searchParams }: PageProps) {
             domainName: ps.topic.domain.name,
           }),
           questionCount: ps.questions.length,
-          alreadyAssigned: assignedIds.has(ps.id),
+          assignment: assignmentBySet.has(ps.id)
+            ? {
+                status: assignmentBySet.get(ps.id)!.status,
+                dueDate: assignmentBySet.get(ps.id)!.dueDate?.toISOString() ?? null,
+              }
+            : null,
         }))}
         groups={groups.map((g) => ({
           id: g.id,
@@ -93,6 +103,10 @@ export default async function AssignPage({ params, searchParams }: PageProps) {
         }))}
         groupAssignmentEnabled={teacherGroupManagementEnabled}
         initialArea={initialArea}
+        initialDomain={query.domain}
+        initialTopic={query.topic}
+        initialDifficulty={query.difficulty}
+        initialSelected={(query.sets ?? "").split(",").filter(Boolean)}
       />
     </PageShell>
   );

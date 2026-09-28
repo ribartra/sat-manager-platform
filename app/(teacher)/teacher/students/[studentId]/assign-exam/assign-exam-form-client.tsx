@@ -12,17 +12,29 @@ type ExamOption = {
   name: string;
   moduleCount: number;
   questionCount: number;
-  alreadyAssigned: boolean;
+  /** Current assignment of this exam for the student, if any. */
+  assignment: { status: string; dueDate: string | null } | null;
 };
+
+/** What assigning again will do, mirroring upsertFullTestAssignment in lib/assignments.ts. */
+function assignmentHint(assignment: ExamOption["assignment"]) {
+  if (!assignment) return "";
+  const due = assignment.dueDate ? ` (due ${new Date(assignment.dueDate).toLocaleDateString()})` : "";
+  if (assignment.status === "COMPLETED") return ` · Completed${due} — will reassign`;
+  if (assignment.status === "OVERDUE") return ` · Overdue${due} — will reassign`;
+  return ` · Pending${due} — will update due date`;
+}
 
 export function AssignExamForm({
   studentId,
   studentName,
   exams,
+  returnHref,
 }: {
   studentId: string;
   studentName: string;
   exams: ExamOption[];
+  returnHref: string;
 }) {
   const router = useRouter();
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -31,6 +43,7 @@ export function AssignExamForm({
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
+  const [doneMessage, setDoneMessage] = useState("");
 
   const visible = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -38,8 +51,7 @@ export function AssignExamForm({
     return exams.filter((exam) => exam.name.toLowerCase().includes(term));
   }, [exams, search]);
 
-  function toggle(id: string, disabled: boolean) {
-    if (disabled) return;
+  function toggle(id: string) {
     setSelected((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
@@ -65,14 +77,28 @@ export function AssignExamForm({
           return data;
         })
       );
-      const created = results.reduce((sum, row) => sum + (Number(row.created) || 0), 0);
-      if (created === 0) {
-        setError("No new exams were assigned (they may already be assigned).");
+      const total = (key: string) => results.reduce((sum, row) => sum + (Number(row[key]) || 0), 0);
+      const created = total("created");
+      const reassigned = total("reassigned");
+      const updated = total("updated");
+      if (created + reassigned + updated === 0) {
+        setError("Nothing changed: the selected exams are already pending with this due date.");
         setLoading(false);
         return;
       }
       setDone(true);
-      window.setTimeout(() => router.push(`/teacher/students/${studentId}?area=mocks`), 1000);
+      setDoneMessage(
+        [
+          created ? `${created} assigned` : null,
+          reassigned ? `${reassigned} reassigned` : null,
+          updated ? `${updated} updated` : null,
+        ].filter(Boolean).join(" · ") + ".",
+      );
+      window.setTimeout(() => {
+        const query = new URLSearchParams(returnHref.split("?")[1] ?? "");
+        query.set("area", "mocks");
+        router.push(`/teacher/students/${studentId}?${query.toString()}`);
+      }, 1000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to assign exam.");
       setLoading(false);
@@ -93,21 +119,19 @@ export function AssignExamForm({
             key={exam.id}
             className={cn(
               "flex cursor-pointer items-start gap-3 rounded-md px-3 py-2 hover:bg-gray-50",
-              exam.alreadyAssigned && "opacity-50"
             )}
           >
             <input
               type="checkbox"
               className="mt-1"
               checked={selected.has(exam.id)}
-              disabled={exam.alreadyAssigned}
-              onChange={() => toggle(exam.id, exam.alreadyAssigned)}
+              onChange={() => toggle(exam.id)}
             />
             <span className="min-w-0 flex-1">
               <span className="block text-sm font-medium text-gray-900">{exam.name}</span>
               <span className="block text-xs text-gray-500">
                 {exam.moduleCount} modules · {exam.questionCount} questions
-                {exam.alreadyAssigned ? " · Already assigned" : ""}
+                {assignmentHint(exam.assignment)}
               </span>
             </span>
           </label>
@@ -121,13 +145,13 @@ export function AssignExamForm({
       </div>
 
       {error && <p className="text-sm text-rose-600">{error}</p>}
-      {done && <p className="text-sm font-medium text-green-600">✓ Assigned successfully! Redirecting...</p>}
+      {done && <p className="text-sm font-medium text-green-600">✓ {doneMessage} Redirecting...</p>}
 
       <div className="flex items-center gap-3">
         <Button onClick={handleAssign} disabled={selected.size === 0 || loading || done}>
           {loading ? "Assigning..." : `Assign Exam${selected.size ? ` (${selected.size})` : ""}`}
         </Button>
-        <Button type="button" variant="ghost" onClick={() => router.push(`/teacher/students/${studentId}`)}>
+        <Button type="button" variant="ghost" onClick={() => router.push(returnHref)}>
           Cancel
         </Button>
       </div>

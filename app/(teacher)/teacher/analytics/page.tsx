@@ -8,21 +8,27 @@ import { formatTime, scorePercent } from "@/lib/utils";
 import { scoreBandTextClass } from "@/lib/score-band";
 import { Card } from "@/components/ui/card";
 import { AnalyticsStudentFilter } from "./analytics-student-filter";
-import { DifficultyAccuracyChart, MockSectionChart, TopicDifficultyChart } from "@/components/progress-charts";
-import { aggregateDifficultyMetrics, aggregateTopicDifficultyMetrics } from "@/lib/progress-analytics";
+import { ProgressFilters } from "@/components/progress-filters";
+import { TopicDifficultyTrend } from "@/components/topic-difficulty-trend";
+import { MockSectionChart } from "@/components/progress-charts";
+import { PerformanceBreakdown } from "@/components/performance-breakdown";
+import { aggregateDifficultyMetrics, aggregateTopicDifficultyMetrics, aggregateTopicDifficultyTrend } from "@/lib/progress-analytics";
 import {
-  activeAreaTab,
   practiceAreaFromTab,
   practiceAreaLabel,
 } from "@/lib/practice-area";
+import { buildProgressHref, progressDateWhere, progressFiltersFromParams } from "@/lib/progress-filters";
+import { refreshAssignmentStates } from "@/lib/assignments";
 
 interface PageProps {
-  searchParams: Promise<{ studentId?: string; area?: string }>;
+  searchParams: Promise<{ studentId?: string; area?: string; topic?: string; difficulty?: string; from?: string; to?: string }>;
 }
 
 interface Bucket {
   key: string;
   label: string;
+  topicId: string;
+  domainId: string;
   section: string;
   difficulty: string;
   correct: number;
@@ -35,8 +41,12 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
   const session = await requireTeacherOrAdmin();
   if (!session) notFound();
   const params = await searchParams;
-  const area = activeAreaTab(params.area, "math");
+  const filters = progressFiltersFromParams(params);
+  const area = filters.area;
   const practiceArea = practiceAreaFromTab(area);
+  const topicId = filters.topic ?? "";
+  const difficulty = filters.difficulty ?? "";
+  const dateFilter = progressDateWhere(filters);
   const studentScope = studentAccessWhereFor(session.user);
 
   const students = await prisma.user.findMany({
@@ -49,42 +59,65 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
       ? params.studentId
       : students[0]?.id;
 
-  const answers =
-    selectedStudentId && practiceArea
-      ? await prisma.attemptAnswer.findMany({
-          where: {
-            attempt: { studentId: selectedStudentId, status: "SUBMITTED" },
-            question: { topic: { domain: { practiceArea } } },
-          },
-          include: {
-            question: {
-              include: {
-                topic: { include: { domain: { include: { section: true } } } },
+  const topics = practiceArea
+    ? await prisma.topic.findMany({ where: { domain: { practiceArea } }, select: { id: true, name: true }, orderBy: { name: "asc" } })
+    : [];
+  const practiceAttempts = selectedStudentId && practiceArea
+    ? await prisma.attempt.findMany({
+        where: {
+          studentId: selectedStudentId,
+          status: "SUBMITTED",
+          ...dateFilter,
+          assignment: { practiceSet: { topic: { domain: { practiceArea } } } },
+        },
+        include: {
+          answers: { include: { question: { include: { topic: { include: { domain: { include: { section: true } } } } } } } },
+          assignment: {
+            include: {
+              practiceSet: {
+                include: {
+                  questions: { include: { question: { include: { topic: { include: { domain: { include: { section: true } } } } } } } },
+                },
               },
             },
-            attempt: {
-              select: {
-                id: true,
-                submittedAt: true,
-                totalTime: true,
-                assignment: { select: { practiceSet: { select: { name: true } } } },
-              },
-            },
           },
-          orderBy: { attempt: { submittedAt: "desc" } },
-        })
-      : [];
+        },
+        orderBy: { submittedAt: "desc" },
+      })
+    : [];
+
+  const progressRows = practiceAttempts.flatMap((attempt) => {
+    const answersByQuestion = new Map(attempt.answers.map((answer) => [answer.questionId, answer]));
+    const questions = attempt.assignment?.practiceSet.questions ?? [];
+    const sources = questions.length
+      ? questions.map((item) => ({ question: item.question, answer: answersByQuestion.get(item.questionId) }))
+      : attempt.answers.map((answer) => ({ question: answer.question, answer }));
+    return sources
+      .filter(({ question }) => (!topicId || question.topicId === topicId) && (!difficulty || question.difficulty === difficulty))
+      .map(({ question, answer }) => ({
+        topic: question.topic.name,
+        topicId: question.topicId,
+        domainId: question.topic.domainId,
+        difficulty: question.difficulty,
+        correct: answer?.isCorrect === true,
+        timeSeconds: answer?.timeSpent ?? 0,
+        attemptId: attempt.id,
+        attemptLabel: attempt.assignment?.practiceSet.name ?? "Practice set",
+        submittedAt: attempt.submittedAt,
+      }));
+  });
 
   const examAttempts =
     selectedStudentId && area === "mocks"
       ? await prisma.fullPracticeTestAttempt.findMany({
-          where: { studentId: selectedStudentId, status: "SUBMITTED" },
+          where: { studentId: selectedStudentId, status: "SUBMITTED", ...dateFilter },
           include: {
             answers: true,
             test: {
               include: {
                 modules: {
                   include: { questions: { include: { question: { include: { topic: true } } } } },
+                  orderBy: { order: "asc" },
                 },
               },
             },
@@ -94,33 +127,26 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
         })
       : [];
   const buckets = new Map<string, Bucket>();
-  const progressRows: Array<{ topic: string; difficulty: string; correct: boolean; timeSeconds: number; attemptId: string }> = [];
-
-  for (const answer of answers) {
-    const areaLabel = practiceAreaLabel(answer.question.topic.domain.practiceArea);
-    const subtopic = answer.question.topic.name;
-    progressRows.push({
-      topic: answer.question.topic.name,
-      difficulty: answer.question.difficulty,
-      correct: Boolean(answer.isCorrect),
-      timeSeconds: answer.timeSpent ?? 0,
-      attemptId: answer.attempt.id,
-    });
-    const key = `${areaLabel}:${subtopic}:${answer.question.difficulty}`;
+  for (const row of progressRows) {
+    const areaLabel = practiceAreaLabel(practiceArea);
+    const subtopic = row.topic;
+    const key = `${areaLabel}:${subtopic}:${row.difficulty}`;
     const bucket = buckets.get(key) ?? {
       key,
       label: subtopic,
+      topicId: row.topicId,
+      domainId: row.domainId,
       section: areaLabel,
-      difficulty: answer.question.difficulty,
+      difficulty: row.difficulty,
       correct: 0,
       total: 0,
       totalTime: 0,
       timed: 0,
     };
     bucket.total += 1;
-    if (answer.isCorrect) bucket.correct += 1;
-    if (answer.timeSpent) {
-      bucket.totalTime += answer.timeSpent;
+    if (row.correct) bucket.correct += 1;
+    if (row.timeSeconds) {
+      bucket.totalTime += row.timeSeconds;
       bucket.timed += 1;
     }
     buckets.set(key, bucket);
@@ -130,32 +156,67 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
     .filter((bucket) => bucket.total > 0)
     .sort((a, b) => scorePercent(a.correct, a.total) - scorePercent(b.correct, b.total) || b.total - a.total)
     .slice(0, 12);
-  const correct = answers.filter((answer) => answer.isCorrect).length;
-  const avgAccuracy = answers.length ? scorePercent(correct, answers.length) : null;
-  const attemptCount = new Set(answers.map((answer) => answer.attempt.id)).size;
-  const timedAnswers = answers.filter((answer) => answer.timeSpent);
+
+  // "Assign practice" only where assigning makes sense for this student: a published set of that
+  // skill + difficulty that is unassigned, completed (retake) or overdue. Sets still pending or in
+  // progress are shown as such instead (assigning again would only update their settings).
+  if (selectedStudentId && weakSubtopics.length > 0) await refreshAssignmentStates();
+  const weakTopicIds = [...new Set(weakSubtopics.map((bucket) => bucket.topicId))];
+  const setsForWeakSkills = selectedStudentId && weakTopicIds.length > 0
+    ? await prisma.practiceSet.findMany({
+        where: { topicId: { in: weakTopicIds }, status: "PUBLISHED" },
+        select: {
+          id: true,
+          topicId: true,
+          difficulty: true,
+          assignments: { where: { studentId: selectedStudentId }, select: { status: true } },
+        },
+        orderBy: { createdAt: "asc" },
+      })
+    : [];
+  const assignOptionFor = (bucket: Bucket) => {
+    const sets = setsForWeakSkills.filter((set) => set.topicId === bucket.topicId && set.difficulty === bucket.difficulty);
+    const assignable = sets.filter((set) => !set.assignments[0] || ["COMPLETED", "OVERDUE"].includes(set.assignments[0].status));
+    return { assignableIds: assignable.map((set) => set.id), pendingCount: sets.length - assignable.length };
+  };
+  const correct = progressRows.filter((row) => row.correct).length;
+  const avgAccuracy = progressRows.length ? scorePercent(correct, progressRows.length) : null;
+  const attemptCount = new Set(progressRows.map((row) => row.attemptId)).size;
+  const timedAnswers = progressRows.filter((row) => row.timeSeconds);
   const avgResponseTime = timedAnswers.length
-    ? Math.round(timedAnswers.reduce((sum, answer) => sum + (answer.timeSpent ?? 0), 0) / timedAnswers.length)
+    ? Math.round(timedAnswers.reduce((sum, row) => sum + row.timeSeconds, 0) / timedAnswers.length)
     : null;
   const difficultyMetrics = aggregateDifficultyMetrics(progressRows);
   const topicDifficultyMetrics = aggregateTopicDifficultyMetrics(progressRows);
+  const trendAttempts = practiceAttempts
+    .filter((attempt) => new Set(progressRows.map((row) => row.attemptId)).has(attempt.id))
+    .map((attempt) => ({ id: attempt.id, label: attempt.assignment?.practiceSet.name ?? "Practice set", submittedAt: attempt.submittedAt }));
+  const topicTrend = aggregateTopicDifficultyTrend(
+    progressRows.map((row) => ({ topic: row.topic, difficulty: row.difficulty, correct: row.correct, attemptId: row.attemptId })),
+    trendAttempts,
+  );
+  const trendTopics = Object.keys(topicTrend);
   const mockProgressRows = examAttempts.flatMap((exam) => {
-    const questions = new Map(
-      exam.test.modules.flatMap((module) => module.questions).map((item) => [item.questionId, item.question]),
-    );
-    return exam.answers.map((answer) => {
-      const question = questions.get(answer.questionId);
-      return {
-        topic: question?.topic.name ?? "Unclassified topic",
-        difficulty: question?.difficulty ?? "UNSPECIFIED",
-        correct: Boolean(answer.isCorrect),
-        timeSeconds: answer.timeSpent ?? 0,
-        attemptId: exam.id,
-      };
+    return exam.test.modules.flatMap((module) => {
+      const answersByQuestion = new Map(exam.answers.map((answer) => [answer.questionId, answer]));
+      const section = module.section === "RW" ? "Reading & Writing" : "Math";
+      return module.questions.map((item) => {
+        const answer = answersByQuestion.get(item.questionId);
+        return {
+          topic: section,
+          difficulty: module.name,
+          correct: answer?.isCorrect === true,
+          timeSeconds: answer?.timeSpent ?? 0,
+          attemptId: exam.id,
+          attemptLabel: exam.test.name,
+          submittedAt: exam.submittedAt,
+        };
+      });
     });
   });
-  const mockDifficultyMetrics = aggregateDifficultyMetrics(mockProgressRows);
-  const mockTopicDifficultyMetrics = aggregateTopicDifficultyMetrics(mockProgressRows);
+  const mockModuleMetrics = aggregateDifficultyMetrics(mockProgressRows);
+  const mockSectionModuleMetrics = aggregateTopicDifficultyMetrics(mockProgressRows);
+  const mockModules = [...new Set(mockProgressRows.map((row) => row.difficulty))];
 
   return (
     <PageShell width="wide">
@@ -168,9 +229,10 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
               students={students.map((student) => ({ id: student.id, name: student.name }))}
               selectedStudentId={selectedStudentId ?? ""}
               area={area}
+              preserve={{ topic: filters.topic, difficulty: filters.difficulty, from: filters.from, to: filters.to }}
             />
             <Link
-              href="/teacher/compare"
+              href={buildProgressHref("/teacher/compare", filters)}
               className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-blue-600 hover:bg-gray-50"
             >
               Compare students
@@ -182,35 +244,53 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
       <PracticeAreaTabs
         basePath="/teacher/analytics"
         active={area}
-        preserve={{ studentId: selectedStudentId }}
+        preserve={{ studentId: selectedStudentId, difficulty: filters.difficulty, from: filters.from, to: filters.to }}
       />
+      <p className="mb-3 text-xs text-gray-500">Roster-wide signal · filtered to the selected student, area and progress dimensions.</p>
+      <ProgressFilters action="/teacher/analytics" filters={{ ...filters, studentId: selectedStudentId }} topics={topics} />
 
       {area === "mocks" ? (
         <MocksAnalyticsPanel
           examAttempts={examAttempts}
-          difficultyMetrics={mockDifficultyMetrics}
-          topicDifficultyMetrics={mockTopicDifficultyMetrics}
+          moduleMetrics={mockModuleMetrics}
+          sectionModuleMetrics={mockSectionModuleMetrics}
+          modules={mockModules}
         />
       ) : (
         <>
           <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
-            <Metric label="Questions answered" value={answers.length.toString()} />
+            <Metric label="Questions" value={progressRows.length.toString()} />
             <Metric
               label="Accuracy"
               value={avgAccuracy !== null ? `${avgAccuracy}%` : "-"}
               valueClassName={avgAccuracy !== null ? scoreBandTextClass(avgAccuracy) : undefined}
-              sub={answers.length ? `${correct} of ${answers.length} correct` : undefined}
+              sub={progressRows.length ? `${correct} correct of ${progressRows.length} questions` : undefined}
             />
             <Metric label="Practice attempts" value={attemptCount.toString()} />
-            <Metric label="Avg response time" value={avgResponseTime !== null ? formatTime(avgResponseTime) : "-"} />
+            <Metric label="Avg question time" value={avgResponseTime !== null ? formatTime(avgResponseTime) : "-"} />
           </div>
 
-          <div className="mb-6">
-            <DifficultyAccuracyChart metrics={difficultyMetrics} />
-          </div>
           <div className="mb-8">
-            <TopicDifficultyChart metrics={topicDifficultyMetrics} />
+            <PerformanceBreakdown
+              title="Performance by skill and difficulty"
+              rowLabel="Skill"
+              dimensionLabel="difficulty"
+              dimensions={difficulty ? [difficulty] : ["EASY", "MEDIUM", "HARD"]}
+              summaryMetrics={difficultyMetrics}
+              detailMetrics={topicDifficultyMetrics}
+            />
           </div>
+
+          {topicId && difficulty && trendTopics.length > 0 && trendAttempts.length > 0 && (
+            <div className="mb-8">
+              <TopicDifficultyTrend
+                topics={trendTopics}
+                pointsByTopic={topicTrend}
+                selectedTopic={topics.find((topic) => topic.id === topicId)?.name ?? trendTopics[0]}
+                selectedDifficulty={difficulty}
+              />
+            </div>
+          )}
 
           <section className="mb-8">
             <div className="mb-3">
@@ -226,7 +306,7 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
                     <th className="px-4 py-3 text-left">Area</th>
                     <th className="px-4 py-3 text-left">Difficulty</th>
                     <th className="px-4 py-3 text-right">Accuracy</th>
-                    <th className="px-4 py-3 text-right">Avg time</th>
+                    <th className="px-4 py-3 text-right">Avg question time</th>
                     <th className="px-4 py-3 text-left">Reinforcement</th>
                     <th className="px-4 py-3" />
                   </tr>
@@ -243,11 +323,29 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
                         <td className="px-4 py-3 text-right text-gray-500">{bucket.timed ? formatTime(Math.round(bucket.totalTime / bucket.timed)) : "-"}</td>
                         <td className="px-4 py-3 text-gray-600">{recommendation(bucket.label, pct)}</td>
                         <td className="px-4 py-3 text-right">
-                          {selectedStudentId && (
-                            <Link href={`/teacher/students/${selectedStudentId}/assign`} className="whitespace-nowrap text-xs font-medium text-blue-600 hover:underline">
-                              Assign practice
-                            </Link>
-                          )}
+                          {selectedStudentId && (() => {
+                            const option = assignOptionFor(bucket);
+                            if (option.assignableIds.length > 0) {
+                              const href = buildProgressHref(`/teacher/students/${selectedStudentId}/assign`, filters, {
+                                topic: bucket.topicId,
+                                difficulty: bucket.difficulty,
+                              });
+                              const extra = new URLSearchParams({ domain: bucket.domainId, sets: option.assignableIds.join(",") });
+                              return (
+                                <Link href={`${href}${href.includes("?") ? "&" : "?"}${extra.toString()}`} className="whitespace-nowrap text-xs font-medium text-blue-600 hover:underline">
+                                  Assign practice
+                                </Link>
+                              );
+                            }
+                            if (option.pendingCount > 0) {
+                              return (
+                                <Link href={`/teacher/students/${selectedStudentId}`} className="whitespace-nowrap text-xs text-gray-400 hover:underline" title="Already assigned and not finished yet">
+                                  Pending ({option.pendingCount})
+                                </Link>
+                              );
+                            }
+                            return null;
+                          })()}
                         </td>
                       </tr>
                     );
@@ -272,8 +370,9 @@ export default async function TeacherAnalyticsPage({ searchParams }: PageProps) 
 
 function MocksAnalyticsPanel({
   examAttempts,
-  difficultyMetrics,
-  topicDifficultyMetrics,
+  moduleMetrics,
+  sectionModuleMetrics,
+  modules,
 }: {
   examAttempts: Array<{
     id: string;
@@ -284,8 +383,9 @@ function MocksAnalyticsPanel({
     rwScore: number | null;
     totalScore: number | null;
   }>;
-  difficultyMetrics: ReturnType<typeof aggregateDifficultyMetrics>;
-  topicDifficultyMetrics: ReturnType<typeof aggregateTopicDifficultyMetrics>;
+  moduleMetrics: ReturnType<typeof aggregateDifficultyMetrics>;
+  sectionModuleMetrics: ReturnType<typeof aggregateTopicDifficultyMetrics>;
+  modules: string[];
 }) {
   return (
     <>
@@ -310,11 +410,15 @@ function MocksAnalyticsPanel({
           }))}
         />
       </div>
-      <div className="mb-6">
-        <DifficultyAccuracyChart metrics={difficultyMetrics} />
-      </div>
       <div className="mb-8">
-        <TopicDifficultyChart metrics={topicDifficultyMetrics} />
+        <PerformanceBreakdown
+          title="Performance by section and module"
+          rowLabel="Section"
+          dimensionLabel="module"
+          dimensions={modules}
+          summaryMetrics={moduleMetrics}
+          detailMetrics={sectionModuleMetrics}
+        />
       </div>
       {examAttempts.length === 0 && (
         <Card padding="lg" className="py-12 text-center text-sm text-gray-400">

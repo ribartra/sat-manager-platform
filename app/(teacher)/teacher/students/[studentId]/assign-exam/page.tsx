@@ -6,18 +6,21 @@ import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { studentAccessWhereFor } from "@/lib/program-scope";
 import { AssignExamForm } from "./assign-exam-form-client";
+import { refreshAssignmentStates } from "@/lib/assignments";
 
 interface PageProps {
   params: Promise<{ studentId: string }>;
+  searchParams: Promise<{ area?: string; topic?: string; difficulty?: string; from?: string; to?: string }>;
 }
 
-export default async function AssignExamPage({ params }: PageProps) {
-  const { studentId } = await params;
+export default async function AssignExamPage({ params, searchParams }: PageProps) {
+  const [{ studentId }, query] = await Promise.all([params, searchParams]);
   const session = await auth();
   const studentWhere = session
     ? studentAccessWhereFor(session.user)
     : { role: "STUDENT" as const, active: true, validationStatus: "APPROVED" as const };
 
+  await refreshAssignmentStates();
   const [student, exams, existing] = await Promise.all([
     prisma.user.findFirst({ where: { id: studentId, ...studentWhere }, select: { id: true, name: true } }),
     prisma.fullPracticeTest.findMany({
@@ -34,13 +37,18 @@ export default async function AssignExamPage({ params }: PageProps) {
     }),
     prisma.fullPracticeTestAssignment.findMany({
       where: { studentId },
-      select: { testId: true },
+      select: { testId: true, status: true, dueDate: true },
     }),
   ]);
 
   if (!student) notFound();
 
-  const assignedIds = new Set(existing.map((row) => row.testId));
+  const assignmentByTest = new Map(existing.map((row) => [row.testId, row]));
+  const returnParams = new URLSearchParams();
+  for (const key of ["area", "topic", "difficulty", "from", "to"] as const) {
+    if (query[key]) returnParams.set(key, query[key]!);
+  }
+  const returnHref = `/teacher/students/${studentId}${returnParams.toString() ? `?${returnParams.toString()}` : ""}`;
 
   return (
     <PageShell width="narrow">
@@ -61,8 +69,14 @@ export default async function AssignExamPage({ params }: PageProps) {
           name: exam.name,
           moduleCount: exam.modules.length,
           questionCount: exam.modules.reduce((sum, module) => sum + module.questions.length, 0),
-          alreadyAssigned: assignedIds.has(exam.id),
+          assignment: assignmentByTest.has(exam.id)
+            ? {
+                status: assignmentByTest.get(exam.id)!.status,
+                dueDate: assignmentByTest.get(exam.id)!.dueDate?.toISOString() ?? null,
+              }
+            : null,
         }))}
+        returnHref={returnHref}
       />
     </PageShell>
   );

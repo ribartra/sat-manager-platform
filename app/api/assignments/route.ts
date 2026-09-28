@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
-import { notifyUser } from "@/lib/notifications";
+import { parseDueDate, parseUnlockDate, upsertPracticeAssignment, type AssignmentOutcome } from "@/lib/assignments";
 import { studentAccessWhereFor } from "@/lib/program-scope";
 
 export async function POST(req: NextRequest) {
@@ -64,75 +64,52 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const results = [];
+  const resolvedDueDate = parseDueDate(dueDate);
+  const resolvedUnlockAt = parseUnlockDate(unlockAt);
+  const resolvedLocked = locked === true;
   if (sourceGroupId) {
     for (const practiceSetId of requestedPracticeSetIds) {
       await prisma.groupAssignment.upsert({
         where: { groupId_practiceSetId: { groupId: sourceGroupId, practiceSetId } },
         update: {
           assignedById: session.user.id,
-          dueDate: dueDate ? new Date(dueDate) : null,
-          unlockAt: unlockAt ? new Date(unlockAt) : null,
-          locked: locked ?? false,
+          dueDate: resolvedDueDate,
+          unlockAt: resolvedUnlockAt,
+          locked: resolvedLocked,
         },
         create: {
           groupId: sourceGroupId,
           practiceSetId,
           assignedById: session.user.id,
-          dueDate: dueDate ? new Date(dueDate) : null,
-          unlockAt: unlockAt ? new Date(unlockAt) : null,
-          locked: locked ?? false,
+          dueDate: resolvedDueDate,
+          unlockAt: resolvedUnlockAt,
+          locked: resolvedLocked,
         },
       });
     }
   }
 
+  // Assigning again never duplicates: pending assignments get the new settings,
+  // completed/overdue ones are reopened (see upsertPracticeAssignment).
+  const counts: Record<AssignmentOutcome, number> = { created: 0, updated: 0, reassigned: 0, unchanged: 0 };
   for (const studentId of requestedStudentIds) {
     for (const practiceSetId of requestedPracticeSetIds) {
-      const existing = await prisma.assignment.findFirst({
-        where: { studentId, practiceSetId },
+      const practiceSet = publishedPracticeSets.find((set) => set.id === practiceSetId);
+      const { outcome } = await upsertPracticeAssignment({
+        studentId,
+        practiceSetId,
+        practiceSetName: practiceSet?.name ?? "A practice set was assigned.",
+        assignedById: session.user.id,
+        dueDate: resolvedDueDate,
+        unlockAt: resolvedUnlockAt,
+        locked: resolvedLocked,
+        feedbackMode: resolvedFeedbackMode,
+        sourceGroupId: sourceGroupId ?? null,
       });
-      if (!existing) {
-        const a = await prisma.assignment.create({
-          data: {
-            studentId,
-            practiceSetId,
-            assignedById: session.user.id,
-            dueDate: dueDate ? new Date(dueDate) : null,
-            unlockAt: unlockAt ? new Date(unlockAt) : null,
-            locked: locked ?? false,
-            feedbackMode: resolvedFeedbackMode,
-            status: "PENDING",
-          },
-        });
-        const practiceSet = publishedPracticeSets.find((set) => set.id === practiceSetId);
-        await notifyUser(
-          studentId,
-          "New practice set assigned",
-          practiceSet?.name ?? "A practice set was assigned.",
-          "/student"
-        );
-        await prisma.auditLog.create({
-          data: {
-            userId: session.user.id,
-            action: "ASSIGN_PRACTICE_SET",
-            targetType: "Assignment",
-            targetId: a.id,
-            metadata: JSON.stringify({
-              studentId,
-              practiceSetId,
-              dueDate,
-              unlockAt,
-              locked: locked ?? false,
-              feedbackMode: resolvedFeedbackMode,
-              sourceGroupId: sourceGroupId ?? null,
-            }),
-          },
-        });
-        results.push(a as never);
-      }
+      counts[outcome] += 1;
     }
   }
 
-  return NextResponse.json({ created: results.length });
+  // `skipped` kept for older clients: assignments that needed no change.
+  return NextResponse.json({ ...counts, skipped: counts.unchanged });
 }

@@ -95,11 +95,19 @@ export default async function ContentMapPage({ searchParams }: PageProps) {
                 </div>
                 <div className="flex shrink-0 items-center gap-3">
                   {attempt?.status === "SUBMITTED" ? (
-                    <Link href={`/student/full-tests/results/${attempt.id}`} className="text-sm font-medium text-blue-600 hover:underline">
-                      Review
-                    </Link>
+                    <>
+                      <Link href={`/student/full-tests/results/${attempt.id}?area=mocks`} className="text-sm font-medium text-blue-600 hover:underline">
+                        Review
+                      </Link>
+                      {/* Reassigned by the teacher after a submission: allow a fresh attempt. */}
+                      {assignment.status !== "COMPLETED" && (
+                        <Link href={`/student/full-tests/${assignment.id}?area=mocks`} className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700">
+                          Start
+                        </Link>
+                      )}
+                    </>
                   ) : (
-                    <Link href={`/student/full-tests/${assignment.id}`} className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700">
+                    <Link href={`/student/full-tests/${assignment.id}?area=mocks`} className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700">
                       {attempt ? "Continue" : "Start"}
                     </Link>
                   )}
@@ -214,7 +222,7 @@ export default async function ContentMapPage({ searchParams }: PageProps) {
             return (
               <Link
                 key={diff}
-                href={`/student/content-map/${topic.id}/${diff.toLowerCase()}`}
+                href={`/student/content-map/${topic.id}/${diff.toLowerCase()}?area=${area}`}
                 className={cn(
                   "rounded px-2.5 py-1 text-xs font-medium transition-colors",
                   available > 0
@@ -327,7 +335,7 @@ export default async function ContentMapPage({ searchParams }: PageProps) {
                             return (
                               <Link
                                 key={diff}
-                                href={`/student/content-map/${topic.id}/${diff.toLowerCase()}`}
+                                href={`/student/content-map/${topic.id}/${diff.toLowerCase()}?area=${area}`}
                                 className={cn(
                                   "px-2.5 py-1 rounded text-xs font-medium transition-colors",
                                   available > 0

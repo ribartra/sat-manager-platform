@@ -59,9 +59,9 @@ export function FullTestAssignClient({
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Failed to assign exam.");
-      const created = Number(data.created) || 0;
-      if (created === 0) {
-        setError("No new exams were assigned (they may already be assigned).");
+      const changed = (Number(data.created) || 0) + (Number(data.reassigned) || 0) + (Number(data.updated) || 0);
+      if (changed === 0) {
+        setError("Nothing changed: this exam is already pending with this due date.");
         setLoading(false);
         return;
       }

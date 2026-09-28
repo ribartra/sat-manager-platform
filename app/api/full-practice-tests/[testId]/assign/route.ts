@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
-import { notifyUser } from "@/lib/notifications";
+import { parseDueDate, upsertFullTestAssignment, type AssignmentOutcome } from "@/lib/assignments";
 import { studentAccessWhereFor } from "@/lib/program-scope";
 
 interface RouteContext {
@@ -20,7 +20,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     return NextResponse.json({ error: "Student selection is required." }, { status: 400 });
   }
 
-  let created = 0;
+  const counts: Record<AssignmentOutcome, number> = { created: 0, updated: 0, reassigned: 0, unchanged: 0 };
   const test = await prisma.fullPracticeTest.findUnique({ where: { id: testId } });
   if (!test) return NextResponse.json({ error: "Exam not found." }, { status: 404 });
   if (test.status !== "PUBLISHED") {
@@ -37,26 +37,16 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
   }
 
   const touchedStudentIds = new Set<string>();
+  const resolvedDueDate = parseDueDate(dueDate);
   for (const studentId of requestedStudentIds) {
-    const existing = await prisma.fullPracticeTestAssignment.findFirst({ where: { testId, studentId } });
-    if (existing) {
-      touchedStudentIds.add(studentId);
-      continue;
-    }
-    const assignment = await prisma.fullPracticeTestAssignment.create({
-      data: { testId, studentId, assignedById: session.user.id, dueDate: dueDate ? new Date(dueDate) : null },
+    const { outcome } = await upsertFullTestAssignment({
+      studentId,
+      testId,
+      testName: test.name,
+      assignedById: session.user.id,
+      dueDate: resolvedDueDate,
     });
-    await notifyUser(studentId, "Exam assigned", test.name, "/student/content-map?area=mocks");
-    await prisma.auditLog.create({
-      data: {
-        userId: session.user.id,
-        action: "ASSIGN_FULL_PRACTICE_TEST",
-        targetType: "FullPracticeTestAssignment",
-        targetId: assignment.id,
-        metadata: JSON.stringify({ studentId, testId, dueDate: dueDate || null }),
-      },
-    });
-    created += 1;
+    counts[outcome] += 1;
     touchedStudentIds.add(studentId);
   }
 
@@ -68,5 +58,6 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
   }
   revalidatePath(`/teacher/full-tests/${testId}`);
 
-  return NextResponse.json({ created });
+  // `skipped` kept for older clients: assignments that needed no change.
+  return NextResponse.json({ ...counts, skipped: counts.unchanged });
 }
