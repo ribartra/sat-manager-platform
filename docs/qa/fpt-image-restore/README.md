@@ -77,12 +77,35 @@ Specs en `followups/specs/text-fixes.json`, auditoría en `followups/applied.md`
   de Q14; ahora empieza en "In 2021…"). Quedan 0 FPT con "COME BACK".
 - Excel `docs/qa/preguntas-pendientes-consistencia.xlsx` (hoja Imágenes): las 22 filas marcadas "¿Necesita figura? = Sí" con la acción.
 
+## Explicaciones con borrador del autor (aplicado 2026-09-28, dev.db + prod)
+Las 10 explicaciones con borrador ("Wait — …", "Hmm — key says…") detectadas en el barrido. Specs en
+`drafts/specs/draft-explanations.json` (12 ops), auditoría en `drafts/applied.md`; backup local
+`backups/devdb-preapply-fptdrafts-20260928-090709.bak`, backup de filas en prod
+`/data/db/backups/fptdrafts-rows-backup-20260928.json`. Drift check previo 0/10; prod == local 10/10 después,
+`quick_check` ok, imagen nueva HTTP 200.
+
+**Las 10 claves son correctas** (ninguna cambia): 9 cuadran con el answer key oficial del test (numeración =
+`order`+1) y T2, que no tiene answer key, se validó leyendo la figura fuente.
+
+| Pregunta | Clave | Qué se corrigió |
+|---|---|---|
+| T2 Math M2 Q18 `cmsjrntg7006kqmt10mtirx79` | D | Explicación reescrita (J = 3/4/3, K = 3/6/3 → DE(J) > DE(K)). **Además**: la imagen solo tenía el dot plot K → nuevo recorte con J y K (`crops/cmsjrntg7006kqmt10mtirx79.png`, fuente `TEST 2/i-018-039.png`); el enunciado traía las 4 opciones pegadas ("✗ A …") y las etiquetas → limpiado |
+| T10 Math M2 Q20 `cmsjrnu8j00htqmt1iahai9w7` | B | Justificación de C sin borrador |
+| T5 Math M2 Q22 `cmsjrnulh00joqmt1laiwfyta` | B | Sin borrador; A (−6) corregida: es par, no puede ser entero impar |
+| T5 R&W M2 Q7 `cmsjrnuve00n3qmt1y8ftlknw` | A | Explicación reescrita; B decía erróneamente que L'Affaire Lettuceberg era "expansive" |
+| T5 R&W M2 Q20 `cmsjrnv2800pdqmt16ka7tqk6` | C | Explicación contradictoria reescrita ("life, however;" + razones de A/B/D) |
+| T4 Math M1 Q20 `cmsjrnvaj00s0qmt17wksnibl` | D | Justificación de A sin borrador; C aclarada |
+| T6 Math M1 Q17 `cmsjrnvw400y7qmt1r47em8md` | D | C sin borrador (pendiente −5/9); encabezado de respuesta añadido |
+| T9 Math M2 Q5 `cmsjrnvzm00zsqmt1zrot3nj8` | −1 | Lectura del gráfico corregida: g(6) = −5 (no −6) → h(6) = −1 |
+| T7 R&W M1 Q20 `cmsjrnwpi018pqmt1yrd5m4an` | B | Explicación contradictoria reescrita; A decía erróneamente que la 2.ª parte era un fragmento |
+| T7 Math M1 Q16 `cmsjrnwxx01bfqmt1dqsbjcuh` | A | Sin borrador; B corregida (32π = media área) |
+
+Barrido posterior: 0 explicaciones con borrador en todo el banco (FPT y practice).
+
 ## Pendiente detectado (no tocado)
-10 explicaciones más contienen borrador del autor ("Wait — …", "Hmm — key says…"; 1 falso positivo "wait for the bus"
-excluido): `cmsjrntg7006kqmt10mtirx79`, `cmsjrnu8j00htqmt1iahai9w7`, `cmsjrnulh00joqmt1laiwfyta`,
-`cmsjrnuve00n3qmt1y8ftlknw`, `cmsjrnv2800pdqmt16ka7tqk6`, `cmsjrnvaj00s0qmt17wksnibl`, `cmsjrnvw400y7qmt1r47em8md`,
-`cmsjrnvzm00zsqmt1zrot3nj8`, `cmsjrnwpi018pqmt1yrd5m4an`, `cmsjrnwxx01bfqmt1dqsbjcuh`. Algunas cuestionan la clave
-("Hmm — key says −1"), así que cada una requiere contrastar con la clave oficial antes de reescribir.
+Otros 7 enunciados FPT traen las opciones de respuesta pegadas en el texto del enunciado ("✗ A …"), igual que tenía
+T2 M2 Q18: `cmsjrntgh006qqmt1kcr9rxh8` (T2 M2 Q19), `cmsjrnu7e00hcqmt1l368ga84`, `cmsjrnuhu00irqmt1y4592ec4`,
+`cmsjrnumx00k8qmt1qcvbkuhl`, `cmsjrnv2500pcqmt1x83duysn`, `cmsjrnwq60191qmt141m6qsvf`, `cmsojfksi003r18pp9dfz4mvz`.
 
 ## Producción (aplicado 2026-09-28)
 - **Drift check** (SSH, solo lectura, huella sha1 de stem/stimulus/clave/explicación/tipo/estado/opciones): 22/22
