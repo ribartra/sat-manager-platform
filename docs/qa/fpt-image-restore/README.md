@@ -72,8 +72,15 @@ Barrido posterior: 13 preguntas Math sin imagen siguen con alguna palabra clave,
   `cmsjrntta00btqmt13xdrew8r`, T10 RW M1 Q15 `cmsjrnt130025qmt1mq5k6kky`.
 - Excel `docs/qa/preguntas-pendientes-consistencia.xlsx` (hoja Imágenes): las 22 filas marcadas "¿Necesita figura? = Sí" con la acción.
 
-## Producción
-**Pendiente.** Mismo flujo que pushes anteriores:
-`node scripts/qa/push-fixes-to-prod.mjs --apply --specs-dir=docs/qa/fpt-image-restore/specs --baseline-db=backups/devdb-preapply-fptfigures-20260928-084808.bak --audit=docs/qa/fpt-image-restore/prod-push.md`
-(dry-run OK: 22 preguntas, solo cambia `imageUrl`). Requiere credenciales de admin de prod y, antes, un drift
-check por SSH de las 22 (gcloud).
+## Producción (aplicado 2026-09-28)
+- **Drift check** (SSH, solo lectura, huella sha1 de stem/stimulus/clave/explicación/tipo/estado/opciones): 22/22
+  idénticas a la baseline local; las 22 con `imageUrl` NULL en prod.
+- **Push** (sin credenciales de admin; mismo patrón de UPDATE puntual en VM de pushes previos), replicando
+  `putQuestionImage` (prod: `GCS_BUCKET=sat-sol-gsc-sat-data`, `GCS_DUAL_WRITE_DISK=true`):
+  1. `gsutil cp` de las 22 PNG (mismo nombre sha256[:24] que en local) → `gs://sat-sol-gsc-sat-data/media/questions/` (613 → 635 objetos).
+  2. Copia a `/app/public/uploads/questions/` del contenedor `sat-platform-web-1` (disco 613 → 635, paridad con GCS).
+  3. Backup de las 22 filas → `/data/db/backups/imgpush-rows-backup-20260928.json`; UPDATE en una transacción
+     (`imageUrl`, `updatedAt` ISO) con guarda `imageUrl IS NULL` → 22 filas.
+- **Verificación**: `imageUrl` esperado 22/22 · resto del contenido sin cambios 22/22 · `https://satsol.org/uploads/questions/<name>`
+  HTTP 200 22/22 · `quick_check = ok` · `/api/health` ok.
+- **Rollback**: restaurar `imageUrl`/`updatedAt` desde el backup de filas (los archivos nuevos pueden quedarse).
