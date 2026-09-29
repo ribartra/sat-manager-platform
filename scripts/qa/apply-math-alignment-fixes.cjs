@@ -21,7 +21,7 @@ if (!dbPath || !opsPath) { console.error("usage: <db> <ops.json> [--apply] [--ba
 const apply = flags.includes("--apply");
 const backupPath = (flags.find((f) => f.startsWith("--backup=")) || "").slice(9) || null;
 
-const Q_FIELDS = new Set(["correctAnswer", "explanation", "topicId", "stem"]);
+const Q_FIELDS = new Set(["correctAnswer", "explanation", "topicId", "stem", "stimulus", "imageUrl"]);
 const C_FIELDS = new Set(["questionExternalId", "correctAnswer"]);
 const ops = JSON.parse(fs.readFileSync(opsPath, "utf8"));
 const db = new Database(dbPath);
