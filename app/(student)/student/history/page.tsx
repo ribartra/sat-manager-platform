@@ -23,6 +23,7 @@ import {
 } from "@/lib/progress-analytics";
 import { buildProgressHref, progressDateWhere, progressFiltersFromParams } from "@/lib/progress-filters";
 import { applyTimeFilterSetting } from "@/lib/time-filters";
+import { compareSkills, isOfficialSkill } from "@/lib/taxonomy-order";
 
 interface PageProps {
   searchParams: Promise<{
@@ -245,7 +246,12 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
         active={area}
         preserve={{ difficulty: filters.difficulty, from: filters.from, to: filters.to }}
       />
-      <ProgressFilters action="/student/history" filters={filters} topics={topics} showEndDate={showEndDate} />
+      <ProgressFilters
+        action="/student/history"
+        filters={filters}
+        topics={topics.filter((topic) => isOfficialSkill(topic.id)).sort(compareSkills).map((topic) => ({ id: topic.id, name: topic.name, group: topic.domain.name }))}
+        showEndDate={showEndDate}
+      />
 
       {visibleAttempts.length === 0 ? (
         <Card padding="lg" className="py-14 text-center text-gray-500">

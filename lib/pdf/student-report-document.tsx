@@ -120,8 +120,14 @@ function Kpis({ items }: { items: Array<{ label: string; value: string; color?: 
 }
 
 /** Matrix like the UI's PerformanceBreakdown: one row per label, one column per dimension. */
-function Matrix({ title, hint, rowLabel, dimensions, summary, detail }: { title: string; hint: string; rowLabel: string; dimensions: string[]; summary: ProgressMetric[]; detail: ProgressMetric[] }) {
-  const labels = [...new Set(detail.map((m) => m.label))].sort((a, b) => a.localeCompare(b));
+function Matrix({ title, hint, rowLabel, dimensions, summary, detail, groups }: { title: string; hint: string; rowLabel: string; dimensions: string[]; summary: ProgressMetric[]; detail: ProgressMetric[]; groups?: Array<{ label: string; rows: string[] }> }) {
+  const present = new Set(detail.map((m) => m.label));
+  // Same grouping as the UI: Domain header rows with skills in official order; else alphabetical.
+  const sections = groups
+    ? groups.map((g) => ({ label: g.label as string | null, rows: g.rows.filter((row) => present.has(row)) })).filter((g) => g.rows.length > 0)
+    : [{ label: null as string | null, rows: [...present].sort((a, b) => a.localeCompare(b)) }];
+  const leftovers = [...present].filter((row) => !sections.some((section) => section.rows.includes(row)));
+  if (leftovers.length) sections.push({ label: groups ? "Other" : null, rows: leftovers.sort((a, b) => a.localeCompare(b)) });
   const cell = (key: string, metric: ProgressMetric | undefined) => {
     const value = pct(metric);
     return (
@@ -139,8 +145,8 @@ function Matrix({ title, hint, rowLabel, dimensions, summary, detail }: { title:
     );
   };
   return (
-    <View style={s.section} wrap={false}>
-      <Text style={s.h2}>{title}</Text>
+    <View style={s.section}>
+      <Text style={s.h2} minPresenceAhead={80}>{title}</Text>
       <Text style={s.hint}>{hint}</Text>
       <View style={s.table}>
         <View style={s.th}>
@@ -151,10 +157,19 @@ function Matrix({ title, hint, rowLabel, dimensions, summary, detail }: { title:
           <Text style={[s.td, s.bold, { flex: 1.6 }]}>All selected questions</Text>
           {dimensions.map((d) => cell(d, summary.find((m) => m.difficulty === d)))}
         </View>
-        {labels.map((label) => (
-          <View key={label} style={s.tr} wrap={false}>
-            <Text style={[s.td, { flex: 1.6 }]}>{label}</Text>
-            {dimensions.map((d) => cell(d, detail.find((m) => m.label === label && m.difficulty === d)))}
+        {sections.map((section) => (
+          <View key={section.label ?? "rows"}>
+            {section.label ? (
+              <View style={[s.tr, { backgroundColor: "#ffffff" }]} wrap={false}>
+                <Text style={[s.td, { flex: 1, fontSize: 7, fontFamily: "Helvetica-Bold", color: GRAY[500], textTransform: "uppercase", letterSpacing: 0.5, paddingTop: 7, paddingBottom: 3 }]}>{section.label}</Text>
+              </View>
+            ) : null}
+            {section.rows.map((label) => (
+              <View key={label} style={s.tr} wrap={false}>
+                <Text style={[s.td, { flex: 1.6 }]}>{label}</Text>
+                {dimensions.map((d) => cell(d, detail.find((m) => m.label === label && m.difficulty === d)))}
+              </View>
+            ))}
           </View>
         ))}
       </View>
@@ -192,6 +207,7 @@ function PracticeSection({ report }: { report: PracticeReport }) {
             dimensions={dims.length ? dims : ["EASY", "MEDIUM", "HARD"]}
             summary={report.difficultyMetrics}
             detail={report.topicDifficultyMetrics}
+            groups={report.skillGroups}
           />
           <View style={s.section}>
             <Text style={s.h2}>Skill performance by difficulty</Text>

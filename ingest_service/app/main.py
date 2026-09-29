@@ -1180,40 +1180,40 @@ PRACTICE_MATH_DOMAIN_MAP = {
     "advanced math": "Advanced Math",
     "algebra": "Algebra",
     "geometry and trigonometry": "Geometry and Trigonometry",
-    "problem solving data analysis": "Problem Solving and Data Analysis",
+    "problem solving data analysis": "Problem-Solving and Data Analysis",
 }
 
 PRACTICE_SKILL_MAP = {
-    "equivalent expression": "Equivalent Expressions",
-    "equivalent expressions": "Equivalent Expressions",
-    "non linear equations": "Nonlinear Equations",
-    "nonlinear equations": "Nonlinear Equations",
-    "non linear functions": "Nonlinear Functions",
-    "nonlinear functions": "Nonlinear Functions",
-    "linear equations one variable": "Linear Equations in One Variable",
-    "linear equations in one variable": "Linear Equations in One Variable",
-    "linear equations two variables": "Linear Equations in Two Variables",
-    "linear equations in two variables": "Linear Equations in Two Variables",
-    "linear functions": "Linear Functions",
-    "linear inequalities": "Linear Inequalities",
-    "systems two linear equations and equations in two variables": "Systems of Two Linear Equations",
-    "areas and volumes": "Area and Volume",
-    "area and volume": "Area and Volume",
+    "equivalent expression": "Equivalent expressions",
+    "equivalent expressions": "Equivalent expressions",
+    "non linear equations": "Nonlinear equations in one variable and systems of equations in two variables",
+    "nonlinear equations": "Nonlinear equations in one variable and systems of equations in two variables",
+    "non linear functions": "Nonlinear functions",
+    "nonlinear functions": "Nonlinear functions",
+    "linear equations one variable": "Linear equations in one variable",
+    "linear equations in one variable": "Linear equations in one variable",
+    "linear equations two variables": "Linear equations in two variables",
+    "linear equations in two variables": "Linear equations in two variables",
+    "linear functions": "Linear functions",
+    "linear inequalities": "Linear inequalities in one or two variables",
+    "systems two linear equations and equations in two variables": "Systems of two linear equations in two variables",
+    "areas and volumes": "Area and volume",
+    "area and volume": "Area and volume",
     "circles": "Circles",
-    "lines angles triangles": "Lines, Angles, and Triangles",
-    "right triangles and trigonometry": "Right Triangles and Trigonometry",
-    "data and mean": "One-Variable Data: Distributions and Measures",
-    "inference and margin of error": "Inference and Margin of Error",
-    "one variable data": "One-Variable Data",
+    "lines angles triangles": "Lines, angles, and triangles",
+    "right triangles and trigonometry": "Right triangles and trigonometry",
+    "data and mean": "One-variable data: Distributions and measures of center and spread",
+    "inference and margin of error": "Inference from Statistics and Margin of Error",
+    "one variable data": "One-variable data: Distributions and measures of center and spread",
     "percentages": "Percentages",
-    "probability": "Probability",
-    "ratios rates proportions units": "Ratios, Rates, Proportions, and Units",
+    "probability": "Probability and conditional probability",
+    "ratios rates proportions units": "Ratios, rates, proportional relationships, and units",
     "statistical claims": "Statistical Claims",
-    "two variable data": "Two-Variable Data",
+    "two variable data": "Two-variable data: Models and scatterplots",
     "command evidence": "Command of Evidence",
     "double passage": "Cross-Text Connections",
     "inferences": "Inferences",
-    "main idea and details": "Central Ideas and Details",
+    "main idea and details": "Main Ideas and Details",
     "text structure and purpose": "Text Structure and Purpose",
     "words in context": "Words in Context",
     "boundaries": "Boundaries",
@@ -1225,13 +1225,15 @@ PRACTICE_SKILL_MAP = {
     "transitions": "Transitions",
 }
 
+# Official College Board order/names (web: lib/taxonomy-order.ts).
 READING_SKILL_DOMAIN_MAP = {
+    "Main Ideas and Details": "Information and Ideas",
+    "Central Ideas and Details": "Information and Ideas",  # legacy name
     "Command of Evidence": "Information and Ideas",
-    "Cross-Text Connections": "Information and Ideas",
     "Inferences": "Information and Ideas",
-    "Central Ideas and Details": "Information and Ideas",
-    "Text Structure and Purpose": "Craft and Structure",
     "Words in Context": "Craft and Structure",
+    "Text Structure and Purpose": "Craft and Structure",
+    "Cross-Text Connections": "Craft and Structure",
 }
 
 WRITING_SKILL_DOMAIN_MAP = {
@@ -1287,14 +1289,15 @@ def internal_practice_metadata_from_text(text: str) -> dict[str, str] | None:
     for canonical_domain in [
         "Advanced Math",
         "Algebra",
-        "Problem Solving and Data Analysis",
+        "Problem-Solving and Data Analysis",
         "Geometry and Trigonometry",
         "Information and Ideas",
         "Craft and Structure",
         "Expression of Ideas",
         "Standard English Conventions",
     ]:
-        match = re.search(re.escape(canonical_domain), sample, re.IGNORECASE)
+        # "Problem-Solving" is printed with or without the hyphen in the sources.
+        match = re.search(re.escape(canonical_domain).replace(r"\-", "[- ]?"), sample, re.IGNORECASE)
         if match:
             domain = canonical_domain
             after_domain = sample[match.end():]

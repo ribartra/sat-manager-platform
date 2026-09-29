@@ -24,6 +24,7 @@ import { loadMockReport, loadPracticeReport, shortSetName, type ReportAttempt } 
 import { activeAreaTab, practiceAreaFromTab } from "@/lib/practice-area";
 import { buildProgressHref, progressFiltersFromParams } from "@/lib/progress-filters";
 import { applyTimeFilterSetting } from "@/lib/time-filters";
+import { officialSkillsFor } from "@/lib/taxonomy-order";
 
 // One page per student (replaces the former Student Analytics and Individual Report views).
 // Everything is on a single screen: KPI strip on top; performance + weak skills (with one-click
@@ -66,13 +67,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
       },
     }),
     prisma.user.findMany({ where: studentWhere, orderBy: { name: "asc" }, select: { id: true, name: true } }),
-    practiceArea
-      ? prisma.topic.findMany({
-          where: { domain: { practiceArea } },
-          select: { id: true, name: true, domain: { select: { name: true } } },
-          orderBy: { name: "asc" },
-        })
-      : Promise.resolve([]),
+    practiceArea ? officialSkillsFor(practiceArea) : Promise.resolve([]),
   ]);
   if (!student) notFound();
 
@@ -146,7 +141,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
       <ProgressFilters
         action={`/teacher/students/${studentId}`}
         filters={filters}
-        topics={skills.map((skill) => ({ id: skill.id, name: skill.name, group: skill.domain.name }))}
+        topics={skills.map((skill) => ({ id: skill.id, name: skill.name, group: skill.domain }))}
         showEndDate={showEndDate}
       />
     </>
@@ -289,6 +284,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
             dimensions={difficulty ? [difficulty] : ["EASY", "MEDIUM", "HARD"]}
             summaryMetrics={report.difficultyMetrics}
             detailMetrics={report.topicDifficultyMetrics}
+            groups={report.skillGroups}
           />
 
           {topicId && difficulty && report.trend.topics.length > 0 && report.trend.attemptCount > 0 && (

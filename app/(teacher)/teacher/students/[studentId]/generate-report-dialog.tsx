@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Download, FileText, Loader2, RefreshCw } from "lucide-react";
+import { useRef, useState } from "react";
+import { Download, FileText, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Hint } from "@/components/hint";
 
@@ -16,8 +16,9 @@ type AreaKey = (typeof AREAS)[number]["key"];
 /**
  * "Generate Report": pick one or more areas, preview the server-generated PDF and download it.
  * Several areas produce ONE file with one section per area (Math → Reading → Writing → FPT).
- * The preview iframe points at the same-origin PDF endpoint (inline), the download at the
- * same endpoint as an attachment, so both are exactly the same document.
+ * The preview regenerates by itself whenever the selection changes; the iframe points at the
+ * same-origin PDF endpoint (inline) and the download at the same endpoint as an attachment,
+ * so both are exactly the same document.
  */
 export function GenerateReportDialog({
   studentId,
@@ -38,26 +39,37 @@ export function GenerateReportDialog({
   const [previewQuery, setPreviewQuery] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const ordered = AREAS.filter((area) => selected.has(area.key)).map((area) => area.key);
-  const params = new URLSearchParams({ areas: ordered.join(",") });
-  for (const [key, value] of Object.entries(filters)) if (value) params.set(key, value);
-  const query = params.toString();
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const endpoint = `/api/reports/students/${studentId}/pdf`;
-  const stale = previewQuery !== query;
 
-  function preview() {
-    if (ordered.length === 0) return;
+  const queryFor = (areas: Set<AreaKey>) => {
+    const keys = AREAS.filter((area) => areas.has(area.key)).map((area) => area.key);
+    if (keys.length === 0) return null;
+    const params = new URLSearchParams({ areas: keys.join(",") });
+    for (const [key, value] of Object.entries(filters)) if (value) params.set(key, value);
+    return params.toString();
+  };
+  const query = queryFor(selected);
+
+  /** Rebuild the preview for this selection (debounced so quick clicks produce one PDF). */
+  function schedulePreview(areas: Set<AreaKey>, delay = 350) {
+    if (timer.current) clearTimeout(timer.current);
+    const next = queryFor(areas);
+    if (!next) {
+      setPreviewQuery(null);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
-    setPreviewQuery(query);
+    timer.current = setTimeout(() => setPreviewQuery(next), delay);
   }
 
   function toggle(key: AreaKey) {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
+    const next = new Set(selected);
+    if (next.has(key)) next.delete(key);
+    else next.add(key);
+    setSelected(next);
+    schedulePreview(next);
   }
 
   return (
@@ -66,7 +78,7 @@ export function GenerateReportDialog({
       onOpenChange={(next) => {
         setOpen(next);
         // First open: build the preview right away.
-        if (next && previewQuery === null && ordered.length > 0) preview();
+        if (next && previewQuery === null) schedulePreview(selected, 0);
       }}
     >
       <Hint label="Build a printable PDF report for this student: pick the areas, preview it, then download. Several areas are combined into one file.">
@@ -96,29 +108,25 @@ export function GenerateReportDialog({
             </label>
           ))}
           <div className="ml-auto flex items-center gap-2">
-            <button
-              type="button"
-              onClick={preview}
-              disabled={loading || ordered.length === 0 || !stale}
-              className="inline-flex h-9 items-center gap-1.5 rounded-md border border-gray-300 bg-white px-3 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-              title="Rebuild the preview with the selected areas"
-            >
-              {loading ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />} {previewQuery && stale ? "Update preview" : "Preview"}
-            </button>
+            {loading && (
+              <span className="inline-flex items-center gap-1.5 text-xs text-gray-500">
+                <Loader2 size={14} className="animate-spin" /> Updating preview…
+              </span>
+            )}
             <a
-              href={ordered.length && !stale ? `${endpoint}?${query}` : undefined}
-              aria-disabled={!ordered.length || stale}
+              href={query ? `${endpoint}?${query}` : undefined}
+              aria-disabled={!query}
               onClick={(event) => {
-                if (!ordered.length || stale) event.preventDefault();
+                if (!query) event.preventDefault();
               }}
-              className={`inline-flex h-9 items-center gap-1.5 rounded-md bg-blue-600 px-3 text-sm font-medium text-white hover:bg-blue-700 ${!ordered.length || stale ? "pointer-events-none opacity-50" : ""}`}
-              title={stale ? "Update the preview first so the download matches your selection" : "Download this PDF"}
+              className={`inline-flex h-9 items-center gap-1.5 rounded-md bg-blue-600 px-3 text-sm font-medium text-white hover:bg-blue-700 ${!query ? "pointer-events-none opacity-50" : ""}`}
+              title="Download the PDF for the selected areas"
             >
               <Download size={14} /> Download PDF
             </a>
           </div>
         </div>
-        {ordered.length === 0 && <p className="text-sm text-rose-600">Select at least one area.</p>}
+        {!query && <p className="text-sm text-rose-600">Select at least one area.</p>}
 
         <div className="relative min-h-0 flex-1 overflow-hidden rounded-md border border-gray-200 bg-gray-100">
           {previewQuery ? (
@@ -127,10 +135,10 @@ export function GenerateReportDialog({
               title="Report preview"
               src={`${endpoint}?${previewQuery}&disposition=inline`}
               onLoad={() => setLoading(false)}
-              className={`h-full w-full ${stale ? "opacity-40" : ""}`}
+              className="h-full w-full"
             />
           ) : (
-            <div className="flex h-full items-center justify-center text-sm text-gray-400">Pick the areas and press Preview.</div>
+            <div className="flex h-full items-center justify-center text-sm text-gray-400">Select one or more areas to build the report.</div>
           )}
           {loading && (
             <div className="absolute inset-0 flex items-center justify-center bg-white/60 text-sm font-medium text-gray-700">

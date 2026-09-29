@@ -9,6 +9,7 @@ import { getFeatureSetting } from "@/lib/app-settings";
 import { studentAccessWhereFor } from "@/lib/program-scope";
 import { resolvePracticeArea } from "@/lib/practice-area";
 import { refreshAssignmentStates } from "@/lib/assignments";
+import { comparePracticeSets, domainRank, skillRank } from "@/lib/taxonomy-order";
 
 interface PageProps {
   params: Promise<{ studentId: string }>;
@@ -74,12 +75,14 @@ export default async function AssignPage({ params, searchParams }: PageProps) {
 
       <AssignForm
         studentId={studentId}
-        practiceSets={practiceSets.map((ps) => ({
+        practiceSets={[...practiceSets].sort(comparePracticeSets).map((ps) => ({
           id: ps.id,
           name: ps.name,
           difficulty: ps.difficulty,
           topicName: ps.topic.name,
           topicId: ps.topicId,
+          domainOrder: domainRank(ps.topic.domain.id),
+          skillOrder: skillRank(ps.topicId),
           domainId: ps.topic.domain.id,
           domainName: ps.topic.domain.name,
           practiceArea: resolvePracticeArea({

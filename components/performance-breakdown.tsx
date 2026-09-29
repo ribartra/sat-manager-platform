@@ -10,6 +10,8 @@ type PerformanceBreakdownProps = {
   dimensions: string[];
   summaryMetrics: ProgressMetric[];
   detailMetrics: ProgressMetric[];
+  /** Optional ordered grouping (e.g. Domain → Skills in official order). Without it rows are alphabetical. */
+  groups?: Array<{ label: string; rows: string[] }>;
 };
 
 export function PerformanceBreakdown({
@@ -19,8 +21,16 @@ export function PerformanceBreakdown({
   dimensions,
   summaryMetrics,
   detailMetrics,
+  groups,
 }: PerformanceBreakdownProps) {
-  const rows = [...new Set(detailMetrics.map((metric) => metric.label))].sort((a, b) => a.localeCompare(b));
+  const present = new Set(detailMetrics.map((metric) => metric.label));
+  const sections: Array<{ label: string | null; rows: string[] }> = groups
+    ? groups.map((group) => ({ label: group.label, rows: group.rows.filter((row) => present.has(row)) })).filter((group) => group.rows.length > 0)
+    : [{ label: null, rows: [...present].sort((a, b) => a.localeCompare(b)) }];
+  const grouped = new Set(sections.flatMap((section) => section.rows));
+  const leftovers = [...present].filter((row) => !grouped.has(row)).sort((a, b) => a.localeCompare(b));
+  if (leftovers.length) sections.push({ label: groups ? "Other" : null, rows: leftovers });
+  const rows = sections.flatMap((section) => section.rows);
 
   return (
     <section className="rounded-md border border-gray-200 bg-white p-4 shadow-sm">
@@ -50,14 +60,23 @@ export function PerformanceBreakdown({
                   metrics={summaryMetrics}
                   className="bg-gray-50"
                 />
-                {rows.map((row) => (
-                  <MetricRow
-                    key={row}
-                    label={row}
-                    dimensions={dimensions}
-                    metrics={detailMetrics.filter((metric) => metric.label === row)}
-                  />
-                ))}
+                {sections.map((section) => [
+                  section.label ? (
+                    <tr key={`group-${section.label}`}>
+                      <td colSpan={dimensions.length + 1} className="border-b border-gray-200 bg-white px-3 pb-1 pt-3 text-[11px] font-semibold uppercase tracking-wide text-gray-500">
+                        {section.label}
+                      </td>
+                    </tr>
+                  ) : null,
+                  ...section.rows.map((row) => (
+                    <MetricRow
+                      key={row}
+                      label={row}
+                      dimensions={dimensions}
+                      metrics={detailMetrics.filter((metric) => metric.label === row)}
+                    />
+                  )),
+                ])}
               </tbody>
             </table>
           </div>

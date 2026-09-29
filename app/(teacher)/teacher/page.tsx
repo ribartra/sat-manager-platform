@@ -16,6 +16,7 @@ import { activeAreaTab, practiceAreaFromTab } from "@/lib/practice-area";
 import { progressFilterQuery } from "@/lib/progress-filters";
 import { summarizeAllQuestionAnswers } from "@/lib/weighted-score";
 import { SkillOptions } from "@/components/progress-filters";
+import { compareSkills, isOfficialSkill } from "@/lib/taxonomy-order";
 
 interface PageProps {
   searchParams: Promise<{
@@ -300,7 +301,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
               Skill
               <select name="topic" defaultValue={topicId} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900">
                 <option value="">All skills</option>
-                <SkillOptions topics={topics.map((topic) => ({ id: topic.id, name: topic.name, group: topic.domain.name }))} />
+                <SkillOptions topics={topics.filter((topic) => isOfficialSkill(topic.id)).sort(compareSkills).map((topic) => ({ id: topic.id, name: topic.name, group: topic.domain.name }))} />
               </select>
             </label>
             <label className="min-w-[7.5rem] flex-1 text-xs font-medium text-gray-600">

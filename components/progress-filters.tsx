@@ -23,7 +23,8 @@ export function SkillOptions({ topics }: { topics: ProgressFilterTopic[] }) {
   }
   return (
     <>
-      {[...groups.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([group, items]) => (
+      {/* Groups keep the order of `topics` (callers pass the official Domain → Skill order). */}
+      {[...groups.entries()].map(([group, items]) => (
         <optgroup key={group} label={group}>
           {items.map((topic) => <option key={topic.id} value={topic.id}>{topic.name}</option>)}
         </optgroup>

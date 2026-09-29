@@ -17,6 +17,9 @@ interface PracticeSetInfo {
   difficulty: string;
   topicName: string;
   topicId: string;
+  /** Official display order (lib/taxonomy-order.ts). */
+  domainOrder: number;
+  skillOrder: number;
   domainId: string;
   domainName: string;
   practiceArea: PracticeAreaCode | null;
@@ -99,11 +102,11 @@ export function AssignForm({
   const [showAllMembers, setShowAllMembers] = useState(false);
 
   const areaSets = practiceSets.filter((ps) => area === "all" || ps.practiceArea?.toLowerCase() === area);
-  const domains = [...new Map(areaSets.map((ps) => [ps.domainId, { id: ps.domainId, name: ps.domainName }])).values()]
-    .sort((a, b) => a.name.localeCompare(b.name));
+  const domains = [...new Map(areaSets.map((ps) => [ps.domainId, { id: ps.domainId, name: ps.domainName, order: ps.domainOrder }])).values()]
+    .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
   const domainSets = domainId ? areaSets.filter((ps) => ps.domainId === domainId) : areaSets;
-  const topics = [...new Map(domainSets.map((ps) => [ps.topicId, { id: ps.topicId, name: ps.topicName }])).values()]
-    .sort((a, b) => a.name.localeCompare(b.name));
+  const topics = [...new Map(domainSets.map((ps) => [ps.topicId, { id: ps.topicId, name: ps.topicName, order: ps.skillOrder }])).values()]
+    .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
   const filtered = domainSets.filter((ps) =>
     (!topicId || ps.topicId === topicId) &&
     (!difficulty || ps.difficulty === difficulty) &&

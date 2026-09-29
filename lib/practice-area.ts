@@ -32,7 +32,8 @@ export const WRITING_DOMAIN_NAMES = ["Expression of Ideas", "Standard English Co
 export const MATH_DOMAIN_NAMES = [
   "Algebra",
   "Advanced Math",
-  "Problem Solving and Data Analysis",
+  "Problem-Solving and Data Analysis",
+  "Problem Solving and Data Analysis", // legacy name (pre 2026-09-29)
   "Geometry and Trigonometry",
 ] as const;
 

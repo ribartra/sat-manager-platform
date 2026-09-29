@@ -15,6 +15,7 @@ import {
 } from "@/lib/progress-analytics";
 import { practiceAreaLabel, type PracticeAreaCode } from "@/lib/practice-area";
 import { progressDateWhere } from "@/lib/progress-filters";
+import { compareSkills, domainRank } from "@/lib/taxonomy-order";
 
 export type ReportFilters = { topic?: string; difficulty?: string; from?: string; to?: string };
 
@@ -58,6 +59,8 @@ export type PracticeReport = {
   };
   difficultyMetrics: ProgressMetric[];
   topicDifficultyMetrics: ProgressMetric[];
+  /** Domain → skill labels in the official order (Skills Tracker), for grouped matrices. */
+  skillGroups: Array<{ label: string; rows: string[] }>;
   weakSkills: WeakSkill[];
   trend: { topics: string[]; pointsByTopic: Record<string, TopicTrendPoint[]>; attemptCount: number };
   assignments: Array<{
@@ -112,7 +115,7 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
   const difficulty = filters.difficulty ?? "";
   const dateFilter = progressDateWhere(filters);
 
-  const [attempts, assignments, pendingExamCount] = await Promise.all([
+  const [attempts, assignments, pendingExamCount, areaTopics] = await Promise.all([
     prisma.attempt.findMany({
       where: {
         studentId,
@@ -144,7 +147,14 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
       orderBy: { createdAt: "desc" },
     }),
     prisma.fullPracticeTestAssignment.count({ where: { studentId, status: { in: OPEN_STATUSES } } }),
+    prisma.topic.findMany({
+      where: { domain: { practiceArea } },
+      select: { id: true, name: true, domainId: true, domain: { select: { name: true } } },
+    }),
   ]);
+  // Current skill name/domain by id: attempts keep a snapshot of the old names, but a renamed or
+  // moved skill must be reported under its current name and domain (one row, not two).
+  const currentTopic = new Map(areaTopics.map((topic) => [topic.id, topic]));
 
   // Question rows use the attempt snapshot (what the student actually saw), filtered by skill/difficulty.
   const rowsByAttempt = attempts.map((attempt) => {
@@ -156,10 +166,13 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
     return sources
       .map(({ question, answer }) => {
         const snapshot = parseSnapshot<QuestionSnapshot>(answer?.questionSnapshot);
+        const topicId = snapshot?.topic?.id ?? question.topicId;
+        const current = currentTopic.get(topicId);
         return {
-          topicId: snapshot?.topic?.id ?? question.topicId,
-          topicName: snapshot?.topic?.name ?? question.topic.name,
-          domainId: question.topic.domainId,
+          topicId,
+          topicName: current?.name ?? snapshot?.topic?.name ?? question.topic.name,
+          domainId: current?.domainId ?? question.topic.domainId,
+          domainName: current?.domain.name ?? "",
           difficulty: snapshot?.difficulty ?? question.difficulty,
           answer: answer?.answer ?? null,
           isCorrect: answer?.isCorrect === true,
@@ -247,6 +260,16 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
     };
   });
 
+  // Domain → skills in official order (only skills with data).
+  const skillsWithData = [...new Map(allRows.map((row) => [row.topicId, { id: row.topicId, name: row.topicName, domainId: row.domainId, domainName: row.domainName }])).values()]
+    .sort((a, b) => domainRank(a.domainId) - domainRank(b.domainId) || compareSkills(a, b));
+  const skillGroups: Array<{ label: string; rows: string[] }> = [];
+  for (const skill of skillsWithData) {
+    const label = skill.domainName || "Other";
+    const group = skillGroups.find((entry) => entry.label === label) ?? (skillGroups.push({ label, rows: [] }), skillGroups[skillGroups.length - 1]);
+    if (!group.rows.includes(skill.name)) group.rows.push(skill.name);
+  }
+
   const trendAttempts = scoredAttempts
     .filter((attempt) => attempt.total > 0)
     .map((attempt) => ({ id: attempt.id, label: attempt.name, submittedAt: attempt.submittedAt }));
@@ -267,6 +290,7 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
     },
     difficultyMetrics: aggregateDifficultyMetrics(progressRows),
     topicDifficultyMetrics: aggregateTopicDifficultyMetrics(progressRows),
+    skillGroups,
     weakSkills,
     trend: { topics: Object.keys(pointsByTopic), pointsByTopic, attemptCount: trendAttempts.length },
     assignments: assignments.map((a) => ({

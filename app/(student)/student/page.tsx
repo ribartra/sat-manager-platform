@@ -20,6 +20,7 @@ import { isAnsweredAnswer, summarizeAllQuestionAnswers } from "@/lib/weighted-sc
 import { ProgressFilters } from "@/components/progress-filters";
 import { buildProgressHref, progressDateWhere, progressFiltersFromParams } from "@/lib/progress-filters";
 import { applyTimeFilterSetting } from "@/lib/time-filters";
+import { officialSkillsFor } from "@/lib/taxonomy-order";
 
 export const dynamic = "force-dynamic";
 
@@ -48,11 +49,7 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
   const areaLabel = isMocks ? "Full Practice Tests" : practiceAreaLabel(practiceArea);
 
   const topics = practiceArea
-    ? await prisma.topic.findMany({
-        where: { domain: { practiceArea } },
-        select: { id: true, name: true },
-        orderBy: { name: "asc" },
-      })
+    ? (await officialSkillsFor(practiceArea)).map((skill) => ({ id: skill.id, name: skill.name, group: skill.domain }))
     : [];
 
   // Guard: only students without an active enrollment land on /student/program
