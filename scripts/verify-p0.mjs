@@ -66,7 +66,7 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
-    requires: ["aggregateTopicDifficultyMetrics", "Average score", "Total time", "PerformanceBreakdown", "Skill performance by difficulty", "Teacher Comments", "Download PDF"],
+    requires: ["aggregateTopicDifficultyMetrics", "Average score", "Total time", "PerformanceBreakdown", "Skill performance by difficulty", "Teacher Comments", "PDF report"],
     label: "Pagina del alumno (ex reporte individual) incluye score ponderado, dificultad, skills debiles, comentarios y PDF",
   },
   {

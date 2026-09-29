@@ -26,7 +26,7 @@ export function PracticeAreaTabs({
   const tabs = includeMocks ? AREA_TABS_WITH_MOCKS : PRACTICE_AREA_TABS;
 
   return (
-    <nav aria-label="Practice area" className={`-mx-1 mb-5 overflow-x-auto border-b border-gray-200 ${className ?? ""}`}>
+    <nav aria-label="Practice area" className={`-mx-1 overflow-x-auto border-b border-gray-200 ${className?.match(/(^|\s)mb-/) ? "" : "mb-5"} ${className ?? ""}`}>
       <div className="flex min-w-max gap-1 px-1">
         {tabs.map((tab) => (
           <Link

@@ -6,8 +6,8 @@ import { PageShell, PageHeader, PageContent } from "@/components/sat";
 import { Card } from "@/components/ui/card";
 import { buildProgressHref, progressFiltersFromParams } from "@/lib/progress-filters";
 
-// Student Analytics was merged into the student page (Performance tab). Old links keep working:
-// /teacher/analytics?studentId=X&area=… -> /teacher/students/X?area=…&view=performance
+// Student Analytics was merged into the student page (performance section). Old links keep working:
+// /teacher/analytics?studentId=X&area=… -> /teacher/students/X?area=…#performance
 interface PageProps {
   searchParams: Promise<{ studentId?: string; area?: string; topic?: string; difficulty?: string; from?: string; to?: string }>;
 }
@@ -29,7 +29,7 @@ export default async function TeacherAnalyticsRedirect({ searchParams }: PagePro
 
   if (selectedStudentId) {
     const href = buildProgressHref(`/teacher/students/${selectedStudentId}`, { ...filters, studentId: undefined });
-    redirect(`${href}${href.includes("?") ? "&" : "?"}view=performance`);
+    redirect(`${href}#performance`);
   }
 
   return (

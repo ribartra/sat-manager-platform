@@ -13,6 +13,9 @@ import { academicTopicWhere } from "@/lib/taxonomy";
 import { difficultyOptions } from "@/lib/domain-meta";
 import { TeacherStudentsTable, type TeacherStudentRow } from "./students-table-client";
 import { activeAreaTab, practiceAreaFromTab } from "@/lib/practice-area";
+import { progressFilterQuery } from "@/lib/progress-filters";
+import { summarizeAllQuestionAnswers } from "@/lib/weighted-score";
+import { SkillOptions } from "@/components/progress-filters";
 
 interface PageProps {
   searchParams: Promise<{
@@ -102,7 +105,6 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
               : {}),
           },
           orderBy: { submittedAt: "desc" },
-          take: 20,
           include: {
             answers: true,
             assignment: { include: { practiceSet: { include: { topic: true } } } },
@@ -121,7 +123,6 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
             ...(area === "mocks" ? {} : { id: "__no_full_test_attempt__" }),
           },
           orderBy: { submittedAt: "desc" },
-          take: 20,
           include: { answers: true, test: { select: { name: true } } },
         },
         fullTestAssignments: {
@@ -217,8 +218,9 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
           total: 0,
           attempts: 0,
         };
-        bucket.correct += attempt.answers.filter((answer) => answer.isCorrect).length;
-        bucket.total += attempt.answers.length;
+        const score = summarizeAllQuestionAnswers(attempt.answers);
+        bucket.correct += score.correct;
+        bucket.total += score.total;
         bucket.attempts += 1;
         performanceBuckets.set(key, bucket);
       }
@@ -235,8 +237,9 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
           total: 0,
           attempts: 0,
         };
-      bucket.correct += attempt.answers.filter((answer) => answer.isCorrect).length;
-      bucket.total += attempt.answers.length;
+      const score = summarizeAllQuestionAnswers(attempt.answers);
+      bucket.correct += score.correct;
+      bucket.total += score.total;
       bucket.attempts += 1;
       performanceBuckets.set(key, bucket);
     }
@@ -265,21 +268,21 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
         preserve={{ q: search, group: groupId, topic: topicId, difficulty, incorporatedFrom: params.incorporatedFrom ?? params.from, incorporatedTo: params.incorporatedTo ?? params.to }}
       />
 
-      <Card as="form" padding="md" className="grid gap-3 md:grid-cols-6">
+      <Card as="form" padding="sm" className="flex flex-wrap items-end gap-x-3 gap-y-2">
         <input type="hidden" name="area" value={area} />
-        <label className="text-xs font-medium text-gray-600 md:col-span-2">
+        <label className="min-w-[10rem] flex-[1.6] text-xs font-medium text-gray-600">
           Search
           <input
             name="q"
             defaultValue={search}
             placeholder="Name or email"
-            className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900"
+            className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900"
           />
         </label>
         {teacherGroupManagementEnabled && (
-          <label className="text-xs font-medium text-gray-600">
+          <label className="min-w-[7.5rem] flex-1 text-xs font-medium text-gray-600">
             Group
-            <select name="group" defaultValue={groupId} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900">
+            <select name="group" defaultValue={groupId} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900">
               <option value="">All</option>
               {groups.map((group) => (
                 <option key={group.id} value={group.id}>
@@ -291,18 +294,16 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
         )}
         {area !== "mocks" && (
           <>
-            <label className="text-xs font-medium text-gray-600">
-              Topic
-              <select name="topic" defaultValue={topicId} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900">
-                <option value="">All</option>
-                {topics.map((topic) => (
-                  <option key={topic.id} value={topic.id}>{topic.name}</option>
-                ))}
+            <label className="min-w-[7.5rem] flex-1 text-xs font-medium text-gray-600">
+              Skill
+              <select name="topic" defaultValue={topicId} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900">
+                <option value="">All skills</option>
+                <SkillOptions topics={topics.map((topic) => ({ id: topic.id, name: topic.name, group: topic.domain.name }))} />
               </select>
             </label>
-            <label className="text-xs font-medium text-gray-600">
+            <label className="min-w-[7.5rem] flex-1 text-xs font-medium text-gray-600">
               Difficulty
-              <select name="difficulty" defaultValue={difficulty} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900">
+              <select name="difficulty" defaultValue={difficulty} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900">
                 <option value="">All</option>
                 {difficultyOptions().map((opt) => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -311,19 +312,19 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
             </label>
           </>
         )}
-        <label className="text-xs font-medium text-gray-600">
-          Incorporated from
-          <input name="incorporatedFrom" type="date" defaultValue={params.incorporatedFrom || params.from || ""} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900" />
+        <label className="min-w-[7.5rem] flex-1 text-xs font-medium text-gray-600">
+          Start date from
+          <input name="incorporatedFrom" type="date" defaultValue={params.incorporatedFrom || params.from || ""} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900" />
         </label>
-        <label className="text-xs font-medium text-gray-600">
-          Incorporated to
-          <input name="incorporatedTo" type="date" defaultValue={params.incorporatedTo || params.to || ""} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900" />
+        <label className="min-w-[7.5rem] flex-1 text-xs font-medium text-gray-600">
+          Start date to
+          <input name="incorporatedTo" type="date" defaultValue={params.incorporatedTo || params.to || ""} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900" />
         </label>
-        <div className="flex items-center gap-2 md:col-span-6">
-          <button type="submit" className="rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700">
-            Apply filters
+        <div className="flex items-center gap-2">
+          <button type="submit" title="Search, group and start date choose which students are listed; skill and difficulty change the scores shown." className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700">
+            Apply
           </button>
-          <Link href={`/teacher?area=${area}`} className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+          <Link href={`/teacher?area=${area}`} className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
             Clear
           </Link>
         </div>
@@ -379,6 +380,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
       {/* Students table */}
       <TeacherStudentsTable
         showGroups={teacherGroupManagementEnabled}
+        filterQuery={progressFilterQuery({ area, topic: topicId, difficulty })}
         rows={students.map((student): TeacherStudentRow => {
           const areaActivity = area === "mocks"
             ? student.fullTestAttempts.map((attempt) => attempt.submittedAt).filter((value): value is Date => Boolean(value))
@@ -389,27 +391,11 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
             ? student.groups.map((gm) => gm.group.name).join(", ")
             : "";
           const programs = student.programEnrollments.map((pe) => pe.program.name).join(", ");
-          const avgScore = area === "mocks"
-            ? student.fullTestAttempts.length
-              ? Math.round(
-                  (student.fullTestAttempts.reduce((sum, attempt) => {
-                    const correct = attempt.answers.filter((answer) => answer.isCorrect).length;
-                    return sum + correct / Math.max(attempt.answers.length, 1);
-                  }, 0) /
-                    student.fullTestAttempts.length) *
-                  100,
-                )
-              : null
-            : student.attempts.length
-            ? Math.round(
-                (student.attempts.reduce((sum, attempt) => {
-                  const correct = attempt.answers.filter((a) => a.isCorrect).length;
-                  return sum + correct / Math.max(attempt.answers.length, 1);
-                }, 0) /
-                  student.attempts.length) *
-                  100,
-              )
-            : null;
+          const avgScore = summarizeAllQuestionAnswers(
+            area === "mocks"
+              ? student.fullTestAttempts.flatMap((attempt) => attempt.answers)
+              : student.attempts.flatMap((attempt) => attempt.answers),
+          ).percent;
 
           return {
             id: student.id,

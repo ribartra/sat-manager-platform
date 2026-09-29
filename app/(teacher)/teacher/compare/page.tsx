@@ -118,7 +118,7 @@ export default async function TeacherComparePage({ searchParams }: PageProps) {
   );
 }
 
-/** Student page, Performance tab. */
+/** Student page, scrolled to its performance section. */
 function performanceHref(href: string) {
-  return `${href}${href.includes("?") ? "&" : "?"}view=performance`;
+  return `${href}#performance`;
 }

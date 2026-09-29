@@ -193,7 +193,7 @@ export function AssignForm({
           </label>
           <label className="text-sm font-medium text-gray-700">
             Search practice
-            <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Practice set or topic" className="mt-1" />
+            <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Practice set, skill or domain" className="mt-1" />
           </label>
           <label className="text-sm font-medium text-gray-700">
             Domain
@@ -203,9 +203,9 @@ export function AssignForm({
             </Select>
           </label>
           <label className="text-sm font-medium text-gray-700">
-            Topic
+            Skill
             <Select value={topicId} onChange={(event) => setTopicId(event.target.value)} className="mt-1">
-              <option value="">All topics</option>
+              <option value="">All skills</option>
               {topics.map((topic) => <option key={topic.id} value={topic.id}>{topic.name}</option>)}
             </Select>
           </label>

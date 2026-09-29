@@ -32,8 +32,8 @@ async function assertSourcePatterns() {
     },
     {
       file: "app/(teacher)/teacher/analytics/page.tsx",
-      requires: ["studentAccessWhereFor", "view=performance", "redirect"],
-      label: "Analytics redirige a la pestana Performance del alumno (misma area y filtros)",
+      requires: ["studentAccessWhereFor", "#performance", "redirect"],
+      label: "Analytics redirige a la seccion de desempeno del alumno (misma area y filtros)",
     },
     {
       file: "app/(student)/student/history/page.tsx",
@@ -42,7 +42,7 @@ async function assertSourcePatterns() {
     },
     {
       file: "app/(teacher)/teacher/students/[studentId]/report/page.tsx",
-      requires: ["view=performance", "redirect", "progressFiltersFromParams"],
+      requires: ["#performance", "redirect", "progressFiltersFromParams"],
       label: "Report individual redirige a la pagina del alumno conservando filtros",
     },
     {
