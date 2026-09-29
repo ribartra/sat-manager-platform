@@ -126,11 +126,9 @@ export async function seedTaxonomy(prisma: PrismaClient): Promise<void> {
       { id: "top-fss", name: "Grammar and Structure" },
     ],
   };
-  const subskillDefs: Record<string, { id: string; name: string }[]> = {
-    "top-nonlinfn": [
-      { id: "sub-nonlin-transform-recip", name: "Function transformations / Reciprocal functions" },
-    ],
-  };
+  // Subskill level = intended home of the real "Topic" level below Skill; empty until the
+  // topic catalogue is defined (the old test entry was removed 2026-09-29).
+  const subskillDefs: Record<string, { id: string; name: string }[]> = {};
 
   const allDomains = [...mathDomains, ...rwDomains];
   for (const domain of allDomains) {
