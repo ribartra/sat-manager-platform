@@ -1,0 +1,4838 @@
+[
+ {
+  "set": "Craft and Structure - Cross-Text Connections - EASY",
+  "pos": 1,
+  "qid": "cmsjro1zs03biqmt1jocvhctm",
+  "hex": "eb89dcc8",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - EASY",
+  "pos": 2,
+  "qid": "cmsjro1zw03bnqmt13y5jtadu",
+  "hex": "02fd3da7",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - EASY",
+  "pos": 3,
+  "qid": "cmsjro20103bsqmt1r10i1md5",
+  "hex": "8d802289",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - EASY",
+  "pos": 4,
+  "qid": "cmsjro20503bxqmt1dtw8n7xw",
+  "hex": "835d1ae6",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - EASY",
+  "pos": 5,
+  "qid": "cmsjro20803c2qmt1z156htab",
+  "hex": "81da17d3",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - EASY",
+  "pos": 6,
+  "qid": "cmsjro20c03c7qmt1pf92z05r",
+  "hex": "c68ceeff",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - EASY",
+  "pos": 7,
+  "qid": "cmsjro20g03ccqmt1fw80lk61",
+  "hex": "5a4b147c",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - EASY",
+  "pos": 8,
+  "qid": "cmsjro20l03chqmt1uq2l4i8w",
+  "hex": "9645f55e",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - EASY",
+  "pos": 9,
+  "qid": "cmsjro20p03cmqmt166ga3t11",
+  "hex": "dc043599",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - EASY",
+  "pos": 10,
+  "qid": "cmsjro20t03crqmt1dzj3mtmv",
+  "hex": "2c50ed1a",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - EASY",
+  "pos": 11,
+  "qid": "cmsjro20y03cwqmt1cp3ty3w6",
+  "hex": "22105871",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - EASY",
+  "pos": 12,
+  "qid": "cmsjro21203d1qmt1h23rt9rs",
+  "hex": "159ef46d",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - EASY",
+  "pos": 13,
+  "qid": "cmsjro21503d6qmt11508xlxp",
+  "hex": "7b55e895",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - EASY",
+  "pos": 14,
+  "qid": "cmsjro21803dbqmt1z3lag0df",
+  "hex": "c106b9f7",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - EASY",
+  "pos": 15,
+  "qid": "cmsjro21c03dgqmt1vrj23g46",
+  "hex": "88bb0f6f",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - HARD",
+  "pos": 1,
+  "qid": "cmsjro21f03dlqmt1118roecj",
+  "hex": "97e5bf55",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - HARD",
+  "pos": 2,
+  "qid": "cmsjro21j03dqqmt1j5gbbrj3",
+  "hex": "105ea6de",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - HARD",
+  "pos": 3,
+  "qid": "cmsjro21m03dvqmt1zaoxz35t",
+  "hex": "c4737d6a",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - HARD",
+  "pos": 4,
+  "qid": "cmsjro21p03e0qmt1r5w09poz",
+  "hex": "a87c3925",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - HARD",
+  "pos": 5,
+  "qid": "cmsjro21s03e5qmt12u2o7aba",
+  "hex": "f3c45b4f",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - HARD",
+  "pos": 6,
+  "qid": "cmsjro21w03eaqmt1hykdprlg",
+  "hex": "f7c02e89",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - HARD",
+  "pos": 7,
+  "qid": "cmsjro21z03efqmt1oe4c9y1t",
+  "hex": "96f3accc",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - HARD",
+  "pos": 8,
+  "qid": "cmsjro22203ekqmt148qu3e66",
+  "hex": "e4e2aeb3",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - HARD",
+  "pos": 9,
+  "qid": "cmsjro22603epqmt1ibgunfkt",
+  "hex": "6a1dc7c5",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - HARD",
+  "pos": 10,
+  "qid": "cmsjro22903euqmt10qwkgmzy",
+  "hex": "17bf10de",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - HARD",
+  "pos": 11,
+  "qid": "cmsjro22c03ezqmt1o87yfmft",
+  "hex": "d0198544",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - HARD",
+  "pos": 12,
+  "qid": "cmsjro22y03f4qmt1zhzpzslo",
+  "hex": "de2c2f57",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - MEDIUM",
+  "pos": 1,
+  "qid": "cmsjro12t02urqmt12i8b5hhl",
+  "hex": "8de51658",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - MEDIUM",
+  "pos": 2,
+  "qid": "cmsjro13002uwqmt1mg4vs7a5",
+  "hex": "82c05b34",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - MEDIUM",
+  "pos": 3,
+  "qid": "cmsjro13502v1qmt12bl90rq2",
+  "hex": "f1c9d2c1",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - MEDIUM",
+  "pos": 4,
+  "qid": "cmsjro13902v6qmt1ezk5w4v5",
+  "hex": "eae66bf9",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - MEDIUM",
+  "pos": 5,
+  "qid": "cmsjro13f02vbqmt1gzpeavx9",
+  "hex": "9a94eb77",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - MEDIUM",
+  "pos": 6,
+  "qid": "cmsjro2py03mgqmt15szncef4",
+  "hex": "03080769",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - MEDIUM",
+  "pos": 7,
+  "qid": "cmsjro2q203mlqmt1vwyq722j",
+  "hex": "12d81fc1",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - MEDIUM",
+  "pos": 8,
+  "qid": "cmsjro2q703mqqmt1iwil1a0u",
+  "hex": "27d9bb69",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Cross-Text Connections - MEDIUM",
+  "pos": 9,
+  "qid": "cmsjro2qb03mvqmt147aoyltf",
+  "hex": "f52cc78c",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - EASY",
+  "pos": 1,
+  "qid": "cmsjro40j04irqmt176sscbxl",
+  "hex": "c966ad55",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - EASY",
+  "pos": 2,
+  "qid": "cmsjro40o04iwqmt1m6z7paiv",
+  "hex": "066a3295",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - EASY",
+  "pos": 3,
+  "qid": "cmsjro40s04j1qmt1e5j7vbzd",
+  "hex": "e13171c4",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - EASY",
+  "pos": 4,
+  "qid": "cmsjro40v04j6qmt1nwu2ij2x",
+  "hex": "e929fe98",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - EASY",
+  "pos": 5,
+  "qid": "cmsjro40z04jbqmt18arrygng",
+  "hex": "809addda",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - EASY",
+  "pos": 6,
+  "qid": "cmsjro41404jgqmt1oyg455wi",
+  "hex": "a68239ed",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - EASY",
+  "pos": 7,
+  "qid": "cmsjro41704jlqmt1c1ibvbre",
+  "hex": "a2dd51c1",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - EASY",
+  "pos": 8,
+  "qid": "cmsjro41b04jqqmt11n27a1sp",
+  "hex": "48e4021d",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - EASY",
+  "pos": 9,
+  "qid": "cmsjro41e04jvqmt1vw1y31y2",
+  "hex": "47904792",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - EASY",
+  "pos": 10,
+  "qid": "cmsjro44x04k0qmt1xnih9daw",
+  "hex": "ac5bf490",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - EASY",
+  "pos": 11,
+  "qid": "cmsjro45c04k5qmt1kqb70ub9",
+  "hex": "0ed94d4c",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - EASY",
+  "pos": 12,
+  "qid": "cmsjro45j04kaqmt17adasnp4",
+  "hex": "5e732e67",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - EASY",
+  "pos": 13,
+  "qid": "cmsjro45o04kfqmt1o8wli203",
+  "hex": "56ec23a0",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - EASY",
+  "pos": 14,
+  "qid": "cmsjro45t04kkqmt12ew16z3d",
+  "hex": "1782cdd7",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - EASY",
+  "pos": 15,
+  "qid": "cmsjro45z04kpqmt1uszz76av",
+  "hex": "02e49a0c",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - EASY",
+  "pos": 16,
+  "qid": "cmsjro46404kuqmt1bs37j9re",
+  "hex": "764331f8",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - EASY",
+  "pos": 17,
+  "qid": "cmsjro46804kzqmt1jbx82591",
+  "hex": "40270820",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - HARD",
+  "pos": 1,
+  "qid": "cmsjro37r03ytqmt1tpvzulwj",
+  "hex": "d4732483",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - HARD",
+  "pos": 2,
+  "qid": "cmsjro37w03yyqmt132dt8brh",
+  "hex": "5f56fdec",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - HARD",
+  "pos": 3,
+  "qid": "cmsjro38103z3qmt14u3evcrl",
+  "hex": "b0f7541b",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - HARD",
+  "pos": 4,
+  "qid": "cmsjro38603z8qmt11brkhrmr",
+  "hex": "c61a7c4a",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - HARD",
+  "pos": 5,
+  "qid": "cmsjro38a03zdqmt18acjfva3",
+  "hex": "aa5897b8",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - HARD",
+  "pos": 6,
+  "qid": "cmsjro38e03ziqmt1rui1uztv",
+  "hex": "b4887dae",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - HARD",
+  "pos": 7,
+  "qid": "cmsjro38i03znqmt1z1j984ia",
+  "hex": "65406d2c",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - HARD",
+  "pos": 8,
+  "qid": "cmsjro38m03zsqmt17pvd2ix5",
+  "hex": "4ed09415",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - HARD",
+  "pos": 9,
+  "qid": "cmsjro38q03zxqmt1tdojl3q4",
+  "hex": "0b5ecf0e",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - HARD",
+  "pos": 10,
+  "qid": "cmsjro38u0402qmt1n1cfn6gb",
+  "hex": "34d7bb25",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - HARD",
+  "pos": 11,
+  "qid": "cmsjro38y0407qmt1nn5yu2a1",
+  "hex": "4eee64fa",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - HARD",
+  "pos": 12,
+  "qid": "cmsjro391040cqmt1prdi8a33",
+  "hex": "a70cbc53",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - HARD",
+  "pos": 13,
+  "qid": "cmsjro396040hqmt10psiyotr",
+  "hex": "ad4f7362",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - HARD",
+  "pos": 14,
+  "qid": "cmsjro39a040mqmt1glzxselt",
+  "hex": "9b01bcf4",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - MEDIUM",
+  "pos": 1,
+  "qid": "cmsjro2qf03n0qmt1wfgi0m6a",
+  "hex": "236fee8e",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - MEDIUM",
+  "pos": 2,
+  "qid": "cmsjro2qj03n5qmt10g5s5p2n",
+  "hex": "2903a041",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - MEDIUM",
+  "pos": 3,
+  "qid": "cmsjro2qo03naqmt10p9y3k44",
+  "hex": "190857f0",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - MEDIUM",
+  "pos": 4,
+  "qid": "cmsjro2qt03nfqmt1wh48ankp",
+  "hex": "df46a2ee",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - MEDIUM",
+  "pos": 5,
+  "qid": "cmsjro2qy03nkqmt1n0fwl8cx",
+  "hex": "ff97fd53",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - MEDIUM",
+  "pos": 6,
+  "qid": "cmsjro2r403npqmt1qacc9duo",
+  "hex": "6f5fc289",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - MEDIUM",
+  "pos": 7,
+  "qid": "cmsjro2ra03nuqmt1hsrovf77",
+  "hex": "c6bd3447",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - MEDIUM",
+  "pos": 8,
+  "qid": "cmsjro2re03nzqmt1e80zgxs2",
+  "hex": "f2c48e47",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - MEDIUM",
+  "pos": 9,
+  "qid": "cmsjro2rk03o4qmt1oqzk8o7a",
+  "hex": "c0e1b70a",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - MEDIUM",
+  "pos": 10,
+  "qid": "cmsjro2rp03o9qmt1h1gc5sh9",
+  "hex": "f631132b",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - MEDIUM",
+  "pos": 11,
+  "qid": "cmsjro2ru03oeqmt110mllm2c",
+  "hex": "6d44060a",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - MEDIUM",
+  "pos": 12,
+  "qid": "cmsjro2ry03ojqmt1g93s02hy",
+  "hex": "48555763",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - MEDIUM",
+  "pos": 13,
+  "qid": "cmsjro2s203ooqmt1lih1mdwq",
+  "hex": "e7247766",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - MEDIUM",
+  "pos": 14,
+  "qid": "cmsjro2s703otqmt1rnl698q1",
+  "hex": "8bc66f89",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - MEDIUM",
+  "pos": 15,
+  "qid": "cmsjro2sc03oyqmt1q98k2zc5",
+  "hex": "b4d29611",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - MEDIUM",
+  "pos": 16,
+  "qid": "cmsjro2sg03p3qmt1xepqm9yi",
+  "hex": "f6352bd3",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Text Structure and Purpose - MEDIUM",
+  "pos": 17,
+  "qid": "cmsjro2sk03p8qmt1s5revry0",
+  "hex": "dcd9ad50",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 1,
+  "qid": "cmsjro39f040rqmt1n5d0bc2x",
+  "hex": "84b5125b",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 2,
+  "qid": "cmsjro39j040wqmt1t4inlawz",
+  "hex": "fa014d2d",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 3,
+  "qid": "cmsjro39n0411qmt1v91nwqke",
+  "hex": "5fe53347",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 4,
+  "qid": "cmsjro39s0416qmt1kghutk5s",
+  "hex": "45a109a3",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 5,
+  "qid": "cmsjro39w041bqmt1cj0ckqhz",
+  "hex": "d4a8f7cb",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 6,
+  "qid": "cmsjro3a0041gqmt1618a7shp",
+  "hex": "95f037ad",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 7,
+  "qid": "cmsjro3a4041lqmt1uvzb9bws",
+  "hex": "e386a11d",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 8,
+  "qid": "cmsjro3a7041qqmt1d42rpl4a",
+  "hex": "a1139ff8",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 9,
+  "qid": "cmsjro3ab041vqmt103cfdmof",
+  "hex": "97ab5669",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 10,
+  "qid": "cmsjro3af0420qmt1k6txturq",
+  "hex": "a0777403",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 11,
+  "qid": "cmsjro3aj0425qmt1duaflss5",
+  "hex": "06b96bfc",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 12,
+  "qid": "cmsjro3dr042aqmt1s03xaohd",
+  "hex": "0f040c50",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 13,
+  "qid": "cmsjro3dz042fqmt1wxe1aw5n",
+  "hex": "e1d5d5df",
+  "key": "D",
+  "ansKey": "D",
+  "flags": [
+   "option_mismatch D (0.14): src \"healthy — a discolored, felty growth on its leaf b\" vs \"healthy\""
+  ]
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 14,
+  "qid": "cmsjro3e3042kqmt1ksr498iy",
+  "hex": "9e501aaf",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 15,
+  "qid": "cmsjro3e7042pqmt1up6pixv3",
+  "hex": "9cdcd902",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 16,
+  "qid": "cmsjro3ea042uqmt19do811ml",
+  "hex": "3ec184af",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 17,
+  "qid": "cmsjro3ee042zqmt1uf5xtyhn",
+  "hex": "e3f05561",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 18,
+  "qid": "cmsjro3ei0434qmt1k8mryfh1",
+  "hex": "4a2b2535",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 19,
+  "qid": "cmsjro3en0439qmt1o8pi3z26",
+  "hex": "9ccf463e",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 20,
+  "qid": "cmsjro3eq043eqmt1xs8yfgj2",
+  "hex": "ca47273b",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 21,
+  "qid": "cmsjro3eu043jqmt17z40sq3u",
+  "hex": "69a6d050",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 22,
+  "qid": "cmsjro3ey043oqmt1osrf5vw8",
+  "hex": "e41dfaab",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 23,
+  "qid": "cmsjro3f3043tqmt1v6p114bj",
+  "hex": "4d1a9c0d",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 24,
+  "qid": "cmsjro3f6043yqmt1grvesuw9",
+  "hex": "b5898291",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 25,
+  "qid": "cmsjro3fa0443qmt1hh2kv8f9",
+  "hex": "5effa190",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 26,
+  "qid": "cmsjro3fd0448qmt1x8wfwqdg",
+  "hex": "a49500cc",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 27,
+  "qid": "cmsjro3fh044dqmt19rh7ikcr",
+  "hex": "f3fac04f",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 28,
+  "qid": "cmsjro3fl044iqmt15fcw0h9p",
+  "hex": "6d5ddea4",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 29,
+  "qid": "cmsjro3fp044nqmt14csocrwv",
+  "hex": "4b8244ca",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 30,
+  "qid": "cmsjro3fs044sqmt12uekjylg",
+  "hex": "a2835734",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 31,
+  "qid": "cmsjro3fw044xqmt1yg0d8p40",
+  "hex": "d529c1ad",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 32,
+  "qid": "cmsjro3g00452qmt1tjzkznkw",
+  "hex": "37219ba2",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 33,
+  "qid": "cmsjro3g40457qmt1ixvmvczt",
+  "hex": "a4ca92fd",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 34,
+  "qid": "cmsjro3g7045cqmt1aagdhort",
+  "hex": "d91e5499",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 35,
+  "qid": "cmsjro3gb045hqmt1fj5rpli4",
+  "hex": "7d84fe2b",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 36,
+  "qid": "cmsjro3gf045mqmt1f94sfo28",
+  "hex": "d2eb1df1",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 37,
+  "qid": "cmsjro3gi045rqmt1fjblfpr0",
+  "hex": "cb526866",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 38,
+  "qid": "cmsjro3gl045wqmt1k2rign8m",
+  "hex": "83687083",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 39,
+  "qid": "cmsjro3gp0461qmt1xzz4l5hx",
+  "hex": "637d0878",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 40,
+  "qid": "cmsjro3gs0466qmt1yx4vdrdc",
+  "hex": "6cf906fc",
+  "key": "A",
+  "ansKey": "A",
+  "flags": [
+   "option_mismatch D (0.20): src \"Suspicious “sheltering” most nearly mean?\" vs \"Suspicious\""
+  ]
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 41,
+  "qid": "cmsjro3gw046bqmt1s1bsduip",
+  "hex": "4480fae9",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 42,
+  "qid": "cmsjro3gz046gqmt1tc57hxe2",
+  "hex": "5d2fd27d",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 43,
+  "qid": "cmsjro3h2046lqmt1204wvw4l",
+  "hex": "e3ffb854",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 44,
+  "qid": "cmsjro3h6046qqmt1qid6loz1",
+  "hex": "afd48140",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 45,
+  "qid": "cmsjro3h9046vqmt1idrc5k6f",
+  "hex": "6e3fdd1a",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 46,
+  "qid": "cmsjro3hd0470qmt1tu1lhhtx",
+  "hex": "daaed806",
+  "key": "D",
+  "ansKey": "D",
+  "flags": [
+   "option_mismatch D (0.25): src \"a substantial that is, to see if differences in\" vs \"a substantial\""
+  ]
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 47,
+  "qid": "cmsjro3hh0475qmt1yd8qruhr",
+  "hex": "84f9b577",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 48,
+  "qid": "cmsjro3i4047aqmt17rorgmc3",
+  "hex": "5514fd1f",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 49,
+  "qid": "cmsjro3i9047fqmt1eafjvzas",
+  "hex": "bdab32fc",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 50,
+  "qid": "cmsjro3id047kqmt13w3ak8jv",
+  "hex": "631a1b64",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 51,
+  "qid": "cmsjro3ih047pqmt17ibjsv02",
+  "hex": "b92c13fa",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 52,
+  "qid": "cmsjro3il047uqmt1sili92xp",
+  "hex": "74ee7737",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 53,
+  "qid": "cmsjro3io047zqmt1v8rb74ca",
+  "hex": "849bf8d7",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 54,
+  "qid": "cmsjro3lr0484qmt1tjma1aod",
+  "hex": "f7d58b53",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 55,
+  "qid": "cmsjro3mj0489qmt1hsai5rqz",
+  "hex": "6286dd96",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 56,
+  "qid": "cmsjro3my048eqmt1mupckryz",
+  "hex": "44cc5f75",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 57,
+  "qid": "cmsjro3nj048jqmt1uf0hl7bu",
+  "hex": "afd2a9eb",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 58,
+  "qid": "cmsjro3nw048oqmt1p8qz9kav",
+  "hex": "3654202f",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 59,
+  "qid": "cmsjro3o3048tqmt1w1m2z0e9",
+  "hex": "03f5a9b7",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 60,
+  "qid": "cmsjro3o9048yqmt10z7r4pux",
+  "hex": "edd64a4a",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 61,
+  "qid": "cmsjro3of0493qmt1o2urzmkm",
+  "hex": "f8ca5766",
+  "key": "B",
+  "ansKey": "B",
+  "flags": [
+   "option_mismatch D (0.08): src \"surprise at — photography and the written word cul\" vs \"surprise at\""
+  ]
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 62,
+  "qid": "cmsjro3ol0498qmt1cx59hde0",
+  "hex": "9671d61d",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 63,
+  "qid": "cmsjro3oq049dqmt1jwz1uo2h",
+  "hex": "ba974387",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 64,
+  "qid": "cmsjro3ou049iqmt15o7i7ckz",
+  "hex": "05575bca",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 65,
+  "qid": "cmsjro3oy049nqmt1zekqkiz6",
+  "hex": "1ad04ea0",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 66,
+  "qid": "cmsjro3p4049sqmt1lj9z6088",
+  "hex": "04e4c51d",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 67,
+  "qid": "cmsjro3p8049xqmt1c88hqlsi",
+  "hex": "479c7e82",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 68,
+  "qid": "cmsjro3pb04a2qmt1qkosoykm",
+  "hex": "52fe862a",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 69,
+  "qid": "cmsjro3pg04a7qmt18yen8vwb",
+  "hex": "7a327791",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 70,
+  "qid": "cmsjro3pl04acqmt13pwukzrm",
+  "hex": "0ee67e09",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 71,
+  "qid": "cmsjro3po04ahqmt1vuwvax5y",
+  "hex": "760ee1db",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 72,
+  "qid": "cmsjro3ps04amqmt1jh539dee",
+  "hex": "417f8dfa",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 73,
+  "qid": "cmsjro3pw04arqmt1v980kd1b",
+  "hex": "9d73c9eb",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 74,
+  "qid": "cmsjro3pz04awqmt13zm390ui",
+  "hex": "1695391a",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 75,
+  "qid": "cmsjro3q404b1qmt1szazllxr",
+  "hex": "8d579825",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 76,
+  "qid": "cmsjro3q704b6qmt19k5k67u0",
+  "hex": "79dec1e1",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 77,
+  "qid": "cmsjro3qb04bbqmt1s1gy4osp",
+  "hex": "bcc91b1e",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 78,
+  "qid": "cmsjro3qe04bgqmt1nb0sssyu",
+  "hex": "31d0bd9a",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 79,
+  "qid": "cmsjro3qi04blqmt1xqb702ha",
+  "hex": "cf9a3f34",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 80,
+  "qid": "cmsjro3ql04bqqmt1o3oqmide",
+  "hex": "47955354",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 81,
+  "qid": "cmsjro3qq04bvqmt1wrtm6mgq",
+  "hex": "a3761c7e",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 82,
+  "qid": "cmsjro3qu04c0qmt1v1ngtw87",
+  "hex": "a20b7511",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 83,
+  "qid": "cmsjro3qy04c5qmt1pour0jq5",
+  "hex": "80ebb189",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 84,
+  "qid": "cmsjro3r204caqmt1pih7sihz",
+  "hex": "b940952c",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 85,
+  "qid": "cmsjro3r604cfqmt1iffujexy",
+  "hex": "683f66c9",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 86,
+  "qid": "cmsjro3s404ckqmt19x6ura4f",
+  "hex": "10a409bd",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 87,
+  "qid": "cmsjro3s704cpqmt1drpr6d4b",
+  "hex": "b0ea8c28",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 88,
+  "qid": "cmsjro3sb04cuqmt1q661qjfz",
+  "hex": "e5e7f264",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 89,
+  "qid": "cmsjro3sf04czqmt1y81q5g6z",
+  "hex": "0d402146",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 90,
+  "qid": "cmsjro3si04d4qmt1dy7wt0kt",
+  "hex": "8a47383f",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 91,
+  "qid": "cmsjro3sl04d9qmt1fjdn99d3",
+  "hex": "bcd924a5",
+  "key": "C",
+  "ansKey": "C",
+  "flags": [
+   "option_mismatch D (0.17): src \"optional — terraces, canals, and water temples\" vs \"optional\""
+  ]
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 92,
+  "qid": "cmsjro3sp04deqmt1hn5join0",
+  "hex": "16f2d678",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 93,
+  "qid": "cmsjro3ss04djqmt1ijxyvyd1",
+  "hex": "a4f50d30",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 94,
+  "qid": "cmsjro3sv04doqmt10h3de7lv",
+  "hex": "fa7a89f1",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 95,
+  "qid": "cmsjro3sz04dtqmt1lr45nvig",
+  "hex": "faa5696c",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 96,
+  "qid": "cmsjro3t204dyqmt13zucd1qr",
+  "hex": "d8d33cc5",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 97,
+  "qid": "cmsjro3t504e3qmt1r3wp2tnb",
+  "hex": "49bbe4d7",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 98,
+  "qid": "cmsjro3wd04e8qmt1sabuu9qe",
+  "hex": "f6d1f735",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 99,
+  "qid": "cmsjro5ai055uqmt1uuvinreq",
+  "hex": "01de46bb",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 100,
+  "qid": "cmsjro5am055zqmt14819fdt1",
+  "hex": "aa7ae735",
+  "key": "A",
+  "ansKey": "A",
+  "flags": [
+   "option_mismatch D (0.20): src \"Clinging to “ ” reaching most nearly mean?\" vs \"Clinging to\""
+  ]
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 101,
+  "qid": "cmsjro5aq0564qmt11stlggp1",
+  "hex": "a7991da1",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 102,
+  "qid": "cmsjro5au0569qmt1hlnw9v4g",
+  "hex": "84a7fbca",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 103,
+  "qid": "cmsjro5az056eqmt1nk1awljt",
+  "hex": "5179fd36",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 104,
+  "qid": "cmsjro5b2056jqmt1et2u4jvc",
+  "hex": "428cd2c1",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 105,
+  "qid": "cmsjro5b6056oqmt1ifxzbe42",
+  "hex": "c2c26e20",
+  "key": "A",
+  "ansKey": "A",
+  "flags": [
+   "option_mismatch D (0.20): src \"Command “ ” suggestion most nearly mean?\" vs \"Command\""
+  ]
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 106,
+  "qid": "cmsjro5ba056tqmt1zgvg0gu8",
+  "hex": "f773a56b",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 107,
+  "qid": "cmsjro5be056yqmt101usbnvf",
+  "hex": "3118ca93",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 108,
+  "qid": "cmsjro5bh0573qmt15kgn7w58",
+  "hex": "21d95d1d",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 109,
+  "qid": "cmsjro5bl0578qmt1j8dqc6wk",
+  "hex": "b622fb78",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 110,
+  "qid": "cmsjro5bo057dqmt12scxdz8q",
+  "hex": "a318c1ef",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 111,
+  "qid": "cmsjro5bt057iqmt14zcncqdx",
+  "hex": "d5235d39",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 112,
+  "qid": "cmsjro5bw057nqmt1izruitsb",
+  "hex": "9b2fbb2e",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 113,
+  "qid": "cmsjro5bz057sqmt14zse8t6p",
+  "hex": "d74788e1",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 114,
+  "qid": "cmsjro5c3057xqmt1brhzn8nk",
+  "hex": "53542eb5",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 115,
+  "qid": "cmsjro5c60582qmt1v18x13z7",
+  "hex": "82b7c3b2",
+  "key": "B",
+  "ansKey": "B",
+  "flags": [
+   "option_mismatch D (0.20): src \"Watched “ ” marked most nearly mean?\" vs \"Watched\""
+  ]
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 116,
+  "qid": "cmsjro5cb0587qmt10zmpqy5p",
+  "hex": "e1e89221",
+  "key": "A",
+  "ansKey": "A",
+  "flags": [
+   "option_mismatch D (0.20): src \"Vague “ ” rough most nearly mean?\" vs \"Vague\""
+  ]
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 117,
+  "qid": "cmsjro5ew058cqmt1qda4g31k",
+  "hex": "b11bb2a3",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 118,
+  "qid": "cmsjro5f7058hqmt1olfqf3c0",
+  "hex": "0afb2ac4",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 119,
+  "qid": "cmsjro5ff058mqmt1imytvw2c",
+  "hex": "051d3065",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 120,
+  "qid": "cmsjro5fo058rqmt1wkl156ua",
+  "hex": "359b891c",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 121,
+  "qid": "cmsjro5ft058wqmt11tyhmh21",
+  "hex": "aad56f2b",
+  "key": "B",
+  "ansKey": "B",
+  "flags": [
+   "option_mismatch D (0.04): src \"prevented ’ features generally seen as flaws. So u\" vs \"prevented\""
+  ]
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 122,
+  "qid": "cmsjro5fx0591qmt19nyt7xis",
+  "hex": "e7b709fc",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 123,
+  "qid": "cmsjro5g20596qmt1jvaxue66",
+  "hex": "dc0bca21",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 124,
+  "qid": "cmsjro5g5059bqmt1tuxiqwq3",
+  "hex": "2c82068f",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 125,
+  "qid": "cmsjro5g9059gqmt1tskfc2ae",
+  "hex": "b93428a6",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 126,
+  "qid": "cmsjro5gc059lqmt1kwr3wiqx",
+  "hex": "213248f7",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 127,
+  "qid": "cmsjro5gf059qqmt1qvur3etg",
+  "hex": "5fa165f7",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 128,
+  "qid": "cmsjro5gi059vqmt15fcqaue2",
+  "hex": "441e2b9e",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 129,
+  "qid": "cmsjro5gm05a0qmt1q45w0h2r",
+  "hex": "b507f90f",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 130,
+  "qid": "cmsjro5gq05a5qmt1yprdr8d1",
+  "hex": "5d48f889",
+  "key": "B",
+  "ansKey": "B",
+  "flags": [
+   "option_mismatch D (0.13): src \"Celebrated “mingled” most nearly mean? “Spring and\" vs \"Celebrated\""
+  ]
+ },
+ {
+  "set": "Craft and Structure - Words in Context - EASY",
+  "pos": 131,
+  "qid": "cmsjro5gt05aaqmt1rpx5od77",
+  "hex": "2390e956",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 1,
+  "qid": "cmsjro5i805cdqmt1mga241w3",
+  "hex": "22a41819",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 2,
+  "qid": "cmsjro5ib05ciqmt1ccsw2wle",
+  "hex": "e35d481c",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 3,
+  "qid": "cmsjro5if05cnqmt1batlxeeh",
+  "hex": "5e57efec",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 4,
+  "qid": "cmsjro5ij05csqmt1wjkyp5e8",
+  "hex": "d5ad34f0",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 5,
+  "qid": "cmsjro5in05cxqmt1ibjhryjh",
+  "hex": "6c086e70",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 6,
+  "qid": "cmsjro5ir05d2qmt1o71cteqe",
+  "hex": "6c9f1727",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 7,
+  "qid": "cmsjro5iu05d7qmt1kzm5b16g",
+  "hex": "93665100",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 8,
+  "qid": "cmsjro5iy05dcqmt1kmse5vny",
+  "hex": "e459076b",
+  "key": "C",
+  "ansKey": "C",
+  "flags": [
+   "option_mismatch D (0.20): src \"Settled “ ” contracted most nearly mean?\" vs \"Settled\""
+  ]
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 9,
+  "qid": "cmsjro5j105dhqmt1qowz91jt",
+  "hex": "0462dac3",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 10,
+  "qid": "cmsjro5j405dmqmt1duwzr5fx",
+  "hex": "5a97d9cd",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 11,
+  "qid": "cmsjro5j805drqmt14csitgrg",
+  "hex": "af4300b0",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 12,
+  "qid": "cmsjro5jb05dwqmt14iki8dt3",
+  "hex": "76e4c51d",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 13,
+  "qid": "cmsjro5jg05e1qmt1vhozait7",
+  "hex": "e26d23c4",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 14,
+  "qid": "cmsjro5jj05e6qmt1q3eevtna",
+  "hex": "98364791",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 15,
+  "qid": "cmsjro5jn05ebqmt1k76p72o6",
+  "hex": "7f935017",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 16,
+  "qid": "cmsjro5mz05egqmt1y1cht2d8",
+  "hex": "be94c9fc",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 17,
+  "qid": "cmsjro5nb05elqmt1mbqd3bp6",
+  "hex": "54804e10",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 18,
+  "qid": "cmsjro5nm05eqqmt1bpquwcst",
+  "hex": "9b22bf7b",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 19,
+  "qid": "cmsjro5ns05evqmt1183zd8bv",
+  "hex": "1455b754",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 20,
+  "qid": "cmsjro5nx05f0qmt1327b75v6",
+  "hex": "7bc05fa2",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 21,
+  "qid": "cmsjro5o305f5qmt1z41o589r",
+  "hex": "10c236ce",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 22,
+  "qid": "cmsjro5o905faqmt1xpex9m5l",
+  "hex": "aaa3ee7c",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 23,
+  "qid": "cmsjro5of05ffqmt1vho5q86f",
+  "hex": "a06c434d",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 24,
+  "qid": "cmsjro5ok05fkqmt1bzdegu4q",
+  "hex": "b411eb09",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 25,
+  "qid": "cmsjro5oo05fpqmt1307jkh7k",
+  "hex": "c14daa3c",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 26,
+  "qid": "cmsjro5os05fuqmt12e220q5d",
+  "hex": "3566120b",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 27,
+  "qid": "cmsjro5ox05fzqmt1ponglrep",
+  "hex": "bce4d106",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 28,
+  "qid": "cmsjro5p205g4qmt1rg3ubllh",
+  "hex": "bbb77c84",
+  "key": "B",
+  "ansKey": "B",
+  "flags": [
+   "option_mismatch D (0.25): src \"obviated and, given the\" vs \"obviated\""
+  ]
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 29,
+  "qid": "cmsjro5p605g9qmt1187l2z6m",
+  "hex": "e7d37666",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 30,
+  "qid": "cmsjro5pc05geqmt12blfhrdg",
+  "hex": "a1ff8ce3",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 31,
+  "qid": "cmsjro5pi05gjqmt1zdkv8lc3",
+  "hex": "7b4dde72",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 32,
+  "qid": "cmsjro5pn05goqmt1jv4q9vwi",
+  "hex": "a60b0004",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 33,
+  "qid": "cmsjro5pt05gtqmt16z69lnmq",
+  "hex": "a5e747f0",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 34,
+  "qid": "cmsjro5py05gyqmt1bpoyppnl",
+  "hex": "5dce6cab",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 35,
+  "qid": "cmsjro5q405h3qmt18ta3zav3",
+  "hex": "f99847ed",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 36,
+  "qid": "cmsjro5q905h8qmt1pe9q51v2",
+  "hex": "83fd3cf4",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 37,
+  "qid": "cmsjro5qd05hdqmt1djh606ue",
+  "hex": "e4f312c5",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 38,
+  "qid": "cmsjro5qh05hiqmt1todkzeic",
+  "hex": "79fe7550",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 39,
+  "qid": "cmsjro5ql05hnqmt1w7gehjxb",
+  "hex": "4b54bbf0",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 40,
+  "qid": "cmsjro5qp05hsqmt1rhjx8d7a",
+  "hex": "3d658a5a",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 41,
+  "qid": "cmsjro5qt05hxqmt1vrl988uz",
+  "hex": "7afb470b",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 42,
+  "qid": "cmsjro5qx05i2qmt1xfafaw7j",
+  "hex": "f83f0aab",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 43,
+  "qid": "cmsjro5r005i7qmt1jber6v10",
+  "hex": "3f753a8e",
+  "key": "B",
+  "ansKey": "B",
+  "flags": [
+   "option_mismatch D (0.50): src \"forfeiture of are\" vs \"forfeiture of\""
+  ]
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 44,
+  "qid": "cmsjro5r505icqmt1yg70ft0o",
+  "hex": "d7807ec8",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 45,
+  "qid": "cmsjro5r805ihqmt11ujci6d4",
+  "hex": "dd19befa",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 46,
+  "qid": "cmsjro5rb05imqmt1k8lei3p9",
+  "hex": "4fa7e50e",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 47,
+  "qid": "cmsjro5rf05irqmt1qjp569x9",
+  "hex": "5444db38",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 48,
+  "qid": "cmsjro5ri05iwqmt1myhwpl0n",
+  "hex": "6017ae31",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 49,
+  "qid": "cmsjro5rm05j1qmt1nlpm2571",
+  "hex": "571cf537",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 50,
+  "qid": "cmsjro5rq05j6qmt1uj9fr8v9",
+  "hex": "dba9eaf8",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 51,
+  "qid": "cmsjro5rt05jbqmt1o6gwwnh3",
+  "hex": "a756aa95",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 52,
+  "qid": "cmsjro5rx05jgqmt1m5h6v0oo",
+  "hex": "0ed8f24f",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 53,
+  "qid": "cmsjro5s005jlqmt1oowpb9zp",
+  "hex": "b35e2fdc",
+  "key": "A",
+  "ansKey": "A",
+  "flags": [
+   "option_mismatch D (0.17): src \"pretentious — a painting but in fact the work is a\" vs \"pretentious\""
+  ]
+ },
+ {
+  "set": "Craft and Structure - Words in Context - HARD",
+  "pos": 54,
+  "qid": "cmsjro5s305jqqmt1wvr30h33",
+  "hex": "e8fb0744",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 1,
+  "qid": "cmsjro4r404s8qmt1x2sqqd5w",
+  "hex": "359902ae",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 2,
+  "qid": "cmsjro4r904sdqmt1gvvnbj0x",
+  "hex": "f0be91b2",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 3,
+  "qid": "cmsjro4re04siqmt1yp4r7bh2",
+  "hex": "c977cfcf",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 4,
+  "qid": "cmsjro4sd04snqmt1huz67550",
+  "hex": "1c7fe9be",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 5,
+  "qid": "cmsjro4si04ssqmt1wsavskzp",
+  "hex": "757077f9",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 6,
+  "qid": "cmsjro4sm04sxqmt1iozurw2x",
+  "hex": "84ece3f6",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 7,
+  "qid": "cmsjro4sq04t2qmt1ueg6ajvd",
+  "hex": "be612a26",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 8,
+  "qid": "cmsjro4su04t7qmt1hwcmhhih",
+  "hex": "3f37eb3b",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 9,
+  "qid": "cmsjro4t004tcqmt1cankagyw",
+  "hex": "4974b053",
+  "key": "B",
+  "ansKey": "B",
+  "flags": [
+   "option_mismatch D (0.17): src \"indecipherable Patternmaster, and she later became\" vs \"indecipherable\""
+  ]
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 10,
+  "qid": "cmsjro4t404thqmt1letqlpt8",
+  "hex": "710799ae",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 11,
+  "qid": "cmsjro4t804tmqmt1mhve7810",
+  "hex": "23974d6c",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 12,
+  "qid": "cmsjro4tc04trqmt1vqwh0msy",
+  "hex": "5a278f24",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 13,
+  "qid": "cmsjro4tg04twqmt1kamug8h0",
+  "hex": "adc8ea28",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 14,
+  "qid": "cmsjro4tl04u1qmt171v1jjh1",
+  "hex": "9107ad5c",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 15,
+  "qid": "cmsjro4tp04u6qmt1yes33jw4",
+  "hex": "e0656211",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 16,
+  "qid": "cmsjro4tt04ubqmt1vn5b01cb",
+  "hex": "9aa44886",
+  "key": "C",
+  "ansKey": "C",
+  "flags": [
+   "option_mismatch D (0.20): src \"Accomplishment “ quality ” most nearly mean?\" vs \"Accomplishment\""
+  ]
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 17,
+  "qid": "cmsjro4tx04ugqmt1ldd5x5x0",
+  "hex": "ab1bd603",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 18,
+  "qid": "cmsjro4u104ulqmt1bk1ejo35",
+  "hex": "e8c26398",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 19,
+  "qid": "cmsjro4u504uqqmt10xxmfbtv",
+  "hex": "4830ab87",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 20,
+  "qid": "cmsjro4u904uvqmt12vmwfyed",
+  "hex": "b44066dc",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 21,
+  "qid": "cmsjro4ud04v0qmt1ns2odtf0",
+  "hex": "8b46bb51",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 22,
+  "qid": "cmsjro4uh04v5qmt1ax7qpwv0",
+  "hex": "ce8c03a8",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 23,
+  "qid": "cmsjro4ul04vaqmt11glcccur",
+  "hex": "2e8ab360",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 24,
+  "qid": "cmsjro4uo04vfqmt1p67zq4w7",
+  "hex": "d3ca5d59",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 25,
+  "qid": "cmsjro4us04vkqmt1c19wag8c",
+  "hex": "c5b1afe5",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 26,
+  "qid": "cmsjro4uw04vpqmt1ywztaqmj",
+  "hex": "81a3a607",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 27,
+  "qid": "cmsjro4v004vuqmt1gmicpkrl",
+  "hex": "995358b4",
+  "key": "B",
+  "ansKey": "B",
+  "flags": [
+   "option_mismatch D (0.04): src \"exploited — when most of the planet s surface was \" vs \"exploited\""
+  ]
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 28,
+  "qid": "cmsjro4v504vzqmt19gktrrmd",
+  "hex": "85083d4d",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 29,
+  "qid": "cmsjro4y004w4qmt1q5mc4g34",
+  "hex": "dc234d74",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 30,
+  "qid": "cmsjro4y704w9qmt1s3mhstgj",
+  "hex": "35fd0eb4",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 31,
+  "qid": "cmsjro4yc04weqmt1iph71yaj",
+  "hex": "fce80a36",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 32,
+  "qid": "cmsjro4yg04wjqmt1agfo73bn",
+  "hex": "d4e8662d",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 33,
+  "qid": "cmsjro4yl04woqmt1gc2lbiki",
+  "hex": "e37b9e34",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 34,
+  "qid": "cmsjro4yp04wtqmt1dq3ydr80",
+  "hex": "1fa751f1",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 35,
+  "qid": "cmsjro4yu04wyqmt1lmamu0nj",
+  "hex": "62a18353",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 36,
+  "qid": "cmsjro4z004x3qmt1vdtvtkhm",
+  "hex": "1374a9fa",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 37,
+  "qid": "cmsjro4z304x8qmt198yqgt2c",
+  "hex": "cd2ce51f",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 38,
+  "qid": "cmsjro4z704xdqmt1xcep6lzi",
+  "hex": "b4c6cff6",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 39,
+  "qid": "cmsjro4zb04xiqmt1ehh7ggtm",
+  "hex": "d8d1ecaa",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 40,
+  "qid": "cmsjro4zf04xnqmt1uydqg0ni",
+  "hex": "e56b66e5",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 41,
+  "qid": "cmsjro4zj04xsqmt1acshgarv",
+  "hex": "bce627d9",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 42,
+  "qid": "cmsjro4zm04xxqmt1anaiddds",
+  "hex": "1fbf276a",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 43,
+  "qid": "cmsjro4zq04y2qmt1t89v1p02",
+  "hex": "f4166aae",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 44,
+  "qid": "cmsjro4zt04y7qmt1bmncbj88",
+  "hex": "1107e7dc",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 45,
+  "qid": "cmsjro4zw04ycqmt160xp763r",
+  "hex": "d7dccee7",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 46,
+  "qid": "cmsjro50004yhqmt1vcygcyvw",
+  "hex": "6c64a8f3",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 47,
+  "qid": "cmsjro50504ymqmt1ppjw274z",
+  "hex": "9c35759f",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 48,
+  "qid": "cmsjro50804yrqmt174w4pvsj",
+  "hex": "6a1194e8",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 49,
+  "qid": "cmsjro50b04ywqmt1qq8uhlh4",
+  "hex": "490b205f",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 50,
+  "qid": "cmsjro50f04z1qmt1rg0z0owj",
+  "hex": "94eb800d",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 51,
+  "qid": "cmsjro50i04z6qmt1yviijvz4",
+  "hex": "c218cd98",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 52,
+  "qid": "cmsjro50l04zbqmt110k76zwa",
+  "hex": "7b43c0cc",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 53,
+  "qid": "cmsjro50p04zgqmt1ulzm2pab",
+  "hex": "d3104a68",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 54,
+  "qid": "cmsjro50s04zlqmt16b9w0v89",
+  "hex": "86fbc64d",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 55,
+  "qid": "cmsjro50v04zqqmt1hebtyp2o",
+  "hex": "8634bf4a",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Craft and Structure - Words in Context - MEDIUM",
+  "pos": 56,
+  "qid": "cmsjro50y04zvqmt12zmckbqj",
+  "hex": "c843d63c",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 1,
+  "qid": "cmsjro19m02x4qmt1djzsg1zf",
+  "hex": "0147b080",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 2,
+  "qid": "cmsjro19q02x9qmt12zl9j2qq",
+  "hex": "6f626ae5",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 3,
+  "qid": "cmsjro19t02xeqmt1e1uo6yku",
+  "hex": "85439572",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 4,
+  "qid": "cmsjro19x02xjqmt1vj8tnuk2",
+  "hex": "a9040290",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 5,
+  "qid": "cmsjro1a102xoqmt1oxsojr2i",
+  "hex": "6df33868",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 6,
+  "qid": "cmsjro1a402xtqmt1mkyeo359",
+  "hex": "0fc0a773",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 7,
+  "qid": "cmsjro1a802xyqmt1t7564wxj",
+  "hex": "9debe79a",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 8,
+  "qid": "cmsjro1ab02y3qmt1dkg8eazk",
+  "hex": "e7dc27dc",
+  "key": "D",
+  "ansKey": "D",
+  "flags": [
+   "option_mismatch C (0.50): src \"Gidra each contributed financially to its creation\" vs \"Gidra was initially based out of the Asian America\""
+  ]
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 9,
+  "qid": "cmsjro1af02y8qmt1cz0wfhfw",
+  "hex": "30c3aa98",
+  "key": "D",
+  "ansKey": "D",
+  "flags": [
+   "source_passage_missing_in_db 0.83"
+  ]
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 10,
+  "qid": "cmsjro1aj02ydqmt1eqfcs2g6",
+  "hex": "4042ff0b",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 11,
+  "qid": "cmsjro1am02yiqmt1ibyega5b",
+  "hex": "40578580",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 12,
+  "qid": "cmsjro1ap02ynqmt1m2v68i5x",
+  "hex": "a9ac31e4",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 13,
+  "qid": "cmsjro1as02ysqmt16a4p2efd",
+  "hex": "628e1305",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 14,
+  "qid": "cmsjro1av02yxqmt1k19qmxpr",
+  "hex": "25b70215",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 15,
+  "qid": "cmsjro1az02z2qmt1epg4om33",
+  "hex": "08b28c1a",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 16,
+  "qid": "cmsjro1b302z7qmt1nd9d0vfo",
+  "hex": "e441da80",
+  "key": "A",
+  "ansKey": "A",
+  "flags": [
+   "source_passage_missing_in_db 0.75"
+  ]
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 17,
+  "qid": "cmsjro1b702zcqmt1lun7w12i",
+  "hex": "08ff903e",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 18,
+  "qid": "cmsjro1bb02zhqmt1oj6wp4qq",
+  "hex": "47f2cddd",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 19,
+  "qid": "cmsjro1bf02zmqmt1jsunxtxy",
+  "hex": "e1ee5f5c",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 20,
+  "qid": "cmsjro1bj02zrqmt18pp48q44",
+  "hex": "26ee16ba",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 21,
+  "qid": "cmsjro1bn02zwqmt1mddhcob3",
+  "hex": "37a49687",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 22,
+  "qid": "cmsjro1br0301qmt1chzvz31y",
+  "hex": "0113152f",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 23,
+  "qid": "cmsjro1bv0306qmt11n2qdjjm",
+  "hex": "f38b40ac",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 24,
+  "qid": "cmsjro1c0030bqmt1vdkehstr",
+  "hex": "89f71526",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 25,
+  "qid": "cmsjro1c5030gqmt1lb73sac3",
+  "hex": "73c091d2",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 26,
+  "qid": "cmsjro1c8030lqmt1vdvn1v96",
+  "hex": "145da981",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 27,
+  "qid": "cmsjro1cc030qqmt107nff1sk",
+  "hex": "ede3f942",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 28,
+  "qid": "cmsjro1cf030vqmt1brfq2slr",
+  "hex": "46e45728",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 29,
+  "qid": "cmsjro1cl0310qmt1dnwgkimn",
+  "hex": "faaf484f",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 30,
+  "qid": "cmsjro1cp0315qmt1iiwdcmfo",
+  "hex": "7fdba7ad",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 31,
+  "qid": "cmsjro1cs031aqmt1ssn62vcf",
+  "hex": "7254379e",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 32,
+  "qid": "cmsjro1cw031fqmt1yezodzlm",
+  "hex": "94c726fb",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 33,
+  "qid": "cmsjro1g2031kqmt1hv11tyxr",
+  "hex": "5ff1ba73",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 34,
+  "qid": "cmsjro1ga031pqmt1ca77mjsu",
+  "hex": "0014477f",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 35,
+  "qid": "cmsjro1ge031uqmt1jihc9oyl",
+  "hex": "ab94d40a",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - EASY",
+  "pos": 36,
+  "qid": "cmsjro1gj031zqmt1w8h34uqx",
+  "hex": "c384987b",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 1,
+  "qid": "cmsjro1h2032fqmt10ig9of9m",
+  "hex": "a15b3219",
+  "key": "B",
+  "ansKey": "B",
+  "flags": [
+   "source_passage_missing_in_db 0.82"
+  ]
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 2,
+  "qid": "cmsjro1h7032kqmt1by2h0n18",
+  "hex": "0d7f4966",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 3,
+  "qid": "cmsjro1hd032pqmt1tlwf8gt4",
+  "hex": "068f939b",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 4,
+  "qid": "cmsjro1hi032uqmt19pia9uok",
+  "hex": "040583a5",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 5,
+  "qid": "cmsjro1hn032zqmt1cixv2udc",
+  "hex": "7a1877be",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 6,
+  "qid": "cmsjro1hu0334qmt125eoa87i",
+  "hex": "04cbeca3",
+  "key": "C",
+  "ansKey": "C",
+  "flags": [
+   "option_mismatch D (0.78): src \"” the work, performed by sheriffs, bishops, and ma\" vs \"“The October 1536 revolt known as the Pilgrimage o\""
+  ]
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 7,
+  "qid": "cmsjro1i00339qmt1ec3zgdif",
+  "hex": "ccb1ab92",
+  "key": "C",
+  "ansKey": "C",
+  "flags": [
+   "source_passage_missing_in_db 0.83"
+  ]
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 8,
+  "qid": "cmsjro1i7033eqmt1to9sai8l",
+  "hex": "be19faa1",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 9,
+  "qid": "cmsjro1ic033iqmt1th7etzn5",
+  "hex": "c83e0b43",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 10,
+  "qid": "cmsjro1ii033nqmt14vqrkx08",
+  "hex": "dd1757fd",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 11,
+  "qid": "cmsjro1in033sqmt1uc0oztf9",
+  "hex": "09f9edb0",
+  "key": "A",
+  "ansKey": "A",
+  "flags": [
+   "option_mismatch B (0.45): src \"Mbaqanga is significantly more popular in the Engl\" vs \"Mbaqanga is significantly more popular in the Engl\"",
+   "option_permutation: source C matches stored D"
+  ]
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 12,
+  "qid": "cmsjro1is033xqmt16fu7lywj",
+  "hex": "39e440e4",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 13,
+  "qid": "cmsjro1iw0342qmt15jyfric0",
+  "hex": "156ff681",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 14,
+  "qid": "cmsjro1j10347qmt1cbtzhixr",
+  "hex": "e946a32e",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 15,
+  "qid": "cmsjro1j5034cqmt1qqvsxtcf",
+  "hex": "dc87adf4",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 16,
+  "qid": "cmsjro1j9034hqmt1rtqkziil",
+  "hex": "53c6c179",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 17,
+  "qid": "cmsjro1je034mqmt16gcsrow7",
+  "hex": "df91532e",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 18,
+  "qid": "cmsjro1ji034rqmt1wavmzpf4",
+  "hex": "44da37eb",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 19,
+  "qid": "cmsjro1jm034wqmt1pnbn1egk",
+  "hex": "626a1308",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 20,
+  "qid": "cmsjro1jq0351qmt118qs2hi2",
+  "hex": "a44bbd6b",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 21,
+  "qid": "cmsjro1jt0356qmt1nerolyji",
+  "hex": "d5da74be",
+  "key": "A",
+  "ansKey": "A",
+  "flags": [
+   "source_passage_missing_in_db 0.78"
+  ]
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 22,
+  "qid": "cmsjro1jw0359qmt15p6q1528",
+  "hex": "63e7799d",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 23,
+  "qid": "cmsjro1k0035eqmt1gnmsro1n",
+  "hex": "4a07be59",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 24,
+  "qid": "cmsjro1k3035jqmt1dg5cwyxv",
+  "hex": "df37c087",
+  "key": "D",
+  "ansKey": "D",
+  "flags": [
+   "source_passage_missing_in_db 0.83"
+  ]
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 25,
+  "qid": "cmsjro1k8035oqmt1tafny4vo",
+  "hex": "af9e3240",
+  "key": "C",
+  "ansKey": "C",
+  "flags": [
+   "option_mismatch D (0.40): src \"“ ” Send to me my brother; for I have no more the \" vs \"“But never will I cease from dirge and sore lament\""
+  ]
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 26,
+  "qid": "cmsjro1kf035tqmt1j694oh0r",
+  "hex": "2c06139b",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 27,
+  "qid": "cmsjro1kk035yqmt1odg5ll2d",
+  "hex": "31ad8024",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 28,
+  "qid": "cmsjro1kq0363qmt16cchfkl8",
+  "hex": "b2e54b50",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 29,
+  "qid": "cmsjro1kv0368qmt1oxt4ta8k",
+  "hex": "cca6fae9",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 30,
+  "qid": "cmsjro1l0036dqmt1gvibkji9",
+  "hex": "378c66d5",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 31,
+  "qid": "cmsjro1l6036iqmt1r6wkdnmn",
+  "hex": "35ec767c",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 32,
+  "qid": "cmsjro1lb036nqmt1gftu21ii",
+  "hex": "24c1b7e4",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 33,
+  "qid": "cmsjro1nz036sqmt1og4h07um",
+  "hex": "56f477fb",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 34,
+  "qid": "cmsjro1o9036xqmt1mfoox9im",
+  "hex": "09775cbf",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 35,
+  "qid": "cmsjro1od0372qmt1jd2t3w7w",
+  "hex": "8391a002",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - HARD",
+  "pos": 36,
+  "qid": "cmsjro1oh0377qmt1wjcrj5ip",
+  "hex": "124fdcd7",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - MEDIUM",
+  "pos": 1,
+  "qid": "cmsjro28v03gsqmt1m547j1im",
+  "hex": "22e4d633",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - MEDIUM",
+  "pos": 2,
+  "qid": "cmsjro28z03gxqmt1tjx58bkm",
+  "hex": "d5b9ed0d",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - MEDIUM",
+  "pos": 3,
+  "qid": "cmsjro29403h1qmt1vlngnyad",
+  "hex": "356ad646",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - MEDIUM",
+  "pos": 4,
+  "qid": "cmsjro29903h6qmt1v50via14",
+  "hex": "8a584241",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - MEDIUM",
+  "pos": 5,
+  "qid": "cmsjro29e03hbqmt1fzfj3tvh",
+  "hex": "67b59a67",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - MEDIUM",
+  "pos": 6,
+  "qid": "cmsjro29j03hgqmt1pedgajtu",
+  "hex": "7edfb2c5",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - MEDIUM",
+  "pos": 7,
+  "qid": "cmsjro29o03hlqmt1sxwv94oo",
+  "hex": "0c622cfb",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - MEDIUM",
+  "pos": 8,
+  "qid": "cmsjro29s03hqqmt1pmqrrkfz",
+  "hex": "5fb6ed10",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - MEDIUM",
+  "pos": 9,
+  "qid": "cmsjro29x03hvqmt18p3g9bzu",
+  "hex": "c538954d",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - MEDIUM",
+  "pos": 10,
+  "qid": "cmsjro2a203i0qmt1is3kvl3r",
+  "hex": "f8244f7c",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - MEDIUM",
+  "pos": 11,
+  "qid": "cmsjro2a803i5qmt1i5caj4xi",
+  "hex": "29cde5fa",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - MEDIUM",
+  "pos": 12,
+  "qid": "cmsjro2ad03iaqmt1dsr5d602",
+  "hex": "7c21b4b5",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - MEDIUM",
+  "pos": 13,
+  "qid": "cmsjro2ai03ifqmt1zg0dsctf",
+  "hex": "81af81d4",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - MEDIUM",
+  "pos": 14,
+  "qid": "cmsjro2an03ikqmt172j0bcb1",
+  "hex": "e1546fd6",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - MEDIUM",
+  "pos": 15,
+  "qid": "cmsjro2ar03ipqmt16xm5xh5j",
+  "hex": "d74b9bc6",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - MEDIUM",
+  "pos": 16,
+  "qid": "cmsjro2aw03iuqmt1cs6rep55",
+  "hex": "a2b0fc3b",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - MEDIUM",
+  "pos": 17,
+  "qid": "cmsjro2b003izqmt16yos3dwi",
+  "hex": "2584bcfb",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - MEDIUM",
+  "pos": 18,
+  "qid": "cmsjro2b503j4qmt1j5l96xad",
+  "hex": "25290c8d",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - MEDIUM",
+  "pos": 19,
+  "qid": "cmsjro2ba03j9qmt1rrabv0on",
+  "hex": "cbecb873",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - MEDIUM",
+  "pos": 20,
+  "qid": "cmsjro2be03jeqmt1abvakaly",
+  "hex": "99fdf71c",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - MEDIUM",
+  "pos": 21,
+  "qid": "cmsjro2bj03jjqmt1l16vdo5d",
+  "hex": "ff18829b",
+  "key": "A",
+  "ansKey": "A",
+  "flags": [
+   "source_passage_missing_in_db 0.84"
+  ]
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - MEDIUM",
+  "pos": 22,
+  "qid": "cmsjro2bo03joqmt1ezs9707c",
+  "hex": "e2829dd7",
+  "key": "C",
+  "ansKey": "C",
+  "flags": [
+   "source_passage_missing_in_db 0.85"
+  ]
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - MEDIUM",
+  "pos": 23,
+  "qid": "cmsjro2bs03jtqmt1g3xsxv4u",
+  "hex": "5d6ab069",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - MEDIUM",
+  "pos": 24,
+  "qid": "cmsjro2bx03jyqmt1xw0nfdmw",
+  "hex": "2df730d0",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - MEDIUM",
+  "pos": 25,
+  "qid": "cmsjro2c203k3qmt125sdd4pv",
+  "hex": "1d08c7ee",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - MEDIUM",
+  "pos": 26,
+  "qid": "cmsjro2c603k8qmt1mlddbnnt",
+  "hex": "dd349efc",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - MEDIUM",
+  "pos": 27,
+  "qid": "cmsjro2cb03kdqmt1q2ameh4p",
+  "hex": "1db1a9a6",
+  "key": "B",
+  "ansKey": "B",
+  "flags": [
+   "source_passage_missing_in_db 0.84"
+  ]
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - MEDIUM",
+  "pos": 28,
+  "qid": "cmsjro2cf03kiqmt1bs26p3rj",
+  "hex": "23e2421a",
+  "key": "C",
+  "ansKey": "C",
+  "flags": [
+   "source_passage_missing_in_db 0.74"
+  ]
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - MEDIUM",
+  "pos": 29,
+  "qid": "cmsjro2ck03knqmt1zmxenabk",
+  "hex": "98fd50f2",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - MEDIUM",
+  "pos": 30,
+  "qid": "cmsjro2cp03ksqmt1td6n0n4v",
+  "hex": "fbb84fb0",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - MEDIUM",
+  "pos": 31,
+  "qid": "cmsjro2cu03kxqmt1tvmgphzu",
+  "hex": "73d457b6",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Command of Evidence - MEDIUM",
+  "pos": 32,
+  "qid": "cmsjro2cy03l2qmt1gh2cr6aq",
+  "hex": "87023f34",
+  "key": "D",
+  "ansKey": "D",
+  "flags": [
+   "option_mismatch C (0.27): src \"D. “ ” “ — What does this brazen tongue declare, /\" vs \"“It tells of many a squandered day, / Of slighted \""
+  ]
+ },
+ {
+  "set": "Information and Ideas - Inferences - EASY",
+  "pos": 1,
+  "qid": "cmsjro2z503teqmt1bydprdw8",
+  "hex": "01989d77",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - EASY",
+  "pos": 2,
+  "qid": "cmsjro2z903tjqmt16lj3q93b",
+  "hex": "4603d1f7",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - EASY",
+  "pos": 3,
+  "qid": "cmsjro2zd03toqmt1hransvrv",
+  "hex": "20000f5f",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - EASY",
+  "pos": 4,
+  "qid": "cmsjro2zh03ttqmt1cjmqhh5t",
+  "hex": "6bc0e595",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - EASY",
+  "pos": 5,
+  "qid": "cmsjro2zl03tyqmt1a7xvw8im",
+  "hex": "c4d43991",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - EASY",
+  "pos": 6,
+  "qid": "cmsjro2zo03u3qmt1wl7tzevy",
+  "hex": "dbbbc5dd",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - EASY",
+  "pos": 7,
+  "qid": "cmsjro2zs03u8qmt1l6lq0y35",
+  "hex": "8a3ecac6",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - EASY",
+  "pos": 8,
+  "qid": "cmsjro2zv03udqmt1jpgcw3e7",
+  "hex": "4025e00c",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - EASY",
+  "pos": 9,
+  "qid": "cmsjro2zz03uiqmt15ouqxw27",
+  "hex": "25893fc7",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - EASY",
+  "pos": 10,
+  "qid": "cmsjro30303unqmt1q5d9aif0",
+  "hex": "787729be",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - EASY",
+  "pos": 11,
+  "qid": "cmsjro30703usqmt1dd8f7ck5",
+  "hex": "7a895def",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - EASY",
+  "pos": 12,
+  "qid": "cmsjro30b03uxqmt1ha9am7md",
+  "hex": "9077be25",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - EASY",
+  "pos": 13,
+  "qid": "cmsjro30e03v2qmt1t8bb8ykg",
+  "hex": "5b4829d2",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - HARD",
+  "pos": 1,
+  "qid": "cmsjro30i03v7qmt1glvjrb30",
+  "hex": "f1bfbed3",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - HARD",
+  "pos": 2,
+  "qid": "cmsjro30l03vcqmt1t5yy8cei",
+  "hex": "6b8a7c74",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - HARD",
+  "pos": 3,
+  "qid": "cmsjro30p03vhqmt1y6tdx4pz",
+  "hex": "ce4448b7",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - HARD",
+  "pos": 4,
+  "qid": "cmsjro30s03vmqmt1cttk4ntm",
+  "hex": "4b3d6062",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - HARD",
+  "pos": 5,
+  "qid": "cmsjro30w03vrqmt1bf2kfuze",
+  "hex": "58e9e497",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - HARD",
+  "pos": 6,
+  "qid": "cmsjro31003vwqmt119mzxbqc",
+  "hex": "e185a21f",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - HARD",
+  "pos": 7,
+  "qid": "cmsjro31403w1qmt1cdsv7fxg",
+  "hex": "f9bd4e61",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - HARD",
+  "pos": 8,
+  "qid": "cmsjro31703w6qmt1cnj00k9h",
+  "hex": "4ba0695d",
+  "key": "C",
+  "ansKey": "C",
+  "flags": [
+   "option_mismatch C (0.75): src \"the period of interbreeding resulted in a greater \" vs \"the period of interbreeding resulted in a greater \""
+  ]
+ },
+ {
+  "set": "Information and Ideas - Inferences - HARD",
+  "pos": 9,
+  "qid": "cmsjro34e03wbqmt183gwrivo",
+  "hex": "aaddd60f",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - HARD",
+  "pos": 10,
+  "qid": "cmsjro34t03wgqmt1bm2xjy80",
+  "hex": "08395130",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - HARD",
+  "pos": 11,
+  "qid": "cmsjro34z03wlqmt1dnmjl35f",
+  "hex": "3f236877",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - HARD",
+  "pos": 12,
+  "qid": "cmsjro35203wqqmt1hckeqcvm",
+  "hex": "95dbdf51",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - HARD",
+  "pos": 13,
+  "qid": "cmsjro35603wvqmt1zbojronc",
+  "hex": "0dba14e6",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - HARD",
+  "pos": 14,
+  "qid": "cmsjro35b03x0qmt1hv16czma",
+  "hex": "a13c1c66",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - HARD",
+  "pos": 15,
+  "qid": "cmsjro35g03x5qmt1cag7td3b",
+  "hex": "f942646f",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - HARD",
+  "pos": 16,
+  "qid": "cmsjro36e03xaqmt1g08w6alr",
+  "hex": "0dccbf17",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - HARD",
+  "pos": 17,
+  "qid": "cmsjro36j03xfqmt1ay631vty",
+  "hex": "61228830",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - HARD",
+  "pos": 18,
+  "qid": "cmsjro36o03xkqmt1l7bjvv87",
+  "hex": "f27559d4",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - HARD",
+  "pos": 19,
+  "qid": "cmsjro36s03xpqmt1o9swfkqv",
+  "hex": "d1539546",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - HARD",
+  "pos": 20,
+  "qid": "cmsjro36w03xuqmt1nyb3u61i",
+  "hex": "9abc3ba5",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - HARD",
+  "pos": 21,
+  "qid": "cmsjro37003xzqmt1wivusj8w",
+  "hex": "5c7e0d62",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - HARD",
+  "pos": 22,
+  "qid": "cmsjro37403y4qmt1mhptjpg2",
+  "hex": "22b3da87",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - HARD",
+  "pos": 23,
+  "qid": "cmsjro37803y9qmt18ecvopnm",
+  "hex": "e503ae04",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - HARD",
+  "pos": 24,
+  "qid": "cmsjro37c03yeqmt1zeec3vnb",
+  "hex": "cae97f58",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - HARD",
+  "pos": 25,
+  "qid": "cmsjro37h03yjqmt1t65blora",
+  "hex": "65502c46",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - HARD",
+  "pos": 26,
+  "qid": "cmsjro37m03yoqmt1ztyhfucs",
+  "hex": "03701ef3",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - MEDIUM",
+  "pos": 1,
+  "qid": "cmsjro2sn03pdqmt1egvbcj4m",
+  "hex": "d748c3fd",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - MEDIUM",
+  "pos": 2,
+  "qid": "cmsjro2sr03piqmt1dgwluasp",
+  "hex": "db876fd5",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - MEDIUM",
+  "pos": 3,
+  "qid": "cmsjro2sx03pnqmt1wlvp43c0",
+  "hex": "55688b3c",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - MEDIUM",
+  "pos": 4,
+  "qid": "cmsjro2t203psqmt11xmdakn9",
+  "hex": "6409016a",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - MEDIUM",
+  "pos": 5,
+  "qid": "cmsjro2t703pxqmt1d6xkc9xb",
+  "hex": "5432d1de",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - MEDIUM",
+  "pos": 6,
+  "qid": "cmsjro2tb03q2qmt1lemh4d0o",
+  "hex": "3882ddf6",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - MEDIUM",
+  "pos": 7,
+  "qid": "cmsjro2tf03q7qmt1e5rnb1bq",
+  "hex": "7ae8065c",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - MEDIUM",
+  "pos": 8,
+  "qid": "cmsjro2tj03qcqmt1hp6n38yx",
+  "hex": "350e2336",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - MEDIUM",
+  "pos": 9,
+  "qid": "cmsjro2to03qhqmt129pd707i",
+  "hex": "485962a6",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - MEDIUM",
+  "pos": 10,
+  "qid": "cmsjro2tt03qmqmt1epocj5tq",
+  "hex": "d8b78a2b",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - MEDIUM",
+  "pos": 11,
+  "qid": "cmsjro2x403qrqmt1l2z6woel",
+  "hex": "299c5303",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - MEDIUM",
+  "pos": 12,
+  "qid": "cmsjro2xb03qwqmt1u3d5f8ub",
+  "hex": "cac82f9b",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Inferences - MEDIUM",
+  "pos": 13,
+  "qid": "cmsjro2xf03r1qmt17r70nnck",
+  "hex": "7afdcca2",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - EASY",
+  "pos": 1,
+  "qid": "cmsjro2xi03r6qmt1n2gss4xu",
+  "hex": "8a8236e1",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - EASY",
+  "pos": 2,
+  "qid": "cmsjro2xl03rbqmt1lbayv9vm",
+  "hex": "c228bd45",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - EASY",
+  "pos": 3,
+  "qid": "cmsjro2xp03rgqmt15e8psbax",
+  "hex": "2592e0de",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - EASY",
+  "pos": 4,
+  "qid": "cmsjro2xs03rlqmt12zegs0bk",
+  "hex": "89961e26",
+  "key": "B",
+  "ansKey": "B",
+  "flags": [
+   "option_mismatch B (0.75): src \"A sculpture of a lowrider car ñata\" vs \"A sculpture of a lowrider car\""
+  ]
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - EASY",
+  "pos": 5,
+  "qid": "cmsjro2xx03rqqmt1pdm37ugx",
+  "hex": "de0a5b4e",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - EASY",
+  "pos": 6,
+  "qid": "cmsjro2y003rvqmt1jdjal15z",
+  "hex": "6675c5c3",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - EASY",
+  "pos": 7,
+  "qid": "cmsjro2y303s0qmt1v7ph4mlr",
+  "hex": "2edd7ffe",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - EASY",
+  "pos": 8,
+  "qid": "cmsjro2y703s5qmt1reqyz116",
+  "hex": "0b696a0c",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - EASY",
+  "pos": 9,
+  "qid": "cmsjro2ya03saqmt1qixwl0zh",
+  "hex": "23a7038f",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - EASY",
+  "pos": 10,
+  "qid": "cmsjro2ye03sfqmt1yd2qthtt",
+  "hex": "7921b86b",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - EASY",
+  "pos": 11,
+  "qid": "cmsjro2yh03skqmt1gpa64zjv",
+  "hex": "dc5edbf6",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - EASY",
+  "pos": 12,
+  "qid": "cmsjro2yl03spqmt1go3f59mr",
+  "hex": "d8758c3b",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - EASY",
+  "pos": 13,
+  "qid": "cmsjro2yr03suqmt10o11ngih",
+  "hex": "0e3b4967",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - EASY",
+  "pos": 14,
+  "qid": "cmsjro2yu03szqmt1s1qb00wv",
+  "hex": "ee41d7e0",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - EASY",
+  "pos": 15,
+  "qid": "cmsjro2yy03t4qmt1bn7bj0zd",
+  "hex": "a842db60",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - EASY",
+  "pos": 16,
+  "qid": "cmsjro2z103t9qmt1e5v06efk",
+  "hex": "1e85caa9",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - HARD",
+  "pos": 1,
+  "qid": "cmsjro3yf04ggqmt18y8vfnze",
+  "hex": "ed314256",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - HARD",
+  "pos": 2,
+  "qid": "cmsjro3yi04glqmt1cj378ka1",
+  "hex": "1a2b29c9",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - HARD",
+  "pos": 3,
+  "qid": "cmsjro3yl04gqqmt15tmgxacw",
+  "hex": "2fdfe002",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - HARD",
+  "pos": 4,
+  "qid": "cmsjro3yo04gvqmt19ab9hr67",
+  "hex": "96802cc0",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - HARD",
+  "pos": 5,
+  "qid": "cmsjro3yr04h0qmt1x8qfo7xk",
+  "hex": "35b46381",
+  "key": "B",
+  "ansKey": "B",
+  "flags": [
+   "explanation_vs_rationale 0.28"
+  ]
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - HARD",
+  "pos": 6,
+  "qid": "cmsjro3yu04h3qmt1k0hmk8w8",
+  "hex": "d0fbf1ae",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - HARD",
+  "pos": 7,
+  "qid": "cmsjro3yx04h8qmt11lnx5kmr",
+  "hex": "14189fbb",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - HARD",
+  "pos": 8,
+  "qid": "cmsjro3z004hdqmt1cno8812d",
+  "hex": "4d3e3c52",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - HARD",
+  "pos": 9,
+  "qid": "cmsjro3z404hiqmt125bs4pfo",
+  "hex": "d1b8a9ad",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - HARD",
+  "pos": 10,
+  "qid": "cmsjro3z704hnqmt1hrue7ck1",
+  "hex": "e80ba20d",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - HARD",
+  "pos": 11,
+  "qid": "cmsjro3za04hsqmt1e6riykzb",
+  "hex": "16025337",
+  "key": "D",
+  "ansKey": "D",
+  "flags": [
+   "option_mismatch D (0.69): src \"The speaker is thinking about the friend instead o\" vs \"The speaker is thinking about the friend instead o\""
+  ]
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - HARD",
+  "pos": 12,
+  "qid": "cmsjro3zd04hxqmt1qhshe3a2",
+  "hex": "34c2e387",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - HARD",
+  "pos": 13,
+  "qid": "cmsjro3zi04i2qmt1ya6td4af",
+  "hex": "7812801f",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - HARD",
+  "pos": 14,
+  "qid": "cmsjro3zl04i7qmt1n6s3lqmp",
+  "hex": "5eda42a3",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - HARD",
+  "pos": 15,
+  "qid": "cmsjro40804icqmt19g2luuki",
+  "hex": "d2e0cba5",
+  "key": "C",
+  "ansKey": "C",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - HARD",
+  "pos": 16,
+  "qid": "cmsjro40c04ihqmt18415cqox",
+  "hex": "7c9a65bb",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - HARD",
+  "pos": 17,
+  "qid": "cmsjro40f04imqmt1r2igtrri",
+  "hex": "b69d821d",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - MEDIUM",
+  "pos": 1,
+  "qid": "cmsjro3wp04edqmt1rww3zed9",
+  "hex": "87aa7bab",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - MEDIUM",
+  "pos": 2,
+  "qid": "cmsjro3wy04eiqmt132550x7j",
+  "hex": "602b47c7",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - MEDIUM",
+  "pos": 3,
+  "qid": "cmsjro3x504enqmt1mqo2999g",
+  "hex": "11a9f635",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - MEDIUM",
+  "pos": 4,
+  "qid": "cmsjro3xa04esqmt13tdg0vsa",
+  "hex": "2312021b",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - MEDIUM",
+  "pos": 5,
+  "qid": "cmsjro3xf04exqmt1rkdnlmwf",
+  "hex": "e677fa6c",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - MEDIUM",
+  "pos": 6,
+  "qid": "cmsjro3xi04f2qmt1yp3n37zg",
+  "hex": "66c47028",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - MEDIUM",
+  "pos": 7,
+  "qid": "cmsjro3xm04f7qmt10mwl1w2k",
+  "hex": "b38935ab",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - MEDIUM",
+  "pos": 8,
+  "qid": "cmsjro3xp04fcqmt1aopuw03j",
+  "hex": "dc3ea63e",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - MEDIUM",
+  "pos": 9,
+  "qid": "cmsjro3xs04fhqmt1qfsqqftj",
+  "hex": "f8befe75",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - MEDIUM",
+  "pos": 10,
+  "qid": "cmsjro3xw04fmqmt1hm16snjk",
+  "hex": "3f05e40f",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - MEDIUM",
+  "pos": 11,
+  "qid": "cmsjro3xz04frqmt1u0jylfv4",
+  "hex": "659c6c1d",
+  "key": "D",
+  "ansKey": "D",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - MEDIUM",
+  "pos": 12,
+  "qid": "cmsjro3y204fwqmt16m4auigg",
+  "hex": "adbcbce0",
+  "key": "B",
+  "ansKey": "B",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - MEDIUM",
+  "pos": 13,
+  "qid": "cmsjro3y604g1qmt1deeyfsk0",
+  "hex": "95146ebb",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - MEDIUM",
+  "pos": 14,
+  "qid": "cmsjro3y904g6qmt18clxugq1",
+  "hex": "409058ee",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ },
+ {
+  "set": "Information and Ideas - Main Ideas and Details - MEDIUM",
+  "pos": 15,
+  "qid": "cmsjro3yc04gbqmt17p964ssy",
+  "hex": "923ebfe3",
+  "key": "A",
+  "ansKey": "A",
+  "flags": []
+ }
+]
