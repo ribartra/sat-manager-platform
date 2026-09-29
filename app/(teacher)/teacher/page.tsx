@@ -49,13 +49,15 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
   const search = params.q?.trim() ?? "";
   const area = activeAreaTab(params.area, "math");
   const practiceArea = practiceAreaFromTab(area);
-  const teacherGroupManagementEnabled =
-    session?.user.role === "ADMIN" || (await getFeatureSetting("TEACHER_GROUP_MANAGEMENT"));
+  // Groups are optional (Admin → Settings, off by default): hide every Group control while off, for admins too.
+  const teacherGroupManagementEnabled = await getFeatureSetting("TEACHER_GROUP_MANAGEMENT");
   const groupId = teacherGroupManagementEnabled ? params.group || "" : "";
   const topicId = params.topic || "";
   const difficulty = params.difficulty || "";
   const fromDate = parseDateParam(params.incorporatedFrom ?? params.from);
-  const toDate = parseDateParam(params.incorporatedTo ?? params.to, true);
+  // Open-ended unless Admin → Settings → "Show 'to' date in time filters" is on.
+  const showEndDate = await getFeatureSetting("TIME_FILTER_END_DATE");
+  const toDate = showEndDate ? parseDateParam(params.incorporatedTo ?? params.to, true) : undefined;
   const practiceSetFilter = {
     ...(topicId ? { topicId } : {}),
     ...(difficulty ? { difficulty } : {}),
@@ -265,7 +267,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
       <PracticeAreaTabs
         basePath="/teacher"
         active={area}
-        preserve={{ q: search, group: groupId, topic: topicId, difficulty, incorporatedFrom: params.incorporatedFrom ?? params.from, incorporatedTo: params.incorporatedTo ?? params.to }}
+        preserve={{ q: search, group: groupId, topic: topicId, difficulty, incorporatedFrom: params.incorporatedFrom ?? params.from, incorporatedTo: showEndDate ? params.incorporatedTo ?? params.to : undefined }}
       />
 
       <Card as="form" padding="sm" className="flex flex-wrap items-end gap-x-3 gap-y-2">
@@ -316,10 +318,12 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
           Start date from
           <input name="incorporatedFrom" type="date" defaultValue={params.incorporatedFrom || params.from || ""} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900" />
         </label>
+{showEndDate && (
         <label className="min-w-[7.5rem] flex-1 text-xs font-medium text-gray-600">
           Start date to
           <input name="incorporatedTo" type="date" defaultValue={params.incorporatedTo || params.to || ""} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900" />
         </label>
+        )}
         <div className="flex items-center gap-2">
           <button type="submit" title="Search, group and start date choose which students are listed; skill and difficulty change the scores shown." className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700">
             Apply

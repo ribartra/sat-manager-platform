@@ -47,7 +47,7 @@ async function assertSourcePatterns() {
     },
     {
       file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
-      requires: ["PracticeAreaTabs", "practiceArea", 'area === "mocks"', "activeAreaTab"],
+      requires: ["PracticeAreaTabs", "practiceAreaFromTab", "loadMockReport", "activeAreaTab"],
       label: "View Student con 4 tabs y filtro por área",
     },
     {
@@ -62,8 +62,8 @@ async function assertSourcePatterns() {
     },
     {
       file: "app/api/reports/students/[studentId]/pdf/route.ts",
-      requires: ["practiceAreaFromReportArea", "Full Practice Tests", "attempt"],
-      label: "PDF separa Practice areas y Full Practice Tests",
+      requires: ["PRACTICE_AREA", "Full Practice Tests", "loadPracticeReport", "loadMockReport"],
+      label: "PDF separa Practice areas y Full Practice Tests (una seccion por area)",
     },
     {
       file: "prisma/seed-taxonomy.ts",

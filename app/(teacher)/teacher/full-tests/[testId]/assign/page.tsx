@@ -11,8 +11,8 @@ interface PageProps { params: Promise<{ testId: string }> }
 export default async function AssignFullTestPage({ params }: PageProps) {
   const { testId } = await params;
   const session = await auth();
-  const teacherGroupManagementEnabled =
-    session?.user.role === "ADMIN" || (await getFeatureSetting("TEACHER_GROUP_MANAGEMENT"));
+  // Groups are optional (Admin → Settings, off by default): hide every Group control while off, for admins too.
+  const teacherGroupManagementEnabled = await getFeatureSetting("TEACHER_GROUP_MANAGEMENT");
 
   const [test, students, groups] = await Promise.all([
     prisma.fullPracticeTest.findUnique({ where: { id: testId } }),

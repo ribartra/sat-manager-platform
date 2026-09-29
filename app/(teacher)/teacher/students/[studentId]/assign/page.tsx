@@ -20,8 +20,8 @@ export default async function AssignPage({ params, searchParams }: PageProps) {
   const initialArea = ["math", "reading", "writing"].includes(query.area ?? "") ? query.area as "math" | "reading" | "writing" : "all";
   const session = await auth();
   const now = new Date();
-  const teacherGroupManagementEnabled =
-    session?.user.role === "ADMIN" || (await getFeatureSetting("TEACHER_GROUP_MANAGEMENT"));
+  // Groups are optional (Admin → Settings, off by default): hide every Group control while off, for admins too.
+  const teacherGroupManagementEnabled = await getFeatureSetting("TEACHER_GROUP_MANAGEMENT");
   const studentWhere = session
     ? studentAccessWhereFor(session.user, now)
     : { role: "STUDENT", active: true, validationStatus: "APPROVED" };

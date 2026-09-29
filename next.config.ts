@@ -15,6 +15,8 @@ const nextConfig: NextConfig = {
       "base-uri 'self'",
       "frame-ancestors 'self'",
       "object-src 'none'",
+      // Report preview iframe loads the same-origin PDF endpoint.
+      "frame-src 'self'",
       "img-src 'self' data: blob:",
       "font-src 'self' data:",
       "style-src 'self' 'unsafe-inline'",
@@ -25,9 +27,14 @@ const nextConfig: NextConfig = {
 
     return [
       {
+        // Document CSP for every page. PDF reports are excluded: a CSP on the PDF response
+        // (object-src 'none') makes Chrome refuse to show it in the preview iframe.
+        source: "/((?!api/reports/).*)",
+        headers: [{ key: "Content-Security-Policy", value: csp }],
+      },
+      {
         source: "/:path*",
         headers: [
-          { key: "Content-Security-Policy", value: csp },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
@@ -42,6 +49,8 @@ const nextConfig: NextConfig = {
     "@prisma/client",
     "bcryptjs",
     "@google-cloud/storage",
+    // Server-side PDF reports (lib/pdf/*): keep the renderer and its native-ish deps out of the bundle.
+    "@react-pdf/renderer",
   ],
   async rewrites() {
     // Serve question media via Node handler (GCS + disk fallback). Public/ still

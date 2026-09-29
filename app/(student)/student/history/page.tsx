@@ -2,25 +2,27 @@ import { PageShell, PracticeAreaTabs } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
-import { formatDate, formatTime, scorePercent } from "@/lib/utils";
+import { formatDate, formatTime } from "@/lib/utils";
 import { scoreBandTextClass } from "@/lib/score-band";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { difficultyOptions } from "@/lib/domain-meta";
+import { ProgressFilters } from "@/components/progress-filters";
 import {
-  activeAreaTab,
   practiceAreaFromTab,
   practiceAreaLabel,
   practiceAreaTopicWhere,
 } from "@/lib/practice-area";
 import { classifyPracticeSetArea, practiceSetAreaLabel } from "@/lib/parent-access";
-import { DifficultyAccuracyChart, TopicDifficultyChart } from "@/components/progress-charts";
+import { PerformanceBreakdown } from "@/components/performance-breakdown";
 import { TopicDifficultyTrend } from "@/components/topic-difficulty-trend";
+import { summarizeAllQuestionAnswers } from "@/lib/weighted-score";
 import {
   aggregateDifficultyMetrics,
   aggregateTopicDifficultyMetrics,
   aggregateTopicDifficultyTrend,
 } from "@/lib/progress-analytics";
+import { buildProgressHref, progressDateWhere, progressFiltersFromParams } from "@/lib/progress-filters";
+import { applyTimeFilterSetting } from "@/lib/time-filters";
 
 interface PageProps {
   searchParams: Promise<{
@@ -32,31 +34,25 @@ interface PageProps {
   }>;
 }
 
-function parseDateParam(value?: string, endOfDay = false) {
-  if (!value) return undefined;
-  const date = new Date(`${value}T${endOfDay ? "23:59:59.999" : "00:00:00.000"}`);
-  return Number.isNaN(date.getTime()) ? undefined : date;
-}
+type HistoryQuestionRow = {
+  topicId: string;
+  topicName: string;
+  difficulty: string;
+  answer: string | null;
+  isCorrect: boolean;
+  attemptId: string;
+};
 
 export default async function StudentHistoryPage({ searchParams }: PageProps) {
   const session = await auth();
   const userId = session!.user.id;
   const params = await searchParams;
-  const area = activeAreaTab(params.area, "math");
+  const { filters, showEndDate } = await applyTimeFilterSetting(progressFiltersFromParams(params));
+  const area = filters.area;
   const practiceArea = practiceAreaFromTab(area);
-  const topicId = params.topic || "";
-  const difficulty = params.difficulty || "";
-  const fromDate = parseDateParam(params.from);
-  const toDate = parseDateParam(params.to, true);
-  const dateFilter =
-    fromDate || toDate
-      ? {
-          submittedAt: {
-            ...(fromDate ? { gte: fromDate } : {}),
-            ...(toDate ? { lte: toDate } : {}),
-          },
-        }
-      : {};
+  const topicId = filters.topic || "";
+  const difficulty = filters.difficulty || "";
+  const dateFilter = progressDateWhere(filters);
 
   if (area === "mocks") {
     const examAttempts = await prisma.fullPracticeTestAttempt.findMany({
@@ -72,26 +68,8 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
     return (
       <PageShell width="wide" density="compact" className="space-y-4">
         <h1 className="text-2xl font-semibold text-gray-900">My History</h1>
-        <PracticeAreaTabs basePath="/student/history" active={area} preserve={{ from: params.from, to: params.to }} />
-        <Card as="form" padding="sm" className="grid gap-3 md:grid-cols-3">
-          <input type="hidden" name="area" value={area} />
-          <label className="text-xs font-medium text-gray-600">
-            From
-            <input name="from" type="date" defaultValue={params.from || ""} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900" />
-          </label>
-          <label className="text-xs font-medium text-gray-600">
-            To
-            <input name="to" type="date" defaultValue={params.to || ""} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900" />
-          </label>
-          <div className="flex items-end gap-2">
-            <button type="submit" className="rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700">
-              Apply filters
-            </button>
-            <Link href="/student/history?area=mocks" className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-              Clear
-            </Link>
-          </div>
-        </Card>
+        <PracticeAreaTabs basePath="/student/history" active={area} preserve={{ difficulty: filters.difficulty, from: filters.from, to: filters.to }} />
+        <ProgressFilters action="/student/history" filters={filters} topics={[]} showEndDate={showEndDate} />
 
         <Card className="overflow-hidden">
           <table className="w-full text-sm">
@@ -110,7 +88,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
                 <tr>
                   <td colSpan={6} className="px-4 py-12 text-center text-gray-500">
                     <p>No completed Full Practice Tests match the current filters.</p>
-                    <Link href="/student/content-map?area=mocks" className="mt-2 inline-block text-sm text-blue-600 hover:underline">
+                    <Link href={buildProgressHref("/student/content-map", filters)} className="mt-2 inline-block text-sm text-blue-600 hover:underline">
                       View assigned exams →
                     </Link>
                   </td>
@@ -128,7 +106,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
                       {exam.totalScore ?? "—"}
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <Link href={`/student/full-tests/results/${exam.id}`} className="text-xs text-blue-600 hover:underline">
+                    <Link href={buildProgressHref(`/student/full-tests/results/${exam.id}`, filters)} className="text-xs text-blue-600 hover:underline">
                         Review
                       </Link>
                     </td>
@@ -153,27 +131,16 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
             ...(practiceArea ? { topic: { domain: { practiceArea } } } : {}),
           },
         },
-        // Filters apply at the QUESTION level (the dimension every chart aggregates on),
-        // not the practice-set level — otherwise picking a difficulty/topic never filters.
-        ...(topicId || difficulty
-          ? {
-              answers: {
-                some: {
-                  question: {
-                    ...(topicId ? { topicId } : {}),
-                    ...(difficulty ? { difficulty } : {}),
-                  },
-                },
-              },
-            }
-          : {}),
       },
       include: {
         answers: { include: { question: { select: { difficulty: true, topicId: true, topic: { select: { id: true, name: true } } } } } },
         assignment: {
           include: {
             practiceSet: {
-              include: { topic: { include: { domain: { include: { section: true } } } } },
+              include: {
+                topic: { include: { domain: { include: { section: true } } } },
+                questions: { include: { question: { select: { topicId: true, difficulty: true, topic: { select: { id: true, name: true } } } } } },
+              },
             },
           },
         },
@@ -187,52 +154,56 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
     }),
   ]);
 
-  // Selected filters apply per answer, at the question level (consistent with the charts).
-  const answerMatchesFilters = (answer: (typeof attempts)[number]["answers"][number]) =>
-    (!difficulty || answer.question.difficulty === difficulty) &&
-    (!topicId || answer.question.topicId === topicId);
-
-  // Per-question rows for every chart/stat — already narrowed to the selected difficulty/topic.
-  const progressRows = attempts.flatMap((attempt) =>
-    attempt.answers.filter(answerMatchesFilters).map((answer) => ({
-      topic: answer.question.topic.name,
-      difficulty: answer.question.difficulty,
-      correct: Boolean(answer.isCorrect),
-      timeSeconds: answer.timeSpent ?? 0,
+  const buildQuestionRows = (attempt: (typeof attempts)[number]): HistoryQuestionRow[] => {
+    const answersByQuestion = new Map(attempt.answers.map((answer) => [answer.questionId, answer]));
+    const practiceQuestions = attempt.assignment?.practiceSet.questions ?? [];
+    const questionSources = practiceQuestions.length
+      ? practiceQuestions.map((item) => ({ question: item.question, answer: answersByQuestion.get(item.questionId) }))
+      : attempt.answers.map((answer) => ({ question: answer.question, answer }));
+    return questionSources.map(({ question, answer }) => ({
+      topicId: question.topicId,
+      topicName: question.topic.name,
+      difficulty: question.difficulty,
+      answer: answer?.answer ?? null,
+      isCorrect: answer?.isCorrect === true,
       attemptId: attempt.id,
-    })),
-  );
+    }));
+  };
+  const questionRowsByAttempt = attempts.map(buildQuestionRows);
+  const questionMatchesFilters = (row: HistoryQuestionRow) =>
+    (!difficulty || row.difficulty === difficulty) &&
+    (!topicId || row.topicId === topicId);
+  const matchingQuestionRows = questionRowsByAttempt.map((rows) => rows.filter(questionMatchesFilters));
+  const scoredAttempts = attempts.map((a, index) => {
+    const rows = matchingQuestionRows[index] ?? [];
+    const score = summarizeAllQuestionAnswers(rows);
+    return { attempt: a, correct: score.correct, total: score.total, pct: score.percent, elapsedTime: a.totalTime ?? 0 };
+  });
+  const visibleAttempts = scoredAttempts;
+  const attemptDetailById = new Map(scoredAttempts.map(({ attempt }) => [attempt.id, attempt]));
+  const progressRows = matchingQuestionRows.flatMap((rows) => rows.map((row) => {
+    const attempt = attemptDetailById.get(row.attemptId);
+    return {
+      topic: row.topicName,
+      difficulty: row.difficulty,
+      correct: row.isCorrect,
+      attemptId: row.attemptId,
+      attemptLabel: attempt?.assignment?.practiceSet.name ?? "Practice set",
+      submittedAt: attempt?.submittedAt ?? null,
+    };
+  }));
   const difficultyMetrics = aggregateDifficultyMetrics(progressRows);
   const topicDifficultyMetrics = aggregateTopicDifficultyMetrics(progressRows);
 
-  // "Progress by skill" grouped by the QUESTION topic (so it honors the topic filter),
-  // not the practice-set topic as before.
-  const topicStats: Record<string, { name: string; correct: number; total: number; attemptIds: Set<string> }> = {};
-  attempts.forEach((a) => {
-    a.answers.filter(answerMatchesFilters).forEach((ans) => {
-      const topic = ans.question.topic;
-      if (!topicStats[topic.id]) topicStats[topic.id] = { name: topic.name, correct: 0, total: 0, attemptIds: new Set() };
-      topicStats[topic.id].total += 1;
-      if (ans.isCorrect) topicStats[topic.id].correct += 1;
-      topicStats[topic.id].attemptIds.add(a.id);
-    });
-  });
-
-  // History table + "Latest score" keep the FULL per-attempt score (a submission log).
-  const scoredAttempts = attempts.map((a) => {
-    const correct = a.answers.filter((ans) => ans.isCorrect).length;
-    const total = a.answers.length;
-    const pct = typeof a.scorePercent === "number" ? a.scorePercent : scorePercent(correct, total);
-    return { attempt: a, correct, total, pct };
-  });
-
   // Headline accuracy is question-weighted over the filtered rows, so it reflects the selection.
-  const answeredTotal = progressRows.length;
-  const answeredCorrect = progressRows.filter((row) => row.correct).length;
-  const avgPct = answeredTotal > 0 ? Math.round((answeredCorrect / answeredTotal) * 100) : null;
+  const totalQuestions = progressRows.length;
+  const correctQuestions = progressRows.filter((row) => row.correct).length;
+  const avgPct = totalQuestions > 0 ? Math.round((correctQuestions / totalQuestions) * 100) : null;
 
-  // Per-difficulty progression (fixes the "everything merges into one line"): 3 lines per attempt.
+  // Build a per-attempt trend only after both topic and difficulty filters are selected.
+  const trendAttemptIds = new Set(progressRows.map((row) => row.attemptId));
   const trendAttempts = [...scoredAttempts]
+    .filter(({ attempt: a }) => trendAttemptIds.has(a.id))
     .map(({ attempt: a }) => ({
       id: a.id,
       label: a.assignment?.practiceSet.name ?? "Practice set",
@@ -244,7 +215,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
   );
   const trendTopics = Object.keys(topicTrend);
 
-  const historyRows = scoredAttempts.map(({ attempt: a, correct, total, pct }) => {
+  const historyRows = visibleAttempts.map(({ attempt: a, correct, total, pct, elapsedTime }) => {
     const ps = a.assignment?.practiceSet;
     const areaLabel = ps
       ? practiceSetAreaLabel(
@@ -257,7 +228,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
         )
       : null;
 
-    return { a, correct, total, pct, ps, areaLabel };
+    return { a, correct, total, pct, elapsedTime, ps, areaLabel };
   });
 
   return (
@@ -267,63 +238,19 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
           <h1 className="text-2xl font-semibold text-gray-900">My History</h1>
           <p className="mt-0.5 text-sm text-gray-500">Review your {practiceAreaLabel(practiceArea).toLowerCase()} practice and find your next focus area.</p>
         </div>
-        <p className="text-xs text-gray-500">{attempts.length} completed set{attempts.length === 1 ? "" : "s"}</p>
+        <p className="text-xs text-gray-500">{visibleAttempts.length} completed set{visibleAttempts.length === 1 ? "" : "s"}</p>
       </header>
-      <PracticeAreaTabs
+        <PracticeAreaTabs
         basePath="/student/history"
         active={area}
-        preserve={{ difficulty: difficulty || undefined, from: params.from, to: params.to }}
+        preserve={{ difficulty: filters.difficulty, from: filters.from, to: filters.to }}
       />
+      <ProgressFilters action="/student/history" filters={filters} topics={topics} showEndDate={showEndDate} />
 
-      <Card as="form" padding="sm" className="space-y-3">
-        <input type="hidden" name="area" value={area} />
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <label className="text-xs font-medium text-gray-600">
-            Topic
-            <select name="topic" defaultValue={topicId} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900">
-              <option value="">All topics</option>
-              {topics.map((topic) => (
-                <option key={topic.id} value={topic.id}>
-                  {topic.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="text-xs font-medium text-gray-600">
-            Difficulty
-            <select name="difficulty" defaultValue={difficulty} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900">
-              <option value="">All levels</option>
-              {difficultyOptions().map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="text-xs font-medium text-gray-600">
-            From
-            <input name="from" type="date" defaultValue={params.from || ""} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900" />
-          </label>
-          <label className="text-xs font-medium text-gray-600">
-            To
-            <input name="to" type="date" defaultValue={params.to || ""} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900" />
-          </label>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <button type="submit" className="rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700">
-            Apply filters
-          </button>
-          <Link href={`/student/history?area=${area}`} className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-            Clear
-          </Link>
-          <span className="text-xs text-gray-500">Filters apply per question (difficulty and skill).</span>
-        </div>
-      </Card>
-
-      {attempts.length === 0 ? (
+      {visibleAttempts.length === 0 ? (
         <Card padding="lg" className="py-14 text-center text-gray-500">
           <p>No completed {practiceAreaLabel(practiceArea).toLowerCase()} practice sets match the current filters.</p>
-          <Link href="/student/content-map" className="mt-2 inline-block text-sm text-blue-600 hover:underline">
+          <Link href={buildProgressHref("/student/content-map", filters)} className="mt-2 inline-block text-sm text-blue-600 hover:underline">
             Browse Content Map →
           </Link>
         </Card>
@@ -332,63 +259,44 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
           {/* Row 1 — key stats (full width) */}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             <Card padding="sm">
-              <p className="text-xs text-gray-500">Average accuracy</p>
+              <p className="text-xs text-gray-500">Average score</p>
               <p className={`mt-1 text-2xl font-semibold ${scoreBandTextClass(avgPct)}`}>{avgPct !== null ? `${avgPct}%` : "—"}</p>
               <p className="mt-0.5 text-xs text-gray-500">
-                {answeredCorrect}/{answeredTotal} answered question{answeredTotal === 1 ? "" : "s"}
+                {correctQuestions} correct of {totalQuestions} questions
                 {difficulty ? ` · ${difficulty.toLowerCase()}` : ""}
               </p>
             </Card>
             <Card padding="sm">
               <p className="text-xs text-gray-500">Completed</p>
-              <p className="mt-1 text-2xl font-semibold text-gray-900">{scoredAttempts.length}</p>
-              <p className="mt-0.5 text-xs text-gray-500">Practice set{scoredAttempts.length === 1 ? "" : "s"}</p>
+                <p className="mt-1 text-2xl font-semibold text-gray-900">{visibleAttempts.length}</p>
+                <p className="mt-0.5 text-xs text-gray-500">Practice set{visibleAttempts.length === 1 ? "" : "s"}</p>
             </Card>
             <Card padding="sm" className="col-span-2 sm:col-span-1">
               <p className="text-xs text-gray-500">Latest score</p>
               <p className={`mt-1 text-2xl font-semibold ${scoreBandTextClass(historyRows[0]?.pct ?? null)}`}>
-                {historyRows[0] ? `${historyRows[0].pct}%` : "—"}
+                {!historyRows[0] ? "—" : historyRows[0].pct === null ? "No answers" : `${historyRows[0].pct}%`}
               </p>
               <p className="mt-0.5 text-xs text-gray-500">Most recent submission</p>
             </Card>
           </div>
 
-          {/* Row 2 — average by difficulty + progress by skill */}
-          <div className="grid gap-4 lg:grid-cols-2">
-            <DifficultyAccuracyChart metrics={difficultyMetrics} area={area} />
-            <section className="min-w-0 rounded-md border border-gray-200 bg-white p-4 shadow-sm">
-              <div className="mb-4">
-                <h2 className="text-sm font-semibold text-gray-900">Progress by skill</h2>
-                <p className="mt-1 text-xs text-gray-500">Accuracy across your submitted answers</p>
-              </div>
-              <div className="grid max-h-80 gap-x-4 gap-y-3 overflow-y-auto pr-1 sm:grid-cols-2">
-                {Object.values(topicStats).map((ts) => {
-                  const avg = Math.round((ts.correct / ts.total) * 100);
-                  return (
-                    <div key={ts.name} className="min-w-0">
-                      <div className="mb-1 flex items-center justify-between gap-2">
-                        <span className="truncate text-xs font-medium text-gray-700" title={ts.name}>{ts.name}</span>
-                        <span className={`shrink-0 text-xs font-semibold ${scoreBandTextClass(avg)}`}>{avg}%</span>
-                      </div>
-                      <div className="h-1.5 w-full rounded-full bg-gray-100">
-                        <div className="h-full rounded-full bg-slate-400" style={{ width: `${avg}%` }} />
-                      </div>
-                      <p className="mt-1 text-xs text-gray-500">
-                        {ts.attemptIds.size} attempt{ts.attemptIds.size !== 1 ? "s" : ""}
-                      </p>
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
-          </div>
-
-          {/* Row 3 — progress by topic and difficulty (full width: tabular data needs room) */}
-          <TopicDifficultyChart metrics={topicDifficultyMetrics} area={area} />
+          <PerformanceBreakdown
+            title="Performance by skill and difficulty"
+            rowLabel="Skill"
+            dimensionLabel="difficulty"
+            dimensions={difficulty ? [difficulty] : ["EASY", "MEDIUM", "HARD"]}
+            summaryMetrics={difficultyMetrics}
+            detailMetrics={topicDifficultyMetrics}
+          />
 
           {/* Row 4 — progression by difficulty over time (full width) */}
-          {trendTopics.length > 0 && scoredAttempts.length > 1 && (
-            <TopicDifficultyTrend topics={trendTopics} pointsByTopic={topicTrend} />
+          {topicId && difficulty && trendTopics.length > 0 && trendAttempts.length > 0 && (
+            <TopicDifficultyTrend
+              topics={trendTopics}
+              pointsByTopic={topicTrend}
+              selectedTopic={topics.find((topic) => topic.id === topicId)?.name ?? trendTopics[0]}
+              selectedDifficulty={difficulty}
+            />
           )}
 
           <section aria-labelledby="history-results-heading">
@@ -407,13 +315,13 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
                       <th className="px-4 py-3 text-left font-medium text-gray-500">Date</th>
                       <th className="px-4 py-3 text-left font-medium text-gray-500">Practice Set</th>
                       <th className="px-4 py-3 text-right font-medium text-gray-500">Score</th>
-                      <th className="px-4 py-3 text-right font-medium text-gray-500">Time</th>
+                      <th className="px-4 py-3 text-right font-medium text-gray-500">Elapsed</th>
                       <th className="px-4 py-3 text-right font-medium text-gray-500">#</th>
                       <th className="px-4 py-3" />
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                    {historyRows.map(({ a, correct, total, pct, ps, areaLabel }) => (
+                    {historyRows.map(({ a, correct, total, pct, elapsedTime, ps, areaLabel }) => (
                       <tr key={a.id} className="hover:bg-gray-50">
                         <td className="whitespace-nowrap px-4 py-3 text-gray-500">
                           {a.submittedAt ? formatDate(a.submittedAt) : "—"}
@@ -427,13 +335,15 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
                           </p>
                         </td>
                         <td className="px-4 py-3 text-right">
-                          <span className="font-medium text-gray-900">{correct}/{total}</span>
-                          <span className={`ml-2 text-xs font-semibold ${scoreBandTextClass(pct)}`}>{pct}%</span>
+                          <>
+                            <span className="font-medium text-gray-900">{correct} correct of {total} questions</span>
+                            <span className={`ml-2 text-xs font-semibold ${scoreBandTextClass(pct)}`}>{pct}%</span>
+                          </>
                         </td>
-                        <td className="px-4 py-3 text-right text-gray-500">{a.totalTime ? formatTime(a.totalTime) : "—"}</td>
+                        <td className="px-4 py-3 text-right text-gray-500">{formatTime(elapsedTime)}</td>
                         <td className="px-4 py-3 text-right"><Badge variant="default">#{a.attemptNumber}</Badge></td>
                         <td className="px-4 py-3 text-right">
-                          <Link href={`/student/results/${a.id}`} className="text-xs text-blue-600 hover:underline">Review</Link>
+                          <Link href={buildProgressHref(`/student/results/${a.id}`, filters)} className="text-xs text-blue-600 hover:underline">Review</Link>
                         </td>
                       </tr>
                     ))}
@@ -443,7 +353,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
             </div>
 
             <div className="space-y-2 md:hidden">
-              {historyRows.map(({ a, correct, total, pct, ps, areaLabel }) => (
+              {historyRows.map(({ a, correct, total, pct, elapsedTime, ps, areaLabel }) => (
                 <Card key={a.id} padding="sm">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -454,13 +364,13 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
                         {ps?.difficulty ? ` · ${ps.difficulty}` : ""}
                       </p>
                     </div>
-                    <span className={`shrink-0 text-sm font-semibold ${scoreBandTextClass(pct)}`}>{pct}%</span>
+                    <span className={`shrink-0 text-sm font-semibold ${scoreBandTextClass(pct)}`}>{pct === null ? "No answers" : `${pct}%`}</span>
                   </div>
                   <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-gray-100 pt-2 text-xs text-gray-500">
                     <span>{a.submittedAt ? formatDate(a.submittedAt) : "—"}</span>
-                    <span>{correct}/{total} correct · {a.totalTime ? formatTime(a.totalTime) : "—"}</span>
+                    <span>{correct} correct of {total} questions · {formatTime(elapsedTime)}</span>
                     <Badge variant="default">#{a.attemptNumber}</Badge>
-                    <Link href={`/student/results/${a.id}`} className="font-medium text-blue-600 hover:underline">Review</Link>
+                    <Link href={buildProgressHref(`/student/results/${a.id}`, filters)} className="font-medium text-blue-600 hover:underline">Review</Link>
                   </div>
                 </Card>
               ))}

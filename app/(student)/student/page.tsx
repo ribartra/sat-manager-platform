@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { formatDate, scorePercent } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 import { scoreBandTextClass } from "@/lib/score-band";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody } from "@/components/ui/card";
@@ -16,11 +16,15 @@ import {
   practiceAreaFromTab,
   practiceAreaLabel,
 } from "@/lib/practice-area";
+import { isAnsweredAnswer, summarizeAllQuestionAnswers } from "@/lib/weighted-score";
+import { ProgressFilters } from "@/components/progress-filters";
+import { buildProgressHref, progressDateWhere, progressFiltersFromParams } from "@/lib/progress-filters";
+import { applyTimeFilterSetting } from "@/lib/time-filters";
 
 export const dynamic = "force-dynamic";
 
 interface PageProps {
-  searchParams: Promise<{ area?: string }>;
+  searchParams: Promise<{ area?: string; topic?: string; difficulty?: string; from?: string; to?: string }>;
 }
 
 export default async function StudentDashboard({ searchParams }: PageProps) {
@@ -34,10 +38,22 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
   }
 
   const query = await searchParams;
-  const area = activeAreaTab(query.area, "math");
+  const { filters, showEndDate } = await applyTimeFilterSetting(progressFiltersFromParams(query));
+  const area = activeAreaTab(filters.area, filters.area);
   const practiceArea = practiceAreaFromTab(area);
   const isMocks = area === "mocks";
+  const topicId = filters.topic ?? "";
+  const difficulty = filters.difficulty ?? "";
+  const dateFilter = progressDateWhere(filters);
   const areaLabel = isMocks ? "Full Practice Tests" : practiceAreaLabel(practiceArea);
+
+  const topics = practiceArea
+    ? await prisma.topic.findMany({
+        where: { domain: { practiceArea } },
+        select: { id: true, name: true },
+        orderBy: { name: "asc" },
+      })
+    : [];
 
   // Guard: only students without an active enrollment land on /student/program
   if (session!.user.role === "STUDENT") {
@@ -57,7 +73,7 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
     if (!activeEnrollment) redirect("/student/program");
   }
 
-  const [assignments, examAssignments, recentAttempts, stats, examCompletedCount, pendingExamCount] =
+  const [assignments, examAssignments, recentAttempts, scoreAnswers, stats, examCompletedCount, pendingExamCount] =
     await Promise.all([
       !isMocks && practiceArea
         ? prisma.assignment.findMany({
@@ -66,7 +82,10 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
               locked: false,
               status: { in: ["PENDING", "IN_PROGRESS", "OVERDUE"] },
               OR: [{ unlockAt: null }, { unlockAt: { lte: new Date() } }],
-              practiceSet: { topic: { domain: { practiceArea } } },
+              practiceSet: {
+                topic: { domain: { practiceArea }, ...(topicId ? { id: topicId } : {}) },
+                ...(difficulty ? { difficulty } : {}),
+              },
             },
             include: {
               practiceSet: { include: { topic: { include: { domain: { include: { section: true } } } } } },
@@ -94,10 +113,16 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
             where: {
               studentId: userId,
               status: "SUBMITTED",
-              assignment: { practiceSet: { topic: { domain: { practiceArea } } } },
+              ...dateFilter,
+              assignment: {
+                practiceSet: {
+                  topic: { domain: { practiceArea }, ...(topicId ? { id: topicId } : {}) },
+                  ...(difficulty ? { difficulty } : {}),
+                },
+              },
             },
             include: {
-              answers: true,
+              answers: { include: { question: { select: { topicId: true, difficulty: true } } } },
               assignment: { include: { practiceSet: { include: { topic: true } } } },
             },
             orderBy: { submittedAt: "desc" },
@@ -105,17 +130,41 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
           })
         : Promise.resolve([]),
       !isMocks && practiceArea
+        ? prisma.attemptAnswer.findMany({
+            where: {
+              attempt: {
+                studentId: userId,
+                status: "SUBMITTED",
+                ...dateFilter,
+                assignment: {
+                  practiceSet: {
+                    topic: { domain: { practiceArea }, ...(topicId ? { id: topicId } : {}) },
+                    ...(difficulty ? { difficulty } : {}),
+                  },
+                },
+              },
+            },
+            select: { answer: true, isCorrect: true, question: { select: { topicId: true, difficulty: true } } },
+          })
+        : Promise.resolve([]),
+      !isMocks && practiceArea
         ? prisma.attempt.aggregate({
             where: {
               studentId: userId,
               status: "SUBMITTED",
-              assignment: { practiceSet: { topic: { domain: { practiceArea } } } },
+              ...dateFilter,
+              assignment: {
+                practiceSet: {
+                  topic: { domain: { practiceArea }, ...(topicId ? { id: topicId } : {}) },
+                  ...(difficulty ? { difficulty } : {}),
+                },
+              },
             },
             _count: { id: true },
           })
         : Promise.resolve({ _count: { id: 0 } }),
       isMocks
-        ? prisma.fullPracticeTestAttempt.count({ where: { studentId: userId, status: "SUBMITTED" } })
+        ? prisma.fullPracticeTestAttempt.count({ where: { studentId: userId, status: "SUBMITTED", ...dateFilter } })
         : Promise.resolve(0),
       prisma.fullPracticeTestAssignment.count({
         where: { studentId: userId, status: { in: ["PENDING", "IN_PROGRESS", "OVERDUE"] } },
@@ -123,18 +172,11 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
     ]);
 
   const totalSets = stats._count.id;
-  const avgScore =
-    recentAttempts.length > 0
-      ? Math.round(
-          recentAttempts.reduce((sum, a) => {
-            const correct = a.answers.filter((ans) => ans.isCorrect).length;
-            const total = a.answers.length;
-            return sum + (total > 0 ? correct / total : 0);
-          }, 0) /
-            recentAttempts.length *
-            100
-        )
-      : null;
+  const filteredScoreAnswers = scoreAnswers.filter((answer) =>
+    (!topicId || answer.question.topicId === topicId) &&
+    (!difficulty || answer.question.difficulty === difficulty),
+  );
+  const avgScore = summarizeAllQuestionAnswers(filteredScoreAnswers).percent;
 
   return (
     <PageShell>
@@ -145,12 +187,13 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
         <p className="mt-0.5 text-sm text-gray-500">Here&apos;s your practice overview</p>
       </div>
 
-      <PracticeAreaTabs basePath="/student" active={area} />
+      <PracticeAreaTabs basePath="/student" active={area} preserve={{ difficulty: filters.difficulty, from: filters.from, to: filters.to }} />
+      <ProgressFilters action="/student" filters={filters} topics={topics} showEndDate={showEndDate} />
 
       {!isMocks && pendingExamCount > 0 && (
         <div className="mb-4 rounded-md border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-900">
           {pendingExamCount} active Full Practice Test{pendingExamCount === 1 ? "" : "s"} assigned.{" "}
-          <Link href="/student?area=mocks" className="font-medium underline">
+          <Link href={buildProgressHref("/student", { ...filters, area: "mocks" })} className="font-medium underline">
             Open Full Practice Tests tab →
           </Link>
         </div>
@@ -186,7 +229,7 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
           <section className="mb-8">
             <div className="mb-3 flex items-center justify-between">
               <h2 className="text-base font-semibold text-gray-900">Assigned Exams</h2>
-              <Link href="/student/content-map?area=mocks" className="text-sm text-blue-600 hover:underline">
+              <Link href={buildProgressHref("/student/content-map", { ...filters, area: "mocks" })} className="text-sm text-blue-600 hover:underline">
                 View all
               </Link>
             </div>
@@ -216,7 +259,7 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
                           {inProgress ? "In Progress" : "Pending"}
                         </Badge>
                         <Link
-                          href={`/student/full-tests/${assignment.id}`}
+                          href={buildProgressHref(`/student/full-tests/${assignment.id}`, filters)}
                           className="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700"
                         >
                           {inProgress ? "Continue →" : "Start →"}
@@ -272,7 +315,7 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
           <section className="mb-8">
             <div className="mb-3 flex items-center justify-between">
               <h2 className="text-base font-semibold text-gray-900">Assigned Practice Sets</h2>
-              <Link href={`/student/content-map?area=${area}`} className="text-sm text-blue-600 hover:underline">
+              <Link href={buildProgressHref("/student/content-map", filters)} className="text-sm text-blue-600 hover:underline">
                 View all
               </Link>
             </div>
@@ -299,7 +342,7 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
                         {a.status === "IN_PROGRESS" ? "In Progress" : "Pending"}
                       </Badge>
                       <Link
-                        href={`/student/practice/assignment/${a.id}`}
+                        href={buildProgressHref(`/student/practice/assignment/${a.id}`, filters)}
                         className="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700"
                       >
                         {a.status === "IN_PROGRESS" ? "Continue →" : "Start →"}
@@ -320,9 +363,14 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
             ) : (
               <div className="space-y-2">
                 {recentAttempts.map((a) => {
-                  const correct = a.answers.filter((ans) => ans.isCorrect).length;
-                  const total = a.answers.length;
-                  const pct = scorePercent(correct, total);
+                  const matchingAnswers = a.answers.filter((answer) =>
+                    (!topicId || answer.question.topicId === topicId) &&
+                    (!difficulty || answer.question.difficulty === difficulty),
+                  );
+                  const score = summarizeAllQuestionAnswers(matchingAnswers);
+                  const correct = score.correct;
+                  const total = score.total;
+                  const hasAnswered = matchingAnswers.some(isAnsweredAnswer);
                   return (
                     <Card key={a.id} className="flex items-center justify-between px-4 py-3">
                       <div>
@@ -335,11 +383,11 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="text-sm font-medium text-gray-900">
-                          {correct}/{total}
+                          {hasAnswered ? `${correct}/${total}` : "—"}
                         </span>
-                        <span className={`text-sm font-semibold ${scoreBandTextClass(pct)}`}>{pct}%</span>
+                        <span className={`text-sm font-semibold ${scoreBandTextClass(hasAnswered ? score.percent : null)}`}>{hasAnswered ? `${score.percent}%` : "—"}</span>
                         <Link
-                          href={`/student/results/${a.id}`}
+                          href={buildProgressHref(`/student/results/${a.id}`, filters)}
                           className="flex items-center gap-1 text-xs text-blue-600 hover:underline"
                         >
                           <CheckCircle size={12} /> Review

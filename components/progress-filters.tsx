@@ -37,12 +37,15 @@ export function ProgressFilters({
   filters,
   topics,
   includeDates = true,
+  showEndDate = false,
   preserve,
 }: {
   action: string;
   filters: ProgressFilterValues;
   topics: ProgressFilterTopic[];
   includeDates?: boolean;
+  /** Show the "To" date (Admin → Settings → TIME_FILTER_END_DATE). Off: open-ended range. */
+  showEndDate?: boolean;
   /** Extra query params kept when applying or clearing filters (e.g. the active page tab). */
   preserve?: Record<string, string | undefined>;
 }) {
@@ -51,7 +54,7 @@ export function ProgressFilters({
   const clearHref = buildProgressHref(action, { area: filters.area, studentId: filters.studentId });
   const clearQuery = new URLSearchParams(preserved).toString();
   const fieldClass = "mt-1 w-full rounded-md border border-gray-300 bg-white px-2 py-1.5 text-sm text-gray-900";
-  const active = [filters.topic, filters.difficulty, filters.from, filters.to].filter(Boolean).length;
+  const active = [filters.topic, filters.difficulty, filters.from, showEndDate ? filters.to : undefined].filter(Boolean).length;
 
   return (
     <form action={action} method="get" className="rounded-lg border border-gray-200 bg-white px-3 py-2.5 shadow-sm">
@@ -79,14 +82,16 @@ export function ProgressFilters({
         )}
         {includeDates && (
           <>
-            <label className="min-w-[9rem] flex-1 text-xs font-medium text-gray-600">
+            <label className="min-w-[9rem] flex-1 text-xs font-medium text-gray-600" title={showEndDate ? undefined : "Everything from this date until today."}>
               From
               <input name="from" type="date" defaultValue={filters.from ?? ""} className={fieldClass} />
             </label>
-            <label className="min-w-[9rem] flex-1 text-xs font-medium text-gray-600">
-              To
-              <input name="to" type="date" defaultValue={filters.to ?? ""} className={fieldClass} />
-            </label>
+            {showEndDate && (
+              <label className="min-w-[9rem] flex-1 text-xs font-medium text-gray-600">
+                To
+                <input name="to" type="date" defaultValue={filters.to ?? ""} className={fieldClass} />
+              </label>
+            )}
           </>
         )}
         <div className="flex items-center gap-2">

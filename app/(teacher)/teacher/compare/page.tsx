@@ -9,6 +9,7 @@ import { scorePercent } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { isAnsweredAnswer } from "@/lib/weighted-score";
 import { buildProgressHref, progressFiltersFromParams } from "@/lib/progress-filters";
+import { applyTimeFilterSetting } from "@/lib/time-filters";
 
 interface PageProps {
   searchParams: Promise<{
@@ -23,10 +24,10 @@ interface PageProps {
 export default async function TeacherComparePage({ searchParams }: PageProps) {
   const session = await requireTeacherOrAdmin();
   if (!session) notFound();
-  const filters = progressFiltersFromParams(await searchParams);
+  const { filters } = await applyTimeFilterSetting(progressFiltersFromParams(await searchParams));
   const now = new Date();
-  const teacherGroupManagementEnabled =
-    session?.user.role === "ADMIN" || (await getFeatureSetting("TEACHER_GROUP_MANAGEMENT"));
+  // Groups are optional (Admin → Settings, off by default): hide every Group control while off, for admins too.
+  const teacherGroupManagementEnabled = await getFeatureSetting("TEACHER_GROUP_MANAGEMENT");
 
   const students = await prisma.user.findMany({
     where: studentAccessWhereFor(session.user, now),

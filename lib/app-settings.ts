@@ -53,6 +53,14 @@ export const FEATURE_SETTINGS = {
     owner: "product",
     expiresAt: null as string | null,
   },
+  TIME_FILTER_END_DATE: {
+    label: "Show 'to' date in time filters",
+    description:
+      "When off (default), time filters only ask for a start date ('From' / 'Start date from') and the range stays open until today. When on, an end date ('To' / 'Start date to') is also shown and applied.",
+    defaultValue: false,
+    owner: "product",
+    expiresAt: null as string | null,
+  },
   CALCULATOR_PRACTICE_SETS: {
     label: "External graphing calculator in Practice Sets",
     description:

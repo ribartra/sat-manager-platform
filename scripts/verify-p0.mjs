@@ -66,8 +66,18 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
-    requires: ["aggregateTopicDifficultyMetrics", "Average score", "Total time", "PerformanceBreakdown", "Skill performance by difficulty", "Teacher Comments", "PDF report"],
+    requires: ["loadPracticeReport", "Average score", "Total time", "PerformanceBreakdown", "Skill performance by difficulty", "Teacher Comments", "GenerateReportDialog"],
     label: "Pagina del alumno (ex reporte individual) incluye score ponderado, dificultad, skills debiles, comentarios y PDF",
+  },
+  {
+    file: "lib/student-report.ts",
+    requires: ["aggregateTopicDifficultyMetrics", "summarizeAllQuestionAnswers", "parseSnapshot", "loadMockReport", "timeSpent", "topic.name"],
+    label: "Datos del reporte compartidos por la pagina del alumno y el PDF (snapshots, score ponderado, FPT)",
+  },
+  {
+    file: "app/api/reports/students/[studentId]/pdf/route.ts",
+    requires: ["requireTeacherOrAdmin", "teacherProgramEnrollmentScope", "renderStudentReportPdf", "TIME_FILTER_END_DATE", "mocks"],
+    label: "PDF generado en backend por area (Math/Reading/Writing/FPT) con scope y filtros de tiempo",
   },
   {
     file: "lib/weighted-score.ts",
@@ -75,9 +85,9 @@ const checks = [
     label: "Accounting de score usa todas las preguntas y tiempo total de intentos",
   },
   {
-    file: "app/api/reports/students/[studentId]/pdf/route.ts",
-    requires: ["makeReportPdf", "Helvetica-Bold", "Average score", "Progress by Difficulty", "Question Media URLs", "Weak Skills", "Teacher Comments", "parseReportAreas", "areas"],
-    label: "PDF presentable incluye score ponderado, secciones, paginacion y resumen enriquecido",
+    file: "lib/pdf/student-report-document.tsx",
+    requires: ["renderToBuffer", "Helvetica-Bold", "Average score", "Performance by skill and difficulty", "Skill performance by difficulty", "Teacher comments", "totalPages", "Scores by exam"],
+    label: "PDF presentable (backend, sin navegador): score ponderado, secciones por area, paginacion y resumen",
   },
   {
     file: "scripts/verify-authz.mjs",

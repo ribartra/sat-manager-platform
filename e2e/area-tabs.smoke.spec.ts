@@ -80,7 +80,7 @@ test.describe("area tabs smoke", () => {
     await loginAs(page, E2E.teacherEmail, E2E.teacherPassword);
     await page.goto(`/teacher/students/${studentId}/report`);
     await expect(page).toHaveURL(/#performance/);
-    await expect(page.getByRole("link", { name: /PDF report/ })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Generate Report/ })).toBeVisible();
     await clickAreaTab(page, "Full Practice Tests");
     await expect(page).toHaveURL(/area=mocks/);
     await expect(page.getByText("No submitted Full Practice Tests for this student yet.")).toBeVisible();

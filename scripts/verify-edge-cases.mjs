@@ -214,10 +214,9 @@ const checks = [
     requires: [
       "Skill performance by difficulty",
       "StudentSwitcher",
-      "topic.name",
       "recommendation",
       "studentAccessWhereFor",
-      "timeSpent",
+      "loadPracticeReport",
     ],
     label: "Analytics docente cubre alumno, skills fallados, dificultad, tiempo y scoping",
   },
