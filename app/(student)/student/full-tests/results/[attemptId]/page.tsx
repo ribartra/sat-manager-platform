@@ -12,8 +12,10 @@ import { resolveQuestionType } from "@/lib/question-type";
 import { formatCorrectAnswer } from "@/lib/answer-grading";
 import { difficultyBadgeVariant } from "@/lib/domain-meta";
 import { difficultyFromFullTestModuleKey, moduleKeyFromOrder } from "@/lib/full-test-modules";
+import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
 
-interface PageProps { params: Promise<{ attemptId: string }> }
+interface PageProps { params: Promise<{ attemptId: string }>; searchParams: Promise<{ from?: string; to?: string }> }
 
 /**
  * Digital SAT adaptive stage → difficulty is defined by MODULE, not by the source PDF
@@ -26,8 +28,12 @@ function moduleTierMeta(order: number) {
     : { key, short: "Baseline", bucket: "Baseline (Module 1)" };
 }
 
-export default async function FullTestResultsPage({ params }: PageProps) {
+export default async function FullTestResultsPage({ params, searchParams }: PageProps) {
   const { attemptId } = await params;
+  const query = await searchParams;
+  const historyHref = query.from || query.to
+    ? `/student/history?area=mocks${query.from ? `&from=${encodeURIComponent(query.from)}` : ""}${query.to ? `&to=${encodeURIComponent(query.to)}` : ""}`
+    : "/student/history?area=mocks";
   const session = await auth();
   const attempt = await prisma.fullPracticeTestAttempt.findFirst({
     where: { id: attemptId, studentId: session!.user.id },
@@ -37,7 +43,6 @@ export default async function FullTestResultsPage({ params }: PageProps) {
 
   const answersByQuestion = new Map(attempt.answers.map((answer) => [answer.questionId, answer]));
   const topicStats = new Map<string, { correct: number; total: number; time: number }>();
-  const tierStats = new Map<string, { correct: number; total: number; time: number }>();
   const moduleStats = attempt.test.modules.map((module) => {
     const tier = moduleTierMeta(module.order);
     let correct = 0;
@@ -55,13 +60,6 @@ export default async function FullTestResultsPage({ params }: PageProps) {
       if (answer?.isCorrect) topicStat.correct += 1;
       topicStat.time += answer?.timeSpent ?? 0;
       topicStats.set(topicKey, topicStat);
-
-      // Difficulty is defined at the MODULE level (baseline vs adaptive), not per question.
-      const tierStat = tierStats.get(tier.bucket) ?? { correct: 0, total: 0, time: 0 };
-      tierStat.total += 1;
-      if (answer?.isCorrect) tierStat.correct += 1;
-      tierStat.time += answer?.timeSpent ?? 0;
-      tierStats.set(tier.bucket, tierStat);
     }
     return { id: module.id, name: module.name, hint: tier.short, correct, total, time };
   });
@@ -69,6 +67,7 @@ export default async function FullTestResultsPage({ params }: PageProps) {
 
   return (
     <PageShell width="narrow">
+      <Link href={historyHref} className="mb-4 flex items-center gap-1 text-sm text-gray-500 hover:text-blue-600"><ChevronLeft size={14} /> History</Link>
       <h1 className="mb-6 text-xl font-semibold text-gray-900">Results: {attempt.test.name}</h1>
       <div className="grid grid-cols-3 gap-4">
         <Card padding="md" className="text-center"><p className="text-3xl font-bold text-[var(--sat-area-mocks)]">{attempt.rwScore ?? "—"}</p><p className="text-xs text-gray-500">Reading & Writing</p></Card>
@@ -79,17 +78,11 @@ export default async function FullTestResultsPage({ params }: PageProps) {
         Time expired events: {attempt.timeExpiredEvents} · Extra time used: {attempt.extraTimeUsed}s
         {attempt.pauses.length > 0 ? ` · Paused ${attempt.pauses.length}x (${formatTime(pauseSeconds)})` : ""}
       </Card>
-      <div className="mt-6 grid gap-4 md:grid-cols-2">
+      <div className="mt-6">
         <StatsPanel
           title="By Module"
-          caption="Module 1 = baseline · Module 2 = adaptive (harder)"
+          caption="Correct answers ÷ all module questions, including blanks"
           rows={moduleStats.map((stat) => ({ ...stat, label: stat.name }))}
-          color="mocks"
-        />
-        <StatsPanel
-          title="By Difficulty"
-          caption="Defined by module: baseline vs adaptive stage"
-          rows={[...tierStats.entries()].map(([label, stat]) => ({ label, ...stat }))}
           color="mocks"
         />
       </div>
@@ -216,7 +209,7 @@ function StatsPanel({
       {caption ? <p className="mb-3 mt-0.5 text-xs text-gray-500">{caption}</p> : <div className="mb-3" />}
       <div className="space-y-3">
         {rows.map((row) => {
-          const pct = scorePercent(row.correct, row.total);
+          const pct = row.total > 0 ? scorePercent(row.correct, row.total) : null;
           return (
             <div key={row.label}>
               <div className="mb-1 flex items-center justify-between gap-3 text-sm">
@@ -224,9 +217,9 @@ function StatsPanel({
                   {row.label}
                   {row.hint ? <span className="ml-2 text-xs font-normal text-gray-400">{row.hint}</span> : null}
                 </span>
-                <span className="shrink-0 text-gray-600">{row.correct}/{row.total} · {pct}% · {formatTime(row.time)}</span>
+                <span className="shrink-0 text-gray-600">{row.total > 0 ? `${pct}% · ${row.correct} correct of ${row.total} questions` : "No questions"}</span>
               </div>
-              <div className="h-2 rounded-full bg-gray-100"><div className="h-2 rounded-full" style={{ width: `${pct}%`, backgroundColor: `var(--sat-area-${color})` }} /></div>
+              <div className="h-2 rounded-full bg-gray-100"><div className="h-2 rounded-full" style={{ width: `${pct ?? 0}%`, backgroundColor: `var(--sat-area-${color})` }} /></div>
             </div>
           );
         })}

@@ -64,15 +64,21 @@ async function ensureUnlockedAssignment(studentId: string, practiceSetId: string
     where: { id: practiceSetId },
     select: { name: true },
   });
-  const assignment = await prisma.assignment.create({
-    data: {
-      studentId,
-      practiceSetId,
-      assignedById: null,
-      locked: false,
-      status: "PENDING",
-    },
-  });
+  let assignment;
+  try {
+    assignment = await prisma.assignment.create({
+      data: {
+        studentId,
+        practiceSetId,
+        assignedById: null,
+        locked: false,
+        status: "PENDING",
+      },
+    });
+  } catch (error) {
+    if (!isUniqueConstraintError(error)) throw error;
+    return;
+  }
   await notifyUser(studentId, "Practice set unlocked", practiceSet?.name ?? "A practice set was unlocked.", "/student");
   await prisma.auditLog.create({
     data: {
@@ -83,6 +89,15 @@ async function ensureUnlockedAssignment(studentId: string, practiceSetId: string
       metadata: JSON.stringify({ practiceSetId, reason }),
     },
   });
+}
+
+function isUniqueConstraintError(error: unknown): boolean {
+  return Boolean(
+    error &&
+      typeof error === "object" &&
+      "code" in error &&
+      (error as { code?: unknown }).code === "P2002",
+  );
 }
 
 export async function applyPracticeProgression({ studentId, practiceSetId, scorePercent }: ProgressionInput) {

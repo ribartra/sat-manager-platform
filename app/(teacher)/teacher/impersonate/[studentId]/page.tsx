@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody } from "@/components/ui/card";
-import { formatDate, scorePercent } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 import { BookOpen, CheckCircle, Clock, TrendingUp } from "lucide-react";
 import { withSqliteRetry } from "@/lib/sqlite-retry";
 import {
@@ -14,12 +14,20 @@ import {
   practiceAreaFromTab,
   practiceAreaLabel,
 } from "@/lib/practice-area";
+import { isAnsweredAnswer, summarizeAllQuestionAnswers } from "@/lib/weighted-score";
+import { buildProgressHref, progressFiltersFromParams } from "@/lib/progress-filters";
 
 export const dynamic = "force-dynamic";
 
 interface PageProps {
   params: Promise<{ studentId: string }>;
-  searchParams: Promise<{ area?: string }>;
+  searchParams: Promise<{
+    area?: string;
+    topic?: string;
+    difficulty?: string;
+    from?: string;
+    to?: string;
+  }>;
 }
 
 function StudentViewUnavailable({
@@ -50,7 +58,8 @@ export default async function ImpersonateStudentPage({ params, searchParams }: P
 
   const { studentId } = await params;
   const query = await searchParams;
-  const area = activeAreaTab(query.area, "math");
+  const filters = progressFiltersFromParams(query);
+  const area = activeAreaTab(filters.area, filters.area);
   const practiceArea = practiceAreaFromTab(area);
   const isMocks = area === "mocks";
 
@@ -156,6 +165,20 @@ export default async function ImpersonateStudentPage({ params, searchParams }: P
       }),
     ),
     withSqliteRetry(() =>
+      prisma.attemptAnswer.findMany({
+        where: {
+          attempt: {
+            studentId,
+            status: "SUBMITTED",
+            ...(practiceArea
+              ? { assignment: { practiceSet: { topic: { domain: { practiceArea } } } } }
+              : { id: "__never__" }),
+          },
+        },
+        select: { answer: true, isCorrect: true },
+      }),
+    ),
+    withSqliteRetry(() =>
       prisma.attempt.aggregate({
         where: {
           studentId,
@@ -197,19 +220,9 @@ export default async function ImpersonateStudentPage({ params, searchParams }: P
     );
   }
 
-  const [assignments, examAssignments, recentAttempts, stats, examCompletedCount, pendingExamCount] = dashboard;
+  const [assignments, examAssignments, recentAttempts, scoreAnswers, stats, examCompletedCount, pendingExamCount] = dashboard;
 
-  const avgScore =
-    recentAttempts.length > 0
-      ? Math.round(
-          (recentAttempts.reduce((sum, a) => {
-            const correct = a.answers.filter((ans) => ans.isCorrect).length;
-            return sum + (a.answers.length ? correct / a.answers.length : 0);
-          }, 0) /
-            recentAttempts.length) *
-            100
-        )
-      : null;
+  const avgScore = summarizeAllQuestionAnswers(scoreAnswers).percent;
 
   const pendingCount = isMocks ? examAssignments.length : assignments.length;
   const completedCount = isMocks ? examCompletedCount : stats._count.id;
@@ -220,7 +233,7 @@ export default async function ImpersonateStudentPage({ params, searchParams }: P
       <div className="border-b border-amber-200 bg-amber-50 px-4 py-2">
         <div className="mx-auto flex max-w-5xl items-center justify-between">
           <span className="text-sm font-medium text-amber-800">You are viewing as: {student.name}</span>
-          <Link href={`/teacher/students/${student.id}?area=${area}`} className="text-sm text-amber-800 underline">
+          <Link href={buildProgressHref(`/teacher/students/${student.id}`, filters)} className="text-sm text-amber-800 underline">
             Exit Student View
           </Link>
         </div>
@@ -231,12 +244,12 @@ export default async function ImpersonateStudentPage({ params, searchParams }: P
           <p className="mt-0.5 text-sm text-gray-500">Read-only student dashboard</p>
         </div>
 
-        <PracticeAreaTabs basePath={`/teacher/impersonate/${studentId}`} active={area} />
+        <PracticeAreaTabs basePath={`/teacher/impersonate/${studentId}`} active={area} preserve={{ difficulty: filters.difficulty, from: filters.from, to: filters.to }} />
 
         {!isMocks && pendingExamCount > 0 && (
           <div className="mb-4 rounded-md border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-900">
             {pendingExamCount} active Full Practice Test{pendingExamCount === 1 ? "" : "s"} assigned.{" "}
-            <Link href={`/teacher/impersonate/${studentId}?area=mocks`} className="font-medium underline">
+            <Link href={buildProgressHref(`/teacher/impersonate/${studentId}`, { ...filters, area: "mocks" })} className="font-medium underline">
               Open Full Practice Tests tab →
             </Link>
           </div>
@@ -324,8 +337,10 @@ export default async function ImpersonateStudentPage({ params, searchParams }: P
             <h2 className="mb-3 text-base font-semibold text-gray-900">Recent Results · {areaLabel}</h2>
             <div className="space-y-2">
               {recentAttempts.map((a) => {
-                const correct = a.answers.filter((ans) => ans.isCorrect).length;
-                const pct = scorePercent(correct, a.answers.length);
+                const score = summarizeAllQuestionAnswers(a.answers);
+                const correct = score.correct;
+                const total = score.total;
+                const hasAnswered = a.answers.some(isAnsweredAnswer);
                 return (
                   <Card key={a.id} className="flex items-center justify-between px-4 py-3">
                     <div>
@@ -333,8 +348,8 @@ export default async function ImpersonateStudentPage({ params, searchParams }: P
                       <p className="mt-0.5 text-xs text-gray-500">{a.submittedAt ? formatDate(a.submittedAt) : "—"}</p>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-sm font-medium text-gray-900">{correct}/{a.answers.length}</span>
-                      <span className="text-sm font-semibold text-blue-700">{pct}%</span>
+                      <span className="text-sm font-medium text-gray-900">{hasAnswered ? `${correct}/${total}` : "—"}</span>
+                      <span className="text-sm font-semibold text-blue-700">{hasAnswered ? `${score.percent}%` : "—"}</span>
                       <CheckCircle size={14} className="text-green-600" />
                     </div>
                   </Card>

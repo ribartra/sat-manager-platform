@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
-import { formatDate, formatTime, scorePercent } from "@/lib/utils";
+import { formatDate, formatTime } from "@/lib/utils";
 import { scoreBandTextClass } from "@/lib/score-band";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -14,16 +14,24 @@ import { parseSnapshot, PracticeSetSnapshot, QuestionSnapshot } from "@/lib/atte
 import { formatCorrectAnswer } from "@/lib/answer-grading";
 import { resolveQuestionType } from "@/lib/question-type";
 import { difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
+import { isAnsweredAnswer, summarizeAllQuestionAnswers } from "@/lib/weighted-score";
 
 interface PageProps {
   params: Promise<{ attemptId: string }>;
+  searchParams: Promise<{ area?: string; topic?: string; difficulty?: string; from?: string; to?: string }>;
 }
 
-export default async function ResultsPage({ params }: PageProps) {
+export default async function ResultsPage({ params, searchParams }: PageProps) {
   const { attemptId } = await params;
   const session = await auth();
   if (!session) redirect("/login");
   const userId = session.user.id;
+  const query = await searchParams;
+  const returnQuery = new URLSearchParams();
+  for (const key of ["area", "topic", "difficulty", "from", "to"] as const) {
+    if (query[key]) returnQuery.set(key, query[key]!);
+  }
+  const historyHref = returnQuery.toString() ? `/student/history?${returnQuery.toString()}` : "/student/history";
 
   const attempt = await prisma.attempt.findFirst({
     where: { id: attemptId, studentId: userId, status: "SUBMITTED" },
@@ -58,10 +66,15 @@ export default async function ResultsPage({ params }: PageProps) {
 
   const snapshotQuestionOrder = practiceSetSnapshot?.questions?.map((question) => question.id) ?? [];
   const totalQuestions = snapshotQuestionOrder.length || psQuestions.length;
-  const correct = attempt.answers.filter((a) => a.isCorrect).length;
-  const incorrect = attempt.answers.filter((a) => !a.isCorrect && a.answer !== null).length;
-  const unanswered = totalQuestions - correct - incorrect;
-  const pct = scorePercent(correct, totalQuestions);
+  const scoreRows = attempt.answers.length >= totalQuestions
+    ? attempt.answers
+    : [...attempt.answers, ...Array.from({ length: totalQuestions - attempt.answers.length }, () => ({ answer: null, isCorrect: false }))];
+  const score = summarizeAllQuestionAnswers(scoreRows);
+  const correct = score.correct;
+  const answeredTotal = attempt.answers.filter(isAnsweredAnswer).length;
+  const incorrect = attempt.answers.filter((a) => a.answer?.trim() && !a.isCorrect).length;
+  const unanswered = Math.max(0, totalQuestions - answeredTotal);
+  const pct = score.percent ?? 0;
   const completedPauses = attempt.pauses.filter((pause) => pause.durationSeconds !== null);
   const pauseSeconds = completedPauses.reduce((sum, pause) => sum + (pause.durationSeconds ?? 0), 0);
 
@@ -79,13 +92,13 @@ export default async function ResultsPage({ params }: PageProps) {
     : psQuestions.map((psq) => psq.questionId);
   const orderedAnswers = orderedQuestionIds.map((questionId) => answersMap[questionId]).filter(Boolean);
 
-  const displayPct = typeof attempt.scorePercent === "number" ? attempt.scorePercent : pct;
+  const displayPct = pct;
 
   return (
     <PageShell width="narrow">
       {/* Back */}
       <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-        <Link href="/student/history" className="hover:text-blue-600 flex items-center gap-1">
+        <Link href={historyHref} className="hover:text-blue-600 flex items-center gap-1">
           <ChevronLeft size={14} /> History
         </Link>
       </div>
@@ -102,7 +115,7 @@ export default async function ResultsPage({ params }: PageProps) {
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div className="text-center">
             <p className="text-3xl font-bold text-gray-900">{correct}/{totalQuestions}</p>
-            <p className="text-xs text-gray-500 mt-0.5">Correct</p>
+            <p className="text-xs text-gray-500 mt-0.5">Correct / total</p>
           </div>
           <div className="text-center">
             <p className={`text-3xl font-bold ${scoreBandTextClass(displayPct)}`}>
@@ -133,13 +146,13 @@ export default async function ResultsPage({ params }: PageProps) {
 
         <div className="mt-5 flex items-center gap-3">
           <Link
-            href={attempt.assignmentId ? `/student/practice/assignment/${attempt.assignmentId}` : "/student/practice-sets"}
+            href={attempt.assignmentId ? `/student/practice/assignment/${attempt.assignmentId}${returnQuery.toString() ? `?${returnQuery.toString()}` : ""}` : "/student/practice-sets"}
             className="flex items-center gap-1.5 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
           >
             <RotateCcw size={14} /> Try Again
           </Link>
           <Link
-            href="/student"
+            href={returnQuery.toString() ? `/student?${returnQuery.toString()}` : "/student"}
             className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
             ← Dashboard

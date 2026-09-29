@@ -19,6 +19,7 @@ interface PracticePlayerInput {
   feedbackMode?: "IMMEDIATE" | "AFTER_SET";
   previewMode?: boolean;
   exitHref?: string;
+  resultQuery?: string;
 }
 
 export async function renderPracticePlayer({
@@ -27,6 +28,7 @@ export async function renderPracticePlayer({
   feedbackMode = "AFTER_SET",
   previewMode = false,
   exitHref,
+  resultQuery,
 }: PracticePlayerInput) {
   const session = await auth();
   if (!session) redirect("/login");
@@ -249,6 +251,8 @@ export async function renderPracticePlayer({
       showCalculator={calculatorEnabled}
       calculatorConfig={getPublicCalculatorConfig()}
       feedbackMode={feedbackMode}
+      exitHref={exitHref ?? "/student/content-map"}
+      resultHref={`/student/results/${attempt.id}${resultQuery ? `?${resultQuery}` : ""}`}
     />
   );
 }

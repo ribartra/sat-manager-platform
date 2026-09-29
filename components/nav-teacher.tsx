@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import { ChevronDown, ChevronRight, KeyRound, LogOut, Camera, Menu, X } from "lucide-react";
@@ -17,6 +17,8 @@ import {
 import type { FeatureSettingKey } from "@/lib/app-settings";
 import {
   groupIsActive,
+  hrefWithArea,
+  isPlayerPath,
   isResolvedNavGroup,
   linkIsActive,
   resolveTeacherNav,
@@ -57,6 +59,8 @@ export function NavTeacher({
   showMaterials,
 }: NavTeacherProps) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const selectedArea = searchParams.get("area");
   const resolvedFlags: Partial<Record<FeatureSettingKey, boolean>> = {
     TEACHER_PROGRAM_MANAGEMENT: flags?.TEACHER_PROGRAM_MANAGEMENT ?? showTeacherPrograms ?? false,
     TEACHER_GROUP_MANAGEMENT: flags?.TEACHER_GROUP_MANAGEMENT ?? showTeacherGroups ?? false,
@@ -74,6 +78,8 @@ export function NavTeacher({
   );
   const closeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  if (isPlayerPath(pathname)) return null;
 
   function onGroupEnter(label: string) {
     clearTimeout(closeTimer.current);
@@ -111,7 +117,7 @@ export function NavTeacher({
 
   return (
     <TooltipProvider delayDuration={500}>
-      <nav className="border-b border-gray-200 bg-white">
+      <nav className="sticky top-0 z-40 border-b border-gray-200 bg-white">
         <div className="mx-auto max-w-6xl px-4">
           <div className="flex h-14 items-center justify-between">
             <div className="flex items-center gap-5">
@@ -125,7 +131,7 @@ export function NavTeacher({
                       <Tooltip key={item.href}>
                         <TooltipTrigger asChild>
                           <Link
-                            href={item.href}
+                            href={hrefWithArea(item.href, selectedArea)}
                             className={cn(
                               "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
                               active ? "text-gray-900" : "text-gray-400 hover:text-gray-700",
@@ -179,7 +185,7 @@ export function NavTeacher({
                             return (
                               <Link
                                 key={link.href}
-                                href={link.href}
+                                href={hrefWithArea(link.href, selectedArea)}
                                 role="menuitem"
                                 onClick={() => setOpenGroup(null)}
                                 className={cn(
@@ -283,7 +289,7 @@ export function NavTeacher({
               return (
                 <Link
                   key={item.href}
-                  href={item.href}
+                  href={hrefWithArea(item.href, selectedArea)}
                   onClick={closeMobile}
                   className={cn(
                     "flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-colors",
@@ -324,7 +330,7 @@ export function NavTeacher({
                       return (
                         <Link
                           key={link.href}
-                          href={link.href}
+                      href={hrefWithArea(link.href, selectedArea)}
                           onClick={closeMobile}
                           className={cn(
                             "flex items-center gap-2.5 px-3 py-2 text-sm rounded-md transition-colors",

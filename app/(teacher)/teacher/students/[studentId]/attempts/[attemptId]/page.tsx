@@ -6,20 +6,24 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { MathContent } from "@/components/math-content";
 import { QuestionMedia } from "@/components/question-media";
-import { formatDate, formatTime, scorePercent } from "@/lib/utils";
+import { formatDate, formatTime } from "@/lib/utils";
 import { ChevronLeft } from "lucide-react";
 import { AttemptActions } from "./attempt-actions-client";
 import { parseSnapshot, PracticeSetSnapshot, QuestionSnapshot } from "@/lib/attempt-snapshots";
 import { formatCorrectAnswer } from "@/lib/answer-grading";
 import { auth } from "@/lib/auth";
 import { teacherProgramEnrollmentScope } from "@/lib/program-scope";
+import { summarizeAllQuestionAnswers } from "@/lib/weighted-score";
+import { buildProgressHref, progressFiltersFromParams } from "@/lib/progress-filters";
 
 interface PageProps {
   params: Promise<{ studentId: string; attemptId: string }>;
+  searchParams: Promise<{ area?: string; topic?: string; difficulty?: string; from?: string; to?: string }>;
 }
 
-export default async function TeacherAttemptDetailPage({ params }: PageProps) {
+export default async function TeacherAttemptDetailPage({ params, searchParams }: PageProps) {
   const { studentId, attemptId } = await params;
+  const filters = progressFiltersFromParams(await searchParams);
   const session = await auth();
   const programScope =
     session?.user.role === "TEACHER"
@@ -53,15 +57,19 @@ export default async function TeacherAttemptDetailPage({ params }: PageProps) {
     ? practiceSetSnapshot.questions.map((question) => question.id)
     : psQuestions.map((item) => item.questionId);
   const liveQuestionsById = new Map(psQuestions.map((item) => [item.questionId, item]));
-  const correct = attempt.answers.filter((a) => a.isCorrect).length;
-  const total = orderedQuestionIds.length;
-  const pct = scorePercent(correct, total);
+  const scoreRows = attempt.answers.length >= psQuestions.length
+    ? attempt.answers
+    : [...attempt.answers, ...Array.from({ length: psQuestions.length - attempt.answers.length }, () => ({ answer: null, isCorrect: false }))];
+  const score = summarizeAllQuestionAnswers(scoreRows);
+  const correct = score.correct;
+  const total = score.total;
+  const pct = score.percent ?? 0;
   const pauseSeconds = attempt.pauses.reduce((sum, pause) => sum + (pause.durationSeconds ?? 0), 0);
 
   return (
     <PageShell>
       <div className="mb-6 flex items-center gap-2 text-sm text-gray-500">
-        <Link href={`/teacher/students/${studentId}`} className="flex items-center gap-1 hover:text-blue-600">
+        <Link href={buildProgressHref(`/teacher/students/${studentId}`, filters)} className="flex items-center gap-1 hover:text-blue-600">
           <ChevronLeft size={14} /> {attempt.student.name}
         </Link>
         <span>/</span>

@@ -8,10 +8,15 @@ import { getFeatureSetting } from "@/lib/app-settings";
 import { extractQuestionGraphArtifacts } from "@/lib/question-graph";
 import { writeAudit } from "@/lib/audit";
 
-interface PageProps { params: Promise<{ assignmentId: string }> }
+interface PageProps { params: Promise<{ assignmentId: string }>; searchParams: Promise<{ area?: string; from?: string; to?: string }> }
 
-export default async function FullTestPlayerPage({ params }: PageProps) {
+export default async function FullTestPlayerPage({ params, searchParams }: PageProps) {
   const { assignmentId } = await params;
+  const query = await searchParams;
+  const returnParams = new URLSearchParams({ area: "mocks" });
+  for (const key of ["from", "to"] as const) {
+    if (query[key]) returnParams.set(key, query[key]!);
+  }
   const session = await auth();
   const assignment = await prisma.fullPracticeTestAssignment.findFirst({
     where: { id: assignmentId, studentId: session!.user.id },
@@ -94,6 +99,8 @@ export default async function FullTestPlayerPage({ params }: PageProps) {
       savedProgressState={savedProgressState}
       calculatorConfig={getPublicCalculatorConfig()}
       showCalculator={showCalculator}
+      exitHref={`/student/content-map?${returnParams.toString()}`}
+      resultQuery={returnParams.toString()}
     />
   );
 }

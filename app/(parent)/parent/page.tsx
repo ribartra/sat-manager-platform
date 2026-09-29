@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
 import { EmptyState, PageContent, PageHeader, PageShell } from "@/components/sat";
 import { scoreBandTextClass } from "@/lib/score-band";
+import { summarizeAllQuestionAnswers } from "@/lib/weighted-score";
 
 export default async function ParentDashboardPage() {
   const session = await auth();
@@ -15,7 +16,6 @@ export default async function ParentDashboardPage() {
             where: { status: "SUBMITTED" },
             include: { answers: true },
             orderBy: { submittedAt: "desc" },
-            take: 10,
           },
         },
       },
@@ -35,16 +35,11 @@ export default async function ParentDashboardPage() {
           <div className="grid grid-cols-1 gap-4 @md:grid-cols-2">
             {links.map((link) => {
               const attempts = link.student.attempts;
-              const pcts = attempts.map((a) => {
-                if (typeof a.scorePercent === "number") return a.scorePercent;
-                const correct = a.answers.filter((ans) => ans.isCorrect).length;
-                return a.answers.length ? Math.round((correct / a.answers.length) * 100) : 0;
-              });
-              const avgPct = pcts.length ? Math.round(pcts.reduce((sum, p) => sum + p, 0) / pcts.length) : null;
+              const avgPct = summarizeAllQuestionAnswers(attempts.flatMap((attempt) => attempt.answers)).percent;
               return (
                 <Card key={link.studentId} padding="md">
                   <h2 className="text-base font-semibold text-foreground">{link.student.name}</h2>
-                  <p className="mt-2 text-sm text-muted-foreground">Recent attempts: {attempts.length}</p>
+                  <p className="mt-2 text-sm text-muted-foreground">Submitted attempts: {attempts.length}</p>
                   <p className={`text-sm font-medium ${scoreBandTextClass(avgPct)}`}>
                     Average %: {avgPct !== null ? `${avgPct}%` : "—"}
                   </p>

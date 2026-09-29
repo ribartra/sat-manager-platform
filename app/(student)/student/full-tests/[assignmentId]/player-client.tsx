@@ -50,7 +50,8 @@ export function FullTestPlayer({
   calculatorConfig,
   showCalculator = false,
   previewMode = false,
-  exitHref = "/teacher/full-tests",
+  exitHref = "/student/content-map?area=mocks",
+  resultQuery,
 }: {
   attemptId: string;
   assignmentId: string;
@@ -69,6 +70,7 @@ export function FullTestPlayer({
   showCalculator?: boolean;
   previewMode?: boolean;
   exitHref?: string;
+  resultQuery?: string;
 }) {
   const router = useRouter();
   const breakSecondsTotal = Math.max(0, breakMinutes) * 60;
@@ -269,8 +271,8 @@ export function FullTestPlayer({
       });
       return;
     }
-    router.push(`/student/full-tests/results/${attemptId}`);
-  }, [attemptId, exitHref, expiredEvents, extraTimeUsed, previewMode, recordQuestionTime, router]);
+    router.push(`/student/full-tests/results/${attemptId}${resultQuery ? `?${resultQuery}` : ""}`);
+  }, [attemptId, exitHref, expiredEvents, extraTimeUsed, previewMode, recordQuestionTime, resultQuery, router]);
 
   const enterModule = useCallback(
     async (nextModule: number) => {
@@ -434,7 +436,7 @@ export function FullTestPlayer({
               if (!previewMode) {
                 await fetch(`/api/full-practice-tests/attempts/${attemptId}/pause`, { method: "POST" });
               }
-              router.push(previewMode ? exitHref : "/student/full-tests");
+              router.push(previewMode ? exitHref : "/student/content-map?area=mocks");
             }}
           >
             Pause & Exit
@@ -481,7 +483,7 @@ export function FullTestPlayer({
               if (!previewMode) {
                 await fetch(`/api/full-practice-tests/attempts/${attemptId}/pause`, { method: "POST" });
               }
-              router.push(previewMode ? exitHref : "/student/full-tests");
+              router.push(previewMode ? exitHref : "/student/content-map?area=mocks");
             }}
           >
             {previewMode ? "Exit preview" : "Pause & Exit"}

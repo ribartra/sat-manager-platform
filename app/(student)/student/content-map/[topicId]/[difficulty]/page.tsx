@@ -3,7 +3,8 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { formatDate, scorePercent } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
+import { summarizeAllQuestionAnswers } from "@/lib/weighted-score";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Lock, ChevronLeft } from "lucide-react";
@@ -12,10 +13,13 @@ import { practiceAreaLabel, resolvePracticeArea } from "@/lib/practice-area";
 
 interface PageProps {
   params: Promise<{ topicId: string; difficulty: string }>;
+  searchParams: Promise<{ area?: string }>;
 }
 
-export default async function TopicPracticeSetsPage({ params }: PageProps) {
+export default async function TopicPracticeSetsPage({ params, searchParams }: PageProps) {
   const { topicId, difficulty } = await params;
+  const query = await searchParams;
+  const area = query.area === "reading" || query.area === "writing" || query.area === "mocks" ? query.area : "math";
   const session = await auth();
   const userId = session!.user.id;
   const diffUpper = difficulty.toUpperCase() as "EASY" | "MEDIUM" | "HARD";
@@ -50,7 +54,7 @@ export default async function TopicPracticeSetsPage({ params }: PageProps) {
   return (
     <PageShell width="narrow">
       <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-        <Link href="/student/content-map" className="hover:text-blue-600 flex items-center gap-1">
+        <Link href={`/student/content-map?area=${area}`} className="hover:text-blue-600 flex items-center gap-1">
           <ChevronLeft size={14} /> Content Map
         </Link>
         <span>/</span>
@@ -87,9 +91,11 @@ export default async function TopicPracticeSetsPage({ params }: PageProps) {
             const lastAttempt = assignment?.attempts.find((attempt) => attempt.status === "SUBMITTED");
             const attemptCount = assignment?.attempts.length ?? 0;
 
-            const correct = lastAttempt?.answers.filter((a) => a.isCorrect).length ?? 0;
+            const lastScore = lastAttempt ? summarizeAllQuestionAnswers(lastAttempt.answers) : null;
+            const correct = lastScore?.correct ?? 0;
+            const answered = lastScore?.total ?? 0;
             const total = ps.questions.length;
-            const pct = lastAttempt ? scorePercent(correct, total) : null;
+            const pct = lastScore?.percent ?? null;
 
             return (
               <Card
@@ -106,7 +112,7 @@ export default async function TopicPracticeSetsPage({ params }: PageProps) {
                       )}
                       {pct !== null && (
                         <span className="ml-2">
-                          · Last: {correct}/{total} ({pct}%)
+                          · Last: {correct}/{answered} answered ({pct}%)
                         </span>
                       )}
                       {lastAttempt?.submittedAt && (
@@ -127,7 +133,7 @@ export default async function TopicPracticeSetsPage({ params }: PageProps) {
                     </div>
                   ) : inProgressAttempt ? (
                     <Link
-                      href={`/student/practice/assignment/${assignment.id}`}
+                      href={`/student/practice/assignment/${assignment.id}?area=${area}`}
                       className="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700"
                     >
                       Resume
@@ -135,13 +141,13 @@ export default async function TopicPracticeSetsPage({ params }: PageProps) {
                   ) : lastAttempt ? (
                     <div className="flex items-center gap-2">
                       <Link
-                        href={`/student/results/${lastAttempt.id}`}
+                        href={`/student/results/${lastAttempt.id}?area=${area}`}
                         className="rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
                       >
                         Review
                       </Link>
                       <Link
-                        href={`/student/practice/assignment/${assignment.id}`}
+                        href={`/student/practice/assignment/${assignment.id}?area=${area}`}
                         className="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700"
                       >
                         Start
@@ -149,7 +155,7 @@ export default async function TopicPracticeSetsPage({ params }: PageProps) {
                     </div>
                   ) : (
                     <Link
-                      href={`/student/practice/assignment/${assignment!.id}`}
+                      href={`/student/practice/assignment/${assignment!.id}?area=${area}`}
                       className="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700"
                     >
                       Start

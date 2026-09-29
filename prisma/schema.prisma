@@ -270,6 +270,8 @@ model Assignment {
   student     User        @relation(fields: [studentId], references: [id])
   attempts    Attempt[]
   unlockRequests UnlockRequest[]
+
+  @@unique([studentId, practiceSetId])
 }
 
 model Attempt {
@@ -466,6 +468,8 @@ model FullPracticeTestAssignment {
   test        FullPracticeTest @relation(fields: [testId], references: [id])
   student     User             @relation(fields: [studentId], references: [id])
   attempts    FullPracticeTestAttempt[]
+
+  @@unique([studentId, testId])
 }
 
 model FullPracticeTestAttempt {

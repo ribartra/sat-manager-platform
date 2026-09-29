@@ -1,6 +1,7 @@
 import Link from "next/link";
 import prisma from "@/lib/prisma";
-import { formatDate, scorePercent } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
+import { summarizeAllQuestionAnswers } from "@/lib/weighted-score";
 import { Card } from "@/components/ui/card";
 import {
   accessWindow,
@@ -69,7 +70,6 @@ export default async function ParentTemporaryAccessPage({ searchParams }: PagePr
               assignment: { include: { practiceSet: { include: { topic: { include: { domain: { include: { section: true } } } } } } } },
             },
             orderBy: { submittedAt: "desc" },
-            take: 30,
           },
         },
       },
@@ -110,8 +110,7 @@ export default async function ParentTemporaryAccessPage({ searchParams }: PagePr
   const areas = parseAreas(access.areas);
   const allAreas = areas.length === 3;
 
-  const attempts = access.student.attempts
-    .filter((attempt) => {
+  const attempts = access.student.attempts.filter((attempt) => {
       const taxonomy = attempt.assignment?.practiceSet.topic.domain;
       const section = taxonomy?.section;
       if (!taxonomy || !section) return allAreas;
@@ -120,12 +119,10 @@ export default async function ParentTemporaryAccessPage({ searchParams }: PagePr
         sectionLabel: section.label,
         domainName: taxonomy.name,
       }, area));
-    })
-    .slice(0, 10);
+    });
 
   const totalAnswers = attempts.flatMap((attempt) => attempt.answers);
-  const correct = totalAnswers.filter((answer) => answer.isCorrect).length;
-  const pct = scorePercent(correct, totalAnswers.length);
+  const score = summarizeAllQuestionAnswers(totalAnswers);
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
@@ -137,14 +134,15 @@ export default async function ParentTemporaryAccessPage({ searchParams }: PagePr
 
       <div className="mb-6 grid gap-4 md:grid-cols-3">
         <Metric label="Completed attempts" value={attempts.length.toString()} />
-        <Metric label="Answered questions" value={totalAnswers.length.toString()} />
-        <Metric label="Average accuracy" value={totalAnswers.length ? `${pct}%` : "-"} />
+        <Metric label="Total questions" value={score.total.toString()} />
+        <Metric label="Average score" value={score.percent !== null ? `${score.percent}%` : "-"} />
       </div>
 
       <Card>
         {attempts.map((attempt) => {
-          const attemptCorrect = attempt.answers.filter((answer) => answer.isCorrect).length;
-          const total = attempt.answers.length;
+          const attemptScore = summarizeAllQuestionAnswers(attempt.answers);
+          const attemptCorrect = attemptScore.correct;
+          const total = attemptScore.total;
           return (
             <div key={attempt.id} className="border-b border-gray-100 px-4 py-3 last:border-b-0">
               <div className="flex items-center justify-between gap-4">
@@ -159,7 +157,7 @@ export default async function ParentTemporaryAccessPage({ searchParams }: PagePr
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-semibold text-gray-900">{attemptCorrect}/{total} · {scorePercent(attemptCorrect, total)}%</p>
+                  <p className="text-sm font-semibold text-gray-900">{attemptCorrect}/{total} · {attemptScore.percent ?? 0}%</p>
                   <p className="text-xs text-gray-400">{attempt.submittedAt ? formatDate(attempt.submittedAt) : ""}</p>
                 </div>
               </div>

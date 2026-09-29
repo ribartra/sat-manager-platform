@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import { ChevronDown, KeyRound, LogOut, Camera, Menu, X } from "lucide-react";
@@ -10,7 +10,7 @@ import { NotificationBell } from "@/components/notification-bell";
 import { Avatar } from "@/components/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { FeatureSettingKey } from "@/lib/app-settings";
-import { linkIsActive, resolveStudentNav } from "@/lib/nav-config";
+import { hrefWithArea, isPlayerPath, linkIsActive, resolveStudentNav } from "@/lib/nav-config";
 
 interface NavStudentProps {
   userName: string;
@@ -34,6 +34,8 @@ export function NavStudent({
   onExitImpersonation,
 }: NavStudentProps) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const selectedArea = searchParams.get("area");
   const [menuOpen, setMenuOpen] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl);
   const [uploading, setUploading] = useState(false);
@@ -46,6 +48,8 @@ export function NavStudent({
       MATERIALS_MODULE: flags?.MATERIALS_MODULE ?? showMaterials,
     },
   });
+
+  if (isPlayerPath(pathname)) return null;
 
   function closeMobile() {
     setMobileOpen(false);
@@ -89,18 +93,20 @@ export function NavStudent({
       )}
 
       <TooltipProvider delayDuration={500}>
-        <nav className="border-b border-gray-200 bg-white">
+        <nav className="sticky top-0 z-40 border-b border-gray-200 bg-white">
           <div className="mx-auto max-w-6xl px-4">
             <div className="flex h-14 items-center justify-between">
               <div className="flex items-center gap-5">
                 <span className="font-semibold text-gray-800 text-sm">SAT Practice</span>
 
                 <div className="hidden md:flex items-center gap-0.5">
-                  {links.map(({ href, label, icon: Icon, exact }) => (
+                  {links.map(({ href, label, icon: Icon, exact }) => {
+                    const targetHref = hrefWithArea(href, selectedArea);
+                    return (
                     <Tooltip key={href}>
                       <TooltipTrigger asChild>
                         <Link
-                          href={href}
+                          href={targetHref}
                           className={cn(
                             "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
                             linkIsActive(href, pathname, exact)
@@ -114,7 +120,8 @@ export function NavStudent({
                       </TooltipTrigger>
                       <TooltipContent side="bottom">{label}</TooltipContent>
                     </Tooltip>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
@@ -195,7 +202,7 @@ export function NavStudent({
             {links.map(({ href, label, icon: Icon, exact }) => (
               <Link
                 key={href}
-                href={href}
+                href={hrefWithArea(href, selectedArea)}
                 onClick={closeMobile}
                 className={cn(
                   "flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-colors",

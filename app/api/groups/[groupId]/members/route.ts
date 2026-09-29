@@ -34,19 +34,32 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ gro
     });
     if (existing) continue;
 
-    await prisma.assignment.create({
-      data: {
-        studentId: userId,
-        practiceSetId: groupAssignment.practiceSetId,
-        assignedById: session.user.id,
-        dueDate: groupAssignment.dueDate,
-        unlockAt: groupAssignment.unlockAt,
-        locked: groupAssignment.locked,
-        status: "PENDING",
-      },
-    });
-    inheritedAssignments += 1;
+    try {
+      await prisma.assignment.create({
+        data: {
+          studentId: userId,
+          practiceSetId: groupAssignment.practiceSetId,
+          assignedById: session.user.id,
+          dueDate: groupAssignment.dueDate,
+          unlockAt: groupAssignment.unlockAt,
+          locked: groupAssignment.locked,
+          status: "PENDING",
+        },
+      });
+      inheritedAssignments += 1;
+    } catch (error) {
+      if (!isUniqueConstraintError(error)) throw error;
+    }
   }
 
   return NextResponse.json({ ok: true, inheritedAssignments });
+}
+
+function isUniqueConstraintError(error: unknown): boolean {
+  return Boolean(
+    error &&
+      typeof error === "object" &&
+      "code" in error &&
+      (error as { code?: unknown }).code === "P2002",
+  );
 }

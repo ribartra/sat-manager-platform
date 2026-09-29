@@ -50,6 +50,7 @@ interface PlayerProps {
   feedbackMode?: "IMMEDIATE" | "AFTER_SET";
   previewMode?: boolean;
   exitHref?: string;
+  resultHref?: string;
 }
 
 export function PracticeSetPlayer({
@@ -67,7 +68,8 @@ export function PracticeSetPlayer({
   calculatorConfig,
   feedbackMode = "AFTER_SET",
   previewMode = false,
-  exitHref = "/teacher/practice-sets",
+  exitHref = "/student/content-map",
+  resultHref,
 }: PlayerProps) {
   const router = useRouter();
   const immediateFeedback = feedbackMode === "IMMEDIATE";
@@ -250,7 +252,7 @@ export function PracticeSetPlayer({
       return;
     }
     await fetch(`/api/attempts/${attemptId}/pause`, { method: "POST" });
-    router.push(`/student/content-map`);
+    router.push(exitHref);
   };
 
   const handleSubmit = async () => {
@@ -291,7 +293,7 @@ export function PracticeSetPlayer({
       window.alert("Submit failed. Please try again.");
       return;
     }
-    router.push(`/student/results/${attemptId}`);
+    router.push(resultHref ?? `/student/results/${attemptId}`);
   };
 
   const timerColor =
@@ -304,7 +306,7 @@ export function PracticeSetPlayer({
   const hasPassage = Boolean(question.stimulus?.trim());
 
   return (
-    <div className="relative flex h-[calc(100dvh-3.5rem)] max-h-[calc(100dvh-3.5rem)] flex-col overflow-hidden bg-white">
+    <div className="relative flex h-dvh max-h-dvh flex-col overflow-hidden bg-white">
       {previewMode && (
         <div className="flex shrink-0 items-center justify-between gap-3 border-b border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-900 sm:px-6">
           <span className="font-medium">Preview only — not scored. No student attempt is created.</span>
