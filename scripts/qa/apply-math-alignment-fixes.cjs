@@ -4,6 +4,7 @@
 // Ops JSON (array), every op guarded by its expected current value (`old`):
 //   {t:"order", setId, questionId, old, new}          -> PracticeSetQuestion."order"
 //   {t:"q",     id, field, old, new}                  -> Question.<field> (+ updatedAt)
+//   {t:"opt",   questionId, label, old, new}         -> QuestionOption.text (+ Question.updatedAt)
 //   {t:"cand",  id, field, old, new}                  -> IngestQuestionCandidate.<field>
 //   {t:"psqMove", questionId, fromSet, toSet, oldOrder, newOrder}
 //        -> moves the PracticeSetQuestion row to another set (old = fromSet:oldOrder)
@@ -20,7 +21,7 @@ if (!dbPath || !opsPath) { console.error("usage: <db> <ops.json> [--apply] [--ba
 const apply = flags.includes("--apply");
 const backupPath = (flags.find((f) => f.startsWith("--backup=")) || "").slice(9) || null;
 
-const Q_FIELDS = new Set(["correctAnswer", "explanation", "topicId"]);
+const Q_FIELDS = new Set(["correctAnswer", "explanation", "topicId", "stem"]);
 const C_FIELDS = new Set(["questionExternalId", "correctAnswer"]);
 const ops = JSON.parse(fs.readFileSync(opsPath, "utf8"));
 const db = new Database(dbPath);
@@ -40,6 +41,10 @@ function current(op) {
     if (!Q_FIELDS.has(op.field)) throw new Error(`field not allowed: ${op.field}`);
     const r = db.prepare(`SELECT ${op.field} AS v FROM Question WHERE id = ?`).get(op.id);
     return r ? r.v : undefined;
+  }
+  if (op.t === "opt") {
+    const r = db.prepare("SELECT text AS v FROM QuestionOption WHERE questionId = ? AND label = ?").all(op.questionId, op.label);
+    return r.length === 1 ? r[0].v : undefined;
   }
   if (op.t === "cand") {
     if (!C_FIELDS.has(op.field)) throw new Error(`field not allowed: ${op.field}`);
@@ -77,6 +82,9 @@ const run = db.transaction(() => {
       info = db.prepare('INSERT INTO PracticeSetQuestion (practiceSetId, questionId, "order") VALUES (?, ?, ?)').run(op.toSet, op.questionId, op.newOrder);
     } else if (op.t === "q") {
       info = db.prepare(`UPDATE Question SET ${op.field} = ?, updatedAt = ? WHERE id = ? AND ${op.field} IS ?`).run(op.new, now, op.id, op.old);
+    } else if (op.t === "opt") {
+      info = db.prepare("UPDATE QuestionOption SET text = ? WHERE questionId = ? AND label = ? AND text IS ?").run(op.new, op.questionId, op.label, op.old);
+      if (info.changes === 1) db.prepare("UPDATE Question SET updatedAt = ? WHERE id = ?").run(now, op.questionId);
     } else {
       info = db.prepare(`UPDATE IngestQuestionCandidate SET ${op.field} = ? WHERE id = ? AND ${op.field} IS ?`).run(op.new, op.id, op.old);
     }

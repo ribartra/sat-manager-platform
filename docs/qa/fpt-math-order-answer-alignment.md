@@ -47,7 +47,7 @@ Hay **cero preguntas con la respuesta correcta mal asignada**. La clave guardada
 
 En todo el banco solo hay estos 2 "■"; la fuente no los tiene.
 
-Los cambios propuestos están en `scripts/qa/fpt-math-alignment-fixes.json` (9 ops con guardas `old`/`new`). **No están aplicados.**
+**APLICADO 2026-09-29 en local y producción**: 9/9 ops de `scripts/qa/fpt-math-alignment-fixes.json` con `scripts/qa/apply-math-alignment-fixes.cjs`, ampliado con `stem` y `opt`. Integridad ok. Backups: `backups/devdb-pre-fptmath-align-*.bak` (local) y `/db/backups/devdb-pre-fptmath-align-20260929.bak` (producción), con los valores previos por fila en `/db/backups/fptmath-align-rows-20260929.json`.
 
 ## Falsos positivos descartados
 - **Opciones (≈150 avisos iniciales):** diferencias de formato, como LaTeX `\frac`/`\leq`/`^{}` frente a unicode, grados o paráfrasis en prosa. Se normalizaron y quedaron en 0 salvo los casos de arriba.
