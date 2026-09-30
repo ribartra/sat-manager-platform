@@ -65,7 +65,7 @@ export function BulkImportClient({ topics }: { topics: { id: string; label: stri
           <Button variant="secondary" onClick={previewAndValidate} disabled={previewLoading}>
             {previewLoading ? "Validating..." : "Preview & Validate"}
           </Button>
-          <Button onClick={submit} disabled={loading || !preview || previewSource !== csv}>
+          <Button onClick={submit} disabled={loading} disabledReason={!preview || previewSource !== csv ? "Preview the CSV first." : null}>
             {loading ? "Importing..." : "Import Previewed Rows"}
           </Button>
           <Link href="/teacher/questions" className="text-sm text-blue-600 hover:underline">Back to Question Bank</Link>

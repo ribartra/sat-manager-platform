@@ -42,6 +42,10 @@ export async function POST(req: NextRequest) {
   if (roles.some((role) => !ALLOWED_ROLES.has(role))) {
     return NextResponse.json({ error: "Invalid file role." }, { status: 400 });
   }
+  // The Questions file is the required tray; answers/explanations alone cannot make a batch.
+  if (roles.length > 0 && !roles.includes("QUESTION")) {
+    return NextResponse.json({ error: "Add the Questions file (PDF or DOCX) to create the batch." }, { status: 400 });
+  }
 
   const totalSize = files.reduce((sum, file) => sum + file.size, 0);
   if (totalSize > MAX_UPLOAD_BYTES) {

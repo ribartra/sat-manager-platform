@@ -1,5 +1,6 @@
 "use client";
 
+import { Checkbox } from "@/components/ui/checkbox";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -191,8 +192,7 @@ export function FullTestEditor({
               render={({ field }) => (
                 <FormItem>
                   <label className="flex items-center gap-2 text-sm text-gray-700">
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       checked={field.value}
                       onChange={(event) => field.onChange(event.target.checked)}
                       onBlur={field.onBlur}
@@ -329,7 +329,7 @@ export function FullTestEditor({
           </Card>
         ) : null}
 
-        <Button type="submit" disabled={saving || !canSave}>
+        <Button type="submit" disabled={saving} disabledReason={!name?.trim() ? "Enter a name." : !moduleQuestionIds.every((ids) => ids.length > 0) ? "Every module needs at least one question." : null}>
           {saving ? "Saving..." : initial?.id ? "Save Exam" : "Create Exam"}
         </Button>
       </form>

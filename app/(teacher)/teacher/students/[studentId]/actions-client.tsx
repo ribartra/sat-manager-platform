@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { UserCheck, UserX } from "lucide-react";
@@ -17,15 +18,17 @@ export function StudentDetailActions({ studentId, isActive }: { studentId: strin
   }
 
   return (
-    <button
+    <Button
       type="button"
+      variant="secondary"
+      size="sm"
       onClick={toggleActive}
       disabled={loading}
       title={isActive ? "Block sign-in for this student (data and history are kept). You can reactivate later." : "Allow this student to sign in again."}
-      className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-gray-300 bg-white px-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+      className="gap-1.5 px-2.5 text-sm"
     >
       {isActive ? <UserX size={14} /> : <UserCheck size={14} />}
       {loading ? "…" : isActive ? "Deactivate" : "Activate"}
-    </button>
+    </Button>
   );
 }

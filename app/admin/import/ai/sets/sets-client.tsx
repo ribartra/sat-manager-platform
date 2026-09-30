@@ -1,5 +1,6 @@
 "use client";
 
+import { Checkbox } from "@/components/ui/checkbox";
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, ChevronDown, ChevronRight, ScissorsSquare, Search } from "lucide-react";
@@ -265,7 +266,7 @@ export function SetsIndexClient({ rows, batchId, batches }: SetsIndexClientProps
           <option value="FULL_PRACTICE_TEST">Full practice tests</option>
         </select>
         <label className="flex items-center gap-2 text-sm text-gray-700">
-          <input type="checkbox" checked={onlyPending} onChange={(event) => setOnlyPending(event.target.checked)} className="h-4 w-4 rounded border-gray-300" />
+          <Checkbox checked={onlyPending} onChange={(event) => setOnlyPending(event.target.checked)} className="h-4 w-4 rounded border-gray-300" />
           Only with pending items
         </label>
       </div>

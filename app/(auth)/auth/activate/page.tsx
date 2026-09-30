@@ -166,7 +166,7 @@ export default function ActivatePage() {
                 />
               </FormSection>
               {serverError ? <p className="text-sm text-destructive">{serverError}</p> : null}
-              <Button type="submit" className="w-full" disabled={loading || Boolean(blockedByConsent)}>
+              <Button type="submit" className="w-full" disabled={loading} disabledReason={blockedByConsent ? "Waiting for parent or guardian consent." : null}>
                 {loading ? "Activating..." : isParent ? "Create Account" : "Activate Account"}
               </Button>
             </form>

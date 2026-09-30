@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -52,31 +53,29 @@ export function Pagination({
   };
   const first = (page - 1) * pageSize + 1;
   const last = Math.min(page * pageSize, total);
-  const linkClass = "inline-flex h-7 items-center gap-1 rounded-md border border-gray-300 bg-white px-2 text-xs font-medium text-gray-700 hover:bg-gray-50";
-  const disabledClass = "inline-flex h-7 items-center gap-1 rounded-md border border-gray-200 px-2 text-xs font-medium text-gray-300";
   return (
     <nav aria-label="Pagination" className={cn("flex items-center justify-between gap-2 px-3 py-2 text-xs text-gray-500", className)}>
       <span>
         {first}–{last} of {total}
       </span>
       <div className="flex items-center gap-2">
-        {page > 1 ? (
-          <Link href={hrefFor(page - 1)} className={linkClass} rel="prev">
-            <ChevronLeft size={12} /> Prev
-          </Link>
-        ) : (
-          <span className={disabledClass} aria-disabled="true"><ChevronLeft size={12} /> Prev</span>
-        )}
+        <Button asChild variant="secondary" size="sm" className="h-7 gap-1 px-2" disabled={page <= 1}>
+          {page > 1 ? (
+            <Link href={hrefFor(page - 1)} rel="prev"><ChevronLeft size={12} /> Prev</Link>
+          ) : (
+            <span><ChevronLeft size={12} /> Prev</span>
+          )}
+        </Button>
         <span className="tabular-nums">
           Page {page} of {pageCount}
         </span>
-        {page < pageCount ? (
-          <Link href={hrefFor(page + 1)} className={linkClass} rel="next">
-            Next <ChevronRight size={12} />
-          </Link>
-        ) : (
-          <span className={disabledClass} aria-disabled="true">Next <ChevronRight size={12} /></span>
-        )}
+        <Button asChild variant="secondary" size="sm" className="h-7 gap-1 px-2" disabled={page >= pageCount}>
+          {page < pageCount ? (
+            <Link href={hrefFor(page + 1)} rel="next">Next <ChevronRight size={12} /></Link>
+          ) : (
+            <span>Next <ChevronRight size={12} /></span>
+          )}
+        </Button>
       </div>
     </nav>
   );

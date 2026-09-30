@@ -1,5 +1,6 @@
 "use client";
 
+import { Checkbox } from "@/components/ui/checkbox";
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { UserPlus } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -260,8 +261,7 @@ export function StudentPicker(props: StudentPickerProps) {
         <div className="max-h-52 space-y-1 overflow-y-auto">
           {filtered.map((student) => (
             <label key={student.id} className="flex items-center gap-2 text-sm text-gray-700">
-              <input
-                type="checkbox"
+              <Checkbox
                 checked={selected.has(student.id)}
                 onChange={(event) => {
                   const next = new Set(selected);

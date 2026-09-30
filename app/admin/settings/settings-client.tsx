@@ -1,5 +1,6 @@
 "use client";
 
+import { BLOCKED_SWITCH } from "@/components/ui/control-states";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -338,7 +339,7 @@ export function SettingsClient({
                 disabled={loadingKey === setting.key}
                 className={`relative h-6 w-11 rounded-full transition ${
                   setting.value ? "bg-primary" : "bg-gray-300"
-                } disabled:opacity-60`}
+                } ${BLOCKED_SWITCH}`}
                 aria-label={`Toggle ${setting.label}`}
               >
                 <span

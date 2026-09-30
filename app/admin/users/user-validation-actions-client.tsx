@@ -70,7 +70,7 @@ export function UserValidationActions({
           {loadingStatus === "ANONYMIZE" ? "Saving..." : "Anonymize"}
         </Button>
       ) : null}
-      <Button variant="secondary" size="sm" onClick={toggleActive} disabled={Boolean(loadingStatus) || isSelf}>
+      <Button variant="secondary" size="sm" onClick={toggleActive} disabled={Boolean(loadingStatus)} disabledReason={isSelf ? "You cannot change your own account here." : null}>
         {loadingStatus === "ACTIVE" ? "Saving..." : active ? "Disable" : "Enable"}
       </Button>
       {currentStatus !== "APPROVED" && (
@@ -83,13 +83,13 @@ export function UserValidationActions({
           variant="danger"
           size="sm"
           onClick={() => updateStatus("REJECTED")}
-          disabled={Boolean(loadingStatus) || isSelf}
+          disabled={Boolean(loadingStatus)} disabledReason={isSelf ? "You cannot change your own account here." : null}
         >
           {loadingStatus === "REJECTED" ? "Saving..." : "Reject"}
         </Button>
       )}
       {currentStatus !== "PENDING" && (
-        <Button variant="secondary" size="sm" onClick={() => updateStatus("PENDING")} disabled={Boolean(loadingStatus) || isSelf}>
+        <Button variant="secondary" size="sm" onClick={() => updateStatus("PENDING")} disabled={Boolean(loadingStatus)} disabledReason={isSelf ? "You cannot change your own account here." : null}>
           {loadingStatus === "PENDING" ? "Saving..." : "Mark pending"}
         </Button>
       )}

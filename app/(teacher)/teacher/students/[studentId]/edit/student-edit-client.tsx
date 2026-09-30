@@ -1,5 +1,6 @@
 "use client";
 
+import { Checkbox } from "@/components/ui/checkbox";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -65,7 +66,7 @@ export function EditStudentForm({ student }: { student: StudentEditInfo }) {
       </div>
       </div>
       <label className="flex items-center gap-2 text-sm text-gray-700">
-        <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} />
+        <Checkbox checked={active} onChange={(e) => setActive(e.target.checked)} />
         Active
       </label>
       {error && <p className="text-sm text-red-600">{error}</p>}

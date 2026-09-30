@@ -38,8 +38,9 @@ export function QuestionActions({ questionId, usedCount }: { questionId: string;
         variant="ghost"
         size="sm"
         onClick={remove}
-        disabled={!canDelete || loading}
-        title={canDelete ? "Delete question" : "Archive questions that are already used."}
+        disabled={loading}
+        disabledReason={canDelete ? null : "This question is already used: archive it instead."}
+        title={canDelete ? "Delete question" : undefined}
       >
         <Trash2 size={14} />
         Delete

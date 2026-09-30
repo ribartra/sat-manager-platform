@@ -1,5 +1,7 @@
 "use client";
 
+import { BLOCKED_TEXT } from "@/components/ui/control-states";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ExternalLink, FileUp, X } from "lucide-react";
@@ -42,6 +44,7 @@ function FileTray({
   files: File[];
   disabled?: boolean;
   onChange: (files: File[]) => void;
+  /** Rendered only once this tray has a file (options that describe the selected file). */
   children?: React.ReactNode;
 }) {
   return (
@@ -54,7 +57,7 @@ function FileTray({
         <span className="text-xs text-gray-500">{files.length ? `${files.length} selected` : "No file"}</span>
       </div>
       <p className="mb-3 text-xs leading-5 text-gray-600">{hint}</p>
-      {children}
+      {files.length > 0 ? children : null}
       <label className="mt-3 flex cursor-pointer flex-col items-center justify-center rounded-md border border-blue-300 bg-white px-4 py-5 text-center hover:bg-blue-50">
         <FileUp className="mb-2 h-5 w-5 text-blue-600" />
         <span className="text-sm font-medium text-blue-700">Choose file</span>
@@ -65,7 +68,11 @@ function FileTray({
           accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
           className="sr-only"
           disabled={disabled}
-          onChange={(event) => onChange(Array.from(event.target.files ?? []))}
+          onChange={(event) => {
+            onChange(Array.from(event.target.files ?? []));
+            // Reset so choosing the same file again (after Remove) still fires onChange.
+            event.target.value = "";
+          }}
         />
       </label>
       {files.length > 0 && (
@@ -77,6 +84,16 @@ function FileTray({
             </li>
           ))}
         </ul>
+      )}
+      {files.length > 0 && (
+        <button
+          type="button"
+          className={`mt-2 text-xs font-medium text-gray-600 underline-offset-2 hover:text-red-700 hover:underline ${BLOCKED_TEXT}`}
+          disabled={disabled}
+          onClick={() => onChange([])}
+        >
+          Remove {files.length === 1 ? "file" : "files"}
+        </button>
       )}
     </div>
   );
@@ -99,6 +116,28 @@ export function ImportQuestionnaireButton({ mode, defaultName, topicName, domain
   const totalSize = useMemo(() => allFiles.reduce((sum, file) => sum + file.size, 0), [allFiles]);
   const oversized = totalSize > MAX_UPLOAD_BYTES;
   const modeLabel = mode === "PRACTICE_SET" ? "Practice Set" : "Full Practice Test";
+
+  // Why "Create staging batch" is unavailable, shown next to the button (null = ready).
+  const blockedReason = questionFiles.length === 0
+    ? "Add the Questions file to create the batch."
+    : !name.trim()
+      ? "Enter a batch name."
+      : oversized
+        ? "The selected files exceed the 256 MB limit."
+        : null;
+
+  function closeModal() {
+    setOpen(false);
+    // Next open starts clean: no files from a previous import, default answer options.
+    if (!loading) {
+      setQuestionFiles([]);
+      setAnswerFiles([]);
+      setAnswersIncludeExplanations(true);
+      setAnswerTrayKind("ANSWERS");
+      setMessage(null);
+      setBatchId(null);
+    }
+  }
 
   const answerRole: AnswerTrayRole = answersIncludeExplanations
     ? "ANSWER_EXPLANATION"
@@ -169,7 +208,7 @@ export function ImportQuestionnaireButton({ mode, defaultName, topicName, domain
                 <p className="text-xs font-medium uppercase text-gray-400">{modeLabel}</p>
                 <h2 className="text-base font-semibold text-gray-900">Import questions from PDF/DOCX</h2>
               </div>
-              <Button type="button" variant="ghost" size="icon" onClick={() => setOpen(false)} aria-label="Close import modal">
+              <Button type="button" variant="ghost" size="icon" onClick={closeModal} aria-label="Close import modal">
                 <X size={18} />
               </Button>
             </div>
@@ -188,7 +227,7 @@ export function ImportQuestionnaireButton({ mode, defaultName, topicName, domain
               {mode === "PRACTICE_SET" ? (
                 <div className="grid gap-3 sm:grid-cols-2">
                   <label className="grid gap-1">
-                    <span className="text-xs font-medium text-gray-500">Skill detected from editor</span>
+                    <span className="text-xs font-medium text-gray-500">Skill (from the Practice Set form)</span>
                     <Input value={[domainName, topicName].filter(Boolean).join(" / ") || "Manual topic"} readOnly />
                   </label>
                   <label className="grid gap-1">
@@ -220,14 +259,13 @@ export function ImportQuestionnaireButton({ mode, defaultName, topicName, domain
                 />
                 <FileTray
                   title="Answers / Explanations"
-                  hint="File type: Answers, Explanations, or Answers with explanations (one document)."
+                  hint="Optional. File type: Answers, Explanations, or Answers with explanations (one document). Options for this file appear once it is added."
                   files={answerFiles}
                   disabled={loading}
                   onChange={setAnswerFiles}
                 >
                   <label className="mb-2 flex items-start gap-2 text-xs text-gray-700">
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       className="mt-0.5 h-4 w-4 rounded border-gray-300"
                       checked={answersIncludeExplanations}
                       onChange={(event) => setAnswersIncludeExplanations(event.target.checked)}
@@ -249,8 +287,10 @@ export function ImportQuestionnaireButton({ mode, defaultName, topicName, domain
 
               <p className={oversized ? "text-xs text-red-600" : "text-xs text-gray-500"}>
                 {allFiles.length
-                  ? `${allFiles.length} files selected, ${formatBytes(totalSize)} total.`
-                  : "Select the Questions tray first. Answers/Explanations tray is recommended."}
+                  ? `${allFiles.length} ${allFiles.length === 1 ? "file" : "files"} selected, ${formatBytes(totalSize)} total.${
+                      answerFiles.length === 0 ? " Adding the Answers / Explanations file is recommended." : ""
+                    }`
+                  : "Start with the Questions file (required). The Answers / Explanations file is recommended."}
               </p>
 
               {message && (
@@ -269,10 +309,18 @@ export function ImportQuestionnaireButton({ mode, defaultName, topicName, domain
                   </Link>
                 </Button>
               )}
-              <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+              {blockedReason && !loading && !batchId ? (
+                <span id="create-batch-blocked" className="mr-auto text-xs text-gray-500">{blockedReason}</span>
+              ) : null}
+              <Button type="button" variant="secondary" onClick={closeModal}>
                 Close
               </Button>
-              <Button type="button" onClick={upload} disabled={loading || !name || questionFiles.length === 0 || oversized}>
+              <Button
+                type="button"
+                onClick={upload}
+                disabled={loading}
+                disabledReason={loading ? null : blockedReason}
+              >
                 {loading ? "Creating batch..." : "Create staging batch"}
               </Button>
             </div>

@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useRef, useState } from "react";
 import { Download, FileText, Loader2, Mail } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -177,7 +179,7 @@ export function GenerateReportDialog({
               key={area.key}
               className={`inline-flex cursor-pointer items-center gap-2 rounded-md border px-3 py-1.5 text-sm font-medium ${selected.has(area.key) ? "border-gray-900 bg-gray-50 text-gray-900" : "border-gray-200 text-gray-500"}`}
             >
-              <input type="checkbox" checked={selected.has(area.key)} onChange={() => toggle(area.key)} className="rounded border-gray-300" />
+              <Checkbox checked={selected.has(area.key)} onChange={() => toggle(area.key)} className="rounded border-gray-300" />
               <span className="h-2.5 w-2.5 rounded-full" style={{ background: area.color }} aria-hidden />
               {area.label}
             </label>
@@ -188,17 +190,15 @@ export function GenerateReportDialog({
                 <Loader2 size={14} className="animate-spin" /> Updating preview…
               </span>
             )}
-            <a
-              href={query ? `${endpoint}?${query}` : undefined}
-              aria-disabled={!query}
-              onClick={(event) => {
-                if (!query) event.preventDefault();
-              }}
-              className={`inline-flex h-9 items-center gap-1.5 rounded-md bg-blue-600 px-3 text-sm font-medium text-white hover:bg-blue-700 ${!query ? "pointer-events-none opacity-50" : ""}`}
-              title="Download the PDF for the selected areas"
+            <Button
+              asChild
+              className="h-9 gap-1.5 px-3"
+              disabledReason={!query ? "Choose at least one area for the report." : null}
             >
-              <Download size={14} /> Download PDF
-            </a>
+              <a href={query ? `${endpoint}?${query}` : undefined} title={query ? "Download the PDF for the selected areas" : undefined}>
+                <Download size={14} /> Download PDF
+              </a>
+            </Button>
           </div>
         </div>
         {!query && <p className="text-sm text-rose-600">Select at least one area.</p>}
@@ -246,8 +246,7 @@ export function GenerateReportDialog({
             ) : (
               emailParents.map((parent) => (
                 <label key={parent.id} className="inline-flex cursor-pointer items-center gap-2 text-sm text-gray-700">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     checked={recipients.has(parent.id)}
                     onChange={() => toggleRecipient(parent.id)}
                     className="rounded border-gray-300"
@@ -257,15 +256,17 @@ export function GenerateReportDialog({
               ))
             )}
             {emailParents.length > 0 ? (
-              <button
+              <Button
                 type="button"
+                variant="secondary"
+                className="ml-auto h-9 gap-1.5 px-3"
                 onClick={() => void sendToParents()}
-                disabled={!query || recipients.size === 0 || sending}
-                className="ml-auto inline-flex h-9 items-center gap-1.5 rounded-md border border-gray-300 bg-white px-3 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                disabled={sending}
+                disabledReason={!query ? "Choose at least one area for the report." : recipients.size === 0 ? "Select at least one parent." : null}
                 title="Send this exact PDF as an email attachment to the selected parents"
               >
                 {sending ? <Loader2 size={14} className="animate-spin" /> : <Mail size={14} />} Send PDF
-              </button>
+              </Button>
             ) : null}
           </div>
           {sendError ? <p className="mt-2 text-sm text-rose-600">{sendError}</p> : null}

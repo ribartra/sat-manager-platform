@@ -1,5 +1,6 @@
 "use client";
 
+import { BLOCKED_SURFACE, SETTLED_RESULT } from "@/components/ui/control-states";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { MathContent } from "@/components/math-content";
@@ -503,7 +504,8 @@ export function PracticeSetPlayer({
                   className={cn(
                     "flex flex-1 items-center gap-3 text-left",
                     isEliminated && "line-through",
-                    checkResult && "cursor-default"
+                    // Checked answers are settled (read-only), not blocked: keep their colors.
+                    SETTLED_RESULT
                   )}
                 >
                   <span
@@ -525,7 +527,7 @@ export function PracticeSetPlayer({
                   type="button"
                   onClick={() => toggleEliminated(question.id, opt.label)}
                   disabled={Boolean(checkResult)}
-                  className="shrink-0 rounded border border-gray-200 px-2 py-1 text-xs text-gray-500 hover:bg-gray-100 disabled:opacity-50"
+                  className={cn("shrink-0 rounded border border-gray-200 px-2 py-1 text-xs text-gray-500 hover:bg-gray-100", BLOCKED_SURFACE)}
                 >
                   {isEliminated ? "Undo" : "Eliminate"}
                 </button>
@@ -555,7 +557,7 @@ export function PracticeSetPlayer({
                     type="button"
                     size="sm"
                     onClick={() => void handleCheck()}
-                    disabled={!answers[question.id] || checking}
+                    disabled={checking} disabledReason={!answers[question.id] ? "Answer the question first." : null}
                   >
                     {checking ? "Checking…" : "Check"}
                   </Button>

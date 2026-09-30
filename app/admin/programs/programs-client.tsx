@@ -1,5 +1,6 @@
 "use client";
 
+import { Checkbox } from "@/components/ui/checkbox";
 import React, { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -332,8 +333,7 @@ function EditProgramForm({
             render={({ field }) => (
               <FormItem>
                 <label className="flex items-center gap-1.5 text-sm text-gray-700 whitespace-nowrap">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     checked={field.value}
                     onChange={(e) => field.onChange(e.target.checked)}
                     onBlur={field.onBlur}
@@ -403,7 +403,7 @@ function EditProgramForm({
                   size="sm"
                   variant="outline"
                   onClick={addTeacher}
-                  disabled={!newTeacherId || teacherLoading === "add"}
+                  disabled={teacherLoading === "add"} disabledReason={!newTeacherId ? "Choose a teacher." : null}
                 >
                   {teacherLoading === "add" ? "..." : "Assign"}
                 </Button>

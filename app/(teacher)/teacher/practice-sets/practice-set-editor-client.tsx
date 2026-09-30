@@ -197,7 +197,7 @@ export function PracticeSetEditor({
                 </Link>
               </Button>
             ) : (
-              <Button type="button" variant="ghost" size="sm" disabled title="Publish the Practice Set before assigning.">
+              <Button type="button" variant="ghost" size="sm" disabledReason="Publish the Practice Set before assigning.">
                 <Send size={14} />
                 Assign
               </Button>
@@ -401,7 +401,7 @@ export function PracticeSetEditor({
         ) : null}
 
         <div className="flex items-center gap-3">
-          <Button type="submit" disabled={saving || !canSave}>
+          <Button type="submit" disabled={saving} disabledReason={!name?.trim() ? "Enter a name." : !topicId ? "Choose a skill." : questionIds.length === 0 ? "Add at least one question." : null}>
             {saving ? "Saving..." : initial?.id ? "Save Practice Set" : "Create Practice Set"}
           </Button>
           <Button type="button" variant="secondary" onClick={() => router.back()}>

@@ -1,5 +1,6 @@
 "use client";
 
+import { Checkbox } from "@/components/ui/checkbox";
 import { PageShell } from "@/components/sat";
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
@@ -104,8 +105,7 @@ export default function InviteStudentPage() {
 
         <div className="border-t border-gray-200 pt-4">
           <label className="flex items-center gap-2 cursor-pointer select-none">
-            <input
-              type="checkbox"
+            <Checkbox
               checked={isMinor}
               onChange={(e) => setIsMinor(e.target.checked)}
               className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
@@ -143,7 +143,7 @@ export default function InviteStudentPage() {
         )}
 
         {error && <p className="text-sm text-red-600" role="alert">{error}</p>}
-        <Button type="submit" disabled={loading || !programId}>
+        <Button type="submit" disabled={loading} disabledReason={!programId ? "Choose a program." : null}>
           {loading ? "Creating..." : "Create Invite"}
         </Button>
       </Card>

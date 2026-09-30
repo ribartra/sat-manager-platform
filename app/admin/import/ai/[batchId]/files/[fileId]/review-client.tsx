@@ -1,5 +1,6 @@
 "use client";
 
+import { Checkbox } from "@/components/ui/checkbox";
 import { useMemo, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -866,8 +867,7 @@ export function FileReviewClient({
           )}
           <div className="border-b border-gray-100 px-3 py-2">
             <label className="flex items-center gap-2 text-[11px] text-gray-600">
-              <input
-                type="checkbox"
+              <Checkbox
                 checked={onlyPending}
                 onChange={(event) => setOnlyPending(event.target.checked)}
                 className="h-3.5 w-3.5 rounded border-gray-300"
@@ -951,7 +951,7 @@ export function FileReviewClient({
                     <Button type="button" variant="secondary" size="sm" onClick={() => openQuestionEditor(draft.id)}>Open in editor</Button>
                   )}
                   <Button type="button" variant="ghost" size="sm" onClick={() => saveCandidate("REJECTED")} disabled={saving}>Reject</Button>
-                  <Button type="button" variant={dirty ? "primary" : "secondary"} size="sm" onClick={() => saveCandidate()} disabled={saving || !dirty}>
+                  <Button type="button" variant={dirty ? "primary" : "secondary"} size="sm" onClick={() => saveCandidate()} disabled={saving} disabledReason={!dirty ? "No changes to save." : null}>
                     {saving ? "Saving…" : dirty ? "Save changes" : "Saved"}
                   </Button>
                   <Button type="button" variant="secondary" size="sm" onClick={() => saveCandidate("REVIEWED")} disabled={saving}>Mark reviewed</Button>
@@ -1328,14 +1328,18 @@ export function FileReviewClient({
                               <option key={t.questionId} value={t.questionId}>{t.label}</option>
                             ))}
                           </select>
-                          <button
+                          <Button
                             type="button"
-                            disabled={assigning || galleryAssign?.imageId !== image.id || !galleryAssign?.questionId}
+                            size="sm"
+                            className="h-7 shrink-0 px-2"
+                            disabled={assigning}
+                            disabledReason={
+                              galleryAssign?.imageId !== image.id || !galleryAssign?.questionId ? "Choose the question for this image first." : null
+                            }
                             onClick={() => galleryAssign && assignGalleryImage(image.id, galleryAssign.questionId)}
-                            className="shrink-0 rounded bg-blue-600 px-2 py-1 text-xs font-medium text-white disabled:opacity-40"
                           >
                             OK
-                          </button>
+                          </Button>
                         </div>
                       )}
                     </figure>

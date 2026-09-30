@@ -292,7 +292,7 @@ export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; 
           </div>
           <DialogFooter>
             <Button variant="secondary" onClick={() => setEditorOpen(false)} disabled={saving}>Cancel</Button>
-            <Button onClick={saveMaterial} disabled={saving || !title.trim()}>
+            <Button onClick={saveMaterial} disabled={saving} disabledReason={!title.trim() ? "Enter a title." : null}>
               {saving ? "Saving..." : editingId ? "Save material" : "Create material"}
             </Button>
           </DialogFooter>

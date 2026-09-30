@@ -214,10 +214,10 @@ function PendingRow({
         <Button
           size="sm"
           variant="ghost"
-          className="h-7 px-2 text-green-700 hover:bg-green-50 disabled:opacity-40"
+          className="h-7 px-2 text-green-700 hover:bg-green-50"
           onClick={() => act("approve")}
-          disabled={!!loading || parentPending}
-          title={parentPending ? "Parent consent required first" : undefined}
+          disabled={!!loading}
+          disabledReason={parentPending ? "Parent consent required first." : null}
         >
           {loading === "approve" ? "..." : "Approve"}
         </Button>
@@ -281,10 +281,10 @@ function EnrollmentRow({
             <Button
               size="sm"
               variant="ghost"
-              className="h-7 px-2 text-green-700 hover:bg-green-50 disabled:opacity-40"
+              className="h-7 px-2 text-green-700 hover:bg-green-50"
               onClick={() => act("approve")}
-              disabled={!!loading || parentPending}
-              title={parentPending ? "Parent consent required first" : undefined}
+              disabled={!!loading}
+              disabledReason={parentPending ? "Parent consent required first." : null}
             >
               {loading === "approve" ? "..." : "Approve"}
             </Button>

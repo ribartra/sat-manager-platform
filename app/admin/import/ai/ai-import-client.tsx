@@ -1,5 +1,7 @@
 "use client";
 
+import { BLOCKED_SURFACE } from "@/components/ui/control-states";
+import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
@@ -7,7 +9,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { CheckCircle2, FileArchive, FileSearch, RefreshCcw, Search, UploadCloud } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, DisabledReason } from "@/components/ui/button";
 import { CopyableTruncatedText } from "@/components/ui/copyable-truncated-text";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -398,14 +400,16 @@ export function AiImportWorkflowClient({
     label: WorkflowStep;
     description: string;
     enabled: boolean;
+    /** Shown when the step is not available yet. */
+    blockedReason?: string;
     count?: number;
     icon: typeof UploadCloud;
   }> = [
     { label: "Load", description: "Batches and ZIP/folder load", enabled: true, count: batches.length, icon: UploadCloud },
-    { label: "Process", description: "Extract text, answers and images", enabled: Boolean(selectedBatchId) && !processBlocked, count: files.length, icon: FileArchive },
-    { label: "Recover", description: "Retry OCR and failed work", enabled: Boolean(selectedBatchId) && (counts.ocrPending > 0 || counts.openIncidents > 0), count: counts.ocrPending + counts.openIncidents, icon: RefreshCcw },
-    { label: "Review", description: "Files, incidents and questions", enabled: Boolean(selectedBatchId) && (files.length > 0 || counts.candidates > 0 || counts.totalIncidents > 0), count: counts.reviewItems, icon: FileSearch },
-    { label: "Promote", description: "Create drafts from reviewed content", enabled: Boolean(selectedBatchId) && counts.candidates > 0, count: practiceSets.length, icon: CheckCircle2 },
+    { label: "Process", description: "Extract text, answers and images", enabled: Boolean(selectedBatchId) && !processBlocked, blockedReason: !selectedBatchId ? "Select or load a batch first." : "The batch is being processed; wait until it finishes.", count: files.length, icon: FileArchive },
+    { label: "Recover", description: "Retry OCR and failed work", enabled: Boolean(selectedBatchId) && (counts.ocrPending > 0 || counts.openIncidents > 0), blockedReason: !selectedBatchId ? "Select or load a batch first." : "Nothing to recover: no pending OCR or open incidents.", count: counts.ocrPending + counts.openIncidents, icon: RefreshCcw },
+    { label: "Review", description: "Files, incidents and questions", enabled: Boolean(selectedBatchId) && (files.length > 0 || counts.candidates > 0 || counts.totalIncidents > 0), blockedReason: !selectedBatchId ? "Select or load a batch first." : "Process the batch first; there is nothing to review yet.", count: counts.reviewItems, icon: FileSearch },
+    { label: "Promote", description: "Create drafts from reviewed content", enabled: Boolean(selectedBatchId) && counts.candidates > 0, blockedReason: !selectedBatchId ? "Select or load a batch first." : "No reviewed questions to promote yet.", count: practiceSets.length, icon: CheckCircle2 },
   ];
 
   async function saveDraft(status?: string) {
@@ -495,23 +499,31 @@ export function AiImportWorkflowClient({
       <div className="grid gap-3 md:grid-cols-5">
         {steps.map((step) => {
           const Icon = step.icon;
-          return (
+          const card = (
             <button
               key={step.label}
               type="button"
               onClick={() => step.enabled && setOpenStep(step.label)}
               disabled={!step.enabled}
-              className="min-h-28 rounded-lg border border-gray-200 bg-white p-4 text-left shadow-sm transition hover:border-blue-300 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-gray-200 disabled:hover:bg-white"
+              aria-describedby={!step.enabled && step.blockedReason ? `step-blocked-${step.label}` : undefined}
+              className={`group min-h-28 rounded-lg border border-gray-200 bg-white p-4 text-left shadow-sm transition hover:border-blue-300 hover:bg-blue-50 ${BLOCKED_SURFACE}`}
             >
               <div className="flex items-start justify-between gap-3">
-                <span className="flex h-9 w-9 items-center justify-center rounded-md bg-gray-100 text-gray-700">
+                <span className="flex h-9 w-9 items-center justify-center rounded-md bg-gray-100 text-gray-700 group-disabled:text-gray-400">
                   <Icon className="h-4 w-4" />
                 </span>
                 {step.count !== undefined && <Badge variant={step.enabled ? "info" : "default"}>{step.count}</Badge>}
               </div>
-              <p className="mt-3 text-sm font-semibold text-gray-900">{step.label}</p>
-              <p className="mt-1 line-clamp-2 text-xs text-gray-500">{step.description}</p>
+              <p className="mt-3 text-sm font-semibold text-gray-900 group-disabled:text-gray-400">{step.label}</p>
+              <p className="mt-1 line-clamp-2 text-xs text-gray-500 group-disabled:text-gray-400">{step.description}</p>
             </button>
+          );
+          return !step.enabled && step.blockedReason ? (
+            <DisabledReason key={step.label} reason={step.blockedReason} id={`step-blocked-${step.label}`} fullWidth>
+              {card}
+            </DisabledReason>
+          ) : (
+            card
           );
         })}
       </div>
@@ -596,8 +608,7 @@ export function AiImportWorkflowClient({
                     >
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex min-w-0 items-center gap-2">
-                          <input
-                            type="checkbox"
+                          <Checkbox
                             checked={selectedCandidateIds.has(candidate.id)}
                             onChange={(event) => toggleCandidate(candidate.id, event.target.checked)}
                             disabled={!["READY", "REVIEWED"].includes(candidate.status) || candidate.promotionStatus === "PROMOTED"}
@@ -843,13 +854,13 @@ function BulkPromoteQuestionsBar({
         <p className="text-xs text-gray-600">{selectedCandidateIds.length} selected · {visiblePromotableCount} promotable in current filter.</p>
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        <Button type="button" variant="secondary" size="sm" onClick={onSelectVisible} disabled={visiblePromotableCount === 0}>
+        <Button type="button" variant="secondary" size="sm" onClick={onSelectVisible} disabledReason={visiblePromotableCount === 0 ? "No promotable questions in this view." : null}>
           Select filtered ready
         </Button>
-        <Button type="button" variant="secondary" size="sm" onClick={onClear} disabled={selectedCandidateIds.length === 0}>
+        <Button type="button" variant="secondary" size="sm" onClick={onClear} disabledReason={selectedCandidateIds.length === 0 ? "Select at least one question." : null}>
           Clear
         </Button>
-        <Button type="button" size="sm" onClick={promoteSelected} disabled={!batchId || selectedCandidateIds.length === 0 || loading}>
+        <Button type="button" size="sm" onClick={promoteSelected} disabled={loading} disabledReason={!batchId ? "Select a batch first." : selectedCandidateIds.length === 0 ? "Select at least one question." : null}>
           {loading ? "Promoting..." : "Promote selected"}
         </Button>
         {message && <span className="text-xs text-gray-600">{message}</span>}
@@ -883,7 +894,7 @@ function PromoteQuestionIdsButton({ batchId, candidateIds, label }: { batchId: s
 
   return (
     <div className="space-y-1">
-      <Button type="button" variant="secondary" size="sm" onClick={promote} disabled={loading || candidateIds.length === 0}>
+      <Button type="button" variant="secondary" size="sm" onClick={promote} disabled={loading} disabledReason={candidateIds.length === 0 ? "No questions to promote in this set." : null}>
         {loading ? "Promoting..." : label}
       </Button>
       {message && <p className="max-w-44 text-xs text-gray-500">{message}</p>}
@@ -1166,7 +1177,7 @@ function QuestionStagingEditor({
             formatPreview={stripMarkdownImageRefs}
           />
           <div className={`flex flex-wrap items-center gap-2 rounded-md border p-3 transition-colors ${dirty ? "border-amber-300 bg-amber-50" : "border-gray-200 bg-gray-50"}`}>
-            <Button type="button" onClick={() => saveDraft()} disabled={saving || !dirty}>
+            <Button type="button" onClick={() => saveDraft()} disabled={saving} disabledReason={!dirty ? "No changes to save." : null}>
               {saving ? "Saving…" : dirty ? "Save changes" : "Saved"}
             </Button>
             <Button type="button" variant="secondary" onClick={() => saveDraft("REVIEWED")} disabled={saving}>Mark Reviewed</Button>
@@ -1366,7 +1377,7 @@ export function AiImportActions({ selectedBatchId }: { selectedBatchId?: string 
               <Input value={basePath} onChange={(event) => setBasePath(event.target.value)} placeholder="files_to_load" />
             </label>
             <div className="flex justify-end">
-              <Button onClick={createBatch} disabled={loading || !name || !basePath}>
+              <Button onClick={createBatch} disabled={loading} disabledReason={!name ? "Enter a batch name." : !basePath ? "Enter the server folder path." : null}>
                 Scan Folder
               </Button>
             </div>
@@ -1384,7 +1395,7 @@ export function AiImportActions({ selectedBatchId }: { selectedBatchId?: string 
               <input
                 type="file"
                 accept=".zip,application/zip,application/x-zip-compressed"
-                className="mt-2 block w-full text-sm text-gray-700 file:mr-3 file:rounded-md file:border-0 file:bg-white file:px-3 file:py-2 file:text-sm file:font-medium file:text-gray-700"
+                className="mt-2 block w-full text-sm text-gray-700 file:mr-3 file:rounded-md file:border-0 file:bg-white file:px-3 file:py-2 file:text-sm file:font-medium file:text-gray-700 disabled:cursor-not-allowed disabled:text-gray-400 disabled:file:bg-gray-100 disabled:file:text-gray-400"
                 disabled={loading}
                 onChange={(event) => {
                   const file = event.target.files?.[0] ?? null;
@@ -1399,7 +1410,7 @@ export function AiImportActions({ selectedBatchId }: { selectedBatchId?: string 
               <span className="mt-1 block text-xs text-gray-500">ZIP files up to 256 MB. PDF and DOCX files go to staging.</span>
             </label>
             <div className="flex justify-end">
-              <Button type="button" variant="secondary" onClick={uploadZip} disabled={loading || !zipFile || zipFile.size > MAX_UPLOAD_BYTES}>
+              <Button type="button" variant="secondary" onClick={uploadZip} disabled={loading} disabledReason={!zipFile ? "Choose a ZIP file." : zipFile.size > MAX_UPLOAD_BYTES ? "The ZIP exceeds the 256 MB limit." : null}>
                 Upload ZIP
               </Button>
             </div>
@@ -1412,7 +1423,7 @@ export function AiImportActions({ selectedBatchId }: { selectedBatchId?: string 
           <p className="text-xs font-medium uppercase text-gray-400">Processing</p>
           <h2 className="text-sm font-semibold text-gray-900">Process selected batch</h2>
         </div>
-        <Button variant="secondary" onClick={processBatch} disabled={loading || !selectedBatchId}>
+        <Button variant="secondary" onClick={processBatch} disabled={loading} disabledReason={!selectedBatchId ? "Select a batch first." : null}>
           Process Selected
         </Button>
       </div>
@@ -1492,7 +1503,7 @@ export function RetryFailedJobsButton({
 
   return (
     <div className="space-y-1">
-      <Button type="button" variant="secondary" size={size} onClick={retry} disabled={loading || pendingCount === 0}>
+      <Button type="button" variant="secondary" size={size} onClick={retry} disabled={loading} disabledReason={pendingCount === 0 ? "Nothing pending in this batch." : null}>
         {loading ? "Retrying..." : sourceFileId ? "Retry File" : "Retry Failed OCR"}
       </Button>
       {message && <p className="max-w-64 text-xs text-gray-500">{message}</p>}

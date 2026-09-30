@@ -50,8 +50,9 @@ export function PracticeSetActions({
         variant="ghost"
         size="sm"
         onClick={remove}
-        disabled={!canDelete || loading}
-        title={canDelete ? "Delete Practice Set" : "Archive sets with assignments."}
+        disabled={loading}
+        disabledReason={canDelete ? null : "This set has assignments: archive it instead."}
+        title={canDelete ? "Delete Practice Set" : undefined}
       >
         <Trash2 size={14} />
         Delete

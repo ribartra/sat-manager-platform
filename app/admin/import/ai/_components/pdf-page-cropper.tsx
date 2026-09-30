@@ -1,5 +1,6 @@
 "use client";
 
+import { BLOCKED_SURFACE } from "@/components/ui/control-states";
 import { useCallback, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -217,7 +218,7 @@ export function PdfPageCropper({
   const hasPages = uniquePages.length > 0;
   return (
     <div className={className}>
-      <Button type="button" size="sm" variant="secondary" onClick={() => setOpen(true)} disabled={!hasPages}>
+      <Button type="button" size="sm" variant="secondary" onClick={() => setOpen(true)} disabledReason={!hasPages ? "This file has no rendered pages." : null}>
         Crop page region
       </Button>
       {!hasPages && (
@@ -257,7 +258,7 @@ export function PdfPageCropper({
                     p === pageNumber
                       ? "bg-blue-600 text-white"
                       : "bg-white text-gray-700 ring-1 ring-gray-200 hover:bg-gray-100"
-                  }`}
+                  } ${BLOCKED_SURFACE}`}
                 >
                   {p}
                 </button>
@@ -348,10 +349,10 @@ export function PdfPageCropper({
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <Button type="button" size="sm" onClick={() => submit("ASSIGN")} disabled={!canSubmit || busy !== null}>
+            <Button type="button" size="sm" onClick={() => submit("ASSIGN")} disabled={busy !== null} disabledReason={!hasSelection ? "Draw a crop area on the page first." : !canSubmit ? "Choose the option this crop belongs to." : null}>
               {busy === "ASSIGN" ? "Assigning…" : "Assign crop"}
             </Button>
-            <Button type="button" size="sm" variant="secondary" onClick={() => submit("OCR")} disabled={!canSubmit || busy !== null}>
+            <Button type="button" size="sm" variant="secondary" onClick={() => submit("OCR")} disabled={busy !== null} disabledReason={!hasSelection ? "Draw a crop area on the page first." : !canSubmit ? "Choose the option this crop belongs to." : null}>
               {busy === "OCR" ? "OCR…" : "OCR crop"}
             </Button>
             {rect && (
@@ -408,7 +409,7 @@ export function PdfPageCropper({
                     className="w-16"
                   />
                 )}
-                <Button type="button" size="sm" onClick={applyOcr} disabled={!canApplyOcr}>
+                <Button type="button" size="sm" onClick={applyOcr} disabledReason={!canApplyOcr ? "Run OCR on a crop and choose where to apply it." : null}>
                   Assign to field
                 </Button>
                 {ocrTarget === "OPTION_BLOCK" && !ocr.options?.length && (

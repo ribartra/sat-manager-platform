@@ -1,5 +1,6 @@
 "use client";
 
+import { Checkbox, Radio } from "@/components/ui/checkbox";
 import { useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -382,8 +383,7 @@ export function QuestionEditor({
               render={({ field }) => (
                 <FormItem>
                   <Card as="label" padding="sm" className="flex items-start gap-3">
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       checked={field.value}
                       onChange={(event) => field.onChange(event.target.checked)}
                       onBlur={field.onBlur}
@@ -445,8 +445,7 @@ export function QuestionEditor({
               <div className="space-y-3">
                 {options.map((opt) => (
                   <div key={opt.label} className="grid grid-cols-[auto_1.5rem_1fr] items-start gap-3">
-                    <input
-                      type="radio"
+                    <Radio
                       name="correct"
                       value={opt.label}
                       checked={correctAnswer === opt.label}
@@ -551,7 +550,7 @@ export function QuestionEditor({
         ) : null}
 
         <div className="flex items-center gap-3">
-          <Button type="submit" disabled={saving || !canSave}>
+          <Button type="submit" disabled={saving} disabledReason={!stem?.trim() ? "Write the question stem." : !topicId ? "Choose a skill." : !correctAnswer?.trim() ? "Set the correct answer." : null}>
             {saving ? "Saving..." : initial?.id ? "Update Question" : "Create Question"}
           </Button>
           <Button type="button" variant="secondary" onClick={() => router.back()}>
@@ -609,8 +608,7 @@ export function QuestionEditor({
                   className="font-mono text-sm"
                 />
                 <label className="mt-3 flex items-center gap-2 text-sm text-gray-700">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     checked={formulaDisplayMode}
                     onChange={(event) => setFormulaDisplayMode(event.target.checked)}
                     className="rounded border-gray-300"
@@ -633,7 +631,7 @@ export function QuestionEditor({
               <Button type="button" variant="secondary" onClick={() => setFormulaOpen(false)}>
                 Cancel
               </Button>
-              <Button type="button" onClick={insertFormula} disabled={!formulaLatex.trim()}>
+              <Button type="button" onClick={insertFormula} disabledReason={!formulaLatex.trim() ? "Type a formula first." : null}>
                 <Sigma size={14} />
                 Insert Formula
               </Button>

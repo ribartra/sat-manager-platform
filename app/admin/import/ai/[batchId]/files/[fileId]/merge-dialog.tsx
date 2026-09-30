@@ -1,5 +1,7 @@
 "use client";
 
+import { FIELD_BLOCKED } from "@/components/ui/control-states";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -245,7 +247,7 @@ export function MergeDialog({ open, onClose, candidates, imageLinks, images, ini
               <Button type="button" size="sm" variant={survivor === "A" ? "primary" : "secondary"} onClick={() => setSurvivor("A")}>
                 Left: {candA.questionNumber != null ? `Q${candA.questionNumber}` : "Q?"}
               </Button>
-              <Button type="button" size="sm" variant={survivor === "B" ? "primary" : "secondary"} onClick={() => setSurvivor("B")} disabled={!candB}>
+              <Button type="button" size="sm" variant={survivor === "B" ? "primary" : "secondary"} onClick={() => setSurvivor("B")} disabledReason={!candB ? "Choose the question to merge with." : null}>
                 Right: {candB?.questionNumber != null ? `Q${candB.questionNumber}` : "Q?"}
               </Button>
             </div>
@@ -341,8 +343,7 @@ export function MergeDialog({ open, onClose, candidates, imageLinks, images, ini
                           )}
                         </div>
                         <label className="mt-2 flex items-center gap-2 text-xs text-gray-700">
-                          <input
-                            type="checkbox"
+                          <Checkbox
                             checked={imgInclude[link.id] ?? false}
                             onChange={(e) => setImgInclude((prev) => ({ ...prev, [link.id]: e.target.checked }))}
                             className="h-4 w-4 rounded border-gray-300"
@@ -352,7 +353,7 @@ export function MergeDialog({ open, onClose, candidates, imageLinks, images, ini
                         <select
                           value={t.targetType}
                           onChange={(e) => setImgTarget((prev) => ({ ...prev, [link.id]: { ...t, targetType: e.target.value } }))}
-                          className="mt-2 w-full rounded-md border border-gray-300 px-2 py-1 text-xs"
+                          className={`mt-2 w-full rounded-md border border-gray-300 px-2 py-1 text-xs ${FIELD_BLOCKED}`}
                           disabled={!imgInclude[link.id]}
                         >
                           {IMAGE_TARGETS.map((target) => (
@@ -379,7 +380,7 @@ export function MergeDialog({ open, onClose, candidates, imageLinks, images, ini
 
             {sourceCand && sourceCand.promotionStatus === "PROMOTED" && sourceCand.officialQuestionId && (
               <label className="flex items-center gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-                <input type="checkbox" checked={cleanup} onChange={(e) => setCleanup(e.target.checked)} className="h-4 w-4 rounded border-gray-300" />
+                <Checkbox checked={cleanup} onChange={(e) => setCleanup(e.target.checked)} className="h-4 w-4 rounded border-gray-300" />
                 Also delete the orphaned official question already promoted (only if it is a draft with no attempts).
               </label>
             )}
@@ -394,7 +395,7 @@ export function MergeDialog({ open, onClose, candidates, imageLinks, images, ini
           <Button type="button" variant="secondary" onClick={onClose} disabled={submitting}>
             Cancel
           </Button>
-          <Button type="button" onClick={handleMerge} disabled={submitting || !candB}>
+          <Button type="button" onClick={handleMerge} disabled={submitting} disabledReason={!candB ? "Choose the question to merge with." : null}>
             {submitting ? "Merging…" : `Merge into ${survivorCand?.questionNumber != null ? `Q${survivorCand.questionNumber}` : "Q?"}`}
           </Button>
         </DialogFooter>

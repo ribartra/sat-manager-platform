@@ -1,5 +1,6 @@
 "use client";
 
+import { Checkbox } from "@/components/ui/checkbox";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -121,8 +122,7 @@ export function AssignExamForm({
               "flex cursor-pointer items-start gap-3 rounded-md px-3 py-2 hover:bg-gray-50",
             )}
           >
-            <input
-              type="checkbox"
+            <Checkbox
               className="mt-1"
               checked={selected.has(exam.id)}
               onChange={() => toggle(exam.id)}
@@ -148,7 +148,7 @@ export function AssignExamForm({
       {done && <p className="text-sm font-medium text-green-600">✓ {doneMessage} Redirecting...</p>}
 
       <div className="flex items-center gap-3">
-        <Button onClick={handleAssign} disabled={selected.size === 0 || loading || done}>
+        <Button onClick={handleAssign} disabled={loading} disabledReason={done ? "Already assigned." : selected.size === 0 ? "Select at least one exam." : null}>
           {loading ? "Assigning..." : `Assign Exam${selected.size ? ` (${selected.size})` : ""}`}
         </Button>
         <Button type="button" variant="ghost" onClick={() => router.push(returnHref)}>

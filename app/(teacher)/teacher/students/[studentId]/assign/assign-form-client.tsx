@@ -1,5 +1,6 @@
 "use client";
 
+import { Checkbox, Radio } from "@/components/ui/checkbox";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -223,12 +224,12 @@ export function AssignForm({
         <label className="mb-2 block text-sm font-medium text-gray-700">Assign to</label>
         <div className="flex items-center gap-4 flex-wrap">
           <label className="flex items-center gap-2 text-sm text-gray-700">
-            <input type="radio" checked={target === "student"} onChange={() => setTarget("student")} />
+            <Radio checked={target === "student"} onChange={() => setTarget("student")} />
             This student
           </label>
           {groupAssignmentEnabled && (
             <label className="flex items-center gap-2 text-sm text-gray-700">
-              <input type="radio" checked={target === "group"} onChange={() => { setTarget("group"); setShowAllMembers(false); }} disabled={groups.length === 0} />
+              <Radio checked={target === "group"} onChange={() => { setTarget("group"); setShowAllMembers(false); }} disabled={groups.length === 0} />
               Group
             </label>
           )}
@@ -283,8 +284,7 @@ export function AssignForm({
                 selected.has(ps.id) && "bg-blue-50",
               )}
             >
-              <input
-                type="checkbox"
+              <Checkbox
                 checked={selected.has(ps.id)}
                 onChange={() => toggleSelect(ps.id)}
                 className="rounded border-gray-300 text-blue-600"
@@ -351,8 +351,7 @@ export function AssignForm({
       </div>
 
       <div className="flex items-center gap-2">
-        <input
-          type="checkbox"
+        <Checkbox
           id="lock"
           checked={lockOnAssign}
           onChange={(e) => setLockOnAssign(e.target.checked)}
@@ -369,7 +368,7 @@ export function AssignForm({
       {error && <p className="text-sm text-rose-600">{error}</p>}
 
       <div className="flex items-center gap-3">
-        <Button onClick={handleAssign} disabled={selected.size === 0 || loading}>
+        <Button onClick={handleAssign} disabled={loading} disabledReason={selected.size === 0 ? "Select at least one Practice Set." : null}>
           {loading ? "Assigning..." : `Assign ${selected.size > 0 ? `(${selected.size})` : ""}`}
         </Button>
         <Button variant="secondary" onClick={() => router.back()}>Cancel</Button>

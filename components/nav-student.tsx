@@ -1,5 +1,6 @@
 "use client";
 
+import { BLOCKED_TEXT } from "@/components/ui/control-states";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { signOut } from "next-auth/react";
@@ -145,7 +146,7 @@ export function NavStudent({
                           fileInputRef.current?.click();
                         }}
                         disabled={uploading}
-                        className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50"
+                        className={`flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 ${BLOCKED_TEXT}`}
                       >
                         <Camera size={14} />
                         {uploading ? "Uploading..." : "Change photo"}
@@ -228,7 +229,7 @@ export function NavStudent({
                 fileInputRef.current?.click();
               }}
               disabled={uploading}
-              className="flex w-full items-center gap-2 px-2 py-2 text-sm text-gray-500 hover:text-gray-800 rounded-md hover:bg-gray-50 disabled:opacity-50"
+              className={`flex w-full items-center gap-2 px-2 py-2 text-sm text-gray-500 hover:text-gray-800 rounded-md hover:bg-gray-50 ${BLOCKED_TEXT}`}
             >
               <Camera size={14} />
               {uploading ? "Uploading..." : "Change photo"}

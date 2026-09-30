@@ -121,7 +121,7 @@ export function GroupsClient({ groups: initialGroups, students }: { groups: Grou
               <label className="mb-1 block text-xs font-medium text-gray-700">Schedule (optional)</label>
               <Input value={newSchedule} onChange={(e) => setNewSchedule(e.target.value)} placeholder="Mon/Wed 9am" />
             </div>
-            <Button onClick={createGroup} disabled={creating || !newName.trim()} className="flex items-center gap-1">
+            <Button onClick={createGroup} disabled={creating} disabledReason={!newName.trim() ? "Enter a group name." : null} className="flex items-center gap-1">
               <Plus size={14} /> Create
             </Button>
           </div>

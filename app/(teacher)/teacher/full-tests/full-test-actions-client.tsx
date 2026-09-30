@@ -86,8 +86,9 @@ export function FullTestActions({
           variant="ghost"
           size="sm"
           onClick={remove}
-          disabled={!canDelete || Boolean(loadingAction)}
-          title={canDelete ? "Delete exam" : "Archive exams with assignments or attempts."}
+          disabled={Boolean(loadingAction)}
+          disabledReason={canDelete ? null : "This exam has assignments or attempts: archive it instead."}
+          title={canDelete ? "Delete exam" : undefined}
         >
           <Trash2 size={14} />
           Delete
@@ -118,7 +119,7 @@ export function FullTestActions({
           </Link>
         </Button>
       ) : (
-        <Button type="button" variant="ghost" size="sm" disabled title="Publish the exam before assigning.">
+        <Button type="button" variant="ghost" size="sm" disabledReason="Publish the exam before assigning.">
           <Send size={14} />
           Assign
         </Button>
@@ -167,8 +168,9 @@ export function FullTestActions({
         variant="ghost"
         size="sm"
         onClick={remove}
-        disabled={!canDelete || Boolean(loadingAction)}
-        title={canDelete ? "Delete exam" : "Archive exams with assignments or attempts."}
+        disabled={Boolean(loadingAction)}
+        disabledReason={canDelete ? null : "This exam has assignments or attempts: archive it instead."}
+        title={canDelete ? "Delete exam" : undefined}
       >
         <Trash2 size={14} />
         Delete

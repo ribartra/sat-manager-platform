@@ -1,5 +1,6 @@
 "use client";
 
+import { Checkbox } from "@/components/ui/checkbox";
 import { FormEvent, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -294,13 +295,13 @@ export function ParentsClient({ parents, students }: { parents: Parent[]; studen
             <div className="flex flex-wrap gap-4">
               {REPORT_GROUPS.map((group) => (
                 <label key={group.key} className="flex items-center gap-1.5 text-sm text-gray-600">
-                  <input type="checkbox" checked={isGroupOn(group)} onChange={(e) => toggleGroup(group, e.target.checked)} />
+                  <Checkbox checked={isGroupOn(group)} onChange={(e) => toggleGroup(group, e.target.checked)} />
                   {group.label}
                 </label>
               ))}
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button type="button" onClick={shareReport} disabled={sharing || !studentId}>
+              <Button type="button" onClick={shareReport} disabled={sharing} disabledReason={!studentId ? "Choose a student." : null}>
                 <Link2 size={14} /> {sharing ? "Sending..." : "Share report by email"}
               </Button>
               {studentId && (
