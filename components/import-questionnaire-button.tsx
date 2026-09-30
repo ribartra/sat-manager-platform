@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { difficultyOptions } from "@/lib/domain-meta";
+import { Alert } from "@/components/sat/alert";
+import { errorMessage, readApiError } from "@/lib/api-client";
 
 const MAX_UPLOAD_BYTES = 256 * 1024 * 1024;
 
@@ -181,12 +183,12 @@ export function ImportQuestionnaireButton({ mode, defaultName, topicName, domain
       method: "POST",
       body: formData,
     });
-    const data = await response.json().catch(() => ({}));
     setLoading(false);
     if (!response.ok) {
-      setMessage(data.error || "Could not create the import batch.");
+      setMessage(errorMessage(await readApiError(response, "Could not create the import batch.")));
       return;
     }
+    const data = await response.json();
     setBatchId(data.id);
     setMessage(
       `Staging batch created with ${data.totalFiles ?? allFiles.length} files. Review and publish only this batch before assigning.`,
@@ -294,9 +296,7 @@ export function ImportQuestionnaireButton({ mode, defaultName, topicName, domain
               </p>
 
               {message && (
-                <div className={batchId ? "rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800" : "rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800"}>
-                  {message}
-                </div>
+                <Alert tone={batchId ? "success" : "error"}>{message}</Alert>
               )}
             </div>
 

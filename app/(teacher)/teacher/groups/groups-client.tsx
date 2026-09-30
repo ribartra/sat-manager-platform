@@ -7,6 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { StudentPicker } from "@/components/student-picker";
 import { Plus, UserMinus } from "lucide-react";
+import { useConfirm } from "@/components/sat/confirm-dialog";
+import { apiFetch } from "@/lib/api-client";
+import { notify } from "@/lib/notify-ui";
 
 interface Member {
   id: string;
@@ -22,6 +25,7 @@ interface Group {
 
 export function GroupsClient({ groups: initialGroups, students }: { groups: Group[]; students: Member[] }) {
   const router = useRouter();
+  const confirm = useConfirm();
   const [groups, setGroups] = useState<Group[]>(initialGroups);
   const [newName, setNewName] = useState("");
   const [newSchedule, setNewSchedule] = useState("");
@@ -79,14 +83,10 @@ export function GroupsClient({ groups: initialGroups, students }: { groups: Grou
   }
 
   async function saveGroup(groupId: string) {
-    const response = await fetch(`/api/groups/${groupId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: editName, schedule: editSchedule }),
-    });
-    if (!response.ok) {
-      const data = await response.json().catch(() => ({}));
-      window.alert(data.error || "Could not update group.");
+    try {
+      await apiFetch(`/api/groups/${groupId}`, { method: "PATCH", json: { name: editName, schedule: editSchedule }, fallback: "Could not update group." });
+    } catch (error) {
+      notify.error(error);
       return;
     }
     setEditingGroupId(null);
@@ -94,11 +94,12 @@ export function GroupsClient({ groups: initialGroups, students }: { groups: Grou
   }
 
   async function deleteGroup(groupId: string) {
-    if (!window.confirm("Delete this group? Members will be unlinked from the group.")) return;
-    const response = await fetch(`/api/groups/${groupId}`, { method: "DELETE" });
-    if (!response.ok) {
-      const data = await response.json().catch(() => ({}));
-      window.alert(data.error || "Could not delete group.");
+    const ok = await confirm({ title: "Delete this group?", description: "Members will be unlinked from the group.", tone: "danger", confirmLabel: "Delete" });
+    if (!ok) return;
+    try {
+      await apiFetch(`/api/groups/${groupId}`, { method: "DELETE", fallback: "Could not delete group." });
+    } catch (error) {
+      notify.error(error);
       return;
     }
     setGroups((prev) => prev.filter((group) => group.id !== groupId));

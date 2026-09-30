@@ -28,6 +28,8 @@ import {
   isIngestWarningInfo,
   reconcileWarningsJson,
 } from "@/lib/ingest-warnings";
+import { Alert, InlineError } from "@/components/sat/alert";
+import { errorMessage, readApiError } from "@/lib/api-client";
 
 type SourceFile = {
   id: string;
@@ -266,7 +268,7 @@ function OptionsEditor({
 
       {showRaw ? (
         <>
-          {jsonInvalid && <p className="text-xs text-rose-600">Invalid JSON — fix it here; the table re-enables once valid.</p>}
+          {jsonInvalid && <InlineError className="text-xs">Invalid JSON — fix it here; the table re-enables once valid.</InlineError>}
           <textarea
             value={raw}
             onChange={(event) => onChange({ optionsJson: event.target.value })}
@@ -446,7 +448,7 @@ function PageTextPreview({ page }: { page: PageArtifact }) {
           )}
         </div>
       ) : (
-        <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">{page.warning || "No text extracted."}</p>
+        <Alert tone="warning" className="text-xs">{page.warning || "No text extracted."}</Alert>
       )}
       {page.warning && hasText && <p className="text-xs text-amber-700">{page.warning}</p>}
     </div>
@@ -536,8 +538,7 @@ export function FileReviewClient({
       body: JSON.stringify({ imageArtifactId, questionId }),
     });
     setAssigning(false);
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) { setMessage(data.error || "Could not assign the image."); return; }
+    if (!res.ok) { setMessage(errorMessage(await readApiError(res, "Could not assign the image."))); return; }
     setGalleryAssign(null);
     setMessage(`Image assigned to ${assignTargets.find((t) => t.questionId === questionId)?.label ?? "the question"}.`);
     router.refresh();
@@ -764,10 +765,14 @@ export function FileReviewClient({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ imageArtifactId: imageId }),
     });
-    const data = await response.json().catch(() => ({}));
     setParsingImageId(null);
-    if (!response.ok || !Array.isArray(data.options) || data.options.length !== 4) {
-      setMessage(data.error || data.warning || "Could not read A–D answer choices from this image.");
+    if (!response.ok) {
+      setMessage(errorMessage(await readApiError(response, "Could not read A–D answer choices from this image.")));
+      return;
+    }
+    const data = await response.json();
+    if (!Array.isArray(data.options) || data.options.length !== 4) {
+      setMessage(data.warning || "Could not read A–D answer choices from this image.");
       return;
     }
     setDraft({ ...selected, type: "MC", optionsJson: JSON.stringify(data.options), status: data.status ?? selected.status });

@@ -9,3 +9,5 @@ export { FormSection } from "./form-section";
 export { PracticeAreaTabs } from "./practice-area-tabs";
 export { AttemptStatusBadge, INVALIDATED, InvalidatedNotice, VoidableValue, invalidatedRowClass, isInvalidated } from "./attempt-status";
 export { Pagination, pageFromParam, paginate } from "./pagination";
+export { Alert, InlineError, type AlertTone, type AlertLayout } from "./alert";
+export { NotFoundView } from "./not-found-view";

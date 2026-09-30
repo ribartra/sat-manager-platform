@@ -45,6 +45,9 @@ import {
   type QuestionEditorInput,
 } from "@/contracts/question";
 import { resolveQuestionType } from "@/lib/question-type";
+import { apiFetch, readApiError } from "@/lib/api-client";
+import { notify } from "@/lib/notify-ui";
+import { Alert } from "@/components/sat/alert";
 
 interface TopicInfo {
   id: string;
@@ -255,8 +258,8 @@ export function QuestionEditor({
     const method = initial?.id ? "PUT" : "POST";
     const response = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     if (!response.ok) {
-      const payload = await response.json().catch(() => null);
-      setErrors(Array.isArray(payload?.errors) ? payload.errors : [payload?.error ?? "Unable to save question."]);
+      const error = await readApiError(response, "Unable to save question.");
+      setErrors(error.details.length ? error.details : [error.message]);
       return;
     }
     router.push("/teacher/questions");
@@ -267,18 +270,19 @@ export function QuestionEditor({
   }
 
   const saving = form.formState.isSubmitting;
-  const canSave = Boolean(stem?.trim() && topicId && correctAnswer?.trim());
   const [duplicating, setDuplicating] = useState(false);
 
   async function duplicateQuestion() {
     if (!initial?.id) return;
     setDuplicating(true);
-    const response = await fetch(`/api/questions/${initial.id}/duplicate`, { method: "POST" });
-    const data = await response.json().catch(() => ({}));
-    setDuplicating(false);
-    if (!response.ok) {
-      window.alert(data.errors?.join("\n") || data.error || "Unable to duplicate.");
+    let data: { question?: { id?: string } };
+    try {
+      data = await apiFetch(`/api/questions/${initial.id}/duplicate`, { method: "POST", fallback: "Unable to duplicate." });
+    } catch (error) {
+      notify.error(error);
       return;
+    } finally {
+      setDuplicating(false);
     }
     if (data?.question?.id) router.push(`/teacher/questions/${data.question.id}/edit`);
   }
@@ -539,14 +543,13 @@ export function QuestionEditor({
         </div>
 
         {errors.length > 0 ? (
-          <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-            <p className="font-medium">Fix these issues before saving:</p>
-            <ul className="mt-1 list-disc pl-5">
+          <Alert tone="error" title="Fix these issues before saving:">
+            <ul className="list-disc pl-5">
               {errors.map((error) => (
                 <li key={error}>{error}</li>
               ))}
             </ul>
-          </div>
+          </Alert>
         ) : null}
 
         <div className="flex items-center gap-3">

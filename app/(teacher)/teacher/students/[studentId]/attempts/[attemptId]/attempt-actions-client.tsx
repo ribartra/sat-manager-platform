@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { InlineError } from "@/components/sat/alert";
+import { errorMessage, readApiError } from "@/lib/api-client";
 
 type AttemptAction = "reopen" | "invalidate";
 
@@ -56,8 +58,7 @@ export function AttemptActions({
     setLoading(null);
     setPending(null);
     if (!response.ok) {
-      const data = (await response.json().catch(() => ({}))) as { error?: string };
-      setError(data.error ?? "The action could not be completed.");
+      setError(errorMessage(await readApiError(response, "The action could not be completed.")));
       return;
     }
     setActionReason("");
@@ -111,7 +112,7 @@ export function AttemptActions({
           />
         </>
       )}
-      {error ? <p className="text-xs text-red-600">{error}</p> : null}
+      <InlineError className="text-xs">{error}</InlineError>
       {kind === "practice" ? (
         <>
           <Textarea

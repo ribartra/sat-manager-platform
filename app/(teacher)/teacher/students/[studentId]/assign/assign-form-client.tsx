@@ -11,6 +11,8 @@ import { cn } from "@/lib/utils";
 import { Tag } from "lucide-react";
 import { explanationVisibilityOptions, difficultyLabel, difficultyOptions } from "@/lib/domain-meta";
 import { practiceAreaLabel, type PracticeAreaCode } from "@/lib/practice-area";
+import { InlineError } from "@/components/sat/alert";
+import { errorMessage, readApiError } from "@/lib/api-client";
 
 interface PracticeSetInfo {
   id: string;
@@ -147,13 +149,13 @@ export function AssignForm({
         feedbackMode,
       }),
     });
-    const data = await response.json().catch(() => ({}));
     if (!response.ok) {
       setLoading(false);
       setSuccess(false);
-      setError(data.error || "Unable to assign the selected practice sets.");
+      setError(errorMessage(await readApiError(response, "Unable to assign the selected practice sets.")));
       return;
     }
+    const data = await response.json();
     setLoading(false);
     const created = Number(data.created) || 0;
     const updated = Number(data.updated) || 0;
@@ -365,7 +367,7 @@ export function AssignForm({
       {success && (
         <p className="text-sm font-medium text-green-600">✓ {successMessage || "Assigned"}. Redirecting...</p>
       )}
-      {error && <p className="text-sm text-rose-600">{error}</p>}
+      <InlineError>{error}</InlineError>
 
       <div className="flex items-center gap-3">
         <Button onClick={handleAssign} disabled={loading} disabledReason={selected.size === 0 ? "Select at least one Practice Set." : null}>

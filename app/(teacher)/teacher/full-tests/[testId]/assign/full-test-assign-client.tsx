@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { StudentPicker } from "@/components/student-picker";
 import { cn } from "@/lib/utils";
+import { InlineError } from "@/components/sat/alert";
+import { readApiError } from "@/lib/api-client";
 
 export function FullTestAssignClient({
   testId,
@@ -57,8 +59,8 @@ export function FullTestAssignClient({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ studentIds, dueDate: dueDate || null }),
       });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || "Failed to assign exam.");
+      if (!res.ok) throw await readApiError(res, "Failed to assign exam.");
+      const data = await res.json();
       const changed = (Number(data.created) || 0) + (Number(data.reassigned) || 0) + (Number(data.updated) || 0);
       if (changed === 0) {
         setError("Nothing changed: this exam is already pending with this due date.");
@@ -138,7 +140,7 @@ export function FullTestAssignClient({
         </div>
       )}
       <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
-      {error && <p className="text-sm text-rose-600">{error}</p>}
+      <InlineError>{error}</InlineError>
       <Button onClick={assign} disabled={loading}>
         {loading ? "Assigning..." : "Assign Exam"}
       </Button>

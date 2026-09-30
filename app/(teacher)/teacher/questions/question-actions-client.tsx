@@ -5,22 +5,28 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useConfirm } from "@/components/sat/confirm-dialog";
+import { apiFetch } from "@/lib/api-client";
+import { notify } from "@/lib/notify-ui";
 
 export function QuestionActions({ questionId, usedCount }: { questionId: string; usedCount: number }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const confirm = useConfirm();
   const canDelete = usedCount === 0;
 
   async function remove() {
     if (!canDelete) return;
-    if (!window.confirm("Delete this unused question? This cannot be undone.")) return;
+    const ok = await confirm({ title: "Delete this question?", description: "It is not used anywhere. This cannot be undone.", tone: "danger", confirmLabel: "Delete" });
+    if (!ok) return;
     setLoading(true);
-    const response = await fetch(`/api/questions/${questionId}`, { method: "DELETE" });
-    const data = await response.json().catch(() => ({}));
-    setLoading(false);
-    if (!response.ok) {
-      window.alert(data.errors?.join("\n") || data.error || "Action failed.");
+    try {
+      await apiFetch(`/api/questions/${questionId}`, { method: "DELETE", fallback: "Could not delete the question." });
+    } catch (error) {
+      notify.error(error);
       return;
+    } finally {
+      setLoading(false);
     }
     router.refresh();
   }

@@ -18,9 +18,13 @@ import { OfflineBanner, SaveIndicator, type SaveStatus } from "@/components/sat"
 import { clearBuffer, readBuffer, sendKeepalive, useOnlineStatus, usePageHideFlush, useSaveQueue, writeBuffer } from "@/lib/player-persistence";
 import { exitPlayerOnAuthLoss, isAuthFailureStatus } from "@/lib/player-session-exit";
 import { fetchWithTransientRetry } from "@/lib/transient-fetch";
+import { errorMessage, readApiError } from "@/lib/api-client";
+import { notify } from "@/lib/notify-ui";
+import { useConfirm } from "@/components/sat/confirm-dialog";
 import { formatCorrectAnswer, isAnswerCorrect } from "@/lib/answer-grading";
 import type { CheckResult } from "@/lib/immediate-check";
 import { questionResponseLabel, resolveQuestionType } from "@/lib/question-type";
+import { Alert, InlineError } from "@/components/sat/alert";
 
 interface Option { label: string; text: string; imageUrl?: string | null }
 interface Question {
@@ -127,6 +131,7 @@ export function PracticeSetPlayer({
   const questionStartTime = useRef<number | null>(null);
   const timeSpentByQuestion = useRef<Record<string, number>>({ ...savedTimeSpent });
   const enqueueSave = useSaveQueue();
+  const confirm = useConfirm();
   const online = useOnlineStatus();
 
   const question = questions[current];
@@ -290,11 +295,11 @@ export function PracticeSetPlayer({
         await exitPlayerOnAuthLoss({ pauseUrl: `/api/attempts/${attemptId}/pause` });
         return;
       }
-      const data = (await res.json().catch(() => null)) as (CheckResult & { answer?: string; error?: string }) | null;
-      if (!res.ok || !data) {
-        setCheckError(data?.error ?? "Could not check this answer. Try again.");
+      if (!res.ok) {
+        setCheckError(errorMessage(await readApiError(res, "Could not check this answer. Try again.")));
         return;
       }
+      const data = (await res.json()) as CheckResult & { answer?: string };
       if (data.answer && data.answer !== selected) setAnswers((prev) => ({ ...prev, [question.id]: data.answer! }));
       setChecked((prev) => ({
         ...prev,
@@ -350,21 +355,26 @@ export function PracticeSetPlayer({
   const handleSubmit = async () => {
     if (submitting) return;
     if (previewMode) {
-      window.alert("Preview only — answers are not scored or saved.");
+      notify.info("Preview only", "Answers are not scored or saved.");
       router.push(exitHref);
       return;
     }
     const unanswered = questions.filter((q) => !answers[q.id]).length;
-    const confirmed = window.confirm(
-      unanswered > 0
-        ? `Submit this Practice Set with ${unanswered} unanswered question${unanswered === 1 ? "" : "s"}? Blank answers will be marked as omitted.`
-        : "Submit this Practice Set?"
-    );
+    const confirmed = await confirm({
+      title: "Submit this Practice Set?",
+      description:
+        unanswered > 0
+          ? `${unanswered} question${unanswered === 1 ? " is" : "s are"} unanswered. Blank answers will be marked as omitted.`
+          : "You can review your results right after submitting.",
+      confirmLabel: "Submit",
+    });
     if (!confirmed) return;
 
     setSubmitting(true);
     const timeSpentSnapshot = recordCurrentQuestionTime();
-    const response = await fetchWithTransientRetry(`/api/attempts/${attemptId}/submit`, {
+    let response: Response;
+    try {
+      response = await fetchWithTransientRetry(`/api/attempts/${attemptId}/submit`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -375,14 +385,19 @@ export function PracticeSetPlayer({
         notes,
         eliminatedOptions: Object.fromEntries(Object.entries(eliminated).map(([id, labels]) => [id, Array.from(labels)])),
       }),
-    });
+      });
+    } catch (error) {
+      setSubmitting(false);
+      notify.error(error, "Submit failed: you seem to be offline. Your answers are saved; try again.");
+      return;
+    }
     if (isAuthFailureStatus(response.status)) {
       await exitPlayerOnAuthLoss({ pauseUrl: `/api/attempts/${attemptId}/pause` });
       return;
     }
     if (!response.ok) {
       setSubmitting(false);
-      window.alert("Submit failed. Please try again.");
+      notify.error(await readApiError(response, "Submit failed. Your answers are saved; please try again."));
       return;
     }
     router.push(resultHref ?? `/student/results/${attemptId}`);
@@ -400,12 +415,19 @@ export function PracticeSetPlayer({
   return (
     <div className="relative flex h-dvh max-h-dvh flex-col overflow-hidden bg-white">
       {previewMode && (
-        <div className="flex shrink-0 items-center justify-between gap-3 border-b border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-900 sm:px-6">
+        <Alert
+          tone="warning"
+          layout="banner"
+          hideIcon
+          className="py-2 text-sm"
+          action={
+            <button type="button" className="underline" onClick={() => router.push(exitHref)}>
+              Exit preview
+            </button>
+          }
+        >
           <span className="font-medium">Preview only — not scored. No student attempt is created.</span>
-          <button type="button" className="underline" onClick={() => router.push(exitHref)}>
-            Exit preview
-          </button>
-        </div>
+        </Alert>
       )}
       <OfflineBanner online={online} />
       {/* Top bar — progress as x of N stays here; large question number lives with choices */}
@@ -561,7 +583,7 @@ export function PracticeSetPlayer({
                   >
                     {checking ? "Checking…" : "Check"}
                   </Button>
-                  {checkError ? <p className="text-xs text-red-700" role="alert">{checkError}</p> : null}
+                  <InlineError className="text-xs">{checkError}</InlineError>
                 </>
               ) : (
                 <>

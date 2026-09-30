@@ -18,6 +18,8 @@ import {
 import { ErrorState, FormSection, LoadingState } from "@/components/sat";
 import { parentConsentSchema, type ParentConsentInput } from "@/contracts/auth";
 import { LegalLinks } from "@/components/legal/legal-page";
+import { Alert, InlineError } from "@/components/sat/alert";
+import { apiFetch, errorMessage } from "@/lib/api-client";
 
 interface ConsentInfo {
   studentName: string;
@@ -46,27 +48,20 @@ export default function ParentConsentPage() {
       return;
     }
 
-    fetch(`/api/auth/parent-consent?token=${token}`)
-      .then((response) => response.json())
+    apiFetch<Parameters<typeof setInfo>[0] & { approved?: boolean }>(`/api/auth/parent-consent?token=${token}`)
       .then((data) => {
-        if (data.error) setLoadError(data.error);
-        else {
-          setInfo(data);
-          setApproved(Boolean(data.approved));
-        }
-      });
+        setInfo(data);
+        setApproved(Boolean(data?.approved));
+      })
+      .catch((error) => setLoadError(errorMessage(error)));
   }, [token]);
 
   async function onSubmit(values: ParentConsentInput) {
     setServerError("");
-    const response = await fetch("/api/auth/parent-consent", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token, password: values.password }),
-    });
-    const data = await response.json();
-    if (data.error) {
-      setServerError(data.error);
+    try {
+      await apiFetch("/api/auth/parent-consent", { method: "POST", json: { token, password: values.password } });
+    } catch (error) {
+      setServerError(errorMessage(error));
       return;
     }
     setApproved(true);
@@ -109,9 +104,7 @@ export default function ParentConsentPage() {
           </p>
         </div>
         {approved ? (
-          <div className="rounded-md border border-green-200 bg-green-50 p-4 text-sm text-green-800">
-            Authorization recorded. The student can now activate their account.
-          </div>
+          <Alert tone="success">Authorization recorded. The student can now activate their account.</Alert>
         ) : (
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" noValidate>
@@ -147,7 +140,7 @@ export default function ParentConsentPage() {
                   )}
                 />
               </FormSection>
-              {serverError ? <p className="text-sm text-destructive">{serverError}</p> : null}
+              <InlineError>{serverError}</InlineError>
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? "Authorizing..." : "Authorize enrollment"}
               </Button>

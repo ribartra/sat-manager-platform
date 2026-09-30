@@ -3,6 +3,7 @@
 import * as LabelPrimitive from "@radix-ui/react-label";
 import { Slot } from "@radix-ui/react-slot";
 import * as React from "react";
+import { InlineError } from "@/components/sat/alert";
 import {
   Controller,
   FormProvider,
@@ -122,8 +123,16 @@ const FormMessage = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<
       return null;
     }
 
+    // Field validation errors share the app-wide error message base (Alert/InlineError).
+    if (error) {
+      return (
+        <InlineError id={formMessageId} className={cn("font-medium", className)} {...props}>
+          {body}
+        </InlineError>
+      );
+    }
     return (
-      <p ref={ref} id={formMessageId} className={cn("text-sm font-medium text-red-600", className)} {...props}>
+      <p ref={ref} id={formMessageId} className={cn("text-sm text-gray-600", className)} {...props}>
         {body}
       </p>
     );

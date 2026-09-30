@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/form";
 import { FormSection, PageHeader, PageShell } from "@/components/sat";
 import { changePasswordSchema, type ChangePasswordInput } from "@/contracts/auth";
+import { InlineError } from "@/components/sat/alert";
+import { apiFetch, errorMessage } from "@/lib/api-client";
 
 export default function ChangePasswordPage() {
   const router = useRouter();
@@ -31,17 +33,15 @@ export default function ChangePasswordPage() {
 
   async function onSubmit(values: ChangePasswordInput) {
     setServerError("");
-    const res = await fetch("/api/auth/change-password", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        currentPassword: values.currentPassword,
-        newPassword: values.newPassword,
-      }),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      setServerError(data.error ?? "Could not change password.");
+    let data: { email?: string; reauthenticate?: boolean };
+    try {
+      data = await apiFetch("/api/auth/change-password", {
+        method: "POST",
+        json: { currentPassword: values.currentPassword, newPassword: values.newPassword },
+        fallback: "Could not change password.",
+      });
+    } catch (error) {
+      setServerError(errorMessage(error));
       return;
     }
     // Changing the password signs out every session, this one included: sign back in here.
@@ -105,7 +105,7 @@ export default function ChangePasswordPage() {
                 )}
               />
             </FormSection>
-            {serverError ? <p className="text-sm text-destructive">{serverError}</p> : null}
+            <InlineError>{serverError}</InlineError>
             {success ? <p className="text-sm text-success">Password updated.</p> : null}
             <Button type="submit" disabled={loading} className="w-full">
               {loading ? "Saving..." : "Save Password"}

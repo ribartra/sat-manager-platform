@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/form";
 import { FormSection } from "@/components/sat";
 import { setPasswordSchema, type SetPasswordInput } from "@/contracts/auth";
+import { InlineError } from "@/components/sat/alert";
+import { apiFetch, errorMessage } from "@/lib/api-client";
 
 export default function ResetPasswordPage() {
   const params = useSearchParams();
@@ -32,14 +34,10 @@ export default function ResetPasswordPage() {
 
   async function onSubmit(values: SetPasswordInput) {
     setServerError("");
-    const res = await fetch("/api/auth/reset-password", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token, password: values.password }),
-    });
-    const data = await res.json();
-    if (data.error) {
-      setServerError(data.error);
+    try {
+      await apiFetch("/api/auth/reset-password", { method: "POST", json: { token, password: values.password } });
+    } catch (error) {
+      setServerError(errorMessage(error));
       return;
     }
     router.push("/login?reset=1");
@@ -82,7 +80,7 @@ export default function ResetPasswordPage() {
                   )}
                 />
               </FormSection>
-              {serverError ? <p className="text-sm text-destructive">{serverError}</p> : null}
+              <InlineError>{serverError}</InlineError>
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? "Saving..." : "Save Password"}
               </Button>

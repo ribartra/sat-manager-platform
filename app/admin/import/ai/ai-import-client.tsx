@@ -20,6 +20,7 @@ import { ExtractedTestRail } from "@/app/admin/import/ai/_components/extracted-t
 import { queryKeys } from "@/lib/query-keys";
 import type { ExtractedTestRow } from "@/lib/ingest-sets";
 import { stripIngestImagePlaceholders } from "@/lib/ingest-text-sanitize";
+import { errorMessage, readApiError } from "@/lib/api-client";
 
 const MAX_UPLOAD_BYTES = 256 * 1024 * 1024;
 const targetTypes = [
@@ -434,12 +435,12 @@ export function AiImportWorkflowClient({
         type: draft.type,
       }),
     });
-    const data = await response.json().catch(() => ({}));
     setSaving(false);
     if (!response.ok) {
-      setMessage(data.error || "Could not save question.");
+      setMessage(errorMessage(await readApiError(response, "Could not save question.")));
       return;
     }
+    const data = await response.json();
     setDraft(data);
     setSavedSignature(candidateContentSignature(data, optionsToJson(optionRows)));
     setMessage(status ? `Question marked ${status}.` : "Question saved.");
@@ -482,10 +483,14 @@ export function AiImportWorkflowClient({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ imageArtifactId }),
     });
-    const data = await response.json().catch(() => ({}));
     setParsingImageId(null);
-    if (!response.ok || !Array.isArray(data.options) || data.options.length !== 4) {
-      setMessage(data.error || data.warning || "Could not parse A-D options from this image.");
+    if (!response.ok) {
+      setMessage(errorMessage(await readApiError(response, "Could not parse A-D options from this image.")));
+      return;
+    }
+    const data = await response.json();
+    if (!Array.isArray(data.options) || data.options.length !== 4) {
+      setMessage(data.warning || "Could not parse A-D options from this image.");
       return;
     }
     setOptionRows(data.options);
@@ -836,12 +841,12 @@ function BulkPromoteQuestionsBar({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ candidateIds: selectedCandidateIds }),
     });
-    const data = await response.json().catch(() => ({}));
     setLoading(false);
     if (!response.ok) {
-      setMessage(data.error ?? "Could not promote selected questions.");
+      setMessage(errorMessage(await readApiError(response, "Could not promote selected questions.")));
       return;
     }
+    const data = await response.json();
     setMessage(`Promoted ${data.promoted ?? 0}; skipped ${data.skipped ?? 0}; errors ${(data.errors ?? []).length}.`);
     onClear();
     router.refresh();
@@ -882,12 +887,12 @@ function PromoteQuestionIdsButton({ batchId, candidateIds, label }: { batchId: s
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ candidateIds }),
     });
-    const data = await response.json().catch(() => ({}));
     setLoading(false);
     if (!response.ok) {
-      setMessage(data.error ?? "Could not promote questions.");
+      setMessage(errorMessage(await readApiError(response, "Could not promote questions.")));
       return;
     }
+    const data = await response.json();
     setMessage(`Promoted ${data.promoted ?? 0}.`);
     router.refresh();
   }
@@ -1306,12 +1311,12 @@ export function AiImportActions({ selectedBatchId }: { selectedBatchId?: string 
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, basePath }),
     });
-    const data = await res.json();
     setLoading(false);
     if (!res.ok) {
-      setMessage(data.error || "Could not create batch.");
+      setMessage(errorMessage(await readApiError(res, "Could not create batch.")));
       return;
     }
+    const data = await res.json();
     setMessage(`Batch created with ${data.totalFiles ?? 0} source files. Review the scan before processing.`);
     router.push(`/admin/import/ai?batch=${data.id}`);
     router.refresh();
@@ -1332,12 +1337,12 @@ export function AiImportActions({ selectedBatchId }: { selectedBatchId?: string 
       method: "POST",
       body: formData,
     });
-    const data = await res.json().catch(() => ({}));
     setLoading(false);
     if (!res.ok) {
-      setMessage(data.error || "Could not upload ZIP.");
+      setMessage(errorMessage(await readApiError(res, "Could not upload ZIP.")));
       return;
     }
+    const data = await res.json();
     setZipFile(null);
     setMessage(`ZIP scanned into staging: ${data.totalFiles ?? 0} source files detected.`);
     router.push(`/admin/import/ai?batch=${data.id}`);
@@ -1349,10 +1354,9 @@ export function AiImportActions({ selectedBatchId }: { selectedBatchId?: string 
     setLoading(true);
     setMessage("Processing selected batch. OCR may continue in the background.");
     const res = await fetch(`/api/admin/ai-import/batches/${selectedBatchId}/process`, { method: "POST" });
-    const data = await res.json();
     setLoading(false);
     if (!res.ok) {
-      setMessage(data.error || "Could not start processing.");
+      setMessage(errorMessage(await readApiError(res, "Could not start processing.")));
       return;
     }
     setMessage("Processing started. Refresh this page to see files, incidents and candidates.");
@@ -1491,12 +1495,12 @@ export function RetryFailedJobsButton({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ sourceFileId, limit: pendingCount ?? 5000 }),
     });
-    const data = await response.json().catch(() => ({}));
     setLoading(false);
     if (!response.ok) {
-      setMessage(data.error || "Could not retry failed OCR.");
+      setMessage(errorMessage(await readApiError(response, "Could not retry failed OCR.")));
       return;
     }
+    const data = await response.json();
     setMessage(`Retried ${data.attempted ?? 0}; fixed ${data.fixed ?? 0}; still pending ${data.stillRequired ?? 0}.`);
     router.refresh();
   }
@@ -1554,9 +1558,14 @@ export function PromotePracticeSetButton({ batchId, sourceFileId, partial = fals
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ sourceFileId, allowPartial: partial }),
     });
-    const data = await response.json().catch(() => ({}));
     setLoading(false);
-    setMessage(response.ok ? `Draft set ready with ${data.questionCount ?? 0}/${data.totalSourceCandidates ?? data.questionCount ?? 0} questions.` : data.error ?? "Could not create draft set.");
+    if (!response.ok) {
+      setMessage(errorMessage(await readApiError(response, "Could not create draft set.")));
+      router.refresh();
+      return;
+    }
+    const data = await response.json();
+    setMessage(`Draft set ready with ${data.questionCount ?? 0}/${data.totalSourceCandidates ?? data.questionCount ?? 0} questions.`);
     router.refresh();
   }
 
@@ -1583,9 +1592,10 @@ export function PromoteFullTestButton({ batchId, testNumber, partial = false }: 
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ testNumber, allowPartial: partial }),
     });
-    const data = await response.json().catch(() => ({}));
     setLoading(false);
-    if (response.ok) {
+    const failure = response.ok ? null : await readApiError(response, "Could not create draft exam.");
+    const data = failure ? {} : await response.json();
+    if (!failure) {
       const modules = Array.isArray(data.modules)
         ? data.modules
             .map((m: { moduleKey?: string; section?: string; count?: number; expected?: number }) =>
@@ -1595,7 +1605,7 @@ export function PromoteFullTestButton({ batchId, testNumber, partial = false }: 
         : (data.moduleCounts ?? []).join("/");
       setMessage(`Standardized FPT ready (4 groups): ${modules}`);
     } else {
-      setMessage(data.error ?? "Could not create draft exam.");
+      setMessage(failure.message);
     }
     router.refresh();
   }

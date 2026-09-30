@@ -28,6 +28,8 @@ import {
   createFullTestEditorSchema,
   type FullTestEditorInput,
 } from "@/contracts/full-test";
+import { Alert } from "@/components/sat/alert";
+import { readApiError } from "@/lib/api-client";
 
 export function FullTestEditor({
   questions,
@@ -114,10 +116,11 @@ export function FullTestEditor({
         moduleQuestionIds: values.moduleQuestionIds,
       }),
     });
-    const data = await response.json().catch(() => null);
     if (!response.ok) {
-      setErrors(data?.errors ?? [data?.error ?? "Unable to create Exam."]);
-      setWarnings(data?.warnings ?? []);
+      const error = await readApiError(response, "Unable to create Exam.");
+      const warnings = (error.data as { warnings?: unknown } | null)?.warnings;
+      setErrors(error.details.length ? error.details : [error.message]);
+      setWarnings(Array.isArray(warnings) ? warnings.map(String) : []);
       return;
     }
     router.push("/teacher/practice-sets?area=mocks");
@@ -138,7 +141,6 @@ export function FullTestEditor({
   }
 
   const saving = form.formState.isSubmitting;
-  const canSave = Boolean(name?.trim() && moduleQuestionIds.every((ids) => ids.length > 0));
 
   return (
     <Form {...form}>
@@ -309,24 +311,22 @@ export function FullTestEditor({
         })}
 
         {warnings.length > 0 ? (
-          <Card variant="warning" padding="sm" className="text-sm text-amber-800">
-            <p className="font-medium">Warnings</p>
-            <ul className="mt-1 list-disc pl-5">
+          <Alert tone="warning" title="Warnings">
+            <ul className="list-disc pl-5">
               {warnings.map((warning) => (
                 <li key={warning}>{warning}</li>
               ))}
             </ul>
-          </Card>
+          </Alert>
         ) : null}
         {errors.length > 0 ? (
-          <Card variant="danger" padding="sm" className="text-sm text-red-700">
-            <p className="font-medium">Fix these issues before saving:</p>
-            <ul className="mt-1 list-disc pl-5">
+          <Alert tone="error" title="Fix these issues before saving:">
+            <ul className="list-disc pl-5">
               {errors.map((error) => (
                 <li key={error}>{error}</li>
               ))}
             </ul>
-          </Card>
+          </Alert>
         ) : null}
 
         <Button type="submit" disabled={saving} disabledReason={!name?.trim() ? "Enter a name." : !moduleQuestionIds.every((ids) => ids.length > 0) ? "Every module needs at least one question." : null}>

@@ -16,6 +16,7 @@ import {
 } from "@/lib/practice-area";
 import { isAnsweredAnswer, summarizeAllQuestionAnswers } from "@/lib/weighted-score";
 import { buildProgressHref, progressFiltersFromParams } from "@/lib/progress-filters";
+import { Alert } from "@/components/sat/alert";
 
 export const dynamic = "force-dynamic";
 
@@ -41,13 +42,12 @@ function StudentViewUnavailable({
 }) {
   return (
     <PageShell width="narrow">
-      <div className="rounded-lg border border-amber-200 bg-amber-50 p-6 text-center">
-        <h1 className="text-lg font-semibold text-amber-900">{title}</h1>
-        <p className="mt-2 text-sm text-amber-800">{message}</p>
-        <Link href={backHref} className="mt-5 inline-flex text-sm font-medium text-amber-900 underline">
+      <Alert tone="warning" title={title} role="alert">
+        <p>{message}</p>
+        <Link href={backHref} className="mt-3 inline-flex text-sm font-medium underline">
           Back to Students
         </Link>
-      </div>
+      </Alert>
     </PageShell>
   );
 }
@@ -230,14 +230,19 @@ export default async function ImpersonateStudentPage({ params, searchParams }: P
 
   return (
     <div>
-      <div className="border-b border-amber-200 bg-amber-50 py-2">
-        <div className="mx-auto flex max-w-[var(--sat-page-wide)] items-center justify-between px-4">
-          <span className="text-sm font-medium text-amber-800">You are viewing as: {student.name}</span>
-          <Link href={buildProgressHref(`/teacher/students/${student.id}`, filters)} className="text-sm text-amber-800 underline">
+      <Alert
+        tone="warning"
+        layout="banner"
+        hideIcon
+        className="py-2 text-sm"
+        action={
+          <Link href={buildProgressHref(`/teacher/students/${student.id}`, filters)} className="text-sm underline">
             Exit Student View
           </Link>
-        </div>
-      </div>
+        }
+      >
+        <span className="font-medium">You are viewing as: {student.name}</span>
+      </Alert>
       <PageShell>
         <div className="mb-6">
           <h1 className="text-2xl font-semibold text-gray-900">Hello, {student.name.split(" ")[0]}!</h1>

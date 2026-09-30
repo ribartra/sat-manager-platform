@@ -15,6 +15,7 @@ import { formatCorrectAnswer } from "@/lib/answer-grading";
 import { resolveQuestionType } from "@/lib/question-type";
 import { difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
 import { isAnsweredAnswer, summarizeAllQuestionAnswers } from "@/lib/weighted-score";
+import { Alert } from "@/components/sat/alert";
 
 interface PageProps {
   params: Promise<{ attemptId: string }>;
@@ -139,10 +140,10 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
         </div>
 
         {attempt.pauses.length > 0 && (
-          <p className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+          <Alert tone="note" className="mt-4 text-xs">
             Paused {attempt.pauses.length} time{attempt.pauses.length === 1 ? "" : "s"}
             {pauseSeconds > 0 ? ` · total pause time ${formatTime(pauseSeconds)}` : ""}
-          </p>
+          </Alert>
         )}
 
         <div className="mt-5 flex items-center gap-3">

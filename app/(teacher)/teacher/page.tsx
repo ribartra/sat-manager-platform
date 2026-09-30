@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { formatDate } from "@/lib/utils";
 import { Card, CardBody } from "@/components/ui/card";
-import { AlertTriangle, UserPlus } from "lucide-react";
+import { UserPlus } from "lucide-react";
 import { UnlockRequestActions } from "./unlock-request-actions-client";
 import { auth } from "@/lib/auth";
 import { getFeatureSetting } from "@/lib/app-settings";
@@ -17,6 +17,7 @@ import { progressFilterQuery } from "@/lib/progress-filters";
 import { summarizeAllQuestionAnswers } from "@/lib/weighted-score";
 import { SkillOptions } from "@/components/progress-filters";
 import { compareSkills, isOfficialSkill } from "@/lib/taxonomy-order";
+import { Alert } from "@/components/sat/alert";
 
 interface PageProps {
   searchParams: Promise<{
@@ -338,16 +339,15 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
 
       {/* Alerts */}
       {(inactiveStudents.length > 0 || overdueAssignments.length > 0 || overdueFullTestAssignments.length > 0 || unlockRequests.length > 0) && (
-        <Card variant="warning" padding="sm" className="mb-5">
+        <Alert tone="warning" className="mb-5">
           <div className="flex items-center gap-2">
-            <AlertTriangle size={16} className="shrink-0 text-amber-600" />
-            <div className="text-sm text-amber-800">
+            <div className="space-y-0.5">
               {inactiveStudents.length > 0 && <p><strong>{inactiveStudents.length} student{inactiveStudents.length > 1 ? "s" : ""}</strong> haven&apos;t practiced in 5+ days: {inactiveStudents.map((s) => s.name).join(", ")}</p>}
               {(overdueAssignments.length > 0 || overdueFullTestAssignments.length > 0) && <p><strong>{overdueAssignments.length + overdueFullTestAssignments.length}</strong> overdue assignment{overdueAssignments.length + overdueFullTestAssignments.length > 1 ? "s" : ""} need attention.</p>}
               {unlockRequests.length > 0 && <p><strong>{unlockRequests.length}</strong> pending unlock request{unlockRequests.length > 1 ? "s" : ""}.</p>}
             </div>
           </div>
-        </Card>
+        </Alert>
       )}
 
       {lowPerformance.length > 0 && (

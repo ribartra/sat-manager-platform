@@ -5,6 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Edit, Play, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useConfirm } from "@/components/sat/confirm-dialog";
+import { apiFetch } from "@/lib/api-client";
+import { notify } from "@/lib/notify-ui";
 
 export function PracticeSetActions({
   practiceSetId,
@@ -15,18 +18,21 @@ export function PracticeSetActions({
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const confirm = useConfirm();
   const canDelete = assignmentCount === 0;
 
   async function remove() {
     if (!canDelete) return;
-    if (!window.confirm("Delete this unused Practice Set? This cannot be undone.")) return;
+    const ok = await confirm({ title: "Delete this Practice Set?", description: "It is not used by any assignment. This cannot be undone.", tone: "danger", confirmLabel: "Delete" });
+    if (!ok) return;
     setLoading(true);
-    const response = await fetch(`/api/practice-sets/${practiceSetId}`, { method: "DELETE" });
-    const data = await response.json().catch(() => ({}));
-    setLoading(false);
-    if (!response.ok) {
-      window.alert(data.errors?.join("\n") || data.error || "Action failed.");
+    try {
+      await apiFetch(`/api/practice-sets/${practiceSetId}`, { method: "DELETE", fallback: "Could not delete the Practice Set." });
+    } catch (error) {
+      notify.error(error);
       return;
+    } finally {
+      setLoading(false);
     }
     router.refresh();
   }

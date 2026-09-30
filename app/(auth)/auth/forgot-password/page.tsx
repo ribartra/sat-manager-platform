@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/form";
 import { FormSection } from "@/components/sat";
 import { forgotPasswordSchema, type ForgotPasswordInput } from "@/contracts/auth";
+import { Alert } from "@/components/sat/alert";
 
 export default function ForgotPasswordPage() {
   const [sent, setSent] = useState(false);
@@ -45,9 +46,7 @@ export default function ForgotPasswordPage() {
           </p>
 
           {sent ? (
-            <div className="rounded-md border border-green-200 bg-green-50 p-4 text-sm text-green-700">
-              If that email is registered, a reset link has been sent. Check your inbox.
-            </div>
+            <Alert tone="success">If that email is registered, a reset link has been sent. Check your inbox.</Alert>
           ) : (
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" noValidate>

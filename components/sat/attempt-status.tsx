@@ -1,3 +1,4 @@
+import { Alert } from "./alert";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
@@ -31,13 +32,10 @@ export function AttemptStatusBadge({ status }: { status: string }) {
 
 export function InvalidatedNotice({ audience }: { audience: "student" | "teacher" }) {
   return (
-    <div role="note" className="mb-6 rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-sm text-gray-700">
-      <p className="font-semibold text-gray-900">This attempt was invalidated</p>
-      <p className="mt-0.5">
-        {audience === "student"
-          ? "Your teacher invalidated this attempt. It stays in your history for reference but does not count toward any score or average."
-          : "It stays in the history for reference but does not count toward any score, average, report or analytics."}
-      </p>
-    </div>
+    <Alert tone="note" role="note" title="This attempt was invalidated" className="mb-6">
+      {audience === "student"
+        ? "Your teacher invalidated this attempt. It stays in your history for reference but does not count toward any score or average."
+        : "It stays in the history for reference but does not count toward any score, average, report or analytics."}
+    </Alert>
   );
 }

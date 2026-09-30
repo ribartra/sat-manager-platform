@@ -15,6 +15,8 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { InlineError } from "@/components/sat/alert";
+import { errorMessage, readApiError } from "@/lib/api-client";
 
 export type MergeCandidate = {
   id: string;
@@ -201,12 +203,12 @@ export function MergeDialog({ open, onClose, candidates, imageLinks, images, ini
           cleanupSourcePromotion: cleanup,
         }),
       });
-      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(data?.error ?? "Could not merge.");
+        setError(errorMessage(await readApiError(res, "Could not merge.")));
         setSubmitting(false);
         return;
       }
+      const data = await res.json();
       onMerged(survivorCand.id, Array.isArray(data?.warnings) ? data.warnings : []);
     } catch {
       setError("Network error while merging.");
@@ -385,7 +387,7 @@ export function MergeDialog({ open, onClose, candidates, imageLinks, images, ini
               </label>
             )}
 
-            {error && <p className="text-sm text-red-600">{error}</p>}
+            <InlineError>{error}</InlineError>
           </>
         ) : (
           <p className="text-sm text-gray-500">No other question in this file to merge with.</p>

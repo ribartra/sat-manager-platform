@@ -5,6 +5,7 @@ import { useCallback, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { errorMessage, readApiError } from "@/lib/api-client";
 
 // Reusable "crop from a PDF page" tool for the ingest review surfaces (batch
 // dashboard + per-file wizard). Renders a source page, lets the reviewer drag a
@@ -170,11 +171,11 @@ export function PdfPageCropper({
           imageSourceFileId: effectiveSourceId,
         }),
       });
-      const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        setMessage(data.error || "Could not process crop.");
+        setMessage(errorMessage(await readApiError(response, "Could not process crop.")));
         return;
       }
+      const data = await response.json();
       if (mode === "ASSIGN") {
         setMessage("Crop assigned.");
         setRect(null);

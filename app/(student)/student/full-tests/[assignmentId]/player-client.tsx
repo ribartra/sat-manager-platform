@@ -16,8 +16,11 @@ import { questionResponseLabel, resolveQuestionType } from "@/lib/question-type"
 import { LoadingState, OfflineBanner, SaveIndicator, type SaveStatus } from "@/components/sat";
 import { exitPlayerOnAuthLoss, isAuthFailureStatus } from "@/lib/player-session-exit";
 import { fetchWithTransientRetry } from "@/lib/transient-fetch";
+import { readApiError } from "@/lib/api-client";
+import { notify } from "@/lib/notify-ui";
 import { clearBuffer, readBuffer, sendKeepalive, useOnlineStatus, usePageHideFlush, useSaveQueue, writeBuffer } from "@/lib/player-persistence";
 import { ChevronLeft, Flag, List } from "lucide-react";
+import { Alert } from "@/components/sat/alert";
 
 interface ModuleQuestion {
   id: string;
@@ -381,7 +384,7 @@ export function FullTestPlayer({
 
   const submit = useCallback(async () => {
     if (previewMode) {
-      window.alert("Preview only — exam is not scored or saved.");
+      notify.info("Preview only", "The exam is not scored or saved.");
       router.push(exitHref);
       return;
     }
@@ -389,7 +392,9 @@ export function FullTestPlayer({
       timerState.current[moduleIndexRef.current] = remainingRef.current;
     }
     const timeSpentSnapshot = recordQuestionTime();
-    const response = await fetchWithTransientRetry(`/api/full-practice-tests/attempts/${attemptId}/submit`, {
+    let response: Response;
+    try {
+      response = await fetchWithTransientRetry(`/api/full-practice-tests/attempts/${attemptId}/submit`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -401,7 +406,12 @@ export function FullTestPlayer({
         notes: notesRef.current,
         eliminatedOptions: fromLabelSets(eliminatedRef.current),
       }),
-    });
+      });
+    } catch (error) {
+      writeBuffer(offlineKey, buildAutosavePayload(answersRef.current, moduleIndexRef.current, questionIndexRef.current));
+      notify.error(error, "Submit failed: you seem to be offline. Your answers are saved on this device; try again.");
+      return;
+    }
     if (isAuthFailureStatus(response.status)) {
       await exitPlayerOnAuthLoss({
         pauseUrl: `/api/full-practice-tests/attempts/${attemptId}/pause`,
@@ -410,7 +420,7 @@ export function FullTestPlayer({
     }
     if (!response.ok) {
       writeBuffer(offlineKey, buildAutosavePayload(answersRef.current, moduleIndexRef.current, questionIndexRef.current));
-      window.alert("Submit failed. Your answers are saved on this device; please try again.");
+      notify.error(await readApiError(response, "Submit failed. Your answers are saved on this device; please try again."));
       return;
     }
     clearBuffer(offlineKey);
@@ -629,12 +639,19 @@ export function FullTestPlayer({
     <div className="flex h-dvh max-h-dvh flex-col overflow-hidden bg-white">
       <OfflineBanner online={online} />
       {previewMode && (
-        <div className="flex items-center justify-between border-b border-amber-200 bg-amber-50 px-6 py-2 text-sm text-amber-900">
+        <Alert
+          tone="warning"
+          layout="banner"
+          hideIcon
+          className="py-2 text-sm"
+          action={
+            <button type="button" className="underline" onClick={() => router.push(exitHref)}>
+              Exit preview
+            </button>
+          }
+        >
           <span className="font-medium">Preview only — not scored. No student attempt is created.</span>
-          <button type="button" className="underline" onClick={() => router.push(exitHref)}>
-            Exit preview
-          </button>
-        </div>
+        </Alert>
       )}
       <div className="flex items-center justify-between border-b border-gray-200 px-6 py-3">
         <div>

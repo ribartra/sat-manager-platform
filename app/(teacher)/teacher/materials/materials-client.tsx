@@ -25,6 +25,9 @@ import {
   questionStatusBadgeVariant,
   questionStatusLabel,
 } from "@/lib/domain-meta";
+import { useConfirm } from "@/components/sat/confirm-dialog";
+import { apiFetch } from "@/lib/api-client";
+import { notify } from "@/lib/notify-ui";
 
 type TopicOption = TaxonomyPickerTopic;
 
@@ -74,6 +77,7 @@ function SkillLine({ topic }: { topic: MaterialRow["topic"] }) {
 
 export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; materials: MaterialRow[] }) {
   const router = useRouter();
+  const confirm = useConfirm();
 
   // Form / modal state
   const [title, setTitle] = useState("");
@@ -148,16 +152,17 @@ export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; 
 
   async function saveMaterial() {
     setSaving(true);
-    const response = await fetch(editingId ? `/api/materials/${editingId}` : "/api/materials", {
-      method: editingId ? "PATCH" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, description, body, url, topicId, status }),
-    });
-    setSaving(false);
-    if (!response.ok) {
-      const data = await response.json().catch(() => ({}));
-      window.alert(data.error || "Could not save material.");
+    try {
+      await apiFetch(editingId ? `/api/materials/${editingId}` : "/api/materials", {
+        method: editingId ? "PATCH" : "POST",
+        json: { title, description, body, url, topicId, status },
+        fallback: "Could not save material.",
+      });
+    } catch (error) {
+      notify.error(error);
       return;
+    } finally {
+      setSaving(false);
     }
     setEditorOpen(false);
     resetForm();
@@ -165,18 +170,23 @@ export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; 
   }
 
   async function duplicateMaterial(materialId: string) {
-    const response = await fetch(`/api/materials/${materialId}/duplicate`, { method: "POST" });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) window.alert(data.error || "Could not duplicate material.");
-    else setViewing(null);
+    try {
+      await apiFetch(`/api/materials/${materialId}/duplicate`, { method: "POST", fallback: "Could not duplicate material." });
+      setViewing(null);
+    } catch (error) {
+      notify.error(error);
+    }
     router.refresh();
   }
 
   async function deleteMaterial(materialId: string) {
-    if (!window.confirm("Delete this study material? This cannot be undone.")) return;
-    const response = await fetch(`/api/materials/${materialId}`, { method: "DELETE" });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) window.alert(data.error || "Could not delete material.");
+    const ok = await confirm({ title: "Delete this study material?", description: "This cannot be undone.", tone: "danger", confirmLabel: "Delete" });
+    if (!ok) return;
+    try {
+      await apiFetch(`/api/materials/${materialId}`, { method: "DELETE", fallback: "Could not delete material." });
+    } catch (error) {
+      notify.error(error);
+    }
     router.refresh();
   }
 

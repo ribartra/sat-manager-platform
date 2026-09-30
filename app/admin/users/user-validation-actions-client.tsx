@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { useConfirm } from "@/components/sat/confirm-dialog";
+import { apiFetch } from "@/lib/api-client";
+import { notify } from "@/lib/notify-ui";
 
 export function UserValidationActions({
   userId,
@@ -20,42 +23,37 @@ export function UserValidationActions({
   const router = useRouter();
   const [loadingStatus, setLoadingStatus] = useState<string | null>(null);
 
-  async function updateStatus(validationStatus: "PENDING" | "APPROVED" | "REJECTED") {
-    setLoadingStatus(validationStatus);
-    await fetch(`/api/admin/users/${userId}/validation`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ validationStatus }),
-    });
-    setLoadingStatus(null);
-    router.refresh();
+  const confirm = useConfirm();
+
+  async function run(key: string, url: string, json?: unknown, fallback?: string) {
+    setLoadingStatus(key);
+    try {
+      await apiFetch(url, { method: "POST", json, fallback });
+    } catch (error) {
+      notify.error(error);
+    } finally {
+      setLoadingStatus(null);
+      router.refresh();
+    }
   }
 
-  async function toggleActive() {
-    setLoadingStatus("ACTIVE");
-    const response = await fetch(`/api/admin/users/${userId}/toggle-active`, { method: "POST" });
-    const data = await response.json().catch(() => ({}));
-    setLoadingStatus(null);
-    if (!response.ok) window.alert(data.error || "Could not update access.");
-    router.refresh();
-  }
+  const updateStatus = (validationStatus: "PENDING" | "APPROVED" | "REJECTED") =>
+    run(validationStatus, `/api/admin/users/${userId}/validation`, { validationStatus }, "Could not update the validation status.");
+
+  const toggleActive = () => run("ACTIVE", `/api/admin/users/${userId}/toggle-active`, undefined, "Could not update access.");
 
   // Erasure on request (RNF-12): typed-email confirmation, personal data removed, history kept.
   async function anonymize() {
-    const typed = window.prompt(
-      `Anonymize this account? Name, email, phone, birth date, avatar and personal notes are removed and the account is disabled. Attempts and scores stay, without the name. This cannot be undone.\n\nType ${email} to confirm:`,
-    );
-    if (typed === null) return;
-    setLoadingStatus("ANONYMIZE");
-    const response = await fetch(`/api/admin/users/${userId}/anonymize`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ confirmEmail: typed }),
+    const ok = await confirm({
+      title: "Anonymize this account?",
+      description:
+        "Name, email, phone, birth date, avatar and personal notes are removed and the account is disabled. Attempts and scores stay, without the name. This cannot be undone.",
+      tone: "danger",
+      confirmLabel: "Anonymize",
+      requireText: email,
     });
-    const data = await response.json().catch(() => ({}));
-    setLoadingStatus(null);
-    if (!response.ok) window.alert(data.error || "Could not anonymize the account.");
-    router.refresh();
+    if (!ok) return;
+    await run("ANONYMIZE", `/api/admin/users/${userId}/anonymize`, { confirmEmail: email }, "Could not anonymize the account.");
   }
 
   const anonymized = email.endsWith("@invalid.local");

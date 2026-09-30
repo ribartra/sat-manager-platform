@@ -4,16 +4,34 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { UserCheck, UserX } from "lucide-react";
+import { useConfirm } from "@/components/sat/confirm-dialog";
+import { apiFetch } from "@/lib/api-client";
+import { notify } from "@/lib/notify-ui";
 
 export function StudentDetailActions({ studentId, isActive }: { studentId: string; isActive: boolean }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const confirm = useConfirm();
 
   async function toggleActive() {
-    if (isActive && !window.confirm("Deactivate this student? They will not be able to sign in until reactivated. Their data and history are kept.")) return;
+    if (
+      isActive &&
+      !(await confirm({
+        title: "Deactivate this student?",
+        description: "They will not be able to sign in until reactivated. Their data and history are kept.",
+        tone: "danger",
+        confirmLabel: "Deactivate",
+      }))
+    )
+      return;
     setLoading(true);
-    await fetch(`/api/students/${studentId}/toggle-active`, { method: "POST" });
-    setLoading(false);
+    try {
+      await apiFetch(`/api/students/${studentId}/toggle-active`, { method: "POST", fallback: "Could not update the student." });
+    } catch (error) {
+      notify.error(error);
+    } finally {
+      setLoading(false);
+    }
     router.refresh();
   }
 

@@ -5,6 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Archive, Copy, Edit, Eye, Play, Send, Trash2, UploadCloud } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useConfirm } from "@/components/sat/confirm-dialog";
+import { apiFetch } from "@/lib/api-client";
+import { notify } from "@/lib/notify-ui";
 
 type FullTestActionsProps = {
   testId: string;
@@ -24,28 +27,27 @@ export function FullTestActions({
 }: FullTestActionsProps) {
   const router = useRouter();
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
+  const confirm = useConfirm();
   const canDelete = !hasAssignments && !hasAttempts;
   const canAssign = status === "PUBLISHED";
 
-  async function request(action: string, url: string, init: RequestInit = {}) {
+  async function request(action: string, url: string, init: { method: string; json?: unknown } = { method: "POST" }) {
     setLoadingAction(action);
-    const response = await fetch(url, init);
-    const data = await response.json().catch(() => ({}));
-    setLoadingAction(null);
-    if (!response.ok) {
-      window.alert(data.errors?.join("\n") || data.error || "Action failed.");
+    let data: { test?: { id?: string } } | null = null;
+    try {
+      data = await apiFetch<{ test?: { id?: string } }>(url, { ...init, fallback: "Action failed." });
+    } catch (error) {
+      notify.error(error);
       return null;
+    } finally {
+      setLoadingAction(null);
     }
     router.refresh();
     return data;
   }
 
   async function changeStatus(nextStatus: string) {
-    await request(nextStatus, `/api/full-practice-tests/${testId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: nextStatus }),
-    });
+    await request(nextStatus, `/api/full-practice-tests/${testId}`, { method: "PATCH", json: { status: nextStatus } });
   }
 
   async function duplicate() {
@@ -55,7 +57,8 @@ export function FullTestActions({
 
   async function remove() {
     if (!canDelete) return;
-    if (!window.confirm("Delete this draft exam? This cannot be undone.")) return;
+    const ok = await confirm({ title: "Delete this draft exam?", description: "This cannot be undone.", tone: "danger", confirmLabel: "Delete" });
+    if (!ok) return;
     const data = await request("delete", `/api/full-practice-tests/${testId}`, { method: "DELETE" });
     if (data && variant === "detail") router.push("/teacher/practice-sets?area=mocks");
   }

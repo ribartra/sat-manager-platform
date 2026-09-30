@@ -23,6 +23,7 @@ import {
   type MistralKeyInput,
   type SmtpSettingsInput,
 } from "@/contracts/admin";
+import { errorMessage, readApiError } from "@/lib/api-client";
 
 type Setting = {
   key: string;
@@ -90,11 +91,11 @@ export function SettingsClient({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ apiKey: values.apiKey }),
     });
-    const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-      setSecretMessage(data.error || "Could not update Mistral key.");
+      setSecretMessage(errorMessage(await readApiError(response, "Could not update Mistral key.")));
       return;
     }
+    const data = await response.json();
     mistralForm.reset({ apiKey: "" });
     setSecretMessage(`Mistral key updated. SHA-256 ${String(data.sha256 ?? "").slice(0, 12)}...`);
     router.refresh();
@@ -113,11 +114,11 @@ export function SettingsClient({
         password: values.password ?? "",
       }),
     });
-    const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-      setSmtpMessage(data.error || "Could not save SMTP settings.");
+      setSmtpMessage(errorMessage(await readApiError(response, "Could not save SMTP settings.")));
       return;
     }
+    const data = await response.json();
     smtpForm.setValue("password", "");
     setSmtpMessage(
       data.configured
@@ -135,9 +136,11 @@ export function SettingsClient({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({}),
     });
-    const data = await response.json().catch(() => ({}));
     setSmtpTesting(false);
-    if (response.ok && data.ok) {
+    // A failed send may still carry a structured reason (e.g. SMTP_NOT_CONFIGURED).
+    const failure = response.ok ? null : await readApiError(response, "Test email failed to send. Verify host, port and credentials.");
+    const data = ((failure ? failure.data : await response.json()) ?? {}) as { ok?: boolean; to?: string; reason?: string };
+    if (!failure && data.ok) {
       setSmtpMessage(`Test email sent to ${data.to}. Check the inbox.`);
       return;
     }
@@ -145,7 +148,7 @@ export function SettingsClient({
       setSmtpMessage("SMTP is not fully configured yet. Save host, user, sender and password first.");
       return;
     }
-    setSmtpMessage(data.error || "Test email failed to send. Verify host, port and credentials.");
+    setSmtpMessage(failure ? failure.message : "Test email failed to send. Verify host, port and credentials.");
   }
 
   async function toggle(setting: Setting) {

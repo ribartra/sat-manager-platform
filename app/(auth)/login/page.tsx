@@ -20,6 +20,7 @@ import {
 import { FormSection } from "@/components/sat";
 import { loginSchema, type LoginInput } from "@/contracts/auth";
 import { LegalLinks } from "@/components/legal/legal-page";
+import { Alert, InlineError } from "@/components/sat/alert";
 
 function isLocalCallbackUrl(value: string) {
   return value.startsWith("/") && !value.startsWith("//");
@@ -86,9 +87,7 @@ export default function LoginPage() {
 
         <Card padding="lg">
           {reasonMessage ? (
-            <p className="mb-4 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-              {reasonMessage}
-            </p>
+            <Alert tone="warning" className="mb-4">{reasonMessage}</Alert>
           ) : null}
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" noValidate>
@@ -120,7 +119,7 @@ export default function LoginPage() {
                   )}
                 />
               </FormSection>
-              {serverError ? <p className="text-sm text-destructive">{serverError}</p> : null}
+              <InlineError>{serverError}</InlineError>
               <Button type="submit" className="w-full" disabled={loading} size="lg">
                 {loading ? "Signing in..." : "Log In"}
               </Button>

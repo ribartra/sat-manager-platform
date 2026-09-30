@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { InlineError } from "@/components/sat/alert";
+import { readApiError } from "@/lib/api-client";
 
 type ExamOption = {
   id: string;
@@ -73,9 +75,8 @@ export function AssignExamForm({
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ studentIds: [studentId], dueDate: dueDate || null }),
           });
-          const data = await res.json().catch(() => ({}));
-          if (!res.ok) throw new Error(data.error || "Failed to assign exam.");
-          return data;
+          if (!res.ok) throw await readApiError(res, "Failed to assign exam.");
+          return res.json();
         })
       );
       const total = (key: string) => results.reduce((sum, row) => sum + (Number(row[key]) || 0), 0);
@@ -144,7 +145,7 @@ export function AssignExamForm({
         <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
       </div>
 
-      {error && <p className="text-sm text-rose-600">{error}</p>}
+      <InlineError>{error}</InlineError>
       {done && <p className="text-sm font-medium text-green-600">✓ {doneMessage} Redirecting...</p>}
 
       <div className="flex items-center gap-3">

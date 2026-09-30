@@ -1,3 +1,4 @@
+import { Alert } from "./alert";
 import { cn } from "@/lib/utils";
 
 export type SaveStatus = "idle" | "saving" | "saved" | "offline" | "syncing" | "error";
@@ -50,12 +51,8 @@ export function SaveIndicator({ status, compact, className, ...props }: SaveIndi
 export function OfflineBanner({ online }: { online: boolean }) {
   if (online) return null;
   return (
-    <div
-      role="status"
-      aria-live="polite"
-      className="shrink-0 border-b border-amber-200 bg-amber-50 px-4 py-1.5 text-center text-xs font-medium text-amber-900 sm:px-6"
-    >
+    <Alert tone="warning" layout="banner" className="justify-center text-center font-medium">
       You are offline. Your answers are saved on this device and will sync when the connection returns.
-    </div>
+    </Alert>
   );
 }

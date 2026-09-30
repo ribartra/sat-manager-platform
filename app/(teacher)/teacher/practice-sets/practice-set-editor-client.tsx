@@ -35,6 +35,9 @@ import {
   practiceSetEditorSchema,
   type PracticeSetEditorInput,
 } from "@/contracts/practice-set";
+import { apiFetch, readApiError } from "@/lib/api-client";
+import { notify } from "@/lib/notify-ui";
+import { Alert } from "@/components/sat/alert";
 
 interface TopicInfo {
   id: string;
@@ -149,8 +152,8 @@ export function PracticeSetEditor({
     const method = initial?.id ? "PUT" : "POST";
     const response = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     if (!response.ok) {
-      const payload = await response.json().catch(() => null);
-      setErrors(Array.isArray(payload?.errors) ? payload.errors : [payload?.error ?? "Unable to save Practice Set."]);
+      const error = await readApiError(response, "Unable to save Practice Set.");
+      setErrors(error.details.length ? error.details : [error.message]);
       return;
     }
     router.push(`/teacher/content/${values.topicId}`);
@@ -166,7 +169,6 @@ export function PracticeSetEditor({
     .filter((q): q is QuestionInfo => Boolean(q));
   const selectedTopic = topics.find((topic) => topic.id === topicId);
   const saving = form.formState.isSubmitting;
-  const canSave = Boolean(name?.trim() && topicId && questionIds.length > 0);
   const status = form.watch("status");
   const canAssign = status === "PUBLISHED" && Boolean(initial?.id);
   const [secondaryLoading, setSecondaryLoading] = useState<string | null>(null);
@@ -174,12 +176,14 @@ export function PracticeSetEditor({
   async function duplicateSet() {
     if (!initial?.id) return;
     setSecondaryLoading("duplicate");
-    const response = await fetch(`/api/practice-sets/${initial.id}/duplicate`, { method: "POST" });
-    const data = await response.json().catch(() => ({}));
-    setSecondaryLoading(null);
-    if (!response.ok) {
-      window.alert(data.errors?.join("\n") || data.error || "Unable to duplicate.");
+    let data: { practiceSet?: { id?: string } };
+    try {
+      data = await apiFetch(`/api/practice-sets/${initial.id}/duplicate`, { method: "POST", fallback: "Unable to duplicate." });
+    } catch (error) {
+      notify.error(error);
       return;
+    } finally {
+      setSecondaryLoading(null);
     }
     if (data?.practiceSet?.id) router.push(`/teacher/practice-sets/${data.practiceSet.id}/edit`);
   }
@@ -390,14 +394,13 @@ export function PracticeSetEditor({
         </div>
 
         {errors.length > 0 ? (
-          <Card variant="danger" padding="sm" className="text-sm text-red-700">
-            <p className="font-medium">Fix these issues before saving:</p>
-            <ul className="mt-1 list-disc pl-5">
+          <Alert tone="error" title="Fix these issues before saving:">
+            <ul className="list-disc pl-5">
               {errors.map((error) => (
                 <li key={error}>{error}</li>
               ))}
             </ul>
-          </Card>
+          </Alert>
         ) : null}
 
         <div className="flex items-center gap-3">

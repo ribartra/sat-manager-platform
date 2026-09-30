@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { InlineError } from "@/components/sat/alert";
+import { errorMessage, readApiError } from "@/lib/api-client";
 
 interface StudentEditInfo {
   id: string;
@@ -35,10 +37,9 @@ export function EditStudentForm({ student }: { student: StudentEditInfo }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email, phone, startDate, active }),
     });
-    const data = await res.json();
     setLoading(false);
     if (!res.ok) {
-      setError(data.error ?? "Could not update student.");
+      setError(errorMessage(await readApiError(res, "Could not update student.")));
       return;
     }
     router.push(`/teacher/students/${student.id}`);
@@ -69,7 +70,7 @@ export function EditStudentForm({ student }: { student: StudentEditInfo }) {
         <Checkbox checked={active} onChange={(e) => setActive(e.target.checked)} />
         Active
       </label>
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      <InlineError>{error}</InlineError>
       <div className="flex items-center gap-3">
         <Button type="submit" disabled={loading}>{loading ? "Saving..." : "Save Student"}</Button>
         <Button type="button" variant="secondary" onClick={() => router.back()}>Cancel</Button>

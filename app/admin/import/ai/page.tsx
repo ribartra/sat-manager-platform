@@ -10,6 +10,7 @@ import { computeCropImageSources } from "@/lib/ingest-crop-source";
 import { computeExtractedTests } from "@/lib/ingest-sets.server";
 import { FULL_TEST_EXPECTED_COUNTS, moduleIndexForCandidate } from "@/lib/full-test-modules";
 import { AiImportWorkflowClient, IngestAutoRefresh } from "./ai-import-client";
+import { InlineError } from "@/components/sat/alert";
 
 export const dynamic = "force-dynamic";
 
@@ -465,7 +466,7 @@ export default async function AiImportPage({ searchParams }: PageProps) {
                   <Badge variant={badgeVariant(selectedBatch.status)}>{selectedBatch.status}</Badge>
                 </div>
                 <p className="mt-2 text-sm font-medium text-gray-900">{statusSummary.description}</p>
-                {selectedBatch.lastError && <p className="mt-1 text-sm text-red-700">{selectedBatch.lastError}</p>}
+                <InlineError className="mt-1">{selectedBatch.lastError}</InlineError>
               </div>
             </div>
             <div className="grid min-w-64 gap-3 text-xs text-gray-600">

@@ -7,6 +7,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { InlineError } from "@/components/sat/alert";
+import { errorMessage, readApiError } from "@/lib/api-client";
 
 export default function InviteStudentPage() {
   const [programs, setPrograms] = useState<{ id: string; name: string; teachers: { teacher: { name: string } }[] }[]>([]);
@@ -43,12 +45,12 @@ export default function InviteStudentPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email, phone, startDate, programId, isMinor, parentName, parentEmail, parentPhone }),
     });
-    const data = await res.json();
     setLoading(false);
     if (!res.ok) {
-      setError(data.error ?? "Could not create invite.");
+      setError(errorMessage(await readApiError(res, "Could not create invite.")));
       return;
     }
+    const data = await res.json();
     setInviteUrl(data.inviteUrl);
   }
 
@@ -142,7 +144,7 @@ export default function InviteStudentPage() {
           </div>
         )}
 
-        {error && <p className="text-sm text-red-600" role="alert">{error}</p>}
+        <InlineError>{error}</InlineError>
         <Button type="submit" disabled={loading} disabledReason={!programId ? "Choose a program." : null}>
           {loading ? "Creating..." : "Create Invite"}
         </Button>

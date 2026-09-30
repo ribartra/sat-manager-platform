@@ -5,6 +5,8 @@ import { ImagePlus, Trash2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { QuestionMedia } from "@/components/question-media";
+import { InlineError } from "@/components/sat/alert";
+import { errorMessage, readApiError } from "@/lib/api-client";
 
 function isDisplayableImageUrl(url: string) {
   const value = url.trim();
@@ -40,11 +42,11 @@ export function QuestionImageField({
       const body = new FormData();
       body.append("file", file);
       const res = await fetch("/api/questions/media/upload", { method: "POST", body });
-      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(data.error || "Upload failed.");
+        setError(errorMessage(await readApiError(res, "Upload failed.")));
         return;
       }
+      const data = await res.json();
       if (typeof data.url === "string") onChange(data.url);
     } catch {
       setError("Upload failed.");
@@ -102,7 +104,7 @@ export function QuestionImageField({
           External URLs are blocked by security policy and will not show in the player. Upload the file instead.
         </p>
       )}
-      {error && <p className="text-xs text-rose-600">{error}</p>}
+      <InlineError className="text-xs">{error}</InlineError>
       {displayable && value.trim() && (
         <QuestionMedia
           imageUrl={value}

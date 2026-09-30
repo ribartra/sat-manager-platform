@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Edit, FileDown, Link2, Plus } from "lucide-react";
 import { StudentPicker } from "@/components/student-picker";
+import { errorMessage, readApiError } from "@/lib/api-client";
 
 type Student = { id: string; name: string };
 type Parent = { id: string; name: string; email: string; phone: string; students: Student[] };
@@ -134,12 +135,12 @@ export function ParentsClient({ parents, students }: { parents: Parent[]; studen
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ studentId, parentId: activeParent.id, areas: [...reportAreas] }),
     });
-    const payload = await response.json().catch(() => ({}));
     setSharing(false);
     if (!response.ok) {
-      setShareStatus(payload.error || "Could not share the report.");
+      setShareStatus(errorMessage(await readApiError(response, "Could not share the report.")));
       return;
     }
+    const payload = await response.json();
     if (payload.emailSent) {
       setShareStatus(`Single-use report link sent to ${payload.parentEmail} (${payload.sections}).`);
     } else {

@@ -13,6 +13,7 @@ import {
 } from "@/lib/parent-access";
 import { hashPublicToken } from "@/lib/token-security";
 import { writeAudit } from "@/lib/audit";
+import { InlineError } from "@/components/sat/alert";
 
 interface PageProps {
   searchParams: Promise<{ token?: string }>;
@@ -45,7 +46,7 @@ async function AccessDenied({ reason, tokenPrefix }: { reason: AccessFailReason;
   return (
     <div className="mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center px-4 py-8 text-center">
       <h1 className="text-lg font-semibold text-gray-900">Unable to open report</h1>
-      <p className="mt-2 text-sm text-red-600">{failMessage(reason)}</p>
+      <InlineError className="mt-2">{failMessage(reason)}</InlineError>
       <p className="mt-3 text-sm text-gray-500">Ask the teacher to share a new link if you still need access.</p>
       <Link href="/login" className="mt-6 text-sm text-blue-600 hover:underline">
         Return to login

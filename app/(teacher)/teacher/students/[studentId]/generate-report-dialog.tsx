@@ -6,6 +6,8 @@ import { useRef, useState } from "react";
 import { Download, FileText, Loader2, Mail } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Hint } from "@/components/hint";
+import { InlineError } from "@/components/sat/alert";
+import { errorMessage, readApiError } from "@/lib/api-client";
 
 const AREAS = [
   { key: "math", label: "Math", color: "var(--sat-area-math)" },
@@ -140,12 +142,12 @@ export function GenerateReportDialog({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ parentIds: [...recipients], areas: keys, filters, fptAttemptId: effectiveExamId || null }),
     });
-    const data = (await response.json().catch(() => ({}))) as { results?: SendResult[]; error?: string };
     setSending(false);
     if (!response.ok) {
-      setSendError(data.error ?? "The report could not be sent.");
+      setSendError(errorMessage(await readApiError(response, "The report could not be sent.")));
       return;
     }
+    const data = (await response.json()) as { results?: SendResult[] };
     setSendResults(data.results ?? []);
   }
 
@@ -201,7 +203,7 @@ export function GenerateReportDialog({
             </Button>
           </div>
         </div>
-        {!query && <p className="text-sm text-rose-600">Select at least one area.</p>}
+        {!query && <InlineError>Select at least one area.</InlineError>}
         {selected.has("mocks") && exams.length > 0 ? (
           <label className="flex flex-wrap items-center gap-2 text-sm text-gray-700">
             <span className="font-medium">Exam</span>
@@ -269,7 +271,7 @@ export function GenerateReportDialog({
               </Button>
             ) : null}
           </div>
-          {sendError ? <p className="mt-2 text-sm text-rose-600">{sendError}</p> : null}
+          <InlineError className="mt-2">{sendError}</InlineError>
           {sendResults ? (
             <ul className="mt-2 space-y-0.5 text-sm">
               {sendResults.map((result) => (

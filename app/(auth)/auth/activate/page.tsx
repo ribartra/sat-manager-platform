@@ -18,6 +18,8 @@ import {
 import { ErrorState, FormSection, LoadingState } from "@/components/sat";
 import { activateSchema, type ActivateInput } from "@/contracts/auth";
 import { LegalLinks } from "@/components/legal/legal-page";
+import { Alert, InlineError } from "@/components/sat/alert";
+import { apiFetch, errorMessage } from "@/lib/api-client";
 
 interface InviteInfo {
   role: string;
@@ -59,14 +61,10 @@ export default function ActivatePage() {
 
   async function onSubmit(values: ActivateInput) {
     setServerError("");
-    const res = await fetch("/api/auth/activate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token, password: values.password }),
-    });
-    const data = await res.json();
-    if (data.error) {
-      setServerError(data.error);
+    try {
+      await apiFetch("/api/auth/activate", { method: "POST", json: { token, password: values.password } });
+    } catch (error) {
+      setServerError(errorMessage(error));
       return;
     }
     router.push("/login?activated=1");
@@ -108,10 +106,10 @@ export default function ActivatePage() {
               : "Set a password to activate your account."}
           </p>
           {blockedByConsent ? (
-            <div className="mb-5 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+            <Alert tone="warning" className="mb-5">
               Parent or guardian authorization is still pending. You can set your password after authorization is
               recorded.
-            </div>
+            </Alert>
           ) : null}
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" noValidate>
@@ -165,7 +163,7 @@ export default function ActivatePage() {
                   )}
                 />
               </FormSection>
-              {serverError ? <p className="text-sm text-destructive">{serverError}</p> : null}
+              <InlineError>{serverError}</InlineError>
               <Button type="submit" className="w-full" disabled={loading} disabledReason={blockedByConsent ? "Waiting for parent or guardian consent." : null}>
                 {loading ? "Activating..." : isParent ? "Create Account" : "Activate Account"}
               </Button>
