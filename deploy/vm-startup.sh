@@ -136,6 +136,18 @@ cat > /etc/cron.d/sat-db-backup <<'CRON'
 0 */6 * * * root /usr/local/bin/sat-db-backup.sh >> /var/log/sat-db-backup.log 2>&1
 CRON
 
+# --- 6b) deadline reminders every hour ----------------------------------------
+# Calls the internal route from inside the web container (localhost:3000) with the
+# internal service token; Caddy returns 404 for /api/internal/* from outside.
+cat > /usr/local/bin/sat-notifications.sh <<'NT'
+#!/bin/bash
+docker exec sat-platform-web-1 node -e "fetch('http://localhost:3000/api/internal/notifications/generate',{method:'POST',headers:{Authorization:'Bearer '+process.env.INTERNAL_INGEST_TOKEN}}).then(async r=>{console.log(new Date().toISOString(),r.status,await r.text());process.exit(r.ok?0:1)}).catch(e=>{console.error(new Date().toISOString(),e.message);process.exit(1)})"
+NT
+chmod +x /usr/local/bin/sat-notifications.sh
+cat > /etc/cron.d/sat-notifications <<'CRON'
+5 * * * * root /usr/local/bin/sat-notifications.sh >> /var/log/sat-notifications.log 2>&1
+CRON
+
 # --- 7) launch the stack -----------------------------------------------------
 # Refuse to launch against an empty DB: the web entrypoint's `migrate deploy`
 # would fail on the non-replayable chain and leave a corrupt/partial schema.

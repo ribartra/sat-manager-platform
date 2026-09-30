@@ -1,4 +1,4 @@
-import { PageShell, PracticeAreaTabs } from "@/components/sat";
+import { AttemptStatusBadge, PageShell, Pagination, PracticeAreaTabs, VoidableValue, invalidatedRowClass, isInvalidated, pageFromParam, paginate } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
@@ -22,7 +22,7 @@ import { getFeatureSetting } from "@/lib/app-settings";
 import { studentAccessWhereFor } from "@/lib/program-scope";
 import { loadMockReport, loadPracticeReport, shortSetName, type ReportAttempt } from "@/lib/student-report";
 import { activeAreaTab, practiceAreaFromTab } from "@/lib/practice-area";
-import { buildProgressHref, progressFiltersFromParams } from "@/lib/progress-filters";
+import { buildProgressHref, progressFilterEntries, progressFiltersFromParams } from "@/lib/progress-filters";
 import { applyTimeFilterSetting } from "@/lib/time-filters";
 import { officialSkillsFor } from "@/lib/taxonomy-order";
 
@@ -35,10 +35,10 @@ import { officialSkillsFor } from "@/lib/taxonomy-order";
 
 interface PageProps {
   params: Promise<{ studentId: string }>;
-  searchParams: Promise<{ area?: string; topic?: string; difficulty?: string; from?: string; to?: string }>;
+  searchParams: Promise<{ area?: string; topic?: string; difficulty?: string; from?: string; to?: string; attemptsPage?: string; examsPage?: string }>;
 }
 
-const RECENT_ATTEMPTS = 6;
+const HISTORY_PAGE_SIZE = 10;
 
 export default async function StudentPage({ params, searchParams }: PageProps) {
   const { studentId } = await params;
@@ -70,6 +70,26 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
     practiceArea ? officialSkillsFor(practiceArea) : Promise.resolve([]),
   ]);
   if (!student) notFound();
+
+  // Report dialog: linked parents (email recipients) and submitted exams (per-exam report).
+  const [parentLinks, submittedExams] = await Promise.all([
+    prisma.parentStudent.findMany({
+      where: { studentId },
+      include: { parent: { select: { id: true, name: true, email: true } } },
+      orderBy: { parent: { name: "asc" } },
+    }),
+    prisma.fullPracticeTestAttempt.findMany({
+      where: { studentId, status: "SUBMITTED" },
+      select: { id: true, submittedAt: true, totalScore: true, test: { select: { name: true } } },
+      orderBy: { submittedAt: "desc" },
+    }),
+  ]);
+  const reportParents = parentLinks.map((link) => link.parent);
+  const reportExams = submittedExams.map((exam) => ({
+    id: exam.id,
+    label: `${exam.test.name} · ${exam.submittedAt ? formatDate(exam.submittedAt) : "—"} · ${exam.totalScore ?? "—"}`,
+  }));
+  const pageParams: Record<string, string | undefined> = { ...Object.fromEntries(progressFilterEntries(filters)), attemptsPage: query.attemptsPage, examsPage: query.examsPage };
 
   const reportFilters = { topic: filters.topic, difficulty: filters.difficulty, from: filters.from, to: filters.to };
   const filterSummary = [
@@ -118,6 +138,8 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
           currentArea={area}
           filters={reportFilters}
           filterSummary={filterSummary}
+          exams={reportExams}
+          parents={reportParents}
         />
         <Hint label="Open the student portal exactly as this student sees it (read-only).">
           <Link href={buildProgressHref(`/teacher/impersonate/${studentId}`, filters)} className={secondaryButton}>
@@ -150,6 +172,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
   // ---------------------------------------------------------------- Full Practice Tests
   if (!practiceArea) {
     const report = await loadMockReport(studentId, reportFilters);
+    const examPage = paginate(report.examHistory, pageFromParam(query.examsPage), HISTORY_PAGE_SIZE);
     return (
       <PageShell width="wide">
         {header}
@@ -199,14 +222,44 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                 </li>
               ))}
             </SidePanel>
-            <SidePanel title="Exam history" count={report.exams.length} empty="No completed Full Practice Tests yet.">
-              {report.exams.map((exam) => (
-                <li key={exam.id} className="flex items-center justify-between gap-3 px-3 py-2">
+            <SidePanel
+              id="exam-history"
+              title="Exam history"
+              count={report.examHistory.length}
+              empty="No completed Full Practice Tests yet."
+              footer={
+                <Pagination
+                  basePath={`/teacher/students/${studentId}`}
+                  params={pageParams}
+                  param="examsPage"
+                  anchor="exam-history"
+                  pageSize={HISTORY_PAGE_SIZE}
+                  {...examPage}
+                />
+              }
+            >
+              {examPage.items.map((exam) => (
+                <li key={exam.id} className={`flex items-center justify-between gap-3 px-3 py-2 ${invalidatedRowClass(exam.status) ?? ""}`}>
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-gray-800">{exam.name}</p>
-                    <p className="text-[11px] text-gray-400">{exam.submittedAt ? formatDate(exam.submittedAt) : "—"} · R&amp;W {exam.rwScore ?? "—"} · Math {exam.mathScore ?? "—"}</p>
+                    <p className="flex items-center gap-2 truncate text-sm font-medium text-gray-800">
+                      <span className="truncate">{exam.name}</span>
+                      {isInvalidated(exam.status) ? <AttemptStatusBadge status={exam.status} /> : null}
+                    </p>
+                    <p className="text-[11px] text-gray-400">
+                      {exam.submittedAt ? formatDate(exam.submittedAt) : "—"} ·{" "}
+                      <VoidableValue status={exam.status}>R&amp;W {exam.rwScore ?? "—"} · Math {exam.mathScore ?? "—"}</VoidableValue>
+                    </p>
                   </div>
-                  <span className="shrink-0 text-sm font-semibold text-gray-900" title="SAT total">{exam.totalScore ?? "—"}</span>
+                  <div className="flex shrink-0 items-center gap-3">
+                    <VoidableValue status={exam.status} className="text-sm font-semibold text-gray-900">
+                      {exam.totalScore ?? "—"}
+                    </VoidableValue>
+                    <Hint label="Open this exam: module and question detail, reopen or invalidate, send the exam report.">
+                      <Link href={buildProgressHref(`/teacher/students/${studentId}/full-tests/${exam.id}`, filters)} className="text-xs font-medium text-blue-600 hover:underline">
+                        Review
+                      </Link>
+                    </Hint>
+                  </div>
                 </li>
               ))}
             </SidePanel>
@@ -219,23 +272,31 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
   // ---------------------------------------------------------------- Practice (Math / Reading / Writing)
   const report = await loadPracticeReport(studentId, practiceArea, reportFilters);
   const { areaLabel, kpis } = report;
+  const attemptPage = paginate(report.attemptHistory, pageFromParam(query.attemptsPage), HISTORY_PAGE_SIZE);
   const assignHref = (overrides: { topic?: string; difficulty?: string }, extra: Record<string, string>) => {
     const href = buildProgressHref(`/teacher/students/${studentId}/assign`, filters, overrides);
     return `${href}${href.includes("?") ? "&" : "?"}${new URLSearchParams(extra).toString()}`;
   };
   const attemptRow = (attempt: ReportAttempt) => (
-    <li key={attempt.id} className="flex items-center justify-between gap-3 px-3 py-2">
+    <li key={attempt.id} className={`flex items-center justify-between gap-3 px-3 py-2 ${invalidatedRowClass(attempt.status) ?? ""}`}>
       <div className="min-w-0">
-        <p className="truncate text-sm font-medium text-gray-800" title={attempt.name}>{shortSetName(attempt.name)}</p>
+        <p className="flex items-center gap-2 truncate text-sm font-medium text-gray-800" title={attempt.name}>
+          <span className="truncate">{shortSetName(attempt.name)}</span>
+          {isInvalidated(attempt.status) ? <AttemptStatusBadge status={attempt.status} /> : null}
+        </p>
         <p className="text-[11px] text-gray-400">
           {attempt.submittedAt ? formatDate(attempt.submittedAt) : "—"} · {formatTime(attempt.totalTime)} spent
         </p>
       </div>
       <div className="flex shrink-0 items-center gap-3">
         {attempt.percent !== null ? (
-          <span className={`text-sm font-semibold ${scoreBandTextClass(attempt.percent)}`} title={`${attempt.correct} correct of ${attempt.total} questions`}>
-            {attempt.percent}%
-          </span>
+          isInvalidated(attempt.status) ? (
+            <VoidableValue status={attempt.status} className="text-sm font-semibold">{attempt.percent}%</VoidableValue>
+          ) : (
+            <span className={`text-sm font-semibold ${scoreBandTextClass(attempt.percent)}`} title={`${attempt.correct} correct of ${attempt.total} questions`}>
+              {attempt.percent}%
+            </span>
+          )
         ) : (
           <span className="text-sm text-gray-400">—</span>
         )}
@@ -381,20 +442,23 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
             ))}
           </SidePanel>
 
-          <SidePanel title="Recent attempts" count={report.attempts.length} empty={`No completed ${areaLabel} attempts yet.`}>
-            {report.attempts.slice(0, RECENT_ATTEMPTS).map(attemptRow)}
-            {report.attempts.length > RECENT_ATTEMPTS && (
-              <li>
-                <details className="group">
-                  <summary className="cursor-pointer list-none px-3 py-2 text-xs font-medium text-blue-600 hover:underline">
-                    Show all {report.attempts.length} attempts
-                  </summary>
-                  <ul className="divide-y divide-gray-100 border-t border-gray-100">
-                    {report.attempts.slice(RECENT_ATTEMPTS).map(attemptRow)}
-                  </ul>
-                </details>
-              </li>
-            )}
+          <SidePanel
+            id="recent-attempts"
+            title="Recent attempts"
+            count={report.attemptHistory.length}
+            empty={`No completed ${areaLabel} attempts yet.`}
+            footer={
+              <Pagination
+                basePath={`/teacher/students/${studentId}`}
+                params={pageParams}
+                param="attemptsPage"
+                anchor="recent-attempts"
+                pageSize={HISTORY_PAGE_SIZE}
+                {...attemptPage}
+              />
+            }
+          >
+            {attemptPage.items.map(attemptRow)}
           </SidePanel>
 
           {report.comments.length > 0 && (
@@ -430,7 +494,7 @@ function KpiStrip({ items }: { items: Array<{ label: string; value: string; clas
   );
 }
 
-function SidePanel({ id, title, count, empty, children }: { id?: string; title: string; count: number; empty: string; children: ReactNode }) {
+function SidePanel({ id, title, count, empty, children, footer }: { id?: string; title: string; count: number; empty: string; children: ReactNode; footer?: ReactNode }) {
   return (
     <section id={id}>
       <h2 className="mb-2 flex items-center justify-between text-sm font-semibold text-gray-900">
@@ -439,6 +503,7 @@ function SidePanel({ id, title, count, empty, children }: { id?: string; title: 
       </h2>
       <Card className="overflow-hidden">
         {count === 0 ? <p className="px-3 py-4 text-sm text-gray-400">{empty}</p> : <ul className="divide-y divide-gray-100">{children}</ul>}
+        {count > 0 && footer ? <div className="border-t border-gray-100">{footer}</div> : null}
       </Card>
     </section>
   );

@@ -1,6 +1,6 @@
 const ingestServiceUrl = process.env.AI_INGEST_SERVICE_URL ?? "http://localhost:8000";
 
-function internalIngestToken() {
+export function internalIngestToken() {
   const token = process.env.INTERNAL_INGEST_TOKEN;
   if (process.env.NODE_ENV === "production" && !token) {
     throw new Error("INTERNAL_INGEST_TOKEN is required in production.");

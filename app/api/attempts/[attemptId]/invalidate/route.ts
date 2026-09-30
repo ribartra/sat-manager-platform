@@ -2,11 +2,13 @@ import { NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { teacherProgramEnrollmentScope } from "@/lib/program-scope";
+import { applyAttemptLifecycle } from "@/lib/attempt-lifecycle";
 
 interface RouteContext {
   params: Promise<{ attemptId: string }>;
 }
 
+/** Invalidate: the attempt stays recorded as it is, marked INVALIDATED, and stops counting toward any score. */
 export async function POST(req: Request, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
   if (!session) {
@@ -20,25 +22,21 @@ export async function POST(req: Request, { params }: RouteContext) {
     session.user.role === "TEACHER"
       ? teacherProgramEnrollmentScope(session.user.id)
       : undefined;
-  const attempt = await prisma.attempt.findFirst({
+  const existing = await prisma.attempt.findFirst({
     where: {
       id: attemptId,
       ...(programScope ? { student: { programEnrollments: programScope } } : {}),
     },
     select: { id: true },
   });
-  if (!attempt) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  await prisma.attempt.update({ where: { id: attemptId }, data: { status: "INVALIDATED" } });
-  await prisma.auditLog.create({
-    data: {
-      userId: session.user.id,
-      action: "INVALIDATE_ATTEMPT",
-      targetType: "Attempt",
-      targetId: attemptId,
-      metadata: reason ? JSON.stringify({ reason }) : null,
-    },
-  });
-
-  return NextResponse.json({ ok: true });
+  const result = await applyAttemptLifecycle({ kind: "practice", action: "invalidate", attemptId, actorId: session.user.id, reason });
+  if (!result.ok) {
+    return NextResponse.json(
+      { error: result.error === "ALREADY_INVALIDATED" ? "This attempt is already invalidated." : "Not found" },
+      { status: result.error === "ALREADY_INVALIDATED" ? 409 : 404 },
+    );
+  }
+  return NextResponse.json({ ok: true, assignmentStatus: result.assignmentStatus ?? null });
 }

@@ -61,7 +61,7 @@ async function assertSourcePatterns() {
       label: "Student Home con 4 tabs y filtro por área",
     },
     {
-      file: "app/api/reports/students/[studentId]/pdf/route.ts",
+      file: "lib/pdf/build-student-report.ts",
       requires: ["PRACTICE_AREA", "Full Practice Tests", "loadPracticeReport", "loadMockReport"],
       label: "PDF separa Practice areas y Full Practice Tests (una seccion por area)",
     },

@@ -38,6 +38,8 @@ export type WeakSkill = {
 
 export type ReportAttempt = {
   id: string;
+  /** SUBMITTED, or INVALIDATED in the history lists (never in scores/KPIs). */
+  status: string;
   name: string;
   submittedAt: Date | null;
   totalTime: number;
@@ -74,6 +76,8 @@ export type PracticeReport = {
     dueDate: Date | null;
   }>;
   attempts: ReportAttempt[];
+  /** Submitted + invalidated attempts, newest first, for the history list only. */
+  attemptHistory: ReportAttempt[];
   comments: ReportAttempt[];
   pendingExamCount: number;
 };
@@ -93,6 +97,8 @@ export type MockReport = {
   sectionModuleMetrics: ProgressMetric[];
   /** Newest first. */
   exams: Array<{ id: string; name: string; submittedAt: Date | null; totalScore: number | null; rwScore: number | null; mathScore: number | null }>;
+  /** Submitted + invalidated exams, newest first, for the history list only (not in the PDF). */
+  examHistory: Array<{ id: string; status: string; name: string; submittedAt: Date | null; totalScore: number | null; rwScore: number | null; mathScore: number | null }>;
   activeExams: Array<{ id: string; name: string; status: string; dueDate: Date | null }>;
 };
 
@@ -115,11 +121,12 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
   const difficulty = filters.difficulty ?? "";
   const dateFilter = progressDateWhere(filters);
 
-  const [attempts, assignments, pendingExamCount, areaTopics] = await Promise.all([
+  const [historyAttempts, assignments, pendingExamCount, areaTopics] = await Promise.all([
+    // Invalidated attempts are loaded only for the history list; every score uses SUBMITTED.
     prisma.attempt.findMany({
       where: {
         studentId,
-        status: "SUBMITTED",
+        status: { in: ["SUBMITTED", "INVALIDATED"] },
         ...dateFilter,
         assignment: { practiceSet: { topic: { domain: { practiceArea } } } },
       },
@@ -157,7 +164,7 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
   const currentTopic = new Map(areaTopics.map((topic) => [topic.id, topic]));
 
   // Question rows use the attempt snapshot (what the student actually saw), filtered by skill/difficulty.
-  const rowsByAttempt = attempts.map((attempt) => {
+  const rowsForAttempt = (attempt: (typeof historyAttempts)[number]) => {
     const answersByQuestion = new Map(attempt.answers.map((answer) => [answer.questionId, answer]));
     const setQuestions = attempt.assignment?.practiceSet.questions ?? [];
     const sources = setQuestions.length
@@ -181,15 +188,13 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
         };
       })
       .filter((row) => (!topicId || row.topicId === topicId) && (!difficulty || row.difficulty === difficulty));
-  });
-  const allRows = rowsByAttempt.flat();
-
-  const scoredAttempts: ReportAttempt[] = attempts.map((attempt, index) => {
-    const rows = rowsByAttempt[index] ?? [];
+  };
+  const scoreAttempt = (attempt: (typeof historyAttempts)[number], rows: ReturnType<typeof rowsForAttempt>): ReportAttempt => {
     const score = summarizeAllQuestionAnswers(rows);
     const snapshot = parseSnapshot<PracticeSetSnapshot>(attempt.practiceSetSnapshot);
     return {
       id: attempt.id,
+      status: attempt.status,
       name: snapshot?.name ?? attempt.assignment?.practiceSet.name ?? "Practice Set",
       submittedAt: attempt.submittedAt,
       totalTime: attempt.totalTime ?? 0,
@@ -198,7 +203,14 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
       percent: rows.some(isAnsweredAnswer) ? score.percent : null,
       teacherComment: attempt.teacherComment,
     };
-  });
+  };
+  const attempts = historyAttempts.filter((attempt) => attempt.status === "SUBMITTED");
+  const rowsByAttempt = attempts.map(rowsForAttempt);
+  const allRows = rowsByAttempt.flat();
+  const scoredAttempts: ReportAttempt[] = attempts.map((attempt, index) => scoreAttempt(attempt, rowsByAttempt[index] ?? []));
+  const attemptHistory: ReportAttempt[] = historyAttempts.map((attempt) =>
+    attempt.status === "SUBMITTED" ? scoredAttempts.find((scored) => scored.id === attempt.id)! : scoreAttempt(attempt, rowsForAttempt(attempt)),
+  );
   const attemptById = new Map(scoredAttempts.map((attempt) => [attempt.id, attempt]));
   const overall = summarizeAllQuestionAnswers(allRows);
   const timedRows = allRows.filter((row) => row.timeSeconds);
@@ -304,16 +316,22 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
       dueDate: a.dueDate,
     })),
     attempts: scoredAttempts,
+    attemptHistory,
     comments: scoredAttempts.filter((attempt) => attempt.teacherComment),
     pendingExamCount,
   };
 }
 
-export async function loadMockReport(studentId: string, filters: ReportFilters): Promise<MockReport> {
+/**
+ * Full Practice Test report. With `attemptId` it describes that single exam (KPIs, module and
+ * section metrics of that attempt only; no pending exams), e.g. for a per-exam PDF.
+ */
+export async function loadMockReport(studentId: string, filters: ReportFilters, options: { attemptId?: string } = {}): Promise<MockReport> {
   const dateFilter = progressDateWhere(filters);
-  const [examAttempts, examAssignments] = await Promise.all([
+  const single = Boolean(options.attemptId);
+  const [examAttempts, examAssignments, invalidatedExams] = await Promise.all([
     prisma.fullPracticeTestAttempt.findMany({
-      where: { studentId, status: "SUBMITTED", ...dateFilter },
+      where: { studentId, status: "SUBMITTED", ...(single ? { id: options.attemptId } : dateFilter) },
       include: {
         answers: true,
         test: { include: { modules: { include: { questions: { select: { questionId: true } } }, orderBy: { order: "asc" } } } },
@@ -321,10 +339,16 @@ export async function loadMockReport(studentId: string, filters: ReportFilters):
       orderBy: { submittedAt: "desc" },
     }),
     prisma.fullPracticeTestAssignment.findMany({
-      where: { studentId, status: { in: OPEN_STATUSES } },
+      where: { studentId, status: { in: OPEN_STATUSES }, ...(single ? { id: "__none__" } : {}) },
       include: { test: { select: { name: true } } },
       orderBy: { createdAt: "desc" },
     }),
+    single
+      ? Promise.resolve([])
+      : prisma.fullPracticeTestAttempt.findMany({
+          where: { studentId, status: "INVALIDATED", ...dateFilter },
+          select: { id: true, status: true, startedAt: true, submittedAt: true, totalScore: true, rwScore: true, mathScore: true, test: { select: { name: true } } },
+        }),
   ]);
   const rows = examAttempts.flatMap((exam) => {
     const answersByQuestion = new Map(exam.answers.map((answer) => [answer.questionId, answer]));
@@ -371,6 +395,20 @@ export async function loadMockReport(studentId: string, filters: ReportFilters):
       rwScore: exam.rwScore,
       mathScore: exam.mathScore,
     })),
+    examHistory: [
+      ...examAttempts.map((exam) => ({ ...exam, sortAt: exam.submittedAt ?? exam.startedAt })),
+      ...invalidatedExams.map((exam) => ({ ...exam, sortAt: exam.submittedAt ?? exam.startedAt })),
+    ]
+      .sort((a, b) => b.sortAt.getTime() - a.sortAt.getTime())
+      .map((exam) => ({
+        id: exam.id,
+        status: exam.status,
+        name: exam.test.name,
+        submittedAt: exam.submittedAt,
+        totalScore: exam.totalScore,
+        rwScore: exam.rwScore,
+        mathScore: exam.mathScore,
+      })),
     activeExams: examAssignments.map((a) => ({ id: a.id, name: a.test.name, status: a.status, dueDate: a.dueDate })),
   };
 }

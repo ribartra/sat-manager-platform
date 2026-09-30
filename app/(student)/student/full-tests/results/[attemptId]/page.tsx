@@ -1,7 +1,8 @@
-import { PageShell } from "@/components/sat";
+import { InvalidatedNotice, PageShell, VoidableValue, isInvalidated } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { parseEliminatedOptions } from "@/lib/answer-review-meta";
 import { formatTime, scorePercent } from "@/lib/utils";
 import { MathContent } from "@/components/math-content";
 import { QuestionMedia } from "@/components/question-media";
@@ -40,6 +41,11 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
     include: { test: { include: { modules: { include: { questions: { include: { question: { include: { topic: { include: { domain: true } }, options: { orderBy: { label: "asc" } } } } }, orderBy: { order: "asc" } } }, orderBy: { order: "asc" } } } }, answers: true, pauses: true },
   });
   if (!attempt) notFound();
+  // Results exist only for a finished attempt; an open one goes back to the exam.
+  if (attempt.status === "IN_PROGRESS") {
+    redirect(attempt.assignmentId ? `/student/full-tests/${attempt.assignmentId}` : historyHref);
+  }
+  const invalidated = isInvalidated(attempt.status);
 
   const answersByQuestion = new Map(attempt.answers.map((answer) => [answer.questionId, answer]));
   const topicStats = new Map<string, { correct: number; total: number; time: number }>();
@@ -69,10 +75,11 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
     <PageShell width="narrow">
       <Link href={historyHref} className="mb-4 flex items-center gap-1 text-sm text-gray-500 hover:text-blue-600"><ChevronLeft size={14} /> History</Link>
       <h1 className="mb-6 text-xl font-semibold text-gray-900">Results: {attempt.test.name}</h1>
+      {invalidated ? <InvalidatedNotice audience="student" /> : null}
       <div className="grid grid-cols-3 gap-4">
-        <Card padding="md" className="text-center"><p className="text-3xl font-bold text-[var(--sat-area-mocks)]">{attempt.rwScore ?? "—"}</p><p className="text-xs text-gray-500">Reading & Writing</p></Card>
-        <Card padding="md" className="text-center"><p className="text-3xl font-bold text-[var(--sat-area-math)]">{attempt.mathScore ?? "—"}</p><p className="text-xs text-gray-500">Math</p></Card>
-        <Card padding="md" className="text-center"><p className="text-3xl font-bold text-[var(--sat-area-mocks)]">{attempt.totalScore ?? "—"}</p><p className="text-xs text-gray-500">Total</p></Card>
+        <Card padding="md" className="text-center"><p className="text-3xl font-bold text-[var(--sat-area-mocks)]"><VoidableValue status={attempt.status}>{attempt.rwScore ?? "—"}</VoidableValue></p><p className="text-xs text-gray-500">Reading & Writing</p></Card>
+        <Card padding="md" className="text-center"><p className="text-3xl font-bold text-[var(--sat-area-math)]"><VoidableValue status={attempt.status}>{attempt.mathScore ?? "—"}</VoidableValue></p><p className="text-xs text-gray-500">Math</p></Card>
+        <Card padding="md" className="text-center"><p className="text-3xl font-bold text-[var(--sat-area-mocks)]"><VoidableValue status={attempt.status}>{attempt.totalScore ?? "—"}</VoidableValue></p><p className="text-xs text-gray-500">Total</p></Card>
       </div>
       <Card padding="md" className="mt-6 text-sm text-gray-600">
         Time expired events: {attempt.timeExpiredEvents} · Extra time used: {attempt.extraTimeUsed}s
@@ -168,6 +175,11 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
                         )}
 
                         {isUnanswered && <p className="mb-1 text-xs italic text-gray-400">Unanswered</p>}
+                        <ReviewTools
+                          marked={Boolean(answer?.markedForReview)}
+                          note={answer?.note ?? null}
+                          eliminated={parseEliminatedOptions(answer?.eliminatedOptions)}
+                        />
 
                         {question.explanation && (
                           <div className="mt-2 border-t border-gray-200 pt-2">
@@ -189,6 +201,17 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
         </Card>
       )}
     </PageShell>
+  );
+}
+
+function ReviewTools({ marked, note, eliminated }: { marked: boolean; note: string | null; eliminated: string[] }) {
+  if (!marked && !note && eliminated.length === 0) return null;
+  return (
+    <div className="mb-2 space-y-1 text-xs text-gray-600">
+      {marked ? <p className="font-medium text-amber-700">Marked for review</p> : null}
+      {eliminated.length > 0 ? <p>Eliminated: {eliminated.join(", ")}</p> : null}
+      {note ? <p className="whitespace-pre-wrap">Note: {note}</p> : null}
+    </div>
   );
 }
 

@@ -8,6 +8,10 @@
 		max_size 256MB
 	}
 
+	# Internal service endpoints (cron jobs) are only reachable inside the VM.
+	@internal path /api/internal/*
+	respond @internal 404
+
 	reverse_proxy web:3000 {
 		# Keep transient container restarts from surfacing as a 502 to the browser.
 		lb_try_duration 10s

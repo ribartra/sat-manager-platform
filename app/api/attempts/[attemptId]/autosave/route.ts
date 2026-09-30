@@ -97,6 +97,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ att
     );
   }
 
+  // markedQuestionIds is the full marked set: unmark stored rows that are no longer in it.
+  if (Array.isArray(markedQuestionIds)) {
+    await withSqliteRetry(() => prisma.attemptAnswer.updateMany({
+      where: { attemptId, markedForReview: true, questionId: { notIn: markedQuestionIds.filter((id: unknown): id is string => typeof id === "string") } },
+      data: { markedForReview: false },
+    }));
+  }
+
   if (timeSpentByQuestion && typeof timeSpentByQuestion === "object") {
     await Promise.all(
       Object.entries(timeSpentByQuestion)

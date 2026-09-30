@@ -39,7 +39,9 @@ export default async function ContentMapPage({ searchParams }: PageProps) {
             },
           },
         },
+        // Latest attempt that still counts (an invalidated one must not show "Continue").
         attempts: {
+          where: { status: { not: "INVALIDATED" } },
           orderBy: { startedAt: "desc" },
           take: 1,
           include: { answers: true },

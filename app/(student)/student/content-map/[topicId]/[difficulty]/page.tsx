@@ -89,7 +89,8 @@ export default async function TopicPracticeSetsPage({ params, searchParams }: Pa
             const locked = !assignment || assignment.locked || scheduledLocked;
             const inProgressAttempt = assignment?.attempts.find((attempt) => attempt.status === "IN_PROGRESS");
             const lastAttempt = assignment?.attempts.find((attempt) => attempt.status === "SUBMITTED");
-            const attemptCount = assignment?.attempts.length ?? 0;
+            // Invalidated attempts no longer count, not even in the attempt number shown.
+            const attemptCount = assignment?.attempts.filter((attempt) => attempt.status !== "INVALIDATED").length ?? 0;
 
             const lastScore = lastAttempt ? summarizeAllQuestionAnswers(lastAttempt.answers) : null;
             const correct = lastScore?.correct ?? 0;

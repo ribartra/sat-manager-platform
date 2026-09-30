@@ -1,3 +1,4 @@
+import { parseEliminatedOptions } from "@/lib/answer-review-meta";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
@@ -92,6 +93,13 @@ export default async function FullTestPlayerPage({ params, searchParams }: PageP
       }))}
       savedAnswers={Object.fromEntries(attempt.answers.map((answer) => [answer.questionId, answer.answer ?? ""]))}
       savedTimeSpent={Object.fromEntries(attempt.answers.map((answer) => [answer.questionId, answer.timeSpent ?? 0]))}
+      savedMarked={attempt.answers.filter((answer) => answer.markedForReview).map((answer) => answer.questionId)}
+      savedNotes={Object.fromEntries(attempt.answers.filter((answer) => answer.note).map((answer) => [answer.questionId, answer.note ?? ""]))}
+      savedEliminated={Object.fromEntries(
+        attempt.answers
+          .map((answer) => [answer.questionId, parseEliminatedOptions(answer.eliminatedOptions)] as const)
+          .filter(([, labels]) => labels.length > 0),
+      )}
       savedModule={attempt.currentModule}
       savedQuestion={attempt.currentQuestion}
       savedExpiredEvents={attempt.timeExpiredEvents}

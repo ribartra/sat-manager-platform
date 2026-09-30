@@ -1,8 +1,8 @@
+import { AttemptStatusBadge, InvalidatedNotice, VoidableValue } from "@/components/sat";
 import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { MathContent } from "@/components/math-content";
 import { QuestionMedia } from "@/components/question-media";
@@ -84,16 +84,15 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
             {attempt.pauses.length > 0 ? ` · Paused ${attempt.pauses.length}x (${formatTime(pauseSeconds)})` : ""}
           </p>
           <div className="mt-3 flex items-center gap-2">
-            <Badge variant={attempt.status === "SUBMITTED" ? "success" : attempt.status === "INVALIDATED" ? "danger" : "warning"}>
-              {attempt.status}
-            </Badge>
-            <span className="text-sm font-semibold text-gray-900">
+            <AttemptStatusBadge status={attempt.status} />
+            <VoidableValue status={attempt.status} className="text-sm font-semibold text-gray-900">
               {correct}/{total} ({pct}%)
-            </span>
+            </VoidableValue>
           </div>
         </div>
-        <AttemptActions attemptId={attempt.id} initialComment={attempt.teacherComment} />
+        <AttemptActions attemptId={attempt.id} initialComment={attempt.teacherComment} status={attempt.status} />
       </Card>
+      {attempt.status === "INVALIDATED" ? <InvalidatedNotice audience="teacher" /> : null}
 
       {attempt.teacherComment && (
         <Card variant="info" padding="md" className="mb-6 text-sm text-blue-900">

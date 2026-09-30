@@ -13,7 +13,8 @@ import type { CalculatorConfig } from "@/lib/calculator-config";
 import type { GraphArtifact } from "@/lib/question-graph";
 import { Flag, ChevronLeft, ChevronRight, List, Pause, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SaveIndicator, type SaveStatus } from "@/components/sat";
+import { OfflineBanner, SaveIndicator, type SaveStatus } from "@/components/sat";
+import { clearBuffer, readBuffer, sendKeepalive, useOnlineStatus, usePageHideFlush, useSaveQueue, writeBuffer } from "@/lib/player-persistence";
 import { exitPlayerOnAuthLoss, isAuthFailureStatus } from "@/lib/player-session-exit";
 import { fetchWithTransientRetry } from "@/lib/transient-fetch";
 import { isAnswerCorrect } from "@/lib/answer-grading";
@@ -53,6 +54,36 @@ interface PlayerProps {
   resultHref?: string;
 }
 
+interface AutosavePayload {
+  answers: Record<string, string>;
+  currentQuestion: number;
+  totalTime: number;
+  timeSpentByQuestion: Record<string, number>;
+  markedQuestionIds: string[];
+  notes: Record<string, string>;
+  eliminatedOptions: Record<string, string[]>;
+}
+
+function buildPayload(
+  answers: Record<string, string>,
+  currentQuestion: number,
+  totalTime: number,
+  marked: Set<string>,
+  notes: Record<string, string>,
+  eliminated: Record<string, Set<string>>,
+  timeSpentByQuestion: Record<string, number>,
+): AutosavePayload {
+  return {
+    answers,
+    currentQuestion,
+    totalTime,
+    timeSpentByQuestion,
+    markedQuestionIds: Array.from(marked),
+    notes,
+    eliminatedOptions: Object.fromEntries(Object.entries(eliminated).map(([id, labels]) => [id, Array.from(labels)])),
+  };
+}
+
 export function PracticeSetPlayer({
   attemptId,
   questions,
@@ -88,6 +119,8 @@ export function PracticeSetPlayer({
   const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const questionStartTime = useRef<number | null>(null);
   const timeSpentByQuestion = useRef<Record<string, number>>({ ...savedTimeSpent });
+  const enqueueSave = useSaveQueue();
+  const online = useOnlineStatus();
 
   const question = questions[current];
   const responseType = question ? resolveQuestionType(question.type, question.options) : "NUMERIC";
@@ -121,6 +154,33 @@ export function PracticeSetPlayer({
     return { ...timeSpentByQuestion.current };
   }, [current, questions]);
 
+  // Sends one payload through the save queue; on failure it stays in the local buffer.
+  const postPayload = useCallback(
+    (payload: AutosavePayload) =>
+      enqueueSave(async () => {
+        setSaving("saving");
+        try {
+          const response = await fetchWithTransientRetry(`/api/attempts/${attemptId}/autosave`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          if (isAuthFailureStatus(response.status)) {
+            await exitPlayerOnAuthLoss({ pauseUrl: `/api/attempts/${attemptId}/pause` });
+            return;
+          }
+          if (!response.ok) throw new Error("Autosave failed");
+          clearBuffer(offlineKey);
+          setSaving("saved");
+          setTimeout(() => setSaving("idle"), 2000);
+        } catch {
+          writeBuffer(offlineKey, payload);
+          setSaving("offline");
+        }
+      }),
+    [attemptId, enqueueSave, offlineKey]
+  );
+
   const saveProgress = useCallback(
     async (
       ans: Record<string, string>,
@@ -134,69 +194,59 @@ export function PracticeSetPlayer({
         setSaving("idle");
         return;
       }
-      const timeSpentSnapshot = { ...timeSpentByQuestion.current };
-      const payload = {
-        answers: ans,
-        currentQuestion: qIndex,
-        totalTime: elapsed,
-        timeSpentByQuestion: timeSpentSnapshot,
-        markedQuestionIds: Array.from(nextMarked),
-        notes: nextNotes,
-        eliminatedOptions: Object.fromEntries(
-          Object.entries(nextEliminated).map(([id, labels]) => [id, Array.from(labels)])
-        ),
-      };
-      setSaving("saving");
-      try {
-        const response = await fetchWithTransientRetry(`/api/attempts/${attemptId}/autosave`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        if (isAuthFailureStatus(response.status)) {
-          await exitPlayerOnAuthLoss({ pauseUrl: `/api/attempts/${attemptId}/pause` });
-          return;
-        }
-        if (!response.ok) throw new Error("Autosave failed");
-        localStorage.removeItem(offlineKey);
-        setSaving("saved");
-        setTimeout(() => setSaving("idle"), 2000);
-      } catch {
-        localStorage.setItem(offlineKey, JSON.stringify(payload));
-        setSaving("offline");
-      }
+      const payload = buildPayload(ans, qIndex, elapsed, nextMarked, nextNotes, nextEliminated, { ...timeSpentByQuestion.current });
+      await postPayload(payload);
     },
-    [attemptId, elapsed, eliminated, marked, notes, offlineKey, previewMode, recordCurrentQuestionTime]
+    [elapsed, eliminated, marked, notes, postPayload, previewMode, recordCurrentQuestionTime]
   );
 
+  // Latest full state, read by the reconnect sync and the page-hide flush.
+  const latestPayload = useRef<AutosavePayload | null>(null);
+  useEffect(() => {
+    latestPayload.current = buildPayload(answers, current, elapsed, marked, notes, eliminated, { ...timeSpentByQuestion.current });
+  });
+
+  // On mount, a local buffer means the last save never reached the server: apply it to the
+  // player state first (so the next autosave does not overwrite it), then send it.
   useEffect(() => {
     if (previewMode) return;
-    const syncOffline = async () => {
-      const raw = localStorage.getItem(offlineKey);
-      if (!raw) return;
-      try {
-        const response = await fetchWithTransientRetry(`/api/attempts/${attemptId}/autosave`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: raw,
-        });
-        if (isAuthFailureStatus(response.status)) {
-          await exitPlayerOnAuthLoss({ pauseUrl: `/api/attempts/${attemptId}/pause` });
-          return;
-        }
-        if (response.ok) {
-          localStorage.removeItem(offlineKey);
-          setSaving("saved");
-          setTimeout(() => setSaving("idle"), 2000);
-        }
-      } catch {
-        setSaving("offline");
+    void (async () => {
+      await Promise.resolve();
+      const buffered = readBuffer<AutosavePayload>(offlineKey);
+      if (!buffered) return;
+      const { savedAt: _savedAt, ...payload } = buffered;
+      void _savedAt;
+      setAnswers(payload.answers ?? {});
+      setCurrent(Math.min(Math.max(payload.currentQuestion ?? 0, 0), Math.max(questions.length - 1, 0)));
+      setElapsed((value) => Math.max(value, payload.totalTime ?? 0));
+      setMarked(new Set(payload.markedQuestionIds ?? []));
+      setNotes(payload.notes ?? {});
+      setEliminated(Object.fromEntries(Object.entries(payload.eliminatedOptions ?? {}).map(([id, labels]) => [id, new Set(labels)])));
+      for (const [id, seconds] of Object.entries(payload.timeSpentByQuestion ?? {})) {
+        timeSpentByQuestion.current[id] = Math.max(timeSpentByQuestion.current[id] ?? 0, seconds);
       }
+      await postPayload(payload);
+    })();
+  }, [offlineKey, postPayload, previewMode, questions.length]);
+
+  // Back online: push the current state (it includes anything buffered while offline).
+  useEffect(() => {
+    if (previewMode) return;
+    const onOnline = () => {
+      if (latestPayload.current) void postPayload(latestPayload.current);
     };
-    window.addEventListener("online", syncOffline);
-    void syncOffline();
-    return () => window.removeEventListener("online", syncOffline);
-  }, [attemptId, offlineKey, previewMode]);
+    window.addEventListener("online", onOnline);
+    return () => window.removeEventListener("online", onOnline);
+  }, [postPayload, previewMode]);
+
+  // Tab hidden or closed: cancel the pending debounce and save now.
+  usePageHideFlush(() => {
+    if (saveTimeout.current) clearTimeout(saveTimeout.current);
+    recordCurrentQuestionTime();
+    const payload = buildPayload(answers, current, elapsed, marked, notes, eliminated, { ...timeSpentByQuestion.current });
+    writeBuffer(offlineKey, payload);
+    sendKeepalive(`/api/attempts/${attemptId}/autosave`, payload);
+  }, !previewMode);
 
   const handleAnswer = (questionId: string, value: string) => {
     if (checked[questionId]) return;
@@ -315,6 +365,7 @@ export function PracticeSetPlayer({
           </button>
         </div>
       )}
+      <OfflineBanner online={online} />
       {/* Top bar — progress as x of N stays here; large question number lives with choices */}
       <div className="flex shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4 py-2.5 sm:px-6">
         <div className="flex min-w-0 items-center gap-3">

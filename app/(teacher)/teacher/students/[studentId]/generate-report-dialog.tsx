@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Download, FileText, Loader2 } from "lucide-react";
+import { Download, FileText, Loader2, Mail } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Hint } from "@/components/hint";
 
@@ -19,13 +19,39 @@ type AreaKey = (typeof AREAS)[number]["key"];
  * The preview regenerates by itself whenever the selection changes; the iframe points at the
  * same-origin PDF endpoint (inline) and the download at the same endpoint as an attachment,
  * so both are exactly the same document.
+ * With Full Practice Tests selected, the teacher can narrow the report to one exam. The same PDF
+ * can be emailed as an attachment to the parents linked to the student.
  */
+export interface ReportExamOption {
+  id: string;
+  label: string;
+}
+export interface ReportParentOption {
+  id: string;
+  name: string;
+  email: string | null;
+}
+interface SendResult {
+  parentId: string;
+  name: string;
+  email: string | null;
+  sent: boolean;
+  reason: string | null;
+}
+const SEND_REASON: Record<string, string> = {
+  SMTP_NOT_CONFIGURED: "email is not configured (Admin → Settings)",
+  SEND_FAILED: "the mail server rejected it",
+};
 export function GenerateReportDialog({
   studentId,
   studentName,
   currentArea,
   filters,
   filterSummary,
+  exams = [],
+  parents = [],
+  initialExamId = "",
+  triggerLabel,
 }: {
   studentId: string;
   studentName: string;
@@ -33,28 +59,45 @@ export function GenerateReportDialog({
   filters: { topic?: string; difficulty?: string; from?: string; to?: string };
   /** Human-readable summary of the active filters, e.g. "Skill: Circles · Difficulty: HARD". */
   filterSummary: string;
+  /** Submitted Full Practice Test attempts the report can be narrowed to. */
+  exams?: ReportExamOption[];
+  /** Parents linked to the student (only those with an email can receive the PDF). */
+  parents?: ReportParentOption[];
+  initialExamId?: string;
+  /** Replaces the default "Generate Report" trigger text. */
+  triggerLabel?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<Set<AreaKey>>(new Set([currentArea]));
+  const [examId, setExamId] = useState(initialExamId);
   const [previewQuery, setPreviewQuery] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const emailParents = parents.filter((parent) => parent.email);
+  const [recipients, setRecipients] = useState<Set<string>>(() => new Set(emailParents.map((parent) => parent.id)));
+  const [sending, setSending] = useState(false);
+  const [sendResults, setSendResults] = useState<SendResult[] | null>(null);
+  const [sendError, setSendError] = useState<string | null>(null);
 
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const endpoint = `/api/reports/students/${studentId}/pdf`;
 
-  const queryFor = (areas: Set<AreaKey>) => {
+  // One exam only makes sense with Full Practice Tests selected; it replaces the other areas.
+  const effectiveExamId = selected.has("mocks") ? examId : "";
+  const queryFor = (areas: Set<AreaKey>, exam: string) => {
     const keys = AREAS.filter((area) => areas.has(area.key)).map((area) => area.key);
     if (keys.length === 0) return null;
     const params = new URLSearchParams({ areas: keys.join(",") });
     for (const [key, value] of Object.entries(filters)) if (value) params.set(key, value);
+    if (exam && areas.has("mocks")) params.set("fptAttemptId", exam);
     return params.toString();
   };
-  const query = queryFor(selected);
+  const query = queryFor(selected, effectiveExamId);
 
   /** Rebuild the preview for this selection (debounced so quick clicks produce one PDF). */
-  function schedulePreview(areas: Set<AreaKey>, delay = 350) {
+  function schedulePreview(areas: Set<AreaKey>, delay = 350, exam = examId) {
     if (timer.current) clearTimeout(timer.current);
-    const next = queryFor(areas);
+    setSendResults(null);
+    const next = queryFor(areas, exam);
     if (!next) {
       setPreviewQuery(null);
       setLoading(false);
@@ -72,6 +115,38 @@ export function GenerateReportDialog({
     schedulePreview(next);
   }
 
+  function chooseExam(value: string) {
+    setExamId(value);
+    schedulePreview(selected, 0, value);
+  }
+
+  function toggleRecipient(id: string) {
+    const next = new Set(recipients);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    setRecipients(next);
+  }
+
+  async function sendToParents() {
+    if (!query || recipients.size === 0) return;
+    setSending(true);
+    setSendError(null);
+    setSendResults(null);
+    const keys = AREAS.filter((area) => selected.has(area.key)).map((area) => area.key);
+    const response = await fetch(`/api/reports/students/${studentId}/email`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ parentIds: [...recipients], areas: keys, filters, fptAttemptId: effectiveExamId || null }),
+    });
+    const data = (await response.json().catch(() => ({}))) as { results?: SendResult[]; error?: string };
+    setSending(false);
+    if (!response.ok) {
+      setSendError(data.error ?? "The report could not be sent.");
+      return;
+    }
+    setSendResults(data.results ?? []);
+  }
+
   return (
     <Dialog
       open={open}
@@ -84,7 +159,7 @@ export function GenerateReportDialog({
       <Hint label="Build a printable PDF report for this student: pick the areas, preview it, then download. Several areas are combined into one file.">
         <DialogTrigger asChild>
           <button type="button" className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-gray-300 bg-white px-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
-            <FileText size={14} /> Generate Report
+            <FileText size={14} /> {triggerLabel ?? "Generate Report"}
           </button>
         </DialogTrigger>
       </Hint>
@@ -127,6 +202,22 @@ export function GenerateReportDialog({
           </div>
         </div>
         {!query && <p className="text-sm text-rose-600">Select at least one area.</p>}
+        {selected.has("mocks") && exams.length > 0 ? (
+          <label className="flex flex-wrap items-center gap-2 text-sm text-gray-700">
+            <span className="font-medium">Exam</span>
+            <select
+              value={examId}
+              onChange={(event) => chooseExam(event.target.value)}
+              className="h-8 rounded-md border border-gray-300 bg-white px-2 text-sm"
+            >
+              <option value="">All exams</option>
+              {exams.map((exam) => (
+                <option key={exam.id} value={exam.id}>{exam.label}</option>
+              ))}
+            </select>
+            {effectiveExamId ? <span className="text-xs text-gray-500">The report covers this exam only.</span> : null}
+          </label>
+        ) : null}
 
         <div className="relative min-h-0 flex-1 overflow-hidden rounded-md border border-gray-200 bg-gray-100">
           {previewQuery ? (
@@ -145,6 +236,50 @@ export function GenerateReportDialog({
               <Loader2 size={18} className="mr-2 animate-spin" /> Generating report…
             </div>
           )}
+        </div>
+
+        <div className="rounded-md border border-gray-200 p-3">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <span className="text-sm font-medium text-gray-900">Email to parents</span>
+            {emailParents.length === 0 ? (
+              <span className="text-sm text-gray-500">No linked parents with email. Link a parent in Parents to send the report.</span>
+            ) : (
+              emailParents.map((parent) => (
+                <label key={parent.id} className="inline-flex cursor-pointer items-center gap-2 text-sm text-gray-700">
+                  <input
+                    type="checkbox"
+                    checked={recipients.has(parent.id)}
+                    onChange={() => toggleRecipient(parent.id)}
+                    className="rounded border-gray-300"
+                  />
+                  {parent.name} <span className="text-gray-400">{parent.email}</span>
+                </label>
+              ))
+            )}
+            {emailParents.length > 0 ? (
+              <button
+                type="button"
+                onClick={() => void sendToParents()}
+                disabled={!query || recipients.size === 0 || sending}
+                className="ml-auto inline-flex h-9 items-center gap-1.5 rounded-md border border-gray-300 bg-white px-3 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                title="Send this exact PDF as an email attachment to the selected parents"
+              >
+                {sending ? <Loader2 size={14} className="animate-spin" /> : <Mail size={14} />} Send PDF
+              </button>
+            ) : null}
+          </div>
+          {sendError ? <p className="mt-2 text-sm text-rose-600">{sendError}</p> : null}
+          {sendResults ? (
+            <ul className="mt-2 space-y-0.5 text-sm">
+              {sendResults.map((result) => (
+                <li key={result.parentId} className={result.sent ? "text-green-700" : "text-rose-600"}>
+                  {result.sent
+                    ? `Sent to ${result.name} (${result.email}).`
+                    : `Not sent to ${result.name}: ${SEND_REASON[result.reason ?? ""] ?? result.reason ?? "unknown error"}.`}
+                </li>
+              ))}
+            </ul>
+          ) : null}
         </div>
       </DialogContent>
     </Dialog>

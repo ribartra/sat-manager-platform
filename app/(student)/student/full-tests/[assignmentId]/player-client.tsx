@@ -7,14 +7,17 @@ import { MathToolPanel } from "@/components/math-tool-panel";
 import { QuestionMedia } from "@/components/question-media";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { formatTime, cn } from "@/lib/utils";
 import type { CalculatorConfig } from "@/lib/calculator-config";
 import type { GraphArtifact } from "@/lib/question-graph";
 import type { FullTestProgressState, FullTestTimerPhase } from "@/lib/full-test-progress";
 import { questionResponseLabel, resolveQuestionType } from "@/lib/question-type";
-import { LoadingState, SaveIndicator, type SaveStatus } from "@/components/sat";
+import { LoadingState, OfflineBanner, SaveIndicator, type SaveStatus } from "@/components/sat";
 import { exitPlayerOnAuthLoss, isAuthFailureStatus } from "@/lib/player-session-exit";
-import { ChevronLeft, List } from "lucide-react";
+import { fetchWithTransientRetry } from "@/lib/transient-fetch";
+import { clearBuffer, readBuffer, sendKeepalive, useOnlineStatus, usePageHideFlush, useSaveQueue, writeBuffer } from "@/lib/player-persistence";
+import { ChevronLeft, Flag, List } from "lucide-react";
 
 interface ModuleQuestion {
   id: string;
@@ -34,6 +37,29 @@ interface TestModule {
 }
 
 const RW_M2_INDEX = 1;
+/** Debounce for typed input (numeric answers, notes); clicks save immediately. */
+const TYPING_SAVE_DELAY_MS = 800;
+
+interface FullTestAutosavePayload {
+  answers: Record<string, string>;
+  currentModule: number;
+  currentQuestion: number;
+  timeExpiredEvents: number;
+  extraTimeUsed: number;
+  moduleTimerState: FullTestProgressState;
+  timeSpentByQuestion: Record<string, number>;
+  markedQuestionIds: string[];
+  notes: Record<string, string>;
+  eliminatedOptions: Record<string, string[]>;
+}
+
+function toLabelSets(value: Record<string, string[]>) {
+  return Object.fromEntries(Object.entries(value).map(([id, labels]) => [id, new Set(labels)]));
+}
+
+function fromLabelSets(value: Record<string, Set<string>>) {
+  return Object.fromEntries(Object.entries(value).map(([id, labels]) => [id, Array.from(labels)]));
+}
 
 export function FullTestPlayer({
   attemptId,
@@ -42,6 +68,9 @@ export function FullTestPlayer({
   breakMinutes,
   savedAnswers,
   savedTimeSpent,
+  savedMarked = [],
+  savedNotes = {},
+  savedEliminated = {},
   savedModule,
   savedQuestion,
   savedExpiredEvents,
@@ -60,6 +89,9 @@ export function FullTestPlayer({
   breakMinutes: number;
   savedAnswers: Record<string, string>;
   savedTimeSpent: Record<string, number>;
+  savedMarked?: string[];
+  savedNotes?: Record<string, string>;
+  savedEliminated?: Record<string, string[]>;
   savedModule: number;
   savedQuestion: number;
   savedExpiredEvents: number;
@@ -93,6 +125,9 @@ export function FullTestPlayer({
   const [expiredEvents, setExpiredEvents] = useState(savedExpiredEvents);
   const [extraTimeUsed] = useState(savedExtraTimeUsed);
   const [answers, setAnswers] = useState<Record<string, string>>(savedAnswers);
+  const [marked, setMarked] = useState<Set<string>>(() => new Set(savedMarked));
+  const [notes, setNotes] = useState<Record<string, string>>(savedNotes);
+  const [eliminated, setEliminated] = useState<Record<string, Set<string>>>(() => toLabelSets(savedEliminated));
   const [saving, setSaving] = useState<SaveStatus>("idle");
   const [advancing, setAdvancing] = useState(false);
   const [confirmSubmitModule, setConfirmSubmitModule] = useState(false);
@@ -111,6 +146,13 @@ export function FullTestPlayer({
   const moduleIndexRef = useRef(moduleIndex);
   const questionIndexRef = useRef(questionIndex);
   const answersRef = useRef(answers);
+  const markedRef = useRef(marked);
+  const notesRef = useRef(notes);
+  const eliminatedRef = useRef(eliminated);
+  const expiredEventsRef = useRef(expiredEvents);
+  const typingSaveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const enqueueSave = useSaveQueue();
+  const online = useOnlineStatus();
 
   useEffect(() => {
     phaseRef.current = phase;
@@ -130,12 +172,24 @@ export function FullTestPlayer({
   useEffect(() => {
     answersRef.current = answers;
   }, [answers]);
+  useEffect(() => {
+    markedRef.current = marked;
+  }, [marked]);
+  useEffect(() => {
+    notesRef.current = notes;
+  }, [notes]);
+  useEffect(() => {
+    eliminatedRef.current = eliminated;
+  }, [eliminated]);
+  useEffect(() => {
+    expiredEventsRef.current = expiredEvents;
+  }, [expiredEvents]);
 
   useEffect(() => {
     questionStartTime.current = Date.now();
     if (previewMode) return;
     void (async () => {
-      const response = await fetch(`/api/full-practice-tests/attempts/${attemptId}/resume`, { method: "POST" });
+      const response = await fetchWithTransientRetry(`/api/full-practice-tests/attempts/${attemptId}/resume`, { method: "POST" });
       if (isAuthFailureStatus(response.status)) {
         await exitPlayerOnAuthLoss({
           pauseUrl: `/api/full-practice-tests/attempts/${attemptId}/pause`,
@@ -164,6 +218,56 @@ export function FullTestPlayer({
     [],
   );
 
+  const buildAutosavePayload = useCallback(
+    (
+      nextAnswers: Record<string, string>,
+      nextModule: number,
+      nextQuestion: number,
+      progressOverrides?: Partial<FullTestProgressState>,
+    ): FullTestAutosavePayload => ({
+      answers: nextAnswers,
+      currentModule: nextModule,
+      currentQuestion: nextQuestion,
+      timeExpiredEvents: expiredEventsRef.current,
+      extraTimeUsed,
+      moduleTimerState: buildProgressPayload(progressOverrides),
+      timeSpentByQuestion: { ...timeSpentByQuestion.current },
+      markedQuestionIds: Array.from(markedRef.current),
+      notes: notesRef.current,
+      eliminatedOptions: fromLabelSets(eliminatedRef.current),
+    }),
+    [buildProgressPayload, extraTimeUsed],
+  );
+
+  // Sends one payload through the save queue; on failure it stays in the local buffer.
+  const postPayload = useCallback(
+    (payload: FullTestAutosavePayload) =>
+      enqueueSave(async () => {
+        setSaving("saving");
+        try {
+          const response = await fetchWithTransientRetry(`/api/full-practice-tests/attempts/${attemptId}/autosave`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          if (isAuthFailureStatus(response.status)) {
+            await exitPlayerOnAuthLoss({
+              pauseUrl: `/api/full-practice-tests/attempts/${attemptId}/pause`,
+            });
+            return;
+          }
+          if (!response.ok) throw new Error("Autosave failed");
+          clearBuffer(offlineKey);
+          setSaving("saved");
+          setTimeout(() => setSaving("idle"), 1500);
+        } catch {
+          writeBuffer(offlineKey, payload);
+          setSaving("offline");
+        }
+      }),
+    [attemptId, enqueueSave, offlineKey],
+  );
+
   const saveProgress = useCallback(
     async (
       nextAnswers = answersRef.current,
@@ -171,79 +275,109 @@ export function FullTestPlayer({
       nextQuestion = questionIndexRef.current,
       progressOverrides?: Partial<FullTestProgressState>,
     ) => {
+      if (typingSaveTimeout.current) {
+        clearTimeout(typingSaveTimeout.current);
+        typingSaveTimeout.current = null;
+      }
       if (phaseRef.current === "MODULE") {
         timerState.current[moduleIndexRef.current] = remainingRef.current;
       }
-      const timeSpentSnapshot = recordQuestionTime();
-      const moduleTimerState = buildProgressPayload(progressOverrides);
-      const payload = {
-        answers: nextAnswers,
-        currentModule: nextModule,
-        currentQuestion: nextQuestion,
-        timeExpiredEvents: expiredEvents,
-        extraTimeUsed,
-        moduleTimerState,
-        timeSpentByQuestion: timeSpentSnapshot,
-      };
+      recordQuestionTime();
+      const payload = buildAutosavePayload(nextAnswers, nextModule, nextQuestion, progressOverrides);
       if (previewMode) {
         setSaving("idle");
         return;
       }
-      setSaving("saving");
-      try {
-        const response = await fetch(`/api/full-practice-tests/attempts/${attemptId}/autosave`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        if (isAuthFailureStatus(response.status)) {
-          await exitPlayerOnAuthLoss({
-            pauseUrl: `/api/full-practice-tests/attempts/${attemptId}/pause`,
-          });
-          return;
-        }
-        if (!response.ok) throw new Error("Autosave failed");
-        localStorage.removeItem(offlineKey);
-        setSaving("saved");
-        setTimeout(() => setSaving("idle"), 1500);
-      } catch {
-        localStorage.setItem(offlineKey, JSON.stringify(payload));
-        setSaving("offline");
-      }
+      await postPayload(payload);
     },
-    [attemptId, buildProgressPayload, expiredEvents, extraTimeUsed, offlineKey, previewMode, recordQuestionTime],
+    [buildAutosavePayload, postPayload, previewMode, recordQuestionTime],
   );
 
+  /** Debounced save for typed input; the refs are read when the timer fires. */
+  const scheduleTypingSave = useCallback(() => {
+    if (typingSaveTimeout.current) clearTimeout(typingSaveTimeout.current);
+    typingSaveTimeout.current = setTimeout(() => {
+      typingSaveTimeout.current = null;
+      void saveProgress();
+    }, TYPING_SAVE_DELAY_MS);
+  }, [saveProgress]);
+
+  // On mount, a local buffer means the last save never reached the server: apply it to the
+  // player state first (so the next autosave does not overwrite it), then send it.
   useEffect(() => {
     if (previewMode) return;
-    const syncOffline = async () => {
-      const raw = localStorage.getItem(offlineKey);
-      if (!raw) return;
-      try {
-        const response = await fetch(`/api/full-practice-tests/attempts/${attemptId}/autosave`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: raw,
-        });
-        if (isAuthFailureStatus(response.status)) {
-          await exitPlayerOnAuthLoss({
-            pauseUrl: `/api/full-practice-tests/attempts/${attemptId}/pause`,
-          });
-          return;
-        }
-        if (response.ok) {
-          localStorage.removeItem(offlineKey);
-          setSaving("saved");
-          setTimeout(() => setSaving("idle"), 1500);
-        }
-      } catch {
-        setSaving("offline");
+    void (async () => {
+      await Promise.resolve();
+      const buffered = readBuffer<FullTestAutosavePayload>(offlineKey);
+      if (!buffered) return;
+      const { savedAt: _savedAt, ...payload } = buffered;
+      void _savedAt;
+      const nextAnswers = { ...answersRef.current, ...(payload.answers ?? {}) };
+      answersRef.current = nextAnswers;
+      setAnswers(nextAnswers);
+      const nextMarked = new Set(payload.markedQuestionIds ?? []);
+      markedRef.current = nextMarked;
+      setMarked(nextMarked);
+      const nextNotes = payload.notes ?? {};
+      notesRef.current = nextNotes;
+      setNotes(nextNotes);
+      const nextEliminated = toLabelSets(payload.eliminatedOptions ?? {});
+      eliminatedRef.current = nextEliminated;
+      setEliminated(nextEliminated);
+      for (const [id, seconds] of Object.entries(payload.timeSpentByQuestion ?? {})) {
+        timeSpentByQuestion.current[id] = Math.max(timeSpentByQuestion.current[id] ?? 0, seconds);
       }
+      // Timers only ever count down, so the smaller value is the more recent one.
+      const bufferedTimers = payload.moduleTimerState?.timers ?? [];
+      timerState.current = timerState.current.map((value, index) =>
+        typeof bufferedTimers[index] === "number" ? Math.min(value, bufferedTimers[index]) : value,
+      );
+      const bufferedModule = payload.currentModule ?? moduleIndexRef.current;
+      if (phaseRef.current === "MODULE" && bufferedModule >= moduleIndexRef.current && bufferedModule < modules.length) {
+        const nextQuestion = Math.min(
+          Math.max(payload.currentQuestion ?? 0, 0),
+          Math.max(modules[bufferedModule].questions.length - 1, 0),
+        );
+        moduleIndexRef.current = bufferedModule;
+        questionIndexRef.current = nextQuestion;
+        setModuleIndex(bufferedModule);
+        setQuestionIndex(nextQuestion);
+        const nextRemaining = timerState.current[bufferedModule] ?? modules[bufferedModule].timeLimit;
+        remainingRef.current = nextRemaining;
+        setRemaining(nextRemaining);
+      }
+      if ((payload.timeExpiredEvents ?? 0) > expiredEventsRef.current) {
+        expiredEventsRef.current = payload.timeExpiredEvents;
+        setExpiredEvents(payload.timeExpiredEvents);
+      }
+      await postPayload(buildAutosavePayload(nextAnswers, moduleIndexRef.current, questionIndexRef.current));
+    })();
+  }, [buildAutosavePayload, modules, offlineKey, postPayload, previewMode]);
+
+  // Back online: push the current state (it includes anything buffered while offline).
+  useEffect(() => {
+    if (previewMode) return;
+    const onOnline = () => {
+      void saveProgress();
     };
-    window.addEventListener("online", syncOffline);
-    void syncOffline();
-    return () => window.removeEventListener("online", syncOffline);
-  }, [attemptId, offlineKey, previewMode]);
+    window.addEventListener("online", onOnline);
+    return () => window.removeEventListener("online", onOnline);
+  }, [previewMode, saveProgress]);
+
+  // Tab hidden or closed: cancel the pending debounce and save now.
+  usePageHideFlush(() => {
+    if (typingSaveTimeout.current) {
+      clearTimeout(typingSaveTimeout.current);
+      typingSaveTimeout.current = null;
+    }
+    if (phaseRef.current === "MODULE") {
+      timerState.current[moduleIndexRef.current] = remainingRef.current;
+    }
+    recordQuestionTime();
+    const payload = buildAutosavePayload(answersRef.current, moduleIndexRef.current, questionIndexRef.current);
+    writeBuffer(offlineKey, payload);
+    sendKeepalive(`/api/full-practice-tests/attempts/${attemptId}/autosave`, payload);
+  }, !previewMode);
 
   const submit = useCallback(async () => {
     if (previewMode) {
@@ -255,14 +389,17 @@ export function FullTestPlayer({
       timerState.current[moduleIndexRef.current] = remainingRef.current;
     }
     const timeSpentSnapshot = recordQuestionTime();
-    const response = await fetch(`/api/full-practice-tests/attempts/${attemptId}/submit`, {
+    const response = await fetchWithTransientRetry(`/api/full-practice-tests/attempts/${attemptId}/submit`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         answers: answersRef.current,
         timeSpentByQuestion: timeSpentSnapshot,
-        timeExpiredEvents: expiredEvents,
+        timeExpiredEvents: expiredEventsRef.current,
         extraTimeUsed,
+        markedQuestionIds: Array.from(markedRef.current),
+        notes: notesRef.current,
+        eliminatedOptions: fromLabelSets(eliminatedRef.current),
       }),
     });
     if (isAuthFailureStatus(response.status)) {
@@ -271,8 +408,14 @@ export function FullTestPlayer({
       });
       return;
     }
+    if (!response.ok) {
+      writeBuffer(offlineKey, buildAutosavePayload(answersRef.current, moduleIndexRef.current, questionIndexRef.current));
+      window.alert("Submit failed. Your answers are saved on this device; please try again.");
+      return;
+    }
+    clearBuffer(offlineKey);
     router.push(`/student/full-tests/results/${attemptId}${resultQuery ? `?${resultQuery}` : ""}`);
-  }, [attemptId, exitHref, expiredEvents, extraTimeUsed, previewMode, recordQuestionTime, resultQuery, router]);
+  }, [attemptId, buildAutosavePayload, exitHref, extraTimeUsed, offlineKey, previewMode, recordQuestionTime, resultQuery, router]);
 
   const enterModule = useCallback(
     async (nextModule: number) => {
@@ -398,6 +541,32 @@ export function FullTestPlayer({
     setShowNav(false);
   }
 
+  function toggleMarked(questionId: string) {
+    const next = new Set(markedRef.current);
+    if (next.has(questionId)) next.delete(questionId);
+    else next.add(questionId);
+    markedRef.current = next;
+    setMarked(next);
+    void saveProgress();
+  }
+
+  function toggleEliminated(questionId: string, label: string) {
+    const labels = new Set(eliminatedRef.current[questionId] ?? []);
+    if (labels.has(label)) labels.delete(label);
+    else labels.add(label);
+    const next = { ...eliminatedRef.current, [questionId]: labels };
+    eliminatedRef.current = next;
+    setEliminated(next);
+    void saveProgress();
+  }
+
+  function handleNote(questionId: string, value: string) {
+    const next = { ...notesRef.current, [questionId]: value };
+    notesRef.current = next;
+    setNotes(next);
+    scheduleTypingSave();
+  }
+
   async function confirmFinishModule() {
     setConfirmSubmitModule(false);
     await advanceAfterModule();
@@ -406,6 +575,9 @@ export function FullTestPlayer({
   const timerIsRed = phase === "MODULE" && remaining <= 60;
   const unansweredInModule = currentModule
     ? currentModule.questions.filter((q) => !answers[q.id]).length
+    : 0;
+  const markedInModule = currentModule
+    ? currentModule.questions.filter((q) => marked.has(q.id)).length
     : 0;
   const isLastQuestionOfModule = Boolean(currentModule) && questionIndex === currentModule.questions.length - 1;
 
@@ -454,7 +626,8 @@ export function FullTestPlayer({
   const responseType = resolveQuestionType(question.type, question.options);
 
   return (
-    <div className="flex h-screen flex-col bg-white">
+    <div className="flex h-dvh max-h-dvh flex-col overflow-hidden bg-white">
+      <OfflineBanner online={online} />
       {previewMode && (
         <div className="flex items-center justify-between border-b border-amber-200 bg-amber-50 px-6 py-2 text-sm text-amber-900">
           <span className="font-medium">Preview only — not scored. No student attempt is created.</span>
@@ -490,7 +663,7 @@ export function FullTestPlayer({
           </Button>
         </div>
       </div>
-      <div className="grid flex-1 grid-cols-1 overflow-hidden md:grid-cols-2">
+      <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden md:grid-cols-2">
         <div
           className={cn(
             "space-y-4 overflow-y-auto border-r border-gray-200 p-6",
@@ -506,9 +679,25 @@ export function FullTestPlayer({
           </div>
         </div>
         <div className="overflow-y-auto p-5 md:p-6">
-          <div className="mb-3 flex items-baseline gap-2">
-            <span className="text-4xl font-bold leading-none tabular-nums text-gray-900">{questionIndex + 1}</span>
-            <p className="text-xs font-medium uppercase tracking-wide text-gray-500">{questionResponseLabel(responseType)}</p>
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <div className="flex items-baseline gap-2">
+              <span className="text-4xl font-bold leading-none tabular-nums text-gray-900">{questionIndex + 1}</span>
+              <p className="text-xs font-medium uppercase tracking-wide text-gray-500">{questionResponseLabel(responseType)}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => toggleMarked(question.id)}
+              aria-pressed={marked.has(question.id)}
+              className={cn(
+                "flex items-center gap-1 rounded border px-2 py-1 text-xs transition-colors",
+                marked.has(question.id)
+                  ? "border-amber-400 bg-amber-50 text-amber-700"
+                  : "border-gray-300 text-gray-600 hover:border-gray-400",
+              )}
+            >
+              <Flag size={12} />
+              {marked.has(question.id) ? "Marked" : "Mark for review"}
+            </button>
           </div>
           <MathToolPanel
             config={calculatorConfig}
@@ -517,37 +706,77 @@ export function FullTestPlayer({
             enabled={showCalculator && currentModule.section === "MATH"}
           />
           {responseType === "MC" ? (
-            question.options.filter((option) => option.text.trim()).map((option) => (
-              <button
-                key={option.label}
-                onClick={() => {
-                  const nextAnswers = { ...answers, [question.id]: option.label };
-                  setAnswers(nextAnswers);
-                  void saveProgress(nextAnswers);
-                }}
-                className={`mb-2 flex min-h-[3.75rem] w-full items-center gap-3 rounded-lg border px-4 py-4 text-left text-base ${
-                  answers[question.id] === option.label ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-gray-300"
-                }`}
-              >
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-gray-300 text-sm font-semibold text-gray-600">
-                  {option.label}
-                </span>
-                <span className="min-w-0 flex-1">
-                  <MathContent content={option.text} className="leading-snug text-gray-800" />
-                </span>
-              </button>
-            ))
+            question.options.filter((option) => option.text.trim()).map((option) => {
+              const selected = answers[question.id] === option.label;
+              const isEliminated = eliminated[question.id]?.has(option.label) ?? false;
+              return (
+                <div
+                  key={option.label}
+                  className={cn(
+                    "mb-2 flex min-h-[3.75rem] w-full items-center gap-2 rounded-lg border px-3 py-3 text-base transition-colors",
+                    selected ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-gray-300",
+                    isEliminated && "opacity-55",
+                  )}
+                >
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const nextAnswers = { ...answersRef.current, [question.id]: option.label };
+                      answersRef.current = nextAnswers;
+                      setAnswers(nextAnswers);
+                      void saveProgress(nextAnswers);
+                    }}
+                    className={cn("flex flex-1 items-center gap-3 text-left", isEliminated && "line-through")}
+                  >
+                    <span
+                      className={cn(
+                        "flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-sm font-semibold",
+                        selected ? "border-blue-500 bg-blue-500 text-white" : "border-gray-300 text-gray-600",
+                      )}
+                    >
+                      {option.label}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <MathContent content={option.text} className="leading-snug text-gray-800" />
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => toggleEliminated(question.id, option.label)}
+                    aria-pressed={isEliminated}
+                    aria-label={isEliminated ? `Undo eliminate choice ${option.label}` : `Eliminate choice ${option.label}`}
+                    className="shrink-0 rounded border border-gray-200 px-2 py-1 text-xs text-gray-500 hover:bg-gray-100"
+                  >
+                    {isEliminated ? "Undo" : "Eliminate"}
+                  </button>
+                </div>
+              );
+            })
           ) : (
             <Input
               value={answers[question.id] ?? ""}
               onChange={(e) => {
-                const nextAnswers = { ...answers, [question.id]: e.target.value };
+                const nextAnswers = { ...answersRef.current, [question.id]: e.target.value };
+                answersRef.current = nextAnswers;
                 setAnswers(nextAnswers);
-                void saveProgress(nextAnswers);
+                scheduleTypingSave();
               }}
               placeholder="Numeric answer"
             />
           )}
+          <details className="mt-3 rounded-md border border-gray-200 bg-gray-50 open:bg-white">
+            <summary className="cursor-pointer select-none px-3 py-2 text-xs font-medium text-gray-500">
+              Personal note
+            </summary>
+            <div className="border-t border-gray-200 px-3 pb-3 pt-2">
+              <Textarea
+                value={notes[question.id] ?? ""}
+                onChange={(e) => handleNote(question.id, e.target.value)}
+                placeholder="Add a private note for review"
+                rows={2}
+              />
+            </div>
+          </details>
         </div>
       </div>
       <div className="flex items-center justify-between border-t border-gray-200 px-6 py-3">
@@ -579,22 +808,28 @@ export function FullTestPlayer({
                 <button
                   key={q.id}
                   onClick={() => goToQuestion(i)}
+                  aria-label={`Question ${i + 1}${marked.has(q.id) ? ", marked for review" : ""}${answers[q.id] ? ", answered" : ", unanswered"}`}
                   className={cn(
-                    "h-9 w-9 rounded border text-xs font-medium transition-colors",
+                    "relative h-9 w-9 rounded border text-xs font-medium transition-colors",
                     i === questionIndex
                       ? "border-blue-500 bg-blue-500 text-white"
                       : answers[q.id]
                         ? "border-green-400 bg-green-50 text-green-700"
                         : "border-gray-200 text-gray-600 hover:bg-gray-50",
+                    marked.has(q.id) && "ring-2 ring-amber-400 ring-offset-1",
                   )}
                 >
                   {i + 1}
+                  {marked.has(q.id) ? (
+                    <Flag size={9} className="absolute -right-1 -top-1 fill-amber-400 text-amber-500" aria-hidden />
+                  ) : null}
                 </button>
               ))}
             </div>
             <div className="flex items-center gap-4 text-xs text-gray-500">
               <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded border border-green-400 bg-green-100" /> Answered</span>
               <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded border border-gray-200 bg-white" /> Unanswered</span>
+              <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded border border-gray-200 bg-white ring-2 ring-amber-400 ring-offset-1" /> Marked</span>
             </div>
             <p className="mt-3 text-xs text-gray-400">You can review questions within this module only.</p>
           </div>
@@ -610,6 +845,11 @@ export function FullTestPlayer({
             {unansweredInModule > 0 && (
               <p className="mt-2 text-sm text-amber-700">
                 {unansweredInModule} question{unansweredInModule === 1 ? "" : "s"} unanswered in this module.
+              </p>
+            )}
+            {markedInModule > 0 && (
+              <p className="mt-2 text-sm text-amber-700">
+                {markedInModule} question{markedInModule === 1 ? "" : "s"} marked for review. You can&apos;t return to this module after submitting it.
               </p>
             )}
             <div className="mt-5 flex justify-end gap-2">

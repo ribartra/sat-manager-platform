@@ -1,4 +1,4 @@
-import { PageShell } from "@/components/sat";
+import { InvalidatedNotice, PageShell, VoidableValue } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
@@ -34,7 +34,7 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
   const historyHref = returnQuery.toString() ? `/student/history?${returnQuery.toString()}` : "/student/history";
 
   const attempt = await prisma.attempt.findFirst({
-    where: { id: attemptId, studentId: userId, status: "SUBMITTED" },
+    where: { id: attemptId, studentId: userId, status: { in: ["SUBMITTED", "INVALIDATED"] } },
     include: {
       answers: {
         include: {
@@ -103,6 +103,7 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
         </Link>
       </div>
 
+      {attempt.status === "INVALIDATED" ? <InvalidatedNotice audience="student" /> : null}
       {/* Score header */}
       <div className="rounded-xl border border-gray-200 bg-white p-6 mb-6">
         <h1 className="text-lg font-semibold text-gray-900 mb-1">
@@ -114,12 +115,12 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
 
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div className="text-center">
-            <p className="text-3xl font-bold text-gray-900">{correct}/{totalQuestions}</p>
+            <p className="text-3xl font-bold text-gray-900"><VoidableValue status={attempt.status}>{correct}/{totalQuestions}</VoidableValue></p>
             <p className="text-xs text-gray-500 mt-0.5">Correct / total</p>
           </div>
           <div className="text-center">
             <p className={`text-3xl font-bold ${scoreBandTextClass(displayPct)}`}>
-              {displayPct}%
+              <VoidableValue status={attempt.status}>{displayPct}%</VoidableValue>
             </p>
             <p className="text-xs text-gray-500 mt-0.5">Percent</p>
           </div>

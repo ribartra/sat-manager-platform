@@ -1,4 +1,4 @@
-import { PageShell, PracticeAreaTabs } from "@/components/sat";
+import { AttemptStatusBadge, PageShell, Pagination, PracticeAreaTabs, VoidableValue, invalidatedRowClass, isInvalidated, pageFromParam, paginate } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
@@ -21,7 +21,7 @@ import {
   aggregateTopicDifficultyMetrics,
   aggregateTopicDifficultyTrend,
 } from "@/lib/progress-analytics";
-import { buildProgressHref, progressDateWhere, progressFiltersFromParams } from "@/lib/progress-filters";
+import { buildProgressHref, progressDateWhere, progressFilterEntries, progressFiltersFromParams } from "@/lib/progress-filters";
 import { applyTimeFilterSetting } from "@/lib/time-filters";
 import { compareSkills, isOfficialSkill } from "@/lib/taxonomy-order";
 
@@ -32,8 +32,13 @@ interface PageProps {
     difficulty?: string;
     from?: string;
     to?: string;
+    page?: string;
   }>;
 }
+
+const HISTORY_PAGE_SIZE = 20;
+// History lists show submitted AND invalidated attempts (crossed out); stats use SUBMITTED only.
+const HISTORY_STATUSES = ["SUBMITTED", "INVALIDATED"];
 
 type HistoryQuestionRow = {
   topicId: string;
@@ -54,17 +59,20 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
   const topicId = filters.topic || "";
   const difficulty = filters.difficulty || "";
   const dateFilter = progressDateWhere(filters);
+  const pageParams = Object.fromEntries(progressFilterEntries(filters));
+  const requestedPage = pageFromParam(params.page);
 
   if (area === "mocks") {
     const examAttempts = await prisma.fullPracticeTestAttempt.findMany({
       where: {
         studentId: userId,
-        status: "SUBMITTED",
+        status: { in: HISTORY_STATUSES },
         ...dateFilter,
       },
       include: { test: { select: { id: true, name: true } } },
-      orderBy: { submittedAt: "desc" },
+      orderBy: [{ submittedAt: "desc" }, { startedAt: "desc" }],
     });
+    const examPage = paginate(examAttempts, requestedPage, HISTORY_PAGE_SIZE);
 
     return (
       <PageShell width="wide" density="compact" className="space-y-4">
@@ -95,16 +103,21 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
                   </td>
                 </tr>
               ) : (
-                examAttempts.map((exam) => (
-                  <tr key={exam.id} className="hover:bg-gray-50">
+                examPage.items.map((exam) => (
+                  <tr key={exam.id} className={`hover:bg-gray-50 ${invalidatedRowClass(exam.status) ?? ""}`}>
                     <td className="whitespace-nowrap px-4 py-3 text-gray-500">
                       {exam.submittedAt ? formatDate(exam.submittedAt) : "—"}
                     </td>
-                    <td className="px-4 py-3 font-medium text-gray-900">{exam.test.name}</td>
-                    <td className="px-4 py-3 text-right text-gray-700">{exam.rwScore ?? "—"}</td>
-                    <td className="px-4 py-3 text-right text-gray-700">{exam.mathScore ?? "—"}</td>
+                    <td className="px-4 py-3 font-medium text-gray-900">
+                      <span className="flex items-center gap-2">
+                        {exam.test.name}
+                        {isInvalidated(exam.status) ? <AttemptStatusBadge status={exam.status} /> : null}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-right text-gray-700"><VoidableValue status={exam.status}>{exam.rwScore ?? "—"}</VoidableValue></td>
+                    <td className="px-4 py-3 text-right text-gray-700"><VoidableValue status={exam.status}>{exam.mathScore ?? "—"}</VoidableValue></td>
                     <td className="px-4 py-3 text-right font-semibold text-[var(--sat-area-mocks)]">
-                      {exam.totalScore ?? "—"}
+                      <VoidableValue status={exam.status}>{exam.totalScore ?? "—"}</VoidableValue>
                     </td>
                     <td className="px-4 py-3 text-right">
                     <Link href={buildProgressHref(`/student/full-tests/results/${exam.id}`, filters)} className="text-xs text-blue-600 hover:underline">
@@ -116,16 +129,17 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
               )}
             </tbody>
           </table>
+          <Pagination basePath="/student/history" params={pageParams} pageSize={HISTORY_PAGE_SIZE} {...examPage} className="border-t border-gray-100" />
         </Card>
       </PageShell>
     );
   }
 
-  const [attempts, topics] = await Promise.all([
+  const [historyAttempts, topics] = await Promise.all([
     prisma.attempt.findMany({
       where: {
         studentId: userId,
-        status: "SUBMITTED",
+        status: { in: HISTORY_STATUSES },
         ...dateFilter,
         assignment: {
           practiceSet: {
@@ -155,7 +169,8 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
     }),
   ]);
 
-  const buildQuestionRows = (attempt: (typeof attempts)[number]): HistoryQuestionRow[] => {
+  const attempts = historyAttempts.filter((attempt) => attempt.status === "SUBMITTED");
+  const buildQuestionRows = (attempt: (typeof historyAttempts)[number]): HistoryQuestionRow[] => {
     const answersByQuestion = new Map(attempt.answers.map((answer) => [answer.questionId, answer]));
     const practiceQuestions = attempt.assignment?.practiceSet.questions ?? [];
     const questionSources = practiceQuestions.length
@@ -216,7 +231,16 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
   );
   const trendTopics = Object.keys(topicTrend);
 
-  const historyRows = visibleAttempts.map(({ attempt: a, correct, total, pct, elapsedTime }) => {
+  // History list: every submitted or invalidated attempt, scored the same way, newest first.
+  const scoreForHistory = (a: (typeof historyAttempts)[number]) => {
+    const score = summarizeAllQuestionAnswers(buildQuestionRows(a).filter(questionMatchesFilters));
+    return { attempt: a, correct: score.correct, total: score.total, pct: score.percent, elapsedTime: a.totalTime ?? 0 };
+  };
+  const scoredById = new Map(scoredAttempts.map((entry) => [entry.attempt.id, entry]));
+  const listedAttempts = historyAttempts.map((a) => scoredById.get(a.id) ?? scoreForHistory(a));
+  const latestSubmitted = scoredAttempts[0] ?? null;
+  const historyPage = paginate(listedAttempts, requestedPage, HISTORY_PAGE_SIZE);
+  const historyRows = historyPage.items.map(({ attempt: a, correct, total, pct, elapsedTime }) => {
     const ps = a.assignment?.practiceSet;
     const areaLabel = ps
       ? practiceSetAreaLabel(
@@ -253,7 +277,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
         showEndDate={showEndDate}
       />
 
-      {visibleAttempts.length === 0 ? (
+      {listedAttempts.length === 0 ? (
         <Card padding="lg" className="py-14 text-center text-gray-500">
           <p>No completed {practiceAreaLabel(practiceArea).toLowerCase()} practice sets match the current filters.</p>
           <Link href={buildProgressHref("/student/content-map", filters)} className="mt-2 inline-block text-sm text-blue-600 hover:underline">
@@ -279,8 +303,8 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
             </Card>
             <Card padding="sm" className="col-span-2 sm:col-span-1">
               <p className="text-xs text-gray-500">Latest score</p>
-              <p className={`mt-1 text-2xl font-semibold ${scoreBandTextClass(historyRows[0]?.pct ?? null)}`}>
-                {!historyRows[0] ? "—" : historyRows[0].pct === null ? "No answers" : `${historyRows[0].pct}%`}
+              <p className={`mt-1 text-2xl font-semibold ${scoreBandTextClass(latestSubmitted?.pct ?? null)}`}>
+                {!latestSubmitted ? "—" : latestSubmitted.pct === null ? "No answers" : `${latestSubmitted.pct}%`}
               </p>
               <p className="mt-0.5 text-xs text-gray-500">Most recent submission</p>
             </Card>
@@ -328,12 +352,15 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                     {historyRows.map(({ a, correct, total, pct, elapsedTime, ps, areaLabel }) => (
-                      <tr key={a.id} className="hover:bg-gray-50">
+                      <tr key={a.id} className={`hover:bg-gray-50 ${invalidatedRowClass(a.status) ?? ""}`}>
                         <td className="whitespace-nowrap px-4 py-3 text-gray-500">
                           {a.submittedAt ? formatDate(a.submittedAt) : "—"}
                         </td>
                         <td className="px-4 py-3">
-                          <p className="font-medium text-gray-900">{ps?.name ?? "—"}</p>
+                          <p className="flex items-center gap-2 font-medium text-gray-900">
+                            {ps?.name ?? "—"}
+                            {isInvalidated(a.status) ? <AttemptStatusBadge status={a.status} /> : null}
+                          </p>
                           <p className="text-xs text-gray-500">
                             {areaLabel ?? "—"}
                             {ps?.topic.name ? ` · ${ps.topic.name}` : ""}
@@ -341,10 +368,10 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
                           </p>
                         </td>
                         <td className="px-4 py-3 text-right">
-                          <>
+                          <VoidableValue status={a.status}>
                             <span className="font-medium text-gray-900">{correct} correct of {total} questions</span>
-                            <span className={`ml-2 text-xs font-semibold ${scoreBandTextClass(pct)}`}>{pct}%</span>
-                          </>
+                            <span className={`ml-2 text-xs font-semibold ${isInvalidated(a.status) ? "" : scoreBandTextClass(pct)}`}>{pct}%</span>
+                          </VoidableValue>
                         </td>
                         <td className="px-4 py-3 text-right text-gray-500">{formatTime(elapsedTime)}</td>
                         <td className="px-4 py-3 text-right"><Badge variant="default">#{a.attemptNumber}</Badge></td>
@@ -356,21 +383,23 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
                   </tbody>
                 </table>
               </div>
+              <Pagination basePath="/student/history" params={pageParams} pageSize={HISTORY_PAGE_SIZE} {...historyPage} className="border-t border-gray-100" />
             </div>
 
             <div className="space-y-2 md:hidden">
               {historyRows.map(({ a, correct, total, pct, elapsedTime, ps, areaLabel }) => (
-                <Card key={a.id} padding="sm">
+                <Card key={a.id} padding="sm" className={invalidatedRowClass(a.status)}>
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium text-gray-900">{ps?.name ?? "—"}</p>
+                      {isInvalidated(a.status) ? <AttemptStatusBadge status={a.status} /> : null}
                       <p className="mt-0.5 truncate text-xs text-gray-500">
                         {areaLabel ?? "—"}
                         {ps?.topic.name ? ` · ${ps.topic.name}` : ""}
                         {ps?.difficulty ? ` · ${ps.difficulty}` : ""}
                       </p>
                     </div>
-                    <span className={`shrink-0 text-sm font-semibold ${scoreBandTextClass(pct)}`}>{pct === null ? "No answers" : `${pct}%`}</span>
+                    <VoidableValue status={a.status} className={`shrink-0 text-sm font-semibold ${isInvalidated(a.status) ? "" : scoreBandTextClass(pct)}`}>{pct === null ? "No answers" : `${pct}%`}</VoidableValue>
                   </div>
                   <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-gray-100 pt-2 text-xs text-gray-500">
                     <span>{a.submittedAt ? formatDate(a.submittedAt) : "—"}</span>
@@ -380,6 +409,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
                   </div>
                 </Card>
               ))}
+              <Pagination basePath="/student/history" params={pageParams} pageSize={HISTORY_PAGE_SIZE} {...historyPage} />
             </div>
           </section>
         </div>

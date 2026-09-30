@@ -8,6 +8,7 @@ import { isAnswerCorrect } from "@/lib/answer-grading";
 import { writeAudit } from "@/lib/audit";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { resolveQuestionType } from "@/lib/question-type";
+import { reviewMetaByQuestion } from "@/lib/answer-review-meta";
 
 interface RouteContext {
   params: Promise<{ attemptId: string }>;
@@ -18,7 +19,8 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { attemptId } = await params;
-  const { answers, timeSpentByQuestion, timeExpiredEvents, extraTimeUsed } = await req.json();
+  const body = await req.json();
+  const { answers, timeSpentByQuestion, timeExpiredEvents, extraTimeUsed } = body;
   const attempt = await prisma.fullPracticeTestAttempt.findFirst({
     where: { id: attemptId, studentId: session.user.id, status: "IN_PROGRESS" },
   });
@@ -36,6 +38,9 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     },
     orderBy: { order: "asc" },
   });
+
+  const allowedIds = new Set(modules.flatMap((testModule) => testModule.questions.map((item) => item.questionId)));
+  const { byQuestion: reviewMeta, markedIds } = reviewMetaByQuestion(body, allowedIds);
 
   let rwCorrect = 0;
   let rwTotal = 0;
@@ -66,6 +71,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
           answer: answer || null,
           isCorrect,
           timeSpent: timeSpentByQuestion?.[item.questionId] ?? undefined,
+          ...(reviewMeta.get(item.questionId) ?? {}),
         },
         create: {
           attemptId,
@@ -74,9 +80,17 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
           answer: answer || null,
           isCorrect,
           timeSpent: timeSpentByQuestion?.[item.questionId] ?? undefined,
+          ...(reviewMeta.get(item.questionId) ?? {}),
         },
       });
     }
+  }
+
+  if (markedIds) {
+    await prisma.fullPracticeTestAnswer.updateMany({
+      where: { attemptId, markedForReview: true, questionId: { notIn: [...markedIds] } },
+      data: { markedForReview: false },
+    });
   }
 
   const rwScore = await scaledScore("RW", rwCorrect, rwTotal);

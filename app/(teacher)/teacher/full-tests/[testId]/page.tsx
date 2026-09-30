@@ -1,4 +1,5 @@
-import { PageShell, PageHeader, PageContent } from "@/components/sat";
+import Link from "next/link";
+import { AttemptStatusBadge, PageShell, PageHeader, PageContent, Pagination, VoidableValue, invalidatedRowClass, pageFromParam, paginate } from "@/components/sat";
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
@@ -18,10 +19,14 @@ import { FullTestActions } from "../full-test-actions-client";
 
 interface PageProps {
   params: Promise<{ testId: string }>;
+  searchParams: Promise<{ attemptsPage?: string }>;
 }
 
-export default async function FullTestDetailPage({ params }: PageProps) {
+const ATTEMPTS_PAGE_SIZE = 10;
+
+export default async function FullTestDetailPage({ params, searchParams }: PageProps) {
   const { testId } = await params;
+  const { attemptsPage } = await searchParams;
   const test = await prisma.fullPracticeTest.findUnique({
     where: { id: testId },
     include: {
@@ -44,15 +49,17 @@ export default async function FullTestDetailPage({ params }: PageProps) {
       assignments: {
         include: {
           student: true,
-          attempts: { orderBy: { startedAt: "desc" }, take: 1, include: { answers: true } },
+          // Latest attempt that still counts: an invalidated one never drives progress or score.
+          attempts: { where: { status: { not: "INVALIDATED" } }, orderBy: { startedAt: "desc" }, take: 1, include: { answers: true } },
         },
         orderBy: { createdAt: "desc" },
       },
-      attempts: { include: { student: true }, orderBy: { startedAt: "desc" }, take: 10 },
+      attempts: { include: { student: true }, orderBy: { startedAt: "desc" } },
     },
   });
   if (!test) notFound();
 
+  const attemptPage = paginate(test.attempts, pageFromParam(attemptsPage), ATTEMPTS_PAGE_SIZE);
   const questionCount = test.modules.reduce((sum, module) => sum + module.questions.length, 0);
 
   return (
@@ -190,22 +197,37 @@ export default async function FullTestDetailPage({ params }: PageProps) {
             </CardBody>
           </Card>
 
-          <Card>
+          <Card id="recent-attempts">
             <CardHeader>
-              <h2 className="text-sm font-semibold text-gray-900">Recent Attempts</h2>
+              <h2 className="flex items-center justify-between text-sm font-semibold text-gray-900">
+                Recent Attempts <span className="text-xs font-normal text-gray-400">{test.attempts.length}</span>
+              </h2>
             </CardHeader>
             <CardBody className="space-y-2">
-              {test.attempts.map((attempt) => (
-                <div key={attempt.id} className="rounded-md border border-gray-100 px-3 py-2">
+              {attemptPage.items.map((attempt) => (
+                <Link
+                  key={attempt.id}
+                  href={`/teacher/students/${attempt.studentId}/full-tests/${attempt.id}`}
+                  className={`block rounded-md border border-gray-100 px-3 py-2 hover:border-gray-300 ${invalidatedRowClass(attempt.status) ?? ""}`}
+                >
                   <p className="text-sm font-medium text-gray-900">{attempt.student.name}</p>
-                  <p className="text-xs text-gray-500">
-                    {attempt.status}
-                    {attempt.totalScore ? ` · ${attempt.totalScore}` : ""}
+                  <p className="mt-0.5 flex items-center gap-2 text-xs text-gray-500">
+                    <AttemptStatusBadge status={attempt.status} />
+                    {attempt.totalScore != null ? <VoidableValue status={attempt.status}>{attempt.totalScore}</VoidableValue> : null}
                   </p>
-                </div>
+                </Link>
               ))}
               {test.attempts.length === 0 && <p className="text-sm text-gray-400">No attempts yet.</p>}
             </CardBody>
+            <Pagination
+              basePath={`/teacher/full-tests/${test.id}`}
+              params={{ attemptsPage }}
+              param="attemptsPage"
+              anchor="recent-attempts"
+              pageSize={ATTEMPTS_PAGE_SIZE}
+              {...attemptPage}
+              className="border-t border-gray-100"
+            />
           </Card>
         </aside>
       </div>

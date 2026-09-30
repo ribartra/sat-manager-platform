@@ -21,15 +21,22 @@ export async function markOverdueAssignments(now = new Date()) {
   );
 }
 
+/** Unlocks Practice Sets whose scheduled unlock time passed and tells each student. Returns the count. */
 export async function releaseScheduledUnlocks(now = new Date()) {
+  const due = await withSqliteRetry(() => prisma.assignment.findMany({
+    where: { locked: true, unlockAt: { lte: now } },
+    select: { id: true, studentId: true, practiceSet: { select: { name: true } } },
+  }));
+  if (due.length === 0) return 0;
   await withSqliteRetry(() => prisma.assignment.updateMany({
-      where: {
-        locked: true,
-        unlockAt: { lte: now },
-      },
+      where: { id: { in: due.map((assignment) => assignment.id) }, locked: true },
       data: { locked: false, unlockAt: null },
     }),
   );
+  for (const assignment of due) {
+    await notifyUser(assignment.studentId, "Practice Set unlocked", `${assignment.practiceSet.name} is available now.`, "/student");
+  }
+  return due.length;
 }
 
 export async function refreshAssignmentStates(now = new Date()) {

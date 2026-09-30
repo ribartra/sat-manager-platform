@@ -2,11 +2,14 @@ import nodemailer from "nodemailer";
 import { getSmtpConfig } from "@/lib/smtp-settings";
 import { captureCaughtError, writeAudit } from "@/lib/audit";
 
+export type EmailAttachment = { filename: string; content: Buffer; contentType?: string };
+
 type EmailPayload = {
   to: string;
   subject: string;
   text: string;
   html?: string;
+  attachments?: EmailAttachment[];
 };
 
 function escapeHtml(value: string) {
@@ -61,6 +64,7 @@ export async function sendTransactionalEmail(payload: EmailPayload) {
       subject: payload.subject,
       text: payload.text,
       html: payload.html,
+      attachments: payload.attachments,
     });
 
     return { sent: true as const };
@@ -180,6 +184,37 @@ export async function sendParentReportEmail(
       <p><a href="${safeUrl}">${safeUrl}</a></p>
       <p>The link activates the first time you open it and stays available for 7 days after that.</p>
     `,
+  });
+}
+
+/** Progress report sent as a PDF attachment (no link to open). */
+export async function sendParentReportPdfEmail(
+  to: string,
+  parentName: string | null,
+  studentName: string,
+  reportLabel: string,
+  attachment: EmailAttachment,
+) {
+  const displayName = parentName || "Parent/Guardian";
+  const safeParent = escapeHtml(displayName);
+  const safeStudent = escapeHtml(studentName);
+  const safeLabel = escapeHtml(reportLabel);
+
+  return sendTransactionalEmail({
+    to,
+    subject: `${studentName}'s SAT progress report (${reportLabel})`,
+    text: [
+      `Hello ${displayName},`,
+      "",
+      `Your child's teacher has shared a progress report for ${studentName} (${reportLabel}).`,
+      "The report is attached to this email as a PDF.",
+    ].join("\n"),
+    html: `
+      <p>Hello ${safeParent},</p>
+      <p>Your child's teacher has shared a progress report for <strong>${safeStudent}</strong> (${safeLabel}).</p>
+      <p>The report is attached to this email as a PDF.</p>
+    `,
+    attachments: [{ contentType: "application/pdf", ...attachment }],
   });
 }
 

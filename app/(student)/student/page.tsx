@@ -99,7 +99,7 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
             },
             include: {
               test: { select: { id: true, name: true, breakMinutes: true } },
-              attempts: { orderBy: { startedAt: "desc" }, take: 1 },
+              attempts: { where: { status: { not: "INVALIDATED" } }, orderBy: { startedAt: "desc" }, take: 1 },
             },
             orderBy: [{ dueDate: "asc" }, { createdAt: "desc" }],
             take: 10,

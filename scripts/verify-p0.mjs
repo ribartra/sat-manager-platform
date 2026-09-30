@@ -20,8 +20,23 @@ const checks = [
     label: "Reopen protegido por rol/scope y razón opcional",
   },
   {
-    file: "app/api/reports/students/[studentId]/pdf/route.ts",
-    requires: ["teacherProgramEnrollmentScope", "Not found"],
+    file: "lib/attempt-lifecycle.ts",
+    requires: ['data: { status: "INVALIDATED" }', '"PENDING"', "writeAudit", "FPT_ATTEMPT_REOPENED", "FPT_ATTEMPT_INVALIDATED", "ALREADY_INVALIDATED"],
+    label: "Intentos atomicos: invalidar conserva el intento; reabrir invalida y devuelve la asignacion a PENDING (Practice y FPT)",
+  },
+  {
+    file: "app/(student)/student/full-tests/results/[attemptId]/page.tsx",
+    requires: ['attempt.status === "IN_PROGRESS"', "InvalidatedNotice", "VoidableValue", "markedForReview"],
+    label: "Resultados FPT: no muestran intentos abiertos; invalidados tachados; herramientas de revision",
+  },
+  {
+    file: "lib/student-report.ts",
+    requires: ["attemptHistory", "examHistory", 'status: "SUBMITTED"', "attemptId"],
+    label: "Reportes: puntajes solo con SUBMITTED; historial incluye invalidados; reporte por examen",
+  },
+  {
+    file: "lib/pdf/build-student-report.ts",
+    requires: ["teacherProgramEnrollmentScope", "return null"],
     label: "PDF con scoping por programa",
   },
   {
@@ -76,7 +91,7 @@ const checks = [
   },
   {
     file: "app/api/reports/students/[studentId]/pdf/route.ts",
-    requires: ["requireTeacherOrAdmin", "teacherProgramEnrollmentScope", "renderStudentReportPdf", "TIME_FILTER_END_DATE", "mocks"],
+    requires: ["requireTeacherOrAdmin", "buildStudentReportPdf", "TIME_FILTER_END_DATE", "Not found", "fptAttemptId"],
     label: "PDF generado en backend por area (Math/Reading/Writing/FPT) con scope y filtros de tiempo",
   },
   {

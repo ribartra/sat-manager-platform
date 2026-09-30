@@ -2,11 +2,13 @@ import { NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { teacherProgramEnrollmentScope } from "@/lib/program-scope";
+import { applyAttemptLifecycle } from "@/lib/attempt-lifecycle";
 
 interface RouteContext {
   params: Promise<{ attemptId: string }>;
 }
 
+/** Reopen: invalidates the attempt (kept as is, no longer counted) and sets the assignment back to PENDING so the student starts a new attempt. */
 export async function POST(req: Request, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
   if (!session) {
@@ -29,24 +31,12 @@ export async function POST(req: Request, { params }: RouteContext) {
   });
   if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const attempt = await prisma.attempt.update({
-    where: { id: attemptId },
-    data: { status: "IN_PROGRESS", submittedAt: null },
-  });
-
-  if (attempt.assignmentId) {
-    await prisma.assignment.update({ where: { id: attempt.assignmentId }, data: { status: "IN_PROGRESS" } });
+  const result = await applyAttemptLifecycle({ kind: "practice", action: "reopen", attemptId, actorId: session.user.id, reason });
+  if (!result.ok) {
+    return NextResponse.json(
+      { error: result.error === "ALREADY_INVALIDATED" ? "This attempt is already invalidated." : "Not found" },
+      { status: result.error === "ALREADY_INVALIDATED" ? 409 : 404 },
+    );
   }
-
-  await prisma.auditLog.create({
-    data: {
-      userId: session.user.id,
-      action: "REOPEN_ATTEMPT",
-      targetType: "Attempt",
-      targetId: attemptId,
-      metadata: reason ? JSON.stringify({ reason }) : null,
-    },
-  });
-
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, assignmentStatus: result.assignmentStatus ?? null });
 }

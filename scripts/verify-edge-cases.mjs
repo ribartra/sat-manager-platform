@@ -44,8 +44,10 @@ const checks = [
   {
     file: "app/(student)/student/practice/player-client.tsx",
     requires: [
-      "localStorage.setItem(offlineKey",
-      "window.addEventListener(\"online\", syncOffline)",
+      "writeBuffer(offlineKey",
+      "readBuffer<AutosavePayload>(offlineKey)",
+      "window.addEventListener(\"online\", onOnline)",
+      "usePageHideFlush",
       "SaveIndicator",
       "timeSpentByQuestion",
       "markedQuestionIds",
@@ -114,7 +116,10 @@ const checks = [
       "Pause & Exit",
       "MathToolPanel",
       "context=\"full-test\"",
-      "localStorage.setItem(offlineKey",
+      "writeBuffer(offlineKey",
+      "readBuffer<FullTestAutosavePayload>(offlineKey)",
+      "usePageHideFlush",
+      "fetchWithTransientRetry",
       "SaveIndicator",
     ],
     label: "Full Practice Test: timers por modulo, auto-advance, break, timer rojo <=1min y offline parity",
@@ -266,8 +271,8 @@ const checks = [
     label: "Restore local exige backup y genera copia previa",
   },
   {
-    file: "scripts/generate-notifications.ts",
-    requires: ["Practice Set due soon", "Practice Set overdue", "Practice Set unlocked", "notifyOnce", "notifications.generated"],
+    file: "lib/deadline-notifications.ts",
+    requires: ["due soon", "overdue", "notifyOnce", "releaseScheduledUnlocks", "DEDUPE_WINDOW_DAYS"],
     label: "Job de notificaciones genera recordatorios idempotentes",
   },
 ];

@@ -65,13 +65,43 @@ const checks = [
     label: "Attempt reopen scoped by teacher program",
   },
   {
+    file: "app/api/full-practice-tests/attempts/[attemptId]/invalidate/route.ts",
+    requires: ["requireTeacherOrAdmin", "teacherProgramEnrollmentScope", "student: { programEnrollments: programScope }", 'kind: "fpt"'],
+    label: "Full test attempt invalidation scoped by teacher program",
+  },
+  {
+    file: "app/api/full-practice-tests/attempts/[attemptId]/reopen/route.ts",
+    requires: ["requireTeacherOrAdmin", "teacherProgramEnrollmentScope", "student: { programEnrollments: programScope }", 'kind: "fpt"'],
+    label: "Full test attempt reopen scoped by teacher program",
+  },
+  {
+    file: "app/(teacher)/teacher/students/[studentId]/full-tests/[attemptId]/page.tsx",
+    requires: ["teacherProgramEnrollmentScope", "student: { programEnrollments: programScope }", "notFound()"],
+    label: "Teacher full test attempt detail scoped by teacher program",
+  },
+  {
+    file: "app/api/reports/students/[studentId]/email/route.ts",
+    requires: ["requireTeacherOrAdmin", "studentAccessWhereFor", "parentStudent.findMany", "REPORT_PDF_EMAILED"],
+    label: "Report PDF email: scoped student, only linked parents, audited",
+  },
+  {
+    file: "app/api/internal/notifications/generate/route.ts",
+    requires: ["timingSafeEqual", "internalIngestToken", "Unauthorized"],
+    label: "Internal reminders route requires the internal service token",
+  },
+  {
+    file: "deploy/Caddyfile",
+    requires: ["@internal path /api/internal/*", "respond @internal 404"],
+    label: "Internal API paths are not exposed publicly",
+  },
+  {
     file: "app/api/attempts/[attemptId]/comment/route.ts",
     requires: ["requireTeacherOrAdmin", "teacherProgramEnrollmentScope", "student: { programEnrollments: programScope }"],
     label: "Attempt comments scoped by teacher program",
   },
   {
-    file: "app/api/reports/students/[studentId]/pdf/route.ts",
-    requires: ["requireTeacherOrAdmin", "teacherProgramEnrollmentScope", "role: \"STUDENT\""],
+    file: "lib/pdf/build-student-report.ts",
+    requires: ["teacherProgramEnrollmentScope", "role: \"STUDENT\"", "status: \"SUBMITTED\""],
     label: "Student PDF report scoped by teacher program",
   },
   {
