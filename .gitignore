@@ -79,3 +79,9 @@ public/uploads/
 
 # Throwaway ingest/diagnostic scripts and plans
 scratchpad/
+
+# Business / management documents: kept locally, not in the repository
+/SAT platform/
+/Analisis de proyecto SAT*
+/SAT_Math_Skills_Tracker_clean.pdf
+.~lock.*#
