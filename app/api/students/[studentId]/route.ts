@@ -2,15 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { studentAccessWhereFor } from "@/lib/program-scope";
+import { ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
   params: Promise<{ studentId: string }>;
 }
 
-export async function PUT(req: NextRequest, { params }: RouteContext) {
+export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
   if (!session) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return new ForbiddenError("Forbidden").toResponse();
   }
 
   const { studentId } = await params;
@@ -21,7 +22,7 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
     select: { id: true },
   });
   if (!student) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return new NotFoundError("Not found").toResponse();
   }
 
   const updated = await prisma.user.update({
@@ -46,4 +47,4 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
   });
 
   return NextResponse.json(updated);
-}
+});

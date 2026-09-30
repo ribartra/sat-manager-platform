@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { ingestAuthHeaders, ingestUrl } from "@/lib/internal-ingest";
+import { ApiError, BadRequestError, ForbiddenError, PayloadTooLargeError, withApiErrors } from "@/lib/api-error";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -15,13 +16,13 @@ function hasAllowedExtension(fileName: string) {
   return ALLOWED_EXTENSIONS.some((extension) => fileName.toLowerCase().endsWith(extension));
 }
 
-export async function POST(req: NextRequest) {
+export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const contentLength = req.headers.get("content-length");
   if (contentLength && Number(contentLength) > MAX_UPLOAD_BYTES + 1024 * 1024) {
-    return NextResponse.json({ error: "Upload exceeds the 256 MB limit." }, { status: 413 });
+    return new PayloadTooLargeError("Upload exceeds the 256 MB limit.").toResponse();
   }
 
   const formData = await req.formData();
@@ -31,29 +32,29 @@ export async function POST(req: NextRequest) {
   const name = String(formData.get("name") || "Questionnaire PDF/DOCX ingest");
 
   if (!ALLOWED_CONTENT_TYPES.has(contentType)) {
-    return NextResponse.json({ error: "Choose Practice Set or Full Practice Test import." }, { status: 400 });
+    return new BadRequestError("Choose Practice Set or Full Practice Test import.").toResponse();
   }
   if (files.length === 0) {
-    return NextResponse.json({ error: "Select at least one PDF or DOCX file." }, { status: 400 });
+    return new BadRequestError("Select at least one PDF or DOCX file.").toResponse();
   }
   if (roles.length > 0 && roles.length !== files.length) {
-    return NextResponse.json({ error: "Each uploaded file needs a role (Questions or Answers/Explanations)." }, { status: 400 });
+    return new BadRequestError("Each uploaded file needs a role (Questions or Answers/Explanations).").toResponse();
   }
   if (roles.some((role) => !ALLOWED_ROLES.has(role))) {
-    return NextResponse.json({ error: "Invalid file role." }, { status: 400 });
+    return new BadRequestError("Invalid file role.").toResponse();
   }
   // The Questions file is the required tray; answers/explanations alone cannot make a batch.
   if (roles.length > 0 && !roles.includes("QUESTION")) {
-    return NextResponse.json({ error: "Add the Questions file (PDF or DOCX) to create the batch." }, { status: 400 });
+    return new BadRequestError("Add the Questions file (PDF or DOCX) to create the batch.").toResponse();
   }
 
   const totalSize = files.reduce((sum, file) => sum + file.size, 0);
   if (totalSize > MAX_UPLOAD_BYTES) {
-    return NextResponse.json({ error: "Upload exceeds the 256 MB limit." }, { status: 413 });
+    return new PayloadTooLargeError("Upload exceeds the 256 MB limit.").toResponse();
   }
   const unsupported = files.find((file) => !hasAllowedExtension(file.name));
   if (unsupported) {
-    return NextResponse.json({ error: `Unsupported file type: ${unsupported.name}. Use PDF or DOCX.` }, { status: 400 });
+    return new BadRequestError(`Unsupported file type: ${unsupported.name}. Use PDF or DOCX.`).toResponse();
   }
 
   const upstream = new FormData();
@@ -73,7 +74,7 @@ export async function POST(req: NextRequest) {
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
-    return NextResponse.json({ error: data.detail || "Ingest service failed while uploading sources." }, { status: res.status });
+    return ApiError.fromStatus(res.status, data.detail || "Ingest service failed while uploading sources.").toResponse();
   }
 
   await prisma.auditLog.create({
@@ -94,4 +95,4 @@ export async function POST(req: NextRequest) {
   });
 
   return NextResponse.json(data);
-}
+});

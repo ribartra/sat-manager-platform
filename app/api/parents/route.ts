@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { studentAccessWhereFor } from "@/lib/program-scope";
+import { BadRequestError, ConflictError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
 async function allowedStudentIdsFor(sessionUser: { id: string; role: string }, studentIds: string[]) {
   if (studentIds.length === 0) return new Set<string>();
@@ -25,25 +26,25 @@ async function parentVisibleFor(sessionUser: { id: string; role: string }, paren
   return Boolean(parent);
 }
 
-export async function POST(req: NextRequest) {
+export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
   const { name, email, phone, studentIds } = await req.json();
   if (!name || !email) {
-    return NextResponse.json({ error: "Name and email are required." }, { status: 400 });
+    return new BadRequestError("Name and email are required.").toResponse();
   }
   const requestedStudentIds = Array.isArray(studentIds) ? studentIds.filter((id) => typeof id === "string") : [];
   const allowedStudentIds = await allowedStudentIdsFor(session.user, requestedStudentIds);
   if (requestedStudentIds.some((studentId) => !allowedStudentIds.has(studentId))) {
-    return NextResponse.json({ error: "One or more students are outside your program scope." }, { status: 403 });
+    return new ForbiddenError("One or more students are outside your program scope.").toResponse();
   }
   const normalizedEmail = String(email).trim().toLowerCase();
   const existingParent = await prisma.user.findUnique({ where: { email: normalizedEmail } });
   if (existingParent && existingParent.role !== "PARENT") {
-    return NextResponse.json({ error: "A non-parent user already uses that email." }, { status: 409 });
+    return new ConflictError("A non-parent user already uses that email.").toResponse();
   }
   if (existingParent?.role === "PARENT" && !(await parentVisibleFor(session.user, existingParent.id)) && requestedStudentIds.length === 0) {
-    return NextResponse.json({ error: "Parent is outside your program scope." }, { status: 403 });
+    return new ForbiddenError("Parent is outside your program scope.").toResponse();
   }
 
   const parent = await prisma.user.upsert({
@@ -85,36 +86,36 @@ export async function POST(req: NextRequest) {
     },
   });
   return NextResponse.json(parent);
-}
+});
 
-export async function PATCH(req: NextRequest) {
+export const PATCH = withApiErrors(async function PATCH(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { action, parentId, studentId, studentIds, name, email, phone } = await req.json();
   const parent = await prisma.user.findFirst({ where: { id: parentId, role: "PARENT" } });
-  if (!parent) return NextResponse.json({ error: "Parent not found." }, { status: 404 });
+  if (!parent) return new NotFoundError("Parent not found.").toResponse();
   if (!(await parentVisibleFor(session.user, parent.id))) {
-    return NextResponse.json({ error: "Parent is outside your program scope." }, { status: 403 });
+    return new ForbiddenError("Parent is outside your program scope.").toResponse();
   }
 
   if (action === "update") {
-    if (!name || !email) return NextResponse.json({ error: "Name and email are required." }, { status: 400 });
+    if (!name || !email) return new BadRequestError("Name and email are required.").toResponse();
     const requestedStudentIds = Array.isArray(studentIds) ? studentIds.filter((id) => typeof id === "string") : null;
     if (requestedStudentIds) {
       const allowedStudentIds = await allowedStudentIdsFor(session.user, requestedStudentIds);
       if (requestedStudentIds.some((id) => !allowedStudentIds.has(id))) {
-        return NextResponse.json({ error: "One or more students are outside your program scope." }, { status: 403 });
+        return new ForbiddenError("One or more students are outside your program scope.").toResponse();
       }
     }
 
     const normalizedEmail = String(email).trim().toLowerCase();
     const emailOwner = await prisma.user.findUnique({ where: { email: normalizedEmail }, select: { id: true, role: true } });
     if (emailOwner && emailOwner.id !== parent.id) {
-      return NextResponse.json({ error: "Another user already uses that email." }, { status: 409 });
+      return new ConflictError("Another user already uses that email.").toResponse();
     }
     if (emailOwner && emailOwner.role !== "PARENT") {
-      return NextResponse.json({ error: "A non-parent user already uses that email." }, { status: 409 });
+      return new ConflictError("A non-parent user already uses that email.").toResponse();
     }
     const updated = await prisma.user.update({
       where: { id: parent.id },
@@ -157,11 +158,11 @@ export async function PATCH(req: NextRequest) {
   }
 
   if (!studentId || typeof studentId !== "string") {
-    return NextResponse.json({ error: "Student is required." }, { status: 400 });
+    return new BadRequestError("Student is required.").toResponse();
   }
   const allowedStudentIds = await allowedStudentIdsFor(session.user, [studentId]);
   if (!allowedStudentIds.has(studentId)) {
-    return NextResponse.json({ error: "Student is outside your program scope." }, { status: 403 });
+    return new ForbiddenError("Student is outside your program scope.").toResponse();
   }
 
   if (action === "link") {
@@ -196,5 +197,5 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ ok: true });
   }
 
-  return NextResponse.json({ error: "Unsupported action." }, { status: 400 });
-}
+  return new BadRequestError("Unsupported action.").toResponse();
+});

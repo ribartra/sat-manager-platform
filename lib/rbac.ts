@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { ForbiddenError, UnauthorizedError } from "@/lib/api-error";
 
 export async function requireTeacherOrAdmin() {
   const session = await auth();
@@ -39,5 +40,25 @@ export async function requireApprovedSession() {
   });
 
   if (!user?.active || user.validationStatus !== "APPROVED") return null;
+  return session;
+}
+
+// Throwing variants for handlers wrapped in withApiErrors (lib/api-error.ts): no session → 401,
+// wrong role / inactive / unapproved → 403, in the shared error format.
+export async function assertApprovedSession() {
+  const session = await requireApprovedSession();
+  if (!session) throw new UnauthorizedError();
+  return session;
+}
+
+export async function assertTeacherOrAdmin() {
+  const session = await requireTeacherOrAdmin();
+  if (!session) throw new ForbiddenError();
+  return session;
+}
+
+export async function assertAdmin() {
+  const session = await requireAdmin();
+  if (!session) throw new ForbiddenError();
   return session;
 }

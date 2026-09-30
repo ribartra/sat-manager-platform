@@ -2,17 +2,18 @@ import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/rbac";
 import { exportUserData } from "@/lib/privacy";
 import { writeAudit } from "@/lib/audit";
+import { ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
 export const runtime = "nodejs";
 
 // Data export on request (RNF-12): every record the platform keeps about the account, as JSON.
-export async function GET(_req: Request, { params }: { params: Promise<{ userId: string }> }) {
+export const GET = withApiErrors(async function GET(_req: Request, { params }: { params: Promise<{ userId: string }> }) {
   const session = await requireAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { userId } = await params;
   const data = await exportUserData(userId);
-  if (!data) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!data) return new NotFoundError("Not found").toResponse();
 
   await writeAudit({
     userId: session.user.id,
@@ -30,4 +31,4 @@ export async function GET(_req: Request, { params }: { params: Promise<{ userId:
       "Cache-Control": "no-store",
     },
   });
-}
+});

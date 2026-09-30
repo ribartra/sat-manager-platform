@@ -6,10 +6,11 @@ import { notify } from "@/lib/notify";
 import { captureCaughtError, writeAudit } from "@/lib/audit";
 import { passwordPolicyError } from "@/lib/password-policy";
 import { revokeUserSessions } from "@/lib/session-state";
+import { BadRequestError, InternalServerError, UnauthorizedError, withApiErrors } from "@/lib/api-error";
 
-export async function POST(req: NextRequest) {
+export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await auth();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session) return new UnauthorizedError("Unauthorized").toResponse();
 
   try {
     const { currentPassword, newPassword } = await req.json();
@@ -23,7 +24,7 @@ export async function POST(req: NextRequest) {
         outcome: "failure",
         metadata: { reason: "validation" },
       });
-      return NextResponse.json({ error: policyError ?? "Current password is required." }, { status: 400 });
+      return new BadRequestError(policyError ?? "Current password is required.").toResponse();
     }
 
     const user = await prisma.user.findUnique({ where: { id: session.user.id } });
@@ -36,7 +37,7 @@ export async function POST(req: NextRequest) {
         outcome: "failure",
         metadata: { reason: "no_password" },
       });
-      return NextResponse.json({ error: "User cannot change password." }, { status: 400 });
+      return new BadRequestError("User cannot change password.").toResponse();
     }
 
     const valid = await bcrypt.compare(currentPassword, user.passwordHash);
@@ -49,7 +50,7 @@ export async function POST(req: NextRequest) {
         outcome: "failure",
         metadata: { reason: "bad_current_password" },
       });
-      return NextResponse.json({ error: "Current password is incorrect." }, { status: 400 });
+      return new BadRequestError("Current password is incorrect.").toResponse();
     }
 
     const passwordHash = await bcrypt.hash(newPassword, 10);
@@ -73,6 +74,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, email: user.email, reauthenticate: true });
   } catch (error) {
     await captureCaughtError("auth.change-password", error, { userId: session.user.id });
-    return NextResponse.json({ error: "Password change failed." }, { status: 500 });
+    return new InternalServerError("Password change failed.").toResponse();
   }
-}
+});

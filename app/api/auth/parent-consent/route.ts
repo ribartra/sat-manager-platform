@@ -6,6 +6,7 @@ import { hashPublicToken } from "@/lib/token-security";
 import { passwordPolicyError } from "@/lib/password-policy";
 import { forgetSessionState } from "@/lib/session-state";
 import { captureCaughtError, writeAudit } from "@/lib/audit";
+import { BadRequestError, InternalServerError, withApiErrors } from "@/lib/api-error";
 
 async function findInviteByParentConsentToken(token: string) {
   const parentConsentTokenHash = hashPublicToken(token);
@@ -33,9 +34,9 @@ function consentLinkFailureReason(invite: {
   return null;
 }
 
-export async function GET(req: NextRequest) {
+export const GET = withApiErrors(async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get("token");
-  if (!token) return NextResponse.json({ error: "Missing token" }, { status: 400 });
+  if (!token) return new BadRequestError("Missing token").toResponse();
   const limited = checkRateLimit(rateLimitKey(req, "parent-consent-info", token.slice(0, 12)), 20, 15 * 60 * 1000);
   if (!limited.allowed) return rateLimitResponse(limited.resetAt);
 
@@ -52,7 +53,7 @@ export async function GET(req: NextRequest) {
         usedAt: invite?.usedAt?.toISOString() ?? null,
       },
     });
-    return NextResponse.json({ error: "Invalid or expired authorization link" }, { status: 400 });
+    return new BadRequestError("Invalid or expired authorization link").toResponse();
   }
 
   await writeAudit({
@@ -75,11 +76,11 @@ export async function GET(req: NextRequest) {
     parentEmail: invite.parentEmail,
     approved: Boolean(invite.parentConsentAt),
   });
-}
+});
 
-export async function POST(req: NextRequest) {
+export const POST = withApiErrors(async function POST(req: NextRequest) {
   const { token, password } = await req.json();
-  if (!token) return NextResponse.json({ error: "Missing token" }, { status: 400 });
+  if (!token) return new BadRequestError("Missing token").toResponse();
   const limited = checkRateLimit(rateLimitKey(req, "parent-consent", token.slice(0, 12)), 10, 15 * 60 * 1000);
   if (!limited.allowed) return rateLimitResponse(limited.resetAt);
 
@@ -97,11 +98,11 @@ export async function POST(req: NextRequest) {
           phase: "submit",
         },
       });
-      return NextResponse.json({ error: "Invalid or expired authorization link" }, { status: 400 });
+      return new BadRequestError("Invalid or expired authorization link").toResponse();
     }
 
     const policyError = passwordPolicyError(password, invite.parentEmail);
-    if (policyError) return NextResponse.json({ error: policyError }, { status: 400 });
+    if (policyError) return new BadRequestError(policyError).toResponse();
 
     const passwordHash = await bcrypt.hash(password, 10);
     const consentAt = new Date();
@@ -173,6 +174,6 @@ export async function POST(req: NextRequest) {
     await captureCaughtError("auth.parent-consent", error, {
       metadata: { tokenPrefix: String(token).slice(0, 8) },
     });
-    return NextResponse.json({ error: "Authorization failed." }, { status: 500 });
+    return new InternalServerError("Authorization failed.").toResponse();
   }
-}
+});

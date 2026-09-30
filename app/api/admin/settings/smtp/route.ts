@@ -3,16 +3,17 @@ import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/rbac";
 import { getSmtpSummary, saveSmtpConfig } from "@/lib/smtp-settings";
 import { sendTransactionalEmail } from "@/lib/email";
+import { BadRequestError, ForbiddenError, withApiErrors } from "@/lib/api-error";
 
-export async function GET() {
+export const GET = withApiErrors(async function GET() {
   const session = await requireAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
   return NextResponse.json(await getSmtpSummary());
-}
+});
 
-export async function PATCH(req: NextRequest) {
+export const PATCH = withApiErrors(async function PATCH(req: NextRequest) {
   const session = await requireAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const body = (await req.json().catch(() => ({}))) as {
     host?: string;
@@ -42,16 +43,16 @@ export async function PATCH(req: NextRequest) {
   });
 
   return NextResponse.json(summary);
-}
+});
 
 // Send a test email to verify the current SMTP configuration.
-export async function POST(req: NextRequest) {
+export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await requireAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const body = (await req.json().catch(() => ({}))) as { to?: string };
   const to = typeof body.to === "string" && body.to.trim() ? body.to.trim() : session.user.email;
-  if (!to) return NextResponse.json({ error: "No recipient available." }, { status: 400 });
+  if (!to) return new BadRequestError("No recipient available.").toResponse();
 
   const result = await sendTransactionalEmail({
     to,
@@ -67,4 +68,4 @@ export async function POST(req: NextRequest) {
     );
   }
   return NextResponse.json({ ok: true, to });
-}
+});

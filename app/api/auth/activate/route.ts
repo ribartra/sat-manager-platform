@@ -5,10 +5,11 @@ import { checkRateLimit, rateLimitKey, rateLimitResponse } from "@/lib/rate-limi
 import { hashPublicToken } from "@/lib/token-security";
 import { captureCaughtError, writeAudit } from "@/lib/audit";
 import { passwordPolicyError } from "@/lib/password-policy";
+import { BadRequestError, ConflictError, ForbiddenError, InternalServerError, withApiErrors } from "@/lib/api-error";
 
-export async function POST(req: NextRequest) {
+export const POST = withApiErrors(async function POST(req: NextRequest) {
   const { token, password } = await req.json();
-  if (!token || !password) return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+  if (!token || !password) return new BadRequestError("Invalid request").toResponse();
   const limited = checkRateLimit(rateLimitKey(req, "activate", token.slice(0, 12)), 10, 15 * 60 * 1000);
   if (!limited.allowed) return rateLimitResponse(limited.resetAt);
 
@@ -28,14 +29,14 @@ export async function POST(req: NextRequest) {
           reason: !invite ? "not_found" : invite.usedAt ? "already_used" : "expired",
         },
       });
-      return NextResponse.json({ error: "This invitation link is invalid or has expired." }, { status: 400 });
+      return new BadRequestError("This invitation link is invalid or has expired.").toResponse();
     }
     if (!invite.tokenHash) {
       await prisma.inviteToken.update({ where: { id: invite.id }, data: { tokenHash, token: `hashed:${tokenHash}` } });
     }
 
     const policyError = passwordPolicyError(password, invite.email);
-    if (policyError) return NextResponse.json({ error: policyError }, { status: 400 });
+    if (policyError) return new BadRequestError(policyError).toResponse();
 
     const hash = await bcrypt.hash(password, 10);
 
@@ -50,7 +51,7 @@ export async function POST(req: NextRequest) {
           outcome: "failure",
           metadata: { reason: "email_exists", email: invite.email },
         });
-        return NextResponse.json({ error: "An account with this email already exists." }, { status: 409 });
+        return new ConflictError("An account with this email already exists.").toResponse();
       }
 
       let parentId = "";
@@ -106,10 +107,7 @@ export async function POST(req: NextRequest) {
         outcome: "failure",
         metadata: { reason: "parent_consent_required", email: invite.email },
       });
-      return NextResponse.json(
-        { error: "Parent/guardian authorization is required before this account can be activated." },
-        { status: 403 }
-      );
+      return new ForbiddenError("Parent/guardian authorization is required before this account can be activated.").toResponse();
     }
 
     const now = new Date();
@@ -126,7 +124,7 @@ export async function POST(req: NextRequest) {
         outcome: "failure",
         metadata: { reason: "program_unavailable", email: invite.email },
       });
-      return NextResponse.json({ error: "This invitation is not linked to an active program." }, { status: 400 });
+      return new BadRequestError("This invitation is not linked to an active program.").toResponse();
     }
 
     const programId = invite.programId;
@@ -201,6 +199,6 @@ export async function POST(req: NextRequest) {
     await captureCaughtError("auth.activate", error, {
       metadata: { tokenPrefix: String(token).slice(0, 8) },
     });
-    return NextResponse.json({ error: "Activation failed." }, { status: 500 });
+    return new InternalServerError("Activation failed.").toResponse();
   }
-}
+});

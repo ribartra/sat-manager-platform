@@ -2,15 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { teacherProgramEnrollmentScope } from "@/lib/program-scope";
+import { ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
   params: Promise<{ attemptId: string }>;
 }
 
-export async function POST(req: NextRequest, { params }: RouteContext) {
+export const POST = withApiErrors(async function POST(req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
   if (!session) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return new ForbiddenError("Forbidden").toResponse();
   }
 
   const { attemptId } = await params;
@@ -25,7 +26,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     },
     select: { id: true },
   });
-  if (!attempt) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!attempt) return new NotFoundError("Not found").toResponse();
 
   const { comment } = await req.json();
   const teacherComment = typeof comment === "string" ? comment.trim() : "";
@@ -46,4 +47,4 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
   });
 
   return NextResponse.json({ ok: true });
-}
+});

@@ -3,10 +3,11 @@ import prisma from "@/lib/prisma";
 import { requireApprovedSession } from "@/lib/rbac";
 import { markUserActive } from "@/lib/activity";
 import { withSqliteRetry } from "@/lib/sqlite-retry";
+import { NotFoundError, UnauthorizedError, withApiErrors } from "@/lib/api-error";
 
-export async function POST(req: NextRequest, { params }: { params: Promise<{ attemptId: string }> }) {
+export const POST = withApiErrors(async function POST(req: NextRequest, { params }: { params: Promise<{ attemptId: string }> }) {
   const session = await requireApprovedSession();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session) return new UnauthorizedError("Unauthorized").toResponse();
 
   const { attemptId } = await params;
   const { answers, currentQuestion, totalTime, timeSpentByQuestion, markedQuestionIds, notes, eliminatedOptions } = await req.json();
@@ -14,7 +15,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ att
   const attempt = await withSqliteRetry(() => prisma.attempt.findFirst({
     where: { id: attemptId, studentId: session.user.id, status: "IN_PROGRESS" },
   }));
-  if (!attempt) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!attempt) return new NotFoundError("Not found").toResponse();
 
   const allowedQuestions = await withSqliteRetry(() => prisma.practiceSetQuestion.findMany({
     where: { practiceSetId: attempt.practiceSetId },
@@ -127,4 +128,4 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ att
   }
 
   return NextResponse.json({ ok: true });
-}
+});

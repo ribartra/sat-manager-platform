@@ -3,27 +3,28 @@ import prisma from "@/lib/prisma";
 import { requireApprovedSession } from "@/lib/rbac";
 import { withSqliteRetry } from "@/lib/sqlite-retry";
 import { gradeCheck } from "@/lib/immediate-check";
+import { BadRequestError, ForbiddenError, NotFoundError, UnauthorizedError, withApiErrors } from "@/lib/api-error";
 
 // Immediate feedback "Check" (RNF-11): grades one answer on the server and locks it. The answer
 // key and explanation are only returned here, for the question just checked.
 //   POST /api/attempts/[attemptId]/check  { questionId, answer }
-export async function POST(req: NextRequest, { params }: { params: Promise<{ attemptId: string }> }) {
+export const POST = withApiErrors(async function POST(req: NextRequest, { params }: { params: Promise<{ attemptId: string }> }) {
   const session = await requireApprovedSession();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session) return new UnauthorizedError("Unauthorized").toResponse();
 
   const { attemptId } = await params;
   const body = (await req.json().catch(() => ({}))) as { questionId?: unknown; answer?: unknown };
   const questionId = typeof body.questionId === "string" ? body.questionId : "";
   const answer = typeof body.answer === "string" ? body.answer.trim() : "";
-  if (!questionId || !answer) return NextResponse.json({ error: "Answer the question first." }, { status: 400 });
+  if (!questionId || !answer) return new BadRequestError("Answer the question first.").toResponse();
 
   const attempt = await withSqliteRetry(() => prisma.attempt.findFirst({
     where: { id: attemptId, studentId: session.user.id, status: "IN_PROGRESS" },
     select: { id: true, practiceSetId: true, assignment: { select: { feedbackMode: true } } },
   }));
-  if (!attempt) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!attempt) return new NotFoundError("Not found").toResponse();
   if (attempt.assignment?.feedbackMode !== "IMMEDIATE") {
-    return NextResponse.json({ error: "Immediate feedback is not enabled for this assignment." }, { status: 403 });
+    return new ForbiddenError("Immediate feedback is not enabled for this assignment.").toResponse();
   }
 
   const item = await withSqliteRetry(() => prisma.practiceSetQuestion.findFirst({
@@ -34,7 +35,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ att
       },
     },
   }));
-  if (!item) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!item) return new NotFoundError("Not found").toResponse();
 
   const existing = await withSqliteRetry(() => prisma.attemptAnswer.findUnique({
     where: { attemptId_questionId: { attemptId, questionId } },
@@ -53,4 +54,4 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ att
   }
 
   return NextResponse.json({ answer: finalAnswer, ...result });
-}
+});

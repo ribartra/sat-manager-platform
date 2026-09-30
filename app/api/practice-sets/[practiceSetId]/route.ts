@@ -3,6 +3,7 @@ import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { practiceSetEditorIssues } from "@/contracts/practice-set";
 import { validatePracticeSetPayload } from "@/lib/content-validation";
+import { BadRequestError, ConflictError, ForbiddenError, NotFoundError, ValidationError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
   params: Promise<{ practiceSetId: string }>;
@@ -10,23 +11,23 @@ interface RouteContext {
 
 const allowedStatuses = new Set(["DRAFT", "PUBLISHED", "BLOCKED", "ARCHIVED"]);
 
-export async function PATCH(req: NextRequest, { params }: RouteContext) {
+export const PATCH = withApiErrors(async function PATCH(req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
   if (!session) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return new ForbiddenError("Forbidden").toResponse();
   }
 
   const { practiceSetId } = await params;
   const body = (await req.json().catch(() => ({}))) as { status?: string };
   if (!body.status || !allowedStatuses.has(body.status)) {
-    return NextResponse.json({ error: "Invalid Practice Set status." }, { status: 400 });
+    return new BadRequestError("Invalid Practice Set status.").toResponse();
   }
 
   const practiceSet = await prisma.practiceSet.findUnique({
     where: { id: practiceSetId },
     include: { questions: { include: { question: { select: { id: true, status: true, topicId: true } } } } },
   });
-  if (!practiceSet) return NextResponse.json({ error: "Practice Set not found." }, { status: 404 });
+  if (!practiceSet) return new NotFoundError("Practice Set not found.").toResponse();
 
   const questionIds = practiceSet.questions.map((item) => item.questionId);
   const validationErrors = validatePracticeSetPayload({
@@ -42,7 +43,7 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
     if (practiceSet.questions.some((item) => item.question.topicId !== practiceSet.topicId)) validationErrors.push("All questions in a Practice Set must belong to the selected topic.");
   }
   if (validationErrors.length > 0) {
-    return NextResponse.json({ error: "Validation failed.", errors: validationErrors }, { status: 400 });
+    return new ValidationError("Validation failed.", validationErrors).toResponse();
   }
 
   const updated = await prisma.practiceSet.update({
@@ -60,12 +61,12 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
   });
 
   return NextResponse.json(updated);
-}
+});
 
-export async function PUT(req: NextRequest, { params }: RouteContext) {
+export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
   if (!session) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return new ForbiddenError("Forbidden").toResponse();
   }
 
   const { practiceSetId } = await params;
@@ -89,7 +90,7 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
     }
   }
   if (validationErrors.length > 0) {
-    return NextResponse.json({ error: "Validation failed.", errors: validationErrors }, { status: 400 });
+    return new ValidationError("Validation failed.", validationErrors).toResponse();
   }
 
   await prisma.$transaction([
@@ -128,12 +129,12 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
   });
 
   return NextResponse.json({ ok: true });
-}
+});
 
-export async function DELETE(_req: NextRequest, { params }: RouteContext) {
+export const DELETE = withApiErrors(async function DELETE(_req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
   if (!session) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return new ForbiddenError("Forbidden").toResponse();
   }
 
   const { practiceSetId } = await params;
@@ -143,9 +144,9 @@ export async function DELETE(_req: NextRequest, { params }: RouteContext) {
     prisma.groupAssignment.count({ where: { practiceSetId } }),
     prisma.attempt.count({ where: { practiceSetId } }),
   ]);
-  if (!practiceSet) return NextResponse.json({ error: "Practice Set not found." }, { status: 404 });
+  if (!practiceSet) return new NotFoundError("Practice Set not found.").toResponse();
   if (assignments > 0 || groupAssignments > 0 || attempts > 0) {
-    return NextResponse.json({ error: "Archive this Practice Set instead. Sets with assignments or attempts cannot be deleted." }, { status: 409 });
+    return new ConflictError("Archive this Practice Set instead. Sets with assignments or attempts cannot be deleted.").toResponse();
   }
 
   await prisma.practiceSet.delete({ where: { id: practiceSetId } });
@@ -160,4 +161,4 @@ export async function DELETE(_req: NextRequest, { params }: RouteContext) {
   });
 
   return NextResponse.json({ ok: true });
-}
+});

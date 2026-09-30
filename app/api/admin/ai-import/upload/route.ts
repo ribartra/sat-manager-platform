@@ -2,19 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { ingestAuthHeaders, ingestUrl } from "@/lib/internal-ingest";
+import { ApiError, BadRequestError, ForbiddenError, PayloadTooLargeError, withApiErrors } from "@/lib/api-error";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
 
 const MAX_UPLOAD_BYTES = 256 * 1024 * 1024;
 
-export async function POST(req: NextRequest) {
+export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const contentLength = req.headers.get("content-length");
   if (contentLength && Number(contentLength) > MAX_UPLOAD_BYTES + 1024 * 1024) {
-    return NextResponse.json({ error: "ZIP upload exceeds the 256 MB limit." }, { status: 413 });
+    return new PayloadTooLargeError("ZIP upload exceeds the 256 MB limit.").toResponse();
   }
 
   const formData = await req.formData();
@@ -22,13 +23,13 @@ export async function POST(req: NextRequest) {
   const name = String(formData.get("name") || "AI ZIP content ingest");
 
   if (!(file instanceof File)) {
-    return NextResponse.json({ error: "Select a ZIP file to upload." }, { status: 400 });
+    return new BadRequestError("Select a ZIP file to upload.").toResponse();
   }
   if (!file.name.toLowerCase().endsWith(".zip")) {
-    return NextResponse.json({ error: "Only .zip uploads are supported." }, { status: 400 });
+    return new BadRequestError("Only .zip uploads are supported.").toResponse();
   }
   if (file.size > MAX_UPLOAD_BYTES) {
-    return NextResponse.json({ error: "ZIP upload exceeds the 256 MB limit." }, { status: 413 });
+    return new PayloadTooLargeError("ZIP upload exceeds the 256 MB limit.").toResponse();
   }
 
   const upstream = new FormData();
@@ -42,7 +43,7 @@ export async function POST(req: NextRequest) {
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
-    return NextResponse.json({ error: data.detail || "Ingest service failed while uploading ZIP." }, { status: res.status });
+    return ApiError.fromStatus(res.status, data.detail || "Ingest service failed while uploading ZIP.").toResponse();
   }
 
   await prisma.auditLog.create({
@@ -56,4 +57,4 @@ export async function POST(req: NextRequest) {
   });
 
   return NextResponse.json(data);
-}
+});

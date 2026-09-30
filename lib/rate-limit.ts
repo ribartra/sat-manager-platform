@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { RateLimitError } from "@/lib/api-error";
 
 // In-memory buckets: fine for the single web instance this platform runs (RNF-20).
 type Bucket = {
@@ -39,10 +40,28 @@ export function checkRateLimit(key: string, limit: number, windowMs: number) {
   return { allowed: true, remaining: limit - current.count, resetAt: current.resetAt };
 }
 
+/**
+ * Failure-only limiter (login): `isRateLimited` peeks without counting, `recordFailure` counts a
+ * failed attempt, `clearFailures` forgets them after a success. Successful sign-ins never
+ * consume the budget, so many users behind one school network can sign in at once.
+ */
+export function isRateLimited(key: string, limit: number) {
+  const current = buckets.get(key);
+  if (!current || current.resetAt <= Date.now()) return false;
+  return current.count >= limit;
+}
+
+export function recordFailure(key: string, windowMs: number) {
+  const now = Date.now();
+  const current = buckets.get(key);
+  if (!current || current.resetAt <= now) buckets.set(key, { count: 1, resetAt: now + windowMs });
+  else current.count += 1;
+}
+
+export function clearFailures(key: string) {
+  buckets.delete(key);
+}
+
 export function rateLimitResponse(resetAt: number) {
-  const retryAfter = Math.max(1, Math.ceil((resetAt - Date.now()) / 1000));
-  return NextResponse.json(
-    { error: "Too many requests. Try again later." },
-    { status: 429, headers: { "Retry-After": String(retryAfter) } }
-  );
+  return new RateLimitError((resetAt - Date.now()) / 1000).toResponse();
 }

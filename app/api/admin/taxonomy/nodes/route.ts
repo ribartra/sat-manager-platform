@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/rbac";
+import { BadRequestError, ForbiddenError, withApiErrors } from "@/lib/api-error";
 
 const NODE_TYPES = new Set(["AREA", "DOMAIN", "SKILL", "SUBSKILL"]);
 
@@ -15,19 +16,19 @@ async function ancestorOfType(parentId: string | null, type: string) {
   return null;
 }
 
-export async function GET() {
+export const GET = withApiErrors(async function GET() {
   const session = await requireAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const nodes = await prisma.taxonomyNode.findMany({
     orderBy: [{ sortOrder: "asc" }, { label: "asc" }],
   });
   return NextResponse.json({ nodes });
-}
+});
 
-export async function POST(req: NextRequest) {
+export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await requireAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const body = await req.json();
   const name = typeof body.name === "string" ? body.name.trim() : "";
@@ -36,7 +37,7 @@ export async function POST(req: NextRequest) {
   const parentId = typeof body.parentId === "string" && body.parentId ? body.parentId : null;
   const sortOrder = Number.isFinite(Number(body.sortOrder)) ? Number(body.sortOrder) : 0;
 
-  if (!name || !NODE_TYPES.has(type)) return NextResponse.json({ error: "Name and valid type are required." }, { status: 400 });
+  if (!name || !NODE_TYPES.has(type)) return new BadRequestError("Name and valid type are required.").toResponse();
 
   const node = await prisma.taxonomyNode.create({
     data: { name, label, type, parentId, sortOrder, active: true },
@@ -75,15 +76,15 @@ export async function POST(req: NextRequest) {
   });
 
   return NextResponse.json({ node });
-}
+});
 
-export async function PATCH(req: NextRequest) {
+export const PATCH = withApiErrors(async function PATCH(req: NextRequest) {
   const session = await requireAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const body = await req.json();
   const id = typeof body.id === "string" ? body.id : "";
-  if (!id) return NextResponse.json({ error: "Node id is required." }, { status: 400 });
+  if (!id) return new BadRequestError("Node id is required.").toResponse();
 
   const data: { name?: string; label?: string; parentId?: string | null; sortOrder?: number; active?: boolean } = {};
   if (typeof body.name === "string" && body.name.trim()) data.name = body.name.trim();
@@ -113,4 +114,4 @@ export async function PATCH(req: NextRequest) {
   });
 
   return NextResponse.json({ node });
-}
+});

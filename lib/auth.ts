@@ -4,11 +4,14 @@ import bcrypt from "bcryptjs";
 import { createHash } from "node:crypto";
 import prisma from "@/lib/prisma";
 import { markUserActive } from "@/lib/activity";
-import { checkRateLimit, clientIpFromHeaders } from "@/lib/rate-limit";
+import { clearFailures, clientIpFromHeaders, isRateLimited, recordFailure } from "@/lib/rate-limit";
 import { writeAudit } from "@/lib/audit";
 import { loadSessionState } from "@/lib/session-state";
 
 const SESSION_MAX_AGE_SECONDS = 7 * 24 * 60 * 60;
+const LOGIN_WINDOW_MS = 15 * 60 * 1000;
+const LOGIN_FAILURES_PER_ACCOUNT = 10;
+const LOGIN_FAILURES_PER_IP = 30;
 
 /** Audit key for a login email that has no account: stable but not the email itself (RNF-12). */
 const emailRef = (email: string) => `email:${createHash("sha256").update(email).digest("hex").slice(0, 16)}`;
@@ -41,18 +44,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       async authorize(credentials, request) {
         if (!credentials?.email || !credentials?.password) return null;
         const email = String(credentials.email).trim().toLowerCase();
-        // Keyed by IP + email (and a looser per-IP cap), so someone elsewhere cannot lock
-        // another person out of their account by failing on purpose.
+        // Only FAILED attempts count, keyed by IP + email plus a looser per-IP cap: someone
+        // elsewhere cannot lock another person out, and a class signing in from one network
+        // is never blocked by its own successful logins.
         const ip = clientIpFromHeaders(request?.headers);
-        const perAccount = checkRateLimit(`login:${ip}:${email}`, 10, 15 * 60 * 1000);
-        const perIp = checkRateLimit(`login-ip:${ip}`, 30, 15 * 60 * 1000);
-        if (!perAccount.allowed || !perIp.allowed) {
+        const accountKey = `login:${ip}:${email}`;
+        const ipKey = `login-ip:${ip}`;
+        const accountBlocked = isRateLimited(accountKey, LOGIN_FAILURES_PER_ACCOUNT);
+        const ipBlocked = isRateLimited(ipKey, LOGIN_FAILURES_PER_IP);
+        const fail = () => {
+          recordFailure(accountKey, LOGIN_WINDOW_MS);
+          recordFailure(ipKey, LOGIN_WINDOW_MS);
+        };
+        if (accountBlocked || ipBlocked) {
           await writeAudit({
             action: "LOGIN_RATE_LIMITED",
             targetType: "User",
             targetId: emailRef(email),
             outcome: "failure",
-            metadata: { scope: perAccount.allowed ? "ip" : "account" },
+            metadata: { scope: accountBlocked ? "account" : "ip" },
           });
           return null;
         }
@@ -62,6 +72,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         });
 
         if (!user || !user.passwordHash || !user.active) {
+          fail();
           await writeAudit({
             userId: user?.id,
             action: "LOGIN_FAILED",
@@ -80,6 +91,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           user.passwordHash
         );
         if (!valid) {
+          fail();
           await writeAudit({
             userId: user.id,
             action: "LOGIN_FAILED",
@@ -91,6 +103,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null;
         }
 
+        clearFailures(accountKey);
         await markUserActive(user.id);
         await writeAudit({
           userId: user.id,

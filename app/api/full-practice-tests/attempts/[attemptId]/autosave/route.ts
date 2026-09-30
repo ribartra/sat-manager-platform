@@ -4,14 +4,15 @@ import { requireApprovedSession } from "@/lib/rbac";
 import { markUserActive } from "@/lib/activity";
 import { saveFullTestTimerState } from "@/lib/full-test-progress";
 import { reviewMetaByQuestion } from "@/lib/answer-review-meta";
+import { NotFoundError, UnauthorizedError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
   params: Promise<{ attemptId: string }>;
 }
 
-export async function POST(req: NextRequest, { params }: RouteContext) {
+export const POST = withApiErrors(async function POST(req: NextRequest, { params }: RouteContext) {
   const session = await requireApprovedSession();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session) return new UnauthorizedError("Unauthorized").toResponse();
 
   const { attemptId } = await params;
   const body = await req.json();
@@ -19,7 +20,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
   const attempt = await prisma.fullPracticeTestAttempt.findFirst({
     where: { id: attemptId, studentId: session.user.id, status: "IN_PROGRESS" },
   });
-  if (!attempt) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!attempt) return new NotFoundError("Not found").toResponse();
 
   await Promise.all([
     prisma.fullPracticeTestAttempt.update({
@@ -75,4 +76,4 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
   }
 
   return NextResponse.json({ ok: true });
-}
+});

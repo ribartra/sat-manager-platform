@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { FEATURE_SETTINGS, getFeatureSettings, isFeatureSettingKey } from "@/lib/app-settings";
 import { requireAdmin } from "@/lib/rbac";
+import { BadRequestError, ForbiddenError, withApiErrors } from "@/lib/api-error";
 
-export async function GET() {
+export const GET = withApiErrors(async function GET() {
   const session = await requireAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const values = await getFeatureSettings();
   return NextResponse.json({
@@ -18,16 +19,16 @@ export async function GET() {
       value: values[key as keyof typeof FEATURE_SETTINGS],
     })),
   });
-}
+});
 
-export async function PATCH(req: NextRequest) {
+export const PATCH = withApiErrors(async function PATCH(req: NextRequest) {
   const session = await requireAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const body = await req.json();
   const key = typeof body.key === "string" ? body.key : "";
   if (!isFeatureSettingKey(key)) {
-    return NextResponse.json({ error: "Unknown setting." }, { status: 400 });
+    return new BadRequestError("Unknown setting.").toResponse();
   }
 
   const value = body.value === true ? "true" : "false";
@@ -48,5 +49,5 @@ export async function PATCH(req: NextRequest) {
   });
 
   return NextResponse.json({ key, value: value === "true" });
-}
+});
 

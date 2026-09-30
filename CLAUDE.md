@@ -73,6 +73,14 @@ Ingestion **never writes directly to official questions.** Documents land in `In
 - Path alias: `@/*` → repo root.
 - UI: Tailwind CSS v4, Radix UI primitives, lucide-react, React Hook Form + Zod, TanStack Table, KaTeX for math.
 
+## UI states & errors (shared bases — `npm run qa:ui` enforces them)
+
+- **Blocked controls:** use `<Button disabled>`; when the block is a rule the user can fix, pass `disabledReason="…"` (tooltip + screen-reader text). `asChild` links get `aria-disabled`. Raw custom buttons use a class from `components/ui/control-states.ts` (`BLOCKED_TEXT`, `BLOCKED_SURFACE`, `BLOCKED_SWITCH`, `SETTLED_RESULT`) and `DisabledReason`. Never `disabled:opacity-*`. Fields: `Input`/`Select`/`Textarea`/`Checkbox`/`Radio` primitives.
+- **Messages:** `Alert` (`components/sat/alert.tsx`, tone error|warning|info|success|note, layout box|inline|banner) is the base; `InlineError`, `ErrorState`, `InvalidatedNotice`, `OfflineBanner`, `FormMessage` build on it. Transient feedback: `notify.error(err)` / `notify.success()` (`lib/notify-ui.ts`). Confirmations: `useConfirm()` (`components/sat/confirm-dialog.tsx`, supports `requireText`). No `window.alert/confirm/prompt`.
+- **Route errors:** `RouteError` / `NotFoundView` in `error.tsx` / `not-found.tsx`.
+- **API errors (server):** throw or return subclasses of `ApiError` (`lib/api-error.ts`: `BadRequestError`, `ValidationError`, `UnauthorizedError`, `ForbiddenError`, `NotFoundError`, `ConflictError`, `RateLimitError`, `ServiceUnavailableError`…; `ApiError.fromStatus` for runtime statuses). Handlers are wrapped in `withApiErrors` (thrown ApiError → response, anything else → logged generic 500). Wire format: `{ error, code, errors?, ...extra }`. `assertAdmin/assertTeacherOrAdmin/assertApprovedSession` (`lib/rbac.ts`) throw the right error.
+- **API errors (client):** `apiFetch` / `readApiError` / `errorMessage` (`lib/api-client.ts`) → `ApiClientError { status, code, details }`. Do not parse `data.error` by hand.
+
 ## Environment & data
 
 - Copy `.env.example` → `.env`. Key vars: `DATABASE_URL`, `AUTH_SECRET`, `SECRET_ENCRYPTION_KEY`, `INTERNAL_INGEST_TOKEN`, `AI_INGEST_SERVICE_URL`, `CORS_ALLOWED_ORIGINS`, `MISTRAL_*`, `EMAIL_*` (Brevo SMTP via nodemailer), `NEXT_PUBLIC_CALCULATOR_*`/`NEXT_PUBLIC_DESMOS_*` (embedded calculators).

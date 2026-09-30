@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { ingestAuthHeaders, ingestUrl } from "@/lib/internal-ingest";
+import { ApiError, ForbiddenError, withApiErrors } from "@/lib/api-error";
 
-export async function GET() {
+export const GET = withApiErrors(async function GET() {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const batches = await prisma.ingestBatch.findMany({
     orderBy: { createdAt: "desc" },
@@ -25,11 +26,11 @@ export async function GET() {
   );
 
   return NextResponse.json({ batches: withCounts });
-}
+});
 
-export async function POST(req: NextRequest) {
+export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const body = await req.json().catch(() => ({}));
   const res = await fetch(ingestUrl("/batches"), {
@@ -43,7 +44,7 @@ export async function POST(req: NextRequest) {
 
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
-    return NextResponse.json({ error: data.detail || "Ingest service failed." }, { status: res.status });
+    return ApiError.fromStatus(res.status, data.detail || "Ingest service failed.").toResponse();
   }
 
   await prisma.auditLog.create({
@@ -57,4 +58,4 @@ export async function POST(req: NextRequest) {
   });
 
   return NextResponse.json(data);
-}
+});

@@ -12,6 +12,7 @@ import {
   moduleKeyFromOrder,
   type FullTestSection,
 } from "@/lib/full-test-modules";
+import { ApiError, BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
   params: Promise<{ batchId: string }>;
@@ -19,16 +20,16 @@ interface RouteContext {
 
 const EXPECTED_MODULE_COUNTS = FULL_TEST_EXPECTED_COUNTS;
 
-export async function POST(req: Request, { params }: RouteContext) {
+export const POST = withApiErrors(async function POST(req: Request, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { batchId } = await params;
   const body = (await req.json().catch(() => ({}))) as { testNumber?: number; allowPartial?: boolean };
   const batch = await prisma.ingestBatch.findUnique({ where: { id: batchId } });
-  if (!batch) return NextResponse.json({ error: "Batch not found." }, { status: 404 });
+  if (!batch) return new NotFoundError("Batch not found.").toResponse();
   if (!Number.isInteger(body.testNumber)) {
-    return NextResponse.json({ error: "testNumber is required." }, { status: 400 });
+    return new BadRequestError("testNumber is required.").toResponse();
   }
 
   const candidates = await prisma.ingestQuestionCandidate.findMany({
@@ -42,19 +43,19 @@ export async function POST(req: Request, { params }: RouteContext) {
     orderBy: [{ testNumber: "asc" }, { moduleLabel: "asc" }, { questionNumber: "asc" }, { createdAt: "asc" }],
   });
   if (candidates.length === 0) {
-    return NextResponse.json({ error: "No promoted Full Practice Test questions found for this test." }, { status: 400 });
+    return new BadRequestError("No promoted Full Practice Test questions found for this test.").toResponse();
   }
 
   const questionIds = candidates.map((candidate) => candidate.officialQuestionId).filter((id): id is string => Boolean(id));
   if (new Set(questionIds).size !== questionIds.length) {
-    return NextResponse.json({ error: "Duplicated promoted questions found in this batch." }, { status: 400 });
+    return new BadRequestError("Duplicated promoted questions found in this batch.").toResponse();
   }
   const questions = await prisma.question.findMany({
     where: { id: { in: questionIds } },
     include: { topic: { include: { domain: { include: { section: true } } } } },
   });
   if (questions.length !== questionIds.length) {
-    return NextResponse.json({ error: "Some promoted questions no longer exist." }, { status: 400 });
+    return new BadRequestError("Some promoted questions no longer exist.").toResponse();
   }
   const sectionByQuestion = new Map(
     questions.map((question) => [question.id, question.topic.domain.section.name === "MATH" ? "MATH" : "RW"]),
@@ -68,10 +69,7 @@ export async function POST(req: Request, { params }: RouteContext) {
     const expectedSection = index >= 2 ? "MATH" : "RW";
     const actualSection = sectionByQuestion.get(questionId);
     if (actualSection !== expectedSection) {
-      return NextResponse.json(
-        { error: `Question ${questionId} belongs to ${actualSection}, but target module requires ${expectedSection}.` },
-        { status: 400 },
-      );
+      return new BadRequestError(`Question ${questionId} belongs to ${actualSection}, but target module requires ${expectedSection}.`).toResponse();
     }
     moduleQuestionIds[index].push(questionId);
   }
@@ -81,16 +79,7 @@ export async function POST(req: Request, { params }: RouteContext) {
   const partial = missingByModule.some((missing) => missing > 0);
   const modules = fullTestModuleBuckets(moduleCounts);
   if (partial && !body.allowPartial) {
-    return NextResponse.json(
-      {
-        error: "This Full Practice Test is partial. Confirm allowPartial to create/update a draft with promoted questions only.",
-        moduleCounts,
-        missingByModule,
-        modules,
-        partial,
-      },
-      { status: 409 },
-    );
+    return ApiError.fromStatus(409, "This Full Practice Test is partial. Confirm allowPartial to create/update a draft with promoted questions only.", { moduleCounts, missingByModule, modules, partial }).toResponse();
   }
 
   const testNumber = body.testNumber;
@@ -198,4 +187,4 @@ export async function POST(req: Request, { params }: RouteContext) {
   });
 
   return NextResponse.json({ test, moduleCounts, missingByModule, modules, partial });
-}
+});

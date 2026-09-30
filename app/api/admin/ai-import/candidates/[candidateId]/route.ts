@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { stripIngestImagePlaceholders } from "@/lib/ingest-text-sanitize";
 import { cleanupOfficialQuestionPlaceholders } from "@/lib/ingest-image-cleanup";
 import { reconcileWarningsJson } from "@/lib/ingest-warnings";
+import { BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
   params: Promise<{ candidateId: string }>;
@@ -11,9 +12,9 @@ interface RouteContext {
 
 const allowedStatuses = new Set(["NEEDS_REVIEW", "READY", "REVIEWED", "REJECTED"]);
 
-export async function PATCH(req: NextRequest, { params }: RouteContext) {
+export const PATCH = withApiErrors(async function PATCH(req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { candidateId } = await params;
   const body = (await req.json().catch(() => ({}))) as {
@@ -32,14 +33,14 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
   };
 
   if (body.status && !allowedStatuses.has(body.status)) {
-    return NextResponse.json({ error: "Invalid status." }, { status: 400 });
+    return new BadRequestError("Invalid status.").toResponse();
   }
 
   const existing = await prisma.ingestQuestionCandidate.findUnique({
     where: { id: candidateId },
     select: { warningsJson: true, correctAnswer: true },
   });
-  if (!existing) return NextResponse.json({ error: "Candidate not found." }, { status: 404 });
+  if (!existing) return new NotFoundError("Candidate not found.").toResponse();
 
   const nextAnswer =
     body.correctAnswer !== undefined ? body.correctAnswer || null : existing.correctAnswer;
@@ -95,4 +96,4 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
   });
 
   return NextResponse.json(candidate);
-}
+});

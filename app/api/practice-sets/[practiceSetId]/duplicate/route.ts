@@ -1,21 +1,22 @@
 import { NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
+import { ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
   params: Promise<{ practiceSetId: string }>;
 }
 
-export async function POST(_req: Request, { params }: RouteContext) {
+export const POST = withApiErrors(async function POST(_req: Request, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { practiceSetId } = await params;
   const practiceSet = await prisma.practiceSet.findUnique({
     where: { id: practiceSetId },
     include: { questions: { orderBy: { order: "asc" } } },
   });
-  if (!practiceSet) return NextResponse.json({ error: "Practice Set not found." }, { status: 404 });
+  if (!practiceSet) return new NotFoundError("Practice Set not found.").toResponse();
 
   const copy = await prisma.practiceSet.create({
     data: {
@@ -44,4 +45,4 @@ export async function POST(_req: Request, { params }: RouteContext) {
   });
 
   return NextResponse.json({ practiceSet: copy });
-}
+});

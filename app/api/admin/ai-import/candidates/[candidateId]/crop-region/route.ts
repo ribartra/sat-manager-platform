@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { ingestAuthHeaders, ingestUrl } from "@/lib/internal-ingest";
 import { propagateAssignedImageToOfficial } from "@/lib/ingest-promotion";
 import { cleanupAfterStemImageAssigned } from "@/lib/ingest-image-cleanup";
+import { ApiError, BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
   params: Promise<{ candidateId: string }>;
@@ -25,33 +26,33 @@ interface CropBody {
 // Crops a region of the candidate's source PDF and either ASSIGNs it (creates an
 // image link to stem/option/…) or OCRs it (returns text for review). Proxies the
 // ingest service, which does the render + persistence.
-export async function POST(req: NextRequest, { params }: RouteContext) {
+export const POST = withApiErrors(async function POST(req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { candidateId } = await params;
   const body = (await req.json().catch(() => ({}))) as CropBody;
 
   if (typeof body.pageNumber !== "number" || !Number.isInteger(body.pageNumber) || body.pageNumber < 1) {
-    return NextResponse.json({ error: "pageNumber is required." }, { status: 400 });
+    return new BadRequestError("pageNumber is required.").toResponse();
   }
   if (!body.bbox || typeof body.bbox.x0 !== "number") {
-    return NextResponse.json({ error: "bbox {x0,y0,x1,y1} (normalized) is required." }, { status: 400 });
+    return new BadRequestError("bbox {x0,y0,x1,y1} (normalized) is required.").toResponse();
   }
   const mode = (body.mode || "ASSIGN").toUpperCase();
   if (!["ASSIGN", "OCR"].includes(mode)) {
-    return NextResponse.json({ error: "mode must be ASSIGN or OCR." }, { status: 400 });
+    return new BadRequestError("mode must be ASSIGN or OCR.").toResponse();
   }
   const targetType = (body.targetType || "PAGE_CONTEXT").toUpperCase();
   if (!TARGET_TYPES.includes(targetType)) {
-    return NextResponse.json({ error: "Invalid targetType." }, { status: 400 });
+    return new BadRequestError("Invalid targetType.").toResponse();
   }
   if (targetType === "OPTION" && !body.optionLabel) {
-    return NextResponse.json({ error: "optionLabel is required for OPTION target." }, { status: 400 });
+    return new BadRequestError("optionLabel is required for OPTION target.").toResponse();
   }
 
   const candidate = await prisma.ingestQuestionCandidate.findUnique({ where: { id: candidateId } });
-  if (!candidate) return NextResponse.json({ error: "Candidate not found." }, { status: 404 });
+  if (!candidate) return new NotFoundError("Candidate not found.").toResponse();
 
   // Validate the sibling image source (if any) lives in the same batch before
   // trusting the client-supplied id.
@@ -62,7 +63,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       select: { batchId: true },
     });
     if (!imageSource || imageSource.batchId !== candidate.batchId) {
-      return NextResponse.json({ error: "Invalid image source." }, { status: 400 });
+      return new BadRequestError("Invalid image source.").toResponse();
     }
     imageSourceFileId = body.imageSourceFileId;
   }
@@ -81,7 +82,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
   });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    return NextResponse.json({ error: data.detail || "Could not process the crop." }, { status: response.status });
+    return ApiError.fromStatus(response.status, data.detail || "Could not process the crop.").toResponse();
   }
 
   // If this candidate is already promoted, mirror an ASSIGNed image onto the
@@ -118,4 +119,4 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
   });
 
   return NextResponse.json({ ...data, officialPropagation });
-}
+});

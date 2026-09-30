@@ -4,25 +4,26 @@ import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { parseDueDate, parseUnlockDate, upsertPracticeAssignment, type AssignmentOutcome } from "@/lib/assignments";
 import { studentAccessWhereFor } from "@/lib/program-scope";
+import { BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
-export async function POST(req: NextRequest) {
+export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
   if (!session) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return new ForbiddenError("Forbidden").toResponse();
   }
 
   const { studentIds, practiceSetIds, dueDate, unlockAt, locked, sourceGroupId, feedbackMode } = await req.json();
   const resolvedFeedbackMode = feedbackMode === "IMMEDIATE" ? "IMMEDIATE" : "AFTER_SET";
   if (sourceGroupId && session.user.role !== "ADMIN") {
     const enabled = await getFeatureSetting("TEACHER_GROUP_MANAGEMENT");
-    if (!enabled) return NextResponse.json({ error: "Teacher group assignment is disabled." }, { status: 403 });
+    if (!enabled) return new ForbiddenError("Teacher group assignment is disabled.").toResponse();
   }
 
   const requestedStudentIds = Array.isArray(studentIds) ? studentIds.filter((id) => typeof id === "string") : [];
   const requestedPracticeSetIds = Array.isArray(practiceSetIds) ? practiceSetIds.filter((id) => typeof id === "string") : [];
 
   if (requestedStudentIds.length === 0 || requestedPracticeSetIds.length === 0) {
-    return NextResponse.json({ error: "Student and practice set selection is required." }, { status: 400 });
+    return new BadRequestError("Student and practice set selection is required.").toResponse();
   }
 
   const [allowedStudents, publishedPracticeSets] = await Promise.all([
@@ -45,11 +46,11 @@ export async function POST(req: NextRequest) {
   const unavailablePracticeSetIds = requestedPracticeSetIds.filter((practiceSetId) => !publishedPracticeSetIds.has(practiceSetId));
 
   if (inaccessibleStudentIds.length > 0) {
-    return NextResponse.json({ error: "One or more students are outside your program scope." }, { status: 403 });
+    return new ForbiddenError("One or more students are outside your program scope.").toResponse();
   }
 
   if (unavailablePracticeSetIds.length > 0) {
-    return NextResponse.json({ error: "Only published practice sets can be assigned." }, { status: 400 });
+    return new BadRequestError("Only published practice sets can be assigned.").toResponse();
   }
 
   if (sourceGroupId) {
@@ -57,10 +58,10 @@ export async function POST(req: NextRequest) {
       where: { id: sourceGroupId },
       include: { members: { select: { userId: true } } },
     });
-    if (!group) return NextResponse.json({ error: "Group not found." }, { status: 404 });
+    if (!group) return new NotFoundError("Group not found.").toResponse();
     const groupMemberIds = new Set(group.members.map((member) => member.userId));
     if (requestedStudentIds.some((studentId) => !groupMemberIds.has(studentId))) {
-      return NextResponse.json({ error: "Group assignment can only target current group members." }, { status: 400 });
+      return new BadRequestError("Group assignment can only target current group members.").toResponse();
     }
   }
 
@@ -112,4 +113,4 @@ export async function POST(req: NextRequest) {
 
   // `skipped` kept for older clients: assignments that needed no change.
   return NextResponse.json({ ...counts, skipped: counts.unchanged });
-}
+});

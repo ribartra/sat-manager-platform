@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { questionEditorIssues } from "@/contracts/question";
 import { validateQuestionPayload } from "@/lib/content-validation";
 import { materializeOfficialImageUrl } from "@/lib/ingest-promotion";
+import { BadRequestError, ConflictError, ForbiddenError, NotFoundError, ValidationError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
   params: Promise<{ questionId: string }>;
@@ -11,23 +12,23 @@ interface RouteContext {
 
 const allowedStatuses = new Set(["DRAFT", "PUBLISHED", "ARCHIVED"]);
 
-export async function PATCH(req: NextRequest, { params }: RouteContext) {
+export const PATCH = withApiErrors(async function PATCH(req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
   if (!session) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return new ForbiddenError("Forbidden").toResponse();
   }
 
   const { questionId } = await params;
   const body = (await req.json().catch(() => ({}))) as { status?: string };
   if (!body.status || !allowedStatuses.has(body.status)) {
-    return NextResponse.json({ error: "Invalid question status." }, { status: 400 });
+    return new BadRequestError("Invalid question status.").toResponse();
   }
 
   const question = await prisma.question.findUnique({
     where: { id: questionId },
     include: { options: true },
   });
-  if (!question) return NextResponse.json({ error: "Question not found." }, { status: 404 });
+  if (!question) return new NotFoundError("Question not found.").toResponse();
 
   const validationErrors = validateQuestionPayload({
     topicId: question.topicId,
@@ -40,7 +41,7 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
     options: question.options,
   });
   if (validationErrors.length > 0) {
-    return NextResponse.json({ error: "Validation failed.", errors: validationErrors }, { status: 400 });
+    return new ValidationError("Validation failed.", validationErrors).toResponse();
   }
 
   const updated = await prisma.question.update({
@@ -59,12 +60,12 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
   });
 
   return NextResponse.json(updated);
-}
+});
 
-export async function PUT(req: NextRequest, { params }: RouteContext) {
+export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
   if (!session) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return new ForbiddenError("Forbidden").toResponse();
   }
 
   const { questionId } = await params;
@@ -85,7 +86,7 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
     options,
   });
   if (validationErrors.length > 0) {
-    return NextResponse.json({ error: "Validation failed.", errors: validationErrors }, { status: 400 });
+    return new ValidationError("Validation failed.", validationErrors).toResponse();
   }
   const officialImageUrl = await materializeOfficialImageUrl(imageUrl);
   const officialOptions = type === "MC"
@@ -155,12 +156,12 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
   });
 
   return NextResponse.json(question);
-}
+});
 
-export async function DELETE(_req: NextRequest, { params }: RouteContext) {
+export const DELETE = withApiErrors(async function DELETE(_req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
   if (!session) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return new ForbiddenError("Forbidden").toResponse();
   }
 
   const { questionId } = await params;
@@ -170,9 +171,9 @@ export async function DELETE(_req: NextRequest, { params }: RouteContext) {
     prisma.fullPracticeTestQuestion.count({ where: { questionId } }),
     prisma.attemptAnswer.count({ where: { questionId } }),
   ]);
-  if (!question) return NextResponse.json({ error: "Question not found." }, { status: 404 });
+  if (!question) return new NotFoundError("Question not found.").toResponse();
   if (practiceSetLinks > 0 || fullTestLinks > 0 || attemptAnswers > 0) {
-    return NextResponse.json({ error: "Archive this question instead. Questions with usage cannot be deleted." }, { status: 409 });
+    return new ConflictError("Archive this question instead. Questions with usage cannot be deleted.").toResponse();
   }
 
   await prisma.question.delete({ where: { id: questionId } });
@@ -187,4 +188,4 @@ export async function DELETE(_req: NextRequest, { params }: RouteContext) {
   });
 
   return NextResponse.json({ ok: true });
-}
+});

@@ -4,20 +4,21 @@ import prisma from "@/lib/prisma";
 import { absoluteAppUrl, sendParentConsentEmail, sendStudentInviteEmail } from "@/lib/email";
 import { hashPublicToken, newPublicToken } from "@/lib/token-security";
 import { captureCaughtError, writeAudit } from "@/lib/audit";
+import { BadRequestError, ConflictError, ForbiddenError, InternalServerError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
-export async function POST(req: NextRequest) {
+export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
   if (!session) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return new ForbiddenError("Forbidden").toResponse();
   }
 
   try {
     const { name, email, phone, startDate, programId, isMinor, parentName, parentEmail, parentPhone } = await req.json();
-    if (!name || !email || !programId) return NextResponse.json({ error: "Name, email, and program are required." }, { status: 400 });
-    if (isMinor && !parentEmail) return NextResponse.json({ error: "Parent email is required for minor students." }, { status: 400 });
+    if (!name || !email || !programId) return new BadRequestError("Name, email, and program are required.").toResponse();
+    if (isMinor && !parentEmail) return new BadRequestError("Parent email is required for minor students.").toResponse();
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
-    if (existingUser) return NextResponse.json({ error: "A user with that email already exists." }, { status: 409 });
+    if (existingUser) return new ConflictError("A user with that email already exists.").toResponse();
 
     const now = new Date();
     const program = await prisma.program.findFirst({
@@ -31,7 +32,7 @@ export async function POST(req: NextRequest) {
           : {}),
       },
     });
-    if (!program) return NextResponse.json({ error: "Program not found or unavailable." }, { status: 404 });
+    if (!program) return new NotFoundError("Program not found or unavailable.").toResponse();
 
     const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 7);
 
@@ -104,6 +105,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, inviteUrl });
   } catch (error) {
     await captureCaughtError("students.invite", error, { userId: session.user.id });
-    return NextResponse.json({ error: "Failed to create invitation." }, { status: 500 });
+    return new InternalServerError("Failed to create invitation.").toResponse();
   }
-}
+});

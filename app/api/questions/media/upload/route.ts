@@ -3,6 +3,7 @@ import crypto from "crypto";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import { putQuestionImage } from "@/lib/object-storage";
 import { writeAudit } from "@/lib/audit";
+import { BadRequestError, ForbiddenError, InternalServerError, withApiErrors } from "@/lib/api-error";
 
 export const runtime = "nodejs";
 
@@ -39,26 +40,26 @@ function detectedImageType(buffer: Buffer): string | null {
   return null;
 }
 
-export async function POST(req: NextRequest) {
+export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const formData = await req.formData();
   const file = formData.get("file");
   if (!(file instanceof File)) {
-    return NextResponse.json({ error: "No file provided." }, { status: 400 });
+    return new BadRequestError("No file provided.").toResponse();
   }
   if (!ALLOWED_TYPES.has(file.type)) {
-    return NextResponse.json({ error: "Only JPEG, PNG, WebP and GIF images are allowed." }, { status: 400 });
+    return new BadRequestError("Only JPEG, PNG, WebP and GIF images are allowed.").toResponse();
   }
   if (file.size > MAX_SIZE) {
-    return NextResponse.json({ error: "Image must be under 5 MB." }, { status: 400 });
+    return new BadRequestError("Image must be under 5 MB.").toResponse();
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());
   const detectedType = detectedImageType(buffer);
   if (!detectedType || !ALLOWED_TYPES.has(detectedType)) {
-    return NextResponse.json({ error: "The uploaded file content does not match a supported image type." }, { status: 400 });
+    return new BadRequestError("The uploaded file content does not match a supported image type.").toResponse();
   }
   // Prefer detected type over client-declared type when they disagree.
   const contentType = detectedType;
@@ -85,6 +86,6 @@ export async function POST(req: NextRequest) {
       outcome: "failure",
       error,
     });
-    return NextResponse.json({ error: "Failed to store image." }, { status: 500 });
+    return new InternalServerError("Failed to store image.").toResponse();
   }
-}
+});

@@ -3,6 +3,7 @@ import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { validateQuestionPayload } from "@/lib/content-validation";
 import { captureCaughtError } from "@/lib/audit";
+import { BadRequestError, ForbiddenError, withApiErrors } from "@/lib/api-error";
 
 type CsvRow = Record<string, string>;
 
@@ -105,14 +106,14 @@ function validateRows(rows: CsvRow[]) {
   return validated;
 }
 
-export async function POST(req: NextRequest) {
+export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
   if (!session) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return new ForbiddenError("Forbidden").toResponse();
   }
 
   const { csv, dryRun } = (await req.json()) as { csv?: string; dryRun?: boolean };
-  if (!csv) return NextResponse.json({ error: "CSV content is required." }, { status: 400 });
+  if (!csv) return new BadRequestError("CSV content is required.").toResponse();
 
   const rows = parseCsv(csv);
   const validatedRows = validateRows(rows);
@@ -191,4 +192,4 @@ export async function POST(req: NextRequest) {
   });
 
   return NextResponse.json({ created, errors });
-}
+});

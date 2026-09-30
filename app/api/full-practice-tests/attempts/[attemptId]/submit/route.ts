@@ -9,14 +9,15 @@ import { writeAudit } from "@/lib/audit";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { resolveQuestionType } from "@/lib/question-type";
 import { reviewMetaByQuestion } from "@/lib/answer-review-meta";
+import { NotFoundError, UnauthorizedError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
   params: Promise<{ attemptId: string }>;
 }
 
-export async function POST(req: NextRequest, { params }: RouteContext) {
+export const POST = withApiErrors(async function POST(req: NextRequest, { params }: RouteContext) {
   const session = await requireApprovedSession();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session) return new UnauthorizedError("Unauthorized").toResponse();
 
   const { attemptId } = await params;
   const body = await req.json();
@@ -24,7 +25,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
   const attempt = await prisma.fullPracticeTestAttempt.findFirst({
     where: { id: attemptId, studentId: session.user.id, status: "IN_PROGRESS" },
   });
-  if (!attempt) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!attempt) return new NotFoundError("Not found").toResponse();
 
   const excludePretest = await getFeatureSetting("FPT_PRETEST_EXCLUSION");
 
@@ -140,4 +141,4 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     raw: { rwCorrect, rwTotal, mathCorrect, mathTotal },
     scores: { rwScore, mathScore, totalScore: rwScore + mathScore },
   });
-}
+});

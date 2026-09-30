@@ -7,6 +7,7 @@ import { getFeatureSetting } from "@/lib/app-settings";
 import { buildStudentReportPdf, parseReportAreas } from "@/lib/pdf/build-student-report";
 import { sendParentReportPdfEmail } from "@/lib/email";
 import { writeAudit } from "@/lib/audit";
+import { BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
 // Emails the student report PDF (same document as the preview/download) as an attachment to
 // the parents the teacher picks. Only parents linked to the student and with an email qualify.
@@ -17,9 +18,9 @@ interface RouteContext {
   params: Promise<{ studentId: string }>;
 }
 
-export async function POST(req: Request, { params }: RouteContext) {
+export const POST = withApiErrors(async function POST(req: Request, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { studentId } = await params;
   const body = (await req.json().catch(() => ({}))) as {
@@ -31,13 +32,13 @@ export async function POST(req: Request, { params }: RouteContext) {
   const parentIds = Array.isArray(body.parentIds)
     ? [...new Set(body.parentIds.filter((id): id is string => typeof id === "string"))].slice(0, 10)
     : [];
-  if (parentIds.length === 0) return NextResponse.json({ error: "Choose at least one parent." }, { status: 400 });
+  if (parentIds.length === 0) return new BadRequestError("Choose at least one parent.").toResponse();
 
   const student = await prisma.user.findFirst({
     where: { id: studentId, ...studentAccessWhereFor(session.user) },
     select: { id: true },
   });
-  if (!student) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!student) return new NotFoundError("Not found").toResponse();
 
   const links = await prisma.parentStudent.findMany({
     where: { studentId, parentId: { in: parentIds } },
@@ -45,7 +46,7 @@ export async function POST(req: Request, { params }: RouteContext) {
   });
   const recipients = links.filter((link) => link.parent.email);
   if (recipients.length === 0) {
-    return NextResponse.json({ error: "None of the selected parents is linked to this student with an email." }, { status: 400 });
+    return new BadRequestError("None of the selected parents is linked to this student with an email.").toResponse();
   }
 
   const showEndDate = await getFeatureSetting("TIME_FILTER_END_DATE");
@@ -58,7 +59,7 @@ export async function POST(req: Request, { params }: RouteContext) {
   const areas = parseReportAreas(Array.isArray(body.areas) ? body.areas.join(",") : typeof body.areas === "string" ? body.areas : "");
   const fptAttemptId = typeof body.fptAttemptId === "string" && body.fptAttemptId ? body.fptAttemptId : null;
   const report = await buildStudentReportPdf({ viewer: session.user, studentId, areas, filters, fptAttemptId });
-  if (!report) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!report) return new NotFoundError("Not found").toResponse();
 
   const results: { parentId: string; name: string; email: string | null; sent: boolean; reason: string | null }[] = [];
   for (const link of recipients) {
@@ -91,4 +92,4 @@ export async function POST(req: Request, { params }: RouteContext) {
   });
 
   return NextResponse.json({ results, skipped });
-}
+});

@@ -8,6 +8,7 @@ import {
   reconcileOfficialUpdate,
 } from "@/lib/ingest-promotion";
 import { validateQuestionPayload } from "@/lib/content-validation";
+import { BadRequestError, ForbiddenError, PayloadTooLargeError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
   params: Promise<{ batchId: string }>;
@@ -24,17 +25,17 @@ type CandidatePayload = {
   resync?: unknown;
 };
 
-export async function POST(req: NextRequest, { params }: RouteContext) {
+export const POST = withApiErrors(async function POST(req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { batchId } = await params;
   const body = (await req.json().catch(() => ({}))) as CandidatePayload;
   const candidateIds = Array.isArray(body.candidateIds)
     ? [...new Set(body.candidateIds.filter((id): id is string => typeof id === "string" && id.length > 0))]
     : [];
-  if (candidateIds.length === 0) return NextResponse.json({ error: "candidateIds is required." }, { status: 400 });
-  if (candidateIds.length > 250) return NextResponse.json({ error: "Promote at most 250 questions at a time." }, { status: 413 });
+  if (candidateIds.length === 0) return new BadRequestError("candidateIds is required.").toResponse();
+  if (candidateIds.length > 250) return new PayloadTooLargeError("Promote at most 250 questions at a time.").toResponse();
   const resync = body.resync === true;
 
   const [candidates, topics, rawLinks] = await Promise.all([
@@ -244,4 +245,4 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     resyncedItems: resynced,
     skippedItems: skipped,
   });
-}
+});

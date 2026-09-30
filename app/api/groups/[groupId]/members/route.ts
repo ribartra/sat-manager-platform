@@ -2,15 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
+import { ForbiddenError, withApiErrors } from "@/lib/api-error";
 
-export async function POST(req: NextRequest, { params }: { params: Promise<{ groupId: string }> }) {
+export const POST = withApiErrors(async function POST(req: NextRequest, { params }: { params: Promise<{ groupId: string }> }) {
   const session = await requireTeacherOrAdmin();
   if (!session) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return new ForbiddenError("Forbidden").toResponse();
   }
   if (session.user.role !== "ADMIN") {
     const enabled = await getFeatureSetting("TEACHER_GROUP_MANAGEMENT");
-    if (!enabled) return NextResponse.json({ error: "Teacher group management is disabled." }, { status: 403 });
+    if (!enabled) return new ForbiddenError("Teacher group management is disabled.").toResponse();
   }
 
   const { groupId } = await params;
@@ -53,7 +54,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ gro
   }
 
   return NextResponse.json({ ok: true, inheritedAssignments });
-}
+});
 
 function isUniqueConstraintError(error: unknown): boolean {
   return Boolean(

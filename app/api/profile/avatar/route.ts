@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireApprovedSession } from "@/lib/rbac";
 import { saveAvatar, deleteAvatar } from "@/lib/storage";
+import { BadRequestError, UnauthorizedError, withApiErrors } from "@/lib/api-error";
 
 const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
@@ -28,24 +29,21 @@ function detectedImageType(buffer: Buffer) {
 }
 
 // POST /api/profile/avatar — upload and set avatar
-export async function POST(req: NextRequest) {
+export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await requireApprovedSession();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session) return new UnauthorizedError("Unauthorized").toResponse();
 
   const formData = await req.formData();
   const file = formData.get("file");
 
   if (!(file instanceof File)) {
-    return NextResponse.json({ error: "No file provided." }, { status: 400 });
+    return new BadRequestError("No file provided.").toResponse();
   }
   if (!ALLOWED_TYPES.has(file.type)) {
-    return NextResponse.json(
-      { error: "Only JPEG, PNG and WebP images are allowed." },
-      { status: 400 }
-    );
+    return new BadRequestError("Only JPEG, PNG and WebP images are allowed.").toResponse();
   }
   if (file.size > MAX_SIZE) {
-    return NextResponse.json({ error: "Image must be under 5 MB." }, { status: 400 });
+    return new BadRequestError("Image must be under 5 MB.").toResponse();
   }
 
   // Delete previous avatar file if it exists
@@ -60,7 +58,7 @@ export async function POST(req: NextRequest) {
   const buffer = Buffer.from(await file.arrayBuffer());
   const detectedType = detectedImageType(buffer);
   if (!detectedType || detectedType !== file.type) {
-    return NextResponse.json({ error: "The uploaded file content does not match a supported image type." }, { status: 400 });
+    return new BadRequestError("The uploaded file content does not match a supported image type.").toResponse();
   }
   const avatarUrl = await saveAvatar(buffer, detectedType, session.user.id);
 
@@ -70,12 +68,12 @@ export async function POST(req: NextRequest) {
   });
 
   return NextResponse.json({ avatarUrl });
-}
+});
 
 // DELETE /api/profile/avatar — remove avatar
-export async function DELETE() {
+export const DELETE = withApiErrors(async function DELETE() {
   const session = await requireApprovedSession();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session) return new UnauthorizedError("Unauthorized").toResponse();
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
@@ -91,4 +89,4 @@ export async function DELETE() {
   }
 
   return NextResponse.json({ ok: true });
-}
+});

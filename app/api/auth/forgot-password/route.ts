@@ -4,8 +4,9 @@ import { absoluteAppUrl, sendPasswordResetEmail } from "@/lib/email";
 import { checkRateLimit, rateLimitKey, rateLimitResponse } from "@/lib/rate-limit";
 import { hashPublicToken, newPublicToken } from "@/lib/token-security";
 import { captureCaughtError, writeAudit } from "@/lib/audit";
+import { withApiErrors } from "@/lib/api-error";
 
-export async function POST(req: NextRequest) {
+export const POST = withApiErrors(async function POST(req: NextRequest) {
   const { email } = await req.json();
   if (!email) return NextResponse.json({ ok: true }); // silent
   const limited = checkRateLimit(rateLimitKey(req, "forgot-password", email), 5, 15 * 60 * 1000);
@@ -49,4 +50,4 @@ export async function POST(req: NextRequest) {
     await captureCaughtError("auth.forgot-password", error, { metadata: { email } });
     return NextResponse.json({ ok: true });
   }
-}
+});

@@ -4,10 +4,11 @@ import prisma from "@/lib/prisma";
 import { fullTestEditorFieldIssues } from "@/contracts/full-test";
 import { validateFullPracticeTestStructure } from "@/lib/full-test-validation";
 import { FULL_TEST_MODULES } from "@/lib/full-test-modules";
+import { ForbiddenError, ValidationError, withApiErrors } from "@/lib/api-error";
 
-export async function POST(req: NextRequest) {
+export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { name, status, moduleQuestionIds, reviewEnabled, breakMinutes } = await req.json();
   const targetStatus = status ?? "DRAFT";
@@ -38,7 +39,7 @@ export async function POST(req: NextRequest) {
     }),
   );
   if (validation.errors.length > 0) {
-    return NextResponse.json({ error: "Validation failed.", errors: [...new Set(validation.errors)], warnings: validation.warnings }, { status: 400 });
+    return new ValidationError("Validation failed.", [...new Set(validation.errors)], { extra: { warnings: validation.warnings } }).toResponse();
   }
 
   const resolvedBreak =
@@ -69,4 +70,4 @@ export async function POST(req: NextRequest) {
   });
 
   return NextResponse.json({ test, warnings: validation.warnings });
-}
+});

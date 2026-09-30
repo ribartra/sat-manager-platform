@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireApprovedSession } from "@/lib/rbac";
+import { UnauthorizedError, withApiErrors } from "@/lib/api-error";
 
 // GET /api/notifications — last 50 for current user
-export async function GET() {
+export const GET = withApiErrors(async function GET() {
   const session = await requireApprovedSession();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session) return new UnauthorizedError("Unauthorized").toResponse();
 
   const notifications = await prisma.notification.findMany({
     where: { userId: session.user.id },
@@ -14,12 +15,12 @@ export async function GET() {
   });
 
   return NextResponse.json({ notifications });
-}
+});
 
 // PATCH /api/notifications — mark all unread as read
-export async function PATCH() {
+export const PATCH = withApiErrors(async function PATCH() {
   const session = await requireApprovedSession();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session) return new UnauthorizedError("Unauthorized").toResponse();
 
   await prisma.notification.updateMany({
     where: { userId: session.user.id, readAt: null },
@@ -27,4 +28,4 @@ export async function PATCH() {
   });
 
   return NextResponse.json({ ok: true });
-}
+});

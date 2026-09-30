@@ -3,18 +3,19 @@ import { randomUUID } from "crypto";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { normalizeIngestDifficulty } from "@/lib/ingest-promotion";
+import { ApiError, BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
   params: Promise<{ batchId: string }>;
 }
 
-export async function POST(req: NextRequest, { params }: RouteContext) {
+export const POST = withApiErrors(async function POST(req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { batchId } = await params;
   const body = (await req.json().catch(() => ({}))) as { sourceFileId?: string; allowPartial?: boolean };
-  if (!body.sourceFileId) return NextResponse.json({ error: "sourceFileId is required." }, { status: 400 });
+  if (!body.sourceFileId) return new BadRequestError("sourceFileId is required.").toResponse();
 
   const [sourceFile, candidates] = await Promise.all([
     prisma.ingestSourceFile.findFirst({ where: { id: body.sourceFileId, batchId } }),
@@ -29,25 +30,21 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       orderBy: [{ questionNumber: "asc" }, { createdAt: "asc" }],
     }),
   ]);
-  if (!sourceFile) return NextResponse.json({ error: "Source file not found." }, { status: 404 });
-  if (candidates.length === 0) return NextResponse.json({ error: "No promoted questions found for this source file." }, { status: 400 });
+  if (!sourceFile) return new NotFoundError("Source file not found.").toResponse();
+  if (candidates.length === 0) return new BadRequestError("No promoted questions found for this source file.").toResponse();
   const totalSourceCandidates = await prisma.ingestQuestionCandidate.count({
     where: { batchId, sourceFileId: sourceFile.id, contentType: "PRACTICE_SET", stem: { not: null } },
   });
   const partial = candidates.length < totalSourceCandidates;
   if (partial && !body.allowPartial) {
-    return NextResponse.json({
-      error: "This Practice Set is partial. Confirm allowPartial to create/update a draft with promoted questions only.",
-      promoted: candidates.length,
-      total: totalSourceCandidates,
-    }, { status: 409 });
+    return ApiError.fromStatus(409, "This Practice Set is partial. Confirm allowPartial to create/update a draft with promoted questions only.", { promoted: candidates.length, total: totalSourceCandidates }).toResponse();
   }
 
   const questionIds = candidates.map((candidate) => candidate.officialQuestionId).filter((id): id is string => Boolean(id));
   const questions = await prisma.question.findMany({ where: { id: { in: questionIds } }, select: { id: true, topicId: true } });
-  if (questions.length !== questionIds.length) return NextResponse.json({ error: "Some promoted questions no longer exist." }, { status: 400 });
+  if (questions.length !== questionIds.length) return new BadRequestError("Some promoted questions no longer exist.").toResponse();
   const topicIds = new Set(questions.map((question) => question.topicId));
-  if (topicIds.size !== 1) return NextResponse.json({ error: "Practice Set questions must resolve to a single topic." }, { status: 400 });
+  if (topicIds.size !== 1) return new BadRequestError("Practice Set questions must resolve to a single topic.").toResponse();
 
   const groupKey = `practice-set:${sourceFile.id}`;
   const name = [
@@ -112,4 +109,4 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
   });
 
   return NextResponse.json({ practiceSet, questionCount: questionIds.length, totalSourceCandidates, partial });
-}
+});

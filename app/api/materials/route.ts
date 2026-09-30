@@ -2,19 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { getFeatureSetting } from "@/lib/app-settings";
+import { BadRequestError, ForbiddenError, withApiErrors } from "@/lib/api-error";
 
-export async function POST(req: NextRequest) {
+export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
   if (!session) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return new ForbiddenError("Forbidden").toResponse();
   }
   if (!(await getFeatureSetting("MATERIALS_MODULE"))) {
-    return NextResponse.json({ error: "Materials module is disabled." }, { status: 403 });
+    return new ForbiddenError("Materials module is disabled.").toResponse();
   }
 
   const { title, description, body, url, topicId, status } = await req.json();
   if (!title || typeof title !== "string") {
-    return NextResponse.json({ error: "Title is required" }, { status: 400 });
+    return new BadRequestError("Title is required").toResponse();
   }
 
   const material = await prisma.studyMaterial.create({
@@ -39,4 +40,4 @@ export async function POST(req: NextRequest) {
   });
 
   return NextResponse.json({ material });
-}
+});

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
+import { BadRequestError, ConflictError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
   params: Promise<{ groupId: string }>;
@@ -17,13 +18,13 @@ async function requireGroupAccess() {
   return session;
 }
 
-export async function PATCH(req: NextRequest, { params }: RouteContext) {
+export const PATCH = withApiErrors(async function PATCH(req: NextRequest, { params }: RouteContext) {
   const session = await requireGroupAccess();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { groupId } = await params;
   const body = (await req.json().catch(() => ({}))) as { name?: string; schedule?: string | null };
-  if (body.name !== undefined && !body.name.trim()) return NextResponse.json({ error: "Group name is required." }, { status: 400 });
+  if (body.name !== undefined && !body.name.trim()) return new BadRequestError("Group name is required.").toResponse();
 
   const group = await prisma.group.update({
     where: { id: groupId },
@@ -44,19 +45,19 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
   });
 
   return NextResponse.json(group);
-}
+});
 
-export async function DELETE(_req: NextRequest, { params }: RouteContext) {
+export const DELETE = withApiErrors(async function DELETE(_req: NextRequest, { params }: RouteContext) {
   const session = await requireGroupAccess();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { groupId } = await params;
   const [group, assignments] = await Promise.all([
     prisma.group.findUnique({ where: { id: groupId } }),
     prisma.groupAssignment.count({ where: { groupId } }),
   ]);
-  if (!group) return NextResponse.json({ error: "Group not found." }, { status: 404 });
-  if (assignments > 0) return NextResponse.json({ error: "Remove group assignments before deleting this group." }, { status: 409 });
+  if (!group) return new NotFoundError("Group not found.").toResponse();
+  if (assignments > 0) return new ConflictError("Remove group assignments before deleting this group.").toResponse();
 
   await prisma.group.delete({ where: { id: groupId } });
   await prisma.auditLog.create({
@@ -70,4 +71,4 @@ export async function DELETE(_req: NextRequest, { params }: RouteContext) {
   });
 
   return NextResponse.json({ ok: true });
-}
+});

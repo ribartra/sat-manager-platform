@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { notifyMany } from "@/lib/notify";
+import { ApiError, BadRequestError, ConflictError, ForbiddenError, NotFoundError, UnauthorizedError, withApiErrors } from "@/lib/api-error";
 
 function ageInYears(birthDate: Date): number {
   const now = new Date();
@@ -13,21 +14,18 @@ function ageInYears(birthDate: Date): number {
 }
 
 // POST /api/programs/[id]/enroll — student requests enrollment
-export async function POST(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export const POST = withApiErrors(async function POST(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session) return new UnauthorizedError("Unauthorized").toResponse();
 
   const enabled = await getFeatureSetting("STUDENT_SELF_ENROLLMENT");
   if (!enabled) {
     await params;
-    return NextResponse.json(
-      { error: "Student enrollment requests are disabled. A teacher or administrator must enroll the student." },
-      { status: 410 }
-    );
+    return ApiError.fromStatus(410, "Student enrollment requests are disabled. A teacher or administrator must enroll the student.").toResponse();
   }
 
   if (!["STUDENT", "PARENT"].includes(session.user.role)) {
-    return NextResponse.json({ error: "Only students or parents can request enrollment." }, { status: 403 });
+    return new ForbiddenError("Only students or parents can request enrollment.").toResponse();
   }
 
   const { id } = await params;
@@ -42,7 +40,7 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
       },
     },
   });
-  if (!program) return NextResponse.json({ error: "Program not found." }, { status: 404 });
+  if (!program) return new NotFoundError("Program not found.").toResponse();
 
   const now = new Date();
   const available =
@@ -52,7 +50,7 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
     (program.endDate === null || program.endDate > now);
 
   if (!available) {
-    return NextResponse.json({ error: "This program is not currently available for enrollment." }, { status: 400 });
+    return new BadRequestError("This program is not currently available for enrollment.").toResponse();
   }
 
   const student = await prisma.user.findUnique({
@@ -74,10 +72,10 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
 
   if (existing) {
     if (existing.status === "APPROVED" && existing.active) {
-      return NextResponse.json({ error: "You are already enrolled in this program." }, { status: 409 });
+      return new ConflictError("You are already enrolled in this program.").toResponse();
     }
     if (existing.status === "PENDING") {
-      return NextResponse.json({ error: "You already have a pending enrollment request." }, { status: 409 });
+      return new ConflictError("You already have a pending enrollment request.").toResponse();
     }
     await prisma.programEnrollment.update({
       where: { programId_studentId: { programId: id, studentId } },
@@ -124,4 +122,4 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
     status: "PENDING",
     requiresParentApproval: parentApprovalStatus === "PENDING",
   });
-}
+});

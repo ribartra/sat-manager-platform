@@ -3,22 +3,23 @@ import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { notifyUser } from "@/lib/notifications";
 import { teacherProgramEnrollmentScope } from "@/lib/program-scope";
+import { BadRequestError, ConflictError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
   params: Promise<{ requestId: string }>;
 }
 
-export async function PUT(req: NextRequest, { params }: RouteContext) {
+export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
   if (!session) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return new ForbiddenError("Forbidden").toResponse();
   }
 
   const { requestId } = await params;
   const { status } = await req.json();
 
   if (!["APPROVED", "DENIED"].includes(status)) {
-    return NextResponse.json({ error: "Invalid unlock request status." }, { status: 400 });
+    return new BadRequestError("Invalid unlock request status.").toResponse();
   }
 
   const scope =
@@ -31,10 +32,10 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
     include: { assignment: { include: { practiceSet: true } } },
   });
   if (!existing) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return new NotFoundError("Not found").toResponse();
   }
   if (existing.status !== "PENDING") {
-    return NextResponse.json({ error: "Unlock request already resolved." }, { status: 409 });
+    return new ConflictError("Unlock request already resolved.").toResponse();
   }
 
   const request = await prisma.unlockRequest.update({
@@ -64,4 +65,4 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
   });
 
   return NextResponse.json(request);
-}
+});

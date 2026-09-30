@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { getFeatureSetting } from "@/lib/app-settings";
+import { ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
   params: Promise<{ materialId: string }>;
@@ -9,15 +10,15 @@ interface RouteContext {
 
 async function requireMaterialsEnabled() {
   if (!(await getFeatureSetting("MATERIALS_MODULE"))) {
-    return NextResponse.json({ error: "Materials module is disabled." }, { status: 403 });
+    return new ForbiddenError("Materials module is disabled.").toResponse();
   }
   return null;
 }
 
-export async function PATCH(req: NextRequest, { params }: RouteContext) {
+export const PATCH = withApiErrors(async function PATCH(req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
   if (!session) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return new ForbiddenError("Forbidden").toResponse();
   }
   const disabled = await requireMaterialsEnabled();
   if (disabled) return disabled;
@@ -48,19 +49,19 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
   });
 
   return NextResponse.json({ material });
-}
+});
 
-export async function DELETE(_req: NextRequest, { params }: RouteContext) {
+export const DELETE = withApiErrors(async function DELETE(_req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
   if (!session) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return new ForbiddenError("Forbidden").toResponse();
   }
   const disabled = await requireMaterialsEnabled();
   if (disabled) return disabled;
 
   const { materialId } = await params;
   const material = await prisma.studyMaterial.findUnique({ where: { id: materialId } });
-  if (!material) return NextResponse.json({ error: "Study material not found." }, { status: 404 });
+  if (!material) return new NotFoundError("Study material not found.").toResponse();
 
   await prisma.studyMaterial.delete({ where: { id: materialId } });
   await prisma.auditLog.create({
@@ -74,4 +75,4 @@ export async function DELETE(_req: NextRequest, { params }: RouteContext) {
   });
 
   return NextResponse.json({ ok: true });
-}
+});

@@ -3,17 +3,15 @@ import prisma from "@/lib/prisma";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { notifyTeachers } from "@/lib/notifications";
 import { requireApprovedSession } from "@/lib/rbac";
+import { ApiError, NotFoundError, UnauthorizedError, withApiErrors } from "@/lib/api-error";
 
-export async function POST(req: NextRequest) {
+export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await requireApprovedSession();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session) return new UnauthorizedError("Unauthorized").toResponse();
 
   const enabled = await getFeatureSetting("STUDENT_UNLOCK_REQUESTS");
   if (!enabled) {
-    return NextResponse.json(
-      { error: "Unlock requests are disabled. Practice access is controlled by scoring rules and teachers." },
-      { status: 410 }
-    );
+    return ApiError.fromStatus(410, "Unlock requests are disabled. Practice access is controlled by scoring rules and teachers.").toResponse();
   }
 
   const { assignmentId } = await req.json();
@@ -21,7 +19,7 @@ export async function POST(req: NextRequest) {
     where: { id: assignmentId, studentId: session.user.id },
     include: { practiceSet: true },
   });
-  if (!assignment) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!assignment) return new NotFoundError("Not found").toResponse();
 
   const existing = await prisma.unlockRequest.findFirst({
     where: { assignmentId, studentId: session.user.id, status: "PENDING" },
@@ -38,4 +36,4 @@ export async function POST(req: NextRequest) {
   );
 
   return NextResponse.json(request);
-}
+});

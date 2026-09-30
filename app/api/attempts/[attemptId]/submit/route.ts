@@ -15,10 +15,11 @@ import { isAnswerCorrect } from "@/lib/answer-grading";
 import { resolveQuestionType } from "@/lib/question-type";
 import { scorePracticeSetAttempt } from "@/lib/practice-set-scoring";
 import { writeAudit } from "@/lib/audit";
+import { NotFoundError, UnauthorizedError, withApiErrors } from "@/lib/api-error";
 
-export async function POST(req: NextRequest, { params }: { params: Promise<{ attemptId: string }> }) {
+export const POST = withApiErrors(async function POST(req: NextRequest, { params }: { params: Promise<{ attemptId: string }> }) {
   const session = await requireApprovedSession();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session) return new UnauthorizedError("Unauthorized").toResponse();
 
   const { attemptId } = await params;
   const { answers: submittedAnswers, totalTime, timeSpentByQuestion, markedQuestionIds, notes, eliminatedOptions } = await req.json();
@@ -29,7 +30,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ att
       answers: true,
     },
   });
-  if (!attempt) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!attempt) return new NotFoundError("Not found").toResponse();
 
   // Get the practice set questions to check correct answers
   const psQuestions = await prisma.practiceSetQuestion.findMany({
@@ -212,4 +213,4 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ att
   });
 
   return NextResponse.json({ ok: true });
-}
+});

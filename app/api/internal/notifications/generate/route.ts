@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { internalIngestToken } from "@/lib/internal-ingest";
 import { generateDeadlineNotifications } from "@/lib/deadline-notifications";
 import { pruneAuditLog } from "@/lib/audit-retention";
+import { UnauthorizedError, withApiErrors } from "@/lib/api-error";
 
 // Scheduled deadline reminders (RF-42). Called hourly by the VM cron from inside the web
 // container (http://localhost:3000), authenticated with the internal service token. Caddy does
@@ -18,9 +19,9 @@ function authorized(req: Request) {
   return provided.length === expected.length && timingSafeEqual(provided, expected);
 }
 
-export async function POST(req: Request) {
-  if (!authorized(req)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+export const POST = withApiErrors(async function POST(req: Request) {
+  if (!authorized(req)) return new UnauthorizedError("Unauthorized").toResponse();
   const summary = { ...(await generateDeadlineNotifications()), auditPruned: await pruneAuditLog() };
   console.info(JSON.stringify({ level: "info", event: "notifications.generated", ...summary }));
   return NextResponse.json(summary);
-}
+});

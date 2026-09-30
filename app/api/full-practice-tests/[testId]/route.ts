@@ -3,6 +3,7 @@ import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { fullTestEditorFieldIssues } from "@/contracts/full-test";
 import { validateFullPracticeTestStructure } from "@/lib/full-test-validation";
+import { BadRequestError, ConflictError, ForbiddenError, NotFoundError, ValidationError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
   params: Promise<{ testId: string }>;
@@ -26,9 +27,9 @@ async function validateStructureForStatus(testId: string, status: string) {
   return validateFullPracticeTestStructure({ status, moduleQuestionIds, questionSections });
 }
 
-export async function PATCH(req: NextRequest, { params }: RouteContext) {
+export const PATCH = withApiErrors(async function PATCH(req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { testId } = await params;
   const body = (await req.json().catch(() => ({}))) as {
@@ -38,30 +39,30 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
     breakMinutes?: number;
   };
   const test = await prisma.fullPracticeTest.findUnique({ where: { id: testId } });
-  if (!test) return NextResponse.json({ error: "Exam not found." }, { status: 404 });
+  if (!test) return new NotFoundError("Exam not found.").toResponse();
 
   const data: { status?: string; name?: string; reviewEnabled?: boolean; breakMinutes?: number } = {};
   if (body.status !== undefined) {
-    if (!allowedStatuses.has(body.status)) return NextResponse.json({ error: "Invalid status." }, { status: 400 });
+    if (!allowedStatuses.has(body.status)) return new BadRequestError("Invalid status.").toResponse();
     const validation = await validateStructureForStatus(testId, body.status);
     if (validation.errors.length > 0) {
-      return NextResponse.json({ error: "Validation failed.", errors: validation.errors, warnings: validation.warnings }, { status: 400 });
+      return new ValidationError("Validation failed.", validation.errors, { extra: { warnings: validation.warnings } }).toResponse();
     }
     data.status = body.status;
   }
   if (body.name !== undefined) {
     const name = body.name.trim();
-    if (!name) return NextResponse.json({ error: "Name is required." }, { status: 400 });
+    if (!name) return new BadRequestError("Name is required.").toResponse();
     data.name = name;
   }
   if (body.reviewEnabled !== undefined) data.reviewEnabled = Boolean(body.reviewEnabled);
   if (body.breakMinutes !== undefined) {
     if (!Number.isInteger(body.breakMinutes) || body.breakMinutes < 0) {
-      return NextResponse.json({ error: "breakMinutes must be a non-negative integer." }, { status: 400 });
+      return new BadRequestError("breakMinutes must be a non-negative integer.").toResponse();
     }
     data.breakMinutes = body.breakMinutes;
   }
-  if (Object.keys(data).length === 0) return NextResponse.json({ error: "No changes provided." }, { status: 400 });
+  if (Object.keys(data).length === 0) return new BadRequestError("No changes provided.").toResponse();
 
   const updated = await prisma.fullPracticeTest.update({ where: { id: testId }, data });
   await prisma.auditLog.create({
@@ -75,17 +76,17 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
   });
 
   return NextResponse.json({ test: updated });
-}
+});
 
-export async function PUT(req: NextRequest, { params }: RouteContext) {
+export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { testId } = await params;
   const { name, status, moduleQuestionIds, reviewEnabled, breakMinutes } = await req.json();
   const targetStatus = status ?? "DRAFT";
   const previous = await prisma.fullPracticeTest.findUnique({ where: { id: testId } });
-  if (!previous) return NextResponse.json({ error: "Exam not found." }, { status: 404 });
+  if (!previous) return new NotFoundError("Exam not found.").toResponse();
 
   const normalizedModules = Array.from({ length: 4 }, (_, index) => (moduleQuestionIds?.[index] ?? []) as string[]);
   const questionIds = [...new Set(normalizedModules.flat())];
@@ -108,7 +109,7 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
     }),
   );
   if (validation.errors.length > 0) {
-    return NextResponse.json({ error: "Validation failed.", errors: [...new Set(validation.errors)], warnings: validation.warnings }, { status: 400 });
+    return new ValidationError("Validation failed.", [...new Set(validation.errors)], { extra: { warnings: validation.warnings } }).toResponse();
   }
 
   const resolvedBreak =
@@ -146,11 +147,11 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
   });
 
   return NextResponse.json({ ok: true, warnings: validation.warnings });
-}
+});
 
-export async function DELETE(_req: NextRequest, { params }: RouteContext) {
+export const DELETE = withApiErrors(async function DELETE(_req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { testId } = await params;
   const [test, assignments, attempts] = await Promise.all([
@@ -158,9 +159,9 @@ export async function DELETE(_req: NextRequest, { params }: RouteContext) {
     prisma.fullPracticeTestAssignment.count({ where: { testId } }),
     prisma.fullPracticeTestAttempt.count({ where: { testId } }),
   ]);
-  if (!test) return NextResponse.json({ error: "Exam not found." }, { status: 404 });
+  if (!test) return new NotFoundError("Exam not found.").toResponse();
   if (assignments > 0 || attempts > 0) {
-    return NextResponse.json({ error: "Archive this exam instead. Exams with assignments or attempts cannot be deleted." }, { status: 409 });
+    return new ConflictError("Archive this exam instead. Exams with assignments or attempts cannot be deleted.").toResponse();
   }
 
   await prisma.fullPracticeTest.delete({ where: { id: testId } });
@@ -175,4 +176,4 @@ export async function DELETE(_req: NextRequest, { params }: RouteContext) {
   });
 
   return NextResponse.json({ ok: true });
-}
+});

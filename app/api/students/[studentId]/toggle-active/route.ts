@@ -3,16 +3,17 @@ import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { forgetSessionState } from "@/lib/session-state";
 import { studentAccessWhereFor } from "@/lib/program-scope";
+import { ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
-export async function POST(req: NextRequest, { params }: { params: Promise<{ studentId: string }> }) {
+export const POST = withApiErrors(async function POST(req: NextRequest, { params }: { params: Promise<{ studentId: string }> }) {
   const session = await requireTeacherOrAdmin();
   if (!session) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return new ForbiddenError("Forbidden").toResponse();
   }
 
   const { studentId } = await params;
   const user = await prisma.user.findFirst({ where: { id: studentId, ...studentAccessWhereFor(session.user) } });
-  if (!user) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!user) return new NotFoundError("Not found").toResponse();
 
   const updated = await prisma.user.update({
     where: { id: studentId },
@@ -31,4 +32,4 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ stu
   });
 
   return NextResponse.json({ active: updated.active });
-}
+});

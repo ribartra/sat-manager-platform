@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
+import { ConflictError, ForbiddenError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
   params: Promise<{ subskillId: string }>;
 }
 
-export async function PUT(req: NextRequest, { params }: RouteContext) {
+export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
   const { subskillId } = await params;
   const { name } = await req.json();
   const subskill = await prisma.subskill.update({ where: { id: subskillId }, data: { name } });
@@ -28,15 +29,15 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
     },
   });
   return NextResponse.json(subskill);
-}
+});
 
-export async function DELETE(_req: NextRequest, { params }: RouteContext) {
+export const DELETE = withApiErrors(async function DELETE(_req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
   const { subskillId } = await params;
   const questionCount = await prisma.question.count({ where: { subskillId } });
   if (questionCount > 0) {
-    return NextResponse.json({ error: "Subskills with questions cannot be deleted." }, { status: 409 });
+    return new ConflictError("Subskills with questions cannot be deleted.").toResponse();
   }
   const subskill = await prisma.subskill.delete({ where: { id: subskillId } });
   if (subskill.taxonomyNodeId) {
@@ -54,4 +55,4 @@ export async function DELETE(_req: NextRequest, { params }: RouteContext) {
     },
   });
   return NextResponse.json({ ok: true });
-}
+});

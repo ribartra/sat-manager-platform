@@ -11,22 +11,23 @@ import {
 } from "@/lib/parent-access";
 import { hashPublicToken, newPublicToken } from "@/lib/token-security";
 import { captureCaughtError, writeAudit } from "@/lib/audit";
+import { BadRequestError, ForbiddenError, InternalServerError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
-export async function POST(req: NextRequest) {
+export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   try {
     const { studentId, parentId, areas } = await req.json();
     if (!studentId || !parentId) {
-      return NextResponse.json({ error: "Student and parent are required." }, { status: 400 });
+      return new BadRequestError("Student and parent are required.").toResponse();
     }
 
     const student = await prisma.user.findFirst({
       where: { id: studentId, ...studentAccessWhereFor(session.user) },
       select: { id: true, name: true },
     });
-    if (!student) return NextResponse.json({ error: "Student not found." }, { status: 404 });
+    if (!student) return new NotFoundError("Student not found.").toResponse();
 
     // Only allow sharing with a parent already linked to this student.
     const link = await prisma.parentStudent.findUnique({
@@ -34,10 +35,10 @@ export async function POST(req: NextRequest) {
       include: { parent: { select: { id: true, name: true, email: true } } },
     });
     if (!link) {
-      return NextResponse.json({ error: "That parent is not associated with this student." }, { status: 404 });
+      return new NotFoundError("That parent is not associated with this student.").toResponse();
     }
     if (!link.parent.email) {
-      return NextResponse.json({ error: "The associated parent has no email on file." }, { status: 400 });
+      return new BadRequestError("The associated parent has no email on file.").toResponse();
     }
 
     const areasCsv = normalizeAreasInput(areas);
@@ -98,6 +99,6 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     await captureCaughtError("parents.access-links", error, { userId: session.user.id });
-    return NextResponse.json({ error: "Failed to create parent report link." }, { status: 500 });
+    return new InternalServerError("Failed to create parent report link.").toResponse();
   }
-}
+});
