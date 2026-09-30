@@ -4,6 +4,8 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { notify } from "@/lib/notify";
 import { captureCaughtError, writeAudit } from "@/lib/audit";
+import { passwordPolicyError } from "@/lib/password-policy";
+import { revokeUserSessions } from "@/lib/session-state";
 
 export async function POST(req: NextRequest) {
   const session = await auth();
@@ -11,7 +13,8 @@ export async function POST(req: NextRequest) {
 
   try {
     const { currentPassword, newPassword } = await req.json();
-    if (!currentPassword || !newPassword || newPassword.length < 6) {
+    const policyError = passwordPolicyError(newPassword, session.user.email);
+    if (!currentPassword || policyError) {
       await writeAudit({
         userId: session.user.id,
         action: "PASSWORD_CHANGE_FAILED",
@@ -20,7 +23,7 @@ export async function POST(req: NextRequest) {
         outcome: "failure",
         metadata: { reason: "validation" },
       });
-      return NextResponse.json({ error: "New password must be at least 6 characters." }, { status: 400 });
+      return NextResponse.json({ error: policyError ?? "Current password is required." }, { status: 400 });
     }
 
     const user = await prisma.user.findUnique({ where: { id: session.user.id } });
@@ -51,6 +54,8 @@ export async function POST(req: NextRequest) {
 
     const passwordHash = await bcrypt.hash(newPassword, 10);
     await prisma.user.update({ where: { id: user.id }, data: { passwordHash } });
+    // Sign out every other device; the client signs this one back in with the new password.
+    await revokeUserSessions(user.id);
 
     await writeAudit({
       userId: user.id,
@@ -65,7 +70,7 @@ export async function POST(req: NextRequest) {
       body: "Your password was updated successfully. If you did not make this change, contact support immediately.",
     }).catch(() => {});
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true, email: user.email, reauthenticate: true });
   } catch (error) {
     await captureCaughtError("auth.change-password", error, { userId: session.user.id });
     return NextResponse.json({ error: "Password change failed." }, { status: 500 });

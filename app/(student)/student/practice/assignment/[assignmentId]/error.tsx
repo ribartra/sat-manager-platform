@@ -23,11 +23,11 @@ export default function PracticeAssignmentError({ reset }: { error: Error & { di
 
   return (
     <main className="mx-auto flex min-h-[50vh] max-w-xl flex-col items-center justify-center px-4 py-12 text-center">
-      <h1 className="text-lg font-semibold text-gray-900">No se pudo cargar este Practice Set</h1>
+      <h1 className="text-lg font-semibold text-gray-900">We couldn&apos;t load this Practice Set</h1>
       <p className="mt-2 text-sm text-gray-500">
         {retrying
-          ? "Estamos reintentando la conexión..."
-          : "El contenido no está bloqueado. Puede tratarse de una interrupción temporal del servicio."}
+          ? "Retrying the connection…"
+          : "The content is not locked. This is usually a brief service interruption."}
       </p>
       <div className="mt-5 flex items-center gap-3">
         <button
@@ -39,10 +39,10 @@ export default function PracticeAssignmentError({ reset }: { error: Error & { di
           }}
           className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
         >
-          Reintentar
+          Try again
         </button>
         <Link href="/student/practice-sets" className="text-sm font-medium text-blue-600 hover:underline">
-          Volver a Practice Sets
+          Back to Practice Sets
         </Link>
       </div>
     </main>

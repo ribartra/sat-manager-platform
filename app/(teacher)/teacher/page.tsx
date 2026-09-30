@@ -109,7 +109,8 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
           },
           orderBy: { submittedAt: "desc" },
           include: {
-            answers: true,
+            // Only the correctness flag is used here; question snapshots stay in the database.
+            answers: { select: { isCorrect: true } },
             assignment: { include: { practiceSet: { include: { topic: true } } } },
           },
         },
@@ -126,7 +127,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
             ...(area === "mocks" ? {} : { id: "__no_full_test_attempt__" }),
           },
           orderBy: { submittedAt: "desc" },
-          include: { answers: true, test: { select: { name: true } } },
+          include: { answers: { select: { isCorrect: true } }, test: { select: { name: true } } },
         },
         fullTestAssignments: {
           where: {

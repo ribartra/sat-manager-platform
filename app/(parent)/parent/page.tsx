@@ -14,7 +14,7 @@ export default async function ParentDashboardPage() {
         include: {
           attempts: {
             where: { status: "SUBMITTED" },
-            include: { answers: true },
+            include: { answers: { select: { isCorrect: true } } },
             orderBy: { submittedAt: "desc" },
           },
         },

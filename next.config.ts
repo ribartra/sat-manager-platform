@@ -20,7 +20,9 @@ const nextConfig: NextConfig = {
       "img-src 'self' data: blob:",
       "font-src 'self' data:",
       "style-src 'self' 'unsafe-inline'",
-      "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+      // 'unsafe-eval' is only needed by the dev server (HMR/React refresh). 'unsafe-inline' stays:
+      // Next's inline bootstrap scripts would otherwise need a per-request nonce (dynamic rendering).
+      `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "production" ? "" : " 'unsafe-eval'"}`,
       "connect-src 'self'",
       "form-action 'self'",
     ].join("; ");
@@ -53,14 +55,17 @@ const nextConfig: NextConfig = {
     "@react-pdf/renderer",
   ],
   async rewrites() {
-    // Serve question media via Node handler (GCS + disk fallback). Public/ still
-    // wins when a file exists on disk; GCS-only objects hit this route.
-    return [
-      {
-        source: "/uploads/questions/:path*",
-        destination: "/api/media/questions/:path*",
-      },
-    ];
+    // Question media and avatars go through Node handlers (session check; GCS + disk fallback).
+    // beforeFiles: these run BEFORE public/ is checked, so files on disk under
+    // public/uploads/{questions,avatars} are never served statically without a session.
+    return {
+      beforeFiles: [
+        { source: "/uploads/questions/:path*", destination: "/api/media/questions/:path*" },
+        { source: "/uploads/avatars/:file", destination: "/api/media/avatars/:file" },
+      ],
+      afterFiles: [],
+      fallback: [],
+    };
   },
 };
 

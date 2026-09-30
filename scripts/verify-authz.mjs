@@ -35,6 +35,26 @@ const checks = [
     label: "Full test assignment blocks students outside scope",
   },
   {
+    file: "app/api/attempts/[attemptId]/check/route.ts",
+    requires: ["requireApprovedSession", "studentId: session.user.id", "status: \"IN_PROGRESS\"", "feedbackMode !== \"IMMEDIATE\"", "checkedAt"],
+    label: "Immediate-feedback check graded on the server for the student's own in-progress attempt",
+  },
+  {
+    file: "app/(student)/student/practice/practice-player-page.tsx",
+    requires: ["...(previewMode", "savedChecks"],
+    label: "Answer key reaches the browser only in teacher preview (immediate feedback via server check)",
+  },
+  {
+    file: "lib/auth.ts",
+    requires: ["maxAge: SESSION_MAX_AGE_SECONDS", "loadSessionState", "state.sessionVersion", "!state.active", "return null"],
+    label: "JWT sessions expire in 7 days and end on deactivation, role change or password change",
+  },
+  {
+    file: "app/api/media/questions/[...path]/route.ts",
+    requires: ["requireApprovedSession", "private"],
+    label: "Question images require an approved session and are not publicly cached",
+  },
+  {
     file: "app/api/attempts/[attemptId]/submit/route.ts",
     requires: ["requireApprovedSession", "studentId: session.user.id", "status: \"IN_PROGRESS\""],
     label: "Student submit limited to own in-progress attempt",

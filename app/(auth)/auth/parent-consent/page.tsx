@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/form";
 import { ErrorState, FormSection, LoadingState } from "@/components/sat";
 import { parentConsentSchema, type ParentConsentInput } from "@/contracts/auth";
+import { LegalLinks } from "@/components/legal/legal-page";
 
 interface ConsentInfo {
   studentName: string;
@@ -154,6 +155,8 @@ export default function ParentConsentPage() {
           </Form>
         )}
       </Card>
+      <p className="mt-4 text-center text-xs text-gray-500">By authorizing you accept the Terms of Use and the Privacy Policy.</p>
+      <LegalLinks className="mt-1" />
     </div>
   );
 }

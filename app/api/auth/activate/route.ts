@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { checkRateLimit, rateLimitKey, rateLimitResponse } from "@/lib/rate-limit";
 import { hashPublicToken } from "@/lib/token-security";
 import { captureCaughtError, writeAudit } from "@/lib/audit";
+import { passwordPolicyError } from "@/lib/password-policy";
 
 export async function POST(req: NextRequest) {
   const { token, password } = await req.json();
@@ -32,6 +33,9 @@ export async function POST(req: NextRequest) {
     if (!invite.tokenHash) {
       await prisma.inviteToken.update({ where: { id: invite.id }, data: { tokenHash, token: `hashed:${tokenHash}` } });
     }
+
+    const policyError = passwordPolicyError(password, invite.email);
+    if (policyError) return NextResponse.json({ error: policyError }, { status: 400 });
 
     const hash = await bcrypt.hash(password, 10);
 

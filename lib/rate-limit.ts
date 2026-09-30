@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+// In-memory buckets: fine for the single web instance this platform runs (RNF-20).
 type Bucket = {
   count: number;
   resetAt: number;
@@ -7,12 +8,17 @@ type Bucket = {
 
 const buckets = new Map<string, Bucket>();
 
-function clientIp(req: NextRequest) {
+/** Client IP as set by the reverse proxy (Caddy replaces any X-Forwarded-For the client sends). */
+export function clientIpFromHeaders(headers?: Headers | null) {
   return (
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    req.headers.get("x-real-ip") ||
+    headers?.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    headers?.get("x-real-ip") ||
     "unknown"
   );
+}
+
+function clientIp(req: NextRequest) {
+  return clientIpFromHeaders(req.headers);
 }
 
 export function rateLimitKey(req: NextRequest, scope: string, subject?: string | null) {

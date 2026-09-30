@@ -17,7 +17,8 @@ import { OfflineBanner, SaveIndicator, type SaveStatus } from "@/components/sat"
 import { clearBuffer, readBuffer, sendKeepalive, useOnlineStatus, usePageHideFlush, useSaveQueue, writeBuffer } from "@/lib/player-persistence";
 import { exitPlayerOnAuthLoss, isAuthFailureStatus } from "@/lib/player-session-exit";
 import { fetchWithTransientRetry } from "@/lib/transient-fetch";
-import { isAnswerCorrect } from "@/lib/answer-grading";
+import { formatCorrectAnswer, isAnswerCorrect } from "@/lib/answer-grading";
+import type { CheckResult } from "@/lib/immediate-check";
 import { questionResponseLabel, resolveQuestionType } from "@/lib/question-type";
 
 interface Option { label: string; text: string; imageUrl?: string | null }
@@ -42,6 +43,8 @@ interface PlayerProps {
   savedMarked: string[];
   savedNotes: Record<string, string>;
   savedEliminated: Record<string, string[]>;
+  /** Immediate feedback results for questions already checked (graded on the server). */
+  savedChecks?: Record<string, CheckResult>;
   savedQuestion: number;
   savedTime: number;
   savedTimeSpent: Record<string, number>;
@@ -91,6 +94,7 @@ export function PracticeSetPlayer({
   savedMarked,
   savedNotes,
   savedEliminated,
+  savedChecks = {},
   savedQuestion,
   savedTime,
   savedTimeSpent,
@@ -111,7 +115,9 @@ export function PracticeSetPlayer({
   const [eliminated, setEliminated] = useState<Record<string, Set<string>>>(
     Object.fromEntries(Object.entries(savedEliminated).map(([id, labels]) => [id, new Set(labels)]))
   );
-  const [checked, setChecked] = useState<Record<string, { isCorrect: boolean }>>({});
+  const [checked, setChecked] = useState<Record<string, CheckResult>>(savedChecks);
+  const [checking, setChecking] = useState(false);
+  const [checkError, setCheckError] = useState("");
   const [elapsed, setElapsed] = useState(savedTime);
   const [showNav, setShowNav] = useState(false);
   const [saving, setSaving] = useState<SaveStatus>("idle");
@@ -257,12 +263,47 @@ export function PracticeSetPlayer({
     saveTimeout.current = setTimeout(() => saveProgress(newAnswers, current), 1500);
   };
 
-  const handleCheck = () => {
-    if (!immediateFeedback || !question) return;
+  const handleCheck = async () => {
+    if (!immediateFeedback || !question || checking) return;
     const selected = answers[question.id];
     if (!selected) return;
-    const ok = isAnswerCorrect(selected, question.correctAnswer, resolveQuestionType(question.type, question.options));
-    setChecked((prev) => ({ ...prev, [question.id]: { isCorrect: ok } }));
+    setCheckError("");
+    // Teacher preview grades locally (it already has the key); students are graded on the server.
+    if (previewMode) {
+      const key = question.correctAnswer ?? "";
+      const ok = isAnswerCorrect(selected, key, resolveQuestionType(question.type, question.options));
+      setChecked((prev) => ({
+        ...prev,
+        [question.id]: { isCorrect: ok, answerKey: key, correctAnswer: formatCorrectAnswer(key), explanation: question.explanation ?? null },
+      }));
+      return;
+    }
+    setChecking(true);
+    try {
+      const res = await fetchWithTransientRetry(`/api/attempts/${attemptId}/check`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ questionId: question.id, answer: selected }),
+      });
+      if (isAuthFailureStatus(res.status)) {
+        await exitPlayerOnAuthLoss({ pauseUrl: `/api/attempts/${attemptId}/pause` });
+        return;
+      }
+      const data = (await res.json().catch(() => null)) as (CheckResult & { answer?: string; error?: string }) | null;
+      if (!res.ok || !data) {
+        setCheckError(data?.error ?? "Could not check this answer. Try again.");
+        return;
+      }
+      if (data.answer && data.answer !== selected) setAnswers((prev) => ({ ...prev, [question.id]: data.answer! }));
+      setChecked((prev) => ({
+        ...prev,
+        [question.id]: { isCorrect: data.isCorrect, answerKey: data.answerKey, correctAnswer: data.correctAnswer, explanation: data.explanation },
+      }));
+    } catch {
+      setCheckError("You seem to be offline. Check again when the connection returns.");
+    } finally {
+      setChecking(false);
+    }
   };
 
   const handleNote = (questionId: string, value: string) => {
@@ -384,7 +425,7 @@ export function PracticeSetPlayer({
           <span className={cn("font-mono text-sm font-medium", timerColor)}>
             {formatTime(elapsed)}
           </span>
-          <SaveIndicator className="hidden sm:inline" status={saving} />
+          <SaveIndicator compact status={saving} />
         </div>
       </div>
 
@@ -442,7 +483,7 @@ export function PracticeSetPlayer({
                 const selected = answers[question.id] === opt.label;
                 const isCorrectChoice =
                   Boolean(checkResult) &&
-                  isAnswerCorrect(opt.label, question.correctAnswer, responseType);
+                  isAnswerCorrect(opt.label, checkResult.answerKey, responseType);
                 const isWrongSelected = Boolean(checkResult) && selected && !checkResult.isCorrect;
                 return (
                 <div
@@ -509,14 +550,17 @@ export function PracticeSetPlayer({
           {immediateFeedback && (
             <div className="space-y-2 rounded-md border border-gray-200 bg-gray-50 p-3">
               {!checked[question.id] ? (
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={handleCheck}
-                  disabled={!answers[question.id]}
-                >
-                  Check
-                </Button>
+                <>
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={() => void handleCheck()}
+                    disabled={!answers[question.id] || checking}
+                  >
+                    {checking ? "Checking…" : "Check"}
+                  </Button>
+                  {checkError ? <p className="text-xs text-red-700" role="alert">{checkError}</p> : null}
+                </>
               ) : (
                 <>
                   <p
@@ -526,14 +570,14 @@ export function PracticeSetPlayer({
                     )}
                   >
                     {checked[question.id].isCorrect ? "Correct" : "Incorrect"}
-                    {!checked[question.id].isCorrect && question.correctAnswer
-                      ? ` · Correct answer: ${question.correctAnswer}`
+                    {!checked[question.id].isCorrect && checked[question.id].correctAnswer
+                      ? ` · Correct answer: ${checked[question.id].correctAnswer}`
                       : ""}
                   </p>
-                  {question.explanation?.trim() ? (
+                  {checked[question.id].explanation?.trim() ? (
                     <div className="text-sm text-gray-700">
                       <p className="mb-1 text-xs font-medium uppercase tracking-wide text-gray-500">Explanation</p>
-                      <MathContent content={question.explanation} />
+                      <MathContent content={checked[question.id].explanation!} />
                     </div>
                   ) : null}
                 </>

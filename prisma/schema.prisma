@@ -22,6 +22,8 @@ model User {
   validationReviewedAt   DateTime?
   validationReviewedById String?
   lastActiveAt DateTime?
+  /// Bumped on password change/reset and anonymization; JWTs carrying an older value are rejected.
+  sessionVersion Int     @default(0)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
@@ -217,6 +219,8 @@ model Question {
   setItems PracticeSetQuestion[]
   answers  AttemptAnswer[]
   fullTestItems FullPracticeTestQuestion[]
+  @@index([topicId, difficulty, status])
+  @@index([createdAt])
 }
 
 model QuestionOption {
@@ -272,6 +276,8 @@ model Assignment {
   unlockRequests UnlockRequest[]
 
   @@unique([studentId, practiceSetId])
+  @@index([status, dueDate])
+  @@index([locked, unlockAt])
 }
 
 model Attempt {
@@ -298,6 +304,9 @@ model Attempt {
   student    User        @relation(fields: [studentId], references: [id])
   answers    AttemptAnswer[]
   pauses     AttemptPause[]
+  @@index([studentId, status])
+  @@index([assignmentId])
+  @@index([practiceSetId])
 }
 
 model AttemptPause {
@@ -321,10 +330,13 @@ model AttemptAnswer {
   markedForReview Boolean @default(false)
   note            String?
   eliminatedOptions String?
+  /// Set when the student used "Check" (immediate feedback); the answer can no longer change.
+  checkedAt       DateTime?
 
   attempt  Attempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
   question Question @relation(fields: [questionId], references: [id])
   @@unique([attemptId, questionId])
+  @@index([questionId])
 }
 
 model InviteToken {
@@ -371,6 +383,8 @@ model AuditLog {
   metadata   String?
   createdAt  DateTime @default(now())
   user       User?    @relation(fields: [userId], references: [id])
+  @@index([createdAt])
+  @@index([targetId])
 }
 
 model UnlockRequest {
@@ -392,6 +406,7 @@ model Notification {
   readAt    DateTime?
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId, readAt])
 }
 
 model ParentStudent {
@@ -470,6 +485,7 @@ model FullPracticeTestAssignment {
   attempts    FullPracticeTestAttempt[]
 
   @@unique([studentId, testId])
+  @@index([status, dueDate])
 }
 
 model FullPracticeTestAttempt {
@@ -493,6 +509,9 @@ model FullPracticeTestAttempt {
   student        User @relation(fields: [studentId], references: [id])
   answers        FullPracticeTestAnswer[]
   pauses         FullPracticeTestPause[]
+  @@index([studentId, status])
+  @@index([assignmentId])
+  @@index([testId])
 }
 
 model FullPracticeTestPause {
@@ -519,6 +538,7 @@ model FullPracticeTestAnswer {
   attempt         FullPracticeTestAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
 
   @@unique([attemptId, questionId])
+  @@index([questionId])
 }
 
 model FullPracticeTestScoreConversion {

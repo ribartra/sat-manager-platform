@@ -75,6 +75,7 @@ export function AdminUsersTable({ rows }: { rows: AdminUserRow[] }) {
             currentStatus={row.original.validationStatus}
             active={row.original.active}
             isSelf={row.original.isSelf}
+            email={row.original.email}
           />
         ),
       },

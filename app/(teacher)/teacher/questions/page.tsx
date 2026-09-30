@@ -1,4 +1,5 @@
 import { PageShell, PracticeAreaTabs } from "@/components/sat";
+import { Pagination, pageFromParam } from "@/components/sat/pagination";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -16,9 +17,10 @@ import { loadOptionImageUrlsByQuestionId } from "@/lib/question-list-media-query
 import { QuestionsTable, type QuestionBankRow } from "./questions-table-client";
 import { resolveQuestionType } from "@/lib/question-type";
 
-interface SearchParams { area?: string; section?: string; topic?: string; difficulty?: string; status?: string }
+interface SearchParams { area?: string; section?: string; topic?: string; difficulty?: string; status?: string; page?: string }
 
 const TOPIC_IN_CHUNK = 400;
+const PAGE_SIZE = 50;
 
 export default async function QuestionBankPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const filters = await searchParams;
@@ -51,21 +53,26 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
       ? { in: visibleTopicIds }
       : { in: visibleTopicIds.slice(0, TOPIC_IN_CHUNK) };
 
+  const questionWhere = {
+    topicId: topicFilter,
+    difficulty: (filters.difficulty as string | undefined) || undefined,
+    status: (filters.status as string | undefined) || undefined,
+  };
+  const total = await prisma.question.count({ where: questionWhere });
+  const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const page = Math.min(pageFromParam(filters.page), pageCount);
   const questions = await prisma.question.findMany({
-    where: {
-      topicId: topicFilter,
-      difficulty: (filters.difficulty as string | undefined) || undefined,
-      status: (filters.status as string | undefined) || undefined,
-    },
+    where: questionWhere,
     include: {
       topic: { include: { domain: { include: { section: true } } } },
       options: { select: { text: true, imageUrl: true } },
       setItems: { select: { practiceSetId: true } },
       fullTestItems: { select: { moduleId: true } },
-      answers: { select: { id: true } },
+      _count: { select: { answers: true } },
     },
     orderBy: { createdAt: "desc" },
-    take: 100,
+    skip: (page - 1) * PAGE_SIZE,
+    take: PAGE_SIZE,
   });
   const optionImages = await loadOptionImageUrlsByQuestionId(questions.map((q) => q.id));
 
@@ -133,9 +140,18 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
             type: resolveQuestionType(q.type, q.options),
             status: q.status,
             uses: setUses + fullUses,
-            usedCount: setUses + fullUses + q.answers.length,
+            usedCount: setUses + fullUses + q._count.answers,
           };
         })}
+      />
+      <Pagination
+        basePath="/teacher/questions"
+        params={{ area: filters.area, section: filters.section, topic: filters.topic, difficulty: filters.difficulty, status: filters.status }}
+        page={page}
+        pageCount={pageCount}
+        total={total}
+        pageSize={PAGE_SIZE}
+        className="mt-2"
       />
     </PageShell>
   );

@@ -3,6 +3,17 @@
 {$DOMAIN} {
 	encode zstd gzip
 
+	# TLS 1.2+ only (Caddy's default, pinned so it cannot drift).
+	tls {
+		protocols tls1.2 tls1.3
+	}
+
+	# HSTS: browsers only ever reach the site over HTTPS for the next year.
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		-Server
+	}
+
 	# Match the app's large-upload path (ZIP/PDF ingest up to 256 MB).
 	request_body {
 		max_size 256MB

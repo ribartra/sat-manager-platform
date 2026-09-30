@@ -583,7 +583,7 @@ export function FullTestPlayer({
 
   if (phase === "BREAK") {
     return (
-      <div className="flex h-screen flex-col items-center justify-center bg-white px-6">
+      <div className="flex min-h-dvh flex-col items-center justify-center bg-white px-6">
         <p className="text-sm font-semibold text-gray-900">{testName}</p>
         <h1 className="mt-3 text-2xl font-semibold text-gray-900">Optional break</h1>
         <p className="mt-2 max-w-md text-center text-sm text-gray-500">Take a break or skip it to continue.</p>
@@ -619,7 +619,7 @@ export function FullTestPlayer({
   }
 
   if (!question) {
-    return <LoadingState className="h-screen" label="Loading…" />;
+    return <LoadingState className="min-h-dvh" label="Loading…" />;
   }
 
   const hasPassage = Boolean(question.stimulus?.trim());

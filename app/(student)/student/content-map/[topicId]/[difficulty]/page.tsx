@@ -41,7 +41,7 @@ export default async function TopicPracticeSetsPage({ params, searchParams }: Pa
           unlockRequests: { where: { status: "PENDING" }, select: { id: true } },
           attempts: {
             orderBy: { startedAt: "desc" },
-            include: { answers: true },
+            include: { answers: { select: { isCorrect: true } } },
           },
         },
       },

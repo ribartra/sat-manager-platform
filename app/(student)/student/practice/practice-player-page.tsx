@@ -12,6 +12,7 @@ import { getFeatureSetting } from "@/lib/app-settings";
 import { extractQuestionGraphArtifacts } from "@/lib/question-graph";
 import { writeAudit } from "@/lib/audit";
 import { withSqliteRetry } from "@/lib/sqlite-retry";
+import { gradeCheck, type CheckResult } from "@/lib/immediate-check";
 
 interface PracticePlayerInput {
   setId: string;
@@ -73,7 +74,9 @@ export async function renderPracticePlayer({
     difficulty: item.question.difficulty,
     options: item.question.options,
     graphArtifacts: item.question.supportsGraph ? extractQuestionGraphArtifacts(item.question) : [],
-    ...(feedbackMode === "IMMEDIATE" || previewMode
+    // The answer key only reaches the browser in the teacher preview. Immediate feedback is
+    // graded on the server (/api/attempts/[id]/check) and returned per checked question.
+    ...(previewMode
       ? {
           correctAnswer: item.question.correctAnswer,
           explanation: item.question.explanation,
@@ -220,7 +223,13 @@ export async function renderPracticePlayer({
   const savedMarked: string[] = [];
   const savedNotes: Record<string, string> = {};
   const savedEliminated: Record<string, string[]> = {};
+  const savedChecks: Record<string, CheckResult> = {};
+  const questionById = new Map(practiceSet.questions.map((item) => [item.questionId, item.question]));
   attempt.answers.forEach((answer) => {
+    const checkedQuestion = questionById.get(answer.questionId);
+    if (feedbackMode === "IMMEDIATE" && answer.checkedAt && answer.answer && checkedQuestion) {
+      savedChecks[answer.questionId] = gradeCheck(answer.answer, checkedQuestion, answer.questionSnapshot);
+    }
     if (answer.answer) savedAnswers[answer.questionId] = answer.answer;
     if (answer.timeSpent) savedTimeSpent[answer.questionId] = answer.timeSpent;
     if (answer.markedForReview) savedMarked.push(answer.questionId);
@@ -244,6 +253,7 @@ export async function renderPracticePlayer({
       savedMarked={savedMarked}
       savedNotes={savedNotes}
       savedEliminated={savedEliminated}
+      savedChecks={savedChecks}
       savedQuestion={attempt.currentQuestion}
       savedTime={attempt.totalTime ?? 0}
       savedTimeSpent={savedTimeSpent}

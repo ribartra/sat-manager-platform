@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -42,6 +43,14 @@ export default function ChangePasswordPage() {
     if (!res.ok) {
       setServerError(data.error ?? "Could not change password.");
       return;
+    }
+    // Changing the password signs out every session, this one included: sign back in here.
+    if (data.reauthenticate && data.email) {
+      const result = await signIn("credentials", { email: data.email, password: values.newPassword, redirect: false });
+      if (result?.error) {
+        router.push("/login");
+        return;
+      }
     }
     setSuccess(true);
     setTimeout(() => router.back(), 900);

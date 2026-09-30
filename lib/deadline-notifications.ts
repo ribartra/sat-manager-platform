@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import { releaseScheduledUnlocks } from "@/lib/assignments";
+import { markOverdueAssignments, releaseScheduledUnlocks } from "@/lib/assignments";
 
 /**
  * In-app deadline reminders (RF-42), run on a schedule (hourly cron → internal route) and safe
@@ -40,6 +40,7 @@ export async function generateDeadlineNotifications(now = new Date()): Promise<D
   // Wide window, then match the local calendar day exactly.
   const soonWindow = { gte: now, lt: new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000) };
 
+  await markOverdueAssignments(now);
   const unlocked = await releaseScheduledUnlocks(now);
 
   const [practiceSoon, examSoon, practiceOverdue, examOverdue] = await Promise.all([

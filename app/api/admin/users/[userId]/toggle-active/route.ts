@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { forgetSessionState } from "@/lib/session-state";
 import { requireAdmin } from "@/lib/rbac";
 
 interface RouteContext {
@@ -23,6 +24,8 @@ export async function POST(_req: Request, { params }: RouteContext) {
     data: { active: !user.active },
     select: { id: true, active: true },
   });
+  // Deactivation ends the user's sessions on their next request.
+  forgetSessionState(userId);
 
   await prisma.auditLog.create({
     data: {

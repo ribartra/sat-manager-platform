@@ -53,9 +53,9 @@ export function isAnswerCorrect(
   return accepted.some((value) => value.toUpperCase() === upper);
 }
 
-// Human-readable rendering of the correct answer(s), e.g. "8 o 9".
+// Human-readable rendering of the correct answer(s), e.g. "8 or 9".
 export function formatCorrectAnswer(correctAnswer: string | null | undefined): string {
   const parts = parseAccepted(correctAnswer);
   if (parts.length <= 1) return (correctAnswer ?? "").trim();
-  return parts.join(" o ");
+  return parts.join(" or ");
 }

@@ -3,6 +3,8 @@ import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { checkRateLimit, rateLimitKey, rateLimitResponse } from "@/lib/rate-limit";
 import { hashPublicToken } from "@/lib/token-security";
+import { passwordPolicyError } from "@/lib/password-policy";
+import { forgetSessionState } from "@/lib/session-state";
 import { captureCaughtError, writeAudit } from "@/lib/audit";
 
 async function findInviteByParentConsentToken(token: string) {
@@ -80,9 +82,6 @@ export async function POST(req: NextRequest) {
   if (!token) return NextResponse.json({ error: "Missing token" }, { status: 400 });
   const limited = checkRateLimit(rateLimitKey(req, "parent-consent", token.slice(0, 12)), 10, 15 * 60 * 1000);
   if (!limited.allowed) return rateLimitResponse(limited.resetAt);
-  if (!password || typeof password !== "string" || password.length < 6) {
-    return NextResponse.json({ error: "Password must be at least 6 characters." }, { status: 400 });
-  }
 
   try {
     const invite = await findInviteByParentConsentToken(token);
@@ -101,6 +100,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid or expired authorization link" }, { status: 400 });
     }
 
+    const policyError = passwordPolicyError(password, invite.parentEmail);
+    if (policyError) return NextResponse.json({ error: policyError }, { status: 400 });
+
     const passwordHash = await bcrypt.hash(password, 10);
     const consentAt = new Date();
     const parentEmail = invite.parentEmail;
@@ -113,6 +115,7 @@ export async function POST(req: NextRequest) {
           phone: invite.parentPhone ?? null,
           role: "PARENT",
           passwordHash,
+          sessionVersion: { increment: 1 },
           active: true,
           validationStatus: "APPROVED",
           validationReviewedAt: consentAt,
@@ -149,6 +152,7 @@ export async function POST(req: NextRequest) {
 
       return upserted;
     });
+    forgetSessionState(parent.id);
 
     await writeAudit({
       userId: parent.id,

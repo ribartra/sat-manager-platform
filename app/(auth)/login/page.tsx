@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/form";
 import { FormSection } from "@/components/sat";
 import { loginSchema, type LoginInput } from "@/contracts/auth";
+import { LegalLinks } from "@/components/legal/legal-page";
 
 function isLocalCallbackUrl(value: string) {
   return value.startsWith("/") && !value.startsWith("//");
@@ -132,6 +133,7 @@ export default function LoginPage() {
             </Link>
           </div>
         </Card>
+        <LegalLinks className="mt-4" />
       </div>
     </div>
   );

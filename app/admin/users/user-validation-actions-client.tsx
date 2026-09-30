@@ -9,11 +9,13 @@ export function UserValidationActions({
   currentStatus,
   active,
   isSelf,
+  email,
 }: {
   userId: string;
   currentStatus: string;
   active: boolean;
   isSelf: boolean;
+  email: string;
 }) {
   const router = useRouter();
   const [loadingStatus, setLoadingStatus] = useState<string | null>(null);
@@ -38,8 +40,36 @@ export function UserValidationActions({
     router.refresh();
   }
 
+  // Erasure on request (RNF-12): typed-email confirmation, personal data removed, history kept.
+  async function anonymize() {
+    const typed = window.prompt(
+      `Anonymize this account? Name, email, phone, birth date, avatar and personal notes are removed and the account is disabled. Attempts and scores stay, without the name. This cannot be undone.\n\nType ${email} to confirm:`,
+    );
+    if (typed === null) return;
+    setLoadingStatus("ANONYMIZE");
+    const response = await fetch(`/api/admin/users/${userId}/anonymize`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ confirmEmail: typed }),
+    });
+    const data = await response.json().catch(() => ({}));
+    setLoadingStatus(null);
+    if (!response.ok) window.alert(data.error || "Could not anonymize the account.");
+    router.refresh();
+  }
+
+  const anonymized = email.endsWith("@invalid.local");
+
   return (
     <div className="flex flex-wrap justify-end gap-2">
+      <Button variant="secondary" size="sm" asChild>
+        <a href={`/api/admin/users/${userId}/export`} download>Export data</a>
+      </Button>
+      {!isSelf && !anonymized ? (
+        <Button variant="danger" size="sm" onClick={anonymize} disabled={Boolean(loadingStatus)}>
+          {loadingStatus === "ANONYMIZE" ? "Saving..." : "Anonymize"}
+        </Button>
+      ) : null}
       <Button variant="secondary" size="sm" onClick={toggleActive} disabled={Boolean(loadingStatus) || isSelf}>
         {loadingStatus === "ACTIVE" ? "Saving..." : active ? "Disable" : "Enable"}
       </Button>

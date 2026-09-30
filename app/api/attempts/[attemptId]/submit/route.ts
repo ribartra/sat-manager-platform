@@ -21,7 +21,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ att
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { attemptId } = await params;
-  const { answers, totalTime, timeSpentByQuestion, markedQuestionIds, notes, eliminatedOptions } = await req.json();
+  const { answers: submittedAnswers, totalTime, timeSpentByQuestion, markedQuestionIds, notes, eliminatedOptions } = await req.json();
 
   const attempt = await prisma.attempt.findFirst({
     where: { id: attemptId, studentId: session.user.id, status: "IN_PROGRESS" },
@@ -47,6 +47,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ att
   });
 
   const existingAnswers = new Map(attempt.answers.map((answer) => [answer.questionId, answer]));
+  // Answers already checked with immediate feedback are locked: the stored answer wins.
+  const answers: Record<string, string> = { ...((submittedAnswers ?? {}) as Record<string, string>) };
+  for (const answer of attempt.answers) {
+    if (answer.checkedAt && answer.answer) answers[answer.questionId] = answer.answer;
+  }
   const allowedQuestionIds = new Set(psQuestions.map((item) => item.questionId));
   const questionById = new Map(psQuestions.map((item) => [item.questionId, item.question]));
   const questionSnapshotMap = new Map(

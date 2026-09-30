@@ -4,6 +4,8 @@ import bcrypt from "bcryptjs";
 import { checkRateLimit, rateLimitKey, rateLimitResponse } from "@/lib/rate-limit";
 import { hashPublicToken } from "@/lib/token-security";
 import { captureCaughtError, writeAudit } from "@/lib/audit";
+import { passwordPolicyError } from "@/lib/password-policy";
+import { forgetSessionState } from "@/lib/session-state";
 
 export async function POST(req: NextRequest) {
   const { token, password } = await req.json();
@@ -30,12 +32,18 @@ export async function POST(req: NextRequest) {
       await prisma.passwordResetToken.update({ where: { id: reset.id }, data: { tokenHash, token: `hashed:${tokenHash}` } });
     }
 
+    const account = await prisma.user.findUnique({ where: { id: reset.userId }, select: { email: true } });
+    const policyError = passwordPolicyError(password, account?.email);
+    if (policyError) return NextResponse.json({ error: policyError }, { status: 400 });
+
     const hash = await bcrypt.hash(password, 10);
+    // A reset signs the account out on every device (sessionVersion bump).
     await prisma.$transaction([
-      prisma.user.update({ where: { id: reset.userId }, data: { passwordHash: hash } }),
+      prisma.user.update({ where: { id: reset.userId }, data: { passwordHash: hash, sessionVersion: { increment: 1 } } }),
       prisma.passwordResetToken.update({ where: { id: reset.id }, data: { usedAt: new Date() } }),
     ]);
 
+    forgetSessionState(reset.userId);
     await writeAudit({
       userId: reset.userId,
       action: "PASSWORD_RESET_COMPLETED",

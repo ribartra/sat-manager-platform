@@ -21,6 +21,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ att
     select: { questionId: true },
   }));
   const allowedQuestionIds = new Set(allowedQuestions.map((item) => item.questionId));
+  // Answers checked with immediate feedback are locked on the server, not only in the UI.
+  const lockedQuestionIds = new Set(
+    (await withSqliteRetry(() => prisma.attemptAnswer.findMany({
+      where: { attemptId, checkedAt: { not: null } },
+      select: { questionId: true },
+    }))).map((item) => item.questionId),
+  );
 
   await Promise.all([
     withSqliteRetry(() => prisma.attempt.update({
@@ -34,7 +41,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ att
   if (answers && typeof answers === "object") {
     await Promise.all(
       Object.entries(answers)
-        .filter(([questionId]) => allowedQuestionIds.has(questionId))
+        .filter(([questionId]) => allowedQuestionIds.has(questionId) && !lockedQuestionIds.has(questionId))
         .map(([questionId, answer]) =>
         withSqliteRetry(() => prisma.attemptAnswer.upsert({
           where: { attemptId_questionId: { attemptId, questionId } },

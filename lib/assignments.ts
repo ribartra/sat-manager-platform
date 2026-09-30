@@ -2,23 +2,24 @@ import prisma from "@/lib/prisma";
 import { withSqliteRetry } from "@/lib/sqlite-retry";
 import { notifyUser } from "@/lib/notifications";
 
+const OPEN_FOR_OVERDUE = { in: ["PENDING", "IN_PROGRESS"] };
+
+/**
+ * Marks past-due open assignments OVERDUE. Reads first and only writes when something changed:
+ * page loads call this, and an UPDATE takes SQLite's write lock even when it matches no row.
+ */
 export async function markOverdueAssignments(now = new Date()) {
-  await withSqliteRetry(() => prisma.assignment.updateMany({
-      where: {
-        dueDate: { lt: now },
-        status: { in: ["PENDING", "IN_PROGRESS"] },
-      },
-      data: { status: "OVERDUE" },
-    }),
-  );
-  await withSqliteRetry(() => prisma.fullPracticeTestAssignment.updateMany({
-      where: {
-        dueDate: { lt: now },
-        status: { in: ["PENDING", "IN_PROGRESS"] },
-      },
-      data: { status: "OVERDUE" },
-    }),
-  );
+  const where = { dueDate: { lt: now }, status: OPEN_FOR_OVERDUE };
+  const [practice, exams] = await Promise.all([
+    withSqliteRetry(() => prisma.assignment.count({ where })),
+    withSqliteRetry(() => prisma.fullPracticeTestAssignment.count({ where })),
+  ]);
+  if (practice > 0) {
+    await withSqliteRetry(() => prisma.assignment.updateMany({ where, data: { status: "OVERDUE" } }));
+  }
+  if (exams > 0) {
+    await withSqliteRetry(() => prisma.fullPracticeTestAssignment.updateMany({ where, data: { status: "OVERDUE" } }));
+  }
 }
 
 /** Unlocks Practice Sets whose scheduled unlock time passed and tells each student. Returns the count. */
@@ -39,7 +40,14 @@ export async function releaseScheduledUnlocks(now = new Date()) {
   return due.length;
 }
 
+// Page loads refresh at most once per REFRESH_INTERVAL_MS per process; the hourly cron
+// (lib/deadline-notifications.ts) releases unlocks too, so nothing waits longer than that.
+const REFRESH_INTERVAL_MS = 30_000;
+let lastRefreshAt = 0;
+
 export async function refreshAssignmentStates(now = new Date()) {
+  if (now.getTime() - lastRefreshAt < REFRESH_INTERVAL_MS) return;
+  lastRefreshAt = now.getTime();
   // Keep SQLite writes sequential; concurrent updates can contend on the shared WAL file.
   await markOverdueAssignments(now);
   await releaseScheduledUnlocks(now);

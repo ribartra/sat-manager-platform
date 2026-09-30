@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/form";
 import { ErrorState, FormSection, LoadingState } from "@/components/sat";
 import { activateSchema, type ActivateInput } from "@/contracts/auth";
+import { LegalLinks } from "@/components/legal/legal-page";
 
 interface InviteInfo {
   role: string;
@@ -171,6 +172,8 @@ export default function ActivatePage() {
             </form>
           </Form>
         </Card>
+        <p className="mt-4 text-center text-xs text-gray-500">By continuing you accept the Terms of Use and the Privacy Policy.</p>
+        <LegalLinks className="mt-1" />
       </div>
     </div>
   );
