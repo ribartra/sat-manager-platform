@@ -140,7 +140,7 @@ Puntos clave:
 - Relación de preguntas mediante `FullPracticeTestQuestion`.
 - Asignación vía `FullPracticeTestAssignment`.
 - Intentos con autosave, pausa, reanudación y submit.
-- Scoring mediante `FullPracticeTestScoreConversion`.
+- Scoring proporcional sobre las preguntas que cuentan: `200 + 600 × aciertos ÷ preguntas que cuentan`, redondeado a 10 (54/44, o 50/40 si `FPT_PRETEST_EXCLUSION` excluye las pretest). Ver `lib/full-test-scoring.ts`.
 - El flujo tiene ciclo de vida completo: crear, editar, duplicar, asignar, resolver, revisar y reportar.
 
 ### Reportes, Analytics y Padres
@@ -403,7 +403,7 @@ Estados importantes:
 | `/teacher/practice-sets/new` | Crear Practice Set o importar cuestionario. |
 | `/teacher/full-tests` | Maestro de Full Practice Tests. |
 | `/teacher/full-tests/new` | Crear Full Practice Test o importar cuestionario. |
-| `/teacher/full-tests/scoring` | Tabla de conversión SAT. |
+| `/teacher/full-tests/scoring` | Explicación del cálculo del puntaje SAT (fórmula y ejemplos). |
 | `/teacher/content` | Mapa de contenido por Math / R&W. |
 | `/teacher/materials` | Materiales de estudio. |
 | `/teacher/analytics` | Analytics. |

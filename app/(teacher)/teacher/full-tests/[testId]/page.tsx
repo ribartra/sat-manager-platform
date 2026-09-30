@@ -59,7 +59,7 @@ export default async function FullTestDetailPage({ params }: PageProps) {
     <PageShell width="wide">
       <PageHeader
         title={test.name}
-        description={`4 SAT groups · ${questionCount} questions · ${test.breakMinutes > 0 ? "optional break" : "no break"} · review ${test.reviewEnabled ? "on" : "off"} · score conversion on /teacher/full-tests/scoring`}
+        description={`4 SAT groups · ${questionCount} questions · ${test.breakMinutes > 0 ? "optional break" : "no break"} · review ${test.reviewEnabled ? "on" : "off"} · see How scores work for the 200–800 calculation`}
         actions={
           <div className="flex flex-col items-end gap-2">
             <Badge variant={fullTestStatusBadgeVariant(test.status)}>

@@ -232,9 +232,9 @@ export function FullTestEditor({
           <p className="font-medium text-gray-800">SAT policy (fixed)</p>
           <p className="mt-1">
             4 groups: RW M1/M2 (32 min) + Math M1/M2 (35 min). Pretest exclusion follows Admin Settings
-            (raw caps RW 0–54 / Math 0–44 when all count; 0–50 / 0–40 when pretest is excluded). Score conversion at{" "}
+            (RW 54 / Math 44 questions count; 50 / 40 when pretest is excluded).{" "}
             <Link className="text-blue-600 hover:underline" href="/teacher/full-tests/scoring">
-              /teacher/full-tests/scoring
+              How scores are calculated
             </Link>
             .
           </p>

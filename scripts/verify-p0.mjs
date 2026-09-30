@@ -96,13 +96,13 @@ const checks = [
   },
   {
     file: "lib/full-test-scoring.ts",
-    requires: ["validateScoreConversions", "scaledScore", "score must be a 200-800", "interpolated"],
-    label: "Full Practice Test scoring valida tabla y calcula score configurable",
+    requires: ["export function sectionScore", "200 + 600 * ratio", "scaledScore", "rawMaxForPretestExclusion"],
+    label: "Full Practice Test scoring: formula proporcional sobre las preguntas que cuentan (con/sin pretest)",
   },
   {
-    file: "app/(teacher)/teacher/full-tests/scoring/scoring-client.tsx",
-    requires: ["Validate Table", "dryRun", "Warnings", "Fix these rows before saving"],
-    label: "UI de scoring previsualiza y valida conversiones SAT",
+    file: "app/(teacher)/teacher/full-tests/scoring/page.tsx",
+    requires: ["How exam scores are calculated", "FPT_PRETEST_EXCLUSION", "scoringExamples", "This is an estimate"],
+    label: "UI de scoring explica la formula con ejemplos segun el ajuste de pretest",
   },
   {
     file: "lib/full-test-validation.ts",

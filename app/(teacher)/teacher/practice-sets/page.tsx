@@ -42,7 +42,7 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
             <p className="mt-1 text-sm text-gray-500">Manage practice content and Full Practice Tests in one place.</p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Link href="/teacher/full-tests/scoring" className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Scoring Table</Link>
+            <Link href="/teacher/full-tests/scoring" className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">How scores work</Link>
             <Link href="/teacher/full-tests/new" className="inline-flex items-center gap-1.5 rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"><Plus size={14} /> New Exam</Link>
           </div>
         </header>

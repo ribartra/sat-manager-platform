@@ -462,7 +462,7 @@ Admin usa layout `app/admin/layout.tsx` → `NavTeacher`.
 
 #### `/teacher/full-tests`
 **Stack:** RSC + Client actions · Tailwind · Lucide · ui/card+badge · Prisma SSR · fetch status/duplicate
-- Scoring Table · New Exam  
+- How scores work · New Exam  
 - Lista cards: name · status · meta modules/Q/break · Actions View/Edit/Assign/Publish/Draft/Archive/Duplicate/Delete
 
 #### `/teacher/full-tests/[testId]`
