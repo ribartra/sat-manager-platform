@@ -46,6 +46,7 @@ export function EditStudentForm({ student }: { student: StudentEditInfo }) {
 
   return (
     <Card as="form" onSubmit={submit} padding="lg" className="space-y-4">
+      <div className="grid gap-4 md:grid-cols-2">
       <div>
         <label className="mb-1 block text-sm font-medium text-gray-700">Name</label>
         <Input value={name} onChange={(e) => setName(e.target.value)} required />
@@ -61,6 +62,7 @@ export function EditStudentForm({ student }: { student: StudentEditInfo }) {
       <div>
         <label className="mb-1 block text-sm font-medium text-gray-700">Start date</label>
         <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+      </div>
       </div>
       <label className="flex items-center gap-2 text-sm text-gray-700">
         <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} />

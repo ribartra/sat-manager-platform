@@ -94,7 +94,7 @@ export function NavStudent({
 
       <TooltipProvider delayDuration={500}>
         <nav className="sticky top-0 z-40 border-b border-gray-200 bg-white">
-          <div className="mx-auto max-w-6xl px-4">
+          <div className="mx-auto max-w-[var(--sat-page-wide)] px-4">
             <div className="flex h-14 items-center justify-between">
               <div className="flex items-center gap-5">
                 <span className="font-semibold text-gray-800 text-sm">SAT Practice</span>

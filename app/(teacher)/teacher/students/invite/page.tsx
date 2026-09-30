@@ -83,6 +83,7 @@ export default function InviteStudentPage() {
             </select>
           )}
         </div>
+        <div className="grid gap-4 md:grid-cols-2">
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">Name</label>
           <Input value={name} onChange={(e) => setName(e.target.value)} required />
@@ -98,6 +99,7 @@ export default function InviteStudentPage() {
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">Start date</label>
           <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+        </div>
         </div>
 
         <div className="border-t border-gray-200 pt-4">

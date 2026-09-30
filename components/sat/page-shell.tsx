@@ -3,16 +3,20 @@ import { cn } from "@/lib/utils";
 type PageWidth = "narrow" | "default" | "wide" | "full";
 type PageDensity = "comfortable" | "compact";
 
+// One page width for every view (same container as the top nav), so the left/right
+// margins never jump between views. `width` is kept for API compatibility only.
+const PAGE_WIDTH = "max-w-[var(--sat-page-wide)]";
 const WIDTH: Record<PageWidth, string> = {
-  narrow: "max-w-[var(--sat-page-narrow)]",
-  default: "max-w-[var(--sat-page-default)]",
-  wide: "max-w-[var(--sat-page-wide)]",
+  narrow: PAGE_WIDTH,
+  default: PAGE_WIDTH,
+  wide: PAGE_WIDTH,
   full: "max-w-none",
 };
 
+// Same outer vertical rhythm for every view: nav -> first content is always 32px.
 const DENSITY_Y: Record<PageDensity, string> = {
   comfortable: "py-8",
-  compact: "py-4",
+  compact: "py-8",
 };
 
 interface PageShellProps extends React.HTMLAttributes<HTMLElement> {
@@ -21,7 +25,7 @@ interface PageShellProps extends React.HTMLAttributes<HTMLElement> {
   density?: PageDensity;
 }
 
-/** Page container: max-width + horizontal padding. Prefer this over ad-hoc max-w-* wrappers. */
+/** Page container: the shared page width + horizontal padding. Prefer this over ad-hoc max-w-* wrappers. */
 export function PageShell({
   as: Component = "div",
   className,
@@ -32,6 +36,7 @@ export function PageShell({
 }: PageShellProps) {
   return (
     <Component
+      data-page-shell=""
       className={cn("mx-auto w-full px-4", WIDTH[width], DENSITY_Y[density], className)}
       {...props}
     >
@@ -51,15 +56,16 @@ export function PageHeader({
   title,
   description,
   actions,
-  density = "comfortable",
   className,
   ...props
 }: PageHeaderProps) {
+  // `density` no longer changes the header spacing (same rhythm in every view); kept for API compatibility.
+  delete (props as { density?: PageDensity }).density;
   return (
     <header
       className={cn(
         "flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between",
-        density === "comfortable" ? "mb-6" : "mb-4",
+        "mb-6",
         className,
       )}
       {...props}

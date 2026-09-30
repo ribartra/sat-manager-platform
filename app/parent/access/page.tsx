@@ -125,7 +125,7 @@ export default async function ParentTemporaryAccessPage({ searchParams }: PagePr
   const score = summarizeAllQuestionAnswers(totalAnswers);
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
+    <div className="mx-auto max-w-[var(--sat-page-wide)] px-4 py-8">
       <div className="mb-6">
         <p className="text-xs font-medium uppercase text-gray-400">Progress report · {areasLabel(areas)}</p>
         <h1 className="mt-1 text-2xl font-semibold text-gray-900">{access.student.name}</h1>

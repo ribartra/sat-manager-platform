@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, ChevronDown, ChevronRight, ScissorsSquare, Search } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { PageShell } from "@/components/sat";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
@@ -180,7 +181,7 @@ export function SetsIndexClient({ rows, batchId, batches }: SetsIndexClientProps
   }
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6 px-4 py-8">
+    <PageShell className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <Link href={`/admin/import/ai?batch=${batchId}`} className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline">
@@ -326,6 +327,6 @@ export function SetsIndexClient({ rows, batchId, batches }: SetsIndexClientProps
           <Card padding="lg"><p className="text-center text-sm text-gray-400">No Extracted Tests match this filter.</p></Card>
         )}
       </div>
-    </div>
+    </PageShell>
   );
 }

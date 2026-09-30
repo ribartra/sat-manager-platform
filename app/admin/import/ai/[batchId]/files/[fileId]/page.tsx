@@ -161,11 +161,8 @@ export default async function AiImportFileReviewPage({ params, searchParams }: P
   const estimatedSeconds = Math.ceil(estimatedPages * secondsPerPage);
 
   return (
-    <PageShell
-      width="full"
-      className="grid max-w-[100rem] gap-6 lg:grid-cols-[300px_minmax(0,1fr)]"
-    >
-      <div className="lg:sticky lg:top-4 lg:self-start">
+    <PageShell className="grid grid-cols-1 gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+      <div className="min-w-0 lg:sticky lg:top-4 lg:self-start">
         <ExtractedTestRail rows={setRows} batchId={batchId} currentFileId={file.id} />
       </div>
 

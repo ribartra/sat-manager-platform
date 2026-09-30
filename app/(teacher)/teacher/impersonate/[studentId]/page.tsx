@@ -230,8 +230,8 @@ export default async function ImpersonateStudentPage({ params, searchParams }: P
 
   return (
     <div>
-      <div className="border-b border-amber-200 bg-amber-50 px-4 py-2">
-        <div className="mx-auto flex max-w-5xl items-center justify-between">
+      <div className="border-b border-amber-200 bg-amber-50 py-2">
+        <div className="mx-auto flex max-w-[var(--sat-page-wide)] items-center justify-between px-4">
           <span className="text-sm font-medium text-amber-800">You are viewing as: {student.name}</span>
           <Link href={buildProgressHref(`/teacher/students/${student.id}`, filters)} className="text-sm text-amber-800 underline">
             Exit Student View

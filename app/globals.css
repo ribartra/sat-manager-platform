@@ -48,9 +48,10 @@
   --ring: var(--sat-blue-600);
 
   /* Layout */
-  --sat-page-narrow: 42rem;
-  --sat-page-default: 64rem;
+  /* Single page width shared by the nav and every view (narrow/default kept as aliases). */
   --sat-page-wide: 72rem;
+  --sat-page-narrow: var(--sat-page-wide);
+  --sat-page-default: var(--sat-page-wide);
   --sat-page-pad-x: 1rem;
   --sat-page-pad-y: 2rem;
 }

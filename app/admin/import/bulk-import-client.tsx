@@ -61,7 +61,7 @@ export function BulkImportClient({ topics }: { topics: { id: string; label: stri
     <div className="grid grid-cols-3 gap-6">
       <div className="col-span-2 space-y-4">
         <Textarea value={csv} onChange={(e) => setCsv(e.target.value)} rows={14} className="font-mono text-xs" />
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <Button variant="secondary" onClick={previewAndValidate} disabled={previewLoading}>
             {previewLoading ? "Validating..." : "Preview & Validate"}
           </Button>

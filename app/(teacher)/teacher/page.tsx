@@ -352,7 +352,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
       {lowPerformance.length > 0 && (
         <div className="mb-5 grid gap-3 md:grid-cols-3">
           {lowPerformance.map((bucket) => (
-            <Card key={bucket.label} variant="danger" padding="sm">
+            <Card key={bucket.label} variant="danger" padding="sm" className="min-w-0">
               <p className="text-xs font-medium text-red-700">Low performance</p>
               <p className="mt-1 truncate text-sm font-semibold text-gray-900">{bucket.label}</p>
               <p className="mt-1 text-xs text-gray-600">

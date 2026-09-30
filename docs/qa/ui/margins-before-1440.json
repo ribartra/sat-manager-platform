@@ -1,0 +1,1890 @@
+[
+ {
+  "role": "admin",
+  "route": "/admin/import",
+  "status": 200,
+  "url": "/admin/import",
+  "slug": "admin_admin_import",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 224,
+   "w": 992,
+   "y": 89,
+   "r": 1216
+  },
+  "h1Text": "Bulk Import Questions",
+  "shell": {
+   "x": 208,
+   "w": 1024,
+   "y": 57,
+   "r": 1232
+  },
+  "contentMinX": 208,
+  "contentMaxX": 1232,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "admin",
+  "route": "/admin/import/ai",
+  "status": 200,
+  "url": "/admin/import/ai",
+  "slug": "admin_admin_import_ai",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 160,
+   "w": 768,
+   "y": 109,
+   "r": 928
+  },
+  "h1Text": "AI Batch Import",
+  "shell": {
+   "x": 160,
+   "w": 768,
+   "y": 89,
+   "r": 928
+  },
+  "contentMinX": 144,
+  "contentMaxX": 1296,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "admin",
+  "route": "/admin/import/ai/batch_e877446f45e144eda0a1e4199465e3d2/files/src_8e2ae0ecccf74c6384cab47992a4f883",
+  "status": 200,
+  "url": "/admin/import/ai/batch_e877446f45e144eda0a1e4199465e3d2/files/src_8e2ae0ecccf74c6384cab47992a4f883",
+  "slug": "admin_admin_import_ai_batch_e877446f45e144eda0a1e4199465e3d2_files_src_8e2ae0ecccf74c6384cab47992a4f883",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 340,
+   "w": 321,
+   "y": 128,
+   "r": 661
+  },
+  "h1Text": "Review File",
+  "shell": {
+   "x": 340,
+   "w": 321,
+   "y": 96,
+   "r": 661
+  },
+  "contentMinX": 0,
+  "contentMaxX": 1440,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "admin",
+  "route": "/admin/import/ai/sets",
+  "status": 200,
+  "url": "/admin/import/ai/sets",
+  "slug": "admin_admin_import_ai_sets",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 160,
+   "w": 1120,
+   "y": 121,
+   "r": 1280
+  },
+  "h1Text": "Extracted Tests to review",
+  "shell": {
+   "x": 160,
+   "w": 1120,
+   "y": 89,
+   "r": 1280
+  },
+  "contentMinX": 144,
+  "contentMaxX": 1296,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "admin",
+  "route": "/admin/logs",
+  "status": 200,
+  "url": "/admin/logs",
+  "slug": "admin_admin_logs",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 160,
+   "w": 1120,
+   "y": 89,
+   "r": 1280
+  },
+  "h1Text": "Audit Log",
+  "shell": {
+   "x": 144,
+   "w": 1152,
+   "y": 57,
+   "r": 1296
+  },
+  "contentMinX": 144,
+  "contentMaxX": 1296,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "admin",
+  "route": "/admin/programs",
+  "status": 200,
+  "url": "/admin/programs",
+  "slug": "admin_admin_programs",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 224,
+   "w": 992,
+   "y": 89,
+   "r": 1216
+  },
+  "h1Text": "Programs Master",
+  "shell": {
+   "x": 208,
+   "w": 1024,
+   "y": 57,
+   "r": 1232
+  },
+  "contentMinX": 208,
+  "contentMaxX": 1232,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "admin",
+  "route": "/admin/settings",
+  "status": 200,
+  "url": "/admin/settings",
+  "slug": "admin_admin_settings",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 224,
+   "w": 992,
+   "y": 89,
+   "r": 1216
+  },
+  "h1Text": "Platform Settings",
+  "shell": {
+   "x": 208,
+   "w": 1024,
+   "y": 57,
+   "r": 1232
+  },
+  "contentMinX": 208,
+  "contentMaxX": 1232,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "admin",
+  "route": "/admin/taxonomy",
+  "status": 200,
+  "url": "/admin/taxonomy",
+  "slug": "admin_admin_taxonomy",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 224,
+   "w": 992,
+   "y": 89,
+   "r": 1216
+  },
+  "h1Text": "Taxonomy",
+  "shell": {
+   "x": 208,
+   "w": 1024,
+   "y": 57,
+   "r": 1232
+  },
+  "contentMinX": 208,
+  "contentMaxX": 1232,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "admin",
+  "route": "/admin/teachers",
+  "status": 200,
+  "url": "/admin/teachers",
+  "slug": "admin_admin_teachers",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 224,
+   "w": 430,
+   "y": 89,
+   "r": 654
+  },
+  "h1Text": "Teachers",
+  "shell": {
+   "x": 224,
+   "w": 430,
+   "y": 89,
+   "r": 654
+  },
+  "contentMinX": 208,
+  "contentMaxX": 1232,
+  "scrollX": false,
+  "navBottom": 141
+ },
+ {
+  "role": "admin",
+  "route": "/admin/users",
+  "status": 200,
+  "url": "/admin/users",
+  "slug": "admin_admin_users",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 160,
+   "w": 1062,
+   "y": 89,
+   "r": 1222
+  },
+  "h1Text": "Account Validation",
+  "shell": {
+   "x": 160,
+   "w": 1062,
+   "y": 89,
+   "r": 1222
+  },
+  "contentMinX": 144,
+  "contentMaxX": 1296,
+  "scrollX": false,
+  "navBottom": 141
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher",
+  "status": 200,
+  "url": "/teacher",
+  "slug": "teacher_teacher",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 160,
+   "w": 104,
+   "y": 75,
+   "r": 264
+  },
+  "h1Text": "Students",
+  "shell": {
+   "x": 160,
+   "w": 1120,
+   "y": 73,
+   "r": 1280
+  },
+  "contentMinX": 144,
+  "contentMaxX": 1296,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/compare",
+  "status": 200,
+  "url": "/teacher/compare",
+  "slug": "teacher_teacher_compare",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 224,
+   "w": 992,
+   "y": 89,
+   "r": 1216
+  },
+  "h1Text": "Private Student Comparison",
+  "shell": {
+   "x": 208,
+   "w": 1024,
+   "y": 57,
+   "r": 1232
+  },
+  "contentMinX": 208,
+  "contentMaxX": 1232,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/content",
+  "status": 200,
+  "url": "/teacher/content",
+  "slug": "teacher_teacher_content",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 224,
+   "w": 150,
+   "y": 91,
+   "r": 374
+  },
+  "h1Text": "Content Map",
+  "shell": {
+   "x": 224,
+   "w": 992,
+   "y": 89,
+   "r": 1216
+  },
+  "contentMinX": 208,
+  "contentMaxX": 1232,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/content/top-equivalent-expressions",
+  "status": 200,
+  "url": "/teacher/content/top-equivalent-expressions",
+  "slug": "teacher_teacher_content_top_equivalent_expressions",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 224,
+   "w": 224,
+   "y": 137,
+   "r": 448
+  },
+  "h1Text": "Equivalent expressions",
+  "shell": {
+   "x": 224,
+   "w": 992,
+   "y": 133,
+   "r": 1216
+  },
+  "contentMinX": 208,
+  "contentMaxX": 1232,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/full-tests",
+  "status": 200,
+  "url": "/teacher/practice-sets?area=mocks",
+  "slug": "teacher_teacher_full_tests",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 160,
+   "w": 406,
+   "y": 73,
+   "r": 566
+  },
+  "h1Text": "Practice & Exams",
+  "shell": {
+   "x": 160,
+   "w": 406,
+   "y": 73,
+   "r": 566
+  },
+  "contentMinX": 144,
+  "contentMaxX": 1296,
+  "scrollX": false,
+  "navBottom": 125
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/full-tests/new",
+  "status": 200,
+  "url": "/teacher/full-tests/new",
+  "slug": "teacher_teacher_full_tests_new",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 224,
+   "w": 992,
+   "y": 89,
+   "r": 1216
+  },
+  "h1Text": "New Exam",
+  "shell": {
+   "x": 208,
+   "w": 1024,
+   "y": 57,
+   "r": 1232
+  },
+  "contentMinX": 208,
+  "contentMaxX": 1232,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/full-tests/scoring",
+  "status": 200,
+  "url": "/teacher/full-tests/scoring",
+  "slug": "teacher_teacher_full_tests_scoring",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 224,
+   "w": 992,
+   "y": 89,
+   "r": 1216
+  },
+  "h1Text": "Exam Score Conversion",
+  "shell": {
+   "x": 208,
+   "w": 1024,
+   "y": 57,
+   "r": 1232
+  },
+  "contentMinX": 208,
+  "contentMaxX": 1232,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/full-tests/cmsjrp00s06bnqmt1dyiuqw2t",
+  "status": 200,
+  "url": "/teacher/full-tests/cmsjrp00s06bnqmt1dyiuqw2t",
+  "slug": "teacher_teacher_full_tests_cmsjrp00s06bnqmt1dyiuqw2t",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 160,
+   "w": 486,
+   "y": 89,
+   "r": 646
+  },
+  "h1Text": "TEST 1",
+  "shell": {
+   "x": 160,
+   "w": 486,
+   "y": 89,
+   "r": 646
+  },
+  "contentMinX": 144,
+  "contentMaxX": 1296,
+  "scrollX": false,
+  "navBottom": 161
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/full-tests/cmsjrp00s06bnqmt1dyiuqw2t/assign",
+  "status": 200,
+  "url": "/teacher/full-tests/cmsjrp00s06bnqmt1dyiuqw2t/assign",
+  "slug": "teacher_teacher_full_tests_cmsjrp00s06bnqmt1dyiuqw2t_assign",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 400,
+   "w": 640,
+   "y": 89,
+   "r": 1040
+  },
+  "h1Text": "Assign Exam: TEST 1",
+  "shell": {
+   "x": 384,
+   "w": 672,
+   "y": 57,
+   "r": 1056
+  },
+  "contentMinX": 384,
+  "contentMaxX": 1056,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/full-tests/cmsjrp00s06bnqmt1dyiuqw2t/edit",
+  "status": 200,
+  "url": "/teacher/full-tests/cmsjrp00s06bnqmt1dyiuqw2t/edit",
+  "slug": "teacher_teacher_full_tests_cmsjrp00s06bnqmt1dyiuqw2t_edit",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 224,
+   "w": 992,
+   "y": 89,
+   "r": 1216
+  },
+  "h1Text": "Edit Exam",
+  "shell": {
+   "x": 208,
+   "w": 1024,
+   "y": 57,
+   "r": 1232
+  },
+  "contentMinX": 208,
+  "contentMaxX": 1232,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/groups",
+  "status": 200,
+  "url": "/teacher",
+  "slug": "teacher_teacher_groups",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 160,
+   "w": 104,
+   "y": 75,
+   "r": 264
+  },
+  "h1Text": "Students",
+  "shell": {
+   "x": 160,
+   "w": 1120,
+   "y": 73,
+   "r": 1280
+  },
+  "contentMinX": 144,
+  "contentMaxX": 1296,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/impersonate/ui-student",
+  "status": 200,
+  "url": "/teacher/impersonate/ui-student",
+  "slug": "teacher_teacher_impersonate_ui_student",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 224,
+   "w": 992,
+   "y": 126,
+   "r": 1216
+  },
+  "h1Text": "Hello, Valeria!",
+  "shell": {
+   "x": 224,
+   "w": 992,
+   "y": 126,
+   "r": 1216
+  },
+  "contentMinX": 0,
+  "contentMaxX": 1440,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/materials",
+  "status": 404,
+  "url": "/teacher/materials",
+  "slug": "teacher_teacher_materials",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 580,
+   "w": 65,
+   "y": 483,
+   "r": 645
+  },
+  "h1Text": "404",
+  "shell": {
+   "x": 580,
+   "w": 281,
+   "y": 483,
+   "r": 860
+  },
+  "contentMinX": 0,
+  "contentMaxX": 1440,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/parents",
+  "status": 200,
+  "url": "/teacher/parents",
+  "slug": "teacher_teacher_parents",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 224,
+   "w": 992,
+   "y": 89,
+   "r": 1216
+  },
+  "h1Text": "Parents",
+  "shell": {
+   "x": 208,
+   "w": 1024,
+   "y": 57,
+   "r": 1232
+  },
+  "contentMinX": 208,
+  "contentMaxX": 1232,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/practice-sets",
+  "status": 200,
+  "url": "/teacher/practice-sets",
+  "slug": "teacher_teacher_practice_sets",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 160,
+   "w": 406,
+   "y": 73,
+   "r": 566
+  },
+  "h1Text": "Practice & Exams",
+  "shell": {
+   "x": 160,
+   "w": 406,
+   "y": 73,
+   "r": 566
+  },
+  "contentMinX": 144,
+  "contentMaxX": 1296,
+  "scrollX": false,
+  "navBottom": 125
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/practice-sets/new",
+  "status": 200,
+  "url": "/teacher/practice-sets/new",
+  "slug": "teacher_teacher_practice_sets_new",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 224,
+   "w": 992,
+   "y": 89,
+   "r": 1216
+  },
+  "h1Text": "New Practice Set",
+  "shell": {
+   "x": 208,
+   "w": 1024,
+   "y": 57,
+   "r": 1232
+  },
+  "contentMinX": 208,
+  "contentMaxX": 1232,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/practice-sets/cmsjrokq5066pqmt1j8870wx9/edit",
+  "status": 200,
+  "url": "/teacher/practice-sets/cmsjrokq5066pqmt1j8870wx9/edit",
+  "slug": "teacher_teacher_practice_sets_cmsjrokq5066pqmt1j8870wx9_edit",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 224,
+   "w": 992,
+   "y": 89,
+   "r": 1216
+  },
+  "h1Text": "Edit Practice Set",
+  "shell": {
+   "x": 208,
+   "w": 1024,
+   "y": 57,
+   "r": 1232
+  },
+  "contentMinX": 208,
+  "contentMaxX": 1232,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/programs",
+  "status": 200,
+  "url": "/teacher",
+  "slug": "teacher_teacher_programs",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 160,
+   "w": 104,
+   "y": 75,
+   "r": 264
+  },
+  "h1Text": "Students",
+  "shell": {
+   "x": 160,
+   "w": 1120,
+   "y": 73,
+   "r": 1280
+  },
+  "contentMinX": 144,
+  "contentMaxX": 1296,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/questions",
+  "status": 200,
+  "url": "/teacher/questions",
+  "slug": "teacher_teacher_questions",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 224,
+   "w": 169,
+   "y": 92,
+   "r": 393
+  },
+  "h1Text": "Question Bank",
+  "shell": {
+   "x": 224,
+   "w": 992,
+   "y": 89,
+   "r": 1216
+  },
+  "contentMinX": 208,
+  "contentMaxX": 1232,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/questions/new",
+  "status": 200,
+  "url": "/teacher/questions/new",
+  "slug": "teacher_teacher_questions_new",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 400,
+   "w": 640,
+   "y": 89,
+   "r": 1040
+  },
+  "h1Text": "New Question",
+  "shell": {
+   "x": 384,
+   "w": 672,
+   "y": 57,
+   "r": 1056
+  },
+  "contentMinX": 384,
+  "contentMaxX": 1056,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/questions/cmsjrnsw10000qmt1eqc6f6pv/edit",
+  "status": 200,
+  "url": "/teacher/questions/cmsjrnsw10000qmt1eqc6f6pv/edit",
+  "slug": "teacher_teacher_questions_cmsjrnsw10000qmt1eqc6f6pv_edit",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 400,
+   "w": 640,
+   "y": 89,
+   "r": 1040
+  },
+  "h1Text": "Edit Question",
+  "shell": {
+   "x": 384,
+   "w": 672,
+   "y": 57,
+   "r": 1056
+  },
+  "contentMinX": 384,
+  "contentMaxX": 1056,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/students/invite",
+  "status": 200,
+  "url": "/teacher/students/invite",
+  "slug": "teacher_teacher_students_invite",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 400,
+   "w": 640,
+   "y": 125,
+   "r": 1040
+  },
+  "h1Text": "Invite Student",
+  "shell": {
+   "x": 400,
+   "w": 640,
+   "y": 89,
+   "r": 1040
+  },
+  "contentMinX": 384,
+  "contentMaxX": 1056,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/students/ui-student",
+  "status": 200,
+  "url": "/teacher/students/ui-student",
+  "slug": "teacher_teacher_students_ui_student",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 160,
+   "w": 432,
+   "y": 113,
+   "r": 592
+  },
+  "h1Text": "Valeria Rojas",
+  "shell": {
+   "x": 160,
+   "w": 432,
+   "y": 89,
+   "r": 592
+  },
+  "contentMinX": 144,
+  "contentMaxX": 1296,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/students/ui-student/assign",
+  "status": 200,
+  "url": "/teacher/students/ui-student/assign",
+  "slug": "teacher_teacher_students_ui_student_assign",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 400,
+   "w": 640,
+   "y": 133,
+   "r": 1040
+  },
+  "h1Text": "Assign to: Valeria Rojas",
+  "shell": {
+   "x": 384,
+   "w": 672,
+   "y": 57,
+   "r": 1056
+  },
+  "contentMinX": 384,
+  "contentMaxX": 1056,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/students/ui-student/assign-exam",
+  "status": 200,
+  "url": "/teacher/students/ui-student/assign-exam",
+  "slug": "teacher_teacher_students_ui_student_assign_exam",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 400,
+   "w": 640,
+   "y": 133,
+   "r": 1040
+  },
+  "h1Text": "Assign Exam",
+  "shell": {
+   "x": 384,
+   "w": 672,
+   "y": 57,
+   "r": 1056
+  },
+  "contentMinX": 384,
+  "contentMaxX": 1056,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/students/ui-student/attempts/ui-att0",
+  "status": 200,
+  "url": "/teacher/students/ui-student/attempts/ui-att0",
+  "slug": "teacher_teacher_students_ui_student_attempts_ui_att0",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 241,
+   "w": 179,
+   "y": 150,
+   "r": 420
+  },
+  "h1Text": "Attempt #1",
+  "shell": {
+   "x": 241,
+   "w": 179,
+   "y": 150,
+   "r": 420
+  },
+  "contentMinX": 208,
+  "contentMaxX": 1232,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/students/ui-student/edit",
+  "status": 200,
+  "url": "/teacher/students/ui-student/edit",
+  "slug": "teacher_teacher_students_ui_student_edit",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 400,
+   "w": 640,
+   "y": 89,
+   "r": 1040
+  },
+  "h1Text": "Edit Student",
+  "shell": {
+   "x": 384,
+   "w": 672,
+   "y": 57,
+   "r": 1056
+  },
+  "contentMinX": 384,
+  "contentMaxX": 1056,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/subskills",
+  "status": 200,
+  "url": "/teacher/practice-sets?area=math",
+  "slug": "teacher_teacher_subskills",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 160,
+   "w": 406,
+   "y": 73,
+   "r": 566
+  },
+  "h1Text": "Practice & Exams",
+  "shell": {
+   "x": 160,
+   "w": 406,
+   "y": 73,
+   "r": 566
+  },
+  "contentMinX": 144,
+  "contentMaxX": 1296,
+  "scrollX": false,
+  "navBottom": 125
+ },
+ {
+  "role": "teacher",
+  "route": "/notifications",
+  "status": 200,
+  "url": "/notifications",
+  "slug": "teacher_notifications",
+  "logo": {
+   "x": 160,
+   "w": 88,
+   "y": 18,
+   "r": 248
+  },
+  "navBar": {
+   "x": 144,
+   "w": 1152,
+   "y": 0,
+   "r": 1296
+  },
+  "h1": {
+   "x": 400,
+   "w": 640,
+   "y": 89,
+   "r": 1040
+  },
+  "h1Text": "Notifications",
+  "shell": {
+   "x": 384,
+   "w": 672,
+   "y": 57,
+   "r": 1056
+  },
+  "contentMinX": 384,
+  "contentMaxX": 1056,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "student",
+  "route": "/student",
+  "status": 200,
+  "url": "/student",
+  "slug": "student_student",
+  "logo": null,
+  "navBar": null,
+  "h1": {
+   "x": 224,
+   "w": 992,
+   "y": 89,
+   "r": 1216
+  },
+  "h1Text": "Hello, Valeria!",
+  "shell": {
+   "x": 224,
+   "w": 992,
+   "y": 89,
+   "r": 1216
+  },
+  "contentMinX": 208,
+  "contentMaxX": 1232,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "student",
+  "route": "/student/content-map",
+  "status": 200,
+  "url": "/student/content-map",
+  "slug": "student_student_content_map",
+  "logo": null,
+  "navBar": null,
+  "h1": {
+   "x": 160,
+   "w": 1120,
+   "y": 73,
+   "r": 1280
+  },
+  "h1Text": "Content Map",
+  "shell": {
+   "x": 160,
+   "w": 1120,
+   "y": 73,
+   "r": 1280
+  },
+  "contentMinX": 144,
+  "contentMaxX": 1296,
+  "scrollX": false,
+  "navBottom": 129
+ },
+ {
+  "role": "student",
+  "route": "/student/content-map/top-equivalent-expressions/EASY",
+  "status": 200,
+  "url": "/student/content-map/top-equivalent-expressions/EASY",
+  "slug": "student_student_content_map_top_equivalent_expressions_EASY",
+  "logo": null,
+  "navBar": null,
+  "h1": {
+   "x": 400,
+   "w": 300,
+   "y": 133,
+   "r": 700
+  },
+  "h1Text": "Equivalent expressions — Easy",
+  "shell": {
+   "x": 400,
+   "w": 640,
+   "y": 133,
+   "r": 1040
+  },
+  "contentMinX": 384,
+  "contentMaxX": 1056,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "student",
+  "route": "/student/full-tests",
+  "status": 200,
+  "url": "/student/content-map?area=mocks",
+  "slug": "student_student_full_tests",
+  "logo": null,
+  "navBar": null,
+  "h1": {
+   "x": 160,
+   "w": 1120,
+   "y": 73,
+   "r": 1280
+  },
+  "h1Text": "Content Map",
+  "shell": {
+   "x": 160,
+   "w": 1120,
+   "y": 73,
+   "r": 1280
+  },
+  "contentMinX": 144,
+  "contentMaxX": 1296,
+  "scrollX": false,
+  "navBottom": 129
+ },
+ {
+  "role": "student",
+  "route": "/student/full-tests/results/ui-fat0",
+  "status": 200,
+  "url": "/student/full-tests/results/ui-fat0",
+  "slug": "student_student_full_tests_results_ui_fat0",
+  "logo": null,
+  "navBar": null,
+  "h1": {
+   "x": 400,
+   "w": 640,
+   "y": 125,
+   "r": 1040
+  },
+  "h1Text": "Results: TEST 1",
+  "shell": {
+   "x": 384,
+   "w": 672,
+   "y": 57,
+   "r": 1056
+  },
+  "contentMinX": 384,
+  "contentMaxX": 1056,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "student",
+  "route": "/student/history",
+  "status": 200,
+  "url": "/student/history",
+  "slug": "student_student_history",
+  "logo": null,
+  "navBar": null,
+  "h1": {
+   "x": 160,
+   "w": 377,
+   "y": 73,
+   "r": 537
+  },
+  "h1Text": "My History",
+  "shell": {
+   "x": 160,
+   "w": 377,
+   "y": 73,
+   "r": 537
+  },
+  "contentMinX": 144,
+  "contentMaxX": 1296,
+  "scrollX": false,
+  "navBottom": 127
+ },
+ {
+  "role": "student",
+  "route": "/student/materials",
+  "status": 404,
+  "url": "/student/materials",
+  "slug": "student_student_materials",
+  "logo": null,
+  "navBar": null,
+  "h1": {
+   "x": 580,
+   "w": 65,
+   "y": 483,
+   "r": 645
+  },
+  "h1Text": "404",
+  "shell": {
+   "x": 580,
+   "w": 281,
+   "y": 483,
+   "r": 860
+  },
+  "contentMinX": 0,
+  "contentMaxX": 1440,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "student",
+  "route": "/student/practice-sets",
+  "status": 200,
+  "url": "/student/content-map?area=math",
+  "slug": "student_student_practice_sets",
+  "logo": null,
+  "navBar": null,
+  "h1": {
+   "x": 160,
+   "w": 1120,
+   "y": 73,
+   "r": 1280
+  },
+  "h1Text": "Content Map",
+  "shell": {
+   "x": 160,
+   "w": 1120,
+   "y": 73,
+   "r": 1280
+  },
+  "contentMinX": 144,
+  "contentMaxX": 1296,
+  "scrollX": false,
+  "navBottom": 129
+ },
+ {
+  "role": "student",
+  "route": "/student/program",
+  "status": 200,
+  "url": "/student/program",
+  "slug": "student_student_program",
+  "logo": null,
+  "navBar": null,
+  "h1": {
+   "x": 477,
+   "w": 177,
+   "y": 130,
+   "r": 654
+  },
+  "h1Text": "SAT Core Program",
+  "shell": {
+   "x": 477,
+   "w": 177,
+   "y": 114,
+   "r": 654
+  },
+  "contentMinX": 384,
+  "contentMaxX": 1056,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "student",
+  "route": "/student/results/ui-att0",
+  "status": 200,
+  "url": "/student/results/ui-att0",
+  "slug": "student_student_results_ui_att0",
+  "logo": null,
+  "navBar": null,
+  "h1": {
+   "x": 425,
+   "w": 590,
+   "y": 158,
+   "r": 1015
+  },
+  "h1Text": "Advanced Math - Equivalent expressions - EASY",
+  "shell": {
+   "x": 400,
+   "w": 640,
+   "y": 133,
+   "r": 1040
+  },
+  "contentMinX": 384,
+  "contentMaxX": 1056,
+  "scrollX": false,
+  "navBottom": 57
+ },
+ {
+  "role": "parent",
+  "route": "/parent",
+  "status": 200,
+  "url": "/parent",
+  "slug": "parent_parent",
+  "logo": {
+   "x": 208,
+   "w": 118,
+   "y": 12,
+   "r": 326
+  },
+  "navBar": {
+   "x": 208,
+   "w": 1024,
+   "y": 12,
+   "r": 1232
+  },
+  "h1": {
+   "x": 224,
+   "w": 167,
+   "y": 77,
+   "r": 391
+  },
+  "h1Text": "Student Progress",
+  "shell": {
+   "x": 224,
+   "w": 167,
+   "y": 77,
+   "r": 391
+  },
+  "contentMinX": 0,
+  "contentMaxX": 1440,
+  "scrollX": false,
+  "navBottom": 105
+ },
+ {
+  "role": "anon",
+  "route": "/login",
+  "status": 200,
+  "url": "/login",
+  "slug": "anon_login",
+  "logo": null,
+  "navBar": null,
+  "h1": {
+   "x": 528,
+   "w": 384,
+   "y": 289,
+   "r": 912
+  },
+  "h1Text": "SAT Practice Platform",
+  "shell": {
+   "x": 528,
+   "w": 384,
+   "y": 237,
+   "r": 912
+  },
+  "contentMinX": 0,
+  "contentMaxX": 1440,
+  "scrollX": false,
+  "navBottom": 0
+ },
+ {
+  "role": "anon",
+  "route": "/auth/forgot-password",
+  "status": 200,
+  "url": "/auth/forgot-password",
+  "slug": "anon_auth_forgot_password",
+  "logo": null,
+  "navBar": null,
+  "h1": {
+   "x": 553,
+   "w": 334,
+   "y": 347,
+   "r": 887
+  },
+  "h1Text": "Reset your password",
+  "shell": {
+   "x": 528,
+   "w": 384,
+   "y": 322,
+   "r": 912
+  },
+  "contentMinX": 0,
+  "contentMaxX": 1440,
+  "scrollX": false,
+  "navBottom": 0
+ },
+ {
+  "role": "anon",
+  "route": "/auth/pending-validation",
+  "status": 200,
+  "url": "/login",
+  "slug": "anon_auth_pending_validation",
+  "logo": null,
+  "navBar": null,
+  "h1": {
+   "x": 528,
+   "w": 384,
+   "y": 289,
+   "r": 912
+  },
+  "h1Text": "SAT Practice Platform",
+  "shell": {
+   "x": 528,
+   "w": 384,
+   "y": 237,
+   "r": 912
+  },
+  "contentMinX": 0,
+  "contentMaxX": 1440,
+  "scrollX": false,
+  "navBottom": 0
+ },
+ {
+  "role": "anon",
+  "route": "/parent/access",
+  "status": 200,
+  "url": "/parent/access",
+  "slug": "anon_parent_access",
+  "logo": null,
+  "navBar": null,
+  "h1": {
+   "x": 625,
+   "w": 189,
+   "y": 204,
+   "r": 815
+  },
+  "h1Text": "Unable to open report",
+  "shell": {
+   "x": 496,
+   "w": 448,
+   "y": 0,
+   "r": 944
+  },
+  "contentMinX": 496,
+  "contentMaxX": 944,
+  "scrollX": false,
+  "navBottom": 0
+ },
+ {
+  "role": "playerTeacher",
+  "route": "/teacher/practice-sets/cmsjrokq5066pqmt1j8870wx9/preview",
+  "status": 200,
+  "url": "/teacher/practice-sets/cmsjrokq5066pqmt1j8870wx9/preview",
+  "slug": "playerTeacher_teacher_practice_sets_cmsjrokq5066pqmt1j8870wx9_preview",
+  "logo": null,
+  "navBar": null,
+  "h1": null,
+  "h1Text": null,
+  "shell": {
+   "x": 0,
+   "w": 1440,
+   "y": 0,
+   "r": 1440
+  },
+  "contentMinX": 0,
+  "contentMaxX": 1440,
+  "scrollX": false,
+  "navBottom": 0
+ },
+ {
+  "role": "playerTeacher",
+  "route": "/teacher/full-tests/cmsjrp00s06bnqmt1dyiuqw2t/preview",
+  "status": 200,
+  "url": "/teacher/full-tests/cmsjrp00s06bnqmt1dyiuqw2t/preview",
+  "slug": "playerTeacher_teacher_full_tests_cmsjrp00s06bnqmt1dyiuqw2t_preview",
+  "logo": null,
+  "navBar": null,
+  "h1": null,
+  "h1Text": null,
+  "shell": {
+   "x": 0,
+   "w": 1440,
+   "y": 0,
+   "r": 1440
+  },
+  "contentMinX": 0,
+  "contentMaxX": 1440,
+  "scrollX": false,
+  "navBottom": 0
+ },
+ {
+  "role": "playerStudent",
+  "route": "/student/practice/assignment/ui-asg4",
+  "status": 200,
+  "url": "/student/practice/assignment/ui-asg4",
+  "slug": "playerStudent_student_practice_assignment_ui_asg4",
+  "logo": null,
+  "navBar": null,
+  "h1": null,
+  "h1Text": null,
+  "shell": {
+   "x": 0,
+   "w": 1440,
+   "y": 0,
+   "r": 1440
+  },
+  "contentMinX": 0,
+  "contentMaxX": 7720,
+  "scrollX": false,
+  "navBottom": 0
+ },
+ {
+  "role": "playerStudent",
+  "route": "/student/full-tests/ui-fa1",
+  "status": 200,
+  "url": "/student/full-tests/ui-fa1",
+  "slug": "playerStudent_student_full_tests_ui_fa1",
+  "logo": null,
+  "navBar": null,
+  "h1": null,
+  "h1Text": null,
+  "shell": {
+   "x": 0,
+   "w": 1440,
+   "y": 0,
+   "r": 1440
+  },
+  "contentMinX": 0,
+  "contentMaxX": 1440,
+  "scrollX": false,
+  "navBottom": 0
+ }
+]

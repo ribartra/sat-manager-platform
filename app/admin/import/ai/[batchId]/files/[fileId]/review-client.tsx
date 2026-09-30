@@ -809,7 +809,7 @@ export function FileReviewClient({
   }
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[260px_1fr]">
+    <div className="grid grid-cols-1 gap-6 xl:grid-cols-[260px_minmax(0,1fr)]">
       <aside className="space-y-4">
         <Card padding="md">
           <p className="text-xs uppercase text-gray-400">File</p>
@@ -917,7 +917,7 @@ export function FileReviewClient({
         </Card>
       </aside>
 
-      <main className="space-y-4">
+      <div className="min-w-0 space-y-4">
         {selected && draft ? (
           <>
             {/* Sticky context + actions bar (shared across all sections). */}
@@ -1361,7 +1361,7 @@ export function FileReviewClient({
             {pages.length === 0 && <p className="py-4 text-sm text-gray-400">No pages recorded.</p>}
           </div>
         </Section>
-      </main>
+      </div>
 
       {mergeOpen && selected && (
         <MergeDialog
