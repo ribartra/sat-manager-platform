@@ -85,3 +85,6 @@ scratchpad/
 /Analisis de proyecto SAT*
 /SAT_Math_Skills_Tracker_clean.pdf
 .~lock.*#
+
+# Local recordings (meetings, demos) stay out of the repo.
+/*.m4a
