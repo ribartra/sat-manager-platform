@@ -14,6 +14,7 @@ import { formatCorrectAnswer } from "@/lib/answer-grading";
 import { difficultyBadgeVariant } from "@/lib/domain-meta";
 import { difficultyFromFullTestModuleKey, moduleKeyFromOrder } from "@/lib/full-test-modules";
 import Link from "next/link";
+import { fullTestModulesForAttempt } from "@/lib/full-test-snapshot";
 import { ChevronLeft } from "lucide-react";
 
 interface PageProps { params: Promise<{ attemptId: string }>; searchParams: Promise<{ from?: string; to?: string }> }
@@ -38,7 +39,7 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
   const session = await auth();
   const attempt = await prisma.fullPracticeTestAttempt.findFirst({
     where: { id: attemptId, studentId: session!.user.id },
-    include: { test: { include: { modules: { include: { questions: { include: { question: { include: { topic: { include: { domain: true } }, options: { orderBy: { label: "asc" } } } } }, orderBy: { order: "asc" } } }, orderBy: { order: "asc" } } } }, answers: true, pauses: true },
+    include: { test: { select: { name: true, reviewEnabled: true } }, answers: true, pauses: true },
   });
   if (!attempt) notFound();
   // Results exist only for a finished attempt; an open one goes back to the exam.
@@ -46,10 +47,12 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
     redirect(attempt.assignmentId ? `/student/full-tests/${attempt.assignmentId}` : historyHref);
   }
   const invalidated = isInvalidated(attempt.status);
+  // The exam as this attempt saw it (RNF-17 snapshot), not the live, possibly edited exam.
+  const modules = await fullTestModulesForAttempt(attempt);
 
   const answersByQuestion = new Map(attempt.answers.map((answer) => [answer.questionId, answer]));
   const topicStats = new Map<string, { correct: number; total: number; time: number }>();
-  const moduleStats = attempt.test.modules.map((module) => {
+  const moduleStats = modules.map((module) => {
     const tier = moduleTierMeta(module.order);
     let correct = 0;
     let total = 0;
@@ -98,7 +101,7 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
       </div>
       {attempt.test.reviewEnabled ? (
         <div className="mt-6 space-y-5">
-          {attempt.test.modules.map((module) => {
+          {modules.map((module) => {
             const tier = moduleTierMeta(module.order);
             return (
               <Card key={module.id} padding="md">

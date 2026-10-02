@@ -20,6 +20,7 @@ import { parentConsentSchema, type ParentConsentInput } from "@/contracts/auth";
 import { LegalLinks } from "@/components/legal/legal-page";
 import { Alert, InlineError } from "@/components/sat/alert";
 import { apiFetch, errorMessage } from "@/lib/api-client";
+import { PARENT_CONSENT_STATEMENT } from "@/lib/consent";
 
 interface ConsentInfo {
   studentName: string;
@@ -27,6 +28,9 @@ interface ConsentInfo {
   parentName: string | null;
   parentEmail: string;
   approved: boolean;
+  existingParent?: boolean;
+  accountConflict?: boolean;
+  consentVersion?: string;
 }
 
 export default function ParentConsentPage() {
@@ -56,16 +60,22 @@ export default function ParentConsentPage() {
       .catch((error) => setLoadError(errorMessage(error)));
   }, [token]);
 
-  async function onSubmit(values: ParentConsentInput) {
+  async function submitConsent(password?: string) {
     setServerError("");
     try {
-      await apiFetch("/api/auth/parent-consent", { method: "POST", json: { token, password: values.password } });
+      await apiFetch("/api/auth/parent-consent", { method: "POST", json: { token, password } });
     } catch (error) {
       setServerError(errorMessage(error));
       return;
     }
     setApproved(true);
   }
+
+  async function onSubmit(values: ParentConsentInput) {
+    await submitConsent(values.password);
+  }
+
+  const [linking, setLinking] = useState(false);
 
   if (loadError) {
     return (
@@ -105,13 +115,35 @@ export default function ParentConsentPage() {
         </div>
         {approved ? (
           <Alert tone="success">Authorization recorded. The student can now activate their account.</Alert>
+        ) : info.accountConflict ? (
+          <Alert tone="error" title="This email cannot be used for a parent account">
+            It already belongs to another type of account. Ask the teacher to send the invitation with a different
+            parent/guardian email.
+          </Alert>
+        ) : info.existingParent ? (
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">{PARENT_CONSENT_STATEMENT}</p>
+            <p className="text-sm text-muted-foreground">
+              You already have a parent account with this email. Authorizing links this student to it; your password does
+              not change.
+            </p>
+            <InlineError>{serverError}</InlineError>
+            <Button
+              className="w-full"
+              disabled={linking}
+              onClick={async () => {
+                setLinking(true);
+                await submitConsent();
+                setLinking(false);
+              }}
+            >
+              {linking ? "Authorizing..." : "Authorize enrollment"}
+            </Button>
+          </div>
         ) : (
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" noValidate>
-              <p className="text-sm text-muted-foreground">
-                By authorizing, you confirm that this student may create an account and be associated with the teacher
-                who issued the invitation.
-              </p>
+              <p className="text-sm text-muted-foreground">{PARENT_CONSENT_STATEMENT}</p>
               <FormSection>
                 <FormField
                   control={form.control}
@@ -148,7 +180,10 @@ export default function ParentConsentPage() {
           </Form>
         )}
       </Card>
-      <p className="mt-4 text-center text-xs text-gray-500">By authorizing you accept the Terms of Use and the Privacy Policy.</p>
+      <p className="mt-4 text-center text-xs text-gray-500">
+        By authorizing you accept the Terms of Use and the Privacy Policy
+        {info.consentVersion ? ` (consent text version ${info.consentVersion})` : ""}.
+      </p>
       <LegalLinks className="mt-1" />
     </div>
   );

@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { absoluteAppUrl, sendParentConsentEmail, sendStudentInviteEmail } from "@/lib/email";
 import { hashPublicToken, newPublicToken } from "@/lib/token-security";
 import { captureCaughtError, writeAudit } from "@/lib/audit";
+import { resolveIsMinor } from "@/lib/consent";
 import { BadRequestError, ConflictError, ForbiddenError, InternalServerError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
 export const POST = withApiErrors(async function POST(req: NextRequest) {
@@ -13,8 +14,14 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
   }
 
   try {
-    const { name, email, phone, startDate, programId, isMinor, parentName, parentEmail, parentPhone } = await req.json();
+    const { name, email, phone, startDate, birthDate: birthDateRaw, programId, isMinor: isMinorFlag, parentName, parentEmail, parentPhone } = await req.json();
     if (!name || !email || !programId) return new BadRequestError("Name, email, and program are required.").toResponse();
+    const birthDate = birthDateRaw ? new Date(birthDateRaw) : null;
+    if (birthDate && (Number.isNaN(birthDate.getTime()) || birthDate > new Date())) {
+      return new BadRequestError("Birth date is not valid.").toResponse();
+    }
+    // Minor status follows the birth date when given; otherwise the teacher's checkbox.
+    const isMinor = resolveIsMinor(birthDate, Boolean(isMinorFlag));
     if (isMinor && !parentEmail) return new BadRequestError("Parent email is required for minor students.").toResponse();
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -53,7 +60,8 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
         startDate: startDate ? new Date(startDate) : null,
         invitedById: session.user.id,
         programId: program.id,
-        isMinor: Boolean(isMinor),
+        birthDate,
+        isMinor,
         parentName: parentName || null,
         parentEmail: parentEmail || null,
         parentPhone: parentPhone || null,
@@ -71,7 +79,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
       targetType: "InviteToken",
       targetId: invite.id,
       outcome: "success",
-      metadata: { email, programId: program.id, isMinor: Boolean(isMinor), hasParentEmail: Boolean(parentEmail) },
+      metadata: { email, programId: program.id, isMinor, minorFromBirthDate: Boolean(birthDate), hasParentEmail: Boolean(parentEmail) },
     });
 
     const inviteUrl = absoluteAppUrl(`/auth/activate?token=${token}`);

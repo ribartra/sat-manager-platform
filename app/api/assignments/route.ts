@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import { parseDueDate, parseUnlockDate, upsertPracticeAssignment, type AssignmentOutcome } from "@/lib/assignments";
 import { studentAccessWhereFor } from "@/lib/program-scope";
 import { BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
+import { writeAudit } from "@/lib/audit";
 
 export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
@@ -88,6 +89,19 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
         },
       });
     }
+    // Group-level rule (inherited by future members); per-student rows are audited in upsertPracticeAssignment.
+    await writeAudit({
+      userId: session.user.id,
+      action: "ASSIGN_GROUP_PRACTICE_SET",
+      targetType: "Group",
+      targetId: sourceGroupId,
+      metadata: {
+        practiceSetIds: requestedPracticeSetIds,
+        dueDate: resolvedDueDate?.toISOString() ?? null,
+        unlockAt: resolvedUnlockAt?.toISOString() ?? null,
+        locked: resolvedLocked,
+      },
+    });
   }
 
   // Assigning again never duplicates: pending assignments get the new settings,

@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { checkRateLimit, rateLimitKey, rateLimitResponse } from "@/lib/rate-limit";
 import { hashPublicToken } from "@/lib/token-security";
 import { captureCaughtError, writeAudit } from "@/lib/audit";
+import { resolveParentAccount } from "@/lib/consent";
 import { passwordPolicyError } from "@/lib/password-policy";
 import { BadRequestError, ConflictError, ForbiddenError, InternalServerError, withApiErrors } from "@/lib/api-error";
 
@@ -129,6 +130,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
 
     const programId = invite.programId;
     let studentId = "";
+    let parentConflictRole: string | null = null;
 
     await prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
@@ -137,6 +139,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
           email: invite.email,
           phone: invite.phone ?? null,
           startDate: invite.startDate ?? null,
+          birthDate: invite.birthDate ?? null,
           passwordHash: hash,
           role: "STUDENT",
           active: true,
@@ -155,31 +158,33 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
       });
 
       if (invite.parentEmail) {
-        const parent = await tx.user.upsert({
-          where: { email: invite.parentEmail },
-          update: {
-            name: invite.parentName ?? invite.parentEmail,
-            phone: invite.parentPhone ?? null,
-            role: "PARENT",
-            active: true,
-            validationStatus: "APPROVED",
-            validationReviewedAt: new Date(),
-          },
-          create: {
-            name: invite.parentName ?? invite.parentEmail,
-            email: invite.parentEmail,
-            phone: invite.parentPhone ?? null,
-            role: "PARENT",
-            active: true,
-            validationStatus: "APPROVED",
-            validationReviewedAt: new Date(),
-          },
-        });
-        await tx.parentStudent.upsert({
-          where: { parentId_studentId: { parentId: parent.id, studentId: user.id } },
-          update: { authorizedAt: new Date() },
-          create: { parentId: parent.id, studentId: user.id, authorizedAt: new Date() },
-        });
+        // Create or link a PARENT account only; never convert an existing student/teacher/admin.
+        const account = await resolveParentAccount(tx, invite.parentEmail);
+        if (account.kind === "conflict") {
+          parentConflictRole = account.role;
+        } else {
+          const parentId =
+            account.kind === "parent"
+              ? account.id
+              : (
+                  await tx.user.create({
+                    data: {
+                      name: invite.parentName ?? invite.parentEmail,
+                      email: invite.parentEmail,
+                      phone: invite.parentPhone ?? null,
+                      role: "PARENT",
+                      active: true,
+                      validationStatus: "APPROVED",
+                      validationReviewedAt: new Date(),
+                    },
+                  })
+                ).id;
+          await tx.parentStudent.upsert({
+            where: { parentId_studentId: { parentId, studentId: user.id } },
+            update: { authorizedAt: new Date() },
+            create: { parentId, studentId: user.id, authorizedAt: new Date() },
+          });
+        }
       }
 
       await tx.inviteToken.update({ where: { id: invite.id }, data: { usedAt: new Date() } });
@@ -193,6 +198,16 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
       outcome: "success",
       metadata: { role: "STUDENT", inviteId: invite.id, email: invite.email, programId },
     });
+    if (parentConflictRole) {
+      await writeAudit({
+        userId: studentId,
+        action: "PARENT_LINK_SKIPPED",
+        targetType: "InviteToken",
+        targetId: invite.id,
+        outcome: "failure",
+        metadata: { reason: "parent_email_belongs_to_other_role", existingRole: parentConflictRole },
+      });
+    }
 
     return NextResponse.json({ ok: true });
   } catch (error) {

@@ -85,7 +85,8 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
       metadata: JSON.stringify({ email: normalizedEmail, linkedStudentIds: requestedStudentIds }),
     },
   });
-  return NextResponse.json(parent);
+  // Never return the password hash or session fields.
+  return NextResponse.json({ id: parent.id, name: parent.name, email: parent.email, phone: parent.phone, role: parent.role, active: parent.active });
 });
 
 export const PATCH = withApiErrors(async function PATCH(req: NextRequest) {
@@ -120,6 +121,7 @@ export const PATCH = withApiErrors(async function PATCH(req: NextRequest) {
     const updated = await prisma.user.update({
       where: { id: parent.id },
       data: { name, email: normalizedEmail, phone: phone || null, active: true, validationStatus: "APPROVED" },
+      select: { id: true, name: true, email: true, phone: true, role: true, active: true },
     });
     if (requestedStudentIds) {
       const currentLinks = await prisma.parentStudent.findMany({

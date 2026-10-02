@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import { writeAudit } from "@/lib/audit";
 import { withSqliteRetry } from "@/lib/sqlite-retry";
 import { notifyUser } from "@/lib/notifications";
 
@@ -36,6 +37,12 @@ export async function releaseScheduledUnlocks(now = new Date()) {
   );
   for (const assignment of due) {
     await notifyUser(assignment.studentId, "Practice Set unlocked", `${assignment.practiceSet.name} is available now.`, "/student");
+    await writeAudit({
+      action: "AUTO_UNLOCK_ASSIGNMENT",
+      targetType: "Assignment",
+      targetId: assignment.id,
+      metadata: { studentId: assignment.studentId, reason: "scheduled_unlock_at", unlockAt: now.toISOString() },
+    });
   }
   return due.length;
 }

@@ -2,6 +2,7 @@
 // (/api/reports/students/[id]/pdf) so both show exactly the same numbers.
 // Taxonomy note: the Topic table is the SKILL level (Section → Domain → Skill).
 import prisma from "@/lib/prisma";
+import { snapshotModulesOf } from "@/lib/full-test-snapshot";
 import { scorePercent } from "@/lib/utils";
 import { parseSnapshot, type PracticeSetSnapshot, type QuestionSnapshot } from "@/lib/attempt-snapshots";
 import { isAnsweredAnswer, sumAttemptElapsedTime, summarizeAllQuestionAnswers } from "@/lib/weighted-score";
@@ -352,7 +353,9 @@ export async function loadMockReport(studentId: string, filters: ReportFilters, 
   ]);
   const rows = examAttempts.flatMap((exam) => {
     const answersByQuestion = new Map(exam.answers.map((answer) => [answer.questionId, answer]));
-    return exam.test.modules.flatMap((module) =>
+    // Exam structure as the attempt saw it (RNF-17 snapshot); legacy attempts use the live exam.
+    const modules = snapshotModulesOf(exam.testSnapshot) ?? exam.test.modules;
+    return modules.flatMap((module) =>
       module.questions.map((item) => {
         const answer = answersByQuestion.get(item.questionId);
         return {

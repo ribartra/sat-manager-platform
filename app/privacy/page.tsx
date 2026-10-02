@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: "Privacy Policy · SAT Practice Platf
 
 export default function PrivacyPage() {
   return (
-    <LegalPage title="Privacy Policy" updated="October 1, 2026">
+    <LegalPage title="Privacy Policy" updated="October 2, 2026">
       <section>
         <p>
           This platform is used by the academy to prepare students for the SAT. It is not open to the
@@ -21,7 +21,7 @@ export default function PrivacyPage() {
           <li>Account data: name, email, optional phone, role (student, parent, teacher, admin) and program.</li>
           <li>For students: birth date or whether the student is a minor, start date and an optional profile picture.</li>
           <li>Study activity: answers, time per question, questions marked for review, eliminated options, personal notes, scores and attempt history.</li>
-          <li>Parent consent for minors: the parent&apos;s name, email and the date and IP address of the consent.</li>
+          <li>Parent consent for minors: the parent&apos;s name, email, the date and IP address of the consent and the version of the consent text that was accepted.</li>
           <li>Security records: sign-ins, failed sign-ins and administrative actions (the audit log).</li>
         </ul>
         <p className="mt-2">We do not collect payment data, precise location, or data from other websites, and we do not use advertising or tracking cookies. The only cookie is the session cookie that keeps you signed in.</p>
@@ -57,7 +57,8 @@ export default function PrivacyPage() {
         <ul>
           <li>Accounts and study history are kept while the student takes part in a program, so progress can be compared over time. Deactivated accounts keep their history unless deletion is requested.</li>
           <li>Audit log entries are deleted after {Math.round(AUDIT_RETENTION_DAYS / 30)} months.</li>
-          <li>Database backups are kept for a limited period and then deleted automatically.</li>
+          <li>Study history is never deleted automatically: deactivating an account or invalidating an attempt keeps the record, and past results do not change if a question is edited later.</li>
+          <li>Database backups are kept for up to 6 months in a separate location and then deleted automatically. A deletion request is applied to the live data at once; older backups expire on that schedule.</li>
         </ul>
       </section>
 

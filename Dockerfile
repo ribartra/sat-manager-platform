@@ -61,6 +61,7 @@ COPY --from=build /app/app/generated ./app/generated
 COPY --from=build /app/prisma ./prisma
 COPY --from=build /app/prisma.config.ts ./prisma.config.ts
 COPY --from=build /app/next.config.ts ./next.config.ts
+COPY --from=build /app/scripts/backfill-fpt-snapshots.mjs ./scripts/backfill-fpt-snapshots.mjs
 COPY deploy/web-entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 

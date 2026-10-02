@@ -5,6 +5,61 @@ const root = process.cwd();
 
 const checks = [
   {
+    file: "app/api/auth/parent-consent/route.ts",
+    requires: ["resolveParentAccount", "kind === \"conflict\"", "parentConsentVersion"],
+    label: "Parent consent only creates/links PARENT accounts (never converts other roles) and stores the consent version",
+  },
+  {
+    file: "app/api/auth/activate/route.ts",
+    requires: ["resolveParentAccount", "parentConflictRole"],
+    label: "Student activation never converts an existing account into a parent",
+  },
+  {
+    file: "app/api/groups/[groupId]/members/route.ts",
+    requires: ["studentAccessWhereFor", "ADD_GROUP_MEMBER"],
+    label: "Group membership scoped to visible students and audited",
+  },
+  {
+    file: "app/api/groups/[groupId]/members/[userId]/route.ts",
+    requires: ["REMOVE_GROUP_MEMBER"],
+    label: "Group member removal audited",
+  },
+  {
+    file: "app/api/groups/route.ts",
+    requires: ["CREATE_GROUP"],
+    label: "Group creation audited",
+  },
+  {
+    file: "app/api/full-practice-tests/route.ts",
+    requires: ["CREATE_FULL_PRACTICE_TEST"],
+    label: "Exam creation audited",
+  },
+  {
+    file: "app/api/unlock-requests/route.ts",
+    requires: ["CREATE_UNLOCK_REQUEST"],
+    label: "Unlock requests audited",
+  },
+  {
+    file: "app/api/assignments/route.ts",
+    requires: ["ASSIGN_GROUP_PRACTICE_SET"],
+    label: "Group-level assignment rules audited",
+  },
+  {
+    file: "lib/assignments.ts",
+    requires: ["AUTO_UNLOCK_ASSIGNMENT"],
+    label: "Scheduled unlocks audited",
+  },
+  {
+    file: "app/api/full-practice-tests/attempts/[attemptId]/submit/route.ts",
+    requires: ["fullTestModulesForAttempt"],
+    label: "Exam grading uses the attempt snapshot (history immutable)",
+  },
+  {
+    file: "app/(student)/student/full-tests/[assignmentId]/page.tsx",
+    requires: ["buildFullTestSnapshot", "fullTestModulesForAttempt"],
+    label: "Exam attempts are snapshotted at start and rendered from the snapshot",
+  },
+  {
     file: "lib/rbac.ts",
     requires: ["requireTeacherOrAdmin", "requireAdmin", "requireApprovedSession", "validationStatus", "active"],
     label: "RBAC helpers validate role, active state and approval",

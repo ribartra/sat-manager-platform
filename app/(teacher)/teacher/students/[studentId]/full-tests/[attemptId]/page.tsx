@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { MathContent } from "@/components/math-content";
 import { QuestionMedia } from "@/components/question-media";
 import prisma from "@/lib/prisma";
+import { fullTestModulesForAttempt } from "@/lib/full-test-snapshot";
 import { auth } from "@/lib/auth";
 import { teacherProgramEnrollmentScope } from "@/lib/program-scope";
 import { formatDate, formatTime, scorePercent } from "@/lib/utils";
@@ -42,22 +43,12 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
       student: { select: { id: true, name: true } },
       answers: true,
       pauses: true,
-      test: {
-        include: {
-          modules: {
-            orderBy: { order: "asc" },
-            include: {
-              questions: {
-                orderBy: { order: "asc" },
-                include: { question: { include: { topic: true, options: { orderBy: { label: "asc" } } } } },
-              },
-            },
-          },
-        },
-      },
+      test: { select: { name: true } },
     },
   });
   if (!attempt) notFound();
+  // The exam as this attempt saw it (RNF-17 snapshot), not the live, possibly edited exam.
+  const modules = await fullTestModulesForAttempt(attempt);
 
   const parents = await prisma.parentStudent.findMany({
     where: { studentId },
@@ -68,7 +59,7 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
     .map((link) => ({ id: link.parent.id, name: link.parent.name, email: link.parent.email }));
 
   const answersByQuestion = new Map(attempt.answers.map((answer) => [answer.questionId, answer]));
-  const moduleRows = attempt.test.modules.map((module) => {
+  const moduleRows = modules.map((module) => {
     let correct = 0;
     let answered = 0;
     let marked = 0;
@@ -161,7 +152,7 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
       </Card>
 
       <div className="space-y-5">
-        {attempt.test.modules.map((module) => (
+        {modules.map((module) => (
           <Card key={module.id} padding="md">
             <h2 className="mb-3 text-sm font-semibold text-gray-900">{module.name}</h2>
             <div className="space-y-3">

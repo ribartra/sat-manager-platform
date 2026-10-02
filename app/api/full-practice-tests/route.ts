@@ -5,6 +5,7 @@ import { fullTestEditorFieldIssues } from "@/contracts/full-test";
 import { validateFullPracticeTestStructure } from "@/lib/full-test-validation";
 import { FULL_TEST_MODULES } from "@/lib/full-test-modules";
 import { ForbiddenError, ValidationError, withApiErrors } from "@/lib/api-error";
+import { writeAudit } from "@/lib/audit";
 
 export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
@@ -67,6 +68,14 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
         })),
       },
     },
+  });
+
+  await writeAudit({
+    userId: session.user.id,
+    action: "CREATE_FULL_PRACTICE_TEST",
+    targetType: "FullPracticeTest",
+    targetId: test.id,
+    metadata: { name, status: test.status, questionCount: normalizedModules.flat().length },
   });
 
   return NextResponse.json({ test, warnings: validation.warnings });

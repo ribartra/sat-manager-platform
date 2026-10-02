@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { InlineError } from "@/components/sat/alert";
 import { errorMessage, readApiError } from "@/lib/api-client";
+import { ADULT_AGE, ageOn } from "@/lib/consent";
 
 export default function InviteStudentPage() {
   const [programs, setPrograms] = useState<{ id: string; name: string; teachers: { teacher: { name: string } }[] }[]>([]);
@@ -17,7 +18,11 @@ export default function InviteStudentPage() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [startDate, setStartDate] = useState("");
-  const [isMinor, setIsMinor] = useState(false);
+  const [birthDate, setBirthDate] = useState("");
+  const [isMinorFlag, setIsMinor] = useState(false);
+  // Birth date, when given, decides minor status (the server derives it the same way).
+  const derivedMinor = birthDate ? ageOn(new Date(birthDate)) < ADULT_AGE : null;
+  const isMinor = derivedMinor ?? isMinorFlag;
   const [parentName, setParentName] = useState("");
   const [parentEmail, setParentEmail] = useState("");
   const [parentPhone, setParentPhone] = useState("");
@@ -43,7 +48,7 @@ export default function InviteStudentPage() {
     const res = await fetch("/api/students/invite", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, phone, startDate, programId, isMinor, parentName, parentEmail, parentPhone }),
+      body: JSON.stringify({ name, email, phone, startDate, birthDate, programId, isMinor, parentName, parentEmail, parentPhone }),
     });
     setLoading(false);
     if (!res.ok) {
@@ -103,19 +108,26 @@ export default function InviteStudentPage() {
           <label className="mb-1 block text-sm font-medium text-gray-700">Start date</label>
           <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
         </div>
+        <div>
+          <label className="mb-1 block text-sm font-medium text-gray-700">Birth date</label>
+          <Input type="date" value={birthDate} max={new Date().toISOString().slice(0, 10)} onChange={(e) => setBirthDate(e.target.value)} />
+        </div>
         </div>
 
         <div className="border-t border-gray-200 pt-4">
           <label className="flex items-center gap-2 cursor-pointer select-none">
             <Checkbox
               checked={isMinor}
+              disabled={derivedMinor !== null}
               onChange={(e) => setIsMinor(e.target.checked)}
               className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
             />
             <span className="text-sm font-medium text-gray-700">Student is a minor (under 18)</span>
           </label>
           <p className="mt-1 text-xs text-gray-500 ml-6">
-            If checked, parent information will be linked when the student accepts the invitation.
+            {derivedMinor !== null
+              ? `Set from the birth date: ${derivedMinor ? "minor (under 18)" : "adult (18 or over)"}.`
+              : "If checked, parent information will be linked when the student accepts the invitation."}
           </p>
         </div>
 

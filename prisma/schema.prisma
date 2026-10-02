@@ -86,7 +86,7 @@ model ProgramEnrollment {
   parentApprovedAt      DateTime?
 
   program Program @relation(fields: [programId], references: [id], onDelete: Cascade)
-  student User    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  student User    @relation(fields: [studentId], references: [id], onDelete: Restrict)
 
   @@id([programId, studentId])
 }
@@ -316,7 +316,7 @@ model AttemptPause {
   resumedAt       DateTime?
   durationSeconds Int?
 
-  attempt Attempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  attempt Attempt @relation(fields: [attemptId], references: [id], onDelete: Restrict)
 }
 
 model AttemptAnswer {
@@ -333,7 +333,7 @@ model AttemptAnswer {
   /// Set when the student used "Check" (immediate feedback); the answer can no longer change.
   checkedAt       DateTime?
 
-  attempt  Attempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  attempt  Attempt  @relation(fields: [attemptId], references: [id], onDelete: Restrict)
   question Question @relation(fields: [questionId], references: [id])
   @@unique([attemptId, questionId])
   @@index([questionId])
@@ -349,6 +349,7 @@ model InviteToken {
   invitedById String?
   programId String?
   isMinor   Boolean   @default(false)
+  birthDate DateTime? // when set, isMinor is derived from it (lib/consent.ts)
   parentName String?
   parentEmail String?
   parentPhone String?
@@ -357,6 +358,7 @@ model InviteToken {
   parentConsentTokenHash String? @unique
   parentConsentAt DateTime?
   parentConsentIp String?
+  parentConsentVersion String? // PARENT_CONSENT_VERSION the parent accepted
   token     String    @unique
   tokenHash String?   @unique
   expiresAt DateTime
@@ -394,7 +396,7 @@ model UnlockRequest {
   status       String    @default("PENDING") // PENDING | APPROVED | DENIED
   createdAt    DateTime  @default(now())
   resolvedAt   DateTime?
-  assignment   Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  assignment   Assignment @relation(fields: [assignmentId], references: [id], onDelete: Restrict)
 }
 
 model Notification {
@@ -413,8 +415,8 @@ model ParentStudent {
   parentId  String
   studentId String
   authorizedAt DateTime?
-  parent    User @relation("ParentLinks", fields: [parentId], references: [id], onDelete: Cascade)
-  student   User @relation("ChildLinks", fields: [studentId], references: [id], onDelete: Cascade)
+  parent    User @relation("ParentLinks", fields: [parentId], references: [id], onDelete: Restrict)
+  student   User @relation("ChildLinks", fields: [studentId], references: [id], onDelete: Restrict)
 
   @@id([parentId, studentId])
 }
@@ -504,6 +506,9 @@ model FullPracticeTestAttempt {
   totalScore     Int?
   timeExpiredEvents Int    @default(0)
   extraTimeUsed  Int       @default(0)
+  // Immutable copy of modules/questions/keys taken when the attempt starts (lib/attempt-snapshots.ts):
+  // grading and results read it, so later edits to the exam or its questions never change history.
+  testSnapshot   String?
   test           FullPracticeTest @relation(fields: [testId], references: [id])
   assignment     FullPracticeTestAssignment? @relation(fields: [assignmentId], references: [id])
   student        User @relation(fields: [studentId], references: [id])
@@ -521,7 +526,7 @@ model FullPracticeTestPause {
   resumedAt       DateTime?
   durationSeconds Int?
 
-  attempt FullPracticeTestAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  attempt FullPracticeTestAttempt @relation(fields: [attemptId], references: [id], onDelete: Restrict)
 }
 
 model FullPracticeTestAnswer {
@@ -535,7 +540,7 @@ model FullPracticeTestAnswer {
   markedForReview Boolean @default(false)
   note            String?
   eliminatedOptions String?
-  attempt         FullPracticeTestAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  attempt         FullPracticeTestAttempt @relation(fields: [attemptId], references: [id], onDelete: Restrict)
 
   @@unique([attemptId, questionId])
   @@index([questionId])

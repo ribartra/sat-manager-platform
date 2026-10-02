@@ -4,6 +4,7 @@ import { getFeatureSetting } from "@/lib/app-settings";
 import { notifyTeachers } from "@/lib/notifications";
 import { requireApprovedSession } from "@/lib/rbac";
 import { ApiError, NotFoundError, UnauthorizedError, withApiErrors } from "@/lib/api-error";
+import { writeAudit } from "@/lib/audit";
 
 export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await requireApprovedSession();
@@ -28,6 +29,13 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
 
   const request = await prisma.unlockRequest.create({
     data: { assignmentId, studentId: session.user.id },
+  });
+  await writeAudit({
+    userId: session.user.id,
+    action: "CREATE_UNLOCK_REQUEST",
+    targetType: "UnlockRequest",
+    targetId: request.id,
+    metadata: { assignmentId, practiceSetId: assignment.practiceSetId },
   });
   await notifyTeachers(
     "Unlock requested",

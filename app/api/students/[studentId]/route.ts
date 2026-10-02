@@ -34,6 +34,8 @@ export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }
       startDate: startDate ? new Date(startDate) : null,
       active: Boolean(active),
     },
+    // Never return the password hash or session fields.
+    select: { id: true, name: true, email: true, phone: true, startDate: true, active: true, role: true },
   });
 
   await prisma.auditLog.create({

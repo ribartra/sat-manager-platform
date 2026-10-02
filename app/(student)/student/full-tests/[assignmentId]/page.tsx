@@ -8,6 +8,7 @@ import { getPublicCalculatorConfig } from "@/lib/calculator-config";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { extractQuestionGraphArtifacts } from "@/lib/question-graph";
 import { writeAudit } from "@/lib/audit";
+import { buildFullTestSnapshot, fullTestModulesForAttempt, fullTestModulesInclude } from "@/lib/full-test-snapshot";
 
 interface PageProps { params: Promise<{ assignmentId: string }>; searchParams: Promise<{ area?: string; from?: string; to?: string }> }
 
@@ -24,15 +25,7 @@ export default async function FullTestPlayerPage({ params, searchParams }: PageP
     include: {
       test: {
         include: {
-          modules: {
-            include: {
-              questions: {
-                include: { question: { include: { options: { orderBy: { label: "asc" } } } } },
-                orderBy: { order: "asc" },
-              },
-            },
-            orderBy: { order: "asc" },
-          },
+          modules: { include: fullTestModulesInclude, orderBy: { order: "asc" } },
         },
       },
       attempts: { where: { status: "IN_PROGRESS" }, include: { answers: true }, take: 1 },
@@ -43,7 +36,13 @@ export default async function FullTestPlayerPage({ params, searchParams }: PageP
   let attempt = assignment.attempts[0];
   if (!attempt) {
     const created = await prisma.fullPracticeTestAttempt.create({
-      data: { testId: assignment.testId, assignmentId: assignment.id, studentId: session!.user.id },
+      data: {
+        testId: assignment.testId,
+        assignmentId: assignment.id,
+        studentId: session!.user.id,
+        // RNF-17: freeze the exam as it is now; later edits never change this attempt.
+        testSnapshot: buildFullTestSnapshot(assignment.testId, assignment.test.modules),
+      },
     });
     attempt = await prisma.fullPracticeTestAttempt.findUniqueOrThrow({
       where: { id: created.id },
@@ -67,7 +66,9 @@ export default async function FullTestPlayerPage({ params, searchParams }: PageP
       metadata: { testId: assignment.testId, assignmentId: assignment.id },
     });
   }
-  const savedProgressState = await getFullTestProgressState(attempt.id, assignment.test.modules.length);
+  // Render the exam this attempt started with (snapshot), not the possibly-edited live exam.
+  const modules = await fullTestModulesForAttempt(attempt);
+  const savedProgressState = await getFullTestProgressState(attempt.id, modules.length);
   const showCalculator = await getFeatureSetting("CALCULATOR_FULL_TESTS");
 
   return (
@@ -76,7 +77,7 @@ export default async function FullTestPlayerPage({ params, searchParams }: PageP
       assignmentId={assignment.id}
       testName={assignment.test.name}
       breakMinutes={assignment.test.breakMinutes}
-      modules={assignment.test.modules.map((module) => ({
+      modules={modules.map((module) => ({
         id: module.id,
         name: module.name,
         section: module.section,

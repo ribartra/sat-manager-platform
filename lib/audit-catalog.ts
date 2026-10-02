@@ -33,6 +33,7 @@ export const AUDIT_ACTION_LABELS: Record<string, string> = {
   PARENT_CONSENT_VIEWED: "Parent consent link reviewed",
   PARENT_CONSENT_VIEW_FAILED: "Parent consent link failed",
   PARENT_CONSENT_RECORDED: "Parent consent recorded",
+  PARENT_LINK_SKIPPED: "Parent link skipped (email belongs to another account type)",
   PARENT_REPORT_LINK_CREATED: "Parent report link created",
   SHARE_PARENT_REPORT_LINK: "Parent report link shared",
   CREATE_PARENT_ACCESS_LINK: "Parent access link created",
@@ -58,7 +59,9 @@ export const AUDIT_ACTION_LABELS: Record<string, string> = {
   AUTO_UNLOCK_ASSIGNMENT: "Assignment auto-unlocked",
   AUTO_UNLOCK_SKIPPED_MANUAL_LOCK: "Auto-unlock skipped (manual lock)",
   AUTO_UNLOCK_SKIPPED_SCHEDULED_LOCK: "Auto-unlock skipped (scheduled lock)",
+  CREATE_UNLOCK_REQUEST: "Unlock requested",
   APPROVE_UNLOCK_REQUEST: "Unlock request approved",
+  ASSIGN_GROUP_PRACTICE_SET: "Practice Set assigned to group",
   DENY_UNLOCK_REQUEST: "Unlock request denied",
 
   // Content
@@ -106,6 +109,8 @@ export const AUDIT_ACTION_LABELS: Record<string, string> = {
   CREATE_GROUP: "Group created",
   UPDATE_GROUP: "Group updated",
   DELETE_GROUP: "Group deleted",
+  ADD_GROUP_MEMBER: "Student added to group",
+  REMOVE_GROUP_MEMBER: "Student removed from group",
 
   // Settings
   UPDATE_APP_SETTING: "App setting updated",
