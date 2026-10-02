@@ -113,4 +113,28 @@ Cada respuesta lleva `x-request-id`. Las líneas de log JSON (`http.request`, `e
 
 ## Ensayo de restore
 
-_Se completa abajo con la fecha, la copia usada y el resultado._
+**2026-10-02:** OK.
+
+**Copia usada:** la última off-site, `gs://sat-sol-gsc-backups-offsite/db/dev-2026-10-02-1843.db.gz`, que es la del backup forzado tras crear el bucket.
+
+**Pasos**
+1. Descargarla y descomprimirla.
+2. Comprobar la copia: `integrity_check` = ok, 2 597 preguntas, 6 usuarios.
+3. Arrancar la imagen de producción `web:ws-20261002-rnf-closure` sobre esa copia.
+
+**Resultado**
+- El entrypoint aplicó la migración pendiente (`20261002_history_restrict_consent_fpt_snapshot`) y el backfill de snapshots (2/2).
+- `/api/health` respondió 200 `{"status":"ok","db":"up"}` y `/login` 200.
+- Antes, la misma migración se probó sobre la copia on-site `dev-2026-10-02-1843.db`: conteos de filas idénticos antes y después en 12 tablas, 0 violaciones de FK y 0 intentos sin snapshot.
+
+**Pendiente:** repetir el ensayo cada trimestre y anotar aquí la fecha.
+
+## Logs
+
+El Ops Agent (`deploy/ops-agent.yaml` → `/etc/google-cloud-ops-agent/config.yaml`) envía los logs
+de los contenedores (`/data/docker/containers/*/*-json.log`) al log `sat_docker`, con el
+`severity` de la app. Consultas útiles:
+
+- `logName="projects/sat-sol-gsc/logs/sat_docker" jsonPayload.event="http.request" jsonPayload.status>=500`
+- `jsonPayload.requestId="<id>"`: una petición de punta a punta.
+- `jsonPayload.event="attempt.submit"`: envíos de Practice y FPT.
