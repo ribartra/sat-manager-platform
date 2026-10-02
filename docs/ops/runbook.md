@@ -12,7 +12,7 @@ Referencia para desplegar, revertir, restaurar backups y atender alertas. Sustit
 | Stack | compose `sat-platform`, `/data/stack/docker-compose.yml`, `/data/stack/.env` (`REGISTRY`, `TAG`, `DOMAIN`), secretos en `/data/app.env` |
 | Datos | `/data/db/dev.db` (SQLite WAL), `/data/uploads`, `/data/private`; Caddy en `/data/caddy` |
 | Imágenes | `us-central1-docker.pkg.dev/sat-sol-gsc/sat-images/{web,ingest}:<TAG>` |
-| Backups | `gs://sat-sol-gsc-sat-data/backups/` (cada 6 h) y `gs://sat-sol-gsc-backups-offsite/` (us-west1, diario, 190 días) |
+| Backups | `gs://sat-sol-gsc-sat-data/backups/dev-*` (cada 6 h, **30 días** por regla de lifecycle; las copias manuales `pre-*` no caducan) y `gs://sat-sol-gsc-backups-offsite/` (us-west1, diario, 190 días; `db/legacy/` = un backup por día anterior al 02-10) |
 
 ## Ventana de mantenimiento
 
@@ -63,7 +63,7 @@ Si la versión nueva aplicó una migración que la anterior no soporta, restaura
 
 - `/usr/local/bin/sat-db-backup.sh` (fuente: `deploy/sat-db-backup.sh`) corre por cron cada 6 h.
   - En cada ejecución: `sqlite3 .backup` + `integrity_check` → `gs://sat-sol-gsc-sat-data/backups/dev-<fecha>.db`.
-  - En la ejecución de las 00 UTC: además, la base en gzip, `/data/uploads` y `/data/private` → `gs://sat-sol-gsc-backups-offsite/` (otra región).
+  - En la ejecución de las 00 UTC: además, la base en gzip → `gs://sat-sol-gsc-backups-offsite/db/`, y `/data/uploads` y `/data/private` con `gcloud storage rsync --recursive --no-clobber` (compara listados y no sobrescribe) → `files/` (otra región).
   - La VM puede crear y leer objetos en ese bucket, pero no borrarlos ni sobrescribirlos. La base se retiene 190 días.
 - Si todo va bien, escribe `/data/db/backup-status.json`, que la app publica en `/api/health/backup`.
 - Log: `/var/log/sat-db-backup.log`. Para forzar una copia off-site: `sudo FORCE_OFFSITE=1 /usr/local/bin/sat-db-backup.sh`.

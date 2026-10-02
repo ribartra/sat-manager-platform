@@ -39,9 +39,11 @@ if [ "$(date -u +%H)" = "00" ] || [ "${FORCE_OFFSITE:-0}" = "1" ]; then
   gzip -c "$out" > "$out.gz"
   gsutil -q cp "$out.gz" "gs://$OFFSITE_BUCKET/db/dev-$ts.db.gz"
   rm -f "$out.gz"
-  # -n: never overwrite (the VM has no delete permission off-site; files are immutable there).
-  gsutil -q -m cp -n -r /data/uploads "gs://$OFFSITE_BUCKET/files/"
-  gsutil -q -m cp -n -r /data/private "gs://$OFFSITE_BUCKET/files/"
+  # rsync compares listings (about 1 list call per 1000 objects) instead of one metadata request
+  # per file; --no-clobber never overwrites (the VM has no delete/overwrite permission off-site,
+  # and staged/question files are immutable once written).
+  gcloud storage rsync --recursive --no-clobber --quiet /data/uploads "gs://$OFFSITE_BUCKET/files/uploads"
+  gcloud storage rsync --recursive --no-clobber --quiet /data/private "gs://$OFFSITE_BUCKET/files/private"
   offsite="gs://$OFFSITE_BUCKET/db/dev-$ts.db.gz"
   log "offsite -> $offsite (+ uploads, private)"
 fi

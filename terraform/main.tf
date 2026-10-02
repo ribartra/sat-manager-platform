@@ -45,6 +45,19 @@ resource "google_storage_bucket" "data" {
     }
   }
 
+  # 6-hourly cron DB copies (backups/dev-*) live 30 days on-site; the off-site bucket keeps a
+  # daily copy for 190 days. Manual backups (pre-push-*, pre-*-*) are not matched and stay.
+  lifecycle_rule {
+    condition {
+      age            = 30
+      with_state     = "LIVE"
+      matches_prefix = ["backups/dev-"]
+    }
+    action {
+      type = "Delete"
+    }
+  }
+
   depends_on = [google_project_service.enabled]
 }
 
