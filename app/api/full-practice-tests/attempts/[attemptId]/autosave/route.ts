@@ -4,6 +4,7 @@ import { requireApprovedSession } from "@/lib/rbac";
 import { markUserActive } from "@/lib/activity";
 import { saveFullTestTimerState } from "@/lib/full-test-progress";
 import { reviewMetaByQuestion } from "@/lib/answer-review-meta";
+import { fullTestModulesForAttempt } from "@/lib/full-test-snapshot";
 import { NotFoundError, UnauthorizedError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
@@ -36,10 +37,8 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
     saveFullTestTimerState(attemptId, moduleTimerState),
   ]);
 
-  const modules = await prisma.fullPracticeTestModule.findMany({
-    where: { testId: attempt.testId },
-    include: { questions: true },
-  });
+  // Question → module map of the exam as this attempt started it (RNF-17 snapshot).
+  const modules = await fullTestModulesForAttempt(attempt);
   const moduleByQuestionId = new Map<string, string>();
   for (const testModule of modules) {
     for (const item of testModule.questions) moduleByQuestionId.set(item.questionId, testModule.id);
