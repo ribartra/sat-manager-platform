@@ -43,5 +43,8 @@ jobs:
       - name: Run typecheck
         run: npm run typecheck
 
+      - name: Static QA gates (security, RBAC scope, edge cases, practice areas, UI states/CSP)
+        run: npm run qa:p0 && npm run qa:authz && npm run qa:edge && npm run qa:practice-area && npm run qa:ui
+
       - name: Build
         run: npm run build
