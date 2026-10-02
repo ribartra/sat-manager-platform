@@ -15,6 +15,7 @@ import { isAnswerCorrect } from "@/lib/answer-grading";
 import { resolveQuestionType } from "@/lib/question-type";
 import { scorePracticeSetAttempt } from "@/lib/practice-set-scoring";
 import { writeAudit } from "@/lib/audit";
+import { log, REQUEST_ID_HEADER } from "@/lib/observability";
 import { NotFoundError, UnauthorizedError, withApiErrors } from "@/lib/api-error";
 
 export const POST = withApiErrors(async function POST(req: NextRequest, { params }: { params: Promise<{ attemptId: string }> }) {
@@ -210,6 +211,14 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
       scorePercent: scored.scorePercent,
       scaledScore: scored.scaledScore,
     },
+  });
+  log.info("attempt.submit", {
+    kind: "practice",
+    attemptId,
+    userId: session.user.id,
+    practiceSetId: attempt.practiceSetId,
+    scorePercent: scored.scorePercent,
+    requestId: req.headers.get(REQUEST_ID_HEADER) ?? undefined,
   });
 
   return NextResponse.json({ ok: true });

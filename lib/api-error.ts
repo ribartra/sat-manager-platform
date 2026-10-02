@@ -1,3 +1,4 @@
+import { log, REQUEST_ID_HEADER } from "@/lib/observability";
 import { NextResponse } from "next/server";
 import { captureCaughtError } from "@/lib/audit";
 
@@ -149,17 +150,46 @@ function codeForStatus(status: number) {
  */
 export function withApiErrors<Args extends unknown[]>(handler: (...args: Args) => Promise<Response> | Response) {
   return async (...args: Args): Promise<Response> => {
+    const request = args[0] instanceof Request ? args[0] : null;
+    const startedAt = Date.now();
+    let response: Response | null = null;
     try {
-      return await handler(...args);
+      response = await handler(...args);
+      return response;
     } catch (error) {
-      if (error instanceof ApiError) return error.toResponse();
+      if (error instanceof ApiError) {
+        response = error.toResponse();
+        return response;
+      }
       // next/navigation redirect()/notFound() signal through throws; let them through.
       if (error && typeof error === "object" && "digest" in error && typeof (error as { digest?: unknown }).digest === "string" && String((error as { digest: string }).digest).startsWith("NEXT_")) {
         throw error;
       }
-      const request = args[0] instanceof Request ? args[0] : null;
-      await captureCaughtError(`api:${request ? new URL(request.url).pathname : "unknown"}`, error).catch(() => {});
-      return new InternalServerError().toResponse();
+      const path = request ? new URL(request.url).pathname : "unknown";
+      await captureCaughtError(`api:${path}`, error, {
+        metadata: { requestId: request?.headers.get(REQUEST_ID_HEADER) ?? undefined },
+      }).catch(() => {});
+      response = new InternalServerError().toResponse();
+      return response;
+    } finally {
+      if (request && response) logAccess(request, response.status, Date.now() - startedAt);
     }
   };
+}
+
+/** One structured access line per API request (method, path, status, duration, request id). */
+function logAccess(request: Request, status: number, ms: number) {
+  const path = new URL(request.url).pathname;
+  // Healthy probes (Docker every 30 s, uptime checks) would drown the log.
+  if (status < 400 && path.startsWith("/api/health")) return;
+  const fields = {
+    method: request.method,
+    path,
+    status,
+    ms,
+    requestId: request.headers.get(REQUEST_ID_HEADER) ?? undefined,
+  };
+  if (status >= 500) log.error("http.request", fields);
+  else if (status >= 400) log.warn("http.request", fields);
+  else log.info("http.request", fields);
 }

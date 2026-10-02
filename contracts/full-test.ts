@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod-config";
 import { validateFullPracticeTestStructure } from "@/lib/full-test-validation";
 
 export const fullTestEditorFieldsSchema = z.object({

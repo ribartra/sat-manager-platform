@@ -1,6 +1,24 @@
 import type { NextConfig } from "next";
+import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+import path from "node:path";
+
+/**
+ * sha256 of the <style> sonner inserts at runtime (it cannot take a nonce). Allowed by hash in
+ * the page CSP (lib/csp.ts); recomputed on every build so a sonner upgrade cannot silently break toasts.
+ * The page Content-Security-Policy itself is set per request, with a nonce, in proxy.ts.
+ */
+function sonnerStyleHash() {
+  const source = readFileSync(path.join(process.cwd(), "node_modules/sonner/dist/index.mjs"), "utf8");
+  const literal = source.match(/__insertCSS\(("(?:[^"\\]|\\.)*")\)/)?.[1];
+  if (!literal) throw new Error("sonner: inline style not found; update sonnerStyleHash in next.config.ts");
+  return createHash("sha256").update(JSON.parse(literal) as string).digest("base64");
+}
 
 const nextConfig: NextConfig = {
+  env: {
+    SONNER_STYLE_HASH: sonnerStyleHash(),
+  },
   experimental: {
     proxyClientMaxBodySize: "256mb",
   },
@@ -10,30 +28,7 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: process.env.DOCKER_BUILD === "1",
   },
   async headers() {
-    const csp = [
-      "default-src 'self'",
-      "base-uri 'self'",
-      "frame-ancestors 'self'",
-      "object-src 'none'",
-      // Report preview iframe loads the same-origin PDF endpoint.
-      "frame-src 'self'",
-      "img-src 'self' data: blob:",
-      "font-src 'self' data:",
-      "style-src 'self' 'unsafe-inline'",
-      // 'unsafe-eval' is only needed by the dev server (HMR/React refresh). 'unsafe-inline' stays:
-      // Next's inline bootstrap scripts would otherwise need a per-request nonce (dynamic rendering).
-      `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "production" ? "" : " 'unsafe-eval'"}`,
-      "connect-src 'self'",
-      "form-action 'self'",
-    ].join("; ");
-
     return [
-      {
-        // Document CSP for every page. PDF reports are excluded: a CSP on the PDF response
-        // (object-src 'none') makes Chrome refuse to show it in the preview iframe.
-        source: "/((?!api/reports/).*)",
-        headers: [{ key: "Content-Security-Policy", value: csp }],
-      },
       {
         source: "/:path*",
         headers: [

@@ -1,3 +1,4 @@
+import { log } from "@/lib/observability";
 import prisma from "@/lib/prisma";
 
 export type AuditOutcome = "success" | "failure" | "info";
@@ -84,14 +85,7 @@ export async function captureCaughtError(
   ctx?: { userId?: string | null; targetType?: string; targetId?: string; metadata?: Record<string, unknown> }
 ): Promise<void> {
   const serialized = serializeError(error);
-  console.error(
-    JSON.stringify({
-      level: "error",
-      scope,
-      ...serialized,
-      ...(ctx?.metadata ?? {}),
-    })
-  );
+  log.error("error.caught", { scope, ...serialized, ...(ctx?.metadata ?? {}) });
   await writeAudit({
     userId: ctx?.userId,
     action: "ERROR_CAUGHT",

@@ -6,9 +6,11 @@ import { markUserActive } from "@/lib/activity";
 import { scaledScore } from "@/lib/full-test-scoring";
 import { isAnswerCorrect } from "@/lib/answer-grading";
 import { writeAudit } from "@/lib/audit";
+import { log, REQUEST_ID_HEADER } from "@/lib/observability";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { resolveQuestionType } from "@/lib/question-type";
 import { reviewMetaByQuestion } from "@/lib/answer-review-meta";
+import { fullTestModulesForAttempt } from "@/lib/full-test-snapshot";
 import { NotFoundError, UnauthorizedError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
@@ -29,16 +31,8 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
 
   const excludePretest = await getFeatureSetting("FPT_PRETEST_EXCLUSION");
 
-  const modules = await prisma.fullPracticeTestModule.findMany({
-    where: { testId: attempt.testId },
-    include: {
-      questions: {
-        include: { question: { include: { options: true } } },
-        orderBy: { order: "asc" },
-      },
-    },
-    orderBy: { order: "asc" },
-  });
+  // Grade against the exam as it was when the attempt started (RNF-17 snapshot).
+  const modules = await fullTestModulesForAttempt(attempt);
 
   const allowedIds = new Set(modules.flatMap((testModule) => testModule.questions.map((item) => item.questionId)));
   const { byQuestion: reviewMeta, markedIds } = reviewMetaByQuestion(body, allowedIds);
@@ -134,6 +128,16 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
       testId: attempt.testId,
       scores: { rwScore, mathScore, totalScore: rwScore + mathScore },
     },
+  });
+
+  log.info("attempt.submit", {
+    kind: "full_test",
+    attemptId,
+    userId: session.user.id,
+    testId: attempt.testId,
+    snapshot: Boolean(attempt.testSnapshot),
+    totalScore: rwScore + mathScore,
+    requestId: req.headers.get(REQUEST_ID_HEADER) ?? undefined,
   });
 
   return NextResponse.json({

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { logApiEvent } from "@/lib/observability";
+import { buildCsp, createNonce } from "@/lib/csp";
+import { logApiEvent, REQUEST_ID_HEADER, resolveRequestId } from "@/lib/observability";
 
 const DEFAULT_DEV_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"];
 
@@ -53,21 +54,55 @@ function applyCorsHeaders(response: NextResponse, origin: string | null) {
   return response;
 }
 
-export function proxy(request: NextRequest) {
+function handleApi(request: NextRequest, requestHeaders: Headers) {
   const origin = request.headers.get("origin");
   const allowed = !origin || allowedOrigins().has(origin);
 
   if (!allowed) {
-    logApiEvent("cors.blocked_origin", { origin, path: request.nextUrl.pathname });
+    logApiEvent("cors.blocked_origin", {
+      origin,
+      path: request.nextUrl.pathname,
+      requestId: requestHeaders.get(REQUEST_ID_HEADER),
+    });
   }
 
   if (request.method === "OPTIONS") {
     return applyCorsHeaders(new NextResponse(null, { status: allowed ? 204 : 403 }), origin);
   }
 
-  return applyCorsHeaders(NextResponse.next(), origin);
+  return applyCorsHeaders(NextResponse.next({ request: { headers: requestHeaders } }), origin);
+}
+
+export function proxy(request: NextRequest) {
+  const requestId = resolveRequestId(request.headers.get(REQUEST_ID_HEADER));
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set(REQUEST_ID_HEADER, requestId);
+
+  let response: NextResponse;
+  if (request.nextUrl.pathname.startsWith("/api/")) {
+    response = handleApi(request, requestHeaders);
+  } else {
+    // Pages: per-request nonce. Next reads the CSP from the request headers and stamps the
+    // nonce on its own <script> tags; the app tree is force-dynamic, so every render is fresh.
+    const nonce = createNonce();
+    const csp = buildCsp(nonce);
+    requestHeaders.set("x-nonce", nonce);
+    requestHeaders.set("Content-Security-Policy", csp);
+    response = NextResponse.next({ request: { headers: requestHeaders } });
+    response.headers.set("Content-Security-Policy", csp);
+  }
+
+  response.headers.set(REQUEST_ID_HEADER, requestId);
+  return response;
 }
 
 export const config = {
-  matcher: "/api/:path*",
+  matcher: [
+    "/api/:path*",
+    // Every page except static assets and media (those carry no document CSP).
+    {
+      source: "/((?!api/|_next/static|_next/image|favicon|uploads/|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico|txt|xml)$).*)",
+      missing: [{ type: "header", key: "next-router-prefetch" }],
+    },
+  ],
 };
