@@ -24,8 +24,9 @@
 	respond @internal 404
 
 	reverse_proxy web:3000 {
-		# Keep transient container restarts from surfacing as a 502 to the browser.
-		lb_try_duration 10s
+		# Deploys and container restarts: hold requests (up to 30 s, the web start time) instead
+		# of answering 502, so a deploy looks like a slow page, not an outage.
+		lb_try_duration 30s
 		lb_try_interval 250ms
 	}
 }

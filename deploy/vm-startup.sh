@@ -6,6 +6,7 @@ set -euo pipefail
 
 REGION="${REGION}"
 CONFIG_BUCKET="${CONFIG_BUCKET}"
+OFFSITE_BUCKET="${OFFSITE_BUCKET}"
 PROJECT_ID="${PROJECT_ID}"
 REGISTRY="${REGISTRY}"
 TAG="${TAG}"
@@ -59,6 +60,7 @@ fi
 # --- 3) pull stack config from the config bucket -----------------------------
 gsutil cp "gs://$${CONFIG_BUCKET}/stack/docker-compose.prod.yml" /data/stack/docker-compose.yml
 gsutil cp "gs://$${CONFIG_BUCKET}/stack/Caddyfile" /data/caddy/Caddyfile
+gsutil cp "gs://$${CONFIG_BUCKET}/stack/deploy.sh" /data/stack/deploy.sh && chmod +x /data/stack/deploy.sh
 
 # --- 4) first-boot seeding (REQUIRED) ----------------------------------------
 # A prebuilt DB is mandatory: the migration chain is NOT replayable from empty
@@ -120,18 +122,17 @@ DOMAIN=$${DOMAIN}
 EOF
 chmod 600 /data/stack/.env
 
-# --- 6) SQLite backup every 6h to the config bucket --------------------------
-# RPO target ~6h. Uses sqlite3 .backup (safe on a live WAL DB), keeps a local
-# copy for fast restore, and prunes local copies older than 3 days.
-cat > /usr/local/bin/sat-db-backup.sh <<BK
-#!/bin/bash
-set -e
-ts=\$(date +%F-%H%M)
-sqlite3 /data/db/dev.db ".backup /data/backups-local/dev-\$ts.db"
-gsutil cp "/data/backups-local/dev-\$ts.db" "gs://$${CONFIG_BUCKET}/backups/dev-\$ts.db"
-find /data/backups-local -name 'dev-*.db' -mtime +3 -delete
-BK
+# --- 6) backups every 6h (RNF-15) -------------------------------------------
+# deploy/sat-db-backup.sh: sqlite3 .backup (safe on a live WAL DB) + integrity_check to the data
+# bucket every run; daily gzip'd DB + uploads/private to the off-site bucket (other region,
+# create-only for this VM, 190-day lifecycle). Writes /data/db/backup-status.json for
+# /api/health/backup. RPO ~6h on-site, ~24h off-site.
+gsutil cp "gs://$${CONFIG_BUCKET}/stack/sat-db-backup.sh" /usr/local/bin/sat-db-backup.sh
 chmod +x /usr/local/bin/sat-db-backup.sh
+cat > /etc/sat-backup.env <<BKENV
+DATA_BUCKET=$${CONFIG_BUCKET}
+OFFSITE_BUCKET=$${OFFSITE_BUCKET}
+BKENV
 cat > /etc/cron.d/sat-db-backup <<'CRON'
 0 */6 * * * root /usr/local/bin/sat-db-backup.sh >> /var/log/sat-db-backup.log 2>&1
 CRON

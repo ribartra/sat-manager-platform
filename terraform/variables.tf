@@ -90,3 +90,9 @@ variable "secret_names" {
   default     = ["auth-secret", "secret-encryption-key", "internal-ingest-token", "mistral-api-key", "email-pass"]
   description = "Secret Manager container names (suffixes) created empty by Terraform; values are loaded post-apply."
 }
+
+variable "offsite_region" {
+  type        = string
+  default     = "us-west1"
+  description = "Region of the off-site backup bucket; must differ from `region` and the VM region."
+}

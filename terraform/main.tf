@@ -61,6 +61,54 @@ resource "google_storage_bucket_object" "caddyfile" {
   source = "${path.module}/../deploy/Caddyfile"
 }
 
+resource "google_storage_bucket_object" "deploy_script" {
+  name   = "stack/deploy.sh"
+  bucket = google_storage_bucket.data.name
+  source = "${path.module}/../deploy/deploy.sh"
+}
+
+resource "google_storage_bucket_object" "backup_script" {
+  name   = "stack/sat-db-backup.sh"
+  bucket = google_storage_bucket.data.name
+  source = "${path.module}/../deploy/sat-db-backup.sh"
+}
+
+# --- off-site backups (RNF-14/15) --------------------------------------------
+# Separate bucket in another region. The VM may create and read objects but never delete or
+# overwrite them (no objectAdmin), so a compromised VM or a bad script cannot erase history.
+# Daily DB copies expire after 190 days (>= 6 months retention); media copies are kept.
+resource "google_storage_bucket" "offsite" {
+  name                        = "${var.project_id}-backups-offsite"
+  location                    = var.offsite_region
+  uniform_bucket_level_access = true
+  public_access_prevention    = "enforced"
+  force_destroy               = false
+
+  lifecycle_rule {
+    condition {
+      age            = 190
+      matches_prefix = ["db/"]
+    }
+    action {
+      type = "Delete"
+    }
+  }
+
+  depends_on = [google_project_service.enabled]
+}
+
+resource "google_storage_bucket_iam_member" "offsite_create" {
+  bucket = google_storage_bucket.offsite.name
+  role   = "roles/storage.objectCreator"
+  member = "serviceAccount:${google_service_account.vm.email}"
+}
+
+resource "google_storage_bucket_iam_member" "offsite_read" {
+  bucket = google_storage_bucket.offsite.name
+  role   = "roles/storage.objectViewer"
+  member = "serviceAccount:${google_service_account.vm.email}"
+}
+
 # --- secrets -----------------------------------------------------------------
 # Containers only. Values are added out-of-band (deploy/load-secrets.sh) so they
 # never touch Terraform state. No google_secret_manager_secret_version here.
@@ -187,17 +235,18 @@ resource "google_compute_instance" "vm" {
 
   metadata = {
     startup-script = templatefile("${path.module}/../deploy/vm-startup.sh", {
-      REGION        = var.region
-      CONFIG_BUCKET = google_storage_bucket.data.name
-      PROJECT_ID    = var.project_id
-      REGISTRY      = local.registry
-      TAG           = var.image_tag
-      DOMAIN        = var.domain
-      PREFIX        = var.name_prefix
-      EMAIL_FROM    = var.email_from
-      EMAIL_HOST    = var.email_host
-      EMAIL_PORT    = tostring(var.email_port)
-      EMAIL_USER    = var.email_user
+      REGION         = var.region
+      CONFIG_BUCKET  = google_storage_bucket.data.name
+      OFFSITE_BUCKET = google_storage_bucket.offsite.name
+      PROJECT_ID     = var.project_id
+      REGISTRY       = local.registry
+      TAG            = var.image_tag
+      DOMAIN         = var.domain
+      PREFIX         = var.name_prefix
+      EMAIL_FROM     = var.email_from
+      EMAIL_HOST     = var.email_host
+      EMAIL_PORT     = tostring(var.email_port)
+      EMAIL_USER     = var.email_user
     })
   }
 
