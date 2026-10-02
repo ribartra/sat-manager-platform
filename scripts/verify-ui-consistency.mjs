@@ -4,6 +4,9 @@
 //   - no ad-hoc disabled look (`disabled:opacity-*`) outside components/ui → Button / control-states
 //   - raw <button disabled> must use a shared blocked class (control-states) or be the Button base
 //   - API routes answer errors with ApiError subclasses, never `NextResponse.json({ error ... })`
+//   - icon-only buttons (no visible text) need an accessible name (aria-label / title)
+//   - page CSP is per-request with a nonce (proxy.ts + lib/csp.ts): no 'unsafe-inline' for scripts
+//     or <style> elements in production
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 
@@ -30,6 +33,35 @@ const allow = {
   ]),
 };
 
+/** `<Button>`/`<button>` elements whose content is only icons, without aria-label/title. */
+function iconOnlyButtons(text) {
+  const problems = [];
+  for (const m of text.matchAll(/<(Button|button)\b/g)) {
+    let i = m.index + m[0].length;
+    let depth = 0;
+    for (; i < text.length; i++) {
+      const c = text[i];
+      if (c === "{") depth++;
+      else if (c === "}") depth--;
+      else if (c === ">" && depth === 0) break;
+    }
+    const attrs = text.slice(m.index, i);
+    if (attrs.endsWith("/") || /aria-label|aria-labelledby|\btitle=|asChild/.test(attrs)) continue;
+    const close = text.indexOf(`</${m[1]}>`, i);
+    if (close < 0) continue;
+    const body = text.slice(i + 1, close);
+    if (/MathContent/.test(body)) continue;
+    const visible = body
+      .replace(/<[A-Z][A-Za-z0-9.]*\b[^<]*?\/>/g, "")
+      .replace(/\{\/\*[\s\S]*?\*\/\}/g, "")
+      .replace(/\s+/g, "");
+    if (visible === "" || /^[✕×]$/.test(visible)) {
+      problems.push(`${lineOf(text, m.index)} icon-only button without aria-label`);
+    }
+  }
+  return problems;
+}
+
 function lineOf(text, index) {
   return text.slice(0, index).split("\n").length;
 }
@@ -52,11 +84,39 @@ for (const file of files) {
       failures.push(`${file}:${lineOf(text, m.index)} ${m[0]} — use Button or a control-states class`);
     }
   }
+  if (file.endsWith(".tsx")) {
+    for (const problem of iconOnlyButtons(text)) failures.push(`${file}:${problem}`);
+  }
   if (isApi) {
     for (const m of text.matchAll(/NextResponse\.json\(\s*\{\s*error\s*:/g)) {
       failures.push(`${file}:${lineOf(text, m.index)} inline error response — use an ApiError subclass`);
     }
   }
+}
+
+// CSP: nonce-based, built per request.
+{
+  // Zod must be configured jitless before any schema exists (its eval probe trips the CSP).
+  for (const file of [...(await walk("contracts")), ...files]) {
+    const text = await readFile(path.join(root, file), "utf8");
+    if (/from "zod"/.test(text)) failures.push(`${file} imports "zod" directly — import { z } from "@/lib/zod-config"`);
+  }
+
+  const csp = await readFile(path.join(root, "lib/csp.ts"), "utf8");
+  const proxy = await readFile(path.join(root, "proxy.ts"), "utf8");
+  const config = await readFile(path.join(root, "next.config.ts"), "utf8");
+  const scriptLine = csp.split("\n").find((l) => l.includes("script-src"));
+  const styleLine = csp.split("\n").find((l) => l.includes("style-src-elem"));
+  if (!scriptLine || !/'nonce-\$\{nonce\}'/.test(scriptLine) || !scriptLine.includes("'strict-dynamic'") || scriptLine.includes("unsafe-inline")) {
+    failures.push("lib/csp.ts script-src must be 'nonce-…' + 'strict-dynamic' without 'unsafe-inline'");
+  }
+  // Production branch (after the `:`) must not allow inline <style> elements.
+  const prodStyle = styleLine?.split(":").slice(1).join(":") ?? "";
+  if (!styleLine || !/'nonce-\$\{nonce\}'/.test(prodStyle) || prodStyle.includes("unsafe-inline")) {
+    failures.push("lib/csp.ts production style-src-elem must be nonce-based without 'unsafe-inline'");
+  }
+  if (!proxy.includes("buildCsp(nonce)")) failures.push("proxy.ts must set the per-request CSP (buildCsp)");
+  if (/key:\s*"Content-Security-Policy"/.test(config)) failures.push("next.config.ts must not set a static CSP (proxy.ts owns it)");
 }
 
 console.log(failures.length ? failures.map((f) => `FAIL - ${f}`).join("\n") : "PASS - UI states and errors use the shared bases");

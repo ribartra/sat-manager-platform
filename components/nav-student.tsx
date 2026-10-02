@@ -194,7 +194,7 @@ export function NavStudent({
         >
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
             <span className="font-semibold text-gray-800 text-sm">SAT Practice</span>
-            <button onClick={closeMobile} className="p-1.5 rounded-md text-gray-400 hover:text-gray-700">
+            <button type="button" aria-label="Close menu" onClick={closeMobile} className="p-1.5 rounded-md text-gray-500 hover:text-gray-700">
               <X size={18} />
             </button>
           </div>

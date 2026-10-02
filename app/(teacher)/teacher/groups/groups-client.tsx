@@ -202,6 +202,8 @@ export function GroupsClient({ groups: initialGroups, students }: { groups: Grou
                       <span className="ml-2 text-gray-400">{m.email}</span>
                     </div>
                     <button
+                      type="button"
+                      aria-label={`Remove ${m.name} from ${group.name}`}
                       onClick={() => removeMember(group.id, m.id)}
                       className="text-gray-400 transition-colors hover:text-red-500"
                     >

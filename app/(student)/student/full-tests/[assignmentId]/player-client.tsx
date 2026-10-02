@@ -21,6 +21,7 @@ import { notify } from "@/lib/notify-ui";
 import { clearBuffer, readBuffer, sendKeepalive, useOnlineStatus, usePageHideFlush, useSaveQueue, writeBuffer } from "@/lib/player-persistence";
 import { ChevronLeft, Flag, List } from "lucide-react";
 import { Alert } from "@/components/sat/alert";
+import { KeyboardShortcutsHint, PlayerShortcuts } from "@/components/sat/keyboard-shortcuts-hint";
 
 interface ModuleQuestion {
   id: string;
@@ -42,6 +43,8 @@ interface TestModule {
 const RW_M2_INDEX = 1;
 /** Debounce for typed input (numeric answers, notes); clicks save immediately. */
 const TYPING_SAVE_DELAY_MS = 800;
+/** Choice clicks, Mark/eliminate and navigation: short enough to feel instant, long enough to batch. */
+const INTERACTION_SAVE_DELAY_MS = 600;
 
 interface FullTestAutosavePayload {
   answers: Record<string, string>;
@@ -296,14 +299,19 @@ export function FullTestPlayer({
     [buildAutosavePayload, postPayload, previewMode, recordQuestionTime],
   );
 
-  /** Debounced save for typed input; the refs are read when the timer fires. */
-  const scheduleTypingSave = useCallback(() => {
+  /**
+   * Debounced save: typing, choice clicks, Mark/eliminate and in-module navigation coalesce into
+   * one autosave (RNF-20); the refs are read when the timer fires. Module changes, break, submit,
+   * tab hide and reconnect call saveProgress directly, which flushes any pending save.
+   */
+  const scheduleSave = useCallback((delayMs: number = TYPING_SAVE_DELAY_MS) => {
     if (typingSaveTimeout.current) clearTimeout(typingSaveTimeout.current);
     typingSaveTimeout.current = setTimeout(() => {
       typingSaveTimeout.current = null;
       void saveProgress();
-    }, TYPING_SAVE_DELAY_MS);
+    }, delayMs);
   }, [saveProgress]);
+  const scheduleTypingSave = useCallback(() => scheduleSave(TYPING_SAVE_DELAY_MS), [scheduleSave]);
 
   // On mount, a local buffer means the last save never reached the server: apply it to the
   // player state first (so the next autosave does not overwrite it), then send it.
@@ -387,6 +395,11 @@ export function FullTestPlayer({
       notify.info("Preview only", "The exam is not scored or saved.");
       router.push(exitHref);
       return;
+    }
+    // Submit carries the full state; a deferred autosave firing afterwards would hit a closed attempt.
+    if (typingSaveTimeout.current) {
+      clearTimeout(typingSaveTimeout.current);
+      typingSaveTimeout.current = null;
     }
     if (phaseRef.current === "MODULE") {
       timerState.current[moduleIndexRef.current] = remainingRef.current;
@@ -528,8 +541,9 @@ export function FullTestPlayer({
     if (phase === "BREAK" || advancing) return;
     if (questionIndex < currentModule.questions.length - 1) {
       const nextQuestion = questionIndex + 1;
+      recordQuestionTime(); // credit time to the question being left before the deferred save
       setQuestionIndex(nextQuestion);
-      void saveProgress(answers, moduleIndex, nextQuestion);
+      scheduleSave(INTERACTION_SAVE_DELAY_MS);
       return;
     }
     setConfirmSubmitModule(true);
@@ -539,15 +553,17 @@ export function FullTestPlayer({
   function previous() {
     if (phase === "BREAK" || advancing || questionIndex === 0) return;
     const prevQuestion = questionIndex - 1;
+    recordQuestionTime();
     setQuestionIndex(prevQuestion);
-    void saveProgress(answers, moduleIndex, prevQuestion);
+    scheduleSave(INTERACTION_SAVE_DELAY_MS);
   }
 
   function goToQuestion(target: number) {
     if (phase === "BREAK" || advancing) return;
     if (target < 0 || target > currentModule.questions.length - 1) return;
+    recordQuestionTime();
     setQuestionIndex(target);
-    void saveProgress(answers, moduleIndex, target);
+    scheduleSave(INTERACTION_SAVE_DELAY_MS);
     setShowNav(false);
   }
 
@@ -557,7 +573,7 @@ export function FullTestPlayer({
     else next.add(questionId);
     markedRef.current = next;
     setMarked(next);
-    void saveProgress();
+    scheduleSave(INTERACTION_SAVE_DELAY_MS);
   }
 
   function toggleEliminated(questionId: string, label: string) {
@@ -567,7 +583,7 @@ export function FullTestPlayer({
     const next = { ...eliminatedRef.current, [questionId]: labels };
     eliminatedRef.current = next;
     setEliminated(next);
-    void saveProgress();
+    scheduleSave(INTERACTION_SAVE_DELAY_MS);
   }
 
   function handleNote(questionId: string, value: string) {
@@ -635,8 +651,25 @@ export function FullTestPlayer({
   const hasPassage = Boolean(question.stimulus?.trim());
   const responseType = resolveQuestionType(question.type, question.options);
 
+  function chooseOption(questionId: string, label: string) {
+    const nextAnswers = { ...answersRef.current, [questionId]: label };
+    answersRef.current = nextAnswers;
+    setAnswers(nextAnswers);
+    scheduleSave(INTERACTION_SAVE_DELAY_MS);
+  }
+
   return (
     <div className="flex h-dvh max-h-dvh flex-col overflow-hidden bg-white">
+      <PlayerShortcuts
+        enabled={!confirmSubmitModule && !showNav}
+        onPrevious={previous}
+        onNext={() => {
+          if (!isLastQuestionOfModule) next();
+        }}
+        onMark={() => toggleMarked(question.id)}
+        onChoose={(label) => chooseOption(question.id, label)}
+        choiceLabels={responseType === "MC" ? question.options.map((option) => option.label) : []}
+      />
       <OfflineBanner online={online} />
       {previewMode && (
         <Alert
@@ -692,7 +725,7 @@ export function FullTestPlayer({
           ) : null}
           <div className={cn(hasPassage && "border-t border-gray-200 pt-4")}>
             <MathContent content={question.stem} className="text-base font-medium text-gray-900 md:text-lg" />
-            <QuestionMedia imageUrl={question.imageUrl} alt={`Question ${question.id} image`} className="mt-4" />
+            <QuestionMedia imageUrl={question.imageUrl} alt={`Figure for question ${questionIndex + 1}`} className="mt-4" />
           </div>
         </div>
         <div className="overflow-y-auto p-5 md:p-6">
@@ -701,20 +734,23 @@ export function FullTestPlayer({
               <span className="text-4xl font-bold leading-none tabular-nums text-gray-900">{questionIndex + 1}</span>
               <p className="text-xs font-medium uppercase tracking-wide text-gray-500">{questionResponseLabel(responseType)}</p>
             </div>
-            <button
-              type="button"
-              onClick={() => toggleMarked(question.id)}
-              aria-pressed={marked.has(question.id)}
-              className={cn(
-                "flex items-center gap-1 rounded border px-2 py-1 text-xs transition-colors",
-                marked.has(question.id)
-                  ? "border-amber-400 bg-amber-50 text-amber-700"
-                  : "border-gray-300 text-gray-600 hover:border-gray-400",
-              )}
-            >
-              <Flag size={12} />
-              {marked.has(question.id) ? "Marked" : "Mark for review"}
-            </button>
+            <div className="flex items-center gap-1">
+              <KeyboardShortcutsHint choices={responseType === "MC"} />
+              <button
+                type="button"
+                onClick={() => toggleMarked(question.id)}
+                aria-pressed={marked.has(question.id)}
+                className={cn(
+                  "flex items-center gap-1 rounded border px-2 py-1 text-xs transition-colors",
+                  marked.has(question.id)
+                    ? "border-amber-500 bg-amber-50 text-amber-800"
+                    : "border-gray-400 text-gray-700 hover:border-gray-500 hover:text-gray-900",
+                )}
+              >
+                <Flag size={12} aria-hidden="true" />
+                {marked.has(question.id) ? "Marked" : "Mark for review"}
+              </button>
+            </div>
           </div>
           <MathToolPanel
             config={calculatorConfig}
@@ -737,12 +773,7 @@ export function FullTestPlayer({
                 >
                   <button
                     type="button"
-                    onClick={() => {
-                      const nextAnswers = { ...answersRef.current, [question.id]: option.label };
-                      answersRef.current = nextAnswers;
-                      setAnswers(nextAnswers);
-                      void saveProgress(nextAnswers);
-                    }}
+                    onClick={() => chooseOption(question.id, option.label)}
                     className={cn("flex flex-1 items-center gap-3 text-left", isEliminated && "line-through")}
                   >
                     <span
@@ -818,7 +849,7 @@ export function FullTestPlayer({
           <div className="w-full max-w-md rounded-t-xl bg-white p-5 shadow-xl" onClick={(event) => event.stopPropagation()}>
             <div className="mb-4 flex items-center justify-between">
               <h3 className="font-semibold text-gray-900">{currentModule.name}</h3>
-              <button type="button" onClick={() => setShowNav(false)} className="text-gray-400 hover:text-gray-600">✕</button>
+              <button type="button" aria-label="Close question navigator" onClick={() => setShowNav(false)} className="text-gray-500 hover:text-gray-700">✕</button>
             </div>
             <div className="mb-4 grid grid-cols-8 gap-2">
               {currentModule.questions.map((q, i) => (

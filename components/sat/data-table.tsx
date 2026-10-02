@@ -24,7 +24,7 @@ export type DataTableColumnMeta = {
 };
 
 declare module "@tanstack/react-table" {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-object-type -- module augmentation must be an interface
   interface ColumnMeta<TData, TValue> extends DataTableColumnMeta {}
 }
 

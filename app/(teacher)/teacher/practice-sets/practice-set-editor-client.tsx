@@ -347,13 +347,14 @@ export function PracticeSetEditor({
                     stemClassName="font-medium text-gray-900"
                   />
                 </div>
-                <Button type="button" variant="ghost" size="sm" onClick={() => moveQuestion(index, -1)} disabled={index === 0}>
+                <Button type="button" variant="ghost" size="sm" aria-label={`Move question ${index + 1} up`} onClick={() => moveQuestion(index, -1)} disabled={index === 0}>
                   <ArrowUp size={14} />
                 </Button>
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
+                  aria-label={`Move question ${index + 1} down`}
                   onClick={() => moveQuestion(index, 1)}
                   disabled={index === selectedQuestions.length - 1}
                 >
@@ -363,6 +364,7 @@ export function PracticeSetEditor({
                   type="button"
                   variant="ghost"
                   size="sm"
+                  aria-label={`Remove question ${index + 1} from the set`}
                   onClick={() => setQuestionIds((ids) => ids.filter((id) => id !== q.id))}
                 >
                   <X size={14} />

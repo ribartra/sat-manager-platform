@@ -1,7 +1,7 @@
 "use client";
 
 import { Checkbox } from "@/components/ui/checkbox";
-import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { UserPlus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -93,7 +93,12 @@ function SingleStudentCombobox({
   const [focused, setFocused] = useState(false);
 
   const search = controlledSearch ?? internalSearch;
-  const setSearch = onSearchChange ?? setInternalSearch;
+  const applySearch = onSearchChange ?? setInternalSearch;
+  // A new search always starts the keyboard highlight at the first match.
+  const setSearch = (next: string) => {
+    setHighlight(0);
+    applySearch(next);
+  };
 
   const selected = students.find((student) => student.id === value);
   const filtered = useFilteredStudents(students, search, filterBy, excludeIds);
@@ -103,10 +108,6 @@ function SingleStudentCombobox({
       : filtered;
 
   const inputValue = focused || search.trim() ? search : selected?.name.trim() || "";
-
-  useEffect(() => {
-    setHighlight(0);
-  }, [search]);
 
   function choose(id: string) {
     onChange(id);

@@ -25,6 +25,7 @@ import { formatCorrectAnswer, isAnswerCorrect } from "@/lib/answer-grading";
 import type { CheckResult } from "@/lib/immediate-check";
 import { questionResponseLabel, resolveQuestionType } from "@/lib/question-type";
 import { Alert, InlineError } from "@/components/sat/alert";
+import { KeyboardShortcutsHint, PlayerShortcuts } from "@/components/sat/keyboard-shortcuts-hint";
 
 interface Option { label: string; text: string; imageUrl?: string | null }
 interface Question {
@@ -413,6 +414,18 @@ export function PracticeSetPlayer({
   const hasPassage = Boolean(question.stimulus?.trim());
 
   return (
+    <>
+      <PlayerShortcuts
+        onPrevious={() => current > 0 && void handleNavigate(current - 1)}
+        onNext={() => current < questions.length - 1 && void handleNavigate(current + 1)}
+        onMark={() => toggleMarked(question.id)}
+        onChoose={(label) => handleAnswer(question.id, label)}
+        choiceLabels={
+          responseType === "MC" && !checked[question.id]
+            ? question.options.filter((opt) => opt.text.trim()).map((opt) => opt.label)
+            : []
+        }
+      />
     <div className="relative flex h-dvh max-h-dvh flex-col overflow-hidden bg-white">
       {previewMode && (
         <Alert
@@ -472,7 +485,7 @@ export function PracticeSetPlayer({
               content={question.stem}
               className="text-base font-medium leading-relaxed text-gray-900 md:text-lg"
             />
-            <QuestionMedia imageUrl={question.imageUrl} alt={`Question ${current + 1} image`} className="mt-4" />
+            <QuestionMedia imageUrl={question.imageUrl} alt={`Figure for question ${current + 1}`} className="mt-4" />
           </div>
         </div>
 
@@ -483,18 +496,23 @@ export function PracticeSetPlayer({
               <span className="text-4xl font-bold leading-none tabular-nums text-gray-900">{current + 1}</span>
               <p className="text-xs font-medium uppercase tracking-wide text-gray-500">{questionResponseLabel(responseType)}</p>
             </div>
-            <button
-              onClick={() => toggleMarked(question.id)}
-              className={cn(
-                "flex items-center gap-1 rounded border px-2 py-1 text-xs transition-colors",
-                marked.has(question.id)
-                  ? "border-amber-400 bg-amber-50 text-amber-700"
-                  : "border-gray-200 text-gray-400 hover:border-gray-300"
-              )}
-            >
-              <Flag size={12} />
-              Mark
-            </button>
+            <div className="flex items-center gap-1">
+              <KeyboardShortcutsHint choices={responseType === "MC"} />
+              <button
+                type="button"
+                onClick={() => toggleMarked(question.id)}
+                aria-pressed={marked.has(question.id)}
+                className={cn(
+                  "flex items-center gap-1 rounded border px-2 py-1 text-xs transition-colors",
+                  marked.has(question.id)
+                    ? "border-amber-500 bg-amber-50 text-amber-800"
+                    : "border-gray-400 text-gray-700 hover:border-gray-500 hover:text-gray-900"
+                )}
+              >
+                <Flag size={12} aria-hidden="true" />
+                {marked.has(question.id) ? "Marked" : "Mark for review"}
+              </button>
+            </div>
           </div>
           <MathToolPanel config={calculatorConfig} context="practice-set" graphArtifacts={question.graphArtifacts} enabled={showCalculator} />
 
@@ -677,7 +695,7 @@ export function PracticeSetPlayer({
           >
             <div className="mb-4 flex items-center justify-between">
               <h3 className="font-semibold text-gray-900">Questions</h3>
-              <button type="button" onClick={() => setShowNav(false)} className="text-gray-400 hover:text-gray-600">✕</button>
+              <button type="button" aria-label="Close question navigator" onClick={() => setShowNav(false)} className="text-gray-500 hover:text-gray-700">✕</button>
             </div>
             <div className="mb-4 grid grid-cols-8 gap-2">
               {questions.map((q, i) => (
@@ -713,5 +731,6 @@ export function PracticeSetPlayer({
         </div>
       )}
     </div>
+    </>
   );
 }

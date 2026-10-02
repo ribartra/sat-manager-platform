@@ -7,12 +7,28 @@ function createPrisma(): PrismaClientType {
   const url = process.env.DATABASE_URL ?? "file:./dev.db";
   // `timeout` is better-sqlite3's busy_timeout (ms): retry instead of failing
   // with SQLITE_BUSY when the ingest service holds a write lock on the shared
-  // dev.db file. WAL + synchronous=NORMAL let readers and the writer coexist;
-  // journal_mode is persisted at the DB-file level, so setting it once here
-  // covers both the web and ingest processes.
+  // dev.db file.
   const adapter = new PrismaBetterSqlite3({ url, timeout: 5000 } as never);
   const client: PrismaClientType = new PrismaClient({ adapter } as never);
+  applyPragmas(client);
   return client;
+}
+
+/**
+ * WAL lets readers and the single writer coexist (journal_mode is persisted in the DB file, so the
+ * ingest service gets it too); synchronous=NORMAL is the safe pairing for WAL and is per
+ * connection. Set explicitly at startup instead of relying on whatever mode the file was left in.
+ */
+function applyPragmas(client: PrismaClientType) {
+  void (async () => {
+    try {
+      await client.$queryRawUnsafe("PRAGMA journal_mode = WAL");
+      await client.$queryRawUnsafe("PRAGMA synchronous = NORMAL");
+      await client.$queryRawUnsafe("PRAGMA busy_timeout = 5000");
+    } catch (error) {
+      console.error(JSON.stringify({ severity: "ERROR", level: "error", event: "db.pragma_failed", message: String(error) }));
+    }
+  })();
 }
 
 // In production: singleton to avoid exhausting the connection pool.
