@@ -11,6 +11,7 @@ import { getFeatureSetting } from "@/lib/app-settings";
 import { resolveQuestionType } from "@/lib/question-type";
 import { reviewMetaByQuestion } from "@/lib/answer-review-meta";
 import { fullTestModulesForAttempt } from "@/lib/full-test-snapshot";
+import { saveFullTestTimerState } from "@/lib/full-test-progress";
 import { NotFoundError, UnauthorizedError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
@@ -23,11 +24,15 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
 
   const { attemptId } = await params;
   const body = await req.json();
-  const { answers, timeSpentByQuestion, timeExpiredEvents, extraTimeUsed } = body;
+  const { answers, timeSpentByQuestion, timeExpiredEvents, extraTimeUsed: rawExtraTimeUsed, moduleTimerState } = body;
   const attempt = await prisma.fullPracticeTestAttempt.findFirst({
     where: { id: attemptId, studentId: session.user.id, status: "IN_PROGRESS" },
   });
   if (!attempt) return new NotFoundError("Not found").toResponse();
+  // Overtime seconds (time worked after a module's limit); never lower than what autosave already recorded.
+  const extraTimeUsed = Number.isInteger(rawExtraTimeUsed) && rawExtraTimeUsed >= 0
+    ? Math.max(rawExtraTimeUsed, attempt.extraTimeUsed)
+    : attempt.extraTimeUsed;
 
   const excludePretest = await getFeatureSetting("FPT_PRETEST_EXCLUSION");
 
@@ -105,6 +110,8 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
       },
     }),
     markUserActive(session.user.id, submittedAt),
+    // Keeps the per-module overtime even when the last autosave did not reach the server.
+    moduleTimerState ? saveFullTestTimerState(attemptId, moduleTimerState) : Promise.resolve(),
   ]);
   if (attempt.assignmentId) {
     await prisma.fullPracticeTestAssignment.update({

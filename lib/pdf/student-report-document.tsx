@@ -291,46 +291,71 @@ function PracticeSection({ report }: { report: PracticeReport }) {
   );
 }
 
-/** Grouped bars per exam: R&W and Math (200–800), SAT total printed above. */
+/**
+ * One stacked bar per exam on the SAT total scale (0–1600): R&W at the bottom, Math on top, each
+ * segment as tall as its section score (200–800), so the top of the bar IS the total printed above it.
+ */
 function ScoreChart({ series }: { series: MockReport["scoreSeries"] }) {
   const width = 523;
-  const height = 150;
-  const left = 26;
+  const height = 168;
+  const left = 30;
+  const top = 14;
   const bottom = 22;
-  const plotH = height - bottom - 16;
+  const plotH = height - bottom - top;
+  const baseY = top + plotH;
   const groupW = (width - left) / Math.max(series.length, 1);
-  const barW = Math.min(18, groupW / 3);
-  const y = (score: number) => 16 + plotH - (Math.max(0, score - 200) / 600) * plotH;
+  const barW = Math.min(26, groupW * 0.5);
+  const h = (score: number) => (Math.max(0, score) / 1600) * plotH;
+  const ticks = [0, 400, 800, 1200, 1600];
   return (
     <View style={s.section} wrap={false}>
       <Text style={s.h2}>Scores by exam</Text>
-      <Text style={s.hint}>Section scores (200-800); the SAT total (400-1600) is shown above each exam.</Text>
+      <Text style={s.hint}>
+        {"Each bar is the SAT total score (400-1600) = Reading & Writing + Math (each 200-800). The bold number above each bar is the total; the numbers inside are the section scores."}
+      </Text>
       <Svg width={width} height={height}>
-        {[200, 400, 600, 800].map((tick) => (
-          <Line key={tick} x1={left} x2={width} y1={y(tick)} y2={y(tick)} stroke={GRAY[200]} strokeWidth={0.6} />
+        {ticks.map((tick) => (
+          <Line key={tick} x1={left} x2={width} y1={baseY - h(tick)} y2={baseY - h(tick)} stroke={GRAY[200]} strokeWidth={0.6} />
         ))}
-        {[200, 400, 600, 800].map((tick) => (
-          <Text key={`t${tick}`} x={0} y={y(tick) + 2.5} style={{ fontSize: 6.5 }} fill={GRAY[400]}>{String(tick)}</Text>
+        {ticks.map((tick) => (
+          <Text key={`t${tick}`} x={0} y={baseY - h(tick) + 2.5} style={{ fontSize: 6.5 }} fill={GRAY[400]}>{String(tick)}</Text>
         ))}
         {series.map((exam, index) => {
           const cx = left + groupW * index + groupW / 2;
+          const x = cx - barW / 2;
+          const rwH = exam.rwScore !== null ? h(exam.rwScore) : 0;
+          const mathH = exam.mathScore !== null ? h(exam.mathScore) : 0;
+          const topY = baseY - rwH - mathH;
+          const total = exam.totalScore ?? (exam.rwScore !== null && exam.mathScore !== null ? exam.rwScore + exam.mathScore : null);
+          const totalText = total !== null ? String(total) : "-";
+          const examLabel = exam.label.slice(0, Math.max(6, Math.floor(groupW / 4)));
           return (
             <G key={`${exam.label}-${index}`}>
-              {exam.rwScore !== null ? <Rect x={cx - barW - 1} y={y(exam.rwScore)} width={barW} height={16 + plotH - y(exam.rwScore)} fill={AREA.reading.color} /> : null}
-              {exam.mathScore !== null ? <Rect x={cx + 1} y={y(exam.mathScore)} width={barW} height={16 + plotH - y(exam.mathScore)} fill={AREA.math.color} /> : null}
-              <Text x={cx - 9} y={Math.min(y(exam.rwScore ?? 200), y(exam.mathScore ?? 200)) - 4} style={{ fontSize: 7, fontFamily: "Helvetica-Bold" }}>{exam.totalScore !== null ? String(exam.totalScore) : "-"}</Text>
-              <Text x={cx - groupW / 2 + 2} y={height - 8} style={{ fontSize: 6.5 }} fill={GRAY[500]}>{exam.label.slice(0, Math.max(6, Math.floor(groupW / 4)))}</Text>
+              {exam.rwScore !== null ? <Rect x={x} y={baseY - rwH} width={barW} height={rwH} fill={AREA.reading.color} /> : null}
+              {exam.mathScore !== null ? <Rect x={x} y={baseY - rwH - mathH} width={barW} height={mathH} fill={AREA.math.color} /> : null}
+              {exam.rwScore !== null && rwH >= 10 ? (
+                <Text x={cx - String(exam.rwScore).length * 1.7} y={baseY - rwH / 2 + 2.2} style={{ fontSize: 6.5 }} fill="#ffffff">{String(exam.rwScore)}</Text>
+              ) : null}
+              {exam.mathScore !== null && mathH >= 10 ? (
+                <Text x={cx - String(exam.mathScore).length * 1.7} y={baseY - rwH - mathH / 2 + 2.2} style={{ fontSize: 6.5 }} fill="#ffffff">{String(exam.mathScore)}</Text>
+              ) : null}
+              <Text x={cx - totalText.length * 2.1} y={topY - 4} style={{ fontSize: 7.5, fontFamily: "Helvetica-Bold" }}>{totalText}</Text>
+              <Text x={cx - examLabel.length * 1.6} y={height - 8} style={{ fontSize: 6.5 }} fill={GRAY[500]}>{examLabel}</Text>
             </G>
           );
         })}
       </Svg>
       <View style={{ flexDirection: "row", gap: 12, marginTop: 2, alignItems: "center" }}>
-        {[{ label: "Reading & Writing", color: AREA.reading.color }, { label: "Math", color: AREA.math.color }].map((item) => (
+        {[
+          { label: "Reading & Writing (200-800)", color: AREA.reading.color },
+          { label: "Math (200-800)", color: AREA.math.color },
+        ].map((item) => (
           <View key={item.label} style={{ flexDirection: "row", alignItems: "center", gap: 3 }}>
             <Svg width={7} height={7}><Rect x={0} y={0} width={7} height={7} fill={item.color} /></Svg>
             <Text style={s.tiny}>{item.label}</Text>
           </View>
         ))}
+        <Text style={s.tiny}>{"Bold number = Total (400-1600) = R&W + Math"}</Text>
       </View>
     </View>
   );

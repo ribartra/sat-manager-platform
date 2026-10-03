@@ -122,8 +122,14 @@ const checks = [
       "usePageHideFlush",
       "fetchWithTransientRetry",
       "SaveIndicator",
+      "overtimeRef",
+      "Overtime",
+      "extraTimeUsed: extraTimeUsedRef.current",
+      "Submit module",
     ],
-    label: "Full Practice Test: timers por modulo, auto-advance, break, timer rojo <=1min y offline parity",
+    // Time running out never ends the module: the student keeps working and overtime is recorded.
+    forbids: ["autoAdvanceTriggered"],
+    label: "Full Practice Test: timers por modulo, tiempo extra registrado (sin auto-advance), envio anticipado, break, timer rojo <=1min y offline parity",
   },
   {
     file: "components/math-tool-panel.tsx",

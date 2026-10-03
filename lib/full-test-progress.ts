@@ -6,6 +6,8 @@ export type FullTestProgressState = {
   timers: number[];
   phase: FullTestTimerPhase;
   breakRemaining: number;
+  /** Seconds worked past each module's time limit (overtime is allowed and recorded, never enforced). */
+  overtime?: number[];
 };
 
 function normalizeTimers(values: unknown, moduleCount: number): number[] {
@@ -27,6 +29,7 @@ export function parseFullTestProgressState(raw: string | null | undefined, modul
         timers: normalizeTimers(parsed.timers, moduleCount),
         phase: parsed.phase === "BREAK" ? "BREAK" : "MODULE",
         breakRemaining: Math.max(0, Number(parsed.breakRemaining) || 0),
+        overtime: normalizeTimers(parsed.overtime, moduleCount),
       };
     }
   } catch {
@@ -57,6 +60,7 @@ export async function saveFullTestProgressState(attemptId: string, state: FullTe
     timers: state.timers.map((value) => Math.max(0, Number(value) || 0)),
     phase: state.phase === "BREAK" ? "BREAK" : "MODULE",
     breakRemaining: Math.max(0, Number(state.breakRemaining) || 0),
+    ...(Array.isArray(state.overtime) ? { overtime: state.overtime.map((value) => Math.max(0, Math.round(Number(value) || 0))) } : {}),
   };
   await prisma.$executeRaw`
     UPDATE "FullPracticeTestAttempt"
@@ -72,6 +76,7 @@ export async function saveFullTestTimerState(attemptId: string, moduleTimerState
       timers: Array.isArray(raw.timers) ? raw.timers.map((value) => Math.max(0, Number(value) || 0)) : [],
       phase: raw.phase === "BREAK" ? "BREAK" : "MODULE",
       breakRemaining: Math.max(0, Number(raw.breakRemaining) || 0),
+      overtime: Array.isArray(raw.overtime) ? raw.overtime : undefined,
     });
     return;
   }
@@ -81,4 +86,9 @@ export async function saveFullTestTimerState(attemptId: string, moduleTimerState
     phase: "MODULE",
     breakRemaining: 0,
   });
+}
+
+/** Overtime seconds per module, for results pages (0 for attempts saved before overtime existed). */
+export function overtimeByModule(raw: string | null | undefined, moduleCount: number): number[] {
+  return parseFullTestProgressState(raw, moduleCount)?.overtime ?? Array.from({ length: moduleCount }, () => 0);
 }

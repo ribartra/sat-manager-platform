@@ -121,6 +121,10 @@ export function FullTestPlayer({
     savedProgressState?.timers?.length === modules.length
       ? savedProgressState.timers
       : modules.map((module) => module.timeLimit);
+  const initialOvertime =
+    savedProgressState?.overtime?.length === modules.length
+      ? savedProgressState.overtime
+      : modules.map(() => 0);
   const [phase, setPhase] = useState<FullTestTimerPhase>(restoringUsableBreak ? "BREAK" : "MODULE");
   const [breakRemaining, setBreakRemaining] = useState(
     restoringUsableBreak ? savedProgressState.breakRemaining : breakSecondsTotal,
@@ -129,7 +133,8 @@ export function FullTestPlayer({
   const [questionIndex, setQuestionIndex] = useState(initialQuestionIndex);
   const [remaining, setRemaining] = useState(initialTimers[initialModuleIndex] ?? modules[0]?.timeLimit ?? 0);
   const [expiredEvents, setExpiredEvents] = useState(savedExpiredEvents);
-  const [extraTimeUsed] = useState(savedExtraTimeUsed);
+  // Overtime: when a module's time runs out the student keeps working and the extra seconds are recorded.
+  const [overtime, setOvertime] = useState(initialOvertime[initialModuleIndex] ?? 0);
   const [answers, setAnswers] = useState<Record<string, string>>(savedAnswers);
   const [marked, setMarked] = useState<Set<string>>(() => new Set(savedMarked));
   const [notes, setNotes] = useState<Record<string, string>>(savedNotes);
@@ -142,8 +147,10 @@ export function FullTestPlayer({
   const currentModule = modules[moduleIndex];
   const question = currentModule?.questions[questionIndex];
   const expiredRecorded = useRef(false);
-  const autoAdvanceTriggered = useRef(false);
+  const breakAdvanceTriggered = useRef(false);
   const timerState = useRef<number[]>(initialTimers);
+  const overtimeRef = useRef<number[]>([...initialOvertime]);
+  const extraTimeUsedRef = useRef(Math.max(savedExtraTimeUsed, initialOvertime.reduce((sum, value) => sum + value, 0)));
   const questionStartTime = useRef<number | null>(null);
   const timeSpentByQuestion = useRef<Record<string, number>>({ ...savedTimeSpent });
   const phaseRef = useRef(phase);
@@ -220,6 +227,7 @@ export function FullTestPlayer({
       timers: [...timerState.current],
       phase: overrides?.phase ?? phaseRef.current,
       breakRemaining: overrides?.breakRemaining ?? breakRemainingRef.current,
+      overtime: [...overtimeRef.current],
     }),
     [],
   );
@@ -235,14 +243,14 @@ export function FullTestPlayer({
       currentModule: nextModule,
       currentQuestion: nextQuestion,
       timeExpiredEvents: expiredEventsRef.current,
-      extraTimeUsed,
+      extraTimeUsed: extraTimeUsedRef.current,
       moduleTimerState: buildProgressPayload(progressOverrides),
       timeSpentByQuestion: { ...timeSpentByQuestion.current },
       markedQuestionIds: Array.from(markedRef.current),
       notes: notesRef.current,
       eliminatedOptions: fromLabelSets(eliminatedRef.current),
     }),
-    [buildProgressPayload, extraTimeUsed],
+    [buildProgressPayload],
   );
 
   // Sends one payload through the save queue; on failure it stays in the local buffer.
@@ -343,6 +351,14 @@ export function FullTestPlayer({
       timerState.current = timerState.current.map((value, index) =>
         typeof bufferedTimers[index] === "number" ? Math.min(value, bufferedTimers[index]) : value,
       );
+      // Overtime only ever grows, so the larger value is the more recent one.
+      const bufferedOvertime = payload.moduleTimerState?.overtime ?? [];
+      overtimeRef.current = overtimeRef.current.map((value, index) =>
+        typeof bufferedOvertime[index] === "number" ? Math.max(value, bufferedOvertime[index]) : value,
+      );
+      if ((payload.extraTimeUsed ?? 0) > extraTimeUsedRef.current) {
+        extraTimeUsedRef.current = payload.extraTimeUsed;
+      }
       const bufferedModule = payload.currentModule ?? moduleIndexRef.current;
       if (phaseRef.current === "MODULE" && bufferedModule >= moduleIndexRef.current && bufferedModule < modules.length) {
         const nextQuestion = Math.min(
@@ -356,6 +372,7 @@ export function FullTestPlayer({
         const nextRemaining = timerState.current[bufferedModule] ?? modules[bufferedModule].timeLimit;
         remainingRef.current = nextRemaining;
         setRemaining(nextRemaining);
+        setOvertime(overtimeRef.current[bufferedModule] ?? 0);
       }
       if ((payload.timeExpiredEvents ?? 0) > expiredEventsRef.current) {
         expiredEventsRef.current = payload.timeExpiredEvents;
@@ -414,7 +431,8 @@ export function FullTestPlayer({
         answers: answersRef.current,
         timeSpentByQuestion: timeSpentSnapshot,
         timeExpiredEvents: expiredEventsRef.current,
-        extraTimeUsed,
+        extraTimeUsed: extraTimeUsedRef.current,
+        moduleTimerState: buildProgressPayload(),
         markedQuestionIds: Array.from(markedRef.current),
         notes: notesRef.current,
         eliminatedOptions: fromLabelSets(eliminatedRef.current),
@@ -438,32 +456,43 @@ export function FullTestPlayer({
     }
     clearBuffer(offlineKey);
     router.push(`/student/full-tests/results/${attemptId}${resultQuery ? `?${resultQuery}` : ""}`);
-  }, [attemptId, buildAutosavePayload, exitHref, extraTimeUsed, offlineKey, previewMode, recordQuestionTime, resultQuery, router]);
+  }, [attemptId, buildAutosavePayload, buildProgressPayload, exitHref, offlineKey, previewMode, recordQuestionTime, resultQuery, router]);
 
   const enterModule = useCallback(
     async (nextModule: number) => {
+      // Credit the question being left, then move the refs right away: saveProgress copies
+      // remainingRef into timerState[moduleIndexRef], so stale refs would write the new module's
+      // clock into the previous module's slot.
+      recordQuestionTime();
+      phaseRef.current = "MODULE";
+      breakRemainingRef.current = 0;
+      moduleIndexRef.current = nextModule;
+      questionIndexRef.current = 0;
       setPhase("MODULE");
       setBreakRemaining(0);
       setModuleIndex(nextModule);
       setQuestionIndex(0);
       expiredRecorded.current = false;
-      autoAdvanceTriggered.current = false;
+      breakAdvanceTriggered.current = false;
       const nextRemaining = timerState.current[nextModule] ?? modules[nextModule].timeLimit;
       setRemaining(nextRemaining);
       remainingRef.current = nextRemaining;
+      setOvertime(overtimeRef.current[nextModule] ?? 0);
       await saveProgress(answersRef.current, nextModule, 0, {
         phase: "MODULE",
         breakRemaining: 0,
       });
     },
-    [modules, saveProgress],
+    [modules, recordQuestionTime, saveProgress],
   );
 
   const enterBreak = useCallback(async () => {
+    timerState.current[moduleIndexRef.current] = 0;
+    phaseRef.current = "BREAK";
     setPhase("BREAK");
     setBreakRemaining(breakSecondsTotal);
     breakRemainingRef.current = breakSecondsTotal;
-    autoAdvanceTriggered.current = false;
+    breakAdvanceTriggered.current = false;
     await saveProgress(answersRef.current, moduleIndexRef.current, questionIndexRef.current, {
       phase: "BREAK",
       breakRemaining: breakSecondsTotal,
@@ -490,34 +519,39 @@ export function FullTestPlayer({
     }
   }, [advancing, breakSecondsTotal, enterBreak, enterModule, modules.length, submit]);
 
-  // Module countdown — auto-advance at 0 (no playable extra time).
+  // Module countdown. At 0 there is no auto-advance (overtime: keep playing and record extra time);
+  // the student submits the module themselves and the extra seconds are stored per module.
   useEffect(() => {
     if (phase !== "MODULE") return;
     const interval = setInterval(() => {
-      setRemaining((time) => {
-        if (time > 1) {
-          timerState.current[moduleIndex] = time - 1;
-          return time - 1;
+      // Refs, not the effect's closure: a tick landing between enterModule and the re-render must
+      // count against the module now on screen.
+      if (phaseRef.current !== "MODULE") return;
+      const moduleIndex = moduleIndexRef.current;
+      const time = remainingRef.current;
+      if (time > 1) {
+        timerState.current[moduleIndex] = time - 1;
+        remainingRef.current = time - 1;
+        setRemaining(time - 1);
+        return;
+      }
+      if (time === 1) {
+        if (!expiredRecorded.current) {
+          expiredRecorded.current = true;
+          setExpiredEvents((count) => count + 1);
         }
-        if (time === 1) {
-          if (!expiredRecorded.current) {
-            expiredRecorded.current = true;
-            setExpiredEvents((count) => count + 1);
-          }
-          timerState.current[moduleIndex] = 0;
-          return 0;
-        }
-        return 0;
-      });
+        timerState.current[moduleIndex] = 0;
+        remainingRef.current = 0;
+        setRemaining(0);
+        return;
+      }
+      const moduleOvertime = (overtimeRef.current[moduleIndex] ?? 0) + 1;
+      overtimeRef.current[moduleIndex] = moduleOvertime;
+      setOvertime(moduleOvertime);
+      extraTimeUsedRef.current += 1;
     }, 1000);
     return () => clearInterval(interval);
-  }, [moduleIndex, phase]);
-
-  useEffect(() => {
-    if (phase !== "MODULE" || remaining > 0 || autoAdvanceTriggered.current || advancing) return;
-    autoAdvanceTriggered.current = true;
-    void advanceAfterModule();
-  }, [advanceAfterModule, advancing, phase, remaining]);
+  }, [moduleIndex, phase]); // restart the 1 s cadence on module/phase change
 
   // Break countdown — then enter Math M1.
   useEffect(() => {
@@ -532,8 +566,8 @@ export function FullTestPlayer({
   }, [phase]);
 
   useEffect(() => {
-    if (phase !== "BREAK" || breakRemaining > 0 || autoAdvanceTriggered.current || advancing) return;
-    autoAdvanceTriggered.current = true;
+    if (phase !== "BREAK" || breakRemaining > 0 || breakAdvanceTriggered.current || advancing) return;
+    breakAdvanceTriggered.current = true;
     void enterModule(RW_M2_INDEX + 1);
   }, [advancing, breakRemaining, enterModule, phase]);
 
@@ -599,6 +633,7 @@ export function FullTestPlayer({
   }
 
   const timerIsRed = phase === "MODULE" && remaining <= 60;
+  const inOvertime = phase === "MODULE" && remaining <= 0;
   const unansweredInModule = currentModule
     ? currentModule.questions.filter((q) => !answers[q.id]).length
     : 0;
@@ -695,9 +730,16 @@ export function FullTestPlayer({
         </div>
         <div className="flex items-center gap-4">
           {!previewMode && <SaveIndicator status={saving} />}
-          <span className={`tabular-nums ${timerIsRed ? "text-red-600" : "text-gray-900"}`}>
-            {formatTime(remaining)}
-          </span>
+          {inOvertime ? (
+            <span className="flex items-baseline gap-1 tabular-nums text-red-600" aria-label={`Overtime ${formatTime(overtime)}`}>
+              <span className="text-xs font-semibold uppercase tracking-wide">Overtime</span>
+              +{formatTime(overtime)}
+            </span>
+          ) : (
+            <span className={`tabular-nums ${timerIsRed ? "text-red-600" : "text-gray-900"}`}>
+              {formatTime(remaining)}
+            </span>
+          )}
           <Button
             variant="secondary"
             size="sm"
@@ -713,6 +755,11 @@ export function FullTestPlayer({
           </Button>
         </div>
       </div>
+      {inOvertime && (
+        <Alert tone="warning" layout="banner" className="py-2 text-sm">
+          Time is up for this module. You can keep working — the extra time is being recorded.
+        </Alert>
+      )}
       <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden md:grid-cols-2">
         <div
           className={cn(
@@ -879,7 +926,20 @@ export function FullTestPlayer({
               <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded border border-gray-200 bg-white" /> Unanswered</span>
               <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded border border-gray-200 bg-white ring-2 ring-amber-400 ring-offset-1" /> Marked</span>
             </div>
-            <p className="mt-3 text-xs text-gray-400">You can review questions within this module only.</p>
+            <div className="mt-4 flex items-center justify-between gap-3 border-t border-gray-200 pt-3">
+              <p className="text-xs text-gray-500">You can review questions within this module only.</p>
+              <Button
+                type="button"
+                size="sm"
+                disabled={advancing}
+                onClick={() => {
+                  setShowNav(false);
+                  setConfirmSubmitModule(true);
+                }}
+              >
+                Submit module
+              </Button>
+            </div>
           </div>
         </div>
       )}
@@ -888,7 +948,11 @@ export function FullTestPlayer({
           <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
             <h2 className="text-lg font-semibold text-gray-900">Submit Module?</h2>
             <p className="mt-2 text-sm text-gray-600">
-              Submit <strong>{currentModule.name}</strong> with {formatTime(remaining)} remaining.
+              {inOvertime ? (
+                <>Submit <strong>{currentModule.name}</strong> · overtime +{formatTime(overtime)}.</>
+              ) : (
+                <>Submit <strong>{currentModule.name}</strong> with {formatTime(remaining)} remaining.</>
+              )}
             </p>
             {unansweredInModule > 0 && (
               <p className="mt-2 text-sm text-amber-700">

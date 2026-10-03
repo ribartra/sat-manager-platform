@@ -15,6 +15,7 @@ import { difficultyBadgeVariant } from "@/lib/domain-meta";
 import { difficultyFromFullTestModuleKey, moduleKeyFromOrder } from "@/lib/full-test-modules";
 import Link from "next/link";
 import { fullTestModulesForAttempt } from "@/lib/full-test-snapshot";
+import { overtimeByModule } from "@/lib/full-test-progress";
 import { ChevronLeft } from "lucide-react";
 
 interface PageProps { params: Promise<{ attemptId: string }>; searchParams: Promise<{ from?: string; to?: string }> }
@@ -51,7 +52,6 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
   const modules = await fullTestModulesForAttempt(attempt);
 
   const answersByQuestion = new Map(attempt.answers.map((answer) => [answer.questionId, answer]));
-  const topicStats = new Map<string, { correct: number; total: number; time: number }>();
   const moduleStats = modules.map((module) => {
     const tier = moduleTierMeta(module.order);
     let correct = 0;
@@ -62,16 +62,13 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
       total += 1;
       if (answer?.isCorrect) correct += 1;
       time += answer?.timeSpent ?? 0;
-
-      const topicKey = `${item.question.topic.domain.name} / ${item.question.topic.name}`;
-      const topicStat = topicStats.get(topicKey) ?? { correct: 0, total: 0, time: 0 };
-      topicStat.total += 1;
-      if (answer?.isCorrect) topicStat.correct += 1;
-      topicStat.time += answer?.timeSpent ?? 0;
-      topicStats.set(topicKey, topicStat);
     }
     return { id: module.id, name: module.name, hint: tier.short, correct, total, time };
   });
+  const overtime = overtimeByModule(attempt.moduleTimerState, modules.length);
+  const overtimeModules = modules
+    .map((module, index) => ({ name: module.name, seconds: overtime[index] ?? 0 }))
+    .filter((item) => item.seconds > 0);
   const pauseSeconds = attempt.pauses.reduce((sum, pause) => sum + (pause.durationSeconds ?? 0), 0);
 
   return (
@@ -85,7 +82,11 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
         <Card padding="md" className="text-center"><p className="text-3xl font-bold text-[var(--sat-area-mocks)]"><VoidableValue status={attempt.status}>{attempt.totalScore ?? "—"}</VoidableValue></p><p className="text-xs text-gray-500">Total</p></Card>
       </div>
       <Card padding="md" className="mt-6 text-sm text-gray-600">
-        Time expired events: {attempt.timeExpiredEvents} · Extra time used: {attempt.extraTimeUsed}s
+        Time ran out: {attempt.timeExpiredEvents === 0 ? "never" : `${attempt.timeExpiredEvents}x`} · Extra time used:{" "}
+        {attempt.extraTimeUsed > 0 ? formatTime(attempt.extraTimeUsed) : "none"}
+        {overtimeModules.length > 0
+          ? ` (${overtimeModules.map((item) => `${item.name} +${formatTime(item.seconds)}`).join(", ")})`
+          : ""}
         {attempt.pauses.length > 0 ? ` · Paused ${attempt.pauses.length}x (${formatTime(pauseSeconds)})` : ""}
       </Card>
       <div className="mt-6">
@@ -95,9 +96,6 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
           rows={moduleStats.map((stat) => ({ ...stat, label: stat.name }))}
           color="mocks"
         />
-      </div>
-      <div className="mt-6">
-        <StatsPanel title="By Skill" rows={[...topicStats.entries()].map(([label, stat]) => ({ label, ...stat }))} color="mocks" />
       </div>
       {attempt.test.reviewEnabled ? (
         <div className="mt-6 space-y-5">
@@ -138,7 +136,6 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
                           <div className="flex items-center gap-2">
                             <Badge variant={difficultyBadgeVariant(tier.key)}>{tier.short}</Badge>
                             {answer?.timeSpent ? <span className="text-xs text-gray-500">{formatTime(answer.timeSpent)}</span> : null}
-                            <span className="text-xs text-gray-500">{question.topic.name}</span>
                           </div>
                         </div>
 

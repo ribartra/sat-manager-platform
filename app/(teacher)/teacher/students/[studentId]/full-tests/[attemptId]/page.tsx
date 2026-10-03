@@ -8,6 +8,7 @@ import { MathContent } from "@/components/math-content";
 import { QuestionMedia } from "@/components/question-media";
 import prisma from "@/lib/prisma";
 import { fullTestModulesForAttempt } from "@/lib/full-test-snapshot";
+import { overtimeByModule } from "@/lib/full-test-progress";
 import { auth } from "@/lib/auth";
 import { teacherProgramEnrollmentScope } from "@/lib/program-scope";
 import { formatDate, formatTime, scorePercent } from "@/lib/utils";
@@ -59,7 +60,8 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
     .map((link) => ({ id: link.parent.id, name: link.parent.name, email: link.parent.email }));
 
   const answersByQuestion = new Map(attempt.answers.map((answer) => [answer.questionId, answer]));
-  const moduleRows = modules.map((module) => {
+  const overtime = overtimeByModule(attempt.moduleTimerState, modules.length);
+  const moduleRows = modules.map((module, index) => {
     let correct = 0;
     let answered = 0;
     let marked = 0;
@@ -72,7 +74,7 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
       time += answer?.timeSpent ?? 0;
     }
     const tier = difficultyFromFullTestModuleKey(moduleKeyFromOrder(module.order));
-    return { id: module.id, name: module.name, tier, total: module.questions.length, correct, answered, marked, time };
+    return { id: module.id, name: module.name, tier, total: module.questions.length, correct, answered, marked, time, overtime: overtime[index] ?? 0 };
   });
   const pauseSeconds = attempt.pauses.reduce((sum, pause) => sum + (pause.durationSeconds ?? 0), 0);
   const studentHref = buildProgressHref(`/teacher/students/${studentId}`, filters);
@@ -94,6 +96,7 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
             Started {formatDate(attempt.startedAt)} · {attempt.submittedAt ? `submitted ${formatDate(attempt.submittedAt)}` : "not submitted"}
             {attempt.pauses.length > 0 ? ` · paused ${attempt.pauses.length}x (${formatTime(pauseSeconds)})` : ""}
             {attempt.timeExpiredEvents > 0 ? ` · time ran out ${attempt.timeExpiredEvents}x` : ""}
+            {attempt.extraTimeUsed > 0 ? ` · extra time used ${formatTime(attempt.extraTimeUsed)}` : ""}
           </p>
           <div className="mt-3 flex flex-wrap items-center gap-4">
             <AttemptStatusBadge status={attempt.status} />
@@ -128,6 +131,7 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
               <th className="px-4 py-2 text-right font-medium">Answered</th>
               <th className="px-4 py-2 text-right font-medium">Marked</th>
               <th className="px-4 py-2 text-right font-medium">Time</th>
+              <th className="px-4 py-2 text-right font-medium">Overtime</th>
             </tr>
           </thead>
           <tbody>
@@ -145,6 +149,9 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
                 <td className="px-4 py-2 text-right tabular-nums text-gray-700">{row.answered}/{row.total}</td>
                 <td className="px-4 py-2 text-right tabular-nums text-gray-700">{row.marked}</td>
                 <td className="px-4 py-2 text-right tabular-nums text-gray-700">{formatTime(row.time)}</td>
+                <td className={`px-4 py-2 text-right tabular-nums ${row.overtime > 0 ? "font-medium text-red-600" : "text-gray-400"}`}>
+                  {row.overtime > 0 ? `+${formatTime(row.overtime)}` : "—"}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -178,7 +185,6 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
                         Answer <span className="font-medium text-gray-900">{answer?.answer || "—"}</span> · correct{" "}
                         <span className="font-medium text-gray-900">{formatCorrectAnswer(question.correctAnswer)}</span>
                       </span>
-                      <span className="text-xs text-gray-500">{question.topic.name}</span>
                       {answer?.timeSpent ? <span className="text-xs text-gray-500">{formatTime(answer.timeSpent)}</span> : null}
                       {item.isPretest ? <Badge variant="default">Pretest</Badge> : null}
                       {answer?.markedForReview ? <Badge variant="warning">Marked</Badge> : null}

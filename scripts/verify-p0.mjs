@@ -146,8 +146,10 @@ const checks = [
   },
   {
     file: "app/(student)/student/full-tests/results/[attemptId]/page.tsx",
-    requires: ["By Module", "By Skill", "including blanks", "timeSpent", "StatsPanel"],
-    label: "Resultados FPT muestran review por modulo, skill y preguntas absolutas",
+    requires: ["By Module", "including blanks", "timeSpent", "StatsPanel", "Extra time used", "overtimeByModule"],
+    // "By Skill" grouped the per-section placeholder topics (R&W M1 + Math M1 mixed): removed on purpose.
+    forbids: ["By Skill"],
+    label: "Resultados FPT muestran review por modulo, tiempo extra y preguntas absolutas (sin By Skill)",
   },
 ];
 
@@ -157,13 +159,17 @@ for (const check of checks) {
   const absolutePath = path.join(root, check.file);
   const content = await readFile(absolutePath, "utf8");
   const missing = check.requires.filter((needle) => !content.includes(needle));
-  if (missing.length === 0) {
+  const forbidden = (check.forbids ?? []).filter((needle) => content.includes(needle));
+  if (missing.length === 0 && forbidden.length === 0) {
     console.log(`PASS - ${check.label}`);
   } else {
     hasFailures = true;
     console.error(`FAIL - ${check.label}`);
     for (const needle of missing) {
       console.error(`  missing: ${needle}`);
+    }
+    for (const needle of forbidden) {
+      console.error(`  forbidden: ${needle}`);
     }
   }
 }

@@ -30,7 +30,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
         currentModule: Number.isInteger(currentModule) ? currentModule : attempt.currentModule,
         currentQuestion: Number.isInteger(currentQuestion) ? currentQuestion : attempt.currentQuestion,
         timeExpiredEvents: Number.isInteger(timeExpiredEvents) ? timeExpiredEvents : attempt.timeExpiredEvents,
-        extraTimeUsed: Number.isInteger(extraTimeUsed) ? extraTimeUsed : attempt.extraTimeUsed,
+        extraTimeUsed: Number.isInteger(extraTimeUsed) && extraTimeUsed >= 0 ? extraTimeUsed : attempt.extraTimeUsed,
       },
     }),
     markUserActive(session.user.id),
