@@ -17,6 +17,7 @@ import { ChevronLeft, ClipboardList, Eye, Pencil, Plus } from "lucide-react";
 import { StudentDetailActions } from "./actions-client";
 import { StudentSwitcher } from "./student-switcher";
 import { GenerateReportDialog } from "./generate-report-dialog";
+import { RestartExamButton } from "./restart-exam-button";
 import { refreshAssignmentStates } from "@/lib/assignments";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { studentAccessWhereFor } from "@/lib/program-scope";
@@ -212,13 +213,21 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                     <div className="mt-0.5 flex items-center gap-2">
                       <StatusBadge status={a.status} />
                       {a.dueDate && <span className="text-[11px] text-gray-400">Due {formatDate(a.dueDate)}</span>}
+                      {a.openAttemptStartedAt && <span className="text-[11px] text-gray-400">Started {formatDate(a.openAttemptStartedAt)}</span>}
                     </div>
                   </div>
-                  <Hint label={a.status === "OVERDUE" ? "Open it again for the student with a new due date." : "Change the due date of this exam."}>
-                    <Link href={buildProgressHref(`/teacher/students/${studentId}/assign-exam`, filters)} className="shrink-0 text-xs font-medium text-blue-600 hover:underline">
-                      {a.status === "OVERDUE" ? "Reassign" : "Due date"}
-                    </Link>
-                  </Hint>
+                  <div className="flex shrink-0 items-center gap-3">
+                    {a.openAttemptId ? (
+                      <Hint label="Invalidate the attempt in progress and send the exam back to Pending, so the student starts again with the current exam content.">
+                        <RestartExamButton attemptId={a.openAttemptId} examName={a.name} />
+                      </Hint>
+                    ) : null}
+                    <Hint label={a.status === "OVERDUE" ? "Open it again for the student with a new due date." : "Change the due date of this exam."}>
+                      <Link href={buildProgressHref(`/teacher/students/${studentId}/assign-exam`, filters)} className="shrink-0 text-xs font-medium text-blue-600 hover:underline">
+                        {a.status === "OVERDUE" ? "Reassign" : "Due date"}
+                      </Link>
+                    </Hint>
+                  </div>
                 </li>
               ))}
             </SidePanel>

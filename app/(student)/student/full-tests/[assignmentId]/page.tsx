@@ -1,7 +1,7 @@
 import { parseEliminatedOptions } from "@/lib/answer-review-meta";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { FullTestPlayer } from "./player-client";
 import { getFullTestProgressState } from "@/lib/full-test-progress";
 import { getPublicCalculatorConfig } from "@/lib/calculator-config";
@@ -34,6 +34,15 @@ export default async function FullTestPlayerPage({ params, searchParams }: PageP
   if (!assignment) notFound();
 
   let attempt = assignment.attempts[0];
+  if (!attempt && assignment.status === "COMPLETED") {
+    // A finished exam is not restarted by opening its URL again; a teacher reopens it explicitly.
+    const last = await prisma.fullPracticeTestAttempt.findFirst({
+      where: { assignmentId: assignment.id, status: "SUBMITTED" },
+      orderBy: { submittedAt: "desc" },
+      select: { id: true },
+    });
+    redirect(last ? `/student/full-tests/results/${last.id}?${returnParams.toString()}` : `/student/content-map?${returnParams.toString()}`);
+  }
   if (!attempt) {
     const created = await prisma.fullPracticeTestAttempt.create({
       data: {
@@ -48,6 +57,9 @@ export default async function FullTestPlayerPage({ params, searchParams }: PageP
       where: { id: created.id },
       include: { answers: true },
     });
+    if (assignment.status === "PENDING") {
+      await prisma.fullPracticeTestAssignment.update({ where: { id: assignment.id }, data: { status: "IN_PROGRESS" } });
+    }
     await writeAudit({
       userId: session!.user.id,
       action: "FPT_ATTEMPT_STARTED",

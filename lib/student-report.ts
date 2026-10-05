@@ -100,7 +100,7 @@ export type MockReport = {
   exams: Array<{ id: string; name: string; submittedAt: Date | null; totalScore: number | null; rwScore: number | null; mathScore: number | null }>;
   /** Submitted + invalidated exams, newest first, for the history list only (not in the PDF). */
   examHistory: Array<{ id: string; status: string; name: string; submittedAt: Date | null; totalScore: number | null; rwScore: number | null; mathScore: number | null }>;
-  activeExams: Array<{ id: string; name: string; status: string; dueDate: Date | null }>;
+  activeExams: Array<{ id: string; name: string; status: string; dueDate: Date | null; openAttemptId: string | null; openAttemptStartedAt: Date | null }>;
 };
 
 export function recommendationFor(pct: number) {
@@ -341,7 +341,11 @@ export async function loadMockReport(studentId: string, filters: ReportFilters, 
     }),
     prisma.fullPracticeTestAssignment.findMany({
       where: { studentId, status: { in: OPEN_STATUSES }, ...(single ? { id: "__none__" } : {}) },
-      include: { test: { select: { name: true } } },
+      include: {
+        test: { select: { name: true } },
+        // The open attempt (if any), so a teacher can restart it with the current exam content.
+        attempts: { where: { status: "IN_PROGRESS" }, select: { id: true, startedAt: true }, orderBy: { startedAt: "desc" }, take: 1 },
+      },
       orderBy: { createdAt: "desc" },
     }),
     single
@@ -412,6 +416,13 @@ export async function loadMockReport(studentId: string, filters: ReportFilters, 
         rwScore: exam.rwScore,
         mathScore: exam.mathScore,
       })),
-    activeExams: examAssignments.map((a) => ({ id: a.id, name: a.test.name, status: a.status, dueDate: a.dueDate })),
+    activeExams: examAssignments.map((a) => ({
+      id: a.id,
+      name: a.test.name,
+      status: a.status,
+      dueDate: a.dueDate,
+      openAttemptId: a.attempts[0]?.id ?? null,
+      openAttemptStartedAt: a.attempts[0]?.startedAt ?? null,
+    })),
   };
 }

@@ -278,6 +278,22 @@ const checks = [
     label: "Restore local exige backup y genera copia previa",
   },
   {
+    file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
+    // An exam started with old content can be restarted: invalidate the open attempt, assignment back to Pending.
+    requires: ["RestartExamButton", "openAttemptId"],
+    label: "Ficha del alumno: reiniciar examen en curso (invalida intento, asignacion a Pending)",
+  },
+  {
+    file: "app/(student)/student/full-tests/[assignmentId]/page.tsx",
+    requires: ['assignment.status === "COMPLETED"', "redirect("],
+    label: "Player FPT: un examen COMPLETED no crea un intento nuevo al abrir su URL",
+  },
+  {
+    file: "app/(teacher)/teacher/students/[studentId]/restart-exam-button.tsx",
+    requires: ["/reopen", "useConfirm", "BLOCKED_TEXT"],
+    label: "Restart de examen usa el ciclo reopen y confirma antes",
+  },
+  {
     file: "lib/math-text.ts",
     // Ingested stems use $$…$$ mid-sentence; only a formula alone on its line renders as a block.
     requires: ["isStandaloneDisplay", "\\displaystyle "],
