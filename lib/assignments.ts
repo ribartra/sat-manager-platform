@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import { writeAudit } from "@/lib/audit";
 import { withSqliteRetry } from "@/lib/sqlite-retry";
 import { notifyUser } from "@/lib/notifications";
+import { isUniqueConstraintError } from "@/lib/db-errors";
 
 const OPEN_FOR_OVERDUE = { in: ["PENDING", "IN_PROGRESS"] };
 
@@ -101,11 +102,6 @@ function sameTime(a: Date | null | undefined, b: Date | null | undefined) {
   return (a?.getTime() ?? null) === (b?.getTime() ?? null);
 }
 
-function isUniqueConstraintError(error: unknown): boolean {
-  return Boolean(
-    error && typeof error === "object" && "code" in error && (error as { code?: unknown }).code === "P2002",
-  );
-}
 
 interface PracticeAssignmentInput {
   studentId: string;

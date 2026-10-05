@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { notifyUser } from "@/lib/notifications";
+import { isUniqueConstraintError } from "@/lib/db-errors";
 
 const DIFFICULTY_ORDER = ["EASY", "MEDIUM", "HARD"];
 
@@ -91,14 +92,6 @@ async function ensureUnlockedAssignment(studentId: string, practiceSetId: string
   });
 }
 
-function isUniqueConstraintError(error: unknown): boolean {
-  return Boolean(
-    error &&
-      typeof error === "object" &&
-      "code" in error &&
-      (error as { code?: unknown }).code === "P2002",
-  );
-}
 
 export async function applyPracticeProgression({ studentId, practiceSetId, scorePercent }: ProgressionInput) {
   const current = await prisma.practiceSet.findUnique({

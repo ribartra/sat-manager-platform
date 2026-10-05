@@ -285,13 +285,23 @@ const checks = [
   },
   {
     file: "app/(student)/student/full-tests/[assignmentId]/page.tsx",
-    requires: ['assignment.status === "COMPLETED"', "redirect("],
+    requires: ['assignment.status === "COMPLETED"', "redirect(", "isUniqueConstraintError", "createdHere"],
     label: "Player FPT: un examen COMPLETED no crea un intento nuevo al abrir su URL",
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/restart-exam-button.tsx",
     requires: ["/reopen", "useConfirm", "BLOCKED_TEXT"],
     label: "Restart de examen usa el ciclo reopen y confirma antes",
+  },
+  {
+    file: "prisma/migrations/20261005_single_open_attempt/migration.sql",
+    requires: ["FullPracticeTestAttempt_one_open_per_assignment", "Attempt_one_open_per_assignment", "Attempt_one_open_unassigned", "WHERE \"status\" = 'IN_PROGRESS'"],
+    label: "BD: como mucho un intento IN_PROGRESS por asignacion (indices unicos parciales)",
+  },
+  {
+    file: "app/(student)/student/practice/practice-player-page.tsx",
+    requires: ["isUniqueConstraintError", "findOpenAttempt"],
+    label: "Player practica: colision al crear intento reutiliza el intento abierto",
   },
   {
     file: "lib/math-text.ts",

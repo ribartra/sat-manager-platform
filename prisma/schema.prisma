@@ -280,6 +280,8 @@ model Assignment {
   @@index([locked, unlockAt])
 }
 
+/// Partial unique indexes (raw migration 20261005_single_open_attempt): at most one IN_PROGRESS attempt
+/// per assignment, and per student+set when unassigned. Keep them when generating new migrations.
 model Attempt {
   id              String    @id @default(cuid())
   assignmentId    String?
@@ -490,6 +492,8 @@ model FullPracticeTestAssignment {
   @@index([status, dueDate])
 }
 
+/// Partial unique index (raw migration 20261005_single_open_attempt): at most one IN_PROGRESS attempt
+/// per assignment. Keep it when generating new migrations.
 model FullPracticeTestAttempt {
   id             String    @id @default(cuid())
   testId         String

@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import { ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 import { writeAudit } from "@/lib/audit";
 import { studentAccessWhereFor } from "@/lib/program-scope";
+import { isUniqueConstraintError } from "@/lib/db-errors";
 
 export const POST = withApiErrors(async function POST(req: NextRequest, { params }: { params: Promise<{ groupId: string }> }) {
   const session = await requireTeacherOrAdmin();
@@ -74,11 +75,3 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
   return NextResponse.json({ ok: true, inheritedAssignments });
 });
 
-function isUniqueConstraintError(error: unknown): boolean {
-  return Boolean(
-    error &&
-      typeof error === "object" &&
-      "code" in error &&
-      (error as { code?: unknown }).code === "P2002",
-  );
-}

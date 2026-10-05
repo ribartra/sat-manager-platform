@@ -8,6 +8,7 @@ import { getPublicCalculatorConfig } from "@/lib/calculator-config";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { extractQuestionGraphArtifacts } from "@/lib/question-graph";
 import { writeAudit } from "@/lib/audit";
+import { isUniqueConstraintError } from "@/lib/db-errors";
 import { buildFullTestSnapshot, fullTestModulesForAttempt, fullTestModulesInclude } from "@/lib/full-test-snapshot";
 
 interface PageProps { params: Promise<{ assignmentId: string }>; searchParams: Promise<{ area?: string; from?: string; to?: string }> }
@@ -43,20 +44,34 @@ export default async function FullTestPlayerPage({ params, searchParams }: PageP
     });
     redirect(last ? `/student/full-tests/results/${last.id}?${returnParams.toString()}` : `/student/content-map?${returnParams.toString()}`);
   }
+  let createdHere = false;
   if (!attempt) {
-    const created = await prisma.fullPracticeTestAttempt.create({
-      data: {
-        testId: assignment.testId,
-        assignmentId: assignment.id,
-        studentId: session!.user.id,
-        // RNF-17: freeze the exam as it is now; later edits never change this attempt.
-        testSnapshot: buildFullTestSnapshot(assignment.testId, assignment.test.modules),
-      },
-    });
-    attempt = await prisma.fullPracticeTestAttempt.findUniqueOrThrow({
-      where: { id: created.id },
-      include: { answers: true },
-    });
+    try {
+      const created = await prisma.fullPracticeTestAttempt.create({
+        data: {
+          testId: assignment.testId,
+          assignmentId: assignment.id,
+          studentId: session!.user.id,
+          // RNF-17: freeze the exam as it is now; later edits never change this attempt.
+          testSnapshot: buildFullTestSnapshot(assignment.testId, assignment.test.modules),
+        },
+      });
+      attempt = await prisma.fullPracticeTestAttempt.findUniqueOrThrow({
+        where: { id: created.id },
+        include: { answers: true },
+      });
+      createdHere = true;
+    } catch (error) {
+      // Another request (second tab, double click) opened it first: the partial unique index allows
+      // one IN_PROGRESS attempt per assignment, so reuse that one.
+      if (!isUniqueConstraintError(error)) throw error;
+      attempt = await prisma.fullPracticeTestAttempt.findFirstOrThrow({
+        where: { assignmentId: assignment.id, status: "IN_PROGRESS" },
+        include: { answers: true },
+      });
+    }
+  }
+  if (createdHere) {
     if (assignment.status === "PENDING") {
       await prisma.fullPracticeTestAssignment.update({ where: { id: assignment.id }, data: { status: "IN_PROGRESS" } });
     }
