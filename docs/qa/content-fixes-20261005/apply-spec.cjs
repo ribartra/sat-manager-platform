@@ -13,7 +13,7 @@ db.transaction(() => {
     const row = db.prepare(`select "${op.field}" v from "${op.table}" where id = ?`).get(op.id);
     const state = !row ? "MISSING" : row.v === op.after ? "ALREADY" : row.v === op.before ? "PENDING" : "DRIFT";
     if (apply && state === "PENDING") {
-      const n = db.prepare(`update "${op.table}" set "${op.field}" = ? where id = ? and "${op.field}" = ?`).run(op.after, op.id, op.before).changes;
+      const n = db.prepare(`update "${op.table}" set "${op.field}" = ? where id = ? and "${op.field}" IS ?`).run(op.after, op.id, op.before).changes;
       if (n !== 1) throw new Error("guard failed " + op.id);
       const qid = op.table === "Question" ? op.id : db.prepare("select questionId q from QuestionOption where id = ?").get(op.id).q;
       db.prepare("update Question set updatedAt = ? where id = ?").run(now, qid);

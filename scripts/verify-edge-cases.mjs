@@ -304,6 +304,12 @@ const checks = [
     label: "Player practica: colision al crear intento reutiliza el intento abierto",
   },
   {
+    file: "components/math-content.tsx",
+    // Data tables in questions are pipe tables rendered as real HTML tables (cells wrap; math inside cells).
+    requires: ["splitContentBlocks", "<table", "renderInline"],
+    label: "MathContent: tablas markdown se renderizan como tabla HTML",
+  },
+  {
     file: "lib/math-text.ts",
     // Ingested stems use $$…$$ mid-sentence; only a formula alone on its line renders as a block.
     requires: ["isStandaloneDisplay", "\\displaystyle "],

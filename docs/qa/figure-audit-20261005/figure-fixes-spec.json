@@ -1,0 +1,466 @@
+[
+ {
+  "table": "Question",
+  "id": "cmsjrnzqq02cpqmt14e343ey1",
+  "field": "imageUrl",
+  "before": null,
+  "after": "/uploads/questions/1983c1697d49c338e44a354e.png",
+  "note": "Figura vectorial recortada de Area and Volume MED.pdf p.7"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0t602sfqmt1s39wpgec",
+  "field": "imageUrl",
+  "before": null,
+  "after": "/uploads/questions/7f520f67f8057ea01be5a55f.png",
+  "note": "Figura vectorial recortada de Lines Angles Triangles EASY.pdf p.14"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1tm039xqmt14d658ff5",
+  "field": "imageUrl",
+  "before": null,
+  "after": "/uploads/questions/f05d9195b1aa1f179da8141b.png",
+  "note": "Figura vectorial recortada de Ratios Rates Proport. Units MED.pdf p.9"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnyx1022pqmt145bp8w1d",
+  "field": "imageUrl",
+  "before": null,
+  "after": "/uploads/questions/d4e3b1c0db62dd529d047fec.png",
+  "note": "Figura vectorial recortada de Linear Funct MED.pdf p.16"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0g902klqmt18v0lhr1f",
+  "field": "imageUrl",
+  "before": null,
+  "after": "/uploads/questions/bf75542d18619c022566636a.png",
+  "note": "Figura vectorial recortada de Lines Angles Triangles MED.pdf p.11"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0f702k6qmt100jb3xiw",
+  "field": "imageUrl",
+  "before": null,
+  "after": "/uploads/questions/0a2f5fdec1177bb211b9a674.png",
+  "note": "Figura vectorial recortada de Lines Angles Triangles MED.pdf p.4"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro06202hiqmt196ercuz4",
+  "field": "imageUrl",
+  "before": null,
+  "after": "/uploads/questions/6676d0cef494268ab7cbc969.png",
+  "note": "Figura vectorial recortada de Circles MED.pdf p.8"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0y602udqmt1n5a3ux5w",
+  "field": "imageUrl",
+  "before": null,
+  "after": "/uploads/questions/27b59cb79f4c0638309b4452.png",
+  "note": "Figura vectorial recortada de Circles HARD.pdf p.6"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1tm039xqmt14d658ff5",
+  "field": "stem",
+  "before": "The glass pictured above can hold a maximum volume of 473 cubic centimeters, which is approximately 16 fluid ounces. Jenny has a pitcher\nthat contains 1 gallon of water. How many times could Jenny completely fill the glass with 1 gallon of water?",
+  "after": "The glass pictured above can hold a maximum volume of 473 cubic centimeters, which is approximately 16 fluid ounces. Jenny has a pitcher\nthat contains 1 gallon of water. How many times could Jenny completely fill the glass with 1 gallon of water?\n(1 gallon = 128 fluid ounces)",
+  "note": "Dato del galón (imagen en el PDF de origen, nunca llegó al texto)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro19m02x4qmt1djzsg1zf",
+  "field": "stimulus",
+  "before": "Pyramids in Egypt and the Americas\nPyramid Country Height (meters) Age (years before present)\nThe Great Pyramid Mexico 33 2,050 to 2,400\nThe Pyramid of Djoser Egypt 60 4,600 to 4,700\nThe Pyramid of Sahure Egypt 47 4,400 to 4,500\nEl Castillo Belize 40 1,100 to 1,400\nA student is writing an essay about four pyramids for a history class and wants to note how long ago each pyramid was built and how tall each\npyramid is. Consulting the table, the student finds that el Castillo was built 1,100 to 1,400 years ago and is ______",
+  "after": "**Pyramids in Egypt and the Americas**\n\n| Pyramid | Country | Height (meters) | Age (years before present) |\n| --- | --- | --- | --- |\n| The Great Pyramid | Mexico | 33 | 2,050 to 2,400 |\n| The Pyramid of Djoser | Egypt | 60 | 4,600 to 4,700 |\n| The Pyramid of Sahure | Egypt | 47 | 4,400 to 4,500 |\n| El Castillo | Belize | 40 | 1,100 to 1,400 |\n\nA student is writing an essay about four pyramids for a history class and wants to note how long ago each pyramid was built and how tall each\npyramid is. Consulting the table, the student finds that el Castillo was built 1,100 to 1,400 years ago and is ______",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Information and Ideas - Command of Evidence - EASY #1"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1aj02ydqmt1eqfcs2g6",
+  "field": "stimulus",
+  "before": "Comfort Ratings and Temperature-Adjustment Preferences from\nOne Survey\nParticipant Comfort rating Preferred temperature adjustment\n20 −2 Cooler\n1 1 Cooler\n21 1 Cooler\nNan Gao and her team conducted multiple surveys to determine participants’ levels of comfort in a room where the temperature was regulated\nby a commercial climate control system. Participants filled out surveys several times a day to indicate their level of comfort on a scale from −3\n(very cold) to +3 (very hot), with 0 indicating neutral (neither warm nor cool), and to indicate how they would prefer the temperature to be\nadjusted. The table shows three participants’ responses in one of the surveys.",
+  "after": "**Comfort Ratings and Temperature-Adjustment Preferences from One Survey**\n\n| Participant | Comfort rating | Preferred temperature adjustment |\n| --- | --- | --- |\n| 20 | −2 | Cooler |\n| 1 | 1 | Cooler |\n| 21 | 1 | Cooler |\n\nNan Gao and her team conducted multiple surveys to determine participants’ levels of comfort in a room where the temperature was regulated\nby a commercial climate control system. Participants filled out surveys several times a day to indicate their level of comfort on a scale from −3\n(very cold) to +3 (very hot), with 0 indicating neutral (neither warm nor cool), and to indicate how they would prefer the temperature to be\nadjusted. The table shows three participants’ responses in one of the surveys.",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Information and Ideas - Command of Evidence - EASY #10"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1av02yxqmt1k19qmxpr",
+  "field": "stimulus",
+  "before": "Effect of Neighboring Species on Pollinator Visits to\nTarget Species\nNeighboring species Target species Effect value\nVirginia spring beauty star chickweed 0.4853\nHimalayan balsam marsh woundwort 0.7905\ncommon dandelion cat’s ear −0.6254\nResearchers Carolina Laura Morales and Anna Traveset gathered data about flowering plants growing alongside each other in various locations.\nIn each case, the researchers identified one plant as a “target species” and a nearby plant as a “neighboring species.” The researchers then\ncalculated a positive or negative value to show how the neighboring species affected pollinator visits to the target species. One example of a\nneighboring species with a negative effect value is the ______",
+  "after": "**Effect of Neighboring Species on Pollinator Visits to Target Species**\n\n| Neighboring species | Target species | Effect value |\n| --- | --- | --- |\n| Virginia spring beauty | star chickweed | 0.4853 |\n| Himalayan balsam | marsh woundwort | 0.7905 |\n| common dandelion | cat’s ear | −0.6254 |\n\nResearchers Carolina Laura Morales and Anna Traveset gathered data about flowering plants growing alongside each other in various locations.\nIn each case, the researchers identified one plant as a “target species” and a nearby plant as a “neighboring species.” The researchers then\ncalculated a positive or negative value to show how the neighboring species affected pollinator visits to the target species. One example of a\nneighboring species with a negative effect value is the ______",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Information and Ideas - Command of Evidence - EASY #14"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1c8030lqmt1vdvn1v96",
+  "field": "stimulus",
+  "before": "Effect of Paywall Introduction on Newspaper Companies’ Revenues\nNewspaper Total revenue change ($ in thousands) Percentage change (%) Newspaper size\nLos Angeles Times 93,966 12.5 large\nThe New York Times 235,788 20 large\nThe Denver Post −3,765 −1 small\nSun Sentinel −24,899 −11.9 small\nChicago Tribune 94,492 19 large\nDigital paywalls restrict access to online content to those with a paid subscription. In an investigation of the effect of paywalls on newspaper\ncompany revenues for print and digital subscriptions and advertising, Doug J. Chung and colleagues compared actual outcomes (with a paywall)\nto control estimates (without a paywall). The researchers concluded that introducing a paywall is generally more beneficial for larger\nnewspapers, which have high circulation and tend to offer a substantial amount of unique online content.",
+  "after": "**Effect of Paywall Introduction on Newspaper Companies’ Revenues**\n\n| Newspaper | Total revenue change ($ in thousands) | Percentage change (%) | Newspaper size |\n| --- | --- | --- | --- |\n| Los Angeles Times | 93,966 | 12.5 | large |\n| The New York Times | 235,788 | 20 | large |\n| The Denver Post | −3,765 | −1 | small |\n| Sun Sentinel | −24,899 | −11.9 | small |\n| Chicago Tribune | 94,492 | 19 | large |\n\nDigital paywalls restrict access to online content to those with a paid subscription. In an investigation of the effect of paywalls on newspaper\ncompany revenues for print and digital subscriptions and advertising, Doug J. Chung and colleagues compared actual outcomes (with a paywall)\nto control estimates (without a paywall). The researchers concluded that introducing a paywall is generally more beneficial for larger\nnewspapers, which have high circulation and tend to offer a substantial amount of unique online content.",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Information and Ideas - Command of Evidence - EASY #26"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1cc030qqmt107nff1sk",
+  "field": "stimulus",
+  "before": "Total Areas of Five Tribal Nations in California\nTribal nation Location Area (square miles)\nHoopa Valley Tribe Northern California 141.68\nLa Jolla Band of Luiseño Indians Southern California 13.50\nPauma Band of Luiseño Mission Indians Southern California 9.36\nAgua Caliente Band of Cahuilla Indians Northern California 53.68\nLos Coyotes Band of Cahuilla and Cupeño Indians Southern California 39.21\nIn what is now the state of California, there are over 100 tribal nations. One of the largest, the Hoopa Valley Tribe, covers 141.68 square miles in\nthe northern part of the state. However, most tribal nations in California are less than 50 square miles in total area. For example, the total area of\nthe Los Coyotes Band of Cahuilla and Cupeño Indians in Southern California is ______",
+  "after": "**Total Areas of Five Tribal Nations in California**\n\n| Tribal nation | Location | Area (square miles) |\n| --- | --- | --- |\n| Hoopa Valley Tribe | Northern California | 141.68 |\n| La Jolla Band of Luiseño Indians | Southern California | 13.50 |\n| Pauma Band of Luiseño Mission Indians | Southern California | 9.36 |\n| Agua Caliente Band of Cahuilla Indians | Northern California | 53.68 |\n| Los Coyotes Band of Cahuilla and Cupeño Indians | Southern California | 39.21 |\n\nIn what is now the state of California, there are over 100 tribal nations. One of the largest, the Hoopa Valley Tribe, covers 141.68 square miles in\nthe northern part of the state. However, most tribal nations in California are less than 50 square miles in total area. For example, the total area of\nthe Los Coyotes Band of Cahuilla and Cupeño Indians in Southern California is ______",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Information and Ideas - Command of Evidence - EASY #27"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1cf030vqmt1brfq2slr",
+  "field": "stimulus",
+  "before": "Daily Distance Traveled by Adult Mountain Lions in Three Seasons\nSeason Kilometers per day traveled by adult females Kilometers per day traveled by adult males\ncold-dry 9.28 15.81\nmonsoon 12.64 18.93\nhot-dry 12.48 18.87\nWildlife researcher Dana L. Karelus and her colleagues tracked the movements of female and male adult mountain lions over three seasons: the\ncold-dry season, the hot-dry season, and the monsoon season. They found that the least amount of travel per day occurred in ______",
+  "after": "**Daily Distance Traveled by Adult Mountain Lions in Three Seasons**\n\n| Season | Kilometers per day traveled by adult females | Kilometers per day traveled by adult males |\n| --- | --- | --- |\n| cold-dry | 9.28 | 15.81 |\n| monsoon | 12.64 | 18.93 |\n| hot-dry | 12.48 | 18.87 |\n\nWildlife researcher Dana L. Karelus and her colleagues tracked the movements of female and male adult mountain lions over three seasons: the\ncold-dry season, the hot-dry season, and the monsoon season. They found that the least amount of travel per day occurred in ______",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Information and Ideas - Command of Evidence - EASY #28"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1cl0310qmt1dnwgkimn",
+  "field": "stimulus",
+  "before": "Percent of Residents of City Areas in Favor of Adding More Bike Paths\nCity Area Percent of area’s residents in favor of adding more bike paths\nNorth East 12%\nNorth Central 26%\nNorth West 46%\nSouth West 88%\nSouth Central 33%\nA city’s Parks and Recreation department is interested in providing residents with more opportunities for bicycling in their neighborhoods.\nThey’re considering adding more bike paths and conducted a survey to understand where demand for more bike paths is highest. The survey\nindicated the highest level of demand, with 88 percent of the residents interested in adding more bike paths, is in the city’s ______",
+  "after": "**Percent of Residents of City Areas in Favor of Adding More Bike Paths**\n\n| City Area | Percent of area’s residents in favor of adding more bike paths |\n| --- | --- |\n| North East | 12% |\n| North Central | 26% |\n| North West | 46% |\n| South West | 88% |\n| South Central | 33% |\n\nA city’s Parks and Recreation department is interested in providing residents with more opportunities for bicycling in their neighborhoods.\nThey’re considering adding more bike paths and conducted a survey to understand where demand for more bike paths is highest. The survey\nindicated the highest level of demand, with 88 percent of the residents interested in adding more bike paths, is in the city’s ______",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Information and Ideas - Command of Evidence - EASY #29"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1cw031fqmt1yezodzlm",
+  "field": "stimulus",
+  "before": "Millions of Metric Tons of Copper\nMined in 1995 and 2020\nCountry 1995 2020\nCanada 0.73 0.59\nIndonesia 0.44 0.51\nKazakhstan 0.26 0.55\nChile 2.49 5.73\nWhile doing research for a paper about copper mining, a student finds a table with information about four different countries. The student notes\nthat the country that mined 0.55 million metric tons of copper in 2020 had mined ______",
+  "after": "**Millions of Metric Tons of Copper Mined in 1995 and 2020**\n\n| Country | 1995 | 2020 |\n| --- | --- | --- |\n| Canada | 0.73 | 0.59 |\n| Indonesia | 0.44 | 0.51 |\n| Kazakhstan | 0.26 | 0.55 |\n| Chile | 2.49 | 5.73 |\n\nWhile doing research for a paper about copper mining, a student finds a table with information about four different countries. The student notes\nthat the country that mined 0.55 million metric tons of copper in 2020 had mined ______",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Information and Ideas - Command of Evidence - EASY #32"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1g2031kqmt1hv11tyxr",
+  "field": "stimulus",
+  "before": "Guilds in French Cities in the Late Eighteenth Century\nCity Date Inhabitants Number of guilds Inhabitants per guild\nParis 1766 600,000 133 4,511\nBordeaux 1762 80,000 49 1,633\nRouen 1775 74,000 112 661\nLyon 1789 143,000 72 1,986\nGuilds—local associations of artisans and merchants in the same industry—were widespread in France from the medieval period until the late\neighteenth century. But guilds were much more numerous relative to the population in some cities than in others: for example, ______",
+  "after": "**Guilds in French Cities in the Late Eighteenth Century**\n\n| City | Date | Inhabitants | Number of guilds | Inhabitants per guild |\n| --- | --- | --- | --- | --- |\n| Paris | 1766 | 600,000 | 133 | 4,511 |\n| Bordeaux | 1762 | 80,000 | 49 | 1,633 |\n| Rouen | 1775 | 74,000 | 112 | 661 |\n| Lyon | 1789 | 143,000 | 72 | 1,986 |\n\nGuilds—local associations of artisans and merchants in the same industry—were widespread in France from the medieval period until the late\neighteenth century. But guilds were much more numerous relative to the population in some cities than in others: for example, ______",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Information and Ideas - Command of Evidence - EASY #33"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1ga031pqmt1ca77mjsu",
+  "field": "stimulus",
+  "before": "Total Areas of Five Pueblo Nations in New\nMexico\nTribal nation Area (square miles)\nPueblo de San Ildefonso 47.3\nSanta Clara Pueblo 77.1\nTaos Pueblo 156.2\nNambé Pueblo 32.4\nPueblo of Acoma 595.7\nThere are nineteen Pueblo tribal nations in New Mexico. A student in a geography class is a citizen of Taos Pueblo in the northern part of the\nstate. The student wants to compare the total area covered by Taos Pueblo with the total areas of various other Pueblo nations in the state.\nLooking at the table, the student finds that the total area of Taos Pueblo is 156.2 square miles, while the total area of Nambé Pueblo is ______",
+  "after": "**Total Areas of Five Pueblo Nations in New Mexico**\n\n| Tribal nation | Area (square miles) |\n| --- | --- |\n| Pueblo de San Ildefonso | 47.3 |\n| Santa Clara Pueblo | 77.1 |\n| Taos Pueblo | 156.2 |\n| Nambé Pueblo | 32.4 |\n| Pueblo of Acoma | 595.7 |\n\nThere are nineteen Pueblo tribal nations in New Mexico. A student in a geography class is a citizen of Taos Pueblo in the northern part of the\nstate. The student wants to compare the total area covered by Taos Pueblo with the total areas of various other Pueblo nations in the state.\nLooking at the table, the student finds that the total area of Taos Pueblo is 156.2 square miles, while the total area of Nambé Pueblo is ______",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Information and Ideas - Command of Evidence - EASY #34"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1ge031uqmt1jihc9oyl",
+  "field": "stimulus",
+  "before": "Time Participants Spent Reading about Five London Museums\nPercentage of total time spent reading about Percentage of total time spent reading about museum\nMuseum Name Ranking museum by participants provided with ranking by participants not provided with ranking\nBritish Museum 1 36 18\nNational Gallery 2 21 20\nTate Modern 4 16 17\nVictoria and Albert\n5 14 23\nMuseum\nNatural History\n3 13 22\nMuseum\nResearchers recently conducted an experiment to understand how we use rankings to make decisions. They created a fictitious travel website\ndescribing five museums in London. Then, they invited two groups of participants, who had never visited the museums, to review the site and\nselect the museum they would be most likely to visit. Meanwhile, the researchers tracked the amount of time each participant spent reading\nabout each museum. For one group, the website ranked each museum, titling the page “The Top 5 Museums in London.” For the other group, the\nmuseums and their descriptions were not ranked. The researchers concluded that when reviewing ranked lists, we tend to focus on the top-\nranked option.",
+  "after": "**Time Participants Spent Reading about Five London Museums**\n\n| Museum Name | Ranking | Percentage of total time spent reading about museum by participants provided with ranking | Percentage of total time spent reading about museum by participants not provided with ranking |\n| --- | --- | --- | --- |\n| British Museum | 1 | 36 | 18 |\n| National Gallery | 2 | 21 | 20 |\n| Tate Modern | 4 | 16 | 17 |\n| Victoria and Albert Museum | 5 | 14 | 23 |\n| Natural History Museum | 3 | 13 | 22 |\n\nResearchers recently conducted an experiment to understand how we use rankings to make decisions. They created a fictitious travel website\ndescribing five museums in London. Then, they invited two groups of participants, who had never visited the museums, to review the site and\nselect the museum they would be most likely to visit. Meanwhile, the researchers tracked the amount of time each participant spent reading\nabout each museum. For one group, the website ranked each museum, titling the page “The Top 5 Museums in London.” For the other group, the\nmuseums and their descriptions were not ranked. The researchers concluded that when reviewing ranked lists, we tend to focus on the top-\nranked option.",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Information and Ideas - Command of Evidence - EASY #35"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1a802xyqmt1t7564wxj",
+  "field": "stimulus",
+  "before": "Average Temperatures in July in Four Locations in the Navajo Nation\nLocation Average highest temperature (Fahrenheit) Average lowest temperature (Fahrenheit)\nTeec Nos Pos 94° 65°\nCameron 99° 65°\nRamah 83° 50°\nTuba City 83° 50°\nThe Navajo Nation has the largest land area of any tribal nation in the United States: over 27,000 square miles in the Southwest. Because this\narea is so huge and its communities are located at various elevations, the people of the Navajo Nation can experience different climate\nconditions depending on where they live. For example, in July, ______",
+  "after": "**Average Temperatures in July in Four Locations in the Navajo Nation**\n\n| Location | Average highest temperature (Fahrenheit) | Average lowest temperature (Fahrenheit) |\n| --- | --- | --- |\n| Teec Nos Pos | 94° | 65° |\n| Cameron | 99° | 65° |\n| Ramah | 83° | 50° |\n| Tuba City | 83° | 50° |\n\nThe Navajo Nation has the largest land area of any tribal nation in the United States: over 27,000 square miles in the Southwest. Because this\narea is so huge and its communities are located at various elevations, the people of the Navajo Nation can experience different climate\nconditions depending on where they live. For example, in July, ______",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Information and Ideas - Command of Evidence - EASY #7"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1jm034wqmt1pnbn1egk",
+  "field": "stimulus",
+  "before": "Data Sources for Neptune Temperature Analysis\nInstrument Observatory Data type Observation years\nTEXES (Texas Echelon Cross Echelle Spectrograph) Gemini Observatory spectroscopy 2007, 2019\nT-ReCS (Thermal-Region Camera Spectrograph) Gemini Observatory infrared imaging 2007, 2010\nLWS (Long Wavelength Spectrometer) Keck Observatory infrared imaging 2003\nVISIR (VLT Imager and Spectrometer for mid-InfraRed) European Southern Observatory spectroscopy 2006\nJulianne I. Moses and colleagues have reported that Neptune may have cooled significantly between 2003 and 2020. The team reached this\nconclusion by analyzing existing infrared imaging and spectroscopy data about the planet obtained from various instruments in different years.\nOf the team’s sources listed in the table, the earliest example of spectroscopy data included in the analysis was obtained in ______",
+  "after": "**Data Sources for Neptune Temperature Analysis**\n\n| Instrument | Observatory | Data type | Observation years |\n| --- | --- | --- | --- |\n| TEXES (Texas Echelon Cross Echelle Spectrograph) | Gemini Observatory | spectroscopy | 2007, 2019 |\n| T-ReCS (Thermal-Region Camera Spectrograph) | Gemini Observatory | infrared imaging | 2007, 2010 |\n| LWS (Long Wavelength Spectrometer) | Keck Observatory | infrared imaging | 2003 |\n| VISIR (VLT Imager and Spectrometer for mid-InfraRed) | European Southern Observatory | spectroscopy | 2006 |\n\nJulianne I. Moses and colleagues have reported that Neptune may have cooled significantly between 2003 and 2020. The team reached this\nconclusion by analyzing existing infrared imaging and spectroscopy data about the planet obtained from various instruments in different years.\nOf the team’s sources listed in the table, the earliest example of spectroscopy data included in the analysis was obtained in ______",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Information and Ideas - Command of Evidence - HARD #19"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1kf035tqmt1j694oh0r",
+  "field": "stimulus",
+  "before": "Tadpole Body Mass and Toxin Production after Three Weeks in Ponds\nAverage number of distinct Average amount of Average bufadienolide concentration\nPopulation Average tadpole body bufadienolide toxins per bufadienolide per tadpole (nanograms per milligram of tadpole\ndensity mass (milligrams) tadpole (nanograms) body mass)\nHigh 193.87 22.69 5,815.51 374.22\nMedium 254.56 21.65 5,525.72 230.10\nLow 258.97 22.08 4,664.99 171.43\nEcologist Veronika Bókony and colleagues investigated within-species competition among common toads (Bufo bufo), a species that secretes\nvarious unpleasant-tasting toxins called bufadienolides in response to threats. The researchers tested B. bufo tadpoles’ responses to different\nlevels of competition by creating ponds with different tadpole population densities but a fixed amount of food. Based on analysis of the tadpoles\nafter three weeks, the researchers concluded that increased competition drove bufadienolide production at the expense of growth.",
+  "after": "**Tadpole Body Mass and Toxin Production after Three Weeks in Ponds**\n\n| Population density | Average tadpole body mass (milligrams) | Average number of distinct bufadienolide toxins per tadpole | Average amount of bufadienolide per tadpole (nanograms) | Average bufadienolide concentration (nanograms per milligram of tadpole body mass) |\n| --- | --- | --- | --- | --- |\n| High | 193.87 | 22.69 | 5,815.51 | 374.22 |\n| Medium | 254.56 | 21.65 | 5,525.72 | 230.10 |\n| Low | 258.97 | 22.08 | 4,664.99 | 171.43 |\n\nEcologist Veronika Bókony and colleagues investigated within-species competition among common toads (Bufo bufo), a species that secretes\nvarious unpleasant-tasting toxins called bufadienolides in response to threats. The researchers tested B. bufo tadpoles’ responses to different\nlevels of competition by creating ponds with different tadpole population densities but a fixed amount of food. Based on analysis of the tadpoles\nafter three weeks, the researchers concluded that increased competition drove bufadienolide production at the expense of growth.",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Information and Ideas - Command of Evidence - HARD #26"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1kq0363qmt16cchfkl8",
+  "field": "stimulus",
+  "before": "Correlations Between Congestion Ratings and Features of\nthe Crowd in Raters’ Immediate Vicinity\nCrowd feature Before obstacle After obstacle Overall\nDensity 0.8592 0.7308 0.7447\nVelocity −0.9357 −0.9518 −0.8587\nResearcher Xiaolu Jia and colleagues monitored individuals’ velocity and the surrounding crowd density as a group of study participants walked\nthrough a space and navigated around an obstacle. Participants rated how congested it seemed before the obstacle, after the obstacle, and\noverall, and the researchers correlated those ratings with velocity and density. (Correlations range from −1 to 1, with greater distance from 0\nindicating greater strength). The researchers concluded that the correlations with velocity are stronger than those with density.",
+  "after": "Correlations Between Congestion Ratings and Features of the Crowd in Raters’ Immediate Vicinity\n\n| Crowd feature | Before obstacle | After obstacle | Overall |\n| --- | --- | --- | --- |\n| Density | 0.8592 | 0.7308 | 0.7447 |\n| Velocity | −0.9357 | −0.9518 | −0.8587 |\n\nResearcher Xiaolu Jia and colleagues monitored individuals’ velocity and the surrounding crowd density as a group of study participants walked\nthrough a space and navigated around an obstacle. Participants rated how congested it seemed before the obstacle, after the obstacle, and\noverall, and the researchers correlated those ratings with velocity and density. (Correlations range from −1 to 1, with greater distance from 0\nindicating greater strength). The researchers concluded that the correlations with velocity are stronger than those with density.",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Information and Ideas - Command of Evidence - HARD #28"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1kv0368qmt1oxt4ta8k",
+  "field": "stimulus",
+  "before": "Delta 15-N Values in Seagrass Samples from Four Sites on the Yucatan, 2016–\n2017\nSite February 2016 October 2016 February 2017 October 2017\nAkumal Bay no data available 3.3 2.0 6.3\nMahahual 0.7 no data available 2.5 3.4\nTulum 6.1 5.9 2.3 5.5\nXahuayxol 0.9 0.3 −0.9 1.4\n15\nBecause water from natural, uncontaminated sources is less enriched with the stable nitrogen isotope N than wastewater from human\n15 14\nactivities is, the presence of such wastewater in nature can be detected by examining delta 15-N values (a measure of the ratio of N to N) in\nplants. Karla A. Camacho-Cruz and colleagues assessed delta 15-N values in the seagrass Thalassia testudinum from sites on Mexico’s Yucatan\npeninsula with intermediate tourism development, including Akumal Bay and Tulum, and low tourism development, including Mahahual and\nXahuayxol, throughout 2016 and 2017. The data suggest that the intermediate-tourism sites experienced influxes of human wastewater.\n++However, the researchers concluded that this happened intermittently.++",
+  "after": "**Delta 15-N Values in Seagrass Samples from Four Sites on the Yucatan, 2016–2017**\n\n| Site | February 2016 | October 2016 | February 2017 | October 2017 |\n| --- | --- | --- | --- | --- |\n| Akumal Bay | no data available | 3.3 | 2.0 | 6.3 |\n| Mahahual | 0.7 | no data available | 2.5 | 3.4 |\n| Tulum | 6.1 | 5.9 | 2.3 | 5.5 |\n| Xahuayxol | 0.9 | 0.3 | −0.9 | 1.4 |\n\nBecause water from natural, uncontaminated sources is less enriched with the stable nitrogen isotope ¹⁵N than wastewater from human\nactivities is, the presence of such wastewater in nature can be detected by examining delta 15-N values (a measure of the ratio of ¹⁵N to ¹⁴N) in\nplants. Karla A. Camacho-Cruz and colleagues assessed delta 15-N values in the seagrass Thalassia testudinum from sites on Mexico’s Yucatan\npeninsula with intermediate tourism development, including Akumal Bay and Tulum, and low tourism development, including Mahahual and\nXahuayxol, throughout 2016 and 2017. The data suggest that the intermediate-tourism sites experienced influxes of human wastewater.\n++However, the researchers concluded that this happened intermittently.++",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Information and Ideas - Command of Evidence - HARD #29"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1l6036iqmt1r6wkdnmn",
+  "field": "stimulus",
+  "before": "Corn-Related Vocabulary in Various Southeastern Languages\nLanguage English Proposed origin in vocabulary of the\nfamily Word (language) translation Totozoquean language family\ntanchi’ (Chickasaw); tanchi (Choctaw); vce (Muscogee,\nMuskogean corn no\npronounced “uh-chi”)\nIroquoian se-lu (Cherokee) corn no\nCaddoan -k’as- (Caddo) dried corn yes\nChitimacha k’asma (Chitimacha) corn yes\nIn Caddo, a language from what is now the US Southeast, vocabulary pertaining to corn cultivation resembles equivalent vocabulary in the\nTotozoquean language family in Mexico. This resemblance is perhaps attributable to cultural contact: such words could have entered Caddo\nthrough the intermediary of the neighboring but unrelated Chitimacha language, concurrent with the dissemination of corn itself from Mexico\ninto the Southeast after 700 CE. That the vocabulary pertaining to domestic crops accompanies them as they diffuse into new regions is an\nestablished phenomenon globally. Crops may also be decoupled from vocabulary altogether: corn cultivation became ubiquitous among the\nSoutheastern tribes, yet ______",
+  "after": "**Corn-Related Vocabulary in Various Southeastern Languages**\n\n| Language family | Word (language) | English translation | Proposed origin in vocabulary of the Totozoquean language family |\n| --- | --- | --- | --- |\n| Muskogean | tanchi’ (Chickasaw); tanchi (Choctaw); vce (Muscogee, pronounced “uh-chi”) | corn | no |\n| Iroquoian | se-lu (Cherokee) | corn | no |\n| Caddoan | -k’as- (Caddo) | dried corn | yes |\n| Chitimacha | k’asma (Chitimacha) | corn | yes |\n\nIn Caddo, a language from what is now the US Southeast, vocabulary pertaining to corn cultivation resembles equivalent vocabulary in the\nTotozoquean language family in Mexico. This resemblance is perhaps attributable to cultural contact: such words could have entered Caddo\nthrough the intermediary of the neighboring but unrelated Chitimacha language, concurrent with the dissemination of corn itself from Mexico\ninto the Southeast after 700 CE. That the vocabulary pertaining to domestic crops accompanies them as they diffuse into new regions is an\nestablished phenomenon globally. Crops may also be decoupled from vocabulary altogether: corn cultivation became ubiquitous among the\nSoutheastern tribes, yet ______",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Information and Ideas - Command of Evidence - HARD #31"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1lb036nqmt1gftu21ii",
+  "field": "stimulus",
+  "before": "Percentage Point Changes in US Federal Outlays Relative to GDP by Congressional Status\nPeriod Congressional status Change in total outlays Change in nondefense outlays Change in defense outlays\n1981–1988 divided −0.4 −1.3 0.9\n1975–1976 divided 2.7 3.0 −0.3\n1977–1980 undivided 0.3 0.6 −0.3\n1964–1968 undivided 1.9 1.4 0.5\n1969–1974 divided −1.8 2.1 −3.9\nEconomist Steve H. Hanke has shown that divided US Congresses—which occur when one party holds the majority in the House of\nRepresentatives and another holds the majority in the Senate—tend to accompany reductions in total federal outlays (spending) relative to gross\ndomestic product (GDP), which Hanke interprets to reflect decreases in government size. Hanke calculated the percentage point change in total\noutlays (encompassing nondefense and defense outlays) for consecutive US Congresses. Hanke has pointed to his calculations as evidence that\n++a divided Congress may be a “necessary but not sufficient condition” for a decrease in government size to occur.++",
+  "after": "**Percentage Point Changes in US Federal Outlays Relative to GDP by Congressional Status**\n\n| Period | Congressional status | Change in total outlays | Change in nondefense outlays | Change in defense outlays |\n| --- | --- | --- | --- | --- |\n| 1981–1988 | divided | −0.4 | −1.3 | 0.9 |\n| 1975–1976 | divided | 2.7 | 3.0 | −0.3 |\n| 1977–1980 | undivided | 0.3 | 0.6 | −0.3 |\n| 1964–1968 | undivided | 1.9 | 1.4 | 0.5 |\n| 1969–1974 | divided | −1.8 | 2.1 | −3.9 |\n\nEconomist Steve H. Hanke has shown that divided US Congresses—which occur when one party holds the majority in the House of\nRepresentatives and another holds the majority in the Senate—tend to accompany reductions in total federal outlays (spending) relative to gross\ndomestic product (GDP), which Hanke interprets to reflect decreases in government size. Hanke calculated the percentage point change in total\noutlays (encompassing nondefense and defense outlays) for consecutive US Congresses. Hanke has pointed to his calculations as evidence that\n++a divided Congress may be a “necessary but not sufficient condition” for a decrease in government size to occur.++",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Information and Ideas - Command of Evidence - HARD #32"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1nz036sqmt1og4h07um",
+  "field": "stimulus",
+  "before": "Distribution of Ecosystem Services Affected by Invasive Species by\nService Type\nRegion (Overall) Provisioning (75%) Regulating (21%) Cultural (4%)\nWest 73% 27% 0%\nNorth 88% 12% 0%\nSouth 79% 14% 7%\nEast 83% 6% 11%\nCentral 33% 67% 0%\nTo assess the impact of invasive species on ecosystems in Africa, Benis N. Egoh and colleagues reviewed government reports from those\nnations about how invasive species are undermining ecosystem services (aspects of the ecosystem on which residents depend). The services\nwere sorted into three categories: provisioning (material resources from the ecosystem), regulating (natural processes such as cleaning the air\nor water), and cultural (nonmaterial benefits of ecosystems). Egoh and her team assert that countries in each region reported effects on\nprovisioning services and that provisioning services represent the majority of the reported services.",
+  "after": "**Distribution of Ecosystem Services Affected by Invasive Species by Service Type**\n\n| Region (Overall) | Provisioning (75%) | Regulating (21%) | Cultural (4%) |\n| --- | --- | --- | --- |\n| West | 73% | 27% | 0% |\n| North | 88% | 12% | 0% |\n| South | 79% | 14% | 7% |\n| East | 83% | 6% | 11% |\n| Central | 33% | 67% | 0% |\n\nTo assess the impact of invasive species on ecosystems in Africa, Benis N. Egoh and colleagues reviewed government reports from those\nnations about how invasive species are undermining ecosystem services (aspects of the ecosystem on which residents depend). The services\nwere sorted into three categories: provisioning (material resources from the ecosystem), regulating (natural processes such as cleaning the air\nor water), and cultural (nonmaterial benefits of ecosystems). Egoh and her team assert that countries in each region reported effects on\nprovisioning services and that provisioning services represent the majority of the reported services.",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Information and Ideas - Command of Evidence - HARD #33"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1hn032zqmt1cixv2udc",
+  "field": "stimulus",
+  "before": "Nucleobase Concentrations from Murchison Meteorite and Soil Samples in Parts per Billion\nNucleobase Murchison meteorite sample 1 Murchison meteorite sample 2 Murchison soil sample\nIsoguanine 0.5 0.04 not detected\nPurine 0.2 0.02 not detected\nXanthine 39 3 1\nAdenine 15 1 40\nHypoxanthine 24 1 2\nEmploying high-performance liquid chromatography—a process that uses pressurized water to separate material into its component molecules—\nastrochemist Yashiro Oba and colleagues analyzed two samples of the Murchison meteorite that landed in Australia as well as soil from the\nlanding zone of the meteorite to determine the concentrations of various organic molecules. By comparing the relative concentrations of types\nof molecules known as nucleobases in the Murchison meteorite with those in the soil, the team concluded that there is evidence that the\nnucleobases in the Murchison meteorite formed in space and are not the result of contamination on Earth.",
+  "after": "**Nucleobase Concentrations from Murchison Meteorite and Soil Samples in Parts per Billion**\n\n| Nucleobase | Murchison meteorite sample 1 | Murchison meteorite sample 2 | Murchison soil sample |\n| --- | --- | --- | --- |\n| Isoguanine | 0.5 | 0.04 | not detected |\n| Purine | 0.2 | 0.02 | not detected |\n| Xanthine | 39 | 3 | 1 |\n| Adenine | 15 | 1 | 40 |\n| Hypoxanthine | 24 | 1 | 2 |\n\nEmploying high-performance liquid chromatography—a process that uses pressurized water to separate material into its component molecules—\nastrochemist Yashiro Oba and colleagues analyzed two samples of the Murchison meteorite that landed in Australia as well as soil from the\nlanding zone of the meteorite to determine the concentrations of various organic molecules. By comparing the relative concentrations of types\nof molecules known as nucleobases in the Murchison meteorite with those in the soil, the team concluded that there is evidence that the\nnucleobases in the Murchison meteorite formed in space and are not the result of contamination on Earth.",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Information and Ideas - Command of Evidence - HARD #5"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro2a203i0qmt1is3kvl3r",
+  "field": "stimulus",
+  "before": "North American Thrasher Mean Bill Size and Habitat Temperature Range\nMean bill surface area\nMean maximum temperature of warmest Mean minimum temperature of coldest\n2\nSpecies (cm ) month (°C) month (°C)\nBrown thrasher 1.86 30.40 −4.29\nBendire’s thrasher 1.98 36.57 0.24\nLong-billed\n2.24 35.27 8.82\nthrasher\nCozumel thrasher 2.28 33.27 18.21\nOcellated thrasher 3.26 27.56 5.45\nIt has been hypothesized that since birds can dissipate excess heat through their bills, bill size should increase with habitat temperature. To\nevaluate this hypothesis for a 2021 study, Charlotte Probst and colleagues gathered data on mean bill surface area of species of North American\nthrashers (genus: Toxostoma) as well as on climate conditions of the birds’ native habitats. Based on their data, Probst and colleagues\nconcluded that the hypothesis was not fully supported.",
+  "after": "**North American Thrasher Mean Bill Size and Habitat Temperature Range**\n\n| Species | Mean bill surface area (cm²) | Mean maximum temperature of warmest month (°C) | Mean minimum temperature of coldest month (°C) |\n| --- | --- | --- | --- |\n| Brown thrasher | 1.86 | 30.40 | −4.29 |\n| Bendire’s thrasher | 1.98 | 36.57 | 0.24 |\n| Long-billed thrasher | 2.24 | 35.27 | 8.82 |\n| Cozumel thrasher | 2.28 | 33.27 | 18.21 |\n| Ocellated thrasher | 3.26 | 27.56 | 5.45 |\n\nIt has been hypothesized that since birds can dissipate excess heat through their bills, bill size should increase with habitat temperature. To\nevaluate this hypothesis for a 2021 study, Charlotte Probst and colleagues gathered data on mean bill surface area of species of North American\nthrashers (genus: Toxostoma) as well as on climate conditions of the birds’ native habitats. Based on their data, Probst and colleagues\nconcluded that the hypothesis was not fully supported.",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Information and Ideas - Command of Evidence - MEDIUM #10"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro2ad03iaqmt1dsr5d602",
+  "field": "stimulus",
+  "before": "Survey Results for Two Online Account Sign-in Methods\nPercent of participants in the UK Percent of participants in Japan Percent of participants in India who\nSign-in method who chose method who chose method chose method\nBiometrics (for example, a\n33 29 22\nface scan)\nOnetime passcodes 16 8 25\nA survey listed methods for signing into online accounts. Participants in different countries were asked to choose the sign-in method they view\nas most secure. The table presents data for two of the methods.",
+  "after": "**Survey Results for Two Online Account Sign-in Methods**\n\n| Sign-in method | Percent of participants in the UK who chose method | Percent of participants in Japan who chose method | Percent of participants in India who chose method |\n| --- | --- | --- | --- |\n| Biometrics (for example, a face scan) | 33 | 29 | 22 |\n| Onetime passcodes | 16 | 8 | 25 |\n\nA survey listed methods for signing into online accounts. Participants in different countries were asked to choose the sign-in method they view\nas most secure. The table presents data for two of the methods.",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Information and Ideas - Command of Evidence - MEDIUM #12"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro2an03ikqmt172j0bcb1",
+  "field": "stimulus",
+  "before": "Average Nitrate and Phosphate Concentrations in Seawater after Volcanic Eruption\nSeawater in lava-affected Seawater in lava-affected Seawater outside of lava- Seawater outside of lava-\narea, 5–45 meters below area, 75–125 meters below affected area, 5–45 meters affected area, 75–125 meters\nNutrient surface surface below surface below surface\nNitrate\n(micromoles per 3.1 0.4 ≤0.03 ≤0.01\nliter)\nPhosphate\n(micromoles per 0.17 0.09 0.14 0.06\nliter)\nAfter a volcanic eruption spilled lava into North Pacific Ocean waters, a dramatic increase of diatoms (a kind of phytoplankton) near the surface\noccurred. Scientists assumed the diatoms were thriving on nutrients such as phosphate from the lava, but analysis showed these nutrients\nweren’t present near the surface in forms diatoms can consume. However, there was an abundance of usable nitrate, a nutrient usually found in\nmuch deeper water and almost never found in lava. Microbial oceanographer Sonya Dyhrman and colleagues believe that as the lava plunged\nnearly 300 meters below the surface it dislodged pockets of this nutrient, releasing it to float upward, given that ______",
+  "after": "**Average Nitrate and Phosphate Concentrations in Seawater after Volcanic Eruption**\n\n| Nutrient | Seawater in lava-affected area, 5–45 meters below surface | Seawater in lava-affected area, 75–125 meters below surface | Seawater outside of lava-affected area, 5–45 meters below surface | Seawater outside of lava-affected area, 75–125 meters below surface |\n| --- | --- | --- | --- | --- |\n| Nitrate (micromoles per liter) | 3.1 | 0.4 | ≤0.03 | ≤0.01 |\n| Phosphate (micromoles per liter) | 0.17 | 0.09 | 0.14 | 0.06 |\n\nAfter a volcanic eruption spilled lava into North Pacific Ocean waters, a dramatic increase of diatoms (a kind of phytoplankton) near the surface\noccurred. Scientists assumed the diatoms were thriving on nutrients such as phosphate from the lava, but analysis showed these nutrients\nweren’t present near the surface in forms diatoms can consume. However, there was an abundance of usable nitrate, a nutrient usually found in\nmuch deeper water and almost never found in lava. Microbial oceanographer Sonya Dyhrman and colleagues believe that as the lava plunged\nnearly 300 meters below the surface it dislodged pockets of this nutrient, releasing it to float upward, given that ______",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Information and Ideas - Command of Evidence - MEDIUM #14"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro2ba03j9qmt1rrabv0on",
+  "field": "stimulus",
+  "before": "Body Length, Filter Time, and Lunges per Dive for Four Whale Species\nWhale Typical adult body length Average time to filter all engulfed water Average number of lunges per dive deeper than\nspecies (meters) (seconds) 50 meters\nfin 18–22 31.30 3.95\nhumpback 11–17 17.12 6.28\nminke 7–10 8.88 7.48\nblue 24–34 60.27 4.02\nSome whale species practice lunge feeding, in which they lunge toward prey with their mouths open at wide angles, collect the prey and the\nsurrounding water, and then filter out the water through baleen plates in their mouths. Although the volume of water engulfed increases with\nwhales’ body length, the surface area of whales’ baleen plates, which influences the rate at which water can be filtered, does not increase with\nbody length to the same degree, which helps explain why ______",
+  "after": "**Body Length, Filter Time, and Lunges per Dive for Four Whale Species**\n\n| Whale species | Typical adult body length (meters) | Average time to filter all engulfed water (seconds) | Average number of lunges per dive deeper than 50 meters |\n| --- | --- | --- | --- |\n| fin | 18–22 | 31.30 | 3.95 |\n| humpback | 11–17 | 17.12 | 6.28 |\n| minke | 7–10 | 8.88 | 7.48 |\n| blue | 24–34 | 60.27 | 4.02 |\n\nSome whale species practice lunge feeding, in which they lunge toward prey with their mouths open at wide angles, collect the prey and the\nsurrounding water, and then filter out the water through baleen plates in their mouths. Although the volume of water engulfed increases with\nwhales’ body length, the surface area of whales’ baleen plates, which influences the rate at which water can be filtered, does not increase with\nbody length to the same degree, which helps explain why ______",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Information and Ideas - Command of Evidence - MEDIUM #19"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro2c603k8qmt1mlddbnnt",
+  "field": "stimulus",
+  "before": "Participants’ Evaluation of the Likelihood That Robots Can Work Effectively in Different Occupations\nOccupation Somewhat or very unlikely (%) Neutral (%) Somewhat or very likely (%)\ntelevision news anchor 24 9 67\nteacher 37 16 47\nfirefighter 62 9 30\nsurgeon 74 9 16\ntour guide 10 8 82\nRows in table may not add up to 100 due to rounding.\nGeorgia Tech roboticists De’Aira Bryant and Ayanna Howard, along with ethicist Jason Borenstein, were interested in people’s perceptions of\nrobots’ competence. They recruited participants and asked them how likely they think it is that a robot could do the work required in various\noccupations. Participants’ evaluations varied widely depending on which occupation was being considered; for example, ______",
+  "after": "Participants’ Evaluation of the Likelihood That Robots Can Work Effectively in Different Occupations\n\n| Occupation | Somewhat or very unlikely (%) | Neutral (%) | Somewhat or very likely (%) |\n| --- | --- | --- | --- |\n| television news anchor | 24 | 9 | 67 |\n| teacher | 37 | 16 | 47 |\n| firefighter | 62 | 9 | 30 |\n| surgeon | 74 | 9 | 16 |\n| tour guide | 10 | 8 | 82 |\n\nRows in table may not add up to 100 due to rounding.\nGeorgia Tech roboticists De’Aira Bryant and Ayanna Howard, along with ethicist Jason Borenstein, were interested in people’s perceptions of\nrobots’ competence. They recruited participants and asked them how likely they think it is that a robot could do the work required in various\noccupations. Participants’ evaluations varied widely depending on which occupation was being considered; for example, ______",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Information and Ideas - Command of Evidence - MEDIUM #26"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0je02nuqmt1autna8vg",
+  "field": "stem",
+  "before": "Sample Percent in favor Margin of error\nA 52% 4.2%\nB 48% 1.6%\nThe results of two random samples of votes for a proposition are shown above. The samples were selected from the same population, and the\nmargins of error were calculated using the same method. Which of the following is the most appropriate reason that the margin of error for\nsample A is greater than the margin of error for sample B?",
+  "after": "| Sample | Percent in favor | Margin of error |\n| --- | --- | --- |\n| A | 52% | 4.2% |\n| B | 48% | 1.6% |\n\nThe results of two random samples of votes for a proposition are shown above. The samples were selected from the same population, and the\nmargins of error were calculated using the same method. Which of the following is the most appropriate reason that the margin of error for\nsample A is greater than the margin of error for sample B?",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Problem-Solving and Data Analysis - Inference from Statistics and Margin of Error - HARD #3"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0ji02nzqmt1zfb4jzl6",
+  "field": "stem",
+  "before": "Texting Talks on cell Does not talk on\nbehavior phone daily cell phone daily Total\nLight 110 146 256\nMedium 139 164 303\nHeavy 166 74 240\nTotal 415 384 799\nIn a study of cell phone use, 799 randomly selected US teens were asked how often they talked on a cell phone and about their texting behavior.\nThe data are summarized in the table above. Based on the data from the study, an estimate of the percent of US teens who are heavy texters is\n30% and the associated margin of error is 3%. Which of the following is a correct statement based on the given margin of error?",
+  "after": "| Texting behavior | Talks on cell phone daily | Does not talk on cell phone daily | Total |\n| --- | --- | --- | --- |\n| Light | 110 | 146 | 256 |\n| Medium | 139 | 164 | 303 |\n| Heavy | 166 | 74 | 240 |\n| Total | 415 | 384 | 799 |\n\nIn a study of cell phone use, 799 randomly selected US teens were asked how often they talked on a cell phone and about their texting behavior.\nThe data are summarized in the table above. Based on the data from the study, an estimate of the percent of US teens who are heavy texters is\n30% and the associated margin of error is 3%. Which of the following is a correct statement based on the given margin of error?",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Problem-Solving and Data Analysis - Inference from Statistics and Margin of Error - HARD #4"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0il02n2qmt1ft2vei7b",
+  "field": "stem",
+  "before": "Five Smallest Countries in 2016\nLand area\nCountry\n(square kilometers)\nMonaco 2.0\nNauru 21\nSan Marino 61\nTuvalu 26\nVatican City 0.44\nThe table above shows the land area, in square kilometers, of the five smallest countries of the world in 2016. Based on the table, what is the\nmean land area of the 5 smallest countries in 2016, to the nearest square kilometer?",
+  "after": "**Five Smallest Countries in 2016**\n\n| Country | Land area (square kilometers) |\n| --- | --- |\n| Monaco | 2.0 |\n| Nauru | 21 |\n| San Marino | 61 |\n| Tuvalu | 26 |\n| Vatican City | 0.44 |\n\nThe table above shows the land area, in square kilometers, of the five smallest countries of the world in 2016. Based on the table, what is the\nmean land area of the 5 smallest countries in 2016, to the nearest square kilometer?",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - EASY #11"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0io02n7qmt1saoknm4e",
+  "field": "stem",
+  "before": "Number of High School Students Who\nCompleted Summer Internships\nYear\nHigh\nschool 2008 2009 2010 2011 2012\nFoothill 87 80 75 76 70\nValley 44 54 65 76 82\nTotal 131 134 140 152 152\nThe table above shows the number of students from two different high schools who completed summer internships in each of five years. No\nstudent attended both schools. Which of the following statements are true about the number of students who completed summer internships for\nthe 5 years shown?\n1. The mean number from Foothill High School is greater than the mean number from Valley High School.\n2. The median number from Foothill High School is greater than the median number from Valley High School.",
+  "after": "**Number of High School Students Who Completed Summer Internships**\n\n| High school | 2008 | 2009 | 2010 | 2011 | 2012 |\n| --- | --- | --- | --- | --- | --- |\n| Foothill | 87 | 80 | 75 | 76 | 70 |\n| Valley | 44 | 54 | 65 | 76 | 82 |\n| Total | 131 | 134 | 140 | 152 | 152 |\n\nThe table above shows the number of students from two different high schools who completed summer internships in each of five years. No\nstudent attended both schools. Which of the following statements are true about the number of students who completed summer internships for\nthe 5 years shown?\nI. The mean number from Foothill High School is greater than the mean number from Valley High School.\nII. The median number from Foothill High School is greater than the median number from Valley High School.",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - EASY #12"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0it02ncqmt1s03c89w0",
+  "field": "stem",
+  "before": "The high temperature, in degrees Fahrenheit (°F), in a certain city was recorded for each of 5 days. The data are shown below.\nDay 1 2 3 4 5\nHigh temperature (°F) 81 80 81 81 82\nOver this 5-day period, which of the following is NOT equal to 81°F?",
+  "after": "The high temperature, in degrees Fahrenheit (°F), in a certain city was recorded for each of 5 days. The data are shown below.\n\n| Day | 1 | 2 | 3 | 4 | 5 |\n| --- | --- | --- | --- | --- | --- |\n| High temperature (°F) | 81 | 80 | 81 | 81 | 82 |\n\nOver this 5-day period, which of the following is NOT equal to 81°F?",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - EASY #13"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0ie02msqmt1zmy6el2l",
+  "field": "stem",
+  "before": "A study was conducted on the production rates for a company that produces tractor wheels. The table below shows the number of wheels made\nduring 11 consecutive one-hour production periods.\nNumber\nOne- of\nhour wheels\nperiod made\nA 24\nB 24\nC 21\nD 21\nE 21\nF 19\nG 24\nH 24\nI 19\nJ 22\nK 23\nWhat is the range of the number of wheels made for the 11 one-hour periods?",
+  "after": "A study was conducted on the production rates for a company that produces tractor wheels. The table below shows the number of wheels made during 11 consecutive one-hour production periods.\n\n| One-hour period | Number of wheels made |\n| --- | --- |\n| A | 24 |\n| B | 24 |\n| C | 21 |\n| D | 21 |\n| E | 21 |\n| F | 19 |\n| G | 24 |\n| H | 24 |\n| I | 19 |\n| J | 22 |\n| K | 23 |\n\nWhat is the range of the number of wheels made for the 11 one-hour periods?",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - EASY #9"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzyq02etqmt1pgs0y4vr",
+  "field": "stem",
+  "before": "For a certain computer game, individuals receive an integer score that ranges from 2 through 10. The table below shows the frequency\ndistribution of the scores of the 9 players in group A and the 11 players in group B.\nScore\nScore Frequencies\nGroup A Group B\n2 1 0\n3 1 0\n4 2 0\n5 1 4\n6 3 2\n7 0 0\n8 0 2\n9 1 1\n10 0 2\nTotal 9 11\nThe median of the scores for group B is how much greater than the median of the scores for group A?",
+  "after": "For a certain computer game, individuals receive an integer score that ranges from 2 through 10. The table below shows the frequency distribution of the scores of the 9 players in group A and the 11 players in group B.\n\n**Score Frequencies**\n\n| Score | Group A frequency | Group B frequency |\n| --- | --- | --- |\n| 2 | 1 | 0 |\n| 3 | 1 | 0 |\n| 4 | 2 | 0 |\n| 5 | 1 | 4 |\n| 6 | 3 | 2 |\n| 7 | 0 | 0 |\n| 8 | 0 | 2 |\n| 9 | 1 | 1 |\n| 10 | 0 | 2 |\n| Total | 9 | 11 |\n\nThe median of the scores for group B is how much greater than the median of the scores for group A?",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - HARD - #2 #1"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzyt02euqmt18iagq73n",
+  "field": "stem",
+  "before": "Masses (kilograms)\nAndrew 2.4 2.5 3.6 3.1 2.5 2.7\nMaria x 3.1 2.7 2.9 3.3 2.8\nAndrew and Maria each collected six rocks, and the masses of the rocks are shown in the table above. The mean of the masses of the rocks\nMaria collected is 0.1 kilogram greater than the mean of the masses of the rocks Andrew collected. What is the value of x ?",
+  "after": "|  | Masses (kilograms) |  |  |  |  |  |\n| --- | --- | --- | --- | --- | --- | --- |\n| Andrew | 2.4 | 2.5 | 3.6 | 3.1 | 2.5 | 2.7 |\n| Maria | x | 3.1 | 2.7 | 2.9 | 3.3 | 2.8 |\n\nAndrew and Maria each collected six rocks, and the masses of the rocks are shown in the table above. The mean of the masses of the rocks\nMaria collected is 0.1 kilogram greater than the mean of the masses of the rocks Andrew collected. What is the value of x ?",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - HARD - #2 #2"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0xd02tsqmt1qm7ef91v",
+  "field": "stem",
+  "before": "International Tourist\nArrivals, in millions\nCountry 2012 2013\nFrance 83.0 84.7\nUnited\n66.7 69.8\nStates\nSpain 57.5 60.7\nChina 57.7 55.7\nItaly 46.4 47.7\nTurkey 35.7 37.8\nGermany 30.4 31.5\nUnited\n26.3 32.2\nKingdom\nRussia 24.7 28.4\nThe table above shows the number of international tourist arrivals, rounded to the nearest tenth of a million, to the top nine tourist destinations in\nboth 2012 and 2013. Based on the information given in the table, how much greater, in millions, was the median number of international tourist\narrivals to the top nine tourist destinations in 2013 than the median number in 2012, to the nearest tenth of a million?",
+  "after": "**International Tourist Arrivals, in millions**\n\n| Country | 2012 | 2013 |\n| --- | --- | --- |\n| France | 83.0 | 84.7 |\n| United States | 66.7 | 69.8 |\n| Spain | 57.5 | 60.7 |\n| China | 57.7 | 55.7 |\n| Italy | 46.4 | 47.7 |\n| Turkey | 35.7 | 37.8 |\n| Germany | 30.4 | 31.5 |\n| United Kingdom | 26.3 | 32.2 |\n| Russia | 24.7 | 28.4 |\n\nThe table above shows the number of international tourist arrivals, rounded to the nearest tenth of a million, to the top nine tourist destinations in\nboth 2012 and 2013. Based on the information given in the table, how much greater, in millions, was the median number of international tourist\narrivals to the top nine tourist destinations in 2013 than the median number in 2012, to the nearest tenth of a million?",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - MEDIUM #10"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0xh02ttqmt1oq4nfvx6",
+  "field": "stem",
+  "before": "Ages of 20 Students Enrolled in a College Class\nAge Frequency\n18 6\n19 5\n20 4\n21 2\n22 1\n23 1\n30 1\nThe table above shows the distribution of ages of the 20 students enrolled in a college class. Which of the following gives the correct order of\nthe mean, median, and mode of the ages?",
+  "after": "**Ages of 20 Students Enrolled in a College Class**\n\n| Age | Frequency |\n| --- | --- |\n| 18 | 6 |\n| 19 | 5 |\n| 20 | 4 |\n| 21 | 2 |\n| 22 | 1 |\n| 23 | 1 |\n| 30 | 1 |\n\nThe table above shows the distribution of ages of the 20 students enrolled in a college class. Which of the following gives the correct order of\nthe mean, median, and mode of the ages?",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - MEDIUM #11"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0xk02tyqmt13nczjfg0",
+  "field": "stem",
+  "before": "The results of two independent surveys are shown in the table below.\nMen's Height\nGroup Sample size Mean (centimeters) Standard deviation (centimeters)\nA 2,500 186 12.5\nB 2,500 186 19.1\nWhich statement is true based on the table?",
+  "after": "The results of two independent surveys are shown in the table below.\n\n**Men's Height**\n\n| Group | Sample size | Mean (centimeters) | Standard deviation (centimeters) |\n| --- | --- | --- | --- |\n| A | 2,500 | 186 | 12.5 |\n| B | 2,500 | 186 | 19.1 |\n\nWhich statement is true based on the table?",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - MEDIUM #12"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0x402tiqmt1jxnhss59",
+  "field": "stem",
+  "before": "Station 1 Station 2 Station 3 Station 4 Station 5\n$3.699 $3.609 $3.729 $3.679 $3.729\nIn the table above, Melissa recorded the price of one gallon of regular gas from five different local gas stations on the same day. What is the\nmedian of the gas prices Melissa recorded?",
+  "after": "| Station 1 | Station 2 | Station 3 | Station 4 | Station 5 |\n| --- | --- | --- | --- | --- |\n| $3.699 | $3.609 | $3.729 | $3.679 | $3.729 |\n\nIn the table above, Melissa recorded the price of one gallon of regular gas from five different local gas stations on the same day. What is the\nmedian of the gas prices Melissa recorded?",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - MEDIUM #8"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro08502irqmt1h5rw4u1r",
+  "field": "stem",
+  "before": "Call Ratings\n1 Star 2 Stars 3 Stars 4 Stars Total\nEmployee A 16 49 72 8 145\nEmployee B 4 10 22 34 70\nEmployee C 8 56 45 16 125\nEmployee D 22 42 84 12 160\nTotal 50 157 223 70 500\nA supervisor at a call center reviewed 500 calls taken by four employees and rated the employees’ performance on each call on a scale from 1\nstar to 4 stars. The ratings for each employee are shown in the table above. According to the table, to the nearest whole percent, what percent of\nEmployee A’s calls received a rating of 1 star?",
+  "after": "**Call Ratings**\n\n|  | 1 Star | 2 Stars | 3 Stars | 4 Stars | Total |\n| --- | --- | --- | --- | --- | --- |\n| Employee A | 16 | 49 | 72 | 8 | 145 |\n| Employee B | 4 | 10 | 22 | 34 | 70 |\n| Employee C | 8 | 56 | 45 | 16 | 125 |\n| Employee D | 22 | 42 | 84 | 12 | 160 |\n| Total | 50 | 157 | 223 | 70 | 500 |\n\nA supervisor at a call center reviewed 500 calls taken by four employees and rated the employees’ performance on each call on a scale from 1\nstar to 4 stars. The ratings for each employee are shown in the table above. According to the table, to the nearest whole percent, what percent of\nEmployee A’s calls received a rating of 1 star?",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Problem-Solving and Data Analysis - Percentages - EASY #10"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro08t02jcqmt1ti8yxehs",
+  "field": "stem",
+  "before": "A table of the US minimum wage for 6 different years is shown below.\nUS minimum\nwage\nYear\n(dollars per\nhour)\n1960 1.00\n1970 1.60\n1980 3.10\n1990 3.80\n2000 5.15\n2010 7.25\nWhat was the percent increase of the minimum wage from 1960 to 1970?",
+  "after": "A table of the US minimum wage for 6 different years is shown below.\n\n| Year | US minimum wage (dollars per hour) |\n| --- | --- |\n| 1960 | 1.00 |\n| 1970 | 1.60 |\n| 1980 | 3.10 |\n| 1990 | 3.80 |\n| 2000 | 5.15 |\n| 2010 | 7.25 |\n\nWhat was the percent increase of the minimum wage from 1960 to 1970?",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Problem-Solving and Data Analysis - Percentages - EASY #15"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro27t03fsqmt1tgpsl2zb",
+  "field": "stem",
+  "before": "Voice type Number of singers\nCountertenor 4\nTenor 6\nBaritone 10\nBass 5\nA total of 25 men registered for singing lessons. The frequency table shows how many of these singers have certain voice types. If one of these\nsingers is selected at random, what is the probability he is a baritone?",
+  "after": "| Voice type | Number of singers |\n| --- | --- |\n| Countertenor | 4 |\n| Tenor | 6 |\n| Baritone | 10 |\n| Bass | 5 |\n\nA total of 25 men registered for singing lessons. The frequency table shows how many of these singers have certain voice types. If one of these\nsingers is selected at random, what is the probability he is a baritone?",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Problem-Solving and Data Analysis - Probability and conditional probability - EASY #12"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1zc03bbqmt1mnrfmehp",
+  "field": "stem",
+  "before": "The table below shows the distribution of US states according to whether they have a state-level sales tax and a state-level income tax.\n2013 State-Level Taxes\nState sales tax No state sales tax\nState income tax 39 4\nNo state income tax 6 1\nTo the nearest tenth of a percent, what percent of states with a state-level sales tax do not have a state-level income tax?",
+  "after": "The table below shows the distribution of US states according to whether they have a state-level sales tax and a state-level income tax.\n\n**2013 State-Level Taxes**\n\n|  | State sales tax | No state sales tax |\n| --- | --- | --- |\n| State income tax | 39 | 4 |\n| No state income tax | 6 | 1 |\n\nTo the nearest tenth of a percent, what percent of states with a state-level sales tax do not have a state-level income tax?",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Problem-Solving and Data Analysis - Probability and conditional probability - HARD #4"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro16402wiqmt13uep3edq",
+  "field": "stem",
+  "before": "Penguin Exhibit\nType of penguin Male Female Total\nChinstrap 41 59 100\nEmperor 8 27 35\nGentoo 49 54 103\nMacaroni 42 40 82\nTotal 140 180 320\nThe number of penguins in a zoo exhibit, sorted by gender and type of penguin, is shown in the table above. Which type of penguin has a female\npopulation that is the closest to being $\\frac{1}{3}$ of the total female penguin population in the exhibit?",
+  "after": "**Penguin Exhibit**\n\n| Type of penguin | Male | Female | Total |\n| --- | --- | --- | --- |\n| Chinstrap | 41 | 59 | 100 |\n| Emperor | 8 | 27 | 35 |\n| Gentoo | 49 | 54 | 103 |\n| Macaroni | 42 | 40 | 82 |\n| Total | 140 | 180 | 320 |\n\nThe number of penguins in a zoo exhibit, sorted by gender and type of penguin, is shown in the table above. Which type of penguin has a female\npopulation that is the closest to being $\\frac{1}{3}$ of the total female penguin population in the exhibit?",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Problem-Solving and Data Analysis - Probability and conditional probability - MEDIUM #5"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro2l803m2qmt17ephq6hu",
+  "field": "stem",
+  "before": "x y\n1 4\n3 12\n5 20\n40 k\nIn the table above, the ratio of y to x for each ordered pair is constant. What is the value of k ?",
+  "after": "| x | y |\n| --- | --- |\n| 1 | 4 |\n| 3 | 12 |\n| 5 | 20 |\n| 40 | k |\n\nIn the table above, the ratio of y to x for each ordered pair is constant. What is the value of k ?",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Problem-Solving and Data Analysis - Ratios, rates, proportional relationships, and units - EASY #8"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1t2039lqmt1rv4ekgxa",
+  "field": "stem",
+  "before": "Food Protein Cost\n1 large egg 6 grams $0.36\n1 cup of milk 8 grams $0.24\nThe table above shows the amount of protein in two foods and the cost of each food. Based on the table, what is the ratio of the cost per gram\nof protein in a large egg to the cost per gram of protein in a cup of milk?",
+  "after": "| Food | Protein | Cost |\n| --- | --- | --- |\n| 1 large egg | 6 grams | $0.36 |\n| 1 cup of milk | 8 grams | $0.24 |\n\nThe table above shows the amount of protein in two foods and the cost of each food. Based on the table, what is the ratio of the cost per gram\nof protein in a large egg to the cost per gram of protein in a cup of milk?",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Problem-Solving and Data Analysis - Ratios, rates, proportional relationships, and units - MEDIUM #5"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro13q02vlqmt1sqt5heft",
+  "field": "stem",
+  "before": "Amount invested Balance increase\nAccount A $500 6% annual interest\nAccount B $1,000 $25 per year\nTwo investments were made as shown in the table above. The interest in Account A is compounded once per year. Which of the following is true\nabout the investments?",
+  "after": "|  | Amount invested | Balance increase |\n| --- | --- | --- |\n| Account A | $500 | 6% annual interest |\n| Account B | $1,000 | $25 per year |\n\nTwo investments were made as shown in the table above. The interest in Account A is compounded once per year. Which of the following is true\nabout the investments?",
+  "note": "Tabla aplanada reconstruida desde el PDF de origen: Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - HARD #5"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzqq02cpqmt14e343ey1",
+  "field": "stem",
+  "before": "Note: Figure not drawn to scale.\n\nRectangles $ABCD$ and $QRST$ shown are similar, where $A, B, C$, and $D$ correspond to $Q, R, S$, and $T$, respectively. What is the length, in inches (in), of $\\overline{AD}$?",
+  "after": "Rectangles $ABCD$ and $QRST$ shown are similar, where $A, B, C$, and $D$ correspond to $Q, R, S$, and $T$, respectively. What is the length, in inches (in), of $\\overline{AD}$?",
+  "note": "La nota \"Figure not drawn to scale\" ya va dentro de la figura"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0t602sfqmt1s39wpgec",
+  "field": "stem",
+  "before": "Note: Figures not drawn to scale.\n\nFor the triangles shown, triangle $ABC$ is dilated by a scale factor of 3 to obtain triangle $XYZ$, where $d = 16$. What is the measure, in degrees, of angle $X$?",
+  "after": "For the triangles shown, triangle $ABC$ is dilated by a scale factor of 3 to obtain triangle $XYZ$, where $d = 16$. What is the measure, in degrees, of angle $X$?",
+  "note": "La nota \"Figure not drawn to scale\" ya va dentro de la figura"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0g902klqmt18v0lhr1f",
+  "field": "stem",
+  "before": "Note: Figure not drawn to scale.\n\nIn triangle $PQR$, $\\overline{QR}$ is extended to point $S$. The measure of $\\angle PQR$ is $132^{\\circ}$, and the measure of $\\angle PRS$ is $163^{\\circ}$. What is the measure of $\\angle QPR$?",
+  "after": "In triangle $PQR$, $\\overline{QR}$ is extended to point $S$. The measure of $\\angle PQR$ is $132^{\\circ}$, and the measure of $\\angle PRS$ is $163^{\\circ}$. What is the measure of $\\angle QPR$?",
+  "note": "La nota \"Figure not drawn to scale\" ya va dentro de la figura"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0f702k6qmt100jb3xiw",
+  "field": "stem",
+  "before": "Note: Figure not drawn to scale.\n\nIn the figure shown, triangle $CAE$ is similar to triangle $CBD$. The measure of angle $CBD$ is $57^{\\circ}$, and $AE = 26(BD)$. What is the measure of angle $CAE$?",
+  "after": "In the figure shown, triangle $CAE$ is similar to triangle $CBD$. The measure of angle $CBD$ is $57^{\\circ}$, and $AE = 26(BD)$. What is the measure of angle $CAE$?",
+  "note": "La nota \"Figure not drawn to scale\" ya va dentro de la figura"
+ }
+]

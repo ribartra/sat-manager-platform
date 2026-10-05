@@ -1,0 +1,34 @@
+[
+ {
+  "table": "Question",
+  "id": "cmsjrntwp00c3qmt1009fvz2k",
+  "field": "imageUrl",
+  "before": "/uploads/questions/040c048ac23f817256193d00.png",
+  "after": "/uploads/questions/99767ab194cafca2f9b6e5e4.png",
+  "note": "Paridad dev→prod (misma imagen, archivo canónico de prod)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwy501bhqmt1rs7o5c3c",
+  "field": "imageUrl",
+  "before": "/uploads/questions/b1764820a572c02b3472ddb2.png",
+  "after": "/uploads/questions/78463f391dbc8c1544a78418.png",
+  "note": "Paridad dev→prod (misma imagen, archivo canónico de prod)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwyd01bnqmt1l4vwq4sj",
+  "field": "imageUrl",
+  "before": "/uploads/questions/5793668dfbf6da6ea73f31f1.png",
+  "after": "/uploads/questions/a199d4bfd16d4d11552c4287.png",
+  "note": "Paridad dev→prod (misma imagen, archivo canónico de prod)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnffuz3001x0mmxlkruutzz",
+  "field": "imageUrl",
+  "before": "/uploads/questions/55cf9dd3cd8c321711edc3f7.png",
+  "after": "/uploads/questions/52de89fc2d20562248a26d3c.png",
+  "note": "Paridad dev→prod (misma imagen, archivo canónico de prod)"
+ }
+]

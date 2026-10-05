@@ -63,3 +63,13 @@
   - vínculos de staging (21);
   - páginas de origen de las figuras faltantes;
   - paridad dev/prod (4).
+
+## Correcciones aplicadas (2026-10-05)
+- **Render:** `MathContent` muestra las tablas markdown (pipe tables) como tablas HTML (`splitContentBlocks` en `lib/math-text.ts`), con salto de línea en las celdas y fórmulas dentro. Las 3 tablas markdown crudas se arreglan sin tocar su contenido.
+- **`figure-fixes-spec.json`** (58 ops, con guarda nula-segura `IS ?`):
+  - 8 figuras recortadas del PDF vectorial con PyMuPDF (`montages/recovered-figures-8.png`);
+  - el dato "(1 gallon = 128 fluid ounces)" en Ratios MEDIUM #9;
+  - 45 tablas aplanadas reconstruidas en markdown a partir de `pdfplumber.extract_tables` sobre la página de origen (los números de cada pregunta coinciden como multiconjunto antes y después);
+  - I/II en PSDA EASY #12 y ¹⁵N/¹⁴N en CoE HARD #29;
+  - se quitó la nota de escala duplicada en 4 enunciados (ya va dentro de la figura).
+- **`parity-spec.json`** (solo dev): las 4 imágenes de dev apuntan a los archivos canónicos de prod.

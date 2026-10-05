@@ -102,6 +102,84 @@ export function parseProseSegments(prose: string): ProseSegment[] {
   return segments;
 }
 
+export type ContentBlock =
+  | { kind: "text"; content: string }
+  | { kind: "table"; header: string[]; rows: string[][] };
+
+const TABLE_ROW_RE = /^\s*\|.*\|\s*$/;
+const TABLE_SEPARATOR_RE = /^\s*\|(\s*:?-{3,}:?\s*\|)+\s*$/;
+
+/** Split a markdown table row into cells; a `|` inside a math token or escaped as `\|` is not a separator. */
+export function splitTableCells(line: string): string[] {
+  const body = line.trim().replace(/^\|/, "").replace(/\|$/, "");
+  const cells: string[] = [];
+  let current = "";
+  let i = 0;
+  while (i < body.length) {
+    const rest = body.slice(i);
+    // Single-$ math never spans a cell separator: "| $210.00 | $25.20 |" are two prices, not one formula.
+    const math = rest.match(/^(\$\$[^|]+?\$\$|\$[^$\n|]+?\$|\\\([^|]+?\\\))/);
+    if (math) {
+      current += math[0];
+      i += math[0].length;
+      continue;
+    }
+    if (rest.startsWith("\\|")) {
+      current += "|";
+      i += 2;
+      continue;
+    }
+    if (body[i] === "|") {
+      cells.push(current.trim());
+      current = "";
+      i += 1;
+      continue;
+    }
+    current += body[i];
+    i += 1;
+  }
+  cells.push(current.trim());
+  return cells;
+}
+
+/**
+ * Split content into prose/math text and GitHub-style pipe tables (header row, `| --- |` separator,
+ * body rows). Tables are rendered as real HTML tables so long cell text wraps.
+ */
+export function splitContentBlocks(content: string): ContentBlock[] {
+  const lines = String(content ?? "").split("\n");
+  const blocks: ContentBlock[] = [];
+  let text: string[] = [];
+  const flushText = () => {
+    if (text.length) blocks.push({ kind: "text", content: text.join("\n") });
+    text = [];
+  };
+  let i = 0;
+  while (i < lines.length) {
+    if (TABLE_ROW_RE.test(lines[i]) && i + 1 < lines.length && TABLE_SEPARATOR_RE.test(lines[i + 1])) {
+      const header = splitTableCells(lines[i]);
+      const rows: string[][] = [];
+      i += 2;
+      while (i < lines.length && TABLE_ROW_RE.test(lines[i])) {
+        const cells = splitTableCells(lines[i]);
+        while (cells.length < header.length) cells.push("");
+        rows.push(cells.slice(0, header.length));
+        i += 1;
+      }
+      // Drop the blank line that separated text from the table; the table is its own block.
+      if (text.length && !text[text.length - 1].trim()) text.pop();
+      flushText();
+      blocks.push({ kind: "table", header, rows });
+      if (i < lines.length && !lines[i].trim()) i += 1;
+      continue;
+    }
+    text.push(lines[i]);
+    i += 1;
+  }
+  flushText();
+  return blocks;
+}
+
 /** Tokenize full content into math blocks + prose (with markup segments). */
 /**
  * A `$$…$$` / `\[…\]` token is a real display block only when it sits alone on its line inside
