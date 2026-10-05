@@ -1,6 +1,7 @@
-const D=require("/home/turista/Descargas/Github/sat-manager-platform/node_modules/better-sqlite3");
+/* eslint-disable @typescript-eslint/no-require-imports */ // run from the repo root: node docs/qa/content-fixes-20261005/<file>
+const D=require("better-sqlite3");
 const fs=require("fs"),path=require("path");
-const ROOT="/home/turista/Descargas/Github/sat-manager-platform";
+const ROOT=process.cwd();
 const db=new D(ROOT+"/dev.db",{readonly:true});
 // where each question is used
 const used=new Map();

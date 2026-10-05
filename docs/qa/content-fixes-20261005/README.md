@@ -20,3 +20,14 @@ Defect classes:
 Earlier the same day: 4 option-D fixes (T1 Math M1 #7/#22, T1 R&W M1 #9, T5 Math M1 #22).
 Known false positives left in the scan output: 5 "2/4 options in stem" (options legitimately echo stem wording).
 Attempts already started keep their immutable snapshot.
+
+## Images (images-spec.json, same day)
+UI-screenshot detector (blue "NEXT QUESTION" button / gray right panel) over the 343 in-use question and option images:
+- T1 R&W M2 #12: image was the full source-UI screenshot (chart + passage + options) → cropped to the chart only
+  (`/uploads/questions/04032063635065f5317be8b1-chart.png`; original kept).
+- T9 Math M2 #4: question image was a UI screenshot of options A/B; the four options already have their own graph
+  images → question `imageUrl` set to null.
+
+## Renderer
+`$$…$$` used mid-sentence (53 questions, e.g. T1 Math M2 #13/#14) rendered as centered blocks. `tokenizeMathContent`
+(`lib/math-text.ts`) now keeps display mode only for a formula alone on its line; otherwise inline with `\displaystyle`.

@@ -278,6 +278,12 @@ const checks = [
     label: "Restore local exige backup y genera copia previa",
   },
   {
+    file: "lib/math-text.ts",
+    // Ingested stems use $$…$$ mid-sentence; only a formula alone on its line renders as a block.
+    requires: ["isStandaloneDisplay", "\\displaystyle "],
+    label: "MathContent: $$ en linea se renderiza inline (display solo si va sola en su linea)",
+  },
+  {
     file: "lib/deadline-notifications.ts",
     requires: ["due soon", "overdue", "notifyOnce", "releaseScheduledUnlocks", "DEDUPE_WINDOW_DAYS"],
     label: "Job de notificaciones genera recordatorios idempotentes",

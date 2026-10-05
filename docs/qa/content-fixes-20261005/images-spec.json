@@ -1,0 +1,18 @@
+[
+ {
+  "table": "Question",
+  "id": "cmsjro6v8062zqmt17xlo4gpt",
+  "field": "imageUrl",
+  "before": "/uploads/questions/04032063635065f5317be8b1.png",
+  "after": "/uploads/questions/04032063635065f5317be8b1-chart.png",
+  "note": "T1 R&W M2 #12: la imagen era la captura completa de la UI (gr\u00e1fica+pasaje+opciones); se recorta solo la gr\u00e1fica"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnvzb00zmqmt1ah3ghqxc",
+  "field": "imageUrl",
+  "before": "/uploads/questions/2afc924634ed80408b7cae28.jpg",
+  "after": null,
+  "note": "T9 Math M2 #4: captura de UI con opciones A/B; las 4 opciones ya tienen su propia imagen"
+ }
+]

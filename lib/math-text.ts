@@ -103,11 +103,29 @@ export function parseProseSegments(prose: string): ProseSegment[] {
 }
 
 /** Tokenize full content into math blocks + prose (with markup segments). */
+/**
+ * A `$$…$$` / `\[…\]` token is a real display block only when it sits alone on its line inside
+ * longer content. Ingested stems often use `$$` mid-sentence ("If $$x$$ and $$y$$, what is…?");
+ * rendering those as blocks breaks the sentence into centered fragments.
+ */
+function isStandaloneDisplay(parts: string[], index: number): boolean {
+  if (parts.length === 1) return false; // the whole content is the formula (e.g. an answer choice)
+  const before = parts.slice(0, index).join("").split("\n").pop() ?? "";
+  const after = parts.slice(index + 1).join("").split("\n")[0] ?? "";
+  return !before.trim() && !after.trim();
+}
+
 export function tokenizeMathContent(content: string): ContentPart[] {
   const parts = String(content ?? "").split(MATH_TOKEN_PATTERN).filter((part) => part.length > 0);
-  return parts.map((part) => {
+  return parts.map((part, index) => {
     const math = parseMathToken(part);
-    if (math) return normalizeMathToken(math);
+    if (math) {
+      if (math.displayMode && !isStandaloneDisplay(parts, index)) {
+        // Inline, but keep display-size fractions/roots.
+        return { ...math, displayMode: false, math: `\\displaystyle ${math.math.trim()}` };
+      }
+      return normalizeMathToken(math);
+    }
     return { kind: "prose" as const, segments: parseProseSegments(part) };
   });
 }

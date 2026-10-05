@@ -1,5 +1,6 @@
-const D=require("/home/turista/Descargas/Github/sat-manager-platform/node_modules/better-sqlite3");
-const db=new D("/home/turista/Descargas/Github/sat-manager-platform/dev.db",{readonly:true});
+/* eslint-disable @typescript-eslint/no-require-imports */ // run from the repo root: node docs/qa/content-fixes-20261005/<file>
+const D=require("better-sqlite3");
+const db=new D(process.cwd() + "/dev.db",{readonly:true});
 const used=new Map();
 for (const r of db.prepare(`select q.questionId id, t.name || ' · ' || m.name || ' #' || (q."order"+1) loc from FullPracticeTestQuestion q join FullPracticeTestModule m on m.id=q.moduleId join FullPracticeTest t on t.id=m.testId`).all()) used.set(r.id,(used.get(r.id)||[]).concat(r.loc));
 for (const r of db.prepare(`select psq.questionId id, ps.name || ' #' || (psq."order"+1) loc from PracticeSetQuestion psq join PracticeSet ps on ps.id=psq.practiceSetId where ps.status!='ARCHIVED'`).all()) used.set(r.id,(used.get(r.id)||[]).concat(r.loc));

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */ // run from the repo root: node docs/qa/content-fixes-20261005/<file>
 // Guarded content fixes from a spec. Usage: node apply-spec.cjs <db> <spec.json> [--apply]
 const Database = require(process.env.BSQ || "better-sqlite3");
 const ops = JSON.parse(require("fs").readFileSync(process.argv[3], "utf8"));
@@ -8,7 +9,7 @@ const now = new Date().toISOString();
 const counts = {};
 db.transaction(() => {
   for (const op of ops) {
-    if (!["Question", "QuestionOption"].includes(op.table) || !["stem", "stimulus", "explanation", "text"].includes(op.field)) throw new Error("bad op");
+    if (!["Question", "QuestionOption"].includes(op.table) || !["stem", "stimulus", "explanation", "text", "imageUrl"].includes(op.field)) throw new Error("bad op");
     const row = db.prepare(`select "${op.field}" v from "${op.table}" where id = ?`).get(op.id);
     const state = !row ? "MISSING" : row.v === op.after ? "ALREADY" : row.v === op.before ? "PENDING" : "DRIFT";
     if (apply && state === "PENDING") {
