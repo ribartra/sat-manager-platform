@@ -1,0 +1,226 @@
+[
+ {
+  "table": "Question",
+  "id": "cmsjrntoi008yqmt1qyb4yqwb",
+  "field": "stem",
+  "before": "Which expression is equivalent to $\\frac{25(x^2 - 5)}{(x - \\sqrt{5})}$, where $x \\neq \\sqrt{5}$?\n\nCOMB. BACK LATER",
+  "after": "Which expression is equivalent to $\\frac{25(x^2 - 5)}{(x - \\sqrt{5})}$, where $x \\neq \\sqrt{5}$?",
+  "note": "T1 Math M2 #17: nota 'COMB. BACK LATER'"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnu0o00f1qmt1m68v5nd1",
+  "field": "stimulus",
+  "before": "Researchers CUME BACK LATER Northern New Zealand is home to some of the oldest forests on Earth. Forests filled with kauri, the Maori name for the Agathis australis tree, _____ back to the Jurassic Period over 135 million years ago.",
+  "after": "Northern New Zealand is home to some of the oldest forests on Earth. Forests filled with kauri, the Maori name for the Agathis australis tree, _____ back to the Jurassic Period over 135 million years ago.",
+  "note": "T2 R&W M1 #16: 'Researchers CUME BACK LATER' al inicio del pasaje"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnul000jhqmt1q1p9ey2x",
+  "field": "stem",
+  "before": "A researcher models the population of lizards on an island using the equation $p(t) = 80(1 + a)^t$, where $t$ is the number of years after the initial observation and $0 < a < 1$. The partial graph of $p(t)$ is shown. What is the best interpretation of $a$ in this context?\n\nA It takes \\(a\\) days in the year for the population to reach 80.\nThe population of lizards will increase by 80 every \\(a\\) years.\nThe population of lizards will increase by 100a percent each year.\nThe population of lizards will decrease by 100a percent each year.\n\nCOMI BACK LATER",
+  "after": "A researcher models the population of lizards on an island using the equation $p(t) = 80(1 + a)^t$, where $t$ is the number of years after the initial observation and $0 < a < 1$. The partial graph of $p(t)$ is shown. What is the best interpretation of $a$ in this context?",
+  "note": "T5 Math M1 #21: opciones duplicadas + 'COMI BACK LATER' en el enunciado"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnve100tgqmt16c33qeyh",
+  "field": "stem",
+  "before": "Which choice best states the main idea of the text? A The Harts want to keep the party a secret for a time. The Harts have revealed their plans through their actions. The Harts are in a state of disorder in advance of the party. The Harts hope that the neighborhood will be more accepting in the future.",
+  "after": "Which choice best states the main idea of the text?",
+  "note": "T3 R&W M1 #8: opciones duplicadas en el enunciado"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnvgw00twqmt1x0a5vw8r",
+  "field": "stem",
+  "before": "Which quotation from \"To Autumn\" most effectively illustrates the claim? A \"Who hath not seen thee oft amid thy store? / Sometimes whoever seeks abroad may find / Thee sitting careless on a granary floor, / Thy hair soft-lifted by the winnowing wind\" \"And sometimes like a gleaner thou dost keep / Steady thy laden head across a brook; / Or by a cyder-press, with patient look, / Thou watchest the last oozings hours by hours.\" \"Where are the songs of spring? Ay, Where are they? / Think not of them, thou hast thy music too,— / While barred clouds bloom the soft-dying day, / And touch the stubble-plains with rosy hue\" \"Hedge-crickets sing; and now with treble soft / The red-breast whistles from a garden-croft; / And gathering swallows twitter in the skies.\" A new species of salamander, Tylototriton phukhaensis, was named in 2020. The defining feature is a distinct head ridge, though it also has head horns and a stripe down its back. A molecular examination shows that it is closely related to two of the four other Tylototriton species found in Thailand. After the creature was first identified from a 20-year-old photograph in a travel magazine, biologists speculated whether the species still existed in the wild, but due to deforestation and other factors, they eventually concluded that ____ MOST QUESTION",
+  "after": "Which quotation from \"To Autumn\" most effectively illustrates the claim?",
+  "note": "T3 R&W M1 #12: opciones + pasaje de otra pregunta + 'MOST QUESTION' en el enunciado"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnvgw00twqmt1x0a5vw8r",
+  "field": "stimulus",
+  "before": "\"To Autumn\" is a short poem written by John Keats in the early 1800s. Addressing autumn itself (\"thee\" or \"thou\" instead of the more modern \"you\") as a living entity, the narrator of this poem expresses a desire to appreciate the fall season instead of longing for a different period of the year: ____ MOST QUESTION",
+  "after": "\"To Autumn\" is a short poem written by John Keats in the early 1800s. Addressing autumn itself (\"thee\" or \"thou\" instead of the more modern \"you\") as a living entity, the narrator of this poem expresses a desire to appreciate the fall season instead of longing for a different period of the year: ____",
+  "note": "T3 R&W M1 #12: 'MOST QUESTION' (botón de la UI) en el pasaje"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwyd01bnqmt1l4vwq4sj",
+  "field": "stem",
+  "before": "The table shows select values for the function  \\( f(x) \\) . What is the equation for the function  \\( f(x) \\) ?\n\n\\[\n\\times \\boxed {A} f (x) = - 3 x + 9\n\\]\n\n\\[\n\\times \\boxed {B} f (x) = - \\frac {4}{3} x + \\frac {1 3}{3}\n\\]\n\n\\[\n\\times \\boxed {c} f (x) = - \\frac {4}{3} x + 5\n\\]\n\n\\[\n\\times \\boxed {D} f (x) = \\frac {4}{3} x + 5\n\\]",
+  "after": "The table shows select values for the function  \\( f(x) \\) . What is the equation for the function  \\( f(x) \\) ?",
+  "note": "T7 Math M1 #18: opciones en LaTeX \\boxed pegadas al enunciado"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnu6000gtqmt1ii0ab5tx",
+  "field": "stem",
+  "before": "# **Test 10 Innovator**\n**Math Module 1**\n\n1. Scott works at a job for four hours. He spent $18 of his earnings for lunch, and has $42 remaining. How many dollars did he earn per hour at the job?",
+  "after": "Scott works at a job for four hours. He spent $18 of his earnings for lunch, and has $42 remaining. How many dollars did he earn per hour at the job?",
+  "note": "T10 Math M1 #1: cabecera '# Test 10 Innovator / Math Module 1 / 1.'"
+ },
+ {
+  "table": "Question",
+  "id": "cmsojfkow000k18ppj9ienu38",
+  "field": "stem",
+  "before": "The panhandle of Oklahoma has _____ history.\nConsidered no man's land until 1907, when it became a\npart of the state, the three counties that make up this\narea were hit particularly hard by the Great Depression of\nthe 1930s, causing massive out-migration. In 2016, their\ncombined population was still less than it was in 1907.\n\n3. Which choice completes the\ntext with the most logical and\nprecise word or phrase?",
+  "after": "Which choice completes the text with the most logical and precise word or phrase?",
+  "note": "T8 R&W M2 #3: enunciado repetía el pasaje + '3.'"
+ },
+ {
+  "table": "Question",
+  "id": "cmsojfkq1001j18ppot71l183",
+  "field": "stem",
+  "before": "# **Text 1**\n\nHanno the Navigator, a Carthaginian sailor and explorer, is credited with being one of the first Mediterranean explorers to sail down the west coast of Africa, along with a purported 60 ships and 30,000 men. His objective was to strengthen colonies and find new trade opportunities. While the results of his expedition remain uncertain, the surviving record claims that he encountered multiple indigenous cultures and had run-ins with unfamiliar wildlife his translators called “gorillas.”\n\n# **Text 2**\n\nUnderstanding Classical Age figures like Hanno the Navigator is challenging. Though evidence suggests he existed, the sole surviving record of his African voyage is a single temple carving, translated nearly a millennium later. Moreover, this record presents logical contradictions: how did the translators know local wildlife names if they couldn’t understand the languages? Until more records emerge, Hanno and his contemporaries will remain enigmatic, almost mythical figures.\n\n7. Based on the texts, what would the author of Text 2 likely say about Text 1’s description of Hanno’s voyage?",
+  "after": "Based on the texts, what would the author of Text 2 likely say about Text 1’s description of Hanno’s voyage?",
+  "note": "T8 R&W M1 #7: enunciado repetía Text 1/Text 2 + '7.'"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnt0z0020qmt12o9tqbuq",
+  "field": "stem",
+  "before": "### Weight of Maize Plants in Grams After Seeding",
+  "after": "Which choice most effectively uses data from the table to complete the example?",
+  "note": "T10 R&W M2 #14: enunciado era solo el título de la tabla"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnt0z0020qmt12o9tqbuq",
+  "field": "stimulus",
+  "before": "### Weight of Maize Plants in Grams After Seeding\n\nA student in a botany class conducted an experiment to demonstrate the effect of bacteria-based fertilizers on plant mass. She planted six maize plants and ensured each received equal water and sunlight. She then treated the soil of three of the plants with three different fertilizers containing the following bacterial additives: nitrogen-fixing bacteria, phosphate-solubilizing bacteria, and cellulolytic bacteria. The other plants received bacteria-free organic fertilizers, chemical fertilizers, or no additives at all. The student weighed each plant regularly after planting them, and on the sixty-fourth day, found that bacteria-based fertilizers, while producing the heaviest plants, did not outperform other types of fertilizers to the extent that was predicted. For example, _____",
+  "after": "A student in a botany class conducted an experiment to demonstrate the effect of bacteria-based fertilizers on plant mass. She planted six maize plants and ensured each received equal water and sunlight. She then treated the soil of three of the plants with three different fertilizers containing the following bacterial additives: nitrogen-fixing bacteria, phosphate-solubilizing bacteria, and cellulolytic bacteria. The other plants received bacteria-free organic fertilizers, chemical fertilizers, or no additives at all. The student weighed each plant regularly after planting them, and on the sixty-fourth day, found that bacteria-based fertilizers, while producing the heaviest plants, did not outperform other types of fertilizers to the extent that was predicted. For example, _____",
+  "note": "T10 R&W M2 #14: título de tabla con '###' (la tabla está en la imagen)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6v8062zqmt17xlo4gpt",
+  "field": "stimulus",
+  "before": "# Sleep Duration of U.S. Adults Aged 20+  The Center for Disease Control and Prevention (CDC) considers lack of sleep (less than the 7–9 hours recommended) to be a widespread public health concern in the United States; in fact, a CDC poll from 2011 revealed that _____",
+  "after": "The Center for Disease Control and Prevention (CDC) considers lack of sleep (less than the 7–9 hours recommended) to be a widespread public health concern in the United States; in fact, a CDC poll from 2011 revealed that _____",
+  "note": "T1 R&W M2 #12: título del gráfico con '#' (el gráfico está en la imagen)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro14o02w9qmt1588z1xed",
+  "field": "stem",
+  "before": "A polling agency recently surveyed 1,000 adults who were selected at random from a large city and asked each of the adults, “Are you satisfied\nwith the quality of air in the city?” Of those surveyed, 78 percent responded that they were satisfied with the quality of air in the city. Based on the\nresults of the survey, which of the following statements must be true?\n1. Of all adults in the city, 78 percent are satisfied with the quality of air in the city.\n2. If another 1,000 adults selected at random from the city were surveyed, 78 percent of them would report they are satisfied with the\nquality of air in the city.\n3. If 1,000 adults selected at random from a different city were surveyed, 78 percent of them would report they are satisfied with the quality\nof air in the city.",
+  "after": "A polling agency recently surveyed 1,000 adults who were selected at random from a large city and asked each of the adults, “Are you satisfied\nwith the quality of air in the city?” Of those surveyed, 78 percent responded that they were satisfied with the quality of air in the city. Based on the\nresults of the survey, which of the following statements must be true?\nI. Of all adults in the city, 78 percent are satisfied with the quality of air in the city.\nII. If another 1,000 adults selected at random from the city were surveyed, 78 percent of them would report they are satisfied with the\nquality of air in the city.\nIII. If 1,000 adults selected at random from a different city were surveyed, 78 percent of them would report they are satisfied with the quality\nof air in the city.",
+  "note": "PSDA Statistical Claims MEDIUM #3: afirmaciones 1/2/3 pero opciones citan I/II/III"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrny5n01usqmt1vpxinvsu",
+  "field": "explanation",
+  "before": "Choice D is correct. Since t represents the number of years after 2010, the estimated data traffic, in terabytes, in 2010 can be calculated using the given equation when t = 0. Substituting 0 for t in the given equation yields D = 5,640(1.9)^0, or 5,640(1) = 5,640. Thus, 5,640 represents the estimated data traffic, in terabytes, in 2010. Choice A is incorrect. Since the equation is exponential, the amount of increase of data traffic each year isn't constant. Choice B is incorrect. According to the equation, the percent increase in data traffic each year is 90%. Choice C is incorrect. The estimated data traffic, in terabytes, for the year that is t years after 2010 is represented by D, not the number 5,640. ##",
+  "after": "Choice D is correct. Since t represents the number of years after 2010, the estimated data traffic, in terabytes, in 2010 can be calculated using the given equation when t = 0. Substituting 0 for t in the given equation yields D = 5,640(1.9)^0, or 5,640(1) = 5,640. Thus, 5,640 represents the estimated data traffic, in terabytes, in 2010. Choice A is incorrect. Since the equation is exponential, the amount of increase of data traffic each year isn't constant. Choice B is incorrect. According to the equation, the percent increase in data traffic each year is 90%. Choice C is incorrect. The estimated data traffic, in terabytes, for the year that is t years after 2010 is represented by D, not the number 5,640.",
+  "note": "explicación termina en '##'"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrny6m01vjqmt14c1j9hek",
+  "field": "explanation",
+  "before": "Choice D is correct. It's given that the equation $h = -4.9t^2 + 7t + 9$ represents this situation, where $h$ is the height, in meters, of the object $t$ seconds after it is kicked. It follows that the height, in meters, from which the object was kicked is the value of $h$ when $t = 0$. Substituting 0 for $t$ in the equation $h = -4.9t^2 + 7t + 9$ yields $h = -4.9(0)^2 + 7(0) + 9$, or $h = 9$. Therefore, the object was kicked from a height of 9 meters. Choice A is incorrect and may result from conceptual or calculation errors. Choice B is incorrect and may result from conceptual or calculation errors. Choice C is incorrect and may result from conceptual or calculation errors. ###",
+  "after": "Choice D is correct. It's given that the equation $h = -4.9t^2 + 7t + 9$ represents this situation, where $h$ is the height, in meters, of the object $t$ seconds after it is kicked. It follows that the height, in meters, from which the object was kicked is the value of $h$ when $t = 0$. Substituting 0 for $t$ in the equation $h = -4.9t^2 + 7t + 9$ yields $h = -4.9(0)^2 + 7(0) + 9$, or $h = 9$. Therefore, the object was kicked from a height of 9 meters. Choice A is incorrect and may result from conceptual or calculation errors. Choice B is incorrect and may result from conceptual or calculation errors. Choice C is incorrect and may result from conceptual or calculation errors.",
+  "note": "explicación termina en '##'"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnywv022oqmt1mqlhjq2t",
+  "field": "explanation",
+  "before": "The correct answer is 2. The slope-intercept form of an equation for a line is $y = mx + b$, where m is the slope and b is the y-coordinate of the y-intercept. Two ordered pairs, $(x_1, y_1)$ and $(x_2, y_2)$, can be used to compute the slope using the formula $m = \\frac{y_2 - y_1}{x_2 - x_1}$. It's given that $f(0) = 18$ and $f(1) = 20$; therefore, the two ordered pairs for this line are $(0, 18)$ and $(1, 20)$. Substituting these values for $(x_1, y_1)$ and $(x_2, y_2)$ gives $\\frac{20 - 18}{1 - 0} = \\frac{2}{1}$, or 2. ##",
+  "after": "The correct answer is 2. The slope-intercept form of an equation for a line is $y = mx + b$, where m is the slope and b is the y-coordinate of the y-intercept. Two ordered pairs, $(x_1, y_1)$ and $(x_2, y_2)$, can be used to compute the slope using the formula $m = \\frac{y_2 - y_1}{x_2 - x_1}$. It's given that $f(0) = 18$ and $f(1) = 20$; therefore, the two ordered pairs for this line are $(0, 18)$ and $(1, 20)$. Substituting these values for $(x_1, y_1)$ and $(x_2, y_2)$ gives $\\frac{20 - 18}{1 - 0} = \\frac{2}{1}$, or 2.",
+  "note": "explicación termina en '##'"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro00c02frqmt1jdnq21o7",
+  "field": "explanation",
+  "before": "Choice B is correct. A rectangle's diagonal divides a rectangle into two congruent right triangles, where the diagonal is the hypotenuse of both triangles. It's given that the length of the diagonal is $5\\sqrt{17}$ and the length of the rectangle's shorter side is 5. Therefore, each of the two right triangles formed by the rectangle's diagonal has a hypotenuse with length $5\\sqrt{17}$, and a shorter leg with length 5. To calculate the length of the longer leg of each right triangle, the Pythagorean theorem, $a^2 + b^2 = c^2$, can be used, where $a$ and $b$ are the lengths of the legs and $c$ is the length of the hypotenuse of the triangle. Substituting 5 for $a$ and $5\\sqrt{17}$ for $c$ in the equation $a^2 + b^2 = c^2$ yields $5^2 + b^2 = (5\\sqrt{17})^2$, which is equivalent to $25 + b^2 = 25(17)$, or $25 + b^2 = 425$. Subtracting 25 from each side of this equation yields $b^2 = 400$. Taking the positive square root of each side of this equation yields $b = 20$. Therefore, the length of the longer leg of each right triangle formed by the diagonal of the rectangle is 20. It follows that the length of the rectangle's longer side is 20. Choice A is incorrect and may result from dividing the length of the rectangle's diagonal by the length of the rectangle's shorter side, rather than substituting these values into the Pythagorean theorem. Choice C is incorrect and may result from using the length of the rectangle's diagonal as the length of a leg of the right triangle, rather than the length of the hypotenuse. Choice D is incorrect. This is the square of the length of the rectangle's longer side. ##",
+  "after": "Choice B is correct. A rectangle's diagonal divides a rectangle into two congruent right triangles, where the diagonal is the hypotenuse of both triangles. It's given that the length of the diagonal is $5\\sqrt{17}$ and the length of the rectangle's shorter side is 5. Therefore, each of the two right triangles formed by the rectangle's diagonal has a hypotenuse with length $5\\sqrt{17}$, and a shorter leg with length 5. To calculate the length of the longer leg of each right triangle, the Pythagorean theorem, $a^2 + b^2 = c^2$, can be used, where $a$ and $b$ are the lengths of the legs and $c$ is the length of the hypotenuse of the triangle. Substituting 5 for $a$ and $5\\sqrt{17}$ for $c$ in the equation $a^2 + b^2 = c^2$ yields $5^2 + b^2 = (5\\sqrt{17})^2$, which is equivalent to $25 + b^2 = 25(17)$, or $25 + b^2 = 425$. Subtracting 25 from each side of this equation yields $b^2 = 400$. Taking the positive square root of each side of this equation yields $b = 20$. Therefore, the length of the longer leg of each right triangle formed by the diagonal of the rectangle is 20. It follows that the length of the rectangle's longer side is 20. Choice A is incorrect and may result from dividing the length of the rectangle's diagonal by the length of the rectangle's shorter side, rather than substituting these values into the Pythagorean theorem. Choice C is incorrect and may result from using the length of the rectangle's diagonal as the length of a leg of the right triangle, rather than the length of the hypotenuse. Choice D is incorrect. This is the square of the length of the rectangle's longer side.",
+  "note": "explicación termina en '##'"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro16002whqmt1hc5onwbf",
+  "field": "explanation",
+  "before": "The correct answer is $\\frac{13}{50}$. It's given that a box contains 13 red pens and 37 blue pens. If one of these pens is selected at random, the probability of selecting a red pen is the number of red pens in the box divided by the number of red and blue pens in the box. The number of red and blue pens in the box is $13 + 37$, or 50. Since there are 13 red pens in the box, it follows that the probability of selecting a red pen is $\\frac{13}{50}$. Note that 13/50 and .26 are examples of ways to enter a correct answer. ##",
+  "after": "The correct answer is $\\frac{13}{50}$. It's given that a box contains 13 red pens and 37 blue pens. If one of these pens is selected at random, the probability of selecting a red pen is the number of red pens in the box divided by the number of red and blue pens in the box. The number of red and blue pens in the box is $13 + 37$, or 50. Since there are 13 red pens in the box, it follows that the probability of selecting a red pen is $\\frac{13}{50}$. Note that 13/50 and .26 are examples of ways to enter a correct answer.",
+  "note": "explicación termina en '##'"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1zk03bgqmt1gdcgk8sj",
+  "field": "explanation",
+  "before": "The correct answer is \\( \\frac{35}{50} \\) . Based on the table, there are a total of 50 tulips, and 35 of these tulips are from site A. The probability of selecting at random a flower from site A, given that the flower is a tulip, is equal to the number of tulips from site A divided by the total number of tulips, which can be written as \\( \\frac{35}{50} \\) , or \\( \\frac{7}{10} \\) . Note that 35/50, 7/10, and .7 are examples of ways to enter a correct answer. ##",
+  "after": "The correct answer is \\( \\frac{35}{50} \\) . Based on the table, there are a total of 50 tulips, and 35 of these tulips are from site A. The probability of selecting at random a flower from site A, given that the flower is a tulip, is equal to the number of tulips from site A divided by the total number of tulips, which can be written as \\( \\frac{35}{50} \\) , or \\( \\frac{7}{10} \\) . Note that 35/50, 7/10, and .7 are examples of ways to enter a correct answer.",
+  "note": "explicación termina en '##'"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "opt_1b8b8a3a-8d8b-438c-9c02-78432e716a63",
+  "field": "text",
+  "before": "\"Who hath not seen thee oft amid thy store?...\"",
+  "after": "\"Who hath not seen thee oft amid thy store? / Sometimes whoever seeks abroad may find / Thee sitting careless on a granary floor, / Thy hair soft-lifted by the winnowing wind\"",
+  "note": "T3 R&W M1 #12: cita recortada con '...'"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "opt_748f7e6b-8019-4e24-9485-ac23f382d686",
+  "field": "text",
+  "before": "\"And sometimes like a gleaner thou dost keep...\"",
+  "after": "\"And sometimes like a gleaner thou dost keep / Steady thy laden head across a brook; / Or by a cyder-press, with patient look, / Thou watchest the last oozings hours by hours.\"",
+  "note": "T3 R&W M1 #12: cita recortada con '...'"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "opt_e09e4058-befb-4ad6-8c78-3ae20ff97ae2",
+  "field": "text",
+  "before": "\"Where are the songs of spring? Ay, Where are they? / Think not of them, thou hast thy music too...\"",
+  "after": "\"Where are the songs of spring? Ay, Where are they? / Think not of them, thou hast thy music too,— / While barred clouds bloom the soft-dying day, / And touch the stubble-plains with rosy hue\"",
+  "note": "T3 R&W M1 #12: cita recortada con '...'"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "opt_e9f38b21-d528-4a3f-90ef-0c7b2bd413eb",
+  "field": "text",
+  "before": "\"Hedge-crickets sing; and now with treble soft...\"",
+  "after": "\"Hedge-crickets sing; and now with treble soft / The red-breast whistles from a garden-croft; / And gathering swallows twitter in the skies.\"",
+  "note": "T3 R&W M1 #12: cita recortada con '...'"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "opt_78efd475-ca88-41ee-9a88-65d921db39d8",
+  "field": "text",
+  "before": "\"The academic system... ignores fundamental structure...\"",
+  "after": "\"The academic system of art-study ignores fundamental structure; hence the young pupil understands but few phases of art.\"",
+  "note": "T3 R&W M1 #10: cita recortada con '...'"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "opt_e4d1cfaa-9fcd-43bb-99b9-026ac147dbff",
+  "field": "text",
+  "before": "\"For a great while we have been teaching art through imitation...\"",
+  "after": "\"For a great while we have been teaching art through imitation—of nature and the 'historic styles'—leaving structure to take care of itself; gathering knowledge of facts but acquiring little power to use them.\"",
+  "note": "T3 R&W M1 #10: cita recortada con '...'"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "opt_459e8c8f-7f2a-4cd7-bfa8-3e2e0bd1e97a",
+  "field": "text",
+  "before": "\"Composition, building up of harmony, is the fundamental process... art should be approached through composition rather than through imitative drawing.\"",
+  "after": "\"Composition, building up of harmony, is the fundamental process in all the fine arts. I hold that art should be approached through composition rather than through imitative drawing.\"",
+  "note": "T3 R&W M1 #10: cita recortada con '...'"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "opt_e137c883-07c5-45c1-912a-734c09c29832",
+  "field": "text",
+  "before": "\"We want the leaders of the public to see that art is a living force...\"",
+  "after": "\"We want the leaders of the public to see that art is a living force in the everyday life of all, not a sort of traditional ornament for the few.\"",
+  "note": "T3 R&W M1 #10: cita recortada con '...'"
+ }
+]
