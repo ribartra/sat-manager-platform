@@ -3,7 +3,8 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
-import { formatDate, formatTime } from "@/lib/utils";
+import { formatDate, formatDuration, formatTime } from "@/lib/utils";
+import { shortSetName } from "@/lib/student-report";
 import { scoreBandTextClass } from "@/lib/score-band";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -108,41 +109,43 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
       {/* Score header */}
       <div className="rounded-xl border border-gray-200 bg-white p-6 mb-6">
         <h1 className="text-lg font-semibold text-gray-900 mb-1">
-          {practiceSetSnapshot?.name ?? practiceSet?.name ?? "Practice Set"}
+          {shortSetName(practiceSetSnapshot?.name ?? practiceSet?.name ?? "Practice set")}
         </h1>
         <p className="text-xs text-gray-400 mb-4">
-          Attempt #{attempt.attemptNumber} · {attempt.submittedAt ? formatDate(attempt.submittedAt) : ""}
+          Try {attempt.attemptNumber}{attempt.submittedAt ? ` · ${formatDate(attempt.submittedAt)}` : ""}
         </p>
 
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div className="text-center">
             <p className="text-3xl font-bold text-gray-900"><VoidableValue status={attempt.status}>{correct}/{totalQuestions}</VoidableValue></p>
-            <p className="text-xs text-gray-500 mt-0.5">Correct / total</p>
+            <p className="text-xs text-gray-500 mt-0.5">Correct answers</p>
           </div>
           <div className="text-center">
             <p className={`text-3xl font-bold ${scoreBandTextClass(displayPct)}`}>
               <VoidableValue status={attempt.status}>{displayPct}%</VoidableValue>
             </p>
-            <p className="text-xs text-gray-500 mt-0.5">Percent</p>
+            <p className="text-xs text-gray-500 mt-0.5">Score</p>
           </div>
           <div className="text-center">
-            <p className="text-3xl font-bold text-gray-900">{attempt.totalTime ? formatTime(attempt.totalTime) : "—"}</p>
+            <p className="text-3xl font-bold text-gray-900">{attempt.totalTime ? formatDuration(attempt.totalTime) : "—"}</p>
             <p className="text-xs text-gray-500 mt-0.5">Time</p>
           </div>
           <div className="text-center">
-            <div className="flex justify-center gap-2 text-sm">
-              <span className="text-green-600">✓ {correct}</span>
-              <span className="text-red-500">✗ {incorrect}</span>
-              <span className="text-gray-400">– {unanswered}</span>
-            </div>
-            <p className="text-xs text-gray-500 mt-0.5">Breakdown</p>
+            <p className="text-sm">
+              <span className="text-green-600">{correct} right</span>
+              {" · "}
+              <span className="text-red-500">{incorrect} wrong</span>
+              {" · "}
+              <span className="text-gray-500">{unanswered} blank</span>
+            </p>
+            <p className="text-xs text-gray-500 mt-0.5">Your answers</p>
           </div>
         </div>
 
         {attempt.pauses.length > 0 && (
           <Alert tone="note" className="mt-4 text-xs">
             Paused {attempt.pauses.length} time{attempt.pauses.length === 1 ? "" : "s"}
-            {pauseSeconds > 0 ? ` · total pause time ${formatTime(pauseSeconds)}` : ""}
+            {pauseSeconds > 0 ? ` (${formatDuration(pauseSeconds)})` : ""}
           </Alert>
         )}
 
@@ -157,24 +160,24 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
             href={returnQuery.toString() ? `/student?${returnQuery.toString()}` : "/student"}
             className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
-            ← Dashboard
+            ← Home
           </Link>
         </div>
       </div>
 
       {attempt.teacherComment && (
         <Card variant="info" padding="md" className="mb-6 text-sm text-blue-900">
-          <p className="mb-1 font-medium">Teacher comment</p>
+          <p className="mb-1 font-medium">Note from your teacher</p>
           <p>{attempt.teacherComment}</p>
         </Card>
       )}
 
       {/* Per-question review */}
       <div>
-        <h2 className="text-base font-semibold text-gray-900 mb-3">Question Review</h2>
+        <h2 className="text-base font-semibold text-gray-900 mb-3">Your answers, question by question</h2>
         {!canRevealSolutions && (
           <p className="mb-3 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-500">
-            Correct answers and explanations are hidden for this Practice Set.
+            Your teacher has hidden the answers for this set.
           </p>
         )}
         <div className="space-y-4">
@@ -201,7 +204,7 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
               <Card key={ans.id} padding="md" className={statusClass}>
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-gray-500">Q{i + 1}</span>
+                      <span className="text-sm font-medium text-gray-500">Question {i + 1}</span>
                       {isUnanswered ? (
                         <MinusCircle size={16} className="text-gray-400" />
                       ) : canRevealSolutions && isCorrect ? (
@@ -262,15 +265,15 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
                   )}
 
                   {isUnanswered && (
-                    <p className="text-xs text-gray-400 italic">Unanswered - no explanation shown</p>
+                    <p className="text-xs text-gray-400 italic">You left this blank.</p>
                   )}
 
                   {(ans.markedForReview || ans.note || ans.eliminatedOptions) && (
                     <div className="mt-2 rounded border border-gray-200 bg-white p-2 text-xs text-gray-600">
                       {ans.markedForReview && <p className="font-medium text-amber-700">Marked for review</p>}
-                      {ans.note && <p className="mt-1">Note: {ans.note}</p>}
+                      {ans.note && <p className="mt-1">Your note: {ans.note}</p>}
                       {ans.eliminatedOptions && (
-                        <p className="mt-1">Eliminated: {JSON.parse(ans.eliminatedOptions).join(", ")}</p>
+                        <p className="mt-1">Crossed out: {JSON.parse(ans.eliminatedOptions).join(", ")}</p>
                       )}
                     </div>
                   )}

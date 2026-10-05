@@ -12,7 +12,7 @@ import { Alert } from "./alert";
  */
 export function RouteError({
   title,
-  description = "This may be a temporary service interruption. Your saved progress was not changed.",
+  description = "Something went wrong on our side. Your progress is safe — please try again.",
   reset,
   back,
   autoRetryKey,
@@ -64,7 +64,7 @@ export function RouteError({
           </div>
         }
       >
-        {retrying ? "Retrying the connection…" : description}
+        {retrying ? "Trying again…" : description}
       </Alert>
       {back ? (
         <Link href={back.href} className="mt-4 text-sm font-medium text-blue-600 hover:underline">

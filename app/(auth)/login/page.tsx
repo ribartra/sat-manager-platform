@@ -52,9 +52,9 @@ export default function LoginPage() {
   const reason = params.get("reason");
   const reasonMessage =
     reason === "idle"
-      ? "Your session ended after 10 minutes of inactivity. Please sign in again."
+      ? "You were signed out after 10 minutes without activity. Your answers were saved — sign in to continue."
       : reason === "session"
-        ? "Your session is no longer valid. Please sign in again."
+        ? "Please sign in again."
         : "";
 
   async function onSubmit(values: LoginInput) {
@@ -66,7 +66,7 @@ export default function LoginPage() {
     });
 
     if (res?.error) {
-      setServerError("Invalid email or password.");
+      setServerError("That email and password don't match. Please try again.");
       return;
     }
     router.replace(await resolvePostLoginUrl(callbackUrl));
@@ -121,7 +121,7 @@ export default function LoginPage() {
               </FormSection>
               <InlineError>{serverError}</InlineError>
               <Button type="submit" className="w-full" disabled={loading} size="lg">
-                {loading ? "Signing in..." : "Log In"}
+                {loading ? "Signing in…" : "Log In"}
               </Button>
             </form>
           </Form>

@@ -90,7 +90,7 @@ export function FullTestActions({
           size="sm"
           onClick={remove}
           disabled={Boolean(loadingAction)}
-          disabledReason={canDelete ? null : "This exam has assignments or attempts: archive it instead."}
+          disabledReason={canDelete ? null : "Students already have this exam. Archive it instead."}
           title={canDelete ? "Delete exam" : undefined}
         >
           <Trash2 size={14} />
@@ -172,7 +172,7 @@ export function FullTestActions({
         size="sm"
         onClick={remove}
         disabled={Boolean(loadingAction)}
-        disabledReason={canDelete ? null : "This exam has assignments or attempts: archive it instead."}
+        disabledReason={canDelete ? null : "Students already have this exam. Archive it instead."}
         title={canDelete ? "Delete exam" : undefined}
       >
         <Trash2 size={14} />

@@ -10,18 +10,16 @@ import { errorMessage, readApiError } from "@/lib/api-client";
 
 type AttemptAction = "reopen" | "invalidate";
 
-const COPY: Record<AttemptAction, { title: string; confirm: string; body: (subject: string) => string }> = {
+const COPY: Record<AttemptAction, { title: string; confirm: string; body: string }> = {
   invalidate: {
-    title: "Invalidate this attempt?",
-    confirm: "Invalidate attempt",
-    body: (subject) =>
-      `The attempt stays in the history exactly as it is, shown crossed out, and no longer counts toward any score, average, report or analytics. The student cannot resume it. This applies to the whole ${subject}.`,
+    title: "Don't count this result?",
+    confirm: "Don't count",
+    body: "It stays in the history, crossed out, but won't count toward scores or reports. The student can't continue it.",
   },
   reopen: {
-    title: "Reopen for a new attempt?",
-    confirm: "Invalidate and reopen",
-    body: (subject) =>
-      `This attempt is invalidated (kept in the history, crossed out, not counted) and the ${subject} goes back to Pending so the student can start a brand-new attempt from the beginning.`,
+    title: "Let the student retry?",
+    confirm: "Start over",
+    body: "This result won't count (it stays crossed out in the history), and the student can start again from the beginning.",
   },
 };
 
@@ -44,7 +42,6 @@ export function AttemptActions({
   const [actionReason, setActionReason] = useState("");
   const [savingComment, setSavingComment] = useState(false);
   const base = kind === "fpt" ? `/api/full-practice-tests/attempts/${attemptId}` : `/api/attempts/${attemptId}`;
-  const subject = kind === "fpt" ? "exam" : "Practice Set";
   const invalidated = status === "INVALIDATED";
 
   async function run(action: AttemptAction) {
@@ -80,7 +77,7 @@ export function AttemptActions({
     <div className="flex w-full max-w-sm flex-col gap-2">
       {invalidated ? (
         <p className="rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-600">
-          This attempt is invalidated. It is kept for reference and does not count toward any score.
+          This result doesn&apos;t count. It&apos;s kept for reference only.
         </p>
       ) : (
         <>
@@ -90,24 +87,24 @@ export function AttemptActions({
               size="sm"
               onClick={() => setPending("reopen")}
               disabled={loading !== null}
-              title="Invalidate this attempt and let the student start a new one"
+              title="This result won't count and the student starts again"
             >
-              {loading === "reopen" ? "Reopening..." : "Reopen attempt"}
+              {loading === "reopen" ? "Working..." : "Let student retry"}
             </Button>
             <Button
               variant="danger"
               size="sm"
               onClick={() => setPending("invalidate")}
               disabled={loading !== null}
-              title="Keep the attempt in the history but stop counting it"
+              title="Keep it in the history but don't count it"
             >
-              {loading === "invalidate" ? "Invalidating..." : "Invalidate"}
+              {loading === "invalidate" ? "Working..." : "Don't count"}
             </Button>
           </div>
           <Textarea
             value={actionReason}
             onChange={(event) => setActionReason(event.target.value)}
-            placeholder="Optional reason for reopen/invalidate (saved in audit log)"
+            placeholder="Reason (optional, visible to admins)"
             rows={2}
           />
         </>
@@ -118,7 +115,7 @@ export function AttemptActions({
           <Textarea
             value={comment}
             onChange={(event) => setComment(event.target.value)}
-            placeholder="Add teacher comment for the student"
+            placeholder="Add a comment for the student"
             rows={3}
           />
           <Button variant="secondary" size="sm" onClick={saveComment} disabled={savingComment}>
@@ -133,14 +130,14 @@ export function AttemptActions({
             <>
               <DialogHeader>
                 <DialogTitle>{COPY[pending].title}</DialogTitle>
-                <DialogDescription>{COPY[pending].body(subject)}</DialogDescription>
+                <DialogDescription>{COPY[pending].body}</DialogDescription>
               </DialogHeader>
               {actionReason.trim() ? (
                 <p className="text-sm text-gray-600">
                   Reason: <span className="text-gray-900">{actionReason.trim()}</span>
                 </p>
               ) : (
-                <p className="text-xs text-gray-500">No reason given. You can add one before confirming.</p>
+                <p className="text-xs text-gray-500">No reason added. You can add one before confirming.</p>
               )}
               <DialogFooter>
                 <Button variant="secondary" size="sm" onClick={() => setPending(null)} disabled={loading !== null}>

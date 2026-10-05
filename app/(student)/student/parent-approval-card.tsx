@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { formatDate } from "@/lib/utils";
 
 interface Props {
   student: { id: string; name: string };
@@ -41,11 +42,11 @@ export function ParentApprovalCard({ student, enrollment }: Props) {
         <p className="text-sm text-gray-600">
           {done === "approve" ? (
             <span className="text-green-700 font-medium">
-              ✓ You approved {student.name}&apos;s enrollment in {enrollment.program.name}.
+              ✓ Done! {student.name} is approved to join {enrollment.program.name}.
             </span>
           ) : (
             <span className="text-red-600">
-              Enrollment request for {student.name} was not approved.
+              You said no — {student.name} won&apos;t join {enrollment.program.name}.
             </span>
           )}
         </p>
@@ -57,13 +58,13 @@ export function ParentApprovalCard({ student, enrollment }: Props) {
     <Card variant="warning" className="flex items-center justify-between gap-4 px-4 py-3">
       <div>
         <p className="text-sm font-medium text-amber-900">
-          {student.name} → {enrollment.program.name}
+          {student.name} wants to join {enrollment.program.name}
         </p>
         <p className="text-xs text-amber-700 mt-0.5">
-          Requested on {new Date(enrollment.enrolledAt).toISOString().slice(0, 10)}
+          Asked on {formatDate(enrollment.enrolledAt)}
         </p>
         <p className="text-xs text-amber-600 mt-1">
-          Your approval is required for this minor&apos;s enrollment.
+          Because {student.name} is under 18, we need your OK to enroll them.
         </p>
       </div>
       <div className="flex gap-2 shrink-0">
@@ -74,7 +75,7 @@ export function ParentApprovalCard({ student, enrollment }: Props) {
           onClick={() => act("approve")}
           disabled={!!loading}
         >
-          {loading === "approve" ? "..." : "Approve"}
+          {loading === "approve" ? "…" : "Approve"}
         </Button>
         <Button
           size="sm"
@@ -83,7 +84,7 @@ export function ParentApprovalCard({ student, enrollment }: Props) {
           onClick={() => act("reject")}
           disabled={!!loading}
         >
-          {loading === "reject" ? "..." : "Reject"}
+          {loading === "reject" ? "…" : "Decline"}
         </Button>
       </div>
     </Card>

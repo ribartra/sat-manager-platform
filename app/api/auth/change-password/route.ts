@@ -10,7 +10,7 @@ import { BadRequestError, InternalServerError, UnauthorizedError, withApiErrors 
 
 export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await auth();
-  if (!session) return new UnauthorizedError("Unauthorized").toResponse();
+  if (!session) return new UnauthorizedError("Please sign in again.").toResponse();
 
   try {
     const { currentPassword, newPassword } = await req.json();
@@ -37,7 +37,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
         outcome: "failure",
         metadata: { reason: "no_password" },
       });
-      return new BadRequestError("User cannot change password.").toResponse();
+      return new BadRequestError("This account can't change its password here.").toResponse();
     }
 
     const valid = await bcrypt.compare(currentPassword, user.passwordHash);
@@ -50,7 +50,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
         outcome: "failure",
         metadata: { reason: "bad_current_password" },
       });
-      return new BadRequestError("Current password is incorrect.").toResponse();
+      return new BadRequestError("Your current password isn't right.").toResponse();
     }
 
     const passwordHash = await bcrypt.hash(newPassword, 10);
@@ -74,6 +74,6 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, email: user.email, reauthenticate: true });
   } catch (error) {
     await captureCaughtError("auth.change-password", error, { userId: session.user.id });
-    return new InternalServerError("Password change failed.").toResponse();
+    return new InternalServerError("We couldn't change your password. Please try again.").toResponse();
   }
 });

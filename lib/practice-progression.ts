@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { notifyUser } from "@/lib/notifications";
+import { shortSetName } from "@/lib/student-report";
 import { isUniqueConstraintError } from "@/lib/db-errors";
 
 const DIFFICULTY_ORDER = ["EASY", "MEDIUM", "HARD"];
@@ -48,7 +49,7 @@ async function ensureUnlockedAssignment(studentId: string, practiceSetId: string
       where: { id: existing.id },
       data: { locked: false, unlockAt: null },
     });
-    await notifyUser(studentId, "Practice set unlocked", existing.practiceSet.name, "/student");
+    await notifyUser(studentId, "Practice Set unlocked", `${shortSetName(existing.practiceSet.name)} is open now.`, "/student");
     await prisma.auditLog.create({
       data: {
         userId: studentId,
@@ -80,7 +81,7 @@ async function ensureUnlockedAssignment(studentId: string, practiceSetId: string
     if (!isUniqueConstraintError(error)) throw error;
     return;
   }
-  await notifyUser(studentId, "Practice set unlocked", practiceSet?.name ?? "A practice set was unlocked.", "/student");
+  await notifyUser(studentId, "Practice Set unlocked", practiceSet?.name ? `${shortSetName(practiceSet.name)} is open now.` : "A new Practice Set is open now.", "/student");
   await prisma.auditLog.create({
     data: {
       userId: studentId,

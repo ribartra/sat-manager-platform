@@ -10,7 +10,7 @@ import { BadRequestError, ForbiddenError, NotFoundError, UnauthorizedError, with
 //   POST /api/attempts/[attemptId]/check  { questionId, answer }
 export const POST = withApiErrors(async function POST(req: NextRequest, { params }: { params: Promise<{ attemptId: string }> }) {
   const session = await requireApprovedSession();
-  if (!session) return new UnauthorizedError("Unauthorized").toResponse();
+  if (!session) return new UnauthorizedError("Please sign in again.").toResponse();
 
   const { attemptId } = await params;
   const body = (await req.json().catch(() => ({}))) as { questionId?: unknown; answer?: unknown };
@@ -22,9 +22,9 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
     where: { id: attemptId, studentId: session.user.id, status: "IN_PROGRESS" },
     select: { id: true, practiceSetId: true, assignment: { select: { feedbackMode: true } } },
   }));
-  if (!attempt) return new NotFoundError("Not found").toResponse();
+  if (!attempt) return new NotFoundError("This practice set was already submitted or closed by your teacher.").toResponse();
   if (attempt.assignment?.feedbackMode !== "IMMEDIATE") {
-    return new ForbiddenError("Immediate feedback is not enabled for this assignment.").toResponse();
+    return new ForbiddenError("Answer checking is turned off for this set.").toResponse();
   }
 
   const item = await withSqliteRetry(() => prisma.practiceSetQuestion.findFirst({
@@ -35,7 +35,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
       },
     },
   }));
-  if (!item) return new NotFoundError("Not found").toResponse();
+  if (!item) return new NotFoundError("We couldn't find this question in the set.").toResponse();
 
   const existing = await withSqliteRetry(() => prisma.attemptAnswer.findUnique({
     where: { attemptId_questionId: { attemptId, questionId } },

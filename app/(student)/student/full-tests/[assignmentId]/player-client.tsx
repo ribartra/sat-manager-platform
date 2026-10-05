@@ -409,7 +409,7 @@ export function FullTestPlayer({
 
   const submit = useCallback(async () => {
     if (previewMode) {
-      notify.info("Preview only", "The exam is not scored or saved.");
+      notify.info("Preview", "Nothing is scored or saved.");
       router.push(exitHref);
       return;
     }
@@ -438,9 +438,9 @@ export function FullTestPlayer({
         eliminatedOptions: fromLabelSets(eliminatedRef.current),
       }),
       });
-    } catch (error) {
+    } catch {
       writeBuffer(offlineKey, buildAutosavePayload(answersRef.current, moduleIndexRef.current, questionIndexRef.current));
-      notify.error(error, "Submit failed: you seem to be offline. Your answers are saved on this device; try again.");
+      notify.error("You're offline, so we couldn't submit. Your answers are safe — try again when you're back online.");
       return;
     }
     if (isAuthFailureStatus(response.status)) {
@@ -451,7 +451,7 @@ export function FullTestPlayer({
     }
     if (!response.ok) {
       writeBuffer(offlineKey, buildAutosavePayload(answersRef.current, moduleIndexRef.current, questionIndexRef.current));
-      notify.error(await readApiError(response, "Submit failed. Your answers are saved on this device; please try again."));
+      notify.error(await readApiError(response, "We couldn't submit. Your answers are safe — please try again."));
       return;
     }
     clearBuffer(offlineKey);
@@ -647,7 +647,7 @@ export function FullTestPlayer({
       <div className="flex min-h-dvh flex-col items-center justify-center bg-white px-6">
         <p className="text-sm font-semibold text-gray-900">{testName}</p>
         <h1 className="mt-3 text-2xl font-semibold text-gray-900">Optional break</h1>
-        <p className="mt-2 max-w-md text-center text-sm text-gray-500">Take a break or skip it to continue.</p>
+        <p className="mt-2 max-w-md text-center text-sm text-gray-500">Take a short break, or skip it to keep going.</p>
         <p className={`mt-8 text-4xl font-semibold tabular-nums ${breakRemaining <= 60 ? "text-red-600" : "text-gray-900"}`}>
           {formatTime(breakRemaining)}
         </p>
@@ -671,8 +671,9 @@ export function FullTestPlayer({
               }
               router.push(previewMode ? exitHref : "/student/content-map?area=mocks");
             }}
+            title="The timer stops. You'll continue where you left off."
           >
-            Pause & Exit
+            Save & exit
           </Button>
         </div>
       </div>
@@ -718,7 +719,7 @@ export function FullTestPlayer({
             </button>
           }
         >
-          <span className="font-medium">Preview only — not scored. No student attempt is created.</span>
+          <span className="font-medium">Preview: nothing is scored or saved.</span>
         </Alert>
       )}
       <div className="flex items-center justify-between border-b border-gray-200 px-6 py-3">
@@ -731,8 +732,8 @@ export function FullTestPlayer({
         <div className="flex items-center gap-4">
           {!previewMode && <SaveIndicator status={saving} />}
           {inOvertime ? (
-            <span className="flex items-baseline gap-1 tabular-nums text-red-600" aria-label={`Overtime ${formatTime(overtime)}`}>
-              <span className="text-xs font-semibold uppercase tracking-wide">Overtime</span>
+            <span className="flex items-baseline gap-1 tabular-nums text-red-600" aria-label={`Extra time +${formatTime(overtime)}`}>
+              <span className="text-xs font-semibold uppercase tracking-wide">Extra time</span>
               +{formatTime(overtime)}
             </span>
           ) : (
@@ -743,6 +744,7 @@ export function FullTestPlayer({
           <Button
             variant="secondary"
             size="sm"
+            title={previewMode ? undefined : "The timer stops. You'll continue where you left off."}
             onClick={async () => {
               await saveProgress();
               if (!previewMode) {
@@ -751,13 +753,13 @@ export function FullTestPlayer({
               router.push(previewMode ? exitHref : "/student/content-map?area=mocks");
             }}
           >
-            {previewMode ? "Exit preview" : "Pause & Exit"}
+            {previewMode ? "Exit preview" : "Save & exit"}
           </Button>
         </div>
       </div>
       {inOvertime && (
         <Alert tone="warning" layout="banner" className="py-2 text-sm">
-          Time is up for this module. You can keep working — the extra time is being recorded.
+          Time&apos;s up for this module. You can keep working — your teacher will see the extra time you use.
         </Alert>
       )}
       <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden md:grid-cols-2">
@@ -856,7 +858,8 @@ export function FullTestPlayer({
                 setAnswers(nextAnswers);
                 scheduleTypingSave();
               }}
-              placeholder="Numeric answer"
+              placeholder="Type your answer"
+              aria-label="Type your answer"
             />
           )}
           <details className="mt-3 rounded-md border border-gray-200 bg-gray-50 open:bg-white">
@@ -867,7 +870,7 @@ export function FullTestPlayer({
               <Textarea
                 value={notes[question.id] ?? ""}
                 onChange={(e) => handleNote(question.id, e.target.value)}
-                placeholder="Add a private note for review"
+                placeholder="A note just for you"
                 rows={2}
               />
             </div>
@@ -927,7 +930,7 @@ export function FullTestPlayer({
               <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded border border-gray-200 bg-white ring-2 ring-amber-400 ring-offset-1" /> Marked</span>
             </div>
             <div className="mt-4 flex items-center justify-between gap-3 border-t border-gray-200 pt-3">
-              <p className="text-xs text-gray-500">You can review questions within this module only.</p>
+              <p className="text-xs text-gray-500">You can only go back to questions in this module.</p>
               <Button
                 type="button"
                 size="sm"
@@ -946,30 +949,31 @@ export function FullTestPlayer({
       {confirmSubmitModule && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
-            <h2 className="text-lg font-semibold text-gray-900">Submit Module?</h2>
+            <h2 className="text-lg font-semibold text-gray-900">Submit module?</h2>
             <p className="mt-2 text-sm text-gray-600">
               {inOvertime ? (
-                <>Submit <strong>{currentModule.name}</strong> · overtime +{formatTime(overtime)}.</>
+                <>You used {formatTime(overtime)} of extra time on <strong>{currentModule.name}</strong>.</>
               ) : (
-                <>Submit <strong>{currentModule.name}</strong> with {formatTime(remaining)} remaining.</>
+                <>You still have {formatTime(remaining)} left on <strong>{currentModule.name}</strong>.</>
               )}
             </p>
             {unansweredInModule > 0 && (
               <p className="mt-2 text-sm text-amber-700">
-                {unansweredInModule} question{unansweredInModule === 1 ? "" : "s"} unanswered in this module.
+                You left {unansweredInModule} question{unansweredInModule === 1 ? "" : "s"} blank. Blank questions count as wrong.
               </p>
             )}
             {markedInModule > 0 && (
               <p className="mt-2 text-sm text-amber-700">
-                {markedInModule} question{markedInModule === 1 ? "" : "s"} marked for review. You can&apos;t return to this module after submitting it.
+                {markedInModule} question{markedInModule === 1 ? "" : "s"} still marked for review.
               </p>
             )}
+            <p className="mt-2 text-sm font-medium text-gray-900">Once you submit, you can&apos;t return to this module.</p>
             <div className="mt-5 flex justify-end gap-2">
               <Button type="button" variant="secondary" onClick={() => setConfirmSubmitModule(false)}>
-                Go Back
+                Go back
               </Button>
               <Button type="button" onClick={() => void confirmFinishModule()} disabled={advancing}>
-                Submit Module
+                Submit module
               </Button>
             </div>
           </div>

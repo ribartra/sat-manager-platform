@@ -9,7 +9,7 @@ import { Card } from "@/components/ui/card";
 import { formatDate } from "@/lib/utils";
 import { fullTestAttemptProgress } from "@/lib/attempt-progress";
 import { parseFullTestProgressState } from "@/lib/full-test-progress";
-import { scoreBandBarClass, scoreBandTextClass } from "@/lib/score-band";
+import { difficultyLabel } from "@/lib/domain-meta";
 import { activeAreaTab, practiceAreaFromTab, practiceAreaLabel, practiceAreaTopicWhere, resolvePracticeArea } from "@/lib/practice-area";
 import { academicTopicWhere, buildTaxonomyTree, type TaxonomyTreeNode } from "@/lib/taxonomy";
 
@@ -53,8 +53,8 @@ export default async function ContentMapPage({ searchParams }: PageProps) {
     return (
       <PageShell width="wide" density="compact" className="space-y-4">
         <header>
-          <h1 className="text-2xl font-semibold text-gray-900">Content Map</h1>
-          <p className="mt-1 text-sm text-gray-500">Open assigned practice by area.</p>
+          <h1 className="text-2xl font-semibold text-gray-900">Content map</h1>
+          <p className="mt-1 text-sm text-gray-500">Your Full Practice Tests.</p>
         </header>
         <PracticeAreaTabs basePath="/student/content-map" active={area} />
         <div className="space-y-3">
@@ -86,11 +86,10 @@ export default async function ContentMapPage({ searchParams }: PageProps) {
                   {progress && (
                     <div className="mt-2 max-w-xl space-y-1">
                       <p className="text-xs text-gray-700">
-                        <span className={`font-semibold ${scoreBandTextClass(progress.percent)}`}>Progress {progress.percent}%</span>{" "}
-                        ({progress.answered}/{progress.total})
+                        <span className="font-semibold">{progress.answered} of {progress.total} answered</span>
                       </p>
-                      <div className="h-2 w-full rounded-full bg-gray-100" aria-label={`Progress ${progress.percent}%`}>
-                        <div className={`h-2 rounded-full ${scoreBandBarClass(progress.percent)}`} style={{ width: `${progress.percent}%` }} />
+                      <div className="h-2 w-full rounded-full bg-gray-100" aria-label={`${progress.answered} of ${progress.total} answered`}>
+                        <div className="h-2 rounded-full bg-blue-500" style={{ width: `${progress.percent}%` }} />
                       </div>
                     </div>
                   )}
@@ -119,7 +118,7 @@ export default async function ContentMapPage({ searchParams }: PageProps) {
           })}
           {assignments.length === 0 && (
             <Card padding="lg" className="text-center text-sm text-gray-400">
-              No Full Practice Tests assigned yet.
+              You don&apos;t have any Full Practice Tests yet.
             </Card>
           )}
         </div>
@@ -236,7 +235,7 @@ export default async function ContentMapPage({ searchParams }: PageProps) {
                     : "bg-gray-100 text-gray-400"
                 )}
               >
-                {diff.charAt(0) + diff.slice(1).toLowerCase()} ({available})
+                {difficultyLabel(diff)} ({available})
               </Link>
             );
           })}
@@ -269,7 +268,7 @@ export default async function ContentMapPage({ searchParams }: PageProps) {
   return (
       <PageShell width="wide" density="compact" className="space-y-4">
       <header>
-        <h1 className="text-2xl font-semibold text-gray-900">Content Map</h1>
+        <h1 className="text-2xl font-semibold text-gray-900">Content map</h1>
         <p className="mt-1 text-sm text-gray-500">Choose an area to find your next practice set.</p>
       </header>
       <PracticeAreaTabs basePath="/student/content-map" active={area} />
@@ -349,7 +348,7 @@ export default async function ContentMapPage({ searchParams }: PageProps) {
                                     : "bg-gray-100 text-gray-400"
                                 )}
                               >
-                                {diff.charAt(0) + diff.slice(1).toLowerCase()} ({available})
+                                {difficultyLabel(diff)} ({available})
                               </Link>
                             );
                           })}

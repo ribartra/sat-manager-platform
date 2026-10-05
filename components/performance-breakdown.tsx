@@ -1,6 +1,7 @@
 "use client";
 
 import { metricAccuracy, type ProgressMetric } from "@/lib/progress-analytics";
+import { difficultyLabel } from "@/lib/domain-meta";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 type PerformanceBreakdownProps = {
@@ -8,7 +9,8 @@ type PerformanceBreakdownProps = {
   rowLabel: string;
   dimensionLabel: string;
   dimensions: string[];
-  summaryMetrics: ProgressMetric[];
+  /** "All questions" row; omit it when the rows already cover everything (e.g. section x module). */
+  summaryMetrics?: ProgressMetric[];
   detailMetrics: ProgressMetric[];
   /** Optional ordered grouping (e.g. Domain → Skills in official order). Without it rows are alphabetical. */
   groups?: Array<{ label: string; rows: string[] }>;
@@ -36,7 +38,7 @@ export function PerformanceBreakdown({
     <section className="rounded-md border border-gray-200 bg-white p-4 shadow-sm">
       <div className="mb-4">
         <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
-        <p className="mt-1 text-xs text-gray-500">By {dimensionLabel.toLowerCase()}. Correct answers ÷ all questions in the selected filters; blank questions are included.</p>
+        <p className="mt-1 text-xs text-gray-500">% correct for each {rowLabel.toLowerCase()} and {dimensionLabel.toLowerCase() === "difficulty" ? "level" : dimensionLabel.toLowerCase()}. Blank answers count as wrong.</p>
       </div>
 
       {rows.length === 0 ? (
@@ -49,17 +51,19 @@ export function PerformanceBreakdown({
                 <tr className="text-xs font-medium uppercase tracking-wide text-gray-500">
                   <th className="border-b border-gray-200 px-3 py-2">{rowLabel}</th>
                   {dimensions.map((dimension) => (
-                    <th key={dimension} className="border-b border-gray-200 px-3 py-2">{dimension}</th>
+                    <th key={dimension} className="border-b border-gray-200 px-3 py-2">{difficultyLabel(dimension)}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                <MetricRow
-                  label="All selected questions"
-                  dimensions={dimensions}
-                  metrics={summaryMetrics}
-                  className="bg-gray-50"
-                />
+                {summaryMetrics ? (
+                  <MetricRow
+                    label="All questions"
+                    dimensions={dimensions}
+                    metrics={summaryMetrics}
+                    className="bg-gray-50"
+                  />
+                ) : null}
                 {sections.map((section) => [
                   section.label ? (
                     <tr key={`group-${section.label}`}>
@@ -82,7 +86,7 @@ export function PerformanceBreakdown({
           </div>
 
           <div className="space-y-3 md:hidden">
-            <MobileMetricCard label="All selected questions" dimensions={dimensions} metrics={summaryMetrics} />
+            {summaryMetrics ? <MobileMetricCard label="All questions" dimensions={dimensions} metrics={summaryMetrics} /> : null}
             {rows.map((row) => (
               <MobileMetricCard
                 key={row}
@@ -128,7 +132,7 @@ function MobileMetricCard({ label, dimensions, metrics }: { label: string; dimen
       <div className="space-y-3">
         {dimensions.map((dimension) => (
           <div key={dimension} className="grid grid-cols-[5.5rem_1fr] gap-3">
-            <p className="pt-0.5 text-xs font-medium text-gray-500">{dimension}</p>
+            <p className="pt-0.5 text-xs font-medium text-gray-500">{difficultyLabel(dimension)}</p>
             <MetricCell metric={metrics.find((item) => item.difficulty === dimension) ?? null} />
           </div>
         ))}
@@ -141,28 +145,28 @@ function MetricCell({ metric }: { metric: ProgressMetric | null }) {
   if (!metric || metric.total === 0) return <span className="text-xs text-gray-400">No questions answered</span>;
   const accuracy = metricAccuracy(metric);
   const detail = metric.attemptDetails;
-  const label = `${accuracy}% accuracy. ${metric.correct} correct of ${metric.total} questions. Show attempt details.`;
+  const label = `${accuracy}% correct. ${metric.correct} of ${metric.total} correct. Show details.`;
 
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <button type="button" aria-label={label} className="block max-w-full rounded text-left outline-none ring-offset-2 focus-visible:ring-2 focus-visible:ring-blue-600">
-          <span className="block text-sm font-semibold text-gray-900">{accuracy}% accuracy</span>
-          <span className="mt-0.5 block text-xs text-gray-600">{metric.correct} correct of {metric.total} questions</span>
+          <span className="block text-sm font-semibold text-gray-900">{accuracy}% correct</span>
+          <span className="mt-0.5 block text-xs text-gray-600">{metric.correct} of {metric.total} correct</span>
         </button>
       </TooltipTrigger>
       <TooltipContent side="bottom" className="max-w-xs p-3 leading-relaxed">
-        <p className="font-semibold">{metric.correct} correct ÷ {metric.total} total questions = {accuracy}%</p>
-        <p className="mt-1 text-gray-300">Blank questions are included in the total.</p>
+        <p className="font-semibold">{metric.correct} of {metric.total} correct ({accuracy}%)</p>
+        <p className="mt-1 text-gray-300">Blank answers count as wrong.</p>
         {detail.length > 0 && (
           <div className="mt-2 border-t border-gray-700 pt-2">
-            <p className="font-medium text-white">Included submissions</p>
+            <p className="font-medium text-white">Based on:</p>
             <ul className="mt-1 space-y-1 text-gray-200">
               {detail.map((attempt, index) => {
                 const attemptAccuracy = attempt.total ? Math.round((attempt.correct / attempt.total) * 100) : 0;
                 return (
                   <li key={attempt.attemptId}>
-                    {attempt.label || `Attempt ${index + 1}`}: {attempt.correct} correct of {attempt.total} questions · {attemptAccuracy}%
+                    {attempt.label || `Try ${index + 1}`}: {attempt.correct} of {attempt.total} correct · {attemptAccuracy}%
                   </li>
                 );
               })}

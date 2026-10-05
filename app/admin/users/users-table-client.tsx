@@ -5,6 +5,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { DataTable } from "@/components/sat/data-table";
 import { UserValidationActions } from "./user-validation-actions-client";
+import { enrollmentStatusLabel, roleLabel } from "@/lib/domain-meta";
 
 export type AdminUserRow = {
   id: string;
@@ -18,9 +19,9 @@ export type AdminUserRow = {
 };
 
 function validationBadge(status: string) {
-  if (status === "APPROVED") return <Badge variant="success">Approved</Badge>;
-  if (status === "REJECTED") return <Badge variant="danger">Rejected</Badge>;
-  return <Badge variant="warning">Pending</Badge>;
+  if (status === "APPROVED") return <Badge variant="success">{enrollmentStatusLabel(status)}</Badge>;
+  if (status === "REJECTED") return <Badge variant="danger">{enrollmentStatusLabel(status)}</Badge>;
+  return <Badge variant="warning">{enrollmentStatusLabel("PENDING")}</Badge>;
 }
 
 export function AdminUsersTable({ rows }: { rows: AdminUserRow[] }) {
@@ -41,7 +42,7 @@ export function AdminUsersTable({ rows }: { rows: AdminUserRow[] }) {
         accessorKey: "role",
         header: "Role",
         meta: { priority: "medium" },
-        cell: ({ row }) => <span className="text-muted-foreground">{row.original.role}</span>,
+        cell: ({ row }) => <span className="text-muted-foreground">{roleLabel(row.original.role)}</span>,
       },
       {
         id: "access",

@@ -297,7 +297,7 @@ export function PracticeSetPlayer({
         return;
       }
       if (!res.ok) {
-        setCheckError(errorMessage(await readApiError(res, "Could not check this answer. Try again.")));
+        setCheckError(errorMessage(await readApiError(res, "We couldn't check this answer. Please try again.")));
         return;
       }
       const data = (await res.json()) as CheckResult & { answer?: string };
@@ -307,7 +307,7 @@ export function PracticeSetPlayer({
         [question.id]: { isCorrect: data.isCorrect, answerKey: data.answerKey, correctAnswer: data.correctAnswer, explanation: data.explanation },
       }));
     } catch {
-      setCheckError("You seem to be offline. Check again when the connection returns.");
+      setCheckError("You're offline. Try again when you're back online.");
     } finally {
       setChecking(false);
     }
@@ -356,17 +356,17 @@ export function PracticeSetPlayer({
   const handleSubmit = async () => {
     if (submitting) return;
     if (previewMode) {
-      notify.info("Preview only", "Answers are not scored or saved.");
+      notify.info("Preview", "Nothing is scored or saved.");
       router.push(exitHref);
       return;
     }
     const unanswered = questions.filter((q) => !answers[q.id]).length;
     const confirmed = await confirm({
-      title: "Submit this Practice Set?",
+      title: "Submit this practice set?",
       description:
         unanswered > 0
-          ? `${unanswered} question${unanswered === 1 ? " is" : "s are"} unanswered. Blank answers will be marked as omitted.`
-          : "You can review your results right after submitting.",
+          ? `You left ${unanswered} question${unanswered === 1 ? "" : "s"} blank. Blank questions count as wrong.`
+          : "You'll see your results right after you submit.",
       confirmLabel: "Submit",
     });
     if (!confirmed) return;
@@ -387,9 +387,9 @@ export function PracticeSetPlayer({
         eliminatedOptions: Object.fromEntries(Object.entries(eliminated).map(([id, labels]) => [id, Array.from(labels)])),
       }),
       });
-    } catch (error) {
+    } catch {
       setSubmitting(false);
-      notify.error(error, "Submit failed: you seem to be offline. Your answers are saved; try again.");
+      notify.error("You're offline, so we couldn't submit. Your answers are safe — try again when you're back online.");
       return;
     }
     if (isAuthFailureStatus(response.status)) {
@@ -398,7 +398,7 @@ export function PracticeSetPlayer({
     }
     if (!response.ok) {
       setSubmitting(false);
-      notify.error(await readApiError(response, "Submit failed. Your answers are saved; please try again."));
+      notify.error(await readApiError(response, "We couldn't submit. Your answers are safe — please try again."));
       return;
     }
     router.push(resultHref ?? `/student/results/${attemptId}`);
@@ -439,7 +439,7 @@ export function PracticeSetPlayer({
             </button>
           }
         >
-          <span className="font-medium">Preview only — not scored. No student attempt is created.</span>
+          <span className="font-medium">Preview: nothing is scored or saved.</span>
         </Alert>
       )}
       <OfflineBanner online={online} />
@@ -576,16 +576,17 @@ export function PracticeSetPlayer({
             </div>
           ) : (
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Your answer</label>
+              <label htmlFor={`answer-${question.id}`} className="sr-only">Type your answer</label>
               <Input
+                id={`answer-${question.id}`}
                 type="text"
                 value={answers[question.id] ?? ""}
                 onChange={(e) => handleAnswer(question.id, e.target.value)}
-                placeholder="Enter a number"
+                placeholder="Type your answer"
                 className="w-40"
                 disabled={Boolean(checked[question.id])}
               />
-              <p className="mt-1 text-xs text-gray-400">For fractions, enter as decimal (e.g. 0.5)</p>
+              <p className="mt-1 text-xs text-gray-400">You can type a fraction (1/2) or a decimal (0.5).</p>
             </div>
           )}
 
@@ -635,7 +636,7 @@ export function PracticeSetPlayer({
               <Textarea
                 value={notes[question.id] ?? ""}
                 onChange={(e) => handleNote(question.id, e.target.value)}
-                placeholder="Add a private note for review"
+                placeholder="A note just for you"
                 rows={2}
               />
             </div>
@@ -658,8 +659,8 @@ export function PracticeSetPlayer({
           <Button variant="secondary" size="sm" onClick={() => setShowNav(!showNav)}>
             <List size={14} className="mr-1" /> Questions
           </Button>
-          <Button variant="secondary" size="sm" onClick={handlePauseExit}>
-            <Pause size={14} className="mr-1" /> Pause & Exit
+          <Button variant="secondary" size="sm" onClick={handlePauseExit} title="The timer stops. You'll continue where you left off.">
+            <Pause size={14} className="mr-1" /> Save & exit
           </Button>
         </div>
 
@@ -675,7 +676,7 @@ export function PracticeSetPlayer({
             className="bg-green-600 hover:bg-green-700"
           >
             <Send size={14} className="mr-1" />
-            {submitting ? "Submitting..." : "Submit"}
+            {submitting ? "Submitting…" : "Submit"}
           </Button>
         )}
       </div>
@@ -723,8 +724,8 @@ export function PracticeSetPlayer({
               <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded border border-gray-200 bg-white" /> Unanswered</span>
             </div>
             <div className="mt-4 border-t border-gray-200 pt-4">
-              <Button variant="secondary" size="sm" onClick={handlePauseExit} className="w-full">
-                <Pause size={14} className="mr-1" /> Pause & Exit
+              <Button variant="secondary" size="sm" onClick={handlePauseExit} className="w-full" title="The timer stops. You'll continue where you left off.">
+                <Pause size={14} className="mr-1" /> Save & exit
               </Button>
             </div>
           </div>

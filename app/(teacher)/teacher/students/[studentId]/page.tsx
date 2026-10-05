@@ -4,7 +4,8 @@ import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { formatDate, formatTime } from "@/lib/utils";
+import { formatDate, formatDuration, formatTime } from "@/lib/utils";
+import { assignmentStatusLabel, difficultyLabel } from "@/lib/domain-meta";
 import { scoreBandTextClass } from "@/lib/score-band";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -21,7 +22,7 @@ import { RestartExamButton } from "./restart-exam-button";
 import { refreshAssignmentStates } from "@/lib/assignments";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { studentAccessWhereFor } from "@/lib/program-scope";
-import { loadMockReport, loadPracticeReport, shortSetName, type ReportAttempt } from "@/lib/student-report";
+import { loadMockReport, loadPracticeReport, moduleTableOf, shortSetName, type ReportAttempt } from "@/lib/student-report";
 import { activeAreaTab, practiceAreaFromTab } from "@/lib/practice-area";
 import { buildProgressHref, progressFilterEntries, progressFiltersFromParams } from "@/lib/progress-filters";
 import { applyTimeFilterSetting } from "@/lib/time-filters";
@@ -95,7 +96,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
   const reportFilters = { topic: filters.topic, difficulty: filters.difficulty, from: filters.from, to: filters.to };
   const filterSummary = [
     topicId ? `Skill: ${skills.find((skill) => skill.id === topicId)?.name ?? topicId}` : null,
-    difficulty ? `Difficulty: ${difficulty}` : null,
+    difficulty ? `Difficulty: ${difficultyLabel(difficulty)}` : null,
     filters.from ? `From ${filters.from}` : null,
     filters.to ? `To ${filters.to}` : null,
   ].filter(Boolean).join(" · ");
@@ -122,12 +123,12 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
       </div>
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
-        <Hint label="Pick one or more Practice Sets for this student. Sets already pending are updated, completed or overdue ones are reassigned.">
+        <Hint label="Give this student one or more practice sets.">
           <Link href={buildProgressHref(`/teacher/students/${studentId}/assign`, filters)} className="inline-flex h-8 items-center justify-center gap-1 rounded-md bg-blue-600 px-3 text-sm font-medium text-white hover:bg-blue-700">
             <Plus size={14} /> Assign practice
           </Link>
         </Hint>
-        <Hint label="Assign a Full Practice Test (mock exam) to this student.">
+        <Hint label="Give this student a full practice exam.">
           <Link href={buildProgressHref(`/teacher/students/${studentId}/assign-exam`, filters)} className="inline-flex h-8 items-center justify-center gap-1 rounded-md border border-blue-600 px-3 text-sm font-medium text-blue-700 hover:bg-blue-50">
             <ClipboardList size={14} /> Assign exam
           </Link>
@@ -142,7 +143,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
           exams={reportExams}
           parents={reportParents}
         />
-        <Hint label="Open the student portal exactly as this student sees it (read-only).">
+        <Hint label="See the app the way this student sees it (view only).">
           <Link href={buildProgressHref(`/teacher/impersonate/${studentId}`, filters)} className={secondaryButton}>
             <Eye size={14} /> Student view
           </Link>
@@ -174,22 +175,23 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
   if (!practiceArea) {
     const report = await loadMockReport(studentId, reportFilters);
     const examPage = paginate(report.examHistory, pageFromParam(query.examsPage), HISTORY_PAGE_SIZE);
+    const moduleTable = moduleTableOf(report.sectionModuleMetrics);
     return (
       <PageShell width="wide">
         {header}
         <KpiStrip
           items={[
-            { label: "Exams completed", value: String(report.kpis.exams), hint: "Submitted Full Practice Tests in the selected dates." },
-            { label: "Latest total", value: String(report.kpis.latestTotal ?? "—"), className: "text-[var(--sat-area-mocks)]", hint: "SAT total (400–1600) of the most recent exam." },
-            { label: "Latest R&W", value: String(report.kpis.latestRw ?? "—"), hint: "Reading & Writing section score (200–800) of the most recent exam." },
-            { label: "Latest Math", value: String(report.kpis.latestMath ?? "—"), hint: "Math section score (200–800) of the most recent exam." },
-            { label: "Pending exams", value: String(report.kpis.pending), hint: "Assigned Full Practice Tests not submitted yet (pending, in progress or overdue)." },
+            { label: "Full Practice Tests completed", value: String(report.kpis.exams), hint: "Finished in the selected dates." },
+            { label: "Latest total score", value: String(report.kpis.latestTotal ?? "—"), className: "text-[var(--sat-area-mocks)]", hint: "Total score (out of 1600) on the most recent test." },
+            { label: "Latest Reading & Writing", value: String(report.kpis.latestRw ?? "—"), hint: "Reading & Writing score (out of 800) on the most recent test." },
+            { label: "Latest Math", value: String(report.kpis.latestMath ?? "—"), hint: "Math score (out of 800) on the most recent test." },
+            { label: "Full Practice Tests to do", value: String(report.kpis.pending), hint: "Assigned but not finished yet." },
           ]}
         />
         <div className="grid gap-6 lg:grid-cols-3">
           <div id="performance" className="min-w-0 space-y-6 lg:col-span-2">
             {report.exams.length === 0 ? (
-              <Card padding="lg" className="py-12 text-center text-sm text-gray-400">No submitted Full Practice Tests for this student yet.</Card>
+              <Card padding="lg" className="py-12 text-center text-sm text-gray-400">This student hasn&apos;t finished a full practice exam yet.</Card>
             ) : (
               <>
                 <MockSectionChart metrics={report.scoreSeries} />
@@ -197,9 +199,8 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                   title="Performance by section and module"
                   rowLabel="Section"
                   dimensionLabel="module"
-                  dimensions={report.modules}
-                  summaryMetrics={report.moduleMetrics}
-                  detailMetrics={report.sectionModuleMetrics}
+                  dimensions={moduleTable.columns}
+                  detailMetrics={moduleTable.detail}
                 />
               </>
             )}
@@ -218,11 +219,11 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                   </div>
                   <div className="flex shrink-0 items-center gap-3">
                     {a.openAttemptId ? (
-                      <Hint label="Invalidate the attempt in progress and send the exam back to Pending, so the student starts again with the current exam content.">
+                      <Hint label="Start the exam over. The current progress won't count.">
                         <RestartExamButton attemptId={a.openAttemptId} examName={a.name} />
                       </Hint>
                     ) : null}
-                    <Hint label={a.status === "OVERDUE" ? "Open it again for the student with a new due date." : "Change the due date of this exam."}>
+                    <Hint label={a.status === "OVERDUE" ? "Give it to the student again with a new due date." : "Change the due date of this exam."}>
                       <Link href={buildProgressHref(`/teacher/students/${studentId}/assign-exam`, filters)} className="shrink-0 text-xs font-medium text-blue-600 hover:underline">
                         {a.status === "OVERDUE" ? "Reassign" : "Due date"}
                       </Link>
@@ -235,7 +236,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
               id="exam-history"
               title="Exam history"
               count={report.examHistory.length}
-              empty="No completed Full Practice Tests yet."
+              empty="No finished exams yet."
               footer={
                 <Pagination
                   basePath={`/teacher/students/${studentId}`}
@@ -263,7 +264,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                     <VoidableValue status={exam.status} className="text-sm font-semibold text-gray-900">
                       {exam.totalScore ?? "—"}
                     </VoidableValue>
-                    <Hint label="Open this exam: module and question detail, reopen or invalidate, send the exam report.">
+                    <Hint label="See answers by question, restart, or send the report.">
                       <Link href={buildProgressHref(`/teacher/students/${studentId}/full-tests/${exam.id}`, filters)} className="text-xs font-medium text-blue-600 hover:underline">
                         Review
                       </Link>
@@ -302,14 +303,14 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
           isInvalidated(attempt.status) ? (
             <VoidableValue status={attempt.status} className="text-sm font-semibold">{attempt.percent}%</VoidableValue>
           ) : (
-            <span className={`text-sm font-semibold ${scoreBandTextClass(attempt.percent)}`} title={`${attempt.correct} correct of ${attempt.total} questions`}>
+            <span className={`text-sm font-semibold ${scoreBandTextClass(attempt.percent)}`} title={`${attempt.correct} of ${attempt.total} correct`}>
               {attempt.percent}%
             </span>
           )
         ) : (
           <span className="text-sm text-gray-400">—</span>
         )}
-        <Hint label="Review this attempt question by question (answers, time and explanations).">
+        <Hint label="See each answer, time spent and explanation.">
           <Link href={buildProgressHref(`/teacher/students/${studentId}/attempts/${attempt.id}`, filters)} className="text-xs font-medium text-blue-600 hover:underline">
             Review
           </Link>
@@ -331,17 +332,17 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
       )}
       <KpiStrip
         items={[
-          { label: `Attempts · ${areaLabel}`, value: String(kpis.attempts), hint: `Submitted ${areaLabel} practice sets matching the filters.` },
+          { label: "Sets completed", value: String(kpis.attempts), hint: `${areaLabel} practice sets finished (with the current filters).` },
           {
-            label: "Average score",
+            label: "Questions correct",
             value: kpis.overall.percent !== null ? `${kpis.overall.percent}%` : "—",
             className: scoreBandTextClass(kpis.overall.percent),
             sub: kpis.overall.total ? `${kpis.overall.correct} of ${kpis.overall.total} correct` : undefined,
-            hint: "Correct answers ÷ all questions of the submitted attempts. Blank answers count as incorrect.",
+            hint: "% of questions answered correctly. Blank answers count as wrong.",
           },
-          { label: "Total time", value: formatTime(kpis.totalTime), hint: "Time spent across all submitted attempts." },
-          { label: "Avg question time", value: kpis.avgQuestionTime !== null ? formatTime(kpis.avgQuestionTime) : "—", hint: "Average time per answered question." },
-          { label: "Pending sets", value: String(kpis.pending), hint: `Assigned ${areaLabel} practice sets not finished yet (pending, in progress or overdue).` },
+          { label: "Total time", value: formatDuration(kpis.totalTime), hint: "Total time on finished work." },
+          { label: "Time per question", value: kpis.avgQuestionTime !== null ? formatDuration(kpis.avgQuestionTime) : "—", hint: "Average time per answered question." },
+          { label: "Sets to finish", value: String(kpis.pending), hint: "Assigned but not finished yet." },
         ]}
       />
 
@@ -369,20 +370,20 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
           <section id="weak-skills">
             <div className="mb-2 flex items-baseline justify-between gap-3">
               <h2 className="text-base font-semibold text-gray-900">Skill performance by difficulty</h2>
-              <p className="text-xs text-gray-500">Lowest accuracy first · assign practice from each row</p>
+              <p className="text-xs text-gray-500">Lowest score first · assign practice from each row</p>
             </div>
             <Card className="overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[36rem] text-sm">
                   <thead className="bg-gray-50 text-xs uppercase text-gray-500">
                     <tr>
-                      <th className="px-3 py-2 text-left">Skill · difficulty</th>
-                      <th className="px-3 py-2 text-right">Accuracy</th>
+                      <th className="px-3 py-2 text-left">Skill · level</th>
+                      <th className="px-3 py-2 text-right">% correct</th>
                       <th className="px-3 py-2 text-right">
-                        <span className="whitespace-nowrap">Avg time <InfoHint label="Average time per answered question in this skill and difficulty." /></span>
+                        <span className="whitespace-nowrap">Avg time <InfoHint label="Average time per answered question." /></span>
                       </th>
                       <th className="px-3 py-2 text-left">
-                        Suggested next step <InfoHint label="Rule of thumb from accuracy: below 50% re-teach, 50–74% review mistakes, 75%+ keep a short reinforcement." />
+                        Suggested next step <InfoHint label="Under 50%: re-teach · 50–74%: review mistakes · 75%+: light practice" />
                       </th>
                       <th className="px-3 py-2" />
                     </tr>
@@ -392,14 +393,14 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                       <tr key={bucket.key}>
                         <td className="px-3 py-2">
                           <span className="font-medium text-gray-800">{bucket.label}</span>
-                          <span className="ml-2 rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-gray-600">{bucket.difficulty}</span>
+                          <span className="ml-2 rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-gray-600">{difficultyLabel(bucket.difficulty)}</span>
                         </td>
                         <td className={`whitespace-nowrap px-3 py-2 text-right font-medium ${scoreBandTextClass(bucket.percent)}`}>{bucket.percent}% <span className="text-xs font-normal text-gray-400">({bucket.correct}/{bucket.total})</span></td>
                         <td className="px-3 py-2 text-right text-gray-500">{bucket.avgTime !== null ? formatTime(bucket.avgTime) : "-"}</td>
                         <td className="px-3 py-2 text-xs text-gray-600">{bucket.recommendation}</td>
                         <td className="px-3 py-2 text-right">
                           {bucket.assignableIds.length > 0 ? (
-                            <Hint label={`Opens the assign form filtered to ${bucket.label} · ${bucket.difficulty} with the ${bucket.assignableIds.length} available set${bucket.assignableIds.length === 1 ? "" : "s"} preselected (not assigned yet, completed or overdue).`}>
+                            <Hint label={`Assign ${bucket.assignableIds.length} more ${bucket.label} set${bucket.assignableIds.length === 1 ? "" : "s"} at this level.`}>
                               <Link
                                 href={assignHref({ topic: bucket.topicId, difficulty: bucket.difficulty }, { domain: bucket.domainId, sets: bucket.assignableIds.join(",") })}
                                 className="whitespace-nowrap text-xs font-medium text-blue-600 hover:underline"
@@ -408,9 +409,9 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                               </Link>
                             </Hint>
                           ) : bucket.pendingCount > 0 ? (
-                            <Hint label="Every set of this skill and difficulty is already assigned and not finished yet. See it under Active practice sets.">
+                            <Hint label="Assigned but not finished yet. See Active practice sets.">
                               <a href="#active-sets" className="whitespace-nowrap text-xs text-gray-400 hover:underline">
-                                Pending ({bucket.pendingCount})
+                                {bucket.pendingCount} assigned
                               </a>
                             </Hint>
                           ) : null}
@@ -421,7 +422,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                 </table>
               </div>
               {report.weakSkills.length === 0 && (
-                <p className="py-10 text-center text-sm text-gray-500">No submitted {areaLabel.toLowerCase()} answers for this student yet.</p>
+                <p className="py-10 text-center text-sm text-gray-500">No finished {areaLabel} work for this student yet.</p>
               )}
             </Card>
           </section>
@@ -439,7 +440,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                     {a.dueDate && <span className="text-[11px] text-gray-400">Due {formatDate(a.dueDate)}</span>}
                   </div>
                 </div>
-                <Hint label={a.status === "OVERDUE" ? "Open it again for the student, optionally with a new due date." : "Change due date, unlock date or feedback mode. The student's progress is kept."}>
+                <Hint label={a.status === "OVERDUE" ? "Give it to the student again, with a new due date if you like." : "Change the due date, open date or when answers are shown. The student's progress is kept."}>
                   <Link
                     href={assignHref({ topic: a.topicId, difficulty: a.difficulty }, { sets: a.practiceSetId })}
                     className="shrink-0 text-xs font-medium text-blue-600 hover:underline"
@@ -453,9 +454,9 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
 
           <SidePanel
             id="recent-attempts"
-            title="Recent attempts"
+            title="Recent work"
             count={report.attemptHistory.length}
-            empty={`No completed ${areaLabel} attempts yet.`}
+            empty={`No finished ${areaLabel} work yet.`}
             footer={
               <Pagination
                 basePath={`/teacher/students/${studentId}`}
@@ -522,12 +523,12 @@ function StatusBadge({ status }: { status: string }) {
   const variant = status === "IN_PROGRESS" ? "warning" : status === "OVERDUE" ? "danger" : "info";
   const help: Record<string, string> = {
     PENDING: "Assigned, not started yet.",
-    IN_PROGRESS: "The student started it and has not submitted.",
-    OVERDUE: "The due date passed before the student submitted it.",
+    IN_PROGRESS: "The student started it but hasn't finished.",
+    OVERDUE: "The due date passed before the student finished it.",
   };
   return (
     <span title={help[status]}>
-      <Badge variant={variant}>{status.replace("_", " ")}</Badge>
+      <Badge variant={variant}>{assignmentStatusLabel(status)}</Badge>
     </span>
   );
 }

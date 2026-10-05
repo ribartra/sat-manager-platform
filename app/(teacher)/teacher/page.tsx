@@ -328,7 +328,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
         </label>
         )}
         <div className="flex items-center gap-2">
-          <button type="submit" title="Search, group and start date choose which students are listed; skill and difficulty change the scores shown." className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700">
+          <button type="submit" title="Apply filters" className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700">
             Apply
           </button>
           <Link href={`/teacher?area=${area}`} className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
@@ -344,7 +344,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
             <div className="space-y-0.5">
               {inactiveStudents.length > 0 && <p><strong>{inactiveStudents.length} student{inactiveStudents.length > 1 ? "s" : ""}</strong> haven&apos;t practiced in 5+ days: {inactiveStudents.map((s) => s.name).join(", ")}</p>}
               {(overdueAssignments.length > 0 || overdueFullTestAssignments.length > 0) && <p><strong>{overdueAssignments.length + overdueFullTestAssignments.length}</strong> overdue assignment{overdueAssignments.length + overdueFullTestAssignments.length > 1 ? "s" : ""} need attention.</p>}
-              {unlockRequests.length > 0 && <p><strong>{unlockRequests.length}</strong> pending unlock request{unlockRequests.length > 1 ? "s" : ""}.</p>}
+              {unlockRequests.length > 0 && <p><strong>{unlockRequests.length}</strong> unlock request{unlockRequests.length > 1 ? "s" : ""} waiting for you.</p>}
             </div>
           </div>
         </Alert>
@@ -357,7 +357,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
               <p className="text-xs font-medium text-red-700">Low performance</p>
               <p className="mt-1 truncate text-sm font-semibold text-gray-900">{bucket.label}</p>
               <p className="mt-1 text-xs text-gray-600">
-                {bucket.score}% avg · {bucket.attempts} attempt{bucket.attempts !== 1 ? "s" : ""}
+                {bucket.score}% average · {bucket.attempts} result{bucket.attempts !== 1 ? "s" : ""}
               </p>
             </Card>
           ))}

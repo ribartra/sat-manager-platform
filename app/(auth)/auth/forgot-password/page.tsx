@@ -46,7 +46,7 @@ export default function ForgotPasswordPage() {
           </p>
 
           {sent ? (
-            <Alert tone="success">If that email is registered, a reset link has been sent. Check your inbox.</Alert>
+            <Alert tone="success">If that email has an account, we sent you a link to reset your password. Check your inbox.</Alert>
           ) : (
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" noValidate>
@@ -65,7 +65,7 @@ export default function ForgotPasswordPage() {
                   />
                 </FormSection>
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Sending..." : "Send Reset Link"}
+                  {loading ? "Sending…" : "Send reset link"}
                 </Button>
               </form>
             </Form>

@@ -7,7 +7,7 @@ import { BadRequestError, withApiErrors } from "@/lib/api-error";
 
 export const GET = withApiErrors(async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get("token");
-  if (!token) return new BadRequestError("Missing token").toResponse();
+  if (!token) return new BadRequestError("This invitation link is incomplete. Please use the full link from the email.").toResponse();
   const limited = checkRateLimit(rateLimitKey(req, "invite-info", token.slice(0, 12)), 20, 15 * 60 * 1000);
   if (!limited.allowed) return rateLimitResponse(limited.resetAt);
 
@@ -27,7 +27,7 @@ export const GET = withApiErrors(async function GET(req: NextRequest) {
         tokenPrefix: token.slice(0, 8),
       },
     });
-    return new BadRequestError("Invalid or expired token").toResponse();
+    return new BadRequestError("This invitation link doesn't work or has expired. Ask your teacher for a new one.").toResponse();
   }
   if (!invite.tokenHash) {
     await prisma.inviteToken.update({ where: { id: invite.id }, data: { tokenHash, token: `hashed:${tokenHash}` } });

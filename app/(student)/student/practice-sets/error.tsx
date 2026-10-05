@@ -5,10 +5,10 @@ import { RouteError } from "@/components/sat/route-error";
 export default function PracticeSetsError({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
   return (
     <RouteError
-      title="Practice Sets could not be loaded"
-      description="Please try again. Your saved progress was not changed."
+      title="We couldn't load your practice sets"
+      description="Something went wrong loading this page. Please try again."
       reset={reset}
-      back={{ href: "/login", label: "Sign in again" }}
+      back={{ href: "/student", label: "Back to home" }}
       autoRetryKey="sat-practice-sets-auto-retry-at"
     />
   );

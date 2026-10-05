@@ -10,7 +10,7 @@ import { BadRequestError, InternalServerError, withApiErrors } from "@/lib/api-e
 
 export const POST = withApiErrors(async function POST(req: NextRequest) {
   const { token, password } = await req.json();
-  if (!token || !password) return new BadRequestError("Invalid request").toResponse();
+  if (!token || !password) return new BadRequestError("Something is missing. Please fill in the form again.").toResponse();
   const limited = checkRateLimit(rateLimitKey(req, "reset-password", token.slice(0, 12)), 10, 15 * 60 * 1000);
   if (!limited.allowed) return rateLimitResponse(limited.resetAt);
 
@@ -27,7 +27,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
           reason: !reset ? "not_found" : reset.usedAt ? "already_used" : "expired",
         },
       });
-      return new BadRequestError("This link is invalid or has expired.").toResponse();
+      return new BadRequestError("This link doesn't work or has expired. Ask for a new reset link.").toResponse();
     }
     if (!reset.tokenHash) {
       await prisma.passwordResetToken.update({ where: { id: reset.id }, data: { tokenHash, token: `hashed:${tokenHash}` } });
@@ -58,6 +58,6 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
     await captureCaughtError("auth.reset-password", error, {
       metadata: { tokenPrefix: String(token).slice(0, 8) },
     });
-    return new InternalServerError("Password reset failed.").toResponse();
+    return new InternalServerError("We couldn't reset your password. Please try again.").toResponse();
   }
 });

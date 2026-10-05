@@ -142,10 +142,12 @@ export function ParentsClient({ parents, students }: { parents: Parent[]; studen
     }
     const payload = await response.json();
     if (payload.emailSent) {
-      setShareStatus(`Single-use report link sent to ${payload.parentEmail} (${payload.sections}).`);
+      setShareStatus(`Report link emailed to ${payload.parentEmail} (${payload.sections}).`);
     } else {
       setShareStatus(
-        `Link created, but the email was not sent (${payload.emailReason === "SMTP_NOT_CONFIGURED" ? "SMTP not configured" : "send failed"}). Configure SMTP in Admin → Settings.`
+        payload.emailReason === "SMTP_NOT_CONFIGURED"
+          ? "Link created, but the email was not sent. Email isn't set up yet. Ask your administrator."
+          : "Link created, but the email could not be delivered."
       );
     }
   }
@@ -283,7 +285,7 @@ export function ParentsClient({ parents, students }: { parents: Parent[]; studen
             <DialogHeader>
               <DialogTitle>Share progress with parent</DialogTitle>
               <DialogDescription>
-                Pick a student and the sections to include, then email a single-use report link to the associated parent
+                Pick a student and the sections to include, then email a report link to the parent
                 {activeParent ? ` (${activeParent.email})` : ""}. Or download the PDF.
               </DialogDescription>
             </DialogHeader>

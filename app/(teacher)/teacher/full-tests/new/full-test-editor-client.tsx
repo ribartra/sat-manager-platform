@@ -21,7 +21,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { FormSection } from "@/components/sat";
-import { fullTestStatusOptions } from "@/lib/domain-meta";
+import { difficultyLabel, fullTestStatusOptions, humanizeCode, questionTypeLabel } from "@/lib/domain-meta";
 import { FULL_TEST_MODULES } from "@/lib/full-test-modules";
 import { validateFullPracticeTestStructure } from "@/lib/full-test-validation";
 import {
@@ -147,10 +147,9 @@ export function FullTestEditor({
       <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} className="space-y-5" noValidate>
         <Card padding="md" className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-xs font-medium uppercase text-gray-400">PDF/DOCX Import</p>
-            <h2 className="text-sm font-semibold text-gray-900">Create a review batch for this Full Practice Test</h2>
+            <h2 className="text-sm font-semibold text-gray-900">Import questions from a file</h2>
             <p className="mt-1 text-xs text-gray-500">
-              Upload all modules, answer keys and explanation files together so the engine can pair questions with answers before review.
+              Upload the test and answer files. You&apos;ll check the questions before they&apos;re added.
             </p>
           </div>
           <ImportQuestionnaireButton mode="FULL_PRACTICE_TEST" defaultName={name || "Full Practice Test PDF import"} />
@@ -201,7 +200,7 @@ export function FullTestEditor({
                       ref={field.ref}
                       name={field.name}
                     />
-                    Show review after submit
+                    Show answers after the exam
                   </label>
                 </FormItem>
               )}
@@ -231,10 +230,9 @@ export function FullTestEditor({
         </FormSection>
 
         <Card padding="sm" className="text-xs text-gray-600">
-          <p className="font-medium text-gray-800">SAT policy (fixed)</p>
+          <p className="font-medium text-gray-800">Exam layout (fixed)</p>
           <p className="mt-1">
-            4 groups: RW M1/M2 (32 min) + Math M1/M2 (35 min). Pretest exclusion follows Admin Settings
-            (RW 54 / Math 44 questions count; 50 / 40 when pretest is excluded).{" "}
+            Same layout as the real SAT: 2 Reading &amp; Writing modules (32 min each) and 2 Math modules (35 min each).{" "}
             <Link className="text-blue-600 hover:underline" href="/teacher/full-tests/scoring">
               How scores are calculated
             </Link>
@@ -261,7 +259,7 @@ export function FullTestEditor({
                 <div>
                   <h2 className="text-sm font-semibold text-gray-900">{module.name}</h2>
                   <p className="text-xs text-gray-500">
-                    Skill {moduleKey} · {moduleKey === "M1" ? "EASY" : "HARD"} ·{" "}
+                    Module {moduleKey === "M1" ? 1 : 2} ·{" "}
                     {Math.round(module.timeLimit / 60)} min
                   </p>
                 </div>
@@ -296,8 +294,8 @@ export function FullTestEditor({
                         meta={
                           <>
                             <span className="text-[10px] font-medium uppercase text-gray-400">
-                              {question.section} · {question.difficulty}
-                              {question.type ? ` · ${question.type}` : ""}
+                              {question.section === "MATH" ? "Math" : question.section === "RW" || question.section === "READING_WRITING" ? "Reading & Writing" : humanizeCode(question.section)} · {difficultyLabel(question.difficulty)}
+                              {question.type ? ` · ${questionTypeLabel(question.type, true)}` : ""}
                             </span>
                           </>
                         }

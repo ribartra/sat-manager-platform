@@ -1,6 +1,7 @@
 import { Alert } from "./alert";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { humanizeCode } from "@/lib/domain-meta";
 
 /**
  * Attempts are atomic: an invalidated attempt stays in the history exactly as it was, but it
@@ -25,17 +26,17 @@ export function VoidableValue({ status, children, className }: { status: string 
 
 export function AttemptStatusBadge({ status }: { status: string }) {
   if (status === "SUBMITTED") return <Badge variant="success">Submitted</Badge>;
-  if (status === INVALIDATED) return <Badge variant="default">Invalidated</Badge>;
+  if (status === INVALIDATED) return <Badge variant="default">Not counted</Badge>;
   if (status === "IN_PROGRESS") return <Badge variant="warning">In progress</Badge>;
-  return <Badge variant="default">{status}</Badge>;
+  return <Badge variant="default">{humanizeCode(status)}</Badge>;
 }
 
 export function InvalidatedNotice({ audience }: { audience: "student" | "teacher" }) {
   return (
-    <Alert tone="note" role="note" title="This attempt was invalidated" className="mb-6">
+    <Alert tone="note" role="note" title="This result doesn't count" className="mb-6">
       {audience === "student"
-        ? "Your teacher invalidated this attempt. It stays in your history for reference but does not count toward any score or average."
-        : "It stays in the history for reference but does not count toward any score, average, report or analytics."}
+        ? "Your teacher set this result aside. You can still review it, but it doesn't count toward your scores."
+        : "It stays in the history for reference, but it doesn't count toward scores or reports."}
     </Alert>
   );
 }

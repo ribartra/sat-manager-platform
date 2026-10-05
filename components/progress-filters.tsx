@@ -98,7 +98,7 @@ export function ProgressFilters({
         <div className="flex items-center gap-2">
           <button
             type="submit"
-            title="Scores and charts use every question matching these filters (blank answers count as incorrect)."
+            title="Blank answers count as wrong."
             className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700"
           >
             Apply

@@ -13,6 +13,8 @@ import {
   difficultyLabel,
   fullTestStatusBadgeVariant,
   fullTestStatusLabel,
+  assignmentStatusLabel,
+  questionTypeLabel,
 } from "@/lib/domain-meta";
 import { resolveQuestionType } from "@/lib/question-type";
 import { FullTestActions } from "../full-test-actions-client";
@@ -90,10 +92,9 @@ export default async function FullTestDetailPage({ params, searchParams }: PageP
             <Card key={module.id} padding="md">
               <p className="text-sm font-semibold text-gray-900">{module.name}</p>
               <p className="mt-1 text-xs text-gray-500">
-                {module.section} · skill {moduleKey} · {Math.round(module.timeLimit / 60)} min
+                Module {moduleKey === "M1" ? 1 : 2} · {Math.round(module.timeLimit / 60)} min
               </p>
               <p className="mt-2 text-lg font-semibold text-gray-900">{module.questions.length} Q</p>
-              <p className="text-[11px] text-gray-400">Pretest exclusion follows Admin Settings</p>
             </Card>
           );
         })}
@@ -109,7 +110,7 @@ export default async function FullTestDetailPage({ params, searchParams }: PageP
                   <div>
                     <h2 className="text-sm font-semibold text-gray-900">{module.name}</h2>
                     <p className="text-xs text-gray-500">
-                      {module.section} · skill {moduleKey} · {Math.round(module.timeLimit / 60)} min ·{" "}
+                      Module {moduleKey === "M1" ? 1 : 2} · {Math.round(module.timeLimit / 60)} min ·{" "}
                       {module.questions.length} questions
                     </p>
                   </div>
@@ -126,7 +127,7 @@ export default async function FullTestDetailPage({ params, searchParams }: PageP
                             <Badge variant={difficultyBadgeVariant(item.question.difficulty)}>
                               {difficultyLabel(item.question.difficulty)}
                             </Badge>
-                            <Badge variant="default">{resolveQuestionType(item.question.type, item.question.options)}</Badge>
+                            <Badge variant="default">{questionTypeLabel(resolveQuestionType(item.question.type, item.question.options), true)}</Badge>
                             <Badge variant="default">{item.question.topic.name}</Badge>
                           </>
                         }
@@ -169,7 +170,7 @@ export default async function FullTestDetailPage({ params, searchParams }: PageP
                   <div key={assignment.id} className="rounded-md border border-gray-100 px-3 py-2">
                     <p className="text-sm font-medium text-gray-900">{assignment.student.name}</p>
                     <p className="text-xs text-gray-500">
-                      {assignment.status}
+                      {assignmentStatusLabel(assignment.status)}
                       {assignment.dueDate ? ` · due ${assignment.dueDate.toLocaleDateString()}` : ""}
                     </p>
                     {progress && (
@@ -200,7 +201,7 @@ export default async function FullTestDetailPage({ params, searchParams }: PageP
           <Card id="recent-attempts">
             <CardHeader>
               <h2 className="flex items-center justify-between text-sm font-semibold text-gray-900">
-                Recent Attempts <span className="text-xs font-normal text-gray-400">{test.attempts.length}</span>
+                Recent results <span className="text-xs font-normal text-gray-400">{test.attempts.length}</span>
               </h2>
             </CardHeader>
             <CardBody className="space-y-2">
@@ -217,7 +218,7 @@ export default async function FullTestDetailPage({ params, searchParams }: PageP
                   </p>
                 </Link>
               ))}
-              {test.attempts.length === 0 && <p className="text-sm text-gray-400">No attempts yet.</p>}
+              {test.attempts.length === 0 && <p className="text-sm text-gray-400">Nobody has taken this exam yet.</p>}
             </CardBody>
             <Pagination
               basePath={`/teacher/full-tests/${test.id}`}

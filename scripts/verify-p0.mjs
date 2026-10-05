@@ -81,7 +81,7 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
-    requires: ["loadPracticeReport", "Average score", "Total time", "PerformanceBreakdown", "Skill performance by difficulty", "Teacher Comments", "GenerateReportDialog"],
+    requires: ["loadPracticeReport", "Questions correct", "Total time", "PerformanceBreakdown", "Skill performance by difficulty", "Teacher Comments", "GenerateReportDialog"],
     label: "Pagina del alumno (ex reporte individual) incluye score ponderado, dificultad, skills debiles, comentarios y PDF",
   },
   {
@@ -101,7 +101,7 @@ const checks = [
   },
   {
     file: "lib/pdf/student-report-document.tsx",
-    requires: ["renderToBuffer", "Helvetica-Bold", "Average score", "Performance by skill and difficulty", "Skill performance by difficulty", "Teacher comments", "totalPages", "Scores by exam"],
+    requires: ["renderToBuffer", "Helvetica-Bold", "Questions correct", "Performance by skill and difficulty", "Skills to work on next", "Teacher comments", "totalPages", "Scores by exam"],
     label: "PDF presentable (backend, sin navegador): score ponderado, secciones por area, paginacion y resumen",
   },
   {
@@ -136,7 +136,7 @@ const checks = [
   },
   {
     file: "app/(student)/student/full-tests/[assignmentId]/player-client.tsx",
-    requires: ["savedAnswers", "savedModule", "savedProgressState", "recordQuestionTime", "timeSpentByQuestion", "Pause & Exit"],
+    requires: ["savedAnswers", "savedModule", "savedProgressState", "recordQuestionTime", "timeSpentByQuestion", "Save & exit"],
     label: "Player FPT reanuda respuestas, posicion, timer y tiempos por pregunta",
   },
   {
@@ -146,7 +146,7 @@ const checks = [
   },
   {
     file: "app/(student)/student/full-tests/results/[attemptId]/page.tsx",
-    requires: ["By Module", "including blanks", "timeSpent", "StatsPanel", "Extra time used", "overtimeByModule"],
+    requires: ["By module", "Blank answers count as wrong.", "timeSpent", "StatsPanel", "Extra time used", "overtimeByModule"],
     // "By Skill" grouped the per-section placeholder topics (R&W M1 + Math M1 mixed): removed on purpose.
     forbids: ["By Skill"],
     label: "Resultados FPT muestran review por modulo, tiempo extra y preguntas absolutas (sin By Skill)",

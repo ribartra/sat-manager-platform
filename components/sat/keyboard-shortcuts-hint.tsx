@@ -7,9 +7,9 @@ import { usePlayerShortcuts, type PlayerShortcutHandlers } from "@/hooks/use-pla
 /** Visible, focusable summary of the player keyboard shortcuts (usePlayerShortcuts). */
 export function KeyboardShortcutsHint({ choices = true }: { choices?: boolean }) {
   const label = [
-    "← / → previous / next question",
+    "← / → go back / next",
     choices ? "A–D or 1–4 choose an answer" : null,
-    "M flag the question for review",
+    "M mark for review",
   ]
     .filter(Boolean)
     .join(" · ");

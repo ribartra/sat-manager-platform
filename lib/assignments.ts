@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import { writeAudit } from "@/lib/audit";
 import { withSqliteRetry } from "@/lib/sqlite-retry";
 import { notifyUser } from "@/lib/notifications";
+import { shortSetName } from "@/lib/student-report";
 import { isUniqueConstraintError } from "@/lib/db-errors";
 
 const OPEN_FOR_OVERDUE = { in: ["PENDING", "IN_PROGRESS"] };
@@ -37,7 +38,7 @@ export async function releaseScheduledUnlocks(now = new Date()) {
     }),
   );
   for (const assignment of due) {
-    await notifyUser(assignment.studentId, "Practice Set unlocked", `${assignment.practiceSet.name} is available now.`, "/student");
+    await notifyUser(assignment.studentId, "Practice Set unlocked", `${shortSetName(assignment.practiceSet.name)} is open now.`, "/student");
     await writeAudit({
       action: "AUTO_UNLOCK_ASSIGNMENT",
       targetType: "Assignment",

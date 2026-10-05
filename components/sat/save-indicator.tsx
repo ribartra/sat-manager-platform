@@ -6,9 +6,9 @@ export type SaveStatus = "idle" | "saving" | "saved" | "offline" | "syncing" | "
 const LABELS: Record<Exclude<SaveStatus, "idle">, string> = {
   saving: "Saving…",
   saved: "Saved",
-  offline: "Saved locally",
-  syncing: "Syncing…",
-  error: "Sync problem",
+  offline: "Saved (offline)",
+  syncing: "Saving…",
+  error: "Not saved yet — retrying…",
 };
 
 interface SaveIndicatorProps extends React.HTMLAttributes<HTMLSpanElement> {
@@ -52,7 +52,7 @@ export function OfflineBanner({ online }: { online: boolean }) {
   if (online) return null;
   return (
     <Alert tone="warning" layout="banner" className="justify-center text-center font-medium">
-      You are offline. Your answers are saved on this device and will sync when the connection returns.
+      You&apos;re offline. Keep working — your answers are saved and will upload when you&apos;re back online.
     </Alert>
   );
 }

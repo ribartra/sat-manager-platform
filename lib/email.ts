@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 import { getSmtpConfig } from "@/lib/smtp-settings";
 import { captureCaughtError, writeAudit } from "@/lib/audit";
+import { PARENT_ACCESS_WINDOW_DAYS, PARENT_ACTIVATION_DEADLINE_DAYS } from "@/lib/parent-access";
 
 export type EmailAttachment = { filename: string; content: Buffer; contentType?: string };
 
@@ -100,26 +101,32 @@ export async function sendStudentInviteEmail(to: string, studentName: string, in
   });
 }
 
+/** "Hello Ana," or just "Hello," when we do not know the parent's name. */
+function greeting(name: string | null) {
+  return name ? `Hello ${name},` : "Hello,";
+}
+
+const REPORT_COLOR_KEY = "Green = strong (80%+), yellow = getting there (60–79%), red = needs work. Reply to this email with any questions.";
+
 export async function sendParentConsentEmail(to: string, parentName: string | null, studentName: string, consentUrl: string) {
-  const displayName = parentName || "Parent/Guardian";
-  const safeParent = escapeHtml(displayName);
+  const safeGreeting = escapeHtml(greeting(parentName));
   const safeStudent = escapeHtml(studentName);
   const safeUrl = escapeHtml(consentUrl);
 
   return sendTransactionalEmail({
     to,
-    subject: "Authorize SAT Practice account enrollment",
+    subject: `Please approve ${studentName}'s SAT Practice account`,
     text: [
-      `Hello ${displayName},`,
+      greeting(parentName),
       "",
-      `${studentName} has been invited to SAT Practice. Please authorize the enrollment here:`,
+      `${studentName} has been invited to SAT Practice. Click below to give permission:`,
       consentUrl,
       "",
       "This link expires in 7 days.",
     ].join("\n"),
     html: `
-      <p>Hello ${safeParent},</p>
-      <p>${safeStudent} has been invited to SAT Practice. Please authorize the enrollment here:</p>
+      <p>${safeGreeting}</p>
+      <p>${safeStudent} has been invited to SAT Practice. Click below to give permission:</p>
       <p><a href="${safeUrl}">${safeUrl}</a></p>
       <p>This link expires in 7 days.</p>
     `,
@@ -127,8 +134,7 @@ export async function sendParentConsentEmail(to: string, parentName: string | nu
 }
 
 export async function sendParentInviteEmail(to: string, parentName: string | null, studentName: string, inviteUrl: string) {
-  const displayName = parentName || "Parent/Guardian";
-  const safeParent = escapeHtml(displayName);
+  const safeGreeting = escapeHtml(greeting(parentName));
   const safeStudent = escapeHtml(studentName);
   const safeUrl = escapeHtml(inviteUrl);
 
@@ -136,16 +142,16 @@ export async function sendParentInviteEmail(to: string, parentName: string | nul
     to,
     subject: "Create your SAT Practice parent account",
     text: [
-      `Hello ${displayName},`,
+      greeting(parentName),
       "",
-      `${studentName} has been invited to SAT Practice. Create your parent account to follow their progress and approve their enrollment:`,
+      `${studentName} has been invited to SAT Practice. Create your parent account to follow their progress and approve their account:`,
       inviteUrl,
       "",
       "This link expires in 7 days.",
     ].join("\n"),
     html: `
-      <p>Hello ${safeParent},</p>
-      <p>${safeStudent} has been invited to SAT Practice. Create your parent account to follow their progress and approve their enrollment:</p>
+      <p>${safeGreeting}</p>
+      <p>${safeStudent} has been invited to SAT Practice. Create your parent account to follow their progress and approve their account:</p>
       <p><a href="${safeUrl}">${safeUrl}</a></p>
       <p>This link expires in 7 days.</p>
     `,
@@ -159,30 +165,33 @@ export async function sendParentReportEmail(
   reportUrl: string,
   sectionsLabel: string
 ) {
-  const displayName = parentName || "Parent/Guardian";
-  const safeParent = escapeHtml(displayName);
+  const safeGreeting = escapeHtml(greeting(parentName));
   const safeStudent = escapeHtml(studentName);
   const safeUrl = escapeHtml(reportUrl);
   const safeSections = escapeHtml(sectionsLabel);
+  const linkNote = `Please open the link within ${PARENT_ACTIVATION_DEADLINE_DAYS} days. After you open it, you can view the report for ${PARENT_ACCESS_WINDOW_DAYS} days.`;
 
   return sendTransactionalEmail({
     to,
-    subject: `${studentName}'s SAT Practice progress report`,
+    subject: `${studentName}'s SAT progress report`,
     text: [
-      `Hello ${displayName},`,
+      greeting(parentName),
       "",
-      `Your child's teacher has shared a progress report for ${studentName} (${sectionsLabel}).`,
+      `${studentName}'s teacher shared an SAT Practice progress report (${sectionsLabel}).`,
       "Open this link to view it:",
       reportUrl,
       "",
-      "The link activates the first time you open it and stays available for 7 days after that.",
+      linkNote,
+      "",
+      REPORT_COLOR_KEY,
     ].join("\n"),
     html: `
-      <p>Hello ${safeParent},</p>
-      <p>Your child's teacher has shared a progress report for <strong>${safeStudent}</strong> (${safeSections}).</p>
+      <p>${safeGreeting}</p>
+      <p><strong>${safeStudent}</strong>'s teacher shared an SAT Practice progress report (${safeSections}).</p>
       <p>Open this link to view it:</p>
       <p><a href="${safeUrl}">${safeUrl}</a></p>
-      <p>The link activates the first time you open it and stays available for 7 days after that.</p>
+      <p>${escapeHtml(linkNote)}</p>
+      <p>${escapeHtml(REPORT_COLOR_KEY)}</p>
     `,
   });
 }
@@ -195,24 +204,26 @@ export async function sendParentReportPdfEmail(
   reportLabel: string,
   attachment: EmailAttachment,
 ) {
-  const displayName = parentName || "Parent/Guardian";
-  const safeParent = escapeHtml(displayName);
+  const safeGreeting = escapeHtml(greeting(parentName));
   const safeStudent = escapeHtml(studentName);
   const safeLabel = escapeHtml(reportLabel);
 
   return sendTransactionalEmail({
     to,
-    subject: `${studentName}'s SAT progress report (${reportLabel})`,
+    subject: `${studentName}'s SAT progress report`,
     text: [
-      `Hello ${displayName},`,
+      greeting(parentName),
       "",
-      `Your child's teacher has shared a progress report for ${studentName} (${reportLabel}).`,
+      `${studentName}'s teacher shared an SAT Practice progress report (${reportLabel}).`,
       "The report is attached to this email as a PDF.",
+      "",
+      REPORT_COLOR_KEY,
     ].join("\n"),
     html: `
-      <p>Hello ${safeParent},</p>
-      <p>Your child's teacher has shared a progress report for <strong>${safeStudent}</strong> (${safeLabel}).</p>
+      <p>${safeGreeting}</p>
+      <p><strong>${safeStudent}</strong>'s teacher shared an SAT Practice progress report (${safeLabel}).</p>
       <p>The report is attached to this email as a PDF.</p>
+      <p>${escapeHtml(REPORT_COLOR_KEY)}</p>
     `,
     attachments: [{ contentType: "application/pdf", ...attachment }],
   });

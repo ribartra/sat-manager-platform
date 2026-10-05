@@ -43,8 +43,8 @@ interface SendResult {
   reason: string | null;
 }
 const SEND_REASON: Record<string, string> = {
-  SMTP_NOT_CONFIGURED: "email is not configured (Admin → Settings)",
-  SEND_FAILED: "the mail server rejected it",
+  SMTP_NOT_CONFIGURED: "email isn't set up yet. Ask your administrator",
+  SEND_FAILED: "the email could not be delivered",
 };
 export function GenerateReportDialog({
   studentId,
@@ -160,7 +160,7 @@ export function GenerateReportDialog({
         if (next && previewQuery === null) schedulePreview(selected, 0);
       }}
     >
-      <Hint label="Build a printable PDF report for this student: pick the areas, preview it, then download. Several areas are combined into one file.">
+      <Hint label="Make a PDF report for this student. Pick the areas, preview it, then download or email it.">
         <DialogTrigger asChild>
           <button type="button" className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-gray-300 bg-white px-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
             <FileText size={14} /> {triggerLabel ?? "Generate Report"}
@@ -171,7 +171,7 @@ export function GenerateReportDialog({
         <DialogHeader>
           <DialogTitle>Progress report · {studentName}</DialogTitle>
           <DialogDescription>
-            One section per selected area, in a single PDF. {filterSummary ? `Filters: ${filterSummary}.` : "No filters (all activity)."} Skill and difficulty apply to Math, Reading and Writing; dates apply to all.
+            One section per area, in a single PDF. {filterSummary ? `Filters: ${filterSummary}.` : "No filters (all activity)."}
           </DialogDescription>
         </DialogHeader>
 
@@ -265,7 +265,7 @@ export function GenerateReportDialog({
                 onClick={() => void sendToParents()}
                 disabled={sending}
                 disabledReason={!query ? "Choose at least one area for the report." : recipients.size === 0 ? "Select at least one parent." : null}
-                title="Send this exact PDF as an email attachment to the selected parents"
+                title="Email this PDF to the selected parents"
               >
                 {sending ? <Loader2 size={14} className="animate-spin" /> : <Mail size={14} />} Send PDF
               </Button>

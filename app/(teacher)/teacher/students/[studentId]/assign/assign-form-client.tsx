@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { Tag } from "lucide-react";
-import { explanationVisibilityOptions, difficultyLabel, difficultyOptions } from "@/lib/domain-meta";
+import { assignmentStatusLabel, explanationVisibilityOptions, difficultyLabel, difficultyOptions } from "@/lib/domain-meta";
 import { practiceAreaLabel, type PracticeAreaCode } from "@/lib/practice-area";
 import { InlineError } from "@/components/sat/alert";
 import { errorMessage, readApiError } from "@/lib/api-client";
@@ -36,7 +36,7 @@ function assignmentHint(assignment: PracticeSetInfo["assignment"]) {
   if (!assignment) return null;
   switch (assignment.status) {
     case "PENDING":
-      return { label: "Pending", action: "will update", className: "text-blue-600" };
+      return { label: "Not started", action: "will update", className: "text-blue-600" };
     case "IN_PROGRESS":
       return { label: "In progress", action: "will update", className: "text-amber-600" };
     case "OVERDUE":
@@ -44,7 +44,7 @@ function assignmentHint(assignment: PracticeSetInfo["assignment"]) {
     case "COMPLETED":
       return { label: "Completed", action: "will reassign", className: "text-emerald-600" };
     default:
-      return { label: assignment.status, action: "", className: "text-gray-500" };
+      return { label: assignmentStatusLabel(assignment.status), action: "", className: "text-gray-500" };
   }
 }
 
@@ -162,7 +162,7 @@ export function AssignForm({
     const reassigned = Number(data.reassigned) || 0;
     if (created + updated + reassigned === 0) {
       setSuccess(false);
-      setError("Nothing changed: the selected sets are already pending with these settings.");
+      setError("Nothing changed: the selected sets are already assigned with these settings.");
       return;
     }
     setSuccessMessage(
@@ -275,7 +275,7 @@ export function AssignForm({
       {/* Practice set selector */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <label className="text-sm font-medium text-gray-700">Select Practice Sets</label>
+          <label className="text-sm font-medium text-gray-700">Select practice sets</label>
         </div>
         <Card className="max-h-80 overflow-y-auto overflow-hidden">
           {filtered.map((ps) => (
@@ -317,28 +317,28 @@ export function AssignForm({
       {/* Options */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Due Date (optional)</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Due date (optional)</label>
           <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
           <p className="mt-1 text-xs text-gray-400">
-            Due at the end of that day. Empty: no due date; sets already pending keep their current due date.
+            Due at the end of that day. Leave blank for no due date.
           </p>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Unlock Date (optional)</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Open date (optional)</label>
           <Input type="date" value={unlockAt} onChange={(e) => setUnlockAt(e.target.value)} />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Feedback mode</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">When to show answers</label>
           <Select value={feedbackMode} onChange={(e) => setFeedbackMode(e.target.value as "AFTER_SET" | "IMMEDIATE")}>
-            <option value="AFTER_SET">After set (default) — no Check until submit</option>
-            <option value="IMMEDIATE">Immediate — Check after each answer</option>
+            <option value="AFTER_SET">Show answers at the end</option>
+            <option value="IMMEDIATE">Show the answer after each question</option>
           </Select>
           <p className="mt-1 text-xs text-gray-400">
-            Applies to the whole Practice Set for this assignment. Mocks never use Immediate.
+            Applies to the whole practice set.
           </p>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Explanation Visibility</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Explanations</label>
           <Select value={explVisibility} onChange={(e) => setExplVisibility(e.target.value)}>
             {explanationVisibilityOptions().map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -347,7 +347,7 @@ export function AssignForm({
             ))}
           </Select>
           <p className="mt-1 text-xs text-gray-400">
-            Set-level content visibility (legacy). Feedback mode above controls the Check button.
+            When the student can see the explanations.
           </p>
         </div>
       </div>
@@ -360,7 +360,7 @@ export function AssignForm({
           className="rounded border-gray-300 text-blue-600"
         />
         <label htmlFor="lock" className="text-sm text-gray-700">
-          Lock on assign (unlock manually later)
+          Keep it locked for now (you unlock it later)
         </label>
       </div>
 
@@ -370,7 +370,7 @@ export function AssignForm({
       <InlineError>{error}</InlineError>
 
       <div className="flex items-center gap-3">
-        <Button onClick={handleAssign} disabled={loading} disabledReason={selected.size === 0 ? "Select at least one Practice Set." : null}>
+        <Button onClick={handleAssign} disabled={loading} disabledReason={selected.size === 0 ? "Select at least one practice set." : null}>
           {loading ? "Assigning..." : `Assign ${selected.size > 0 ? `(${selected.size})` : ""}`}
         </Button>
         <Button variant="secondary" onClick={() => router.back()}>Cancel</Button>

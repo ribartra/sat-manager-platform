@@ -36,7 +36,7 @@ function consentLinkFailureReason(invite: {
 
 export const GET = withApiErrors(async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get("token");
-  if (!token) return new BadRequestError("Missing token").toResponse();
+  if (!token) return new BadRequestError("This link is incomplete or has expired. Ask the teacher for a new one.").toResponse();
   const limited = checkRateLimit(rateLimitKey(req, "parent-consent-info", token.slice(0, 12)), 20, 15 * 60 * 1000);
   if (!limited.allowed) return rateLimitResponse(limited.resetAt);
 
@@ -53,7 +53,7 @@ export const GET = withApiErrors(async function GET(req: NextRequest) {
         usedAt: invite?.usedAt?.toISOString() ?? null,
       },
     });
-    return new BadRequestError("Invalid or expired authorization link").toResponse();
+    return new BadRequestError("This link is incomplete or has expired. Ask the teacher for a new one.").toResponse();
   }
 
   const account = await resolveParentAccount(prisma, invite.parentEmail);
@@ -87,7 +87,7 @@ export const GET = withApiErrors(async function GET(req: NextRequest) {
 
 export const POST = withApiErrors(async function POST(req: NextRequest) {
   const { token, password } = await req.json();
-  if (!token) return new BadRequestError("Missing token").toResponse();
+  if (!token) return new BadRequestError("This link is incomplete or has expired. Ask the teacher for a new one.").toResponse();
   const limited = checkRateLimit(rateLimitKey(req, "parent-consent", token.slice(0, 12)), 10, 15 * 60 * 1000);
   if (!limited.allowed) return rateLimitResponse(limited.resetAt);
 
@@ -105,7 +105,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
           phase: "submit",
         },
       });
-      return new BadRequestError("Invalid or expired authorization link").toResponse();
+      return new BadRequestError("This link is incomplete or has expired. Ask the teacher for a new one.").toResponse();
     }
 
     const consentAt = new Date();
@@ -121,7 +121,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
         metadata: { reason: "parent_email_belongs_to_other_role", existingRole: account.role, phase: "submit" },
       });
       return new ConflictError(
-        "This email already belongs to a non-parent account. Ask the teacher to use a different parent/guardian email.",
+        "This email is already used by a different kind of account. Ask the teacher to use a different parent or guardian email.",
       ).toResponse();
     }
 
@@ -136,7 +136,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
     const parent = await prisma.$transaction(async (tx) => {
       // Re-check inside the transaction: the email may have been taken since.
       const current = await resolveParentAccount(tx, parentEmail);
-      if (current.kind === "conflict") throw new ConflictError("This email already belongs to a non-parent account.");
+      if (current.kind === "conflict") throw new ConflictError("This email is already used by a different kind of account.");
 
       const linked =
         current.kind === "parent"
@@ -198,6 +198,6 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
     await captureCaughtError("auth.parent-consent", error, {
       metadata: { tokenPrefix: String(token).slice(0, 8) },
     });
-    return new InternalServerError("Authorization failed.").toResponse();
+    return new InternalServerError("We couldn't save your approval. Please try again.").toResponse();
   }
 });

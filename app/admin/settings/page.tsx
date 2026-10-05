@@ -31,8 +31,7 @@ export default async function AdminSettingsPage() {
     <PageShell>
       <h1 className="mb-1 text-xl font-semibold text-gray-900">Platform Settings</h1>
       <p className="mb-6 text-sm text-gray-500">
-        Enable optional workflows by role. Defaults keep student unlock requests,
-        student self-enrollment, and teacher program management disabled.
+        Turn optional features on or off.
       </p>
       <SettingsClient settings={settings} mistralKey={secretSummary(mistralSetting?.value)} smtp={smtp} />
     </PageShell>

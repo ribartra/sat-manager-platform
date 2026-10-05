@@ -74,15 +74,15 @@ test.describe("FPT assign visibility", () => {
 
     await page.goto("/student");
     await expectAreaTabs(page, { basePath: "/student" });
-    await expect(page.getByText(/active Full Practice Test/i)).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Assigned Practice Sets" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Assigned Exams" })).toHaveCount(0);
+    await expect(page.getByText(/Full Practice Tests? to take/i)).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Your practice sets" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Your Full Practice Tests" })).toHaveCount(0);
 
     await page.goto("/student?area=mocks");
-    await expect(page.getByRole("heading", { name: "Assigned Exams" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Your Full Practice Tests" })).toBeVisible();
     await expect(page.getByText(examName).first()).toBeVisible({ timeout: 20_000 });
     await expect(page.getByRole("link", { name: /Start/i }).first()).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Assigned Practice Sets" })).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: "Your practice sets" })).toHaveCount(0);
 
     await page.goto("/student/full-tests");
     await expect(page.getByRole("heading", { name: "Exams" })).toBeVisible();

@@ -25,14 +25,14 @@ test.describe("consideraciones smoke", () => {
     await expectPortal(page, "teacher");
     await expect(page.getByRole("link", { name: "Materials" })).toHaveCount(0);
     await page.goto("/teacher/materials");
-    await expect(page.getByRole("heading", { name: "Study Materials" })).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: "Study materials" })).toHaveCount(0);
 
     await page.context().clearCookies();
     await loginAs(page, studentBox.email, E2E.studentPassword);
     await expectPortal(page, "student");
     await expect(page.getByRole("link", { name: "Materials" })).toHaveCount(0);
     await page.goto("/student/materials");
-    await expect(page.getByRole("heading", { name: "Study Materials" })).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: "Study materials" })).toHaveCount(0);
   });
 
   test("Practice Set import modal shows dual trays", async ({ page }) => {
@@ -48,7 +48,7 @@ test.describe("consideraciones smoke", () => {
   test("Student history does not show practice SAT averages", async ({ page }) => {
     await loginAs(page, studentBox.email, E2E.studentPassword);
     await page.goto("/student/history");
-    await expect(page.getByRole("heading", { name: "My History" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "My history" })).toBeVisible();
     await expect(page.getByText("SAT R&W average")).toHaveCount(0);
     await expect(page.getByText("SAT Math average")).toHaveCount(0);
     await expect(page.getByRole("link", { name: "Math", exact: true })).toBeVisible();

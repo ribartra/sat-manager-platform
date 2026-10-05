@@ -49,7 +49,7 @@ export default function ResetPasswordPage() {
     <div className="flex min-h-screen items-center justify-center bg-muted">
       <div className="w-full max-w-sm">
         <Card padding="lg">
-          <h1 className="mb-1 text-lg font-semibold text-foreground">Set new password</h1>
+          <h1 className="mb-1 text-lg font-semibold text-foreground">Choose a new password</h1>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="mt-4 space-y-4" noValidate>
               <FormSection>
@@ -58,7 +58,7 @@ export default function ResetPasswordPage() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>New Password</FormLabel>
+                      <FormLabel>New password</FormLabel>
                       <FormControl>
                         <Input type="password" {...field} />
                       </FormControl>
@@ -71,7 +71,7 @@ export default function ResetPasswordPage() {
                   name="confirm"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Confirm Password</FormLabel>
+                      <FormLabel>Type it again</FormLabel>
                       <FormControl>
                         <Input type="password" {...field} />
                       </FormControl>
@@ -82,7 +82,7 @@ export default function ResetPasswordPage() {
               </FormSection>
               <InlineError>{serverError}</InlineError>
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Saving..." : "Save Password"}
+                {loading ? "Saving…" : "Save password"}
               </Button>
             </form>
           </Form>

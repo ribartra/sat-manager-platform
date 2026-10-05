@@ -38,7 +38,7 @@ export default function ChangePasswordPage() {
       data = await apiFetch("/api/auth/change-password", {
         method: "POST",
         json: { currentPassword: values.currentPassword, newPassword: values.newPassword },
-        fallback: "Could not change password.",
+        fallback: "We couldn't change your password. Please try again.",
       });
     } catch (error) {
       setServerError(errorMessage(error));
@@ -60,7 +60,7 @@ export default function ChangePasswordPage() {
 
   return (
     <PageShell width="narrow" density="comfortable">
-      <PageHeader title="Change Password" />
+      <PageHeader title="Change password" />
       <Card padding="lg">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" noValidate>
@@ -96,7 +96,7 @@ export default function ChangePasswordPage() {
                 name="confirm"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Confirm new password</FormLabel>
+                    <FormLabel>Type the new password again</FormLabel>
                     <FormControl>
                       <Input type="password" {...field} />
                     </FormControl>
@@ -106,9 +106,9 @@ export default function ChangePasswordPage() {
               />
             </FormSection>
             <InlineError>{serverError}</InlineError>
-            {success ? <p className="text-sm text-success">Password updated.</p> : null}
+            {success ? <p className="text-sm text-success">Your password was changed.</p> : null}
             <Button type="submit" disabled={loading} className="w-full">
-              {loading ? "Saving..." : "Save Password"}
+              {loading ? "Saving…" : "Save password"}
             </Button>
           </form>
         </Form>

@@ -14,6 +14,7 @@ import {
 import { hashPublicToken } from "@/lib/token-security";
 import { writeAudit } from "@/lib/audit";
 import { InlineError } from "@/components/sat/alert";
+import { shortSetName } from "@/lib/student-report";
 
 interface PageProps {
   searchParams: Promise<{ token?: string }>;
@@ -24,13 +25,13 @@ type AccessFailReason = "missing" | "unknown" | "expired" | "revoked";
 function failMessage(reason: AccessFailReason): string {
   switch (reason) {
     case "missing":
-      return "This report link is missing a token.";
+      return "This link is incomplete. Please use the full link from the email.";
     case "unknown":
-      return "This report link is invalid.";
+      return "This link doesn't work.";
     case "revoked":
-      return "This report link has been revoked.";
+      return "This link is no longer active. Ask the teacher for a new one.";
     case "expired":
-      return "This report link has expired.";
+      return "This link has expired. Ask the teacher for a new one.";
   }
 }
 
@@ -45,11 +46,11 @@ async function AccessDenied({ reason, tokenPrefix }: { reason: AccessFailReason;
 
   return (
     <div className="mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center px-4 py-8 text-center">
-      <h1 className="text-lg font-semibold text-gray-900">Unable to open report</h1>
+      <h1 className="text-lg font-semibold text-gray-900">We couldn&apos;t open this report</h1>
       <InlineError className="mt-2">{failMessage(reason)}</InlineError>
-      <p className="mt-3 text-sm text-gray-500">Ask the teacher to share a new link if you still need access.</p>
+      <p className="mt-3 text-sm text-gray-500">If you still need the report, ask the teacher to send you a new link.</p>
       <Link href="/login" className="mt-6 text-sm text-blue-600 hover:underline">
-        Return to login
+        Go to sign in
       </Link>
     </div>
   );
@@ -130,13 +131,13 @@ export default async function ParentTemporaryAccessPage({ searchParams }: PagePr
       <div className="mb-6">
         <p className="text-xs font-medium uppercase text-gray-400">Progress report · {areasLabel(areas)}</p>
         <h1 className="mt-1 text-2xl font-semibold text-gray-900">{access.student.name}</h1>
-        <p className="mt-1 text-sm text-gray-500">Access available until {formatDate(state.effectiveExpiresAt)}</p>
+        <p className="mt-1 text-sm text-gray-500">You can open this report until {formatDate(state.effectiveExpiresAt)}.</p>
       </div>
 
       <div className="mb-6 grid gap-4 md:grid-cols-3">
-        <Metric label="Completed attempts" value={attempts.length.toString()} />
+        <Metric label="Practice sets finished" value={attempts.length.toString()} />
         <Metric label="Total questions" value={score.total.toString()} />
-        <Metric label="Average score" value={score.percent !== null ? `${score.percent}%` : "-"} />
+        <Metric label="Questions correct" value={score.percent !== null ? `${score.percent}%` : "—"} />
       </div>
 
       <Card>
@@ -148,7 +149,7 @@ export default async function ParentTemporaryAccessPage({ searchParams }: PagePr
             <div key={attempt.id} className="border-b border-gray-100 px-4 py-3 last:border-b-0">
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <p className="text-sm font-medium text-gray-900">{attempt.assignment?.practiceSet.name ?? "Practice Set"}</p>
+                  <p className="text-sm font-medium text-gray-900">{attempt.assignment?.practiceSet.name ? shortSetName(attempt.assignment.practiceSet.name) : "Practice set"}</p>
                   <p className="mt-0.5 text-xs text-gray-500">
                     {practiceSetAreaLabel(classifyPracticeSetArea({
                       sectionName: attempt.assignment?.practiceSet.topic.domain.section.name,
@@ -158,17 +159,17 @@ export default async function ParentTemporaryAccessPage({ searchParams }: PagePr
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-semibold text-gray-900">{attemptCorrect}/{total} · {attemptScore.percent ?? 0}%</p>
+                  <p className="text-sm font-semibold text-gray-900">{attemptCorrect} of {total} correct ({attemptScore.percent ?? 0}%)</p>
                   <p className="text-xs text-gray-400">{attempt.submittedAt ? formatDate(attempt.submittedAt) : ""}</p>
                 </div>
               </div>
             </div>
           );
         })}
-        {attempts.length === 0 && <p className="p-8 text-center text-sm text-gray-400">No completed practice in the selected sections yet.</p>}
+        {attempts.length === 0 && <p className="p-8 text-center text-sm text-gray-400">No practice sets finished in these subjects yet.</p>}
       </Card>
 
-      <Link href="/login" className="mt-6 inline-block text-sm text-blue-600 hover:underline">Return to login</Link>
+      <Link href="/login" className="mt-6 inline-block text-sm text-blue-600 hover:underline">Go to sign in</Link>
     </div>
   );
 }

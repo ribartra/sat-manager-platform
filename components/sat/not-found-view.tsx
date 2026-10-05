@@ -7,7 +7,7 @@ export function NotFoundView({ homeHref = "/", homeLabel = "Go to the home page"
   return (
     <PageShell>
       <Alert tone="note" title="Page not found">
-        The page you are looking for does not exist or is not enabled.
+        We couldn&apos;t find this page.
       </Alert>
       <Link href={homeHref} className="mt-4 inline-block text-sm font-medium text-blue-600 hover:underline">
         {homeLabel}

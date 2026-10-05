@@ -3,6 +3,7 @@ import { teacherProgramEnrollmentScope } from "@/lib/program-scope";
 import { loadMockReport, loadPracticeReport, type ReportFilters } from "@/lib/student-report";
 import { renderStudentReportPdf, type ReportAreaKey, type StudentReportData } from "@/lib/pdf/student-report-document";
 import { formatDate } from "@/lib/utils";
+import { difficultyLabel } from "@/lib/domain-meta";
 
 // Builds the student progress report PDF from the same data as the teacher student page
 // (lib/student-report.ts), server-side and without a browser. Shared by the download/preview
@@ -11,6 +12,15 @@ import { formatDate } from "@/lib/utils";
 export const REPORT_AREA_ORDER: ReportAreaKey[] = ["math", "reading", "writing", "mocks"];
 const PRACTICE_AREA = { math: "MATH", reading: "READING", writing: "WRITING" } as const;
 export const REPORT_AREA_LABEL: Record<ReportAreaKey, string> = { math: "Math", reading: "Reading", writing: "Writing", mocks: "Full Practice Tests" };
+
+const FILE_SCOPE: Record<ReportAreaKey, string> = { math: "math", reading: "reading", writing: "writing", mocks: "full-practice-tests" };
+
+/** Filter dates arrive as "YYYY-MM-DD"; show them as "Oct 5, 2026" (read as a calendar day, not UTC midnight). */
+function reportDate(value: string) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  const parsed = match ? new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3])) : new Date(value);
+  return Number.isNaN(parsed.getTime()) ? value : formatDate(parsed);
+}
 
 export function parseReportAreas(value: string | null | undefined, legacy?: string | null): ReportAreaKey[] {
   const raw = (value || legacy || "").toLowerCase();
@@ -58,12 +68,12 @@ export async function buildStudentReportPdf(input: {
 
   const skill = filters.topic ? await prisma.topic.findUnique({ where: { id: filters.topic }, select: { name: true } }) : null;
   const filterSummary = exam
-    ? `Exam: ${exam.test.name}${exam.submittedAt ? ` · ${formatDate(exam.submittedAt)}` : ""}`
+    ? `Full Practice Test: ${exam.test.name}${exam.submittedAt ? `, ${formatDate(exam.submittedAt)}` : ""}`
     : [
         skill ? `Skill: ${skill.name}` : null,
-        filters.difficulty ? `Difficulty: ${filters.difficulty}` : null,
-        filters.from ? `From ${filters.from}` : null,
-        filters.to ? `To ${filters.to}` : null,
+        filters.difficulty ? `${difficultyLabel(filters.difficulty)} questions only` : null,
+        filters.from ? `From ${reportDate(filters.from)}` : null,
+        filters.to ? `To ${reportDate(filters.to)}` : null,
       ].filter(Boolean).join(" · ");
 
   const sections: StudentReportData["sections"] = [];
@@ -88,11 +98,13 @@ export async function buildStudentReportPdf(input: {
     sections,
   });
 
-  const safeName = student.name.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "") || "student";
-  const scope = exam ? `exam-${exam.test.name.replace(/[^a-z0-9]+/gi, "-")}` : areas.join("-");
+  const slug = (value: string) => value.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "");
+  const safeName = slug(student.name) || "student";
+  const scope = exam ? slug(exam.test.name) || "full-practice-test" : areas.map((area) => FILE_SCOPE[area]).join("-");
+  const month = new Date().toLocaleDateString("en-US", { month: "short", year: "numeric" }).replace(" ", "-"); // "Oct-2026"
   return {
     pdf,
-    fileName: `SAT-report-${safeName}-${scope}-${new Date().toISOString().slice(0, 10)}.pdf`,
+    fileName: `SAT-progress-${safeName}-${scope}-${month}.pdf`,
     studentName: student.name,
     label: exam ? `${exam.test.name} results` : areas.map((area) => REPORT_AREA_LABEL[area]).join(", "),
   };

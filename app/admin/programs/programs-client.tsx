@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { enrollmentStatusLabel } from "@/lib/domain-meta";
 import {
   Form,
   FormControl,
@@ -449,7 +450,7 @@ function EnrollmentRow({
           {enrollment.student.name}
         </span>
         <Badge variant={ENROLLMENT_VARIANT[enrollment.status]}>
-          {enrollment.status}
+          {enrollmentStatusLabel(enrollment.status)}
         </Badge>
         <span className="text-xs text-gray-400">{fmt(enrollment.enrolledAt)}</span>
       </div>

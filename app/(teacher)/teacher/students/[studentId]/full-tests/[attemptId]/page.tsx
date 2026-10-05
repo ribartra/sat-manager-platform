@@ -11,7 +11,8 @@ import { fullTestModulesForAttempt } from "@/lib/full-test-snapshot";
 import { overtimeByModule } from "@/lib/full-test-progress";
 import { auth } from "@/lib/auth";
 import { teacherProgramEnrollmentScope } from "@/lib/program-scope";
-import { formatDate, formatTime, scorePercent } from "@/lib/utils";
+import { formatDate, formatDuration, formatTime, scorePercent } from "@/lib/utils";
+import { InfoHint } from "@/components/hint";
 import { formatCorrectAnswer } from "@/lib/answer-grading";
 import { resolveQuestionType } from "@/lib/question-type";
 import { parseEliminatedOptions } from "@/lib/answer-review-meta";
@@ -93,10 +94,10 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
         <div>
           <h1 className="text-xl font-semibold text-gray-900">{attempt.test.name}</h1>
           <p className="mt-1 text-sm text-gray-500">
-            Started {formatDate(attempt.startedAt)} · {attempt.submittedAt ? `submitted ${formatDate(attempt.submittedAt)}` : "not submitted"}
-            {attempt.pauses.length > 0 ? ` · paused ${attempt.pauses.length}x (${formatTime(pauseSeconds)})` : ""}
-            {attempt.timeExpiredEvents > 0 ? ` · time ran out ${attempt.timeExpiredEvents}x` : ""}
-            {attempt.extraTimeUsed > 0 ? ` · extra time used ${formatTime(attempt.extraTimeUsed)}` : ""}
+            Started {formatDate(attempt.startedAt)} · {attempt.submittedAt ? `Finished ${formatDate(attempt.submittedAt)}` : "Not finished"}
+            {attempt.pauses.length > 0 ? ` · Paused ${attempt.pauses.length} ${attempt.pauses.length === 1 ? "time" : "times"} (${formatDuration(pauseSeconds)})` : ""}
+            {attempt.timeExpiredEvents > 0 ? ` · Ran out of time ${attempt.timeExpiredEvents} ${attempt.timeExpiredEvents === 1 ? "time" : "times"}` : ""}
+            {attempt.extraTimeUsed > 0 ? ` · Extra time ${formatTime(attempt.extraTimeUsed)}` : ""}
           </p>
           <div className="mt-3 flex flex-wrap items-center gap-4">
             <AttemptStatusBadge status={attempt.status} />
@@ -131,7 +132,11 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
               <th className="px-4 py-2 text-right font-medium">Answered</th>
               <th className="px-4 py-2 text-right font-medium">Marked</th>
               <th className="px-4 py-2 text-right font-medium">Time</th>
-              <th className="px-4 py-2 text-right font-medium">Overtime</th>
+              <th className="px-4 py-2 text-right font-medium">
+                <span className="inline-flex items-center gap-1">
+                  Extra time <InfoHint label="Time used after the module timer ended" />
+                </span>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -139,7 +144,7 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
               <tr key={row.id} className="border-b border-gray-100 last:border-0">
                 <td className="px-4 py-2 font-medium text-gray-900">{row.name}</td>
                 <td className="px-4 py-2">
-                  <Badge variant={difficultyBadgeVariant(row.tier)}>{row.tier === "HARD" ? "Adaptive" : "Baseline"}</Badge>
+                  <Badge variant={difficultyBadgeVariant(row.tier)}>{row.tier === "HARD" ? "Harder" : "Standard"}</Badge>
                 </td>
                 <td className="px-4 py-2 text-right tabular-nums">
                   <VoidableValue status={attempt.status}>
@@ -175,18 +180,18 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
                     <summary className="flex cursor-pointer select-none flex-wrap items-center gap-x-3 gap-y-1 px-3 py-2 text-sm">
                       <span className="w-8 font-medium text-gray-500">Q{index + 1}</span>
                       {isUnanswered ? (
-                        <MinusCircle size={16} className="text-gray-400" aria-label="Unanswered" />
+                        <MinusCircle size={16} className="text-gray-400" aria-label="Blank" />
                       ) : isCorrect ? (
                         <CheckCircle size={16} className="text-green-600" aria-label="Correct" />
                       ) : (
-                        <XCircle size={16} className="text-red-500" aria-label="Incorrect" />
+                        <XCircle size={16} className="text-red-500" aria-label="Wrong" />
                       )}
                       <span className="text-gray-700">
-                        Answer <span className="font-medium text-gray-900">{answer?.answer || "—"}</span> · correct{" "}
+                        Answer: <span className="font-medium text-gray-900">{answer?.answer || "—"}</span> · Correct:{" "}
                         <span className="font-medium text-gray-900">{formatCorrectAnswer(question.correctAnswer)}</span>
                       </span>
                       {answer?.timeSpent ? <span className="text-xs text-gray-500">{formatTime(answer.timeSpent)}</span> : null}
-                      {item.isPretest ? <Badge variant="default">Pretest</Badge> : null}
+                      {item.isPretest ? <Badge variant="default">Unscored (pretest)</Badge> : null}
                       {answer?.markedForReview ? <Badge variant="warning">Marked</Badge> : null}
                       {answer?.note ? <Badge variant="info">Note</Badge> : null}
                     </summary>
@@ -215,7 +220,7 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
                           })}
                         </div>
                       ) : null}
-                      {eliminated.length > 0 ? <p className="text-xs text-gray-600">Eliminated by the student: {eliminated.join(", ")}</p> : null}
+                      {eliminated.length > 0 ? <p className="text-xs text-gray-600">Crossed out by the student: {eliminated.join(", ")}</p> : null}
                       {answer?.note ? <p className="mt-1 whitespace-pre-wrap text-xs text-gray-600">Student note: {answer.note}</p> : null}
                     </div>
                   </details>

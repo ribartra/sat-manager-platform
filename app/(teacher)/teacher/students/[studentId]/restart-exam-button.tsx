@@ -22,7 +22,7 @@ export function RestartExamButton({ attemptId, examName }: { attemptId: string; 
     const ok = await confirm({
       title: `Restart ${examName}?`,
       description:
-        "The attempt in progress is invalidated (kept in the history, crossed out, not counted) and the exam goes back to Pending. The student starts again from the beginning with the current version of the exam.",
+        "The student's current progress won't count (it stays crossed out in the history). They'll start the exam again from the beginning.",
       confirmLabel: "Restart exam",
       tone: "danger",
     });
@@ -31,9 +31,9 @@ export function RestartExamButton({ attemptId, examName }: { attemptId: string; 
     try {
       await apiFetch(`/api/full-practice-tests/attempts/${attemptId}/reopen`, {
         method: "POST",
-        json: { reason: "Restarted from the student page (exam back to Pending)" },
+        json: { reason: "Restarted by teacher" },
       });
-      notify.success("Exam restarted", "The student will start a new attempt.");
+      notify.success("Exam restarted", "The student can start the exam again.");
       router.refresh();
     } catch (error) {
       notify.error(error, "The exam could not be restarted.");

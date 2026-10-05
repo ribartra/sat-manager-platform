@@ -47,7 +47,7 @@ export function UserValidationActions({
     const ok = await confirm({
       title: "Anonymize this account?",
       description:
-        "Name, email, phone, birth date, avatar and personal notes are removed and the account is disabled. Attempts and scores stay, without the name. This cannot be undone.",
+        "Name, email, phone, birth date, avatar and personal notes are removed and the account is disabled. Their scores are kept but no longer linked to their name. This cannot be undone.",
       tone: "danger",
       confirmLabel: "Anonymize",
       requireText: email,

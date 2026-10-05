@@ -63,7 +63,7 @@ export function FullTestAssignClient({
       const data = await res.json();
       const changed = (Number(data.created) || 0) + (Number(data.reassigned) || 0) + (Number(data.updated) || 0);
       if (changed === 0) {
-        setError("Nothing changed: this exam is already pending with this due date.");
+        setError("Nothing changed: this exam is already assigned with this due date.");
         setLoading(false);
         return;
       }

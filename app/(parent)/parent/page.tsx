@@ -24,12 +24,12 @@ export default async function ParentDashboardPage() {
 
   return (
     <PageShell width="default">
-      <PageHeader title="Student Progress" />
+      <PageHeader title="Your student's progress" />
       <PageContent>
         {links.length === 0 ? (
           <EmptyState
-            title="No students linked yet"
-            description="When a teacher links your account to a student, their progress will appear here."
+            title="No students yet"
+            description="When a teacher links your account to a student, you'll see their progress here."
           />
         ) : (
           <div className="grid grid-cols-1 gap-4 @md:grid-cols-2">
@@ -39,9 +39,9 @@ export default async function ParentDashboardPage() {
               return (
                 <Card key={link.studentId} padding="md">
                   <h2 className="text-base font-semibold text-foreground">{link.student.name}</h2>
-                  <p className="mt-2 text-sm text-muted-foreground">Submitted attempts: {attempts.length}</p>
+                  <p className="mt-2 text-sm text-muted-foreground">Practice sets finished: {attempts.length}</p>
                   <p className={`text-sm font-medium ${scoreBandTextClass(avgPct)}`}>
-                    Average %: {avgPct !== null ? `${avgPct}%` : "—"}
+                    Questions correct: {avgPct !== null ? `${avgPct}%` : "—"}
                   </p>
                 </Card>
               );

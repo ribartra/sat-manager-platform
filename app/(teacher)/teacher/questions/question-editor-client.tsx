@@ -396,9 +396,9 @@ export function QuestionEditor({
                       className="mt-1 rounded border-gray-300"
                     />
                     <span>
-                      <span className="block text-sm font-medium text-gray-800">Enable graph visualization</span>
+                      <span className="block text-sm font-medium text-gray-800">Show a graph for this question</span>
                       <span className="mt-0.5 block text-xs text-gray-500">
-                        Use this only when the question should preload graph data into the calculator or local renderer.
+                        Turn on if the question includes a graph.
                       </span>
                     </span>
                   </Card>
@@ -417,8 +417,8 @@ export function QuestionEditor({
             placeholder="Reading passage, graph description, or any context..."
             hint={
               isMathQuestion
-                ? "Bold/Underline wrap selection; Formula inserts LaTeX."
-                : "Select text then Bold/Underline. Appears in the left column of the player."
+                ? "Select text to bold or underline. Use Formula for math."
+                : "Select text to bold or underline. Shown on the left side of the question."
             }
             collapsible
             collapseLabel="Add passage"

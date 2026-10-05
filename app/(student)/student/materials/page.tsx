@@ -17,7 +17,7 @@ export default async function StudentMaterialsPage() {
 
   return (
     <PageShell>
-      <h1 className="mb-6 text-2xl font-semibold text-gray-900">Study Materials</h1>
+      <h1 className="mb-6 text-2xl font-semibold text-gray-900">Study materials</h1>
       <div className="space-y-4">
         {materials.map((material) => (
           <Card as="article" key={material.id} padding="md">
@@ -42,7 +42,7 @@ export default async function StudentMaterialsPage() {
         ))}
         {materials.length === 0 && (
           <Card padding="lg" className="border-dashed text-center text-sm text-gray-500">
-            No study materials have been published yet.
+            There are no study materials yet.
           </Card>
         )}
       </div>

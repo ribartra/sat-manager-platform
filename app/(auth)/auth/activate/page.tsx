@@ -20,6 +20,7 @@ import { activateSchema, type ActivateInput } from "@/contracts/auth";
 import { LegalLinks } from "@/components/legal/legal-page";
 import { Alert, InlineError } from "@/components/sat/alert";
 import { apiFetch, errorMessage } from "@/lib/api-client";
+import { PASSWORD_MIN_LENGTH } from "@/lib/password-policy";
 
 interface InviteInfo {
   role: string;
@@ -75,7 +76,7 @@ export default function ActivatePage() {
       <div className="flex min-h-screen items-center justify-center bg-muted px-4">
         <ErrorState
           className="max-w-sm"
-          title="This invitation link is invalid or has expired."
+          title="This invitation link doesn't work or has expired. Ask your teacher for a new one."
         />
       </div>
     );
@@ -102,13 +103,13 @@ export default function ActivatePage() {
           </h1>
           <p className="mb-5 text-sm text-muted-foreground">
             {isParent
-              ? "Create your parent account to follow your child's progress and approve their enrollment."
-              : "Set a password to activate your account."}
+              ? "Create your parent account to follow your child's progress."
+              : "Choose a password to finish setting up your account."}
           </p>
           {blockedByConsent ? (
             <Alert tone="warning" className="mb-5">
-              Parent or guardian authorization is still pending. You can set your password after authorization is
-              recorded.
+              We&apos;re still waiting for your parent or guardian to approve. You can choose your password once
+              they do.
             </Alert>
           ) : null}
           <Form {...form}>
@@ -143,7 +144,7 @@ export default function ActivatePage() {
                     <FormItem>
                       <FormLabel>Password</FormLabel>
                       <FormControl>
-                        <Input type="password" placeholder="At least 6 characters" {...field} />
+                        <Input type="password" placeholder={`At least ${PASSWORD_MIN_LENGTH} characters`} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -154,7 +155,7 @@ export default function ActivatePage() {
                   name="confirm"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Confirm Password</FormLabel>
+                      <FormLabel>Type the password again</FormLabel>
                       <FormControl>
                         <Input type="password" placeholder="Repeat your password" {...field} />
                       </FormControl>
@@ -164,8 +165,8 @@ export default function ActivatePage() {
                 />
               </FormSection>
               <InlineError>{serverError}</InlineError>
-              <Button type="submit" className="w-full" disabled={loading} disabledReason={blockedByConsent ? "Waiting for parent or guardian consent." : null}>
-                {loading ? "Activating..." : isParent ? "Create Account" : "Activate Account"}
+              <Button type="submit" className="w-full" disabled={loading} disabledReason={blockedByConsent ? "Waiting for your parent or guardian to approve." : null}>
+                {loading ? "Setting up…" : isParent ? "Create account" : "Finish setup"}
               </Button>
             </form>
           </Form>

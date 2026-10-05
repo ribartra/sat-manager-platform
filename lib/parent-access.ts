@@ -44,8 +44,8 @@ export function normalizeAreasInput(input: unknown): string {
 export function areasLabel(areas: ReportArea[]): string {
   const hasMath = areas.includes("mathematics");
   const hasRW = areas.includes("reading") || areas.includes("writing");
-  if (hasMath && hasRW) return "Mathematics and Reading & Writing";
-  if (hasMath) return "Mathematics";
+  if (hasMath && hasRW) return "Math and Reading & Writing";
+  if (hasMath) return "Math";
   if (hasRW) return "Reading & Writing";
   return "All sections";
 }

@@ -10,6 +10,8 @@ import { Card } from "@/components/ui/card";
 import { Lock, ChevronLeft } from "lucide-react";
 import { refreshAssignmentStates } from "@/lib/assignments";
 import { practiceAreaLabel, resolvePracticeArea } from "@/lib/practice-area";
+import { difficultyLabel } from "@/lib/domain-meta";
+import { shortSetName } from "@/lib/student-report";
 
 interface PageProps {
   params: Promise<{ topicId: string; difficulty: string }>;
@@ -55,7 +57,7 @@ export default async function TopicPracticeSetsPage({ params, searchParams }: Pa
     <PageShell width="narrow">
       <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
         <Link href={`/student/content-map?area=${area}`} className="hover:text-blue-600 flex items-center gap-1">
-          <ChevronLeft size={14} /> Content Map
+          <ChevronLeft size={14} /> Content map
         </Link>
         <span>/</span>
         <span>{practiceAreaLabel(resolvePracticeArea({
@@ -72,14 +74,14 @@ export default async function TopicPracticeSetsPage({ params, searchParams }: Pa
 
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-xl font-semibold text-gray-900">
-          {topic.name} — {diffUpper.charAt(0) + diffUpper.slice(1).toLowerCase()}
+          {topic.name} — {difficultyLabel(diffUpper)}
         </h1>
-        <Badge variant={diffColor[diffUpper]}>{diffUpper}</Badge>
+        <Badge variant={diffColor[diffUpper]}>{difficultyLabel(diffUpper)}</Badge>
       </div>
 
       {practiceSets.length === 0 ? (
         <div className="text-center py-12 text-gray-400">
-          <p>No practice sets available for this topic and difficulty.</p>
+          <p>There are no practice sets here yet.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -105,15 +107,15 @@ export default async function TopicPracticeSetsPage({ params, searchParams }: Pa
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{ps.name}</p>
+                    <p className="text-sm font-medium text-gray-900">{shortSetName(ps.name)}</p>
                     <p className="text-xs text-gray-500 mt-1">
                       {total} questions
                       {attemptCount > 0 && (
-                        <span className="ml-2">· Attempts: {attemptCount}</span>
+                        <span className="ml-2">· Tries: {attemptCount}</span>
                       )}
                       {pct !== null && (
                         <span className="ml-2">
-                          · Last: {correct}/{answered} answered ({pct}%)
+                          · Last score: {correct} of {answered} ({pct}%)
                         </span>
                       )}
                       {lastAttempt?.submittedAt && (
@@ -128,9 +130,9 @@ export default async function TopicPracticeSetsPage({ params, searchParams }: Pa
                     <div className="flex flex-col items-end gap-1 text-xs text-gray-400">
                       <div className="flex items-center gap-2">
                         <Lock size={14} />
-                        <span>{scheduledLocked && assignment?.unlockAt ? `Unlocks ${formatDate(assignment.unlockAt)}` : "Locked"}</span>
+                        <span>{scheduledLocked && assignment?.unlockAt ? `Opens ${formatDate(assignment.unlockAt)}` : "Locked"}</span>
                       </div>
-                      {assignment?.unlockRequests.length ? <span>Pending teacher review</span> : null}
+                      {assignment?.unlockRequests.length ? <span>Unlock requested — waiting for your teacher</span> : null}
                     </div>
                   ) : inProgressAttempt ? (
                     <Link
@@ -151,7 +153,7 @@ export default async function TopicPracticeSetsPage({ params, searchParams }: Pa
                         href={`/student/practice/assignment/${assignment.id}?area=${area}`}
                         className="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700"
                       >
-                        Start
+                        Try again
                       </Link>
                     </div>
                   ) : (

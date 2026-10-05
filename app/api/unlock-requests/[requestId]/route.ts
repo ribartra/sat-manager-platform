@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { notifyUser } from "@/lib/notifications";
+import { shortSetName } from "@/lib/student-report";
 import { teacherProgramEnrollmentScope } from "@/lib/program-scope";
 import { BadRequestError, ConflictError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
@@ -49,7 +50,7 @@ export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }
       where: { id: request.assignmentId },
       data: { locked: false, unlockAt: null },
     });
-    await notifyUser(request.studentId, "Practice set unlocked", request.assignment.practiceSet.name, "/student");
+    await notifyUser(request.studentId, "Practice Set unlocked", `${shortSetName(request.assignment.practiceSet.name)} is open now.`, "/student");
   } else {
     await notifyUser(request.studentId, "Unlock request denied", request.assignment.practiceSet.name, "/student/content-map");
   }

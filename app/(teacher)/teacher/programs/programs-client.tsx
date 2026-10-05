@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { enrollmentStatusLabel } from "@/lib/domain-meta";
 
 type Enrollment = {
   studentId: string;
@@ -266,7 +267,7 @@ function EnrollmentRow({
         <span className="text-sm font-medium text-gray-800">
           {enrollment.student.name}
         </span>
-        <Badge variant={ENROLLMENT_VARIANT[enrollment.status]}>{enrollment.status}</Badge>
+        <Badge variant={ENROLLMENT_VARIANT[enrollment.status]}>{enrollmentStatusLabel(enrollment.status)}</Badge>
         {parentPending && (
           <Badge variant="warning" className="text-xs">Awaiting parent</Badge>
         )}
@@ -342,7 +343,7 @@ export function TeacherProgramsClient({ programs }: { programs: Program[] }) {
       {allPending.length > 0 && (
         <Card variant="warning" padding="md" className="mb-6">
           <h2 className="mb-3 text-sm font-semibold text-amber-900">
-            Pending Enrollment Requests
+            Requests waiting for approval
           </h2>
           <div className="divide-y divide-amber-100">
             {allPending.map(({ program, enrollment }) => (
@@ -402,7 +403,7 @@ export function TeacherProgramsClient({ programs }: { programs: Program[] }) {
                       <p className="font-medium text-gray-900">{program.name}</p>
                       {pendingCount > 0 && (
                         <span className="text-xs text-amber-600">
-                          {pendingCount} pending
+                          {pendingCount} waiting for approval
                         </span>
                       )}
                     </td>

@@ -27,14 +27,14 @@ test.describe("area tabs smoke", () => {
     await loginAs(page, studentBox.email, E2E.studentPassword);
     await expectPortal(page, "student");
     await page.goto("/student/history");
-    await expect(page.getByRole("heading", { name: "My History" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "My history" })).toBeVisible();
     await expectAreaTabs(page, { basePath: "/student/history" });
     await expect(page.locator('label:text-is("Section")')).toHaveCount(0);
     await expect(page.locator('select[name="section"], input[name="section"]')).toHaveCount(0);
 
     await clickAreaTab(page, "Full Practice Tests");
     await expect(page).toHaveURL(/area=mocks/);
-    await expect(page.getByRole("columnheader", { name: "R&W" })).toBeVisible();
+    await expect(page.getByRole("columnheader", { name: "Reading & Writing" })).toBeVisible();
     await expect(page.getByRole("columnheader", { name: "Math" })).toBeVisible();
     await expect(page.getByRole("columnheader", { name: "Practice Set" })).toHaveCount(0);
     await expect(page.getByRole("heading", { name: "Practice History" })).toHaveCount(0);
@@ -60,7 +60,7 @@ test.describe("area tabs smoke", () => {
     await clickAreaTab(page, "Writing");
     await expect(page).toHaveURL(/area=writing/);
     await expect(page.getByRole("heading", { name: /Active practice sets/ })).toBeVisible();
-    await expect(page.getByText(/No completed Writing attempts yet/i)).toBeVisible();
+    await expect(page.getByText(/No finished Writing work yet/i)).toBeVisible();
     await clickAreaTab(page, "Full Practice Tests");
     await expect(page).toHaveURL(/area=mocks/);
     await expect(page.getByRole("columnheader", { name: "R&W" })).toBeVisible();
@@ -73,7 +73,7 @@ test.describe("area tabs smoke", () => {
     await expect(page.getByRole("heading", { name: "Assigned to Student" })).toBeVisible();
     await clickAreaTab(page, "Full Practice Tests");
     await expect(page).toHaveURL(/area=mocks/);
-    await expect(page.getByText(/No active Full Practice Tests|Full Practice Test · R&W/i).first()).toBeVisible();
+    await expect(page.getByText(/No active Full Practice Tests|No finished exams yet|Full Practice Test · R&W/i).first()).toBeVisible();
   });
 
   test("Individual Report link lands on the student page and keeps Practice out of FPT", async ({ page }) => {

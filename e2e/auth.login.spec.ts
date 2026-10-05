@@ -19,7 +19,7 @@ test.describe("Auth — login por rol", () => {
     await page.locator('input[type="email"]').fill(E2E.teacherEmail);
     await page.locator('input[type="password"]').fill("wrong-password");
     await page.getByRole("button", { name: "Log In" }).click();
-    await expect(page.getByText("Invalid email or password.")).toBeVisible();
+    await expect(page.getByText("That email and password don't match. Please try again.")).toBeVisible();
     await expect(page).toHaveURL(/\/login/);
   });
 });

@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import { writeAudit } from "@/lib/audit";
 import { notifyUser } from "@/lib/notifications";
+import { shortSetName } from "@/lib/student-report";
 
 /**
  * Attempts are atomic (Practice Sets and Full Practice Tests alike):
@@ -50,19 +51,21 @@ export async function applyAttemptLifecycle(input: {
     },
   });
 
-  const what = kind === "practice" ? `your attempt on ${result.title}` : `your ${result.title} attempt`;
+  const what = kind === "practice" ? "Practice Set" : "Full Practice Test";
+  const name = result.title ? (kind === "practice" ? shortSetName(result.title) : result.title) : null;
+  const note = reason ? ` Note from your teacher: ${reason}` : "";
   if (action === "reopen") {
     await notifyUser(
       result.studentId,
-      kind === "practice" ? "Practice Set reopened" : "Exam reopened",
-      `Your teacher invalidated ${what} and reopened it. You can start a new attempt.${reason ? ` Reason: ${reason}` : ""}`,
+      "Result reset",
+      `Your teacher reset your ${what}${name ? ` "${name}"` : ""} so you can try again.${note}`,
       kind === "practice" ? "/student/content-map" : "/student/content-map?area=mocks",
     );
   } else {
     await notifyUser(
       result.studentId,
-      "Attempt invalidated",
-      `Your teacher invalidated ${what}. It stays in your history but no longer counts toward your scores.${reason ? ` Reason: ${reason}` : ""}`,
+      "Result set aside",
+      `Your teacher set aside a result${name ? ` (${name})` : ""}. It won't count toward your scores.${note}`,
       "/student/history",
     );
   }

@@ -33,13 +33,13 @@ export function TopicDifficultyTrend({ topics, pointsByTopic, selectedTopic, sel
     <section className="rounded-md border border-gray-200 bg-white p-4 shadow-sm">
       <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h3 className="text-sm font-semibold text-gray-900">Accuracy progress by attempt</h3>
-          <p className="mt-1 text-xs text-gray-500">Correct answers ÷ all questions in each selected attempt, including blanks</p>
+          <h3 className="text-sm font-semibold text-gray-900">Progress over time</h3>
+          <p className="mt-1 text-xs text-gray-500">% correct each time. Blank answers count as wrong.</p>
         </div>
         <p className="text-xs font-medium text-gray-600">{topic} · {selectedDifficulty.toLowerCase()}</p>
       </div>
       {points.length === 0 ? (
-        <p className="flex min-h-40 items-center justify-center text-sm text-gray-400">No submitted attempts yet.</p>
+        <p className="flex min-h-40 items-center justify-center text-sm text-gray-400">No finished work yet.</p>
       ) : (
         <>
           <div className="mb-2 flex flex-wrap gap-x-4 gap-y-1">
@@ -50,7 +50,7 @@ export function TopicDifficultyTrend({ topics, pointsByTopic, selectedTopic, sel
             ))}
           </div>
           <div className="overflow-x-auto">
-            <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`Accuracy over attempts for ${topic}`} className="h-56 min-w-[34rem] w-full">
+            <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`Progress over time for ${topic}`} className="h-56 min-w-[34rem] w-full">
               {[0, 25, 50, 75, 100].map((value) => (
                 <g key={value}>
                   <line x1={left} x2={width - right} y1={y(value)} y2={y(value)} stroke="#e5e7eb" />
@@ -80,7 +80,7 @@ export function TopicDifficultyTrend({ topics, pointsByTopic, selectedTopic, sel
               ))}
             </svg>
           </div>
-          <p className="mt-1 text-right text-[11px] text-gray-400">Attempts in chronological order</p>
+          <p className="mt-1 text-right text-[11px] text-gray-400">Oldest to newest</p>
         </>
       )}
     </section>

@@ -78,10 +78,10 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
 
       <Card padding="md" className="mb-6 flex items-start justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-gray-900">Attempt #{attempt.attemptNumber}</h1>
+          <h1 className="text-xl font-semibold text-gray-900">Try {attempt.attemptNumber}</h1>
           <p className="mt-1 text-sm text-gray-500">
-            {attempt.submittedAt ? formatDate(attempt.submittedAt) : "Not submitted"} · {attempt.totalTime ? formatTime(attempt.totalTime) : "No time"}
-            {attempt.pauses.length > 0 ? ` · Paused ${attempt.pauses.length}x (${formatTime(pauseSeconds)})` : ""}
+            {attempt.submittedAt ? formatDate(attempt.submittedAt) : "Not finished"} · {attempt.totalTime ? formatTime(attempt.totalTime) : "No time"}
+            {attempt.pauses.length > 0 ? ` · Paused ${attempt.pauses.length} ${attempt.pauses.length === 1 ? "time" : "times"} (${formatTime(pauseSeconds)})` : ""}
           </p>
           <div className="mt-3 flex items-center gap-2">
             <AttemptStatusBadge status={attempt.status} />
@@ -133,7 +133,7 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
                     {ans?.answer ? (
                       ans.isCorrect ? <span className="text-green-600">Correct</span> : <span className="text-red-600">Wrong ({formatCorrectAnswer(question.correctAnswer)})</span>
                     ) : (
-                      <span className="text-gray-400">Unanswered</span>
+                      <span className="text-gray-400">Blank</span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-right text-gray-500">{ans?.timeSpent ? formatTime(ans.timeSpent) : "—"}</td>

@@ -2,7 +2,9 @@ import { AttemptStatusBadge, PageShell, Pagination, PracticeAreaTabs, VoidableVa
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
-import { formatDate, formatTime } from "@/lib/utils";
+import { formatDate, formatDuration } from "@/lib/utils";
+import { difficultyLabel } from "@/lib/domain-meta";
+import { shortSetName } from "@/lib/student-report";
 import { scoreBandTextClass } from "@/lib/score-band";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -76,7 +78,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
 
     return (
       <PageShell width="wide" density="compact" className="space-y-4">
-        <h1 className="text-2xl font-semibold text-gray-900">My History</h1>
+        <h1 className="text-2xl font-semibold text-gray-900">My history</h1>
         <PracticeAreaTabs basePath="/student/history" active={area} preserve={{ difficulty: filters.difficulty, from: filters.from, to: filters.to }} />
         <ProgressFilters action="/student/history" filters={filters} topics={[]} showEndDate={showEndDate} />
 
@@ -85,8 +87,8 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
                 <th className="px-4 py-3 text-left font-medium text-gray-500">Date</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-500">Exam</th>
-                <th className="px-4 py-3 text-right font-medium text-gray-500">R&amp;W</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-500">Test</th>
+                <th className="px-4 py-3 text-right font-medium text-gray-500">Reading &amp; Writing</th>
                 <th className="px-4 py-3 text-right font-medium text-gray-500">Math</th>
                 <th className="px-4 py-3 text-right font-medium text-gray-500">Total</th>
                 <th className="px-4 py-3" />
@@ -96,9 +98,9 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
               {examAttempts.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-4 py-12 text-center text-gray-500">
-                    <p>No completed Full Practice Tests match the current filters.</p>
+                    <p>No finished Full Practice Tests for these filters.</p>
                     <Link href={buildProgressHref("/student/content-map", filters)} className="mt-2 inline-block text-sm text-blue-600 hover:underline">
-                      View assigned exams →
+                      See your tests →
                     </Link>
                   </td>
                 </tr>
@@ -204,7 +206,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
       difficulty: row.difficulty,
       correct: row.isCorrect,
       attemptId: row.attemptId,
-      attemptLabel: attempt?.assignment?.practiceSet.name ?? "Practice set",
+      attemptLabel: attempt?.assignment?.practiceSet.name ? shortSetName(attempt.assignment.practiceSet.name) : "Practice set",
       submittedAt: attempt?.submittedAt ?? null,
     };
   }));
@@ -222,7 +224,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
     .filter(({ attempt: a }) => trendAttemptIds.has(a.id))
     .map(({ attempt: a }) => ({
       id: a.id,
-      label: a.assignment?.practiceSet.name ?? "Practice set",
+      label: a.assignment?.practiceSet.name ? shortSetName(a.assignment.practiceSet.name) : "Practice set",
       submittedAt: a.submittedAt,
     }));
   const topicTrend = aggregateTopicDifficultyTrend(
@@ -260,10 +262,10 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
     <PageShell width="wide" density="compact" className="space-y-4">
       <header className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">My History</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">My history</h1>
           <p className="mt-0.5 text-sm text-gray-500">Review your {practiceAreaLabel(practiceArea).toLowerCase()} practice and find your next focus area.</p>
         </div>
-        <p className="text-xs text-gray-500">{visibleAttempts.length} completed set{visibleAttempts.length === 1 ? "" : "s"}</p>
+        <p className="text-xs text-gray-500">{visibleAttempts.length} finished set{visibleAttempts.length === 1 ? "" : "s"}</p>
       </header>
         <PracticeAreaTabs
         basePath="/student/history"
@@ -279,9 +281,9 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
 
       {listedAttempts.length === 0 ? (
         <Card padding="lg" className="py-14 text-center text-gray-500">
-          <p>No completed {practiceAreaLabel(practiceArea).toLowerCase()} practice sets match the current filters.</p>
+          <p>No finished {practiceAreaLabel(practiceArea).toLowerCase()} practice sets for these filters.</p>
           <Link href={buildProgressHref("/student/content-map", filters)} className="mt-2 inline-block text-sm text-blue-600 hover:underline">
-            Browse Content Map →
+            Go to the content map →
           </Link>
         </Card>
       ) : (
@@ -293,7 +295,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
               <p className={`mt-1 text-2xl font-semibold ${scoreBandTextClass(avgPct)}`}>{avgPct !== null ? `${avgPct}%` : "—"}</p>
               <p className="mt-0.5 text-xs text-gray-500">
                 {correctQuestions} correct of {totalQuestions} questions
-                {difficulty ? ` · ${difficulty.toLowerCase()}` : ""}
+                {difficulty ? ` · ${difficultyLabel(difficulty)}` : ""}
               </p>
             </Card>
             <Card padding="sm">
@@ -306,7 +308,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
               <p className={`mt-1 text-2xl font-semibold ${scoreBandTextClass(latestSubmitted?.pct ?? null)}`}>
                 {!latestSubmitted ? "—" : latestSubmitted.pct === null ? "No answers" : `${latestSubmitted.pct}%`}
               </p>
-              <p className="mt-0.5 text-xs text-gray-500">Most recent submission</p>
+              <p className="mt-0.5 text-xs text-gray-500">Your last finished set</p>
             </Card>
           </div>
 
@@ -333,7 +335,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
             <div className="mb-3 flex items-end justify-between gap-3">
               <div>
                 <h2 id="history-results-heading" className="text-sm font-semibold text-gray-900">Practice history</h2>
-                <p className="mt-0.5 text-xs text-gray-500">Open any submission to review each question.</p>
+                <p className="mt-0.5 text-xs text-gray-500">Open any set to see each question again.</p>
               </div>
             </div>
 
@@ -343,10 +345,10 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
                   <thead>
                     <tr className="border-b border-gray-200 bg-gray-50">
                       <th className="px-4 py-3 text-left font-medium text-gray-500">Date</th>
-                      <th className="px-4 py-3 text-left font-medium text-gray-500">Practice Set</th>
+                      <th className="px-4 py-3 text-left font-medium text-gray-500">Practice set</th>
                       <th className="px-4 py-3 text-right font-medium text-gray-500">Score</th>
-                      <th className="px-4 py-3 text-right font-medium text-gray-500">Elapsed</th>
-                      <th className="px-4 py-3 text-right font-medium text-gray-500">#</th>
+                      <th className="px-4 py-3 text-right font-medium text-gray-500">Time</th>
+                      <th className="px-4 py-3 text-right font-medium text-gray-500">Try</th>
                       <th className="px-4 py-3" />
                     </tr>
                   </thead>
@@ -358,23 +360,23 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
                         </td>
                         <td className="px-4 py-3">
                           <p className="flex items-center gap-2 font-medium text-gray-900">
-                            {ps?.name ?? "—"}
+                            {ps?.name ? shortSetName(ps.name) : "—"}
                             {isInvalidated(a.status) ? <AttemptStatusBadge status={a.status} /> : null}
                           </p>
                           <p className="text-xs text-gray-500">
                             {areaLabel ?? "—"}
                             {ps?.topic.name ? ` · ${ps.topic.name}` : ""}
-                            {ps?.difficulty ? ` · ${ps.difficulty}` : ""}
+                            {ps?.difficulty ? ` · ${difficultyLabel(ps.difficulty)}` : ""}
                           </p>
                         </td>
                         <td className="px-4 py-3 text-right">
                           <VoidableValue status={a.status}>
-                            <span className="font-medium text-gray-900">{correct} correct of {total} questions</span>
+                            <span className="font-medium text-gray-900">{correct} of {total} correct</span>
                             <span className={`ml-2 text-xs font-semibold ${isInvalidated(a.status) ? "" : scoreBandTextClass(pct)}`}>{pct}%</span>
                           </VoidableValue>
                         </td>
-                        <td className="px-4 py-3 text-right text-gray-500">{formatTime(elapsedTime)}</td>
-                        <td className="px-4 py-3 text-right"><Badge variant="default">#{a.attemptNumber}</Badge></td>
+                        <td className="px-4 py-3 text-right text-gray-500">{formatDuration(elapsedTime)}</td>
+                        <td className="px-4 py-3 text-right"><Badge variant="default">{a.attemptNumber}</Badge></td>
                         <td className="px-4 py-3 text-right">
                           <Link href={buildProgressHref(`/student/results/${a.id}`, filters)} className="text-xs text-blue-600 hover:underline">Review</Link>
                         </td>
@@ -391,20 +393,20 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
                 <Card key={a.id} padding="sm" className={invalidatedRowClass(a.status)}>
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-gray-900">{ps?.name ?? "—"}</p>
+                      <p className="truncate text-sm font-medium text-gray-900">{ps?.name ? shortSetName(ps.name) : "—"}</p>
                       {isInvalidated(a.status) ? <AttemptStatusBadge status={a.status} /> : null}
                       <p className="mt-0.5 truncate text-xs text-gray-500">
                         {areaLabel ?? "—"}
                         {ps?.topic.name ? ` · ${ps.topic.name}` : ""}
-                        {ps?.difficulty ? ` · ${ps.difficulty}` : ""}
+                        {ps?.difficulty ? ` · ${difficultyLabel(ps.difficulty)}` : ""}
                       </p>
                     </div>
                     <VoidableValue status={a.status} className={`shrink-0 text-sm font-semibold ${isInvalidated(a.status) ? "" : scoreBandTextClass(pct)}`}>{pct === null ? "No answers" : `${pct}%`}</VoidableValue>
                   </div>
                   <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-gray-100 pt-2 text-xs text-gray-500">
                     <span>{a.submittedAt ? formatDate(a.submittedAt) : "—"}</span>
-                    <span>{correct} correct of {total} questions · {formatTime(elapsedTime)}</span>
-                    <Badge variant="default">#{a.attemptNumber}</Badge>
+                    <span>{correct} of {total} correct · {formatDuration(elapsedTime)}</span>
+                    <Badge variant="default">Try {a.attemptNumber}</Badge>
                     <Link href={buildProgressHref(`/student/results/${a.id}`, filters)} className="font-medium text-blue-600 hover:underline">Review</Link>
                   </div>
                 </Card>

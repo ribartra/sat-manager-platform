@@ -89,7 +89,7 @@ export default async function TeacherComparePage({ searchParams }: PageProps) {
             <tr className="border-b border-gray-200 bg-gray-50">
               <th className="px-4 py-3 text-left font-medium text-gray-500">Student</th>
               {teacherGroupManagementEnabled && <th className="px-4 py-3 text-left font-medium text-gray-500">Group</th>}
-              <th className="px-4 py-3 text-right font-medium text-gray-500">Attempts</th>
+              <th className="px-4 py-3 text-right font-medium text-gray-500">Finished</th>
               <th className="px-4 py-3 text-right font-medium text-gray-500">Answered</th>
               <th className="px-4 py-3 text-right font-medium text-gray-500">Avg score</th>
               <th className="px-4 py-3 text-left font-medium text-gray-500">Weakest skill</th>

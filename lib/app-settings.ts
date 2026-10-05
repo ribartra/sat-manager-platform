@@ -3,76 +3,70 @@ import prisma from "@/lib/prisma";
 export const FEATURE_SETTINGS = {
   STUDENT_UNLOCK_REQUESTS: {
     label: "Student unlock requests",
-    description: "Allow students to request access to locked Practice Sets.",
+    description: "Lets students ask their teacher to unlock a locked practice set.",
     defaultValue: false,
     owner: "product",
     expiresAt: null as string | null,
   },
   STUDENT_SELF_ENROLLMENT: {
     label: "Student self enrollment",
-    description: "Allow students or parents to request enrollment into an available program.",
+    description: "Lets students or parents ask to join an open program.",
     defaultValue: false,
     owner: "product",
     expiresAt: null as string | null,
   },
   TEACHER_PROGRAM_MANAGEMENT: {
     label: "Teacher program management",
-    description: "Allow teachers to create and edit their own programs.",
+    description: "Lets teachers create and edit their own programs.",
     defaultValue: false,
     owner: "product",
     expiresAt: null as string | null,
   },
   TEACHER_GROUP_MANAGEMENT: {
     label: "Teacher group management",
-    description: "Allow teachers to create groups, manage memberships, and assign work by group.",
+    description: "Lets teachers create groups of students and assign work to a whole group.",
     defaultValue: false,
     owner: "product",
     expiresAt: null as string | null,
   },
   QUESTION_GRAPH_VISUALIZATION: {
     label: "Question graph visualization option",
-    description:
-      "Show the “Enable graph visualization” checkbox in the question editor (Math). When off, the option stays hidden; existing supportsGraph values are unchanged.",
+    description: "Shows the 'graph' option in the question editor.",
     defaultValue: false,
     owner: "product",
     expiresAt: null as string | null,
   },
   MATERIALS_MODULE: {
     label: "Study Materials module",
-    description:
-      "Show Materials in Student and Teacher navigation and allow access to materials pages/APIs. When off (default), Materials stays hidden for both roles; data is preserved.",
+    description: "Shows Study Materials to students and teachers. Turning it off hides them; nothing is deleted.",
     defaultValue: false,
     owner: "product",
     expiresAt: null as string | null,
   },
   FPT_PRETEST_EXCLUSION: {
     label: "Exclude Full Practice Test pretest questions from score",
-    description:
-      "When on, questions marked as pretest (typically the first 2 per module) do not count toward R&W/Math raw or scaled scores. When off (default), every question counts.",
+    description: "When on, the 2 trial questions at the start of each module don't count toward the score.",
     defaultValue: false,
     owner: "product",
     expiresAt: null as string | null,
   },
   TIME_FILTER_END_DATE: {
     label: "Show 'to' date in time filters",
-    description:
-      "When off (default), time filters only ask for a start date ('From' / 'Start date from') and the range stays open until today. When on, an end date ('To' / 'Start date to') is also shown and applied.",
+    description: "Adds an end date to date filters. When off, filters run from the start date to today.",
     defaultValue: false,
     owner: "product",
     expiresAt: null as string | null,
   },
   CALCULATOR_PRACTICE_SETS: {
     label: "External graphing calculator in Practice Sets",
-    description:
-      "When on, Math Practice players may load the external graphing calculator (Desmos/GeoGebra per env). When off (default), no calculator panel is shown. If the CDN fails or the browser is offline, the panel hides automatically.",
+    description: "Shows a graphing calculator in Math practice. It hides itself if it can't load.",
     defaultValue: false,
     owner: "product",
     expiresAt: null as string | null,
   },
   CALCULATOR_FULL_TESTS: {
     label: "External graphing calculator in Full Practice Tests",
-    description:
-      "When on, Math modules in Full Practice Tests may load the external graphing calculator (Desmos/GeoGebra per env). When off (default), no calculator panel is shown. If the CDN fails or the browser is offline, the panel hides automatically.",
+    description: "Shows a graphing calculator in Math exams. It hides itself if it can't load.",
     defaultValue: false,
     owner: "product",
     expiresAt: null as string | null,

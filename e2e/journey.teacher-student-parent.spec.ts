@@ -72,7 +72,7 @@ test.describe.serial("Journey Teacher → Student → Parent", () => {
     const passwords = page.locator('input[type="password"]');
     await passwords.nth(0).fill(E2E.studentPassword);
     await passwords.nth(1).fill(E2E.studentPassword);
-    await page.getByRole("button", { name: "Activate Account" }).click();
+    await page.getByRole("button", { name: "Finish setup" }).click();
     await expect(page).toHaveURL(/\/login/, { timeout: 20_000 });
 
     await loginAs(page, student.email, E2E.studentPassword);
@@ -157,7 +157,7 @@ test.describe.serial("Journey Teacher → Student → Parent", () => {
       timeout: 10_000,
     });
     await page.getByRole("button", { name: /Share report by email/i }).click();
-    await expect(page.getByText(/Link created|report link sent|SMTP not configured/i)).toBeVisible({
+    await expect(page.getByText(/Link created|Report link emailed/i)).toBeVisible({
       timeout: 20_000,
     });
   });
@@ -167,7 +167,7 @@ test.describe.serial("Journey Teacher → Student → Parent", () => {
 
     await loginAs(page, parent.email, E2E.parentPassword);
     await expectPortal(page, "parent");
-    await expect(page.getByRole("heading", { name: /Student Progress/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Your student's progress/i })).toBeVisible();
     await expect(page.getByText(student.name)).toBeVisible();
 
     await logoutViaClear(page);
@@ -181,7 +181,7 @@ test.describe.serial("Journey Teacher → Student → Parent", () => {
     await page.goto(access.urlPath);
     await expect(page.getByRole("heading", { name: student.name })).toBeVisible({ timeout: 20_000 });
     await expect(page.getByText(/Progress report/i)).toBeVisible();
-    await expect(page.getByText(/Access available until/i)).toBeVisible();
+    await expect(page.getByText(/You can open this report until/i)).toBeVisible();
   });
 });
 

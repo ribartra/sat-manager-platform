@@ -20,7 +20,7 @@ interface RouteContext {
 
 export const POST = withApiErrors(async function POST(req: NextRequest, { params }: RouteContext) {
   const session = await requireApprovedSession();
-  if (!session) return new UnauthorizedError("Unauthorized").toResponse();
+  if (!session) return new UnauthorizedError("Please sign in again.").toResponse();
 
   const { attemptId } = await params;
   const body = await req.json();
@@ -28,7 +28,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
   const attempt = await prisma.fullPracticeTestAttempt.findFirst({
     where: { id: attemptId, studentId: session.user.id, status: "IN_PROGRESS" },
   });
-  if (!attempt) return new NotFoundError("Not found").toResponse();
+  if (!attempt) return new NotFoundError("This test was already submitted or closed by your teacher.").toResponse();
   // Overtime seconds (time worked after a module's limit); never lower than what autosave already recorded.
   const extraTimeUsed = Number.isInteger(rawExtraTimeUsed) && rawExtraTimeUsed >= 0
     ? Math.max(rawExtraTimeUsed, attempt.extraTimeUsed)

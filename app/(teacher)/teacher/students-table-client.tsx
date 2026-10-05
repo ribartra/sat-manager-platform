@@ -82,7 +82,7 @@ export function TeacherStudentsTable({
       },
       {
         id: "pending",
-        header: "Pending",
+        header: "Not finished",
         meta: { priority: "low", align: "right" },
         cell: ({ row }) =>
           row.original.pendingCount > 0 ? (

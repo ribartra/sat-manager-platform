@@ -21,6 +21,7 @@ import { LegalLinks } from "@/components/legal/legal-page";
 import { Alert, InlineError } from "@/components/sat/alert";
 import { apiFetch, errorMessage } from "@/lib/api-client";
 import { PARENT_CONSENT_STATEMENT } from "@/lib/consent";
+import { formatDate } from "@/lib/utils";
 
 interface ConsentInfo {
   studentName: string;
@@ -48,7 +49,7 @@ export default function ParentConsentPage() {
 
   useEffect(() => {
     if (!token) {
-      queueMicrotask(() => setLoadError("Missing authorization token."));
+      queueMicrotask(() => setLoadError("This link is incomplete or has expired. Ask the teacher for a new one."));
       return;
     }
 
@@ -98,9 +99,9 @@ export default function ParentConsentPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted px-4">
       <Card padding="lg" className="w-full max-w-md">
-        <h1 className="mb-2 text-lg font-semibold text-foreground">Parent Authorization</h1>
+        <h1 className="mb-2 text-lg font-semibold text-foreground">Parent approval</h1>
         <p className="mb-5 text-sm text-muted-foreground">
-          {info.parentName ?? info.parentEmail}, please authorize this SAT Practice account enrollment.
+          Hi {info.parentName ?? info.parentEmail}! Because {info.studentName} is under 18, we need your OK to enroll them.
         </p>
         <div className="mb-5 rounded-md bg-muted p-4 text-sm text-foreground">
           <p>
@@ -114,18 +115,18 @@ export default function ParentConsentPage() {
           </p>
         </div>
         {approved ? (
-          <Alert tone="success">Authorization recorded. The student can now activate their account.</Alert>
+          <Alert tone="success">Thanks! {info.studentName} can now finish setting up their account.</Alert>
         ) : info.accountConflict ? (
-          <Alert tone="error" title="This email cannot be used for a parent account">
-            It already belongs to another type of account. Ask the teacher to send the invitation with a different
-            parent/guardian email.
+          <Alert tone="error" title="This email can't be used for a parent account">
+            It&apos;s already used by a different kind of account. Ask the teacher to send the invitation to a different
+            parent or guardian email.
           </Alert>
         ) : info.existingParent ? (
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">{PARENT_CONSENT_STATEMENT}</p>
             <p className="text-sm text-muted-foreground">
-              You already have a parent account with this email. Authorizing links this student to it; your password does
-              not change.
+              You already have a parent account with this email. Approving adds this student to it — your password stays the
+              same.
             </p>
             <InlineError>{serverError}</InlineError>
             <Button
@@ -137,7 +138,7 @@ export default function ParentConsentPage() {
                 setLinking(false);
               }}
             >
-              {linking ? "Authorizing..." : "Authorize enrollment"}
+              {linking ? "Approving…" : "Approve"}
             </Button>
           </div>
         ) : (
@@ -150,7 +151,7 @@ export default function ParentConsentPage() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Parent account password</FormLabel>
+                      <FormLabel>Create a password for your parent account</FormLabel>
                       <FormControl>
                         <Input type="password" {...field} />
                       </FormControl>
@@ -174,15 +175,15 @@ export default function ParentConsentPage() {
               </FormSection>
               <InlineError>{serverError}</InlineError>
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Authorizing..." : "Authorize enrollment"}
+                {loading ? "Approving…" : "Approve"}
               </Button>
             </form>
           </Form>
         )}
       </Card>
       <p className="mt-4 text-center text-xs text-gray-500">
-        By authorizing you accept the Terms of Use and the Privacy Policy
-        {info.consentVersion ? ` (consent text version ${info.consentVersion})` : ""}.
+        By approving, you accept the Terms of Use and the Privacy Policy.
+        {info.consentVersion ? ` Terms updated ${formatDate(`${info.consentVersion}T12:00:00`)}.` : ""}
       </p>
       <LegalLinks className="mt-1" />
     </div>

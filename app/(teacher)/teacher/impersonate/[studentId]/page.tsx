@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody } from "@/components/ui/card";
 import { formatDate } from "@/lib/utils";
+import { assignmentStatusLabel } from "@/lib/domain-meta";
 import { BookOpen, CheckCircle, Clock, TrendingUp } from "lucide-react";
 import { withSqliteRetry } from "@/lib/sqlite-retry";
 import {
@@ -286,7 +287,7 @@ export default async function ImpersonateStudentPage({ params, searchParams }: P
               <Clock size={16} className="text-amber-600" />
               <div>
                 <p className="text-2xl font-bold text-gray-900">{pendingCount}</p>
-                <p className="text-xs text-gray-500">Pending tasks · {areaLabel}</p>
+                <p className="text-xs text-gray-500">To do · {areaLabel}</p>
               </div>
             </CardBody>
           </Card>
@@ -305,7 +306,7 @@ export default async function ImpersonateStudentPage({ params, searchParams }: P
                       {a.dueDate && <span className="ml-2 text-amber-600">Due: {formatDate(a.dueDate)}</span>}
                     </p>
                   </div>
-                  <Badge variant={a.status === "IN_PROGRESS" ? "warning" : "info"}>{a.status}</Badge>
+                  <Badge variant={a.status === "IN_PROGRESS" ? "warning" : "info"}>{assignmentStatusLabel(a.status)}</Badge>
                 </Card>
               ))}
               {examAssignments.length === 0 && (
@@ -325,7 +326,7 @@ export default async function ImpersonateStudentPage({ params, searchParams }: P
                       {a.dueDate && <span className="ml-2 text-amber-600">Due: {formatDate(a.dueDate)}</span>}
                     </p>
                   </div>
-                  <Badge variant={a.status === "IN_PROGRESS" ? "warning" : "info"}>{a.status}</Badge>
+                  <Badge variant={a.status === "IN_PROGRESS" ? "warning" : "info"}>{assignmentStatusLabel(a.status)}</Badge>
                 </Card>
               ))}
               {assignments.length === 0 && (

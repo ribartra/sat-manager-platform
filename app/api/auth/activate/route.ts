@@ -10,7 +10,7 @@ import { BadRequestError, ConflictError, ForbiddenError, InternalServerError, wi
 
 export const POST = withApiErrors(async function POST(req: NextRequest) {
   const { token, password } = await req.json();
-  if (!token || !password) return new BadRequestError("Invalid request").toResponse();
+  if (!token || !password) return new BadRequestError("Something is missing. Please fill in the form again.").toResponse();
   const limited = checkRateLimit(rateLimitKey(req, "activate", token.slice(0, 12)), 10, 15 * 60 * 1000);
   if (!limited.allowed) return rateLimitResponse(limited.resetAt);
 
@@ -30,7 +30,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
           reason: !invite ? "not_found" : invite.usedAt ? "already_used" : "expired",
         },
       });
-      return new BadRequestError("This invitation link is invalid or has expired.").toResponse();
+      return new BadRequestError("This invitation link doesn't work or has expired. Ask your teacher for a new one.").toResponse();
     }
     if (!invite.tokenHash) {
       await prisma.inviteToken.update({ where: { id: invite.id }, data: { tokenHash, token: `hashed:${tokenHash}` } });
@@ -52,7 +52,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
           outcome: "failure",
           metadata: { reason: "email_exists", email: invite.email },
         });
-        return new ConflictError("An account with this email already exists.").toResponse();
+        return new ConflictError("There's already an account with this email. Try signing in instead.").toResponse();
       }
 
       let parentId = "";
@@ -108,7 +108,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
         outcome: "failure",
         metadata: { reason: "parent_consent_required", email: invite.email },
       });
-      return new ForbiddenError("Parent/guardian authorization is required before this account can be activated.").toResponse();
+      return new ForbiddenError("Your parent or guardian needs to approve first. Then you can finish setting up your account.").toResponse();
     }
 
     const now = new Date();
@@ -125,7 +125,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
         outcome: "failure",
         metadata: { reason: "program_unavailable", email: invite.email },
       });
-      return new BadRequestError("This invitation is not linked to an active program.").toResponse();
+      return new BadRequestError("This invitation isn't linked to an open program. Ask your teacher for a new one.").toResponse();
     }
 
     const programId = invite.programId;
@@ -214,6 +214,6 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
     await captureCaughtError("auth.activate", error, {
       metadata: { tokenPrefix: String(token).slice(0, 8) },
     });
-    return new InternalServerError("Activation failed.").toResponse();
+    return new InternalServerError("We couldn't set up your account. Please try again.").toResponse();
   }
 });

@@ -4,6 +4,7 @@
 import prisma from "@/lib/prisma";
 import { snapshotModulesOf } from "@/lib/full-test-snapshot";
 import { scorePercent } from "@/lib/utils";
+import { difficultyLabel } from "@/lib/domain-meta";
 import { parseSnapshot, type PracticeSetSnapshot, type QuestionSnapshot } from "@/lib/attempt-snapshots";
 import { isAnsweredAnswer, sumAttemptElapsedTime, summarizeAllQuestionAnswers } from "@/lib/weighted-score";
 import {
@@ -104,15 +105,18 @@ export type MockReport = {
 };
 
 export function recommendationFor(pct: number) {
-  if (pct < 50) return "Re-teach, then assign Easy targeted practice.";
-  if (pct < 75) return "Review mistakes before moving up in difficulty.";
-  return "Monitor; a short reinforcement set is enough.";
+  if (pct < 50) return "Needs review with the teacher, then easier practice.";
+  if (pct < 75) return "Go over mistakes before trying harder questions.";
+  return "Doing well. A short refresher is enough.";
 }
 
-/** "Advanced Math - Nonlinear Functions - EASY" -> "Nonlinear Functions · EASY" (the area implies the domain). */
+/** "Advanced Math - Nonlinear Functions - EASY" -> "Nonlinear Functions (Easy)" (the area implies the domain). */
 export function shortSetName(name: string) {
   const parts = name.split(" - ").map((part) => part.trim()).filter(Boolean);
-  return parts.length >= 3 ? parts.slice(1).join(" · ") : name;
+  if (parts.length < 3) return name;
+  const last = parts[parts.length - 1].toUpperCase();
+  if (!["EASY", "MEDIUM", "HARD"].includes(last)) return parts.slice(1).join(" · ");
+  return `${parts.slice(1, -1).join(" - ")} (${difficultyLabel(last)})`;
 }
 
 const OPEN_STATUSES = ["PENDING", "IN_PROGRESS", "OVERDUE"];
@@ -425,4 +429,29 @@ export async function loadMockReport(studentId: string, filters: ReportFilters, 
       openAttemptStartedAt: a.attempts[0]?.startedAt ?? null,
     })),
   };
+}
+
+function moduleColumn(moduleName: string) {
+  const match = /module\s*(\d+)/i.exec(moduleName);
+  return match ? `Module ${match[1]}` : moduleName;
+}
+
+/**
+ * Section x module table for Full Practice Tests: rows are the sections, columns "Module 1",
+ * "Module 2" (no always-empty cells). Same correct/total as sectionModuleMetrics; only the column
+ * key changes (the module number instead of its full name). Shared by the student page and the PDF.
+ */
+export function moduleTableOf(sectionModuleMetrics: ProgressMetric[]) {
+  const merged = new Map<string, ProgressMetric>();
+  for (const metric of sectionModuleMetrics) {
+    const column = moduleColumn(metric.difficulty);
+    const key = `${metric.label}\u0000${column}`;
+    const existing = merged.get(key);
+    merged.set(key, existing
+      ? { ...existing, correct: existing.correct + metric.correct, total: existing.total + metric.total }
+      : { ...metric, difficulty: column });
+  }
+  const detail = [...merged.values()];
+  const columns = [...new Set(detail.map((metric) => metric.difficulty))].sort((a, b) => a.localeCompare(b, "en", { numeric: true }));
+  return { columns, detail };
 }

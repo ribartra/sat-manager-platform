@@ -92,12 +92,11 @@ export function SettingsClient({
       body: JSON.stringify({ apiKey: values.apiKey }),
     });
     if (!response.ok) {
-      setSecretMessage(errorMessage(await readApiError(response, "Could not update Mistral key.")));
+      setSecretMessage(errorMessage(await readApiError(response, "Could not save the key.")));
       return;
     }
-    const data = await response.json();
     mistralForm.reset({ apiKey: "" });
-    setSecretMessage(`Mistral key updated. SHA-256 ${String(data.sha256 ?? "").slice(0, 12)}...`);
+    setSecretMessage("Key saved.");
     router.refresh();
   }
 
@@ -115,14 +114,14 @@ export function SettingsClient({
       }),
     });
     if (!response.ok) {
-      setSmtpMessage(errorMessage(await readApiError(response, "Could not save SMTP settings.")));
+      setSmtpMessage(errorMessage(await readApiError(response, "Could not save the email settings.")));
       return;
     }
     const data = await response.json();
     smtpForm.setValue("password", "");
     setSmtpMessage(
       data.configured
-        ? "SMTP settings saved. Email sending is configured."
+        ? "Saved. Email sending is set up."
         : "Saved, but some required fields are still missing.",
     );
     router.refresh();
@@ -138,17 +137,17 @@ export function SettingsClient({
     });
     setSmtpTesting(false);
     // A failed send may still carry a structured reason (e.g. SMTP_NOT_CONFIGURED).
-    const failure = response.ok ? null : await readApiError(response, "Test email failed to send. Verify host, port and credentials.");
+    const failure = response.ok ? null : await readApiError(response, "The test email could not be sent. Check the mail server, port, login and password.");
     const data = ((failure ? failure.data : await response.json()) ?? {}) as { ok?: boolean; to?: string; reason?: string };
     if (!failure && data.ok) {
       setSmtpMessage(`Test email sent to ${data.to}. Check the inbox.`);
       return;
     }
     if (data.reason === "SMTP_NOT_CONFIGURED") {
-      setSmtpMessage("SMTP is not fully configured yet. Save host, user, sender and password first.");
+      setSmtpMessage("Email isn't fully set up yet. Save the mail server, login, from address and password first.");
       return;
     }
-    setSmtpMessage(failure ? failure.message : "Test email failed to send. Verify host, port and credentials.");
+    setSmtpMessage(failure ? failure.message : "The test email could not be sent. Check the mail server, port, login and password.");
   }
 
   async function toggle(setting: Setting) {
@@ -166,18 +165,17 @@ export function SettingsClient({
     <div className="space-y-6">
       <Card className="overflow-hidden">
         <div className="border-b border-border px-4 py-3">
-          <h2 className="text-sm font-semibold text-foreground">Integrations</h2>
+          <h2 className="text-sm font-semibold text-foreground">Connections</h2>
         </div>
         <div className="grid gap-4 px-4 py-4">
           <div>
-            <p className="text-sm font-medium text-foreground">Mistral OCR API key</p>
+            <p className="text-sm font-medium text-foreground">Document scanning key (Mistral)</p>
             <p className="mt-1 text-xs text-muted-foreground">
-              Stored encrypted in the database. SHA-256 is kept as a fingerprint; the raw key is never shown again.
+              Saved securely. Only the last 4 characters are shown.
             </p>
             <div className="mt-2 grid gap-1 text-xs text-muted-foreground">
-              <p>Status: {mistralKey.configured ? "Configured" : "Not configured"}</p>
+              <p>Status: {mistralKey.configured ? "Set up" : "Not set up"}</p>
               {mistralKey.last4 ? <p>Last 4: {mistralKey.last4}</p> : null}
-              {mistralKey.sha256 ? <p className="break-all">SHA-256: {mistralKey.sha256}</p> : null}
               {mistralKey.updatedAt ? (
                 <p suppressHydrationWarning>Updated: {new Date(mistralKey.updatedAt).toLocaleString()}</p>
               ) : null}
@@ -191,14 +189,14 @@ export function SettingsClient({
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Input type="password" placeholder="Paste new Mistral API key" autoComplete="off" {...field} />
+                      <Input type="password" placeholder="Paste the new key" autoComplete="off" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <Button type="submit" disabled={mistralForm.formState.isSubmitting}>
-                {mistralForm.formState.isSubmitting ? "Saving..." : "Save Key"}
+                {mistralForm.formState.isSubmitting ? "Saving..." : "Save key"}
               </Button>
             </form>
           </Form>
@@ -208,21 +206,17 @@ export function SettingsClient({
 
       <Card className="overflow-hidden">
         <div className="border-b border-border px-4 py-3">
-          <h2 className="text-sm font-semibold text-foreground">Email (SMTP)</h2>
+          <h2 className="text-sm font-semibold text-foreground">Email sending</h2>
         </div>
         <div className="grid gap-4 px-4 py-4">
           <div className="grid gap-1 text-xs text-muted-foreground">
             <p>
               Status:{" "}
               <span className={smtp.configured ? "font-medium text-green-700" : "font-medium text-amber-700"}>
-                {smtp.configured ? "Configured" : "Not configured"}
-              </span>{" "}
-              · Source: {smtp.source}
+                {smtp.configured ? "Set up" : "Not set up"}
+              </span>
             </p>
-            <p>
-              Used for invites, parent consent, password resets and shared parent reports. Password stored encrypted; DB
-              values override EMAIL_* env vars.
-            </p>
+            <p>Used for invites, parent consent, password resets and reports sent to parents. The password is saved securely.</p>
             {smtp.passwordConfigured && smtp.passwordLast4 ? (
               <p suppressHydrationWarning>
                 Password on file (last 4: {smtp.passwordLast4}
@@ -239,7 +233,7 @@ export function SettingsClient({
                     name="host"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>SMTP host</FormLabel>
+                        <FormLabel>Mail server</FormLabel>
                         <FormControl>
                           <Input placeholder="smtp-relay.brevo.com" autoComplete="off" {...field} />
                         </FormControl>
@@ -265,7 +259,7 @@ export function SettingsClient({
                     name="user"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>SMTP user / login</FormLabel>
+                        <FormLabel>Email login</FormLabel>
                         <FormControl>
                           <Input placeholder="your-brevo-smtp-login" autoComplete="off" {...field} />
                         </FormControl>
@@ -292,13 +286,13 @@ export function SettingsClient({
                     render={({ field }) => (
                       <FormItem className="md:col-span-2">
                         <FormLabel>
-                          Password / SMTP key{" "}
+                          Password{" "}
                           {smtp.passwordConfigured ? (
                             <span className="text-muted-foreground">(leave blank to keep current)</span>
                           ) : null}
                         </FormLabel>
                         <FormControl>
-                          <Input type="password" placeholder="Paste SMTP key" autoComplete="off" {...field} />
+                          <Input type="password" placeholder="Paste the password" autoComplete="off" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -308,7 +302,7 @@ export function SettingsClient({
               </FormSection>
               <div className="flex flex-wrap gap-2">
                 <Button type="submit" disabled={smtpForm.formState.isSubmitting}>
-                  {smtpForm.formState.isSubmitting ? "Saving..." : "Save SMTP"}
+                  {smtpForm.formState.isSubmitting ? "Saving..." : "Save email settings"}
                 </Button>
                 <Button type="button" variant="secondary" onClick={testSmtp} disabled={smtpTesting}>
                   {smtpTesting ? "Sending..." : "Send test email"}
@@ -322,19 +316,14 @@ export function SettingsClient({
 
       <Card className="overflow-hidden">
         <div className="border-b border-border px-4 py-3">
-          <h2 className="text-sm font-semibold text-foreground">Feature flags</h2>
+          <h2 className="text-sm font-semibold text-foreground">Optional features</h2>
         </div>
         <div className="divide-y divide-border">
           {settings.map((setting) => (
             <div key={setting.key} className="flex items-center justify-between gap-4 px-4 py-4">
               <div>
-                <p className="text-sm font-medium text-foreground">{setting.label}</p>
+                <p className="text-sm font-medium text-foreground" title={setting.key}>{setting.label}</p>
                 <p className="mt-1 text-xs text-muted-foreground">{setting.description}</p>
-                <p className="mt-1 text-xs text-muted-foreground/80">
-                  {setting.key}
-                  {setting.owner ? ` · owner: ${setting.owner}` : ""}
-                  {setting.expiresAt ? ` · expires: ${setting.expiresAt}` : ""}
-                </p>
               </div>
               <button
                 type="button"

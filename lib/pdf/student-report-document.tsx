@@ -3,10 +3,12 @@
 // it to a PDF buffer. One section per selected area, each starting on a new page, so several
 // areas come out as a single concatenated file.
 // Only WinAnsi characters are used (built-in Helvetica): no arrows or ≤/≥ symbols.
-import { Document, G, Page, Rect, StyleSheet, Svg, Text, View, Line, renderToBuffer } from "@react-pdf/renderer";
+import { Document, Font, G, Page, Rect, StyleSheet, Svg, Text, View, Line, renderToBuffer } from "@react-pdf/renderer";
 import type { MockReport, PracticeReport } from "@/lib/student-report";
-import { shortSetName } from "@/lib/student-report";
+import { moduleTableOf, shortSetName } from "@/lib/student-report";
 import type { ProgressMetric } from "@/lib/progress-analytics";
+import { assignmentStatusLabel, difficultyLabel } from "@/lib/domain-meta";
+import { formatDate, formatDuration } from "@/lib/utils";
 
 export type ReportAreaKey = "math" | "reading" | "writing" | "mocks";
 
@@ -19,6 +21,9 @@ export type StudentReportData = {
     | { area: "mocks"; mock: MockReport }
   >;
 };
+
+// Wrap whole words only: no "COM-PLETED" style hyphen breaks in labels and sentences.
+Font.registerHyphenationCallback((word) => [word]);
 
 const AREA = {
   math: { label: "Math", color: "#0ea5e9", tint: "#e0f2fe" },
@@ -38,9 +43,8 @@ function band(pct: number | null) {
 }
 
 const pct = (m: Pick<ProgressMetric, "correct" | "total"> | undefined) => (m && m.total > 0 ? Math.round((m.correct / m.total) * 100) : null);
-const time = (seconds: number) => `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
-const date = (d: Date | string | null | undefined) =>
-  d ? new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "-";
+const time = (seconds: number) => formatDuration(seconds);
+const date = (d: Date | string | null | undefined) => (d ? formatDate(d) : "-");
 
 const s = StyleSheet.create({
   page: { paddingTop: 34, paddingBottom: 46, paddingHorizontal: 36, fontFamily: "Helvetica", fontSize: 9, color: GRAY[900] },
@@ -91,12 +95,14 @@ function SectionHeader({ area, data }: { area: ReportAreaKey; data: StudentRepor
           <Text style={[s.eyebrow, { color: cfg.color }]}>SAT Practice Report</Text>
           <Text style={s.name}>{data.student.name}</Text>
           <Text style={s.meta}>
-            {data.student.email}
-            {data.student.programs.length ? `  ·  Programs: ${data.student.programs.join(", ")}` : ""}
-            {data.student.startDate ? `  ·  Since ${date(data.student.startDate)}` : ""}
+            {[
+              data.student.email,
+              data.student.programs.length ? `Program: ${data.student.programs.join(", ")}` : null,
+              data.student.startDate ? `Started ${date(data.student.startDate)}` : null,
+            ].filter(Boolean).join(" · ")}
           </Text>
           <Text style={s.meta}>
-            {data.filterSummary ? `Filters: ${data.filterSummary}` : "All activity (no filters)"}  ·  Generated {date(data.generatedAt)}
+            {data.filterSummary ? `Showing: ${data.filterSummary}` : "Showing: all practice"} · Created {date(data.generatedAt)}
           </Text>
         </View>
         <Text style={[s.areaPill, { backgroundColor: cfg.color }]}>{cfg.label}</Text>
@@ -120,7 +126,7 @@ function Kpis({ items }: { items: Array<{ label: string; value: string; color?: 
 }
 
 /** Matrix like the UI's PerformanceBreakdown: one row per label, one column per dimension. */
-function Matrix({ title, hint, rowLabel, dimensions, summary, detail, groups }: { title: string; hint: string; rowLabel: string; dimensions: string[]; summary: ProgressMetric[]; detail: ProgressMetric[]; groups?: Array<{ label: string; rows: string[] }> }) {
+function Matrix({ title, hint, rowLabel, dimensions, dimensionLabel = (d) => d, summary, detail, groups }: { title: string; hint: string; rowLabel: string; dimensions: string[]; dimensionLabel?: (dimension: string) => string; summary?: ProgressMetric[]; detail: ProgressMetric[]; groups?: Array<{ label: string; rows: string[] }> }) {
   const present = new Set(detail.map((m) => m.label));
   // Same grouping as the UI: Domain header rows with skills in official order; else alphabetical.
   const sections = groups
@@ -151,12 +157,14 @@ function Matrix({ title, hint, rowLabel, dimensions, summary, detail, groups }: 
       <View style={s.table}>
         <View style={s.th}>
           <Text style={[s.thCell, { flex: 1.6 }]}>{rowLabel}</Text>
-          {dimensions.map((d) => <Text key={d} style={[s.thCell, { flex: 1 }]}>{d}</Text>)}
+          {dimensions.map((d) => <Text key={d} style={[s.thCell, { flex: 1 }]}>{dimensionLabel(d)}</Text>)}
         </View>
-        <View style={[s.tr, { backgroundColor: GRAY[50] }]}>
-          <Text style={[s.td, s.bold, { flex: 1.6 }]}>All selected questions</Text>
-          {dimensions.map((d) => cell(d, summary.find((m) => m.difficulty === d)))}
-        </View>
+        {summary ? (
+          <View style={[s.tr, { backgroundColor: GRAY[50] }]}>
+            <Text style={[s.td, s.bold, { flex: 1.6 }]}>All questions</Text>
+            {dimensions.map((d) => cell(d, summary.find((m) => m.difficulty === d)))}
+          </View>
+        ) : null}
         {sections.map((section) => (
           <View key={section.label ?? "rows"}>
             {section.label ? (
@@ -179,7 +187,7 @@ function Matrix({ title, hint, rowLabel, dimensions, summary, detail, groups }: 
 
 function StatusText({ status }: { status: string }) {
   const color = status === "OVERDUE" ? "#dc2626" : status === "IN_PROGRESS" ? "#ca8a04" : "#2563eb";
-  return <Text style={[s.bold, { color, fontSize: 7.5 }]}>{status.replace("_", " ")}</Text>;
+  return <Text style={[s.bold, { color, fontSize: 7.5 }]}>{assignmentStatusLabel(status)}</Text>;
 }
 
 function PracticeSection({ report }: { report: PracticeReport }) {
@@ -189,44 +197,45 @@ function PracticeSection({ report }: { report: PracticeReport }) {
     <>
       <Kpis
         items={[
-          { label: `Attempts · ${report.areaLabel}`, value: String(k.attempts) },
-          { label: "Average score", value: k.overall.percent !== null ? `${k.overall.percent}%` : "-", color: band(k.overall.percent).text, sub: k.overall.total ? `${k.overall.correct} of ${k.overall.total} correct` : undefined },
-          { label: "Total time", value: time(k.totalTime) },
-          { label: "Avg question time", value: k.avgQuestionTime !== null ? time(k.avgQuestionTime) : "-" },
-          { label: "Pending sets", value: String(k.pending) },
+          { label: "Practice sets completed", value: String(k.attempts) },
+          { label: "Questions correct", value: k.overall.percent !== null ? `${k.overall.percent}%` : "-", color: band(k.overall.percent).text, sub: k.overall.total ? `${k.overall.correct} of ${k.overall.total} correct` : undefined },
+          { label: "Time practiced", value: time(k.totalTime) },
+          { label: "Average time per question", value: k.avgQuestionTime !== null ? time(k.avgQuestionTime) : "-" },
+          { label: "Assignments to do", value: String(k.pending) },
         ]}
       />
       {k.attempts === 0 ? (
-        <View style={[s.table, s.section]}><Text style={s.empty}>No submitted {report.areaLabel} practice for this student yet.</Text></View>
+        <View style={[s.table, s.section]}><Text style={s.empty}>No {report.areaLabel} practice finished yet.</Text></View>
       ) : (
         <>
           <Matrix
             title="Performance by skill and difficulty"
-            hint="Correct answers / all questions in the selected filters; blank answers count as incorrect."
+            hint="Percent of questions answered correctly. Skipped questions count as wrong."
             rowLabel="Skill"
             dimensions={dims.length ? dims : ["EASY", "MEDIUM", "HARD"]}
+            dimensionLabel={difficultyLabel}
             summary={report.difficultyMetrics}
             detail={report.topicDifficultyMetrics}
             groups={report.skillGroups}
           />
           <View style={s.section}>
-            <Text style={s.h2}>Skill performance by difficulty</Text>
-            <Text style={s.hint}>Lowest accuracy first, with the suggested next step.</Text>
+            <Text style={s.h2}>Skills to work on next</Text>
+            <Text style={s.hint}>Weakest skills first, with what to do next.</Text>
             <View style={s.table}>
               <View style={s.th}>
-                <Text style={[s.thCell, { flex: 2.2 }]}>Skill · difficulty</Text>
-                <Text style={[s.thCell, { flex: 1.3 }]}>Accuracy</Text>
-                <Text style={[s.thCell, { flex: 0.8, textAlign: "right" }]}>Avg time</Text>
+                <Text style={[s.thCell, { flex: 2.2 }]}>Skill (level)</Text>
+                <Text style={[s.thCell, { flex: 1.3 }]}>Correct</Text>
+                <Text style={[s.thCell, { flex: 0.8, textAlign: "right" }]}>Time per question</Text>
                 <Text style={[s.thCell, { flex: 2.6 }]}>Suggested next step</Text>
               </View>
               {report.weakSkills.map((w) => (
                 <View key={w.key} style={s.tr} wrap={false}>
                   <View style={[s.td, { flex: 2.2, flexDirection: "row", alignItems: "center", gap: 4 }]}>
                     <Text style={s.bold}>{w.label}</Text>
-                    <Text style={s.chip}>{w.difficulty}</Text>
+                    <Text style={s.chip}>{difficultyLabel(w.difficulty)}</Text>
                   </View>
                   <View style={[s.td, { flex: 1.3 }]}>
-                    <Text style={[s.bold, { color: band(w.percent).text }]}>{w.percent}%  <Text style={[s.tiny, { fontFamily: "Helvetica" }]}>({w.correct}/{w.total})</Text></Text>
+                    <Text style={[s.bold, { color: band(w.percent).text }]}>{w.percent}% <Text style={[s.tiny, { fontFamily: "Helvetica" }]}>({w.correct} of {w.total})</Text></Text>
                     <Bar value={w.percent} width={60} />
                   </View>
                   <Text style={[s.td, s.muted, { flex: 0.8, textAlign: "right" }]}>{w.avgTime !== null ? time(w.avgTime) : "-"}</Text>
@@ -241,15 +250,15 @@ function PracticeSection({ report }: { report: PracticeReport }) {
       {/* Side-by-side lists move to the next page as a block (flex rows do not split across pages). */}
       <View style={s.twoCol} wrap={false}>
         <View style={[s.section, { flex: 1 }]}>
-          <Text style={s.h2}>Active practice sets ({report.assignments.length})</Text>
+          <Text style={s.h2}>Assigned practice ({report.assignments.length})</Text>
           <View style={s.table}>
-            {report.assignments.length === 0 ? <Text style={s.empty}>No active {report.areaLabel} practice sets.</Text> : report.assignments.map((a) => (
+            {report.assignments.length === 0 ? <Text style={s.empty}>No {report.areaLabel} practice assigned right now.</Text> : report.assignments.map((a) => (
               <View key={a.id} style={s.tr} wrap={false}>
                 <View style={[s.td, { flex: 1 }]}>
                   <Text style={s.bold}>{shortSetName(a.name)}</Text>
                   <View style={{ flexDirection: "row", gap: 6, marginTop: 1 }}>
                     <StatusText status={a.status} />
-                    {a.locked ? <Text style={[s.tiny, { color: "#dc2626" }]}>Locked</Text> : null}
+                    {a.locked ? <Text style={[s.tiny, { color: "#dc2626" }]}>Not open yet</Text> : null}
                     {a.dueDate ? <Text style={s.tiny}>Due {date(a.dueDate)}</Text> : null}
                   </View>
                 </View>
@@ -258,9 +267,9 @@ function PracticeSection({ report }: { report: PracticeReport }) {
           </View>
         </View>
         <View style={[s.section, { flex: 1.25 }]}>
-          <Text style={s.h2}>Recent attempts ({report.attempts.length})</Text>
+          <Text style={s.h2}>Recent practice ({report.attempts.length})</Text>
           <View style={s.table}>
-            {report.attempts.length === 0 ? <Text style={s.empty}>No completed {report.areaLabel} attempts yet.</Text> : report.attempts.slice(0, 10).map((a) => (
+            {report.attempts.length === 0 ? <Text style={s.empty}>No {report.areaLabel} practice finished yet.</Text> : report.attempts.slice(0, 10).map((a) => (
               <View key={a.id} style={s.tr} wrap={false}>
                 <View style={[s.td, { flex: 1 }]}>
                   <Text style={s.bold}>{shortSetName(a.name)}</Text>
@@ -270,7 +279,7 @@ function PracticeSection({ report }: { report: PracticeReport }) {
               </View>
             ))}
           </View>
-          {report.attempts.length > 10 ? <Text style={[s.tiny, { marginTop: 3 }]}>+{report.attempts.length - 10} older attempts</Text> : null}
+          {report.attempts.length > 10 ? <Text style={[s.tiny, { marginTop: 3 }]}>+{report.attempts.length - 10} earlier sets not shown</Text> : null}
         </View>
       </View>
 
@@ -311,7 +320,7 @@ function ScoreChart({ series }: { series: MockReport["scoreSeries"] }) {
     <View style={s.section} wrap={false}>
       <Text style={s.h2}>Scores by exam</Text>
       <Text style={s.hint}>
-        {"Each bar is the SAT total score (400-1600) = Reading & Writing + Math (each 200-800). The bold number above each bar is the total; the numbers inside are the section scores."}
+        {"Each bar is one Full Practice Test. The number on top is the total score (out of 1600). Inside: Reading & Writing (bottom) and Math (top), each out of 800."}
       </Text>
       <Svg width={width} height={height}>
         {ticks.map((tick) => (
@@ -347,62 +356,66 @@ function ScoreChart({ series }: { series: MockReport["scoreSeries"] }) {
       </Svg>
       <View style={{ flexDirection: "row", gap: 12, marginTop: 2, alignItems: "center" }}>
         {[
-          { label: "Reading & Writing (200-800)", color: AREA.reading.color },
-          { label: "Math (200-800)", color: AREA.math.color },
+          { label: "Reading & Writing (out of 800)", color: AREA.reading.color },
+          { label: "Math (out of 800)", color: AREA.math.color },
         ].map((item) => (
           <View key={item.label} style={{ flexDirection: "row", alignItems: "center", gap: 3 }}>
             <Svg width={7} height={7}><Rect x={0} y={0} width={7} height={7} fill={item.color} /></Svg>
             <Text style={s.tiny}>{item.label}</Text>
           </View>
         ))}
-        <Text style={s.tiny}>{"Bold number = Total (400-1600) = R&W + Math"}</Text>
+        <Text style={s.tiny}>Number on top = total score</Text>
       </View>
     </View>
   );
 }
 
+const SECTION_ROWS = ["Reading & Writing", "Math"];
+
+/** "Reading & Writing Module 1" -> "Module 1" (the row already names the section). */
 function MockSection({ report }: { report: MockReport }) {
   const k = report.kpis;
+  const moduleTable = moduleTableOf(report.sectionModuleMetrics);
   return (
     <>
       <Kpis
         items={[
-          { label: "Exams completed", value: String(k.exams) },
-          { label: "Latest total", value: k.latestTotal !== null ? String(k.latestTotal) : "-", color: AREA.mocks.color },
-          { label: "Latest R&W", value: k.latestRw !== null ? String(k.latestRw) : "-" },
+          { label: "Full Practice Tests completed", value: String(k.exams) },
+          { label: "Latest total score", value: k.latestTotal !== null ? String(k.latestTotal) : "-", color: AREA.mocks.color },
+          { label: "Latest Reading & Writing", value: k.latestRw !== null ? String(k.latestRw) : "-" },
           { label: "Latest Math", value: k.latestMath !== null ? String(k.latestMath) : "-" },
-          { label: "Pending exams", value: String(k.pending) },
+          { label: "Full Practice Tests to do", value: String(k.pending) },
         ]}
       />
       {report.exams.length === 0 ? (
-        <View style={[s.table, s.section]}><Text style={s.empty}>No submitted Full Practice Tests for this student yet.</Text></View>
+        <View style={[s.table, s.section]}><Text style={s.empty}>No Full Practice Tests finished yet.</Text></View>
       ) : (
         <>
           <ScoreChart series={report.scoreSeries} />
           <Matrix
             title="Performance by section and module"
-            hint="Correct answers / all questions of each module; blank answers count as incorrect."
+            hint="Percent correct in each module. Skipped questions count as wrong."
             rowLabel="Section"
-            dimensions={report.modules}
-            summary={report.moduleMetrics}
-            detail={report.sectionModuleMetrics}
+            dimensions={moduleTable.columns}
+            detail={moduleTable.detail}
+            groups={[{ label: "", rows: SECTION_ROWS }]}
           />
           <View style={s.section}>
-            <Text style={s.h2}>Exam history</Text>
+            <Text style={s.h2}>Full Practice Test history</Text>
             <View style={s.table}>
               <View style={s.th}>
                 <Text style={[s.thCell, { flex: 1 }]}>Date</Text>
-                <Text style={[s.thCell, { flex: 2.5 }]}>Exam</Text>
-                <Text style={[s.thCell, { flex: 1, textAlign: "right" }]}>SAT total</Text>
-                <Text style={[s.thCell, { flex: 1, textAlign: "right" }]}>R&W</Text>
+                <Text style={[s.thCell, { flex: 2.2 }]}>Full Practice Test</Text>
+                <Text style={[s.thCell, { flex: 1, textAlign: "right" }]}>Total score</Text>
+                <Text style={[s.thCell, { flex: 1.3, textAlign: "right" }]}>Reading & Writing</Text>
                 <Text style={[s.thCell, { flex: 1, textAlign: "right" }]}>Math</Text>
               </View>
               {report.exams.map((exam) => (
                 <View key={exam.id} style={s.tr} wrap={false}>
                   <Text style={[s.td, s.muted, { flex: 1 }]}>{date(exam.submittedAt)}</Text>
-                  <Text style={[s.td, s.bold, { flex: 2.5 }]}>{exam.name}</Text>
+                  <Text style={[s.td, s.bold, { flex: 2.2 }]}>{exam.name}</Text>
                   <Text style={[s.td, s.bold, { flex: 1, textAlign: "right" }]}>{exam.totalScore ?? "-"}</Text>
-                  <Text style={[s.td, { flex: 1, textAlign: "right" }]}>{exam.rwScore ?? "-"}</Text>
+                  <Text style={[s.td, { flex: 1.3, textAlign: "right" }]}>{exam.rwScore ?? "-"}</Text>
                   <Text style={[s.td, { flex: 1, textAlign: "right" }]}>{exam.mathScore ?? "-"}</Text>
                 </View>
               ))}
@@ -411,9 +424,9 @@ function MockSection({ report }: { report: MockReport }) {
         </>
       )}
       <View style={s.section}>
-        <Text style={s.h2}>Active Full Practice Tests ({report.activeExams.length})</Text>
+        <Text style={s.h2}>Assigned Full Practice Tests ({report.activeExams.length})</Text>
         <View style={s.table}>
-          {report.activeExams.length === 0 ? <Text style={s.empty}>No active Full Practice Tests.</Text> : report.activeExams.map((a) => (
+          {report.activeExams.length === 0 ? <Text style={s.empty}>No Full Practice Tests assigned right now.</Text> : report.activeExams.map((a) => (
             <View key={a.id} style={s.tr} wrap={false}>
               <Text style={[s.td, s.bold, { flex: 3 }]}>{a.name}</Text>
               <View style={[s.td, { flex: 1 }]}><StatusText status={a.status} /></View>

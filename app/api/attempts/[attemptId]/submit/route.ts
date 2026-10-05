@@ -20,7 +20,7 @@ import { NotFoundError, UnauthorizedError, withApiErrors } from "@/lib/api-error
 
 export const POST = withApiErrors(async function POST(req: NextRequest, { params }: { params: Promise<{ attemptId: string }> }) {
   const session = await requireApprovedSession();
-  if (!session) return new UnauthorizedError("Unauthorized").toResponse();
+  if (!session) return new UnauthorizedError("Please sign in again.").toResponse();
 
   const { attemptId } = await params;
   const { answers: submittedAnswers, totalTime, timeSpentByQuestion, markedQuestionIds, notes, eliminatedOptions } = await req.json();
@@ -31,7 +31,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
       answers: true,
     },
   });
-  if (!attempt) return new NotFoundError("Not found").toResponse();
+  if (!attempt) return new NotFoundError("This practice set was already submitted or closed by your teacher.").toResponse();
 
   // Get the practice set questions to check correct answers
   const psQuestions = await prisma.practiceSetQuestion.findMany({

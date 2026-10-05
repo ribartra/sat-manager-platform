@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { formatDate } from "@/lib/utils";
+import { roleLabel } from "@/lib/domain-meta";
 import { Card } from "@/components/ui/card";
 import {
   AUDIT_ACTION_LABELS,
@@ -20,9 +21,9 @@ interface PageProps {
 
 const TABS: { id: string; label: string; match?: AuditCategory }[] = [
   { id: "all", label: "All" },
-  { id: "auth", label: "Auth", match: "Auth" },
+  { id: "auth", label: "Sign-in", match: "Auth" },
   { id: "users", label: "Users", match: "Users" },
-  { id: "attempts", label: "Attempts", match: "Attempts" },
+  { id: "attempts", label: "Student work", match: "Attempts" },
   { id: "content", label: "Content", match: "Content" },
   { id: "import", label: "Import", match: "Import" },
   { id: "programs", label: "Programs", match: "Programs" },
@@ -66,9 +67,9 @@ export default async function AdminLogsPage({ searchParams }: PageProps) {
 
   return (
     <PageShell width="wide">
-      <h1 className="mb-1 text-xl font-semibold text-gray-900">Audit Log</h1>
+      <h1 className="mb-1 text-xl font-semibold text-gray-900">Activity log</h1>
       <p className="mb-4 text-sm text-gray-500">
-        Latest system events with full payload. Unknown codes are humanized automatically.
+        Recent actions by users.
       </p>
 
       <div className="mb-4 flex flex-wrap gap-2">
@@ -97,12 +98,13 @@ export default async function AdminLogsPage({ searchParams }: PageProps) {
                 <th className="px-4 py-3 text-left font-medium text-gray-500">When</th>
                 <th className="px-4 py-3 text-left font-medium text-gray-500">Who</th>
                 <th className="px-4 py-3 text-left font-medium text-gray-500">Event</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-500">Target / payload</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-500">Details</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {filtered.map((log) => {
-                const categoryLabel = actionCategory(log.action);
+                const eventCategory = actionCategory(log.action);
+                const categoryLabel = TABS.find((t) => t.match === eventCategory)?.label ?? eventCategory;
                 const label = humanizeAction(log.action);
                 const outcome = outcomeFromMetadata(log.metadata);
                 const payload = formatAuditPayload(log.metadata);
@@ -120,12 +122,12 @@ export default async function AdminLogsPage({ searchParams }: PageProps) {
                       {log.user ? (
                         <>
                           <p className="font-medium text-gray-800">{log.user.name}</p>
-                          <p className="text-xs text-gray-400">{log.user.role}</p>
+                          <p className="text-xs text-gray-400">{roleLabel(log.user.role)}</p>
                           <p className="text-[10px] text-gray-400">{log.user.email}</p>
                         </>
                       ) : (
                         <>
-                          <p className="font-medium text-gray-800">Anonymous / System</p>
+                          <p className="font-medium text-gray-800">System</p>
                           <p className="text-xs text-gray-400">—</p>
                         </>
                       )}
@@ -142,10 +144,7 @@ export default async function AdminLogsPage({ searchParams }: PageProps) {
                           </span>
                         )}
                       </div>
-                      <p className="mt-1 font-medium text-gray-900">{label}</p>
-                      <p className="mt-0.5 font-mono text-[10px] text-gray-400" title="Internal event code">
-                        {log.action}
-                      </p>
+                      <p className="mt-1 font-medium text-gray-900" title={log.action}>{label}</p>
                     </td>
                     <td className="px-4 py-3">
                       <AuditPayload payload={payload} targetType={log.targetType} targetId={log.targetId} />

@@ -29,6 +29,7 @@ import {
   difficultyOptions,
   explanationVisibilityOptions,
   practiceSetStatusOptions,
+  questionTypeLabel,
 } from "@/lib/domain-meta";
 import { validatePracticeSetPayload } from "@/lib/content-validation";
 import {
@@ -221,10 +222,9 @@ export function PracticeSetEditor({
 
         <Card padding="md" className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-xs font-medium uppercase text-gray-400">PDF/DOCX Import</p>
-            <h2 className="text-sm font-semibold text-gray-900">Create a review batch for this Practice Set</h2>
+            <h2 className="text-sm font-semibold text-gray-900">Import questions from a file</h2>
             <p className="mt-1 text-xs text-gray-500">
-              Upload the question file plus any answer or explanation files, then review extracted questions before promotion.
+              Upload the test and answer files. You&apos;ll check the questions before they&apos;re added.
             </p>
           </div>
           <ImportQuestionnaireButton
@@ -341,7 +341,7 @@ export function PracticeSetEditor({
                     meta={
                       <>
                         <Badge variant={difficultyBadgeVariant(q.difficulty)}>{difficultyLabel(q.difficulty)}</Badge>
-                        <Badge variant="default">{q.type}</Badge>
+                        <Badge variant="default">{questionTypeLabel(q.type, true)}</Badge>
                       </>
                     }
                     stemClassName="font-medium text-gray-900"
@@ -389,7 +389,7 @@ export function PracticeSetEditor({
             <option value="">Select a published question...</option>
             {visibleAvailableQuestions.map((q) => (
               <option key={q.id} value={q.id}>
-                {q.difficulty} / {q.type} / {plainMathLabel(q.stem, 90)}
+                {difficultyLabel(q.difficulty)} / {questionTypeLabel(q.type, true)} / {plainMathLabel(q.stem, 90)}
               </option>
             ))}
           </Select>

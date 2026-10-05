@@ -33,8 +33,8 @@ const checks = [
     file: "app/(student)/student/results/[attemptId]/page.tsx",
     requires: [
       "canRevealSolutions",
-      "Correct answers and explanations are hidden",
-      "Unanswered - no explanation shown",
+      "Your teacher has hidden the answers for this set.",
+      "You left this blank.",
       "Try Again",
       "parseSnapshot<QuestionSnapshot>",
       "parseSnapshot<PracticeSetSnapshot>",
@@ -53,13 +53,13 @@ const checks = [
       "markedQuestionIds",
       "eliminatedOptions",
       "useConfirm",
-      "Blank answers will be marked as omitted",
+      "Blank questions count as wrong.",
     ],
     label: "Player Practice Set cubre autosave offline, reconexion, tiempo y confirmacion con blanks",
   },
   {
     file: "components/sat/save-indicator.tsx",
-    requires: ["Saved locally", "Saving…", "Sync problem", "SaveStatus"],
+    requires: ["Saved (offline)", "Saving…", "Not saved yet", "SaveStatus"],
     label: "SaveIndicator unifica copy de persistencia (Saved locally)",
   },
   {
@@ -99,7 +99,7 @@ const checks = [
   {
     file: "app/(teacher)/teacher/students/[studentId]/attempts/[attemptId]/attempt-actions-client.tsx",
     requires: [
-      "Optional reason for reopen/invalidate",
+      "Reason (optional, visible to admins)",
       "body: JSON.stringify({ reason: actionReason })",
       "setActionReason(\"\")",
     ],
@@ -114,7 +114,7 @@ const checks = [
       "advanceAfterModule",
       "phase === \"BREAK\"",
       "remaining <= 60",
-      "Pause & Exit",
+      "Save & exit",
       "MathToolPanel",
       "context=\"full-test\"",
       "writeBuffer(offlineKey",
@@ -123,7 +123,7 @@ const checks = [
       "fetchWithTransientRetry",
       "SaveIndicator",
       "overtimeRef",
-      "Overtime",
+      "Extra time",
       "extraTimeUsed: extraTimeUsedRef.current",
       "Submit module",
     ],

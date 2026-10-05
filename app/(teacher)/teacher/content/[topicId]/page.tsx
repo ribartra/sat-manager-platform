@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ChevronLeft, Plus, Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
+import { difficultyBadgeVariant, difficultyLabel, practiceSetStatusLabel } from "@/lib/domain-meta";
 import { practiceAreaLabel, resolvePracticeArea, tabFromPracticeArea } from "@/lib/practice-area";
 
 interface PageProps {
@@ -111,7 +111,7 @@ export default async function TopicContentPage({ params }: PageProps) {
                   </td>
                   <td className="px-4 py-3 text-right text-gray-500">{ps.questions.length}</td>
                   <td className="px-4 py-3">
-                    <Badge variant={statusBadge(ps.status)}>{ps.status}</Badge>
+                    <Badge variant={statusBadge(ps.status)}>{practiceSetStatusLabel(ps.status)}</Badge>
                   </td>
                   <td className="px-4 py-3 text-right text-gray-500">
                     {new Set(ps.assignments.map((a) => a.studentId)).size} students

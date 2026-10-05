@@ -10,7 +10,8 @@ import { Card, CardBody } from "@/components/ui/card";
 import { Clock, BookOpen, TrendingUp, CheckCircle, ClipboardList } from "lucide-react";
 import { ParentApprovalCard } from "./parent-approval-card";
 import { refreshAssignmentStates } from "@/lib/assignments";
-import { difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
+import { assignmentStatusLabel, difficultyBadgeVariant, difficultyLabel, enrollmentStatusLabel } from "@/lib/domain-meta";
+import { shortSetName } from "@/lib/student-report";
 import {
   activeAreaTab,
   practiceAreaFromTab,
@@ -189,9 +190,9 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
 
       {!isMocks && pendingExamCount > 0 && (
         <div className="mb-4 rounded-md border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-900">
-          {pendingExamCount} active Full Practice Test{pendingExamCount === 1 ? "" : "s"} assigned.{" "}
+          You have {pendingExamCount} Full Practice Test{pendingExamCount === 1 ? "" : "s"} to take.{" "}
           <Link href={buildProgressHref("/student", { ...filters, area: "mocks" })} className="font-medium underline">
-            Open Full Practice Tests tab →
+            Go to Full Practice Tests →
           </Link>
         </div>
       )}
@@ -206,7 +207,7 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-gray-900">{examAssignments.length}</p>
-                  <p className="text-xs text-gray-500">Pending exams</p>
+                  <p className="text-xs text-gray-500">Tests to take</p>
                 </div>
               </CardBody>
             </Card>
@@ -217,7 +218,7 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-gray-900">{examCompletedCount}</p>
-                  <p className="text-xs text-gray-500">Exams completed</p>
+                  <p className="text-xs text-gray-500">Tests finished</p>
                 </div>
               </CardBody>
             </Card>
@@ -225,14 +226,14 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
 
           <section className="mb-8">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-base font-semibold text-gray-900">Assigned Exams</h2>
+              <h2 className="text-base font-semibold text-gray-900">Your Full Practice Tests</h2>
               <Link href={buildProgressHref("/student/content-map", { ...filters, area: "mocks" })} className="text-sm text-blue-600 hover:underline">
                 View all
               </Link>
             </div>
             {examAssignments.length === 0 ? (
               <Card padding="lg" className="text-center text-sm text-gray-400">
-                No Full Practice Tests assigned yet.
+                You don&apos;t have any Full Practice Tests yet.
               </Card>
             ) : (
               <div className="space-y-2">
@@ -247,13 +248,13 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
                           Full Practice Test ·{" "}
                           {assignment.test.breakMinutes > 0 ? "Optional break" : "No break"}
                           {assignment.dueDate && (
-                            <span className="ml-2 text-amber-600">Due: {formatDate(assignment.dueDate)}</span>
+                            <span className="ml-2 text-amber-600">Due {formatDate(assignment.dueDate)}</span>
                           )}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
                         <Badge variant={inProgress ? "warning" : "info"}>
-                          {inProgress ? "In Progress" : "Pending"}
+                          {inProgress ? "In progress" : "Not started"}
                         </Badge>
                         <Link
                           href={buildProgressHref(`/student/full-tests/${assignment.id}`, filters)}
@@ -279,7 +280,7 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-gray-900">{totalSets}</p>
-                  <p className="text-xs text-gray-500">Sets completed · {areaLabel}</p>
+                  <p className="text-xs text-gray-500">Sets finished · {areaLabel}</p>
                 </div>
               </CardBody>
             </Card>
@@ -292,7 +293,7 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
                   <p className="text-2xl font-bold text-gray-900">
                     {avgScore !== null ? `${avgScore}%` : "—"}
                   </p>
-                  <p className="text-xs text-gray-500">Avg score · {areaLabel}</p>
+                  <p className="text-xs text-gray-500">Average score · {areaLabel}</p>
                 </div>
               </CardBody>
             </Card>
@@ -303,7 +304,7 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-gray-900">{assignments.length}</p>
-                  <p className="text-xs text-gray-500">Pending · {areaLabel}</p>
+                  <p className="text-xs text-gray-500">To do · {areaLabel}</p>
                 </div>
               </CardBody>
             </Card>
@@ -311,24 +312,24 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
 
           <section className="mb-8">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-base font-semibold text-gray-900">Assigned Practice Sets</h2>
+              <h2 className="text-base font-semibold text-gray-900">Your practice sets</h2>
               <Link href={buildProgressHref("/student/content-map", filters)} className="text-sm text-blue-600 hover:underline">
                 View all
               </Link>
             </div>
             {assignments.length === 0 ? (
               <Card padding="lg" className="text-center text-sm text-gray-400">
-                No {areaLabel} practice sets assigned yet.
+                You don&apos;t have any {areaLabel} practice sets yet.
               </Card>
             ) : (
               <div className="space-y-2">
                 {assignments.map((a) => (
                   <Card key={a.id} className="flex items-center justify-between px-4 py-3">
                     <div>
-                      <p className="text-sm font-medium text-gray-900">{a.practiceSet.name}</p>
+                      <p className="text-sm font-medium text-gray-900">{shortSetName(a.practiceSet.name)}</p>
                       <p className="mt-0.5 text-xs text-gray-500">
                         {practiceAreaLabel(a.practiceSet.topic.domain.practiceArea)} · {a.practiceSet.topic.name}
-                        {a.dueDate && <span className="ml-2 text-amber-600">Due: {formatDate(a.dueDate)}</span>}
+                        {a.dueDate && <span className="ml-2 text-amber-600">Due {formatDate(a.dueDate)}</span>}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
@@ -336,7 +337,7 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
                         {difficultyLabel(a.practiceSet.difficulty)}
                       </Badge>
                       <Badge variant={a.status === "IN_PROGRESS" ? "warning" : "info"}>
-                        {a.status === "IN_PROGRESS" ? "In Progress" : "Pending"}
+                        {a.status === "IN_PROGRESS" ? "In progress" : assignmentStatusLabel(a.status)}
                       </Badge>
                       <Link
                         href={buildProgressHref(`/student/practice/assignment/${a.id}`, filters)}
@@ -352,10 +353,10 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
           </section>
 
           <section>
-            <h2 className="mb-3 text-base font-semibold text-gray-900">Recent Results · {areaLabel}</h2>
+            <h2 className="mb-3 text-base font-semibold text-gray-900">Recent results · {areaLabel}</h2>
             {recentAttempts.length === 0 ? (
               <Card padding="lg" className="text-center text-sm text-gray-400">
-                No submitted {areaLabel} attempts yet.
+                No finished {areaLabel} sets yet.
               </Card>
             ) : (
               <div className="space-y-2">
@@ -372,7 +373,7 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
                     <Card key={a.id} className="flex items-center justify-between px-4 py-3">
                       <div>
                         <p className="text-sm font-medium text-gray-900">
-                          {a.assignment?.practiceSet.name ?? "Practice Set"}
+                          {a.assignment?.practiceSet.name ? shortSetName(a.assignment.practiceSet.name) : "Practice set"}
                         </p>
                         <p className="mt-0.5 text-xs text-gray-500">
                           {a.submittedAt ? formatDate(a.submittedAt) : "—"}
@@ -380,7 +381,7 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="text-sm font-medium text-gray-900">
-                          {hasAnswered ? `${correct}/${total}` : "—"}
+                          {hasAnswered ? `${correct} of ${total}` : "—"}
                         </span>
                         <span className={`text-sm font-semibold ${scoreBandTextClass(hasAnswered ? score.percent : null)}`}>{hasAnswered ? `${score.percent}%` : "—"}</span>
                         <Link
@@ -441,7 +442,7 @@ async function ParentDashboard({ parentId, parentName }: { parentId: string; par
       {pendingApprovals.length > 0 && (
         <section className="mb-8">
           <h2 className="mb-3 text-base font-semibold text-gray-900">
-            Enrollment requests awaiting your approval
+            Waiting for your approval
           </h2>
           <div className="space-y-3">
             {pendingApprovals.map(({ student, enrollment }) => (
@@ -458,7 +459,7 @@ async function ParentDashboard({ parentId, parentName }: { parentId: string; par
       <section>
         <h2 className="mb-3 text-base font-semibold text-gray-900">Your children</h2>
         {children.length === 0 ? (
-          <p className="text-sm text-gray-400">No linked students yet.</p>
+          <p className="text-sm text-gray-400">No students are linked to your account yet.</p>
         ) : (
           <div className="space-y-3">
             {children.map((link) => (
@@ -479,10 +480,10 @@ async function ParentDashboard({ parentId, parentName }: { parentId: string; par
                                 : "text-red-500"
                           }`}
                         >
-                          {e.status}
+                          {enrollmentStatusLabel(e.status)}
                         </span>
                         {e.parentApprovalStatus === "PENDING" && (
-                          <span className="text-amber-500">· awaiting your approval</span>
+                          <span className="text-amber-500">· waiting for your OK</span>
                         )}
                         {e.parentApprovalStatus === "APPROVED" && (
                           <span className="text-green-500">· you approved</span>
@@ -491,7 +492,7 @@ async function ParentDashboard({ parentId, parentName }: { parentId: string; par
                     ))}
                   </div>
                 ) : (
-                  <p className="mt-1 text-xs text-gray-400">No enrollments yet.</p>
+                  <p className="mt-1 text-xs text-gray-400">Not in any program yet.</p>
                 )}
               </Card>
             ))}

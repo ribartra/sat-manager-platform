@@ -25,5 +25,5 @@ export function resolveQuestionType(
 }
 
 export function questionResponseLabel(type: ResolvedQuestionType) {
-  return type === "MC" ? "Answer choices" : "Numeric answer";
+  return type === "MC" ? "Choose one" : "Type your answer";
 }

@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import { parseEliminatedOptions } from "@/lib/answer-review-meta";
-import { formatTime, scorePercent } from "@/lib/utils";
+import { formatDuration, formatTime, scorePercent } from "@/lib/utils";
 import { MathContent } from "@/components/math-content";
 import { QuestionMedia } from "@/components/question-media";
 import { Card } from "@/components/ui/card";
@@ -27,8 +27,8 @@ interface PageProps { params: Promise<{ attemptId: string }>; searchParams: Prom
 function moduleTierMeta(order: number) {
   const key = difficultyFromFullTestModuleKey(moduleKeyFromOrder(order)); // "EASY" | "HARD"
   return key === "HARD"
-    ? { key, short: "Adaptive", bucket: "Adaptive (Module 2)" }
-    : { key, short: "Baseline", bucket: "Baseline (Module 1)" };
+    ? { key, short: "Harder", bucket: "Harder (Module 2)" }
+    : { key, short: "Standard", bucket: "Standard (Module 1)" };
 }
 
 export default async function FullTestResultsPage({ params, searchParams }: PageProps) {
@@ -70,6 +70,17 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
     .map((module, index) => ({ name: module.name, seconds: overtime[index] ?? 0 }))
     .filter((item) => item.seconds > 0);
   const pauseSeconds = attempt.pauses.reduce((sum, pause) => sum + (pause.durationSeconds ?? 0), 0);
+  const timeNotes: string[] = [];
+  if (attempt.timeExpiredEvents > 0) {
+    timeNotes.push(`Ran out of time in ${attempt.timeExpiredEvents} module${attempt.timeExpiredEvents === 1 ? "" : "s"}`);
+  }
+  if (attempt.extraTimeUsed > 0) {
+    const perModule = overtimeModules.map((item) => `${item.name}: ${formatTime(item.seconds)}`).join(", ");
+    timeNotes.push(`Extra time used: ${formatTime(attempt.extraTimeUsed)}${perModule ? ` (${perModule})` : ""}`);
+  }
+  if (attempt.pauses.length > 0) {
+    timeNotes.push(`Paused ${attempt.pauses.length} time${attempt.pauses.length === 1 ? "" : "s"} (${formatDuration(pauseSeconds)})`);
+  }
 
   return (
     <PageShell width="narrow">
@@ -82,17 +93,18 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
         <Card padding="md" className="text-center"><p className="text-3xl font-bold text-[var(--sat-area-mocks)]"><VoidableValue status={attempt.status}>{attempt.totalScore ?? "—"}</VoidableValue></p><p className="text-xs text-gray-500">Total</p></Card>
       </div>
       <Card padding="md" className="mt-6 text-sm text-gray-600">
-        Time ran out: {attempt.timeExpiredEvents === 0 ? "never" : `${attempt.timeExpiredEvents}x`} · Extra time used:{" "}
-        {attempt.extraTimeUsed > 0 ? formatTime(attempt.extraTimeUsed) : "none"}
-        {overtimeModules.length > 0
-          ? ` (${overtimeModules.map((item) => `${item.name} +${formatTime(item.seconds)}`).join(", ")})`
-          : ""}
-        {attempt.pauses.length > 0 ? ` · Paused ${attempt.pauses.length}x (${formatTime(pauseSeconds)})` : ""}
+        {timeNotes.length > 0 ? (
+          <ul className="space-y-1">
+            {timeNotes.map((note) => <li key={note}>{note}</li>)}
+          </ul>
+        ) : (
+          <p>You finished every module on time.</p>
+        )}
       </Card>
       <div className="mt-6">
         <StatsPanel
-          title="By Module"
-          caption="Correct answers ÷ all module questions, including blanks"
+          title="By module"
+          caption="Blank answers count as wrong."
           rows={moduleStats.map((stat) => ({ ...stat, label: stat.name }))}
           color="mocks"
         />
@@ -124,7 +136,7 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
                       <Card key={item.questionId} padding="md" className={statusClass}>
                         <div className="mb-2 flex items-start justify-between gap-3">
                           <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-gray-500">Q{index + 1}</span>
+                            <span className="text-sm font-medium text-gray-500">Question {index + 1}</span>
                             {isUnanswered ? (
                               <MinusCircle size={16} className="text-gray-400" />
                             ) : isCorrect ? (
@@ -174,7 +186,7 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
                           </div>
                         )}
 
-                        {isUnanswered && <p className="mb-1 text-xs italic text-gray-400">Unanswered</p>}
+                        {isUnanswered && <p className="mb-1 text-xs italic text-gray-400">You left this blank.</p>}
                         <ReviewTools
                           marked={Boolean(answer?.markedForReview)}
                           note={answer?.note ?? null}
@@ -197,7 +209,7 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
         </div>
       ) : (
         <Card padding="md" className="mt-6 text-sm text-gray-500">
-          Question-by-question review is disabled for this exam.
+          Your teacher hasn&apos;t turned on answer review for this test.
         </Card>
       )}
     </PageShell>
@@ -209,8 +221,8 @@ function ReviewTools({ marked, note, eliminated }: { marked: boolean; note: stri
   return (
     <div className="mb-2 space-y-1 text-xs text-gray-600">
       {marked ? <p className="font-medium text-amber-700">Marked for review</p> : null}
-      {eliminated.length > 0 ? <p>Eliminated: {eliminated.join(", ")}</p> : null}
-      {note ? <p className="whitespace-pre-wrap">Note: {note}</p> : null}
+      {eliminated.length > 0 ? <p>Crossed out: {eliminated.join(", ")}</p> : null}
+      {note ? <p className="whitespace-pre-wrap">Your note: {note}</p> : null}
     </div>
   );
 }
@@ -240,7 +252,7 @@ function StatsPanel({
                   {row.label}
                   {row.hint ? <span className="ml-2 text-xs font-normal text-gray-400">{row.hint}</span> : null}
                 </span>
-                <span className="shrink-0 text-gray-600">{row.total > 0 ? `${pct}% · ${row.correct} correct of ${row.total} questions` : "No questions"}</span>
+                <span className="shrink-0 text-gray-600">{row.total > 0 ? `${row.correct} of ${row.total} correct (${pct}%)` : "No questions"}</span>
               </div>
               <div className="h-2 rounded-full bg-gray-100"><div className="h-2 rounded-full" style={{ width: `${pct ?? 0}%`, backgroundColor: `var(--sat-area-${color})` }} /></div>
             </div>

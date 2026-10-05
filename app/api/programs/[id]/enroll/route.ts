@@ -105,14 +105,14 @@ export const POST = withApiErrors(async function POST(_req: NextRequest, { param
 
   if (parentApprovalStatus === "PENDING") {
     await notifyMany(parentIds, {
-      title: "Enrollment consent required",
-      body: `${session.user.name} has requested to join ${program.name}. Your approval is required before the teacher can confirm enrollment.`,
+      title: `Please approve ${session.user.name}'s program request`,
+      body: `${session.user.name} asked to join ${program.name}. Approve it so the teacher can add them.`,
       href: "/student",
     }).catch(() => {});
   } else {
     await notifyMany(program.teachers.map((teacher) => teacher.teacherId), {
       title: "New enrollment request",
-      body: `${session.user.name} has requested to join ${program.name}.`,
+      body: `${session.user.name} asked to join ${program.name}.`,
       href: "/teacher/programs",
     }).catch(() => {});
   }

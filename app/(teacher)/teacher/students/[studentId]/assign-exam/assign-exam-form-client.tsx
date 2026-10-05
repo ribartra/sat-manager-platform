@@ -25,7 +25,7 @@ function assignmentHint(assignment: ExamOption["assignment"]) {
   const due = assignment.dueDate ? ` (due ${new Date(assignment.dueDate).toLocaleDateString()})` : "";
   if (assignment.status === "COMPLETED") return ` · Completed${due} — will reassign`;
   if (assignment.status === "OVERDUE") return ` · Overdue${due} — will reassign`;
-  return ` · Pending${due} — will update due date`;
+  return ` · Not finished${due} — will update due date`;
 }
 
 export function AssignExamForm({
@@ -84,7 +84,7 @@ export function AssignExamForm({
       const reassigned = total("reassigned");
       const updated = total("updated");
       if (created + reassigned + updated === 0) {
-        setError("Nothing changed: the selected exams are already pending with this due date.");
+        setError("Nothing changed: the selected exams are already assigned with this due date.");
         setLoading(false);
         return;
       }

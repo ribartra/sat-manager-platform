@@ -58,7 +58,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
     <PageShell width="wide">
       <PageHeader
         title="Account Validation"
-        description="Review manually created or otherwise unverified accounts. Accounts created through emailed invite links are approved automatically when the link is consumed."
+        description="Approve new accounts. People who joined from an email invite are approved automatically."
       />
       <PageContent>
         <FilterBar>
