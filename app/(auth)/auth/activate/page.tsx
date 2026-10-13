@@ -31,6 +31,7 @@ interface InviteInfo {
   programName?: string | null;
   requiresParentConsent?: boolean;
   parentConsentApproved?: boolean;
+  parentEmail?: string | null;
 }
 
 export default function ActivatePage() {
@@ -40,6 +41,8 @@ export default function ActivatePage() {
   const [invite, setInvite] = useState<InviteInfo | null>(null);
   const [tokenError, setTokenError] = useState(false);
   const [serverError, setServerError] = useState("");
+  const [resendState, setResendState] = useState<"idle" | "sending" | "sent">("idle");
+  const [resendError, setResendError] = useState("");
 
   const form = useForm<ActivateInput>({
     resolver: zodResolver(activateSchema),
@@ -69,6 +72,18 @@ export default function ActivatePage() {
       return;
     }
     router.push("/login?activated=1");
+  }
+
+  async function resendToParent() {
+    setResendError("");
+    setResendState("sending");
+    try {
+      await apiFetch("/api/auth/parent-consent/resend", { method: "POST", json: { token } });
+      setResendState("sent");
+    } catch (error) {
+      setResendError(errorMessage(error));
+      setResendState("idle");
+    }
   }
 
   if (tokenError) {
@@ -108,8 +123,31 @@ export default function ActivatePage() {
           </p>
           {blockedByConsent ? (
             <Alert tone="warning" className="mb-5">
-              We&apos;re still waiting for your parent or guardian to approve. You can choose your password once
-              they do.
+              <p>
+                Your parent or guardian needs to authorize your account first.
+                {invite.parentEmail ? (
+                  <>
+                    {" "}We sent an email to <strong>{invite.parentEmail}</strong>.
+                  </>
+                ) : null}{" "}
+                Once they accept, come back to this link to finish setting up.
+              </p>
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={resendToParent}
+                  disabled={resendState !== "idle"}
+                  disabledReason={resendState === "sent" ? "Email sent. Ask your parent to check their inbox (and spam folder)." : null}
+                >
+                  {resendState === "sending" ? "Sending…" : resendState === "sent" ? "Email sent" : "Resend email to my parent"}
+                </Button>
+                <Button type="button" size="sm" variant="ghost" onClick={() => window.location.reload()}>
+                  My parent already accepted
+                </Button>
+              </div>
+              <InlineError>{resendError}</InlineError>
             </Alert>
           ) : null}
           <Form {...form}>

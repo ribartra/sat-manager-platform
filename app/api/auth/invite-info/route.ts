@@ -4,6 +4,7 @@ import { checkRateLimit, rateLimitKey, rateLimitResponse } from "@/lib/rate-limi
 import { hashPublicToken } from "@/lib/token-security";
 import { writeAudit } from "@/lib/audit";
 import { BadRequestError, withApiErrors } from "@/lib/api-error";
+import { requiresParentAuthorization } from "@/lib/consent";
 
 export const GET = withApiErrors(async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get("token");
@@ -33,7 +34,7 @@ export const GET = withApiErrors(async function GET(req: NextRequest) {
     await prisma.inviteToken.update({ where: { id: invite.id }, data: { tokenHash, token: `hashed:${tokenHash}` } });
   }
 
-  const requiresParentConsent = Boolean(invite.isMinor && invite.parentEmail && !invite.parentConsentAt);
+  const requiresParentConsent = requiresParentAuthorization(invite);
 
   await writeAudit({
     action: "INVITE_VIEWED",
@@ -57,5 +58,7 @@ export const GET = withApiErrors(async function GET(req: NextRequest) {
     programName: invite.program?.name ?? null,
     requiresParentConsent,
     parentConsentApproved: Boolean(invite.parentConsentAt),
+    // Shown to the student so they know whose inbox has the authorization email.
+    parentEmail: requiresParentConsent ? invite.parentEmail : null,
   });
 });

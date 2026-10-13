@@ -77,6 +77,9 @@ export const GET = withApiErrors(async function GET(req: NextRequest) {
     parentName: invite.parentName,
     parentEmail: invite.parentEmail,
     approved: Boolean(invite.parentConsentAt),
+    isMinor: invite.isMinor,
+    // The student already has an account (teacher's "Ask parent to authorize"), so there is no setup step left.
+    studentHasAccount: Boolean(invite.usedAt),
     // An existing parent account is linked as-is (no new password); any other account type
     // cannot be used as a parent email.
     existingParent: account.kind === "parent",

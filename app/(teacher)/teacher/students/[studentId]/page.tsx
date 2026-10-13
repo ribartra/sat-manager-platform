@@ -19,6 +19,8 @@ import { StudentDetailActions } from "./actions-client";
 import { StudentSwitcher } from "./student-switcher";
 import { GenerateReportDialog } from "./generate-report-dialog";
 import { RestartExamButton } from "./restart-exam-button";
+import { ParentAuthorization, type ParentAuthorizationView } from "./parent-authorization";
+import { parentAuthorizationState } from "@/lib/parent-authorization";
 import { refreshAssignmentStates } from "@/lib/assignments";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { studentAccessWhereFor } from "@/lib/program-scope";
@@ -74,7 +76,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
   if (!student) notFound();
 
   // Report dialog: linked parents (email recipients) and submitted exams (per-exam report).
-  const [parentLinks, submittedExams] = await Promise.all([
+  const [parentLinks, submittedExams, parentAuth] = await Promise.all([
     prisma.parentStudent.findMany({
       where: { studentId },
       include: { parent: { select: { id: true, name: true, email: true } } },
@@ -85,7 +87,21 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
       select: { id: true, submittedAt: true, totalScore: true, test: { select: { name: true } } },
       orderBy: { submittedAt: "desc" },
     }),
+    parentAuthorizationState(student),
   ]);
+  const parentAuthView: ParentAuthorizationView =
+    parentAuth.status === "authorized"
+      ? {
+          status: "authorized",
+          label: `Parent: ${parentAuth.parentName} (${parentAuth.parentEmail}) · Authorized${parentAuth.at ? ` ${formatDate(parentAuth.at)}` : ""}`,
+        }
+      : parentAuth.status === "waiting"
+        ? {
+            status: "waiting",
+            parentEmail: parentAuth.parentEmail,
+            label: `Waiting for parent: we emailed ${parentAuth.parentEmail} (link valid until ${formatDate(parentAuth.linkExpiresAt)}).`,
+          }
+        : { status: "none" };
   const reportParents = parentLinks.map((link) => link.parent);
   const reportExams = submittedExams.map((exam) => ({
     id: exam.id,
@@ -118,6 +134,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
             {teacherGroupManagementEnabled && <> · Groups: {student.groups.map((g) => g.group.name).join(", ") || "—"}</>}
             {" · "}Programs: {student.programEnrollments.map((e) => e.program.name).join(", ") || "—"}
           </p>
+          <ParentAuthorization studentId={studentId} studentName={student.name} state={parentAuthView} />
         </div>
         <StudentSwitcher students={roster} selectedStudentId={studentId} query={switcherQuery} />
       </div>
@@ -322,6 +339,17 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
   return (
     <PageShell width="wide">
       {header}
+      {report.latestExam && (
+        <div className="mt-3 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-900">
+          {student.name} finished {report.completedExamCount} Full Practice Test{report.completedExamCount === 1 ? "" : "s"}
+          {" "}(latest: {report.latestExam.name}
+          {report.latestExam.totalScore !== null ? ` · ${report.latestExam.totalScore}` : ""}
+          {report.latestExam.submittedAt ? `, ${formatDate(report.latestExam.submittedAt)}` : ""}). Exam results are in the Full Practice Tests tab.{" "}
+          <Link href={buildProgressHref(`/teacher/students/${studentId}`, filters, { area: "mocks" })} className="font-medium underline">
+            See exam results →
+          </Link>
+        </div>
+      )}
       {report.pendingExamCount > 0 && (
         <div className="mt-3 rounded-md border border-orange-200 bg-orange-50 px-3 py-2 text-sm text-orange-900">
           {report.pendingExamCount} active Full Practice Test{report.pendingExamCount === 1 ? "" : "s"} assigned.{" "}

@@ -82,6 +82,9 @@ export type PracticeReport = {
   attemptHistory: ReportAttempt[];
   comments: ReportAttempt[];
   pendingExamCount: number;
+  /** Finished Full Practice Tests (any date). Their results live only in the Full Practice Tests tab. */
+  completedExamCount: number;
+  latestExam: { name: string; totalScore: number | null; submittedAt: Date | null } | null;
 };
 
 export type MockReport = {
@@ -126,7 +129,7 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
   const difficulty = filters.difficulty ?? "";
   const dateFilter = progressDateWhere(filters);
 
-  const [historyAttempts, assignments, pendingExamCount, areaTopics] = await Promise.all([
+  const [historyAttempts, assignments, pendingExamCount, areaTopics, completedExamCount, latestExamRow] = await Promise.all([
     // Invalidated attempts are loaded only for the history list; every score uses SUBMITTED.
     prisma.attempt.findMany({
       where: {
@@ -162,6 +165,12 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
     prisma.topic.findMany({
       where: { domain: { practiceArea } },
       select: { id: true, name: true, domainId: true, domain: { select: { name: true } } },
+    }),
+    prisma.fullPracticeTestAttempt.count({ where: { studentId, status: "SUBMITTED" } }),
+    prisma.fullPracticeTestAttempt.findFirst({
+      where: { studentId, status: "SUBMITTED" },
+      orderBy: { submittedAt: "desc" },
+      select: { totalScore: true, submittedAt: true, test: { select: { name: true } } },
     }),
   ]);
   // Current skill name/domain by id: attempts keep a snapshot of the old names, but a renamed or
@@ -324,6 +333,10 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
     attemptHistory,
     comments: scoredAttempts.filter((attempt) => attempt.teacherComment),
     pendingExamCount,
+    completedExamCount,
+    latestExam: latestExamRow
+      ? { name: latestExamRow.test.name, totalScore: latestExamRow.totalScore, submittedAt: latestExamRow.submittedAt }
+      : null,
   };
 }
 

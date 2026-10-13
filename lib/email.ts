@@ -108,25 +108,26 @@ function greeting(name: string | null) {
 
 const REPORT_COLOR_KEY = "Green = strong (80%+), yellow = getting there (60–79%), red = needs work. Reply to this email with any questions.";
 
-export async function sendParentConsentEmail(to: string, parentName: string | null, studentName: string, consentUrl: string) {
+export async function sendParentConsentEmail(
+  to: string,
+  parentName: string | null,
+  studentName: string,
+  consentUrl: string,
+  options: { existingStudent?: boolean } = {},
+) {
   const safeGreeting = escapeHtml(greeting(parentName));
-  const safeStudent = escapeHtml(studentName);
   const safeUrl = escapeHtml(consentUrl);
+  const intro = options.existingStudent
+    ? `${studentName} is practicing for the SAT with their teacher on SAT Practice. The teacher asks for your permission. Click below to authorize:`
+    : `${studentName} has been invited to SAT Practice. Click below to give permission:`;
 
   return sendTransactionalEmail({
     to,
-    subject: `Please approve ${studentName}'s SAT Practice account`,
-    text: [
-      greeting(parentName),
-      "",
-      `${studentName} has been invited to SAT Practice. Click below to give permission:`,
-      consentUrl,
-      "",
-      "This link expires in 7 days.",
-    ].join("\n"),
+    subject: `Please authorize ${studentName}'s SAT Practice account`,
+    text: [greeting(parentName), "", intro, consentUrl, "", "This link expires in 7 days."].join("\n"),
     html: `
       <p>${safeGreeting}</p>
-      <p>${safeStudent} has been invited to SAT Practice. Click below to give permission:</p>
+      <p>${escapeHtml(intro)}</p>
       <p><a href="${safeUrl}">${safeUrl}</a></p>
       <p>This link expires in 7 days.</p>
     `,

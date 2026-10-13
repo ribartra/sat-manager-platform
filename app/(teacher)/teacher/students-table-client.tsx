@@ -18,7 +18,6 @@ export type TeacherStudentRow = {
   avgScoreLabel: string;
   avgScoreTone: "high" | "mid" | "low" | "none";
   avgScoreFiltered: boolean;
-  active: boolean;
 };
 
 const SCORE_CLASS = {
@@ -67,11 +66,13 @@ export function TeacherStudentsTable({
     cols.push(
       {
         id: "lastActive",
-        header: "Last Active",
+        header: () => (
+          <span title="Last practice set or Full Practice Test the student finished, in any section.">Last activity</span>
+        ),
         meta: { priority: "medium" },
         cell: ({ row }) => {
           if (row.original.lastActiveTone === "never") {
-            return <span className="text-destructive">Never</span>;
+            return <span className="text-destructive">Nothing finished yet</span>;
           }
           return (
             <span className={row.original.lastActiveTone === "warn" ? "text-warning" : "text-muted-foreground"}>
@@ -102,16 +103,6 @@ export function TeacherStudentsTable({
               <span className="ml-1 text-xs font-normal text-muted-foreground">filtered</span>
             ) : null}
           </span>
-        ),
-      },
-      {
-        id: "status",
-        header: "Status",
-        meta: { priority: "high" },
-        cell: ({ row }) => (
-          <Badge variant={row.original.active ? "success" : "danger"}>
-            {row.original.active ? "Active" : "Inactive"}
-          </Badge>
         ),
       },
       {

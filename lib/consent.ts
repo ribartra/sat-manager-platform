@@ -44,3 +44,13 @@ export async function resolveParentAccount(
   if (existing.role === "PARENT") return { kind: "parent", id: existing.id };
   return { kind: "conflict", role: existing.role };
 }
+
+/** Parent authorization is needed when the teacher asked for it or the student is a minor (always). */
+export function requiresParentAuthorization(invite: {
+  parentConsentRequired: boolean;
+  isMinor: boolean;
+  parentEmail: string | null;
+  parentConsentAt: Date | null;
+}) {
+  return Boolean((invite.parentConsentRequired || invite.isMinor) && invite.parentEmail && !invite.parentConsentAt);
+}

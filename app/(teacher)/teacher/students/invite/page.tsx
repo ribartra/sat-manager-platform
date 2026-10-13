@@ -19,10 +19,11 @@ export default function InviteStudentPage() {
   const [phone, setPhone] = useState("");
   const [startDate, setStartDate] = useState("");
   const [birthDate, setBirthDate] = useState("");
-  const [isMinorFlag, setIsMinor] = useState(false);
+  const [requireAuthChoice, setRequireAuth] = useState(true);
   // Birth date, when given, decides minor status (the server derives it the same way).
+  // Students under 18 always need a parent's authorization; for adults it is the teacher's choice.
   const derivedMinor = birthDate ? ageOn(new Date(birthDate)) < ADULT_AGE : null;
-  const isMinor = derivedMinor ?? isMinorFlag;
+  const requireParentAuthorization = derivedMinor === true || requireAuthChoice;
   const [parentName, setParentName] = useState("");
   const [parentEmail, setParentEmail] = useState("");
   const [parentPhone, setParentPhone] = useState("");
@@ -48,7 +49,7 @@ export default function InviteStudentPage() {
     const res = await fetch("/api/students/invite", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, phone, startDate, birthDate, programId, isMinor, parentName, parentEmail, parentPhone }),
+      body: JSON.stringify({ name, email, phone, startDate, birthDate, programId, requireParentAuthorization, parentName, parentEmail, parentPhone }),
     });
     setLoading(false);
     if (!res.ok) {
@@ -117,21 +118,22 @@ export default function InviteStudentPage() {
         <div className="border-t border-gray-200 pt-4">
           <label className="flex items-center gap-2 cursor-pointer select-none">
             <Checkbox
-              checked={isMinor}
-              disabled={derivedMinor !== null}
-              onChange={(e) => setIsMinor(e.target.checked)}
+              checked={requireParentAuthorization}
+              disabled={derivedMinor === true}
+              onChange={(e) => setRequireAuth(e.target.checked)}
               className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
             />
-            <span className="text-sm font-medium text-gray-700">Student is a minor (under 18)</span>
+            <span className="text-sm font-medium text-gray-700">Require parent authorization</span>
           </label>
           <p className="mt-1 text-xs text-gray-500 ml-6">
-            {derivedMinor !== null
-              ? `Set from the birth date: ${derivedMinor ? "minor (under 18)" : "adult (18 or over)"}.`
-              : "If checked, parent information will be linked when the student accepts the invitation."}
+            {derivedMinor === true ? "Required because the student is under 18. " : ""}
+            {requireParentAuthorization
+              ? "We email the parent or guardian. The student can finish setting up their account only after the parent accepts."
+              : "The student can set up their account right away. You can ask a parent to authorize later from the student's page."}
           </p>
         </div>
 
-        {isMinor && (
+        {requireParentAuthorization && (
           <div className="rounded-md border border-blue-200 bg-blue-50 p-4 space-y-3">
             <h2 className="text-sm font-semibold text-blue-900">Parent / guardian account</h2>
             <div>
@@ -146,7 +148,7 @@ export default function InviteStudentPage() {
                 type="email"
                 value={parentEmail}
                 onChange={(e) => setParentEmail(e.target.value)}
-                required={isMinor}
+                required={requireParentAuthorization}
               />
             </div>
             <div>

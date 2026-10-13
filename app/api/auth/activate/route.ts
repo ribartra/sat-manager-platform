@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import { checkRateLimit, rateLimitKey, rateLimitResponse } from "@/lib/rate-limit";
 import { hashPublicToken } from "@/lib/token-security";
 import { captureCaughtError, writeAudit } from "@/lib/audit";
-import { resolveParentAccount } from "@/lib/consent";
+import { requiresParentAuthorization, resolveParentAccount } from "@/lib/consent";
 import { passwordPolicyError } from "@/lib/password-policy";
 import { BadRequestError, ConflictError, ForbiddenError, InternalServerError, withApiErrors } from "@/lib/api-error";
 
@@ -99,7 +99,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
     }
 
     // Student account creation flow
-    const requiresParentConsent = Boolean(invite.isMinor && invite.parentEmail && !invite.parentConsentAt);
+    const requiresParentConsent = requiresParentAuthorization(invite);
     if (requiresParentConsent) {
       await writeAudit({
         action: "USER_CREATE_FAILED",
@@ -108,7 +108,9 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
         outcome: "failure",
         metadata: { reason: "parent_consent_required", email: invite.email },
       });
-      return new ForbiddenError("Your parent or guardian needs to approve first. Then you can finish setting up your account.").toResponse();
+      return new ForbiddenError(
+        `Your parent or guardian needs to authorize your account first. We sent an email to ${invite.parentEmail}. Once they accept, come back to this link to finish setting up.`,
+      ).toResponse();
     }
 
     const now = new Date();

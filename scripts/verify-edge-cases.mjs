@@ -268,6 +268,31 @@ const checks = [
     label: "Activacion de alumno crea y vincula padre capturado",
   },
   {
+    file: "app/api/auth/activate/route.ts",
+    requires: ["requiresParentAuthorization(invite)", "Your parent or guardian needs to authorize your account first. We sent an email to"],
+    label: "Activacion bloqueada sin autorizacion del apoderado (opcion de la tutora o menor) y avisa con el email del apoderado",
+  },
+  {
+    file: "app/api/students/invite/route.ts",
+    requires: ["parentConsentRequired", "requireParentAuthorization"],
+    label: "Invitacion guarda la opcion Require parent authorization (siempre para menores)",
+  },
+  {
+    file: "app/api/students/[studentId]/parent-authorization/route.ts",
+    requires: ["studentAccessWhereFor", "usedAt: now", "PARENT_AUTHORIZATION_REQUESTED", "resolveParentAccount"],
+    label: "Ask parent to authorize: alcance del docente, token de activacion inutilizable, auditado, sin convertir cuentas",
+  },
+  {
+    file: "app/api/auth/parent-consent/resend/route.ts",
+    requires: ["checkRateLimit", "requiresParentAuthorization", "invite.usedAt"],
+    label: "Reenvio del correo al apoderado limitado y solo para invitaciones pendientes",
+  },
+  {
+    file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
+    requires: ["completedExamCount", "See exam results"],
+    label: "Pestanas de practica avisan de Full Practice Tests terminados (no parece inactivo)",
+  },
+  {
     file: "app/(teacher)/teacher/parents/parents-client.tsx",
     requires: ["Share report by email", "Download PDF", "mathematics", "reading", "writing", "Edit Parent", "Associated students"],
     label: "Vista de padres gestiona asociaciones desde modal, comparte reporte y PDF por tipo",

@@ -71,13 +71,13 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/page.tsx",
-    requires: ["areaActivity", "lastActiveAt", "TeacherStudentsTable"],
-    label: "Dashboard docente usa ultima actividad por area y DataTable de estudiantes",
+    requires: ["lastSubmissionByStudent", "lastActiveAt", "TeacherStudentsTable"],
+    label: "Dashboard docente usa ultima actividad de todas las areas (practica + Full Practice Tests) y DataTable de estudiantes",
   },
   {
     file: "app/(teacher)/teacher/students-table-client.tsx",
-    requires: ["Last Active", "lastActiveLabel", "lastActiveTone"],
-    label: "Tabla de estudiantes expone columna Last Active",
+    requires: ["Last activity", "lastActiveLabel", "lastActiveTone"],
+    label: "Tabla de estudiantes expone columna Last activity",
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/page.tsx",

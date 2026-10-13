@@ -352,6 +352,7 @@ model InviteToken {
   programId String?
   isMinor   Boolean   @default(false)
   birthDate DateTime? // when set, isMinor is derived from it (lib/consent.ts)
+  parentConsentRequired Boolean @default(false) // teacher asked for parent authorization (always true for minors)
   parentName String?
   parentEmail String?
   parentPhone String?

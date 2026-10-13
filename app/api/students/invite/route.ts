@@ -14,7 +14,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
   }
 
   try {
-    const { name, email, phone, startDate, birthDate: birthDateRaw, programId, isMinor: isMinorFlag, parentName, parentEmail, parentPhone } = await req.json();
+    const { name, email, phone, startDate, birthDate: birthDateRaw, programId, isMinor: isMinorFlag, requireParentAuthorization, parentName, parentEmail, parentPhone } = await req.json();
     if (!name || !email || !programId) return new BadRequestError("Name, email, and program are required.").toResponse();
     const birthDate = birthDateRaw ? new Date(birthDateRaw) : null;
     if (birthDate && (Number.isNaN(birthDate.getTime()) || birthDate > new Date())) {
@@ -22,7 +22,13 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
     }
     // Minor status follows the birth date when given; otherwise the teacher's checkbox.
     const isMinor = resolveIsMinor(birthDate, Boolean(isMinorFlag));
-    if (isMinor && !parentEmail) return new BadRequestError("Parent email is required for minor students.").toResponse();
+    // Minors always need a parent's authorization; for adults it is the teacher's choice.
+    const parentConsentRequired = isMinor || Boolean(requireParentAuthorization);
+    if (parentConsentRequired && !parentEmail) {
+      return new BadRequestError(
+        isMinor ? "Parent email is required for students under 18." : "Add the parent's email so they can authorize the account.",
+      ).toResponse();
+    }
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) return new ConflictError("A user with that email already exists.").toResponse();
@@ -62,6 +68,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
         programId: program.id,
         birthDate,
         isMinor,
+        parentConsentRequired,
         parentName: parentName || null,
         parentEmail: parentEmail || null,
         parentPhone: parentPhone || null,
@@ -79,7 +86,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
       targetType: "InviteToken",
       targetId: invite.id,
       outcome: "success",
-      metadata: { email, programId: program.id, isMinor, minorFromBirthDate: Boolean(birthDate), hasParentEmail: Boolean(parentEmail) },
+      metadata: { email, programId: program.id, isMinor, parentConsentRequired, minorFromBirthDate: Boolean(birthDate), hasParentEmail: Boolean(parentEmail) },
     });
 
     const inviteUrl = absoluteAppUrl(`/auth/activate?token=${token}`);
