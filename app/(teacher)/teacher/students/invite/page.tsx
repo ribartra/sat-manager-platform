@@ -110,8 +110,11 @@ export default function InviteStudentPage() {
           <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">Birth date</label>
-          <Input type="date" value={birthDate} max={new Date().toISOString().slice(0, 10)} onChange={(e) => setBirthDate(e.target.value)} />
+          <label className="mb-1 block text-sm font-medium text-gray-700">
+            Birth date <span className="text-red-500">*</span>
+          </label>
+          <Input type="date" required value={birthDate} max={new Date().toISOString().slice(0, 10)} onChange={(e) => setBirthDate(e.target.value)} />
+          <p className="mt-1 text-xs text-gray-500">Needed to know if the student is under 18 (then a parent must authorize).</p>
         </div>
         </div>
 
@@ -159,7 +162,7 @@ export default function InviteStudentPage() {
         )}
 
         <InlineError>{error}</InlineError>
-        <Button type="submit" disabled={loading} disabledReason={!programId ? "Choose a program." : null}>
+        <Button type="submit" disabled={loading || !programId || !birthDate} disabledReason={!programId ? "Choose a program." : !birthDate ? "Enter the student's birth date." : null}>
           {loading ? "Creating..." : "Create Invite"}
         </Button>
       </Card>

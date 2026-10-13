@@ -14,14 +14,15 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
   }
 
   try {
-    const { name, email, phone, startDate, birthDate: birthDateRaw, programId, isMinor: isMinorFlag, requireParentAuthorization, parentName, parentEmail, parentPhone } = await req.json();
+    const { name, email, phone, startDate, birthDate: birthDateRaw, programId, requireParentAuthorization, parentName, parentEmail, parentPhone } = await req.json();
     if (!name || !email || !programId) return new BadRequestError("Name, email, and program are required.").toResponse();
-    const birthDate = birthDateRaw ? new Date(birthDateRaw) : null;
-    if (birthDate && (Number.isNaN(birthDate.getTime()) || birthDate > new Date())) {
+    if (!birthDateRaw) return new BadRequestError("Enter the student's birth date.").toResponse();
+    const birthDate = new Date(birthDateRaw);
+    if (Number.isNaN(birthDate.getTime()) || birthDate > new Date()) {
       return new BadRequestError("Birth date is not valid.").toResponse();
     }
     // Minor status follows the birth date when given; otherwise the teacher's checkbox.
-    const isMinor = resolveIsMinor(birthDate, Boolean(isMinorFlag));
+    const isMinor = resolveIsMinor(birthDate, false);
     // Minors always need a parent's authorization; for adults it is the teacher's choice.
     const parentConsentRequired = isMinor || Boolean(requireParentAuthorization);
     if (parentConsentRequired && !parentEmail) {

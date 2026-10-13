@@ -2,6 +2,7 @@
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { useMemo, useState } from "react";
+import { localToday } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -41,7 +42,8 @@ export function AssignExamForm({
 }) {
   const router = useRouter();
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [dueDate, setDueDate] = useState("");
+  // Due date starts on the day the exam is assigned (end of that day); the teacher can change it.
+  const [dueDate, setDueDate] = useState(localToday);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
@@ -141,7 +143,7 @@ export function AssignExamForm({
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700">Due date (optional)</label>
+        <label className="mb-1 block text-sm font-medium text-gray-700">Due date</label>
         <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
       </div>
 

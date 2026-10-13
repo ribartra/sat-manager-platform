@@ -18,7 +18,6 @@ import { summarizeAllQuestionAnswers } from "@/lib/weighted-score";
 import { SkillOptions } from "@/components/progress-filters";
 import { compareSkills, isOfficialSkill } from "@/lib/taxonomy-order";
 import { Alert } from "@/components/sat/alert";
-import { lastSubmissionByStudent } from "@/lib/student-activity";
 
 interface PageProps {
   searchParams: Promise<{
@@ -205,11 +204,11 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
 
   const fiveDaysAgo = new Date();
   fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
-  // Last activity spans every tab (practice sets and Full Practice Tests): a student who only took an
-  // exam must not look inactive on the Math tab.
-  const lastActivityById = await lastSubmissionByStudent(students.map((s) => s.id));
   const inactiveStudents = students.filter((s) => {
-    const lastActiveAt = lastActivityById.get(s.id);
+    const areaActivity = area === "mocks"
+      ? s.fullTestAttempts.map((attempt) => attempt.submittedAt).filter((value): value is Date => Boolean(value))
+      : s.attempts.map((attempt) => attempt.submittedAt).filter((value): value is Date => Boolean(value));
+    const lastActiveAt = areaActivity.sort((a, b) => b.getTime() - a.getTime())[0];
     if (!lastActiveAt) return true;
     return lastActiveAt < fiveDaysAgo;
   });
@@ -343,7 +342,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
         <Alert tone="warning" className="mb-5">
           <div className="flex items-center gap-2">
             <div className="space-y-0.5">
-              {inactiveStudents.length > 0 && <p><strong>{inactiveStudents.length} student{inactiveStudents.length > 1 ? "s" : ""}</strong> haven&apos;t finished any practice or test in 5+ days: {inactiveStudents.map((s) => s.name).join(", ")}</p>}
+              {inactiveStudents.length > 0 && <p><strong>{inactiveStudents.length} student{inactiveStudents.length > 1 ? "s" : ""}</strong> haven&apos;t practiced in 5+ days: {inactiveStudents.map((s) => s.name).join(", ")}</p>}
               {(overdueAssignments.length > 0 || overdueFullTestAssignments.length > 0) && <p><strong>{overdueAssignments.length + overdueFullTestAssignments.length}</strong> overdue assignment{overdueAssignments.length + overdueFullTestAssignments.length > 1 ? "s" : ""} need attention.</p>}
               {unlockRequests.length > 0 && <p><strong>{unlockRequests.length}</strong> unlock request{unlockRequests.length > 1 ? "s" : ""} waiting for you.</p>}
             </div>
@@ -389,7 +388,10 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
         showGroups={teacherGroupManagementEnabled}
         filterQuery={progressFilterQuery({ area, topic: topicId, difficulty })}
         rows={students.map((student): TeacherStudentRow => {
-          const lastActiveAt = lastActivityById.get(student.id);
+          const areaActivity = area === "mocks"
+            ? student.fullTestAttempts.map((attempt) => attempt.submittedAt).filter((value): value is Date => Boolean(value))
+            : student.attempts.map((attempt) => attempt.submittedAt).filter((value): value is Date => Boolean(value));
+          const lastActiveAt = areaActivity.sort((a, b) => b.getTime() - a.getTime())[0];
           const inactive = !lastActiveAt || lastActiveAt < fiveDaysAgo;
           const studentGroups = teacherGroupManagementEnabled
             ? student.groups.map((gm) => gm.group.name).join(", ")
@@ -409,13 +411,14 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
             groupsLabel: teacherGroupManagementEnabled ? studentGroups || "—" : null,
             lastActiveLabel: lastActiveAt
               ? `${formatDate(lastActiveAt)}${inactive ? " ⚠" : ""}`
-              : "Nothing finished yet",
+              : "Never",
             lastActiveTone: !lastActiveAt ? "never" : inactive ? "warn" : "ok",
             pendingCount: area === "mocks" ? student.fullTestAssignments.length : student.assignments.length,
             avgScoreLabel: avgScore !== null ? `${avgScore}%` : "—",
             avgScoreTone:
               avgScore === null ? "none" : avgScore >= 80 ? "high" : avgScore >= 60 ? "mid" : "low",
             avgScoreFiltered: avgScore !== null && hasAttemptFilter,
+            active: student.active,
           };
         })}
       />

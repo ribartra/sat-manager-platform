@@ -49,3 +49,10 @@ export function statusColor(status: string): string {
     default: return "text-gray-600 bg-gray-50";
   }
 }
+
+/** Today's date in the browser's time zone as YYYY-MM-DD (value for <input type="date">). */
+export function localToday(): string {
+  const now = new Date();
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+}
