@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+import { cn, localToday } from "@/lib/utils";
 import { Tag } from "lucide-react";
 import { assignmentStatusLabel, explanationVisibilityOptions, difficultyLabel, difficultyOptions } from "@/lib/domain-meta";
 import { practiceAreaLabel, type PracticeAreaCode } from "@/lib/practice-area";
@@ -88,7 +88,8 @@ export function AssignForm({
   const [selected, setSelected] = useState<Set<string>>(
     () => new Set((initialSelected ?? []).filter((id) => practiceSets.some((ps) => ps.id === id))),
   );
-  const [dueDate, setDueDate] = useState("");
+  // Due date starts on the day the practice is assigned (end of that day); the teacher can change it.
+  const [dueDate, setDueDate] = useState(localToday);
   const [unlockAt, setUnlockAt] = useState("");
   const [explVisibility, setExplVisibility] = useState("AFTER_FINISH");
   const [feedbackMode, setFeedbackMode] = useState<"AFTER_SET" | "IMMEDIATE">("AFTER_SET");
@@ -317,10 +318,10 @@ export function AssignForm({
       {/* Options */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Due date (optional)</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Due date</label>
           <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
           <p className="mt-1 text-xs text-gray-400">
-            Due at the end of that day. Leave blank for no due date.
+            Due at the end of that day. Starts on today; change it if needed.
           </p>
         </div>
         <div>
