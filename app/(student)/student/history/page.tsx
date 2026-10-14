@@ -26,6 +26,7 @@ import {
 import { buildProgressHref, progressDateWhere, progressFilterEntries, progressFiltersFromParams } from "@/lib/progress-filters";
 import { applyTimeFilterSetting } from "@/lib/time-filters";
 import { compareSkills, isOfficialSkill } from "@/lib/taxonomy-order";
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 
 interface PageProps {
   searchParams: Promise<{
@@ -68,7 +69,8 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
     const examAttempts = await prisma.fullPracticeTestAttempt.findMany({
       where: {
         studentId: userId,
-        status: { in: HISTORY_STATUSES },
+        // Every attempt is kept, including Tests not finished yet (modules can be taken in any order).
+        status: { in: [...HISTORY_STATUSES, "IN_PROGRESS"] },
         ...dateFilter,
       },
       include: { test: { select: { id: true, name: true } } },
@@ -78,7 +80,9 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
 
     return (
       <PageShell width="wide" density="compact" className="space-y-4">
+        <Breadcrumbs items={[{ label: "Home", href: "/student" }, { label: "History", href: "/student/history" }, { label: "Tests" }]} />
         <h1 className="text-2xl font-semibold text-gray-900">My history</h1>
+        <p className="text-sm text-gray-500">Every Test attempt is saved, including tests you haven&apos;t finished. Click a row to see the results.</p>
         <PracticeAreaTabs basePath="/student/history" active={area} preserve={{ difficulty: filters.difficulty, from: filters.from, to: filters.to }} />
         <ProgressFilters action="/student/history" filters={filters} topics={[]} showEndDate={showEndDate} />
 
@@ -98,8 +102,8 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
               {examAttempts.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-4 py-12 text-center text-gray-500">
-                    <p>No finished Full Practice Tests for these filters.</p>
-                    <Link href={buildProgressHref("/student/content-map", filters)} className="mt-2 inline-block text-sm text-blue-600 hover:underline">
+                    <p>No Test attempts for these filters.</p>
+                    <Link href="/student/tests" className="mt-2 inline-block text-sm text-blue-600 hover:underline">
                       See your tests →
                     </Link>
                   </td>
@@ -108,12 +112,13 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
                 examPage.items.map((exam) => (
                   <tr key={exam.id} className={`hover:bg-gray-50 ${invalidatedRowClass(exam.status) ?? ""}`}>
                     <td className="whitespace-nowrap px-4 py-3 text-gray-500">
-                      {exam.submittedAt ? formatDate(exam.submittedAt) : "—"}
+                      {formatDate(exam.submittedAt ?? exam.startedAt)}
                     </td>
                     <td className="px-4 py-3 font-medium text-gray-900">
                       <span className="flex items-center gap-2">
                         {exam.test.name}
                         {isInvalidated(exam.status) ? <AttemptStatusBadge status={exam.status} /> : null}
+                        {exam.status === "IN_PROGRESS" ? <Badge variant="warning">In progress</Badge> : null}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-right text-gray-700"><VoidableValue status={exam.status}>{exam.rwScore ?? "—"}</VoidableValue></td>
@@ -122,7 +127,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
                       <VoidableValue status={exam.status}>{exam.totalScore ?? "—"}</VoidableValue>
                     </td>
                     <td className="px-4 py-3 text-right">
-                    <Link href={buildProgressHref(`/student/full-tests/results/${exam.id}`, filters)} className="text-xs text-blue-600 hover:underline">
+                    <Link href={`/student/tests/results/${exam.id}`} className="text-xs text-blue-600 hover:underline">
                         Review
                       </Link>
                     </td>
@@ -260,6 +265,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
 
   return (
     <PageShell width="wide" density="compact" className="space-y-4">
+      <Breadcrumbs items={[{ label: "Home", href: "/student" }, { label: "History", href: "/student/history" }, { label: `Practice · ${practiceAreaLabel(practiceArea)}` }]} />
       <header className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">My history</h1>
@@ -282,7 +288,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
       {listedAttempts.length === 0 ? (
         <Card padding="lg" className="py-14 text-center text-gray-500">
           <p>No finished {practiceAreaLabel(practiceArea).toLowerCase()} practice sets for these filters.</p>
-          <Link href={buildProgressHref("/student/content-map", filters)} className="mt-2 inline-block text-sm text-blue-600 hover:underline">
+          <Link href={buildProgressHref("/student/practice", filters)} className="mt-2 inline-block text-sm text-blue-600 hover:underline">
             Go to the content map →
           </Link>
         </Card>

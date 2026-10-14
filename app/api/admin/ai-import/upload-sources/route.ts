@@ -32,7 +32,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
   const name = String(formData.get("name") || "Questionnaire PDF/DOCX ingest");
 
   if (!ALLOWED_CONTENT_TYPES.has(contentType)) {
-    return new BadRequestError("Choose Practice Set or Full Practice Test import.").toResponse();
+    return new BadRequestError("Choose Practice Set or Test import.").toResponse();
   }
   if (files.length === 0) {
     return new BadRequestError("Select at least one PDF or DOCX file.").toResponse();

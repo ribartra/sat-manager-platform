@@ -293,8 +293,8 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
-    requires: ["completedExamCount", "See exam results"],
-    label: "Pestanas de practica avisan de Full Practice Tests terminados (no parece inactivo)",
+    requires: ["completedExamCount", "See test results"],
+    label: "Pestanas de practica avisan de Tests terminados sin mostrar sus puntajes (no parece inactivo)",
   },
   {
     file: "app/(teacher)/teacher/parents/parents-client.tsx",

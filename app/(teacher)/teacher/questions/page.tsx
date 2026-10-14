@@ -26,7 +26,7 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
   const filters = await searchParams;
   const area = activeAreaTab(filters.area ?? filters.section, "math");
   // "Full Practice Tests" is an exam surface, not a question-bank area.
-  if (area === "tests") redirect("/teacher/full-tests");
+  if (area === "tests") redirect("/teacher/tests");
   const practiceArea = practiceAreaFromTab(area);
   const sectionLabel = practiceSectionLabel(practiceArea);
 
@@ -96,8 +96,12 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
       <PracticeAreaTabs
         basePath="/teacher/questions"
         active={area}
+        includeTests={false}
         preserve={{ difficulty: filters.difficulty, status: filters.status }}
       />
+      <p className="-mt-3 mb-3 text-xs text-gray-500">
+        Questions of the Tests are managed in <Link href="/teacher/tests" className="text-blue-600 hover:underline">Tests</Link>.
+      </p>
 
       <QuestionsFilter
         area={area}

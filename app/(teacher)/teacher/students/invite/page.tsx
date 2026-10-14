@@ -63,7 +63,7 @@ export default function InviteStudentPage() {
   return (
     <PageShell width="narrow">
       <div className="mb-6">
-        <Link href="/teacher" className="text-sm text-blue-600 hover:underline">← Students</Link>
+        <Link href="/teacher/students" className="text-sm text-blue-600 hover:underline">← Students</Link>
         <h1 className="mt-3 text-xl font-semibold text-gray-900">Invite Student</h1>
       </div>
       <Card as="form" onSubmit={submit} padding="lg" className="space-y-4">

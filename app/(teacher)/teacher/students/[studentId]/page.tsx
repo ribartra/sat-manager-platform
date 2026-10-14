@@ -14,7 +14,7 @@ import { PerformanceBreakdown } from "@/components/performance-breakdown";
 import { TopicDifficultyTrend } from "@/components/topic-difficulty-trend";
 import { MockSectionChart } from "@/components/progress-charts";
 import { Hint, InfoHint } from "@/components/hint";
-import { ChevronLeft, ClipboardList, Eye, Pencil, Plus } from "lucide-react";
+import { ClipboardList, Eye, Pencil, Plus } from "lucide-react";
 import { StudentDetailActions } from "./actions-client";
 import { StudentSwitcher } from "./student-switcher";
 import { GenerateReportDialog } from "./generate-report-dialog";
@@ -25,7 +25,13 @@ import { refreshAssignmentStates } from "@/lib/assignments";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { studentAccessWhereFor } from "@/lib/program-scope";
 import { loadMockReport, loadPracticeReport, moduleTableOf, shortSetName, type ReportAttempt } from "@/lib/student-report";
-import { activeAreaTab, practiceAreaFromTab } from "@/lib/practice-area";
+import { activeAreaTab, activeHomeTab, practiceAreaFromTab, practiceAreaLabel, type HomeTabKey, type PracticeAreaCode } from "@/lib/practice-area";
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import { SectionCell } from "@/components/sat/test-ui";
+import { DueLine, Pct, WorkStatusBadges } from "@/components/sat/work-status";
+import { loadStudentTests, sortTests, type StudentTestItem } from "@/lib/test-assignments";
+import { loadStudentOverviews } from "@/lib/teacher-overview";
+import { relativeDay } from "@/lib/utils";
 import { buildProgressHref, progressFilterEntries, progressFiltersFromParams } from "@/lib/progress-filters";
 import { applyTimeFilterSetting } from "@/lib/time-filters";
 import { officialSkillsFor } from "@/lib/taxonomy-order";
@@ -49,6 +55,8 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
   const query = await searchParams;
   const { filters, showEndDate } = await applyTimeFilterSetting(progressFiltersFromParams(query));
   const area = activeAreaTab(filters.area, filters.area);
+  // Tabs: Summary · Math · Reading · Writing · Tests · Activity (no `area` param = Summary).
+  const view: HomeTabKey | "activity" = query.area === "activity" ? "activity" : activeHomeTab(query.area);
   const practiceArea = practiceAreaFromTab(area);
   const topicId = filters.topic ?? "";
   const difficulty = filters.difficulty ?? "";
@@ -124,9 +132,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
     <>
       <div className="mb-3 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
         <div className="min-w-0">
-          <Link href={buildProgressHref("/teacher", filters)} className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-blue-600">
-            <ChevronLeft size={12} /> Students
-          </Link>
+          <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Students", href: "/teacher/students" }, { label: student.name }]} />
           <h1 className="text-2xl font-semibold text-gray-900">{student.name}</h1>
           <p className="mt-0.5 truncate text-xs text-gray-500">
             {student.email} · {student.phone ?? "—"}
@@ -145,9 +151,9 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
             <Plus size={14} /> Assign practice
           </Link>
         </Hint>
-        <Hint label="Give this student a full practice exam.">
-          <Link href={buildProgressHref(`/teacher/students/${studentId}/assign-exam`, filters)} className="inline-flex h-8 items-center justify-center gap-1 rounded-md border border-blue-600 px-3 text-sm font-medium text-blue-700 hover:bg-blue-50">
-            <ClipboardList size={14} /> Assign exam
+        <Hint label="Give this student a full-length Test (4 modules).">
+          <Link href={buildProgressHref(`/teacher/students/${studentId}/assign-test`, filters)} className="inline-flex h-8 items-center justify-center gap-1 rounded-md border border-blue-600 px-3 text-sm font-medium text-blue-700 hover:bg-blue-50">
+            <ClipboardList size={14} /> Assign test
           </Link>
         </Hint>
         <span className="mx-1 hidden h-5 w-px bg-gray-200 sm:inline-block" aria-hidden />
@@ -175,40 +181,185 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
 
       <PracticeAreaTabs
         basePath={`/teacher/students/${studentId}`}
-        active={area}
+        active={view as HomeTabKey}
+        includeSummary
+        extraTabs={[{ key: "activity", label: "Activity" }]}
         preserve={{ difficulty: filters.difficulty, from: filters.from, to: filters.to }}
         className="mb-3"
       />
-      <ProgressFilters
-        action={`/teacher/students/${studentId}`}
-        filters={filters}
-        topics={skills.map((skill) => ({ id: skill.id, name: skill.name, group: skill.domain }))}
-        showEndDate={showEndDate}
-      />
+      {view !== "summary" && view !== "activity" ? (
+        <ProgressFilters
+          action={`/teacher/students/${studentId}`}
+          filters={filters}
+          topics={skills.map((skill) => ({ id: skill.id, name: skill.name, group: skill.domain }))}
+          showEndDate={showEndDate}
+        />
+      ) : null}
     </>
   );
+  const first = student.name.split(" ")[0];
+
+  // ---------------------------------------------------------------- Summary
+  if (view === "summary") {
+    const [overview, tests, pendingSets] = await Promise.all([
+      loadStudentOverviews([studentId], now).then((m) => m.get(studentId)!),
+      loadStudentTests(studentId),
+      prisma.assignment.findMany({
+        where: { studentId, status: { in: ["PENDING", "IN_PROGRESS", "OVERDUE"] } },
+        include: { practiceSet: { select: { name: true } } },
+        orderBy: { dueDate: "asc" },
+        take: 8,
+      }),
+    ]);
+    const activity = await loadActivity(studentId, 6);
+    const testItems = tests.filter((t) => t.attempts.length > 0 || t.state !== "done");
+    const suggestions = (["MATH", "READING", "WRITING"] as PracticeAreaCode[])
+      .map((code) => ({ code, w: overview.areas[code].weakest }))
+      .filter((x): x is { code: PracticeAreaCode; w: NonNullable<typeof x.w> } => Boolean(x.w))
+      .sort((a, b) => a.w.pct - b.w.pct);
+    const { pending: pendingTests } = sortTests(tests);
+    return (
+      <PageShell width="wide">
+        {header}
+        <h2 className="text-base font-semibold text-gray-900">What {first} has done in practice</h2>
+        <p className="mb-2 text-xs text-gray-500">% correct in practice sets. Click a box to see that area.</p>
+        <div className="grid gap-3 md:grid-cols-3">
+          {(["MATH", "READING", "WRITING"] as PracticeAreaCode[]).map((code) => {
+            const o = overview.areas[code];
+            const tab = code.toLowerCase();
+            return (
+              <Card key={code} as={Link} href={`/teacher/students/${studentId}?area=${tab}`} padding="md" className="border-t-4 hover:border-gray-400" style={{ borderTopColor: `var(--sat-area-${tab})` }}>
+                <p className="text-base font-semibold" style={{ color: `var(--sat-area-${tab})` }}>{practiceAreaLabel(code)}</p>
+                {o.last ? (
+                  <>
+                    <p className="mt-1 text-xs text-gray-500">Latest practice · {o.last.setName} · {formatDate(o.last.at)}</p>
+                    <p className="mt-1 text-3xl font-bold"><Pct value={o.last.pct} /></p>
+                    <p className="text-xs text-gray-500">Average <Pct value={o.avgPct} /> over {o.attempts} attempt{o.attempts === 1 ? "" : "s"}</p>
+                    {o.weakest ? <p className="mt-1 text-xs text-gray-600">Weakest skill: <b>{o.weakest.name}</b> ({difficultyLabel(o.weakest.difficulty)}, {o.weakest.pct}%)</p> : null}
+                  </>
+                ) : (
+                  <p className="mt-2 text-sm text-gray-400">No {practiceAreaLabel(code)} practice yet.</p>
+                )}
+                <p className="mt-2 border-t border-gray-100 pt-2 text-xs text-gray-500">
+                  {o.toDo} set{o.toDo === 1 ? "" : "s"} to do{o.overdue ? ` · ${o.overdue} overdue` : ""} · <span className="text-blue-600">See {practiceAreaLabel(code)}</span>
+                </p>
+              </Card>
+            );
+          })}
+        </div>
+
+        <div className="mb-2 mt-6 flex items-baseline justify-between">
+          <h2 className="text-base font-semibold text-gray-900">Tests</h2>
+          <Link href={`/teacher/students/${studentId}?area=tests`} className="text-xs font-medium text-blue-600 hover:underline">All test results →</Link>
+        </div>
+        {testItems.length === 0 ? (
+          <Card padding="md" className="text-sm text-gray-400">No tests assigned.</Card>
+        ) : (
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {testItems.map((t) => <TestMiniCard key={t.assignmentId} item={t} studentId={studentId} />)}
+          </div>
+        )}
+
+        <div className="mt-6 grid gap-6 lg:grid-cols-3">
+          <section className="lg:col-span-2">
+            <div className="mb-2 flex items-baseline justify-between">
+              <h2 className="text-base font-semibold text-gray-900">Recent activity</h2>
+              <Link href={`/teacher/students/${studentId}?area=activity`} className="text-xs font-medium text-blue-600 hover:underline">All activity →</Link>
+            </div>
+            <ActivityList items={activity} studentId={studentId} />
+          </section>
+          <aside className="space-y-4">
+            <Card padding="md">
+              <h2 className="text-sm font-semibold text-gray-900">Then, assign something</h2>
+              <p className="mb-2 text-xs text-gray-500">Suggestions from {first}&apos;s weakest practice skills</p>
+              {suggestions.length === 0 ? (
+                <p className="text-sm text-gray-400">Not enough results yet. Start with a test as a diagnostic.</p>
+              ) : (
+                <ul className="space-y-2">
+                  {suggestions.slice(0, 3).map(({ code, w }) => (
+                    <li key={`${w.topicId}-${w.difficulty}`} className="flex items-center justify-between gap-2 text-sm">
+                      <span className="min-w-0">
+                        <span className="block truncate font-medium text-gray-800">{w.name} <Badge>{difficultyLabel(w.difficulty)}</Badge></span>
+                        <span className="text-xs text-gray-500">{practiceAreaLabel(code)} · {w.pct}% correct</span>
+                      </span>
+                      <Link
+                        href={`/teacher/students/${studentId}/assign?area=${code.toLowerCase()}&topic=${w.topicId}&difficulty=${w.difficulty}`}
+                        className="shrink-0 text-xs font-medium text-blue-600 hover:underline"
+                      >
+                        Assign practice
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <Link href={`/teacher/students/${studentId}/assign-test`} className="mt-3 block rounded-md border border-blue-600 px-3 py-1.5 text-center text-sm font-medium text-blue-700 hover:bg-blue-50">
+                Assign a test
+              </Link>
+            </Card>
+            <Card padding="md">
+              <h2 className="mb-2 text-sm font-semibold text-gray-900">Pending for {first}</h2>
+              {pendingTests.length === 0 && pendingSets.length === 0 ? (
+                <p className="text-sm text-gray-400">Nothing pending.</p>
+              ) : (
+                <ul className="space-y-1.5 text-sm">
+                  {pendingTests.map((t) => (
+                    <li key={t.assignmentId} className={t.overdue ? "text-red-700" : "text-gray-800"}>
+                      {t.name} test{t.dueDate ? <span className="text-xs text-gray-500"> · Due {formatDate(t.dueDate)}</span> : null}
+                    </li>
+                  ))}
+                  {pendingSets.map((a) => (
+                    <li key={a.id} className={a.status === "OVERDUE" ? "text-red-700" : "text-gray-800"}>
+                      {shortSetName(a.practiceSet.name)} practice{a.dueDate ? <span className="text-xs text-gray-500"> · Due {formatDate(a.dueDate)}</span> : null}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Card>
+          </aside>
+        </div>
+      </PageShell>
+    );
+  }
+
+  // ---------------------------------------------------------------- Activity
+  if (view === "activity") {
+    const activity = await loadActivity(studentId, 100);
+    return (
+      <PageShell width="wide">
+        {header}
+        <p className="mb-2 text-sm text-gray-500">Every practice set and test, newest first. Click to review.</p>
+        <ActivityList items={activity} studentId={studentId} />
+      </PageShell>
+    );
+  }
 
   // ---------------------------------------------------------------- Full Practice Tests
   if (!practiceArea) {
     const report = await loadMockReport(studentId, reportFilters);
     const examPage = paginate(report.examHistory, pageFromParam(query.examsPage), HISTORY_PAGE_SIZE);
     const moduleTable = moduleTableOf(report.sectionModuleMetrics);
+    const tests = await loadStudentTests(studentId);
     return (
       <PageShell width="wide">
         {header}
         <KpiStrip
           items={[
-            { label: "Full Practice Tests completed", value: String(report.kpis.exams), hint: "Finished in the selected dates." },
+            { label: "Tests completed", value: String(report.kpis.exams), hint: "Finished in the selected dates." },
             { label: "Latest total score", value: String(report.kpis.latestTotal ?? "—"), className: "text-[var(--sat-area-tests)]", hint: "Total score (out of 1600) on the most recent test." },
             { label: "Latest Reading & Writing", value: String(report.kpis.latestRw ?? "—"), hint: "Reading & Writing score (out of 800) on the most recent test." },
             { label: "Latest Math", value: String(report.kpis.latestMath ?? "—"), hint: "Math score (out of 800) on the most recent test." },
-            { label: "Full Practice Tests to do", value: String(report.kpis.pending), hint: "Assigned but not finished yet." },
+            { label: "Tests to do", value: String(report.kpis.pending), hint: "Assigned but not finished yet." },
           ]}
         />
+        {tests.length > 0 ? (
+          <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {tests.map((t) => <TestMiniCard key={t.assignmentId} item={t} studentId={studentId} />)}
+          </div>
+        ) : null}
         <div className="grid gap-6 lg:grid-cols-3">
           <div id="performance" className="min-w-0 space-y-6 lg:col-span-2">
             {report.exams.length === 0 ? (
-              <Card padding="lg" className="py-12 text-center text-sm text-gray-400">This student hasn&apos;t finished a full practice exam yet.</Card>
+              <Card padding="lg" className="py-12 text-center text-sm text-gray-400">This student hasn&apos;t finished a test yet.</Card>
             ) : (
               <>
                 <MockSectionChart metrics={report.scoreSeries} />
@@ -223,7 +374,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
             )}
           </div>
           <aside className="min-w-0 space-y-6">
-            <SidePanel title="Active Full Practice Tests" count={report.activeExams.length} empty="No active Full Practice Tests.">
+            <SidePanel title="Active tests" count={report.activeExams.length} empty="No active tests.">
               {report.activeExams.map((a) => (
                 <li key={a.id} className="flex items-start justify-between gap-3 px-3 py-2">
                   <div className="min-w-0">
@@ -236,12 +387,12 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                   </div>
                   <div className="flex shrink-0 items-center gap-3">
                     {a.openAttemptId ? (
-                      <Hint label="Start the exam over. The current progress won't count.">
+                      <Hint label="Start the test over. The current progress won't count.">
                         <RestartExamButton attemptId={a.openAttemptId} examName={a.name} />
                       </Hint>
                     ) : null}
-                    <Hint label={a.status === "OVERDUE" ? "Give it to the student again with a new due date." : "Change the due date of this exam."}>
-                      <Link href={buildProgressHref(`/teacher/students/${studentId}/assign-exam`, filters)} className="shrink-0 text-xs font-medium text-blue-600 hover:underline">
+                    <Hint label={a.status === "OVERDUE" ? "Give it to the student again with a new due date." : "Change the due date of this test."}>
+                      <Link href={buildProgressHref(`/teacher/students/${studentId}/assign-test`, filters)} className="shrink-0 text-xs font-medium text-blue-600 hover:underline">
                         {a.status === "OVERDUE" ? "Reassign" : "Due date"}
                       </Link>
                     </Hint>
@@ -251,9 +402,9 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
             </SidePanel>
             <SidePanel
               id="exam-history"
-              title="Exam history"
+              title="Test history"
               count={report.examHistory.length}
-              empty="No finished exams yet."
+              empty="No finished tests yet."
               footer={
                 <Pagination
                   basePath={`/teacher/students/${studentId}`}
@@ -282,7 +433,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                       {exam.totalScore ?? "—"}
                     </VoidableValue>
                     <Hint label="See answers by question, restart, or send the report.">
-                      <Link href={buildProgressHref(`/teacher/students/${studentId}/full-tests/${exam.id}`, filters)} className="text-xs font-medium text-blue-600 hover:underline">
+                      <Link href={buildProgressHref(`/teacher/students/${studentId}/tests/${exam.id}`, filters)} className="text-xs font-medium text-blue-600 hover:underline">
                         Review
                       </Link>
                     </Hint>
@@ -339,25 +490,16 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
   return (
     <PageShell width="wide">
       {header}
-      {report.latestExam && (
-        <div className="mt-3 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-900">
-          {student.name} finished {report.completedExamCount} Full Practice Test{report.completedExamCount === 1 ? "" : "s"}
-          {" "}(latest: {report.latestExam.name}
-          {report.latestExam.totalScore !== null ? ` · ${report.latestExam.totalScore}` : ""}
-          {report.latestExam.submittedAt ? `, ${formatDate(report.latestExam.submittedAt)}` : ""}). Exam results are in the Full Practice Tests tab.{" "}
+      {report.completedExamCount > 0 || report.pendingExamCount > 0 ? (
+        <div className="mt-3 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700">
+          Test results are kept apart from practice
+          {report.completedExamCount > 0 ? ` (${first} finished ${report.completedExamCount} test${report.completedExamCount === 1 ? "" : "s"})` : ""}
+          {report.pendingExamCount > 0 ? ` · ${report.pendingExamCount} test${report.pendingExamCount === 1 ? "" : "s"} assigned` : ""}.{" "}
           <Link href={buildProgressHref(`/teacher/students/${studentId}`, filters, { area: "tests" })} className="font-medium underline">
-            See exam results →
+            See test results →
           </Link>
         </div>
-      )}
-      {report.pendingExamCount > 0 && (
-        <div className="mt-3 rounded-md border border-orange-200 bg-orange-50 px-3 py-2 text-sm text-orange-900">
-          {report.pendingExamCount} active Full Practice Test{report.pendingExamCount === 1 ? "" : "s"} assigned.{" "}
-          <Link href={buildProgressHref(`/teacher/students/${studentId}`, filters, { area: "tests" })} className="font-medium underline">
-            Open Full Practice Tests →
-          </Link>
-        </div>
-      )}
+      ) : null}
       <KpiStrip
         items={[
           { label: "Sets completed", value: String(kpis.attempts), hint: `${areaLabel} practice sets finished (with the current filters).` },
@@ -558,5 +700,140 @@ function StatusBadge({ status }: { status: string }) {
     <span title={help[status]}>
       <Badge variant={variant}>{assignmentStatusLabel(status)}</Badge>
     </span>
+  );
+}
+
+type ActivityItem = {
+  id: string;
+  kind: "Practice" | "Test";
+  area: string;
+  title: string;
+  at: Date;
+  status: string;
+  pct: number | null;
+  href: string;
+};
+
+/** Practice attempts and Test attempts, newest first (flat list for the Activity tab). */
+async function loadActivity(studentId: string, take: number): Promise<ActivityItem[]> {
+  const [practice, tests] = await Promise.all([
+    prisma.attempt.findMany({
+      where: { studentId, status: { in: ["SUBMITTED", "INVALIDATED", "IN_PROGRESS"] } },
+      orderBy: { startedAt: "desc" },
+      take,
+      select: {
+        id: true,
+        status: true,
+        startedAt: true,
+        submittedAt: true,
+        answers: { select: { isCorrect: true } },
+        assignment: { select: { practiceSet: { select: { name: true, topic: { select: { domain: { select: { name: true, practiceArea: true } } } } } } } },
+      },
+    }),
+    prisma.fullPracticeTestAttempt.findMany({
+      where: { studentId },
+      orderBy: { startedAt: "desc" },
+      take,
+      select: { id: true, status: true, startedAt: true, submittedAt: true, totalScore: true, test: { select: { name: true } } },
+    }),
+  ]);
+  const items: ActivityItem[] = [
+    ...practice.map((a) => {
+      const set = a.assignment?.practiceSet;
+      const correct = a.answers.filter((x) => x.isCorrect).length;
+      return {
+        id: a.id,
+        kind: "Practice" as const,
+        area: set?.topic.domain.practiceArea ? practiceAreaLabel(set.topic.domain.practiceArea) : "Practice",
+        title: set ? shortSetName(set.name) : "Practice set",
+        at: a.submittedAt ?? a.startedAt,
+        status: a.status,
+        pct: a.status === "IN_PROGRESS" || !a.answers.length ? null : Math.round((correct / a.answers.length) * 100),
+        href: `/teacher/students/${studentId}/attempts/${a.id}`,
+      };
+    }),
+    ...tests.map((a) => ({
+      id: a.id,
+      kind: "Test" as const,
+      area: "R&W + Math",
+      title: a.test.name,
+      at: a.submittedAt ?? a.startedAt,
+      status: a.status,
+      pct: null,
+      href: `/teacher/students/${studentId}/tests/${a.id}`,
+    })),
+  ];
+  return items.sort((a, b) => b.at.getTime() - a.at.getTime()).slice(0, take);
+}
+
+function ActivityList({ items, studentId }: { items: ActivityItem[]; studentId: string }) {
+  void studentId;
+  if (items.length === 0) return <Card padding="md" className="text-sm text-gray-400">This student has no activity yet.</Card>;
+  return (
+    <Card className="overflow-hidden">
+      <ul className="divide-y divide-gray-100">
+        {items.map((item) => (
+          <li key={`${item.kind}-${item.id}`}>
+            <Link href={item.href} className={`flex items-center justify-between gap-3 px-3 py-2 hover:bg-gray-50 ${invalidatedRowClass(item.status) ?? ""}`}>
+              <span className="min-w-0">
+                <span className="flex flex-wrap items-center gap-1.5">
+                  <Badge className={item.kind === "Test" ? "bg-gray-900 text-white" : undefined}>{item.kind}</Badge>
+                  <span className="text-xs text-gray-500">{item.area}</span>
+                  <span className="truncate text-sm font-medium text-gray-800">{item.title}</span>
+                  {item.status === "IN_PROGRESS" ? <Badge variant="warning">In progress</Badge> : null}
+                  {isInvalidated(item.status) ? <AttemptStatusBadge status={item.status} /> : null}
+                </span>
+                <span className="block text-xs text-gray-400">{formatDate(item.at)} · {relativeDay(item.at)}</span>
+              </span>
+              {item.kind === "Practice" ? <Pct value={item.pct} className="shrink-0 text-sm font-semibold" /> : <span className="shrink-0 text-xs text-blue-600">Review</span>}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </Card>
+  );
+}
+
+/** One Test for this student: status, due date, module progress or section scores. */
+function TestMiniCard({ item, studentId }: { item: StudentTestItem; studentId: string }) {
+  const last = item.lastSubmitted;
+  const open = item.openAttempt;
+  const href = open ? `/teacher/students/${studentId}/tests/${open.id}` : last ? `/teacher/students/${studentId}/tests/${last.id}` : null;
+  const body = (
+    <>
+      <div className="flex items-center justify-between gap-2">
+        <p className="font-semibold text-gray-900">{item.name}</p>
+        <WorkStatusBadges state={item.state} overdue={item.overdue} />
+      </div>
+      {item.state === "done" && last ? (
+        <p className="mt-1 text-sm">
+          R&amp;W <b>{last.rwScore ?? "—"}</b> · Math <b>{last.mathScore ?? "—"}</b>
+          <span className="block text-xs text-gray-500">
+            {last.submittedAt ? formatDate(last.submittedAt) : ""} · {item.attempts.length} attempt{item.attempts.length === 1 ? "" : "s"}
+          </span>
+        </p>
+      ) : (
+        <>
+          <p className="mt-1 text-xs text-gray-600">
+            {open?.view ? `${open.view.modulesDone} of 4 modules` : "Not started"}
+            {open?.view ? (
+              <>
+                {" · "}R&amp;W <SectionCell section={open.view.sections.RW} /> · Math <SectionCell section={open.view.sections.MATH} />
+              </>
+            ) : null}
+          </p>
+          <DueLine dueDate={item.dueDate} />
+        </>
+      )}
+    </>
+  );
+  return href ? (
+    <Card as={Link} href={href} padding="md" className={item.overdue ? "border-red-200 hover:border-red-400" : "hover:border-gray-400"}>
+      {body}
+    </Card>
+  ) : (
+    <Card padding="md" className={item.overdue ? "border-red-200" : "bg-gray-50"}>
+      {body}
+    </Card>
   );
 }

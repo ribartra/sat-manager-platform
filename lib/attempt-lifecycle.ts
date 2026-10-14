@@ -51,7 +51,7 @@ export async function applyAttemptLifecycle(input: {
     },
   });
 
-  const what = kind === "practice" ? "Practice Set" : "Full Practice Test";
+  const what = kind === "practice" ? "Practice Set" : "Test";
   const name = result.title ? (kind === "practice" ? shortSetName(result.title) : result.title) : null;
   const note = reason ? ` Note from your teacher: ${reason}` : "";
   if (action === "reopen") {
@@ -59,7 +59,7 @@ export async function applyAttemptLifecycle(input: {
       result.studentId,
       "Result reset",
       `Your teacher reset your ${what}${name ? ` "${name}"` : ""} so you can try again.${note}`,
-      kind === "practice" ? "/student/content-map" : "/student/content-map?area=tests",
+      kind === "practice" ? "/student/practice" : "/student/tests",
     );
   } else {
     await notifyUser(

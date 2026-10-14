@@ -16,7 +16,7 @@ type ExamOption = {
   name: string;
   moduleCount: number;
   questionCount: number;
-  /** Current assignment of this exam for the student, if any. */
+  /** Current assignment of this test for the student, if any. */
   assignment: { status: string; dueDate: string | null } | null;
 };
 
@@ -29,20 +29,22 @@ function assignmentHint(assignment: ExamOption["assignment"]) {
   return ` · Not finished${due} — will update due date`;
 }
 
-export function AssignExamForm({
+export function AssignTestForm({
   studentId,
   studentName,
   exams,
   returnHref,
+  initialSelected = [],
 }: {
   studentId: string;
   studentName: string;
   exams: ExamOption[];
   returnHref: string;
+  initialSelected?: string[];
 }) {
   const router = useRouter();
-  const [selected, setSelected] = useState<Set<string>>(new Set());
-  // Due date starts on the day the exam is assigned (end of that day); the teacher can change it.
+  const [selected, setSelected] = useState<Set<string>>(() => new Set(initialSelected.filter((id) => exams.some((exam) => exam.id === id))));
+  // Due date starts on the day the test is assigned (end of that day); the teacher can change it.
   const [dueDate, setDueDate] = useState(localToday);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
@@ -77,7 +79,7 @@ export function AssignExamForm({
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ studentIds: [studentId], dueDate: dueDate || null }),
           });
-          if (!res.ok) throw await readApiError(res, "Failed to assign exam.");
+          if (!res.ok) throw await readApiError(res, "Failed to assign the test.");
           return res.json();
         })
       );
@@ -86,7 +88,7 @@ export function AssignExamForm({
       const reassigned = total("reassigned");
       const updated = total("updated");
       if (created + reassigned + updated === 0) {
-        setError("Nothing changed: the selected exams are already assigned with this due date.");
+        setError("Nothing changed: the selected tests are already assigned with this due date.");
         setLoading(false);
         return;
       }
@@ -104,7 +106,7 @@ export function AssignExamForm({
         router.push(`/teacher/students/${studentId}?${query.toString()}`);
       }, 1000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to assign exam.");
+      setError(err instanceof Error ? err.message : "Failed to assign the test.");
       setLoading(false);
     }
   }
@@ -112,10 +114,10 @@ export function AssignExamForm({
   return (
     <Card padding="lg" className="space-y-4">
       <p className="text-sm text-gray-600">
-        Assign exams to <span className="font-medium text-blue-700">{studentName}</span>
+        Assign tests to <span className="font-medium text-blue-700">{studentName}</span>
       </p>
 
-      <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search exams..." />
+      <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search tests..." />
 
       <div className="max-h-96 space-y-2 overflow-y-auto rounded-md border border-gray-200 p-2">
         {visible.map((exam) => (
@@ -133,13 +135,13 @@ export function AssignExamForm({
             <span className="min-w-0 flex-1">
               <span className="block text-sm font-medium text-gray-900">{exam.name}</span>
               <span className="block text-xs text-gray-500">
-                {exam.moduleCount} modules · {exam.questionCount} questions
+                {exam.moduleCount} modules (2 Reading & Writing + 2 Math) · {exam.questionCount} questions
                 {assignmentHint(exam.assignment)}
               </span>
             </span>
           </label>
         ))}
-        {visible.length === 0 && <p className="p-4 text-center text-sm text-gray-400">No published exams found.</p>}
+        {visible.length === 0 && <p className="p-4 text-center text-sm text-gray-400">No published tests found.</p>}
       </div>
 
       <div>
@@ -151,8 +153,8 @@ export function AssignExamForm({
       {done && <p className="text-sm font-medium text-green-600">✓ {doneMessage} Redirecting...</p>}
 
       <div className="flex items-center gap-3">
-        <Button onClick={handleAssign} disabled={loading} disabledReason={done ? "Already assigned." : selected.size === 0 ? "Select at least one exam." : null}>
-          {loading ? "Assigning..." : `Assign Exam${selected.size ? ` (${selected.size})` : ""}`}
+        <Button onClick={handleAssign} disabled={loading} disabledReason={done ? "Already assigned." : selected.size === 0 ? "Select at least one test." : null}>
+          {loading ? "Assigning..." : `Assign test${selected.size ? ` (${selected.size})` : ""}`}
         </Button>
         <Button type="button" variant="ghost" onClick={() => router.push(returnHref)}>
           Cancel

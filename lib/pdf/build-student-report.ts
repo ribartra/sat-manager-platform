@@ -11,7 +11,7 @@ import { difficultyLabel } from "@/lib/domain-meta";
 
 export const REPORT_AREA_ORDER: ReportAreaKey[] = ["math", "reading", "writing", "mocks"];
 const PRACTICE_AREA = { math: "MATH", reading: "READING", writing: "WRITING" } as const;
-export const REPORT_AREA_LABEL: Record<ReportAreaKey, string> = { math: "Math", reading: "Reading", writing: "Writing", mocks: "Full Practice Tests" };
+export const REPORT_AREA_LABEL: Record<ReportAreaKey, string> = { math: "Math", reading: "Reading", writing: "Writing", mocks: "Tests" };
 
 const FILE_SCOPE: Record<ReportAreaKey, string> = { math: "math", reading: "reading", writing: "writing", mocks: "full-practice-tests" };
 
@@ -68,7 +68,7 @@ export async function buildStudentReportPdf(input: {
 
   const skill = filters.topic ? await prisma.topic.findUnique({ where: { id: filters.topic }, select: { name: true } }) : null;
   const filterSummary = exam
-    ? `Full Practice Test: ${exam.test.name}${exam.submittedAt ? `, ${formatDate(exam.submittedAt)}` : ""}`
+    ? `Test: ${exam.test.name}${exam.submittedAt ? `, ${formatDate(exam.submittedAt)}` : ""}`
     : [
         skill ? `Skill: ${skill.name}` : null,
         filters.difficulty ? `${difficultyLabel(filters.difficulty)} questions only` : null,
@@ -79,7 +79,7 @@ export async function buildStudentReportPdf(input: {
   const sections: StudentReportData["sections"] = [];
   for (const area of areas) {
     if (area === "mocks") {
-      // Skill/difficulty do not apply to Full Practice Tests; dates do.
+      // Skill/difficulty do not apply to Tests; dates do.
       sections.push({ area, mock: await loadMockReport(studentId, { from: filters.from, to: filters.to }, { attemptId: exam?.id }) });
     } else {
       sections.push({ area, practice: await loadPracticeReport(studentId, PRACTICE_AREA[area], filters) });

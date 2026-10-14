@@ -276,8 +276,8 @@ export async function renderPracticePlayer({
       showCalculator={calculatorEnabled}
       calculatorConfig={getPublicCalculatorConfig()}
       feedbackMode={feedbackMode}
-      exitHref={exitHref ?? "/student/content-map"}
-      resultHref={`/student/results/${attempt.id}${resultQuery ? `?${resultQuery}` : ""}`}
+      exitHref={exitHref ?? "/student/practice"}
+      resultHref={`/student/results/${attempt.id}?new=1${resultQuery ? `&${resultQuery}` : ""}`}
     />
   );
 }

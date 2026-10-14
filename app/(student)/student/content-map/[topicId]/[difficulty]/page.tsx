@@ -56,8 +56,8 @@ export default async function TopicPracticeSetsPage({ params, searchParams }: Pa
   return (
     <PageShell width="narrow">
       <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-        <Link href={`/student/content-map?area=${area}`} className="hover:text-blue-600 flex items-center gap-1">
-          <ChevronLeft size={14} /> Content map
+        <Link href={`/student/practice?area=${area}`} className="hover:text-blue-600 flex items-center gap-1">
+          <ChevronLeft size={14} /> Practice
         </Link>
         <span>/</span>
         <span>{practiceAreaLabel(resolvePracticeArea({

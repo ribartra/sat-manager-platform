@@ -110,7 +110,7 @@ export function PracticeSetPlayer({
   calculatorConfig,
   feedbackMode = "AFTER_SET",
   previewMode = false,
-  exitHref = "/student/content-map",
+  exitHref = "/student/practice",
   resultHref,
 }: PlayerProps) {
   const router = useRouter();

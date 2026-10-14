@@ -44,7 +44,7 @@ export const FEATURE_SETTINGS = {
     expiresAt: null as string | null,
   },
   FPT_PRETEST_EXCLUSION: {
-    label: "Exclude Full Practice Test pretest questions from score",
+    label: "Exclude Test pretest questions from score",
     description: "When on, the 2 trial questions at the start of each module don't count toward the score.",
     defaultValue: false,
     owner: "product",
@@ -65,7 +65,7 @@ export const FEATURE_SETTINGS = {
     expiresAt: null as string | null,
   },
   CALCULATOR_FULL_TESTS: {
-    label: "External graphing calculator in Full Practice Tests",
+    label: "External graphing calculator in Tests",
     description: "Shows a graphing calculator in Math exams. It hides itself if it can't load.",
     defaultValue: false,
     owner: "product",

@@ -3,10 +3,11 @@ import prisma from "@/lib/prisma";
 import { withSqliteRetry } from "@/lib/sqlite-retry";
 import { notFound, redirect } from "next/navigation";
 import { renderPracticePlayer } from "../../practice-player-page";
+import { PracticeIntro } from "./practice-intro";
 
 interface PageProps {
   params: Promise<{ assignmentId: string }>;
-  searchParams: Promise<{ area?: string; topic?: string; difficulty?: string; from?: string; to?: string }>;
+  searchParams: Promise<{ area?: string; topic?: string; difficulty?: string; from?: string; to?: string; start?: string }>;
 }
 
 export default async function PracticeAssignmentPlayerPage({ params, searchParams }: PageProps) {
@@ -29,12 +30,16 @@ export default async function PracticeAssignmentPlayerPage({ params, searchParam
   }));
 
   if (!assignment) notFound();
+  // Intro first (mockup practice.html): previous tries, dates, Start/Continue. `?start=1` opens the player.
+  if (query.start !== "1" && session.user.role === "STUDENT") {
+    return <PracticeIntro studentId={session.user.id} assignmentId={assignment.id} />;
+  }
 
   return renderPracticePlayer({
     setId: assignment.practiceSetId,
     assignmentId: assignment.id,
     feedbackMode: assignment.feedbackMode === "IMMEDIATE" ? "IMMEDIATE" : "AFTER_SET",
-    exitHref: `/student/content-map?${returnParams.toString()}`,
+    exitHref: `/student/practice?${returnParams.toString()}`,
     resultQuery: returnParams.toString(),
   });
 }

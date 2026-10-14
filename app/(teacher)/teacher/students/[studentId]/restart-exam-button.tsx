@@ -22,8 +22,8 @@ export function RestartExamButton({ attemptId, examName }: { attemptId: string; 
     const ok = await confirm({
       title: `Restart ${examName}?`,
       description:
-        "The student's current progress won't count (it stays crossed out in the history). They'll start the exam again from the beginning.",
-      confirmLabel: "Restart exam",
+        "The student's current progress won't count (it stays crossed out in the history). They'll start the test again from the beginning.",
+      confirmLabel: "Restart test",
       tone: "danger",
     });
     if (!ok) return;
@@ -33,10 +33,10 @@ export function RestartExamButton({ attemptId, examName }: { attemptId: string; 
         method: "POST",
         json: { reason: "Restarted by teacher" },
       });
-      notify.success("Exam restarted", "The student can start the exam again.");
+      notify.success("Test restarted", "The student can start the test again.");
       router.refresh();
     } catch (error) {
-      notify.error(error, "The exam could not be restarted.");
+      notify.error(error, "The test could not be restarted.");
     } finally {
       setBusy(false);
     }

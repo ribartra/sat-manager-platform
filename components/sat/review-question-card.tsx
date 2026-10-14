@@ -48,7 +48,7 @@ export function ReviewQuestionCard({
     <article
       id={id}
       className={cn(
-        "scroll-mt-20 rounded-lg border border-l-4 bg-white p-4",
+        "scroll-mt-20 rounded-lg border border-gray-200 border-l-4 bg-white p-4",
         state === "ok" && "border-l-green-500",
         state === "bad" && "border-l-red-500",
         state === "blank" && "border-l-gray-300",

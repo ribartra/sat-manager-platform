@@ -52,7 +52,7 @@ export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }
     });
     await notifyUser(request.studentId, "Practice Set unlocked", `${shortSetName(request.assignment.practiceSet.name)} is open now.`, "/student");
   } else {
-    await notifyUser(request.studentId, "Unlock request denied", request.assignment.practiceSet.name, "/student/content-map");
+    await notifyUser(request.studentId, "Unlock request denied", request.assignment.practiceSet.name, "/student/practice");
   }
 
   await prisma.auditLog.create({

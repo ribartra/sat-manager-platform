@@ -50,7 +50,7 @@ export function NavStudent({
     },
   });
 
-  if (isPlayerPath(pathname)) return null;
+  if (isPlayerPath(pathname, searchParams)) return null;
 
   function closeMobile() {
     setMobileOpen(false);

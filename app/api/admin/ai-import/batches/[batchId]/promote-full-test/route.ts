@@ -43,7 +43,7 @@ export const POST = withApiErrors(async function POST(req: Request, { params }: 
     orderBy: [{ testNumber: "asc" }, { moduleLabel: "asc" }, { questionNumber: "asc" }, { createdAt: "asc" }],
   });
   if (candidates.length === 0) {
-    return new BadRequestError("No promoted Full Practice Test questions found for this test.").toResponse();
+    return new BadRequestError("No promoted Test questions found for this test.").toResponse();
   }
 
   const questionIds = candidates.map((candidate) => candidate.officialQuestionId).filter((id): id is string => Boolean(id));
@@ -79,7 +79,7 @@ export const POST = withApiErrors(async function POST(req: Request, { params }: 
   const partial = missingByModule.some((missing) => missing > 0);
   const modules = fullTestModuleBuckets(moduleCounts);
   if (partial && !body.allowPartial) {
-    return ApiError.fromStatus(409, "This Full Practice Test is partial. Confirm allowPartial to create/update a draft with promoted questions only.", { moduleCounts, missingByModule, modules, partial }).toResponse();
+    return ApiError.fromStatus(409, "This Test is partial. Confirm allowPartial to create/update a draft with promoted questions only.", { moduleCounts, missingByModule, modules, partial }).toResponse();
   }
 
   const testNumber = body.testNumber;

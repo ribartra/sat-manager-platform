@@ -249,11 +249,13 @@ export function hrefWithArea(href: string, area: string | null | undefined): str
   return `${url.pathname}?${url.searchParams.toString()}`;
 }
 
-export function isPlayerPath(pathname: string): boolean {
+export function isPlayerPath(pathname: string, search?: { get(name: string): string | null } | null): boolean {
+  // Student practice sets and Tests open on an intro page with the normal chrome; the player
+  // itself (full screen, no nav) is the same URL with ?start=1.
+  const studentPlayer = [/^\/student\/practice\/assignment\/[^/]+$/, /^\/student\/tests\/(?!results$)[^/]+$/];
+  if (studentPlayer.some((pattern) => pattern.test(pathname))) return search?.get("start") === "1";
   return [
-    /^\/student\/practice\/assignment\/[^/]+$/,
     /^\/student\/full-tests\/[^/]+$/,
-    /^\/student\/tests\/(?!results\/)[^/]+$/,
     /^\/teacher\/practice-sets\/[^/]+\/preview$/,
     /^\/teacher\/full-tests\/[^/]+\/preview$/,
     /^\/teacher\/tests\/[^/]+\/preview$/,

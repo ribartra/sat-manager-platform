@@ -143,7 +143,7 @@ export function TopicDifficultyChart({ metrics, selectedDifficulty }: { metrics:
 
 export function MockSectionChart({ metrics }: { metrics: MockSectionMetric[] }) {
   return (
-    <ChartFrame title="Full Practice Test progress" description="SAT score for each exam, by section">
+    <ChartFrame title="Test progress" description="SAT score for each Test, by section">
       {metrics.length === 0 ? (
         <EmptyChart />
       ) : (

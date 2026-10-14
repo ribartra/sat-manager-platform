@@ -2,8 +2,9 @@ import { PageShell } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
-import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import { loadStudentOverviews } from "@/lib/teacher-overview";
+import { StudentDonePanel } from "../student-done-panel";
 import { AssignForm } from "./assign-form-client";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { studentAccessWhereFor } from "@/lib/program-scope";
@@ -13,7 +14,7 @@ import { comparePracticeSets, domainRank, skillRank } from "@/lib/taxonomy-order
 
 interface PageProps {
   params: Promise<{ studentId: string }>;
-  searchParams: Promise<{ area?: string; domain?: string; topic?: string; difficulty?: string; sets?: string }>;
+  searchParams: Promise<{ area?: string; domain?: string; topic?: string; skill?: string; difficulty?: string; sets?: string }>;
 }
 
 export default async function AssignPage({ params, searchParams }: PageProps) {
@@ -31,6 +32,7 @@ export default async function AssignPage({ params, searchParams }: PageProps) {
     where: { id: studentId, ...studentWhere },
   });
   if (!student) notFound();
+  const overview = (await loadStudentOverviews([student.id], now)).get(student.id);
 
   const practiceSets = await prisma.practiceSet.findMany({
     where: { status: "PUBLISHED" },
@@ -61,17 +63,19 @@ export default async function AssignPage({ params, searchParams }: PageProps) {
 
   return (
     <PageShell width="narrow">
-      <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-        <Link href={`/teacher/students/${studentId}`} className="hover:text-blue-600 flex items-center gap-1">
-          <ChevronLeft size={14} /> {student.name}
-        </Link>
-        <span>/</span>
-        <span className="text-gray-900">Assign Practice Sets</span>
-      </div>
-
-      <h1 className="text-xl font-semibold text-gray-900 mb-6">
-        Assign to: <span className="text-blue-700">{student.name}</span>
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/teacher" },
+          { label: "Students", href: "/teacher/students" },
+          { label: student.name, href: `/teacher/students/${studentId}` },
+          { label: "Assign practice" },
+        ]}
+      />
+      <h1 className="mb-1 text-xl font-semibold text-gray-900">
+        Assign practice to <span className="text-blue-700">{student.name}</span>
       </h1>
+      <p className="mb-4 text-sm text-gray-500">1. Check what the student has done · 2. Choose practice sets · 3. Set a due date</p>
+      {overview ? <StudentDonePanel overview={overview} studentId={studentId} focus="practice" /> : null}
 
       <AssignForm
         studentId={studentId}
@@ -107,7 +111,7 @@ export default async function AssignPage({ params, searchParams }: PageProps) {
         groupAssignmentEnabled={teacherGroupManagementEnabled}
         initialArea={initialArea}
         initialDomain={query.domain}
-        initialTopic={query.topic}
+        initialTopic={query.topic ?? query.skill}
         initialDifficulty={query.difficulty}
         initialSelected={(query.sets ?? "").split(",").filter(Boolean)}
       />

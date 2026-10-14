@@ -19,6 +19,12 @@ export type TeacherStudentRow = {
   avgScoreTone: "high" | "mid" | "low" | "none";
   avgScoreFiltered: boolean;
   active: boolean;
+  /** Practice tabs: latest set in this area ("Linear functions (Easy) · 75%"). */
+  lastPracticeLabel?: string;
+  /** Practice tabs: lowest-scoring skill in this area ("Boundaries (Hard) · 40%"). */
+  weakestLabel?: string;
+  /** Practice tabs: assign practice in this area. */
+  assignHref?: string;
 };
 
 const SCORE_CLASS = {
@@ -81,8 +87,14 @@ export function TeacherStudentsTable({
         },
       },
       {
+        id: "lastPractice",
+        header: "Last practice",
+        meta: { priority: "low" },
+        cell: ({ row }) => <span className="text-xs text-muted-foreground">{row.original.lastPracticeLabel ?? "—"}</span>,
+      },
+      {
         id: "pending",
-        header: "Not finished",
+        header: "Sets to do",
         meta: { priority: "low", align: "right" },
         cell: ({ row }) =>
           row.original.pendingCount > 0 ? (
@@ -105,6 +117,12 @@ export function TeacherStudentsTable({
         ),
       },
       {
+        id: "weakest",
+        header: "Weakest skill",
+        meta: { priority: "low" },
+        cell: ({ row }) => <span className="text-xs text-muted-foreground">{row.original.weakestLabel ?? "—"}</span>,
+      },
+      {
         id: "status",
         header: "Status",
         meta: { priority: "high" },
@@ -120,6 +138,11 @@ export function TeacherStudentsTable({
         meta: { priority: "high", align: "right" },
         cell: ({ row }) => (
           <div className="flex flex-wrap justify-end gap-x-3 gap-y-1">
+            {row.original.assignHref ? (
+              <Link href={row.original.assignHref} className="text-xs text-primary hover:underline">
+                Assign practice
+              </Link>
+            ) : null}
             <Link href={`/teacher/students/${row.original.id}${filterQuery ? `?${filterQuery}` : ""}`} className="text-xs text-primary hover:underline">
               Open →
             </Link>

@@ -117,8 +117,11 @@ export function recommendationFor(pct: number) {
 export function shortSetName(name: string) {
   const parts = name.split(" - ").map((part) => part.trim()).filter(Boolean);
   if (parts.length < 3) return name;
+  // Several sets of one skill and level end in "#n": "… - Boundaries - HARD - #1" → "Boundaries (Hard) #1".
+  const numbered = /^#\d+$/.test(parts[parts.length - 1]) && parts.length >= 4 ? parts.pop() : null;
   const last = parts[parts.length - 1].toUpperCase();
-  if (!["EASY", "MEDIUM", "HARD"].includes(last)) return parts.slice(1).join(" · ");
+  if (!["EASY", "MEDIUM", "HARD"].includes(last)) return [...parts.slice(1), ...(numbered ? [numbered] : [])].join(" · ");
+  if (numbered) return `${parts.slice(1, -1).join(" - ")} (${difficultyLabel(last)}) ${numbered}`;
   return `${parts.slice(1, -1).join(" - ")} (${difficultyLabel(last)})`;
 }
 

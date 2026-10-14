@@ -11,17 +11,24 @@ import { Card } from "@/components/ui/card";
 import { MathContent } from "@/components/math-content";
 import { OptionContent } from "@/components/option-content";
 import { QuestionMedia } from "@/components/question-media";
-import { CheckCircle, XCircle, MinusCircle, ChevronLeft, RotateCcw } from "lucide-react";
+import { CheckCircle, XCircle, MinusCircle, RotateCcw } from "lucide-react";
 import { parseSnapshot, PracticeSetSnapshot, QuestionSnapshot } from "@/lib/attempt-snapshots";
 import { formatCorrectAnswer } from "@/lib/answer-grading";
 import { resolveQuestionType, isAnswerOption } from "@/lib/question-type";
 import { difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
 import { isAnsweredAnswer, summarizeAllQuestionAnswers } from "@/lib/weighted-score";
 import { Alert } from "@/components/sat/alert";
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import { AreaTag } from "@/components/sat/practice-set-row";
+import { AnswerGrid, AnswerGridLegend } from "@/components/sat/test-ui";
+import { Pct } from "@/components/sat/work-status";
+import { tabFromPracticeArea, type PracticeAreaCode } from "@/lib/practice-area";
+import { loadStudentPractice, sortPracticeSets } from "@/lib/student-practice";
+import { relativeDay } from "@/lib/utils";
 
 interface PageProps {
   params: Promise<{ attemptId: string }>;
-  searchParams: Promise<{ area?: string; topic?: string; difficulty?: string; from?: string; to?: string }>;
+  searchParams: Promise<{ area?: string; topic?: string; difficulty?: string; from?: string; to?: string; new?: string }>;
 }
 
 export default async function ResultsPage({ params, searchParams }: PageProps) {
@@ -96,24 +103,44 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
   const orderedAnswers = orderedQuestionIds.map((questionId) => answersMap[questionId]).filter(Boolean);
 
   const displayPct = pct;
+  const practiceArea = (practiceSet?.topic.domain.practiceArea ?? null) as PracticeAreaCode | null;
+  const areaTab = practiceArea ? tabFromPracticeArea(practiceArea) : null;
+  const allPractice = await loadStudentPractice(userId);
+  const thisSet = attempt.assignmentId ? allPractice.find((p) => p.assignmentId === attempt.assignmentId) : undefined;
+  const tries = thisSet?.tries ?? [];
+  const thisTry = tries.find((t) => t.id === attempt.id);
+  const prevTry = thisTry ? tries[thisTry.tryNumber - 2] : undefined;
+  const delta = prevTry && prevTry.pct !== null ? displayPct - prevTry.pct : null;
+  const nextAssignment = sortPracticeSets(allPractice.filter((p) => p.state !== "done" && p.assignmentId !== attempt.assignmentId && !p.locked))[0];
+  const perQuestion = attempt.totalTime && totalQuestions ? Math.round(attempt.totalTime / totalQuestions) : null;
+  const tryAgainHref = attempt.assignmentId ? `/student/practice/assignment/${attempt.assignmentId}?start=1` : "/student/practice";
 
   return (
-    <PageShell width="narrow">
-      {/* Back */}
-      <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-        <Link href={historyHref} className="hover:text-blue-600 flex items-center gap-1">
-          <ChevronLeft size={14} /> History
-        </Link>
-      </div>
+    <PageShell>
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/student" },
+          { label: "Practice", href: areaTab ? `/student/practice?area=${areaTab}` : "/student/practice" },
+          { label: "History", href: areaTab ? `/student/history?area=${areaTab}` : historyHref },
+          { label: `Try ${thisTry?.tryNumber ?? attempt.attemptNumber} results` },
+        ]}
+      />
+      {query.new === "1" ? <Alert tone="success" className="mb-4">Practice submitted. Here are your results.</Alert> : null}
 
       {attempt.status === "INVALIDATED" ? <InvalidatedNotice audience="student" /> : null}
       {/* Score header */}
       <div className="rounded-xl border border-gray-200 bg-white p-6 mb-6">
-        <h1 className="text-lg font-semibold text-gray-900 mb-1">
-          {shortSetName(practiceSetSnapshot?.name ?? practiceSet?.name ?? "Practice set")}
+        <div className="mb-1 flex flex-wrap items-center gap-2">
+          {practiceArea ? <AreaTag area={practiceArea} /> : null}
+          {practiceSet ? <Badge variant={difficultyBadgeVariant(practiceSet.difficulty)}>{difficultyLabel(practiceSet.difficulty)}</Badge> : null}
+          <Badge>Try {thisTry?.tryNumber ?? attempt.attemptNumber} of {Math.max(tries.length, 1)}</Badge>
+        </div>
+        <h1 className="text-xl font-semibold text-gray-900 mb-1">
+          {practiceSet?.topic.name ?? shortSetName(practiceSetSnapshot?.name ?? "Practice set")}
         </h1>
-        <p className="text-xs text-gray-400 mb-4">
-          Try {attempt.attemptNumber}{attempt.submittedAt ? ` · ${formatDate(attempt.submittedAt)}` : ""}
+        <p className="text-xs text-gray-500 mb-4">
+          {attempt.submittedAt ? <>Completed <b className="font-medium text-gray-700">{formatDate(attempt.submittedAt)}</b> ({relativeDay(attempt.submittedAt)})</> : null}
+          {attempt.assignment?.createdAt ? <> · Assigned {formatDate(attempt.assignment.createdAt)}</> : null}
         </p>
 
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -143,6 +170,26 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
           </div>
         </div>
 
+        {delta !== null ? (
+          <p className={`mt-3 text-xs ${delta >= 0 ? "text-green-700" : "text-red-600"}`}>
+            {delta >= 0 ? "▲" : "▼"} {Math.abs(delta)} points vs. try {prevTry!.tryNumber} ({prevTry!.pct}%)
+          </p>
+        ) : null}
+        <div className="mt-3">
+          <p className="text-sm text-gray-700">
+            You answered <b className="text-green-700">{correct} correctly</b>, <b className="text-red-600">{incorrect} incorrectly</b> and left{" "}
+            <b className="text-gray-600">{unanswered} blank</b>.
+          </p>
+          <div className="mt-1.5 flex h-3 overflow-hidden rounded-full bg-gray-100" aria-label={`${correct} correct, ${incorrect} incorrect, ${unanswered} blank`}>
+            <span className="bg-green-500" style={{ width: `${totalQuestions ? (correct / totalQuestions) * 100 : 0}%` }} />
+            <span className="bg-red-400" style={{ width: `${totalQuestions ? (incorrect / totalQuestions) * 100 : 0}%` }} />
+            <span className="bg-gray-300" style={{ width: `${totalQuestions ? (unanswered / totalQuestions) * 100 : 0}%` }} />
+          </div>
+          {attempt.totalTime ? (
+            <p className="mt-1 text-xs text-gray-500">{formatDuration(attempt.totalTime)} total{perQuestion ? ` · ${formatDuration(perQuestion)} per question on average` : ""}</p>
+          ) : null}
+        </div>
+
         {attempt.pauses.length > 0 && (
           <Alert tone="note" className="mt-4 text-xs">
             Paused {attempt.pauses.length} time{attempt.pauses.length === 1 ? "" : "s"}
@@ -152,16 +199,21 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
 
         <div className="mt-5 flex items-center gap-3">
           <Link
-            href={attempt.assignmentId ? `/student/practice/assignment/${attempt.assignmentId}${returnQuery.toString() ? `?${returnQuery.toString()}` : ""}` : "/student/practice-sets"}
+            href={tryAgainHref}
             className="flex items-center gap-1.5 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
           >
             <RotateCcw size={14} /> Try Again
           </Link>
-          <Link
-            href={returnQuery.toString() ? `/student?${returnQuery.toString()}` : "/student"}
-            className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-          >
-            ← Home
+          {nextAssignment ? (
+            <Link
+              href={`/student/practice/assignment/${nextAssignment.assignmentId}`}
+              className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              Next assignment: {nextAssignment.skill} · {difficultyLabel(nextAssignment.difficulty)}
+            </Link>
+          ) : null}
+          <Link href="/student" className="rounded-md px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50">
+            Home
           </Link>
         </div>
       </div>
@@ -172,6 +224,45 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
           <p>{attempt.teacherComment}</p>
         </Card>
       )}
+
+      {tries.length > 1 ? (
+        <Card padding="md" className="mb-6">
+          <h2 className="text-sm font-semibold text-gray-900">All attempts for this set</h2>
+          <p className="mb-2 text-xs text-gray-500">Every time you try again, a new attempt is recorded here.</p>
+          <table className="w-full text-sm">
+            <thead className="text-left text-xs text-gray-500">
+              <tr><th className="py-1">Attempt</th><th>Completed</th><th>Score</th><th>Correct</th><th>Time</th></tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {tries.map((t) => (
+                <tr key={t.id} className={t.id === attempt.id ? "bg-blue-50" : ""}>
+                  <td className="py-1.5">
+                    <Link href={`/student/results/${t.id}`} className="hover:underline">Try {t.tryNumber}</Link>
+                    {t.id === attempt.id ? <Badge variant="info" className="ml-2">Viewing</Badge> : null}
+                  </td>
+                  <td className="text-gray-600">{formatDate(t.submittedAt)}</td>
+                  <td><Pct value={t.pct} className="font-semibold" /></td>
+                  <td>{t.correct} of {t.total}</td>
+                  <td className="text-gray-600">{t.time ? formatDuration(t.time) : "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Card>
+      ) : null}
+
+      {canRevealSolutions && orderedAnswers.length > 0 ? (
+        <Card padding="md" className="mb-6">
+          <h2 className="text-sm font-semibold text-gray-900">Your answers at a glance</h2>
+          <div className="mt-2">
+            <AnswerGrid
+              idPrefix="q-"
+              items={orderedAnswers.map((a) => ({ state: !a?.answer ? ("blank" as const) : a.isCorrect ? ("ok" as const) : ("bad" as const) }))}
+            />
+          </div>
+          <AnswerGridLegend />
+        </Card>
+      ) : null}
 
       {/* Per-question review */}
       <div>
@@ -202,7 +293,7 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
               : "border-red-200 bg-red-50";
 
             return (
-              <Card key={ans.id} padding="md" className={statusClass}>
+              <Card key={ans.id} id={`q-${i + 1}`} padding="md" className={`scroll-mt-20 ${statusClass}`}>
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium text-gray-500">Question {i + 1}</span>
@@ -279,11 +370,11 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
                     </div>
                   )}
 
-                  {canRevealSolutions && !isUnanswered && question.explanation && (
-                    <div className="mt-2 pt-2 border-t border-gray-200">
-                      <p className="text-xs font-medium text-gray-500 mb-1">Explanation</p>
-                      <MathContent content={question.explanation} className="text-sm text-gray-700" />
-                    </div>
+                  {canRevealSolutions && question.explanation && (
+                    <details className="mt-2 pt-2 border-t border-gray-200" open={!isCorrect}>
+                      <summary className="cursor-pointer select-none text-xs font-medium text-gray-500">Explanation</summary>
+                      <MathContent content={question.explanation} className="mt-1 text-sm text-gray-700" />
+                    </details>
                   )}
               </Card>
               );

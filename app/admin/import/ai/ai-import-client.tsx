@@ -699,11 +699,11 @@ export function AiImportWorkflowClient({
         <DialogContent className="max-h-[90vh] max-w-6xl overflow-auto">
           <DialogHeader>
             <DialogTitle>Promote Reviewed Content</DialogTitle>
-            <DialogDescription>Create draft Practice Sets or Full Practice Tests only after staging review is clean.</DialogDescription>
+            <DialogDescription>Create draft Practice Sets or Tests only after staging review is clean.</DialogDescription>
           </DialogHeader>
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-gray-200 p-4">
             <div>
-              <p className="text-sm font-semibold text-gray-900">Full Practice Tests (standardized SAT)</p>
+              <p className="text-sm font-semibold text-gray-900">Tests (full-length SAT)</p>
               <p className="text-xs text-gray-500">
                 {fullTests.length} tests · staging review uses 2 Extracted Tests (R&amp;W + Math); promote assembles 4 groups
                 (RW M1/M2 · Math M1/M2) with timers 32/32/35/35 and section scores.
@@ -715,7 +715,7 @@ export function AiImportWorkflowClient({
               <div key={test.testNumber} className="rounded-md border border-gray-200 p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">Full Practice Test {test.testNumber}</p>
+                    <p className="text-sm font-semibold text-gray-900">Test {test.testNumber}</p>
                     <p className="mt-1 text-xs text-gray-500">
                       {test.promoted}/{test.total} official · 2 Extracted Tests → 4 SAT groups
                     </p>
@@ -751,7 +751,7 @@ export function AiImportWorkflowClient({
                     />
                   )}
                   {test.artifactId ? (
-                    <Link href="/teacher/practice-sets?area=tests" className="rounded-md border border-green-200 px-3 py-2 text-xs font-medium text-green-700 hover:bg-green-50">
+                    <Link href="/teacher/tests" className="rounded-md border border-green-200 px-3 py-2 text-xs font-medium text-green-700 hover:bg-green-50">
                       Open Draft Test
                     </Link>
                   ) : test.promoted > 0 && selectedBatchId ? (
@@ -762,7 +762,7 @@ export function AiImportWorkflowClient({
                 </div>
               </div>
             ))}
-            {fullTests.length === 0 && <p className="col-span-full py-8 text-center text-sm text-gray-400">No Full Practice Tests detected in this batch.</p>}
+            {fullTests.length === 0 && <p className="col-span-full py-8 text-center text-sm text-gray-400">No Tests detected in this batch.</p>}
           </div>
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             {practiceSets.map((set) => {

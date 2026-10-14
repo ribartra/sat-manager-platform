@@ -52,34 +52,34 @@ export function FullTestActions({
 
   async function duplicate() {
     const data = await request("duplicate", `/api/full-practice-tests/${testId}/duplicate`, { method: "POST" });
-    if (data?.test?.id) router.push(`/teacher/full-tests/${data.test.id}/edit`);
+    if (data?.test?.id) router.push(`/teacher/tests/${data.test.id}/edit`);
   }
 
   async function remove() {
     if (!canDelete) return;
-    const ok = await confirm({ title: "Delete this draft exam?", description: "This cannot be undone.", tone: "danger", confirmLabel: "Delete" });
+    const ok = await confirm({ title: "Delete this draft test?", description: "This cannot be undone.", tone: "danger", confirmLabel: "Delete" });
     if (!ok) return;
     const data = await request("delete", `/api/full-practice-tests/${testId}`, { method: "DELETE" });
-    if (data && variant === "detail") router.push("/teacher/practice-sets?area=tests");
+    if (data && variant === "detail") router.push("/teacher/tests");
   }
 
   if (variant === "list") {
     return (
       <div className="flex flex-wrap items-center justify-end gap-2">
         <Button asChild variant="ghost" size="sm">
-          <Link href={`/teacher/full-tests/${testId}`}>
+          <Link href={`/teacher/tests/${testId}`}>
             <Eye size={14} />
             View
           </Link>
         </Button>
         <Button asChild variant="ghost" size="sm">
-          <Link href={`/teacher/full-tests/${testId}/preview`}>
+          <Link href={`/teacher/tests/${testId}/preview`}>
             <Play size={14} />
             Preview
           </Link>
         </Button>
         <Button asChild variant="ghost" size="sm">
-          <Link href={`/teacher/full-tests/${testId}/edit`}>
+          <Link href={`/teacher/tests/${testId}/edit`}>
             <Edit size={14} />
             Edit
           </Link>
@@ -91,7 +91,7 @@ export function FullTestActions({
           onClick={remove}
           disabled={Boolean(loadingAction)}
           disabledReason={canDelete ? null : "Students already have this exam. Archive it instead."}
-          title={canDelete ? "Delete exam" : undefined}
+          title={canDelete ? "Delete test" : undefined}
         >
           <Trash2 size={14} />
           Delete
@@ -103,26 +103,26 @@ export function FullTestActions({
   return (
     <div className="flex flex-wrap items-center justify-end gap-2">
       <Button asChild variant="secondary" size="sm">
-        <Link href={`/teacher/full-tests/${testId}/preview`}>
+        <Link href={`/teacher/tests/${testId}/preview`}>
           <Play size={14} />
           Preview
         </Link>
       </Button>
       <Button asChild variant="secondary" size="sm">
-        <Link href={`/teacher/full-tests/${testId}/edit`}>
+        <Link href={`/teacher/tests/${testId}/edit`}>
           <Edit size={14} />
           Edit
         </Link>
       </Button>
       {canAssign ? (
         <Button asChild size="sm">
-          <Link href={`/teacher/full-tests/${testId}/assign`}>
+          <Link href={`/teacher/tests/${testId}/assign`}>
             <Send size={14} />
             Assign
           </Link>
         </Button>
       ) : (
-        <Button type="button" variant="ghost" size="sm" disabledReason="Publish the exam before assigning.">
+        <Button type="button" variant="ghost" size="sm" disabledReason="Publish the test before assigning.">
           <Send size={14} />
           Assign
         </Button>
@@ -173,7 +173,7 @@ export function FullTestActions({
         onClick={remove}
         disabled={Boolean(loadingAction)}
         disabledReason={canDelete ? null : "Students already have this exam. Archive it instead."}
-        title={canDelete ? "Delete exam" : undefined}
+        title={canDelete ? "Delete test" : undefined}
       >
         <Trash2 size={14} />
         Delete

@@ -117,7 +117,7 @@ export function ImportQuestionnaireButton({ mode, defaultName, topicName, domain
   const allFiles = useMemo(() => [...questionFiles, ...answerFiles], [questionFiles, answerFiles]);
   const totalSize = useMemo(() => allFiles.reduce((sum, file) => sum + file.size, 0), [allFiles]);
   const oversized = totalSize > MAX_UPLOAD_BYTES;
-  const modeLabel = mode === "PRACTICE_SET" ? "Practice Set" : "Full Practice Test";
+  const modeLabel = mode === "PRACTICE_SET" ? "Practice Set" : "Test";
 
   // Why "Create staging batch" is unavailable, shown next to the button (null = ready).
   const blockedReason = questionFiles.length === 0

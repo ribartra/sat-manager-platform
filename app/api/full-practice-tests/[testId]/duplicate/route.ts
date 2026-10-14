@@ -16,7 +16,7 @@ export const POST = withApiErrors(async function POST(_req: Request, { params }:
     where: { id: testId },
     include: { modules: { include: { questions: { orderBy: { order: "asc" } } }, orderBy: { order: "asc" } } },
   });
-  if (!test) return new NotFoundError("Exam not found.").toResponse();
+  if (!test) return new NotFoundError("Test not found.").toResponse();
 
   const copy = await prisma.fullPracticeTest.create({
     data: {

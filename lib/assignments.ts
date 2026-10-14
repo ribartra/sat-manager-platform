@@ -217,7 +217,7 @@ export async function upsertFullTestAssignment(input: FullTestAssignmentInput): 
         metadata: JSON.stringify({ studentId, testId, dueDate: dueDate?.toISOString() ?? null, ...extra }),
       },
     });
-  const href = "/student/content-map?area=tests";
+  const href = "/student/tests";
 
   let existing = await prisma.fullPracticeTestAssignment.findFirst({ where: { testId, studentId } });
   if (!existing) {
@@ -225,7 +225,7 @@ export async function upsertFullTestAssignment(input: FullTestAssignmentInput): 
       const created = await prisma.fullPracticeTestAssignment.create({
         data: { testId, studentId, assignedById, dueDate, status: "PENDING" },
       });
-      await notifyUser(studentId, "Exam assigned", testName, href);
+      await notifyUser(studentId, "Test assigned", testName, href);
       await audit("ASSIGN_FULL_PRACTICE_TEST", created.id);
       return { outcome: "created", assignmentId: created.id };
     } catch (error) {
@@ -242,7 +242,7 @@ export async function upsertFullTestAssignment(input: FullTestAssignmentInput): 
       where: { id: existing.id },
       data: { dueDate: nextDueDate, assignedById },
     });
-    await notifyUser(studentId, "Exam assignment updated", testName, href);
+    await notifyUser(studentId, "Test assignment updated", testName, href);
     await audit("UPDATE_FULL_PRACTICE_TEST_ASSIGNMENT", existing.id, { previousDueDate: existing.dueDate?.toISOString() ?? null });
     return { outcome: "updated", assignmentId: existing.id };
   }
@@ -255,7 +255,7 @@ export async function upsertFullTestAssignment(input: FullTestAssignmentInput): 
     where: { id: existing.id },
     data: { status: openAttempt ? "IN_PROGRESS" : "PENDING", dueDate, assignedById },
   });
-  await notifyUser(studentId, "Exam reassigned", testName, href);
+  await notifyUser(studentId, "Test reassigned", testName, href);
   await audit("REASSIGN_FULL_PRACTICE_TEST", existing.id, { previousStatus: existing.status });
   return { outcome: "reassigned", assignmentId: existing.id };
 }

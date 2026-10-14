@@ -101,7 +101,7 @@ const checks = [
   },
   {
     file: "lib/pdf/student-report-document.tsx",
-    requires: ["renderToBuffer", "Helvetica-Bold", "Questions correct", "Performance by skill and difficulty", "Skills to work on next", "Teacher comments", "totalPages", "Scores by exam"],
+    requires: ["renderToBuffer", "Helvetica-Bold", "Questions correct", "Performance by skill and difficulty", "Skills to work on next", "Teacher comments", "totalPages", "Scores by Test"],
     label: "PDF presentable (backend, sin navegador): score ponderado, secciones por area, paginacion y resumen",
   },
   {
@@ -115,8 +115,8 @@ const checks = [
     label: "Full Practice Test scoring: formula proporcional sobre las preguntas que cuentan (con/sin pretest)",
   },
   {
-    file: "app/(teacher)/teacher/full-tests/scoring/page.tsx",
-    requires: ["How exam scores are calculated", "FPT_PRETEST_EXCLUSION", "scoringExamples", "This is an estimate"],
+    file: "app/(teacher)/teacher/tests/scoring/page.tsx",
+    requires: ["How test scores are calculated", "FPT_PRETEST_EXCLUSION", "scoringExamples", "This is an estimate"],
     label: "UI de scoring explica la formula con ejemplos segun el ajuste de pretest",
   },
   {

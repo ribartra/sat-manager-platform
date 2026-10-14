@@ -22,13 +22,13 @@ async function assertSourcePatterns() {
     },
     {
       file: "components/sat/practice-area-tabs.tsx",
-      requires: ["AREA_TABS_WITH_MOCKS", "buildAreaHref"],
-      label: "tabs compartidos Math/Reading/Writing/Full Practice Tests",
+      requires: ["AREA_TABS_WITH_TESTS", "buildAreaHref", "includeSummary"],
+      label: "tabs compartidos Summary/Math/Reading/Writing/Tests",
     },
     {
       file: "lib/practice-area.ts",
-      requires: ['label: "Full Practice Tests"', 'key: "mocks"'],
-      label: "4ª pestaña Full Practice Tests (key mocks)",
+      requires: ['export const TESTS_LABEL = "Tests"', 'key: "tests" as const, label: TESTS_LABEL', 'if (value === "mocks") return "tests"'],
+      label: "Pestaña Tests a la derecha (key tests; alias legacy mocks)",
     },
     {
       file: "app/(teacher)/teacher/analytics/page.tsx",
@@ -37,8 +37,8 @@ async function assertSourcePatterns() {
     },
     {
       file: "app/(student)/student/history/page.tsx",
-      requires: ["PracticeAreaTabs", "practiceArea", 'area === "mocks"'],
-      label: "History sin Section redundante y con Full Practice Tests",
+      requires: ["PracticeAreaTabs", "practiceArea", 'area === "tests"'],
+      label: "History sin Section redundante y con Tests",
     },
     {
       file: "app/(teacher)/teacher/students/[studentId]/report/page.tsx",
@@ -52,18 +52,18 @@ async function assertSourcePatterns() {
     },
     {
       file: "app/(teacher)/teacher/impersonate/[studentId]/page.tsx",
-      requires: ["PracticeAreaTabs", "practiceArea", 'area === "mocks"', "activeAreaTab"],
+      requires: ["PracticeAreaTabs", "practiceArea", 'area === "tests"', "activeAreaTab"],
       label: "Impersonate Assigned con 4 tabs",
     },
     {
       file: "app/(student)/student/page.tsx",
-      requires: ["PracticeAreaTabs", "practiceArea", 'area === "mocks"', "activeAreaTab"],
-      label: "Student Home con 4 tabs y filtro por área",
+      requires: ["PracticeAreaTabs", "practiceArea", 'area === "tests"', "activeHomeTab", "AreaPracticeView", "TestsTab"],
+      label: "Student Home: Summary + Math/Reading/Writing (solo practica) + Tests aparte",
     },
     {
       file: "lib/pdf/build-student-report.ts",
-      requires: ["PRACTICE_AREA", "Full Practice Tests", "loadPracticeReport", "loadMockReport"],
-      label: "PDF separa Practice areas y Full Practice Tests (una seccion por area)",
+      requires: ["PRACTICE_AREA", 'mocks: "Tests"', "loadPracticeReport", "loadMockReport"],
+      label: "PDF separa Practice areas y Tests (una seccion por area)",
     },
     {
       file: "prisma/seed-taxonomy.ts",
@@ -72,7 +72,7 @@ async function assertSourcePatterns() {
     },
     {
       file: "lib/app-settings.ts",
-      requires: ["FPT_PRETEST_EXCLUSION", "Exclude Full Practice Test pretest", "defaultValue: false"],
+      requires: ["FPT_PRETEST_EXCLUSION", "Exclude Test pretest", "defaultValue: false"],
       label: "Feature flag FPT_PRETEST_EXCLUSION default off",
     },
   ];

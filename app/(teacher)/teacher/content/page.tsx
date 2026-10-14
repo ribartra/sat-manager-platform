@@ -29,7 +29,7 @@ export default async function TeacherContentPage({
   // Navigation is by practice area: Math / Reading / Writing / Full Practice Tests.
   const area = activeAreaTab(params.area ?? params.section, "math");
   // "Full Practice Tests" is an exam surface, not a practice-set area.
-  if (area === "tests") redirect("/teacher/full-tests");
+  if (area === "tests") redirect("/teacher/tests");
   const activeArea = practiceAreaFromTab(area); // MATH | READING | WRITING (mocks handled above)
   const areaLabel = practiceAreaLabel(activeArea);
   const domainFilter = params.domain?.trim() || null;
@@ -190,7 +190,10 @@ export default async function TeacherContentPage({
         </Link>
       </div>
 
-      <PracticeAreaTabs basePath="/teacher/content" active={area} />
+      <PracticeAreaTabs basePath="/teacher/content" active={area} includeTests={false} />
+      <p className="-mt-3 mb-3 text-xs text-gray-500">
+        Practice skills only. Full-length tests are in <Link href="/teacher/tests" className="text-blue-600 hover:underline">Tests</Link>.
+      </p>
 
       {domainFilter ? (
         <p className="mb-4 text-sm text-gray-500">

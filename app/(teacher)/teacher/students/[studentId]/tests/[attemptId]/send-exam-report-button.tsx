@@ -2,7 +2,7 @@
 
 import { GenerateReportDialog, type ReportParentOption } from "../../generate-report-dialog";
 
-/** "Send this exam report": the report dialog preset to this Full Practice Test attempt. */
+/** "Send this test report": the report dialog preset to this Test attempt. */
 export function SendExamReportButton({
   studentId,
   studentName,
@@ -26,7 +26,7 @@ export function SendExamReportButton({
       exams={[{ id: attemptId, label: attemptLabel }]}
       initialExamId={attemptId}
       parents={parents}
-      triggerLabel="Exam report (PDF / email)"
+      triggerLabel="Test report (PDF / email)"
     />
   );
 }

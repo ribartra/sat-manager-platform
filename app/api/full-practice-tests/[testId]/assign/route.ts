@@ -23,7 +23,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
 
   const counts: Record<AssignmentOutcome, number> = { created: 0, updated: 0, reassigned: 0, unchanged: 0 };
   const test = await prisma.fullPracticeTest.findUnique({ where: { id: testId } });
-  if (!test) return new NotFoundError("Exam not found.").toResponse();
+  if (!test) return new NotFoundError("Test not found.").toResponse();
   if (test.status !== "PUBLISHED") {
     return new BadRequestError("Only published exams can be assigned.").toResponse();
   }
@@ -52,12 +52,12 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
   }
 
   revalidatePath("/student");
-  revalidatePath("/student/content-map");
+  revalidatePath("/student/tests");
   for (const studentId of touchedStudentIds) {
     revalidatePath(`/teacher/students/${studentId}`);
     revalidatePath(`/teacher/impersonate/${studentId}`);
   }
-  revalidatePath(`/teacher/full-tests/${testId}`);
+  revalidatePath(`/teacher/tests/${testId}`);
 
   // `skipped` kept for older clients: assignments that needed no change.
   return NextResponse.json({ ...counts, skipped: counts.unchanged });

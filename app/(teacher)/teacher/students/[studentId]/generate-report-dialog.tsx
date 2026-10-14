@@ -13,7 +13,7 @@ const AREAS = [
   { key: "math", label: "Math", color: "var(--sat-area-math)" },
   { key: "reading", label: "Reading", color: "var(--sat-area-reading)" },
   { key: "writing", label: "Writing", color: "var(--sat-area-writing)" },
-  { key: "tests", label: "Full Practice Tests", color: "var(--sat-area-tests)" },
+  { key: "tests", label: "Tests", color: "var(--sat-area-tests)" },
 ] as const;
 type AreaKey = (typeof AREAS)[number]["key"];
 
@@ -206,13 +206,13 @@ export function GenerateReportDialog({
         {!query && <InlineError>Select at least one area.</InlineError>}
         {selected.has("tests") && exams.length > 0 ? (
           <label className="flex flex-wrap items-center gap-2 text-sm text-gray-700">
-            <span className="font-medium">Exam</span>
+            <span className="font-medium">Test</span>
             <select
               value={examId}
               onChange={(event) => chooseExam(event.target.value)}
               className="h-8 rounded-md border border-gray-300 bg-white px-2 text-sm"
             >
-              <option value="">All exams</option>
+              <option value="">All tests</option>
               {exams.map((exam) => (
                 <option key={exam.id} value={exam.id}>{exam.label}</option>
               ))}

@@ -227,7 +227,7 @@ export default async function ImpersonateStudentPage({ params, searchParams }: P
 
   const pendingCount = isMocks ? examAssignments.length : assignments.length;
   const completedCount = isMocks ? examCompletedCount : stats._count.id;
-  const areaLabel = isMocks ? "Full Practice Tests" : practiceAreaLabel(practiceArea);
+  const areaLabel = isMocks ? "Tests" : practiceAreaLabel(practiceArea);
 
   return (
     <div>
@@ -254,9 +254,9 @@ export default async function ImpersonateStudentPage({ params, searchParams }: P
 
         {!isMocks && pendingExamCount > 0 && (
           <div className="mb-4 rounded-md border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-900">
-            {pendingExamCount} active Full Practice Test{pendingExamCount === 1 ? "" : "s"} assigned.{" "}
+            {pendingExamCount} active Test{pendingExamCount === 1 ? "" : "s"} assigned.{" "}
             <Link href={buildProgressHref(`/teacher/impersonate/${studentId}`, { ...filters, area: "tests" })} className="font-medium underline">
-              Open Full Practice Tests tab →
+              Open Tests tab →
             </Link>
           </div>
         )}
@@ -267,7 +267,7 @@ export default async function ImpersonateStudentPage({ params, searchParams }: P
               <BookOpen size={16} className="text-blue-600" />
               <div>
                 <p className="text-2xl font-bold text-gray-900">{completedCount}</p>
-                <p className="text-xs text-gray-500">{isMocks ? "Exams completed" : "Sets completed"} · {areaLabel}</p>
+                <p className="text-xs text-gray-500">{isMocks ? "Tests completed" : "Sets completed"} · {areaLabel}</p>
               </div>
             </CardBody>
           </Card>
@@ -278,7 +278,7 @@ export default async function ImpersonateStudentPage({ params, searchParams }: P
                 <p className="text-2xl font-bold text-gray-900">
                   {isMocks ? "—" : avgScore !== null ? `${avgScore}%` : "—"}
                 </p>
-                <p className="text-xs text-gray-500">{isMocks ? "Use R&W / Math on exams" : "Avg score"}</p>
+                <p className="text-xs text-gray-500">{isMocks ? "Use R&W / Math on tests" : "Avg score"}</p>
               </div>
             </CardBody>
           </Card>
@@ -302,7 +302,7 @@ export default async function ImpersonateStudentPage({ params, searchParams }: P
                   <div>
                     <p className="text-sm font-medium text-gray-900">{a.test.name}</p>
                     <p className="mt-0.5 text-xs text-gray-500">
-                      Full Practice Test · R&amp;W + Math
+                      Test · R&amp;W + Math
                       {a.dueDate && <span className="ml-2 text-amber-600">Due: {formatDate(a.dueDate)}</span>}
                     </p>
                   </div>
@@ -311,7 +311,7 @@ export default async function ImpersonateStudentPage({ params, searchParams }: P
               ))}
               {examAssignments.length === 0 && (
                 <Card padding="lg" className="text-center text-sm text-gray-400">
-                  No active Full Practice Tests.
+                  No active tests.
                 </Card>
               )}
             </div>

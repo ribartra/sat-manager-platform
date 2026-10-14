@@ -150,7 +150,7 @@ const checks = [
     label: "Full test attempt reopen scoped by teacher program",
   },
   {
-    file: "app/(teacher)/teacher/students/[studentId]/full-tests/[attemptId]/page.tsx",
+    file: "app/(teacher)/teacher/students/[studentId]/tests/[attemptId]/page.tsx",
     requires: ["teacherProgramEnrollmentScope", "student: { programEnrollments: programScope }", "notFound()"],
     label: "Teacher full test attempt detail scoped by teacher program",
   },

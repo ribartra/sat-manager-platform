@@ -117,13 +117,13 @@ export function FullTestEditor({
       }),
     });
     if (!response.ok) {
-      const error = await readApiError(response, "Unable to create Exam.");
+      const error = await readApiError(response, "Unable to create the test.");
       const warnings = (error.data as { warnings?: unknown } | null)?.warnings;
       setErrors(error.details.length ? error.details : [error.message]);
       setWarnings(Array.isArray(warnings) ? warnings.map(String) : []);
       return;
     }
-    router.push("/teacher/practice-sets?area=tests");
+    router.push("/teacher/tests");
     router.refresh();
   }
 
@@ -152,10 +152,10 @@ export function FullTestEditor({
               Upload the test and answer files. You&apos;ll check the questions before they&apos;re added.
             </p>
           </div>
-          <ImportQuestionnaireButton mode="FULL_PRACTICE_TEST" defaultName={name || "Full Practice Test PDF import"} />
+          <ImportQuestionnaireButton mode="FULL_PRACTICE_TEST" defaultName={name || "Test PDF import"} />
         </Card>
 
-        <FormSection title="Exam settings">
+        <FormSection title="Test settings">
           <div className="grid grid-cols-2 gap-4">
             <FormField
               control={form.control}
@@ -163,7 +163,7 @@ export function FullTestEditor({
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input {...field} placeholder="Exam #1" />
+                    <Input {...field} placeholder="TEST 11" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -200,7 +200,7 @@ export function FullTestEditor({
                       ref={field.ref}
                       name={field.name}
                     />
-                    Show answers after the exam
+                    Show answers after the test
                   </label>
                 </FormItem>
               )}
@@ -230,10 +230,10 @@ export function FullTestEditor({
         </FormSection>
 
         <Card padding="sm" className="text-xs text-gray-600">
-          <p className="font-medium text-gray-800">Exam layout (fixed)</p>
+          <p className="font-medium text-gray-800">Test layout (fixed)</p>
           <p className="mt-1">
             Same layout as the real SAT: 2 Reading &amp; Writing modules (32 min each) and 2 Math modules (35 min each).{" "}
-            <Link className="text-blue-600 hover:underline" href="/teacher/full-tests/scoring">
+            <Link className="text-blue-600 hover:underline" href="/teacher/tests/scoring">
               How scores are calculated
             </Link>
             .
@@ -328,7 +328,7 @@ export function FullTestEditor({
         ) : null}
 
         <Button type="submit" disabled={saving} disabledReason={!name?.trim() ? "Enter a name." : !moduleQuestionIds.every((ids) => ids.length > 0) ? "Every module needs at least one question." : null}>
-          {saving ? "Saving..." : initial?.id ? "Save Exam" : "Create Exam"}
+          {saving ? "Saving..." : initial?.id ? "Save test" : "Create test"}
         </Button>
       </form>
     </Form>

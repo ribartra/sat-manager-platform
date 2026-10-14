@@ -29,7 +29,7 @@ const AREA = {
   math: { label: "Math", color: "#0ea5e9", tint: "#e0f2fe" },
   reading: { label: "Reading", color: "#c4a035", tint: "#fbf3dc" },
   writing: { label: "Writing", color: "#16a34a", tint: "#dcfce7" },
-  mocks: { label: "Full Practice Tests", color: "#ea580c", tint: "#ffedd5" },
+  mocks: { label: "Tests", color: "#ea580c", tint: "#ffedd5" },
 } as const;
 
 const GRAY = { 900: "#111827", 700: "#374151", 500: "#6b7280", 400: "#9ca3af", 200: "#e5e7eb", 100: "#f3f4f6", 50: "#f9fafb" };
@@ -318,9 +318,9 @@ function ScoreChart({ series }: { series: MockReport["scoreSeries"] }) {
   const ticks = [0, 400, 800, 1200, 1600];
   return (
     <View style={s.section} wrap={false}>
-      <Text style={s.h2}>Scores by exam</Text>
+      <Text style={s.h2}>Scores by Test</Text>
       <Text style={s.hint}>
-        {"Each bar is one Full Practice Test. The number on top is the total score (out of 1600). Inside: Reading & Writing (bottom) and Math (top), each out of 800."}
+        {"Each bar is one Test. The number on top is the total score (out of 1600). Inside: Reading & Writing (bottom) and Math (top), each out of 800."}
       </Text>
       <Svg width={width} height={height}>
         {ticks.map((tick) => (
@@ -380,15 +380,15 @@ function MockSection({ report }: { report: MockReport }) {
     <>
       <Kpis
         items={[
-          { label: "Full Practice Tests completed", value: String(k.exams) },
+          { label: "Tests completed", value: String(k.exams) },
           { label: "Latest total score", value: k.latestTotal !== null ? String(k.latestTotal) : "-", color: AREA.mocks.color },
           { label: "Latest Reading & Writing", value: k.latestRw !== null ? String(k.latestRw) : "-" },
           { label: "Latest Math", value: k.latestMath !== null ? String(k.latestMath) : "-" },
-          { label: "Full Practice Tests to do", value: String(k.pending) },
+          { label: "Tests to do", value: String(k.pending) },
         ]}
       />
       {report.exams.length === 0 ? (
-        <View style={[s.table, s.section]}><Text style={s.empty}>No Full Practice Tests finished yet.</Text></View>
+        <View style={[s.table, s.section]}><Text style={s.empty}>No Tests finished yet.</Text></View>
       ) : (
         <>
           <ScoreChart series={report.scoreSeries} />
@@ -401,11 +401,11 @@ function MockSection({ report }: { report: MockReport }) {
             groups={[{ label: "", rows: SECTION_ROWS }]}
           />
           <View style={s.section}>
-            <Text style={s.h2}>Full Practice Test history</Text>
+            <Text style={s.h2}>Test history</Text>
             <View style={s.table}>
               <View style={s.th}>
                 <Text style={[s.thCell, { flex: 1 }]}>Date</Text>
-                <Text style={[s.thCell, { flex: 2.2 }]}>Full Practice Test</Text>
+                <Text style={[s.thCell, { flex: 2.2 }]}>Test</Text>
                 <Text style={[s.thCell, { flex: 1, textAlign: "right" }]}>Total score</Text>
                 <Text style={[s.thCell, { flex: 1.3, textAlign: "right" }]}>Reading & Writing</Text>
                 <Text style={[s.thCell, { flex: 1, textAlign: "right" }]}>Math</Text>
@@ -424,9 +424,9 @@ function MockSection({ report }: { report: MockReport }) {
         </>
       )}
       <View style={s.section}>
-        <Text style={s.h2}>Assigned Full Practice Tests ({report.activeExams.length})</Text>
+        <Text style={s.h2}>Assigned Tests ({report.activeExams.length})</Text>
         <View style={s.table}>
-          {report.activeExams.length === 0 ? <Text style={s.empty}>No Full Practice Tests assigned right now.</Text> : report.activeExams.map((a) => (
+          {report.activeExams.length === 0 ? <Text style={s.empty}>No Tests assigned right now.</Text> : report.activeExams.map((a) => (
             <View key={a.id} style={s.tr} wrap={false}>
               <Text style={[s.td, s.bold, { flex: 3 }]}>{a.name}</Text>
               <View style={[s.td, { flex: 1 }]}><StatusText status={a.status} /></View>

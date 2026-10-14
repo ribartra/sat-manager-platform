@@ -65,20 +65,20 @@ export async function generateDeadlineNotifications(now = new Date()): Promise<D
 
   const soon = [
     ...practiceSoon.map((a) => ({ studentId: a.studentId, dueDate: a.dueDate!, name: shortSetName(a.practiceSet.name), kind: "Practice Set" as const })),
-    ...examSoon.map((a) => ({ studentId: a.studentId, dueDate: a.dueDate!, name: a.test.name, kind: "Full Practice Test" as const })),
+    ...examSoon.map((a) => ({ studentId: a.studentId, dueDate: a.dueDate!, name: a.test.name, kind: "Test" as const })),
   ].filter((item) => dayKey(item.dueDate) === tomorrowKey);
   const overdue = [
     ...practiceOverdue.map((a) => ({ studentId: a.studentId, dueDate: a.dueDate!, name: shortSetName(a.practiceSet.name), kind: "Practice Set" as const })),
-    ...examOverdue.map((a) => ({ studentId: a.studentId, dueDate: a.dueDate!, name: a.test.name, kind: "Full Practice Test" as const })),
+    ...examOverdue.map((a) => ({ studentId: a.studentId, dueDate: a.dueDate!, name: a.test.name, kind: "Test" as const })),
   ];
 
   let created = unlocked;
   for (const item of soon) {
-    const href = item.kind === "Full Practice Test" ? "/student/content-map?area=tests" : "/student";
+    const href = item.kind === "Test" ? "/student/tests" : "/student";
     if (await notifyOnce(item.studentId, `${item.kind} due soon`, `${item.name} is due tomorrow (${shortDate(item.dueDate)}).`, href, since)) created += 1;
   }
   for (const item of overdue) {
-    const href = item.kind === "Full Practice Test" ? "/student/content-map?area=tests" : "/student";
+    const href = item.kind === "Test" ? "/student/tests" : "/student";
     if (await notifyOnce(item.studentId, `${item.kind} overdue`, `${item.name} was due ${shortDate(item.dueDate)} and isn't finished yet.`, href, since)) created += 1;
   }
 

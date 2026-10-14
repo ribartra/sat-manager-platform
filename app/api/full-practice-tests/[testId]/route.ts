@@ -39,7 +39,7 @@ export const PATCH = withApiErrors(async function PATCH(req: NextRequest, { para
     breakMinutes?: number;
   };
   const test = await prisma.fullPracticeTest.findUnique({ where: { id: testId } });
-  if (!test) return new NotFoundError("Exam not found.").toResponse();
+  if (!test) return new NotFoundError("Test not found.").toResponse();
 
   const data: { status?: string; name?: string; reviewEnabled?: boolean; breakMinutes?: number } = {};
   if (body.status !== undefined) {
@@ -86,7 +86,7 @@ export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }
   const { name, status, moduleQuestionIds, reviewEnabled, breakMinutes } = await req.json();
   const targetStatus = status ?? "DRAFT";
   const previous = await prisma.fullPracticeTest.findUnique({ where: { id: testId } });
-  if (!previous) return new NotFoundError("Exam not found.").toResponse();
+  if (!previous) return new NotFoundError("Test not found.").toResponse();
 
   const normalizedModules = Array.from({ length: 4 }, (_, index) => (moduleQuestionIds?.[index] ?? []) as string[]);
   const questionIds = [...new Set(normalizedModules.flat())];
@@ -159,9 +159,9 @@ export const DELETE = withApiErrors(async function DELETE(_req: NextRequest, { p
     prisma.fullPracticeTestAssignment.count({ where: { testId } }),
     prisma.fullPracticeTestAttempt.count({ where: { testId } }),
   ]);
-  if (!test) return new NotFoundError("Exam not found.").toResponse();
+  if (!test) return new NotFoundError("Test not found.").toResponse();
   if (assignments > 0 || attempts > 0) {
-    return new ConflictError("Archive this exam instead. Exams with assignments or attempts cannot be deleted.").toResponse();
+    return new ConflictError("Archive this Test instead. Tests with assignments or attempts cannot be deleted.").toResponse();
   }
 
   await prisma.fullPracticeTest.delete({ where: { id: testId } });
