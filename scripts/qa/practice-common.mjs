@@ -6,14 +6,25 @@ import { openDb, remapAppPath } from "./qa-common.mjs";
 
 const DIFF_TOKENS = { EASY: ["easy"], MEDIUM: ["med", "medium"], HARD: ["hard"] };
 
-// Find the sibling "ANS ..." pdf in the exercise pdf's folder matching the difficulty.
+// Set number after a difficulty word in a file name: "BOUNDARIES H1", "ANS BOUNDARIES H 2",
+// "Boundaries Medium 1" / "Ans Boundaries Med 1", "HARD 1EQUIV" → "1"; null when the name has none.
+function setNumber(fname) {
+  const m = fname.toLowerCase().replace(/\.pdf$/, "").match(/(?:^|[\s.])(?:h|hard|med|medium|easy)\s*(\d)(?!\d)/);
+  return m ? m[1] : null;
+}
+
+// Find the sibling "ANS ..." pdf in the exercise pdf's folder: the one with the same set number
+// when the folder holds several sets of one difficulty (Boundaries H1/H2/H3, Med 1/2), else by difficulty.
 function findAnsPdf(exerciseAbs, difficulty) {
   if (!exerciseAbs) return null;
   const dir = path.dirname(exerciseAbs);
   if (!fs.existsSync(dir)) return null;
   const toks = DIFF_TOKENS[difficulty] || [String(difficulty || "").toLowerCase()];
-  const files = fs.readdirSync(dir).filter((f) => /\.pdf$/i.test(f));
+  const files = fs.readdirSync(dir).filter((f) => /\.pdf$/i.test(f)).sort();
   const ansFiles = files.filter((f) => /^ans\b|\bans\s/i.test(f) || /^ans/i.test(f.trim()));
+  const num = setNumber(path.basename(exerciseAbs));
+  const byNum = num ? ansFiles.filter((f) => setNumber(f) === num) : [];
+  if (byNum.length === 1) return path.join(dir, byNum[0]);
   // prefer an ANS file whose name contains a difficulty token
   const byDiff = ansFiles.filter((f) => toks.some((t) => f.toLowerCase().includes(t)));
   const pick = (byDiff[0] || ansFiles[0]) || null;

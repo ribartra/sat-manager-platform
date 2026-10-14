@@ -42,6 +42,7 @@ None.
   - Default and `-layout` modes reorder curly quotes, apostrophes, em dashes and accented glyphs in these PDFs. That produces false diffs in options, for example `of—` showing up as `of`.
   - Questions were joined to the ANS by Question ID hex across all 9 ANS files. The regex handles the H2/H3 `Question ID <hex>` form without the colon.
   - The resolver's `ansPdf` is wrong for some sets: all three HARD sets point at `ANS BOUNDARIES H 2.pdf`, and MEDIUM #2 points at `Ans Boundaries Med 1.pdf`. The hex join does not depend on it.
+  - Fixed 2026-10-14: `findAnsPdf` now pairs by set number (H1/H 2/H 3, Med 1/2) before the difficulty token, on a sorted listing. All 6 Boundaries sets resolve to their own ANS; the other 85 practice sets are unchanged. Re-check: 788/788 Writing+Reading question IDs are found in their resolved ANS, and 82/82 Boundaries keys and explanations match it, so no data was affected.
 - **Answer keys.** 141/141 match the ANS. Every explanation opens with "Choice <key> is the best answer", so none is shifted against the key.
 - **Stems.** All 141 match both the ANS and the exercise PDF word for word, apart from whitespace and the 4 fixes above.
   - No neighbour text, no appended or replaced passage, no missing first sentence.
