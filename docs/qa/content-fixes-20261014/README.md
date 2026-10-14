@@ -54,3 +54,15 @@ Applied dev.db (backup `backups/devdb-pre-content-fixes-20261014-r3.db`) and pro
 - Missing explanations added: T9 Math M2 #14/#15/#20 (docx); T9 M1 #21 (explanation argued D, key C) and #22 written from the graphs.
 - Tables: T8 Math M2 #18, T10 Math M1 #21; T8 Math M2 #1 options as two-line systems.
 - Left as is (source cut off): T9 R&W M1 #11 ending, T10 R&W M2 #9 Text 2 ending, T10 R&W M1 #24 / T7 R&W M1 #26 "notes:" intro.
+
+## Round 4 — notes intros, one-line notes, T10 #9 (same day)
+`specs/notes-r4.json` (`build-notes-r4.cjs`), 12 ops, applied dev.db (backup `backups/devdb-pre-content-fixes-20261014-r4.db`) and
+prod (`/db/backups/dev.db.pre-content-fixes-20261014-r4`), 12 PENDING → apply → 12 ALREADY, integrity ok:
+- T7 R&W M1 #26 and T10 R&W M1 #24: source screenshot cropped above "notes:" → standard intro sentence (same as the 48
+  other notes questions). Visual check of the source pages: nothing else recoverable in the explanation/answer docs.
+- 9 notes lists still on one line (T2 R&W M1 #24–27, M2 #26; T3 R&W M1 #26–27, M2 #26–27) → one bullet per line.
+- T10 R&W M2 #9: Text 2 ends with ";" in the source (page not cut; source typo) → ".".
+- T9 R&W M1 #11 ending "the turbine base." confirmed: the cut last line's letter tops + the explanations docx.
+
+## Practice-set explanations with stripped math (in progress)
+See `checkpoints/README.md`.
