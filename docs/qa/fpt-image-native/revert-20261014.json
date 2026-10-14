@@ -1,0 +1,470 @@
+[
+ {
+  "table": "Question",
+  "id": "cmsjro6qz062eqmt11k3t4pcx",
+  "field": "imageUrl",
+  "before": "/uploads/questions/324f2158d2c3b6e52584b254.png",
+  "after": null,
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6rj062gqmt1oqq2nq4j",
+  "field": "imageUrl",
+  "before": "/uploads/questions/fdfccbfeda7d3de5d47a2dca.png",
+  "after": null,
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6wh0638qmt1huhh5s6l",
+  "field": "imageUrl",
+  "before": "/uploads/questions/81cac0ca530d4512807d2419.png",
+  "after": null,
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6wt063aqmt1085omb2i",
+  "field": "imageUrl",
+  "before": "/uploads/questions/1589911671cc8db3b197c132.png",
+  "after": null,
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6xb063eqmt1f3anp4et",
+  "field": "imageUrl",
+  "before": "/uploads/questions/dd679fdab599168bafc831d2.png",
+  "after": null,
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6xj063gqmt10c041xtn",
+  "field": "imageUrl",
+  "before": "/uploads/questions/c7db390dcbfce6e16599802d.png",
+  "after": null,
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6ya063iqmt16hc22zcy",
+  "field": "imageUrl",
+  "before": "/uploads/questions/1c38aadce598a674fbe3e27e.png",
+  "after": null,
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro70i063kqmt1zlfv8shx",
+  "field": "imageUrl",
+  "before": "/uploads/questions/5fb77e61136eec37322e24a9.png",
+  "after": null,
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro713063mqmt13t6k0zga",
+  "field": "imageUrl",
+  "before": "/uploads/questions/b3baa26ec869c05adce96fc3.png",
+  "after": null,
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro71e063oqmt1o35w3kgi",
+  "field": "imageUrl",
+  "before": "/uploads/questions/65a13f97a4d4581dbb9402e5.png",
+  "after": null,
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro71p063qqmt1keboinuy",
+  "field": "imageUrl",
+  "before": "/uploads/questions/1e0f9f5dbc0b6afa001238dd.png",
+  "after": null,
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro71y063sqmt19xsrpx6b",
+  "field": "imageUrl",
+  "before": "/uploads/questions/375f9491c05d3767c206f250.png",
+  "after": null,
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6ql062dqmt1kargnr1i",
+  "field": "imageUrl",
+  "before": "/uploads/questions/9f108902203c39fb66326bf6.png",
+  "after": null,
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6r8062fqmt1r4kabjcw",
+  "field": "imageUrl",
+  "before": "/uploads/questions/e825b3ad9bc7538d6959074b.png",
+  "after": null,
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6rt062hqmt1rjdbzrax",
+  "field": "imageUrl",
+  "before": "/uploads/questions/b61c1b876e3e8f4e584bbb1e.png",
+  "after": null,
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6s7062jqmt139241es0",
+  "field": "imageUrl",
+  "before": "/uploads/questions/d701146e23b108ffa682fe99.png",
+  "after": null,
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6ss062lqmt1a9nqiisc",
+  "field": "imageUrl",
+  "before": "/uploads/questions/e5f66591f4e71178121de193.png",
+  "after": null,
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6tk062pqmt1kknt3py0",
+  "field": "imageUrl",
+  "before": "/uploads/questions/9c57205cdf240f7b06d3b0fb.png",
+  "after": null,
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6tx062rqmt118kzhi2v",
+  "field": "imageUrl",
+  "before": "/uploads/questions/f77f6356caa5db17fddbb47e.png",
+  "after": null,
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6uh062vqmt1hkbem60k",
+  "field": "imageUrl",
+  "before": "/uploads/questions/4bd3e6fccd67cd6a440de4b3.png",
+  "after": null,
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6uw062xqmt10ylzxqzb",
+  "field": "imageUrl",
+  "before": "/uploads/questions/33b2311a6f6214e90cffc4e4.png",
+  "after": null,
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro725063tqmt1hnfcs3et",
+  "field": "imageUrl",
+  "before": "/uploads/questions/725a5cde8d5301500cc7c3a8.png",
+  "after": null,
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrntj4007yqmt1xyt9s8g3",
+  "field": "imageUrl",
+  "before": "/uploads/questions/45117d7d7f828dfa28d8bce1.png",
+  "after": "/uploads/questions/d9847f69708d0a46211b95b2.jpg",
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnth9006zqmt1bp2vnfpl",
+  "field": "imageUrl",
+  "before": "/uploads/questions/d10cea333f4d16b2d27061e8.png",
+  "after": "/uploads/questions/ef0e26753fca3e2fe3aa40eb.png",
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnvgn00tqqmt19m9y0ui2",
+  "field": "imageUrl",
+  "before": "/uploads/questions/4d3915f37eb98cda702082d8.png",
+  "after": "/uploads/questions/7a3f17ebc7595de573fd5dff.jpg",
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrntwj00c2qmt1dlfrtelp",
+  "field": "imageUrl",
+  "before": "/uploads/questions/b6f3722d3fbb422ebae12aee.png",
+  "after": "/uploads/questions/0eb09dcadc4b3c1448cdc227.jpg",
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnvcn00spqmt1cg2v4a6v",
+  "field": "imageUrl",
+  "before": "/uploads/questions/e96ea79b7da45f5b422f5b04.png",
+  "after": "/uploads/questions/bd820a11fb21dfdf430e86c9.jpg",
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnupf00kmqmt11b72urtn",
+  "field": "imageUrl",
+  "before": "/uploads/questions/2e4fa2a65d4e280a92ccec35.png",
+  "after": "/uploads/questions/50106b5ce1087f8522a1fef0.jpg",
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnuq300kzqmt1gxiw1leu",
+  "field": "imageUrl",
+  "before": "/uploads/questions/42ea8f6563f386bb20a88fc8.png",
+  "after": "/uploads/questions/382af2b01c9aa0f71c599979.jpg",
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnv0i00ofqmt1hqtxt8gl",
+  "field": "imageUrl",
+  "before": "/uploads/questions/68122232d5a13ef451d14960.png",
+  "after": "/uploads/questions/079b25889c66016201ed4b53.jpg",
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrnude00i2qmt1ilisoxp2",
+  "field": "imageUrl",
+  "before": "/uploads/questions/b55355cd9aadc6925f17a336.png",
+  "after": null,
+  "class": "revert_ai_image_attempt",
+  "note": "revert option A of cmsjrnudd00i1qmt1bete05le"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrnude00i3qmt1snhzbrti",
+  "field": "imageUrl",
+  "before": "/uploads/questions/de0bdffb061b1f69088bb7ab.png",
+  "after": null,
+  "class": "revert_ai_image_attempt",
+  "note": "revert option B of cmsjrnudd00i1qmt1bete05le"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrnude00i4qmt1d0kxmhje",
+  "field": "imageUrl",
+  "before": "/uploads/questions/1b49ab634c2a19d1d65a71d0.png",
+  "after": null,
+  "class": "revert_ai_image_attempt",
+  "note": "revert option C of cmsjrnudd00i1qmt1bete05le"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrnude00i5qmt1uetr9pby",
+  "field": "imageUrl",
+  "before": "/uploads/questions/a31e17bd7aeff7e101b0aa7a.png",
+  "after": null,
+  "class": "revert_ai_image_attempt",
+  "note": "revert option D of cmsjrnudd00i1qmt1bete05le"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnuhc00inqmt1t1hr8hpk",
+  "field": "imageUrl",
+  "before": "/uploads/questions/c661c635eb2b3e01d3a9c740.png",
+  "after": "/uploads/questions/3715835e3420e42cc330cdd3.jpg",
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwf60130qmt1vh7yp7es",
+  "field": "imageUrl",
+  "before": "/uploads/questions/48c47d1266531ac295ad9d4b.png",
+  "after": "/uploads/questions/6ebba2b85db2192b304cb41d.jpg",
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwfo013fqmt1vzmkgsij",
+  "field": "imageUrl",
+  "before": "/uploads/questions/698114ac7ee85d24658ed1a6.png",
+  "after": "/uploads/questions/0009fa916244769aaacf0af6.jpg",
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwgk014aqmt1lv54oj89",
+  "field": "imageUrl",
+  "before": "/uploads/questions/e3db010d68e8a5211f26424c.png",
+  "after": "/uploads/questions/e540c6e8e2437c74d1edad9f.jpg",
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cq6m1q4919a54dc531b4e438",
+  "field": "imageUrl",
+  "before": "/uploads/questions/6f4c82858e5587f45351ebfa.png",
+  "after": "/uploads/questions/765716dc1c89ddda97e603b4.jpg",
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwyd01bnqmt1l4vwq4sj",
+  "field": "imageUrl",
+  "before": "/uploads/questions/8d5606e020763e583f9b60dd.png",
+  "after": "/uploads/questions/a199d4bfd16d4d11552c4287.png",
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsojfkrr002x18ppf60070gi",
+  "field": "imageUrl",
+  "before": "/uploads/questions/1eb6b4475d3e794c7ed6e508.png",
+  "after": "/uploads/questions/d950f4c0c9bb8fd349e76527.jpg",
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3fz8000f0mpdhil7l0kw",
+  "field": "imageUrl",
+  "before": "/uploads/questions/c0d29c0b6b155738f2e2aa9b.png",
+  "after": null,
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3g4e003z0mpd4udukjcd",
+  "field": "imageUrl",
+  "before": "/uploads/questions/86da122c7805f4462edb0f81.png",
+  "after": null,
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnw4r010rqmt1ygntzggz",
+  "field": "imageUrl",
+  "before": "/uploads/questions/50c044fbcdfc6dc3951c0cf0.png",
+  "after": "/uploads/questions/5a35019500f7ecdf697b4dc7.jpg",
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "opt_773843b2-5c5d-4887-a73d-8525861875da",
+  "field": "imageUrl",
+  "before": "/uploads/questions/e1863346b4625bc3a9c6648c.png",
+  "after": "/uploads/questions/1af0bf51af5ef79305ef1f9a.jpg",
+  "class": "revert_ai_image_attempt",
+  "note": "revert option A of cmsjrnvzb00zmqmt1ah3ghqxc"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "opt_5b6b85c8-1ffd-4759-89c6-02b8905d3610",
+  "field": "imageUrl",
+  "before": "/uploads/questions/de7244bbbd70454c5933b348.png",
+  "after": "/uploads/questions/b531619a22617f5f10e46d8f.jpg",
+  "class": "revert_ai_image_attempt",
+  "note": "revert option B of cmsjrnvzb00zmqmt1ah3ghqxc"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "opt_03508cea-8583-4e29-9fd9-feb034a930c7",
+  "field": "imageUrl",
+  "before": "/uploads/questions/3610295db63095b881e0aafd.png",
+  "after": "/uploads/questions/86a04dd03c75b3b604550ca8.jpg",
+  "class": "revert_ai_image_attempt",
+  "note": "revert option C of cmsjrnvzb00zmqmt1ah3ghqxc"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "opt_b01521be-0db6-4e55-8ebc-dc000c0a90b6",
+  "field": "imageUrl",
+  "before": "/uploads/questions/39cb772e5689df9464a054a3.png",
+  "after": "/uploads/questions/2f8f573cbc1ef9576e22017c.jpg",
+  "class": "revert_ai_image_attempt",
+  "note": "revert option D of cmsjrnvzb00zmqmt1ah3ghqxc"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnt0a001mqmt1cup0z4r9",
+  "field": "imageUrl",
+  "before": "/uploads/questions/7db3e42754b1dfa259e422b3.png",
+  "after": "/uploads/questions/277ad0072c39bc483591c521.jpg",
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnt0z0020qmt12o9tqbuq",
+  "field": "imageUrl",
+  "before": "/uploads/questions/2026f1f24d3596a456444693.png",
+  "after": "/uploads/questions/a5818cb5481c75fb0f729ca5.jpg",
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnu7e00hcqmt1l368ga84",
+  "field": "imageUrl",
+  "before": "/uploads/questions/bd7b1e592765cf84fa13c760.png",
+  "after": "/uploads/questions/ff77d5f80b080ffd452e93a7.jpg",
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnu7u00hgqmt1pj9fonr8",
+  "field": "imageUrl",
+  "before": "/uploads/questions/c66b6631f07b2b643c3425a3.png",
+  "after": "/uploads/questions/919052b47cdbd9101e14cfea.jpg",
+  "class": "revert_ai_image_attempt",
+  "note": "revert 2026-10-14 reprocess-fpt-images-highres apply"
+ }
+]

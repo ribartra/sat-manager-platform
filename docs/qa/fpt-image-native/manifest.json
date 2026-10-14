@@ -1,0 +1,4309 @@
+[
+ {
+  "qid": "cmsjrntj0007tqmt1c2t8cksm",
+  "url": "/uploads/questions/500e85a98b7eb51a9fbe3261.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 6,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 1",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 246,
+   "h": 159
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 1/MATH/TEST 1 INNOVATOR MATH MOD 1 AND 2.pdf",
+  "scale": 3.4512,
+  "x": 539.5966,
+  "y": 230.1822,
+  "w": 848.9937,
+  "h": 548.7398,
+  "ncc": 0.975,
+  "ncc_coarse": 0.965,
+  "second": 0.4716,
+  "where": {
+   "page": 3,
+   "xref": 23,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "045f36af9c3aa56215b3ae54.png",
+   "w": 849,
+   "h": 549
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrntj4007yqmt1xyt9s8g3",
+  "url": "/uploads/questions/d9847f69708d0a46211b95b2.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 6,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 1",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 487,
+   "h": 178
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 1/MATH/TEST 1 INNOVATOR MATH MOD 1 AND 2.pdf",
+  "scale": 1.4145,
+  "x": 601.9168,
+  "y": 262.4351,
+  "w": 688.8637,
+  "h": 251.7818,
+  "ncc": 0.9744,
+  "ncc_coarse": 0.9563,
+  "second": 0.4346,
+  "where": {
+   "page": 10,
+   "xref": 67,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "b5b27882ab05a8dd72746505.png",
+   "w": 689,
+   "h": 252
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjro6ub062uqmt147f5hpf4",
+  "url": "/uploads/questions/d9b27e1e137aa6ccc54085cc.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 9,
+  "module": "Reading & Writing Module 1",
+  "section": "RW",
+  "test": "TEST 1",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 988,
+   "h": 536
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 1/Reading and Writing/ Test 1 Module 1, 2B R&W.docx",
+  "status": "skip_native",
+  "scale": 0.9996,
+  "ncc": 0.982,
+  "second": 0.4494,
+  "where": {
+   "media": "word/media/image12.png"
+  },
+  "new": {
+   "file": "75ccdabcff8d28afeeccc6a9.png",
+   "w": 988,
+   "h": 536
+  },
+  "decision": "keep_native"
+ },
+ {
+  "qid": "cmsjro6v8062zqmt17xlo4gpt",
+  "url": "/uploads/questions/04032063635065f5317be8b1-chart.png",
+  "optId": null,
+  "label": null,
+  "ord": 11,
+  "module": "Reading & Writing Module 2",
+  "section": "RW",
+  "test": "TEST 1",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 990,
+   "h": 835
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 1/Reading and Writing/ Test 1 Module 1, 2B R&W.docx",
+  "status": "skip_native",
+  "scale": 0.9996,
+  "ncc": 0.9817,
+  "second": 0.4196,
+  "where": {
+   "media": "word/media/image46.png"
+  },
+  "new": {
+   "file": "254de99da9314bc50c848c5a.png",
+   "w": 990,
+   "h": 835
+  },
+  "decision": "keep_native"
+ },
+ {
+  "qid": "cmsnffuwf000l0mmx4vvrlqaw",
+  "url": "/uploads/questions/76d05ee217b4e2d20bdfd85f.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 6,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 10",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 155,
+   "h": 268
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 10/MATH/Test 10 Innov. Math.pdf",
+  "scale": 2.8306,
+  "x": 733.4266,
+  "y": 329.547,
+  "w": 438.7452,
+  "h": 758.6046,
+  "ncc": 0.9794,
+  "ncc_coarse": 0.9255,
+  "second": 0.3619,
+  "where": {
+   "page": 3,
+   "xref": 27,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "52abe75817a382ff2d2e8a83.png",
+   "w": 439,
+   "h": 759
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsnffux1000q0mmxic96gfpq",
+  "url": "/uploads/questions/76147a0e63599f3529b3babb.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 7,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 10",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 191,
+   "h": 114
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 10/MATH/Test 10 Innov. Math.pdf",
+  "scale": 2.7753,
+  "x": 667.4829,
+  "y": 217.5055,
+  "w": 530.0773,
+  "h": 316.3812,
+  "ncc": 0.9819,
+  "ncc_coarse": 0.9539,
+  "second": 0.576,
+  "where": {
+   "page": 3,
+   "xref": 28,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "e292a30fc033be311bc8a2e6.png",
+   "w": 593,
+   "h": 357
+  },
+  "note": "framing widened (C label was clipped in the old crop)",
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsnffuyr001q0mmxjm8sgd11",
+  "url": "/uploads/questions/1f68e3a67c31cbba9b1016e6.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 15,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 10",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 224,
+   "h": 233
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 10/MATH/Test 10 Innov. Math.pdf",
+  "scale": 2.8164,
+  "x": 638.8392,
+  "y": 287.0228,
+  "w": 630.8713,
+  "h": 656.2188,
+  "ncc": 0.9759,
+  "ncc_coarse": 0.8723,
+  "second": 0.2814,
+  "where": {
+   "page": 6,
+   "xref": 45,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "a9cfdcfa7640ee3e1a2ef434.png",
+   "w": 631,
+   "h": 656
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsnffuz3001x0mmxlkruutzz",
+  "url": "/uploads/questions/52de89fc2d20562248a26d3c.png",
+  "optId": null,
+  "label": null,
+  "ord": 18,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 10",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 529,
+   "h": 198
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 10/MATH/Test 10 Innov. Math.pdf",
+  "scale": 1.7331,
+  "x": 494.6491,
+  "y": 252.1928,
+  "w": 916.8174,
+  "h": 343.1566,
+  "ncc": 0.9908,
+  "ncc_coarse": 0.913,
+  "second": 0.3605,
+  "where": {
+   "page": 7,
+   "xref": 51,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "de6ddad0a610b10a9569b015.png",
+   "w": 917,
+   "h": 343
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsnffuz700220mmxj997lph9",
+  "url": "/uploads/questions/44d61c6ddded83dfbc768470.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 19,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 10",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 293,
+   "h": 303
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 10/MATH/Test 10 Innov. Math.pdf",
+  "scale": 2.8022,
+  "x": 540.3061,
+  "y": 308.7126,
+  "w": 821.0345,
+  "h": 849.0562,
+  "ncc": 0.9878,
+  "ncc_coarse": 0.9408,
+  "second": 0.3182,
+  "where": {
+   "page": 8,
+   "xref": 55,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "d42f02329670a1f3647ffa6c.png",
+   "w": 821,
+   "h": 849
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnu6l00gxqmt14e4kzksy",
+  "url": "/uploads/questions/155ea453079736b8f3fa0dd3.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 3,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 10",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 190,
+   "h": 211
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 10/MATH/Test 10 Innov. Math.pdf",
+  "scale": 2.8591,
+  "x": 687.6309,
+  "y": 250.2081,
+  "w": 543.2219,
+  "h": 603.2622,
+  "ncc": 0.9811,
+  "ncc_coarse": 0.984,
+  "second": 0.3062,
+  "where": {
+   "page": 10,
+   "xref": 68,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "0bbbe9a46e24192068d16359.png",
+   "w": 543,
+   "h": 603
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnu6v00gzqmt13qh62boa",
+  "url": "/uploads/questions/95510b85ed48bf3a9756eb7a.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 5,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 10",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 221,
+   "h": 192
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 10/MATH/Test 10 Innov. Math.pdf",
+  "scale": 2.7889,
+  "x": 615.6131,
+  "y": 246.6684,
+  "w": 616.3569,
+  "h": 535.4775,
+  "ncc": 0.9739,
+  "ncc_coarse": 0.8872,
+  "second": 0.3166,
+  "where": {
+   "page": 11,
+   "xref": 73,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "810693aff17764874e59b53c.png",
+   "w": 616,
+   "h": 535
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnu7e00hcqmt1l368ga84",
+  "url": "/uploads/questions/ff77d5f80b080ffd452e93a7.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 10,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 10",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 279,
+   "h": 133
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 10/MATH/Test 10 Innov. Math.pdf",
+  "scale": 2.8022,
+  "x": 587.7018,
+  "y": 310.4498,
+  "w": 781.8042,
+  "h": 372.688,
+  "ncc": 0.9949,
+  "ncc_coarse": 0.989,
+  "second": 0.6786,
+  "where": {
+   "page": 14,
+   "xref": 87,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "5d7511cd12f8667e92b494de.png",
+   "w": 782,
+   "h": 373
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnu7o00heqmt13yzsvmfz",
+  "url": "/uploads/questions/6a07f4abbec28332e9f1d875.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 12,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 10",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 213,
+   "h": 214
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 10/MATH/Test 10 Innov. Math.pdf",
+  "scale": 3.2842,
+  "x": 759.0956,
+  "y": 301.3799,
+  "w": 699.5427,
+  "h": 702.827,
+  "ncc": 0.9898,
+  "ncc_coarse": 0.917,
+  "second": 0.4111,
+  "where": {
+   "page": 15,
+   "xref": 92,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "a55e9f3355f845dc09cb100e.png",
+   "w": 700,
+   "h": 703
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnu7u00hgqmt1pj9fonr8",
+  "url": "/uploads/questions/919052b47cdbd9101e14cfea.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 14,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 10",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 338,
+   "h": 274
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 10/MATH/Test 10 Innov. Math.pdf",
+  "scale": 1.4572,
+  "x": 729.1465,
+  "y": 207.0317,
+  "w": 492.5369,
+  "h": 399.2755,
+  "ncc": 0.9657,
+  "ncc_coarse": 0.9488,
+  "second": 0.4388,
+  "where": {
+   "page": 16,
+   "xref": 97,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "32a6f4780917daeb8bee499e.png",
+   "w": 493,
+   "h": 399
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnu8400hiqmt1hq2iv0yf",
+  "url": "/uploads/questions/f95624696c100aeedce67e20.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 16,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 10",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 156,
+   "h": 85
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 10/MATH/Test 10 Innov. Math.pdf",
+  "scale": 2.8164,
+  "x": 742.2261,
+  "y": 245.0622,
+  "w": 439.3568,
+  "h": 239.3931,
+  "ncc": 0.9792,
+  "ncc_coarse": 0.922,
+  "second": 0.5464,
+  "where": {
+   "page": 17,
+   "xref": 103,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "87a3c527bdc2f0f8e531fec2.png",
+   "w": 439,
+   "h": 239
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnt0a001mqmt1cup0z4r9",
+  "url": "/uploads/questions/277ad0072c39bc483591c521.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 10,
+  "module": "Reading & Writing Module 1",
+  "section": "RW",
+  "test": "TEST 10",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 654,
+   "h": 267
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf",
+  "scale": 1.4645,
+  "x": 479.3749,
+  "y": 311.2941,
+  "w": 957.7566,
+  "h": 391.0107,
+  "ncc": 0.9379,
+  "ncc_coarse": 0.9276,
+  "second": 0.5475,
+  "where": {
+   "page": 7,
+   "xref": 43,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "50708b5792a8d48dfbcd74fc.png",
+   "w": 958,
+   "h": 391
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsojfknx000018ppjdthonh9",
+  "url": "/uploads/questions/550fefb968242bdbbe37e1e1.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 11,
+  "module": "Reading & Writing Module 2",
+  "section": "RW",
+  "test": "TEST 10",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 338,
+   "h": 226
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf",
+  "scale": 2.7616,
+  "x": 441.6033,
+  "y": 371.6561,
+  "w": 933.4217,
+  "h": 624.1222,
+  "ncc": 0.9943,
+  "ncc_coarse": 0.9827,
+  "second": 0.3987,
+  "where": {
+   "page": 25,
+   "xref": 131,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "025616a7c2bc0dd3606c8918.png",
+   "w": 933,
+   "h": 624
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnt0z0020qmt12o9tqbuq",
+  "url": "/uploads/questions/a5818cb5481c75fb0f729ca5.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 13,
+  "module": "Reading & Writing Module 2",
+  "section": "RW",
+  "test": "TEST 10",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 681,
+   "h": 297
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf",
+  "scale": 1.4282,
+  "x": 419.816,
+  "y": 321.8387,
+  "w": 972.6115,
+  "h": 424.1786,
+  "ncc": 0.9798,
+  "ncc_coarse": 0.9233,
+  "second": 0.3426,
+  "where": {
+   "page": 27,
+   "xref": 139,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "5c13b9d935d04b23d3ac8738.png",
+   "w": 973,
+   "h": 424
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrntdd0051qmt1fn2h436w",
+  "url": "/uploads/questions/8c538fc07c99edd3649e54ce.png",
+  "optId": null,
+  "label": null,
+  "ord": 8,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 2",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 554,
+   "h": 549
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 2/MATH/Innov. Test 2 Math Mod 1, 2B REV.pdf",
+  "scale": 0.9996,
+  "x": 733.9634,
+  "y": 221.9642,
+  "w": 553.7866,
+  "h": 548.7885,
+  "ncc": 1.0,
+  "ncc_coarse": 0.8135,
+  "second": 0.1634,
+  "where": {
+   "page": 4,
+   "xref": 30,
+   "media": null
+  },
+  "status": "skip_native",
+  "new": {
+   "file": "8c538fc07c99edd3649e54ce.png",
+   "w": 554,
+   "h": 549
+  },
+  "decision": "keep_native"
+ },
+ {
+  "qid": "cmsjrntee005jqmt1vi9rhybu",
+  "url": "/uploads/questions/51b7479140e458e000a704f2.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 11,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 2",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 322,
+   "h": 271
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 2/MATH/Innov. Test 2 Math Mod 1, 2B REV.pdf",
+  "scale": 2.6674,
+  "x": 421.0352,
+  "y": 302.3634,
+  "w": 858.9028,
+  "h": 722.8654,
+  "ncc": 0.9936,
+  "ncc_coarse": 0.8927,
+  "second": 0.4032,
+  "where": {
+   "page": 5,
+   "xref": 36,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "49adfba6249de6741272ac31.png",
+   "w": 859,
+   "h": 723
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnten005tqmt1ezjpso1b",
+  "url": "/uploads/questions/11c9fc935c7491c960a96650.png",
+  "optId": null,
+  "label": null,
+  "ord": 12,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 2",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 624,
+   "h": 574
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 2/MATH/Innov. Test 2 Math Mod 1, 2B REV.pdf",
+  "scale": 0.9996,
+  "x": 322.9584,
+  "y": 208.9622,
+  "w": 623.7596,
+  "h": 573.7788,
+  "ncc": 0.9968,
+  "ncc_coarse": 0.9239,
+  "second": 0.3245,
+  "where": {
+   "page": 6,
+   "xref": 42,
+   "media": null
+  },
+  "status": "skip_native",
+  "new": {
+   "file": "b638eaeceb85bc822577a956.png",
+   "w": 624,
+   "h": 574
+  },
+  "decision": "keep_native"
+ },
+ {
+  "qid": "cmsjrntg0006fqmt1dri8c2kr",
+  "url": "/uploads/questions/336acca2ce04438bb334816a.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 17,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 2",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 219,
+   "h": 278
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 2/MATH/Innov. Test 2 Math Mod 1, 2B REV.pdf",
+  "scale": 2.4627,
+  "x": 574.0447,
+  "y": 237.2089,
+  "w": 539.3282,
+  "h": 684.6266,
+  "ncc": 0.9631,
+  "ncc_coarse": 0.8295,
+  "second": 0.3869,
+  "where": {
+   "page": 8,
+   "xref": 53,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "cc26cba1d002b521392370cf.png",
+   "w": 539,
+   "h": 685
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrntgb006lqmt1k63h2kpd",
+  "url": "/uploads/questions/60197de4e1b31832d76c2e98.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 18,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 2",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 263,
+   "h": 298
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 2/MATH/Innov. Test 2 Math Mod 1, 2B REV.pdf",
+  "scale": 2.6674,
+  "x": 517.0308,
+  "y": 303.033,
+  "w": 701.5262,
+  "h": 794.8852,
+  "ncc": 0.9661,
+  "ncc_coarse": 0.8923,
+  "second": 0.2497,
+  "where": {
+   "page": 9,
+   "xref": 58,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "7e9910986dfcc5d1265f4b2c.png",
+   "w": 702,
+   "h": 795
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnth9006zqmt1bp2vnfpl",
+  "url": "/uploads/questions/ef0e26753fca3e2fe3aa40eb.png",
+  "optId": null,
+  "label": null,
+  "ord": 21,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 2",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 599,
+   "h": 284
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 2/MATH/Innov. Test 2 Math Mod 1, 2B REV.pdf",
+  "scale": 0.9996,
+  "x": 656.9588,
+  "y": 273.98,
+  "w": 598.7692,
+  "h": 283.8906,
+  "ncc": 1.0,
+  "ncc_coarse": 0.9195,
+  "second": 0.3568,
+  "where": {
+   "page": 10,
+   "xref": 64,
+   "media": null
+  },
+  "status": "skip_native",
+  "new": {
+   "file": "ef0e26753fca3e2fe3aa40eb.png",
+   "w": 599,
+   "h": 284
+  },
+  "decision": "keep_native"
+ },
+ {
+  "qid": "cmsjrntc9004qqmt1k5l1svjy",
+  "url": "/uploads/questions/c69f3c9434f3ebc38c4bb92d.png",
+  "optId": null,
+  "label": null,
+  "ord": 4,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 2",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 419,
+   "h": 484
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 2/MATH/Innov. Test 2 Math Mod 1, 2B REV.pdf",
+  "scale": 0.9996,
+  "x": 740.9711,
+  "y": 210.968,
+  "w": 418.8386,
+  "h": 483.8135,
+  "ncc": 1.0,
+  "ncc_coarse": 0.8326,
+  "second": 0.4424,
+  "where": {
+   "page": 12,
+   "xref": 77,
+   "media": null
+  },
+  "status": "skip_native",
+  "new": {
+   "file": "c69f3c9434f3ebc38c4bb92d.png",
+   "w": 419,
+   "h": 484
+  },
+  "decision": "keep_native"
+ },
+ {
+  "qid": "cmsjrntcl004sqmt1ohglwlql",
+  "url": "/uploads/questions/8b4d68c13312f660519ed8f7.png",
+  "optId": null,
+  "label": null,
+  "ord": 5,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 2",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 899,
+   "h": 714
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 2/MATH/Innov. Test 2 Math Mod 1, 2B REV.pdf",
+  "scale": 0.9996,
+  "x": 510.9411,
+  "y": 264.953,
+  "w": 898.6536,
+  "h": 713.7249,
+  "ncc": 1.0,
+  "ncc_coarse": 0.9716,
+  "second": 0.4249,
+  "where": {
+   "page": 13,
+   "xref": 81,
+   "media": null
+  },
+  "status": "skip_native",
+  "new": {
+   "file": "8b4d68c13312f660519ed8f7.png",
+   "w": 899,
+   "h": 714
+  },
+  "decision": "keep_native"
+ },
+ {
+  "qid": "cmsjrntg7006kqmt10mtirx79",
+  "url": "/uploads/questions/629cba0bc673fba8883d9093.png",
+  "optId": null,
+  "label": null,
+  "ord": 17,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 2",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 390,
+   "h": 550
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 2/MATH/Innov. Test 2 Math Mod 1, 2B REV.pdf",
+  "scale": 0.9996,
+  "x": 777.973,
+  "y": 346.9634,
+  "w": 389.8497,
+  "h": 549.7881,
+  "ncc": 1.0,
+  "ncc_coarse": 0.9556,
+  "second": 0.6439,
+  "where": {
+   "page": 18,
+   "xref": 109,
+   "media": null
+  },
+  "status": "skip_native",
+  "new": {
+   "file": "821b7d1f46ae55fa78c93825.png",
+   "w": 390,
+   "h": 550
+  },
+  "decision": "keep_native"
+ },
+ {
+  "qid": "cmsjrntgr006wqmt1u73v9xcp",
+  "url": "/uploads/questions/c001a3801fe58aca949ec0e6.png",
+  "optId": null,
+  "label": null,
+  "ord": 19,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 2",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 839,
+   "h": 409
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 2/MATH/Innov. Test 2 Math Mod 1, 2B REV.pdf",
+  "scale": 0.9996,
+  "x": 527.9445,
+  "y": 186.9723,
+  "w": 838.6767,
+  "h": 408.8424,
+  "ncc": 1.0,
+  "ncc_coarse": 0.9651,
+  "second": 0.4951,
+  "where": {
+   "page": 19,
+   "xref": 114,
+   "media": null
+  },
+  "status": "skip_native",
+  "new": {
+   "file": "c001a3801fe58aca949ec0e6.png",
+   "w": 839,
+   "h": 409
+  },
+  "decision": "keep_native"
+ },
+ {
+  "qid": "cmsjrntz800dpqmt1kbv7yjkl",
+  "url": "/uploads/questions/4389e2bb6ac99455e1effab1.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 9,
+  "module": "Reading & Writing Module 1",
+  "section": "RW",
+  "test": "TEST 2",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 338,
+   "h": 217
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 2/READING AND WRITING/INNOVATOR TEST 2 R&W MOD 1 REV.pdf",
+  "scale": 2.2538,
+  "x": 382.4519,
+  "y": 261.8833,
+  "w": 761.7876,
+  "h": 489.0767,
+  "ncc": 0.9801,
+  "ncc_coarse": 0.9909,
+  "second": 0.6163,
+  "where": {
+   "page": 6,
+   "xref": 39,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "4abbd308e15a821f763a364c.png",
+   "w": 762,
+   "h": 489
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrntzg00duqmt1t01beiay",
+  "url": "/uploads/questions/b342e8f0df6c33fb54447e42.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 9,
+  "module": "Reading & Writing Module 2",
+  "section": "RW",
+  "test": "TEST 2",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 233,
+   "h": 242
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 2/READING AND WRITING/INNOVATOR TEST 2 R&W MOD 1 REV.pdf",
+  "scale": 2.7343,
+  "x": 448.6361,
+  "y": 442.3704,
+  "w": 637.0826,
+  "h": 661.691,
+  "ncc": 0.9849,
+  "ncc_coarse": 0.9826,
+  "second": 0.3179,
+  "where": {
+   "page": 25,
+   "xref": 133,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "ccd5e802d01cdbdeb82948aa.png",
+   "w": 637,
+   "h": 662
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrntvy00bzqmt1w6x7sigd",
+  "url": "/uploads/questions/41bcb0687531bc162e1c0136.png",
+  "optId": null,
+  "label": null,
+  "ord": 13,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 3",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 724,
+   "h": 739
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 3/MATH/Test 3 REV Math modules 1&2(A and B).pdf",
+  "scale": 0.9996,
+  "x": 559.9538,
+  "y": 223.9526,
+  "w": 723.7211,
+  "h": 738.7153,
+  "ncc": 1.0,
+  "ncc_coarse": 0.9031,
+  "second": 0.2906,
+  "where": {
+   "page": 5,
+   "xref": 38,
+   "media": null
+  },
+  "status": "skip_native",
+  "new": {
+   "file": "41bcb0687531bc162e1c0136.png",
+   "w": 724,
+   "h": 739
+  },
+  "decision": "keep_native"
+ },
+ {
+  "qid": "cmsjrntwj00c2qmt1dlfrtelp",
+  "url": "/uploads/questions/0eb09dcadc4b3c1448cdc227.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 15,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 3",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 416,
+   "h": 212
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 3/MATH/Test 3 REV Math modules 1&2(A and B).pdf",
+  "scale": 0.9515,
+  "x": 431.7532,
+  "y": 330.1101,
+  "w": 395.8406,
+  "h": 201.7264,
+  "ncc": 0.9458,
+  "ncc_coarse": 0.8988,
+  "second": 0.4471,
+  "where": {
+   "page": 6,
+   "xref": 43,
+   "media": null
+  },
+  "status": "skip_native",
+  "new": {
+   "file": "311610daaa7373f11c155164.png",
+   "w": 396,
+   "h": 202
+  },
+  "decision": "keep_native"
+ },
+ {
+  "qid": "cmsjrntwp00c3qmt1009fvz2k",
+  "url": "/uploads/questions/99767ab194cafca2f9b6e5e4.png",
+  "optId": null,
+  "label": null,
+  "ord": 16,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 3",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 561,
+   "h": 462
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 3/MATH/Test 3 REV Math modules 1&2(A and B).pdf",
+  "scale": 1.143,
+  "x": 304.0138,
+  "y": 201.8687,
+  "w": 641.228,
+  "h": 528.0701,
+  "ncc": 0.9871,
+  "ncc_coarse": 0.9748,
+  "second": 0.2892,
+  "where": {
+   "page": 6,
+   "xref": 44,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "a89c0cf21513c41f7d3b9b1a.png",
+   "w": 641,
+   "h": 528
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrntx000c9qmt1igaxp017",
+  "url": "/uploads/questions/a6ae7a739794a3b6d688631e.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 18,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 3",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 166,
+   "h": 174
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 3/MATH/Test 3 REV Math modules 1&2(A and B).pdf",
+  "scale": 1.8577,
+  "x": 479.8743,
+  "y": 151.7321,
+  "w": 308.3841,
+  "h": 323.2459,
+  "ncc": 0.9571,
+  "ncc_coarse": 0.919,
+  "second": 0.4081,
+  "where": {
+   "page": 7,
+   "xref": 49,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "557a5f4554f69537ccff2f4b.png",
+   "w": 308,
+   "h": 323
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrntxd00cgqmt1omxmx93a",
+  "url": "/uploads/questions/bc36d905fc87ad55664f2552.png",
+  "optId": null,
+  "label": null,
+  "ord": 21,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 3",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 569,
+   "h": 569
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 3/MATH/Test 3 REV Math modules 1&2(A and B).pdf",
+  "scale": 0.9996,
+  "x": 350.9622,
+  "y": 209.9626,
+  "w": 568.7808,
+  "h": 568.7808,
+  "ncc": 1.0,
+  "ncc_coarse": 0.8158,
+  "second": 0.2515,
+  "where": {
+   "page": 8,
+   "xref": 55,
+   "media": null
+  },
+  "status": "skip_native",
+  "new": {
+   "file": "bc36d905fc87ad55664f2552.png",
+   "w": 569,
+   "h": 569
+  },
+  "decision": "keep_native"
+ },
+ {
+  "qid": "cmsjrnvck00soqmt1vn0qou8q",
+  "url": "/uploads/questions/6477c045d2f7f1f26bc6d762.png",
+  "optId": null,
+  "label": null,
+  "ord": 20,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 3",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 414,
+   "h": 377
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 3/MATH/Test 3 REV Math modules 1&2(A and B).pdf",
+  "scale": 0.9996,
+  "x": 758.9719,
+  "y": 438.9746,
+  "w": 413.8405,
+  "h": 376.8547,
+  "ncc": 1.0,
+  "ncc_coarse": 0.9015,
+  "second": 0.4935,
+  "where": {
+   "page": 16,
+   "xref": 103,
+   "media": null
+  },
+  "status": "skip_native",
+  "new": {
+   "file": "6477c045d2f7f1f26bc6d762.png",
+   "w": 414,
+   "h": 377
+  },
+  "decision": "keep_native"
+ },
+ {
+  "qid": "cmsjrnvcn00spqmt1cg2v4a6v",
+  "url": "/uploads/questions/bd820a11fb21dfdf430e86c9.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 21,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 3",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 356,
+   "h": 331
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 3/MATH/Test 3 REV Math modules 1&2(A and B).pdf",
+  "scale": 1.4282,
+  "x": 708.1209,
+  "y": 204.408,
+  "w": 508.443,
+  "h": 472.7377,
+  "ncc": 0.9943,
+  "ncc_coarse": 0.87,
+  "second": 0.5176,
+  "where": {
+   "page": 16,
+   "xref": 104,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "ef21266aa8f85f644e0522c3.png",
+   "w": 508,
+   "h": 473
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnvgn00tqqmt19m9y0ui2",
+  "url": "/uploads/questions/7a3f17ebc7595de573fd5dff.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 10,
+  "module": "Reading & Writing Module 1",
+  "section": "RW",
+  "test": "TEST 3",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 555,
+   "h": 210
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 3/READING AND WRITING/INNOV test 3 R&W mod. 1 and 2B.pdf",
+  "scale": 1.1544,
+  "x": 289.1273,
+  "y": 191.4054,
+  "w": 640.7137,
+  "h": 242.4322,
+  "ncc": 0.9387,
+  "ncc_coarse": 0.9308,
+  "second": 0.6657,
+  "where": {
+   "page": 5,
+   "xref": 37,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "be4d49e1427f3213577f8914.png",
+   "w": 641,
+   "h": 242
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnvh100txqmt10n9r6csg",
+  "url": "/uploads/questions/fd383d6f96b6ed52b6d837bf.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 11,
+  "module": "Reading & Writing Module 2",
+  "section": "RW",
+  "test": "TEST 3",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 344,
+   "h": 255
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 3/READING AND WRITING/INNOV test 3 R&W mod. 1 and 2B.pdf",
+  "scale": 2.7479,
+  "x": 434.6404,
+  "y": 265.6652,
+  "w": 945.2884,
+  "h": 700.7225,
+  "ncc": 0.9822,
+  "ncc_coarse": 0.9769,
+  "second": 0.4387,
+  "where": {
+   "page": 21,
+   "xref": 120,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "5165c5127efe9268a4af4e6c.png",
+   "w": 945,
+   "h": 701
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnv8600qwqmt13tbb16ds",
+  "url": "/uploads/questions/eb646bc34d54b103ec958ccd.png",
+  "optId": null,
+  "label": null,
+  "ord": 11,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 4",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 259,
+   "h": 409
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 4/MATHS/INNOVATOR TEST 4 Math MOD 1&2.pdf",
+  "scale": 0.9996,
+  "x": 685.9807,
+  "y": 261.9719,
+  "w": 258.9002,
+  "h": 408.8424,
+  "ncc": 1.0,
+  "ncc_coarse": 0.8417,
+  "second": 0.2832,
+  "where": {
+   "page": 4,
+   "xref": 31,
+   "media": null
+  },
+  "status": "skip_native",
+  "new": {
+   "file": "eb646bc34d54b103ec958ccd.png",
+   "w": 259,
+   "h": 409
+  },
+  "decision": "keep_native"
+ },
+ {
+  "qid": "cmsjrnv9i00rgqmt1fwndeqs6",
+  "url": "/uploads/questions/e69b4b3d5429d6d3af2f3201.png",
+  "optId": null,
+  "label": null,
+  "ord": 15,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 4",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 737,
+   "h": 289
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 4/MATHS/INNOVATOR TEST 4 Math MOD 1&2.pdf",
+  "scale": 0.9996,
+  "x": 452.9526,
+  "y": 141.978,
+  "w": 736.716,
+  "h": 288.8887,
+  "ncc": 1.0,
+  "ncc_coarse": 0.8699,
+  "second": 0.315,
+  "where": {
+   "page": 6,
+   "xref": 41,
+   "media": null
+  },
+  "status": "skip_native",
+  "new": {
+   "file": "e69b4b3d5429d6d3af2f3201.png",
+   "w": 737,
+   "h": 289
+  },
+  "decision": "keep_native"
+ },
+ {
+  "qid": "cmsjrnvad00rqqmt1dkutaaga",
+  "url": "/uploads/questions/a96d1a8a8c09757ce2226f41.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 18,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 4",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 248,
+   "h": 257
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 4/MATHS/INNOVATOR TEST 4 Math MOD 1&2.pdf",
+  "scale": 2.3791,
+  "x": 514.9222,
+  "y": 199.6804,
+  "w": 590.0168,
+  "h": 611.4287,
+  "ncc": 0.9824,
+  "ncc_coarse": 0.901,
+  "second": 0.3545,
+  "where": {
+   "page": 7,
+   "xref": 47,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "ef0328a13dea0fd1c81e0343.png",
+   "w": 590,
+   "h": 611
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnv8g00qxqmt1cmsb6ze7",
+  "url": "/uploads/questions/3a02ed29dbe94b4bd7585666.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 11,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 4",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 302,
+   "h": 164
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 4/MATHS/INNOVATOR TEST 4 Math MOD 1&2.pdf",
+  "scale": 2.3566,
+  "x": 451.4047,
+  "y": 137.6288,
+  "w": 711.7004,
+  "h": 386.4863,
+  "ncc": 0.9865,
+  "ncc_coarse": 0.9472,
+  "second": 0.4897,
+  "where": {
+   "page": 12,
+   "xref": 80,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "a50f8c611b236f2887af0442.png",
+   "w": 712,
+   "h": 386
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnva700rlqmt11otks7wt",
+  "url": "/uploads/questions/9c185772814b40d470a9b6e4.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 17,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 4",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 207,
+   "h": 208
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 4/MATHS/INNOVATOR TEST 4 Math MOD 1&2.pdf",
+  "scale": 2.3912,
+  "x": 561.6933,
+  "y": 198.4758,
+  "w": 494.9863,
+  "h": 497.3776,
+  "ncc": 0.9708,
+  "ncc_coarse": 0.8949,
+  "second": 0.453,
+  "where": {
+   "page": 15,
+   "xref": 95,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "6d6349522b72bb7ff62d2f67.png",
+   "w": 495,
+   "h": 497
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnuna00kfqmt18j8hku4p",
+  "url": "/uploads/questions/07c611f877b190c92deb9315.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 9,
+  "module": "Reading & Writing Module 1",
+  "section": "RW",
+  "test": "TEST 4",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 353,
+   "h": 197
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 4/READING AND WRITING/INNOVATOR TEST 4 RW MOD 1 &2 REV.pdf",
+  "scale": 2.4519,
+  "x": 370.3081,
+  "y": 261.4617,
+  "w": 865.5311,
+  "h": 483.0301,
+  "ncc": 0.9959,
+  "ncc_coarse": 0.9918,
+  "second": 0.4424,
+  "where": {
+   "page": 8,
+   "xref": 43,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "49c33678f387ba43d2eaca35.png",
+   "w": 866,
+   "h": 483
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnupf00kmqmt11b72urtn",
+  "url": "/uploads/questions/50106b5ce1087f8522a1fef0.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 10,
+  "module": "Reading & Writing Module 2",
+  "section": "RW",
+  "test": "TEST 4",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 626,
+   "h": 258
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 4/READING AND WRITING/INNOVATOR TEST 4 RW MOD 1 &2 REV.pdf",
+  "scale": 1.4355,
+  "x": 470.9815,
+  "y": 267.0312,
+  "w": 898.5983,
+  "h": 370.3488,
+  "ncc": 0.9647,
+  "ncc_coarse": 0.982,
+  "second": 0.5757,
+  "where": {
+   "page": 26,
+   "xref": 134,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "1af2c7f36f01a52815ab79b9.png",
+   "w": 899,
+   "h": 370
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnuq300kzqmt1gxiw1leu",
+  "url": "/uploads/questions/382af2b01c9aa0f71c599979.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 13,
+  "module": "Reading & Writing Module 2",
+  "section": "RW",
+  "test": "TEST 4",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 654,
+   "h": 580
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 4/READING AND WRITING/INNOVATOR TEST 4 RW MOD 1 &2 REV.pdf",
+  "scale": 1.4355,
+  "x": 462.5943,
+  "y": 304.8042,
+  "w": 938.7911,
+  "h": 832.5671,
+  "ncc": 0.9788,
+  "ncc_coarse": 0.9347,
+  "second": 0.3916,
+  "where": {
+   "page": 29,
+   "xref": 148,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "daa49500440e01a1115c6dd0.png",
+   "w": 939,
+   "h": 833
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnugu00ijqmt1szmnlak6",
+  "url": "/uploads/questions/f38422293f217d11d8b303b8.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 7,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 5",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 295,
+   "h": 299
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 5/MATHS/INNOV. TEST 5 MATH  MOD 1&2.pdf",
+  "scale": 2.7616,
+  "x": 541.0337,
+  "y": 262.5569,
+  "w": 814.6728,
+  "h": 825.7192,
+  "ncc": 0.9863,
+  "ncc_coarse": 0.9367,
+  "second": 0.3106,
+  "where": {
+   "page": 4,
+   "xref": 30,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "520285d7bb170491024377be.png",
+   "w": 815,
+   "h": 826
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnuh400ilqmt1obq908v1",
+  "url": "/uploads/questions/c10861991e9b9ec9308120dc.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 8,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 5",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 253,
+   "h": 286
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 5/MATHS/INNOV. TEST 5 MATH  MOD 1&2.pdf",
+  "scale": 2.7889,
+  "x": 599.3468,
+  "y": 266.1357,
+  "w": 705.6032,
+  "h": 797.6384,
+  "ncc": 0.9806,
+  "ncc_coarse": 0.866,
+  "second": 0.323,
+  "where": {
+   "page": 4,
+   "xref": 31,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "9d4d6718c9dddf253e68be41.png",
+   "w": 706,
+   "h": 798
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnuhc00inqmt1t1hr8hpk",
+  "url": "/uploads/questions/3715835e3420e42cc330cdd3.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 9,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 5",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 546,
+   "h": 191
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 5/MATHS/INNOV. TEST 5 MATH  MOD 1&2.pdf",
+  "scale": 1.4006,
+  "x": 410.8495,
+  "y": 151.6193,
+  "w": 764.7104,
+  "h": 267.5086,
+  "ncc": 0.9171,
+  "ncc_coarse": 0.9416,
+  "second": 0.3332,
+  "where": {
+   "page": 5,
+   "xref": 35,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "4583cc0352a4e62e8a5f2e1a.png",
+   "w": 765,
+   "h": 268
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnul000jhqmt1q1p9ey2x",
+  "url": "/uploads/questions/736aa28304adaf1530094470.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 20,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 5",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 211,
+   "h": 210
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 5/MATHS/INNOV. TEST 5 MATH  MOD 1&2.pdf",
+  "scale": 2.7879,
+  "x": 651.578,
+  "y": 244.9418,
+  "w": 588.2556,
+  "h": 585.4677,
+  "ncc": 0.9885,
+  "ncc_coarse": 0.926,
+  "second": 0.5339,
+  "where": {
+   "page": 9,
+   "xref": 59,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "e1d3234db1468f553d105133.png",
+   "w": 588,
+   "h": 585
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnulb00jjqmt1ij3wojjk",
+  "url": "/uploads/questions/c626793cfdf58227e4896132.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 21,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 5",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 168,
+   "h": 195
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 5/MATHS/INNOV. TEST 5 MATH  MOD 1&2.pdf",
+  "scale": 2.7879,
+  "x": 725.6382,
+  "y": 273.0021,
+  "w": 468.3742,
+  "h": 543.6486,
+  "ncc": 0.9854,
+  "ncc_coarse": 0.8899,
+  "second": 0.4333,
+  "where": {
+   "page": 9,
+   "xref": 60,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "5657ddd60cd58e4af0dbfc23.png",
+   "w": 468,
+   "h": 544
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnuh900imqmt1xpf8w377",
+  "url": "/uploads/questions/5c8cdf7af2e5abe4ba77d4a3.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 8,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 5",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 84,
+   "h": 105
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 5/MATHS/INNOV. TEST 5 MATH  MOD 1&2.pdf",
+  "scale": 2.7616,
+  "x": 643.1856,
+  "y": 191.7088,
+  "w": 231.9746,
+  "h": 289.9683,
+  "ncc": 0.981,
+  "ncc_coarse": 0.947,
+  "second": 0.4663,
+  "where": {
+   "page": 13,
+   "xref": 81,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "1bf2d961b030a895979416a2.png",
+   "w": 232,
+   "h": 290
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnuj600j0qmt1zq99t5h3",
+  "url": "/uploads/questions/56200442015666107877381c.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 15,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 5",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 247,
+   "h": 253
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 5/MATHS/INNOV. TEST 5 MATH  MOD 1&2.pdf",
+  "scale": 2.8164,
+  "x": 605.472,
+  "y": 213.2884,
+  "w": 695.6483,
+  "h": 712.5466,
+  "ncc": 0.9846,
+  "ncc_coarse": 0.9754,
+  "second": 0.5528,
+  "where": {
+   "page": 15,
+   "xref": 94,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "98710cc1dbad994da3fe4e7f.png",
+   "w": 696,
+   "h": 713
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnukm00jeqmt19xq4o5db",
+  "url": "/uploads/questions/5219f1ff3301bce4601ffd17.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 18,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 5",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 278,
+   "h": 209
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 5/MATHS/INNOV. TEST 5 MATH  MOD 1&2.pdf",
+  "scale": 2.8022,
+  "x": 552.3061,
+  "y": 272.0758,
+  "w": 779.002,
+  "h": 585.6526,
+  "ncc": 0.9905,
+  "ncc_coarse": 0.965,
+  "second": 0.5291,
+  "where": {
+   "page": 17,
+   "xref": 104,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "ec981443e1e86e899bfc9f97.png",
+   "w": 779,
+   "h": 586
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnv0300o8qmt1poncffke",
+  "url": "/uploads/questions/575c6f17e2043e09ba20e04f.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 11,
+  "module": "Reading & Writing Module 1",
+  "section": "RW",
+  "test": "TEST 5",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 338,
+   "h": 170
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf",
+  "scale": 2.7343,
+  "x": 431.65,
+  "y": 394.2935,
+  "w": 924.1799,
+  "h": 464.8242,
+  "ncc": 0.9982,
+  "ncc_coarse": 0.9953,
+  "second": 0.3957,
+  "where": {
+   "page": 9,
+   "xref": 53,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "725bd8c6b038acf969a4659f.png",
+   "w": 924,
+   "h": 465
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnv0i00ofqmt1hqtxt8gl",
+  "url": "/uploads/questions/079b25889c66016201ed4b53.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 12,
+  "module": "Reading & Writing Module 2",
+  "section": "RW",
+  "test": "TEST 5",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 690,
+   "h": 162
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf",
+  "scale": 1.4075,
+  "x": 407.9763,
+  "y": 265.6336,
+  "w": 971.2002,
+  "h": 228.0209,
+  "ncc": 0.9754,
+  "ncc_coarse": 0.9245,
+  "second": 0.4851,
+  "where": {
+   "page": 29,
+   "xref": 150,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "44ff5c0e1c1671eeb67702f5.png",
+   "w": 971,
+   "h": 228
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnv1100olqmt1ddk8eg1v",
+  "url": "/uploads/questions/d98a7e4d6dc62cdc1367be8d.png",
+  "optId": null,
+  "label": null,
+  "ord": 13,
+  "module": "Reading & Writing Module 2",
+  "section": "RW",
+  "test": "TEST 5",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 915,
+   "h": 560
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf",
+  "scale": 1.0148,
+  "x": 444.2108,
+  "y": 306.3205,
+  "w": 928.5761,
+  "h": 568.3089,
+  "ncc": 0.9894,
+  "ncc_coarse": 0.9944,
+  "second": 0.5354,
+  "where": {
+   "page": 30,
+   "xref": 154,
+   "media": null
+  },
+  "status": "skip_native",
+  "new": {
+   "file": "8fd07b574e83a1d30e6cc593.png",
+   "w": 929,
+   "h": 568
+  },
+  "decision": "keep_native"
+ },
+ {
+  "qid": "cq6m1q4919a54dc531b4e438",
+  "url": "/uploads/questions/765716dc1c89ddda97e603b4.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 3,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 6",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 528,
+   "h": 559
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 6/MATH/INNO TEST 6 MATH MOD 1, 2B.pdf",
+  "scale": 1.4427,
+  "x": 554.4012,
+  "y": 116.8595,
+  "w": 761.751,
+  "h": 806.475,
+  "ncc": 0.9945,
+  "ncc_coarse": 0.9589,
+  "second": 0.2886,
+  "where": {
+   "page": 2,
+   "xref": 19,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "7ae9fd2f23c74d195ea5bd45.png",
+   "w": 762,
+   "h": 806
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnvpu00xbqmt156zmd2xc",
+  "url": "/uploads/questions/d68c224e32e056bc6e3d9c48.png",
+  "optId": null,
+  "label": null,
+  "ord": 4,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 6",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 521,
+   "h": 477
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 6/MATH/INNO TEST 6 MATH MOD 1, 2B.pdf",
+  "scale": 0.9996,
+  "x": 704.9649,
+  "y": 188.9676,
+  "w": 520.7993,
+  "h": 476.8162,
+  "ncc": 0.9999,
+  "ncc_coarse": 0.8842,
+  "second": 0.4499,
+  "where": {
+   "page": 2,
+   "xref": 20,
+   "media": null
+  },
+  "status": "skip_native",
+  "new": {
+   "file": "50fd8b9ff12f562e8d4d454f.png",
+   "w": 521,
+   "h": 477
+  },
+  "decision": "keep_native"
+ },
+ {
+  "qid": "cmsjrnvuh00xzqmt1pw9qt91q",
+  "url": "/uploads/questions/68a00853f84fb34c704f2cd9.png",
+  "optId": null,
+  "label": null,
+  "ord": 12,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 6",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 854,
+   "h": 854
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 6/MATH/INNO TEST 6 MATH MOD 1, 2B.pdf",
+  "scale": 0.9996,
+  "x": 520.9468,
+  "y": 268.9437,
+  "w": 853.671,
+  "h": 853.671,
+  "ncc": 1.0,
+  "ncc_coarse": 0.8716,
+  "second": 0.2179,
+  "where": {
+   "page": 5,
+   "xref": 37,
+   "media": null
+  },
+  "status": "skip_native",
+  "new": {
+   "file": "68a00853f84fb34c704f2cd9.png",
+   "w": 854,
+   "h": 854
+  },
+  "decision": "keep_native"
+ },
+ {
+  "qid": "cmsjrnvuv00y1qmt18u6xmqr1",
+  "url": "/uploads/questions/032dcb8c54b7c328aa831050.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 13,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 6",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 202,
+   "h": 216
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 6/MATH/INNO TEST 6 MATH MOD 1, 2B.pdf",
+  "scale": 2.7879,
+  "x": 673.3659,
+  "y": 282.7297,
+  "w": 563.1642,
+  "h": 602.1953,
+  "ncc": 0.9906,
+  "ncc_coarse": 0.9438,
+  "second": 0.3918,
+  "where": {
+   "page": 6,
+   "xref": 41,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "62454ed5d39486db9b386a3c.png",
+   "w": 563,
+   "h": 602
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnvxg00yrqmt1xateifju",
+  "url": "/uploads/questions/f2ffe78a9aad8fbfc70fa953.png",
+  "optId": null,
+  "label": null,
+  "ord": 20,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 6",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 699,
+   "h": 809
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 6/MATH/INNO TEST 6 MATH MOD 1, 2B.pdf",
+  "scale": 0.9996,
+  "x": 603.9538,
+  "y": 280.9488,
+  "w": 698.7307,
+  "h": 808.6883,
+  "ncc": 1.0,
+  "ncc_coarse": 0.8534,
+  "second": 0.3725,
+  "where": {
+   "page": 8,
+   "xref": 54,
+   "media": null
+  },
+  "status": "skip_native",
+  "new": {
+   "file": "f2ffe78a9aad8fbfc70fa953.png",
+   "w": 699,
+   "h": 809
+  },
+  "decision": "keep_native"
+ },
+ {
+  "qid": "cmsjrnvoe00x7qmt1c3n1ln3s",
+  "url": "/uploads/questions/6ff1e435e8bbcb0fac03c958.png",
+  "optId": null,
+  "label": null,
+  "ord": 1,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 6",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 639,
+   "h": 644
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 6/MATH/INNO TEST 6 MATH MOD 1, 2B.pdf",
+  "scale": 0.9996,
+  "x": 624.9584,
+  "y": 220.9576,
+  "w": 638.7538,
+  "h": 643.7519,
+  "ncc": 1.0,
+  "ncc_coarse": 0.9553,
+  "second": 0.5237,
+  "where": {
+   "page": 10,
+   "xref": 64,
+   "media": null
+  },
+  "status": "skip_native",
+  "new": {
+   "file": "6ff1e435e8bbcb0fac03c958.png",
+   "w": 639,
+   "h": 644
+  },
+  "decision": "keep_native"
+ },
+ {
+  "qid": "cmsjrnvpf00x9qmt1cl5jfhm8",
+  "url": "/uploads/questions/54ff5103412bb0cf6744ca47.png",
+  "optId": null,
+  "label": null,
+  "ord": 2,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 6",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 639,
+   "h": 644
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 6/MATH/INNO TEST 6 MATH MOD 1, 2B.pdf",
+  "scale": 0.9996,
+  "x": 623.9588,
+  "y": 215.9576,
+  "w": 638.7538,
+  "h": 643.7519,
+  "ncc": 1.0,
+  "ncc_coarse": 0.929,
+  "second": 0.5363,
+  "where": {
+   "page": 10,
+   "xref": 65,
+   "media": null
+  },
+  "status": "skip_native",
+  "new": {
+   "file": "54ff5103412bb0cf6744ca47.png",
+   "w": 639,
+   "h": 644
+  },
+  "decision": "keep_native"
+ },
+ {
+  "qid": "cmsjrnvst00xqqmt167kc59z8",
+  "url": "/uploads/questions/e681c6b6854a4e014161f2cb.png",
+  "optId": null,
+  "label": null,
+  "ord": 7,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 6",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 844,
+   "h": 844
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 6/MATH/INNO TEST 6 MATH MOD 1, 2B.pdf",
+  "scale": 0.9996,
+  "x": 528.9449,
+  "y": 267.9464,
+  "w": 843.6748,
+  "h": 843.6748,
+  "ncc": 1.0,
+  "ncc_coarse": 0.9097,
+  "second": 0.2438,
+  "where": {
+   "page": 12,
+   "xref": 76,
+   "media": null
+  },
+  "status": "skip_native",
+  "new": {
+   "file": "e681c6b6854a4e014161f2cb.png",
+   "w": 844,
+   "h": 844
+  },
+  "decision": "keep_native"
+ },
+ {
+  "qid": "cmsjrnvy000yuqmt1dmcha9vm",
+  "url": "/uploads/questions/c7f5d6b799d8a861bb67bd43.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 21,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 6",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 184,
+   "h": 142
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 6/MATH/INNO TEST 6 MATH MOD 1, 2B.pdf",
+  "scale": 2.7753,
+  "x": 698.2582,
+  "y": 246.6066,
+  "w": 510.6504,
+  "h": 394.0889,
+  "ncc": 0.9785,
+  "ncc_coarse": 0.9338,
+  "second": 0.4875,
+  "where": {
+   "page": 19,
+   "xref": 112,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "a09ea105d58e5fe7cf86d770.png",
+   "w": 511,
+   "h": 394
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnwf60130qmt1vh7yp7es",
+  "url": "/uploads/questions/6ebba2b85db2192b304cb41d.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 8,
+  "module": "Reading & Writing Module 1",
+  "section": "RW",
+  "test": "TEST 6",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 640,
+   "h": 340
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 6/READING AND WRITING/INNOVATOR TEST 6 RW.pdf",
+  "scale": 1.4215,
+  "x": 452.4614,
+  "y": 280.6025,
+  "w": 909.7424,
+  "h": 483.3007,
+  "ncc": 0.9717,
+  "ncc_coarse": 0.8403,
+  "second": 0.4183,
+  "where": {
+   "page": 5,
+   "xref": 29,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "a83568875f033fc413336757.png",
+   "w": 910,
+   "h": 483
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnwfo013fqmt1vzmkgsij",
+  "url": "/uploads/questions/0009fa916244769aaacf0af6.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 10,
+  "module": "Reading & Writing Module 1",
+  "section": "RW",
+  "test": "TEST 6",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 656,
+   "h": 287
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 6/READING AND WRITING/INNOVATOR TEST 6 RW.pdf",
+  "scale": 1.4282,
+  "x": 452.1032,
+  "y": 324.9823,
+  "w": 936.9062,
+  "h": 409.8965,
+  "ncc": 0.9824,
+  "ncc_coarse": 0.9662,
+  "second": 0.4955,
+  "where": {
+   "page": 7,
+   "xref": 38,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "37cc3bce041841dd1400099b.png",
+   "w": 937,
+   "h": 410
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnwfz013lqmt1u394h52b",
+  "url": "/uploads/questions/03ada6ad07534a8dc4867650.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 11,
+  "module": "Reading & Writing Module 1",
+  "section": "RW",
+  "test": "TEST 6",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 337,
+   "h": 251
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 6/READING AND WRITING/INNOVATOR TEST 6 RW.pdf",
+  "scale": 2.7753,
+  "x": 441.3143,
+  "y": 268.4604,
+  "w": 935.2674,
+  "h": 696.5938,
+  "ncc": 0.9873,
+  "ncc_coarse": 0.9517,
+  "second": 0.6103,
+  "where": {
+   "page": 8,
+   "xref": 42,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "c9d0618df5e8ff7e41fdc14a.png",
+   "w": 935,
+   "h": 697
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnwg9013vqmt1b6a4r33l",
+  "url": "/uploads/questions/f4935e44dbb057ed1b4238d0.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 12,
+  "module": "Reading & Writing Module 1",
+  "section": "RW",
+  "test": "TEST 6",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 318,
+   "h": 196
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 6/READING AND WRITING/INNOVATOR TEST 6 RW.pdf",
+  "scale": 2.7343,
+  "x": 467.1815,
+  "y": 409.9648,
+  "w": 869.4947,
+  "h": 535.915,
+  "ncc": 0.9973,
+  "ncc_coarse": 0.964,
+  "second": 0.635,
+  "where": {
+   "page": 9,
+   "xref": 48,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "e47384c7c3141f1d867e7b2e.png",
+   "w": 869,
+   "h": 536
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnwgk014aqmt1lv54oj89",
+  "url": "/uploads/questions/e540c6e8e2437c74d1edad9f.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 13,
+  "module": "Reading & Writing Module 2",
+  "section": "RW",
+  "test": "TEST 6",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 644,
+   "h": 377
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 6/READING AND WRITING/INNOVATOR TEST 6 RW.pdf",
+  "scale": 1.4282,
+  "x": 470.1032,
+  "y": 319.9773,
+  "w": 919.7677,
+  "h": 538.4354,
+  "ncc": 0.9737,
+  "ncc_coarse": 0.8819,
+  "second": 0.3602,
+  "where": {
+   "page": 28,
+   "xref": 144,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "435a0769427a440af9de3ab8.png",
+   "w": 920,
+   "h": 538
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnwxx01bfqmt1dqsbjcuh",
+  "url": "/uploads/questions/5173d34a039f193bac6a37a8.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 15,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 7",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 221,
+   "h": 220
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 7/MATH/TEST 7 INNOVATOR MATH.pdf",
+  "scale": 2.7753,
+  "x": 641.1346,
+  "y": 251.9099,
+  "w": 613.3356,
+  "h": 610.5603,
+  "ncc": 0.9955,
+  "ncc_coarse": 0.9268,
+  "second": 0.4305,
+  "where": {
+   "page": 6,
+   "xref": 39,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "eb3a6cd1f259e935ff198279.png",
+   "w": 613,
+   "h": 611
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnwy501bhqmt1rs7o5c3c",
+  "url": "/uploads/questions/78463f391dbc8c1544a78418.png",
+  "optId": null,
+  "label": null,
+  "ord": 16,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 7",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 447,
+   "h": 174
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 7/MATH/TEST 7 INNOVATOR MATH.pdf",
+  "scale": 1.7076,
+  "x": 562.9492,
+  "y": 186.5212,
+  "w": 763.3093,
+  "h": 297.1271,
+  "ncc": 0.9769,
+  "ncc_coarse": 0.9596,
+  "second": 0.5039,
+  "where": {
+   "page": 6,
+   "xref": 40,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "2694623549577453ab3b5d9c.png",
+   "w": 763,
+   "h": 297
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnwyd01bnqmt1l4vwq4sj",
+  "url": "/uploads/questions/a199d4bfd16d4d11552c4287.png",
+  "optId": null,
+  "label": null,
+  "ord": 17,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 7",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 306,
+   "h": 297
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 7/MATH/TEST 7 INNOVATOR MATH.pdf",
+  "scale": 1.7246,
+  "x": 698.5063,
+  "y": 196.7817,
+  "w": 527.7333,
+  "h": 512.2117,
+  "ncc": 0.9811,
+  "ncc_coarse": 0.8634,
+  "second": 0.5209,
+  "where": {
+   "page": 7,
+   "xref": 44,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "b50b9adbfea405716f7eb927.png",
+   "w": 528,
+   "h": 512
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnwym01btqmt1846xul16",
+  "url": "/uploads/questions/cb3f3446054d7f62bf950671.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 18,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 7",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 153,
+   "h": 89
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 7/MATH/TEST 7 INNOVATOR MATH.pdf",
+  "scale": 2.7753,
+  "x": 743.3819,
+  "y": 215.6291,
+  "w": 424.6169,
+  "h": 246.9994,
+  "ncc": 0.9813,
+  "ncc_coarse": 0.9362,
+  "second": 0.5597,
+  "where": {
+   "page": 7,
+   "xref": 45,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "a5007b9b841e053d03b04b6a.png",
+   "w": 425,
+   "h": 247
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnx2701c2qmt18m37uycw",
+  "url": "/uploads/questions/67f33f97bbccf50c456d9895.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 21,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 7",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 272,
+   "h": 281
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 7/MATH/TEST 7 INNOVATOR MATH.pdf",
+  "scale": 2.7879,
+  "x": 563.0332,
+  "y": 317.8212,
+  "w": 758.3201,
+  "h": 783.4115,
+  "ncc": 0.9826,
+  "ncc_coarse": 0.9029,
+  "second": 0.5098,
+  "where": {
+   "page": 9,
+   "xref": 55,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "bbc030f5975d7d50f5eab2ab.png",
+   "w": 758,
+   "h": 783
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnwuo01a8qmt11c9v1qtn",
+  "url": "/uploads/questions/2290da2383e3152f865ac20d.png",
+  "optId": null,
+  "label": null,
+  "ord": 1,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 7",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 604,
+   "h": 614
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 7/MATH/TEST 7 INNOVATOR MATH.pdf",
+  "scale": 0.9996,
+  "x": 666.9607,
+  "y": 218.9595,
+  "w": 603.7673,
+  "h": 613.7634,
+  "ncc": 1.0,
+  "ncc_coarse": 0.9364,
+  "second": 0.5283,
+  "where": {
+   "page": 10,
+   "xref": 60,
+   "media": null
+  },
+  "status": "skip_native",
+  "new": {
+   "file": "2290da2383e3152f865ac20d.png",
+   "w": 604,
+   "h": 614
+  },
+  "decision": "keep_native"
+ },
+ {
+  "qid": "cmsjrnwya01biqmt1cdbusd7c",
+  "url": "/uploads/questions/c6f516ca8b51734bc9c935c0.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 16,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 7",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 299,
+   "h": 95
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 7/MATH/TEST 7 INNOVATOR MATH.pdf",
+  "scale": 2.7616,
+  "x": 523.2721,
+  "y": 243.9472,
+  "w": 825.7192,
+  "h": 262.3523,
+  "ncc": 0.9743,
+  "ncc_coarse": 0.9572,
+  "second": 0.6619,
+  "where": {
+   "page": 16,
+   "xref": 93,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "5f0095caf85109d22c160147.png",
+   "w": 826,
+   "h": 262
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnwyh01boqmt18xmt7cc9",
+  "url": "/uploads/questions/aede96fb5cf4912236bdd59d.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 17,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 7",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 278,
+   "h": 107
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 7/MATH/TEST 7 INNOVATOR MATH.pdf",
+  "scale": 2.8022,
+  "x": 556.8996,
+  "y": 230.2411,
+  "w": 779.002,
+  "h": 299.8317,
+  "ncc": 0.9931,
+  "ncc_coarse": 0.9266,
+  "second": 0.3743,
+  "where": {
+   "page": 16,
+   "xref": 94,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "70070af6a5b4b6a50d62e31e.png",
+   "w": 779,
+   "h": 300
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnwzg01bwqmt1kj5hz9qu",
+  "url": "/uploads/questions/9175a6a6a7bbc22015ae3457.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 19,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 7",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 133,
+   "h": 116
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 7/MATH/TEST 7 INNOVATOR MATH.pdf",
+  "scale": 2.7753,
+  "x": 778.8313,
+  "y": 235.5055,
+  "w": 369.1114,
+  "h": 321.9318,
+  "ncc": 0.9849,
+  "ncc_coarse": 0.9071,
+  "second": 0.5337,
+  "where": {
+   "page": 17,
+   "xref": 100,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "78c62405c1300a68b3e8a9fe.png",
+   "w": 369,
+   "h": 322
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnwnp017nqmt1wpirbbk3",
+  "url": "/uploads/questions/bbf0a1fcda0c60b4a2e8c7a7.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 10,
+  "module": "Reading & Writing Module 1",
+  "section": "RW",
+  "test": "TEST 7",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 346,
+   "h": 207
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf",
+  "scale": 2.7206,
+  "x": 407.0736,
+  "y": 317.2206,
+  "w": 941.3237,
+  "h": 563.1619,
+  "ncc": 0.9953,
+  "ncc_coarse": 0.9813,
+  "second": 0.3542,
+  "where": {
+   "page": 7,
+   "xref": 41,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "bb45c5f1b40a20771d4395c0.png",
+   "w": 941,
+   "h": 563
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnwo5017wqmt1oupeqir8",
+  "url": "/uploads/questions/a39adb1502560f04d40ba42f.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 11,
+  "module": "Reading & Writing Module 2",
+  "section": "RW",
+  "test": "TEST 7",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 338,
+   "h": 174
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf",
+  "scale": 2.7616,
+  "x": 460.3649,
+  "y": 171.8481,
+  "w": 933.4217,
+  "h": 480.5189,
+  "ncc": 0.9943,
+  "ncc_coarse": 0.9413,
+  "second": 0.507,
+  "where": {
+   "page": 25,
+   "xref": 130,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "2abd194e57f359d591c5af09.png",
+   "w": 933,
+   "h": 481
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsnb3fzg000k0mpdb3ur9ziu",
+  "url": "/uploads/questions/8ad1996ebe3409bd8fb2674f.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 6,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 8",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 215,
+   "h": 137
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf",
+  "scale": 2.5132,
+  "x": 599.9621,
+  "y": 196.8301,
+  "w": 540.3385,
+  "h": 344.3087,
+  "ncc": 0.9812,
+  "ncc_coarse": 0.9634,
+  "second": 0.4427,
+  "where": {
+   "page": 3,
+   "xref": 25,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "f6d76f3d88267a3d703aebdf.png",
+   "w": 540,
+   "h": 344
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsnb3fzo000p0mpd20puzuf4",
+  "url": "/uploads/questions/b78174b42a89c2d8e7a30247.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 7,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 8",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 269,
+   "h": 127
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf",
+  "scale": 2.5132,
+  "x": 515.5809,
+  "y": 238.8037,
+  "w": 676.0514,
+  "h": 319.1767,
+  "ncc": 0.9961,
+  "ncc_coarse": 0.9951,
+  "second": 0.6789,
+  "where": {
+   "page": 4,
+   "xref": 29,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "4c9ce781d6ccd4a27f73a108.png",
+   "w": 676,
+   "h": 319
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsnb3g0u00160mpd2e7gq53l",
+  "url": "/uploads/questions/a2971e09575d6dba6c386253.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 12,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 8",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 256,
+   "h": 264
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf",
+  "scale": 2.4762,
+  "x": 536.572,
+  "y": 243.4769,
+  "w": 633.9088,
+  "h": 653.7184,
+  "ncc": 0.9821,
+  "ncc_coarse": 0.9204,
+  "second": 0.3561,
+  "where": {
+   "page": 6,
+   "xref": 42,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "34b45888e62e722557bb2185.png",
+   "w": 634,
+   "h": 654
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsnb3g2c001y0mpd76881utf",
+  "url": "/uploads/questions/6ad65c3584059d7843545131.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 20,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 8",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 293,
+   "h": 172
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf",
+  "scale": 2.9747,
+  "x": 565.8609,
+  "y": 233.3166,
+  "w": 871.5835,
+  "h": 511.6463,
+  "ncc": 0.9978,
+  "ncc_coarse": 0.9929,
+  "second": 0.5889,
+  "where": {
+   "page": 9,
+   "xref": 60,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "eeb4f0b453af0f45ace953b9.png",
+   "w": 872,
+   "h": 512
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsnb3g2h00230mpdixue08j3",
+  "url": "/uploads/questions/471b36ba09df5aae83ac6e9f.png",
+  "optId": null,
+  "label": null,
+  "ord": 21,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 8",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 679,
+   "h": 769
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf",
+  "scale": 0.9996,
+  "x": 706.9572,
+  "y": 305.9495,
+  "w": 678.7384,
+  "h": 768.7037,
+  "ncc": 1.0,
+  "ncc_coarse": 0.9171,
+  "second": 0.2378,
+  "where": {
+   "page": 9,
+   "xref": 61,
+   "media": null
+  },
+  "status": "skip_native",
+  "new": {
+   "file": "a2840dbad7f4d8c5c3a41ff0.png",
+   "w": 679,
+   "h": 769
+  },
+  "decision": "keep_native"
+ },
+ {
+  "qid": "cmsnb3g2v002i0mpdrimxrlt4",
+  "url": "/uploads/questions/1cca36cb78ae20aa76b07f60.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 3,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 8",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 205,
+   "h": 165
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf",
+  "scale": 3.5032,
+  "x": 858.6063,
+  "y": 262.0838,
+  "w": 718.1605,
+  "h": 578.0316,
+  "ncc": 0.9889,
+  "ncc_coarse": 0.9488,
+  "second": 0.3019,
+  "where": {
+   "page": 11,
+   "xref": 71,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "4c41eb8d799f14d1d3f985d9.png",
+   "w": 718,
+   "h": 578
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsnb3g38002s0mpdwn9a43dy",
+  "url": "/uploads/questions/1d939c804b2ee65e3b967574.png",
+  "optId": null,
+  "label": null,
+  "ord": 6,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 8",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 729,
+   "h": 784
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf",
+  "scale": 0.9996,
+  "x": 821.9515,
+  "y": 315.9484,
+  "w": 728.7191,
+  "h": 783.6979,
+  "ncc": 0.9972,
+  "ncc_coarse": 0.9336,
+  "second": 0.3829,
+  "where": {
+   "page": 12,
+   "xref": 77,
+   "media": null
+  },
+  "status": "skip_native",
+  "new": {
+   "file": "1c493a978d6300fd7018ba70.png",
+   "w": 729,
+   "h": 784
+  },
+  "decision": "keep_native"
+ },
+ {
+  "qid": "cmsnb3g3d002t0mpdhh5lit47",
+  "url": "/uploads/questions/cddaec76e007b3d8d49152a1.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 7,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 8",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 209,
+   "h": 216
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf",
+  "scale": 3.5547,
+  "x": 846.4137,
+  "y": 315.5231,
+  "w": 742.9276,
+  "h": 767.8104,
+  "ncc": 0.9899,
+  "ncc_coarse": 0.9695,
+  "second": 0.6884,
+  "where": {
+   "page": 13,
+   "xref": 81,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "9f9dd88c7f1455ff9720dbca.png",
+   "w": 743,
+   "h": 768
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsnb3g40003e0mpde64fpbyr",
+  "url": "/uploads/questions/103bff3261c7202a56c5174d.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 12,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 8",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 233,
+   "h": 212
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf",
+  "scale": 3.6984,
+  "x": 388.9374,
+  "y": 283.7468,
+  "w": 861.7353,
+  "h": 784.0682,
+  "ncc": 0.9881,
+  "ncc_coarse": 0.9221,
+  "second": 0.276,
+  "where": {
+   "page": 15,
+   "xref": 92,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "7c6df283d6b9f0989943e760.png",
+   "w": 862,
+   "h": 784
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsnb3g43003f0mpdgnh8uvk7",
+  "url": "/uploads/questions/811eac11867d22d3708b13bf.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 13,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 8",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 146,
+   "h": 141
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf",
+  "scale": 3.0043,
+  "x": 783.0986,
+  "y": 213.0986,
+  "w": 438.6258,
+  "h": 423.6044,
+  "ncc": 0.9826,
+  "ncc_coarse": 0.967,
+  "second": 0.3605,
+  "where": {
+   "page": 15,
+   "xref": 93,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "4c8fa9024573e0417feb0cc5.png",
+   "w": 439,
+   "h": 424
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsnb3g4m00490mpd1v3v3lb8",
+  "url": "/uploads/questions/142457fafc49f90a9bfb014e.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 19,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 8",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 294,
+   "h": 300
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf",
+  "scale": 3.5547,
+  "x": 725.1792,
+  "y": 373.6245,
+  "w": 1045.0752,
+  "h": 1066.4033,
+  "ncc": 0.9688,
+  "ncc_coarse": 0.9331,
+  "second": 0.3739,
+  "where": {
+   "page": 18,
+   "xref": 109,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "8f2d9a5262813feed7742b05.png",
+   "w": 1045,
+   "h": 1066
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsnb3g4v004j0mpdk86h3pmn",
+  "url": "/uploads/questions/eb6d93cfa99112e984e19347.png",
+  "optId": null,
+  "label": null,
+  "ord": 21,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 8",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 619,
+   "h": 714
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf",
+  "scale": 0.9996,
+  "x": 660.9584,
+  "y": 343.9542,
+  "w": 618.7615,
+  "h": 713.7249,
+  "ncc": 1.0,
+  "ncc_coarse": 0.9242,
+  "second": 0.3069,
+  "where": {
+   "page": 19,
+   "xref": 114,
+   "media": null
+  },
+  "status": "skip_native",
+  "new": {
+   "file": "eb6d93cfa99112e984e19347.png",
+   "w": 619,
+   "h": 714
+  },
+  "decision": "keep_native"
+ },
+ {
+  "qid": "cmsojfkra002n18ppgiwi84ht",
+  "url": "/uploads/questions/d11dd8aa37901b099c44ff17.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 10,
+  "module": "Reading & Writing Module 1",
+  "section": "RW",
+  "test": "TEST 8",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 339,
+   "h": 173
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 8/READING AND WRITING/TEST 8 R&W MOD 1 AND 2.pdf",
+  "scale": 2.7206,
+  "x": 430.353,
+  "y": 298.1765,
+  "w": 922.2796,
+  "h": 470.6619,
+  "ncc": 0.9975,
+  "ncc_coarse": 0.9768,
+  "second": 0.6558,
+  "where": {
+   "page": 7,
+   "xref": 41,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "5789e2589ffaad60b9b57332.png",
+   "w": 922,
+   "h": 471
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsojfkrr002x18ppf60070gi",
+  "url": "/uploads/questions/d950f4c0c9bb8fd349e76527.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 11,
+  "module": "Reading & Writing Module 1",
+  "section": "RW",
+  "test": "TEST 8",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 688,
+   "h": 521
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 8/READING AND WRITING/TEST 8 R&W MOD 1 AND 2.pdf",
+  "scale": 1.3866,
+  "x": 408.5296,
+  "y": 270.0905,
+  "w": 954.0032,
+  "h": 722.4355,
+  "ncc": 0.8059,
+  "ncc_coarse": 0.7807,
+  "second": 0.3426,
+  "where": {
+   "page": 8,
+   "xref": 45,
+   "media": null
+  },
+  "status": "needs_review",
+  "new": {
+   "file": "56665ba5845caefd330664fb.png",
+   "w": 954,
+   "h": 722
+  },
+  "decision": "keep_old"
+ },
+ {
+  "qid": "cmsojfkrm002s18ppn4eddu0o",
+  "url": "/uploads/questions/c7a955b1ba654c2d3f3ea594.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 10,
+  "module": "Reading & Writing Module 2",
+  "section": "RW",
+  "test": "TEST 8",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 334,
+   "h": 199
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 8/READING AND WRITING/TEST 8 R&W MOD 1 AND 2.pdf",
+  "scale": 2.2762,
+  "x": 361.9167,
+  "y": 270.8395,
+  "w": 760.2627,
+  "h": 452.9709,
+  "ncc": 0.9978,
+  "ncc_coarse": 0.968,
+  "second": 0.4094,
+  "where": {
+   "page": 27,
+   "xref": 136,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "d4a2ef5f5f09c7ad5034870d.png",
+   "w": 760,
+   "h": 453
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsojfkrv003218pphx1qk2j3",
+  "url": "/uploads/questions/a4fbeb018a128c4054e92d2d.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 11,
+  "module": "Reading & Writing Module 2",
+  "section": "RW",
+  "test": "TEST 8",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 343,
+   "h": 218
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 8/READING AND WRITING/TEST 8 R&W MOD 1 AND 2.pdf",
+  "scale": 2.7616,
+  "x": 430.8882,
+  "y": 369.8945,
+  "w": 947.2297,
+  "h": 602.0294,
+  "ncc": 0.9777,
+  "ncc_coarse": 0.958,
+  "second": 0.3372,
+  "where": {
+   "page": 28,
+   "xref": 140,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "760b3db62b296469811f84be.png",
+   "w": 947,
+   "h": 602
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnvyi00z1qmt1j1x9sal6",
+  "url": "/uploads/questions/95cd77a8552eb10960249a07.png",
+  "optId": null,
+  "label": null,
+  "ord": 1,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 9",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 804,
+   "h": 854
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 9/MATH/TEST 9 MATH MOD 1, 2B.pdf",
+  "scale": 0.9996,
+  "x": 542.948,
+  "y": 262.9457,
+  "w": 803.6902,
+  "h": 853.671,
+  "ncc": 0.9973,
+  "ncc_coarse": 0.9215,
+  "second": 0.1994,
+  "where": {
+   "page": 1,
+   "xref": 9,
+   "media": null
+  },
+  "status": "skip_native",
+  "new": {
+   "file": "ff9f621c5adee9abfe2959a1.png",
+   "w": 804,
+   "h": 854
+  },
+  "decision": "keep_native"
+ },
+ {
+  "qid": "cmsjrnw0g0105qmt1875wgsir",
+  "url": "/uploads/questions/da7f44d2ece84457ad4c1bc4.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 7,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 9",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 300,
+   "h": 68
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 9/MATH/TEST 9 MATH MOD 1, 2B.pdf",
+  "scale": 2.7753,
+  "x": 530.4379,
+  "y": 194.3033,
+  "w": 832.5822,
+  "h": 188.7186,
+  "ncc": 0.9845,
+  "ncc_coarse": 0.9625,
+  "second": 0.7676,
+  "where": {
+   "page": 4,
+   "xref": 27,
+   "media": null
+  },
+  "status": "needs_review",
+  "new": {
+   "file": "cfd97d2e761e04fed38ddeae.png",
+   "w": 833,
+   "h": 189
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnw47010nqmt1p748vpt9",
+  "url": "/uploads/questions/d7ca33552417a5b516338297.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 12,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 9",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 292,
+   "h": 264
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 9/MATH/TEST 9 MATH MOD 1, 2B.pdf",
+  "scale": 2.7879,
+  "x": 558.185,
+  "y": 276.4574,
+  "w": 814.0789,
+  "h": 736.0165,
+  "ncc": 0.9768,
+  "ncc_coarse": 0.8976,
+  "second": 0.2849,
+  "where": {
+   "page": 6,
+   "xref": 38,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "1289d344b3412ad8e8ffed7e.png",
+   "w": 814,
+   "h": 736
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnw4r010rqmt1ygntzggz",
+  "url": "/uploads/questions/5a35019500f7ecdf697b4dc7.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 14,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 9",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 372,
+   "h": 381
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 9/MATH/TEST 9 MATH MOD 1, 2B.pdf",
+  "scale": 1.4215,
+  "x": 680.0239,
+  "y": 205.8669,
+  "w": 528.7878,
+  "h": 541.581,
+  "ncc": 0.9886,
+  "ncc_coarse": 0.8253,
+  "second": 0.4222,
+  "where": {
+   "page": 7,
+   "xref": 43,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "414d5f3703ec4f2a885c5b14.png",
+   "w": 529,
+   "h": 542
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnw5v010xqmt1rmkqr3lc",
+  "url": "/uploads/questions/ca0f52aabdacb946dfa0c630.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 15,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 9",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 156,
+   "h": 205
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 9/MATH/TEST 9 MATH MOD 1, 2B.pdf",
+  "scale": 2.8164,
+  "x": 738.0425,
+  "y": 258.5736,
+  "w": 439.3568,
+  "h": 577.3599,
+  "ncc": 0.9815,
+  "ncc_coarse": 0.9793,
+  "second": 0.4875,
+  "where": {
+   "page": 7,
+   "xref": 44,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "c680ee28ce1f3d5d52a5597f.png",
+   "w": 439,
+   "h": 577
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnw6y0115qmt1n6l2xku6",
+  "url": "/uploads/questions/72a2daa0cf1c57f33618dbde.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 17,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 9",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 300,
+   "h": 166
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 9/MATH/TEST 9 MATH MOD 1, 2B.pdf",
+  "scale": 2.7889,
+  "x": 537.1357,
+  "y": 243.3015,
+  "w": 836.6836,
+  "h": 462.9649,
+  "ncc": 0.9584,
+  "ncc_coarse": 0.7618,
+  "second": 0.4553,
+  "where": {
+   "page": 8,
+   "xref": 49,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "4008954acc863f8dc8745b10.png",
+   "w": 837,
+   "h": 463
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnw7u0119qmt1b5z6rb0r",
+  "url": "/uploads/questions/772cd25ff740ddc7c40a1d12.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 19,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 9",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 245,
+   "h": 246
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 9/MATH/TEST 9 MATH MOD 1, 2B.pdf",
+  "scale": 2.8022,
+  "x": 615.691,
+  "y": 296.0866,
+  "w": 686.5306,
+  "h": 689.3327,
+  "ncc": 0.9747,
+  "ncc_coarse": 0.9393,
+  "second": 0.4151,
+  "where": {
+   "page": 9,
+   "xref": 55,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "b6540ed581432087a6b86648.png",
+   "w": 687,
+   "h": 689
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnw88011bqmt1xskeplzv",
+  "url": "/uploads/questions/b6b1e564a282f8b0d3ef4cb6.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 20,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 9",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 227,
+   "h": 234
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 9/MATH/TEST 9 MATH MOD 1, 2B.pdf",
+  "scale": 2.8022,
+  "x": 635.2845,
+  "y": 282.2845,
+  "w": 636.0916,
+  "h": 655.7068,
+  "ncc": 0.9749,
+  "ncc_coarse": 0.8802,
+  "second": 0.3605,
+  "where": {
+   "page": 10,
+   "xref": 59,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "a362cb20ee0d6860057bb4c0.png",
+   "w": 636,
+   "h": 656
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnw8l011dqmt1owbpkau5",
+  "url": "/uploads/questions/41ed29941f28c0ded9594324.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 21,
+  "module": "Math Module 1",
+  "section": "MATH",
+  "test": "TEST 9",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 285,
+   "h": 297
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 9/MATH/TEST 9 MATH MOD 1, 2B.pdf",
+  "scale": 2.8022,
+  "x": 569.3061,
+  "y": 304.1083,
+  "w": 798.6172,
+  "h": 832.2432,
+  "ncc": 0.9606,
+  "ncc_coarse": 0.9085,
+  "second": 0.3903,
+  "where": {
+   "page": 10,
+   "xref": 60,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "5509bf3cc13f01d0166b7092.png",
+   "w": 799,
+   "h": 832
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnvzb00zmqmt1ah3ghqxc",
+  "url": "/uploads/questions/1af0bf51af5ef79305ef1f9a.jpg",
+  "optId": "opt_773843b2-5c5d-4887-a73d-8525861875da",
+  "label": "A",
+  "ord": 3,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 9",
+  "field": "QuestionOption.imageUrl",
+  "old": {
+   "w": 356,
+   "h": 351
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 9/MATH/TEST 9 MATH MOD 1, 2B.pdf",
+  "scale": 1.4282,
+  "x": 1559.1209,
+  "y": 433.1209,
+  "w": 508.443,
+  "h": 501.3019,
+  "ncc": 0.985,
+  "ncc_coarse": 0.9783,
+  "second": 0.6782,
+  "where": {
+   "page": 12,
+   "xref": 72,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "df3755e70ce86342bbfa8c55.png",
+   "w": 508,
+   "h": 501
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnvzb00zmqmt1ah3ghqxc",
+  "url": "/uploads/questions/b531619a22617f5f10e46d8f.jpg",
+  "optId": "opt_5b6b85c8-1ffd-4759-89c6-02b8905d3610",
+  "label": "B",
+  "ord": 3,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 9",
+  "field": "QuestionOption.imageUrl",
+  "old": {
+   "w": 349,
+   "h": 326
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 9/MATH/TEST 9 MATH MOD 1, 2B.pdf",
+  "scale": 1.4282,
+  "x": 1581.1209,
+  "y": 1049.8362,
+  "w": 498.4455,
+  "h": 465.5967,
+  "ncc": 0.9743,
+  "ncc_coarse": 0.9795,
+  "second": 0.7192,
+  "where": {
+   "page": 12,
+   "xref": 72,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "6456582c31ba7343a83f86c5.png",
+   "w": 498,
+   "h": 466
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnvzb00zmqmt1ah3ghqxc",
+  "url": "/uploads/questions/86a04dd03c75b3b604550ca8.jpg",
+  "optId": "opt_03508cea-8583-4e29-9fd9-feb034a930c7",
+  "label": "C",
+  "ord": 3,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 9",
+  "field": "QuestionOption.imageUrl",
+  "old": {
+   "w": 352,
+   "h": 342
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 9/MATH/TEST 9 MATH MOD 1, 2B.pdf",
+  "scale": 1.4355,
+  "x": 1581.5631,
+  "y": 310.1276,
+  "w": 505.2821,
+  "h": 490.9275,
+  "ncc": 0.9829,
+  "ncc_coarse": 0.9803,
+  "second": 0.756,
+  "where": {
+   "page": 13,
+   "xref": 76,
+   "media": null
+  },
+  "status": "needs_review",
+  "new": {
+   "file": "a4d73acd2b3129f13cc428c3.png",
+   "w": 505,
+   "h": 491
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnvzb00zmqmt1ah3ghqxc",
+  "url": "/uploads/questions/2f8f573cbc1ef9576e22017c.jpg",
+  "optId": "opt_b01521be-0db6-4e55-8ebc-dc000c0a90b6",
+  "label": "D",
+  "ord": 3,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 9",
+  "field": "QuestionOption.imageUrl",
+  "old": {
+   "w": 349,
+   "h": 356
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 9/MATH/TEST 9 MATH MOD 1, 2B.pdf",
+  "scale": 1.4427,
+  "x": 1580.6772,
+  "y": 905.0053,
+  "w": 503.5059,
+  "h": 513.6049,
+  "ncc": 0.9711,
+  "ncc_coarse": 0.9723,
+  "second": 0.6541,
+  "where": {
+   "page": 13,
+   "xref": 76,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "d09b52abe2e1ffd9f03c1fbf.png",
+   "w": 504,
+   "h": 514
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnvzm00zsqmt1zrot3nj8",
+  "url": "/uploads/questions/2b0b2c0bd81dbf7a8cf97212.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 4,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 9",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 223,
+   "h": 231
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 9/MATH/TEST 9 MATH MOD 1, 2B.pdf",
+  "scale": 2.8591,
+  "x": 651.7853,
+  "y": 251.7853,
+  "w": 637.5709,
+  "h": 660.4434,
+  "ncc": 0.9835,
+  "ncc_coarse": 0.9729,
+  "second": 0.4763,
+  "where": {
+   "page": 13,
+   "xref": 77,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "7aa367f1bd48cc0d5a2ef18a.png",
+   "w": 638,
+   "h": 660
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnw090104qmt1g7ge6fle",
+  "url": "/uploads/questions/a4ce3b29885313ad39512372.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 6,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 9",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 270,
+   "h": 224
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 9/MATH/TEST 9 MATH MOD 1, 2B.pdf",
+  "scale": 2.8306,
+  "x": 590.547,
+  "y": 288.7327,
+  "w": 764.2658,
+  "h": 634.0575,
+  "ncc": 0.9761,
+  "ncc_coarse": 0.9497,
+  "second": 0.3523,
+  "where": {
+   "page": 14,
+   "xref": 82,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "f38bc02056b1dead04bdb922.png",
+   "w": 764,
+   "h": 634
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnw4o010qqmt15p9zquem",
+  "url": "/uploads/questions/e74c96984cb9202a07704d52.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 13,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 9",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 167,
+   "h": 92
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 9/MATH/TEST 9 MATH MOD 1, 2B.pdf",
+  "scale": 2.8306,
+  "x": 728.2572,
+  "y": 190.1204,
+  "w": 472.7125,
+  "h": 260.4165,
+  "ncc": 0.9761,
+  "ncc_coarse": 0.9688,
+  "second": 0.4271,
+  "where": {
+   "page": 17,
+   "xref": 99,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "284c08c5bf170bd601df4bdb.png",
+   "w": 473,
+   "h": 260
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnw4w010wqmt1lxiguftt",
+  "url": "/uploads/questions/1f8200194587eda6c05451e4.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 14,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 9",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 287,
+   "h": 187
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 9/MATH/TEST 9 MATH MOD 1, 2B.pdf",
+  "scale": 2.8306,
+  "x": 547.0389,
+  "y": 237.749,
+  "w": 812.3862,
+  "h": 529.3248,
+  "ncc": 0.9981,
+  "ncc_coarse": 0.9972,
+  "second": 0.5438,
+  "where": {
+   "page": 17,
+   "xref": 100,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "a67b90acf6700c2d7ccffd63.png",
+   "w": 812,
+   "h": 529
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrnw80011aqmt1ujrd01x3",
+  "url": "/uploads/questions/5ca237f0d68b047efaab2db0.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 19,
+  "module": "Math Module 2",
+  "section": "MATH",
+  "test": "TEST 9",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 283,
+   "h": 239
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 9/MATH/TEST 9 MATH MOD 1, 2B.pdf",
+  "scale": 2.8306,
+  "x": 554.0389,
+  "y": 268.3939,
+  "w": 801.0638,
+  "h": 676.5167,
+  "ncc": 0.9858,
+  "ncc_coarse": 0.9732,
+  "second": 0.3354,
+  "where": {
+   "page": 19,
+   "xref": 111,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "eb9da3d49aed9be8b7e23904.png",
+   "w": 801,
+   "h": 677
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrny0701rrqmt1am7guns9",
+  "url": "/uploads/questions/08c5b537ee5ddc3a8e8e53bc.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 10,
+  "module": "Reading & Writing Module 1",
+  "section": "RW",
+  "test": "TEST 9",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 334,
+   "h": 171
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf",
+  "scale": 2.7753,
+  "x": 442.539,
+  "y": 380.1571,
+  "w": 926.9415,
+  "h": 474.5719,
+  "ncc": 0.9696,
+  "ncc_coarse": 0.9522,
+  "second": 0.2739,
+  "where": {
+   "page": 7,
+   "xref": 42,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "1763b88b8ce1f31a0250b737.png",
+   "w": 927,
+   "h": 475
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrny0j01ryqmt1k6kl94mk",
+  "url": "/uploads/questions/4115bf0ff184f7bef4cb5b4d.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 11,
+  "module": "Reading & Writing Module 2",
+  "section": "RW",
+  "test": "TEST 9",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 338,
+   "h": 145
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf",
+  "scale": 2.7616,
+  "x": 452.0801,
+  "y": 361.7553,
+  "w": 933.4217,
+  "h": 400.4324,
+  "ncc": 0.984,
+  "ncc_coarse": 0.9484,
+  "second": 0.3969,
+  "where": {
+   "page": 26,
+   "xref": 140,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "984202ee344a884e82ead981.png",
+   "w": 933,
+   "h": 400
+  },
+  "decision": "apply"
+ },
+ {
+  "qid": "cmsjrny2o01s4qmt152hy9n2j",
+  "url": "/uploads/questions/d572c19261379f8bdbd5bdd7.jpg",
+  "optId": null,
+  "label": null,
+  "ord": 12,
+  "module": "Reading & Writing Module 2",
+  "section": "RW",
+  "test": "TEST 9",
+  "field": "Question.imageUrl",
+  "old": {
+   "w": 340,
+   "h": 150
+  },
+  "source": "files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf",
+  "scale": 2.7343,
+  "x": 428.3843,
+  "y": 334.0908,
+  "w": 929.6485,
+  "h": 410.139,
+  "ncc": 0.9706,
+  "ncc_coarse": 0.9672,
+  "second": 0.3665,
+  "where": {
+   "page": 27,
+   "xref": 145,
+   "media": null
+  },
+  "status": "ok",
+  "new": {
+   "file": "ea2b767f873b415a9f86ca5b.png",
+   "w": 930,
+   "h": 410
+  },
+  "decision": "apply"
+ }
+]
