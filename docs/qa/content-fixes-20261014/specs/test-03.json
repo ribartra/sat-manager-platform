@@ -1,0 +1,172 @@
+[
+  {
+    "table": "Question",
+    "id": "cmsjrnvhd00ubqmt1oy49iejm",
+    "field": "stimulus",
+    "before": "Plants contain many chemicals that can attract or repel pests. Scientists at Michigan State University have manipulated the phytochemical diversity of 16 genotypes of tomatoes and measured the response of a common caterpillar, the cabbage looper. The researchers found that plants with different chemical properties could be grouped to slow or discourage caterpillar feeding altogether. For example, some plants were biologically toxic, causing the caterpillars to move on to a different plant. Therefore, the chemical diversity between the plants determined whether caterpillars were deterred or encouraged. It can be concluded from the findings of this study _____ Waterfalls come in many shapes. One classic form is the punchbowl, such as the one at Eagle Falls in Oregon. In such a _____ water flows down a narrow chute into a wide pool at the bottom. It is easy to swim in the tranquil waters at the base. Elizabeth Catlett, _____ artwork is modernist with African and Mexican influences, was a leading figure in portraying images related to race, gender, and class as they were experienced by Black Americans in the twentieth century.",
+    "after": "Plants contain many chemicals that can attract or repel pests. Scientists at Michigan State University have manipulated the phytochemical diversity of 16 genotypes of tomatoes and measured the response of a common caterpillar, the cabbage looper. The researchers found that plants with different chemical properties could be grouped to slow or discourage caterpillar feeding altogether. For example, some plants were biologically toxic, causing the caterpillars to move on to a different plant. Therefore, the chemical diversity between the plants determined whether caterpillars were deterred or encouraged. It can be concluded from the findings of this study _____",
+    "note": "T3 R&W M1 #14: bleed — stimulus had the passages of #15 (Waterfalls) and #16 (Elizabeth Catlett) appended; trimmed to its own passage",
+    "class": "bleed",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 3/READING AND WRITING/INNOV test 3 R&W mod. 1 and 2B.pdf p7 (image + IngestPageArtifact): three separate passage/question panels 14,15,16; #15/#16 stimuli already hold those passages"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnvhw00uxqmt1p3eubmrm",
+    "field": "stimulus",
+    "before": "____ massive stones erected around 2500 BCE—is one of the most famous Neolithic monuments in the world, though it was constructed on a circular site made of timber and pounded earth that had been built about 500 years earlier. American author and inspirational ____ has shared his optimistic outlook with audiences around the world. His unusual approach to leadership is founded in cultural anthropology rather than in business. Jin Au-Yeung, known professionally as MC Jin, is an American rap artist of Chinese descent. His big musical break came when he lasted 7 rounds in a freestyle rap ____ The owners of record label Ruff Ryders Entertainment were watching and signed MC Jin as soon as the competition was finished.",
+    "after": "____ massive stones erected around 2500 BCE—is one of the most famous Neolithic monuments in the world, though it was constructed on a circular site made of timber and pounded earth that had been built about 500 years earlier.",
+    "note": "T3 R&W M1 #17: bleed — stimulus had the passages of #18 (Simon Sinek) and #19 (MC Jin) appended; trimmed to the Stonehenge passage",
+    "class": "bleed",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 3/READING AND WRITING/INNOV test 3 R&W mod. 1 and 2B.pdf p8 (image + OCR): three separate panels 17,18,19"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnvif00vrqmt1oy7f0n6o",
+    "field": "stimulus",
+    "before": "The nomadic herders of ancient Mongolia have long been a subject of fascination for anthropologists and historians. A recent genetic analysis by a team of molecular anthropologists, led by population geneticist Chuan-Chao Wang of Xiamen University in China, _____ the best look yet at the herders' genetic history. Employers are increasingly prioritizing diversity, equity, and inclusion, as well as offering flexible work arrangements. To a greater degree than many more costly programs, these simple measures can increase employee engagement, which _____ important for retaining experienced staff. Onions produce a chemical irritant known as syn-Propanethial-S-oxide, which stimulates the _____ and causes them to release tears.",
+    "after": "The nomadic herders of ancient Mongolia have long been a subject of fascination for anthropologists and historians. A recent genetic analysis by a team of molecular anthropologists, led by population geneticist Chuan-Chao Wang of Xiamen University in China, _____ the best look yet at the herders' genetic history.",
+    "note": "T3 R&W M1 #20: bleed — stimulus had the passages of #21 (Employers) and #22 (Onions) appended; trimmed to the Mongolia passage",
+    "class": "bleed",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 3/READING AND WRITING/INNOV test 3 R&W mod. 1 and 2B.pdf p9 (image + OCR): three separate panels 20,21,22"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnvii00vsqmt1jzc25dsp",
+    "field": "stimulus",
+    "before": "in an effort to retain good employees. Dividing one full-time job between two employees _____ a company to recruit talented workers who do not have the time or inclination to work 40 hours every week.",
+    "after": "Many organizations are turning to a policy called “job sharing” in an effort to retain good employees. Dividing one full-time job between two employees _____ a company to recruit talented workers who do not have the time or inclination to work 40 hours every week.",
+    "note": "T3 R&W M2 #20: bleed — stimulus lost its opening clause (it had bled into #19 option D and was removed there); restore \"Many organizations are turning to a policy called “job sharing”\"",
+    "class": "bleed",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 3/READING AND WRITING/INNOV test 3 R&W mod. 1 and 2B.pdf p26 OCR: \"Many organizations are turning to a policy called “job sharing” in an effort to retain good employees...\" (+ image)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnvj700w4qmt1rfg1dcx6",
+    "field": "stimulus",
+    "before": "For Several international organizations monitor the position of space debris larger than 10 centimeters across to ensure safe space travel. _____, such efforts are not sufficient, as there are about twenty times as many smaller objects that are moving at speeds fast enough to damage even a heavily protected spacecraft.",
+    "after": "Several international organizations monitor the position of space debris larger than 10 centimeters across to ensure safe space travel. _____, such efforts are not sufficient, as there are about twenty times as many smaller objects that are moving at speeds fast enough to damage even a heavily protected spacecraft.",
+    "note": "T3 R&W M2 #24: bleed — leading \"For \" bled from #23 option A (\"Literature for\"); passage starts \"Several international organizations\"",
+    "class": "bleed",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 3/READING AND WRITING/INNOV test 3 R&W mod. 1 and 2B.pdf p28 image + OCR"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnvg700tjqmt1xgwffl5s",
+    "field": "stimulus",
+    "before": "Chromosomes were unknown in 1834 when Gregor Mendel proposed his classic concept of heredity. In the late 1880s, scientists finally could stain cell structures with the clarity to identify chromosomes. Walter Sutton and Theodor Boveri, in 1902 and 1903 respectively, independently published papers suggesting that genes—which determine the physical characteristics of offspring—were located within chromosomes, a concept later referred to as the \"chromosome theory of inheritance.\" Prior to Sutton's and Boveri's research, the scientific community was relatively undecided on where genes reside. Thomas Hunt Morgan was originally skeptical of the Sutton–Boveri chromosome theory of inheritance. However, he noticed some unusual trends while conducting experiments on fruit flies. Through observing the fruit flies' eye color over countless generations, he eventually concluded that the eye color gene is passed down through the X chromosome, not the Y chromosome, meaning that eye color is connected to sex chromosomes. Morgan later won the 1933 Nobel Prize in Physiology or Medicine for his discovery.",
+    "after": "Text 1\n\nChromosomes were unknown in 1834 when Gregor Mendel proposed his classic concept of heredity. In the late 1880s, scientists finally could stain cell structures with the clarity to identify chromosomes. Walter Sutton and Theodor Boveri, in 1902 and 1903 respectively, independently published papers suggesting that genes—which determine the physical characteristics of offspring—were located within chromosomes, a concept later referred to as the \"chromosome theory of inheritance.\" Prior to Sutton's and Boveri's research, the scientific community was relatively undecided on where genes reside.\n\nText 2\n\nThomas Hunt Morgan was originally skeptical of the Sutton–Boveri chromosome theory of inheritance. However, he noticed some unusual trends while conducting experiments on fruit flies. Through observing the fruit flies' eye color over countless generations, he eventually concluded that the eye color gene is passed down through the X chromosome, not the Y chromosome, meaning that eye color is connected to sex chromosomes. Morgan later won the 1933 Nobel Prize in Physiology or Medicine for his discovery.",
+    "note": "T3 R&W M2 #9: other — paired passage merged into one paragraph without the \"Text 1\"/\"Text 2\" labels the stem refers to; restore labels",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 3/READING AND WRITING/INNOV test 3 R&W mod. 1 and 2B.pdf p18 image + OCR (\"# **Text 1**\" / \"# **Text 2**\" headings)"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "opt_44a1e8ec-5a13-4c1a-8f7c-a5467df7c914",
+    "field": "text",
+    "before": "By pointing out that the theory is flawed because his research contradicts it.",
+    "after": "By pointing out that the theory of inheritance is flawed because his own research contradicts Sutton's and Boveri's claims.",
+    "note": "T3 R&W M2 #9: other — option B truncated/paraphrased; restore full source text",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 3/READING AND WRITING/INNOV test 3 R&W mod. 1 and 2B.pdf p18 image + OCR"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "opt_6c83cf98-f818-426e-99cb-1bed6d7835b7",
+    "field": "text",
+    "before": "By asserting that the chromosome theory is a rudimentary view.",
+    "after": "By asserting that the chromosome theory of inheritance is a rudimentary view of how genes are passed down.",
+    "note": "T3 R&W M2 #9: other — option C truncated/paraphrased; restore full source text",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 3/READING AND WRITING/INNOV test 3 R&W mod. 1 and 2B.pdf p18 image + OCR"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "opt_35ecdce4-369d-4480-b46f-b787626417c0",
+    "field": "text",
+    "before": "It outlines values the narrator endorses.",
+    "after": "It outlines a set of values that the narrator endorses in the subsequent sentence.",
+    "note": "T3 R&W M1 #6: other — option B truncated/paraphrased; restore full source text",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 3/READING AND WRITING/INNOV test 3 R&W mod. 1 and 2B.pdf p3 image + OCR"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "opt_ffd23148-58c1-4760-9d7a-9ee196db5192",
+    "field": "text",
+    "before": "It summarizes the remarks of characters mentioned in the previous sentence.",
+    "after": "It summarizes the remarks of the characters mentioned in the previous sentence.",
+    "note": "T3 R&W M1 #6: other — option C missing word \"the\"; restore source text",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 3/READING AND WRITING/INNOV test 3 R&W mod. 1 and 2B.pdf p3 image + OCR"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "opt_4f810777-b8a3-45ce-8729-a995d8bcf47a",
+    "field": "text",
+    "before": "The Harts are in a state of disorder.",
+    "after": "The Harts are in a state of disorder in advance of the party.",
+    "note": "T3 R&W M1 #8: other — option C truncated; restore full source text",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 3/READING AND WRITING/INNOV test 3 R&W mod. 1 and 2B.pdf p4 image + OCR"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "opt_cd8267de-8957-44ec-a40d-772f3fe7023c",
+    "field": "text",
+    "before": "The Harts hope the neighborhood will be more accepting.",
+    "after": "The Harts hope that the neighborhood will be more accepting in the future.",
+    "note": "T3 R&W M1 #8: other — option D truncated; restore full source text",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 3/READING AND WRITING/INNOV test 3 R&W mod. 1 and 2B.pdf p4 image + OCR"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "opt_015c9422-bb89-4f49-ac62-81ae907ab18c",
+    "field": "text",
+    "before": "students should not decide on a major until their junior year.",
+    "after": "students should not decide on a major until their junior year, since they are likely to change degrees within the first couple of years.",
+    "note": "T3 R&W M2 #15: other — option B truncated; restore full source text",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 3/READING AND WRITING/INNOV test 3 R&W mod. 1 and 2B.pdf p24 image + OCR"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "opt_64908f38-8e1f-4af9-bd8d-089776a9a7b4",
+    "field": "text",
+    "before": "Will pass with more than 50%, but exact % cannot be predicted.",
+    "after": "The ballot measure will pass with more than 50% of the vote, but the exact percentage cannot be predicted.",
+    "note": "T3 Math M1 #16: other — option A abbreviated; restore full source text",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 3/MATH/Test 3 REV Math modules 1&2(A and B).pdf p6 image + OCR"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "opt_c6ef1a16-779f-419a-9d3d-862e83affff8",
+    "field": "text",
+    "before": "At least 51% will vote yes.",
+    "after": "The percentage who will vote yes is at least 51%.",
+    "note": "T3 Math M1 #16: other — option B abbreviated; restore full source text",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 3/MATH/Test 3 REV Math modules 1&2(A and B).pdf p6 image + OCR"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "opt_a9cb2ebc-a88e-434f-8ef7-855dac1556f8",
+    "field": "text",
+    "before": "'No' votes between 45.7% and 47.9%.",
+    "after": "The percentage of \"No\" votes expected is between 45.7% and 47.9%.",
+    "note": "T3 Math M1 #16: other — option C abbreviated; restore full source text",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 3/MATH/Test 3 REV Math modules 1&2(A and B).pdf p6 image + OCR"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrntx500caqmt1bpt36vtp",
+    "field": "stem",
+    "before": "If sin(C*) = 0.454 and cos(63*) = 0.454, what is the value of C, in degrees?",
+    "after": "If sin(C°) = 0.454 and cos(63°) = 0.454, what is the value of C, in degrees?",
+    "note": "T3 Math M1 #20: other — degree sign OCR-ed as \"*\"; restore \"°\"",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 3/MATH/Test 3 REV Math modules 1&2(A and B).pdf p7 image (sin(C°), cos(63°))"
+  }
+]

@@ -36,6 +36,7 @@ export type ContentPart = MathToken | { kind: "prose"; segments: ProseSegment[] 
  */
 function isProseDollarBody(body: string): boolean {
   if (/[\\^_{}]/.test(body)) return false; // LaTeX markup → real math
+  if (/^\d[\d,.]*\s/.test(body) && /\s$/.test(body)) return true; // "$25 (Week 1: $200" → two prices, not math
   if (!/\s/.test(body)) return false; // no spaces → math token
   return (body.match(/[A-Za-z]{3,}/g) || []).length >= 2; // ≥2 real words → prose/currency
 }
@@ -195,17 +196,30 @@ function isStandaloneDisplay(parts: string[], index: number): boolean {
 
 export function tokenizeMathContent(content: string): ContentPart[] {
   const parts = String(content ?? "").split(MATH_TOKEN_PATTERN).filter((part) => part.length > 0);
-  return parts.map((part, index) => {
+  const maths = parts.map((part, index) => {
     const math = parseMathToken(part);
-    if (math) {
-      if (math.displayMode && !isStandaloneDisplay(parts, index)) {
-        // Inline, but keep display-size fractions/roots.
-        return { ...math, displayMode: false, math: `\\displaystyle ${math.math.trim()}` };
-      }
-      return normalizeMathToken(math);
+    if (math?.displayMode && !isStandaloneDisplay(parts, index)) {
+      // Inline, but keep display-size fractions/roots.
+      return { ...math, displayMode: false, math: `\\displaystyle ${math.math.trim()}` };
     }
-    return { kind: "prose" as const, segments: parseProseSegments(part) };
+    return math && normalizeMathToken(math);
   });
+  const isBlock = (index: number) => Boolean(maths[index]?.displayMode);
+  const result: ContentPart[] = [];
+  parts.forEach((part, index) => {
+    const math = maths[index];
+    if (math) {
+      result.push(math);
+      return;
+    }
+    // A display block already starts its own line: the blank lines around it would add an empty
+    // line on top of the formula's margin (big gaps between "$$…$$\n\n$$…$$" equations).
+    let prose = part;
+    if (isBlock(index - 1)) prose = prose.replace(/^[ \t]*\n\s*/, "");
+    if (isBlock(index + 1)) prose = prose.replace(/\s*\n[ \t]*$/, "");
+    if (prose) result.push({ kind: "prose", segments: parseProseSegments(prose) });
+  });
+  return result;
 }
 
 /**
