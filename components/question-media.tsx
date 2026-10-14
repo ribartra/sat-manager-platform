@@ -14,7 +14,8 @@ export function QuestionMedia({ imageUrl, alt = "Question image", className = ""
       <img
         src={imageUrl}
         alt={alt}
-        className="max-h-96 w-full rounded-md border border-gray-200 object-contain"
+        // Natural size, never upscaled: rendered width = min(image width, container width).
+        className="block h-auto max-w-full rounded-md border border-gray-200"
       />
     </a>
   );
