@@ -4,6 +4,7 @@ import { BLOCKED_SURFACE, SETTLED_RESULT } from "@/components/ui/control-states"
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { MathContent } from "@/components/math-content";
+import { OptionContent } from "@/components/option-content";
 import { MathToolPanel } from "@/components/math-tool-panel";
 import { QuestionMedia } from "@/components/question-media";
 import { Button } from "@/components/ui/button";
@@ -23,7 +24,7 @@ import { notify } from "@/lib/notify-ui";
 import { useConfirm } from "@/components/sat/confirm-dialog";
 import { formatCorrectAnswer, isAnswerCorrect } from "@/lib/answer-grading";
 import type { CheckResult } from "@/lib/immediate-check";
-import { questionResponseLabel, resolveQuestionType } from "@/lib/question-type";
+import { questionResponseLabel, resolveQuestionType, isAnswerOption } from "@/lib/question-type";
 import { Alert, InlineError } from "@/components/sat/alert";
 import { KeyboardShortcutsHint, PlayerShortcuts } from "@/components/sat/keyboard-shortcuts-hint";
 
@@ -422,7 +423,7 @@ export function PracticeSetPlayer({
         onChoose={(label) => handleAnswer(question.id, label)}
         choiceLabels={
           responseType === "MC" && !checked[question.id]
-            ? question.options.filter((opt) => opt.text.trim()).map((opt) => opt.label)
+            ? question.options.filter(isAnswerOption).map((opt) => opt.label)
             : []
         }
       />
@@ -518,7 +519,7 @@ export function PracticeSetPlayer({
 
           {responseType === "MC" ? (
             <div className="space-y-2">
-              {question.options.filter((opt) => opt.text.trim()).map((opt) => {
+              {question.options.filter(isAnswerOption).map((opt) => {
                 const isEliminated = eliminated[question.id]?.has(opt.label);
                 const checkResult = checked[question.id];
                 const selected = answers[question.id] === opt.label;
@@ -560,7 +561,7 @@ export function PracticeSetPlayer({
                     {opt.label}
                   </span>
                   <span className="min-w-0 flex-1">
-                    <MathContent content={opt.text} className="text-base leading-snug text-gray-800 md:text-[1.05rem]" />
+                    <OptionContent text={opt.text} imageUrl={opt.imageUrl} label={opt.label} className="text-base leading-snug text-gray-800 md:text-[1.05rem]" />
                   </span>
                 </button>
                 <button

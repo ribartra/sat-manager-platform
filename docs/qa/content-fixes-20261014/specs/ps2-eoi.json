@@ -1,0 +1,242 @@
+[
+  {
+    "table": "Question",
+    "id": "cmsjro6ky060oqmt1kdnevgni",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes:\nThe Azores is a group of islands about 870 miles off the coast of Portugal.\nHistorians have long believed that in the fifteenth century Portuguese mariners were the first humans to populate the Azores.\nA 2015 study coauthored by Sofia Gabriel and Maria da Luz Mathias found that Vikings from Scandinavia may have populated the Azores\nas early as the ninth century.\nThe researchers found a genetic connection between house mice in the Azores and house mice in Scandinavia.\nHouse mice may have traveled from Scandinavia to the Azores on Viking ships.",
+    "after": "While researching a topic, a student has taken the following notes:\nThe Azores is a group of islands about 870 miles off the coast of Portugal.\nHistorians have long believed that in the fifteenth century Portuguese mariners were the first humans to populate the Azores.\nA 2015 study coauthored by Sofia Gabriel and Maria da Luz Mathias found that Vikings from Scandinavia may have populated the Azores as early as the ninth century.\nThe researchers found a genetic connection between house mice in the Azores and house mice in Scandinavia.\nHouse mice may have traveled from Scandinavia to the Azores on Viking ships.",
+    "class": "notes_bullets",
+    "note": "PS Rhetorical Synthesis EASY #7: notes_bullets — note lines hard-wrapped mid-sentence (a wrapped note reads as an extra note); joined each wrapped note onto one line, text identical",
+    "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Easy/Ans Student Notes Easy.pdf p7 (Question ID 296801d2); exercise PDF files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Easy/Student Notes Easy.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjro6l7060yqmt1n6f00lqf",
+    "field": "stem",
+    "before": "The student wants to identify the setting of Cather’s novel My Ántonia.Which choice most effectively uses relevant information from the notes to\naccomplish this goal?",
+    "after": "The student wants to identify the setting of Cather’s novel My Ántonia. Which choice most effectively uses relevant information from the notes to\naccomplish this goal?",
+    "class": "glued_words",
+    "note": "PS Rhetorical Synthesis EASY #9: glued_words — missing space between the goal sentence and the question (“My Ántonia. Which choice…”)",
+    "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Easy/Ans Student Notes Easy.pdf p9 (Question ID 00460c13); exercise PDF files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Easy/Student Notes Easy.pdf"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "cmsjro6lb0614qmt150y9hyov",
+    "field": "text",
+    "before": "Mansourasaurus, a new species discovered in Egypt in 2013, livedapproximately 80 million years ago.",
+    "after": "Mansourasaurus, a new species discovered in Egypt in 2013, lived approximately 80 million years ago.",
+    "class": "glued_words",
+    "note": "PS Rhetorical Synthesis EASY #10 option A: glued_words — option A glued “livedapproximately”",
+    "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Easy/Ans Student Notes Easy.pdf p10 (Question ID f4b63a04); exercise PDF files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Easy/Student Notes Easy.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjro68005q9qmt1og2zc1rq",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes:\nSome powerful works of literature have so influenced readers that new legislation has been passed as a result.\nThe Interesting Narrativeof the Life of Olaudah Equiano (1789) is the autobiography of a man who endured slavery on both sides of the\nAtlantic.\nEquiano’s book contributed to the passage of the Slave Trade Act of 1807.\nThe Jungle (1906) is a fictional work by Upton Sinclair that describes unsanitary conditions in US meatpacking plants.\nSinclair’s book contributed to the passage of the Pure Food and Drug Act in 1906.",
+    "after": "While researching a topic, a student has taken the following notes:\nSome powerful works of literature have so influenced readers that new legislation has been passed as a result.\nThe Interesting Narrative of the Life of Olaudah Equiano (1789) is the autobiography of a man who endured slavery on both sides of the Atlantic.\nEquiano’s book contributed to the passage of the Slave Trade Act of 1807.\nThe Jungle (1906) is a fictional work by Upton Sinclair that describes unsanitary conditions in US meatpacking plants.\nSinclair’s book contributed to the passage of the Pure Food and Drug Act in 1906.",
+    "class": "notes_bullets+glued_words",
+    "note": "PS Rhetorical Synthesis HARD #2: notes_bullets + glued_words — note lines hard-wrapped mid-sentence (a wrapped note reads as an extra note); joined each wrapped note onto one line, text identical; title glued “Narrativeof”",
+    "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Hard/ANS SN Hard.pdf p2 (Question ID 6c9df5d1); exercise PDF files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Hard/SN Hard.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjro68805qjqmt14hby1a52",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes:\nDigital Light Synthesis (DLS) is a form of additive manufacturing that utilizes light to rapidly cure liquid resin into high-quality, 3D objects.\nStep 1: Ultraviolet (UV) light images are projected up into a pool of liquid resin, where the object’s first layer takes shape.\nStep 2: The partially cured resin object is raised, leaving a thin space (a “dead zone”) beneath it for oxygen and liquid resin to flow\nthrough.\nStep 3: The UV light passes through the dead zone—maintaining the flow of resin—and partially cures additional layers of the object.\nStep 4: When the resin object is complete, it is baked in an oven to complete the curing.",
+    "after": "While researching a topic, a student has taken the following notes:\nDigital Light Synthesis (DLS) is a form of additive manufacturing that utilizes light to rapidly cure liquid resin into high-quality, 3D objects.\nStep 1: Ultraviolet (UV) light images are projected up into a pool of liquid resin, where the object’s first layer takes shape.\nStep 2: The partially cured resin object is raised, leaving a thin space (a “dead zone”) beneath it for oxygen and liquid resin to flow through.\nStep 3: The UV light passes through the dead zone—maintaining the flow of resin—and partially cures additional layers of the object.\nStep 4: When the resin object is complete, it is baked in an oven to complete the curing.",
+    "class": "notes_bullets",
+    "note": "PS Rhetorical Synthesis HARD #4: notes_bullets — note lines hard-wrapped mid-sentence (a wrapped note reads as an extra note); joined each wrapped note onto one line, text identical",
+    "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Hard/ANS SN Hard.pdf p4 (Question ID b07a7634); exercise PDF files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Hard/SN Hard.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjro68c05qoqmt1je3zltfp",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes:\nBritish scholar Robert Plot described fossilized dinosaur bones in his 1676 book The Natural History of Oxfordshire.\nPlot earned a reputation for being the first person to have discovered dinosaur remains.\nIn 1990, archaeologists in Lesotho, in southern Africa, discovered a fossilized phalanx of a Massospondylus carinatus dinosaur in a cave\nonce inhabited by humans.\nIndigenous Khoesan and Basotho peoples had inhabited the cave beginning around 1100 CE.\nAccording to paleontologist Julien Benoit, these peoples may have found the phalanx and brought it to the cave centuries before Plot’s\ndescriptions.",
+    "after": "While researching a topic, a student has taken the following notes:\nBritish scholar Robert Plot described fossilized dinosaur bones in his 1676 book The Natural History of Oxfordshire.\nPlot earned a reputation for being the first person to have discovered dinosaur remains.\nIn 1990, archaeologists in Lesotho, in southern Africa, discovered a fossilized phalanx of a Massospondylus carinatus dinosaur in a cave once inhabited by humans.\nIndigenous Khoesan and Basotho peoples had inhabited the cave beginning around 1100 CE.\nAccording to paleontologist Julien Benoit, these peoples may have found the phalanx and brought it to the cave centuries before Plot’s descriptions.",
+    "class": "notes_bullets",
+    "note": "PS Rhetorical Synthesis HARD #5: notes_bullets — note lines hard-wrapped mid-sentence (a wrapped note reads as an extra note); joined each wrapped note onto one line, text identical",
+    "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Hard/ANS SN Hard.pdf p5 (Question ID 3fa48bf3); exercise PDF files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Hard/SN Hard.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjro68g05qtqmt1gk9r3q2a",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes:\nOne of history’s greatest libraries was the House of Wisdom in Baghdad, Iraq.\nIt was founded in the eighth century with the goal of preserving all the world’s knowledge.\nScholars at the House of Wisdom collected ancient and contemporary texts from Greece, India, and elsewhere and translated them into\nArabic.\nWritings included those of the Greek philosopher Aristotle and the Indian mathematician Aryabhata.\nThe House of Wisdom used Chinese papermaking technology to create paper versions to be studied and shared.",
+    "after": "While researching a topic, a student has taken the following notes:\nOne of history’s greatest libraries was the House of Wisdom in Baghdad, Iraq.\nIt was founded in the eighth century with the goal of preserving all the world’s knowledge.\nScholars at the House of Wisdom collected ancient and contemporary texts from Greece, India, and elsewhere and translated them into Arabic.\nWritings included those of the Greek philosopher Aristotle and the Indian mathematician Aryabhata.\nThe House of Wisdom used Chinese papermaking technology to create paper versions to be studied and shared.",
+    "class": "notes_bullets",
+    "note": "PS Rhetorical Synthesis HARD #6: notes_bullets — note lines hard-wrapped mid-sentence (a wrapped note reads as an extra note); joined each wrapped note onto one line, text identical",
+    "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Hard/ANS SN Hard.pdf p6 (Question ID 8fe4f4ab); exercise PDF files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Hard/SN Hard.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjro68k05qyqmt1msw8ln5p",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes:\nTwo opposing theories of vision divided scholars for many centuries.\nThe ancient Greek mathematician Euclid (circa 300 BCE) supported the extramission theory.\nThis theory held that the eyes emit a form of radiation that illuminates objects in its range.\nThe ancient Greek philosopher Aristotle (384–322 BCE) supported the intromission theory.\nThis theory held that objects emit a form of radiation that reaches the eyes.\nIn the eleventh century, Arab mathematician Ibn al-Haytham (965–1040 CE) largely settled the debate with the first conclusive\nexperiments supporting intromission.",
+    "after": "While researching a topic, a student has taken the following notes:\nTwo opposing theories of vision divided scholars for many centuries.\nThe ancient Greek mathematician Euclid (circa 300 BCE) supported the extramission theory.\nThis theory held that the eyes emit a form of radiation that illuminates objects in its range.\nThe ancient Greek philosopher Aristotle (384–322 BCE) supported the intromission theory.\nThis theory held that objects emit a form of radiation that reaches the eyes.\nIn the eleventh century, Arab mathematician Ibn al-Haytham (965–1040 CE) largely settled the debate with the first conclusive experiments supporting intromission.",
+    "class": "notes_bullets",
+    "note": "PS Rhetorical Synthesis HARD #7: notes_bullets — note lines hard-wrapped mid-sentence (a wrapped note reads as an extra note); joined each wrapped note onto one line, text identical",
+    "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Hard/ANS SN Hard.pdf p7 (Question ID 964c6055); exercise PDF files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Hard/SN Hard.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjro68y05riqmt10quvi2n8",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes:\nThe popular wood-wide web theory posits that trees can communicate and exchange resources with one another via common\nmycorrhizal networks (CMNs) of fungi.\nEcologist Dr. Suzanne Simard first suggested this theory in 1997.\nShe described trees as “super-cooperators.”\nIn the 2022 study “The Decay of the Wood-Wide Web?,” mycologist Dr. Justine Karst and colleagues evaluated dozens of CMN studies.\nThey write that CMNs “have captured the interest of broad audiences. We are concerned, however, that recent claims about CMNs in\nforests are disconnected from evidence.”",
+    "after": "While researching a topic, a student has taken the following notes:\nThe popular wood-wide web theory posits that trees can communicate and exchange resources with one another via common mycorrhizal networks (CMNs) of fungi.\nEcologist Dr. Suzanne Simard first suggested this theory in 1997.\nShe described trees as “super-cooperators.”\nIn the 2022 study “The Decay of the Wood-Wide Web?,” mycologist Dr. Justine Karst and colleagues evaluated dozens of CMN studies.\nThey write that CMNs “have captured the interest of broad audiences. We are concerned, however, that recent claims about CMNs in forests are disconnected from evidence.”",
+    "class": "notes_bullets",
+    "note": "PS Rhetorical Synthesis HARD #11: notes_bullets — note lines hard-wrapped mid-sentence (a wrapped note reads as an extra note); joined each wrapped note onto one line, text identical",
+    "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Hard/ANS SN Hard.pdf p11 (Question ID fdd9a360); exercise PDF files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Hard/SN Hard.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjro69105rnqmt1d795cbd9",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes:\nA thermal inversion is a phenomenon where a layer of atmosphere is warmer than the layer beneath it.\nIn 2022, a team of researchers studied the presence of thermal inversions in twenty-five gas giants.\nGas giants are planets largely composed of helium and hydrogen.\nThe team found that gas giants featuring a thermal inversion were also likely to contain heat-absorbing metals.\nOne explanation for this relationship is that these metals may reside in a planet’s upper atmosphere, where their absorbed heat causes\nan increase in temperature.",
+    "after": "While researching a topic, a student has taken the following notes:\nA thermal inversion is a phenomenon where a layer of atmosphere is warmer than the layer beneath it.\nIn 2022, a team of researchers studied the presence of thermal inversions in twenty-five gas giants.\nGas giants are planets largely composed of helium and hydrogen.\nThe team found that gas giants featuring a thermal inversion were also likely to contain heat-absorbing metals.\nOne explanation for this relationship is that these metals may reside in a planet’s upper atmosphere, where their absorbed heat causes an increase in temperature.",
+    "class": "notes_bullets",
+    "note": "PS Rhetorical Synthesis HARD #12: notes_bullets — note lines hard-wrapped mid-sentence (a wrapped note reads as an extra note); joined each wrapped note onto one line, text identical",
+    "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Hard/ANS SN Hard.pdf p12 (Question ID 10cd0327); exercise PDF files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Hard/SN Hard.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjro69605rsqmt1nxq6d0h1",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes:\nArchaeologist Jon Erlandson and colleagues argue that humans first arrived in the Americas by sea.\nThey propose that humans traveled between Pacific Ocean islands and coastlines from northeast Asia to the Americas.\nMany of these islands and coastal zones were later submerged as glaciers melted and sea levels rose.\nThe researchers think that “a coastal route, including kelp forests and estuaries, would have provided a rich mix of marine, estuarine,\nriverine, and terrestrial resources” such as seaweeds, fish, and birds.\nThis proposed scenario is known as the kelp highway hypothesis.",
+    "after": "While researching a topic, a student has taken the following notes:\nArchaeologist Jon Erlandson and colleagues argue that humans first arrived in the Americas by sea.\nThey propose that humans traveled between Pacific Ocean islands and coastlines from northeast Asia to the Americas.\nMany of these islands and coastal zones were later submerged as glaciers melted and sea levels rose.\nThe researchers think that “a coastal route, including kelp forests and estuaries, would have provided a rich mix of marine, estuarine, riverine, and terrestrial resources” such as seaweeds, fish, and birds.\nThis proposed scenario is known as the kelp highway hypothesis.",
+    "class": "notes_bullets",
+    "note": "PS Rhetorical Synthesis HARD #13: notes_bullets — note lines hard-wrapped mid-sentence (a wrapped note reads as an extra note); joined each wrapped note onto one line, text identical",
+    "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Hard/ANS SN Hard.pdf p13 (Question ID 5b8b69a2); exercise PDF files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Hard/SN Hard.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjro69f05s2qmt1s5fs40x4",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes:\nNissologists are scientists who study islands.\nSome nissologists define an island as any piece of land surrounded by water.\nUsing that definition, they determined that Sweden has 221,000 islands.\nOther nissologists define an island as being 1 kilometer square, a certain distance from the mainland, and having at least 50 permanent\nresidents.\nUsing that definition, they determined that Sweden has 24 islands.",
+    "after": "While researching a topic, a student has taken the following notes:\nNissologists are scientists who study islands.\nSome nissologists define an island as any piece of land surrounded by water.\nUsing that definition, they determined that Sweden has 221,000 islands.\nOther nissologists define an island as being 1 kilometer square, a certain distance from the mainland, and having at least 50 permanent residents.\nUsing that definition, they determined that Sweden has 24 islands.",
+    "class": "notes_bullets",
+    "note": "PS Rhetorical Synthesis HARD #15: notes_bullets — note lines hard-wrapped mid-sentence (a wrapped note reads as an extra note); joined each wrapped note onto one line, text identical",
+    "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Hard/ANS SN Hard.pdf p15 (Question ID 3dcc7140); exercise PDF files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Hard/SN Hard.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjro69n05scqmt12ft2maig",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes:\nIn a 2023 study, environmental scientist Jazmin Locke-Rodriguez and colleagues tested the use of floating treatment wetlands (FTWs) in\nFlorida.\nFTWs are artificial floating platforms of plants used to remediate polluted or nutrient-imbalanced water.\nFinding: FTWs using marigold flowers removed 52% more total phosphorus than the control.\nFinding: The test yielded 65 market-quality blooms per square meter.\nThe authors concluded marigolds showed “promising potential as a commercially viable remediating crop cultivated on FTWs in South\nFlorida.”",
+    "after": "While researching a topic, a student has taken the following notes:\nIn a 2023 study, environmental scientist Jazmin Locke-Rodriguez and colleagues tested the use of floating treatment wetlands (FTWs) in Florida.\nFTWs are artificial floating platforms of plants used to remediate polluted or nutrient-imbalanced water.\nFinding: FTWs using marigold flowers removed 52% more total phosphorus than the control.\nFinding: The test yielded 65 market-quality blooms per square meter.\nThe authors concluded marigolds showed “promising potential as a commercially viable remediating crop cultivated on FTWs in South Florida.”",
+    "class": "notes_bullets",
+    "note": "PS Rhetorical Synthesis HARD #17: notes_bullets — note lines hard-wrapped mid-sentence (a wrapped note reads as an extra note); joined each wrapped note onto one line, text identical",
+    "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Hard/ANS SN Hard.pdf p17 (Question ID 5645f119); exercise PDF files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Hard/SN Hard.pdf"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "cmsjro69n05sdqmt1vut5e8of",
+    "field": "text",
+    "before": "The authors concluded that marigolds grown on FTWs were “commercially viable,” having produced 65 blooms per square meter of market- quality blooms in a 2023 study.",
+    "after": "The authors concluded that marigolds grown on FTWs were “commercially viable,” having produced 65 blooms per square meter of market-quality blooms in a 2023 study.",
+    "class": "glued_words",
+    "note": "PS Rhetorical Synthesis HARD #17 option A: glued_words — line-break hyphen left as “market- quality”",
+    "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Hard/ANS SN Hard.pdf p17 (Question ID 5645f119); exercise PDF files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Hard/SN Hard.pdf"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "cmsjro69r05skqmt1iyuiswud",
+    "field": "text",
+    "before": "The NCAI’s advocacy was key to the passing of Public Law 96-638, legislation formally acknowledging Indigenous tribes’ right to self- governance.",
+    "after": "The NCAI’s advocacy was key to the passing of Public Law 96-638, legislation formally acknowledging Indigenous tribes’ right to self-governance.",
+    "class": "glued_words",
+    "note": "PS Rhetorical Synthesis HARD #18 option C: glued_words — line-break hyphen left as “self- governance”",
+    "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Hard/ANS SN Hard.pdf p18 (Question ID 87d34a39); exercise PDF files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Hard/SN Hard.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjro6ad05t1qmt1flx6uew4",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes:\nOrganisms release cellular material into their environment by shedding substances such as hair or skin.\nThe DNA in these substances is known as environmental DNA, or eDNA.\nResearchers collect and analyze eDNA to detect the presence of species that are difficult to observe.\nGeneticist Sara Oyler-McCance’s research team analyzed eDNA in water samples from the Florida Everglades to detect invasive\nconstrictor snake species in the area.\nThe study determined a 91% probability of detecting Burmese python eDNA in a given location.",
+    "after": "While researching a topic, a student has taken the following notes:\nOrganisms release cellular material into their environment by shedding substances such as hair or skin.\nThe DNA in these substances is known as environmental DNA, or eDNA.\nResearchers collect and analyze eDNA to detect the presence of species that are difficult to observe.\nGeneticist Sara Oyler-McCance’s research team analyzed eDNA in water samples from the Florida Everglades to detect invasive constrictor snake species in the area.\nThe study determined a 91% probability of detecting Burmese python eDNA in a given location.",
+    "class": "notes_bullets",
+    "note": "PS Rhetorical Synthesis MEDIUM #1: notes_bullets — note lines hard-wrapped mid-sentence (a wrapped note reads as an extra note); joined each wrapped note onto one line, text identical",
+    "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Medium/ANS SN Medium.pdf p1 (Question ID b46e0c8a); exercise PDF files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Medium/SN Medium.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjro6b205tqqmt1iqniqqfd",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes:\nIn 2018 researchers Adwait Deshpande, Shreejata Gupta, and Anindya Sinha were observing wild macaques in India’s Bandipur National\nPark.\nThey saw macaques calling out to and gesturing at humans who were eating or carrying food.\nThey designed a study to find out if the macaques were intentionally communicating to try to persuade the humans to share their food.\nIn the study trials, macaques frequently called out to and gestured at humans holding food.\nIn the study trials, macaques called out to and gestured at empty-handed humans less frequently.",
+    "after": "While researching a topic, a student has taken the following notes:\nIn 2018 researchers Adwait Deshpande, Shreejata Gupta, and Anindya Sinha were observing wild macaques in India’s Bandipur National Park.\nThey saw macaques calling out to and gesturing at humans who were eating or carrying food.\nThey designed a study to find out if the macaques were intentionally communicating to try to persuade the humans to share their food.\nIn the study trials, macaques frequently called out to and gestured at humans holding food.\nIn the study trials, macaques called out to and gestured at empty-handed humans less frequently.",
+    "class": "notes_bullets",
+    "note": "PS Rhetorical Synthesis MEDIUM #6: notes_bullets — note lines hard-wrapped mid-sentence (a wrapped note reads as an extra note); joined each wrapped note onto one line, text identical",
+    "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Medium/ANS SN Medium.pdf p6 (Question ID 6249b173); exercise PDF files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Medium/SN Medium.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjro6bu05ufqmt1e8b01q4i",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes:\nTexture analysis and historical analysis are two approaches to art criticism.\nTexture analysis examines how surfaces are visually represented in an artwork.\nSuch an analysis of Giorgione’s Youth Holding an Arrow might consider how the painting’s blended colors make the subject’s skin appear\nsmooth in texture.\nHistorical analysis considers the historical context in which a work was created.\nSuch an analysis of Diego Velázquez’s Las Meninas might consider how the painting’s depiction of the artist with King Philip IV\nsymbolizes art’s historical ties to power.",
+    "after": "While researching a topic, a student has taken the following notes:\nTexture analysis and historical analysis are two approaches to art criticism.\nTexture analysis examines how surfaces are visually represented in an artwork.\nSuch an analysis of Giorgione’s Youth Holding an Arrow might consider how the painting’s blended colors make the subject’s skin appear smooth in texture.\nHistorical analysis considers the historical context in which a work was created.\nSuch an analysis of Diego Velázquez’s Las Meninas might consider how the painting’s depiction of the artist with King Philip IV symbolizes art’s historical ties to power.",
+    "class": "notes_bullets",
+    "note": "PS Rhetorical Synthesis MEDIUM #11: notes_bullets — note lines hard-wrapped mid-sentence (a wrapped note reads as an extra note); joined each wrapped note onto one line, text identical",
+    "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Medium/ANS SN Medium.pdf p11 (Question ID 85c0c0f0); exercise PDF files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Medium/SN Medium.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjro6c305upqmt15euzg8rc",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes:\nSome US reformers sought to improve society in the 1800s by building utopias.\nA utopia is a community intended to represent a perfect society based on a specific set of principles.\nOne such community was Brook Farm near Boston, Massachusetts.\nIt was founded in 1841 by writer George Ripley.\nRipley wrote in a letter that his goal for Brook Farm was “to guarantee the highest mental freedom, by providing all with labor, adapted to\ntheir tastes and talents, and securing to them the fruits of their industry.”",
+    "after": "While researching a topic, a student has taken the following notes:\nSome US reformers sought to improve society in the 1800s by building utopias.\nA utopia is a community intended to represent a perfect society based on a specific set of principles.\nOne such community was Brook Farm near Boston, Massachusetts.\nIt was founded in 1841 by writer George Ripley.\nRipley wrote in a letter that his goal for Brook Farm was “to guarantee the highest mental freedom, by providing all with labor, adapted to their tastes and talents, and securing to them the fruits of their industry.”",
+    "class": "notes_bullets",
+    "note": "PS Rhetorical Synthesis MEDIUM #13: notes_bullets — note lines hard-wrapped mid-sentence (a wrapped note reads as an extra note); joined each wrapped note onto one line, text identical",
+    "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Medium/ANS SN Medium.pdf p13 (Question ID bce57278); exercise PDF files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Medium/SN Medium.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjro6ca05uzqmt18lsl5g55",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes:\nIn the early 1960s, the US had a strict national-origins quota system for immigrants.\nThe number of new immigrants allowed from a country each year was based on how many people from that country lived in the US in\n1890.\nThis system favored immigrants from northern Europe.\nAlmost 70% of slots were reserved for immigrants from Great Britain, Ireland, and Germany.\nThe 1965 Hart-Celler Act abolished the national-origins quota system.",
+    "after": "While researching a topic, a student has taken the following notes:\nIn the early 1960s, the US had a strict national-origins quota system for immigrants.\nThe number of new immigrants allowed from a country each year was based on how many people from that country lived in the US in 1890.\nThis system favored immigrants from northern Europe.\nAlmost 70% of slots were reserved for immigrants from Great Britain, Ireland, and Germany.\nThe 1965 Hart-Celler Act abolished the national-origins quota system.",
+    "class": "notes_bullets",
+    "note": "PS Rhetorical Synthesis MEDIUM #15: notes_bullets — note lines hard-wrapped mid-sentence (a wrapped note reads as an extra note); joined each wrapped note onto one line, text identical",
+    "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Medium/ANS SN Medium.pdf p15 (Question ID 5d3177aa); exercise PDF files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Medium/SN Medium.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjro6fn05voqmt1xjw9hwd8",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes:\nGenerally, an object will heat up when twisted.\nThe twisting of an object is known as torsion.\nA 2019 study led by Zunfeng Liu and Ray Baughman tested the torsional heating of various fibers.\nWhen a 3-millimeter-thick sample of thermoplastic polyurethane (TPU) fiber was twisted, its average surface temperature increased by\n6°C.\nWhen a 4-millimeter-thick sample of styrene-ethylene-butylene-styrene (SEBS) rubber fiber was twisted, its average surface temperature\nincreased by 3.5°C.",
+    "after": "While researching a topic, a student has taken the following notes:\nGenerally, an object will heat up when twisted.\nThe twisting of an object is known as torsion.\nA 2019 study led by Zunfeng Liu and Ray Baughman tested the torsional heating of various fibers.\nWhen a 3-millimeter-thick sample of thermoplastic polyurethane (TPU) fiber was twisted, its average surface temperature increased by 6°C.\nWhen a 4-millimeter-thick sample of styrene-ethylene-butylene-styrene (SEBS) rubber fiber was twisted, its average surface temperature increased by 3.5°C.",
+    "class": "notes_bullets",
+    "note": "PS Rhetorical Synthesis MEDIUM #20: notes_bullets — note lines hard-wrapped mid-sentence (a wrapped note reads as an extra note); joined each wrapped note onto one line, text identical",
+    "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Medium/ANS SN Medium.pdf p20 (Question ID 25755def); exercise PDF files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Medium/SN Medium.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjro6fz05vyqmt1sh8p1o8q",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes:\nCecilia Vicuña is a multidisciplinary artist.\nIn 1971, her first solo art exhibition, Pinturas, poemas y explicaciones, was shown at the Museo Nacional de Bellas Artes in Santiago,\nChile.\nHer poetry collection Precario/Precarious was published in 1983 by Tanam Press.\nHer poetry collection Instan was published in 2002 by Kelsey St. Press.\nShe lives part time in Chile, where she was born, and part time in New York.",
+    "after": "While researching a topic, a student has taken the following notes:\nCecilia Vicuña is a multidisciplinary artist.\nIn 1971, her first solo art exhibition, Pinturas, poemas y explicaciones, was shown at the Museo Nacional de Bellas Artes in Santiago, Chile.\nHer poetry collection Precario/Precarious was published in 1983 by Tanam Press.\nHer poetry collection Instan was published in 2002 by Kelsey St. Press.\nShe lives part time in Chile, where she was born, and part time in New York.",
+    "class": "notes_bullets",
+    "note": "PS Rhetorical Synthesis MEDIUM #22: notes_bullets — note lines hard-wrapped mid-sentence (a wrapped note reads as an extra note); joined each wrapped note onto one line, text identical",
+    "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Medium/ANS SN Medium.pdf p22 (Question ID a1ca7ec4); exercise PDF files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Medium/SN Medium.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjro6gn05wiqmt1w4q9hgbl",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes:\nThe Pueblo of Zuni is located about 150 miles west of Albuquerque, New Mexico.\nIt is the traditional home of the A:shiwi (Zuni) people.\nThe A:shiwi A:wan Museum and Heritage Center was established by tribal members in 1992.\nIts mission is stated on its website: “As a tribal museum and heritage center for the Zuni people and by the Zuni people we work to\nprovide learning experiences that emphasize A:shiwi ways of knowing, as well as exploring modern concepts of knowledge and the\ntransfer of knowledge.”",
+    "after": "While researching a topic, a student has taken the following notes:\nThe Pueblo of Zuni is located about 150 miles west of Albuquerque, New Mexico.\nIt is the traditional home of the A:shiwi (Zuni) people.\nThe A:shiwi A:wan Museum and Heritage Center was established by tribal members in 1992.\nIts mission is stated on its website: “As a tribal museum and heritage center for the Zuni people and by the Zuni people we work to provide learning experiences that emphasize A:shiwi ways of knowing, as well as exploring modern concepts of knowledge and the transfer of knowledge.”",
+    "class": "notes_bullets",
+    "note": "PS Rhetorical Synthesis MEDIUM #26: notes_bullets — note lines hard-wrapped mid-sentence (a wrapped note reads as an extra note); joined each wrapped note onto one line, text identical",
+    "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Medium/ANS SN Medium.pdf p26 (Question ID ed80971c); exercise PDF files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Student Notes/SN Medium/SN Medium.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjro64b05p3qmt1vniw6igl",
+    "field": "stem",
+    "before": "A 2017 study of sign language learners tested the role of iconicity—the similarity of a sign to the thing it represents—in language acquisition. The\nstudy found that thegreater the iconicity of a sign, the more likely it was to have been learned. ______ the correlation between acquisition and\niconicity was lower than that between acquisition and another factor studied: sign frequency.\nWhich choice completes the text with the most logical transition?",
+    "after": "A 2017 study of sign language learners tested the role of iconicity—the similarity of a sign to the thing it represents—in language acquisition. The\nstudy found that the greater the iconicity of a sign, the more likely it was to have been learned. ______ the correlation between acquisition and\niconicity was lower than that between acquisition and another factor studied: sign frequency.\nWhich choice completes the text with the most logical transition?",
+    "class": "glued_words",
+    "note": "PS Transitions HARD #9: glued_words — glued “thegreater”",
+    "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Transitions/Transitions Hard/ANS Transitions Hard.pdf p9 (Question ID 176edca6); exercise PDF files_to_load/PRACTICE EXERCISES/EXERCISES WRITING/Transitions/Transitions Hard/Transitions Hard.pdf"
+  }
+]

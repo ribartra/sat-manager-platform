@@ -31,7 +31,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
     where: { practiceSetId: attempt.practiceSetId, questionId },
     select: {
       question: {
-        select: { type: true, correctAnswer: true, explanation: true, options: { select: { label: true, text: true } } },
+        select: { type: true, correctAnswer: true, explanation: true, options: { select: { label: true, text: true, imageUrl: true } } },
       },
     },
   }));

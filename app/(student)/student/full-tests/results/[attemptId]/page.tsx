@@ -5,11 +5,12 @@ import { notFound, redirect } from "next/navigation";
 import { parseEliminatedOptions } from "@/lib/answer-review-meta";
 import { formatDuration, formatTime, scorePercent } from "@/lib/utils";
 import { MathContent } from "@/components/math-content";
+import { OptionContent } from "@/components/option-content";
 import { QuestionMedia } from "@/components/question-media";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, MinusCircle, XCircle } from "lucide-react";
-import { resolveQuestionType } from "@/lib/question-type";
+import { resolveQuestionType, isAnswerOption } from "@/lib/question-type";
 import { formatCorrectAnswer } from "@/lib/answer-grading";
 import { difficultyBadgeVariant } from "@/lib/domain-meta";
 import { difficultyFromFullTestModuleKey, moduleKeyFromOrder } from "@/lib/full-test-modules";
@@ -159,7 +160,7 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
 
                         {responseType === "MC" && (
                           <div className="mb-3 space-y-1">
-                            {options.filter((opt) => opt.text.trim()).map((opt) => {
+                            {options.filter(isAnswerOption).map((opt) => {
                               const studentPick = answer?.answer === opt.label;
                               const isRight = question.correctAnswer === opt.label;
                               const optionClass = isRight
@@ -170,7 +171,7 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
                               return (
                                 <div key={opt.label} className={`flex items-start gap-2 rounded px-2 py-1 text-sm ${optionClass}`}>
                                   <span className="w-4 font-medium">{opt.label})</span>
-                                  <span className="min-w-0 flex-1"><MathContent content={opt.text} /></span>
+                                  <span className="min-w-0 flex-1"><OptionContent text={opt.text} imageUrl={opt.imageUrl} label={opt.label} /></span>
                                 </div>
                               );
                             })}

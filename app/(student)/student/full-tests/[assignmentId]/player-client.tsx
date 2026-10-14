@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { MathContent } from "@/components/math-content";
+import { OptionContent } from "@/components/option-content";
 import { MathToolPanel } from "@/components/math-tool-panel";
 import { QuestionMedia } from "@/components/question-media";
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,7 @@ import { formatTime, cn } from "@/lib/utils";
 import type { CalculatorConfig } from "@/lib/calculator-config";
 import type { GraphArtifact } from "@/lib/question-graph";
 import type { FullTestProgressState, FullTestTimerPhase } from "@/lib/full-test-progress";
-import { questionResponseLabel, resolveQuestionType } from "@/lib/question-type";
+import { questionResponseLabel, resolveQuestionType, isAnswerOption } from "@/lib/question-type";
 import { LoadingState, OfflineBanner, SaveIndicator, type SaveStatus } from "@/components/sat";
 import { exitPlayerOnAuthLoss, isAuthFailureStatus } from "@/lib/player-session-exit";
 import { fetchWithTransientRetry } from "@/lib/transient-fetch";
@@ -808,7 +809,7 @@ export function FullTestPlayer({
             enabled={showCalculator && currentModule.section === "MATH"}
           />
           {responseType === "MC" ? (
-            question.options.filter((option) => option.text.trim()).map((option) => {
+            question.options.filter(isAnswerOption).map((option) => {
               const selected = answers[question.id] === option.label;
               const isEliminated = eliminated[question.id]?.has(option.label) ?? false;
               return (
@@ -834,7 +835,7 @@ export function FullTestPlayer({
                       {option.label}
                     </span>
                     <span className="min-w-0 flex-1">
-                      <MathContent content={option.text} className="leading-snug text-gray-800" />
+                      <OptionContent text={option.text} imageUrl={option.imageUrl} label={option.label} className="leading-snug text-gray-800" />
                     </span>
                   </button>
                   <button

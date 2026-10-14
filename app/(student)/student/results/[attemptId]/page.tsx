@@ -9,11 +9,12 @@ import { scoreBandTextClass } from "@/lib/score-band";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { MathContent } from "@/components/math-content";
+import { OptionContent } from "@/components/option-content";
 import { QuestionMedia } from "@/components/question-media";
 import { CheckCircle, XCircle, MinusCircle, ChevronLeft, RotateCcw } from "lucide-react";
 import { parseSnapshot, PracticeSetSnapshot, QuestionSnapshot } from "@/lib/attempt-snapshots";
 import { formatCorrectAnswer } from "@/lib/answer-grading";
-import { resolveQuestionType } from "@/lib/question-type";
+import { resolveQuestionType, isAnswerOption } from "@/lib/question-type";
 import { difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
 import { isAnsweredAnswer, summarizeAllQuestionAnswers } from "@/lib/weighted-score";
 import { Alert } from "@/components/sat/alert";
@@ -231,7 +232,7 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
 
                   {responseType === "MC" && (
                     <div className="space-y-1 mb-3">
-                      {options.filter((opt) => opt.text.trim()).map((opt) => {
+                      {options.filter(isAnswerOption).map((opt) => {
                         const studentPick = ans.answer === opt.label;
                         const isRight = canRevealSolutions && question.correctAnswer === opt.label;
                         const optionClass = isRight
@@ -245,7 +246,7 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
                           <div key={opt.label} className={`flex items-start gap-2 text-sm px-2 py-1 rounded ${optionClass}`}>
                             <span className="font-medium w-4">{opt.label})</span>
                             <span className="min-w-0 flex-1">
-                              <MathContent content={opt.text} />
+                              <OptionContent text={opt.text} imageUrl={opt.imageUrl} label={opt.label} />
                             </span>
                           </div>
             );

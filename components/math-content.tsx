@@ -54,18 +54,22 @@ export function MathContent({ content, className }: MathContentProps) {
           return <span key={index}>{renderInline(block.content, `b${index}`)}</span>;
         }
         // Pipe tables from ingested sources (data tables in R&W and Math): real cells so text wraps.
+        // An all-blank header row means the source table has no header (e.g. step-by-step work tables).
+        const hasHeader = block.header.some((cell) => cell.trim());
         return (
           <div key={index} className="my-3 overflow-x-auto whitespace-normal">
             <table className="w-full border-collapse text-[0.92em] leading-snug">
-              <thead>
-                <tr>
-                  {block.header.map((cell, cellIndex) => (
-                    <th key={cellIndex} scope="col" className="border border-gray-300 bg-gray-50 px-2 py-1.5 text-left align-bottom font-semibold">
-                      {renderInline(cell, `b${index}h${cellIndex}`)}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
+              {hasHeader && (
+                <thead>
+                  <tr>
+                    {block.header.map((cell, cellIndex) => (
+                      <th key={cellIndex} scope="col" className="border border-gray-300 bg-gray-50 px-2 py-1.5 text-left align-bottom font-semibold">
+                        {renderInline(cell, `b${index}h${cellIndex}`)}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+              )}
               <tbody>
                 {block.rows.map((row, rowIndex) => (
                   <tr key={rowIndex}>

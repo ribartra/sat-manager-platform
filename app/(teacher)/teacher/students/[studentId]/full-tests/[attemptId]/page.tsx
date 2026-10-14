@@ -5,6 +5,7 @@ import { AttemptStatusBadge, InvalidatedNotice, PageShell, VoidableValue } from 
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MathContent } from "@/components/math-content";
+import { OptionContent } from "@/components/option-content";
 import { QuestionMedia } from "@/components/question-media";
 import prisma from "@/lib/prisma";
 import { fullTestModulesForAttempt } from "@/lib/full-test-snapshot";
@@ -14,7 +15,7 @@ import { teacherProgramEnrollmentScope } from "@/lib/program-scope";
 import { formatDate, formatDuration, formatTime, scorePercent } from "@/lib/utils";
 import { InfoHint } from "@/components/hint";
 import { formatCorrectAnswer } from "@/lib/answer-grading";
-import { resolveQuestionType } from "@/lib/question-type";
+import { resolveQuestionType, isAnswerOption } from "@/lib/question-type";
 import { parseEliminatedOptions } from "@/lib/answer-review-meta";
 import { difficultyBadgeVariant } from "@/lib/domain-meta";
 import { difficultyFromFullTestModuleKey, moduleKeyFromOrder } from "@/lib/full-test-modules";
@@ -203,7 +204,7 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
                       <QuestionMedia imageUrl={question.imageUrl} alt={`Question ${index + 1} image`} className="mb-3" />
                       {responseType === "MC" ? (
                         <div className="mb-3 space-y-1">
-                          {question.options.filter((opt) => opt.text.trim()).map((opt) => {
+                          {question.options.filter(isAnswerOption).map((opt) => {
                             const picked = answer?.answer === opt.label;
                             const right = question.correctAnswer === opt.label;
                             return (
@@ -214,7 +215,7 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
                                 } ${eliminated.includes(opt.label) ? "line-through opacity-70" : ""}`}
                               >
                                 <span className="w-4 font-medium">{opt.label})</span>
-                                <span className="min-w-0 flex-1"><MathContent content={opt.text} /></span>
+                                <span className="min-w-0 flex-1"><OptionContent text={opt.text} imageUrl={opt.imageUrl} label={opt.label} /></span>
                               </div>
                             );
                           })}

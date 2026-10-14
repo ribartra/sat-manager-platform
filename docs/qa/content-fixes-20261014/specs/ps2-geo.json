@@ -1,0 +1,182 @@
+[
+ {
+  "table": "Question",
+  "id": "cmsjrnzxe02e1qmt1yeq5hv36",
+  "field": "explanation",
+  "before": "Choice A is correct. It’s given that the volume of a right rectangular prism is . The prism shown has a length of 6 cm, a width of 2 cm, and a\nheight of 3 cm. Thus, , or 36 cubic centimeters.\nChoice B is incorrect. This is the volume of a rectangular prism with edge lengths of 6, 2, and 2. Choice C is incorrect and may result from only\nfinding the product of the length and width of the base of the prism. Choice D is incorrect and may result from finding the sum, not the product,\nof the edge lengths of the prism.",
+  "after": "Choice A is correct. It’s given that the volume of a right rectangular prism is $\\ell wh$. The prism shown has a length of 6 cm, a width of 2 cm, and a\nheight of 3 cm. Thus, $\\ell wh = (6)(2)(3)$, or 36 cubic centimeters.\nChoice B is incorrect. This is the volume of a rectangular prism with edge lengths of 6, 2, and 2. Choice C is incorrect and may result from only\nfinding the product of the length and width of the base of the prism. Choice D is incorrect and may result from finding the sum, not the product,\nof the edge lengths of the prism.",
+  "class": "stripped_math",
+  "note": "restored V = ℓwh formula and (6)(2)(3) product",
+  "evidence": "ANS Area and Volume Easy.pdf p2 (Question ID d683a9cc); rendered page read at 110 dpi"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzxo02ebqmt17jl6uxl7",
+  "field": "stem",
+  "before": "Triangle ABC and triangle DEF are similar triangles, where and are corresponding sides. If and the perimeter of triangle\nABC is 20, what is the perimeter of triangle DEF ?",
+  "after": "Triangle ABC and triangle DEF are similar triangles, where $\\overline{AB}$ and $\\overline{DE}$ are corresponding sides. If $DE = 2AB$ and the perimeter of triangle\nABC is 20, what is the perimeter of triangle DEF ?",
+  "class": "stripped_math",
+  "note": "restored segment names and DE = 2AB in stem",
+  "evidence": "ANS Area and Volume Easy.pdf p4 (Question ID 0837c3b9); rendered page read at 110 dpi"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzxo02ebqmt17jl6uxl7",
+  "field": "explanation",
+  "before": "Choice B is correct. Since triangles ABC and DEF are similar and , the length of each side of triangle DEF is two times the length of\nits corresponding side in triangle ABC. Therefore, the perimeter of triangle DEF is two times the perimeter of triangle ABC. Since the perimeter of\ntriangle ABC is 20, the perimeter of triangle DEF is 40.\nChoice A is incorrect. This is half, not two times, the perimeter of triangle ABC. Choice C is incorrect. This is two times the perimeter of triangle\nDEF rather than two times the perimeter of triangle ABC. Choice D is incorrect. This is six times, not two times, the perimeter of triangle ABC.",
+  "after": "Choice B is correct. Since triangles ABC and DEF are similar and $DE = 2AB$, the length of each side of triangle DEF is two times the length of\nits corresponding side in triangle ABC. Therefore, the perimeter of triangle DEF is two times the perimeter of triangle ABC. Since the perimeter of\ntriangle ABC is 20, the perimeter of triangle DEF is 40.\nChoice A is incorrect. This is half, not two times, the perimeter of triangle ABC. Choice C is incorrect. This is two times the perimeter of triangle\nDEF rather than two times the perimeter of triangle ABC. Choice D is incorrect. This is six times, not two times, the perimeter of triangle ABC.",
+  "class": "stripped_math",
+  "note": "restored DE = 2AB",
+  "evidence": "ANS Area and Volume Easy.pdf p4 (Question ID 0837c3b9); rendered page read at 110 dpi"
+ },
+ {
+  "table": "Question",
+  "id": "cmsp5xn8500000vo0g76v9z25",
+  "field": "explanation",
+  "before": "Choice D is correct. The surface area is found by summing the area of each face. A right rectangular prism consists of three pairs of congruent rectangles, so the surface area is found by multiplying the areas of three adjacent rectangles by 2 and adding these products. For this prism, the surface area is equal to , or , which is equal to 148. Choice A is incorrect. This is the area of one of the",
+  "after": "Choice D is correct. The surface area is found by summing the area of each face. A right rectangular prism consists of three pairs of congruent rectangles, so the surface area is found by multiplying the areas of three adjacent rectangles by 2 and adding these products. For this prism, the surface area is equal to $2(4 \\cdot 5) + 2(5 \\cdot 6) + 2(4 \\cdot 6)$, or $2(20) + 2(30) + 2(24)$, which is equal to 148. Choice A is incorrect. This is the area of one of the faces of the prism. Choice B is incorrect and may result from adding the areas of three adjacent rectangles without multiplying by 2. Choice C is incorrect. This is the volume, in cubic inches, of the prism.",
+  "class": "stripped_math+explanation_truncated",
+  "note": "restored surface-area sums and the cut tail (rest of Choice A + Choices B, C)",
+  "evidence": "ANS Area and Volume HARD.pdf p10 (Question ID f7e626b2); rendered page read at 110 dpi"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro04y02h0qmt1751fydh5",
+  "field": "explanation",
+  "before": "Choice C is correct. The volume of right circular cylinder A is given by the expression $\\pi r^2 h$, where r is the radius of its circular base and h is its height. The volume of a cylinder with twice the radius and half the height of cylinder A is given by $\\pi(2r)^2\\left(\\frac{1}{2}\\right)h$, which is equivalent to $4\\pi r^2\\left(\\frac{1}{2}\\right)h = 2\\pi r^2 h$. Therefore, the volume is twice the volume of cylinder A, or $2 \\times 22 = 44$. Choice A is incorrect and likely results from not multiplying the radius of cylinder A by 2. Choice B is incorrect and likely results from not squaring the 2 in 2r when applying the volume formula. Choice D is incorrect and likely results from a conceptual error. #",
+  "after": "Choice C is correct. The volume of right circular cylinder A is given by the expression $\\pi r^2 h$, where r is the radius of its circular base and h is its height. The volume of a cylinder with twice the radius and half the height of cylinder A is given by $\\pi(2r)^2\\left(\\frac{1}{2}\\right)h$, which is equivalent to $4\\pi r^2\\left(\\frac{1}{2}\\right)h = 2\\pi r^2 h$. Therefore, the volume is twice the volume of cylinder A, or $2 \\times 22 = 44$. Choice A is incorrect and likely results from not multiplying the radius of cylinder A by 2. Choice B is incorrect and likely results from not squaring the 2 in 2r when applying the volume formula. Choice D is incorrect and likely results from a conceptual error.",
+  "class": "footer_leak",
+  "note": "removed stray trailing '#'",
+  "evidence": "ANS Area and Volume HARD.pdf p13 (Question ID 93de3f84); rendered page read at 110 dpi"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzq302cgqmt1s3y0hqw3",
+  "field": "explanation",
+  "before": "Choice D is correct. Using the volume formula and the given information that the volume of the glass is 473 cubic centimeters, the\nvalue of k can be found as follows:\nTherefore, the value of k is approximately 10.11 centimeters.\nChoices A, B, and C are incorrect. Substituting the values of k from these choices in the formula results in volumes of approximately 7 cubic\ncentimeters, 207 cubic centimeters, and 217 cubic centimeters, respectively, all of which contradict the given information that the volume of the\nglass is 473 cubic centimeters.",
+  "after": "Choice D is correct. Using the volume formula $V = \\frac{7\\pi k^3}{48}$ and the given information that the volume of the glass is 473 cubic centimeters, the\nvalue of k can be found as follows:\n$$473 = \\frac{7\\pi k^3}{48}$$\n$$k^3 = \\frac{473(48)}{7\\pi}$$\n$$k = \\sqrt[3]{\\frac{473(48)}{7\\pi}} \\approx 10.10690$$\nTherefore, the value of k is approximately 10.11 centimeters.\nChoices A, B, and C are incorrect. Substituting the values of k from these choices in the formula results in volumes of approximately 7 cubic\ncentimeters, 207 cubic centimeters, and 217 cubic centimeters, respectively, all of which contradict the given information that the volume of the\nglass is 473 cubic centimeters.",
+  "class": "stripped_math",
+  "note": "restored V = 7πk³/48 and the three solution steps",
+  "evidence": "ANS Area and Volume MED.pdf p2 (Question ID 37dde49f); rendered page read at 110 dpi"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzqv02cqqmt1up27iunj",
+  "field": "explanation",
+  "before": "Choice B is correct. If the radius of container A is 16 centimeters and the radius of container B is 25% longer than the radius of container A, then\nthe radius of container B is centimeters. The volume of a cylinder is , where r is the radius of the cylinder and h\nis its height. Substituting and into yields that the volume of cylinder B is cubic\ncentimeters.\nChoice A is incorrect and may result from multiplying the radius of cylinder B by the radius of cylinder A rather than squaring the radius of\ncylinder B. Choice C is incorrect and may result from multiplying the radius of cylinder B by 25 rather than squaring it. Choice D is incorrect and\nmay result from taking the radius of cylinder B to be 25 centimeters rather than 20 centimeters.",
+  "after": "Choice B is correct. If the radius of container A is 16 centimeters and the radius of container B is 25% longer than the radius of container A, then\nthe radius of container B is $16 + (0.25)(16) = 20$ centimeters. The volume of a cylinder is $\\pi r^2 h$, where r is the radius of the cylinder and h\nis its height. Substituting $r = 20$ and $h = 50$ into $\\pi r^2 h$ yields that the volume of cylinder B is $\\pi(20)^2(50) = 20{,}000\\pi$ cubic\ncentimeters.\nChoice A is incorrect and may result from multiplying the radius of cylinder B by the radius of cylinder A rather than squaring the radius of\ncylinder B. Choice C is incorrect and may result from multiplying the radius of cylinder B by 25 rather than squaring it. Choice D is incorrect and\nmay result from taking the radius of cylinder B to be 25 centimeters rather than 20 centimeters.",
+  "class": "stripped_math",
+  "note": "restored radius, volume formula, substitution and result",
+  "evidence": "ANS Area and Volume MED.pdf p9 (Question ID 151eda3c); rendered page read at 110 dpi"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzrt02d1qmt1jz7a7g4n",
+  "field": "explanation",
+  "before": "The correct answer is 360. The volume of a right rectangular prism is calculated by multiplying its dimensions: length, width, and height.\nMultiplying the values given for these dimensions yields a volume of cubic centimeters.",
+  "after": "The correct answer is 360. The volume of a right rectangular prism is calculated by multiplying its dimensions: length, width, and height.\nMultiplying the values given for these dimensions yields a volume of $(4)(9)(10) = 360$ cubic centimeters.",
+  "class": "stripped_math",
+  "note": "restored (4)(9)(10) = 360",
+  "evidence": "ANS Area and Volume MED.pdf p16 (Question ID ec5d4823); rendered page read at 110 dpi"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzs002d2qmt123n5ui75",
+  "field": "explanation",
+  "before": "Choice D is correct. The volume, , of a cube can be found using the formula , where is the edge length of the cube. It's given that a\ncube has an edge length of inches. Substituting inches for in this equation yields cubic inches, or cubic inches.\nTherefore, the volume of the cube is cubic inches.\nChoice A is incorrect. This is the perimeter, in inches, of the cube.\nChoice B is incorrect. This is the area, in square inches, of a face of the cube.\nChoice C is incorrect. This is the surface area, in square inches, of the cube.",
+  "after": "Choice D is correct. The volume, $V$, of a cube can be found using the formula $V = s^3$, where $s$ is the edge length of the cube. It's given that a\ncube has an edge length of $41$ inches. Substituting $41$ inches for $s$ in this equation yields $V = 41^3$ cubic inches, or $V = 68{,}921$ cubic inches.\nTherefore, the volume of the cube is $68{,}921$ cubic inches.\nChoice A is incorrect. This is the perimeter, in inches, of the cube.\nChoice B is incorrect. This is the area, in square inches, of a face of the cube.\nChoice C is incorrect. This is the surface area, in square inches, of the cube.",
+  "class": "stripped_math",
+  "note": "restored V, s, 41, 41³, 68,921",
+  "evidence": "ANS Area and Volume MED.pdf p17 (Question ID e336a1d2); rendered page read at 110 dpi"
+ },
+ {
+  "table": "Question",
+  "id": "cmsp3qmp900000vmtxd0qyfzc",
+  "field": "explanation",
+  "before": "Choice C is correct. There is a proportional relationship between the height of an object and the length of its shadow. Let c represent the height, in feet, of the cherry tree. The given relationship can be expressed by the proportion . Multiplying both sides of this equation by 16 yields . This height is closest to the value given in choice C, 30. Choices A, B, and D are incorrect and may result",
+  "after": "Choice C is correct. There is a proportional relationship between the height of an object and the length of its shadow. Let c represent the height, in feet, of the cherry tree. The given relationship can be expressed by the proportion $\\frac{555}{300} = \\frac{c}{16}$. Multiplying both sides of this equation by 16 yields $c = 29.6$. This height is closest to the value given in choice C, 30. Choices A, B, and D are incorrect and may result from calculation errors.",
+  "class": "stripped_math+explanation_truncated",
+  "note": "restored proportion 555/300 = c/16, c = 29.6 and cut tail 'from calculation errors.'",
+  "evidence": "ANS Lines Angles Triangles EASY.pdf p7 (Question ID 3563d76d); rendered page read at 110 dpi"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0se02rpqmt1p4tbrst9",
+  "field": "explanation",
+  "before": "Choice C is correct. It’s given that ; therefore, substituting 100 for x in triangle ABC gives two known angle measures for this triangle.\nThe sum of the measures of the interior angles of any triangle equals 180°. Subtracting the two known angle measures of triangle ABC from 180°\ngives the third angle measure: . This is the measure of angle BCA. Since vertical angles are congruent, the\nmeasure of angle DCE is also 60°. Subtracting the two known angle measures of triangle CDE from 180° gives the third angle measure:\n. Therefore, the value of y is 80.\nChoice A is incorrect and may result from a calculation error. Choice B is incorrect and may result from classifying angle CDE as a right angle.\nChoice D is incorrect and may result from finding the measure of angle BCA or DCE instead of the measure of angle CDE.",
+  "after": "Choice C is correct. It’s given that $x = 100$; therefore, substituting 100 for x in triangle ABC gives two known angle measures for this triangle.\nThe sum of the measures of the interior angles of any triangle equals 180°. Subtracting the two known angle measures of triangle ABC from 180°\ngives the third angle measure: $180^\\circ - 100^\\circ - 20^\\circ = 60^\\circ$. This is the measure of angle BCA. Since vertical angles are congruent, the\nmeasure of angle DCE is also 60°. Subtracting the two known angle measures of triangle CDE from 180° gives the third angle measure:\n$180^\\circ - 60^\\circ - 40^\\circ = 80^\\circ$. Therefore, the value of y is 80.\nChoice A is incorrect and may result from a calculation error. Choice B is incorrect and may result from classifying angle CDE as a right angle.\nChoice D is incorrect and may result from finding the measure of angle BCA or DCE instead of the measure of angle CDE.",
+  "class": "stripped_math",
+  "note": "restored x = 100 and the two angle subtractions",
+  "evidence": "ANS Lines Angles Triangles EASY.pdf p8 (Question ID dfc420b2); rendered page read at 110 dpi"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0ss02s4qmt1imesn9lx",
+  "field": "explanation",
+  "before": "Choice C is correct. Since lines and k are parallel, corresponding angles formed by the intersection of line j with lines and k are congruent.\nTherefore, the angle with measure a° must be the supplement of the angle with measure 64°. The sum of two supplementary angles is 180°, so a\n= 180 – 64 = 116.\nChoice A is incorrect and likely results from thinking the angle with measure a° is the complement of the angle with measure 64°. Choice B is\nincorrect and likely results from thinking the angle with measure a° is congruent to the angle with measure 64°. Choice D is incorrect and likely\nresults from a conceptual or computational error.",
+  "after": "Choice C is correct. Since lines $\\ell$ and k are parallel, corresponding angles formed by the intersection of line j with lines $\\ell$ and k are congruent.\nTherefore, the angle with measure a° must be the supplement of the angle with measure 64°. The sum of two supplementary angles is 180°, so a\n= 180 – 64 = 116.\nChoice A is incorrect and likely results from thinking the angle with measure a° is the complement of the angle with measure 64°. Choice B is\nincorrect and likely results from thinking the angle with measure a° is congruent to the angle with measure 64°. Choice D is incorrect and likely\nresults from a conceptual or computational error.",
+  "class": "stripped_math",
+  "note": "restored line ℓ (twice)",
+  "evidence": "ANS Lines Angles Triangles EASY.pdf p11 (Question ID 992f4e93); rendered page read at 110 dpi"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0tb02sgqmt1dfmcyvz7",
+  "field": "explanation",
+  "before": "Choice A is correct. Given that lines m and n are parallel, the angle marked 130° must be supplementary to the leftmost angle marked a° because\nthey are same-side interior angles. Therefore, 130° + a° = 180°, which yields a = 50°. Lines and m intersect at a right angle, so lines j, , and m\nform a right triangle where the two acute angles are a° and b°. The acute angles of a right triangle are complementary, so a° + b° = 90°, which\nyields 50° + b° = 90°, and b = 40.\nChoice B is incorrect. This is the value of a, not b. Choice C is incorrect and may be the result of dividing 130° by 2. Choice D is incorrect and may\nbe the result of multiplying b by 2.",
+  "after": "Choice A is correct. Given that lines m and n are parallel, the angle marked 130° must be supplementary to the leftmost angle marked a° because\nthey are same-side interior angles. Therefore, 130° + a° = 180°, which yields a = 50°. Lines $\\ell$ and m intersect at a right angle, so lines j, $\\ell$, and m\nform a right triangle where the two acute angles are a° and b°. The acute angles of a right triangle are complementary, so a° + b° = 90°, which\nyields 50° + b° = 90°, and b = 40.\nChoice B is incorrect. This is the value of a, not b. Choice C is incorrect and may be the result of dividing 130° by 2. Choice D is incorrect and may\nbe the result of multiplying b by 2.",
+  "class": "stripped_math",
+  "note": "restored line ℓ (twice)",
+  "evidence": "ANS Lines Angles Triangles EASY.pdf p15 (Question ID 3828f53d); rendered page read at 110 dpi"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzu102dqqmt1kmsxcyjc",
+  "field": "explanation",
+  "before": "The correct answer is 4.5. According to the properties of right triangles, BD divides triangle ABC into two similar triangles, ABD and BCD. The\ncorresponding sides of ABD and BCD are proportional, so the ratio of BD to AD is the same as the ratio of DC to BD. Expressing this information\nas a proportion gives . Solving the proportion for DC results in . Note that 4.5 and 9/2 are examples of ways to enter a\ncorrect answer.",
+  "after": "The correct answer is 4.5. According to the properties of right triangles, BD divides triangle ABC into two similar triangles, ABD and BCD. The\ncorresponding sides of ABD and BCD are proportional, so the ratio of BD to AD is the same as the ratio of DC to BD. Expressing this information\nas a proportion gives $\\frac{6}{8} = \\frac{DC}{6}$. Solving the proportion for DC results in $DC = 4.5$. Note that 4.5 and 9/2 are examples of ways to enter a\ncorrect answer.",
+  "class": "stripped_math",
+  "note": "restored 6/8 = DC/6 and DC = 4.5",
+  "evidence": "ANS Lines Angles Triangles HARD.pdf p7 (Question ID 6a3fbec3); rendered page read at 110 dpi"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro01k02gbqmt1e1od4uks",
+  "field": "explanation",
+  "before": "Choice C is correct. The sine of an acute angle in a right triangle is the ratio of the length of the side opposite that angle to the length of the\nhypotenuse. In the right triangle shown, it's given that the length of the side opposite the angle with measure is units and the length of the\nhypotenuse is units. Therefore, the value of is .\nChoice A is incorrect and may result from conceptual or calculation errors.\nChoice B is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "after": "Choice C is correct. The sine of an acute angle in a right triangle is the ratio of the length of the side opposite that angle to the length of the\nhypotenuse. In the right triangle shown, it's given that the length of the side opposite the angle with measure $x^\\circ$ is $63$ units and the length of the\nhypotenuse is $73$ units. Therefore, the value of $\\sin x^\\circ$ is $\\frac{63}{73}$.\nChoice A is incorrect and may result from conceptual or calculation errors.\nChoice B is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "class": "stripped_math",
+  "note": "restored x°, 63, 73, sin x° = 63/73",
+  "evidence": "ANS Right Triangles and Trig EASY.pdf p2 (Question ID a6097ec2); rendered page read at 110 dpi"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro09f02jlqmt1gn1daxym",
+  "field": "explanation",
+  "before": "Choice D is correct. The tangent of a nonright angle in a right triangle is defined as the ratio of the length of the leg opposite the angle to the\nlength of the leg adjacent to the angle. Using that definition for tangent, in a right triangle with legs that have lengths a and b, the tangent of one\nacute angle is and the tangent for the other acute angle is . It follows that the tangents of the acute angles in a right triangle are\nreciprocals of each other. Therefore, the tangent of the other acute angle in the given triangle is the reciprocal of or .\nChoice A is incorrect and may result from assuming that the tangent of the other acute angle is the negative of the tangent of the angle\ndescribed. Choice B is incorrect and may result from assuming that the tangent of the other acute angle is the negative of the reciprocal of the\ntangent of the angle described. Choice C is incorrect and may result from interpreting the tangent of the other acute angle as equal to the\ntangent of the angle described.",
+  "after": "Choice D is correct. The tangent of a nonright angle in a right triangle is defined as the ratio of the length of the leg opposite the angle to the\nlength of the leg adjacent to the angle. Using that definition for tangent, in a right triangle with legs that have lengths a and b, the tangent of one\nacute angle is $\\frac{a}{b}$ and the tangent for the other acute angle is $\\frac{b}{a}$. It follows that the tangents of the acute angles in a right triangle are\nreciprocals of each other. Therefore, the tangent of the other acute angle in the given triangle is the reciprocal of $\\frac{\\sqrt{3}}{3}$ or $\\frac{3}{\\sqrt{3}}$.\nChoice A is incorrect and may result from assuming that the tangent of the other acute angle is the negative of the tangent of the angle\ndescribed. Choice B is incorrect and may result from assuming that the tangent of the other acute angle is the negative of the reciprocal of the\ntangent of the angle described. Choice C is incorrect and may result from interpreting the tangent of the other acute angle as equal to the\ntangent of the angle described.",
+  "class": "stripped_math",
+  "note": "restored a/b, b/a, √3/3 and 3/√3",
+  "evidence": "ANS Right Triangles and Trig HARD.pdf p5 (Question ID 92eb236a); rendered page read at 110 dpi"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro01402g4qmt19upecd83",
+  "field": "explanation",
+  "before": "Choice C is correct. Angle A is an acute angle in a right triangle, so the value of tan(A) is equivalent to the ratio of the length of the side\nopposite angle A, 20, to the length of the nonhypotenuse side adjacent to angle A, 21. Therefore, .\nChoice A is incorrect. This is the value of sin(A). Choice B is incorrect. This is the value of cos(A). Choice D is incorrect. This is the value of\ntan(B).",
+  "after": "Choice C is correct. Angle A is an acute angle in a right triangle, so the value of tan(A) is equivalent to the ratio of the length of the side\nopposite angle A, 20, to the length of the nonhypotenuse side adjacent to angle A, 21. Therefore, $\\tan(A) = \\frac{20}{21}$.\nChoice A is incorrect. This is the value of sin(A). Choice B is incorrect. This is the value of cos(A). Choice D is incorrect. This is the value of\ntan(B).",
+  "class": "stripped_math",
+  "note": "restored tan(A) = 20/21",
+  "evidence": "ANS Right Triangles and Trig MED.pdf p7 (Question ID 902dc959); rendered page read at 110 dpi"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro01a02g9qmt1zds7x4ms",
+  "field": "explanation",
+  "before": "Choice D is correct. The sine of an angle is equal to the cosine of its complementary angle. In the triangle shown, angle is a right angle; thus,\nangles and are complementary angles. Therefore, has the same value as .\nChoice A is incorrect and may result from conceptual errors.\nChoice B is incorrect and may result from conceptual errors.\nChoice C is incorrect and may result from conceptual errors.",
+  "after": "Choice D is correct. The sine of an angle is equal to the cosine of its complementary angle. In the triangle shown, angle $Z$ is a right angle; thus,\nangles $X$ and $Y$ are complementary angles. Therefore, $\\cos Y$ has the same value as $\\sin X$.\nChoice A is incorrect and may result from conceptual errors.\nChoice B is incorrect and may result from conceptual errors.\nChoice C is incorrect and may result from conceptual errors.",
+  "class": "stripped_math",
+  "note": "restored Z, X, Y, cos Y, sin X",
+  "evidence": "ANS Right Triangles and Trig MED.pdf p8 (Question ID 659cb706); rendered page read at 110 dpi"
+ }
+]

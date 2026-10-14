@@ -1,0 +1,592 @@
+[
+ {
+  "table": "Question",
+  "id": "cmsjrnz7p026zqmt1vioj8sfw",
+  "field": "explanation",
+  "before": "Choice A is correct. It's given that a principal used a total of blue flags and yellow flags. It's also given that of the flags used, flags were\nblue. Subtracting the number of blue flags used from the total number of flags used results in the number of yellow flags used. It follows that the\nnumber of yellow flags used is , or .\nChoice B is incorrect. This is the number of blue flags used.\nChoice C is incorrect. This is the total number of flags used.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "after": "Choice A is correct. It's given that a principal used a total of $25$ blue flags and yellow flags. It's also given that of the $25$ flags used, $20$ flags were\nblue. Subtracting the number of blue flags used from the total number of flags used results in the number of yellow flags used. It follows that the\nnumber of yellow flags used is $25 - 20$, or $5$.\nChoice B is incorrect. This is the number of blue flags used.\nChoice C is incorrect. This is the total number of flags used.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "class": "stripped_math",
+  "note": "restored 25, 20, 25-20, 5",
+  "evidence": "ANS ANS Linear Eq. One Variable EASY.pdf p5-6 (3d04de9c)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnz8t027yqmt1x5jaq93x",
+  "field": "explanation",
+  "before": "The correct answer is 5. Subtracting from both sides of the given equation gives , so for any value of x, if and only\nif . Therefore, if the given equation has infinitely many solutions, the value of k is 5.",
+  "after": "The correct answer is 5. Subtracting $6x$ from both sides of the given equation gives $k = 5$, so for any value of x, $6x + k = 6x + 5$ if and only\nif $k = 5$. Therefore, if the given equation has infinitely many solutions, the value of k is 5.",
+  "class": "stripped_math",
+  "note": "restored 6x, k=5, 6x+k=6x+5",
+  "evidence": "ANS ANS Linear Eq. One Variable EASY.pdf p17-18 (e53870b6)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnz52025cqmt10ghjso56",
+  "field": "explanation",
+  "before": "Choice D is correct. Since gasoline costs $4 per gallon, and since Alan’s car travels an average of 25 miles per gallon, the expression gives\nthe cost, in dollars per mile, to drive the car. Multiplying by m gives the cost for Alan to drive m miles in his car. Alan wants to reduce his\nweekly spending by $5, so setting m equal to 5 gives the number of miles, m, by which he must reduce his driving.\nChoices A, B, and C are incorrect. Choices A and B transpose the numerator and the denominator in the fraction. The fraction would result\nin the unit miles per dollar, but the question requires a unit of dollars per mile. Choices A and C set the expression equal to 95 instead of 5, a\nmistake that may result from a misconception that Alan wants to reduce his driving by 5 miles each week; instead, the question says he wants to\nreduce his weekly expenditure by $5.",
+  "after": "Choice D is correct. Since gasoline costs \\$4 per gallon, and since Alan’s car travels an average of 25 miles per gallon, the expression $\\frac{4}{25}$ gives\nthe cost, in dollars per mile, to drive the car. Multiplying $\\frac{4}{25}$ by m gives the cost for Alan to drive m miles in his car. Alan wants to reduce his\nweekly spending by \\$5, so setting $\\frac{4}{25}m$ equal to 5 gives the number of miles, m, by which he must reduce his driving.\nChoices A, B, and C are incorrect. Choices A and B transpose the numerator and the denominator in the fraction. The fraction $\\frac{25}{4}$ would result\nin the unit miles per dollar, but the question requires a unit of dollars per mile. Choices A and C set the expression equal to 95 instead of 5, a\nmistake that may result from a misconception that Alan wants to reduce his driving by 5 miles each week; instead, the question says he wants to\nreduce his weekly expenditure by \\$5.",
+  "class": "stripped_math",
+  "note": "restored fractions 4/25, (4/25)m, 25/4; prose currency escaped as \\$",
+  "evidence": "ANS ANS Linear Eq. One Variable HARD.pdf p9-10 (b7e6394d)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnz59025eqmt1mvigyjtk",
+  "field": "explanation",
+  "before": "Choice D is correct. After using the auger for 5 hours, Hector had removed 24,000 – 19,350 = 4,650 bushels of corn from the storage bin. During\nthe 5-hour period, the auger removed corn from the bin at a constant rate of bushels per hour. Assuming the auger continues\nto remove corn at this rate, after x hours it will have removed 930x bushels of corn. Because the bin contained 24,000 bushels of corn when\nHector started using the auger, the equation 24,000 – 930x = 12,840 can be used to find the number of hours, x, Hector will have been using the\nauger when 12,840 bushels of corn remain in the bin. Subtracting 12,840 from both sides of this equation and adding 930x to both sides of the\nequation yields 11,160 = 930x. Dividing both sides of this equation by 930 yields x = 12. Therefore, Hector will have been using the auger for 12\nhours when 12,840 bushels of corn remain in the storage bin.\nChoice A is incorrect. Three hours after Hector began using the auger, 24,000 – 3(930) = 21,210 bushels of corn remained, not 12,840. Choice B\nis incorrect. Seven hours after Hector began using the auger, 24,000 – 7(930) = 17,490 bushels of corn will remain, not 12,840. Choice C is\nincorrect. Eight hours after Hector began using the auger, 24,000 – 8(930) = 16,560 bushels of corn will remain, not 12,840.",
+  "after": "Choice D is correct. After using the auger for 5 hours, Hector had removed 24,000 – 19,350 = 4,650 bushels of corn from the storage bin. During\nthe 5-hour period, the auger removed corn from the bin at a constant rate of $\\frac{4{,}650}{5} = 930$ bushels per hour. Assuming the auger continues\nto remove corn at this rate, after x hours it will have removed 930x bushels of corn. Because the bin contained 24,000 bushels of corn when\nHector started using the auger, the equation 24,000 – 930x = 12,840 can be used to find the number of hours, x, Hector will have been using the\nauger when 12,840 bushels of corn remain in the bin. Subtracting 12,840 from both sides of this equation and adding 930x to both sides of the\nequation yields 11,160 = 930x. Dividing both sides of this equation by 930 yields x = 12. Therefore, Hector will have been using the auger for 12\nhours when 12,840 bushels of corn remain in the storage bin.\nChoice A is incorrect. Three hours after Hector began using the auger, 24,000 – 3(930) = 21,210 bushels of corn remained, not 12,840. Choice B\nis incorrect. Seven hours after Hector began using the auger, 24,000 – 7(930) = 17,490 bushels of corn will remain, not 12,840. Choice C is\nincorrect. Eight hours after Hector began using the auger, 24,000 – 8(930) = 16,560 bushels of corn will remain, not 12,840.",
+  "class": "stripped_math",
+  "note": "restored 4,650/5 = 930",
+  "evidence": "ANS ANS Linear Eq. One Variable HARD.pdf p11-12 (2937ef4f)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnymx01z5qmt1y8nq3m50",
+  "field": "explanation",
+  "before": "Choice B is correct. The height of the tree at a given time is equal to its height when it was planted plus the number of feet that the tree grew. In\nthe given equation, 14 represents the height of the tree at the given time, and 6 represents the height of the tree when it was planted. It follows\nthat represents the number of feet the tree grew from the time it was planted until the time it reached a height of 14 feet. Since n represents\nthe number of years between the given time and the time the tree was planted, 2 must represent the average number of feet the tree grew each\nyear.\nChoice A is incorrect and may result from interpreting the coefficient 2 as doubling instead of as increasing by 2 each year. Choice C is incorrect.\nThe height of the tree when it was 1 year old was feet, not 2 feet. Choice D is incorrect. No information is given to connect the\ngrowth of one particular tree to the growth of similar trees.",
+  "after": "Choice B is correct. The height of the tree at a given time is equal to its height when it was planted plus the number of feet that the tree grew. In\nthe given equation, 14 represents the height of the tree at the given time, and 6 represents the height of the tree when it was planted. It follows\nthat $2n$ represents the number of feet the tree grew from the time it was planted until the time it reached a height of 14 feet. Since n represents\nthe number of years between the given time and the time the tree was planted, 2 must represent the average number of feet the tree grew each\nyear.\nChoice A is incorrect and may result from interpreting the coefficient 2 as doubling instead of as increasing by 2 each year. Choice C is incorrect.\nThe height of the tree when it was 1 year old was $2(1) + 6 = 8$ feet, not 2 feet. Choice D is incorrect. No information is given to connect the\ngrowth of one particular tree to the growth of similar trees.",
+  "class": "stripped_math",
+  "note": "restored 2n, 2(1)+6=8",
+  "evidence": "ANS ANS Linear Eq One Variable MED.pdf p4-5 (aa85b138)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnyni01zqqmt1wjr293nq",
+  "field": "explanation",
+  "before": "The correct answer is 22.4. If the height of the plant increased by an average of 1.20 centimeters per day for 12 days, then its total growth over\nthe 12 days was centimeters. The plant was 36.8 centimeters tall after 12 days, so at the beginning of the study its height\nwas centimeters. Note that 22.4 and 112/5 are examples of ways to enter a correct answer.\nAlternate approach: The equation can be used to represent this situation, where h is the height of the plant, in\ncentimeters, at the beginning of the study. Solving this equation for h yields 22.4 centimeters.",
+  "after": "The correct answer is 22.4. If the height of the plant increased by an average of 1.20 centimeters per day for 12 days, then its total growth over\nthe 12 days was $(1.20)(12) = 14.4$ centimeters. The plant was 36.8 centimeters tall after 12 days, so at the beginning of the study its height\nwas $36.8 - 14.4 = 22.4$ centimeters. Note that 22.4 and 112/5 are examples of ways to enter a correct answer.\nAlternate approach: The equation $36.8 = 12(1.20) + h$ can be used to represent this situation, where h is the height of the plant, in\ncentimeters, at the beginning of the study. Solving this equation for h yields 22.4 centimeters.",
+  "class": "stripped_math",
+  "note": "restored (1.20)(12)=14.4, 36.8-14.4=22.4, 36.8=12(1.20)+h",
+  "evidence": "ANS ANS Linear Eq One Variable MED.pdf p9-10 (f09097b1)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnyys023oqmt1xhqxlmt7",
+  "field": "explanation",
+  "before": "Choice B is correct. It’s given that the equation models the relationship between the number of different pieces of music a certain\npianist practices, y, and the number of minutes in a practice session, x. Since it’s given that the session lasted 30 minutes, the number of pieces\nthe pianist practiced can be found by substituting 30 for x in the given equation, which yields , or .\nChoices A and C are incorrect and may result from misinterpreting the values in the equation. Choice D is incorrect. This is the given value of x,\nnot the value of y.",
+  "after": "Choice B is correct. It’s given that the equation $y = 0.1x$ models the relationship between the number of different pieces of music a certain\npianist practices, y, and the number of minutes in a practice session, x. Since it’s given that the session lasted 30 minutes, the number of pieces\nthe pianist practiced can be found by substituting 30 for x in the given equation, which yields $y = 0.1(30)$, or $y = 3$.\nChoices A and C are incorrect and may result from misinterpreting the values in the equation. Choice D is incorrect. This is the given value of x,\nnot the value of y.",
+  "class": "stripped_math",
+  "note": "restored y=0.1x, y=0.1(30), y=3",
+  "evidence": "ANS ANS Linear Eq TWO Variables EASY.pdf p7-8 (8c98c834)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnyz6023wqmt1nicwdbbq",
+  "field": "explanation",
+  "before": "Choice C is correct. Since Mario purchased 4 binders that cost x dollars each, the expression represents the total cost, in dollars, of the 4\nbinders he purchased. Since Mario purchased 3 notebooks that cost y dollars each, the expression represents the total cost, in dollars, of the\n3 notebooks he purchased. Therefore, the expression represents the total cost, in dollars, for all binders and notebooks he purchased.\nIn the given equation, the expression is equal to 24. Therefore, it follows that 24 is the total cost, in dollars, for all binders and\nnotebooks purchased.\nChoice A is incorrect. This is represented by the expression in the given equation. Choice B is incorrect. This is represented by the expression\nin the given equation. Choice D is incorrect. This is represented by the expression .",
+  "after": "Choice C is correct. Since Mario purchased 4 binders that cost x dollars each, the expression $4x$ represents the total cost, in dollars, of the 4\nbinders he purchased. Since Mario purchased 3 notebooks that cost y dollars each, the expression $3y$ represents the total cost, in dollars, of the\n3 notebooks he purchased. Therefore, the expression $4x + 3y$ represents the total cost, in dollars, for all binders and notebooks he purchased.\nIn the given equation, the expression $4x + 3y$ is equal to 24. Therefore, it follows that 24 is the total cost, in dollars, for all binders and\nnotebooks purchased.\nChoice A is incorrect. This is represented by the expression $4x$ in the given equation. Choice B is incorrect. This is represented by the expression\n$3y$ in the given equation. Choice D is incorrect. This is represented by the expression $|4x - 3y|$.",
+  "class": "stripped_math",
+  "note": "restored 4x, 3y, 4x+3y, |4x-3y|",
+  "evidence": "ANS ANS Linear Eq TWO Variables EASY.pdf p11-12 (dd797fe2)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnz0h024dqmt1n50dbo5p",
+  "field": "explanation",
+  "before": "Choice B is correct. It’s given that is equal to the total amount of money, in dollars, a food truck charges for x drinks and y\nsalads. Since each salad has the same price, it follows that the total charge for y salads is dollars. When , the value of the\nexpression is , or 7.00. Therefore, the price for one salad is 7.00 dollars.\nChoice A is incorrect. Since each drink has the same price, it follows that the total charge for x drinks is dollars. Therefore, the price, in\ndollars, for one drink is 2.50, not 7.00. Choices C and D are incorrect. In the given equation, F represents the total charge, in dollars, when x drinks\nand y salads are bought at the food truck. No information is provided about the number of drinks or the number of salads that are bought during\nthe day. Therefore, 7.00 doesn’t represent either of these quantities.",
+  "after": "Choice B is correct. It’s given that $2.50x + 7.00y$ is equal to the total amount of money, in dollars, a food truck charges for x drinks and y\nsalads. Since each salad has the same price, it follows that the total charge for y salads is $7.00y$ dollars. When $y = 1$, the value of the\nexpression $7.00y$ is $7.00 \\times 1$, or 7.00. Therefore, the price for one salad is 7.00 dollars.\nChoice A is incorrect. Since each drink has the same price, it follows that the total charge for x drinks is $2.50x$ dollars. Therefore, the price, in\ndollars, for one drink is 2.50, not 7.00. Choices C and D are incorrect. In the given equation, F represents the total charge, in dollars, when x drinks\nand y salads are bought at the food truck. No information is provided about the number of drinks or the number of salads that are bought during\nthe day. Therefore, 7.00 doesn’t represent either of these quantities.",
+  "class": "stripped_math",
+  "note": "restored 2.50x+7.00y, 7.00y, y=1, 7.00x1, 2.50x",
+  "evidence": "ANS ANS Linear Eq TWO Variables EASY.pdf p25-26 (b9839f9e)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzl202bqqmt1nwdb0a1m",
+  "field": "explanation",
+  "before": "Choice A is correct. It is given that line is perpendicular to a line whose equation is x = 2. A line whose equation is a constant value of x is\nvertical, so must therefore be horizontal. Horizontal lines have a slope of 0, so has a slope of 0.\nChoice B is incorrect. A line with slope is perpendicular to a line with slope 2. However, the line with equation x = 2 is vertical and has\nundefined slope (not slope of 2). Choice C is incorrect. A line with slope –2 is perpendicular to a line with slope . However, the line with\nequation x = 2 has undefined slope (not slope of ). Choice D is incorrect; this is the slope of the line x = 2 itself, not the slope of a line\nperpendicular to it.",
+  "after": "Choice A is correct. It is given that line $\\ell$ is perpendicular to a line whose equation is x = 2. A line whose equation is a constant value of x is\nvertical, so $\\ell$ must therefore be horizontal. Horizontal lines have a slope of 0, so $\\ell$ has a slope of 0.\nChoice B is incorrect. A line with slope $-\\frac{1}{2}$ is perpendicular to a line with slope 2. However, the line with equation x = 2 is vertical and has\nundefined slope (not slope of 2). Choice C is incorrect. A line with slope –2 is perpendicular to a line with slope $\\frac{1}{2}$. However, the line with\nequation x = 2 has undefined slope (not slope of $\\frac{1}{2}$). Choice D is incorrect; this is the slope of the line x = 2 itself, not the slope of a line\nperpendicular to it.",
+  "class": "stripped_math",
+  "note": "restored line ℓ symbols and -1/2, 1/2 slopes",
+  "evidence": "ANS ANS Linear Eq TWO Variables HARD.pdf p10-11 (98d3393a)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzl202bqqmt1nwdb0a1m",
+  "field": "stem",
+  "before": "Line $\\mathcal{P}$ in the xy-plane is perpendicular to the line with equation $x = 2$. What is the slope of line $\\mathcal{P}$?",
+  "after": "Line $\\ell$ in the xy-plane is perpendicular to the line with equation $x = 2$. What is the slope of line $\\ell$?",
+  "class": "broken_math",
+  "note": "line ℓ OCR'd as \\mathcal{P}; source prints script ℓ",
+  "evidence": "ANS ANS Linear Eq TWO Variables HARD.pdf p10-11 (98d3393a)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzlb02buqmt14xwwo7l3",
+  "field": "explanation",
+  "before": "The correct answer is 1.5. The point corresponds to the situation where 16 cornflowers and 0 wallflowers are purchased. Since the total\nspent on the two types of flowers is $24.00, it follows that the price of 16 cornflowers is $24.00, and the price of one cornflower is $1.50. Note\nthat 1.5 and 3/2 are examples of ways to enter a correct answer.",
+  "after": "The correct answer is 1.5. The point $(16, 0)$ corresponds to the situation where 16 cornflowers and 0 wallflowers are purchased. Since the total\nspent on the two types of flowers is \\$24.00, it follows that the price of 16 cornflowers is \\$24.00, and the price of one cornflower is \\$1.50. Note\nthat 1.5 and 3/2 are examples of ways to enter a correct answer.",
+  "class": "stripped_math",
+  "note": "restored point (16, 0); prose currency escaped",
+  "evidence": "ANS ANS Linear Eq TWO Variables HARD.pdf p12-13 (c362c210)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnz920284qmt1vkp5o4q7",
+  "field": "explanation",
+  "before": "Choice A is correct. It’s given that the front of the roller-coaster car starts rising when it’s 15 feet above the ground. This initial height of 15 feet\ncan be represented by a constant term, 15, in an equation. Each second, the front of the roller-coaster car rises 8 feet, which can be represented\nby 8s. Thus, the equation gives the height, in feet, of the front of the roller-coaster car s seconds after it starts up the hill.\nChoices B and C are incorrect and may result from conceptual errors in creating a linear equation. Choice D is incorrect and may result from\nswitching the rate at which the roller-coaster car rises with its initial height.",
+  "after": "Choice A is correct. It’s given that the front of the roller-coaster car starts rising when it’s 15 feet above the ground. This initial height of 15 feet\ncan be represented by a constant term, 15, in an equation. Each second, the front of the roller-coaster car rises 8 feet, which can be represented\nby 8s. Thus, the equation $h = 8s + 15$ gives the height, in feet, of the front of the roller-coaster car s seconds after it starts up the hill.\nChoices B and C are incorrect and may result from conceptual errors in creating a linear equation. Choice D is incorrect and may result from\nswitching the rate at which the roller-coaster car rises with its initial height.",
+  "class": "stripped_math",
+  "note": "restored h = 8s + 15",
+  "evidence": "ANS ANS Linear Functions EASY.pdf p1-2 (84664a7c)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnyx7022uqmt1gkvkpedj",
+  "field": "explanation",
+  "before": "Choice C is correct. It’s given that for each point on the graph of the given equation, the x-coordinate represents the number of seconds\nafter Sheila applied the brakes, and the y-coordinate represents the speed of Sheila’s bicycle at that moment in time. For the graph of the\nequation, the y-coordinate of the x-intercept is 0. Therefore, the x-coordinate of the x-intercept of the graph of the given equation represents the\nnumber of seconds it took from the time Sheila began applying the brakes until the bicycle came to a complete stop.\nChoice A is incorrect. The speed of Sheila’s bicycle before she applied the brakes is represented by the y-coordinate of the y-intercept of the\ngraph of the given equation, not the x-coordinate of the x-intercept. Choice B is incorrect. The number of feet per second the speed of Sheila’s\nbicycle decreased each second after Sheila applied the brakes is represented by the slope of the graph of the given equation, not the x-\ncoordinate of the x-intercept. Choice D is incorrect and may result from misinterpreting x as the distance, in feet, traveled after applying the\nbrakes, rather than the time, in seconds, after applying the brakes.",
+  "after": "Choice C is correct. It’s given that for each point $(x, y)$ on the graph of the given equation, the x-coordinate represents the number of seconds\nafter Sheila applied the brakes, and the y-coordinate represents the speed of Sheila’s bicycle at that moment in time. For the graph of the\nequation, the y-coordinate of the x-intercept is 0. Therefore, the x-coordinate of the x-intercept of the graph of the given equation represents the\nnumber of seconds it took from the time Sheila began applying the brakes until the bicycle came to a complete stop.\nChoice A is incorrect. The speed of Sheila’s bicycle before she applied the brakes is represented by the y-coordinate of the y-intercept of the\ngraph of the given equation, not the x-coordinate of the x-intercept. Choice B is incorrect. The number of feet per second the speed of Sheila’s\nbicycle decreased each second after Sheila applied the brakes is represented by the slope of the graph of the given equation, not the x-\ncoordinate of the x-intercept. Choice D is incorrect and may result from misinterpreting x as the distance, in feet, traveled after applying the\nbrakes, rather than the time, in seconds, after applying the brakes.",
+  "class": "stripped_math",
+  "note": "restored point (x, y)",
+  "evidence": "ANS ANS Linear Funct MED.pdf p18-19 (113b938e)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnype020uqmt180342x45",
+  "field": "explanation",
+  "before": "Choice B is correct. The savings each year from installing the geothermal heating system will be the average annual energy cost for the home\nbefore the geothermal heating system installation minus the average annual energy cost after the geothermal heating system installation, which\nis dollars. In t years, the savings will be dollars. Therefore, the inequality that can be solved to find the\nnumber of years after installation at which the total amount of energy cost savings will exceed (be greater than) the installation cost, $25,000, is\n.\nChoice A is incorrect. It gives the number of years after installation at which the total amount of energy cost savings will be less than the\ninstallation cost. Choice C is incorrect and may result from subtracting the average annual energy cost for the home from the onetime cost\nof the geothermal heating system installation. To find the predicted total savings, the predicted average cost should be subtracted from the\naverage annual energy cost before the installation, and the result should be multiplied by the number of years, t. Choice D is incorrect and may\nresult from misunderstanding the context. The ratio compares the average energy cost before installation and the average energy cost\nafter installation; it does not represent the savings.",
+  "after": "Choice B is correct. The savings each year from installing the geothermal heating system will be the average annual energy cost for the home\nbefore the geothermal heating system installation minus the average annual energy cost after the geothermal heating system installation, which\nis $(4{,}334 - 2{,}712)$ dollars. In t years, the savings will be $(4{,}334 - 2{,}712)t$ dollars. Therefore, the inequality that can be solved to find the\nnumber of years after installation at which the total amount of energy cost savings will exceed (be greater than) the installation cost, \\$25,000, is\n$25{,}000 < (4{,}334 - 2{,}712)t$.\nChoice A is incorrect. It gives the number of years after installation at which the total amount of energy cost savings will be less than the\ninstallation cost. Choice C is incorrect and may result from subtracting the average annual energy cost for the home from the onetime cost\nof the geothermal heating system installation. To find the predicted total savings, the predicted average cost should be subtracted from the\naverage annual energy cost before the installation, and the result should be multiplied by the number of years, t. Choice D is incorrect and may\nresult from misunderstanding the context. The ratio $\\frac{4{,}332}{2{,}712}$ compares the average energy cost before installation and the average energy cost\nafter installation; it does not represent the savings.",
+  "class": "stripped_math",
+  "note": "restored (4,334-2,712), (4,334-2,712)t, 25,000 < (4,334-2,712)t, ratio 4,332/2,712 (source quirk kept); prose currency escaped",
+  "evidence": "ANS ANS Linear Inequalities MED.pdf p11-12 (90bd9ef8)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0qy02qwqmt146agqa79",
+  "field": "explanation",
+  "before": "Choice B is correct. A system of two linear equations written in standard form has no solution when the equations are distinct and the ratio of\nthe x-coefficient to the y-coefficient for one equation is equivalent to the ratio of the x-coefficient to the y-coefficient for the other equation. This\nratio for the given equation is 2 to 6, or 1 to 3. Only choice B is an equation that isn’t equivalent to the given equation and whose ratio of the x-\ncoefficient to the y-coefficient is 1 to 3.\nChoice A is incorrect. Multiplying each of the terms in this equation by 2 yields an equation that is equivalent to the given equation. This system\nwould have infinitely many solutions. Choices C and D are incorrect. The ratio of the x-coefficient to the y-coefficient in (choice C)\nis to 2, or to 1. This ratio in (choice D) is 6 to 2, or 3 to 1. Since neither of these ratios is equivalent to that for the given\nequation, these systems would have exactly one solution.",
+  "after": "Choice B is correct. A system of two linear equations written in standard form has no solution when the equations are distinct and the ratio of\nthe x-coefficient to the y-coefficient for one equation is equivalent to the ratio of the x-coefficient to the y-coefficient for the other equation. This\nratio for the given equation is 2 to 6, or 1 to 3. Only choice B is an equation that isn’t equivalent to the given equation and whose ratio of the x-\ncoefficient to the y-coefficient is 1 to 3.\nChoice A is incorrect. Multiplying each of the terms in this equation by 2 yields an equation that is equivalent to the given equation. This system\nwould have infinitely many solutions. Choices C and D are incorrect. The ratio of the x-coefficient to the y-coefficient in $6x - 2y = 0$ (choice C)\nis $-6$ to 2, or $-3$ to 1. This ratio in $6x + 2y = 10$ (choice D) is 6 to 2, or 3 to 1. Since neither of these ratios is equivalent to that for the given\nequation, these systems would have exactly one solution.",
+  "class": "stripped_math",
+  "note": "restored 6x-2y=0, -6, -3, 6x+2y=10",
+  "evidence": "ANS ANS Systems Two Lin Eq. Two Var HARD.pdf p14-15 (567ac7ab)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0ql02qlqmt1j468h4ba",
+  "field": "explanation",
+  "before": "Choice D is correct. A system of two linear equations has no solution when the graphs of the equations have the same slope and different y-\ncoordinates of the y-intercepts. Each of the given equations is written in the slope-intercept form of a linear equation, , where m is\nthe slope and b is the y-coordinate of the y-intercept of the graph of the equation. For these two linear equations, the y-coordinates of the y-\nintercepts are different: and . Thus, if the system of equations has no solution, the slopes of the two linear equations must be the same.\nThe slope of the first linear equation is 2. Therefore, for the system of equations to have no solution, the value of a must be 2.\nChoices A, B, and C are incorrect and may result from conceptual and computational errors.",
+  "after": "Choice D is correct. A system of two linear equations has no solution when the graphs of the equations have the same slope and different y-\ncoordinates of the y-intercepts. Each of the given equations is written in the slope-intercept form of a linear equation, $y = mx + b$, where m is\nthe slope and b is the y-coordinate of the y-intercept of the graph of the equation. For these two linear equations, the y-coordinates of the y-\nintercepts are different: $1$ and $-8$. Thus, if the system of equations has no solution, the slopes of the two linear equations must be the same.\nThe slope of the first linear equation is 2. Therefore, for the system of equations to have no solution, the value of a must be 2.\nChoices A, B, and C are incorrect and may result from conceptual and computational errors.",
+  "class": "stripped_math",
+  "note": "restored y = mx + b, 1, -8",
+  "evidence": "ANS ANS Systems Two Lin Eq. Two Var HARD.pdf p10-11 (e2e3942f)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0r102qxqmt13jpgi87c",
+  "field": "explanation",
+  "before": "Choice D is correct. Adding the corresponding sides of the two equations eliminates y and yields , as shown.\nIf (x, y) is a solution to the system, then (x, y) satisfies both equations in the system and any equation derived from them. Therefore, .\nChoices A, B, and C are incorrect and may be the result of errors when solving the system.",
+  "after": "Choice D is correct. Adding the corresponding sides of the two equations eliminates y and yields $x = 6$, as shown.\n$$\\begin{array}{r} \\frac{1}{2}y = 4 \\\\ x - \\frac{1}{2}y = 2 \\\\ \\hline x + 0 = 6 \\end{array}$$\nIf (x, y) is a solution to the system, then (x, y) satisfies both equations in the system and any equation derived from them. Therefore, $x = 6$.\nChoices A, B, and C are incorrect and may be the result of errors when solving the system.",
+  "class": "stripped_math",
+  "note": "restored x = 6 (twice) and the shown elimination work",
+  "evidence": "ANS ANS Systems 2 Lin Equat 2 Var MED.pdf p17-18 (cb8f449f)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnypx0213qmt1wvpd8dbq",
+  "field": "explanation",
+  "before": "Choice A is correct. The solution to a system of equations is the coordinates of the intersection point of the graphs of the equations in the xy-plane. Based on the graph, the solution to the given system of equations is best approximated as $\\left(\\frac{3}{2}, 0\\right)$. In the xy-plane, the graph of $y=0$ is a horizontal line on which every y-coordinate is 0, and the graph of $x=\\frac{3}{2}$ is a vertical line on which every x-coordinate is $\\frac{3}{2}$. These graphs intersect at the point $\\left(\\frac{3}{2}, 0\\right)$. Therefore, the system of equations in choice A has the same solution as the given system.",
+  "after": "Choice A is correct. The solution to a system of equations is the coordinates of the intersection point of the graphs of the equations in the xy-plane. Based on the graph, the solution to the given system of equations is best approximated as $\\left(\\frac{3}{2}, 0\\right)$. In the xy-plane, the graph of $y=0$ is a horizontal line on which every y-coordinate is 0, and the graph of $x=\\frac{3}{2}$ is a vertical line on which every x-coordinate is $\\frac{3}{2}$. These graphs intersect at the point $\\left(\\frac{3}{2}, 0\\right)$. Therefore, the system of equations in choice A has the same solution as the given system. Choices B, C, and D are incorrect. If graphed in the xy-plane, these choices would intersect at the points $\\left(0, \\frac{3}{2}\\right)$, $(1, 0)$, and $(0, 1)$, respectively, not $\\left(\\frac{3}{2}, 0\\right)$.",
+  "class": "explanation_truncated",
+  "note": "appended missing distractor paragraph from ANS p4 (page break)",
+  "evidence": "ANS ANS Systems 2 Lin Equat 2 Var MED.pdf p3-4-5 (2704399f)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnz4d024vqmt126v4shyk",
+  "field": "explanation",
+  "before": "Choice D is correct. For a linear equation in a form $ax + b = cx + d$ to have no solutions, the x-terms must have equal coefficients and the remaining terms must not be equal. Expanding the right-hand side of the given equation yields $9x + 5 = ax + ab$. Inspecting the x-terms, 9 must equal a, so statement I must be true. Inspecting the remaining terms, 5 can't equal $9b$. Dividing both of these quantities by 9 yields that b can't equal $\\frac{5}{9}$. Therefore, statement III must be true. Since b can have any value other than $\\frac{5}{9}$, statement II may or may not be true. Choice A is incorrect. For the given equation to have no solution, both $a = 9$ and $h \\neq \\frac{5}{9}$ must be true. Choice B is incorrect because it must also be true that $b \\neq \\frac{5}{9}$. Choice C is incorrect because when $a = 9$, there are many values of b that lead to an equation having no solution. That is, b might be 5, but b isn't required to be 5.",
+  "after": "Choice D is correct. For a linear equation in a form $ax + b = cx + d$ to have no solutions, the x-terms must have equal coefficients and the remaining terms must not be equal. Expanding the right-hand side of the given equation yields $9x + 5 = ax + ab$. Inspecting the x-terms, 9 must equal a, so statement I must be true. Inspecting the remaining terms, 5 can't equal $9b$. Dividing both of these quantities by 9 yields that b can't equal $\\frac{5}{9}$. Therefore, statement III must be true. Since b can have any value other than $\\frac{5}{9}$, statement II may or may not be true. Choice A is incorrect. For the given equation to have no solution, both $a = 9$ and $b \\neq \\frac{5}{9}$ must be true. Choice B is incorrect because it must also be true that $b \\neq \\frac{5}{9}$. Choice C is incorrect because when $a = 9$, there are many values of b that lead to an equation having no solution. That is, b might be 5, but b isn't required to be 5.",
+  "class": "broken_math",
+  "note": "variable h → b in 'b ≠ 5/9' (ANS p4)",
+  "evidence": "ANS ANS Linear Eq. One Variable HARD.pdf p4-5 (3f8a701b)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnz8h027iqmt1102yrb2w",
+  "field": "explanation",
+  "before": "Choice B is correct. Multiplying both sides of the given equation by 5 yields $2n = 50$. Substituting 50 for $2n$ in the expression $2n - 1$ yields $50 - 1 = 49$. Alternate approach: Dividing both sides of $2n = 50$ by 2 yields $n = 25$. Evaluating the expression $2n - 1$ for $n = 25$ yields $2(25) - 1 = 49$. Choice A is incorrect and may result from finding the value of $n - 1$ instead of $2n - 1$. Choice C is incorrect and may result from finding the value of $2n$ instead of $2n - 1$. Choice D is incorrect and may result from finding the value of $4n - 1$ instead of $2n - 1$. #",
+  "after": "Choice B is correct. Multiplying both sides of the given equation by 5 yields $2n = 50$. Substituting 50 for $2n$ in the expression $2n - 1$ yields $50 - 1 = 49$. Alternate approach: Dividing both sides of $2n = 50$ by 2 yields $n = 25$. Evaluating the expression $2n - 1$ for $n = 25$ yields $2(25) - 1 = 49$. Choice A is incorrect and may result from finding the value of $n - 1$ instead of $2n - 1$. Choice C is incorrect and may result from finding the value of $2n$ instead of $2n - 1$. Choice D is incorrect and may result from finding the value of $4n - 1$ instead of $2n - 1$.",
+  "class": "footer_leak",
+  "note": "removed stray trailing '#' (ANS p12-13 ends at '...instead of 2n - 1.')",
+  "evidence": "ANS ANS Linear Eq. One Variable EASY.pdf p12-13 (7a987ae4)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0q602qdqmt1ubmu4ytp",
+  "field": "explanation",
+  "before": "Choice D is correct. A system of two linear equations has infinitely many solutions if one equation is equivalent to the other. This means that when the two equations are written in the same form, each coefficient or constant in one equation is equal to the corresponding coefficient or constant in the other equation multiplied by the same number. The equations in the given system of equations are written in the same form, with x and y on the left-hand side and a constant on the right-hand side of the equation. The coefficient of y in the second equation is equal to the coefficient of y in the first equation multiplied by 3. Therefore, a, the coefficient of x in the second equation, must be equal to 3 times the coefficient of x in the first equation: $a = (\\frac{1}{2})(3)$, or $a = \\frac{3}{2}$. Choices A, B, and C are incorrect. When $a = -\\frac{1}{2}$, $a = 0$, or $a = \\frac{1}{2}$, the given system of equations has one solution. #",
+  "after": "Choice D is correct. A system of two linear equations has infinitely many solutions if one equation is equivalent to the other. This means that when the two equations are written in the same form, each coefficient or constant in one equation is equal to the corresponding coefficient or constant in the other equation multiplied by the same number. The equations in the given system of equations are written in the same form, with x and y on the left-hand side and a constant on the right-hand side of the equation. The coefficient of y in the second equation is equal to the coefficient of y in the first equation multiplied by 3. Therefore, a, the coefficient of x in the second equation, must be equal to 3 times the coefficient of x in the first equation: $a = (\\frac{1}{2})(3)$, or $a = \\frac{3}{2}$. Choices A, B, and C are incorrect. When $a = -\\frac{1}{2}$, $a = 0$, or $a = \\frac{1}{2}$, the given system of equations has one solution.",
+  "class": "footer_leak",
+  "note": "removed stray trailing '#' (ANS p5-6 ends at '...has one solution.')",
+  "evidence": "ANS ANS Systems Two Lin Eq. Two Var HARD.pdf p5-6 (e1248a5c)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsp5ap9j00020vmk6srhwtyo",
+  "field": "explanation",
+  "before": "Choice B is correct. Since p represents Megan’s regular pay per hour, 1.5p represents the pay per hour in excess of 8 hours. Since Megan worked for 10 hours, she must have been paid p dollars per hour for 8 of the hours plus 1.5p dollars per hour for the remaining 2 hours. Therefore, since Megan earned $137.50 for the 10 hours, the situation can be represented by the equation 137.5 = 8p + 2(1.5)p",
+  "after": "Choice B is correct. Since p represents Megan’s regular pay per hour, 1.5p represents the pay per hour in excess of 8 hours. Since Megan worked for 10 hours, she must have been paid p dollars per hour for 8 of the hours plus 1.5p dollars per hour for the remaining 2 hours. Therefore, since Megan earned \\$137.50 for the 10 hours, the situation can be represented by the equation 137.5 = 8p + 2(1.5)p. Distributing the 2 in the equation gives 137.5 = 8p + 3p, and combining like terms gives 137.5 = 11p. Dividing both sides by 11 gives p = 12.5. Therefore, Megan’s regular wage is \\$12.50.\nChoices A and C are incorrect and may be the result of calculation errors. Choice D is incorrect and may result from finding the average hourly wage that Megan earned for the 10 hours of work.",
+  "class": "explanation_truncated",
+  "note": "restored cut tail (ANS p16-17) and distractor paragraph; prose currency escaped as \\$",
+  "evidence": "ANS ANS Linear Eq One Variable MED.pdf p16-17 (36ab4122)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnyzp0245qmt1vrq35pe9",
+  "field": "stem",
+  "before": "Tony spends $80 per month on public transportation. A 10-ride pass costs $12.50, and a single-ride pass costs $1.50. If g represents the number of 10-ride passes Tony buys in a month and t represents the number of single-ride passes Tony buys in a month, which of the following equations best represents the relationship between g and t ?\n\n#",
+  "after": "Tony spends \\$80 per month on public transportation. A 10-ride pass costs \\$12.50, and a single-ride pass costs \\$1.50. If g represents the number of 10-ride passes Tony buys in a month and t represents the number of single-ride passes Tony buys in a month, which of the following equations best represents the relationship between g and t ?",
+  "class": "currency_dollar+footer_leak",
+  "note": "prose currency escaped as \\$ (odd $ count in stem); removed stray trailing '\\n\\n#' page-footer artifact",
+  "evidence": "ANS ANS Linear Eq TWO Variables EASY.pdf p16-17 (dfa45424)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnyyk023iqmt1uuzqm98a",
+  "field": "stem",
+  "before": "Line $r$ in the $xy$-plane has a slope of 4 and passes through the point $(0, 6)$. Which equation defines line $r$?\n\n#",
+  "after": "Line $r$ in the $xy$-plane has a slope of 4 and passes through the point $(0, 6)$. Which equation defines line $r$?",
+  "class": "footer_leak",
+  "note": "removed stray trailing '\\n\\n#' page-footer artifact",
+  "evidence": "ANS ANS Linear Eq TWO Variables EASY.pdf p5-6 (6fa1dc0f)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnyyz023uqmt1jhlwhadv",
+  "field": "stem",
+  "before": "A city's total expense budget for one year was x million dollars. The city budgeted y million dollars for departmental expenses and 201 million dollars for all other expenses. Which of the following represents the relationship between x and y in this context?\n\n#",
+  "after": "A city's total expense budget for one year was x million dollars. The city budgeted y million dollars for departmental expenses and 201 million dollars for all other expenses. Which of the following represents the relationship between x and y in this context?",
+  "class": "footer_leak",
+  "note": "removed stray trailing '\\n\\n#' page-footer artifact",
+  "evidence": "ANS ANS Linear Eq TWO Variables EASY.pdf p9-10 (8adf1335)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnz0s024kqmt1sj7y0uyv",
+  "field": "stem",
+  "before": "In 2010, a swim club had a total of 35 swimmers, each classified as either advanced or intermediate. From 2010 to 2020, the number of advanced swimmers in the club increased by approximately 53%, and the number of intermediate swimmers in the club increased by approximately 44%. The total number of swimmers in the club increased by approximately 49%. Which equation best represents this situation, where a represents the number of advanced swimmers in the club in 2010 and b represents the number of intermediate swimmers in the club in 2010?\n\n#",
+  "after": "In 2010, a swim club had a total of 35 swimmers, each classified as either advanced or intermediate. From 2010 to 2020, the number of advanced swimmers in the club increased by approximately 53%, and the number of intermediate swimmers in the club increased by approximately 44%. The total number of swimmers in the club increased by approximately 49%. Which equation best represents this situation, where a represents the number of advanced swimmers in the club in 2010 and b represents the number of intermediate swimmers in the club in 2010?",
+  "class": "footer_leak",
+  "note": "removed stray trailing '\\n\\n#' page-footer artifact",
+  "evidence": "ANS ANS Linear Eq TWO Variables EASY.pdf p28-29 (8da536c6)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzct028yqmt1idhnfbz2",
+  "field": "explanation",
+  "before": "Choice B is correct. Since Brittany's total take-home pay was $1,576, the value 1,576 can be substituted for T in the given equation $T = 1,000 + 18h$ to give $1,576 = 1,000 + 18h$. Subtracting 1,000 from both sides of this equation gives $576 = 18h$. Dividing both sides of this equation by 18 gives $32 = h$. Therefore, Brittany was paid for 32 hours for her first week of work. Choice A is incorrect. This is half the number of hours Brittany was paid for. Choice C is incorrect and may result from dividing 1,000 by 18. Choice D is incorrect and may result from dividing 1,576 by 18.",
+  "after": "Choice B is correct. Since Brittany's total take-home pay was \\$1,576, the value 1,576 can be substituted for T in the given equation $T = 1,000 + 18h$ to give $1,576 = 1,000 + 18h$. Subtracting 1,000 from both sides of this equation gives $576 = 18h$. Dividing both sides of this equation by 18 gives $32 = h$. Therefore, Brittany was paid for 32 hours for her first week of work. Choice A is incorrect. This is half the number of hours Brittany was paid for. Choice C is incorrect and may result from dividing 1,000 by 18. Choice D is incorrect and may result from dividing 1,576 by 18.",
+  "class": "currency_dollar",
+  "note": "unescaped prose currency \\$1,576 paired with the next math $ and broke rendering; escaped as \\$",
+  "evidence": "ANS ANS Linear Functions EASY.pdf p11-12 (255996a6)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzfn02anqmt1udae05zd",
+  "field": "explanation",
+  "before": "Choice D is correct. It's given that the cost of renting a backhoe for up to 10 days is $270 for the first day and $135 for each additional day. Therefore, the cost $y$, in dollars, for $x$ days, where $x \\leq 10$, is the sum of the cost for the first day, $270, and the cost for the additional $x - 1$ days, $135(x - 1)$. It follows that $y = 270 + 135(x - 1)$, which is equivalent to $y = 270 + 135x - 135$, or $y = 135x + 135$. Choice A is incorrect. This equation represents a situation where the cost of renting a backhoe is $135 for the first day and $270 for each additional day. Choice B is incorrect and may result from conceptual or calculation errors. Choice C is incorrect and may result from conceptual or calculation errors.",
+  "after": "Choice D is correct. It's given that the cost of renting a backhoe for up to 10 days is \\$270 for the first day and \\$135 for each additional day. Therefore, the cost $y$, in dollars, for $x$ days, where $x \\leq 10$, is the sum of the cost for the first day, \\$270, and the cost for the additional $x - 1$ days, $135(x - 1)$. It follows that $y = 270 + 135(x - 1)$, which is equivalent to $y = 270 + 135x - 135$, or $y = 135x + 135$. Choice A is incorrect. This equation represents a situation where the cost of renting a backhoe is \\$135 for the first day and \\$270 for each additional day. Choice B is incorrect and may result from conceptual or calculation errors. Choice C is incorrect and may result from conceptual or calculation errors.",
+  "class": "currency_dollar",
+  "note": "unescaped prose currency ($270, $135) paired with math delimiters and broke rendering; escaped as \\$",
+  "evidence": "ANS ANS Linear Funct HARD.pdf p15-16 (be9cb6a2)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnyxz0234qmt16q0dxub9",
+  "field": "explanation",
+  "before": "The correct answer is 3500. The given information includes a cost, $800, to produce 100 shirts. Substituting $c(x) = 800$ and $x = 100$ into the given equation yields $800 = m \\cdot 100 + 500$. Subtracting 500 from both sides of the equation yields $300 = m \\cdot 100$. Dividing both sides of this equation by 100 yields $3 = m$. Substituting the value of m into the given equation yields $c(x) = 3x + 500$. Substituting 1000 for x in this equation and solving for $c(x)$ gives the cost of 1000 shirts: $3(1000) + 500$, or 3500.",
+  "after": "The correct answer is 3500. The given information includes a cost, \\$800, to produce 100 shirts. Substituting $c(x) = 800$ and $x = 100$ into the given equation yields $800 = m \\cdot 100 + 500$. Subtracting 500 from both sides of the equation yields $300 = m \\cdot 100$. Dividing both sides of this equation by 100 yields $3 = m$. Substituting the value of m into the given equation yields $c(x) = 3x + 500$. Substituting 1000 for x in this equation and solving for $c(x)$ gives the cost of 1000 shirts: $3(1000) + 500$, or 3500.",
+  "class": "currency_dollar",
+  "note": "unescaped prose currency \\$800 paired with math delimiters and broke rendering; escaped as \\$",
+  "evidence": "ANS ANS Linear Funct MED.pdf p24-25 (4fe4fd7c)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzg902b2qmt1fkbvt19a",
+  "field": "explanation",
+  "before": "Choice C is correct. It's given that Anthony will spend at most $115 to purchase $x$ small cheese pizzas and $y$ large cheese pizzas. In the inequality $11x + 14y \\leq 115$, $y$ represents the number of large cheese pizzas that Anthony will purchase. This means the coefficient 14 represents the amount, in dollars, Anthony will spend on each large cheese pizza. Therefore, the best interpretation of $14y$ in this context is the total amount, in dollars, Anthony will spend on large cheese pizzas. Choice A is incorrect. This is the best interpretation of 14, not $14y$. Choice B is incorrect. This is the best interpretation of 11, not $14y$. Choice D is incorrect. This is the best interpretation of $11x$, not $14y$.",
+  "after": "Choice C is correct. It's given that Anthony will spend at most \\$115 to purchase $x$ small cheese pizzas and $y$ large cheese pizzas. In the inequality $11x + 14y \\leq 115$, $y$ represents the number of large cheese pizzas that Anthony will purchase. This means the coefficient 14 represents the amount, in dollars, Anthony will spend on each large cheese pizza. Therefore, the best interpretation of $14y$ in this context is the total amount, in dollars, Anthony will spend on large cheese pizzas. Choice A is incorrect. This is the best interpretation of 14, not $14y$. Choice B is incorrect. This is the best interpretation of 11, not $14y$. Choice D is incorrect. This is the best interpretation of $11x$, not $14y$.",
+  "class": "currency_dollar",
+  "note": "unescaped prose currency \\$115 paired with math delimiters and broke rendering; escaped as \\$",
+  "evidence": "ANS ANS Linear Inequalities HARD.pdf p3-4 (68c5c81a)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnyzp0245qmt1vrq35pe9",
+  "field": "explanation",
+  "before": "Choice D is correct. Since a 10-ride pass costs $12.50 and g is the number of 10-ride passes Tony buys in a month, the expression $$12.50g$$ represents the amount Tony spends on 10-ride passes in a month. Since a single-ride pass costs $1.50 and t is the number of single-ride passes Tony buys in a month, the expression $$1.50t$$ represents the amount Tony spends on single-ride passes in a month. Therefore, the sum $$12.50g + 1.50t$$ represents the amount he spends on the two types of passes in a month. Since Tony spends a total of $80 on passes in a month, this expression can be set equal to 80, producing $$12.50g + 1.50t = 80$$.\n\nChoices A and B are incorrect. The expression $$g + t$$ represents the total number of the two types of passes Tony buys in a month, not the amount Tony spends, which is equal to 80, nor the cost of one of each pass, which is equal to $$1.50 + 12.50$$. Choice C is incorrect and may result from reversing the cost for each type of pass Tony buys in a month.",
+  "after": "Choice D is correct. Since a 10-ride pass costs \\$12.50 and g is the number of 10-ride passes Tony buys in a month, the expression $$12.50g$$ represents the amount Tony spends on 10-ride passes in a month. Since a single-ride pass costs \\$1.50 and t is the number of single-ride passes Tony buys in a month, the expression $$1.50t$$ represents the amount Tony spends on single-ride passes in a month. Therefore, the sum $$12.50g + 1.50t$$ represents the amount he spends on the two types of passes in a month. Since Tony spends a total of \\$80 on passes in a month, this expression can be set equal to 80, producing $$12.50g + 1.50t = 80$$.\n\nChoices A and B are incorrect. The expression $$g + t$$ represents the total number of the two types of passes Tony buys in a month, not the amount Tony spends, which is equal to 80, nor the cost of one of each pass, which is equal to $$1.50 + 12.50$$. Choice C is incorrect and may result from reversing the cost for each type of pass Tony buys in a month.",
+  "class": "currency_dollar",
+  "note": "unescaped prose currency (\\$12.50, \\$1.50, \\$80) paired with math delimiters and broke rendering; escaped as \\$",
+  "evidence": "ANS ANS Linear Eq TWO Variables EASY.pdf p16-17 (dfa45424)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnyhu01xnqmt1dkf5z42i",
+  "field": "explanation",
+  "before": "The correct answer is .25. It's given that the topsoil and crushed stone Isabel ordered for her garden cost a total of $641. It's also given that the equation $24.5x + 24.75y = 641$ represents the relationship between the number of cubic yards of topsoil, $x$, and the number of tons of crushed stone, $y$, that Isabel ordered. Since $x$ represents the number of cubic yards of topsoil ordered, $24.5x$ represents the total cost, in dollars, of the topsoil, and the cost per cubic yard of topsoil is $24.50. Similarly, since $y$ represents the number of tons of crushed stone ordered, $24.75y$ represents the total cost, in dollars, of crushed stone ordered, and the cost per ton of crushed stone is $24.75. Therefore, a ton of crushed stone cost Isabel $24.75 - 24.50$, or 0.25, more dollars than a cubic yard of topsoil. Note that .25 and 1/4 are examples of ways to enter a correct answer.",
+  "after": "The correct answer is .25. It's given that the topsoil and crushed stone Isabel ordered for her garden cost a total of \\$641. It's also given that the equation $24.5x + 24.75y = 641$ represents the relationship between the number of cubic yards of topsoil, $x$, and the number of tons of crushed stone, $y$, that Isabel ordered. Since $x$ represents the number of cubic yards of topsoil ordered, $24.5x$ represents the total cost, in dollars, of the topsoil, and the cost per cubic yard of topsoil is \\$24.50. Similarly, since $y$ represents the number of tons of crushed stone ordered, $24.75y$ represents the total cost, in dollars, of crushed stone ordered, and the cost per ton of crushed stone is \\$24.75. Therefore, a ton of crushed stone cost Isabel $24.75 - 24.50$, or 0.25, more dollars than a cubic yard of topsoil. Note that .25 and 1/4 are examples of ways to enter a correct answer.",
+  "class": "currency_dollar",
+  "note": "unescaped prose currency (\\$641, \\$24.50, \\$24.75) paired with math delimiters and broke rendering; escaped as \\$",
+  "evidence": "ANS ANS Linear Eq TWO Variables MED.pdf p3-4 (1087f6c4)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnz7f026oqmt1c28riet1",
+  "field": "explanation",
+  "before": "Choice A is correct. Multiplying both sides of the equation by 5 results in . Dividing both sides of the resulting equation by 4 results in\n.\nChoice B is incorrect and may result from adding 20 and 4. Choice C is incorrect and may result from dividing 20 by 5 and then multiplying the\nresult by 4. Choice D is incorrect and may result from subtracting 5 from 20.",
+  "after": "Choice A is correct. Multiplying both sides of the equation by 5 results in $4x = 100$. Dividing both sides of the resulting equation by 4 results in\n$x = 25$.\nChoice B is incorrect and may result from adding 20 and 4. Choice C is incorrect and may result from dividing 20 by 5 and then multiplying the\nresult by 4. Choice D is incorrect and may result from subtracting 5 from 20.",
+  "class": "stripped_math",
+  "note": "restored 4x = 100 and x = 25",
+  "evidence": "ANS ANS Linear Eq. One Variable EASY.pdf p2-3 (6ac23de7)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnyyg023dqmt10uvdzu40",
+  "field": "explanation",
+  "before": "Choice C is correct. Maria spends x minutes running each day and y minutes biking each day. Therefore, represents the total number of\nminutes Maria spent running and biking each day. Because , it follows that 75 is the total number of minutes that Maria spent\nrunning and biking each day.\nChoices A and B are incorrect. The number of minutes Maria spent running each day is represented by x and need not be 75. Similarly, the\nnumber of minutes that Maria spends biking each day is represented by y and need not be 75. The number of minutes Maria spends running\neach day and biking each day may vary; however, the total number of minutes she spends each day on these activities is constant and equal to\n75. Choice D is incorrect. The number of minutes Maria spent biking for each minute spent running cannot be determined from the information\nprovided.",
+  "after": "Choice C is correct. Maria spends x minutes running each day and y minutes biking each day. Therefore, $x + y$ represents the total number of\nminutes Maria spent running and biking each day. Because $x + y = 75$, it follows that 75 is the total number of minutes that Maria spent\nrunning and biking each day.\nChoices A and B are incorrect. The number of minutes Maria spent running each day is represented by x and need not be 75. Similarly, the\nnumber of minutes that Maria spends biking each day is represented by y and need not be 75. The number of minutes Maria spends running\neach day and biking each day may vary; however, the total number of minutes she spends each day on these activities is constant and equal to\n75. Choice D is incorrect. The number of minutes Maria spent biking for each minute spent running cannot be determined from the information\nprovided.",
+  "class": "stripped_math",
+  "note": "restored x + y and x + y = 75",
+  "evidence": "ANS ANS Linear Eq TWO Variables EASY.pdf p4-5 (87322577)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnyh901xbqmt11p3gn17i",
+  "field": "explanation",
+  "before": "Choice B is correct. If each tray contains the least number of cookies possible, 50 cookies, then the least number of cookies possible on 4 trays\nis 50 × 4 = 200 cookies. If each tray contains the greatest number of cookies possible, 60 cookies, then the greatest number of cookies possible\non 4 trays is 60 × 4 = 240 cookies. If the least number of cookies on 4 trays is 200 and the greatest number of cookies is 240, then 205 could be\nthe total number of cookies on these 4 trays of cookies because .\nChoices A, C, and D are incorrect. The least number of cookies on 4 trays is 200 cookies, and the greatest number of cookies on 4 trays is 240\ncookies. The choices 165, 245, and 285 are each either less than 200 or greater than 240; therefore, they cannot represent the total number of\ncookies on 4 trays.",
+  "after": "Choice B is correct. If each tray contains the least number of cookies possible, 50 cookies, then the least number of cookies possible on 4 trays\nis 50 × 4 = 200 cookies. If each tray contains the greatest number of cookies possible, 60 cookies, then the greatest number of cookies possible\non 4 trays is 60 × 4 = 240 cookies. If the least number of cookies on 4 trays is 200 and the greatest number of cookies is 240, then 205 could be\nthe total number of cookies on these 4 trays of cookies because $200 \\leq 205 \\leq 240$.\nChoices A, C, and D are incorrect. The least number of cookies on 4 trays is 200 cookies, and the greatest number of cookies on 4 trays is 240\ncookies. The choices 165, 245, and 285 are each either less than 200 or greater than 240; therefore, they cannot represent the total number of\ncookies on 4 trays.",
+  "class": "stripped_math",
+  "note": "restored 200 ≤ 205 ≤ 240",
+  "evidence": "ANS ANS Linear Inequalities EASY.pdf p10-11 (563407e5)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnyx1022pqmt145bp8w1d",
+  "field": "stem",
+  "before": "The graph represents the total charge, in dollars, by an electrician for hours of work. The electrician charges a onetime fee plus an hourly rate.\nWhat is the best interpretation of the slope of the graph?",
+  "after": "The graph represents the total charge, in dollars, by an electrician for $x$ hours of work. The electrician charges a onetime fee plus an hourly rate.\nWhat is the best interpretation of the slope of the graph?",
+  "class": "stripped_math",
+  "note": "restored variable x in 'for x hours of work' (ANS p16 question)",
+  "evidence": "ANS ANS Linear Funct MED.pdf p16-17-18 (f0773a55)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnyoa020bqmt1lc1ac9h1",
+  "field": "explanation",
+  "before": "Choice D is correct. It’s given that the candle starts with ounces of wax and has ounces of wax remaining after a period of time has passed.\nThe amount of wax the candle has lost during the time period can be found by subtracting the remaining amount of wax from the amount of wax\nthe candle was made of, which yields ounces, or ounces. This means the candle loses ounces of wax during that period of time.\nIt’s given that the amount of wax decreases by ounce every hours. If represents the number of hours the candle has been burning, it follows\nthat . Multiplying both sides of this equation by yields . Therefore, the candle has been burning for hours.\nChoice A is incorrect and may result from using the equation rather than to represent the situation, and then rounding to the\nnearest whole number.\nChoice B is incorrect. This is the amount of wax, in ounces, remaining in the candle, not the number of hours it has been burning.\nChoice C is incorrect and may result from using the equation rather than to represent the situation.",
+  "after": "Choice D is correct. It’s given that the candle starts with $17$ ounces of wax and has $6$ ounces of wax remaining after a period of time has passed.\nThe amount of wax the candle has lost during the time period can be found by subtracting the remaining amount of wax from the amount of wax\nthe candle was made of, which yields $17 - 6$ ounces, or $11$ ounces. This means the candle loses $11$ ounces of wax during that period of time.\nIt’s given that the amount of wax decreases by $1$ ounce every $4$ hours. If $h$ represents the number of hours the candle has been burning, it follows\nthat $\\frac{1}{4} = \\frac{11}{h}$. Multiplying both sides of this equation by $4h$ yields $h = 44$. Therefore, the candle has been burning for $44$ hours.\nChoice A is incorrect and may result from using the equation $\\frac{1}{4} = \\frac{h}{11}$ rather than $\\frac{1}{4} = \\frac{11}{h}$ to represent the situation, and then rounding to the\nnearest whole number.\nChoice B is incorrect. This is the amount of wax, in ounces, remaining in the candle, not the number of hours it has been burning.\nChoice C is incorrect and may result from using the equation $\\frac{1}{4} = \\frac{6}{h}$ rather than $\\frac{1}{4} = \\frac{11}{h}$ to represent the situation.",
+  "class": "stripped_math",
+  "note": "restored all stripped numbers/fractions (17, 6, 17-6, 11, 1/4=11/h, 4h, h=44, distractor equations)",
+  "evidence": "ANS ANS Linear Eq One Variable MED.pdf p19-20 (8c515062)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnyk101ymqmt137ykwbgt",
+  "field": "explanation",
+  "before": "Choice A is correct. It's given that a neighborhood consists of a -hectare park and a -hectare residential area and that the total number of\ntrees in the neighborhood is . It's also given that the equation represents this situation. Since the total number of trees\nfor a given area can be determined by taking the number of hectares times the average number of trees per hectare, this must mean that the\nterms and correspond to the number of trees in the park and in the residential area, respectively. Since corresponds to the number of\ntrees in the park, and is the size of the park, in hectares, must represent the average number of trees per hectare in the park.\nChoice B is incorrect and may result from conceptual errors.\nChoice C is incorrect and may result from conceptual errors.\nChoice D is incorrect and may result from conceptual errors.",
+  "after": "Choice A is correct. It's given that a neighborhood consists of a $2$-hectare park and a $35$-hectare residential area and that the total number of\ntrees in the neighborhood is $3{,}934$. It's also given that the equation $2x + 35y = 3{,}934$ represents this situation. Since the total number of trees\nfor a given area can be determined by taking the number of hectares times the average number of trees per hectare, this must mean that the\nterms $2x$ and $35y$ correspond to the number of trees in the park and in the residential area, respectively. Since $2x$ corresponds to the number of\ntrees in the park, and $2$ is the size of the park, in hectares, $x$ must represent the average number of trees per hectare in the park.\nChoice B is incorrect and may result from conceptual errors.\nChoice C is incorrect and may result from conceptual errors.\nChoice D is incorrect and may result from conceptual errors.",
+  "class": "stripped_math",
+  "note": "restored 2, 35, 3,934, 2x+35y=3,934, 2x, 35y, x",
+  "evidence": "ANS ANS Linear Eq TWO Variables MED.pdf p22-23 (038d87d7)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzca028nqmt1n51zk9nf",
+  "field": "explanation",
+  "before": "Choice D is correct. It′s given that Juan rides his bike at an average rate of minutes per mile. The number of minutes it will take Juan to ride\nmiles can be determined by multiplying his average rate by the number of miles, , which yields . Therefore, the function\nmodels the number of minutes it will take Juan to ride miles.\nChoice A is incorrect and may result from conceptual errors.\nChoice B is incorrect and may result from conceptual errors.\nChoice C is incorrect and may result from conceptual errors.",
+  "after": "Choice D is correct. It′s given that Juan rides his bike at an average rate of $5.7$ minutes per mile. The number of minutes it will take Juan to ride $x$\nmiles can be determined by multiplying his average rate by the number of miles, $x$, which yields $5.7x$. Therefore, the function $m(x) = 5.7x$\nmodels the number of minutes it will take Juan to ride $x$ miles.\nChoice A is incorrect and may result from conceptual errors.\nChoice B is incorrect and may result from conceptual errors.\nChoice C is incorrect and may result from conceptual errors.",
+  "class": "stripped_math",
+  "note": "restored 5.7, x, 5.7x, m(x)=5.7x",
+  "evidence": "ANS ANS Linear Functions EASY.pdf p8-9 (a396ed75)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzev02abqmt1gr044lw3",
+  "field": "explanation",
+  "before": "Choice A is correct. It’s given that the function gives the temperature, in degrees Fahrenheit, that corresponds to\na temperature of kelvins. A temperature that increased by kelvins means that the value of increased by kelvins. It follows that an\nincrease in by increases by , or . Therefore, if a temperature increased by kelvins, the temperature increased by\ndegrees Fahrenheit.\nChoice B is incorrect and may result from conceptual or calculation errors.\nChoice C is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "after": "Choice A is correct. It’s given that the function $F(x) = \\frac{9}{5}(x - 273.15) + 32$ gives the temperature, in degrees Fahrenheit, that corresponds to\na temperature of $x$ kelvins. A temperature that increased by $2.10$ kelvins means that the value of $x$ increased by $2.10$ kelvins. It follows that an\nincrease in $x$ by $2.10$ increases $F(x)$ by $\\frac{9}{5}(2.10)$, or $3.78$. Therefore, if a temperature increased by $2.10$ kelvins, the temperature increased by\n$3.78$ degrees Fahrenheit.\nChoice B is incorrect and may result from conceptual or calculation errors.\nChoice C is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "class": "stripped_math",
+  "note": "restored F(x)=9/5(x-273.15)+32, x, 2.10, 9/5(2.10), 3.78",
+  "evidence": "ANS ANS Linear Funct HARD.pdf p7-8 (6989c80a)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzfk02amqmt1v8tdlxz2",
+  "field": "explanation",
+  "before": "Choice A is correct. It’s given that the function gives the temperature, in degrees Fahrenheit, that corresponds to\na temperature of kelvins. A temperature that increased by kelvins means that the value of increased by kelvins. It follows that an\nincrease in by increases by , or . Therefore, if a temperature increased by kelvins, the temperature increased by\ndegrees Fahrenheit.\nChoice B is incorrect and may result from conceptual or calculation errors.\nChoice C is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "after": "Choice A is correct. It’s given that the function $F(x) = \\frac{9}{5}(x - 273.15) + 32$ gives the temperature, in degrees Fahrenheit, that corresponds to\na temperature of $x$ kelvins. A temperature that increased by $9.10$ kelvins means that the value of $x$ increased by $9.10$ kelvins. It follows that an\nincrease in $x$ by $9.10$ increases $F(x)$ by $\\frac{9}{5}(9.10)$, or $16.38$. Therefore, if a temperature increased by $9.10$ kelvins, the temperature increased by\n$16.38$ degrees Fahrenheit.\nChoice B is incorrect and may result from conceptual or calculation errors.\nChoice C is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "class": "stripped_math",
+  "note": "restored F(x)=9/5(x-273.15)+32, x, 9.10, 9/5(9.10), 16.38",
+  "evidence": "ANS ANS Linear Funct HARD.pdf p14-15 (b3abf40f)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnyfz01x0qmt11v6epal0",
+  "field": "explanation",
+  "before": "Choice C is correct. It's given that the estimated volume of the slab of granite is greater than cubic feet but less than cubic feet. It's\nalso given that the estimated weight per cubic foot of volume of that slab is pounds. The estimated total weight of the slab of granite, in\npounds, can be calculated by multiplying the estimated volume by the estimated weight per cubic foot. Therefore, if the estimated volume of the\nslab of granite is cubic feet, its estimated total weight is pounds, and if the estimated volume of the slab of granite is cubic\nfeet, its estimated total weight is pounds. Since the estimated volume of the slab of granite is greater than cubic feet but less\nthan cubic feet, the estimated total weight , in pounds, must be greater than pounds and less than pounds. This\nsituation can be represented by the inequality .\nChoice A is incorrect and may result from conceptual or calculation errors.\nChoice B is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "after": "Choice C is correct. It's given that the estimated volume of the slab of granite is greater than $12.7$ cubic feet but less than $15.7$ cubic feet. It's\nalso given that the estimated weight per cubic foot of volume of that slab is $165$ pounds. The estimated total weight of the slab of granite, in\npounds, can be calculated by multiplying the estimated volume by the estimated weight per cubic foot. Therefore, if the estimated volume of the\nslab of granite is $12.7$ cubic feet, its estimated total weight is $165(12.7)$ pounds, and if the estimated volume of the slab of granite is $15.7$ cubic\nfeet, its estimated total weight is $165(15.7)$ pounds. Since the estimated volume of the slab of granite is greater than $12.7$ cubic feet but less\nthan $15.7$ cubic feet, the estimated total weight $x$, in pounds, must be greater than $165(12.7)$ pounds and less than $165(15.7)$ pounds. This\nsituation can be represented by the inequality $165(12.7) < x < 165(15.7)$.\nChoice A is incorrect and may result from conceptual or calculation errors.\nChoice B is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "class": "stripped_math",
+  "note": "restored 12.7, 15.7, 165, 165(12.7), 165(15.7), x and the inequality",
+  "evidence": "ANS ANS Linear Inequalities EASY.pdf p3-4 (f01ef454)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnyga01x3qmt11rv16djp",
+  "field": "explanation",
+  "before": "Choice A is correct. Since the cost of each shirt is $15 and Geoff buys s shirts, the expression represents the amount Geoff spends on\nshirts. Since the cost of each pair of pants is $25 and Geoff buys p pairs of pants, the expression represents the amount Geoff spends on\npants. Therefore, the sum represents the total amount Geoff spends at the store. Since Geoff can spend at most $120 at the store,\nthe total amount he spends must be less than or equal to 120. Thus, .\nChoice B is incorrect. This represents the situation in which Geoff spends at least, rather than at most, $120 at the store. Choice C is incorrect\nand may result from reversing the cost of a shirt and that of a pair of paints. Choice D is incorrect and may result from both reversing the cost of\na shirt and that of a pair of pants and from representing a situation in which Geoff spends at least, rather than at most, $120 at the store.",
+  "after": "Choice A is correct. Since the cost of each shirt is \\$15 and Geoff buys s shirts, the expression $15s$ represents the amount Geoff spends on\nshirts. Since the cost of each pair of pants is \\$25 and Geoff buys p pairs of pants, the expression $25p$ represents the amount Geoff spends on\npants. Therefore, the sum $15s + 25p$ represents the total amount Geoff spends at the store. Since Geoff can spend at most \\$120 at the store,\nthe total amount he spends must be less than or equal to 120. Thus, $15s + 25p \\leq 120$.\nChoice B is incorrect. This represents the situation in which Geoff spends at least, rather than at most, \\$120 at the store. Choice C is incorrect\nand may result from reversing the cost of a shirt and that of a pair of paints. Choice D is incorrect and may result from both reversing the cost of\na shirt and that of a pair of pants and from representing a situation in which Geoff spends at least, rather than at most, \\$120 at the store.",
+  "class": "stripped_math",
+  "note": "restored 15s, 25p, 15s+25p, 15s+25p ≤ 120; prose currency escaped as \\$",
+  "evidence": "ANS ANS Linear Inequalities EASY.pdf p6-7 (84d0d07e)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzgl02b9qmt1hd5h3q4l",
+  "field": "explanation",
+  "before": "Choice B is correct. It’s given that a team plans to sell at least tickets before an event and at least tickets during the event to raise a\ntotal of at least from all tickets sold. It’s also given that the price of a ticket during the event is less than the price of a ticket before\nthe event and that represents the price, in dollars, of a ticket sold during the event. It follows that represents the price, in dollars, of a\nticket sold before the event. The expression represents the planned revenue, in dollars, from the tickets sold before the event, and\nthe expression represents the planned revenue, in dollars, from the tickets sold during the event. Thus, the expression\nrepresents the planned revenue, in dollars, from all tickets sold. Since the team plans to raise a total of at least from all tickets sold, the\ntotal revenue must be at least . Therefore, the inequality represents this situation.\nChoice A is incorrect. This inequality represents a situation in which the team raises a total of at most from all tickets sold.\nChoice C is incorrect. This inequality represents a situation in which the price of a ticket before the event is less, rather than more, than the\nprice of a ticket during the event and the team raises a total of at most from all tickets sold.\nChoice D is incorrect. This inequality represents a situation in which the price of a ticket before the event is less, rather than more, than the\nprice of a ticket during the event.",
+  "after": "Choice B is correct. It’s given that a team plans to sell at least $140$ tickets before an event and at least $220$ tickets during the event to raise a\ntotal of at least \\$5,820 from all tickets sold. It’s also given that the price of a ticket during the event is \\$3 less than the price of a ticket before\nthe event and that $x$ represents the price, in dollars, of a ticket sold during the event. It follows that $x + 3$ represents the price, in dollars, of a\nticket sold before the event. The expression $140(x + 3)$ represents the planned revenue, in dollars, from the tickets sold before the event, and\nthe expression $220x$ represents the planned revenue, in dollars, from the tickets sold during the event. Thus, the expression $140(x + 3) + 220x$\nrepresents the planned revenue, in dollars, from all tickets sold. Since the team plans to raise a total of at least \\$5,820 from all tickets sold, the\ntotal revenue must be at least \\$5,820. Therefore, the inequality $140(x + 3) + 220x \\geq 5{,}820$ represents this situation.\nChoice A is incorrect. This inequality represents a situation in which the team raises a total of at most \\$5,820 from all tickets sold.\nChoice C is incorrect. This inequality represents a situation in which the price of a ticket before the event is \\$3 less, rather than \\$3 more, than the\nprice of a ticket during the event and the team raises a total of at most \\$5,820 from all tickets sold.\nChoice D is incorrect. This inequality represents a situation in which the price of a ticket before the event is \\$3 less, rather than \\$3 more, than the\nprice of a ticket during the event.",
+  "class": "stripped_math",
+  "note": "restored 140, 220, \\$5,820, \\$3, x, x+3, 140(x+3), 220x and the inequality",
+  "evidence": "ANS ANS Linear Inequalities HARD.pdf p6-7 (55ea82f3)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnyp7020sqmt1ukw7csc9",
+  "field": "explanation",
+  "before": "Choice D is correct. It’s given that a city employee will plant azaleas and boxwoods in a park, where is the number of azaleas that will be\nplanted and is the number of boxwoods that will be planted. It’s also given that there will be no more than total bushes planted, which can\nbe represented by the inequality . It’s also given that the number of azaleas planted will be at most three times the number of\nboxwoods planted, which can be represented by the inequality . Therefore, the system of inequalities containing and\nbest represents this situation.\nChoice A is incorrect. The inequality represents a situation where at least total bushes will be planted, not that there will be no\nmore than total bushes planted. Also, the inequality represents a situation where the number of boxwoods that will be planted is at\nmost three times the number of azaleas that will be planted, not that the number of azaleas planted will be at most three times the number of\nboxwoods planted.\nChoice B is incorrect. The inequality represents a situation where at least total bushes will be planted, not that there will be no\nmore than total bushes planted.\nChoice C is incorrect. The inequality represents a situation where the number of boxwoods that will be planted is at most three times the\nnumber of azaleas that will be planted, not that the number of azaleas planted will be at most three times the number of boxwoods planted.",
+  "after": "Choice D is correct. It’s given that a city employee will plant azaleas and boxwoods in a park, where $a$ is the number of azaleas that will be\nplanted and $b$ is the number of boxwoods that will be planted. It’s also given that there will be no more than $164$ total bushes planted, which can\nbe represented by the inequality $a + b \\leq 164$. It’s also given that the number of azaleas planted will be at most three times the number of\nboxwoods planted, which can be represented by the inequality $a \\leq 3b$. Therefore, the system of inequalities containing $a + b \\leq 164$ and\n$a \\leq 3b$ best represents this situation.\nChoice A is incorrect. The inequality $a + b \\geq 164$ represents a situation where at least $164$ total bushes will be planted, not that there will be no\nmore than $164$ total bushes planted. Also, the inequality $3a \\geq b$ represents a situation where the number of boxwoods that will be planted is at\nmost three times the number of azaleas that will be planted, not that the number of azaleas planted will be at most three times the number of\nboxwoods planted.\nChoice B is incorrect. The inequality $a + b \\geq 164$ represents a situation where at least $164$ total bushes will be planted, not that there will be no\nmore than $164$ total bushes planted.\nChoice C is incorrect. The inequality $3a \\geq b$ represents a situation where the number of boxwoods that will be planted is at most three times the\nnumber of azaleas that will be planted, not that the number of azaleas planted will be at most three times the number of boxwoods planted.",
+  "class": "stripped_math",
+  "note": "restored a, b, 164 and all inequalities (a+b ≤ 164, a ≤ 3b, a+b ≥ 164, 3a ≥ b)",
+  "evidence": "ANS ANS Linear Inequalities MED.pdf p9-10 (6daf8d70)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnyph020vqmt1u20rbmd0",
+  "field": "explanation",
+  "before": "Choice B is correct. It's given that the model estimates that whales from the genus Eschrichtius travel to miles in the ocean each day\nduring their migration. If one of these whales travels miles each day for days, then the whale travels miles total. If one of these\nwhales travels miles each day for days, then the whale travels miles total. Therefore, the model estimates that in days of its\nmigration, a whale from the genus Eschrichtius could travel at least and at most miles total. Thus, the inequality\nrepresents the estimated total number of miles, , a whale from the genus Eschrichtius could travel in days of its migration.\nChoice A is incorrect and may result from conceptual errors.\nChoice C is incorrect and may result from conceptual errors.\nChoice D is incorrect and may result from conceptual errors.",
+  "after": "Choice B is correct. It's given that the model estimates that whales from the genus *Eschrichtius* travel $72$ to $77$ miles in the ocean each day\nduring their migration. If one of these whales travels $72$ miles each day for $16$ days, then the whale travels $72(16)$ miles total. If one of these\nwhales travels $77$ miles each day for $16$ days, then the whale travels $77(16)$ miles total. Therefore, the model estimates that in $16$ days of its\nmigration, a whale from the genus *Eschrichtius* could travel at least $72(16)$ and at most $77(16)$ miles total. Thus, the inequality\n$(72)(16) \\leq x \\leq (77)(16)$ represents the estimated total number of miles, $x$, a whale from the genus *Eschrichtius* could travel in $16$ days of its migration.\nChoice A is incorrect and may result from conceptual errors.\nChoice C is incorrect and may result from conceptual errors.\nChoice D is incorrect and may result from conceptual errors.",
+  "class": "stripped_math",
+  "note": "restored 72, 77, 16, 72(16), 77(16), x and the inequality",
+  "evidence": "ANS ANS Linear Inequalities MED.pdf p12-13 (e9ef0e6b)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnz6g026bqmt189lkgblx",
+  "field": "explanation",
+  "before": "Choice A is correct. It’s given that the petting zoo sells two types of tickets, standard and premium, and that s represents the number of standard\ntickets sold and p represents the number of premium tickets sold. It’s also given that the petting zoo sold 250 tickets on one Saturday; thus,\n. It’s also given that each standard ticket costs $5 and each premium ticket costs $12. Thus, the amount collected in ticket sales\ncan be represented by for standard tickets and for premium tickets. On that Saturday the petting zoo collected a total of $2,300 from\nticket sales; thus, . These two equations are correctly represented in choice A.\nChoice B is incorrect. The second equation in the system represents the cost per standard ticket as $12, not $5, and the cost per premium ticket\nas $5, not $12. Choices C and D are incorrect. The equations represent the total collected from standard and premium ticket sales as $250, not\n$2,300, and the total number of standard and premium tickets sold as $2,300, not $250. Additionally, the first equation in choice D represents the\ncost per standard ticket as $12, not $5, and the cost per premium ticket as $5, not $12.",
+  "after": "Choice A is correct. It’s given that the petting zoo sells two types of tickets, standard and premium, and that s represents the number of standard\ntickets sold and p represents the number of premium tickets sold. It’s also given that the petting zoo sold 250 tickets on one Saturday; thus,\n$s + p = 250$. It’s also given that each standard ticket costs \\$5 and each premium ticket costs \\$12. Thus, the amount collected in ticket sales\ncan be represented by $5s$ for standard tickets and $12p$ for premium tickets. On that Saturday the petting zoo collected a total of \\$2,300 from\nticket sales; thus, $5s + 12p = 2{,}300$. These two equations are correctly represented in choice A.\nChoice B is incorrect. The second equation in the system represents the cost per standard ticket as \\$12, not \\$5, and the cost per premium ticket\nas \\$5, not \\$12. Choices C and D are incorrect. The equations represent the total collected from standard and premium ticket sales as \\$250, not\n\\$2,300, and the total number of standard and premium tickets sold as \\$2,300, not \\$250. Additionally, the first equation in choice D represents the\ncost per standard ticket as \\$12, not \\$5, and the cost per premium ticket as \\$5, not \\$12.",
+  "class": "stripped_math",
+  "note": "restored s+p=250, 5s, 12p, 5s+12p=2,300; prose currency escaped as \\$",
+  "evidence": "ANS ANS Systems 2 Lin Equat 2 Var EASY.pdf p12-13 (dba8d38a)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnz5s025sqmt17va91f53",
+  "field": "explanation",
+  "before": "Choice B is correct. Let n be the number of novels and m be the number of magazines that Sadie purchased. If Sadie purchased a total of 11 novels and magazines, then n + m = 11. It is given that the combined price of 11 novels and magazines is $20. Since each novel sells for $4 and each magazine sells for $1, it follows that 4n + m = 20. So the system of equations below must hold. $4n + m = 20$ $n + m = 11$ Subtracting corresponding sides of the second equation from the first equation yields 3n = 9, so n = 3. Therefore, Sadie purchased 3 novels. Choice A is incorrect. If 2 novels were purchased, then a total of $8 was spent on novels. That leaves $12 to be spent on magazines, which means that 12 magazines would have been purchased. However, Sadie purchased a total of 11 novels and magazines. Choices C and D are incorrect. If 4 novels were purchased, then a total of $16 was spent on novels. That leaves $4 to be spent on magazines, which means that 4 magazines would have been purchased. By the same logic, if Sadie purchased 5 novels, she would have no money at all ($0) to buy magazines. However, Sadie purchased a total of 11 novels and magazines.",
+  "after": "Choice B is correct. Let n be the number of novels and m be the number of magazines that Sadie purchased. If Sadie purchased a total of 11 novels and magazines, then n + m = 11. It is given that the combined price of 11 novels and magazines is \\$20. Since each novel sells for \\$4 and each magazine sells for \\$1, it follows that 4n + m = 20. So the system of equations below must hold.\n$$\\begin{aligned} 4n + m &= 20 \\\\ n + m &= 11 \\end{aligned}$$\nSubtracting corresponding sides of the second equation from the first equation yields 3n = 9, so n = 3. Therefore, Sadie purchased 3 novels. Choice A is incorrect. If 2 novels were purchased, then a total of \\$8 was spent on novels. That leaves \\$12 to be spent on magazines, which means that 12 magazines would have been purchased. However, Sadie purchased a total of 11 novels and magazines. Choices C and D are incorrect. If 4 novels were purchased, then a total of \\$16 was spent on novels. That leaves \\$4 to be spent on magazines, which means that 4 magazines would have been purchased. By the same logic, if Sadie purchased 5 novels, she would have no money at all (\\$0) to buy magazines. However, Sadie purchased a total of 11 novels and magazines.",
+  "class": "currency_dollar+stripped_math",
+  "note": "prose currency escaped as \\$ (it was pairing with math and breaking rendering); system shown as display; remaining plain-text math kept as in DB",
+  "evidence": "ANS ANS Systems 2 Lin Equat 2 Var EASY.pdf p5-6 (0df106df)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0qd02qiqmt14myik8ok",
+  "field": "explanation",
+  "before": "The correct answer is 180. Let a be the number of adult tickets sold and c be the number of child tickets sold. Since the theater sold a total of 30\ntickets, a + c = 30. The price per adult ticket is $12, and the price per child ticket is $8. Since the theater received a total of $300 for the 30 tickets\nsold, it follows that 12a + 8c = 300. To eliminate c, the first equation can be multiplied by 8 and then subtracted from the second equation:\nBecause the question asks for the amount spent on adult tickets, which is 12a dollars, the resulting equation can be multiplied by 3 to give 3(4a)\n= 3(60) = 180. Therefore, $180 was spent on adult tickets.\nAlternate approach: If all the 30 tickets sold were child tickets, their total price would be 30($8) = $240. Since the actual total price of the 30\ntickets was $300, the extra $60 indicates that a certain number of adult tickets, a, were sold. Since the price of each adult ticket is $4 more than\neach child ticket, 4a = 60, and it follows that 12a = 180.",
+  "after": "The correct answer is 180. Let a be the number of adult tickets sold and c be the number of child tickets sold. Since the theater sold a total of 30\ntickets, a + c = 30. The price per adult ticket is \\$12, and the price per child ticket is \\$8. Since the theater received a total of \\$300 for the 30 tickets\nsold, it follows that 12a + 8c = 300. To eliminate c, the first equation can be multiplied by 8 and then subtracted from the second equation:\n$$\\begin{array}{r} 12a + 8c = 300 \\\\ -8a - 8c = -240 \\\\ \\hline 4a + 0c = 60 \\end{array}$$\nBecause the question asks for the amount spent on adult tickets, which is 12a dollars, the resulting equation can be multiplied by 3 to give 3(4a)\n= 3(60) = 180. Therefore, \\$180 was spent on adult tickets.\nAlternate approach: If all the 30 tickets sold were child tickets, their total price would be 30(\\$8) = \\$240. Since the actual total price of the 30\ntickets was \\$300, the extra \\$60 indicates that a certain number of adult tickets, a, were sold. Since the price of each adult ticket is \\$4 more than\neach child ticket, 4a = 60, and it follows that 12a = 180.",
+  "class": "stripped_math+currency_dollar",
+  "note": "restored the elimination display (12a+8c=300 / -8a-8c=-240 / 4a+0c=60) that the ANS prints as an image after 'second equation:'; prose currency escaped as \\$ (the unescaped $ paired into a broken math token '$8) = $')",
+  "evidence": "ANS ANS Systems Two Lin Eq. Two Var HARD.pdf p7-8 (d7bf55e1)"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "opt_b67c119e31ba48aa8c9b8bf06ee0f246",
+  "field": "text",
+  "before": "The slope of line $\\mathcal{P}$ is undefined.",
+  "after": "The slope of line $\\ell$ is undefined.",
+  "class": "broken_math",
+  "note": "line ℓ OCR'd as \\mathcal{P} [Q cmsjrnzl202bqqmt1nwdb0a1m Linear equations in two variables - HARD #9 opt D]",
+  "evidence": "ANS ANS Linear Eq TWO Variables HARD.pdf p10-11 (98d3393a)"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "opt_dffeb49f44374575bbcac1262014e1eb",
+  "field": "text",
+  "before": "$$y = -4x - 1$$\n\n#",
+  "after": "$$y = -4x - 1$$",
+  "class": "footer_leak",
+  "note": "removed stray trailing '\\n\\n#' page-footer artifact [Q cmsjrnyyw023tqmt1heotosww Linear equations in two variables - EASY #8 opt D]",
+  "evidence": "ANS ANS Linear Eq TWO Variables EASY.pdf p8-9 (b2845d88)"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "opt_96489b3aff8a40c58ecf0d4b97b84282",
+  "field": "text",
+  "before": "\\((0,9)\\)\n\n#",
+  "after": "\\((0,9)\\)",
+  "class": "footer_leak",
+  "note": "removed stray trailing '\\n\\n#' page-footer artifact [Q cmsjrnz0d024cqmt1kk05hyfn Linear equations in two variables - EASY #23 opt D]",
+  "evidence": "ANS ANS Linear Eq TWO Variables EASY.pdf p24-25 (eeebe166)"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "opt_362b6dfb600e4a7a8365172dc12b005d",
+  "field": "text",
+  "before": "$\\frac{9}{4}$\n\n#",
+  "after": "$\\frac{9}{4}$",
+  "class": "footer_leak",
+  "note": "removed stray trailing '\\n\\n#' page-footer artifact [Q cmsjrnyw4022dqmt131cgy8jl Linear functions - MEDIUM #8 opt D]",
+  "evidence": "ANS ANS Linear Funct MED.pdf p10-11 (271f7e3f)"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "opt_48d85bf07d7548b5b8a7536589e2a1e6",
+  "field": "text",
+  "before": "$f(x) = -\\frac{3}{2}x + 1$\n\n#",
+  "after": "$f(x) = -\\frac{3}{2}x + 1$",
+  "class": "footer_leak",
+  "note": "removed stray trailing '\\n\\n#' page-footer artifact [Q cmsjrnywf022lqmt1i8km6hpv Linear functions - MEDIUM #10 opt D]",
+  "evidence": "ANS ANS Linear Funct MED.pdf p12-13 (c22b5f25)"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "opt_8e83848c-4fe6-4110-81fb-81f9bb874fa2",
+  "field": "text",
+  "before": "![img-0.jpeg](img-0.jpeg)",
+  "after": "",
+  "class": "ocr_artifact",
+  "note": "image-only option: OCR markdown placeholder '![img-N.jpeg](img-N.jpeg)' removed (imageUrl already set; other image options store text '') [Q cmsjrnze9029uqmt1lvqmwse9 Linear functions - EASY #22 opt A]",
+  "evidence": "ANS ANS Linear Functions EASY.pdf p24-25-26 (a8e6bd75)"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "opt_cd4e1d9e-954c-442d-a61f-70629fd4c645",
+  "field": "text",
+  "before": "![img-1.jpeg](img-1.jpeg)",
+  "after": "",
+  "class": "ocr_artifact",
+  "note": "image-only option: OCR markdown placeholder '![img-N.jpeg](img-N.jpeg)' removed (imageUrl already set; other image options store text '') [Q cmsjrnze9029uqmt1lvqmwse9 Linear functions - EASY #22 opt B]",
+  "evidence": "ANS ANS Linear Functions EASY.pdf p24-25-26 (a8e6bd75)"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "opt_f101cab3-c01d-4f12-b17d-2b215de6cad9",
+  "field": "text",
+  "before": "![img-2.jpeg](img-2.jpeg)",
+  "after": "",
+  "class": "ocr_artifact",
+  "note": "image-only option: OCR markdown placeholder '![img-N.jpeg](img-N.jpeg)' removed (imageUrl already set; other image options store text '') [Q cmsjrnze9029uqmt1lvqmwse9 Linear functions - EASY #22 opt C]",
+  "evidence": "ANS ANS Linear Functions EASY.pdf p24-25-26 (a8e6bd75)"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "opt_d818c705-58cf-469b-abd5-66ee86f8533b",
+  "field": "text",
+  "before": "![img-3.jpeg](img-3.jpeg)",
+  "after": "",
+  "class": "ocr_artifact",
+  "note": "image-only option: OCR markdown placeholder '![img-N.jpeg](img-N.jpeg)' removed (imageUrl already set; other image options store text '') [Q cmsjrnze9029uqmt1lvqmwse9 Linear functions - EASY #22 opt D]",
+  "evidence": "ANS ANS Linear Functions EASY.pdf p24-25-26 (a8e6bd75)"
+ }
+]
