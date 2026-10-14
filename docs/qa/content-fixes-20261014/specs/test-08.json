@@ -1,0 +1,202 @@
+[
+ {
+  "table": "Question",
+  "id": "cmsjrnwip0167qmt12sr8cbf9",
+  "field": "stimulus",
+  "before": "According to researchers François de Médicis and Steven Huebner, Claude Debussy's influence on modern music is ______. Even to this day, many people are familiar with his 1905 piece \"Clair de Lune,\" which has been featured in movies and TikTok videos alike due to its poignant melancholy tones. A recent study suggests that millennials, as well as members of Generation X and Generation Z, prioritize flexible work schedules and the opportunity for telework in their professional pursuits, rather than the more traditional 9-to-5 schedule in a brick-and-mortar building. Indeed, in the last decade, many companies have shifted to a virtual office model, challenging the previous generation's idealization of the coveted corner office as the ______ of professional success.",
+  "after": "According to researchers François de Médicis and Steven Huebner, Claude Debussy's influence on modern music is ______. Even to this day, many people are familiar with his 1905 piece \"Clair de Lune,\" which has been featured in movies and TikTok videos alike due to its poignant melancholy tones.",
+  "note": "T8 R&W M1 #1: bleed — stimulus had Q2's remote-work/corner-office passage (with its own ______ blank) appended after the Debussy passage; removed (Q2 stimulus already holds it)",
+  "class": "bleed",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/READING AND WRITING/TEST 8 R&W MOD 1 AND 2.pdf p1 (IngestPageArtifact): Debussy passage = Q1, millennials/telework passage = Q2 (two passages on one page)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsojfkp9000u18ppy3lyfgdg",
+  "field": "stem",
+  "before": "Which choice completes the\ntext with the most logical and\nprecise word or phrase?",
+  "after": "Which choice completes the text with the most logical and precise word or phrase?",
+  "note": "T8 R&W M2 #4: other — stem kept the PDF column line breaks (renders on 3 lines); joined into one line (text identical)",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/READING AND WRITING/TEST 8 R&W MOD 1 AND 2.pdf p21 OCR/page: same sentence as all other words-in-context stems"
+ },
+ {
+  "table": "Question",
+  "id": "cmsojfkqf001y18ppgsj880tj",
+  "field": "stimulus",
+  "before": "The following text is from Sultan Murad II's 15th-century poem \"Ruba'i.\"\n\nCupbearer, bring, bring here again my yester even's wine;\nMy harp and rebec bring, them bid address this heart of mine:\n\nWhile still I live, 'tis meet that I should mirth and glee enjoy;\nThe day shall come when none may e'en my resting-place Divine.",
+  "after": "The following text is from Sultan Murad II's 15th-century poem \"Ruba'i.\"\n\nCupbearer, bring, bring here again my yester even's wine;\nMy harp and rebec bring, them bid address this heart of mine:\nWhile still I live, 'tis meet that I should mirth and glee enjoy;\nThe day shall come when none may e'en my resting-place Divine.",
+  "note": "T8 R&W M2 #8: other — spurious stanza break between couplet lines 2 and 3; the source shows the 4 lines as one block (text identical)",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/READING AND WRITING/TEST 8 R&W MOD 1 AND 2.pdf p24 (rendered): four consecutive verse lines, no blank line"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3g0c000v0mpd7syi3zod",
+  "field": "stem",
+  "before": "Given the equations 3x + 4y = 20 and y = x(-x - 4), how many solutions (x, y) exist for the system?",
+  "after": "Given the equations $3x + 4y = 20$ and $y = x(-x - 4)$, how many solutions $(x, y)$ exist for the system?",
+  "note": "T8 Math M1 #10: other — equations typed as plain text; restore as inline math (text identical)",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf p4 (rendered): 3x+4y=20, y=x(−x−4), (x, y) typeset as math"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3g1d001l0mpd1lt129hz",
+  "field": "stem",
+  "before": "$$c(t) = 4,000(0.5)^{\\frac{t}{0.730}}$$\n\nThe function $c(t)$ is used to determine the amount of carbon-14 left in a sample $t$ years after the sample is initially measured. How many years will it take the sample to contain half as much carbon-14 from when it was initially measured?",
+  "after": "$$c(t) = 4,000(0.5)^{\\frac{t}{5{,}730}}$$\n\nThe function $c(t)$ is used to determine the amount of carbon-14 left in a sample $t$ years after the sample is initially measured. How many years will it take the sample to contain half as much carbon-14 from when it was initially measured?",
+  "note": "T8 Math M1 #16: other — OCR digit loss in exponent: t/0.730 → t/5,730 (carbon-14 half-life; key 5730 depends on it)",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf p7 rendered at 300 dpi: exponent t over 5,730; docx heading 'c(t) = 4000(0.5)^(t/5730)'"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3g20001o0mpdbh9bejs6",
+  "field": "stem",
+  "before": "$$\\frac{(a^2)^{-2}b^5c^{\\frac{3}{2}}c^{-1}}{a^6b^{-5}c^{\\frac{3}{2}}}$$\n\nWhich of the following is equivalent to the expression shown above?",
+  "after": "$$\\frac{(a^3)^{-2}b^5c^{\\frac{3}{2}}c^{-1}}{a^6b^{-5}c^{\\frac{1}{2}}}$$\n\nWhich of the following is equivalent to the expression shown above?",
+  "note": "T8 Math M1 #19: other — OCR misread the expression: (a^2)^{-2} → (a^3)^{-2} and denominator c^{3/2} → c^{1/2} (as stored no option was correct)",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf p8 rendered at 300 dpi; docx explanation Q19 (a-term (a^3)^{-2}/a^6, c-term c^{3/2}c^{-1}/c^{1/2})"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsnb3g21001r0mpd0mzsq7ol",
+  "field": "text",
+  "before": "$\\frac{b^{10}}{a^{13}}$",
+  "after": "$\\frac{b^{10}}{a^{12}}$",
+  "note": "T8 Math M1 #19: other — option C (the key) OCR'd as b^10/a^13; source shows b^10/a^12",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf p8 rendered at 300 dpi: C = b^10/a^12; docx 'Altogether, the expression is b^10/a^12'"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrnw99011hqmt14n9yibu3",
+  "field": "text",
+  "before": "c + b = 5 6c + 4b = 32",
+  "after": "$c + b = 5$\n$6c + 4b = 32$",
+  "note": "T8 Math M2 #1: flattened_table — option A is a 2-equation system flattened onto one line; one equation per line, as math",
+  "class": "flattened_table",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf p10 (rendered): each option shows two stacked equations"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrnw99011iqmt1zta6fgqt",
+  "field": "text",
+  "before": "2c + 3b = 19 4c + b = 13",
+  "after": "$2c + 3b = 19$\n$4c + b = 13$",
+  "note": "T8 Math M2 #1: flattened_table — option B is a 2-equation system flattened onto one line; one equation per line, as math",
+  "class": "flattened_table",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf p10 (rendered): each option shows two stacked equations"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrnw99011jqmt1uabkjaqn",
+  "field": "text",
+  "before": "5c = 19b 5b = 13c",
+  "after": "$5c = 19b$\n$5b = 13c$",
+  "note": "T8 Math M2 #1: flattened_table — option C is a 2-equation system flattened onto one line; one equation per line, as math",
+  "class": "flattened_table",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf p10 (rendered): each option shows two stacked equations"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrnw99011kqmt1081517yu",
+  "field": "text",
+  "before": "6c = 19 4b = 13",
+  "after": "$6c = 19$\n$4b = 13$",
+  "note": "T8 Math M2 #1: flattened_table — option D is a 2-equation system flattened onto one line; one equation per line, as math",
+  "class": "flattened_table",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf p10 (rendered): each option shows two stacked equations"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3g2m00280mpd0k0wyj5p",
+  "field": "stem",
+  "before": "$$y = \\frac{1}{3}x$$\n\n$$y = -2x - 7$$\n\nThe given system of equations is graphed in the xy-plane, and the two lines intersect at the coordinate point (-3, y). What is the value of y?",
+  "after": "$$y = \\frac{1}{3}x$$\n\n$$y = -2x - 7$$\n\nThe given system of equations is graphed in the $xy$-plane, and the two lines intersect at the coordinate point $(-3, y)$. What is the value of $y$?",
+  "note": "T8 Math M2 #2: other — xy-plane, (-3, y) and y typed as plain text; restore as inline math (text identical)",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf p10 (rendered)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3g4e003z0mpd4udukjcd",
+  "field": "stem",
+  "before": "The table shows the price for ordering different quantities of shirts (Number of shirts / Cost of Shirts / Delivery Cost / Tax / Total Cost): 6 / $210.00 / $25.20 / $23.52 / $258.72; 15 / $525.00 / $63.00 / $58.80 / $646.80; 21 / $735.00 / $88.20 / $82.32 / $905.52. A delivery fee is calculated as a percentage of the base cost of the shirts. Then, a tax is applied to the combined cost of the shirts and the delivery. If p is the percentage added for delivery and q is the percentage added for taxes, what is the value of p - q?",
+  "after": "| Number of shirts | Cost of Shirts | Delivery Cost | Tax | Total Cost |\n| --- | --- | --- | --- | --- |\n| 6 | $210.00 | $25.20 | $23.52 | $258.72 |\n| 15 | $525.00 | $63.00 | $58.80 | $646.80 |\n| 21 | $735.00 | $88.20 | $82.32 | $905.52 |\n\nThe table above shows the price for ordering different quantities of shirts. A delivery fee is calculated as a percentage of the base cost of the shirts. Then, a tax is applied to the combined cost of the shirts and the delivery. If $p$ is the percentage added for delivery and $q$ is the percentage added for taxes, what is the value of $p - q$?",
+  "note": "T8 Math M2 #18: flattened_table — 5-column shirts table flattened into one sentence ('6 / $210.00 / …'); rebuilt as pipe table above the source wording",
+  "class": "flattened_table",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf p17 (rendered): table Number of shirts | Cost of Shirts | Delivery Cost | Tax | Total Cost, rows 6/15/21; OCR [tbl-0.html] + 'The table above shows…'"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3g4i00440mpdfj0egqr8",
+  "field": "stem",
+  "before": "In the right triangle ABC, angle C is a right angle. If cos(A) = (x - k)/(x + k), where k is a constant and x is the side length of BC, what is the value of x, in terms of k?",
+  "after": "In the right triangle $ABC$, angle $C$ is a right angle. If $\\cos(A) = \\frac{x-k}{x+k}$, where $k$ is a constant and $x$ is the side length of $BC$, what is the value of $x$, in terms of $k$?",
+  "note": "T8 Math M2 #19: other — fraction typed as '(x - k)/(x + k)' and variables as plain text; restore as math (text identical)",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf p17 (rendered): cos(A) = (x−k)/(x+k) as stacked fraction"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3g4v004j0mpdk86h3pmn",
+  "field": "stem",
+  "before": "Note: Figure not drawn to scale.\n\nA rectangular pyramid has a base length measuring b centimeters, a base width measuring 2b centimeters, and a height measuring c centimeters, as shown. A similar rectangular pyramid is 2/3 the size of the given rectangular pyramid. What is the volume of the smaller rectangular pyramid?",
+  "after": "Note: Figure not drawn to scale.\n\nA rectangular pyramid has a base length measuring $b$ centimeters, a base width measuring $2b$ centimeters, and a height measuring $c$ centimeters, as shown. A similar rectangular pyramid is $\\frac{2}{3}$ the size of the given rectangular pyramid. What is the volume of the smaller rectangular pyramid?",
+  "note": "T8 Math M2 #22: other — '2/3' and b, 2b, c typed as plain text; restore as math (text identical)",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf p19 (rendered): stacked fraction 2/3, italic b, 2b, c"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3fye00050mpd53sirb23",
+  "field": "explanation",
+  "before": "Choice A is correct. A point that is a solution to a system of equations must satisfy all the equations in the system. On a graph, this would correspond to the intersection(s) of the equations. It can be seen that the two equations in the given system have the same slope  and different –intercepts ( and ). Two lines with the same slope but different –intercepts are parallel lines. Therefore, the two lines will never intersect, and the system has zero solutions.\nChoice B is incorrect as this would happen if the two lines have different slopes. Choice C is incorrect as it is impossible for two lines to intersect only two times. Choice D is incorrect as this would happen if the two lines have the same slope and the same –intercept.\nCalculator tip: The two equations can be graphed in separate lines in Desmos to see how many intersections they have. Two parallel lines will appear in the coordinate plane; therefore, the system of equations has zero solutions.",
+  "after": "Choice A is correct. A point that is a solution to a system of equations must satisfy all the equations in the system. On a graph, this would correspond to the intersection(s) of the equations. It can be seen that the two equations in the given system have the same slope $\\left(-\\frac{1}{5}\\right)$ and different $y$–intercepts ($7$ and $-3$). Two lines with the same slope but different $y$–intercepts are parallel lines. Therefore, the two lines will never intersect, and the system has zero solutions.\nChoice B is incorrect as this would happen if the two lines have different slopes. Choice C is incorrect as it is impossible for two lines to intersect only two times. Choice D is incorrect as this would happen if the two lines have the same slope and the same $y$–intercept.\nCalculator tip: The two equations can be graphed in separate lines in Desmos to see how many intersections they have. Two parallel lines will appear in the coordinate plane; therefore, the system of equations has zero solutions.",
+  "note": "T8 Math M1 #3: stripped_math — explanation lost every Word equation (OMML) (blank gaps where the values belong); rebuilt as LaTeX from the docx, prose unchanged",
+  "class": "stripped_math",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/Test8_Math_Answer_Explanations.docx, Question 3 (MODULE 1), m:oMath elements"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3g20001o0mpdbh9bejs6",
+  "field": "explanation",
+  "before": "Choice C is correct. Simplify the expression by looking at each variable separately.\nFor the  term,  becomes , which simplifies to .\nFor the  term,  becomes .\nFor the  term,  becomes , which simplifies to .\nAltogether, the expression is\nChoice A is incorrect and may result from assuming all the exponents reduced the terms to . Choice B is incorrect as this is the reciprocal of the correct answer. Choice D is incorrect and could result from incorrectly combining the exponents for the  term.",
+  "after": "Choice C is correct. Simplify the expression by looking at each variable separately.\nFor the $a$ term, $\\frac{(a^{3})^{-2}}{a^{6}}$ becomes $\\frac{a^{-6}}{a^{6}}$, which simplifies to $\\frac{1}{a^{12}}$.\nFor the $b$ term, $\\frac{b^{5}}{b^{-5}}$ becomes $b^{10}$.\nFor the $c$ term, $\\frac{c^{\\frac{3}{2}}c^{-1}}{c^{\\frac{1}{2}}}$ becomes $\\frac{c^{\\frac{1}{2}}}{c^{\\frac{1}{2}}}$, which simplifies to $1$.\nAltogether, the expression is $\\frac{1}{a^{12}}\\cdot b^{10}\\cdot 1=\\frac{b^{10}}{a^{12}}$\nChoice A is incorrect and may result from assuming all the exponents reduced the terms to $1$. Choice B is incorrect as this is the reciprocal of the correct answer. Choice D is incorrect and could result from incorrectly combining the exponents for the $c$ term.",
+  "note": "T8 Math M1 #19: stripped_math — explanation lost every Word equation (OMML) (blank gaps where the values belong); rebuilt as LaTeX from the docx, prose unchanged",
+  "class": "stripped_math",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/Test8_Math_Answer_Explanations.docx, Question 19 (MODULE 1), m:oMath elements"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3g2c001y0mpd76881utf",
+  "field": "explanation",
+  "before": "Choice C is correct. The largest possible mean would be the result of the largest possible sum divided by the number of people. This can be found by multiplying the frequency of each range times the largest value of each range plus the sum of  or more. This yields . Taking this sum and dividing by the total number of attendees  results in , which is approximately .\nChoice A is incorrect as this is the minimum possible value for the mean. Choice B is incorrect as this is the result of using the middle value for each range instead of the largest possible value. Choice D is incorrect and may be the result of taking the average of the distance traveled for less than  and averaged it with the mean of the range of greater than .",
+  "after": "Choice C is correct. The largest possible mean would be the result of the largest possible sum divided by the number of people. This can be found by multiplying the frequency of each range times the largest value of each range plus the sum of $50$ or more. This yields $100(9.99)+60(19.99)+80(29.99)+30(39.99)+20(49.99)+120(57.82)=13{,}735.5$. Taking this sum and dividing by the total number of attendees $410$ results in $\\frac{13{,}735.5}{410}$, which is approximately $33.50$.\nChoice A is incorrect as this is the minimum possible value for the mean. Choice B is incorrect as this is the result of using the middle value for each range instead of the largest possible value. Choice D is incorrect and may be the result of taking the average of the distance traveled for less than $50$ and averaged it with the mean of the range of greater than $50$.",
+  "note": "T8 Math M1 #21: stripped_math — explanation lost every Word equation (OMML) (blank gaps where the values belong); rebuilt as LaTeX from the docx, prose unchanged",
+  "class": "stripped_math",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/Test8_Math_Answer_Explanations.docx, Question 21 (MODULE 1), m:oMath elements"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3g2h00230mpdixue08j3",
+  "field": "explanation",
+  "before": "Choice A is correct. This question asks for the input value (in  years) that corresponds with an output of  years. Since the graph represents a linear relationship, use the slope-intercept form for a linear equation . To find the slope, use the slope formula . Using points  and , substitute the coordinate values into the slope formula, yielding . To find the –coordinate of the –intercept, locate the part of the graph where the line intersects the –axis, which is at point . Therefore, in the slope-intercept form, . Substituting the slope () and  into the slope-intercept form results in , or in function form, . Substituting  for  results in . Subtract  from both sides to yield . Finally, multiply both sides by the reciprocal of the slope to get , which results in .\nChoice B is incorrect and may be the result of inverting the slope and using  for . Choice C is incorrect and may result from inverting the slope. Choice D is incorrect and may be the result of substituting  for  instead of for .\nCalculator tip: Use Desmos to create a linear regression equation with the data points given.\nStep 1) Press the add item \"+\" button to create a table. Input  and  in the  and  columns of the table\nStep 2) Write the regression equation \"{1}\\sim mx{1}+b\" into a separate equation entry line. The graph of the regression line will appear.\nStep 3) To find the value of  when the function equals , write the equation  in a separate line and find the intersection point. The intersection occurs at , so the value for  in the original function is .",
+  "after": "Choice A is correct. This question asks for the input value (in $t$ years) that corresponds with an output of $260$ years. Since the graph represents a linear relationship, use the slope-intercept form for a linear equation $y=mx+b$. To find the slope, use the slope formula $\\frac{y_{2}-y_{1}}{x_{2}-x_{1}}$. Using points $(0,20)$ and $(14,100)$, substitute the coordinate values into the slope formula, yielding $\\frac{100-20}{14-0}=\\frac{80}{14}=\\frac{40}{7}$. To find the $y$–coordinate of the $y$–intercept, locate the part of the graph where the line intersects the $y$–axis, which is at point $(0,20)$. Therefore, in the slope-intercept form, $b=20$. Substituting the slope ($m$) and $b$ into the slope-intercept form results in $y=\\frac{40}{7}x+20$, or in function form, $h(t)=\\frac{40}{7}t+20$. Substituting $260$ for $h(t)$ results in $260=\\frac{40}{7}t+20$. Subtract $20$ from both sides to yield $260-20=\\frac{40}{7}t$. Finally, multiply both sides by the reciprocal of the slope to get $240(\\frac{7}{40})=t$, which results in $t=42$.\nChoice B is incorrect and may be the result of inverting the slope and using $260$ for $t$. Choice C is incorrect and may result from inverting the slope. Choice D is incorrect and may be the result of substituting $260$ for $t$ instead of for $h(t)$.\nCalculator tip: Use Desmos to create a linear regression equation with the data points given.\nStep 1) Press the add item \"+\" button to create a table. Input $(0,20)$ and $(14,100)$ in the $x_{1}$ and $y_{1}$ columns of the table\nStep 2) Write the regression equation \"$y_{1}\\sim mx_{1}+b$\" into a separate equation entry line. The graph of the regression line will appear.\nStep 3) To find the value of $x$ when the function equals $260$, write the equation $y=260$ in a separate line and find the intersection point. The intersection occurs at $(42,260)$, so the value for $t$ in the original function is $42$.",
+  "note": "T8 Math M1 #22: stripped_math — explanation lost every Word equation (OMML) (blank gaps where the values belong); rebuilt as LaTeX from the docx, prose unchanged; docx typos fixed: 'output of 280' / '280−20' → 260 (the question asks h(t)=260; next step uses 240), and a stray '{1}\\sim mx{1}+b' tail dropped",
+  "class": "stripped_math",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/Test8_Math_Answer_Explanations.docx, Question 22 (MODULE 1), m:oMath elements"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3g3d002t0mpdhh5lit47",
+  "field": "explanation",
+  "before": "Choice A is correct. For a coordinate point to be a solution to an inequality when graphed in the –plane, it needs to be in the shaded area. Since the coordinate  is in the shaded area, Choice A is correct.\nChoice B is incorrect as this coordinate point is not in the shaded area. Choice C is incorrect as this is on the dashed line; since the line is not solid, points on the dashed line are not included in the inequality. Choice D is incorrect as this is not in the shaded area.",
+  "after": "Choice A is correct. For a coordinate point to be a solution to an inequality when graphed in the $xy$–plane, it needs to be in the shaded area. Since the coordinate $(-3,-4)$ is in the shaded area, Choice A is correct.\nChoice B is incorrect as this coordinate point is not in the shaded area. Choice C is incorrect as this is on the dashed line; since the line is not solid, points on the dashed line are not included in the inequality. Choice D is incorrect as this is not in the shaded area.",
+  "note": "T8 Math M2 #8: stripped_math — explanation lost every Word equation (OMML) (blank gaps where the values belong); rebuilt as LaTeX from the docx, prose unchanged",
+  "class": "stripped_math",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/Test8_Math_Answer_Explanations.docx, Question 8 (MODULE 2B), m:oMath elements"
+ }
+]

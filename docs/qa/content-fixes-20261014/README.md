@@ -39,3 +39,18 @@ shortened options, OCR vs page image). `spec-r2.json` = `specs/test-05/06/07.jso
   T7 M1 #22, M2 #2/#16/#21). The same defect exists in ~23 practice-set explanations and 1 TEST 8 Math (not fixed yet).
 - T5 Math M1 #22 explanation rewritten (old derivation contradicted the figure); T6 R&W M2 #15 A "change" → "charge".
 - T6 Math M2 #4 flagged as "MC without options" is NUMERIC with key 29 in the DB — no defect.
+
+## Round 3 — TEST 8–10 (same day)
+Three agents, same brief plus stripped-equation explanations. `spec-r3.json` = `specs/test-08/09/10.json` +
+`specs/extra-r3.json` (`build-extra-r3.cjs`): 85 ops (7 bleed, 6 flattened_table, 9 stripped_math, 63 other).
+Prod uses `spec-r3-prod.json`: T8 Math M2 #1 options have different ids in prod (recreated by an earlier API PUT); same text.
+Applied dev.db (backup `backups/devdb-pre-content-fixes-20261014-r3.db`) and prod (`/db/backups/dev.db.pre-content-fixes-20261014-r3`):
+85 PENDING → apply → 85 ALREADY, integrity ok.
+- No explanation shift in TEST 8–10; all keys match the answer key docs.
+- T8 Math M1 #19: stem misread ((a^2)^-2, c^{3/2} denominator) and key option C misread (b^10/a^13) — as stored no option
+  was correct; fixed from the page image. T8 Math M1 #16 t/5,730.
+- Bleeds: T8 R&W M1 #1; T9 R&W M1 #13 (option D), #15, #21, M2 #14, #24; T10 R&W M1 #7 (option D).
+- Stripped-equation explanations rebuilt: T8 M1 #3/#19/#21/#22, M2 #8; T9 M1 #19; T10 M1 #20, M2 #13/#17.
+- Missing explanations added: T9 Math M2 #14/#15/#20 (docx); T9 M1 #21 (explanation argued D, key C) and #22 written from the graphs.
+- Tables: T8 Math M2 #18, T10 Math M1 #21; T8 Math M2 #1 options as two-line systems.
+- Left as is (source cut off): T9 R&W M1 #11 ending, T10 R&W M2 #9 Text 2 ending, T10 R&W M1 #24 / T7 R&W M1 #26 "notes:" intro.
