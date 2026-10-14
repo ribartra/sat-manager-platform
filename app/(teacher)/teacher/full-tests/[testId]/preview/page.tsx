@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
-import { FullTestPlayer } from "@/app/(student)/student/full-tests/[assignmentId]/player-client";
+import { FullTestPlayer } from "@/app/(student)/student/tests/[assignmentId]/player-client";
 import { getPublicCalculatorConfig } from "@/lib/calculator-config";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { extractQuestionGraphArtifacts } from "@/lib/question-graph";

@@ -72,8 +72,8 @@ export function FullTestAssignClient({
       const firstStudentId = studentIds[0];
       router.push(
         firstStudentId
-          ? `/teacher/students/${firstStudentId}?area=mocks`
-          : "/teacher/practice-sets?area=mocks"
+          ? `/teacher/students/${firstStudentId}?area=tests`
+          : "/teacher/practice-sets?area=tests"
       );
       router.refresh();
     } catch (err) {

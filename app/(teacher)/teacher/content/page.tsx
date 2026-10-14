@@ -29,7 +29,7 @@ export default async function TeacherContentPage({
   // Navigation is by practice area: Math / Reading / Writing / Full Practice Tests.
   const area = activeAreaTab(params.area ?? params.section, "math");
   // "Full Practice Tests" is an exam surface, not a practice-set area.
-  if (area === "mocks") redirect("/teacher/full-tests");
+  if (area === "tests") redirect("/teacher/full-tests");
   const activeArea = practiceAreaFromTab(area); // MATH | READING | WRITING (mocks handled above)
   const areaLabel = practiceAreaLabel(activeArea);
   const domainFilter = params.domain?.trim() || null;

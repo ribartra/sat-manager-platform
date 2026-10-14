@@ -751,7 +751,7 @@ export function AiImportWorkflowClient({
                     />
                   )}
                   {test.artifactId ? (
-                    <Link href="/teacher/practice-sets?area=mocks" className="rounded-md border border-green-200 px-3 py-2 text-xs font-medium text-green-700 hover:bg-green-50">
+                    <Link href="/teacher/practice-sets?area=tests" className="rounded-md border border-green-200 px-3 py-2 text-xs font-medium text-green-700 hover:bg-green-50">
                       Open Draft Test
                     </Link>
                   ) : test.promoted > 0 && selectedBatchId ? (

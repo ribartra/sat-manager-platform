@@ -30,7 +30,7 @@
   --sat-area-math: #0ea5e9; /* sky blue */
   --sat-area-reading: #c4a035; /* mustard */
   --sat-area-writing: #16a34a; /* green */
-  --sat-area-mocks: #ea580c; /* orange */
+  --sat-area-tests: #ea580c; /* orange */
 
   /* Semantic */
   --background: var(--sat-white);

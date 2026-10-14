@@ -21,7 +21,7 @@ interface PageProps {
 export default async function TopicPracticeSetsPage({ params, searchParams }: PageProps) {
   const { topicId, difficulty } = await params;
   const query = await searchParams;
-  const area = query.area === "reading" || query.area === "writing" || query.area === "mocks" ? query.area : "math";
+  const area = query.area === "reading" || query.area === "writing" || query.area === "tests" ? query.area : "math";
   const session = await auth();
   const userId = session!.user.id;
   const diffUpper = difficulty.toUpperCase() as "EASY" | "MEDIUM" | "HARD";

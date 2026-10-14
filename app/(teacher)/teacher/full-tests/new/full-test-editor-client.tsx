@@ -123,7 +123,7 @@ export function FullTestEditor({
       setWarnings(Array.isArray(warnings) ? warnings.map(String) : []);
       return;
     }
-    router.push("/teacher/practice-sets?area=mocks");
+    router.push("/teacher/practice-sets?area=tests");
     router.refresh();
   }
 

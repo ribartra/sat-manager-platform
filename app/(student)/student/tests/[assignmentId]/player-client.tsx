@@ -13,6 +13,7 @@ import { formatTime, cn } from "@/lib/utils";
 import type { CalculatorConfig } from "@/lib/calculator-config";
 import type { GraphArtifact } from "@/lib/question-graph";
 import type { FullTestProgressState, FullTestTimerPhase } from "@/lib/full-test-progress";
+import { MODULE_KEYS } from "@/lib/test-module-keys";
 import { questionResponseLabel, resolveQuestionType, isAnswerOption } from "@/lib/question-type";
 import { LoadingState, OfflineBanner, SaveIndicator, type SaveStatus } from "@/components/sat";
 import { exitPlayerOnAuthLoss, isAuthFailureStatus } from "@/lib/player-session-exit";
@@ -86,8 +87,10 @@ export function FullTestPlayer({
   calculatorConfig,
   showCalculator = false,
   previewMode = false,
-  exitHref = "/student/content-map?area=mocks",
+  exitHref = "/student/tests",
   resultQuery,
+  completedModules = [],
+  startModule = null,
 }: {
   attemptId: string;
   assignmentId: string;
@@ -110,14 +113,24 @@ export function FullTestPlayer({
   previewMode?: boolean;
   exitHref?: string;
   resultQuery?: string;
+  /** Modules already submitted (locked). Students may take the modules in any order. */
+  completedModules?: number[];
+  /** Module chosen on the Test page (?module=rw1|rw2|m1|m2). */
+  startModule?: number | null;
 }) {
   const router = useRouter();
   const breakSecondsTotal = Math.max(0, breakMinutes) * 60;
-  const restoringUsableBreak = savedProgressState?.phase === "BREAK" && breakSecondsTotal > 0;
-  const initialModuleIndex = savedProgressState?.phase === "BREAK" && breakSecondsTotal === 0
-    ? RW_M2_INDEX + 1
-    : savedModule;
-  const initialQuestionIndex = savedProgressState?.phase === "BREAK" && breakSecondsTotal === 0 ? 0 : savedQuestion;
+  const completedAtLoad = new Set(completedModules);
+  const isOpen = (index: number) => index >= 0 && index < modules.length && !completedAtLoad.has(index);
+  const firstOpenModule = modules.findIndex((_, index) => isOpen(index));
+  // A chosen module wins; otherwise resume where the student was, unless that module is already submitted.
+  const chosenModule = startModule !== null && isOpen(startModule) ? startModule : null;
+  const restoringUsableBreak = chosenModule === null && savedProgressState?.phase === "BREAK" && breakSecondsTotal > 0;
+  const initialModuleIndex = chosenModule
+    ?? (isOpen(savedModule) && !(savedProgressState?.phase === "BREAK" && breakSecondsTotal === 0)
+      ? savedModule
+      : Math.max(firstOpenModule, 0));
+  const initialQuestionIndex = initialModuleIndex === savedModule && savedProgressState?.phase !== "BREAK" ? savedQuestion : 0;
   const initialTimers =
     savedProgressState?.timers?.length === modules.length
       ? savedProgressState.timers
@@ -152,6 +165,7 @@ export function FullTestPlayer({
   const timerState = useRef<number[]>(initialTimers);
   const overtimeRef = useRef<number[]>([...initialOvertime]);
   const extraTimeUsedRef = useRef(Math.max(savedExtraTimeUsed, initialOvertime.reduce((sum, value) => sum + value, 0)));
+  const completedRef = useRef<Set<number>>(new Set(completedModules));
   const questionStartTime = useRef<number | null>(null);
   const timeSpentByQuestion = useRef<Record<string, number>>({ ...savedTimeSpent });
   const phaseRef = useRef(phase);
@@ -361,7 +375,12 @@ export function FullTestPlayer({
         extraTimeUsedRef.current = payload.extraTimeUsed;
       }
       const bufferedModule = payload.currentModule ?? moduleIndexRef.current;
-      if (phaseRef.current === "MODULE" && bufferedModule >= moduleIndexRef.current && bufferedModule < modules.length) {
+      if (
+        phaseRef.current === "MODULE" &&
+        bufferedModule >= moduleIndexRef.current &&
+        bufferedModule < modules.length &&
+        !completedRef.current.has(bufferedModule)
+      ) {
         const nextQuestion = Math.min(
           Math.max(payload.currentQuestion ?? 0, 0),
           Math.max(modules[bufferedModule].questions.length - 1, 0),
@@ -456,7 +475,7 @@ export function FullTestPlayer({
       return;
     }
     clearBuffer(offlineKey);
-    router.push(`/student/full-tests/results/${attemptId}${resultQuery ? `?${resultQuery}` : ""}`);
+    router.push(`/student/tests/results/${attemptId}${resultQuery ? `?${resultQuery}` : ""}`);
   }, [attemptId, buildAutosavePayload, buildProgressPayload, exitHref, offlineKey, previewMode, recordQuestionTime, resultQuery, router]);
 
   const enterModule = useCallback(
@@ -500,25 +519,96 @@ export function FullTestPlayer({
     });
   }, [breakSecondsTotal, saveProgress]);
 
+  /** Submits the module on screen. Returns false when it could not be saved (the student stays on it). */
+  const submitModule = useCallback(async (index: number) => {
+    if (typingSaveTimeout.current) {
+      clearTimeout(typingSaveTimeout.current);
+      typingSaveTimeout.current = null;
+    }
+    timerState.current[index] = remainingRef.current;
+    recordQuestionTime();
+    const payload = buildAutosavePayload(answersRef.current, index, questionIndexRef.current);
+    let response: Response;
+    try {
+      response = await fetchWithTransientRetry(`/api/full-practice-tests/attempts/${attemptId}/modules/${index}/submit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+    } catch {
+      writeBuffer(offlineKey, payload);
+      notify.error("You're offline, so we couldn't submit this module. Your answers are safe — try again when you're back online.");
+      return null;
+    }
+    if (isAuthFailureStatus(response.status)) {
+      await exitPlayerOnAuthLoss({ pauseUrl: `/api/full-practice-tests/attempts/${attemptId}/pause` });
+      return null;
+    }
+    if (!response.ok) {
+      writeBuffer(offlineKey, payload);
+      notify.error(await readApiError(response, "We couldn't submit this module. Your answers are safe — please try again."));
+      return null;
+    }
+    clearBuffer(offlineKey);
+    const data = (await response.json()) as { done?: boolean; completedModules?: number[] };
+    completedRef.current = new Set(data.completedModules ?? [...completedRef.current, index]);
+    return data;
+  }, [attemptId, buildAutosavePayload, offlineKey, recordQuestionTime]);
+
+  const resultsHref = useCallback(
+    (submittedIndex?: number) => {
+      const params = new URLSearchParams(resultQuery ?? "");
+      const key = submittedIndex !== undefined ? MODULE_KEYS[submittedIndex] : undefined;
+      if (key) params.set("submitted", key);
+      const qs = params.toString();
+      return `/student/tests/results/${attemptId}${qs ? `?${qs}` : ""}`;
+    },
+    [attemptId, resultQuery],
+  );
+
   const advanceAfterModule = useCallback(async () => {
     if (advancing) return;
     setAdvancing(true);
     try {
       const current = moduleIndexRef.current;
-      timerState.current[current] = 0;
-      if (current >= modules.length - 1) {
-        await submit();
+      if (previewMode) {
+        // Preview walks the modules in order; nothing is saved.
+        timerState.current[current] = 0;
+        if (current >= modules.length - 1) {
+          await submit();
+          return;
+        }
+        await enterModule(current + 1);
         return;
       }
-      if (current === RW_M2_INDEX && breakSecondsTotal > 0) {
+      const result = await submitModule(current);
+      if (!result) return;
+      if (result.done) {
+        router.push(resultsHref());
+        return;
+      }
+      timerState.current[current] = 0;
+      // Optional break only between the R&W section and a Math section not started yet.
+      const mathOpen = modules
+        .map((testModule, index) => ({ testModule, index }))
+        .filter(({ testModule, index }) => testModule.section === "MATH" && !completedRef.current.has(index));
+      const mathUntouched = mathOpen.length === modules.filter((m) => m.section === "MATH").length
+        && mathOpen.every(({ testModule, index }) => (timerState.current[index] ?? testModule.timeLimit) >= testModule.timeLimit);
+      if (current === RW_M2_INDEX && breakSecondsTotal > 0 && mathUntouched) {
         await enterBreak();
         return;
       }
-      await enterModule(current + 1);
+      router.push(resultsHref(current));
     } finally {
       setAdvancing(false);
     }
-  }, [advancing, breakSecondsTotal, enterBreak, enterModule, modules.length, submit]);
+  }, [advancing, breakSecondsTotal, enterBreak, enterModule, modules, previewMode, resultsHref, router, submit, submitModule]);
+
+  /** After the break: the first Math module the student has not submitted. */
+  const moduleAfterBreak = useCallback(() => {
+    const next = modules.findIndex((testModule, index) => testModule.section === "MATH" && !completedRef.current.has(index));
+    return next >= 0 ? next : RW_M2_INDEX + 1;
+  }, [modules]);
 
   // Module countdown. At 0 there is no auto-advance (overtime: keep playing and record extra time);
   // the student submits the module themselves and the extra seconds are stored per module.
@@ -569,8 +659,8 @@ export function FullTestPlayer({
   useEffect(() => {
     if (phase !== "BREAK" || breakRemaining > 0 || breakAdvanceTriggered.current || advancing) return;
     breakAdvanceTriggered.current = true;
-    void enterModule(RW_M2_INDEX + 1);
-  }, [advancing, breakRemaining, enterModule, phase]);
+    void enterModule(moduleAfterBreak());
+  }, [advancing, breakRemaining, enterModule, moduleAfterBreak, phase]);
 
   function next() {
     if (phase === "BREAK" || advancing) return;
@@ -655,7 +745,7 @@ export function FullTestPlayer({
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <Button
             onClick={() => {
-              void enterModule(RW_M2_INDEX + 1);
+              void enterModule(moduleAfterBreak());
             }}
           >
             Skip break
@@ -670,7 +760,7 @@ export function FullTestPlayer({
               if (!previewMode) {
                 await fetch(`/api/full-practice-tests/attempts/${attemptId}/pause`, { method: "POST" });
               }
-              router.push(previewMode ? exitHref : "/student/content-map?area=mocks");
+              router.push(exitHref);
             }}
             title="The timer stops. You'll continue where you left off."
           >
@@ -751,7 +841,7 @@ export function FullTestPlayer({
               if (!previewMode) {
                 await fetch(`/api/full-practice-tests/attempts/${attemptId}/pause`, { method: "POST" });
               }
-              router.push(previewMode ? exitHref : "/student/content-map?area=mocks");
+              router.push(exitHref);
             }}
           >
             {previewMode ? "Exit preview" : "Save & exit"}
@@ -968,7 +1058,7 @@ export function FullTestPlayer({
                 {markedInModule} question{markedInModule === 1 ? "" : "s"} still marked for review.
               </p>
             )}
-            <p className="mt-2 text-sm font-medium text-gray-900">Once you submit, you can&apos;t return to this module.</p>
+            <p className="mt-2 text-sm font-medium text-gray-900">Once you submit, you can&apos;t return to this module. You can take the other modules in any order.</p>
             <div className="mt-5 flex justify-end gap-2">
               <Button type="button" variant="secondary" onClick={() => setConfirmSubmitModule(false)}>
                 Go back

@@ -50,12 +50,12 @@ const checks = [
     label: "Scheduled unlocks audited",
   },
   {
-    file: "app/api/full-practice-tests/attempts/[attemptId]/submit/route.ts",
+    file: "lib/full-test-grading.ts",
     requires: ["fullTestModulesForAttempt"],
     label: "Exam grading uses the attempt snapshot (history immutable)",
   },
   {
-    file: "app/(student)/student/full-tests/[assignmentId]/page.tsx",
+    file: "app/(student)/student/tests/[assignmentId]/page.tsx",
     requires: ["buildFullTestSnapshot", "fullTestModulesForAttempt"],
     label: "Exam attempts are snapshotted at start and rendered from the snapshot",
   },
@@ -126,7 +126,7 @@ const checks = [
   },
   {
     file: "app/api/full-practice-tests/attempts/[attemptId]/autosave/route.ts",
-    requires: ["requireApprovedSession", "studentId: session.user.id", "status: \"IN_PROGRESS\"", "saveFullTestTimerState"],
+    requires: ["requireApprovedSession", "studentId: session.user.id", "status: \"IN_PROGRESS\"", "saveFullTestProgress"],
     label: "Full test autosave limited to own in-progress attempt",
   },
   {

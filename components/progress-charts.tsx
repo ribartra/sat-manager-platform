@@ -11,7 +11,7 @@ const AREA_COLORS: Record<AreaTabKey, string> = {
   math: "var(--sat-area-math)",
   reading: "var(--sat-area-reading)",
   writing: "var(--sat-area-writing)",
-  mocks: "var(--sat-area-mocks)",
+  tests: "var(--sat-area-tests)",
 };
 
 // Neutral, non-evaluative bar color for accuracy bars: magnitude lives in the bar,

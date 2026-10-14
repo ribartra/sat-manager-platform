@@ -25,9 +25,9 @@ const checks = [
     label: "Intentos atomicos: invalidar conserva el intento; reabrir invalida y devuelve la asignacion a PENDING (Practice y FPT)",
   },
   {
-    file: "app/(student)/student/full-tests/results/[attemptId]/page.tsx",
+    file: "app/(student)/student/tests/results/[attemptId]/page.tsx",
     requires: ['attempt.status === "IN_PROGRESS"', "InvalidatedNotice", "VoidableValue", "markedForReview"],
-    label: "Resultados FPT: no muestran intentos abiertos; invalidados tachados; herramientas de revision",
+    label: "Resultados FPT: intento abierto muestra solo modulos enviados; invalidados tachados; herramientas de revision",
   },
   {
     file: "lib/student-report.ts",
@@ -130,12 +130,27 @@ const checks = [
     label: "API de Full Practice Test rechaza estructura invalida",
   },
   {
-    file: "app/api/full-practice-tests/attempts/[attemptId]/autosave/route.ts",
+    file: "lib/full-test-grading.ts",
     requires: ["currentModule", "currentQuestion", "fullPracticeTestAnswer.upsert", "markUserActive", "saveFullTestTimerState", "timeSpentByQuestion"],
     label: "Full Practice Test autosave persiste posicion, timers y respuestas",
   },
   {
-    file: "app/(student)/student/full-tests/[assignmentId]/player-client.tsx",
+    file: "app/api/full-practice-tests/attempts/[attemptId]/autosave/route.ts",
+    requires: ["saveFullTestProgress(attempt, body, session.user.id)"],
+    label: "Autosave de Test delega en saveFullTestProgress (bloquea modulos enviados)",
+  },
+  {
+    file: "lib/full-test-grading.ts",
+    requires: ["completedModulesOf(attempt.moduleTimerState", "if (locked.has(index)) return;", "lockedQuestionIds"],
+    label: "Modulos enviados quedan bloqueados: autosave no los cambia y la nota final usa lo guardado",
+  },
+  {
+    file: "app/api/full-practice-tests/attempts/[attemptId]/modules/[moduleIndex]/submit/route.ts",
+    requires: ["requireApprovedSession", "studentId: session.user.id", "status: \"IN_PROGRESS\"", "completeFullTestModule", "finalizeFullTestAttempt"],
+    label: "Submit por modulo: propio intento abierto; califica al entrar el ultimo modulo",
+  },
+  {
+    file: "app/(student)/student/tests/[assignmentId]/player-client.tsx",
     requires: ["savedAnswers", "savedModule", "savedProgressState", "recordQuestionTime", "timeSpentByQuestion", "Save & exit"],
     label: "Player FPT reanuda respuestas, posicion, timer y tiempos por pregunta",
   },
@@ -145,8 +160,8 @@ const checks = [
     label: "Full Practice Test persiste timer por modulo",
   },
   {
-    file: "app/(student)/student/full-tests/results/[attemptId]/page.tsx",
-    requires: ["By module", "Blank answers count as wrong.", "timeSpent", "StatsPanel", "Extra time used", "overtimeByModule"],
+    file: "app/(student)/student/tests/results/[attemptId]/page.tsx",
+    requires: ["Results by module", "Blank answers count as wrong.", "timeSpent", "ModuleResultRows", "Extra time used", "overtimeByModule"],
     // "By Skill" grouped the per-section placeholder topics (R&W M1 + Math M1 mixed): removed on purpose.
     forbids: ["By Skill"],
     label: "Resultados FPT muestran review por modulo, tiempo extra y preguntas absolutas (sin By Skill)",

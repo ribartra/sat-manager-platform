@@ -60,7 +60,7 @@ export function FullTestActions({
     const ok = await confirm({ title: "Delete this draft exam?", description: "This cannot be undone.", tone: "danger", confirmLabel: "Delete" });
     if (!ok) return;
     const data = await request("delete", `/api/full-practice-tests/${testId}`, { method: "DELETE" });
-    if (data && variant === "detail") router.push("/teacher/practice-sets?area=mocks");
+    if (data && variant === "detail") router.push("/teacher/practice-sets?area=tests");
   }
 
   if (variant === "list") {

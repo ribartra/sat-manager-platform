@@ -26,7 +26,7 @@ export function parseReportAreas(value: string | null | undefined, legacy?: stri
   const raw = (value || legacy || "").toLowerCase();
   const alias: Record<string, ReportAreaKey> = {
     math: "math", mathematics: "math", reading: "reading", writing: "writing",
-    mocks: "mocks", fpt: "mocks", exams: "mocks", "full-practice-tests": "mocks",
+    mocks: "mocks", tests: "mocks", fpt: "mocks", exams: "mocks", "full-practice-tests": "mocks",
   };
   const picked = new Set(raw.split(",").map((item) => alias[item.trim()]).filter(Boolean));
   if (picked.size === 0) return ["math", "reading", "writing"];

@@ -59,7 +59,7 @@ export async function applyAttemptLifecycle(input: {
       result.studentId,
       "Result reset",
       `Your teacher reset your ${what}${name ? ` "${name}"` : ""} so you can try again.${note}`,
-      kind === "practice" ? "/student/content-map" : "/student/content-map?area=mocks",
+      kind === "practice" ? "/student/content-map" : "/student/content-map?area=tests",
     );
   } else {
     await notifyUser(

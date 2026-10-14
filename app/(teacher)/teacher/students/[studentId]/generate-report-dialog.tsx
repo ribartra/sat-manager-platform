@@ -13,7 +13,7 @@ const AREAS = [
   { key: "math", label: "Math", color: "var(--sat-area-math)" },
   { key: "reading", label: "Reading", color: "var(--sat-area-reading)" },
   { key: "writing", label: "Writing", color: "var(--sat-area-writing)" },
-  { key: "mocks", label: "Full Practice Tests", color: "var(--sat-area-mocks)" },
+  { key: "tests", label: "Full Practice Tests", color: "var(--sat-area-tests)" },
 ] as const;
 type AreaKey = (typeof AREAS)[number]["key"];
 
@@ -86,13 +86,13 @@ export function GenerateReportDialog({
   const endpoint = `/api/reports/students/${studentId}/pdf`;
 
   // One exam only makes sense with Full Practice Tests selected; it replaces the other areas.
-  const effectiveExamId = selected.has("mocks") ? examId : "";
+  const effectiveExamId = selected.has("tests") ? examId : "";
   const queryFor = (areas: Set<AreaKey>, exam: string) => {
     const keys = AREAS.filter((area) => areas.has(area.key)).map((area) => area.key);
     if (keys.length === 0) return null;
     const params = new URLSearchParams({ areas: keys.join(",") });
     for (const [key, value] of Object.entries(filters)) if (value) params.set(key, value);
-    if (exam && areas.has("mocks")) params.set("fptAttemptId", exam);
+    if (exam && areas.has("tests")) params.set("fptAttemptId", exam);
     return params.toString();
   };
   const query = queryFor(selected, effectiveExamId);
@@ -204,7 +204,7 @@ export function GenerateReportDialog({
           </div>
         </div>
         {!query && <InlineError>Select at least one area.</InlineError>}
-        {selected.has("mocks") && exams.length > 0 ? (
+        {selected.has("tests") && exams.length > 0 ? (
           <label className="flex flex-wrap items-center gap-2 text-sm text-gray-700">
             <span className="font-medium">Exam</span>
             <select

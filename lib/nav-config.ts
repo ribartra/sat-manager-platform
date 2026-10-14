@@ -67,6 +67,7 @@ export type ResolvedNavDirect = {
   href: string;
   label: string;
   icon: LucideIcon;
+  exact?: boolean;
 };
 
 export type ResolvedNavEntry = ResolvedNavGroup | ResolvedNavDirect;
@@ -81,12 +82,13 @@ function isNavGroupDef(item: TeacherNavEntryDef): item is NavGroupDef {
 
 /** Declarative Teacher (+ Admin) navigation. Desktop, drawer and future crumbs share this. */
 export const TEACHER_NAV: TeacherNavEntryDef[] = [
+  { id: "teacher.home", label: "Home", href: "/teacher", icon: Home, exact: true },
   {
     id: "teacher.students",
     label: "Students",
     icon: Users,
     links: [
-      { id: "teacher.students.list", label: "Students", href: "/teacher", icon: Users },
+      { id: "teacher.students.list", label: "Students", href: "/teacher/students", icon: Users },
       {
         id: "teacher.students.groups",
         label: "Groups",
@@ -96,8 +98,27 @@ export const TEACHER_NAV: TeacherNavEntryDef[] = [
         hideForAdmin: true,
       },
       { id: "teacher.students.parents", label: "Parents", href: "/teacher/parents", icon: UserCheck },
+      { id: "teacher.students.compare", label: "Compare", href: "/teacher/compare", icon: BarChart2 },
     ],
   },
+  {
+    id: "teacher.practice",
+    label: "Practice",
+    icon: BookOpen,
+    links: [
+      { id: "teacher.practice.sets", label: "Practice sets", href: "/teacher/practice-sets", icon: BookOpen },
+      { id: "teacher.practice.map", label: "Content map", href: "/teacher/content", icon: Map },
+      { id: "teacher.practice.questions", label: "Questions", href: "/teacher/questions", icon: HelpCircle },
+      {
+        id: "teacher.practice.materials",
+        label: "Materials",
+        href: "/teacher/materials",
+        icon: FileText,
+        feature: "MATERIALS_MODULE",
+      },
+    ],
+  },
+  { id: "teacher.tests", label: "Tests", href: "/teacher/tests", icon: ClipboardList },
   {
     id: "teacher.programs",
     label: "Programs",
@@ -105,31 +126,6 @@ export const TEACHER_NAV: TeacherNavEntryDef[] = [
     icon: FolderOpen,
     feature: "TEACHER_PROGRAM_MANAGEMENT",
     hideForAdmin: true,
-  },
-  {
-    id: "teacher.content",
-    label: "Content",
-    icon: FileText,
-    links: [
-      { id: "teacher.content.map", label: "Content Map", href: "/teacher/content", icon: Map },
-      {
-        id: "teacher.content.materials",
-        label: "Materials",
-        href: "/teacher/materials",
-        icon: FileText,
-        feature: "MATERIALS_MODULE",
-      },
-      { id: "teacher.content.questions", label: "Questions", href: "/teacher/questions", icon: HelpCircle },
-    ],
-  },
-  {
-    id: "teacher.assessments",
-    label: "Assessments",
-    icon: ClipboardList,
-    links: [
-      { id: "teacher.assessments.practice-sets", label: "Practice & Exams", href: "/teacher/practice-sets", icon: BookOpen },
-      { id: "teacher.assessments.compare", label: "Compare", href: "/teacher/compare", icon: BarChart2 },
-    ],
   },
 ];
 
@@ -151,7 +147,8 @@ export const ADMIN_NAV_GROUP: NavGroupDef = {
 
 export const STUDENT_NAV_ENROLLED: NavLinkDef[] = [
   { id: "student.home", label: "Home", href: "/student", icon: Home, exact: true },
-  { id: "student.content-map", label: "Content Map", href: "/student/content-map", icon: Map },
+  { id: "student.tests", label: "Tests", href: "/student/tests", icon: ClipboardList },
+  { id: "student.practice", label: "Practice", href: "/student/practice", icon: Map },
   {
     id: "student.materials",
     label: "Materials",
@@ -191,7 +188,7 @@ export function resolveTeacherNav(opts: {
       continue;
     }
     if (!linkVisible(item, opts)) continue;
-    entries.push({ href: item.href, label: item.label, icon: item.icon });
+    entries.push({ href: item.href, label: item.label, icon: item.icon, exact: item.exact });
   }
 
   if (opts.role === "ADMIN") {
@@ -219,9 +216,16 @@ export function resolveStudentNav(opts: {
     .map((link) => ({ href: link.href, label: link.label, icon: link.icon, exact: link.exact }));
 }
 
+/** Other paths that belong to a nav item (detail pages living outside its prefix, legacy URLs). */
+const NAV_ALIASES: Record<string, string[]> = {
+  "/student/tests": ["/student/full-tests"],
+  "/student/practice": ["/student/content-map", "/student/results"],
+  "/teacher/tests": ["/teacher/full-tests"],
+};
+
 export function linkIsActive(href: string, pathname: string, exact = false): boolean {
   if (exact || href === "/teacher" || href === "/student") return pathname === href;
-  return pathname === href || pathname.startsWith(`${href}/`);
+  return [href, ...(NAV_ALIASES[href] ?? [])].some((base) => pathname === base || pathname.startsWith(`${base}/`));
 }
 
 export function groupIsActive(group: ResolvedNavGroup, pathname: string): boolean {
@@ -229,13 +233,11 @@ export function groupIsActive(group: ResolvedNavGroup, pathname: string): boolea
 }
 
 export function hrefWithArea(href: string, area: string | null | undefined): string {
-  if (!area || !["math", "reading", "writing", "mocks"].includes(area)) return href;
+  if (!area || !["math", "reading", "writing", "tests"].includes(area)) return href;
   const areaAware = [
-    "/student",
-    "/student/content-map",
+    "/student/practice",
     "/student/history",
     "/student/materials",
-    "/teacher",
     "/teacher/content",
     "/teacher/questions",
     "/teacher/practice-sets",
@@ -251,7 +253,9 @@ export function isPlayerPath(pathname: string): boolean {
   return [
     /^\/student\/practice\/assignment\/[^/]+$/,
     /^\/student\/full-tests\/[^/]+$/,
+    /^\/student\/tests\/(?!results\/)[^/]+$/,
     /^\/teacher\/practice-sets\/[^/]+\/preview$/,
     /^\/teacher\/full-tests\/[^/]+\/preview$/,
+    /^\/teacher\/tests\/[^/]+\/preview$/,
   ].some((pattern) => pattern.test(pathname));
 }

@@ -26,7 +26,7 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
   const filters = await searchParams;
   const area = activeAreaTab(filters.area ?? filters.section, "math");
   // "Full Practice Tests" is an exam surface, not a question-bank area.
-  if (area === "mocks") redirect("/teacher/full-tests");
+  if (area === "tests") redirect("/teacher/full-tests");
   const practiceArea = practiceAreaFromTab(area);
   const sectionLabel = practiceSectionLabel(practiceArea);
 

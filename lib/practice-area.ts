@@ -1,6 +1,6 @@
 /**
  * Canonical Practice area classification (Math / Reading / Writing) and
- * report/analytics tab keys including Full Practice Tests (`mocks` URL key).
+ * report/analytics tab keys including Tests (`tests` URL key; legacy `mocks` still accepted).
  *
  * Source of truth for practice content is Domain.practiceArea (persisted).
  * Heuristic domain-name lists remain only as a fallback for null rows.
@@ -9,8 +9,12 @@
 export const PRACTICE_AREAS = ["MATH", "READING", "WRITING"] as const;
 export type PracticeAreaCode = (typeof PRACTICE_AREAS)[number];
 
-/** URL / UI tab keys for practice + Full Practice Tests. */
-export const AREA_TAB_KEYS = ["math", "reading", "writing", "mocks"] as const;
+/** User-facing name of the full-length SAT exams (product decision: "Tests", never "Exams"/"Full Practice Tests"). */
+export const TESTS_LABEL = "Tests";
+export const TEST_LABEL = "Test";
+
+/** URL / UI tab keys for practice + Tests. */
+export const AREA_TAB_KEYS = ["math", "reading", "writing", "tests"] as const;
 export type AreaTabKey = (typeof AREA_TAB_KEYS)[number];
 
 export const PRACTICE_AREA_TABS = [
@@ -19,10 +23,19 @@ export const PRACTICE_AREA_TABS = [
   { key: "writing", label: "Writing", practiceArea: "WRITING" as const },
 ] as const;
 
-export const AREA_TABS_WITH_MOCKS = [
+export const AREA_TABS_WITH_TESTS = [
   ...PRACTICE_AREA_TABS,
-  { key: "mocks" as const, label: "Full Practice Tests", practiceArea: null },
+  { key: "tests" as const, label: TESTS_LABEL, practiceArea: null },
 ];
+
+/** Home pages add a Summary tab in front of the area tabs (no `area` param). */
+export const HOME_TAB_KEYS = ["summary", ...AREA_TAB_KEYS] as const;
+export type HomeTabKey = (typeof HOME_TAB_KEYS)[number];
+
+export function activeHomeTab(value: string | null | undefined): HomeTabKey {
+  if (!value || value === "summary") return "summary";
+  return activeAreaTab(value, "math");
+}
 
 /** Legacy report-area keys used by parent tokens / PDF query params. */
 export type ReportAreaKey = "mathematics" | "reading" | "writing";
@@ -48,6 +61,7 @@ export function activeAreaTab(value: string | null | undefined, fallback: AreaTa
   // Legacy pages used `rw` for a combined Reading & Writing tab. Reading is
   // the safest destination now that the combined surface is split in two.
   if (value === "rw") return "reading";
+  if (value === "mocks") return "tests";
   return isAreaTabKey(value) ? value : fallback;
 }
 
@@ -76,7 +90,7 @@ export function practiceAreaLabel(area: PracticeAreaCode | null | undefined): st
  * Section-style label used to GROUP practice content in pickers, tables and
  * breadcrumbs (Math uses the long form "Mathematics" to match SECTION_ORDER).
  * Reading and Writing are surfaced separately; the combined "Reading & Writing"
- * label is reserved for exam/full-test surfaces.
+ * label is reserved for Test surfaces.
  */
 export function practiceSectionLabel(area: PracticeAreaCode | null | undefined): string {
   if (area === "MATH") return "Mathematics";
@@ -95,12 +109,12 @@ export function domainSectionLabel(input: {
   return practiceSectionLabel(resolvePracticeArea(input));
 }
 
-export function reportAreaFromTab(tab: Exclude<AreaTabKey, "mocks">): ReportAreaKey {
+export function reportAreaFromTab(tab: Exclude<AreaTabKey, "tests">): ReportAreaKey {
   if (tab === "math") return "mathematics";
   return tab;
 }
 
-export function tabFromReportArea(area: ReportAreaKey): Exclude<AreaTabKey, "mocks"> {
+export function tabFromReportArea(area: ReportAreaKey): Exclude<AreaTabKey, "tests"> {
   if (area === "mathematics") return "math";
   return area;
 }
@@ -121,7 +135,7 @@ export function areaTabClass(tab: AreaTabKey, active: boolean): string {
     math: "blue",
     reading: "amber",
     writing: "green",
-    mocks: "orange",
+    tests: "orange",
   }[tab];
   if (active) {
     return `border-${color}-600 text-${color}-700 border-b-2`;
@@ -130,17 +144,19 @@ export function areaTabClass(tab: AreaTabKey, active: boolean): string {
 }
 
 /** Explicit active/inactive classes (Tailwind needs full class names). */
-export function areaTabLinkClass(tab: AreaTabKey, active: boolean): string {
+export function areaTabLinkClass(tab: HomeTabKey, active: boolean): string {
   if (!active) return "border-b-2 border-transparent px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-800";
   switch (tab) {
+    case "summary":
+      return "border-b-2 border-gray-900 px-3 py-2 text-sm font-medium text-gray-900";
     case "math":
       return "border-b-2 border-[var(--sat-area-math)] px-3 py-2 text-sm font-medium text-[var(--sat-area-math)]";
     case "reading":
       return "border-b-2 border-[var(--sat-area-reading)] px-3 py-2 text-sm font-medium text-[var(--sat-area-reading)]";
     case "writing":
       return "border-b-2 border-[var(--sat-area-writing)] px-3 py-2 text-sm font-medium text-[var(--sat-area-writing)]";
-    case "mocks":
-      return "border-b-2 border-[var(--sat-area-mocks)] px-3 py-2 text-sm font-medium text-[var(--sat-area-mocks)]";
+    case "tests":
+      return "border-b-2 border-[var(--sat-area-tests)] px-3 py-2 text-sm font-medium text-[var(--sat-area-tests)]";
   }
 }
 
@@ -205,11 +221,11 @@ export function practiceAreaPracticeSetWhere(area: PracticeAreaCode) {
 
 export function buildAreaHref(
   basePath: string,
-  area: AreaTabKey,
+  area: HomeTabKey,
   extra?: Record<string, string | undefined | null>
 ): string {
   const params = new URLSearchParams();
-  params.set("area", area);
+  if (area !== "summary") params.set("area", area);
   if (extra) {
     for (const [key, value] of Object.entries(extra)) {
       if (value) params.set(key, value);

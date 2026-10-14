@@ -62,7 +62,7 @@ export default async function ImpersonateStudentPage({ params, searchParams }: P
   const filters = progressFiltersFromParams(query);
   const area = activeAreaTab(filters.area, filters.area);
   const practiceArea = practiceAreaFromTab(area);
-  const isMocks = area === "mocks";
+  const isMocks = area === "tests";
 
   const student = await withSqliteRetry(() => prisma.user.findUnique({
     where: { id: studentId },
@@ -255,7 +255,7 @@ export default async function ImpersonateStudentPage({ params, searchParams }: P
         {!isMocks && pendingExamCount > 0 && (
           <div className="mb-4 rounded-md border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-900">
             {pendingExamCount} active Full Practice Test{pendingExamCount === 1 ? "" : "s"} assigned.{" "}
-            <Link href={buildProgressHref(`/teacher/impersonate/${studentId}`, { ...filters, area: "mocks" })} className="font-medium underline">
+            <Link href={buildProgressHref(`/teacher/impersonate/${studentId}`, { ...filters, area: "tests" })} className="font-medium underline">
               Open Full Practice Tests tab →
             </Link>
           </div>

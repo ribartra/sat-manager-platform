@@ -199,7 +199,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
         <KpiStrip
           items={[
             { label: "Full Practice Tests completed", value: String(report.kpis.exams), hint: "Finished in the selected dates." },
-            { label: "Latest total score", value: String(report.kpis.latestTotal ?? "—"), className: "text-[var(--sat-area-mocks)]", hint: "Total score (out of 1600) on the most recent test." },
+            { label: "Latest total score", value: String(report.kpis.latestTotal ?? "—"), className: "text-[var(--sat-area-tests)]", hint: "Total score (out of 1600) on the most recent test." },
             { label: "Latest Reading & Writing", value: String(report.kpis.latestRw ?? "—"), hint: "Reading & Writing score (out of 800) on the most recent test." },
             { label: "Latest Math", value: String(report.kpis.latestMath ?? "—"), hint: "Math score (out of 800) on the most recent test." },
             { label: "Full Practice Tests to do", value: String(report.kpis.pending), hint: "Assigned but not finished yet." },
@@ -345,7 +345,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
           {" "}(latest: {report.latestExam.name}
           {report.latestExam.totalScore !== null ? ` · ${report.latestExam.totalScore}` : ""}
           {report.latestExam.submittedAt ? `, ${formatDate(report.latestExam.submittedAt)}` : ""}). Exam results are in the Full Practice Tests tab.{" "}
-          <Link href={buildProgressHref(`/teacher/students/${studentId}`, filters, { area: "mocks" })} className="font-medium underline">
+          <Link href={buildProgressHref(`/teacher/students/${studentId}`, filters, { area: "tests" })} className="font-medium underline">
             See exam results →
           </Link>
         </div>
@@ -353,7 +353,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
       {report.pendingExamCount > 0 && (
         <div className="mt-3 rounded-md border border-orange-200 bg-orange-50 px-3 py-2 text-sm text-orange-900">
           {report.pendingExamCount} active Full Practice Test{report.pendingExamCount === 1 ? "" : "s"} assigned.{" "}
-          <Link href={buildProgressHref(`/teacher/students/${studentId}`, filters, { area: "mocks" })} className="font-medium underline">
+          <Link href={buildProgressHref(`/teacher/students/${studentId}`, filters, { area: "tests" })} className="font-medium underline">
             Open Full Practice Tests →
           </Link>
         </div>

@@ -74,11 +74,11 @@ export async function generateDeadlineNotifications(now = new Date()): Promise<D
 
   let created = unlocked;
   for (const item of soon) {
-    const href = item.kind === "Full Practice Test" ? "/student/content-map?area=mocks" : "/student";
+    const href = item.kind === "Full Practice Test" ? "/student/content-map?area=tests" : "/student";
     if (await notifyOnce(item.studentId, `${item.kind} due soon`, `${item.name} is due tomorrow (${shortDate(item.dueDate)}).`, href, since)) created += 1;
   }
   for (const item of overdue) {
-    const href = item.kind === "Full Practice Test" ? "/student/content-map?area=mocks" : "/student";
+    const href = item.kind === "Full Practice Test" ? "/student/content-map?area=tests" : "/student";
     if (await notifyOnce(item.studentId, `${item.kind} overdue`, `${item.name} was due ${shortDate(item.dueDate)} and isn't finished yet.`, href, since)) created += 1;
   }
 

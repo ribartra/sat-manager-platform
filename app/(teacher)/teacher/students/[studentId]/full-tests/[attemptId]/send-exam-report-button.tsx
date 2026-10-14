@@ -20,7 +20,7 @@ export function SendExamReportButton({
     <GenerateReportDialog
       studentId={studentId}
       studentName={studentName}
-      currentArea="mocks"
+      currentArea="tests"
       filters={{}}
       filterSummary=""
       exams={[{ id: attemptId, label: attemptLabel }]}

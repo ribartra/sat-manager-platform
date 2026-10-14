@@ -28,7 +28,7 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
   const area = activeAreaTab(filters.area ?? filters.section, "math");
   const practiceArea = practiceAreaFromTab(area);
 
-  if (area === "mocks") {
+  if (area === "tests") {
     const tests = await prisma.fullPracticeTest.findMany({
       include: { modules: { include: { questions: true } }, assignments: true, attempts: true },
       orderBy: { createdAt: "desc" },

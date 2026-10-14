@@ -50,7 +50,7 @@ export function ProgressFilters({
   /** Extra query params kept when applying or clearing filters (e.g. the active page tab). */
   preserve?: Record<string, string | undefined>;
 }) {
-  const isMocks = filters.area === "mocks";
+  const isMocks = filters.area === "tests";
   const preserved = Object.entries(preserve ?? {}).filter((entry): entry is [string, string] => Boolean(entry[1]));
   const clearHref = buildProgressHref(action, { area: filters.area, studentId: filters.studentId });
   const clearQuery = new URLSearchParams(preserved).toString();

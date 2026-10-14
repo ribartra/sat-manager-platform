@@ -64,7 +64,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
   const pageParams = Object.fromEntries(progressFilterEntries(filters));
   const requestedPage = pageFromParam(params.page);
 
-  if (area === "mocks") {
+  if (area === "tests") {
     const examAttempts = await prisma.fullPracticeTestAttempt.findMany({
       where: {
         studentId: userId,
@@ -118,7 +118,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
                     </td>
                     <td className="px-4 py-3 text-right text-gray-700"><VoidableValue status={exam.status}>{exam.rwScore ?? "—"}</VoidableValue></td>
                     <td className="px-4 py-3 text-right text-gray-700"><VoidableValue status={exam.status}>{exam.mathScore ?? "—"}</VoidableValue></td>
-                    <td className="px-4 py-3 text-right font-semibold text-[var(--sat-area-mocks)]">
+                    <td className="px-4 py-3 text-right font-semibold text-[var(--sat-area-tests)]">
                       <VoidableValue status={exam.status}>{exam.totalScore ?? "—"}</VoidableValue>
                     </td>
                     <td className="px-4 py-3 text-right">

@@ -217,7 +217,7 @@ export async function upsertFullTestAssignment(input: FullTestAssignmentInput): 
         metadata: JSON.stringify({ studentId, testId, dueDate: dueDate?.toISOString() ?? null, ...extra }),
       },
     });
-  const href = "/student/content-map?area=mocks";
+  const href = "/student/content-map?area=tests";
 
   let existing = await prisma.fullPracticeTestAssignment.findFirst({ where: { testId, studentId } });
   if (!existing) {

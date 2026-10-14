@@ -27,7 +27,7 @@ export default async function ContentMapPage({ searchParams }: PageProps) {
   const area = activeAreaTab(params.area, "math");
   const practiceArea = practiceAreaFromTab(area);
 
-  if (area === "mocks") {
+  if (area === "tests") {
     const assignments = await prisma.fullPracticeTestAssignment.findMany({
       where: { studentId: userId },
       include: {
@@ -97,18 +97,18 @@ export default async function ContentMapPage({ searchParams }: PageProps) {
                 <div className="flex shrink-0 items-center gap-3">
                   {attempt?.status === "SUBMITTED" ? (
                     <>
-                      <Link href={`/student/full-tests/results/${attempt.id}?area=mocks`} className="text-sm font-medium text-blue-600 hover:underline">
+                      <Link href={`/student/full-tests/results/${attempt.id}?area=tests`} className="text-sm font-medium text-blue-600 hover:underline">
                         Review
                       </Link>
                       {/* Reassigned by the teacher after a submission: allow a fresh attempt. */}
                       {assignment.status !== "COMPLETED" && (
-                        <Link href={`/student/full-tests/${assignment.id}?area=mocks`} className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700">
+                        <Link href={`/student/full-tests/${assignment.id}?area=tests`} className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700">
                           Start
                         </Link>
                       )}
                     </>
                   ) : (
-                    <Link href={`/student/full-tests/${assignment.id}?area=mocks`} className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700">
+                    <Link href={`/student/full-tests/${assignment.id}?area=tests`} className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700">
                       {attempt ? "Continue" : "Start"}
                     </Link>
                   )}

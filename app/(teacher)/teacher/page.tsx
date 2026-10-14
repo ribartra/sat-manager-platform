@@ -99,8 +99,8 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
         attempts: {
           where: {
             status: "SUBMITTED",
-            ...(area === "mocks" ? { id: "__no_practice_attempt__" } : {}),
-            ...(area !== "mocks" && (topicId || difficulty || practiceArea)
+            ...(area === "tests" ? { id: "__no_practice_attempt__" } : {}),
+            ...(area !== "tests" && (topicId || difficulty || practiceArea)
               ? {
                   assignment: {
                     practiceSet: practiceSetFilter,
@@ -118,14 +118,14 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
         assignments: {
           where: {
             status: { in: ["PENDING", "OVERDUE"] },
-            ...(area === "mocks" ? { id: "__no_practice_assignment__" } : {}),
-            ...(area !== "mocks" && practiceArea ? { practiceSet: { topic: { domain: { practiceArea } } } } : {}),
+            ...(area === "tests" ? { id: "__no_practice_assignment__" } : {}),
+            ...(area !== "tests" && practiceArea ? { practiceSet: { topic: { domain: { practiceArea } } } } : {}),
           },
         },
         fullTestAttempts: {
           where: {
             status: "SUBMITTED",
-            ...(area === "mocks" ? {} : { id: "__no_full_test_attempt__" }),
+            ...(area === "tests" ? {} : { id: "__no_full_test_attempt__" }),
           },
           orderBy: { submittedAt: "desc" },
           include: { answers: { select: { isCorrect: true } }, test: { select: { name: true } } },
@@ -133,7 +133,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
         fullTestAssignments: {
           where: {
             status: { in: ["PENDING", "OVERDUE"] },
-            ...(area === "mocks" ? {} : { id: "__no_full_test_assignment__" }),
+            ...(area === "tests" ? {} : { id: "__no_full_test_assignment__" }),
           },
         },
       },
@@ -154,8 +154,8 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
       where: {
         dueDate: { lt: new Date() },
         status: { in: ["PENDING", "IN_PROGRESS"] },
-        ...(area === "mocks" ? { id: "__no_practice_overdue__" } : {}),
-        ...(area !== "mocks" && practiceArea ? { practiceSet: { topic: { domain: { practiceArea } } } } : {}),
+        ...(area === "tests" ? { id: "__no_practice_overdue__" } : {}),
+        ...(area !== "tests" && practiceArea ? { practiceSet: { topic: { domain: { practiceArea } } } } : {}),
         student: {
           active: true,
           validationStatus: "APPROVED",
@@ -170,7 +170,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
       where: {
         status: { in: ["PENDING", "IN_PROGRESS"] },
         dueDate: { lt: new Date() },
-        ...(area === "mocks" ? {} : { id: "__no_full_test_overdue__" }),
+        ...(area === "tests" ? {} : { id: "__no_full_test_overdue__" }),
         student: {
           active: true,
           validationStatus: "APPROVED",
@@ -185,7 +185,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
       ? prisma.unlockRequest.findMany({
           where: {
             status: "PENDING",
-            ...(area === "mocks" ? { id: "__no_unlock_request__" } : {}),
+            ...(area === "tests" ? { id: "__no_unlock_request__" } : {}),
             assignment: {
               ...(practiceArea ? { practiceSet: { topic: { domain: { practiceArea } } } } : {}),
               student: {
@@ -205,7 +205,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
   const fiveDaysAgo = new Date();
   fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
   const inactiveStudents = students.filter((s) => {
-    const areaActivity = area === "mocks"
+    const areaActivity = area === "tests"
       ? s.fullTestAttempts.map((attempt) => attempt.submittedAt).filter((value): value is Date => Boolean(value))
       : s.attempts.map((attempt) => attempt.submittedAt).filter((value): value is Date => Boolean(value));
     const lastActiveAt = areaActivity.sort((a, b) => b.getTime() - a.getTime())[0];
@@ -214,7 +214,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
   });
   const performanceBuckets = new Map<string, { label: string; correct: number; total: number; attempts: number }>();
   for (const student of students) {
-    if (area === "mocks") {
+    if (area === "tests") {
       for (const attempt of student.fullTestAttempts) {
         const key = `full-test:${attempt.testId}`;
         const bucket = performanceBuckets.get(key) ?? {
@@ -297,7 +297,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
             </select>
           </label>
         )}
-        {area !== "mocks" && (
+        {area !== "tests" && (
           <>
             <label className="min-w-[7.5rem] flex-1 text-xs font-medium text-gray-600">
               Skill
@@ -388,7 +388,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
         showGroups={teacherGroupManagementEnabled}
         filterQuery={progressFilterQuery({ area, topic: topicId, difficulty })}
         rows={students.map((student): TeacherStudentRow => {
-          const areaActivity = area === "mocks"
+          const areaActivity = area === "tests"
             ? student.fullTestAttempts.map((attempt) => attempt.submittedAt).filter((value): value is Date => Boolean(value))
             : student.attempts.map((attempt) => attempt.submittedAt).filter((value): value is Date => Boolean(value));
           const lastActiveAt = areaActivity.sort((a, b) => b.getTime() - a.getTime())[0];
@@ -398,7 +398,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
             : "";
           const programs = student.programEnrollments.map((pe) => pe.program.name).join(", ");
           const avgScore = summarizeAllQuestionAnswers(
-            area === "mocks"
+            area === "tests"
               ? student.fullTestAttempts.flatMap((attempt) => attempt.answers)
               : student.attempts.flatMap((attempt) => attempt.answers),
           ).percent;
@@ -413,7 +413,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
               ? `${formatDate(lastActiveAt)}${inactive ? " ⚠" : ""}`
               : "Never",
             lastActiveTone: !lastActiveAt ? "never" : inactive ? "warn" : "ok",
-            pendingCount: area === "mocks" ? student.fullTestAssignments.length : student.assignments.length,
+            pendingCount: area === "tests" ? student.fullTestAssignments.length : student.assignments.length,
             avgScoreLabel: avgScore !== null ? `${avgScore}%` : "—",
             avgScoreTone:
               avgScore === null ? "none" : avgScore >= 80 ? "high" : avgScore >= 60 ? "mid" : "low",

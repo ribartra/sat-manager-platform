@@ -56,3 +56,15 @@ export function localToday(): string {
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
 }
+
+/** Relative day in plain words: "today", "tomorrow", "in 3 days", "2 weeks ago", "3 months ago". */
+export function relativeDay(date: Date | string, now: Date = new Date()): string {
+  const day = (d: Date) => Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+  const diff = Math.round((day(new Date(date)) - day(now)) / 86_400_000);
+  if (diff === 0) return "today";
+  if (diff === 1) return "tomorrow";
+  if (diff === -1) return "yesterday";
+  const n = Math.abs(diff);
+  const text = n < 14 ? `${n} days` : n < 60 ? `${Math.round(n / 7)} weeks` : `${Math.round(n / 30)} months`;
+  return diff > 0 ? `in ${text}` : `${text} ago`;
+}

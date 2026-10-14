@@ -100,7 +100,7 @@ export function AssignExamForm({
       );
       window.setTimeout(() => {
         const query = new URLSearchParams(returnHref.split("?")[1] ?? "");
-        query.set("area", "mocks");
+        query.set("area", "tests");
         router.push(`/teacher/students/${studentId}?${query.toString()}`);
       }, 1000);
     } catch (err) {

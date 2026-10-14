@@ -43,7 +43,7 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
   const { filters, showEndDate } = await applyTimeFilterSetting(progressFiltersFromParams(query));
   const area = activeAreaTab(filters.area, filters.area);
   const practiceArea = practiceAreaFromTab(area);
-  const isMocks = area === "mocks";
+  const isMocks = area === "tests";
   const topicId = filters.topic ?? "";
   const difficulty = filters.difficulty ?? "";
   const dateFilter = progressDateWhere(filters);
@@ -191,7 +191,7 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
       {!isMocks && pendingExamCount > 0 && (
         <div className="mb-4 rounded-md border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-900">
           You have {pendingExamCount} Full Practice Test{pendingExamCount === 1 ? "" : "s"} to take.{" "}
-          <Link href={buildProgressHref("/student", { ...filters, area: "mocks" })} className="font-medium underline">
+          <Link href={buildProgressHref("/student", { ...filters, area: "tests" })} className="font-medium underline">
             Go to Full Practice Tests →
           </Link>
         </div>
@@ -227,7 +227,7 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
           <section className="mb-8">
             <div className="mb-3 flex items-center justify-between">
               <h2 className="text-base font-semibold text-gray-900">Your Full Practice Tests</h2>
-              <Link href={buildProgressHref("/student/content-map", { ...filters, area: "mocks" })} className="text-sm text-blue-600 hover:underline">
+              <Link href={buildProgressHref("/student/content-map", { ...filters, area: "tests" })} className="text-sm text-blue-600 hover:underline">
                 View all
               </Link>
             </div>

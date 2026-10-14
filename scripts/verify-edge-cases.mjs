@@ -106,7 +106,7 @@ const checks = [
     label: "Reopen/invalidate capturan razon operativa para auditoria",
   },
   {
-    file: "app/(student)/student/full-tests/[assignmentId]/player-client.tsx",
+    file: "app/(student)/student/tests/[assignmentId]/player-client.tsx",
     requires: [
       "savedProgressState",
       "moduleTimerState",
@@ -176,24 +176,28 @@ const checks = [
     label: "Practice player respeta CALCULATOR_PRACTICE_SETS",
   },
   {
-    file: "app/(student)/student/full-tests/[assignmentId]/page.tsx",
+    file: "app/(student)/student/tests/[assignmentId]/page.tsx",
     requires: ['getFeatureSetting("CALCULATOR_FULL_TESTS")', "showCalculator={showCalculator}"],
     label: "FPT player respeta CALCULATOR_FULL_TESTS",
   },
   {
-    file: "app/api/full-practice-tests/attempts/[attemptId]/submit/route.ts",
+    file: "lib/full-test-grading.ts",
     requires: [
       "scaledScore(\"RW\"",
       "scaledScore(\"MATH\"",
       "totalScore: rwScore + mathScore",
       "timeExpiredEvents: timeExpiredEvents ?? 0",
       "extraTimeUsed: extraTimeUsed ?? 0",
-      "status: \"IN_PROGRESS\"",
       "FPT_PRETEST_EXCLUSION",
       "countsTowardScore",
       "!excludePretest || !item.isPretest",
     ],
     label: "Submit FPT respeta FPT_PRETEST_EXCLUSION al contar raw y guarda eventos de tiempo",
+  },
+  {
+    file: "app/api/full-practice-tests/attempts/[attemptId]/submit/route.ts",
+    requires: ["status: \"IN_PROGRESS\"", "finalizeFullTestAttempt"],
+    label: "Submit FPT solo sobre intento abierto y usa la calificacion compartida",
   },
   {
     file: "prisma/seed.ts",
@@ -309,7 +313,7 @@ const checks = [
     label: "Ficha del alumno: reiniciar examen en curso (invalida intento, asignacion a Pending)",
   },
   {
-    file: "app/(student)/student/full-tests/[assignmentId]/page.tsx",
+    file: "app/(student)/student/tests/[assignmentId]/page.tsx",
     requires: ['assignment.status === "COMPLETED"', "redirect(", "isUniqueConstraintError", "createdHere"],
     label: "Player FPT: un examen COMPLETED no crea un intento nuevo al abrir su URL",
   },
