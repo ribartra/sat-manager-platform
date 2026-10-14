@@ -1,0 +1,50 @@
+# PS Advanced Math — stripped-math explanations (2026-10-14)
+
+Scope: 28 heuristic candidates from `psx/adv.json`. Read-only on dev.db; ops in `specs/ps-adv.json` (28 guarded ops, class `stripped_math`), built from `checkpoints/ps-adv.jsonl`.
+
+**Result: 28 fixed / 0 false positive / 0 needs_review.**
+
+Sources: no `IngestQuestionCandidate.explanation` had usable LaTeX (the one with a `$` only has the currency "$0"), and the `ANS …pdf` page artifacts are plain PDF text. Every restore was transcribed from the rendered ANS PDF page (`pdftoppm -r 110`; 220 dpi crops for Nonlinear functions HARD #13). Drafts left by the cut-off run 1 (13 questions) were re-checked against the page images before they were accepted. Note: in the EASY/MED ANS PDFs the header is "Question ID: <hex>" (with a colon).
+
+Checks on each op: `before` is the exact DB value. Dollar signs are balanced. All 338 inline expressions render with KaTeX (`throwOnError`), and the real `MATH_TOKEN_PATTERN` tokenization gives no prose or currency tokens and no stray `$`. The conclusion matches `correctAnswer`. A dry run plus `--apply` of `apply-spec.cjs` on a scratch copy of dev.db gave 28 PENDING → 28 applied → 28 ALREADY, with integrity ok. Prose invariance was checked in 4 modes:
+- **strict** (19): `after` with `$…$` removed equals `before`, ignoring whitespace. Ignoring all whitespace is needed so that "left-\nhand", "y-\naxis" and "x-\ncoordinate" can be joined into one word.
+- **tail** (5): `before` is a strict prefix of `after`. These explanations were **truncated at the PDF page break**: the continuation on the next ANS page was never imported. Affected: EE HARD-1 #1 (Choice B tail + Choice D), #2 (Choices B–D), #14 (Choices A–C), #17 (long-division and Choices A–C sentence), and NLF HARD #23 (Choices A/C/D). The missing tail was restored from the next page, word for word.
+- **words** (3): the sequence of alphabetic words is unchanged. Here `before` held flattened math residue rather than blanks: EE HARD-1 #3 ("4 - 1", "𝑥+14…"), NLF MED #26 ("f( ) = –0.28( – 27) 2 + 880", where only θ was dropped), and NEq MED #9 (a 4-row solving table flattened to its justification column, rebuilt as a pipe table `| math | justification |`, which `lib/math-text.ts` renders as an HTML table).
+- **words-prefix** (1): NLF HARD #13 has residue and was also truncated at the page break (the end of the alternate approach and Choices A/C/D were on p23).
+
+Notation: `{,}` for thousands separators (`648{,}650`, `1{,}800`). The source prints "gt" for g(t) in NLF HARD #13; it is written `g(t)`. In NLF HARD #6 the prose currency "$0" (×2) is written `\(\$0\)` (the repo convention from the math-practice QA), because otherwise "$0 is represented by $" would be captured as a math token next to the restored `$f(x)$`. Plain-text variables in the DB prose ("k were 2", "values of d and a", "4a", "6a", "x", "f") were left as plain text.
+
+| Set / # | Question id | ANS PDF page (Question ID) | Restored | Key check |
+|---|---|---|---|---|
+| Equivalent expressions HARD-1 #1 | cmsjrnxel01eqqmt15q77tgvt | ANS HARD 1EQUIV EXPRES .pdf p1 (371cbf6b) | restored polynomial product, x²-terms, -ab+15=-9, ab=24 and per-choice arithmetic; joined hard line breaks; restored the Choice B/D tail cut at the page break (p2) | C ✓ |
+| Equivalent expressions HARD-1 #13 | cmsjrnxfr01ftqmt1wj4k7nt2 | ANS HARD 1EQUIV EXPRES .pdf p19 (a0b4103e) | restored 1/3, x²−6, (x−√6)(x+√6), √6 and choice-A/B/C expressions; joined hard line breaks | D ✓ |
+| Equivalent expressions HARD-1 #14 | cmsjrnxfu01fwqmt10doytpcg | ANS HARD 1EQUIV EXPRES .pdf p21 (ad038c19) | restored (a+b/2)², its expansion and a²+ab+b²/4; joined hard line breaks; restored the Choices A–C paragraph cut at the page break (p22) | D ✓ |
+| Equivalent expressions HARD-1 #16 | cmsjrnxg101g2qmt1t7c0bqt3 | ANS HARD 1EQUIV EXPRES .pdf p24 (12e7faf8) | restored factoring (x+7)(x−1), rewritten equation, x≠−7, a=1, d=−1, 1+(−1)=0, a+d; joined hard line breaks | C ✓ |
+| Equivalent expressions HARD-1 #17 | cmsjrnxg501g7qmt1tkea9b5o | ANS HARD 1EQUIV EXPRES .pdf p26 (89fc23af) | restored x−3, numerator rewrite, fraction split, x≠3, x+1−2/(x−3); joined hard line breaks; restored the long-division/Choices A–C paragraph cut at the page break (p27) | D ✓ |
+| Equivalent expressions HARD-1 #18 | cmsjrnxg801gcqmt11tq3fgv3 | ANS HARD 1EQUIV EXPRES .pdf p28 (911c415b) | restored distributed expression, 200y²+6432, ay²+b, a=200, b=6432, a+b=6632; joined hard line breaks | 6632 ✓ |
+| Equivalent expressions HARD-1 #2 | cmsjrnxep01evqmt19m7s33gg | ANS HARD 1EQUIV EXPRES .pdf p3 (d8789a4c) | restored x+b, (x²−c)/(x−b)=x+b, x−b, x²−c=(x+b)(x−b); joined hard line breaks; restored the Choices B–D paragraph cut at the page break (p4) | A ✓ |
+| Equivalent expressions HARD-1 #3 | cmsjrnxet01f0qmt1umsqgwd0 | ANS HARD 1EQUIV EXPRES .pdf p5 (433184f1) | replaced the flattened fraction residue (e.g. '4 - 1', '𝑥+14') with the fractions and common-denominator steps ending in 9/((x+1)(4x−5)); joined hard line breaks | D ✓ |
+| Equivalent expressions HARD-1 #7 | cmsjrnxf601fbqmt1avybp1mn | ANS HARD 1EQUIV EXPRES .pdf p10 (40c09d66) | restored 7/6, a/b, x^(5/2)/x^(4/3), x^(5/2−4/3), x^(7/6); joined hard line breaks | 7/6\|1.166\|1.167 ✓ |
+| Nonlinear equations in one variable and systems of equations in two variables EASY #12 | cmsjrnxxy01puqmt1ghid1gnm | ANS Non Linear Equations EASY.pdf p12 (4ca30186) | restored the intersection point (2, 4) twice; joined hard line breaks | C ✓ |
+| Nonlinear equations in one variable and systems of equations in two variables MEDIUM #6 | cmsjrnxhw01h0qmt1rgdtzg0x | ANS Non Linear Equations MED.pdf p5 (09e5e4d3) | restored x, 42=7x², 7x², 42 | C ✓ |
+| Nonlinear equations in one variable and systems of equations in two variables MEDIUM #9 | cmsjrnxi601hbqmt1cq6h3q8u | ANS Non Linear Equations MED.pdf p8 (876a731c) | restored x², 2(x²)+6=2(x+3); rebuilt the 4-step solving table (math \| justification) as a pipe table; x=0, x=1, x>0, y=x²=1²=1, (1)(1)=1; joined hard line breaks | A ✓ |
+| Nonlinear functions EASY #10 | cmsjrnxqi01mdqmt11g0xkr4e | ANS Non Linear Functions EASY.pdf p11 (d84a514a) | restored f, x, f(5), f(x), x=5, 648,650, 5; joined hard line breaks | A ✓ |
+| Nonlinear functions EASY #14 | cmsjrnxqz01mtqmt1xdv9pr38 | ANS Non Linear Functions EASY.pdf p16 (50418728) | restored −3, (0, −3), (0, y), y; joined hard line breaks | -3 ✓ |
+| Nonlinear functions EASY #4 | cmsjrnxpq01lnqmt1bldb1u22 | ANS Non Linear Functions EASY.pdf p5 (b5c43226) | restored (0, 2) twice; joined hard line breaks (incl. 'y-/axis') | B ✓ |
+| Nonlinear functions EASY #6 | cmsjrnxpy01ltqmt1u969pf1n | ANS Non Linear Functions EASY.pdf p7 (5377d9cf) | restored f(−1)=((−1)²−6(−1)+3)/((−1)−1), (1+6+3)/(−2), 10/(−2); joined hard line breaks | A ✓ |
+| Nonlinear functions EASY #9 | cmsjrnxqe01m8qmt1m0ndg1em | ANS Non Linear Functions EASY.pdf p10 (5e63b9cf) | restored (0, 8), y, x, 8, 0; joined hard line breaks | B ✓ |
+| Nonlinear functions HARD #13 | cmsjrnx9c01diqmt1glembo2t | ANS NON LINEAR FUNCT HARD .pdf p22 (d139cf4b) | replaced the flattened residue with g(t)/f(t) completing-the-square and alternate zeros approach (max 3+2(55/4)²; source prints 'gt' for g(t)); joined hard line breaks; restored the tail cut at the page break (p23: end of alternate approach + Choices A/C/D) | B ✓ |
+| Nonlinear functions HARD #2 | cmsjrnx8301cnqmt13d6pvsr5 | ANS NON LINEAR FUNCT HARD .pdf p2 (91e7ea5e) | restored y=h(x), (0,0), (t,0), h(0)=0, h(t)=0, 0=2(t−4)²−32 … 8=t; joined hard line breaks | D ✓ |
+| Nonlinear functions HARD #20 | cmsjrnxa501dtqmt1b64fm7ne | ANS NON LINEAR FUNCT HARD .pdf p33 (58dcc59f) | restored w+5, w(w+5)=104, w²+5w−104=0, (w+13)(w−8)=0, w=8, w=−13, 8+5=13; joined hard line breaks | 13 ✓ |
+| Nonlinear functions HARD #22 | cmsjrnxac01dvqmt1cgvtud8e | ANS NON LINEAR FUNCT HARD .pdf p35 (59d1f4b5) | restored q=4t, t=q/4, M=1,800(1.02)^(q/4), t=4q, 1.02^(4q), (1.02⁴)^q, 1.082^q; joined hard line breaks | A ✓ |
+| Nonlinear functions HARD #23 | cmsjrnxag01dwqmt1kuxrtwic | ANS NON LINEAR FUNCT HARD .pdf p37 (635f54ee) | restored 6(a/4)², (a/4)², a/4, 4(a/4)=a; joined hard line breaks; restored the Choices A/C/D paragraph cut at the page break (p38) | B ✓ |
+| Nonlinear functions HARD #28 | cmsjrnxaz01e1qmt1wrnj5kzg | ANS NON LINEAR FUNCT HARD .pdf p46 (9f2ecade) | restored −5, h(x)=(x+5)(x−6)(x−7), x³−8x²−23x+210, a=−8, b=−23, c=210; joined hard line breaks | 210 ✓ |
+| Nonlinear functions HARD #32 | cmsjrnxbe01e9qmt12rwoi5qe | ANS NON LINEAR FUNCT HARD .pdf p52 (43926bd9) | restored f(x), a⁴, f(x)=a^(4x+b), x=2, f(x)=a⁵, a⁵=a^(4(2)+b), b=−3, f(x)=a^(4x−3), f(k)=a²⁹, 4k−3=29, k=8; joined hard line breaks | 8 ✓ |
+| Nonlinear functions HARD #35 | cmsjrnxbq01egqmt1g9tw9oc0 | ANS NON LINEAR FUNCT HARD .pdf p56 (a7711fe8) | restored f(x)=(x−h)²+k, (h,k), y=f(x), (2,−4), (x−2)², x=2, −4; joined hard line breaks (incl. 'x-/coordinate') | A ✓ |
+| Nonlinear functions HARD #6 | cmsjrnx8k01czqmt1txo80byt | ANS NON LINEAR FUNCT HARD .pdf p9 (9654add7) | restored f(x), y=f(x), y=0, x=0; joined hard line breaks; currency $0 written as \(\$0\) (repo convention, avoids $-token capture) | C ✓ |
+| Nonlinear functions MEDIUM #26 | cmsjrnyb901weqmt14hir6f3i | ANS Non Linear Functions MED.pdf p28 (6676f055) | restored the dropped θ: f(θ)=−0.28(θ−27)²+880 (replacing the flattened 'f( ) = –0.28( – 27) 2 + 880'), θ=27, f(θ), θ; joined hard line breaks | C ✓ |
+| Nonlinear functions MEDIUM #29 | cmsjrnybj01wlqmt1p488w8bu | ANS Non Linear Functions MED.pdf p31 (dd8ac009) | restored t, d, d=a(1+b)^t, a, b, t=0, d=670 … b=0.006, d=670(1+0.006)^t; joined hard line breaks | B ✓ |
+
+Notes:
+- The page-break truncation (6 of 28) is a separate parser defect in the same import. These ops fix it together with the math because the tail is on the same ANS source. Other PS domains probably have the same defect: any explanation whose source rationale continues onto the next PDF page.
+- Build tooling (read-only DB access) is in the scratchpad `ps-adv/`: `cp.cjs` (per-question checks + checkpoint), `final.cjs` (re-verification + spec build).

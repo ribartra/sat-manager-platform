@@ -66,3 +66,7 @@ prod (`/db/backups/dev.db.pre-content-fixes-20261014-r4`), 12 PENDING → apply 
 
 ## Practice-set explanations with stripped math (in progress)
 See `checkpoints/README.md`.
+Done: 86 explanations restored (spec-ps.json = ps-geo 12 + ps-alg 21 + ps-psda 23 + ps-adv 28 + ps-extra 2), all 1063 math
+tokens render with KaTeX and no stray `$` in prose (checked with the app tokenizer). 8 explanations also got their last
+paragraph(s) back (cut at a PDF page break). Applied dev.db (backup `backups/devdb-pre-content-fixes-20261014-ps.db`).
+Renderer: `\$` is now a literal dollar sign in prose (`lib/math-text.ts`), used for prices next to formulas.

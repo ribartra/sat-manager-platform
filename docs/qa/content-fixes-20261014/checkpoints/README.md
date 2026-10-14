@@ -8,6 +8,6 @@ already there. The final spec `specs/ps-<area>.json` is built from the checkpoin
 | Area | Candidates | State |
 |---|---|---|
 | Geometry and Trigonometry | 12 | DONE — 12 fixed (specs/ps-geo.json, ps-geo-findings.md) |
-| Advanced Math | 28 | run 1 cut off (session limit) — relaunched |
-| Algebra | 22 | run 1 cut off (session limit) — relaunched |
-| Problem-Solving and Data Analysis | 24 | run 1 cut off (session limit) — relaunched |
+| Advanced Math | 28 | DONE — 28 fixed (specs/ps-adv.json, ps-adv-findings.md) |
+| Algebra | 22 | DONE — 21 fixed + EASY #13 resolved by main session with prose `\$` (specs/ps-extra.json; renderer now supports `\$`) |
+| Problem-Solving and Data Analysis | 24 | DONE — 23 fixed (specs/ps-psda.json) + Percentages EASY #14 by main session with prose `\$` (specs/ps-extra.json); One-var EASY #15 and Two-var MED #11 also get their last Choice paragraph (next PDF page, verified with pdftotext) |

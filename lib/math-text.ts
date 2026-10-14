@@ -194,15 +194,22 @@ function isStandaloneDisplay(parts: string[], index: number): boolean {
   return !before.trim() && !after.trim();
 }
 
+/** `\$` is a literal dollar sign: it never opens or closes math. Hidden while splitting, restored per part. */
+const ESCAPED_DOLLAR = "\uE000";
+
 export function tokenizeMathContent(content: string): ContentPart[] {
-  const parts = String(content ?? "").split(MATH_TOKEN_PATTERN).filter((part) => part.length > 0);
+  const source = String(content ?? "").replace(/\\\$/g, ESCAPED_DOLLAR);
+  const parts = source.split(MATH_TOKEN_PATTERN).filter((part) => part.length > 0);
   const maths = parts.map((part, index) => {
     const math = parseMathToken(part);
-    if (math?.displayMode && !isStandaloneDisplay(parts, index)) {
+    if (!math) return null;
+    // Inside math the escape stays (KaTeX renders `\$` as a dollar sign).
+    const restored = { ...math, raw: math.raw.replaceAll(ESCAPED_DOLLAR, "\\$"), math: math.math.replaceAll(ESCAPED_DOLLAR, "\\$") };
+    if (restored.displayMode && !isStandaloneDisplay(parts, index)) {
       // Inline, but keep display-size fractions/roots.
-      return { ...math, displayMode: false, math: `\\displaystyle ${math.math.trim()}` };
+      return { ...restored, displayMode: false, math: `\\displaystyle ${restored.math.trim()}` };
     }
-    return math && normalizeMathToken(math);
+    return normalizeMathToken(restored);
   });
   const isBlock = (index: number) => Boolean(maths[index]?.displayMode);
   const result: ContentPart[] = [];
@@ -214,7 +221,7 @@ export function tokenizeMathContent(content: string): ContentPart[] {
     }
     // A display block already starts its own line: the blank lines around it would add an empty
     // line on top of the formula's margin (big gaps between "$$…$$\n\n$$…$$" equations).
-    let prose = part;
+    let prose = part.replaceAll(ESCAPED_DOLLAR, "$");
     if (isBlock(index - 1)) prose = prose.replace(/^[ \t]*\n\s*/, "");
     if (isBlock(index + 1)) prose = prose.replace(/\s*\n[ \t]*$/, "");
     if (prose) result.push({ kind: "prose", segments: parseProseSegments(prose) });
