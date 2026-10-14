@@ -49,3 +49,27 @@ previously shown as a numeric field) count as options and render in the players/
 | dev.db | `backups/devdb-pre-content-fixes-20261014-trunc.db` (pre-round) | 386/386 applied, re-run ALREADY, integrity ok |
 | prod code | — | web `ws-20261014-image-options` (built from a clean HEAD export) deployed first, healthy; VM disk 51% |
 | prod DB | `/db/backups/dev.db.pre-content-fixes-20261014-ps2` | 6 option ids differ in prod → remapped by (questionId,label) with text===before (`spec-ps2-prod-option-remap.json`); 386 PENDING → applied, re-run 386 ALREADY, quick_check ok, health ok |
+
+## Round 3 — PDF hard wraps, notes bullets, subscripts (2026-10-14)
+
+Order requested: Math → Reading → Writing. Deterministic `unwrap-ps.cjs` (whitespace-only invariant per op; joins only
+mid-sentence wraps — never after `. ! ?`; protects tables, `$$`, Text 1/2, `Choice X` starts, bullets, I./II. and numbered
+items, equation lines, notes lists, and in R&W runs of 3+ short lines = verse). Verse runs checked against the PDFs by an
+agent (`checkpoints/ps3-reading-verse.jsonl`, 45 fields, 8 ops).
+
+| Spec | Ops | Content |
+|---|---|---|
+| specs/ps3-math.json | 308 | Math stems 200 / explanations 108 |
+| specs/ps3-math-extra.json | 1 | PSDA Percentages HARD #7 Year/Subscriptions table rebuilt (missed in round 2) |
+| specs/ps3-reading.json | 1046 | stimulus 311 / explanation 529 / stem 206 |
+| specs/ps3-reading-verse.json | 8 | 6 poem intros, De Acosta continuation lines, CE EASY #9 stem |
+| specs/ps3-writing.json | 507 | stem 251 / explanation 256 |
+| specs/ps3-writing-notes.json | 68 | EoI notes as `- ` bullets (FPT format); NH₃/N₂/H₂ subscripts |
+| **Total** | **1938** | mid-sentence breaks left: 5 (Algebra equation lines, correct) |
+
+| Target | Backup | Result |
+|---|---|---|
+| dev.db | `backups/devdb-pre-content-fixes-20261014-ps3.db` | 1938/1938, re-run ALREADY, integrity ok |
+| prod DB | `/db/backups/dev.db.pre-content-fixes-20261014-ps3` | spec-ps3 1930 PENDING → applied, then spec-ps3-verse 8; re-runs ALREADY; quick_check ok; health ok (no code deploy needed) |
+
+Not done (whitespace-only, from the verse findings): stanza blank lines in 4 poems; 4 CE table stimuli with wraps after a full stop.

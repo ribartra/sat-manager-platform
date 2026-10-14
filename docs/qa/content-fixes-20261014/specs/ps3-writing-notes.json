@@ -1,0 +1,682 @@
+[
+ {
+  "table": "Question",
+  "id": "cmsjro6k905zuqmt1z9jhq6ft",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nSue is the nickname of a dinosaur fossil specimen housed at the Field Museum of Natural History.\nThe Field Museum of Natural History is located in Chicago, Illinois.\nSue is a member of the genus Tyrannosaurus.\nBig Mike is the nickname of a dinosaur fossil specimen housed at the Museum of the Rockies.\nThe Museum of the Rockies is located in Bozeman, Montana.\nBig Mike is a member of the genus Tyrannosaurus.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Sue is the nickname of a dinosaur fossil specimen housed at the Field Museum of Natural History.\n- The Field Museum of Natural History is located in Chicago, Illinois.\n- Sue is a member of the genus Tyrannosaurus.\n- Big Mike is the nickname of a dinosaur fossil specimen housed at the Museum of the Rockies.\n- The Museum of the Rockies is located in Bozeman, Montana.\n- Big Mike is a member of the genus Tyrannosaurus.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - EASY #0: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6kd05zzqmt1i8dkwxgz",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nThe Haber-Bosch process is an industrial process used to manufacture ammonia (NH3).\nIt was invented by chemists Fritz Haber and Carl Bosch in 1910.\nThe process’s primary reaction combines nitrogen (N2) from the air with hydrogen (H2).\nIt requires an iron catalyst and high temperatures and pressures.\nMost of the ammonia produced by this process is used in fertilizers.",
+  "after": "While researching a topic, a student has taken the following notes:\n- The Haber-Bosch process is an industrial process used to manufacture ammonia (NH₃).\n- It was invented by chemists Fritz Haber and Carl Bosch in 1910.\n- The process’s primary reaction combines nitrogen (N₂) from the air with hydrogen (H₂).\n- It requires an iron catalyst and high temperatures and pressures.\n- Most of the ammonia produced by this process is used in fertilizers.",
+  "class": "notes_bullets+chem_subscript",
+  "note": "Expression of Ideas - Rhetorical Synthesis - EASY #1: notes as \"- \" bullets (FPT format); NH₃/N₂/H₂ subscripts as in the source",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6kh0604qmt1yk9qto2g",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nThe human body requires magnesium for over 300 essential processes.\nMagnesium is a mineral present in many foods.\nPeanuts contain 49 milligrams per ounce (mg/oz) of magnesium.\nAlmonds contain 80 mg/oz.\nChia seeds contain 150 mg/oz.",
+  "after": "While researching a topic, a student has taken the following notes:\n- The human body requires magnesium for over 300 essential processes.\n- Magnesium is a mineral present in many foods.\n- Peanuts contain 49 milligrams per ounce (mg/oz) of magnesium.\n- Almonds contain 80 mg/oz.\n- Chia seeds contain 150 mg/oz.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - EASY #2: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6km0609qmt1yyoca5h4",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nOracles of the Pink Universe was a 2021 exhibition at the Denver Museum of Art in Colorado.\nIt featured eight artworks by South African artist Simphiwe Ndzube.\nOne of these works is a painting titled Assertion of Will.\nAssertion of Will depicts three standing figures.\nThe figures wear clothing made of fabric pieces stitched to the painting’s canvas.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Oracles of the Pink Universe was a 2021 exhibition at the Denver Museum of Art in Colorado.\n- It featured eight artworks by South African artist Simphiwe Ndzube.\n- One of these works is a painting titled Assertion of Will.\n- Assertion of Will depicts three standing figures.\n- The figures wear clothing made of fabric pieces stitched to the painting’s canvas.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - EASY #3: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6kp060eqmt1kqbng9z4",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nThe mountain pygmy possum is a mammal species.\nUp until 1966, it was believed to be extinct.\nThat year, a live mountain pygmy possum was identified in the wild in Australia.\nThe mountain pygmy possum is considered a Lazarus species.\n“Lazarus species” is a term for living species of organisms that were once believed to be extinct.",
+  "after": "While researching a topic, a student has taken the following notes:\n- The mountain pygmy possum is a mammal species.\n- Up until 1966, it was believed to be extinct.\n- That year, a live mountain pygmy possum was identified in the wild in Australia.\n- The mountain pygmy possum is considered a Lazarus species.\n- “Lazarus species” is a term for living species of organisms that were once believed to be extinct.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - EASY #4: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6ku060jqmt19mm5ckog",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nMuslins are woven cotton fabrics with a variety of uses.\nDhaka muslin is a handmade fabric produced in Dhaka, Bangladesh.\nIt has an extremely fine weave and is primarily used to make luxury clothing.\nSheeting muslin is a machine-made fabric produced in factories.\nIt has a coarse weave and is primarily used to upholster furniture and create backdrops for theater sets.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Muslins are woven cotton fabrics with a variety of uses.\n- Dhaka muslin is a handmade fabric produced in Dhaka, Bangladesh.\n- It has an extremely fine weave and is primarily used to make luxury clothing.\n- Sheeting muslin is a machine-made fabric produced in factories.\n- It has a coarse weave and is primarily used to upholster furniture and create backdrops for theater sets.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - EASY #5: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6ky060oqmt1kdnevgni",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nThe Azores is a group of islands about 870 miles off the coast of Portugal.\nHistorians have long believed that in the fifteenth century Portuguese mariners were the first humans to populate the Azores.\nA 2015 study coauthored by Sofia Gabriel and Maria da Luz Mathias found that Vikings from Scandinavia may have populated the Azores as early as the ninth century.\nThe researchers found a genetic connection between house mice in the Azores and house mice in Scandinavia.\nHouse mice may have traveled from Scandinavia to the Azores on Viking ships.",
+  "after": "While researching a topic, a student has taken the following notes:\n- The Azores is a group of islands about 870 miles off the coast of Portugal.\n- Historians have long believed that in the fifteenth century Portuguese mariners were the first humans to populate the Azores.\n- A 2015 study coauthored by Sofia Gabriel and Maria da Luz Mathias found that Vikings from Scandinavia may have populated the Azores as early as the ninth century.\n- The researchers found a genetic connection between house mice in the Azores and house mice in Scandinavia.\n- House mice may have traveled from Scandinavia to the Azores on Viking ships.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - EASY #6: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6l2060tqmt1n1vwvnb2",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nYellowstone is a national park in the northwest United States.\nIn 1995, gray wolves were reintroduced into the park.\nSince then, the number of gray wolves in the park has stabilized at roughly 100.\nThis number is believed to be the park’s carrying capacity.\nCarrying capacity describes the maximum number of a species that a specific environment’s resources can sustain over time.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Yellowstone is a national park in the northwest United States.\n- In 1995, gray wolves were reintroduced into the park.\n- Since then, the number of gray wolves in the park has stabilized at roughly 100.\n- This number is believed to be the park’s carrying capacity.\n- Carrying capacity describes the maximum number of a species that a specific environment’s resources can sustain over time.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - EASY #7: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6l7060yqmt1n6f00lqf",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nNovelist Willa Cather grew up in Nebraska and attended the University of Nebraska-Lincoln.\nSome of Cather’s best-known novels are set in Nebraska.\nTwo such novels are O Pioneers! (1913) and My Ántonia (1918).\nCather’s novels describe the experiences of immigrants who settled in the Great Plains.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Novelist Willa Cather grew up in Nebraska and attended the University of Nebraska-Lincoln.\n- Some of Cather’s best-known novels are set in Nebraska.\n- Two such novels are O Pioneers! (1913) and My Ántonia (1918).\n- Cather’s novels describe the experiences of immigrants who settled in the Great Plains.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - EASY #8: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6lb0613qmt1d89a323i",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nIn 2013, paleontology professor Hesham Sallam and his students from Mansoura University in Egypt made a discovery.\nThe team found a partial dinosaur skeleton at a site in Egypt’s Dakhla Oasis.\nThe skeleton belonged to a dinosaur species that lived approximately 80 million years ago.\nThe new species was named Mansourasaurus to recognize the team that discovered it.",
+  "after": "While researching a topic, a student has taken the following notes:\n- In 2013, paleontology professor Hesham Sallam and his students from Mansoura University in Egypt made a discovery.\n- The team found a partial dinosaur skeleton at a site in Egypt’s Dakhla Oasis.\n- The skeleton belonged to a dinosaur species that lived approximately 80 million years ago.\n- The new species was named Mansourasaurus to recognize the team that discovered it.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - EASY #9: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6nu0618qmt1dv1dlazk",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nA wok is a cooking pan that originated in China during the Han dynasty (206 BCE–220 CE).\nThe wok’s round, wide base helps to cook food evenly.\nThe wok’s high, angled sides help to contain oil splatters.\nGrace Young is a cook and culinary historian.\nHer book The Breath of a Wok (2004) traces the history of the wok.",
+  "after": "While researching a topic, a student has taken the following notes:\n- A wok is a cooking pan that originated in China during the Han dynasty (206 BCE–220 CE).\n- The wok’s round, wide base helps to cook food evenly.\n- The wok’s high, angled sides help to contain oil splatters.\n- Grace Young is a cook and culinary historian.\n- Her book The Breath of a Wok (2004) traces the history of the wok.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - EASY #10: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6o5061dqmt1kaqvmgjz",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nArchaeologist Dr. Sada Mire founded the Horn Heritage Foundation to preserve the cultural history of regions in the Horn of Africa.\nHorn Heritage has overseen a preservation project to create 3D digital scans of ancient rock art in Somaliland.\nPaintings found at the Laas Geel caves are included in the scans.\nThe Laas Geel paintings feature human figures and animals.\nPaintings found at the Dhagah Nabi Galay caves are included in the scans.\nThe Dhagah Nabi Galay caves feature what are thought to be the earliest examples of writing in East Africa.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Archaeologist Dr. Sada Mire founded the Horn Heritage Foundation to preserve the cultural history of regions in the Horn of Africa.\n- Horn Heritage has overseen a preservation project to create 3D digital scans of ancient rock art in Somaliland.\n- Paintings found at the Laas Geel caves are included in the scans.\n- The Laas Geel paintings feature human figures and animals.\n- Paintings found at the Dhagah Nabi Galay caves are included in the scans.\n- The Dhagah Nabi Galay caves feature what are thought to be the earliest examples of writing in East Africa.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - EASY #11: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6od061iqmt1arvgj5ww",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nIn 1897, African American inventor Andrew Beard invented an automatic coupler.\nIt improved on the existing design of train car couplers.\nIt made the job of connecting train cars safer.\nIn 1938, African American inventor Frederick Jones invented a mobile refrigeration system.\nIt improved on the existing design of food transport trucks.\nIt enabled trucks to carry perishable foods farther.",
+  "after": "While researching a topic, a student has taken the following notes:\n- In 1897, African American inventor Andrew Beard invented an automatic coupler.\n- It improved on the existing design of train car couplers.\n- It made the job of connecting train cars safer.\n- In 1938, African American inventor Frederick Jones invented a mobile refrigeration system.\n- It improved on the existing design of food transport trucks.\n- It enabled trucks to carry perishable foods farther.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - EASY #12: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6ok061nqmt1a7wsdx1e",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nCerthidea olivacea is a perching bird that can be found on the Galápagos Island of Pinzón.\nCreagrus furcatus is a seabird that can be found on the Galápagos Island of Darwin.\nConservation organizations evaluate the risk that species will become extinct in the near future.\nC. olivacea faces a high risk of extinction.\nC. furcatus faces little risk of becoming extinct in the near future.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Certhidea olivacea is a perching bird that can be found on the Galápagos Island of Pinzón.\n- Creagrus furcatus is a seabird that can be found on the Galápagos Island of Darwin.\n- Conservation organizations evaluate the risk that species will become extinct in the near future.\n- C. olivacea faces a high risk of extinction.\n- C. furcatus faces little risk of becoming extinct in the near future.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - EASY #13: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6os061sqmt1ae1g3kzx",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nMiguel Luciano is a multimedia visual artist.\nOne of his sculptures is Double Phantom/EntroP.R. (2017).\nThe work consists of two red Schwinn Phantom bicycles that he fused together.\nThe bicycles face opposite directions.\nThe bicycles share the same rear wheel.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Miguel Luciano is a multimedia visual artist.\n- One of his sculptures is Double Phantom/EntroP.R. (2017).\n- The work consists of two red Schwinn Phantom bicycles that he fused together.\n- The bicycles face opposite directions.\n- The bicycles share the same rear wheel.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - EASY #14: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6p1061xqmt16xhm9q23",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nAnnie Wu is a prominent American flutist who graduated from the New England Conservatory.\nShe has won multiple national flute competitions.\nShe is best known for a 2011 YouTube video that has been viewed over two million times.\nThe video shows her performing Three Beats for Beatbox Flute, an original work by composer Greg Pattillo.\nWu combines flute playing and beatboxing in the video.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Annie Wu is a prominent American flutist who graduated from the New England Conservatory.\n- She has won multiple national flute competitions.\n- She is best known for a 2011 YouTube video that has been viewed over two million times.\n- The video shows her performing Three Beats for Beatbox Flute, an original work by composer Greg Pattillo.\n- Wu combines flute playing and beatboxing in the video.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - EASY #15: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6p80622qmt19qrrurxv",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nBioluminescence is the emission of light by living organisms.\nThis light is produced by chemical reactions in organisms’ cells.\nJellyfish emit flashes of blue light.\nThis behavior serves to startle predators.\nBlack dragonfish emit a steady red light.\nThis behavior helps them locate prey in deep waters.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Bioluminescence is the emission of light by living organisms.\n- This light is produced by chemical reactions in organisms’ cells.\n- Jellyfish emit flashes of blue light.\n- This behavior serves to startle predators.\n- Black dragonfish emit a steady red light.\n- This behavior helps them locate prey in deep waters.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - EASY #16: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6pf0627qmt17u0vnetf",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nThe painter Frida Kahlo is one of the most influential artists of the twentieth century.\nShe was born in Coyoacán, Mexico, in 1907.\nShe is best known for her vivid and richly symbolic self-portraits.\nThe Two Fridas (1939) features two versions of Kahlo sitting together.\nOne version wears a European-style dress and the other a traditional Tehuana dress.",
+  "after": "While researching a topic, a student has taken the following notes:\n- The painter Frida Kahlo is one of the most influential artists of the twentieth century.\n- She was born in Coyoacán, Mexico, in 1907.\n- She is best known for her vivid and richly symbolic self-portraits.\n- The Two Fridas (1939) features two versions of Kahlo sitting together.\n- One version wears a European-style dress and the other a traditional Tehuana dress.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - EASY #17: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro67x05q4qmt1bwqn0o7s",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nAs engineered structures, many bird nests are uniquely flexible yet cohesive.\nA research team led by Yashraj Bhosale wanted to better understand the mechanics behind these structural properties.\nBhosale’s team used laboratory models that simulated the arrangement of flexible sticks into nest-like structures.\nThe researchers analyzed the points where sticks touched one another.\nWhen pressure was applied to the model nests, the number of contact points between the sticks increased, making the structures stiffer.",
+  "after": "While researching a topic, a student has taken the following notes:\n- As engineered structures, many bird nests are uniquely flexible yet cohesive.\n- A research team led by Yashraj Bhosale wanted to better understand the mechanics behind these structural properties.\n- Bhosale’s team used laboratory models that simulated the arrangement of flexible sticks into nest-like structures.\n- The researchers analyzed the points where sticks touched one another.\n- When pressure was applied to the model nests, the number of contact points between the sticks increased, making the structures stiffer.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - HARD #0: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro68005q9qmt1og2zc1rq",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nSome powerful works of literature have so influenced readers that new legislation has been passed as a result.\nThe Interesting Narrative of the Life of Olaudah Equiano (1789) is the autobiography of a man who endured slavery on both sides of the Atlantic.\nEquiano’s book contributed to the passage of the Slave Trade Act of 1807.\nThe Jungle (1906) is a fictional work by Upton Sinclair that describes unsanitary conditions in US meatpacking plants.\nSinclair’s book contributed to the passage of the Pure Food and Drug Act in 1906.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Some powerful works of literature have so influenced readers that new legislation has been passed as a result.\n- The Interesting Narrative of the Life of Olaudah Equiano (1789) is the autobiography of a man who endured slavery on both sides of the Atlantic.\n- Equiano’s book contributed to the passage of the Slave Trade Act of 1807.\n- The Jungle (1906) is a fictional work by Upton Sinclair that describes unsanitary conditions in US meatpacking plants.\n- Sinclair’s book contributed to the passage of the Pure Food and Drug Act in 1906.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - HARD #1: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro68405qeqmt1964wyhx5",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nThe Million Song Dataset (MSD) includes main audio features and descriptive tags for popular songs.\nAudio features include acoustic traits such as loudness and pitch intervals.\nMany algorithms use these audio features to predict a new song’s popularity.\nThese algorithms may fail to accurately identify main audio features of a song with varying acoustic traits.\nAlgorithms based on descriptive tags that describe fixed traits such as genre are more reliable predictors of song popularity.",
+  "after": "While researching a topic, a student has taken the following notes:\n- The Million Song Dataset (MSD) includes main audio features and descriptive tags for popular songs.\n- Audio features include acoustic traits such as loudness and pitch intervals.\n- Many algorithms use these audio features to predict a new song’s popularity.\n- These algorithms may fail to accurately identify main audio features of a song with varying acoustic traits.\n- Algorithms based on descriptive tags that describe fixed traits such as genre are more reliable predictors of song popularity.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - HARD #2: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro68805qjqmt14hby1a52",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nDigital Light Synthesis (DLS) is a form of additive manufacturing that utilizes light to rapidly cure liquid resin into high-quality, 3D objects.\nStep 1: Ultraviolet (UV) light images are projected up into a pool of liquid resin, where the object’s first layer takes shape.\nStep 2: The partially cured resin object is raised, leaving a thin space (a “dead zone”) beneath it for oxygen and liquid resin to flow through.\nStep 3: The UV light passes through the dead zone—maintaining the flow of resin—and partially cures additional layers of the object.\nStep 4: When the resin object is complete, it is baked in an oven to complete the curing.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Digital Light Synthesis (DLS) is a form of additive manufacturing that utilizes light to rapidly cure liquid resin into high-quality, 3D objects.\n- Step 1: Ultraviolet (UV) light images are projected up into a pool of liquid resin, where the object’s first layer takes shape.\n- Step 2: The partially cured resin object is raised, leaving a thin space (a “dead zone”) beneath it for oxygen and liquid resin to flow through.\n- Step 3: The UV light passes through the dead zone—maintaining the flow of resin—and partially cures additional layers of the object.\n- Step 4: When the resin object is complete, it is baked in an oven to complete the curing.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - HARD #3: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro68c05qoqmt1je3zltfp",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nBritish scholar Robert Plot described fossilized dinosaur bones in his 1676 book The Natural History of Oxfordshire.\nPlot earned a reputation for being the first person to have discovered dinosaur remains.\nIn 1990, archaeologists in Lesotho, in southern Africa, discovered a fossilized phalanx of a Massospondylus carinatus dinosaur in a cave once inhabited by humans.\nIndigenous Khoesan and Basotho peoples had inhabited the cave beginning around 1100 CE.\nAccording to paleontologist Julien Benoit, these peoples may have found the phalanx and brought it to the cave centuries before Plot’s descriptions.",
+  "after": "While researching a topic, a student has taken the following notes:\n- British scholar Robert Plot described fossilized dinosaur bones in his 1676 book The Natural History of Oxfordshire.\n- Plot earned a reputation for being the first person to have discovered dinosaur remains.\n- In 1990, archaeologists in Lesotho, in southern Africa, discovered a fossilized phalanx of a Massospondylus carinatus dinosaur in a cave once inhabited by humans.\n- Indigenous Khoesan and Basotho peoples had inhabited the cave beginning around 1100 CE.\n- According to paleontologist Julien Benoit, these peoples may have found the phalanx and brought it to the cave centuries before Plot’s descriptions.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - HARD #4: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro68g05qtqmt1gk9r3q2a",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nOne of history’s greatest libraries was the House of Wisdom in Baghdad, Iraq.\nIt was founded in the eighth century with the goal of preserving all the world’s knowledge.\nScholars at the House of Wisdom collected ancient and contemporary texts from Greece, India, and elsewhere and translated them into Arabic.\nWritings included those of the Greek philosopher Aristotle and the Indian mathematician Aryabhata.\nThe House of Wisdom used Chinese papermaking technology to create paper versions to be studied and shared.",
+  "after": "While researching a topic, a student has taken the following notes:\n- One of history’s greatest libraries was the House of Wisdom in Baghdad, Iraq.\n- It was founded in the eighth century with the goal of preserving all the world’s knowledge.\n- Scholars at the House of Wisdom collected ancient and contemporary texts from Greece, India, and elsewhere and translated them into Arabic.\n- Writings included those of the Greek philosopher Aristotle and the Indian mathematician Aryabhata.\n- The House of Wisdom used Chinese papermaking technology to create paper versions to be studied and shared.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - HARD #5: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro68k05qyqmt1msw8ln5p",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nTwo opposing theories of vision divided scholars for many centuries.\nThe ancient Greek mathematician Euclid (circa 300 BCE) supported the extramission theory.\nThis theory held that the eyes emit a form of radiation that illuminates objects in its range.\nThe ancient Greek philosopher Aristotle (384–322 BCE) supported the intromission theory.\nThis theory held that objects emit a form of radiation that reaches the eyes.\nIn the eleventh century, Arab mathematician Ibn al-Haytham (965–1040 CE) largely settled the debate with the first conclusive experiments supporting intromission.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Two opposing theories of vision divided scholars for many centuries.\n- The ancient Greek mathematician Euclid (circa 300 BCE) supported the extramission theory.\n- This theory held that the eyes emit a form of radiation that illuminates objects in its range.\n- The ancient Greek philosopher Aristotle (384–322 BCE) supported the intromission theory.\n- This theory held that objects emit a form of radiation that reaches the eyes.\n- In the eleventh century, Arab mathematician Ibn al-Haytham (965–1040 CE) largely settled the debate with the first conclusive experiments supporting intromission.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - HARD #6: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro68n05r3qmt1pnz4aiow",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nIn 1971, experimental musician Pauline Oliveros created Sonic Meditations.\nSonic Meditations is not music but rather a series of sound-based exercises called meditations.\nEach meditation consists of instructions for participants to make, imagine, listen to, or remember sounds.\nThe instructions for Meditation V state, “walk so silently that the bottoms of your feet become ears.”\nThose for Meditation XVIII state, “listen to a sound until you no longer recognize it.”",
+  "after": "While researching a topic, a student has taken the following notes:\n- In 1971, experimental musician Pauline Oliveros created Sonic Meditations.\n- Sonic Meditations is not music but rather a series of sound-based exercises called meditations.\n- Each meditation consists of instructions for participants to make, imagine, listen to, or remember sounds.\n- The instructions for Meditation V state, “walk so silently that the bottoms of your feet become ears.”\n- Those for Meditation XVIII state, “listen to a sound until you no longer recognize it.”",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - HARD #7: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro68r05r8qmt1h6gxqid4",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nFreddie Wong (born 1985) is a director and special effects artist from the United States.\nHe is best known for the action-comedy web series Video Game High School (VGHS).\nVGHS premiered in 2012 on RocketJump, a YouTube channel that Wong cocreated.\nThe series was celebrated for its inventive video game–centric world and high-quality special effects.\nVGHS was nominated for a Producers Guild Award for Outstanding Digital Series.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Freddie Wong (born 1985) is a director and special effects artist from the United States.\n- He is best known for the action-comedy web series Video Game High School (VGHS).\n- VGHS premiered in 2012 on RocketJump, a YouTube channel that Wong cocreated.\n- The series was celebrated for its inventive video game–centric world and high-quality special effects.\n- VGHS was nominated for a Producers Guild Award for Outstanding Digital Series.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - HARD #8: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro68u05rdqmt165wizjg3",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nUlaanbaatar is the capital of Mongolia.\nThe city’s population is 907,802.\nUlaanbaatar contains 31.98 percent of Mongolia’s population.\nHanoi is the capital of Vietnam.\nThe city’s population is 7,781,631.\nHanoi contains 8.14 percent of Vietnam’s population.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Ulaanbaatar is the capital of Mongolia.\n- The city’s population is 907,802.\n- Ulaanbaatar contains 31.98 percent of Mongolia’s population.\n- Hanoi is the capital of Vietnam.\n- The city’s population is 7,781,631.\n- Hanoi contains 8.14 percent of Vietnam’s population.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - HARD #9: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro68y05riqmt10quvi2n8",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nThe popular wood-wide web theory posits that trees can communicate and exchange resources with one another via common mycorrhizal networks (CMNs) of fungi.\nEcologist Dr. Suzanne Simard first suggested this theory in 1997.\nShe described trees as “super-cooperators.”\nIn the 2022 study “The Decay of the Wood-Wide Web?,” mycologist Dr. Justine Karst and colleagues evaluated dozens of CMN studies.\nThey write that CMNs “have captured the interest of broad audiences. We are concerned, however, that recent claims about CMNs in forests are disconnected from evidence.”",
+  "after": "While researching a topic, a student has taken the following notes:\n- The popular wood-wide web theory posits that trees can communicate and exchange resources with one another via common mycorrhizal networks (CMNs) of fungi.\n- Ecologist Dr. Suzanne Simard first suggested this theory in 1997.\n- She described trees as “super-cooperators.”\n- In the 2022 study “The Decay of the Wood-Wide Web?,” mycologist Dr. Justine Karst and colleagues evaluated dozens of CMN studies.\n- They write that CMNs “have captured the interest of broad audiences. We are concerned, however, that recent claims about CMNs in forests are disconnected from evidence.”",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - HARD #10: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro69105rnqmt1d795cbd9",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nA thermal inversion is a phenomenon where a layer of atmosphere is warmer than the layer beneath it.\nIn 2022, a team of researchers studied the presence of thermal inversions in twenty-five gas giants.\nGas giants are planets largely composed of helium and hydrogen.\nThe team found that gas giants featuring a thermal inversion were also likely to contain heat-absorbing metals.\nOne explanation for this relationship is that these metals may reside in a planet’s upper atmosphere, where their absorbed heat causes an increase in temperature.",
+  "after": "While researching a topic, a student has taken the following notes:\n- A thermal inversion is a phenomenon where a layer of atmosphere is warmer than the layer beneath it.\n- In 2022, a team of researchers studied the presence of thermal inversions in twenty-five gas giants.\n- Gas giants are planets largely composed of helium and hydrogen.\n- The team found that gas giants featuring a thermal inversion were also likely to contain heat-absorbing metals.\n- One explanation for this relationship is that these metals may reside in a planet’s upper atmosphere, where their absorbed heat causes an increase in temperature.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - HARD #11: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro69605rsqmt1nxq6d0h1",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nArchaeologist Jon Erlandson and colleagues argue that humans first arrived in the Americas by sea.\nThey propose that humans traveled between Pacific Ocean islands and coastlines from northeast Asia to the Americas.\nMany of these islands and coastal zones were later submerged as glaciers melted and sea levels rose.\nThe researchers think that “a coastal route, including kelp forests and estuaries, would have provided a rich mix of marine, estuarine, riverine, and terrestrial resources” such as seaweeds, fish, and birds.\nThis proposed scenario is known as the kelp highway hypothesis.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Archaeologist Jon Erlandson and colleagues argue that humans first arrived in the Americas by sea.\n- They propose that humans traveled between Pacific Ocean islands and coastlines from northeast Asia to the Americas.\n- Many of these islands and coastal zones were later submerged as glaciers melted and sea levels rose.\n- The researchers think that “a coastal route, including kelp forests and estuaries, would have provided a rich mix of marine, estuarine, riverine, and terrestrial resources” such as seaweeds, fish, and birds.\n- This proposed scenario is known as the kelp highway hypothesis.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - HARD #12: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro69b05rxqmt1ko7zy9ik",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nNeuroscientists Krishnan Padmanabhan and Zhen Chen sought to better understand the workings of the brain’s olfactory system.\nThey devised a study using mathematical models.\nThey found that certain fibers allow the brain to toggle from one method of processing smells to another.\nIn one method, cells in the piriform cortex (where the perception of odor forms) capture olfactory information at a given moment.\nIn the other, the cells track changes in olfactory information over time.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Neuroscientists Krishnan Padmanabhan and Zhen Chen sought to better understand the workings of the brain’s olfactory system.\n- They devised a study using mathematical models.\n- They found that certain fibers allow the brain to toggle from one method of processing smells to another.\n- In one method, cells in the piriform cortex (where the perception of odor forms) capture olfactory information at a given moment.\n- In the other, the cells track changes in olfactory information over time.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - HARD #13: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro69f05s2qmt1s5fs40x4",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nNissologists are scientists who study islands.\nSome nissologists define an island as any piece of land surrounded by water.\nUsing that definition, they determined that Sweden has 221,000 islands.\nOther nissologists define an island as being 1 kilometer square, a certain distance from the mainland, and having at least 50 permanent residents.\nUsing that definition, they determined that Sweden has 24 islands.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Nissologists are scientists who study islands.\n- Some nissologists define an island as any piece of land surrounded by water.\n- Using that definition, they determined that Sweden has 221,000 islands.\n- Other nissologists define an island as being 1 kilometer square, a certain distance from the mainland, and having at least 50 permanent residents.\n- Using that definition, they determined that Sweden has 24 islands.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - HARD #14: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro69j05s7qmt1c24dp7z1",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nIn 1978, Sámi activists staged protests to block the construction of a dam on the Alta River in Norway.\nThe dam would disrupt Sámi fishing and reindeer herding.\nThe dam was ultimately built, but the Alta conflict had a lasting impact.\nIt brought international attention to the issue of Sámi rights.\nIt led to a set of 2005 legal protections establishing Sámi rights to lands, waters, and resources.",
+  "after": "While researching a topic, a student has taken the following notes:\n- In 1978, Sámi activists staged protests to block the construction of a dam on the Alta River in Norway.\n- The dam would disrupt Sámi fishing and reindeer herding.\n- The dam was ultimately built, but the Alta conflict had a lasting impact.\n- It brought international attention to the issue of Sámi rights.\n- It led to a set of 2005 legal protections establishing Sámi rights to lands, waters, and resources.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - HARD #15: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro69n05scqmt12ft2maig",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nIn a 2023 study, environmental scientist Jazmin Locke-Rodriguez and colleagues tested the use of floating treatment wetlands (FTWs) in Florida.\nFTWs are artificial floating platforms of plants used to remediate polluted or nutrient-imbalanced water.\nFinding: FTWs using marigold flowers removed 52% more total phosphorus than the control.\nFinding: The test yielded 65 market-quality blooms per square meter.\nThe authors concluded marigolds showed “promising potential as a commercially viable remediating crop cultivated on FTWs in South Florida.”",
+  "after": "While researching a topic, a student has taken the following notes:\n- In a 2023 study, environmental scientist Jazmin Locke-Rodriguez and colleagues tested the use of floating treatment wetlands (FTWs) in Florida.\n- FTWs are artificial floating platforms of plants used to remediate polluted or nutrient-imbalanced water.\n- Finding: FTWs using marigold flowers removed 52% more total phosphorus than the control.\n- Finding: The test yielded 65 market-quality blooms per square meter.\n- The authors concluded marigolds showed “promising potential as a commercially viable remediating crop cultivated on FTWs in South Florida.”",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - HARD #16: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro69r05shqmt1pzfu7bdl",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nThe National Congress of American Indians (NCAI) was founded in 1944 by representatives of fifty tribal governments.\nThe NCAI was created to protect the sovereignty of Indigenous tribes.\nNapoleon B. Johnson (Cherokee) was the NCAI’s first president.\nIn 1975, the US Congress passed the Indian Self-Determination and Education Assistance Act (Public Law 96-638).\nThis legislation formally acknowledged tribes’ right to self-governance.\nThe advocacy of the NCAI was a key factor in the law’s passing.",
+  "after": "While researching a topic, a student has taken the following notes:\n- The National Congress of American Indians (NCAI) was founded in 1944 by representatives of fifty tribal governments.\n- The NCAI was created to protect the sovereignty of Indigenous tribes.\n- Napoleon B. Johnson (Cherokee) was the NCAI’s first president.\n- In 1975, the US Congress passed the Indian Self-Determination and Education Assistance Act (Public Law 96-638).\n- This legislation formally acknowledged tribes’ right to self-governance.\n- The advocacy of the NCAI was a key factor in the law’s passing.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - HARD #17: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro69v05smqmt1kr2aonx6",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nPhobetor, a name drawn from Greek mythology, is an exoplanet that orbits the star PSR B1257+12, also known as Lich.\nPhobetor’s mass is 0.01 times that of Jupiter, or 0.01 Jupiter masses.\nMastika, which means “gem” or “jewel” in Malay, is an exoplanet that orbits the star HD 179949, also known as Gumala.\nMastika’s mass is 0.92 Jupiter masses.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Phobetor, a name drawn from Greek mythology, is an exoplanet that orbits the star PSR B1257+12, also known as Lich.\n- Phobetor’s mass is 0.01 times that of Jupiter, or 0.01 Jupiter masses.\n- Mastika, which means “gem” or “jewel” in Malay, is an exoplanet that orbits the star HD 179949, also known as Gumala.\n- Mastika’s mass is 0.92 Jupiter masses.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - HARD #18: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6a005srqmt13duh62e7",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nAfrican American women played prominent roles in the Civil Rights Movement, including at the famous 1963 March on Washington.\nCivil rights activist Anna Hedgeman, one of the march’s organizers, was a political adviser who had worked for President Truman.\nCivil rights activist Daisy Bates was a well-known journalist and advocate for school desegregation.\nHedgeman worked behind the scenes to make sure a woman was included in the lineup of speakers at the march.\nBates was the sole woman to speak, delivering a brief but memorable address to the cheering crowd.",
+  "after": "While researching a topic, a student has taken the following notes:\n- African American women played prominent roles in the Civil Rights Movement, including at the famous 1963 March on Washington.\n- Civil rights activist Anna Hedgeman, one of the march’s organizers, was a political adviser who had worked for President Truman.\n- Civil rights activist Daisy Bates was a well-known journalist and advocate for school desegregation.\n- Hedgeman worked behind the scenes to make sure a woman was included in the lineup of speakers at the march.\n- Bates was the sole woman to speak, delivering a brief but memorable address to the cheering crowd.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - HARD #19: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6a805swqmt1qvl3wjcq",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nStars form in a galaxy when gravity causes a massive cloud of dust and gas to collapse.\nA galaxy in a phase of rapid star formation is called a starburst galaxy.\nQuenching is a process in which a galaxy loses star-forming gas.\nA galaxy that no longer forms stars is called a quenched galaxy.\nA quenched galaxy has entered the poststarburst phase.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Stars form in a galaxy when gravity causes a massive cloud of dust and gas to collapse.\n- A galaxy in a phase of rapid star formation is called a starburst galaxy.\n- Quenching is a process in which a galaxy loses star-forming gas.\n- A galaxy that no longer forms stars is called a quenched galaxy.\n- A quenched galaxy has entered the poststarburst phase.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - HARD #20: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6ad05t1qmt1flx6uew4",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nOrganisms release cellular material into their environment by shedding substances such as hair or skin.\nThe DNA in these substances is known as environmental DNA, or eDNA.\nResearchers collect and analyze eDNA to detect the presence of species that are difficult to observe.\nGeneticist Sara Oyler-McCance’s research team analyzed eDNA in water samples from the Florida Everglades to detect invasive constrictor snake species in the area.\nThe study determined a 91% probability of detecting Burmese python eDNA in a given location.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Organisms release cellular material into their environment by shedding substances such as hair or skin.\n- The DNA in these substances is known as environmental DNA, or eDNA.\n- Researchers collect and analyze eDNA to detect the presence of species that are difficult to observe.\n- Geneticist Sara Oyler-McCance’s research team analyzed eDNA in water samples from the Florida Everglades to detect invasive constrictor snake species in the area.\n- The study determined a 91% probability of detecting Burmese python eDNA in a given location.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - MEDIUM #0: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6ai05t6qmt12sit0f54",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nSam Maloof (1916–2009) was an American woodworker and furniture designer.\nHe was the son of Lebanese immigrants.\nHe received a “genius grant” from the John D. and Catherine T. MacArthur Foundation in 1985.\nThe Museum of Fine Arts in Boston, Massachusetts, owns a rocking chair that Maloof made from walnut wood.\nThe armrests and the seat of the chair are sleek and contoured, and the back consists of seven spindle-like slats.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Sam Maloof (1916–2009) was an American woodworker and furniture designer.\n- He was the son of Lebanese immigrants.\n- He received a “genius grant” from the John D. and Catherine T. MacArthur Foundation in 1985.\n- The Museum of Fine Arts in Boston, Massachusetts, owns a rocking chair that Maloof made from walnut wood.\n- The armrests and the seat of the chair are sleek and contoured, and the back consists of seven spindle-like slats.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - MEDIUM #1: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6an05tbqmt1ahhyp281",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nPlatinum is a rare and expensive metal.\nIt is used as a catalyst for chemical reactions.\nPlatinum catalysts typically require a large amount of platinum to be effective.\nResearcher Jianbo Tang and his colleagues created a platinum catalyst that combines platinum with liquid gallium.\nTheir catalyst was highly effective and required only trace amounts of platinum (0.0001% of the atoms in the mixture).",
+  "after": "While researching a topic, a student has taken the following notes:\n- Platinum is a rare and expensive metal.\n- It is used as a catalyst for chemical reactions.\n- Platinum catalysts typically require a large amount of platinum to be effective.\n- Researcher Jianbo Tang and his colleagues created a platinum catalyst that combines platinum with liquid gallium.\n- Their catalyst was highly effective and required only trace amounts of platinum (0.0001% of the atoms in the mixture).",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - MEDIUM #2: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6as05tgqmt10q991x9y",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nGrimanesa Amoros is a Peruvian American artist well known for her LED light sculptures.\nHer sculpture Uros Island is made of smooth multicolored LED domes.\nIt occupies 335 cubic feet of space.\nHer sculpture Fortuna is made of entangled blue and white LED tubes.\nIt occupies 19,950 cubic feet of space.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Grimanesa Amoros is a Peruvian American artist well known for her LED light sculptures.\n- Her sculpture Uros Island is made of smooth multicolored LED domes.\n- It occupies 335 cubic feet of space.\n- Her sculpture Fortuna is made of entangled blue and white LED tubes.\n- It occupies 19,950 cubic feet of space.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - MEDIUM #3: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6ax05tlqmt1iicd6dga",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nIn the midst of the US Civil War, Susie Taylor escaped slavery and fled to Union-army-occupied St. Simons Island off the Georgia coast.\nShe began working for an all-Black army regiment as a nurse and teacher.\nIn 1902, she published a book about the time she spent with the regiment.\nHer book was the only Civil War memoir to be published by a Black woman.\nIt is still available to readers in print and online.",
+  "after": "While researching a topic, a student has taken the following notes:\n- In the midst of the US Civil War, Susie Taylor escaped slavery and fled to Union-army-occupied St. Simons Island off the Georgia coast.\n- She began working for an all-Black army regiment as a nurse and teacher.\n- In 1902, she published a book about the time she spent with the regiment.\n- Her book was the only Civil War memoir to be published by a Black woman.\n- It is still available to readers in print and online.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - MEDIUM #4: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6b205tqqmt1iqniqqfd",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nIn 2018 researchers Adwait Deshpande, Shreejata Gupta, and Anindya Sinha were observing wild macaques in India’s Bandipur National Park.\nThey saw macaques calling out to and gesturing at humans who were eating or carrying food.\nThey designed a study to find out if the macaques were intentionally communicating to try to persuade the humans to share their food.\nIn the study trials, macaques frequently called out to and gestured at humans holding food.\nIn the study trials, macaques called out to and gestured at empty-handed humans less frequently.",
+  "after": "While researching a topic, a student has taken the following notes:\n- In 2018 researchers Adwait Deshpande, Shreejata Gupta, and Anindya Sinha were observing wild macaques in India’s Bandipur National Park.\n- They saw macaques calling out to and gesturing at humans who were eating or carrying food.\n- They designed a study to find out if the macaques were intentionally communicating to try to persuade the humans to share their food.\n- In the study trials, macaques frequently called out to and gestured at humans holding food.\n- In the study trials, macaques called out to and gestured at empty-handed humans less frequently.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - MEDIUM #5: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6b805tvqmt10t46yzpr",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nMuckrakers were journalists who sought to expose corruption in US institutions during the Progressive Era (1897–1920).\nIda Tarbell was a muckraker who investigated the Standard Oil Company.\nShe interviewed Standard Oil Company executives, oil industry workers, and public officials.\nShe examined thousands of pages of the company’s internal communications, including letters and financial records.\nHer book The History of the Standard Oil Company (1904) exposed the company’s unfair business practices.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Muckrakers were journalists who sought to expose corruption in US institutions during the Progressive Era (1897–1920).\n- Ida Tarbell was a muckraker who investigated the Standard Oil Company.\n- She interviewed Standard Oil Company executives, oil industry workers, and public officials.\n- She examined thousands of pages of the company’s internal communications, including letters and financial records.\n- Her book The History of the Standard Oil Company (1904) exposed the company’s unfair business practices.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - MEDIUM #6: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6bd05u0qmt1iumpo4fy",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nHina Hanta is an online archive curated by the Choctaw Nation of Oklahoma.\nHina Hanta means “bright path” in Choctaw.\nIt features images of cultural artifacts relevant to the history of the Choctaw people.\nIt includes a fanner basket (ufko tapushik in Choctaw) made from cane.\nIt includes a robe (nita anchi) made from bear fur.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Hina Hanta is an online archive curated by the Choctaw Nation of Oklahoma.\n- Hina Hanta means “bright path” in Choctaw.\n- It features images of cultural artifacts relevant to the history of the Choctaw people.\n- It includes a fanner basket (ufko tapushik in Choctaw) made from cane.\n- It includes a robe (nita anchi) made from bear fur.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - MEDIUM #7: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6bi05u5qmt1ias9j7u0",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nMarine biologist Camille Jazmin Gaynus studies coral reefs.\nCoral reefs are vital underwater ecosystems that provide habitats to 25% of all marine species.\nReefs can include up to 8,000 species of fish, such as toadfish, seahorses, and clown triggerfish.\nThe Amazon Reef is a coral reef in Brazil.\nIt is one of the largest known reefs in the world.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Marine biologist Camille Jazmin Gaynus studies coral reefs.\n- Coral reefs are vital underwater ecosystems that provide habitats to 25% of all marine species.\n- Reefs can include up to 8,000 species of fish, such as toadfish, seahorses, and clown triggerfish.\n- The Amazon Reef is a coral reef in Brazil.\n- It is one of the largest known reefs in the world.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - MEDIUM #8: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6bo05uaqmt1ei3tprpm",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nLighthouses send out crucial light signals to help ships and other watercraft navigate at night.\nBefore automation, lighthouses were run by lighthouse keepers.\nMaria Younghans was the lighthouse keeper at Biloxi Light in Mississippi.\nShe held this position from 1867 to 1918.\nFlora McNeil was the lighthouse keeper at Bridgeport Breakwater Light in Connecticut.\nShe held this position from 1904 to 1920.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Lighthouses send out crucial light signals to help ships and other watercraft navigate at night.\n- Before automation, lighthouses were run by lighthouse keepers.\n- Maria Younghans was the lighthouse keeper at Biloxi Light in Mississippi.\n- She held this position from 1867 to 1918.\n- Flora McNeil was the lighthouse keeper at Bridgeport Breakwater Light in Connecticut.\n- She held this position from 1904 to 1920.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - MEDIUM #9: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6bu05ufqmt1e8b01q4i",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nTexture analysis and historical analysis are two approaches to art criticism.\nTexture analysis examines how surfaces are visually represented in an artwork.\nSuch an analysis of Giorgione’s Youth Holding an Arrow might consider how the painting’s blended colors make the subject’s skin appear smooth in texture.\nHistorical analysis considers the historical context in which a work was created.\nSuch an analysis of Diego Velázquez’s Las Meninas might consider how the painting’s depiction of the artist with King Philip IV symbolizes art’s historical ties to power.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Texture analysis and historical analysis are two approaches to art criticism.\n- Texture analysis examines how surfaces are visually represented in an artwork.\n- Such an analysis of Giorgione’s Youth Holding an Arrow might consider how the painting’s blended colors make the subject’s skin appear smooth in texture.\n- Historical analysis considers the historical context in which a work was created.\n- Such an analysis of Diego Velázquez’s Las Meninas might consider how the painting’s depiction of the artist with King Philip IV symbolizes art’s historical ties to power.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - MEDIUM #10: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6by05ukqmt1z4ix59nc",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nSoo Sunny Park is a Korean American artist who uses light as her primary medium of expression.\nShe created her work Unwoven Light in 2013.\nUnwoven Light featured a chain-link fence fitted with iridescent plexiglass tiles.\nWhen light passed through the fence, colorful prisms formed.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Soo Sunny Park is a Korean American artist who uses light as her primary medium of expression.\n- She created her work Unwoven Light in 2013.\n- Unwoven Light featured a chain-link fence fitted with iridescent plexiglass tiles.\n- When light passed through the fence, colorful prisms formed.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - MEDIUM #11: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6c305upqmt15euzg8rc",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nSome US reformers sought to improve society in the 1800s by building utopias.\nA utopia is a community intended to represent a perfect society based on a specific set of principles.\nOne such community was Brook Farm near Boston, Massachusetts.\nIt was founded in 1841 by writer George Ripley.\nRipley wrote in a letter that his goal for Brook Farm was “to guarantee the highest mental freedom, by providing all with labor, adapted to their tastes and talents, and securing to them the fruits of their industry.”",
+  "after": "While researching a topic, a student has taken the following notes:\n- Some US reformers sought to improve society in the 1800s by building utopias.\n- A utopia is a community intended to represent a perfect society based on a specific set of principles.\n- One such community was Brook Farm near Boston, Massachusetts.\n- It was founded in 1841 by writer George Ripley.\n- Ripley wrote in a letter that his goal for Brook Farm was “to guarantee the highest mental freedom, by providing all with labor, adapted to their tastes and talents, and securing to them the fruits of their industry.”",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - MEDIUM #12: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6c605uuqmt1q9m8obul",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nIn 1999, astronomer Todd Henry studied the differences in surface temperature between the Sun and nearby stars.\nHis team mapped all stars within 10 parsecs (approximately 200 trillion miles) of the Sun.\nThe surface temperature of the Sun is around 9,800°F, which classifies it as a G star.\n327 of the 357 stars in the study were classified as K or M stars, with surface temperatures under 8,900°F (cooler than the Sun).\n11 of the 357 stars in the study were classified as A or F stars, with surface temperatures greater than 10,300°F (hotter than the Sun).",
+  "after": "While researching a topic, a student has taken the following notes:\n- In 1999, astronomer Todd Henry studied the differences in surface temperature between the Sun and nearby stars.\n- His team mapped all stars within 10 parsecs (approximately 200 trillion miles) of the Sun.\n- The surface temperature of the Sun is around 9,800°F, which classifies it as a G star.\n- 327 of the 357 stars in the study were classified as K or M stars, with surface temperatures under 8,900°F (cooler than the Sun).\n- 11 of the 357 stars in the study were classified as A or F stars, with surface temperatures greater than 10,300°F (hotter than the Sun).",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - MEDIUM #13: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6ca05uzqmt18lsl5g55",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nIn the early 1960s, the US had a strict national-origins quota system for immigrants.\nThe number of new immigrants allowed from a country each year was based on how many people from that country lived in the US in 1890.\nThis system favored immigrants from northern Europe.\nAlmost 70% of slots were reserved for immigrants from Great Britain, Ireland, and Germany.\nThe 1965 Hart-Celler Act abolished the national-origins quota system.",
+  "after": "While researching a topic, a student has taken the following notes:\n- In the early 1960s, the US had a strict national-origins quota system for immigrants.\n- The number of new immigrants allowed from a country each year was based on how many people from that country lived in the US in 1890.\n- This system favored immigrants from northern Europe.\n- Almost 70% of slots were reserved for immigrants from Great Britain, Ireland, and Germany.\n- The 1965 Hart-Celler Act abolished the national-origins quota system.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - MEDIUM #14: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6ce05v4qmt12r3ku31y",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nWool is a natural—and economically important—fiber that is obtained from animals like sheep.\nAustralia is a leading producer of wool.\nThe thickness of wool fibers varies across sheep breeds.\nMerino sheep produce fine wool that is used for apparel.\nRambouillet sheep produce fine wool that is used for apparel.\nRomney sheep produce thick wool that is used for rugs and blankets.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Wool is a natural—and economically important—fiber that is obtained from animals like sheep.\n- Australia is a leading producer of wool.\n- The thickness of wool fibers varies across sheep breeds.\n- Merino sheep produce fine wool that is used for apparel.\n- Rambouillet sheep produce fine wool that is used for apparel.\n- Romney sheep produce thick wool that is used for rugs and blankets.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - MEDIUM #15: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6cj05v9qmt1o0tnthje",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nA marathon is a long-distance running race that is 26.2 miles long.\nAn ultramarathon is a long-distance running race of more than 26.2 miles.\nThe Kepler Challenge is a one-day, 37.3-mile ultramarathon in New Zealand.\nThe Spreelauf is a six-day, 261-mile ultramarathon in Germany.",
+  "after": "While researching a topic, a student has taken the following notes:\n- A marathon is a long-distance running race that is 26.2 miles long.\n- An ultramarathon is a long-distance running race of more than 26.2 miles.\n- The Kepler Challenge is a one-day, 37.3-mile ultramarathon in New Zealand.\n- The Spreelauf is a six-day, 261-mile ultramarathon in Germany.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - MEDIUM #16: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6cn05veqmt1owol2hpo",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nClaude McKay (1889–1948) was a Jamaican American writer.\nSongs of Jamaica (1912) and Constab Ballads (1912) are two acclaimed poetry collections that McKay published while living in Jamaica.\nMcKay moved to Harlem in New York City in 1914.\nHe is best known as a poet and novelist of the Harlem Renaissance, a literary and cultural movement of the 1920s and 1930s.\nHis most famous works include the poetry collection Harlem Shadows (1922) and the novel Home to Harlem (1928).",
+  "after": "While researching a topic, a student has taken the following notes:\n- Claude McKay (1889–1948) was a Jamaican American writer.\n- Songs of Jamaica (1912) and Constab Ballads (1912) are two acclaimed poetry collections that McKay published while living in Jamaica.\n- McKay moved to Harlem in New York City in 1914.\n- He is best known as a poet and novelist of the Harlem Renaissance, a literary and cultural movement of the 1920s and 1930s.\n- His most famous works include the poetry collection Harlem Shadows (1922) and the novel Home to Harlem (1928).",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - MEDIUM #17: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6fe05vjqmt1ga15h2ck",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nPineapple is a fruit that contains ascorbic acid, an essential nutrient for humans.\nEvery 100 grams (g) of pineapple contains 48 milligrams (mg) of ascorbic acid.\nMany animals can make ascorbic acid in their bodies, but humans cannot.\nHumans must get ascorbic acid from foods, including fruits and vegetables.\nAscorbic acid is also known as vitamin C.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Pineapple is a fruit that contains ascorbic acid, an essential nutrient for humans.\n- Every 100 grams (g) of pineapple contains 48 milligrams (mg) of ascorbic acid.\n- Many animals can make ascorbic acid in their bodies, but humans cannot.\n- Humans must get ascorbic acid from foods, including fruits and vegetables.\n- Ascorbic acid is also known as vitamin C.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - MEDIUM #18: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6fn05voqmt1xjw9hwd8",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nGenerally, an object will heat up when twisted.\nThe twisting of an object is known as torsion.\nA 2019 study led by Zunfeng Liu and Ray Baughman tested the torsional heating of various fibers.\nWhen a 3-millimeter-thick sample of thermoplastic polyurethane (TPU) fiber was twisted, its average surface temperature increased by 6°C.\nWhen a 4-millimeter-thick sample of styrene-ethylene-butylene-styrene (SEBS) rubber fiber was twisted, its average surface temperature increased by 3.5°C.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Generally, an object will heat up when twisted.\n- The twisting of an object is known as torsion.\n- A 2019 study led by Zunfeng Liu and Ray Baughman tested the torsional heating of various fibers.\n- When a 3-millimeter-thick sample of thermoplastic polyurethane (TPU) fiber was twisted, its average surface temperature increased by 6°C.\n- When a 4-millimeter-thick sample of styrene-ethylene-butylene-styrene (SEBS) rubber fiber was twisted, its average surface temperature increased by 3.5°C.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - MEDIUM #19: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6ft05vtqmt1zqqi7iqu",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nTecozautla is a municipality in the state of Hidalgo, Mexico.\nMunicipalities are governmental regions responsible for providing many public services to their residents.\nOne service they provide is street lighting.\nTecozautla covers an area of roughly 535 km².\nHidalgo is divided into 84 municipalities.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Tecozautla is a municipality in the state of Hidalgo, Mexico.\n- Municipalities are governmental regions responsible for providing many public services to their residents.\n- One service they provide is street lighting.\n- Tecozautla covers an area of roughly 535 km².\n- Hidalgo is divided into 84 municipalities.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - MEDIUM #20: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6fz05vyqmt1sh8p1o8q",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nCecilia Vicuña is a multidisciplinary artist.\nIn 1971, her first solo art exhibition, Pinturas, poemas y explicaciones, was shown at the Museo Nacional de Bellas Artes in Santiago, Chile.\nHer poetry collection Precario/Precarious was published in 1983 by Tanam Press.\nHer poetry collection Instan was published in 2002 by Kelsey St. Press.\nShe lives part time in Chile, where she was born, and part time in New York.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Cecilia Vicuña is a multidisciplinary artist.\n- In 1971, her first solo art exhibition, Pinturas, poemas y explicaciones, was shown at the Museo Nacional de Bellas Artes in Santiago, Chile.\n- Her poetry collection Precario/Precarious was published in 1983 by Tanam Press.\n- Her poetry collection Instan was published in 2002 by Kelsey St. Press.\n- She lives part time in Chile, where she was born, and part time in New York.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - MEDIUM #21: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6g705w3qmt1b34f09z4",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nChromosomes are cellular structures that contain genes.\nGenes carry critical instructions for determining an organism’s physical traits.\nMembers of the same species typically have the same number of chromosomes.\nThe pineapple (Ananas comosus) and the melon (Cucumis melo) are species of fruits.\nThe pineapple has fifty chromosomes.\nThe melon has twenty-four chromosomes.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Chromosomes are cellular structures that contain genes.\n- Genes carry critical instructions for determining an organism’s physical traits.\n- Members of the same species typically have the same number of chromosomes.\n- The pineapple (Ananas comosus) and the melon (Cucumis melo) are species of fruits.\n- The pineapple has fifty chromosomes.\n- The melon has twenty-four chromosomes.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - MEDIUM #22: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6ge05w8qmt1afx6k8ot",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nIn geology, an Aeolian landform is one that has been created by the wind.\nIn Greek mythology, Aeolus is the keeper of the winds.\nAeolian landforms are created when the wind erodes, transports, or deposits material.\nA mushroom rock is a rock formation in which the top is wider than the base.\nA mushroom rock can be formed when the wind erodes the base and the top at different rates.",
+  "after": "While researching a topic, a student has taken the following notes:\n- In geology, an Aeolian landform is one that has been created by the wind.\n- In Greek mythology, Aeolus is the keeper of the winds.\n- Aeolian landforms are created when the wind erodes, transports, or deposits material.\n- A mushroom rock is a rock formation in which the top is wider than the base.\n- A mushroom rock can be formed when the wind erodes the base and the top at different rates.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - MEDIUM #23: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6gh05wdqmt132vvem8f",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nEtel Adnan was a Lebanese American poet and artist known for making many leporellos.\nA leporello is an artist’s book that is folded accordion style.\nWhen the book is expanded, the artist’s work is revealed, and its zigzag shape allows it to stand on its own.\nHer leporello December from My Window (1993) features a panoramic landscape.\nIt is painted using ink and watercolor.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Etel Adnan was a Lebanese American poet and artist known for making many leporellos.\n- A leporello is an artist’s book that is folded accordion style.\n- When the book is expanded, the artist’s work is revealed, and its zigzag shape allows it to stand on its own.\n- Her leporello December from My Window (1993) features a panoramic landscape.\n- It is painted using ink and watercolor.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - MEDIUM #24: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6gn05wiqmt1w4q9hgbl",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nThe Pueblo of Zuni is located about 150 miles west of Albuquerque, New Mexico.\nIt is the traditional home of the A:shiwi (Zuni) people.\nThe A:shiwi A:wan Museum and Heritage Center was established by tribal members in 1992.\nIts mission is stated on its website: “As a tribal museum and heritage center for the Zuni people and by the Zuni people we work to provide learning experiences that emphasize A:shiwi ways of knowing, as well as exploring modern concepts of knowledge and the transfer of knowledge.”",
+  "after": "While researching a topic, a student has taken the following notes:\n- The Pueblo of Zuni is located about 150 miles west of Albuquerque, New Mexico.\n- It is the traditional home of the A:shiwi (Zuni) people.\n- The A:shiwi A:wan Museum and Heritage Center was established by tribal members in 1992.\n- Its mission is stated on its website: “As a tribal museum and heritage center for the Zuni people and by the Zuni people we work to provide learning experiences that emphasize A:shiwi ways of knowing, as well as exploring modern concepts of knowledge and the transfer of knowledge.”",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - MEDIUM #25: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6gs05wnqmt1nsg4blhc",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nGravitational waves are powerful ripples that originate in deep space and eventually pass through Earth.\nThe Laser Interferometer Gravitational Wave Observatory (LIGO) is a physics study that began in 2002.\nLIGO’s goal is to detect and analyze gravitational waves.\nLIGO uses a pair of massive gravitational wave detectors called interferometers that are thousands of miles apart.\nIn 2015, for the first time in history, LIGO researchers detected a gravitational wave passing through Earth.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Gravitational waves are powerful ripples that originate in deep space and eventually pass through Earth.\n- The Laser Interferometer Gravitational Wave Observatory (LIGO) is a physics study that began in 2002.\n- LIGO’s goal is to detect and analyze gravitational waves.\n- LIGO uses a pair of massive gravitational wave detectors called interferometers that are thousands of miles apart.\n- In 2015, for the first time in history, LIGO researchers detected a gravitational wave passing through Earth.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - MEDIUM #26: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6gy05wsqmt126nrw17n",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nIn the late 1890s, over 14,000 unique varieties of apples were grown in the US.\nThe rise of industrial agriculture in the mid-1900s narrowed the range of commercially grown crops.\nThousands of apple varieties considered less suitable for commercial growth were lost.\nToday, only 15 apple varieties dominate the market, making up 90% of apples purchased in the US.\nThe Lost Apple Project, based in Washington State, attempts to find and grow lost apple varieties.",
+  "after": "While researching a topic, a student has taken the following notes:\n- In the late 1890s, over 14,000 unique varieties of apples were grown in the US.\n- The rise of industrial agriculture in the mid-1900s narrowed the range of commercially grown crops.\n- Thousands of apple varieties considered less suitable for commercial growth were lost.\n- Today, only 15 apple varieties dominate the market, making up 90% of apples purchased in the US.\n- The Lost Apple Project, based in Washington State, attempts to find and grow lost apple varieties.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - MEDIUM #27: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro6h605x2qmt13m4gm9k1",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes:\nMaika’i Tubbs is a Native Hawaiian sculptor and installation artist.\nHis work has been shown in the United States, Canada, Japan, and Germany, among other places.\nMany of his sculptures feature discarded objects.\nHis work Erasure (2008) includes discarded audiocassette tapes and magnets.\nHis work Home Grown (2009) includes discarded pushpins, plastic plates and forks, and wood.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Maika’i Tubbs is a Native Hawaiian sculptor and installation artist.\n- His work has been shown in the United States, Canada, Japan, and Germany, among other places.\n- Many of his sculptures feature discarded objects.\n- His work Erasure (2008) includes discarded audiocassette tapes and magnets.\n- His work Home Grown (2009) includes discarded pushpins, plastic plates and forks, and wood.",
+  "class": "notes_bullets",
+  "note": "Expression of Ideas - Rhetorical Synthesis - MEDIUM #29: notes as \"- \" bullets (FPT format)",
+  "evidence": "FPT notes format; source PDF shows one note per bullet"
+ }
+]

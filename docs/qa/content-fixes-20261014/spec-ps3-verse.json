@@ -1,0 +1,82 @@
+[
+ {
+  "table": "Question",
+  "id": "cmsjro396040hqmt10psiyotr",
+  "field": "stimulus",
+  "before": "The following text is from John Dryden’s 1697 translation of Virgil’s poem the Aeneid, written in the first century BCE. Queen Dido has just heard\nthe Trojan hero Aeneas recount a sad tale.\nBut anxious cares already seiz’d the queen:\nShe fed within her veins a flame unseen;\nThe hero’s valor, acts, and birth inspire\nHer soul with love, and fan the secret fire.\nHis words, his looks, imprinted in her heart,\nImprove the passion, and increase the smart.",
+  "after": "The following text is from John Dryden’s 1697 translation of Virgil’s poem the Aeneid, written in the first century BCE. Queen Dido has just heard the Trojan hero Aeneas recount a sad tale.\nBut anxious cares already seiz’d the queen:\nShe fed within her veins a flame unseen;\nThe hero’s valor, acts, and birth inspire\nHer soul with love, and fan the secret fire.\nHis words, his looks, imprinted in her heart,\nImprove the passion, and increase the smart.",
+  "class": "pdf_hard_wrap_verse",
+  "note": "Craft and Structure - Text Structure and Purpose - HARD #12: joined 1 PDF wrap(s) (\"just heard\\nthe Trojan\"); real verse/line breaks kept (whitespace only)",
+  "evidence": "TEXT STRUCT PURPOSE HARD.pdf p13 (ad4f7362): full-width intro wraps at margin after \"heard\"; verse starts indented at \"But anxious cares\"; 6 verse lines kept."
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro3gs0466qmt1yx4vdrdc",
+  "field": "stimulus",
+  "before": "The following text is adapted from José Martí’s 1891 poem “At the Salon” (translated by Cecil Charles in 1898). The speaker describes a painting\nfeaturing a female figure.\nFrom the sterile soil no ray\nOf hope in a blade of green,\nNor ++sheltering++ roof is seen—\nThough the skies are heavy and gray.\nAh, this is the woman fair\nWho stole away my heart\nIn the splendid halls of art\nYester-e’en as I wandered there!",
+  "after": "The following text is adapted from José Martí’s 1891 poem “At the Salon” (translated by Cecil Charles in 1898). The speaker describes a painting featuring a female figure.\nFrom the sterile soil no ray\nOf hope in a blade of green,\nNor ++sheltering++ roof is seen—\nThough the skies are heavy and gray.\nAh, this is the woman fair\nWho stole away my heart\nIn the splendid halls of art\nYester-e’en as I wandered there!",
+  "class": "pdf_hard_wrap_verse",
+  "note": "Craft and Structure - Words in Context - EASY #39: joined 1 PDF wrap(s) (\"a painting\\nfeaturing\"); real verse/line breaks kept (whitespace only)",
+  "evidence": "WORDS CONTEXT EASY.pdf p40 (6cf906fc): full-width intro wraps after \"painting\"; 8 indented verse lines (alternating indent = rhyme layout) kept."
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro3ol0498qmt1cx59hde0",
+  "field": "stimulus",
+  "before": "The following text is from Claude McKay’s 1922 poem “Morning Joy.” The speaker is looking out a window and observing a wold, or large area of\nland.\nAt night the wide and level stretch of wold,\nWhich at high noon had basked in quiet gold,\nFar as the eye could see was ghostly white;\nDark was the night save for the snow’s weird light.\nI ++drew++ the shades far down, crept into bed;\nHearing the cold wind moaning overhead\nThrough the sad pines, my soul, catching its pain,\nWent sorrowing with it across the plain.",
+  "after": "The following text is from Claude McKay’s 1922 poem “Morning Joy.” The speaker is looking out a window and observing a wold, or large area of land.\nAt night the wide and level stretch of wold,\nWhich at high noon had basked in quiet gold,\nFar as the eye could see was ghostly white;\nDark was the night save for the snow’s weird light.\nI ++drew++ the shades far down, crept into bed;\nHearing the cold wind moaning overhead\nThrough the sad pines, my soul, catching its pain,\nWent sorrowing with it across the plain.",
+  "class": "pdf_hard_wrap_verse",
+  "note": "Craft and Structure - Words in Context - EASY #61: joined 1 PDF wrap(s) (\"area of\\nland.\"); real verse/line breaks kept (whitespace only)",
+  "evidence": "WORDS CONTEXT EASY.pdf p62 (9671d61d): full-width intro wraps after \"area of\"; 8 indented verse lines kept."
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro5gq05a5qmt1yprdr8d1",
+  "field": "stimulus",
+  "before": "The following text is adapted from Mercedes de Acosta’s 1921 poem “Spring and You.”\nNow, Love and April, and the gold of your\nhair,\nAre all ++mingled++ together\nLike the blending of an exotic dream plant\nWith the fragrant perfume of a strange, frail\nflower.",
+  "after": "The following text is adapted from Mercedes de Acosta’s 1921 poem “Spring and You.”\nNow, Love and April, and the gold of your hair,\nAre all ++mingled++ together\nLike the blending of an exotic dream plant\nWith the fragrant perfume of a strange, frail flower.",
+  "class": "pdf_hard_wrap_verse",
+  "note": "Craft and Structure - Words in Context - EASY #129: joined 2 PDF wrap(s) (\"gold of your\\nhair,\", \"strange, frail\\nflower.\"); real verse/line breaks kept (whitespace only)",
+  "evidence": "WORDS CONTEXT EASY.pdf p130 (5d48f889): \"hair,\" and \"flower.\" are set with a deeper hanging indent (x≈101px vs 73px for verse lines at 110dpi) = turnover/runover of the previous verse line, not new lines; 4 verse lines result (\"Now, Love and April, and the gold of your hair,\" / \"Are all mingled together\" / \"Like the blending…\" / \"With the fragrant perfume of a strange, frail flower.\")."
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1aj02ydqmt1eqfcs2g6",
+  "field": "stem",
+  "before": "According to the table, all three participants wanted the room to\nbe cooler, ______\nWhich choice most effectively uses data from the table to complete the statement?",
+  "after": "According to the table, all three participants wanted the room to be cooler, ______\nWhich choice most effectively uses data from the table to complete the statement?",
+  "class": "pdf_hard_wrap_verse",
+  "note": "Information and Ideas - Command of Evidence - EASY #9: joined 1 PDF wrap(s) (\"room to\\nbe cooler\"); real verse/line breaks kept (whitespace only)",
+  "evidence": "CE EASY.pdf p10 (Question ID 4042ff0b): \"…wanted the room to / be cooler\" is one full-width prose paragraph wrapped at the right margin."
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro3za04hsqmt1e6riykzb",
+  "field": "stimulus",
+  "before": "The following text is adapted from William Shakespeare’s 1609 poem “Sonnet 27.” The poem is addressed to a close friend as if he were\nphysically present.\nWeary with toil, I [hurry] to my bed,\nThe dear repose for limbs with travel tired;\nBut then begins a journey in my head\nTo work my mind, when body’s work’s expired:\nFor then my thoughts—from far where I abide—\n[Begin] a zealous pilgrimage to thee,\nAnd keep my drooping eyelids open wide,",
+  "after": "The following text is adapted from William Shakespeare’s 1609 poem “Sonnet 27.” The poem is addressed to a close friend as if he were physically present.\nWeary with toil, I [hurry] to my bed,\nThe dear repose for limbs with travel tired;\nBut then begins a journey in my head\nTo work my mind, when body’s work’s expired:\nFor then my thoughts—from far where I abide—\n[Begin] a zealous pilgrimage to thee,\nAnd keep my drooping eyelids open wide,",
+  "class": "pdf_hard_wrap_verse",
+  "note": "Information and Ideas - Main Ideas and Details - HARD #10: joined 1 PDF wrap(s) (\"as if he were\\nphysically\"); real verse/line breaks kept (whitespace only)",
+  "evidence": "MAIN IDEA DETAILS HARD.pdf p11 (16025337): full-width intro wraps after \"were\"; 7 indented sonnet lines kept."
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro3zl04i7qmt1n6s3lqmp",
+  "field": "stimulus",
+  "before": "The following text is from Maggie Pogue Johnson’s 1910 poem “Poet of Our Race.” In this poem, the speaker is addressing Paul Laurence\nDunbar, a Black author.\nThou, with stroke of mighty pen,\nHast told of joy and mirth,\nAnd read the hearts and souls of men\nAs cradled from their birth.\nThe language of the flowers,\nThou hast read them all,\nAnd e’en the little brook\nResponded to thy call.",
+  "after": "The following text is from Maggie Pogue Johnson’s 1910 poem “Poet of Our Race.” In this poem, the speaker is addressing Paul Laurence Dunbar, a Black author.\nThou, with stroke of mighty pen,\nHast told of joy and mirth,\nAnd read the hearts and souls of men\nAs cradled from their birth.\nThe language of the flowers,\nThou hast read them all,\nAnd e’en the little brook\nResponded to thy call.",
+  "class": "pdf_hard_wrap_verse",
+  "note": "Information and Ideas - Main Ideas and Details - HARD #13: joined 1 PDF wrap(s) (\"Paul Laurence\\nDunbar\"); real verse/line breaks kept (whitespace only)",
+  "evidence": "MAIN IDEA DETAILS HARD.pdf p14 (5eda42a3): full-width intro wraps after \"Laurence\"; 8 verse lines (alternating indent) kept."
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro40f04imqmt1r2igtrri",
+  "field": "stimulus",
+  "before": "The following text is Vita Sackville-West’s circa 1920 poem “Evening.” Spars are ships’ masts, moorings are ropes that hold docked ships in\nplace, and a riding-light is a light that a ship shines when it is anchored.\nWhen little lights in little ports come out,\nQuivering down through water with the stars,\nAnd all the fishing fleet of slender spars\nRange at their moorings, veer with tide about;\nWhen race of wind is stilled and sails are furled,\nAnd underneath our single riding-light\nThe curve of black-ribbed deck gleams palely white,\nAnd slumbrous waters pool a slumbrous world;\n—Then, and then only, have I thought how sweet\nOld age might sink upon a windy youth,\nQuiet beneath the riding-light of truth,\nWeathered through storms, and gracious in retreat.",
+  "after": "The following text is Vita Sackville-West’s circa 1920 poem “Evening.” Spars are ships’ masts, moorings are ropes that hold docked ships in place, and a riding-light is a light that a ship shines when it is anchored.\nWhen little lights in little ports come out,\nQuivering down through water with the stars,\nAnd all the fishing fleet of slender spars\nRange at their moorings, veer with tide about;\nWhen race of wind is stilled and sails are furled,\nAnd underneath our single riding-light\nThe curve of black-ribbed deck gleams palely white,\nAnd slumbrous waters pool a slumbrous world;\n—Then, and then only, have I thought how sweet\nOld age might sink upon a windy youth,\nQuiet beneath the riding-light of truth,\nWeathered through storms, and gracious in retreat.",
+  "class": "pdf_hard_wrap_verse",
+  "note": "Information and Ideas - Main Ideas and Details - HARD #16: joined 1 PDF wrap(s) (\"ships in\\nplace,\"); real verse/line breaks kept (whitespace only)",
+  "evidence": "MAIN IDEA DETAILS HARD.pdf p17 (b69d821d): full-width intro wraps after \"ships in\"; 12 indented verse lines kept."
+ }
+]

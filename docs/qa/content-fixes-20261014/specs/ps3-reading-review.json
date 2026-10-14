@@ -1,0 +1,91 @@
+[
+ {
+  "id": "cmsjro1aj02ydqmt1eqfcs2g6",
+  "field": "stem",
+  "where": "Information and Ideas - Command of Evidence - EASY #9",
+  "items": [
+   {
+    "line": "ding to the table, all three participants wanted the room to",
+    "next": "be cooler, ______",
+    "reason": "kept-block"
+   }
+  ]
+ },
+ {
+  "id": "cmsjro3za04hsqmt1e6riykzb",
+  "field": "stimulus",
+  "where": "Information and Ideas - Main Ideas and Details - HARD #10",
+  "items": [
+   {
+    "line": "t 27.” The poem is addressed to a close friend as if he were",
+    "next": "physically present.",
+    "reason": "kept-block"
+   }
+  ]
+ },
+ {
+  "id": "cmsjro40f04imqmt1r2igtrri",
+  "field": "stimulus",
+  "where": "Information and Ideas - Main Ideas and Details - HARD #16",
+  "items": [
+   {
+    "line": "e ships’ masts, moorings are ropes that hold docked ships in",
+    "next": "place, and a riding-light is a light that a ship shines when",
+    "reason": "kept-block"
+   }
+  ]
+ },
+ {
+  "id": "cmsjro396040hqmt10psiyotr",
+  "field": "stimulus",
+  "where": "Craft and Structure - Text Structure and Purpose - HARD #12",
+  "items": [
+   {
+    "line": " written in the first century BCE. Queen Dido has just heard",
+    "next": "the Trojan hero Aeneas recount a sad tale.",
+    "reason": "kept-block"
+   }
+  ]
+ },
+ {
+  "id": "cmsjro3gs0466qmt1yx4vdrdc",
+  "field": "stimulus",
+  "where": "Craft and Structure - Words in Context - EASY #39",
+  "items": [
+   {
+    "line": " by Cecil Charles in 1898). The speaker describes a painting",
+    "next": "featuring a female figure.",
+    "reason": "kept-block"
+   }
+  ]
+ },
+ {
+  "id": "cmsjro3ol0498qmt1cx59hde0",
+  "field": "stimulus",
+  "where": "Craft and Structure - Words in Context - EASY #61",
+  "items": [
+   {
+    "line": " looking out a window and observing a wold, or large area of",
+    "next": "land.",
+    "reason": "kept-block"
+   }
+  ]
+ },
+ {
+  "id": "cmsjro5gq05a5qmt1yprdr8d1",
+  "field": "stimulus",
+  "where": "Craft and Structure - Words in Context - EASY #129",
+  "items": [
+   {
+    "line": "Now, Love and April, and the gold of your",
+    "next": "hair,",
+    "reason": "kept-block"
+   },
+   {
+    "line": "With the fragrant perfume of a strange, frail",
+    "next": "flower.",
+    "reason": "kept-block"
+   }
+  ]
+ }
+]
