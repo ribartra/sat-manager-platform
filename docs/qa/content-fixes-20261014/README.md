@@ -24,3 +24,18 @@ Highlights:
 
 Renderer (`lib/math-text.ts`), same day: blank lines next to a `$$…$$` block no longer add an empty line (big gap between
 stacked equations, T8 M1 #4); "$25 (Week 1: $200" style prices are prose, not math (140 tokens bank-wide).
+
+## Round 2 — TEST 5–7 (same day)
+Three agents (one per test) with the round-1 lessons added (explanation shift by meaning, missing opening sentences,
+shortened options, OCR vs page image). `spec-r2.json` = `specs/test-05/06/07.json` + `specs/extra-r2.json`
+(`build-extra-r2.cjs`): 89 ops (9 bleed, 1 options_in_stem, 4 flattened_table, 75 other). Applied dev.db
+(backup `backups/devdb-pre-content-fixes-20261014-r2.db`) and prod (`/db/backups/dev.db.pre-content-fixes-20261014-r2`):
+89 PENDING → apply → 89 ALREADY, integrity ok.
+- No explanation shift in TEST 5–7; all keys match the answer key docs.
+- Bleeds: T5 R&W M1 #13; T6 R&W M1 #6/#14/#16/#18/#24, M2 #7 (option A was a copy of the passage — A is the key), M2 #22;
+  T7 R&W M1 #9.
+- T5 Math M1 #3: options were `[tbl-N.html]` placeholders → pipe tables; option images dropped (image A showed B's table).
+- T6/T7 Math explanations with the Word equations stripped ("If , then …") rebuilt from the docx (T6 M1 #14/#18,
+  T7 M1 #22, M2 #2/#16/#21). The same defect exists in ~23 practice-set explanations and 1 TEST 8 Math (not fixed yet).
+- T5 Math M1 #22 explanation rewritten (old derivation contradicted the figure); T6 R&W M2 #15 A "change" → "charge".
+- T6 Math M2 #4 flagged as "MC without options" is NUMERIC with key 29 in the DB — no defect.

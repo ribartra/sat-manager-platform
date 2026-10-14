@@ -1,0 +1,282 @@
+[
+  {
+    "table": "Question",
+    "id": "cmsjrnwlk016dqmt136bxx94k",
+    "field": "stimulus",
+    "before": "Alexander Fleming's fortuitous discovery of an unexpected patch of mold growing on a Petri dish of staphylococcus bacteria. Fleming noted the mold's apparent ability to inhibit bacterial growth, ______ scientific breakthrough that laid the foundations for the development of modern antibiotics.",
+    "after": "Penicillin, a common antibiotic, was developed in the late 1920s after Dr. Alexander Fleming's fortuitous discovery of an unexpected patch of mold growing on a Petri dish of staphylococcus bacteria. Fleming noted the mold's apparent ability to inhibit bacterial growth, ______ scientific breakthrough that laid the foundations for the development of modern antibiotics.",
+    "note": "T7 R&W M1 #4: other — stimulus truncated: lead-in \"Penicillin, a common antibiotic, was developed in the late 1920s after Dr.\" dropped (passage started mid-sentence)",
+    "class": "other",
+    "evidence": "IngestPageArtifact p2 of files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf (Q4 passage)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnwly016lqmt16nw9dxca",
+    "field": "stimulus",
+    "before": "In this excerpt, the narrator, Dr. Watson, explains how Holmes views emotions in his work. Holmes was, I take it, the most perfect reasoning and observing machine that the world has seen, but he never spoke of the softer passions, save with a gibe and a sneer. They were admirable things for the observer—excellent for drawing the veil from men's motives and actions. But for the trained reasoner to admit such intrusions into his own delicate and finely adjusted temperament was to introduce a distracting factor which might throw a doubt upon all his mental results. Grit in a sensitive instrument, or a crack in one of his own high-power lenses, would not be more disturbing than a strong emotion in a nature such as his.",
+    "after": "The following is adapted from Arthur Conan Doyle's 1891 Sherlock Holmes short story \"A Scandal in Bohemia.\" In this excerpt, the narrator, Dr. Watson, explains how Holmes views emotions in his work.\n\nHolmes was, I take it, the most perfect reasoning and observing machine that the world has seen, but he never spoke of the softer passions, save with a gibe and a sneer. They were admirable things for the observer—excellent for drawing the veil from men's motives and actions. But for the trained reasoner to admit such intrusions into his own delicate and finely adjusted temperament was to introduce a distracting factor which might throw a doubt upon all his mental results. Grit in a sensitive instrument, or a crack in one of his own high-power lenses, would not be more disturbing than a strong emotion in a nature such as his.",
+    "note": "T7 R&W M1 #6: other — stimulus truncated: intro \"The following is adapted from Arthur Conan Doyle's 1891 … \"A Scandal in Bohemia.\"\" dropped; intro/passage paragraph break restored",
+    "class": "other",
+    "evidence": "IngestPageArtifact p3 of files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf (Q6 passage)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnwmb0171qmt1c23v95x4",
+    "field": "stimulus",
+    "before": "The following is adapted from E.M. Forster's 1909 novella *The Machine Stops*, a dystopian story in which humans live in entirely artificial environments. Imagine, if you can, a small room, hexagonal in shape, like the cell of a bee. It is lighted neither by window nor by lamp, yet it is filled with a soft radiance. There are no apertures for ventilation, yet the air is fresh. There are no musical instruments, and yet, at this moment, this room is throbbing with melodious sounds. An armchair is in the center, by its side a reading-desk — that is all the furniture. ++And in the armchair there sits a swaddled lump of flesh — a woman, about five feet high, with a face as white as a fungus.++",
+    "after": "The following is adapted from E.M. Forster's 1909 novella *The Machine Stops*, a dystopian story in which humans live in entirely artificial environments.\n\nImagine, if you can, a small room, hexagonal in shape, like the cell of a bee. It is lighted neither by window nor by lamp, yet it is filled with a soft radiance. There are no apertures for ventilation, yet the air is fresh. There are no musical instruments, and yet, at this moment, this room is throbbing with melodious sounds. An armchair is in the center, by its side a reading-desk — that is all the furniture. ++And in the armchair there sits a swaddled lump of flesh — a woman, about five feet high, with a face as white as a fungus.++",
+    "note": "T7 R&W M1 #8: other — intro line and passage run together; restore paragraph break (text identical)",
+    "class": "other",
+    "evidence": "IngestPageArtifact p5 of files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnwmi017bqmt1bpv3sgv7",
+    "field": "stimulus",
+    "before": "The following text is from Horace Smith's 1817 poem \"On a Stupendous Leg of Granite, Discovered Standing by Itself in the Deserts of Egypt, with the Inscription Inserted Below.\" In Egypt's sandy silence, all alone, Stands a gigantic Leg, which far off throws The only shadow that the Desert knows. \"I am great Ozymandias,\" saith the stone, \"The King of kings: this mighty city shows The wonders of my hand.\" The city's gone! Naught but the leg remaining to disclose The sight of that forgotten Babylon. We wonder, and some hunter may express Wonder like ours, when through the wilderness Where London stood, holding the wolf in chase, He met some fragment huge, and stops to guess What wonderful, but unrecorded race Once dwelt in that annihilated place. The Art of War is a book by Sun Tzu that was written in fifth century BCE. It is perhaps the most widely quoted military work in human history. One reason for this is likely due to adages that are applicable not only to generals but also to the general population: ______",
+    "after": "The following text is from Horace Smith's 1817 poem \"On a Stupendous Leg of Granite, Discovered Standing by Itself in the Deserts of Egypt, with the Inscription Inserted Below.\"\n\nIn Egypt's sandy silence, all alone,\nStands a gigantic Leg, which far off throws\nThe only shadow that the Desert knows.\n\"I am great Ozymandias,\" saith the stone,\n\"The King of kings: this mighty city shows\nThe wonders of my hand.\" The city's gone!\nNaught but the leg remaining to disclose\nThe sight of that forgotten Babylon.\n\nWe wonder, and some hunter may express\nWonder like ours, when through the wilderness\nWhere London stood, holding the wolf in chase,\nHe met some fragment huge, and stops to guess\nWhat wonderful, but unrecorded race\nOnce dwelt in that annihilated place.",
+    "note": "T7 R&W M1 #9: bleed — stimulus had Q10's Art of War passage (incl. its \"______\" blank) appended after the poem; removed it and restored the poem's line/stanza breaks",
+    "class": "bleed",
+    "evidence": "IngestPageArtifact p6 of files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf: poem block for Q9, Art of War passage belongs to Q10 (same page); Q10 stimulus already holds it"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnwou018hqmt1lrr54z4g",
+    "field": "stimulus",
+    "before": "Although they were previously thought to prefer damp environments, recent studies _____ that they can thrive in dry habitats too. Despite their slight physique, rusty-spotted cats are efficient and ambitious hunters, capable of capturing prey larger than themselves.",
+    "after": "Indigenous to India, the rusty-spotted cat (*Prionailurus rubiginosus*) is considered one of the world's smallest cat species. Although they were previously thought to prefer damp environments, recent studies _____ that they can thrive in dry habitats too. Despite their slight physique, rusty-spotted cats are efficient and ambitious hunters, capable of capturing prey larger than themselves.",
+    "note": "T7 R&W M1 #16: other — stimulus truncated: opening sentence \"Indigenous to India, the rusty-spotted cat … smallest cat species.\" dropped (\"they\" had no referent)",
+    "class": "other",
+    "evidence": "IngestPageArtifact p10 of files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf (Q16 passage)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnwp7018lqmt1fjl59nf9",
+    "field": "stimulus",
+    "before": "Some plants are able to release toxins—ones that often have no effect on humans—to protect _____ from insects or other invasive threats.",
+    "after": "Plants rely on a number of nearly invisible tools for their survival. Some plants are able to release toxins—ones that often have no effect on humans—to protect _____ from insects or other invasive threats.",
+    "note": "T7 R&W M1 #18: other — stimulus truncated: opening sentence \"Plants rely on a number of nearly invisible tools for their survival.\" dropped",
+    "class": "other",
+    "evidence": "IngestPageArtifact p11 of files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf (Q18 passage)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnwpt018xqmt1fqlh3ksc",
+    "field": "stimulus",
+    "before": "is a common logical fallacy that assumes an event is caused by what preceded it. Many superstitions are classic examples of this, such as one assuming that a black cat crossing the street is a harbinger of bad luck. _____ the “cum hoc ergo propter hoc” fallacy assumes causation between two things that happen simultaneously (for example, the assumption that a victorious sports game was brought about by the family heirloom worn during the match).",
+    "after": "“Post hoc ergo propter hoc” is a common logical fallacy that assumes an event is caused by what preceded it. Many superstitions are classic examples of this, such as one assuming that a black cat crossing the street is a harbinger of bad luck. _____ the “cum hoc ergo propter hoc” fallacy assumes causation between two things that happen simultaneously (for example, the assumption that a victorious sports game was brought about by the family heirloom worn during the match).",
+    "note": "T7 R&W M1 #22: other — stimulus truncated: subject \"“Post hoc ergo propter hoc”\" dropped (passage began \"is a common logical fallacy\")",
+    "class": "other",
+    "evidence": "IngestPageArtifact p13 of files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf (Q22 passage)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnwsp0193qmt1o7t4skqv",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes: - The ginkgo tree, also known as *Ginkgo biloba*, is a tree native to China. - The ginkgo is called a \"living fossil\" because it is the sole surviving member of an ancient order of trees called Ginkgoales which dates back more than 290 million years. - Since the 14th century, ginkgo trees have been widely cultivated in Japan and Korea. Six ginkgo trees survived the 1945 atom bomb explosion in Hiroshima, Japan, during the Second World War. - ginkgo leaves have a distinct fan-like shape with veins that radiate from a central point. - Ginkgo seeds, also called ginkgo nuts, are commonly used in Chinese, Japanese, and Korean cuisine, while the leaves are often used to make an herbal tea.",
+    "after": "While researching a topic, a student has taken the following notes:\n- The ginkgo tree, also known as *Ginkgo biloba*, is a tree native to China.\n- The ginkgo is called a \"living fossil\" because it is the sole surviving member of an ancient order of trees called Ginkgoales which dates back more than 290 million years.\n- Since the 14th century, ginkgo trees have been widely cultivated in Japan and Korea. Six ginkgo trees survived the 1945 atom bomb explosion in Hiroshima, Japan, during the Second World War.\n- ginkgo leaves have a distinct fan-like shape with veins that radiate from a central point.\n- Ginkgo seeds, also called ginkgo nuts, are commonly used in Chinese, Japanese, and Korean cuisine, while the leaves are often used to make an herbal tea.",
+    "note": "T7 R&W M1 #25: other — notes bullets flattened into one line; restore one bullet per line (text identical)",
+    "class": "other",
+    "evidence": "IngestPageArtifact p15 of files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnwt7019dqmt14cfxvtbt",
+    "field": "stimulus",
+    "before": "notes: - One of the largest art thefts in modern history occurred at The Isabella Stewart Gardner Museum in Boston, Massachusetts, on March 18, 1990. - The stolen artworks were worth an estimated $500 million and included masterpieces by renowned artists such as Rembrandt Harmenszoon van Rijn and Johannes Vermeer, including his piece *The Concert*, which is considered one of the most valuable paintings in the world. - Among the stolen artworks was a bronze *gu*, a vessel used for serving wine in ancient China that was worth only a few thousand dollars. - The stolen artworks were cut out from their frames, leaving empty frames hanging on the museum walls, which still serve as a haunting reminder of the missing masterpieces and the unsolved crime. - Despite extensive investigations by the Federal Bureau of Investigation to recover the stolen artworks, the case remains unsolved. - As of 2017, The Gardner Museum offered a reward of $10 million for information leading to the recovery of the stolen pieces.",
+    "after": "notes:\n- One of the largest art thefts in modern history occurred at The Isabella Stewart Gardner Museum in Boston, Massachusetts, on March 18, 1990.\n- The stolen artworks were worth an estimated $500 million and included masterpieces by renowned artists such as Rembrandt Harmenszoon van Rijn and Johannes Vermeer, including his piece *The Concert*, which is considered one of the most valuable paintings in the world.\n- Among the stolen artworks was a bronze *gu*, a vessel used for serving wine in ancient China that was worth only a few thousand dollars.\n- The stolen artworks were cut out from their frames, leaving empty frames hanging on the museum walls, which still serve as a haunting reminder of the missing masterpieces and the unsolved crime.\n- Despite extensive investigations by the Federal Bureau of Investigation to recover the stolen artworks, the case remains unsolved.\n- As of 2017, The Gardner Museum offered a reward of $10 million for information leading to the recovery of the stolen pieces.",
+    "note": "T7 R&W M1 #26: other — notes bullets flattened into one line; restore one bullet per line (text identical)",
+    "class": "other",
+    "evidence": "IngestPageArtifact p16 of files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnwty019nqmt1tmo3l2en",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes: - Antipater of Sidon was a Greek author who lived in the second century BCE. - He composed a list of the seven wonders of the ancient world, highlighting notable monuments and works of public architecture. - Two sites from ancient Babylon, the Hanging Gardens and the Ishtar Gate, appeared on Antipater's list. - Other lists include the Hanging Gardens but omit the Ishtar Gate in favor of monuments more directly inspired by ancient Greece. - The Temple of Artemis at Ephesus, the Colossus of Rhodes, and the Statue of Zeus at Olympia were all products of Greek art.",
+    "after": "While researching a topic, a student has taken the following notes:\n- Antipater of Sidon was a Greek author who lived in the second century BCE.\n- He composed a list of the seven wonders of the ancient world, highlighting notable monuments and works of public architecture.\n- Two sites from ancient Babylon, the Hanging Gardens and the Ishtar Gate, appeared on Antipater's list.\n- Other lists include the Hanging Gardens but omit the Ishtar Gate in favor of monuments more directly inspired by ancient Greece.\n- The Temple of Artemis at Ephesus, the Colossus of Rhodes, and the Statue of Zeus at Olympia were all products of Greek art.",
+    "note": "T7 R&W M1 #27: other — notes bullets flattened into one line; restore one bullet per line (text identical)",
+    "class": "other",
+    "evidence": "IngestPageArtifact p17 of files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmson6g1w000518pp9ognfh6z",
+    "field": "stimulus",
+    "before": "One of the most famous criminals in modern history was Charles Ponzi who was notorious for his \\_\\_\\_\\_\\_, wrongly assuming himself to be immune to legal investigation so long as he treated his investors generously and generated positive press for his business.",
+    "after": "One of the most famous criminals in modern history was Charles Ponzi who was notorious for his _____, wrongly assuming himself to be immune to legal investigation so long as he treated his investors generously and generated positive press for his business.",
+    "note": "T7 R&W M2 #2: other — escaped blank \\_\\_\\_\\_\\_ renders literally; use _____",
+    "class": "other",
+    "evidence": "IngestPageArtifact p18 of files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf (Q2 passage shows _____)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnwm8016wqmt1j6ur57yy",
+    "field": "stimulus",
+    "before": "The following text comes from a 10th-century account of an Arab ambassador to Constantinople titled “An Embassy from Baghdad to the Emperor Basil II.” The Byzantine Sovereign said: “You have come on a reprehensible errand; your envoy came and procured our consent to certain terms, which included the restoring of the fortresses taken during the revolt; you are now asking to have other fortresses which were taken by my predecessors. Either consent to what was originally stipulated or go in peace.” I replied: “But we agreed on nothing, for, as for the document we brought, you deprived us under its terms of half our territory; how can we admit such a thing against ourselves?” Here the Chamberlain interposed, saying: “This envoy is skilled in controversy and can make up a fine story: death is better for us than submission to these terms: let him return to his master.” The Sovereign then rose, and I withdrew.",
+    "after": "The following text comes from a 10th-century account of an Arab ambassador to Constantinople titled “An Embassy from Baghdad to the Emperor Basil II.”\n\nThe Byzantine Sovereign said: “You have come on a reprehensible errand; your envoy came and procured our consent to certain terms, which included the restoring of the fortresses taken during the revolt; you are now asking to have other fortresses which were taken by my predecessors. Either consent to what was originally stipulated or go in peace.” I replied: “But we agreed on nothing, for, as for the document we brought, you deprived us under its terms of half our territory; how can we admit such a thing against ourselves?” Here the Chamberlain interposed, saying: “This envoy is skilled in controversy and can make up a fine story: death is better for us than submission to these terms: let him return to his master.” The Sovereign then rose, and I withdrew.",
+    "note": "T7 R&W M2 #7: other — intro line and passage run together; restore paragraph break (text identical)",
+    "class": "other",
+    "evidence": "IngestPageArtifact p21 of files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnwmf0176qmt1mo1aok2h",
+    "field": "stimulus",
+    "before": "The following text comes from the first-century work *A Record of Buddhistic Kingdoms* by Fa-Hien. After travelling for seventeen days, the pilgrims reached the kingdom of Shen-shen, a country rugged and hilly, with a thin and barren soil. The clothes of the common people are coarse, and like those worn in our land of Han, some wearing felt and others coarse serge or cloth of hair; this was the only difference seen among them. The king professed our Law, and there might be in the country more than four thousand monks, who were all students of the hinayana. The common people of this and other kingdoms in that region, as well as the sramans, all practise the rules of India, only that the latter do so more exactly, and the former more loosely.",
+    "after": "The following text comes from the first-century work *A Record of Buddhistic Kingdoms* by Fa-Hien.\n\nAfter travelling for seventeen days, the pilgrims reached the kingdom of Shen-shen, a country rugged and hilly, with a thin and barren soil. The clothes of the common people are coarse, and like those worn in our land of Han, some wearing felt and others coarse serge or cloth of hair; this was the only difference seen among them. The king professed our Law, and there might be in the country more than four thousand monks, who were all students of the hinayana. The common people of this and other kingdoms in that region, as well as the sramans, all practise the rules of India, only that the latter do so more exactly, and the former more loosely.",
+    "note": "T7 R&W M2 #8: other — intro line and passage run together; restore paragraph break (text identical)",
+    "class": "other",
+    "evidence": "IngestPageArtifact p22 of files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnwt00198qmt199lbpf45",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes: - Bruges, a city founded in the 12th century in northwestern Belgium, is known for its medieval architecture and picturesque canals. - Since 2000, Bruges's city center has been a UNESCO (United Nations Educational, Scientific, and Cultural Organization) World Heritage Site. - Bruges was occupied by German forces during World War I and World War II but suffered virtually no destruction. Today, it is one of the best-preserved medieval towns in Europe. - Over eight million tourists visit Bruges each year. - Bruges is commercially important due to its port, Zeebrugge, which handles approximately 45 million tons of cargo annually.",
+    "after": "While researching a topic, a student has taken the following notes:\n- Bruges, a city founded in the 12th century in northwestern Belgium, is known for its medieval architecture and picturesque canals.\n- Since 2000, Bruges's city center has been a UNESCO (United Nations Educational, Scientific, and Cultural Organization) World Heritage Site.\n- Bruges was occupied by German forces during World War I and World War II but suffered virtually no destruction. Today, it is one of the best-preserved medieval towns in Europe.\n- Over eight million tourists visit Bruges each year.\n- Bruges is commercially important due to its port, Zeebrugge, which handles approximately 45 million tons of cargo annually.",
+    "note": "T7 R&W M2 #25: other — notes bullets flattened into one line; restore one bullet per line (text identical)",
+    "class": "other",
+    "evidence": "IngestPageArtifact p33 of files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnwtt019iqmt1x1ja4rz6",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes: - *The Great Wave off Kanagawa* is a woodblock print created in 1831 by Japanese artist Katsushika Hokusai. - *The Great Wave off Kanagawa* reportedly inspired French composer Claude Debussy's symphony *La Mer* (The Sea) in 1905 and Austrian poet Rainer Maria Rilke's \"Der Berg\" (The Mountain) in 1907. - *The Great Wave off Kanagawa* is an example of *ukiyo-e*, a Japanese printmaking technique that dates to the 17th century. - *The Great Wave off Kanagawa* depicts a giant wave that suggests tsunami-like conditions off the shore of Mount Fuji, the highest mountain in Japan. - The Japanese government will release a redesign of the 1000-yen bill in 2024 that will feature *The Great Wave off Kanagawa* on one side of the currency. - *The Great Wave off Kanagawa* features a sense of depth between the foreground and the background of the print, reflecting Western influence that emerged via Dutch trade in Japan in the 18th century.",
+    "after": "While researching a topic, a student has taken the following notes:\n- *The Great Wave off Kanagawa* is a woodblock print created in 1831 by Japanese artist Katsushika Hokusai.\n- *The Great Wave off Kanagawa* reportedly inspired French composer Claude Debussy's symphony *La Mer* (The Sea) in 1905 and Austrian poet Rainer Maria Rilke's \"Der Berg\" (The Mountain) in 1907.\n- *The Great Wave off Kanagawa* is an example of *ukiyo-e*, a Japanese printmaking technique that dates to the 17th century.\n- *The Great Wave off Kanagawa* depicts a giant wave that suggests tsunami-like conditions off the shore of Mount Fuji, the highest mountain in Japan.\n- The Japanese government will release a redesign of the 1000-yen bill in 2024 that will feature *The Great Wave off Kanagawa* on one side of the currency.\n- *The Great Wave off Kanagawa* features a sense of depth between the foreground and the background of the print, reflecting Western influence that emerged via Dutch trade in Japan in the 18th century.",
+    "note": "T7 R&W M2 #26: other — notes bullets flattened into one line; restore one bullet per line (text identical)",
+    "class": "other",
+    "evidence": "IngestPageArtifact p34 of files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnwu2019sqmt10whohlet",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes: - Wuyi teas are a category of Chinese black and oolong teas grown in and around the Wuyi Mountains in China. - The Wuyi Mountains, a UNESCO World Heritage Site since 1999, provide an ideal environment for cultivating these teas. - Wuyi teas are known for their complex and robust flavors with notes of charcoal, caramel, and fresh herbs. - The production of Wuyi teas involves plucking, withering, bruising, drying, and multiple roastings to enhance flavors. - One of the most famous varieties of Wuyi tea is the most expensive tea in the world: Da Hong Pao, which costs over one million dollars per kilogram.",
+    "after": "While researching a topic, a student has taken the following notes:\n- Wuyi teas are a category of Chinese black and oolong teas grown in and around the Wuyi Mountains in China.\n- The Wuyi Mountains, a UNESCO World Heritage Site since 1999, provide an ideal environment for cultivating these teas.\n- Wuyi teas are known for their complex and robust flavors with notes of charcoal, caramel, and fresh herbs.\n- The production of Wuyi teas involves plucking, withering, bruising, drying, and multiple roastings to enhance flavors.\n- One of the most famous varieties of Wuyi tea is the most expensive tea in the world: Da Hong Pao, which costs over one million dollars per kilogram.",
+    "note": "T7 R&W M2 #27: other — notes bullets flattened into one line; restore one bullet per line (text identical)",
+    "class": "other",
+    "evidence": "IngestPageArtifact p35 of files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnwwl01b5qmt1oln4m8lr",
+    "field": "stem",
+    "before": "A soccer coach wants to purchase new uniforms for his 22 players. The athletic department's budget allows for a maximum of \\$2,800 to be spent on these uniforms, which includes a 6% sales tax. Which of the following is the maximum amount of money per uniform, before sales tax, that the coach can spend?",
+    "after": "A soccer coach wants to purchase new uniforms for his 22 players. The athletic department's budget allows for a maximum of $2,800 to be spent on these uniforms, which includes a 6% sales tax. Which of the following is the maximum amount of money per uniform, before sales tax, that the coach can spend?",
+    "note": "T7 Math M1 #11: other — escaped dollar \"\\$2,800\" renders with a literal backslash (renderer does not unescape \\$); single $ price is prose",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 7/MATH/TEST 7 INNOVATOR MATH.pdf p4 (rendered): \"maximum of $2,800\""
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnwyd01bnqmt1l4vwq4sj",
+    "field": "stem",
+    "before": "The table shows select values for the function  \\( f(x) \\) . What is the equation for the function  \\( f(x) \\) ?",
+    "after": "The table shows select values for the function $f(x)$. What is the equation for the function $f(x)$?",
+    "note": "T7 Math M1 #18: other — OCR inline-math delimiters \"  \\( f(x) \\) \" with stray spaces; normalise to $f(x)$ (table is the image; options clean)",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 7/MATH/TEST 7 INNOVATOR MATH.pdf p7 (rendered)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnwym01btqmt1846xul16",
+    "field": "stem",
+    "before": "Note: Figure not drawn to scale\n\nIn the figure shown, the length of BC is 6 centimeters. What is the length of AB, in centimeters?\n\n\\[\n\\times \\boxed {A} 3\n\\]\n\n\\[\n\\times \\boxed {B} 3 \\sqrt {2}\n\\]\n\n\\[\n\\times \\boxed {c} 6\n\\]\n\n\\[\n\\times \\boxed {D} 6 \\sqrt {2}\n\\]",
+    "after": "Note: Figure not drawn to scale\n\nIn the figure shown, the length of BC is 6 centimeters. What is the length of AB, in centimeters?",
+    "note": "T7 Math M1 #19: options_in_stem — options A–D left in the stem as OCR \"\\[ \\times \\boxed{A} 3 \\]…\" blocks (× = cross-out UI); options table already holds 3, 3√2, 6, 6√2",
+    "class": "options_in_stem",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 7/MATH/TEST 7 INNOVATOR MATH.pdf p7 (rendered): Q19 options panel A 3 / B 3√2 / C 6 / D 6√2"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "cmsjrnwvr01avqmt1ywsjoaep",
+    "field": "text",
+    "before": "y = 200(3)ᵗ",
+    "after": "$y = 200(3)^t$",
+    "note": "T7 Math M2 #7: other — option A uses Unicode superscripts (\"y = 200(3)ᵗ\"); rewrite as LaTeX like option C",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 7/MATH/TEST 7 INNOVATOR MATH.pdf p12 rendered at 250 dpi: A y=200(3)^t, B y=3(200)^t, C y=200(3)^{t/7}, D y=200^{3t}"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "cmsjrnwvr01awqmt1rlgb7o3q",
+    "field": "text",
+    "before": "y = 3(200)ᵗ",
+    "after": "$y = 3(200)^t$",
+    "note": "T7 Math M2 #7: other — option B uses Unicode superscripts (\"y = 3(200)ᵗ\"); rewrite as LaTeX like option C",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 7/MATH/TEST 7 INNOVATOR MATH.pdf p12 rendered at 250 dpi: A y=200(3)^t, B y=3(200)^t, C y=200(3)^{t/7}, D y=200^{3t}"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "cmsjrnwvr01ayqmt1nv6p0vzt",
+    "field": "text",
+    "before": "y = 200³ᵗ",
+    "after": "$y = 200^{3t}$",
+    "note": "T7 Math M2 #7: other — option D uses Unicode superscripts (\"y = 200³ᵗ\"); rewrite as LaTeX like option C",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 7/MATH/TEST 7 INNOVATOR MATH.pdf p12 rendered at 250 dpi: A y=200(3)^t, B y=3(200)^t, C y=200(3)^{t/7}, D y=200^{3t}"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnww001b0qmt192ba8rnz",
+    "field": "stem",
+    "before": "24x + 24y = -8y + 2/3\n\n-ky = 3x - 1/12\n\nIn the given system of equations, k is a constant. If the system has infinite solutions, what is the value of k?",
+    "after": "$24x + 24y = -8y + \\frac{2}{3}$\n\n$-ky = 3x - \\frac{1}{12}$\n\nIn the given system of equations, $k$ is a constant. If the system has infinite solutions, what is the value of $k$?",
+    "note": "T7 Math M2 #8: other — system typed as plain text with slash fractions; restore as math ($$…\\frac{2}{3}$$, $$…\\frac{1}{12}$$)",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 7/MATH/TEST 7 INNOVATOR MATH.pdf p12 (rendered): stacked fractions 2/3 and 1/12"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnwxb01baqmt1s1u8sv5b",
+    "field": "stem",
+    "before": "The graph of $$x^{2} + 3x + y^{2} - y = \\frac{13}{2}$$ in the $$xy$$-plane is a circle. What is the length of the circle's radius?",
+    "after": "The graph of $x^{2} + 3x + y^{2} - y = \\frac{13}{2}$ in the $xy$-plane is a circle. What is the length of the circle's radius?",
+    "note": "T7 Math M2 #13: other — inline math wrapped in display $$…$$ (breaks the sentence into blocks, \"xy\" on its own line); use inline $…$",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 7/MATH/TEST 7 INNOVATOR MATH.pdf p14 (rendered): equation inline in the sentence"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnx2701c2qmt18m37uycw",
+    "field": "explanation",
+    "before": "Choice D is correct. If , then the –value for  when  is . So, . As a result, the value of  is the value of . The –value of  when  is .\nChoice A is incorrect as this is the value of . Choice B is incorrect as this is the value of  or . Choice C is incorrect and may be the result of choosing  because of the –value in .",
+    "after": "Choice D is correct. If $g(2)=q$, then the $y$–value for $g(x)$ when $x=2$ is $0$. So, $q=0$. As a result, the value of $f(q)$ is the value of $f(0)$. The $y$–value of $f(x)$ when $x=0$ is $5$.\nChoice A is incorrect as this is the value of $q$. Choice B is incorrect as this is the value of $f(2)$ or $g(0)$. Choice C is incorrect and may be the result of choosing $2$ because of the $x$–value in $g(2)$.",
+    "note": "T7 Math M1 #22: other — explanation lost every Word-equation (OMML) value (\"If , then the –value for  when  is .\") — restored with LaTeX from the docx equations; prose unchanged",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 7/Test7_Math_Answer_Explanations.docx, table for Question 22 (MODULE 1), m:oMath elements"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnwuo01a8qmt11c9v1qtn",
+    "field": "explanation",
+    "before": "Choice B is correct. Using  between the coordinate points  and  yields a slope of  for line . If two lines are perpendicular, then the slopes of the lines are opposite reciprocals. So, since the slope for line  is , the slope of line  is .\nChoice A is incorrect and is the result of taking the negative of the slope of line  but not the reciprocal. Choice C is incorrect and is the result of taking the reciprocal of line  but not the negative. Choice D is incorrect as this would be the slope of line  if the lines were parallel.",
+    "after": "Choice B is correct. Using $\\frac{rise}{run}$ between the coordinate points $(0,1)$ and $(1,6)$ yields a slope of $\\frac{5}{1}=5$ for line $q$. If two lines are perpendicular, then the slopes of the lines are opposite reciprocals. So, since the slope for line $q$ is $5$, the slope of line $r$ is $-\\frac{1}{5}$.\nChoice A is incorrect and is the result of taking the negative of the slope of line $q$ but not the reciprocal. Choice C is incorrect and is the result of taking the reciprocal of line $q$ but not the negative. Choice D is incorrect as this would be the slope of line $r$ if the lines were parallel.",
+    "note": "T7 Math M2 #2: other — explanation lost every Word-equation (OMML) value (\"If , then the –value for  when  is .\") — restored with LaTeX from the docx equations; prose unchanged",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 7/Test7_Math_Answer_Explanations.docx, table for Question 2 (MODULE 2B), m:oMath elements"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnwy001bgqmt1mj7a9ibd",
+    "field": "explanation",
+    "before": "Choice D is correct. Focusing on the term in the denominator,  can be combined into a singular term. To combine fractions, they must have the same denominator. The common denominator of  and  is\n. Multiplying the first term by  yields . Similarly, multiplying the second term by  yields . Adding these fractions yields . Adding like terms simplifies this to . Since this expression is equivalent to the denominator of the original expression, the original expression can be rewritten as . This is the same as . Using the rules for dividing fractions in which dividing by a fraction is the same as multiplying by the reciprocal of the second fraction, this becomes , which simplifies to .\nChoice A is incorrect and may result from adding the terms directly instead of finding a common denominator for the two fractions. Additionally, the reciprocal of the fraction was not found in the last step. Choice B is incorrect and may result from adding the terms directly instead of finding a common denominator for the two fractions. Choice C is incorrect and may result from not finding the reciprocal in the last step.\nCalculator tip: Enter the original expression  into an equation line to get a defined graph in the coordinate plane. Enter the answer choice expressions in a separate equation entry line to find which one produces a graph in exactly alignment with the original expression. Since Choice D,, produces a graph that is a perfect match, it is equivalent.",
+    "after": "Choice D is correct. Focusing on the term in the denominator, $\\frac{1}{x+5}+\\frac{1}{x-2}$ can be combined into a singular term. To combine fractions, they must have the same denominator. The common denominator of $(x+5)$ and $(x-2)$ is $(x+5)(x-2)$. Multiplying the first term by $\\frac{x-2}{x-2}$ yields $\\frac{x-2}{(x+5)(x-2)}$. Similarly, multiplying the second term by $\\frac{x+5}{x+5}$ yields $\\frac{x+5}{(x+5)(x-2)}$. Adding these fractions yields $\\frac{x-2+x+5}{(x+5)(x-2)}$. Adding like terms simplifies this to $\\frac{2x+3}{x^{2}+3x-10}$. Since this expression is equivalent to the denominator of the original expression, the original expression can be rewritten as $\\frac{1}{\\frac{2x+3}{x^{2}+3x-10}}$. This is the same as $1÷\\frac{2x+3}{x^{2}+3x-10}$. Using the rules for dividing fractions in which dividing by a fraction is the same as multiplying by the reciprocal of the second fraction, this becomes $1×\\frac{x^{2}+3x-10}{2x+3}$, which simplifies to $\\frac{x^{2}+3x-10}{2x+3}$.\nChoice A is incorrect and may result from adding the terms directly instead of finding a common denominator for the two fractions. Additionally, the reciprocal of the fraction was not found in the last step. Choice B is incorrect and may result from adding the terms directly instead of finding a common denominator for the two fractions. Choice C is incorrect and may result from not finding the reciprocal in the last step.\nCalculator tip: Enter the original expression $\\frac{1}{\\frac{1}{x+5}+\\frac{1}{x-2}}$ into an equation line to get a defined graph in the coordinate plane. Enter the answer choice expressions in a separate equation entry line to find which one produces a graph in exactly alignment with the original expression. Since Choice D, $\\frac{x^{2}+3x-10}{2x+3}$, produces a graph that is a perfect match, it is equivalent.",
+    "note": "T7 Math M2 #16: other — explanation lost every Word-equation (OMML) value (\"If , then the –value for  when  is .\") — restored with LaTeX from the docx equations; prose unchanged",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 7/Test7_Math_Answer_Explanations.docx, table for Question 16 (MODULE 2B), m:oMath elements"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnx1k01c1qmt111g85jey",
+    "field": "explanation",
+    "before": "The correct answer is . It is given that  has two distinct values such that . Since  is a polynomial function with a degree of , one of the solutions must be a perfect square. It is given that , so  must be a perfect square (note that since  is not a factor of\n,  cannot be written with  as a term). Since that term is a perfect square, , so the term can be rewritten as . This means that  can be written as  which means that .\nAlternatively, since  has two different forms of being written, both forms can be set equal to each other. This gives\n. Dividing both sides by  yields the equation , which means . Since it is a requirement that this factor is a perfect square, the discriminant of this factor must by . So, , which can be solved for  to yield . Setting the  values equal to each other gives , which means .",
+    "after": "The correct answer is $4$. It is given that $g(x)$ has two distinct values such that $g(x)=0$. Since $g(x)$ is a polynomial function with a degree of $3$, one of the solutions must be a perfect square. It is given that $g(x)=(x^{2}+bx+c)(x+a)$, so $(x^{2}+bx+c)$ must be a perfect square (note that since $x+a$ is not a factor of $x^{2}+bx+c$, $g(x)$ cannot be written with ${(x+a)}^{2}$ as a term). Since that term is a perfect square, $(\\frac{b}{2})^{2}=c$, so the term can be rewritten as $(x^{2}+bx+\\frac{b^{2}}{4})$. This means that $g(x)$ can be written as $g(x)=(x^{2}+bx+\\frac{b^{2}}{4})(x+a)$ which means that $m=4$.\nAlternatively, since $g(x)$ has two different forms of being written, both forms can be set equal to each other. This gives $(x^{2}+bx+c)(x+a)=(x^{2}+bx+\\frac{b^{2}}{m})(x+a)$. Dividing both sides by $x+a$ yields the equation $x^{2}+bx+c=x^{2}+bx+\\frac{b^{2}}{m}$, which means $c=\\frac{b^{2}}{m}$. Since it is a requirement that this factor is a perfect square, the discriminant of this factor must by $0$. So, $b^{2}-4ac=0$, which can be solved for $c$ to yield $c=\\frac{b^{2}}{4}$. Setting the $c$ values equal to each other gives $\\frac{b^{2}}{m}=\\frac{b^{2}}{4}$, which means $m=4$.",
+    "note": "T7 Math M2 #21: other — explanation lost every Word-equation (OMML) value (\"If , then the –value for  when  is .\") — restored with LaTeX from the docx equations; prose unchanged",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 7/Test7_Math_Answer_Explanations.docx, table for Question 21 (MODULE 2B), m:oMath elements"
+  }
+]
