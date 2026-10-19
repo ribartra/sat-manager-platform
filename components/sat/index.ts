@@ -11,3 +11,13 @@ export { AttemptStatusBadge, INVALIDATED, InvalidatedNotice, VoidableValue, inva
 export { Pagination, pageFromParam, paginate } from "./pagination";
 export { Alert, InlineError, type AlertTone, type AlertLayout } from "./alert";
 export { NotFoundView } from "./not-found-view";
+export { Breadcrumbs, type Crumb } from "./breadcrumbs";
+export { SectionHeader } from "./section-header";
+export { StatTile, StatGrid, Delta, ChipStat } from "./stat-tile";
+export { LinkTr, RowLink, RowAction, ChevronCell, SimpleTable, TD } from "./link-table";
+export { LinkTabs } from "./link-tabs";
+export { AreaSummaryCard, AreaPracticeRow, studentAreaCardProps, type AreaSummaryCardProps } from "./area-summary-card";
+export { TestMiniCard, TestResultSentence, TestAttemptResultCell, TestTotalCell, TestSectionScore } from "./test-cards";
+export { PracticeAttemptsTable, TestAttemptsTable, type PracticeAttemptRow } from "./attempts-table";
+export { SkillsMap, SkillsMapLegend, SkillDifficultyMatrix, DIFFICULTIES, type SkillsMapSkill, type SkillsMapChip, type MatrixCell, type ChipState } from "./skills-map";
+export { AttentionCard, AttentionItem, DateCell, StudentCell } from "./teacher-ui";

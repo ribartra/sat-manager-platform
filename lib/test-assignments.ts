@@ -94,7 +94,8 @@ export async function loadStudentTests(studentId: string): Promise<StudentTestIt
         dueDate: a.dueDate,
         status: a.status,
         state,
-        overdue: state !== "done" && Boolean(a.dueDate && a.dueDate < today),
+        // A retake (the Test was already finished once) is never overdue.
+        overdue: state !== "done" && !lastSubmitted && Boolean(a.dueDate && a.dueDate < today),
         modules: openAttempt?.view?.modules ?? moduleViewsForTest(a.test.modules),
         openAttempt,
         attempts,

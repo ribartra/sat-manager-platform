@@ -1,16 +1,15 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PageShell } from "@/components/sat";
+import { PageShell, PracticeAttemptsTable, SectionHeader } from "@/components/sat";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { AreaTag } from "@/components/sat/practice-set-row";
-import { DueLine, Pct, WorkStatusBadges } from "@/components/sat/work-status";
+import { DueLine, WorkStatusBadges } from "@/components/sat/work-status";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
 import { practiceAreaLabel, tabFromPracticeArea } from "@/lib/practice-area";
 import { loadStudentPractice } from "@/lib/student-practice";
-import { formatDate } from "@/lib/utils";
 
 /** Practice set intro: what it is, due date, previous tries, and Start / Continue. */
 export async function PracticeIntro({ studentId, assignmentId }: { studentId: string; assignmentId: string }) {
@@ -43,21 +42,8 @@ export async function PracticeIntro({ studentId, assignmentId }: { studentId: st
 
         {item.tries.length > 0 ? (
           <div className="mt-5">
-            <h2 className="mb-1 text-sm font-semibold text-gray-900">Your previous attempts</h2>
-            <table className="w-full text-sm">
-              <thead className="text-left text-xs text-gray-500">
-                <tr><th className="py-1">Attempt</th><th>Completed</th><th>Score</th></tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {item.tries.map((t) => (
-                  <tr key={t.id}>
-                    <td className="py-1.5"><Link href={`/student/results/${t.id}`} className="text-blue-600 hover:underline">Try {t.tryNumber}</Link></td>
-                    <td className="text-gray-600">{formatDate(t.submittedAt)}</td>
-                    <td>{t.correct} of {t.total} · <Pct value={t.pct} className="font-semibold" /></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <SectionHeader size="sm" title="Your previous attempts" description="Click a try to review it." />
+            <PracticeAttemptsTable rows={item.tries} hrefFor={(id) => `/student/results/${id}`} />
           </div>
         ) : null}
 

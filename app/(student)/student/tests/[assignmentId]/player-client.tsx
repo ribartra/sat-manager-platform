@@ -157,6 +157,9 @@ export function FullTestPlayer({
   const [advancing, setAdvancing] = useState(false);
   const [confirmSubmitModule, setConfirmSubmitModule] = useState(false);
   const [showNav, setShowNav] = useState(false);
+  // "Check your work" page shown after the last question (mockup take.js), before submitting.
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [timerHidden, setTimerHidden] = useState(false);
   const offlineKey = `sat-fpt-autosave:${attemptId}`;
   const currentModule = modules[moduleIndex];
   const question = currentModule?.questions[questionIndex];
@@ -671,7 +674,8 @@ export function FullTestPlayer({
       scheduleSave(INTERACTION_SAVE_DELAY_MS);
       return;
     }
-    setConfirmSubmitModule(true);
+    recordQuestionTime();
+    setReviewOpen(true);
   }
 
   // Back within the CURRENT module only (Digital SAT rule: no returning to a submitted module).
@@ -690,6 +694,7 @@ export function FullTestPlayer({
     setQuestionIndex(target);
     scheduleSave(INTERACTION_SAVE_DELAY_MS);
     setShowNav(false);
+    setReviewOpen(false);
   }
 
   function toggleMarked(questionId: string) {
@@ -788,7 +793,7 @@ export function FullTestPlayer({
   return (
     <div className="flex h-dvh max-h-dvh flex-col overflow-hidden bg-white">
       <PlayerShortcuts
-        enabled={!confirmSubmitModule && !showNav}
+        enabled={!confirmSubmitModule && !showNav && !reviewOpen}
         onPrevious={previous}
         onNext={() => {
           if (!isLastQuestionOfModule) next();
@@ -827,9 +832,18 @@ export function FullTestPlayer({
               <span className="text-xs font-semibold uppercase tracking-wide">Extra time</span>
               +{formatTime(overtime)}
             </span>
+          ) : timerHidden && !timerIsRed ? (
+            <button type="button" onClick={() => setTimerHidden(false)} className="text-xs font-medium text-gray-500 underline hover:text-gray-800">
+              Show timer
+            </button>
           ) : (
-            <span className={`tabular-nums ${timerIsRed ? "text-red-600" : "text-gray-900"}`}>
-              {formatTime(remaining)}
+            <span className="flex items-center gap-2">
+              <span className={`tabular-nums ${timerIsRed ? "text-red-600" : "text-gray-900"}`}>{formatTime(remaining)}</span>
+              {!timerIsRed ? (
+                <button type="button" onClick={() => setTimerHidden(true)} className="text-xs text-gray-400 underline hover:text-gray-700">
+                  Hide
+                </button>
+              ) : null}
             </span>
           )}
           <Button
@@ -853,6 +867,46 @@ export function FullTestPlayer({
           Time&apos;s up for this module. You can keep working — your teacher will see the extra time you use.
         </Alert>
       )}
+      {reviewOpen ? (
+        <div className="min-h-0 flex-1 overflow-y-auto p-6">
+          <div className="mx-auto max-w-2xl">
+            <h2 className="text-2xl font-semibold text-gray-900">Check your work</h2>
+            <p className="mt-1 text-sm text-gray-600">
+              {unansweredInModule > 0
+                ? `${unansweredInModule} question${unansweredInModule === 1 ? " is" : "s are"} still unanswered. `
+                : "Every question has an answer. "}
+              {markedInModule > 0 ? `${markedInModule} marked for review. ` : ""}
+              Click a question to go back to it. When you are ready, submit the module.
+            </p>
+            <div className="mt-5 rounded-lg border border-gray-200 p-4">
+              <p className="mb-3 text-sm font-semibold text-gray-900">{currentModule.name}</p>
+              <div className="grid grid-cols-6 gap-2 sm:grid-cols-10">
+                {currentModule.questions.map((q, i) => (
+                  <button
+                    key={q.id}
+                    type="button"
+                    onClick={() => goToQuestion(i)}
+                    aria-label={`Question ${i + 1}${marked.has(q.id) ? ", marked for review" : ""}${answers[q.id] ? ", answered" : ", unanswered"}`}
+                    className={cn(
+                      "relative h-9 rounded border text-xs font-medium",
+                      answers[q.id] ? "border-green-400 bg-green-50 text-green-700" : "border-dashed border-gray-300 text-gray-600 hover:bg-gray-50",
+                      marked.has(q.id) && "ring-2 ring-amber-400 ring-offset-1",
+                    )}
+                  >
+                    {i + 1}
+                    {marked.has(q.id) ? <Flag size={9} className="absolute -right-1 -top-1 fill-amber-400 text-amber-500" aria-hidden /> : null}
+                  </button>
+                ))}
+              </div>
+              <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-gray-500">
+                <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded border border-green-400 bg-green-100" /> Answered</span>
+                <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded border border-dashed border-gray-300 bg-white" /> Unanswered</span>
+                <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded border border-gray-200 bg-white ring-2 ring-amber-400 ring-offset-1" /> Marked</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
       <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden md:grid-cols-2">
         <div
           className={cn(
@@ -968,16 +1022,29 @@ export function FullTestPlayer({
           </details>
         </div>
       </div>
+      )}
       <div className="flex items-center justify-between border-t border-gray-200 px-6 py-3">
-        <Button variant="ghost" size="sm" onClick={previous} disabled={advancing || questionIndex === 0}>
-          <ChevronLeft size={16} className="mr-1" /> Back
-        </Button>
+        {reviewOpen ? (
+          <Button variant="ghost" size="sm" onClick={() => setReviewOpen(false)} disabled={advancing}>
+            <ChevronLeft size={16} className="mr-1" /> Back
+          </Button>
+        ) : (
+          <Button variant="ghost" size="sm" onClick={previous} disabled={advancing || questionIndex === 0}>
+            <ChevronLeft size={16} className="mr-1" /> Back
+          </Button>
+        )}
         <Button variant="secondary" size="sm" onClick={() => setShowNav((value) => !value)}>
-          <List size={14} className="mr-1" /> Questions
+          <List size={14} className="mr-1" /> {reviewOpen ? "Questions" : `Question ${questionIndex + 1} of ${currentModule.questions.length}`}
         </Button>
-        <Button onClick={next} disabled={advancing}>
-          {isLastQuestionOfModule ? "Finish" : "Next"}
-        </Button>
+        {reviewOpen ? (
+          <Button onClick={() => setConfirmSubmitModule(true)} disabled={advancing}>
+            Submit module
+          </Button>
+        ) : (
+          <Button onClick={next} disabled={advancing}>
+            {isLastQuestionOfModule ? "Review" : "Next"}
+          </Button>
+        )}
       </div>
       {showNav && (
         <div
@@ -1025,13 +1092,15 @@ export function FullTestPlayer({
               <Button
                 type="button"
                 size="sm"
+                variant="secondary"
                 disabled={advancing}
                 onClick={() => {
+                  recordQuestionTime();
                   setShowNav(false);
-                  setConfirmSubmitModule(true);
+                  setReviewOpen(true);
                 }}
               >
-                Submit module
+                Go to review page
               </Button>
             </div>
           </div>

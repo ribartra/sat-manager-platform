@@ -56,6 +56,8 @@ interface PlayerProps {
   savedTime: number;
   savedTimeSpent: Record<string, number>;
   setName: string;
+  /** Skill of the set, shown with each question (mockup take.js question header). */
+  skillName?: string;
   showCalculator: boolean;
   calculatorConfig: CalculatorConfig;
   feedbackMode?: "IMMEDIATE" | "AFTER_SET";
@@ -106,6 +108,7 @@ export function PracticeSetPlayer({
   savedTime,
   savedTimeSpent,
   setName,
+  skillName,
   showCalculator,
   calculatorConfig,
   feedbackMode = "AFTER_SET",
@@ -127,6 +130,9 @@ export function PracticeSetPlayer({
   const [checkError, setCheckError] = useState("");
   const [elapsed, setElapsed] = useState(savedTime);
   const [showNav, setShowNav] = useState(false);
+  // "Check your work" page after the last question, before submitting (mockup take.js).
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [timerHidden, setTimerHidden] = useState(false);
   const [saving, setSaving] = useState<SaveStatus>("idle");
   const [submitting, setSubmitting] = useState(false);
   const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -342,6 +348,7 @@ export function PracticeSetPlayer({
     await saveProgress(answers, idx);
     setCurrent(idx);
     setShowNav(false);
+    setReviewOpen(false);
   };
 
   const handlePauseExit = async () => {
@@ -405,6 +412,7 @@ export function PracticeSetPlayer({
     router.push(resultHref ?? `/student/results/${attemptId}`);
   };
 
+  const blankCount = questions.filter((q) => !answers[q.id]).length;
   const timerColor =
     elapsed > 0 && elapsed < 300
       ? "text-gray-700"
@@ -417,6 +425,7 @@ export function PracticeSetPlayer({
   return (
     <>
       <PlayerShortcuts
+        enabled={!reviewOpen && !showNav}
         onPrevious={() => current > 0 && void handleNavigate(current - 1)}
         onNext={() => current < questions.length - 1 && void handleNavigate(current + 1)}
         onMark={() => toggleMarked(question.id)}
@@ -459,14 +468,54 @@ export function PracticeSetPlayer({
               style={{ width: `${((current + 1) / questions.length) * 100}%` }}
             />
           </div>
-          <span className={cn("font-mono text-sm font-medium", timerColor)}>
-            {formatTime(elapsed)}
-          </span>
+          {timerHidden ? (
+            <button type="button" onClick={() => setTimerHidden(false)} className="text-xs font-medium text-gray-500 underline hover:text-gray-800">
+              Show timer
+            </button>
+          ) : (
+            <span className="flex items-center gap-2">
+              <span className={cn("font-mono text-sm font-medium", timerColor)}>{formatTime(elapsed)}</span>
+              <button type="button" onClick={() => setTimerHidden(true)} className="text-xs text-gray-400 underline hover:text-gray-700">
+                Hide
+              </button>
+            </span>
+          )}
           <SaveIndicator compact status={saving} />
         </div>
       </div>
 
-      {/* Two-column player — left: stimulus + stem; right: alternatives */}
+      {reviewOpen ? (
+        <div className="min-h-0 flex-1 overflow-y-auto p-6">
+          <div className="mx-auto max-w-2xl">
+            <h2 className="text-2xl font-semibold text-gray-900">Check your work</h2>
+            <p className="mt-1 text-sm text-gray-600">
+              {blankCount > 0 ? `${blankCount} question${blankCount === 1 ? " is" : "s are"} still unanswered. ` : "Every question has an answer. "}
+              {marked.size > 0 ? `${marked.size} marked for review. ` : ""}
+              Click a question to go back to it. When you are ready, submit the set.
+            </p>
+            <div className="mt-5 rounded-lg border border-gray-200 p-4">
+              <p className="mb-3 text-sm font-semibold text-gray-900">{setName}</p>
+              <div className="grid grid-cols-6 gap-2 sm:grid-cols-10">
+                {questions.map((q, i) => (
+                  <button
+                    key={q.id}
+                    type="button"
+                    onClick={() => void handleNavigate(i)}
+                    aria-label={`Question ${i + 1}${marked.has(q.id) ? ", marked for review" : ""}${answers[q.id] ? ", answered" : ", unanswered"}`}
+                    className={cn(
+                      "h-9 rounded border text-xs font-medium",
+                      answers[q.id] ? "border-green-400 bg-green-50 text-green-700" : "border-dashed border-gray-300 text-gray-600 hover:bg-gray-50",
+                      marked.has(q.id) && "ring-2 ring-amber-400 ring-offset-1",
+                    )}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
       <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden md:grid-cols-2">
         {/* Left: stimulus + enunciado */}
         <div
@@ -496,6 +545,7 @@ export function PracticeSetPlayer({
             <div className="flex items-baseline gap-2">
               <span className="text-4xl font-bold leading-none tabular-nums text-gray-900">{current + 1}</span>
               <p className="text-xs font-medium uppercase tracking-wide text-gray-500">{questionResponseLabel(responseType)}</p>
+              {skillName ? <p className="hidden truncate text-xs text-gray-500 sm:block">· {skillName}</p> : null}
             </div>
             <div className="flex items-center gap-1">
               <KeyboardShortcutsHint choices={responseType === "MC"} />
@@ -645,13 +695,15 @@ export function PracticeSetPlayer({
         </div>
       </div>
 
+      )}
+
       {/* Bottom navigation — always visible in the player viewport */}
       <div className="z-10 flex shrink-0 items-center justify-between border-t border-gray-200 bg-white px-4 py-2.5 sm:px-6">
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => current > 0 && handleNavigate(current - 1)}
-          disabled={current === 0}
+          onClick={() => (reviewOpen ? setReviewOpen(false) : current > 0 && handleNavigate(current - 1))}
+          disabled={!reviewOpen && current === 0}
         >
           <ChevronLeft size={16} className="mr-1" /> Back
         </Button>
@@ -665,9 +717,13 @@ export function PracticeSetPlayer({
           </Button>
         </div>
 
-        {current < questions.length - 1 ? (
+        {current < questions.length - 1 && !reviewOpen ? (
           <Button size="sm" onClick={() => handleNavigate(current + 1)}>
             Next <ChevronRight size={16} className="ml-1" />
+          </Button>
+        ) : !reviewOpen ? (
+          <Button size="sm" onClick={() => setReviewOpen(true)}>
+            Review <ChevronRight size={16} className="ml-1" />
           </Button>
         ) : (
           <Button

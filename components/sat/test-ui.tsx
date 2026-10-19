@@ -20,11 +20,17 @@ export function ModuleTiles({
   modules,
   hrefFor,
   selectedKey,
+  detail = false,
+  statusFor,
   className,
 }: {
   modules: ModuleView[];
   hrefFor: (module: ModuleView) => string | null;
   selectedKey?: string | null;
+  /** Full module name ("Reading and Writing · Module 1") instead of the short one. */
+  detail?: boolean;
+  /** Replaces the default status line (e.g. "Selected" on the module intro). */
+  statusFor?: (module: ModuleView) => React.ReactNode;
   className?: string;
 }) {
   return (
@@ -34,10 +40,12 @@ export function ModuleTiles({
         const body = (
           <>
             <span className={cn("block text-sm font-semibold", SECTION_TEXT[m.section])}>
-              {m.short} <span className="font-normal text-gray-500">· {m.tier}</span>
+              {detail ? m.name : m.short} <span className="font-normal text-gray-500">· {m.tier}</span>
             </span>
             <span className="mt-0.5 block text-xs text-gray-500">
-              {m.state === "done" ? (
+              {statusFor ? (
+                statusFor(m)
+              ) : m.state === "done" ? (
                 <span className="text-green-700">✓ Done · {m.right} of {m.questionCount} correct</span>
               ) : m.state === "progress" ? (
                 <span className="text-amber-700">In progress · continue</span>
@@ -108,8 +116,30 @@ export function ScoreBlocks({ view, actionFor }: { view: TestAttemptView; action
   );
 }
 
-/** One row per module: stacked bar of correct / incorrect / blank, or "Not taken". */
-export function ModuleResultRows({ modules, anchorPrefix = "mod-", actionFor }: { modules: ModuleView[]; anchorPrefix?: string; actionFor?: (m: ModuleView) => React.ReactNode }) {
+/** Legend for ModuleResultRows (mockup test-result.html). */
+export function ModuleResultLegend() {
+  return (
+    <p className="mt-1 flex flex-wrap items-center gap-3 text-xs text-gray-500">
+      <span className="flex items-center gap-1"><span className="inline-block h-2.5 w-2.5 rounded-sm bg-[var(--sat-area-reading)]" /> R&amp;W correct</span>
+      <span className="flex items-center gap-1"><span className="inline-block h-2.5 w-2.5 rounded-sm bg-[var(--sat-area-math)]" /> Math correct</span>
+      <span className="flex items-center gap-1"><span className="inline-block h-2.5 w-2.5 rounded-sm bg-red-400" /> Incorrect</span>
+      <span className="flex items-center gap-1"><span className="inline-block h-2.5 w-2.5 rounded-sm bg-gray-300" /> Blank</span>
+    </p>
+  );
+}
+
+/** One row per module: stacked bar of correct / incorrect / blank, or "Not taken". `timeFor` adds the time spent. */
+export function ModuleResultRows({
+  modules,
+  anchorPrefix = "mod-",
+  actionFor,
+  timeFor,
+}: {
+  modules: ModuleView[];
+  anchorPrefix?: string;
+  actionFor?: (m: ModuleView) => React.ReactNode;
+  timeFor?: (m: ModuleView) => string | null;
+}) {
   return (
     <div className="divide-y divide-gray-100">
       {modules.map((m) => (
@@ -131,7 +161,7 @@ export function ModuleResultRows({ modules, anchorPrefix = "mod-", actionFor }: 
             {m.state === "done" ? (
               <>
                 <span className="font-semibold text-gray-900">{m.right} of {m.questionCount}</span> correct ({m.pct}%)
-                <span className="block">{m.wrong} wrong · {m.blank} blank</span>
+                <span className="block">{m.wrong} wrong · {m.blank} blank{timeFor?.(m) ? <> · <b className="font-medium text-gray-700">{timeFor(m)}</b></> : null}</span>
               </>
             ) : (
               <span className="flex items-center justify-end gap-2">

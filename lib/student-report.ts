@@ -38,6 +38,13 @@ export type WeakSkill = {
   pendingCount: number;
 };
 
+export type SkillMatrixRow = {
+  topicId: string;
+  domainId: string;
+  label: string;
+  cells: Record<string, { correct: number; total: number; tries: number; percent: number }>;
+};
+
 export type ReportAttempt = {
   id: string;
   /** SUBMITTED, or INVALIDATED in the history lists (never in scores/KPIs). */
@@ -49,6 +56,10 @@ export type ReportAttempt = {
   total: number;
   percent: number | null;
   teacherComment: string | null;
+  /** Practice only: try number within its assignment and the set's difficulty. */
+  attemptNumber?: number;
+  assignmentId?: string | null;
+  difficulty?: string | null;
 };
 
 export type PracticeReport = {
@@ -66,6 +77,8 @@ export type PracticeReport = {
   /** Domain → skill labels in the official order (Skills Tracker), for grouped matrices. */
   skillGroups: Array<{ label: string; rows: string[] }>;
   weakSkills: WeakSkill[];
+  /** Skill × difficulty results in the official skill order (skills with data only). */
+  skillMatrix: SkillMatrixRow[];
   trend: { topics: string[]; pointsByTopic: Record<string, TopicTrendPoint[]>; attemptCount: number };
   assignments: Array<{
     id: string;
@@ -219,6 +232,9 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
       total: score.total,
       percent: rows.some(isAnsweredAnswer) ? score.percent : null,
       teacherComment: attempt.teacherComment,
+      attemptNumber: attempt.attemptNumber,
+      assignmentId: attempt.assignmentId,
+      difficulty: attempt.assignment?.practiceSet.difficulty ?? null,
     };
   };
   const attempts = historyAttempts.filter((attempt) => attempt.status === "SUBMITTED");
@@ -292,6 +308,29 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
   // Domain → skills in official order (only skills with data).
   const skillsWithData = [...new Map(allRows.map((row) => [row.topicId, { id: row.topicId, name: row.topicName, domainId: row.domainId, domainName: row.domainName }])).values()]
     .sort((a, b) => domainRank(a.domainId) - domainRank(b.domainId) || compareSkills(a, b));
+  const triesByBucket = new Map<string, Set<string>>();
+  for (const row of allRows) {
+    const key = `${row.topicId}:${row.difficulty}`;
+    (triesByBucket.get(key) ?? triesByBucket.set(key, new Set()).get(key)!).add(row.attemptId);
+  }
+  const skillMatrix: SkillMatrixRow[] = skillsWithData.map((skill) => ({
+    topicId: skill.id,
+    domainId: skill.domainId,
+    label: skill.name,
+    cells: Object.fromEntries(
+      [...buckets.values()]
+        .filter((bucket) => bucket.topicId === skill.id)
+        .map((bucket) => [
+          bucket.difficulty,
+          {
+            correct: bucket.correct,
+            total: bucket.total,
+            tries: triesByBucket.get(`${bucket.topicId}:${bucket.difficulty}`)?.size ?? 0,
+            percent: scorePercent(bucket.correct, bucket.total),
+          },
+        ]),
+    ),
+  }));
   const skillGroups: Array<{ label: string; rows: string[] }> = [];
   for (const skill of skillsWithData) {
     const label = skill.domainName || "Other";
@@ -321,6 +360,7 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
     topicDifficultyMetrics: aggregateTopicDifficultyMetrics(progressRows),
     skillGroups,
     weakSkills,
+    skillMatrix,
     trend: { topics: Object.keys(pointsByTopic), pointsByTopic, attemptCount: trendAttempts.length },
     assignments: assignments.map((a) => ({
       id: a.id,

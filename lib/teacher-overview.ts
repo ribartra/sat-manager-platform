@@ -29,6 +29,7 @@ export interface StudentOverview {
   id: string;
   name: string;
   email: string;
+  avatarUrl: string | null;
   active: boolean;
   lastActiveAt: Date | null;
   areas: Record<PracticeAreaCode, AreaOverview>;
@@ -49,6 +50,7 @@ export async function loadStudentOverviews(studentIds: string[], now = new Date(
       id: true,
       name: true,
       email: true,
+      avatarUrl: true,
       active: true,
       lastActiveAt: true,
       attempts: {
@@ -148,6 +150,7 @@ export async function loadStudentOverviews(studentIds: string[], now = new Date(
       id: s.id,
       name: s.name,
       email: s.email,
+      avatarUrl: s.avatarUrl,
       active: s.active,
       lastActiveAt: activity.sort((a, b) => b.getTime() - a.getTime())[0] ?? null,
       areas,

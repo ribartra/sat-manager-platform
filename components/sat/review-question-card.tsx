@@ -20,7 +20,8 @@ export type ReviewQuestion = {
 /**
  * One answered question in a results page: the student's answer, the correct one and the
  * explanation (open by default when the answer was wrong or blank). `id` is the scroll target of
- * the answer grid.
+ * the answer grid. With `reveal={false}` (the teacher hid the solutions) only the student's own
+ * answer is shown: no right/wrong marks, correct answer or explanation.
  */
 export function ReviewQuestionCard({
   id,
@@ -30,6 +31,8 @@ export function ReviewQuestionCard({
   isCorrect,
   timeSpent,
   tags,
+  reveal = true,
+  blankNote = "You left this question blank. Blank answers count as incorrect.",
   children,
 }: {
   id: string;
@@ -39,11 +42,13 @@ export function ReviewQuestionCard({
   isCorrect: boolean;
   timeSpent?: number | null;
   tags?: React.ReactNode;
+  reveal?: boolean;
+  blankNote?: string;
   children?: React.ReactNode;
 }) {
   const blank = !answer;
   const responseType = resolveQuestionType(question.type, question.options);
-  const state = isCorrect ? "ok" : blank ? "blank" : "bad";
+  const state = blank ? "blank" : !reveal ? "answered" : isCorrect ? "ok" : "bad";
   return (
     <article
       id={id}
@@ -52,6 +57,7 @@ export function ReviewQuestionCard({
         state === "ok" && "border-l-green-500",
         state === "bad" && "border-l-red-500",
         state === "blank" && "border-l-gray-300",
+        state === "answered" && "border-l-blue-300",
       )}
     >
       <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
@@ -61,6 +67,8 @@ export function ReviewQuestionCard({
             <Badge variant="success"><CheckCircle size={12} className="mr-1" /> Correct</Badge>
           ) : state === "bad" ? (
             <Badge variant="danger"><XCircle size={12} className="mr-1" /> Incorrect</Badge>
+          ) : state === "answered" ? (
+            <Badge variant="info">Answered</Badge>
           ) : (
             <Badge><MinusCircle size={12} className="mr-1" /> Blank</Badge>
           )}
@@ -81,20 +89,20 @@ export function ReviewQuestionCard({
         <div className="mb-3 space-y-1">
           {question.options.filter(isAnswerOption).map((opt) => {
             const picked = answer === opt.label;
-            const right = question.correctAnswer === opt.label;
+            const right = reveal && question.correctAnswer === opt.label;
             return (
               <div
                 key={opt.label}
                 className={cn(
                   "flex items-start gap-2 rounded px-2 py-1 text-sm",
-                  right ? "bg-green-50 text-green-800" : picked ? "bg-red-50 text-red-700" : "text-gray-600",
+                  right ? "bg-green-50 text-green-800" : picked ? (reveal ? "bg-red-50 text-red-700" : "bg-blue-50 text-blue-800") : "text-gray-600",
                 )}
               >
                 <span className="w-4 font-medium">{opt.label})</span>
                 <span className="min-w-0 flex-1"><OptionContent text={opt.text} imageUrl={opt.imageUrl} label={opt.label} /></span>
                 {right && picked ? <span className="shrink-0 text-xs font-medium">✓ Your answer · Correct</span> : null}
                 {right && !picked ? <span className="shrink-0 text-xs font-medium">✓ Correct answer</span> : null}
-                {!right && picked ? <span className="shrink-0 text-xs font-medium">✗ Your answer</span> : null}
+                {!right && picked ? <span className="shrink-0 text-xs font-medium">{reveal ? "✗ Your answer" : "Your answer"}</span> : null}
               </div>
             );
           })}
@@ -104,16 +112,18 @@ export function ReviewQuestionCard({
           <span className="rounded border border-gray-200 px-2 py-1 text-gray-600">
             Your answer: <span className="font-medium text-gray-900">{answer || <em className="text-gray-400">blank</em>}</span>
           </span>
-          <span className="rounded border border-green-200 bg-green-50 px-2 py-1 text-green-800">
-            Correct answer: <span className="font-medium">{formatCorrectAnswer(question.correctAnswer)}</span>
-          </span>
+          {reveal ? (
+            <span className="rounded border border-green-200 bg-green-50 px-2 py-1 text-green-800">
+              Correct answer: <span className="font-medium">{formatCorrectAnswer(question.correctAnswer)}</span>
+            </span>
+          ) : null}
         </div>
       )}
 
-      {blank ? <p className="mb-2 text-xs italic text-gray-500">You left this question blank. Blank answers count as incorrect.</p> : null}
+      {blank ? <p className="mb-2 text-xs italic text-gray-500">{blankNote}</p> : null}
       {children}
 
-      {question.explanation ? (
+      {reveal && question.explanation ? (
         <details className="mt-2 border-t border-gray-100 pt-2" open={!isCorrect}>
           <summary className="cursor-pointer select-none text-xs font-medium text-gray-600">Explanation</summary>
           <MathContent content={question.explanation} className="mt-1 text-sm text-gray-700" />

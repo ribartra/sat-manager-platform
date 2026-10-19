@@ -13,15 +13,17 @@ const OPEN_FOR_OVERDUE = { in: ["PENDING", "IN_PROGRESS"] };
  */
 export async function markOverdueAssignments(now = new Date()) {
   const where = { dueDate: { lt: now }, status: OPEN_FOR_OVERDUE };
+  // A Test finished at least once met its due date: a student's retake is never "overdue".
+  const examWhere = { ...where, attempts: { none: { status: "SUBMITTED" } } };
   const [practice, exams] = await Promise.all([
     withSqliteRetry(() => prisma.assignment.count({ where })),
-    withSqliteRetry(() => prisma.fullPracticeTestAssignment.count({ where })),
+    withSqliteRetry(() => prisma.fullPracticeTestAssignment.count({ where: examWhere })),
   ]);
   if (practice > 0) {
     await withSqliteRetry(() => prisma.assignment.updateMany({ where, data: { status: "OVERDUE" } }));
   }
   if (exams > 0) {
-    await withSqliteRetry(() => prisma.fullPracticeTestAssignment.updateMany({ where, data: { status: "OVERDUE" } }));
+    await withSqliteRetry(() => prisma.fullPracticeTestAssignment.updateMany({ where: examWhere, data: { status: "OVERDUE" } }));
   }
 }
 

@@ -37,7 +37,7 @@ async function assertSourcePatterns() {
     },
     {
       file: "app/(student)/student/history/page.tsx",
-      requires: ["PracticeAreaTabs", "practiceArea", 'area === "tests"'],
+      requires: ["HISTORY_TABS", "LinkTabs", "practiceArea", 'area === "tests"'],
       label: "History sin Section redundante y con Tests",
     },
     {

@@ -7,6 +7,8 @@ import { DueLine } from "@/components/sat/work-status";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import prisma from "@/lib/prisma";
+import { getFeatureSetting } from "@/lib/app-settings";
 import { fullTestModulesForAttempt } from "@/lib/full-test-snapshot";
 import { buildTestAttemptView, moduleViewsForTest, type ModuleView } from "@/lib/test-view";
 
@@ -60,6 +62,22 @@ export async function TestIntro({
 
   const base = `/student/tests/${assignment.id}`;
   const startHref = `${base}?module=${current.key}&start=1`;
+  const [attemptCount, calculator] = await Promise.all([
+    prisma.fullPracticeTestAttempt.count({ where: { assignmentId: assignment.id } }),
+    getFeatureSetting("CALCULATOR_FULL_TESTS"),
+  ]);
+  // The open attempt is already counted; a first start is try 1.
+  const tryNumber = attempt ? attemptCount : attemptCount + 1;
+  const statusFor = (m: ModuleView) =>
+    m.state === "done" ? (
+      <span className="text-green-700">✓ Done · view results</span>
+    ) : m.key === current.key ? (
+      <span className="font-medium text-blue-700">Selected</span>
+    ) : m.state === "progress" ? (
+      <span className="text-amber-700">In progress</span>
+    ) : (
+      <>Not started · {m.questionCount} questions · {m.minutes} min</>
+    );
 
   return (
     <PageShell>
@@ -73,7 +91,7 @@ export async function TestIntro({
       />
       <Card padding="lg" className="mx-auto max-w-3xl">
         <div className="flex flex-wrap items-center gap-1.5">
-          <Badge className="bg-gray-900 text-white">{assignment.test.name}</Badge>
+          <Badge className="bg-gray-900 text-white">{assignment.test.name}{tryNumber > 1 ? ` · try ${tryNumber}` : ""}</Badge>
           <Badge>{current.tier}</Badge>
           {current.state === "progress" ? <Badge variant="warning">In progress</Badge> : null}
         </div>
@@ -85,14 +103,19 @@ export async function TestIntro({
 
         <div className="mt-5 rounded-lg border border-gray-200 bg-gray-50 p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Directions</p>
-          <p className="mt-1 text-sm text-gray-700">{DIRECTIONS[current.section]}</p>
+          <p className="mt-1 text-sm text-gray-700">
+            {DIRECTIONS[current.section]}
+            {current.section === "MATH" && calculator ? " You may use a calculator." : ""}
+          </p>
         </div>
 
         <h2 className="mt-6 text-sm font-semibold text-gray-900">Modules in this test</h2>
         <p className="mb-2 text-xs text-gray-500">You can take the modules in any order. A submitted module can&apos;t be changed.</p>
         <ModuleTiles
+          detail
           modules={modules}
           selectedKey={current.key}
+          statusFor={statusFor}
           hrefFor={(m) => (m.state === "done" && attempt ? `/student/tests/results/${attempt.id}#mod-${m.key}` : `${base}?module=${m.key}`)}
         />
 

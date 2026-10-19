@@ -26,8 +26,13 @@ const checks = [
   },
   {
     file: "app/(student)/student/tests/results/[attemptId]/page.tsx",
-    requires: ['attempt.status === "IN_PROGRESS"', "InvalidatedNotice", "VoidableValue", "markedForReview"],
+    requires: ['attempt.status === "IN_PROGRESS"', "InvalidatedNotice", "TestResultSentence", "TestAttemptsTable", "markedForReview"],
     label: "Resultados FPT: intento abierto muestra solo modulos enviados; invalidados tachados; herramientas de revision",
+  },
+  {
+    file: "components/sat/test-cards.tsx",
+    requires: ["VoidableValue", "view.total !== null", "Not available until all modules are done"],
+    label: "Bloques de Test: total solo con los 4 modulos; intentos invalidados tachados",
   },
   {
     file: "lib/student-report.ts",
@@ -46,8 +51,13 @@ const checks = [
   },
   {
     file: "app/(student)/student/results/[attemptId]/page.tsx",
-    requires: ["canRevealSolutions", "explanationVisibility", "QuestionMedia", "questionSnapshot"],
+    requires: ["canRevealSolutions", "explanationVisibility", "ReviewQuestionCard", "reveal={canRevealSolutions}", "questionSnapshot"],
     label: "Resultados respetan visibilidad de soluciones y snapshots/media",
+  },
+  {
+    file: "components/sat/review-question-card.tsx",
+    requires: ["QuestionMedia", "imageUrl", "reveal && question.explanation", "reveal && question.correctAnswer"],
+    label: "Tarjeta de revision muestra media y oculta respuesta/explicacion cuando el profesor las esconde",
   },
   {
     file: "app/(student)/student/practice/player-client.tsx",

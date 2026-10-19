@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { InvalidatedNotice, PageShell, VoidableValue, isInvalidated } from "@/components/sat";
+import { InvalidatedNotice, PageShell, SectionHeader, TestAttemptsTable, TestResultSentence, isInvalidated } from "@/components/sat";
+import { RetakeTestButton } from "@/components/sat/retake-test-button";
 import { Alert } from "@/components/sat/alert";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { ReviewQuestionCard } from "@/components/sat/review-question-card";
-import { AnswerGrid, AnswerGridLegend, ModuleResultRows, ScoreBlocks } from "@/components/sat/test-ui";
+import { AnswerGrid, AnswerGridLegend, ModuleResultLegend, ModuleResultRows, ScoreBlocks } from "@/components/sat/test-ui";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -36,7 +37,7 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
     where: { id: attemptId, studentId: session!.user.id },
     include: {
       test: { select: { name: true, reviewEnabled: true } },
-      assignment: { select: { id: true, dueDate: true, createdAt: true } },
+      assignment: { select: { id: true, dueDate: true, createdAt: true, status: true } },
       answers: true,
       pauses: true,
     },
@@ -64,6 +65,9 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
     select: { id: true, status: true, startedAt: true, submittedAt: true, rwScore: true, mathScore: true, totalScore: true },
   });
   const tryNumber = siblings.findIndex((s) => s.id === attempt.id) + 1;
+  const attemptRows = siblings.map((s, i) => ({ ...s, tryNumber: i + 1, view: s.id === attempt.id && inProgress ? view : null }));
+  const canRetake = attempt.assignment?.status === "COMPLETED" && !siblings.some((s) => s.status === "IN_PROGRESS");
+  const timeByModule = modules.map((m) => m.questions.reduce((sum, q) => sum + (attempt.answers.find((a) => a.questionId === q.questionId)?.timeSpent ?? 0), 0));
 
   const answersByQuestion = new Map(attempt.answers.map((answer) => [answer.questionId, answer]));
   const overtime = overtimeByModule(attempt.moduleTimerState, modules.length);
@@ -137,32 +141,29 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
             {attempt.assignment?.dueDate ? <> · Due {formatDate(attempt.assignment.dueDate)}</> : null}
           </p>
         </div>
-        <Button asChild variant="ghost" size="sm">
-          <Link href="/student/tests">All tests</Link>
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          {canRetake && attempt.assignmentId ? <RetakeTestButton assignmentId={attempt.assignmentId} testName={attempt.test.name} /> : null}
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/student/tests">All tests</Link>
+          </Button>
+        </div>
       </div>
 
       {invalidated ? <InvalidatedNotice audience="student" /> : null}
 
-      <Card padding="md" className="mb-4 text-sm text-gray-700">
-        {view.total !== null ? (
-          <>You completed all 4 modules. Your total score is <b><VoidableValue status={attempt.status}>{view.total}</VoidableValue></b> out of 1600.</>
-        ) : (
-          <>
-            You completed <b>{doneModules.length} of 4 modules</b>
-            {doneModules.length ? ` (${doneModules.map((m) => m.short).join(", ")})` : ""}.{" "}
-            {pendingModules.map((m) => m.short).join(", ")} {pendingModules.length === 1 ? "has" : "have"} not been taken yet, so your total score
-            will appear when you finish every module.
-          </>
-        )}
-      </Card>
+      <TestResultSentence view={view} status={attempt.status} who="You" />
 
       <ScoreBlocks view={view} actionFor={(s) => startButton(view.modules.find((m) => m.section === s.section && m.state !== "done"))} />
 
       <Card padding="md" className="mt-4">
         <h2 className="text-sm font-semibold text-gray-900">Results by module</h2>
         <p className="mt-0.5 text-xs text-gray-500">Blank answers count as wrong. Click a module to jump to its questions.</p>
-        <ModuleResultRows modules={view.modules} actionFor={(m) => startButton(m)} />
+        <ModuleResultLegend />
+        <ModuleResultRows
+          modules={view.modules}
+          actionFor={(m) => startButton(m)}
+          timeFor={(m) => (m.state === "done" && timeByModule[m.index] ? formatDuration(timeByModule[m.index]) : null)}
+        />
         {timeNotes.length > 0 ? (
           <ul className="mt-2 space-y-0.5 border-t border-gray-100 pt-2 text-xs text-gray-500">
             {timeNotes.map((note) => <li key={note}>{note}</li>)}
@@ -195,29 +196,10 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
       ) : null}
 
       {siblings.length > 1 ? (
-        <Card padding="md" className="mt-4">
-          <h2 className="mb-2 text-sm font-semibold text-gray-900">All attempts for {attempt.test.name}</h2>
-          <table className="w-full text-sm">
-            <thead className="text-left text-xs text-gray-500">
-              <tr><th className="py-1">Attempt</th><th>Date</th><th>R&amp;W</th><th>Math</th><th>Total</th></tr>
-            </thead>
-            <tbody>
-              {siblings.map((s, i) => (
-                <tr key={s.id} className={s.id === attempt.id ? "bg-blue-50" : ""}>
-                  <td className="py-1.5">
-                    <Link href={`/student/tests/results/${s.id}`} className="hover:underline">Try {i + 1}</Link>
-                    {s.id === attempt.id ? <Badge variant="info" className="ml-2">Viewing</Badge> : null}
-                    {s.status === "IN_PROGRESS" ? <Badge variant="warning" className="ml-2">In progress</Badge> : null}
-                  </td>
-                  <td>{formatDate(s.submittedAt ?? s.startedAt)}</td>
-                  <td><VoidableValue status={s.status}>{s.rwScore ?? "—"}</VoidableValue></td>
-                  <td><VoidableValue status={s.status}>{s.mathScore ?? "—"}</VoidableValue></td>
-                  <td className="font-semibold"><VoidableValue status={s.status}>{s.totalScore ?? "—"}</VoidableValue></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </Card>
+        <section className="mt-4">
+          <SectionHeader title={`All attempts for ${attempt.test.name}`} description="Every try is kept. Click one to see it." />
+          <TestAttemptsTable rows={attemptRows} hrefFor={(id) => `/student/tests/results/${id}`} viewingId={attempt.id} />
+        </section>
       ) : null}
 
       {attempt.test.reviewEnabled ? (

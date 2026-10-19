@@ -64,7 +64,7 @@ export function PracticeSetRow({ item, showArea = false }: { item: PracticeSetIt
   );
 }
 
-/** Horizontal % bars (weakest first). */
+/** Horizontal % bars (mockup `hbars`); rows without data show a striped bar. */
 export function PctBars({ rows }: { rows: { label: string; pct: number | null; sub?: string; href?: string; color?: string }[] }) {
   return (
     <div className="space-y-2.5">
@@ -75,9 +75,7 @@ export function PctBars({ rows }: { rows: { label: string; pct: number | null; s
               <span className="font-medium text-gray-800">{r.label}{r.sub ? <span className="ml-1 text-xs font-normal text-gray-400">· {r.sub}</span> : null}</span>
               <span className="shrink-0">{r.pct === null ? <span className="text-xs text-gray-400">No data yet</span> : <Pct value={r.pct} className="font-semibold" />}</span>
             </div>
-            <div className="h-2 rounded-full bg-gray-100">
-              <div className="h-2 rounded-full" style={{ width: `${r.pct ?? 0}%`, backgroundColor: r.color ?? "var(--sat-area-math)" }} />
-            </div>
+            <StripedBar pct={r.pct} color={r.color ?? "var(--sat-area-math)"} />
           </>
         );
         return r.href ? (
@@ -86,6 +84,18 @@ export function PctBars({ rows }: { rows: { label: string; pct: number | null; s
           <div key={r.label} className="px-1 py-0.5">{body}</div>
         );
       })}
+    </div>
+  );
+}
+
+/** Progress bar; striped grey when there is no value (mockup `.bar.striped`). */
+export function StripedBar({ pct, color }: { pct: number | null; color: string }) {
+  if (pct === null) {
+    return <div className="h-2 rounded-full bg-[repeating-linear-gradient(45deg,#f3f4f6,#f3f4f6_6px,#e5e7eb_6px,#e5e7eb_12px)]" aria-hidden />;
+  }
+  return (
+    <div className="h-2 rounded-full bg-gray-100" aria-hidden>
+      <div className="h-2 rounded-full" style={{ width: `${pct}%`, backgroundColor: color }} />
     </div>
   );
 }

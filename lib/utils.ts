@@ -31,6 +31,11 @@ export function formatDate(date: Date | string): string {
   });
 }
 
+/** Time of day, "3:42 PM". */
+export function formatClock(date: Date | string): string {
+  return new Date(date).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+}
+
 export function scorePercent(correct: number, total: number): number {
   if (total === 0) return 0;
   return Math.round((correct / total) * 100);

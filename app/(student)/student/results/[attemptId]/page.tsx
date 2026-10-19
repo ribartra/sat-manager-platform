@@ -1,27 +1,25 @@
-import { InvalidatedNotice, PageShell, VoidableValue } from "@/components/sat";
+import { Delta, InvalidatedNotice, PageShell, PracticeAttemptsTable, SectionHeader, VoidableValue } from "@/components/sat";
+import { ReviewQuestionCard } from "@/components/sat/review-question-card";
+import { ResultFilterBar, ResultFilterEmpty, ResultFilterRoot, ResultFilterSegments } from "@/components/sat/result-filter";
+import { Button } from "@/components/ui/button";
+import { parseEliminatedOptions } from "@/lib/answer-review-meta";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
-import { formatDate, formatDuration, formatTime } from "@/lib/utils";
+import { formatClock, formatDate, formatDuration } from "@/lib/utils";
 import { shortSetName } from "@/lib/student-report";
 import { scoreBandTextClass } from "@/lib/score-band";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { MathContent } from "@/components/math-content";
-import { OptionContent } from "@/components/option-content";
-import { QuestionMedia } from "@/components/question-media";
-import { CheckCircle, XCircle, MinusCircle, RotateCcw } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 import { parseSnapshot, PracticeSetSnapshot, QuestionSnapshot } from "@/lib/attempt-snapshots";
-import { formatCorrectAnswer } from "@/lib/answer-grading";
-import { resolveQuestionType, isAnswerOption } from "@/lib/question-type";
 import { difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
 import { isAnsweredAnswer, summarizeAllQuestionAnswers } from "@/lib/weighted-score";
 import { Alert } from "@/components/sat/alert";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { AreaTag } from "@/components/sat/practice-set-row";
 import { AnswerGrid, AnswerGridLegend } from "@/components/sat/test-ui";
-import { Pct } from "@/components/sat/work-status";
 import { tabFromPracticeArea, type PracticeAreaCode } from "@/lib/practice-area";
 import { loadStudentPractice, sortPracticeSets } from "@/lib/student-practice";
 import { relativeDay } from "@/lib/utils";
@@ -115,6 +113,13 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
   const perQuestion = attempt.totalTime && totalQuestions ? Math.round(attempt.totalTime / totalQuestions) : null;
   const tryAgainHref = attempt.assignmentId ? `/student/practice/assignment/${attempt.assignmentId}?start=1` : "/student/practice";
 
+  const counts = {
+    ok: canRevealSolutions ? correct : 0,
+    bad: canRevealSolutions ? incorrect : 0,
+    blank: unanswered,
+  };
+  const attemptRows = tries.map((t) => ({ ...t, status: "SUBMITTED" }));
+
   return (
     <PageShell>
       <Breadcrumbs
@@ -128,259 +133,162 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
       {query.new === "1" ? <Alert tone="success" className="mb-4">Practice submitted. Here are your results.</Alert> : null}
 
       {attempt.status === "INVALIDATED" ? <InvalidatedNotice audience="student" /> : null}
-      {/* Score header */}
-      <div className="rounded-xl border border-gray-200 bg-white p-6 mb-6">
-        <div className="mb-1 flex flex-wrap items-center gap-2">
-          {practiceArea ? <AreaTag area={practiceArea} /> : null}
-          {practiceSet ? <Badge variant={difficultyBadgeVariant(practiceSet.difficulty)}>{difficultyLabel(practiceSet.difficulty)}</Badge> : null}
-          <Badge>Try {thisTry?.tryNumber ?? attempt.attemptNumber} of {Math.max(tries.length, 1)}</Badge>
-        </div>
-        <h1 className="text-xl font-semibold text-gray-900 mb-1">
-          {practiceSet?.topic.name ?? shortSetName(practiceSetSnapshot?.name ?? "Practice set")}
-        </h1>
-        <p className="text-xs text-gray-500 mb-4">
-          {attempt.submittedAt ? <>Completed <b className="font-medium text-gray-700">{formatDate(attempt.submittedAt)}</b> ({relativeDay(attempt.submittedAt)})</> : null}
-          {attempt.assignment?.createdAt ? <> · Assigned {formatDate(attempt.assignment.createdAt)}</> : null}
-        </p>
-
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <div className="text-center">
-            <p className="text-3xl font-bold text-gray-900"><VoidableValue status={attempt.status}>{correct}/{totalQuestions}</VoidableValue></p>
-            <p className="text-xs text-gray-500 mt-0.5">Correct answers</p>
+      <ResultFilterRoot>
+        {/* Score header */}
+        <Card padding="lg" className="mb-6">
+          <div className="mb-1 flex flex-wrap items-center gap-2">
+            {practiceArea ? <AreaTag area={practiceArea} /> : null}
+            {practiceSet ? <Badge variant={difficultyBadgeVariant(practiceSet.difficulty)}>{difficultyLabel(practiceSet.difficulty)}</Badge> : null}
+            <Badge>Try {thisTry?.tryNumber ?? attempt.attemptNumber} of {Math.max(tries.length, 1)}</Badge>
           </div>
-          <div className="text-center">
-            <p className={`text-3xl font-bold ${scoreBandTextClass(displayPct)}`}>
-              <VoidableValue status={attempt.status}>{displayPct}%</VoidableValue>
-            </p>
-            <p className="text-xs text-gray-500 mt-0.5">Score</p>
-          </div>
-          <div className="text-center">
-            <p className="text-3xl font-bold text-gray-900">{attempt.totalTime ? formatDuration(attempt.totalTime) : "—"}</p>
-            <p className="text-xs text-gray-500 mt-0.5">Time</p>
-          </div>
-          <div className="text-center">
-            <p className="text-sm">
-              <span className="text-green-600">{correct} right</span>
-              {" · "}
-              <span className="text-red-500">{incorrect} wrong</span>
-              {" · "}
-              <span className="text-gray-500">{unanswered} blank</span>
-            </p>
-            <p className="text-xs text-gray-500 mt-0.5">Your answers</p>
-          </div>
-        </div>
-
-        {delta !== null ? (
-          <p className={`mt-3 text-xs ${delta >= 0 ? "text-green-700" : "text-red-600"}`}>
-            {delta >= 0 ? "▲" : "▼"} {Math.abs(delta)} points vs. try {prevTry!.tryNumber} ({prevTry!.pct}%)
+          <h1 className="mb-1 text-xl font-semibold text-gray-900">
+            {practiceSet?.topic.name ?? shortSetName(practiceSetSnapshot?.name ?? "Practice set")}
+          </h1>
+          <p className="mb-4 text-xs text-gray-500">
+            {attempt.submittedAt ? (
+              <>
+                Completed <b className="font-medium text-gray-700">{formatDate(attempt.submittedAt)}</b> at {formatClock(attempt.submittedAt)} ({relativeDay(attempt.submittedAt)})
+              </>
+            ) : null}
+            {attempt.assignment?.createdAt ? <> · Assigned {formatDate(attempt.assignment.createdAt)}</> : null}
           </p>
+
+          <div className="grid gap-5 md:grid-cols-[auto_1fr] md:items-center">
+            <div>
+              <p className={`text-5xl font-bold leading-none ${scoreBandTextClass(displayPct)}`}>
+                <VoidableValue status={attempt.status}>{displayPct}%</VoidableValue>
+              </p>
+              <p className="mt-1 text-sm text-gray-600">
+                <VoidableValue status={attempt.status}>{correct} of {totalQuestions} correct</VoidableValue>
+              </p>
+              {delta !== null ? <Delta value={delta} suffix={`vs. try ${prevTry!.tryNumber} (${prevTry!.pct}%)`} className="mt-1 block" /> : null}
+            </div>
+            <div>
+              <p className="text-sm text-gray-700">
+                You answered <b className="text-green-700">{correct} correctly</b>, <b className="text-red-600">{incorrect} incorrectly</b> and left{" "}
+                <b className="text-gray-600">{unanswered} blank</b>.
+              </p>
+              <div className="mt-1.5">
+                <ResultFilterBar counts={{ ok: correct, bad: incorrect, blank: unanswered }} interactive={canRevealSolutions} />
+              </div>
+              <p className="mt-1 text-xs text-gray-500">
+                {canRevealSolutions ? "Click a colour to see only those questions. " : ""}
+                {attempt.totalTime ? <>{formatDuration(attempt.totalTime)} total{perQuestion ? ` · ${formatDuration(perQuestion)} per question on average` : ""}</> : null}
+              </p>
+            </div>
+          </div>
+
+          {attempt.pauses.length > 0 && (
+            <Alert tone="note" className="mt-4 text-xs">
+              Paused {attempt.pauses.length} time{attempt.pauses.length === 1 ? "" : "s"}
+              {pauseSeconds > 0 ? ` (${formatDuration(pauseSeconds)})` : ""}
+            </Alert>
+          )}
+
+          <div className="mt-5 flex flex-wrap items-center gap-2">
+            <Button asChild>
+              <Link href={tryAgainHref}><RotateCcw size={14} /> Try Again</Link>
+            </Button>
+            {nextAssignment ? (
+              <Button asChild variant="secondary" className="max-w-full">
+                <Link href={`/student/practice/assignment/${nextAssignment.assignmentId}`}>
+                  <span className="truncate">Next assignment: {nextAssignment.skill} · {difficultyLabel(nextAssignment.difficulty)}</span>
+                </Link>
+              </Button>
+            ) : null}
+            <Button asChild variant="ghost">
+              <Link href="/student">Summary</Link>
+            </Button>
+          </div>
+        </Card>
+
+        {attempt.teacherComment && (
+          <Card variant="info" padding="md" className="mb-6 text-sm text-blue-900">
+            <p className="mb-1 font-medium">Note from your teacher</p>
+            <p>{attempt.teacherComment}</p>
+          </Card>
+        )}
+
+        {attemptRows.length > 0 ? (
+          <section className="mb-6">
+            <SectionHeader title="All attempts for this set" description="Every time you try again, a new attempt is recorded here." />
+            <PracticeAttemptsTable rows={attemptRows} hrefFor={(id) => `/student/results/${id}`} viewingId={attempt.id} />
+          </section>
         ) : null}
-        <div className="mt-3">
-          <p className="text-sm text-gray-700">
-            You answered <b className="text-green-700">{correct} correctly</b>, <b className="text-red-600">{incorrect} incorrectly</b> and left{" "}
-            <b className="text-gray-600">{unanswered} blank</b>.
-          </p>
-          <div className="mt-1.5 flex h-3 overflow-hidden rounded-full bg-gray-100" aria-label={`${correct} correct, ${incorrect} incorrect, ${unanswered} blank`}>
-            <span className="bg-green-500" style={{ width: `${totalQuestions ? (correct / totalQuestions) * 100 : 0}%` }} />
-            <span className="bg-red-400" style={{ width: `${totalQuestions ? (incorrect / totalQuestions) * 100 : 0}%` }} />
-            <span className="bg-gray-300" style={{ width: `${totalQuestions ? (unanswered / totalQuestions) * 100 : 0}%` }} />
-          </div>
-          {attempt.totalTime ? (
-            <p className="mt-1 text-xs text-gray-500">{formatDuration(attempt.totalTime)} total{perQuestion ? ` · ${formatDuration(perQuestion)} per question on average` : ""}</p>
-          ) : null}
-        </div>
 
-        {attempt.pauses.length > 0 && (
-          <Alert tone="note" className="mt-4 text-xs">
-            Paused {attempt.pauses.length} time{attempt.pauses.length === 1 ? "" : "s"}
-            {pauseSeconds > 0 ? ` (${formatDuration(pauseSeconds)})` : ""}
-          </Alert>
-        )}
-
-        <div className="mt-5 flex items-center gap-3">
-          <Link
-            href={tryAgainHref}
-            className="flex items-center gap-1.5 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-          >
-            <RotateCcw size={14} /> Try Again
-          </Link>
-          {nextAssignment ? (
-            <Link
-              href={`/student/practice/assignment/${nextAssignment.assignmentId}`}
-              className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >
-              Next assignment: {nextAssignment.skill} · {difficultyLabel(nextAssignment.difficulty)}
-            </Link>
-          ) : null}
-          <Link href="/student" className="rounded-md px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50">
-            Home
-          </Link>
-        </div>
-      </div>
-
-      {attempt.teacherComment && (
-        <Card variant="info" padding="md" className="mb-6 text-sm text-blue-900">
-          <p className="mb-1 font-medium">Note from your teacher</p>
-          <p>{attempt.teacherComment}</p>
-        </Card>
-      )}
-
-      {tries.length > 1 ? (
-        <Card padding="md" className="mb-6">
-          <h2 className="text-sm font-semibold text-gray-900">All attempts for this set</h2>
-          <p className="mb-2 text-xs text-gray-500">Every time you try again, a new attempt is recorded here.</p>
-          <table className="w-full text-sm">
-            <thead className="text-left text-xs text-gray-500">
-              <tr><th className="py-1">Attempt</th><th>Completed</th><th>Score</th><th>Correct</th><th>Time</th></tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {tries.map((t) => (
-                <tr key={t.id} className={t.id === attempt.id ? "bg-blue-50" : ""}>
-                  <td className="py-1.5">
-                    <Link href={`/student/results/${t.id}`} className="hover:underline">Try {t.tryNumber}</Link>
-                    {t.id === attempt.id ? <Badge variant="info" className="ml-2">Viewing</Badge> : null}
-                  </td>
-                  <td className="text-gray-600">{formatDate(t.submittedAt)}</td>
-                  <td><Pct value={t.pct} className="font-semibold" /></td>
-                  <td>{t.correct} of {t.total}</td>
-                  <td className="text-gray-600">{t.time ? formatDuration(t.time) : "—"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </Card>
-      ) : null}
-
-      {canRevealSolutions && orderedAnswers.length > 0 ? (
-        <Card padding="md" className="mb-6">
-          <h2 className="text-sm font-semibold text-gray-900">Your answers at a glance</h2>
-          <div className="mt-2">
-            <AnswerGrid
-              idPrefix="q-"
-              items={orderedAnswers.map((a) => ({ state: !a?.answer ? ("blank" as const) : a.isCorrect ? ("ok" as const) : ("bad" as const) }))}
+        {canRevealSolutions && orderedAnswers.length > 0 ? (
+          <Card padding="md" className="mb-6">
+            <SectionHeader
+              size="sm"
+              title="Your answers at a glance"
+              description="Each square is a question. Click one to see it."
+              action={<ResultFilterSegments counts={counts} />}
             />
-          </div>
-          <AnswerGridLegend />
-        </Card>
-      ) : null}
+            <div className="mt-2">
+              <AnswerGrid
+                idPrefix="q-"
+                items={orderedAnswers.map((a) => ({ state: !a?.answer ? ("blank" as const) : a.isCorrect ? ("ok" as const) : ("bad" as const) }))}
+              />
+            </div>
+            <AnswerGridLegend />
+          </Card>
+        ) : null}
 
-      {/* Per-question review */}
-      <div>
-        <h2 className="text-base font-semibold text-gray-900 mb-3">Your answers, question by question</h2>
-        {!canRevealSolutions && (
-          <p className="mb-3 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-500">
-            Your teacher has hidden the answers for this set.
-          </p>
-        )}
-        <div className="space-y-4">
-          {orderedAnswers.map((ans, i) => {
-            if (!ans) return null;
-            const snapshot = parseSnapshot<QuestionSnapshot>(ans.questionSnapshot);
-            const question = snapshot ?? ans.question;
-            const options = snapshot?.options?.length ? snapshot.options : ans.question.options;
-            const responseType = resolveQuestionType(question.type, options);
-            const topicName = snapshot?.topic?.name ?? ans.question.topic.name;
-            const isUnanswered = !ans.answer;
-            const isCorrect = ans.isCorrect;
-            const statusClass = !canRevealSolutions
-              ? isUnanswered
-                ? "border-gray-200 bg-gray-50"
-                : "border-blue-100 bg-blue-50"
-              : isCorrect
-              ? "border-green-200 bg-green-50"
-              : isUnanswered
-              ? "border-gray-200 bg-gray-50"
-              : "border-red-200 bg-red-50";
-
-            return (
-              <Card key={ans.id} id={`q-${i + 1}`} padding="md" className={`scroll-mt-20 ${statusClass}`}>
-                  <div className="flex items-start justify-between gap-3 mb-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-gray-500">Question {i + 1}</span>
-                      {isUnanswered ? (
-                        <MinusCircle size={16} className="text-gray-400" />
-                      ) : canRevealSolutions && isCorrect ? (
-                        <CheckCircle size={16} className="text-green-600" />
-                      ) : canRevealSolutions ? (
-                        <XCircle size={16} className="text-red-500" />
-                      ) : (
-                        <span className="h-4 w-4 rounded-full border border-blue-300 bg-white" />
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant={difficultyBadgeVariant(question.difficulty)}>
-                        {difficultyLabel(question.difficulty)}
-                      </Badge>
-                      {ans.timeSpent !== null && (
-                        <span className="text-xs text-gray-500">{formatTime(ans.timeSpent)}</span>
-                      )}
-                      <span className="text-xs text-gray-500">{topicName}</span>
-                    </div>
-                  </div>
-
-                  <MathContent content={question.stem} className="text-sm text-gray-800 mb-3" />
-                  <QuestionMedia imageUrl={question.imageUrl} alt={`Question ${i + 1} image`} className="mb-3" />
-
-                  {responseType === "MC" && (
-                    <div className="space-y-1 mb-3">
-                      {options.filter(isAnswerOption).map((opt) => {
-                        const studentPick = ans.answer === opt.label;
-                        const isRight = canRevealSolutions && question.correctAnswer === opt.label;
-                        const optionClass = isRight
-                          ? "bg-green-100 text-green-800"
-                          : studentPick && canRevealSolutions
-                          ? "bg-red-100 text-red-700 line-through"
-                          : studentPick
-                          ? "bg-blue-100 text-blue-800"
-                          : "text-gray-600";
-                        return (
-                          <div key={opt.label} className={`flex items-start gap-2 text-sm px-2 py-1 rounded ${optionClass}`}>
-                            <span className="font-medium w-4">{opt.label})</span>
-                            <span className="min-w-0 flex-1">
-                              <OptionContent text={opt.text} imageUrl={opt.imageUrl} label={opt.label} />
-                            </span>
-                          </div>
-            );
-          })}
-                    </div>
-                  )}
-
-                  {responseType === "NUMERIC" && (
-                    <div className="mb-3 flex flex-wrap gap-4 text-sm">
-                      <span className="text-gray-600">Your answer: <span className="font-medium text-gray-900">{ans.answer || "—"}</span></span>
-                      {canRevealSolutions && (
-                        <span className={isCorrect ? "text-green-700" : "text-red-700"}>
-                          Correct answer: <span className="font-medium">{formatCorrectAnswer(question.correctAnswer)}</span>
-                        </span>
-                      )}
-                    </div>
-                  )}
-
-                  {isUnanswered && (
-                    <p className="text-xs text-gray-400 italic">You left this blank.</p>
-                  )}
-
-                  {(ans.markedForReview || ans.note || ans.eliminatedOptions) && (
-                    <div className="mt-2 rounded border border-gray-200 bg-white p-2 text-xs text-gray-600">
-                      {ans.markedForReview && <p className="font-medium text-amber-700">Marked for review</p>}
-                      {ans.note && <p className="mt-1">Your note: {ans.note}</p>}
-                      {ans.eliminatedOptions && (
-                        <p className="mt-1">Crossed out: {JSON.parse(ans.eliminatedOptions).join(", ")}</p>
-                      )}
-                    </div>
-                  )}
-
-                  {canRevealSolutions && question.explanation && (
-                    <details className="mt-2 pt-2 border-t border-gray-200" open={!isCorrect}>
-                      <summary className="cursor-pointer select-none text-xs font-medium text-gray-500">Explanation</summary>
-                      <MathContent content={question.explanation} className="mt-1 text-sm text-gray-700" />
-                    </details>
-                  )}
-              </Card>
+        {/* Per-question review */}
+        <section>
+          <h2 className="mb-3 text-base font-semibold text-gray-900">Your answers, question by question</h2>
+          {!canRevealSolutions && (
+            <p className="mb-3 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-500">
+              Your teacher has hidden the answers for this set.
+            </p>
+          )}
+          <ResultFilterEmpty counts={counts} />
+          <div className="space-y-4">
+            {orderedAnswers.map((ans, i) => {
+              if (!ans) return null;
+              // Historic attempts render the question as it was when answered (questionSnapshot).
+              const snapshot = parseSnapshot<QuestionSnapshot>(ans.questionSnapshot);
+              const question = snapshot ?? ans.question;
+              const options = snapshot?.options?.length ? snapshot.options : ans.question.options;
+              const topicName = snapshot?.topic?.name ?? ans.question.topic.name;
+              const state = !ans.answer ? "blank" : ans.isCorrect ? "ok" : "bad";
+              return (
+                <div key={ans.id} data-q-state={canRevealSolutions ? state : state === "blank" ? "blank" : "answered"}>
+                  <ReviewQuestionCard
+                    id={`q-${i + 1}`}
+                    number={i + 1}
+                    question={{ ...question, options, imageUrl: question.imageUrl ?? null }}
+                    answer={ans.answer}
+                    isCorrect={Boolean(ans.isCorrect)}
+                    timeSpent={ans.timeSpent}
+                    reveal={canRevealSolutions}
+                    blankNote="You left this blank."
+                    tags={
+                      <>
+                        <Badge variant={difficultyBadgeVariant(question.difficulty)}>{difficultyLabel(question.difficulty)}</Badge>
+                        <span>{topicName}</span>
+                      </>
+                    }
+                  >
+                    <ReviewTools marked={Boolean(ans.markedForReview)} note={ans.note} eliminated={parseEliminatedOptions(ans.eliminatedOptions)} />
+                  </ReviewQuestionCard>
+                </div>
               );
-          })}
-        </div>
-      </div>
+            })}
+          </div>
+        </section>
+      </ResultFilterRoot>
     </PageShell>
+  );
+}
+
+function ReviewTools({ marked, note, eliminated }: { marked: boolean; note: string | null; eliminated: string[] }) {
+  if (!marked && !note && eliminated.length === 0) return null;
+  return (
+    <div className="mb-2 rounded border border-gray-200 bg-white p-2 text-xs text-gray-600">
+      {marked ? <p className="font-medium text-amber-700">Marked for review</p> : null}
+      {note ? <p className="mt-1">Your note: {note}</p> : null}
+      {eliminated.length > 0 ? <p className="mt-1">Crossed out: {eliminated.join(", ")}</p> : null}
+    </div>
   );
 }
