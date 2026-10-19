@@ -1,5 +1,5 @@
 import type { PrismaClient } from "../app/generated/prisma/client.js";
-import { SAT_TAXONOMY } from "../lib/taxonomy-reference";
+import { SAT_TAXONOMY, referenceAliases } from "../lib/taxonomy-reference";
 
 // Canonical academic taxonomy (Section → Domain → Topic[=Skill] → Subskill) plus
 // the parallel TaxonomyNode tree. Shared by both the demo seed (prisma/seed.ts)
@@ -44,6 +44,9 @@ export async function seedTaxonomy(prisma: PrismaClient): Promise<void> {
     );
   }
   const topicDefs: Record<string, { id: string; name: string }[]> = Object.fromEntries(SAT_TAXONOMY.map((ref) => [ref.domainId, ref.skills]));
+  // Domain ↔ Skill aliases (PDF spellings and former names), same ids as migration 20261020_taxonomy_aliases.
+  // Runs after the topics exist (see below); collected here so the reference stays the single source.
+  const aliasRows = referenceAliases();
   // Subskill level = intended home of the real "Topic" level below Skill; empty until the
   // topic catalogue is defined (the old test entry was removed 2026-09-29).
   const subskillDefs: Record<string, { id: string; name: string }[]> = {};
@@ -59,6 +62,13 @@ export async function seedTaxonomy(prisma: PrismaClient): Promise<void> {
         })
       )
     );
+  }
+  for (const row of aliasRows) {
+    await prisma.taxonomyAlias.upsert({
+      where: { kind_alias: { kind: row.kind, alias: row.alias } },
+      update: { domainId: row.domainId, topicId: row.topicId, source: row.source },
+      create: { id: row.id, alias: row.alias, kind: row.kind, domainId: row.domainId, topicId: row.topicId, source: row.source },
+    });
   }
   for (const [topicId, defs] of Object.entries(subskillDefs)) {
     await Promise.all(

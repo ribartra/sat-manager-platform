@@ -148,6 +148,7 @@ model Domain {
   practiceArea PracticeArea?
   section      Section       @relation(fields: [sectionId], references: [id])
   topics       Topic[]
+  aliases      TaxonomyAlias[]
 
   @@index([practiceArea])
 }
@@ -163,8 +164,29 @@ model Topic {
   questions Question[]
   practiceSets PracticeSet[]
   materials StudyMaterial[]
+  aliases   TaxonomyAlias[]
 
   @@index([taxonomyNodeId])
+}
+
+/// Domain ↔ Skill correspondence aliases (lib/taxonomy-reference.ts ← Taxonomia-SAT.md + PDFs): other
+/// names a domain or skill is printed with (PDF) or had before (LEGACY), or added by an admin (MANUAL).
+/// The platform always shows Domain.name / Topic.name; aliases are used to match ingest files.
+model TaxonomyAlias {
+  id        String   @id @default(cuid())
+  alias     String
+  kind      String   // DOMAIN | SKILL
+  domainId  String
+  topicId   String?  // set for SKILL aliases
+  source    String   @default("MANUAL") // PDF | LEGACY | MANUAL
+  createdAt DateTime @default(now())
+
+  domain Domain @relation(fields: [domainId], references: [id], onDelete: Cascade)
+  topic  Topic? @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@unique([kind, alias])
+  @@index([domainId])
+  @@index([topicId])
 }
 
 model Subskill {

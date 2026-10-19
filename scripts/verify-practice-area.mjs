@@ -205,6 +205,12 @@ function assertDatabaseConsistency() {
     if (practiceSkills !== 29 || removed) fail(`Taxonomia de referencia: ${practiceSkills} skills de practica (esperado 29), ${removed} legacy`);
     else ok("Taxonomia de referencia: 29 skills, sin legacy");
 
+    // Domain ↔ Skill correspondence table (TaxonomyAlias): PDF spellings as aliases of the md names.
+    const grammarAlias = db.prepare(`SELECT COUNT(*) AS n FROM TaxonomyAlias WHERE kind = 'SKILL' AND alias = 'Grammar' AND topicId = 'top-fss'`).get().n;
+    const pdfAliases = db.prepare(`SELECT COUNT(*) AS n FROM TaxonomyAlias WHERE source = 'PDF'`).get().n;
+    if (!grammarAlias || pdfAliases < 5) fail(`Correspondencia: alias Grammar=${grammarAlias}, alias PDF=${pdfAliases} (esperado >=5)`);
+    else ok(`Correspondencia Domain ↔ Skill con alias del PDF (${pdfAliases})`);
+
     const dual = db
       .prepare(
         `SELECT t.name, COUNT(DISTINCT d.practiceArea) AS areas

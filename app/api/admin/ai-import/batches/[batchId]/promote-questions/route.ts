@@ -43,7 +43,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
       where: { id: { in: candidateIds }, batchId },
       orderBy: [{ sourceFileId: "asc" }, { questionNumber: "asc" }, { createdAt: "asc" }],
     }),
-    prisma.topic.findMany({ include: { domain: { include: { section: true } }, subskills: true }, orderBy: { name: "asc" } }),
+    prisma.topic.findMany({ include: { domain: { include: { section: true, aliases: { select: { alias: true } } } }, subskills: true, aliases: { select: { alias: true } } }, orderBy: { name: "asc" } }),
     prisma.ingestCandidateImageLink.findMany({
       where: { batchId, candidateId: { in: candidateIds } },
       orderBy: [{ candidateId: "asc" }, { targetType: "asc" }, { sortOrder: "asc" }],
