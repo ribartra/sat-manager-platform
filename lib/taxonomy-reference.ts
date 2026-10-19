@@ -1,5 +1,5 @@
-// Reference SAT practice taxonomy: Section → Domain → Skill (Topic table), each skill with an Easy,
-// Medium and Hard set. Source: "SAT platform/Documentacion de negocio/Referencias de taxonomía SAT/"
+// Reference SAT practice taxonomy: Section → Domain → Skill (Topic table); practice sets hang from a
+// skill and a level (Easy, Medium, Hard). Source: "SAT platform/Documentacion de negocio/Referencias de taxonomía SAT/"
 // — Taxonomia-SAT.md gives the names shown in the platform and their order; the PDFs (Reading all
 // topics, TEMPLATE Math_CookSAT, Writing CB Template) give the domain ↔ skill correspondence and
 // their own spellings, kept as aliases. Decisions 2026-10-19 (product owner):
@@ -8,8 +8,9 @@
 //   - Domain names in the md's "&" style: "Problem Solving & Data Analysis", "Geometry & Trigonometry".
 //   - PDF names and former names are aliases (TaxonomyAlias table, Admin → Taxonomy).
 // Data only (no imports): shared by the app (lib/taxonomy-order.ts) and the seed (prisma/seed-taxonomy.ts).
-// Topic ids are stable; only names follow this file. Every skill has at least one practice set per
-// level (Easy, Medium, Hard); more are allowed when files_to_load has more files (e.g. Boundaries H1–H3).
+// Topic ids are stable; only names follow this file. Each skill has three levels (Easy, Medium, Hard)
+// and each level holds 0..N practice sets: a new skill starts empty, sets are added or archived over
+// time, and a level may have several (one per source file, e.g. Boundaries H1–H3).
 
 export type ReferenceSection = "MATH" | "READING" | "WRITING";
 

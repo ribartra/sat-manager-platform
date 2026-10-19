@@ -90,7 +90,7 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
         <div>
           <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Practice</h1>
           <p className="mt-1 text-sm text-gray-500">
-            Manage practice sets: every SAT skill in Math, Reading and Writing has at least one Easy, Medium and Hard set. Results show as % correct only
+            Manage practice sets: every SAT skill in Math, Reading and Writing has Easy, Medium and Hard levels, each with any number of sets. Results show as % correct only
             (SAT scores are for Tests).
           </p>
         </div>
