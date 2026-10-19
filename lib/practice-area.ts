@@ -2,8 +2,11 @@
  * Canonical Practice area classification (Math / Reading / Writing) and
  * report/analytics tab keys including Tests (`tests` URL key; legacy `mocks` still accepted).
  *
- * Source of truth for practice content is Domain.practiceArea (persisted).
- * Heuristic domain-name lists remain only as a fallback for null rows.
+ * Source of truth: the Section of a domain. Practice sections are MATH, READING and WRITING
+ * (READING_WRITING exists only for the Test placeholder domain: Tests have 2 sections).
+ * Domain.practiceArea is a copy of the section name kept in sync by database triggers
+ * (migration 20261018_practice_sections), so queries can filter on it directly.
+ * No name-based guessing: a domain without practiceArea is not practice content.
  */
 
 export const PRACTICE_AREAS = ["MATH", "READING", "WRITING"] as const;
@@ -39,16 +42,6 @@ export function activeHomeTab(value: string | null | undefined): HomeTabKey {
 
 /** Legacy report-area keys used by parent tokens / PDF query params. */
 export type ReportAreaKey = "mathematics" | "reading" | "writing";
-
-export const READING_DOMAIN_NAMES = ["Information and Ideas", "Craft and Structure"] as const;
-export const WRITING_DOMAIN_NAMES = ["Expression of Ideas", "Standard English Conventions"] as const;
-export const MATH_DOMAIN_NAMES = [
-  "Algebra",
-  "Advanced Math",
-  "Problem-Solving and Data Analysis",
-  "Problem Solving and Data Analysis", // legacy name (pre 2026-09-29)
-  "Geometry and Trigonometry",
-] as const;
 
 export const GRAMMAR_AND_STRUCTURE_TOPIC = "Grammar and Structure";
 export const LEGACY_FORM_STRUCTURE_TOPIC = "Form, Structure, and Sense";
@@ -86,27 +79,17 @@ export function practiceAreaLabel(area: PracticeAreaCode | null | undefined): st
   return "Unclassified";
 }
 
-/**
- * Section-style label used to GROUP practice content in pickers, tables and
- * breadcrumbs (Math uses the long form "Mathematics" to match SECTION_ORDER).
- * Reading and Writing are surfaced separately; the combined "Reading & Writing"
- * label is reserved for Test surfaces.
- */
+/** Section label used to GROUP practice content in pickers, tables and breadcrumbs (= Section.label). */
 export function practiceSectionLabel(area: PracticeAreaCode | null | undefined): string {
-  if (area === "MATH") return "Mathematics";
+  if (area === "MATH") return "Math";
   if (area === "READING") return "Reading";
   if (area === "WRITING") return "Writing";
   return "Unclassified";
 }
 
-/** Convenience: resolve a topic's domain to its practice section label in one call. */
-export function domainSectionLabel(input: {
-  practiceArea?: PracticeAreaCode | string | null;
-  sectionName?: string | null;
-  sectionLabel?: string | null;
-  domainName?: string | null;
-}): string {
-  return practiceSectionLabel(resolvePracticeArea(input));
+/** Convenience: a domain's practice section label in one call. */
+export function domainSectionLabel(domain: { practiceArea?: PracticeAreaCode | string | null }): string {
+  return practiceSectionLabel(resolvePracticeArea(domain));
 }
 
 export function reportAreaFromTab(tab: Exclude<AreaTabKey, "tests">): ReportAreaKey {
@@ -160,55 +143,15 @@ export function areaTabLinkClass(tab: HomeTabKey, active: boolean): string {
   }
 }
 
-function normalizeName(value: string | null | undefined): string {
-  return String(value ?? "")
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, " ");
-}
-
-/** Fallback when Domain.practiceArea is null (legacy / placeholder rows). */
-export function inferPracticeAreaFromNames(input: {
-  sectionName?: string | null;
-  sectionLabel?: string | null;
-  domainName?: string | null;
-}): PracticeAreaCode | null {
-  const section = normalizeName(`${input.sectionName ?? ""} ${input.sectionLabel ?? ""}`);
-  const domain = normalizeName(input.domainName);
-
-  if (!domain && !section) return null;
-  if (domain === "full practice test") return null;
-  if (MATH_DOMAIN_NAMES.some((name) => domain === normalizeName(name))) return "MATH";
-  if (READING_DOMAIN_NAMES.some((name) => domain === normalizeName(name))) return "READING";
-  if (WRITING_DOMAIN_NAMES.some((name) => domain === normalizeName(name))) return "WRITING";
-  if (section.includes("math")) return "MATH";
-  return null;
-}
-
-export function resolvePracticeArea(input: {
-  practiceArea?: PracticeAreaCode | string | null;
-  sectionName?: string | null;
-  sectionLabel?: string | null;
-  domainName?: string | null;
-}): PracticeAreaCode | null {
-  const persisted = input.practiceArea;
-  if (persisted === "MATH" || persisted === "READING" || persisted === "WRITING") return persisted;
-  return inferPracticeAreaFromNames(input);
+/** A domain's practice area (its Section: MATH, READING or WRITING); null for Test placeholders. */
+export function resolvePracticeArea(domain: { practiceArea?: PracticeAreaCode | string | null }): PracticeAreaCode | null {
+  const area = domain.practiceArea;
+  return area === "MATH" || area === "READING" || area === "WRITING" ? area : null;
 }
 
 /** Prisma where clause for practice content in a given area. */
 export function practiceAreaDomainWhere(area: PracticeAreaCode) {
-  const fallbackNames = area === "MATH"
-    ? MATH_DOMAIN_NAMES
-    : area === "READING"
-      ? READING_DOMAIN_NAMES
-      : WRITING_DOMAIN_NAMES;
-  return {
-    OR: [
-      { practiceArea: area },
-      { practiceArea: null, name: { in: [...fallbackNames] } },
-    ],
-  };
+  return { practiceArea: area };
 }
 
 export function practiceAreaTopicWhere(area: PracticeAreaCode) {

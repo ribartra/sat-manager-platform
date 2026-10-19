@@ -176,7 +176,7 @@ export function QuestionEditor({
   const fieldRefs = useRef<Record<string, HTMLTextAreaElement | null>>({});
 
   const selectedTopic = useMemo(() => topics.find((topic) => topic.id === topicId), [topicId, topics]);
-  const isMathQuestion = selectedTopic?.sectionLabel === "Mathematics";
+  const isMathQuestion = selectedTopic?.sectionLabel === "Math";
 
   function bindFieldRef(key: string) {
     return (node: HTMLTextAreaElement | null) => {

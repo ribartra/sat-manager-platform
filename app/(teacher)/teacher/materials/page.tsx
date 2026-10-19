@@ -29,7 +29,7 @@ export default async function TeacherMaterialsPage() {
         topics={topics.map((t) => ({
           id: t.id,
           name: t.name,
-          sectionLabel: domainSectionLabel({ practiceArea: t.domain.practiceArea, sectionName: t.domain.section.name, sectionLabel: t.domain.section.label, domainName: t.domain.name }),
+          sectionLabel: domainSectionLabel({ practiceArea: t.domain.practiceArea }),
           domainName: t.domain.name,
         }))}
         materials={materials.map((m) => ({
@@ -44,7 +44,7 @@ export default async function TeacherMaterialsPage() {
             ? {
                 name: m.topic.name,
                 domainName: m.topic.domain.name,
-                sectionLabel: domainSectionLabel({ practiceArea: m.topic.domain.practiceArea, sectionName: m.topic.domain.section.name, sectionLabel: m.topic.domain.section.label, domainName: m.topic.domain.name }),
+                sectionLabel: domainSectionLabel({ practiceArea: m.topic.domain.practiceArea }),
               }
             : null,
         }))}

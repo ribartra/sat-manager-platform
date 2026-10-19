@@ -5,14 +5,27 @@ import type { PrismaClient } from "../app/generated/prisma/client.js";
 // and the production seed (prisma/seed.prod.ts) so there is a single source of
 // truth. See CLAUDE.md "Taxonomía" for the Topic↔Skill divergence this encodes.
 export async function seedTaxonomy(prisma: PrismaClient): Promise<void> {
+  // Official sections. Practice: MATH, READING, WRITING (Domain.practiceArea = section name, enforced
+  // by triggers from migration 20261018_practice_sections). READING_WRITING only holds the Test
+  // placeholder domain (Tests have 2 sections: Math and Reading & Writing).
   const mathSection = await prisma.section.upsert({
     where: { name: "MATH" },
-    update: {},
-    create: { name: "MATH", label: "Mathematics" },
+    update: { label: "Math" },
+    create: { name: "MATH", label: "Math" },
+  });
+  const readingSection = await prisma.section.upsert({
+    where: { name: "READING" },
+    update: { label: "Reading" },
+    create: { id: "sec-reading", name: "READING", label: "Reading" },
+  });
+  const writingSection = await prisma.section.upsert({
+    where: { name: "WRITING" },
+    update: { label: "Writing" },
+    create: { id: "sec-writing", name: "WRITING", label: "Writing" },
   });
   const rwSection = await prisma.section.upsert({
     where: { name: "READING_WRITING" },
-    update: {},
+    update: { label: "Reading & Writing" },
     create: { name: "READING_WRITING", label: "Reading & Writing" },
   });
 
@@ -42,23 +55,23 @@ export async function seedTaxonomy(prisma: PrismaClient): Promise<void> {
   const rwDomains = await Promise.all([
     prisma.domain.upsert({
       where: { id: "dom-info" },
-      update: { name: "Information and Ideas", practiceArea: "READING", sectionId: rwSection.id },
-      create: { id: "dom-info", name: "Information and Ideas", sectionId: rwSection.id, practiceArea: "READING" },
+      update: { name: "Information and Ideas", practiceArea: "READING", sectionId: readingSection.id },
+      create: { id: "dom-info", name: "Information and Ideas", sectionId: readingSection.id, practiceArea: "READING" },
     }),
     prisma.domain.upsert({
       where: { id: "dom-craft" },
-      update: { name: "Craft and Structure", practiceArea: "READING", sectionId: rwSection.id },
-      create: { id: "dom-craft", name: "Craft and Structure", sectionId: rwSection.id, practiceArea: "READING" },
+      update: { name: "Craft and Structure", practiceArea: "READING", sectionId: readingSection.id },
+      create: { id: "dom-craft", name: "Craft and Structure", sectionId: readingSection.id, practiceArea: "READING" },
     }),
     prisma.domain.upsert({
       where: { id: "dom-expr" },
-      update: { name: "Expression of Ideas", practiceArea: "WRITING", sectionId: rwSection.id },
-      create: { id: "dom-expr", name: "Expression of Ideas", sectionId: rwSection.id, practiceArea: "WRITING" },
+      update: { name: "Expression of Ideas", practiceArea: "WRITING", sectionId: writingSection.id },
+      create: { id: "dom-expr", name: "Expression of Ideas", sectionId: writingSection.id, practiceArea: "WRITING" },
     }),
     prisma.domain.upsert({
       where: { id: "dom-sec" },
-      update: { name: "Standard English Conventions", practiceArea: "WRITING", sectionId: rwSection.id },
-      create: { id: "dom-sec", name: "Standard English Conventions", sectionId: rwSection.id, practiceArea: "WRITING" },
+      update: { name: "Standard English Conventions", practiceArea: "WRITING", sectionId: writingSection.id },
+      create: { id: "dom-sec", name: "Standard English Conventions", sectionId: writingSection.id, practiceArea: "WRITING" },
     }),
   ]);
 
@@ -155,13 +168,14 @@ export async function seedTaxonomy(prisma: PrismaClient): Promise<void> {
     );
   }
 
-  const allSections = [mathSection, rwSection];
+  const allSections = [mathSection, readingSection, writingSection, rwSection];
   await Promise.all(
     allSections.map((section, index) =>
       prisma.taxonomyNode.upsert({
         where: { id: `tax-area-${section.id}` },
-        update: { name: section.name, label: section.label, type: "AREA", parentId: null, sortOrder: index, active: true },
-        create: { id: `tax-area-${section.id}`, name: section.name, label: section.label, type: "AREA", sortOrder: index, active: true },
+        // READING_WRITING only holds the Test placeholder domain: not part of the practice tree.
+        update: { name: section.name, label: section.label, type: "AREA", parentId: null, sortOrder: index, active: section.name !== "READING_WRITING" },
+        create: { id: `tax-area-${section.id}`, name: section.name, label: section.label, type: "AREA", sortOrder: index, active: section.name !== "READING_WRITING" },
       })
     )
   );

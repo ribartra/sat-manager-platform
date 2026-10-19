@@ -116,11 +116,7 @@ export default async function ParentTemporaryAccessPage({ searchParams }: PagePr
       const taxonomy = attempt.assignment?.practiceSet.topic.domain;
       const section = taxonomy?.section;
       if (!taxonomy || !section) return allAreas;
-      return areas.some((area) => practiceSetMatchesArea({
-        sectionName: section.name,
-        sectionLabel: section.label,
-        domainName: taxonomy.name,
-      }, area));
+      return areas.some((area) => practiceSetMatchesArea({ practiceArea: taxonomy.practiceArea, sectionName: section.name }, area));
     });
 
   const totalAnswers = attempts.flatMap((attempt) => attempt.answers);
@@ -152,9 +148,8 @@ export default async function ParentTemporaryAccessPage({ searchParams }: PagePr
                   <p className="text-sm font-medium text-gray-900">{attempt.assignment?.practiceSet.name ? shortSetName(attempt.assignment.practiceSet.name) : "Practice set"}</p>
                   <p className="mt-0.5 text-xs text-gray-500">
                     {practiceSetAreaLabel(classifyPracticeSetArea({
+                      practiceArea: attempt.assignment?.practiceSet.topic.domain.practiceArea,
                       sectionName: attempt.assignment?.practiceSet.topic.domain.section.name,
-                      sectionLabel: attempt.assignment?.practiceSet.topic.domain.section.label,
-                      domainName: attempt.assignment?.practiceSet.topic.domain.name,
                     })) ?? attempt.assignment?.practiceSet.topic.domain.section.label} · {attempt.assignment?.practiceSet.topic.name}
                   </p>
                 </div>

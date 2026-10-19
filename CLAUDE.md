@@ -57,6 +57,8 @@ Current code/DB do **not** yet match this:
 - The legacy `Topic` table is linked 1:1 to `SKILL` nodes (Topic rows ↔ SKILL nodes 1:1, same names via `taxonomyNodeId`), so in practice today **`Topic` occupies the Skill slot**. `Subskill` is empty (0 rows).
 - Questions, sets, materials, reports and ingest all group by that `Topic` table, i.e. "topic" currently means "skill".
 
+**Sections are official (migration `20261018_practice_sections`).** Practice sections are `MATH`, `READING`, `WRITING` (labels Math / Reading / Writing); `READING_WRITING` holds only the Test placeholder domain "Full Practice Test" (Tests have 2 sections). `Domain.practiceArea` is a copy of the section name kept equal by SQLite triggers (not expressible in `schema.prisma` — keep them when generating migrations). Read the area with `resolvePracticeArea(domain)` / filter with `practiceAreaDomainWhere`; never infer Reading vs Writing from domain or topic names.
+
 So when you read `topic` in code, it is really the skill level. Aligning the model to the source of truth (adding a real Topic level below Skill) is open work — see README "Taxonomía Académica". See `lib/taxonomy.ts`, `prisma/seed.ts`.
 
 ### AI ingestion (two layers)

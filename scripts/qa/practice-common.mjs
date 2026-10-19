@@ -82,8 +82,8 @@ export function resolveMathPracticeSets(db) {
 }
 
 // Read-only resolver for READING Practice Sets QA (the Reading half of R&W).
-// Section is 'READING_WRITING' in the DB ("R&W" is only a UI label). Reading = the two
-// domains 'Information and Ideas' + 'Craft and Structure' (Writing domains are excluded).
+// Section is 'READING' in the DB (official practice sections since 2026-10-18: MATH, READING,
+// WRITING; READING_WRITING only holds the Test placeholder domain).
 // Adds questionExternalId (the "Question ID: <hex>" that also appears in the exercise/ANS
 // PDFs) and explanation, so callers can join answer keys by hex without fuzzy filename
 // matching. Reading PDFs carry no images, so imageUrl is not surfaced. Never writes.
@@ -95,8 +95,7 @@ export function resolveReadingPracticeSets(db) {
     JOIN Topic t ON t.id = ps.topicId
     JOIN Domain d ON d.id = t.domainId
     JOIN Section s ON s.id = d.sectionId
-    WHERE s.name = 'READING_WRITING'
-      AND d.name IN ('Information and Ideas', 'Craft and Structure')
+    WHERE s.name = 'READING'
     ORDER BY d.name, t.name, ps.difficulty
   `).all();
 
@@ -159,8 +158,7 @@ export function resolveWritingPracticeSets(db) {
     JOIN Topic t ON t.id = ps.topicId
     JOIN Domain d ON d.id = t.domainId
     JOIN Section s ON s.id = d.sectionId
-    WHERE s.name = 'READING_WRITING'
-      AND d.name IN ('Expression of Ideas', 'Standard English Conventions')
+    WHERE s.name = 'WRITING'
     ORDER BY d.name, t.name, ps.difficulty, ps.id
   `).all();
 

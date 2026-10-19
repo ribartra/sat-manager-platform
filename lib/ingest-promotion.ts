@@ -296,14 +296,14 @@ export function resolveTopicFromCandidate(candidate: CandidateForDraft, topics: 
     const wantsMath = section === "MATH";
     const byName = topics.find((item) => {
       if (normalize(item.domain.name) !== "full practice test") return false;
-      if (normalize(item.domain.section.name).includes("math") !== wantsMath) return false;
+      if ((item.domain.section.name === "MATH") !== wantsMath) return false;
       return normalize(item.name) === normalize(moduleKey);
     });
     if (byName) return { topicId: byName.id, subskillId: "" };
 
     const legacy = topics.find((item) => {
       if (normalize(item.domain.name) !== "full practice test") return false;
-      return normalize(item.domain.section.name).includes("math") === wantsMath;
+      return (item.domain.section.name === "MATH") === wantsMath;
     });
     if (legacy) return { topicId: legacy.id, subskillId: "" };
   }
@@ -315,17 +315,14 @@ export function resolveTopicFromCandidate(candidate: CandidateForDraft, topics: 
     if (!topicTerm || !sameTaxonomyName(item.name, candidate.topicName)) return false;
     if (domainTerm && !sameTaxonomyName(item.domain.name, candidate.domainName)) return false;
     if (sectionTerm) {
-      const sectionName = normalize(item.domain.section.name);
-      const sectionLabel = normalize(item.domain.section.label);
-      // Acepta el código interno de la ingesta ("RW"/"MATH") además del nombre/label
-      // oficial, para que el candidato resuelva sin importar cómo quedó guardada la sección.
-      const accepted = new Set([sectionName, sectionLabel]);
-      if (sectionName.includes("reading") || sectionLabel.includes("reading")) {
-        accepted.add("rw").add("r and w").add("reading and writing");
+      // Sections are official codes (MATH, READING, WRITING; READING_WRITING = Test placeholder).
+      // The ingest stores "MATH" or "RW": a Reading & Writing candidate belongs to READING or WRITING.
+      const code = item.domain.section.name;
+      const accepted = new Set([normalize(code), normalize(item.domain.section.label)]);
+      if (code === "READING" || code === "WRITING" || code === "READING_WRITING") {
+        accepted.add("rw").add("r and w").add("reading and writing").add("reading_writing");
       }
-      if (sectionName.includes("math") || sectionLabel.includes("math")) {
-        accepted.add("math");
-      }
+      if (code === "MATH") accepted.add("mathematics");
       return accepted.has(sectionTerm);
     }
     return true;

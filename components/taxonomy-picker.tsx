@@ -14,7 +14,7 @@ export interface TaxonomyPickerTopic {
 // Preferred display order for sections; anything else falls after these.
 // Reading and Writing are surfaced as separate practice areas (the combined
 // "Reading & Writing" label is kept only for exam/full-test contexts).
-const SECTION_ORDER = ["Mathematics", "Reading", "Writing", "Reading & Writing"];
+const SECTION_ORDER = ["Math", "Reading", "Writing", "Reading & Writing"];
 
 /**
  * Cascading Section -> Domain -> Skill picker over the taxonomy, replacing flat

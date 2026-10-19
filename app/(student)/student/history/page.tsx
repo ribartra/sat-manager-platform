@@ -295,8 +295,6 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
           classifyPracticeSetArea({
             practiceArea: ps.topic.domain.practiceArea,
             sectionName: ps.topic.domain.section.name,
-            sectionLabel: ps.topic.domain.section.label,
-            domainName: ps.topic.domain.name,
           }),
         )
       : null;

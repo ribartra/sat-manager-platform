@@ -39,9 +39,6 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
     (t) =>
       resolvePracticeArea({
         practiceArea: t.domain.practiceArea,
-        sectionName: t.domain.section.name,
-        sectionLabel: t.domain.section.label,
-        domainName: t.domain.name,
       }) === practiceArea
   );
   const visibleTopicIds = [...new Set(visibleTopics.map((topic) => topic.id))];
@@ -111,9 +108,6 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
           name: t.name,
           sectionLabel: domainSectionLabel({
             practiceArea: t.domain.practiceArea,
-            sectionName: t.domain.section.name,
-            sectionLabel: t.domain.section.label,
-            domainName: t.domain.name,
           }),
           domainName: t.domain.name,
         }))}
@@ -134,9 +128,6 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
             optionImageUrls: optionImages.get(q.id) ?? [],
             skillSection: domainSectionLabel({
               practiceArea: q.topic.domain.practiceArea,
-              sectionName: q.topic.domain.section.name,
-              sectionLabel: q.topic.domain.section.label,
-              domainName: q.topic.domain.name,
             }),
             skillDomain: q.topic.domain.name,
             skillName: q.topic.name,

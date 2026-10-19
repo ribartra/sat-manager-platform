@@ -62,9 +62,6 @@ export default async function TopicPracticeSetsPage({ params, searchParams }: Pa
         <span>/</span>
         <span>{practiceAreaLabel(resolvePracticeArea({
           practiceArea: topic.domain.practiceArea,
-          sectionName: topic.domain.section.name,
-          sectionLabel: topic.domain.section.label,
-          domainName: topic.domain.name,
         }))}</span>
         <span>/</span>
         <span>{topic.domain.name}</span>

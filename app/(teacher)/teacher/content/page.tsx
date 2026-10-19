@@ -63,7 +63,7 @@ export default async function TeacherContentPage({
   // other-area topics, and now-empty section/domain headings are hidden (recursive).
   const topicVisible = (t: (typeof topics)[number]) =>
     t.practiceSets.length > 0 &&
-    resolvePracticeArea({ practiceArea: t.domain?.practiceArea, domainName: t.domain?.name }) === activeArea;
+    resolvePracticeArea({ practiceArea: t.domain?.practiceArea }) === activeArea;
   function subtreeVisible(node: TaxonomyTreeNode): boolean {
     const own = (topicsByNodeId.get(node.id) ?? []).some(topicVisible);
     return own || node.children.some(subtreeVisible);
@@ -107,9 +107,6 @@ export default async function TeacherContentPage({
           (domain) =>
             resolvePracticeArea({
               practiceArea: domain.practiceArea,
-              sectionName: section.name,
-              sectionLabel: section.label,
-              domainName: domain.name,
             }) === activeArea
         )
         .filter((domain) => !domainFilter || matchesTaxonomyDomainName(domain, domainFilter))

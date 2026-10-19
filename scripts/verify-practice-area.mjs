@@ -21,6 +21,11 @@ async function assertSourcePatterns() {
       label: "practice-area helpers canónicos",
     },
     {
+      file: "lib/practice-area.ts",
+      forbids: ["DOMAIN_NAMES", "inferPracticeAreaFromNames"],
+      label: "Sin reglas por nombre de dominio: el área sale de la Section",
+    },
+    {
       file: "components/sat/practice-area-tabs.tsx",
       requires: ["AREA_TABS_WITH_TESTS", "buildAreaHref", "includeSummary"],
       label: "tabs compartidos Summary/Math/Reading/Writing/Tests",
@@ -79,9 +84,12 @@ async function assertSourcePatterns() {
 
   for (const check of checks) {
     const content = await readFile(path.join(root, check.file), "utf8");
-    const missing = check.requires.filter((token) => !content.includes(token));
+    const missing = (check.requires ?? []).filter((token) => !content.includes(token));
+    const present = (check.forbids ?? []).filter((token) => content.includes(token));
     if (missing.length) {
       fail(`${check.label}: falta ${missing.join(", ")} en ${check.file}`);
+    } else if (present.length) {
+      fail(`${check.label}: no debe contener ${present.join(", ")} en ${check.file}`);
     } else {
       ok(check.label);
     }
@@ -126,6 +134,36 @@ function assertDatabaseConsistency() {
       fail(`Domains académicos sin practiceArea válido: ${missing.map((d) => d.name).join(", ")}`);
     } else {
       ok("Todos los domains académicos tienen practiceArea");
+    }
+
+    const sections = db.prepare(`SELECT name, label FROM Section ORDER BY name`).all();
+    const want = { MATH: "Math", READING: "Reading", WRITING: "Writing", READING_WRITING: "Reading & Writing" };
+    const badSections = Object.entries(want).filter(([name, label]) => !sections.some((s) => s.name === name && s.label === label));
+    if (badSections.length) {
+      fail(`Sections oficiales faltantes o con label distinto: ${badSections.map(([n]) => n).join(", ")}`);
+    } else {
+      ok("Sections oficiales: Math, Reading, Writing (+ Reading & Writing solo Tests)");
+    }
+
+    const desync = db
+      .prepare(
+        `SELECT d.name, d.practiceArea, s.name AS section FROM Domain d JOIN Section s ON s.id = d.sectionId
+         WHERE (d.practiceArea IS NOT NULL AND d.practiceArea <> s.name)
+            OR (d.practiceArea IS NULL AND d.name <> 'Full Practice Test')
+            OR (s.name = 'READING_WRITING' AND d.name <> 'Full Practice Test')`
+      )
+      .all();
+    if (desync.length) {
+      fail(`Domains con practiceArea distinto de su Section: ${desync.map((d) => `${d.name} (${d.practiceArea}/${d.section})`).join(", ")}`);
+    } else {
+      ok("Domain.practiceArea = Section en todos los domains");
+    }
+
+    const triggers = db.prepare(`SELECT name FROM sqlite_master WHERE type = 'trigger' AND name LIKE 'Domain_practiceArea_matches_section%'`).all();
+    if (triggers.length < 2) {
+      fail("Faltan los triggers que mantienen Domain.practiceArea = Section");
+    } else {
+      ok("Triggers practiceArea = Section presentes");
     }
 
     const boundaries = db

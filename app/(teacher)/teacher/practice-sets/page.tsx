@@ -8,7 +8,7 @@ import { redirect } from "next/navigation";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { compareSkills } from "@/lib/taxonomy-order";
 import { cn } from "@/lib/utils";
-import { activeAreaTab, practiceAreaFromTab, practiceAreaLabel } from "@/lib/practice-area";
+import { activeAreaTab, practiceAreaFromTab, practiceSectionLabel } from "@/lib/practice-area";
 import { academicTopicWhere } from "@/lib/taxonomy";
 
 interface SearchParams {
@@ -54,7 +54,7 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
   });
   // Practice areas are shown separately (Math / Reading / Writing); "Reading & Writing"
   // stays only in exam/full-test surfaces.
-  const sectionLabel = practiceArea === "MATH" ? "Mathematics" : practiceAreaLabel(practiceArea);
+  const sectionLabel = practiceSectionLabel(practiceArea);
 
   const manageHref = (extra: Record<string, string>) =>
     `/teacher/practice-sets?${new URLSearchParams({ area, view: "manage", ...extra }).toString()}`;

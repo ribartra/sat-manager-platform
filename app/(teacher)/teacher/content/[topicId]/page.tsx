@@ -33,9 +33,6 @@ export default async function TopicContentPage({ params }: PageProps) {
 
   const area = resolvePracticeArea({
     practiceArea: topic.domain.practiceArea,
-    sectionName: topic.domain.section.name,
-    sectionLabel: topic.domain.section.label,
-    domainName: topic.domain.name,
   });
   const areaKey = tabFromPracticeArea(area) ?? "math";
   const areaLabel = practiceAreaLabel(area);

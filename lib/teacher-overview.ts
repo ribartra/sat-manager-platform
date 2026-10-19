@@ -98,7 +98,7 @@ export async function loadStudentOverviews(studentIds: string[], now = new Date(
     for (const attempt of s.attempts) {
       const set = attempt.assignment?.practiceSet;
       if (!set) continue;
-      const area = resolvePracticeArea({ practiceArea: set.topic.domain.practiceArea, domainName: set.topic.domain.name });
+      const area = resolvePracticeArea({ practiceArea: set.topic.domain.practiceArea });
       if (!area) continue;
       const score = summarizeAllQuestionAnswers(attempt.answers);
       const o = areas[area];
@@ -126,7 +126,7 @@ export async function loadStudentOverviews(studentIds: string[], now = new Date(
       areas[area].weakest = weakest ? { name: weakest.name, difficulty: weakest.difficulty, pct: weakest.pct, topicId: weakest.topicId } : null;
     }
     for (const a of s.assignments) {
-      const area = resolvePracticeArea({ practiceArea: a.practiceSet.topic.domain.practiceArea, domainName: a.practiceSet.topic.domain.name });
+      const area = resolvePracticeArea({ practiceArea: a.practiceSet.topic.domain.practiceArea });
       if (!area) continue;
       areas[area].toDo += 1;
       if (a.status === "OVERDUE" || (a.dueDate && a.dueDate < now)) areas[area].overdue += 1;

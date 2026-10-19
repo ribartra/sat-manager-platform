@@ -100,9 +100,6 @@ export default async function AssignPage({ params, searchParams }: PageProps) {
           domainName: ps.topic.domain.name,
           practiceArea: resolvePracticeArea({
             practiceArea: ps.topic.domain.practiceArea,
-            sectionName: ps.topic.domain.section.name,
-            sectionLabel: ps.topic.domain.section.label,
-            domainName: ps.topic.domain.name,
           }),
           questionCount: ps.questions.length,
           assignment: assignmentBySet.has(ps.id)

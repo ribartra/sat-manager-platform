@@ -52,14 +52,14 @@ const TABS: { key: SectionKey; label: string }[] = [
 ];
 
 const SECTION_LABEL_BY_TAB: Record<SectionKey, string> = {
-  math: "Mathematics",
+  math: "Math",
   reading: "Reading",
   writing: "Writing",
   general: "",
 };
 
 function sectionKeyOf(sectionLabel: string | null | undefined): SectionKey {
-  if (sectionLabel === "Mathematics") return "math";
+  if (sectionLabel === "Math") return "math";
   if (sectionLabel === "Reading") return "reading";
   if (sectionLabel === "Writing") return "writing";
   return "general";

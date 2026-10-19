@@ -14,7 +14,7 @@ const db = new Database(dbPath);
 
 const sections = db.prepare("SELECT id, name FROM Section").all();
 const mathSection = sections.find((s) => s.name === "MATH");
-const rwSection = sections.find((s) => /READ|RW|WRIT/i.test(s.name));
+const rwSection = sections.find((s) => s.name === "READING_WRITING"); // Test-only section (Practice uses READING / WRITING)
 if (!mathSection || !rwSection) {
   console.error("Could not find MATH and READING_WRITING sections.", sections);
   process.exit(1);

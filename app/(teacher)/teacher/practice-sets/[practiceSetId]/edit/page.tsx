@@ -42,7 +42,7 @@ export default async function EditPracticeSetPage({ params }: PageProps) {
           id: t.id,
           name: t.name,
           domainName: t.domain.name,
-          sectionLabel: domainSectionLabel({ practiceArea: t.domain.practiceArea, sectionName: t.domain.section.name, sectionLabel: t.domain.section.label, domainName: t.domain.name }),
+          sectionLabel: domainSectionLabel({ practiceArea: t.domain.practiceArea }),
           taxonomyLabel: taxonomyPathLabel(t.taxonomyNodeId, byId, `${t.domain.section.label} / ${t.domain.name} / ${t.name}`),
         }))}
         questions={questions}
