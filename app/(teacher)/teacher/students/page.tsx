@@ -54,14 +54,19 @@ export default async function TeacherStudentsPage({ searchParams }: PageProps) {
     if (show === "pending-tests") return s.tests.pending.length > 0;
     return true;
   });
-  const invited = await prisma.inviteToken
-    .findMany({
-      where: { role: "STUDENT", usedAt: null, expiresAt: { gt: now }, ...(session?.user.role === "TEACHER" ? { invitedById: session.user.id } : {}) },
-      select: { id: true, email: true, name: true, expiresAt: true },
-      orderBy: { expiresAt: "desc" },
-      take: 20,
-    })
-    .catch(() => [] as { id: string; email: string; name: string; expiresAt: Date }[]);
+  const inviteWhere = { role: "STUDENT", usedAt: null, expiresAt: { gt: now }, ...(session?.user.role === "TEACHER" ? { invitedById: session.user.id } : {}) };
+  // The list shows the latest 20; the count in the header is the real total.
+  const [invited, invitedTotal] = await Promise.all([
+    prisma.inviteToken
+      .findMany({
+        where: inviteWhere,
+        select: { id: true, email: true, name: true, expiresAt: true },
+        orderBy: { expiresAt: "desc" },
+        take: 20,
+      })
+      .catch(() => [] as { id: string; email: string; name: string; expiresAt: Date }[]),
+    prisma.inviteToken.count({ where: inviteWhere }).catch(() => 0),
+  ]);
 
   return (
     <PageShell maxWidth={1100} width="wide">
@@ -70,7 +75,7 @@ export default async function TeacherStudentsPage({ searchParams }: PageProps) {
         <div>
           <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Students</h1>
           <p className="mt-0.5 text-sm text-gray-500">
-            {all.length} student{all.length === 1 ? "" : "s"} · {invited.length} pending invitation{invited.length === 1 ? "" : "s"}
+            {all.length} student{all.length === 1 ? "" : "s"} · {invitedTotal} pending invitation{invitedTotal === 1 ? "" : "s"}
           </p>
         </div>
         <Link href="/teacher/students/invite" className="inline-flex items-center gap-1.5 self-start shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]">
@@ -137,7 +142,9 @@ export default async function TeacherStudentsPage({ searchParams }: PageProps) {
 
       {invited.length > 0 ? (
         <section className="mt-6">
-          <h2 className="mb-2 text-sm font-semibold text-gray-900">Pending invitations</h2>
+          <h2 className="mb-2 text-sm font-semibold text-gray-900">
+            Pending invitations{invitedTotal > invited.length ? ` · showing ${invited.length} of ${invitedTotal}` : ""}
+          </h2>
           <Card>
             <ul className="divide-y divide-gray-100">
               {invited.map((i) => (

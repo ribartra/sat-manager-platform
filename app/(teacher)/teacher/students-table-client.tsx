@@ -26,6 +26,8 @@ export type TeacherStudentRow = {
   avgScoreFiltered: boolean;
   /** Lowest-scoring skill in this area ("Boundaries (Hard) · 40%"). */
   weakestLabel?: string;
+  /** The student's area tab filtered to that skill and level. */
+  weakestHref?: string;
   /** Assign practice in this area. */
   assignHref?: string;
 };
@@ -54,12 +56,18 @@ export function TeacherStudentsTable({
   filterQuery?: string;
 }) {
   const columns = useMemo<ColumnDef<TeacherStudentRow>[]>(() => {
+    // The student's page on this area tab (keeps the Home filters).
+    const studentHref = (id: string) => `/teacher/students/${id}${filterQuery ? `?${filterQuery}` : ""}`;
     const cols: ColumnDef<TeacherStudentRow>[] = [
       {
         id: "name",
         header: "Name",
         meta: { priority: "high" },
-        cell: ({ row }) => <StudentCell name={row.original.name} email={row.original.email} avatarUrl={row.original.avatarUrl} />,
+        cell: ({ row }) => (
+          <StudentCell name={row.original.name} email={row.original.email} avatarUrl={row.original.avatarUrl}>
+            <Link href={studentHref(row.original.id)} className="block truncate font-medium text-gray-900 hover:underline">{row.original.name}</Link>
+          </StudentCell>
+        ),
       },
     ];
 
@@ -109,13 +117,26 @@ export function TeacherStudentsTable({
         header: "Pending",
         meta: { priority: "low", align: "right" },
         cell: ({ row }) =>
-          row.original.pendingCount > 0 ? <Badge variant="warning">{row.original.pendingCount}</Badge> : <span className="text-muted-foreground">—</span>,
+          row.original.pendingCount > 0 ? (
+            <Link href={`${studentHref(row.original.id)}#active-sets`} title="See the pending sets">
+              <Badge variant="warning">{row.original.pendingCount}</Badge>
+            </Link>
+          ) : (
+            <span className="text-muted-foreground">—</span>
+          ),
       },
       {
         id: "weakest",
         header: "Weakest skill",
         meta: { priority: "low" },
-        cell: ({ row }) => <span className="block min-w-[190px] text-xs text-muted-foreground">{row.original.weakestLabel ?? "—"}</span>,
+        cell: ({ row }) =>
+          row.original.weakestLabel && row.original.weakestHref ? (
+            <Link href={row.original.weakestHref} className="block min-w-[190px] text-xs text-muted-foreground hover:text-[var(--sat-primary)] hover:underline">
+              {row.original.weakestLabel}
+            </Link>
+          ) : (
+            <span className="block min-w-[190px] text-xs text-muted-foreground">{row.original.weakestLabel ?? "—"}</span>
+          ),
       },
       {
         id: "actions",
@@ -129,7 +150,7 @@ export function TeacherStudentsTable({
               </Button>
             ) : null}
             <Button asChild size="sm" variant="secondary">
-              <Link href={`/teacher/students/${row.original.id}${filterQuery ? `?${filterQuery}` : ""}`}>Open</Link>
+              <Link href={studentHref(row.original.id)}>Open</Link>
             </Button>
           </div>
         ),

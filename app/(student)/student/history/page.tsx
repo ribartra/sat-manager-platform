@@ -41,6 +41,7 @@ import {
   practiceAreaFromTab,
   practiceAreaLabel,
   practiceAreaTopicWhere,
+  tabFromPracticeArea,
 } from "@/lib/practice-area";
 import { classifyPracticeSetArea, practiceSetAreaLabel } from "@/lib/parent-access";
 import { PerformanceBreakdown } from "@/components/performance-breakdown";
@@ -281,7 +282,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
           <SectionHeader
             title="Test attempts"
             description={`${examAttempts.length} attempt${examAttempts.length === 1 ? "" : "s"}`}
-            action={<Button asChild size="sm" variant="secondary"><Link href="/student/tests">Go to Tests ›</Link></Button>}
+            action={<Button asChild size="sm" variant="secondary"><Link href="/student/tests?view=completed">Go to Tests ›</Link></Button>}
           />
           {examAttempts.length === 0 ? (
             <EmptyState
@@ -515,8 +516,8 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
       {listedAttempts.length === 0 ? (
         <Card padding="lg" className="py-14 text-center text-gray-500">
           <p>No finished {practiceAreaLabel(practiceArea).toLowerCase()} practice sets for these filters.</p>
-          <Link href={buildProgressHref("/student/practice", filters)} className="mt-2 inline-block text-sm text-blue-600 hover:underline">
-            Go to the content map →
+          <Link href={buildAreaHref("/student/practice", tabFromPracticeArea(practiceArea) ?? "summary")} className="mt-2 inline-block text-sm text-blue-600 hover:underline">
+            Go to Practice →
           </Link>
         </Card>
       ) : (
@@ -528,7 +529,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
               value={<Pct value={avgPct} />}
               sub={<>{correctQuestions} correct of {totalQuestions} questions{difficulty ? ` · ${difficultyLabel(difficulty)}` : ""}</>}
             />
-            <StatTile label="Completed" value={visibleAttempts.length} sub={`attempt${visibleAttempts.length === 1 ? "" : "s"} on ${setsPracticed} practice set${setsPracticed === 1 ? "" : "s"}`} />
+            <StatTile label="Completed" value={visibleAttempts.length} sub={`attempt${visibleAttempts.length === 1 ? "" : "s"} on ${setsPracticed} practice set${setsPracticed === 1 ? "" : "s"}`} href="#history" />
             <StatTile
               label="Latest score"
               value={!latestSubmitted ? "—" : latestSubmitted.pct === null ? "No answers" : <Pct value={latestSubmitted.pct} />}
@@ -615,7 +616,8 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
 
             <div className="space-y-2 md:hidden">
               {historyRows.map(({ a, correct, total, pct, elapsedTime, ps, areaLabel }) => (
-                <Card key={a.id} padding="sm" className={invalidatedRowClass(a.status)}>
+                // The whole card opens the result (stretched "Review" link), as the desktop row does.
+                <Card key={a.id} padding="sm" className={`relative ${invalidatedRowClass(a.status)}`}>
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium text-gray-900">{ps?.name ? shortSetName(ps.name) : "—"}</p>
@@ -632,7 +634,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
                     <span>{a.submittedAt ? formatDate(a.submittedAt) : "—"}</span>
                     <span>{correct} of {total} correct · {formatDuration(elapsedTime)}</span>
                     <Badge variant="default">Try {a.attemptNumber}</Badge>
-                    <Link href={buildProgressHref(`/student/results/${a.id}`, filters)} className="font-medium text-blue-600 hover:underline">Review</Link>
+                    <Link href={buildProgressHref(`/student/results/${a.id}`, filters)} className="font-medium text-blue-600 after:absolute after:inset-0 after:content-[''] hover:underline">Review</Link>
                   </div>
                 </Card>
               ))}

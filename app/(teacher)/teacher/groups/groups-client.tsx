@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,8 @@ interface Group {
 }
 
 export function GroupsClient({ groups: initialGroups, students }: { groups: Group[]; students: Member[] }) {
+  // Members the viewer can open (program scope): their name links to the student's page.
+  const inScope = new Set(students.map((student) => student.id));
   const router = useRouter();
   const confirm = useConfirm();
   const [groups, setGroups] = useState<Group[]>(initialGroups);
@@ -198,7 +201,13 @@ export function GroupsClient({ groups: initialGroups, students }: { groups: Grou
                 {group.members.map((m) => (
                   <div key={m.id} className="flex items-center justify-between text-sm">
                     <div>
-                      <span className="font-medium text-gray-800">{m.name}</span>
+                      {inScope.has(m.id) ? (
+                        <Link href={`/teacher/students/${m.id}`} className="font-medium text-gray-800 hover:text-[var(--sat-primary)] hover:underline">
+                          {m.name}
+                        </Link>
+                      ) : (
+                        <span className="font-medium text-gray-800">{m.name}</span>
+                      )}
                       <span className="ml-2 text-gray-400">{m.email}</span>
                     </div>
                     <button

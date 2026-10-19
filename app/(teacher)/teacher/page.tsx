@@ -164,7 +164,11 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
                   <td className={TD}>
                     <div className="flex flex-wrap gap-1">
                       {s.tests.pending.map((p) => (
-                        <Badge key={p.testId} variant={p.overdue ? "danger" : "default"}>{p.name}</Badge>
+                        <RowAction key={p.testId}>
+                          <Link href={`/teacher/tests/${p.testId}`} title="Open this test">
+                            <Badge variant={p.overdue ? "danger" : "default"}>{p.name}</Badge>
+                          </Link>
+                        </RowAction>
                       ))}
                       {s.tests.pending.length === 0 ? <span className="text-xs text-gray-400">—</span> : null}
                     </div>
@@ -194,6 +198,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
             icon={<Clock size={14} />}
             label="Inactive 5+ days"
             tone="warn"
+            viewAllHref="/teacher/students?show=inactive"
             people={inactive.map((s) => ({
               id: s.id,
               name: s.name,
@@ -205,6 +210,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
             icon={<Flag size={14} />}
             label="Overdue tests"
             tone="bad"
+            viewAllHref="/teacher?area=tests"
             people={overdueTests.map((s) => ({
               id: s.id,
               name: s.name,
@@ -216,6 +222,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
             icon={<TrendingDown size={14} />}
             label="Section under 550"
             tone="info"
+            viewAllHref="/teacher?area=tests"
             people={lowScores.map((s) => ({
               id: s.id,
               name: s.name,
@@ -356,40 +363,39 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
     }),
   ]);
 
-  const [overdueAssignments, unlockRequests] = await Promise.all([
+  // Same scope for the alert lists and their real counts (the lists only show the first 5).
+  const scopedStudent = {
+    active: true,
+    validationStatus: "APPROVED",
+    ...(programScope ? { programEnrollments: programScope } : {}),
+  };
+  const overdueWhere = {
+    dueDate: { lt: new Date() },
+    status: { in: ["PENDING", "IN_PROGRESS"] },
+    practiceSet: { topic: { domain: { practiceArea } } },
+    student: scopedStudent,
+  };
+  const unlockWhere = {
+    status: "PENDING",
+    assignment: { practiceSet: { topic: { domain: { practiceArea } } }, student: scopedStudent },
+  };
+  const [overdueAssignments, overdueCount, unlockRequests, unlockCount] = await Promise.all([
     prisma.assignment.findMany({
-      where: {
-        dueDate: { lt: new Date() },
-        status: { in: ["PENDING", "IN_PROGRESS"] },
-        practiceSet: { topic: { domain: { practiceArea } } },
-        student: {
-          active: true,
-          validationStatus: "APPROVED",
-          ...(programScope ? { programEnrollments: programScope } : {}),
-        },
-      },
+      where: overdueWhere,
       include: { student: true, practiceSet: true },
       take: 5,
       orderBy: { dueDate: "asc" },
     }),
+    prisma.assignment.count({ where: overdueWhere }),
     studentUnlockRequestsEnabled
       ? prisma.unlockRequest.findMany({
-          where: {
-            status: "PENDING",
-            assignment: {
-              practiceSet: { topic: { domain: { practiceArea } } },
-              student: {
-                active: true,
-                validationStatus: "APPROVED",
-                ...(programScope ? { programEnrollments: programScope } : {}),
-              },
-            },
-          },
+          where: unlockWhere,
           include: { assignment: { include: { student: true, practiceSet: true } } },
           orderBy: { createdAt: "desc" },
           take: 5,
         })
       : Promise.resolve([]),
+    studentUnlockRequestsEnabled ? prisma.unlockRequest.count({ where: unlockWhere }) : Promise.resolve(0),
   ]);
 
   const fiveDaysAgo = new Date();
@@ -400,7 +406,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
     if (!lastActiveAt) return true;
     return lastActiveAt < fiveDaysAgo;
   });
-  const performanceBuckets = new Map<string, { label: string; correct: number; total: number; attempts: number }>();
+  const performanceBuckets = new Map<string, { label: string; topicId: string; difficulty: string; correct: number; total: number; attempts: number }>();
   const studentBuckets = new Map<string, Map<string, { label: string; correct: number; total: number }>>();
   for (const student of students) {
     const mine = new Map<string, { label: string; correct: number; total: number }>();
@@ -409,7 +415,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
       if (!practiceSet) continue;
       const key = `${practiceSet.topicId}:${practiceSet.difficulty}`;
       const label = `${practiceSet.topic.name} (${difficultyLabel(practiceSet.difficulty)})`;
-      const bucket = performanceBuckets.get(key) ?? { label, correct: 0, total: 0, attempts: 0 };
+      const bucket = performanceBuckets.get(key) ?? { label, topicId: practiceSet.topicId, difficulty: practiceSet.difficulty, correct: 0, total: 0, attempts: 0 };
       const score = summarizeAllQuestionAnswers(attempt.answers);
       bucket.correct += score.correct;
       bucket.total += score.total;
@@ -492,12 +498,35 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
         </div>
       </Card>
 
-      {(inactiveStudents.length > 0 || overdueAssignments.length > 0 || unlockRequests.length > 0) && (
+      {(inactiveStudents.length > 0 || overdueCount > 0 || unlockCount > 0) && (
         <Alert tone="warning" className="mb-5">
           <div className="space-y-0.5">
-            {inactiveStudents.length > 0 && <p><strong>{inactiveStudents.length} student{inactiveStudents.length > 1 ? "s" : ""}</strong> haven&apos;t practiced {practiceAreaLabel(practiceArea)} in 5+ days: {inactiveStudents.map((s) => s.name).join(", ")}</p>}
-            {overdueAssignments.length > 0 && <p><strong>{overdueAssignments.length}</strong> overdue practice set{overdueAssignments.length > 1 ? "s" : ""} need attention.</p>}
-            {unlockRequests.length > 0 && <p><strong>{unlockRequests.length}</strong> unlock request{unlockRequests.length > 1 ? "s" : ""} waiting for you.</p>}
+            {inactiveStudents.length > 0 && (
+              <p>
+                <strong>{inactiveStudents.length} student{inactiveStudents.length > 1 ? "s" : ""}</strong> haven&apos;t practiced {practiceAreaLabel(practiceArea)} in 5+ days:{" "}
+                {inactiveStudents.map((s, i) => (
+                  <span key={s.id}>
+                    {i > 0 ? ", " : ""}
+                    <Link href={`/teacher/students/${s.id}?area=${area}`} className="underline hover:no-underline">{s.name}</Link>
+                  </span>
+                ))}
+              </p>
+            )}
+            {overdueCount > 0 && (
+              <p>
+                <strong>{overdueCount}</strong> overdue practice set{overdueCount > 1 ? "s" : ""} need attention:{" "}
+                {overdueAssignments.map((a, i) => (
+                  <span key={a.id}>
+                    {i > 0 ? ", " : ""}
+                    <Link href={`/teacher/students/${a.studentId}?area=${area}#active-sets`} className="underline hover:no-underline">
+                      {a.student.name} ({a.practiceSet.name})
+                    </Link>
+                  </span>
+                ))}
+                {overdueCount > overdueAssignments.length ? ` and ${overdueCount - overdueAssignments.length} more` : ""}
+              </p>
+            )}
+            {unlockCount > 0 && <p><strong>{unlockCount}</strong> unlock request{unlockCount > 1 ? "s" : ""} waiting for you.</p>}
           </div>
         </Alert>
       )}
@@ -505,7 +534,15 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
       {lowPerformance.length > 0 && (
         <div className="mb-5 grid gap-3 md:grid-cols-3">
           {lowPerformance.map((bucket) => (
-            <Card key={bucket.label} variant="danger" padding="sm" className="min-w-0">
+            <Card
+              key={bucket.label}
+              as={Link}
+              href={`/teacher?area=${area}&topic=${bucket.topicId}&difficulty=${bucket.difficulty}`}
+              title="See the students' results for this skill and level"
+              variant="danger"
+              padding="sm"
+              className="block min-w-0"
+            >
               <p className="text-xs font-medium text-red-700">Low performance</p>
               <p className="mt-1 truncate text-sm font-semibold text-gray-900">{bucket.label}</p>
               <p className="mt-1 text-xs text-gray-600">
@@ -519,12 +556,17 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
       {unlockRequests.length > 0 && (
         <Card className="mb-6">
           <CardBody className="p-4">
-            <h2 className="mb-3 text-sm font-semibold text-gray-900">Unlock Requests</h2>
+            <h2 className="mb-3 text-sm font-semibold text-gray-900">
+              Unlock Requests{unlockCount > unlockRequests.length ? ` · showing ${unlockRequests.length} of ${unlockCount}` : ""}
+            </h2>
             <div className="space-y-2">
               {unlockRequests.map((request) => (
                 <div key={request.id} className="flex items-center justify-between border-b border-gray-100 pb-2 last:border-b-0 last:pb-0">
                   <p className="text-sm text-gray-700">
-                    <strong>{request.assignment.student.name}</strong> requested <strong>{request.assignment.practiceSet.name}</strong>
+                    <Link href={`/teacher/students/${request.assignment.studentId}?area=${area}#active-sets`} className="font-semibold hover:underline">
+                      {request.assignment.student.name}
+                    </Link>{" "}
+                    requested <strong>{request.assignment.practiceSet.name}</strong>
                   </p>
                   <UnlockRequestActions requestId={request.id} />
                 </div>
@@ -543,10 +585,11 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
           const avgScore = summarizeAllQuestionAnswers(student.attempts.flatMap((attempt) => attempt.answers)).percent;
           const last = student.attempts[0];
           const lastScore = last ? summarizeAllQuestionAnswers(last.answers).percent : null;
-          const weakest = [...(studentBuckets.get(student.id)?.values() ?? [])]
-            .filter((b) => b.total >= 2)
-            .map((b) => ({ ...b, pct: Math.round((b.correct / b.total) * 100) }))
+          const weakest = [...(studentBuckets.get(student.id)?.entries() ?? [])]
+            .filter(([, b]) => b.total >= 2)
+            .map(([key, b]) => ({ ...b, key, pct: Math.round((b.correct / b.total) * 100) }))
             .sort((a, b) => a.pct - b.pct)[0];
+          const [weakTopic, weakDifficulty] = weakest ? weakest.key.split(":") : [];
 
           return {
             id: student.id,
@@ -565,6 +608,9 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
             avgScoreTone: avgScore === null ? "none" : avgScore >= 80 ? "high" : avgScore >= 60 ? "mid" : "low",
             avgScoreFiltered: avgScore !== null && hasAttemptFilter,
             weakestLabel: weakest ? `${weakest.label} · ${weakest.pct}%` : undefined,
+            weakestHref: weakest
+              ? `/teacher/students/${student.id}?${progressFilterQuery({ area, topic: weakTopic, difficulty: weakDifficulty })}#performance`
+              : undefined,
             assignHref: `/teacher/students/${student.id}/assign?area=${area}`,
           };
         })}

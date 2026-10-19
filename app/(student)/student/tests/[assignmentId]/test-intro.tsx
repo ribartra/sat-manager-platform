@@ -85,7 +85,7 @@ export async function TestIntro({
         items={[
           { label: "Home", href: "/student" },
           { label: "Tests", href: "/student/tests" },
-          { label: assignment.test.name, href: `/student/tests#test-${assignment.id}` },
+          { label: assignment.test.name, href: `/student/tests?view=all#test-${assignment.id}` },
           { label: current.short },
         ]}
       />
@@ -124,7 +124,7 @@ export async function TestIntro({
             <Link href={startHref}>{current.state === "progress" ? "Continue module" : "Start module"} ›</Link>
           </Button>
           <Button asChild variant="secondary" size="lg">
-            <Link href={`/student/tests#test-${assignment.id}`}>Back</Link>
+            <Link href={`/student/tests?view=all#test-${assignment.id}`}>Back</Link>
           </Button>
         </div>
       </Card>

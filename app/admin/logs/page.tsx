@@ -1,5 +1,5 @@
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
-import { PageShell } from "@/components/sat";
+import { PageShell, Pagination, pageFromParam, paginate } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
@@ -16,8 +16,10 @@ import {
 } from "@/lib/audit-catalog";
 import { AuditPayload } from "@/components/admin/audit-payload";
 
+const LOG_PAGE_SIZE = 50;
+
 interface PageProps {
-  searchParams: Promise<{ cat?: string }>;
+  searchParams: Promise<{ cat?: string; page?: string }>;
 }
 
 const TABS: { id: string; label: string; match?: AuditCategory }[] = [
@@ -52,7 +54,7 @@ export default async function AdminLogsPage({ searchParams }: PageProps) {
   if (!session) redirect("/login");
   if (session.user.role !== "ADMIN") redirect("/teacher");
 
-  const { cat } = await searchParams;
+  const { cat, page } = await searchParams;
   const category = cat?.toLowerCase() ?? "all";
   const tab = TABS.find((t) => t.id === category) ?? TABS[0];
 
@@ -62,16 +64,16 @@ export default async function AdminLogsPage({ searchParams }: PageProps) {
     take: 500,
   });
 
-  const filtered = (
-    tab.id === "all" ? logs : logs.filter((log) => actionCategory(log.action) === tab.match)
-  ).slice(0, 250);
+  // The latest 500 actions, paginated (every one of them is reachable, nothing is cut).
+  const filtered = tab.id === "all" ? logs : logs.filter((log) => actionCategory(log.action) === tab.match);
+  const logPage = paginate(filtered, pageFromParam(page), LOG_PAGE_SIZE);
 
   return (
     <PageShell width="wide">
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Admin" }, { label: "Audit Log" }]} />
       <h1 className="mb-1 text-xl font-semibold text-gray-900">Activity log</h1>
       <p className="mb-4 text-sm text-gray-500">
-        Recent actions by users.
+        Recent actions by users (the latest 500).
       </p>
 
       <div className="mb-4 flex flex-wrap gap-2">
@@ -104,7 +106,7 @@ export default async function AdminLogsPage({ searchParams }: PageProps) {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filtered.map((log) => {
+              {logPage.items.map((log) => {
                 const eventCategory = actionCategory(log.action);
                 const categoryLabel = TABS.find((t) => t.match === eventCategory)?.label ?? eventCategory;
                 const label = humanizeAction(log.action);
@@ -161,6 +163,7 @@ export default async function AdminLogsPage({ searchParams }: PageProps) {
           <p className="py-10 text-center text-sm text-gray-400">No events recorded yet.</p>
         )}
       </Card>
+      <Pagination basePath="/admin/logs" params={{ cat: tab.id === "all" ? undefined : tab.id }} pageSize={LOG_PAGE_SIZE} {...logPage} />
     </PageShell>
   );
 }

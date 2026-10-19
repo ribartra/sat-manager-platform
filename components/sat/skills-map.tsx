@@ -40,6 +40,8 @@ export interface SkillsMapSkill {
   sub: React.ReactNode;
   chips: SkillsMapChip[];
   action?: React.ReactNode;
+  /** Optional link on the skill name (e.g. the student's sets filtered by this skill). */
+  href?: string;
 }
 
 export function SkillsMap({ domains }: { domains: { id: string; name: string; skills: SkillsMapSkill[] }[] }) {
@@ -56,7 +58,11 @@ export function SkillsMap({ domains }: { domains: { id: string; name: string; sk
             {d.skills.map((skill) => (
               <div key={skill.id} className="grid items-center gap-2 py-2 sm:grid-cols-[1fr_auto]">
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-gray-900">{skill.name}</p>
+                  {skill.href ? (
+                    <Link href={skill.href} className="text-sm font-semibold text-gray-900 hover:underline">{skill.name}</Link>
+                  ) : (
+                    <p className="text-sm font-semibold text-gray-900">{skill.name}</p>
+                  )}
                   <p className="text-xs text-gray-500">{skill.sub}</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-1.5">

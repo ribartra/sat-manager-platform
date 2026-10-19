@@ -91,11 +91,30 @@ export function SectionCell({ section }: { section: SectionView }) {
   return <span className="text-xs text-gray-400">Not taken</span>;
 }
 
-/** Reading & Writing | Math | Total blocks (mockup `.scores`). Scores appear only for complete sections (never estimated). */
-export function ScoreBlocks({ view, actionFor }: { view: TestAttemptView; actionFor?: (section: SectionView) => React.ReactNode }) {
+/**
+ * Reading & Writing | Math | Total blocks (mockup `.scores`). Scores appear only for complete sections (never estimated).
+ * With `anchorPrefix`, a section with a finished module jumps to its first finished module (`#{prefix}{key}`).
+ */
+export function ScoreBlocks({
+  view,
+  actionFor,
+  anchorPrefix,
+}: {
+  view: TestAttemptView;
+  actionFor?: (section: SectionView) => React.ReactNode;
+  anchorPrefix?: string;
+}) {
+  const anchorFor = (s: SectionView) => {
+    const first = anchorPrefix ? view.modules.find((m) => m.section === s.section && m.state === "done") : undefined;
+    return first ? `#${anchorPrefix}${first.key}` : null;
+  };
   const block = (s: SectionView) => (
-    <div className={cn("rounded-[var(--sat-radius)] border border-[var(--sat-border)] border-t-4 bg-white p-4", s.section === "MATH" ? "border-t-[var(--sat-area-math)]" : "border-t-[var(--sat-area-reading)]")}>
-      <p className="text-xs font-semibold">{s.label}</p>
+    <div className={cn("relative rounded-[var(--sat-radius)] border border-[var(--sat-border)] border-t-4 bg-white p-4", s.section === "MATH" ? "border-t-[var(--sat-area-math)]" : "border-t-[var(--sat-area-reading)]", anchorFor(s) && "hover:bg-[var(--sat-surface-2)]")}>
+      {anchorFor(s) ? (
+        <a href={anchorFor(s)!} className="text-xs font-semibold after:absolute after:inset-0 after:content-['']">{s.label}</a>
+      ) : (
+        <p className="text-xs font-semibold">{s.label}</p>
+      )}
       {s.complete && s.score !== null ? (
         <>
           <p className={cn("mt-1 text-[34px] font-extrabold leading-[1.1] tabular-nums", SECTION_TEXT[s.section])}>{s.score}</p>
@@ -105,7 +124,7 @@ export function ScoreBlocks({ view, actionFor }: { view: TestAttemptView; action
         <>
           <p className="mt-1 text-[22px] font-extrabold leading-[1.1] text-[var(--sat-blank)]">{s.modulesDone > 0 ? "Incomplete" : "Not taken"}</p>
           <p className="text-xs text-[var(--sat-muted)]">{s.modulesDone > 0 ? `${s.modulesDone} of ${s.modulesTotal} modules done` : "No module of this section yet"}</p>
-          {actionFor ? <div className="mt-2">{actionFor(s)}</div> : null}
+          {actionFor ? <div className="relative z-10 mt-2">{actionFor(s)}</div> : null}
         </>
       )}
     </div>
@@ -152,8 +171,9 @@ export function ModuleResultRows({
   return (
     <div className="divide-y divide-[var(--sat-border)]">
       {modules.map((m) => (
-        <div key={m.key} className="grid items-center gap-2 py-3 sm:grid-cols-[9rem_1fr_11rem]">
-          <a href={`#${anchorPrefix}${m.key}`} className="text-sm hover:underline">
+        // The whole row jumps to the module (stretched label link); the action stays on top.
+        <div key={m.key} className="relative grid items-center gap-2 py-3 hover:bg-[var(--sat-surface-2)] sm:grid-cols-[9rem_1fr_11rem]">
+          <a href={`#${anchorPrefix}${m.key}`} className="text-sm after:absolute after:inset-0 after:content-[''] hover:underline">
             <span className={cn("font-semibold", SECTION_TEXT[m.section])}>{m.short}</span>
             <span className="text-gray-500"> · {m.tier}</span>
           </a>
@@ -175,7 +195,7 @@ export function ModuleResultRows({
             ) : (
               <span className="flex items-center justify-end gap-2">
                 <span>{m.state === "progress" ? "In progress" : "Not taken"}</span>
-                {actionFor?.(m)}
+                <span className="relative z-10">{actionFor?.(m)}</span>
               </span>
             )}
           </div>

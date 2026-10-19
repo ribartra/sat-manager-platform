@@ -9,8 +9,24 @@ import { formatDate, formatDuration, relativeDay } from "@/lib/utils";
 
 /**
  * "All attempts" tables (mockup result.html / test-result.html / practice.html): one row per try,
- * the whole row opens it, the try being viewed is marked, the best practice try gets a badge.
+ * the whole row opens it, the try being viewed is marked (and not linked to itself), the best practice try gets a badge.
  */
+
+/** Row of an attempts table: linked, except the try being viewed (plain highlighted row, no chevron). */
+function AttemptTr({ viewing, className, children }: { viewing: boolean; className?: string; children: React.ReactNode }) {
+  if (!viewing) return <LinkTr className={className}>{children}</LinkTr>;
+  return (
+    <tr className="bg-blue-50/60" aria-current="page">
+      {children}
+      <td className="w-8" />
+    </tr>
+  );
+}
+
+/** The row's main link, or plain bold text on the row being viewed. */
+function AttemptLink({ viewing, href, children }: { viewing: boolean; href: string; children: React.ReactNode }) {
+  return viewing ? <span className="font-semibold text-[var(--sat-text)]">{children}</span> : <RowLink href={href}>{children}</RowLink>;
+}
 
 export interface PracticeAttemptRow {
   id: string;
@@ -44,10 +60,10 @@ export function PracticeAttemptsTable({
   return (
     <SimpleTable head={[...(mixed ? ["Practice set"] : []), "Attempt", "Completed", "Score", "Correct", "Time", ""]}>
       {rows.map((r) => (
-        <LinkTr key={r.id} className={r.id === viewingId ? "bg-blue-50/60" : invalidatedRowClass(r.status)}>
-          {mixed ? <td className={TD}><RowLink href={hrefFor(r.id)}>{r.title}</RowLink></td> : null}
+        <AttemptTr key={r.id} viewing={r.id === viewingId} className={invalidatedRowClass(r.status)}>
+          {mixed ? <td className={TD}><AttemptLink viewing={r.id === viewingId} href={hrefFor(r.id)}>{r.title}</AttemptLink></td> : null}
           <td className={TD}>
-            {mixed ? <>Try {r.tryNumber}{r.tryCount ? ` of ${r.tryCount}` : ""}</> : <RowLink href={hrefFor(r.id)}>Try {r.tryNumber} of {r.tryCount ?? rows.length}</RowLink>}
+            {mixed ? <>Try {r.tryNumber}{r.tryCount ? ` of ${r.tryCount}` : ""}</> : <AttemptLink viewing={r.id === viewingId} href={hrefFor(r.id)}>Try {r.tryNumber} of {r.tryCount ?? rows.length}</AttemptLink>}
             {r.id === viewingId ? <Badge variant="info" className="ml-2">Viewing</Badge> : null}
             {r.id === bestId ? <Badge variant="success" className="ml-2">Best</Badge> : null}
             {r.status && r.status !== "SUBMITTED" ? <span className="ml-2"><AttemptStatusBadge status={r.status} /></span> : null}
@@ -58,8 +74,8 @@ export function PracticeAttemptsTable({
           <td className={TD}><VoidableValue status={r.status}><Pct value={r.pct} className="font-semibold" /></VoidableValue></td>
           <td className={TD}>{r.correct} of {r.total}</td>
           <td className={`${TD} text-gray-600`}>{r.time ? formatDuration(r.time) : "—"}</td>
-          <ChevronCell />
-        </LinkTr>
+          {r.id === viewingId ? null : <ChevronCell />}
+        </AttemptTr>
       ))}
     </SimpleTable>
   );
@@ -77,9 +93,9 @@ export function TestAttemptsTable({
   return (
     <SimpleTable head={["Attempt", "Date", <SectionHead key="rw" section="RW" />, <SectionHead key="m" section="MATH" />, "Total", ""]}>
       {rows.map((r) => (
-        <LinkTr key={r.id} className={r.id === viewingId ? "bg-blue-50/60" : undefined}>
+        <AttemptTr key={r.id} viewing={r.id === viewingId}>
           <td className={TD}>
-            <RowLink href={hrefFor(r.id)}>Try {r.tryNumber} of {rows.length}</RowLink>
+            <AttemptLink viewing={r.id === viewingId} href={hrefFor(r.id)}>Try {r.tryNumber} of {rows.length}</AttemptLink>
             {r.id === viewingId ? <Badge variant="info" className="ml-2">Viewing</Badge> : null}
             {r.status !== "SUBMITTED" ? <span className="ml-2"><AttemptStatusBadge status={r.status} /></span> : null}
           </td>
@@ -90,8 +106,8 @@ export function TestAttemptsTable({
           <td className={TD}><TestSectionScore attempt={r} section="RW" /></td>
           <td className={TD}><TestSectionScore attempt={r} section="MATH" /></td>
           <td className={TD}><TestTotalCell attempt={r} /></td>
-          <ChevronCell />
-        </LinkTr>
+          {r.id === viewingId ? null : <ChevronCell />}
+        </AttemptTr>
       ))}
     </SimpleTable>
   );

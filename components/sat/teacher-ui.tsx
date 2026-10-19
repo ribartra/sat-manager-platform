@@ -82,18 +82,22 @@ export function shortName(name: string) {
 
 /**
  * One line of the compact "Needs attention" card (mockup `mejorada/teacher/index.html`): coloured
- * label with icon and count, then a chip per student (details in the chip tooltip).
+ * label with icon and count, then a chip per student (details in the chip tooltip) and a "View all ›"
+ * shortcut to the full list when there is one.
  */
 export function AttentionRow({
   icon,
   label,
   tone,
   people,
+  viewAllHref,
 }: {
   icon: React.ReactNode;
   label: string;
   tone: "warn" | "bad" | "info";
   people: { id: string; name: string; href: string; detail: string }[];
+  /** Full list behind this row (e.g. the students list filtered the same way). */
+  viewAllHref?: string;
 }) {
   const color = tone === "warn" ? "text-amber-700" : tone === "bad" ? "text-red-600" : "text-blue-600";
   return (
@@ -111,6 +115,11 @@ export function AttentionRow({
           </Link>
         ))
       )}
+      {viewAllHref && people.length ? (
+        <Link href={viewAllHref} className="ml-auto whitespace-nowrap text-xs font-medium text-[var(--sat-primary)] hover:underline">
+          View all ›
+        </Link>
+      ) : null}
     </div>
   );
 }

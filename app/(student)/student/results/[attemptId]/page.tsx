@@ -126,7 +126,8 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
         items={[
           { label: "Home", href: "/student" },
           { label: "Practice", href: areaTab ? `/student/practice?area=${areaTab}` : "/student/practice" },
-          { label: "History", href: areaTab ? `/student/history?area=${areaTab}` : historyHref },
+          // Back to the same History list the student came from (area, skill, level and dates kept).
+          { label: "History", href: query.area || !areaTab ? historyHref : `/student/history?area=${areaTab}` },
           { label: `Try ${thisTry?.tryNumber ?? attempt.attemptNumber} results` },
         ]}
       />

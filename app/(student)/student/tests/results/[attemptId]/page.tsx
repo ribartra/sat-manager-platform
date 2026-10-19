@@ -112,7 +112,7 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
         items={[
           { label: "Home", href: "/student" },
           { label: "Tests", href: "/student/tests" },
-          { label: attempt.test.name, href: attempt.assignmentId ? `/student/tests#test-${attempt.assignmentId}` : "/student/tests" },
+          { label: attempt.test.name, href: attempt.assignmentId ? `/student/tests?view=all#test-${attempt.assignmentId}` : "/student/tests?view=completed" },
           { label: `Try ${tryNumber} results` },
         ]}
       />
@@ -146,7 +146,7 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
         <div className="flex flex-wrap gap-2">
           {canRetake && attempt.assignmentId ? <RetakeTestButton assignmentId={attempt.assignmentId} testName={attempt.test.name} /> : null}
           <Button asChild variant="ghost" size="sm">
-            <Link href="/student/tests">All tests</Link>
+            <Link href="/student/tests?view=completed">All tests</Link>
           </Button>
         </div>
       </div>
@@ -155,7 +155,7 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
 
       <TestResultSentence view={view} status={attempt.status} who="You" />
 
-      <ScoreBlocks view={view} actionFor={(s) => startButton(view.modules.find((m) => m.section === s.section && m.state !== "done"))} />
+      <ScoreBlocks view={view} anchorPrefix={attempt.test.reviewEnabled ? "mod-" : undefined} actionFor={(s) => startButton(view.modules.find((m) => m.section === s.section && m.state !== "done"))} />
 
       <Card padding="md" className="mt-4">
         <h2 className="text-sm font-semibold text-gray-900">Results by module</h2>

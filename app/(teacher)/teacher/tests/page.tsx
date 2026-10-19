@@ -105,14 +105,19 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
                   </div>
                 </div>
                 <div className="grid gap-2.5 px-4 py-3">
-                  <TestModuleTiles modules={modules} />
+                  <TestModuleTiles modules={modules} hrefFor={(m) => `/teacher/tests/${test.id}#module-${m.key}`} />
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-600">
+                    {/* Counts open the Test page's Students table (who is assigned, done, in progress, late). */}
+                    <Link
+                      href={`/teacher/tests/${test.id}#students`}
+                      title="See the students of this test"
+                      className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md text-sm text-gray-600 hover:underline"
+                    >
                       <span className="inline-flex items-center gap-1"><User size={14} /> <b>{a.length}</b> assigned</span>
                       <span className="text-green-700"><b>{completed}</b> completed</span>
                       <span className="text-amber-700"><b>{inProgress}</b> in progress</span>
                       {overdue ? <span className="text-red-600"><b>{overdue}</b> overdue</span> : null}
-                    </p>
+                    </Link>
                     <FullTestActions
                       testId={test.id}
                       status={test.status}

@@ -220,7 +220,15 @@ export function SetsIndexClient({ rows, batchId, batches }: SetsIndexClientProps
           <p className="text-xs uppercase text-gray-400">Questions</p>
           <p className="mt-1 text-2xl font-semibold text-gray-900">{totals.total}</p>
         </Card>
-        <Card padding="md">
+        {/* Opens the list filtered to what still needs review (same as the "pending only" box). */}
+        <Card
+          as="button"
+          padding="md"
+          aria-pressed={onlyPending}
+          title="Show only the Extracted Tests that need review"
+          onClick={() => setOnlyPending(true)}
+          className="text-left"
+        >
           <p className="text-xs uppercase text-gray-400">Needs review</p>
           <p className="mt-1 text-2xl font-semibold text-rose-600">{totals.needsReview}</p>
         </Card>

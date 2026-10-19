@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FormEvent, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -210,7 +211,16 @@ export function ParentsClient({ parents, students }: { parents: Parent[]; studen
                   {parent.phone && <p className="text-xs text-gray-400">{parent.phone}</p>}
                 </td>
                 <td className="px-4 py-3 text-gray-600">
-                  {parent.students.map((student) => student.name).join(", ") || "None"}
+                  {parent.students.length === 0
+                    ? "None"
+                    : parent.students.map((student, index) => (
+                        <span key={student.id}>
+                          {index > 0 ? ", " : null}
+                          <Link href={`/teacher/students/${student.id}`} className="hover:text-[var(--sat-primary)] hover:underline">
+                            {student.name}
+                          </Link>
+                        </span>
+                      ))}
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex justify-end gap-2">

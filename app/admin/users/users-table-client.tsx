@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
@@ -33,7 +34,14 @@ export function AdminUsersTable({ rows }: { rows: AdminUserRow[] }) {
         meta: { priority: "high" },
         cell: ({ row }) => (
           <div>
-            <p className="font-medium text-foreground">{row.original.name}</p>
+            {/* Active, approved students open their page (the only students an admin can view). */}
+            {row.original.role === "STUDENT" && row.original.active && row.original.validationStatus === "APPROVED" ? (
+              <Link href={`/teacher/students/${row.original.id}`} className="font-medium text-foreground hover:text-[var(--sat-primary)] hover:underline">
+                {row.original.name}
+              </Link>
+            ) : (
+              <p className="font-medium text-foreground">{row.original.name}</p>
+            )}
             <p className="text-xs text-muted-foreground">{row.original.email}</p>
           </div>
         ),

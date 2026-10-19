@@ -40,7 +40,11 @@ export default async function StudentTestsPage({ searchParams }: PageProps) {
     .flatMap((t) => t.attempts.filter((a) => a.status === "SUBMITTED").map((a) => ({ test: t, attempt: a })))
     .sort((a, b) => (a.attempt.submittedAt?.getTime() ?? 0) - (b.attempt.submittedAt?.getTime() ?? 0));
   const latest = submitted[submitted.length - 1] ?? null;
-  const best = submitted.reduce<number | null>((m, s) => (s.attempt.totalScore !== null && (m === null || s.attempt.totalScore > m) ? s.attempt.totalScore : m), null);
+  const bestAttempt = submitted.reduce<(typeof submitted)[number] | null>(
+    (m, s) => (s.attempt.totalScore !== null && (m === null || s.attempt.totalScore > (m.attempt.totalScore ?? -1)) ? s : m),
+    null
+  );
+  const best = bestAttempt?.attempt.totalScore ?? null;
   const inProgress = pending.filter((t) => t.state === "progress").length;
   const overdue = pending.filter((t) => t.overdue).length;
   const attemptsTotal = submitted.length;
@@ -64,7 +68,13 @@ export default async function StudentTestsPage({ searchParams }: PageProps) {
           sub={`${attemptsTotal} attempt${attemptsTotal === 1 ? "" : "s"} in total · see them`}
           href="/student/tests?view=completed"
         />
-        <StatTile tone="dark" label="Best total score" value={best ?? "—"} sub="out of 1600" />
+        <StatTile
+          tone="dark"
+          label="Best total score"
+          value={best ?? "—"}
+          sub={bestAttempt ? "out of 1600 · open ›" : "out of 1600"}
+          href={bestAttempt ? `/student/tests/results/${bestAttempt.attempt.id}` : undefined}
+        />
         {latest ? (
           <StatTile
             label="Latest total score"

@@ -90,7 +90,8 @@ export function teacherViewLinks(studentId: string, studentName: string): HomeLi
     tab: (tab) => (tab === "summary" ? home : `${home}?area=${tab}`),
     practiceResult: (id) => `${student}/attempts/${id}`,
     testResult: (id) => `${student}/tests/${id}`,
-    history: () => `${student}?area=history`,
+    // From an area tab: that area on the student page, at its recent attempts.
+    history: (tab) => (tab ? `${student}?area=${tab}#recent-attempts` : `${student}?area=history`),
     practice: () => null,
     readOnly: true,
     crumbs: [

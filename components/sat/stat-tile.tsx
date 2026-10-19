@@ -13,6 +13,7 @@ export function StatTile({
   value,
   sub,
   href,
+  title,
   icon,
   iconTone,
   tone = "default",
@@ -22,6 +23,8 @@ export function StatTile({
   value: React.ReactNode;
   sub?: React.ReactNode;
   href?: string;
+  /** Tooltip of the tile (used when the tile is a link and cannot hold an info button). */
+  title?: string;
   icon?: React.ReactNode;
   /** Colour of the round icon badge (mockup stat cards: green check, blue trend, amber clock). */
   iconTone?: "ok" | "info" | "warn";
@@ -63,11 +66,11 @@ export function StatTile({
   );
   const classes = cn(dark && "border-[var(--sat-area-tests)] bg-[var(--sat-area-tests)]", href && dark && "hover:brightness-95", className);
   return href ? (
-    <Card as={Link} href={href} padding="md" className={cn("block", classes)}>
+    <Card as={Link} href={href} title={title} padding="md" className={cn("block", classes)}>
       {body}
     </Card>
   ) : (
-    <Card padding="md" className={classes}>
+    <Card padding="md" title={title} className={classes}>
       {body}
     </Card>
   );

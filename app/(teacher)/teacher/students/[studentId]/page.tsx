@@ -80,10 +80,11 @@ import { officialSkillsFor } from "@/lib/taxonomy-order";
 
 interface PageProps {
   params: Promise<{ studentId: string }>;
-  searchParams: Promise<{ area?: string; topic?: string; difficulty?: string; from?: string; to?: string; attemptsPage?: string; examsPage?: string; type?: string }>;
+  searchParams: Promise<{ area?: string; topic?: string; difficulty?: string; from?: string; to?: string; attemptsPage?: string; examsPage?: string; activityPage?: string; type?: string }>;
 }
 
 const HISTORY_PAGE_SIZE = 10;
+const ACTIVITY_PAGE_SIZE = 20;
 
 export default async function StudentPage({ params, searchParams }: PageProps) {
   const { studentId } = await params;
@@ -313,7 +314,17 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
             <ActivityList items={activity} studentId={studentId} />
           </section>
           <Card padding="md">
-            <h2 className="text-sm font-semibold text-gray-900">Then, assign something</h2>
+            <div className="flex items-baseline justify-between gap-2">
+              <h2 className="text-sm font-semibold text-gray-900">Then, assign something</h2>
+              {suggestions.length > 0 ? (
+                <Link
+                  href={`/teacher/students/${studentId}?area=${suggestions[0].code.toLowerCase()}#weak-skills`}
+                  className="whitespace-nowrap text-xs font-medium text-[var(--sat-primary)] hover:underline"
+                >
+                  View all ›
+                </Link>
+              ) : null}
+            </div>
             <p className="mb-3 mt-0.5 text-sm text-gray-600">
               {pendingCount ? (
                 <>
@@ -350,12 +361,21 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
 
   // ---------------------------------------------------------------- Activity
   if (view === "activity") {
-    const activity = await loadActivity(studentId, 100);
+    // Everything, newest first, 20 per page (mockup student.html activity pager).
+    const activity = await loadActivity(studentId, 1000);
+    const activityPage = paginate(activity, pageFromParam(query.activityPage), ACTIVITY_PAGE_SIZE);
     return (
       <PageShell maxWidth={1180} width="wide">
         {header}
         <p className="mb-2 text-sm text-gray-500">Every practice set and test, newest first. Click to review.</p>
-        <ActivityList items={activity} studentId={studentId} grouped />
+        <ActivityList items={activityPage.items} studentId={studentId} grouped />
+        <Pagination
+          basePath={`/teacher/students/${studentId}`}
+          params={{ area: "activity" }}
+          param="activityPage"
+          pageSize={ACTIVITY_PAGE_SIZE}
+          {...activityPage}
+        />
       </PageShell>
     );
   }
@@ -466,6 +486,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
     const report = await loadMockReport(studentId, reportFilters);
     const moduleTable = moduleTableOf(report.sectionModuleMetrics);
     const tests = await loadStudentTests(studentId);
+    const testIdByAssignment = new Map(tests.map((t) => [t.assignmentId, t.testId]));
     // Every try (in progress, submitted, not counted), newest first; the date filter applies to finished tries.
     const inDates = new Set(report.examHistory.map((exam) => exam.id));
     const dated = Boolean(filters.from || filters.to);
@@ -479,11 +500,11 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
         {header}
         <KpiStrip
           items={[
-            { label: "Tests completed", value: String(report.kpis.exams), hint: "Finished in the selected dates." },
-            { label: "Latest total score", value: String(report.kpis.latestTotal ?? "—"), className: "text-[var(--sat-tests-ink)]", hint: "Total score (out of 1600) on the most recent test." },
-            { label: "Latest Reading & Writing", value: String(report.kpis.latestRw ?? "—"), hint: "Reading & Writing score (out of 800) on the most recent test." },
-            { label: "Latest Math", value: String(report.kpis.latestMath ?? "—"), hint: "Math score (out of 800) on the most recent test." },
-            { label: "Tests to do", value: String(report.kpis.pending), hint: "Assigned but not finished yet." },
+            { label: "Tests completed", value: String(report.kpis.exams), hint: "Finished in the selected dates.", href: "#exam-history" },
+            { label: "Latest total score", value: String(report.kpis.latestTotal ?? "—"), className: "text-[var(--sat-tests-ink)]", hint: "Total score (out of 1600) on the most recent test.", href: "#exam-history" },
+            { label: "Latest Reading & Writing", value: String(report.kpis.latestRw ?? "—"), hint: "Reading & Writing score (out of 800) on the most recent test.", href: "#exam-history" },
+            { label: "Latest Math", value: String(report.kpis.latestMath ?? "—"), hint: "Math score (out of 800) on the most recent test.", href: "#exam-history" },
+            { label: "Tests to do", value: String(report.kpis.pending), hint: "Assigned but not finished yet.", href: "#active-tests" },
           ]}
         />
         {tests.length > 0 ? (
@@ -525,11 +546,25 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
             )}
           </div>
           <aside className="min-w-0 space-y-6">
-            <SidePanel title="Active tests" count={report.activeExams.length} empty="No active tests.">
-              {report.activeExams.map((a) => (
+            <SidePanel id="active-tests" title="Active tests" count={report.activeExams.length} empty="No active tests.">
+              {report.activeExams.map((a) => {
+                // Pre-select this test in Assign test (activeExams ids are assignment ids).
+                const testId = testIdByAssignment.get(a.id);
+                const assignHref = buildProgressHref(`/teacher/students/${studentId}/assign-test`, filters);
+                return (
                 <li key={a.id} className="flex items-start justify-between gap-3 px-3 py-2">
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-gray-800">{a.name}</p>
+                    {a.openAttemptId ? (
+                      <Link href={`/teacher/students/${studentId}/tests/${a.openAttemptId}`} className="block truncate text-sm font-medium text-gray-800 hover:underline">
+                        {a.name}
+                      </Link>
+                    ) : testId ? (
+                      <Link href={`/teacher/tests/${testId}`} className="block truncate text-sm font-medium text-gray-800 hover:underline">
+                        {a.name}
+                      </Link>
+                    ) : (
+                      <p className="truncate text-sm font-medium text-gray-800">{a.name}</p>
+                    )}
                     <div className="mt-0.5 flex items-center gap-2">
                       <StatusBadge status={a.status} />
                       {a.dueDate && <span className="text-[11px] text-gray-400">Due {formatDate(a.dueDate)}</span>}
@@ -543,13 +578,17 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                       </Hint>
                     ) : null}
                     <Hint label={a.status === "OVERDUE" ? "Give it to the student again with a new due date." : "Change the due date of this test."}>
-                      <Link href={buildProgressHref(`/teacher/students/${studentId}/assign-test`, filters)} className="shrink-0 text-xs font-medium text-blue-600 hover:underline">
+                      <Link
+                        href={testId ? `${assignHref}${assignHref.includes("?") ? "&" : "?"}test=${testId}` : assignHref}
+                        className="shrink-0 text-xs font-medium text-blue-600 hover:underline"
+                      >
                         {a.status === "OVERDUE" ? "Reassign" : "Due date"}
                       </Link>
                     </Hint>
                   </div>
                 </li>
-              ))}
+                );
+              })}
             </SidePanel>
           </aside>
         </div>
@@ -632,17 +671,18 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
       ) : null}
       <KpiStrip
         items={[
-          { label: "Sets completed", value: String(kpis.attempts), hint: `${areaLabel} practice sets finished (with the current filters).` },
+          { label: "Sets completed", value: String(kpis.attempts), hint: `${areaLabel} practice sets finished (with the current filters).`, href: "#recent-attempts" },
           {
             label: "Questions correct",
             value: kpis.overall.percent !== null ? `${kpis.overall.percent}%` : "—",
             className: scoreBandTextClass(kpis.overall.percent),
             sub: kpis.overall.total ? `${kpis.overall.correct} of ${kpis.overall.total} correct` : undefined,
             hint: "% of questions answered correctly. Blank answers count as wrong.",
+            href: "#performance",
           },
-          { label: "Total time", value: formatDuration(kpis.totalTime), hint: "Total time on finished work." },
-          { label: "Time per question", value: kpis.avgQuestionTime !== null ? formatDuration(kpis.avgQuestionTime) : "—", hint: "Average time per answered question." },
-          { label: "Sets to finish", value: String(kpis.pending), hint: "Assigned but not finished yet." },
+          { label: "Total time", value: formatDuration(kpis.totalTime), hint: "Total time on finished work.", href: "#recent-attempts" },
+          { label: "Time per question", value: kpis.avgQuestionTime !== null ? formatDuration(kpis.avgQuestionTime) : "—", hint: "Average time per answered question.", href: "#recent-attempts" },
+          { label: "Sets to finish", value: String(kpis.pending), hint: "Assigned but not finished yet.", href: "#active-sets" },
         ]}
       />
 
@@ -817,9 +857,12 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
           {report.comments.length > 0 && (
             <SidePanel title="Teacher Comments" count={report.comments.length} empty="">
               {report.comments.map((entry) => (
-                <li key={entry.id} className="px-3 py-2">
-                  <p className="text-[11px] text-gray-400" title={entry.name}>{shortSetName(entry.name)} · {entry.submittedAt ? formatDate(entry.submittedAt) : "-"}</p>
-                  <p className="text-sm text-gray-800">{entry.teacherComment}</p>
+                <li key={entry.id}>
+                  {/* Each comment opens the attempt it was written on. */}
+                  <Link href={`/teacher/students/${studentId}/attempts/${entry.id}`} className="block px-3 py-2 hover:bg-[var(--sat-primary-soft)]">
+                    <p className="text-[11px] text-gray-400" title={entry.name}>{shortSetName(entry.name)} · {entry.submittedAt ? formatDate(entry.submittedAt) : "-"}</p>
+                    <p className="text-sm text-gray-800">{entry.teacherComment}</p>
+                  </Link>
                 </li>
               ))}
             </SidePanel>
@@ -877,16 +920,19 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
 }
 
 /** KPI row (mockup stat cards); each label has a short "what is this" hint. */
-function KpiStrip({ items }: { items: Array<{ label: string; value: string; className?: string; sub?: string; hint?: string }> }) {
+/** KPI tiles; a tile with `href` jumps to the block that lists its items (its hint becomes the tooltip). */
+function KpiStrip({ items }: { items: Array<{ label: string; value: string; className?: string; sub?: string; hint?: string; href?: string }> }) {
   return (
     <StatGrid cols={5} className="my-4">
       {items.map((item) => (
         <StatTile
           key={item.label}
+          href={item.href}
+          title={item.href ? item.hint : undefined}
           label={
             <span className="flex items-center gap-1">
               {item.label}
-              {item.hint ? <InfoHint label={item.hint} /> : null}
+              {item.hint && !item.href ? <InfoHint label={item.hint} /> : null}
             </span>
           }
           value={<span className={item.className}>{item.value}</span>}

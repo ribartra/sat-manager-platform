@@ -93,7 +93,25 @@ function SummaryView({ practice }: { practice: PracticeSetItem[] }) {
         })}
       </AreaBoxGrid>
       <section className="mt-6">
-        <SectionHeader title="Up next" description={`${todo.length} set${todo.length === 1 ? "" : "s"} to do · in progress first, then by due date`} />
+        <SectionHeader
+          title="Up next"
+          description={`${todo.length} set${todo.length === 1 ? "" : "s"} to do · in progress first, then by due date`}
+          action={
+            // Shortcut to the full to-do list of each area (Home area tab filtered by "To do").
+            todo.length > 0 ? (
+              <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+                {PRACTICE_AREAS_IN_ORDER.map((code) => {
+                  const n = todo.filter((p) => p.area === code).length;
+                  return n ? (
+                    <Link key={code} href={`/student?area=${tabFromPracticeArea(code)}&status=todo#sets`} className="text-blue-600 hover:underline">
+                      {practiceAreaLabel(code)} · {n} to do ›
+                    </Link>
+                  ) : null;
+                })}
+              </span>
+            ) : undefined
+          }
+        />
         {todo.length === 0 ? (
           <Card padding="md" className="text-sm text-gray-500">Nothing pending.</Card>
         ) : (
@@ -114,7 +132,7 @@ function SummaryView({ practice }: { practice: PracticeSetItem[] }) {
             ))}
           </ListStack>
         )}
-        {todo.length > 4 ? <p className="mt-2 text-xs text-gray-500">+ {todo.length - 4} more · open an area above to see all sets</p> : null}
+        {todo.length > 4 ? <p className="mt-2 text-xs text-gray-500">+ {todo.length - 4} more · use the area links above to see all of them</p> : null}
       </section>
     </>
   );
@@ -188,6 +206,7 @@ async function AreaView({ practice, area, page }: { practice: PracticeSetItem[];
                   name: skill.name,
                   sub: assigned ? `${assigned} set${assigned === 1 ? "" : "s"} assigned` : "No sets assigned yet",
                   chips: DIFFICULTIES.map((d) => chipFor(skill.id, d)),
+                  href: `/student?area=${tab}&skill=${skill.id}#sets`,
                 };
               }),
           }))}

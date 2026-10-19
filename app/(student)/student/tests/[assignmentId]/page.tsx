@@ -154,7 +154,7 @@ export default async function FullTestPlayerPage({ params, searchParams }: PageP
       savedProgressState={savedProgressState}
       calculatorConfig={getPublicCalculatorConfig()}
       showCalculator={showCalculator}
-      exitHref={`/student/tests#test-${assignment.id}`}
+      exitHref={`/student/tests?view=all#test-${assignment.id}`}
       resultQuery={returnParams.toString()}
       completedModules={completedModules}
       startModule={requestedModule}

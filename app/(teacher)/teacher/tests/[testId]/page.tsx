@@ -167,7 +167,7 @@ export default async function FullTestDetailPage({ params, searchParams }: PageP
         }
       />
       <PageContent>
-      <TestModuleTiles modules={moduleViews} />
+      <TestModuleTiles modules={moduleViews} hrefFor={(m) => `#module-${m.key}`} />
 
       <section id="students" className="mt-6 scroll-mt-6">
         <SectionHeader title="Students" description="Correct answers per module and section scores (200–800). Click a row to review the answers." />

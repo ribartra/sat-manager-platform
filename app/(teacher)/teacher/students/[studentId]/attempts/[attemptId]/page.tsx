@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   AttemptStatusBadge,
   Breadcrumbs,
@@ -143,8 +144,28 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
               <AttemptStatusBadge status={attempt.status} />
             </div>
             <h1 className="text-xl font-semibold text-gray-900">
-              {practiceSet?.topic.name ?? practiceSetSnapshot?.name ?? "Practice set"} · {first}&apos;s results
+              {practiceSet && areaTab ? (
+                // The skill opens this student's area tab filtered by the skill and level (performance section).
+                <Link
+                  href={`${studentHref({ area: areaTab, topic: practiceSet.topicId, difficulty: practiceSet.difficulty })}#performance`}
+                  className="hover:text-[var(--sat-primary)] hover:underline"
+                  title={`${first}'s ${practiceSet.topic.name} results`}
+                >
+                  {practiceSet.topic.name}
+                </Link>
+              ) : (
+                practiceSet?.topic.name ?? practiceSetSnapshot?.name ?? "Practice set"
+              )}{" "}
+              · {first}&apos;s results
             </h1>
+            {practiceSet ? (
+              <p className="mt-0.5 text-xs text-gray-500">
+                Practice set:{" "}
+                <Link href={`/teacher/practice-sets/${practiceSet.id}/preview`} className="font-medium text-[var(--sat-primary)] hover:underline">
+                  {practiceSet.name}
+                </Link>
+              </p>
+            ) : null}
             <p className="mb-4 mt-1 text-xs text-gray-500">
               {attempt.submittedAt ? (
                 <>Completed <b className="font-medium text-gray-700">{formatDate(attempt.submittedAt)}</b> at {formatClock(attempt.submittedAt)} ({relativeDay(attempt.submittedAt)})</>

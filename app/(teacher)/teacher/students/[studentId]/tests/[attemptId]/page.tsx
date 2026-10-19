@@ -117,7 +117,12 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
       <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">{attempt.test.name} · {attempt.student.name}&apos;s results</h1>
+            <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">
+              <Link href={`/teacher/tests/${attempt.testId}`} className="hover:text-[var(--sat-primary)] hover:underline" title="Open this test">
+                {attempt.test.name}
+              </Link>{" "}
+              · {attempt.student.name}&apos;s results
+            </h1>
             <Badge variant="test">Test</Badge>
             <Badge>Try {tryNumber} of {siblings.length}</Badge>
             <AttemptStatusBadge status={attempt.status} />

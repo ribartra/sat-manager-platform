@@ -67,10 +67,15 @@ export function BluebookCard({ item }: { item: StudentTestItem }) {
     );
   };
 
+  // The title opens the same place as the main button below.
+  const mainHref = doneNoOpen && last ? `/student/tests/results/${last.id}` : `${base}?module=${next?.key ?? "rw1"}`;
+
   return (
     <div id={`test-${item.assignmentId}`} className="scroll-mt-6 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
       <div className={cn("flex items-center justify-between px-4 py-3", late ? "bg-red-600 text-white" : "bg-[var(--sat-area-tests)] text-[var(--sat-tests-ink)]")}>
-        <h2 className="text-2xl font-black">{item.name}</h2>
+        <h2 className="text-2xl font-black">
+          <Link href={mainHref} className="hover:underline">{item.name}</Link>
+        </h2>
         <span className="rounded-[5px] bg-white/25 px-2 py-[3px] text-[10px] font-extrabold tracking-wide">{tag}</span>
       </div>
       <div className="bg-[#8f8f8f] px-4 py-1 text-[10px] font-extrabold tracking-wide text-white">
@@ -90,14 +95,14 @@ export function BluebookCard({ item }: { item: StudentTestItem }) {
       <div className="flex gap-2 border-t border-gray-200 px-3.5 py-2.5">
         {doneNoOpen && last ? (
           <>
-            <Link href={`/student/tests/results/${last.id}`} className="flex-1 shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-3 py-2 text-center text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]">
+            <Link href={mainHref} className="flex-1 shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-3 py-2 text-center text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]">
               REVIEW RESULTS
             </Link>
             <RetakeTestButton assignmentId={item.assignmentId} testName={item.name} iconOnly />
           </>
         ) : (
           <>
-            <Link href={`${base}?module=${next?.key ?? "rw1"}`} className="flex-1 shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-3 py-2 text-center text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]">
+            <Link href={mainHref} className="flex-1 shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-3 py-2 text-center text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]">
               {open ? "CONTINUE" : "START TEST"}
             </Link>
             {open ? (

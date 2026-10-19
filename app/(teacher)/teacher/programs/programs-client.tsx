@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -264,9 +265,14 @@ function EnrollmentRow({
   return (
     <div className="flex items-center justify-between py-2">
       <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-sm font-medium text-gray-800">
-          {enrollment.student.name}
-        </span>
+        {/* Approved, active students open their page; pending ones are not in the program yet. */}
+        {enrollment.status === "APPROVED" && enrollment.active ? (
+          <Link href={`/teacher/students/${enrollment.studentId}`} className="text-sm font-medium text-gray-800 hover:text-[var(--sat-primary)] hover:underline">
+            {enrollment.student.name}
+          </Link>
+        ) : (
+          <span className="text-sm font-medium text-gray-800">{enrollment.student.name}</span>
+        )}
         <Badge variant={ENROLLMENT_VARIANT[enrollment.status]}>{enrollmentStatusLabel(enrollment.status)}</Badge>
         {parentPending && (
           <Badge variant="warning" className="text-xs">Awaiting parent</Badge>
