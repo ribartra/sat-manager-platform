@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { PageShell } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
@@ -7,7 +8,7 @@ import { formatDate } from "@/lib/utils";
 import { summarizeAllQuestionAnswers } from "@/lib/weighted-score";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Lock, ChevronLeft } from "lucide-react";
+import { Lock } from "lucide-react";
 import { refreshAssignmentStates } from "@/lib/assignments";
 import { practiceAreaLabel, resolvePracticeArea } from "@/lib/practice-area";
 import { difficultyLabel } from "@/lib/domain-meta";
@@ -55,22 +56,17 @@ export default async function TopicPracticeSetsPage({ params, searchParams }: Pa
 
   return (
     <PageShell width="narrow">
-      <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-        <Link href={`/student/practice?area=${area}`} className="hover:text-blue-600 flex items-center gap-1">
-          <ChevronLeft size={14} /> Practice
-        </Link>
-        <span>/</span>
-        <span>{practiceAreaLabel(resolvePracticeArea({
-          practiceArea: topic.domain.practiceArea,
-        }))}</span>
-        <span>/</span>
-        <span>{topic.domain.name}</span>
-        <span>/</span>
-        <span className="font-medium text-gray-900">{topic.name}</span>
-      </div>
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/student" },
+          { label: "Practice", href: "/student/practice" },
+          { label: practiceAreaLabel(resolvePracticeArea({ practiceArea: topic.domain.practiceArea })), href: `/student/practice?area=${area}` },
+          { label: `${topic.name} · ${difficultyLabel(diffUpper)}` },
+        ]}
+      />
 
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-semibold text-gray-900">
+        <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">
           {topic.name} — {difficultyLabel(diffUpper)}
         </h1>
         <Badge variant={diffColor[diffUpper]}>{difficultyLabel(diffUpper)}</Badge>

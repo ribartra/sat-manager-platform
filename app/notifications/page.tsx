@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
@@ -5,6 +6,7 @@ import { redirect } from "next/navigation";
 import { formatDate } from "@/lib/utils";
 import { requireApprovedSession } from "@/lib/rbac";
 import { Card } from "@/components/ui/card";
+import { homeHrefForRole } from "@/lib/nav-config";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +22,8 @@ export default async function NotificationsPage() {
 
   return (
     <PageShell width="narrow">
-      <h1 className="mb-6 text-xl font-semibold text-gray-900">Notifications</h1>
+      <Breadcrumbs items={[{ label: "Home", href: homeHrefForRole(session.user.role) }, { label: "Notifications" }]} />
+      <h1 className="mb-6 text-[26px] font-bold tracking-[-0.3px] text-gray-900">Notifications</h1>
       <Card>
         {notifications.map((n) => (
           <Link

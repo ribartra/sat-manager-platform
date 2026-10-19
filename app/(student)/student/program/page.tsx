@@ -1,4 +1,5 @@
 import { PageShell } from "@/components/sat";
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
@@ -89,6 +90,7 @@ function EnrolledView({ enrollment }: { enrollment: Enrollment }) {
   const teachers = program.teachers.map((t) => t.teacher.name).join(", ") || "—";
   return (
     <PageShell width="narrow">
+      <Breadcrumbs items={[{ label: "Home", href: "/student" }, { label: "Programs" }]} />
       <Card variant="success" padding="lg">
         <div className="flex items-center gap-3 mb-6">
           <div className="rounded-full bg-green-100 p-2.5">
@@ -132,6 +134,7 @@ function EnrolledView({ enrollment }: { enrollment: Enrollment }) {
 function PendingView({ program, requestedAt }: { program: { name: string }; requestedAt: Date }) {
   return (
     <PageShell width="narrow">
+      <Breadcrumbs items={[{ label: "Home", href: "/student" }, { label: "Programs" }]} />
       <Card variant="warning" padding="lg" className="text-center">
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-amber-100">
           <Clock size={24} className="text-amber-600" />
@@ -153,6 +156,7 @@ function PendingView({ program, requestedAt }: { program: { name: string }; requ
 function NoProgramView() {
   return (
     <PageShell width="narrow">
+      <Breadcrumbs items={[{ label: "Home", href: "/student" }, { label: "Programs" }]} />
       <div className="mb-8 text-center">
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-100">
           <FolderOpen size={24} className="text-blue-600" />

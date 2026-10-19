@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import Link from "next/link";
 import { randomUUID } from "crypto";
 import { redirect } from "next/navigation";
@@ -169,10 +170,8 @@ export default async function AiImportFileReviewPage({ params, searchParams }: P
       <div className="min-w-0 space-y-6">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <Link href={`/admin/import/ai?batch=${batchId}`} className="text-sm text-blue-600 hover:underline">
-            Back to batch
-          </Link>
-          <h1 className="mt-2 text-[26px] font-bold tracking-[-0.3px] text-gray-900">Review File</h1>
+          <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Admin" }, { label: "AI Import", href: `/admin/import/ai?batch=${batchId}` }, { label: "Review file" }]} />
+          <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Review File</h1>
           <p className="mt-1 text-sm text-gray-500">{file.relativePath}</p>
         </div>
         <Card padding="md">

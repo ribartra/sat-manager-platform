@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { redirect } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -56,6 +57,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
 
   return (
     <PageShell width="wide">
+      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Admin" }, { label: "Accounts" }]} />
       <PageHeader
         title="Account Validation"
         description="Approve new accounts. People who joined from an email invite are approved automatically."

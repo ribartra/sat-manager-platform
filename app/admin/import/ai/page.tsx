@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { PageShell } from "@/components/sat";
 import { redirect } from "next/navigation";
 import { Activity, AlertTriangle, CheckCircle2, Clock3, FileSearch, RefreshCcw } from "lucide-react";
@@ -430,8 +431,8 @@ export default async function AiImportPage({ searchParams }: PageProps) {
       <IngestAutoRefresh batchId={selectedBatchId} enabled={autoRefresh} />
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Admin / AI Import</p>
-          <h1 className="mt-1 text-[26px] font-bold tracking-[-0.3px] text-gray-900">AI Batch Import</h1>
+          <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Admin" }, { label: "AI Import" }]} />
+          <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">AI Batch Import</h1>
           <p className="mt-1 max-w-3xl text-sm text-gray-500">
             Work through staging in order: load files, process extraction, recover OCR issues, review candidates and promote clean drafts.
           </p>

@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import Link from "next/link";
 import { PageHeader, PageShell } from "@/components/sat";
 import { Card } from "@/components/ui/card";
@@ -22,6 +23,7 @@ export default async function FullTestScoringPage() {
 
   return (
     <PageShell>
+      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Tests", href: "/teacher/tests" }, { label: "How scores work" }]} />
       <PageHeader
         title="How test scores are calculated"
         description="Tests report a Reading & Writing score and a Math score from 200 to 800 each, and a total from 400 to 1600. Scores are calculated automatically when the student submits; there is nothing to set up here."

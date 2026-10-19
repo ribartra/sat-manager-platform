@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { PageShell } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
@@ -45,6 +46,7 @@ export default async function TeacherProgramsPage() {
 
   return (
     <PageShell>
+      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Programs" }]} />
       <h1 className="mb-1 text-xl font-semibold text-gray-900">Programs</h1>
       <p className="mb-6 text-sm text-gray-500">
         Programs you teach. Leave end date blank for indefinite programs.

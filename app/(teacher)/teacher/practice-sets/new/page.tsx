@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { PracticeSetEditor } from "../practice-set-editor-client";
@@ -20,7 +21,8 @@ export default async function NewPracticeSetPage({ searchParams }: PageProps) {
 
   return (
     <PageShell>
-      <h1 className="mb-6 text-xl font-semibold text-gray-900">New Practice Set</h1>
+      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Practice", href: "/teacher/practice-sets" }, { label: "New practice set" }]} />
+      <h1 className="mb-6 text-[26px] font-bold tracking-[-0.3px] text-gray-900">New Practice Set</h1>
       <PracticeSetEditor
         initial={{ topicId }}
         topics={topics.map((t) => ({

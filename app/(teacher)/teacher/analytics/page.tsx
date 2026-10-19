@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { notFound, redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
@@ -34,6 +35,7 @@ export default async function TeacherAnalyticsRedirect({ searchParams }: PagePro
 
   return (
     <PageShell>
+      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Students", href: "/teacher/students" }, { label: "Performance" }]} />
       <PageHeader title="Student performance" description="Open a student to see their performance." />
       <PageContent>
         <Card padding="lg" className="text-center text-sm text-gray-400">No students in your programs yet.</Card>

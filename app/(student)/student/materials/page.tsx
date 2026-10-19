@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
@@ -17,6 +18,7 @@ export default async function StudentMaterialsPage() {
 
   return (
     <PageShell>
+      <Breadcrumbs items={[{ label: "Home", href: "/student" }, { label: "Materials" }]} />
       <h1 className="mb-6 text-[26px] font-bold tracking-[-0.3px] text-gray-900">Study materials</h1>
       <div className="space-y-4">
         {materials.map((material) => (

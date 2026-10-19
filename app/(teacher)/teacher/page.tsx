@@ -13,6 +13,7 @@ import {
   StudentCell,
   TD,
 } from "@/components/sat";
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { formatDate, relativeDay } from "@/lib/utils";
@@ -84,6 +85,9 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
 
   const head = (count: number) => (
     <>
+      {tab !== "summary" ? (
+        <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: tab === "tests" ? "Tests" : practiceAreaLabel(practiceArea) }]} />
+      ) : null}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Hello, {firstName}!</h1>

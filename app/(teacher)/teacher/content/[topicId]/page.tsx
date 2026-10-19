@@ -1,8 +1,9 @@
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft, Plus, Pencil } from "lucide-react";
+import { Plus, Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { difficultyBadgeVariant, difficultyLabel, practiceSetStatusLabel } from "@/lib/domain-meta";
@@ -51,24 +52,18 @@ export default async function TopicContentPage({ params }: PageProps) {
 
   return (
     <PageShell>
-      <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-        <Link href={sectionHref} className="flex items-center gap-1 hover:text-blue-600">
-          <ChevronLeft size={14} /> Content
-        </Link>
-        <span>/</span>
-        <Link href={sectionHref} className="hover:text-blue-600">
-          {areaLabel}
-        </Link>
-        <span>/</span>
-        <Link href={domainHref} className="hover:text-blue-600">
-          {topic.domain.name}
-        </Link>
-        <span>/</span>
-        <span className="font-medium text-gray-900">{topic.name}</span>
-      </div>
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/teacher" },
+          { label: "Practice", href: "/teacher/practice-sets" },
+          { label: `Content map · ${areaLabel}`, href: sectionHref },
+          { label: topic.domain.name, href: domainHref },
+          { label: topic.name },
+        ]}
+      />
 
       <div className="flex items-center justify-between mb-5">
-        <h1 className="text-xl font-semibold text-gray-900">{topic.name}</h1>
+        <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">{topic.name}</h1>
         <Link
           href={`/teacher/practice-sets/new?topicId=${topicId}`}
           className="flex items-center gap-1.5 rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"

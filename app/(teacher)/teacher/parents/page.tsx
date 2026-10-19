@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
@@ -25,7 +26,8 @@ export default async function ParentsPage() {
 
   return (
     <PageShell>
-      <h1 className="mb-6 text-xl font-semibold text-gray-900">Parents</h1>
+      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Students", href: "/teacher/students" }, { label: "Parents" }]} />
+      <h1 className="mb-6 text-[26px] font-bold tracking-[-0.3px] text-gray-900">Parents</h1>
       <ParentsClient
         parents={visibleParents.map((p) => ({
           id: p.id,

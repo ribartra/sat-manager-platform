@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { PageShell } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
@@ -67,6 +68,7 @@ export default async function AdminLogsPage({ searchParams }: PageProps) {
 
   return (
     <PageShell width="wide">
+      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Admin" }, { label: "Audit Log" }]} />
       <h1 className="mb-1 text-xl font-semibold text-gray-900">Activity log</h1>
       <p className="mb-4 text-sm text-gray-500">
         Recent actions by users.

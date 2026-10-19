@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { PageShell } from "@/components/sat";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -78,7 +79,8 @@ export default async function TeacherComparePage({ searchParams }: PageProps) {
 
   return (
     <PageShell>
-      <h1 className="mb-2 text-xl font-semibold text-gray-900">Private Student Comparison</h1>
+      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Students", href: "/teacher/students" }, { label: "Compare" }]} />
+      <h1 className="mb-2 text-[26px] font-bold tracking-[-0.3px] text-gray-900">Private Student Comparison</h1>
       <p className="mb-6 text-sm text-gray-500">
         Teacher-only comparison by student, score and weakest skill.
       </p>

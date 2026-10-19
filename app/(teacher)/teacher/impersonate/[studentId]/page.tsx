@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { PageShell, PracticeAreaTabs } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
@@ -245,6 +246,7 @@ export default async function ImpersonateStudentPage({ params, searchParams }: P
         <span className="font-medium">You are viewing as: {student.name}</span>
       </Alert>
       <PageShell>
+        <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Students", href: "/teacher/students" }, { label: student.name, href: `/teacher/students/${student.id}` }, { label: "View as student" }]} />
         <div className="mb-6">
           <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Hello, {student.name.split(" ")[0]}!</h1>
           <p className="mt-0.5 text-sm text-gray-500">Read-only student dashboard</p>

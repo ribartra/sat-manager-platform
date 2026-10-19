@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { QuestionEditor } from "../question-editor-client";
@@ -26,7 +27,8 @@ export default async function NewQuestionPage({ searchParams }: PageProps) {
 
   return (
     <PageShell width="narrow">
-      <h1 className="text-xl font-semibold text-gray-900 mb-6">New Question</h1>
+      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Practice", href: "/teacher/practice-sets" }, { label: "Questions", href: "/teacher/questions" }, { label: "New question" }]} />
+      <h1 className="mb-6 text-[26px] font-bold tracking-[-0.3px] text-gray-900">New Question</h1>
       <QuestionEditor
         showGraphOption={showGraphOption}
         initial={ingestDraft?.initial}

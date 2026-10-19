@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
@@ -23,7 +24,8 @@ export default async function TeacherMaterialsPage() {
 
   return (
     <PageShell width="wide">
-      <h1 className="mb-2 text-xl font-semibold text-gray-900">Study Materials</h1>
+      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Practice", href: "/teacher/practice-sets" }, { label: "Materials" }]} />
+      <h1 className="mb-2 text-[26px] font-bold tracking-[-0.3px] text-gray-900">Study Materials</h1>
       <p className="mb-6 text-sm text-gray-500">Publish theory notes and support links for students.</p>
       <MaterialsClient
         topics={topics.map((t) => ({

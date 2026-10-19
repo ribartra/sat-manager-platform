@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { PageShell } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import { getFeatureSetting } from "@/lib/app-settings";
@@ -32,7 +33,8 @@ export default async function GroupsPage() {
 
   return (
     <PageShell>
-      <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900 mb-6">Groups & Cycles</h1>
+      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Students", href: "/teacher/students" }, { label: "Groups" }]} />
+      <h1 className="mb-6 text-[26px] font-bold tracking-[-0.3px] text-gray-900">Groups & Cycles</h1>
       <GroupsClient
         groups={groups.map((g) => ({
           id: g.id,

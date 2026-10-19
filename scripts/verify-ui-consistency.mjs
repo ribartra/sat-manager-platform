@@ -119,6 +119,30 @@ for (const file of files) {
   if (/key:\s*"Content-Security-Policy"/.test(config)) failures.push("next.config.ts must not set a static CSP (proxy.ts owns it)");
 }
 
+{
+  // Every view inside the app shell shows breadcrumbs (mockup `A.crumbs`): a page folder whose
+  // .tsx files render PageShell must also render Breadcrumbs. Exceptions: the portal Homes and
+  // screens without the shell (auth, public parent access).
+  const noCrumbs = new Set([
+    "app/(teacher)/teacher", // teacher Home
+    "app/(parent)/parent", // parent Home
+    "app/(auth)/auth/change-password", // auth layout, no sidebar
+    "app/parent/access", // public token page
+  ]);
+  const byDir = new Map();
+  for (const file of files.filter((f) => f.startsWith("app/") && f.endsWith(".tsx"))) {
+    const dir = path.dirname(file);
+    byDir.set(dir, [...(byDir.get(dir) ?? []), file]);
+  }
+  for (const [dir, dirFiles] of byDir) {
+    if (!dirFiles.some((f) => path.basename(f) === "page.tsx") || noCrumbs.has(dir)) continue;
+    const texts = await Promise.all(dirFiles.map((f) => readFile(path.join(root, f), "utf8")));
+    if (texts.some((t) => /<PageShell\b/.test(t)) && !texts.some((t) => /<Breadcrumbs\b/.test(t))) {
+      failures.push(`${dir}/page.tsx renders PageShell without Breadcrumbs (components/sat/breadcrumbs.tsx)`);
+    }
+  }
+}
+
 console.log(failures.length ? failures.map((f) => `FAIL - ${f}`).join("\n") : "PASS - UI states and errors use the shared bases");
 if (failures.length) {
   console.error(`\n${failures.length} UI consistency problem(s).`);

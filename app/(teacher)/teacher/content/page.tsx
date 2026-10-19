@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { PageShell, PracticeAreaTabs } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
@@ -177,6 +178,7 @@ export default async function TeacherContentPage({
 
   return (
     <PageShell>
+      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Practice", href: "/teacher/practice-sets" }, { label: "Content map" }]} />
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Content Map</h1>
         <Link

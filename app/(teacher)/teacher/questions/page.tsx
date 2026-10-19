@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { PageShell, PracticeAreaTabs } from "@/components/sat";
 import { Pagination, pageFromParam } from "@/components/sat/pagination";
 import prisma from "@/lib/prisma";
@@ -75,6 +76,7 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
 
   return (
     <PageShell>
+      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Practice", href: "/teacher/practice-sets" }, { label: "Questions" }]} />
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Question Bank</h1>
         <div className="flex items-center gap-2">

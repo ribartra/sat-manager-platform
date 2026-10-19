@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { TaxonomyClient } from "./taxonomy-client";
@@ -9,7 +10,8 @@ export default async function AdminTaxonomyPage() {
 
   return (
     <PageShell>
-      <h1 className="mb-2 text-xl font-semibold text-gray-900">Taxonomy</h1>
+      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Admin" }, { label: "Taxonomy" }]} />
+      <h1 className="mb-2 text-[26px] font-bold tracking-[-0.3px] text-gray-900">Taxonomy</h1>
       <p className="mb-6 text-sm text-gray-500">Academic hierarchy used by the content map, question bank, and import review.</p>
       <TaxonomyClient nodes={nodes.map((node) => ({
         id: node.id,

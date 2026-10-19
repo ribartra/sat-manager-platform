@@ -1,5 +1,6 @@
 "use client";
 
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PageShell } from "@/components/sat";
 import { FormEvent, useEffect, useState } from "react";
@@ -62,9 +63,9 @@ export default function InviteStudentPage() {
 
   return (
     <PageShell width="narrow">
+      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Students", href: "/teacher/students" }, { label: "Invite student" }]} />
       <div className="mb-6">
-        <Link href="/teacher/students" className="text-sm text-blue-600 hover:underline">← Students</Link>
-        <h1 className="mt-3 text-xl font-semibold text-gray-900">Invite Student</h1>
+        <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Invite Student</h1>
       </div>
       <Card as="form" onSubmit={submit} padding="lg" className="space-y-4">
         <div>

@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
@@ -60,6 +61,7 @@ export default async function AdminTeachersPage({ searchParams }: PageProps) {
 
   return (
     <PageShell width="default">
+      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Admin" }, { label: "Teachers" }]} />
       <PageHeader
         title="Teachers"
         description="Enable or disable teacher access and review assigned programs."

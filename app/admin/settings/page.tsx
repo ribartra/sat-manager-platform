@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { PageShell } from "@/components/sat";
 import { redirect } from "next/navigation";
 import { FEATURE_SETTINGS, getFeatureSettings } from "@/lib/app-settings";
@@ -29,6 +30,7 @@ export default async function AdminSettingsPage() {
 
   return (
     <PageShell>
+      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Admin" }, { label: "Settings" }]} />
       <h1 className="mb-1 text-xl font-semibold text-gray-900">Platform Settings</h1>
       <p className="mb-6 text-sm text-gray-500">
         Turn optional features on or off.

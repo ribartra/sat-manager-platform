@@ -275,3 +275,10 @@ export function isPlayerPath(pathname: string, search?: { get(name: string): str
     /^\/teacher\/tests\/[^/]+\/preview$/,
   ].some((pattern) => pattern.test(pathname));
 }
+
+/** The Home of each portal (first breadcrumb on pages shared by several roles). */
+export function homeHrefForRole(role: string | null | undefined): string {
+  if (role === "STUDENT") return "/student";
+  if (role === "PARENT") return "/parent";
+  return "/teacher";
+}
