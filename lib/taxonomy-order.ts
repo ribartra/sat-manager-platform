@@ -1,93 +1,11 @@
-// Official display order of domains and skills (Topic table = SKILL level).
-// Math follows the "SAT Math — Skills Tracker" (College Board order and names); Reading follows
-// the College Board list (Information and Ideas; Craft and Structure, incl. Cross-Text
-// Connections). Writing keeps its current order. Only these skills are shown in filters,
-// content maps and reports; legacy topics without content stay in the DB but are hidden.
+// Official display order of domains and skills (Topic table = SKILL level), from the reference
+// taxonomy (lib/taxonomy-reference.ts ← Taxonomia-SAT.md). Only these skills are shown in filters,
+// Practice and reports.
 import prisma from "@/lib/prisma";
 import type { PracticeAreaCode } from "@/lib/practice-area";
+import { SAT_TAXONOMY } from "@/lib/taxonomy-reference";
 
-export const TAXONOMY_ORDER: Array<{ domainId: string; domain: string; skills: Array<{ id: string; name: string }> }> = [
-  // ---- Math
-  {
-    domainId: "dom-algebra",
-    domain: "Algebra",
-    skills: [
-      { id: "top-lineq-one-var", name: "Linear equations in one variable" },
-      { id: "top-linfn", name: "Linear functions" },
-      { id: "top-lineq-two-var", name: "Linear equations in two variables" },
-      { id: "top-systems-two-linear", name: "Systems of two linear equations in two variables" },
-      { id: "top-linineq", name: "Linear inequalities in one or two variables" },
-    ],
-  },
-  {
-    domainId: "dom-advmath",
-    domain: "Advanced Math",
-    skills: [
-      { id: "top-nonlinfn", name: "Nonlinear functions" },
-      { id: "top-nonlinear-equations", name: "Nonlinear equations in one variable and systems of equations in two variables" },
-      { id: "top-equivalent-expressions", name: "Equivalent expressions" },
-    ],
-  },
-  {
-    domainId: "dom-psda",
-    domain: "Problem-Solving and Data Analysis",
-    skills: [
-      { id: "top-ratios-rates-units", name: "Ratios, rates, proportional relationships, and units" },
-      { id: "top-pct", name: "Percentages" },
-      { id: "top-data-mean", name: "One-variable data: Distributions and measures of center and spread" },
-      { id: "top-two-var-data", name: "Two-variable data: Models and scatterplots" },
-      { id: "top-prob", name: "Probability and conditional probability" },
-      { id: "top-inference-margin", name: "Inference from Statistics and Margin of Error" },
-      { id: "top-statistical-claims", name: "Statistical Claims" },
-    ],
-  },
-  {
-    domainId: "dom-geotrig",
-    domain: "Geometry and Trigonometry",
-    skills: [
-      { id: "top-area-volume", name: "Area and volume" },
-      { id: "top-lines-angles-triangles", name: "Lines, angles, and triangles" },
-      { id: "top-right-tri-trig", name: "Right triangles and trigonometry" },
-      { id: "top-circles", name: "Circles" },
-    ],
-  },
-  // ---- Reading
-  {
-    domainId: "dom-info",
-    domain: "Information and Ideas",
-    skills: [
-      { id: "top-central-details", name: "Main Ideas and Details" },
-      { id: "top-command-evidence", name: "Command of Evidence" },
-      { id: "top-infer", name: "Inferences" },
-    ],
-  },
-  {
-    domainId: "dom-craft",
-    domain: "Craft and Structure",
-    skills: [
-      { id: "top-wic", name: "Words in Context" },
-      { id: "top-text-structure-purpose", name: "Text Structure and Purpose" },
-      { id: "top-cross", name: "Cross-Text Connections" },
-    ],
-  },
-  // ---- Writing (unchanged order and names)
-  {
-    domainId: "dom-expr",
-    domain: "Expression of Ideas",
-    skills: [
-      { id: "top-rhet", name: "Rhetorical Synthesis" },
-      { id: "top-trans", name: "Transitions" },
-    ],
-  },
-  {
-    domainId: "dom-sec",
-    domain: "Standard English Conventions",
-    skills: [
-      { id: "top-bound", name: "Boundaries" },
-      { id: "top-fss", name: "Grammar and Structure" },
-    ],
-  },
-];
+export const TAXONOMY_ORDER: Array<{ domainId: string; domain: string; skills: Array<{ id: string; name: string }> }> = SAT_TAXONOMY;
 
 const DOMAIN_RANK = new Map(TAXONOMY_ORDER.map((entry, index) => [entry.domainId, index]));
 const SKILL_RANK = new Map(

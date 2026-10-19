@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import { LEGACY_DOMAIN_NAMES, LEGACY_SKILL_NAMES } from "@/lib/taxonomy-reference";
 import crypto from "crypto";
 import { readFile } from "fs/promises";
 import path from "path";
@@ -14,6 +15,7 @@ import { cleanupOfficialQuestionPlaceholders } from "@/lib/ingest-image-cleanup"
 type TopicWithRelations = {
   id: string;
   name: string;
+  domainId: string;
   domain: { name: string; section: { name: string; label: string } };
   subskills: { id: string; name: string }[];
 };
@@ -249,6 +251,16 @@ function normalizeLoose(value: string | null | undefined) {
     .join(" ");
 }
 
+function legacySkillId(name: string | null | undefined) {
+  const key = normalizeLoose(name);
+  return Object.entries(LEGACY_SKILL_NAMES).find(([legacy]) => normalizeLoose(legacy) === key)?.[1] ?? null;
+}
+
+function legacyDomainId(name: string | null | undefined) {
+  const key = normalizeLoose(name);
+  return Object.entries(LEGACY_DOMAIN_NAMES).find(([legacy]) => normalizeLoose(legacy) === key)?.[1] ?? null;
+}
+
 function sameTaxonomyName(left: string | null | undefined, right: string | null | undefined) {
   return normalize(left) === normalize(right) || normalizeLoose(left) === normalizeLoose(right);
 }
@@ -312,8 +324,9 @@ export function resolveTopicFromCandidate(candidate: CandidateForDraft, topics: 
   const domainTerm = normalize(candidate.domainName);
   const sectionTerm = normalize(candidate.section);
   const topic = topics.find((item) => {
-    if (!topicTerm || !sameTaxonomyName(item.name, candidate.topicName)) return false;
-    if (domainTerm && !sameTaxonomyName(item.domain.name, candidate.domainName)) return false;
+    // Staging keeps the names the file had; former names map to the reference skill/domain ids.
+    if (!topicTerm || !(sameTaxonomyName(item.name, candidate.topicName) || legacySkillId(candidate.topicName) === item.id)) return false;
+    if (domainTerm && !(sameTaxonomyName(item.domain.name, candidate.domainName) || legacyDomainId(candidate.domainName) === item.domainId)) return false;
     if (sectionTerm) {
       // Sections are official codes (MATH, READING, WRITING; READING_WRITING = Test placeholder).
       // The ingest stores "MATH" or "RW": a Reading & Writing candidate belongs to READING or WRITING.

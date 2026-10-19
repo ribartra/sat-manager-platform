@@ -91,8 +91,8 @@ test.describe.serial("Journey Teacher → Student → Parent", () => {
     await page.goto(`/teacher/students/${ctx.studentId}/assign`);
     await expect(page.getByText("Select Practice Sets")).toBeVisible({ timeout: 20_000 });
 
-    await page.getByPlaceholder("Search...").fill("Statistical Claims - EASY");
-    const row = page.locator("label").filter({ hasText: "Statistical Claims - EASY" }).first();
+    await page.getByPlaceholder("Search...").fill("Data, Studies & Experiments - EASY");
+    const row = page.locator("label").filter({ hasText: "Data, Studies & Experiments - EASY" }).first();
     await expect(row).toBeVisible({ timeout: 15_000 });
     await row.locator('input[type="checkbox"]').check();
 

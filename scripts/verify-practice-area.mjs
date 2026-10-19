@@ -17,7 +17,7 @@ async function assertSourcePatterns() {
   const checks = [
     {
       file: "lib/practice-area.ts",
-      requires: ["PRACTICE_AREA_TABS", "practiceAreaDomainWhere", "Grammar and Structure"],
+      requires: ["PRACTICE_AREA_TABS", "practiceAreaDomainWhere", "Form, Structure & Sense"],
       label: "practice-area helpers canónicos",
     },
     {
@@ -72,8 +72,8 @@ async function assertSourcePatterns() {
     },
     {
       file: "prisma/seed-taxonomy.ts",
-      requires: ['practiceArea: "MATH"', 'practiceArea: "READING"', 'practiceArea: "WRITING"', "Grammar and Structure"],
-      label: "Seed persiste practiceArea y Grammar and Structure",
+      requires: ["SAT_TAXONOMY", "practiceArea: ref.section", "skillOrder"],
+      label: "Seed sigue la taxonomia de referencia (lib/taxonomy-reference.ts)",
     },
     {
       file: "lib/app-settings.ts",
@@ -183,21 +183,27 @@ function assertDatabaseConsistency() {
     }
 
     const grammar = db
-      .prepare(`SELECT name FROM Topic WHERE name = 'Grammar and Structure' OR id = 'top-fss'`)
+      .prepare(`SELECT name FROM Topic WHERE id = 'top-fss' AND name = 'Form, Structure & Sense'`)
       .all();
     const legacy = db
-      .prepare(`SELECT name FROM Topic WHERE name = 'Form, Structure, and Sense'`)
+      .prepare(`SELECT name FROM Topic WHERE name IN ('Form, Structure, and Sense', 'Grammar and Structure')`)
       .all();
     if (!grammar.length) {
-      fail("Grammar and Structure no encontrado");
+      fail("Form, Structure & Sense no encontrado");
     } else {
-      ok("Grammar and Structure presente");
+      ok("Form, Structure & Sense presente");
     }
     if (legacy.length) {
-      fail("Todavía existe Form, Structure, and Sense");
+      fail("Todavía existe un nombre antiguo de Form, Structure & Sense");
     } else {
-      ok("Legacy Form, Structure, and Sense renombrado");
+      ok("Nombres antiguos de Form, Structure & Sense renombrados");
     }
+
+    // Reference taxonomy (Taxonomia-SAT.md): 29 practice skills, no legacy skills left.
+    const practiceSkills = db.prepare(`SELECT COUNT(*) AS n FROM Topic t JOIN Domain d ON d.id = t.domainId WHERE d.practiceArea IS NOT NULL`).get().n;
+    const removed = db.prepare(`SELECT COUNT(*) AS n FROM Topic WHERE id IN ('top-lineq','top-syseq','top-ineq','top-quadfn','top-poly','top-expfn','top-radeq','top-ratprop','top-stats','top-tri','top-trig','top-vol','top-central','top-textev','top-texstr','top-authpur')`).get().n;
+    if (practiceSkills !== 29 || removed) fail(`Taxonomia de referencia: ${practiceSkills} skills de practica (esperado 29), ${removed} legacy`);
+    else ok("Taxonomia de referencia: 29 skills, sin legacy");
 
     const dual = db
       .prepare(

@@ -1176,40 +1176,47 @@ def normalize_taxonomy_key(value: str | None) -> str:
     return " ".join(replacements.get(token, token) for token in normalized.split())
 
 
+# Reference taxonomy names (web: lib/taxonomy-reference.ts ← Taxonomia-SAT.md).
+REFERENCE_DOMAIN_NAME = {
+    "Problem-Solving and Data Analysis": "Problem Solving & Data Analysis",
+    "Geometry and Trigonometry": "Geometry & Trigonometry",
+}
+
 PRACTICE_MATH_DOMAIN_MAP = {
     "advanced math": "Advanced Math",
     "algebra": "Algebra",
-    "geometry and trigonometry": "Geometry and Trigonometry",
-    "problem solving data analysis": "Problem-Solving and Data Analysis",
+    "geometry and trigonometry": "Geometry & Trigonometry",
+    "problem solving data analysis": "Problem Solving & Data Analysis",
+    "problem solving and data analysis": "Problem Solving & Data Analysis",
 }
 
 PRACTICE_SKILL_MAP = {
-    "equivalent expression": "Equivalent expressions",
-    "equivalent expressions": "Equivalent expressions",
-    "non linear equations": "Nonlinear equations in one variable and systems of equations in two variables",
-    "nonlinear equations": "Nonlinear equations in one variable and systems of equations in two variables",
-    "non linear functions": "Nonlinear functions",
-    "nonlinear functions": "Nonlinear functions",
-    "linear equations one variable": "Linear equations in one variable",
-    "linear equations in one variable": "Linear equations in one variable",
-    "linear equations two variables": "Linear equations in two variables",
-    "linear equations in two variables": "Linear equations in two variables",
-    "linear functions": "Linear functions",
-    "linear inequalities": "Linear inequalities in one or two variables",
-    "systems two linear equations and equations in two variables": "Systems of two linear equations in two variables",
-    "areas and volumes": "Area and volume",
-    "area and volume": "Area and volume",
+    "equivalent expression": "Equivalent Expressions",
+    "equivalent expressions": "Equivalent Expressions",
+    "non linear equations": "Nonlinear Equations",
+    "nonlinear equations": "Nonlinear Equations",
+    "non linear functions": "Nonlinear Functions",
+    "nonlinear functions": "Nonlinear Functions",
+    "linear equations one variable": "Linear Equations in One Variable",
+    "linear equations in one variable": "Linear Equations in One Variable",
+    "linear equations two variables": "Linear Equations in Two Variables",
+    "linear equations in two variables": "Linear Equations in Two Variables",
+    "linear functions": "Linear Functions",
+    "linear inequalities": "Linear Inequalities",
+    "systems two linear equations and equations in two variables": "Systems of Linear Equations",
+    "areas and volumes": "Area & Volume",
+    "area and volume": "Area & Volume",
     "circles": "Circles",
-    "lines angles triangles": "Lines, angles, and triangles",
-    "right triangles and trigonometry": "Right triangles and trigonometry",
-    "data and mean": "One-variable data: Distributions and measures of center and spread",
-    "inference and margin of error": "Inference from Statistics and Margin of Error",
-    "one variable data": "One-variable data: Distributions and measures of center and spread",
+    "lines angles triangles": "Lines, Angles & Triangles",
+    "right triangles and trigonometry": "Right Triangles & Trigonometry",
+    "data and mean": "Distributions, Center & Spread",
+    "inference and margin of error": "Statistical Inference",
+    "one variable data": "Distributions, Center & Spread",
     "percentages": "Percentages",
-    "probability": "Probability and conditional probability",
-    "ratios rates proportions units": "Ratios, rates, proportional relationships, and units",
-    "statistical claims": "Statistical Claims",
-    "two variable data": "Two-variable data: Models and scatterplots",
+    "probability": "Probability",
+    "ratios rates proportions units": "Ratios, Rates, Proportions & Units",
+    "statistical claims": "Data, Studies & Experiments",
+    "two variable data": "Scatterplots & Models",
     "command evidence": "Command of Evidence",
     "double passage": "Cross-Text Connections",
     "inferences": "Inferences",
@@ -1217,10 +1224,10 @@ PRACTICE_SKILL_MAP = {
     "text structure and purpose": "Text Structure and Purpose",
     "words in context": "Words in Context",
     "boundaries": "Boundaries",
-    "structure and form structure and sense": "Grammar and Structure",
-    "structure and grammar": "Grammar and Structure",
-    "form structure and sense": "Grammar and Structure",
-    "grammar and structure": "Grammar and Structure",
+    "structure and form structure and sense": "Form, Structure & Sense",
+    "structure and grammar": "Form, Structure & Sense",
+    "form structure and sense": "Form, Structure & Sense",
+    "grammar and structure": "Form, Structure & Sense",
     "student notes": "Rhetorical Synthesis",
     "transitions": "Transitions",
 }
@@ -1238,7 +1245,7 @@ READING_SKILL_DOMAIN_MAP = {
 
 WRITING_SKILL_DOMAIN_MAP = {
     "Boundaries": "Standard English Conventions",
-    "Grammar and Structure": "Standard English Conventions",
+    "Form, Structure & Sense": "Standard English Conventions",
     "Form, Structure, and Sense": "Standard English Conventions",  # legacy alias
     "Rhetorical Synthesis": "Expression of Ideas",
     "Transitions": "Expression of Ideas",
@@ -1299,7 +1306,8 @@ def internal_practice_metadata_from_text(text: str) -> dict[str, str] | None:
         # "Problem-Solving" is printed with or without the hyphen in the sources.
         match = re.search(re.escape(canonical_domain).replace(r"\-", "[- ]?"), sample, re.IGNORECASE)
         if match:
-            domain = canonical_domain
+            # Sources print the College Board names; the platform uses the reference names.
+            domain = REFERENCE_DOMAIN_NAME.get(canonical_domain, canonical_domain)
             after_domain = sample[match.end():]
             end_match = re.search(r"\b(?:ID:|Question ID|Easy|Medium|Med|Hard|Question Difficulty:)\b", after_domain, re.IGNORECASE)
             raw_skill = after_domain[: end_match.start() if end_match else 120].strip()

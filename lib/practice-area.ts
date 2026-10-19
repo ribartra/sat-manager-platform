@@ -43,7 +43,8 @@ export function activeHomeTab(value: string | null | undefined): HomeTabKey {
 /** Legacy report-area keys used by parent tokens / PDF query params. */
 export type ReportAreaKey = "mathematics" | "reading" | "writing";
 
-export const GRAMMAR_AND_STRUCTURE_TOPIC = "Grammar and Structure";
+/** Writing skill formerly called "Grammar and Structure" (reference taxonomy name). */
+export const FORM_STRUCTURE_SENSE_TOPIC = "Form, Structure & Sense";
 export const LEGACY_FORM_STRUCTURE_TOPIC = "Form, Structure, and Sense";
 
 export function isAreaTabKey(value: string | null | undefined): value is AreaTabKey {

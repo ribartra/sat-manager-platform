@@ -6,7 +6,7 @@ export const E2E = {
   /** Small published Practice Set (2 questions) — stable seed content. */
   tinyPracticeSetName:
     process.env.E2E_PRACTICE_SET_NAME ||
-    "Problem Solving and Data Analysis - Statistical Claims - EASY",
+    "Problem Solving & Data Analysis - Data, Studies & Experiments - EASY",
   studentPassword: process.env.E2E_STUDENT_PASSWORD || "student123",
   parentPassword: process.env.E2E_PARENT_PASSWORD || "parent123",
 };
