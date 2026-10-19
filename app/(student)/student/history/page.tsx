@@ -54,6 +54,8 @@ import { buildProgressHref, progressDateWhere, progressFilterEntries, progressFi
 import { applyTimeFilterSetting } from "@/lib/time-filters";
 import { compareSkills, isOfficialSkill } from "@/lib/taxonomy-order";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import { AreaTag } from "@/components/sat/practice-set-row";
+import { loadStudentSessions, type StudentSession } from "@/lib/session-history";
 
 interface PageProps {
   searchParams: Promise<{
@@ -63,12 +65,16 @@ interface PageProps {
     from?: string;
     to?: string;
     page?: string;
+    source?: string;
+    sarea?: string;
+    result?: string;
   }>;
 }
 
 const HISTORY_PAGE_SIZE = 20;
-// Tabs in the mockup's order: Tests first, then practice by area. `area` keeps the old values.
+// Tabs in the mockup's order: By session (default), Tests, then practice by area. `area` keeps the old values.
 const HISTORY_TABS = [
+  { key: "sessions", label: "By session" },
   { key: "tests", label: "Tests" },
   { key: "math", label: "Practice · Math" },
   { key: "reading", label: "Practice · Reading" },
@@ -99,17 +105,150 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
   const pageParams = Object.fromEntries(progressFilterEntries(filters));
   const requestedPage = pageFromParam(params.page);
 
+  const sessionsView = !params.area || params.area === "sessions";
   const historyTabs = (
     <LinkTabs
       label="History"
-      active={area}
+      active={sessionsView ? "sessions" : area}
       tabs={HISTORY_TABS.map((t) => ({
         key: t.key,
         label: t.label,
-        href: buildAreaHref("/student/history", t.key, { difficulty: filters.difficulty, from: filters.from, to: filters.to }),
+        href:
+          t.key === "sessions"
+            ? "/student/history?area=sessions"
+            : buildAreaHref("/student/history", t.key, { difficulty: filters.difficulty, from: filters.from, to: filters.to }),
       }))}
     />
   );
+
+  if (sessionsView) {
+    const all = await loadStudentSessions(userId);
+    const source = params.source === "test" || params.source === "practice" ? params.source : "";
+    const sarea = params.sarea === "math" || params.sarea === "reading" || params.sarea === "writing" ? params.sarea : "";
+    const result = params.result === "ok" || params.result === "bad" || params.result === "blank" ? params.result : "";
+    const from = params.from && !Number.isNaN(new Date(`${params.from}T00:00:00`).getTime()) ? params.from : "";
+    const areaMatch = (s: StudentSession) =>
+      !sarea ||
+      (sarea === "math" ? s.area === "MATH" || s.area === "math-test" : s.area === sarea.toUpperCase() || s.area === "rw");
+    const listed = all
+      .filter((s) => (!source || s.source === source) && areaMatch(s) && (!from || s.at >= new Date(`${from}T00:00:00`)))
+      .map((s) => ({ s, rows: result ? s.rows.filter((r) => r.result === result) : s.rows }))
+      .filter((x) => !result || x.rows.length > 0);
+    const sessionPage = paginate(listed, requestedPage, HISTORY_PAGE_SIZE);
+    const dayOf = (d: Date) => d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+    // A day heading before the first session of each day.
+    const headings = sessionPage.items.map((x, i) => (i === 0 || dayOf(sessionPage.items[i - 1].s.at) !== dayOf(x.s.at) ? dayOf(x.s.at) : null));
+    return (
+      <PageShell width="wide" density="compact" className="space-y-4">
+        <Breadcrumbs items={[{ label: "Home", href: "/student" }, { label: "History", href: "/student/history" }, { label: "By session" }]} />
+        <h1 className="text-2xl font-semibold text-gray-900">My history</h1>
+        {historyTabs}
+        <form action="/student/history" className="flex flex-wrap items-end gap-2 text-sm">
+          <input type="hidden" name="area" value="sessions" />
+          <label className="flex flex-col text-xs text-gray-500">Source
+            <select name="source" defaultValue={source} className="mt-0.5 rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-800">
+              <option value="">All sources</option>
+              <option value="test">Test</option>
+              <option value="practice">Practice</option>
+            </select>
+          </label>
+          <label className="flex flex-col text-xs text-gray-500">Area
+            <select name="sarea" defaultValue={sarea} className="mt-0.5 rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-800">
+              <option value="">All areas</option>
+              <option value="math">Math</option>
+              <option value="reading">Reading</option>
+              <option value="writing">Writing</option>
+            </select>
+          </label>
+          <label className="flex flex-col text-xs text-gray-500">Result
+            <select name="result" defaultValue={result} className="mt-0.5 rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-800">
+              <option value="">All results</option>
+              <option value="ok">Correct</option>
+              <option value="bad">Incorrect</option>
+              <option value="blank">Blank</option>
+            </select>
+          </label>
+          <label className="flex flex-col text-xs text-gray-500">From
+            <input type="date" name="from" defaultValue={from} className="mt-0.5 rounded-md border border-gray-300 px-2 py-1 text-sm text-gray-800" />
+          </label>
+          <Button type="submit" size="sm" variant="secondary">Apply</Button>
+          {source || sarea || result || from ? <Link href="/student/history?area=sessions" className="pb-1.5 text-xs text-blue-600 hover:underline">Clear</Link> : null}
+        </form>
+        <p className="text-xs text-gray-500">Each card is one session: a practice set or a test module. Click a session to see every question.</p>
+        {sessionPage.items.length === 0 ? (
+          <EmptyState title="No sessions match these filters." />
+        ) : (
+          <div>
+            {sessionPage.items.map(({ s, rows }, index) => {
+              const heading = headings[index];
+              const right = s.rows.filter((r) => r.result === "ok").length;
+              const pct = Math.round((right / Math.max(1, s.rows.length)) * 100);
+              const time = s.rows.reduce((x, r) => x + (r.time ?? 0), 0);
+              return (
+                <div key={s.id}>
+                  {heading ? (
+                    <h3 className="mb-2 mt-5 text-sm font-semibold text-gray-900">
+                      {heading} <span className="text-xs font-normal text-gray-500">· {relativeDay(s.at)}</span>
+                    </h3>
+                  ) : null}
+                  <details className="group mt-2 rounded-lg border border-gray-200 bg-white">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-3.5 py-3 [&::-webkit-details-marker]:hidden">
+                      <span className="min-w-0">
+                        <span className="flex flex-wrap items-center gap-1.5">
+                          {s.source === "test" ? <Badge variant="test">Test</Badge> : <Badge>Practice</Badge>}
+                          {s.area === "rw" ? (
+                            <span className="text-xs font-medium text-[var(--sat-area-reading)]">Reading &amp; Writing</span>
+                          ) : s.area === "math-test" ? (
+                            <AreaTag area="MATH" />
+                          ) : (
+                            <AreaTag area={s.area} />
+                          )}
+                          {s.done ? null : <Badge variant="warning">In progress</Badge>}
+                        </span>
+                        <b className="block text-sm text-gray-900">{s.title}</b>
+                        <span className="text-xs text-gray-500">{formatClock(s.at)} · {s.rows.length} questions · {formatDuration(time)}</span>
+                      </span>
+                      <span className="flex shrink-0 items-center gap-2 text-right">
+                        <span>
+                          <span className="block text-xs text-gray-500">CORRECT</span>
+                          <b className="text-sm">{right}/{s.rows.length}</b> <Pct value={pct} className="text-sm" />
+                        </span>
+                        <span aria-hidden className="text-gray-400 transition-transform group-open:rotate-90">›</span>
+                      </span>
+                    </summary>
+                    <div className="border-t border-gray-200">
+                      <SimpleTable head={["#", "Result", "Skill", "Difficulty", "Time"]} className="rounded-none border-0">
+                        {rows.map((r) => (
+                          <tr key={r.n}>
+                            <td className={TD}>{r.n}</td>
+                            <td className={TD}>
+                              {r.result === "blank" ? <Badge>Blank</Badge> : r.result === "ok" ? <Badge variant="success">Correct</Badge> : <Badge variant="danger">Incorrect</Badge>}
+                            </td>
+                            <td className={`${TD} text-gray-700`}>{r.skill}</td>
+                            <td className={TD}><Badge variant={difficultyBadgeVariant(r.difficulty)}>{difficultyLabel(r.difficulty)}</Badge></td>
+                            <td className={`${TD} text-gray-500`}>{r.time ? formatDuration(r.time) : "—"}</td>
+                          </tr>
+                        ))}
+                      </SimpleTable>
+                      <div className="px-3.5 py-2.5">
+                        <Button asChild size="sm"><Link href={s.href}>{s.done ? "Open full results" : "Continue"} ›</Link></Button>
+                      </div>
+                    </div>
+                  </details>
+                </div>
+              );
+            })}
+          </div>
+        )}
+        <Pagination
+          basePath="/student/history"
+          params={{ area: "sessions", source, sarea, result, from }}
+          pageSize={HISTORY_PAGE_SIZE}
+          {...sessionPage}
+        />
+      </PageShell>
+    );
+  }
 
   if (area === "tests") {
     const [examAttempts, tests] = await Promise.all([

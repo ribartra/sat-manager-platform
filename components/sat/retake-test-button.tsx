@@ -9,7 +9,7 @@ import { apiFetch } from "@/lib/api-client";
 import { notify } from "@/lib/notify-ui";
 
 /** Student "Retake" for a finished Test: confirm, start a new attempt, open its module intro. */
-export function RetakeTestButton({ assignmentId, testName, size = "sm" }: { assignmentId: string; testName: string; size?: "sm" | "md" }) {
+export function RetakeTestButton({ assignmentId, testName, size = "sm", iconOnly = false }: { assignmentId: string; testName: string; size?: "sm" | "md"; iconOnly?: boolean }) {
   const router = useRouter();
   const confirm = useConfirm();
   const [busy, setBusy] = useState(false);
@@ -32,8 +32,16 @@ export function RetakeTestButton({ assignmentId, testName, size = "sm" }: { assi
   }
 
   return (
-    <Button type="button" size={size} variant="secondary" onClick={() => void retake()} disabled={busy}>
-      <RotateCcw size={14} /> {busy ? "Starting…" : "Retake"}
+    <Button
+      type="button"
+      size={size}
+      variant="secondary"
+      onClick={() => void retake()}
+      disabled={busy}
+      title="Retake"
+      aria-label={`Retake ${testName}`}
+    >
+      <RotateCcw size={14} /> {iconOnly ? null : busy ? "Starting…" : "Retake"}
     </Button>
   );
 }

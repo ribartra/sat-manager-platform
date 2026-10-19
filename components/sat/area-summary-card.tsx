@@ -110,3 +110,67 @@ export function AreaPracticeRow({ area, avgPct, todo, href }: { area: PracticeAr
     </Link>
   );
 }
+
+/**
+ * Compact area box (mockup `.area-box.compact`): area name + latest %, then two summary lines.
+ * Practice only. `href` makes the whole box a link (chevron on the second line).
+ */
+export function CompactAreaBox({
+  area,
+  label,
+  href,
+  pct,
+  emptyText = "No practice yet",
+  line1,
+  delta,
+  line1Right,
+  line2,
+}: {
+  area: PracticeAreaCode;
+  label: string;
+  href?: string;
+  pct: number | null;
+  emptyText?: string;
+  line1: React.ReactNode;
+  delta?: number | null;
+  /** Replaces the ▲/▼ delta on the first line (e.g. "3/5 done"). */
+  line1Right?: React.ReactNode;
+  line2: React.ReactNode;
+}) {
+  const tab = tabFromPracticeArea(area) ?? "math";
+  const body = (
+    <>
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-[17px] font-semibold" style={{ color: `var(--sat-area-${tab})` }}>{label}</h2>
+        {pct !== null ? <Pct value={pct} className="text-[30px] font-bold leading-none" /> : <span className="text-sm text-gray-500">{emptyText}</span>}
+      </div>
+      <div className="flex items-center justify-between gap-2 text-xs text-gray-500">
+        <span className="min-w-0 truncate">{line1}</span>
+        {line1Right !== undefined ? (
+          <span className="shrink-0">{line1Right}</span>
+        ) : delta !== null && delta !== undefined ? (
+          <b className={delta >= 0 ? "text-green-600" : "text-red-600"}>{delta >= 0 ? "▲" : "▼"} {Math.abs(delta)}</b>
+        ) : null}
+      </div>
+      <div className="flex items-center justify-between gap-2 text-xs text-gray-500">
+        <span className="min-w-0 truncate">{line2}</span>
+        {href ? <span aria-hidden className="text-gray-400">›</span> : null}
+      </div>
+    </>
+  );
+  const cls = "flex flex-col gap-1 border-t-[5px] px-4 py-3.5";
+  return href ? (
+    <Card as={Link} href={href} className={`${cls} hover:border-gray-400`} style={{ borderTopColor: `var(--sat-area-${tab})` }}>
+      {body}
+    </Card>
+  ) : (
+    <Card className={cls} style={{ borderTopColor: `var(--sat-area-${tab})` }}>
+      {body}
+    </Card>
+  );
+}
+
+/** Grid for area boxes (mockup `.grid.boxes`: auto-fit, min 250px). */
+export function AreaBoxGrid({ children }: { children: React.ReactNode }) {
+  return <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(250px,1fr))]">{children}</div>;
+}

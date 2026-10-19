@@ -36,6 +36,8 @@ export interface StudentTestItem {
   openAttempt: TestAttemptRow | null;
   attempts: TestAttemptRow[];
   lastSubmitted: TestAttemptRow | null;
+  /** Per-module results of the latest submitted attempt (Bluebook card module buttons). */
+  lastSubmittedView: TestAttemptView | null;
 }
 
 function startOfToday() {
@@ -86,6 +88,19 @@ export async function loadStudentTests(studentId: string): Promise<StudentTestIt
       const submitted = attempts.filter((t) => t.status === "SUBMITTED");
       const lastSubmitted = submitted.sort((x, y) => (y.submittedAt?.getTime() ?? 0) - (x.submittedAt?.getTime() ?? 0))[0] ?? null;
       const state: WorkState = openAttempt ? "progress" : a.status === "COMPLETED" ? "done" : "todo";
+      const lastRaw = lastSubmitted ? a.attempts.find((x) => x.id === lastSubmitted.id) : null;
+      const lastSubmittedView = lastRaw
+        ? buildTestAttemptView({
+            modules: await fullTestModulesForAttempt(lastRaw),
+            status: lastRaw.status,
+            moduleTimerState: lastRaw.moduleTimerState,
+            answers: lastRaw.answers,
+            rwScore: lastRaw.rwScore,
+            mathScore: lastRaw.mathScore,
+            totalScore: lastRaw.totalScore,
+            excludePretest,
+          })
+        : null;
       return {
         assignmentId: a.id,
         testId: a.testId,
@@ -100,6 +115,7 @@ export async function loadStudentTests(studentId: string): Promise<StudentTestIt
         openAttempt,
         attempts,
         lastSubmitted,
+        lastSubmittedView,
       };
     }),
   );

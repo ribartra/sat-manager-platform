@@ -1,6 +1,6 @@
 "use client";
 
-import { BLOCKED_SURFACE, SETTLED_RESULT } from "@/components/ui/control-states";
+import { SETTLED_RESULT } from "@/components/ui/control-states";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { MathContent } from "@/components/math-content";
@@ -13,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { formatTime } from "@/lib/utils";
 import type { CalculatorConfig } from "@/lib/calculator-config";
 import type { GraphArtifact } from "@/lib/question-graph";
-import { Flag, ChevronLeft, ChevronRight, List, Pause, Send } from "lucide-react";
+import { Calculator, ChevronLeft, ChevronRight, FileText, Flag, Highlighter, List as ListIcon, LogOut, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { OfflineBanner, SaveIndicator, type SaveStatus } from "@/components/sat";
 import { clearBuffer, readBuffer, sendKeepalive, useOnlineStatus, usePageHideFlush, useSaveQueue, writeBuffer } from "@/lib/player-persistence";
@@ -27,6 +27,9 @@ import type { CheckResult } from "@/lib/immediate-check";
 import { questionResponseLabel, resolveQuestionType, isAnswerOption } from "@/lib/question-type";
 import { Alert, InlineError } from "@/components/sat/alert";
 import { KeyboardShortcutsHint, PlayerShortcuts } from "@/components/sat/keyboard-shortcuts-hint";
+import { EliminateIcon, ReferenceSheet, StrikeButton, ToolButton, useQuestionHighlights } from "@/components/sat/player-tools";
+import { Badge } from "@/components/ui/badge";
+import { difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
 
 interface Option { label: string; text: string; imageUrl?: string | null }
 interface Question {
@@ -58,6 +61,8 @@ interface PlayerProps {
   setName: string;
   /** Skill of the set, shown with each question (mockup take.js question header). */
   skillName?: string;
+  /** Math set: shows the Calculator and Reference tools. */
+  isMath?: boolean;
   showCalculator: boolean;
   calculatorConfig: CalculatorConfig;
   feedbackMode?: "IMMEDIATE" | "AFTER_SET";
@@ -109,6 +114,7 @@ export function PracticeSetPlayer({
   savedTimeSpent,
   setName,
   skillName,
+  isMath = false,
   showCalculator,
   calculatorConfig,
   feedbackMode = "AFTER_SET",
@@ -133,6 +139,14 @@ export function PracticeSetPlayer({
   // "Check your work" page after the last question, before submitting (mockup take.js).
   const [reviewOpen, setReviewOpen] = useState(false);
   const [timerHidden, setTimerHidden] = useState(false);
+  // Mockup take.js tools: Eliminate mode, calculator, reference sheet, question list.
+  const [elimMode, setElimMode] = useState(false);
+  const [calcOpen, setCalcOpen] = useState(false);
+  const [refOpen, setRefOpen] = useState(false);
+  const [listOpen, setListOpen] = useState(true);
+  const [listDifficulty, setListDifficulty] = useState("");
+  const [listStatus, setListStatus] = useState("");
+  const [hlZone, setHlZone] = useState<HTMLDivElement | null>(null);
   const [saving, setSaving] = useState<SaveStatus>("idle");
   const [submitting, setSubmitting] = useState(false);
   const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -143,6 +157,7 @@ export function PracticeSetPlayer({
   const online = useOnlineStatus();
 
   const question = questions[current];
+  const highlights = useQuestionHighlights(`sat.hl.practice.${attemptId}`, question?.id, hlZone);
   const responseType = question ? resolveQuestionType(question.type, question.options) : "NUMERIC";
   const offlineKey = `sat-autosave:${attemptId}`;
 
@@ -453,21 +468,18 @@ export function PracticeSetPlayer({
         </Alert>
       )}
       <OfflineBanner online={online} />
-      {/* Top bar — progress as x of N stays here; large question number lives with choices */}
-      <div className="flex shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4 py-2.5 sm:px-6">
-        <div className="flex min-w-0 items-center gap-3">
-          <span className="truncate text-sm font-medium text-gray-900 max-w-[12rem] sm:max-w-xs">{setName}</span>
-          <span className="shrink-0 text-xs tabular-nums text-gray-500">
-            {current + 1} of {questions.length}
+      {/* Top bar (mockup take.js): question list toggle + title, timer, tool buttons */}
+      <div className="flex shrink-0 items-center justify-between gap-3 border-b border-gray-200 bg-white px-3 py-2 sm:px-4">
+        <div className="flex min-w-0 items-center gap-2">
+          <span className="max-[859px]:hidden">
+            <ToolButton icon={<ListIcon size={18} />} label="Questions" active={listOpen} onClick={() => setListOpen((v) => !v)} title={listOpen ? "Hide question list" : "Show question list"} />
           </span>
-        </div>
-        <div className="flex shrink-0 items-center gap-3">
-          <div className="hidden h-1.5 w-24 overflow-hidden rounded-full bg-gray-200 sm:block sm:w-32">
-            <div
-              className="h-full rounded-full bg-blue-500 transition-all"
-              style={{ width: `${((current + 1) / questions.length) * 100}%` }}
-            />
+          <div className="min-w-0">
+            <p className="max-w-[12rem] truncate text-sm font-medium text-gray-900 sm:max-w-xs">{setName}</p>
+            <p className="text-xs tabular-nums text-gray-500">{current + 1} of {questions.length}</p>
           </div>
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
           {timerHidden ? (
             <button type="button" onClick={() => setTimerHidden(false)} className="text-xs font-medium text-gray-500 underline hover:text-gray-800">
               Show timer
@@ -482,7 +494,78 @@ export function PracticeSetPlayer({
           )}
           <SaveIndicator compact status={saving} />
         </div>
+        <div className="flex shrink-0 items-center gap-0.5">
+          <ToolButton icon={<Highlighter size={18} />} label="Highlight" onClick={highlights.highlightSelection} title="Highlight the selected text" />
+          <ToolButton icon={<EliminateIcon />} label="Eliminate" active={elimMode} onClick={() => setElimMode((v) => !v)} />
+          {isMath && showCalculator ? <ToolButton icon={<Calculator size={18} />} label="Calculator" active={calcOpen} onClick={() => setCalcOpen((v) => !v)} /> : null}
+          {isMath ? <ToolButton icon={<FileText size={18} />} label="Reference" onClick={() => setRefOpen(true)} /> : null}
+          <ToolButton icon={<LogOut size={18} />} label="Save & exit" onClick={() => void handlePauseExit()} title="The timer stops. You'll continue where you left off." />
+        </div>
       </div>
+      <ReferenceSheet open={refOpen} onOpenChange={setRefOpen} />
+
+      <div className="flex min-h-0 flex-1">
+      {listOpen ? (
+        <aside className="flex w-[230px] shrink-0 flex-col border-r border-gray-200 bg-white max-[859px]:hidden" aria-label="Question list">
+          <div className="space-y-2 border-b border-gray-100 p-3">
+            <p className="text-xs text-gray-600">
+              <b className="text-gray-900">{questions.length - blankCount}</b> of {questions.length} answered
+            </p>
+            <div className="h-1.5 overflow-hidden rounded-full bg-gray-100">
+              <div className="h-full rounded-full bg-blue-500" style={{ width: `${questions.length ? ((questions.length - blankCount) / questions.length) * 100 : 0}%` }} />
+            </div>
+            <div className="flex gap-1.5">
+              <select aria-label="Filter by difficulty" value={listDifficulty} onChange={(e) => setListDifficulty(e.target.value)} className="min-w-0 flex-1 rounded border border-gray-200 px-1 py-1 text-xs">
+                <option value="">All levels</option>
+                <option value="EASY">Easy</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="HARD">Hard</option>
+              </select>
+              <select aria-label="Filter by status" value={listStatus} onChange={(e) => setListStatus(e.target.value)} className="min-w-0 flex-1 rounded border border-gray-200 px-1 py-1 text-xs">
+                <option value="">All</option>
+                <option value="open">Unanswered</option>
+                <option value="answered">Answered</option>
+                <option value="marked">Marked</option>
+              </select>
+            </div>
+          </div>
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            {(() => {
+              const rows = questions
+                .map((q, i) => ({ q, i }))
+                .filter(({ q }) => (!listDifficulty || q.difficulty === listDifficulty))
+                .filter(({ q }) => (listStatus === "open" ? !answers[q.id] : listStatus === "answered" ? Boolean(answers[q.id]) : listStatus === "marked" ? marked.has(q.id) : true));
+              if (rows.length === 0) return <p className="p-3 text-xs text-gray-500">No questions match.</p>;
+              return rows.map(({ q, i }) => (
+                <button
+                  key={q.id}
+                  type="button"
+                  onClick={() => void handleNavigate(i)}
+                  aria-current={i === current && !reviewOpen ? "true" : undefined}
+                  className={cn(
+                    "flex w-full items-center gap-2 border-b border-gray-50 px-3 py-2 text-left text-sm hover:bg-gray-50",
+                    i === current && !reviewOpen && "bg-blue-50 shadow-[inset_3px_0_0_#2563eb]",
+                  )}
+                >
+                  <b className="w-8 tabular-nums">Q{i + 1}</b>
+                  <Badge variant={difficultyBadgeVariant(q.difficulty)}>{difficultyLabel(q.difficulty)}</Badge>
+                  {marked.has(q.id) ? <Flag size={12} className="fill-red-500 text-red-500" aria-label="Marked" /> : null}
+                  <span
+                    aria-hidden
+                    className={cn(
+                      "ml-auto grid h-4 w-4 place-items-center rounded-full border text-[9px]",
+                      answers[q.id] ? "border-blue-600 bg-blue-600 text-white" : "border-dashed border-gray-400",
+                    )}
+                  >
+                    {answers[q.id] ? "✓" : ""}
+                  </span>
+                </button>
+              ));
+            })()}
+          </div>
+        </aside>
+      ) : null}
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
 
       {reviewOpen ? (
         <div className="min-h-0 flex-1 overflow-y-auto p-6">
@@ -519,6 +602,7 @@ export function PracticeSetPlayer({
       <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden md:grid-cols-2">
         {/* Left: stimulus + enunciado */}
         <div
+          ref={setHlZone}
           className={cn(
             "min-h-0 space-y-4 overflow-y-auto border-r border-gray-200 p-4 md:p-6",
             hasPassage && "bg-gray-50",
@@ -545,7 +629,8 @@ export function PracticeSetPlayer({
             <div className="flex items-baseline gap-2">
               <span className="text-4xl font-bold leading-none tabular-nums text-gray-900">{current + 1}</span>
               <p className="text-xs font-medium uppercase tracking-wide text-gray-500">{questionResponseLabel(responseType)}</p>
-              {skillName ? <p className="hidden truncate text-xs text-gray-500 sm:block">· {skillName}</p> : null}
+              <Badge variant={difficultyBadgeVariant(question.difficulty)}>{difficultyLabel(question.difficulty)}</Badge>
+              {skillName ? <p className="hidden truncate text-xs text-gray-500 sm:block">{skillName}</p> : null}
             </div>
             <div className="flex items-center gap-1">
               <KeyboardShortcutsHint choices={responseType === "MC"} />
@@ -565,7 +650,9 @@ export function PracticeSetPlayer({
               </button>
             </div>
           </div>
-          <MathToolPanel config={calculatorConfig} context="practice-set" graphArtifacts={question.graphArtifacts} enabled={showCalculator} />
+          {calcOpen ? (
+            <MathToolPanel config={calculatorConfig} context="practice-set" graphArtifacts={question.graphArtifacts} enabled={showCalculator} />
+          ) : null}
 
           {responseType === "MC" ? (
             <div className="space-y-2">
@@ -614,14 +701,14 @@ export function PracticeSetPlayer({
                     <OptionContent text={opt.text} imageUrl={opt.imageUrl} label={opt.label} className="text-base leading-snug text-gray-800 md:text-[1.05rem]" />
                   </span>
                 </button>
-                <button
-                  type="button"
-                  onClick={() => toggleEliminated(question.id, opt.label)}
-                  disabled={Boolean(checkResult)}
-                  className={cn("shrink-0 rounded border border-gray-200 px-2 py-1 text-xs text-gray-500 hover:bg-gray-100", BLOCKED_SURFACE)}
-                >
-                  {isEliminated ? "Undo" : "Eliminate"}
-                </button>
+                {elimMode ? (
+                  <StrikeButton
+                    label={opt.label}
+                    struck={Boolean(isEliminated)}
+                    onClick={() => toggleEliminated(question.id, opt.label)}
+                    disabled={Boolean(checkResult)}
+                  />
+                ) : null}
                 </div>
               )})}
             </div>
@@ -697,6 +784,9 @@ export function PracticeSetPlayer({
 
       )}
 
+      </div>
+      </div>
+
       {/* Bottom navigation — always visible in the player viewport */}
       <div className="z-10 flex shrink-0 items-center justify-between border-t border-gray-200 bg-white px-4 py-2.5 sm:px-6">
         <Button
@@ -709,11 +799,9 @@ export function PracticeSetPlayer({
         </Button>
 
         <div className="flex items-center gap-2">
+          <span className="hidden text-xs text-gray-400 lg:inline">Your answers are saved automatically</span>
           <Button variant="secondary" size="sm" onClick={() => setShowNav(!showNav)}>
-            <List size={14} className="mr-1" /> Questions
-          </Button>
-          <Button variant="secondary" size="sm" onClick={handlePauseExit} title="The timer stops. You'll continue where you left off.">
-            <Pause size={14} className="mr-1" /> Save & exit
+            Question {current + 1} of {questions.length} ▴
           </Button>
         </div>
 
@@ -781,8 +869,16 @@ export function PracticeSetPlayer({
               <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded border border-gray-200 bg-white" /> Unanswered</span>
             </div>
             <div className="mt-4 border-t border-gray-200 pt-4">
-              <Button variant="secondary" size="sm" onClick={handlePauseExit} className="w-full" title="The timer stops. You'll continue where you left off.">
-                <Pause size={14} className="mr-1" /> Save & exit
+              <Button
+                variant="secondary"
+                size="sm"
+                className="w-full"
+                onClick={() => {
+                  setShowNav(false);
+                  setReviewOpen(true);
+                }}
+              >
+                Go to review page
               </Button>
             </div>
           </div>

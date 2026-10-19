@@ -21,7 +21,8 @@ import { fetchWithTransientRetry } from "@/lib/transient-fetch";
 import { readApiError } from "@/lib/api-client";
 import { notify } from "@/lib/notify-ui";
 import { clearBuffer, readBuffer, sendKeepalive, useOnlineStatus, usePageHideFlush, useSaveQueue, writeBuffer } from "@/lib/player-persistence";
-import { ChevronLeft, Flag, List } from "lucide-react";
+import { Calculator, ChevronLeft, FileText, Flag, Highlighter, List, LogOut } from "lucide-react";
+import { EliminateIcon, ReferenceSheet, StrikeButton, ToolButton, useQuestionHighlights } from "@/components/sat/player-tools";
 import { Alert } from "@/components/sat/alert";
 import { KeyboardShortcutsHint, PlayerShortcuts } from "@/components/sat/keyboard-shortcuts-hint";
 
@@ -160,9 +161,15 @@ export function FullTestPlayer({
   // "Check your work" page shown after the last question (mockup take.js), before submitting.
   const [reviewOpen, setReviewOpen] = useState(false);
   const [timerHidden, setTimerHidden] = useState(false);
+  // Mockup take.js tools: Eliminate mode, calculator, reference sheet, highlights.
+  const [elimMode, setElimMode] = useState(false);
+  const [calcOpen, setCalcOpen] = useState(false);
+  const [refOpen, setRefOpen] = useState(false);
+  const [hlZone, setHlZone] = useState<HTMLDivElement | null>(null);
   const offlineKey = `sat-fpt-autosave:${attemptId}`;
   const currentModule = modules[moduleIndex];
   const question = currentModule?.questions[questionIndex];
+  const highlights = useQuestionHighlights(`sat.hl.test.${attemptId}`, question?.id, hlZone);
   const expiredRecorded = useRef(false);
   const breakAdvanceTriggered = useRef(false);
   const timerState = useRef<number[]>(initialTimers);
@@ -846,20 +853,26 @@ export function FullTestPlayer({
               ) : null}
             </span>
           )}
-          <Button
-            variant="secondary"
-            size="sm"
-            title={previewMode ? undefined : "The timer stops. You'll continue where you left off."}
-            onClick={async () => {
-              await saveProgress();
-              if (!previewMode) {
-                await fetch(`/api/full-practice-tests/attempts/${attemptId}/pause`, { method: "POST" });
-              }
-              router.push(exitHref);
-            }}
-          >
-            {previewMode ? "Exit preview" : "Save & exit"}
-          </Button>
+          <div className="flex items-center gap-0.5">
+            <ToolButton icon={<Highlighter size={18} />} label="Highlight" onClick={highlights.highlightSelection} title="Highlight the selected text" />
+            <ToolButton icon={<EliminateIcon />} label="Eliminate" active={elimMode} onClick={() => setElimMode((v) => !v)} />
+            {currentModule.section === "MATH" && showCalculator ? (
+              <ToolButton icon={<Calculator size={18} />} label="Calculator" active={calcOpen} onClick={() => setCalcOpen((v) => !v)} />
+            ) : null}
+            {currentModule.section === "MATH" ? <ToolButton icon={<FileText size={18} />} label="Reference" onClick={() => setRefOpen(true)} /> : null}
+            <ToolButton
+              icon={<LogOut size={18} />}
+              label={previewMode ? "Exit preview" : "Save & exit"}
+              title={previewMode ? "Exit preview" : "The timer stops. You'll continue where you left off."}
+              onClick={async () => {
+                await saveProgress();
+                if (!previewMode) {
+                  await fetch(`/api/full-practice-tests/attempts/${attemptId}/pause`, { method: "POST" });
+                }
+                router.push(exitHref);
+              }}
+            />
+          </div>
         </div>
       </div>
       {inOvertime && (
@@ -867,6 +880,7 @@ export function FullTestPlayer({
           Time&apos;s up for this module. You can keep working — your teacher will see the extra time you use.
         </Alert>
       )}
+      <ReferenceSheet open={refOpen} onOpenChange={setRefOpen} />
       {reviewOpen ? (
         <div className="min-h-0 flex-1 overflow-y-auto p-6">
           <div className="mx-auto max-w-2xl">
@@ -909,6 +923,7 @@ export function FullTestPlayer({
       ) : (
       <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden md:grid-cols-2">
         <div
+          ref={setHlZone}
           className={cn(
             "space-y-4 overflow-y-auto border-r border-gray-200 p-6",
             hasPassage && "bg-gray-50",
@@ -950,7 +965,7 @@ export function FullTestPlayer({
             config={calculatorConfig}
             context="full-test"
             graphArtifacts={question.graphArtifacts}
-            enabled={showCalculator && currentModule.section === "MATH"}
+            enabled={calcOpen && showCalculator && currentModule.section === "MATH"}
           />
           {responseType === "MC" ? (
             question.options.filter(isAnswerOption).map((option) => {
@@ -982,15 +997,9 @@ export function FullTestPlayer({
                       <OptionContent text={option.text} imageUrl={option.imageUrl} label={option.label} className="leading-snug text-gray-800" />
                     </span>
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => toggleEliminated(question.id, option.label)}
-                    aria-pressed={isEliminated}
-                    aria-label={isEliminated ? `Undo eliminate choice ${option.label}` : `Eliminate choice ${option.label}`}
-                    className="shrink-0 rounded border border-gray-200 px-2 py-1 text-xs text-gray-500 hover:bg-gray-100"
-                  >
-                    {isEliminated ? "Undo" : "Eliminate"}
-                  </button>
+                  {elimMode ? (
+                    <StrikeButton label={option.label} struck={isEliminated} onClick={() => toggleEliminated(question.id, option.label)} />
+                  ) : null}
                 </div>
               );
             })

@@ -14,6 +14,7 @@ export function StatTile({
   sub,
   href,
   icon,
+  iconTone,
   tone = "default",
   className,
 }: {
@@ -22,6 +23,8 @@ export function StatTile({
   sub?: React.ReactNode;
   href?: string;
   icon?: React.ReactNode;
+  /** Colour of the round icon badge (mockup stat cards: green check, blue trend, amber clock). */
+  iconTone?: "ok" | "info" | "warn";
   tone?: StatTone;
   className?: string;
 }) {
@@ -33,7 +36,19 @@ export function StatTile({
           aria-hidden
           className={cn(
             "flex h-9 w-9 shrink-0 items-center justify-center rounded-full",
-            dark ? "bg-white/40 text-[var(--sat-tests-ink)]" : tone === "danger" ? "bg-red-50 text-red-600" : tone === "warning" ? "bg-amber-50 text-amber-600" : "bg-gray-100 text-gray-600",
+            iconTone === "ok"
+              ? "bg-green-50 text-green-600"
+              : iconTone === "info"
+                ? "bg-blue-50 text-blue-600"
+                : iconTone === "warn"
+                  ? "bg-amber-50 text-amber-700"
+                  : dark
+                    ? "bg-white/40 text-[var(--sat-tests-ink)]"
+                    : tone === "danger"
+                      ? "bg-red-50 text-red-600"
+                      : tone === "warning"
+                        ? "bg-amber-50 text-amber-600"
+                        : "bg-gray-100 text-gray-600",
           )}
         >
           {icon}

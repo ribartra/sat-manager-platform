@@ -139,7 +139,7 @@ export function areaTabLinkClass(tab: HomeTabKey, active: boolean): string {
     case "writing":
       return "border-b-2 border-[var(--sat-area-writing)] px-3 py-2 text-sm font-medium text-[var(--sat-area-writing)]";
     case "tests":
-      return "border-b-2 border-[var(--sat-area-tests)] px-3 py-2 text-sm font-medium text-[var(--sat-area-tests)]";
+      return "border-b-2 border-[var(--sat-area-tests)] px-3 py-2 text-sm font-medium text-[var(--sat-tests-ink)]";
   }
 }
 

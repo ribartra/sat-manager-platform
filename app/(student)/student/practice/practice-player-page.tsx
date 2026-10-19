@@ -105,6 +105,7 @@ export async function renderPracticePlayer({
         savedTimeSpent={{}}
         setName={practiceSet.name}
         skillName={practiceSet.topic.name}
+        isMath={practiceSet.topic.domain.section.name === "MATH"}
         showCalculator={calculatorEnabled}
         calculatorConfig={getPublicCalculatorConfig()}
         feedbackMode={feedbackMode}
@@ -275,6 +276,7 @@ export async function renderPracticePlayer({
       savedTimeSpent={savedTimeSpent}
       setName={practiceSet.name}
       skillName={practiceSet.topic.name}
+      isMath={practiceSet.topic.domain.section.name === "MATH"}
       showCalculator={calculatorEnabled}
       calculatorConfig={getPublicCalculatorConfig()}
       feedbackMode={feedbackMode}

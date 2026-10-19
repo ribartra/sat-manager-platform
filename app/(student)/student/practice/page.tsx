@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
-  AreaSummaryCard,
+  AreaBoxGrid,
+  CompactAreaBox,
   DIFFICULTIES,
   EmptyState,
   PageShell,
@@ -12,13 +13,11 @@ import {
   SkillsMapLegend,
   pageFromParam,
   paginate,
-  studentAreaCardProps,
   type ChipState,
   type SkillsMapChip,
 } from "@/components/sat";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { AreaTag, PracticeSetRow } from "@/components/sat/practice-set-row";
-import { Pct } from "@/components/sat/work-status";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
@@ -58,54 +57,64 @@ export default async function StudentPracticePage({ searchParams }: PageProps) {
         ]}
       />
       <h1 className="text-2xl font-semibold text-gray-900">Practice</h1>
-      <p className="mb-4 mt-1 text-sm text-gray-500">Practice sets by skill, assigned by your teacher. Use them to prepare for your Tests.</p>
+      <p className="mb-4 mt-1 text-sm text-gray-500">Practice sets by skill, assigned by your teacher. Use them to prepare for your tests.</p>
       <PracticeAreaTabs basePath="/student/practice" active={tab} includeSummary includeTests={false} />
       {area ? <AreaView practice={practice} area={area} page={pageFromParam(query.page)} /> : <SummaryView practice={practice} />}
     </PageShell>
   );
 }
 
+/** Practice summary (mockup content-map.html): compact area boxes and the next 4 sets to do. */
 function SummaryView({ practice }: { practice: PracticeSetItem[] }) {
   const todo = sortPracticeSets(practice.filter((p) => p.state !== "done"));
-  const recent = practice
-    .flatMap((item) => item.tries.map((t) => ({ item, t })))
-    .sort((a, b) => b.t.submittedAt.getTime() - a.t.submittedAt.getTime())
-    .slice(0, 5);
   return (
     <>
-      <div className="grid gap-4 md:grid-cols-3">
+      <AreaBoxGrid>
         {PRACTICE_AREAS_IN_ORDER.map((area) => {
           const s = summarizeArea(practice, area);
-          return <AreaSummaryCard key={area} {...studentAreaCardProps(s, `/student/practice?area=${tabFromPracticeArea(area)}`, `Open ${s.label} practice`)} />;
+          return (
+            <CompactAreaBox
+              key={area}
+              area={area}
+              label={s.label}
+              href={`/student/practice?area=${tabFromPracticeArea(area)}`}
+              pct={s.latest?.attempt.pct ?? null}
+              emptyText="No results"
+              line1={s.lastPracticed ? `Latest practice · ${relativeDay(s.lastPracticed)}` : "Not practiced yet"}
+              line1Right={<><b className="text-gray-800">{s.done}/{s.total}</b> done</>}
+              line2={
+                <>
+                  {s.todo} to do{s.overdue ? <> · <b className="text-red-600">{s.overdue} overdue</b></> : null}
+                </>
+              }
+            />
+          );
         })}
-      </div>
-      <div className="mt-6 grid gap-4 lg:grid-cols-[1.4fr_1fr]">
-        <Card padding="md">
-          <SectionHeader title="Practice to do" description={`${todo.length} set${todo.length === 1 ? "" : "s"} · in progress first, then by due date`} />
-          {todo.length === 0 ? <p className="py-3 text-sm text-gray-500">Nothing pending.</p> : todo.map((item) => <PracticeSetRow key={item.assignmentId} item={item} showArea />)}
-        </Card>
-        <Card padding="md">
-          <SectionHeader title="Recent practice results" action={<Link href="/student/history" className="text-xs text-blue-600 hover:underline">History ›</Link>} />
-          {recent.length === 0 ? (
-            <p className="py-3 text-sm text-gray-500">No finished practice yet.</p>
-          ) : (
-            <ul className="divide-y divide-gray-100">
-              {recent.map(({ item, t }) => (
-                <li key={t.id}>
-                  <Link href={`/student/results/${t.id}`} className="flex items-center justify-between gap-3 py-2 text-sm hover:bg-gray-50">
-                    <span>
-                      <AreaTag area={item.area} /> <span className="font-medium text-gray-900">{item.skill}</span>{" "}
-                      <Badge variant={difficultyBadgeVariant(item.difficulty)}>{difficultyLabel(item.difficulty)}</Badge>
-                      <span className="block text-xs text-gray-500">Completed {formatDate(t.submittedAt)} ({relativeDay(t.submittedAt)}) · Try {t.tryNumber}</span>
-                    </span>
-                    <Pct value={t.pct} className="shrink-0 font-semibold" />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
-      </div>
+      </AreaBoxGrid>
+      <section className="mt-6">
+        <SectionHeader title="Up next" description={`${todo.length} set${todo.length === 1 ? "" : "s"} to do · in progress first, then by due date`} />
+        {todo.length === 0 ? (
+          <Card padding="md" className="text-sm text-gray-500">Nothing pending.</Card>
+        ) : (
+          <Card className="divide-y divide-gray-100">
+            {todo.slice(0, 4).map((item) => (
+              <Link key={item.assignmentId} href={`/student/practice/assignment/${item.assignmentId}`} className="flex items-center justify-between gap-3 px-3 py-2.5 hover:bg-gray-50">
+                <span className="flex min-w-0 flex-wrap items-center gap-1.5">
+                  <AreaTag area={item.area} />
+                  <b className="text-sm text-gray-900">{item.skill}</b>
+                  <Badge variant={difficultyBadgeVariant(item.difficulty)}>{difficultyLabel(item.difficulty)}</Badge>
+                  {item.overdue ? <Badge variant="danger">Overdue</Badge> : item.state === "progress" ? <Badge variant="warning">In progress</Badge> : null}
+                </span>
+                <span className="flex shrink-0 items-center gap-2 text-xs text-gray-500">
+                  {item.dueDate ? `Due ${formatDate(item.dueDate)}` : null}
+                  <span aria-hidden className="text-gray-400">›</span>
+                </span>
+              </Link>
+            ))}
+          </Card>
+        )}
+        {todo.length > 4 ? <p className="mt-2 text-xs text-gray-500">+ {todo.length - 4} more · open an area above to see all sets</p> : null}
+      </section>
     </>
   );
 }

@@ -119,3 +119,9 @@ body {
 .math-content strong {
   font-weight: 600;
 }
+
+/* Player "Highlight" tool (CSS Custom Highlight API, components/sat/player-tools.tsx). */
+::highlight(sat-hl) {
+  background-color: #fde68a;
+  color: inherit;
+}

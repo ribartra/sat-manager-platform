@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
   Breadcrumbs,
@@ -9,18 +8,14 @@ import {
   SectionHeader,
   StatGrid,
   StatTile,
-  TestAttemptsTable,
   pageFromParam,
   paginate,
 } from "@/components/sat";
 import { LineChart } from "@/components/sat/line-chart";
-import { RetakeTestButton } from "@/components/sat/retake-test-button";
-import { ModuleTiles } from "@/components/sat/test-ui";
-import { DueLine, WorkStatusBadges } from "@/components/sat/work-status";
-import { Button } from "@/components/ui/button";
+import { BluebookCard } from "@/components/sat/bluebook-card";
 import { Card } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
-import { loadStudentTests, sortTests, type StudentTestItem } from "@/lib/test-assignments";
+import { loadStudentTests, sortTests } from "@/lib/test-assignments";
 import { formatDate } from "@/lib/utils";
 
 interface PageProps {
@@ -98,10 +93,12 @@ export default async function StudentTestsPage({ searchParams }: PageProps) {
       {shown.length === 0 ? (
         <EmptyState title={view === "pending" ? "No pending tests. Great job!" : "No tests here yet."} />
       ) : (
-        <div id="tests" className="scroll-mt-6 space-y-4">
-          {page.items.map((t) => (
-            <TestCard key={t.assignmentId} item={t} />
-          ))}
+        <div id="tests" className="scroll-mt-6">
+          <div className="grid items-start gap-[18px] [grid-template-columns:repeat(auto-fill,minmax(270px,1fr))]">
+            {page.items.map((t) => (
+              <BluebookCard key={t.assignmentId} item={t} />
+            ))}
+          </div>
           <Pagination basePath="/student/tests" params={{ view }} anchor="tests" pageSize={TESTS_PAGE_SIZE} {...page} />
         </div>
       )}
@@ -135,64 +132,4 @@ const TESTS_PAGE_SIZE = 10;
 
 function shortName(name: string) {
   return name.replace(/^TEST\s*/i, "T");
-}
-
-function TestCard({ item }: { item: StudentTestItem }) {
-  const base = `/student/tests/${item.assignmentId}`;
-  const next = item.openAttempt?.view?.nextModule ?? null;
-  const showPicker = item.state !== "done";
-  return (
-    <Card id={`test-${item.assignmentId}`} padding="md" className="scroll-mt-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-lg font-semibold text-gray-900">{item.name}</h2>
-            <WorkStatusBadges state={item.state} overdue={item.overdue} />
-          </div>
-          <DueLine
-            assignedAt={item.assignedAt}
-            dueDate={item.dueDate}
-            completedAt={item.state === "done" ? item.lastSubmitted?.submittedAt ?? null : null}
-            className="mt-1"
-          />
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {item.state === "done" && item.lastSubmitted ? (
-            <>
-              <Button asChild variant="ghost" size="sm">
-                <Link href={`/student/tests/results/${item.lastSubmitted.id}`}>View latest results</Link>
-              </Button>
-              <RetakeTestButton assignmentId={item.assignmentId} testName={item.name} />
-            </>
-          ) : item.state === "progress" && next ? (
-            <Button asChild size="sm">
-              <Link href={`${base}?module=${next.key}`}>Continue with {next.short} ›</Link>
-            </Button>
-          ) : item.state === "todo" ? (
-            <Button asChild size="sm">
-              <Link href={`${base}?module=rw1`}>Start test ›</Link>
-            </Button>
-          ) : null}
-        </div>
-      </div>
-
-      {showPicker ? (
-        <div className="mt-4">
-          <p className="mb-2 text-xs text-gray-500">Or choose a module to {item.state === "progress" ? "continue with" : "start with"}:</p>
-          <ModuleTiles
-            detail
-            modules={item.modules}
-            hrefFor={(m) => (m.state === "done" && item.openAttempt ? `/student/tests/results/${item.openAttempt.id}#mod-${m.key}` : `${base}?module=${m.key}`)}
-          />
-        </div>
-      ) : null}
-
-      {item.attempts.length > 0 ? (
-        <div className="mt-4">
-          <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-gray-500">Attempts</h3>
-          <TestAttemptsTable rows={item.attempts} hrefFor={(id) => `/student/tests/results/${id}`} />
-        </div>
-      ) : null}
-    </Card>
-  );
 }
