@@ -33,7 +33,7 @@ export interface CorrespondenceRow {
   skillAliases: CorrespondenceAlias[];
 }
 
-const SOURCE_LABEL: Record<string, string> = { PDF: "PDF", LEGACY: "Former name", MANUAL: "Added" };
+const SOURCE_LABEL: Record<string, string> = { PDF: "PDF", FILE: "Source folder", LEGACY: "Former name", MANUAL: "Added" };
 
 /**
  * Domain ↔ Skill correspondence (reference: Taxonomia-SAT.md for the names shown, the PDFs for the

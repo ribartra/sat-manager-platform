@@ -208,6 +208,12 @@ function assertDatabaseConsistency() {
     // Domain ↔ Skill correspondence table (TaxonomyAlias): PDF spellings as aliases of the md names.
     const grammarAlias = db.prepare(`SELECT COUNT(*) AS n FROM TaxonomyAlias WHERE kind = 'SKILL' AND alias = 'Grammar' AND topicId = 'top-fss'`).get().n;
     const pdfAliases = db.prepare(`SELECT COUNT(*) AS n FROM TaxonomyAlias WHERE source = 'PDF'`).get().n;
+    // Every reference skill has at least one practice set per level (more are allowed: one per source file).
+    const missingLevels = db.prepare(`SELECT t.name || ' ' || l.d AS gap FROM Topic t JOIN Domain d ON d.id = t.domainId
+      CROSS JOIN (SELECT 'EASY' AS d UNION ALL SELECT 'MEDIUM' UNION ALL SELECT 'HARD') l
+      WHERE d.practiceArea IS NOT NULL AND NOT EXISTS (SELECT 1 FROM PracticeSet p WHERE p.topicId = t.id AND p.difficulty = l.d)`).all();
+    if (missingLevels.length) fail(`Skills sin set en algun nivel: ${missingLevels.map((r) => r.gap).join(", ")}`);
+    else ok("Cada skill tiene al menos un set por nivel (Easy, Medium, Hard)");
     if (!grammarAlias || pdfAliases < 5) fail(`Correspondencia: alias Grammar=${grammarAlias}, alias PDF=${pdfAliases} (esperado >=5)`);
     else ok(`Correspondencia Domain ↔ Skill con alias del PDF (${pdfAliases})`);
 

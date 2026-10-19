@@ -8,18 +8,19 @@
 //   - Domain names in the md's "&" style: "Problem Solving & Data Analysis", "Geometry & Trigonometry".
 //   - PDF names and former names are aliases (TaxonomyAlias table, Admin → Taxonomy).
 // Data only (no imports): shared by the app (lib/taxonomy-order.ts) and the seed (prisma/seed-taxonomy.ts).
-// Topic ids are stable; only names follow this file.
+// Topic ids are stable; only names follow this file. Every skill has at least one practice set per
+// level (Easy, Medium, Hard); more are allowed when files_to_load has more files (e.g. Boundaries H1–H3).
 
 export type ReferenceSection = "MATH" | "READING" | "WRITING";
 
 /**
- * Another name for a domain or skill. PDF = how a reference PDF prints it; LEGACY = a name the
- * platform or the ingest files used before. Display names are always the md names; aliases only
+ * Another name for a domain or skill. PDF = how a reference PDF prints it; FILE = the folder name in
+ * files_to_load/PRACTICE EXERCISES; LEGACY = a name the platform used before. Display names are always the md names; aliases only
  * help matching (ingest promotion, search).
  */
 export interface ReferenceAlias {
   alias: string;
-  source: "PDF" | "LEGACY";
+  source: "PDF" | "FILE" | "LEGACY";
 }
 
 export interface ReferenceSkill {
@@ -38,6 +39,7 @@ export interface ReferenceDomain {
 
 const pdf = (alias: string): ReferenceAlias => ({ alias, source: "PDF" });
 const legacy = (alias: string): ReferenceAlias => ({ alias, source: "LEGACY" });
+const file = (alias: string): ReferenceAlias => ({ alias, source: "FILE" });
 
 export const SAT_TAXONOMY: ReferenceDomain[] = [
   // ---- Math (PDF: TEMPLATE Math_CookSAT)
@@ -46,10 +48,10 @@ export const SAT_TAXONOMY: ReferenceDomain[] = [
     domainId: "dom-algebra",
     domain: "Algebra",
     skills: [
-      { id: "top-lineq-one-var", name: "Linear Equations in One Variable", aliases: [legacy("Linear equations in one variable")] },
+      { id: "top-lineq-one-var", name: "Linear Equations in One Variable", aliases: [file("Linear Equations One Variable"), legacy("Linear equations in one variable")] },
       { id: "top-linfn", name: "Linear Functions", aliases: [legacy("Linear functions")] },
-      { id: "top-lineq-two-var", name: "Linear Equations in Two Variables", aliases: [legacy("Linear equations in two variables")] },
-      { id: "top-systems-two-linear", name: "Systems of Linear Equations", aliases: [legacy("Systems of two linear equations in two variables")] },
+      { id: "top-lineq-two-var", name: "Linear Equations in Two Variables", aliases: [file("Linear Equations Two Variables"), legacy("Linear equations in two variables")] },
+      { id: "top-systems-two-linear", name: "Systems of Linear Equations", aliases: [file("Systems Two Linear Equations & Equations in Two Variables"), legacy("Systems of two linear equations in two variables")] },
       { id: "top-linineq", name: "Linear Inequalities", aliases: [legacy("Linear inequalities in one or two variables")] },
     ],
   },
@@ -58,13 +60,13 @@ export const SAT_TAXONOMY: ReferenceDomain[] = [
     domainId: "dom-advmath",
     domain: "Advanced Math",
     skills: [
-      { id: "top-nonlinfn", name: "Nonlinear Functions", aliases: [legacy("Nonlinear functions")] },
+      { id: "top-nonlinfn", name: "Nonlinear Functions", aliases: [file("Non Linear Functions"), legacy("Nonlinear functions")] },
       {
         id: "top-nonlinear-equations",
         name: "Nonlinear Equations",
-        aliases: [legacy("Nonlinear equations in one variable and systems of equations in two variables")],
+        aliases: [file("Non Linear Equations"), legacy("Nonlinear equations in one variable and systems of equations in two variables")],
       },
-      { id: "top-equivalent-expressions", name: "Equivalent Expressions", aliases: [legacy("Equivalent expressions")] },
+      { id: "top-equivalent-expressions", name: "Equivalent Expressions", aliases: [file("Equivalent Expression"), legacy("Equivalent expressions")] },
     ],
   },
   {
@@ -73,17 +75,17 @@ export const SAT_TAXONOMY: ReferenceDomain[] = [
     domain: "Problem Solving & Data Analysis",
     aliases: [pdf("Problem Solving and Data Analysis"), legacy("Problem-Solving and Data Analysis"), legacy("Problem solving data Analysis")],
     skills: [
-      { id: "top-ratios-rates-units", name: "Ratios, Rates, Proportions & Units", aliases: [legacy("Ratios, rates, proportional relationships, and units")] },
+      { id: "top-ratios-rates-units", name: "Ratios, Rates, Proportions & Units", aliases: [file("Ratios Rates Proportions Units"), legacy("Ratios, rates, proportional relationships, and units")] },
       { id: "top-pct", name: "Percentages" },
       { id: "top-statistical-claims", name: "Data, Studies & Experiments", aliases: [pdf("Claims, Studies & Experiments"), legacy("Statistical Claims")] },
       {
         id: "top-data-mean",
         name: "Distributions, Center & Spread",
-        aliases: [legacy("One-variable data: Distributions and measures of center and spread")],
+        aliases: [file("One Variable Data"), file("Data and Mean"), legacy("One-variable data: Distributions and measures of center and spread")],
       },
       { id: "top-prob", name: "Probability", aliases: [legacy("Probability and conditional probability")] },
-      { id: "top-two-var-data", name: "Scatterplots & Models", aliases: [legacy("Two-variable data: Models and scatterplots")] },
-      { id: "top-inference-margin", name: "Statistical Inference", aliases: [legacy("Inference from Statistics and Margin of Error")] },
+      { id: "top-two-var-data", name: "Scatterplots & Models", aliases: [file("Two Variable Data"), legacy("Two-variable data: Models and scatterplots")] },
+      { id: "top-inference-margin", name: "Statistical Inference", aliases: [file("Inference & Margin of Error"), legacy("Inference from Statistics and Margin of Error")] },
     ],
   },
   {
@@ -92,8 +94,8 @@ export const SAT_TAXONOMY: ReferenceDomain[] = [
     domain: "Geometry & Trigonometry",
     aliases: [pdf("Geometry and Trigonometry")],
     skills: [
-      { id: "top-area-volume", name: "Area & Volume", aliases: [legacy("Area and volume")] },
-      { id: "top-lines-angles-triangles", name: "Lines, Angles & Triangles", aliases: [legacy("Lines, angles, and triangles")] },
+      { id: "top-area-volume", name: "Area & Volume", aliases: [file("Areas and Volumes"), legacy("Area and volume")] },
+      { id: "top-lines-angles-triangles", name: "Lines, Angles & Triangles", aliases: [file("Lines Angles Triangles"), legacy("Lines, angles, and triangles")] },
       { id: "top-circles", name: "Circles" },
       { id: "top-right-tri-trig", name: "Right Triangles & Trigonometry", aliases: [legacy("Right triangles and trigonometry")] },
     ],
@@ -104,8 +106,8 @@ export const SAT_TAXONOMY: ReferenceDomain[] = [
     domainId: "dom-info",
     domain: "Information and Ideas",
     skills: [
-      { id: "top-central-details", name: "Main Ideas and Details", aliases: [legacy("Central Ideas and Details")] },
-      { id: "top-command-evidence", name: "Command of Evidence" },
+      { id: "top-central-details", name: "Main Ideas and Details", aliases: [file("Main Idea and Details"), legacy("Central Ideas and Details")] },
+      { id: "top-command-evidence", name: "Command of Evidence", aliases: [file("Command Evidence")] },
       { id: "top-infer", name: "Inferences" },
     ],
   },
@@ -116,7 +118,7 @@ export const SAT_TAXONOMY: ReferenceDomain[] = [
     skills: [
       { id: "top-wic", name: "Words in Context" },
       { id: "top-text-structure-purpose", name: "Text Structure and Purpose" },
-      { id: "top-cross", name: "Cross-Text Connections", aliases: [pdf("Cross Text Connections")] },
+      { id: "top-cross", name: "Cross-Text Connections", aliases: [pdf("Cross Text Connections"), file("Double Passage")] },
     ],
   },
   // ---- Writing (PDF: Writing CB Template; domains split as the College Board does)
@@ -129,7 +131,7 @@ export const SAT_TAXONOMY: ReferenceDomain[] = [
       {
         id: "top-fss",
         name: "Form, Structure & Sense",
-        aliases: [pdf("Grammar"), legacy("Grammar and Structure"), legacy("Form, Structure, and Sense")],
+        aliases: [pdf("Grammar"), file("Structure and Grammar"), legacy("Grammar and Structure"), legacy("Form, Structure, and Sense")],
       },
     ],
   },
@@ -139,7 +141,7 @@ export const SAT_TAXONOMY: ReferenceDomain[] = [
     domain: "Expression of Ideas",
     skills: [
       { id: "top-trans", name: "Transitions" },
-      { id: "top-rhet", name: "Rhetorical Synthesis" },
+      { id: "top-rhet", name: "Rhetorical Synthesis", aliases: [file("Student Notes")] },
     ],
   },
 ];

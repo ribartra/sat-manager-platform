@@ -170,7 +170,8 @@ model Topic {
 }
 
 /// Domain ↔ Skill correspondence aliases (lib/taxonomy-reference.ts ← Taxonomia-SAT.md + PDFs): other
-/// names a domain or skill is printed with (PDF) or had before (LEGACY), or added by an admin (MANUAL).
+/// names a domain or skill is printed with (PDF), the source folder name in files_to_load (FILE), a name
+/// it had before (LEGACY), or one added by an admin (MANUAL).
 /// The platform always shows Domain.name / Topic.name; aliases are used to match ingest files.
 model TaxonomyAlias {
   id        String   @id @default(cuid())
@@ -178,7 +179,7 @@ model TaxonomyAlias {
   kind      String   // DOMAIN | SKILL
   domainId  String
   topicId   String?  // set for SKILL aliases
-  source    String   @default("MANUAL") // PDF | LEGACY | MANUAL
+  source    String   @default("MANUAL") // PDF | FILE | LEGACY | MANUAL
   createdAt DateTime @default(now())
 
   domain Domain @relation(fields: [domainId], references: [id], onDelete: Cascade)
