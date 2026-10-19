@@ -75,7 +75,7 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
   }
 
   return (
-    <PageShell width="wide" density="compact" className="space-y-4">
+    <PageShell maxWidth={1000} width="wide" density="compact" className="space-y-4">
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Practice" }]} />
       <header className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>

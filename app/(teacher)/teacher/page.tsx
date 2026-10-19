@@ -100,7 +100,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
                 defaultValue={search}
                 placeholder="Search a student…"
                 aria-label="Search a student"
-                className="w-56 rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900"
+                className="w-56 rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]"
               />
             </form>
           ) : null}
@@ -128,7 +128,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
 
     if (tab === "tests") {
       return (
-        <PageShell width="wide" density="compact" className="space-y-4">
+        <PageShell maxWidth={1180} width="wide" density="compact" className="space-y-4">
           {head(rows.length)}
           {rows.length === 0 ? (
             <EmptyState title="No students match." />
@@ -182,7 +182,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
     const overdueTests = rows.filter((s) => s.tests.pending.some((p) => p.overdue));
     const lowScores = rows.filter((s) => s.tests.lowSection);
     return (
-      <PageShell width="wide" density="compact" className="space-y-4">
+      <PageShell maxWidth={1180} width="wide" density="compact" className="space-y-4">
         {head(rows.length)}
         <Card padding="none" className="flex flex-col gap-2 px-4 py-3">
           <AttentionRow
@@ -424,7 +424,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
     .slice(0, 3);
 
   return (
-    <PageShell width="wide" density="compact" className="space-y-4">
+    <PageShell maxWidth={1180} width="wide" density="compact" className="space-y-4">
       {head(students.length)}
 
       <Card as="form" padding="sm" className="flex flex-wrap items-end gap-x-3 gap-y-2">
@@ -435,13 +435,13 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
             name="q"
             defaultValue={search}
             placeholder="Name or email"
-            className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900"
+            className="mt-1 w-full rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]"
           />
         </label>
         {teacherGroupManagementEnabled && (
           <label className="min-w-[7.5rem] flex-1 text-xs font-medium text-gray-600">
             Group
-            <select name="group" defaultValue={groupId} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900">
+            <select name="group" defaultValue={groupId} className="mt-1 w-full rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]">
               <option value="">All</option>
               {groups.map((group) => (
                 <option key={group.id} value={group.id}>
@@ -453,14 +453,14 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
         )}
         <label className="min-w-[7.5rem] flex-1 text-xs font-medium text-gray-600">
           Skill
-          <select name="topic" defaultValue={topicId} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900">
+          <select name="topic" defaultValue={topicId} className="mt-1 w-full rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]">
             <option value="">All skills</option>
             <SkillOptions topics={topics.filter((topic) => isOfficialSkill(topic.id)).sort(compareSkills).map((topic) => ({ id: topic.id, name: topic.name, group: topic.domain.name }))} />
           </select>
         </label>
         <label className="min-w-[7.5rem] flex-1 text-xs font-medium text-gray-600">
           Difficulty
-          <select name="difficulty" defaultValue={difficulty} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900">
+          <select name="difficulty" defaultValue={difficulty} className="mt-1 w-full rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]">
             <option value="">All</option>
             {difficultyOptions().map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -469,12 +469,12 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
         </label>
         <label className="min-w-[7.5rem] flex-1 text-xs font-medium text-gray-600">
           Start date from
-          <input name="incorporatedFrom" type="date" defaultValue={params.incorporatedFrom || params.from || ""} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900" />
+          <input name="incorporatedFrom" type="date" defaultValue={params.incorporatedFrom || params.from || ""} className="mt-1 w-full rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]" />
         </label>
         {showEndDate && (
           <label className="min-w-[7.5rem] flex-1 text-xs font-medium text-gray-600">
             Start date to
-            <input name="incorporatedTo" type="date" defaultValue={params.incorporatedTo || params.to || ""} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900" />
+            <input name="incorporatedTo" type="date" defaultValue={params.incorporatedTo || params.to || ""} className="mt-1 w-full rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]" />
           </label>
         )}
         <div className="flex items-center gap-2">

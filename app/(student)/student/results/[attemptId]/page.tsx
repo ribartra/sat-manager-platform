@@ -121,7 +121,7 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
   const attemptRows = tries.map((t) => ({ ...t, status: "SUBMITTED" }));
 
   return (
-    <PageShell>
+    <PageShell maxWidth={920}>
       <Breadcrumbs
         items={[
           { label: "Home", href: "/student" },

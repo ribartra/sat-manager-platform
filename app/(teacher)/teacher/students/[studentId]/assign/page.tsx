@@ -62,7 +62,7 @@ export default async function AssignPage({ params, searchParams }: PageProps) {
     : [];
 
   return (
-    <PageShell>
+    <PageShell maxWidth={1180}>
       <Breadcrumbs
         items={[
           { label: "Home", href: "/teacher" },

@@ -142,7 +142,7 @@ export default async function FullTestDetailPage({ params, searchParams }: PageP
     status === "Completed" ? "success" : status === "In progress" ? "warning" : status === "Overdue" ? "danger" : status === "Not started" ? "info" : "default";
 
   return (
-    <PageShell width="wide">
+    <PageShell maxWidth={1180} width="wide">
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Tests", href: "/teacher/tests" }, { label: test.name }]} />
       <PageHeader
         title={test.name}

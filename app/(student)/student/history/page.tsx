@@ -143,33 +143,33 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
         <Breadcrumbs items={[{ label: "Home", href: "/student" }, { label: "History", href: "/student/history" }, { label: "By session" }]} />
         <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">My history</h1>
         {historyTabs}
-        <form action="/student/history" className="flex flex-wrap items-end gap-2 text-sm">
+        <form action="/student/history" className="flex flex-wrap items-end gap-2.5 rounded-[var(--sat-radius)] border border-[var(--sat-border)] bg-white p-3 text-sm">
           <input type="hidden" name="area" value="sessions" />
-          <label className="flex flex-col text-xs text-gray-500">Source
-            <select name="source" defaultValue={source} className="mt-0.5 rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-800">
+          <label className="flex min-w-[150px] flex-1 flex-col gap-1 text-xs font-medium text-[var(--sat-muted)]">Source
+            <select name="source" defaultValue={source} className="rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]">
               <option value="">All sources</option>
               <option value="test">Test</option>
               <option value="practice">Practice</option>
             </select>
           </label>
-          <label className="flex flex-col text-xs text-gray-500">Area
-            <select name="sarea" defaultValue={sarea} className="mt-0.5 rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-800">
+          <label className="flex min-w-[150px] flex-1 flex-col gap-1 text-xs font-medium text-[var(--sat-muted)]">Area
+            <select name="sarea" defaultValue={sarea} className="rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]">
               <option value="">All areas</option>
               <option value="math">Math</option>
               <option value="reading">Reading</option>
               <option value="writing">Writing</option>
             </select>
           </label>
-          <label className="flex flex-col text-xs text-gray-500">Result
-            <select name="result" defaultValue={result} className="mt-0.5 rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-800">
+          <label className="flex min-w-[150px] flex-1 flex-col gap-1 text-xs font-medium text-[var(--sat-muted)]">Result
+            <select name="result" defaultValue={result} className="rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]">
               <option value="">All results</option>
               <option value="ok">Correct</option>
               <option value="bad">Incorrect</option>
               <option value="blank">Blank</option>
             </select>
           </label>
-          <label className="flex flex-col text-xs text-gray-500">From
-            <input type="date" name="from" defaultValue={from} className="mt-0.5 rounded-md border border-gray-300 px-2 py-1 text-sm text-gray-800" />
+          <label className="flex min-w-[150px] flex-1 flex-col gap-1 text-xs font-medium text-[var(--sat-muted)]">From
+            <input type="date" name="from" defaultValue={from} className="rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-[7px] text-sm text-[var(--sat-text)]" />
           </label>
           <Button type="submit" size="sm" variant="secondary">Apply</Button>
           {source || sarea || result || from ? <Link href="/student/history?area=sessions" className="pb-1.5 text-xs text-blue-600 hover:underline">Clear</Link> : null}

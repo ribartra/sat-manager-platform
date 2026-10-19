@@ -17,7 +17,7 @@ import {
   type SkillsMapChip,
 } from "@/components/sat";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
-import { ListStack } from "@/components/sat/list";
+import { ListItem, ListStack } from "@/components/sat/list";
 import { AreaTag, PracticeSetRow } from "@/components/sat/practice-set-row";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -97,9 +97,9 @@ function SummaryView({ practice }: { practice: PracticeSetItem[] }) {
         {todo.length === 0 ? (
           <Card padding="md" className="text-sm text-gray-500">Nothing pending.</Card>
         ) : (
-          <Card className="divide-y divide-gray-100">
+          <ListStack>
             {todo.slice(0, 4).map((item) => (
-              <Link key={item.assignmentId} href={`/student/practice/assignment/${item.assignmentId}`} className="flex items-center justify-between gap-3 px-3 py-2.5 hover:bg-gray-50">
+              <ListItem compact key={item.assignmentId} href={`/student/practice/assignment/${item.assignmentId}`}>
                 <span className="flex min-w-0 flex-wrap items-center gap-1.5">
                   <AreaTag area={item.area} />
                   <b className="text-sm text-gray-900">{item.skill}</b>
@@ -110,9 +110,9 @@ function SummaryView({ practice }: { practice: PracticeSetItem[] }) {
                   {item.dueDate ? `Due ${formatDate(item.dueDate)}` : null}
                   <span aria-hidden className="text-gray-400">›</span>
                 </span>
-              </Link>
+              </ListItem>
             ))}
-          </Card>
+          </ListStack>
         )}
         {todo.length > 4 ? <p className="mt-2 text-xs text-gray-500">+ {todo.length - 4} more · open an area above to see all sets</p> : null}
       </section>

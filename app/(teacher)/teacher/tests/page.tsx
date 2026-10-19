@@ -50,7 +50,7 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
   const page = paginate(tests, pageFromParam(query.page), PAGE_SIZE);
 
   return (
-    <PageShell width="wide">
+    <PageShell maxWidth={1100} width="wide">
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Tests" }]} />
       <header className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>

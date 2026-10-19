@@ -53,7 +53,7 @@ export default async function AssignTestPage({ params, searchParams }: PageProps
   const returnHref = `/teacher/students/${studentId}${returnParams.toString() ? `?${returnParams.toString()}` : ""}`;
 
   return (
-    <PageShell width="narrow">
+    <PageShell maxWidth={1180} width="narrow">
       <Breadcrumbs
         items={[
           { label: "Home", href: "/teacher" },

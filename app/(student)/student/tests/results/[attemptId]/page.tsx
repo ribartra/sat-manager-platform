@@ -105,7 +105,7 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
   const pendingModules = view.modules.filter((m) => m.state !== "done");
 
   return (
-    <PageShell>
+    <PageShell maxWidth={960}>
       <Breadcrumbs
         items={[
           { label: "Home", href: "/student" },

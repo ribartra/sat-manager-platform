@@ -71,7 +71,7 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
   const anyFilter = Object.values(params).some(Boolean);
 
   return (
-    <PageShell width="wide">
+    <PageShell maxWidth={1180} width="wide">
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "History" }]} />
       <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">History</h1>
       <p className="mb-4 mt-0.5 text-sm text-gray-500">
@@ -81,14 +81,14 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
       <Card as="form" padding="sm" className="mb-4 flex flex-wrap items-end gap-3">
         <label className="min-w-[12rem] flex-1 text-xs font-medium text-gray-600">
           Student
-          <select name="student" defaultValue={studentId} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900">
+          <select name="student" defaultValue={studentId} className="mt-1 w-full rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]">
             <option value="">All students</option>
             {students.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
         </label>
         <label className="text-xs font-medium text-gray-600">
           Type
-          <select name="type" defaultValue={type} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900">
+          <select name="type" defaultValue={type} className="mt-1 w-full rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]">
             <option value="">Tests and practice</option>
             <option value="tests">Tests</option>
             <option value="practice">Practice</option>
@@ -96,14 +96,14 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
         </label>
         <label className="text-xs font-medium text-gray-600">
           Practice area
-          <select name="area" defaultValue={area ? query.area : ""} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900">
+          <select name="area" defaultValue={area ? query.area : ""} className="mt-1 w-full rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]">
             <option value="">All areas</option>
             {PRACTICE_AREA_TABS.map((t) => <option key={t.key} value={t.key}>{t.label}</option>)}
           </select>
         </label>
         <label className="text-xs font-medium text-gray-600">
           Status
-          <select name="status" defaultValue={status} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900">
+          <select name="status" defaultValue={status} className="mt-1 w-full rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]">
             <option value="">Any</option>
             <option value="completed">Completed</option>
             <option value="progress">In progress</option>

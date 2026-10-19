@@ -23,7 +23,9 @@ import {
   paginate,
 } from "@/components/sat";
 import { LineChart } from "@/components/sat/line-chart";
-import { ListStack } from "@/components/sat/list";
+import { ListItem, ListStack } from "@/components/sat/list";
+import { FilterBar, FilterField } from "@/components/sat/filter-bar";
+import { Select } from "@/components/ui/select";
 import { PctBars, PracticeSetRow } from "@/components/sat/practice-set-row";
 import { Pct, WorkStatusBadges } from "@/components/sat/work-status";
 import { Badge } from "@/components/ui/badge";
@@ -199,11 +201,11 @@ function SummaryView({ practice, tests }: { practice: PracticeSetItem[]; tests: 
         {recent.length === 0 ? (
           <EmptyState title="No attempts yet" description="Your finished practice sets and Tests will appear here." />
         ) : (
-          <Card className="divide-y divide-gray-100">
+          <ListStack>
             {recent.map((r) => {
               const href = r.kind === "practice" ? `/student/results/${r.t.id}` : `/student/tests/results/${r.a.id}`;
               return (
-                <Link key={r.kind === "practice" ? r.t.id : r.a.id} href={href} className="flex items-center justify-between gap-3 px-3 py-2.5 hover:bg-gray-50">
+                <ListItem compact key={r.kind === "practice" ? r.t.id : r.a.id} href={href}>
                   <span className="flex min-w-0 flex-wrap items-center gap-1.5">
                     {r.kind === "test" ? <Badge variant="test">Test</Badge> : <Badge>Practice</Badge>}
                     <b className="text-sm text-gray-900">{r.kind === "test" ? r.test.name : `${r.item.skill} · ${difficultyLabel(r.item.difficulty)}`}</b>
@@ -222,10 +224,10 @@ function SummaryView({ practice, tests }: { practice: PracticeSetItem[]; tests: 
                     )}
                     <span aria-hidden className="text-gray-400">›</span>
                   </span>
-                </Link>
+                </ListItem>
               );
             })}
-          </Card>
+          </ListStack>
         )}
       </section>
     </>
@@ -313,30 +315,32 @@ async function AreaPracticeView({
           title={`Your ${s.label} practice sets`}
           action={<Button asChild size="sm" variant="ghost"><Link href={`/student/practice?area=${tab}`}><MapIcon size={14} /> Skills map</Link></Button>}
         />
-        <form action="/student" className="mb-3 flex flex-wrap items-end gap-2 text-sm">
+        <FilterBar action="/student">
           <input type="hidden" name="area" value={tab} />
-          <label className="flex min-w-0 max-w-full flex-col text-xs text-gray-500">Skill
-            <select name="skill" defaultValue={query.skill ?? ""} className="mt-0.5 w-full max-w-[18rem] rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-800">
+          <FilterField label="Skill" htmlFor="f-skill" className="@md:flex-[2]">
+            <Select id="f-skill" name="skill" defaultValue={query.skill ?? ""}>
               <option value="">All skills</option>
               {skills.map(([id, name]) => <option key={id} value={id}>{name}</option>)}
-            </select>
-          </label>
-          <label className="flex flex-col text-xs text-gray-500">Difficulty
-            <select name="difficulty" defaultValue={query.difficulty ?? ""} className="mt-0.5 rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-800">
+            </Select>
+          </FilterField>
+          <FilterField label="Difficulty" htmlFor="f-difficulty">
+            <Select id="f-difficulty" name="difficulty" defaultValue={query.difficulty ?? ""}>
               <option value="">All levels</option>
               <option value="EASY">Easy</option>
               <option value="MEDIUM">Medium</option>
               <option value="HARD">Hard</option>
-            </select>
-          </label>
-          <label className="flex flex-col text-xs text-gray-500">Status
-            <select name="status" defaultValue={query.status ?? ""} className="mt-0.5 rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-800">
+            </Select>
+          </FilterField>
+          <FilterField label="Status" htmlFor="f-status">
+            <Select id="f-status" name="status" defaultValue={query.status ?? ""}>
               {STATUS_FILTERS.map((f) => <option key={f.key} value={f.key}>{f.label}</option>)}
-            </select>
-          </label>
-          <Button type="submit" size="sm" variant="secondary">Apply</Button>
-          {anyFilter ? <Link href={`/student?area=${tab}#sets`} className="pb-1.5 text-xs text-blue-600 hover:underline">Clear filters</Link> : null}
-        </form>
+            </Select>
+          </FilterField>
+          <div className="flex items-center gap-2">
+            <Button type="submit" variant="secondary">Apply</Button>
+            {anyFilter ? <Button asChild variant="ghost"><Link href={`/student?area=${tab}#sets`}>Clear</Link></Button> : null}
+          </div>
+        </FilterBar>
         {filtered.length === 0 ? (
           <EmptyState title="No practice sets match these filters." />
         ) : (
@@ -424,22 +428,22 @@ function TestsTab({ tests, page }: { tests: StudentTestItem[]; page: number }) {
       {pending.length === 0 ? (
         <Card padding="md" className="text-sm text-gray-500">No pending tests.</Card>
       ) : (
-        <Card className="divide-y divide-gray-100">
+        <ListStack>
           {pending.map((t) => {
             const next = t.openAttempt?.view?.nextModule ?? t.modules[0];
             const done = t.openAttempt?.view?.modulesDone ?? 0;
             return (
-              <Link key={t.assignmentId} href={`/student/tests/${t.assignmentId}?module=${next?.key ?? "rw1"}`} className="flex items-center justify-between gap-3 px-3 py-2.5 hover:bg-gray-50">
+              <ListItem compact key={t.assignmentId} href={`/student/tests/${t.assignmentId}?module=${next?.key ?? "rw1"}`}>
                 <span className="flex min-w-0 flex-wrap items-center gap-1.5">
                   <b className="text-sm text-gray-900">{t.name}</b>
                   <WorkStatusBadges state={t.state} overdue={t.overdue} />
                   <span className="text-xs text-gray-500">{done} of 4 modules{t.dueDate ? ` · due ${formatDate(t.dueDate)}` : ""}</span>
                 </span>
-                <span className="shrink-0 rounded-md bg-blue-600 px-3 py-1 text-xs font-medium text-white">{t.openAttempt ? "Continue" : "Start"}</span>
-              </Link>
+                <span className="shrink-0 rounded-lg bg-[var(--sat-primary)] px-2.5 py-[5px] text-xs font-semibold text-white">{t.openAttempt ? "Continue" : "Start"}</span>
+              </ListItem>
             );
           })}
-        </Card>
+        </ListStack>
       )}
 
       <section className="mt-6">

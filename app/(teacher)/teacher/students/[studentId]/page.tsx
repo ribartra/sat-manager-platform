@@ -272,7 +272,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
     const overdueCount =
       pendingTests.filter((t) => t.overdue).length + pendingSets.filter((a) => a.status === "OVERDUE" || (a.dueDate && a.dueDate < now)).length;
     return (
-      <PageShell width="wide">
+      <PageShell maxWidth={1180} width="wide">
         {header}
         <AreaBoxGrid>
           {(["MATH", "READING", "WRITING"] as PracticeAreaCode[]).map((code) => {
@@ -351,7 +351,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
   if (view === "activity") {
     const activity = await loadActivity(studentId, 100);
     return (
-      <PageShell width="wide">
+      <PageShell maxWidth={1180} width="wide">
         {header}
         <p className="mb-2 text-sm text-gray-500">Every practice set and test, newest first. Click to review.</p>
         <ActivityList items={activity} studentId={studentId} grouped />
@@ -368,7 +368,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
     );
     const typeHref = (t: string) => `/teacher/students/${studentId}?area=history${t === "all" ? "" : `&type=${t}`}`;
     return (
-      <PageShell width="wide">
+      <PageShell maxWidth={1180} width="wide">
         {header}
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <p className="text-sm text-gray-500">Every try {first} made, grouped by Test and practice set. Changes compare with the previous counted try.</p>
@@ -474,7 +474,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
       .sort((x, y) => (y.a.submittedAt ?? y.a.startedAt).getTime() - (x.a.submittedAt ?? x.a.startedAt).getTime());
     const examPage = paginate(testAttemptRows, pageFromParam(query.examsPage), HISTORY_PAGE_SIZE);
     return (
-      <PageShell width="wide">
+      <PageShell maxWidth={1180} width="wide">
         {header}
         <KpiStrip
           items={[
@@ -617,7 +617,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
     return `${href}${href.includes("?") ? "&" : "?"}${new URLSearchParams(extra).toString()}`;
   };
   return (
-    <PageShell width="wide">
+    <PageShell maxWidth={1180} width="wide">
       {header}
       {report.completedExamCount > 0 || report.pendingExamCount > 0 ? (
         <div className="mt-3 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700">

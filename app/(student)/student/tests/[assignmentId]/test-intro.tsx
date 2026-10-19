@@ -80,7 +80,7 @@ export async function TestIntro({
     );
 
   return (
-    <PageShell>
+    <PageShell maxWidth={720}>
       <Breadcrumbs
         items={[
           { label: "Home", href: "/student" },
@@ -89,7 +89,7 @@ export async function TestIntro({
           { label: current.short },
         ]}
       />
-      <Card padding="lg" className="mx-auto max-w-3xl">
+      <Card padding="lg">
         <div className="flex flex-wrap items-center gap-1.5">
           <Badge variant="test">{assignment.test.name}{tryNumber > 1 ? ` · try ${tryNumber}` : ""}</Badge>
           <Badge>{current.tier}</Badge>

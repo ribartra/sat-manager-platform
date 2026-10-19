@@ -20,7 +20,7 @@ export async function PracticeIntro({ studentId, assignmentId }: { studentId: st
   const label =
     item.state === "progress" ? "Continue where you left off" : item.tries.length > 0 ? `Start try ${item.tries.length + 1}` : "Start practice";
   return (
-    <PageShell>
+    <PageShell maxWidth={720}>
       <Breadcrumbs
         items={[
           { label: "Home", href: "/student" },
@@ -28,7 +28,7 @@ export async function PracticeIntro({ studentId, assignmentId }: { studentId: st
           { label: item.skill },
         ]}
       />
-      <Card padding="lg" className="mx-auto max-w-3xl">
+      <Card padding="lg">
         <div className="flex flex-wrap items-center gap-2">
           <AreaTag area={item.area} />
           <Badge variant={difficultyBadgeVariant(item.difficulty)}>{difficultyLabel(item.difficulty)}</Badge>

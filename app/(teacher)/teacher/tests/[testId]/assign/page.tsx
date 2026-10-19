@@ -30,7 +30,7 @@ export default async function AssignFullTestPage({ params }: PageProps) {
   if (!test) notFound();
 
   return (
-    <PageShell width="narrow">
+    <PageShell maxWidth={1180} width="narrow">
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Tests", href: "/teacher/tests" }, { label: test.name, href: `/teacher/tests/${testId}` }, { label: "Assign" }]} />
       <h1 className="mb-6 text-xl font-semibold text-gray-900">Assign test: {test.name}</h1>
       <FullTestAssignClient

@@ -103,7 +103,7 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
   const doneModules = view.modules.filter((m) => m.state === "done");
 
   return (
-    <PageShell>
+    <PageShell maxWidth={1180}>
       <Breadcrumbs
         items={[
           { label: "Home", href: "/teacher" },

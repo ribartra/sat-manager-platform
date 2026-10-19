@@ -120,7 +120,7 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
   const perQuestion = attempt.totalTime && total ? Math.round(attempt.totalTime / total) : null;
 
   return (
-    <PageShell>
+    <PageShell maxWidth={1180}>
       <Breadcrumbs
         items={[
           { label: "Home", href: "/teacher" },

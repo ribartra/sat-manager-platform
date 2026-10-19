@@ -64,7 +64,7 @@ export default async function TeacherStudentsPage({ searchParams }: PageProps) {
     .catch(() => [] as { id: string; email: string; name: string; expiresAt: Date }[]);
 
   return (
-    <PageShell width="wide">
+    <PageShell maxWidth={1100} width="wide">
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Students" }]} />
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
@@ -83,11 +83,11 @@ export default async function TeacherStudentsPage({ searchParams }: PageProps) {
       <Card as="form" padding="sm" className="mb-4 flex flex-wrap items-end gap-3">
         <label className="min-w-[12rem] flex-1 text-xs font-medium text-gray-600">
           Search
-          <input name="q" defaultValue={search} placeholder="Name or email" className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900" />
+          <input name="q" defaultValue={search} placeholder="Name or email" className="mt-1 w-full rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]" />
         </label>
         <label className="min-w-[10rem] text-xs font-medium text-gray-600">
           Show
-          <select name="show" defaultValue={show} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900">
+          <select name="show" defaultValue={show} className="mt-1 w-full rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]">
             {(Object.keys(SHOW) as Show[]).map((key) => (
               <option key={key} value={key}>{SHOW[key]}</option>
             ))}
