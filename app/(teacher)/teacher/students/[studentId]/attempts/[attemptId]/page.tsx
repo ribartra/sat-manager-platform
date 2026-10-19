@@ -1,16 +1,27 @@
-import { AttemptStatusBadge, InvalidatedNotice, VoidableValue } from "@/components/sat";
-import { PageShell } from "@/components/sat";
+import {
+  AttemptStatusBadge,
+  Breadcrumbs,
+  Delta,
+  InvalidatedNotice,
+  PageShell,
+  PracticeAttemptsTable,
+  SectionHeader,
+  VoidableValue,
+} from "@/components/sat";
+import { AreaTag } from "@/components/sat/practice-set-row";
+import { ReviewQuestionCard } from "@/components/sat/review-question-card";
+import { ResultFilterBar, ResultFilterEmpty, ResultFilterRoot, ResultFilterSegments } from "@/components/sat/result-filter";
+import { AnswerGrid, AnswerGridLegend } from "@/components/sat/test-ui";
+import { Badge } from "@/components/ui/badge";
+import { difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
+import { practiceAreaLabel, tabFromPracticeArea, type PracticeAreaCode } from "@/lib/practice-area";
+import { scoreBandTextClass } from "@/lib/score-band";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { Card } from "@/components/ui/card";
-import { MathContent } from "@/components/math-content";
-import { QuestionMedia } from "@/components/question-media";
-import { formatDate, formatTime } from "@/lib/utils";
-import { ChevronLeft } from "lucide-react";
+import { formatClock, formatDate, formatDuration, formatTime, relativeDay } from "@/lib/utils";
 import { AttemptActions } from "./attempt-actions-client";
 import { parseSnapshot, PracticeSetSnapshot, QuestionSnapshot } from "@/lib/attempt-snapshots";
-import { formatCorrectAnswer } from "@/lib/answer-grading";
 import { auth } from "@/lib/auth";
 import { teacherProgramEnrollmentScope } from "@/lib/program-scope";
 import { summarizeAllQuestionAnswers } from "@/lib/weighted-score";
@@ -39,7 +50,7 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
     include: {
       student: true,
       answers: { include: { question: { include: { topic: true } } } },
-      assignment: { include: { practiceSet: true } },
+      assignment: { include: { practiceSet: { include: { topic: { include: { domain: true } } } } } },
       pauses: true,
     },
   });
@@ -65,84 +76,160 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
   const total = score.total;
   const pct = score.percent ?? 0;
   const pauseSeconds = attempt.pauses.reduce((sum, pause) => sum + (pause.durationSeconds ?? 0), 0);
+  const first = attempt.student.name.split(" ")[0];
+  const practiceSet = attempt.assignment?.practiceSet;
+  const area = (practiceSet?.topic.domain.practiceArea ?? null) as PracticeAreaCode | null;
+  const areaTab = area ? tabFromPracticeArea(area) : null;
+  const studentHref = (extra?: Record<string, string>) => buildProgressHref(`/teacher/students/${studentId}`, filters, extra);
+
+  // Every try of this assignment (the one being viewed is highlighted).
+  const siblings = attempt.assignmentId
+    ? await prisma.attempt.findMany({
+        where: { assignmentId: attempt.assignmentId, studentId, status: { in: ["SUBMITTED", "INVALIDATED"] } },
+        orderBy: { startedAt: "asc" },
+        select: { id: true, status: true, submittedAt: true, totalTime: true, attemptNumber: true, answers: { select: { answer: true, isCorrect: true } } },
+      })
+    : [];
+  const tries = siblings.map((t, i) => {
+    const rows = t.answers.length >= total ? t.answers : [...t.answers, ...Array.from({ length: total - t.answers.length }, () => ({ answer: null, isCorrect: false }))];
+    const sc = summarizeAllQuestionAnswers(rows);
+    return { id: t.id, tryNumber: i + 1, submittedAt: t.submittedAt, correct: sc.correct, total: sc.total, pct: sc.percent, time: t.totalTime, status: t.status };
+  });
+  const thisTry = tries.find((t) => t.id === attempt.id);
+  const prevTry = thisTry ? [...tries.slice(0, thisTry.tryNumber - 1)].reverse().find((t) => t.status === "SUBMITTED") : undefined;
+  const delta = prevTry && prevTry.pct !== null && attempt.status === "SUBMITTED" ? pct - prevTry.pct : null;
+
+  const ordered = orderedQuestionIds
+    .map((questionId) => {
+      const item = liveQuestionsById.get(questionId);
+      const ans = answersByQuestion.get(questionId);
+      // Historic attempts render the question as it was when answered (questionSnapshot).
+      const snapshot = parseSnapshot<QuestionSnapshot>(ans?.questionSnapshot);
+      const question = snapshot ?? item?.question;
+      if (!question) return null;
+      const options = snapshot?.options?.length ? snapshot.options : item?.question.options ?? [];
+      const state: "ok" | "bad" | "blank" = !ans?.answer ? "blank" : ans.isCorrect ? "ok" : "bad";
+      return { questionId, ans, question, options, state, topicName: snapshot?.topic?.name ?? item?.question.topic.name ?? "—" };
+    })
+    .filter((x): x is NonNullable<typeof x> => x !== null);
+  const counts = {
+    ok: ordered.filter((q) => q.state === "ok").length,
+    bad: ordered.filter((q) => q.state === "bad").length,
+    blank: ordered.filter((q) => q.state === "blank").length,
+  };
+  const perQuestion = attempt.totalTime && total ? Math.round(attempt.totalTime / total) : null;
 
   return (
     <PageShell>
-      <div className="mb-6 flex items-center gap-2 text-sm text-gray-500">
-        <Link href={buildProgressHref(`/teacher/students/${studentId}`, filters)} className="flex items-center gap-1 hover:text-blue-600">
-          <ChevronLeft size={14} /> {attempt.student.name}
-        </Link>
-        <span>/</span>
-        <span className="font-medium text-gray-900">{practiceSetSnapshot?.name ?? attempt.assignment?.practiceSet.name ?? "Practice Set"}</span>
-      </div>
-
-      <Card padding="md" className="mb-6 flex items-start justify-between">
-        <div>
-          <h1 className="text-xl font-semibold text-gray-900">Try {attempt.attemptNumber}</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            {attempt.submittedAt ? formatDate(attempt.submittedAt) : "Not finished"} · {attempt.totalTime ? formatTime(attempt.totalTime) : "No time"}
-            {attempt.pauses.length > 0 ? ` · Paused ${attempt.pauses.length} ${attempt.pauses.length === 1 ? "time" : "times"} (${formatTime(pauseSeconds)})` : ""}
-          </p>
-          <div className="mt-3 flex items-center gap-2">
-            <AttemptStatusBadge status={attempt.status} />
-            <VoidableValue status={attempt.status} className="text-sm font-semibold text-gray-900">
-              {correct}/{total} ({pct}%)
-            </VoidableValue>
-          </div>
-        </div>
-        <AttemptActions attemptId={attempt.id} initialComment={attempt.teacherComment} status={attempt.status} />
-      </Card>
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/teacher" },
+          { label: "Students", href: "/teacher/students" },
+          { label: attempt.student.name, href: studentHref() },
+          ...(area && areaTab ? [{ label: practiceAreaLabel(area), href: studentHref({ area: areaTab }) }] : []),
+          { label: `Try ${thisTry?.tryNumber ?? attempt.attemptNumber}` },
+        ]}
+      />
       {attempt.status === "INVALIDATED" ? <InvalidatedNotice audience="teacher" /> : null}
 
-      {attempt.teacherComment && (
-        <Card variant="info" padding="md" className="mb-6 text-sm text-blue-900">
-          <p className="mb-1 font-medium">Teacher comment</p>
-          <p>{attempt.teacherComment}</p>
-        </Card>
-      )}
+      <ResultFilterRoot>
+        <div className="mb-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
+          <Card padding="lg">
+            <div className="mb-1 flex flex-wrap items-center gap-2">
+              <Badge>Practice</Badge>
+              {area ? <AreaTag area={area} /> : null}
+              {practiceSet ? <Badge variant={difficultyBadgeVariant(practiceSet.difficulty)}>{difficultyLabel(practiceSet.difficulty)}</Badge> : null}
+              <Badge>Try {thisTry?.tryNumber ?? attempt.attemptNumber} of {Math.max(tries.length, 1)}</Badge>
+              <AttemptStatusBadge status={attempt.status} />
+            </div>
+            <h1 className="text-xl font-semibold text-gray-900">
+              {practiceSet?.topic.name ?? practiceSetSnapshot?.name ?? "Practice set"} · {first}&apos;s results
+            </h1>
+            <p className="mb-4 mt-1 text-xs text-gray-500">
+              {attempt.submittedAt ? (
+                <>Completed <b className="font-medium text-gray-700">{formatDate(attempt.submittedAt)}</b> at {formatClock(attempt.submittedAt)} ({relativeDay(attempt.submittedAt)})</>
+              ) : "Not finished"}
+              {attempt.assignment?.dueDate ? <> · Due {formatDate(attempt.assignment.dueDate)}</> : null}
+              {attempt.pauses.length > 0 ? ` · Paused ${attempt.pauses.length} ${attempt.pauses.length === 1 ? "time" : "times"} (${formatTime(pauseSeconds)})` : ""}
+            </p>
+            <div className="grid gap-5 md:grid-cols-[auto_1fr] md:items-center">
+              <div>
+                <p className={`text-5xl font-bold leading-none ${scoreBandTextClass(pct)}`}>
+                  <VoidableValue status={attempt.status}>{pct}%</VoidableValue>
+                </p>
+                <p className="mt-1 text-sm text-gray-600"><VoidableValue status={attempt.status}>{correct} of {total} correct</VoidableValue></p>
+                {delta !== null ? <Delta value={delta} suffix={`vs. try ${prevTry!.tryNumber} (${prevTry!.pct}%)`} className="mt-1 block" /> : null}
+              </div>
+              <div>
+                <p className="text-sm text-gray-700">
+                  {first} answered <b className="text-green-700">{counts.ok} correctly</b>, <b className="text-red-600">{counts.bad} incorrectly</b> and left{" "}
+                  <b className="text-gray-600">{counts.blank} blank</b>.
+                </p>
+                <div className="mt-1.5"><ResultFilterBar counts={counts} /></div>
+                <p className="mt-1 text-xs text-gray-500">
+                  Click a colour to see only those questions.{" "}
+                  {attempt.totalTime ? <>{formatDuration(attempt.totalTime)} total{perQuestion ? ` · ${formatDuration(perQuestion)} per question on average` : ""}</> : null}
+                </p>
+              </div>
+            </div>
+          </Card>
+          <Card padding="md" className="space-y-3">
+            <h2 className="text-sm font-semibold text-gray-900">Teacher actions</h2>
+            <p className="text-xs text-gray-500">{tries.length} attempt{tries.length === 1 ? "" : "s"} recorded. Every try is kept, even when you let the student start again.</p>
+            <AttemptActions attemptId={attempt.id} initialComment={attempt.teacherComment} status={attempt.status} />
+          </Card>
+        </div>
 
-      <Card className="overflow-x-auto">
-        <table className="w-full min-w-[34rem] text-sm">
-          <thead>
-            <tr className="border-b border-gray-200 bg-gray-50">
-              <th className="px-4 py-3 text-left font-medium text-gray-500">Q</th>
-              <th className="px-4 py-3 text-left font-medium text-gray-500">Question</th>
-              <th className="px-4 py-3 text-left font-medium text-gray-500">Answer</th>
-              <th className="px-4 py-3 text-left font-medium text-gray-500">Correct</th>
-              <th className="px-4 py-3 text-right font-medium text-gray-500">Time</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {orderedQuestionIds.map((questionId, index) => {
-              const item = liveQuestionsById.get(questionId);
-              const ans = answersByQuestion.get(questionId);
-              const snapshot = parseSnapshot<QuestionSnapshot>(ans?.questionSnapshot);
-              const question = snapshot ?? item?.question;
-              if (!question) return null;
-              const topicName = snapshot?.topic?.name ?? item?.question.topic.name ?? "—";
-              return (
-                <tr key={questionId}>
-                  <td className="px-4 py-3 text-gray-500">{index + 1}</td>
-                  <td className="max-w-md px-4 py-3">
-                    <MathContent content={question.stem} className="text-sm text-gray-800" />
-                    <QuestionMedia imageUrl={question.imageUrl} alt={`Question ${index + 1} image`} className="mt-2" />
-                    <p className="mt-1 text-xs text-gray-400">{topicName} · {question.difficulty}</p>
-                  </td>
-                  <td className="px-4 py-3 text-gray-700">{ans?.answer ?? "Blank"}</td>
-                  <td className="px-4 py-3">
-                    {ans?.answer ? (
-                      ans.isCorrect ? <span className="text-green-600">Correct</span> : <span className="text-red-600">Wrong ({formatCorrectAnswer(question.correctAnswer)})</span>
-                    ) : (
-                      <span className="text-gray-400">Blank</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-right text-gray-500">{ans?.timeSpent ? formatTime(ans.timeSpent) : "—"}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </Card>
+        {attempt.teacherComment && (
+          <Card variant="info" padding="md" className="mb-6 text-sm text-blue-900">
+            <p className="mb-1 font-medium">Comment for {first}</p>
+            <p>{attempt.teacherComment}</p>
+          </Card>
+        )}
+
+        {tries.length > 0 ? (
+          <section className="mb-6">
+            <SectionHeader title="All attempts for this set" description="Click a try to see it." />
+            <PracticeAttemptsTable rows={tries} viewingId={attempt.id} hrefFor={(id) => buildProgressHref(`/teacher/students/${studentId}/attempts/${id}`, filters)} />
+          </section>
+        ) : null}
+
+        {ordered.length > 0 ? (
+          <Card padding="md" className="mb-6">
+            <SectionHeader size="sm" title="Answers at a glance" description="Each square is a question. Click one to see it." action={<ResultFilterSegments counts={counts} />} />
+            <div className="mt-2">
+              <AnswerGrid idPrefix="q-" items={ordered.map((q) => ({ state: q.state }))} />
+            </div>
+            <AnswerGridLegend />
+          </Card>
+        ) : null}
+
+        <section>
+          <h2 className="mb-3 text-base font-semibold text-gray-900">Question by question</h2>
+          <ResultFilterEmpty counts={counts} />
+          <div className="space-y-4">
+            {ordered.map((q, index) => (
+              <div key={q.questionId} data-q-state={q.state}>
+                <ReviewQuestionCard
+                  id={`q-${index + 1}`}
+                  number={index + 1}
+                  question={{ ...q.question, options: q.options, imageUrl: q.question.imageUrl ?? null }}
+                  answer={q.ans?.answer ?? null}
+                  isCorrect={Boolean(q.ans?.isCorrect)}
+                  timeSpent={q.ans?.timeSpent}
+                  blankNote={`${first} left this question blank. Blank answers count as incorrect.`}
+                  tags={
+                    <>
+                      <Badge variant={difficultyBadgeVariant(q.question.difficulty)}>{difficultyLabel(q.question.difficulty)}</Badge>
+                      <span>{q.topicName}</span>
+                    </>
+                  }
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+      </ResultFilterRoot>
     </PageShell>
   );
 }

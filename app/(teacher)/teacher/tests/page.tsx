@@ -120,7 +120,10 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
                 {students.map((s) => (
                   <tr key={s.id}>
                     <td className="sticky left-0 bg-white px-3 py-2">
-                      <Link href={`/teacher/students/${s.id}?area=tests`} className="font-medium text-blue-700 hover:underline">{s.name}</Link>
+                      <span className="flex items-center justify-between gap-3">
+                        <Link href={`/teacher/students/${s.id}?area=tests`} className="font-medium text-gray-900 hover:underline">{s.name}</Link>
+                        <Link href={`/teacher/students/${s.id}?area=tests`} className="text-xs text-blue-600 hover:underline">Open</Link>
+                      </span>
                     </td>
                     {published.map((t) => {
                       const assignment = s.fullTestAssignments.find((a) => a.testId === t.id);
@@ -243,11 +246,14 @@ function MatrixCell({
       </Link>
     );
   }
-  const overdue = Boolean(assignment.dueDate && assignment.dueDate < now);
+  // No open or counted try: pending. Tries the teacher set aside ("Not counted") are noted.
+  const overdue = assignment.status === "OVERDUE" || (assignment.status !== "COMPLETED" && Boolean(assignment.dueDate && assignment.dueDate < now));
+  const notCounted = assignment.attempts.filter((a) => a.status === "INVALIDATED").length;
   return (
     <span className={cn(base, overdue ? "bg-red-50 text-red-700" : "bg-gray-50 text-gray-600")}>
       <b>{overdue ? "Overdue" : "Not started"}</b>
       {assignment.dueDate ? <span className="block">due {formatDate(assignment.dueDate)}</span> : null}
+      {notCounted ? <span className="block text-gray-500">{notCounted} not counted</span> : null}
     </span>
   );
 }

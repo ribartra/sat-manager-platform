@@ -62,7 +62,7 @@ export default async function AssignPage({ params, searchParams }: PageProps) {
     : [];
 
   return (
-    <PageShell width="narrow">
+    <PageShell>
       <Breadcrumbs
         items={[
           { label: "Home", href: "/teacher" },
@@ -79,6 +79,15 @@ export default async function AssignPage({ params, searchParams }: PageProps) {
 
       <AssignForm
         studentId={studentId}
+        studentName={student.name}
+        recommended={
+          overview
+            ? Object.values(overview.areas)
+                .map((a) => a.weakest)
+                .filter((w): w is NonNullable<typeof w> => Boolean(w) && w!.pct < 70)
+                .map((w) => `${w.topicId}:${w.difficulty}`)
+            : []
+        }
         practiceSets={[...practiceSets].sort(comparePracticeSets).map((ps) => ({
           id: ps.id,
           name: ps.name,

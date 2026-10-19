@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
-import { AttemptStatusBadge, InvalidatedNotice, PageShell, VoidableValue } from "@/components/sat";
+import { AttemptStatusBadge, InvalidatedNotice, PageShell, SectionHeader, TestAttemptsTable, TestResultSentence } from "@/components/sat";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { ReviewQuestionCard } from "@/components/sat/review-question-card";
-import { AnswerGrid, AnswerGridLegend, ModuleResultRows, ScoreBlocks } from "@/components/sat/test-ui";
+import { AnswerGrid, AnswerGridLegend, ModuleResultLegend, ModuleResultRows, ScoreBlocks } from "@/components/sat/test-ui";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { buildTestAttemptView } from "@/lib/test-view";
 import prisma from "@/lib/prisma";
@@ -50,6 +50,7 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
       answers: true,
       pauses: true,
       test: { select: { name: true } },
+      assignment: { select: { dueDate: true } },
     },
   });
   if (!attempt) notFound();
@@ -120,6 +121,7 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
           </div>
           <p className="mt-1 text-sm text-gray-500">
             Started {formatDate(attempt.startedAt)} · {attempt.submittedAt ? `Completed ${formatDate(attempt.submittedAt)}` : "Not finished"}
+            {attempt.assignment?.dueDate ? ` · Due ${formatDate(attempt.assignment.dueDate)}` : ""}
             {attempt.pauses.length > 0 ? ` · Paused ${attempt.pauses.length} ${attempt.pauses.length === 1 ? "time" : "times"} (${formatDuration(pauseSeconds)})` : ""}
             {attempt.timeExpiredEvents > 0 ? ` · Ran out of time ${attempt.timeExpiredEvents} ${attempt.timeExpiredEvents === 1 ? "time" : "times"}` : ""}
             {attempt.extraTimeUsed > 0 ? ` · Extra time ${formatTime(attempt.extraTimeUsed)}` : ""}
@@ -132,16 +134,7 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
 
       {attempt.status === "INVALIDATED" ? <InvalidatedNotice audience="teacher" /> : null}
 
-      <Card padding="md" className="mb-4 text-sm text-gray-700">
-        {view.total !== null ? (
-          <>{attempt.student.name.split(" ")[0]} completed all 4 modules. Reading &amp; Writing <b>{view.sections.RW.score}</b> · Math <b>{view.sections.MATH.score}</b> · Total <b><VoidableValue status={attempt.status}>{view.total}</VoidableValue></b>.</>
-        ) : (
-          <>
-            {attempt.student.name.split(" ")[0]} completed <b>{doneModules.length} of 4 modules</b>
-            {doneModules.length ? ` (${doneModules.map((m) => m.short).join(", ")})` : ""}. Each section score appears when both of its modules are done.
-          </>
-        )}
-      </Card>
+      <TestResultSentence view={view} status={attempt.status} who={attempt.student.name.split(" ")[0]} />
 
       <ScoreBlocks view={view} />
 
@@ -149,6 +142,7 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
         <Card padding="md" className="min-w-0">
           <h2 className="text-sm font-semibold text-gray-900">Results by module</h2>
           <p className="mt-0.5 text-xs text-gray-500">Blank answers count as incorrect. Click a module to jump to its questions.</p>
+          <ModuleResultLegend />
           <ModuleResultRows modules={view.modules} />
           <div className="mt-2 overflow-x-auto border-t border-gray-100 pt-2">
             <table className="w-full min-w-[28rem] text-xs">
@@ -219,29 +213,14 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
       ) : null}
 
       {siblings.length > 1 ? (
-        <Card padding="md" className="mt-4">
-          <h2 className="mb-2 text-sm font-semibold text-gray-900">All attempts for {attempt.test.name}</h2>
-          <table className="w-full text-sm">
-            <thead className="text-left text-xs text-gray-500">
-              <tr><th className="py-1">Attempt</th><th>Date</th><th>R&amp;W</th><th>Math</th><th>Total</th></tr>
-            </thead>
-            <tbody>
-              {siblings.map((s, i) => (
-                <tr key={s.id} className={s.id === attempt.id ? "bg-blue-50" : ""}>
-                  <td className="py-1.5">
-                    <Link href={`/teacher/students/${studentId}/tests/${s.id}`} className="hover:underline">Try {i + 1}</Link>
-                    {s.id === attempt.id ? <Badge variant="info" className="ml-2">Viewing</Badge> : null}
-                    {s.status === "IN_PROGRESS" ? <Badge variant="warning" className="ml-2">In progress</Badge> : null}
-                  </td>
-                  <td>{formatDate(s.submittedAt ?? s.startedAt)}</td>
-                  <td><VoidableValue status={s.status}>{s.rwScore ?? "—"}</VoidableValue></td>
-                  <td><VoidableValue status={s.status}>{s.mathScore ?? "—"}</VoidableValue></td>
-                  <td className="font-semibold"><VoidableValue status={s.status}>{s.totalScore ?? "—"}</VoidableValue></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </Card>
+        <section className="mt-4">
+          <SectionHeader title={`All attempts for ${attempt.test.name}`} description="Every try is kept. Click one to see it." />
+          <TestAttemptsTable
+            rows={siblings.map((s, i) => ({ ...s, tryNumber: i + 1, view: s.id === attempt.id && inProgress ? view : null }))}
+            viewingId={attempt.id}
+            hrefFor={(id) => buildProgressHref(`/teacher/students/${studentId}/tests/${id}`, filters)}
+          />
+        </section>
       ) : null}
 
       <div className="mt-6 space-y-6">

@@ -1,13 +1,11 @@
-import { PageShell, PracticeAreaTabs } from "@/components/sat";
+import { PageShell, PracticeAreaTabs, SkillsMap } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { Plus } from "lucide-react";
-import { Card } from "@/components/ui/card";
 import { PracticeSetsFilter } from "./practice-sets-filter-client";
 import { PracticeSetsTable, type PracticeSetRow } from "./practice-sets-table-client";
 import { redirect } from "next/navigation";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
-import { difficultyLabel } from "@/lib/domain-meta";
 import { compareSkills } from "@/lib/taxonomy-order";
 import { cn } from "@/lib/utils";
 import { activeAreaTab, practiceAreaFromTab, practiceAreaLabel } from "@/lib/practice-area";
@@ -94,53 +92,40 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
       </nav>
       {view === "skills" ? (
         <div className="space-y-3">
-          {[...domains.entries()].map(([domainId, domain]) => (
-            <Card key={domainId}>
-              <div className="flex items-center justify-between border-b border-gray-100 px-4 py-2">
-                <h2 className="text-xs font-semibold uppercase tracking-wide text-gray-500">{domain.name}</h2>
-                <span className="text-xs text-gray-400">{domain.topics.length} skill{domain.topics.length === 1 ? "" : "s"}</span>
-              </div>
-              <ul className="divide-y divide-gray-100">
-                {domain.topics.map((topic) => {
-                  const setsOfTopic = practiceSets.filter((set) => set.topicId === topic.id);
-                  const assigned = setsOfTopic.reduce((sum, set) => sum + set.assignments.length, 0);
-                  return (
-                    <li key={topic.id} className="grid gap-2 px-4 py-2.5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-medium text-gray-900">{topic.name}</p>
-                        <p className="text-xs text-gray-500">Assigned {assigned} time{assigned === 1 ? "" : "s"}</p>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5">
-                        {DIFFICULTIES.map((difficulty) => {
-                          const sets = setsOfTopic.filter((set) => set.difficulty === difficulty);
-                          const published = sets.filter((set) => set.status === "PUBLISHED").length;
-                          return sets.length > 0 ? (
-                            <Link
-                              key={difficulty}
-                              href={manageHref({ topic: topic.id, difficulty })}
-                              title={`${sets.length} set${sets.length === 1 ? "" : "s"} (${published} published): edit, preview or change status`}
-                              className="rounded-full border border-gray-300 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 hover:border-gray-500"
-                            >
-                              {difficultyLabel(difficulty)} · {sets.length}
-                            </Link>
-                          ) : (
-                            <Link
-                              key={difficulty}
-                              href={`/teacher/practice-sets/new?topicId=${topic.id}`}
-                              title="No set at this level yet: create one"
-                              className="rounded-full border border-dashed border-gray-300 px-2.5 py-1 text-xs text-gray-400 hover:text-gray-700"
-                            >
-                              {difficultyLabel(difficulty)} · +
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            </Card>
-          ))}
+          <SkillsMap
+            domains={[...domains.entries()].map(([domainId, domain]) => ({
+              id: domainId,
+              name: domain.name,
+              skills: domain.topics.map((topic) => {
+                const setsOfTopic = practiceSets.filter((set) => set.topicId === topic.id);
+                const assigned = setsOfTopic.reduce((sum, set) => sum + set.assignments.length, 0);
+                return {
+                  id: topic.id,
+                  name: topic.name,
+                  sub: `Assigned ${assigned} time${assigned === 1 ? "" : "s"}`,
+                  chips: DIFFICULTIES.map((difficulty) => {
+                    const sets = setsOfTopic.filter((set) => set.difficulty === difficulty);
+                    const published = sets.filter((set) => set.status === "PUBLISHED").length;
+                    return sets.length > 0
+                      ? {
+                          difficulty,
+                          state: "available" as const,
+                          href: manageHref({ topic: topic.id, difficulty }),
+                          title: `${sets.length} set${sets.length === 1 ? "" : "s"} (${published} published): edit, preview or change status`,
+                          extra: <span className="text-gray-500">· {sets.length}</span>,
+                        }
+                      : {
+                          difficulty,
+                          state: null,
+                          href: `/teacher/practice-sets/new?topicId=${topic.id}`,
+                          title: "No set at this level yet: create one",
+                          extra: " · +",
+                        };
+                  }),
+                };
+              }),
+            }))}
+          />
           <p className="text-xs text-gray-500">To assign a set, open a student (Students → Assign practice) or use a group.</p>
         </div>
       ) : (

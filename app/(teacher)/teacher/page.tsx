@@ -1,4 +1,19 @@
-import { PageShell, PracticeAreaTabs } from "@/components/sat";
+import {
+  AttentionCard,
+  AttentionItem,
+  ChevronCell,
+  DateCell,
+  EmptyState,
+  LinkTr,
+  PageShell,
+  PracticeAreaTabs,
+  RowAction,
+  RowLink,
+  SectionHeader,
+  SimpleTable,
+  StudentCell,
+  TD,
+} from "@/components/sat";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { formatDate, relativeDay } from "@/lib/utils";
@@ -21,7 +36,6 @@ import { compareSkills, isOfficialSkill } from "@/lib/taxonomy-order";
 import { Alert } from "@/components/sat/alert";
 import { Pct } from "@/components/sat/work-status";
 import { isInactive, loadStudentOverviews, type StudentOverview } from "@/lib/teacher-overview";
-import { cn } from "@/lib/utils";
 
 interface PageProps {
   searchParams: Promise<{
@@ -117,59 +131,50 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
       return (
         <PageShell width="wide" density="compact" className="space-y-4">
           {head(rows.length)}
-          <Card className="overflow-x-auto">
-            <table className="w-full min-w-[48rem] text-sm">
-              <thead className="bg-gray-50 text-left text-xs text-gray-500">
-                <tr>
-                  <th className="px-3 py-2">Name</th>
-                  <th className="px-3 py-2">Latest test</th>
-                  <th className="px-3 py-2">R&amp;W</th>
-                  <th className="px-3 py-2">Math</th>
-                  <th className="px-3 py-2">In progress</th>
-                  <th className="px-3 py-2">Pending</th>
-                  <th className="px-3 py-2" />
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {rows.map((s) => (
-                  <tr key={s.id}>
-                    <td className="px-3 py-2">
-                      <Link href={`/teacher/students/${s.id}?area=tests`} className="font-medium text-blue-700 hover:underline">{s.name}</Link>
-                      <p className="text-xs text-gray-500">{s.email}</p>
-                    </td>
-                    <td className="px-3 py-2">
-                      {s.tests.latest ? (
+          {rows.length === 0 ? (
+            <EmptyState title="No students match." />
+          ) : (
+            <SimpleTable head={["Name", "Latest test", "R&W", "Math", "In progress", "Pending", ""]}>
+              {rows.map((s) => (
+                <LinkTr key={s.id}>
+                  <td className={TD}>
+                    <StudentCell name={s.name} email={s.email} avatarUrl={s.avatarUrl}>
+                      <RowLink href={`/teacher/students/${s.id}?area=tests`} className="block truncate">{s.name}</RowLink>
+                    </StudentCell>
+                  </td>
+                  <td className={TD}>
+                    {s.tests.latest ? (
+                      <RowAction>
                         <Link href={`/teacher/students/${s.id}/tests/${s.tests.latest.id}`} className="hover:underline">
                           {s.tests.latest.name}
                           <span className="block text-xs text-gray-500">{s.tests.latest.submittedAt ? formatDate(s.tests.latest.submittedAt) : ""}</span>
                         </Link>
-                      ) : (
-                        <span className="text-xs text-gray-400">None yet</span>
-                      )}
-                    </td>
-                    <td className="px-3 py-2 font-semibold tabular-nums">{s.tests.latest?.rw ?? "—"}</td>
-                    <td className="px-3 py-2 font-semibold tabular-nums">{s.tests.latest?.math ?? "—"}</td>
-                    <td className="px-3 py-2">{s.tests.inProgress || "—"}</td>
-                    <td className="px-3 py-2">
-                      <div className="flex flex-wrap gap-1">
-                        {s.tests.pending.map((p) => (
-                          <Badge key={p.testId} variant={p.overdue ? "danger" : "default"}>{p.name}</Badge>
-                        ))}
-                        {s.tests.pending.length === 0 ? <span className="text-xs text-gray-400">—</span> : null}
-                      </div>
-                    </td>
-                    <td className="px-3 py-2 text-right">
-                      <div className="flex justify-end gap-3 text-xs">
-                        <Link href={`/teacher/students/${s.id}/assign-test`} className="text-blue-600 hover:underline">Assign test</Link>
-                        <Link href={`/teacher/students/${s.id}?area=tests`} className="text-blue-600 hover:underline">Open →</Link>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {rows.length === 0 ? <p className="py-10 text-center text-sm text-gray-500">No students match.</p> : null}
-          </Card>
+                      </RowAction>
+                    ) : (
+                      <span className="text-xs text-gray-400">None yet</span>
+                    )}
+                  </td>
+                  <td className={`${TD} font-semibold tabular-nums`}>{s.tests.latest?.rw ?? "—"}</td>
+                  <td className={`${TD} font-semibold tabular-nums`}>{s.tests.latest?.math ?? "—"}</td>
+                  <td className={TD}>{s.tests.inProgress || "—"}</td>
+                  <td className={TD}>
+                    <div className="flex flex-wrap gap-1">
+                      {s.tests.pending.map((p) => (
+                        <Badge key={p.testId} variant={p.overdue ? "danger" : "default"}>{p.name}</Badge>
+                      ))}
+                      {s.tests.pending.length === 0 ? <span className="text-xs text-gray-400">—</span> : null}
+                    </div>
+                  </td>
+                  <td className={`${TD} text-right`}>
+                    <RowAction>
+                      <Link href={`/teacher/students/${s.id}/assign-test`} className="whitespace-nowrap text-xs text-blue-600 hover:underline">Assign test</Link>
+                    </RowAction>
+                  </td>
+                  <ChevronCell />
+                </LinkTr>
+              ))}
+            </SimpleTable>
+          )}
         </PageShell>
       );
     }
@@ -183,70 +188,65 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
         <div className="grid gap-3 md:grid-cols-3">
           <AttentionCard title="Inactive 5+ days" icon={<Clock size={14} />} tone="warn" count={inactive.length}>
             {inactive.map((s) => (
-              <li key={s.id}>
-                <Link href={`/teacher/students/${s.id}`} className="hover:underline">{s.name}</Link>
-                <span className="ml-1 text-xs text-gray-500">{s.lastActiveAt ? `Last active ${relativeDay(s.lastActiveAt, now)}` : "Never active"}</span>
-              </li>
+              <AttentionItem
+                key={s.id}
+                name={s.name}
+                avatarUrl={s.avatarUrl}
+                href={`/teacher/students/${s.id}`}
+                detail={s.lastActiveAt ? `Last active ${relativeDay(s.lastActiveAt, now)}` : "Never active"}
+              />
             ))}
           </AttentionCard>
           <AttentionCard title="Overdue tests" icon={<Flag size={14} />} tone="bad" count={overdueTests.length}>
             {overdueTests.map((s) => (
-              <li key={s.id}>
-                <Link href={`/teacher/students/${s.id}?area=tests`} className="hover:underline">{s.name}</Link>
-                <span className="ml-1 text-xs text-gray-500">{s.tests.pending.filter((p) => p.overdue).map((p) => p.name).join(", ")}</span>
-              </li>
+              <AttentionItem
+                key={s.id}
+                name={s.name}
+                avatarUrl={s.avatarUrl}
+                href={`/teacher/students/${s.id}?area=tests`}
+                detail={s.tests.pending.filter((p) => p.overdue).map((p) => p.name).join(", ")}
+              />
             ))}
           </AttentionCard>
           <AttentionCard title="Section under 550 in latest test" icon={<AlertTriangle size={14} />} tone="info" count={lowScores.length}>
             {lowScores.map((s) => (
-              <li key={s.id}>
-                <Link href={`/teacher/students/${s.id}?area=tests`} className="hover:underline">{s.name}</Link>
-                <span className="ml-1 text-xs text-gray-500">
-                  {s.tests.latest?.name} · R&amp;W {s.tests.latest?.rw ?? "—"} · Math {s.tests.latest?.math ?? "—"}
-                </span>
-              </li>
+              <AttentionItem
+                key={s.id}
+                name={s.name}
+                avatarUrl={s.avatarUrl}
+                href={`/teacher/students/${s.id}?area=tests`}
+                detail={<>{s.tests.latest?.name} · R&amp;W {s.tests.latest?.rw ?? "—"} · Math {s.tests.latest?.math ?? "—"}</>}
+              />
             ))}
           </AttentionCard>
         </div>
 
         <section>
-          <h2 className="text-base font-semibold text-gray-900">Students</h2>
-          <p className="mb-2 text-xs text-gray-500">Click a name to see everything the student has done. Click a cell to go straight to that area.</p>
-          <Card className="overflow-x-auto">
-            <table className="w-full min-w-[56rem] text-sm">
-              <thead className="bg-gray-50 text-left text-xs text-gray-500">
-                <tr>
-                  <th className="px-3 py-2">Name</th>
-                  <th className="px-3 py-2">Last active</th>
-                  {PRACTICE_AREAS.map((a) => (
-                    <th key={a.code} className="px-3 py-2" style={{ color: `var(--sat-area-${a.tab})` }}>{practiceAreaLabel(a.code)}</th>
-                  ))}
-                  <th className="px-3 py-2 text-[var(--sat-area-tests)]">Tests</th>
-                  <th className="px-3 py-2" />
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {rows.map((s) => (
-                  <tr key={s.id}>
-                    <td className="px-3 py-2">
-                      <Link href={`/teacher/students/${s.id}`} className="font-medium text-blue-700 hover:underline">{s.name}</Link>
-                      <p className="text-xs text-gray-500">{s.email}</p>
-                    </td>
-                    <td className="px-3 py-2">
-                      {s.lastActiveAt ? (
-                        <span className={cn("text-sm", isInactive(s.lastActiveAt, now) ? "text-amber-700" : "text-gray-700")}>
-                          <b className="font-medium">{formatDate(s.lastActiveAt)}</b>
-                          <span className="block text-xs">{relativeDay(s.lastActiveAt, now)}{isInactive(s.lastActiveAt, now) ? " · ⚠ inactive" : ""}</span>
-                        </span>
-                      ) : (
-                        <span className="text-sm text-red-600">Never</span>
-                      )}
-                    </td>
-                    {PRACTICE_AREAS.map((a) => {
-                      const o = s.areas[a.code];
-                      return (
-                        <td key={a.code} className="px-3 py-2">
-                          <Link href={`/teacher/students/${s.id}?area=${a.tab}`} className="-mx-2 -my-1 block rounded-md px-2 py-1 hover:bg-gray-50">
+          <SectionHeader title="Students" description="Click a row to see everything the student has done. Click an area cell to go straight to that area." />
+          {rows.length === 0 ? (
+            <EmptyState title="No students yet" description="Invite your first student to get started." />
+          ) : (
+            <SimpleTable head={[
+              "Name",
+              "Last active",
+              ...PRACTICE_AREAS.map((a) => <span key={a.code} style={{ color: `var(--sat-area-${a.tab})` }}>{practiceAreaLabel(a.code)}</span>),
+              <span key="tests" className="text-[var(--sat-area-tests)]">Tests</span>,
+              "",
+            ]}>
+              {rows.map((s) => (
+                <LinkTr key={s.id}>
+                  <td className={TD}>
+                    <StudentCell name={s.name} email={s.email} avatarUrl={s.avatarUrl}>
+                      <RowLink href={`/teacher/students/${s.id}`} className="block truncate">{s.name}</RowLink>
+                    </StudentCell>
+                  </td>
+                  <td className={TD}><DateCell date={s.lastActiveAt} now={now} inactive={isInactive(s.lastActiveAt, now)} /></td>
+                  {PRACTICE_AREAS.map((a) => {
+                    const o = s.areas[a.code];
+                    return (
+                      <td key={a.code} className={TD}>
+                        <RowAction>
+                          <Link href={`/teacher/students/${s.id}?area=${a.tab}`} className="-mx-2 -my-1 block rounded-md px-2 py-1 hover:bg-gray-100">
                             {o.last ? (
                               <>
                                 <b className="text-sm font-medium text-gray-800">{formatDate(o.last.at)}</b>
@@ -256,11 +256,13 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
                               <span className="text-xs text-gray-400">No activity</span>
                             )}
                           </Link>
-                        </td>
-                      );
-                    })}
-                    <td className="px-3 py-2">
-                      <Link href={`/teacher/students/${s.id}?area=tests`} className="-mx-2 -my-1 block rounded-md px-2 py-1 hover:bg-gray-50">
+                        </RowAction>
+                      </td>
+                    );
+                  })}
+                  <td className={TD}>
+                    <RowAction>
+                      <Link href={`/teacher/students/${s.id}?area=tests`} className="-mx-2 -my-1 block rounded-md px-2 py-1 hover:bg-gray-100">
                         {s.tests.latest ? (
                           <>
                             <span className="whitespace-nowrap text-sm">R&amp;W <b>{s.tests.latest.rw ?? "—"}</b> · M <b>{s.tests.latest.math ?? "—"}</b></span>
@@ -271,16 +273,13 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
                         )}
                         {s.tests.inProgress ? <span className="block text-xs text-amber-700">{s.tests.inProgress} in progress</span> : null}
                       </Link>
-                    </td>
-                    <td className="px-3 py-2 text-right">
-                      <Link href={`/teacher/students/${s.id}`} className="text-xs text-blue-600 hover:underline">Open →</Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {rows.length === 0 ? <p className="py-10 text-center text-sm text-gray-500">No students yet. Invite your first student to get started.</p> : null}
-          </Card>
+                    </RowAction>
+                  </td>
+                  <ChevronCell />
+                </LinkTr>
+              ))}
+            </SimpleTable>
+          )}
         </section>
       </PageShell>
     );
@@ -575,35 +574,5 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
         })}
       />
     </PageShell>
-  );
-}
-
-function AttentionCard({
-  title,
-  icon,
-  tone,
-  count,
-  children,
-}: {
-  title: string;
-  icon: React.ReactNode;
-  tone: "warn" | "bad" | "info";
-  count: number;
-  children: React.ReactNode;
-}) {
-  return (
-    <Card
-      padding="md"
-      className={cn(
-        "border-t-4",
-        tone === "warn" ? "border-t-amber-400" : tone === "bad" ? "border-t-red-500" : "border-t-blue-500",
-      )}
-    >
-      <h3 className="flex items-center justify-between gap-2 text-sm font-semibold text-gray-900">
-        <span className="flex items-center gap-1.5">{icon} {title}</span>
-        <Badge variant={count ? (tone === "bad" ? "danger" : tone === "warn" ? "warning" : "info") : "default"}>{count}</Badge>
-      </h3>
-      {count ? <ul className="mt-2 space-y-1 text-sm text-gray-800">{children}</ul> : <p className="mt-2 text-sm text-gray-400">Nobody right now</p>}
-    </Card>
   );
 }

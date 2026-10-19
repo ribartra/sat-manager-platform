@@ -1,11 +1,42 @@
-import { AttemptStatusBadge, PageShell, Pagination, PracticeAreaTabs, VoidableValue, invalidatedRowClass, isInvalidated, pageFromParam, paginate } from "@/components/sat";
+import {
+  AreaSummaryCard,
+  AttemptStatusBadge,
+  ChevronCell,
+  Delta,
+  DIFFICULTIES,
+  EmptyState,
+  LinkTabs,
+  LinkTr,
+  PageShell,
+  Pagination,
+  PracticeAreaTabs,
+  PracticeAttemptsTable,
+  RowLink,
+  SectionHeader,
+  SimpleTable,
+  SkillDifficultyMatrix,
+  StatGrid,
+  StatTile,
+  TD,
+  TestMiniCard,
+  TestSectionScore,
+  TestTotalCell,
+  VoidableValue,
+  invalidatedRowClass,
+  isInvalidated,
+  pageFromParam,
+  paginate,
+} from "@/components/sat";
+import { AreaTag } from "@/components/sat/practice-set-row";
+import { LineChart } from "@/components/sat/line-chart";
+import { loadAttemptHistory } from "@/lib/attempt-history";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { formatDate, formatDuration, formatTime } from "@/lib/utils";
-import { assignmentStatusLabel, difficultyLabel } from "@/lib/domain-meta";
+import { assignmentStatusLabel, difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
 import { scoreBandTextClass } from "@/lib/score-band";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -24,12 +55,11 @@ import { parentAuthorizationState } from "@/lib/parent-authorization";
 import { refreshAssignmentStates } from "@/lib/assignments";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { studentAccessWhereFor } from "@/lib/program-scope";
-import { loadMockReport, loadPracticeReport, moduleTableOf, shortSetName, type ReportAttempt } from "@/lib/student-report";
+import { loadMockReport, loadPracticeReport, moduleTableOf, shortSetName } from "@/lib/student-report";
 import { activeAreaTab, activeHomeTab, practiceAreaFromTab, practiceAreaLabel, type HomeTabKey, type PracticeAreaCode } from "@/lib/practice-area";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
-import { SectionCell } from "@/components/sat/test-ui";
-import { DueLine, Pct, WorkStatusBadges } from "@/components/sat/work-status";
-import { loadStudentTests, sortTests, type StudentTestItem } from "@/lib/test-assignments";
+import { Pct } from "@/components/sat/work-status";
+import { loadStudentTests, sortTests } from "@/lib/test-assignments";
 import { loadStudentOverviews } from "@/lib/teacher-overview";
 import { relativeDay } from "@/lib/utils";
 import { buildProgressHref, progressFilterEntries, progressFiltersFromParams } from "@/lib/progress-filters";
@@ -45,7 +75,7 @@ import { officialSkillsFor } from "@/lib/taxonomy-order";
 
 interface PageProps {
   params: Promise<{ studentId: string }>;
-  searchParams: Promise<{ area?: string; topic?: string; difficulty?: string; from?: string; to?: string; attemptsPage?: string; examsPage?: string }>;
+  searchParams: Promise<{ area?: string; topic?: string; difficulty?: string; from?: string; to?: string; attemptsPage?: string; examsPage?: string; type?: string }>;
 }
 
 const HISTORY_PAGE_SIZE = 10;
@@ -56,7 +86,8 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
   const { filters, showEndDate } = await applyTimeFilterSetting(progressFiltersFromParams(query));
   const area = activeAreaTab(filters.area, filters.area);
   // Tabs: Summary · Math · Reading · Writing · Tests · Activity (no `area` param = Summary).
-  const view: HomeTabKey | "activity" = query.area === "activity" ? "activity" : activeHomeTab(query.area);
+  const view: HomeTabKey | "activity" | "history" =
+    query.area === "activity" ? "activity" : query.area === "history" ? "history" : activeHomeTab(query.area);
   const practiceArea = practiceAreaFromTab(area);
   const topicId = filters.topic ?? "";
   const difficulty = filters.difficulty ?? "";
@@ -183,11 +214,14 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
         basePath={`/teacher/students/${studentId}`}
         active={view as HomeTabKey}
         includeSummary
-        extraTabs={[{ key: "activity", label: "Activity" }]}
+        extraTabs={[
+          { key: "history", label: "History" },
+          { key: "activity", label: "Activity" },
+        ]}
         preserve={{ difficulty: filters.difficulty, from: filters.from, to: filters.to }}
         className="mb-3"
       />
-      {view !== "summary" && view !== "activity" ? (
+      {view !== "summary" && view !== "activity" && view !== "history" ? (
         <ProgressFilters
           action={`/teacher/students/${studentId}`}
           filters={filters}
@@ -226,24 +260,32 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
         <div className="grid gap-3 md:grid-cols-3">
           {(["MATH", "READING", "WRITING"] as PracticeAreaCode[]).map((code) => {
             const o = overview.areas[code];
-            const tab = code.toLowerCase();
+            const label = practiceAreaLabel(code);
             return (
-              <Card key={code} as={Link} href={`/teacher/students/${studentId}?area=${tab}`} padding="md" className="border-t-4 hover:border-gray-400" style={{ borderTopColor: `var(--sat-area-${tab})` }}>
-                <p className="text-base font-semibold" style={{ color: `var(--sat-area-${tab})` }}>{practiceAreaLabel(code)}</p>
-                {o.last ? (
-                  <>
-                    <p className="mt-1 text-xs text-gray-500">Latest practice · {o.last.setName} · {formatDate(o.last.at)}</p>
-                    <p className="mt-1 text-3xl font-bold"><Pct value={o.last.pct} /></p>
-                    <p className="text-xs text-gray-500">Average <Pct value={o.avgPct} /> over {o.attempts} attempt{o.attempts === 1 ? "" : "s"}</p>
-                    {o.weakest ? <p className="mt-1 text-xs text-gray-600">Weakest skill: <b>{o.weakest.name}</b> ({difficultyLabel(o.weakest.difficulty)}, {o.weakest.pct}%)</p> : null}
-                  </>
-                ) : (
-                  <p className="mt-2 text-sm text-gray-400">No {practiceAreaLabel(code)} practice yet.</p>
-                )}
-                <p className="mt-2 border-t border-gray-100 pt-2 text-xs text-gray-500">
-                  {o.toDo} set{o.toDo === 1 ? "" : "s"} to do{o.overdue ? ` · ${o.overdue} overdue` : ""} · <span className="text-blue-600">See {practiceAreaLabel(code)}</span>
-                </p>
-              </Card>
+              <AreaSummaryCard
+                key={code}
+                area={code}
+                label={label}
+                href={`/teacher/students/${studentId}?area=${code.toLowerCase()}`}
+                latest={
+                  o.last
+                    ? {
+                        caption: <>Latest practice · {o.last.setName} · {formatDate(o.last.at)}</>,
+                        pct: o.last.pct,
+                        detail: <>Average <Pct value={o.avgPct} /></>,
+                      }
+                    : null
+                }
+                chips={[
+                  { label: "Practice attempts", value: o.attempts },
+                  { label: "To do", value: o.toDo },
+                  { label: "Overdue", value: o.overdue, tone: o.overdue ? "danger" : "default" },
+                ]}
+                weakest={o.weakest ? <>Weakest skill: <b>{o.weakest.name}</b> ({difficultyLabel(o.weakest.difficulty)}, {o.weakest.pct}%)</> : null}
+                footer={`${o.toDo} set${o.toDo === 1 ? "" : "s"} to do`}
+                action={`See ${label}`}
+                emptyText={`No ${label} practice yet.`}
+              />
             );
           })}
         </div>
@@ -256,7 +298,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
           <Card padding="md" className="text-sm text-gray-400">No tests assigned.</Card>
         ) : (
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {testItems.map((t) => <TestMiniCard key={t.assignmentId} item={t} studentId={studentId} />)}
+            {testItems.map((t) => <TestMiniCard key={t.assignmentId} item={t} hrefFor={(id) => `/teacher/students/${studentId}/tests/${id}`} />)}
           </div>
         )}
 
@@ -333,12 +375,120 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
     );
   }
 
+  // ---------------------------------------------------------------- History (every try, grouped by Test / practice set)
+  if (view === "history") {
+    const type = query.type === "tests" || query.type === "practice" ? query.type : "all";
+    const rows = await loadAttemptHistory([studentId], { kind: type === "tests" ? "test" : type === "practice" ? "practice" : undefined });
+    const groups = [...new Map(rows.map((r) => [r.groupId, rows.filter((x) => x.groupId === r.groupId)])).values()].map((g) =>
+      [...g].sort((a, b) => a.tryNumber - b.tryNumber),
+    );
+    const typeHref = (t: string) => `/teacher/students/${studentId}?area=history${t === "all" ? "" : `&type=${t}`}`;
+    return (
+      <PageShell width="wide">
+        {header}
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <p className="text-sm text-gray-500">Every try {first} made, grouped by Test and practice set. Changes compare with the previous counted try.</p>
+          <LinkTabs
+            className="mb-0 border-b-0"
+            label="Show"
+            active={type}
+            tabs={[
+              { key: "all", label: "All", href: typeHref("all") },
+              { key: "tests", label: "Tests", href: typeHref("tests") },
+              { key: "practice", label: "Practice", href: typeHref("practice") },
+            ]}
+          />
+        </div>
+        {groups.length === 0 ? (
+          <EmptyState title="No attempts yet" description={`${first}'s practice sets and Tests will appear here.`} />
+        ) : (
+          <div className="space-y-4">
+            {groups.map((tries) => {
+              const head = tries[0];
+              const isTest = head.kind === "test";
+              const counted = tries.filter((t) => t.status === "SUBMITTED");
+              const bestRw = isTest ? counted.reduce<number | null>((m, t) => (t.rw !== null && (m === null || t.rw > m) ? t.rw : m), null) : null;
+              const bestMath = isTest ? counted.reduce<number | null>((m, t) => (t.math !== null && (m === null || t.math > m) ? t.math : m), null) : null;
+              const bestPct = !isTest ? counted.reduce<number | null>((m, t) => (t.pct !== null && (m === null || t.pct > m) ? t.pct : m), null) : null;
+              const hrefFor = (id: string) => buildProgressHref(`/teacher/students/${studentId}/${isTest ? "tests" : "attempts"}/${id}`, filters);
+              return (
+                <Card key={head.groupId} padding="md">
+                  <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      {isTest ? <Badge className="bg-gray-900 text-white">Test</Badge> : <Badge>Practice</Badge>}
+                      {head.area ? <AreaTag area={head.area} /> : null}
+                      <h3 className="text-sm font-semibold text-gray-900">{head.title}</h3>
+                      {head.difficulty ? <Badge variant={difficultyBadgeVariant(head.difficulty)}>{difficultyLabel(head.difficulty)}</Badge> : null}
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      {tries.length} {tries.length === 1 ? "try" : "tries"}
+                      {isTest ? <> · Best R&amp;W <b>{bestRw ?? "—"}</b> · Best Math <b>{bestMath ?? "—"}</b></> : <> · Best <Pct value={bestPct} className="font-semibold" /></>}
+                    </p>
+                  </div>
+                  {isTest ? (
+                    <SimpleTable head={["Try", "Date", "Status", "R&W", "Change", "Math", "Change", ""]}>
+                      {tries.map((t) => (
+                        <LinkTr key={t.id} className={invalidatedRowClass(t.status)}>
+                          <td className={TD}><RowLink href={hrefFor(t.id)}>Try {t.tryNumber}</RowLink></td>
+                          <td className={`${TD} text-gray-600`}>{formatDate(t.at)}<span className="block text-xs text-gray-400">{relativeDay(t.at)}</span></td>
+                          <td className={TD}>
+                            {t.status === "IN_PROGRESS" ? <Badge variant="warning">{t.modulesDone ?? 0} of 4 modules</Badge> : <AttemptStatusBadge status={t.status} />}
+                          </td>
+                          <td className={`${TD} font-semibold tabular-nums`}><VoidableValue status={t.status}>{t.rw ?? "—"}</VoidableValue></td>
+                          <td className={TD}><Delta value={t.changeRw} unit="" /></td>
+                          <td className={`${TD} font-semibold tabular-nums`}><VoidableValue status={t.status}>{t.math ?? "—"}</VoidableValue></td>
+                          <td className={TD}><Delta value={t.changeMath} unit="" /></td>
+                          <ChevronCell />
+                        </LinkTr>
+                      ))}
+                    </SimpleTable>
+                  ) : (
+                    <SimpleTable head={["Try", "Date", "Score", "Correct", "Change", "Time", ""]}>
+                      {tries.map((t) => (
+                        <LinkTr key={t.id} className={invalidatedRowClass(t.status)}>
+                          <td className={TD}>
+                            <RowLink href={hrefFor(t.id)}>Try {t.tryNumber}</RowLink>
+                            {t.status !== "SUBMITTED" ? <span className="ml-2"><AttemptStatusBadge status={t.status} /></span> : null}
+                          </td>
+                          <td className={`${TD} text-gray-600`}>{formatDate(t.at)}<span className="block text-xs text-gray-400">{relativeDay(t.at)}</span></td>
+                          <td className={TD}><VoidableValue status={t.status}><Pct value={t.pct} className="font-semibold" /></VoidableValue></td>
+                          <td className={TD}>
+                            {t.correct !== null ? (
+                              <>
+                                {t.correct} of {t.total}
+                                <span className="block text-xs text-gray-500">{t.wrong} wrong · {t.blank} blank</span>
+                              </>
+                            ) : "—"}
+                          </td>
+                          <td className={TD}><Delta value={t.change} unit="pts" /></td>
+                          <td className={`${TD} text-gray-600`}>{t.time ? formatDuration(t.time) : "—"}</td>
+                          <ChevronCell />
+                        </LinkTr>
+                      ))}
+                    </SimpleTable>
+                  )}
+                </Card>
+              );
+            })}
+          </div>
+        )}
+      </PageShell>
+    );
+  }
+
   // ---------------------------------------------------------------- Full Practice Tests
   if (!practiceArea) {
     const report = await loadMockReport(studentId, reportFilters);
-    const examPage = paginate(report.examHistory, pageFromParam(query.examsPage), HISTORY_PAGE_SIZE);
     const moduleTable = moduleTableOf(report.sectionModuleMetrics);
     const tests = await loadStudentTests(studentId);
+    // Every try (in progress, submitted, not counted), newest first; the date filter applies to finished tries.
+    const inDates = new Set(report.examHistory.map((exam) => exam.id));
+    const dated = Boolean(filters.from || filters.to);
+    const testAttemptRows = tests
+      .flatMap((t) => t.attempts.map((a) => ({ t, a })))
+      .filter(({ a }) => (a.status === "IN_PROGRESS" ? !dated : inDates.has(a.id)))
+      .sort((x, y) => (y.a.submittedAt ?? y.a.startedAt).getTime() - (x.a.submittedAt ?? x.a.startedAt).getTime());
+    const examPage = paginate(testAttemptRows, pageFromParam(query.examsPage), HISTORY_PAGE_SIZE);
     return (
       <PageShell width="wide">
         {header}
@@ -353,7 +503,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
         />
         {tests.length > 0 ? (
           <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {tests.map((t) => <TestMiniCard key={t.assignmentId} item={t} studentId={studentId} />)}
+            {tests.map((t) => <TestMiniCard key={t.assignmentId} item={t} hrefFor={(id) => `/teacher/students/${studentId}/tests/${id}`} />)}
           </div>
         ) : null}
         <div className="grid gap-6 lg:grid-cols-3">
@@ -362,7 +512,23 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
               <Card padding="lg" className="py-12 text-center text-sm text-gray-400">This student hasn&apos;t finished a test yet.</Card>
             ) : (
               <>
-                <MockSectionChart metrics={report.scoreSeries} />
+                {report.scoreSeries.filter((m) => m.rwScore !== null || m.mathScore !== null).length >= 2 ? (
+                  <Card padding="md">
+                    <SectionHeader size="sm" title="Section scores by test" description="Reading & Writing (solid) and Math (dashed), 200–800" />
+                    <LineChart
+                      title="Section scores by test"
+                      min={200}
+                      max={800}
+                      labels={report.scoreSeries.map((m) => m.label)}
+                      series={[
+                        { name: "Reading & Writing", color: "var(--sat-area-reading)", values: report.scoreSeries.map((m) => m.rwScore) },
+                        { name: "Math", color: "var(--sat-area-math)", values: report.scoreSeries.map((m) => m.mathScore), dashed: true },
+                      ]}
+                    />
+                  </Card>
+                ) : (
+                  <MockSectionChart metrics={report.scoreSeries} />
+                )}
                 <PerformanceBreakdown
                   title="Performance by section and module"
                   rowLabel="Section"
@@ -400,49 +566,53 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                 </li>
               ))}
             </SidePanel>
-            <SidePanel
-              id="exam-history"
-              title="Test history"
-              count={report.examHistory.length}
-              empty="No finished tests yet."
-              footer={
-                <Pagination
-                  basePath={`/teacher/students/${studentId}`}
-                  params={pageParams}
-                  param="examsPage"
-                  anchor="exam-history"
-                  pageSize={HISTORY_PAGE_SIZE}
-                  {...examPage}
-                />
-              }
-            >
-              {examPage.items.map((exam) => (
-                <li key={exam.id} className={`flex items-center justify-between gap-3 px-3 py-2 ${invalidatedRowClass(exam.status) ?? ""}`}>
-                  <div className="min-w-0">
-                    <p className="flex items-center gap-2 truncate text-sm font-medium text-gray-800">
-                      <span className="truncate">{exam.name}</span>
-                      {isInvalidated(exam.status) ? <AttemptStatusBadge status={exam.status} /> : null}
-                    </p>
-                    <p className="text-[11px] text-gray-400">
-                      {exam.submittedAt ? formatDate(exam.submittedAt) : "—"} ·{" "}
-                      <VoidableValue status={exam.status}>R&amp;W {exam.rwScore ?? "—"} · Math {exam.mathScore ?? "—"}</VoidableValue>
-                    </p>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-3">
-                    <VoidableValue status={exam.status} className="text-sm font-semibold text-gray-900">
-                      {exam.totalScore ?? "—"}
-                    </VoidableValue>
-                    <Hint label="See answers by question, restart, or send the report.">
-                      <Link href={buildProgressHref(`/teacher/students/${studentId}/tests/${exam.id}`, filters)} className="text-xs font-medium text-blue-600 hover:underline">
-                        Review
-                      </Link>
-                    </Hint>
-                  </div>
-                </li>
-              ))}
-            </SidePanel>
           </aside>
         </div>
+
+        <section id="exam-history" className="mt-6 scroll-mt-20">
+          <SectionHeader
+            title="Test attempts"
+            description={`${testAttemptRows.length} attempt${testAttemptRows.length === 1 ? "" : "s"} · every try is kept; "Not counted" tries don't count toward scores`}
+            action={
+              <Link href={buildProgressHref(`/teacher/students/${studentId}/assign-test`, filters)} className="text-xs font-medium text-blue-600 hover:underline">
+                Assign test
+              </Link>
+            }
+          />
+          {testAttemptRows.length === 0 ? (
+            <EmptyState title="No test attempts yet." />
+          ) : (
+            <>
+              <SimpleTable head={["Date", "Test", "Attempt", "R&W", "Math", "Total", ""]}>
+                {examPage.items.map(({ t, a }) => (
+                  <LinkTr key={a.id} className={invalidatedRowClass(a.status)}>
+                    <td className={`${TD} text-gray-600`}>
+                      {formatDate(a.submittedAt ?? a.startedAt)}
+                      <span className="block text-xs text-gray-400">{a.submittedAt ? "Completed" : "Started"} {relativeDay(a.submittedAt ?? a.startedAt)}</span>
+                    </td>
+                    <td className={TD}>
+                      <RowLink href={buildProgressHref(`/teacher/students/${studentId}/tests/${a.id}`, filters)}>{t.name}</RowLink>
+                      {a.status !== "SUBMITTED" ? <span className="ml-2"><AttemptStatusBadge status={a.status} /></span> : null}
+                    </td>
+                    <td className={`${TD} whitespace-nowrap`}>Try {a.tryNumber} of {t.attempts.length}</td>
+                    <td className={TD}><TestSectionScore attempt={a} section="RW" /></td>
+                    <td className={TD}><TestSectionScore attempt={a} section="MATH" /></td>
+                    <td className={TD}><TestTotalCell attempt={a} /></td>
+                    <ChevronCell />
+                  </LinkTr>
+                ))}
+              </SimpleTable>
+              <Pagination
+                basePath={`/teacher/students/${studentId}`}
+                params={pageParams}
+                param="examsPage"
+                anchor="exam-history"
+                pageSize={HISTORY_PAGE_SIZE}
+                {...examPage}
+              />
+            </>
+          )}
+        </section>
       </PageShell>
     );
   }
@@ -451,42 +621,14 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
   const report = await loadPracticeReport(studentId, practiceArea, reportFilters);
   const { areaLabel, kpis } = report;
   const attemptPage = paginate(report.attemptHistory, pageFromParam(query.attemptsPage), HISTORY_PAGE_SIZE);
+  const triesByAssignment = new Map<string, number>();
+  for (const attempt of report.attemptHistory) {
+    if (attempt.assignmentId) triesByAssignment.set(attempt.assignmentId, Math.max(triesByAssignment.get(attempt.assignmentId) ?? 0, attempt.attemptNumber ?? 1));
+  }
   const assignHref = (overrides: { topic?: string; difficulty?: string }, extra: Record<string, string>) => {
     const href = buildProgressHref(`/teacher/students/${studentId}/assign`, filters, overrides);
     return `${href}${href.includes("?") ? "&" : "?"}${new URLSearchParams(extra).toString()}`;
   };
-  const attemptRow = (attempt: ReportAttempt) => (
-    <li key={attempt.id} className={`flex items-center justify-between gap-3 px-3 py-2 ${invalidatedRowClass(attempt.status) ?? ""}`}>
-      <div className="min-w-0">
-        <p className="flex items-center gap-2 truncate text-sm font-medium text-gray-800" title={attempt.name}>
-          <span className="truncate">{shortSetName(attempt.name)}</span>
-          {isInvalidated(attempt.status) ? <AttemptStatusBadge status={attempt.status} /> : null}
-        </p>
-        <p className="text-[11px] text-gray-400">
-          {attempt.submittedAt ? formatDate(attempt.submittedAt) : "—"} · {formatTime(attempt.totalTime)} spent
-        </p>
-      </div>
-      <div className="flex shrink-0 items-center gap-3">
-        {attempt.percent !== null ? (
-          isInvalidated(attempt.status) ? (
-            <VoidableValue status={attempt.status} className="text-sm font-semibold">{attempt.percent}%</VoidableValue>
-          ) : (
-            <span className={`text-sm font-semibold ${scoreBandTextClass(attempt.percent)}`} title={`${attempt.correct} of ${attempt.total} correct`}>
-              {attempt.percent}%
-            </span>
-          )
-        ) : (
-          <span className="text-sm text-gray-400">—</span>
-        )}
-        <Hint label="See each answer, time spent and explanation.">
-          <Link href={buildProgressHref(`/teacher/students/${studentId}/attempts/${attempt.id}`, filters)} className="text-xs font-medium text-blue-600 hover:underline">
-            Review
-          </Link>
-        </Hint>
-      </div>
-    </li>
-  );
-
   return (
     <PageShell width="wide">
       {header}
@@ -518,6 +660,47 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div id="performance" className="min-w-0 space-y-6 lg:col-span-2">
+          <section>
+            <SectionHeader
+              title={`${areaLabel} skills by difficulty`}
+              description="% correct in practice · click a cell to filter this page · Assign gives more practice for that skill"
+            />
+            <SkillDifficultyMatrix
+              selected={{ skill: topicId, difficulty }}
+              actionHeader=""
+              emptyText={`No finished ${areaLabel} work for this student yet.`}
+              rows={report.skillMatrix.map((row) => ({
+                id: row.topicId,
+                label: row.label,
+                cells: Object.fromEntries(
+                  DIFFICULTIES.map((d) => {
+                    const c = row.cells[d];
+                    return [
+                      d,
+                      c
+                        ? {
+                            pct: c.percent,
+                            right: c.correct,
+                            total: c.total,
+                            tries: c.tries,
+                            href: `${buildProgressHref(`/teacher/students/${studentId}`, filters, { topic: row.topicId, difficulty: d })}#performance`,
+                          }
+                        : null,
+                    ];
+                  }),
+                ),
+                action: (
+                  <Link
+                    href={assignHref({ topic: row.topicId, difficulty: undefined }, { domain: row.domainId })}
+                    className="whitespace-nowrap font-medium text-blue-600 hover:underline"
+                  >
+                    Assign
+                  </Link>
+                ),
+              }))}
+            />
+          </section>
+
           <PerformanceBreakdown
             title="Performance by skill and difficulty"
             rowLabel="Skill"
@@ -622,25 +805,6 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
             ))}
           </SidePanel>
 
-          <SidePanel
-            id="recent-attempts"
-            title="Recent work"
-            count={report.attemptHistory.length}
-            empty={`No finished ${areaLabel} work yet.`}
-            footer={
-              <Pagination
-                basePath={`/teacher/students/${studentId}`}
-                params={pageParams}
-                param="attemptsPage"
-                anchor="recent-attempts"
-                pageSize={HISTORY_PAGE_SIZE}
-                {...attemptPage}
-              />
-            }
-          >
-            {attemptPage.items.map(attemptRow)}
-          </SidePanel>
-
           {report.comments.length > 0 && (
             <SidePanel title="Teacher Comments" count={report.comments.length} empty="">
               {report.comments.map((entry) => (
@@ -653,24 +817,74 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
           )}
         </aside>
       </div>
+
+      <section id="recent-attempts" className="mt-6 scroll-mt-20">
+        <SectionHeader
+          title={`${areaLabel} practice attempts`}
+          description={`${report.attemptHistory.length} finished attempt${report.attemptHistory.length === 1 ? "" : "s"} · click a row to see each answer`}
+          action={
+            <Link href={buildProgressHref(`/teacher/students/${studentId}/assign`, filters)} className="text-xs font-medium text-blue-600 hover:underline">
+              Assign practice
+            </Link>
+          }
+        />
+        {report.attemptHistory.length === 0 ? (
+          <EmptyState title={`No finished ${areaLabel} work yet.`} />
+        ) : (
+          <>
+            <PracticeAttemptsTable
+              hrefFor={(id) => buildProgressHref(`/teacher/students/${studentId}/attempts/${id}`, filters)}
+              rows={attemptPage.items.map((attempt) => ({
+                id: attempt.id,
+                tryNumber: attempt.attemptNumber ?? 1,
+                tryCount: attempt.assignmentId ? triesByAssignment.get(attempt.assignmentId) : undefined,
+                submittedAt: attempt.submittedAt,
+                correct: attempt.correct,
+                total: attempt.total,
+                pct: attempt.percent,
+                time: attempt.totalTime,
+                status: attempt.status,
+                title: (
+                  <>
+                    {shortSetName(attempt.name)}
+                    {attempt.difficulty ? <Badge variant={difficultyBadgeVariant(attempt.difficulty)} className="ml-2">{difficultyLabel(attempt.difficulty)}</Badge> : null}
+                  </>
+                ),
+              }))}
+            />
+            <Pagination
+              basePath={`/teacher/students/${studentId}`}
+              params={pageParams}
+              param="attemptsPage"
+              anchor="recent-attempts"
+              pageSize={HISTORY_PAGE_SIZE}
+              {...attemptPage}
+            />
+          </>
+        )}
+      </section>
     </PageShell>
   );
 }
 
+/** KPI row (mockup stat cards); each label has a short "what is this" hint. */
 function KpiStrip({ items }: { items: Array<{ label: string; value: string; className?: string; sub?: string; hint?: string }> }) {
   return (
-    <div className="my-4 grid grid-cols-2 divide-gray-100 overflow-hidden rounded-lg border border-gray-200 bg-white sm:grid-cols-3 lg:grid-cols-5 lg:divide-x">
+    <StatGrid cols={5} className="my-4">
       {items.map((item) => (
-        <div key={item.label} className="px-4 py-3">
-          <p className="flex items-center gap-1 text-[11px] font-medium uppercase tracking-wide text-gray-500">
-            {item.label}
-            {item.hint ? <InfoHint label={item.hint} /> : null}
-          </p>
-          <p className={`mt-1 text-xl font-bold leading-none ${item.className ?? "text-gray-900"}`}>{item.value}</p>
-          {item.sub ? <p className="mt-1 text-[11px] text-gray-400">{item.sub}</p> : null}
-        </div>
+        <StatTile
+          key={item.label}
+          label={
+            <span className="flex items-center gap-1">
+              {item.label}
+              {item.hint ? <InfoHint label={item.hint} /> : null}
+            </span>
+          }
+          value={<span className={item.className}>{item.value}</span>}
+          sub={item.sub}
+        />
       ))}
-    </div>
+    </StatGrid>
   );
 }
 
@@ -790,50 +1004,6 @@ function ActivityList({ items, studentId }: { items: ActivityItem[]; studentId: 
           </li>
         ))}
       </ul>
-    </Card>
-  );
-}
-
-/** One Test for this student: status, due date, module progress or section scores. */
-function TestMiniCard({ item, studentId }: { item: StudentTestItem; studentId: string }) {
-  const last = item.lastSubmitted;
-  const open = item.openAttempt;
-  const href = open ? `/teacher/students/${studentId}/tests/${open.id}` : last ? `/teacher/students/${studentId}/tests/${last.id}` : null;
-  const body = (
-    <>
-      <div className="flex items-center justify-between gap-2">
-        <p className="font-semibold text-gray-900">{item.name}</p>
-        <WorkStatusBadges state={item.state} overdue={item.overdue} />
-      </div>
-      {item.state === "done" && last ? (
-        <p className="mt-1 text-sm">
-          R&amp;W <b>{last.rwScore ?? "—"}</b> · Math <b>{last.mathScore ?? "—"}</b>
-          <span className="block text-xs text-gray-500">
-            {last.submittedAt ? formatDate(last.submittedAt) : ""} · {item.attempts.length} attempt{item.attempts.length === 1 ? "" : "s"}
-          </span>
-        </p>
-      ) : (
-        <>
-          <p className="mt-1 text-xs text-gray-600">
-            {open?.view ? `${open.view.modulesDone} of 4 modules` : "Not started"}
-            {open?.view ? (
-              <>
-                {" · "}R&amp;W <SectionCell section={open.view.sections.RW} /> · Math <SectionCell section={open.view.sections.MATH} />
-              </>
-            ) : null}
-          </p>
-          <DueLine dueDate={item.dueDate} />
-        </>
-      )}
-    </>
-  );
-  return href ? (
-    <Card as={Link} href={href} padding="md" className={item.overdue ? "border-red-200 hover:border-red-400" : "hover:border-gray-400"}>
-      {body}
-    </Card>
-  ) : (
-    <Card padding="md" className={item.overdue ? "border-red-200" : "bg-gray-50"}>
-      {body}
     </Card>
   );
 }

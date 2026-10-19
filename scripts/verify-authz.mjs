@@ -150,6 +150,11 @@ const checks = [
     label: "Full test attempt reopen scoped by teacher program",
   },
   {
+    file: "app/(teacher)/teacher/history/page.tsx",
+    requires: ["studentAccessWhereFor", "students.some((s) => s.id === query.student)", "loadAttemptHistory(studentId ? [studentId] : students.map((s) => s.id)"],
+    label: "Teacher attempt history only lists students in the teacher's programs",
+  },
+  {
     file: "app/(teacher)/teacher/students/[studentId]/tests/[attemptId]/page.tsx",
     requires: ["teacherProgramEnrollmentScope", "student: { programEnrollments: programScope }", "notFound()"],
     label: "Teacher full test attempt detail scoped by teacher program",

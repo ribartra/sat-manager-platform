@@ -1,4 +1,4 @@
-import { PageShell } from "@/components/sat";
+import { Breadcrumbs, PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { FullTestAssignClient } from "./full-test-assign-client";
@@ -31,6 +31,7 @@ export default async function AssignFullTestPage({ params }: PageProps) {
 
   return (
     <PageShell width="narrow">
+      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Tests", href: "/teacher/tests" }, { label: test.name, href: `/teacher/tests/${testId}` }, { label: "Assign" }]} />
       <h1 className="mb-6 text-xl font-semibold text-gray-900">Assign test: {test.name}</h1>
       <FullTestAssignClient
         testId={testId}

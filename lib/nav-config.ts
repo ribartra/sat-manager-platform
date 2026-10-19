@@ -99,6 +99,7 @@ export const TEACHER_NAV: TeacherNavEntryDef[] = [
       },
       { id: "teacher.students.parents", label: "Parents", href: "/teacher/parents", icon: UserCheck },
       { id: "teacher.students.compare", label: "Compare", href: "/teacher/compare", icon: BarChart2 },
+      { id: "teacher.students.history", label: "History", href: "/teacher/history", icon: Clock },
     ],
   },
   {

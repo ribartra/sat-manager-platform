@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ChevronRight, UserPlus } from "lucide-react";
-import { EmptyState, PageShell } from "@/components/sat";
+import { DateCell, EmptyState, PageShell, StudentCell } from "@/components/sat";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -8,7 +8,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { studentAccessWhereFor } from "@/lib/program-scope";
 import { isInactive, loadStudentOverviews, type StudentOverview } from "@/lib/teacher-overview";
-import { cn, formatDate, relativeDay } from "@/lib/utils";
+import { formatDate, relativeDay } from "@/lib/utils";
 
 interface PageProps {
   searchParams: Promise<{ q?: string; show?: string }>;
@@ -50,11 +50,11 @@ export default async function TeacherStudentsPage({ searchParams }: PageProps) {
   const invited = await prisma.inviteToken
     .findMany({
       where: { role: "STUDENT", usedAt: null, expiresAt: { gt: now }, ...(session?.user.role === "TEACHER" ? { invitedById: session.user.id } : {}) },
-      select: { id: true, email: true, expiresAt: true },
+      select: { id: true, email: true, name: true, expiresAt: true },
       orderBy: { expiresAt: "desc" },
       take: 20,
     })
-    .catch(() => [] as { id: string; email: string; expiresAt: Date }[]);
+    .catch(() => [] as { id: string; email: string; name: string; expiresAt: Date }[]);
 
   return (
     <PageShell width="wide">
@@ -100,18 +100,10 @@ export default async function TeacherStudentsPage({ searchParams }: PageProps) {
                 <li key={s.id}>
                   <Link href={`/teacher/students/${s.id}`} className="grid gap-2 px-4 py-3 hover:bg-gray-50 sm:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,1fr)_7rem_1rem] sm:items-center">
                     <div className="min-w-0">
-                      <p className="truncate font-medium text-gray-900">{s.name}</p>
-                      <p className="truncate text-xs text-gray-500">{s.email} · {parents ? `Parent: ${parents}` : "No parent linked"}</p>
+                      <StudentCell name={s.name} email={`${s.email} · ${parents ? `Parent: ${parents}` : "No parent linked"}`} avatarUrl={s.avatarUrl} />
                     </div>
-                    <div className={cn("text-sm", !s.lastActiveAt ? "text-red-600" : inactive ? "text-amber-700" : "text-gray-700")}>
-                      {s.lastActiveAt ? (
-                        <>
-                          <b className="font-medium">{formatDate(s.lastActiveAt)}</b>
-                          <span className="block text-xs">{relativeDay(s.lastActiveAt, now)}{inactive ? " · ⚠ inactive" : ""}</span>
-                        </>
-                      ) : (
-                        "Never active"
-                      )}
+                    <div>
+                      <DateCell date={s.lastActiveAt} now={now} inactive={inactive} />
                     </div>
                     <div className="text-sm">
                       <span className="block text-xs text-gray-500">Latest test</span>
@@ -140,9 +132,9 @@ export default async function TeacherStudentsPage({ searchParams }: PageProps) {
           <Card>
             <ul className="divide-y divide-gray-100">
               {invited.map((i) => (
-                <li key={i.id} className="flex items-center justify-between px-4 py-2 text-sm text-gray-500">
-                  <span>{i.email}</span>
-                  <Badge>Invitation valid until {formatDate(i.expiresAt)}</Badge>
+                <li key={i.id} className="flex flex-wrap items-center justify-between gap-2 px-4 py-2 text-sm text-gray-500">
+                  <StudentCell name={i.name || i.email} email={i.email} />
+                  <Badge>Invitation valid until {formatDate(i.expiresAt)} ({relativeDay(i.expiresAt, now)})</Badge>
                 </li>
               ))}
             </ul>

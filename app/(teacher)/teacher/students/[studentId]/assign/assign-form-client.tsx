@@ -9,7 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { cn, localToday } from "@/lib/utils";
 import { Tag } from "lucide-react";
-import { assignmentStatusLabel, explanationVisibilityOptions, difficultyLabel, difficultyOptions } from "@/lib/domain-meta";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { assignmentStatusLabel, difficultyLabel, difficultyOptions } from "@/lib/domain-meta";
 import { practiceAreaLabel, type PracticeAreaCode } from "@/lib/practice-area";
 import { InlineError } from "@/components/sat/alert";
 import { errorMessage, readApiError } from "@/lib/api-client";
@@ -61,6 +63,9 @@ interface GroupInfo {
 
 interface AssignFormProps {
   studentId: string;
+  studentName: string;
+  /** `${topicId}:${difficulty}` of the student's weakest practice skills (shown first, "Recommended"). */
+  recommended?: string[];
   practiceSets: PracticeSetInfo[];
   groups: GroupInfo[];
   groupAssignmentEnabled: boolean;
@@ -73,6 +78,8 @@ interface AssignFormProps {
 
 export function AssignForm({
   studentId,
+  studentName,
+  recommended = [],
   practiceSets,
   groups,
   groupAssignmentEnabled,
@@ -88,10 +95,9 @@ export function AssignForm({
   const [selected, setSelected] = useState<Set<string>>(
     () => new Set((initialSelected ?? []).filter((id) => practiceSets.some((ps) => ps.id === id))),
   );
-  // Due date starts on the day the practice is assigned (end of that day); the teacher can change it.
-  const [dueDate, setDueDate] = useState(localToday);
+  // Due date starts one week after today (end of that day); the teacher can change it.
+  const [dueDate, setDueDate] = useState(() => addDays(localToday(), 7));
   const [unlockAt, setUnlockAt] = useState("");
-  const [explVisibility, setExplVisibility] = useState("AFTER_FINISH");
   const [feedbackMode, setFeedbackMode] = useState<"AFTER_SET" | "IMMEDIATE">("AFTER_SET");
   const [lockOnAssign, setLockOnAssign] = useState(false);
   const [search, setSearch] = useState("");
@@ -111,11 +117,25 @@ export function AssignForm({
   const domainSets = domainId ? areaSets.filter((ps) => ps.domainId === domainId) : areaSets;
   const topics = [...new Map(domainSets.map((ps) => [ps.topicId, { id: ps.topicId, name: ps.topicName, order: ps.skillOrder }])).values()]
     .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
-  const filtered = domainSets.filter((ps) =>
-    (!topicId || ps.topicId === topicId) &&
-    (!difficulty || ps.difficulty === difficulty) &&
-    (!search || ps.name.toLowerCase().includes(search.toLowerCase()) || ps.topicName.toLowerCase().includes(search.toLowerCase()) || ps.domainName.toLowerCase().includes(search.toLowerCase()))
-  );
+  const recommendedKeys = new Set(recommended);
+  const isRecommended = (ps: PracticeSetInfo) => recommendedKeys.has(`${ps.topicId}:${ps.difficulty}`);
+  const filtered = domainSets
+    .filter((ps) =>
+      (!topicId || ps.topicId === topicId) &&
+      (!difficulty || ps.difficulty === difficulty) &&
+      (!search || ps.name.toLowerCase().includes(search.toLowerCase()) || ps.topicName.toLowerCase().includes(search.toLowerCase()) || ps.domainName.toLowerCase().includes(search.toLowerCase()))
+    )
+    // Weak skills first (stable: keeps the official order inside each group).
+    .sort((a, b) => Number(isRecommended(b)) - Number(isRecommended(a)));
+  const first = studentName.split(" ")[0];
+  const backHref = (() => {
+    const params = new URLSearchParams();
+    if (area !== "all") params.set("area", area);
+    if (domainId) params.set("domain", domainId);
+    if (topicId) params.set("topic", topicId);
+    if (difficulty) params.set("difficulty", difficulty);
+    return `/teacher/students/${studentId}${params.toString() ? `?${params.toString()}` : ""}`;
+  })();
 
   function toggleSelect(id: string) {
     setSelected((prev) => {
@@ -175,18 +195,12 @@ export function AssignForm({
     );
     setSuccess(true);
     setError("");
-    setTimeout(() => {
-      const params = new URLSearchParams();
-      if (area !== "all") params.set("area", area);
-      if (domainId) params.set("domain", domainId);
-      if (topicId) params.set("topic", topicId);
-      if (difficulty) params.set("difficulty", difficulty);
-      router.push(`/teacher/students/${studentId}${params.toString() ? `?${params.toString()}` : ""}`);
-    }, 1200);
+    router.refresh();
   }
 
   return (
-    <div className="space-y-6">
+    <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
+      <div className="min-w-0 space-y-6">
       <Card padding="md">
         <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 sm:items-end">
           <label className="text-sm font-medium text-gray-700">
@@ -296,6 +310,7 @@ export function AssignForm({
                 <p className="text-sm font-medium text-gray-900 truncate">{ps.name}</p>
                 <p className="text-xs text-gray-500">{practiceAreaLabel(ps.practiceArea) || "Unclassified"} · {ps.domainName} · {ps.topicName} · {ps.questionCount} questions</p>
               </div>
+              {isRecommended(ps) ? <Badge variant="info" className="shrink-0">Recommended</Badge> : null}
               <span className="shrink-0 text-xs font-medium text-gray-700">{difficultyLabel(ps.difficulty)}</span>
               {target === "student" && (() => {
                 const hint = assignmentHint(ps.assignment);
@@ -321,7 +336,7 @@ export function AssignForm({
           <label className="block text-sm font-medium text-gray-700 mb-1">Due date</label>
           <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
           <p className="mt-1 text-xs text-gray-400">
-            Due at the end of that day. Starts on today; change it if needed.
+            Due at the end of that day. Starts one week from today; change it if needed.
           </p>
         </div>
         <div>
@@ -339,16 +354,9 @@ export function AssignForm({
           </p>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Explanations</label>
-          <Select value={explVisibility} onChange={(e) => setExplVisibility(e.target.value)}>
-            {explanationVisibilityOptions().map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </Select>
-          <p className="mt-1 text-xs text-gray-400">
-            When the student can see the explanations.
+          <p className="mb-1 block text-sm font-medium text-gray-700">Explanations</p>
+          <p className="text-xs text-gray-500">
+            Each practice set has its own setting for when explanations are shown. Change it by editing the set.
           </p>
         </div>
       </div>
@@ -365,17 +373,70 @@ export function AssignForm({
         </label>
       </div>
 
-      {success && (
-        <p className="text-sm font-medium text-green-600">✓ {successMessage || "Assigned"}. Redirecting...</p>
-      )}
       <InlineError>{error}</InlineError>
-
-      <div className="flex items-center gap-3">
-        <Button onClick={handleAssign} disabled={loading} disabledReason={selected.size === 0 ? "Select at least one practice set." : null}>
-          {loading ? "Assigning..." : `Assign ${selected.size > 0 ? `(${selected.size})` : ""}`}
-        </Button>
-        <Button variant="secondary" onClick={() => router.back()}>Cancel</Button>
       </div>
+
+      <aside className="lg:sticky lg:top-20">
+        <Card padding="md" className="space-y-3">
+          <h2 className="text-sm font-semibold text-gray-900">Summary</h2>
+          <dl className="space-y-1.5 text-sm">
+            <div className="flex justify-between gap-2">
+              <dt className="text-gray-500">To</dt>
+              <dd className="text-right font-medium text-gray-900">
+                {target === "group" ? groups.find((g) => g.id === groupId)?.name ?? "Group" : studentName}
+              </dd>
+            </div>
+            <div className="flex justify-between gap-2">
+              <dt className="text-gray-500">Practice sets</dt>
+              <dd className="font-medium text-gray-900">{selected.size}</dd>
+            </div>
+            <div className="flex justify-between gap-2">
+              <dt className="text-gray-500">Due</dt>
+              <dd className="font-medium text-gray-900">{dueDate ? new Date(`${dueDate}T00:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "No due date"}</dd>
+            </div>
+          </dl>
+          {selected.size > 0 ? (
+            <ul className="max-h-40 space-y-1 overflow-y-auto border-t border-gray-100 pt-2 text-xs text-gray-600">
+              {practiceSets.filter((ps) => selected.has(ps.id)).map((ps) => (
+                <li key={ps.id} className="truncate">{ps.topicName} · {difficultyLabel(ps.difficulty)}</li>
+              ))}
+            </ul>
+          ) : null}
+          <Button className="w-full" onClick={handleAssign} disabled={loading} disabledReason={selected.size === 0 ? "Select at least one practice set." : null}>
+            {loading ? "Assigning..." : `Assign ${selected.size > 0 ? `(${selected.size})` : ""}`}
+          </Button>
+          <Button className="w-full" variant="secondary" onClick={() => router.back()}>Cancel</Button>
+        </Card>
+      </aside>
+
+      <Dialog open={success} onOpenChange={setSuccess}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Assigned</DialogTitle>
+            <DialogDescription>{successMessage || "Assigned"}. {target === "group" ? "The group's students" : first} will see it on their Home and Practice pages.</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setSelected(new Set());
+                setSuccess(false);
+              }}
+            >
+              Assign more
+            </Button>
+            <Button onClick={() => router.push(backHref)}>Back to {first}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
+}
+
+/** YYYY-MM-DD plus `days` (calendar days, local). */
+function addDays(isoDate: string, days: number) {
+  const d = new Date(`${isoDate}T00:00:00`);
+  d.setDate(d.getDate() + days);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
