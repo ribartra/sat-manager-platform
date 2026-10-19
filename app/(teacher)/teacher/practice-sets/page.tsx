@@ -79,7 +79,7 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Practice" }]} />
       <header className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Practice</h1>
+          <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Practice</h1>
           <p className="mt-1 text-sm text-gray-500">
             Manage practice sets: every SAT skill in Math, Reading and Writing has an Easy, Medium and Hard set. Results show as % correct only
             (SAT scores are for Tests).

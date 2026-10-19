@@ -32,7 +32,7 @@ export default async function GroupsPage() {
 
   return (
     <PageShell>
-      <h1 className="text-2xl font-semibold text-gray-900 mb-6">Groups & Cycles</h1>
+      <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900 mb-6">Groups & Cycles</h1>
       <GroupsClient
         groups={groups.map((g) => ({
           id: g.id,

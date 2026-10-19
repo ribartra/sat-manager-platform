@@ -15,11 +15,11 @@ export type AlertTone = "error" | "warning" | "info" | "success" | "note";
 export type AlertLayout = "box" | "inline" | "banner";
 
 const TONES: Record<AlertTone, { box: string; text: string; icon: LucideIcon }> = {
-  error: { box: "border-red-200 bg-red-50 text-red-800", text: "text-red-700", icon: AlertCircle },
-  warning: { box: "border-amber-200 bg-amber-50 text-amber-900", text: "text-amber-800", icon: AlertTriangle },
-  info: { box: "border-blue-200 bg-blue-50 text-blue-900", text: "text-blue-800", icon: Info },
-  success: { box: "border-green-200 bg-green-50 text-green-800", text: "text-green-700", icon: CheckCircle2 },
-  note: { box: "border-gray-300 bg-gray-50 text-gray-700", text: "text-gray-600", icon: Info },
+  error: { box: "border-[var(--sat-bad-border)] bg-[var(--sat-bad-soft)] text-red-800", text: "text-red-700", icon: AlertCircle },
+  warning: { box: "border-[var(--sat-warn-border)] bg-[var(--sat-warn-soft)] text-[#7c2d12]", text: "text-amber-800", icon: AlertTriangle },
+  info: { box: "border-blue-200 bg-[var(--sat-primary-soft)] text-[#1e3a8a]", text: "text-blue-800", icon: Info },
+  success: { box: "border-[var(--sat-ok-border)] bg-[var(--sat-ok-soft)] text-green-800", text: "text-green-700", icon: CheckCircle2 },
+  note: { box: "border-[var(--sat-border)] bg-[var(--sat-surface-2)] text-gray-700", text: "text-gray-600", icon: Info },
 };
 
 export interface AlertProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> {
@@ -55,7 +55,7 @@ export function Alert({ tone = "info", layout = "box", title, action, hideIcon, 
       aria-live={aria === "alert" ? undefined : "polite"}
       className={cn(
         "flex items-start gap-2.5 text-sm",
-        layout === "banner" ? "shrink-0 border-b px-4 py-1.5 text-xs sm:px-6" : "rounded-md border px-3 py-2.5",
+        layout === "banner" ? "shrink-0 border-b px-4 py-1.5 text-xs sm:px-6" : "rounded-[var(--sat-radius)] border px-3.5 py-3",
         t.box,
         className,
       )}

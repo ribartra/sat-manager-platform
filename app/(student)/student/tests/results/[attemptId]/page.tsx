@@ -129,7 +129,7 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-2xl font-semibold text-gray-900">{attempt.test.name} results</h1>
+            <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">{attempt.test.name} results</h1>
             <Badge>Try {tryNumber} of {siblings.length}</Badge>
             {inProgress ? <Badge variant="warning">In progress</Badge> : invalidated ? null : <Badge variant="success">Completed</Badge>}
           </div>

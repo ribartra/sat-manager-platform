@@ -26,7 +26,6 @@ export function TeacherShell({ userName, avatarUrl, role, flags = {}, children }
       avatarUrl={avatarUrl}
       items={items}
       userMenuLinks={userMenuLinks}
-      mainClassName="bg-gray-50"
     >
       {children}
     </AppShell>

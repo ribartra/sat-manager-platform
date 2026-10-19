@@ -5,12 +5,13 @@ import { DueLine, Pct, WorkStatusBadges } from "@/components/sat/work-status";
 import { difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
 import { practiceAreaLabel, tabFromPracticeArea } from "@/lib/practice-area";
 import type { PracticeSetItem } from "@/lib/student-practice";
+import { ListItem } from "@/components/sat/list";
 
 /** Area tag: coloured square + area name. */
 export function AreaTag({ area }: { area: PracticeSetItem["area"] }) {
   const tab = tabFromPracticeArea(area) ?? "math";
   return (
-    <span className="inline-flex items-center gap-1 text-xs font-medium" style={{ color: `var(--sat-area-${tab})` }}>
+    <span className="inline-flex items-center gap-1.5 text-xs font-semibold" style={{ color: `var(--sat-area-${tab})` }}>
       <span className="inline-block h-2 w-2 rounded-sm" style={{ backgroundColor: `var(--sat-area-${tab})` }} />
       {practiceAreaLabel(area)}
     </span>
@@ -21,11 +22,11 @@ export function AreaTag({ area }: { area: PracticeSetItem["area"] }) {
 export function PracticeSetRow({ item, showArea = false }: { item: PracticeSetItem; showArea?: boolean }) {
   const player = `/student/practice/assignment/${item.assignmentId}`;
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 py-3 last:border-b-0">
+    <ListItem>
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
           {showArea ? <AreaTag area={item.area} /> : null}
-          <span className="text-sm font-medium text-gray-900">{item.skill}</span>
+          <span className="font-semibold text-[var(--sat-text)]">{item.skill}</span>
           <Badge variant={difficultyBadgeVariant(item.difficulty)}>{difficultyLabel(item.difficulty)}</Badge>
           <WorkStatusBadges state={item.state} overdue={item.overdue} />
         </div>
@@ -36,12 +37,12 @@ export function PracticeSetRow({ item, showArea = false }: { item: PracticeSetIt
           className="mt-0.5"
         />
         {item.tries.length > 0 ? (
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-[var(--sat-muted)]">
             {item.tries.length} attempt{item.tries.length === 1 ? "" : "s"} · last <Pct value={item.last?.pct} className="font-semibold" /> · best{" "}
-            <b className="text-gray-700">{item.best ?? "—"}%</b>
+            <b className="text-[var(--sat-text)]">{item.best ?? "—"}%</b>
           </p>
         ) : item.openAnswered !== null ? (
-          <p className="text-xs text-gray-500">{item.openAnswered} of {item.questionCount} answered so far</p>
+          <p className="text-xs text-[var(--sat-muted)]">{item.openAnswered} of {item.questionCount} answered so far</p>
         ) : null}
       </div>
       <div className="flex shrink-0 items-center gap-2">
@@ -60,7 +61,7 @@ export function PracticeSetRow({ item, showArea = false }: { item: PracticeSetIt
           <Button asChild size="sm"><Link href={player}>Start ›</Link></Button>
         )}
       </div>
-    </div>
+    </ListItem>
   );
 }
 
@@ -91,11 +92,11 @@ export function PctBars({ rows }: { rows: { label: string; pct: number | null; s
 /** Progress bar; striped grey when there is no value (mockup `.bar.striped`). */
 export function StripedBar({ pct, color }: { pct: number | null; color: string }) {
   if (pct === null) {
-    return <div className="h-2 rounded-full bg-[repeating-linear-gradient(45deg,#f3f4f6,#f3f4f6_6px,#e5e7eb_6px,#e5e7eb_12px)]" aria-hidden />;
+    return <div className="h-3 rounded-md bg-[repeating-linear-gradient(45deg,#f1f5f9_0_6px,#e2e8f0_6px_12px)]" aria-hidden />;
   }
   return (
-    <div className="h-2 rounded-full bg-gray-100" aria-hidden>
-      <div className="h-2 rounded-full" style={{ width: `${pct}%`, backgroundColor: color }} />
+    <div className="h-3 overflow-hidden rounded-md bg-[var(--sat-surface-2)]" aria-hidden>
+      <div className="h-full rounded-md" style={{ width: `${pct}%`, backgroundColor: color }} />
     </div>
   );
 }

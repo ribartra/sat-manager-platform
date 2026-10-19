@@ -126,7 +126,7 @@ export default async function ParentTemporaryAccessPage({ searchParams }: PagePr
     <div className="mx-auto max-w-[var(--sat-page-wide)] px-4 py-8">
       <div className="mb-6">
         <p className="text-xs font-medium uppercase text-gray-400">Progress report · {areasLabel(areas)}</p>
-        <h1 className="mt-1 text-2xl font-semibold text-gray-900">{access.student.name}</h1>
+        <h1 className="mt-1 text-[26px] font-bold tracking-[-0.3px] text-gray-900">{access.student.name}</h1>
         <p className="mt-1 text-sm text-gray-500">You can open this report until {formatDate(state.effectiveExpiresAt)}.</p>
       </div>
 

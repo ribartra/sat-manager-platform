@@ -34,7 +34,7 @@ export async function PracticeIntro({ studentId, assignmentId }: { studentId: st
           <Badge variant={difficultyBadgeVariant(item.difficulty)}>{difficultyLabel(item.difficulty)}</Badge>
           <WorkStatusBadges state={item.state} overdue={item.overdue} />
         </div>
-        <h1 className="mt-2 text-2xl font-semibold text-gray-900">{item.skill}</h1>
+        <h1 className="mt-2 text-[26px] font-bold tracking-[-0.3px] text-gray-900">{item.skill}</h1>
         <p className="mt-1 text-sm text-gray-500">
           {practiceAreaLabel(item.area)} · {item.domain} · {item.questionCount} questions · no time limit
         </p>

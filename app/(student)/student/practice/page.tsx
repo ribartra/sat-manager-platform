@@ -17,6 +17,7 @@ import {
   type SkillsMapChip,
 } from "@/components/sat";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import { ListStack } from "@/components/sat/list";
 import { AreaTag, PracticeSetRow } from "@/components/sat/practice-set-row";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -56,7 +57,7 @@ export default async function StudentPracticePage({ searchParams }: PageProps) {
           ...(area ? [{ label: "Practice", href: "/student/practice" }, { label: practiceAreaLabel(area) }] : [{ label: "Practice" }]),
         ]}
       />
-      <h1 className="text-2xl font-semibold text-gray-900">Practice</h1>
+      <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Practice</h1>
       <p className="mb-4 mt-1 text-sm text-gray-500">Practice sets by skill, assigned by your teacher. Use them to prepare for your tests.</p>
       <PracticeAreaTabs basePath="/student/practice" active={tab} includeSummary includeTests={false} />
       {area ? <AreaView practice={practice} area={area} page={pageFromParam(query.page)} /> : <SummaryView practice={practice} />}
@@ -164,10 +165,10 @@ async function AreaView({ practice, area, page }: { practice: PracticeSetItem[];
         {mine.length === 0 ? (
           <EmptyState title={`No ${practiceAreaLabel(area)} practice sets yet.`} description="Your teacher assigns practice sets for each skill." />
         ) : (
-          <Card padding="md" className="py-1">
+          <ListStack>
             {setsPage.items.map((item) => <PracticeSetRow key={item.assignmentId} item={item} />)}
             <Pagination basePath="/student/practice" params={{ area: tab }} anchor="sets" pageSize={SETS_PAGE_SIZE} {...setsPage} />
-          </Card>
+          </ListStack>
         )}
       </section>
 

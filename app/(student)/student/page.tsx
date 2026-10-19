@@ -23,6 +23,7 @@ import {
   paginate,
 } from "@/components/sat";
 import { LineChart } from "@/components/sat/line-chart";
+import { ListStack } from "@/components/sat/list";
 import { PctBars, PracticeSetRow } from "@/components/sat/practice-set-row";
 import { Pct, WorkStatusBadges } from "@/components/sat/work-status";
 import { Badge } from "@/components/ui/badge";
@@ -100,7 +101,7 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
         <Breadcrumbs items={[{ label: "Home", href: "/student" }, { label: area === "tests" ? "Tests" : practiceAreaLabel(practiceArea) }]} />
       ) : null}
       <div className="mb-4">
-        <h1 className="text-2xl font-semibold text-gray-900">Hello, {firstName}!</h1>
+        <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Hello, {firstName}!</h1>
         <p className="mt-0.5 text-sm text-gray-500">
           {tab === "summary"
             ? `Today is ${new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}.`
@@ -339,7 +340,7 @@ async function AreaPracticeView({
         {filtered.length === 0 ? (
           <EmptyState title="No practice sets match these filters." />
         ) : (
-          <Card padding="md" className="py-1">
+          <ListStack>
             {setsPage.items.map((item) => <PracticeSetRow key={item.assignmentId} item={item} />)}
             <Pagination
               basePath="/student"
@@ -348,7 +349,7 @@ async function AreaPracticeView({
               pageSize={SETS_PAGE_SIZE}
               {...setsPage}
             />
-          </Card>
+          </ListStack>
         )}
       </section>
 
@@ -525,7 +526,7 @@ async function ParentDashboard({ parentId, parentName }: { parentId: string; par
   return (
     <PageShell width="narrow">
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">
+        <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">
           Hello, {parentName.split(" ")[0]}!
         </h1>
         <p className="mt-0.5 text-sm text-gray-500">Parent dashboard</p>

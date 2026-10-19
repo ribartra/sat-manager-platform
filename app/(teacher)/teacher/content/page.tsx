@@ -178,7 +178,7 @@ export default async function TeacherContentPage({
   return (
     <PageShell>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">Content Map</h1>
+        <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Content Map</h1>
         <Link
           href="/teacher/practice-sets/new"
           className="flex items-center gap-1.5 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"

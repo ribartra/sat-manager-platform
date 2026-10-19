@@ -68,7 +68,7 @@ export default async function TeacherStudentsPage({ searchParams }: PageProps) {
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Students" }]} />
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Students</h1>
+          <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Students</h1>
           <p className="mt-0.5 text-sm text-gray-500">
             {all.length} student{all.length === 1 ? "" : "s"} · {invited.length} pending invitation{invited.length === 1 ? "" : "s"}
           </p>

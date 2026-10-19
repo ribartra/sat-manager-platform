@@ -51,7 +51,7 @@ export default async function StudentTestsPage({ searchParams }: PageProps) {
   return (
     <PageShell>
       <Breadcrumbs items={[{ label: "Home", href: "/student" }, { label: "Tests" }]} />
-      <h1 className="text-2xl font-semibold text-gray-900">Tests</h1>
+      <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Tests</h1>
       <p className="mb-5 mt-1 text-sm text-gray-500">
         Full-length SAT tests assigned by your teacher. You can take a whole test or choose one module at a time.
       </p>

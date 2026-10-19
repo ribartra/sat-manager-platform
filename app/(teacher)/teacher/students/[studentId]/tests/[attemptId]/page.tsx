@@ -115,7 +115,7 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
       <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-2xl font-semibold text-gray-900">{attempt.test.name} · {attempt.student.name}&apos;s results</h1>
+            <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">{attempt.test.name} · {attempt.student.name}&apos;s results</h1>
             <Badge>Try {tryNumber} of {siblings.length}</Badge>
             <AttemptStatusBadge status={attempt.status} />
           </div>

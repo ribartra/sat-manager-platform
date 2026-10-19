@@ -73,7 +73,7 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
   return (
     <PageShell width="wide">
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "History" }]} />
-      <h1 className="text-2xl font-semibold text-gray-900">History</h1>
+      <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">History</h1>
       <p className="mb-4 mt-0.5 text-sm text-gray-500">
         Every practice set and Test your students took, newest first. Practice shows % correct; Tests show SAT section scores.
       </p>

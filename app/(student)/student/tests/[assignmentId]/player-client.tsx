@@ -749,7 +749,7 @@ export function FullTestPlayer({
     return (
       <div className="flex min-h-dvh flex-col items-center justify-center bg-white px-6">
         <p className="text-sm font-semibold text-gray-900">{testName}</p>
-        <h1 className="mt-3 text-2xl font-semibold text-gray-900">Optional break</h1>
+        <h1 className="mt-3 text-[26px] font-bold tracking-[-0.3px] text-gray-900">Optional break</h1>
         <p className="mt-2 max-w-md text-center text-sm text-gray-500">Take a short break, or skip it to keep going.</p>
         <p className={`mt-8 text-4xl font-semibold tabular-nums ${breakRemaining <= 60 ? "text-red-600" : "text-gray-900"}`}>
           {formatTime(breakRemaining)}

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { TAB_BAR, TAB_LINK_ACTIVE, TAB_LINK_IDLE } from "@/lib/practice-area";
 import { cn } from "@/lib/utils";
 
 /** Link-based view tabs (mockup `.tabs`): "Pending (2) · Completed (3) · All". State lives in the URL. */
@@ -14,8 +15,8 @@ export function LinkTabs({
   className?: string;
 }) {
   return (
-    <nav aria-label={label} className={cn("mb-4 overflow-x-auto border-b border-gray-200", className)}>
-      <div className="flex min-w-max gap-1">
+    <nav aria-label={label} className={cn("mb-4", TAB_BAR, className)}>
+      <div className="flex min-w-max gap-0.5">
         {tabs.map((t) => {
           const on = t.key === active;
           return (
@@ -23,13 +24,10 @@ export function LinkTabs({
               key={t.key}
               href={t.href}
               aria-current={on ? "page" : undefined}
-              className={cn(
-                "-mb-px whitespace-nowrap border-b-2 px-3 py-2 text-sm font-medium",
-                on ? "border-gray-900 text-gray-900" : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-800",
-              )}
+              className={on ? TAB_LINK_ACTIVE : TAB_LINK_IDLE}
             >
               {t.label}
-              {t.count !== undefined ? <span className="ml-1 text-xs text-gray-400">({t.count})</span> : null}
+              {t.count !== undefined ? <span className="ml-1 text-xs font-normal opacity-70">({t.count})</span> : null}
             </Link>
           );
         })}

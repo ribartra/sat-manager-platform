@@ -17,7 +17,7 @@ export default async function StudentMaterialsPage() {
 
   return (
     <PageShell>
-      <h1 className="mb-6 text-2xl font-semibold text-gray-900">Study materials</h1>
+      <h1 className="mb-6 text-[26px] font-bold tracking-[-0.3px] text-gray-900">Study materials</h1>
       <div className="space-y-4">
         {materials.map((material) => (
           <Card as="article" key={material.id} padding="md">

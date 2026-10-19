@@ -17,10 +17,10 @@ export function SectionHeader({
   className?: string;
 }) {
   return (
-    <div className={cn("mb-2 flex flex-wrap items-end justify-between gap-2", className)}>
+    <div className={cn("mb-2.5 flex flex-wrap items-end justify-between gap-2", className)}>
       <div className="min-w-0">
-        <Heading className={cn("font-semibold text-gray-900", size === "sm" ? "text-sm" : "text-base")}>{title}</Heading>
-        {description ? <p className="text-xs text-gray-500">{description}</p> : null}
+        <Heading className={cn("font-bold text-[var(--sat-text)]", size === "sm" ? "text-[15px]" : "text-[17px]")}>{title}</Heading>
+        {description ? <p className="text-[13px] text-[var(--sat-muted)]">{description}</p> : null}
       </div>
       {action ? <div className="flex shrink-0 flex-wrap items-center gap-2">{action}</div> : null}
     </div>

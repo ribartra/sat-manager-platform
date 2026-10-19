@@ -431,7 +431,7 @@ export default async function AiImportPage({ searchParams }: PageProps) {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Admin / AI Import</p>
-          <h1 className="mt-1 text-2xl font-semibold text-gray-900">AI Batch Import</h1>
+          <h1 className="mt-1 text-[26px] font-bold tracking-[-0.3px] text-gray-900">AI Batch Import</h1>
           <p className="mt-1 max-w-3xl text-sm text-gray-500">
             Work through staging in order: load files, process extraction, recover OCR issues, review candidates and promote clean drafts.
           </p>

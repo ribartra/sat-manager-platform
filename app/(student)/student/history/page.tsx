@@ -141,7 +141,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
     return (
       <PageShell width="wide" density="compact" className="space-y-4">
         <Breadcrumbs items={[{ label: "Home", href: "/student" }, { label: "History", href: "/student/history" }, { label: "By session" }]} />
-        <h1 className="text-2xl font-semibold text-gray-900">My history</h1>
+        <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">My history</h1>
         {historyTabs}
         <form action="/student/history" className="flex flex-wrap items-end gap-2 text-sm">
           <input type="hidden" name="area" value="sessions" />
@@ -271,7 +271,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
     return (
       <PageShell width="wide" density="compact" className="space-y-4">
         <Breadcrumbs items={[{ label: "Home", href: "/student" }, { label: "History", href: "/student/history" }, { label: "Tests" }]} />
-        <h1 className="text-2xl font-semibold text-gray-900">My history</h1>
+        <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">My history</h1>
         <p className="text-sm text-gray-500">Every Test attempt is saved, including tests you haven&apos;t finished. Click a row to see the results.</p>
         {historyTabs}
         <ProgressFilters action="/student/history" filters={filters} topics={[]} showEndDate={showEndDate} />
@@ -498,7 +498,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
       <Breadcrumbs items={[{ label: "Home", href: "/student" }, { label: "History", href: "/student/history" }, { label: `Practice · ${practiceAreaLabel(practiceArea)}` }]} />
       <header className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">My history</h1>
+          <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">My history</h1>
           <p className="mt-0.5 text-sm text-gray-500">Review your {practiceAreaLabel(practiceArea).toLowerCase()} practice and find your next focus area.</p>
         </div>
         <p className="text-xs text-gray-500">{visibleAttempts.length} finished set{visibleAttempts.length === 1 ? "" : "s"}</p>

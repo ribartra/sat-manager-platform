@@ -9,13 +9,13 @@ import { cn } from "@/lib/utils";
  */
 
 export function LinkTr({ className, children }: { className?: string; children: React.ReactNode }) {
-  return <tr className={cn("relative hover:bg-gray-50", className)}>{children}</tr>;
+  return <tr className={cn("relative hover:bg-[var(--sat-primary-soft)]", className)}>{children}</tr>;
 }
 
 /** The row's main link (stretched). Put it in the first meaningful cell. */
 export function RowLink({ href, className, children, ...rest }: { href: string; className?: string; children: React.ReactNode } & Omit<React.ComponentProps<typeof Link>, "href" | "className" | "children">) {
   return (
-    <Link href={href} className={cn("font-medium text-gray-900 after:absolute after:inset-0 after:content-[''] hover:underline", className)} {...rest}>
+    <Link href={href} className={cn("font-semibold text-[var(--sat-text)] after:absolute after:inset-0 after:content-[''] hover:underline", className)} {...rest}>
       {children}
     </Link>
   );
@@ -29,7 +29,7 @@ export function RowAction({ className, children }: { className?: string; childre
 /** Trailing chevron cell. */
 export function ChevronCell({ className }: { className?: string }) {
   return (
-    <td className={cn("w-8 px-2 py-2 text-right text-gray-300", className)} aria-hidden>
+    <td className={cn("w-8 px-2 py-2 text-right text-[var(--sat-blank)]", className)} aria-hidden>
       <ChevronRight size={16} className="inline" />
     </td>
   );
@@ -38,19 +38,19 @@ export function ChevronCell({ className }: { className?: string }) {
 /** Shared table frame: header row style + body dividers. */
 export function SimpleTable({ head, children, className }: { head: React.ReactNode[]; children: React.ReactNode; className?: string }) {
   return (
-    <div className={cn("overflow-x-auto rounded-lg border border-gray-200 bg-white", className)}>
-      <table className="w-full text-sm">
-        <thead className="bg-gray-50 text-left text-xs text-gray-500">
+    <div className={cn("overflow-x-auto rounded-[var(--sat-radius)] border border-[var(--sat-border)] bg-white", className)}>
+      <table className="w-full border-collapse text-sm">
+        <thead className="bg-[var(--sat-surface-2)] text-left text-xs text-[var(--sat-muted)]">
           <tr>
             {head.map((h, i) => (
-              <th key={i} className="whitespace-nowrap px-4 py-2 font-medium">{h}</th>
+              <th key={i} className="whitespace-nowrap border-b border-[var(--sat-border)] px-3 py-2.5 font-semibold">{h}</th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-100">{children}</tbody>
+        <tbody className="divide-y divide-[var(--sat-border)]">{children}</tbody>
       </table>
     </div>
   );
 }
 
-export const TD = "px-4 py-2 align-middle";
+export const TD = "px-3 py-[11px] align-middle";

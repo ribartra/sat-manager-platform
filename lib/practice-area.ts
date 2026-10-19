@@ -127,21 +127,18 @@ export function areaTabClass(tab: AreaTabKey, active: boolean): string {
 }
 
 /** Explicit active/inactive classes (Tailwind needs full class names). */
-export function areaTabLinkClass(tab: HomeTabKey, active: boolean): string {
-  if (!active) return "border-b-2 border-transparent px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-800";
-  switch (tab) {
-    case "summary":
-      return "border-b-2 border-gray-900 px-3 py-2 text-sm font-medium text-gray-900";
-    case "math":
-      return "border-b-2 border-[var(--sat-area-math)] px-3 py-2 text-sm font-medium text-[var(--sat-area-math)]";
-    case "reading":
-      return "border-b-2 border-[var(--sat-area-reading)] px-3 py-2 text-sm font-medium text-[var(--sat-area-reading)]";
-    case "writing":
-      return "border-b-2 border-[var(--sat-area-writing)] px-3 py-2 text-sm font-medium text-[var(--sat-area-writing)]";
-    case "tests":
-      return "border-b-2 border-[var(--sat-area-tests)] px-3 py-2 text-sm font-medium text-[var(--sat-tests-ink)]";
-  }
+export function areaTabLinkClass(_tab: HomeTabKey, active: boolean): string {
+  // Mockup `.tabs a`: the active tab is primary blue for every section (the section colour lives in the content).
+  void _tab;
+  return active ? TAB_LINK_ACTIVE : TAB_LINK_IDLE;
 }
+
+/** Mockup `.tabs a` / `.tabs a.active`, shared by every link tab bar. */
+export const TAB_LINK_BASE = "-mb-px whitespace-nowrap border-b-2 px-3.5 py-[9px] text-sm";
+export const TAB_LINK_IDLE = `${TAB_LINK_BASE} border-transparent font-medium text-[var(--sat-muted)] hover:text-[var(--sat-text)]`;
+export const TAB_LINK_ACTIVE = `${TAB_LINK_BASE} border-[var(--sat-primary)] font-semibold text-[var(--sat-primary)]`;
+/** Mockup `.tabs`: 1px rule below, horizontal scroll without a scrollbar. */
+export const TAB_BAR = "overflow-x-auto overflow-y-hidden border-b border-[var(--sat-border)] [scrollbar-width:none]";
 
 /** A domain's practice area (its Section: MATH, READING or WRITING); null for Test placeholders. */
 export function resolvePracticeArea(domain: { practiceArea?: PracticeAreaCode | string | null }): PracticeAreaCode | null {

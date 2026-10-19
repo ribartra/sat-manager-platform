@@ -8,7 +8,7 @@ export function LegalPage({ title, updated, children }: { title: string; updated
       <Alert tone="warning" title="Draft — pending legal review" className="mb-6">
         This text describes how the platform works today; the academy will publish the reviewed version.
       </Alert>
-      <h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
+      <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">{title}</h1>
       <p className="mt-1 text-sm text-gray-500">Last updated {updated}</p>
       <div className="mt-8 space-y-8 text-sm leading-6 text-gray-700 [&_h2]:mb-2 [&_h2]:text-base [&_h2]:font-semibold [&_h2]:text-gray-900 [&_li]:ml-5 [&_li]:list-disc [&_ul]:space-y-1">
         {children}

@@ -172,7 +172,7 @@ export default async function AiImportFileReviewPage({ params, searchParams }: P
           <Link href={`/admin/import/ai?batch=${batchId}`} className="text-sm text-blue-600 hover:underline">
             Back to batch
           </Link>
-          <h1 className="mt-2 text-2xl font-semibold text-gray-900">Review File</h1>
+          <h1 className="mt-2 text-[26px] font-bold tracking-[-0.3px] text-gray-900">Review File</h1>
           <p className="mt-1 text-sm text-gray-500">{file.relativePath}</p>
         </div>
         <Card padding="md">

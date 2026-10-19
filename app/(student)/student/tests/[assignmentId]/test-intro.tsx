@@ -95,7 +95,7 @@ export async function TestIntro({
           <Badge>{current.tier}</Badge>
           {current.state === "progress" ? <Badge variant="warning">In progress</Badge> : null}
         </div>
-        <h1 className="mt-3 text-2xl font-semibold text-gray-900">{current.name}</h1>
+        <h1 className="mt-3 text-[26px] font-bold tracking-[-0.3px] text-gray-900">{current.name}</h1>
         <p className="mt-1 text-sm text-gray-500">
           {current.questionCount} questions · {current.minutes} minutes · the timer keeps your remaining time if you leave
         </p>

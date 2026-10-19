@@ -86,7 +86,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
     <>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Hello, {firstName}!</h1>
+          <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Hello, {firstName}!</h1>
           <p className="mt-0.5 text-sm text-gray-500">
             {count} student{count === 1 ? "" : "s"} · Today is {now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}.
           </p>

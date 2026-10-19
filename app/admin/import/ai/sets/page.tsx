@@ -30,7 +30,7 @@ export default async function AiImportSetsPage({ searchParams }: PageProps) {
   if (!selectedBatchId) {
     return (
       <PageShell>
-        <h1 className="text-2xl font-semibold text-gray-900">Extracted Tests to review</h1>
+        <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Extracted Tests to review</h1>
         <p className="mt-2 text-sm text-gray-500">No ingest batches yet.</p>
         <Link href="/admin/import/ai" className="mt-4 inline-block text-sm text-blue-600 hover:underline">
           Go to AI Import

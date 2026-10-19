@@ -246,7 +246,7 @@ export default async function ImpersonateStudentPage({ params, searchParams }: P
       </Alert>
       <PageShell>
         <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900">Hello, {student.name.split(" ")[0]}!</h1>
+          <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Hello, {student.name.split(" ")[0]}!</h1>
           <p className="mt-0.5 text-sm text-gray-500">Read-only student dashboard</p>
         </div>
 

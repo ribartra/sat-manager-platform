@@ -3,6 +3,7 @@ import {
   AREA_TABS_WITH_TESTS,
   PRACTICE_AREA_TABS,
   areaTabLinkClass,
+  TAB_BAR,
   buildAreaHref,
   type HomeTabKey,
 } from "@/lib/practice-area";
@@ -37,8 +38,8 @@ export function PracticeAreaTabs({
   ];
 
   return (
-    <nav aria-label="Sections" className={`overflow-x-auto border-b border-gray-200 ${className?.match(/(^|\s)mb-/) ? "" : "mb-5"} ${className ?? ""}`}>
-      <div className="flex min-w-max gap-1">
+    <nav aria-label="Sections" className={`${TAB_BAR} ${className?.match(/(^|\s)mb-/) ? "" : "mb-4"} ${className ?? ""}`}>
+      <div className="flex min-w-max gap-0.5">
         {tabs.map((tab) => {
           const known = tab.key === "summary" || AREA_TABS_WITH_TESTS.some((t) => t.key === tab.key);
           const href = known

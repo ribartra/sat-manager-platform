@@ -2,42 +2,44 @@ import { cn } from "@/lib/utils";
 
 type PageWidth = "narrow" | "default" | "wide" | "full";
 type PageDensity = "comfortable" | "compact";
+/** Page widths of the mockup (`mejorada/*.html` `.page` max-width), in px. */
+export type PageMaxWidth = 720 | 920 | 960 | 1000 | 1080 | 1100 | 1180;
 
-// One page width for every view (centred in the area right of the left sidebar), so the
-// left/right margins never jump between views. `width` is kept for API compatibility only.
-const PAGE_WIDTH = "max-w-[var(--sat-page-wide)]";
-const WIDTH: Record<PageWidth, string> = {
-  narrow: PAGE_WIDTH,
-  default: PAGE_WIDTH,
-  wide: PAGE_WIDTH,
-  full: "max-w-none",
-};
-
-// Same outer vertical rhythm for every view: top of the page -> first content is always 32px.
-const DENSITY_Y: Record<PageDensity, string> = {
-  comfortable: "py-8",
-  compact: "py-8",
+// Legacy `width` names map to the mockup widths; `maxWidth` sets the exact mockup width per page.
+const WIDTH: Record<PageWidth, PageMaxWidth | null> = {
+  narrow: 1080,
+  default: 1080,
+  wide: 1080,
+  full: null,
 };
 
 interface PageShellProps extends React.HTMLAttributes<HTMLElement> {
   as?: React.ElementType;
   width?: PageWidth;
+  /** Mockup page width in px (default 1080). */
+  maxWidth?: PageMaxWidth;
   density?: PageDensity;
 }
 
-/** Page container: the shared page width + horizontal padding. Prefer this over ad-hoc max-w-* wrappers. */
+/** Page container (mockup `.page`): centred, mockup width, padding 22px 20px 70px. Prefer this over ad-hoc max-w-* wrappers. */
 export function PageShell({
   as: Component = "div",
   className,
   width = "default",
-  density = "comfortable",
+  maxWidth,
+  density: _density,
+  style,
   children,
   ...props
 }: PageShellProps) {
+  void _density;
+  const px = maxWidth ?? WIDTH[width];
   return (
     <Component
       data-page-shell=""
-      className={cn("mx-auto w-full px-4", WIDTH[width], DENSITY_Y[density], className)}
+      data-page-width={px ?? "full"}
+      className={cn("mx-auto w-full px-4 pb-[70px] pt-[22px] sm:px-5", className)}
+      style={{ maxWidth: px ? `${px}px` : "none", ...style }}
       {...props}
     >
       {children}
@@ -65,14 +67,14 @@ export function PageHeader({
     <header
       className={cn(
         "flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between",
-        "mb-6",
+        "mb-[18px]",
         className,
       )}
       {...props}
     >
       <div className="min-w-0">
-        <h1 className="text-xl font-semibold text-foreground">{title}</h1>
-        {description ? <p className="mt-1 text-sm text-muted-foreground">{description}</p> : null}
+        <h1 className="text-[26px] font-bold tracking-[-0.3px] text-[var(--sat-text)]">{title}</h1>
+        {description ? <p className="mt-1 text-sm text-[var(--sat-muted)]">{description}</p> : null}
       </div>
       {actions ? <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div> : null}
     </header>

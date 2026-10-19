@@ -4,7 +4,7 @@ export { LoadingState } from "./loading-state";
 export { ErrorState } from "./error-state";
 export { OfflineBanner, SaveIndicator, type SaveStatus } from "./save-indicator";
 export { DataTable, type DataTableResponsiveStrategy, type DataTableColumnMeta } from "./data-table";
-export { FilterBar } from "./filter-bar";
+export { FilterBar, FilterField } from "./filter-bar";
 export { FormSection } from "./form-section";
 export { PracticeAreaTabs } from "./practice-area-tabs";
 export { AttemptStatusBadge, INVALIDATED, InvalidatedNotice, VoidableValue, invalidatedRowClass, isInvalidated } from "./attempt-status";
@@ -22,3 +22,4 @@ export { PracticeAttemptsTable, TestAttemptsTable, type PracticeAttemptRow } fro
 export { SkillsMap, SkillsMapLegend, SkillDifficultyMatrix, DIFFICULTIES, type SkillsMapSkill, type SkillsMapChip, type MatrixCell, type ChipState } from "./skills-map";
 export { AttentionCard, AttentionItem, AttentionRow, DateCell, StudentCell, shortName } from "./teacher-ui";
 export { ContinueCard } from "./continue-card";
+export { ListItem, ListStack } from "./list";

@@ -188,7 +188,7 @@ export function SetsIndexClient({ rows, batchId, batches }: SetsIndexClientProps
           <Link href={`/admin/import/ai?batch=${batchId}`} className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline">
             <ArrowLeft className="h-3.5 w-3.5" /> Back to batch
           </Link>
-          <h1 className="mt-2 text-2xl font-semibold text-gray-900">Extracted Tests to review</h1>
+          <h1 className="mt-2 text-[26px] font-bold tracking-[-0.3px] text-gray-900">Extracted Tests to review</h1>
           <p className="mt-1 text-sm text-gray-500">
             An Extracted Test groups the source files for one set — questions plus answers and/or explanations. Expand a row to see
             each question status (stem, stimulus, options, answer, explanation) and use <strong>Review / crop</strong>

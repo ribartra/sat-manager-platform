@@ -54,7 +54,7 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Tests" }]} />
       <header className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Tests</h1>
+          <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Tests</h1>
           <p className="mt-1 text-sm text-gray-500">
             Manage full-length tests. Each test has 4 modules: 2 of Reading &amp; Writing and 2 of Math. Section scores (200–800) appear only on
             Test pages, never in practice.

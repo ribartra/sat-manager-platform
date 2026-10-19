@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -53,29 +52,39 @@ export function Pagination({
   };
   const first = (page - 1) * pageSize + 1;
   const last = Math.min(page * pageSize, total);
+  // Mockup `.pager`: "Showing x–y of n" + 32px page buttons (current filled blue), windowed around the current page.
+  const pages = Array.from(new Set([1, page - 1, page, page + 1, pageCount]))
+    .filter((p) => p >= 1 && p <= pageCount)
+    .sort((x, y) => x - y);
+  const btn = "inline-flex h-8 min-w-8 items-center justify-center rounded-lg border px-2 text-sm font-semibold";
+  const idle = `${btn} border-[var(--sat-border-strong)] bg-white text-[var(--sat-text)] hover:bg-[var(--sat-surface-2)]`;
+  const off = `${btn} cursor-default border-[var(--sat-border)] bg-white text-[var(--sat-blank)]`;
   return (
-    <nav aria-label="Pagination" className={cn("flex items-center justify-between gap-2 px-3 py-2 text-xs text-gray-500", className)}>
+    <nav aria-label="Pagination" className={cn("mt-2.5 flex flex-wrap items-center justify-between gap-2.5 text-xs text-[var(--sat-muted)]", className)}>
       <span>
-        {first}–{last} of {total}
+        Showing {first}–{last} of {total}
       </span>
-      <div className="flex items-center gap-2">
-        <Button asChild variant="secondary" size="sm" className="h-7 gap-1 px-2" disabled={page <= 1}>
-          {page > 1 ? (
-            <Link href={hrefFor(page - 1)} rel="prev"><ChevronLeft size={12} /> Prev</Link>
-          ) : (
-            <span><ChevronLeft size={12} /> Prev</span>
-          )}
-        </Button>
-        <span className="tabular-nums">
-          Page {page} of {pageCount}
-        </span>
-        <Button asChild variant="secondary" size="sm" className="h-7 gap-1 px-2" disabled={page >= pageCount}>
-          {page < pageCount ? (
-            <Link href={hrefFor(page + 1)} rel="next">Next <ChevronRight size={12} /></Link>
-          ) : (
-            <span>Next <ChevronRight size={12} /></span>
-          )}
-        </Button>
+      <div className="flex items-center gap-1.5">
+        {page > 1 ? (
+          <Link href={hrefFor(page - 1)} rel="prev" aria-label="Previous page" className={idle}><ChevronLeft size={14} /></Link>
+        ) : (
+          <span aria-disabled className={off}><ChevronLeft size={14} /></span>
+        )}
+        {pages.map((p, i) => (
+          <span key={p} className="flex items-center gap-1.5">
+            {i > 0 && p - pages[i - 1] > 1 ? <span aria-hidden>…</span> : null}
+            {p === page ? (
+              <span aria-current="page" className={`${btn} border-[var(--sat-primary)] bg-[var(--sat-primary)] text-white`}>{p}</span>
+            ) : (
+              <Link href={hrefFor(p)} aria-label={`Page ${p}`} className={idle}>{p}</Link>
+            )}
+          </span>
+        ))}
+        {page < pageCount ? (
+          <Link href={hrefFor(page + 1)} rel="next" aria-label="Next page" className={idle}><ChevronRight size={14} /></Link>
+        ) : (
+          <span aria-disabled className={off}><ChevronRight size={14} /></span>
+        )}
       </div>
     </nav>
   );
