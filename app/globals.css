@@ -156,3 +156,8 @@ body {
   background-color: #fde68a;
   color: inherit;
 }
+
+/* Mockup question typeface (`.stimulus`, `.qstem`, `.opt`, `.choice`): Georgia serif. */
+@utility font-serif-q {
+  font-family: Georgia, "Times New Roman", serif;
+}

@@ -258,7 +258,7 @@ const checks = [
   },
   {
     file: "app/(student)/student/practice/player-client.tsx",
-    requires: ["text-4xl font-bold", "fixed inset-0 z-40", "immediateFeedback", "Check"],
+    requires: ["text-[28px] font-extrabold", "fixed inset-0 z-40", "immediateFeedback", "Check"],
     label: "Practice player: número grande, overlay fixed y Check IMMEDIATE",
   },
   {

@@ -21,7 +21,7 @@ import { fetchWithTransientRetry } from "@/lib/transient-fetch";
 import { readApiError } from "@/lib/api-client";
 import { notify } from "@/lib/notify-ui";
 import { clearBuffer, readBuffer, sendKeepalive, useOnlineStatus, usePageHideFlush, useSaveQueue, writeBuffer } from "@/lib/player-persistence";
-import { Calculator, ChevronLeft, FileText, Flag, Highlighter, List, LogOut } from "lucide-react";
+import { Calculator, ChevronLeft, FileText, Flag, Highlighter, LogOut } from "lucide-react";
 import { EliminateIcon, ReferenceSheet, StrikeButton, ToolButton, useQuestionHighlights } from "@/components/sat/player-tools";
 import { Alert } from "@/components/sat/alert";
 import { KeyboardShortcutsHint, PlayerShortcuts } from "@/components/sat/keyboard-shortcuts-hint";
@@ -825,17 +825,17 @@ export function FullTestPlayer({
           <span className="font-medium">Preview: nothing is scored or saved.</span>
         </Alert>
       )}
-      <div className="flex items-center justify-between border-b border-gray-200 px-6 py-3">
-        <div>
-          <p className="text-sm font-semibold text-gray-900">{testName}</p>
-          <p className="text-xs tabular-nums text-gray-500">
+      {/* Top bar (mockup `.take-top`): title · centred timer · tools */}
+      <div className="grid shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-3 border-b border-[var(--sat-border)] bg-[var(--sat-surface-2)] px-3 py-2.5 sm:px-5">
+        <div className="min-w-0">
+          <p className="truncate font-semibold text-[var(--sat-text)]">{testName}</p>
+          <p className="truncate text-xs tabular-nums text-[var(--sat-muted)]">
             {currentModule.name} · {questionIndex + 1} of {currentModule.questions.length}
           </p>
         </div>
-        <div className="flex items-center gap-4">
-          {!previewMode && <SaveIndicator status={saving} />}
+        <div className="flex flex-col items-center leading-tight">
           {inOvertime ? (
-            <span className="flex items-baseline gap-1 tabular-nums text-red-600" aria-label={`Extra time +${formatTime(overtime)}`}>
+            <span className="flex items-baseline gap-1 text-xl font-extrabold tabular-nums text-[var(--sat-bad)]" aria-label={`Extra time +${formatTime(overtime)}`}>
               <span className="text-xs font-semibold uppercase tracking-wide">Extra time</span>
               +{formatTime(overtime)}
             </span>
@@ -844,8 +844,8 @@ export function FullTestPlayer({
               Show timer
             </button>
           ) : (
-            <span className="flex items-center gap-2">
-              <span className={`tabular-nums ${timerIsRed ? "text-red-600" : "text-gray-900"}`}>{formatTime(remaining)}</span>
+            <span className="flex items-baseline gap-2">
+              <span className={`text-xl font-extrabold tabular-nums ${timerIsRed ? "text-[var(--sat-bad)]" : "text-[var(--sat-text)]"}`}>{formatTime(remaining)}</span>
               {!timerIsRed ? (
                 <button type="button" onClick={() => setTimerHidden(true)} className="text-xs text-gray-400 underline hover:text-gray-700">
                   Hide
@@ -853,7 +853,9 @@ export function FullTestPlayer({
               ) : null}
             </span>
           )}
-          <div className="flex items-center gap-0.5">
+          {!previewMode && <SaveIndicator compact status={saving} />}
+        </div>
+        <div className="flex items-center justify-end gap-0.5">
             <ToolButton icon={<Highlighter size={18} />} label="Highlight" onClick={highlights.highlightSelection} title="Highlight the selected text" />
             <ToolButton icon={<EliminateIcon />} label="Eliminate" active={elimMode} onClick={() => setElimMode((v) => !v)} />
             {currentModule.section === "MATH" && showCalculator ? (
@@ -872,7 +874,6 @@ export function FullTestPlayer({
                 router.push(exitHref);
               }}
             />
-          </div>
         </div>
       </div>
       {inOvertime && (
@@ -902,13 +903,14 @@ export function FullTestPlayer({
                     onClick={() => goToQuestion(i)}
                     aria-label={`Question ${i + 1}${marked.has(q.id) ? ", marked for review" : ""}${answers[q.id] ? ", answered" : ", unanswered"}`}
                     className={cn(
-                      "relative h-9 rounded border text-xs font-medium",
-                      answers[q.id] ? "border-green-400 bg-green-50 text-green-700" : "border-dashed border-gray-300 text-gray-600 hover:bg-gray-50",
-                      marked.has(q.id) && "ring-2 ring-amber-400 ring-offset-1",
+                      "relative aspect-square rounded-lg border-[1.5px] text-sm font-bold",
+                      answers[q.id]
+                        ? "border-[var(--sat-primary)] bg-[var(--sat-primary)] text-white"
+                        : "border-dashed border-[var(--sat-muted)] text-[var(--sat-text)] hover:bg-[var(--sat-surface-2)]",
+                      marked.has(q.id) && "after:absolute after:-right-1.5 after:-top-2.5 after:text-[13px] after:text-[var(--sat-bad)] after:content-['⚑']",
                     )}
                   >
                     {i + 1}
-                    {marked.has(q.id) ? <Flag size={9} className="absolute -right-1 -top-1 fill-amber-400 text-amber-500" aria-hidden /> : null}
                   </button>
                 ))}
               </div>
@@ -925,22 +927,21 @@ export function FullTestPlayer({
         <div
           ref={setHlZone}
           className={cn(
-            "space-y-4 overflow-y-auto border-r border-gray-200 p-6",
-            hasPassage && "bg-gray-50",
+            "min-h-0 space-y-4 overflow-y-auto border-[var(--sat-border)] p-4 max-md:border-b-[3px] md:border-r-[3px] md:px-[30px] md:py-[26px]",
           )}
         >
           {hasPassage ? (
-            <MathContent content={question.stimulus!} className="prose prose-base max-w-none text-gray-800" />
+            <MathContent content={question.stimulus!} className="prose prose-base max-w-none font-serif-q text-base leading-[1.7] text-[var(--sat-text)]" />
           ) : null}
-          <div className={cn(hasPassage && "border-t border-gray-200 pt-4")}>
-            <MathContent content={question.stem} className="text-base font-medium text-gray-900 md:text-lg" />
+          <div className={cn(hasPassage && "border-t border-[var(--sat-border)] pt-4")}>
+            <MathContent content={question.stem} className="font-serif-q text-base leading-relaxed text-[var(--sat-text)] md:text-[17px]" />
             <QuestionMedia imageUrl={question.imageUrl} alt={`Figure for question ${questionIndex + 1}`} className="mt-4" />
           </div>
         </div>
-        <div className="overflow-y-auto p-5 md:p-6">
+        <div className="min-h-0 overflow-y-auto p-4 md:px-[30px] md:py-[26px]">
           <div className="mb-3 flex items-center justify-between gap-3">
             <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-bold leading-none tabular-nums text-gray-900">{questionIndex + 1}</span>
+              <span className="text-[28px] font-extrabold leading-none tabular-nums text-[var(--sat-text)]">{questionIndex + 1}</span>
               <p className="text-xs font-medium uppercase tracking-wide text-gray-500">{questionResponseLabel(responseType)}</p>
             </div>
             <div className="flex items-center gap-1">
@@ -975,26 +976,26 @@ export function FullTestPlayer({
                 <div
                   key={option.label}
                   className={cn(
-                    "mb-2 flex min-h-[3.75rem] w-full items-center gap-2 rounded-lg border px-3 py-3 text-base transition-colors",
-                    selected ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-gray-300",
-                    isEliminated && "opacity-55",
+                    // Mockup `.choice`: Georgia 15px, 1.5px border, radius 10, 28px letter circle.
+                    "mb-2.5 flex w-full items-center gap-2 rounded-[10px] border-[1.5px] bg-white px-3.5 py-[11px] font-serif-q text-[15px] transition-colors",
+                    selected ? "border-[var(--sat-primary)] bg-[var(--sat-primary-soft)]" : "border-[var(--sat-border-strong)] hover:border-[var(--sat-primary)]",
                   )}
                 >
                   <button
                     type="button"
                     onClick={() => chooseOption(question.id, option.label)}
-                    className={cn("flex flex-1 items-center gap-3 text-left", isEliminated && "line-through")}
+                    className={cn("flex flex-1 items-center gap-3 text-left", isEliminated && "line-through opacity-45")}
                   >
                     <span
                       className={cn(
-                        "flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-sm font-semibold",
-                        selected ? "border-blue-500 bg-blue-500 text-white" : "border-gray-300 text-gray-600",
+                        "grid h-7 w-7 shrink-0 place-items-center rounded-full border-[1.5px] font-sans text-xs font-bold",
+                        selected ? "border-[var(--sat-primary)] bg-[var(--sat-primary)] text-white" : "border-[var(--sat-muted)] text-[var(--sat-text)]",
                       )}
                     >
                       {option.label}
                     </span>
                     <span className="min-w-0 flex-1">
-                      <OptionContent text={option.text} imageUrl={option.imageUrl} label={option.label} className="leading-snug text-gray-800" />
+                      <OptionContent text={option.text} imageUrl={option.imageUrl} label={option.label} className="text-[15px] leading-snug text-[var(--sat-text)]" />
                     </span>
                   </button>
                   {elimMode ? (
@@ -1032,69 +1033,76 @@ export function FullTestPlayer({
         </div>
       </div>
       )}
-      <div className="flex items-center justify-between border-t border-gray-200 px-6 py-3">
-        {reviewOpen ? (
-          <Button variant="ghost" size="sm" onClick={() => setReviewOpen(false)} disabled={advancing}>
-            <ChevronLeft size={16} className="mr-1" /> Back
-          </Button>
-        ) : (
-          <Button variant="ghost" size="sm" onClick={previous} disabled={advancing || questionIndex === 0}>
-            <ChevronLeft size={16} className="mr-1" /> Back
-          </Button>
-        )}
-        <Button variant="secondary" size="sm" onClick={() => setShowNav((value) => !value)}>
-          <List size={14} className="mr-1" /> {reviewOpen ? "Questions" : `Question ${questionIndex + 1} of ${currentModule.questions.length}`}
+      {/* Footer (mockup `.take-foot`): saved note · question navigator · Back / Next */}
+      <div className="grid shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-2 border-t border-[var(--sat-border)] bg-[var(--sat-surface-2)] px-3 py-2.5 sm:px-5">
+        <span className="text-xs text-[var(--sat-muted)] max-[859px]:hidden">{previewMode ? "Preview: nothing is saved" : "Your answers are saved automatically"}</span>
+        <Button
+          variant="secondary"
+          className="col-start-2 border-0 bg-[var(--sat-text)] text-white hover:bg-[#1e293b]"
+          onClick={() => setShowNav((value) => !value)}
+        >
+          {reviewOpen ? "Questions" : `Question ${questionIndex + 1} of ${currentModule.questions.length}`} ▴
         </Button>
-        {reviewOpen ? (
-          <Button onClick={() => setConfirmSubmitModule(true)} disabled={advancing}>
-            Submit module
-          </Button>
-        ) : (
-          <Button onClick={next} disabled={advancing}>
-            {isLastQuestionOfModule ? "Review" : "Next"}
-          </Button>
-        )}
+        <div className="col-start-3 flex items-center justify-end gap-2">
+          {reviewOpen ? (
+            <Button variant="secondary" onClick={() => setReviewOpen(false)} disabled={advancing}>
+              <ChevronLeft size={16} className="max-sm:hidden" /> Back
+            </Button>
+          ) : (
+            <Button variant="secondary" onClick={previous} disabled={advancing || questionIndex === 0}>
+              <ChevronLeft size={16} className="max-sm:hidden" /> Back
+            </Button>
+          )}
+          {reviewOpen ? (
+            <Button onClick={() => setConfirmSubmitModule(true)} disabled={advancing}>
+              Submit module
+            </Button>
+          ) : (
+            <Button onClick={next} disabled={advancing}>
+              {isLastQuestionOfModule ? "Review" : "Next"}
+            </Button>
+          )}
+        </div>
       </div>
       {showNav && (
         <div
-          className="fixed inset-0 z-40 flex items-end justify-center bg-black/20"
+          className="fixed inset-0 z-40 flex items-end justify-center pb-[66px]"
           role="dialog"
           aria-modal="true"
           aria-label="Question navigator"
           onClick={() => setShowNav(false)}
         >
-          <div className="w-full max-w-md rounded-t-xl bg-white p-5 shadow-xl" onClick={(event) => event.stopPropagation()}>
+          <div className="w-[min(460px,94vw)] rounded-[14px] border border-[var(--sat-border)] bg-white p-4 shadow-[0_16px_40px_rgba(0,0,0,.2)]" onClick={(event) => event.stopPropagation()}>
             <div className="mb-4 flex items-center justify-between">
               <h3 className="font-semibold text-gray-900">{currentModule.name}</h3>
               <button type="button" aria-label="Close question navigator" onClick={() => setShowNav(false)} className="text-gray-500 hover:text-gray-700">✕</button>
             </div>
-            <div className="mb-4 grid grid-cols-8 gap-2">
+            <div className="mb-4 mt-2.5 grid grid-cols-8 gap-2">
               {currentModule.questions.map((q, i) => (
                 <button
                   key={q.id}
                   onClick={() => goToQuestion(i)}
                   aria-label={`Question ${i + 1}${marked.has(q.id) ? ", marked for review" : ""}${answers[q.id] ? ", answered" : ", unanswered"}`}
                   className={cn(
-                    "relative h-9 w-9 rounded border text-xs font-medium transition-colors",
-                    i === questionIndex
-                      ? "border-blue-500 bg-blue-500 text-white"
-                      : answers[q.id]
-                        ? "border-green-400 bg-green-50 text-green-700"
-                        : "border-gray-200 text-gray-600 hover:bg-gray-50",
-                    marked.has(q.id) && "ring-2 ring-amber-400 ring-offset-1",
+                    // Mockup `.navgrid`: dashed when blank, blue when answered, outline on the current one.
+                    "relative aspect-square rounded-lg border-[1.5px] text-sm font-bold transition-colors",
+                    answers[q.id]
+                      ? "border-[var(--sat-primary)] bg-[var(--sat-primary)] text-white"
+                      : "border-dashed border-[var(--sat-muted)] bg-white text-[var(--sat-text)] hover:bg-[var(--sat-surface-2)]",
+                    i === questionIndex && "outline outline-2 outline-offset-1 outline-[var(--sat-text)]",
                   )}
                 >
                   {i + 1}
                   {marked.has(q.id) ? (
-                    <Flag size={9} className="absolute -right-1 -top-1 fill-amber-400 text-amber-500" aria-hidden />
+                    <span className="absolute -right-1.5 -top-2.5 text-[13px] text-[var(--sat-bad)]" aria-hidden>⚑</span>
                   ) : null}
                 </button>
               ))}
             </div>
             <div className="flex items-center gap-4 text-xs text-gray-500">
-              <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded border border-green-400 bg-green-100" /> Answered</span>
-              <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded border border-gray-200 bg-white" /> Unanswered</span>
-              <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded border border-gray-200 bg-white ring-2 ring-amber-400 ring-offset-1" /> Marked</span>
+              <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded-[3px] border-[1.5px] border-[var(--sat-primary)] bg-[var(--sat-primary)]" /> Answered</span>
+              <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded-[3px] border-[1.5px] border-dashed border-[var(--sat-muted)]" /> Unanswered</span>
+              <span className="flex items-center gap-1"><span className="text-[var(--sat-bad)]">⚑</span> Marked</span>
             </div>
             <div className="mt-4 flex items-center justify-between gap-3 border-t border-gray-200 pt-3">
               <p className="text-xs text-gray-500">You can only go back to questions in this module.</p>

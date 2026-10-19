@@ -53,16 +53,17 @@ export function ReviewQuestionCard({
     <article
       id={id}
       className={cn(
-        "scroll-mt-6 rounded-lg border border-gray-200 border-l-4 bg-white p-4",
-        state === "ok" && "border-l-green-500",
-        state === "bad" && "border-l-red-500",
-        state === "blank" && "border-l-gray-300",
+        // Mockup `.qcard`: radius 10, 4px left rule in the result colour; question text in Georgia.
+        "scroll-mt-20 rounded-[var(--sat-radius)] border border-[var(--sat-border)] border-l-4 bg-white px-[18px] py-4",
+        state === "ok" && "border-l-[var(--sat-ok)]",
+        state === "bad" && "border-l-[var(--sat-bad)]",
+        state === "blank" && "border-l-[var(--sat-blank)]",
         state === "answered" && "border-l-blue-300",
       )}
     >
       <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold text-gray-900">Question {number}</span>
+          <span className="font-bold text-[var(--sat-text)]">Question {number}</span>
           {state === "ok" ? (
             <Badge variant="success"><CheckCircle size={12} className="mr-1" /> Correct</Badge>
           ) : state === "bad" ? (
@@ -73,20 +74,20 @@ export function ReviewQuestionCard({
             <Badge><MinusCircle size={12} className="mr-1" /> Blank</Badge>
           )}
         </div>
-        <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500">
+        <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--sat-muted)]">
           {tags}
           {timeSpent ? <span>{formatTime(timeSpent)}</span> : null}
         </div>
       </div>
 
       {question.stimulus?.trim() ? (
-        <MathContent content={question.stimulus} className="mb-3 rounded-md bg-gray-50 p-3 text-sm text-gray-700" />
+        <MathContent content={question.stimulus} className="my-2.5 whitespace-pre-wrap rounded-lg bg-[var(--sat-surface-2)] px-3.5 py-3 font-serif-q text-[15px] leading-[1.65] text-[var(--sat-text)]" />
       ) : null}
-      <MathContent content={question.stem} className="mb-3 text-sm text-gray-800" />
+      <MathContent content={question.stem} className="mb-2.5 mt-2 font-serif-q text-[15px] text-[var(--sat-text)]" />
       <QuestionMedia imageUrl={question.imageUrl} alt={`Question ${number} image`} className="mb-3" />
 
       {responseType === "MC" ? (
-        <div className="mb-3 space-y-1">
+        <div className="mb-3">
           {question.options.filter(isAnswerOption).map((opt) => {
             const picked = answer === opt.label;
             const right = reveal && question.correctAnswer === opt.label;
@@ -94,39 +95,46 @@ export function ReviewQuestionCard({
               <div
                 key={opt.label}
                 className={cn(
-                  "flex items-start gap-2 rounded px-2 py-1 text-sm",
-                  right ? "bg-green-50 text-green-800" : picked ? (reveal ? "bg-red-50 text-red-700" : "bg-blue-50 text-blue-800") : "text-gray-600",
+                  // Mockup `.opt`: Georgia row, tinted border when it is the right / picked answer.
+                  "mb-1 flex items-start gap-2.5 rounded-lg border px-2.5 py-2 font-serif-q text-[15px]",
+                  right
+                    ? "border-[var(--sat-ok-border)] bg-[var(--sat-ok-soft)]"
+                    : picked
+                      ? reveal
+                        ? "border-[var(--sat-bad-border)] bg-[var(--sat-bad-soft)]"
+                        : "border-blue-200 bg-[var(--sat-primary-soft)]"
+                      : "border-transparent",
                 )}
               >
-                <span className="w-4 font-medium">{opt.label})</span>
+                <span className="w-[22px] shrink-0 font-sans font-bold">{opt.label}</span>
                 <span className="min-w-0 flex-1"><OptionContent text={opt.text} imageUrl={opt.imageUrl} label={opt.label} /></span>
-                {right && picked ? <span className="shrink-0 text-xs font-medium">✓ Your answer · Correct</span> : null}
-                {right && !picked ? <span className="shrink-0 text-xs font-medium">✓ Correct answer</span> : null}
-                {!right && picked ? <span className="shrink-0 text-xs font-medium">{reveal ? "✗ Your answer" : "Your answer"}</span> : null}
+                {right && picked ? <span className="ml-auto shrink-0 font-sans text-[11px] font-bold text-[var(--sat-ok)]">✓ Your answer · Correct</span> : null}
+                {right && !picked ? <span className="ml-auto shrink-0 font-sans text-[11px] font-bold text-[var(--sat-ok)]">✓ Correct answer</span> : null}
+                {!right && picked ? <span className={cn("ml-auto shrink-0 font-sans text-[11px] font-bold", reveal ? "text-[var(--sat-bad)]" : "text-[var(--sat-primary)]")}>{reveal ? "✗ Your answer" : "Your answer"}</span> : null}
               </div>
             );
           })}
         </div>
       ) : (
-        <div className="mb-3 flex flex-wrap gap-3 text-sm">
-          <span className="rounded border border-gray-200 px-2 py-1 text-gray-600">
-            Your answer: <span className="font-medium text-gray-900">{answer || <em className="text-gray-400">blank</em>}</span>
+        <div className="my-1.5 flex flex-wrap gap-2.5 text-sm">
+          <span className={cn("rounded-lg border px-3 py-2 font-semibold", !reveal || blank ? "border-[var(--sat-border)] text-[var(--sat-text)]" : isCorrect ? "border-[var(--sat-ok-border)] bg-[var(--sat-ok-soft)] text-[var(--sat-ok)]" : "border-[var(--sat-bad-border)] bg-[var(--sat-bad-soft)] text-[var(--sat-bad)]")}>
+            Your answer: <span>{answer || <em className="font-normal text-[var(--sat-blank)]">blank</em>}</span>
           </span>
           {reveal ? (
-            <span className="rounded border border-green-200 bg-green-50 px-2 py-1 text-green-800">
-              Correct answer: <span className="font-medium">{formatCorrectAnswer(question.correctAnswer)}</span>
+            <span className="rounded-lg border border-[var(--sat-ok-border)] bg-[var(--sat-ok-soft)] px-3 py-2 font-semibold text-[var(--sat-ok)]">
+              Correct answer: <span>{formatCorrectAnswer(question.correctAnswer)}</span>
             </span>
           ) : null}
         </div>
       )}
 
-      {blank ? <p className="mb-2 text-xs italic text-gray-500">{blankNote}</p> : null}
+      {blank ? <p className="mb-2 text-xs italic text-[var(--sat-muted)]">{blankNote}</p> : null}
       {children}
 
       {reveal && question.explanation ? (
-        <details className="mt-2 border-t border-gray-100 pt-2" open={!isCorrect}>
-          <summary className="cursor-pointer select-none text-xs font-medium text-gray-600">Explanation</summary>
-          <MathContent content={question.explanation} className="mt-1 text-sm text-gray-700" />
+        <details className="mt-2.5 border-t border-[var(--sat-border)] pt-2" open={!isCorrect}>
+          <summary className="cursor-pointer select-none text-[13px] font-semibold text-[var(--sat-primary)]">Explanation</summary>
+          <MathContent content={question.explanation} className="mt-2 text-sm text-[var(--sat-text)]" />
         </details>
       ) : null}
     </article>

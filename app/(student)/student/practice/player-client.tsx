@@ -469,24 +469,24 @@ export function PracticeSetPlayer({
       )}
       <OfflineBanner online={online} />
       {/* Top bar (mockup take.js): question list toggle + title, timer, tool buttons */}
-      <div className="flex shrink-0 items-center justify-between gap-3 border-b border-gray-200 bg-white px-3 py-2 sm:px-4">
+      <div className="grid shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-3 border-b border-[var(--sat-border)] bg-[var(--sat-surface-2)] px-3 py-2.5 sm:px-5">
         <div className="flex min-w-0 items-center gap-2">
           <span className="max-[859px]:hidden">
             <ToolButton icon={<ListIcon size={18} />} label="Questions" active={listOpen} onClick={() => setListOpen((v) => !v)} title={listOpen ? "Hide question list" : "Show question list"} />
           </span>
           <div className="min-w-0">
-            <p className="max-w-[12rem] truncate text-sm font-medium text-gray-900 sm:max-w-xs">{setName}</p>
-            <p className="text-xs tabular-nums text-gray-500">{current + 1} of {questions.length}</p>
+            <p className="max-w-[12rem] truncate font-semibold text-[var(--sat-text)] sm:max-w-xs">{setName}</p>
+            <p className="text-xs tabular-nums text-[var(--sat-muted)]">{current + 1} of {questions.length}</p>
           </div>
         </div>
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex shrink-0 flex-col items-center">
           {timerHidden ? (
             <button type="button" onClick={() => setTimerHidden(false)} className="text-xs font-medium text-gray-500 underline hover:text-gray-800">
               Show timer
             </button>
           ) : (
-            <span className="flex items-center gap-2">
-              <span className={cn("font-mono text-sm font-medium", timerColor)}>{formatTime(elapsed)}</span>
+            <span className="flex flex-col items-center leading-tight">
+              <span className={cn("text-xl font-extrabold tabular-nums", timerColor)}>{formatTime(elapsed)}</span>
               <button type="button" onClick={() => setTimerHidden(true)} className="text-xs text-gray-400 underline hover:text-gray-700">
                 Hide
               </button>
@@ -494,7 +494,7 @@ export function PracticeSetPlayer({
           )}
           <SaveIndicator compact status={saving} />
         </div>
-        <div className="flex shrink-0 items-center gap-0.5">
+        <div className="flex shrink-0 items-center justify-end gap-0.5">
           <ToolButton icon={<Highlighter size={18} />} label="Highlight" onClick={highlights.highlightSelection} title="Highlight the selected text" />
           <ToolButton icon={<EliminateIcon />} label="Eliminate" active={elimMode} onClick={() => setElimMode((v) => !v)} />
           {isMath && showCalculator ? <ToolButton icon={<Calculator size={18} />} label="Calculator" active={calcOpen} onClick={() => setCalcOpen((v) => !v)} /> : null}
@@ -543,8 +543,8 @@ export function PracticeSetPlayer({
                   onClick={() => void handleNavigate(i)}
                   aria-current={i === current && !reviewOpen ? "true" : undefined}
                   className={cn(
-                    "flex w-full items-center gap-2 border-b border-gray-50 px-3 py-2 text-left text-sm hover:bg-gray-50",
-                    i === current && !reviewOpen && "bg-blue-50 shadow-[inset_3px_0_0_#2563eb]",
+                    "flex w-full items-center gap-2 border-b border-[var(--sat-surface-2)] px-3 py-[9px] text-left text-sm hover:bg-[var(--sat-surface-2)]",
+                    i === current && !reviewOpen && "bg-[var(--sat-primary-soft)] shadow-[inset_3px_0_0_var(--sat-primary)]",
                   )}
                 >
                   <b className="w-8 tabular-nums">Q{i + 1}</b>
@@ -553,8 +553,8 @@ export function PracticeSetPlayer({
                   <span
                     aria-hidden
                     className={cn(
-                      "ml-auto grid h-4 w-4 place-items-center rounded-full border text-[9px]",
-                      answers[q.id] ? "border-blue-600 bg-blue-600 text-white" : "border-dashed border-gray-400",
+                      "ml-auto grid h-[18px] w-[18px] place-items-center rounded-full text-[9px]",
+                      answers[q.id] ? "bg-[var(--sat-primary)] text-white" : "border-[1.5px] border-dashed border-[var(--sat-muted)]",
                     )}
                   >
                     {answers[q.id] ? "✓" : ""}
@@ -586,9 +586,11 @@ export function PracticeSetPlayer({
                     onClick={() => void handleNavigate(i)}
                     aria-label={`Question ${i + 1}${marked.has(q.id) ? ", marked for review" : ""}${answers[q.id] ? ", answered" : ", unanswered"}`}
                     className={cn(
-                      "h-9 rounded border text-xs font-medium",
-                      answers[q.id] ? "border-green-400 bg-green-50 text-green-700" : "border-dashed border-gray-300 text-gray-600 hover:bg-gray-50",
-                      marked.has(q.id) && "ring-2 ring-amber-400 ring-offset-1",
+                      "relative aspect-square rounded-lg border-[1.5px] text-sm font-bold",
+                      answers[q.id]
+                        ? "border-[var(--sat-primary)] bg-[var(--sat-primary)] text-white"
+                        : "border-dashed border-[var(--sat-muted)] text-[var(--sat-text)] hover:bg-[var(--sat-surface-2)]",
+                      marked.has(q.id) && "after:absolute after:-right-1.5 after:-top-2.5 after:text-[13px] after:text-[var(--sat-bad)] after:content-['⚑']",
                     )}
                   >
                     {i + 1}
@@ -604,30 +606,29 @@ export function PracticeSetPlayer({
         <div
           ref={setHlZone}
           className={cn(
-            "min-h-0 space-y-4 overflow-y-auto border-r border-gray-200 p-4 md:p-6",
-            hasPassage && "bg-gray-50",
+            "min-h-0 space-y-4 overflow-y-auto border-[var(--sat-border)] p-4 max-md:border-b-[3px] md:border-r-[3px] md:px-[30px] md:py-[26px]",
           )}
         >
           {hasPassage ? (
             <MathContent
               content={question.stimulus!}
-              className="prose prose-base max-w-none leading-relaxed text-gray-800"
+              className="prose prose-base max-w-none font-serif-q text-base leading-[1.7] text-[var(--sat-text)]"
             />
           ) : null}
-          <div className={cn(hasPassage && "border-t border-gray-200 pt-4")}>
+          <div className={cn(hasPassage && "border-t border-[var(--sat-border)] pt-4")}>
             <MathContent
               content={question.stem}
-              className="text-base font-medium leading-relaxed text-gray-900 md:text-lg"
+              className="font-serif-q text-base leading-relaxed text-[var(--sat-text)] md:text-[17px]"
             />
             <QuestionMedia imageUrl={question.imageUrl} alt={`Figure for question ${current + 1}`} className="mt-4" />
           </div>
         </div>
 
         {/* Right: alternatives — large Q number + taller choices */}
-        <div className="flex min-h-0 flex-col gap-3 overflow-y-auto p-4 md:p-5">
+        <div className="flex min-h-0 flex-col gap-3 overflow-y-auto p-4 md:px-[30px] md:py-[26px]">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-bold leading-none tabular-nums text-gray-900">{current + 1}</span>
+              <span className="text-[28px] font-extrabold leading-none tabular-nums text-[var(--sat-text)]">{current + 1}</span>
               <p className="text-xs font-medium uppercase tracking-wide text-gray-500">{questionResponseLabel(responseType)}</p>
               <Badge variant={difficultyBadgeVariant(question.difficulty)}>{difficultyLabel(question.difficulty)}</Badge>
               {skillName ? <p className="hidden truncate text-xs text-gray-500 sm:block">{skillName}</p> : null}
@@ -655,7 +656,7 @@ export function PracticeSetPlayer({
           ) : null}
 
           {responseType === "MC" ? (
-            <div className="space-y-2">
+            <div>
               {question.options.filter(isAnswerOption).map((opt) => {
                 const isEliminated = eliminated[question.id]?.has(opt.label);
                 const checkResult = checked[question.id];
@@ -668,12 +669,12 @@ export function PracticeSetPlayer({
                 <div
                   key={opt.label}
                   className={cn(
-                    "flex min-h-[3.75rem] items-center gap-2 rounded-lg border px-3 py-4 text-sm transition-colors",
-                    selected && !checkResult && "border-blue-500 bg-blue-50",
-                    isCorrectChoice && "border-green-500 bg-green-50",
-                    isWrongSelected && "border-red-500 bg-red-50",
-                    !selected && !isCorrectChoice && "border-gray-200 hover:border-gray-300 hover:bg-gray-50",
-                    isEliminated && "opacity-55"
+                    // Mockup `.choice`: Georgia 15px, 1.5px border, radius 10, 28px letter circle.
+                    "mb-2.5 flex items-center gap-2 rounded-[10px] border-[1.5px] bg-white px-3.5 py-[11px] font-serif-q text-[15px] transition-colors",
+                    selected && !checkResult && "border-[var(--sat-primary)] bg-[var(--sat-primary-soft)]",
+                    isCorrectChoice && "border-[var(--sat-ok)] bg-[var(--sat-ok-soft)]",
+                    isWrongSelected && "border-[var(--sat-bad)] bg-[var(--sat-bad-soft)]",
+                    !selected && !isCorrectChoice && "border-[var(--sat-border-strong)] hover:border-[var(--sat-primary)]"
                   )}
                 >
                 <button
@@ -681,24 +682,24 @@ export function PracticeSetPlayer({
                   disabled={Boolean(checkResult)}
                   className={cn(
                     "flex flex-1 items-center gap-3 text-left",
-                    isEliminated && "line-through",
+                    isEliminated && "line-through opacity-45",
                     // Checked answers are settled (read-only), not blocked: keep their colors.
                     SETTLED_RESULT
                   )}
                 >
                   <span
                     className={cn(
-                      "flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-sm font-semibold",
-                      selected && !checkResult && "border-blue-500 bg-blue-500 text-white",
-                      isCorrectChoice && "border-green-600 bg-green-600 text-white",
-                      isWrongSelected && "border-red-600 bg-red-600 text-white",
-                      !selected && !isCorrectChoice && "border-gray-300 text-gray-500"
+                      "grid h-7 w-7 shrink-0 place-items-center rounded-full border-[1.5px] font-sans text-xs font-bold",
+                      selected && !checkResult && "border-[var(--sat-primary)] bg-[var(--sat-primary)] text-white",
+                      isCorrectChoice && "border-[var(--sat-ok)] bg-[var(--sat-ok)] text-white",
+                      isWrongSelected && "border-[var(--sat-bad)] bg-[var(--sat-bad)] text-white",
+                      !selected && !isCorrectChoice && "border-[var(--sat-muted)] text-[var(--sat-text)]"
                     )}
                   >
                     {opt.label}
                   </span>
                   <span className="min-w-0 flex-1">
-                    <OptionContent text={opt.text} imageUrl={opt.imageUrl} label={opt.label} className="text-base leading-snug text-gray-800 md:text-[1.05rem]" />
+                    <OptionContent text={opt.text} imageUrl={opt.imageUrl} label={opt.label} className="text-[15px] leading-snug text-[var(--sat-text)]" />
                   </span>
                 </button>
                 {elimMode ? (
@@ -787,86 +788,81 @@ export function PracticeSetPlayer({
       </div>
       </div>
 
-      {/* Bottom navigation — always visible in the player viewport */}
-      <div className="z-10 flex shrink-0 items-center justify-between border-t border-gray-200 bg-white px-4 py-2.5 sm:px-6">
+      {/* Bottom navigation (mockup `.take-foot`): saved note · question navigator · Back / Next */}
+      <div className="z-10 grid shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-2 border-t border-[var(--sat-border)] bg-[var(--sat-surface-2)] px-3 py-2.5 sm:px-5">
+        <span className="text-xs text-[var(--sat-muted)] max-[859px]:hidden">Your answers are saved automatically</span>
         <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => (reviewOpen ? setReviewOpen(false) : current > 0 && handleNavigate(current - 1))}
-          disabled={!reviewOpen && current === 0}
+          variant="secondary"
+          className="col-start-2 border-0 bg-[var(--sat-text)] text-white hover:bg-[#1e293b]"
+          onClick={() => setShowNav(!showNav)}
         >
-          <ChevronLeft size={16} className="mr-1" /> Back
+          Question {current + 1} of {questions.length} ▴
         </Button>
-
-        <div className="flex items-center gap-2">
-          <span className="hidden text-xs text-gray-400 lg:inline">Your answers are saved automatically</span>
-          <Button variant="secondary" size="sm" onClick={() => setShowNav(!showNav)}>
-            Question {current + 1} of {questions.length} ▴
-          </Button>
-        </div>
-
-        {current < questions.length - 1 && !reviewOpen ? (
-          <Button size="sm" onClick={() => handleNavigate(current + 1)}>
-            Next <ChevronRight size={16} className="ml-1" />
-          </Button>
-        ) : !reviewOpen ? (
-          <Button size="sm" onClick={() => setReviewOpen(true)}>
-            Review <ChevronRight size={16} className="ml-1" />
-          </Button>
-        ) : (
+        <div className="col-start-3 flex items-center justify-end gap-2">
           <Button
-            size="sm"
-            onClick={handleSubmit}
-            disabled={submitting}
-            className="bg-green-600 hover:bg-green-700"
+            variant="secondary"
+            onClick={() => (reviewOpen ? setReviewOpen(false) : current > 0 && handleNavigate(current - 1))}
+            disabled={!reviewOpen && current === 0}
           >
-            <Send size={14} className="mr-1" />
-            {submitting ? "Submitting…" : "Submit"}
+            <ChevronLeft size={16} className="max-sm:hidden" /> Back
           </Button>
-        )}
+          {current < questions.length - 1 && !reviewOpen ? (
+            <Button onClick={() => handleNavigate(current + 1)}>
+              Next <ChevronRight size={16} className="max-sm:hidden" />
+            </Button>
+          ) : !reviewOpen ? (
+            <Button onClick={() => setReviewOpen(true)}>
+              Review <ChevronRight size={16} className="max-sm:hidden" />
+            </Button>
+          ) : (
+            <Button onClick={handleSubmit} disabled={submitting} className="bg-[var(--sat-ok)] hover:bg-green-700">
+              <Send size={14} />
+              {submitting ? "Submitting…" : "Submit"}
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Question navigator overlay — fixed so it never leaves a stuck inset block */}
       {showNav && (
         <div
-          className="fixed inset-0 z-40 flex items-end justify-center bg-black/20"
+          className="fixed inset-0 z-40 flex items-end justify-center pb-[66px]"
           role="dialog"
           aria-modal="true"
           aria-label="Question navigator"
           onClick={() => setShowNav(false)}
         >
           <div
-            className="w-full max-w-md rounded-t-xl bg-white p-5 shadow-xl"
+            className="w-[min(460px,94vw)] rounded-[14px] border border-[var(--sat-border)] bg-white p-4 shadow-[0_16px_40px_rgba(0,0,0,.2)]"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="mb-4 flex items-center justify-between">
               <h3 className="font-semibold text-gray-900">Questions</h3>
               <button type="button" aria-label="Close question navigator" onClick={() => setShowNav(false)} className="text-gray-500 hover:text-gray-700">✕</button>
             </div>
-            <div className="mb-4 grid grid-cols-8 gap-2">
+            <div className="mb-4 mt-2.5 grid grid-cols-8 gap-2">
               {questions.map((q, i) => (
                 <button
                   key={q.id}
                   onClick={() => handleNavigate(i)}
                   className={cn(
-                    "h-9 w-9 rounded border text-xs font-medium transition-colors",
-                    i === current
-                      ? "border-blue-500 bg-blue-500 text-white"
-                      : answers[q.id]
-                      ? "border-green-400 bg-green-50 text-green-700"
-                      : marked.has(q.id)
-                      ? "border-amber-400 bg-amber-50 text-amber-700"
-                      : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                    // Mockup `.navgrid`: dashed when blank, blue when answered, outline on the current one, ⚑ when marked.
+                    "relative aspect-square rounded-lg border-[1.5px] text-sm font-bold transition-colors",
+                    answers[q.id]
+                      ? "border-[var(--sat-primary)] bg-[var(--sat-primary)] text-white"
+                      : "border-dashed border-[var(--sat-muted)] bg-white text-[var(--sat-text)] hover:bg-[var(--sat-surface-2)]",
+                    i === current && "outline-2 outline-offset-1 outline-[var(--sat-text)] outline",
+                    marked.has(q.id) && "after:absolute after:-right-1.5 after:-top-2.5 after:text-[13px] after:text-[var(--sat-bad)] after:content-['⚑']"
                   )}
                 >
                   {i + 1}
                 </button>
               ))}
             </div>
-            <div className="flex items-center gap-4 text-xs text-gray-500">
-              <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded border border-green-400 bg-green-100" /> Answered</span>
-              <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded border border-amber-400 bg-amber-50" /> Marked</span>
-              <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded border border-gray-200 bg-white" /> Unanswered</span>
+            <div className="flex items-center gap-4 text-xs text-[var(--sat-muted)]">
+              <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded-[3px] border-[1.5px] border-[var(--sat-primary)] bg-[var(--sat-primary)]" /> Answered</span>
+              <span className="flex items-center gap-1"><span className="text-[var(--sat-bad)]">⚑</span> Marked</span>
+              <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded-[3px] border-[1.5px] border-dashed border-[var(--sat-muted)]" /> Unanswered</span>
             </div>
             <div className="mt-4 border-t border-gray-200 pt-4">
               <Button

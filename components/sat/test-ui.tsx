@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { ModuleView, SectionView, TestAttemptView } from "@/lib/test-view";
 
@@ -40,15 +39,15 @@ export function ModuleTiles({
         const body = (
           <>
             <span className={cn("block text-sm font-semibold", SECTION_TEXT[m.section])}>
-              {detail ? m.name : m.short} <span className="font-normal text-gray-500">· {m.tier}</span>
+              {detail ? m.name : m.short} <span className="font-normal text-[var(--sat-muted)]">· {m.tier}</span>
             </span>
-            <span className="mt-0.5 block text-xs text-gray-500">
+            <span className="mt-0.5 block text-xs text-[var(--sat-muted)]">
               {statusFor ? (
                 statusFor(m)
               ) : m.state === "done" ? (
-                <span className="text-green-700">✓ Done · {m.right} of {m.questionCount} correct</span>
+                <span className="font-semibold text-[var(--sat-ok)]">✓ Done · {m.right} of {m.questionCount} correct</span>
               ) : m.state === "progress" ? (
-                <span className="text-amber-700">In progress · continue</span>
+                <span className="font-semibold text-[var(--sat-warn)]">In progress · continue</span>
               ) : (
                 <>{m.questionCount} questions · {m.minutes} min</>
               )}
@@ -56,10 +55,14 @@ export function ModuleTiles({
           </>
         );
         const classes = cn(
-          "block rounded-lg border px-3 py-2.5 text-left transition-colors",
-          m.state === "done" ? "border-green-200 bg-green-50/50" : m.state === "progress" ? "border-amber-200 bg-amber-50/50" : "border-gray-200 bg-white",
-          selectedKey === m.key && "ring-2 ring-blue-500 ring-offset-1",
-          href && "hover:border-gray-400",
+          "block rounded-[var(--sat-radius)] border-[1.5px] px-3 py-2.5 text-left transition-colors",
+          m.state === "done"
+            ? "border-[var(--sat-ok-border)] bg-[var(--sat-ok-soft)]"
+            : m.state === "progress"
+              ? "border-[var(--sat-warn-border)] bg-[var(--sat-warn-soft)]"
+              : "border-[var(--sat-border)] bg-white",
+          selectedKey === m.key && "border-[var(--sat-primary)] bg-[var(--sat-primary-soft)]",
+          href && "hover:border-[var(--sat-primary)] hover:bg-[var(--sat-primary-soft)]",
         );
         return href ? (
           <Link key={m.key} href={href} className={classes}>
@@ -82,36 +85,36 @@ export function SectionCell({ section }: { section: SectionView }) {
   return <span className="text-xs text-gray-400">Not taken</span>;
 }
 
-/** Reading & Writing | Math | Total blocks. Scores appear only for complete sections (never estimated). */
+/** Reading & Writing | Math | Total blocks (mockup `.scores`). Scores appear only for complete sections (never estimated). */
 export function ScoreBlocks({ view, actionFor }: { view: TestAttemptView; actionFor?: (section: SectionView) => React.ReactNode }) {
   const block = (s: SectionView) => (
-    <Card padding="md" className={cn("border-t-4", s.section === "MATH" ? "border-t-[var(--sat-area-math)]" : "border-t-[var(--sat-area-reading)]")}>
-      <p className="text-xs font-medium text-gray-500">{s.label}</p>
+    <div className={cn("rounded-[var(--sat-radius)] border border-[var(--sat-border)] border-t-4 bg-white p-4", s.section === "MATH" ? "border-t-[var(--sat-area-math)]" : "border-t-[var(--sat-area-reading)]")}>
+      <p className="text-xs font-semibold">{s.label}</p>
       {s.complete && s.score !== null ? (
         <>
-          <p className="mt-1 text-3xl font-bold tabular-nums text-gray-900">{s.score}</p>
-          <p className="text-xs text-gray-500">{s.right} of {s.counted} correct · scale 200–800</p>
+          <p className={cn("mt-1 text-[34px] font-extrabold leading-[1.1] tabular-nums", SECTION_TEXT[s.section])}>{s.score}</p>
+          <p className="text-xs text-[var(--sat-muted)]">{s.right} of {s.counted} correct · scale 200–800</p>
         </>
       ) : (
         <>
-          <p className="mt-1 text-xl font-semibold text-gray-400">{s.modulesDone > 0 ? "Incomplete" : "Not taken"}</p>
-          <p className="text-xs text-gray-500">{s.modulesDone > 0 ? `${s.modulesDone} of ${s.modulesTotal} modules done` : "No module of this section yet"}</p>
+          <p className="mt-1 text-[22px] font-extrabold leading-[1.1] text-[var(--sat-blank)]">{s.modulesDone > 0 ? "Incomplete" : "Not taken"}</p>
+          <p className="text-xs text-[var(--sat-muted)]">{s.modulesDone > 0 ? `${s.modulesDone} of ${s.modulesTotal} modules done` : "No module of this section yet"}</p>
           {actionFor ? <div className="mt-2">{actionFor(s)}</div> : null}
         </>
       )}
-    </Card>
+    </div>
   );
   return (
-    <div className="grid gap-3 sm:grid-cols-[1fr_1fr_1.2fr]">
+    <div className="grid gap-3.5 sm:grid-cols-2 md:grid-cols-[1fr_1fr_1.2fr]">
       {block(view.sections.RW)}
       {block(view.sections.MATH)}
-      <Card padding="md" className="border-[var(--sat-area-tests)] bg-[var(--sat-area-tests)] text-[var(--sat-tests-ink)]">
-        <p className="text-xs font-medium text-gray-700">Total score</p>
-        <p className={cn("mt-1 font-bold tabular-nums", view.total !== null ? "text-3xl" : "text-xl text-gray-600")}>
+      <div className="rounded-[var(--sat-radius)] border border-[var(--sat-area-tests)] bg-[var(--sat-area-tests)] p-4 text-[var(--sat-tests-ink)] sm:col-span-2 md:col-span-1">
+        <p className="text-xs font-semibold">Total score</p>
+        <p className={cn("mt-1 font-extrabold leading-[1.1] tabular-nums", view.total !== null ? "text-[40px]" : "text-[22px] text-gray-600")}>
           {view.total ?? "—"}
         </p>
         <p className="text-xs text-gray-700">{view.total !== null ? "out of 1600" : "Available when all 4 modules are done"}</p>
-      </Card>
+      </div>
     </div>
   );
 }
@@ -119,11 +122,11 @@ export function ScoreBlocks({ view, actionFor }: { view: TestAttemptView; action
 /** Legend for ModuleResultRows (mockup test-result.html). */
 export function ModuleResultLegend() {
   return (
-    <p className="mt-1 flex flex-wrap items-center gap-3 text-xs text-gray-500">
+    <p className="mt-1 flex flex-wrap items-center gap-3.5 text-xs text-[var(--sat-muted)]">
       <span className="flex items-center gap-1"><span className="inline-block h-2.5 w-2.5 rounded-sm bg-[var(--sat-area-reading)]" /> R&amp;W correct</span>
       <span className="flex items-center gap-1"><span className="inline-block h-2.5 w-2.5 rounded-sm bg-[var(--sat-area-math)]" /> Math correct</span>
-      <span className="flex items-center gap-1"><span className="inline-block h-2.5 w-2.5 rounded-sm bg-red-400" /> Incorrect</span>
-      <span className="flex items-center gap-1"><span className="inline-block h-2.5 w-2.5 rounded-sm bg-gray-300" /> Blank</span>
+      <span className="flex items-center gap-1"><span className="inline-block h-2.5 w-2.5 rounded-sm bg-[var(--sat-bad)]" /> Incorrect</span>
+      <span className="flex items-center gap-1"><span className="inline-block h-2.5 w-2.5 rounded-sm bg-[var(--sat-blank)]" /> Blank</span>
     </p>
   );
 }
@@ -141,7 +144,7 @@ export function ModuleResultRows({
   timeFor?: (m: ModuleView) => string | null;
 }) {
   return (
-    <div className="divide-y divide-gray-100">
+    <div className="divide-y divide-[var(--sat-border)]">
       {modules.map((m) => (
         <div key={m.key} className="grid items-center gap-2 py-3 sm:grid-cols-[9rem_1fr_11rem]">
           <a href={`#${anchorPrefix}${m.key}`} className="text-sm hover:underline">
@@ -149,18 +152,18 @@ export function ModuleResultRows({
             <span className="text-gray-500"> · {m.tier}</span>
           </a>
           {m.state === "done" ? (
-            <div className="flex h-3 overflow-hidden rounded-full bg-gray-100" aria-label={`${m.right} correct, ${m.wrong} incorrect, ${m.blank} blank`}>
+            <div className="flex h-3 overflow-hidden rounded-md bg-[var(--sat-surface-2)]" aria-label={`${m.right} correct, ${m.wrong} incorrect, ${m.blank} blank`}>
               <span className={SECTION_BAR[m.section]} style={{ width: `${pct(m.right, m.questionCount)}%` }} />
-              <span className="bg-red-400" style={{ width: `${pct(m.wrong, m.questionCount)}%` }} />
-              <span className="bg-gray-300" style={{ width: `${pct(m.blank, m.questionCount)}%` }} />
+              <span className="bg-[var(--sat-bad)]" style={{ width: `${pct(m.wrong, m.questionCount)}%` }} />
+              <span className="bg-[var(--sat-blank)]" style={{ width: `${pct(m.blank, m.questionCount)}%` }} />
             </div>
           ) : (
-            <div className="h-3 rounded-full bg-[repeating-linear-gradient(45deg,#f3f4f6,#f3f4f6_6px,#e5e7eb_6px,#e5e7eb_12px)]" />
+            <div className="h-3 rounded-md bg-[repeating-linear-gradient(45deg,#f1f5f9_0_6px,#e2e8f0_6px_12px)]" />
           )}
-          <div className="text-right text-xs text-gray-500">
+          <div className="text-right text-xs text-[var(--sat-muted)]">
             {m.state === "done" ? (
               <>
-                <span className="font-semibold text-gray-900">{m.right} of {m.questionCount}</span> correct ({m.pct}%)
+                <span className="font-semibold text-[var(--sat-text)]">{m.right} of {m.questionCount}</span> correct ({m.pct}%)
                 <span className="block">{m.wrong} wrong · {m.blank} blank{timeFor?.(m) ? <> · <b className="font-medium text-gray-700">{timeFor(m)}</b></> : null}</span>
               </>
             ) : (
@@ -193,11 +196,13 @@ export function AnswerGrid({
       {items.map((item, i) => {
         const n = i + 1;
         const cls = cn(
-          "flex h-8 w-8 items-center justify-center rounded border text-xs font-medium tabular-nums",
-          item.state === "ok" && "border-green-300 bg-green-50 text-green-700 hover:bg-green-100",
-          item.state === "bad" && "border-red-300 bg-red-50 text-red-700 hover:bg-red-100",
-          item.state === "blank" && "border-dashed border-gray-300 bg-white text-gray-500 hover:bg-gray-50",
-          item.state === "na" && "border-gray-100 bg-gray-50 text-gray-300",
+          // Mockup `.qcell`: 38px, radius 8, 1.5px border in the result colour; blank dashed; hover lift.
+          "grid h-[38px] w-[38px] place-items-center rounded-lg border-[1.5px] text-[13px] font-bold tabular-nums transition-[transform,box-shadow]",
+          item.state !== "na" && "hover:-translate-y-px hover:shadow-[0_3px_8px_rgba(0,0,0,.1)]",
+          item.state === "ok" && "border-[var(--sat-ok)] bg-[var(--sat-ok-soft)] text-[var(--sat-ok)]",
+          item.state === "bad" && "border-[var(--sat-bad)] bg-[var(--sat-bad-soft)] text-[var(--sat-bad)]",
+          item.state === "blank" && "border-dashed border-[var(--sat-blank)] bg-[var(--sat-surface-2)] text-[var(--sat-muted)]",
+          item.state === "na" && "border-[var(--sat-border)] bg-[var(--sat-surface-2)] text-[var(--sat-blank)]",
         );
         const title = `Question ${n}: ${item.state === "ok" ? "correct" : item.state === "bad" ? "incorrect" : item.state === "blank" ? "blank" : "not taken"}`;
         return item.state === "na" ? (
@@ -214,11 +219,11 @@ export function AnswerGrid({
 
 export function AnswerGridLegend({ withNotTaken = false }: { withNotTaken?: boolean }) {
   return (
-    <p className="mt-2 flex flex-wrap items-center gap-3 text-xs text-gray-500">
-      <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded border border-green-300 bg-green-50" /> Correct</span>
-      <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded border border-red-300 bg-red-50" /> Incorrect</span>
-      <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded border border-dashed border-gray-300" /> Blank</span>
-      {withNotTaken ? <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded border border-gray-100 bg-gray-50" /> Not taken</span> : null}
+    <p className="mt-2 flex flex-wrap items-center gap-3.5 text-xs text-[var(--sat-muted)]">
+      <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded-[3px] border-[1.5px] border-[var(--sat-ok)] bg-[var(--sat-ok-soft)]" /> Correct</span>
+      <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded-[3px] border-[1.5px] border-[var(--sat-bad)] bg-[var(--sat-bad-soft)]" /> Incorrect</span>
+      <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded-[3px] border-[1.5px] border-dashed border-[var(--sat-blank)] bg-[var(--sat-surface-2)]" /> Blank</span>
+      {withNotTaken ? <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded-[3px] border-[1.5px] border-[var(--sat-border)] bg-[var(--sat-surface-2)]" /> Not taken</span> : null}
       <span>· Click a number to see that question</span>
     </p>
   );

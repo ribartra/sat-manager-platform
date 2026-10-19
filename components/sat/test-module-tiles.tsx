@@ -11,9 +11,9 @@ export function TestModuleTiles({ modules }: { modules: ModuleView[] }) {
       {modules.map((m) => {
         const color = m.section === "MATH" ? "var(--sat-area-math)" : "var(--sat-area-reading)";
         return (
-          <div key={m.key} className="rounded-lg border border-gray-200 border-t-[3px] px-3 py-2" style={{ borderTopColor: color }}>
+          <div key={m.key} className="rounded-lg border border-[var(--sat-border)] border-t-[3px] bg-white px-3 py-2" style={{ borderTopColor: color }}>
             <p className="text-xs font-bold uppercase tracking-wide" style={{ color }}>{m.short}</p>
-            <p className="text-xs text-gray-500">{m.questionCount} questions · {m.minutes} min · {m.tier}</p>
+            <p className="text-xs text-[var(--sat-muted)]">{m.questionCount} questions · {m.minutes} min · {m.tier}</p>
           </div>
         );
       })}
