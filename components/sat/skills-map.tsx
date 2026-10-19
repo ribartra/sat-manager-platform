@@ -2,7 +2,8 @@ import Link from "next/link";
 import { Lock } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Pct } from "@/components/sat/work-status";
-import { difficultyLabel } from "@/lib/domain-meta";
+import { Badge } from "@/components/ui/badge";
+import { difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
 import { cn } from "@/lib/utils";
 
 /**
@@ -71,6 +72,9 @@ export function SkillsMap({ domains }: { domains: { id: string; name: string; sk
   );
 }
 
+/** Mockup `.chip`: 5px 10px, radius 8, 12px/600, slate border. */
+const CHIP = "inline-flex items-center gap-1.5 rounded-lg border border-[var(--sat-border)] px-2.5 py-[5px] text-xs font-semibold";
+
 function SkillChip({ chip }: { chip: SkillsMapChip }) {
   if (chip.state === null) {
     const locked = (
@@ -80,25 +84,33 @@ function SkillChip({ chip }: { chip: SkillsMapChip }) {
       </>
     );
     return chip.href ? (
-      <Link href={chip.href} title={chip.title} className="flex items-center gap-1 rounded-md border border-dashed border-gray-300 px-2 py-1 text-xs text-gray-500 hover:border-gray-400">
+      <Link href={chip.href} title={chip.title} className={cn(CHIP, "border-dashed text-[var(--sat-muted)] hover:border-[var(--sat-primary)] hover:bg-[var(--sat-primary-soft)]")}>
         {locked}
       </Link>
     ) : (
-      <span title={chip.title} className="flex items-center gap-1 rounded-md border border-dashed border-gray-200 px-2 py-1 text-xs text-gray-400">
+      <span title={chip.title} className={cn(CHIP, "cursor-help bg-[var(--sat-surface-2)] text-[var(--sat-blank)]")}>
         {locked}
       </span>
     );
   }
-  const body = (
-    <>
-      <span className={cn("inline-block h-2 w-2 rounded-full", STATE_DOT[chip.state])} aria-hidden />
-      {difficultyLabel(chip.difficulty)}
-      {chip.extra}
-    </>
-  );
-  const cls = "flex items-center gap-1.5 rounded-md border border-gray-200 px-2 py-1 text-xs font-medium text-gray-700";
+  // Teacher catalogue (mockup teacher/content.html): the difficulty badge in its colour; student map:
+  // status dot + level (mockup content-map.html).
+  const body =
+    chip.state === "available" ? (
+      <>
+        <Badge variant={difficultyBadgeVariant(chip.difficulty)}>{difficultyLabel(chip.difficulty)}</Badge>
+        {chip.extra}
+      </>
+    ) : (
+      <>
+        <span className={cn("inline-block h-2 w-2 rounded-full", STATE_DOT[chip.state])} aria-hidden />
+        {difficultyLabel(chip.difficulty)}
+        {chip.extra}
+      </>
+    );
+  const cls = cn(CHIP, "bg-white text-[var(--sat-text)]");
   return chip.href ? (
-    <Link href={chip.href} title={chip.title} className={cn(cls, "hover:border-gray-400")}>{body}</Link>
+    <Link href={chip.href} title={chip.title} className={cn(cls, "hover:border-[var(--sat-primary)] hover:bg-[var(--sat-primary-soft)]")}>{body}</Link>
   ) : (
     <span title={chip.title} className={cls}>{body}</span>
   );

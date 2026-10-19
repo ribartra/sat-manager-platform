@@ -29,6 +29,7 @@ import {
   pageFromParam,
   paginate,
 } from "@/components/sat";
+import { SectionHead } from "@/components/sat/test-ui";
 import { AreaTag } from "@/components/sat/practice-set-row";
 import { LineChart } from "@/components/sat/line-chart";
 import { loadAttemptHistory } from "@/lib/attempt-history";
@@ -60,7 +61,7 @@ import { refreshAssignmentStates } from "@/lib/assignments";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { studentAccessWhereFor } from "@/lib/program-scope";
 import { loadMockReport, loadPracticeReport, moduleTableOf, shortSetName } from "@/lib/student-report";
-import { activeAreaTab, activeHomeTab, practiceAreaFromTab, practiceAreaLabel, type HomeTabKey, type PracticeAreaCode } from "@/lib/practice-area";
+import { activeAreaTab, activeHomeTab, practiceAreaFromTab, practiceAreaLabel, resolvePracticeArea, type HomeTabKey, type PracticeAreaCode } from "@/lib/practice-area";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { Pct } from "@/components/sat/work-status";
 import { loadStudentTests, sortTests } from "@/lib/test-assignments";
@@ -210,7 +211,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <Hint label="Give this student one or more practice sets.">
-          <Link href={buildProgressHref(`/teacher/students/${studentId}/assign`, filters)} className="inline-flex h-9 items-center justify-center gap-1 rounded-md bg-blue-600 px-3.5 text-sm font-medium text-white hover:bg-blue-700">
+          <Link href={buildProgressHref(`/teacher/students/${studentId}/assign`, filters)} className="inline-flex h-9 items-center justify-center gap-1 shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-3.5 text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]">
             <Plus size={14} /> Assign practice
           </Link>
         </Hint>
@@ -410,7 +411,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                     </p>
                   </div>
                   {isTest ? (
-                    <SimpleTable head={["Try", "Date", "Status", "R&W", "Change", "Math", "Change", ""]}>
+                    <SimpleTable head={["Try", "Date", "Status", <SectionHead key="rw" section="RW" short />, "Change", <SectionHead key="m" section="MATH" />, "Change", ""]}>
                       {tries.map((t) => (
                         <LinkTr key={t.id} className={invalidatedRowClass(t.status)}>
                           <td className={TD}><RowLink href={hrefFor(t.id)}>Try {t.tryNumber}</RowLink></td>
@@ -567,7 +568,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
             <EmptyState title="No test attempts yet." />
           ) : (
             <>
-              <SimpleTable head={["Date", "Test", "Attempt", "R&W", "Math", "Total", ""]}>
+              <SimpleTable head={["Date", "Test", "Attempt", <SectionHead key="rw" section="RW" short />, <SectionHead key="m" section="MATH" />, "Total", ""]}>
                 {examPage.items.map(({ t, a }) => (
                   <LinkTr key={a.id} className={invalidatedRowClass(a.status)}>
                     <td className={`${TD} text-gray-600`}>
@@ -929,6 +930,8 @@ type ActivityItem = {
   id: string;
   kind: "Practice" | "Test";
   area: string;
+  /** Practice area, shown as a coloured area tag (Tests already carry the grey Test badge). */
+  areaCode: PracticeAreaCode | null;
   title: string;
   at: Date;
   status: string;
@@ -967,6 +970,7 @@ async function loadActivity(studentId: string, take: number): Promise<ActivityIt
         id: a.id,
         kind: "Practice" as const,
         area: set?.topic.domain.practiceArea ? practiceAreaLabel(set.topic.domain.practiceArea) : "Practice",
+        areaCode: resolvePracticeArea({ practiceArea: set?.topic.domain.practiceArea }),
         title: set ? shortSetName(set.name) : "Practice set",
         at: a.submittedAt ?? a.startedAt,
         status: a.status,
@@ -978,6 +982,7 @@ async function loadActivity(studentId: string, take: number): Promise<ActivityIt
       id: a.id,
       kind: "Test" as const,
       area: "R&W + Math",
+      areaCode: null,
       title: a.test.name,
       at: a.submittedAt ?? a.startedAt,
       status: a.status,
@@ -1009,7 +1014,7 @@ function ActivityList({ items, studentId, grouped = false }: { items: ActivityIt
                       <span className="min-w-0">
                         <span className="flex flex-wrap items-center gap-1.5">
                           <Badge variant={item.kind === "Test" ? "test" : "default"}>{item.kind}</Badge>
-                          <span className="text-xs text-gray-500">{item.area}</span>
+                          {item.areaCode ? <AreaTag area={item.areaCode} /> : null}
                           <span className="truncate text-sm font-medium text-gray-800">{item.title}</span>
                           {item.status === "IN_PROGRESS" ? <Badge variant="warning">In progress</Badge> : null}
                           {isInvalidated(item.status) ? <AttemptStatusBadge status={item.status} /> : null}

@@ -73,7 +73,7 @@ export default async function TeacherStudentsPage({ searchParams }: PageProps) {
             {all.length} student{all.length === 1 ? "" : "s"} · {invited.length} pending invitation{invited.length === 1 ? "" : "s"}
           </p>
         </div>
-        <Link href="/teacher/students/invite" className="inline-flex items-center gap-1.5 self-start rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
+        <Link href="/teacher/students/invite" className="inline-flex items-center gap-1.5 self-start shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]">
           <UserPlus size={14} /> Invite student
         </Link>
       </div>
@@ -93,7 +93,7 @@ export default async function TeacherStudentsPage({ searchParams }: PageProps) {
             ))}
           </select>
         </label>
-        <button type="submit" className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700">Apply</button>
+        <button type="submit" className="shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-3 py-1.5 text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]">Apply</button>
         <Link href="/teacher/students" className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">Clear</Link>
       </Card>
 
@@ -116,7 +116,7 @@ export default async function TeacherStudentsPage({ searchParams }: PageProps) {
                     </div>
                     <div className="text-sm">
                       <span className="block text-xs text-gray-500">Latest test</span>
-                      {s.tests.latest ? <>R&amp;W <b>{s.tests.latest.rw ?? "—"}</b> · Math <b>{s.tests.latest.math ?? "—"}</b></> : <span className="text-gray-400">—</span>}
+                      {s.tests.latest ? <><span className="text-[var(--sat-area-reading)]">R&amp;W</span> <b>{s.tests.latest.rw ?? "—"}</b> · <span className="text-[var(--sat-area-math)]">Math</span> <b>{s.tests.latest.math ?? "—"}</b></> : <span className="text-gray-400">—</span>}
                     </div>
                     <div className="text-sm">
                       <span className="block text-xs text-gray-500">Pending tests</span>

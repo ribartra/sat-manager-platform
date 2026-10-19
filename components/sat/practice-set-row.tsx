@@ -19,7 +19,19 @@ export function AreaTag({ area }: { area: PracticeSetItem["area"] }) {
 }
 
 /** One practice set (mockup setRow): status, dates, tries, and Start / Continue / Try again. */
-export function PracticeSetRow({ item, showArea = false }: { item: PracticeSetItem; showArea?: boolean }) {
+export function PracticeSetRow({
+  item,
+  showArea = false,
+  resultHref = (id) => `/student/results/${id}`,
+  readOnly = false,
+}: {
+  item: PracticeSetItem;
+  showArea?: boolean;
+  /** Where "View results" goes (the teacher's "Student view" opens the teacher attempt page). */
+  resultHref?: (attemptId: string) => string;
+  /** Teacher "Student view": no Start / Continue / Try again. */
+  readOnly?: boolean;
+}) {
   const player = `/student/practice/assignment/${item.assignmentId}`;
   return (
     <ListItem>
@@ -48,10 +60,10 @@ export function PracticeSetRow({ item, showArea = false }: { item: PracticeSetIt
       <div className="flex shrink-0 items-center gap-2">
         {item.last ? (
           <Button asChild variant="ghost" size="sm">
-            <Link href={`/student/results/${item.last.id}`}>View results</Link>
+            <Link href={resultHref(item.last.id)}>View results</Link>
           </Button>
         ) : null}
-        {item.locked ? (
+        {readOnly ? null : item.locked ? (
           <Button size="sm" variant="secondary" disabledReason="Your teacher hasn't opened this set yet.">Locked</Button>
         ) : item.state === "progress" ? (
           <Button asChild size="sm"><Link href={player}>Continue ›</Link></Button>
@@ -73,7 +85,7 @@ export function PctBars({ rows }: { rows: { label: string; pct: number | null; s
         const body = (
           <>
             <div className="mb-1 flex items-center justify-between gap-3 text-sm">
-              <span className="font-medium text-gray-800">{r.label}{r.sub ? <span className="ml-1 text-xs font-normal text-gray-400">· {r.sub}</span> : null}</span>
+              <span className="font-semibold" style={r.color ? { color: r.color } : undefined}>{r.label}{r.sub ? <span className="ml-1 text-xs font-normal text-[var(--sat-muted)]">· {r.sub}</span> : null}</span>
               <span className="shrink-0">{r.pct === null ? <span className="text-xs text-gray-400">No data yet</span> : <Pct value={r.pct} className="font-semibold" />}</span>
             </div>
             <StripedBar pct={r.pct} color={r.color ?? "var(--sat-area-math)"} />

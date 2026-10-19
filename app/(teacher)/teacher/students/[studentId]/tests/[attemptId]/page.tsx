@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { SECTION_TEXT } from "@/components/sat/test-ui";
 import { notFound } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { AttemptStatusBadge, InvalidatedNotice, PageShell, SectionHeader, TestAttemptsTable, TestResultSentence } from "@/components/sat";
@@ -116,6 +118,7 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">{attempt.test.name} · {attempt.student.name}&apos;s results</h1>
+            <Badge variant="test">Test</Badge>
             <Badge>Try {tryNumber} of {siblings.length}</Badge>
             <AttemptStatusBadge status={attempt.status} />
           </div>
@@ -195,7 +198,7 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
           <div className="mt-2 space-y-3">
             {view.modules.map((m, index) => (
               <div key={m.key}>
-                <p className="mb-1 text-xs font-medium text-gray-600">{m.name}{m.state !== "done" ? " · not taken yet" : ""}</p>
+                <p className={cn("mb-1 text-xs font-semibold", SECTION_TEXT[m.section])}>{m.name}{m.state !== "done" ? " · not taken yet" : ""}</p>
                 <AnswerGrid
                   idPrefix={`${m.key}-`}
                   items={modules[index].questions.map((item) => {

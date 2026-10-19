@@ -22,6 +22,7 @@ import {
   pageFromParam,
   paginate,
 } from "@/components/sat";
+import { SectionHead } from "@/components/sat/test-ui";
 import { Pct } from "@/components/sat/work-status";
 import { Button } from "@/components/ui/button";
 import { loadStudentTests } from "@/lib/test-assignments";
@@ -288,7 +289,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
               action={<Link href="/student/tests" className="text-sm text-blue-600 hover:underline">See your tests →</Link>}
             />
           ) : (
-            <SimpleTable head={["Date", "Test", "Attempt", "Reading & Writing", "Math", "Total", ""]}>
+            <SimpleTable head={["Date", "Test", "Attempt", <SectionHead key="rw" section="RW" />, <SectionHead key="m" section="MATH" />, "Total", ""]}>
               {examPage.items.map((exam) => {
                 const info = tryInfo.get(exam.id);
                 const row = info?.a ?? { ...exam, view: null, tryNumber: 1 };

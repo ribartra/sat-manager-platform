@@ -157,7 +157,7 @@ export function PracticeSetEditor({
       setErrors(error.details.length ? error.details : [error.message]);
       return;
     }
-    router.push(`/teacher/content/${values.topicId}`);
+    router.push(`/teacher/practice-sets?view=manage&topic=${values.topicId}`);
     router.refresh();
   }
 

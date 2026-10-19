@@ -57,12 +57,12 @@ async function assertSourcePatterns() {
     },
     {
       file: "app/(teacher)/teacher/impersonate/[studentId]/page.tsx",
-      requires: ["PracticeAreaTabs", "practiceArea", 'area === "tests"', "activeAreaTab"],
-      label: "Impersonate Assigned con 4 tabs",
+      requires: ["StudentHome", "teacherViewLinks", "studentAccessWhereFor", "IMPERSONATE_STUDENT_VIEW"],
+      label: "Student view = Home real del alumno (solo lectura), con alcance de programa y auditoria",
     },
     {
-      file: "app/(student)/student/page.tsx",
-      requires: ["PracticeAreaTabs", "practiceArea", 'area === "tests"', "activeHomeTab", "AreaPracticeView", "TestsTab"],
+      file: "app/(student)/student/student-home.tsx",
+      requires: ["PracticeAreaTabs", "practiceArea", 'area === "tests"', "activeHomeTab", "AreaPracticeView", "TestsTab", "readOnly"],
       label: "Student Home: Summary + Math/Reading/Writing (solo practica) + Tests aparte",
     },
     {

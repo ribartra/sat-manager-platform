@@ -399,15 +399,15 @@ Estados importantes:
 | `/teacher/parents` | Maestro de padres y asociaciones. |
 | `/teacher/questions` | Repositorio de preguntas. |
 | `/teacher/questions/new` | Crear pregunta o partir desde candidato de ingesta. |
-| `/teacher/practice-sets` | Maestro de Practice Sets. |
+| `/teacher/practice-sets` | Practice: mapa por skill (Easy/Medium/Hard por color) y "Manage sets". Reemplaza al antiguo Content map. |
 | `/teacher/practice-sets/new` | Crear Practice Set o importar cuestionario. |
 | `/teacher/full-tests` | Maestro de Full Practice Tests. |
 | `/teacher/full-tests/new` | Crear Full Practice Test o importar cuestionario. |
 | `/teacher/full-tests/scoring` | Explicación del cálculo del puntaje SAT (fórmula y ejemplos). |
-| `/teacher/content` | Mapa de contenido por Math / R&W. |
+| `/teacher/content` | Redirige a Practice (el Content map se unió a Practice). |
 | `/teacher/materials` | Materiales de estudio. |
 | `/teacher/analytics` | Analytics. |
-| `/teacher/compare` | Comparación de alumnos activos. |
+| `/teacher/compare` | Redirige al Home del profesor (pestaña del área). |
 
 ### Student
 

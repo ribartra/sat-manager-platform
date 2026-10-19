@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { SectionHead } from "@/components/sat/test-ui";
 import { ChevronCell, LinkTr, RowLink, SimpleTable, TD } from "@/components/sat/link-table";
 import { TestSectionScore, TestTotalCell } from "@/components/sat/test-cards";
 import { Pct } from "@/components/sat/work-status";
@@ -74,7 +75,7 @@ export function TestAttemptsTable({
   viewingId?: string;
 }) {
   return (
-    <SimpleTable head={["Attempt", "Date", "Reading & Writing", "Math", "Total", ""]}>
+    <SimpleTable head={["Attempt", "Date", <SectionHead key="rw" section="RW" />, <SectionHead key="m" section="MATH" />, "Total", ""]}>
       {rows.map((r) => (
         <LinkTr key={r.id} className={r.id === viewingId ? "bg-blue-50/60" : undefined}>
           <td className={TD}>

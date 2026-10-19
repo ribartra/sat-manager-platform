@@ -85,7 +85,7 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
           </Link>
           <Link
             href="/teacher/questions/new"
-            className="flex items-center gap-1.5 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            className="flex items-center gap-1.5 shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]"
           >
             <Plus size={14} /> New Question
           </Link>

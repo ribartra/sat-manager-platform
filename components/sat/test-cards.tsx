@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
-import { SectionCell } from "@/components/sat/test-ui";
+import { SECTION_TEXT, SectionCell } from "@/components/sat/test-ui";
 import { DueLine, WorkStatusBadges } from "@/components/sat/work-status";
 import { VoidableValue } from "@/components/sat/attempt-status";
 import type { TestAttemptView } from "@/lib/test-view";
@@ -63,7 +63,7 @@ export function TestTotalCell({ attempt }: { attempt: Pick<TestAttemptRow, "stat
 export function TestSectionScore({ attempt, section }: { attempt: Pick<TestAttemptRow, "status" | "view" | "rwScore" | "mathScore">; section: "RW" | "MATH" }) {
   if (attempt.view) return <SectionCell section={attempt.view.sections[section]} />;
   const value = section === "RW" ? attempt.rwScore : attempt.mathScore;
-  return <VoidableValue status={attempt.status}><span className="font-semibold tabular-nums">{value ?? "—"}</span></VoidableValue>;
+  return <VoidableValue status={attempt.status}><span className={cn("font-semibold tabular-nums", SECTION_TEXT[section])}>{value ?? "—"}</span></VoidableValue>;
 }
 
 /** Mini card for one assigned Test (mockup `.mini-bb`): status, then section scores or module progress. */
@@ -90,8 +90,8 @@ export function TestMiniCard({ item, hrefFor }: { item: StudentTestItem; hrefFor
         {item.state === "done" && last ? (
           <>
             <div className="flex gap-4 text-sm">
-              <span><span className="block text-[11px] text-gray-500">R&amp;W</span><b className="text-lg tabular-nums">{last.rwScore ?? "—"}</b></span>
-              <span><span className="block text-[11px] text-gray-500">Math</span><b className="text-lg tabular-nums">{last.mathScore ?? "—"}</b></span>
+              <span><span className="block text-[11px] font-semibold text-[var(--sat-area-reading)]">R&amp;W</span><b className="text-lg tabular-nums">{last.rwScore ?? "—"}</b></span>
+              <span><span className="block text-[11px] font-semibold text-[var(--sat-area-math)]">Math</span><b className="text-lg tabular-nums">{last.mathScore ?? "—"}</b></span>
             </div>
             <p className="text-xs text-gray-500">
               {last.submittedAt ? formatDate(last.submittedAt) : ""} · {item.attempts.length} attempt{item.attempts.length === 1 ? "" : "s"}

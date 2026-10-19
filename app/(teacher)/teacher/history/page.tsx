@@ -173,7 +173,7 @@ function HistoryTableRow({ row: r }: { row: HistoryRow }) {
             <span className="text-xs text-gray-400">—</span>
           ) : (
             <VoidableValue status={r.status}>
-              <span className="whitespace-nowrap">R&amp;W <b className="tabular-nums">{r.rw ?? "—"}</b> · Math <b className="tabular-nums">{r.math ?? "—"}</b></span>
+              <span className="whitespace-nowrap"><span className="text-[var(--sat-area-reading)]">R&amp;W</span> <b className="tabular-nums">{r.rw ?? "—"}</b> · <span className="text-[var(--sat-area-math)]">Math</span> <b className="tabular-nums">{r.math ?? "—"}</b></span>
             </VoidableValue>
           )
         ) : r.pct !== null ? (

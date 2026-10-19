@@ -143,12 +143,12 @@ async function AreaView({ practice, area, page }: { practice: PracticeSetItem[];
         ? one.state === "done" && one.last
           ? `/student/results/${one.last.id}`
           : `/student/practice/assignment/${one.assignmentId}`
-        : `/student/content-map/${skillId}/${diff.toLowerCase()}?area=${tab}`,
+        : `/student?area=${tab}&skill=${skillId}&difficulty=${diff}#sets`,
       title: one ? (one.state === "done" ? "View results" : one.state === "progress" ? "Continue" : "Start") : `${sets.length} sets`,
       extra: (
         <>
           {sets.length > 1 ? ` ×${sets.length}` : ""}
-          {state === "done" && best !== null ? <span className="text-gray-500">· {best}%</span> : null}
+          {state === "done" && best !== null ? <span className="text-[var(--sat-muted)]">· {best}%</span> : null}
         </>
       ),
     };

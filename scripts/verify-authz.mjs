@@ -205,6 +205,16 @@ const checks = [
     label: "User validation is admin-only",
   },
   {
+    file: "app/admin/taxonomy/page.tsx",
+    requires: ["requireAdmin", "redirect(\"/teacher\")"],
+    label: "Taxonomy page is admin-only (the admin layout also admits teachers)",
+  },
+  {
+    file: "app/(teacher)/teacher/impersonate/[studentId]/page.tsx",
+    requires: ["requireTeacherOrAdmin", "studentAccessWhereFor", "IMPERSONATE_STUDENT_VIEW", "teacherViewLinks"],
+    label: "Student view is program-scoped, audited and read-only",
+  },
+  {
     file: "app/api/programs/[id]/teachers/[teacherId]/route.ts",
     requires: ["requireAdmin", "role: \"TEACHER\""],
     label: "Program teacher assignment is admin-only",

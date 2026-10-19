@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { SECTION_TEXT } from "@/components/sat/test-ui";
 import { notFound } from "next/navigation";
 import { InvalidatedNotice, PageShell, SectionHeader, TestAttemptsTable, TestResultSentence, isInvalidated } from "@/components/sat";
 import { RetakeTestButton } from "@/components/sat/retake-test-button";
@@ -178,7 +180,7 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
           <div className="space-y-3">
             {view.modules.map((m, index) => (
               <div key={m.key}>
-                <p className="mb-1 text-xs font-medium text-gray-600">{m.name}{m.state !== "done" ? " · not taken yet" : ""}</p>
+                <p className={cn("mb-1 text-xs font-semibold", SECTION_TEXT[m.section])}>{m.name}{m.state !== "done" ? " · not taken yet" : ""}</p>
                 <AnswerGrid
                   idPrefix={`${m.key}-`}
                   items={modules[index].questions.map((item) => {
@@ -209,7 +211,7 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
             return (
               <section key={testModule.id} id={`mod-${m.key}`} className="scroll-mt-6">
                 <div className="mb-2 flex items-baseline justify-between gap-2">
-                  <h2 className="text-base font-semibold text-gray-900">
+                  <h2 className={cn("text-[17px] font-bold", SECTION_TEXT[m.section])}>
                     {testModule.name} <span className="font-normal text-gray-500">· {m.tier}</span>
                   </h2>
                   {m.state === "done" ? <span className="text-sm text-gray-600">{m.right} of {m.questionCount} correct</span> : null}

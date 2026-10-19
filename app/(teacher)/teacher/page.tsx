@@ -13,6 +13,7 @@ import {
   StudentCell,
   TD,
 } from "@/components/sat";
+import { SectionHead } from "@/components/sat/test-ui";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
@@ -110,7 +111,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
           ) : null}
           <Link
             href="/teacher/students/invite"
-            className="flex items-center gap-1.5 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            className="flex items-center gap-1.5 shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]"
           >
             <UserPlus size={14} /> Invite student
           </Link>
@@ -137,7 +138,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
           {rows.length === 0 ? (
             <EmptyState title="No students match." />
           ) : (
-            <SimpleTable head={["Name", "Latest test", "R&W", "Math", "In progress", "Pending", ""]}>
+            <SimpleTable head={["Name", "Latest test", <SectionHead key="rw" section="RW" short />, <SectionHead key="m" section="MATH" />, "In progress", "Pending", ""]}>
               {rows.map((s) => (
                 <LinkTr key={s.id}>
                   <td className={TD}>
@@ -268,7 +269,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
                       <Link href={`/teacher/students/${s.id}?area=tests`} className="-mx-2 -my-1 block rounded-md px-2 py-1 hover:bg-gray-100">
                         {s.tests.latest ? (
                           <>
-                            <span className="whitespace-nowrap text-sm">R&amp;W <b>{s.tests.latest.rw ?? "—"}</b> · M <b>{s.tests.latest.math ?? "—"}</b></span>
+                            <span className="whitespace-nowrap text-sm"><span className="text-[var(--sat-area-reading)]">R&amp;W</span> <b>{s.tests.latest.rw ?? "—"}</b> · <span className="text-[var(--sat-area-math)]">M</span> <b>{s.tests.latest.math ?? "—"}</b></span>
                             <span className="block text-xs text-gray-500">{s.tests.latest.name}{s.tests.latest.submittedAt ? ` · ${formatDate(s.tests.latest.submittedAt)}` : ""}</span>
                           </>
                         ) : (
@@ -482,7 +483,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
           </label>
         )}
         <div className="flex items-center gap-2">
-          <button type="submit" title="Apply filters" className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700">
+          <button type="submit" title="Apply filters" className="shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-3 py-1.5 text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]">
             Apply
           </button>
           <Link href={`/teacher?area=${area}`} className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">

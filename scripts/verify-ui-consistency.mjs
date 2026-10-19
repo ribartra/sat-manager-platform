@@ -137,7 +137,8 @@ for (const file of files) {
   for (const [dir, dirFiles] of byDir) {
     if (!dirFiles.some((f) => path.basename(f) === "page.tsx") || noCrumbs.has(dir)) continue;
     const texts = await Promise.all(dirFiles.map((f) => readFile(path.join(root, f), "utf8")));
-    if (texts.some((t) => /<PageShell\b/.test(t)) && !texts.some((t) => /<Breadcrumbs\b/.test(t))) {
+    // StudentHome renders the Breadcrumbs itself (student Home and the teacher's Student view).
+    if (texts.some((t) => /<PageShell\b/.test(t)) && !texts.some((t) => /<(Breadcrumbs|StudentHome)\b/.test(t))) {
       failures.push(`${dir}/page.tsx renders PageShell without Breadcrumbs (components/sat/breadcrumbs.tsx)`);
     }
   }

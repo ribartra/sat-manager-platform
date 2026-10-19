@@ -2,7 +2,8 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import type { ModuleView, SectionView, TestAttemptView } from "@/lib/test-view";
 
-const SECTION_TEXT: Record<ModuleView["section"], string> = {
+/** Section colour (mockup: R&W orange, Math blue) for text. */
+export const SECTION_TEXT: Record<ModuleView["section"], string> = {
   RW: "text-[var(--sat-area-reading)]",
   MATH: "text-[var(--sat-area-math)]",
 };
@@ -78,9 +79,14 @@ export function ModuleTiles({
   );
 }
 
+/** Column header / label in the section colour: "Reading & Writing" (or "R&W") and "Math". */
+export function SectionHead({ section, short = false }: { section: ModuleView["section"]; short?: boolean }) {
+  return <span className={SECTION_TEXT[section]}>{section === "MATH" ? "Math" : short ? "R&W" : "Reading & Writing"}</span>;
+}
+
 /** "R&W 650" / "2 of 2 modules" / "Not taken" for tables. */
 export function SectionCell({ section }: { section: SectionView }) {
-  if (section.complete && section.score !== null) return <span className="font-semibold tabular-nums text-gray-900">{section.score}</span>;
+  if (section.complete && section.score !== null) return <span className={cn("font-semibold tabular-nums", SECTION_TEXT[section.section])}>{section.score}</span>;
   if (section.modulesDone > 0) return <span className="text-xs text-gray-500">{section.modulesDone} of {section.modulesTotal} modules</span>;
   return <span className="text-xs text-gray-400">Not taken</span>;
 }

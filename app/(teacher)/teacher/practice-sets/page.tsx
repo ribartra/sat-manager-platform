@@ -8,7 +8,7 @@ import { redirect } from "next/navigation";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { compareSkills } from "@/lib/taxonomy-order";
 import { cn } from "@/lib/utils";
-import { activeAreaTab, practiceAreaFromTab, practiceSectionLabel } from "@/lib/practice-area";
+import { activeAreaTab, practiceAreaFromTab, practiceSectionLabel, resolvePracticeArea, tabFromPracticeArea } from "@/lib/practice-area";
 import { academicTopicWhere } from "@/lib/taxonomy";
 import { MoreLinks } from "@/components/sat/more-links";
 import { auth } from "@/lib/auth";
@@ -32,7 +32,16 @@ const DIFFICULTIES = ["EASY", "MEDIUM", "HARD"] as const;
 
 export default async function TeacherPracticeSetsPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const filters = await searchParams;
-  const area = activeAreaTab(filters.area ?? filters.section, "math");
+  // Links that only know the skill (editor after saving, old Content map URLs) land on its area.
+  const topicArea =
+    !filters.area && !filters.section && filters.topic
+      ? tabFromPracticeArea(
+          resolvePracticeArea(
+            (await prisma.topic.findUnique({ where: { id: filters.topic }, select: { domain: { select: { practiceArea: true } } } }))?.domain ?? {},
+          ),
+        )
+      : null;
+  const area = activeAreaTab(filters.area ?? filters.section ?? topicArea ?? undefined, "math");
   const practiceArea = practiceAreaFromTab(area);
 
   // Tests have their own section; old links to the Tests tab land there.
@@ -85,7 +94,7 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
             (SAT scores are for Tests).
           </p>
         </div>
-        <Link href="/teacher/practice-sets/new" className="inline-flex items-center gap-1.5 self-start rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"><Plus size={14} /> New Practice Set</Link>
+        <Link href="/teacher/practice-sets/new" className="inline-flex items-center gap-1.5 self-start shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-3 py-2 text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]"><Plus size={14} /> New Practice Set</Link>
       </header>
       <MoreLinks links={moreLinks} />
       <PracticeAreaTabs basePath="/teacher/practice-sets" active={area} includeTests={false} preserve={tabPreserve(filters)} />
@@ -123,14 +132,19 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
                           state: "available" as const,
                           href: manageHref({ topic: topic.id, difficulty }),
                           title: `${sets.length} set${sets.length === 1 ? "" : "s"} (${published} published): edit, preview or change status`,
-                          extra: <span className="text-gray-500">· {sets.length}</span>,
+                          extra: (
+                            <span className="text-[var(--sat-muted)]">
+                              {sets.length} set{sets.length === 1 ? "" : "s"}
+                              {sets.length > published ? ` · ${sets.length - published} draft` : ""}
+                            </span>
+                          ),
                         }
                       : {
                           difficulty,
                           state: null,
                           href: `/teacher/practice-sets/new?topicId=${topic.id}`,
                           title: "No set at this level yet: create one",
-                          extra: " · +",
+                          extra: <span className="text-[var(--sat-muted)]">+ New</span>,
                         };
                   }),
                 };

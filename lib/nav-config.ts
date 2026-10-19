@@ -9,7 +9,6 @@ import {
   HelpCircle,
   Layers,
   ClipboardList,
-  BarChart2,
   BookOpen,
   ShieldCheck,
   FolderCog,
@@ -105,10 +104,8 @@ export const TEACHER_MORE_LINKS: Record<"students" | "practice", NavLinkDef[]> =
       hideForAdmin: true,
     },
     { id: "teacher.students.parents", label: "Parents", href: "/teacher/parents", icon: UserCheck },
-    { id: "teacher.students.compare", label: "Compare", href: "/teacher/compare", icon: BarChart2 },
   ],
   practice: [
-    { id: "teacher.practice.map", label: "Content map", href: "/teacher/content", icon: Map },
     { id: "teacher.practice.questions", label: "Questions", href: "/teacher/questions", icon: HelpCircle },
     {
       id: "teacher.practice.materials",
@@ -233,8 +230,8 @@ const NAV_ALIASES: Record<string, string[]> = {
   "/student/tests": ["/student/full-tests"],
   "/student/practice": ["/student/content-map", "/student/results"],
   "/teacher/tests": ["/teacher/full-tests"],
-  "/teacher/students": ["/teacher/groups", "/teacher/parents", "/teacher/compare", "/teacher/impersonate"],
-  "/teacher/practice-sets": ["/teacher/content", "/teacher/questions", "/teacher/materials"],
+  "/teacher/students": ["/teacher/groups", "/teacher/parents", "/teacher/impersonate"],
+  "/teacher/practice-sets": ["/teacher/questions", "/teacher/materials"],
 };
 
 export function linkIsActive(href: string, pathname: string, exact = false): boolean {
@@ -252,10 +249,8 @@ export function hrefWithArea(href: string, area: string | null | undefined): str
     "/student/practice",
     "/student/history",
     "/student/materials",
-    "/teacher/content",
     "/teacher/questions",
     "/teacher/practice-sets",
-    "/teacher/compare",
   ];
   const url = new URL(href, "http://sat.local");
   if (!areaAware.includes(url.pathname)) return href;

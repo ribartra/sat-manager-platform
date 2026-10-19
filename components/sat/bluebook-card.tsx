@@ -90,14 +90,14 @@ export function BluebookCard({ item }: { item: StudentTestItem }) {
       <div className="flex gap-2 border-t border-gray-200 px-3.5 py-2.5">
         {doneNoOpen && last ? (
           <>
-            <Link href={`/student/tests/results/${last.id}`} className="flex-1 rounded-md bg-blue-600 px-3 py-2 text-center text-sm font-semibold text-white hover:bg-blue-700">
+            <Link href={`/student/tests/results/${last.id}`} className="flex-1 shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-3 py-2 text-center text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]">
               REVIEW RESULTS
             </Link>
             <RetakeTestButton assignmentId={item.assignmentId} testName={item.name} iconOnly />
           </>
         ) : (
           <>
-            <Link href={`${base}?module=${next?.key ?? "rw1"}`} className="flex-1 rounded-md bg-blue-600 px-3 py-2 text-center text-sm font-semibold text-white hover:bg-blue-700">
+            <Link href={`${base}?module=${next?.key ?? "rw1"}`} className="flex-1 shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-3 py-2 text-center text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]">
               {open ? "CONTINUE" : "START TEST"}
             </Link>
             {open ? (
