@@ -10,6 +10,8 @@ import { summarizeAllQuestionAnswers } from "@/lib/weighted-score";
 
 export interface AreaOverview {
   last: { at: Date; pct: number | null; setName: string; attemptId: string } | null;
+  /** % points vs. the previous practice in this area (null with fewer than 2 results). */
+  delta: number | null;
   avgPct: number | null;
   attempts: number;
   toDo: number;
@@ -39,7 +41,7 @@ export interface StudentOverview {
 const AREAS: PracticeAreaCode[] = ["MATH", "READING", "WRITING"];
 
 function emptyArea(): AreaOverview {
-  return { last: null, avgPct: null, attempts: 0, toDo: 0, overdue: 0, weakest: null };
+  return { last: null, delta: null, avgPct: null, attempts: 0, toDo: 0, overdue: 0, weakest: null };
 }
 
 export async function loadStudentOverviews(studentIds: string[], now = new Date()): Promise<Map<string, StudentOverview>> {
@@ -105,6 +107,9 @@ export async function loadStudentOverviews(studentIds: string[], now = new Date(
       o.attempts += 1;
       if (!o.last && attempt.submittedAt) {
         o.last = { at: attempt.submittedAt, pct: score.percent, setName: `${set.topic.name} (${set.difficulty.charAt(0)}${set.difficulty.slice(1).toLowerCase()})`, attemptId: attempt.id };
+      } else if (o.last && o.attempts === 2 && o.last.pct !== null && score.percent !== null) {
+        // Attempts come newest first: the second one is the previous practice.
+        o.delta = o.last.pct - score.percent;
       }
       const t = totals.get(area) ?? { correct: 0, total: 0 };
       t.correct += score.correct;

@@ -1,5 +1,28 @@
 import Link from "next/link";
-import { AttemptStatusBadge, PageShell, PageHeader, PageContent, Pagination, VoidableValue, invalidatedRowClass, pageFromParam, paginate } from "@/components/sat";
+import {
+  EmptyState,
+  LinkTr,
+  PageContent,
+  PageHeader,
+  PageShell,
+  Pagination,
+  RowAction,
+  RowLink,
+  SectionHeader,
+  SimpleTable,
+  StudentCell,
+  TD,
+  invalidatedRowClass,
+  pageFromParam,
+  paginate,
+} from "@/components/sat";
+import { TestModuleTiles } from "@/components/sat/test-module-tiles";
+import { Pct } from "@/components/sat/work-status";
+import { Button } from "@/components/ui/button";
+import { getFeatureSetting } from "@/lib/app-settings";
+import { fullTestModulesForAttempt } from "@/lib/full-test-snapshot";
+import { studentAccessWhereFor } from "@/lib/program-scope";
+import { formatDate } from "@/lib/utils";
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
@@ -7,16 +30,13 @@ import { teacherProgramEnrollmentScope } from "@/lib/program-scope";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { QuestionListItem, toQuestionListMedia } from "@/components/question-list-item";
-import { completedModulesOf } from "@/lib/full-test-progress";
-import { moduleViewsForTest } from "@/lib/test-view";
+import { buildTestAttemptView, moduleViewsForTest } from "@/lib/test-view";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
-import { cn } from "@/lib/utils";
 import {
   difficultyBadgeVariant,
   difficultyLabel,
   fullTestStatusBadgeVariant,
   fullTestStatusLabel,
-  assignmentStatusLabel,
   questionTypeLabel,
 } from "@/lib/domain-meta";
 import { resolveQuestionType } from "@/lib/question-type";
@@ -34,6 +54,7 @@ export default async function FullTestDetailPage({ params, searchParams }: PageP
   const { attemptsPage } = await searchParams;
   const session = await requireTeacherOrAdmin();
   if (!session) notFound();
+  const now = new Date();
   // Teachers only see students of their programs; the delete/archive guard still counts everyone.
   const studentScope =
     session.user.role === "TEACHER" ? { student: { programEnrollments: teacherProgramEnrollmentScope(session.user.id) } } : {};
@@ -71,45 +92,157 @@ export default async function FullTestDetailPage({ params, searchParams }: PageP
   });
   if (!test) notFound();
 
-  const attemptPage = paginate(test.attempts, pageFromParam(attemptsPage), ATTEMPTS_PAGE_SIZE);
-  const questionCount = test.modules.reduce((sum, module) => sum + module.questions.length, 0);
+  // Students table (mockup tests.html?test=): every student this teacher can see, assigned or not.
+  const roster = await prisma.user.findMany({
+    where: studentAccessWhereFor(session.user, now),
+    select: { id: true, name: true, email: true, avatarUrl: true },
+    orderBy: { name: "asc" },
+  });
+  const excludePretest = await getFeatureSetting("FPT_PRETEST_EXCLUSION");
+  const attemptsByAssignment = new Map<string, number>();
+  for (const a of test.attempts) if (a.assignmentId && a.status !== "INVALIDATED") attemptsByAssignment.set(a.assignmentId, (attemptsByAssignment.get(a.assignmentId) ?? 0) + 1);
+  const assignmentByStudent = new Map(test.assignments.map((a) => [a.studentId, a]));
+  const rows = await Promise.all(
+    [...roster.filter((st) => assignmentByStudent.has(st.id)), ...roster.filter((st) => !assignmentByStudent.has(st.id))].map(async (st) => {
+      const assignment = assignmentByStudent.get(st.id) ?? null;
+      const attempt = assignment?.attempts[0] ?? null;
+      const view = attempt
+        ? buildTestAttemptView({
+            modules: await fullTestModulesForAttempt(attempt),
+            status: attempt.status,
+            moduleTimerState: attempt.moduleTimerState,
+            answers: attempt.answers,
+            rwScore: attempt.rwScore,
+            mathScore: attempt.mathScore,
+            totalScore: attempt.totalScore,
+            excludePretest,
+          })
+        : null;
+      const overdue = Boolean(assignment && assignment.status !== "COMPLETED" && (assignment.status === "OVERDUE" || (assignment.dueDate && assignment.dueDate < now)));
+      const status = !assignment
+        ? "Not assigned"
+        : attempt?.status === "IN_PROGRESS"
+          ? "In progress"
+          : assignment.status === "COMPLETED"
+            ? "Completed"
+            : overdue
+              ? "Overdue"
+              : "Not started";
+      return { st, assignment, attempt, view, status, tries: assignment ? attemptsByAssignment.get(assignment.id) ?? 0 : 0 };
+    }),
+  );
+  const rowPage = paginate(rows, pageFromParam(attemptsPage), ATTEMPTS_PAGE_SIZE);
+  const firstAssigned = test.assignments.reduce<Date | null>((m, a) => (!m || a.createdAt < m ? a.createdAt : m), null);
+  const nextDue = test.assignments
+    .filter((a) => a.status !== "COMPLETED" && a.dueDate)
+    .reduce<Date | null>((m, a) => (!m || a.dueDate! < m ? a.dueDate : m), null);
   const moduleViews = moduleViewsForTest(test.modules.map((m) => ({ name: m.name, section: m.section, timeLimit: m.timeLimit, questions: m.questions.map((q) => ({ questionId: q.questionId })) })));
   const sectionText = (section: string) => (section === "MATH" ? "text-[var(--sat-area-math)]" : "text-[var(--sat-area-reading)]");
+  const statusBadge = (status: string) =>
+    status === "Completed" ? "success" : status === "In progress" ? "warning" : status === "Overdue" ? "danger" : status === "Not started" ? "info" : "default";
 
   return (
     <PageShell width="wide">
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Tests", href: "/teacher/tests" }, { label: test.name }]} />
       <PageHeader
         title={test.name}
-        description={`4 modules · ${questionCount} questions · ${test.breakMinutes > 0 ? "optional break" : "no break"} · review ${test.reviewEnabled ? "on" : "off"} · see How scores work for the 200–800 calculation`}
+        description={`${firstAssigned ? `Assigned ${formatDate(firstAssigned)}` : "Not assigned yet"}${nextDue ? ` · next due ${formatDate(nextDue)}` : ""} · 4 modules · ${test.breakMinutes > 0 ? "optional break" : "no break"} · review ${test.reviewEnabled ? "on" : "off"}`}
         actions={
           <div className="flex flex-col items-end gap-2">
-            <Badge variant={fullTestStatusBadgeVariant(test.status)}>
-              {fullTestStatusLabel(test.status)}
-            </Badge>
-            <FullTestActions
-              testId={test.id}
-              status={test.status}
-              hasAssignments={test._count.assignments > 0}
-              hasAttempts={test._count.attempts > 0}
-              variant="detail"
-            />
+            <div className="flex flex-wrap gap-2">
+              <Button asChild variant="secondary"><Link href="/teacher/tests">All tests</Link></Button>
+              <Button asChild><Link href={`/teacher/tests/${test.id}/assign`}>Assign this test</Link></Button>
+            </div>
+            <div className="flex items-center gap-2">
+              {test.status !== "PUBLISHED" ? <Badge variant={fullTestStatusBadgeVariant(test.status)}>{fullTestStatusLabel(test.status)}</Badge> : null}
+              <FullTestActions
+                testId={test.id}
+                status={test.status}
+                hasAssignments={test._count.assignments > 0}
+                hasAttempts={test._count.attempts > 0}
+                variant="detail"
+              />
+            </div>
           </div>
         }
       />
       <PageContent>
-      <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {moduleViews.map((m) => (
-          <Card key={m.key} as="a" href={`#module-${m.key}`} padding="md" className="hover:border-gray-400">
-            <p className={cn("text-sm font-semibold", sectionText(m.section))}>{m.short} <span className="font-normal text-gray-500">· {m.tier}</span></p>
-            <p className="mt-1 text-xs text-gray-500">{m.name} · {m.minutes} min</p>
-            <p className="mt-2 text-lg font-semibold text-gray-900">{m.questionCount} questions</p>
-          </Card>
-        ))}
-      </div>
+      <TestModuleTiles modules={moduleViews} />
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="space-y-4">
+      <section id="students" className="mt-6 scroll-mt-6">
+        <SectionHeader title="Students" description="Correct answers per module and section scores (200–800). Click a row to review the answers." />
+        {rows.length === 0 ? (
+          <EmptyState title="No students yet." />
+        ) : (
+          <>
+            <SimpleTable
+              head={[
+                "Student",
+                "Status",
+                ...moduleViews.map((m) => <span key={m.key} className={sectionText(m.section)}>{m.short}</span>),
+                <span key="rw" className="text-[var(--sat-area-reading)]">R&amp;W score</span>,
+                <span key="m" className="text-[var(--sat-area-math)]">Math score</span>,
+                "",
+              ]}
+            >
+              {rowPage.items.map(({ st, assignment, attempt, view, status, tries }) => {
+                const href = attempt ? `/teacher/students/${st.id}/tests/${attempt.id}` : `/teacher/students/${st.id}?area=tests`;
+                const section = (code: "RW" | "MATH") => {
+                  const sec = view?.sections[code];
+                  if (!sec) return <span className="text-xs text-gray-400">Not taken</span>;
+                  if (sec.complete && sec.score !== null) return <b className="text-base tabular-nums">{sec.score}</b>;
+                  return <span className="text-xs text-gray-500">{sec.modulesDone ? `${sec.modulesDone} of 2 modules` : "Not taken"}</span>;
+                };
+                return (
+                  <LinkTr key={st.id} className={attempt ? invalidatedRowClass(attempt.status) : undefined}>
+                    <td className={TD}>
+                      <StudentCell name={st.name} email={st.email} avatarUrl={st.avatarUrl}>
+                        <RowLink href={href} className="block truncate">{st.name}</RowLink>
+                      </StudentCell>
+                    </td>
+                    <td className={TD}>
+                      <Badge variant={statusBadge(status)}>{status}</Badge>
+                      {status === "Completed" && tries > 1 ? <span className="block text-xs text-gray-500">{tries} attempts</span> : null}
+                      {assignment?.dueDate && status !== "Completed" ? <span className="block text-xs text-gray-500">due {formatDate(assignment.dueDate)}</span> : null}
+                    </td>
+                    {moduleViews.map((_, i) => {
+                      const m = view?.modules[i];
+                      return (
+                        <td key={i} className={TD}>
+                          {m?.state === "done" ? (
+                            <Pct value={m.pct} className="font-semibold" />
+                          ) : m?.state === "progress" ? (
+                            <span className="text-xs text-amber-700">In progress</span>
+                          ) : (
+                            <span className="text-xs text-gray-400">—</span>
+                          )}
+                          {m?.state === "done" ? <span className="block text-xs text-gray-500">{m.right}/{m.questionCount}</span> : null}
+                        </td>
+                      );
+                    })}
+                    <td className={TD}>{section("RW")}</td>
+                    <td className={TD}>{section("MATH")}</td>
+                    <td className={`${TD} text-right`}>
+                      {assignment ? (
+                        <span className="text-xs text-blue-600">Open ›</span>
+                      ) : (
+                        <RowAction>
+                          <Button asChild size="sm" variant="ghost">
+                            <Link href={`/teacher/students/${st.id}/assign-test?test=${test.id}`}>Assign</Link>
+                          </Button>
+                        </RowAction>
+                      )}
+                    </td>
+                  </LinkTr>
+                );
+              })}
+            </SimpleTable>
+            <Pagination basePath={`/teacher/tests/${test.id}`} params={{}} param="attemptsPage" anchor="students" pageSize={ATTEMPTS_PAGE_SIZE} {...rowPage} />
+          </>
+        )}
+      </section>
+
+      <div className="mt-6 space-y-4">
           {test.modules.map((module, moduleIndex) => {
             const view = moduleViews[moduleIndex];
             return (
@@ -150,93 +283,6 @@ export default async function FullTestDetailPage({ params, searchParams }: PageP
               </Card>
             );
           })}
-        </div>
-
-        <aside className="space-y-4">
-          <Card>
-            <CardHeader>
-              <h2 className="text-sm font-semibold text-gray-900">Assignments</h2>
-            </CardHeader>
-            <CardBody className="space-y-2">
-              {test.assignments.map((assignment) => {
-                const attempt = assignment.attempts[0];
-                const submitted = attempt?.status === "SUBMITTED";
-                const completed = new Set(attempt ? completedModulesOf(attempt.moduleTimerState, test.modules.length) : []);
-                const answered = new Set((attempt?.answers ?? []).filter((a) => a.answer).map((a) => a.questionId));
-                return (
-                  <div key={assignment.id} className="rounded-md border border-gray-100 px-3 py-2">
-                    <Link href={`/teacher/students/${assignment.studentId}?area=tests`} className="text-sm font-medium text-gray-900 hover:underline">
-                      {assignment.student.name}
-                    </Link>
-                    <p className="text-xs text-gray-500">
-                      {assignmentStatusLabel(assignment.status)}
-                      {assignment.dueDate ? ` · due ${assignment.dueDate.toLocaleDateString()}` : ""}
-                    </p>
-                    {attempt ? (
-                      <div className="mt-1.5 grid grid-cols-2 gap-1">
-                        {moduleViews.map((m, i) => {
-                          const state = submitted || completed.has(i)
-                            ? "done"
-                            : test.modules[i].questions.some((q) => answered.has(q.questionId))
-                              ? "progress"
-                              : "todo";
-                          return (
-                            <span
-                              key={m.key}
-                              className={cn(
-                                "rounded px-1.5 py-0.5 text-[11px]",
-                                state === "done" ? "bg-green-50 text-green-700" : state === "progress" ? "bg-amber-50 text-amber-700" : "bg-gray-50 text-gray-500",
-                              )}
-                            >
-                              {m.short}: {state === "done" ? "done" : state === "progress" ? "in progress" : "not started"}
-                            </span>
-                          );
-                        })}
-                      </div>
-                    ) : null}
-                    {attempt?.status === "SUBMITTED" && attempt.totalScore != null && (
-                      <p className="mt-1 text-xs text-gray-600">Score {attempt.totalScore}</p>
-                    )}
-                  </div>
-                );
-              })}
-              {test.assignments.length === 0 && <p className="text-sm text-gray-400">No assignments yet.</p>}
-            </CardBody>
-          </Card>
-
-          <Card id="recent-attempts">
-            <CardHeader>
-              <h2 className="flex items-center justify-between text-sm font-semibold text-gray-900">
-                Recent results <span className="text-xs font-normal text-gray-400">{test.attempts.length}</span>
-              </h2>
-            </CardHeader>
-            <CardBody className="space-y-2">
-              {attemptPage.items.map((attempt) => (
-                <Link
-                  key={attempt.id}
-                  href={`/teacher/students/${attempt.studentId}/tests/${attempt.id}`}
-                  className={`block rounded-md border border-gray-100 px-3 py-2 hover:border-gray-300 ${invalidatedRowClass(attempt.status) ?? ""}`}
-                >
-                  <p className="text-sm font-medium text-gray-900">{attempt.student.name}</p>
-                  <p className="mt-0.5 flex items-center gap-2 text-xs text-gray-500">
-                    <AttemptStatusBadge status={attempt.status} />
-                    {attempt.totalScore != null ? <VoidableValue status={attempt.status}>{attempt.totalScore}</VoidableValue> : null}
-                  </p>
-                </Link>
-              ))}
-              {test.attempts.length === 0 && <p className="text-sm text-gray-400">Nobody has taken this test yet.</p>}
-            </CardBody>
-            <Pagination
-              basePath={`/teacher/tests/${test.id}`}
-              params={{ attemptsPage }}
-              param="attemptsPage"
-              anchor="recent-attempts"
-              pageSize={ATTEMPTS_PAGE_SIZE}
-              {...attemptPage}
-              className="border-t border-gray-100"
-            />
-          </Card>
-        </aside>
       </div>
       </PageContent>
     </PageShell>

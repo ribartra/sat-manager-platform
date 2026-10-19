@@ -71,7 +71,13 @@ export function TestMiniCard({ item, hrefFor }: { item: StudentTestItem; hrefFor
   const last = item.lastSubmitted;
   const open = item.openAttempt;
   const href = open ? hrefFor(open.id) : last ? hrefFor(last.id) : null;
-  const tone = item.state === "done" ? "bg-green-50 text-green-800" : item.state === "progress" ? "bg-amber-50 text-amber-800" : item.overdue ? "bg-red-50 text-red-800" : "bg-gray-50 text-gray-600";
+  // Mockup `.mini-bb .t`: grey header with dark ink; red when overdue; light grey when not started.
+  const tone =
+    item.overdue && item.state !== "done"
+      ? "bg-red-600 text-white"
+      : item.state === "todo"
+        ? "bg-[var(--sat-tests-soft)] text-[var(--sat-tests-ink)]"
+        : "bg-[var(--sat-area-tests)] text-[var(--sat-tests-ink)]";
   const body = (
     <>
       <div className={cn("flex items-center justify-between gap-2 rounded-t-lg px-3 py-2", tone)}>

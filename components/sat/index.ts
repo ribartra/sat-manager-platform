@@ -20,5 +20,5 @@ export { AreaSummaryCard, AreaPracticeRow, AreaBoxGrid, CompactAreaBox, studentA
 export { TestMiniCard, TestResultSentence, TestAttemptResultCell, TestTotalCell, TestSectionScore } from "./test-cards";
 export { PracticeAttemptsTable, TestAttemptsTable, type PracticeAttemptRow } from "./attempts-table";
 export { SkillsMap, SkillsMapLegend, SkillDifficultyMatrix, DIFFICULTIES, type SkillsMapSkill, type SkillsMapChip, type MatrixCell, type ChipState } from "./skills-map";
-export { AttentionCard, AttentionItem, DateCell, StudentCell } from "./teacher-ui";
+export { AttentionCard, AttentionItem, AttentionRow, DateCell, StudentCell, shortName } from "./teacher-ui";
 export { ContinueCard } from "./continue-card";

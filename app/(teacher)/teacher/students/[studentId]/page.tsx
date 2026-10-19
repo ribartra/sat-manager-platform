@@ -1,5 +1,7 @@
 import {
+  AreaBoxGrid,
   AreaSummaryCard,
+  CompactAreaBox,
   AttemptStatusBadge,
   ChevronCell,
   Delta,
@@ -35,17 +37,19 @@ import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { formatDate, formatDuration, formatTime } from "@/lib/utils";
+import { formatClock, formatDate, formatDuration, formatTime } from "@/lib/utils";
 import { assignmentStatusLabel, difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
 import { scoreBandTextClass } from "@/lib/score-band";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { ProgressFilters } from "@/components/progress-filters";
 import { PerformanceBreakdown } from "@/components/performance-breakdown";
 import { TopicDifficultyTrend } from "@/components/topic-difficulty-trend";
 import { MockSectionChart } from "@/components/progress-charts";
 import { Hint, InfoHint } from "@/components/hint";
-import { ClipboardList, Eye, Pencil, Plus } from "lucide-react";
+import { ClipboardList, Eye, History, Pencil, Plus } from "lucide-react";
+import { Avatar } from "@/components/avatar";
 import { StudentDetailActions } from "./actions-client";
 import { StudentSwitcher } from "./student-switcher";
 import { GenerateReportDialog } from "./generate-report-dialog";
@@ -161,47 +165,61 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
 
   const header = (
     <>
-      <div className="mb-3 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-        <div className="min-w-0">
-          <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Students", href: "/teacher/students" }, { label: student.name }]} />
-          <h1 className="text-2xl font-semibold text-gray-900">{student.name}</h1>
-          <p className="mt-0.5 truncate text-xs text-gray-500">
-            {student.email} · {student.phone ?? "—"}
-            {student.startDate && <> · Since {formatDate(student.startDate)}</>}
-            {teacherGroupManagementEnabled && <> · Groups: {student.groups.map((g) => g.group.name).join(", ") || "—"}</>}
-            {" · "}Programs: {student.programEnrollments.map((e) => e.program.name).join(", ") || "—"}
-          </p>
-          <ParentAuthorization studentId={studentId} studentName={student.name} state={parentAuthView} />
+      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Students", href: "/teacher/students" }, { label: student.name }]} />
+      <div className="mb-3 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+        <div className="flex min-w-0 items-start gap-3">
+          <Avatar name={student.name} avatarUrl={student.avatarUrl} size="xl" />
+          <div className="min-w-0">
+            <h1 className="text-2xl font-semibold text-gray-900">{student.name}</h1>
+            <p className="mt-0.5 truncate text-xs text-gray-500">
+              {student.email} · {student.phone ?? "—"}
+              {student.startDate && <> · Student since {formatDate(student.startDate)}</>}
+              {teacherGroupManagementEnabled && <> · Groups: {student.groups.map((g) => g.group.name).join(", ") || "—"}</>}
+              {" · "}Programs: {student.programEnrollments.map((e) => e.program.name).join(", ") || "—"}
+            </p>
+            <p className="text-xs text-gray-500">
+              Last active: {student.lastActiveAt ? `${formatDate(student.lastActiveAt)} (${relativeDay(student.lastActiveAt)})` : "never"}
+            </p>
+            <ParentAuthorization studentId={studentId} studentName={student.name} state={parentAuthView} />
+          </div>
         </div>
-        <StudentSwitcher students={roster} selectedStudentId={studentId} query={switcherQuery} />
+        <div className="flex flex-col items-start gap-2 lg:items-end">
+          <div className="flex flex-wrap items-center gap-2">
+            <Link href="/teacher" className={secondaryButton}>Back to Home</Link>
+            <Hint label="See the app the way this student sees it (view only).">
+              <Link href={buildProgressHref(`/teacher/impersonate/${studentId}`, filters)} className={secondaryButton}>
+                <Eye size={14} /> Student view
+              </Link>
+            </Hint>
+            <Link href={`/teacher/students/${studentId}?area=history`} className={secondaryButton}>
+              <History size={14} /> History
+            </Link>
+            <GenerateReportDialog
+              studentId={studentId}
+              studentName={student.name}
+              currentArea={area}
+              filters={reportFilters}
+              filterSummary={filterSummary}
+              exams={reportExams}
+              parents={reportParents}
+            />
+          </div>
+          <StudentSwitcher students={roster} selectedStudentId={studentId} query={switcherQuery} />
+        </div>
       </div>
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <Hint label="Give this student one or more practice sets.">
-          <Link href={buildProgressHref(`/teacher/students/${studentId}/assign`, filters)} className="inline-flex h-8 items-center justify-center gap-1 rounded-md bg-blue-600 px-3 text-sm font-medium text-white hover:bg-blue-700">
+          <Link href={buildProgressHref(`/teacher/students/${studentId}/assign`, filters)} className="inline-flex h-9 items-center justify-center gap-1 rounded-md bg-blue-600 px-3.5 text-sm font-medium text-white hover:bg-blue-700">
             <Plus size={14} /> Assign practice
           </Link>
         </Hint>
         <Hint label="Give this student a full-length Test (4 modules).">
-          <Link href={buildProgressHref(`/teacher/students/${studentId}/assign-test`, filters)} className="inline-flex h-8 items-center justify-center gap-1 rounded-md border border-blue-600 px-3 text-sm font-medium text-blue-700 hover:bg-blue-50">
+          <Link href={buildProgressHref(`/teacher/students/${studentId}/assign-test`, filters)} className="inline-flex h-9 items-center justify-center gap-1 rounded-md bg-[var(--sat-area-tests)] px-3.5 text-sm font-medium text-[var(--sat-tests-ink)] hover:brightness-95">
             <ClipboardList size={14} /> Assign test
           </Link>
         </Hint>
         <span className="mx-1 hidden h-5 w-px bg-gray-200 sm:inline-block" aria-hidden />
-        <GenerateReportDialog
-          studentId={studentId}
-          studentName={student.name}
-          currentArea={area}
-          filters={reportFilters}
-          filterSummary={filterSummary}
-          exams={reportExams}
-          parents={reportParents}
-        />
-        <Hint label="See the app the way this student sees it (view only).">
-          <Link href={buildProgressHref(`/teacher/impersonate/${studentId}`, filters)} className={secondaryButton}>
-            <Eye size={14} /> Student view
-          </Link>
-        </Hint>
         <Hint label="Edit name, email, phone and start date.">
           <Link href={`/teacher/students/${studentId}/edit`} className={secondaryButton}>
             <Pencil size={14} /> Edit
@@ -215,7 +233,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
         active={view as HomeTabKey}
         includeSummary
         extraTabs={[
-          { key: "history", label: "History" },
+          { key: "history", label: "History · attempts & scores" },
           { key: "activity", label: "Activity" },
         ]}
         preserve={{ difficulty: filters.difficulty, from: filters.from, to: filters.to }}
@@ -233,131 +251,97 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
   );
   const first = student.name.split(" ")[0];
 
-  // ---------------------------------------------------------------- Summary
+  // ---------------------------------------------------------------- Summary (mockup mejorada/teacher/student.html)
   if (view === "summary") {
     const [overview, tests, pendingSets] = await Promise.all([
       loadStudentOverviews([studentId], now).then((m) => m.get(studentId)!),
       loadStudentTests(studentId),
       prisma.assignment.findMany({
         where: { studentId, status: { in: ["PENDING", "IN_PROGRESS", "OVERDUE"] } },
-        include: { practiceSet: { select: { name: true } } },
-        orderBy: { dueDate: "asc" },
-        take: 8,
+        select: { id: true, status: true, dueDate: true },
       }),
     ]);
-    const activity = await loadActivity(studentId, 6);
+    const activity = await loadActivity(studentId, 4);
     const testItems = tests.filter((t) => t.attempts.length > 0 || t.state !== "done");
     const suggestions = (["MATH", "READING", "WRITING"] as PracticeAreaCode[])
       .map((code) => ({ code, w: overview.areas[code].weakest }))
       .filter((x): x is { code: PracticeAreaCode; w: NonNullable<typeof x.w> } => Boolean(x.w))
       .sort((a, b) => a.w.pct - b.w.pct);
     const { pending: pendingTests } = sortTests(tests);
+    const pendingCount = pendingTests.length + pendingSets.length;
+    const overdueCount =
+      pendingTests.filter((t) => t.overdue).length + pendingSets.filter((a) => a.status === "OVERDUE" || (a.dueDate && a.dueDate < now)).length;
     return (
       <PageShell width="wide">
         {header}
-        <h2 className="text-base font-semibold text-gray-900">What {first} has done in practice</h2>
-        <p className="mb-2 text-xs text-gray-500">% correct in practice sets. Click a box to see that area.</p>
-        <div className="grid gap-3 md:grid-cols-3">
+        <AreaBoxGrid>
           {(["MATH", "READING", "WRITING"] as PracticeAreaCode[]).map((code) => {
             const o = overview.areas[code];
-            const label = practiceAreaLabel(code);
             return (
-              <AreaSummaryCard
+              <CompactAreaBox
                 key={code}
                 area={code}
-                label={label}
+                label={practiceAreaLabel(code)}
                 href={`/teacher/students/${studentId}?area=${code.toLowerCase()}`}
-                latest={
-                  o.last
-                    ? {
-                        caption: <>Latest practice · {o.last.setName} · {formatDate(o.last.at)}</>,
-                        pct: o.last.pct,
-                        detail: <>Average <Pct value={o.avgPct} /></>,
-                      }
-                    : null
-                }
-                chips={[
-                  { label: "Practice attempts", value: o.attempts },
-                  { label: "To do", value: o.toDo },
-                  { label: "Overdue", value: o.overdue, tone: o.overdue ? "danger" : "default" },
-                ]}
-                weakest={o.weakest ? <>Weakest skill: <b>{o.weakest.name}</b> ({difficultyLabel(o.weakest.difficulty)}, {o.weakest.pct}%)</> : null}
-                footer={`${o.toDo} set${o.toDo === 1 ? "" : "s"} to do`}
-                action={`See ${label}`}
-                emptyText={`No ${label} practice yet.`}
+                pct={o.last?.pct ?? null}
+                line1={o.last ? `Latest practice · ${relativeDay(o.last.at)}` : "Not practiced yet"}
+                delta={o.delta}
+                line2={o.weakest ? <>Weakest: <b className="text-gray-700">{o.weakest.name}</b></> : `${o.attempts} practice attempt${o.attempts === 1 ? "" : "s"}`}
               />
             );
           })}
-        </div>
+        </AreaBoxGrid>
 
-        <div className="mb-2 mt-6 flex items-baseline justify-between">
-          <h2 className="text-base font-semibold text-gray-900">Tests</h2>
-          <Link href={`/teacher/students/${studentId}?area=tests`} className="text-xs font-medium text-blue-600 hover:underline">All test results →</Link>
-        </div>
-        {testItems.length === 0 ? (
-          <Card padding="md" className="text-sm text-gray-400">No tests assigned.</Card>
-        ) : (
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {testItems.map((t) => <TestMiniCard key={t.assignmentId} item={t} hrefFor={(id) => `/teacher/students/${studentId}/tests/${id}`} />)}
-          </div>
-        )}
-
-        <div className="mt-6 grid gap-6 lg:grid-cols-3">
-          <section className="lg:col-span-2">
-            <div className="mb-2 flex items-baseline justify-between">
-              <h2 className="text-base font-semibold text-gray-900">Recent activity</h2>
-              <Link href={`/teacher/students/${studentId}?area=activity`} className="text-xs font-medium text-blue-600 hover:underline">All activity →</Link>
+        <section className="mt-6">
+          <SectionHeader
+            title={<>Tests <span className="text-xs font-normal text-gray-500">· section scores</span></>}
+            action={<Link href={`/teacher/students/${studentId}?area=history&type=tests`} className="text-sm text-blue-600 hover:underline">Attempts &amp; scores ›</Link>}
+          />
+          {testItems.length === 0 ? (
+            <Card padding="md" className="text-sm text-gray-400">No tests assigned.</Card>
+          ) : (
+            <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(160px,1fr))]">
+              {testItems.map((t) => <TestMiniCard key={t.assignmentId} item={t} hrefFor={(id) => `/teacher/students/${studentId}/tests/${id}`} />)}
             </div>
+          )}
+        </section>
+
+        <div className="mt-6 grid items-start gap-4 lg:grid-cols-2">
+          <section>
+            <SectionHeader title="Recent activity" action={<Link href={`/teacher/students/${studentId}?area=history`} className="text-sm text-blue-600 hover:underline">History ›</Link>} />
             <ActivityList items={activity} studentId={studentId} />
           </section>
-          <aside className="space-y-4">
-            <Card padding="md">
-              <h2 className="text-sm font-semibold text-gray-900">Then, assign something</h2>
-              <p className="mb-2 text-xs text-gray-500">Suggestions from {first}&apos;s weakest practice skills</p>
-              {suggestions.length === 0 ? (
-                <p className="text-sm text-gray-400">Not enough results yet. Start with a test as a diagnostic.</p>
+          <Card padding="md">
+            <h2 className="text-sm font-semibold text-gray-900">Then, assign something</h2>
+            <p className="mb-3 mt-0.5 text-sm text-gray-600">
+              {pendingCount ? (
+                <>
+                  <b>{pendingCount}</b> pending{overdueCount ? <> · <b className="text-red-600">{overdueCount} overdue</b></> : null}
+                </>
               ) : (
-                <ul className="space-y-2">
-                  {suggestions.slice(0, 3).map(({ code, w }) => (
-                    <li key={`${w.topicId}-${w.difficulty}`} className="flex items-center justify-between gap-2 text-sm">
-                      <span className="min-w-0">
-                        <span className="block truncate font-medium text-gray-800">{w.name} <Badge>{difficultyLabel(w.difficulty)}</Badge></span>
-                        <span className="text-xs text-gray-500">{practiceAreaLabel(code)} · {w.pct}% correct</span>
-                      </span>
-                      <Link
-                        href={`/teacher/students/${studentId}/assign?area=${code.toLowerCase()}&topic=${w.topicId}&difficulty=${w.difficulty}`}
-                        className="shrink-0 text-xs font-medium text-blue-600 hover:underline"
-                      >
-                        Assign practice
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
+                "Nothing pending"
               )}
-              <Link href={`/teacher/students/${studentId}/assign-test`} className="mt-3 block rounded-md border border-blue-600 px-3 py-1.5 text-center text-sm font-medium text-blue-700 hover:bg-blue-50">
-                Assign a test
-              </Link>
-            </Card>
-            <Card padding="md">
-              <h2 className="mb-2 text-sm font-semibold text-gray-900">Pending for {first}</h2>
-              {pendingTests.length === 0 && pendingSets.length === 0 ? (
-                <p className="text-sm text-gray-400">Nothing pending.</p>
-              ) : (
-                <ul className="space-y-1.5 text-sm">
-                  {pendingTests.map((t) => (
-                    <li key={t.assignmentId} className={t.overdue ? "text-red-700" : "text-gray-800"}>
-                      {t.name} test{t.dueDate ? <span className="text-xs text-gray-500"> · Due {formatDate(t.dueDate)}</span> : null}
-                    </li>
-                  ))}
-                  {pendingSets.map((a) => (
-                    <li key={a.id} className={a.status === "OVERDUE" ? "text-red-700" : "text-gray-800"}>
-                      {shortSetName(a.practiceSet.name)} practice{a.dueDate ? <span className="text-xs text-gray-500"> · Due {formatDate(a.dueDate)}</span> : null}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Card>
-          </aside>
+            </p>
+            {suggestions.length === 0 ? (
+              <p className="text-sm text-gray-400">Start with a practice set or a test.</p>
+            ) : (
+              <ul className="divide-y divide-gray-100 rounded-lg border border-gray-100">
+                {suggestions.slice(0, 2).map(({ code, w }) => (
+                  <li key={`${w.topicId}-${w.difficulty}`} className="flex items-center justify-between gap-2 px-3 py-2 text-sm">
+                    <span className="min-w-0 truncate">
+                      <b className="font-medium text-gray-800">{w.name}</b> <Pct value={w.pct} className="font-semibold" />
+                    </span>
+                    <Button asChild size="sm" variant="secondary">
+                      <Link href={`/teacher/students/${studentId}/assign?area=${code.toLowerCase()}&topic=${w.topicId}&difficulty=${w.difficulty}`}>Assign practice</Link>
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <Button asChild variant="secondary" className="mt-3 w-full">
+              <Link href={`/teacher/students/${studentId}/assign-test`}>Assign a test</Link>
+            </Button>
+          </Card>
         </div>
       </PageShell>
     );
@@ -370,7 +354,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
       <PageShell width="wide">
         {header}
         <p className="mb-2 text-sm text-gray-500">Every practice set and test, newest first. Click to review.</p>
-        <ActivityList items={activity} studentId={studentId} />
+        <ActivityList items={activity} studentId={studentId} grouped />
       </PageShell>
     );
   }
@@ -618,7 +602,10 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
   }
 
   // ---------------------------------------------------------------- Practice (Math / Reading / Writing)
-  const report = await loadPracticeReport(studentId, practiceArea, reportFilters);
+  const [report, areaOverview] = await Promise.all([
+    loadPracticeReport(studentId, practiceArea, reportFilters),
+    loadStudentOverviews([studentId], now).then((m) => m.get(studentId)!.areas[practiceArea]),
+  ]);
   const { areaLabel, kpis } = report;
   const attemptPage = paginate(report.attemptHistory, pageFromParam(query.attemptsPage), HISTORY_PAGE_SIZE);
   const triesByAssignment = new Map<string, number>();
@@ -660,10 +647,30 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div id="performance" className="min-w-0 space-y-6 lg:col-span-2">
-          <section>
+          <section className="grid items-start gap-4 xl:grid-cols-[minmax(0,320px)_1fr]">
+            <AreaSummaryCard
+              area={practiceArea}
+              label={`${areaLabel} practice`}
+              latest={
+                areaOverview.last
+                  ? {
+                      caption: <>Latest practice · {areaOverview.last.setName} · {formatDate(areaOverview.last.at)}</>,
+                      pct: areaOverview.last.pct,
+                      detail: "correct",
+                    }
+                  : null
+              }
+              delta={areaOverview.delta}
+              chips={[{ label: "Average", value: areaOverview.avgPct !== null ? `${areaOverview.avgPct}%` : "—" }]}
+              weakest={areaOverview.weakest ? <>Weakest skill: <b>{areaOverview.weakest.name}</b> ({areaOverview.weakest.pct}%)</> : null}
+              footer={`${areaOverview.attempts} practice attempt${areaOverview.attempts === 1 ? "" : "s"} · ${areaOverview.toDo} set${areaOverview.toDo === 1 ? "" : "s"} to do`}
+              action=""
+              emptyText={`No ${areaLabel} practice yet.`}
+            />
+            <div className="min-w-0">
             <SectionHeader
               title={`${areaLabel} skills by difficulty`}
-              description="% correct in practice · click a cell to filter this page · Assign gives more practice for that skill"
+              description="Practice only · % correct by difficulty · click a cell to filter this page"
             />
             <SkillDifficultyMatrix
               selected={{ skill: topicId, difficulty }}
@@ -699,6 +706,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                 ),
               }))}
             />
+            </div>
           </section>
 
           <PerformanceBreakdown
@@ -980,30 +988,42 @@ async function loadActivity(studentId: string, take: number): Promise<ActivityIt
   return items.sort((a, b) => b.at.getTime() - a.at.getTime()).slice(0, take);
 }
 
-function ActivityList({ items, studentId }: { items: ActivityItem[]; studentId: string }) {
+/** Practice and Test activity, newest first; `grouped` adds a heading per day (Activity tab). */
+function ActivityList({ items, studentId, grouped = false }: { items: ActivityItem[]; studentId: string; grouped?: boolean }) {
   void studentId;
   if (items.length === 0) return <Card padding="md" className="text-sm text-gray-400">This student has no activity yet.</Card>;
+  const dayOf = (d: Date) => d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+  const days = grouped ? [...new Set(items.map((i) => dayOf(i.at)))] : [""];
   return (
-    <Card className="overflow-hidden">
-      <ul className="divide-y divide-gray-100">
-        {items.map((item) => (
-          <li key={`${item.kind}-${item.id}`}>
-            <Link href={item.href} className={`flex items-center justify-between gap-3 px-3 py-2 hover:bg-gray-50 ${invalidatedRowClass(item.status) ?? ""}`}>
-              <span className="min-w-0">
-                <span className="flex flex-wrap items-center gap-1.5">
-                  <Badge variant={item.kind === "Test" ? "test" : "default"}>{item.kind}</Badge>
-                  <span className="text-xs text-gray-500">{item.area}</span>
-                  <span className="truncate text-sm font-medium text-gray-800">{item.title}</span>
-                  {item.status === "IN_PROGRESS" ? <Badge variant="warning">In progress</Badge> : null}
-                  {isInvalidated(item.status) ? <AttemptStatusBadge status={item.status} /> : null}
-                </span>
-                <span className="block text-xs text-gray-400">{formatDate(item.at)} · {relativeDay(item.at)}</span>
-              </span>
-              {item.kind === "Practice" ? <Pct value={item.pct} className="shrink-0 text-sm font-semibold" /> : <span className="shrink-0 text-xs text-blue-600">Review</span>}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </Card>
+    <div className="space-y-3">
+      {days.map((day) => (
+        <div key={day || "all"}>
+          {grouped ? <p className="mb-1 mt-2 text-sm font-semibold text-gray-500">{day}</p> : null}
+          <Card className="overflow-hidden">
+            <ul className="divide-y divide-gray-100">
+              {items
+                .filter((item) => !grouped || dayOf(item.at) === day)
+                .map((item) => (
+                  <li key={`${item.kind}-${item.id}`}>
+                    <Link href={item.href} className={`flex items-center justify-between gap-3 px-3 py-2 hover:bg-gray-50 ${invalidatedRowClass(item.status) ?? ""}`}>
+                      <span className="min-w-0">
+                        <span className="flex flex-wrap items-center gap-1.5">
+                          <Badge variant={item.kind === "Test" ? "test" : "default"}>{item.kind}</Badge>
+                          <span className="text-xs text-gray-500">{item.area}</span>
+                          <span className="truncate text-sm font-medium text-gray-800">{item.title}</span>
+                          {item.status === "IN_PROGRESS" ? <Badge variant="warning">In progress</Badge> : null}
+                          {isInvalidated(item.status) ? <AttemptStatusBadge status={item.status} /> : null}
+                        </span>
+                        <span className="block text-xs text-gray-400">{grouped ? formatClock(item.at) : `${formatDate(item.at)} · ${relativeDay(item.at)}`}</span>
+                      </span>
+                      {item.kind === "Practice" ? <Pct value={item.pct} className="shrink-0 text-sm font-semibold" /> : <span className="shrink-0 text-xs text-blue-600">Review</span>}
+                    </Link>
+                  </li>
+                ))}
+            </ul>
+          </Card>
+        </div>
+      ))}
+    </div>
   );
 }

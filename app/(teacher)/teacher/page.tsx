@@ -1,6 +1,5 @@
 import {
-  AttentionCard,
-  AttentionItem,
+  AttentionRow,
   ChevronCell,
   DateCell,
   EmptyState,
@@ -19,7 +18,7 @@ import Link from "next/link";
 import { formatDate, relativeDay } from "@/lib/utils";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, Clock, Flag, UserPlus } from "lucide-react";
+import { Clock, Flag, TrendingDown, UserPlus } from "lucide-react";
 import { UnlockRequestActions } from "./unlock-request-actions-client";
 import { auth } from "@/lib/auth";
 import { getFeatureSetting } from "@/lib/app-settings";
@@ -185,41 +184,41 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
     return (
       <PageShell width="wide" density="compact" className="space-y-4">
         {head(rows.length)}
-        <div className="grid gap-3 md:grid-cols-3">
-          <AttentionCard title="Inactive 5+ days" icon={<Clock size={14} />} tone="warn" count={inactive.length}>
-            {inactive.map((s) => (
-              <AttentionItem
-                key={s.id}
-                name={s.name}
-                avatarUrl={s.avatarUrl}
-                href={`/teacher/students/${s.id}`}
-                detail={s.lastActiveAt ? `Last active ${relativeDay(s.lastActiveAt, now)}` : "Never active"}
-              />
-            ))}
-          </AttentionCard>
-          <AttentionCard title="Overdue tests" icon={<Flag size={14} />} tone="bad" count={overdueTests.length}>
-            {overdueTests.map((s) => (
-              <AttentionItem
-                key={s.id}
-                name={s.name}
-                avatarUrl={s.avatarUrl}
-                href={`/teacher/students/${s.id}?area=tests`}
-                detail={s.tests.pending.filter((p) => p.overdue).map((p) => p.name).join(", ")}
-              />
-            ))}
-          </AttentionCard>
-          <AttentionCard title="Section under 550 in latest test" icon={<AlertTriangle size={14} />} tone="info" count={lowScores.length}>
-            {lowScores.map((s) => (
-              <AttentionItem
-                key={s.id}
-                name={s.name}
-                avatarUrl={s.avatarUrl}
-                href={`/teacher/students/${s.id}?area=tests`}
-                detail={<>{s.tests.latest?.name} · R&amp;W {s.tests.latest?.rw ?? "—"} · Math {s.tests.latest?.math ?? "—"}</>}
-              />
-            ))}
-          </AttentionCard>
-        </div>
+        <Card padding="none" className="flex flex-col gap-2 px-4 py-3">
+          <AttentionRow
+            icon={<Clock size={14} />}
+            label="Inactive 5+ days"
+            tone="warn"
+            people={inactive.map((s) => ({
+              id: s.id,
+              name: s.name,
+              href: `/teacher/students/${s.id}`,
+              detail: s.lastActiveAt ? `Last active ${relativeDay(s.lastActiveAt, now)}` : "Never active",
+            }))}
+          />
+          <AttentionRow
+            icon={<Flag size={14} />}
+            label="Overdue tests"
+            tone="bad"
+            people={overdueTests.map((s) => ({
+              id: s.id,
+              name: s.name,
+              href: `/teacher/students/${s.id}?area=tests`,
+              detail: s.tests.pending.filter((p) => p.overdue).map((p) => p.name).join(", "),
+            }))}
+          />
+          <AttentionRow
+            icon={<TrendingDown size={14} />}
+            label="Section under 550"
+            tone="info"
+            people={lowScores.map((s) => ({
+              id: s.id,
+              name: s.name,
+              href: `/teacher/students/${s.id}?area=tests`,
+              detail: `${s.tests.latest?.name ?? ""} · R&W ${s.tests.latest?.rw ?? "—"} · Math ${s.tests.latest?.math ?? "—"}`,
+            }))}
+          />
+        </Card>
 
         <section>
           <SectionHeader title="Students" description="Click a row to see everything the student has done. Click an area cell to go straight to that area." />
@@ -532,15 +531,10 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
 
       <TeacherStudentsTable
         showGroups={teacherGroupManagementEnabled}
+        areaLabel={practiceAreaLabel(practiceArea)}
         filterQuery={progressFilterQuery({ area, topic: topicId, difficulty })}
         rows={students.map((student): TeacherStudentRow => {
-          const areaActivity = student.attempts.map((attempt) => attempt.submittedAt).filter((value): value is Date => Boolean(value));
-          const lastActiveAt = areaActivity.sort((a, b) => b.getTime() - a.getTime())[0];
-          const inactive = !lastActiveAt || lastActiveAt < fiveDaysAgo;
-          const studentGroups = teacherGroupManagementEnabled
-            ? student.groups.map((gm) => gm.group.name).join(", ")
-            : "";
-          const programs = student.programEnrollments.map((pe) => pe.program.name).join(", ");
+          const studentGroups = teacherGroupManagementEnabled ? student.groups.map((gm) => gm.group.name).join(", ") : "";
           const avgScore = summarizeAllQuestionAnswers(student.attempts.flatMap((attempt) => attempt.answers)).percent;
           const last = student.attempts[0];
           const lastScore = last ? summarizeAllQuestionAnswers(last.answers).percent : null;
@@ -553,21 +547,18 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
             id: student.id,
             name: student.name,
             email: student.email,
-            programsLabel: programs || "—",
+            avatarUrl: student.avatarUrl,
             groupsLabel: teacherGroupManagementEnabled ? studentGroups || "—" : null,
-            lastActiveLabel: lastActiveAt
-              ? `${formatDate(lastActiveAt)}${inactive ? " ⚠" : ""}`
-              : "Never",
-            lastActiveTone: !lastActiveAt ? "never" : inactive ? "warn" : "ok",
-            pendingCount: student.assignments.length,
-            avgScoreLabel: avgScore !== null ? `${avgScore}%` : "—",
-            avgScoreTone:
-              avgScore === null ? "none" : avgScore >= 80 ? "high" : avgScore >= 60 ? "mid" : "low",
-            avgScoreFiltered: avgScore !== null && hasAttemptFilter,
-            active: student.active,
+            lastPracticeAt: last?.submittedAt ? formatDate(last.submittedAt) : null,
             lastPracticeLabel: last?.assignment?.practiceSet
               ? `${last.assignment.practiceSet.topic.name} (${difficultyLabel(last.assignment.practiceSet.difficulty)})${lastScore !== null ? ` · ${lastScore}%` : ""}`
               : undefined,
+            lastPracticeHref: last ? `/teacher/students/${student.id}/attempts/${last.id}` : undefined,
+            setsCompleted: new Set(student.attempts.map((attempt) => attempt.practiceSetId)).size,
+            pendingCount: student.assignments.length,
+            avgScoreLabel: avgScore !== null ? `${avgScore}%` : "—",
+            avgScoreTone: avgScore === null ? "none" : avgScore >= 80 ? "high" : avgScore >= 60 ? "mid" : "low",
+            avgScoreFiltered: avgScore !== null && hasAttemptFilter,
             weakestLabel: weakest ? `${weakest.label} · ${weakest.pct}%` : undefined,
             assignHref: `/teacher/students/${student.id}/assign?area=${area}`,
           };

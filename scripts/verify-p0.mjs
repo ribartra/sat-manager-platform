@@ -86,8 +86,8 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/students-table-client.tsx",
-    requires: ["Last Active", "lastActiveLabel", "lastActiveTone"],
-    label: "Tabla de estudiantes expone columna Last Active",
+    requires: ["Last ${areaLabel} practice", "lastPracticeLabel", "Average correct", "setsCompleted"],
+    label: "Tabla de estudiantes por area: ultima practica, sets completados, promedio (mockup mejorada)",
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/page.tsx",

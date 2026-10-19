@@ -72,3 +72,45 @@ export function StudentCell({ name, email, avatarUrl, children }: { name: string
     </span>
   );
 }
+
+/** "Ana P." for the compact attention chips. */
+export function shortName(name: string) {
+  const [first, ...rest] = name.trim().split(/\s+/);
+  const last = rest[rest.length - 1];
+  return last ? `${first} ${last[0]}.` : first;
+}
+
+/**
+ * One line of the compact "Needs attention" card (mockup `mejorada/teacher/index.html`): coloured
+ * label with icon and count, then a chip per student (details in the chip tooltip).
+ */
+export function AttentionRow({
+  icon,
+  label,
+  tone,
+  people,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  tone: "warn" | "bad" | "info";
+  people: { id: string; name: string; href: string; detail: string }[];
+}) {
+  const color = tone === "warn" ? "text-amber-700" : tone === "bad" ? "text-red-600" : "text-blue-600";
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <span className={cn("flex min-w-[190px] items-center gap-1.5 text-sm font-semibold", color)}>
+        {icon} {label}
+        <Badge variant={people.length ? (tone === "bad" ? "danger" : tone === "warn" ? "warning" : "info") : "default"}>{people.length}</Badge>
+      </span>
+      {people.length === 0 ? (
+        <span className="text-sm text-gray-400">Nobody</span>
+      ) : (
+        people.map((p) => (
+          <Link key={p.id} href={p.href} title={p.detail} className="rounded-full border border-gray-200 bg-white px-2.5 py-0.5 text-sm text-gray-800 hover:border-gray-400">
+            {shortName(p.name)}
+          </Link>
+        ))
+      )}
+    </div>
+  );
+}

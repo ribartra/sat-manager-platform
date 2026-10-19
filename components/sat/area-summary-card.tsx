@@ -16,7 +16,8 @@ import { formatDate, relativeDay } from "@/lib/utils";
 export interface AreaSummaryCardProps {
   area: PracticeAreaCode;
   label: string;
-  href: string;
+  /** Without href the box is a plain card (teacher area tab). */
+  href?: string;
   latest: { caption: React.ReactNode; pct: number | null; detail?: React.ReactNode } | null;
   delta?: number | null;
   chips?: { label: string; value: React.ReactNode; tone?: "default" | "danger" }[];
@@ -30,15 +31,15 @@ export function AreaSummaryCard({ area, label, href, latest, delta, chips = [], 
   const tab = tabFromPracticeArea(area) ?? "math";
   return (
     <Card
-      as={Link}
+      as={href ? Link : "div"}
       href={href}
       padding="md"
-      className="flex min-h-[14rem] flex-col gap-2 border-t-[6px] hover:border-gray-400"
+      className={`flex min-h-[14rem] flex-col gap-2 border-t-[6px] ${href ? "hover:border-gray-400" : ""}`}
       style={{ borderTopColor: `var(--sat-area-${tab})` }}
     >
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold" style={{ color: `var(--sat-area-${tab})` }}>{label}</h2>
-        <span aria-hidden className="text-gray-400">›</span>
+        {href ? <span aria-hidden className="text-gray-400">›</span> : null}
       </div>
       {latest ? (
         <div>
