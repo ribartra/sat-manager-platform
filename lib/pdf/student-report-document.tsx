@@ -26,10 +26,10 @@ export type StudentReportData = {
 Font.registerHyphenationCallback((word) => [word]);
 
 const AREA = {
-  math: { label: "Math", color: "#0ea5e9", tint: "#e0f2fe" },
-  reading: { label: "Reading", color: "#c4a035", tint: "#fbf3dc" },
-  writing: { label: "Writing", color: "#16a34a", tint: "#dcfce7" },
-  mocks: { label: "Tests", color: "#ea580c", tint: "#ffedd5" },
+  math: { label: "Math", color: "#305bab", tint: "#eaf0fa" },
+  reading: { label: "Reading", color: "#e89600", tint: "#fdf4e3" },
+  writing: { label: "Writing", color: "#09a63b", tint: "#e6f6ec" },
+  mocks: { label: "Tests", color: "#6b7280", tint: "#f2f2f2" },
 } as const;
 
 const GRAY = { 900: "#111827", 700: "#374151", 500: "#6b7280", 400: "#9ca3af", 200: "#e5e7eb", 100: "#f3f4f6", 50: "#f9fafb" };

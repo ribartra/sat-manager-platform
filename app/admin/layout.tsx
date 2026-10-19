@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { NavTeacher } from "@/components/nav-teacher";
+import { TeacherShell } from "@/components/nav-teacher";
 import { auth } from "@/lib/auth";
 import { getFeatureFlagValues } from "@/lib/feature-flags";
 import prisma from "@/lib/prisma";
@@ -21,14 +21,8 @@ export default async function AdminSectionLayout({ children }: { children: React
   const flags = await getFeatureFlagValues({ role: session.user.role, userId: session.user.id });
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <NavTeacher
-        userName={session.user.name}
-        avatarUrl={user.avatarUrl}
-        role={session.user.role}
-        flags={flags}
-      />
-      <main className="flex-1 bg-gray-50">{children}</main>
-    </div>
+    <TeacherShell userName={session.user.name} avatarUrl={user.avatarUrl} role={session.user.role} flags={flags}>
+      {children}
+    </TeacherShell>
   );
 }

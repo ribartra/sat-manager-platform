@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { NavStudent } from "@/components/nav-student";
+import { StudentShell } from "@/components/nav-student";
 import prisma from "@/lib/prisma";
 import { getFeatureFlagValues } from "@/lib/feature-flags";
 
@@ -36,15 +36,14 @@ export default async function StudentLayout({ children }: { children: React.Reac
   const flags = await getFeatureFlagValues({ role: session.user.role, userId: session.user.id });
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <NavStudent
-        userName={session.user.name}
-        avatarUrl={user.avatarUrl}
-        isImpersonated={isImpersonated}
-        hasActiveEnrollment={hasActiveEnrollment}
-        flags={flags}
-      />
-      <main className="flex min-h-0 flex-1 flex-col">{children}</main>
-    </div>
+    <StudentShell
+      userName={session.user.name}
+      avatarUrl={user.avatarUrl}
+      isImpersonated={isImpersonated}
+      hasActiveEnrollment={hasActiveEnrollment}
+      flags={flags}
+    >
+      {children}
+    </StudentShell>
   );
 }

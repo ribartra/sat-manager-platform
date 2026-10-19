@@ -426,7 +426,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
             />
           )}
 
-          <section id="history" aria-labelledby="history-results-heading" className="scroll-mt-20">
+          <section id="history" aria-labelledby="history-results-heading" className="scroll-mt-6">
             <SectionHeader title={<span id="history-results-heading">Practice history</span>} description="Click a row to see each question again." />
 
             <div className="hidden md:block">

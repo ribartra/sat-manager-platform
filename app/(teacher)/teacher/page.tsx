@@ -230,7 +230,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
               "Name",
               "Last active",
               ...PRACTICE_AREAS.map((a) => <span key={a.code} style={{ color: `var(--sat-area-${a.tab})` }}>{practiceAreaLabel(a.code)}</span>),
-              <span key="tests" className="text-[var(--sat-area-tests)]">Tests</span>,
+              <span key="tests" className="text-[var(--sat-tests-ink)]">Tests</span>,
               "",
             ]}>
               {rows.map((s) => (

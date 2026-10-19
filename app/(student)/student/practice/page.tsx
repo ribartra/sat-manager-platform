@@ -146,7 +146,7 @@ async function AreaView({ practice, area, page }: { practice: PracticeSetItem[];
 
   return (
     <>
-      <section id="sets" className="mb-6 scroll-mt-20">
+      <section id="sets" className="mb-6 scroll-mt-6">
         <SectionHeader
           title={`Your ${practiceAreaLabel(area)} practice sets`}
           description={`${mine.length} set${mine.length === 1 ? "" : "s"} · in progress first, then by due date`}

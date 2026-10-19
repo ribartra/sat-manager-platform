@@ -57,7 +57,9 @@ for (const [role, routes] of Object.entries(ROUTES)) {
           isPageShell: !!shell?.hasAttribute?.("data-page-shell"), firstY: firstChild ? Math.round(firstChild.getBoundingClientRect().top) : null,
           padL: shellStyle ? parseFloat(shellStyle.paddingLeft) : null,
           contentMinX: Math.round(minX), contentMaxX: Math.round(maxX), scrollX: document.documentElement.scrollWidth > innerWidth,
-          navBottom: (() => { const bar = logo?.closest("header, nav"); return bar ? Math.round(bar.getBoundingClientRect().bottom) : 0; })(),
+          // Left sidebar (2026-10): the nav is a vertical column; content starts at its right edge.
+          sidebarRight: (() => { const bar = logo?.closest("nav"); if (!bar) return 0; const b = bar.getBoundingClientRect(); return b.height > b.width && b.left >= 0 ? Math.round(b.right) : 0; })(),
+          navBottom: (() => { const bar = logo?.closest("header, nav"); if (!bar) return 0; const b = bar.getBoundingClientRect(); return b.height > b.width ? 0 : Math.round(b.bottom); })(),
         };
       });
       await page.screenshot({ path: `${outDir}/shots/${slug}.png` });

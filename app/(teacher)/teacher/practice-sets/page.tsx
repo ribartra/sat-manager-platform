@@ -10,6 +10,10 @@ import { compareSkills } from "@/lib/taxonomy-order";
 import { cn } from "@/lib/utils";
 import { activeAreaTab, practiceAreaFromTab, practiceSectionLabel } from "@/lib/practice-area";
 import { academicTopicWhere } from "@/lib/taxonomy";
+import { MoreLinks } from "@/components/sat/more-links";
+import { auth } from "@/lib/auth";
+import { getFeatureFlagValues } from "@/lib/feature-flags";
+import { TEACHER_MORE_LINKS, resolveLinks } from "@/lib/nav-config";
 
 interface SearchParams {
   area?: string;
@@ -34,6 +38,11 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
   // Tests have their own section; old links to the Tests tab land there.
   if (area === "tests") redirect("/teacher/tests");
   const view = filters.view === "manage" ? "manage" : "skills";
+  const session = await auth();
+  const moreLinks = resolveLinks(TEACHER_MORE_LINKS.practice, {
+    role: session?.user.role,
+    flags: await getFeatureFlagValues({ role: session?.user.role, userId: session?.user.id }),
+  });
 
   const topicWhere = practiceArea ? { AND: [academicTopicWhere, { domain: { practiceArea } }] } : academicTopicWhere;
   const topics = await prisma.topic.findMany({
@@ -67,16 +76,18 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
 
   return (
     <PageShell width="wide" density="compact" className="space-y-4">
-      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Practice sets" }]} />
+      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Practice" }]} />
       <header className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Practice sets</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">Practice</h1>
           <p className="mt-1 text-sm text-gray-500">
-            Every SAT skill has Easy, Medium and Hard sets. Results show as % correct only (SAT scores are for Tests).
+            Manage practice sets: every SAT skill in Math, Reading and Writing has an Easy, Medium and Hard set. Results show as % correct only
+            (SAT scores are for Tests).
           </p>
         </div>
         <Link href="/teacher/practice-sets/new" className="inline-flex items-center gap-1.5 self-start rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"><Plus size={14} /> New Practice Set</Link>
       </header>
+      <MoreLinks links={moreLinks} />
       <PracticeAreaTabs basePath="/teacher/practice-sets" active={area} includeTests={false} preserve={tabPreserve(filters)} />
       <nav aria-label="Practice sets view" className="flex gap-1 text-sm">
         {(["skills", "manage"] as const).map((v) => (

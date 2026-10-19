@@ -80,46 +80,48 @@ function isNavGroupDef(item: TeacherNavEntryDef): item is NavGroupDef {
   return "links" in item;
 }
 
-/** Declarative Teacher (+ Admin) navigation. Desktop, drawer and future crumbs share this. */
+/**
+ * Teacher sidebar (mockup `mejorada/teacher`): exactly Home · Students · Tests · Practice · History.
+ * The other teacher pages are reached from in-page "More" rows (TEACHER_MORE_LINKS) and the user
+ * menu (Programs); admins also get the Admin group.
+ */
 export const TEACHER_NAV: TeacherNavEntryDef[] = [
   { id: "teacher.home", label: "Home", href: "/teacher", icon: Home, exact: true },
-  {
-    id: "teacher.students",
-    label: "Students",
-    icon: Users,
-    links: [
-      { id: "teacher.students.list", label: "Students", href: "/teacher/students", icon: Users },
-      {
-        id: "teacher.students.groups",
-        label: "Groups",
-        href: "/teacher/groups",
-        icon: UsersRound,
-        feature: "TEACHER_GROUP_MANAGEMENT",
-        hideForAdmin: true,
-      },
-      { id: "teacher.students.parents", label: "Parents", href: "/teacher/parents", icon: UserCheck },
-      { id: "teacher.students.compare", label: "Compare", href: "/teacher/compare", icon: BarChart2 },
-      { id: "teacher.students.history", label: "History", href: "/teacher/history", icon: Clock },
-    ],
-  },
-  {
-    id: "teacher.practice",
-    label: "Practice",
-    icon: BookOpen,
-    links: [
-      { id: "teacher.practice.sets", label: "Practice sets", href: "/teacher/practice-sets", icon: BookOpen },
-      { id: "teacher.practice.map", label: "Content map", href: "/teacher/content", icon: Map },
-      { id: "teacher.practice.questions", label: "Questions", href: "/teacher/questions", icon: HelpCircle },
-      {
-        id: "teacher.practice.materials",
-        label: "Materials",
-        href: "/teacher/materials",
-        icon: FileText,
-        feature: "MATERIALS_MODULE",
-      },
-    ],
-  },
+  { id: "teacher.students", label: "Students", href: "/teacher/students", icon: Users },
   { id: "teacher.tests", label: "Tests", href: "/teacher/tests", icon: ClipboardList },
+  { id: "teacher.practice", label: "Practice", href: "/teacher/practice-sets", icon: BookOpen },
+  { id: "teacher.history", label: "History", href: "/teacher/history", icon: Clock },
+];
+
+/** Secondary teacher pages, shown as a "More" row on the Students and Practice pages. */
+export const TEACHER_MORE_LINKS: Record<"students" | "practice", NavLinkDef[]> = {
+  students: [
+    {
+      id: "teacher.students.groups",
+      label: "Groups",
+      href: "/teacher/groups",
+      icon: UsersRound,
+      feature: "TEACHER_GROUP_MANAGEMENT",
+      hideForAdmin: true,
+    },
+    { id: "teacher.students.parents", label: "Parents", href: "/teacher/parents", icon: UserCheck },
+    { id: "teacher.students.compare", label: "Compare", href: "/teacher/compare", icon: BarChart2 },
+  ],
+  practice: [
+    { id: "teacher.practice.map", label: "Content map", href: "/teacher/content", icon: Map },
+    { id: "teacher.practice.questions", label: "Questions", href: "/teacher/questions", icon: HelpCircle },
+    {
+      id: "teacher.practice.materials",
+      label: "Materials",
+      href: "/teacher/materials",
+      icon: FileText,
+      feature: "MATERIALS_MODULE",
+    },
+  ],
+};
+
+/** Teacher user-menu links (Programs lives here since the sidebar keeps the 5 mockup items). */
+export const TEACHER_USER_MENU_LINKS: NavLinkDef[] = [
   {
     id: "teacher.programs",
     label: "Programs",
@@ -129,6 +131,15 @@ export const TEACHER_NAV: TeacherNavEntryDef[] = [
     hideForAdmin: true,
   },
 ];
+
+export function resolveLinks(
+  links: NavLinkDef[],
+  opts: { role?: string; flags: Partial<Record<FeatureSettingKey, boolean>> },
+): ResolvedNavLink[] {
+  return links
+    .filter((link) => linkVisible(link, opts))
+    .map((link) => ({ href: link.href, label: link.label, icon: link.icon, exact: link.exact }));
+}
 
 export const ADMIN_NAV_GROUP: NavGroupDef = {
   id: "admin",
@@ -222,6 +233,8 @@ const NAV_ALIASES: Record<string, string[]> = {
   "/student/tests": ["/student/full-tests"],
   "/student/practice": ["/student/content-map", "/student/results"],
   "/teacher/tests": ["/teacher/full-tests"],
+  "/teacher/students": ["/teacher/groups", "/teacher/parents", "/teacher/compare", "/teacher/impersonate"],
+  "/teacher/practice-sets": ["/teacher/content", "/teacher/questions", "/teacher/materials"],
 };
 
 export function linkIsActive(href: string, pathname: string, exact = false): boolean {

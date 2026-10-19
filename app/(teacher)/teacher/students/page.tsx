@@ -5,6 +5,9 @@ import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
+import { MoreLinks } from "@/components/sat/more-links";
+import { getFeatureFlagValues } from "@/lib/feature-flags";
+import { TEACHER_MORE_LINKS, resolveLinks } from "@/lib/nav-config";
 import prisma from "@/lib/prisma";
 import { studentAccessWhereFor } from "@/lib/program-scope";
 import { isInactive, loadStudentOverviews, type StudentOverview } from "@/lib/teacher-overview";
@@ -25,6 +28,10 @@ type Show = keyof typeof SHOW;
 /** Students roster: search, a status filter, last activity, latest Test scores and pending Tests. */
 export default async function TeacherStudentsPage({ searchParams }: PageProps) {
   const session = await auth();
+  const moreLinks = resolveLinks(TEACHER_MORE_LINKS.students, {
+    role: session?.user.role,
+    flags: await getFeatureFlagValues({ role: session?.user.role, userId: session?.user.id }),
+  });
   const now = new Date();
   const query = await searchParams;
   const search = query.q?.trim() ?? "";
@@ -70,6 +77,8 @@ export default async function TeacherStudentsPage({ searchParams }: PageProps) {
           <UserPlus size={14} /> Invite student
         </Link>
       </div>
+
+      <MoreLinks links={moreLinks} />
 
       <Card as="form" padding="sm" className="mb-4 flex flex-wrap items-end gap-3">
         <label className="min-w-[12rem] flex-1 text-xs font-medium text-gray-600">

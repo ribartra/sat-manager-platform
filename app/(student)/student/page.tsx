@@ -193,7 +193,7 @@ function SummaryView({ practice, tests }: { practice: PracticeSetItem[]; tests: 
                 <LinkTr key={r.a.id}>
                   <td className={`${TD} text-gray-600`}>{formatDate(r.when)}<span className="block text-xs text-gray-400">{r.a.status === "IN_PROGRESS" ? "Started" : "Completed"} {relativeDay(r.when)}</span></td>
                   <td className={TD}><RowLink href={`/student/tests/results/${r.a.id}`}>{r.test.name}</RowLink> {r.a.status === "IN_PROGRESS" ? <Badge variant="warning">In progress</Badge> : null}</td>
-                  <td className={TD}><Badge className="bg-gray-900 text-white">Test</Badge></td>
+                  <td className={TD}><Badge variant="test">Test</Badge></td>
                   <td className={TD}>Try {r.a.tryNumber}</td>
                   <td className={TD}><TestAttemptResultCell attempt={r.a} /></td>
                   <ChevronCell />
@@ -346,7 +346,7 @@ async function AreaPracticeView({
         />
       </StatGrid>
 
-      <section id="sets" className="mt-6 scroll-mt-20">
+      <section id="sets" className="mt-6 scroll-mt-6">
         <SectionHeader
           title="Your practice sets"
           description={`${filtered.length} set${filtered.length === 1 ? "" : "s"} · in progress first, then by due date`}

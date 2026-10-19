@@ -54,7 +54,7 @@ export function TestTotalCell({ attempt }: { attempt: Pick<TestAttemptRow, "stat
   if (attempt.totalScore === null) return <span className="text-gray-400">—</span>;
   return (
     <VoidableValue status={attempt.status}>
-      <span className="inline-flex rounded-md bg-gray-900 px-2 py-0.5 text-sm font-semibold tabular-nums text-white">{attempt.totalScore}</span>
+      <span className="inline-flex rounded-md bg-[var(--sat-area-tests)] px-2 py-0.5 text-sm font-semibold tabular-nums text-[var(--sat-tests-ink)]">{attempt.totalScore}</span>
     </VoidableValue>
   );
 }

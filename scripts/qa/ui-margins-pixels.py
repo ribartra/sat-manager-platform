@@ -21,7 +21,8 @@ for r in rows:
     W, H = im.size
     top = int(r.get("navBottom") or 0) + 8
     band = (top, min(H, top + 240))
-    bg = Counter(im.getpixel((x, band[0] + 2)) for x in range(0, 8)).most_common(1)[0][0]
+    x0 = int(r.get("sidebarRight") or 0) + 1  # skip the left sidebar column
+    bg = Counter(im.getpixel((x, band[0] + 2)) for x in range(x0, x0 + 8)).most_common(1)[0][0]
 
     def col_has_ink(x):
         for y in range(band[0], band[1], 2):
@@ -30,7 +31,7 @@ for r in rows:
                 return True
         return False
 
-    left = next((x for x in range(W) if col_has_ink(x)), None)
+    left = next((x for x in range(x0, W) if col_has_ink(x)), None)
     right = next((x for x in range(W - 1, -1, -1) if col_has_ink(x)), None)
     res.append({"role": r["role"], "route": r["route"], "inkLeft": left, "inkRight": right, "domShellX": (r.get("shell") or {}).get("x"), "domH1X": (r.get("h1") or {}).get("x")})
 json.dump(res, open(f"{out}/pixels.json", "w"), indent=1)

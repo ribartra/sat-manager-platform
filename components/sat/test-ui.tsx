@@ -105,12 +105,12 @@ export function ScoreBlocks({ view, actionFor }: { view: TestAttemptView; action
     <div className="grid gap-3 sm:grid-cols-[1fr_1fr_1.2fr]">
       {block(view.sections.RW)}
       {block(view.sections.MATH)}
-      <Card padding="md" className="border-t-4 border-t-[var(--sat-area-tests)]">
-        <p className="text-xs font-medium text-gray-500">Total score</p>
-        <p className={cn("mt-1 font-bold tabular-nums", view.total !== null ? "text-3xl text-gray-900" : "text-xl text-gray-400")}>
+      <Card padding="md" className="border-[var(--sat-area-tests)] bg-[var(--sat-area-tests)] text-[var(--sat-tests-ink)]">
+        <p className="text-xs font-medium text-gray-700">Total score</p>
+        <p className={cn("mt-1 font-bold tabular-nums", view.total !== null ? "text-3xl" : "text-xl text-gray-600")}>
           {view.total ?? "—"}
         </p>
-        <p className="text-xs text-gray-500">{view.total !== null ? "out of 1600" : "Available when all 4 modules are done"}</p>
+        <p className="text-xs text-gray-700">{view.total !== null ? "out of 1600" : "Available when all 4 modules are done"}</p>
       </Card>
     </div>
   );

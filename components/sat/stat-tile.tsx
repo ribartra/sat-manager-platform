@@ -6,7 +6,7 @@ type StatTone = "default" | "dark" | "warning" | "danger";
 
 /**
  * Big-number tile (mockup stat cards): label, value, one sub line. With `href` the whole tile is a
- * link (e.g. "see them" sets a filter). `dark` is the Test total tile.
+ * link (e.g. "see them" sets a filter). `dark` is the Test total tile (grey with dark ink, as in the mockup).
  */
 export function StatTile({
   label,
@@ -33,20 +33,20 @@ export function StatTile({
           aria-hidden
           className={cn(
             "flex h-9 w-9 shrink-0 items-center justify-center rounded-full",
-            dark ? "bg-white/10 text-white" : tone === "danger" ? "bg-red-50 text-red-600" : tone === "warning" ? "bg-amber-50 text-amber-600" : "bg-gray-100 text-gray-600",
+            dark ? "bg-white/40 text-[var(--sat-tests-ink)]" : tone === "danger" ? "bg-red-50 text-red-600" : tone === "warning" ? "bg-amber-50 text-amber-600" : "bg-gray-100 text-gray-600",
           )}
         >
           {icon}
         </span>
       ) : null}
       <div className="min-w-0">
-        <p className={cn("text-xs font-medium", dark ? "text-gray-300" : "text-gray-500")}>{label}</p>
-        <p className={cn("mt-0.5 text-2xl font-bold tabular-nums leading-tight", dark ? "text-white" : "text-gray-900")}>{value}</p>
-        {sub ? <p className={cn("mt-0.5 text-xs", dark ? "text-gray-300" : "text-gray-500")}>{sub}</p> : null}
+        <p className={cn("text-xs font-medium", dark ? "text-gray-700" : "text-gray-500")}>{label}</p>
+        <p className={cn("mt-0.5 text-2xl font-bold tabular-nums leading-tight", dark ? "text-[var(--sat-tests-ink)]" : "text-gray-900")}>{value}</p>
+        {sub ? <p className={cn("mt-0.5 text-xs", dark ? "text-gray-600" : "text-gray-500")}>{sub}</p> : null}
       </div>
     </div>
   );
-  const classes = cn(dark && "border-gray-900 bg-gray-900", href && (dark ? "hover:bg-gray-800" : "hover:border-gray-400"), className);
+  const classes = cn(dark && "border-[var(--sat-area-tests)] bg-[var(--sat-area-tests)]", href && (dark ? "hover:brightness-95" : "hover:border-gray-400"), className);
   return href ? (
     <Card as={Link} href={href} padding="md" className={cn("block", classes)}>
       {body}

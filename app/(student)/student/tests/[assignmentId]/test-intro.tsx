@@ -91,7 +91,7 @@ export async function TestIntro({
       />
       <Card padding="lg" className="mx-auto max-w-3xl">
         <div className="flex flex-wrap items-center gap-1.5">
-          <Badge className="bg-gray-900 text-white">{assignment.test.name}{tryNumber > 1 ? ` · try ${tryNumber}` : ""}</Badge>
+          <Badge variant="test">{assignment.test.name}{tryNumber > 1 ? ` · try ${tryNumber}` : ""}</Badge>
           <Badge>{current.tier}</Badge>
           {current.state === "progress" ? <Badge variant="warning">In progress</Badge> : null}
         </div>

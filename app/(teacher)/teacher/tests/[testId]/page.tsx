@@ -113,7 +113,7 @@ export default async function FullTestDetailPage({ params, searchParams }: PageP
           {test.modules.map((module, moduleIndex) => {
             const view = moduleViews[moduleIndex];
             return (
-              <Card key={module.id} id={`module-${view.key}`} className="scroll-mt-20">
+              <Card key={module.id} id={`module-${view.key}`} className="scroll-mt-6">
                 <CardHeader className="flex items-center justify-between gap-3">
                   <div>
                     <h2 className="text-sm font-semibold text-gray-900">

@@ -207,7 +207,7 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
           {modules.map((testModule, index) => {
             const m = view.modules[index];
             return (
-              <section key={testModule.id} id={`mod-${m.key}`} className="scroll-mt-20">
+              <section key={testModule.id} id={`mod-${m.key}`} className="scroll-mt-6">
                 <div className="mb-2 flex items-baseline justify-between gap-2">
                   <h2 className="text-base font-semibold text-gray-900">
                     {testModule.name} <span className="font-normal text-gray-500">· {m.tier}</span>

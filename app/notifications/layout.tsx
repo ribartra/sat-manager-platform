@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { NavStudent } from "@/components/nav-student";
-import { NavTeacher } from "@/components/nav-teacher";
+import { StudentShell } from "@/components/nav-student";
+import { TeacherShell } from "@/components/nav-teacher";
 import { auth } from "@/lib/auth";
 import { getFeatureFlagValues } from "@/lib/feature-flags";
 import prisma from "@/lib/prisma";
@@ -23,15 +23,9 @@ export default async function NotificationsLayout({ children }: { children: Reac
     const flags = await getFeatureFlagValues({ role: session.user.role, userId: session.user.id });
 
     return (
-      <div className="min-h-screen flex flex-col">
-        <NavTeacher
-          userName={session.user.name}
-          avatarUrl={user.avatarUrl}
-          role={session.user.role}
-          flags={flags}
-        />
-        <main className="flex-1 bg-gray-50">{children}</main>
-      </div>
+      <TeacherShell userName={session.user.name} avatarUrl={user.avatarUrl} role={session.user.role} flags={flags}>
+        {children}
+      </TeacherShell>
     );
   }
 
@@ -51,15 +45,9 @@ export default async function NotificationsLayout({ children }: { children: Reac
     const flags = await getFeatureFlagValues({ role: session.user.role, userId: session.user.id });
 
     return (
-      <div className="min-h-screen flex flex-col">
-        <NavStudent
-          userName={session.user.name}
-          avatarUrl={user.avatarUrl}
-          hasActiveEnrollment={hasActiveEnrollment}
-          flags={flags}
-        />
-        <main className="flex-1">{children}</main>
-      </div>
+      <StudentShell userName={session.user.name} avatarUrl={user.avatarUrl} hasActiveEnrollment={hasActiveEnrollment} flags={flags}>
+        {children}
+      </StudentShell>
     );
   }
 

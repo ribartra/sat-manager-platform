@@ -26,11 +26,14 @@
   --sat-orange-600: #ea580c;
   --sat-mustard-600: #c4a035;
 
-  /* Practice / Mock area colors (Analytics, History, Reports) */
-  --sat-area-math: #0ea5e9; /* sky blue */
-  --sat-area-reading: #c4a035; /* mustard */
-  --sat-area-writing: #16a34a; /* green */
-  --sat-area-tests: #ea580c; /* orange */
+  /* Area colors (mockup `mejorada`): practice areas and Tests */
+  --sat-area-math: #305bab; /* blue */
+  --sat-area-reading: #e89600; /* orange; also R&W on Test surfaces */
+  --sat-area-writing: #09a63b; /* green */
+  --sat-area-tests: #b0b0b0; /* grey: text on it uses --sat-tests-ink, never white */
+  --sat-tests-ink: #1f2937;
+  --sat-tests-soft: #f2f2f2;
+  --sat-ok: #16a34a;
 
   /* Semantic */
   --background: var(--sat-white);
@@ -48,7 +51,7 @@
   --ring: var(--sat-blue-600);
 
   /* Layout */
-  /* Single page width shared by the nav and every view (narrow/default kept as aliases). */
+  /* Single page width for every view, next to the left sidebar (narrow/default kept as aliases). */
   --sat-page-wide: 72rem;
   --sat-page-narrow: var(--sat-page-wide);
   --sat-page-default: var(--sat-page-wide);

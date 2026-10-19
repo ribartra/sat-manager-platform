@@ -98,7 +98,7 @@ export default async function StudentTestsPage({ searchParams }: PageProps) {
       {shown.length === 0 ? (
         <EmptyState title={view === "pending" ? "No pending tests. Great job!" : "No tests here yet."} />
       ) : (
-        <div id="tests" className="scroll-mt-20 space-y-4">
+        <div id="tests" className="scroll-mt-6 space-y-4">
           {page.items.map((t) => (
             <TestCard key={t.assignmentId} item={t} />
           ))}
@@ -110,7 +110,7 @@ export default async function StudentTestsPage({ searchParams }: PageProps) {
         <div className="mt-6 grid gap-4 lg:grid-cols-2">
           <Card padding="md">
             <SectionHeader size="sm" title="Total score over time" description="Completed tests only · 400–1600" />
-            <LineChart title="Total score over time" min={400} max={1600} labels={chartLabels} series={[{ name: "Total", color: "#111827", values: submitted.map((s) => s.attempt.totalScore) }]} />
+            <LineChart title="Total score over time" min={400} max={1600} labels={chartLabels} series={[{ name: "Total", color: "#6b7280", values: submitted.map((s) => s.attempt.totalScore) }]} />
           </Card>
           <Card padding="md">
             <SectionHeader size="sm" title="Section scores over time" description="Each section is scored 200–800" />
@@ -142,7 +142,7 @@ function TestCard({ item }: { item: StudentTestItem }) {
   const next = item.openAttempt?.view?.nextModule ?? null;
   const showPicker = item.state !== "done";
   return (
-    <Card id={`test-${item.assignmentId}`} padding="md" className="scroll-mt-20">
+    <Card id={`test-${item.assignmentId}`} padding="md" className="scroll-mt-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="flex flex-wrap items-center gap-2">

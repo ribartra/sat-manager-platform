@@ -415,7 +415,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                 <Card key={head.groupId} padding="md">
                   <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                     <div className="flex flex-wrap items-center gap-2">
-                      {isTest ? <Badge className="bg-gray-900 text-white">Test</Badge> : <Badge>Practice</Badge>}
+                      {isTest ? <Badge variant="test">Test</Badge> : <Badge>Practice</Badge>}
                       {head.area ? <AreaTag area={head.area} /> : null}
                       <h3 className="text-sm font-semibold text-gray-900">{head.title}</h3>
                       {head.difficulty ? <Badge variant={difficultyBadgeVariant(head.difficulty)}>{difficultyLabel(head.difficulty)}</Badge> : null}
@@ -495,7 +495,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
         <KpiStrip
           items={[
             { label: "Tests completed", value: String(report.kpis.exams), hint: "Finished in the selected dates." },
-            { label: "Latest total score", value: String(report.kpis.latestTotal ?? "—"), className: "text-[var(--sat-area-tests)]", hint: "Total score (out of 1600) on the most recent test." },
+            { label: "Latest total score", value: String(report.kpis.latestTotal ?? "—"), className: "text-[var(--sat-tests-ink)]", hint: "Total score (out of 1600) on the most recent test." },
             { label: "Latest Reading & Writing", value: String(report.kpis.latestRw ?? "—"), hint: "Reading & Writing score (out of 800) on the most recent test." },
             { label: "Latest Math", value: String(report.kpis.latestMath ?? "—"), hint: "Math score (out of 800) on the most recent test." },
             { label: "Tests to do", value: String(report.kpis.pending), hint: "Assigned but not finished yet." },
@@ -569,7 +569,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
           </aside>
         </div>
 
-        <section id="exam-history" className="mt-6 scroll-mt-20">
+        <section id="exam-history" className="mt-6 scroll-mt-6">
           <SectionHeader
             title="Test attempts"
             description={`${testAttemptRows.length} attempt${testAttemptRows.length === 1 ? "" : "s"} · every try is kept; "Not counted" tries don't count toward scores`}
@@ -818,7 +818,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
         </aside>
       </div>
 
-      <section id="recent-attempts" className="mt-6 scroll-mt-20">
+      <section id="recent-attempts" className="mt-6 scroll-mt-6">
         <SectionHeader
           title={`${areaLabel} practice attempts`}
           description={`${report.attemptHistory.length} finished attempt${report.attemptHistory.length === 1 ? "" : "s"} · click a row to see each answer`}
@@ -991,7 +991,7 @@ function ActivityList({ items, studentId }: { items: ActivityItem[]; studentId: 
             <Link href={item.href} className={`flex items-center justify-between gap-3 px-3 py-2 hover:bg-gray-50 ${invalidatedRowClass(item.status) ?? ""}`}>
               <span className="min-w-0">
                 <span className="flex flex-wrap items-center gap-1.5">
-                  <Badge className={item.kind === "Test" ? "bg-gray-900 text-white" : undefined}>{item.kind}</Badge>
+                  <Badge variant={item.kind === "Test" ? "test" : "default"}>{item.kind}</Badge>
                   <span className="text-xs text-gray-500">{item.area}</span>
                   <span className="truncate text-sm font-medium text-gray-800">{item.title}</span>
                   {item.status === "IN_PROGRESS" ? <Badge variant="warning">In progress</Badge> : null}

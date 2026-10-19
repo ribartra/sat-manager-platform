@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 
 interface BadgeProps {
   children: React.ReactNode;
-  variant?: "default" | "success" | "warning" | "danger" | "info" | "easy" | "medium" | "hard";
+  variant?: "default" | "success" | "warning" | "danger" | "info" | "easy" | "medium" | "hard" | "test";
   className?: string;
 }
 
@@ -15,6 +15,8 @@ const variantClasses: Record<string, string> = {
   easy: "bg-green-100 text-green-700",
   medium: "bg-yellow-100 text-yellow-700",
   hard: "bg-red-100 text-red-700",
+  // Tests (mockup: grey with dark ink, never white text)
+  test: "bg-[var(--sat-area-tests)] text-[var(--sat-tests-ink)]",
 };
 
 export function Badge({ children, variant = "default", className }: BadgeProps) {

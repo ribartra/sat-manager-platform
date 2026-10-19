@@ -227,7 +227,7 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
         {modules.map((module, index) => {
           const m = view.modules[index];
           return (
-            <section key={module.id} id={`mod-${m.key}`} className="scroll-mt-20">
+            <section key={module.id} id={`mod-${m.key}`} className="scroll-mt-6">
               <div className="mb-2 flex items-baseline justify-between gap-2">
                 <h2 className="text-base font-semibold text-gray-900">{module.name} <span className="font-normal text-gray-500">· {m.tier}</span></h2>
                 {m.state === "done" ? <span className="text-sm text-gray-600">{m.right} of {m.questionCount} correct</span> : null}

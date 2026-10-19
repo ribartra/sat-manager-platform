@@ -3,8 +3,8 @@ import { cn } from "@/lib/utils";
 type PageWidth = "narrow" | "default" | "wide" | "full";
 type PageDensity = "comfortable" | "compact";
 
-// One page width for every view (same container as the top nav), so the left/right
-// margins never jump between views. `width` is kept for API compatibility only.
+// One page width for every view (centred in the area right of the left sidebar), so the
+// left/right margins never jump between views. `width` is kept for API compatibility only.
 const PAGE_WIDTH = "max-w-[var(--sat-page-wide)]";
 const WIDTH: Record<PageWidth, string> = {
   narrow: PAGE_WIDTH,
@@ -13,7 +13,7 @@ const WIDTH: Record<PageWidth, string> = {
   full: "max-w-none",
 };
 
-// Same outer vertical rhythm for every view: nav -> first content is always 32px.
+// Same outer vertical rhythm for every view: top of the page -> first content is always 32px.
 const DENSITY_Y: Record<PageDensity, string> = {
   comfortable: "py-8",
   compact: "py-8",

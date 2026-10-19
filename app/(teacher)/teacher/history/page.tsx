@@ -150,7 +150,7 @@ function HistoryTableRow({ row: r }: { row: HistoryRow }) {
       </td>
       <td className={TD}>
         <span className="flex flex-wrap items-center gap-1.5">
-          {isTest ? <Badge className="bg-gray-900 text-white">Test</Badge> : <Badge>Practice</Badge>}
+          {isTest ? <Badge variant="test">Test</Badge> : <Badge>Practice</Badge>}
           {r.area ? <AreaTag area={r.area} /> : null}
         </span>
       </td>

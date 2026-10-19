@@ -376,7 +376,7 @@ export function AssignForm({
       <InlineError>{error}</InlineError>
       </div>
 
-      <aside className="lg:sticky lg:top-20">
+      <aside className="lg:sticky lg:top-6">
         <Card padding="md" className="space-y-3">
           <h2 className="text-sm font-semibold text-gray-900">Summary</h2>
           <dl className="space-y-1.5 text-sm">

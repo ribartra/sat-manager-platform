@@ -44,7 +44,7 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
           aria-current={view === v ? "page" : undefined}
           className={cn(
             "border-b-2 px-3 py-2 text-sm font-medium",
-            view === v ? "border-[var(--sat-area-tests)] text-[var(--sat-area-tests)]" : "border-transparent text-gray-500 hover:text-gray-800",
+            view === v ? "border-[var(--sat-area-tests)] text-[var(--sat-tests-ink)]" : "border-transparent text-gray-500 hover:text-gray-800",
           )}
         >
           {v === "tests" ? `Tests (${tests.length})` : "Results by student"}
