@@ -1,4 +1,5 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, request as playwrightRequest, test, type Page } from "@playwright/test";
+import http from "http";
 import { readdirSync, readFileSync } from "fs";
 import path from "path";
 import { loginAs } from "./helpers/auth";
@@ -37,7 +38,7 @@ async function send(page: Page, comment: string, category?: string) {
   ]);
   expect(res.status()).toBe(201);
   await expect(page.getByText("Thanks — your report was sent.").last()).toBeVisible();
-  return ((await res.json()) as { id: string; emailed: boolean });
+  return ((await res.json()) as { id: string; emailed: boolean; sentToAgent: boolean });
 }
 
 function mailFor(comment: string) {
@@ -64,7 +65,8 @@ test.describe("Report a problem", () => {
     expect(page.url()).toBe(url); // the card link was not followed
 
     const comment = `E2E element report ${Date.now()}`;
-    const { id, emailed } = await send(page, comment, "Confusing");
+    const { id, emailed, sentToAgent } = await send(page, comment, "Confusing");
+    expect(sentToAgent).toBe(false); // no coding agent URL set up yet
     const row = report(id);
     expect(row.category).toBe("CONFUSING");
     expect(row.size ?? 0).toBeGreaterThan(10_000);
@@ -138,8 +140,97 @@ test.describe("Report a problem", () => {
     const img = page.getByRole("img", { name: /What the user saw/ });
     await expect(img).toBeVisible();
     expect(await img.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBeGreaterThan(300);
-    await page.getByRole("button", { name: "Mark resolved" }).click();
+    await expect(page.getByRole("button", { name: "Send to coding agent" })).toBeDisabled();
+    await expect(page.getByText("Set the coding agent URL in Admin → Settings").first()).toBeAttached();
+    await page.getByRole("button", { name: "Mark fixed" }).click();
+    await page.getByLabel(/What was done/).fill("Fixed by hand");
+    await page.getByRole("button", { name: "Mark fixed" }).last().click();
     await expect(page.getByRole("button", { name: "Reopen" })).toBeVisible();
-    expect(report(latest.id).status).toBe("RESOLVED");
+    const row = openDb().prepare("select status, resolvedBySource, resolutionNote from IssueReport where id = ?").get(latest.id) as Record<string, string>;
+    expect(row).toEqual({ status: "RESOLVED", resolvedBySource: "ADMIN", resolutionNote: "Fixed by hand" });
+  });
+});
+
+test.describe("Report a problem → coding agent", () => {
+  const received: { headers: http.IncomingHttpHeaders; body: { event: string; report: { id: string; target: { kind: string } }; screenshot: { base64: string } | null; callback: { url: string } } }[] = [];
+  let server: http.Server;
+  const port = Number(process.env.E2E_AGENT_PORT || 4555);
+
+  test.beforeAll(async () => {
+    server = http.createServer((req, res) => {
+      let data = "";
+      req.on("data", (c) => (data += c));
+      req.on("end", () => {
+        received.push({ headers: req.headers, body: JSON.parse(data) });
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ ticketId: `AGENT-${received.length}` }));
+      });
+    });
+    await new Promise<void>((resolve) => server.listen(port, "127.0.0.1", resolve));
+  });
+  test.afterAll(async () => {
+    await new Promise((resolve) => server.close(resolve));
+  });
+
+  test("report goes to the agent; the agent takes it and marks it fixed; admin can reopen", async ({ browser, baseURL }) => {
+    const admin = await browser.newPage();
+    await loginAs(admin, E2E.adminEmail, E2E.adminPassword);
+    const put = await admin.request.put("/api/admin/settings/coder-agent", { data: { url: `http://127.0.0.1:${port}/hook`, token: "agent-outbound-1234" } });
+    expect(put.status()).toBe(200);
+    const rotated = await admin.request.post("/api/admin/settings/coder-agent", { data: { action: "rotate-callback-token" } });
+    const { token } = (await rotated.json()) as { token: string };
+    expect(token).toMatch(/^sat_agent_/);
+
+    const student = await browser.newPage();
+    await loginAs(student, studentEmail, studentPassword);
+    await student.goto("/student");
+    await student.getByRole("button", { name: "Report a problem" }).click();
+    await student.getByRole("button", { name: "Whole screen" }).click();
+    const comment = `E2E agent report ${Date.now()}`;
+    const { id, sentToAgent } = await send(student, comment);
+    expect(sentToAgent).toBe(true);
+    const hit = received.find((r) => r.body.report.id === id)!;
+    expect(hit.headers.authorization).toBe("Bearer agent-outbound-1234");
+    expect(hit.headers["x-event"]).toBe("issue_report.created");
+    expect(hit.body.report.target.kind).toBe("page");
+    expect(hit.body.screenshot?.base64.length ?? 0).toBeGreaterThan(10_000);
+    expect(hit.body.callback.url).toContain(`/api/agent/issue-reports/${id}`);
+    expect((openDb().prepare("select agentTicketId from IssueReport where id = ?").get(id) as { agentTicketId: string }).agentTicketId).toMatch(/^AGENT-/);
+
+    // The agent calls back without any session.
+    const agent = await playwrightRequest.newContext({ baseURL });
+    const url = `/api/agent/issue-reports/${id}`;
+    expect((await agent.post(url, { headers: { Authorization: "Bearer wrong" }, data: { status: "RESOLVED" } })).status()).toBe(401);
+    const auth = { Authorization: `Bearer ${token}` };
+    const got = await agent.get(url, { headers: auth });
+    expect(got.status()).toBe(200);
+    expect(((await got.json()) as { report: { comment: string } }).report.comment).toBe(comment);
+    expect((await agent.post(url, { headers: auth, data: { status: "BOGUS" } })).status()).toBe(400);
+    const taken = await agent.post(url, { headers: auth, data: { status: "IN_PROGRESS", message: "Looking into it" } });
+    expect(((await taken.json()) as { status: string }).status).toBe("IN_PROGRESS");
+    const fixed = await agent.post(url, { headers: auth, data: { status: "RESOLVED", message: "Chart fixed", ref: "https://github.com/org/repo/pull/1" } });
+    expect(fixed.status()).toBe(200);
+    const row = openDb().prepare("select status, resolvedBySource, resolutionNote, resolutionRef, userId from IssueReport where id = ?").get(id) as Record<string, string>;
+    expect(row).toMatchObject({ status: "RESOLVED", resolvedBySource: "AGENT", resolutionNote: "Chart fixed", resolutionRef: "https://github.com/org/repo/pull/1" });
+    const note = openDb().prepare("select title, body from Notification where userId = ? order by createdAt desc limit 1").get(row.userId) as { title: string; body: string };
+    expect(note.title).toBe("Your report was fixed");
+    expect(note.body).toContain("Chart fixed");
+    if (mailDir) await expect.poll(() => mailFor("Chart fixed") !== null, { timeout: 15_000 }).toBe(true);
+    await agent.dispose();
+
+    await admin.goto(`/admin/reports/${id}`);
+    await expect(admin.getByText("Fixed by the AI coding agent")).toBeVisible();
+    await expect(admin.getByText("Coding agent took it")).toBeVisible();
+    await expect(admin.getByRole("link", { name: "https://github.com/org/repo/pull/1" }).first()).toBeVisible();
+    await admin.getByRole("button", { name: "Reopen" }).click();
+    await expect(admin.getByRole("button", { name: "Mark fixed" })).toBeVisible();
+    expect((openDb().prepare("select status, resolvedBySource from IssueReport where id = ?").get(id) as Record<string, string | null>)).toEqual({ status: "OPEN", resolvedBySource: null });
+
+    // Settings page shows it on; turning the URL off stops sending.
+    await admin.goto("/admin/settings");
+    await expect(admin.getByText("On — new problem reports are sent to the agent")).toBeVisible();
+    await admin.request.put("/api/admin/settings/coder-agent", { data: { url: "" } });
+    await admin.goto("/admin/settings");
+    await expect(admin.getByText("Off (no URL)")).toBeVisible();
   });
 });

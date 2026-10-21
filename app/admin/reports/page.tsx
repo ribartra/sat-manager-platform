@@ -12,6 +12,7 @@ const PAGE_SIZE = 20;
 
 const TABS = [
   { id: "open", label: "Open", where: { status: "OPEN" } },
+  { id: "in_progress", label: "In progress", where: { status: "IN_PROGRESS" } },
   { id: "resolved", label: "Resolved", where: { status: "RESOLVED" } },
   { id: "all", label: "All", where: {} },
 ] as const;
@@ -35,6 +36,7 @@ export default async function AdminReportsPage({ searchParams }: { searchParams:
         url: true,
         pageTitle: true,
         status: true,
+        resolvedBySource: true,
         emailSentAt: true,
         createdAt: true,
         user: { select: { name: true, role: true } },
@@ -43,7 +45,12 @@ export default async function AdminReportsPage({ searchParams }: { searchParams:
     prisma.issueReport.groupBy({ by: ["status"], _count: { _all: true } }),
   ]);
   const count = (s: string) => counts.find((c) => c.status === s)?._count._all ?? 0;
-  const tabCount = { open: count("OPEN"), resolved: count("RESOLVED"), all: count("OPEN") + count("RESOLVED") };
+  const tabCount = {
+    open: count("OPEN"),
+    in_progress: count("IN_PROGRESS"),
+    resolved: count("RESOLVED"),
+    all: counts.reduce((n, c) => n + c._count._all, 0),
+  };
   const reportPage = paginate(reports, pageFromParam(page), PAGE_SIZE);
 
   return (
@@ -51,7 +58,7 @@ export default async function AdminReportsPage({ searchParams }: { searchParams:
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Admin" }, { label: "Reports" }]} />
       <h1 className="mb-1 text-xl font-semibold text-gray-900">Reports</h1>
       <p className="mb-4 text-sm text-gray-500">
-        Problems and suggestions users sent with “Report a problem”. Each one is also emailed to the SAT team.
+        Problems and suggestions users sent with “Report a problem”. Each one is emailed to the SAT team and, when set up, sent to the coding agent. An admin or the agent marks it fixed.
       </p>
 
       <div className="mb-4 flex flex-wrap gap-2">
@@ -83,7 +90,13 @@ export default async function AdminReportsPage({ searchParams }: { searchParams:
                 </td>
                 <td className={TD}>
                   <span className="rounded px-1.5 py-0.5 text-[11px] font-bold text-white" style={{ background: cat.color }}>{cat.label}</span>
-                  {r.status === "RESOLVED" ? <span className="ml-1 rounded bg-gray-100 px-1.5 py-0.5 text-[11px] text-gray-500">Resolved</span> : null}
+                  {r.status === "RESOLVED" ? (
+                    <span className="ml-1 rounded bg-green-50 px-1.5 py-0.5 text-[11px] text-green-700">
+                      {r.resolvedBySource === "AGENT" ? "Fixed by AI agent" : "Fixed by admin"}
+                    </span>
+                  ) : r.status === "IN_PROGRESS" ? (
+                    <span className="ml-1 rounded bg-blue-50 px-1.5 py-0.5 text-[11px] text-blue-700">In progress</span>
+                  ) : null}
                 </td>
                 <td className={`${TD} max-w-[22rem]`}><p className="line-clamp-2 text-gray-800">{r.comment}</p></td>
                 <td className={`${TD} max-w-[14rem]`}>

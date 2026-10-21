@@ -4,7 +4,7 @@ import { assertApprovedSession } from "@/lib/rbac";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { BadRequestError, RateLimitError, withApiErrors } from "@/lib/api-error";
 import { ISSUE_CATEGORIES, ISSUE_COMMENT_MAX, ISSUE_SCREENSHOT_MAX, ISSUE_TARGET_MAX, type IssueTarget } from "@/lib/issue-report";
-import { emailIssueReport } from "@/lib/issue-report-server";
+import { addIssueEvent, emailIssueReport, sendIssueReportToAgent } from "@/lib/issue-report-server";
 
 const CATEGORIES = new Set<string>(ISSUE_CATEGORIES.map((c) => c.value));
 const KINDS = new Set(["element", "area", "page"]);
@@ -21,7 +21,8 @@ function screenshotType(buffer: Buffer) {
 }
 
 // POST /api/issue-reports — "Report a problem" (components/sat/issue-reporter.tsx), any signed-in user.
-// Saved first, then emailed to ISSUE_REPORT_EMAIL; a failed email never loses the report.
+// Saved first, then emailed to ISSUE_REPORT_EMAIL and sent to the coding agent (if set up); a failed
+// email or agent call never loses the report.
 export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await assertApprovedSession();
   const limit = checkRateLimit(`issue-report:${session.user.id}`, 10, 60 * 60 * 1000);
@@ -79,6 +80,9 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
     },
     select: { id: true },
   });
+  await addIssueEvent(report.id, "SYSTEM", "CREATED", { userId: session.user.id });
   const email = await emailIssueReport(report.id);
-  return NextResponse.json({ id: report.id, emailed: email.sent }, { status: 201 });
+  // Off while Admin → Settings → Coding agent has no URL; a failure is recorded, never fatal.
+  const agent = await sendIssueReportToAgent(report.id).catch(() => ({ sent: false }));
+  return NextResponse.json({ id: report.id, emailed: email.sent, sentToAgent: agent.sent }, { status: 201 });
 });

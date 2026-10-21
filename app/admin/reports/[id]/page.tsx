@@ -6,7 +6,30 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { roleLabel } from "@/lib/domain-meta";
 import { issueCategoryMeta, type IssueElement, type IssueTarget } from "@/lib/issue-report";
+import { getCoderAgentConfig } from "@/lib/coder-agent-settings";
 import { ReportActions } from "./report-actions";
+
+const EVENT_LABELS: Record<string, string> = {
+  CREATED: "Reported",
+  EMAILED: "Emailed to the SAT team",
+  EMAIL_FAILED: "Email not sent",
+  SENT_TO_AGENT: "Sent to the coding agent",
+  AGENT_ERROR: "Coding agent did not accept it",
+  IN_PROGRESS: "Coding agent took it",
+  RESOLVED: "Marked fixed",
+  REOPENED: "Reopened",
+  NOTE: "Note",
+};
+const SOURCE_LABELS: Record<string, string> = { ADMIN: "Admin", AGENT: "AI coding agent", SYSTEM: "System" };
+
+/** Commit / PR link when it is a URL, plain text otherwise. */
+function RefLink({ value }: { value: string }) {
+  return /^https?:\/\//i.test(value) ? (
+    <a href={value} target="_blank" rel="noreferrer" className="break-all text-blue-600 hover:underline">{value}</a>
+  ) : (
+    <code className="break-all text-xs">{value}</code>
+  );
+}
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -60,12 +83,20 @@ export default async function AdminReportPage({ params }: { params: Promise<{ id
       emailSentAt: true,
       emailError: true,
       resolvedAt: true,
+      resolvedBySource: true,
+      resolutionNote: true,
+      resolutionRef: true,
+      agentTicketId: true,
+      agentSentAt: true,
+      agentError: true,
       createdAt: true,
+      events: { orderBy: { createdAt: "asc" }, select: { id: true, source: true, type: true, message: true, ref: true, createdAt: true } },
       user: { select: { id: true, name: true, email: true, role: true } },
       resolvedBy: { select: { name: true } },
     },
   });
   if (!report) notFound();
+  const agent = await getCoderAgentConfig();
   let target: IssueTarget = { kind: "page", context: "" };
   try {
     target = JSON.parse(report.target) as IssueTarget;
@@ -81,9 +112,11 @@ export default async function AdminReportPage({ params }: { params: Promise<{ id
           <p className="mb-1 flex items-center gap-2">
             <span className="rounded px-2 py-0.5 text-xs font-bold text-white" style={{ background: cat.color }}>{cat.label}</span>
             {report.status === "RESOLVED" ? (
-              <span className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
-                Resolved{report.resolvedBy ? ` by ${report.resolvedBy.name}` : ""}
+              <span className="rounded bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">
+                {report.resolvedBySource === "AGENT" ? "Fixed by the AI coding agent" : `Fixed by ${report.resolvedBy?.name ?? "an admin"}`}
               </span>
+            ) : report.status === "IN_PROGRESS" ? (
+              <span className="rounded bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">In progress (coding agent)</span>
             ) : (
               <span className="rounded bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">Open</span>
             )}
@@ -93,12 +126,20 @@ export default async function AdminReportPage({ params }: { params: Promise<{ id
             {report.user.name} ({report.user.email}, {roleLabel(report.user.role)}) · {report.createdAt.toISOString().replace("T", " ").slice(0, 16)} UTC
           </p>
         </div>
-        <ReportActions id={report.id} status={report.status} emailed={!!report.emailSentAt} />
+        <ReportActions id={report.id} status={report.status} emailed={!!report.emailSentAt} agentEnabled={agent.enabled} sentToAgent={!!report.agentSentAt} />
       </div>
 
       <blockquote className="mb-4 whitespace-pre-wrap rounded-lg border-l-4 bg-white px-4 py-3 text-[15px] text-gray-900" style={{ borderColor: cat.color }}>
         {report.comment}
       </blockquote>
+
+      {report.status === "RESOLVED" && (report.resolutionNote || report.resolutionRef) ? (
+        <Card padding="md" className="mb-4 border-green-200 bg-green-50/40">
+          <h2 className="mb-1 text-sm font-semibold text-gray-900">How it was fixed</h2>
+          {report.resolutionNote ? <p className="whitespace-pre-wrap text-sm text-gray-800">{report.resolutionNote}</p> : null}
+          {report.resolutionRef ? <p className="mt-1 text-sm"><RefLink value={report.resolutionRef} /></p> : null}
+        </Card>
+      ) : null}
 
       <div className="grid items-start gap-4 lg:grid-cols-[3fr_2fr]">
         <Card padding="md">
@@ -117,7 +158,7 @@ export default async function AdminReportPage({ params }: { params: Promise<{ id
             <h2 className="mb-1 text-sm font-semibold text-gray-900">Page</h2>
             <dl>
               <Row label="Address"><a href={report.url} className="text-blue-600 hover:underline" target="_blank" rel="noreferrer">{report.url}</a></Row>
-              <Row label="About">{about} · {target.context}</Row>
+              <Row label="About">{target.kind === "page" ? about : `${about} · ${target.context}`}</Row>
               {target.columns?.length ? <Row label="Table columns">{target.columns.join(", ")}</Row> : null}
               <Row label="Viewport">
                 {report.viewport ?? "—"}
@@ -129,6 +170,32 @@ export default async function AdminReportPage({ params }: { params: Promise<{ id
                 {report.emailSentAt ? `Sent ${report.emailSentAt.toISOString().replace("T", " ").slice(0, 16)} UTC` : `Not sent${report.emailError ? ` (${report.emailError})` : ""}`}
               </Row>
             </dl>
+          </Card>
+          <Card padding="md">
+            <h2 className="mb-2 text-sm font-semibold text-gray-900">Timeline</h2>
+            <ol className="grid gap-2 text-sm">
+              {report.events.map((e) => (
+                <li key={e.id} className="grid gap-0.5 border-l-2 border-gray-200 pl-3">
+                  <span className="text-gray-800">
+                    <b className="font-medium">{EVENT_LABELS[e.type] ?? e.type}</b>
+                    <span className="text-xs text-gray-500"> · {SOURCE_LABELS[e.source] ?? e.source} · {e.createdAt.toISOString().replace("T", " ").slice(0, 16)} UTC</span>
+                  </span>
+                  {e.message ? <span className="whitespace-pre-wrap text-xs text-gray-600">{e.message}</span> : null}
+                  {e.ref ? <span className="text-xs"><RefLink value={e.ref} /></span> : null}
+                </li>
+              ))}
+              {report.events.length === 0 ? <li className="text-xs text-gray-500">No events recorded.</li> : null}
+            </ol>
+            <p className="mt-3 text-xs text-gray-500">
+              Coding agent:{" "}
+              {!agent.enabled
+                ? "off (set the URL in Admin → Settings)"
+                : report.agentSentAt
+                  ? `sent ${report.agentSentAt.toISOString().replace("T", " ").slice(0, 16)} UTC${report.agentTicketId ? ` · ticket ${report.agentTicketId}` : ""}`
+                  : report.agentError
+                    ? `not accepted (${report.agentError})`
+                    : "not sent"}
+            </p>
           </Card>
           {target.errors?.length ? (
             <Card padding="md">

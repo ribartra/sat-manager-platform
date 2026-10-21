@@ -309,7 +309,7 @@ export async function sendIssueReportEmail(report: IssueReportEmailInput) {
     ["When", when],
     ["Page", report.url],
     ["Title", report.pageTitle ?? "—"],
-    ["About", `${about} · ${t.context}`],
+    ["About", t.kind === "page" ? about : `${about} · ${t.context}`],
     ["Viewport", `${report.viewport ?? "—"}${t.devicePixelRatio ? ` @${t.devicePixelRatio}x` : ""}${t.scroll ? ` · scrolled ${t.scroll.x},${t.scroll.y}` : ""}`],
     ["Browser", report.userAgent ?? "—"],
   ];
@@ -367,5 +367,35 @@ export async function sendIssueReportEmail(report: IssueReportEmailInput) {
     text,
     html,
     attachments,
+  });
+}
+
+/** The coding agent marked a report as fixed ("levantado") — tells ISSUE_REPORT_EMAIL. */
+export async function sendIssueReportResolvedEmail(input: { id: string; comment: string; url: string; note: string | null; ref: string | null }) {
+  const to = process.env.ISSUE_REPORT_EMAIL?.trim() || ISSUE_REPORT_DEFAULT_EMAIL;
+  const adminUrl = absoluteAppUrl(`/admin/reports/${input.id}`);
+  let path = input.url;
+  try {
+    path = new URL(input.url).pathname;
+  } catch {}
+  return sendTransactionalEmail({
+    to,
+    subject: `[SAT report] Fixed by the coding agent · ${path}`.slice(0, 200),
+    text: [
+      "The coding agent marked this report as fixed.",
+      "",
+      `Report: ${input.comment}`,
+      input.note ? `Agent note: ${input.note}` : "",
+      input.ref ? `Change: ${input.ref}` : "",
+      "",
+      `Review it (and reopen if needed): ${adminUrl}`,
+    ].filter((l, i, a) => l || a[i - 1]).join("\n"),
+    html: `
+      <p>The coding agent marked this report as <b>fixed</b>.</p>
+      <blockquote style="border-left:4px solid #16a34a;margin:12px 0;padding:6px 12px;white-space:pre-wrap">${escapeHtml(input.comment)}</blockquote>
+      ${input.note ? `<p><b>Agent note:</b> ${escapeHtml(input.note)}</p>` : ""}
+      ${input.ref ? `<p><b>Change:</b> ${/^https?:\/\//i.test(input.ref) ? `<a href="${escapeHtml(input.ref)}">${escapeHtml(input.ref)}</a>` : escapeHtml(input.ref)}</p>` : ""}
+      <p><a href="${escapeHtml(adminUrl)}">Review it in Admin → Reports</a> (reopen it if it is not fixed).</p>
+    `,
   });
 }

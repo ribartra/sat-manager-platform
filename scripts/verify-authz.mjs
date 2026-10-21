@@ -20,6 +20,21 @@ const checks = [
     label: "Problem report screenshots are admin-only and never publicly cached",
   },
   {
+    file: "app/api/agent/issue-reports/[id]/route.ts",
+    requires: ["verifyCallbackToken", "callbackTokenConfigured", "checkRateLimit", "ISSUE_REPORT_AGENT_UPDATE"],
+    label: "Coding agent callback needs the callback token (hash-compared), is rate limited and audited",
+  },
+  {
+    file: "lib/coder-agent-settings.ts",
+    requires: ["timingSafeEqual", "encryptSecret", "sha256Fingerprint"],
+    label: "Coding agent tokens: outbound token encrypted at rest, callback token stored as a hash and compared in constant time",
+  },
+  {
+    file: "app/api/admin/settings/coder-agent/route.ts",
+    requires: ["assertAdmin", "writeAudit"],
+    label: "Coding agent settings are admin-only and audited",
+  },
+  {
     file: "app/admin/reports/page.tsx",
     requires: ["session.user.role !== \"ADMIN\""],
     label: "Admin → Reports list is admin-only",

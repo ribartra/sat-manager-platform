@@ -435,16 +435,40 @@ model IssueReport {
   target         String // JSON: selected element(s), page context, JS errors
   screenshot     Bytes?
   screenshotType String?
-  status         String    @default("OPEN") // OPEN | RESOLVED
+  status         String    @default("OPEN") // OPEN | IN_PROGRESS | RESOLVED
   emailSentAt    DateTime?
   emailError     String?
   resolvedById   String?
   resolvedAt     DateTime?
+  /// Who fixed it: ADMIN (Admin → Reports) or AGENT (coding agent via /api/agent/issue-reports/[id]).
+  resolvedBySource String?
+  resolutionNote String?
+  /// Commit / PR / ticket link given with the fix.
+  resolutionRef  String?
+  /// Coding agent (lib/coder-agent-settings.ts): its ticket id and the last send.
+  agentTicketId  String?
+  agentSentAt    DateTime?
+  agentError     String?
   createdAt      DateTime  @default(now())
   user           User      @relation("IssueReportAuthor", fields: [userId], references: [id], onDelete: Cascade)
   resolvedBy     User?     @relation("IssueReportResolver", fields: [resolvedById], references: [id], onDelete: SetNull)
+  events         IssueReportEvent[]
   @@index([status, createdAt])
   @@index([userId])
+}
+
+/// Timeline of an IssueReport: emails, coding agent sends/updates, admin resolve/reopen.
+model IssueReportEvent {
+  id        String      @id @default(cuid())
+  reportId  String
+  source    String // ADMIN | AGENT | SYSTEM
+  type      String // CREATED | EMAILED | EMAIL_FAILED | SENT_TO_AGENT | AGENT_ERROR | IN_PROGRESS | RESOLVED | REOPENED | NOTE
+  message   String?
+  ref       String?
+  userId    String?
+  createdAt DateTime    @default(now())
+  report    IssueReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  @@index([reportId, createdAt])
 }
 
 model UnlockRequest {
