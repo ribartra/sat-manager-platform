@@ -66,8 +66,12 @@ function startOfToday() {
   return d.getTime();
 }
 
-/** Percentage coloured with the shared accuracy bands (practice and per-area results only, never SAT scores). */
-export function Pct({ value, className = "" }: { value: number | null | undefined; className?: string }) {
+/**
+ * Percentage coloured with the shared accuracy bands (practice and per-area results only, never SAT scores).
+ * `color` overrides the band, e.g. the section colour on area boxes.
+ */
+export function Pct({ value, className = "", color }: { value: number | null | undefined; className?: string; color?: string }) {
   if (value === null || value === undefined) return <span className={`text-gray-400 ${className}`}>—</span>;
+  if (color) return <span className={className} style={{ color }}>{value}%</span>;
   return <span className={`${scoreBandTextClass(value)} ${className}`}>{value}%</span>;
 }

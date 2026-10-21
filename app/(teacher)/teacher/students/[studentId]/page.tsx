@@ -315,7 +315,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
           </section>
           <Card padding="md">
             <div className="flex items-baseline justify-between gap-2">
-              <h2 className="text-sm font-semibold text-gray-900">Then, assign something</h2>
+              <h2 className="text-sm font-semibold text-gray-900">What to assign next</h2>
               {suggestions.length > 0 ? (
                 <Link
                   href={`/teacher/students/${studentId}?area=${suggestions[0].code.toLowerCase()}#weak-skills`}
@@ -325,13 +325,14 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                 </Link>
               ) : null}
             </div>
-            <p className="mb-3 mt-0.5 text-sm text-gray-600">
+            <p className="mt-0.5 text-sm text-gray-600">Weakest skills for this student — assign a set to work on them.</p>
+            <p className="mb-3 mt-0.5 text-xs text-gray-500">
               {pendingCount ? (
                 <>
-                  <b>{pendingCount}</b> pending{overdueCount ? <> · <b className="text-red-600">{overdueCount} overdue</b></> : null}
+                  Already assigned: <b>{pendingCount}</b> not done yet{overdueCount ? <> · <b className="text-red-600">{overdueCount} overdue</b></> : null}
                 </>
               ) : (
-                "Nothing pending"
+                "Nothing assigned right now"
               )}
             </p>
             {suggestions.length === 0 ? (

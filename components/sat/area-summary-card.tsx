@@ -45,7 +45,7 @@ export function AreaSummaryCard({ area, label, href, latest, delta, chips = [], 
         <div>
           <p className="text-xs text-gray-500">{latest.caption}</p>
           <p className="mt-1 flex items-end gap-2">
-            <Pct value={latest.pct} className="text-4xl font-bold leading-none" />
+            <Pct value={latest.pct} className="text-4xl font-bold leading-none" color={`var(--sat-area-${tab})`} />
             {latest.detail ? <span className="text-xs text-gray-500">{latest.detail}</span> : null}
           </p>
           {delta !== null && delta !== undefined ? <Delta value={delta} suffix="vs. previous practice" className="mt-1 block" /> : null}
@@ -104,7 +104,7 @@ export function AreaPracticeRow({ area, avgPct, todo, href }: { area: PracticeAr
       <div className="mb-1 flex items-center justify-between gap-2 text-xs">
         <AreaTag area={area} />
         <span className="text-gray-500">
-          {avgPct !== null ? <><Pct value={avgPct} className="font-semibold" /> avg</> : "No results yet"} · {todo ? `${todo} to do` : "all done"}
+          {avgPct !== null ? <><Pct value={avgPct} className="font-semibold" color={`var(--sat-area-${tab})`} /> avg</> : "No results yet"} · {todo ? `${todo} to do` : "all done"}
         </span>
       </div>
       <StripedBar pct={avgPct} color={`var(--sat-area-${tab})`} />
@@ -143,7 +143,7 @@ export function CompactAreaBox({
     <>
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-[17px] font-semibold" style={{ color: `var(--sat-area-${tab})` }}>{label}</h2>
-        {pct !== null ? <Pct value={pct} className="text-[30px] font-bold leading-none" /> : <span className="text-sm text-gray-500">{emptyText}</span>}
+        {pct !== null ? <Pct value={pct} className="text-[30px] font-bold leading-none" color={`var(--sat-area-${tab})`} /> : <span className="text-sm text-gray-500">{emptyText}</span>}
       </div>
       <div className="flex items-center justify-between gap-2 text-xs text-gray-500">
         <span className="min-w-0 truncate">{line1}</span>
