@@ -61,7 +61,8 @@ La protección de rutas vive en layouts y helpers server-side. No hay `middlewar
 - Usuarios con estados `PENDING`, `APPROVED`, `REJECTED`.
 - Admin valida usuarios y puede activar/desactivar cuentas.
 - Estudiante invitado activa cuenta desde token.
-- Si la invitación del estudiante incluye padre, el padre se crea/vincula durante la activación del alumno; no requiere invitación separada.
+- Política de invitación (2026-10-22): **una sola invitación abierta por alumno hasta que vence** (7 días); el alumno recibe por correo el enlace para activar su cuenta. El **consentimiento se documenta en los T&C** (`/terms`, sección "Students under 18"): al activar, el alumno (también si es menor) acepta los Términos y se guardan `termsVersion` / `termsAcceptedAt`. La autorización del apoderado por correo ya no bloquea la activación.
+- Si la invitación del estudiante incluye padre (opcional; nunca el correo de otra cuenta), el padre se crea/vincula durante la activación del alumno; no requiere invitación separada.
 - Padres se administran desde un maestro de padres con asociación/desasociación de alumnos.
 
 ### Programas, Grupos y Permisos

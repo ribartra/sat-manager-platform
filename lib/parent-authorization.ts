@@ -61,7 +61,7 @@ export async function parentAuthorizationState(student: { id: string; email: str
   if (link) return { status: "authorized", parentName: link.parent.name, parentEmail: link.parent.email, at: link.authorizedAt };
 
   const pending = await prisma.inviteToken.findFirst({
-    where: { role: "STUDENT", email: student.email, parentEmail: { not: null }, parentConsentAt: null, parentConsentRequired: true },
+    where: { role: "STUDENT", email: student.email, parentEmail: { not: null }, parentConsentAt: null, parentConsentRequired: true, revokedAt: null },
     orderBy: { expiresAt: "desc" },
   });
   if (pending?.parentEmail) {

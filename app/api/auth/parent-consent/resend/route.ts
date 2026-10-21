@@ -18,7 +18,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
 
   const tokenHash = hashPublicToken(token);
   const invite = await prisma.inviteToken.findFirst({ where: { OR: [{ tokenHash }, { token }] } });
-  if (!invite || invite.role !== "STUDENT" || invite.usedAt || invite.expiresAt < new Date()) {
+  if (!invite || invite.role !== "STUDENT" || invite.usedAt || invite.revokedAt || invite.expiresAt < new Date()) {
     return new BadRequestError("This invitation link doesn't work or has expired. Ask your teacher for a new one.").toResponse();
   }
   if (!requiresParentAuthorization(invite)) {

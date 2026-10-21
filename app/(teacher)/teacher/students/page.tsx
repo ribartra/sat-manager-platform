@@ -54,7 +54,7 @@ export default async function TeacherStudentsPage({ searchParams }: PageProps) {
     if (show === "pending-tests") return s.tests.pending.length > 0;
     return true;
   });
-  const inviteWhere = { role: "STUDENT", usedAt: null, expiresAt: { gt: now }, ...(session?.user.role === "TEACHER" ? { invitedById: session.user.id } : {}) };
+  const inviteWhere = { role: "STUDENT", usedAt: null, revokedAt: null, expiresAt: { gt: now }, ...(session?.user.role === "TEACHER" ? { invitedById: session.user.id } : {}) };
   // The list shows the latest 20; the count in the header is the real total.
   const [invited, invitedTotal] = await Promise.all([
     prisma.inviteToken

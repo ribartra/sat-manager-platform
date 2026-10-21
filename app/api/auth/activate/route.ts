@@ -4,12 +4,12 @@ import bcrypt from "bcryptjs";
 import { checkRateLimit, rateLimitKey, rateLimitResponse } from "@/lib/rate-limit";
 import { hashPublicToken } from "@/lib/token-security";
 import { captureCaughtError, writeAudit } from "@/lib/audit";
-import { requiresParentAuthorization, resolveParentAccount } from "@/lib/consent";
+import { inviteUnusableReason, resolveParentAccount, TERMS_VERSION } from "@/lib/consent";
 import { passwordPolicyError } from "@/lib/password-policy";
-import { BadRequestError, ConflictError, ForbiddenError, InternalServerError, withApiErrors } from "@/lib/api-error";
+import { BadRequestError, ConflictError, InternalServerError, ValidationError, withApiErrors } from "@/lib/api-error";
 
 export const POST = withApiErrors(async function POST(req: NextRequest) {
-  const { token, password } = await req.json();
+  const { token, password, acceptTerms } = await req.json();
   if (!token || !password) return new BadRequestError("Something is missing. Please fill in the form again.").toResponse();
   const limited = checkRateLimit(rateLimitKey(req, "activate", token.slice(0, 12)), 10, 15 * 60 * 1000);
   if (!limited.allowed) return rateLimitResponse(limited.resetAt);
@@ -20,18 +20,22 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
       where: { OR: [{ tokenHash }, { token }] },
       include: { program: true },
     });
-    if (!invite || invite.usedAt || invite.expiresAt < new Date()) {
+    const unusable = inviteUnusableReason(invite);
+    if (!invite || unusable) {
       await writeAudit({
         action: "USER_CREATE_FAILED",
         targetType: "InviteToken",
         targetId: invite?.id ?? token.slice(0, 12),
         outcome: "failure",
-        metadata: {
-          reason: !invite ? "not_found" : invite.usedAt ? "already_used" : "expired",
-        },
+        metadata: { reason: unusable },
       });
       return new BadRequestError("This invitation link doesn't work or has expired. Ask your teacher for a new one.").toResponse();
     }
+    // Consent is recorded as accepting the Terms of Use (with the clause for students under 18).
+    if (acceptTerms !== true) {
+      return new ValidationError("Please accept the Terms of Use and the Privacy Policy to continue.", ["acceptTerms"]).toResponse();
+    }
+    const termsAcceptedAt = new Date();
     if (!invite.tokenHash) {
       await prisma.inviteToken.update({ where: { id: invite.id }, data: { tokenHash, token: `hashed:${tokenHash}` } });
     }
@@ -67,6 +71,8 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
             active: true,
             validationStatus: "APPROVED",
             validationReviewedAt: new Date(),
+            termsAcceptedAt,
+            termsVersion: TERMS_VERSION,
           },
         });
         parentId = parent.id;
@@ -83,7 +89,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
           }
         }
 
-        await tx.inviteToken.update({ where: { id: invite.id }, data: { usedAt: new Date() } });
+        await tx.inviteToken.update({ where: { id: invite.id }, data: { usedAt: new Date(), termsAcceptedAt, termsVersion: TERMS_VERSION } });
       });
 
       await writeAudit({
@@ -92,27 +98,14 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
         targetType: "User",
         targetId: parentId,
         outcome: "success",
-        metadata: { role: "PARENT", inviteId: invite.id, email: invite.email },
+        metadata: { role: "PARENT", inviteId: invite.id, email: invite.email, termsVersion: TERMS_VERSION },
       });
 
       return NextResponse.json({ ok: true });
     }
 
-    // Student account creation flow
-    const requiresParentConsent = requiresParentAuthorization(invite);
-    if (requiresParentConsent) {
-      await writeAudit({
-        action: "USER_CREATE_FAILED",
-        targetType: "InviteToken",
-        targetId: invite.id,
-        outcome: "failure",
-        metadata: { reason: "parent_consent_required", email: invite.email },
-      });
-      return new ForbiddenError(
-        `Your parent or guardian needs to authorize your account first. We sent an email to ${invite.parentEmail}. Once they accept, come back to this link to finish setting up.`,
-      ).toResponse();
-    }
-
+    // Student account creation flow. A parent's authorization no longer blocks it (policy
+    // 2026-10-22): the student accepts the Terms above, which include the clause for minors.
     const now = new Date();
     const programAvailable =
       invite.program?.active &&
@@ -147,6 +140,8 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
           active: true,
           validationStatus: "APPROVED",
           validationReviewedAt: new Date(),
+          termsAcceptedAt,
+          termsVersion: TERMS_VERSION,
         },
       });
       studentId = user.id;
@@ -189,7 +184,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
         }
       }
 
-      await tx.inviteToken.update({ where: { id: invite.id }, data: { usedAt: new Date() } });
+      await tx.inviteToken.update({ where: { id: invite.id }, data: { usedAt: new Date(), termsAcceptedAt, termsVersion: TERMS_VERSION } });
     });
 
     await writeAudit({
@@ -198,7 +193,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
       targetType: "User",
       targetId: studentId,
       outcome: "success",
-      metadata: { role: "STUDENT", inviteId: invite.id, email: invite.email, programId },
+      metadata: { role: "STUDENT", inviteId: invite.id, email: invite.email, programId, isMinor: invite.isMinor, termsVersion: TERMS_VERSION },
     });
     if (parentConflictRole) {
       await writeAudit({

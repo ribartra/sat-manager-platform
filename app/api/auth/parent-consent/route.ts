@@ -24,10 +24,12 @@ async function findInviteByParentConsentToken(token: string) {
 
 function consentLinkFailureReason(invite: {
   expiresAt: Date;
+  revokedAt: Date | null;
   parentEmail: string | null;
-} | null): "not_found" | "no_parent_email" | "expired" | null {
+} | null): "not_found" | "no_parent_email" | "revoked" | "expired" | null {
   if (!invite) return "not_found";
   if (!invite.parentEmail) return "no_parent_email";
+  if (invite.revokedAt) return "revoked";
   if (invite.expiresAt < new Date()) return "expired";
   // Note: do NOT reject when invite.usedAt is set — the student may activate
   // first; the parent must still be able to set their password / record consent.

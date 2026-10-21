@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -18,7 +19,8 @@ import {
 import { ErrorState, FormSection, LoadingState } from "@/components/sat";
 import { activateSchema, type ActivateInput } from "@/contracts/auth";
 import { LegalLinks } from "@/components/legal/legal-page";
-import { Alert, InlineError } from "@/components/sat/alert";
+import { InlineError } from "@/components/sat/alert";
+import { Checkbox } from "@/components/ui/checkbox";
 import { apiFetch, errorMessage } from "@/lib/api-client";
 import { PASSWORD_MIN_LENGTH } from "@/lib/password-policy";
 
@@ -29,9 +31,7 @@ interface InviteInfo {
   phone?: string;
   startDate?: string | null;
   programName?: string | null;
-  requiresParentConsent?: boolean;
-  parentConsentApproved?: boolean;
-  parentEmail?: string | null;
+  isMinor?: boolean;
 }
 
 export default function ActivatePage() {
@@ -41,8 +41,8 @@ export default function ActivatePage() {
   const [invite, setInvite] = useState<InviteInfo | null>(null);
   const [tokenError, setTokenError] = useState(false);
   const [serverError, setServerError] = useState("");
-  const [resendState, setResendState] = useState<"idle" | "sending" | "sent">("idle");
-  const [resendError, setResendError] = useState("");
+  // Consent is recorded as accepting the Terms of Use (with the clause for students under 18).
+  const [acceptTerms, setAcceptTerms] = useState(false);
 
   const form = useForm<ActivateInput>({
     resolver: zodResolver(activateSchema),
@@ -66,24 +66,12 @@ export default function ActivatePage() {
   async function onSubmit(values: ActivateInput) {
     setServerError("");
     try {
-      await apiFetch("/api/auth/activate", { method: "POST", json: { token, password: values.password } });
+      await apiFetch("/api/auth/activate", { method: "POST", json: { token, password: values.password, acceptTerms } });
     } catch (error) {
       setServerError(errorMessage(error));
       return;
     }
     router.push("/login?activated=1");
-  }
-
-  async function resendToParent() {
-    setResendError("");
-    setResendState("sending");
-    try {
-      await apiFetch("/api/auth/parent-consent/resend", { method: "POST", json: { token } });
-      setResendState("sent");
-    } catch (error) {
-      setResendError(errorMessage(error));
-      setResendState("idle");
-    }
   }
 
   if (tokenError) {
@@ -106,7 +94,6 @@ export default function ActivatePage() {
   }
 
   const isParent = invite.role === "PARENT";
-  const blockedByConsent = !isParent && invite.requiresParentConsent && !invite.parentConsentApproved;
   const loading = form.formState.isSubmitting;
 
   return (
@@ -121,35 +108,6 @@ export default function ActivatePage() {
               ? "Create your parent account to follow your child's progress."
               : "Choose a password to finish setting up your account."}
           </p>
-          {blockedByConsent ? (
-            <Alert tone="warning" className="mb-5">
-              <p>
-                Your parent or guardian needs to authorize your account first.
-                {invite.parentEmail ? (
-                  <>
-                    {" "}We sent an email to <strong>{invite.parentEmail}</strong>.
-                  </>
-                ) : null}{" "}
-                Once they accept, come back to this link to finish setting up.
-              </p>
-              <div className="mt-2 flex flex-wrap items-center gap-2">
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={resendToParent}
-                  disabled={resendState !== "idle"}
-                  disabledReason={resendState === "sent" ? "Email sent. Ask your parent to check their inbox (and spam folder)." : null}
-                >
-                  {resendState === "sending" ? "Sending…" : resendState === "sent" ? "Email sent" : "Resend email to my parent"}
-                </Button>
-                <Button type="button" size="sm" variant="ghost" onClick={() => window.location.reload()}>
-                  My parent already accepted
-                </Button>
-              </div>
-              <InlineError>{resendError}</InlineError>
-            </Alert>
-          ) : null}
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" noValidate>
               <FormSection>
@@ -202,15 +160,32 @@ export default function ActivatePage() {
                   )}
                 />
               </FormSection>
+              <label className="flex items-start gap-2 text-sm text-foreground">
+                <Checkbox className="mt-0.5" checked={acceptTerms} onChange={(e) => setAcceptTerms(e.target.checked)} required />
+                <span>
+                  I accept the{" "}
+                  <Link href="/terms" target="_blank" className="text-blue-600 hover:underline">Terms of Use</Link> and the{" "}
+                  <Link href="/privacy" target="_blank" className="text-blue-600 hover:underline">Privacy Policy</Link>.
+                  {!isParent && invite.isMinor ? (
+                    <span className="mt-1 block text-xs text-muted-foreground">
+                      You are under 18: you confirm that your parent or guardian knows about and agrees to your account, as described in the Terms.
+                    </span>
+                  ) : null}
+                </span>
+              </label>
               <InlineError>{serverError}</InlineError>
-              <Button type="submit" className="w-full" disabled={loading} disabledReason={blockedByConsent ? "Waiting for your parent or guardian to approve." : null}>
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={loading || !acceptTerms}
+                disabledReason={!acceptTerms ? "Accept the Terms of Use and the Privacy Policy to continue." : null}
+              >
                 {loading ? "Setting up…" : isParent ? "Create account" : "Finish setup"}
               </Button>
             </form>
           </Form>
         </Card>
-        <p className="mt-4 text-center text-xs text-gray-500">By continuing you accept the Terms of Use and the Privacy Policy.</p>
-        <LegalLinks className="mt-1" />
+        <LegalLinks className="mt-4" />
       </div>
     </div>
   );

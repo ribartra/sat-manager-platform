@@ -8,6 +8,30 @@ export const PARENT_CONSENT_VERSION = "2026-10-02";
 export const PARENT_CONSENT_STATEMENT =
   "By authorizing, you confirm that you are this student's parent or legal guardian and that the student may create an account and be associated with the teacher who issued the invitation.";
 
+/**
+ * Terms of Use version (app/terms/page.tsx). Consent, including the clause for students under 18, is
+ * recorded as the student accepting these terms at activation (User/InviteToken.termsVersion).
+ * Bump it whenever the terms change.
+ */
+export const TERMS_VERSION = "2026-10-22";
+
+/** Days an invitation link works. Only one open invitation per student email until it expires. */
+export const INVITE_DAYS = 7;
+
+/** The open (not used, not revoked, not expired) student invitations for an email. */
+export function openInviteWhere(email: string, now: Date = new Date()): Prisma.InviteTokenWhereInput {
+  return { role: "STUDENT", email, usedAt: null, revokedAt: null, expiresAt: { gt: now } };
+}
+
+/** Why an invitation link no longer works, or null when it can still be used. */
+export function inviteUnusableReason(invite: { usedAt: Date | null; revokedAt: Date | null; expiresAt: Date } | null) {
+  if (!invite) return "not_found";
+  if (invite.usedAt) return "already_used";
+  if (invite.revokedAt) return "revoked";
+  if (invite.expiresAt < new Date()) return "expired";
+  return null;
+}
+
 export const ADULT_AGE = 18;
 
 /** Whole years between birthDate and `at`. */
@@ -45,7 +69,10 @@ export async function resolveParentAccount(
   return { kind: "conflict", role: existing.role };
 }
 
-/** Parent authorization is needed when the teacher asked for it or the student is a minor (always). */
+/**
+ * Legacy invitations (before TERMS_VERSION 2026-10-22) waiting for a parent's email authorization.
+ * Activation no longer waits for it; this only decides whether the parent link can be resent.
+ */
 export function requiresParentAuthorization(invite: {
   parentConsentRequired: boolean;
   isMinor: boolean;

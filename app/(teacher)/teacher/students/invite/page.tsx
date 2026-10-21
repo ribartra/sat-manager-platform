@@ -1,7 +1,6 @@
 "use client";
 
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
-import { Checkbox } from "@/components/ui/checkbox";
 import { PageShell } from "@/components/sat";
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
@@ -20,11 +19,8 @@ export default function InviteStudentPage() {
   const [phone, setPhone] = useState("");
   const [startDate, setStartDate] = useState("");
   const [birthDate, setBirthDate] = useState("");
-  const [requireAuthChoice, setRequireAuth] = useState(true);
-  // Birth date, when given, decides minor status (the server derives it the same way).
-  // Students under 18 always need a parent's authorization; for adults it is the teacher's choice.
+  // Under 18 is shown for information: consent is the student accepting the Terms at activation.
   const derivedMinor = birthDate ? ageOn(new Date(birthDate)) < ADULT_AGE : null;
-  const requireParentAuthorization = derivedMinor === true || requireAuthChoice;
   const [parentName, setParentName] = useState("");
   const [parentEmail, setParentEmail] = useState("");
   const [parentPhone, setParentPhone] = useState("");
@@ -50,7 +46,7 @@ export default function InviteStudentPage() {
     const res = await fetch("/api/students/invite", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, phone, startDate, birthDate, programId, requireParentAuthorization, parentName, parentEmail, parentPhone }),
+      body: JSON.stringify({ name, email, phone, startDate, birthDate, programId, parentName, parentEmail, parentPhone }),
     });
     setLoading(false);
     if (!res.ok) {
@@ -115,53 +111,39 @@ export default function InviteStudentPage() {
             Birth date <span className="text-red-500">*</span>
           </label>
           <Input type="date" required value={birthDate} max={new Date().toISOString().slice(0, 10)} onChange={(e) => setBirthDate(e.target.value)} />
-          <p className="mt-1 text-xs text-gray-500">Needed to know if the student is under 18 (then a parent must authorize).</p>
-        </div>
-        </div>
-
-        <div className="border-t border-gray-200 pt-4">
-          <label className="flex items-center gap-2 cursor-pointer select-none">
-            <Checkbox
-              checked={requireParentAuthorization}
-              disabled={derivedMinor === true}
-              onChange={(e) => setRequireAuth(e.target.checked)}
-              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-            />
-            <span className="text-sm font-medium text-gray-700">Require parent authorization</span>
-          </label>
-          <p className="mt-1 text-xs text-gray-500 ml-6">
-            {derivedMinor === true ? "Required because the student is under 18. " : ""}
-            {requireParentAuthorization
-              ? "We email the parent or guardian. The student can finish setting up their account only after the parent accepts."
-              : "The student can set up their account right away. You can ask a parent to authorize later from the student's page."}
+          <p className="mt-1 text-xs text-gray-500">
+            {derivedMinor === true
+              ? "Under 18: when activating, the student confirms their parent or guardian agrees (Terms of Use)."
+              : "Kept on the student's record."}
           </p>
         </div>
+        </div>
 
-        {requireParentAuthorization && (
-          <div className="rounded-md border border-blue-200 bg-blue-50 p-4 space-y-3">
-            <h2 className="text-sm font-semibold text-blue-900">Parent / guardian account</h2>
-            <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Parent name</label>
-              <Input value={parentName} onChange={(e) => setParentName(e.target.value)} />
-            </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
-                Parent email <span className="text-red-500">*</span>
-              </label>
-              <Input
-                type="email"
-                value={parentEmail}
-                onChange={(e) => setParentEmail(e.target.value)}
-                required={requireParentAuthorization}
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Parent phone</label>
-              <Input value={parentPhone} onChange={(e) => setParentPhone(e.target.value)} />
-            </div>
+        <div className="rounded-md border border-gray-200 bg-gray-50 p-4 space-y-3">
+          <div>
+            <h2 className="text-sm font-semibold text-gray-900">Parent / guardian (optional)</h2>
+            <p className="mt-0.5 text-xs text-gray-500">
+              Links a parent account when the student activates, so the parent can see reports. It is not needed to activate.
+            </p>
           </div>
-        )}
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Parent name</label>
+            <Input value={parentName} onChange={(e) => setParentName(e.target.value)} />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Parent email</label>
+            <Input type="email" value={parentEmail} onChange={(e) => setParentEmail(e.target.value)} />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Parent phone</label>
+            <Input value={parentPhone} onChange={(e) => setParentPhone(e.target.value)} />
+          </div>
+        </div>
 
+        <p className="text-xs text-gray-500">
+          The student gets an email with a link to set up their account. The link works for 7 days; until then you
+          can&apos;t send another invitation to the same email.
+        </p>
         <InlineError>{error}</InlineError>
         <Button type="submit" disabled={loading || !programId || !birthDate} disabledReason={!programId ? "Choose a program." : !birthDate ? "Enter the student's birth date." : null}>
           {loading ? "Creating..." : "Create Invite"}

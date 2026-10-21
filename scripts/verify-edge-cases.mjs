@@ -273,13 +273,18 @@ const checks = [
   },
   {
     file: "app/api/auth/activate/route.ts",
-    requires: ["requiresParentAuthorization(invite)", "Your parent or guardian needs to authorize your account first. We sent an email to"],
-    label: "Activacion bloqueada sin autorizacion del apoderado (opcion de la tutora o menor) y avisa con el email del apoderado",
+    requires: ["inviteUnusableReason(invite)", "acceptTerms !== true", "termsVersion: TERMS_VERSION", "termsAcceptedAt"],
+    label: "Activacion exige aceptar T&C (consentimiento, incluido menores) y guarda version/fecha; rechaza enlaces usados, anulados o vencidos",
   },
   {
     file: "app/api/students/invite/route.ts",
-    requires: ["parentConsentRequired", "requireParentAuthorization"],
-    label: "Invitacion guarda la opcion Require parent authorization (siempre para menores)",
+    requires: ["openInviteWhere(email, now)", "$transaction", "INVITE_ALREADY_OPEN", "resolveParentAccount", "parentConsentRequired: false"],
+    label: "Una sola invitacion abierta por alumno hasta que vence; email del apoderado opcional y nunca de otra cuenta",
+  },
+  {
+    file: "lib/consent.ts",
+    requires: ["revokedAt: null", "expiresAt: { gt: now }", "TERMS_VERSION"],
+    label: "Invitacion abierta = no usada, no anulada, no vencida; version de T&C",
   },
   {
     file: "app/api/students/[studentId]/parent-authorization/route.ts",

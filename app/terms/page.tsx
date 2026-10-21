@@ -6,13 +6,37 @@ export const metadata: Metadata = { title: "Terms of Use · SAT Practice Platfor
 
 export default function TermsPage() {
   return (
-    <LegalPage title="Terms of Use" updated="October 1, 2026">
+    <LegalPage title="Terms of Use" updated="October 22, 2026">
       <section>
         <h2>Who may use the platform</h2>
         <p>
           Accounts are personal and created by invitation from the academy for its students, their
           parents or guardians, and its teachers. Do not share your password or let someone else use
           your account.
+        </p>
+      </section>
+
+      <section>
+        <h2>Invitations and activation</h2>
+        <p>
+          The academy sends each student one invitation by email. The link in it works for 7 days and
+          lets the student choose a password; while it is valid, no second invitation is sent to the same
+          email. The account is created when the student accepts these Terms and the Privacy Policy.
+        </p>
+      </section>
+
+      <section>
+        <h2>Students under 18</h2>
+        <p>
+          A student under 18 may activate their account only with the knowledge and agreement of a parent
+          or legal guardian. By accepting these Terms when activating, the student confirms that their
+          parent or guardian knows about and agrees to the use of the platform and the handling of personal
+          data described in the Privacy Policy. The date and version of the Terms accepted are recorded.
+        </p>
+        <p className="mt-2">
+          A parent or guardian may ask the academy at any time to see, copy or delete the student&apos;s
+          data, or to close the account. The academy may also link a parent account so the parent can
+          follow the student&apos;s progress.
         </p>
       </section>
 

@@ -4,7 +4,7 @@ import { checkRateLimit, rateLimitKey, rateLimitResponse } from "@/lib/rate-limi
 import { hashPublicToken } from "@/lib/token-security";
 import { writeAudit } from "@/lib/audit";
 import { BadRequestError, withApiErrors } from "@/lib/api-error";
-import { requiresParentAuthorization } from "@/lib/consent";
+import { inviteUnusableReason, TERMS_VERSION } from "@/lib/consent";
 
 export const GET = withApiErrors(async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get("token");
@@ -17,16 +17,14 @@ export const GET = withApiErrors(async function GET(req: NextRequest) {
     where: { OR: [{ tokenHash }, { token }] },
     include: { program: true },
   });
-  if (!invite || invite.usedAt || invite.expiresAt < new Date()) {
+  const unusable = inviteUnusableReason(invite);
+  if (!invite || unusable) {
     await writeAudit({
       action: "INVITE_VIEW_FAILED",
       targetType: "InviteToken",
       targetId: invite?.id ?? token.slice(0, 12),
       outcome: "failure",
-      metadata: {
-        reason: !invite ? "not_found" : invite.usedAt ? "already_used" : "expired",
-        tokenPrefix: token.slice(0, 8),
-      },
+      metadata: { reason: unusable, tokenPrefix: token.slice(0, 8) },
     });
     return new BadRequestError("This invitation link doesn't work or has expired. Ask your teacher for a new one.").toResponse();
   }
@@ -34,19 +32,12 @@ export const GET = withApiErrors(async function GET(req: NextRequest) {
     await prisma.inviteToken.update({ where: { id: invite.id }, data: { tokenHash, token: `hashed:${tokenHash}` } });
   }
 
-  const requiresParentConsent = requiresParentAuthorization(invite);
-
   await writeAudit({
     action: "INVITE_VIEWED",
     targetType: "InviteToken",
     targetId: invite.id,
     outcome: "success",
-    metadata: {
-      email: invite.email,
-      role: invite.role,
-      requiresParentConsent,
-      parentConsentApproved: Boolean(invite.parentConsentAt),
-    },
+    metadata: { email: invite.email, role: invite.role, isMinor: invite.isMinor },
   });
 
   return NextResponse.json({
@@ -56,9 +47,8 @@ export const GET = withApiErrors(async function GET(req: NextRequest) {
     phone: invite.phone,
     startDate: invite.startDate?.toISOString().slice(0, 10) ?? null,
     programName: invite.program?.name ?? null,
-    requiresParentConsent,
-    parentConsentApproved: Boolean(invite.parentConsentAt),
-    // Shown to the student so they know whose inbox has the authorization email.
-    parentEmail: requiresParentConsent ? invite.parentEmail : null,
+    // Under 18: the activation page shows the minors clause of the Terms next to the checkbox.
+    isMinor: invite.isMinor,
+    termsVersion: TERMS_VERSION,
   });
 });
