@@ -2,8 +2,9 @@ import nodemailer from "nodemailer";
 import { getSmtpConfig } from "@/lib/smtp-settings";
 import { captureCaughtError, writeAudit } from "@/lib/audit";
 import { PARENT_ACCESS_WINDOW_DAYS, PARENT_ACTIVATION_DEADLINE_DAYS } from "@/lib/parent-access";
+import { ISSUE_REPORT_DEFAULT_EMAIL, issueCategoryMeta, type IssueElement, type IssueTarget } from "@/lib/issue-report";
 
-export type EmailAttachment = { filename: string; content: Buffer; contentType?: string };
+export type EmailAttachment = { filename: string; content: Buffer; contentType?: string; cid?: string };
 
 type EmailPayload = {
   to: string;
@@ -251,5 +252,120 @@ export async function sendPasswordResetEmail(to: string, name: string, resetUrl:
       <p><a href="${safeUrl}">${safeUrl}</a></p>
       <p>This link expires in 1 hour. If you did not request it, ignore this message.</p>
     `,
+  });
+}
+
+export interface IssueReportEmailInput {
+  id: string;
+  category: string;
+  comment: string;
+  url: string;
+  pageTitle: string | null;
+  viewport: string | null;
+  userAgent: string | null;
+  createdAt: Date;
+  target: IssueTarget;
+  user: { id: string; name: string; email: string; role: string };
+  screenshot: { content: Buffer; contentType: string } | null;
+}
+
+function issueElementRows(el: IssueElement) {
+  const rows: [string, string][] = [
+    ["Selector", el.selector],
+    ["Tag", el.tag],
+  ];
+  if (el.id) rows.push(["id", el.id]);
+  if (el.classes?.length) rows.push(["Classes", el.classes.join(" ")]);
+  for (const [k, v] of Object.entries(el.attributes ?? {})) rows.push([k, v]);
+  if (el.text) rows.push(["Text", el.text]);
+  if (el.ancestors?.length) rows.push(["Ancestors", el.ancestors.join(" › ")]);
+  if (el.rect) rows.push(["Box", `${el.rect.width}×${el.rect.height} at (${el.rect.x}, ${el.rect.y})`]);
+  return rows;
+}
+
+const PRE = 'style="white-space:pre-wrap;word-break:break-all;background:#f3f4f6;border-radius:6px;padding:8px;font-size:12px"';
+const TD = 'style="padding:4px 8px;border-bottom:1px solid #e5e7eb;vertical-align:top;font-size:13px"';
+
+function htmlTable(rows: [string, string][]) {
+  return `<table style="border-collapse:collapse">${rows
+    .map(([k, v]) => `<tr><td ${TD}><b>${escapeHtml(k)}</b></td><td ${TD}><code>${escapeHtml(v)}</code></td></tr>`)
+    .join("")}</table>`;
+}
+
+/** "Report a problem" → ISSUE_REPORT_EMAIL, with the screenshot and the full report as JSON. */
+export async function sendIssueReportEmail(report: IssueReportEmailInput) {
+  const to = process.env.ISSUE_REPORT_EMAIL?.trim() || ISSUE_REPORT_DEFAULT_EMAIL;
+  const category = issueCategoryMeta(report.category);
+  const t = report.target;
+  let path = report.url;
+  try {
+    path = new URL(report.url).pathname;
+  } catch {}
+  const adminUrl = absoluteAppUrl(`/admin/reports/${report.id}`);
+  const when = report.createdAt.toISOString().replace("T", " ").slice(0, 16) + " UTC";
+  const about = t.kind === "page" ? "The whole screen" : t.kind === "area" ? "A dragged area" : "One element";
+  const summary: [string, string][] = [
+    ["From", `${report.user.name} <${report.user.email}> · ${report.user.role}`],
+    ["When", when],
+    ["Page", report.url],
+    ["Title", report.pageTitle ?? "—"],
+    ["About", `${about} · ${t.context}`],
+    ["Viewport", `${report.viewport ?? "—"}${t.devicePixelRatio ? ` @${t.devicePixelRatio}x` : ""}${t.scroll ? ` · scrolled ${t.scroll.x},${t.scroll.y}` : ""}`],
+    ["Browser", report.userAgent ?? "—"],
+  ];
+  if (t.columns?.length) summary.push(["Table columns", t.columns.join(", ")]);
+
+  const text = [
+    `${category.label} reported by ${report.user.name} (${report.user.email}, ${report.user.role})`,
+    "",
+    report.comment,
+    "",
+    ...summary.map(([k, v]) => `${k}: ${v}`),
+    ...(t.element ? ["", "Element:", ...issueElementRows(t.element).map(([k, v]) => `  ${k}: ${v}`), "", "HTML:", t.element.html ?? "—"] : []),
+    ...(t.inside?.length ? ["", "Inside the area:", ...t.inside.map((e) => `  ${e.selector} · ${e.text ?? ""}`)] : []),
+    ...(t.errors?.length ? ["", "JS errors:", ...t.errors] : []),
+    "",
+    `Open in Admin → Reports: ${adminUrl}`,
+  ].join("\n");
+
+  const html = `
+    <p><span style="background:${category.color};color:#fff;border-radius:6px;padding:2px 8px;font-weight:700">${escapeHtml(category.label)}</span>
+      reported by <b>${escapeHtml(report.user.name)}</b> (${escapeHtml(report.user.email)}, ${escapeHtml(report.user.role)})</p>
+    <blockquote style="border-left:4px solid ${category.color};margin:12px 0;padding:6px 12px;white-space:pre-wrap;font-size:15px">${escapeHtml(report.comment)}</blockquote>
+    ${htmlTable(summary.map(([k, v]) => [k, v]))}
+    <p><a href="${escapeHtml(report.url)}">Open the page</a> · <a href="${escapeHtml(adminUrl)}">Open in Admin → Reports</a></p>
+    ${report.screenshot ? `<p><img src="cid:issue-screenshot" alt="Screenshot" style="max-width:100%;border:1px solid #e5e7eb;border-radius:8px"></p>` : "<p><i>No screenshot (the browser could not capture the page).</i></p>"}
+    ${t.element ? `<h3 style="margin-bottom:4px">${t.kind === "area" ? "Element containing the area" : "Element"}</h3>${htmlTable(issueElementRows(t.element))}<h4 style="margin-bottom:4px">HTML</h4><pre ${PRE}>${escapeHtml(t.element.html ?? "—")}</pre>` : ""}
+    ${t.inside?.length ? `<h3 style="margin-bottom:4px">Inside the area (${t.inside.length})</h3>${htmlTable(t.inside.map((e) => [e.selector, [e.classes?.join(" "), e.text].filter(Boolean).join(" · ")]))}` : ""}
+    ${t.errors?.length ? `<h3 style="margin-bottom:4px">JS errors on the page</h3><pre ${PRE}>${escapeHtml(t.errors.join("\n"))}</pre>` : ""}
+    <p style="color:#6b7280;font-size:12px">The full report is attached as report.json.</p>
+  `;
+
+  const json = {
+    id: report.id,
+    category: report.category,
+    comment: report.comment,
+    url: report.url,
+    pageTitle: report.pageTitle,
+    viewport: report.viewport,
+    userAgent: report.userAgent,
+    createdAt: report.createdAt.toISOString(),
+    user: report.user,
+    target: t,
+  };
+  const attachments: EmailAttachment[] = [
+    { filename: "report.json", content: Buffer.from(JSON.stringify(json, null, 2)), contentType: "application/json" },
+  ];
+  if (report.screenshot) {
+    const ext = report.screenshot.contentType === "image/png" ? "png" : "jpg";
+    attachments.unshift({ filename: `screenshot.${ext}`, content: report.screenshot.content, contentType: report.screenshot.contentType, cid: "issue-screenshot" });
+  }
+
+  return sendTransactionalEmail({
+    to,
+    subject: `[SAT report] ${category.label} · ${path}${t.context ? ` · ${t.context}` : ""}`.slice(0, 200),
+    text,
+    html,
+    attachments,
   });
 }

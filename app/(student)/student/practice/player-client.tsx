@@ -28,6 +28,7 @@ import { questionResponseLabel, resolveQuestionType, isAnswerOption } from "@/li
 import { Alert, InlineError } from "@/components/sat/alert";
 import { KeyboardShortcutsHint, PlayerShortcuts } from "@/components/sat/keyboard-shortcuts-hint";
 import { EliminateIcon, ReferenceSheet, StrikeButton, ToolButton, useQuestionHighlights } from "@/components/sat/player-tools";
+import { IssueReportButton } from "@/components/sat/issue-reporter";
 import { Badge } from "@/components/ui/badge";
 import { difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
 
@@ -499,6 +500,7 @@ export function PracticeSetPlayer({
           <ToolButton icon={<EliminateIcon />} label="Eliminate" active={elimMode} onClick={() => setElimMode((v) => !v)} />
           {isMath && showCalculator ? <ToolButton icon={<Calculator size={18} />} label="Calculator" active={calcOpen} onClick={() => setCalcOpen((v) => !v)} /> : null}
           {isMath ? <ToolButton icon={<FileText size={18} />} label="Reference" onClick={() => setRefOpen(true)} /> : null}
+          <IssueReportButton variant="tool" />
           <ToolButton icon={<LogOut size={18} />} label="Save & exit" onClick={() => void handlePauseExit()} title="The timer stops. You'll continue where you left off." />
         </div>
       </div>

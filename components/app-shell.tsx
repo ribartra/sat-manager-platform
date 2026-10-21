@@ -6,6 +6,7 @@ import { signOut } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import { Camera, ChevronDown, ChevronLeft, ChevronRight, KeyRound, LogOut, Menu, X } from "lucide-react";
 import { Avatar } from "@/components/avatar";
+import { IssueReportButton } from "@/components/sat/issue-reporter";
 import { NotificationBell, sidePopoverPosition } from "@/components/notification-bell";
 import { BLOCKED_TEXT } from "@/components/ui/control-states";
 import {
@@ -223,6 +224,7 @@ export function AppShell({
         </div>
 
         <div className="mt-auto flex flex-col gap-1 border-t border-gray-200 pt-2.5">
+          <IssueReportButton collapsed={mini} onStart={() => setMobileOpen(false)} />
           <NotificationBell collapsed={mini} />
           <div ref={userRef}>
             <button

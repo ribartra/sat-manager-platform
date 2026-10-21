@@ -161,3 +161,16 @@ body {
 @utility font-serif-q {
   font-family: Georgia, "Times New Roman", serif;
 }
+
+/* "Report a problem" selection mode (components/sat/issue-reporter.tsx). */
+body.issue-reporter-on,
+body.issue-reporter-on * {
+  cursor: crosshair !important;
+}
+body.issue-reporter-on [data-issue-reporter],
+body.issue-reporter-on [data-issue-reporter] * {
+  cursor: default !important;
+}
+body.issue-reporter-on [data-issue-reporter] button {
+  cursor: pointer !important;
+}

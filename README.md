@@ -157,6 +157,7 @@ Puntos clave:
 - `AuditLog` registra eventos administrativos y de programa.
 - `/admin/logs` muestra registros de auditoría como vista de administrador.
 - La ingesta IA además registra `IngestIncident` e `IngestJobEvent` para observabilidad documental.
+- **Reportar un problema**: todos los portales (barra lateral, menú de padres y barra de herramientas de los players) tienen "Report a problem". El usuario señala un elemento o arrastra un área (o reporta la pantalla entera) y escribe un comentario con categoría. Se guarda en `IssueReport` (captura JPEG del viewport tomada en el navegador + selector, clases, atributos, HTML y ancestros del elemento + errores JS recientes), se envía por correo a `ISSUE_REPORT_EMAIL` (por defecto `admin@nordmetric.com`) con la captura y `report.json` adjuntos, y se gestiona en `/admin/reports` (resolver/reabrir, reenviar correo).
 
 ---
 

@@ -23,6 +23,7 @@ import { notify } from "@/lib/notify-ui";
 import { clearBuffer, readBuffer, sendKeepalive, useOnlineStatus, usePageHideFlush, useSaveQueue, writeBuffer } from "@/lib/player-persistence";
 import { Calculator, ChevronLeft, FileText, Flag, Highlighter, LogOut } from "lucide-react";
 import { EliminateIcon, ReferenceSheet, StrikeButton, ToolButton, useQuestionHighlights } from "@/components/sat/player-tools";
+import { IssueReportButton } from "@/components/sat/issue-reporter";
 import { Alert } from "@/components/sat/alert";
 import { KeyboardShortcutsHint, PlayerShortcuts } from "@/components/sat/keyboard-shortcuts-hint";
 
@@ -862,6 +863,7 @@ export function FullTestPlayer({
               <ToolButton icon={<Calculator size={18} />} label="Calculator" active={calcOpen} onClick={() => setCalcOpen((v) => !v)} />
             ) : null}
             {currentModule.section === "MATH" ? <ToolButton icon={<FileText size={18} />} label="Reference" onClick={() => setRefOpen(true)} /> : null}
+            <IssueReportButton variant="tool" />
             <ToolButton
               icon={<LogOut size={18} />}
               label={previewMode ? "Exit preview" : "Save & exit"}

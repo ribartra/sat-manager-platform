@@ -5,6 +5,31 @@ const root = process.cwd();
 
 const checks = [
   {
+    file: "app/api/issue-reports/route.ts",
+    requires: ["assertApprovedSession", "userId: session.user.id", "checkRateLimit", "screenshotType"],
+    label: "Problem reports need a signed-in user, are rate limited and only accept real JPEG/PNG screenshots",
+  },
+  {
+    file: "app/api/admin/issue-reports/[id]/route.ts",
+    requires: ["assertAdmin"],
+    label: "Problem report status/resend is admin-only",
+  },
+  {
+    file: "app/api/admin/issue-reports/[id]/screenshot/route.ts",
+    requires: ["assertAdmin", "private"],
+    label: "Problem report screenshots are admin-only and never publicly cached",
+  },
+  {
+    file: "app/admin/reports/page.tsx",
+    requires: ["session.user.role !== \"ADMIN\""],
+    label: "Admin → Reports list is admin-only",
+  },
+  {
+    file: "app/admin/reports/[id]/page.tsx",
+    requires: ["session.user.role !== \"ADMIN\""],
+    label: "Admin → Reports detail is admin-only",
+  },
+  {
     file: "app/api/auth/parent-consent/route.ts",
     requires: ["resolveParentAccount", "kind === \"conflict\"", "parentConsentVersion"],
     label: "Parent consent only creates/links PARENT accounts (never converts other roles) and stores the consent version",

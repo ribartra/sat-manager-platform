@@ -32,6 +32,8 @@ model User {
   attempts    Attempt[]
   resetTokens    PasswordResetToken[]
   auditLogs   AuditLog[]
+  issueReports IssueReport[] @relation("IssueReportAuthor")
+  issueReportsResolved IssueReport[] @relation("IssueReportResolver")
   parentLinks ParentStudent[] @relation("ParentLinks")
   childLinks  ParentStudent[] @relation("ChildLinks")
   notifications Notification[]
@@ -416,6 +418,33 @@ model AuditLog {
   user       User?    @relation(fields: [userId], references: [id])
   @@index([createdAt])
   @@index([targetId])
+}
+
+/// "Report a problem" (components/sat/issue-reporter.tsx): a user points at part of a screen and
+/// comments. Saved here and emailed to ISSUE_REPORT_EMAIL; listed in Admin → Reports.
+model IssueReport {
+  id             String    @id @default(cuid())
+  userId         String
+  role           String
+  category       String // PROBLEM | CONFUSING | SUGGESTION | PRAISE
+  comment        String
+  url            String
+  pageTitle      String?
+  viewport       String?
+  userAgent      String?
+  target         String // JSON: selected element(s), page context, JS errors
+  screenshot     Bytes?
+  screenshotType String?
+  status         String    @default("OPEN") // OPEN | RESOLVED
+  emailSentAt    DateTime?
+  emailError     String?
+  resolvedById   String?
+  resolvedAt     DateTime?
+  createdAt      DateTime  @default(now())
+  user           User      @relation("IssueReportAuthor", fields: [userId], references: [id], onDelete: Cascade)
+  resolvedBy     User?     @relation("IssueReportResolver", fields: [resolvedById], references: [id], onDelete: SetNull)
+  @@index([status, createdAt])
+  @@index([userId])
 }
 
 model UnlockRequest {
