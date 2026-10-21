@@ -527,6 +527,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                       min={200}
                       max={800}
                       labels={report.scoreSeries.map((m) => m.label)}
+                      notes={report.scoreSeries.map((m) => (m.timeSeconds ? formatDuration(m.timeSeconds) : null))}
                       series={[
                         { name: "Reading & Writing", color: "var(--sat-area-reading)", values: report.scoreSeries.map((m) => m.rwScore) },
                         { name: "Math", color: "var(--sat-area-math)", values: report.scoreSeries.map((m) => m.mathScore), dashed: true },

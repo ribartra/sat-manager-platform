@@ -44,7 +44,7 @@ import { loadStudentPractice, sortPracticeSets, summarizeArea, PRACTICE_AREAS_IN
 import { loadStudentTests, sortTests, type StudentTestItem } from "@/lib/test-assignments";
 import { officialSkillsFor } from "@/lib/taxonomy-order";
 import { loadContinueWork } from "@/lib/continue-work";
-import { formatDate, relativeDay } from "@/lib/utils";
+import { formatDate, formatDuration, relativeDay } from "@/lib/utils";
 
 /**
  * Student Home (mockup `mejorada` index.html + area.html). Tabs: Summary · Math · Reading · Writing · Tests.
@@ -516,6 +516,7 @@ function TestsTab({ tests, page, links }: { tests: StudentTestItem[]; page: numb
             min={200}
             max={800}
             labels={finished.map(({ t, a }) => `${t.name.replace(/^TEST\s*/i, "T")} · ${a.tryNumber}`)}
+            notes={finished.map(({ a }) => (a.timeTaken ? formatDuration(a.timeTaken) : null))}
             series={[
               { name: "Reading & Writing", color: "var(--sat-area-reading)", values: finished.map(({ a }) => a.rwScore) },
               { name: "Math", color: "var(--sat-area-math)", values: finished.map(({ a }) => a.mathScore), dashed: true },

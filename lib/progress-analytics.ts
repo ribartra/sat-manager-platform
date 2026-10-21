@@ -40,6 +40,8 @@ export type MockSectionMetric = {
   rwScore: number | null;
   totalScore: number | null;
   attempts: number;
+  /** Tests only: seconds spent answering. */
+  timeSeconds?: number | null;
 };
 
 export type TopicTrendPoint = {

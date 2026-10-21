@@ -17,6 +17,8 @@ export interface TestAttemptRow {
   rwScore: number | null;
   mathScore: number | null;
   totalScore: number | null;
+  /** Seconds spent answering (sum of the answers' time), null when nothing was timed. */
+  timeTaken: number | null;
   /** Module-level view; built for open attempts (needed for "k of 2 modules"). */
   view: TestAttemptView | null;
   tryNumber: number;
@@ -54,7 +56,7 @@ export async function loadStudentTests(studentId: string): Promise<StudentTestIt
       test: { include: { modules: { include: fullTestModulesInclude, orderBy: { order: "asc" } } } },
       attempts: {
         orderBy: { startedAt: "asc" },
-        include: { answers: { select: { questionId: true, answer: true, isCorrect: true } } },
+        include: { answers: { select: { questionId: true, answer: true, isCorrect: true, timeSpent: true } } },
       },
     },
     orderBy: [{ dueDate: "asc" }, { createdAt: "asc" }],
@@ -71,6 +73,7 @@ export async function loadStudentTests(studentId: string): Promise<StudentTestIt
           rwScore: attempt.rwScore,
           mathScore: attempt.mathScore,
           totalScore: attempt.totalScore,
+          timeTaken: attempt.answers.reduce((sum, a) => sum + (a.timeSpent ?? 0), 0) || null,
           tryNumber: i + 1,
           view:
             attempt.status === "IN_PROGRESS"

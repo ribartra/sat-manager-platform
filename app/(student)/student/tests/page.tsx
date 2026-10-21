@@ -16,7 +16,7 @@ import { BluebookCard } from "@/components/sat/bluebook-card";
 import { Card } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
 import { loadStudentTests, sortTests } from "@/lib/test-assignments";
-import { formatDate } from "@/lib/utils";
+import { formatDate, formatDuration } from "@/lib/utils";
 
 interface PageProps {
   searchParams: Promise<{ view?: string; page?: string }>;
@@ -49,6 +49,7 @@ export default async function StudentTestsPage({ searchParams }: PageProps) {
   const overdue = pending.filter((t) => t.overdue).length;
   const attemptsTotal = submitted.length;
   const chartLabels = submitted.map((s) => `${shortName(s.test.name)} · try ${s.attempt.tryNumber}`);
+  const chartNotes = submitted.map((s) => (s.attempt.timeTaken ? formatDuration(s.attempt.timeTaken) : null));
 
   const page = paginate(shown, pageFromParam(query.page), TESTS_PAGE_SIZE);
 
@@ -117,7 +118,7 @@ export default async function StudentTestsPage({ searchParams }: PageProps) {
         <div className="mt-6 grid gap-4 lg:grid-cols-2">
           <Card padding="md">
             <SectionHeader size="sm" title="Total score over time" description="Completed tests only · 400–1600" />
-            <LineChart title="Total score over time" min={400} max={1600} labels={chartLabels} series={[{ name: "Total", color: "#6b7280", values: submitted.map((s) => s.attempt.totalScore) }]} />
+            <LineChart title="Total score over time" min={400} max={1600} labels={chartLabels} notes={chartNotes} series={[{ name: "Total", color: "#6b7280", values: submitted.map((s) => s.attempt.totalScore) }]} />
           </Card>
           <Card padding="md">
             <SectionHeader size="sm" title="Section scores over time" description="Each section is scored 200–800" />
@@ -126,6 +127,7 @@ export default async function StudentTestsPage({ searchParams }: PageProps) {
               min={200}
               max={800}
               labels={chartLabels}
+              notes={chartNotes}
               series={[
                 { name: "Reading & Writing", color: "var(--sat-area-reading)", values: submitted.map((s) => s.attempt.rwScore) },
                 { name: "Math", color: "var(--sat-area-math)", values: submitted.map((s) => s.attempt.mathScore), dashed: true },
