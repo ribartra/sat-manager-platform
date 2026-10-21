@@ -61,7 +61,7 @@ La protección de rutas vive en layouts y helpers server-side. No hay `middlewar
 - Usuarios con estados `PENDING`, `APPROVED`, `REJECTED`.
 - Admin valida usuarios y puede activar/desactivar cuentas.
 - Estudiante invitado activa cuenta desde token.
-- Política de invitación (2026-10-22): **una sola invitación abierta por alumno hasta que vence** (7 días); el alumno recibe por correo el enlace para activar su cuenta. El **consentimiento se documenta en los T&C** (`/terms`, sección "Students under 18"): al activar, el alumno (también si es menor) acepta los Términos y se guardan `termsVersion` / `termsAcceptedAt`. La autorización del apoderado por correo ya no bloquea la activación.
+- Política de invitación (2026-10-22): **una sola invitación abierta por alumno hasta que vence** (7 días); el alumno recibe por correo el enlace para activar su cuenta. El **consentimiento se documenta en los T&C** (`/terms`, sección "Students under 18"): al activar, el alumno (también si es menor) acepta los Términos y se guardan `termsVersion` / `termsAcceptedAt`. La autorización del apoderado por correo ya no bloquea la activación. En la activación la casilla "I have read and accept the Terms of Use and the Privacy Policy" viene marcada (enlaces clicables); si se desmarca no se puede continuar. Solo un **admin** puede anular una invitación abierta ("Cancel invitation" en Students → Pending invitations), lo que libera el cupo.
 - Si la invitación del estudiante incluye padre (opcional; nunca el correo de otra cuenta), el padre se crea/vincula durante la activación del alumno; no requiere invitación separada.
 - Padres se administran desde un maestro de padres con asociación/desasociación de alumnos.
 
@@ -147,6 +147,7 @@ Puntos clave:
 ### Reportes, Analytics y Padres
 
 - Reporte individual por alumno.
+- Enviar el reporte por correo: a los padres vinculados o, si el alumno no tiene padre, a una dirección escrita. Tras "Report sent" se ofrece vincular esa dirección como padre (nombre + correo autocompletado, **Assign parent** / **Skip**, "Don't ask again for this student", guardado por docente en `ParentLinkPromptDismissal`). La vista **Parents** lista los alumnos sin padre/tutor con "Add parent".
 - Reporte PDF por áreas configurables.
 - Vista de padre con hijos asociados y progreso.
 - Analytics por alumno, pregunta, skill, dificultad y tiempo.

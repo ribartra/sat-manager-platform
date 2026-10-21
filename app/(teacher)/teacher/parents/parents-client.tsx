@@ -32,7 +32,16 @@ function allAreas() {
   return new Set(REPORT_GROUPS.flatMap((group) => group.areas));
 }
 
-export function ParentsClient({ parents, students }: { parents: Parent[]; students: Student[] }) {
+export function ParentsClient({
+  parents,
+  students,
+  studentsWithoutParent = [],
+}: {
+  parents: Parent[];
+  students: Student[];
+  /** Students in scope with no parent or guardian linked. */
+  studentsWithoutParent?: (Student & { email: string })[];
+}) {
   const router = useRouter();
   const [modal, setModal] = useState<ModalMode>(null);
   const [activeParent, setActiveParent] = useState<Parent | null>(null);
@@ -75,8 +84,9 @@ export function ParentsClient({ parents, students }: { parents: Parent[]; studen
     resetForm();
   }
 
-  function openAdd() {
+  function openAdd(forStudentId?: string) {
     resetForm();
+    if (forStudentId) setSelectedStudentIds([forStudentId]);
     setModal("add");
   }
 
@@ -187,11 +197,35 @@ export function ParentsClient({ parents, students }: { parents: Parent[]; studen
             placeholder="Search parent or student..."
             className="w-64 text-sm"
           />
-          <Button type="button" onClick={openAdd} className="flex items-center gap-1.5">
+          <Button type="button" onClick={() => openAdd()} className="flex items-center gap-1.5">
             <Plus size={14} /> Add Parent
           </Button>
         </div>
       </div>
+
+      {studentsWithoutParent.length > 0 ? (
+        <Card variant="warning" padding="md">
+          <h2 className="text-sm font-semibold text-amber-900">
+            Students without a parent or guardian ({studentsWithoutParent.length})
+          </h2>
+          <p className="mt-0.5 text-xs text-amber-800">They can&apos;t receive reports by email until a parent is linked.</p>
+          <ul className="mt-3 divide-y divide-amber-100">
+            {studentsWithoutParent.map((student) => (
+              <li key={student.id} className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm">
+                <span>
+                  <Link href={`/teacher/students/${student.id}`} className="font-medium text-gray-900 hover:text-[var(--sat-primary)] hover:underline">
+                    {student.name}
+                  </Link>
+                  <span className="ml-2 text-xs text-gray-500">{student.email}</span>
+                </span>
+                <Button type="button" variant="outline" size="sm" onClick={() => openAdd(student.id)}>
+                  <Plus size={14} /> Add parent
+                </Button>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      ) : null}
 
       <Card className="overflow-hidden">
         <table className="w-full text-sm">

@@ -38,6 +38,8 @@ model User {
   issueReportsResolved IssueReport[] @relation("IssueReportResolver")
   parentLinks ParentStudent[] @relation("ParentLinks")
   childLinks  ParentStudent[] @relation("ChildLinks")
+  parentPromptsDismissed ParentLinkPromptDismissal[] @relation("ParentPromptDismisser")
+  parentPromptDismissals ParentLinkPromptDismissal[] @relation("ParentPromptStudent")
   notifications Notification[]
   fullTestAssignments FullPracticeTestAssignment[]
   fullTestAttempts FullPracticeTestAttempt[]
@@ -506,6 +508,18 @@ model ParentStudent {
   student   User @relation("ChildLinks", fields: [studentId], references: [id], onDelete: Restrict)
 
   @@id([parentId, studentId])
+}
+
+/// A teacher chose "Don't ask again" for linking a parent to this student (report → email to an address).
+model ParentLinkPromptDismissal {
+  userId    String
+  studentId String
+  createdAt DateTime @default(now())
+  user      User     @relation("ParentPromptDismisser", fields: [userId], references: [id], onDelete: Cascade)
+  student   User     @relation("ParentPromptStudent", fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@id([userId, studentId])
+  @@index([studentId])
 }
 
 model ParentAccessToken {

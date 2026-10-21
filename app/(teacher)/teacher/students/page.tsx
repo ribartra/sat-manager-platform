@@ -1,3 +1,4 @@
+import { RevokeInviteButton } from "./revoke-invite-button";
 import Link from "next/link";
 import { ChevronRight, UserPlus } from "lucide-react";
 import { DateCell, EmptyState, PageShell, StudentCell } from "@/components/sat";
@@ -150,7 +151,10 @@ export default async function TeacherStudentsPage({ searchParams }: PageProps) {
               {invited.map((i) => (
                 <li key={i.id} className="flex flex-wrap items-center justify-between gap-2 px-4 py-2 text-sm text-gray-500">
                   <StudentCell name={i.name || i.email} email={i.email} />
-                  <Badge>Invitation valid until {formatDate(i.expiresAt)} ({relativeDay(i.expiresAt, now)})</Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge>Invitation valid until {formatDate(i.expiresAt)} ({relativeDay(i.expiresAt, now)})</Badge>
+                    {session?.user.role === "ADMIN" ? <RevokeInviteButton inviteId={i.id} email={i.email} /> : null}
+                  </div>
                 </li>
               ))}
             </ul>

@@ -117,9 +117,14 @@ test.describe.serial("Student invitation policy", () => {
     await expect(page.getByRole("heading", { name: new RegExp(`Welcome, ${minor.name}`) })).toBeVisible();
     await expect(page.getByText(/You are under 18/)).toBeVisible();
     await expect(page.getByText(/needs to authorize/)).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Terms of Use" }).first()).toHaveAttribute("href", "/terms");
     const passwords = page.locator('input[type="password"]');
     await passwords.nth(0).fill(E2E.studentPassword + "Aa1!");
     await passwords.nth(1).fill(E2E.studentPassword + "Aa1!");
+    // The T&C box comes checked; unchecking it blocks the button.
+    const terms = page.getByRole("checkbox");
+    await expect(terms).toBeChecked();
+    await terms.uncheck();
     await expect(page.getByRole("button", { name: "Finish setup" })).toBeDisabled();
 
     const token = new URL(ctx.url!, "http://x").searchParams.get("token");
@@ -127,7 +132,7 @@ test.describe.serial("Student invitation policy", () => {
     expect(refused.status()).toBe(400);
     expect((await refused.json()).error).toMatch(/accept the Terms/);
 
-    await page.getByRole("checkbox").check();
+    await terms.check();
     await page.getByRole("button", { name: "Finish setup" }).click();
     await expect(page).toHaveURL(/\/login/, { timeout: 20_000 });
     const user = sql<{ termsVersion: string; termsAcceptedAt: string | null }>(
@@ -142,18 +147,31 @@ test.describe.serial("Student invitation policy", () => {
     await expect(page.getByText(/doesn't work or has expired/)).toBeVisible();
   });
 
-  test("a revoked invitation stops working and frees the slot", async ({ page }) => {
+  test("only an admin can cancel an invitation; the link stops working and the slot is free", async ({ page }) => {
     await loginAs(page, E2E.teacherEmail, E2E.teacherPassword);
     const first = await invite(page, revoked, "2009-05-25");
     expect(first.status).toBe(200);
-    const db = openDb();
-    try {
-      db.prepare("update InviteToken set revokedAt = ? where email = ?").run(new Date().toISOString().replace("Z", "+00:00"), revoked.email);
-    } finally {
-      db.close();
-    }
+    await page.goto("/teacher/students");
+    const teacherRow = page.locator("li").filter({ hasText: revoked.email });
+    await expect(teacherRow).toBeVisible();
+    await expect(teacherRow.getByRole("button", { name: "Cancel invitation" })).toHaveCount(0);
+    const forbidden = await page.request.post(`/api/admin/invites/${sql<{ id: string }>("select id from InviteToken where email = ?", revoked.email).id}/revoke`);
+    expect(forbidden.status()).toBe(403);
+
+    await page.context().clearCookies();
+    await loginAs(page, E2E.adminEmail, E2E.adminPassword);
+    await page.goto("/teacher/students");
+    const adminRow = page.locator("li").filter({ hasText: revoked.email });
+    await adminRow.getByRole("button", { name: "Cancel invitation" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Cancel invitation" }).click();
+    await expect(page.getByText("Invitation cancelled").first()).toBeVisible();
+    await expect(page.locator("li").filter({ hasText: revoked.email })).toHaveCount(0);
+    expect(sql<{ revokedAt: string | null }>("select revokedAt from InviteToken where email = ?", revoked.email).revokedAt).toBeTruthy();
+
+    await page.context().clearCookies();
     await page.goto(relative(first.body.inviteUrl!));
     await expect(page.getByText(/doesn't work or has expired/)).toBeVisible();
+    await loginAs(page, E2E.teacherEmail, E2E.teacherPassword);
     const again = await invite(page, revoked, "2009-05-25");
     expect(again.status, JSON.stringify(again.body)).toBe(200);
   });

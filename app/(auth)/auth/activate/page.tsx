@@ -19,7 +19,7 @@ import {
 import { ErrorState, FormSection, LoadingState } from "@/components/sat";
 import { activateSchema, type ActivateInput } from "@/contracts/auth";
 import { LegalLinks } from "@/components/legal/legal-page";
-import { InlineError } from "@/components/sat/alert";
+import { Alert, InlineError } from "@/components/sat/alert";
 import { Checkbox } from "@/components/ui/checkbox";
 import { apiFetch, errorMessage } from "@/lib/api-client";
 import { PASSWORD_MIN_LENGTH } from "@/lib/password-policy";
@@ -42,7 +42,8 @@ export default function ActivatePage() {
   const [tokenError, setTokenError] = useState(false);
   const [serverError, setServerError] = useState("");
   // Consent is recorded as accepting the Terms of Use (with the clause for students under 18).
-  const [acceptTerms, setAcceptTerms] = useState(false);
+  // Checked by default (policy 2026-10-22); the student can uncheck it, and then cannot continue.
+  const [acceptTerms, setAcceptTerms] = useState(true);
 
   const form = useForm<ActivateInput>({
     resolver: zodResolver(activateSchema),
@@ -160,17 +161,25 @@ export default function ActivatePage() {
                   )}
                 />
               </FormSection>
+              <Alert tone="info">
+                <p>
+                  <strong>Before you start:</strong> creating your password means you accept the{" "}
+                  <Link href="/terms" target="_blank" className="font-medium text-blue-700 underline">Terms of Use</Link> and the{" "}
+                  <Link href="/privacy" target="_blank" className="font-medium text-blue-700 underline">Privacy Policy</Link>.
+                  {!isParent && invite.isMinor ? (
+                    <>
+                      {" "}You are under 18, so your parent or guardian must know about and agree to your account (see
+                      &quot;Students under 18&quot; in the Terms).
+                    </>
+                  ) : null}
+                </p>
+              </Alert>
               <label className="flex items-start gap-2 text-sm text-foreground">
                 <Checkbox className="mt-0.5" checked={acceptTerms} onChange={(e) => setAcceptTerms(e.target.checked)} required />
                 <span>
-                  I accept the{" "}
-                  <Link href="/terms" target="_blank" className="text-blue-600 hover:underline">Terms of Use</Link> and the{" "}
-                  <Link href="/privacy" target="_blank" className="text-blue-600 hover:underline">Privacy Policy</Link>.
-                  {!isParent && invite.isMinor ? (
-                    <span className="mt-1 block text-xs text-muted-foreground">
-                      You are under 18: you confirm that your parent or guardian knows about and agrees to your account, as described in the Terms.
-                    </span>
-                  ) : null}
+                  I have read and accept the{" "}
+                  <Link href="/terms" target="_blank" className="text-blue-600 underline hover:text-blue-800">Terms of Use</Link> and the{" "}
+                  <Link href="/privacy" target="_blank" className="text-blue-600 underline hover:text-blue-800">Privacy Policy</Link>.
                 </span>
               </label>
               <InlineError>{serverError}</InlineError>

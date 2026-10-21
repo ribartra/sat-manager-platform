@@ -6,8 +6,11 @@ import { useRef, useState } from "react";
 import { Download, FileText, Loader2, Mail } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Hint } from "@/components/hint";
-import { InlineError } from "@/components/sat/alert";
-import { errorMessage, readApiError } from "@/lib/api-client";
+import { Alert, InlineError } from "@/components/sat/alert";
+import { Input } from "@/components/ui/input";
+import { apiFetch, errorMessage, readApiError } from "@/lib/api-client";
+import { notify } from "@/lib/notify-ui";
+import { useRouter } from "next/navigation";
 
 const AREAS = [
   { key: "math", label: "Math", color: "var(--sat-area-math)" },
@@ -36,7 +39,7 @@ export interface ReportParentOption {
   email: string | null;
 }
 interface SendResult {
-  parentId: string;
+  parentId: string | null;
   name: string;
   email: string | null;
   sent: boolean;
@@ -81,6 +84,11 @@ export function GenerateReportDialog({
   const [sending, setSending] = useState(false);
   const [sendResults, setSendResults] = useState<SendResult[] | null>(null);
   const [sendError, setSendError] = useState<string | null>(null);
+  // No parent linked: send to one address, then offer to link it as the parent.
+  const [toEmail, setToEmail] = useState("");
+  const [sentTo, setSentTo] = useState<string | null>(null);
+  const [askToLink, setAskToLink] = useState(false);
+  const toEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(toEmail.trim());
 
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const endpoint = `/api/reports/students/${studentId}/pdf`;
@@ -101,6 +109,8 @@ export function GenerateReportDialog({
   function schedulePreview(areas: Set<AreaKey>, delay = 350, exam = examId) {
     if (timer.current) clearTimeout(timer.current);
     setSendResults(null);
+    setSentTo(null);
+    setAskToLink(false);
     const next = queryFor(areas, exam);
     if (!next) {
       setPreviewQuery(null);
@@ -131,24 +141,39 @@ export function GenerateReportDialog({
     setRecipients(next);
   }
 
-  async function sendToParents() {
-    if (!query || recipients.size === 0) return;
+  async function sendReport() {
+    const toAddress = emailParents.length === 0 ? toEmail.trim() : "";
+    if (!query || (toAddress ? !toEmailValid : recipients.size === 0)) return;
     setSending(true);
     setSendError(null);
     setSendResults(null);
+    setSentTo(null);
+    setAskToLink(false);
     const keys = AREAS.filter((area) => selected.has(area.key)).map((area) => area.key);
     const response = await fetch(`/api/reports/students/${studentId}/email`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ parentIds: [...recipients], areas: keys, filters, fptAttemptId: effectiveExamId || null }),
+      body: JSON.stringify({
+        ...(toAddress ? { toEmail: toAddress } : { parentIds: [...recipients] }),
+        areas: keys,
+        filters,
+        fptAttemptId: effectiveExamId || null,
+      }),
     });
     setSending(false);
     if (!response.ok) {
       setSendError(errorMessage(await readApiError(response, "The report could not be sent.")));
       return;
     }
-    const data = (await response.json()) as { results?: SendResult[] };
-    setSendResults(data.results ?? []);
+    const data = (await response.json()) as { results?: SendResult[]; askToLinkParent?: boolean };
+    const results = data.results ?? [];
+    setSendResults(results);
+    const delivered = results.filter((result) => result.sent).map((result) => result.email).filter(Boolean) as string[];
+    if (delivered.length > 0) {
+      setSentTo(delivered.join(", "));
+      setAskToLink(Boolean(toAddress && data.askToLinkParent));
+      notify.success("Report sent", delivered.join(", "));
+    }
   }
 
   return (
@@ -242,9 +267,19 @@ export function GenerateReportDialog({
 
         <div className="rounded-md border border-gray-200 p-3">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-            <span className="text-sm font-medium text-gray-900">Email to parents</span>
+            <span className="text-sm font-medium text-gray-900">{emailParents.length > 0 ? "Email to parents" : "Email the report"}</span>
             {emailParents.length === 0 ? (
-              <span className="text-sm text-gray-500">No linked parents with email. Link a parent in Parents to send the report.</span>
+              <label className="flex min-w-[16rem] flex-1 flex-wrap items-center gap-2 text-sm text-gray-600">
+                <span>No parent linked. Send to:</span>
+                <Input
+                  type="email"
+                  value={toEmail}
+                  onChange={(event) => setToEmail(event.target.value)}
+                  placeholder="name@example.com"
+                  aria-label="Email address for the report"
+                  className="h-9 min-w-[14rem] flex-1"
+                />
+              </label>
             ) : (
               emailParents.map((parent) => (
                 <label key={parent.id} className="inline-flex cursor-pointer items-center gap-2 text-sm text-gray-700">
@@ -257,34 +292,129 @@ export function GenerateReportDialog({
                 </label>
               ))
             )}
-            {emailParents.length > 0 ? (
-              <Button
-                type="button"
-                variant="secondary"
-                className="ml-auto h-9 gap-1.5 px-3"
-                onClick={() => void sendToParents()}
-                disabled={sending}
-                disabledReason={!query ? "Choose at least one area for the report." : recipients.size === 0 ? "Select at least one parent." : null}
-                title="Email this PDF to the selected parents"
-              >
-                {sending ? <Loader2 size={14} className="animate-spin" /> : <Mail size={14} />} Send PDF
-              </Button>
-            ) : null}
+            <Button
+              type="button"
+              variant="secondary"
+              className="ml-auto h-9 gap-1.5 px-3"
+              onClick={() => void sendReport()}
+              disabled={sending}
+              disabledReason={
+                !query
+                  ? "Choose at least one area for the report."
+                  : emailParents.length === 0
+                    ? toEmailValid
+                      ? null
+                      : "Enter the email address to send the report to."
+                    : recipients.size === 0
+                      ? "Select at least one parent."
+                      : null
+              }
+              title="Email this PDF"
+            >
+              {sending ? <Loader2 size={14} className="animate-spin" /> : <Mail size={14} />} Send PDF
+            </Button>
           </div>
           <InlineError className="mt-2">{sendError}</InlineError>
-          {sendResults ? (
+          {sentTo ? (
+            <Alert tone="success" className="mt-2">
+              <p className="font-medium">Report sent to {sentTo}.</p>
+              {askToLink ? (
+                <LinkParentPrompt
+                  studentId={studentId}
+                  studentName={studentName}
+                  email={toEmail.trim().toLowerCase()}
+                  onDone={() => setAskToLink(false)}
+                />
+              ) : null}
+            </Alert>
+          ) : null}
+          {sendResults && sendResults.some((result) => !result.sent) ? (
             <ul className="mt-2 space-y-0.5 text-sm">
-              {sendResults.map((result) => (
-                <li key={result.parentId} className={result.sent ? "text-green-700" : "text-rose-600"}>
-                  {result.sent
-                    ? `Sent to ${result.name} (${result.email}).`
-                    : `Not sent to ${result.name}: ${SEND_REASON[result.reason ?? ""] ?? result.reason ?? "unknown error"}.`}
-                </li>
-              ))}
+              {sendResults
+                .filter((result) => !result.sent)
+                .map((result) => (
+                  <li key={result.parentId ?? result.email ?? result.name} className="text-rose-600">
+                    {`Not sent to ${result.name}: ${SEND_REASON[result.reason ?? ""] ?? result.reason ?? "unknown error"}.`}
+                  </li>
+                ))}
             </ul>
           ) : null}
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+/**
+ * Shown in the "Report sent" notice when the student has no parent linked: link the address just
+ * used as the parent (POST /api/parents creates or links a PARENT account), skip, or skip for good.
+ */
+function LinkParentPrompt({ studentId, studentName, email: initialEmail, onDone }: { studentId: string; studentName: string; email: string; onDone: () => void }) {
+  const router = useRouter();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState(initialEmail);
+  const [dontAsk, setDontAsk] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function assign() {
+    setBusy(true);
+    setError(null);
+    try {
+      await apiFetch("/api/parents", { method: "POST", json: { name: name.trim(), email: email.trim(), studentIds: [studentId] } });
+      notify.success("Parent linked", `${name.trim()} can now receive ${studentName}'s reports.`);
+      onDone();
+      router.refresh();
+    } catch (err) {
+      setError(errorMessage(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function skip() {
+    if (dontAsk) {
+      setBusy(true);
+      try {
+        await apiFetch(`/api/students/${studentId}/parent-prompt`, { method: "POST", json: { dismiss: true } });
+      } catch (err) {
+        setBusy(false);
+        setError(errorMessage(err));
+        return;
+      }
+      setBusy(false);
+    }
+    onDone();
+  }
+
+  const nameMissing = !name.trim();
+  const emailInvalid = !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  return (
+    <div className="mt-2 space-y-2 border-t border-[var(--sat-ok-border)] pt-2 text-sm text-gray-800">
+      <p>{studentName} has no parent linked. Link this person as their parent or guardian?</p>
+      <div className="grid gap-2 sm:grid-cols-2">
+        <Input value={name} onChange={(event) => setName(event.target.value)} placeholder="Parent name" aria-label="Parent name" className="h-9" />
+        <Input type="email" value={email} onChange={(event) => setEmail(event.target.value)} aria-label="Parent email" className="h-9" />
+      </div>
+      <div className="flex flex-wrap items-center gap-3">
+        <Button
+          type="button"
+          size="sm"
+          onClick={() => void assign()}
+          disabled={busy}
+          disabledReason={nameMissing ? "Enter the parent's name." : emailInvalid ? "Enter a valid email." : null}
+        >
+          Assign parent
+        </Button>
+        <Button type="button" size="sm" variant="ghost" onClick={() => void skip()} disabled={busy}>
+          Skip
+        </Button>
+        <label className="inline-flex cursor-pointer items-center gap-2 text-xs text-gray-600">
+          <Checkbox checked={dontAsk} onChange={(event) => setDontAsk(event.target.checked)} />
+          Don&apos;t ask again for this student
+        </label>
+      </div>
+      <InlineError>{error}</InlineError>
+    </div>
   );
 }

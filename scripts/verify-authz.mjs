@@ -35,6 +35,21 @@ const checks = [
     label: "Coding agent settings are admin-only and audited",
   },
   {
+    file: "app/api/admin/invites/[id]/revoke/route.ts",
+    requires: ["assertAdmin", "revokedAt", "usedAt: null", "INVITE_REVOKED"],
+    label: "Cancelling an invitation is admin-only, only for open invitations, and audited",
+  },
+  {
+    file: "app/api/students/[studentId]/parent-prompt/route.ts",
+    requires: ["assertTeacherOrAdmin", "studentAccessWhereFor", "userId: session.user.id"],
+    label: "\"Don't ask again\" for linking a parent is per teacher and only for students in scope",
+  },
+  {
+    file: "app/api/reports/students/[studentId]/email/route.ts",
+    requires: ["studentAccessWhereFor", "toEmail", "checkRateLimit", "parentStudent.count", "resolveParentAccount"],
+    label: "Report to an address only for students without a linked parent, rate limited; never offers linking another role's email",
+  },
+  {
     file: "app/admin/reports/page.tsx",
     requires: ["session.user.role !== \"ADMIN\""],
     label: "Admin → Reports list is admin-only",
