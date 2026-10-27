@@ -227,6 +227,13 @@ export function CompactAreaBox({
 }
 
 /** Grid for area boxes (mockup `.grid.boxes`: auto-fit, min 250px). */
-export function AreaBoxGrid({ children }: { children: React.ReactNode }) {
-  return <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(250px,1fr))]">{children}</div>;
+/**
+ * The card grid of every role's views: the Math / Reading / Writing cards and the Test cards share it,
+ * so a Test card is exactly as wide as an area card (3 per row on desktop, 2 on tablets, 1 on phones).
+ */
+export function CardGrid({ children, className }: { children: React.ReactNode; className?: string }) {
+  return <div className={`grid gap-3 sm:grid-cols-2 lg:grid-cols-3 ${className ?? ""}`}>{children}</div>;
 }
+
+/** Area cards (Math / Reading / Writing): the shared CardGrid. */
+export const AreaBoxGrid = CardGrid;

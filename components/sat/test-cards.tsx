@@ -1,11 +1,8 @@
-import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { SECTION_TEXT, SectionCell } from "@/components/sat/test-ui";
-import { DueLine, WorkStatusBadges } from "@/components/sat/work-status";
 import { VoidableValue } from "@/components/sat/attempt-status";
 import type { TestAttemptView } from "@/lib/test-view";
-import type { StudentTestItem, TestAttemptRow } from "@/lib/test-assignments";
-import { formatDate } from "@/lib/utils";
+import type { TestAttemptRow } from "@/lib/test-assignments";
 import { cn } from "@/lib/utils";
 
 /**
@@ -66,62 +63,3 @@ export function TestSectionScore({ attempt, section }: { attempt: Pick<TestAttem
   return <VoidableValue status={attempt.status}><span className={cn("font-semibold tabular-nums", SECTION_TEXT[section])}>{value ?? "—"}</span></VoidableValue>;
 }
 
-/** Mini card for one assigned Test (mockup `.mini-bb`): status, then section scores or module progress. */
-export function TestMiniCard({ item, hrefFor }: { item: StudentTestItem; hrefFor: (attemptId: string) => string }) {
-  const last = item.lastSubmitted;
-  const open = item.openAttempt;
-  const href = open ? hrefFor(open.id) : last ? hrefFor(last.id) : null;
-  // Mockup `.mini-bb .t`: grey header with dark ink; red when overdue; light grey when not started.
-  const tone =
-    item.overdue && item.state !== "done"
-      ? "bg-red-600 text-white"
-      : item.state === "todo"
-        ? "bg-[var(--sat-tests-soft)] text-[var(--sat-tests-ink)]"
-        : "bg-[var(--sat-area-tests)] text-[var(--sat-tests-ink)]";
-  const body = (
-    <>
-      <div className={cn("flex items-center justify-between gap-2 rounded-t-lg px-3 py-2", tone)}>
-        <p className="truncate text-sm font-semibold">{item.name}</p>
-        <span className="text-[10px] font-semibold uppercase tracking-wide">
-          {item.state === "done" ? "Completed" : item.state === "progress" ? "In progress" : "Not started"}
-        </span>
-      </div>
-      <div className="px-3 py-2">
-        {item.state === "done" && last ? (
-          <>
-            <div className="flex gap-4 text-sm">
-              <span><span className="block text-[11px] font-semibold text-[var(--sat-area-reading)]">R&amp;W</span><b className="text-lg tabular-nums">{last.rwScore ?? "—"}</b></span>
-              <span><span className="block text-[11px] font-semibold text-[var(--sat-area-math)]">Math</span><b className="text-lg tabular-nums">{last.mathScore ?? "—"}</b></span>
-            </div>
-            <p className="text-xs text-gray-500">
-              {last.submittedAt ? formatDate(last.submittedAt) : ""} · {item.attempts.length} attempt{item.attempts.length === 1 ? "" : "s"}
-            </p>
-          </>
-        ) : (
-          <>
-            <p className="text-xs text-gray-600">
-              {open?.view ? `${open.view.modulesDone} of 4 modules` : "Not started"}
-              {open?.view ? (
-                <>
-                  {" · "}R&amp;W <SectionCell section={open.view.sections.RW} /> · Math <SectionCell section={open.view.sections.MATH} />
-                </>
-              ) : null}
-            </p>
-            <div className="mt-0.5 flex items-center gap-2">
-              {item.overdue ? <WorkStatusBadges state={item.state} overdue /> : null}
-              <DueLine dueDate={item.dueDate} />
-            </div>
-          </>
-        )}
-      </div>
-    </>
-  );
-  const classes = cn("block overflow-hidden", item.overdue && item.state !== "done" ? "border-red-200" : "");
-  return href ? (
-    <Card as={Link} href={href} className={cn(classes, "hover:border-gray-400")}>
-      {body}
-    </Card>
-  ) : (
-    <Card className={classes}>{body}</Card>
-  );
-}

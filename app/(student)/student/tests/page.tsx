@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import {
   Breadcrumbs,
+  CardGrid,
   EmptyState,
   LinkTabs,
   PageShell,
@@ -9,11 +10,12 @@ import {
   StatGrid,
   StatTile,
   TestAttemptsAccordion,
+  TestCard,
+  type TestCardLinks,
   pageFromParam,
   paginate,
 } from "@/components/sat";
 import { testGroups as groupTests } from "@/lib/attempt-groups";
-import { BluebookCard } from "@/components/sat/bluebook-card";
 import { auth } from "@/lib/auth";
 import { loadStudentTests, sortTests } from "@/lib/test-assignments";
 import { formatDate } from "@/lib/utils";
@@ -93,11 +95,11 @@ export default async function StudentTestsPage({ searchParams }: PageProps) {
         <EmptyState title={view === "pending" ? "No pending tests. Great job!" : "No tests here yet."} />
       ) : (
         <div id="tests" className="scroll-mt-6">
-          <div className="grid items-start gap-[18px] [grid-template-columns:repeat(auto-fill,minmax(270px,1fr))]">
+          <CardGrid>
             {page.items.map((t) => (
-              <BluebookCard key={t.assignmentId} item={t} />
+              <TestCard key={t.assignmentId} item={t} links={STUDENT_TEST_CARD_LINKS} />
             ))}
-          </div>
+          </CardGrid>
           <Pagination basePath="/student/tests" params={{ view }} anchor="tests" pageSize={TESTS_PAGE_SIZE} {...page} />
         </div>
       )}
@@ -113,4 +115,11 @@ export default async function StudentTestsPage({ searchParams }: PageProps) {
 }
 
 const TESTS_PAGE_SIZE = 10;
+
+/** The student's Test card links (same card as every view): start / continue modules, review, retake. */
+const STUDENT_TEST_CARD_LINKS: TestCardLinks = {
+  attempt: (id) => `/student/tests/results/${id}`,
+  module: (assignmentId, moduleKey) => `/student/tests/${assignmentId}?module=${moduleKey}`,
+  canRetake: true,
+};
 

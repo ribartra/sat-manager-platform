@@ -3,6 +3,7 @@ import { BookOpen, CheckCircle2, ClipboardList, Clock, Map as MapIcon, TrendingU
 import {
   AreaBoxGrid,
   Breadcrumbs,
+  CardGrid,
   CompactAreaBox,
   ContinueCard,
   EmptyState,
@@ -13,6 +14,8 @@ import {
   StatGrid,
   StatTile,
   TestAttemptsAccordion,
+  TestCard,
+  type TestCardLinks,
   pageFromParam,
   paginate,
 } from "@/components/sat";
@@ -22,7 +25,7 @@ import { ListItem, ListStack } from "@/components/sat/list";
 import { FilterBar, FilterField } from "@/components/sat/filter-bar";
 import { Select } from "@/components/ui/select";
 import { PctBars, PracticeSetRow } from "@/components/sat/practice-set-row";
-import { Pct, WorkStatusBadges } from "@/components/sat/work-status";
+import { Pct } from "@/components/sat/work-status";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -65,6 +68,16 @@ export interface HomeLinks {
   readOnly: boolean;
   /** Breadcrumb trail up to the Home (Student view: Home › Students › {name} › View as student). */
   crumbs?: Crumb[];
+}
+
+/** Test card links for the Home: the student starts and retakes; the teacher's Student view only looks. */
+function testCardLinks(links: HomeLinks): TestCardLinks {
+  return {
+    attempt: links.testResult,
+    module: links.readOnly ? null : (assignmentId, moduleKey) => `/student/tests/${assignmentId}?module=${moduleKey}`,
+    canRetake: !links.readOnly,
+    scoreLabel: links.readOnly ? "TOTAL SCORE" : undefined,
+  };
 }
 
 export const STUDENT_HOME_LINKS: HomeLinks = {
@@ -149,17 +162,16 @@ export async function StudentHome({
   );
 }
 
-/** Summary (mockup index.html): compact practice boxes, a Tests strip and the last 4 attempts. */
+/** Summary (mockup index.html): compact practice boxes, the Test cards and the last 4 attempts. */
 function SummaryView({ practice, tests, links }: { practice: PracticeSetItem[]; tests: StudentTestItem[]; links: HomeLinks }) {
   const recentPractice = practice.flatMap((item) => item.tries.map((t) => ({ kind: "practice" as const, when: t.submittedAt, item, t })));
   const recentTests = tests.flatMap((test) =>
     test.attempts.filter((a) => a.status !== "INVALIDATED").map((a) => ({ kind: "test" as const, when: a.submittedAt ?? a.startedAt, test, a })),
   );
   const recent = [...recentPractice, ...recentTests].sort((x, y) => y.when.getTime() - x.when.getTime()).slice(0, 4);
-  const latestTest = tests
-    .flatMap((t) => (t.lastSubmitted ? [{ t, a: t.lastSubmitted }] : []))
-    .sort((x, y) => (y.a.submittedAt?.getTime() ?? 0) - (x.a.submittedAt?.getTime() ?? 0))[0];
   const pendingTests = tests.filter((t) => t.state !== "done");
+  // Test cards (same component as every view): pending first, then the finished ones.
+  const testCards = [...sortTests(tests).pending, ...sortTests(tests).done];
   const overdueTests = pendingTests.filter((t) => t.overdue).length;
 
   return (
@@ -185,36 +197,20 @@ function SummaryView({ practice, tests, links }: { practice: PracticeSetItem[]; 
         })}
       </AreaBoxGrid>
 
-      <Card
-        as={Link}
-        href={links.tab("tests")}
-        padding="md"
-        className="mt-6 flex flex-wrap items-center justify-between gap-3.5 border-t-[5px] border-t-[var(--sat-area-tests)] hover:border-gray-400"
-      >
-        <div>
-          <h2 className="inline-flex items-center gap-1.5 text-base font-semibold text-gray-900"><ClipboardList size={16} /> Tests</h2>
-          <p className="text-sm text-gray-500">
-            {pendingTests.length} pending
-            {overdueTests ? <> · <b className="text-red-600">{overdueTests} overdue</b></> : null}
-          </p>
-        </div>
-        {latestTest ? (
-          <div className="flex items-center gap-[18px]">
-            <span className="text-xs text-gray-500">Latest · {latestTest.t.name}</span>
-            <div>
-              <p className="text-xs font-semibold text-[var(--sat-area-reading)]">R&amp;W</p>
-              <b className="text-xl tabular-nums">{latestTest.a.rwScore ?? "—"}</b>
-            </div>
-            <div>
-              <p className="text-xs font-semibold text-[var(--sat-area-math)]">Math</p>
-              <b className="text-xl tabular-nums">{latestTest.a.mathScore ?? "—"}</b>
-            </div>
-            <span aria-hidden className="text-gray-400">›</span>
-          </div>
+      <section className="mt-6">
+        <SectionHeader
+          title={<span className="inline-flex items-center gap-1.5"><ClipboardList size={16} /> Tests</span>}
+          description={`${pendingTests.length} pending${overdueTests ? ` · ${overdueTests} overdue` : ""}`}
+          action={<Link href={links.tab("tests")} className="text-sm text-blue-600 hover:underline">All tests ›</Link>}
+        />
+        {testCards.length === 0 ? (
+          <Card padding="md" className="text-sm text-gray-500">No tests assigned.</Card>
         ) : (
-          <span className="text-sm text-gray-500">No tests finished yet</span>
+          <CardGrid>
+            {testCards.map((t) => <TestCard key={t.assignmentId} item={t} links={testCardLinks(links)} />)}
+          </CardGrid>
         )}
-      </Card>
+      </section>
 
       <section className="mt-6">
         <SectionHeader title="Recent attempts" action={<Link href={links.history()} className="text-sm text-blue-600 hover:underline">View all ›</Link>} />
@@ -431,22 +427,9 @@ function TestsTab({ tests, page, links }: { tests: StudentTestItem[]; page: numb
       {pending.length === 0 ? (
         <Card padding="md" className="text-sm text-gray-500">No pending tests.</Card>
       ) : (
-        <ListStack>
-          {pending.map((t) => {
-            const next = t.openAttempt?.view?.nextModule ?? t.modules[0];
-            const done = t.openAttempt?.view?.modulesDone ?? 0;
-            return (
-              <ListItem compact key={t.assignmentId} href={links.readOnly ? undefined : `/student/tests/${t.assignmentId}?module=${next?.key ?? "rw1"}`}>
-                <span className="flex min-w-0 flex-wrap items-center gap-1.5">
-                  <b className="text-sm text-gray-900">{t.name}</b>
-                  <WorkStatusBadges state={t.state} overdue={t.overdue} />
-                  <span className="text-xs text-gray-500">{done} of 4 modules{t.dueDate ? ` · due ${formatDate(t.dueDate)}` : ""}</span>
-                </span>
-                {links.readOnly ? null : <span className="shrink-0 rounded-lg bg-[var(--sat-primary)] px-2.5 py-[5px] text-xs font-semibold text-white">{t.openAttempt ? "Continue" : "Start"}</span>}
-              </ListItem>
-            );
-          })}
-        </ListStack>
+        <CardGrid>
+          {pending.map((t) => <TestCard key={t.assignmentId} item={t} links={testCardLinks(links)} />)}
+        </CardGrid>
       )}
 
       <section className="mt-6">

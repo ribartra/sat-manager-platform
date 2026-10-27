@@ -73,6 +73,29 @@ const checks = [
     forbids: ["Questions correct", "Total questions"],
     label: "Reporte temporal del apoderado: ultimo intento por set, sin promedio",
   },
+  // One Test card (CookSAT reference) in every view, on the same grid as the area cards.
+  {
+    file: "components/sat/test-card.tsx",
+    requires: ["SAT MOCK EXAM", "REVIEW TEST", "400–1600", "canRetake"],
+    label: "Card de Test unica (referencia CookSAT): SAT MOCK EXAM, total, Mod 1/2 por seccion, REVIEW TEST",
+  },
+  {
+    file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
+    requires: ["<TestCard", "CardGrid", "canRetake: false"],
+    forbids: ["TestMiniCard"],
+    label: "Ficha del alumno: cards de Test con el mismo componente y ancho que las de area; sin reintento del teacher",
+  },
+  {
+    file: "app/(student)/student/student-home.tsx",
+    requires: ["<TestCard", "CardGrid"],
+    label: "Home del alumno / Student view: cards de Test con el mismo componente",
+  },
+  {
+    file: "app/(student)/student/tests/page.tsx",
+    requires: ["<TestCard", "CardGrid"],
+    forbids: ["BluebookCard"],
+    label: "Tests del alumno: misma card de Test",
+  },
   {
     file: "components/sat/test-cards.tsx",
     requires: ["VoidableValue", "view.total !== null", "Not available until all modules are done"],

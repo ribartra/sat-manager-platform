@@ -22,7 +22,9 @@ import {
   StatGrid,
   StatTile,
   TD,
-  TestMiniCard,
+  CardGrid,
+  TestCard,
+  type TestCardLinks,
   VoidableValue,
   invalidatedRowClass,
   isInvalidated,
@@ -160,6 +162,15 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
   ].filter(Boolean).join(" · ");
   const switcherQuery = buildProgressHref("", filters).replace(/^\?/, "");
   const secondaryButton = HEADER_ACTION_CLASS;
+
+  // Test cards for the teacher: completed modules open the attempt, nothing to start, no retake.
+  const teacherTestLinks: TestCardLinks = {
+    attempt: (id) => buildProgressHref(`/teacher/students/${studentId}/tests/${id}`, filters),
+    module: null,
+    test: (testId) => `/teacher/tests/${testId}`,
+    canRetake: false,
+    scoreLabel: "TOTAL SCORE",
+  };
 
   const header = (
     <>
@@ -302,9 +313,9 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
           {testItems.length === 0 ? (
             <Card padding="md" className="text-sm text-gray-400">No tests assigned.</Card>
           ) : (
-            <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(160px,1fr))]">
-              {testItems.map((t) => <TestMiniCard key={t.assignmentId} item={t} hrefFor={(id) => `/teacher/students/${studentId}/tests/${id}`} />)}
-            </div>
+            <CardGrid>
+              {testItems.map((t) => <TestCard key={t.assignmentId} item={t} links={teacherTestLinks} />)}
+            </CardGrid>
           )}
         </section>
 
@@ -508,6 +519,12 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
             { label: "Tests to do", value: String(report.kpis.pending), hint: "Assigned but not finished yet.", href: "#active-tests" },
           ]}
         />
+        {/* One card per assigned Test (same component as every other view), then every try below. */}
+        {tests.length > 0 ? (
+          <CardGrid className="mb-6">
+            {[...sortTests(tests).pending, ...sortTests(tests).done].map((t) => <TestCard key={t.assignmentId} item={t} links={teacherTestLinks} />)}
+          </CardGrid>
+        ) : null}
         <div className="grid gap-6 lg:grid-cols-3">
           {/* One section per Test and attempt; no chart across different Tests (product rule). */}
           <div id="performance" className="min-w-0 space-y-6 lg:col-span-2">
