@@ -23,6 +23,7 @@ import { AnswerGrid, AnswerGridLegend } from "@/components/sat/test-ui";
 import { tabFromPracticeArea, type PracticeAreaCode } from "@/lib/practice-area";
 import { loadStudentPractice, sortPracticeSets } from "@/lib/student-practice";
 import { relativeDay } from "@/lib/utils";
+import { liveImagesOf } from "@/lib/question-media";
 
 interface PageProps {
   params: Promise<{ attemptId: string }>;
@@ -241,7 +242,9 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
               // Historic attempts render the question as it was when answered (questionSnapshot).
               const snapshot = parseSnapshot<QuestionSnapshot>(ans.questionSnapshot);
               const question = snapshot ?? ans.question;
-              const options = snapshot?.options?.length ? snapshot.options : ans.question.options;
+              // Text and options as answered (snapshot); images from the live bank question (only referenced).
+              const media = liveImagesOf(ans.question, snapshot?.options?.length ? snapshot.options : ans.question.options);
+              const options = media.options;
               const topicName = snapshot?.topic?.name ?? ans.question.topic.name;
               const state = !ans.answer ? "blank" : ans.isCorrect ? "ok" : "bad";
               return (
@@ -249,7 +252,7 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
                   <ReviewQuestionCard
                     id={`q-${i + 1}`}
                     number={i + 1}
-                    question={{ ...question, options, imageUrl: question.imageUrl ?? null }}
+                    question={{ ...question, options, imageUrl: media.imageUrl }}
                     answer={ans.answer}
                     isCorrect={Boolean(ans.isCorrect)}
                     timeSpent={ans.timeSpent}

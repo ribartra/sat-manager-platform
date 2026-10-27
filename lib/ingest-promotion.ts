@@ -220,8 +220,24 @@ export async function propagateAssignedImageToOfficial(args: {
   return { propagated: true, target: `OPTION ${optionLabel}`, imageUrl: publicUrl };
 }
 
+const DATA_URI_PATTERN = /^data:(image\/(png|jpe?g|webp|gif));base64,([A-Za-z0-9+/=\s]+)$/i;
+
+/**
+ * Official question images are files in storage, referenced by URL — never base64 in the database.
+ * Private ingest assets are copied to public storage; a `data:` image is decoded and saved the same
+ * way (sha256 name), so no write path can store a data URI on a Question or QuestionOption.
+ */
 export async function materializeOfficialImageUrl(imageUrl: string | null | undefined) {
   if (!imageUrl) return null;
+  if (imageUrl.startsWith("data:")) {
+    const parsed = DATA_URI_PATTERN.exec(imageUrl.trim());
+    if (!parsed) return null;
+    const data = Buffer.from(parsed[3].replace(/\s+/g, ""), "base64");
+    const extension = parsed[2].toLowerCase() === "jpeg" ? ".jpg" : `.${parsed[2].toLowerCase()}`;
+    const digest = crypto.createHash("sha256").update(data).digest("hex").slice(0, 24);
+    const { putQuestionImage } = await import("@/lib/object-storage");
+    return putQuestionImage(`${digest}${extension}`, data);
+  }
   const match = PRIVATE_ASSET_PATTERN.exec(imageUrl);
   if (!match) return imageUrl;
 

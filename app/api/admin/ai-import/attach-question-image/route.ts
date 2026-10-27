@@ -31,13 +31,14 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
   if (!image) return new NotFoundError("Image not found").toResponse();
   if (!question) return new NotFoundError("Question not found").toResponse();
 
-  // Prefer the private asset URL (copied into public/uploads/questions); fall back to a data URI.
+  // The private asset, or the inline image data, becomes a file in storage referenced by URL
+  // (materializeOfficialImageUrl) — never a base64 data URI stored on the question.
   let imageUrl: string | null = null;
   if (image.fileUrl) imageUrl = await materializeOfficialImageUrl(image.fileUrl);
   if (!imageUrl && image.base64Data) {
-    imageUrl = image.base64Data.startsWith("data:")
-      ? image.base64Data
-      : `data:${image.mimeType || "image/jpeg"};base64,${image.base64Data}`;
+    imageUrl = await materializeOfficialImageUrl(
+      image.base64Data.startsWith("data:") ? image.base64Data : `data:${image.mimeType || "image/jpeg"};base64,${image.base64Data}`,
+    );
   }
   if (!imageUrl) return new BadRequestError("Could not resolve image data").toResponse();
 

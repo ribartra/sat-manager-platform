@@ -57,10 +57,10 @@ function snapshotFor(testId) {
         difficulty: row.difficulty,
         correctAnswer: row.correctAnswer,
         explanation: row.explanation,
-        imageUrl: row.imageUrl,
+        imageUrl: null, // images are referenced (read from the live question), not stored
         supportsGraph: Boolean(row.supportsGraph),
         topic: { id: row.topicId, name: row.topicName, domain: { id: row.domainId, name: row.domainName } },
-        options: optionsStmt.all(row.questionId).map((o) => ({ id: o.id, label: o.label, text: o.text, imageUrl: o.imageUrl })),
+        options: optionsStmt.all(row.questionId).map((o) => ({ id: o.id, label: o.label, text: o.text, imageUrl: null })),
       },
     })),
   }));

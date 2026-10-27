@@ -25,6 +25,7 @@ import { parseSnapshot, PracticeSetSnapshot, QuestionSnapshot } from "@/lib/atte
 import { auth } from "@/lib/auth";
 import { teacherProgramEnrollmentScope } from "@/lib/program-scope";
 import { summarizeAllQuestionAnswers } from "@/lib/weighted-score";
+import { liveImagesOf } from "@/lib/question-media";
 import { buildProgressHref, progressFiltersFromParams } from "@/lib/progress-filters";
 
 interface PageProps {
@@ -107,9 +108,11 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
       const snapshot = parseSnapshot<QuestionSnapshot>(ans?.questionSnapshot);
       const question = snapshot ?? item?.question;
       if (!question) return null;
-      const options = snapshot?.options?.length ? snapshot.options : item?.question.options ?? [];
+      // Text and options as answered (snapshot); images from the live bank question (only referenced).
+      const media = liveImagesOf(item?.question, snapshot?.options?.length ? snapshot.options : item?.question.options ?? []);
+      const options = media.options;
       const state: "ok" | "bad" | "blank" = !ans?.answer ? "blank" : ans.isCorrect ? "ok" : "bad";
-      return { questionId, ans, question, options, state, topicName: snapshot?.topic?.name ?? item?.question.topic.name ?? "—" };
+      return { questionId, ans, question: { ...question, imageUrl: media.imageUrl }, options, state, topicName: snapshot?.topic?.name ?? item?.question.topic.name ?? "—" };
     })
     .filter((x): x is NonNullable<typeof x> => x !== null);
   const counts = {

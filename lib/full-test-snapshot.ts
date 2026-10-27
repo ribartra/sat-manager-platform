@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import { loadLiveQuestionMedia, withLiveMedia } from "@/lib/question-media";
 import { parseSnapshot, stringifySnapshot } from "@/lib/attempt-snapshots";
 
 /**
@@ -130,12 +131,21 @@ export function snapshotModules(modules: LiveModule[]): FullTestSnapshotModule[]
 }
 
 export function buildFullTestSnapshot(testId: string, modules: LiveModule[], opts: { backfilled?: boolean } = {}) {
+  // The attempt references the questions' images (by questionId), it never stores them: images are
+  // read from the live bank question (fullTestModulesForAttempt), so a fixed crop reaches old attempts.
+  const withoutImages = snapshotModules(modules).map((module) => ({
+    ...module,
+    questions: module.questions.map((item) => ({
+      ...item,
+      question: { ...item.question, imageUrl: null, options: item.question.options.map((option) => ({ ...option, imageUrl: null })) },
+    })),
+  }));
   const snapshot: FullTestSnapshot = {
     version: FULL_TEST_SNAPSHOT_VERSION,
     takenAt: new Date().toISOString(),
     ...(opts.backfilled ? { backfilled: true } : {}),
     testId,
-    modules: snapshotModules(modules),
+    modules: withoutImages,
   };
   return stringifySnapshot(snapshot);
 }
@@ -156,9 +166,15 @@ export function snapshotModulesOf(testSnapshot: string | null | undefined) {
 }
 
 /**
- * The exam as the attempt saw it: the stored snapshot, or (legacy attempts without one) the
- * live exam rows in the same shape.
+ * The exam as the attempt saw it: the stored snapshot (text, options, answer key), or (legacy
+ * attempts without one) the live exam rows in the same shape. Images always come from the live bank
+ * question (an attempt only references them), never from the snapshot.
  */
 export async function fullTestModulesForAttempt(attempt: { testId: string; testSnapshot: string | null }) {
-  return snapshotModulesOf(attempt.testSnapshot) ?? loadLiveFullTestModules(attempt.testId);
+  const modules = snapshotModulesOf(attempt.testSnapshot) ?? (await loadLiveFullTestModules(attempt.testId));
+  const media = await loadLiveQuestionMedia(modules.flatMap((module) => module.questions.map((item) => item.questionId)));
+  return modules.map((module) => ({
+    ...module,
+    questions: module.questions.map((item) => ({ ...item, question: withLiveMedia(item.question, media) })),
+  }));
 }

@@ -73,6 +73,34 @@ const checks = [
     forbids: ["Questions correct", "Total questions"],
     label: "Reporte temporal del apoderado: ultimo intento por set, sin promedio",
   },
+  // Attempts reference the question's images (live bank question by id); they never store them.
+  {
+    file: "lib/full-test-snapshot.ts",
+    requires: ["loadLiveQuestionMedia", "withLiveMedia", "imageUrl: null"],
+    label: "Tests: el intento referencia la imagen de la pregunta (se lee del banco), no la guarda",
+  },
+  {
+    file: "lib/attempt-snapshots.ts",
+    requires: ["imageUrl: null"],
+    forbids: ["imageUrl: item.question.imageUrl", "imageUrl: option.imageUrl"],
+    label: "Practice: el snapshot de la pregunta no guarda imagenes",
+  },
+  {
+    file: "app/(student)/student/results/[attemptId]/page.tsx",
+    requires: ["liveImagesOf"],
+    label: "Resultado de practice: imagenes desde la pregunta viva",
+  },
+  {
+    file: "lib/ingest-promotion.ts",
+    requires: ["DATA_URI_PATTERN", "putQuestionImage"],
+    label: "Imagenes oficiales: un data: URI se guarda como archivo y se referencia por URL (nunca base64 en la BD)",
+  },
+  {
+    file: "app/api/admin/ai-import/attach-question-image/route.ts",
+    requires: ["materializeOfficialImageUrl("],
+    forbids: ["? image.base64Data\n"],
+    label: "Adjuntar imagen desde la galeria: sin fallback a base64",
+  },
   // One Test card (CookSAT reference) in every view, on the same grid as the area cards.
   {
     file: "components/sat/test-card.tsx",
