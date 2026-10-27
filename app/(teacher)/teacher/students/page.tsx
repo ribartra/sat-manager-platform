@@ -1,7 +1,7 @@
 import { RevokeInviteButton } from "./revoke-invite-button";
 import Link from "next/link";
 import { ChevronRight, UserPlus } from "lucide-react";
-import { DateCell, EmptyState, PageShell, StudentCell } from "@/components/sat";
+import { DateCell, EmptyState, ListFilters, PageShell, StudentCell } from "@/components/sat";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -86,22 +86,12 @@ export default async function TeacherStudentsPage({ searchParams }: PageProps) {
 
       <MoreLinks links={moreLinks} />
 
-      <Card as="form" padding="sm" className="mb-4 flex flex-wrap items-end gap-3">
-        <label className="min-w-[12rem] flex-1 text-xs font-medium text-gray-600">
-          Search
-          <input name="q" defaultValue={search} placeholder="Name or email" className="mt-1 w-full rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]" />
-        </label>
-        <label className="min-w-[10rem] text-xs font-medium text-gray-600">
-          Show
-          <select name="show" defaultValue={show} className="mt-1 w-full rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]">
-            {(Object.keys(SHOW) as Show[]).map((key) => (
-              <option key={key} value={key}>{SHOW[key]}</option>
-            ))}
-          </select>
-        </label>
-        <button type="submit" className="shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-3 py-1.5 text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]">Apply</button>
-        <Link href="/teacher/students" className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">Clear</Link>
-      </Card>
+      <ListFilters
+        action="/teacher/students"
+        q={search}
+        placeholder="Name or email"
+        filters={[{ name: "show", label: "Show", value: show === "all" ? "" : show, allLabel: SHOW.all, options: (Object.keys(SHOW) as Show[]).filter((key) => key !== "all").map((key) => ({ value: key, label: SHOW[key] })) }]}
+      />
 
       {rows.length === 0 ? (
         <EmptyState title="No students match." />

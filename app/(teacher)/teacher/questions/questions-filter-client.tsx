@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { TaxonomyPicker, type TaxonomyPickerTopic } from "@/components/taxonomy-picker";
@@ -42,7 +43,8 @@ export function QuestionsFilter({
   }
 
   return (
-    <form onSubmit={apply} className="mb-5 space-y-3">
+    // Same look as the shared ListFilters bar (FilterBar box), client-side because of the skill picker.
+    <form onSubmit={apply} role="search" className="@container mb-3.5 space-y-2 rounded-[var(--sat-radius)] border border-[var(--sat-border)] bg-white p-3">
       <TaxonomyPicker topics={topics} value={topicId} onChange={setTopicId} allowAll fixedSection={sectionLabel} />
       <div className="flex flex-wrap items-center gap-3">
         <Input
@@ -69,9 +71,7 @@ export function QuestionsFilter({
             </option>
           ))}
         </Select>
-        <button type="submit" className="rounded-md bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-200">
-          Filter
-        </button>
+        <Button type="submit" variant="secondary">Apply</Button>
       </div>
     </form>
   );

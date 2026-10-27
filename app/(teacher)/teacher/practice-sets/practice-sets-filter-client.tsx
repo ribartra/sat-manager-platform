@@ -44,7 +44,7 @@ export function PracticeSetsFilter({
   }
 
   return (
-    <form onSubmit={apply} className="mb-3.5 space-y-3 rounded-[var(--sat-radius)] border border-[var(--sat-border)] bg-white p-3">
+    <form onSubmit={apply} role="search" className="@container mb-3.5 space-y-2 rounded-[var(--sat-radius)] border border-[var(--sat-border)] bg-white p-3">
       <TaxonomyPicker topics={topics} value={topicId} onChange={setTopicId} allowAll fixedSection={sectionLabel} />
       <div className="flex flex-wrap items-center gap-2.5">
         <Input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search set name" aria-label="Search practice sets" className="max-w-xs text-sm" />
@@ -64,9 +64,7 @@ export function PracticeSetsFilter({
             </option>
           ))}
         </Select>
-        <Button type="submit" variant="secondary">
-          Filter
-        </Button>
+        <Button type="submit" variant="secondary">Apply</Button>
       </div>
     </form>
   );

@@ -27,18 +27,24 @@ export function ListFilters({
   q,
   placeholder = "Search",
   filters = [],
+  dates = [],
   hidden = {},
   qName = "q",
+  children,
 }: {
   action: string;
   q?: string;
   placeholder?: string;
   filters?: ListFilterSelect[];
+  /** Date fields (e.g. From / To), sent as YYYY-MM-DD. */
+  dates?: { name: string; label: string; value?: string }[];
   hidden?: Record<string, string | undefined>;
   /** Param name of the text search (default `q`). */
   qName?: string;
+  /** Extra named controls inside the same form (e.g. a skill picker), placed before the selects. */
+  children?: React.ReactNode;
 }) {
-  const active = Boolean(q) || filters.some((f) => f.value);
+  const active = Boolean(q) || filters.some((f) => f.value) || dates.some((d) => d.value);
   const keep = Object.entries(hidden).filter((entry): entry is [string, string] => Boolean(entry[1]));
   const clearHref = keep.length ? `${action}?${new URLSearchParams(keep).toString()}` : action;
   return (
@@ -50,12 +56,18 @@ export function ListFilters({
           <Input id={`lf-${qName}`} name={qName} type="search" defaultValue={q ?? ""} placeholder={placeholder} className="pl-8" />
         </div>
       </FilterField>
+      {children}
       {filters.map((f) => (
         <FilterField key={f.name} label={f.label} htmlFor={`lf-${f.name}`}>
           <Select id={`lf-${f.name}`} name={f.name} defaultValue={f.value ?? ""}>
             <option value="">{f.allLabel}</option>
             {f.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </Select>
+        </FilterField>
+      ))}
+      {dates.map((d) => (
+        <FilterField key={d.name} label={d.label} htmlFor={`lf-${d.name}`} className="@md:max-w-[11rem]">
+          <Input id={`lf-${d.name}`} name={d.name} type="date" defaultValue={d.value ?? ""} />
         </FilterField>
       ))}
       <div className="flex items-center gap-2">

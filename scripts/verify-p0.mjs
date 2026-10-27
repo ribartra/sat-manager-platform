@@ -75,6 +75,18 @@ const checks = [
   },
   // Every list (teacher + admin) has a text search and filters.
   {
+    file: "app/(teacher)/teacher/page.tsx",
+    requires: ["<ListFilters", 'hidden={{ area }}', 'hidden={{ area: "tests" }}'],
+    forbids: ['Card as="form"', 'placeholder="Search a student…"'],
+    label: "Busqueda con filtros: Home del teacher (todas las pestanas) con el mismo componente",
+  },
+  {
+    file: "app/(teacher)/teacher/students/page.tsx",
+    requires: ["<ListFilters"],
+    forbids: ['Card as="form"'],
+    label: "Busqueda con filtros: Students con el mismo componente",
+  },
+  {
     file: "app/(teacher)/teacher/tests/page.tsx",
     requires: ["ListFilters", "matchesQuery(query.q"],
     label: "Busqueda con filtros: Tests (teacher)",
@@ -111,7 +123,8 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/history/page.tsx",
-    requires: ['name="q"', "student", "status"],
+    requires: ["<ListFilters", "student", "status"],
+    forbids: ['Card as="form"'],
     label: "Busqueda con filtros: Historial: texto + alumno, tipo, area, estado, fecha",
   },
   {

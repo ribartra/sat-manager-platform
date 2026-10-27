@@ -216,7 +216,7 @@ export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; 
         ))}
       </div>
 
-      <div className="mb-5 flex flex-wrap items-end gap-3">
+      <div role="search" className="@container mb-3.5 space-y-2 rounded-[var(--sat-radius)] border border-[var(--sat-border)] bg-white p-3 flex flex-wrap items-end gap-3 space-y-0">
         <div className="min-w-[220px]">
           <label htmlFor="materials-search" className="mb-1 block text-sm font-medium text-gray-700">Search</label>
           <Input id="materials-search" type="search" value={searchFilter} onChange={(e) => setSearchFilter(e.target.value)} placeholder="Title or description" className="text-sm" />

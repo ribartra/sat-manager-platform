@@ -15,6 +15,7 @@ import {
   TD,
   VoidableValue,
   invalidatedRowClass,
+  ListFilters,
   matchesQuery,
   pageFromParam,
   paginate,
@@ -23,8 +24,6 @@ import { AreaTag } from "@/components/sat/practice-set-row";
 import { InvalidateAttemptButton } from "@/components/sat/invalidate-attempt-button";
 import { Pct } from "@/components/sat/work-status";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { studentAccessWhereFor } from "@/lib/program-scope";
@@ -73,7 +72,6 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
   const shownRows = rows.filter((r) => matchesQuery(q, r.studentName, r.title));
   const page = paginate(shownRows, pageFromParam(query.page), PAGE_SIZE);
   const params = { q, student: studentId, type, area: query.area && area ? query.area : "", status, from };
-  const anyFilter = Object.values(params).some(Boolean);
 
   return (
     <PageShell maxWidth={1180} width="wide">
@@ -83,48 +81,18 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
         Every practice set and Test your students took, newest first. Practice shows % correct; Tests show SAT section scores.
       </p>
 
-      <Card as="form" padding="sm" className="mb-4 flex flex-wrap items-end gap-3" role="search">
-        <label className="min-w-[12rem] flex-1 text-xs font-medium text-gray-600">
-          Search
-          <input type="search" name="q" defaultValue={q} placeholder="Student, practice set or Test" className="mt-1 w-full rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]" />
-        </label>
-        <label className="min-w-[12rem] flex-1 text-xs font-medium text-gray-600">
-          Student
-          <select name="student" defaultValue={studentId} className="mt-1 w-full rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]">
-            <option value="">All students</option>
-            {students.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-          </select>
-        </label>
-        <label className="text-xs font-medium text-gray-600">
-          Type
-          <select name="type" defaultValue={type} className="mt-1 w-full rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]">
-            <option value="">Tests and practice</option>
-            <option value="tests">Tests</option>
-            <option value="practice">Practice</option>
-          </select>
-        </label>
-        <label className="text-xs font-medium text-gray-600">
-          Practice area
-          <select name="area" defaultValue={area ? query.area : ""} className="mt-1 w-full rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]">
-            <option value="">All areas</option>
-            {PRACTICE_AREA_TABS.map((t) => <option key={t.key} value={t.key}>{t.label}</option>)}
-          </select>
-        </label>
-        <label className="text-xs font-medium text-gray-600">
-          Status
-          <select name="status" defaultValue={status} className="mt-1 w-full rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]">
-            <option value="">Any</option>
-            <option value="completed">Completed</option>
-            <option value="progress">In progress</option>
-          </select>
-        </label>
-        <label className="text-xs font-medium text-gray-600">
-          From
-          <input type="date" name="from" defaultValue={from} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1 text-sm text-gray-900" />
-        </label>
-        <Button type="submit" size="sm">Apply</Button>
-        {anyFilter ? <Link href="/teacher/history" className="pb-1.5 text-xs text-blue-600 hover:underline">Clear</Link> : null}
-      </Card>
+      <ListFilters
+        action="/teacher/history"
+        q={q}
+        placeholder="Student, practice set or Test"
+        filters={[
+          { name: "student", label: "Student", value: studentId, allLabel: "All students", options: students.map((st) => ({ value: st.id, label: st.name })) },
+          { name: "type", label: "Type", value: type, allLabel: "Tests and practice", options: [{ value: "tests", label: "Tests" }, { value: "practice", label: "Practice" }] },
+          { name: "area", label: "Practice area", value: area ? query.area : "", allLabel: "All areas", options: PRACTICE_AREA_TABS.map((t) => ({ value: t.key, label: t.label })) },
+          { name: "status", label: "Status", value: status, allLabel: "Any", options: [{ value: "completed", label: "Completed" }, { value: "progress", label: "In progress" }] },
+        ]}
+        dates={[{ name: "from", label: "From", value: from }]}
+      />
 
       <p className="mb-2 text-xs text-gray-500">{shownRows.length} attempt{shownRows.length === 1 ? "" : "s"}</p>
       {shownRows.length === 0 ? (

@@ -14,6 +14,8 @@ import {
   TD,
 } from "@/components/sat";
 import { SectionHead } from "@/components/sat/test-ui";
+import { FilterField, ListFilters } from "@/components/sat";
+import { Select } from "@/components/ui/select";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
@@ -97,18 +99,6 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {tab === "summary" || tab === "tests" ? (
-            <form action="/teacher" className="flex items-center gap-2">
-              {tab !== "summary" ? <input type="hidden" name="area" value={tab} /> : null}
-              <input
-                name="q"
-                defaultValue={search}
-                placeholder="Search a student…"
-                aria-label="Search a student"
-                className="w-56 rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]"
-              />
-            </form>
-          ) : null}
           <Link
             href="/teacher/students/invite"
             className="flex items-center gap-1.5 shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]"
@@ -135,6 +125,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
       return (
         <PageShell maxWidth={1180} width="wide" density="compact" className="space-y-4">
           {head(rows.length)}
+          <ListFilters action="/teacher" q={search} placeholder="Name or email" hidden={{ area: "tests" }} />
           {rows.length === 0 ? (
             <EmptyState title="No students match." />
           ) : (
@@ -193,6 +184,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
     return (
       <PageShell maxWidth={1180} width="wide" density="compact" className="space-y-4">
         {head(rows.length)}
+        <ListFilters action="/teacher" q={search} placeholder="Name or email" />
         <Card padding="none" className="flex flex-col gap-2 px-4 py-3">
           <AttentionRow
             icon={<Clock size={14} />}
@@ -438,65 +430,29 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
     <PageShell maxWidth={1180} width="wide" density="compact" className="space-y-4">
       {head(students.length)}
 
-      <Card as="form" padding="sm" className="flex flex-wrap items-end gap-x-3 gap-y-2">
-        <input type="hidden" name="area" value={area} />
-        <label className="min-w-[10rem] flex-[1.6] text-xs font-medium text-gray-600">
-          Search
-          <input
-            name="q"
-            defaultValue={search}
-            placeholder="Name or email"
-            className="mt-1 w-full rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]"
-          />
-        </label>
-        {teacherGroupManagementEnabled && (
-          <label className="min-w-[7.5rem] flex-1 text-xs font-medium text-gray-600">
-            Group
-            <select name="group" defaultValue={groupId} className="mt-1 w-full rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]">
-              <option value="">All</option>
-              {groups.map((group) => (
-                <option key={group.id} value={group.id}>
-                  {group.name}
-                </option>
-              ))}
-            </select>
-          </label>
-        )}
-        <label className="min-w-[7.5rem] flex-1 text-xs font-medium text-gray-600">
-          Skill
-          <select name="topic" defaultValue={topicId} className="mt-1 w-full rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]">
+      <ListFilters
+        action="/teacher"
+        q={search}
+        placeholder="Name or email"
+        hidden={{ area }}
+        filters={[
+          ...(teacherGroupManagementEnabled
+            ? [{ name: "group", label: "Group", value: groupId, allLabel: "All groups", options: groups.map((group) => ({ value: group.id, label: group.name })) }]
+            : []),
+          { name: "difficulty", label: "Difficulty", value: difficulty, allLabel: "All levels", options: difficultyOptions().map((opt) => ({ value: opt.value, label: opt.label })) },
+        ]}
+        dates={[
+          { name: "incorporatedFrom", label: "Start date from", value: params.incorporatedFrom || params.from || "" },
+          ...(showEndDate ? [{ name: "incorporatedTo", label: "Start date to", value: params.incorporatedTo || params.to || "" }] : []),
+        ]}
+      >
+        <FilterField label="Skill" htmlFor="lf-topic">
+          <Select id="lf-topic" name="topic" defaultValue={topicId}>
             <option value="">All skills</option>
             <SkillOptions topics={topics.filter((topic) => isOfficialSkill(topic.id)).sort(compareSkills).map((topic) => ({ id: topic.id, name: topic.name, group: topic.domain.name }))} />
-          </select>
-        </label>
-        <label className="min-w-[7.5rem] flex-1 text-xs font-medium text-gray-600">
-          Difficulty
-          <select name="difficulty" defaultValue={difficulty} className="mt-1 w-full rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]">
-            <option value="">All</option>
-            {difficultyOptions().map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
-        </label>
-        <label className="min-w-[7.5rem] flex-1 text-xs font-medium text-gray-600">
-          Start date from
-          <input name="incorporatedFrom" type="date" defaultValue={params.incorporatedFrom || params.from || ""} className="mt-1 w-full rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]" />
-        </label>
-        {showEndDate && (
-          <label className="min-w-[7.5rem] flex-1 text-xs font-medium text-gray-600">
-            Start date to
-            <input name="incorporatedTo" type="date" defaultValue={params.incorporatedTo || params.to || ""} className="mt-1 w-full rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]" />
-          </label>
-        )}
-        <div className="flex items-center gap-2">
-          <button type="submit" title="Apply filters" className="shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-3 py-1.5 text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]">
-            Apply
-          </button>
-          <Link href={`/teacher?area=${area}`} className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
-            Clear
-          </Link>
-        </div>
-      </Card>
+          </Select>
+        </FilterField>
+      </ListFilters>
 
       {(inactiveStudents.length > 0 || overdueCount > 0 || unlockCount > 0) && (
         <Alert tone="warning" className="mb-5">
