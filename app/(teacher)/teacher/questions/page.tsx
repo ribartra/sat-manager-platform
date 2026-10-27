@@ -18,7 +18,7 @@ import { loadOptionImageUrlsByQuestionId } from "@/lib/question-list-media-query
 import { QuestionsTable, type QuestionBankRow } from "./questions-table-client";
 import { resolveQuestionType } from "@/lib/question-type";
 
-interface SearchParams { area?: string; section?: string; topic?: string; difficulty?: string; status?: string; page?: string }
+interface SearchParams { area?: string; section?: string; topic?: string; difficulty?: string; status?: string; page?: string; q?: string }
 
 const TOPIC_IN_CHUNK = 400;
 const PAGE_SIZE = 50;
@@ -51,10 +51,13 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
       ? { in: visibleTopicIds }
       : { in: visibleTopicIds.slice(0, TOPIC_IN_CHUNK) };
 
+  // Text search: words of the stem / stimulus, or a question ID.
+  const q = (filters.q ?? "").trim();
   const questionWhere = {
     topicId: topicFilter,
     difficulty: (filters.difficulty as string | undefined) || undefined,
     status: (filters.status as string | undefined) || undefined,
+    ...(q ? { OR: [{ stem: { contains: q } }, { stimulus: { contains: q } }, { id: q }] } : {}),
   };
   const total = await prisma.question.count({ where: questionWhere });
   const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -104,6 +107,7 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
 
       <QuestionsFilter
         area={area}
+        initialQuery={q}
         sectionLabel={sectionLabel}
         topics={visibleTopics.map((t) => ({
           id: t.id,
@@ -143,7 +147,7 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
       />
       <Pagination
         basePath="/teacher/questions"
-        params={{ area: filters.area, section: filters.section, topic: filters.topic, difficulty: filters.difficulty, status: filters.status }}
+        params={{ area: filters.area, section: filters.section, topic: filters.topic, difficulty: filters.difficulty, status: filters.status, q: q || undefined }}
         page={page}
         pageCount={pageCount}
         total={total}

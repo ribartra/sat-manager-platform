@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import { TaxonomyPicker, type TaxonomyPickerTopic } from "@/components/taxonomy-picker";
 import { cn } from "@/lib/utils";
+import { matchesQuery } from "@/components/sat/list-filters";
 import {
   contentStatusOptions,
   questionStatusBadgeVariant,
@@ -95,6 +96,7 @@ export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; 
   const [activeTab, setActiveTab] = useState<SectionKey>("math");
   const [skillFilter, setSkillFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [searchFilter, setSearchFilter] = useState("");
 
   const counts = useMemo(() => {
     const c: Record<SectionKey, number> = { math: 0, reading: 0, writing: 0, general: 0 };
@@ -114,9 +116,10 @@ export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; 
         if (sectionKeyOf(m.topic?.sectionLabel) !== activeTab) return false;
         if (activeTab !== "general" && skillFilter && m.topicId !== skillFilter) return false;
         if (statusFilter && m.status !== statusFilter) return false;
+        if (!matchesQuery(searchFilter, m.title, m.description, m.topic?.name)) return false;
         return true;
       }),
-    [materials, activeTab, skillFilter, statusFilter]
+    [materials, activeTab, skillFilter, statusFilter, searchFilter]
   );
 
   function selectTab(key: SectionKey) {
@@ -214,6 +217,10 @@ export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; 
       </div>
 
       <div className="mb-5 flex flex-wrap items-end gap-3">
+        <div className="min-w-[220px]">
+          <label htmlFor="materials-search" className="mb-1 block text-sm font-medium text-gray-700">Search</label>
+          <Input id="materials-search" type="search" value={searchFilter} onChange={(e) => setSearchFilter(e.target.value)} placeholder="Title or description" className="text-sm" />
+        </div>
         {activeTab !== "general" && (
           <div className="min-w-[280px] flex-1">
             <TaxonomyPicker

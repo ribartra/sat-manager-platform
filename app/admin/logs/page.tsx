@@ -1,5 +1,5 @@
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
-import { PageShell, Pagination, pageFromParam, paginate } from "@/components/sat";
+import { ListFilters, PageShell, Pagination, matchesQuery, pageFromParam, paginate } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
@@ -19,7 +19,7 @@ import { AuditPayload } from "@/components/admin/audit-payload";
 const LOG_PAGE_SIZE = 50;
 
 interface PageProps {
-  searchParams: Promise<{ cat?: string; page?: string }>;
+  searchParams: Promise<{ cat?: string; page?: string; q?: string; outcome?: string; role?: string }>;
 }
 
 const TABS: { id: string; label: string; match?: AuditCategory }[] = [
@@ -54,7 +54,10 @@ export default async function AdminLogsPage({ searchParams }: PageProps) {
   if (!session) redirect("/login");
   if (session.user.role !== "ADMIN") redirect("/teacher");
 
-  const { cat, page } = await searchParams;
+  const { cat, page, q: rawQ, outcome: rawOutcome, role: rawRole } = await searchParams;
+  const q = (rawQ ?? "").trim();
+  const outcomeFilter = rawOutcome === "success" || rawOutcome === "failure" || rawOutcome === "info" ? rawOutcome : undefined;
+  const roleFilter = ["STUDENT", "TEACHER", "PARENT", "ADMIN"].includes(rawRole ?? "") ? rawRole : undefined;
   const category = cat?.toLowerCase() ?? "all";
   const tab = TABS.find((t) => t.id === category) ?? TABS[0];
 
@@ -65,7 +68,14 @@ export default async function AdminLogsPage({ searchParams }: PageProps) {
   });
 
   // The latest 500 actions, paginated (every one of them is reachable, nothing is cut).
-  const filtered = tab.id === "all" ? logs : logs.filter((log) => actionCategory(log.action) === tab.match);
+  // Search + filters (URL): who / what (user, email, action), outcome and account type, on top of the tab.
+  const filtered = logs.filter(
+    (log) =>
+      (tab.id === "all" || actionCategory(log.action) === tab.match) &&
+      matchesQuery(q, log.user?.name, log.user?.email, log.action, AUDIT_ACTION_LABELS[log.action] ?? humanizeAction(log.action), log.targetType) &&
+      (!outcomeFilter || outcomeFromMetadata(log.metadata) === outcomeFilter) &&
+      (!roleFilter || log.user?.role === roleFilter),
+  );
   const logPage = paginate(filtered, pageFromParam(page), LOG_PAGE_SIZE);
 
   return (
@@ -76,6 +86,16 @@ export default async function AdminLogsPage({ searchParams }: PageProps) {
         Recent actions by users (the latest 500).
       </p>
 
+      <ListFilters
+        action="/admin/logs"
+        q={q}
+        placeholder="User, email or action"
+        hidden={{ cat: tab.id === "all" ? undefined : tab.id }}
+        filters={[
+          { name: "outcome", label: "Outcome", value: outcomeFilter, allLabel: "Any outcome", options: [{ value: "success", label: "Success" }, { value: "failure", label: "Failure" }, { value: "info", label: "Info" }] },
+          { name: "role", label: "Account type", value: roleFilter, allLabel: "Any account", options: ["STUDENT", "TEACHER", "PARENT", "ADMIN"].map((r) => ({ value: r, label: roleLabel(r) })) },
+        ]}
+      />
       <div className="mb-4 flex flex-wrap gap-2">
         {TABS.map((item) => {
           const active = tab.id === item.id;
@@ -163,7 +183,7 @@ export default async function AdminLogsPage({ searchParams }: PageProps) {
           <p className="py-10 text-center text-sm text-gray-400">No events recorded yet.</p>
         )}
       </Card>
-      <Pagination basePath="/admin/logs" params={{ cat: tab.id === "all" ? undefined : tab.id }} pageSize={LOG_PAGE_SIZE} {...logPage} />
+      <Pagination basePath="/admin/logs" params={{ cat: tab.id === "all" ? undefined : tab.id, q: q || undefined, outcome: outcomeFilter, role: roleFilter }} pageSize={LOG_PAGE_SIZE} {...logPage} />
     </PageShell>
   );
 }

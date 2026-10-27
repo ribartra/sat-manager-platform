@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Plus, User } from "lucide-react";
-import { EmptyState, PageShell, Pagination, pageFromParam, paginate } from "@/components/sat";
+import { EmptyState, ListFilters, PageShell, Pagination, matchesQuery, pageFromParam, paginate } from "@/components/sat";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { TestModuleTiles } from "@/components/sat/test-module-tiles";
 import { Badge } from "@/components/ui/badge";
@@ -15,7 +15,7 @@ import { formatDate } from "@/lib/utils";
 import { FullTestActions } from "./full-test-actions-client";
 
 interface PageProps {
-  searchParams: Promise<{ view?: string; page?: string }>;
+  searchParams: Promise<{ view?: string; page?: string; q?: string; status?: string; assigned?: string }>;
 }
 
 const PAGE_SIZE = 10;
@@ -47,7 +47,17 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
       orderBy: { name: "asc" },
     })
   ).sort((a, b) => a.name.localeCompare(b.name, "en", { numeric: true }));
-  const page = paginate(tests, pageFromParam(query.page), PAGE_SIZE);
+  // Search + filters (URL): name, status, assigned to the teacher's students or not.
+  const status = ["PUBLISHED", "DRAFT", "ARCHIVED"].includes(query.status ?? "") ? query.status : undefined;
+  const assigned = query.assigned === "yes" || query.assigned === "no" ? query.assigned : undefined;
+  const shown = tests.filter(
+    (t) =>
+      matchesQuery(query.q, t.name) &&
+      (!status || t.status === status) &&
+      (!assigned || (assigned === "yes") === t.assignments.length > 0),
+  );
+  const filterParams = { q: query.q || undefined, status, assigned };
+  const page = paginate(shown, pageFromParam(query.page), PAGE_SIZE);
 
   return (
     <PageShell maxWidth={1100} width="wide">
@@ -70,8 +80,19 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
         </div>
       </header>
 
+      <ListFilters
+        action="/teacher/tests"
+        q={query.q}
+        placeholder="Test name"
+        filters={[
+          { name: "status", label: "Status", value: status, allLabel: "All statuses", options: ["PUBLISHED", "DRAFT", "ARCHIVED"].map((v) => ({ value: v, label: fullTestStatusLabel(v) })) },
+          { name: "assigned", label: "Assigned", value: assigned, allLabel: "Assigned or not", options: [{ value: "yes", label: "Assigned to my students" }, { value: "no", label: "Not assigned yet" }] },
+        ]}
+      />
       {tests.length === 0 ? (
         <EmptyState title="No tests yet." description="Create one with New test." />
+      ) : shown.length === 0 ? (
+        <EmptyState title="No tests match these filters." />
       ) : (
         <div className="space-y-3.5">
           {page.items.map((test) => {
@@ -130,7 +151,7 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
               </div>
             );
           })}
-          <Pagination basePath="/teacher/tests" params={{}} pageSize={PAGE_SIZE} {...page} />
+          <Pagination basePath="/teacher/tests" params={filterParams} pageSize={PAGE_SIZE} {...page} />
         </div>
       )}
     </PageShell>

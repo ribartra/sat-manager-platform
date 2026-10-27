@@ -15,6 +15,7 @@ import {
   TD,
   VoidableValue,
   invalidatedRowClass,
+  matchesQuery,
   pageFromParam,
   paginate,
 } from "@/components/sat";
@@ -35,7 +36,7 @@ import { formatDate, formatDuration, relativeDay } from "@/lib/utils";
 export const dynamic = "force-dynamic";
 
 interface PageProps {
-  searchParams: Promise<{ student?: string; type?: string; area?: string; status?: string; from?: string; page?: string }>;
+  searchParams: Promise<{ student?: string; type?: string; area?: string; status?: string; from?: string; page?: string; q?: string }>;
 }
 
 const PAGE_SIZE = 25;
@@ -67,8 +68,11 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
     status: status || undefined,
     from: from ? new Date(`${from}T00:00:00`) : undefined,
   });
-  const page = paginate(rows, pageFromParam(query.page), PAGE_SIZE);
-  const params = { student: studentId, type, area: query.area && area ? query.area : "", status, from };
+  // Text search: student name or practice set / Test name.
+  const q = (query.q ?? "").trim();
+  const shownRows = rows.filter((r) => matchesQuery(q, r.studentName, r.title));
+  const page = paginate(shownRows, pageFromParam(query.page), PAGE_SIZE);
+  const params = { q, student: studentId, type, area: query.area && area ? query.area : "", status, from };
   const anyFilter = Object.values(params).some(Boolean);
 
   return (
@@ -79,7 +83,11 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
         Every practice set and Test your students took, newest first. Practice shows % correct; Tests show SAT section scores.
       </p>
 
-      <Card as="form" padding="sm" className="mb-4 flex flex-wrap items-end gap-3">
+      <Card as="form" padding="sm" className="mb-4 flex flex-wrap items-end gap-3" role="search">
+        <label className="min-w-[12rem] flex-1 text-xs font-medium text-gray-600">
+          Search
+          <input type="search" name="q" defaultValue={q} placeholder="Student, practice set or Test" className="mt-1 w-full rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]" />
+        </label>
         <label className="min-w-[12rem] flex-1 text-xs font-medium text-gray-600">
           Student
           <select name="student" defaultValue={studentId} className="mt-1 w-full rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]">
@@ -118,8 +126,8 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
         {anyFilter ? <Link href="/teacher/history" className="pb-1.5 text-xs text-blue-600 hover:underline">Clear</Link> : null}
       </Card>
 
-      <p className="mb-2 text-xs text-gray-500">{rows.length} attempt{rows.length === 1 ? "" : "s"}</p>
-      {rows.length === 0 ? (
+      <p className="mb-2 text-xs text-gray-500">{shownRows.length} attempt{shownRows.length === 1 ? "" : "s"}</p>
+      {shownRows.length === 0 ? (
         <EmptyState title="No attempts match these filters." />
       ) : (
         <>

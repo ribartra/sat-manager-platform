@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -54,18 +55,21 @@ export function ParentsClient({
   const [sharing, setSharing] = useState(false);
   const [reportAreas, setReportAreas] = useState<Set<string>>(allAreas);
   const [parentSearch, setParentSearch] = useState("");
+  const [parentLinkFilter, setParentLinkFilter] = useState<"" | "linked" | "unlinked">("");
   const [studentSearch, setStudentSearch] = useState("");
 
   const sortedParents = useMemo(() => parents.slice().sort((a, b) => a.name.localeCompare(b.name)), [parents]);
   const filteredParents = useMemo(() => {
     const term = parentSearch.trim().toLowerCase();
-    if (!term) return sortedParents;
-    return sortedParents.filter((parent) =>
-      [parent.name, parent.email, parent.phone, ...parent.students.map((student) => student.name)]
-        .filter(Boolean)
-        .some((value) => value.toLowerCase().includes(term))
+    return sortedParents.filter(
+      (parent) =>
+        (!parentLinkFilter || (parentLinkFilter === "linked") === parent.students.length > 0) &&
+        (!term ||
+          [parent.name, parent.email, parent.phone, ...parent.students.map((student) => student.name)]
+            .filter(Boolean)
+            .some((value) => value.toLowerCase().includes(term))),
     );
-  }, [parentSearch, sortedParents]);
+  }, [parentSearch, parentLinkFilter, sortedParents]);
 
   function resetForm() {
     setName("");
@@ -195,8 +199,14 @@ export function ParentsClient({
             value={parentSearch}
             onChange={(event) => setParentSearch(event.target.value)}
             placeholder="Search parent or student..."
+            aria-label="Search parents"
             className="w-64 text-sm"
           />
+          <Select value={parentLinkFilter} onChange={(event) => setParentLinkFilter(event.target.value as "" | "linked" | "unlinked")} aria-label="Filter parents" className="w-auto text-sm">
+            <option value="">All parents</option>
+            <option value="linked">With students</option>
+            <option value="unlinked">Without students</option>
+          </Select>
           <Button type="button" onClick={() => openAdd()} className="flex items-center gap-1.5">
             <Plus size={14} /> Add Parent
           </Button>

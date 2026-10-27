@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
-import { PageShell, Pagination, pageFromParam, paginate } from "@/components/sat";
+import { ListFilters, PageShell, Pagination, pageFromParam, paginate } from "@/components/sat";
 import { ChevronCell, LinkTr, RowLink, SimpleTable, TD } from "@/components/sat/link-table";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
@@ -17,17 +17,28 @@ const TABS = [
   { id: "all", label: "All", where: {} },
 ] as const;
 
+const CATEGORY_OPTIONS = ["PROBLEM", "CONFUSING", "SUGGESTION", "PRAISE"].map((value) => ({ value, label: issueCategoryMeta(value).label }));
+
 /** Admin → Reports: what users sent with "Report a problem" (components/sat/issue-reporter.tsx). */
-export default async function AdminReportsPage({ searchParams }: { searchParams: Promise<{ status?: string; page?: string }> }) {
+export default async function AdminReportsPage({ searchParams }: { searchParams: Promise<{ status?: string; page?: string; q?: string; category?: string; from?: string }> }) {
   const session = await auth();
   if (!session) redirect("/login");
   if (session.user.role !== "ADMIN") redirect("/teacher");
 
-  const { status, page } = await searchParams;
+  const { status, page, q: rawQ, category: rawCategory, from: rawFrom } = await searchParams;
   const tab = TABS.find((t) => t.id === status) ?? TABS[0];
+  // Search + filters (URL): comment, reporter or page; type; who reported (account type).
+  const q = (rawQ ?? "").trim();
+  const category = CATEGORY_OPTIONS.some((c) => c.value === rawCategory) ? rawCategory : undefined;
+  const fromRole = ["STUDENT", "TEACHER", "PARENT", "ADMIN"].includes(rawFrom ?? "") ? rawFrom : undefined;
   const [reports, counts] = await Promise.all([
     prisma.issueReport.findMany({
-      where: tab.where,
+      where: {
+        ...tab.where,
+        ...(category ? { category } : {}),
+        ...(fromRole ? { user: { role: fromRole } } : {}),
+        ...(q ? { OR: [{ comment: { contains: q } }, { pageTitle: { contains: q } }, { url: { contains: q } }, { user: { name: { contains: q } } }] } : {}),
+      },
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
@@ -73,6 +84,17 @@ export default async function AdminReportsPage({ searchParams }: { searchParams:
         ))}
       </div>
 
+      <ListFilters
+        action="/admin/reports"
+        q={q}
+        placeholder="Comment, reporter or page"
+        hidden={{ status: tab.id === "open" ? undefined : tab.id }}
+        filters={[
+          { name: "category", label: "Type", value: category, allLabel: "All types", options: CATEGORY_OPTIONS },
+          { name: "from", label: "From", value: fromRole, allLabel: "Any account", options: ["STUDENT", "TEACHER", "PARENT", "ADMIN"].map((r) => ({ value: r, label: roleLabel(r) })) },
+        ]}
+      />
+
       {reportPage.items.length === 0 ? (
         <p className="rounded-lg border border-dashed border-gray-300 bg-white p-6 text-center text-sm text-gray-500">
           {tab.id === "open" ? "No open reports." : "No reports here yet."}
@@ -110,7 +132,7 @@ export default async function AdminReportsPage({ searchParams }: { searchParams:
           })}
         </SimpleTable>
       )}
-      <Pagination basePath="/admin/reports" params={{ status: tab.id === "open" ? undefined : tab.id }} pageSize={PAGE_SIZE} {...reportPage} />
+      <Pagination basePath="/admin/reports" params={{ status: tab.id === "open" ? undefined : tab.id, q: q || undefined, category, from: fromRole }} pageSize={PAGE_SIZE} {...reportPage} />
     </PageShell>
   );
 }

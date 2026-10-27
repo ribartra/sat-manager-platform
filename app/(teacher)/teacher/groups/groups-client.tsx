@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { StudentPicker } from "@/components/student-picker";
 import { Plus, UserMinus } from "lucide-react";
@@ -37,9 +38,11 @@ export function GroupsClient({ groups: initialGroups, students }: { groups: Grou
   const [editName, setEditName] = useState("");
   const [editSchedule, setEditSchedule] = useState("");
   const [groupSearch, setGroupSearch] = useState("");
+  const [groupSizeFilter, setGroupSizeFilter] = useState<"" | "members" | "empty">("");
   const [studentSearch, setStudentSearch] = useState("");
 
   const visibleGroups = groups.filter((group) => {
+    if (groupSizeFilter && (groupSizeFilter === "members") !== group.members.length > 0) return false;
     const term = groupSearch.trim().toLowerCase();
     if (!term) return true;
     return (
@@ -137,8 +140,14 @@ export function GroupsClient({ groups: initialGroups, students }: { groups: Grou
           value={groupSearch}
           onChange={(event) => setGroupSearch(event.target.value)}
           placeholder="Search group or member..."
+          aria-label="Search groups"
           className="max-w-sm"
         />
+        <Select value={groupSizeFilter} onChange={(event) => setGroupSizeFilter(event.target.value as "" | "members" | "empty")} aria-label="Filter groups" className="w-auto">
+          <option value="">All groups</option>
+          <option value="members">With students</option>
+          <option value="empty">Empty</option>
+        </Select>
         <Input
           value={studentSearch}
           onChange={(event) => setStudentSearch(event.target.value)}

@@ -73,6 +73,67 @@ const checks = [
     forbids: ["Questions correct", "Total questions"],
     label: "Reporte temporal del apoderado: ultimo intento por set, sin promedio",
   },
+  // Every list (teacher + admin) has a text search and filters.
+  {
+    file: "app/(teacher)/teacher/tests/page.tsx",
+    requires: ["ListFilters", "matchesQuery(query.q"],
+    label: "Busqueda con filtros: Tests (teacher)",
+  },
+  {
+    file: "app/(teacher)/teacher/programs/page.tsx",
+    requires: ["ListFilters"],
+    label: "Busqueda con filtros: Programas (teacher)",
+  },
+  {
+    file: "app/(teacher)/teacher/questions/questions-filter-client.tsx",
+    requires: ['params.set("q"'],
+    label: "Busqueda con filtros: Banco de preguntas: texto/ID + area, skill, nivel, estado",
+  },
+  {
+    file: "app/(teacher)/teacher/practice-sets/practice-sets-filter-client.tsx",
+    requires: ['params.set("q"'],
+    label: "Busqueda con filtros: Practice sets: nombre + skill, nivel, estado",
+  },
+  {
+    file: "app/(teacher)/teacher/materials/materials-client.tsx",
+    requires: ["matchesQuery(searchFilter"],
+    label: "Busqueda con filtros: Materiales: texto + skill, estado",
+  },
+  {
+    file: "app/(teacher)/teacher/parents/parents-client.tsx",
+    requires: ["parentLinkFilter"],
+    label: "Busqueda con filtros: Apoderados: busqueda + con/sin alumnos",
+  },
+  {
+    file: "app/(teacher)/teacher/groups/groups-client.tsx",
+    requires: ["groupSizeFilter"],
+    label: "Busqueda con filtros: Grupos: busqueda + con/sin alumnos",
+  },
+  {
+    file: "app/(teacher)/teacher/history/page.tsx",
+    requires: ['name="q"', "student", "status"],
+    label: "Busqueda con filtros: Historial: texto + alumno, tipo, area, estado, fecha",
+  },
+  {
+    file: "app/admin/users/page.tsx",
+    requires: ["ListFilters", "validation"],
+    label: "Busqueda con filtros: Cuentas (admin): texto + tipo, validacion, acceso",
+  },
+  {
+    file: "app/admin/teachers/page.tsx",
+    requires: ["ListFilters"],
+    label: "Busqueda con filtros: Profesores (admin): texto + acceso, programas",
+  },
+  {
+    file: "app/admin/reports/page.tsx",
+    requires: ["ListFilters"],
+    label: "Busqueda con filtros: Reportes (admin): texto + tipo, cuenta",
+  },
+  {
+    file: "app/admin/logs/page.tsx",
+    requires: ["ListFilters"],
+    label: "Busqueda con filtros: Log (admin): texto + resultado, cuenta",
+  },
   // Attempts reference the question's images (live bank question by id); they never store them.
   {
     file: "lib/full-test-snapshot.ts",

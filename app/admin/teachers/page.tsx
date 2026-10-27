@@ -2,13 +2,11 @@ import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { FilterBar, PageContent, PageHeader, PageShell } from "@/components/sat";
+import { ListFilters, PageContent, PageHeader, PageShell } from "@/components/sat";
 import { AdminTeachersTable, type AdminTeacherRow } from "./teachers-table-client";
 
 interface PageProps {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; access?: string; programs?: string }>;
 }
 
 export default async function AdminTeachersPage({ searchParams }: PageProps) {
@@ -17,10 +15,14 @@ export default async function AdminTeachersPage({ searchParams }: PageProps) {
   if (session.user.role !== "ADMIN") redirect("/teacher");
   const params = await searchParams;
   const q = params.q?.trim() ?? "";
+  const access = params.access === "enabled" || params.access === "disabled" ? params.access : undefined;
+  const programs = params.programs === "with" || params.programs === "without" ? params.programs : undefined;
 
   const teachers = await prisma.user.findMany({
     where: {
       role: "TEACHER",
+      ...(access ? { active: access === "enabled" } : {}),
+      ...(programs === "with" ? { programTeachingAssignments: { some: { endDate: null } } } : programs === "without" ? { programTeachingAssignments: { none: { endDate: null } } } : {}),
       ...(q
         ? {
             OR: [
@@ -67,12 +69,15 @@ export default async function AdminTeachersPage({ searchParams }: PageProps) {
         description="Enable or disable teacher access and review assigned programs."
       />
       <PageContent>
-        <FilterBar>
-          <form className="flex w-full max-w-xl gap-2">
-            <Input name="q" defaultValue={q} placeholder="Search teacher or program..." />
-            <Button type="submit">Search</Button>
-          </form>
-        </FilterBar>
+        <ListFilters
+          action="/admin/teachers"
+          q={q}
+          placeholder="Teacher, email or program"
+          filters={[
+            { name: "access", label: "Access", value: access, allLabel: "Any access", options: [{ value: "enabled", label: "Enabled" }, { value: "disabled", label: "Disabled" }] },
+            { name: "programs", label: "Programs", value: programs, allLabel: "With or without programs", options: [{ value: "with", label: "With programs" }, { value: "without", label: "Without programs" }] },
+          ]}
+        />
         <AdminTeachersTable rows={rows} />
       </PageContent>
     </PageShell>

@@ -1,4 +1,4 @@
-import { PageShell, PracticeAreaTabs, SkillsMap } from "@/components/sat";
+import { PageShell, PracticeAreaTabs, SkillsMap, matchesQuery } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { Plus } from "lucide-react";
@@ -22,6 +22,7 @@ interface SearchParams {
   difficulty?: string;
   status?: string;
   view?: string;
+  q?: string;
 }
 
 function tabPreserve(filters: SearchParams) {
@@ -162,10 +163,11 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
             initialTopicId={selectedTopicId}
             initialDifficulty={filters.difficulty}
             initialStatus={filters.status}
+            initialQuery={filters.q}
           />
           <PracticeSetsTable
             rows={practiceSets
-              .filter((practiceSet) => (!selectedTopicId || practiceSet.topicId === selectedTopicId) && (!filters.difficulty || practiceSet.difficulty === filters.difficulty) && (!filters.status || practiceSet.status === filters.status))
+              .filter((practiceSet) => (!selectedTopicId || practiceSet.topicId === selectedTopicId) && (!filters.difficulty || practiceSet.difficulty === filters.difficulty) && (!filters.status || practiceSet.status === filters.status) && matchesQuery(filters.q, practiceSet.name, practiceSet.topic.name))
               .map((practiceSet): PracticeSetRow => ({
                 id: practiceSet.id,
                 name: practiceSet.name,
