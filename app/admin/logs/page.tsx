@@ -1,5 +1,5 @@
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
-import { ListFilters, PageShell, Pagination, matchesQuery, pageFromParam, paginate } from "@/components/sat";
+import { ListFilters, PageShell, Pagination, RoleBadge, matchesQuery, pageFromParam, paginate } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
@@ -146,7 +146,7 @@ export default async function AdminLogsPage({ searchParams }: PageProps) {
                       {log.user ? (
                         <>
                           <p className="font-medium text-gray-800">{log.user.name}</p>
-                          <p className="text-xs text-gray-400">{roleLabel(log.user.role)}</p>
+                          <span className="mt-0.5 block"><RoleBadge role={log.user.role} /></span>
                           <p className="text-[10px] text-gray-400">{log.user.email}</p>
                         </>
                       ) : (

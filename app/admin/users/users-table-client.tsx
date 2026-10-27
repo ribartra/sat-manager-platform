@@ -6,7 +6,8 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { DataTable } from "@/components/sat/data-table";
 import { UserValidationActions } from "./user-validation-actions-client";
-import { enrollmentStatusLabel, roleLabel } from "@/lib/domain-meta";
+import { enrollmentStatusLabel } from "@/lib/domain-meta";
+import { RoleBadge } from "@/components/sat/role-badge";
 
 export type AdminUserRow = {
   id: string;
@@ -50,7 +51,7 @@ export function AdminUsersTable({ rows }: { rows: AdminUserRow[] }) {
         accessorKey: "role",
         header: "Role",
         meta: { priority: "medium" },
-        cell: ({ row }) => <span className="text-muted-foreground">{roleLabel(row.original.role)}</span>,
+        cell: ({ row }) => <RoleBadge role={row.original.role} />,
       },
       {
         id: "access",

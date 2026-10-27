@@ -95,6 +95,7 @@ export default function ActivatePage() {
   }
 
   const isParent = invite.role === "PARENT";
+  const isTeacher = invite.role === "TEACHER";
   const loading = form.formState.isSubmitting;
 
   return (
@@ -107,7 +108,9 @@ export default function ActivatePage() {
           <p className="mb-5 text-sm text-muted-foreground">
             {isParent
               ? "Create your parent account to follow your child's progress."
-              : "Choose a password to finish setting up your account."}
+              : isTeacher
+                ? "You were invited as a teacher. Choose a password; then you can invite and follow your own students."
+                : "Choose a password to finish setting up your account."}
           </p>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" noValidate>

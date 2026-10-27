@@ -18,9 +18,9 @@ export const TERMS_VERSION = "2026-10-22";
 /** Days an invitation link works. Only one open invitation per student email until it expires. */
 export const INVITE_DAYS = 7;
 
-/** The open (not used, not revoked, not expired) student invitations for an email. */
-export function openInviteWhere(email: string, now: Date = new Date()): Prisma.InviteTokenWhereInput {
-  return { role: "STUDENT", email, usedAt: null, revokedAt: null, expiresAt: { gt: now } };
+/** The open (not used, not revoked, not expired) invitations of a role (student by default) for an email. */
+export function openInviteWhere(email: string, now: Date = new Date(), role: "STUDENT" | "TEACHER" = "STUDENT"): Prisma.InviteTokenWhereInput {
+  return { role, email, usedAt: null, revokedAt: null, expiresAt: { gt: now } };
 }
 
 /** Why an invitation link no longer works, or null when it can still be used. */

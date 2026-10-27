@@ -25,3 +25,4 @@ export { ContinueCard } from "./continue-card";
 export { ListItem, ListStack } from "./list";
 export { TestCard, type TestCardLinks } from "./test-card";
 export { ListFilters, matchesQuery, type ListFilterSelect } from "./list-filters";
+export { RoleBadge } from "./role-badge";

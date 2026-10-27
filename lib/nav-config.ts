@@ -37,7 +37,15 @@ export type NavLinkDef = {
    */
   hideForAdmin?: boolean;
   exact?: boolean;
+  /**
+   * Per-account capability (not a feature flag): shown only to accounts that have it, e.g. the
+   * master teacher's Teachers menu. The pages and APIs re-check it on the server (lib/rbac.ts).
+   */
+  capability?: NavCapability;
 };
+
+/** Per-account capabilities that unlock nav items (User.canManageTeachers → "manageTeachers"). */
+export type NavCapability = "manageTeachers";
 
 export type NavGroupDef = {
   id: string;
@@ -91,6 +99,8 @@ export const TEACHER_NAV: TeacherNavEntryDef[] = [
   { id: "teacher.tests", label: "Tests", href: "/teacher/tests", icon: ClipboardList },
   { id: "teacher.practice", label: "Practice", href: "/teacher/practice-sets", icon: BookOpen },
   { id: "teacher.history", label: "History", href: "/teacher/history", icon: Clock },
+  // Master teacher only (User.canManageTeachers): invite / deactivate teachers, see who their students are.
+  { id: "teacher.teachers", label: "Teachers", href: "/teacher/teachers", icon: GraduationCap, capability: "manageTeachers" },
 ];
 
 /** Secondary teacher pages, shown as a "More" row on the Students and Practice pages. */
@@ -176,9 +186,10 @@ export const STUDENT_NAV_RESTRICTED: NavLinkDef[] = [
 
 function linkVisible(
   link: NavLinkDef,
-  opts: { role?: string; flags: Partial<Record<FeatureSettingKey, boolean>> },
+  opts: { role?: string; flags: Partial<Record<FeatureSettingKey, boolean>>; capabilities?: NavCapability[] },
 ): boolean {
   if (link.hideForAdmin && opts.role === "ADMIN") return false;
+  if (link.capability && !opts.capabilities?.includes(link.capability)) return false;
   if (!link.feature) return true;
   return Boolean(opts.flags[link.feature]);
 }
@@ -186,6 +197,7 @@ function linkVisible(
 export function resolveTeacherNav(opts: {
   role?: string;
   flags: Partial<Record<FeatureSettingKey, boolean>>;
+  capabilities?: NavCapability[];
 }): ResolvedNavEntry[] {
   const entries: ResolvedNavEntry[] = [];
 
@@ -234,6 +246,7 @@ const NAV_ALIASES: Record<string, string[]> = {
   "/teacher/tests": ["/teacher/full-tests"],
   "/teacher/students": ["/teacher/groups", "/teacher/parents", "/teacher/impersonate"],
   "/teacher/practice-sets": ["/teacher/questions", "/teacher/materials"],
+  "/teacher/teachers": [],
 };
 
 export function linkIsActive(href: string, pathname: string, exact = false): boolean {

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
-import { ListFilters, PageShell, Pagination, pageFromParam, paginate } from "@/components/sat";
+import { ListFilters, PageShell, Pagination, RoleBadge, pageFromParam, paginate } from "@/components/sat";
 import { ChevronCell, LinkTr, RowLink, SimpleTable, TD } from "@/components/sat/link-table";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
@@ -108,7 +108,7 @@ export default async function AdminReportsPage({ searchParams }: { searchParams:
                 <td className={`${TD} whitespace-nowrap text-gray-500`}>{formatDate(r.createdAt)}</td>
                 <td className={TD}>
                   <RowLink href={`/admin/reports/${r.id}`}>{r.user.name}</RowLink>
-                  <p className="text-xs text-gray-400">{roleLabel(r.user.role)}</p>
+                  <span className="mt-0.5 block"><RoleBadge role={r.user.role} /></span>
                 </td>
                 <td className={TD}>
                   <span className="rounded px-1.5 py-0.5 text-[11px] font-bold text-white" style={{ background: cat.color }}>{cat.label}</span>

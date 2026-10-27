@@ -26,6 +26,8 @@ model User {
   termsVersion String?      // TERMS_VERSION accepted (lib/consent.ts)
   /// Bumped on password change/reset and anonymization; JWTs carrying an older value are rejected.
   sessionVersion Int     @default(0)
+  /// Master teacher: may manage teachers (Teachers menu: invite, deactivate, see each teacher's students). Only for the SAT Teacher account.
+  canManageTeachers Boolean @default(false)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 

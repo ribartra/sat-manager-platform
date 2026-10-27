@@ -104,6 +104,45 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true });
     }
 
+    // Teacher invited by the master teacher (Teachers menu): an approved teacher account with their
+    // own program, so they can invite and manage their own students right away.
+    if (invite.role === "TEACHER") {
+      const existing = await prisma.user.findUnique({ where: { email: invite.email }, select: { id: true } });
+      if (existing) {
+        await writeAudit({ action: "USER_CREATE_FAILED", targetType: "InviteToken", targetId: invite.id, outcome: "failure", metadata: { reason: "email_exists", email: invite.email, role: "TEACHER" } });
+        return new ConflictError("There's already an account with this email. Try signing in instead.").toResponse();
+      }
+      let teacherId = "";
+      await prisma.$transaction(async (tx) => {
+        const teacher = await tx.user.create({
+          data: {
+            name: invite.name,
+            email: invite.email,
+            passwordHash: hash,
+            role: "TEACHER",
+            active: true,
+            validationStatus: "APPROVED",
+            validationReviewedAt: new Date(),
+            termsAcceptedAt,
+            termsVersion: TERMS_VERSION,
+          },
+        });
+        teacherId = teacher.id;
+        const program = await tx.program.create({ data: { name: `Program of ${invite.name}`, active: true, startDate: new Date() } });
+        await tx.programTeacher.create({ data: { programId: program.id, teacherId: teacher.id } });
+        await tx.inviteToken.update({ where: { id: invite.id }, data: { usedAt: new Date(), termsAcceptedAt, termsVersion: TERMS_VERSION } });
+      });
+      await writeAudit({
+        userId: teacherId,
+        action: "USER_ACTIVATED",
+        targetType: "User",
+        targetId: teacherId,
+        outcome: "success",
+        metadata: { role: "TEACHER", inviteId: invite.id, email: invite.email, invitedById: invite.invitedById, termsVersion: TERMS_VERSION },
+      });
+      return NextResponse.json({ ok: true, role: "TEACHER" });
+    }
+
     // Student account creation flow. A parent's authorization no longer blocks it (policy
     // 2026-10-22): the student accepts the Terms above, which include the clause for minors.
     const now = new Date();

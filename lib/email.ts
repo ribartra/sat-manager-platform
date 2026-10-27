@@ -102,6 +102,31 @@ export async function sendStudentInviteEmail(to: string, studentName: string, in
   });
 }
 
+export async function sendTeacherInviteEmail(to: string, teacherName: string, invitedBy: string, inviteUrl: string) {
+  const safeName = escapeHtml(teacherName);
+  const safeBy = escapeHtml(invitedBy);
+  const safeUrl = escapeHtml(inviteUrl);
+
+  return sendTransactionalEmail({
+    to,
+    subject: "You're invited to teach on SAT Practice",
+    text: [
+      `Hello ${teacherName},`,
+      "",
+      `${invitedBy} invited you to SAT Practice as a teacher. Use this link to create your password and start inviting your students:`,
+      inviteUrl,
+      "",
+      "This link expires in 7 days.",
+    ].join("\n"),
+    html: `
+      <p>Hello ${safeName},</p>
+      <p>${safeBy} invited you to SAT Practice as a teacher. Use this link to create your password and start inviting your students:</p>
+      <p><a href="${safeUrl}">${safeUrl}</a></p>
+      <p>This link expires in 7 days.</p>
+    `,
+  });
+}
+
 /** "Hello Ana," or just "Hello," when we do not know the parent's name. */
 function greeting(name: string | null) {
   return name ? `Hello ${name},` : "Hello,";

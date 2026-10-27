@@ -4,6 +4,49 @@ import path from "node:path";
 const root = process.cwd();
 
 const checks = [
+  // Master teacher (Teachers menu): one account flag, re-checked on the server; no access to other
+  // teachers' students' data.
+  {
+    file: "lib/rbac.ts",
+    requires: ["requireTeacherManager", "assertTeacherManager", "canManageTeachers", 'teacher.role !== "TEACHER"'],
+    label: "Master teacher: capacidad por cuenta (canManageTeachers) verificada en la BD",
+  },
+  {
+    file: "app/(teacher)/layout.tsx",
+    requires: ["canManageTeachers", '"manageTeachers"'],
+    label: "Menu Teachers solo para la cuenta con la capacidad",
+  },
+  {
+    file: "app/api/teachers/invite/route.ts",
+    requires: ["assertTeacherManager", 'role: "TEACHER"', 'openInviteWhere(email, now, "TEACHER")', "TEACHER_INVITED"],
+    label: "Invitar profesor: solo master teacher, una invitacion abierta por email, auditado",
+  },
+  {
+    file: "app/api/teachers/[teacherId]/toggle-active/route.ts",
+    requires: ["assertTeacherManager", 'role: "TEACHER"', "teacherId === session.user.id", "forgetSessionState"],
+    label: "Dar de baja profesor: solo master teacher, solo TEACHER, nunca a si mismo, cierra sesiones",
+  },
+  {
+    file: "app/(teacher)/teacher/teachers/page.tsx",
+    requires: ["requireTeacherManager", 'redirect("/teacher")'],
+    label: "Lista de profesores: solo master teacher",
+  },
+  {
+    file: "app/(teacher)/teacher/teachers/[teacherId]/page.tsx",
+    requires: ["requireTeacherManager", "select: { id: true, name: true, email: true, avatarUrl: true }"],
+    forbids: ["/teacher/students/${s.id}", "attempts", "loadPracticeReport"],
+    label: "Detalle de profesor: solo nombre/email de sus alumnos, sin enlaces ni datos de los alumnos",
+  },
+  {
+    file: "app/(teacher)/teacher/teachers/invite/page.tsx",
+    requires: ["requireTeacherManager"],
+    label: "Invitar profesor (pagina): solo master teacher",
+  },
+  {
+    file: "app/api/auth/activate/route.ts",
+    requires: ['invite.role === "TEACHER"', "programTeacher.create"],
+    label: "Activacion de profesor invitado: cuenta TEACHER aprobada con su propio programa",
+  },
   {
     file: "app/api/issue-reports/route.ts",
     requires: ["assertApprovedSession", "userId: session.user.id", "checkRateLimit", "screenshotType"],
@@ -302,12 +345,14 @@ for (const check of checks) {
   const absolutePath = path.join(root, check.file);
   const content = await readFile(absolutePath, "utf8");
   const missing = check.requires.filter((needle) => !content.includes(needle));
-  if (missing.length === 0) {
+  const forbidden = (check.forbids ?? []).filter((needle) => content.includes(needle));
+  if (missing.length === 0 && forbidden.length === 0) {
     console.log(`PASS - ${check.label}`);
   } else {
     hasFailures = true;
     console.error(`FAIL - ${check.label}`);
     for (const needle of missing) console.error(`  missing: ${needle}`);
+    for (const needle of forbidden) console.error(`  forbidden present: ${needle}`);
   }
 }
 

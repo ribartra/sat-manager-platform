@@ -106,6 +106,9 @@ export const AUDIT_ACTION_LABELS: Record<string, string> = {
   REJECT_ENROLLMENT: "Enrollment rejected",
   REMOVE_ENROLLMENT: "Enrollment removed",
   ADD_PROGRAM_TEACHER: "Teacher added to program",
+  TEACHER_INVITED: "Teacher invited",
+  ENABLE_TEACHER: "Teacher activated",
+  DISABLE_TEACHER: "Teacher deactivated",
   REMOVE_PROGRAM_TEACHER: "Teacher removed from program",
   CREATE_GROUP: "Group created",
   UPDATE_GROUP: "Group updated",
@@ -181,7 +184,10 @@ export function actionCategory(action: string): AuditCategory {
     action === "UNLINK_PARENT_STUDENT" ||
     action === "IMPERSONATE_STUDENT_VIEW" ||
     action === "SHARE_PARENT_REPORT_LINK" ||
-    action === "CREATE_PARENT_ACCESS_LINK"
+    action === "CREATE_PARENT_ACCESS_LINK" ||
+    action === "TEACHER_INVITED" ||
+    action === "ENABLE_TEACHER" ||
+    action === "DISABLE_TEACHER"
   ) {
     return "Users";
   }

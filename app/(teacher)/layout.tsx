@@ -12,7 +12,7 @@ export default async function TeacherLayout({ children }: { children: React.Reac
   if (!["TEACHER", "ADMIN"].includes(session.user.role)) redirect("/student");
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { active: true, validationStatus: true, avatarUrl: true },
+    select: { active: true, validationStatus: true, avatarUrl: true, canManageTeachers: true },
   });
   if (!user?.active) redirect("/login");
   if (user.validationStatus !== "APPROVED") redirect("/auth/pending-validation");
@@ -20,7 +20,14 @@ export default async function TeacherLayout({ children }: { children: React.Reac
   const flags = await getFeatureFlagValues({ role: session.user.role, userId: session.user.id });
 
   return (
-    <TeacherShell userName={session.user.name} avatarUrl={user.avatarUrl} role={session.user.role} flags={flags}>
+    <TeacherShell
+      userName={session.user.name}
+      avatarUrl={user.avatarUrl}
+      role={session.user.role}
+      flags={flags}
+      // Master teacher (Teachers menu): only TEACHER accounts with the flag (the SAT Teacher account).
+      capabilities={session.user.role === "TEACHER" && user.canManageTeachers ? ["manageTeachers"] : []}
+    >
       {children}
     </TeacherShell>
   );
