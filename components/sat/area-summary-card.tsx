@@ -68,8 +68,9 @@ export function AreaSummaryCard({ area, label, href, latest, delta, chips = [], 
 }
 
 /**
- * Teacher's per-area summary: % correct at Easy / Medium / Hard (latest counted try of each set) with
- * the weakest skill underneath. A level without questions shows "—" (no attempts), never 0%.
+ * Teacher's per-area summary at attempt level: Easy / Medium / Hard each show ONE attempt (the most
+ * recent at that level: its set and date, linked), with the weakest skill underneath. Never an
+ * average across sets. A level without attempts shows "—" (no attempts), never 0%.
  */
 export function DifficultySummaryCard({
   area,
@@ -81,7 +82,7 @@ export function DifficultySummaryCard({
 }: {
   area: PracticeAreaCode;
   label: string;
-  levels: { key: string; label: string; correct: number; total: number; percent: number | null }[];
+  levels: { key: string; label: string; correct: number; total: number; percent: number | null; caption?: React.ReactNode; href?: string }[];
   weakest: React.ReactNode;
   footer: React.ReactNode;
   emptyText: string;
@@ -93,15 +94,25 @@ export function DifficultySummaryCard({
       <h2 className="text-lg font-semibold" style={{ color: `var(--sat-area-${tab})` }}>{label}</h2>
       {any ? (
         <div className="grid grid-cols-3 gap-3">
-          {levels.map((level) => (
-            <div key={level.key} className="rounded-lg bg-[var(--sat-surface-2)] px-3 py-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">{level.label}</p>
-              <p className="mt-1">
-                <Pct value={level.percent} className="text-3xl font-bold leading-none sm:text-4xl" />
-              </p>
-              <p className="mt-1 text-xs text-gray-500">{level.total ? `${level.correct} of ${level.total} correct` : "No attempts"}</p>
-            </div>
-          ))}
+          {levels.map((level) => {
+            const body = (
+              <>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">{level.label}</p>
+                <p className="mt-1">
+                  <Pct value={level.percent} className="text-3xl font-bold leading-none sm:text-4xl" />
+                </p>
+                <p className="mt-1 text-xs text-gray-500">{level.total ? `${level.correct} of ${level.total} correct` : "No attempts"}</p>
+                {level.caption ? <p className="mt-0.5 truncate text-[11px] text-gray-400">{level.caption}</p> : null}
+              </>
+            );
+            return level.href ? (
+              <Link key={level.key} href={level.href} className="block min-w-0 rounded-lg bg-[var(--sat-surface-2)] px-3 py-3 hover:bg-[var(--sat-primary-soft)]">
+                {body}
+              </Link>
+            ) : (
+              <div key={level.key} className="min-w-0 rounded-lg bg-[var(--sat-surface-2)] px-3 py-3">{body}</div>
+            );
+          })}
         </div>
       ) : (
         <p className="text-sm text-gray-500">{emptyText}</p>

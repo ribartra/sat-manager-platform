@@ -10,8 +10,9 @@ import { formatDate, relativeDay } from "@/lib/utils";
 export function StudentDonePanel({ overview, studentId, focus }: { overview: StudentOverview; studentId: string; focus: "practice" | "tests" }) {
   const first = overview.name.split(" ")[0];
   const weak = (Object.keys(overview.areas) as PracticeAreaCode[])
-    .map((area) => ({ area, w: overview.areas[area].weakest }))
-    .filter((x): x is { area: PracticeAreaCode; w: NonNullable<StudentOverview["areas"]["MATH"]["weakest"]> } => Boolean(x.w))
+    // Attempt level only: each skill's % is its set's last counted attempt, never a pooled average.
+    .map((area) => ({ area, w: overview.areas[area].weakestLast }))
+    .filter((x): x is { area: PracticeAreaCode; w: NonNullable<StudentOverview["areas"]["MATH"]["weakestLast"]> } => Boolean(x.w))
     .sort((a, b) => a.w.pct - b.w.pct);
   return (
     <Card padding="md" variant="subtle" className="mb-4 text-sm">

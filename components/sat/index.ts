@@ -18,7 +18,7 @@ export { LinkTr, RowLink, RowAction, ChevronCell, SimpleTable, TD } from "./link
 export { LinkTabs } from "./link-tabs";
 export { AreaSummaryCard, AreaPracticeRow, AreaBoxGrid, CompactAreaBox, DifficultySummaryCard, studentAreaCardProps, type AreaSummaryCardProps } from "./area-summary-card";
 export { TestMiniCard, TestResultSentence, TestAttemptResultCell, TestTotalCell, TestSectionScore } from "./test-cards";
-export { PracticeAttemptsTable, PracticeSetAttemptsAccordion, TestAttemptsTable, type PracticeAttemptRow, type PracticeSetAttempts } from "./attempts-table";
+export { PracticeAttemptsTable, PracticeSetAttemptsAccordion, TestAttemptsAccordion, TestAttemptsTable, type PracticeAttemptRow, type PracticeSetAttempts, type TestAttempts } from "./attempts-table";
 export { SkillsMap, SkillsMapLegend, SkillDifficultyMatrix, DIFFICULTIES, type SkillsMapSkill, type SkillsMapChip, type MatrixCell, type ChipState } from "./skills-map";
 export { AttentionCard, AttentionItem, AttentionRow, DateCell, StudentCell, shortName } from "./teacher-ui";
 export { ContinueCard } from "./continue-card";

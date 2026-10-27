@@ -115,6 +115,51 @@ export function TestAttemptsTable({
   );
 }
 
+/**
+ * Shared shell of the grouped-attempts accordions (practice sets and Tests look the same): a header
+ * row, then one native <details> per group (keyboard and screen-reader friendly, no JS) whose summary
+ * row shows ONE attempt and whose body lists the group's tries.
+ */
+function GroupedAttemptsAccordion({
+  head,
+  cols,
+  groups,
+}: {
+  head: React.ReactNode[];
+  /** md+ grid template; one track per `head` entry plus the chevron. */
+  cols: string;
+  groups: { key: string; summary: React.ReactNode[]; body: React.ReactNode }[];
+}) {
+  const grid = `md:grid ${cols} md:items-center md:gap-3`;
+  return (
+    <div className="overflow-hidden rounded-[var(--sat-radius)] border border-[var(--sat-border)] bg-white text-sm">
+      <div className={`hidden border-b border-[var(--sat-border)] bg-[var(--sat-surface-2)] px-3 py-2.5 text-xs font-semibold text-[var(--sat-muted)] ${grid}`}>
+        {head.map((h, i) => <span key={i}>{h}</span>)}
+        <span />
+      </div>
+      <ul className="divide-y divide-[var(--sat-border)]">
+        {groups.map((group) => (
+          <li key={group.key}>
+            <details className="group">
+              <summary className={`flex cursor-pointer list-none flex-wrap items-center gap-x-4 gap-y-1 px-3 py-[11px] hover:bg-[var(--sat-primary-soft)] [&::-webkit-details-marker]:hidden ${grid}`}>
+                {group.summary.map((cell, i) => (
+                  <span key={i} className={i === 0 ? "w-full min-w-0 font-semibold text-[var(--sat-text)] md:w-auto" : undefined}>{cell}</span>
+                ))}
+                <ChevronRight aria-hidden size={16} className="ml-auto text-[var(--sat-blank)] transition-transform group-open:rotate-90" />
+              </summary>
+              <div className="border-t border-[var(--sat-border)] bg-[var(--sat-surface-2)] px-3 py-3">{group.body}</div>
+            </details>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function TriesCount({ count }: { count: number }) {
+  return <span className="ml-2 text-xs font-normal text-[var(--sat-muted)]">{count} {count === 1 ? "try" : "tries"}</span>;
+}
+
 export interface PracticeSetAttempts {
   /** Assignment id (one row per practice set). */
   key: string;
@@ -130,8 +175,7 @@ export interface PracticeSetAttempts {
 
 /**
  * Practice attempts grouped by set: one row per set showing its LAST attempt (not the best), which
- * opens to its most recent tries (native <details>, keyboard and screen-reader friendly, no JS).
- * Older tries are not deleted, only listed in History.
+ * opens to its most recent tries. Older tries are not deleted, only listed in History.
  */
 export function PracticeSetAttemptsAccordion({
   sets,
@@ -144,55 +188,79 @@ export function PracticeSetAttemptsAccordion({
   historyHref: string;
   recentLimit?: number;
 }) {
-  const cols = "md:grid md:grid-cols-[minmax(0,1fr)_7rem_6rem_6rem_8rem_1.5rem] md:items-center md:gap-3";
   return (
-    <div className="overflow-hidden rounded-[var(--sat-radius)] border border-[var(--sat-border)] bg-white text-sm">
-      <div className={`hidden border-b border-[var(--sat-border)] bg-[var(--sat-surface-2)] px-3 py-2.5 text-xs font-semibold text-[var(--sat-muted)] ${cols}`}>
-        <span>Practice set</span>
-        <span>Last Attempt</span>
-        <span>Correct</span>
-        <span>Time</span>
-        <span>Completed</span>
-        <span />
-      </div>
-      <ul className="divide-y divide-[var(--sat-border)]">
-        {sets.map((set) => (
-          <li key={set.key}>
-            <details className="group">
-              <summary className={`flex cursor-pointer list-none flex-wrap items-center gap-x-4 gap-y-1 px-3 py-[11px] hover:bg-[var(--sat-primary-soft)] [&::-webkit-details-marker]:hidden ${cols}`}>
-                <span className="w-full min-w-0 font-semibold text-[var(--sat-text)] md:w-auto">
-                  {set.title}
-                  <span className="ml-2 text-xs font-normal text-[var(--sat-muted)]">
-                    {set.tryCount} {set.tryCount === 1 ? "try" : "tries"}
-                  </span>
-                </span>
-                <span className={invalidatedRowClass(set.last.status)}>
-                  <VoidableValue status={set.last.status}><Pct value={set.last.pct} className="font-semibold" /></VoidableValue>
-                </span>
-                <span>{set.last.correct} of {set.last.total}</span>
-                <span className="text-gray-600">{set.last.time ? formatDuration(set.last.time) : "—"}</span>
-                <span className="text-gray-600">{set.last.submittedAt ? formatDate(set.last.submittedAt) : "—"}</span>
-                <ChevronRight aria-hidden size={16} className="ml-auto text-[var(--sat-blank)] transition-transform group-open:rotate-90" />
-              </summary>
-              <div className="border-t border-[var(--sat-border)] bg-[var(--sat-surface-2)] px-3 py-3">
-                <p className="mb-2 text-xs text-[var(--sat-muted)]">
-                  {set.recent.length === 1 ? "The only try so far" : `Last ${Math.min(recentLimit, set.recent.length)} tries, newest first`}
-                </p>
-                <PracticeAttemptsTable
-                  showBest={false}
-                  hrefFor={hrefFor}
-                  rows={set.recent.slice(0, recentLimit).map((row) => ({ ...row, tryCount: set.tryCount }))}
-                />
-                {set.tryCount > Math.min(recentLimit, set.recent.length) ? (
-                  <Link href={historyHref} className="mt-2 inline-block text-xs font-medium text-blue-600 hover:underline">
-                    See all {set.tryCount} tries in History →
-                  </Link>
-                ) : null}
-              </div>
-            </details>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <GroupedAttemptsAccordion
+      head={["Practice set", "Last Attempt", "Correct", "Time", "Completed"]}
+      cols="md:grid-cols-[minmax(0,1fr)_7rem_6rem_6rem_8rem_1.5rem]"
+      groups={sets.map((set) => ({
+        key: set.key,
+        summary: [
+          <>{set.title}<TriesCount count={set.tryCount} /></>,
+          <VoidableValue key="pct" status={set.last.status}><Pct value={set.last.pct} className="font-semibold" /></VoidableValue>,
+          <>{set.last.correct} of {set.last.total}</>,
+          <span key="t" className="text-gray-600">{set.last.time ? formatDuration(set.last.time) : "—"}</span>,
+          <span key="d" className="text-gray-600">{set.last.submittedAt ? formatDate(set.last.submittedAt) : "—"}</span>,
+        ],
+        body: (
+          <>
+            <p className="mb-2 text-xs text-[var(--sat-muted)]">
+              {set.recent.length === 1 ? "The only try so far" : `Last ${Math.min(recentLimit, set.recent.length)} tries, newest first`}
+            </p>
+            <PracticeAttemptsTable
+              showBest={false}
+              hrefFor={hrefFor}
+              rows={set.recent.slice(0, recentLimit).map((row) => ({ ...row, tryCount: set.tryCount }))}
+            />
+            {set.tryCount > Math.min(recentLimit, set.recent.length) ? (
+              <Link href={historyHref} className="mt-2 inline-block text-xs font-medium text-blue-600 hover:underline">
+                See all {set.tryCount} tries in History →
+              </Link>
+            ) : null}
+          </>
+        ),
+      }))}
+    />
+  );
+}
+
+type TestTry = Pick<TestAttemptRow, "id" | "status" | "startedAt" | "submittedAt" | "rwScore" | "mathScore" | "totalScore" | "view" | "tryNumber">;
+
+export interface TestAttempts {
+  /** Test assignment id (one row per Test). */
+  key: string;
+  title: React.ReactNode;
+  /** The latest counted try, or the latest try when none counts (e.g. one in progress). */
+  last: TestTry;
+  /** Every try of this Test, newest first. */
+  tries: TestTry[];
+}
+
+/** Test attempts grouped by Test (same look as the practice accordion): last try's scores, then every try. */
+export function TestAttemptsAccordion({ tests, hrefFor }: { tests: TestAttempts[]; hrefFor: (id: string) => string }) {
+  return (
+    <GroupedAttemptsAccordion
+      head={["Test", <SectionHead key="rw" section="RW" short />, <SectionHead key="m" section="MATH" />, "Total", "Date"]}
+      cols="md:grid-cols-[minmax(0,1fr)_6rem_6rem_6rem_8rem_1.5rem]"
+      groups={tests.map((test) => ({
+        key: test.key,
+        summary: [
+          <>
+            {test.title}
+            <TriesCount count={test.tries.length} />
+            {test.last.status !== "SUBMITTED" ? <span className="ml-2"><AttemptStatusBadge status={test.last.status} /></span> : null}
+          </>,
+          <TestSectionScore key="rw" attempt={test.last} section="RW" />,
+          <TestSectionScore key="m" attempt={test.last} section="MATH" />,
+          <TestTotalCell key="t" attempt={test.last} />,
+          <span key="d" className="text-gray-600">{formatDate(test.last.submittedAt ?? test.last.startedAt)}</span>,
+        ],
+        body: (
+          <>
+            <p className="mb-2 text-xs text-[var(--sat-muted)]">{test.tries.length === 1 ? "The only try so far" : "Every try, newest first"}</p>
+            <TestAttemptsTable rows={test.tries} hrefFor={hrefFor} />
+          </>
+        ),
+      }))}
+    />
   );
 }

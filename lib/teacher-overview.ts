@@ -17,6 +17,8 @@ export interface AreaOverview {
   toDo: number;
   overdue: number;
   weakest: { name: string; difficulty: string; pct: number; topicId: string } | null;
+  /** Student profile (attempt level only): the lowest LAST counted attempt among this area's sets. */
+  weakestLast: { name: string; difficulty: string; pct: number; topicId: string; attemptId: string } | null;
 }
 
 export interface TestsOverview {
@@ -41,7 +43,7 @@ export interface StudentOverview {
 const AREAS: PracticeAreaCode[] = ["MATH", "READING", "WRITING"];
 
 function emptyArea(): AreaOverview {
-  return { last: null, delta: null, avgPct: null, attempts: 0, toDo: 0, overdue: 0, weakest: null };
+  return { last: null, delta: null, avgPct: null, attempts: 0, toDo: 0, overdue: 0, weakest: null, weakestLast: null };
 }
 
 export async function loadStudentOverviews(studentIds: string[], now = new Date()): Promise<Map<string, StudentOverview>> {
@@ -61,6 +63,7 @@ export async function loadStudentOverviews(studentIds: string[], now = new Date(
         select: {
           id: true,
           submittedAt: true,
+          assignmentId: true,
           answers: { select: { isCorrect: true } },
           assignment: {
             select: {
@@ -97,6 +100,8 @@ export async function loadStudentOverviews(studentIds: string[], now = new Date(
     const areas = Object.fromEntries(AREAS.map((a) => [a, emptyArea()])) as Record<PracticeAreaCode, AreaOverview>;
     const buckets = new Map<string, { area: PracticeAreaCode; name: string; difficulty: string; topicId: string; correct: number; total: number }>();
     const totals = new Map<PracticeAreaCode, { correct: number; total: number }>();
+    // Newest first, so the first attempt seen per assignment is that set's last counted attempt.
+    const lastBySet = new Map<string, { area: PracticeAreaCode; name: string; difficulty: string; topicId: string; attemptId: string; pct: number }>();
     for (const attempt of s.attempts) {
       const set = attempt.assignment?.practiceSet;
       if (!set) continue;
@@ -115,6 +120,9 @@ export async function loadStudentOverviews(studentIds: string[], now = new Date(
       t.correct += score.correct;
       t.total += score.total;
       totals.set(area, t);
+      if (attempt.assignmentId && !lastBySet.has(attempt.assignmentId) && score.total > 0) {
+        lastBySet.set(attempt.assignmentId, { area, name: set.topic.name, difficulty: set.difficulty, topicId: set.topicId, attemptId: attempt.id, pct: score.percent ?? 0 });
+      }
       const key = `${set.topicId}:${set.difficulty}`;
       const b = buckets.get(key) ?? { area, name: set.topic.name, difficulty: set.difficulty, topicId: set.topicId, correct: 0, total: 0 };
       b.correct += score.correct;
@@ -129,6 +137,10 @@ export async function loadStudentOverviews(studentIds: string[], now = new Date(
         .map((b) => ({ ...b, pct: Math.round((b.correct / b.total) * 100) }))
         .sort((a, b) => a.pct - b.pct)[0];
       areas[area].weakest = weakest ? { name: weakest.name, difficulty: weakest.difficulty, pct: weakest.pct, topicId: weakest.topicId } : null;
+      const weakestLast = [...lastBySet.values()].filter((l) => l.area === area).sort((a, b) => a.pct - b.pct)[0];
+      areas[area].weakestLast = weakestLast
+        ? { name: weakestLast.name, difficulty: weakestLast.difficulty, pct: weakestLast.pct, topicId: weakestLast.topicId, attemptId: weakestLast.attemptId }
+        : null;
     }
     for (const a of s.assignments) {
       const area = resolvePracticeArea({ practiceArea: a.practiceSet.topic.domain.practiceArea });

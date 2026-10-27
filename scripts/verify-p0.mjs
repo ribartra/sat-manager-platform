@@ -91,8 +91,8 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
-    requires: ["loadPracticeReport", "DifficultySummaryCard", "difficultySummary", "weakestSkill", "SkillDifficultyMatrix", "PracticeSetAttemptsAccordion", "HistoryAttemptActions", "Teacher Comments", "GenerateReportDialog"],
-    label: "Pagina del alumno: resumen Easy/Medium/Hard + weakest skill, matriz unica de skills, intentos por set (ultimo intento), Don't count en History, comentarios y PDF",
+    requires: ["loadPracticeReport", "DifficultySummaryCard", "difficultySummary", "weakestSkill", "SkillDifficultyMatrix", "PracticeSetAttemptsAccordion", "TestAttemptsAccordion", "HistoryAttemptActions", "Teacher Comments", "GenerateReportDialog"],
+    label: "Pagina del alumno a nivel de intento (sin promedios entre tests ni entre sets): Easy/Medium/Hard = ultimo intento por nivel, matriz de ultimo intento, acordeones por set y por test, Don't count en History, comentarios y PDF",
   },
   {
     file: "lib/student-report.ts",
