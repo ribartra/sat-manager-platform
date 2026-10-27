@@ -76,21 +76,31 @@ const checks = [
   // One Test card (CookSAT reference) in every view, on the same grid as the area cards.
   {
     file: "components/sat/test-card.tsx",
-    requires: ["YOUR TOTAL SCORE", "REVIEW RESULTS", "400–1600", "canRetake", "--sat-area-tests", "--sat-primary-soft"],
+    requires: ["TestModuleTiles", "--sat-area-tests", "Review results", "canRetake", 'layout === "compact"', "/ 1600"],
     forbids: ["#3b74ff", "sky-500", "slate-700"],
-    label: "Card de Test unica = mockup mejorada/tests.html (bb-card, referencia CookSAT) con los tokens de la plataforma",
+    label: "Card de Test unica con el estilo de /teacher/tests (barra gris + modulos con resultado + puntajes); compacta en los home",
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
-    requires: ["<TestCard", "CardGrid", "canRetake: false"],
+    requires: ["<TestCard", "CardGrid", "canRetake: false", 'layout="compact"'],
     forbids: ["TestMiniCard"],
     label: "Ficha del alumno: cards de Test con el mismo componente y ancho que las de area; sin reintento del teacher",
   },
   {
     file: "app/(student)/student/tests/page.tsx",
-    requires: ["<TestCard", "CardGrid"],
+    requires: ["<TestCard"],
     forbids: ["BluebookCard"],
     label: "Tests del alumno: misma card de Test",
+  },
+  {
+    file: "app/(student)/student/student-home.tsx",
+    requires: ["<TestCard", 'layout="compact"', "CardGrid"],
+    label: "Home del alumno / Student view: card de Test compacta (mismo componente) al ancho de las de area",
+  },
+  {
+    file: "components/question-list-item.tsx",
+    requires: ["line-clamp-2", ".slice(0, 600)"],
+    label: "report-11: la vista previa del estimulo usa todo el ancho (2 lineas), no 120 caracteres",
   },
   {
     file: "components/sat/test-cards.tsx",

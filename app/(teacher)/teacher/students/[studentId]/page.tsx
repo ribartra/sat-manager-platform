@@ -169,7 +169,6 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
     module: null,
     test: (testId) => `/teacher/tests/${testId}`,
     canRetake: false,
-    scoreLabel: "TOTAL SCORE",
   };
 
   const header = (
@@ -314,7 +313,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
             <Card padding="md" className="text-sm text-gray-400">No tests assigned.</Card>
           ) : (
             <CardGrid>
-              {testItems.map((t) => <TestCard key={t.assignmentId} item={t} links={teacherTestLinks} />)}
+              {testItems.map((t) => <TestCard key={t.assignmentId} item={t} links={teacherTestLinks} layout="compact" />)}
             </CardGrid>
           )}
         </section>
@@ -521,9 +520,9 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
         />
         {/* One card per assigned Test (same component as every other view), then every try below. */}
         {tests.length > 0 ? (
-          <CardGrid className="mb-6">
+          <div className="mb-6 space-y-3.5">
             {[...sortTests(tests).pending, ...sortTests(tests).done].map((t) => <TestCard key={t.assignmentId} item={t} links={teacherTestLinks} />)}
-          </CardGrid>
+          </div>
         ) : null}
         <div className="grid gap-6 lg:grid-cols-3">
           {/* One section per Test and attempt; no chart across different Tests (product rule). */}

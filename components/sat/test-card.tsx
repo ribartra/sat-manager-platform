@@ -1,9 +1,11 @@
 import Link from "next/link";
-import { List } from "lucide-react";
 import { RetakeTestButton } from "@/components/sat/retake-test-button";
+import { TestModuleTiles } from "@/components/sat/test-module-tiles";
+import { WorkStatusBadges } from "@/components/sat/work-status";
+import { Button } from "@/components/ui/button";
 import type { ModuleView } from "@/lib/test-view";
 import type { StudentTestItem } from "@/lib/test-assignments";
-import { cn, formatDate, relativeDay } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 
 /** Where a Test card's buttons go; one card for every role, only the links change. */
 export interface TestCardLinks {
@@ -15,18 +17,17 @@ export interface TestCardLinks {
   test?: (testId: string) => string;
   /** Retake on a completed Test (only the student retakes, on their own). */
   canRetake: boolean;
-  /** "YOUR TOTAL SCORE" (student) or "TOTAL SCORE" (teacher). */
-  scoreLabel?: string;
 }
 
 /**
- * Test card: the mockup's Bluebook-style card (mejorada/tests.html `testCard`, after the CookSAT
- * reference) with the mockup's styles (`.bb-card`): grey Tests header with the status tag, due /
- * completed strip, total score, each section with Mod 1 / Mod 2 buttons, the main action and the
- * list of attempts. The same component in every view; the module buttons show the open attempt,
- * else the LAST finished one (never the best).
+ * Test card, the same component in every view, in the style of the teacher's Tests list
+ * (`/teacher/tests`, mockup `mejorada/teacher/tests.html`): grey Tests bar with the name, date, status
+ * and actions; the 4 module boxes (here with this student's result: correct / questions); total and
+ * section scores. `layout="row"` is full width (modules in one row); `layout="compact"` fits the area
+ * card width (home pages: Reading & Writing and Math one under the other).
+ * Attempt level: the open attempt, else the LAST finished one — never the best.
  */
-export function TestCard({ item, links }: { item: StudentTestItem; links: TestCardLinks }) {
+export function TestCard({ item, links, layout = "row" }: { item: StudentTestItem; links: TestCardLinks; layout?: "row" | "compact" }) {
   const open = item.openAttempt;
   const last = item.lastSubmitted;
   const done = item.state === "done" && !open && last;
@@ -34,59 +35,23 @@ export function TestCard({ item, links }: { item: StudentTestItem; links: TestCa
   const shownId = open?.id ?? last?.id ?? null;
   const modules: ModuleView[] = shownView?.modules ?? item.modules;
   const next = open?.view?.nextModule ?? null;
-  const late = item.overdue && item.state !== "done";
-  const tag = item.state === "progress" ? "IN PROGRESS" : item.state === "done" ? "COMPLETED" : item.overdue ? "OVERDUE" : "NOT STARTED";
   const counted = item.attempts.filter((a) => a.status === "SUBMITTED").length;
+  const compact = layout === "compact";
 
-  // .bb-mod / .bb-mod.done / .bb-mod.prog
-  const modButton = (m: ModuleView) => {
-    const href =
-      m.state === "done" && shownId
-        ? `${links.attempt(shownId)}#mod-${m.key}`
-        : done && last
-          ? `${links.attempt(last.id)}#mod-${m.key}`
-          : links.module
-            ? links.module(item.assignmentId, m.key)
-            : null;
-    const classes = cn(
-      "flex items-center justify-between rounded-lg border-b-[3px] px-2.5 py-[7px] text-[13px] font-bold",
-      m.state === "done"
-        ? "border-b-[var(--sat-primary-dark)] bg-[var(--sat-primary)] text-white"
-        : m.state === "progress"
-          ? "border-b-[#f59e0b] bg-[#fde68a] text-[#78350f]"
-          : "border-b-[#bfdbfe] bg-[var(--sat-primary-soft)] text-[var(--sat-primary-dark)]",
-      href && "hover:brightness-[.97]",
-    );
-    const label = (
-      <>
-        <span>Mod {m.short.slice(-1)}</span>
-        <span className="text-xs">{m.state === "done" ? `${m.right}/${m.questionCount}` : m.state === "progress" ? "Continue" : done || !links.module ? "" : "Start"}</span>
-      </>
-    );
-    return href ? (
-      <Link key={m.key} href={href} title={m.name} className={classes}>{label}</Link>
+  const moduleHref = (m: ModuleView) =>
+    m.state === "done" && shownId
+      ? `${links.attempt(shownId)}#mod-${m.key}`
+      : links.module && !done
+        ? links.module(item.assignmentId, m.key)
+        : null;
+  const moduleResult = (m: ModuleView) =>
+    m.state === "done" ? (
+      <span className="tabular-nums">{m.right}/{m.questionCount} correct</span>
+    ) : m.state === "progress" ? (
+      <span className="text-amber-700">In progress</span>
     ) : (
-      <span key={m.key} title={m.name} className={classes}>{label}</span>
+      <span className="font-normal text-[var(--sat-muted)]">{links.module && !done ? "Start" : "Not taken"}</span>
     );
-  };
-
-  // .bb-sec
-  const section = (code: "RW" | "MATH", label: string) => {
-    const score = done && last ? (code === "RW" ? last.rwScore : last.mathScore) : null;
-    return (
-      <div className="border-t border-[var(--sat-border)] px-3.5 py-2.5">
-        <div className="flex items-center justify-between">
-          <b className="text-sm text-[var(--sat-text)]">{label}</b>
-          {score !== null ? (
-            <b className="text-sm" style={{ color: code === "RW" ? "var(--sat-area-reading)" : "var(--sat-area-math)" }}>{score}</b>
-          ) : (
-            <span className="text-sm text-[var(--sat-muted)]">200–800</span>
-          )}
-        </div>
-        <div className="mt-1.5 grid grid-cols-2 gap-1.5">{modules.filter((m) => m.section === code).map(modButton)}</div>
-      </div>
-    );
-  };
 
   const mainHref = done && last
     ? links.attempt(last.id)
@@ -95,55 +60,68 @@ export function TestCard({ item, links }: { item: StudentTestItem; links: TestCa
       : links.module
         ? links.module(item.assignmentId, next?.key ?? "rw1")
         : links.test?.(item.testId) ?? null;
-  const mainLabel = done ? "REVIEW RESULTS" : open ? (links.module ? "CONTINUE" : "VIEW PROGRESS") : links.module ? "START TEST" : "VIEW TEST";
-  const mainClass = "flex-1 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-3 py-2 text-center text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]";
+  const mainLabel = done ? "Review results" : open ? (links.module ? "Continue" : "View progress") : links.module ? "Start test" : "Open test";
+  const dateText = done && last?.submittedAt ? `completed ${formatDate(last.submittedAt)}` : item.dueDate ? `due ${formatDate(item.dueDate)}` : "no due date";
+
+  const score = (code: "RW" | "MATH") => (done && last ? (code === "RW" ? last.rwScore : last.mathScore) : shownView?.sections[code].score ?? null);
+  const scoreText = (value: number | null | undefined) => (value != null ? value : "—");
+  const actions = (
+    <div className="flex shrink-0 gap-2">
+      {done && links.canRetake ? <RetakeTestButton assignmentId={item.assignmentId} testName={item.name} /> : null}
+      {mainHref ? (
+        <Button asChild size="sm">
+          <Link href={mainHref}>{mainLabel} →</Link>
+        </Button>
+      ) : null}
+    </div>
+  );
+  const scores = (
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600">
+      <span>Total <b className="text-base tabular-nums text-[var(--sat-text)]">{done && last?.totalScore != null ? last.totalScore : "—"}</b> <span className="text-xs text-[var(--sat-muted)]">/ 1600</span></span>
+      <span><span className="text-[var(--sat-area-reading)]">R&amp;W</span> <b className="tabular-nums text-[var(--sat-text)]">{scoreText(score("RW"))}</b></span>
+      <span><span className="text-[var(--sat-area-math)]">Math</span> <b className="tabular-nums text-[var(--sat-text)]">{scoreText(score("MATH"))}</b></span>
+      {counted > 1 ? <span className="text-xs text-[var(--sat-muted)]">{counted} attempts</span> : null}
+    </div>
+  );
+  const sectionBlock = (code: "RW" | "MATH", label: string) => (
+    <div>
+      <div className="mb-1.5 flex items-center justify-between text-sm">
+        <b style={{ color: code === "RW" ? "var(--sat-area-reading)" : "var(--sat-area-math)" }}>{label}</b>
+        <b className="tabular-nums text-[var(--sat-text)]">{scoreText(score(code))}</b>
+      </div>
+      <TestModuleTiles modules={modules.filter((m) => m.section === code)} hrefFor={moduleHref} resultFor={moduleResult} columns={2} />
+    </div>
+  );
 
   return (
-    // .bb-card (.late)
-    <div id={`test-${item.assignmentId}`} className="min-w-0 scroll-mt-5 overflow-hidden rounded-xl border border-[var(--sat-border)] bg-white shadow-[var(--sat-shadow)]">
-      <div className={cn("flex items-center justify-between gap-2 px-4 py-3", late ? "bg-[var(--sat-bad)] text-white" : "bg-[var(--sat-area-tests)] text-[var(--sat-tests-ink)]")}>
-        <h2 className="truncate text-2xl font-black">
-          {mainHref ? <Link href={mainHref} className="hover:underline">{item.name}</Link> : item.name}
-        </h2>
-        <span className="shrink-0 rounded-[5px] bg-white/25 px-2 py-[3px] text-[10px] font-extrabold tracking-[.3px]">{tag}</span>
+    <div id={`test-${item.assignmentId}`} className="flex min-w-0 scroll-mt-6 flex-col overflow-hidden rounded-[10px] border border-gray-200 bg-white shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-2 bg-[var(--sat-area-tests)] px-4 py-2.5 text-[var(--sat-tests-ink)]">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <b className="text-base">{mainHref ? <Link href={mainHref} className="hover:underline">{item.name}</Link> : item.name}</b>
+          <span className="text-sm">· {dateText}</span>
+          <WorkStatusBadges state={item.state} overdue={item.overdue} />
+        </div>
+        {compact ? null : actions}
       </div>
-      <div className="bg-[#8f8f8f] px-4 py-1 text-[10px] font-extrabold tracking-[.4px] text-white">
-        {done && last?.submittedAt
-          ? `COMPLETED ${formatDate(last.submittedAt).toUpperCase()}`
-          : item.dueDate
-            ? `DUE ${formatDate(item.dueDate).toUpperCase()} · ${relativeDay(item.dueDate).toUpperCase()}`
-            : "NO DUE DATE"}
-      </div>
-      <div className={cn("p-3 text-center", late ? "bg-[var(--sat-bad-soft)]" : "bg-[var(--sat-primary-soft)]")}>
-        <p className="text-xs font-extrabold tracking-[.4px]">{links.scoreLabel ?? "YOUR TOTAL SCORE"}</p>
-        <p className="text-[34px] font-black leading-[1.1] tabular-nums">{done && last?.totalScore != null ? last.totalScore : "–"}</p>
-        <p className="text-xs text-[var(--sat-muted)]">400–1600{counted > 1 ? ` · ${counted} attempts` : ""}</p>
-      </div>
-      {section("RW", "Reading and Writing")}
-      {section("MATH", "Math")}
-      <div className="flex gap-2 border-t border-[var(--sat-border)] px-3.5 py-2.5">
-        {mainHref ? <Link href={mainHref} className={mainClass}>{mainLabel}</Link> : <span className={cn(mainClass, "bg-[var(--sat-surface-2)] text-[var(--sat-muted)] hover:bg-[var(--sat-surface-2)]")}>{mainLabel}</span>}
-        {done && links.canRetake ? <RetakeTestButton assignmentId={item.assignmentId} testName={item.name} iconOnly /> : null}
-        {open && links.module ? (
-          <Link href={links.attempt(open.id)} title="View progress" aria-label="View progress" className="grid place-items-center rounded-lg border border-[var(--sat-border-strong)] bg-white px-3 text-[var(--sat-text)] hover:bg-[var(--sat-surface-2)]">
-            <List size={14} />
-          </Link>
-        ) : null}
-      </div>
-      {item.attempts.length > 0 ? (
-        // .bb-att
-        <details className="px-3.5 pb-2.5 text-xs">
-          <summary className="cursor-pointer py-1 font-semibold text-[var(--sat-primary)]">
-            {item.attempts.length} attempt{item.attempts.length === 1 ? "" : "s"}
-          </summary>
-          {item.attempts.map((a) => (
-            <Link key={a.id} href={links.attempt(a.id)} className="flex justify-between border-t border-[var(--sat-surface-2)] py-[5px] text-sm hover:underline">
-              <span>Try {a.tryNumber} · {formatDate(a.submittedAt ?? a.startedAt)}</span>
-              <b>{a.status === "IN_PROGRESS" ? "In progress" : a.status === "INVALIDATED" ? "Not counted" : a.totalScore ?? "—"}</b>
-            </Link>
-          ))}
-        </details>
-      ) : null}
+      {compact ? (
+        <div className="flex flex-1 flex-col gap-3 px-4 py-3">
+          <div className="flex items-baseline justify-between">
+            <span className="text-xs font-semibold uppercase tracking-wide text-[var(--sat-muted)]">Total score</span>
+            <span><b className="text-2xl tabular-nums text-[var(--sat-text)]">{done && last?.totalScore != null ? last.totalScore : "—"}</b> <span className="text-xs text-[var(--sat-muted)]">/ 1600</span></span>
+          </div>
+          {sectionBlock("RW", "Reading & Writing")}
+          {sectionBlock("MATH", "Math")}
+          <div className={cn("mt-auto flex items-center justify-between gap-2 border-t border-[var(--sat-border)] pt-2.5")}>
+            <span className="text-xs text-[var(--sat-muted)]">{counted > 1 ? `${counted} attempts` : counted === 1 ? "1 attempt" : "No attempts yet"}</span>
+            {actions}
+          </div>
+        </div>
+      ) : (
+        <div className="grid gap-2.5 px-4 py-3">
+          <TestModuleTiles modules={modules} hrefFor={moduleHref} resultFor={moduleResult} />
+          {scores}
+        </div>
+      )}
     </div>
   );
 }

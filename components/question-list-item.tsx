@@ -51,8 +51,9 @@ export function QuestionListItem({
             className={cn("max-h-28 overflow-auto text-sm text-gray-800", stemClassName)}
           />
           {question.stimulus?.trim() ? (
+            // Up to 2 full-width lines (line-clamp), not a fixed 120 characters that left the row half empty.
             <p className="mt-1 line-clamp-2 text-xs text-gray-500">
-              Stimulus: {question.stimulus.replace(/<[^>]+>/g, " ").slice(0, 120)}
+              Stimulus: {question.stimulus.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 600)}
             </p>
           ) : null}
           {href ? (

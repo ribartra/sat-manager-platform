@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import {
   Breadcrumbs,
-  CardGrid,
   EmptyState,
   LinkTabs,
   PageShell,
@@ -95,11 +94,11 @@ export default async function StudentTestsPage({ searchParams }: PageProps) {
         <EmptyState title={view === "pending" ? "No pending tests. Great job!" : "No tests here yet."} />
       ) : (
         <div id="tests" className="scroll-mt-6">
-          <CardGrid>
+          <div className="space-y-3.5">
             {page.items.map((t) => (
               <TestCard key={t.assignmentId} item={t} links={STUDENT_TEST_CARD_LINKS} />
             ))}
-          </CardGrid>
+          </div>
           <Pagination basePath="/student/tests" params={{ view }} anchor="tests" pageSize={TESTS_PAGE_SIZE} {...page} />
         </div>
       )}
