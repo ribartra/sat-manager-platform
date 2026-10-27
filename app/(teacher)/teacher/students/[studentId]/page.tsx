@@ -31,7 +31,6 @@ import {
 } from "@/components/sat";
 import { SectionHead } from "@/components/sat/test-ui";
 import { AreaTag } from "@/components/sat/practice-set-row";
-import { LineChart } from "@/components/sat/line-chart";
 import { loadAttemptHistory } from "@/lib/attempt-history";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
@@ -45,7 +44,6 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ProgressFilters } from "@/components/progress-filters";
 import { TopicDifficultyTrend } from "@/components/topic-difficulty-trend";
-import { MockSectionChart } from "@/components/progress-charts";
 import { Hint, InfoHint } from "@/components/hint";
 import { ClipboardList, Eye, History, Pencil, Plus } from "lucide-react";
 import { Avatar } from "@/components/avatar";
@@ -391,7 +389,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
       <PageShell maxWidth={1180} width="wide">
         {header}
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <p className="text-sm text-gray-500">Every try {first} made, grouped by Test and practice set. Changes compare with the previous counted try. Use &ldquo;Don&apos;t count&rdquo; to leave a try out of scores.</p>
+          <p className="text-sm text-gray-500">Every try {first} made, grouped by Test and practice set. Changes compare with the previous counted try. Use &ldquo;Invalidate&rdquo; to leave a try out of scores.</p>
           <LinkTabs
             className="mb-0 border-b-0"
             label="Show"
@@ -521,31 +519,34 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
           ]}
         />
         <div className="grid gap-6 lg:grid-cols-3">
+          {/* One section per Test and attempt; no chart across different Tests (product rule). */}
           <div id="performance" className="min-w-0 space-y-6 lg:col-span-2">
-            {report.exams.length === 0 ? (
-              <Card padding="lg" className="py-12 text-center text-sm text-gray-400">This student hasn&apos;t finished a test yet.</Card>
-            ) : (
-              <>
-                {report.scoreSeries.filter((m) => m.rwScore !== null || m.mathScore !== null).length >= 2 ? (
-                  <Card padding="md">
-                    <SectionHeader size="sm" title="Section scores by test" description="Reading & Writing (solid) and Math (dashed), 200–800" />
-                    <LineChart
-                      title="Section scores by test"
-                      min={200}
-                      max={800}
-                      labels={report.scoreSeries.map((m) => m.label)}
-                      notes={report.scoreSeries.map((m) => (m.timeSeconds ? formatDuration(m.timeSeconds) : null))}
-                      series={[
-                        { name: "Reading & Writing", color: "var(--sat-area-reading)", values: report.scoreSeries.map((m) => m.rwScore) },
-                        { name: "Math", color: "var(--sat-area-math)", values: report.scoreSeries.map((m) => m.mathScore), dashed: true },
-                      ]}
-                    />
-                  </Card>
-                ) : (
-                  <MockSectionChart metrics={report.scoreSeries} />
-                )}
-              </>
-            )}
+            <section id="exam-history" className="scroll-mt-6">
+              <SectionHeader
+                title="Test attempts"
+                description={`${testGroups.length} test${testGroups.length === 1 ? "" : "s"} · ${attemptCount} attempt${attemptCount === 1 ? "" : "s"} · each row shows the last try; open it to see every try. "Not counted" tries don't count toward scores`}
+                action={
+                  <Link href={buildProgressHref(`/teacher/students/${studentId}/assign-test`, filters)} className="text-xs font-medium text-blue-600 hover:underline">
+                    Assign test
+                  </Link>
+                }
+              />
+              {testGroups.length === 0 ? (
+                <EmptyState title="No test attempts yet." />
+              ) : (
+                <>
+                  <TestAttemptsAccordion tests={examPage.items} hrefFor={(id) => buildProgressHref(`/teacher/students/${studentId}/tests/${id}`, filters)} />
+                  <Pagination
+                    basePath={`/teacher/students/${studentId}`}
+                    params={pageParams}
+                    param="examsPage"
+                    anchor="exam-history"
+                    pageSize={HISTORY_PAGE_SIZE}
+                    {...examPage}
+                  />
+                </>
+              )}
+            </section>
           </div>
           <aside className="min-w-0 space-y-6">
             <SidePanel id="active-tests" title="Active tests" count={report.activeExams.length} empty="No active tests.">
@@ -595,32 +596,6 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
           </aside>
         </div>
 
-        <section id="exam-history" className="mt-6 scroll-mt-6">
-          <SectionHeader
-            title="Test attempts"
-            description={`${testGroups.length} test${testGroups.length === 1 ? "" : "s"} · ${attemptCount} attempt${attemptCount === 1 ? "" : "s"} · each row shows the last try; open it to see every try. "Not counted" tries don't count toward scores`}
-            action={
-              <Link href={buildProgressHref(`/teacher/students/${studentId}/assign-test`, filters)} className="text-xs font-medium text-blue-600 hover:underline">
-                Assign test
-              </Link>
-            }
-          />
-          {testGroups.length === 0 ? (
-            <EmptyState title="No test attempts yet." />
-          ) : (
-            <>
-              <TestAttemptsAccordion tests={examPage.items} hrefFor={(id) => buildProgressHref(`/teacher/students/${studentId}/tests/${id}`, filters)} />
-              <Pagination
-                basePath={`/teacher/students/${studentId}`}
-                params={pageParams}
-                param="examsPage"
-                anchor="exam-history"
-                pageSize={HISTORY_PAGE_SIZE}
-                {...examPage}
-              />
-            </>
-          )}
-        </section>
       </PageShell>
     );
   }

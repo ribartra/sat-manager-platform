@@ -81,7 +81,7 @@ export type PracticeReport = {
   skillGroups: Array<{ label: string; rows: string[] }>;
   weakSkills: WeakSkill[];
   /**
-   * Skill × difficulty in the official skill order: each cell is the most recent counted attempt of
+   * Skill × difficulty, skills in alphabetical order: each cell is the most recent counted attempt of
    * that skill and level (attempt level, never pooled); `tries` counts the counted attempts.
    */
   skillMatrix: SkillMatrixRow[];
@@ -353,12 +353,12 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
   // Domain → skills in official order (only skills with data).
   const skillsWithData = [...new Map(allRows.map((row) => [row.topicId, { id: row.topicId, name: row.topicName, domainId: row.domainId, domainName: row.domainName }])).values()]
     .sort((a, b) => domainRank(a.domainId) - domainRank(b.domainId) || compareSkills(a, b));
-  // Skill x difficulty matrix: each cell is the most recent attempt of that skill and level.
+  // Skill x difficulty matrix (skills A–Z): each cell is the most recent attempt of that skill and level.
   const cellSkills = [...new Map([...latestIndexByCell.values()].map((index) => {
     const topicId = setOf(index)!.topicId;
     const current = currentTopic.get(topicId);
     return [topicId, { id: topicId, name: current?.name ?? shortSetName(scoredAttempts[index].name), domainId: current?.domainId ?? "", domainName: current?.domain.name ?? "" }];
-  })).values()].sort((x, y) => domainRank(x.domainId) - domainRank(y.domainId) || compareSkills(x, y));
+  })).values()].sort((x, y) => x.name.localeCompare(y.name, "en", { numeric: true, sensitivity: "base" }));
   const skillMatrix: SkillMatrixRow[] = cellSkills.map((skill) => ({
     topicId: skill.id,
     domainId: skill.domainId,

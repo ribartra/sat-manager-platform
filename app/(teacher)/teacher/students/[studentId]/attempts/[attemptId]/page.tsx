@@ -20,6 +20,7 @@ import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { formatClock, formatDate, formatDuration, formatTime, relativeDay } from "@/lib/utils";
+import { InvalidateAttemptButton } from "@/components/sat/invalidate-attempt-button";
 import { parseSnapshot, PracticeSetSnapshot, QuestionSnapshot } from "@/lib/attempt-snapshots";
 import { auth } from "@/lib/auth";
 import { teacherProgramEnrollmentScope } from "@/lib/program-scope";
@@ -145,6 +146,9 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
                   All tries in History →
                 </Link>
               ) : null}
+              <span className="ml-auto">
+                <InvalidateAttemptButton attemptId={attempt.id} kind="practice" status={attempt.status} />
+              </span>
             </div>
             <h1 className="text-xl font-semibold text-gray-900">
               {practiceSet && areaTab ? (

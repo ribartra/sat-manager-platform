@@ -22,7 +22,7 @@ import { isAnswerCorrect } from "@/lib/answer-grading";
 import { resolveQuestionType } from "@/lib/question-type";
 import { parseEliminatedOptions } from "@/lib/answer-review-meta";
 import { buildProgressHref, progressFiltersFromParams } from "@/lib/progress-filters";
-import { AttemptActions } from "../../attempts/[attemptId]/attempt-actions-client";
+import { InvalidateAttemptButton } from "@/components/sat/invalidate-attempt-button";
 import { SendExamReportButton } from "./send-exam-report-button";
 
 interface PageProps {
@@ -31,7 +31,8 @@ interface PageProps {
 }
 
 /**
- * One Test attempt for the teacher (same layout as the student results), with reopen/invalidate.
+ * One Test attempt for the teacher (same layout as the student results). The only action on it is
+ * "Invalidate attempt" (with a reason); students retake Tests on their own, no teacher permission.
  * An open attempt shows only the modules the student already submitted.
  */
 export default async function TeacherFullTestAttemptPage({ params, searchParams }: PageProps) {
@@ -181,11 +182,8 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
             </table>
           </div>
         </Card>
-        <Card padding="md" className="space-y-3">
-          <h2 className="text-sm font-semibold text-gray-900">Teacher actions</h2>
-          <p className="text-xs text-gray-500">{siblings.length} attempt{siblings.length === 1 ? "" : "s"} recorded. Every try is kept, even when you let the student start again.</p>
-          <AttemptActions attemptId={attempt.id} kind="fpt" status={attempt.status} />
-          {attempt.status === "SUBMITTED" ? (
+        {attempt.status === "SUBMITTED" ? (
+          <Card padding="md" className="space-y-3">
             <SendExamReportButton
               studentId={studentId}
               studentName={attempt.student.name}
@@ -193,8 +191,9 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
               attemptLabel={`${attempt.test.name} · ${attempt.submittedAt ? formatDate(attempt.submittedAt) : ""} · ${attempt.totalScore ?? "—"}`}
               parents={parentOptions}
             />
-          ) : null}
-        </Card>
+            <InvalidateAttemptButton attemptId={attempt.id} kind="test" status={attempt.status} />
+          </Card>
+        ) : null}
       </div>
 
       {doneModules.length > 0 ? (

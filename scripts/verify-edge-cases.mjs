@@ -97,23 +97,20 @@ const checks = [
     label: "Publicacion de Practice Set valida preguntas publicadas y mismo topic",
   },
   {
-    file: "app/(teacher)/teacher/students/[studentId]/attempts/[attemptId]/attempt-actions-client.tsx",
+    file: "components/sat/invalidate-attempt-button.tsx",
     requires: [
-      "Reason (optional, visible to admins)",
-      "body: JSON.stringify({ reason: actionReason })",
-      "setActionReason(\"\")",
+      '{ value: "HEALTH", label: "Health" }',
+      '{ value: "CONNECTION", label: "Connection problem" }',
+      '{ value: "OTHER", label: "Other (explain)" }',
+      "/invalidate`, { method: \"POST\", json: { reason: text }",
+      'if (status !== "SUBMITTED") return null;',
     ],
-    label: "Reopen/invalidate capturan razon operativa para auditoria",
+    label: "Invalidar intento: unica accion del teacher, razon obligatoria (salud, conexion, otra con detalle) auditada, solo intentos contados",
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/history-attempt-actions.tsx",
-    requires: [
-      "Reason (optional, visible to admins)",
-      "/invalidate`, { method: \"POST\", json: { reason }",
-      "apiFetch(`/api/attempts/${attemptId}/comment`",
-      "status === \"SUBMITTED\"",
-    ],
-    label: "Don't count y comentario desde History: razon auditada, errores via apiFetch, solo intentos contados",
+    requires: ["InvalidateAttemptButton", "apiFetch(`/api/attempts/${attemptId}/comment`"],
+    label: "History: invalidar con el mismo modal de razones + comentario via apiFetch",
   },
   {
     file: "app/(student)/student/tests/[assignmentId]/player-client.tsx",

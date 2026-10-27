@@ -125,15 +125,21 @@ function Kpis({ items }: { items: Array<{ label: string; value: string; color?: 
   );
 }
 
+/** A–Z with numbers in numeric order ("TEST 2" before "TEST 10"). */
+const alphabetical = (a: string, b: string) => a.localeCompare(b, "en", { numeric: true, sensitivity: "base" });
+
 /** Matrix like the UI's PerformanceBreakdown: one row per label, one column per dimension. */
 function Matrix({ title, hint, rowLabel, dimensions, dimensionLabel = (d) => d, summary, detail, groups }: { title: string; hint: string; rowLabel: string; dimensions: string[]; dimensionLabel?: (dimension: string) => string; summary?: ProgressMetric[]; detail: ProgressMetric[]; groups?: Array<{ label: string; rows: string[] }> }) {
   const present = new Set(detail.map((m) => m.label));
-  // Same grouping as the UI: Domain header rows with skills in official order; else alphabetical.
+  // Report charts are in alphabetical order: Domain header rows A–Z, skills A–Z inside each domain.
   const sections = groups
-    ? groups.map((g) => ({ label: g.label as string | null, rows: g.rows.filter((row) => present.has(row)) })).filter((g) => g.rows.length > 0)
-    : [{ label: null as string | null, rows: [...present].sort((a, b) => a.localeCompare(b)) }];
+    ? groups
+        .map((g) => ({ label: g.label as string | null, rows: g.rows.filter((row) => present.has(row)).sort(alphabetical) }))
+        .filter((g) => g.rows.length > 0)
+        .sort((a, b) => alphabetical(a.label ?? "", b.label ?? ""))
+    : [{ label: null as string | null, rows: [...present].sort(alphabetical) }];
   const leftovers = [...present].filter((row) => !sections.some((section) => section.rows.includes(row)));
-  if (leftovers.length) sections.push({ label: groups ? "Other" : null, rows: leftovers.sort((a, b) => a.localeCompare(b)) });
+  if (leftovers.length) sections.push({ label: groups ? "Other" : null, rows: leftovers.sort(alphabetical) });
   const cell = (key: string, metric: ProgressMetric | undefined) => {
     const value = pct(metric);
     return (
@@ -304,12 +310,15 @@ function PracticeSection({ report }: { report: PracticeReport }) {
  * One stacked bar per exam on the SAT total scale (0–1600): R&W at the bottom, Math on top, each
  * segment as tall as its section score (200–800), so the top of the bar IS the total printed above it.
  */
-function ScoreChart({ series }: { series: MockReport["scoreSeries"] }) {
+function ScoreChart({ series: bySubmission }: { series: MockReport["scoreSeries"] }) {
+  // Alphabetical by Test ("TEST 1 · try 1", "TEST 1 · try 2", "TEST 2", …, "TEST 10"), not by date:
+  // different Tests are not a progression.
+  const series = [...bySubmission].sort((a, b) => alphabetical(a.label, b.label));
   const width = 523;
-  const height = 168;
+  const height = 176;
   const left = 30;
   const top = 14;
-  const bottom = 22;
+  const bottom = 30;
   const plotH = height - bottom - top;
   const baseY = top + plotH;
   const groupW = (width - left) / Math.max(series.length, 1);
@@ -320,7 +329,7 @@ function ScoreChart({ series }: { series: MockReport["scoreSeries"] }) {
     <View style={s.section} wrap={false}>
       <Text style={s.h2}>Scores by Test</Text>
       <Text style={s.hint}>
-        {"Each bar is one Test. The number on top is the total score (out of 1600). Inside: Reading & Writing (bottom) and Math (top), each out of 800."}
+        {"Each bar is one Test attempt, in alphabetical order. The number on top is the total score (out of 1600). Inside: Reading & Writing (bottom) and Math (top), each out of 800."}
       </Text>
       <Svg width={width} height={height}>
         {ticks.map((tick) => (
@@ -337,7 +346,9 @@ function ScoreChart({ series }: { series: MockReport["scoreSeries"] }) {
           const topY = baseY - rwH - mathH;
           const total = exam.totalScore ?? (exam.rwScore !== null && exam.mathScore !== null ? exam.rwScore + exam.mathScore : null);
           const totalText = total !== null ? String(total) : "-";
-          const examLabel = exam.label.slice(0, Math.max(6, Math.floor(groupW / 4)));
+          // "TEST 1 · try 2" → "TEST 1" with "try 2" on a second line, so it never gets cut.
+          const [examName, tryText] = exam.label.split(" · ");
+          const examLabel = examName.slice(0, Math.max(6, Math.floor(groupW / 4)));
           return (
             <G key={`${exam.label}-${index}`}>
               {exam.rwScore !== null ? <Rect x={x} y={baseY - rwH} width={barW} height={rwH} fill={AREA.reading.color} /> : null}
@@ -349,7 +360,8 @@ function ScoreChart({ series }: { series: MockReport["scoreSeries"] }) {
                 <Text x={cx - String(exam.mathScore).length * 1.7} y={baseY - rwH - mathH / 2 + 2.2} style={{ fontSize: 6.5 }} fill="#ffffff">{String(exam.mathScore)}</Text>
               ) : null}
               <Text x={cx - totalText.length * 2.1} y={topY - 4} style={{ fontSize: 7.5, fontFamily: "Helvetica-Bold" }}>{totalText}</Text>
-              <Text x={cx - examLabel.length * 1.6} y={height - 8} style={{ fontSize: 6.5 }} fill={GRAY[500]}>{examLabel}</Text>
+              <Text x={cx - examLabel.length * 1.6} y={height - 16} style={{ fontSize: 6.5 }} fill={GRAY[500]}>{examLabel}</Text>
+              {tryText ? <Text x={cx - tryText.length * 1.5} y={height - 8} style={{ fontSize: 6 }} fill={GRAY[400]}>{tryText}</Text> : null}
             </G>
           );
         })}
