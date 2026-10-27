@@ -5,7 +5,6 @@ import {
   Delta,
   InvalidatedNotice,
   PageShell,
-  PracticeAttemptsTable,
   SectionHeader,
   VoidableValue,
 } from "@/components/sat";
@@ -21,7 +20,6 @@ import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { formatClock, formatDate, formatDuration, formatTime, relativeDay } from "@/lib/utils";
-import { AttemptActions } from "./attempt-actions-client";
 import { parseSnapshot, PracticeSetSnapshot, QuestionSnapshot } from "@/lib/attempt-snapshots";
 import { auth } from "@/lib/auth";
 import { teacherProgramEnrollmentScope } from "@/lib/program-scope";
@@ -134,7 +132,7 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
       {attempt.status === "INVALIDATED" ? <InvalidatedNotice audience="teacher" /> : null}
 
       <ResultFilterRoot>
-        <div className="mb-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
+        <div className="mb-6">
           <Card padding="lg">
             <div className="mb-1 flex flex-wrap items-center gap-2">
               <Badge>Practice</Badge>
@@ -142,6 +140,11 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
               {practiceSet ? <Badge variant={difficultyBadgeVariant(practiceSet.difficulty)}>{difficultyLabel(practiceSet.difficulty)}</Badge> : null}
               <Badge>Try {thisTry?.tryNumber ?? attempt.attemptNumber} of {Math.max(tries.length, 1)}</Badge>
               <AttemptStatusBadge status={attempt.status} />
+              {tries.length > 1 ? (
+                <Link href={`/teacher/students/${studentId}?area=history&type=practice`} className="text-xs font-medium text-[var(--sat-primary)] hover:underline">
+                  All tries in History →
+                </Link>
+              ) : null}
             </div>
             <h1 className="text-xl font-semibold text-gray-900">
               {practiceSet && areaTab ? (
@@ -194,11 +197,6 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
               </div>
             </div>
           </Card>
-          <Card padding="md" className="space-y-3">
-            <h2 className="text-sm font-semibold text-gray-900">Teacher actions</h2>
-            <p className="text-xs text-gray-500">{tries.length} attempt{tries.length === 1 ? "" : "s"} recorded. Every try is kept, even when you let the student start again.</p>
-            <AttemptActions attemptId={attempt.id} initialComment={attempt.teacherComment} status={attempt.status} />
-          </Card>
         </div>
 
         {attempt.teacherComment && (
@@ -207,13 +205,6 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
             <p>{attempt.teacherComment}</p>
           </Card>
         )}
-
-        {tries.length > 0 ? (
-          <section className="mb-6">
-            <SectionHeader title="All attempts for this set" description="Click a try to see it." />
-            <PracticeAttemptsTable rows={tries} viewingId={attempt.id} hrefFor={(id) => buildProgressHref(`/teacher/students/${studentId}/attempts/${id}`, filters)} />
-          </section>
-        ) : null}
 
         {ordered.length > 0 ? (
           <Card padding="md" className="mb-6">

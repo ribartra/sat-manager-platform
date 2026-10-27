@@ -106,6 +106,16 @@ const checks = [
     label: "Reopen/invalidate capturan razon operativa para auditoria",
   },
   {
+    file: "app/(teacher)/teacher/students/[studentId]/history-attempt-actions.tsx",
+    requires: [
+      "Reason (optional, visible to admins)",
+      "/invalidate`, { method: \"POST\", json: { reason }",
+      "apiFetch(`/api/attempts/${attemptId}/comment`",
+      "status === \"SUBMITTED\"",
+    ],
+    label: "Don't count y comentario desde History: razon auditada, errores via apiFetch, solo intentos contados",
+  },
+  {
     file: "app/(student)/student/tests/[assignmentId]/player-client.tsx",
     requires: [
       "savedProgressState",
@@ -228,9 +238,9 @@ const checks = [
   {
     file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
     requires: [
-      "Skill performance by difficulty",
+      "skills by difficulty",
       "StudentSwitcher",
-      "recommendation",
+      "Weakest skill",
       "studentAccessWhereFor",
       "loadPracticeReport",
     ],

@@ -77,8 +77,17 @@ export type PracticeReport = {
   /** Domain → skill labels in the official order (Skills Tracker), for grouped matrices. */
   skillGroups: Array<{ label: string; rows: string[] }>;
   weakSkills: WeakSkill[];
-  /** Skill × difficulty results in the official skill order (skills with data only). */
+  /**
+   * Skill × difficulty results in the official skill order (skills with data only), from the latest
+   * counted try of each set (same scope as `difficultySummary`); `tries` still counts every try.
+   */
   skillMatrix: SkillMatrixRow[];
+  /** % correct by difficulty over the latest counted try of each set (percent null = no questions). */
+  difficultySummary: Record<string, { correct: number; total: number; percent: number | null }>;
+  /** Lowest skill × difficulty of `skillMatrix` (at least 2 questions), or null. */
+  weakestSkill: { topicId: string; label: string; difficulty: string; correct: number; total: number; percent: number } | null;
+  /** Number of sets behind `difficultySummary` / `skillMatrix` (one latest try each). */
+  latestSetCount: number;
   trend: { topics: string[]; pointsByTopic: Record<string, TopicTrendPoint[]>; attemptCount: number };
   assignments: Array<{
     id: string;
@@ -258,22 +267,45 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
     submittedAt: attemptById.get(row.attemptId)?.submittedAt ?? null,
   }));
 
-  // Weakest skill x difficulty buckets.
-  const buckets = new Map<string, { topicId: string; domainId: string; label: string; difficulty: string; correct: number; total: number; totalTime: number; timed: number }>();
-  for (const row of allRows) {
-    const key = `${row.topicId}:${row.difficulty}`;
-    const bucket = buckets.get(key) ?? {
-      topicId: row.topicId, domainId: row.domainId, label: row.topicName, difficulty: row.difficulty,
-      correct: 0, total: 0, totalTime: 0, timed: 0,
-    };
-    bucket.total += 1;
-    if (row.isCorrect) bucket.correct += 1;
-    if (row.timeSeconds) {
-      bucket.totalTime += row.timeSeconds;
-      bucket.timed += 1;
+  // Skill x difficulty buckets: every counted try (weak skills, PDF) and the latest counted try of
+  // each set (summary card + skill matrix: where the student stands now, a retry replaces older tries).
+  const bucketsOf = (rows: typeof allRows) => {
+    const map = new Map<string, { topicId: string; domainId: string; label: string; difficulty: string; correct: number; total: number; totalTime: number; timed: number }>();
+    for (const row of rows) {
+      const key = `${row.topicId}:${row.difficulty}`;
+      const bucket = map.get(key) ?? {
+        topicId: row.topicId, domainId: row.domainId, label: row.topicName, difficulty: row.difficulty,
+        correct: 0, total: 0, totalTime: 0, timed: 0,
+      };
+      bucket.total += 1;
+      if (row.isCorrect) bucket.correct += 1;
+      if (row.timeSeconds) {
+        bucket.totalTime += row.timeSeconds;
+        bucket.timed += 1;
+      }
+      map.set(key, bucket);
     }
-    buckets.set(key, bucket);
-  }
+    return map;
+  };
+  const buckets = bucketsOf(allRows);
+  // `attempts` is newest first, so the first try seen per set is its latest counted one.
+  const latestIndexBySet = new Map<string, number>();
+  attempts.forEach((attempt, index) => {
+    const setKey = attempt.assignmentId ?? attempt.id;
+    if (!latestIndexBySet.has(setKey)) latestIndexBySet.set(setKey, index);
+  });
+  const latestRows = [...latestIndexBySet.values()].flatMap((index) => rowsByAttempt[index] ?? []);
+  const latestBuckets = bucketsOf(latestRows);
+  const difficultySummary = Object.fromEntries(
+    ["EASY", "MEDIUM", "HARD"].map((level) => {
+      const levelRows = latestRows.filter((row) => row.difficulty === level);
+      const score = summarizeAllQuestionAnswers(levelRows);
+      return [level, { correct: score.correct, total: score.total, percent: score.total ? score.percent : null }];
+    }),
+  );
+  const weakestBucket = [...latestBuckets.values()]
+    .filter((bucket) => bucket.total >= 2)
+    .sort((a, b) => scorePercent(a.correct, a.total) - scorePercent(b.correct, b.total) || b.total - a.total)[0];
   const weakest = [...buckets.entries()]
     .sort(([, a], [, b]) => scorePercent(a.correct, a.total) - scorePercent(b.correct, b.total) || b.total - a.total)
     .slice(0, 12);
@@ -318,7 +350,7 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
     domainId: skill.domainId,
     label: skill.name,
     cells: Object.fromEntries(
-      [...buckets.values()]
+      [...latestBuckets.values()]
         .filter((bucket) => bucket.topicId === skill.id)
         .map((bucket) => [
           bucket.difficulty,
@@ -330,7 +362,7 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
           },
         ]),
     ),
-  }));
+  })).filter((row) => Object.keys(row.cells).length > 0);
   const skillGroups: Array<{ label: string; rows: string[] }> = [];
   for (const skill of skillsWithData) {
     const label = skill.domainName || "Other";
@@ -361,6 +393,18 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
     skillGroups,
     weakSkills,
     skillMatrix,
+    difficultySummary,
+    weakestSkill: weakestBucket
+      ? {
+          topicId: weakestBucket.topicId,
+          label: weakestBucket.label,
+          difficulty: weakestBucket.difficulty,
+          correct: weakestBucket.correct,
+          total: weakestBucket.total,
+          percent: scorePercent(weakestBucket.correct, weakestBucket.total),
+        }
+      : null,
+    latestSetCount: latestIndexBySet.size,
     trend: { topics: Object.keys(pointsByTopic), pointsByTopic, attemptCount: trendAttempts.length },
     assignments: assignments.map((a) => ({
       id: a.id,
@@ -435,6 +479,16 @@ export async function loadMockReport(studentId: string, filters: ReportFilters, 
     );
   });
   const latest = examAttempts[0];
+  // One chart point per try: a retaken Test gets "· try N" so its points are not two identical labels.
+  const chronological = [...examAttempts].reverse();
+  const triesPerTest = new Map<string, number>();
+  for (const exam of chronological) triesPerTest.set(exam.testId, (triesPerTest.get(exam.testId) ?? 0) + 1);
+  const trySeen = new Map<string, number>();
+  const seriesLabel = (exam: (typeof examAttempts)[number]) => {
+    const n = (trySeen.get(exam.testId) ?? 0) + 1;
+    trySeen.set(exam.testId, n);
+    return (triesPerTest.get(exam.testId) ?? 1) > 1 ? `${exam.test.name} · try ${n}` : exam.test.name;
+  };
   return {
     kpis: {
       exams: examAttempts.length,
@@ -443,9 +497,9 @@ export async function loadMockReport(studentId: string, filters: ReportFilters, 
       latestMath: latest?.mathScore ?? null,
       pending: examAssignments.length,
     },
-    scoreSeries: [...examAttempts].reverse().map((exam) => ({
+    scoreSeries: chronological.map((exam) => ({
       attempts: 1,
-      label: exam.test.name,
+      label: seriesLabel(exam),
       submittedAt: exam.submittedAt?.toISOString() ?? null,
       mathScore: exam.mathScore,
       rwScore: exam.rwScore,

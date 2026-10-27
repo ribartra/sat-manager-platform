@@ -1,7 +1,8 @@
 /**
  * Small SVG line chart (scores over time). `notes` adds a second line under each x label (e.g. the
  * time a test took) and goes into each point's tooltip. Edge labels are anchored inward so they are
- * never clipped, and value labels of different series at the same point never overlap.
+ * never clipped, middle labels are thinned out when they would run into each other (the point's
+ * tooltip keeps the full label), and value labels of different series at the same point never overlap.
  */
 export function LineChart({
   series,
@@ -31,6 +32,13 @@ export function LineChart({
   // First/last labels hug the plot edges so long labels ("T1 · try 1") are not cut off.
   const anchor = (i: number) => (labels.length <= 1 ? "middle" : i === 0 ? "start" : i === labels.length - 1 ? "end" : "middle");
   const labelX = (i: number) => (labels.length <= 1 ? x(i) : i === 0 ? x(i) - 6 : i === labels.length - 1 ? x(i) + 6 : x(i));
+  // ~5.5px per character at font-size 10: show every `step`-th label so neighbours never overlap
+  // ("TEST 10 · try 2" next to "TEST 9"). First and last are always shown.
+  const longest = Math.max(0, ...labels.map((label, i) => Math.max(label.length, notes?.[i]?.length ?? 0)));
+  const gap = labels.length > 1 ? iw / (labels.length - 1) : iw;
+  const step = Math.max(1, Math.ceil((longest * 5.5 + 10) / gap));
+  const last = labels.length - 1;
+  const showLabel = (i: number) => i === 0 || i === last || (i % step === 0 && last - i >= step);
 
   // Value label above the point, unless another series' point is close above it: then below.
   const below = (si: number, i: number) => {
@@ -51,7 +59,7 @@ export function LineChart({
             <text x={pad.l - 6} y={y(t) + 3} textAnchor="end" fontSize="10" fill="#6b7280">{Math.round(t)}</text>
           </g>
         ))}
-        {labels.map((label, i) => (
+        {labels.map((label, i) => !showLabel(i) ? null : (
           <text key={`${label}-${i}`} x={labelX(i)} y={H - (hasNotes ? 22 : 8)} textAnchor={anchor(i)} fontSize="10" fill="#6b7280">
             {label}
             {notes?.[i] ? (

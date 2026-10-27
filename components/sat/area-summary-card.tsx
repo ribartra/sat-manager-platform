@@ -67,6 +67,51 @@ export function AreaSummaryCard({ area, label, href, latest, delta, chips = [], 
   );
 }
 
+/**
+ * Teacher's per-area summary: % correct at Easy / Medium / Hard (latest counted try of each set) with
+ * the weakest skill underneath. A level without questions shows "—" (no attempts), never 0%.
+ */
+export function DifficultySummaryCard({
+  area,
+  label,
+  levels,
+  weakest,
+  footer,
+  emptyText,
+}: {
+  area: PracticeAreaCode;
+  label: string;
+  levels: { key: string; label: string; correct: number; total: number; percent: number | null }[];
+  weakest: React.ReactNode;
+  footer: React.ReactNode;
+  emptyText: string;
+}) {
+  const tab = tabFromPracticeArea(area) ?? "math";
+  const any = levels.some((level) => level.total > 0);
+  return (
+    <Card padding="md" className="flex flex-col gap-3 border-t-[6px]" style={{ borderTopColor: `var(--sat-area-${tab})` }}>
+      <h2 className="text-lg font-semibold" style={{ color: `var(--sat-area-${tab})` }}>{label}</h2>
+      {any ? (
+        <div className="grid grid-cols-3 gap-3">
+          {levels.map((level) => (
+            <div key={level.key} className="rounded-lg bg-[var(--sat-surface-2)] px-3 py-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">{level.label}</p>
+              <p className="mt-1">
+                <Pct value={level.percent} className="text-3xl font-bold leading-none sm:text-4xl" />
+              </p>
+              <p className="mt-1 text-xs text-gray-500">{level.total ? `${level.correct} of ${level.total} correct` : "No attempts"}</p>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="text-sm text-gray-500">{emptyText}</p>
+      )}
+      {weakest ? <p className="text-sm text-gray-700">{weakest}</p> : null}
+      <p className="border-t border-gray-100 pt-2 text-xs text-gray-500">{footer}</p>
+    </Card>
+  );
+}
+
 /** Props for a student's own practice summary (lib/student-practice summarizeArea). */
 export function studentAreaCardProps(s: AreaPracticeSummary, href: string, action: string): AreaSummaryCardProps {
   return {

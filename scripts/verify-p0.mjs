@@ -91,12 +91,12 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
-    requires: ["loadPracticeReport", "Questions correct", "Total time", "PerformanceBreakdown", "Skill performance by difficulty", "Teacher Comments", "GenerateReportDialog"],
-    label: "Pagina del alumno (ex reporte individual) incluye score ponderado, dificultad, skills debiles, comentarios y PDF",
+    requires: ["loadPracticeReport", "DifficultySummaryCard", "difficultySummary", "weakestSkill", "SkillDifficultyMatrix", "PracticeSetAttemptsAccordion", "HistoryAttemptActions", "Teacher Comments", "GenerateReportDialog"],
+    label: "Pagina del alumno: resumen Easy/Medium/Hard + weakest skill, matriz unica de skills, intentos por set (ultimo intento), Don't count en History, comentarios y PDF",
   },
   {
     file: "lib/student-report.ts",
-    requires: ["aggregateTopicDifficultyMetrics", "summarizeAllQuestionAnswers", "parseSnapshot", "loadMockReport", "timeSpent", "topic.name"],
+    requires: ["aggregateTopicDifficultyMetrics", "summarizeAllQuestionAnswers", "parseSnapshot", "loadMockReport", "timeSpent", "topic.name", "latestIndexBySet", "difficultySummary", "· try ${n}"],
     label: "Datos del reporte compartidos por la pagina del alumno y el PDF (snapshots, score ponderado, FPT)",
   },
   {

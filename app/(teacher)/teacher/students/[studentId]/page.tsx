@@ -1,6 +1,5 @@
 import {
   AreaBoxGrid,
-  AreaSummaryCard,
   CompactAreaBox,
   AttemptStatusBadge,
   ChevronCell,
@@ -12,7 +11,9 @@ import {
   PageShell,
   Pagination,
   PracticeAreaTabs,
-  PracticeAttemptsTable,
+  PracticeSetAttemptsAccordion,
+  DifficultySummaryCard,
+  RowAction,
   RowLink,
   SectionHeader,
   SimpleTable,
@@ -38,9 +39,8 @@ import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { formatClock, formatDate, formatDuration, formatTime } from "@/lib/utils";
+import { formatClock, formatDate, formatDuration } from "@/lib/utils";
 import { assignmentStatusLabel, difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
-import { scoreBandTextClass } from "@/lib/score-band";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -55,6 +55,7 @@ import { StudentDetailActions } from "./actions-client";
 import { StudentSwitcher } from "./student-switcher";
 import { GenerateReportDialog } from "./generate-report-dialog";
 import { RestartExamButton } from "./restart-exam-button";
+import { HistoryAttemptActions } from "./history-attempt-actions";
 import { ParentAuthorization, type ParentAuthorizationView } from "./parent-authorization";
 import { parentAuthorizationState } from "@/lib/parent-authorization";
 import { refreshAssignmentStates } from "@/lib/assignments";
@@ -72,9 +73,9 @@ import { applyTimeFilterSetting } from "@/lib/time-filters";
 import { officialSkillsFor } from "@/lib/taxonomy-order";
 
 // One page per student (replaces the former Student Analytics and Individual Report views).
-// Everything is on a single screen: KPI strip on top; performance + weak skills (with one-click
-// "Assign practice") in the main column; active assignments, recent attempts and teacher
-// comments in the side column. "Generate Report" builds the same report as a PDF (server-side).
+// Practice tabs (Math / Reading / Writing): Easy / Medium / Hard summary and the skill × difficulty
+// matrix (latest attempt of each set) in the main column; active assignments and teacher comments in
+// the side column; practice attempts grouped by set below. "Don't count" / comments live in History. "Generate Report" builds the same report as a PDF (server-side).
 // Data comes from lib/student-report.ts, shared with the PDF so both show the same numbers.
 // Taxonomy note: the `topic` param / Topic table is the SKILL level (Section → Domain → Skill).
 
@@ -318,7 +319,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
               <h2 className="text-sm font-semibold text-gray-900">What to assign next</h2>
               {suggestions.length > 0 ? (
                 <Link
-                  href={`/teacher/students/${studentId}?area=${suggestions[0].code.toLowerCase()}#weak-skills`}
+                  href={`/teacher/students/${studentId}?area=${suggestions[0].code.toLowerCase()}#performance`}
                   className="whitespace-nowrap text-xs font-medium text-[var(--sat-primary)] hover:underline"
                 >
                   View all ›
@@ -393,7 +394,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
       <PageShell maxWidth={1180} width="wide">
         {header}
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <p className="text-sm text-gray-500">Every try {first} made, grouped by Test and practice set. Changes compare with the previous counted try.</p>
+          <p className="text-sm text-gray-500">Every try {first} made, grouped by Test and practice set. Changes compare with the previous counted try. Use &ldquo;Don&apos;t count&rdquo; to leave a try out of scores.</p>
           <LinkTabs
             className="mb-0 border-b-0"
             label="Show"
@@ -432,7 +433,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                     </p>
                   </div>
                   {isTest ? (
-                    <SimpleTable head={["Try", "Date", "Status", <SectionHead key="rw" section="RW" short />, "Change", <SectionHead key="m" section="MATH" />, "Change", ""]}>
+                    <SimpleTable head={["Try", "Date", "Status", <SectionHead key="rw" section="RW" short />, "Change", <SectionHead key="m" section="MATH" />, "Change", "", ""]}>
                       {tries.map((t) => (
                         <LinkTr key={t.id} className={invalidatedRowClass(t.status)}>
                           <td className={TD}><RowLink href={hrefFor(t.id)}>Try {t.tryNumber}</RowLink></td>
@@ -444,12 +445,15 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                           <td className={TD}><Delta value={t.changeRw} unit="" /></td>
                           <td className={`${TD} font-semibold tabular-nums`}><VoidableValue status={t.status}>{t.math ?? "—"}</VoidableValue></td>
                           <td className={TD}><Delta value={t.changeMath} unit="" /></td>
+                          <td className={`${TD} text-right`}>
+                            <RowAction><HistoryAttemptActions attemptId={t.id} kind="test" status={t.status} /></RowAction>
+                          </td>
                           <ChevronCell />
                         </LinkTr>
                       ))}
                     </SimpleTable>
                   ) : (
-                    <SimpleTable head={["Try", "Date", "Score", "Correct", "Change", "Time", ""]}>
+                    <SimpleTable head={["Try", "Date", "Score", "Correct", "Change", "Time", "", ""]}>
                       {tries.map((t) => (
                         <LinkTr key={t.id} className={invalidatedRowClass(t.status)}>
                           <td className={TD}>
@@ -468,6 +472,11 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                           </td>
                           <td className={TD}><Delta value={t.change} unit="pts" /></td>
                           <td className={`${TD} text-gray-600`}>{t.time ? formatDuration(t.time) : "—"}</td>
+                          <td className={`${TD} text-right`}>
+                            <RowAction>
+                              <HistoryAttemptActions attemptId={t.id} kind="practice" status={t.status} initialComment={t.teacherComment} />
+                            </RowAction>
+                          </td>
                           <ChevronCell />
                         </LinkTr>
                       ))}
@@ -644,16 +653,45 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
   }
 
   // ---------------------------------------------------------------- Practice (Math / Reading / Writing)
-  const [report, areaOverview] = await Promise.all([
-    loadPracticeReport(studentId, practiceArea, reportFilters),
-    loadStudentOverviews([studentId], now).then((m) => m.get(studentId)!.areas[practiceArea]),
-  ]);
-  const { areaLabel, kpis } = report;
-  const attemptPage = paginate(report.attemptHistory, pageFromParam(query.attemptsPage), HISTORY_PAGE_SIZE);
-  const triesByAssignment = new Map<string, number>();
-  for (const attempt of report.attemptHistory) {
-    if (attempt.assignmentId) triesByAssignment.set(attempt.assignmentId, Math.max(triesByAssignment.get(attempt.assignmentId) ?? 0, attempt.attemptNumber ?? 1));
+  const report = await loadPracticeReport(studentId, practiceArea, reportFilters);
+  const { areaLabel } = report;
+  // One row per practice set (its last attempt), opening to its latest tries; every try is in History.
+  const attemptsBySet = new Map<string, typeof report.attemptHistory>();
+  for (const attempt of [...report.attemptHistory].sort(
+    (a, b) => (b.submittedAt?.getTime() ?? 0) - (a.submittedAt?.getTime() ?? 0) || b.id.localeCompare(a.id),
+  )) {
+    const key = attempt.assignmentId ?? attempt.id;
+    (attemptsBySet.get(key) ?? attemptsBySet.set(key, []).get(key)!).push(attempt);
   }
+  const attemptRow = (attempt: (typeof report.attemptHistory)[number]) => ({
+    id: attempt.id,
+    tryNumber: attempt.attemptNumber ?? 1,
+    submittedAt: attempt.submittedAt,
+    correct: attempt.correct,
+    total: attempt.total,
+    pct: attempt.percent,
+    time: attempt.totalTime,
+    status: attempt.status,
+  });
+  const practiceSets = [...attemptsBySet.entries()].map(([key, tries]) => {
+    const last = tries.find((attempt) => attempt.status === "SUBMITTED") ?? tries[0];
+    return {
+      key,
+      tryCount: Math.max(...tries.map((attempt) => attempt.attemptNumber ?? 1)),
+      last: attemptRow(last),
+      recent: tries.slice(0, 3).map(attemptRow),
+      title: (
+        <>
+          {shortSetName(last.name)}
+          {/* The short name already ends in "(Easy)"; the badge is only for names without the level. */}
+          {last.difficulty && !shortSetName(last.name).includes(`(${difficultyLabel(last.difficulty)})`) ? (
+            <Badge variant={difficultyBadgeVariant(last.difficulty)} className="ml-2">{difficultyLabel(last.difficulty)}</Badge>
+          ) : null}
+        </>
+      ),
+    };
+  });
+  const setPage = paginate(practiceSets, pageFromParam(query.attemptsPage), HISTORY_PAGE_SIZE);
   const assignHref = (overrides: { topic?: string; difficulty?: string }, extra: Record<string, string>) => {
     const href = buildProgressHref(`/teacher/students/${studentId}/assign`, filters, overrides);
     return `${href}${href.includes("?") ? "&" : "?"}${new URLSearchParams(extra).toString()}`;
@@ -671,49 +709,30 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
           </Link>
         </div>
       ) : null}
-      <KpiStrip
-        items={[
-          { label: "Sets completed", value: String(kpis.attempts), hint: `${areaLabel} practice sets finished (with the current filters).`, href: "#recent-attempts" },
-          {
-            label: "Questions correct",
-            value: kpis.overall.percent !== null ? `${kpis.overall.percent}%` : "—",
-            className: scoreBandTextClass(kpis.overall.percent),
-            sub: kpis.overall.total ? `${kpis.overall.correct} of ${kpis.overall.total} correct` : undefined,
-            hint: "% of questions answered correctly. Blank answers count as wrong.",
-            href: "#performance",
-          },
-          { label: "Total time", value: formatDuration(kpis.totalTime), hint: "Total time on finished work.", href: "#recent-attempts" },
-          { label: "Time per question", value: kpis.avgQuestionTime !== null ? formatDuration(kpis.avgQuestionTime) : "—", hint: "Average time per answered question.", href: "#recent-attempts" },
-          { label: "Sets to finish", value: String(kpis.pending), hint: "Assigned but not finished yet.", href: "#active-sets" },
-        ]}
-      />
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="mt-4 grid gap-6 lg:grid-cols-3">
         <div id="performance" className="min-w-0 space-y-6 lg:col-span-2">
-          <section className="grid items-start gap-4 xl:grid-cols-[minmax(0,320px)_1fr]">
-            <AreaSummaryCard
-              area={practiceArea}
-              label={`${areaLabel} practice`}
-              latest={
-                areaOverview.last
-                  ? {
-                      caption: <>Latest practice · {areaOverview.last.setName} · {formatDate(areaOverview.last.at)}</>,
-                      pct: areaOverview.last.pct,
-                      detail: "correct",
-                    }
-                  : null
-              }
-              delta={areaOverview.delta}
-              chips={[{ label: "Average", value: areaOverview.avgPct !== null ? `${areaOverview.avgPct}%` : "—" }]}
-              weakest={areaOverview.weakest ? <>Weakest skill: <b>{areaOverview.weakest.name}</b> ({areaOverview.weakest.pct}%)</> : null}
-              footer={`${areaOverview.attempts} practice attempt${areaOverview.attempts === 1 ? "" : "s"} · ${areaOverview.toDo} set${areaOverview.toDo === 1 ? "" : "s"} to do`}
-              action=""
-              emptyText={`No ${areaLabel} practice yet.`}
-            />
-            <div className="min-w-0">
+          <DifficultySummaryCard
+            area={practiceArea}
+            label={`${areaLabel} practice`}
+            levels={DIFFICULTIES.map((d) => ({ key: d, label: difficultyLabel(d), ...report.difficultySummary[d] }))}
+            weakest={
+              report.weakestSkill ? (
+                <>
+                  Weakest skill: <b>{report.weakestSkill.label}</b> · {difficultyLabel(report.weakestSkill.difficulty)} ·{" "}
+                  <Pct value={report.weakestSkill.percent} className="font-semibold" />{" "}
+                  <span className="text-xs text-gray-500">({report.weakestSkill.correct} of {report.weakestSkill.total})</span>
+                </>
+              ) : null
+            }
+            footer={`Last attempt of each practice set (${report.latestSetCount} set${report.latestSetCount === 1 ? "" : "s"}) · blank answers count as wrong`}
+            emptyText={`No ${areaLabel} practice yet.`}
+          />
+
+          <section className="min-w-0">
             <SectionHeader
               title={`${areaLabel} skills by difficulty`}
-              description="Practice only · % correct by difficulty · click a cell to filter this page"
+              description="Practice only · % correct in the last attempt of each set · click a cell to filter this page"
             />
             <SkillDifficultyMatrix
               selected={{ skill: topicId, difficulty }}
@@ -749,18 +768,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                 ),
               }))}
             />
-            </div>
           </section>
-
-          <PerformanceBreakdown
-            title="Performance by skill and difficulty"
-            rowLabel="Skill"
-            dimensionLabel="difficulty"
-            dimensions={difficulty ? [difficulty] : ["EASY", "MEDIUM", "HARD"]}
-            summaryMetrics={report.difficultyMetrics}
-            detailMetrics={report.topicDifficultyMetrics}
-            groups={report.skillGroups}
-          />
 
           {topicId && difficulty && report.trend.topics.length > 0 && report.trend.attemptCount > 0 && (
             <TopicDifficultyTrend
@@ -771,65 +779,6 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
             />
           )}
 
-          <section id="weak-skills">
-            <div className="mb-2 flex items-baseline justify-between gap-3">
-              <h2 className="text-base font-semibold text-gray-900">Skill performance by difficulty</h2>
-              <p className="text-xs text-gray-500">Lowest score first · assign practice from each row</p>
-            </div>
-            <Card className="overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[36rem] text-sm">
-                  <thead className="bg-gray-50 text-xs uppercase text-gray-500">
-                    <tr>
-                      <th className="px-3 py-2 text-left">Skill · level</th>
-                      <th className="px-3 py-2 text-right">% correct</th>
-                      <th className="px-3 py-2 text-right">
-                        <span className="whitespace-nowrap">Avg time <InfoHint label="Average time per answered question." /></span>
-                      </th>
-                      <th className="px-3 py-2 text-left">
-                        Suggested next step <InfoHint label="Under 50%: re-teach · 50–74%: review mistakes · 75%+: light practice" />
-                      </th>
-                      <th className="px-3 py-2" />
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {report.weakSkills.map((bucket) => (
-                      <tr key={bucket.key}>
-                        <td className="px-3 py-2">
-                          <span className="font-medium text-gray-800">{bucket.label}</span>
-                          <span className="ml-2 rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-gray-600">{difficultyLabel(bucket.difficulty)}</span>
-                        </td>
-                        <td className={`whitespace-nowrap px-3 py-2 text-right font-medium ${scoreBandTextClass(bucket.percent)}`}>{bucket.percent}% <span className="text-xs font-normal text-gray-400">({bucket.correct}/{bucket.total})</span></td>
-                        <td className="px-3 py-2 text-right text-gray-500">{bucket.avgTime !== null ? formatTime(bucket.avgTime) : "-"}</td>
-                        <td className="px-3 py-2 text-xs text-gray-600">{bucket.recommendation}</td>
-                        <td className="px-3 py-2 text-right">
-                          {bucket.assignableIds.length > 0 ? (
-                            <Hint label={`Assign ${bucket.assignableIds.length} more ${bucket.label} set${bucket.assignableIds.length === 1 ? "" : "s"} at this level.`}>
-                              <Link
-                                href={assignHref({ topic: bucket.topicId, difficulty: bucket.difficulty }, { domain: bucket.domainId, sets: bucket.assignableIds.join(",") })}
-                                className="whitespace-nowrap text-xs font-medium text-blue-600 hover:underline"
-                              >
-                                Assign practice
-                              </Link>
-                            </Hint>
-                          ) : bucket.pendingCount > 0 ? (
-                            <Hint label="Assigned but not finished yet. See Active practice sets.">
-                              <a href="#active-sets" className="whitespace-nowrap text-xs text-gray-400 hover:underline">
-                                {bucket.pendingCount} assigned
-                              </a>
-                            </Hint>
-                          ) : null}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              {report.weakSkills.length === 0 && (
-                <p className="py-10 text-center text-sm text-gray-500">No finished {areaLabel} work for this student yet.</p>
-              )}
-            </Card>
-          </section>
         </div>
 
         <aside className="min-w-0 space-y-6">
@@ -875,36 +824,21 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
       <section id="recent-attempts" className="mt-6 scroll-mt-6">
         <SectionHeader
           title={`${areaLabel} practice attempts`}
-          description={`${report.attemptHistory.length} finished attempt${report.attemptHistory.length === 1 ? "" : "s"} · click a row to see each answer`}
+          description={`${practiceSets.length} practice set${practiceSets.length === 1 ? "" : "s"} · Last Attempt is the most recent try · open a set to see its last 3 tries`}
           action={
             <Link href={buildProgressHref(`/teacher/students/${studentId}/assign`, filters)} className="text-xs font-medium text-blue-600 hover:underline">
               Assign practice
             </Link>
           }
         />
-        {report.attemptHistory.length === 0 ? (
+        {practiceSets.length === 0 ? (
           <EmptyState title={`No finished ${areaLabel} work yet.`} />
         ) : (
           <>
-            <PracticeAttemptsTable
+            <PracticeSetAttemptsAccordion
+              sets={setPage.items}
               hrefFor={(id) => buildProgressHref(`/teacher/students/${studentId}/attempts/${id}`, filters)}
-              rows={attemptPage.items.map((attempt) => ({
-                id: attempt.id,
-                tryNumber: attempt.attemptNumber ?? 1,
-                tryCount: attempt.assignmentId ? triesByAssignment.get(attempt.assignmentId) : undefined,
-                submittedAt: attempt.submittedAt,
-                correct: attempt.correct,
-                total: attempt.total,
-                pct: attempt.percent,
-                time: attempt.totalTime,
-                status: attempt.status,
-                title: (
-                  <>
-                    {shortSetName(attempt.name)}
-                    {attempt.difficulty ? <Badge variant={difficultyBadgeVariant(attempt.difficulty)} className="ml-2">{difficultyLabel(attempt.difficulty)}</Badge> : null}
-                  </>
-                ),
-              }))}
+              historyHref={`/teacher/students/${studentId}?area=history&type=practice`}
             />
             <Pagination
               basePath={`/teacher/students/${studentId}`}
@@ -912,7 +846,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
               param="attemptsPage"
               anchor="recent-attempts"
               pageSize={HISTORY_PAGE_SIZE}
-              {...attemptPage}
+              {...setPage}
             />
           </>
         )}
