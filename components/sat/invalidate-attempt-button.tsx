@@ -7,7 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Ban } from "lucide-react";
 import { InlineError } from "@/components/sat/alert";
+import { HEADER_ACTION_DANGER_CLASS } from "@/components/sat/header-actions";
 import { apiFetch, errorMessage } from "@/lib/api-client";
 import { notify } from "@/lib/notify-ui";
 
@@ -24,18 +26,16 @@ type ReasonValue = (typeof INVALIDATE_REASONS)[number]["value"];
  * The only teacher action on an attempt: invalidate it ("doesn't count"). The try stays in the
  * history, crossed out, and leaves scores and reports. Retrying never needs the teacher: the first
  * assignment is the only one; students start new tries of a practice set or Test on their own.
+ * One look everywhere (page header and History rows): the header action style, in red.
  */
 export function InvalidateAttemptButton({
   attemptId,
   kind,
   status,
-  compact = false,
 }: {
   attemptId: string;
   kind: "practice" | "test";
   status: string;
-  /** Small text button for table rows (History). */
-  compact?: boolean;
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -70,15 +70,9 @@ export function InvalidateAttemptButton({
 
   return (
     <>
-      <Button
-        variant={compact ? "ghost" : "danger"}
-        size="sm"
-        className={compact ? "text-[var(--sat-bad)]" : undefined}
-        onClick={() => setOpen(true)}
-        title="Keep it in the history but don't count it"
-      >
-        {compact ? "Invalidate" : "Invalidate attempt"}
-      </Button>
+      <button type="button" className={HEADER_ACTION_DANGER_CLASS} onClick={() => setOpen(true)} title="Keep it in the history but don't count it">
+        <Ban size={14} aria-hidden /> Invalidate attempt
+      </button>
       <Dialog open={open} onOpenChange={(next) => !working && setOpen(next)}>
         <DialogContent className="max-w-md">
           <DialogHeader>

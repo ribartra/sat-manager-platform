@@ -1,5 +1,6 @@
 "use client";
 
+import { HEADER_ACTION_CLASS } from "@/components/sat/header-actions";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useRef, useState } from "react";
@@ -187,7 +188,7 @@ export function GenerateReportDialog({
     >
       <Hint label="Make a PDF report for this student. Pick the areas, preview it, then download or email it.">
         <DialogTrigger asChild>
-          <button type="button" className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-gray-300 bg-white px-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
+          <button type="button" className={HEADER_ACTION_CLASS}>
             <FileText size={14} /> {triggerLabel ?? "Generate Report"}
           </button>
         </DialogTrigger>

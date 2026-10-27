@@ -15,20 +15,23 @@ import { formatDate, formatDuration, relativeDay } from "@/lib/utils";
  * the whole row opens it, the try being viewed is marked (and not linked to itself), the best practice try gets a badge.
  */
 
-/** Row of an attempts table: linked, except the try being viewed (plain highlighted row, no chevron). */
-function AttemptTr({ viewing, className, children }: { viewing: boolean; className?: string; children: React.ReactNode }) {
-  if (!viewing) return <LinkTr className={className}>{children}</LinkTr>;
+/**
+ * Row of an attempts table: linked, except the try being viewed (plain highlighted row, no chevron)
+ * and views without attempt pages (parents: `linked` false, plain row).
+ */
+function AttemptTr({ viewing, linked = true, className, children }: { viewing: boolean; linked?: boolean; className?: string; children: React.ReactNode }) {
+  if (!viewing && linked) return <LinkTr className={className}>{children}</LinkTr>;
   return (
-    <tr className="bg-blue-50/60" aria-current="page">
+    <tr className={viewing ? "bg-blue-50/60" : className} aria-current={viewing ? "page" : undefined}>
       {children}
       <td className="w-8" />
     </tr>
   );
 }
 
-/** The row's main link, or plain bold text on the row being viewed. */
-function AttemptLink({ viewing, href, children }: { viewing: boolean; href: string; children: React.ReactNode }) {
-  return viewing ? <span className="font-semibold text-[var(--sat-text)]">{children}</span> : <RowLink href={href}>{children}</RowLink>;
+/** The row's main link, or plain bold text on the row being viewed / without a link. */
+function AttemptLink({ viewing, href, children }: { viewing: boolean; href?: string; children: React.ReactNode }) {
+  return viewing || !href ? <span className="font-semibold text-[var(--sat-text)]">{children}</span> : <RowLink href={href}>{children}</RowLink>;
 }
 
 export interface PracticeAttemptRow {
@@ -55,7 +58,8 @@ export function PracticeAttemptsTable({
   showBest = true,
 }: {
   rows: PracticeAttemptRow[];
-  hrefFor: (id: string) => string;
+  /** Omit for views without attempt pages (parents): rows are not links. */
+  hrefFor?: (id: string) => string;
   viewingId?: string;
   showBest?: boolean;
 }) {
@@ -66,10 +70,10 @@ export function PracticeAttemptsTable({
   return (
     <SimpleTable head={[...(mixed ? ["Practice set"] : []), "Attempt", "Completed", "Score", ...(withChange ? ["Change"] : []), "Correct", "Time", ""]}>
       {rows.map((r) => (
-        <AttemptTr key={r.id} viewing={r.id === viewingId} className={invalidatedRowClass(r.status)}>
-          {mixed ? <td className={TD}><AttemptLink viewing={r.id === viewingId} href={hrefFor(r.id)}>{r.title}</AttemptLink></td> : null}
+        <AttemptTr key={r.id} viewing={r.id === viewingId} linked={Boolean(hrefFor)} className={invalidatedRowClass(r.status)}>
+          {mixed ? <td className={TD}><AttemptLink viewing={r.id === viewingId} href={hrefFor?.(r.id)}>{r.title}</AttemptLink></td> : null}
           <td className={TD}>
-            {mixed ? <>Try {r.tryNumber}{r.tryCount ? ` of ${r.tryCount}` : ""}</> : <AttemptLink viewing={r.id === viewingId} href={hrefFor(r.id)}>Try {r.tryNumber} of {r.tryCount ?? rows.length}</AttemptLink>}
+            {mixed ? <>Try {r.tryNumber}{r.tryCount ? ` of ${r.tryCount}` : ""}</> : <AttemptLink viewing={r.id === viewingId} href={hrefFor?.(r.id)}>Try {r.tryNumber} of {r.tryCount ?? rows.length}</AttemptLink>}
             {r.id === viewingId ? <Badge variant="info" className="ml-2">Viewing</Badge> : null}
             {r.id === bestId ? <Badge variant="success" className="ml-2">Best</Badge> : null}
             {r.status && r.status !== "SUBMITTED" ? <span className="ml-2"><AttemptStatusBadge status={r.status} /></span> : null}
@@ -81,7 +85,7 @@ export function PracticeAttemptsTable({
           {withChange ? <td className={TD}>{r.change !== null && r.change !== undefined ? <Delta value={r.change} unit="pts" /> : <span className="text-gray-300">—</span>}</td> : null}
           <td className={TD}>{r.correct} of {r.total}</td>
           <td className={`${TD} text-gray-600`}>{r.time ? formatDuration(r.time) : "—"}</td>
-          {r.id === viewingId ? null : <ChevronCell />}
+          {r.id === viewingId || !hrefFor ? null : <ChevronCell />}
         </AttemptTr>
       ))}
     </SimpleTable>
@@ -94,15 +98,16 @@ export function TestAttemptsTable({
   viewingId,
 }: {
   rows: Pick<TestAttemptRow, "id" | "status" | "startedAt" | "submittedAt" | "rwScore" | "mathScore" | "totalScore" | "view" | "tryNumber">[];
-  hrefFor: (id: string) => string;
+  /** Omit for views without attempt pages (parents): rows are not links. */
+  hrefFor?: (id: string) => string;
   viewingId?: string;
 }) {
   return (
     <SimpleTable head={["Attempt", "Date", <SectionHead key="rw" section="RW" />, <SectionHead key="m" section="MATH" />, "Total", ""]}>
       {rows.map((r) => (
-        <AttemptTr key={r.id} viewing={r.id === viewingId}>
+        <AttemptTr key={r.id} viewing={r.id === viewingId} linked={Boolean(hrefFor)}>
           <td className={TD}>
-            <AttemptLink viewing={r.id === viewingId} href={hrefFor(r.id)}>Try {r.tryNumber} of {rows.length}</AttemptLink>
+            <AttemptLink viewing={r.id === viewingId} href={hrefFor?.(r.id)}>Try {r.tryNumber} of {rows.length}</AttemptLink>
             {r.id === viewingId ? <Badge variant="info" className="ml-2">Viewing</Badge> : null}
             {r.status !== "SUBMITTED" ? <span className="ml-2"><AttemptStatusBadge status={r.status} /></span> : null}
           </td>
@@ -113,7 +118,7 @@ export function TestAttemptsTable({
           <td className={TD}><TestSectionScore attempt={r} section="RW" /></td>
           <td className={TD}><TestSectionScore attempt={r} section="MATH" /></td>
           <td className={TD}><TestTotalCell attempt={r} /></td>
-          {r.id === viewingId ? null : <ChevronCell />}
+          {r.id === viewingId || !hrefFor ? null : <ChevronCell />}
         </AttemptTr>
       ))}
     </SimpleTable>
@@ -189,8 +194,10 @@ export function PracticeSetAttemptsAccordion({
   recentLimit = 3,
 }: {
   sets: PracticeSetAttempts[];
-  hrefFor: (id: string) => string;
-  historyHref: string;
+  /** Omit for views without attempt pages (parents): rows are not links. */
+  hrefFor?: (id: string) => string;
+  /** "See all N tries" link; omitted where there is no History (parents). */
+  historyHref?: string;
   recentLimit?: number;
 }) {
   return (
@@ -220,9 +227,13 @@ export function PracticeSetAttemptsAccordion({
               rows={set.recent.slice(0, recentLimit).map((row) => ({ ...row, tryCount: set.tryCount }))}
             />
             {set.tryCount > Math.min(recentLimit, set.recent.length) ? (
-              <Link href={historyHref} className="mt-2 inline-block text-xs font-medium text-blue-600 hover:underline">
-                See all {set.tryCount} tries in History →
-              </Link>
+              historyHref ? (
+                <Link href={historyHref} className="mt-2 inline-block text-xs font-medium text-blue-600 hover:underline">
+                  See all {set.tryCount} tries in History →
+                </Link>
+              ) : (
+                <p className="mt-2 text-xs text-[var(--sat-muted)]">{set.tryCount} tries in total.</p>
+              )
             ) : null}
           </>
         ),
@@ -244,7 +255,7 @@ export interface TestAttempts {
 }
 
 /** Test attempts grouped by Test (same look as the practice accordion): last try's scores, then every try. */
-export function TestAttemptsAccordion({ tests, hrefFor }: { tests: TestAttempts[]; hrefFor: (id: string) => string }) {
+export function TestAttemptsAccordion({ tests, hrefFor }: { tests: TestAttempts[]; hrefFor?: (id: string) => string }) {
   return (
     <GroupedAttemptsAccordion
       head={["Test", <SectionHead key="rw" section="RW" short />, <SectionHead key="m" section="MATH" />, "Total", "Date"]}

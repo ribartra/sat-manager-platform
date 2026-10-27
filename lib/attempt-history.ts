@@ -42,8 +42,6 @@ export interface HistoryRow {
   math: number | null;
   totalScore: number | null;
   modulesDone: number | null;
-  /** Practice only: the teacher's comment for the student (null for Tests). */
-  teacherComment: string | null;
   /** Practice: % points; Test: { rw, math } points; vs. the previous counted try. */
   change: number | null;
   changeRw: number | null;
@@ -80,7 +78,6 @@ export async function loadAttemptHistory(studentIds: string[], filters: HistoryF
             submittedAt: true,
             totalTime: true,
             scorePercent: true,
-            teacherComment: true,
             assignmentId: true,
             student: { select: { id: true, name: true, avatarUrl: true } },
             answers: { select: { answer: true, isCorrect: true } },
@@ -165,7 +162,6 @@ export async function loadAttemptHistory(studentIds: string[], filters: HistoryF
         math: null,
         totalScore: null,
         modulesDone: null,
-        teacherComment: a.teacherComment,
         change: a.status === COUNTED && pct !== null && previousPct !== null ? pct - previousPct : null,
         changeRw: null,
         changeMath: null,
@@ -208,7 +204,6 @@ export async function loadAttemptHistory(studentIds: string[], filters: HistoryF
         rw: a.status === "IN_PROGRESS" ? null : a.rwScore,
         math: a.status === "IN_PROGRESS" ? null : a.mathScore,
         totalScore: a.status === "IN_PROGRESS" ? null : a.totalScore,
-        teacherComment: null,
         modulesDone: a.status === "IN_PROGRESS" ? completedModulesOf(a.moduleTimerState, a.test._count.modules || 4).length : null,
         change: null,
         changeRw: counted && previous?.rw != null && a.rwScore != null ? a.rwScore - previous.rw : null,

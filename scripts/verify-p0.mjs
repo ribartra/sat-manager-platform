@@ -86,13 +86,15 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/students-table-client.tsx",
-    requires: ["Last ${areaLabel} practice", "lastPracticeLabel", "Average correct", "setsCompleted"],
-    label: "Tabla de estudiantes por area: ultima practica, sets completados, promedio (mockup mejorada)",
+    requires: ["Last ${areaLabel} practice", "lastPracticeLabel", "setsCompleted"],
+    forbids: ["Average correct", "avgScore"],
+    label: "Tabla de estudiantes por area: ultima practica y sets completados; sin promedios (regla: solo nivel de intento)",
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
-    requires: ["loadPracticeReport", "DifficultySummaryCard", "difficultySummary", "weakestSkill", "SkillDifficultyMatrix", "PracticeSetAttemptsAccordion", "TestAttemptsAccordion", "HistoryAttemptActions", "Teacher Comments", "GenerateReportDialog"],
-    label: "Pagina del alumno a nivel de intento (sin promedios entre tests ni entre sets): Easy/Medium/Hard = ultimo intento por nivel, matriz de ultimo intento, acordeones por set y por test, Don't count en History, comentarios y PDF",
+    requires: ["loadPracticeReport", "DifficultySummaryCard", "difficultySummary", "weakestSkill", "SkillDifficultyMatrix", "PracticeSetAttemptsAccordion", "TestAttemptsAccordion", "InvalidateAttemptButton", "HeaderActions", "Practice Sets", "Teacher Comments", "GenerateReportDialog"],
+    forbids: ["RestartExamButton", "TopicDifficultyTrend", "Best R&amp;W", "LineChart"],
+    label: "Pagina del alumno a nivel de intento (sin promedios entre tests ni entre sets): Easy/Medium/Hard = ultimo intento por nivel, matriz de ultimo intento, acordeones por set y por test, Invalidar (unica accion) en History, acciones arriba, sin Restart ni graficas entre tests",
   },
   {
     file: "lib/student-report.ts",

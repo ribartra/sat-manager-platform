@@ -19,6 +19,7 @@ import {
   paginate,
 } from "@/components/sat";
 import { AreaTag } from "@/components/sat/practice-set-row";
+import { InvalidateAttemptButton } from "@/components/sat/invalidate-attempt-button";
 import { Pct } from "@/components/sat/work-status";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -122,7 +123,7 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
         <EmptyState title="No attempts match these filters." />
       ) : (
         <>
-          <SimpleTable head={["Date", "Student", "Type", "Test / practice set", "Attempt", "Score", "Change", ""]}>
+          <SimpleTable head={["Date", "Student", "Type", "Test / practice set", "Attempt", "Score", "Change", "", ""]}>
             {page.items.map((r) => <HistoryTableRow key={r.id} row={r} />)}
           </SimpleTable>
           <Pagination basePath="/teacher/history" params={params} pageSize={PAGE_SIZE} {...page} />
@@ -194,6 +195,10 @@ function HistoryTableRow({ row: r }: { row: HistoryRow }) {
         ) : (
           <Delta value={r.change} unit="pts" />
         )}
+      </td>
+      <td className={`${TD} text-right`}>
+        {/* The only action on an attempt, same component as the attempt pages and the student's History. */}
+        <RowAction><InvalidateAttemptButton attemptId={r.id} kind={isTest ? "test" : "practice"} status={r.status} /></RowAction>
       </td>
       <ChevronCell />
     </LinkTr>

@@ -2,8 +2,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { SECTION_TEXT } from "@/components/sat/test-ui";
 import { notFound } from "next/navigation";
-import { ChevronLeft } from "lucide-react";
-import { AttemptStatusBadge, InvalidatedNotice, PageShell, SectionHeader, TestAttemptsTable, TestResultSentence } from "@/components/sat";
+import { AttemptStatusBadge, InvalidatedNotice, PageShell, TestResultSentence } from "@/components/sat";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
@@ -22,8 +21,7 @@ import { isAnswerCorrect } from "@/lib/answer-grading";
 import { resolveQuestionType } from "@/lib/question-type";
 import { parseEliminatedOptions } from "@/lib/answer-review-meta";
 import { buildProgressHref, progressFiltersFromParams } from "@/lib/progress-filters";
-import { InvalidateAttemptButton } from "@/components/sat/invalidate-attempt-button";
-import { SendExamReportButton } from "./send-exam-report-button";
+import { AttemptHeaderActions } from "../../attempt-header-actions";
 
 interface PageProps {
   params: Promise<{ studentId: string; attemptId: string }>;
@@ -31,8 +29,9 @@ interface PageProps {
 }
 
 /**
- * One Test attempt for the teacher (same layout as the student results). The only action on it is
- * "Invalidate attempt" (with a reason); students retake Tests on their own, no teacher permission.
+ * One Test attempt for the teacher (same layout as the student results). Header actions (shared with
+ * the practice attempt page): Back · Test report · Invalidate attempt (the only action on an attempt;
+ * students retake Tests on their own). Every try of the Test is listed in the profile and History.
  * An open attempt shows only the modules the student already submitted.
  */
 export default async function TeacherFullTestAttemptPage({ params, searchParams }: PageProps) {
@@ -78,14 +77,6 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
   });
   const tryNumber = siblings.findIndex((s) => s.id === attempt.id) + 1;
 
-  const parents = await prisma.parentStudent.findMany({
-    where: { studentId },
-    include: { parent: { select: { id: true, name: true, email: true } } },
-  });
-  const parentOptions = parents
-    .filter((link) => link.parent.email)
-    .map((link) => ({ id: link.parent.id, name: link.parent.name, email: link.parent.email }));
-
   const answersByQuestion = new Map(attempt.answers.map((answer) => [answer.questionId, answer]));
   const overtime = overtimeByModule(attempt.moduleTimerState, modules.length);
   const moduleRows = modules.map((module, index) => {
@@ -115,8 +106,8 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
           { label: `${attempt.test.name} · Try ${tryNumber}` },
         ]}
       />
-      <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-        <div>
+      <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+        <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">
               <Link href={`/teacher/tests/${attempt.testId}`} className="hover:text-[var(--sat-primary)] hover:underline" title="Open this test">
@@ -136,9 +127,13 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
             {attempt.extraTimeUsed > 0 ? ` · Extra time ${formatTime(attempt.extraTimeUsed)}` : ""}
           </p>
         </div>
-        <Link href={studentHref} className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-blue-600">
-          <ChevronLeft size={14} /> Back to {attempt.student.name.split(" ")[0]}
-        </Link>
+        <AttemptHeaderActions
+          studentId={studentId}
+          studentName={attempt.student.name}
+          backHref={studentHref}
+          attempt={{ id: attempt.id, kind: "test", status: attempt.status }}
+          report={{ area: "tests", examLabel: `${attempt.test.name} · ${attempt.submittedAt ? formatDate(attempt.submittedAt) : ""} · ${attempt.totalScore ?? "—"}` }}
+        />
       </div>
 
       {attempt.status === "INVALIDATED" ? <InvalidatedNotice audience="teacher" /> : null}
@@ -147,7 +142,7 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
 
       <ScoreBlocks view={view} />
 
-      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="mt-4">
         <Card padding="md" className="min-w-0">
           <h2 className="text-sm font-semibold text-gray-900">Results by module</h2>
           <p className="mt-0.5 text-xs text-gray-500">Blank answers count as incorrect. Click a module to jump to its questions.</p>
@@ -182,18 +177,6 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
             </table>
           </div>
         </Card>
-        {attempt.status === "SUBMITTED" ? (
-          <Card padding="md" className="space-y-3">
-            <SendExamReportButton
-              studentId={studentId}
-              studentName={attempt.student.name}
-              attemptId={attempt.id}
-              attemptLabel={`${attempt.test.name} · ${attempt.submittedAt ? formatDate(attempt.submittedAt) : ""} · ${attempt.totalScore ?? "—"}`}
-              parents={parentOptions}
-            />
-            <InvalidateAttemptButton attemptId={attempt.id} kind="test" status={attempt.status} />
-          </Card>
-        ) : null}
       </div>
 
       {doneModules.length > 0 ? (
@@ -219,16 +202,6 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
         </Card>
       ) : null}
 
-      {siblings.length > 1 ? (
-        <section className="mt-4">
-          <SectionHeader title={`All attempts for ${attempt.test.name}`} description="Every try is kept. Click one to see it." />
-          <TestAttemptsTable
-            rows={siblings.map((s, i) => ({ ...s, tryNumber: i + 1, view: s.id === attempt.id && inProgress ? view : null }))}
-            viewingId={attempt.id}
-            hrefFor={(id) => buildProgressHref(`/teacher/students/${studentId}/tests/${id}`, filters)}
-          />
-        </section>
-      ) : null}
 
       <div className="mt-6 space-y-6">
         {modules.map((module, index) => {

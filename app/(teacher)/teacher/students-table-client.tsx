@@ -21,9 +21,6 @@ export type TeacherStudentRow = {
   /** Distinct practice sets finished in this area. */
   setsCompleted: number;
   pendingCount: number;
-  avgScoreLabel: string;
-  avgScoreTone: "high" | "mid" | "low" | "none";
-  avgScoreFiltered: boolean;
   /** Lowest-scoring skill in this area ("Boundaries (Hard) · 40%"). */
   weakestLabel?: string;
   /** The student's area tab filtered to that skill and level. */
@@ -32,16 +29,9 @@ export type TeacherStudentRow = {
   assignHref?: string;
 };
 
-const SCORE_CLASS = {
-  high: "text-green-600",
-  mid: "text-yellow-600",
-  low: "text-red-500",
-  none: "text-muted-foreground",
-} as const;
-
 /**
  * Teacher Home practice tabs (mockup `mejorada/teacher/index.html` area table): Name · Last {Area}
- * practice · Sets completed · Average correct · Pending · Weakest skill · Assign practice / Open.
+ * practice · Sets completed · Pending · Weakest skill · Assign practice / Open.
  * Practice only (% correct); Tests are in their own tab.
  */
 export function TeacherStudentsTable({
@@ -100,17 +90,6 @@ export function TeacherStudentsTable({
         header: "Sets completed",
         meta: { priority: "low", align: "right" },
         cell: ({ row }) => <span className="tabular-nums">{row.original.setsCompleted}</span>,
-      },
-      {
-        id: "avg",
-        header: "Average correct",
-        meta: { priority: "medium", align: "right" },
-        cell: ({ row }) => (
-          <span className={`font-medium ${SCORE_CLASS[row.original.avgScoreTone]}`}>
-            {row.original.avgScoreLabel}
-            {row.original.avgScoreFiltered ? <span className="ml-1 text-xs font-normal text-muted-foreground">filtered</span> : null}
-          </span>
-        ),
       },
       {
         id: "pending",

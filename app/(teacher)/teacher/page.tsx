@@ -312,7 +312,6 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
     ...(difficulty ? { difficulty } : {}),
     topic: { domain: { practiceArea } },
   };
-  const hasAttemptFilter = Boolean(topicId || difficulty || fromDate || toDate);
 
   const studentWhere = {
     ...studentScope,
@@ -406,32 +405,33 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
     if (!lastActiveAt) return true;
     return lastActiveAt < fiveDaysAgo;
   });
-  const performanceBuckets = new Map<string, { label: string; topicId: string; difficulty: string; correct: number; total: number; attempts: number }>();
-  const studentBuckets = new Map<string, Map<string, { label: string; correct: number; total: number }>>();
+  // Attempt level only (no averages across sets or students): each student's LAST attempt of each
+  // skill × level. "Low performance" counts students whose last attempt there is under 50%.
+  const LOW = 50;
+  const cells = new Map<string, { label: string; topicId: string; difficulty: string; students: number; low: number; lowest: number }>();
+  const studentLast = new Map<string, Map<string, { label: string; pct: number }>>();
   for (const student of students) {
-    const mine = new Map<string, { label: string; correct: number; total: number }>();
+    const mine = new Map<string, { label: string; pct: number }>();
     for (const attempt of student.attempts) {
+      // Attempts come newest first: the first one seen per skill × level is the last attempt there.
       const practiceSet = attempt.assignment?.practiceSet;
       if (!practiceSet) continue;
       const key = `${practiceSet.topicId}:${practiceSet.difficulty}`;
-      const label = `${practiceSet.topic.name} (${difficultyLabel(practiceSet.difficulty)})`;
-      const bucket = performanceBuckets.get(key) ?? { label, topicId: practiceSet.topicId, difficulty: practiceSet.difficulty, correct: 0, total: 0, attempts: 0 };
       const score = summarizeAllQuestionAnswers(attempt.answers);
-      bucket.correct += score.correct;
-      bucket.total += score.total;
-      bucket.attempts += 1;
-      performanceBuckets.set(key, bucket);
-      const own = mine.get(key) ?? { label, correct: 0, total: 0 };
-      own.correct += score.correct;
-      own.total += score.total;
-      mine.set(key, own);
+      if (mine.has(key) || score.percent === null) continue;
+      const label = `${practiceSet.topic.name} (${difficultyLabel(practiceSet.difficulty)})`;
+      mine.set(key, { label, pct: score.percent });
+      const cell = cells.get(key) ?? { label, topicId: practiceSet.topicId, difficulty: practiceSet.difficulty, students: 0, low: 0, lowest: 100 };
+      cell.students += 1;
+      if (score.percent < LOW) cell.low += 1;
+      cell.lowest = Math.min(cell.lowest, score.percent);
+      cells.set(key, cell);
     }
-    studentBuckets.set(student.id, mine);
+    studentLast.set(student.id, mine);
   }
-  const lowPerformance = Array.from(performanceBuckets.values())
-    .filter((bucket) => bucket.total > 0)
-    .map((bucket) => ({ ...bucket, score: Math.round((bucket.correct / bucket.total) * 100) }))
-    .sort((a, b) => a.score - b.score)
+  const lowPerformance = Array.from(cells.values())
+    .filter((cell) => cell.low > 0)
+    .sort((a, b) => b.low - a.low || a.lowest - b.lowest)
     .slice(0, 3);
 
   return (
@@ -546,7 +546,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
               <p className="text-xs font-medium text-red-700">Low performance</p>
               <p className="mt-1 truncate text-sm font-semibold text-gray-900">{bucket.label}</p>
               <p className="mt-1 text-xs text-gray-600">
-                {bucket.score}% average · {bucket.attempts} result{bucket.attempts !== 1 ? "s" : ""}
+                {bucket.low} of {bucket.students} student{bucket.students !== 1 ? "s" : ""} under {LOW}% on their last attempt
               </p>
             </Card>
           ))}
@@ -582,12 +582,11 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
         filterQuery={progressFilterQuery({ area, topic: topicId, difficulty })}
         rows={students.map((student): TeacherStudentRow => {
           const studentGroups = teacherGroupManagementEnabled ? student.groups.map((gm) => gm.group.name).join(", ") : "";
-          const avgScore = summarizeAllQuestionAnswers(student.attempts.flatMap((attempt) => attempt.answers)).percent;
           const last = student.attempts[0];
           const lastScore = last ? summarizeAllQuestionAnswers(last.answers).percent : null;
-          const weakest = [...(studentBuckets.get(student.id)?.entries() ?? [])]
-            .filter(([, b]) => b.total >= 2)
-            .map(([key, b]) => ({ ...b, key, pct: Math.round((b.correct / b.total) * 100) }))
+          // Weakest skill = the lowest last attempt among skill × level (attempt level, not pooled).
+          const weakest = [...(studentLast.get(student.id)?.entries() ?? [])]
+            .map(([key, b]) => ({ ...b, key }))
             .sort((a, b) => a.pct - b.pct)[0];
           const [weakTopic, weakDifficulty] = weakest ? weakest.key.split(":") : [];
 
@@ -604,10 +603,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
             lastPracticeHref: last ? `/teacher/students/${student.id}/attempts/${last.id}` : undefined,
             setsCompleted: new Set(student.attempts.map((attempt) => attempt.practiceSetId)).size,
             pendingCount: student.assignments.length,
-            avgScoreLabel: avgScore !== null ? `${avgScore}%` : "—",
-            avgScoreTone: avgScore === null ? "none" : avgScore >= 80 ? "high" : avgScore >= 60 ? "mid" : "low",
-            avgScoreFiltered: avgScore !== null && hasAttemptFilter,
-            weakestLabel: weakest ? `${weakest.label} · ${weakest.pct}%` : undefined,
+            weakestLabel: weakest ? `${weakest.label} · last attempt ${weakest.pct}%` : undefined,
             weakestHref: weakest
               ? `/teacher/students/${student.id}?${progressFilterQuery({ area, topic: weakTopic, difficulty: weakDifficulty })}#performance`
               : undefined,

@@ -108,9 +108,14 @@ const checks = [
     label: "Invalidar intento: unica accion del teacher, razon obligatoria (salud, conexion, otra con detalle) auditada, solo intentos contados",
   },
   {
-    file: "app/(teacher)/teacher/students/[studentId]/history-attempt-actions.tsx",
-    requires: ["InvalidateAttemptButton", "apiFetch(`/api/attempts/${attemptId}/comment`"],
-    label: "History: invalidar con el mismo modal de razones + comentario via apiFetch",
+    file: "app/(teacher)/teacher/history/page.tsx",
+    requires: ["InvalidateAttemptButton"],
+    label: "History global: invalidar con el mismo componente (unica accion sobre un intento)",
+  },
+  {
+    file: "app/(teacher)/teacher/students/[studentId]/attempt-header-actions.tsx",
+    requires: ["HeaderActions", "GenerateReportDialog", "InvalidateAttemptButton"],
+    label: "Paginas de intento: Back · Report · Invalidar arriba a la derecha, mismo componente en practice y Test",
   },
   {
     file: "app/(student)/student/tests/[assignmentId]/player-client.tsx",
@@ -319,20 +324,9 @@ const checks = [
     label: "Restore local exige backup y genera copia previa",
   },
   {
-    file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
-    // An exam started with old content can be restarted: invalidate the open attempt, assignment back to Pending.
-    requires: ["RestartExamButton", "openAttemptId"],
-    label: "Ficha del alumno: reiniciar examen en curso (invalida intento, asignacion a Pending)",
-  },
-  {
     file: "app/(student)/student/tests/[assignmentId]/page.tsx",
     requires: ['assignment.status === "COMPLETED"', "redirect(", "isUniqueConstraintError", "createdHere"],
     label: "Player FPT: un examen COMPLETED no crea un intento nuevo al abrir su URL",
-  },
-  {
-    file: "app/(teacher)/teacher/students/[studentId]/restart-exam-button.tsx",
-    requires: ["/reopen", "useConfirm", "BLOCKED_TEXT"],
-    label: "Restart de examen usa el ciclo reopen y confirma antes",
   },
   {
     file: "prisma/migrations/20261005_single_open_attempt/migration.sql",

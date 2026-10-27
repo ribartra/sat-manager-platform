@@ -43,15 +43,14 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ProgressFilters } from "@/components/progress-filters";
-import { TopicDifficultyTrend } from "@/components/topic-difficulty-trend";
 import { Hint, InfoHint } from "@/components/hint";
 import { ClipboardList, Eye, History, Pencil, Plus } from "lucide-react";
 import { Avatar } from "@/components/avatar";
 import { StudentDetailActions } from "./actions-client";
 import { StudentSwitcher } from "./student-switcher";
 import { GenerateReportDialog } from "./generate-report-dialog";
-import { RestartExamButton } from "./restart-exam-button";
-import { HistoryAttemptActions } from "./history-attempt-actions";
+import { InvalidateAttemptButton } from "@/components/sat/invalidate-attempt-button";
+import { practiceSetGroups, setsFromReportAttempts, testGroups as groupTests } from "@/lib/attempt-groups";
 import { ParentAuthorization, type ParentAuthorizationView } from "./parent-authorization";
 import { parentAuthorizationState } from "@/lib/parent-authorization";
 import { refreshAssignmentStates } from "@/lib/assignments";
@@ -60,6 +59,7 @@ import { studentAccessWhereFor } from "@/lib/program-scope";
 import { loadMockReport, loadPracticeReport, shortSetName } from "@/lib/student-report";
 import { activeAreaTab, activeHomeTab, practiceAreaFromTab, practiceAreaLabel, resolvePracticeArea, type HomeTabKey, type PracticeAreaCode } from "@/lib/practice-area";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import { HEADER_ACTION_CLASS, HeaderActions } from "@/components/sat/header-actions";
 import { Pct } from "@/components/sat/work-status";
 import { loadStudentTests, sortTests } from "@/lib/test-assignments";
 import { loadStudentOverviews } from "@/lib/teacher-overview";
@@ -159,8 +159,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
     filters.to ? `To ${filters.to}` : null,
   ].filter(Boolean).join(" · ");
   const switcherQuery = buildProgressHref("", filters).replace(/^\?/, "");
-  const secondaryButton =
-    "inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-gray-300 bg-white px-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50";
+  const secondaryButton = HEADER_ACTION_CLASS;
 
   const header = (
     <>
@@ -183,7 +182,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
           </div>
         </div>
         <div className="flex flex-col items-start gap-2 lg:items-end">
-          <div className="flex flex-wrap items-center gap-2">
+          <HeaderActions>
             <Link href="/teacher" className={secondaryButton}>Back to Home</Link>
             <Hint label="See the app the way this student sees it (view only).">
               <Link href={buildProgressHref(`/teacher/impersonate/${studentId}`, filters)} className={secondaryButton}>
@@ -202,7 +201,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
               exams={reportExams}
               parents={reportParents}
             />
-          </div>
+          </HeaderActions>
           <StudentSwitcher students={roster} selectedStudentId={studentId} query={switcherQuery} />
         </div>
       </div>
@@ -273,6 +272,11 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
     return (
       <PageShell maxWidth={1180} width="wide">
         {header}
+        {/* report-9: the area cards are practice sets; say so above them, like the Tests block below. */}
+        <SectionHeader
+          title={<>Practice Sets <span className="text-xs font-normal text-gray-500">· last attempt in each area</span></>}
+          action={<Link href={`/teacher/students/${studentId}?area=history&type=practice`} className="text-sm text-blue-600 hover:underline">Attempts ›</Link>}
+        />
         <AreaBoxGrid>
           {(["MATH", "READING", "WRITING"] as PracticeAreaCode[]).map((code) => {
             const o = overview.areas[code];
@@ -304,7 +308,8 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
           )}
         </section>
 
-        <div className="mt-6 grid items-start gap-4 lg:grid-cols-2">
+        {/* report-10: Recent activity first, What to assign next below it (one column, not side by side). */}
+        <div className="mt-6 space-y-4">
           <section>
             <SectionHeader title="Recent activity" action={<Link href={`/teacher/students/${studentId}?area=history`} className="text-sm text-blue-600 hover:underline">History ›</Link>} />
             <ActivityList items={activity} studentId={studentId} />
@@ -408,10 +413,6 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
             {groups.map((tries) => {
               const head = tries[0];
               const isTest = head.kind === "test";
-              const counted = tries.filter((t) => t.status === "SUBMITTED");
-              const bestRw = isTest ? counted.reduce<number | null>((m, t) => (t.rw !== null && (m === null || t.rw > m) ? t.rw : m), null) : null;
-              const bestMath = isTest ? counted.reduce<number | null>((m, t) => (t.math !== null && (m === null || t.math > m) ? t.math : m), null) : null;
-              const bestPct = !isTest ? counted.reduce<number | null>((m, t) => (t.pct !== null && (m === null || t.pct > m) ? t.pct : m), null) : null;
               const hrefFor = (id: string) => buildProgressHref(`/teacher/students/${studentId}/${isTest ? "tests" : "attempts"}/${id}`, filters);
               return (
                 <Card key={head.groupId} padding="md">
@@ -422,10 +423,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                       <h3 className="text-sm font-semibold text-gray-900">{head.title}</h3>
                       {head.difficulty ? <Badge variant={difficultyBadgeVariant(head.difficulty)}>{difficultyLabel(head.difficulty)}</Badge> : null}
                     </div>
-                    <p className="text-xs text-gray-500">
-                      {tries.length} {tries.length === 1 ? "try" : "tries"}
-                      {isTest ? <> · Best R&amp;W <b>{bestRw ?? "—"}</b> · Best Math <b>{bestMath ?? "—"}</b></> : <> · Best <Pct value={bestPct} className="font-semibold" /></>}
-                    </p>
+                    <p className="text-xs text-gray-500">{tries.length} {tries.length === 1 ? "try" : "tries"}</p>
                   </div>
                   {isTest ? (
                     <SimpleTable head={["Try", "Date", "Status", <SectionHead key="rw" section="RW" short />, "Change", <SectionHead key="m" section="MATH" />, "Change", "", ""]}>
@@ -441,7 +439,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                           <td className={`${TD} font-semibold tabular-nums`}><VoidableValue status={t.status}>{t.math ?? "—"}</VoidableValue></td>
                           <td className={TD}><Delta value={t.changeMath} unit="" /></td>
                           <td className={`${TD} text-right`}>
-                            <RowAction><HistoryAttemptActions attemptId={t.id} kind="test" status={t.status} /></RowAction>
+                            <RowAction><InvalidateAttemptButton attemptId={t.id} kind="test" status={t.status} /></RowAction>
                           </td>
                           <ChevronCell />
                         </LinkTr>
@@ -469,7 +467,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                           <td className={`${TD} text-gray-600`}>{t.time ? formatDuration(t.time) : "—"}</td>
                           <td className={`${TD} text-right`}>
                             <RowAction>
-                              <HistoryAttemptActions attemptId={t.id} kind="practice" status={t.status} initialComment={t.teacherComment} />
+                              <InvalidateAttemptButton attemptId={t.id} kind="practice" status={t.status} />
                             </RowAction>
                           </td>
                           <ChevronCell />
@@ -494,16 +492,8 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
     // Every try (in progress, submitted, not counted), newest first; the date filter applies to finished tries.
     const inDates = new Set(report.examHistory.map((exam) => exam.id));
     const dated = Boolean(filters.from || filters.to);
-    const triesOf = (t: (typeof tests)[number]) =>
-      t.attempts
-        .filter((a) => (a.status === "IN_PROGRESS" ? !dated : inDates.has(a.id)))
-        .sort((x, y) => (y.submittedAt ?? y.startedAt).getTime() - (x.submittedAt ?? x.startedAt).getTime() || y.id.localeCompare(x.id));
-    // One row per Test (its last counted try), opening to every try; most recently taken Test first.
-    const testGroups = tests
-      .map((t) => ({ t, tries: triesOf(t) }))
-      .filter(({ tries }) => tries.length > 0)
-      .map(({ t, tries }) => ({ key: t.assignmentId, title: t.name, tries, last: tries.find((a) => a.status === "SUBMITTED") ?? tries[0] }))
-      .sort((x, y) => (y.tries[0].submittedAt ?? y.tries[0].startedAt).getTime() - (x.tries[0].submittedAt ?? x.tries[0].startedAt).getTime());
+    // One row per Test (its last counted try), opening to every try; the date filter applies to finished tries.
+    const testGroups = groupTests(tests, (a) => (a.status === "IN_PROGRESS" ? !dated : inDates.has(a.id)));
     const attemptCount = testGroups.reduce((sum, g) => sum + g.tries.length, 0);
     const examPage = paginate(testGroups, pageFromParam(query.examsPage), HISTORY_PAGE_SIZE);
     return (
@@ -575,11 +565,6 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                     </div>
                   </div>
                   <div className="flex shrink-0 items-center gap-3">
-                    {a.openAttemptId ? (
-                      <Hint label="Start the test over. The current progress won't count.">
-                        <RestartExamButton attemptId={a.openAttemptId} examName={a.name} />
-                      </Hint>
-                    ) : null}
                     <Hint label={a.status === "OVERDUE" ? "Give it to the student again with a new due date." : "Change the due date of this test."}>
                       <Link
                         href={testId ? `${assignHref}${assignHref.includes("?") ? "&" : "?"}test=${testId}` : assignHref}
@@ -604,48 +589,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
   const report = await loadPracticeReport(studentId, practiceArea, reportFilters);
   const { areaLabel } = report;
   // One row per practice set (its last attempt), opening to its latest tries; every try is in History.
-  const attemptsBySet = new Map<string, typeof report.attemptHistory>();
-  for (const attempt of [...report.attemptHistory].sort(
-    (a, b) => (b.submittedAt?.getTime() ?? 0) - (a.submittedAt?.getTime() ?? 0) || b.id.localeCompare(a.id),
-  )) {
-    const key = attempt.assignmentId ?? attempt.id;
-    (attemptsBySet.get(key) ?? attemptsBySet.set(key, []).get(key)!).push(attempt);
-  }
-  const attemptRow = (attempt: (typeof report.attemptHistory)[number]) => ({
-    id: attempt.id,
-    tryNumber: attempt.attemptNumber ?? 1,
-    submittedAt: attempt.submittedAt,
-    correct: attempt.correct,
-    total: attempt.total,
-    pct: attempt.percent,
-    time: attempt.totalTime,
-    status: attempt.status,
-  });
-  const practiceSets = [...attemptsBySet.entries()].map(([key, tries]) => {
-    const last = tries.find((attempt) => attempt.status === "SUBMITTED") ?? tries[0];
-    // Progress within the set: % points vs. the previous counted try (same rule as History).
-    const withChange = (attempt: (typeof tries)[number]) => {
-      const previous = attempt.status === "SUBMITTED" && attempt.percent !== null
-        ? tries.slice(tries.indexOf(attempt) + 1).find((older) => older.status === "SUBMITTED" && older.percent !== null)
-        : undefined;
-      return { ...attemptRow(attempt), change: previous ? attempt.percent! - previous.percent! : null };
-    };
-    return {
-      key,
-      tryCount: Math.max(...tries.map((attempt) => attempt.attemptNumber ?? 1)),
-      last: withChange(last),
-      recent: tries.slice(0, 3).map(withChange),
-      title: (
-        <>
-          {shortSetName(last.name)}
-          {/* The short name already ends in "(Easy)"; the badge is only for names without the level. */}
-          {last.difficulty && !shortSetName(last.name).includes(`(${difficultyLabel(last.difficulty)})`) ? (
-            <Badge variant={difficultyBadgeVariant(last.difficulty)} className="ml-2">{difficultyLabel(last.difficulty)}</Badge>
-          ) : null}
-        </>
-      ),
-    };
-  });
+  const practiceSets = practiceSetGroups(setsFromReportAttempts(report.attemptHistory));
   const setPage = paginate(practiceSets, pageFromParam(query.attemptsPage), HISTORY_PAGE_SIZE);
   const assignHref = (overrides: { topic?: string; difficulty?: string }, extra: Record<string, string>) => {
     const href = buildProgressHref(`/teacher/students/${studentId}/assign`, filters, overrides);
@@ -740,14 +684,6 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
             />
           </section>
 
-          {topicId && difficulty && report.trend.topics.length > 0 && report.trend.attemptCount > 0 && (
-            <TopicDifficultyTrend
-              topics={report.trend.topics}
-              pointsByTopic={report.trend.pointsByTopic}
-              selectedTopic={skills.find((skill) => skill.id === topicId)?.name ?? report.trend.topics[0]}
-              selectedDifficulty={difficulty}
-            />
-          )}
 
         </div>
 
