@@ -3,6 +3,8 @@ import { PageShell } from "@/components/sat";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { requireTeacherManager } from "@/lib/rbac";
 import { InviteTeacherForm } from "./invite-teacher-form";
+import prisma from "@/lib/prisma";
+import { teachingProgramWhere } from "@/lib/program-scope";
 
 export const dynamic = "force-dynamic";
 
@@ -10,14 +12,16 @@ export const dynamic = "force-dynamic";
 export default async function InviteTeacherPage() {
   const session = await requireTeacherManager();
   if (!session) redirect("/teacher");
+  // The invited teacher joins one of the master's programs (shared bank; own students).
+  const programs = await prisma.program.findMany({ where: teachingProgramWhere(session.user.id), select: { id: true, name: true }, orderBy: { createdAt: "asc" } });
   return (
     <PageShell maxWidth={720}>
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Teachers", href: "/teacher/teachers" }, { label: "Invite teacher" }]} />
       <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Invite a teacher</h1>
       <p className="mb-5 mt-0.5 text-sm text-gray-500">
-        They get an email to create their password. Then they can invite and follow their own students; you will see who their students are, not their work.
+        They get an email to create their password and join your program: they share its question bank, sets and Tests, and invite and follow their own students. You will see who their students are, not their work.
       </p>
-      <InviteTeacherForm />
+      <InviteTeacherForm programs={programs} />
     </PageShell>
   );
 }

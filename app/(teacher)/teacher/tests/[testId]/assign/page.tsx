@@ -1,4 +1,5 @@
 import { Breadcrumbs, PageShell } from "@/components/sat";
+import { currentContentScope } from "@/lib/content-scope";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { FullTestAssignClient } from "./full-test-assign-client";
@@ -15,7 +16,7 @@ export default async function AssignFullTestPage({ params }: PageProps) {
   const teacherGroupManagementEnabled = await getFeatureSetting("TEACHER_GROUP_MANAGEMENT");
 
   const [test, students, groups] = await Promise.all([
-    prisma.fullPracticeTest.findUnique({ where: { id: testId } }),
+    prisma.fullPracticeTest.findFirst({ where: { id: testId, ...(await currentContentScope()) } }),
     prisma.user.findMany({
       where: session ? studentAccessWhereFor(session.user) : { role: "STUDENT", active: true, validationStatus: "APPROVED" },
       orderBy: { name: "asc" },

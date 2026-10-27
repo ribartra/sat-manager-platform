@@ -104,9 +104,18 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true });
     }
 
-    // Teacher invited by the master teacher (Teachers menu): an approved teacher account with their
-    // own program, so they can invite and manage their own students right away.
+    // Teacher invited by the master teacher (Teachers menu): an approved teacher account that JOINS
+    // the inviter's program (the program is the tenant: shared bank; each teacher has own students).
     if (invite.role === "TEACHER") {
+      const now = new Date();
+      const programOpen =
+        invite.program && !invite.program.deletedAt && invite.program.active && invite.program.startDate <= now &&
+        (invite.program.endDate === null || invite.program.endDate > now);
+      if (!invite.programId || !programOpen) {
+        await writeAudit({ action: "USER_CREATE_FAILED", targetType: "InviteToken", targetId: invite.id, outcome: "failure", metadata: { reason: "program_unavailable", email: invite.email, role: "TEACHER" } });
+        return new BadRequestError("This invitation isn't linked to an open program. Ask for a new one.").toResponse();
+      }
+      const teacherProgramId = invite.programId;
       const existing = await prisma.user.findUnique({ where: { email: invite.email }, select: { id: true } });
       if (existing) {
         await writeAudit({ action: "USER_CREATE_FAILED", targetType: "InviteToken", targetId: invite.id, outcome: "failure", metadata: { reason: "email_exists", email: invite.email, role: "TEACHER" } });
@@ -128,8 +137,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
           },
         });
         teacherId = teacher.id;
-        const program = await tx.program.create({ data: { name: `Program of ${invite.name}`, active: true, startDate: new Date() } });
-        await tx.programTeacher.create({ data: { programId: program.id, teacherId: teacher.id } });
+        await tx.programTeacher.create({ data: { programId: teacherProgramId, teacherId: teacher.id } });
         await tx.inviteToken.update({ where: { id: invite.id }, data: { usedAt: new Date(), termsAcceptedAt, termsVersion: TERMS_VERSION } });
       });
       await writeAudit({
@@ -138,7 +146,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
         targetType: "User",
         targetId: teacherId,
         outcome: "success",
-        metadata: { role: "TEACHER", inviteId: invite.id, email: invite.email, invitedById: invite.invitedById, termsVersion: TERMS_VERSION },
+        metadata: { role: "TEACHER", inviteId: invite.id, email: invite.email, invitedById: invite.invitedById, programId: teacherProgramId, termsVersion: TERMS_VERSION },
       });
       return NextResponse.json({ ok: true, role: "TEACHER" });
     }
@@ -184,12 +192,20 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
         },
       });
       studentId = user.id;
+      // Owner teacher = who invited the student (a teacher only sees the students they own). An
+      // invitation sent by an admin goes to the program's first current teacher.
+      const inviter = invite.invitedById ? await tx.user.findUnique({ where: { id: invite.invitedById }, select: { role: true } }) : null;
+      const ownerId =
+        inviter?.role === "TEACHER"
+          ? invite.invitedById
+          : (await tx.programTeacher.findFirst({ where: { programId, endDate: null }, orderBy: { startDate: "asc" }, select: { teacherId: true } }))?.teacherId ?? null;
       await tx.programEnrollment.create({
         data: {
           programId,
           studentId: user.id,
           status: "APPROVED",
           active: true,
+          teacherId: ownerId,
         },
       });
 

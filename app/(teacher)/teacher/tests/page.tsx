@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { currentContentScope } from "@/lib/content-scope";
 import { redirect } from "next/navigation";
 import { Plus, User } from "lucide-react";
 import { EmptyState, ListFilters, PageShell, Pagination, matchesQuery, pageFromParam, paginate } from "@/components/sat";
@@ -35,6 +36,8 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
   const studentWhere = session ? studentAccessWhereFor(session.user, now) : { role: "STUDENT", active: true, validationStatus: "APPROVED" };
   const tests = (
     await prisma.fullPracticeTest.findMany({
+      // The Tests of the programs the teacher teaches (shared bank).
+      where: await currentContentScope(),
       include: {
         modules: { include: { questions: { select: { questionId: true, isPretest: true } } }, orderBy: { order: "asc" } },
         _count: { select: { assignments: true, attempts: true } },

@@ -1,4 +1,5 @@
 import { PageShell } from "@/components/sat";
+import { assignableContentWhere } from "@/lib/program-scope";
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
@@ -25,7 +26,8 @@ export default async function AssignTestPage({ params, searchParams }: PageProps
   const [student, exams, existing] = await Promise.all([
     prisma.user.findFirst({ where: { id: studentId, ...studentWhere }, select: { id: true, name: true } }),
     prisma.fullPracticeTest.findMany({
-      where: { status: "PUBLISHED" },
+      // Only Tests of a program the teacher teaches and the student is enrolled in.
+      where: { status: "PUBLISHED", ...(session ? assignableContentWhere(session.user, studentId) : { id: "__no_session__" }) },
       include: {
         modules: {
           select: {

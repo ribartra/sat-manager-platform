@@ -8,17 +8,25 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
 import { apiFetch, errorMessage } from "@/lib/api-client";
 import { notify } from "@/lib/notify-ui";
 
-export function InviteTeacherForm() {
+export function InviteTeacherForm({ programs }: { programs: { id: string; name: string }[] }) {
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [programId, setProgramId] = useState(programs[0]?.id ?? "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState<{ email: string; emailSent: boolean; inviteUrl: string } | null>(null);
-  const missing = !name.trim() ? "Enter the teacher's name." : !email.trim() ? "Enter the teacher's email." : null;
+  const missing = !programs.length
+    ? "You don't teach any program yet."
+    : !name.trim()
+      ? "Enter the teacher's name."
+      : !email.trim()
+        ? "Enter the teacher's email."
+        : null;
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
@@ -28,7 +36,7 @@ export function InviteTeacherForm() {
     try {
       const result = await apiFetch<{ inviteUrl: string; emailSent: boolean }>("/api/teachers/invite", {
         method: "POST",
-        json: { name: name.trim(), email: email.trim() },
+        json: { name: name.trim(), email: email.trim(), programId },
         fallback: "The invitation could not be created.",
       });
       setSent({ email: email.trim(), ...result });
@@ -60,6 +68,16 @@ export function InviteTeacherForm() {
           <Label htmlFor="teacher-email">Email</Label>
           <Input id="teacher-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@school.com" autoComplete="off" />
         </div>
+        {programs.length > 1 ? (
+          <div className="space-y-1.5">
+            <Label htmlFor="teacher-program">Program they join</Label>
+            <Select id="teacher-program" value={programId} onChange={(e) => setProgramId(e.target.value)}>
+              {programs.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+            </Select>
+          </div>
+        ) : programs[0] ? (
+          <p className="text-xs text-gray-500">They join <b>{programs[0].name}</b>.</p>
+        ) : null}
         {error ? <Alert tone="error">{error}</Alert> : null}
         <div className="flex items-center gap-2">
           <Button type="submit" disabled={saving} disabledReason={saving ? undefined : missing ?? undefined}>

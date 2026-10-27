@@ -1,4 +1,5 @@
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import { currentContentScope } from "@/lib/content-scope";
 import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
@@ -15,8 +16,9 @@ export default async function EditQuestionPage({ params }: PageProps) {
   const { questionId } = await params;
 
   const [question, topics, taxonomyNodes, showGraphOption] = await Promise.all([
-    prisma.question.findUnique({
-      where: { id: questionId },
+    prisma.question.findFirst({
+      // Only the bank of a program the teacher teaches.
+      where: { id: questionId, ...(await currentContentScope()) },
       include: { options: { orderBy: { label: "asc" } } },
     }),
     prisma.topic.findMany({

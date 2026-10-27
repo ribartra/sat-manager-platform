@@ -63,6 +63,13 @@ async function main() {
   // ─── Taxonomy + score tables + governance settings ─────────────────────────
   await seedTaxonomy(prisma);
   await seedScoreConversions(prisma);
+  // The default program (tenant): content and invitations belong to a program. init-prod-db builds
+  // the schema without running the migration SQL, so make sure it exists here too.
+  await prisma.program.upsert({
+    where: { id: "program-sat-core" },
+    update: {},
+    create: { id: "program-sat-core", name: "SAT Core Program", active: true },
+  });
 
   await Promise.all(
     [

@@ -1,4 +1,5 @@
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import { currentContentScope } from "@/lib/content-scope";
 import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
@@ -13,14 +14,16 @@ interface PageProps {
 
 export default async function EditPracticeSetPage({ params }: PageProps) {
   const { practiceSetId } = await params;
+  // The bank of the programs the teacher teaches (shared by the program's teachers).
+  const scope = await currentContentScope();
   const [practiceSet, topics, taxonomyNodes, questions] = await Promise.all([
-    prisma.practiceSet.findUnique({
-      where: { id: practiceSetId },
+    prisma.practiceSet.findFirst({
+      where: { id: practiceSetId, ...scope },
       include: { questions: { orderBy: { order: "asc" } } },
     }),
     prisma.topic.findMany({ where: academicTopicWhere, include: { taxonomyNode: true, domain: { include: { section: true } } }, orderBy: { name: "asc" } }),
     prisma.taxonomyNode.findMany({ where: { active: true }, orderBy: [{ sortOrder: "asc" }, { label: "asc" }] }),
-    findQuestionsWithOptionMedia({ status: { in: ["PUBLISHED", "DRAFT"] }, topic: academicTopicWhere }),
+    findQuestionsWithOptionMedia({ status: { in: ["PUBLISHED", "DRAFT"] }, topic: academicTopicWhere, ...scope }),
   ]);
   const { byId } = buildTaxonomyTree(taxonomyNodes);
 

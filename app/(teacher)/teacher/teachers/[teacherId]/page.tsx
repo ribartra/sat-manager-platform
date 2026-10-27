@@ -39,13 +39,12 @@ export default async function TeacherDetailPage({ params }: { params: Promise<{ 
   });
   if (!teacher) notFound();
 
-  // The teacher's students (also when the teacher is deactivated): only who they are, nothing else.
+  // The students this teacher owns (invited), also when the teacher is deactivated: only who they
+  // are, nothing else. Other teachers of the same program have their own students.
   const students = await prisma.user.findMany({
     where: {
       role: "STUDENT",
-      programEnrollments: {
-        some: { status: "APPROVED", active: true, program: { deletedAt: null, teachers: { some: { teacherId: teacher.id, endDate: null } } } },
-      },
+      programEnrollments: { some: { teacherId: teacher.id, status: "APPROVED", active: true, program: { deletedAt: null } } },
     },
     select: { id: true, name: true, email: true, avatarUrl: true },
     orderBy: { name: "asc" },

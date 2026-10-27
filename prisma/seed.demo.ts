@@ -156,12 +156,14 @@ async function main() {
     students.map((student) =>
       prisma.programEnrollment.upsert({
         where: { programId_studentId: { programId: defaultProgram.id, studentId: student.id } },
-        update: { active: true, status: "APPROVED" },
+        update: { active: true, status: "APPROVED", teacherId: teacher.id },
         create: {
           programId: defaultProgram.id,
           studentId: student.id,
           status: "APPROVED",
           active: true,
+          // Owner teacher (a teacher sees only the students they own).
+          teacherId: teacher.id,
         },
       })
     )

@@ -1,4 +1,5 @@
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import { currentContentScope } from "@/lib/content-scope";
 import { PageShell, PracticeAreaTabs } from "@/components/sat";
 import { Pagination, pageFromParam } from "@/components/sat/pagination";
 import prisma from "@/lib/prisma";
@@ -54,6 +55,8 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
   // Text search: words of the stem / stimulus, or a question ID.
   const q = (filters.q ?? "").trim();
   const questionWhere = {
+    // The bank of the programs the teacher teaches (shared by the program's teachers).
+    ...(await currentContentScope()),
     topicId: topicFilter,
     difficulty: (filters.difficulty as string | undefined) || undefined,
     status: (filters.status as string | undefined) || undefined,

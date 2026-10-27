@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { currentContentScope } from "@/lib/content-scope";
 import prisma from "@/lib/prisma";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import { FullTestPlayer } from "@/app/(student)/student/tests/[assignmentId]/player-client";
@@ -15,8 +16,8 @@ export default async function FullTestPreviewPage({ params }: PageProps) {
   if (!session) notFound();
   const { testId } = await params;
 
-  const test = await prisma.fullPracticeTest.findUnique({
-    where: { id: testId },
+  const test = await prisma.fullPracticeTest.findFirst({
+    where: { id: testId, ...(await currentContentScope()) },
     include: {
       modules: {
         include: {

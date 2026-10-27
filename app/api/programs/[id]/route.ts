@@ -28,6 +28,8 @@ export const GET = withApiErrors(async function GET(
         orderBy: { startDate: "asc" },
       },
       enrollments: {
+        // A teacher only sees the enrollments they own (students they invited); admins see all.
+        ...(session.user.role === "TEACHER" ? { where: { teacherId: session.user.id } } : {}),
         include: { student: { select: { id: true, name: true } } },
         orderBy: { enrolledAt: "desc" },
       },

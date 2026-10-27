@@ -1,4 +1,5 @@
 import { PageShell, PracticeAreaTabs, SkillsMap, matchesQuery } from "@/components/sat";
+import { contentScopeFor } from "@/lib/program-scope";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { Plus } from "lucide-react";
@@ -63,7 +64,8 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
   const topicIds = topics.map((topic) => topic.id);
   const selectedTopicId = filters.topic && topicIds.includes(filters.topic) ? filters.topic : undefined;
   const practiceSets = await prisma.practiceSet.findMany({
-    where: { topicId: { in: topicIds } },
+    // The sets of the programs the teacher teaches (shared bank).
+    where: { topicId: { in: topicIds }, ...(session ? contentScopeFor(session.user) : { id: "__no_session__" }) },
     include: {
       topic: { include: { domain: { include: { section: true } } } },
       questions: { select: { questionId: true } },

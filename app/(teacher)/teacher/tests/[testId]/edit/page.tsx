@@ -1,4 +1,5 @@
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import { currentContentScope } from "@/lib/content-scope";
 import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
@@ -11,12 +12,14 @@ interface PageProps {
 
 export default async function EditFullTestPage({ params }: PageProps) {
   const { testId } = await params;
+  // The bank of the programs the teacher teaches (shared by the program's teachers).
+  const scope = await currentContentScope();
   const [test, questions] = await Promise.all([
-    prisma.fullPracticeTest.findUnique({
-      where: { id: testId },
+    prisma.fullPracticeTest.findFirst({
+      where: { id: testId, ...scope },
       include: { modules: { include: { questions: { orderBy: { order: "asc" } } }, orderBy: { order: "asc" } } },
     }),
-    findQuestionsWithOptionMediaAndSection({ status: { in: ["PUBLISHED", "DRAFT"] } }),
+    findQuestionsWithOptionMediaAndSection({ status: { in: ["PUBLISHED", "DRAFT"] }, ...scope }),
   ]);
   if (!test) notFound();
 

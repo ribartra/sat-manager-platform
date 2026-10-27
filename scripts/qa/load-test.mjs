@@ -34,7 +34,7 @@ if (mode === "prepare") {
     const id = `${PREFIX}${i}`;
     db.prepare("insert or ignore into User (id,name,email,passwordHash,role,active,validationStatus,createdAt,updatedAt) values (?,?,?,?,'STUDENT',1,'APPROVED',?,?)")
       .run(id, `Load Student ${i}`, `${id}@load.local`, hash, now, now);
-    db.prepare("insert or ignore into ProgramEnrollment (programId,studentId,enrolledAt,active,status) values (?,?,?,1,'APPROVED')").run(program.id, id, now);
+    db.prepare("insert or ignore into ProgramEnrollment (programId,studentId,enrolledAt,active,status,teacherId) values (?,?,?,1,'APPROVED',?)").run(program.id, id, now, teacher.id);
     db.prepare("insert or ignore into FullPracticeTestAssignment (id,testId,studentId,status,createdAt) values (?,?,?,'PENDING',?)").run(`load-fa-${i}`, test.id, id, now);
   }
   console.log(JSON.stringify({ prepared: Number(n), test: test.id, program: program.id, teacher: teacher.email }));

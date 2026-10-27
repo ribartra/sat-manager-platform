@@ -21,6 +21,8 @@ export default async function TeacherProgramsPage({ searchParams }: { searchPara
     where: { deletedAt: null, teachers: { some: { teacherId: session.user.id, endDate: null } } },
     include: {
       enrollments: {
+        // Only the students this teacher owns (invited) — other teachers of the program have theirs.
+        where: { teacherId: session.user.id },
         include: { student: { select: { id: true, name: true } } },
         orderBy: { enrolledAt: "desc" },
       },

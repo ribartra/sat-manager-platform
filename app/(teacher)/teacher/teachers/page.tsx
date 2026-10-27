@@ -8,6 +8,8 @@ import { Card } from "@/components/ui/card";
 import { TeacherToggle } from "@/app/admin/teachers/teacher-toggle-client";
 import prisma from "@/lib/prisma";
 import { requireTeacherManager } from "@/lib/rbac";
+import { teacherProgramIds } from "@/lib/program-scope";
+import { RevokeInviteButton } from "../students/revoke-invite-button";
 import { formatDate, relativeDay } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -45,20 +47,17 @@ export default async function TeachersPage({ searchParams }: PageProps) {
         active: true,
         canManageTeachers: true,
         lastActiveAt: true,
-        programTeachingAssignments: {
-          where: { endDate: null, program: { deletedAt: null } },
-          select: { program: { select: { enrollments: { where: { status: "APPROVED", active: true }, select: { studentId: true } } } } },
-        },
+        // Students the teacher owns (invited) — not every student of a shared program.
+        _count: { select: { ownedEnrollments: { where: { status: "APPROVED", active: true, program: { deletedAt: null } } } } },
       },
     }),
     prisma.inviteToken.findMany({
-      where: { role: "TEACHER", usedAt: null, revokedAt: null, expiresAt: { gt: now } },
+      where: { role: "TEACHER", usedAt: null, revokedAt: null, expiresAt: { gt: now }, OR: [{ invitedById: session.user.id }, { programId: { in: await teacherProgramIds(session.user) } }] },
       select: { id: true, name: true, email: true, expiresAt: true },
       orderBy: { expiresAt: "desc" },
     }),
   ]);
-  const studentCount = (t: (typeof teachers)[number]) =>
-    new Set(t.programTeachingAssignments.flatMap((a) => a.program.enrollments.map((e) => e.studentId))).size;
+  const studentCount = (t: (typeof teachers)[number]) => t._count.ownedEnrollments;
 
   return (
     <PageShell maxWidth={1100} width="wide">
@@ -130,6 +129,7 @@ export default async function TeachersPage({ searchParams }: PageProps) {
                   <div className="flex items-center gap-2">
                     <RoleBadge role="TEACHER" />
                     <Badge>Invitation valid until {formatDate(i.expiresAt)} ({relativeDay(i.expiresAt, now)})</Badge>
+                    <RevokeInviteButton inviteId={i.id} email={i.email} endpoint={`/api/teachers/invites/${i.id}/revoke`} />
                   </div>
                 </li>
               ))}

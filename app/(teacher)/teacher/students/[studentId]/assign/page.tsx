@@ -1,4 +1,5 @@
 import { PageShell } from "@/components/sat";
+import { assignableContentWhere } from "@/lib/program-scope";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
@@ -35,7 +36,8 @@ export default async function AssignPage({ params, searchParams }: PageProps) {
   const overview = (await loadStudentOverviews([student.id], now)).get(student.id);
 
   const practiceSets = await prisma.practiceSet.findMany({
-    where: { status: "PUBLISHED" },
+    // Only sets of a program the teacher teaches and the student is enrolled in.
+    where: { status: "PUBLISHED", ...(session ? assignableContentWhere(session.user, studentId) : { id: "__no_session__" }) },
     include: {
       topic: { include: { domain: { include: { section: true } } } },
       questions: { select: { questionId: true } },

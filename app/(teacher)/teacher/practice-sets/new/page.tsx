@@ -1,4 +1,5 @@
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import { currentContentScope } from "@/lib/content-scope";
 import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { PracticeSetEditor } from "../practice-set-editor-client";
@@ -15,7 +16,7 @@ export default async function NewPracticeSetPage({ searchParams }: PageProps) {
   const [topics, taxonomyNodes, questions] = await Promise.all([
     prisma.topic.findMany({ where: academicTopicWhere, include: { taxonomyNode: true, domain: { include: { section: true } } }, orderBy: { name: "asc" } }),
     prisma.taxonomyNode.findMany({ where: { active: true }, orderBy: [{ sortOrder: "asc" }, { label: "asc" }] }),
-    findQuestionsWithOptionMedia({ status: "PUBLISHED", topic: academicTopicWhere }),
+    findQuestionsWithOptionMedia({ status: "PUBLISHED", topic: academicTopicWhere, ...(await currentContentScope()) }),
   ]);
   const { byId } = buildTaxonomyTree(taxonomyNodes);
 

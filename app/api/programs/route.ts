@@ -42,7 +42,8 @@ export const GET = withApiErrors(async function GET() {
           include: { teacher: { select: { id: true, name: true, email: true, active: true } } },
           orderBy: { startDate: "asc" },
         },
-        enrollments: { select: { studentId: true, status: true, active: true } },
+        // Only the enrollments this teacher owns (students they invited), not the whole shared program.
+        enrollments: { where: { teacherId: session.user.id }, select: { studentId: true, status: true, active: true } },
       },
       orderBy: { name: "asc" },
     });

@@ -1,10 +1,11 @@
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import { currentContentScope } from "@/lib/content-scope";
 import { PageShell } from "@/components/sat";
 import { FullTestEditor } from "./full-test-editor-client";
 import { findQuestionsWithOptionMediaAndSection } from "@/lib/question-list-media-query";
 
 export default async function NewFullTestPage() {
-  const questions = await findQuestionsWithOptionMediaAndSection({ status: "PUBLISHED" });
+  const questions = await findQuestionsWithOptionMediaAndSection({ status: "PUBLISHED", ...(await currentContentScope()) });
 
   return (
     <PageShell>

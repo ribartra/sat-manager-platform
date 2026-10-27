@@ -62,7 +62,8 @@ export const PATCH = withApiErrors(async function PATCH(
 
   if (action === "approve") {
     // Notify teachers that parent approved — they can now review
-    const teacherIds = enrollment.program.teachers.map((t) => t.teacherId);
+    // The owner teacher when the enrollment has one (shared program), else every program teacher.
+    const teacherIds = enrollment.teacherId ? [enrollment.teacherId] : enrollment.program.teachers.map((t) => t.teacherId);
     await notifyMany(teacherIds, {
       title: "New enrollment request",
       body: `${studentName} has requested to join ${programName}. Parent consent has been given.`,

@@ -35,6 +35,11 @@ export const PATCH = withApiErrors(async function PATCH(
     },
   });
   if (!enrollment) return new NotFoundError("Enrollment not found.").toResponse();
+  // A teacher only manages the students they own; an enrollment without owner (self-enrollment)
+  // becomes theirs when they approve it.
+  if (session.user.role === "TEACHER" && enrollment.teacherId && enrollment.teacherId !== session.user.id) {
+    return new NotFoundError("Enrollment not found.").toResponse();
+  }
 
   // Block teacher approval if parental consent is still pending
   if (action === "approve" && enrollment.parentApprovalStatus === "PENDING") {
@@ -45,7 +50,7 @@ export const PATCH = withApiErrors(async function PATCH(
   let auditAction: string;
 
   if (action === "approve") {
-    data = { status: "APPROVED", active: true };
+    data = { status: "APPROVED", active: true, ...(session.user.role === "TEACHER" && !enrollment.teacherId ? { teacherId: session.user.id } : {}) };
     auditAction = "APPROVE_ENROLLMENT";
   } else if (action === "reject") {
     data = { status: "REJECTED", active: false };

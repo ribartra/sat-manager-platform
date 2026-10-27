@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { currentContentScope } from "@/lib/content-scope";
 import {
   EmptyState,
   LinkTr,
@@ -58,8 +59,8 @@ export default async function FullTestDetailPage({ params, searchParams }: PageP
   // Teachers only see students of their programs; the delete/archive guard still counts everyone.
   const studentScope =
     session.user.role === "TEACHER" ? { student: { programEnrollments: teacherProgramEnrollmentScope(session.user.id) } } : {};
-  const test = await prisma.fullPracticeTest.findUnique({
-    where: { id: testId },
+  const test = await prisma.fullPracticeTest.findFirst({
+    where: { id: testId, ...(await currentContentScope()) },
     include: {
       modules: {
         include: {

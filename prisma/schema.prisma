@@ -46,7 +46,9 @@ model User {
   fullTestAssignments FullPracticeTestAssignment[]
   fullTestAttempts FullPracticeTestAttempt[]
   programTeachingAssignments ProgramTeacher[]
-  programEnrollments ProgramEnrollment[]
+  programEnrollments ProgramEnrollment[] @relation("EnrollmentStudent")
+  /// Enrollments this teacher owns (students they invited): a teacher sees and manages only these.
+  ownedEnrollments ProgramEnrollment[] @relation("EnrollmentOwner")
   parentAccessTokensCreated ParentAccessToken[] @relation("ParentAccessCreatedBy")
   parentAccessTokensForStudent ParentAccessToken[] @relation("ParentAccessStudent")
 }
@@ -70,6 +72,11 @@ model Program {
   teachers    ProgramTeacher[]
   enrollments ProgramEnrollment[]
   invites     InviteToken[]
+  // The program is the tenant: its bank (questions, sets, Tests, materials) is shared by its teachers.
+  questions    Question[]
+  practiceSets PracticeSet[]
+  fullTests    FullPracticeTest[]
+  materials    StudyMaterial[]
 }
 
 model ProgramTeacher {
@@ -92,11 +99,15 @@ model ProgramEnrollment {
   active     Boolean  @default(true)
   parentApprovalStatus  String?    // null = not required | PENDING | APPROVED | REJECTED
   parentApprovedAt      DateTime?
+  /// Owner teacher (who invited the student). Within a shared program each teacher sees only their students.
+  teacherId             String?
 
   program Program @relation(fields: [programId], references: [id], onDelete: Cascade)
-  student User    @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  student User    @relation("EnrollmentStudent", fields: [studentId], references: [id], onDelete: Restrict)
+  teacher User?   @relation("EnrollmentOwner", fields: [teacherId], references: [id], onDelete: SetNull)
 
   @@id([programId, studentId])
+  @@index([teacherId])
 }
 
 model Group {
@@ -244,9 +255,12 @@ model Question {
   status        String   @default("DRAFT") // DRAFT | PUBLISHED | ARCHIVED
   imageUrl      String?
   supportsGraph Boolean  @default(false)
+  /// Tenant: the program whose bank holds this question.
+  programId     String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
+  program  Program?  @relation(fields: [programId], references: [id], onDelete: Restrict)
   topic    Topic     @relation(fields: [topicId], references: [id])
   subskill Subskill? @relation(fields: [subskillId], references: [id])
   options  QuestionOption[]
@@ -255,6 +269,7 @@ model Question {
   fullTestItems FullPracticeTestQuestion[]
   @@index([topicId, difficulty, status])
   @@index([createdAt])
+  @@index([programId])
 }
 
 model QuestionOption {
@@ -273,13 +288,18 @@ model PracticeSet {
   difficulty            String   @default("EASY")
   status                String   @default("DRAFT") // DRAFT | PUBLISHED | BLOCKED | ARCHIVED
   explanationVisibility String   @default("HIDDEN") // IMMEDIATE | AFTER_FINISH | HIDDEN
+  /// Tenant: the program whose bank holds this set.
+  programId             String?
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 
+  program     Program?            @relation(fields: [programId], references: [id], onDelete: Restrict)
   topic       Topic               @relation(fields: [topicId], references: [id])
   questions   PracticeSetQuestion[]
   assignments Assignment[]
   groupAssignments GroupAssignment[]
+
+  @@index([programId])
 }
 
 model PracticeSetQuestion {
@@ -547,11 +567,16 @@ model FullPracticeTest {
   reviewEnabled  Boolean  @default(true)
   /// Break between RW Module 2 and Math Module 1 (minutes). 0 = no break.
   breakMinutes   Int      @default(0)
+  /// Tenant: the program whose bank holds this Test.
+  programId      String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  program        Program? @relation(fields: [programId], references: [id], onDelete: Restrict)
   modules        FullPracticeTestModule[]
   assignments    FullPracticeTestAssignment[]
   attempts       FullPracticeTestAttempt[]
+
+  @@index([programId])
 }
 
 model FullPracticeTestModule {
@@ -669,10 +694,15 @@ model StudyMaterial {
   topicId     String?
   status      String   @default("PUBLISHED") // DRAFT | PUBLISHED | ARCHIVED
   createdById String?
+  /// Tenant: the program whose bank holds this material.
+  programId   String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  topic Topic? @relation(fields: [topicId], references: [id], onDelete: SetNull)
+  program Program? @relation(fields: [programId], references: [id], onDelete: Restrict)
+  topic   Topic?   @relation(fields: [topicId], references: [id], onDelete: SetNull)
+
+  @@index([programId])
 }
 
 model IngestBatch {

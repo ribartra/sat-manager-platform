@@ -8,8 +8,11 @@ import { useConfirm } from "@/components/sat/confirm-dialog";
 import { apiFetch } from "@/lib/api-client";
 import { notify } from "@/lib/notify-ui";
 
-/** Admin only (the page renders it for admins): cancel an open invitation so a new one can be sent. */
-export function RevokeInviteButton({ inviteId, email }: { inviteId: string; email: string }) {
+/**
+ * Cancel an open invitation so a new one can be sent. Admin (students' invitations, default
+ * endpoint) and the master teacher (teacher invitations, `endpoint="/api/teachers/invites/…"`).
+ */
+export function RevokeInviteButton({ inviteId, email, endpoint = `/api/admin/invites/${inviteId}/revoke` }: { inviteId: string; email: string; endpoint?: string }) {
   const confirm = useConfirm();
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -25,7 +28,7 @@ export function RevokeInviteButton({ inviteId, email }: { inviteId: string; emai
     if (!ok) return;
     setBusy(true);
     try {
-      await apiFetch(`/api/admin/invites/${inviteId}/revoke`, { method: "POST" });
+      await apiFetch(endpoint, { method: "POST" });
       notify.success("Invitation cancelled");
       router.refresh();
     } catch (error) {

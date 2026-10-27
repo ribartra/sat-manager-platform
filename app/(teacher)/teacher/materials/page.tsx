@@ -1,4 +1,5 @@
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import { currentContentScope } from "@/lib/content-scope";
 import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
@@ -17,6 +18,8 @@ export default async function TeacherMaterialsPage() {
       include: { domain: { include: { section: true } } },
     }),
     prisma.studyMaterial.findMany({
+      // The materials of the programs the teacher teaches (shared bank).
+      where: await currentContentScope(),
       orderBy: { updatedAt: "desc" },
       include: { topic: { include: { domain: { include: { section: true } } } } },
     }),
