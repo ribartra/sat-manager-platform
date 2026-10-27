@@ -50,8 +50,7 @@ export function PracticeSetRow({
         />
         {item.tries.length > 0 ? (
           <p className="text-xs text-[var(--sat-muted)]">
-            {item.tries.length} attempt{item.tries.length === 1 ? "" : "s"} · last <Pct value={item.last?.pct} className="font-semibold" /> · best{" "}
-            <b className="text-[var(--sat-text)]">{item.best ?? "—"}%</b>
+            {item.tries.length} attempt{item.tries.length === 1 ? "" : "s"} · last attempt <Pct value={item.last?.pct} className="font-semibold" />
           </p>
         ) : item.openAnswered !== null ? (
           <p className="text-xs text-[var(--sat-muted)]">{item.openAnswered} of {item.questionCount} answered so far</p>

@@ -153,7 +153,10 @@ async function AreaView({ practice, area, page }: { practice: PracticeSetItem[];
     if (sets.length === 0) return { difficulty: diff, state: null, title: `Your teacher hasn't assigned a ${difficultyLabel(diff)} set for this skill yet` };
     const one = sets.length === 1 ? sets[0] : null;
     const state: ChipState = sets.some((s) => s.overdue) ? "overdue" : sets.every((s) => s.state === "done") ? "done" : sets.some((s) => s.state === "progress") ? "progress" : "todo";
-    const best = sets.reduce<number | null>((m, s) => (s.best !== null && (m === null || s.best > m) ? s.best : m), null);
+    // Attempt level: the most recent attempt among this skill × level's sets (never the best one).
+    const lastPct = sets
+      .filter((s) => s.last)
+      .sort((a, b) => b.last!.submittedAt.getTime() - a.last!.submittedAt.getTime())[0]?.last?.pct ?? null;
     return {
       difficulty: diff,
       state,
@@ -166,7 +169,7 @@ async function AreaView({ practice, area, page }: { practice: PracticeSetItem[];
       extra: (
         <>
           {sets.length > 1 ? ` ×${sets.length}` : ""}
-          {state === "done" && best !== null ? <span className="text-[var(--sat-muted)]">· {best}%</span> : null}
+          {state === "done" && lastPct !== null ? <span className="text-[var(--sat-muted)]">· last {lastPct}%</span> : null}
         </>
       ),
     };

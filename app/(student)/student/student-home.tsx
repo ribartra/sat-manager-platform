@@ -5,23 +5,19 @@ import {
   Breadcrumbs,
   CompactAreaBox,
   ContinueCard,
-  ChevronCell,
   EmptyState,
-  LinkTr,
   Pagination,
   PracticeAreaTabs,
-  RowLink,
+  PracticeSetAttemptsAccordion,
   SectionHeader,
-  SimpleTable,
   StatGrid,
   StatTile,
-  TD,
-  TestSectionScore,
+  TestAttemptsAccordion,
   pageFromParam,
   paginate,
 } from "@/components/sat";
 import type { Crumb } from "@/components/sat/breadcrumbs";
-import { LineChart } from "@/components/sat/line-chart";
+import { practiceSetGroups, setsFromStudentPractice, testGroups as groupTests } from "@/lib/attempt-groups";
 import { ListItem, ListStack } from "@/components/sat/list";
 import { FilterBar, FilterField } from "@/components/sat/filter-bar";
 import { Select } from "@/components/ui/select";
@@ -30,7 +26,7 @@ import { Pct, WorkStatusBadges } from "@/components/sat/work-status";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
+import { difficultyLabel } from "@/lib/domain-meta";
 import {
   activeAreaTab,
   activeHomeTab,
@@ -44,7 +40,7 @@ import { loadStudentPractice, sortPracticeSets, summarizeArea, PRACTICE_AREAS_IN
 import { loadStudentTests, sortTests, type StudentTestItem } from "@/lib/test-assignments";
 import { officialSkillsFor } from "@/lib/taxonomy-order";
 import { loadContinueWork } from "@/lib/continue-work";
-import { formatDate, formatDuration, relativeDay } from "@/lib/utils";
+import { formatDate, relativeDay } from "@/lib/utils";
 
 /**
  * Student Home (mockup `mejorada` index.html + area.html). Tabs: Summary · Math · Reading · Writing · Tests.
@@ -182,8 +178,7 @@ function SummaryView({ practice, tests, links }: { practice: PracticeSetItem[]; 
               label={s.label}
               href={links.tab(tabFromPracticeArea(code)!)}
               pct={s.latest?.attempt.pct ?? null}
-              line1={s.lastPracticed ? `Latest practice · ${relativeDay(s.lastPracticed)}` : "Not practiced yet"}
-              delta={s.delta}
+              line1={s.latest ? `Latest practice · ${s.latest.item.name} · ${relativeDay(s.latest.attempt.submittedAt)}` : "Not practiced yet"}
               line2={`${s.todo} set${s.todo === 1 ? "" : "s"} to do`}
             />
           );
@@ -302,19 +297,19 @@ async function AreaPracticeView({
     for (const [k, v] of Object.entries(next)) if (v) params.set(k, v);
     return `${links.home}?${params.toString()}#sets`;
   };
-  // % correct by skill: skills with sets or attempts, in taxonomy order.
+  // Last attempt by skill (attempt level, never pooled), skills A–Z.
   const bySkill = skills
     .map(([id, name]) => {
-      const tries = mine.filter((p) => p.skillId === id).flatMap((p) => p.tries);
-      const correct = tries.reduce((x, t) => x + t.correct, 0);
-      const total = tries.reduce((x, t) => x + t.total, 0);
-      return { id, name, pct: total ? Math.round((correct / total) * 100) : null, n: tries.length, assigned: mine.some((p) => p.skillId === id) };
+      const sets = mine.filter((p) => p.skillId === id);
+      const last = sets
+        .filter((p) => p.last)
+        .sort((a, b) => b.last!.submittedAt.getTime() - a.last!.submittedAt.getTime())[0];
+      return { id, name, pct: last?.last?.pct ?? null, setName: last?.name ?? null, assigned: sets.length > 0 };
     })
-    .filter((r) => r.n > 0 || r.assigned);
-  const recent = mine
-    .flatMap((item) => item.tries.map((t) => ({ item, t })))
-    .sort((a, b) => b.t.submittedAt.getTime() - a.t.submittedAt.getTime())
-    .slice(0, 4);
+    .filter((r) => r.pct !== null || r.assigned)
+    .sort((a, b) => a.name.localeCompare(b.name, "en", { numeric: true, sensitivity: "base" }));
+  // Practice sets with their last attempt (same accordion as the teacher), most recently practiced first.
+  const recentSets = practiceSetGroups(setsFromStudentPractice(mine)).slice(0, 4);
   const anyFilter = Boolean(query.skill || query.difficulty || query.status);
 
   return (
@@ -324,8 +319,8 @@ async function AreaPracticeView({
         <StatTile
           icon={<TrendingUp size={18} />}
           iconTone="info"
-          label={`Average correct · ${s.attempts} attempt${s.attempts === 1 ? "" : "s"} · see history`}
-          value={<Pct value={s.avgPct} />}
+          label={s.latest ? `Last attempt · ${s.latest.item.name} · see history` : "Last attempt · see history"}
+          value={<Pct value={s.latest?.attempt.pct ?? null} />}
           href={links.history(tab)}
         />
         <StatTile
@@ -384,9 +379,9 @@ async function AreaPracticeView({
         )}
       </section>
 
-      <div className="mt-6 grid items-start gap-4 lg:grid-cols-2">
+      <div className="mt-6 space-y-4">
         <Card padding="md">
-          <SectionHeader title="% correct by skill" size="sm" action={<span className="text-xs text-gray-500">Practice only · click a skill to filter</span>} />
+          <SectionHeader title="Last attempt by skill" size="sm" action={<span className="text-xs text-gray-500">Practice only · click a skill to filter</span>} />
           {bySkill.length === 0 ? (
             <p className="text-sm text-gray-500">No practice sets in this area yet.</p>
           ) : (
@@ -394,7 +389,7 @@ async function AreaPracticeView({
               rows={bySkill.map((r) => ({
                 label: r.name,
                 pct: r.pct,
-                sub: r.n ? `${r.n} attempt${r.n === 1 ? "" : "s"}` : undefined,
+                sub: r.setName ?? undefined,
                 href: filterHref({ skill: r.id, page: undefined }),
                 color: `var(--sat-area-${tab})`,
               }))}
@@ -407,27 +402,10 @@ async function AreaPracticeView({
             size="sm"
             action={<Link href={links.history(tab)} className="text-xs text-blue-600 hover:underline">View all</Link>}
           />
-          {recent.length === 0 ? (
+          {recentSets.length === 0 ? (
             <p className="text-sm text-gray-500">No finished {s.label} sets yet.</p>
           ) : (
-            <ul className="divide-y divide-gray-100">
-              {recent.map(({ item, t }) => (
-                <li key={t.id}>
-                  <Link href={links.practiceResult(t.id)} className="flex items-center justify-between gap-3 py-2 text-sm hover:bg-gray-50">
-                    <span>
-                      <span className="font-medium text-gray-900">{item.skill}</span>{" "}
-                      <Badge variant={difficultyBadgeVariant(item.difficulty)}>{difficultyLabel(item.difficulty)}</Badge>
-                      <span className="block text-xs text-gray-500">Completed {formatDate(t.submittedAt)} ({relativeDay(t.submittedAt)}) · Try {t.tryNumber}</span>
-                    </span>
-                    <span className="flex shrink-0 items-center gap-2 text-xs text-gray-500">
-                      {t.correct} of {t.total}
-                      <Pct value={t.pct} className="text-sm font-semibold" />
-                      <span aria-hidden className="text-gray-400">›</span>
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <PracticeSetAttemptsAccordion sets={recentSets} hrefFor={links.practiceResult} historyHref={links.history(tab)} />
           )}
         </Card>
       </div>
@@ -437,14 +415,12 @@ async function AreaPracticeView({
 
 const TEST_ROWS_PAGE_SIZE = 10;
 
-/** Tests tab (mockup area.html testsView): pending tests, section results, section scores chart. */
+/** Tests tab (mockup area.html testsView): pending tests, then results grouped per Test (no chart across Tests). */
 function TestsTab({ tests, page, links }: { tests: StudentTestItem[]; page: number; links: HomeLinks }) {
   const { pending } = sortTests(tests);
-  const rows = tests
-    .flatMap((t) => t.attempts.filter((a) => a.status !== "INVALIDATED").map((a) => ({ t, a })))
-    .sort((x, y) => (y.a.submittedAt ?? y.a.startedAt).getTime() - (x.a.submittedAt ?? x.a.startedAt).getTime());
-  const rowsPage = paginate(rows, page, TEST_ROWS_PAGE_SIZE);
-  const finished = rows.filter((r) => r.a.status === "SUBMITTED").reverse();
+  // One row per Test (its last try), opening to every try; no chart across different Tests.
+  const groups = groupTests(tests, (a) => a.status !== "INVALIDATED");
+  const rowsPage = paginate(groups, page, TEST_ROWS_PAGE_SIZE);
   return (
     <>
       <SectionHeader
@@ -474,56 +450,17 @@ function TestsTab({ tests, page, links }: { tests: StudentTestItem[]; page: numb
       )}
 
       <section className="mt-6">
-        <SectionHeader title="Test results" description="SAT section scores (200–800) for each test. Click a row to see your answers." />
-        {rows.length === 0 ? (
+        <SectionHeader title="Test results" description="One row per test with its last try (SAT section scores, 200–800). Open a test to see every try." />
+        {groups.length === 0 ? (
           <Card padding="md" className="text-sm text-gray-500">No tests taken yet.</Card>
         ) : (
           <>
-            <SimpleTable
-              head={[
-                "Date",
-                "Test",
-                "Attempt",
-                <span key="rw" className="text-[var(--sat-area-reading)]">Reading &amp; Writing</span>,
-                <span key="m" className="text-[var(--sat-area-math)]">Math</span>,
-                "",
-              ]}
-            >
-              {rowsPage.items.map(({ t, a }) => (
-                <LinkTr key={a.id}>
-                  <td className={TD}>
-                    <b className="font-medium text-gray-800">{formatDate(a.submittedAt ?? a.startedAt)}</b>
-                    <span className="block text-xs text-gray-400">{relativeDay(a.submittedAt ?? a.startedAt)}</span>
-                  </td>
-                  <td className={TD}><RowLink href={links.testResult(a.id)}>{t.name}</RowLink> {a.status === "IN_PROGRESS" ? <Badge variant="warning">In progress</Badge> : null}</td>
-                  <td className={TD}>Try {a.tryNumber}</td>
-                  <td className={TD}><TestSectionScore attempt={a} section="RW" /></td>
-                  <td className={TD}><TestSectionScore attempt={a} section="MATH" /></td>
-                  <ChevronCell />
-                </LinkTr>
-              ))}
-            </SimpleTable>
+            <TestAttemptsAccordion tests={rowsPage.items} hrefFor={links.testResult} />
             <Pagination basePath={links.home} params={{ area: "tests" }} pageSize={TEST_ROWS_PAGE_SIZE} {...rowsPage} />
           </>
         )}
       </section>
 
-      {finished.length > 1 ? (
-        <Card padding="md" className="mt-6 max-w-[640px]">
-          <SectionHeader size="sm" title="Section scores over time" description="Each section is scored 200–800" />
-          <LineChart
-            title="Section scores over time"
-            min={200}
-            max={800}
-            labels={finished.map(({ t, a }) => `${t.name.replace(/^TEST\s*/i, "T")} · ${a.tryNumber}`)}
-            notes={finished.map(({ a }) => (a.timeTaken ? formatDuration(a.timeTaken) : null))}
-            series={[
-              { name: "Reading & Writing", color: "var(--sat-area-reading)", values: finished.map(({ a }) => a.rwScore) },
-              { name: "Math", color: "var(--sat-area-math)", values: finished.map(({ a }) => a.mathScore), dashed: true },
-            ]}
-          />
-        </Card>
-      ) : null}
     </>
   );
 }

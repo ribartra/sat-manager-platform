@@ -1,7 +1,7 @@
-import { Delta, InvalidatedNotice, PageShell, PracticeAttemptsTable, SectionHeader, VoidableValue } from "@/components/sat";
+import { Delta, InvalidatedNotice, PageShell, SectionHeader, VoidableValue } from "@/components/sat";
+import { HEADER_ACTION_CLASS, HeaderActions } from "@/components/sat/header-actions";
 import { ReviewQuestionCard } from "@/components/sat/review-question-card";
 import { ResultFilterBar, ResultFilterEmpty, ResultFilterRoot, ResultFilterSegments } from "@/components/sat/result-filter";
-import { Button } from "@/components/ui/button";
 import { parseEliminatedOptions } from "@/lib/answer-review-meta";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
@@ -118,7 +118,6 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
     bad: canRevealSolutions ? incorrect : 0,
     blank: unanswered,
   };
-  const attemptRows = tries.map((t) => ({ ...t, status: "SUBMITTED" }));
 
   return (
     <PageShell maxWidth={920}>
@@ -134,9 +133,9 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
       {query.new === "1" ? <Alert tone="success" className="mb-4">Practice submitted. Here are your results.</Alert> : null}
 
       {attempt.status === "INVALIDATED" ? <InvalidatedNotice audience="student" /> : null}
-      <ResultFilterRoot>
-        {/* Score header */}
-        <Card padding="lg" className="mb-6">
+      {/* Header: title on the left, actions top right (same slot and style for every role). */}
+      <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+        <div className="min-w-0">
           <div className="mb-1 flex flex-wrap items-center gap-2">
             {practiceArea ? <AreaTag area={practiceArea} /> : null}
             {practiceSet ? <Badge variant={difficultyBadgeVariant(practiceSet.difficulty)}>{difficultyLabel(practiceSet.difficulty)}</Badge> : null}
@@ -145,7 +144,7 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
           <h1 className="mb-1 text-xl font-semibold text-gray-900">
             {practiceSet?.topic.name ?? shortSetName(practiceSetSnapshot?.name ?? "Practice set")}
           </h1>
-          <p className="mb-4 text-xs text-gray-500">
+          <p className="text-xs text-gray-500">
             {attempt.submittedAt ? (
               <>
                 Completed <b className="font-medium text-gray-700">{formatDate(attempt.submittedAt)}</b> at {formatClock(attempt.submittedAt)} ({relativeDay(attempt.submittedAt)})
@@ -153,6 +152,21 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
             ) : null}
             {attempt.assignment?.createdAt ? <> · Assigned {formatDate(attempt.assignment.createdAt)}</> : null}
           </p>
+        </div>
+        <HeaderActions>
+          <Link href={tryAgainHref} className={HEADER_ACTION_CLASS}><RotateCcw size={14} aria-hidden /> Try Again</Link>
+          {nextAssignment ? (
+            <Link href={`/student/practice/assignment/${nextAssignment.assignmentId}`} className={`${HEADER_ACTION_CLASS} max-w-full`}>
+              <span className="truncate">Next: {nextAssignment.skill} · {difficultyLabel(nextAssignment.difficulty)}</span>
+            </Link>
+          ) : null}
+          <Link href="/student" className={HEADER_ACTION_CLASS}>Summary</Link>
+        </HeaderActions>
+      </div>
+
+      <ResultFilterRoot>
+        {/* Score */}
+        <Card padding="lg" className="mb-6">
 
           <div className="grid gap-5 md:grid-cols-[auto_1fr] md:items-center">
             <div>
@@ -185,22 +199,6 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
               {pauseSeconds > 0 ? ` (${formatDuration(pauseSeconds)})` : ""}
             </Alert>
           )}
-
-          <div className="mt-5 flex flex-wrap items-center gap-2">
-            <Button asChild>
-              <Link href={tryAgainHref}><RotateCcw size={14} /> Try Again</Link>
-            </Button>
-            {nextAssignment ? (
-              <Button asChild variant="secondary" className="max-w-full">
-                <Link href={`/student/practice/assignment/${nextAssignment.assignmentId}`}>
-                  <span className="truncate">Next assignment: {nextAssignment.skill} · {difficultyLabel(nextAssignment.difficulty)}</span>
-                </Link>
-              </Button>
-            ) : null}
-            <Button asChild variant="ghost">
-              <Link href="/student">Summary</Link>
-            </Button>
-          </div>
         </Card>
 
         {attempt.teacherComment && (
@@ -209,13 +207,6 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
             <p>{attempt.teacherComment}</p>
           </Card>
         )}
-
-        {attemptRows.length > 0 ? (
-          <section className="mb-6">
-            <SectionHeader title="All attempts for this set" description="Every time you try again, a new attempt is recorded here." />
-            <PracticeAttemptsTable rows={attemptRows} hrefFor={(id) => `/student/results/${id}`} viewingId={attempt.id} />
-          </section>
-        ) : null}
 
         {canRevealSolutions && orderedAnswers.length > 0 ? (
           <Card padding="md" className="mb-6">

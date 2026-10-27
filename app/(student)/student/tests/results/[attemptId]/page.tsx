@@ -2,7 +2,8 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { SECTION_TEXT } from "@/components/sat/test-ui";
 import { notFound } from "next/navigation";
-import { InvalidatedNotice, PageShell, SectionHeader, TestAttemptsTable, TestResultSentence, isInvalidated } from "@/components/sat";
+import { InvalidatedNotice, PageShell, TestResultSentence, isInvalidated } from "@/components/sat";
+import { HEADER_ACTION_CLASS, HeaderActions } from "@/components/sat/header-actions";
 import { RetakeTestButton } from "@/components/sat/retake-test-button";
 import { Alert } from "@/components/sat/alert";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
@@ -67,7 +68,6 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
     select: { id: true, status: true, startedAt: true, submittedAt: true, rwScore: true, mathScore: true, totalScore: true },
   });
   const tryNumber = siblings.findIndex((s) => s.id === attempt.id) + 1;
-  const attemptRows = siblings.map((s, i) => ({ ...s, tryNumber: i + 1, view: s.id === attempt.id && inProgress ? view : null }));
   const canRetake = attempt.assignment?.status === "COMPLETED" && !siblings.some((s) => s.status === "IN_PROGRESS");
   const timeByModule = modules.map((m) => m.questions.reduce((sum, q) => sum + (attempt.answers.find((a) => a.questionId === q.questionId)?.timeSpent ?? 0), 0));
 
@@ -128,8 +128,9 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
         </Alert>
       ) : null}
 
-      <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
-        <div>
+      {/* Header: title on the left, actions top right (same slot and style for every role). */}
+      <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+        <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">{attempt.test.name} results</h1>
             <Badge>Try {tryNumber} of {siblings.length}</Badge>
@@ -143,12 +144,10 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
             {attempt.assignment?.dueDate ? <> · Due {formatDate(attempt.assignment.dueDate)}</> : null}
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <HeaderActions>
           {canRetake && attempt.assignmentId ? <RetakeTestButton assignmentId={attempt.assignmentId} testName={attempt.test.name} /> : null}
-          <Button asChild variant="ghost" size="sm">
-            <Link href="/student/tests?view=completed">All tests</Link>
-          </Button>
-        </div>
+          <Link href="/student/tests?view=completed" className={HEADER_ACTION_CLASS}>All tests</Link>
+        </HeaderActions>
       </div>
 
       {invalidated ? <InvalidatedNotice audience="student" /> : null}
@@ -195,13 +194,6 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
           </div>
           <AnswerGridLegend withNotTaken={pendingModules.length > 0} />
         </Card>
-      ) : null}
-
-      {siblings.length > 1 ? (
-        <section className="mt-4">
-          <SectionHeader title={`All attempts for ${attempt.test.name}`} description="Every try is kept. Click one to see it." />
-          <TestAttemptsTable rows={attemptRows} hrefFor={(id) => `/student/tests/results/${id}`} viewingId={attempt.id} />
-        </section>
       ) : null}
 
       {attempt.test.reviewEnabled ? (

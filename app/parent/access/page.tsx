@@ -6,15 +6,14 @@ import { Card } from "@/components/ui/card";
 import {
   accessWindow,
   areasLabel,
-  classifyPracticeSetArea,
   parseAreas,
-  practiceSetAreaLabel,
   practiceSetMatchesArea,
 } from "@/lib/parent-access";
 import { hashPublicToken } from "@/lib/token-security";
 import { writeAudit } from "@/lib/audit";
 import { InlineError } from "@/components/sat/alert";
-import { shortSetName } from "@/lib/student-report";
+import { PracticeSetAttemptsAccordion } from "@/components/sat";
+import { practiceSetGroups, practiceSetTitle, type GroupableSet } from "@/lib/attempt-groups";
 
 interface PageProps {
   searchParams: Promise<{ token?: string }>;
@@ -119,8 +118,26 @@ export default async function ParentTemporaryAccessPage({ searchParams }: PagePr
       return areas.some((area) => practiceSetMatchesArea({ practiceArea: taxonomy.practiceArea, sectionName: section.name }, area));
     });
 
-  const totalAnswers = attempts.flatMap((attempt) => attempt.answers);
-  const score = summarizeAllQuestionAnswers(totalAnswers);
+  // Attempt level only (same accordion as teacher and student): one row per practice set with its
+  // LAST attempt, opening to its last 3 tries. No average across sets.
+  const sets = new Map<string, GroupableSet>();
+  for (const attempt of attempts) {
+    const practiceSet = attempt.assignment?.practiceSet;
+    const key = attempt.assignmentId ?? attempt.id;
+    const set = sets.get(key) ?? sets.set(key, { key, title: practiceSet ? practiceSetTitle(practiceSet.name, practiceSet.difficulty) : "Practice set", tries: [] }).get(key)!;
+    const attemptScore = summarizeAllQuestionAnswers(attempt.answers);
+    set.tries.push({
+      id: attempt.id,
+      tryNumber: attempt.attemptNumber,
+      submittedAt: attempt.submittedAt,
+      correct: attemptScore.correct,
+      total: attemptScore.total,
+      pct: attemptScore.percent,
+      time: attempt.totalTime,
+      status: attempt.status,
+    });
+  }
+  const groups = practiceSetGroups([...sets.values()]);
 
   return (
     <div className="mx-auto max-w-[var(--sat-page-wide)] px-4 py-8">
@@ -130,50 +147,16 @@ export default async function ParentTemporaryAccessPage({ searchParams }: PagePr
         <p className="mt-1 text-sm text-gray-500">You can open this report until {formatDate(state.effectiveExpiresAt)}.</p>
       </div>
 
-      <div className="mb-6 grid gap-4 md:grid-cols-3">
-        <Metric label="Practice sets finished" value={attempts.length.toString()} />
-        <Metric label="Total questions" value={score.total.toString()} />
-        <Metric label="Questions correct" value={score.percent !== null ? `${score.percent}%` : "—"} />
-      </div>
-
-      <Card>
-        {attempts.map((attempt) => {
-          const attemptScore = summarizeAllQuestionAnswers(attempt.answers);
-          const attemptCorrect = attemptScore.correct;
-          const total = attemptScore.total;
-          return (
-            <div key={attempt.id} className="border-b border-gray-100 px-4 py-3 last:border-b-0">
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="text-sm font-medium text-gray-900">{attempt.assignment?.practiceSet.name ? shortSetName(attempt.assignment.practiceSet.name) : "Practice set"}</p>
-                  <p className="mt-0.5 text-xs text-gray-500">
-                    {practiceSetAreaLabel(classifyPracticeSetArea({
-                      practiceArea: attempt.assignment?.practiceSet.topic.domain.practiceArea,
-                      sectionName: attempt.assignment?.practiceSet.topic.domain.section.name,
-                    })) ?? attempt.assignment?.practiceSet.topic.domain.section.label} · {attempt.assignment?.practiceSet.topic.name}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-semibold text-gray-900">{attemptCorrect} of {total} correct ({attemptScore.percent ?? 0}%)</p>
-                  <p className="text-xs text-gray-400">{attempt.submittedAt ? formatDate(attempt.submittedAt) : ""}</p>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-        {attempts.length === 0 && <p className="p-8 text-center text-sm text-gray-400">No practice sets finished in these subjects yet.</p>}
-      </Card>
+      <p className="mb-3 text-sm text-gray-600">
+        {groups.length} practice set{groups.length === 1 ? "" : "s"} finished · each row shows the last attempt; open it to see the latest tries.
+      </p>
+      {groups.length === 0 ? (
+        <Card><p className="p-8 text-center text-sm text-gray-400">No practice sets finished in these subjects yet.</p></Card>
+      ) : (
+        <PracticeSetAttemptsAccordion sets={groups} />
+      )}
 
       <Link href="/login" className="mt-6 inline-block text-sm text-blue-600 hover:underline">Go to sign in</Link>
     </div>
-  );
-}
-
-function Metric({ label, value }: { label: string; value: string }) {
-  return (
-    <Card padding="md">
-      <p className="text-xs font-medium uppercase text-gray-400">{label}</p>
-      <p className="mt-1 text-2xl font-semibold text-gray-900">{value}</p>
-    </Card>
   );
 }

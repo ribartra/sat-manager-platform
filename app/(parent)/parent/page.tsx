@@ -1,10 +1,14 @@
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
-import { EmptyState, PageContent, PageHeader, PageShell } from "@/components/sat";
-import { scoreBandTextClass } from "@/lib/score-band";
+import { EmptyState, PageContent, PageHeader, PageShell, PracticeSetAttemptsAccordion } from "@/components/sat";
+import { practiceSetGroups, practiceSetTitle, type GroupableSet } from "@/lib/attempt-groups";
 import { summarizeAllQuestionAnswers } from "@/lib/weighted-score";
 
+/**
+ * Parent home: each linked student's practice sets with the LAST attempt of each (same accordion as
+ * the teacher and the student). Attempt level only: no average across sets.
+ */
 export default async function ParentDashboardPage() {
   const session = await auth();
   const links = await prisma.parentStudent.findMany({
@@ -13,8 +17,11 @@ export default async function ParentDashboardPage() {
       student: {
         include: {
           attempts: {
-            where: { status: "SUBMITTED" },
-            include: { answers: { select: { isCorrect: true } } },
+            where: { status: "SUBMITTED", assignmentId: { not: null } },
+            include: {
+              answers: { select: { answer: true, isCorrect: true } },
+              assignment: { select: { practiceSet: { select: { name: true, difficulty: true, _count: { select: { questions: true } } } } } },
+            },
             orderBy: { submittedAt: "desc" },
           },
         },
@@ -32,17 +39,39 @@ export default async function ParentDashboardPage() {
             description="When a teacher links your account to a student, you'll see their progress here."
           />
         ) : (
-          <div className="grid grid-cols-1 gap-4 @md:grid-cols-2">
+          <div className="space-y-4">
             {links.map((link) => {
               const attempts = link.student.attempts;
-              const avgPct = summarizeAllQuestionAnswers(attempts.flatMap((attempt) => attempt.answers)).percent;
+              const sets = new Map<string, GroupableSet>();
+              for (const attempt of attempts) {
+                const practiceSet = attempt.assignment!.practiceSet;
+                const key = attempt.assignmentId!;
+                const set = sets.get(key) ?? sets.set(key, { key, title: practiceSetTitle(practiceSet.name, practiceSet.difficulty), tries: [] }).get(key)!;
+                const score = summarizeAllQuestionAnswers(attempt.answers);
+                const total = Math.max(score.total, practiceSet._count.questions);
+                set.tries.push({
+                  id: attempt.id,
+                  tryNumber: attempt.attemptNumber,
+                  submittedAt: attempt.submittedAt,
+                  correct: score.correct,
+                  total,
+                  pct: attempt.scorePercent ?? (total ? Math.round((score.correct / total) * 100) : null),
+                  time: attempt.totalTime,
+                  status: attempt.status,
+                });
+              }
+              const groups = practiceSetGroups([...sets.values()]);
               return (
                 <Card key={link.studentId} padding="md">
                   <h2 className="text-base font-semibold text-foreground">{link.student.name}</h2>
-                  <p className="mt-2 text-sm text-muted-foreground">Practice sets finished: {attempts.length}</p>
-                  <p className={`text-sm font-medium ${scoreBandTextClass(avgPct)}`}>
-                    Questions correct: {avgPct !== null ? `${avgPct}%` : "—"}
+                  <p className="mb-3 mt-1 text-sm text-muted-foreground">
+                    {groups.length} practice set{groups.length === 1 ? "" : "s"} finished · each row shows the last attempt
                   </p>
+                  {groups.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">No practice finished yet.</p>
+                  ) : (
+                    <PracticeSetAttemptsAccordion sets={groups} />
+                  )}
                 </Card>
               );
             })}

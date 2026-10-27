@@ -6,7 +6,8 @@ import type { WorkState } from "@/lib/test-view";
 
 /**
  * A student's practice sets (Math / Reading / Writing) with status and every try. Percentages only:
- * SAT scaled scores belong to Tests, never to practice.
+ * SAT scaled scores belong to Tests, never to practice. Attempt level only (product rule, all roles):
+ * no averages across sets, no "best" try, no change between different sets — the last attempt.
  */
 
 export interface PracticeTry {
@@ -35,7 +36,6 @@ export interface PracticeSetItem {
   overdue: boolean;
   tries: PracticeTry[];
   last: PracticeTry | null;
-  best: number | null;
   /** Answers saved in the open try (for "k of n answered so far"). */
   openAnswered: number | null;
   questionCount: number;
@@ -48,10 +48,10 @@ export interface AreaPracticeSummary {
   done: number;
   todo: number;
   overdue: number;
-  avgPct: number | null;
   attempts: number;
+  /** The most recent attempt in the area (any set). */
   latest: { item: PracticeSetItem; attempt: PracticeTry } | null;
-  delta: number | null;
+  /** The lowest LAST attempt among the area's sets. */
   weakest: { skill: string; skillId: string; pct: number } | null;
   lastPracticed: Date | null;
 }
@@ -120,7 +120,6 @@ export async function loadStudentPractice(studentId: string): Promise<PracticeSe
         overdue: state !== "done" && Boolean(a.dueDate && a.dueDate < today),
         tries,
         last,
-        best: tries.reduce<number | null>((m, t) => (t.pct !== null && (m === null || t.pct > m) ? t.pct : m), null),
         openAnswered: open ? open.answers.filter((x) => x.answer && x.answer.trim()).length : null,
         questionCount: a.practiceSet._count.questions,
       };
@@ -140,20 +139,10 @@ export function summarizeArea(items: PracticeSetItem[], area: PracticeAreaCode):
   const tries = mine
     .flatMap((item) => item.tries.map((attempt) => ({ item, attempt })))
     .sort((a, b) => a.attempt.submittedAt.getTime() - b.attempt.submittedAt.getTime());
-  const correct = tries.reduce((s, t) => s + t.attempt.correct, 0);
-  const total = tries.reduce((s, t) => s + t.attempt.total, 0);
-  const bySkill = new Map<string, { skill: string; correct: number; total: number }>();
-  for (const t of tries) {
-    const b = bySkill.get(t.item.skillId) ?? { skill: t.item.skill, correct: 0, total: 0 };
-    b.correct += t.attempt.correct;
-    b.total += t.attempt.total;
-    bySkill.set(t.item.skillId, b);
-  }
-  const weakestEntry = [...bySkill.entries()]
-    .filter(([, b]) => b.total > 0)
-    .sort((a, b) => a[1].correct / a[1].total - b[1].correct / b[1].total)[0];
+  const weakestSet = mine
+    .filter((item) => item.last && item.last.pct !== null)
+    .sort((a, b) => a.last!.pct! - b.last!.pct!)[0];
   const latest = tries[tries.length - 1] ?? null;
-  const prev = tries[tries.length - 2] ?? null;
   return {
     area,
     label: practiceAreaLabel(area),
@@ -161,13 +150,9 @@ export function summarizeArea(items: PracticeSetItem[], area: PracticeAreaCode):
     done: mine.filter((i) => i.state === "done").length,
     todo: mine.filter((i) => i.state !== "done").length,
     overdue: mine.filter((i) => i.overdue).length,
-    avgPct: total ? Math.round((correct / total) * 100) : null,
     attempts: tries.length,
     latest,
-    delta: latest && prev && latest.attempt.pct !== null && prev.attempt.pct !== null ? latest.attempt.pct - prev.attempt.pct : null,
-    weakest: weakestEntry
-      ? { skill: weakestEntry[1].skill, skillId: weakestEntry[0], pct: Math.round((weakestEntry[1].correct / weakestEntry[1].total) * 100) }
-      : null,
+    weakest: weakestSet ? { skill: weakestSet.skill, skillId: weakestSet.skillId, pct: weakestSet.last!.pct! } : null,
     lastPracticed: latest?.attempt.submittedAt ?? null,
   };
 }

@@ -8,15 +8,15 @@ import {
   SectionHeader,
   StatGrid,
   StatTile,
+  TestAttemptsAccordion,
   pageFromParam,
   paginate,
 } from "@/components/sat";
-import { LineChart } from "@/components/sat/line-chart";
+import { testGroups as groupTests } from "@/lib/attempt-groups";
 import { BluebookCard } from "@/components/sat/bluebook-card";
-import { Card } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
 import { loadStudentTests, sortTests } from "@/lib/test-assignments";
-import { formatDate, formatDuration } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 
 interface PageProps {
   searchParams: Promise<{ view?: string; page?: string }>;
@@ -25,7 +25,7 @@ interface PageProps {
 const VIEWS = ["pending", "completed", "all"] as const;
 type View = (typeof VIEWS)[number];
 
-/** Student Tests (mockup "tests.html"): pending / completed / all, module picker per Test, attempts and score charts. */
+/** Student Tests (mockup "tests.html"): pending / completed / all, module picker per Test, attempts grouped per Test. */
 export default async function StudentTestsPage({ searchParams }: PageProps) {
   const session = await auth();
   if (!session?.user) redirect("/login");
@@ -40,16 +40,11 @@ export default async function StudentTestsPage({ searchParams }: PageProps) {
     .flatMap((t) => t.attempts.filter((a) => a.status === "SUBMITTED").map((a) => ({ test: t, attempt: a })))
     .sort((a, b) => (a.attempt.submittedAt?.getTime() ?? 0) - (b.attempt.submittedAt?.getTime() ?? 0));
   const latest = submitted[submitted.length - 1] ?? null;
-  const bestAttempt = submitted.reduce<(typeof submitted)[number] | null>(
-    (m, s) => (s.attempt.totalScore !== null && (m === null || s.attempt.totalScore > (m.attempt.totalScore ?? -1)) ? s : m),
-    null
-  );
-  const best = bestAttempt?.attempt.totalScore ?? null;
   const inProgress = pending.filter((t) => t.state === "progress").length;
   const overdue = pending.filter((t) => t.overdue).length;
   const attemptsTotal = submitted.length;
-  const chartLabels = submitted.map((s) => `${shortName(s.test.name)} · try ${s.attempt.tryNumber}`);
-  const chartNotes = submitted.map((s) => (s.attempt.timeTaken ? formatDuration(s.attempt.timeTaken) : null));
+  // Attempt level only: one row per Test with its last try (no best score, no chart across Tests).
+  const attemptGroups = groupTests(items, (a) => a.status !== "INVALIDATED");
 
   const page = paginate(shown, pageFromParam(query.page), TESTS_PAGE_SIZE);
 
@@ -61,20 +56,13 @@ export default async function StudentTestsPage({ searchParams }: PageProps) {
         Full-length SAT tests assigned by your teacher. You can take a whole test or choose one module at a time.
       </p>
 
-      <StatGrid cols={4}>
+      <StatGrid cols={3}>
         <StatTile label="Tests to take" value={pending.length} sub={`${inProgress} in progress · ${overdue} overdue`} href="/student/tests?view=pending" />
         <StatTile
           label="Tests completed"
           value={`${items.filter((t) => t.lastSubmitted).length} of ${items.length}`}
           sub={`${attemptsTotal} attempt${attemptsTotal === 1 ? "" : "s"} in total · see them`}
           href="/student/tests?view=completed"
-        />
-        <StatTile
-          tone="dark"
-          label="Best total score"
-          value={best ?? "—"}
-          sub={bestAttempt ? "out of 1600 · open ›" : "out of 1600"}
-          href={bestAttempt ? `/student/tests/results/${bestAttempt.attempt.id}` : undefined}
         />
         {latest ? (
           <StatTile
@@ -114,27 +102,11 @@ export default async function StudentTestsPage({ searchParams }: PageProps) {
         </div>
       )}
 
-      {view !== "pending" && submitted.length > 0 ? (
-        <div className="mt-6 grid gap-4 lg:grid-cols-2">
-          <Card padding="md">
-            <SectionHeader size="sm" title="Total score over time" description="Completed tests only · 400–1600" />
-            <LineChart title="Total score over time" min={400} max={1600} labels={chartLabels} notes={chartNotes} series={[{ name: "Total", color: "#6b7280", values: submitted.map((s) => s.attempt.totalScore) }]} />
-          </Card>
-          <Card padding="md">
-            <SectionHeader size="sm" title="Section scores over time" description="Each section is scored 200–800" />
-            <LineChart
-              title="Section scores over time"
-              min={200}
-              max={800}
-              labels={chartLabels}
-              notes={chartNotes}
-              series={[
-                { name: "Reading & Writing", color: "var(--sat-area-reading)", values: submitted.map((s) => s.attempt.rwScore) },
-                { name: "Math", color: "var(--sat-area-math)", values: submitted.map((s) => s.attempt.mathScore), dashed: true },
-              ]}
-            />
-          </Card>
-        </div>
+      {view !== "pending" && attemptGroups.length > 0 ? (
+        <section className="mt-6">
+          <SectionHeader title="Your attempts" description="One row per test with its last try. Open a test to see every try." />
+          <TestAttemptsAccordion tests={attemptGroups} hrefFor={(id) => `/student/tests/results/${id}`} />
+        </section>
       ) : null}
     </PageShell>
   );
@@ -142,6 +114,3 @@ export default async function StudentTestsPage({ searchParams }: PageProps) {
 
 const TESTS_PAGE_SIZE = 10;
 
-function shortName(name: string) {
-  return name.replace(/^TEST\s*/i, "T");
-}

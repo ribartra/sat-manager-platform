@@ -136,13 +136,12 @@ export function studentAreaCardProps(s: AreaPracticeSummary, href: string, actio
           detail: <>{s.latest.attempt.correct} of {s.latest.attempt.total} correct</>,
         }
       : null,
-    delta: s.delta,
     chips: [
       { label: "Completed", value: `${s.done} of ${s.total}` },
       { label: "To do", value: s.todo },
       { label: "Overdue", value: s.overdue, tone: s.overdue ? "danger" : "default" },
     ],
-    weakest: s.weakest ? <>Weakest skill: <b>{s.weakest.skill}</b> ({s.weakest.pct}%)</> : null,
+    weakest: s.weakest ? <>Weakest skill: <b>{s.weakest.skill}</b> (last attempt {s.weakest.pct}%)</> : null,
     footer: s.lastPracticed ? `Last practiced ${relativeDay(s.lastPracticed)}` : "Not practiced yet",
     action,
     emptyText: `No ${s.label} practice finished yet.`,

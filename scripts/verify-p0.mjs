@@ -26,8 +26,52 @@ const checks = [
   },
   {
     file: "app/(student)/student/tests/results/[attemptId]/page.tsx",
-    requires: ['attempt.status === "IN_PROGRESS"', "InvalidatedNotice", "TestResultSentence", "TestAttemptsTable", "markedForReview"],
-    label: "Resultados FPT: intento abierto muestra solo modulos enviados; invalidados tachados; herramientas de revision",
+    requires: ['attempt.status === "IN_PROGRESS"', "InvalidatedNotice", "TestResultSentence", "HeaderActions", "markedForReview"],
+    forbids: ["TestAttemptsTable"],
+    label: "Resultados FPT: intento abierto muestra solo modulos enviados; invalidados tachados; acciones arriba; intentos en el acordeon (no tabla)",
+  },
+  // Attempt level only, for every role: no averages, no best try, no chart across different Tests.
+  {
+    file: "app/(student)/student/student-home.tsx",
+    requires: ["PracticeSetAttemptsAccordion", "TestAttemptsAccordion"],
+    forbids: ["LineChart", "avgPct", "Average correct", "s.delta"],
+    label: "Home del alumno (y Student view): acordeones por set y por Test, sin promedios ni graficas entre Tests",
+  },
+  {
+    file: "app/(student)/student/tests/page.tsx",
+    requires: ["TestAttemptsAccordion"],
+    forbids: ["LineChart", "Best total score"],
+    label: "Tests del alumno: ultimo intento por Test, sin mejor puntaje ni graficas entre Tests",
+  },
+  {
+    file: "app/(student)/student/history/page.tsx",
+    requires: ["PracticeSetAttemptsAccordion", "TestAttemptsAccordion", "loadPracticeReport"],
+    forbids: ["Average score", "bestByAssignment", "TopicDifficultyTrend", "PerformanceBreakdown"],
+    label: "Historial del alumno: acordeones y matriz de ultimo intento, sin promedios ni Best",
+  },
+  {
+    file: "app/(student)/student/results/[attemptId]/page.tsx",
+    requires: ["HeaderActions", "Try Again"],
+    forbids: ["PracticeAttemptsTable"],
+    label: "Resultado de practice del alumno: acciones arriba (Try Again), sin tabla de intentos",
+  },
+  {
+    file: "lib/student-practice.ts",
+    requires: ["weakestSet"],
+    forbids: ["avgPct", "best:"],
+    label: "Resumen de practice del alumno: sin promedio ni mejor intento",
+  },
+  {
+    file: "app/(parent)/parent/page.tsx",
+    requires: ["PracticeSetAttemptsAccordion"],
+    forbids: ["Questions correct", "avgPct"],
+    label: "Portal de apoderado: ultimo intento por set, sin promedio",
+  },
+  {
+    file: "app/parent/access/page.tsx",
+    requires: ["PracticeSetAttemptsAccordion", "Progress report", "You can open this report until"],
+    forbids: ["Questions correct", "Total questions"],
+    label: "Reporte temporal del apoderado: ultimo intento por set, sin promedio",
   },
   {
     file: "components/sat/test-cards.tsx",
