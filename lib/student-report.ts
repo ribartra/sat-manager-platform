@@ -10,14 +10,11 @@ import { isAnsweredAnswer, sumAttemptElapsedTime, summarizeAllQuestionAnswers } 
 import {
   aggregateDifficultyMetrics,
   aggregateTopicDifficultyMetrics,
-  aggregateTopicDifficultyTrend,
   type MockSectionMetric,
   type ProgressMetric,
-  type TopicTrendPoint,
 } from "@/lib/progress-analytics";
 import { practiceAreaLabel, type PracticeAreaCode } from "@/lib/practice-area";
 import { progressDateWhere } from "@/lib/progress-filters";
-import { compareSkills, domainRank } from "@/lib/taxonomy-order";
 
 export type ReportFilters = { topic?: string; difficulty?: string; from?: string; to?: string };
 
@@ -68,17 +65,13 @@ export type ReportAttempt = {
 export type PracticeReport = {
   practiceArea: PracticeAreaCode;
   areaLabel: string;
+  /** Counts and sums only (attempt level: no pooled % across sets). */
   kpis: {
     attempts: number;
-    overall: { correct: number; total: number; percent: number | null };
     totalTime: number;
-    avgQuestionTime: number | null;
     pending: number;
   };
-  difficultyMetrics: ProgressMetric[];
-  topicDifficultyMetrics: ProgressMetric[];
-  /** Domain → skill labels in the official order (Skills Tracker), for grouped matrices. */
-  skillGroups: Array<{ label: string; rows: string[] }>;
+  /** The last attempt of each skill × level, lowest first (PDF "Skills to work on next"). */
   weakSkills: WeakSkill[];
   /**
    * Skill × difficulty, skills in alphabetical order: each cell is the most recent counted attempt of
@@ -91,7 +84,6 @@ export type PracticeReport = {
   weakestSkill: (AttemptRef & { topicId: string; label: string; difficulty: string }) | null;
   /** Number of practice sets with a counted attempt. */
   latestSetCount: number;
-  trend: { topics: string[]; pointsByTopic: Record<string, TopicTrendPoint[]>; attemptCount: number };
   assignments: Array<{
     id: string;
     practiceSetId: string;
@@ -251,42 +243,11 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
   };
   const attempts = historyAttempts.filter((attempt) => attempt.status === "SUBMITTED");
   const rowsByAttempt = attempts.map(rowsForAttempt);
-  const allRows = rowsByAttempt.flat();
   const scoredAttempts: ReportAttempt[] = attempts.map((attempt, index) => scoreAttempt(attempt, rowsByAttempt[index] ?? []));
   const attemptHistory: ReportAttempt[] = historyAttempts.map((attempt) =>
     attempt.status === "SUBMITTED" ? scoredAttempts.find((scored) => scored.id === attempt.id)! : scoreAttempt(attempt, rowsForAttempt(attempt)),
   );
-  const attemptById = new Map(scoredAttempts.map((attempt) => [attempt.id, attempt]));
-  const overall = summarizeAllQuestionAnswers(allRows);
-  const timedRows = allRows.filter((row) => row.timeSeconds);
 
-  const progressRows = allRows.map((row) => ({
-    topic: row.topicName,
-    difficulty: row.difficulty,
-    correct: row.isCorrect,
-    timeSeconds: row.timeSeconds,
-    attemptId: row.attemptId,
-    attemptLabel: attemptById.get(row.attemptId)?.name ?? "Practice set",
-    submittedAt: attemptById.get(row.attemptId)?.submittedAt ?? null,
-  }));
-
-  // Weakest skill x difficulty buckets, pooled over every counted try (PDF report only; the
-  // student page reports at attempt level, see below).
-  const buckets = new Map<string, { topicId: string; domainId: string; label: string; difficulty: string; correct: number; total: number; totalTime: number; timed: number }>();
-  for (const row of allRows) {
-    const key = `${row.topicId}:${row.difficulty}`;
-    const bucket = buckets.get(key) ?? {
-      topicId: row.topicId, domainId: row.domainId, label: row.topicName, difficulty: row.difficulty,
-      correct: 0, total: 0, totalTime: 0, timed: 0,
-    };
-    bucket.total += 1;
-    if (row.isCorrect) bucket.correct += 1;
-    if (row.timeSeconds) {
-      bucket.totalTime += row.timeSeconds;
-      bucket.timed += 1;
-    }
-    buckets.set(key, bucket);
-  }
   // Attempt level only (product rule: no averages across Tests or across the sets of a Section).
   // Every figure below is ONE attempt's result. `attempts` / `scoredAttempts` are newest first.
   const setOf = (index: number) => attempts[index].assignment?.practiceSet ?? null;
@@ -319,7 +280,22 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
   const weakestIndex = [...latestIndexBySet.values()]
     .filter((index) => setOf(index) && scoredAttempts[index].percent !== null)
     .sort((a, b) => (scoredAttempts[a].percent ?? 0) - (scoredAttempts[b].percent ?? 0))[0];
-  const weakest = [...buckets.entries()]
+  // Skills to work on next (PDF): the last attempt of each skill × level, lowest first.
+  const weakest = [...latestIndexByCell.entries()]
+    .map(([key, index]) => {
+      const scored = scoredAttempts[index];
+      const set = setOf(index)!;
+      const current = currentTopic.get(set.topicId);
+      return [key, {
+        topicId: set.topicId,
+        domainId: current?.domainId ?? "",
+        label: current?.name ?? shortSetName(scored.name),
+        difficulty: set.difficulty,
+        correct: scored.correct,
+        total: scored.total,
+        avgTime: scored.total && scored.totalTime ? Math.round(scored.totalTime / scored.total) : null,
+      }] as const;
+    })
     .sort(([, a], [, b]) => scorePercent(a.correct, a.total) - scorePercent(b.correct, b.total) || b.total - a.total)
     .slice(0, 12);
   const weakTopicIds = [...new Set(weakest.map(([, bucket]) => bucket.topicId))];
@@ -343,16 +319,13 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
       correct: bucket.correct,
       total: bucket.total,
       percent,
-      avgTime: bucket.timed ? Math.round(bucket.totalTime / bucket.timed) : null,
+      avgTime: bucket.avgTime,
       recommendation: recommendationFor(percent),
       assignableIds: assignable.map((set) => set.id),
       pendingCount: sets.length - assignable.length,
     };
   });
 
-  // Domain → skills in official order (only skills with data).
-  const skillsWithData = [...new Map(allRows.map((row) => [row.topicId, { id: row.topicId, name: row.topicName, domainId: row.domainId, domainName: row.domainName }])).values()]
-    .sort((a, b) => domainRank(a.domainId) - domainRank(b.domainId) || compareSkills(a, b));
   // Skill x difficulty matrix (skills A–Z): each cell is the most recent attempt of that skill and level.
   const cellSkills = [...new Map([...latestIndexByCell.values()].map((index) => {
     const topicId = setOf(index)!.topicId;
@@ -375,34 +348,16 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
         }),
     ),
   }));
-  const skillGroups: Array<{ label: string; rows: string[] }> = [];
-  for (const skill of skillsWithData) {
-    const label = skill.domainName || "Other";
-    const group = skillGroups.find((entry) => entry.label === label) ?? (skillGroups.push({ label, rows: [] }), skillGroups[skillGroups.length - 1]);
-    if (!group.rows.includes(skill.name)) group.rows.push(skill.name);
-  }
 
-  const trendAttempts = scoredAttempts
-    .filter((attempt) => attempt.total > 0)
-    .map((attempt) => ({ id: attempt.id, label: attempt.name, submittedAt: attempt.submittedAt }));
-  const pointsByTopic = aggregateTopicDifficultyTrend(
-    progressRows.map((row) => ({ topic: row.topic, difficulty: row.difficulty, correct: row.correct, attemptId: row.attemptId })),
-    trendAttempts,
-  );
 
   return {
     practiceArea,
     areaLabel: practiceAreaLabel(practiceArea),
     kpis: {
       attempts: scoredAttempts.length,
-      overall: { correct: overall.correct, total: overall.total, percent: overall.percent },
       totalTime: sumAttemptElapsedTime(scoredAttempts),
-      avgQuestionTime: timedRows.length ? Math.round(timedRows.reduce((sum, row) => sum + row.timeSeconds, 0) / timedRows.length) : null,
       pending: assignments.length,
     },
-    difficultyMetrics: aggregateDifficultyMetrics(progressRows),
-    topicDifficultyMetrics: aggregateTopicDifficultyMetrics(progressRows),
-    skillGroups,
     weakSkills,
     skillMatrix,
     difficultySummary,
@@ -416,7 +371,6 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
           }
         : null,
     latestSetCount: latestIndexBySet.size,
-    trend: { topics: Object.keys(pointsByTopic), pointsByTopic, attemptCount: trendAttempts.length },
     assignments: assignments.map((a) => ({
       id: a.id,
       practiceSetId: a.practiceSetId,

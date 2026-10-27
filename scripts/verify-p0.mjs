@@ -157,8 +157,9 @@ const checks = [
   },
   {
     file: "lib/pdf/student-report-document.tsx",
-    requires: ["renderToBuffer", "Helvetica-Bold", "Questions correct", "Performance by skill and difficulty", "Skills to work on next", "Teacher comments", "totalPages", "Scores by Test"],
-    label: "PDF presentable (backend, sin navegador): score ponderado, secciones por area, paginacion y resumen",
+    requires: ["renderToBuffer", "Helvetica-Bold", "Latest practice", "Last attempt per level", "Performance by skill and difficulty", "Skills to work on next", "Teacher comments", "totalPages", "Scores by Test", "report.exams.length === 1"],
+    forbids: ["Questions correct", "Average time per question", "difficultyMetrics"],
+    label: "PDF presentable (backend, sin navegador): nivel de intento (sin promedios), secciones por area, paginacion y resumen",
   },
   {
     file: "scripts/verify-authz.mjs",

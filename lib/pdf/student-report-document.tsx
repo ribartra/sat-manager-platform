@@ -129,7 +129,7 @@ function Kpis({ items }: { items: Array<{ label: string; value: string; color?: 
 const alphabetical = (a: string, b: string) => a.localeCompare(b, "en", { numeric: true, sensitivity: "base" });
 
 /** Matrix like the UI's PerformanceBreakdown: one row per label, one column per dimension. */
-function Matrix({ title, hint, rowLabel, dimensions, dimensionLabel = (d) => d, summary, detail, groups }: { title: string; hint: string; rowLabel: string; dimensions: string[]; dimensionLabel?: (dimension: string) => string; summary?: ProgressMetric[]; detail: ProgressMetric[]; groups?: Array<{ label: string; rows: string[] }> }) {
+function Matrix({ title, hint, rowLabel, dimensions, dimensionLabel = (d) => d, summary, summaryLabel = "All questions", detail, groups }: { title: string; hint: string; rowLabel: string; dimensions: string[]; dimensionLabel?: (dimension: string) => string; summary?: ProgressMetric[]; summaryLabel?: string; detail: ProgressMetric[]; groups?: Array<{ label: string; rows: string[] }> }) {
   const present = new Set(detail.map((m) => m.label));
   // Report charts are in alphabetical order: Domain header rows A–Z, skills A–Z inside each domain.
   const sections = groups
@@ -167,7 +167,7 @@ function Matrix({ title, hint, rowLabel, dimensions, dimensionLabel = (d) => d, 
         </View>
         {summary ? (
           <View style={[s.tr, { backgroundColor: GRAY[50] }]}>
-            <Text style={[s.td, s.bold, { flex: 1.6 }]}>All questions</Text>
+            <Text style={[s.td, s.bold, { flex: 1.6 }]}>{summaryLabel}</Text>
             {dimensions.map((d) => cell(d, summary.find((m) => m.difficulty === d)))}
           </View>
         ) : null}
@@ -196,17 +196,33 @@ function StatusText({ status }: { status: string }) {
   return <Text style={[s.bold, { color, fontSize: 7.5 }]}>{assignmentStatusLabel(status)}</Text>;
 }
 
+/** One attempt's result as a matrix cell (the report is attempt level: no pooled % across sets). */
+function attemptMetric(label: string, difficulty: string, cell: { correct: number; total: number }): ProgressMetric {
+  return { label, difficulty, correct: cell.correct, total: cell.total, attempts: 1, timeSeconds: 0, attemptDetails: [] };
+}
+
 function PracticeSection({ report }: { report: PracticeReport }) {
   const k = report.kpis;
-  const dims = ["EASY", "MEDIUM", "HARD"].filter((d) => report.difficultyMetrics.some((m) => m.difficulty === d));
+  const levels = ["EASY", "MEDIUM", "HARD"];
+  const lastByLevel = levels.flatMap((d) => {
+    const last = report.difficultySummary[d];
+    return last && last.total ? [attemptMetric("", d, last)] : [];
+  });
+  const cells = report.skillMatrix.flatMap((row) => Object.entries(row.cells).map(([d, cell]) => attemptMetric(row.label, d, cell)));
+  const dims = levels.filter((d) => cells.some((m) => m.difficulty === d));
+  const latest = report.attempts[0];
   return (
     <>
       <Kpis
         items={[
           { label: "Practice sets completed", value: String(k.attempts) },
-          { label: "Questions correct", value: k.overall.percent !== null ? `${k.overall.percent}%` : "-", color: band(k.overall.percent).text, sub: k.overall.total ? `${k.overall.correct} of ${k.overall.total} correct` : undefined },
+          {
+            label: "Latest practice",
+            value: latest && latest.percent !== null ? `${latest.percent}%` : "-",
+            color: band(latest?.percent ?? null).text,
+            sub: latest ? `${shortSetName(latest.name)} · ${latest.correct} of ${latest.total} correct` : undefined,
+          },
           { label: "Time practiced", value: time(k.totalTime) },
-          { label: "Average time per question", value: k.avgQuestionTime !== null ? time(k.avgQuestionTime) : "-" },
           { label: "Assignments to do", value: String(k.pending) },
         ]}
       />
@@ -216,17 +232,17 @@ function PracticeSection({ report }: { report: PracticeReport }) {
         <>
           <Matrix
             title="Performance by skill and difficulty"
-            hint="Percent of questions answered correctly. Skipped questions count as wrong."
+            hint="Each cell is the most recent attempt of that skill and level (skills A–Z). Skipped questions count as wrong."
             rowLabel="Skill"
-            dimensions={dims.length ? dims : ["EASY", "MEDIUM", "HARD"]}
+            dimensions={dims.length ? dims : levels}
             dimensionLabel={difficultyLabel}
-            summary={report.difficultyMetrics}
-            detail={report.topicDifficultyMetrics}
-            groups={report.skillGroups}
+            summary={lastByLevel}
+            summaryLabel="Last attempt per level"
+            detail={cells}
           />
           <View style={s.section}>
             <Text style={s.h2}>Skills to work on next</Text>
-            <Text style={s.hint}>Weakest skills first, with what to do next.</Text>
+            <Text style={s.hint}>Lowest last attempts first (one per skill and level), with what to do next.</Text>
             <View style={s.table}>
               <View style={s.th}>
                 <Text style={[s.thCell, { flex: 2.2 }]}>Skill (level)</Text>
@@ -404,14 +420,17 @@ function MockSection({ report }: { report: MockReport }) {
       ) : (
         <>
           <ScoreChart series={report.scoreSeries} />
-          <Matrix
-            title="Performance by section and module"
-            hint="Percent correct in each module. Skipped questions count as wrong."
-            rowLabel="Section"
-            dimensions={moduleTable.columns}
-            detail={moduleTable.detail}
-            groups={[{ label: "", rows: SECTION_ROWS }]}
-          />
+          {/* Modules of ONE Test attempt only (single-test report); across Tests it would be a pooled average. */}
+          {report.exams.length === 1 ? (
+            <Matrix
+              title="Performance by section and module"
+              hint="Percent correct in each module of this Test. Skipped questions count as wrong."
+              rowLabel="Section"
+              dimensions={moduleTable.columns}
+              detail={moduleTable.detail}
+              groups={[{ label: "", rows: SECTION_ROWS }]}
+            />
+          ) : null}
           <View style={s.section}>
             <Text style={s.h2}>Test history</Text>
             <View style={s.table}>
