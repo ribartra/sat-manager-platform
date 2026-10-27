@@ -95,3 +95,11 @@ export function assignableContentWhere(user: { id: string; role: string }, stude
   const teaching = user.role === "ADMIN" ? { deletedAt: null } : teachingProgramWhere(user.id);
   return { program: { ...teaching, enrollments: { some: { studentId, active: true, status: "APPROVED" } } } };
 }
+
+/** A practice set / Test only links questions of its own program's bank. Returns an issue or null. */
+export async function sameProgramQuestionsIssue(questionIds: string[] | null | undefined, programId: string | null | undefined) {
+  const ids = [...new Set((questionIds ?? []).filter(Boolean))];
+  if (!ids.length) return null;
+  const inProgram = await prisma.question.count({ where: { id: { in: ids }, programId: programId ?? "__none__" } });
+  return inProgram === ids.length ? null : "All questions must come from this program's question bank.";
+}

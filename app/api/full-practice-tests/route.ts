@@ -6,12 +6,15 @@ import { validateFullPracticeTestStructure } from "@/lib/full-test-validation";
 import { FULL_TEST_MODULES } from "@/lib/full-test-modules";
 import { ForbiddenError, ValidationError, withApiErrors } from "@/lib/api-error";
 import { writeAudit } from "@/lib/audit";
+import { contentProgramFor, sameProgramQuestionsIssue } from "@/lib/program-scope";
 
 export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
   if (!session) return new ForbiddenError("Forbidden").toResponse();
 
-  const { name, status, moduleQuestionIds, reviewEnabled, breakMinutes } = await req.json();
+  const { name, status, moduleQuestionIds, reviewEnabled, breakMinutes, programId: requestedProgramId } = await req.json();
+  // The Test goes to the bank of a program the author teaches, with questions of that same bank.
+  const programId = await contentProgramFor(session.user, typeof requestedProgramId === "string" ? requestedProgramId : null);
   const targetStatus = status ?? "DRAFT";
   const normalizedModules = Array.from({ length: 4 }, (_, index) => (moduleQuestionIds?.[index] ?? []) as string[]);
   const questionIds = [...new Set(normalizedModules.flat())];
@@ -39,6 +42,8 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
       moduleQuestionIds: normalizedModules,
     }),
   );
+  const programIssue = await sameProgramQuestionsIssue(questionIds, programId);
+  if (programIssue) validation.errors.push(programIssue);
   if (validation.errors.length > 0) {
     return new ValidationError("Validation failed.", [...new Set(validation.errors)], { extra: { warnings: validation.warnings } }).toResponse();
   }
@@ -48,6 +53,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
 
   const test = await prisma.fullPracticeTest.create({
     data: {
+      programId,
       name,
       status: status ?? "DRAFT",
       reviewEnabled: reviewEnabled ?? true,

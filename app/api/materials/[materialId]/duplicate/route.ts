@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { contentScopeFor } from "@/lib/program-scope";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { getFeatureSetting } from "@/lib/app-settings";
@@ -16,7 +17,7 @@ export const POST = withApiErrors(async function POST(_req: Request, { params }:
   }
 
   const { materialId } = await params;
-  const material = await prisma.studyMaterial.findUnique({ where: { id: materialId } });
+  const material = await prisma.studyMaterial.findFirst({ where: { id: materialId, ...contentScopeFor(session.user) } });
   if (!material) return new NotFoundError("Study material not found.").toResponse();
 
   const copy = await prisma.studyMaterial.create({
@@ -28,6 +29,8 @@ export const POST = withApiErrors(async function POST(_req: Request, { params }:
       topicId: material.topicId,
       status: "DRAFT",
       createdById: session.user.id,
+      // The copy stays in the same program's bank.
+      programId: material.programId,
     },
   });
 

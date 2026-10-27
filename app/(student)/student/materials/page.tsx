@@ -6,12 +6,15 @@ import { notFound } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { MathContent } from "@/components/math-content";
 import { getFeatureSetting } from "@/lib/app-settings";
+import { auth } from "@/lib/auth";
 
 export default async function StudentMaterialsPage() {
   if (!(await getFeatureSetting("MATERIALS_MODULE"))) notFound();
+  const session = await auth();
 
   const materials = await prisma.studyMaterial.findMany({
-    where: { status: "PUBLISHED" },
+    // Materials of the programs the student is enrolled in (program = tenant).
+    where: { status: "PUBLISHED", program: { deletedAt: null, enrollments: { some: { studentId: session?.user?.id ?? "__no_session__", active: true, status: "APPROVED" } } } },
     orderBy: { updatedAt: "desc" },
     include: { topic: { include: { domain: { include: { section: true } } } } },
   });

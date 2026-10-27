@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { contentScopeFor, sameProgramQuestionsIssue } from "@/lib/program-scope";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { practiceSetEditorIssues } from "@/contracts/practice-set";
@@ -23,8 +24,9 @@ export const PATCH = withApiErrors(async function PATCH(req: NextRequest, { para
     return new BadRequestError("Invalid Practice Set status.").toResponse();
   }
 
-  const practiceSet = await prisma.practiceSet.findUnique({
-    where: { id: practiceSetId },
+  // Only sets of a program the teacher teaches (shared bank).
+  const practiceSet = await prisma.practiceSet.findFirst({
+    where: { id: practiceSetId, ...contentScopeFor(session.user) },
     include: { questions: { include: { question: { select: { id: true, status: true, topicId: true } } } } },
   });
   if (!practiceSet) return new NotFoundError("Practice Set not found.").toResponse();
@@ -71,11 +73,14 @@ export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }
 
   const { practiceSetId } = await params;
   const { name, topicId, difficulty, status, explanationVisibility, questionIds } = await req.json();
-  const previous = await prisma.practiceSet.findUnique({
-    where: { id: practiceSetId },
-    select: { status: true, topicId: true, difficulty: true },
+  const previous = await prisma.practiceSet.findFirst({
+    where: { id: practiceSetId, ...contentScopeFor(session.user) },
+    select: { status: true, topicId: true, difficulty: true, programId: true },
   });
+  if (!previous) return new NotFoundError("Practice Set not found.").toResponse();
   const validationErrors = practiceSetEditorIssues({ name, topicId, difficulty, status, explanationVisibility, questionIds });
+  const programIssue = await sameProgramQuestionsIssue(Array.isArray(questionIds) ? questionIds : [], previous.programId);
+  if (programIssue) validationErrors.push(programIssue);
   if ((status || "DRAFT") === "PUBLISHED" && Array.isArray(questionIds) && questionIds.length > 0) {
     const questions = await prisma.question.findMany({
       where: { id: { in: questionIds } },
@@ -139,7 +144,7 @@ export const DELETE = withApiErrors(async function DELETE(_req: NextRequest, { p
 
   const { practiceSetId } = await params;
   const [practiceSet, assignments, groupAssignments, attempts] = await Promise.all([
-    prisma.practiceSet.findUnique({ where: { id: practiceSetId } }),
+    prisma.practiceSet.findFirst({ where: { id: practiceSetId, ...contentScopeFor(session.user) } }),
     prisma.assignment.count({ where: { practiceSetId } }),
     prisma.groupAssignment.count({ where: { practiceSetId } }),
     prisma.attempt.count({ where: { practiceSetId } }),

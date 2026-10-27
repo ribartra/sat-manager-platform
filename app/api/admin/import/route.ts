@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { contentProgramFor } from "@/lib/program-scope";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { validateQuestionPayload } from "@/lib/content-validation";
@@ -138,6 +139,8 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
 
   let created = 0;
   const errors: string[] = [];
+  // Imported questions go to the importer's program bank (program = tenant).
+  const programId = await contentProgramFor(session.user);
 
   for (const validated of validatedRows) {
     try {
@@ -164,6 +167,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
           imageUrl: row.imageUrl || null,
           explanation: row.explanation || null,
           correctAnswer: row.correctAnswer,
+          programId,
           options: type === "MC" ? { create: options } : undefined,
         },
       });

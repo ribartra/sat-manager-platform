@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { contentProgramFor } from "@/lib/program-scope";
 import { randomUUID } from "crypto";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
@@ -41,8 +42,13 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
   }
 
   const questionIds = candidates.map((candidate) => candidate.officialQuestionId).filter((id): id is string => Boolean(id));
-  const questions = await prisma.question.findMany({ where: { id: { in: questionIds } }, select: { id: true, topicId: true } });
+  const questions = await prisma.question.findMany({ where: { id: { in: questionIds } }, select: { id: true, topicId: true, programId: true } });
   if (questions.length !== questionIds.length) return new BadRequestError("Some promoted questions no longer exist.").toResponse();
+  // The set lives in its questions' program bank (all from one program).
+  const questionPrograms = new Set(questions.map((question) => question.programId));
+  if (questionPrograms.size !== 1) return new BadRequestError("All questions must come from this program's question bank.").toResponse();
+  const programId = [...questionPrograms][0] ?? (await contentProgramFor(session.user));
+  await contentProgramFor(session.user, programId);
   const topicIds = new Set(questions.map((question) => question.topicId));
   if (topicIds.size !== 1) return new BadRequestError("Practice Set questions must resolve to a single topic.").toResponse();
 
@@ -76,6 +82,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
 
     const created = await tx.practiceSet.create({
       data: {
+        programId,
         name: partial ? `${name} (partial ${questionIds.length}/${totalSourceCandidates})` : name,
         topicId: [...topicIds][0],
         difficulty: normalizeIngestDifficulty(sourceFile.difficulty ?? candidates[0]?.difficulty),

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { contentScopeFor } from "@/lib/program-scope";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { questionEditorIssues } from "@/contracts/question";
@@ -24,8 +25,9 @@ export const PATCH = withApiErrors(async function PATCH(req: NextRequest, { para
     return new BadRequestError("Invalid question status.").toResponse();
   }
 
-  const question = await prisma.question.findUnique({
-    where: { id: questionId },
+  // Only questions of a program the teacher teaches (shared bank).
+  const question = await prisma.question.findFirst({
+    where: { id: questionId, ...contentScopeFor(session.user) },
     include: { options: true },
   });
   if (!question) return new NotFoundError("Question not found.").toResponse();
@@ -70,10 +72,11 @@ export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }
 
   const { questionId } = await params;
   const { topicId, subskillId, difficulty, type, stem, stimulus, explanation, imageUrl, supportsGraph, correctAnswer, status, options } = await req.json();
-  const previous = await prisma.question.findUnique({
-    where: { id: questionId },
+  const previous = await prisma.question.findFirst({
+    where: { id: questionId, ...contentScopeFor(session.user) },
     select: { status: true, topicId: true, difficulty: true, type: true },
   });
+  if (!previous) return new NotFoundError("Question not found.").toResponse();
   const validationErrors = questionEditorIssues({
     topicId,
     difficulty,
@@ -166,7 +169,7 @@ export const DELETE = withApiErrors(async function DELETE(_req: NextRequest, { p
 
   const { questionId } = await params;
   const [question, practiceSetLinks, fullTestLinks, attemptAnswers] = await Promise.all([
-    prisma.question.findUnique({ where: { id: questionId } }),
+    prisma.question.findFirst({ where: { id: questionId, ...contentScopeFor(session.user) } }),
     prisma.practiceSetQuestion.count({ where: { questionId } }),
     prisma.fullPracticeTestQuestion.count({ where: { questionId } }),
     prisma.attemptAnswer.count({ where: { questionId } }),

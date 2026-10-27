@@ -3,7 +3,7 @@ import { getFeatureSetting } from "@/lib/app-settings";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { parseDueDate, parseUnlockDate, upsertPracticeAssignment, type AssignmentOutcome } from "@/lib/assignments";
-import { studentAccessWhereFor } from "@/lib/program-scope";
+import { contentScopeFor, studentAccessWhereFor } from "@/lib/program-scope";
 import { BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 import { writeAudit } from "@/lib/audit";
 
@@ -36,8 +36,9 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
       select: { id: true },
     }),
     prisma.practiceSet.findMany({
-      where: { id: { in: requestedPracticeSetIds }, status: "PUBLISHED" },
-      select: { id: true, name: true },
+      // Bank scope: sets of a program the teacher teaches.
+      where: { id: { in: requestedPracticeSetIds }, status: "PUBLISHED", ...contentScopeFor(session.user) },
+      select: { id: true, name: true, programId: true },
     }),
   ]);
 
@@ -52,6 +53,17 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
 
   if (unavailablePracticeSetIds.length > 0) {
     return new BadRequestError("Only published practice sets can be assigned.").toResponse();
+  }
+
+  // Each student must be enrolled in the program of every set assigned to them.
+  const setProgramIds = [...new Set(publishedPracticeSets.map((practiceSet) => practiceSet.programId ?? "__none__"))];
+  const enrollments = await prisma.programEnrollment.findMany({
+    where: { studentId: { in: requestedStudentIds }, programId: { in: setProgramIds }, active: true, status: "APPROVED" },
+    select: { studentId: true, programId: true },
+  });
+  const enrolled = new Set(enrollments.map((enrollment) => `${enrollment.studentId}:${enrollment.programId}`));
+  if (requestedStudentIds.some((studentId) => setProgramIds.some((programId) => !enrolled.has(`${studentId}:${programId}`)))) {
+    return new BadRequestError("Only practice sets from the student's program can be assigned.").toResponse();
   }
 
   if (sourceGroupId) {

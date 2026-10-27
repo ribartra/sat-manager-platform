@@ -337,6 +337,42 @@ const checks = [
     requires: ["sourceGroupId", "TEACHER_GROUP_MANAGEMENT", "Teacher group assignment is disabled"],
     label: "Practice Set group assignment is gated by admin-configured teacher permission",
   },
+  {
+    file: "lib/program-scope.ts",
+    requires: ["teacherId,", "export function contentScopeFor", "export async function contentProgramFor", "sameProgramQuestionsIssue"],
+    label: "Program is the tenant: students per owner teacher, bank shared per program",
+  },
+  {
+    file: "app/api/auth/activate/route.ts",
+    requires: ["teacherId: ownerId", "programTeacher.create"],
+    forbids: ["Program of "],
+    label: "Activation: invited teacher joins the inviter's program; student enrollment has an owner",
+  },
+  {
+    file: "app/api/teachers/invites/[inviteId]/revoke/route.ts",
+    requires: ["assertTeacherManager", "revokedAt: null", "INVITE_REVOKED"],
+    label: "Master teacher can revoke only pending teacher invitations of their programs",
+  },
+  ...[
+    "app/api/questions/[questionId]/route.ts",
+    "app/api/questions/[questionId]/duplicate/route.ts",
+    "app/api/practice-sets/[practiceSetId]/route.ts",
+    "app/api/practice-sets/[practiceSetId]/duplicate/route.ts",
+    "app/api/full-practice-tests/[testId]/route.ts",
+    "app/api/full-practice-tests/[testId]/duplicate/route.ts",
+    "app/api/full-practice-tests/[testId]/assign/route.ts",
+    "app/api/materials/[materialId]/route.ts",
+    "app/api/materials/[materialId]/duplicate/route.ts",
+    "app/api/assignments/route.ts",
+  ].map((file) => ({ file, requires: ["contentScopeFor"], label: `Bank scope (program) on ${file}` })),
+  ...[
+    "app/api/questions/route.ts",
+    "app/api/practice-sets/route.ts",
+    "app/api/full-practice-tests/route.ts",
+    "app/api/materials/route.ts",
+    "app/api/admin/import/route.ts",
+    "app/api/admin/ai-import/batches/[batchId]/promote-questions/route.ts",
+  ].map((file) => ({ file, requires: ["contentProgramFor"], label: `New content gets a program on ${file}` })),
 ];
 
 let hasFailures = false;

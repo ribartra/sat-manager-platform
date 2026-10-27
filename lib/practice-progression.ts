@@ -97,7 +97,7 @@ async function ensureUnlockedAssignment(studentId: string, practiceSetId: string
 export async function applyPracticeProgression({ studentId, practiceSetId, scorePercent }: ProgressionInput) {
   const current = await prisma.practiceSet.findUnique({
     where: { id: practiceSetId },
-    select: { id: true, topicId: true, difficulty: true, createdAt: true, name: true },
+    select: { id: true, topicId: true, difficulty: true, createdAt: true, name: true, programId: true },
   });
   if (!current) return;
 
@@ -108,6 +108,8 @@ export async function applyPracticeProgression({ studentId, practiceSetId, score
       topicId: current.topicId,
       difficulty: current.difficulty,
       status: "PUBLISHED",
+      // Only the next set of the same program's bank (program = tenant).
+      programId: current.programId,
     },
     orderBy: [{ createdAt: "asc" }, { name: "asc" }],
     select: { id: true },
@@ -128,6 +130,8 @@ export async function applyPracticeProgression({ studentId, practiceSetId, score
       topicId: current.topicId,
       difficulty: nextDifficulty,
       status: "PUBLISHED",
+      // Only the next set of the same program's bank (program = tenant).
+      programId: current.programId,
     },
     orderBy: [{ createdAt: "asc" }, { name: "asc" }],
     select: { id: true },

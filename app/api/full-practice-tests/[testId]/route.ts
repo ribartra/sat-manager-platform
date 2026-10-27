@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { contentScopeFor, sameProgramQuestionsIssue } from "@/lib/program-scope";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { fullTestEditorFieldIssues } from "@/contracts/full-test";
@@ -38,7 +39,8 @@ export const PATCH = withApiErrors(async function PATCH(req: NextRequest, { para
     reviewEnabled?: boolean;
     breakMinutes?: number;
   };
-  const test = await prisma.fullPracticeTest.findUnique({ where: { id: testId } });
+  // Only Tests of a program the teacher teaches (shared bank).
+  const test = await prisma.fullPracticeTest.findFirst({ where: { id: testId, ...contentScopeFor(session.user) } });
   if (!test) return new NotFoundError("Test not found.").toResponse();
 
   const data: { status?: string; name?: string; reviewEnabled?: boolean; breakMinutes?: number } = {};
@@ -85,7 +87,7 @@ export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }
   const { testId } = await params;
   const { name, status, moduleQuestionIds, reviewEnabled, breakMinutes } = await req.json();
   const targetStatus = status ?? "DRAFT";
-  const previous = await prisma.fullPracticeTest.findUnique({ where: { id: testId } });
+  const previous = await prisma.fullPracticeTest.findFirst({ where: { id: testId, ...contentScopeFor(session.user) } });
   if (!previous) return new NotFoundError("Test not found.").toResponse();
 
   const normalizedModules = Array.from({ length: 4 }, (_, index) => (moduleQuestionIds?.[index] ?? []) as string[]);
@@ -108,6 +110,8 @@ export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }
       moduleQuestionIds: normalizedModules,
     }),
   );
+  const programIssue = await sameProgramQuestionsIssue(questionIds, previous.programId);
+  if (programIssue) validation.errors.push(programIssue);
   if (validation.errors.length > 0) {
     return new ValidationError("Validation failed.", [...new Set(validation.errors)], { extra: { warnings: validation.warnings } }).toResponse();
   }
@@ -155,7 +159,7 @@ export const DELETE = withApiErrors(async function DELETE(_req: NextRequest, { p
 
   const { testId } = await params;
   const [test, assignments, attempts] = await Promise.all([
-    prisma.fullPracticeTest.findUnique({ where: { id: testId } }),
+    prisma.fullPracticeTest.findFirst({ where: { id: testId, ...contentScopeFor(session.user) } }),
     prisma.fullPracticeTestAssignment.count({ where: { testId } }),
     prisma.fullPracticeTestAttempt.count({ where: { testId } }),
   ]);

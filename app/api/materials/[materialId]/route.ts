@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { contentScopeFor } from "@/lib/program-scope";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { getFeatureSetting } from "@/lib/app-settings";
@@ -25,6 +26,9 @@ export const PATCH = withApiErrors(async function PATCH(req: NextRequest, { para
 
   const { materialId } = await params;
   const { title, description, body, url, topicId, status } = await req.json();
+  // Only materials of a program the teacher teaches (shared bank).
+  const existing = await prisma.studyMaterial.findFirst({ where: { id: materialId, ...contentScopeFor(session.user) }, select: { id: true } });
+  if (!existing) return new NotFoundError("Study material not found.").toResponse();
 
   const material = await prisma.studyMaterial.update({
     where: { id: materialId },
@@ -60,7 +64,7 @@ export const DELETE = withApiErrors(async function DELETE(_req: NextRequest, { p
   if (disabled) return disabled;
 
   const { materialId } = await params;
-  const material = await prisma.studyMaterial.findUnique({ where: { id: materialId } });
+  const material = await prisma.studyMaterial.findFirst({ where: { id: materialId, ...contentScopeFor(session.user) } });
   if (!material) return new NotFoundError("Study material not found.").toResponse();
 
   await prisma.studyMaterial.delete({ where: { id: materialId } });

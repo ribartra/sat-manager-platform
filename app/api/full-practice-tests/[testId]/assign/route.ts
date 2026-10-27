@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { contentScopeFor } from "@/lib/program-scope";
 import { revalidatePath } from "next/cache";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
@@ -22,14 +23,20 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
   }
 
   const counts: Record<AssignmentOutcome, number> = { created: 0, updated: 0, reassigned: 0, unchanged: 0 };
-  const test = await prisma.fullPracticeTest.findUnique({ where: { id: testId } });
+  // Only Tests of a program the teacher teaches (shared bank).
+  const test = await prisma.fullPracticeTest.findFirst({ where: { id: testId, ...contentScopeFor(session.user) } });
   if (!test) return new NotFoundError("Test not found.").toResponse();
   if (test.status !== "PUBLISHED") {
     return new BadRequestError("Only published exams can be assigned.").toResponse();
   }
 
   const allowedStudents = await prisma.user.findMany({
-    where: { id: { in: requestedStudentIds }, ...studentAccessWhereFor(session.user) },
+    // The teacher's own students, enrolled in the Test's program (content stays inside its tenant).
+    where: {
+      id: { in: requestedStudentIds },
+      ...studentAccessWhereFor(session.user),
+      AND: [{ programEnrollments: { some: { programId: test.programId ?? "__none__", active: true, status: "APPROVED" } } }],
+    },
     select: { id: true },
   });
   const allowedStudentIds = new Set(allowedStudents.map((student) => student.id));

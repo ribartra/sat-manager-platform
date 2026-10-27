@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { contentProgramFor } from "@/lib/program-scope";
 import { randomUUID } from "crypto";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
@@ -57,6 +58,11 @@ export const POST = withApiErrors(async function POST(req: Request, { params }: 
   if (questions.length !== questionIds.length) {
     return new BadRequestError("Some promoted questions no longer exist.").toResponse();
   }
+  // The Test lives in its questions' program bank (all from one program).
+  const questionPrograms = new Set(questions.map((question) => question.programId));
+  if (questionPrograms.size !== 1) return new BadRequestError("All questions must come from this program's question bank.").toResponse();
+  const programId = [...questionPrograms][0] ?? (await contentProgramFor(session.user));
+  await contentProgramFor(session.user, programId);
   const sectionByQuestion = new Map(
     questions.map((question) => [question.id, question.topic.domain.section.name === "MATH" ? "MATH" : "RW"]),
   );
@@ -127,6 +133,7 @@ export const POST = withApiErrors(async function POST(req: Request, { params }: 
 
     const created = await tx.fullPracticeTest.create({
       data: {
+        programId,
         name: testName,
         status: "DRAFT",
         modules: {

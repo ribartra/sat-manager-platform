@@ -4,6 +4,7 @@ import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { questionEditorIssues } from "@/contracts/question";
 import { materializeOfficialImageUrl } from "@/lib/ingest-promotion";
+import { contentProgramFor } from "@/lib/program-scope";
 import { ForbiddenError, NotFoundError, ValidationError, withApiErrors } from "@/lib/api-error";
 
 export const POST = withApiErrors(async function POST(req: NextRequest) {
@@ -13,7 +14,9 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
   }
 
   const data = await req.json();
-  const { topicId, subskillId, difficulty, type, stem, stimulus, explanation, imageUrl, supportsGraph, correctAnswer, status, options, ingestCandidateId } = data;
+  const { topicId, subskillId, difficulty, type, stem, stimulus, explanation, imageUrl, supportsGraph, correctAnswer, status, options, ingestCandidateId, programId: requestedProgramId } = data;
+  // The question goes to the bank of a program the author teaches (shared by its teachers).
+  const programId = await contentProgramFor(session.user, typeof requestedProgramId === "string" ? requestedProgramId : null);
   const validationErrors = questionEditorIssues({
     topicId,
     difficulty,
@@ -48,6 +51,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
   const question = await prisma.$transaction(async (tx) => {
     const created = await tx.question.create({
       data: {
+        programId,
         topicId,
         subskillId: subskillId || null,
         difficulty,

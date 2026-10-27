@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { contentScopeFor } from "@/lib/program-scope";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
@@ -12,14 +13,16 @@ export const POST = withApiErrors(async function POST(_req: Request, { params }:
   if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { practiceSetId } = await params;
-  const practiceSet = await prisma.practiceSet.findUnique({
-    where: { id: practiceSetId },
+  const practiceSet = await prisma.practiceSet.findFirst({
+    where: { id: practiceSetId, ...contentScopeFor(session.user) },
     include: { questions: { orderBy: { order: "asc" } } },
   });
   if (!practiceSet) return new NotFoundError("Practice Set not found.").toResponse();
 
   const copy = await prisma.practiceSet.create({
     data: {
+      // The copy stays in the same program's bank.
+      programId: practiceSet.programId,
       name: `${practiceSet.name} Copy`,
       topicId: practiceSet.topicId,
       difficulty: practiceSet.difficulty,

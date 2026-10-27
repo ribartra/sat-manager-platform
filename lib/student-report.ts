@@ -301,7 +301,8 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
   const weakTopicIds = [...new Set(weakest.map(([, bucket]) => bucket.topicId))];
   const setsForWeakSkills = weakTopicIds.length
     ? await prisma.practiceSet.findMany({
-        where: { topicId: { in: weakTopicIds }, status: "PUBLISHED" },
+        // Assignable only from a program the student is enrolled in (program = tenant).
+        where: { topicId: { in: weakTopicIds }, status: "PUBLISHED", program: { deletedAt: null, enrollments: { some: { studentId, active: true, status: "APPROVED" } } } },
         select: { id: true, topicId: true, difficulty: true, assignments: { where: { studentId }, select: { status: true } } },
         orderBy: { createdAt: "asc" },
       })

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { contentProgramFor } from "@/lib/program-scope";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { getFeatureSetting } from "@/lib/app-settings";
@@ -13,7 +14,9 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
     return new ForbiddenError("Materials module is disabled.").toResponse();
   }
 
-  const { title, description, body, url, topicId, status } = await req.json();
+  const { title, description, body, url, topicId, status, programId: requestedProgramId } = await req.json();
+  // The material goes to the bank of a program the author teaches (shared by its teachers).
+  const programId = await contentProgramFor(session.user, typeof requestedProgramId === "string" ? requestedProgramId : null);
   if (!title || typeof title !== "string") {
     return new BadRequestError("Title is required").toResponse();
   }
@@ -27,6 +30,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
       topicId: typeof topicId === "string" && topicId ? topicId : null,
       status: typeof status === "string" ? status : "PUBLISHED",
       createdById: session.user.id,
+      programId,
     },
   });
 

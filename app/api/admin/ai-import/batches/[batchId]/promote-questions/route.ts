@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { contentProgramFor } from "@/lib/program-scope";
 import { randomUUID } from "crypto";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
@@ -37,6 +38,8 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
   if (candidateIds.length === 0) return new BadRequestError("candidateIds is required.").toResponse();
   if (candidateIds.length > 250) return new PayloadTooLargeError("Promote at most 250 questions at a time.").toResponse();
   const resync = body.resync === true;
+  // New official questions go to the promoter's program bank (program = tenant).
+  const programId = await contentProgramFor(session.user);
 
   const [candidates, topics, rawLinks] = await Promise.all([
     prisma.ingestQuestionCandidate.findMany({
@@ -180,6 +183,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
           supportsGraph: Boolean(draft.supportsGraph),
           correctAnswer: draft.correctAnswer,
           status: draft.status,
+          programId,
           options: draft.type === "MC"
             ? {
                 create: officialOptions
