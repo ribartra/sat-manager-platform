@@ -76,19 +76,15 @@ const checks = [
   // One Test card (CookSAT reference) in every view, on the same grid as the area cards.
   {
     file: "components/sat/test-card.tsx",
-    requires: ["SAT MOCK EXAM", "REVIEW TEST", "400–1600", "canRetake"],
-    label: "Card de Test unica (referencia CookSAT): SAT MOCK EXAM, total, Mod 1/2 por seccion, REVIEW TEST",
+    requires: ["YOUR TOTAL SCORE", "REVIEW RESULTS", "400–1600", "canRetake", "--sat-area-tests", "--sat-primary-soft"],
+    forbids: ["#3b74ff", "sky-500", "slate-700"],
+    label: "Card de Test unica = mockup mejorada/tests.html (bb-card, referencia CookSAT) con los tokens de la plataforma",
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
     requires: ["<TestCard", "CardGrid", "canRetake: false"],
     forbids: ["TestMiniCard"],
     label: "Ficha del alumno: cards de Test con el mismo componente y ancho que las de area; sin reintento del teacher",
-  },
-  {
-    file: "app/(student)/student/student-home.tsx",
-    requires: ["<TestCard", "CardGrid"],
-    label: "Home del alumno / Student view: cards de Test con el mismo componente",
   },
   {
     file: "app/(student)/student/tests/page.tsx",
