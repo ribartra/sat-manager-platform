@@ -648,11 +648,18 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
   });
   const practiceSets = [...attemptsBySet.entries()].map(([key, tries]) => {
     const last = tries.find((attempt) => attempt.status === "SUBMITTED") ?? tries[0];
+    // Progress within the set: % points vs. the previous counted try (same rule as History).
+    const withChange = (attempt: (typeof tries)[number]) => {
+      const previous = attempt.status === "SUBMITTED" && attempt.percent !== null
+        ? tries.slice(tries.indexOf(attempt) + 1).find((older) => older.status === "SUBMITTED" && older.percent !== null)
+        : undefined;
+      return { ...attemptRow(attempt), change: previous ? attempt.percent! - previous.percent! : null };
+    };
     return {
       key,
       tryCount: Math.max(...tries.map((attempt) => attempt.attemptNumber ?? 1)),
-      last: attemptRow(last),
-      recent: tries.slice(0, 3).map(attemptRow),
+      last: withChange(last),
+      recent: tries.slice(0, 3).map(withChange),
       title: (
         <>
           {shortSetName(last.name)}

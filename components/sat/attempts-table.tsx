@@ -5,6 +5,7 @@ import { SectionHead } from "@/components/sat/test-ui";
 import { ChevronCell, LinkTr, RowLink, SimpleTable, TD } from "@/components/sat/link-table";
 import { TestSectionScore, TestTotalCell } from "@/components/sat/test-cards";
 import { Pct } from "@/components/sat/work-status";
+import { Delta } from "@/components/sat/stat-tile";
 import { AttemptStatusBadge, VoidableValue, invalidatedRowClass, isInvalidated } from "@/components/sat/attempt-status";
 import type { TestAttemptRow } from "@/lib/test-assignments";
 import { formatDate, formatDuration, relativeDay } from "@/lib/utils";
@@ -43,6 +44,8 @@ export interface PracticeAttemptRow {
   tryCount?: number;
   /** Set name + badges, for lists that mix sets. */
   title?: React.ReactNode;
+  /** % points vs. the previous counted try of the same set; shown as a "Change" column when present. */
+  change?: number | null;
 }
 
 export function PracticeAttemptsTable({
@@ -58,9 +61,10 @@ export function PracticeAttemptsTable({
 }) {
   const counted = rows.filter((r) => !isInvalidated(r.status) && r.pct !== null);
   const mixed = rows.some((r) => r.title);
+  const withChange = rows.some((r) => r.change !== undefined);
   const bestId = showBest && !mixed && counted.length > 1 ? counted.reduce((b, r) => ((r.pct ?? -1) > (b.pct ?? -1) ? r : b)).id : null;
   return (
-    <SimpleTable head={[...(mixed ? ["Practice set"] : []), "Attempt", "Completed", "Score", "Correct", "Time", ""]}>
+    <SimpleTable head={[...(mixed ? ["Practice set"] : []), "Attempt", "Completed", "Score", ...(withChange ? ["Change"] : []), "Correct", "Time", ""]}>
       {rows.map((r) => (
         <AttemptTr key={r.id} viewing={r.id === viewingId} className={invalidatedRowClass(r.status)}>
           {mixed ? <td className={TD}><AttemptLink viewing={r.id === viewingId} href={hrefFor(r.id)}>{r.title}</AttemptLink></td> : null}
@@ -74,6 +78,7 @@ export function PracticeAttemptsTable({
             {r.submittedAt ? <>{formatDate(r.submittedAt)}<span className="block text-xs text-gray-400">{relativeDay(r.submittedAt)}</span></> : "—"}
           </td>
           <td className={TD}><VoidableValue status={r.status}><Pct value={r.pct} className="font-semibold" /></VoidableValue></td>
+          {withChange ? <td className={TD}>{r.change !== null && r.change !== undefined ? <Delta value={r.change} unit="pts" /> : <span className="text-gray-300">—</span>}</td> : null}
           <td className={TD}>{r.correct} of {r.total}</td>
           <td className={`${TD} text-gray-600`}>{r.time ? formatDuration(r.time) : "—"}</td>
           {r.id === viewingId ? null : <ChevronCell />}
@@ -191,12 +196,15 @@ export function PracticeSetAttemptsAccordion({
   return (
     <GroupedAttemptsAccordion
       head={["Practice set", "Last Attempt", "Correct", "Time", "Completed"]}
-      cols="md:grid-cols-[minmax(0,1fr)_7rem_6rem_6rem_8rem_1.5rem]"
+      cols="md:grid-cols-[minmax(0,1fr)_8rem_6rem_6rem_8rem_1.5rem]"
       groups={sets.map((set) => ({
         key: set.key,
         summary: [
           <>{set.title}<TriesCount count={set.tryCount} /></>,
-          <VoidableValue key="pct" status={set.last.status}><Pct value={set.last.pct} className="font-semibold" /></VoidableValue>,
+          <span key="pct" className="whitespace-nowrap">
+            <VoidableValue status={set.last.status}><Pct value={set.last.pct} className="font-semibold" /></VoidableValue>
+            {set.last.change !== null && set.last.change !== undefined ? <Delta value={set.last.change} unit="" className="ml-1.5" /> : null}
+          </span>,
           <>{set.last.correct} of {set.last.total}</>,
           <span key="t" className="text-gray-600">{set.last.time ? formatDuration(set.last.time) : "—"}</span>,
           <span key="d" className="text-gray-600">{set.last.submittedAt ? formatDate(set.last.submittedAt) : "—"}</span>,
