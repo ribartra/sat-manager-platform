@@ -19,7 +19,7 @@ export interface TestCardLinks {
 }
 
 /**
- * Test card (CookSAT reference, reportes/cooksat-reference.webp), the same component in every view:
+ * Test card (CookSAT reference layout, reportes/cooksat-reference.webp, in this platform's palette), the same component in every view:
  * name, "SAT MOCK EXAM" + date, total score (400–1600), each section with its score and Mod 1 / Mod 2
  * (correct / questions), and REVIEW TEST (+ retake). Attempt level: the open attempt, else the LAST
  * finished one — never the best. Every try is listed in the view's attempts accordion.
@@ -52,10 +52,10 @@ export function TestCard({ item, links }: { item: StudentTestItem; links: TestCa
     const classes = cn(
       "flex items-center justify-between rounded-lg border-b-[3px] px-3 py-2 text-sm font-bold",
       m.state === "done"
-        ? "border-b-sky-700 bg-sky-500 text-white"
+        ? "border-b-blue-800 bg-blue-600 text-white"
         : m.state === "progress"
           ? "border-b-amber-500 bg-amber-200 text-amber-900"
-          : "border-b-sky-200 bg-sky-50 text-sky-800",
+          : "border-b-blue-200 bg-blue-50 text-blue-800",
       href && "hover:brightness-[.97]",
     );
     return href ? (
@@ -96,12 +96,12 @@ export function TestCard({ item, links }: { item: StudentTestItem; links: TestCa
 
   return (
     <div id={`test-${item.assignmentId}`} className="flex min-w-0 scroll-mt-6 flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-      <div className={cn("px-4 py-3", late ? "bg-red-600" : "bg-[#3b74ff]")}>
-        <h2 className="truncate text-2xl font-black text-white">
+      <div className={cn("px-4 py-3", late ? "bg-red-600 text-white" : "bg-[var(--sat-area-tests)] text-[var(--sat-tests-ink)]")}>
+        <h2 className="truncate text-2xl font-black">
           {mainHref ? <Link href={mainHref} className="hover:underline">{item.name}</Link> : item.name}
         </h2>
       </div>
-      <div className="flex items-center justify-between gap-2 bg-slate-700 px-4 py-1.5 text-[11px] font-bold text-white">
+      <div className="flex items-center justify-between gap-2 bg-[#8f8f8f] px-4 py-1.5 text-[11px] font-bold text-white">
         <span className="tracking-wide">SAT MOCK EXAM</span>
         <span className="font-medium">{dateLine}</span>
       </div>
@@ -116,7 +116,7 @@ export function TestCard({ item, links }: { item: StudentTestItem; links: TestCa
         {mainHref ? (
           <Link
             href={mainHref}
-            className="flex-1 whitespace-nowrap rounded-lg border-b-[3px] border-b-blue-800 bg-[#3b74ff] px-3 py-2.5 text-center text-base font-extrabold text-white hover:brightness-105"
+            className="flex-1 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-3 py-2.5 text-center text-base font-extrabold text-white hover:bg-[var(--sat-primary-dark)]"
           >
             {mainLabel}
           </Link>
