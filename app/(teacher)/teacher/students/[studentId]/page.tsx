@@ -596,6 +596,12 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
     const href = buildProgressHref(`/teacher/students/${studentId}/assign`, filters, overrides);
     return `${href}${href.includes("?") ? "&" : "?"}${new URLSearchParams(extra).toString()}`;
   };
+  // Low performance (moved here from Home): this student's last attempt of a skill × level under 50%,
+  // attempt level only, lowest first.
+  const LOW = 50;
+  const lowCells = report.skillMatrix
+    .flatMap((row) => DIFFICULTIES.flatMap((d) => (row.cells[d] && row.cells[d].percent < LOW ? [{ row, difficulty: d, cell: row.cells[d] }] : [])))
+    .sort((a, b) => a.cell.percent - b.cell.percent);
   return (
     <PageShell maxWidth={1180} width="wide">
       {header}
@@ -612,6 +618,37 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
 
       <div className="mt-4 grid gap-6 lg:grid-cols-3">
         <div id="performance" className="min-w-0 space-y-6 lg:col-span-2">
+          {lowCells.length > 0 ? (
+            <section className="min-w-0">
+              <div className="grid gap-3 md:grid-cols-3">
+                {lowCells.slice(0, 3).map(({ row, difficulty: d, cell }) => (
+                  <Card key={`${row.topicId}:${d}`} variant="danger" padding="sm" className="min-w-0">
+                    <p className="text-xs font-medium text-red-700">Low performance</p>
+                    <p className="mt-1 truncate text-sm font-semibold text-gray-900">{row.label} ({difficultyLabel(d)})</p>
+                    <p className="mt-1 text-xs text-gray-600">
+                      Last attempt{" "}
+                      <Link href={buildProgressHref(`/teacher/students/${studentId}/attempts/${cell.attemptId}`, filters)} className="font-semibold hover:underline">
+                        {cell.percent}%
+                      </Link>{" "}
+                      ({cell.correct} of {cell.total})
+                    </p>
+                    <Link
+                      href={assignHref({ topic: row.topicId, difficulty: d }, { domain: row.domainId })}
+                      className="mt-1 inline-block text-xs font-medium text-blue-600 hover:underline"
+                    >
+                      Assign a set
+                    </Link>
+                  </Card>
+                ))}
+              </div>
+              {lowCells.length > 3 ? (
+                <p className="mt-2 text-xs text-gray-500">
+                  +{lowCells.length - 3} more under {LOW}% — <a href="#skills-matrix" className="underline hover:no-underline">see the skills table below</a>
+                </p>
+              ) : null}
+            </section>
+          ) : null}
+
           <DifficultySummaryCard
             area={practiceArea}
             label={`${areaLabel} practice`}
@@ -644,7 +681,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
             emptyText={`No ${areaLabel} practice yet.`}
           />
 
-          <section className="min-w-0">
+          <section id="skills-matrix" className="min-w-0">
             <SectionHeader
               title={`${areaLabel} skills by difficulty`}
               description="Practice only · each cell is the most recent attempt of that skill and level · click a cell to open it"

@@ -4,6 +4,19 @@ import path from "node:path";
 const root = process.cwd();
 
 const checks = [
+  // Home: no "Overdue tests" / "Section under 550" in Summary and no low-performance cards in the
+  // section tabs; low performance is shown per student on the student's section tab.
+  {
+    file: "app/(teacher)/teacher/page.tsx",
+    requires: ["Inactive 5+ days"],
+    forbids: ["Overdue tests", "Section under 550", "Low performance"],
+    label: "Teacher Home: Summary keeps only inactivity; no low-performance cards",
+  },
+  {
+    file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
+    requires: ["Low performance", "lowCells", "report.skillMatrix"],
+    label: "Student section tab shows the student's low-performance warnings",
+  },
   // No parent approval step (consent = Terms accepted at activation): the student page only says the
   // parent's email is missing and lets the teacher add it; enrollments never wait for a parent.
   {

@@ -22,7 +22,7 @@ import Link from "next/link";
 import { formatDate, relativeDay } from "@/lib/utils";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Flag, TrendingDown, UserPlus } from "lucide-react";
+import { Clock, UserPlus } from "lucide-react";
 import { UnlockRequestActions } from "./unlock-request-actions-client";
 import { auth } from "@/lib/auth";
 import { getFeatureSetting } from "@/lib/app-settings";
@@ -179,8 +179,6 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
     }
 
     const inactive = rows.filter((s) => isInactive(s.lastActiveAt, now));
-    const overdueTests = rows.filter((s) => s.tests.pending.some((p) => p.overdue));
-    const lowScores = rows.filter((s) => s.tests.lowSection);
     return (
       <PageShell maxWidth={1180} width="wide" density="compact" className="space-y-4">
         {head(rows.length)}
@@ -196,30 +194,6 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
               name: s.name,
               href: `/teacher/students/${s.id}`,
               detail: s.lastActiveAt ? `Last active ${relativeDay(s.lastActiveAt, now)}` : "Never active",
-            }))}
-          />
-          <AttentionRow
-            icon={<Flag size={14} />}
-            label="Overdue tests"
-            tone="bad"
-            viewAllHref="/teacher?area=tests"
-            people={overdueTests.map((s) => ({
-              id: s.id,
-              name: s.name,
-              href: `/teacher/students/${s.id}?area=tests`,
-              detail: s.tests.pending.filter((p) => p.overdue).map((p) => p.name).join(", "),
-            }))}
-          />
-          <AttentionRow
-            icon={<TrendingDown size={14} />}
-            label="Section under 550"
-            tone="info"
-            viewAllHref="/teacher?area=tests"
-            people={lowScores.map((s) => ({
-              id: s.id,
-              name: s.name,
-              href: `/teacher/students/${s.id}?area=tests`,
-              detail: `${s.tests.latest?.name ?? ""} · R&W ${s.tests.latest?.rw ?? "—"} · Math ${s.tests.latest?.math ?? "—"}`,
             }))}
           />
         </Card>
@@ -397,10 +371,8 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
     if (!lastActiveAt) return true;
     return lastActiveAt < fiveDaysAgo;
   });
-  // Attempt level only (no averages across sets or students): each student's LAST attempt of each
-  // skill × level. "Low performance" counts students whose last attempt there is under 50%.
-  const LOW = 50;
-  const cells = new Map<string, { label: string; topicId: string; difficulty: string; students: number; low: number; lowest: number }>();
+  // Attempt level only (no averages across sets): each student's LAST attempt of each skill × level,
+  // used for the "weakest skill" column. Low-performance warnings live on the student's own page.
   const studentLast = new Map<string, Map<string, { label: string; pct: number }>>();
   for (const student of students) {
     const mine = new Map<string, { label: string; pct: number }>();
@@ -411,21 +383,10 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
       const key = `${practiceSet.topicId}:${practiceSet.difficulty}`;
       const score = summarizeAllQuestionAnswers(attempt.answers);
       if (mine.has(key) || score.percent === null) continue;
-      const label = `${practiceSet.topic.name} (${difficultyLabel(practiceSet.difficulty)})`;
-      mine.set(key, { label, pct: score.percent });
-      const cell = cells.get(key) ?? { label, topicId: practiceSet.topicId, difficulty: practiceSet.difficulty, students: 0, low: 0, lowest: 100 };
-      cell.students += 1;
-      if (score.percent < LOW) cell.low += 1;
-      cell.lowest = Math.min(cell.lowest, score.percent);
-      cells.set(key, cell);
+      mine.set(key, { label: `${practiceSet.topic.name} (${difficultyLabel(practiceSet.difficulty)})`, pct: score.percent });
     }
     studentLast.set(student.id, mine);
   }
-  const lowPerformance = Array.from(cells.values())
-    .filter((cell) => cell.low > 0)
-    .sort((a, b) => b.low - a.low || a.lowest - b.lowest)
-    .slice(0, 3);
-
   return (
     <PageShell maxWidth={1180} width="wide" density="compact" className="space-y-4">
       {head(students.length)}
@@ -485,28 +446,6 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
             {unlockCount > 0 && <p><strong>{unlockCount}</strong> unlock request{unlockCount > 1 ? "s" : ""} waiting for you.</p>}
           </div>
         </Alert>
-      )}
-
-      {lowPerformance.length > 0 && (
-        <div className="mb-5 grid gap-3 md:grid-cols-3">
-          {lowPerformance.map((bucket) => (
-            <Card
-              key={bucket.label}
-              as={Link}
-              href={`/teacher?area=${area}&topic=${bucket.topicId}&difficulty=${bucket.difficulty}`}
-              title="See the students' results for this skill and level"
-              variant="danger"
-              padding="sm"
-              className="block min-w-0"
-            >
-              <p className="text-xs font-medium text-red-700">Low performance</p>
-              <p className="mt-1 truncate text-sm font-semibold text-gray-900">{bucket.label}</p>
-              <p className="mt-1 text-xs text-gray-600">
-                {bucket.low} of {bucket.students} student{bucket.students !== 1 ? "s" : ""} under {LOW}% on their last attempt
-              </p>
-            </Card>
-          ))}
-        </div>
       )}
 
       {unlockRequests.length > 0 && (

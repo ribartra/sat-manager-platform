@@ -25,8 +25,6 @@ export interface TestsOverview {
   latest: { id: string; name: string; submittedAt: Date | null; rw: number | null; math: number | null; total: number | null } | null;
   inProgress: number;
   pending: { name: string; overdue: boolean; testId: string }[];
-  /** Latest test has a section under 550. */
-  lowSection: boolean;
 }
 
 export interface StudentOverview {
@@ -156,7 +154,6 @@ export async function loadStudentOverviews(studentIds: string[], now = new Date(
         : null,
       inProgress: s.fullTestAttempts.filter((a) => a.status === "IN_PROGRESS").length,
       pending: s.fullTestAssignments.map((a) => ({ name: a.test.name, testId: a.testId, overdue: a.status === "OVERDUE" || Boolean(a.dueDate && a.dueDate < now) })),
-      lowSection: Boolean(latest && ((latest.rwScore ?? 800) < 550 || (latest.mathScore ?? 800) < 550)),
     };
     const activity = [
       s.lastActiveAt,
