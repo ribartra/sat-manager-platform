@@ -49,7 +49,6 @@ export default async function TeacherProgramsPage({ searchParams }: { searchPara
       status: e.status,
       active: e.active,
       enrolledAt: e.enrolledAt.toISOString(),
-      parentApprovalStatus: e.parentApprovalStatus ?? null,
       parentApprovedAt: e.parentApprovedAt?.toISOString() ?? null,
       student: e.student,
     })),

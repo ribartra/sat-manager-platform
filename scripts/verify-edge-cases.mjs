@@ -299,9 +299,9 @@ const checks = [
     label: "Invitacion abierta = no usada, no anulada, no vencida; version de T&C",
   },
   {
-    file: "app/api/students/[studentId]/parent-authorization/route.ts",
-    requires: ["studentAccessWhereFor", "usedAt: now", "PARENT_AUTHORIZATION_REQUESTED", "resolveParentAccount"],
-    label: "Ask parent to authorize: alcance del docente, token de activacion inutilizable, auditado, sin convertir cuentas",
+    file: "app/api/students/[studentId]/parent/route.ts",
+    requires: ["studentAccessWhereFor", "resolveParentAccount", "parentId_studentId", "authorizedAt: now", "PARENT_LINKED", "passwordResetToken.create"],
+    label: "Add parent email: alcance del docente, sin aprobacion del padre, vincula al instante, nunca convierte otra cuenta, auditado",
   },
   {
     file: "app/api/auth/parent-consent/resend/route.ts",

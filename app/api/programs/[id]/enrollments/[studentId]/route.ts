@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import { notify } from "@/lib/notify";
-import { BadRequestError, ForbiddenError, NotFoundError, UnprocessableError, withApiErrors } from "@/lib/api-error";
+import { BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
 // PATCH /api/programs/[id]/enrollments/[studentId]
 // body: { action: "approve" | "reject" | "remove" }
@@ -39,11 +39,6 @@ export const PATCH = withApiErrors(async function PATCH(
   // becomes theirs when they approve it.
   if (session.user.role === "TEACHER" && enrollment.teacherId && enrollment.teacherId !== session.user.id) {
     return new NotFoundError("Enrollment not found.").toResponse();
-  }
-
-  // Block teacher approval if parental consent is still pending
-  if (action === "approve" && enrollment.parentApprovalStatus === "PENDING") {
-    return new UnprocessableError("Parent consent is required before this enrollment can be approved.").toResponse();
   }
 
   let data: Record<string, unknown>;

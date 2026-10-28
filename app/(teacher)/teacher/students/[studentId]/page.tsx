@@ -53,8 +53,7 @@ import { StudentSwitcher } from "./student-switcher";
 import { GenerateReportDialog } from "./generate-report-dialog";
 import { InvalidateAttemptButton } from "@/components/sat/invalidate-attempt-button";
 import { practiceSetGroups, setsFromReportAttempts, testGroups as groupTests } from "@/lib/attempt-groups";
-import { ParentAuthorization, type ParentAuthorizationView } from "./parent-authorization";
-import { parentAuthorizationState } from "@/lib/parent-authorization";
+import { ParentContact } from "./parent-contact";
 import { refreshAssignmentStates } from "@/lib/assignments";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { studentAccessWhereFor } from "@/lib/program-scope";
@@ -120,7 +119,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
   if (!student) notFound();
 
   // Report dialog: linked parents (email recipients) and submitted exams (per-exam report).
-  const [parentLinks, submittedExams, parentAuth] = await Promise.all([
+  const [parentLinks, submittedExams] = await Promise.all([
     prisma.parentStudent.findMany({
       where: { studentId },
       include: { parent: { select: { id: true, name: true, email: true } } },
@@ -131,21 +130,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
       select: { id: true, submittedAt: true, totalScore: true, test: { select: { name: true } } },
       orderBy: { submittedAt: "desc" },
     }),
-    parentAuthorizationState(student),
   ]);
-  const parentAuthView: ParentAuthorizationView =
-    parentAuth.status === "authorized"
-      ? {
-          status: "authorized",
-          label: `Parent: ${parentAuth.parentName} (${parentAuth.parentEmail}) · Authorized${parentAuth.at ? ` ${formatDate(parentAuth.at)}` : ""}`,
-        }
-      : parentAuth.status === "waiting"
-        ? {
-            status: "waiting",
-            parentEmail: parentAuth.parentEmail,
-            label: `Waiting for parent: we emailed ${parentAuth.parentEmail} (link valid until ${formatDate(parentAuth.linkExpiresAt)}).`,
-          }
-        : { status: "none" };
   const reportParents = parentLinks.map((link) => link.parent);
   const reportExams = submittedExams.map((exam) => ({
     id: exam.id,
@@ -188,7 +173,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
             <p className="text-xs text-gray-500">
               Last active: {student.lastActiveAt ? `${formatDate(student.lastActiveAt)} (${relativeDay(student.lastActiveAt)})` : "never"}
             </p>
-            <ParentAuthorization studentId={studentId} studentName={student.name} state={parentAuthView} />
+            <ParentContact studentId={studentId} studentName={student.name} parents={parentLinks.map((link) => link.parent)} />
           </div>
         </div>
         <div className="flex flex-col items-start gap-2 lg:items-end">

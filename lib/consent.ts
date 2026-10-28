@@ -13,7 +13,7 @@ export const PARENT_CONSENT_STATEMENT =
  * recorded as the student accepting these terms at activation (User/InviteToken.termsVersion).
  * Bump it whenever the terms change.
  */
-export const TERMS_VERSION = "2026-10-22";
+export const TERMS_VERSION = "2026-10-28";
 
 /** Days an invitation link works. Only one open invitation per student email until it expires. */
 export const INVITE_DAYS = 7;

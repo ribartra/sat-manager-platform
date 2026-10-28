@@ -8,7 +8,7 @@ const CONSENT_LINK_DAYS = 7;
 /**
  * Issue a fresh parent-authorization link for an invite and email it to the parent.
  * Each call replaces the previous link (only the newest email works) and gives it 7 more days.
- * Used by the student's "Resend email to my parent" and the teacher's "Ask parent to authorize".
+ * Legacy: only the student's "Resend email to my parent" for invitations sent before 2026-10-22.
  */
 export async function sendParentAuthorizationLink(
   inviteId: string,
@@ -44,28 +44,4 @@ export async function sendParentAuthorizationLink(
     metadata: { kind: "parent_consent", reason: options.reason, to: invite.parentEmail, error: result.sent ? undefined : result.reason },
   });
   return result;
-}
-
-export type ParentAuthorizationState =
-  | { status: "authorized"; parentName: string; parentEmail: string; at: Date | null }
-  | { status: "waiting"; parentName: string | null; parentEmail: string; linkExpiresAt: Date; inviteId: string }
-  | { status: "none" };
-
-/** What the teacher sees on the student page: an authorized parent, a pending request, or nothing. */
-export async function parentAuthorizationState(student: { id: string; email: string }): Promise<ParentAuthorizationState> {
-  const link = await prisma.parentStudent.findFirst({
-    where: { studentId: student.id, authorizedAt: { not: null } },
-    include: { parent: { select: { name: true, email: true } } },
-    orderBy: { authorizedAt: "desc" },
-  });
-  if (link) return { status: "authorized", parentName: link.parent.name, parentEmail: link.parent.email, at: link.authorizedAt };
-
-  const pending = await prisma.inviteToken.findFirst({
-    where: { role: "STUDENT", email: student.email, parentEmail: { not: null }, parentConsentAt: null, parentConsentRequired: true, revokedAt: null },
-    orderBy: { expiresAt: "desc" },
-  });
-  if (pending?.parentEmail) {
-    return { status: "waiting", parentName: pending.parentName, parentEmail: pending.parentEmail, linkExpiresAt: pending.expiresAt, inviteId: pending.id };
-  }
-  return { status: "none" };
 }

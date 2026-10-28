@@ -4,6 +4,32 @@ import path from "node:path";
 const root = process.cwd();
 
 const checks = [
+  // No parent approval step (consent = Terms accepted at activation): the student page only says the
+  // parent's email is missing and lets the teacher add it; enrollments never wait for a parent.
+  {
+    file: "app/(teacher)/teacher/students/[studentId]/parent-contact.tsx",
+    requires: ["Parent email: missing", "Add parent email", "/api/students/${studentId}/parent"],
+    forbids: ["Waiting for parent", "not authorized yet", "Ask parent to authorize", "Resend"],
+    label: "Student page parent line: linked parents or 'Parent email: missing' + Add parent email",
+  },
+  {
+    file: "app/(teacher)/teacher/programs/programs-client.tsx",
+    requires: [],
+    forbids: ["Awaiting parent", "Parent consent required first"],
+    label: "Enrollments do not wait for parent approval",
+  },
+  {
+    file: "app/api/programs/[id]/enroll/route.ts",
+    requires: ["parentApprovalStatus: null"],
+    forbids: ['parentApprovalStatus = "PENDING"', "requiresParentApproval"],
+    label: "Enroll request never sets a pending parent approval",
+  },
+  {
+    file: "app/(student)/student/page.tsx",
+    requires: [],
+    forbids: ["ParentApprovalCard", "waiting for your OK"],
+    label: "Parent dashboard has no approval step",
+  },
   // Reports 12–14: every attempt page (Test and practice, teacher and student) has the same try
   // navigator and the "<Item> › Try M of N" breadcrumb; the module results add up to a Total.
   ...[

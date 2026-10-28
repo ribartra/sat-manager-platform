@@ -29,6 +29,7 @@ export const AUDIT_ACTION_LABELS: Record<string, string> = {
   UPDATE_STUDENT: "Student updated",
   UPDATE_PARENT: "Parent updated",
   LINK_PARENT_STUDENT: "Parent linked to student",
+  PARENT_LINKED: "Parent added to student",
   UNLINK_PARENT_STUDENT: "Parent unlinked from student",
   PARENT_CONSENT_VIEWED: "Parent consent link reviewed",
   PARENT_CONSENT_VIEW_FAILED: "Parent consent link failed",

@@ -14,7 +14,6 @@ type Enrollment = {
   status: string;
   active: boolean;
   enrolledAt: string;
-  parentApprovalStatus: string | null;
   parentApprovedAt: string | null;
   student: { id: string; name: string };
 };
@@ -196,8 +195,6 @@ function PendingRow({
     router.refresh();
   }
 
-  const parentPending = enrollment.parentApprovalStatus === "PENDING";
-
   return (
     <div className="flex items-center justify-between py-2">
       <div className="flex items-center gap-2 flex-wrap">
@@ -205,12 +202,6 @@ function PendingRow({
         <span className="text-amber-300">·</span>
         <span className="text-sm text-amber-800">{enrollment.student.name}</span>
         <span className="text-xs text-amber-500">{fmt(enrollment.enrolledAt)}</span>
-        {parentPending && (
-          <Badge variant="warning" className="text-xs">Awaiting parent</Badge>
-        )}
-        {enrollment.parentApprovalStatus === "APPROVED" && (
-          <Badge variant="success" className="text-xs">Parent ✓</Badge>
-        )}
       </div>
       <div className="flex gap-1">
         <Button
@@ -219,7 +210,6 @@ function PendingRow({
           className="h-7 px-2 text-green-700 hover:bg-green-50"
           onClick={() => act("approve")}
           disabled={!!loading}
-          disabledReason={parentPending ? "Parent consent required first." : null}
         >
           {loading === "approve" ? "..." : "Approve"}
         </Button>
@@ -260,8 +250,6 @@ function EnrollmentRow({
     router.refresh();
   }
 
-  const parentPending = enrollment.parentApprovalStatus === "PENDING";
-
   return (
     <div className="flex items-center justify-between py-2">
       <div className="flex items-center gap-2 flex-wrap">
@@ -274,12 +262,6 @@ function EnrollmentRow({
           <span className="text-sm font-medium text-gray-800">{enrollment.student.name}</span>
         )}
         <Badge variant={ENROLLMENT_VARIANT[enrollment.status]}>{enrollmentStatusLabel(enrollment.status)}</Badge>
-        {parentPending && (
-          <Badge variant="warning" className="text-xs">Awaiting parent</Badge>
-        )}
-        {enrollment.parentApprovalStatus === "APPROVED" && (
-          <Badge variant="success" className="text-xs">Parent ✓</Badge>
-        )}
         <span className="text-xs text-gray-400">{fmt(enrollment.enrolledAt)}</span>
       </div>
       <div className="flex gap-1">
@@ -291,7 +273,6 @@ function EnrollmentRow({
               className="h-7 px-2 text-green-700 hover:bg-green-50"
               onClick={() => act("approve")}
               disabled={!!loading}
-              disabledReason={parentPending ? "Parent consent required first." : null}
             >
               {loading === "approve" ? "..." : "Approve"}
             </Button>

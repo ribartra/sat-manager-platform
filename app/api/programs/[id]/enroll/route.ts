@@ -5,14 +5,6 @@ import { getFeatureSetting } from "@/lib/app-settings";
 import { notifyMany } from "@/lib/notify";
 import { ApiError, BadRequestError, ConflictError, ForbiddenError, NotFoundError, UnauthorizedError, withApiErrors } from "@/lib/api-error";
 
-function ageInYears(birthDate: Date): number {
-  const now = new Date();
-  let age = now.getFullYear() - birthDate.getFullYear();
-  const monthDiff = now.getMonth() - birthDate.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birthDate.getDate())) age--;
-  return age;
-}
-
 // POST /api/programs/[id]/enroll — student requests enrollment
 export const POST = withApiErrors(async function POST(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
@@ -53,19 +45,7 @@ export const POST = withApiErrors(async function POST(_req: NextRequest, { param
     return new BadRequestError("This program is not currently available for enrollment.").toResponse();
   }
 
-  const student = await prisma.user.findUnique({
-    where: { id: studentId },
-    include: { childLinks: { select: { parentId: true } } },
-  });
-
-  let parentApprovalStatus: string | null = null;
-  let parentIds: string[] = [];
-
-  if (student?.birthDate && ageInYears(student.birthDate) < 18) {
-    parentIds = student.childLinks.map((link) => link.parentId);
-    if (parentIds.length > 0) parentApprovalStatus = "PENDING";
-  }
-
+  // No parent approval step: consent is the Terms accepted at activation (policy since 2026-10-22).
   const existing = await prisma.programEnrollment.findUnique({
     where: { programId_studentId: { programId: id, studentId } },
   });
@@ -83,7 +63,7 @@ export const POST = withApiErrors(async function POST(_req: NextRequest, { param
         status: "PENDING",
         active: false,
         enrolledAt: new Date(),
-        parentApprovalStatus,
+        parentApprovalStatus: null,
         parentApprovedAt: null,
       },
     });
@@ -94,7 +74,6 @@ export const POST = withApiErrors(async function POST(_req: NextRequest, { param
         studentId,
         status: "PENDING",
         active: false,
-        parentApprovalStatus,
       },
     });
   }
@@ -103,23 +82,11 @@ export const POST = withApiErrors(async function POST(_req: NextRequest, { param
     data: { userId: studentId, action: "REQUEST_ENROLLMENT", targetType: "Program", targetId: id },
   });
 
-  if (parentApprovalStatus === "PENDING") {
-    await notifyMany(parentIds, {
-      title: `Please approve ${session.user.name}'s program request`,
-      body: `${session.user.name} asked to join ${program.name}. Approve it so the teacher can add them.`,
-      href: "/student",
-    }).catch(() => {});
-  } else {
-    await notifyMany(program.teachers.map((teacher) => teacher.teacherId), {
-      title: "New enrollment request",
-      body: `${session.user.name} asked to join ${program.name}.`,
-      href: "/teacher/programs",
-    }).catch(() => {});
-  }
+  await notifyMany(program.teachers.map((teacher) => teacher.teacherId), {
+    title: "New enrollment request",
+    body: `${session.user.name} asked to join ${program.name}.`,
+    href: "/teacher/programs",
+  }).catch(() => {});
 
-  return NextResponse.json({
-    ok: true,
-    status: "PENDING",
-    requiresParentApproval: parentApprovalStatus === "PENDING",
-  });
+  return NextResponse.json({ ok: true, status: "PENDING" });
 });

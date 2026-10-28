@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { ShieldCheck } from "lucide-react";
+import { Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -10,13 +10,11 @@ import { InlineError } from "@/components/sat/alert";
 import { apiFetch, errorMessage } from "@/lib/api-client";
 import { notify } from "@/lib/notify-ui";
 
-export type ParentAuthorizationView =
-  | { status: "authorized"; label: string }
-  | { status: "waiting"; parentEmail: string; label: string }
-  | { status: "none" };
-
-/** Parent line on the student page: who authorized, a pending request, or "Ask parent to authorize". */
-export function ParentAuthorization({ studentId, studentName, state }: { studentId: string; studentName: string; state: ParentAuthorizationView }) {
+/**
+ * Parent line on the student page: the linked parents, or "Parent email: missing" with
+ * "Add parent email". No approval step (consent is the Terms accepted at activation).
+ */
+export function ParentContact({ studentId, studentName, parents }: { studentId: string; studentName: string; parents: { name: string; email: string }[] }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [parentName, setParentName] = useState("");
@@ -24,59 +22,52 @@ export function ParentAuthorization({ studentId, studentName, state }: { student
   const [error, setError] = useState("");
   const [sending, setSending] = useState(false);
 
-  async function request(json: Record<string, unknown>) {
+  async function submit(event: FormEvent) {
+    event.preventDefault();
     setSending(true);
     setError("");
     try {
-      const data = await apiFetch<{ parentEmail: string }>(`/api/students/${studentId}/parent-authorization`, {
+      const data = await apiFetch<{ parentEmail: string; emailSent: boolean }>(`/api/students/${studentId}/parent`, {
         method: "POST",
-        json,
-        fallback: "Could not send the request.",
+        json: { parentName, parentEmail },
+        fallback: "Could not add the parent.",
       });
-      notify.success("Request sent", `We emailed ${data.parentEmail}. ${studentName} can keep practicing meanwhile.`);
+      if (data.emailSent) notify.success("Parent added", `We emailed ${data.parentEmail} a link to sign in.`);
+      else notify.success("Parent added", `The email to ${data.parentEmail} couldn't be sent. They can use "Forgot password" to sign in.`);
       setOpen(false);
+      setParentName("");
+      setParentEmail("");
       router.refresh();
     } catch (err) {
-      if (open) setError(errorMessage(err));
-      else notify.error(err);
+      setError(errorMessage(err));
     } finally {
       setSending(false);
     }
   }
 
-  function submit(event: FormEvent) {
-    event.preventDefault();
-    void request({ parentName, parentEmail });
-  }
-
-  if (state.status === "authorized") {
+  if (parents.length > 0) {
     return (
-      <p className="mt-1 inline-flex items-center gap-1 text-xs text-green-700">
-        <ShieldCheck size={12} /> {state.label}
+      <p className="mt-1 inline-flex items-center gap-1 text-xs text-gray-500">
+        <Users size={12} aria-hidden /> Parent: {parents.map((p) => `${p.name} (${p.email})`).join(" · ")}
       </p>
     );
   }
 
   return (
-    <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-gray-500">
-      <span>{state.status === "waiting" ? state.label : "Parent: not authorized yet."}</span>
-      {state.status === "waiting" ? (
-        <Button type="button" variant="link" size="sm" className="h-auto px-0 text-xs" disabled={sending} onClick={() => void request({ resend: true })}>
-          {sending ? "Sending…" : "Resend"}
-        </Button>
-      ) : null}
+    <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+      <span className="text-amber-700">Parent email: missing</span>
       <Dialog open={open} onOpenChange={(next) => { setOpen(next); setError(""); }}>
         <DialogTrigger asChild>
           <Button type="button" variant="link" size="sm" className="h-auto px-0 text-xs">
-            {state.status === "waiting" ? "Change parent" : "Ask parent to authorize"}
+            Add parent email
           </Button>
         </DialogTrigger>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Ask parent to authorize</DialogTitle>
+            <DialogTitle>Add parent email</DialogTitle>
             <DialogDescription>
-              We email the parent or guardian a link to authorize {studentName}&apos;s account. {studentName} keeps
-              practicing while they decide. Once they accept, they can also receive progress reports.
+              We link the parent or guardian to {studentName} and email them a link to sign in, so they can follow
+              {" "}{studentName}&apos;s progress and receive reports.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={submit} className="space-y-3">
@@ -96,7 +87,7 @@ export function ParentAuthorization({ studentId, studentName, state }: { student
                 Cancel
               </Button>
               <Button type="submit" size="sm" disabled={sending || !parentEmail.trim()} disabledReason={!parentEmail.trim() ? "Enter the parent's email." : null}>
-                {sending ? "Sending…" : "Send request"}
+                {sending ? "Adding…" : "Add parent"}
               </Button>
             </div>
           </form>

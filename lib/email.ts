@@ -160,31 +160,6 @@ export async function sendParentConsentEmail(
   });
 }
 
-export async function sendParentInviteEmail(to: string, parentName: string | null, studentName: string, inviteUrl: string) {
-  const safeGreeting = escapeHtml(greeting(parentName));
-  const safeStudent = escapeHtml(studentName);
-  const safeUrl = escapeHtml(inviteUrl);
-
-  return sendTransactionalEmail({
-    to,
-    subject: "Create your SAT Practice parent account",
-    text: [
-      greeting(parentName),
-      "",
-      `${studentName} has been invited to SAT Practice. Create your parent account to follow their progress and approve their account:`,
-      inviteUrl,
-      "",
-      "This link expires in 7 days.",
-    ].join("\n"),
-    html: `
-      <p>${safeGreeting}</p>
-      <p>${safeStudent} has been invited to SAT Practice. Create your parent account to follow their progress and approve their account:</p>
-      <p><a href="${safeUrl}">${safeUrl}</a></p>
-      <p>This link expires in 7 days.</p>
-    `,
-  });
-}
-
 export async function sendParentReportEmail(
   to: string,
   parentName: string | null,
@@ -253,6 +228,34 @@ export async function sendParentReportPdfEmail(
       <p>${escapeHtml(REPORT_COLOR_KEY)}</p>
     `,
     attachments: [{ contentType: "application/pdf", ...attachment }],
+  });
+}
+
+export async function sendParentAccessEmail(
+  to: string,
+  parentName: string | null,
+  studentName: string,
+  url: string,
+  options: { setPassword: boolean },
+) {
+  const safeGreeting = escapeHtml(greeting(parentName));
+  const safeStudent = escapeHtml(studentName);
+  const safeUrl = escapeHtml(url);
+  const action = options.setPassword
+    ? "Set your password to follow their progress:"
+    : "Sign in to follow their progress:";
+  const footer = options.setPassword ? "This link expires in 7 days." : "Use your usual password.";
+
+  return sendTransactionalEmail({
+    to,
+    subject: `You were added as ${studentName}'s parent on SAT Practice`,
+    text: [greeting(parentName), "", `${studentName}'s teacher added you as parent or guardian on SAT Practice. ${action}`, url, "", footer].join("\n"),
+    html: `
+      <p>${safeGreeting}</p>
+      <p>${safeStudent}'s teacher added you as parent or guardian on SAT Practice. ${escapeHtml(action)}</p>
+      <p><a href="${safeUrl}">${safeUrl}</a></p>
+      <p>${escapeHtml(footer)}</p>
+    `,
   });
 }
 
