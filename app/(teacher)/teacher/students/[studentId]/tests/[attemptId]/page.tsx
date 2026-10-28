@@ -22,6 +22,7 @@ import { resolveQuestionType } from "@/lib/question-type";
 import { parseEliminatedOptions } from "@/lib/answer-review-meta";
 import { buildProgressHref, progressFiltersFromParams } from "@/lib/progress-filters";
 import { AttemptHeaderActions } from "../../attempt-header-actions";
+import { TryNavigator } from "@/components/sat/try-navigator";
 
 interface PageProps {
   params: Promise<{ studentId: string; attemptId: string }>;
@@ -103,7 +104,8 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
           { label: "Home", href: "/teacher" },
           { label: "Students", href: "/teacher/students" },
           { label: attempt.student.name, href: studentHref },
-          { label: `${attempt.test.name} · Try ${tryNumber}` },
+          { label: attempt.test.name, href: `/teacher/tests/${attempt.testId}` },
+          { label: `Try ${tryNumber} of ${siblings.length}` },
         ]}
       />
       <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
@@ -116,8 +118,18 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
               · {attempt.student.name}&apos;s results
             </h1>
             <Badge variant="test">Test</Badge>
-            <Badge>Try {tryNumber} of {siblings.length}</Badge>
             <AttemptStatusBadge status={attempt.status} />
+          </div>
+          <div className="mt-2">
+            <TryNavigator
+              current={tryNumber}
+              tries={siblings.map((s, i) => ({
+                number: i + 1,
+                href: buildProgressHref(`/teacher/students/${studentId}/tests/${s.id}`, filters, { area: "tests" }),
+                detail: [s.submittedAt ? formatDate(s.submittedAt) : "In progress", s.totalScore != null ? String(s.totalScore) : null].filter(Boolean).join(" · "),
+                invalidated: s.status === "INVALIDATED",
+              }))}
+            />
           </div>
           <p className="mt-1 text-sm text-gray-500">
             Started {formatDate(attempt.startedAt)} · {attempt.submittedAt ? `Completed ${formatDate(attempt.submittedAt)}` : "Not finished"}
@@ -174,6 +186,17 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
                   </tr>
                 ))}
               </tbody>
+              <tfoot>
+                <tr className="border-t border-gray-200 font-semibold text-gray-900">
+                  <td className="py-1">Total</td>
+                  <td className="py-1 text-right tabular-nums">{moduleRows.reduce((sum, row) => sum + row.answered, 0)}/{moduleRows.reduce((sum, row) => sum + row.total, 0)}</td>
+                  <td className="py-1 text-right tabular-nums">{moduleRows.reduce((sum, row) => sum + row.marked, 0)}</td>
+                  <td className="py-1 text-right tabular-nums">{formatTime(moduleRows.reduce((sum, row) => sum + row.time, 0))}</td>
+                  <td className={`py-1 text-right tabular-nums ${moduleRows.some((row) => row.overtime > 0) ? "text-red-600" : "text-gray-400"}`}>
+                    {moduleRows.some((row) => row.overtime > 0) ? `+${formatTime(moduleRows.reduce((sum, row) => sum + row.overtime, 0))}` : "—"}
+                  </td>
+                </tr>
+              </tfoot>
             </table>
           </div>
         </Card>

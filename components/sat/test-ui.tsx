@@ -201,6 +201,37 @@ export function ModuleResultRows({
           </div>
         </div>
       ))}
+      <ModuleTotalRow modules={modules} />
+    </div>
+  );
+}
+
+/** Total row: the sum of the finished modules (correct by section, incorrect, blank). */
+function ModuleTotalRow({ modules }: { modules: ModuleView[] }) {
+  const done = modules.filter((m) => m.state === "done");
+  if (done.length === 0) return null;
+  const sum = (pick: (m: ModuleView) => number) => done.reduce((total, m) => total + pick(m), 0);
+  const questions = sum((m) => m.questionCount);
+  const right = sum((m) => m.right);
+  const rwRight = sum((m) => (m.section === "RW" ? m.right : 0));
+  const wrong = sum((m) => m.wrong);
+  const blank = sum((m) => m.blank);
+  return (
+    <div className="grid items-center gap-2 py-3 font-semibold sm:grid-cols-[9rem_1fr_11rem]">
+      <span className="text-sm text-[var(--sat-text)]">
+        Total
+        {done.length < modules.length ? <span className="font-normal text-gray-500"> · {done.length} of {modules.length} modules</span> : null}
+      </span>
+      <div className="flex h-3 overflow-hidden rounded-md bg-[var(--sat-surface-2)]" aria-label={`${right} correct, ${wrong} incorrect, ${blank} blank`}>
+        <span className={SECTION_BAR.RW} style={{ width: `${pct(rwRight, questions)}%` }} />
+        <span className={SECTION_BAR.MATH} style={{ width: `${pct(right - rwRight, questions)}%` }} />
+        <span className="bg-[var(--sat-bad)]" style={{ width: `${pct(wrong, questions)}%` }} />
+        <span className="bg-[var(--sat-blank)]" style={{ width: `${pct(blank, questions)}%` }} />
+      </div>
+      <div className="text-right text-xs text-[var(--sat-muted)]">
+        <span className="text-[var(--sat-text)]">{right} of {questions}</span> correct ({Math.round(pct(right, questions))}%)
+        <span className="block font-normal">{wrong} wrong · {blank} blank</span>
+      </div>
     </div>
   );
 }

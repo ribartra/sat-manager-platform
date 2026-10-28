@@ -21,6 +21,8 @@ import { notFound } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { formatClock, formatDate, formatDuration, formatTime, relativeDay } from "@/lib/utils";
 import { AttemptHeaderActions } from "../../attempt-header-actions";
+import { TryNavigator } from "@/components/sat/try-navigator";
+import { practiceSetTitle } from "@/lib/attempt-groups";
 import { parseSnapshot, PracticeSetSnapshot, QuestionSnapshot } from "@/lib/attempt-snapshots";
 import { auth } from "@/lib/auth";
 import { teacherProgramEnrollmentScope } from "@/lib/program-scope";
@@ -97,6 +99,8 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
     return { id: t.id, tryNumber: i + 1, submittedAt: t.submittedAt, correct: sc.correct, total: sc.total, pct: sc.percent, time: t.totalTime, status: t.status };
   });
   const thisTry = tries.find((t) => t.id === attempt.id);
+  const tryNumber = thisTry?.tryNumber ?? attempt.attemptNumber;
+  const tryCount = Math.max(tries.length, 1);
   const prevTry = thisTry ? [...tries.slice(0, thisTry.tryNumber - 1)].reverse().find((t) => t.status === "SUBMITTED") : undefined;
   const delta = prevTry && prevTry.pct !== null && attempt.status === "SUBMITTED" ? pct - prevTry.pct : null;
 
@@ -130,7 +134,12 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
           { label: "Students", href: "/teacher/students" },
           { label: attempt.student.name, href: studentHref() },
           ...(area && areaTab ? [{ label: practiceAreaLabel(area), href: studentHref({ area: areaTab }) }] : []),
-          { label: `Try ${thisTry?.tryNumber ?? attempt.attemptNumber}` },
+          // <Practice set (Level)> › Try M of N — the same pattern as a Test attempt.
+          {
+            label: practiceSetTitle(practiceSet?.name ?? practiceSetSnapshot?.name ?? "Practice set", practiceSet?.difficulty),
+            href: practiceSet && areaTab ? `${studentHref({ area: areaTab, topic: practiceSet.topicId, difficulty: practiceSet.difficulty })}#performance` : undefined,
+          },
+          { label: `Try ${tryNumber} of ${tryCount}` },
         ]}
       />
       {attempt.status === "INVALIDATED" ? <InvalidatedNotice audience="teacher" /> : null}
@@ -142,7 +151,6 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
             <Badge>Practice</Badge>
             {area ? <AreaTag area={area} /> : null}
             {practiceSet ? <Badge variant={difficultyBadgeVariant(practiceSet.difficulty)}>{difficultyLabel(practiceSet.difficulty)}</Badge> : null}
-            <Badge>Try {thisTry?.tryNumber ?? attempt.attemptNumber} of {Math.max(tries.length, 1)}</Badge>
             <AttemptStatusBadge status={attempt.status} />
             {tries.length > 1 ? (
               <Link href={`/teacher/students/${studentId}?area=history&type=practice`} className="text-xs font-medium text-[var(--sat-primary)] hover:underline">
@@ -165,6 +173,17 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
             )}{" "}
             · {first}&apos;s results
           </h1>
+          <div className="mt-2">
+            <TryNavigator
+              current={tryNumber}
+              tries={tries.map((t) => ({
+                number: t.tryNumber,
+                href: buildProgressHref(`/teacher/students/${studentId}/attempts/${t.id}`, filters, areaTab ? { area: areaTab } : undefined),
+                detail: [t.submittedAt ? formatDate(t.submittedAt) : null, t.pct !== null ? `${t.pct}%` : null].filter(Boolean).join(" · "),
+                invalidated: t.status === "INVALIDATED",
+              }))}
+            />
+          </div>
           {practiceSet ? (
             <p className="mt-0.5 text-xs text-gray-500">
               Practice set:{" "}

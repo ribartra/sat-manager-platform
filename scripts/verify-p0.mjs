@@ -4,6 +4,33 @@ import path from "node:path";
 const root = process.cwd();
 
 const checks = [
+  // Reports 12–14: every attempt page (Test and practice, teacher and student) has the same try
+  // navigator and the "<Item> › Try M of N" breadcrumb; the module results add up to a Total.
+  ...[
+    "app/(teacher)/teacher/students/[studentId]/tests/[attemptId]/page.tsx",
+    "app/(teacher)/teacher/students/[studentId]/attempts/[attemptId]/page.tsx",
+    "app/(student)/student/tests/results/[attemptId]/page.tsx",
+    "app/(student)/student/results/[attemptId]/page.tsx",
+  ].map((file) => ({
+    file,
+    requires: ["<TryNavigator", " of ${"],
+    forbids: ["<Badge>Try "],
+    label: `Try navigator + "Try M of N" breadcrumb on ${file}`,
+  })),
+  ...[
+    "app/(teacher)/teacher/students/[studentId]/attempts/[attemptId]/page.tsx",
+    "app/(student)/student/results/[attemptId]/page.tsx",
+  ].map((file) => ({ file, requires: ["practiceSetTitle("], label: `Practice breadcrumb "<Set (Level)>" on ${file}` })),
+  {
+    file: "components/sat/test-ui.tsx",
+    requires: ["<ModuleTotalRow modules={modules} />"],
+    label: "Results by module ends with the Total row",
+  },
+  {
+    file: "app/(teacher)/teacher/students/[studentId]/tests/[attemptId]/page.tsx",
+    requires: ["<tfoot>"],
+    label: "Teacher Test module table has a Total row",
+  },
   {
     file: "app/api/attempts/[attemptId]/submit/route.ts",
     requires: ["status: \"IN_PROGRESS\"", "practiceSetSnapshot", "questionSnapshot"],

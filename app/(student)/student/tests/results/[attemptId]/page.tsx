@@ -7,6 +7,7 @@ import { HEADER_ACTION_CLASS, HeaderActions } from "@/components/sat/header-acti
 import { RetakeTestButton } from "@/components/sat/retake-test-button";
 import { Alert } from "@/components/sat/alert";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import { TryNavigator } from "@/components/sat/try-navigator";
 import { ReviewQuestionCard } from "@/components/sat/review-question-card";
 import { AnswerGrid, AnswerGridLegend, ModuleResultLegend, ModuleResultRows, ScoreBlocks } from "@/components/sat/test-ui";
 import { Badge } from "@/components/ui/badge";
@@ -113,7 +114,7 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
           { label: "Home", href: "/student" },
           { label: "Tests", href: "/student/tests" },
           { label: attempt.test.name, href: attempt.assignmentId ? `/student/tests?view=all#test-${attempt.assignmentId}` : "/student/tests?view=completed" },
-          { label: `Try ${tryNumber} results` },
+          { label: `Try ${tryNumber} of ${siblings.length}` },
         ]}
       />
 
@@ -133,8 +134,18 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">{attempt.test.name} results</h1>
-            <Badge>Try {tryNumber} of {siblings.length}</Badge>
             {inProgress ? <Badge variant="warning">In progress</Badge> : invalidated ? null : <Badge variant="success">Completed</Badge>}
+          </div>
+          <div className="mt-2">
+            <TryNavigator
+              current={tryNumber}
+              tries={siblings.map((s, i) => ({
+                number: i + 1,
+                href: `/student/tests/results/${s.id}`,
+                detail: [s.submittedAt ? formatDate(s.submittedAt) : "In progress", s.totalScore != null ? String(s.totalScore) : null].filter(Boolean).join(" · "),
+                invalidated: s.status === "INVALIDATED",
+              }))}
+            />
           </div>
           <p className="mt-1 text-xs text-gray-500">
             Started <b className="font-medium text-gray-700">{formatDate(attempt.startedAt)}</b>

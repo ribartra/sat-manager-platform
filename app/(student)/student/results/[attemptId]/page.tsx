@@ -18,6 +18,8 @@ import { difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
 import { isAnsweredAnswer, summarizeAllQuestionAnswers } from "@/lib/weighted-score";
 import { Alert } from "@/components/sat/alert";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import { TryNavigator } from "@/components/sat/try-navigator";
+import { practiceSetTitle } from "@/lib/attempt-groups";
 import { AreaTag } from "@/components/sat/practice-set-row";
 import { AnswerGrid, AnswerGridLegend } from "@/components/sat/test-ui";
 import { tabFromPracticeArea, type PracticeAreaCode } from "@/lib/practice-area";
@@ -128,7 +130,9 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
           { label: "Practice", href: areaTab ? `/student/practice?area=${areaTab}` : "/student/practice" },
           // Back to the same History list the student came from (area, skill, level and dates kept).
           { label: "History", href: query.area || !areaTab ? historyHref : `/student/history?area=${areaTab}` },
-          { label: `Try ${thisTry?.tryNumber ?? attempt.attemptNumber} results` },
+          // <Practice set (Level)> › Try M of N — the same pattern as a Test attempt.
+          { label: practiceSetTitle(practiceSet?.name ?? practiceSetSnapshot?.name ?? "Practice set", practiceSet?.difficulty) },
+          { label: `Try ${thisTry?.tryNumber ?? attempt.attemptNumber} of ${Math.max(tries.length, 1)}` },
         ]}
       />
       {query.new === "1" ? <Alert tone="success" className="mb-4">Practice submitted. Here are your results.</Alert> : null}
@@ -140,11 +144,20 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
           <div className="mb-1 flex flex-wrap items-center gap-2">
             {practiceArea ? <AreaTag area={practiceArea} /> : null}
             {practiceSet ? <Badge variant={difficultyBadgeVariant(practiceSet.difficulty)}>{difficultyLabel(practiceSet.difficulty)}</Badge> : null}
-            <Badge>Try {thisTry?.tryNumber ?? attempt.attemptNumber} of {Math.max(tries.length, 1)}</Badge>
           </div>
           <h1 className="mb-1 text-xl font-semibold text-gray-900">
             {practiceSet?.topic.name ?? shortSetName(practiceSetSnapshot?.name ?? "Practice set")}
           </h1>
+          <div className="mb-1 mt-2">
+            <TryNavigator
+              current={thisTry?.tryNumber ?? attempt.attemptNumber}
+              tries={tries.map((t) => ({
+                number: t.tryNumber,
+                href: `/student/results/${t.id}${returnQuery.toString() ? `?${returnQuery.toString()}` : ""}`,
+                detail: [t.submittedAt ? formatDate(t.submittedAt) : null, t.pct !== null ? `${t.pct}%` : null].filter(Boolean).join(" · "),
+              }))}
+            />
+          </div>
           <p className="text-xs text-gray-500">
             {attempt.submittedAt ? (
               <>
