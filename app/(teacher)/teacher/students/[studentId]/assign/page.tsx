@@ -51,7 +51,7 @@ export default async function AssignPage({ params, searchParams }: PageProps) {
   await refreshAssignmentStates(now);
   const existing = await prisma.assignment.findMany({
     where: { studentId },
-    select: { practiceSetId: true, status: true, dueDate: true },
+    select: { practiceSetId: true, status: true, dueDate: true, unlockAt: true, feedbackMode: true, showExplanations: true },
   });
   // Already assigned = never offered again (the student can retry it any time); only "Edit" (dates and
   // settings) of an open one, via ?sets=.
@@ -59,7 +59,19 @@ export default async function AssignPage({ params, searchParams }: PageProps) {
   const editIds = new Set((query.sets ?? "").split(",").filter(Boolean));
   const editing = practiceSets
     .filter((ps) => editIds.has(ps.id) && ["PENDING", "IN_PROGRESS"].includes(assignmentBySet.get(ps.id)?.status ?? ""))
-    .map((ps) => ({ id: ps.id, name: ps.name, difficulty: ps.difficulty, status: assignmentBySet.get(ps.id)!.status, dueDate: assignmentBySet.get(ps.id)!.dueDate?.toISOString() ?? null }));
+    .map((ps) => {
+      const current = assignmentBySet.get(ps.id)!;
+      return {
+        id: ps.id,
+        name: ps.name,
+        difficulty: ps.difficulty,
+        status: current.status,
+        dueDate: current.dueDate?.toISOString() ?? null,
+        unlockAt: current.unlockAt?.toISOString() ?? null,
+        feedbackMode: current.feedbackMode === "IMMEDIATE" ? ("IMMEDIATE" as const) : ("AFTER_SET" as const),
+        showExplanations: current.showExplanations,
+      };
+    });
 
   const groups = teacherGroupManagementEnabled
     ? await prisma.group.findMany({

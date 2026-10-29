@@ -252,7 +252,7 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
-    requires: ["<TestCard", "CardGrid", "canRetake: false", 'layout="compact"'],
+    requires: ["<TestCard", "TestCardsByNumber", "canRetake: false", 'layout="compact"'],
     forbids: ["TestMiniCard"],
     label: "Ficha del alumno: cards de Test con el mismo componente y ancho que las de area; sin reintento del teacher",
   },
@@ -264,7 +264,7 @@ const checks = [
   },
   {
     file: "app/(student)/student/student-home.tsx",
-    requires: ["<TestCard", 'layout="compact"', "CardGrid"],
+    requires: ["<TestCard", 'layout="compact"', "TestCardsByNumber"],
     label: "Home del alumno / Student view: card de Test compacta (mismo componente) al ancho de las de area",
   },
   {
@@ -491,8 +491,8 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/tests/page.tsx",
-    requires: ["sourceHeading", "sortOrder"],
-    label: "Tests agrupados por fuente (SAT-022)",
+    requires: ["<TestNumberAccordion", "groupTestVersions", "sortOrder"],
+    label: "Tests: un acordeon TEST N con la version de cada fuente (paginacion por TEST N)",
   },
   {
     file: "prisma/migrations/20261031_cb_test_sources/migration.sql",
@@ -513,6 +513,67 @@ const checks = [
     file: "lib/app-settings.ts",
     requires: ["ASSIGN_LOCKED_OPTION"],
     label: "Ajuste de admin para la opcion 'Keep it locked' (apagado por defecto)",
+  },
+  {
+    file: "prisma/migrations/20261102_assignment_explanations/migration.sql",
+    requires: ['"Assignment" ADD COLUMN "showExplanations"', '"FullPracticeTestAssignment" ADD COLUMN "showExplanations"', '"FullPracticeTest" ADD COLUMN "number"', '"FullPracticeTestAnswer" ADD COLUMN "checkedAt"'],
+    forbids: ["DROP TABLE"],
+    label: "Explicaciones por asignacion + numero de Test (ADD-only con backfill)",
+  },
+  {
+    file: "app/(teacher)/teacher/students/[studentId]/assign/assign-form-client.tsx",
+    requires: ["Show explanations in the player", "showExplanations,"],
+    label: "Assign practice: opcion por alumno 'Show explanations in the player'",
+  },
+  {
+    file: "app/(teacher)/teacher/students/[studentId]/assign-test/assign-test-form-client.tsx",
+    requires: ["Show explanations in the player", "showExplanations }", "<TestNumberAccordion"],
+    label: "Assign test: opcion de explicaciones y acordeon TEST N por fuente",
+  },
+  {
+    file: "lib/immediate-check.ts",
+    requires: ["showExplanation ? ("],
+    label: "Check del Practice Set: explicacion solo si la asignacion la habilita",
+  },
+  {
+    file: "app/api/full-practice-tests/attempts/[attemptId]/check/route.ts",
+    requires: ["Explanations are turned off for this test.", "checkedAt: new Date()", "This module was already submitted."],
+    label: "Check del player de Test: solo con la opcion activa, modulo abierto, respuesta bloqueada",
+  },
+  {
+    file: "lib/full-test-grading.ts",
+    requires: ["!checkedIds.has(questionId)", "checkedAt: { not: null }"],
+    label: "Una respuesta de Test comprobada no se puede cambiar",
+  },
+  {
+    file: "components/sat/attempts-table.tsx",
+    requires: ["<TestNumberAccordion", "TestAttemptRows"],
+    label: "Intentos de Test agrupados en acordeon TEST N por fuente",
+  },
+  {
+    file: "contracts/full-test.ts",
+    requires: ["Test number is required."],
+    label: "Editor de Test: numero de Test obligatorio",
+  },
+  {
+    file: "app/(teacher)/teacher/students/[studentId]/attempts/[attemptId]/page.tsx",
+    requires: ["explanationsInPlayerLabel("],
+    label: "Detalle de intento (PS, profesor): opcion de explicaciones con la que se dio",
+  },
+  {
+    file: "app/(teacher)/teacher/students/[studentId]/tests/[attemptId]/page.tsx",
+    requires: ["explanationsInPlayerLabel("],
+    label: "Detalle de intento (Test, profesor): opcion de explicaciones con la que se dio",
+  },
+  {
+    file: "app/(student)/student/results/[attemptId]/page.tsx",
+    requires: ["explanationsInPlayerLabel("],
+    label: "Detalle de intento (PS, alumno): opcion de explicaciones con la que se dio",
+  },
+  {
+    file: "app/(student)/student/tests/results/[attemptId]/page.tsx",
+    requires: ["explanationsInPlayerLabel("],
+    label: "Detalle de intento (Test, alumno): opcion de explicaciones con la que se dio",
   },
   {
     file: "prisma/migrations/20261101_ingest_source_target/migration.sql",

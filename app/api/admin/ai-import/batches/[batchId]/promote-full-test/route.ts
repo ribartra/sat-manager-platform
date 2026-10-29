@@ -121,7 +121,7 @@ export const POST = withApiErrors(async function POST(req: Request, { params }: 
       }
       await tx.fullPracticeTest.update({
         where: { id: existingArtifact.artifactId },
-        data: { name: testName, status: "DRAFT" },
+        data: { name: testName, number: testNumber, status: "DRAFT" },
       });
       for (const testModule of existingModules) {
         const ids = moduleQuestionIds[testModule.order] ?? [];
@@ -139,6 +139,7 @@ export const POST = withApiErrors(async function POST(req: Request, { params }: 
         programId,
         sourceId,
         name: testName,
+        number: testNumber,
         status: "DRAFT",
         modules: {
           create: FULL_TEST_MODULES.map((module, order) => ({

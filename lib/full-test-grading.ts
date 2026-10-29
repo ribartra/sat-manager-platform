@@ -79,6 +79,12 @@ export async function saveFullTestProgress(attempt: AttemptRow, body: FullTestSa
       ? (body.timeSpentByQuestion as Record<string, number>)
       : {};
   const { byQuestion: reviewMeta, markedIds } = reviewMetaByQuestion(body, allowedIds);
+  // A checked question keeps the answer it was checked with ("Show explanations in the player").
+  const checkedIds = new Set(
+    (await prisma.fullPracticeTestAnswer.findMany({ where: { attemptId: attempt.id, checkedAt: { not: null } }, select: { questionId: true } })).map(
+      (row) => row.questionId,
+    ),
+  );
 
   // One upsert per question with everything the payload carries for it.
   const questionIds = new Set<string>([...Object.keys(answerMap), ...Object.keys(timeMap), ...reviewMeta.keys()]);
@@ -88,7 +94,7 @@ export async function saveFullTestProgress(attempt: AttemptRow, body: FullTestSa
       if (!moduleId) return Promise.resolve();
       const data = {
         moduleId,
-        ...(questionId in answerMap ? { answer: answerMap[questionId] || null } : {}),
+        ...(questionId in answerMap && !checkedIds.has(questionId) ? { answer: answerMap[questionId] || null } : {}),
         ...(questionId in timeMap ? { timeSpent: Number(timeMap[questionId]) || 0 } : {}),
         ...(reviewMeta.get(questionId) ?? {}),
       };
@@ -151,12 +157,11 @@ export async function finalizeFullTestAttempt(input: {
   const lockedQuestionIds = new Set(
     modules.flatMap((testModule, index) => (locked.has(index) ? testModule.questions.map((q) => q.questionId) : [])),
   );
-  const stored = lockedQuestionIds.size
-    ? await prisma.fullPracticeTestAnswer.findMany({
-        where: { attemptId, questionId: { in: [...lockedQuestionIds] } },
-        select: { questionId: true, answer: true },
-      })
-    : [];
+  // Stored answers win for submitted modules and for questions the student already checked.
+  const stored = await prisma.fullPracticeTestAnswer.findMany({
+    where: { attemptId, OR: [{ questionId: { in: [...lockedQuestionIds] } }, { checkedAt: { not: null } }] },
+    select: { questionId: true, answer: true },
+  });
   const answers: Record<string, string> = {
     ...(body.answers && typeof body.answers === "object" ? (body.answers as Record<string, string>) : {}),
     ...Object.fromEntries(stored.map((row) => [row.questionId, row.answer ?? ""])),

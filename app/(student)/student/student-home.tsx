@@ -3,7 +3,6 @@ import { BookOpen, CheckCircle2, ClipboardList, Clock, Map as MapIcon, TrendingU
 import {
   AreaBoxGrid,
   Breadcrumbs,
-  CardGrid,
   CompactAreaBox,
   ContinueCard,
   EmptyState,
@@ -14,7 +13,7 @@ import {
   StatGrid,
   StatTile,
   TestAttemptsAccordion,
-  TestCard,
+  TestCardsByNumber,
   type TestCardLinks,
   pageFromParam,
   paginate,
@@ -205,9 +204,7 @@ function SummaryView({ practice, tests, links }: { practice: PracticeSetItem[]; 
         {testCards.length === 0 ? (
           <Card padding="md" className="text-sm text-gray-500">No tests assigned.</Card>
         ) : (
-          <CardGrid>
-            {testCards.map((t) => <TestCard key={t.assignmentId} item={t} links={testCardLinks(links)} layout="compact" />)}
-          </CardGrid>
+          <TestCardsByNumber items={testCards} links={testCardLinks(links)} layout="compact" openPending />
         )}
       </section>
 
@@ -426,9 +423,7 @@ function TestsTab({ tests, page, links }: { tests: StudentTestItem[]; page: numb
       {pending.length === 0 ? (
         <Card padding="md" className="text-sm text-gray-500">No pending tests.</Card>
       ) : (
-        <div className="space-y-3.5">
-          {pending.map((t) => <TestCard key={t.assignmentId} item={t} links={testCardLinks(links)} />)}
-        </div>
+        <TestCardsByNumber items={pending} links={testCardLinks(links)} openPending />
       )}
 
       <section className="mt-6">

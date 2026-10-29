@@ -16,7 +16,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
   if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { testId } = await params;
-  const { studentIds, dueDate } = await req.json();
+  const { studentIds, dueDate, showExplanations } = await req.json();
   const requestedStudentIds = Array.isArray(studentIds) ? studentIds.filter((id) => typeof id === "string") : [];
   if (requestedStudentIds.length === 0) {
     return new BadRequestError("Student selection is required.").toResponse();
@@ -53,6 +53,8 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
       testName: test.name,
       assignedById: session.user.id,
       dueDate: resolvedDueDate,
+      // Check + explanation per question in the player (on unless explicitly turned off).
+      showExplanations: showExplanations !== false,
     });
     counts[outcome] += 1;
     touchedStudentIds.add(studentId);

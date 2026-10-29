@@ -1,5 +1,6 @@
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import Link from "next/link";
+import { promotionSourceId } from "@/lib/content-source";
 import { randomUUID } from "crypto";
 import { redirect } from "next/navigation";
 import { Card } from "@/components/ui/card";
@@ -124,11 +125,18 @@ export default async function AiImportFileReviewPage({ params, searchParams }: P
   // often has images but no candidates, so there's no per-candidate board to use).
   let assignTargets: { questionId: string; label: string }[] = [];
   if (file.contentType === "FULL_PRACTICE_TEST" && file.testNumber != null) {
-    const tests = await prisma.fullPracticeTest.findMany({ select: { id: true, name: true } });
-    const match = tests.find((t) => {
-      const m = t.name.match(/test\s*0*(\d+)/i);
-      return m && Number(m[1]) === file.testNumber;
+    // The Test this batch promoted for that number, else TEST N of the batch's source (several
+    // sources can each have a TEST N, so the number alone is not enough).
+    const promotedTest = await prisma.ingestPromotionArtifact.findFirst({
+      where: { batchId, artifactType: "FULL_PRACTICE_TEST", groupKey: `full-test:${file.testNumber}` },
+      select: { artifactId: true },
     });
+    const match = promotedTest
+      ? { id: promotedTest.artifactId }
+      : await prisma.fullPracticeTest.findFirst({
+          where: { number: file.testNumber, sourceId: await promotionSourceId(batchId, "tests") },
+          select: { id: true },
+        });
     if (match) {
       const wantSection = file.section ? (file.section.toUpperCase().includes("MATH") ? "MATH" : "RW") : null;
       const ftqs = await prisma.fullPracticeTestQuestion.findMany({

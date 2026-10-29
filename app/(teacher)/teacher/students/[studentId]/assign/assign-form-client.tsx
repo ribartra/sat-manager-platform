@@ -40,6 +40,9 @@ interface EditingSetInfo {
   difficulty: string;
   status: string;
   dueDate: string | null;
+  unlockAt: string | null;
+  feedbackMode: "AFTER_SET" | "IMMEDIATE";
+  showExplanations: boolean;
 }
 
 const AREAS: Array<{ key: "math" | "reading" | "writing"; code: PracticeAreaCode }> = [
@@ -90,8 +93,10 @@ export function AssignForm({
   const [selected, setSelected] = useState<Set<string>>(() => new Set(editing.map((set) => set.id)));
   // Due date starts one week after today (end of that day), or the set's current one when editing.
   const [dueDate, setDueDate] = useState(() => editing[0]?.dueDate?.slice(0, 10) ?? addDays(localToday(), 7));
-  const [unlockAt, setUnlockAt] = useState("");
-  const [feedbackMode, setFeedbackMode] = useState<"AFTER_SET" | "IMMEDIATE">("AFTER_SET");
+  const [unlockAt, setUnlockAt] = useState(() => editing[0]?.unlockAt?.slice(0, 10) ?? "");
+  // Editing an assigned set starts from its stored settings.
+  const [feedbackMode, setFeedbackMode] = useState<"AFTER_SET" | "IMMEDIATE">(() => editing[0]?.feedbackMode ?? "AFTER_SET");
+  const [showExplanations, setShowExplanations] = useState(() => editing[0]?.showExplanations ?? true);
   const [lockOnAssign, setLockOnAssign] = useState(false);
   const [search, setSearch] = useState("");
   const [area, setArea] = useState<AssignFormProps["initialArea"]>(initialArea);
@@ -154,6 +159,7 @@ export function AssignForm({
         unlockAt: unlockAt || null,
         locked: lockOptionEnabled && lockOnAssign,
         feedbackMode,
+        showExplanations,
       }),
     });
     if (!response.ok) {
@@ -353,8 +359,13 @@ export function AssignForm({
         </div>
         <div>
           <p className="mb-1 block text-sm font-medium text-gray-700">Explanations</p>
-          <p className="text-xs text-gray-500">
-            Each practice set has its own setting for when explanations are shown. Change it by editing the set.
+          {/* Per student: shown in the player when the student checks a question. */}
+          <label className="flex items-center gap-2 text-sm text-gray-700">
+            <Checkbox checked={showExplanations} onChange={(e) => setShowExplanations(e.target.checked)} />
+            Show explanations in the player
+          </label>
+          <p className="mt-1 text-xs text-gray-500">
+            Only for this assignment: other students can have it on or off.
           </p>
         </div>
       </div>

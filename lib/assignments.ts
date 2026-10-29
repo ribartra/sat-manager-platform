@@ -115,11 +115,13 @@ interface PracticeAssignmentInput {
   unlockAt: Date | null;
   locked: boolean;
   feedbackMode: "IMMEDIATE" | "AFTER_SET";
+  /** Explanations in the player (after Check); per student. */
+  showExplanations: boolean;
   sourceGroupId?: string | null;
 }
 
 export async function upsertPracticeAssignment(input: PracticeAssignmentInput): Promise<{ outcome: AssignmentOutcome; assignmentId: string }> {
-  const { studentId, practiceSetId, practiceSetName, assignedById, dueDate, unlockAt, locked, feedbackMode } = input;
+  const { studentId, practiceSetId, practiceSetName, assignedById, dueDate, unlockAt, locked, feedbackMode, showExplanations } = input;
   const audit = (action: string, targetId: string, extra: Record<string, unknown> = {}) =>
     prisma.auditLog.create({
       data: {
@@ -134,6 +136,7 @@ export async function upsertPracticeAssignment(input: PracticeAssignmentInput): 
           unlockAt: unlockAt?.toISOString() ?? null,
           locked,
           feedbackMode,
+          showExplanations,
           sourceGroupId: input.sourceGroupId ?? null,
           ...extra,
         }),
@@ -148,7 +151,7 @@ export async function upsertPracticeAssignment(input: PracticeAssignmentInput): 
   if (!existing) {
     try {
       const created = await prisma.assignment.create({
-        data: { studentId, practiceSetId, assignedById, dueDate, unlockAt, locked, feedbackMode, status: "PENDING" },
+        data: { studentId, practiceSetId, assignedById, dueDate, unlockAt, locked, feedbackMode, showExplanations, status: "PENDING" },
       });
       await notifyUser(studentId, "New practice set assigned", practiceSetName, "/student");
       await audit("ASSIGN_PRACTICE_SET", created.id);
@@ -171,11 +174,12 @@ export async function upsertPracticeAssignment(input: PracticeAssignmentInput): 
       !sameTime(existing.dueDate, nextDueDate) ||
       !sameTime(existing.unlockAt, unlockAt) ||
       existing.locked !== locked ||
-      existing.feedbackMode !== feedbackMode;
+      existing.feedbackMode !== feedbackMode ||
+      existing.showExplanations !== showExplanations;
     if (!changed) return { outcome: "unchanged", assignmentId: existing.id };
     await prisma.assignment.update({
       where: { id: existing.id },
-      data: { dueDate: nextDueDate, unlockAt, locked, feedbackMode, assignedById },
+      data: { dueDate: nextDueDate, unlockAt, locked, feedbackMode, showExplanations, assignedById },
     });
     await notifyUser(studentId, "Assignment updated", practiceSetName, "/student");
     await audit("UPDATE_ASSIGNMENT", existing.id, { previousDueDate: existing.dueDate?.toISOString() ?? null });
@@ -191,6 +195,7 @@ export async function upsertPracticeAssignment(input: PracticeAssignmentInput): 
       unlockAt,
       locked,
       feedbackMode,
+      showExplanations,
       assignedById,
     },
   });
@@ -205,10 +210,12 @@ interface FullTestAssignmentInput {
   testName: string;
   assignedById: string;
   dueDate: Date | null;
+  /** Check + explanation per question in the Test player; per student. */
+  showExplanations: boolean;
 }
 
 export async function upsertFullTestAssignment(input: FullTestAssignmentInput): Promise<{ outcome: AssignmentOutcome; assignmentId: string }> {
-  const { studentId, testId, testName, assignedById, dueDate } = input;
+  const { studentId, testId, testName, assignedById, dueDate, showExplanations } = input;
   const audit = (action: string, targetId: string, extra: Record<string, unknown> = {}) =>
     prisma.auditLog.create({
       data: {
@@ -216,7 +223,7 @@ export async function upsertFullTestAssignment(input: FullTestAssignmentInput): 
         action,
         targetType: "FullPracticeTestAssignment",
         targetId,
-        metadata: JSON.stringify({ studentId, testId, dueDate: dueDate?.toISOString() ?? null, ...extra }),
+        metadata: JSON.stringify({ studentId, testId, dueDate: dueDate?.toISOString() ?? null, showExplanations, ...extra }),
       },
     });
   const href = "/student/tests";
@@ -225,7 +232,7 @@ export async function upsertFullTestAssignment(input: FullTestAssignmentInput): 
   if (!existing) {
     try {
       const created = await prisma.fullPracticeTestAssignment.create({
-        data: { testId, studentId, assignedById, dueDate, status: "PENDING" },
+        data: { testId, studentId, assignedById, dueDate, showExplanations, status: "PENDING" },
       });
       await notifyUser(studentId, "Test assigned", testName, href);
       await audit("ASSIGN_FULL_PRACTICE_TEST", created.id);
@@ -239,10 +246,10 @@ export async function upsertFullTestAssignment(input: FullTestAssignmentInput): 
 
   if (OPEN_STATUSES.has(existing.status)) {
     const nextDueDate = dueDate ?? existing.dueDate;
-    if (sameTime(existing.dueDate, nextDueDate)) return { outcome: "unchanged", assignmentId: existing.id };
+    if (sameTime(existing.dueDate, nextDueDate) && existing.showExplanations === showExplanations) return { outcome: "unchanged", assignmentId: existing.id };
     await prisma.fullPracticeTestAssignment.update({
       where: { id: existing.id },
-      data: { dueDate: nextDueDate, assignedById },
+      data: { dueDate: nextDueDate, showExplanations, assignedById },
     });
     await notifyUser(studentId, "Test assignment updated", testName, href);
     await audit("UPDATE_FULL_PRACTICE_TEST_ASSIGNMENT", existing.id, { previousDueDate: existing.dueDate?.toISOString() ?? null });
@@ -255,7 +262,7 @@ export async function upsertFullTestAssignment(input: FullTestAssignmentInput): 
   });
   await prisma.fullPracticeTestAssignment.update({
     where: { id: existing.id },
-    data: { status: openAttempt ? "IN_PROGRESS" : "PENDING", dueDate, assignedById },
+    data: { status: openAttempt ? "IN_PROGRESS" : "PENDING", dueDate, showExplanations, assignedById },
   });
   await notifyUser(studentId, "Test reassigned", testName, href);
   await audit("REASSIGN_FULL_PRACTICE_TEST", existing.id, { previousStatus: existing.status });

@@ -20,8 +20,7 @@ import {
   StatGrid,
   StatTile,
   TD,
-  CardGrid,
-  TestCard,
+  TestCardsByNumber,
   type TestCardLinks,
   VoidableValue,
   invalidatedRowClass,
@@ -284,9 +283,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
           {testItems.length === 0 ? (
             <Card padding="md" className="text-sm text-gray-400">No tests assigned.</Card>
           ) : (
-            <CardGrid>
-              {testItems.map((t) => <TestCard key={t.assignmentId} item={t} links={teacherTestLinks} layout="compact" />)}
-            </CardGrid>
+            <TestCardsByNumber items={testItems} links={teacherTestLinks} layout="compact" />
           )}
         </section>
 
@@ -445,10 +442,10 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
             { label: "Tests to do", value: String(report.kpis.pending), hint: "Assigned but not finished yet.", href: "#active-tests" },
           ]}
         />
-        {/* One card per assigned Test (same component as every other view), then every try below. */}
+        {/* One "TEST N" accordion per test number, each source's version with its TestCard; then every try below. */}
         {tests.length > 0 ? (
-          <div className="mb-6 space-y-3.5">
-            {[...sortTests(tests).pending, ...sortTests(tests).done].map((t) => <TestCard key={t.assignmentId} item={t} links={teacherTestLinks} />)}
+          <div className="mb-6">
+            <TestCardsByNumber items={[...sortTests(tests).pending, ...sortTests(tests).done]} links={teacherTestLinks} />
           </div>
         ) : null}
         <div className="grid gap-6 lg:grid-cols-3">

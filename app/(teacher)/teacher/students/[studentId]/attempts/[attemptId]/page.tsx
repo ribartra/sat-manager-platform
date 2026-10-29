@@ -13,7 +13,7 @@ import { ReviewQuestionCard } from "@/components/sat/review-question-card";
 import { ResultFilterBar, ResultFilterEmpty, ResultFilterRoot, ResultFilterSegments } from "@/components/sat/result-filter";
 import { AnswerGrid, AnswerGridLegend } from "@/components/sat/test-ui";
 import { Badge } from "@/components/ui/badge";
-import { difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
+import { difficultyBadgeVariant, difficultyLabel, explanationsInPlayerLabel } from "@/lib/domain-meta";
 import { practiceAreaLabel, tabFromPracticeArea, type PracticeAreaCode } from "@/lib/practice-area";
 import { scoreBandTextClass } from "@/lib/score-band";
 import prisma from "@/lib/prisma";
@@ -198,6 +198,7 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
             ) : "Not finished"}
             {attempt.assignment?.dueDate ? <> · Due {formatDate(attempt.assignment.dueDate)}</> : null}
             {attempt.pauses.length > 0 ? ` · Paused ${attempt.pauses.length} ${attempt.pauses.length === 1 ? "time" : "times"} (${formatTime(pauseSeconds)})` : ""}
+            {` · ${explanationsInPlayerLabel(attempt.showExplanations ?? attempt.assignment?.showExplanations)}`}
           </p>
         </div>
         <AttemptHeaderActions

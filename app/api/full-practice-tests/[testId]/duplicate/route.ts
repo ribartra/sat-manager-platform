@@ -25,6 +25,7 @@ export const POST = withApiErrors(async function POST(_req: Request, { params }:
       programId: test.programId,
       sourceId: test.sourceId,
       name: `${test.name} Copy`,
+      number: test.number,
       status: "DRAFT",
       reviewEnabled: test.reviewEnabled,
       breakMinutes: test.breakMinutes,

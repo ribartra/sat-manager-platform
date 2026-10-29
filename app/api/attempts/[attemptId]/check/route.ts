@@ -20,7 +20,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
 
   const attempt = await withSqliteRetry(() => prisma.attempt.findFirst({
     where: { id: attemptId, studentId: session.user.id, status: "IN_PROGRESS" },
-    select: { id: true, practiceSetId: true, assignment: { select: { feedbackMode: true } } },
+    select: { id: true, practiceSetId: true, showExplanations: true, assignment: { select: { feedbackMode: true, showExplanations: true } } },
   }));
   if (!attempt) return new NotFoundError("This practice set was already submitted or closed by your teacher.").toResponse();
   if (attempt.assignment?.feedbackMode !== "IMMEDIATE") {
@@ -43,7 +43,9 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
   }));
   // Already checked: return the stored result; the answer cannot change any more.
   const finalAnswer = existing?.checkedAt && existing.answer ? existing.answer : answer;
-  const result = gradeCheck(finalAnswer, item.question, existing?.questionSnapshot);
+  // Explanations only when this attempt was given "Show explanations in the player".
+  const showExplanation = attempt.showExplanations ?? attempt.assignment?.showExplanations ?? true;
+  const result = gradeCheck(finalAnswer, item.question, existing?.questionSnapshot, { showExplanation });
 
   if (!existing?.checkedAt) {
     await withSqliteRetry(() => prisma.attemptAnswer.upsert({

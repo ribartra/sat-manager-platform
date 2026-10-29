@@ -86,11 +86,13 @@ export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }
   if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { testId } = await params;
-  const { name, status, moduleQuestionIds, reviewEnabled, breakMinutes, sourceId: requestedSourceId } = await req.json();
+  const { name, number: requestedNumber, status, moduleQuestionIds, reviewEnabled, breakMinutes, sourceId: requestedSourceId } = await req.json();
   const targetStatus = status ?? "DRAFT";
   const previous = await prisma.fullPracticeTest.findFirst({ where: { id: testId, ...contentScopeFor(session.user) } });
   if (!previous) return new NotFoundError("Test not found.").toResponse();
   const sourceId = requestedSourceId ?? previous.sourceId;
+  // "TEST N": a client that doesn't send it keeps the stored number.
+  const number = requestedNumber ?? previous.number;
 
   const normalizedModules = Array.from({ length: 4 }, (_, index) => (moduleQuestionIds?.[index] ?? []) as string[]);
   const questionIds = [...new Set(normalizedModules.flat())];
@@ -105,6 +107,7 @@ export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }
   validation.errors.push(
     ...fullTestEditorFieldIssues({
       name,
+      number,
       status: targetStatus,
       reviewEnabled: reviewEnabled ?? previous.reviewEnabled,
       breakMinutes:
@@ -130,6 +133,7 @@ export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }
       where: { id: testId },
       data: {
         name: name.trim(),
+        number: Number(number),
         sourceId,
         status: targetStatus,
         reviewEnabled: reviewEnabled ?? previous.reviewEnabled,

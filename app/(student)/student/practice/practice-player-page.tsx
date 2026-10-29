@@ -19,6 +19,8 @@ interface PracticePlayerInput {
   setId: string;
   assignmentId?: string;
   feedbackMode?: "IMMEDIATE" | "AFTER_SET";
+  /** The assignment's "Show explanations in the player" (recorded on the attempt). */
+  showExplanations?: boolean;
   previewMode?: boolean;
   exitHref?: string;
   resultQuery?: string;
@@ -28,6 +30,7 @@ export async function renderPracticePlayer({
   setId,
   assignmentId,
   feedbackMode = "AFTER_SET",
+  showExplanations = true,
   previewMode = false,
   exitHref,
   resultQuery,
@@ -150,6 +153,7 @@ export async function renderPracticePlayer({
           practiceSetSnapshot,
           assignmentId: assignmentId ?? null,
           attemptNumber: prevAttempts + 1,
+          showExplanations,
           status: "IN_PROGRESS",
           currentQuestion: 0,
         },
@@ -245,7 +249,9 @@ export async function renderPracticePlayer({
   attempt.answers.forEach((answer) => {
     const checkedQuestion = questionById.get(answer.questionId);
     if (feedbackMode === "IMMEDIATE" && answer.checkedAt && answer.answer && checkedQuestion) {
-      savedChecks[answer.questionId] = gradeCheck(answer.answer, checkedQuestion, answer.questionSnapshot);
+      savedChecks[answer.questionId] = gradeCheck(answer.answer, checkedQuestion, answer.questionSnapshot, {
+        showExplanation: attempt.showExplanations ?? showExplanations,
+      });
     }
     if (answer.answer) savedAnswers[answer.questionId] = answer.answer;
     if (answer.timeSpent) savedTimeSpent[answer.questionId] = answer.timeSpent;

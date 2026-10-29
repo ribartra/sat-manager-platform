@@ -41,6 +41,7 @@ export function ImportTargetForm({
   const [difficulty, setDifficulty] = useState(initial.difficulty);
   const sources = kind === "PRACTICE_SET" ? practiceSources : testSources;
   const [sourceId, setSourceId] = useState(() => (sources.some((s) => s.id === initial.sourceId) ? initial.sourceId : sources[0]?.id ?? ""));
+  const [testNumber, setTestNumber] = useState("");
   const [testName, setTestName] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [answers, setAnswers] = useState<File | null>(null);
@@ -53,6 +54,7 @@ export function ImportTargetForm({
     !sourceId ? "Choose the source." :
     kind === "PRACTICE_SET" && !topicId ? "Choose the skill." :
     kind === "PRACTICE_SET" && !difficulty ? "Choose the level." :
+    kind === "FULL_PRACTICE_TEST" && !(Number(testNumber) >= 1) ? "Write the test number." :
     kind === "FULL_PRACTICE_TEST" && !testName.trim() ? "Write the test name." :
     !file ? "Upload the questions PDF." : null;
 
@@ -73,6 +75,7 @@ export function ImportTargetForm({
       form.set("topicId", topicId);
       form.set("difficulty", difficulty);
     } else {
+      form.set("testNumber", testNumber);
       form.set("testName", testName.trim());
     }
     form.set("file", file);
@@ -125,9 +128,25 @@ export function ImportTargetForm({
           </Field>
         </div>
       ) : (
-        <Field label="Test name">
-          <Input value={testName} onChange={(e) => setTestName(e.target.value)} placeholder="e.g. College Board 2025 · Test 1" maxLength={120} />
-        </Field>
+        <div className="grid gap-3 sm:grid-cols-[10rem_1fr]">
+          <Field label="Test number" hint="TEST N: groups the versions of one test across sources.">
+            <Input
+              type="number"
+              min={1}
+              max={999}
+              value={testNumber}
+              onChange={(e) => {
+                setTestNumber(e.target.value);
+                // Default name "TEST N" until the teacher writes their own.
+                if (!testName || /^TEST \d*$/.test(testName)) setTestName(e.target.value ? `TEST ${e.target.value}` : "");
+              }}
+              placeholder="1"
+            />
+          </Field>
+          <Field label="Test name">
+            <Input value={testName} onChange={(e) => setTestName(e.target.value)} placeholder="TEST 1" maxLength={120} />
+          </Field>
+        </div>
       )}
 
       <Field label="Source" hint={sources.length ? "Where the content comes from (Admin › Sources)." : "No active source for this kind of content: ask an admin to add one."}>

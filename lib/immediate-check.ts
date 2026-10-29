@@ -23,11 +23,15 @@ interface GradableQuestion {
   options: { label: string; text: string }[];
 }
 
-/** Grades against the attempt's question snapshot when present, so a later edit does not change it. */
+/**
+ * Grades against the attempt's question snapshot when present, so a later edit does not change it.
+ * `showExplanation` is the attempt's "Show explanations in the player" (per assignment).
+ */
 export function gradeCheck(
   answer: string | null | undefined,
   question: GradableQuestion,
   questionSnapshot?: string | null,
+  { showExplanation = true }: { showExplanation?: boolean } = {},
 ): CheckResult {
   const snapshot = parseSnapshot<QuestionSnapshot>(questionSnapshot);
   const correctAnswer = snapshot?.correctAnswer ?? question.correctAnswer;
@@ -36,6 +40,6 @@ export function gradeCheck(
     isCorrect: isAnswerCorrect(answer, correctAnswer, resolveQuestionType(snapshot?.type ?? question.type, options)),
     answerKey: correctAnswer,
     correctAnswer: formatCorrectAnswer(correctAnswer),
-    explanation: (snapshot ? snapshot.explanation : question.explanation) ?? null,
+    explanation: showExplanation ? ((snapshot ? snapshot.explanation : question.explanation) ?? null) : null,
   };
 }

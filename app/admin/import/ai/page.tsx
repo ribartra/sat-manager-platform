@@ -11,7 +11,7 @@ import { computeCropImageSources } from "@/lib/ingest-crop-source";
 import { computeExtractedTests } from "@/lib/ingest-sets.server";
 import { FULL_TEST_EXPECTED_COUNTS, moduleIndexForCandidate } from "@/lib/full-test-modules";
 import { AiImportWorkflowClient, IngestAutoRefresh } from "./ai-import-client";
-import { listSources } from "@/lib/content-source";
+import { listSources, promotionSourceId } from "@/lib/content-source";
 import { InlineError } from "@/components/sat/alert";
 
 export const dynamic = "force-dynamic";
@@ -493,6 +493,7 @@ export default async function AiImportPage({ searchParams }: PageProps) {
 
       <AiImportWorkflowClient
         sources={(await listSources({ activeOnly: true })).filter((source) => source.forPracticeSets || source.forTests)}
+        testSourceName={selectedBatch ? (await prisma.source.findUnique({ where: { id: await promotionSourceId(selectedBatch.id, "tests") }, select: { name: true } }))?.name : undefined}
         selectedBatchId={selectedBatch?.id}
         selectedBatchStatus={selectedBatch?.status}
         batches={batches.map((batch) => ({

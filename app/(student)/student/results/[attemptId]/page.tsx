@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { RotateCcw } from "lucide-react";
 import { parseSnapshot, PracticeSetSnapshot, QuestionSnapshot } from "@/lib/attempt-snapshots";
-import { difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
+import { difficultyBadgeVariant, difficultyLabel, explanationsInPlayerLabel } from "@/lib/domain-meta";
 import { isAnsweredAnswer, summarizeAllQuestionAnswers } from "@/lib/weighted-score";
 import { Alert } from "@/components/sat/alert";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
@@ -165,6 +165,7 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
               </>
             ) : null}
             {attempt.assignment?.createdAt ? <> · Assigned {formatDate(attempt.assignment.createdAt)}</> : null}
+            {` · ${explanationsInPlayerLabel(attempt.showExplanations ?? attempt.assignment?.showExplanations)}`}
           </p>
         </div>
         <HeaderActions>

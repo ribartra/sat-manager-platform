@@ -53,6 +53,11 @@ const checks = [
     label: "Problem reports need a signed-in user, are rate limited and only accept real JPEG/PNG screenshots",
   },
   {
+    file: "app/api/full-practice-tests/attempts/[attemptId]/check/route.ts",
+    requires: ["requireApprovedSession", "studentId: session.user.id", 'status: "IN_PROGRESS"'],
+    label: "Check del player de Test: solo el intento abierto del propio alumno",
+  },
+  {
     file: "app/api/admin/sources/[id]/content/route.ts",
     requires: ["assertAdmin", "writeAudit", "SOURCE_CONTENT_ASSIGNED", "is not used for Practice Sets", "is not used for Tests"],
     label: "Maestro de fuentes: solo admin asocia Practice Sets / Tests a una fuente del tipo correcto (auditado)",

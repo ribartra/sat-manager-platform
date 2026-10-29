@@ -58,6 +58,7 @@ export function FullTestEditor({
   initial?: {
     id?: string;
     name?: string;
+    number?: number | null;
     status?: string;
     reviewEnabled?: boolean;
     breakMinutes?: number;
@@ -82,6 +83,8 @@ export function FullTestEditor({
     resolver: zodResolver(schema),
     defaultValues: {
       name: initial?.name ?? "",
+      // "TEST N" (groups the versions of one test across sources); from the name when it is "TEST N".
+      number: initial?.number ?? (Number((initial?.name ?? "").match(/^\s*test\s*0*(\d+)\s*$/i)?.[1]) || (undefined as unknown as number)),
       status: (initial?.status as FullTestEditorInput["status"]) ?? "DRAFT",
       reviewEnabled: initial?.reviewEnabled ?? true,
       breakMinutes: initial?.breakMinutes ?? 0,
@@ -121,6 +124,7 @@ export function FullTestEditor({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         name: values.name,
+        number: values.number,
         status: values.status,
         reviewEnabled: values.reviewEnabled,
         breakMinutes: values.breakMinutes,
@@ -172,6 +176,27 @@ export function FullTestEditor({
                   <FormControl>
                     <Input {...field} placeholder="TEST 11" />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="number"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Test number</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={999}
+                      value={Number.isFinite(field.value) ? field.value : ""}
+                      onChange={(e) => field.onChange(e.target.value === "" ? undefined : Number(e.target.value))}
+                      placeholder="11"
+                    />
+                  </FormControl>
+                  <p className="text-xs text-gray-500">Groups the versions of the same test from different sources (TEST 1, TEST 2…).</p>
                   <FormMessage />
                 </FormItem>
               )}

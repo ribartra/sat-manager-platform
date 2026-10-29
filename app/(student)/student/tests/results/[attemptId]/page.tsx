@@ -1,3 +1,4 @@
+import { explanationsInPlayerLabel } from "@/lib/domain-meta";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { SECTION_TEXT } from "@/components/sat/test-ui";
@@ -41,7 +42,7 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
     where: { id: attemptId, studentId: session!.user.id },
     include: {
       test: { select: { name: true, reviewEnabled: true } },
-      assignment: { select: { id: true, dueDate: true, createdAt: true, status: true } },
+      assignment: { select: { id: true, dueDate: true, createdAt: true, status: true, showExplanations: true } },
       answers: true,
       pauses: true,
     },
@@ -153,6 +154,7 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
               <> · Completed <b className="font-medium text-gray-700">{formatDate(attempt.submittedAt)}</b> ({relativeDay(attempt.submittedAt)})</>
             ) : null}
             {attempt.assignment?.dueDate ? <> · Due {formatDate(attempt.assignment.dueDate)}</> : null}
+            {` · ${explanationsInPlayerLabel(attempt.showExplanations ?? attempt.assignment?.showExplanations)}`}
           </p>
         </div>
         <HeaderActions>

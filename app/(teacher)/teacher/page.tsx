@@ -175,7 +175,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
                       {s.tests.latest ? (
                         <>
                           <span className="whitespace-nowrap text-sm"><span className="text-[var(--sat-area-reading)]">R&amp;W</span> <b>{s.tests.latest.rw ?? "—"}</b> · <span className="text-[var(--sat-area-math)]">M</span> <b>{s.tests.latest.math ?? "—"}</b></span>
-                          <span className="block text-xs text-gray-500">{s.tests.latest.name}{s.tests.latest.submittedAt ? ` · ${formatDate(s.tests.latest.submittedAt)}` : ""}</span>
+                          <span className="block text-xs text-gray-500">{s.tests.latest.label}{s.tests.latest.submittedAt ? ` · ${formatDate(s.tests.latest.submittedAt)}` : ""}</span>
                         </>
                       ) : (
                         <span className="text-xs text-gray-400">No test finished</span>

@@ -161,6 +161,8 @@ type AiImportWorkflowProps = {
   setRows: ExtractedTestRow[];
   /** Active content sources (AI Import "Source": what the batch promotes is saved under it). */
   sources?: { id: string; name: string; forPracticeSets: boolean; forTests: boolean }[];
+  /** Source the batch's Tests are promoted under ("TEST N · source"). */
+  testSourceName?: string;
   counts: {
     ocrPending: number;
     openIncidents: number;
@@ -285,6 +287,7 @@ export function AiImportWorkflowClient({
   cropImageSources,
   setRows,
   sources = [],
+  testSourceName,
   counts,
 }: AiImportWorkflowProps) {
   const router = useRouter();
@@ -709,7 +712,7 @@ export function AiImportWorkflowClient({
             <div>
               <p className="text-sm font-semibold text-gray-900">Tests (full-length SAT)</p>
               <p className="text-xs text-gray-500">
-                {fullTests.length} tests · staging review uses 2 Extracted Tests (R&amp;W + Math); promote assembles 4 groups
+                {fullTests.length} tests{testSourceName ? <> · promoted as TEST N of <b>{testSourceName}</b></> : null} · staging review uses 2 Extracted Tests (R&amp;W + Math); promote assembles 4 groups
                 (RW M1/M2 · Math M1/M2) with timers 32/32/35/35 and section scores.
               </p>
             </div>
@@ -719,7 +722,7 @@ export function AiImportWorkflowClient({
               <div key={test.testNumber} className="rounded-md border border-gray-200 p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">Test {test.testNumber}</p>
+                    <p className="text-sm font-semibold text-gray-900">TEST {test.testNumber}{testSourceName ? <span className="font-normal text-gray-500"> · {testSourceName}</span> : null}</p>
                     <p className="mt-1 text-xs text-gray-500">
                       {test.promoted}/{test.total} official · 2 Extracted Tests → 4 SAT groups
                     </p>

@@ -1,3 +1,4 @@
+import { TestNumberAccordion } from "@/components/sat/test-number-accordion";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -252,10 +253,34 @@ export interface TestAttempts {
   last: TestTry;
   /** Every try of this Test, newest first. */
   tries: TestTry[];
+  /** "TEST N" and source: with them the rows are grouped in TEST N accordions, one version per source. */
+  number?: number | null;
+  sourceName?: string;
+  sourceOrder?: number;
 }
 
-/** Test attempts grouped by Test (same look as the practice accordion): last try's scores, then every try. */
+/**
+ * Test attempts: one "TEST N" accordion per test number (TestNumberAccordion); inside, each source's
+ * version as the usual row (last try's scores, opening to every try). Rows without number/source
+ * info keep the flat list.
+ */
 export function TestAttemptsAccordion({ tests, hrefFor }: { tests: TestAttempts[]; hrefFor?: (id: string) => string }) {
+  if (tests.length === 0 || tests.some((test) => test.sourceName === undefined)) return <TestAttemptRows tests={tests} hrefFor={hrefFor} />;
+  return (
+    <TestNumberAccordion
+      items={tests.map((test) => ({
+        key: test.key,
+        number: test.number ?? null,
+        sourceName: test.sourceName ?? "",
+        sourceOrder: test.sourceOrder ?? 999,
+        open: test.last.status === "IN_PROGRESS",
+        node: <TestAttemptRows tests={[test]} hrefFor={hrefFor} />,
+      }))}
+    />
+  );
+}
+
+function TestAttemptRows({ tests, hrefFor }: { tests: TestAttempts[]; hrefFor?: (id: string) => string }) {
   return (
     <GroupedAttemptsAccordion
       head={["Test", <SectionHead key="rw" section="RW" short />, <SectionHead key="m" section="MATH" />, "Total", "Date"]}

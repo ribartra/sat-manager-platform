@@ -134,6 +134,8 @@ model GroupAssignment {
   dueDate       DateTime?
   unlockAt      DateTime?
   locked        Boolean  @default(false)
+  /// Explanations in the player for the members (copied to each member's Assignment).
+  showExplanations Boolean @default(true)
   createdAt     DateTime @default(now())
 
   group       Group       @relation(fields: [groupId], references: [id], onDelete: Cascade)
@@ -341,6 +343,8 @@ model Assignment {
   status        String    @default("PENDING")
   /// Per-assignment practice feedback: IMMEDIATE (Check per question) | AFTER_SET (only after submit).
   feedbackMode  String    @default("AFTER_SET")
+  /// Per-student choice: explanations are shown in the player (after Check). Default on.
+  showExplanations Boolean @default(true)
   createdAt     DateTime  @default(now())
 
   practiceSet PracticeSet @relation(fields: [practiceSetId], references: [id])
@@ -366,6 +370,8 @@ model Attempt {
   submittedAt     DateTime?
   totalTime       Int?
   status          String    @default("IN_PROGRESS") // IN_PROGRESS | SUBMITTED | INVALIDATED
+  /// The assignment's "Show explanations in the player" when this attempt was taken.
+  showExplanations Boolean?
   currentQuestion Int       @default(0)
   teacherComment  String?
   /// Percent correct 0–100 at submit (also drives the 75% unlock rule).
@@ -582,6 +588,8 @@ model ParentAccessToken {
 model FullPracticeTest {
   id             String   @id @default(cuid())
   name           String
+  /// "TEST N": groups the versions of one test across sources.
+  number         Int?
   status         String   @default("DRAFT") // DRAFT | PUBLISHED | ARCHIVED
   reviewEnabled  Boolean  @default(true)
   /// Break between RW Module 2 and Math Module 1 (minutes). 0 = no break.
@@ -600,6 +608,7 @@ model FullPracticeTest {
 
   @@index([programId])
   @@index([sourceId])
+  @@index([number])
 }
 
 model FullPracticeTestModule {
@@ -632,6 +641,8 @@ model FullPracticeTestAssignment {
   assignedById String?
   dueDate     DateTime?
   status      String    @default("PENDING")
+  /// Per-student choice: Check + explanation per question in the Test player.
+  showExplanations Boolean @default(true)
   createdAt   DateTime  @default(now())
   test        FullPracticeTest @relation(fields: [testId], references: [id])
   student     User             @relation(fields: [studentId], references: [id])
@@ -651,6 +662,8 @@ model FullPracticeTestAttempt {
   startedAt      DateTime  @default(now())
   submittedAt    DateTime?
   status         String    @default("IN_PROGRESS")
+  /// The assignment's "Show explanations in the player" when this attempt was taken.
+  showExplanations Boolean?
   currentModule  Int       @default(0)
   currentQuestion Int      @default(0)
   moduleTimerState String?
@@ -693,6 +706,8 @@ model FullPracticeTestAnswer {
   markedForReview Boolean @default(false)
   note            String?
   eliminatedOptions String?
+  /// Set when the student used Check (answer locked from then on).
+  checkedAt       DateTime?
   attempt         FullPracticeTestAttempt @relation(fields: [attemptId], references: [id], onDelete: Restrict)
 
   @@unique([attemptId, questionId])

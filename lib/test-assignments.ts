@@ -28,6 +28,10 @@ export interface StudentTestItem {
   assignmentId: string;
   testId: string;
   name: string;
+  /** "TEST N" and source: Tests are shown grouped by number, one version per source. */
+  number: number | null;
+  sourceName: string;
+  sourceOrder: number;
   assignedAt: Date;
   dueDate: Date | null;
   status: string;
@@ -53,7 +57,7 @@ export async function loadStudentTests(studentId: string): Promise<StudentTestIt
   const assignments = await prisma.fullPracticeTestAssignment.findMany({
     where: { studentId },
     include: {
-      test: { include: { modules: { include: fullTestModulesInclude, orderBy: { order: "asc" } } } },
+      test: { include: { source: { select: { name: true, sortOrder: true } }, modules: { include: fullTestModulesInclude, orderBy: { order: "asc" } } } },
       attempts: {
         orderBy: { startedAt: "asc" },
         include: { answers: { select: { questionId: true, answer: true, isCorrect: true, timeSpent: true } } },
@@ -108,6 +112,9 @@ export async function loadStudentTests(studentId: string): Promise<StudentTestIt
         assignmentId: a.id,
         testId: a.testId,
         name: a.test.name,
+        number: a.test.number,
+        sourceName: a.test.source?.name ?? "No source",
+        sourceOrder: a.test.source?.sortOrder ?? 999,
         assignedAt: a.createdAt,
         dueDate: a.dueDate,
         status: a.status,

@@ -16,7 +16,7 @@ export type QuickImportTarget =
       section: string;
       difficulty: "EASY" | "MEDIUM" | "HARD";
     }
-  | { kind: "FULL_PRACTICE_TEST"; testName: string };
+  | { kind: "FULL_PRACTICE_TEST"; testName: string; /** "TEST N" (groups versions across sources). */ testNumber?: number };
 
 export const QUICK_IMPORT_COLUMNS = [
   "number",

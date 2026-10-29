@@ -163,3 +163,8 @@ export function humanizeCode(value: string | null | undefined): string {
   const text = value.replace(/_/g, " ").toLowerCase();
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
+
+/** Attempt general info: the assignment's "Show explanations in the player" this attempt was given. */
+export function explanationsInPlayerLabel(shown: boolean | null | undefined): string {
+  return `Explanations in the player: ${shown ? "shown" : "hidden"}`;
+}

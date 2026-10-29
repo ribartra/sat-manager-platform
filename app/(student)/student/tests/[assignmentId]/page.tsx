@@ -10,6 +10,8 @@ import { extractQuestionGraphArtifacts } from "@/lib/question-graph";
 import { writeAudit } from "@/lib/audit";
 import { isUniqueConstraintError } from "@/lib/db-errors";
 import { buildFullTestSnapshot, fullTestModulesForAttempt, fullTestModulesInclude } from "@/lib/full-test-snapshot";
+import { formatCorrectAnswer, isAnswerCorrect } from "@/lib/answer-grading";
+import { resolveQuestionType } from "@/lib/question-type";
 import { completedModulesOf, moduleIndexFromKey, moduleKeyFromIndex } from "@/lib/full-test-progress";
 import { TestIntro } from "./test-intro";
 
@@ -68,6 +70,8 @@ export default async function FullTestPlayerPage({ params, searchParams }: PageP
           studentId: session!.user.id,
           // RNF-17: freeze the exam as it is now; later edits never change this attempt.
           testSnapshot: buildFullTestSnapshot(assignment.testId, assignment.test.modules),
+          // The assignment's "Show explanations in the player" when this attempt starts.
+          showExplanations: assignment.showExplanations,
         },
       });
       attempt = await prisma.fullPracticeTestAttempt.findUniqueOrThrow({
@@ -139,6 +143,21 @@ export default async function FullTestPlayerPage({ params, searchParams }: PageP
         })),
       }))}
       savedAnswers={Object.fromEntries(attempt.answers.map((answer) => [answer.questionId, answer.answer ?? ""]))}
+      // "Show explanations in the player" of this attempt (assignment choice when it started).
+      showExplanations={attempt.showExplanations ?? assignment.showExplanations}
+      savedChecks={Object.fromEntries(
+        attempt.answers.flatMap((answer) => {
+          if (!answer.checkedAt || !answer.answer) return [];
+          const question = modules.flatMap((m) => m.questions).find((q) => q.questionId === answer.questionId)?.question;
+          if (!question) return [];
+          return [[answer.questionId, {
+            isCorrect: isAnswerCorrect(answer.answer, question.correctAnswer, resolveQuestionType(question.type, question.options)),
+            answerKey: question.correctAnswer,
+            correctAnswer: formatCorrectAnswer(question.correctAnswer),
+            explanation: question.explanation ?? null,
+          }]];
+        }),
+      )}
       savedTimeSpent={Object.fromEntries(attempt.answers.map((answer) => [answer.questionId, answer.timeSpent ?? 0]))}
       savedMarked={attempt.answers.filter((answer) => answer.markedForReview).map((answer) => answer.questionId)}
       savedNotes={Object.fromEntries(attempt.answers.filter((answer) => answer.note).map((answer) => [answer.questionId, answer.note ?? ""]))}

@@ -1,7 +1,7 @@
 "use client";
 
 import { Checkbox } from "@/components/ui/checkbox";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { localToday } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -9,12 +9,15 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { InlineError } from "@/components/sat/alert";
+import { TestNumberAccordion } from "@/components/sat/test-number-accordion";
 import { readApiError } from "@/lib/api-client";
 
 /** A test the student does NOT have yet (already assigned tests are never offered again). */
 type ExamOption = {
   id: string;
   name: string;
+  /** "TEST N": the versions of a test across sources share one accordion. */
+  number: number | null;
   sourceId: string;
   sourceName: string;
   sourceOrder: number;
@@ -34,29 +37,22 @@ export function AssignTestForm({
   exams: ExamOption[];
   returnHref: string;
   /** Due-date edit of a test the student already has (open). */
-  editing?: { id: string; name: string; dueDate: string | null };
+  editing?: { id: string; name: string; dueDate: string | null; showExplanations: boolean };
 }) {
   const router = useRouter();
   const [selected, setSelected] = useState<Set<string>>(() => new Set(editing ? [editing.id] : []));
   // Due date starts on the day the test is assigned (end of that day), or the current one when editing.
   const [dueDate, setDueDate] = useState(() => editing?.dueDate?.slice(0, 10) ?? localToday());
+  // Per student: Check + explanation per question in the Test player (on by default).
+  const [showExplanations, setShowExplanations] = useState(() => editing?.showExplanations ?? true);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
   const [doneMessage, setDoneMessage] = useState("");
 
-  // One card per source (Innovator, College Board 2025, …), like the Tests list.
-  const groups = useMemo(() => {
-    const term = search.trim().toLowerCase();
-    const visible = term ? exams.filter((exam) => exam.name.toLowerCase().includes(term)) : exams;
-    const bySource = new Map<string, { id: string; name: string; order: number; exams: ExamOption[] }>();
-    for (const exam of visible) {
-      const group = bySource.get(exam.sourceId) ?? bySource.set(exam.sourceId, { id: exam.sourceId, name: exam.sourceName, order: exam.sourceOrder, exams: [] }).get(exam.sourceId)!;
-      group.exams.push(exam);
-    }
-    return [...bySource.values()].sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
-  }, [exams, search]);
+  const term = search.trim().toLowerCase();
+  const visible = term ? exams.filter((exam) => exam.name.toLowerCase().includes(term) || exam.sourceName.toLowerCase().includes(term)) : exams;
 
   function toggle(id: string) {
     setSelected((prev) => {
@@ -77,7 +73,7 @@ export function AssignTestForm({
           const res = await fetch(`/api/full-practice-tests/${testId}/assign`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ studentIds: [studentId], dueDate: dueDate || null }),
+            body: JSON.stringify({ studentIds: [studentId], dueDate: dueDate || null, showExplanations }),
           });
           if (!res.ok) throw await readApiError(res, "Failed to assign the test.");
           return res.json();
@@ -123,29 +119,30 @@ export function AssignTestForm({
         <>
           <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search tests..." />
           <p className="text-xs text-gray-500">Tests {studentName.split(" ")[0]} already has are not listed (they can be retaken).</p>
-          <div className="max-h-[28rem] space-y-3 overflow-y-auto">
-            {groups.map((group) => (
-              <div key={group.id} className="rounded-[var(--sat-radius)] border border-[var(--sat-border)] bg-white p-3">
-                <div className="mb-1 flex items-baseline justify-between">
-                  <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">{group.name}</h3>
-                  <span className="text-xs text-gray-400">{group.exams.length} test{group.exams.length === 1 ? "" : "s"}</span>
-                </div>
-                <div className="divide-y divide-gray-100">
-                  {group.exams.map((exam) => (
-                    <label key={exam.id} className={cn("flex cursor-pointer items-start gap-3 rounded-md px-2 py-2 hover:bg-gray-50", selected.has(exam.id) && "bg-blue-50")}>
-                      <Checkbox className="mt-1" checked={selected.has(exam.id)} onChange={() => toggle(exam.id)} />
-                      <span className="min-w-0 flex-1">
-                        <span className="block text-sm font-medium text-gray-900">{exam.name}</span>
-                        <span className="block text-xs text-gray-500">
-                          {exam.moduleCount} modules (2 Reading & Writing + 2 Math) · {exam.questionCount} questions
-                        </span>
+          {/* Same structure as the Tests list: one "TEST N" accordion, each source's version inside. */}
+          <div className="max-h-[32rem] overflow-y-auto">
+            <TestNumberAccordion
+              emptyText={search ? "No test matches the search." : "Every published test is already assigned."}
+              items={visible.map((exam) => ({
+                key: exam.id,
+                number: exam.number,
+                sourceName: exam.sourceName,
+                sourceOrder: exam.sourceOrder,
+                // Searching opens the matches (selection doesn't drive it, so unticking never collapses it).
+                open: Boolean(term),
+                node: (
+                  <label className={cn("flex cursor-pointer items-start gap-3 rounded-md border border-[var(--sat-border)] bg-white px-3 py-2 hover:bg-gray-50", selected.has(exam.id) && "border-[var(--sat-primary)] bg-blue-50")}>
+                    <Checkbox className="mt-1" checked={selected.has(exam.id)} onChange={() => toggle(exam.id)} />
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-medium text-gray-900">{exam.name}</span>
+                      <span className="block text-xs text-gray-500">
+                        {exam.moduleCount} modules (2 Reading & Writing + 2 Math) · {exam.questionCount} questions
                       </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            ))}
-            {groups.length === 0 && <p className="p-4 text-center text-sm text-gray-400">{search ? "No test matches the search." : "Every published test is already assigned."}</p>}
+                    </span>
+                  </label>
+                ),
+              }))}
+            />
           </div>
         </>
       )}
@@ -154,13 +151,18 @@ export function AssignTestForm({
         <label className="mb-1 block text-sm font-medium text-gray-700">Due date</label>
         <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
       </div>
+      <label className="flex items-center gap-2 text-sm text-gray-700">
+        <Checkbox checked={showExplanations} onChange={(e) => setShowExplanations(e.target.checked)} />
+        Show explanations in the player
+        <span className="text-xs text-gray-500">(a Check button per question shows the answer and its explanation)</span>
+      </label>
 
       <InlineError>{error}</InlineError>
       {done && <p className="text-sm font-medium text-green-600">✓ {doneMessage} Redirecting...</p>}
 
       <div className="flex items-center gap-3">
         <Button onClick={handleAssign} disabled={loading} disabledReason={done ? "Already assigned." : selected.size === 0 ? "Select at least one test." : null}>
-          {editing ? (loading ? "Saving..." : "Save due date") : loading ? "Assigning..." : `Assign test${selected.size ? ` (${selected.size})` : ""}`}
+          {editing ? (loading ? "Saving..." : "Save changes") : loading ? "Assigning..." : `Assign test${selected.size ? ` (${selected.size})` : ""}`}
         </Button>
         <Button type="button" variant="ghost" onClick={() => router.push(returnHref)}>
           Cancel

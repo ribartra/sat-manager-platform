@@ -42,6 +42,8 @@ export const POST = withApiErrors(async function POST(_req: Request, { params }:
         studentId: session.user.id,
         // RNF-17: freeze the test as it is now; later edits never change this attempt.
         testSnapshot: buildFullTestSnapshot(assignment.testId, assignment.test.modules),
+        // The assignment's "Show explanations in the player" when this attempt starts.
+        showExplanations: assignment.showExplanations,
       },
       select: { id: true },
     });

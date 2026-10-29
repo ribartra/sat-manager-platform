@@ -14,6 +14,7 @@ export { NotFoundView } from "./not-found-view";
 export { Breadcrumbs, type Crumb } from "./breadcrumbs";
 export { SectionHeader } from "./section-header";
 export { SkillResults } from "./skill-results";
+export { TestNumberAccordion, groupTestVersions, type TestVersionItem } from "./test-number-accordion";
 export { StatTile, StatGrid, Delta, ChipStat } from "./stat-tile";
 export { LinkTr, RowLink, RowAction, ChevronCell, SimpleTable, TD } from "./link-table";
 export { LinkTabs } from "./link-tabs";
@@ -24,6 +25,6 @@ export { SkillsMap, SkillsSourceMap, type SkillsSourceSkill, type SkillsSourceRo
 export { AttentionCard, AttentionItem, AttentionRow, DateCell, StudentCell, shortName } from "./teacher-ui";
 export { ContinueCard } from "./continue-card";
 export { ListItem, ListStack } from "./list";
-export { TestCard, type TestCardLinks } from "./test-card";
+export { TestCard, TestCardsByNumber, type TestCardLinks } from "./test-card";
 export { ListFilters, matchesQuery, type ListFilterSelect } from "./list-filters";
 export { RoleBadge } from "./role-badge";

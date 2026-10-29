@@ -1,9 +1,8 @@
-import { Fragment } from "react";
 import Link from "next/link";
 import { currentContentScope } from "@/lib/content-scope";
 import { redirect } from "next/navigation";
 import { Plus, Sparkles, User } from "lucide-react";
-import { EmptyState, ListFilters, PageShell, Pagination, matchesQuery, pageFromParam, paginate } from "@/components/sat";
+import { EmptyState, ListFilters, PageShell, Pagination, TestNumberAccordion, groupTestVersions, matchesQuery, pageFromParam, paginate } from "@/components/sat";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { TestModuleTiles } from "@/components/sat/test-module-tiles";
 import { Badge } from "@/components/ui/badge";
@@ -73,7 +72,12 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
       (!assigned || (assigned === "yes") === t.assignments.length > 0),
   );
   const filterParams = { q: query.q || undefined, status, assigned };
-  const page = paginate(shown, pageFromParam(query.page), PAGE_SIZE);
+  // Pagination counts "TEST N" groups (every version of a test stays on the same page).
+  const testGroups = groupTestVersions(
+    shown.map((test) => ({ key: test.id, number: test.number, sourceName: test.source?.name ?? "No source", sourceOrder: test.source?.sortOrder ?? 999, node: null })),
+  );
+  const page = paginate(testGroups, pageFromParam(query.page), PAGE_SIZE);
+  const pageTests = new Set(page.items.flatMap((group) => group.versions.map((version) => version.key)));
   const emptySources = canImport
     ? (await listSources({ activeOnly: true, kind: "tests" })).filter((source) => !tests.some((test) => test.source?.id === source.id))
     : [];
@@ -133,15 +137,9 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
         <EmptyState title="No tests match these filters." />
       ) : (
         <div className="space-y-3.5">
-          {page.items.map((test, index) => {
-            // A heading where a new source starts (also at the top of each page).
-            const sourceHeading =
-              index === 0 || page.items[index - 1].source?.id !== test.source?.id ? (
-                <h2 className="pt-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
-                  {test.source?.name ?? "No source"}{" "}
-                  <span className="font-normal normal-case text-gray-400">· {shown.filter((t) => t.source?.id === test.source?.id).length} tests</span>
-                </h2>
-              ) : null;
+          {/* One "TEST N" accordion per test number; inside, each source's version with its card. */}
+          <TestNumberAccordion
+            items={shown.filter((test) => pageTests.has(test.id)).map((test) => {
             const modules = moduleViewsForTest(test.modules.map((m) => ({ ...m, questions: m.questions })));
             const a = test.assignments;
             const completed = a.filter((x) => x.status === "COMPLETED").length;
@@ -151,14 +149,16 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
             const nextDue = a
               .filter((x) => x.status !== "COMPLETED" && x.dueDate)
               .reduce<Date | null>((m, x) => (!m || x.dueDate! < m ? x.dueDate : m), null);
-            return (
-              <Fragment key={test.id}>
-              {sourceHeading}
+            return {
+              key: test.id,
+              number: test.number,
+              sourceName: test.source?.name ?? "No source",
+              sourceOrder: test.source?.sortOrder ?? 999,
+              node: (
               <div className="overflow-hidden rounded-[10px] border border-gray-200 bg-white shadow-sm">
                 <div className="flex flex-wrap items-center justify-between gap-2 bg-[var(--sat-area-tests)] px-4 py-2.5 text-[var(--sat-tests-ink)]">
                   <div className="flex flex-wrap items-center gap-2">
                     <b className="text-base">{test.name}</b>
-                    {test.source ? <span className="text-sm">· {test.source.name}</span> : null}
                     <span className="text-sm">
                       {firstAssigned ? `· assigned ${formatDate(firstAssigned)}` : "· not assigned yet"}
                       {nextDue ? ` · next due ${formatDate(nextDue)}` : ""}
@@ -198,9 +198,10 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
                   </div>
                 </div>
               </div>
-              </Fragment>
-            );
-          })}
+              ),
+            };
+            })}
+          />
           <Pagination basePath="/teacher/tests" params={filterParams} pageSize={PAGE_SIZE} {...page} />
         </div>
       )}

@@ -26,7 +26,7 @@ export default async function PracticeAssignmentPlayerPage({ params, searchParam
       id: assignmentId,
       ...(session.user.role === "STUDENT" ? { studentId: session.user.id } : {}),
     },
-    select: { id: true, practiceSetId: true, feedbackMode: true },
+    select: { id: true, practiceSetId: true, feedbackMode: true, showExplanations: true },
   }));
 
   if (!assignment) notFound();
@@ -39,6 +39,7 @@ export default async function PracticeAssignmentPlayerPage({ params, searchParam
     setId: assignment.practiceSetId,
     assignmentId: assignment.id,
     feedbackMode: assignment.feedbackMode === "IMMEDIATE" ? "IMMEDIATE" : "AFTER_SET",
+    showExplanations: assignment.showExplanations,
     exitHref: `/student/practice?${returnParams.toString()}`,
     resultQuery: returnParams.toString(),
   });

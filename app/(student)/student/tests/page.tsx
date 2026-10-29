@@ -9,7 +9,7 @@ import {
   StatGrid,
   StatTile,
   TestAttemptsAccordion,
-  TestCard,
+  TestCardsByNumber,
   type TestCardLinks,
   pageFromParam,
   paginate,
@@ -94,11 +94,7 @@ export default async function StudentTestsPage({ searchParams }: PageProps) {
         <EmptyState title={view === "pending" ? "No pending tests. Great job!" : "No tests here yet."} />
       ) : (
         <div id="tests" className="scroll-mt-6">
-          <div className="space-y-3.5">
-            {page.items.map((t) => (
-              <TestCard key={t.assignmentId} item={t} links={STUDENT_TEST_CARD_LINKS} />
-            ))}
-          </div>
+          <TestCardsByNumber items={page.items} links={STUDENT_TEST_CARD_LINKS} openPending />
           <Pagination basePath="/student/tests" params={{ view }} anchor="tests" pageSize={TESTS_PAGE_SIZE} {...page} />
         </div>
       )}

@@ -37,6 +37,7 @@ export default async function EditFullTestPage({ params }: PageProps) {
         initial={{
           id: test.id,
           name: test.name,
+          number: test.number,
           status: test.status,
           reviewEnabled: test.reviewEnabled,
           breakMinutes: test.breakMinutes,

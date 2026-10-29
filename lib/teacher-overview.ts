@@ -22,7 +22,16 @@ export interface AreaOverview {
 }
 
 export interface TestsOverview {
-  latest: { id: string; name: string; submittedAt: Date | null; rw: number | null; math: number | null; total: number | null } | null;
+  latest: {
+    id: string;
+    name: string;
+    /** "TEST N · source" label (tests are grouped by number, one version per source). */
+    label: string;
+    submittedAt: Date | null;
+    rw: number | null;
+    math: number | null;
+    total: number | null;
+  } | null;
   inProgress: number;
   pending: { name: string; overdue: boolean; testId: string }[];
 }
@@ -84,7 +93,7 @@ export async function loadStudentOverviews(studentIds: string[], now = new Date(
       fullTestAttempts: {
         where: { status: { in: ["SUBMITTED", "IN_PROGRESS"] } },
         orderBy: { startedAt: "desc" },
-        select: { id: true, status: true, submittedAt: true, startedAt: true, rwScore: true, mathScore: true, totalScore: true, test: { select: { name: true } } },
+        select: { id: true, status: true, submittedAt: true, startedAt: true, rwScore: true, mathScore: true, totalScore: true, test: { select: { name: true, number: true, source: { select: { name: true } } } } },
       },
       fullTestAssignments: {
         where: { status: { in: ["PENDING", "IN_PROGRESS", "OVERDUE"] } },
@@ -150,7 +159,15 @@ export async function loadStudentOverviews(studentIds: string[], now = new Date(
     const latest = submitted[0] ?? null;
     const tests: TestsOverview = {
       latest: latest
-        ? { id: latest.id, name: latest.test.name, submittedAt: latest.submittedAt, rw: latest.rwScore, math: latest.mathScore, total: latest.totalScore }
+        ? {
+            id: latest.id,
+            name: latest.test.name,
+            label: [latest.test.number ? `TEST ${latest.test.number}` : latest.test.name, latest.test.source?.name].filter(Boolean).join(" · "),
+            submittedAt: latest.submittedAt,
+            rw: latest.rwScore,
+            math: latest.mathScore,
+            total: latest.totalScore,
+          }
         : null,
       inProgress: s.fullTestAttempts.filter((a) => a.status === "IN_PROGRESS").length,
       pending: s.fullTestAssignments.map((a) => ({ name: a.test.name, testId: a.testId, overdue: a.status === "OVERDUE" || Boolean(a.dueDate && a.dueDate < now) })),

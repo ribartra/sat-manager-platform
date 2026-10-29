@@ -2,6 +2,7 @@ import Link from "next/link";
 import { RetakeTestButton } from "@/components/sat/retake-test-button";
 import { TestModuleTiles } from "@/components/sat/test-module-tiles";
 import { WorkStatusBadges } from "@/components/sat/work-status";
+import { TestNumberAccordion } from "@/components/sat/test-number-accordion";
 import { Button } from "@/components/ui/button";
 import type { ModuleView } from "@/lib/test-view";
 import type { StudentTestItem } from "@/lib/test-assignments";
@@ -123,5 +124,39 @@ export function TestCard({ item, links, layout = "row" }: { item: StudentTestIte
         </div>
       )}
     </div>
+  );
+}
+
+/**
+ * Test cards grouped in "TEST N" accordions (TestNumberAccordion): each source's version of a test
+ * keeps its TestCard. A version not done yet (to do / in progress / overdue) opens its accordion when
+ * `openPending` (student views).
+ */
+export function TestCardsByNumber({
+  items,
+  links,
+  layout = "row",
+  openPending = false,
+  emptyText,
+}: {
+  items: StudentTestItem[];
+  links: TestCardLinks;
+  layout?: "row" | "compact";
+  openPending?: boolean;
+  emptyText?: string;
+}) {
+  return (
+    <TestNumberAccordion
+      compact={layout === "compact"}
+      emptyText={emptyText}
+      items={items.map((item) => ({
+        key: item.assignmentId,
+        number: item.number,
+        sourceName: item.sourceName,
+        sourceOrder: item.sourceOrder,
+        open: openPending && item.state !== "done",
+        node: <TestCard item={item} links={links} layout={layout} />,
+      }))}
+    />
   );
 }

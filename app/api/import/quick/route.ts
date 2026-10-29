@@ -49,8 +49,10 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
     target = { kind, topicId: topic.id, topicName: topic.name, domainName: topic.domain.name, section, difficulty: difficulty as "EASY" | "MEDIUM" | "HARD" };
   } else {
     const testName = String(form.get("testName") || "").trim();
+    const testNumber = Number(form.get("testNumber"));
+    if (!Number.isInteger(testNumber) || testNumber < 1 || testNumber > 999) throw new ValidationError("Validation failed.", ["Write the test number (TEST N)."]);
     if (!testName || testName.length > 120) throw new ValidationError("Validation failed.", ["Write the test name."]);
-    target = { kind, testName };
+    target = { kind, testName, testNumber };
   }
 
   // The PDF goes through the ingest service's upload (staging folder + IngestSourceFile rows).

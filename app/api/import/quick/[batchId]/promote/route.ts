@@ -87,6 +87,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
         programId,
         sourceId,
         name: target.testName,
+        number: target.testNumber ?? null,
         status: "DRAFT",
         modules: {
           create: FULL_TEST_MODULES.map((module, order) => ({

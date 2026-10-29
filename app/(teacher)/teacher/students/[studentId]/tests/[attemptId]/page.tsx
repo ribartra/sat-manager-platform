@@ -1,3 +1,4 @@
+import { explanationsInPlayerLabel } from "@/lib/domain-meta";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { SECTION_TEXT } from "@/components/sat/test-ui";
@@ -53,7 +54,7 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
       answers: true,
       pauses: true,
       test: { select: { name: true } },
-      assignment: { select: { dueDate: true } },
+      assignment: { select: { dueDate: true, showExplanations: true } },
     },
   });
   if (!attempt) notFound();
@@ -137,6 +138,7 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
             {attempt.pauses.length > 0 ? ` · Paused ${attempt.pauses.length} ${attempt.pauses.length === 1 ? "time" : "times"} (${formatDuration(pauseSeconds)})` : ""}
             {attempt.timeExpiredEvents > 0 ? ` · Ran out of time ${attempt.timeExpiredEvents} ${attempt.timeExpiredEvents === 1 ? "time" : "times"}` : ""}
             {attempt.extraTimeUsed > 0 ? ` · Extra time ${formatTime(attempt.extraTimeUsed)}` : ""}
+            {` · ${explanationsInPlayerLabel(attempt.showExplanations ?? attempt.assignment?.showExplanations)}`}
           </p>
         </div>
         <AttemptHeaderActions

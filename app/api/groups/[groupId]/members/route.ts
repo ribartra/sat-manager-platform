@@ -54,6 +54,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
           dueDate: groupAssignment.dueDate,
           unlockAt: groupAssignment.unlockAt,
           locked: groupAssignment.locked,
+          showExplanations: groupAssignment.showExplanations,
           status: "PENDING",
         },
       });

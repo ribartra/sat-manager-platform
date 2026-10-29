@@ -13,7 +13,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
   if (!session) return new ForbiddenError("Forbidden").toResponse();
 
-  const { name, status, moduleQuestionIds, reviewEnabled, breakMinutes, sourceId, programId: requestedProgramId } = await req.json();
+  const { name, number, status, moduleQuestionIds, reviewEnabled, breakMinutes, sourceId, programId: requestedProgramId } = await req.json();
   // The Test goes to the bank of a program the author teaches, with questions of that same bank.
   const programId = await contentProgramFor(session.user, typeof requestedProgramId === "string" ? requestedProgramId : null);
   const targetStatus = status ?? "DRAFT";
@@ -37,6 +37,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
   validation.errors.push(
     ...fullTestEditorFieldIssues({
       name,
+      number,
       status: targetStatus,
       reviewEnabled: reviewEnabled ?? true,
       breakMinutes: Number.isInteger(breakMinutes) && breakMinutes >= 0 ? breakMinutes : 0,
@@ -59,6 +60,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
       programId,
       sourceId,
       name,
+      number: Number(number),
       status: status ?? "DRAFT",
       reviewEnabled: reviewEnabled ?? true,
       breakMinutes: resolvedBreak,

@@ -41,7 +41,7 @@ export default async function AssignTestPage({ params, searchParams }: PageProps
     }),
     prisma.fullPracticeTestAssignment.findMany({
       where: { studentId },
-      select: { testId: true, status: true, dueDate: true },
+      select: { testId: true, status: true, dueDate: true, showExplanations: true },
     }),
   ]);
 
@@ -74,7 +74,7 @@ export default async function AssignTestPage({ params, searchParams }: PageProps
       </p>
       {overview ? <StudentDonePanel overview={overview} studentId={student.id} focus="tests" /> : null}
       <AssignTestForm
-        editing={editingExam ? { id: editingExam.id, name: editingExam.name, dueDate: editingRow?.dueDate?.toISOString() ?? null } : undefined}
+        editing={editingExam ? { id: editingExam.id, name: editingExam.name, dueDate: editingRow?.dueDate?.toISOString() ?? null, showExplanations: editingRow?.showExplanations ?? true } : undefined}
         studentId={student.id}
         studentName={student.name}
         exams={exams
@@ -82,6 +82,7 @@ export default async function AssignTestPage({ params, searchParams }: PageProps
           .map((exam) => ({
             id: exam.id,
             name: exam.name,
+            number: exam.number,
             sourceId: exam.source?.id ?? "none",
             sourceName: exam.source?.name ?? "No source",
             sourceOrder: exam.source?.sortOrder ?? 999,

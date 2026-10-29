@@ -13,7 +13,9 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
     return new ForbiddenError("Forbidden").toResponse();
   }
 
-  const { studentIds, practiceSetIds, dueDate, unlockAt, locked, sourceGroupId, feedbackMode } = await req.json();
+  const { studentIds, practiceSetIds, dueDate, unlockAt, locked, sourceGroupId, feedbackMode, showExplanations } = await req.json();
+  // "Show explanations in the player" (per student; on unless explicitly turned off).
+  const resolvedShowExplanations = showExplanations !== false;
   const resolvedFeedbackMode = feedbackMode === "IMMEDIATE" ? "IMMEDIATE" : "AFTER_SET";
   if (sourceGroupId && session.user.role !== "ADMIN") {
     const enabled = await getFeatureSetting("TEACHER_GROUP_MANAGEMENT");
@@ -91,6 +93,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
           dueDate: resolvedDueDate,
           unlockAt: resolvedUnlockAt,
           locked: resolvedLocked,
+          showExplanations: resolvedShowExplanations,
         },
         create: {
           groupId: sourceGroupId,
@@ -99,6 +102,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
           dueDate: resolvedDueDate,
           unlockAt: resolvedUnlockAt,
           locked: resolvedLocked,
+          showExplanations: resolvedShowExplanations,
         },
       });
     }
@@ -132,6 +136,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
         unlockAt: resolvedUnlockAt,
         locked: resolvedLocked,
         feedbackMode: resolvedFeedbackMode,
+        showExplanations: resolvedShowExplanations,
         sourceGroupId: sourceGroupId ?? null,
       });
       counts[outcome] += 1;

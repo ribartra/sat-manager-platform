@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Select } from "@/components/ui/select";
 import { StudentPicker } from "@/components/student-picker";
 import { cn } from "@/lib/utils";
@@ -29,6 +30,8 @@ export function FullTestAssignClient({
   const [groupId, setGroupId] = useState(groups[0]?.id ?? "");
   // Due date starts on the day the exam is assigned (end of that day); the teacher can change it.
   const [dueDate, setDueDate] = useState(localToday);
+  // Per student: Check + explanation per question in the Test player (on by default).
+  const [showExplanations, setShowExplanations] = useState(true);
   const [groupSearch, setGroupSearch] = useState("");
   const [groupOpen, setGroupOpen] = useState(false);
 
@@ -59,7 +62,7 @@ export function FullTestAssignClient({
       const res = await fetch(`/api/full-practice-tests/${testId}/assign`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ studentIds, dueDate: dueDate || null }),
+        body: JSON.stringify({ studentIds, dueDate: dueDate || null, showExplanations }),
       });
       if (!res.ok) throw await readApiError(res, "Failed to assign exam.");
       const data = await res.json();
@@ -145,6 +148,11 @@ export function FullTestAssignClient({
         <label className="mb-1 block text-sm font-medium text-gray-700">Due date</label>
         <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
       </div>
+      <label className="flex items-center gap-2 text-sm text-gray-700">
+        <Checkbox checked={showExplanations} onChange={(e) => setShowExplanations(e.target.checked)} />
+        Show explanations in the player
+        <span className="text-xs text-gray-500">(a Check button per question shows the answer and its explanation)</span>
+      </label>
       <InlineError>{error}</InlineError>
       <Button onClick={assign} disabled={loading}>
         {loading ? "Assigning..." : "Assign test"}

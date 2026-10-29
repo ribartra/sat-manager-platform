@@ -19,6 +19,7 @@ import { LoadingState, OfflineBanner, SaveIndicator, type SaveStatus } from "@/c
 import { exitPlayerOnAuthLoss, isAuthFailureStatus } from "@/lib/player-session-exit";
 import { fetchWithTransientRetry } from "@/lib/transient-fetch";
 import { readApiError } from "@/lib/api-client";
+import type { CheckResult } from "@/lib/immediate-check";
 import { notify } from "@/lib/notify-ui";
 import { clearBuffer, readBuffer, sendKeepalive, useOnlineStatus, usePageHideFlush, useSaveQueue, writeBuffer } from "@/lib/player-persistence";
 import { Calculator, ChevronLeft, FileText, Flag, Highlighter, LogOut } from "lucide-react";
@@ -93,7 +94,13 @@ export function FullTestPlayer({
   resultQuery,
   completedModules = [],
   startModule = null,
+  showExplanations = false,
+  savedChecks = {},
 }: {
+  /** Assignment option: a Check button per question shows the answer and its explanation. */
+  showExplanations?: boolean;
+  /** Questions already checked in this attempt (their answer is locked). */
+  savedChecks?: Record<string, CheckResult>;
   attemptId: string;
   assignmentId: string;
   testName: string;
@@ -121,6 +128,9 @@ export function FullTestPlayer({
   startModule?: number | null;
 }) {
   const router = useRouter();
+  const [checked, setChecked] = useState<Record<string, CheckResult>>(savedChecks);
+  const [checking, setChecking] = useState(false);
+  const [checkError, setCheckError] = useState("");
   const breakSecondsTotal = Math.max(0, breakMinutes) * 60;
   const completedAtLoad = new Set(completedModules);
   const isOpen = (index: number) => index >= 0 && index < modules.length && !completedAtLoad.has(index);
@@ -789,9 +799,44 @@ export function FullTestPlayer({
   }
 
   const hasPassage = Boolean(question.stimulus?.trim());
+
+  // "Show explanations in the player": grade one answer on the server and lock it.
+  async function handleCheck(questionId: string) {
+    const selected = answersRef.current[questionId];
+    if (!selected || checking) return;
+    setCheckError("");
+    setChecking(true);
+    try {
+      const res = await fetchWithTransientRetry(`/api/full-practice-tests/attempts/${attemptId}/check`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ questionId, answer: selected }),
+      });
+      if (isAuthFailureStatus(res.status)) {
+        await exitPlayerOnAuthLoss({ pauseUrl: `/api/full-practice-tests/attempts/${attemptId}/pause` });
+        return;
+      }
+      if (!res.ok) {
+        setCheckError((await readApiError(res, "We couldn't check this answer. Please try again.")).message);
+        return;
+      }
+      const data = (await res.json()) as CheckResult & { answer?: string };
+      if (data.answer && data.answer !== selected) {
+        const nextAnswers = { ...answersRef.current, [questionId]: data.answer };
+        answersRef.current = nextAnswers;
+        setAnswers(nextAnswers);
+      }
+      setChecked((prev) => ({ ...prev, [questionId]: { isCorrect: data.isCorrect, answerKey: data.answerKey, correctAnswer: data.correctAnswer, explanation: data.explanation } }));
+    } catch {
+      setCheckError("You're offline. Try again when you're back online.");
+    } finally {
+      setChecking(false);
+    }
+  }
   const responseType = resolveQuestionType(question.type, question.options);
 
   function chooseOption(questionId: string, label: string) {
+    if (checked[questionId]) return; // checked answers are locked
     const nextAnswers = { ...answersRef.current, [questionId]: label };
     answersRef.current = nextAnswers;
     setAnswers(nextAnswers);
@@ -1017,8 +1062,40 @@ export function FullTestPlayer({
               }}
               placeholder="Type your answer"
               aria-label="Type your answer"
+              disabled={Boolean(checked[question.id])}
             />
           )}
+          {showExplanations && !previewMode ? (
+            <div className="mt-3 space-y-2 rounded-md border border-gray-200 bg-gray-50 p-3">
+              {!checked[question.id] ? (
+                <>
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={() => void handleCheck(question.id)}
+                    disabled={checking}
+                    disabledReason={!answers[question.id] ? "Answer the question first." : null}
+                  >
+                    {checking ? "Checking…" : "Check"}
+                  </Button>
+                  {checkError ? <p className="text-xs text-red-700">{checkError}</p> : null}
+                </>
+              ) : (
+                <>
+                  <p className={cn("text-sm font-semibold", checked[question.id].isCorrect ? "text-green-700" : "text-red-700")}>
+                    {checked[question.id].isCorrect ? "Correct" : "Incorrect"}
+                    {!checked[question.id].isCorrect && checked[question.id].correctAnswer ? ` · Correct answer: ${checked[question.id].correctAnswer}` : ""}
+                  </p>
+                  {checked[question.id].explanation?.trim() ? (
+                    <div className="text-sm text-gray-700">
+                      <p className="mb-1 text-xs font-medium uppercase tracking-wide text-gray-500">Explanation</p>
+                      <MathContent content={checked[question.id].explanation!} />
+                    </div>
+                  ) : null}
+                </>
+              )}
+            </div>
+          ) : null}
           <details className="mt-3 rounded-md border border-gray-200 bg-gray-50 open:bg-white">
             <summary className="cursor-pointer select-none px-3 py-2 text-xs font-medium text-gray-500">
               Personal note

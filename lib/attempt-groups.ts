@@ -94,6 +94,14 @@ export function testGroups(tests: StudentTestItem[], keep: (attempt: TestAttempt
   return tests
     .map((t) => ({ t, tries: t.attempts.filter(keep).sort((x, y) => (y.submittedAt ?? y.startedAt).getTime() - (x.submittedAt ?? x.startedAt).getTime() || y.id.localeCompare(x.id)) }))
     .filter(({ tries }) => tries.length > 0)
-    .map(({ t, tries }) => ({ key: t.assignmentId, title: t.name, tries, last: tries.find((a) => a.status === "SUBMITTED") ?? tries[0] }))
+    .map(({ t, tries }) => ({
+      key: t.assignmentId,
+      title: t.name,
+      number: t.number,
+      sourceName: t.sourceName,
+      sourceOrder: t.sourceOrder,
+      tries,
+      last: tries.find((a) => a.status === "SUBMITTED") ?? tries[0],
+    }))
     .sort((x, y) => (y.tries[0].submittedAt ?? y.tries[0].startedAt).getTime() - (x.tries[0].submittedAt ?? x.tries[0].startedAt).getTime());
 }
