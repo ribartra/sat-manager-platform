@@ -2,13 +2,15 @@ import { Fragment } from "react";
 import Link from "next/link";
 import { currentContentScope } from "@/lib/content-scope";
 import { redirect } from "next/navigation";
-import { Plus, User } from "lucide-react";
+import { Plus, Sparkles, User } from "lucide-react";
 import { EmptyState, ListFilters, PageShell, Pagination, matchesQuery, pageFromParam, paginate } from "@/components/sat";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { TestModuleTiles } from "@/components/sat/test-module-tiles";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
+import { requireContentImporter } from "@/lib/rbac";
+import { listSources } from "@/lib/content-source";
 import prisma from "@/lib/prisma";
 import { fullTestStatusBadgeVariant, fullTestStatusLabel } from "@/lib/domain-meta";
 import { studentAccessWhereFor } from "@/lib/program-scope";
@@ -29,6 +31,8 @@ const PAGE_SIZE = 10;
  */
 export default async function TeacherTestsPage({ searchParams }: PageProps) {
   const session = await auth();
+  // Admin and master teacher import Tests with AI; a Tests source with no test yet offers "+ Import test".
+  const canImport = Boolean(await requireContentImporter());
   const now = new Date();
   const query = await searchParams;
   // The students × tests matrix was replaced by the per-test page (mockup); old links land here.
@@ -70,6 +74,9 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
   );
   const filterParams = { q: query.q || undefined, status, assigned };
   const page = paginate(shown, pageFromParam(query.page), PAGE_SIZE);
+  const emptySources = canImport
+    ? (await listSources({ activeOnly: true, kind: "tests" })).filter((source) => !tests.some((test) => test.source?.id === source.id))
+    : [];
 
   return (
     <PageShell maxWidth={1100} width="wide">
@@ -86,11 +93,30 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
           <Button asChild variant="secondary">
             <Link href="/teacher/tests/scoring">How scores work</Link>
           </Button>
+          {canImport ? (
+            <Button asChild variant="secondary">
+              <Link href="/teacher/import?kind=FULL_PRACTICE_TEST"><Sparkles size={14} /> Import with AI</Link>
+            </Button>
+          ) : null}
           <Button asChild>
             <Link href="/teacher/tests/new"><Plus size={14} /> New test</Link>
           </Button>
         </div>
       </header>
+      {emptySources.length ? (
+        <div className="mb-4 flex flex-wrap items-center gap-2 text-sm">
+          <span className="text-gray-500">No tests yet from</span>
+          {emptySources.map((source) => (
+            <Link
+              key={source.id}
+              href={`/teacher/import?${new URLSearchParams({ kind: "FULL_PRACTICE_TEST", source: source.id }).toString()}`}
+              className="rounded-lg border border-dashed border-[var(--sat-border)] px-2.5 py-1 font-semibold text-[var(--sat-muted)] hover:border-[var(--sat-primary)] hover:bg-[var(--sat-primary-soft)]"
+            >
+              {source.name} · + Import test
+            </Link>
+          ))}
+        </div>
+      ) : null}
 
       <ListFilters
         action="/teacher/tests"

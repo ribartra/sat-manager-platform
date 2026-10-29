@@ -5,7 +5,7 @@ import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { normalizeIngestDifficulty } from "@/lib/ingest-promotion";
 import { ApiError, BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
-import { DEFAULT_PRACTICE_SOURCE_ID } from "@/lib/content-source";
+import { promotionSourceId } from "@/lib/content-source";
 
 interface RouteContext {
   params: Promise<{ batchId: string }>;
@@ -64,6 +64,8 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
     where: { batchId_artifactType_groupKey: { batchId, artifactType: "PRACTICE_SET", groupKey } },
   });
 
+  // The AI Import "Source" of the batch (default College Board / Innovator).
+  const sourceId = await promotionSourceId(batchId, "practice");
   const practiceSet = await prisma.$transaction(async (tx) => {
     if (existingArtifact) {
       await tx.practiceSetQuestion.deleteMany({ where: { practiceSetId: existingArtifact.artifactId } });
@@ -84,7 +86,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
     const created = await tx.practiceSet.create({
       data: {
         programId,
-        sourceId: DEFAULT_PRACTICE_SOURCE_ID,
+        sourceId,
         name: partial ? `${name} (partial ${questionIds.length}/${totalSourceCandidates})` : name,
         topicId: [...topicIds][0],
         difficulty: normalizeIngestDifficulty(sourceFile.difficulty ?? candidates[0]?.difficulty),

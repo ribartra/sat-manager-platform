@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { ArrowDown, ArrowUp, Copy, X } from "lucide-react";
 import { QuestionListItem } from "@/components/question-list-item";
-import { ImportQuestionnaireButton } from "@/components/import-questionnaire-button";
+import { ImportWithAiCard, type ImportArtifacts } from "@/components/sat/import-with-ai-card";
 import { TaxonomyPicker } from "@/components/taxonomy-picker";
 import {
   Form,
@@ -85,7 +85,13 @@ export function PracticeSetEditor({
   questions,
   sources,
   initial,
+  canImport = false,
+  importArtifacts = null,
 }: {
+  /** Admin / master teacher: "Import with AI" pre-filled with this set's skill, level and source. */
+  canImport?: boolean;
+  /** This set came from "Import with AI": links to its import, review and zip. */
+  importArtifacts?: ImportArtifacts | null;
   topics: TopicInfo[];
   questions: QuestionInfo[];
   /** Active Practice Set sources, plus the set's current one (even if deactivated or Tests-only). */
@@ -174,7 +180,6 @@ export function PracticeSetEditor({
   const selectedQuestions = questionIds
     .map((id) => questions.find((q) => q.id === id))
     .filter((q): q is QuestionInfo => Boolean(q));
-  const selectedTopic = topics.find((topic) => topic.id === topicId);
   const saving = form.formState.isSubmitting;
   const [secondaryLoading, setSecondaryLoading] = useState<string | null>(null);
 
@@ -211,21 +216,14 @@ export function PracticeSetEditor({
           </div>
         ) : null}
 
-        <Card padding="md" className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 className="text-sm font-semibold text-gray-900">Import questions from a file</h2>
-            <p className="mt-1 text-xs text-gray-500">
-              Upload the test and answer files. You&apos;ll check the questions before they&apos;re added.
-            </p>
-          </div>
-          <ImportQuestionnaireButton
-            mode="PRACTICE_SET"
-            defaultName={name || "Practice Set PDF import"}
-            topicName={selectedTopic?.name}
-            domainName={selectedTopic?.domainName}
-            difficulty={difficulty}
-          />
-        </Card>
+        <ImportWithAiCard
+          importHref={
+            canImport
+              ? `/teacher/import?${new URLSearchParams({ kind: "PRACTICE_SET", ...(topicId ? { topic: topicId } : {}), ...(difficulty ? { difficulty } : {}), ...(form.watch("sourceId") ? { source: form.watch("sourceId") } : {}) }).toString()}`
+              : null
+          }
+          artifacts={importArtifacts}
+        />
 
         <FormSection title="Details">
           <div className="grid grid-cols-2 gap-4">

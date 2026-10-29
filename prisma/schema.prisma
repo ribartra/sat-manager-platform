@@ -740,6 +740,13 @@ model IngestBatch {
   candidatesDetected Int      @default(0)
   errorCount         Int      @default(0)
   lastError          String?
+  /// Content Source given to what this batch promotes (null = College Board / Innovator default).
+  sourceId           String?
+  /// null = OCR pipeline; "AI_CSV" = simple import (CSV made by an external AI from the PDF).
+  importMode         String?
+  /// Simple import target: { kind, topicId?, difficulty?, testName? }.
+  targetJson         String?
+  createdById        String?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 }

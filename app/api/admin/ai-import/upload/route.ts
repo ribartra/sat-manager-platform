@@ -3,6 +3,7 @@ import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { ingestAuthHeaders, ingestUrl } from "@/lib/internal-ingest";
 import { ApiError, BadRequestError, ForbiddenError, PayloadTooLargeError, withApiErrors } from "@/lib/api-error";
+import { uploadSourceId } from "@/lib/content-source";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -32,6 +33,9 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
     return new PayloadTooLargeError("ZIP upload exceeds the 256 MB limit.").toResponse();
   }
 
+  const source = await uploadSourceId(formData.get("sourceId"));
+  if (source.error) return new BadRequestError(source.error).toResponse();
+
   const upstream = new FormData();
   upstream.set("name", name);
   upstream.set("file", file, file.name);
@@ -46,13 +50,16 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
     return ApiError.fromStatus(res.status, data.detail || "Ingest service failed while uploading ZIP.").toResponse();
   }
 
+  // Content source of what this batch will promote (AI Import "Source" field).
+  if (source.sourceId && data.id) await prisma.ingestBatch.update({ where: { id: data.id }, data: { sourceId: source.sourceId, createdById: session.user.id } });
+
   await prisma.auditLog.create({
     data: {
       userId: session.user.id,
       action: "UPLOAD_AI_IMPORT_ZIP",
       targetType: "IngestBatch",
       targetId: data.id,
-      metadata: JSON.stringify({ ...data, fileName: file.name, fileSize: file.size }),
+      metadata: JSON.stringify({ ...data, fileName: file.name, fileSize: file.size, sourceId: source.sourceId }),
     },
   });
 

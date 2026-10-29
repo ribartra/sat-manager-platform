@@ -500,6 +500,56 @@ const checks = [
     label: "Fuentes de Tests por edicion: College Board 2025 / 2026 (solo Tests)",
   },
   {
+    file: "prisma/migrations/20261101_ingest_source_target/migration.sql",
+    requires: ['ADD COLUMN "sourceId"', 'ADD COLUMN "importMode"', 'ADD COLUMN "targetJson"'],
+    forbids: ["DROP TABLE"],
+    label: "IngestBatch guarda fuente, modo y objetivo (ADD-only)",
+  },
+  {
+    file: "app/api/admin/ai-import/batches/[batchId]/promote-practice-set/route.ts",
+    requires: ['promotionSourceId(batchId, "practice")'],
+    forbids: ["sourceId: DEFAULT_PRACTICE_SOURCE_ID"],
+    label: "AI Import: el Practice Set promovido usa la fuente del lote",
+  },
+  {
+    file: "app/api/admin/ai-import/batches/[batchId]/promote-full-test/route.ts",
+    requires: ['promotionSourceId(batchId, "tests")'],
+    forbids: ["sourceId: DEFAULT_TEST_SOURCE_ID"],
+    label: "AI Import: el Test promovido usa la fuente del lote",
+  },
+  {
+    file: "app/admin/import/ai/ai-import-client.tsx",
+    requires: ['formData.set("sourceId", sourceId)', "JSON.stringify({ name, basePath, sourceId })"],
+    label: "AI Import: campo Fuente en carga por ZIP y por carpeta",
+  },
+  {
+    file: "lib/quick-import.ts",
+    requires: ["QUICK_IMPORT_COLUMNS", "$...$", "\\$", "pipe tables", "import.csv", "Q<number>_STEM.png", "unbalancedDollars"],
+    label: "Import with AI: prompt detallado (columnas CSV, LaTeX, tablas, archivo descargable) y prompt de imagenes",
+  },
+  {
+    file: "app/api/import/quick/[batchId]/promote/route.ts",
+    requires: ['status: "DRAFT"', "siblings + 1", "FULL_TEST_MODULES"],
+    label: "Import with AI: siempre un Practice Set / Test NUEVO en borrador",
+  },
+  {
+    file: "app/(teacher)/teacher/practice-sets/practice-set-editor-client.tsx",
+    requires: ["ImportWithAiCard"],
+    forbids: ["ImportQuestionnaireButton"],
+    label: "Editor de Practice Set: Import with AI + artefactos (sin el import PDF anterior)",
+  },
+  {
+    file: "app/(teacher)/teacher/tests/new/full-test-editor-client.tsx",
+    requires: ["ImportWithAiCard"],
+    forbids: ["ImportQuestionnaireButton"],
+    label: "Editor de Test: Import with AI + artefactos (sin el import PDF anterior)",
+  },
+  {
+    file: "ingest_service/app/main.py",
+    requires: ["/batches/{batch_id}/quick-prepare", "/batches/{batch_id}/artifacts.zip", "/batches/{batch_id}/image-zip", "ALTER TABLE IngestBatch ADD COLUMN sourceId TEXT"],
+    label: "Servicio de ingesta: paginas sin OCR, zip de artefactos e imagenes por zip",
+  },
+  {
     file: "prisma/migrations/20261030_source_scope/migration.sql",
     requires: ['ADD COLUMN "forPracticeSets"', 'ADD COLUMN "forTests"', "src_innovator"],
     forbids: ["DROP TABLE"],

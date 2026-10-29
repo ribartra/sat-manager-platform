@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { ingestAuthHeaders, ingestUrl } from "@/lib/internal-ingest";
-import { ApiError, ForbiddenError, withApiErrors } from "@/lib/api-error";
+import { uploadSourceId } from "@/lib/content-source";
+import { ApiError, BadRequestError, ForbiddenError, withApiErrors } from "@/lib/api-error";
 
 export const GET = withApiErrors(async function GET() {
   const session = await requireTeacherOrAdmin();
@@ -33,6 +34,8 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
   if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const body = await req.json().catch(() => ({}));
+  const source = await uploadSourceId(typeof body.sourceId === "string" ? body.sourceId : null);
+  if (source.error) return new BadRequestError(source.error).toResponse();
   const res = await fetch(ingestUrl("/batches"), {
     method: "POST",
     headers: ingestAuthHeaders({ "Content-Type": "application/json" }),
@@ -46,6 +49,9 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
   if (!res.ok) {
     return ApiError.fromStatus(res.status, data.detail || "Ingest service failed.").toResponse();
   }
+
+  // Content source of what this batch will promote (AI Import "Source" field).
+  if (source.sourceId && data.id) await prisma.ingestBatch.update({ where: { id: data.id }, data: { sourceId: source.sourceId, createdById: session.user.id } });
 
   await prisma.auditLog.create({
     data: {

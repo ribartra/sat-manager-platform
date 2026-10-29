@@ -3,6 +3,7 @@ import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { ingestAuthHeaders, ingestUrl } from "@/lib/internal-ingest";
 import { ApiError, BadRequestError, ForbiddenError, PayloadTooLargeError, withApiErrors } from "@/lib/api-error";
+import { uploadSourceId } from "@/lib/content-source";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -57,6 +58,9 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
     return new BadRequestError(`Unsupported file type: ${unsupported.name}. Use PDF or DOCX.`).toResponse();
   }
 
+  const source = await uploadSourceId(formData.get("sourceId"));
+  if (source.error) return new BadRequestError(source.error).toResponse();
+
   const upstream = new FormData();
   upstream.set("name", name);
   upstream.set("contentType", contentType);
@@ -77,6 +81,9 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
     return ApiError.fromStatus(res.status, data.detail || "Ingest service failed while uploading sources.").toResponse();
   }
 
+  // Content source of what this batch will promote (AI Import "Source" field).
+  if (source.sourceId && data.id) await prisma.ingestBatch.update({ where: { id: data.id }, data: { sourceId: source.sourceId, createdById: session.user.id } });
+
   await prisma.auditLog.create({
     data: {
       userId: session.user.id,
@@ -89,6 +96,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
         fileCount: files.length,
         roles,
         totalSize,
+        sourceId: source.sourceId,
         source: "QUESTIONNAIRE_EDITOR",
       }),
     },

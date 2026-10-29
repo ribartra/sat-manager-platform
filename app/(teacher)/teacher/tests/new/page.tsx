@@ -1,4 +1,5 @@
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import { requireContentImporter } from "@/lib/rbac";
 import { currentContentScope } from "@/lib/content-scope";
 import { PageShell } from "@/components/sat";
 import { FullTestEditor } from "./full-test-editor-client";
@@ -15,7 +16,7 @@ export default async function NewFullTestPage() {
     <PageShell>
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Tests", href: "/teacher/tests" }, { label: "New test" }]} />
       <h1 className="mb-6 text-[26px] font-bold tracking-[-0.3px] text-gray-900">New test</h1>
-      <FullTestEditor questions={questions} sources={sources} initial={{ sourceId: sources.find((s) => s.id === DEFAULT_TEST_SOURCE_ID)?.id }} />
+      <FullTestEditor canImport={Boolean(await requireContentImporter())} questions={questions} sources={sources} initial={{ sourceId: sources.find((s) => s.id === DEFAULT_TEST_SOURCE_ID)?.id }} />
     </PageShell>
   );
 }

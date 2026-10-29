@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import { validateQuestionPayload } from "@/lib/content-validation";
 import { captureCaughtError } from "@/lib/audit";
 import { BadRequestError, ForbiddenError, withApiErrors } from "@/lib/api-error";
+import { parseCsv } from "@/lib/csv";
 
 type CsvRow = Record<string, string>;
 
@@ -12,55 +13,6 @@ interface ValidatedRow {
   rowNumber: number;
   row: CsvRow;
   errors: string[];
-}
-
-function parseCsv(text: string) {
-  const rows: string[][] = [];
-  let row: string[] = [];
-  let field = "";
-  let quoted = false;
-
-  for (let i = 0; i < text.length; i += 1) {
-    const char = text[i];
-    const next = text[i + 1];
-
-    if (char === "\"") {
-      if (quoted && next === "\"") {
-        field += "\"";
-        i += 1;
-      } else {
-        quoted = !quoted;
-      }
-      continue;
-    }
-
-    if (char === "," && !quoted) {
-      row.push(field.trim());
-      field = "";
-      continue;
-    }
-
-    if ((char === "\n" || char === "\r") && !quoted) {
-      if (char === "\r" && next === "\n") i += 1;
-      row.push(field.trim());
-      if (row.some((value) => value.length > 0)) rows.push(row);
-      row = [];
-      field = "";
-      continue;
-    }
-
-    field += char;
-  }
-
-  row.push(field.trim());
-  if (row.some((value) => value.length > 0)) rows.push(row);
-
-  const [headerRow, ...dataRows] = rows;
-  if (!headerRow) return [];
-  const headers = headerRow.map((header) => header.trim());
-  return dataRows.map((values) =>
-    Object.fromEntries(headers.map((header, index) => [header, values[index] ?? ""]))
-  );
 }
 
 function normalizeRow(row: CsvRow): CsvRow {

@@ -47,3 +47,29 @@ export async function sourceIdIssue(sourceId: unknown, kind: SourceKind, keep?: 
   }
   return null;
 }
+
+/**
+ * Source chosen on an AI Import upload form ("" / missing = none, i.e. the default at promotion).
+ * Returns the id, or an error message when it does not exist or is inactive.
+ */
+export async function uploadSourceId(value: FormDataEntryValue | null): Promise<{ sourceId: string | null; error?: string }> {
+  const sourceId = typeof value === "string" ? value.trim() : "";
+  if (!sourceId) return { sourceId: null };
+  const source = await prisma.source.findUnique({ where: { id: sourceId }, select: { active: true } });
+  if (!source) return { sourceId: null, error: "The selected source does not exist." };
+  if (!source.active) return { sourceId: null, error: "The selected source is no longer active." };
+  return { sourceId };
+}
+
+/**
+ * Source given to what an AI Import batch promotes: the batch's source when it is used for that kind of
+ * content, otherwise the default (College Board for Practice Sets, Innovator for Tests).
+ */
+export async function promotionSourceId(batchId: string, kind: SourceKind): Promise<string> {
+  const fallback = kind === "practice" ? DEFAULT_PRACTICE_SOURCE_ID : DEFAULT_TEST_SOURCE_ID;
+  const batch = await prisma.ingestBatch.findUnique({ where: { id: batchId }, select: { sourceId: true } });
+  if (!batch?.sourceId) return fallback;
+  const source = await prisma.source.findUnique({ where: { id: batch.sourceId }, select: { forPracticeSets: true, forTests: true } });
+  if (!source) return fallback;
+  return (kind === "practice" ? source.forPracticeSets : source.forTests) ? batch.sourceId : fallback;
+}

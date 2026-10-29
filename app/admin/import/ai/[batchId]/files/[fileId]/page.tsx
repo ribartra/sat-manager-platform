@@ -170,15 +170,26 @@ export default async function AiImportFileReviewPage({ params, searchParams }: P
       <div className="min-w-0 space-y-6">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Admin" }, { label: "AI Import", href: `/admin/import/ai?batch=${batchId}` }, { label: "Review file" }]} />
+          {/* "Import with AI" batches come back to their wizard (step 3); OCR batches to AI Import. */}
+          {batch?.importMode === "AI_CSV" ? (
+            <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Import with AI", href: `/teacher/import/${batchId}` }, { label: "Review and crop" }]} />
+          ) : (
+            <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Admin" }, { label: "AI Import", href: `/admin/import/ai?batch=${batchId}` }, { label: "Review file" }]} />
+          )}
           <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Review File</h1>
           <p className="mt-1 text-sm text-gray-500">{file.relativePath}</p>
         </div>
-        <Card padding="md">
-          <p className="text-xs uppercase text-gray-400">Estimated processing time</p>
-          <p className="mt-1 text-lg font-semibold text-gray-900">{formatDuration(estimatedSeconds)}</p>
-          <p className="mt-1 text-xs text-gray-500">{estimatedPages} pages · {secondsPerPage.toFixed(1)} sec/page</p>
-        </Card>
+        {batch?.importMode === "AI_CSV" ? (
+          <Link href={`/teacher/import/${batchId}`} className="shrink-0 rounded-lg bg-[var(--sat-primary)] px-3 py-2 text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]">
+            ← Back to Import with AI
+          </Link>
+        ) : (
+          <Card padding="md">
+            <p className="text-xs uppercase text-gray-400">Estimated processing time</p>
+            <p className="mt-1 text-lg font-semibold text-gray-900">{formatDuration(estimatedSeconds)}</p>
+            <p className="mt-1 text-xs text-gray-500">{estimatedPages} pages · {secondsPerPage.toFixed(1)} sec/page</p>
+          </Card>
+        )}
       </div>
 
       {extractedTest && (

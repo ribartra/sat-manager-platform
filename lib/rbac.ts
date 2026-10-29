@@ -47,6 +47,14 @@ export async function requireTeacherManager() {
   return session;
 }
 
+/**
+ * Content importer ("Import with AI", AI Import source): an ADMIN, or the master teacher
+ * (canManageTeachers). Re-checked against the DB like the helpers above.
+ */
+export async function requireContentImporter() {
+  return (await requireAdmin()) ?? (await requireTeacherManager());
+}
+
 export async function requireApprovedSession() {
   const session = await auth();
   if (!session) return null;
@@ -82,6 +90,12 @@ export async function assertAdmin() {
 
 export async function assertTeacherManager() {
   const session = await requireTeacherManager();
+  if (!session) throw new ForbiddenError();
+  return session;
+}
+
+export async function assertContentImporter() {
+  const session = await requireContentImporter();
   if (!session) throw new ForbiddenError();
   return session;
 }

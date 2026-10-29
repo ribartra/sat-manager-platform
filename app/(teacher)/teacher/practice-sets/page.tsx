@@ -2,7 +2,7 @@ import { ListFilters, PageShell, PracticeAreaTabs, SkillsSourceMap, matchesQuery
 import { contentScopeFor } from "@/lib/program-scope";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Plus, Sparkles } from "lucide-react";
 import { PracticeSetActions } from "./practice-set-actions-client";
 import { PracticeSetStatusSelect } from "./practice-set-status-client";
 import { redirect } from "next/navigation";
@@ -12,6 +12,7 @@ import { activeAreaTab, practiceAreaFromTab, resolvePracticeArea, tabFromPractic
 import { academicTopicWhere } from "@/lib/taxonomy";
 import { MoreLinks } from "@/components/sat/more-links";
 import { auth } from "@/lib/auth";
+import { requireContentImporter } from "@/lib/rbac";
 import { getFeatureFlagValues } from "@/lib/feature-flags";
 import { TEACHER_MORE_LINKS, resolveLinks } from "@/lib/nav-config";
 import { DEFAULT_PRACTICE_SOURCE_ID, listSources } from "@/lib/content-source";
@@ -44,6 +45,8 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
   // Tests have their own section; old links to the Tests tab land there.
   if (area === "tests") redirect("/teacher/tests");
   const session = await auth();
+  // Admin and master teacher import content with AI ("+ Import" on empty levels, header button).
+  const canImport = Boolean(await requireContentImporter());
   const moreLinks = resolveLinks(TEACHER_MORE_LINKS.practice, {
     role: session?.user.role,
     flags: await getFeatureFlagValues({ role: session?.user.role, userId: session?.user.id }),
@@ -96,7 +99,12 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
             (SAT scores are for Tests).
           </p>
         </div>
-        <Link href="/teacher/practice-sets/new" className="inline-flex items-center gap-1.5 self-start shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-3 py-2 text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]"><Plus size={14} /> New Practice Set</Link>
+        <div className="flex shrink-0 flex-wrap gap-2 self-start">
+          {canImport ? (
+            <Link href="/teacher/import?kind=PRACTICE_SET" className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg border border-[var(--sat-border)] bg-white px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-[var(--sat-primary-soft)]"><Sparkles size={14} /> Import with AI</Link>
+          ) : null}
+          <Link href="/teacher/practice-sets/new" className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-3 py-2 text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]"><Plus size={14} /> New Practice Set</Link>
+        </div>
       </header>
       <MoreLinks links={moreLinks} />
       <PracticeAreaTabs basePath="/teacher/practice-sets" active={area} includeTests={false} preserve={{ q: search || undefined }} />
@@ -135,6 +143,16 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
                   };
                 }
                 if (source && !source.active) return { difficulty, state: null, title: `No ${source.name} set at this level` };
+                // Empty level: admin / master teacher import it with AI (pre-filled), others create it by hand.
+                if (canImport) {
+                  return {
+                    difficulty,
+                    state: null,
+                    href: `/teacher/import?${new URLSearchParams({ kind: "PRACTICE_SET", topic: topic.id, difficulty, ...(source ? { source: source.id } : {}) }).toString()}`,
+                    title: source ? `No ${source.name} set at this level yet: import one with AI` : "No set at this level yet: import one with AI",
+                    extra: <span className="text-[var(--sat-muted)]">+ Import</span>,
+                  };
+                }
                 return {
                   difficulty,
                   state: null,

@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { ArrowDown, ArrowUp } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,6 +48,16 @@ export function SourcesClient({ sources }: { sources: SourceRow[] }) {
     if (await run(() => apiFetch(`/api/admin/sources/${id}`, { method: "PATCH", json: { name: name.trim() } }), "Source renamed.")) setEditing(null);
   }
 
+  // Swap with the neighbour: rewrite every source's sortOrder as its new position (1..n).
+  async function move(index: number, delta: -1 | 1) {
+    const order = sources.map((s) => s.id);
+    [order[index], order[index + delta]] = [order[index + delta], order[index]];
+    await run(
+      () => Promise.all(order.map((id, i) => apiFetch(`/api/admin/sources/${id}`, { method: "PATCH", json: { sortOrder: i + 1 } }))),
+      "Order saved.",
+    );
+  }
+
   return (
     <div className="space-y-4">
       <form onSubmit={add} className="flex flex-wrap items-center gap-2 rounded-[var(--sat-radius)] border border-[var(--sat-border)] bg-white p-3">
@@ -67,7 +79,7 @@ export function SourcesClient({ sources }: { sources: SourceRow[] }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {sources.map((source) => (
+            {sources.map((source, index) => (
               <TableRow key={source.id}>
                 <TableCell>
                   {editing?.id === source.id ? (
@@ -77,7 +89,7 @@ export function SourcesClient({ sources }: { sources: SourceRow[] }) {
                       <Button type="button" size="sm" variant="ghost" onClick={() => setEditing(null)}>Cancel</Button>
                     </form>
                   ) : (
-                    <span className="font-medium">{source.name}</span>
+                    <Link href={`/admin/sources/${source.id}`} className="font-medium text-blue-700 hover:underline">{source.name}</Link>
                   )}
                 </TableCell>
                 <TableCell>
@@ -107,6 +119,13 @@ export function SourcesClient({ sources }: { sources: SourceRow[] }) {
                 <TableCell className="whitespace-nowrap text-right">
                   {editing?.id !== source.id ? (
                     <div className="flex justify-end gap-2">
+                      {/* Order of the source rows in Practice › By skill and of the Tests groups. */}
+                      <Button size="sm" variant="ghost" aria-label={`Move ${source.name} up`} disabled={busy || index === 0} onClick={() => move(index, -1)}>
+                        <ArrowUp size={14} />
+                      </Button>
+                      <Button size="sm" variant="ghost" aria-label={`Move ${source.name} down`} disabled={busy || index === sources.length - 1} onClick={() => move(index, 1)}>
+                        <ArrowDown size={14} />
+                      </Button>
                       <Button size="sm" variant="secondary" disabled={busy} onClick={() => setEditing({ id: source.id, name: source.name })}>Rename</Button>
                       <Button
                         size="sm"

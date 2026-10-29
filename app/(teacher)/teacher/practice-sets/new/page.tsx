@@ -1,4 +1,5 @@
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import { requireContentImporter } from "@/lib/rbac";
 import { currentContentScope } from "@/lib/content-scope";
 import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
@@ -27,6 +28,7 @@ export default async function NewPracticeSetPage({ searchParams }: PageProps) {
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Practice", href: "/teacher/practice-sets" }, { label: "New practice set" }]} />
       <h1 className="mb-6 text-[26px] font-bold tracking-[-0.3px] text-gray-900">New Practice Set</h1>
       <PracticeSetEditor
+        canImport={Boolean(await requireContentImporter())}
         initial={{
           topicId,
           difficulty: difficulty && ["EASY", "MEDIUM", "HARD"].includes(difficulty) ? difficulty : undefined,

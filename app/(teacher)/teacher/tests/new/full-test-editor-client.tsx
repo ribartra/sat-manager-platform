@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { QuestionListItem } from "@/components/question-list-item";
-import { ImportQuestionnaireButton } from "@/components/import-questionnaire-button";
+import { ImportWithAiCard, type ImportArtifacts } from "@/components/sat/import-with-ai-card";
 import {
   Form,
   FormControl,
@@ -35,7 +35,13 @@ export function FullTestEditor({
   questions,
   sources,
   initial,
+  canImport = false,
+  importArtifacts = null,
 }: {
+  /** Admin / master teacher: "Import with AI" for a new Test of this source. */
+  canImport?: boolean;
+  /** This Test came from "Import with AI": links to its import, review and zip. */
+  importArtifacts?: ImportArtifacts | null;
   /** Active sources, plus the Test's current one if it was deactivated. */
   sources: { id: string; name: string }[];
   questions: {
@@ -151,15 +157,10 @@ export function FullTestEditor({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} className="space-y-5" noValidate>
-        <Card padding="md" className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 className="text-sm font-semibold text-gray-900">Import questions from a file</h2>
-            <p className="mt-1 text-xs text-gray-500">
-              Upload the test and answer files. You&apos;ll check the questions before they&apos;re added.
-            </p>
-          </div>
-          <ImportQuestionnaireButton mode="FULL_PRACTICE_TEST" defaultName={name || "Test PDF import"} />
-        </Card>
+        <ImportWithAiCard
+          importHref={canImport ? `/teacher/import?${new URLSearchParams({ kind: "FULL_PRACTICE_TEST", ...(form.watch("sourceId") ? { source: form.watch("sourceId") } : {}) }).toString()}` : null}
+          artifacts={importArtifacts}
+        />
 
         <FormSection title="Test settings">
           <div className="grid grid-cols-2 gap-4">

@@ -13,6 +13,7 @@ import { Button, DisabledReason } from "@/components/ui/button";
 import { CopyableTruncatedText } from "@/components/ui/copyable-truncated-text";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
 import { MathContent } from "@/components/math-content";
 import { FormattedTextField } from "@/components/formatted-text-field";
 import { PdfPageCropper, type CropTarget, type CropOcrResult } from "@/app/admin/import/ai/_components/pdf-page-cropper";
@@ -158,6 +159,8 @@ type AiImportWorkflowProps = {
   fullTests: FullTestSummary[];
   cropImageSources: Record<string, { imageSourceFileId: string; pageNumbers: number[] }>;
   setRows: ExtractedTestRow[];
+  /** Active content sources (AI Import "Source": what the batch promotes is saved under it). */
+  sources?: { id: string; name: string; forPracticeSets: boolean; forTests: boolean }[];
   counts: {
     ocrPending: number;
     openIncidents: number;
@@ -281,6 +284,7 @@ export function AiImportWorkflowClient({
   fullTests,
   cropImageSources,
   setRows,
+  sources = [],
   counts,
 }: AiImportWorkflowProps) {
   const router = useRouter();
@@ -539,7 +543,7 @@ export function AiImportWorkflowClient({
             <DialogTitle>Load Sources</DialogTitle>
             <DialogDescription>Create a staging batch from the server folder or upload a ZIP package.</DialogDescription>
           </DialogHeader>
-          <AiImportActions selectedBatchId={selectedBatchId} />
+          <AiImportActions selectedBatchId={selectedBatchId} sources={sources} />
           <div className="rounded-md border border-gray-200">
             <div className="border-b border-gray-100 px-4 py-3 text-sm font-semibold text-gray-900">Batch selector</div>
             <div className="max-h-72 divide-y divide-gray-100 overflow-auto">
@@ -568,7 +572,7 @@ export function AiImportWorkflowClient({
             <DialogTitle>Process Batch</DialogTitle>
             <DialogDescription>Run extraction for the selected batch and monitor the result from the dashboard.</DialogDescription>
           </DialogHeader>
-          <AiImportActions selectedBatchId={selectedBatchId} />
+          <AiImportActions selectedBatchId={selectedBatchId} sources={sources} />
         </DialogContent>
       </Dialog>
 
@@ -1295,8 +1299,10 @@ function MiniStat({ label, value, warning }: { label: string; value: number | st
   );
 }
 
-export function AiImportActions({ selectedBatchId }: { selectedBatchId?: string }) {
+export function AiImportActions({ selectedBatchId, sources = [] }: { selectedBatchId?: string; sources?: AiImportWorkflowProps["sources"] }) {
   const router = useRouter();
+  // "" = the default (College Board for Practice Sets, Innovator for Tests).
+  const [sourceId, setSourceId] = useState("");
   const [name, setName] = useState("SAT files_to_load ingest");
   const [basePath, setBasePath] = useState("files_to_load");
   const [zipFile, setZipFile] = useState<File | null>(null);
@@ -1309,7 +1315,7 @@ export function AiImportActions({ selectedBatchId }: { selectedBatchId?: string 
     const res = await fetch("/api/admin/ai-import/batches", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, basePath }),
+      body: JSON.stringify({ name, basePath, sourceId }),
     });
     setLoading(false);
     if (!res.ok) {
@@ -1333,6 +1339,7 @@ export function AiImportActions({ selectedBatchId }: { selectedBatchId?: string 
     const formData = new FormData();
     formData.set("name", name || zipFile.name.replace(/\.zip$/i, ""));
     formData.set("file", zipFile);
+    formData.set("sourceId", sourceId);
     const res = await fetch("/api/admin/ai-import/upload", {
       method: "POST",
       body: formData,
@@ -1365,6 +1372,19 @@ export function AiImportActions({ selectedBatchId }: { selectedBatchId?: string 
 
   return (
     <div className="space-y-5">
+      <label className="grid max-w-md gap-1">
+        <span className="text-xs font-medium text-gray-500">Source</span>
+        <Select value={sourceId} onChange={(event) => setSourceId(event.target.value)} aria-label="Source">
+          <option value="">Default (College Board for Practice Sets, Innovator for Tests)</option>
+          {(sources ?? []).map((source) => (
+            <option key={source.id} value={source.id}>
+              {source.name}
+              {source.forPracticeSets && source.forTests ? "" : source.forTests ? " · Tests only" : " · Practice Sets only"}
+            </option>
+          ))}
+        </Select>
+        <span className="text-xs text-gray-500">The Practice Sets / Tests this batch creates are saved under this source (when it is used for that kind of content).</span>
+      </label>
       <div className="grid gap-4 lg:grid-cols-2">
         <section className="rounded-md border border-gray-200 bg-white p-4">
           <div className="mb-3">

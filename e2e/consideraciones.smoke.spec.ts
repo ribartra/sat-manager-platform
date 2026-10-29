@@ -35,14 +35,13 @@ test.describe("consideraciones smoke", () => {
     await expect(page.getByRole("heading", { name: "Study materials" })).toHaveCount(0);
   });
 
-  test("Practice Set import modal shows dual trays", async ({ page }) => {
+  test("Practice Set editor offers Import with AI (master teacher)", async ({ page }) => {
     await loginAs(page, E2E.teacherEmail, E2E.teacherPassword);
     await page.goto("/teacher/practice-sets/new");
-    await page.getByRole("button", { name: "Import from PDF" }).click();
-    await expect(page.getByRole("heading", { name: "Import questions from PDF/DOCX" })).toBeVisible();
-    await expect(page.getByText("Answers / Explanations").first()).toBeVisible();
-    await expect(page.getByText("Choose file").first()).toBeVisible();
-    await expect(page.getByText(/answers with explanations/i).first()).toBeVisible();
+    await page.getByRole("link", { name: "Import with AI" }).click();
+    await expect(page.getByRole("heading", { name: "Import with AI" })).toBeVisible();
+    await expect(page.getByText("Step 1 · What are you importing?")).toBeVisible();
+    await expect(page.getByText("Questions PDF (required)")).toBeVisible();
   });
 
   test("Student history does not show practice SAT averages", async ({ page }) => {

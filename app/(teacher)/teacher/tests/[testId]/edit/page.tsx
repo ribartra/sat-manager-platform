@@ -1,4 +1,6 @@
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import { requireContentImporter } from "@/lib/rbac";
+import { importArtifactsFor } from "@/lib/quick-import.server";
 import { currentContentScope } from "@/lib/content-scope";
 import { PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
@@ -30,6 +32,8 @@ export default async function EditFullTestPage({ params }: PageProps) {
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Tests", href: "/teacher/tests" }, { label: test.name, href: `/teacher/tests/${test.id}` }, { label: "Edit" }]} />
       <h1 className="mb-6 text-[26px] font-bold tracking-[-0.3px] text-gray-900">Edit test</h1>
       <FullTestEditor
+        canImport={Boolean(await requireContentImporter())}
+        importArtifacts={await importArtifactsFor(test.id)}
         initial={{
           id: test.id,
           name: test.name,

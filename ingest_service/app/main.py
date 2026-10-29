@@ -580,6 +580,11 @@ def init_db() -> None:
             "ALTER TABLE IngestImageArtifact ADD COLUMN height INTEGER",
             "ALTER TABLE IngestImageArtifact ADD COLUMN contentHash TEXT",
             "ALTER TABLE IngestImageArtifact ADD COLUMN status TEXT NOT NULL DEFAULT 'AVAILABLE'",
+            # Prisma migration 20261101_ingest_source_target (content source + simple AI-CSV import).
+            "ALTER TABLE IngestBatch ADD COLUMN sourceId TEXT",
+            "ALTER TABLE IngestBatch ADD COLUMN importMode TEXT",
+            "ALTER TABLE IngestBatch ADD COLUMN targetJson TEXT",
+            "ALTER TABLE IngestBatch ADD COLUMN createdById TEXT",
         ]:
             try:
                 db.execute(statement)
@@ -5943,3 +5948,171 @@ def crop_candidate_region_endpoint(candidate_id: str, payload: dict[str, Any]) -
         payload.get("optionLabel"),
         str(image_source_file_id) if image_source_file_id else None,
     )
+
+
+# ---------------------------------------------------------------------------
+# "Import with AI" (simple import): the questions come from a CSV that an external AI made from
+# the PDF. The service only keeps the original PDFs for the crop tool and the artifacts zip; it
+# never runs OCR on these batches.
+# ---------------------------------------------------------------------------
+
+QUICK_IMAGE_NAME = re.compile(r"^(?:(rw1|rw2|math1|math2)[_\- ]+)?q0*(\d+)[_\- ]+(stem|stimulus|[abcd])(?:[_\- ]*\d+)?\.(png|jpe?g|webp)$", re.IGNORECASE)
+QUICK_MODULES = {"RW1": ("RW", "1"), "RW2": ("RW", "2"), "MATH1": ("MATH", "1"), "MATH2": ("MATH", "2")}
+
+
+@app.post("/batches/{batch_id}/quick-prepare")
+def quick_prepare_batch(batch_id: str) -> dict[str, Any]:
+    """Register the pages of each PDF (count + text layer, no OCR) so the crop tool can show them."""
+    pages_total = 0
+    with conn() as db:
+        sources = db.execute("SELECT id, path FROM IngestSourceFile WHERE batchId = ?", (batch_id,)).fetchall()
+        if not sources:
+            raise HTTPException(status_code=404, detail="Batch has no source files.")
+        for source in sources:
+            path = resolve_existing_source_path(source["path"])
+            if not path.exists() or path.suffix.lower() != ".pdf":
+                continue
+            with _PDF_RENDER_LOCK:
+                with pdfplumber.open(path) as pdf:
+                    texts = [(page.extract_text() or "") for page in pdf.pages]
+            for number, text in enumerate(texts, start=1):
+                db.execute(
+                    """
+                    INSERT OR IGNORE INTO IngestPageArtifact
+                      (id, batchId, sourceFileId, pageNumber, method, textDensity, extractedText, requiresOcr, status, createdAt, updatedAt)
+                    VALUES (?, ?, ?, ?, 'PDF_TEXT', ?, ?, 0, 'COMPLETED', ?, ?)
+                    """,
+                    (new_id("page"), batch_id, source["id"], number, float(len(text.strip())), text, now_iso(), now_iso()),
+                )
+            db.execute(
+                "UPDATE IngestSourceFile SET pageCount = ?, status = 'COMPLETED', updatedAt = ? WHERE id = ?",
+                (len(texts), now_iso(), source["id"]),
+            )
+            pages_total += len(texts)
+        db.execute(
+            "UPDATE IngestBatch SET status = 'COMPLETED', totalPages = ?, pagesProcessed = ?, filesProcessed = totalFiles, updatedAt = ? WHERE id = ?",
+            (pages_total, pages_total, now_iso(), batch_id),
+        )
+        db.commit()
+    return {"batchId": batch_id, "pages": pages_total}
+
+
+@app.post("/batches/{batch_id}/artifacts.zip")
+def quick_artifacts_zip(batch_id: str, payload: dict[str, Any]) -> Response:
+    """Original files + page images + the given text files (uploaded CSV, current candidates CSV,
+    image-recovery prompt), for reprocessing with an external AI."""
+    extra_files = payload.get("files") if isinstance(payload.get("files"), dict) else {}
+    output = BytesIO()
+    with conn() as db:
+        sources = db.execute("SELECT id, path, relativePath FROM IngestSourceFile WHERE batchId = ?", (batch_id,)).fetchall()
+    if not sources:
+        raise HTTPException(status_code=404, detail="Batch has no source files.")
+    with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        for source in sources:
+            path = resolve_existing_source_path(source["path"])
+            if not path.exists():
+                continue
+            archive.write(path, f"original/{safe_upload_filename(path.name)}")
+            if path.suffix.lower() != ".pdf":
+                continue
+            with _PDF_RENDER_LOCK:
+                with pdfplumber.open(path) as pdf:
+                    for number, page in enumerate(pdf.pages, start=1):
+                        image = page.to_image(resolution=150).original.convert("RGB")
+                        buffer = BytesIO()
+                        image.save(buffer, format="PNG", optimize=True)
+                        archive.writestr(f"pages/{Path(safe_upload_filename(path.name)).stem}-page-{number:03d}.png", buffer.getvalue())
+        for name, content in extra_files.items():
+            if isinstance(name, str) and isinstance(content, str) and re.fullmatch(r"[A-Za-z0-9._-]{1,80}", name):
+                archive.writestr(name, content)
+    return Response(
+        content=output.getvalue(),
+        media_type="application/zip",
+        headers={"Content-Disposition": f'attachment; filename="import-{batch_id}-artifacts.zip"'},
+    )
+
+
+@app.post("/batches/{batch_id}/image-zip")
+async def quick_image_zip(batch_id: str, file: UploadFile = File(...)) -> dict[str, Any]:
+    """Images recovered by an external AI, named Q{n}_{STEM|STIMULUS|A|B|C|D}.png (Tests: RW1_Q{n}_…,
+    RW2_, MATH1_, MATH2_): each one is saved as an image artifact and linked to that question's slot
+    (replacing the slot's previous link)."""
+    data = await file.read()
+    if len(data) > MAX_UPLOAD_BYTES:
+        raise HTTPException(status_code=413, detail="ZIP exceeds the 256 MB limit.")
+    try:
+        archive = zipfile.ZipFile(BytesIO(data))
+    except zipfile.BadZipFile as exc:
+        raise HTTPException(status_code=400, detail="The file is not a valid ZIP.") from exc
+    linked: list[dict[str, Any]] = []
+    skipped: list[str] = []
+    with conn() as db:
+        rows = db.execute(
+            "SELECT id, sourceFileId, questionNumber, section, moduleLabel FROM IngestQuestionCandidate WHERE batchId = ? AND questionNumber IS NOT NULL",
+            (batch_id,),
+        ).fetchall()
+        by_module = {(row["section"], row["moduleLabel"], row["questionNumber"]): row for row in rows}
+        by_number: dict[int, list[Any]] = {}
+        for row in rows:
+            by_number.setdefault(row["questionNumber"], []).append(row)
+        for info in archive.infolist():
+            if info.is_dir():
+                continue
+            name = Path(info.filename).name
+            match = QUICK_IMAGE_NAME.match(name)
+            if not match:
+                skipped.append(f"{name}: name must be Q<number>_<STEM|STIMULUS|A|B|C|D>.png")
+                continue
+            module, number, slot = (match.group(1) or "").upper(), int(match.group(2)), match.group(3).upper()
+            if module:
+                candidate = by_module.get((*QUICK_MODULES[module], number))
+            else:
+                matches = by_number.get(number, [])
+                candidate = matches[0] if len(matches) == 1 else None
+                if len(matches) > 1:
+                    skipped.append(f"{name}: question {number} exists in several modules; prefix the name with RW1_, RW2_, MATH1_ or MATH2_")
+                    continue
+            if not candidate:
+                skipped.append(f"{name}: no question {number}{' in ' + module if module else ''} in this import")
+                continue
+            raw = archive.read(info)
+            try:
+                with Image.open(BytesIO(raw)) as im:
+                    width, height = im.width, im.height
+                    buffer = BytesIO()
+                    im.convert("RGB").save(buffer, format="PNG", optimize=True)
+                    png = buffer.getvalue()
+            except Exception:
+                skipped.append(f"{name}: not a readable image")
+                continue
+            image_id = new_id("img")
+            file_url, content_hash = save_ingest_image(batch_id, image_id, png, "png")
+            next_index = db.execute(
+                "SELECT COALESCE(MAX(imageIndex), -1) + 1 FROM IngestImageArtifact WHERE sourceFileId = ? AND pageNumber = 0 AND origin = 'AI_ZIP'",
+                (candidate["sourceFileId"],),
+            ).fetchone()[0]
+            db.execute(
+                """
+                INSERT INTO IngestImageArtifact
+                  (id, batchId, sourceFileId, pageArtifactId, pageNumber, imageIndex, imageId, origin, bboxJson, mimeType, fileUrl, width, height, contentHash, status)
+                VALUES (?, ?, ?, NULL, 0, ?, ?, 'AI_ZIP', NULL, 'image/png', ?, ?, ?, ?, 'AVAILABLE')
+                """,
+                (image_id, batch_id, candidate["sourceFileId"], next_index, image_id, file_url, width, height, content_hash),
+            )
+            target_type = slot if slot in {"STEM", "STIMULUS"} else "OPTION"
+            option_label = slot if target_type == "OPTION" else None
+            db.execute(
+                "DELETE FROM IngestCandidateImageLink WHERE candidateId = ? AND targetType = ? AND COALESCE(optionLabel, '') = COALESCE(?, '')",
+                (candidate["id"], target_type, option_label),
+            )
+            db.execute(
+                """
+                INSERT INTO IngestCandidateImageLink
+                  (id, batchId, candidateId, imageArtifactId, targetType, optionLabel, sortOrder, createdAt, updatedAt)
+                VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?)
+                """,
+                (new_id("imglink"), batch_id, candidate["id"], image_id, target_type, option_label, now_iso(), now_iso()),
+            )
+            linked.append({"question": number, "slot": slot, "imageArtifactId": image_id})
+        db.commit()
+    return {"linked": linked, "skipped": skipped}

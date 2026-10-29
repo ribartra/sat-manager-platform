@@ -53,6 +53,61 @@ const checks = [
     label: "Problem reports need a signed-in user, are rate limited and only accept real JPEG/PNG screenshots",
   },
   {
+    file: "app/api/admin/sources/[id]/content/route.ts",
+    requires: ["assertAdmin", "writeAudit", "SOURCE_CONTENT_ASSIGNED", "is not used for Practice Sets", "is not used for Tests"],
+    label: "Maestro de fuentes: solo admin asocia Practice Sets / Tests a una fuente del tipo correcto (auditado)",
+  },
+  {
+    file: "app/admin/sources/[id]/page.tsx",
+    requires: ["requireAdmin"],
+    label: "Detalle de fuente solo admin",
+  },
+  {
+    file: "lib/rbac.ts",
+    requires: ["export async function requireContentImporter", "requireTeacherManager()", "export async function assertContentImporter"],
+    label: "Import with AI: solo admin o master teacher",
+  },
+  {
+    file: "app/api/import/quick/route.ts",
+    requires: ["assertContentImporter", "contentProgramFor", "sourceIdIssue", "writeAudit"],
+    label: "Import with AI paso 1: importador, programa propio, fuente valida para el tipo",
+  },
+  {
+    file: "lib/quick-import.server.ts",
+    requires: ['user.role !== "ADMIN" && batch.createdById !== user.id', "QUICK_IMPORT_MODE"],
+    label: "Import with AI: el master teacher solo ve sus importaciones",
+  },
+  {
+    file: "app/api/import/quick/[batchId]/csv/route.ts",
+    requires: ["assertContentImporter", "loadQuickBatch"],
+    label: "Import with AI CSV: importador y lote propio",
+  },
+  {
+    file: "app/api/import/quick/[batchId]/artifacts/route.ts",
+    requires: ["assertContentImporter", "loadQuickBatch"],
+    label: "Import with AI artefactos: importador y lote propio",
+  },
+  {
+    file: "app/api/import/quick/[batchId]/images/route.ts",
+    requires: ["assertContentImporter", "loadQuickBatch", "writeAudit"],
+    label: "Import with AI imagenes: importador y lote propio",
+  },
+  {
+    file: "app/api/import/quick/[batchId]/promote/route.ts",
+    requires: ["assertContentImporter", "loadQuickBatch", "contentProgramFor", "promotionSourceId", "writeAudit"],
+    label: "Import with AI Draft: programa propio y fuente del lote",
+  },
+  {
+    file: "app/(teacher)/teacher/import/page.tsx",
+    requires: ["requireContentImporter"],
+    label: "Pagina Import with AI solo importadores",
+  },
+  {
+    file: "app/(teacher)/teacher/import/[batchId]/page.tsx",
+    requires: ["requireContentImporter", "loadQuickBatch"],
+    label: "Import with AI pasos 2-3 solo importadores (lote propio)",
+  },
+  {
     file: "app/api/admin/sources/route.ts",
     requires: ["assertAdmin", "writeAudit", "SOURCE_CREATED"],
     label: "Admin sources: solo admin crea fuentes (auditado)",

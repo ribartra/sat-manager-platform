@@ -14,7 +14,7 @@ import {
   type FullTestSection,
 } from "@/lib/full-test-modules";
 import { ApiError, BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
-import { DEFAULT_TEST_SOURCE_ID } from "@/lib/content-source";
+import { promotionSourceId } from "@/lib/content-source";
 
 interface RouteContext {
   params: Promise<{ batchId: string }>;
@@ -97,6 +97,8 @@ export const POST = withApiErrors(async function POST(req: Request, { params }: 
   // Canonical display name for standardized SAT exams (no "Imported" / partial suffix).
   const testName = `TEST ${testNumber}`;
 
+  // The AI Import "Source" of the batch (default College Board / Innovator).
+  const sourceId = await promotionSourceId(batchId, "tests");
   const test = await prisma.$transaction(async (tx) => {
     // Stamp M1/M2 skill + EASY/HARD before wiring so the draft exam is standardized.
     for (let order = 0; order < 4; order++) {
@@ -135,7 +137,7 @@ export const POST = withApiErrors(async function POST(req: Request, { params }: 
     const created = await tx.fullPracticeTest.create({
       data: {
         programId,
-        sourceId: DEFAULT_TEST_SOURCE_ID,
+        sourceId,
         name: testName,
         status: "DRAFT",
         modules: {
