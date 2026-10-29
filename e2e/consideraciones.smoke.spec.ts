@@ -35,13 +35,13 @@ test.describe("consideraciones smoke", () => {
     await expect(page.getByRole("heading", { name: "Study materials" })).toHaveCount(0);
   });
 
-  test("Practice Set editor offers Import with AI (master teacher)", async ({ page }) => {
+  test("Practice offers Import with AI (master teacher)", async ({ page }) => {
     await loginAs(page, E2E.teacherEmail, E2E.teacherPassword);
-    await page.goto("/teacher/practice-sets/new");
+    await page.goto("/teacher/practice-sets");
     await page.getByRole("link", { name: "Import with AI" }).click();
     await expect(page.getByRole("heading", { name: "Import with AI" })).toBeVisible();
-    await expect(page.getByText("Step 1 · What are you importing?")).toBeVisible();
-    await expect(page.getByText("Questions PDF (required)")).toBeVisible();
+    await expect(page.getByText("What are you importing?")).toBeVisible();
+    await expect(page.getByText("Questions PDF")).toBeVisible();
   });
 
   test("Student history does not show practice SAT averages", async ({ page }) => {

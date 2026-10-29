@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { QuestionListItem } from "@/components/question-list-item";
-import { ImportWithAiCard, type ImportArtifacts } from "@/components/sat/import-with-ai-card";
+import { ContentMediaCard, CropShortcut, type ContentMediaLinks } from "@/components/sat/content-media-card";
 import {
   Form,
   FormControl,
@@ -35,13 +35,10 @@ export function FullTestEditor({
   questions,
   sources,
   initial,
-  canImport = false,
-  importArtifacts = null,
+  mediaLinks = null,
 }: {
-  /** Admin / master teacher: "Import with AI" for a new Test of this source. */
-  canImport?: boolean;
-  /** This Test came from "Import with AI": links to its import, review and zip. */
-  importArtifacts?: ImportArtifacts | null;
+  /** Imported Test (admin / master teacher): images & source files + crop per question. */
+  mediaLinks?: ContentMediaLinks | null;
   /** Active sources, plus the Test's current one if it was deactivated. */
   sources: { id: string; name: string }[];
   questions: {
@@ -161,10 +158,7 @@ export function FullTestEditor({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} className="space-y-5" noValidate>
-        <ImportWithAiCard
-          importHref={canImport ? `/teacher/import?${new URLSearchParams({ kind: "FULL_PRACTICE_TEST", ...(form.watch("sourceId") ? { source: form.watch("sourceId") } : {}) }).toString()}` : null}
-          artifacts={importArtifacts}
-        />
+        <ContentMediaCard links={mediaLinks} />
 
         <FormSection title="Test settings">
           <div className="grid grid-cols-2 gap-4">
@@ -337,7 +331,8 @@ export function FullTestEditor({
                   const question = questions.find((q) => q.id === id);
                   if (!question) return null;
                   return (
-                    <li key={id} className="rounded border border-gray-100 px-3 py-2">
+                    <li key={id} className="flex items-start gap-3 rounded border border-gray-100 px-3 py-2">
+                      <div className="min-w-0 flex-1">
                       <QuestionListItem
                         question={question}
                         href={`/teacher/questions/${question.id}/edit`}
@@ -351,6 +346,8 @@ export function FullTestEditor({
                           </>
                         }
                       />
+                      </div>
+                      <CropShortcut href={mediaLinks?.cropByQuestion[question.id]} />
                     </li>
                   );
                 })}

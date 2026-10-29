@@ -18,16 +18,3 @@ export async function loadQuickBatch(batchId: string, user: { id: string; role: 
   return { batch, target, files, questionFile };
 }
 
-/** Artifacts of the "Import with AI" that created this Practice Set / Test, if any (for its editor). */
-export async function importArtifactsFor(artifactId: string) {
-  const artifact = await prisma.ingestPromotionArtifact.findFirst({
-    where: { artifactId, artifactType: { in: ["PRACTICE_SET", "FULL_PRACTICE_TEST"] }, groupKey: { startsWith: "quick:" } },
-    select: { batchId: true, sourceFileId: true },
-  });
-  if (!artifact) return null;
-  return {
-    wizardHref: `/teacher/import/${artifact.batchId}`,
-    reviewHref: artifact.sourceFileId ? `/admin/import/ai/${artifact.batchId}/files/${artifact.sourceFileId}` : null,
-    zipHref: `/api/import/quick/${artifact.batchId}/artifacts`,
-  };
-}

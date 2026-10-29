@@ -59,7 +59,7 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
       },
       assignment: {
         include: {
-          practiceSet: { include: { topic: { include: { domain: { include: { section: true } } } } } },
+          practiceSet: { include: { source: { select: { name: true } }, topic: { include: { domain: { include: { section: true } } } } } },
         },
       },
       pauses: true,
@@ -130,7 +130,8 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
           { label: "Practice", href: areaTab ? `/student/practice?area=${areaTab}` : "/student/practice" },
           // Back to the same History list the student came from (area, skill, level and dates kept).
           { label: "History", href: query.area || !areaTab ? historyHref : `/student/history?area=${areaTab}` },
-          // <Practice set (Level)> › Try M of N — the same pattern as a Test attempt.
+          // Source › <Practice set (Level)> › Try M of N — the same pattern as a Test attempt.
+          ...(practiceSet?.source ? [{ label: practiceSet.source.name }] : []),
           { label: practiceSetTitle(practiceSet?.name ?? practiceSetSnapshot?.name ?? "Practice set", practiceSet?.difficulty) },
           { label: `Try ${thisTry?.tryNumber ?? attempt.attemptNumber} of ${Math.max(tries.length, 1)}` },
         ]}
@@ -164,6 +165,7 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
                 Completed <b className="font-medium text-gray-700">{formatDate(attempt.submittedAt)}</b> at {formatClock(attempt.submittedAt)} ({relativeDay(attempt.submittedAt)})
               </>
             ) : null}
+            {practiceSet?.source ? <> · Source: <b className="font-medium text-gray-700">{practiceSet.source.name}</b></> : null}
             {attempt.assignment?.createdAt ? <> · Assigned {formatDate(attempt.assignment.createdAt)}</> : null}
             {` · ${explanationsInPlayerLabel(attempt.showExplanations ?? attempt.assignment?.showExplanations)}`}
           </p>

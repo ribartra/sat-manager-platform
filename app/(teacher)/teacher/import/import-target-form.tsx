@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Radio } from "@/components/ui/checkbox";
 import { InlineError } from "@/components/sat/alert";
+import { ImportStepHeader } from "@/components/sat/import-steps";
 import { apiFetch, errorMessage } from "@/lib/api-client";
 import { difficultyOptions } from "@/lib/domain-meta";
 
@@ -91,81 +92,83 @@ export function ImportTargetForm({
 
   return (
     <Card padding="lg" className="space-y-5">
-      <h2 className="text-base font-semibold text-gray-900">Step 1 · What are you importing?</h2>
-      <div className="flex flex-wrap gap-5 text-sm">
-        <label className="inline-flex items-center gap-2">
-          <Radio checked={kind === "PRACTICE_SET"} onChange={() => changeKind("PRACTICE_SET")} /> A new Practice Set (one skill and level)
-        </label>
-        <label className="inline-flex items-center gap-2">
-          <Radio checked={kind === "FULL_PRACTICE_TEST"} onChange={() => changeKind("FULL_PRACTICE_TEST")} /> A new Test (4 modules)
-        </label>
+      <ImportStepHeader step={1} title="What are you importing?" help="A new Draft Practice Set (one skill and level) or a new Test, its source and the original PDF." />
+
+      <fieldset className="space-y-2">
+        <legend className="text-sm font-medium text-gray-700">Content</legend>
+        <div className="flex flex-wrap gap-5 text-sm">
+          <label className="inline-flex items-center gap-2">
+            <Radio checked={kind === "PRACTICE_SET"} onChange={() => changeKind("PRACTICE_SET")} /> A new Practice Set (one skill and level)
+          </label>
+          <label className="inline-flex items-center gap-2">
+            <Radio checked={kind === "FULL_PRACTICE_TEST"} onChange={() => changeKind("FULL_PRACTICE_TEST")} /> A new Test (4 modules)
+          </label>
+        </div>
+      </fieldset>
+
+      {/* One 2-column grid for every field (labels and helps reserve the same height). */}
+      <div className="grid gap-x-4 gap-y-3 sm:grid-cols-2">
+        {kind === "PRACTICE_SET" ? (
+          <>
+            <Field label="Section">
+              <Select value={area} onChange={(e) => { setArea(e.target.value as Area); setDomainId(""); setTopicId(""); }}>
+                {AREAS.map((a) => <option key={a.code} value={a.code}>{a.label}</option>)}
+              </Select>
+            </Field>
+            <Field label="Domain">
+              <Select value={domainId} onChange={(e) => { setDomainId(e.target.value); setTopicId(""); }}>
+                <option value="">All domains</option>
+                {domains.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
+              </Select>
+            </Field>
+            <Field label="Skill">
+              <Select value={topicId} onChange={(e) => { setTopicId(e.target.value); setDomainId(skills[area].find((s) => s.id === e.target.value)?.domainId ?? domainId); }}>
+                <option value="">Choose a skill</option>
+                {domainSkills.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+              </Select>
+            </Field>
+            <Field label="Difficulty">
+              <Select value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
+                <option value="">Choose a level</option>
+                {difficultyOptions().map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </Select>
+            </Field>
+          </>
+        ) : (
+          <>
+            <Field label="Test number" hint="TEST N groups the versions of one test across sources.">
+              <Input
+                type="number"
+                min={1}
+                max={999}
+                value={testNumber}
+                onChange={(e) => {
+                  setTestNumber(e.target.value);
+                  // Default name "TEST N" until the teacher writes their own.
+                  if (!testName || /^TEST \d*$/.test(testName)) setTestName(e.target.value ? `TEST ${e.target.value}` : "");
+                }}
+                placeholder="1"
+              />
+            </Field>
+            <Field label="Test name" hint="Shown to students.">
+              <Input value={testName} onChange={(e) => setTestName(e.target.value)} placeholder="TEST 1" maxLength={120} />
+            </Field>
+          </>
+        )}
+        <Field label="Source" hint={sources.length ? "Where the content comes from (Admin › Sources)." : "No active source for this kind of content: ask an admin to add one."}>
+          <Select value={sourceId} onChange={(e) => setSourceId(e.target.value)}>
+            {sources.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+          </Select>
+        </Field>
       </div>
 
-      {kind === "PRACTICE_SET" ? (
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Field label="Section">
-            <Select value={area} onChange={(e) => { setArea(e.target.value as Area); setDomainId(""); setTopicId(""); }}>
-              {AREAS.map((a) => <option key={a.code} value={a.code}>{a.label}</option>)}
-            </Select>
-          </Field>
-          <Field label="Domain">
-            <Select value={domainId} onChange={(e) => { setDomainId(e.target.value); setTopicId(""); }}>
-              <option value="">All domains</option>
-              {domains.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
-            </Select>
-          </Field>
-          <Field label="Skill">
-            <Select value={topicId} onChange={(e) => { setTopicId(e.target.value); setDomainId(skills[area].find((s) => s.id === e.target.value)?.domainId ?? domainId); }}>
-              <option value="">Choose a skill</option>
-              {domainSkills.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-            </Select>
-          </Field>
-          <Field label="Difficulty">
-            <Select value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
-              <option value="">Choose a level</option>
-              {difficultyOptions().map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-            </Select>
-          </Field>
-        </div>
-      ) : (
-        <div className="grid gap-3 sm:grid-cols-[10rem_1fr]">
-          <Field label="Test number" hint="TEST N: groups the versions of one test across sources.">
-            <Input
-              type="number"
-              min={1}
-              max={999}
-              value={testNumber}
-              onChange={(e) => {
-                setTestNumber(e.target.value);
-                // Default name "TEST N" until the teacher writes their own.
-                if (!testName || /^TEST \d*$/.test(testName)) setTestName(e.target.value ? `TEST ${e.target.value}` : "");
-              }}
-              placeholder="1"
-            />
-          </Field>
-          <Field label="Test name">
-            <Input value={testName} onChange={(e) => setTestName(e.target.value)} placeholder="TEST 1" maxLength={120} />
-          </Field>
-        </div>
-      )}
-
-      <Field label="Source" hint={sources.length ? "Where the content comes from (Admin › Sources)." : "No active source for this kind of content: ask an admin to add one."}>
-        <Select value={sourceId} onChange={(e) => setSourceId(e.target.value)}>
-          {sources.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-        </Select>
-      </Field>
-
-      <div className="grid gap-3 sm:grid-cols-2">
-        <Field label="Questions PDF (required)" hint="Kept to crop figures in step 3 and for the artifacts zip.">
-          <input type="file" accept=".pdf,application/pdf" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="block w-full text-sm text-gray-700 file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-2 file:text-sm file:font-medium" />
-        </Field>
-        <Field label="Answers / explanations PDF (optional)" hint="Give it to the AI too, so it can fill answers and explanations.">
-          <input type="file" accept=".pdf,application/pdf" onChange={(e) => setAnswers(e.target.files?.[0] ?? null)} className="block w-full text-sm text-gray-700 file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-2 file:text-sm file:font-medium" />
-        </Field>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <FileTray label="Questions PDF" required hint="Kept to crop figures in step 3 and for the artifacts zip." file={file} onChange={setFile} />
+        <FileTray label="Answers / explanations PDF" hint="Give it to the AI too, so it can fill answers and explanations." file={answers} onChange={setAnswers} />
       </div>
 
       <InlineError>{error}</InlineError>
-      <div className="flex justify-end gap-2">
+      <div className="flex justify-end gap-2 border-t border-gray-100 pt-4">
         <Button variant="secondary" onClick={() => router.back()}>Cancel</Button>
         <Button onClick={submit} disabled={busy} disabledReason={missing}>{busy ? "Uploading…" : "Continue to step 2"}</Button>
       </div>
@@ -175,10 +178,28 @@ export function ImportTargetForm({
 
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
-    <label className="grid gap-1">
+    <label className="grid content-start gap-1">
       <span className="text-sm font-medium text-gray-700">{label}</span>
       {children}
-      {hint ? <span className="text-xs text-gray-500">{hint}</span> : null}
+      <span className="min-h-4 text-xs text-gray-500">{hint ?? ""}</span>
     </label>
+  );
+}
+
+/** PDF picker in the AI Import tray style: dashed box, file name, choose button. */
+function FileTray({ label, hint, required = false, file, onChange }: { label: string; hint: string; required?: boolean; file: File | null; onChange: (file: File | null) => void }) {
+  return (
+    <div className="flex h-full flex-col gap-2 rounded-[var(--sat-radius)] border border-dashed border-[var(--sat-border-strong)] bg-[var(--sat-surface-2)] p-4">
+      <div className="flex items-baseline justify-between gap-2">
+        <p className="text-sm font-semibold text-gray-800">{label}</p>
+        <span className="text-xs text-gray-500">{required ? "Required" : "Optional"}</span>
+      </div>
+      <p className="text-xs text-gray-500">{hint}</p>
+      <label className="mt-auto inline-flex cursor-pointer items-center gap-2 self-start rounded-lg border border-[var(--sat-border)] bg-white px-3 py-1.5 text-sm font-medium hover:bg-[var(--sat-primary-soft)]">
+        {file ? "Change file" : "Choose PDF"}
+        <input type="file" accept=".pdf,application/pdf" className="sr-only" onChange={(e) => onChange(e.target.files?.[0] ?? null)} />
+      </label>
+      <p className="truncate text-xs text-gray-600" title={file?.name}>{file ? file.name : "No file chosen"}</p>
+    </div>
   );
 }

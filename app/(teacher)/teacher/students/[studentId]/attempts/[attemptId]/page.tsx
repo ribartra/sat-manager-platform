@@ -53,7 +53,7 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
     include: {
       student: true,
       answers: { include: { question: { include: { topic: true } } } },
-      assignment: { include: { practiceSet: { include: { topic: { include: { domain: true } } } } } },
+      assignment: { include: { practiceSet: { include: { source: { select: { name: true } }, topic: { include: { domain: true } } } } } },
       pauses: true,
     },
   });
@@ -134,7 +134,8 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
           { label: "Students", href: "/teacher/students" },
           { label: attempt.student.name, href: studentHref() },
           ...(area && areaTab ? [{ label: practiceAreaLabel(area), href: studentHref({ area: areaTab }) }] : []),
-          // <Practice set (Level)> › Try M of N — the same pattern as a Test attempt.
+          // Source › <Practice set (Level)> › Try M of N — the same pattern as a Test attempt.
+          ...(practiceSet?.source ? [{ label: practiceSet.source.name }] : []),
           {
             label: practiceSetTitle(practiceSet?.name ?? practiceSetSnapshot?.name ?? "Practice set", practiceSet?.difficulty),
             href: practiceSet && areaTab ? `${studentHref({ area: areaTab, topic: practiceSet.topicId, difficulty: practiceSet.difficulty })}#performance` : undefined,
@@ -190,6 +191,7 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
               <Link href={`/teacher/practice-sets/${practiceSet.id}/preview`} className="font-medium text-[var(--sat-primary)] hover:underline">
                 {practiceSet.name}
               </Link>
+              {practiceSet.source ? <> · Source: <b className="font-medium text-gray-700">{practiceSet.source.name}</b></> : null}
             </p>
           ) : null}
           <p className="mt-1 text-xs text-gray-500">

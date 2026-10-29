@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { ArrowDown, ArrowUp, Copy, X } from "lucide-react";
 import { QuestionListItem } from "@/components/question-list-item";
-import { ImportWithAiCard, type ImportArtifacts } from "@/components/sat/import-with-ai-card";
+import { ContentMediaCard, CropShortcut, type ContentMediaLinks } from "@/components/sat/content-media-card";
 import { TaxonomyPicker } from "@/components/taxonomy-picker";
 import {
   Form,
@@ -85,13 +85,10 @@ export function PracticeSetEditor({
   questions,
   sources,
   initial,
-  canImport = false,
-  importArtifacts = null,
+  mediaLinks = null,
 }: {
-  /** Admin / master teacher: "Import with AI" pre-filled with this set's skill, level and source. */
-  canImport?: boolean;
-  /** This set came from "Import with AI": links to its import, review and zip. */
-  importArtifacts?: ImportArtifacts | null;
+  /** Imported set (admin / master teacher): images & source files + crop per question. */
+  mediaLinks?: ContentMediaLinks | null;
   topics: TopicInfo[];
   questions: QuestionInfo[];
   /** Active Practice Set sources, plus the set's current one (even if deactivated or Tests-only). */
@@ -115,7 +112,6 @@ export function PracticeSetEditor({
 
   const name = form.watch("name");
   const topicId = form.watch("topicId");
-  const difficulty = form.watch("difficulty");
   const questionIds = form.watch("questionIds");
 
   const [errors, setErrors] = useState<string[]>([]);
@@ -216,14 +212,7 @@ export function PracticeSetEditor({
           </div>
         ) : null}
 
-        <ImportWithAiCard
-          importHref={
-            canImport
-              ? `/teacher/import?${new URLSearchParams({ kind: "PRACTICE_SET", ...(topicId ? { topic: topicId } : {}), ...(difficulty ? { difficulty } : {}), ...(form.watch("sourceId") ? { source: form.watch("sourceId") } : {}) }).toString()}`
-              : null
-          }
-          artifacts={importArtifacts}
-        />
+        <ContentMediaCard links={mediaLinks} />
 
         <FormSection title="Details">
           <div className="grid grid-cols-2 gap-4">
@@ -355,6 +344,7 @@ export function PracticeSetEditor({
                     stemClassName="font-medium text-gray-900"
                   />
                 </div>
+                <CropShortcut href={mediaLinks?.cropByQuestion[q.id]} />
                 <Button type="button" variant="ghost" size="sm" aria-label={`Move question ${index + 1} up`} onClick={() => moveQuestion(index, -1)} disabled={index === 0}>
                   <ArrowUp size={14} />
                 </Button>

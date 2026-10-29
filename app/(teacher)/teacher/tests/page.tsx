@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { currentContentScope } from "@/lib/content-scope";
 import { redirect } from "next/navigation";
-import { Plus, Sparkles, User } from "lucide-react";
+import { Sparkles, User } from "lucide-react";
 import { EmptyState, ListFilters, PageShell, Pagination, TestNumberAccordion, groupTestVersions, matchesQuery, pageFromParam, paginate } from "@/components/sat";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { TestModuleTiles } from "@/components/sat/test-module-tiles";
@@ -9,7 +9,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
 import { requireContentImporter } from "@/lib/rbac";
-import { listSources } from "@/lib/content-source";
 import prisma from "@/lib/prisma";
 import { fullTestStatusBadgeVariant, fullTestStatusLabel } from "@/lib/domain-meta";
 import { studentAccessWhereFor } from "@/lib/program-scope";
@@ -78,9 +77,7 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
   );
   const page = paginate(testGroups, pageFromParam(query.page), PAGE_SIZE);
   const pageTests = new Set(page.items.flatMap((group) => group.versions.map((version) => version.key)));
-  const emptySources = canImport
-    ? (await listSources({ activeOnly: true, kind: "tests" })).filter((source) => !tests.some((test) => test.source?.id === source.id))
-    : [];
+
 
   return (
     <PageShell maxWidth={1100} width="wide">
@@ -102,25 +99,8 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
               <Link href="/teacher/import?kind=FULL_PRACTICE_TEST"><Sparkles size={14} /> Import with AI</Link>
             </Button>
           ) : null}
-          <Button asChild>
-            <Link href="/teacher/tests/new"><Plus size={14} /> New test</Link>
-          </Button>
         </div>
       </header>
-      {emptySources.length ? (
-        <div className="mb-4 flex flex-wrap items-center gap-2 text-sm">
-          <span className="text-gray-500">No tests yet from</span>
-          {emptySources.map((source) => (
-            <Link
-              key={source.id}
-              href={`/teacher/import?${new URLSearchParams({ kind: "FULL_PRACTICE_TEST", source: source.id }).toString()}`}
-              className="rounded-lg border border-dashed border-[var(--sat-border)] px-2.5 py-1 font-semibold text-[var(--sat-muted)] hover:border-[var(--sat-primary)] hover:bg-[var(--sat-primary-soft)]"
-            >
-              {source.name} · + Import test
-            </Link>
-          ))}
-        </div>
-      ) : null}
 
       <ListFilters
         action="/teacher/tests"
@@ -132,7 +112,7 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
         ]}
       />
       {tests.length === 0 ? (
-        <EmptyState title="No tests yet." description="Create one with New test." />
+        <EmptyState title="No tests yet." description={canImport ? "Import one with Import with AI." : "Your program has no tests yet."} />
       ) : shown.length === 0 ? (
         <EmptyState title="No tests match these filters." />
       ) : (

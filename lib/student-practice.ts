@@ -27,6 +27,9 @@ export interface PracticeSetItem {
   skill: string;
   skillId: string;
   domain: string;
+  /** Content source of the set (College Board, Cook…). */
+  sourceName: string | null;
+  sourceOrder: number | null;
   area: PracticeAreaCode;
   difficulty: string;
   assignedAt: Date;
@@ -71,6 +74,7 @@ export async function loadStudentPractice(studentId: string): Promise<PracticeSe
       practiceSet: {
         include: {
           topic: { include: { domain: true } },
+          source: { select: { name: true, sortOrder: true } },
           _count: { select: { questions: true } },
         },
       },
@@ -111,6 +115,8 @@ export async function loadStudentPractice(studentId: string): Promise<PracticeSe
         skill: a.practiceSet.topic.name,
         skillId: a.practiceSet.topicId,
         domain: a.practiceSet.topic.domain.name,
+        sourceName: a.practiceSet.source?.name ?? null,
+        sourceOrder: a.practiceSet.source?.sortOrder ?? null,
         area,
         difficulty: a.practiceSet.difficulty,
         assignedAt: a.createdAt,

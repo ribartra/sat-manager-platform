@@ -10,6 +10,7 @@ import { buildQuestionContent, classifyQuestion } from "@/lib/ingest-sets";
 import { difficultyLabel } from "@/lib/domain-meta";
 import { practiceAreaLabel, type PracticeAreaCode } from "@/lib/practice-area";
 import { QuickImportWorkspace, type QuickQuestionRow } from "./quick-import-workspace";
+import { ImportSteps } from "@/components/sat/import-steps";
 
 /**
  * "Import with AI", steps 2 and 3: copy the prompt, upload the CSV the AI made (and, to reprocess,
@@ -86,11 +87,21 @@ export default async function QuickImportBatchPage({ params }: { params: Promise
 
   return (
     <PageShell width="wide">
-      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Import with AI", href: "/teacher/import" }, { label: target.kind === "PRACTICE_SET" ? target.topicName : target.testName }]} />
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/teacher" },
+          target.kind === "PRACTICE_SET" ? { label: "Practice", href: "/teacher/practice-sets" } : { label: "Tests", href: "/teacher/tests" },
+          { label: "Import with AI", href: `/teacher/import?kind=${target.kind}` },
+          { label: target.kind === "PRACTICE_SET" ? `${target.topicName} · ${difficultyLabel(target.difficulty)}` : target.testNumber ? `TEST ${target.testNumber}` : target.testName },
+          { label: rows.length ? "Step 3 · Review & Draft" : "Step 2 · AI file" },
+        ]}
+      />
       <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Import with AI</h1>
-      <p className="mb-5 mt-1 text-sm text-gray-500">
+      <p className="mb-4 mt-1 text-sm text-gray-500">
         {title} · Source: <b>{source?.name ?? "—"}</b> · PDF: {questionFile?.relativePath.split("/").pop() ?? "—"}
       </p>
+      {/* Step 1 is done (the import exists); steps 2 and 3 are on this page. */}
+      <ImportSteps current={rows.length ? 3 : 2} hrefs={{ 2: "#step-2", 3: "#step-3" }} />
       <QuickImportWorkspace
         batchId={batchId}
         kind={target.kind}

@@ -67,6 +67,11 @@ export type ReportAttempt = {
   attemptNumber?: number;
   assignmentId?: string | null;
   difficulty?: string | null;
+  /** Practice only: skill and source of the set (attempt accordions: skill → source → sets). */
+  skillId?: string | null;
+  skillName?: string | null;
+  sourceName?: string | null;
+  sourceOrder?: number | null;
 };
 
 export type PracticeReport = {
@@ -241,6 +246,11 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
       attemptNumber: attempt.attemptNumber,
       assignmentId: attempt.assignmentId,
       difficulty: attempt.assignment?.practiceSet.difficulty ?? null,
+      skillId: attempt.assignment?.practiceSet.topicId ?? snapshot?.topic?.id ?? null,
+      skillName:
+        currentTopic.get(attempt.assignment?.practiceSet.topicId ?? "")?.name ?? snapshot?.topic?.name ?? null,
+      sourceName: attempt.assignment?.practiceSet.source?.name ?? null,
+      sourceOrder: attempt.assignment?.practiceSet.source?.sortOrder ?? null,
     };
   };
   const attempts = historyAttempts.filter((attempt) => attempt.status === "SUBMITTED");

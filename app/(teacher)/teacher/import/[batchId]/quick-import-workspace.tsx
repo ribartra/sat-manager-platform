@@ -3,15 +3,16 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Check, Copy, Download, Upload } from "lucide-react";
+import { Check, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { InlineError } from "@/components/sat/alert";
+import { ImportMediaPanel } from "@/components/sat/import-media-panel";
+import { ImportStepHeader } from "@/components/sat/import-steps";
 import { useConfirm } from "@/components/sat/confirm-dialog";
 import { ApiClientError, apiFetch, errorMessage } from "@/lib/api-client";
 import { notify } from "@/lib/notify-ui";
-import { cn } from "@/lib/utils";
 
 export type QuickQuestionRow = {
   id: string;
@@ -63,7 +64,6 @@ export function QuickImportWorkspace({
   const [preview, setPreview] = useState<Preview | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [imageResult, setImageResult] = useState<{ linked: number; skipped: string[] } | null>(null);
   const locked = Boolean(draftHref);
   const counts = { crit: rows.filter((r) => r.level === "crit").length, warn: rows.filter((r) => r.level === "warn").length, needsReview: rows.filter((r) => r.status === "NEEDS_REVIEW").length };
 
@@ -96,22 +96,6 @@ export function QuickImportWorkspace({
     }
   }
 
-  async function uploadImages(file: File) {
-    setBusy(true);
-    setError("");
-    const form = new FormData();
-    form.set("file", file);
-    try {
-      const result = await apiFetch<{ linked: number; skipped: string[] }>(`/api/import/quick/${batchId}/images`, { method: "POST", body: form });
-      setImageResult(result);
-      router.refresh();
-    } catch (err) {
-      setError(errorMessage(err));
-    } finally {
-      setBusy(false);
-    }
-  }
-
   async function createDraft(allowPartial = false) {
     setBusy(true);
     setError("");
@@ -137,11 +121,13 @@ export function QuickImportWorkspace({
   return (
     <div className="space-y-5">
       {/* Step 2 */}
-      <Card padding="lg" className="space-y-4">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="text-base font-semibold text-gray-900">Step 2 · Ask an AI for the CSV</h2>
-          {rows.length ? <span className="text-sm text-gray-500">{rows.length} question{rows.length === 1 ? "" : "s"} loaded</span> : null}
-        </div>
+      <Card id="step-2" padding="lg" className="scroll-mt-6 space-y-4">
+        <ImportStepHeader
+          step={2}
+          title="Ask an AI for the CSV"
+          help="Copy the prompt, give it to your AI with the PDF, and upload the CSV it makes."
+          aside={rows.length ? `${rows.length} question${rows.length === 1 ? "" : "s"} loaded` : null}
+        />
         <ol className="list-decimal space-y-1 pl-5 text-sm text-gray-700">
           <li>Copy the prompt and open your AI chat (ChatGPT, Claude, Gemini…).</li>
           <li>Attach the PDF(s) you uploaded in step 1, paste the prompt and send it.</li>
@@ -196,60 +182,33 @@ export function QuickImportWorkspace({
 
         <details className="rounded-md border border-gray-200 bg-white text-sm">
           <summary className="cursor-pointer px-3 py-2 font-medium text-gray-800">Reprocess with AI (artifacts and images)</summary>
-          <div className="space-y-3 border-t border-gray-100 p-3 text-gray-700">
-            <p>
-              Download a zip with the original PDF, every page as an image, the questions loaded so far and two prompts. Give it to your AI with <b>PROMPT-images.md</b> to
-              get the figures back as a zip of images named <code>Q3_STEM.png</code>, <code>Q5_A.png</code>
-              {kind === "FULL_PRACTICE_TEST" ? <> (Tests: <code>RW1_Q3_STEM.png</code>, <code>MATH2_Q12_A.png</code>)</> : null}, then upload it here: each image goes to its question.
-            </p>
-            <div className="flex flex-wrap items-center gap-2">
-              <Button asChild variant="secondary">
-                <a href={`/api/import/quick/${batchId}/artifacts`}>
-                  <Download size={14} /> Download artifacts (zip)
-                </a>
-              </Button>
-              <label className={cn("inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-[var(--sat-border)] px-3 py-2 text-sm font-semibold", (busy || !rows.length) && "pointer-events-none text-gray-400")}>
-                <Upload size={14} /> Upload images (zip)
-                <input
-                  type="file"
-                  accept=".zip,application/zip"
-                  className="sr-only"
-                  disabled={busy || !rows.length}
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    e.target.value = "";
-                    if (file) void uploadImages(file);
-                  }}
-                />
-              </label>
-              {!rows.length ? <span className="text-xs text-gray-500">Load the CSV first.</span> : null}
-            </div>
-            {imageResult ? (
-              <div className="text-sm">
-                <p>{imageResult.linked} image{imageResult.linked === 1 ? "" : "s"} linked.</p>
-                {imageResult.skipped.length ? (
-                  <ul className="mt-1 list-disc pl-5 text-xs text-amber-700">
-                    {imageResult.skipped.slice(0, 10).map((s) => <li key={s}>{s}</li>)}
-                  </ul>
-                ) : null}
-              </div>
-            ) : null}
+          <div className="border-t border-gray-100 p-3">
+            <ImportMediaPanel
+              artifactsHref={`/api/import/quick/${batchId}/artifacts`}
+              imagesUrl={`/api/import/quick/${batchId}/images`}
+              isTest={kind === "FULL_PRACTICE_TEST"}
+              disabledReason={rows.length ? null : "Load the CSV first."}
+            />
           </div>
         </details>
       </Card>
 
       {/* Step 3 */}
-      <Card padding="lg" className="space-y-4">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="text-base font-semibold text-gray-900">Step 3 · Check, crop figures and create the Draft</h2>
-          {rows.length ? (
-            <span className="text-sm text-gray-500">
-              {counts.crit ? <span className="text-red-600">{counts.crit} missing content · </span> : null}
-              {counts.warn ? <span className="text-amber-700">{counts.warn} to check · </span> : null}
-              {counts.needsReview} need review
-            </span>
-          ) : null}
-        </div>
+      <Card id="step-3" padding="lg" className="scroll-mt-6 space-y-4">
+        <ImportStepHeader
+          step={3}
+          title="Review, crop figures and create the Draft"
+          help="Fix what the check flags, crop figures from the PDF, then create the Draft."
+          aside={
+            rows.length ? (
+              <>
+                {counts.crit ? <span className="text-red-600">{counts.crit} missing content · </span> : null}
+                {counts.warn ? <span className="text-amber-700">{counts.warn} to check · </span> : null}
+                {counts.needsReview} need review
+              </>
+            ) : null
+          }
+        />
         {rows.length === 0 ? (
           <p className="text-sm text-gray-500">Load the CSV in step 2 first.</p>
         ) : (

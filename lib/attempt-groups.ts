@@ -25,6 +25,11 @@ export interface GroupableSet {
   key: string;
   title: string;
   tries: GroupableTry[];
+  /** Skill and source of the set: with them the accordion opens skill → source → sets. */
+  skillId?: string | null;
+  skillName?: string | null;
+  sourceName?: string | null;
+  sourceOrder?: number | null;
 }
 
 const newestFirst = (a: { submittedAt: Date | null; id: string }, b: { submittedAt: Date | null; id: string }) =>
@@ -55,6 +60,10 @@ export function practiceSetGroups(sets: GroupableSet[], recentLimit = 3): Practi
       return {
         key: set.key,
         title: set.title,
+        skillId: set.skillId ?? null,
+        skillName: set.skillName ?? null,
+        sourceName: set.sourceName ?? null,
+        sourceOrder: set.sourceOrder ?? null,
         tryCount: Math.max(...tries.map((t) => t.tryNumber)),
         last: row(tries[lastIndex], lastIndex),
         recent: tries.slice(0, recentLimit).map(row),
@@ -74,7 +83,11 @@ export function setsFromReportAttempts(attempts: ReportAttempt[]): GroupableSet[
   const bySet = new Map<string, GroupableSet>();
   for (const a of attempts) {
     const key = a.assignmentId ?? a.id;
-    const set = bySet.get(key) ?? bySet.set(key, { key, title: practiceSetTitle(a.name, a.difficulty), tries: [] }).get(key)!;
+    const set =
+      bySet.get(key) ??
+      bySet
+        .set(key, { key, title: practiceSetTitle(a.name, a.difficulty), tries: [], skillId: a.skillId, skillName: a.skillName, sourceName: a.sourceName, sourceOrder: a.sourceOrder })
+        .get(key)!;
     set.tries.push({ id: a.id, tryNumber: a.attemptNumber ?? 1, submittedAt: a.submittedAt, correct: a.correct, total: a.total, pct: a.percent, time: a.totalTime, status: a.status });
   }
   return [...bySet.values()];
@@ -85,6 +98,10 @@ export function setsFromStudentPractice(items: PracticeSetItem[]): GroupableSet[
   return items.map((item) => ({
     key: item.assignmentId,
     title: practiceSetTitle(item.name, item.difficulty),
+    skillId: item.skillId,
+    skillName: item.skill,
+    sourceName: item.sourceName,
+    sourceOrder: item.sourceOrder,
     tries: item.tries.map((t) => ({ id: t.id, tryNumber: t.tryNumber, submittedAt: t.submittedAt, correct: t.correct, total: t.total, pct: t.pct, time: t.time, status: "SUBMITTED" })),
   }));
 }

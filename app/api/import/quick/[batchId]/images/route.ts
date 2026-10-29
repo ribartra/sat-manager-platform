@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { assertContentImporter } from "@/lib/rbac";
-import { ApiError, PayloadTooLargeError, ValidationError, withApiErrors } from "@/lib/api-error";
-import { ingestAuthHeaders, ingestUrl } from "@/lib/internal-ingest";
+import { PayloadTooLargeError, ValidationError, withApiErrors } from "@/lib/api-error";
+import { uploadImagesZip } from "@/lib/import-media.server";
 import { writeAudit } from "@/lib/audit";
 import { loadQuickBatch } from "@/lib/quick-import.server";
 
@@ -21,11 +21,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
   if (!(file instanceof File) || !file.name.toLowerCase().endsWith(".zip")) throw new ValidationError("Validation failed.", ["Upload the images as a .zip file."]);
   if (file.size > 256 * 1024 * 1024) throw new PayloadTooLargeError("ZIP exceeds the 256 MB limit.");
 
-  const upstream = new FormData();
-  upstream.set("file", file, file.name);
-  const res = await fetch(ingestUrl(`/batches/${batchId}/image-zip`), { method: "POST", headers: ingestAuthHeaders(), body: upstream });
-  const data = (await res.json().catch(() => ({}))) as { linked?: unknown[]; skipped?: string[]; detail?: string };
-  if (!res.ok) throw ApiError.fromStatus(res.status, data.detail || "The import service could not read the zip.");
-  await writeAudit({ userId: session.user.id, action: "QUICK_IMPORT_IMAGES_LOADED", targetType: "IngestBatch", targetId: batchId, metadata: { linked: data.linked?.length ?? 0, skipped: data.skipped?.length ?? 0 } });
-  return NextResponse.json({ linked: data.linked?.length ?? 0, skipped: data.skipped ?? [] });
+  const result = await uploadImagesZip(batchId, file);
+  await writeAudit({ userId: session.user.id, action: "QUICK_IMPORT_IMAGES_LOADED", targetType: "IngestBatch", targetId: batchId, metadata: { linked: result.linked, propagated: result.propagated, skipped: result.skipped.length } });
+  return NextResponse.json(result);
 });

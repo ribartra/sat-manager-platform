@@ -5,6 +5,7 @@ import { requireContentImporter } from "@/lib/rbac";
 import { listSources } from "@/lib/content-source";
 import { officialSkillsFor } from "@/lib/taxonomy-order";
 import { ImportTargetForm } from "./import-target-form";
+import { ImportSteps } from "@/components/sat/import-steps";
 
 interface PageProps {
   searchParams: Promise<{ kind?: string; topic?: string; difficulty?: string; source?: string }>;
@@ -26,13 +27,21 @@ export default async function QuickImportPage({ searchParams }: PageProps) {
     listSources({ activeOnly: true, kind: "tests" }),
   ]);
   return (
-    <PageShell width="default">
-      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Import with AI" }]} />
+    <PageShell width="wide">
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/teacher" },
+          query.kind === "FULL_PRACTICE_TEST" ? { label: "Tests", href: "/teacher/tests" } : { label: "Practice", href: "/teacher/practice-sets" },
+          { label: "Import with AI" },
+          { label: "Step 1 · What & PDF" },
+        ]}
+      />
       <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Import with AI</h1>
-      <p className="mb-5 mt-1 text-sm text-gray-500">
-        Three steps: 1. choose what you import and upload the PDF · 2. ask an AI (ChatGPT, Claude, Gemini…) to turn it into a CSV and upload it · 3. check the
-        questions, crop the figures and create the Draft.
+      <p className="mb-4 mt-1 text-sm text-gray-500">
+        Choose what you import and upload the PDF, ask an AI (ChatGPT, Claude, Gemini…) to turn it into a CSV, then check the questions, crop the figures and
+        create the Draft.
       </p>
+      <ImportSteps current={1} />
       <ImportTargetForm
         skills={{ MATH: math, READING: reading, WRITING: writing }}
         practiceSources={practiceSources.map((s) => ({ id: s.id, name: s.name }))}

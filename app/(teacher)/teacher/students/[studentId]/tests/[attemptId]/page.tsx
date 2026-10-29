@@ -53,7 +53,7 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
       student: { select: { id: true, name: true } },
       answers: true,
       pauses: true,
-      test: { select: { name: true } },
+      test: { select: { name: true, number: true, source: { select: { name: true } } } },
       assignment: { select: { dueDate: true, showExplanations: true } },
     },
   });
@@ -105,6 +105,9 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
           { label: "Home", href: "/teacher" },
           { label: "Students", href: "/teacher/students" },
           { label: attempt.student.name, href: studentHref },
+          { label: "Tests", href: `/teacher/students/${studentId}?area=tests` },
+          // Source › Test › Try M of N
+          ...(attempt.test.source ? [{ label: attempt.test.source.name }] : []),
           { label: attempt.test.name, href: `/teacher/tests/${attempt.testId}` },
           { label: `Try ${tryNumber} of ${siblings.length}` },
         ]}
@@ -133,7 +136,7 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
             />
           </div>
           <p className="mt-1 text-sm text-gray-500">
-            Started {formatDate(attempt.startedAt)} · {attempt.submittedAt ? `Completed ${formatDate(attempt.submittedAt)}` : "Not finished"}
+            {attempt.test.source ? `Source: ${attempt.test.source.name} · ` : ""}Started {formatDate(attempt.startedAt)} · {attempt.submittedAt ? `Completed ${formatDate(attempt.submittedAt)}` : "Not finished"}
             {attempt.assignment?.dueDate ? ` · Due ${formatDate(attempt.assignment.dueDate)}` : ""}
             {attempt.pauses.length > 0 ? ` · Paused ${attempt.pauses.length} ${attempt.pauses.length === 1 ? "time" : "times"} (${formatDuration(pauseSeconds)})` : ""}
             {attempt.timeExpiredEvents > 0 ? ` · Ran out of time ${attempt.timeExpiredEvents} ${attempt.timeExpiredEvents === 1 ? "time" : "times"}` : ""}

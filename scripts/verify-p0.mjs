@@ -576,6 +576,57 @@ const checks = [
     label: "Detalle de intento (Test, alumno): opcion de explicaciones con la que se dio",
   },
   {
+    file: "app/(teacher)/teacher/tests/page.tsx",
+    requires: ["<TestNumberAccordion"],
+    forbids: ["New test", "emptySources"],
+    label: "Lista de Tests: sin 'New test' ni atajos de importar por fuente",
+  },
+  {
+    file: "components/sat/attempts-table.tsx",
+    requires: ["PracticeSetRows", "set.skillName", "set.sourceName"],
+    label: "Intentos de Practice Sets: skill -> fuente -> sets (y sus tries)",
+  },
+  {
+    file: "components/sat/skills-map.tsx",
+    requires: ["<Plus size={12} aria-hidden /> {difficultyLabel(chip.difficulty)}"],
+    label: "By skill: nivel vacio como placeholder '+ Easy' que abre la importacion",
+  },
+  {
+    file: "lib/import-media.server.ts",
+    requires: ["propagateAssignedImageToOfficial(", "contentScopeFor(user)", "export async function contentMediaLinks"],
+    label: "Imagenes y archivos fuente: acceso por lote, zip, imagenes copiadas a las preguntas publicadas",
+  },
+  {
+    file: "app/(teacher)/teacher/import/[batchId]/page.tsx",
+    requires: ["<ImportSteps", "Step 3 · Review & Draft"],
+    label: "Import with AI: stepper navegable y breadcrumb por paso",
+  },
+  {
+    file: "app/admin/import/ai/[batchId]/files/[fileId]/page.tsx",
+    requires: ["<ImportSteps current={3}", "Step 3 · Review & crop"],
+    label: "Revision y recorte de Import with AI: stepper y breadcrumb",
+  },
+  {
+    file: "app/(teacher)/teacher/students/[studentId]/attempts/[attemptId]/page.tsx",
+    requires: ["Source", ".source.name }] : [])"],
+    label: "Intento (PS profesor): fuente en cabecera y breadcrumb",
+  },
+  {
+    file: "app/(student)/student/results/[attemptId]/page.tsx",
+    requires: ["Source", ".source.name }] : [])"],
+    label: "Intento (PS alumno): fuente en cabecera y breadcrumb",
+  },
+  {
+    file: "app/(teacher)/teacher/students/[studentId]/tests/[attemptId]/page.tsx",
+    requires: ["Source", ".source.name }] : [])"],
+    label: "Intento (Test profesor): fuente en cabecera y breadcrumb",
+  },
+  {
+    file: "app/(student)/student/tests/results/[attemptId]/page.tsx",
+    requires: ["Source", ".source.name }] : [])"],
+    label: "Intento (Test alumno): fuente en cabecera y breadcrumb",
+  },
+  {
     file: "prisma/migrations/20261101_ingest_source_target/migration.sql",
     requires: ['ADD COLUMN "sourceId"', 'ADD COLUMN "importMode"', 'ADD COLUMN "targetJson"'],
     forbids: ["DROP TABLE"],
@@ -610,15 +661,15 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/practice-sets/practice-set-editor-client.tsx",
-    requires: ["ImportWithAiCard"],
-    forbids: ["ImportQuestionnaireButton"],
-    label: "Editor de Practice Set: Import with AI + artefactos (sin el import PDF anterior)",
+    requires: ["ContentMediaCard", "<CropShortcut"],
+    forbids: ["ImportQuestionnaireButton", "ImportWithAiCard"],
+    label: "Editor de Practice Set: atajo a imagenes y archivos fuente + recorte por pregunta (sin boton de importar)",
   },
   {
     file: "app/(teacher)/teacher/tests/new/full-test-editor-client.tsx",
-    requires: ["ImportWithAiCard"],
-    forbids: ["ImportQuestionnaireButton"],
-    label: "Editor de Test: Import with AI + artefactos (sin el import PDF anterior)",
+    requires: ["ContentMediaCard", "<CropShortcut"],
+    forbids: ["ImportQuestionnaireButton", "ImportWithAiCard"],
+    label: "Editor de Test: atajo a imagenes y archivos fuente + recorte por pregunta (sin boton de importar)",
   },
   {
     file: "ingest_service/app/main.py",

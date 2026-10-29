@@ -6031,7 +6031,7 @@ def quick_artifacts_zip(batch_id: str, payload: dict[str, Any]) -> Response:
 
 
 @app.post("/batches/{batch_id}/image-zip")
-async def quick_image_zip(batch_id: str, file: UploadFile = File(...)) -> dict[str, Any]:
+async def quick_image_zip(batch_id: str, file: UploadFile = File(...), candidateIds: str | None = Form(None)) -> dict[str, Any]:
     """Images recovered by an external AI, named Q{n}_{STEM|STIMULUS|A|B|C|D}.png (Tests: RW1_Q{n}_…,
     RW2_, MATH1_, MATH2_): each one is saved as an image artifact and linked to that question's slot
     (replacing the slot's previous link)."""
@@ -6049,6 +6049,10 @@ async def quick_image_zip(batch_id: str, file: UploadFile = File(...)) -> dict[s
             "SELECT id, sourceFileId, questionNumber, section, moduleLabel FROM IngestQuestionCandidate WHERE batchId = ? AND questionNumber IS NOT NULL",
             (batch_id,),
         ).fetchall()
+        # Optional scope (one Practice Set / Test of a large batch): only these candidates are matched.
+        scope = {value.strip() for value in (candidateIds or "").split(",") if value.strip()}
+        if scope:
+            rows = [row for row in rows if row["id"] in scope]
         by_module = {(row["section"], row["moduleLabel"], row["questionNumber"]): row for row in rows}
         by_number: dict[int, list[Any]] = {}
         for row in rows:
@@ -6111,6 +6115,6 @@ async def quick_image_zip(batch_id: str, file: UploadFile = File(...)) -> dict[s
                 """,
                 (new_id("imglink"), batch_id, candidate["id"], image_id, target_type, option_label, now_iso(), now_iso()),
             )
-            linked.append({"question": number, "slot": slot, "imageArtifactId": image_id})
+            linked.append({"question": number, "slot": slot, "imageArtifactId": image_id, "candidateId": candidate["id"], "targetType": target_type, "optionLabel": option_label})
         db.commit()
     return {"linked": linked, "skipped": skipped}

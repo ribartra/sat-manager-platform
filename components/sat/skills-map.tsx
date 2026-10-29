@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChevronRight, Lock } from "lucide-react";
+import { ChevronRight, Lock, Plus } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Pct } from "@/components/sat/work-status";
 import { Badge } from "@/components/ui/badge";
@@ -206,9 +206,11 @@ function SkillChip({ chip }: { chip: SkillsMapChip }) {
         {chip.extra}
       </>
     );
+    // A level with nothing yet that can be added: dashed placeholder "+ Easy" (opens the import / editor).
     return chip.href ? (
-      <Link href={chip.href} title={chip.title} className={cn(CHIP, "border-dashed text-[var(--sat-muted)] hover:border-[var(--sat-primary)] hover:bg-[var(--sat-primary-soft)]")}>
-        {locked}
+      <Link href={chip.href} title={chip.title} className={cn(CHIP, "border-dashed text-[var(--sat-muted)] hover:border-[var(--sat-primary)] hover:bg-[var(--sat-primary-soft)] hover:text-[var(--sat-primary)]")}>
+        <Plus size={12} aria-hidden /> {difficultyLabel(chip.difficulty)}
+        {chip.extra}
       </Link>
     ) : (
       <span title={chip.title} className={cn(CHIP, "cursor-help bg-[var(--sat-surface-2)] text-[var(--sat-blank)]")}>

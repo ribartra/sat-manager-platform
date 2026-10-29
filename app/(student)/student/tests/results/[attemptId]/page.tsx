@@ -41,7 +41,7 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
   const attempt = await prisma.fullPracticeTestAttempt.findFirst({
     where: { id: attemptId, studentId: session!.user.id },
     include: {
-      test: { select: { name: true, reviewEnabled: true } },
+      test: { select: { name: true, reviewEnabled: true, number: true, source: { select: { name: true } } } },
       assignment: { select: { id: true, dueDate: true, createdAt: true, status: true, showExplanations: true } },
       answers: true,
       pauses: true,
@@ -114,6 +114,8 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
         items={[
           { label: "Home", href: "/student" },
           { label: "Tests", href: "/student/tests" },
+          // Source › Test › Try M of N
+          ...(attempt.test.source ? [{ label: attempt.test.source.name }] : []),
           { label: attempt.test.name, href: attempt.assignmentId ? `/student/tests?view=all#test-${attempt.assignmentId}` : "/student/tests?view=completed" },
           { label: `Try ${tryNumber} of ${siblings.length}` },
         ]}
@@ -149,6 +151,7 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
             />
           </div>
           <p className="mt-1 text-xs text-gray-500">
+            {attempt.test.source ? <>Source: <b className="font-medium text-gray-700">{attempt.test.source.name}</b> · </> : null}
             Started <b className="font-medium text-gray-700">{formatDate(attempt.startedAt)}</b>
             {attempt.submittedAt ? (
               <> · Completed <b className="font-medium text-gray-700">{formatDate(attempt.submittedAt)}</b> ({relativeDay(attempt.submittedAt)})</>

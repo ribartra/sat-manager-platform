@@ -150,7 +150,6 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
                     state: null,
                     href: `/teacher/import?${new URLSearchParams({ kind: "PRACTICE_SET", topic: topic.id, difficulty, ...(source ? { source: source.id } : {}) }).toString()}`,
                     title: source ? `No ${source.name} set at this level yet: import one with AI` : "No set at this level yet: import one with AI",
-                    extra: <span className="text-[var(--sat-muted)]">+ Import</span>,
                   };
                 }
                 return {
@@ -158,7 +157,6 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
                   state: null,
                   href: `/teacher/practice-sets/new?${new URLSearchParams({ topicId: topic.id, difficulty, ...(source ? { sourceId: source.id } : {}) }).toString()}`,
                   title: source ? `No ${source.name} set at this level yet: create one` : "No set at this level yet: create one",
-                  extra: <span className="text-[var(--sat-muted)]">+ New</span>,
                 };
               };
               // Rows: every active practice source (empty ones offer "+ New"), plus an inactive one that still has sets here.

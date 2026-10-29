@@ -58,6 +58,21 @@ const checks = [
     label: "Check del player de Test: solo el intento abierto del propio alumno",
   },
   {
+    file: "app/api/import/batches/[batchId]/artifacts/route.ts",
+    requires: ["assertContentImporter", "loadImportBatch"],
+    label: "Artefactos de una importacion: importador con acceso al lote",
+  },
+  {
+    file: "app/api/import/batches/[batchId]/images/route.ts",
+    requires: ["assertContentImporter", "loadImportBatch", "writeAudit"],
+    label: "Imagenes de una importacion: importador con acceso al lote",
+  },
+  {
+    file: "app/(teacher)/teacher/media/[kind]/[id]/page.tsx",
+    requires: ["requireContentImporter", "contentScopeFor"],
+    label: "Imagenes y archivos fuente: importador y contenido de su programa",
+  },
+  {
     file: "app/api/admin/sources/[id]/content/route.ts",
     requires: ["assertAdmin", "writeAudit", "SOURCE_CONTENT_ASSIGNED", "is not used for Practice Sets", "is not used for Tests"],
     label: "Maestro de fuentes: solo admin asocia Practice Sets / Tests a una fuente del tipo correcto (auditado)",

@@ -25,7 +25,7 @@ export default async function ParentDashboardPage() {
             where: { status: "SUBMITTED", assignmentId: { not: null } },
             include: {
               answers: { select: { answer: true, isCorrect: true } },
-              assignment: { select: { practiceSet: { select: { name: true, difficulty: true, _count: { select: { questions: true } } } } } },
+              assignment: { select: { practiceSet: { select: { name: true, difficulty: true, topicId: true, topic: { select: { name: true } }, source: { select: { name: true, sortOrder: true } }, _count: { select: { questions: true } } } } } },
             },
             orderBy: { submittedAt: "desc" },
           },
@@ -57,7 +57,20 @@ export default async function ParentDashboardPage() {
               for (const attempt of attempts) {
                 const practiceSet = attempt.assignment!.practiceSet;
                 const key = attempt.assignmentId!;
-                const set = sets.get(key) ?? sets.set(key, { key, title: practiceSetTitle(practiceSet.name, practiceSet.difficulty), tries: [] }).get(key)!;
+                const set =
+                  sets.get(key) ??
+                  sets
+                    .set(key, {
+                      key,
+                      title: practiceSetTitle(practiceSet.name, practiceSet.difficulty),
+                      tries: [],
+                      // Skill → source → sets, like the teacher and student views.
+                      skillId: practiceSet.topicId,
+                      skillName: practiceSet.topic.name,
+                      sourceName: practiceSet.source?.name ?? null,
+                      sourceOrder: practiceSet.source?.sortOrder ?? null,
+                    })
+                    .get(key)!;
                 const score = summarizeAllQuestionAnswers(attempt.answers);
                 const total = Math.max(score.total, practiceSet._count.questions);
                 set.tries.push({

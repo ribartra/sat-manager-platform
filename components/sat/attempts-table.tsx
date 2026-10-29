@@ -182,25 +182,75 @@ export interface PracticeSetAttempts {
   last: PracticeAttemptRow;
   /** Newest first, at most `recentLimit` (the rest is in History). */
   recent: PracticeAttemptRow[];
+  /** Skill and source of the set: with them the accordion opens skill → source → sets. */
+  skillId?: string | null;
+  skillName?: string | null;
+  sourceName?: string | null;
+  sourceOrder?: number | null;
 }
 
-/**
- * Practice attempts grouped by set: one row per set showing its LAST attempt (not the best), which
- * opens to its most recent tries. Older tries are not deleted, only listed in History.
- */
-export function PracticeSetAttemptsAccordion({
-  sets,
-  hrefFor,
-  historyHref,
-  recentLimit = 3,
-}: {
+type PracticeSetAccordionProps = {
   sets: PracticeSetAttempts[];
   /** Omit for views without attempt pages (parents): rows are not links. */
   hrefFor?: (id: string) => string;
   /** "See all N tries" link; omitted where there is no History (parents). */
   historyHref?: string;
   recentLimit?: number;
-}) {
+};
+
+/**
+ * Practice attempts: one accordion per skill (A–Z); inside, each source (College Board, Cook…) with its
+ * sets, one row per set showing its LAST attempt (not the best), which opens to its most recent tries.
+ * Older tries are not deleted, only listed in History. Sets without skill/source info stay a flat list.
+ */
+export function PracticeSetAttemptsAccordion(props: PracticeSetAccordionProps) {
+  const { sets } = props;
+  if (sets.length === 0 || sets.some((set) => !set.skillName)) return <PracticeSetRows {...props} />;
+  const bySkill = new Map<string, { name: string; sets: PracticeSetAttempts[] }>();
+  for (const set of sets) {
+    const key = set.skillId ?? set.skillName!;
+    const group = bySkill.get(key) ?? bySkill.set(key, { name: set.skillName!, sets: [] }).get(key)!;
+    group.sets.push(set);
+  }
+  const skills = [...bySkill.entries()].sort(([, a], [, b]) => a.name.localeCompare(b.name, "en", { numeric: true, sensitivity: "base" }));
+  return (
+    <div className="space-y-3">
+      {skills.map(([key, skill]) => {
+        const sources = new Map<string, { name: string; order: number; sets: PracticeSetAttempts[] }>();
+        for (const set of skill.sets) {
+          const name = set.sourceName ?? "No source";
+          const group = sources.get(name) ?? sources.set(name, { name, order: set.sourceOrder ?? 999, sets: [] }).get(name)!;
+          group.sets.push(set);
+        }
+        const last = skill.sets.map((set) => set.last.submittedAt).filter((d): d is Date => Boolean(d)).sort((a, b) => b.getTime() - a.getTime())[0];
+        return (
+          <details key={key} className="group overflow-hidden rounded-[var(--sat-radius)] border border-[var(--sat-border)] bg-white">
+            <summary className="flex cursor-pointer list-none flex-wrap items-center gap-x-3 gap-y-1 px-4 py-3 hover:bg-[var(--sat-primary-soft)] [&::-webkit-details-marker]:hidden">
+              <ChevronRight aria-hidden size={16} className="shrink-0 text-[var(--sat-blank)] transition-transform group-open:rotate-90" />
+              <span className="font-semibold text-[var(--sat-text)]">{skill.name}</span>
+              <span className="text-xs text-gray-500">
+                {skill.sets.length} set{skill.sets.length === 1 ? "" : "s"} · {[...sources.keys()].join(" · ")}
+                {last ? ` · last ${formatDate(last)}` : ""}
+              </span>
+            </summary>
+            <div className="space-y-4 border-t border-[var(--sat-border)] bg-[var(--sat-surface-2)] p-3">
+              {[...sources.values()]
+                .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name))
+                .map((source) => (
+                  <section key={source.name} className="space-y-1.5">
+                    <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">{source.name}</h3>
+                    <PracticeSetRows {...props} sets={source.sets} />
+                  </section>
+                ))}
+            </div>
+          </details>
+        );
+      })}
+    </div>
+  );
+}
+
+function PracticeSetRows({ sets, hrefFor, historyHref, recentLimit = 3 }: PracticeSetAccordionProps) {
   return (
     <GroupedAttemptsAccordion
       head={["Practice set", "Last Attempt", "Correct", "Time", "Completed"]}

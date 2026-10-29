@@ -1,6 +1,8 @@
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import Link from "next/link";
 import { promotionSourceId } from "@/lib/content-source";
+import { ImportSteps } from "@/components/sat/import-steps";
+import { parseTarget } from "@/lib/quick-import";
 import { randomUUID } from "crypto";
 import { redirect } from "next/navigation";
 import { Card } from "@/components/ui/card";
@@ -57,6 +59,8 @@ export default async function AiImportFileReviewPage({ params, searchParams }: P
   ]);
 
   if (!batch || !file) redirect("/admin/import/ai");
+  // "Import with AI" target (breadcrumb + stepper) when this batch comes from it.
+  const quickTarget = batch.importMode === "AI_CSV" ? parseTarget(batch.targetJson) : null;
 
   // Extracted Test grouping + crop siblings first — candidates for FPT/PS often
   // live on the answer/explanation file while images live on the question file.
@@ -180,7 +184,20 @@ export default async function AiImportFileReviewPage({ params, searchParams }: P
         <div>
           {/* "Import with AI" batches come back to their wizard (step 3); OCR batches to AI Import. */}
           {batch?.importMode === "AI_CSV" ? (
-            <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Import with AI", href: `/teacher/import/${batchId}` }, { label: "Review and crop" }]} />
+            <>
+              <Breadcrumbs
+                items={[
+                  { label: "Home", href: "/teacher" },
+                  quickTarget?.kind === "FULL_PRACTICE_TEST" ? { label: "Tests", href: "/teacher/tests" } : { label: "Practice", href: "/teacher/practice-sets" },
+                  { label: "Import with AI", href: `/teacher/import/${batchId}` },
+                  ...(quickTarget
+                    ? [{ label: quickTarget.kind === "PRACTICE_SET" ? quickTarget.topicName : quickTarget.testNumber ? `TEST ${quickTarget.testNumber}` : quickTarget.testName, href: `/teacher/import/${batchId}` }]
+                    : []),
+                  { label: "Step 3 · Review & crop" },
+                ]}
+              />
+              <ImportSteps current={3} hrefs={{ 2: `/teacher/import/${batchId}#step-2`, 3: `/teacher/import/${batchId}#step-3` }} />
+            </>
           ) : (
             <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Admin" }, { label: "AI Import", href: `/admin/import/ai?batch=${batchId}` }, { label: "Review file" }]} />
           )}
@@ -188,8 +205,8 @@ export default async function AiImportFileReviewPage({ params, searchParams }: P
           <p className="mt-1 text-sm text-gray-500">{file.relativePath}</p>
         </div>
         {batch?.importMode === "AI_CSV" ? (
-          <Link href={`/teacher/import/${batchId}`} className="shrink-0 rounded-lg bg-[var(--sat-primary)] px-3 py-2 text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]">
-            ← Back to Import with AI
+          <Link href={`/teacher/import/${batchId}#step-3`} className="shrink-0 self-start rounded-lg border border-[var(--sat-border)] bg-white px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-[var(--sat-primary-soft)]">
+            ← Back to step 3
           </Link>
         ) : (
           <Card padding="md">

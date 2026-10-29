@@ -70,7 +70,7 @@ export default async function ParentTemporaryAccessPage({ searchParams }: PagePr
             where: { status: "SUBMITTED" },
             include: {
               answers: true,
-              assignment: { include: { practiceSet: { include: { topic: { include: { domain: { include: { section: true } } } } } } } },
+              assignment: { include: { practiceSet: { include: { source: { select: { name: true, sortOrder: true } }, topic: { include: { domain: { include: { section: true } } } } } } } },
             },
             orderBy: { submittedAt: "desc" },
           },
@@ -126,7 +126,20 @@ export default async function ParentTemporaryAccessPage({ searchParams }: PagePr
   for (const attempt of attempts) {
     const practiceSet = attempt.assignment?.practiceSet;
     const key = attempt.assignmentId ?? attempt.id;
-    const set = sets.get(key) ?? sets.set(key, { key, title: practiceSet ? practiceSetTitle(practiceSet.name, practiceSet.difficulty) : "Practice set", tries: [] }).get(key)!;
+    const set =
+      sets.get(key) ??
+      sets
+        .set(key, {
+          key,
+          title: practiceSet ? practiceSetTitle(practiceSet.name, practiceSet.difficulty) : "Practice set",
+          tries: [],
+          // Skill → source → sets, like the teacher and student views.
+          skillId: practiceSet?.topicId ?? null,
+          skillName: practiceSet?.topic.name ?? null,
+          sourceName: practiceSet?.source?.name ?? null,
+          sourceOrder: practiceSet?.source?.sortOrder ?? null,
+        })
+        .get(key)!;
     const attemptScore = summarizeAllQuestionAnswers(attempt.answers);
     set.tries.push({
       id: attempt.id,
