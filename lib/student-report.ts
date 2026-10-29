@@ -15,7 +15,6 @@ import {
 } from "@/lib/progress-analytics";
 import { practiceAreaLabel, type PracticeAreaCode } from "@/lib/practice-area";
 import { progressDateWhere } from "@/lib/progress-filters";
-import { DEFAULT_PRACTICE_SOURCE_ID } from "@/lib/content-source";
 import { domainRank } from "@/lib/taxonomy-order";
 
 const DIFFICULTY_LEVELS = ["EASY", "MEDIUM", "HARD"] as const;
@@ -45,8 +44,6 @@ export type SkillResultRow = {
   label: string;
   /** EASY / MEDIUM / HARD → result over every source. */
   levels: Partial<Record<string, LevelResult>>;
-  /** The same per content source (College Board, Cook, …), in source order. */
-  bySource: Array<{ sourceId: string; sourceName: string; levels: Partial<Record<string, LevelResult>> }>;
 };
 
 /** One attempt's result (the only level the student profile reports at). */
@@ -85,7 +82,7 @@ export type PracticeReport = {
   };
   /**
    * Skill × difficulty results (domains in official order, skills A–Z): see LevelResult — the last
-   * counted attempt of each set, weighted by questions; per source in `bySource`.
+   * counted attempt of each set, weighted by questions, over every source.
    */
   skillResults: SkillResultRow[];
   /** The skill × level with the lowest weighted result, or null. */
@@ -275,8 +272,6 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
     if (!set) return;
     const cell = `${set.topicId}:${set.difficulty}`;
     triesByCell.set(cell, (triesByCell.get(cell) ?? 0) + 1);
-    const sourceCell = `${cell}:${set.sourceId ?? DEFAULT_PRACTICE_SOURCE_ID}`;
-    triesByCell.set(sourceCell, (triesByCell.get(sourceCell) ?? 0) + 1);
   });
   type Acc = { correct: number; total: number; sets: number; lastAt: Date | null; latestAttemptId: string };
   const add = (map: Map<string, Acc>, key: string, index: number) => {
@@ -296,15 +291,11 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
     }
   };
   const byCell = new Map<string, Acc>();
-  const bySourceCell = new Map<string, Acc>();
-  const sourcesSeen = new Map<string, { name: string; sortOrder: number }>();
   const skillsSeen = new Map<string, { domainId: string; domainName: string; label: string }>();
   // Map iteration follows insertion = newest-first attempt order.
   for (const index of [...latestIndexBySet.values()].sort((a, b) => a - b)) {
     const set = setOf(index);
     if (!set) continue;
-    const sourceId = set.sourceId ?? DEFAULT_PRACTICE_SOURCE_ID;
-    sourcesSeen.set(sourceId, { name: set.source?.name ?? "College Board", sortOrder: set.source?.sortOrder ?? 0 });
     const current = currentTopic.get(set.topicId);
     skillsSeen.set(set.topicId, {
       domainId: current?.domainId ?? "",
@@ -312,27 +303,22 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
       label: current?.name ?? shortSetName(scoredAttempts[index].name),
     });
     add(byCell, `${set.topicId}:${set.difficulty}`, index);
-    add(bySourceCell, `${set.topicId}:${set.difficulty}:${sourceId}`, index);
   }
   const levelResult = (acc: Acc | undefined, triesKey: string): LevelResult | undefined =>
     acc ? { ...acc, percent: scorePercent(acc.correct, acc.total), tries: triesByCell.get(triesKey) ?? acc.sets } : undefined;
-  const levelsFor = (topic: string, source?: string) =>
+  const levelsFor = (topic: string) =>
     Object.fromEntries(
       DIFFICULTY_LEVELS.flatMap((level) => {
-        const key = source ? `${topic}:${level}:${source}` : `${topic}:${level}`;
-        const result = levelResult((source ? bySourceCell : byCell).get(key), key);
+        const key = `${topic}:${level}`;
+        const result = levelResult(byCell.get(key), key);
         return result ? [[level, result]] : [];
       }),
     );
-  const orderedSources = [...sourcesSeen.entries()].sort(([, a], [, b]) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name));
   const skillResults: SkillResultRow[] = [...skillsSeen.entries()]
     .map(([topic, skill]) => ({
       topicId: topic,
       ...skill,
       levels: levelsFor(topic),
-      bySource: orderedSources
-        .map(([sourceId, source]) => ({ sourceId, sourceName: source.name, levels: levelsFor(topic, sourceId) }))
-        .filter((row) => Object.keys(row.levels).length > 0),
     }))
     .sort((x, y) => domainRank(x.domainId) - domainRank(y.domainId) || x.label.localeCompare(y.label, "en", { numeric: true, sensitivity: "base" }));
   // Weakest skill: the skill × level with the lowest weighted result.

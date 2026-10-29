@@ -221,7 +221,7 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
                   <VoidableValue status={attempt.status}>{pct}%</VoidableValue>
                 </p>
                 <p className="mt-1 text-sm text-gray-600"><VoidableValue status={attempt.status}>{correct} of {total} correct</VoidableValue></p>
-                {delta !== null ? <Delta value={delta} suffix={`vs. try ${prevTry!.tryNumber} (${prevTry!.pct}%)`} className="mt-1 block" /> : null}
+                {delta !== null ? <Delta value={delta} unit="%" suffix={`vs. try ${prevTry!.tryNumber} (${prevTry!.pct}%)`} className="mt-1 block" /> : null}
               </div>
               <div>
                 <p className="text-sm text-gray-700">

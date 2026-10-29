@@ -83,7 +83,7 @@ export function PracticeAttemptsTable({
             {r.submittedAt ? <>{formatDate(r.submittedAt)}<span className="block text-xs text-gray-400">{relativeDay(r.submittedAt)}</span></> : "—"}
           </td>
           <td className={TD}><VoidableValue status={r.status}><Pct value={r.pct} className="font-semibold" /></VoidableValue></td>
-          {withChange ? <td className={TD}>{r.change !== null && r.change !== undefined ? <Delta value={r.change} unit="pts" /> : <span className="text-gray-300">—</span>}</td> : null}
+          {withChange ? <td className={TD}>{r.change !== null && r.change !== undefined ? <Delta value={r.change} unit="%" /> : <span className="text-gray-300">—</span>}</td> : null}
           <td className={TD}>{r.correct} of {r.total}</td>
           <td className={`${TD} text-gray-600`}>{r.time ? formatDuration(r.time) : "—"}</td>
           {r.id === viewingId || !hrefFor ? null : <ChevronCell />}
@@ -261,7 +261,7 @@ function PracticeSetRows({ sets, hrefFor, historyHref, recentLimit = 3 }: Practi
           <>{set.title}<TriesCount count={set.tryCount} /></>,
           <span key="pct" className="whitespace-nowrap">
             <VoidableValue status={set.last.status}><Pct value={set.last.pct} className="font-semibold" /></VoidableValue>
-            {set.last.change !== null && set.last.change !== undefined ? <Delta value={set.last.change} unit="" className="ml-1.5" /> : null}
+            {set.last.change !== null && set.last.change !== undefined ? <Delta value={set.last.change} unit="%" className="ml-1.5" /> : null}
           </span>,
           <>{set.last.correct} of {set.last.total}</>,
           <span key="t" className="text-gray-600">{set.last.time ? formatDuration(set.last.time) : "—"}</span>,

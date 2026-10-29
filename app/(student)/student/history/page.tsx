@@ -315,7 +315,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
           <SkillResults
             report={report}
             title="Skills by difficulty"
-            description="Each level adds up your last attempt of every set (by questions) · open a skill to see each source"
+            description="Each level adds up your last attempt of every set, across all sources (by questions)"
             attemptHref={(id) => buildProgressHref(`/student/results/${id}`, filters)}
           />
 

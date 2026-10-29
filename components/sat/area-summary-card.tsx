@@ -48,7 +48,7 @@ export function AreaSummaryCard({ area, label, href, latest, delta, chips = [], 
             <Pct value={latest.pct} className="text-4xl font-bold leading-none" color={`var(--sat-area-${tab})`} />
             {latest.detail ? <span className="text-xs text-gray-500">{latest.detail}</span> : null}
           </p>
-          {delta !== null && delta !== undefined ? <Delta value={delta} suffix="vs. previous practice" className="mt-1 block" /> : null}
+          {delta !== null && delta !== undefined ? <Delta value={delta} unit="%" suffix="vs. previous practice" className="mt-1 block" /> : null}
         </div>
       ) : (
         <p className="text-sm text-gray-500">{emptyText}</p>

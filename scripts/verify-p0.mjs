@@ -166,13 +166,13 @@ const checks = [
   {
     file: "app/(teacher)/teacher/questions/questions-filter-client.tsx",
     requires: ['params.set("q"'],
-    label: "Busqueda con filtros: Banco de preguntas: texto/ID + area, skill, nivel, estado",
+    label: "Busqueda con filtros: Banco de preguntas: texto + area, skill, nivel, estado",
   },
   {
     file: "app/(teacher)/teacher/practice-sets/page.tsx",
-    requires: ["<ListFilters", "matchesQuery(search", "<SetList", "PracticeSetStatusSelect"],
-    forbids: ["PracticeSetsTable", 'view: "manage"'],
-    label: "Practice: solo By skill (SAT-042) con un buscador unico; cada chip lista sus sets con estado, Preview, Edit",
+    requires: ["<ListFilters", "matchesQuery(search", "<PracticeSetsMenu"],
+    forbids: ["PracticeSetsTable", 'view: "manage"', "<SetList", "New Practice Set"],
+    label: "Practice: solo By skill (SAT-042) con un buscador unico; cada chip abre un desplegable con sus sets (Preview, Edit, Status, Delete); solo el boton Import with AI",
   },
   {
     file: "app/(teacher)/teacher/materials/materials-client.tsx",
@@ -335,7 +335,7 @@ const checks = [
   },
   {
     file: "lib/student-report.ts",
-    requires: ["aggregateTopicDifficultyMetrics", "summarizeAllQuestionAnswers", "parseSnapshot", "loadMockReport", "timeSpent", "topic.name", "latestIndexBySet", "skillResults", "bySource", "acc.correct += scored.correct", "· try ${n}"],
+    requires: ["aggregateTopicDifficultyMetrics", "summarizeAllQuestionAnswers", "parseSnapshot", "loadMockReport", "timeSpent", "topic.name", "latestIndexBySet", "skillResults", "acc.correct += scored.correct", "· try ${n}"],
     label: "Datos del reporte compartidos por la pagina del alumno y el PDF (snapshots, score ponderado, FPT)",
   },
   {
@@ -455,7 +455,7 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/practice-sets/page.tsx",
-    requires: ["SkillsSourceMap", "listSources({ kind: \"practice\" })", "source: source.id", "sourceId: source.id"],
+    requires: ["SkillsSourceMap", "listSources({ kind: \"practice\" })", "source: source.id"],
     label: "Practice › By skill: chips por skill y, al abrirlo, una fila por fuente de Practice Sets (sin Innovator)",
   },
   {
@@ -465,9 +465,9 @@ const checks = [
   },
   {
     file: "components/sat/skill-results.tsx",
-    requires: ["SkillsSourceMap", "Weakest skill", "skills by difficulty", "bySource"],
-    forbids: ["Assign"],
-    label: "SkillResults (profesor, alumno, padre): weakest skill bajo el titulo, chips agregadas y fila por fuente, sin Assign",
+    requires: ["SkillsSourceMap", "Weakest skill", "skills by difficulty", "across all sources"],
+    forbids: ["Assign", "bySource", "rows: row."],
+    label: "SkillResults (profesor, alumno, padre): weakest skill bajo el titulo, chips agregadas sobre todas las fuentes (sin acordeon por fuente), sin Assign",
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/assign/page.tsx",

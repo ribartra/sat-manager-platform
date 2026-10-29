@@ -82,13 +82,13 @@ export function StatGrid({ cols = 4, className, children }: { cols?: 2 | 3 | 4 |
   return <div className={cn("grid grid-cols-2 gap-3.5", colClass, className)}>{children}</div>;
 }
 
-/** "▲ 6 points vs. previous practice" / "▼ 4 …". Nothing when there is no previous value. */
+/** "▲ 6% vs. previous practice" (practice: % correct) / "▼ 40" (Test scores). Nothing when there is no previous value. */
 export function Delta({ value, suffix = "", unit = "points", className }: { value: number | null | undefined; suffix?: string; unit?: string; className?: string }) {
   if (value === null || value === undefined) return null;
   const up = value >= 0;
   return (
     <span className={cn("whitespace-nowrap text-xs font-bold", up ? "text-[var(--sat-ok)]" : "text-[var(--sat-bad)]", className)}>
-      {up ? "▲" : "▼"} {Math.abs(value)}{unit ? ` ${unit}` : ""}{suffix ? ` ${suffix}` : ""}
+      {up ? "▲" : "▼"} {Math.abs(value)}{unit === "%" ? "%" : unit ? ` ${unit}` : ""}{suffix ? ` ${suffix}` : ""}
     </span>
   );
 }

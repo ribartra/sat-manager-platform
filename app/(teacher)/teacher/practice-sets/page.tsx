@@ -2,9 +2,8 @@ import { ListFilters, PageShell, PracticeAreaTabs, SkillsSourceMap, matchesQuery
 import { contentScopeFor } from "@/lib/program-scope";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
-import { Plus, Sparkles } from "lucide-react";
-import { PracticeSetActions } from "./practice-set-actions-client";
-import { PracticeSetStatusSelect } from "./practice-set-status-client";
+import { Sparkles } from "lucide-react";
+import { PracticeSetsMenu } from "./practice-sets-menu-client";
 import { redirect } from "next/navigation";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { compareSkills } from "@/lib/taxonomy-order";
@@ -59,9 +58,8 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
     orderBy: { name: "asc" },
   });
   const topicIds = topics.map((topic) => topic.id);
-  // The chip the teacher clicked: its skill opens with that level's sets listed under each source.
+  // A skill named in the URL (editor after saving, old links) starts opened.
   const selectedTopicId = filters.topic && topicIds.includes(filters.topic) ? filters.topic : undefined;
-  const selectedLevel = selectedTopicId && filters.difficulty ? filters.difficulty : undefined;
   const search = filters.q?.trim() ?? "";
   // Only sources used for Practice Sets (Innovator is Tests-only).
   const sources = await listSources({ kind: "practice" });
@@ -76,8 +74,6 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
     },
     orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
   });
-  const chipHref = (extra: Record<string, string>) =>
-    `/teacher/practice-sets?${new URLSearchParams({ area, ...(search ? { q: search } : {}), ...extra }).toString()}#skill-${extra.topic}`;
   // One search box (SAT-042): a skill shows when its name or one of its sets matches.
   const setMatches = (set: (typeof practiceSets)[number]) => matchesQuery(search, set.name);
   const domains = new Map<string, { name: string; topics: typeof topics }>();
@@ -103,7 +99,6 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
           {canImport ? (
             <Link href="/teacher/import?kind=PRACTICE_SET" className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg border border-[var(--sat-border)] bg-white px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-[var(--sat-primary-soft)]"><Sparkles size={14} /> Import with AI</Link>
           ) : null}
-          <Link href="/teacher/practice-sets/new" className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-3 py-2 text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]"><Plus size={14} /> New Practice Set</Link>
         </div>
       </header>
       <MoreLinks links={moreLinks} />
@@ -123,7 +118,7 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
               const assigned = setsOfTopic.reduce((sum, set) => sum + set.assignments.length, 0);
               const isSelected = selectedTopicId === topic.id;
               const searchHit = Boolean(search) && setsOfTopic.some(setMatches);
-              // Chip of one level: its sets (all sources, or one) open the list below; an empty level offers "+ New".
+              // Chip of one level: a drop-down of its sets (all sources, or one); an empty level offers "+ Import".
               const chipFor = (difficulty: string, source?: { id: string; name: string; active: boolean }): SkillsMapChip => {
                 const sets = setsOfTopic.filter((set) => set.difficulty === difficulty && (!source || set.sourceId === source.id));
                 const published = sets.filter((set) => set.status === "PUBLISHED").length;
@@ -132,18 +127,23 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
                   return {
                     difficulty,
                     state: "available",
-                    href: chipHref({ topic: topic.id, difficulty, ...(source ? { source: source.id } : {}) }),
-                    title: `${prefix}${sets.length} set${sets.length === 1 ? "" : "s"} (${published} published): edit, preview or change status`,
-                    extra: (
-                      <span className="text-[var(--sat-muted)]">
-                        {sets.length} set{sets.length === 1 ? "" : "s"}
-                        {sets.length > published ? ` · ${sets.length - published} draft` : ""}
-                      </span>
+                    render: (
+                      <PracticeSetsMenu
+                        difficulty={difficulty}
+                        title={`${prefix}${sets.length} set${sets.length === 1 ? "" : "s"} (${published} published): preview, edit or change status`}
+                        sets={sets.map((set) => ({ id: set.id, name: set.name, status: set.status, questions: set.questions.length, assignments: set.assignments.length }))}
+                        extra={
+                          <span className="text-[var(--sat-muted)]">
+                            {sets.length} set{sets.length === 1 ? "" : "s"}
+                            {sets.length > published ? ` · ${sets.length - published} draft` : ""}
+                          </span>
+                        }
+                      />
                     ),
                   };
                 }
                 if (source && !source.active) return { difficulty, state: null, title: `No ${source.name} set at this level` };
-                // Empty level: admin / master teacher import it with AI (pre-filled), others create it by hand.
+                // Empty level: admin / master teacher import it with AI (pre-filled); others just see it's empty.
                 if (canImport) {
                   return {
                     difficulty,
@@ -152,14 +152,9 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
                     title: source ? `No ${source.name} set at this level yet: import one with AI` : "No set at this level yet: import one with AI",
                   };
                 }
-                return {
-                  difficulty,
-                  state: null,
-                  href: `/teacher/practice-sets/new?${new URLSearchParams({ topicId: topic.id, difficulty, ...(source ? { sourceId: source.id } : {}) }).toString()}`,
-                  title: source ? `No ${source.name} set at this level yet: create one` : "No set at this level yet: create one",
-                };
+                return { difficulty, state: null, title: source ? `No ${source.name} set at this level yet` : "No set at this level yet" };
               };
-              // Rows: every active practice source (empty ones offer "+ New"), plus an inactive one that still has sets here.
+              // Rows: every active practice source (empty levels offer "+ Import"), plus an inactive one that still has sets here.
               const rows = sources.filter((source) => source.active || setsOfTopic.some((set) => set.sourceId === source.id));
               return {
                 id: topic.id,
@@ -167,46 +162,17 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
                 sub: `Assigned ${assigned} time${assigned === 1 ? "" : "s"}`,
                 open: isSelected || searchHit,
                 chips: DIFFICULTIES.map((difficulty) => chipFor(difficulty)),
-                rows: rows.map((source) => {
-                  // Sets listed under the row: the clicked level (this source, or every source), or the search hits.
-                  const listed = setsOfTopic.filter(
-                    (set) =>
-                      set.sourceId === source.id &&
-                      ((isSelected && selectedLevel && set.difficulty === selectedLevel && (!filters.source || filters.source === source.id)) || (searchHit && setMatches(set))),
-                  );
-                  return {
-                    id: source.id,
-                    name: source.active ? source.name : `${source.name} (inactive)`,
-                    chips: DIFFICULTIES.map((difficulty) => chipFor(difficulty, source)),
-                    children: listed.length ? <SetList sets={listed} /> : null,
-                  };
-                }),
+                rows: rows.map((source) => ({
+                  id: source.id,
+                  name: source.active ? source.name : `${source.name} (inactive)`,
+                  chips: DIFFICULTIES.map((difficulty) => chipFor(difficulty, source)),
+                })),
               };
             }),
           }))}
         />
-        <p className="text-xs text-gray-500">Click a level to see its sets (edit, preview, status). To assign a set, open a student (Students → Assign practice).</p>
+        <p className="text-xs text-gray-500">Click a level to open its sets (preview, edit, status). To assign a set, open a student (Students → Assign practice).</p>
       </div>
     </PageShell>
-  );
-}
-
-/** The sets of one skill × level × source, with their status and actions (former "Manage sets" rows). */
-function SetList({ sets }: { sets: Array<{ id: string; name: string; status: string; questions: unknown[]; assignments: unknown[] }> }) {
-  return (
-    <ul className="mt-1.5 divide-y divide-gray-100 rounded-lg border border-[var(--sat-border)] bg-white">
-      {sets.map((set) => (
-        <li key={set.id} className="flex flex-wrap items-center gap-2 px-3 py-2">
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium text-gray-900" title={set.name}>{set.name}</p>
-            <p className="text-xs text-gray-500">
-              {set.questions.length} question{set.questions.length === 1 ? "" : "s"} · assigned {set.assignments.length} time{set.assignments.length === 1 ? "" : "s"}
-            </p>
-          </div>
-          <PracticeSetStatusSelect practiceSetId={set.id} status={set.status} />
-          <PracticeSetActions practiceSetId={set.id} assignmentCount={set.assignments.length} />
-        </li>
-      ))}
-    </ul>
   );
 }

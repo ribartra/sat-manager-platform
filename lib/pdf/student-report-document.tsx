@@ -204,15 +204,11 @@ function levelMetric(label: string, difficulty: string, cell: { correct: number;
 function PracticeSection({ report }: { report: PracticeReport }) {
   const k = report.kpis;
   const levels = ["EASY", "MEDIUM", "HARD"];
-  // One row per skill (all sources) and, under it, one row per source ("Skill — College Board").
-  const sourceLabel = (skill: string, source: string) => `${skill} — ${source}`;
-  const cells = report.skillResults.flatMap((row) => [
-    ...Object.entries(row.levels).map(([d, cell]) => levelMetric(row.label, d, cell!)),
-    ...row.bySource.flatMap((source) => Object.entries(source.levels).map(([d, cell]) => levelMetric(sourceLabel(row.label, source.sourceName), d, cell!))),
-  ]);
+  // One row per skill: each level over every source (no per-source rows).
+  const cells = report.skillResults.flatMap((row) => Object.entries(row.levels).map(([d, cell]) => levelMetric(row.label, d, cell!)));
   const domainGroups = [...new Map(report.skillResults.map((row) => [row.domainName || "Other", [] as string[]])).entries()].map(([label, rows]) => ({ label, rows }));
   for (const row of report.skillResults) {
-    domainGroups.find((g) => g.label === (row.domainName || "Other"))!.rows.push(row.label, ...row.bySource.map((source) => sourceLabel(row.label, source.sourceName)));
+    domainGroups.find((g) => g.label === (row.domainName || "Other"))!.rows.push(row.label);
   }
   const dims = levels.filter((d) => cells.some((m) => m.difficulty === d));
   const latest = report.attempts[0];

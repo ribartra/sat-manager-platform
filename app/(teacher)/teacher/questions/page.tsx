@@ -52,7 +52,7 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
       ? { in: visibleTopicIds }
       : { in: visibleTopicIds.slice(0, TOPIC_IN_CHUNK) };
 
-  // Text search: words of the stem / stimulus, or a question ID.
+  // Text search: words of the stem / stimulus.
   const q = (filters.q ?? "").trim();
   const questionWhere = {
     // The bank of the programs the teacher teaches (shared by the program's teachers).
@@ -60,7 +60,7 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
     topicId: topicFilter,
     difficulty: (filters.difficulty as string | undefined) || undefined,
     status: (filters.status as string | undefined) || undefined,
-    ...(q ? { OR: [{ stem: { contains: q } }, { stimulus: { contains: q } }, { id: q }] } : {}),
+    ...(q ? { OR: [{ stem: { contains: q } }, { stimulus: { contains: q } }] } : {}),
   };
   const total = await prisma.question.count({ where: questionWhere });
   const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -86,9 +86,6 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Question Bank</h1>
         <div className="flex items-center gap-2">
-          <Link href="/admin/import" className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-            Bulk Import
-          </Link>
           <Link
             href="/teacher/questions/new"
             className="flex items-center gap-1.5 shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]"

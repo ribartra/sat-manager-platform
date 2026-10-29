@@ -397,7 +397,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                               </>
                             ) : "—"}
                           </td>
-                          <td className={TD}><Delta value={t.change} unit="pts" /></td>
+                          <td className={TD}><Delta value={t.change} unit="%" /></td>
                           <td className={`${TD} text-gray-600`}>{t.time ? formatDuration(t.time) : "—"}</td>
                           <td className={`${TD} text-right`}>
                             <RowAction>

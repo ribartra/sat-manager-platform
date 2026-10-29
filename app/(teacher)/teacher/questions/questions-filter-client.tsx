@@ -51,7 +51,7 @@ export function QuestionsFilter({
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search question text or ID"
+          placeholder="Search question text"
           aria-label="Search questions"
           className="max-w-xs text-sm"
         />

@@ -169,7 +169,7 @@ function HistoryTableRow({ row: r }: { row: HistoryRow }) {
             {r.changeMath !== null ? <span>Math <Delta value={r.changeMath} unit="" /></span> : null}
           </span>
         ) : (
-          <Delta value={r.change} unit="pts" />
+          <Delta value={r.change} unit="%" />
         )}
       </td>
       <td className={`${TD} text-right`}>

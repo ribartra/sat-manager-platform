@@ -41,6 +41,8 @@ export interface SkillsMapChip {
   /** Toggle chip (client trees only, e.g. Assign): rendered as a pressed/unpressed button. */
   onClick?: () => void;
   selected?: boolean;
+  /** Replaces the chip with this element (e.g. the catalogue's drop-down of the level's sets). */
+  render?: React.ReactNode;
 }
 
 export interface SkillsMapSkill {
@@ -98,8 +100,8 @@ export interface SkillsSourceRow {
 }
 
 export interface SkillsSourceSkill extends SkillsMapSkill {
-  /** Shown when the skill is opened: one row per source with its own Easy / Medium / Hard chips. */
-  rows: SkillsSourceRow[];
+  /** Shown when the skill is opened: one row per source with its own Easy / Medium / Hard chips. Without rows the skill doesn't open. */
+  rows?: SkillsSourceRow[];
   /** Start opened (e.g. the skill the teacher just picked or searched). */
   open?: boolean;
 }
@@ -108,7 +110,8 @@ const SOURCE_GRID = "sm:grid sm:grid-cols-[minmax(8rem,1fr)_auto] sm:items-cente
 
 /**
  * Teacher catalogue by skill: the SkillsMap card per domain (one row per skill, Easy / Medium / Hard
- * chips over every source); each skill opens (native <details>) to the same chips per source.
+ * chips over every source); each skill opens (native <details>) to the same chips per source. Skills
+ * without `rows` (results) are plain rows.
  */
 export function SkillsSourceMap({
   domains,
@@ -129,7 +132,19 @@ export function SkillsSourceMap({
             <span className="text-xs text-gray-400">{d.skills.length} skill{d.skills.length === 1 ? "" : "s"}</span>
           </div>
           <div className="divide-y divide-gray-100">
-            {d.skills.map((skill) => (
+            {d.skills.map((skill) =>
+              !skill.rows ? (
+                <div key={skill.id} id={`skill-${skill.id}`} className="grid items-center gap-2 py-2 sm:grid-cols-[1fr_auto]">
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-gray-900">{skill.name}</p>
+                    <p className="text-xs text-gray-500">{skill.sub}</p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {skill.chips.map((chip) => <SkillChip key={chip.difficulty} chip={chip} />)}
+                    {skill.action}
+                  </div>
+                </div>
+              ) : (
               <details key={skill.id} id={`skill-${skill.id}`} open={skill.open} className="group scroll-mt-6">
                 <summary className="grid cursor-pointer list-none items-center gap-2 py-2 sm:grid-cols-[1fr_auto] [&::-webkit-details-marker]:hidden">
                   <div className="flex min-w-0 items-center gap-1.5">
@@ -159,7 +174,8 @@ export function SkillsSourceMap({
                   ))}
                 </div>
               </details>
-            ))}
+              ),
+            )}
           </div>
         </Card>
       ))}
@@ -168,9 +184,10 @@ export function SkillsSourceMap({
 }
 
 /** Mockup `.chip`: 5px 10px, radius 8, 12px/600, slate border. */
-const CHIP = "inline-flex items-center gap-1.5 rounded-lg border border-[var(--sat-border)] px-2.5 py-[5px] text-xs font-semibold";
+export const SKILL_CHIP_CLASS = "inline-flex items-center gap-1.5 rounded-lg border border-[var(--sat-border)] px-2.5 py-[5px] text-xs font-semibold";
 
 function SkillChip({ chip }: { chip: SkillsMapChip }) {
+  if (chip.render) return <>{chip.render}</>;
   const levelText = chip.label ?? difficultyLabel(chip.difficulty);
   if (chip.onClick) {
     return (
@@ -180,7 +197,7 @@ function SkillChip({ chip }: { chip: SkillsMapChip }) {
         aria-pressed={chip.selected ? "true" : "false"}
         title={chip.title}
         className={cn(
-          CHIP,
+          SKILL_CHIP_CLASS,
           "bg-white text-[var(--sat-text)] hover:border-[var(--sat-primary)]",
           chip.selected && "border-[var(--sat-primary)] bg-[var(--sat-primary-soft)] ring-1 ring-[var(--sat-primary)]",
         )}
@@ -193,7 +210,7 @@ function SkillChip({ chip }: { chip: SkillsMapChip }) {
   }
   if (chip.state === "none") {
     return (
-      <span title={chip.title} className={cn(CHIP, "bg-white text-[var(--sat-muted)]")}>
+      <span title={chip.title} className={cn(SKILL_CHIP_CLASS, "bg-white text-[var(--sat-muted)]")}>
         <Badge variant={difficultyBadgeVariant(chip.difficulty)}>{levelText}</Badge>
         {chip.extra ?? <span>—</span>}
       </span>
@@ -208,12 +225,12 @@ function SkillChip({ chip }: { chip: SkillsMapChip }) {
     );
     // A level with nothing yet that can be added: dashed placeholder "+ Easy" (opens the import / editor).
     return chip.href ? (
-      <Link href={chip.href} title={chip.title} className={cn(CHIP, "border-dashed text-[var(--sat-muted)] hover:border-[var(--sat-primary)] hover:bg-[var(--sat-primary-soft)] hover:text-[var(--sat-primary)]")}>
+      <Link href={chip.href} title={chip.title} className={cn(SKILL_CHIP_CLASS, "border-dashed text-[var(--sat-muted)] hover:border-[var(--sat-primary)] hover:bg-[var(--sat-primary-soft)] hover:text-[var(--sat-primary)]")}>
         <Plus size={12} aria-hidden /> {difficultyLabel(chip.difficulty)}
         {chip.extra}
       </Link>
     ) : (
-      <span title={chip.title} className={cn(CHIP, "cursor-help bg-[var(--sat-surface-2)] text-[var(--sat-blank)]")}>
+      <span title={chip.title} className={cn(SKILL_CHIP_CLASS, "cursor-help bg-[var(--sat-surface-2)] text-[var(--sat-blank)]")}>
         {locked}
       </span>
     );
@@ -233,7 +250,7 @@ function SkillChip({ chip }: { chip: SkillsMapChip }) {
         {chip.extra}
       </>
     );
-  const cls = cn(CHIP, "bg-white text-[var(--sat-text)]");
+  const cls = cn(SKILL_CHIP_CLASS, "bg-white text-[var(--sat-text)]");
   return chip.href ? (
     <Link href={chip.href} title={chip.title} className={cn(cls, "hover:border-[var(--sat-primary)] hover:bg-[var(--sat-primary-soft)]")}>{body}</Link>
   ) : (

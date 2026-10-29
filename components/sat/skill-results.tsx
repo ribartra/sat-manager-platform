@@ -9,14 +9,14 @@ import type { LevelResult, PracticeReport, SkillResultRow } from "@/lib/student-
 /**
  * Practice results by skill (teacher, student and parent views): the By-skill cards (domains in
  * official order, skills A–Z). Each chip is the skill × level result — the last attempt of each set,
- * weighted by questions; opening a skill shows the same per source with date and tries. The weakest
- * skill sits on one line right under the title. No assign actions here (results only).
+ * weighted by questions, over every source (no per-source rows). The weakest skill sits on one line
+ * right under the title. No assign actions here (results only).
  */
 export function SkillResults({
   report,
   attemptHref,
   title,
-  description = "Each level adds up the last attempt of every set (by questions) · open a skill to see each source",
+  description = "Each level adds up the last attempt of every set, across all sources (by questions)",
   id = "skills-results",
 }: {
   report: Pick<PracticeReport, "skillResults" | "weakestSkill" | "areaLabel">;
@@ -54,12 +54,8 @@ export function SkillResults({
               id: row.topicId,
               name: row.label,
               sub: `${tries} ${tries === 1 ? "try" : "tries"}`,
+              // One chip per level over every source (no per-source breakdown here).
               chips: DIFFICULTIES.map((level) => resultChip(level, row.levels[level], attemptHref)),
-              rows: row.bySource.map((source) => ({
-                id: source.sourceId,
-                name: source.sourceName,
-                chips: DIFFICULTIES.map((level) => resultChip(level, source.levels[level], attemptHref, true)),
-              })),
             };
           }),
         }))}
@@ -68,7 +64,7 @@ export function SkillResults({
   );
 }
 
-function resultChip(level: string, result: LevelResult | undefined, attemptHref: ((id: string) => string) | undefined, detail = false): SkillsMapChip {
+function resultChip(level: string, result: LevelResult | undefined, attemptHref: ((id: string) => string) | undefined): SkillsMapChip {
   if (!result) return { difficulty: level, state: "none", title: `${difficultyLabel(level)}: no attempt yet` };
   const date = result.lastAt ? formatDate(result.lastAt) : "";
   return {
@@ -79,7 +75,6 @@ function resultChip(level: string, result: LevelResult | undefined, attemptHref:
     extra: (
       <span className="text-[var(--sat-muted)]">
         <Pct value={result.percent} className="font-semibold" /> · {result.correct}/{result.total}
-        {detail ? ` · ${date ? `${date} · ` : ""}${result.tries} ${result.tries === 1 ? "try" : "tries"}` : ""}
       </span>
     ),
   };
