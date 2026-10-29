@@ -1,35 +1,75 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { StudentPicker } from "@/components/student-picker";
+import { Check, ChevronDown, Search } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { matchesQuery } from "@/components/sat/list-filters";
+import { cn } from "@/lib/utils";
 
-/** Jump to another student's page keeping the current tab, area and filters. */
+/**
+ * The student's name (page title) is a drop-down of the teacher's students: picking one opens their
+ * page on the same tab (query kept). A search box narrows long lists.
+ */
 export function StudentSwitcher({
+  name,
   students,
   selectedStudentId,
   query,
 }: {
+  name: string;
   students: { id: string; name: string }[];
   selectedStudentId: string;
   /** Query string (without "?") to carry over to the other student. */
   query: string;
 }) {
   const router = useRouter();
+  const [search, setSearch] = useState("");
+  const shown = useMemo(() => students.filter((student) => matchesQuery(search, student.name)), [students, search]);
 
   return (
-    <div className="min-w-[16rem] sm:max-w-xs">
-      <StudentPicker
-        mode="single"
-        label="Student"
-        students={students}
-        value={selectedStudentId}
-        onChange={(nextId) => {
-          if (nextId && nextId !== selectedStudentId) {
-            router.push(`/teacher/students/${nextId}${query ? `?${query}` : ""}`);
-          }
-        }}
-        emptyLabel="No students match the current search."
-      />
-    </div>
+    <DropdownMenu onOpenChange={(open) => !open && setSearch("")}>
+      <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">
+        <DropdownMenuTrigger
+          className="-mx-1 inline-flex max-w-full items-center gap-1.5 rounded-lg px-1 text-left hover:bg-[var(--sat-primary-soft)] data-[state=open]:bg-[var(--sat-primary-soft)]"
+          title="Choose another student"
+        >
+          <span className="min-w-0 truncate">{name}</span>
+          <ChevronDown size={20} aria-hidden className="shrink-0 text-[var(--sat-muted)]" />
+        </DropdownMenuTrigger>
+      </h1>
+      <DropdownMenuContent align="start" className="w-72 max-w-[calc(100vw-2rem)] p-0">
+        {students.length > 8 ? (
+          <div className="flex items-center gap-2 border-b border-gray-100 px-2.5 py-2">
+            <Search size={14} aria-hidden className="text-gray-400" />
+            <input
+              autoFocus
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              // Keep typing in the box (the menu would use the keys for typeahead / navigation).
+              onKeyDown={(e) => e.key !== "Escape" && e.key !== "ArrowDown" && e.stopPropagation()}
+              placeholder="Search students"
+              aria-label="Search students"
+              className="w-full bg-transparent text-sm outline-none placeholder:text-gray-400"
+            />
+          </div>
+        ) : null}
+        <div className="max-h-80 overflow-y-auto p-1">
+          {shown.length === 0 ? <p className="px-2 py-1.5 text-sm text-gray-500">No student matches.</p> : null}
+          {shown.map((student) => (
+            <DropdownMenuItem
+              key={student.id}
+              onSelect={() => {
+                if (student.id !== selectedStudentId) router.push(`/teacher/students/${student.id}${query ? `?${query}` : ""}`);
+              }}
+              className={cn("gap-2", student.id === selectedStudentId && "font-semibold")}
+            >
+              <Check size={14} aria-hidden className={cn("shrink-0", student.id === selectedStudentId ? "text-[var(--sat-primary)]" : "invisible")} />
+              <span className="truncate">{student.name}</span>
+            </DropdownMenuItem>
+          ))}
+        </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

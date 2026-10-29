@@ -40,7 +40,6 @@ import { formatClock, formatDate, formatDuration } from "@/lib/utils";
 import { assignmentStatusLabel, difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { ProgressFilters } from "@/components/progress-filters";
 import { Hint, InfoHint } from "@/components/hint";
 import { ClipboardList, Eye, History, Pencil, Plus } from "lucide-react";
 import { Avatar } from "@/components/avatar";
@@ -63,7 +62,6 @@ import { loadStudentTests, sortTests } from "@/lib/test-assignments";
 import { loadStudentOverviews } from "@/lib/teacher-overview";
 import { relativeDay } from "@/lib/utils";
 import { buildProgressHref, progressFilterEntries, progressFiltersFromParams } from "@/lib/progress-filters";
-import { applyTimeFilterSetting } from "@/lib/time-filters";
 import { officialSkillsFor } from "@/lib/taxonomy-order";
 
 // One page per student (replaces the former Student Analytics and Individual Report views).
@@ -84,7 +82,8 @@ const ACTIVITY_PAGE_SIZE = 20;
 export default async function StudentPage({ params, searchParams }: PageProps) {
   const { studentId } = await params;
   const query = await searchParams;
-  const { filters, showEndDate } = await applyTimeFilterSetting(progressFiltersFromParams(query));
+  // No date filter on this page (every tab shows all results); old `from` / `to` links are ignored.
+  const filters = { ...progressFiltersFromParams(query), from: undefined, to: undefined };
   const area = activeAreaTab(filters.area, filters.area);
   // Tabs: Summary · Math · Reading · Writing · Tests · Activity (no `area` param = Summary).
   const view: HomeTabKey | "activity" | "history" =
@@ -139,8 +138,6 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
   const filterSummary = [
     topicId ? `Skill: ${skills.find((skill) => skill.id === topicId)?.name ?? topicId}` : null,
     difficulty ? `Difficulty: ${difficultyLabel(difficulty)}` : null,
-    filters.from ? `From ${filters.from}` : null,
-    filters.to ? `To ${filters.to}` : null,
   ].filter(Boolean).join(" · ");
   const switcherQuery = buildProgressHref("", filters).replace(/^\?/, "");
   const secondaryButton = HEADER_ACTION_CLASS;
@@ -160,7 +157,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
         <div className="flex min-w-0 items-start gap-3">
           <Avatar name={student.name} avatarUrl={student.avatarUrl} size="xl" />
           <div className="min-w-0">
-            <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">{student.name}</h1>
+            <StudentSwitcher name={student.name} students={roster} selectedStudentId={studentId} query={switcherQuery} />
             <p className="mt-0.5 truncate text-xs text-gray-500">
               {student.email} · {student.phone ?? "—"}
               {student.startDate && <> · Student since {formatDate(student.startDate)}</>}
@@ -194,7 +191,6 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
               parents={reportParents}
             />
           </HeaderActions>
-          <StudentSwitcher students={roster} selectedStudentId={studentId} query={switcherQuery} />
         </div>
       </div>
 
@@ -226,18 +222,9 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
           { key: "history", label: "History · attempts & scores" },
           { key: "activity", label: "Activity" },
         ]}
-        preserve={{ difficulty: filters.difficulty, from: filters.from, to: filters.to }}
+        preserve={{ difficulty: filters.difficulty }}
         className="mb-3"
       />
-      {/* Practice results have no filters (SAT-039); the Tests tab keeps its date filter. */}
-      {view === "tests" ? (
-        <ProgressFilters
-          action={`/teacher/students/${studentId}`}
-          filters={filters}
-          topics={skills.map((skill) => ({ id: skill.id, name: skill.name, group: skill.domain }))}
-          showEndDate={showEndDate}
-        />
-      ) : null}
     </>
   );
   const first = student.name.split(" ")[0];
@@ -423,11 +410,9 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
     const report = await loadMockReport(studentId, reportFilters);
     const tests = await loadStudentTests(studentId);
     const testIdByAssignment = new Map(tests.map((t) => [t.assignmentId, t.testId]));
-    // Every try (in progress, submitted, not counted), newest first; the date filter applies to finished tries.
-    const inDates = new Set(report.examHistory.map((exam) => exam.id));
-    const dated = Boolean(filters.from || filters.to);
-    // One row per Test (its last counted try), opening to every try; the date filter applies to finished tries.
-    const testGroups = groupTests(tests, (a) => (a.status === "IN_PROGRESS" ? !dated : inDates.has(a.id)));
+    // One row per Test (its last counted try), opening to every try (in progress, submitted, not counted).
+    const finished = new Set(report.examHistory.map((exam) => exam.id));
+    const testGroups = groupTests(tests, (a) => a.status === "IN_PROGRESS" || finished.has(a.id));
     const attemptCount = testGroups.reduce((sum, g) => sum + g.tries.length, 0);
     const examPage = paginate(testGroups, pageFromParam(query.examsPage), HISTORY_PAGE_SIZE);
     return (
@@ -435,7 +420,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
         {header}
         <KpiStrip
           items={[
-            { label: "Tests completed", value: String(report.kpis.exams), hint: "Finished in the selected dates.", href: "#exam-history" },
+            { label: "Tests completed", value: String(report.kpis.exams), hint: "Tests finished.", href: "#exam-history" },
             { label: "Latest total score", value: String(report.kpis.latestTotal ?? "—"), className: "text-[var(--sat-tests-ink)]", hint: "Total score (out of 1600) on the most recent test.", href: "#exam-history" },
             { label: "Latest Reading & Writing", value: String(report.kpis.latestRw ?? "—"), hint: "Reading & Writing score (out of 800) on the most recent test.", href: "#exam-history" },
             { label: "Latest Math", value: String(report.kpis.latestMath ?? "—"), hint: "Math score (out of 800) on the most recent test.", href: "#exam-history" },
