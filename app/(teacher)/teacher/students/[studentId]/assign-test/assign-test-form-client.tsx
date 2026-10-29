@@ -11,51 +11,51 @@ import { cn } from "@/lib/utils";
 import { InlineError } from "@/components/sat/alert";
 import { readApiError } from "@/lib/api-client";
 
+/** A test the student does NOT have yet (already assigned tests are never offered again). */
 type ExamOption = {
   id: string;
   name: string;
+  sourceId: string;
+  sourceName: string;
+  sourceOrder: number;
   moduleCount: number;
   questionCount: number;
-  /** Current assignment of this test for the student, if any. */
-  assignment: { status: string; dueDate: string | null } | null;
 };
-
-/** What assigning again will do, mirroring upsertFullTestAssignment in lib/assignments.ts. */
-function assignmentHint(assignment: ExamOption["assignment"]) {
-  if (!assignment) return "";
-  const due = assignment.dueDate ? ` (due ${new Date(assignment.dueDate).toLocaleDateString()})` : "";
-  if (assignment.status === "COMPLETED") return ` · Completed${due} — will reassign`;
-  if (assignment.status === "OVERDUE") return ` · Overdue${due} — will reassign`;
-  return ` · Not finished${due} — will update due date`;
-}
 
 export function AssignTestForm({
   studentId,
   studentName,
   exams,
   returnHref,
-  initialSelected = [],
+  editing,
 }: {
   studentId: string;
   studentName: string;
   exams: ExamOption[];
   returnHref: string;
-  initialSelected?: string[];
+  /** Due-date edit of a test the student already has (open). */
+  editing?: { id: string; name: string; dueDate: string | null };
 }) {
   const router = useRouter();
-  const [selected, setSelected] = useState<Set<string>>(() => new Set(initialSelected.filter((id) => exams.some((exam) => exam.id === id))));
-  // Due date starts on the day the test is assigned (end of that day); the teacher can change it.
-  const [dueDate, setDueDate] = useState(localToday);
+  const [selected, setSelected] = useState<Set<string>>(() => new Set(editing ? [editing.id] : []));
+  // Due date starts on the day the test is assigned (end of that day), or the current one when editing.
+  const [dueDate, setDueDate] = useState(() => editing?.dueDate?.slice(0, 10) ?? localToday());
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
   const [doneMessage, setDoneMessage] = useState("");
 
-  const visible = useMemo(() => {
+  // One card per source (Innovator, College Board 2025, …), like the Tests list.
+  const groups = useMemo(() => {
     const term = search.trim().toLowerCase();
-    if (!term) return exams;
-    return exams.filter((exam) => exam.name.toLowerCase().includes(term));
+    const visible = term ? exams.filter((exam) => exam.name.toLowerCase().includes(term)) : exams;
+    const bySource = new Map<string, { id: string; name: string; order: number; exams: ExamOption[] }>();
+    for (const exam of visible) {
+      const group = bySource.get(exam.sourceId) ?? bySource.set(exam.sourceId, { id: exam.sourceId, name: exam.sourceName, order: exam.sourceOrder, exams: [] }).get(exam.sourceId)!;
+      group.exams.push(exam);
+    }
+    return [...bySource.values()].sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
   }, [exams, search]);
 
   function toggle(id: string) {
@@ -114,35 +114,41 @@ export function AssignTestForm({
   return (
     <Card padding="lg" className="space-y-4">
       <p className="text-sm text-gray-600">
-        Assign tests to <span className="font-medium text-blue-700">{studentName}</span>
+        {editing ? "Due date for" : "Assign tests to"} <span className="font-medium text-blue-700">{studentName}</span>
       </p>
 
-      <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search tests..." />
-
-      <div className="max-h-96 space-y-2 overflow-y-auto rounded-md border border-gray-200 p-2">
-        {visible.map((exam) => (
-          <label
-            key={exam.id}
-            className={cn(
-              "flex cursor-pointer items-start gap-3 rounded-md px-3 py-2 hover:bg-gray-50",
-            )}
-          >
-            <Checkbox
-              className="mt-1"
-              checked={selected.has(exam.id)}
-              onChange={() => toggle(exam.id)}
-            />
-            <span className="min-w-0 flex-1">
-              <span className="block text-sm font-medium text-gray-900">{exam.name}</span>
-              <span className="block text-xs text-gray-500">
-                {exam.moduleCount} modules (2 Reading & Writing + 2 Math) · {exam.questionCount} questions
-                {assignmentHint(exam.assignment)}
-              </span>
-            </span>
-          </label>
-        ))}
-        {visible.length === 0 && <p className="p-4 text-center text-sm text-gray-400">No published tests found.</p>}
-      </div>
+      {editing ? (
+        <p className="rounded-md border border-gray-200 px-3 py-2 text-sm font-medium text-gray-800">{editing.name}</p>
+      ) : (
+        <>
+          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search tests..." />
+          <p className="text-xs text-gray-500">Tests {studentName.split(" ")[0]} already has are not listed (they can be retaken).</p>
+          <div className="max-h-[28rem] space-y-3 overflow-y-auto">
+            {groups.map((group) => (
+              <div key={group.id} className="rounded-[var(--sat-radius)] border border-[var(--sat-border)] bg-white p-3">
+                <div className="mb-1 flex items-baseline justify-between">
+                  <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">{group.name}</h3>
+                  <span className="text-xs text-gray-400">{group.exams.length} test{group.exams.length === 1 ? "" : "s"}</span>
+                </div>
+                <div className="divide-y divide-gray-100">
+                  {group.exams.map((exam) => (
+                    <label key={exam.id} className={cn("flex cursor-pointer items-start gap-3 rounded-md px-2 py-2 hover:bg-gray-50", selected.has(exam.id) && "bg-blue-50")}>
+                      <Checkbox className="mt-1" checked={selected.has(exam.id)} onChange={() => toggle(exam.id)} />
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-sm font-medium text-gray-900">{exam.name}</span>
+                        <span className="block text-xs text-gray-500">
+                          {exam.moduleCount} modules (2 Reading & Writing + 2 Math) · {exam.questionCount} questions
+                        </span>
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            ))}
+            {groups.length === 0 && <p className="p-4 text-center text-sm text-gray-400">{search ? "No test matches the search." : "Every published test is already assigned."}</p>}
+          </div>
+        </>
+      )}
 
       <div>
         <label className="mb-1 block text-sm font-medium text-gray-700">Due date</label>
@@ -154,7 +160,7 @@ export function AssignTestForm({
 
       <div className="flex items-center gap-3">
         <Button onClick={handleAssign} disabled={loading} disabledReason={done ? "Already assigned." : selected.size === 0 ? "Select at least one test." : null}>
-          {loading ? "Assigning..." : `Assign test${selected.size ? ` (${selected.size})` : ""}`}
+          {editing ? (loading ? "Saving..." : "Save due date") : loading ? "Assigning..." : `Assign test${selected.size ? ` (${selected.size})` : ""}`}
         </Button>
         <Button type="button" variant="ghost" onClick={() => router.push(returnHref)}>
           Cancel

@@ -40,7 +40,7 @@ export default async function EditFullTestPage({ params }: PageProps) {
           moduleQuestionIds: test.modules.map((module) => module.questions.map((item) => item.questionId)),
         }}
         questions={questions}
-        sources={sources.filter((s) => s.active || s.id === test.sourceId)}
+        sources={sources.filter((s) => s.id === test.sourceId || (s.active && s.forTests))}
       />
     </PageShell>
   );

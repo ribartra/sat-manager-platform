@@ -45,7 +45,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
   );
   const programIssue = await sameProgramQuestionsIssue(questionIds, programId);
   if (programIssue) validation.errors.push(programIssue);
-  const sourceIssue = await sourceIdIssue(sourceId);
+  const sourceIssue = await sourceIdIssue(sourceId, "tests");
   if (sourceIssue) validation.errors.push(sourceIssue);
   if (validation.errors.length > 0) {
     return new ValidationError("Validation failed.", [...new Set(validation.errors)], { extra: { warnings: validation.warnings } }).toResponse();

@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { apiFetch } from "@/lib/api-client";
 import { notify } from "@/lib/notify-ui";
 
-type SourceRow = { id: string; name: string; active: boolean; practiceSets: number; tests: number };
+type SourceRow = { id: string; name: string; active: boolean; forPracticeSets: boolean; forTests: boolean; practiceSets: number; tests: number };
 
 export function SourcesClient({ sources }: { sources: SourceRow[] }) {
   const router = useRouter();
@@ -59,6 +60,7 @@ export function SourcesClient({ sources }: { sources: SourceRow[] }) {
             <TableRow>
               <TableHead>Source</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Used for</TableHead>
               <TableHead className="text-right">Practice sets</TableHead>
               <TableHead className="text-right">Tests</TableHead>
               <TableHead />
@@ -80,6 +82,25 @@ export function SourcesClient({ sources }: { sources: SourceRow[] }) {
                 </TableCell>
                 <TableCell>
                   <Badge variant={source.active ? "success" : "default"}>{source.active ? "Active" : "Inactive"}</Badge>
+                </TableCell>
+                <TableCell>
+                  <div className="flex flex-wrap gap-3">
+                    {([["forPracticeSets", "Practice Sets"], ["forTests", "Tests"]] as const).map(([key, label]) => (
+                      <label key={key} className="inline-flex items-center gap-1.5 text-sm">
+                        <Checkbox
+                          checked={source[key]}
+                          disabled={busy}
+                          onChange={(e) =>
+                            run(
+                              () => apiFetch(`/api/admin/sources/${source.id}`, { method: "PATCH", json: { [key]: e.target.checked } }),
+                              `"${source.name}" ${e.target.checked ? "is now" : "is no longer"} used for ${label}.`,
+                            )
+                          }
+                        />
+                        {label}
+                      </label>
+                    ))}
+                  </div>
                 </TableCell>
                 <TableCell className="text-right">{source.practiceSets}</TableCell>
                 <TableCell className="text-right">{source.tests}</TableCell>

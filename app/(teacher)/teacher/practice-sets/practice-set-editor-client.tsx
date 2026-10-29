@@ -3,14 +3,13 @@
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { ArrowDown, ArrowUp, Copy, Send, X } from "lucide-react";
+import { ArrowDown, ArrowUp, Copy, X } from "lucide-react";
 import { QuestionListItem } from "@/components/question-list-item";
 import { ImportQuestionnaireButton } from "@/components/import-questionnaire-button";
 import { TaxonomyPicker } from "@/components/taxonomy-picker";
@@ -89,7 +88,7 @@ export function PracticeSetEditor({
 }: {
   topics: TopicInfo[];
   questions: QuestionInfo[];
-  /** Active sources, plus the set's current one if it was deactivated. */
+  /** Active Practice Set sources, plus the set's current one (even if deactivated or Tests-only). */
   sources: { id: string; name: string }[];
   initial?: PracticeSetInitial;
 }) {
@@ -163,7 +162,8 @@ export function PracticeSetEditor({
       setErrors(error.details.length ? error.details : [error.message]);
       return;
     }
-    router.push(`/teacher/practice-sets?view=manage&topic=${values.topicId}`);
+    // Back to Practice › By skill with this skill × level × source open (its sets listed).
+    router.push(`/teacher/practice-sets?${new URLSearchParams({ topic: values.topicId, difficulty: values.difficulty, ...(values.sourceId ? { source: values.sourceId } : {}) }).toString()}#skill-${values.topicId}`);
     router.refresh();
   }
 
@@ -176,8 +176,6 @@ export function PracticeSetEditor({
     .filter((q): q is QuestionInfo => Boolean(q));
   const selectedTopic = topics.find((topic) => topic.id === topicId);
   const saving = form.formState.isSubmitting;
-  const status = form.watch("status");
-  const canAssign = status === "PUBLISHED" && Boolean(initial?.id);
   const [secondaryLoading, setSecondaryLoading] = useState<string | null>(null);
 
   async function duplicateSet() {
@@ -200,19 +198,6 @@ export function PracticeSetEditor({
       <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} className="space-y-6" noValidate>
         {initial?.id ? (
           <div className="flex flex-wrap items-center justify-end gap-2">
-            {canAssign ? (
-              <Button asChild variant="secondary" size="sm" type="button">
-                <Link href={`/teacher?assignPracticeSet=${initial.id}`}>
-                  <Send size={14} />
-                  Assign
-                </Link>
-              </Button>
-            ) : (
-              <Button type="button" variant="ghost" size="sm" disabledReason="Publish the Practice Set before assigning.">
-                <Send size={14} />
-                Assign
-              </Button>
-            )}
             <Button
               type="button"
               variant="ghost"

@@ -13,8 +13,11 @@ import { cn } from "@/lib/utils";
  */
 
 export const DIFFICULTIES = ["EASY", "MEDIUM", "HARD"] as const;
-/** Student status of the level's sets; "available" = sets exist (teacher catalogue, no student status). */
-export type ChipState = "todo" | "progress" | "done" | "overdue" | "available";
+/**
+ * Student status of the level's sets; "available" = sets exist (teacher catalogue, no student status);
+ * "none" = nothing to show at this level (results: no attempt yet).
+ */
+export type ChipState = "todo" | "progress" | "done" | "overdue" | "available" | "none";
 
 const STATE_DOT: Record<ChipState, string> = {
   todo: "bg-blue-500",
@@ -22,6 +25,7 @@ const STATE_DOT: Record<ChipState, string> = {
   done: "bg-green-500",
   overdue: "bg-red-500",
   available: "bg-gray-400",
+  none: "bg-gray-300",
 };
 
 export interface SkillsMapChip {
@@ -32,6 +36,11 @@ export interface SkillsMapChip {
   title?: string;
   /** Extra text after the level, e.g. "×2" or "· 80%". */
   extra?: React.ReactNode;
+  /** Text instead of the level name (e.g. a set name in Assign). */
+  label?: React.ReactNode;
+  /** Toggle chip (client trees only, e.g. Assign): rendered as a pressed/unpressed button. */
+  onClick?: () => void;
+  selected?: boolean;
 }
 
 export interface SkillsMapSkill {
@@ -80,64 +89,79 @@ export function SkillsMap({ domains }: { domains: { id: string; name: string; sk
 
 export interface SkillsSourceRow {
   id: string;
-  /** Source name (College Board, Innovator, …). */
+  /** Source name (College Board, …). */
   name: string;
-  /** One chip per level, in DIFFICULTIES order. */
+  /** One chip per level, in DIFFICULTIES order (or one per set in Assign). */
   chips: SkillsMapChip[];
+  /** Shown under the row (e.g. the sets of the chosen level in the catalogue). */
+  children?: React.ReactNode;
 }
 
-export interface SkillsSourceSkill {
-  id: string;
-  name: string;
-  sub: React.ReactNode;
+export interface SkillsSourceSkill extends SkillsMapSkill {
+  /** Shown when the skill is opened: one row per source with its own Easy / Medium / Hard chips. */
   rows: SkillsSourceRow[];
+  /** Start opened (e.g. the skill the teacher just picked or searched). */
+  open?: boolean;
 }
 
-const SOURCE_GRID = "sm:grid sm:grid-cols-[minmax(8rem,1fr)_repeat(3,minmax(0,10rem))] sm:items-center sm:gap-2";
+const SOURCE_GRID = "sm:grid sm:grid-cols-[minmax(8rem,1fr)_auto] sm:items-center sm:gap-2";
 
 /**
- * Teacher catalogue by skill: one accordion per domain (native <details>, the first open); inside,
- * each skill has a Source × level grid (rows = sources, columns = Easy / Medium / Hard) of the same
- * chips as SkillsMap, so the teacher picks the source and level in one click.
+ * Teacher catalogue by skill: the SkillsMap card per domain (one row per skill, Easy / Medium / Hard
+ * chips over every source); each skill opens (native <details>) to the same chips per source.
  */
-export function SkillsSourceMap({ domains }: { domains: { id: string; name: string; skills: SkillsSourceSkill[] }[] }) {
-  if (domains.length === 0) return <p className="rounded-lg border border-dashed border-gray-200 p-4 text-center text-sm text-gray-500">No skills in this area yet.</p>;
+export function SkillsSourceMap({
+  domains,
+  emptyText = "No skills in this area yet.",
+  emptySourcesText = "No source available for practice sets.",
+}: {
+  domains: { id: string; name: string; skills: SkillsSourceSkill[] }[];
+  emptyText?: string;
+  emptySourcesText?: string;
+}) {
+  if (domains.length === 0) return <p className="rounded-lg border border-dashed border-gray-200 p-4 text-center text-sm text-gray-500">{emptyText}</p>;
   return (
-    <div className="space-y-3">
-      {domains.map((d, index) => (
-        <details key={d.id} open={index === 0} className="group overflow-hidden rounded-[var(--sat-radius)] border border-[var(--sat-border)] bg-white">
-          <summary className="flex cursor-pointer list-none items-center gap-3 px-4 py-3 hover:bg-[var(--sat-primary-soft)] [&::-webkit-details-marker]:hidden">
+    <div className="space-y-4">
+      {domains.map((d) => (
+        <Card key={d.id} padding="md">
+          <div className="mb-2 flex items-baseline justify-between">
             <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">{d.name}</h3>
-            <span className="ml-auto text-xs text-gray-400">{d.skills.length} skill{d.skills.length === 1 ? "" : "s"}</span>
-            <ChevronRight aria-hidden size={16} className="text-[var(--sat-blank)] transition-transform group-open:rotate-90" />
-          </summary>
-          <div className="divide-y divide-gray-100 border-t border-[var(--sat-border)] px-4">
+            <span className="text-xs text-gray-400">{d.skills.length} skill{d.skills.length === 1 ? "" : "s"}</span>
+          </div>
+          <div className="divide-y divide-gray-100">
             {d.skills.map((skill) => (
-              <div key={skill.id} className="py-3">
-                <p className="text-sm font-semibold text-gray-900">{skill.name}</p>
-                <p className="text-xs text-gray-500">{skill.sub}</p>
-                <div className="mt-2 space-y-2 sm:space-y-1.5">
-                  <div className={cn("hidden text-[11px] font-medium uppercase tracking-wide text-[var(--sat-muted)]", SOURCE_GRID)} aria-hidden>
-                    <span>Source</span>
-                    {DIFFICULTIES.map((level) => <span key={level}>{difficultyLabel(level)}</span>)}
+              <details key={skill.id} id={`skill-${skill.id}`} open={skill.open} className="group scroll-mt-6">
+                <summary className="grid cursor-pointer list-none items-center gap-2 py-2 sm:grid-cols-[1fr_auto] [&::-webkit-details-marker]:hidden">
+                  <div className="flex min-w-0 items-center gap-1.5">
+                    <ChevronRight aria-hidden size={14} className="shrink-0 text-[var(--sat-blank)] transition-transform group-open:rotate-90" />
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-gray-900">{skill.name}</p>
+                      <p className="text-xs text-gray-500">{skill.sub}</p>
+                    </div>
                   </div>
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {skill.chips.map((chip) => <SkillChip key={chip.difficulty} chip={chip} />)}
+                    {skill.action}
+                  </div>
+                </summary>
+                <div className="mb-2 ml-5 space-y-2 rounded-lg bg-[var(--sat-surface-2)] px-3 py-2 sm:space-y-1.5">
+                  {skill.rows.length === 0 ? <p className="text-xs text-gray-500">{emptySourcesText}</p> : null}
                   {skill.rows.map((row) => (
-                    <div key={row.id} className={SOURCE_GRID}>
-                      <p className="mb-1 text-xs font-semibold text-[var(--sat-text)] sm:mb-0">{row.name}</p>
-                      <div className="flex flex-wrap gap-1.5 sm:contents">
-                        {row.chips.map((chip) => (
-                          <div key={chip.difficulty} className="sm:min-w-0">
-                            <SkillChip chip={chip} />
-                          </div>
-                        ))}
+                    <div key={row.id}>
+                      <div className={SOURCE_GRID}>
+                        <p className="mb-1 text-xs font-semibold text-[var(--sat-text)] sm:mb-0">{row.name}</p>
+                        <div className="flex flex-wrap items-center gap-1.5 sm:justify-end">
+                          {row.chips.map((chip, i) => <SkillChip key={`${chip.difficulty}-${i}`} chip={chip} />)}
+                        </div>
                       </div>
+                      {row.children}
                     </div>
                   ))}
                 </div>
-              </div>
+              </details>
             ))}
           </div>
-        </details>
+        </Card>
       ))}
     </div>
   );
@@ -147,6 +171,34 @@ export function SkillsSourceMap({ domains }: { domains: { id: string; name: stri
 const CHIP = "inline-flex items-center gap-1.5 rounded-lg border border-[var(--sat-border)] px-2.5 py-[5px] text-xs font-semibold";
 
 function SkillChip({ chip }: { chip: SkillsMapChip }) {
+  const levelText = chip.label ?? difficultyLabel(chip.difficulty);
+  if (chip.onClick) {
+    return (
+      <button
+        type="button"
+        onClick={chip.onClick}
+        aria-pressed={chip.selected ? "true" : "false"}
+        title={chip.title}
+        className={cn(
+          CHIP,
+          "bg-white text-[var(--sat-text)] hover:border-[var(--sat-primary)]",
+          chip.selected && "border-[var(--sat-primary)] bg-[var(--sat-primary-soft)] ring-1 ring-[var(--sat-primary)]",
+        )}
+      >
+        <Badge variant={difficultyBadgeVariant(chip.difficulty)}>{difficultyLabel(chip.difficulty)}</Badge>
+        {chip.label ? <span>{chip.label}</span> : null}
+        {chip.extra}
+      </button>
+    );
+  }
+  if (chip.state === "none") {
+    return (
+      <span title={chip.title} className={cn(CHIP, "bg-white text-[var(--sat-muted)]")}>
+        <Badge variant={difficultyBadgeVariant(chip.difficulty)}>{levelText}</Badge>
+        {chip.extra ?? <span>—</span>}
+      </span>
+    );
+  }
   if (chip.state === null) {
     const locked = (
       <>

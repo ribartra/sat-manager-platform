@@ -1,5 +1,4 @@
 import {
-  DIFFICULTIES,
   EmptyState,
   LinkTabs,
   PageShell,
@@ -7,7 +6,7 @@ import {
   Pagination,
   SectionHeader,
   SimpleTable,
-  SkillDifficultyMatrix,
+  SkillResults,
   StatGrid,
   StatTile,
   TestAttemptsAccordion,
@@ -32,12 +31,10 @@ import {
   buildAreaHref,
   practiceAreaFromTab,
   practiceAreaLabel,
-  practiceAreaTopicWhere,
   tabFromPracticeArea,
 } from "@/lib/practice-area";
 import { buildProgressHref, progressDateWhere, progressFilterEntries, progressFiltersFromParams } from "@/lib/progress-filters";
 import { applyTimeFilterSetting } from "@/lib/time-filters";
-import { compareSkills, isOfficialSkill } from "@/lib/taxonomy-order";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { AreaTag } from "@/components/sat/practice-set-row";
 import { loadStudentSessions, type StudentSession } from "@/lib/session-history";
@@ -77,8 +74,6 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
   const { filters, showEndDate } = await applyTimeFilterSetting(progressFiltersFromParams(params));
   const area = filters.area;
   const practiceArea = practiceAreaFromTab(area);
-  const topicId = filters.topic || "";
-  const difficulty = filters.difficulty || "";
   const dateFilter = progressDateWhere(filters);
   const pageParams = Object.fromEntries(progressFilterEntries(filters));
   const requestedPage = pageFromParam(params.page);
@@ -276,16 +271,8 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
     );
   }
 
-  // Same attempt-level data as the teacher's view (lib/student-report.ts): no averages, no best try.
-  const [report, topics] = await Promise.all([
-    loadPracticeReport(userId, practiceArea ?? "MATH", { topic: topicId || undefined, difficulty: difficulty || undefined, from: filters.from, to: filters.to }),
-    prisma.topic.findMany({
-      where: practiceArea ? practiceAreaTopicWhere(practiceArea) : undefined,
-      include: { domain: { include: { section: true } } },
-      orderBy: { name: "asc" },
-    }),
-  ]);
-  const officialTopics = topics.filter((topic) => isOfficialSkill(topic.id)).sort(compareSkills);
+  // Same data as the teacher's view (lib/student-report.ts); results by skill have no filters.
+  const report = await loadPracticeReport(userId, practiceArea ?? "MATH", {});
   const counted = report.attempts; // SUBMITTED, newest first
   const latestSubmitted = counted[0] ?? null;
   const setsPracticed = new Set(counted.map((a) => a.assignmentId ?? a.id)).size;
@@ -293,18 +280,6 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
   // Practice sets with their last attempt; this is the student's history, so every try is listed.
   const setGroups = practiceSetGroups(setsFromReportAttempts(report.attemptHistory), ALL_TRIES);
   const historyPage = paginate(setGroups, requestedPage, HISTORY_PAGE_SIZE);
-  // Skill × difficulty (skills A–Z): each cell is the most recent attempt there and opens it.
-  const matrixRows = report.skillMatrix.map((row) => ({
-    id: row.topicId,
-    label: row.label,
-    cells: Object.fromEntries(
-      DIFFICULTIES.map((d) => {
-        const c = row.cells[d];
-        return [d, c ? { pct: c.percent, right: c.correct, total: c.total, tries: c.tries, href: buildProgressHref(`/student/results/${c.attemptId}`, filters) } : null];
-      }),
-    ),
-  }));
-
   return (
     <PageShell width="wide" density="compact" className="space-y-4">
       <Breadcrumbs items={[{ label: "Home", href: "/student" }, { label: "History", href: "/student/history" }, { label: `Practice · ${practiceAreaLabel(practiceArea)}` }]} />
@@ -316,16 +291,10 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
         <p className="text-xs text-gray-500">{counted.length} finished attempt{counted.length === 1 ? "" : "s"}</p>
       </header>
       {historyTabs}
-      <ProgressFilters
-        action="/student/history"
-        filters={filters}
-        topics={officialTopics.map((topic) => ({ id: topic.id, name: topic.name, group: topic.domain.name }))}
-        showEndDate={showEndDate}
-      />
 
       {setGroups.length === 0 ? (
         <Card padding="lg" className="py-14 text-center text-gray-500">
-          <p>No finished {practiceAreaLabel(practiceArea).toLowerCase()} practice sets for these filters.</p>
+          <p>No finished {practiceAreaLabel(practiceArea).toLowerCase()} practice sets yet.</p>
           <Link href={buildAreaHref("/student/practice", tabFromPracticeArea(practiceArea) ?? "summary")} className="mt-2 inline-block text-sm text-blue-600 hover:underline">
             Go to Practice →
           </Link>
@@ -343,14 +312,12 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
             <StatTile label="Time practicing" value={formatDuration(timePracticing)} sub="on finished sets" />
           </StatGrid>
 
-          <section>
-            <SectionHeader
-              title="Skills by difficulty"
-              description="Each cell is your most recent attempt of that skill and level · click it to see it"
-              action={topicId || difficulty ? <Link href={buildProgressHref("/student/history", { ...filters, topic: undefined, difficulty: undefined })} className="text-xs text-blue-600 hover:underline">Clear skill and level</Link> : undefined}
-            />
-            <SkillDifficultyMatrix rows={matrixRows} selected={{ skill: topicId, difficulty }} emptyText="No finished practice in this area yet." />
-          </section>
+          <SkillResults
+            report={report}
+            title="Skills by difficulty"
+            description="Each level adds up your last attempt of every set (by questions) · open a skill to see each source"
+            attemptHref={(id) => buildProgressHref(`/student/results/${id}`, filters)}
+          />
 
           <section id="history" aria-labelledby="history-results-heading" className="scroll-mt-6">
             <SectionHeader

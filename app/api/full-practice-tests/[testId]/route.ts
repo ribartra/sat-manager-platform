@@ -114,7 +114,7 @@ export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }
   );
   const programIssue = await sameProgramQuestionsIssue(questionIds, previous.programId);
   if (programIssue) validation.errors.push(programIssue);
-  const sourceIssue = await sourceIdIssue(sourceId, previous.sourceId);
+  const sourceIssue = await sourceIdIssue(sourceId, "tests", previous.sourceId);
   if (sourceIssue) validation.errors.push(sourceIssue);
   if (validation.errors.length > 0) {
     return new ValidationError("Validation failed.", [...new Set(validation.errors)], { extra: { warnings: validation.warnings } }).toResponse();

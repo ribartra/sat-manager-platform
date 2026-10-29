@@ -81,7 +81,7 @@ export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }
   if (!previous) return new NotFoundError("Practice Set not found.").toResponse();
   const sourceId = requestedSourceId ?? previous.sourceId;
   const validationErrors = practiceSetEditorIssues({ name, topicId, difficulty, status, explanationVisibility, questionIds });
-  const sourceIssue = await sourceIdIssue(sourceId, previous.sourceId);
+  const sourceIssue = await sourceIdIssue(sourceId, "practice", previous.sourceId);
   if (sourceIssue) validationErrors.push(sourceIssue);
   const programIssue = await sameProgramQuestionsIssue(Array.isArray(questionIds) ? questionIds : [], previous.programId);
   if (programIssue) validationErrors.push(programIssue);

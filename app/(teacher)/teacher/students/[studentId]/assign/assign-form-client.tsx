@@ -1,7 +1,7 @@
 "use client";
 
 import { Checkbox, Radio } from "@/components/ui/checkbox";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -9,10 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { cn, localToday } from "@/lib/utils";
 import { Tag } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { assignmentStatusLabel, difficultyLabel, difficultyOptions } from "@/lib/domain-meta";
+import { assignmentStatusLabel, difficultyLabel } from "@/lib/domain-meta";
 import { practiceAreaLabel, type PracticeAreaCode } from "@/lib/practice-area";
+import { SkillsSourceMap, DIFFICULTIES, type SkillsMapChip, type SkillsSourceSkill } from "@/components/sat/skills-map";
 import { InlineError } from "@/components/sat/alert";
 import { errorMessage, readApiError } from "@/lib/api-client";
 
@@ -22,33 +22,31 @@ interface PracticeSetInfo {
   difficulty: string;
   topicName: string;
   topicId: string;
-  /** Official display order (lib/taxonomy-order.ts). */
+  /** Official domain order (lib/taxonomy-order.ts); skills are listed A–Z inside each domain. */
   domainOrder: number;
-  skillOrder: number;
   domainId: string;
   domainName: string;
+  sourceId: string;
+  sourceName: string;
+  sourceOrder: number;
   practiceArea: PracticeAreaCode | null;
   questionCount: number;
-  /** Current assignment of this set for the student, if any. */
-  assignment: { status: string; dueDate: string | null } | null;
 }
 
-/** What assigning again will do, mirroring upsertPracticeAssignment in lib/assignments.ts. */
-function assignmentHint(assignment: PracticeSetInfo["assignment"]) {
-  if (!assignment) return null;
-  switch (assignment.status) {
-    case "PENDING":
-      return { label: "Not started", action: "will update", className: "text-blue-600" };
-    case "IN_PROGRESS":
-      return { label: "In progress", action: "will update", className: "text-amber-600" };
-    case "OVERDUE":
-      return { label: "Overdue", action: "will reassign", className: "text-rose-600" };
-    case "COMPLETED":
-      return { label: "Completed", action: "will reassign", className: "text-emerald-600" };
-    default:
-      return { label: assignmentStatusLabel(assignment.status), action: "", className: "text-gray-500" };
-  }
+/** A set the student already has, opened from "Edit" to change its dates/settings (never re-assigned). */
+interface EditingSetInfo {
+  id: string;
+  name: string;
+  difficulty: string;
+  status: string;
+  dueDate: string | null;
 }
+
+const AREAS: Array<{ key: "math" | "reading" | "writing"; code: PracticeAreaCode }> = [
+  { key: "math", code: "MATH" },
+  { key: "reading", code: "READING" },
+  { key: "writing", code: "WRITING" },
+];
 
 interface GroupMember {
   id: string;
@@ -64,79 +62,64 @@ interface GroupInfo {
 interface AssignFormProps {
   studentId: string;
   studentName: string;
-  /** `${topicId}:${difficulty}` of the student's weakest practice skills (shown first, "Recommended"). */
-  recommended?: string[];
+  /** Only the sets the student does NOT have yet (already assigned ones are never offered again). */
   practiceSets: PracticeSetInfo[];
+  /** Non-empty = edit mode: change the settings of these already-assigned sets. */
+  editing?: EditingSetInfo[];
   groups: GroupInfo[];
   groupAssignmentEnabled: boolean;
-  initialArea: "all" | "math" | "reading" | "writing";
-  initialDomain?: string;
-  initialTopic?: string;
-  initialDifficulty?: string;
-  initialSelected?: string[];
+  initialArea: "math" | "reading" | "writing";
 }
 
 export function AssignForm({
   studentId,
   studentName,
-  recommended = [],
   practiceSets,
+  editing = [],
   groups,
   groupAssignmentEnabled,
   initialArea,
-  initialDomain,
-  initialTopic,
-  initialDifficulty,
-  initialSelected,
 }: AssignFormProps) {
   const router = useRouter();
+  const editMode = editing.length > 0;
   const [target, setTarget] = useState<"student" | "group">("student");
   const [groupId, setGroupId] = useState(groups[0]?.id ?? "");
-  const [selected, setSelected] = useState<Set<string>>(
-    () => new Set((initialSelected ?? []).filter((id) => practiceSets.some((ps) => ps.id === id))),
-  );
-  // Due date starts one week after today (end of that day); the teacher can change it.
-  const [dueDate, setDueDate] = useState(() => addDays(localToday(), 7));
+  const [selected, setSelected] = useState<Set<string>>(() => new Set(editing.map((set) => set.id)));
+  // Due date starts one week after today (end of that day), or the set's current one when editing.
+  const [dueDate, setDueDate] = useState(() => editing[0]?.dueDate?.slice(0, 10) ?? addDays(localToday(), 7));
   const [unlockAt, setUnlockAt] = useState("");
   const [feedbackMode, setFeedbackMode] = useState<"AFTER_SET" | "IMMEDIATE">("AFTER_SET");
   const [lockOnAssign, setLockOnAssign] = useState(false);
   const [search, setSearch] = useState("");
   const [area, setArea] = useState<AssignFormProps["initialArea"]>(initialArea);
-  const [domainId, setDomainId] = useState(initialDomain ?? "");
-  const [topicId, setTopicId] = useState(initialTopic ?? "");
-  const [difficulty, setDifficulty] = useState(initialDifficulty ?? "");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [error, setError] = useState("");
   const [showAllMembers, setShowAllMembers] = useState(false);
 
-  const areaSets = practiceSets.filter((ps) => area === "all" || ps.practiceArea?.toLowerCase() === area);
-  const domains = [...new Map(areaSets.map((ps) => [ps.domainId, { id: ps.domainId, name: ps.domainName, order: ps.domainOrder }])).values()]
-    .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
-  const domainSets = domainId ? areaSets.filter((ps) => ps.domainId === domainId) : areaSets;
-  const topics = [...new Map(domainSets.map((ps) => [ps.topicId, { id: ps.topicId, name: ps.topicName, order: ps.skillOrder }])).values()]
-    .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
-  const recommendedKeys = new Set(recommended);
-  const isRecommended = (ps: PracticeSetInfo) => recommendedKeys.has(`${ps.topicId}:${ps.difficulty}`);
-  const filtered = domainSets
-    .filter((ps) =>
-      (!topicId || ps.topicId === topicId) &&
-      (!difficulty || ps.difficulty === difficulty) &&
-      (!search || ps.name.toLowerCase().includes(search.toLowerCase()) || ps.topicName.toLowerCase().includes(search.toLowerCase()) || ps.domainName.toLowerCase().includes(search.toLowerCase()))
-    )
-    // Weak skills first (stable: keeps the official order inside each group).
-    .sort((a, b) => Number(isRecommended(b)) - Number(isRecommended(a)));
+  const areaCode = AREAS.find((a) => a.key === area)!.code;
+  const needle = search.trim().toLowerCase();
+  // The By-skill cards (same component as Practice › By skill): domains in official order, skills A–Z;
+  // a skill opens to one row per source with one toggle chip per set the student doesn't have yet.
+  const domains = useMemo(() => {
+    const areaSets = practiceSets.filter(
+      (ps) => ps.practiceArea === areaCode && (!needle || ps.name.toLowerCase().includes(needle) || ps.topicName.toLowerCase().includes(needle)),
+    );
+    const byDomain = new Map<string, { id: string; name: string; order: number; skills: Map<string, { id: string; name: string; sets: PracticeSetInfo[] }> }>();
+    for (const ps of areaSets) {
+      const domain = byDomain.get(ps.domainId) ?? byDomain.set(ps.domainId, { id: ps.domainId, name: ps.domainName, order: ps.domainOrder, skills: new Map() }).get(ps.domainId)!;
+      const skill = domain.skills.get(ps.topicId) ?? domain.skills.set(ps.topicId, { id: ps.topicId, name: ps.topicName, sets: [] }).get(ps.topicId)!;
+      skill.sets.push(ps);
+    }
+    return [...byDomain.values()].sort((a, b) => a.order - b.order || a.name.localeCompare(b.name)).map((domain) => ({
+      id: domain.id,
+      name: domain.name,
+      skills: [...domain.skills.values()].sort((a, b) => a.name.localeCompare(b.name, "en", { numeric: true, sensitivity: "base" })),
+    }));
+  }, [practiceSets, areaCode, needle]);
   const first = studentName.split(" ")[0];
-  const backHref = (() => {
-    const params = new URLSearchParams();
-    if (area !== "all") params.set("area", area);
-    if (domainId) params.set("domain", domainId);
-    if (topicId) params.set("topic", topicId);
-    if (difficulty) params.set("difficulty", difficulty);
-    return `/teacher/students/${studentId}${params.toString() ? `?${params.toString()}` : ""}`;
-  })();
-
+  const backHref = `/teacher/students/${studentId}?area=${area}`;
   function toggleSelect(id: string) {
     setSelected((prev) => {
       const next = new Set(prev);
@@ -202,42 +185,21 @@ export function AssignForm({
     <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
       <div className="min-w-0 space-y-6">
       <Card padding="md">
-        <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 sm:items-end">
-          <label className="text-sm font-medium text-gray-700">
-            Practice area
-            <Select value={area} onChange={(event) => { setArea(event.target.value as AssignFormProps["initialArea"]); setDomainId(""); setTopicId(""); }} className="mt-1">
-              <option value="all">All areas</option>
-              <option value="math">Math</option>
-              <option value="reading">Reading</option>
-              <option value="writing">Writing</option>
-            </Select>
-          </label>
-          <label className="text-sm font-medium text-gray-700">
-            Search practice
-            <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Practice set, skill or domain" className="mt-1" />
-          </label>
-          <label className="text-sm font-medium text-gray-700">
-            Domain
-            <Select value={domainId} onChange={(event) => { setDomainId(event.target.value); setTopicId(""); }} className="mt-1">
-              <option value="">All domains</option>
-              {domains.map((domain) => <option key={domain.id} value={domain.id}>{domain.name}</option>)}
-            </Select>
-          </label>
-          <label className="text-sm font-medium text-gray-700">
-            Skill
-            <Select value={topicId} onChange={(event) => setTopicId(event.target.value)} className="mt-1">
-              <option value="">All skills</option>
-              {topics.map((topic) => <option key={topic.id} value={topic.id}>{topic.name}</option>)}
-            </Select>
-          </label>
-          <label className="text-sm font-medium text-gray-700">
-            Difficulty
-            <Select value={difficulty} onChange={(event) => setDifficulty(event.target.value)} className="mt-1">
-              <option value="">All levels</option>
-              {difficultyOptions().map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-            </Select>
-          </label>
-        </div>
+        {editMode ? (
+          <>
+            <h2 className="text-sm font-semibold text-gray-900">Change the settings of what {first} already has</h2>
+            <p className="mt-0.5 text-xs text-gray-500">The student keeps the progress and can retry as many times as needed; nothing is assigned again.</p>
+            <ul className="mt-3 divide-y divide-gray-100 rounded-lg border border-gray-100">
+              {editing.map((set) => (
+                <li key={set.id} className="flex items-center justify-between gap-2 px-3 py-2 text-sm">
+                  <span className="min-w-0 truncate font-medium text-gray-800">{set.name}</span>
+                  <span className="shrink-0 text-xs text-gray-500">{difficultyLabel(set.difficulty)} · {assignmentStatusLabel(set.status)}</span>
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : (
+        <>
         <label className="mb-2 block text-sm font-medium text-gray-700">Assign to</label>
         <div className="flex items-center gap-4 flex-wrap">
           <label className="flex items-center gap-2 text-sm text-gray-700">
@@ -285,50 +247,83 @@ export function AssignForm({
             </div>
           );
         })()}
+        </>
+        )}
       </Card>
 
-      {/* Practice set selector */}
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <label className="text-sm font-medium text-gray-700">Select practice sets</label>
-        </div>
-        <Card className="max-h-80 overflow-y-auto overflow-hidden">
-          {filtered.map((ps) => (
-            <label
-              key={ps.id}
-              className={cn(
-                "flex items-center gap-3 px-4 py-3 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors",
-                selected.has(ps.id) && "bg-blue-50",
-              )}
-            >
-              <Checkbox
-                checked={selected.has(ps.id)}
-                onChange={() => toggleSelect(ps.id)}
-                className="rounded border-gray-300 text-blue-600"
-              />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">{ps.name}</p>
-                <p className="text-xs text-gray-500">{practiceAreaLabel(ps.practiceArea) || "Unclassified"} · {ps.domainName} · {ps.topicName} · {ps.questionCount} questions</p>
-              </div>
-              {isRecommended(ps) ? <Badge variant="info" className="shrink-0">Recommended</Badge> : null}
-              <span className="shrink-0 text-xs font-medium text-gray-700">{difficultyLabel(ps.difficulty)}</span>
-              {target === "student" && (() => {
-                const hint = assignmentHint(ps.assignment);
-                if (!hint) return null;
-                return (
-                  <span className={cn("shrink-0 text-right text-xs", hint.className)}>
-                    {hint.label}
-                    {ps.assignment?.dueDate ? ` · due ${new Date(ps.assignment.dueDate).toLocaleDateString()}` : ""}
-                    {hint.action && <span className="block text-[11px] text-gray-400">{hint.action}</span>}
-                  </span>
+      {/* Practice set picker: Practice › By skill cards, only sets the student doesn't have yet */}
+      {editMode ? null : (
+        <section className="space-y-3">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div role="tablist" aria-label="Practice area" className="flex gap-1 text-sm">
+              {AREAS.map((a) => (
+                <button
+                  key={a.key}
+                  type="button"
+                  role="tab"
+                  aria-selected={area === a.key}
+                  onClick={() => setArea(a.key)}
+                  className={cn("rounded-md px-3 py-1.5 font-medium", area === a.key ? "bg-gray-900 text-white" : "text-gray-600 hover:bg-gray-100")}
+                >
+                  {practiceAreaLabel(a.code)}
+                </button>
+              ))}
+            </div>
+            <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Skill or practice set name" aria-label="Search practice" className="max-w-xs text-sm" />
+          </div>
+          <p className="text-xs text-gray-500">Open a skill and pick sets by source and level. Sets {first} already has are not listed (they can be retried any time).</p>
+          <SkillsSourceMap
+            emptyText={
+              needle
+                ? "No practice set matches the search."
+                : `No ${practiceAreaLabel(areaCode)} practice set to assign: ${first} already has every published set of their program, or there is none yet.`
+            }
+            emptySourcesText="No set to assign."
+            domains={domains.map((domain) => ({
+              id: domain.id,
+              name: domain.name,
+              skills: domain.skills.map((skill): SkillsSourceSkill => {
+                const picked = skill.sets.filter((ps) => selected.has(ps.id)).length;
+                const sources = [...new Map(skill.sets.map((ps) => [ps.sourceId, { id: ps.sourceId, name: ps.sourceName, order: ps.sourceOrder }])).values()].sort(
+                  (a, b) => a.order - b.order || a.name.localeCompare(b.name),
                 );
-              })()}
-            </label>
-          ))}
-          {filtered.length === 0 && <p className="px-4 py-8 text-center text-sm text-gray-400">No practice sets in this area.</p>}
-        </Card>
-        <p className="text-xs text-gray-400 mt-1">{selected.size} selected</p>
-      </div>
+                return {
+                  id: skill.id,
+                  name: skill.name,
+                  sub: `${skill.sets.length} set${skill.sets.length === 1 ? "" : "s"} to assign${picked ? ` · ${picked} selected` : ""}`,
+                  open: Boolean(needle) || picked > 0 ? true : undefined,
+                  chips: DIFFICULTIES.map((level): SkillsMapChip => {
+                    const count = skill.sets.filter((ps) => ps.difficulty === level).length;
+                    return count
+                      ? { difficulty: level, state: "available", title: `${count} set${count === 1 ? "" : "s"} to assign`, extra: <span className="text-[var(--sat-muted)]">{count} set{count === 1 ? "" : "s"}</span> }
+                      : { difficulty: level, state: "none", title: "Nothing to assign at this level" };
+                  }),
+                  rows: sources.map((source) => {
+                    const sets = skill.sets.filter((ps) => ps.sourceId === source.id);
+                    return {
+                      id: source.id,
+                      name: source.name,
+                      chips: DIFFICULTIES.flatMap((level) => {
+                        const ofLevel = sets.filter((ps) => ps.difficulty === level);
+                        return ofLevel.map((ps): SkillsMapChip => ({
+                          difficulty: level,
+                          state: "available",
+                          label: ofLevel.length > 1 ? setNumber(ps.name) : undefined,
+                          title: `${ps.name} · ${ps.questionCount} questions`,
+                          extra: <span className="text-[var(--sat-muted)]">{ps.questionCount} Q</span>,
+                          selected: selected.has(ps.id),
+                          onClick: () => toggleSelect(ps.id),
+                        }));
+                      }),
+                    };
+                  }),
+                };
+              }),
+            }))}
+          />
+          <p className="text-xs text-gray-400">{selected.size} selected</p>
+        </section>
+      )}
 
       {/* Options */}
       <div className="grid grid-cols-2 gap-4">
@@ -398,12 +393,15 @@ export function AssignForm({
           {selected.size > 0 ? (
             <ul className="max-h-40 space-y-1 overflow-y-auto border-t border-gray-100 pt-2 text-xs text-gray-600">
               {practiceSets.filter((ps) => selected.has(ps.id)).map((ps) => (
-                <li key={ps.id} className="truncate">{ps.topicName} · {difficultyLabel(ps.difficulty)}</li>
+                <li key={ps.id} className="truncate">{ps.topicName} · {difficultyLabel(ps.difficulty)} · {ps.sourceName}</li>
+              ))}
+              {editing.map((set) => (
+                <li key={set.id} className="truncate">{set.name}</li>
               ))}
             </ul>
           ) : null}
           <Button className="w-full" onClick={handleAssign} disabled={loading} disabledReason={selected.size === 0 ? "Select at least one practice set." : null}>
-            {loading ? "Assigning..." : `Assign ${selected.size > 0 ? `(${selected.size})` : ""}`}
+            {editMode ? (loading ? "Saving..." : "Save changes") : loading ? "Assigning..." : `Assign ${selected.size > 0 ? `(${selected.size})` : ""}`}
           </Button>
           <Button className="w-full" variant="secondary" onClick={() => router.back()}>Cancel</Button>
         </Card>
@@ -412,19 +410,21 @@ export function AssignForm({
       <Dialog open={success} onOpenChange={setSuccess}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Assigned</DialogTitle>
+            <DialogTitle>{editMode ? "Saved" : "Assigned"}</DialogTitle>
             <DialogDescription>{successMessage || "Assigned"}. {target === "group" ? "The group's students" : first} will see it on their Home and Practice pages.</DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                setSelected(new Set());
-                setSuccess(false);
-              }}
-            >
-              Assign more
-            </Button>
+            {editMode ? null : (
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setSelected(new Set());
+                  setSuccess(false);
+                }}
+              >
+                Assign more
+              </Button>
+            )}
             <Button onClick={() => router.push(backHref)}>Back to {first}</Button>
           </DialogFooter>
         </DialogContent>
@@ -439,4 +439,9 @@ function addDays(isoDate: string, days: number) {
   d.setDate(d.getDate() + days);
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+/** "… - HARD - #2" → "#2" (several sets of one skill, level and source). */
+function setNumber(name: string) {
+  return name.match(/#\d+\s*$/)?.[0].trim() ?? name;
 }

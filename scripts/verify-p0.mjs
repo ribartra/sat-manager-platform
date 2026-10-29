@@ -4,18 +4,19 @@ import path from "node:path";
 const root = process.cwd();
 
 const checks = [
-  // Home: no "Overdue tests" / "Section under 550" in Summary and no low-performance cards in the
-  // section tabs; low performance is shown per student on the student's section tab.
+  // Home is one view (SAT-036/037): no section tabs, inactivity + unlock requests, no low performance.
   {
     file: "app/(teacher)/teacher/page.tsx",
-    requires: ["Inactive 5+ days"],
-    forbids: ["Overdue tests", "Section under 550", "Low performance"],
-    label: "Teacher Home: Summary keeps only inactivity; no low-performance cards",
+    requires: ["Inactive 5+ days", "Unlock requests"],
+    forbids: ["Overdue tests", "Section under 550", "Low performance", "PracticeAreaTabs", "TeacherStudentsTable"],
+    label: "Teacher Home: one view (no Math/Reading/Writing/Tests tabs), inactivity and unlock requests only",
   },
+  // Results by skill (SAT-039/040/041): no Low performance, no summary card, no matrix, no Assign in results.
   {
     file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
-    requires: ["Low performance", "lowCells", "report.skillMatrix"],
-    label: "Student section tab shows the student's low-performance warnings",
+    requires: ["<SkillResults", "UnlockRequestActions"],
+    forbids: ["Low performance", "lowCells", "DifficultySummaryCard", "SkillDifficultyMatrix", "Reassign"],
+    label: "Student section tab: results by skill (weighted, per source), unlock requests, no Low performance / Reassign",
   },
   // No parent approval step (consent = Terms accepted at activation): the student page only says the
   // parent's email is missing and lets the teacher add it; enrollments never wait for a parent.
@@ -142,9 +143,9 @@ const checks = [
   // Every list (teacher + admin) has a text search and filters.
   {
     file: "app/(teacher)/teacher/page.tsx",
-    requires: ["<ListFilters", 'hidden={{ area }}', 'hidden={{ area: "tests" }}'],
+    requires: ["<ListFilters"],
     forbids: ['Card as="form"', 'placeholder="Search a student…"'],
-    label: "Busqueda con filtros: Home del teacher (todas las pestanas) con el mismo componente",
+    label: "Busqueda con filtros: Home del teacher con el mismo componente",
   },
   {
     file: "app/(teacher)/teacher/students/page.tsx",
@@ -168,9 +169,10 @@ const checks = [
     label: "Busqueda con filtros: Banco de preguntas: texto/ID + area, skill, nivel, estado",
   },
   {
-    file: "app/(teacher)/teacher/practice-sets/practice-sets-filter-client.tsx",
-    requires: ['params.set("q"'],
-    label: "Busqueda con filtros: Practice sets: nombre + skill, nivel, estado",
+    file: "app/(teacher)/teacher/practice-sets/page.tsx",
+    requires: ["<ListFilters", "matchesQuery(search", "<SetList", "PracticeSetStatusSelect"],
+    forbids: ["PracticeSetsTable", 'view: "manage"'],
+    label: "Practice: solo By skill (SAT-042) con un buscador unico; cada chip lista sus sets con estado, Preview, Edit",
   },
   {
     file: "app/(teacher)/teacher/materials/materials-client.tsx",
@@ -322,24 +324,18 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/page.tsx",
-    requires: ["areaActivity", "lastActiveAt", "TeacherStudentsTable"],
-    label: "Dashboard docente usa ultima actividad por area y DataTable de estudiantes",
-  },
-  {
-    file: "app/(teacher)/teacher/students-table-client.tsx",
-    requires: ["Last ${areaLabel} practice", "lastPracticeLabel", "setsCompleted"],
-    forbids: ["Average correct", "avgScore"],
-    label: "Tabla de estudiantes por area: ultima practica y sets completados; sin promedios (regla: solo nivel de intento)",
+    requires: ["lastActiveAt", "loadStudentOverviews"],
+    label: "Dashboard docente usa ultima actividad y la tabla de estudiantes por area",
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
-    requires: ["loadPracticeReport", "DifficultySummaryCard", "difficultySummary", "weakestSkill", "SkillDifficultyMatrix", "PracticeSetAttemptsAccordion", "TestAttemptsAccordion", "InvalidateAttemptButton", "HeaderActions", "Practice Sets", "Teacher Comments", "GenerateReportDialog"],
+    requires: ["loadPracticeReport", "SkillResults", "PracticeSetAttemptsAccordion", "TestAttemptsAccordion", "InvalidateAttemptButton", "HeaderActions", "Practice Sets", "Teacher Comments", "GenerateReportDialog"],
     forbids: ["RestartExamButton", "TopicDifficultyTrend", "Best R&amp;W", "LineChart"],
-    label: "Pagina del alumno a nivel de intento (sin promedios entre tests ni entre sets): Easy/Medium/Hard = ultimo intento por nivel, matriz de ultimo intento, acordeones por set y por test, Invalidar (unica accion) en History, acciones arriba, sin Restart ni graficas entre tests",
+    label: "Pagina del alumno: resultados por skill (ultimo intento de cada set, ponderado por preguntas, detalle por fuente), acordeones por set y por test, Invalidar en History, acciones arriba, sin Restart ni graficas entre tests",
   },
   {
     file: "lib/student-report.ts",
-    requires: ["aggregateTopicDifficultyMetrics", "summarizeAllQuestionAnswers", "parseSnapshot", "loadMockReport", "timeSpent", "topic.name", "latestIndexBySet", "difficultySummary", "· try ${n}"],
+    requires: ["aggregateTopicDifficultyMetrics", "summarizeAllQuestionAnswers", "parseSnapshot", "loadMockReport", "timeSpent", "topic.name", "latestIndexBySet", "skillResults", "bySource", "acc.correct += scored.correct", "· try ${n}"],
     label: "Datos del reporte compartidos por la pagina del alumno y el PDF (snapshots, score ponderado, FPT)",
   },
   {
@@ -354,8 +350,8 @@ const checks = [
   },
   {
     file: "lib/pdf/student-report-document.tsx",
-    requires: ["renderToBuffer", "Helvetica-Bold", "Latest practice", "Last attempt per level", "Performance by skill and difficulty", "Skills to work on next", "Teacher comments", "totalPages", "Scores by Test", "report.exams.length === 1"],
-    forbids: ["Questions correct", "Average time per question", "difficultyMetrics"],
+    requires: ["renderToBuffer", "Helvetica-Bold", "Latest practice", "report.skillResults", "Performance by skill and difficulty", "Teacher comments", "totalPages", "Scores by Test", "report.exams.length === 1"],
+    forbids: ["Questions correct", "Average time per question", "difficultyMetrics", "Last attempt per level"],
     label: "PDF presentable (backend, sin navegador): nivel de intento (sin promedios), secciones por area, paginacion y resumen",
   },
   {
@@ -429,22 +425,22 @@ const checks = [
   },
   {
     file: "app/api/practice-sets/route.ts",
-    requires: ["sourceIdIssue(sourceId)", "sourceId,"],
-    label: "Practice Set nuevo exige una fuente activa",
+    requires: ['sourceIdIssue(sourceId, "practice")', "sourceId,"],
+    label: "Practice Set nuevo exige una fuente activa de Practice Sets",
   },
   {
     file: "app/api/practice-sets/[practiceSetId]/route.ts",
-    requires: ["sourceIdIssue(sourceId, previous.sourceId)", "explanationVisibility, sourceId }"],
+    requires: ['sourceIdIssue(sourceId, "practice", previous.sourceId)', "explanationVisibility, sourceId }"],
     label: "Practice Set editado valida la fuente (puede conservar una inactiva)",
   },
   {
     file: "app/api/full-practice-tests/route.ts",
-    requires: ["sourceIdIssue(sourceId)", "sourceId,"],
-    label: "Test nuevo exige una fuente activa",
+    requires: ['sourceIdIssue(sourceId, "tests")', "sourceId,"],
+    label: "Test nuevo exige una fuente activa de Tests",
   },
   {
     file: "app/api/full-practice-tests/[testId]/route.ts",
-    requires: ["sourceIdIssue(sourceId, previous.sourceId)"],
+    requires: ['sourceIdIssue(sourceId, "tests", previous.sourceId)'],
     label: "Test editado valida la fuente",
   },
   {
@@ -459,13 +455,60 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/practice-sets/page.tsx",
-    requires: ["SkillsSourceMap", "listSources()", "source: source.id", "sourceId: source.id"],
-    label: "Practice › By skill: Domain en acordeon y por skill una grilla Fuente × Easy/Medium/Hard",
+    requires: ["SkillsSourceMap", "listSources({ kind: \"practice\" })", "source: source.id", "sourceId: source.id"],
+    label: "Practice › By skill: chips por skill y, al abrirlo, una fila por fuente de Practice Sets (sin Innovator)",
   },
   {
     file: "components/sat/skills-map.tsx",
-    requires: ["export function SkillsSourceMap", "<details", "SkillChip chip={chip}"],
-    label: "SkillsSourceMap: acordeon nativo por Domain con las chips de dificultad",
+    requires: ["export function SkillsSourceMap", "<details", "<summary", "<SkillChip key={chip.difficulty} chip={chip}"],
+    label: "SkillsSourceMap: tarjeta por Domain, cada skill se abre (details) con sus fuentes",
+  },
+  {
+    file: "components/sat/skill-results.tsx",
+    requires: ["SkillsSourceMap", "Weakest skill", "skills by difficulty", "bySource"],
+    forbids: ["Assign"],
+    label: "SkillResults (profesor, alumno, padre): weakest skill bajo el titulo, chips agregadas y fila por fuente, sin Assign",
+  },
+  {
+    file: "app/(teacher)/teacher/students/[studentId]/assign/page.tsx",
+    requires: ["!assignmentBySet.has(ps.id)", '["PENDING", "IN_PROGRESS"]'],
+    label: "Assign practice: lo ya asignado no se ofrece; Edit solo cambia fechas de lo abierto",
+  },
+  {
+    file: "app/(teacher)/teacher/students/[studentId]/assign/assign-form-client.tsx",
+    requires: ["SkillsSourceMap", "localeCompare(b.name", "onClick: () => toggleSelect(ps.id)"],
+    label: "Assign practice: mismo componente que By skill, skills A–Z, una chip por set",
+  },
+  {
+    file: "app/(teacher)/teacher/students/[studentId]/assign-test/page.tsx",
+    requires: ["!assignmentByTest.has(exam.id)"],
+    label: "Assign test: los tests ya asignados no se ofrecen",
+  },
+  {
+    file: "app/(teacher)/teacher/tests/[testId]/assign/page.tsx",
+    requires: ["fullTestAssignments: { none: { testId } }"],
+    label: "Asignar un test: no se ofrecen alumnos que ya lo tienen",
+  },
+  {
+    file: "app/(teacher)/teacher/tests/page.tsx",
+    requires: ["sourceHeading", "sortOrder"],
+    label: "Tests agrupados por fuente (SAT-022)",
+  },
+  {
+    file: "prisma/migrations/20261031_cb_test_sources/migration.sql",
+    requires: ["College Board 2025", "College Board 2026", "false, true"],
+    label: "Fuentes de Tests por edicion: College Board 2025 / 2026 (solo Tests)",
+  },
+  {
+    file: "prisma/migrations/20261030_source_scope/migration.sql",
+    requires: ['ADD COLUMN "forPracticeSets"', 'ADD COLUMN "forTests"', "src_innovator"],
+    forbids: ["DROP TABLE"],
+    label: "Source scope: Innovator no es fuente de Practice Sets (migracion ADD-only)",
+  },
+  {
+    file: "lib/content-source.ts",
+    requires: ["forPracticeSets: true", "forTests: true", "is not used for Practice Sets"],
+    label: "Fuentes filtradas por tipo de contenido y validadas al guardar",
   },
 ];
 

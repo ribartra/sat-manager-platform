@@ -239,10 +239,10 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
+    // "skills by difficulty" / "Weakest skill" live in the shared SkillResults component.
     requires: [
-      "skills by difficulty",
+      "SkillResults",
       "StudentSwitcher",
-      "Weakest skill",
       "studentAccessWhereFor",
       "loadPracticeReport",
     ],

@@ -11,16 +11,18 @@ import { getFeatureSetting } from "@/lib/app-settings";
 import { studentAccessWhereFor } from "@/lib/program-scope";
 import { resolvePracticeArea } from "@/lib/practice-area";
 import { refreshAssignmentStates } from "@/lib/assignments";
-import { comparePracticeSets, domainRank, skillRank } from "@/lib/taxonomy-order";
+import { domainRank } from "@/lib/taxonomy-order";
+import { DEFAULT_PRACTICE_SOURCE_ID } from "@/lib/content-source";
 
 interface PageProps {
   params: Promise<{ studentId: string }>;
-  searchParams: Promise<{ area?: string; domain?: string; topic?: string; skill?: string; difficulty?: string; sets?: string }>;
+  /** `sets` = edit mode for those already-assigned sets ("Edit" in the student's Active practice sets). */
+  searchParams: Promise<{ area?: string; sets?: string }>;
 }
 
 export default async function AssignPage({ params, searchParams }: PageProps) {
   const [{ studentId }, query] = await Promise.all([params, searchParams]);
-  const initialArea = ["math", "reading", "writing"].includes(query.area ?? "") ? query.area as "math" | "reading" | "writing" : "all";
+  const initialArea = ["math", "reading", "writing"].includes(query.area ?? "") ? (query.area as "math" | "reading" | "writing") : "math";
   const session = await auth();
   const now = new Date();
   // Groups are optional (Admin → Settings, off by default): hide every Group control while off, for admins too.
@@ -40,6 +42,7 @@ export default async function AssignPage({ params, searchParams }: PageProps) {
     where: { status: "PUBLISHED", ...(session ? assignableContentWhere(session.user, studentId) : { id: "__no_session__" }) },
     include: {
       topic: { include: { domain: { include: { section: true } } } },
+      source: { select: { id: true, name: true, sortOrder: true } },
       questions: { select: { questionId: true } },
     },
     orderBy: { createdAt: "asc" },
@@ -50,7 +53,13 @@ export default async function AssignPage({ params, searchParams }: PageProps) {
     where: { studentId },
     select: { practiceSetId: true, status: true, dueDate: true },
   });
+  // Already assigned = never offered again (the student can retry it any time); only "Edit" (dates and
+  // settings) of an open one, via ?sets=.
   const assignmentBySet = new Map(existing.map((a) => [a.practiceSetId, a]));
+  const editIds = new Set((query.sets ?? "").split(",").filter(Boolean));
+  const editing = practiceSets
+    .filter((ps) => editIds.has(ps.id) && ["PENDING", "IN_PROGRESS"].includes(assignmentBySet.get(ps.id)?.status ?? ""))
+    .map((ps) => ({ id: ps.id, name: ps.name, difficulty: ps.difficulty, status: assignmentBySet.get(ps.id)!.status, dueDate: assignmentBySet.get(ps.id)!.dueDate?.toISOString() ?? null }));
 
   const groups = teacherGroupManagementEnabled
     ? await prisma.group.findMany({
@@ -70,11 +79,11 @@ export default async function AssignPage({ params, searchParams }: PageProps) {
           { label: "Home", href: "/teacher" },
           { label: "Students", href: "/teacher/students" },
           { label: student.name, href: `/teacher/students/${studentId}` },
-          { label: "Assign practice" },
+          { label: editing.length ? "Edit assigned practice" : "Assign practice" },
         ]}
       />
       <h1 className="mb-1 text-xl font-semibold text-gray-900">
-        Assign practice to <span className="text-blue-700">{student.name}</span>
+        {editing.length ? "Edit practice of" : "Assign practice to"} <span className="text-blue-700">{student.name}</span>
       </h1>
       <p className="mb-4 text-sm text-gray-500">1. Check what the student has done · 2. Choose practice sets · 3. Set a due date</p>
       {overview ? <StudentDonePanel overview={overview} studentId={studentId} focus="practice" /> : null}
@@ -82,35 +91,24 @@ export default async function AssignPage({ params, searchParams }: PageProps) {
       <AssignForm
         studentId={studentId}
         studentName={student.name}
-        recommended={
-          overview
-            ? Object.values(overview.areas)
-                .map((a) => a.weakest)
-                .filter((w): w is NonNullable<typeof w> => Boolean(w) && w!.pct < 70)
-                .map((w) => `${w.topicId}:${w.difficulty}`)
-            : []
-        }
-        practiceSets={[...practiceSets].sort(comparePracticeSets).map((ps) => ({
-          id: ps.id,
-          name: ps.name,
-          difficulty: ps.difficulty,
-          topicName: ps.topic.name,
-          topicId: ps.topicId,
-          domainOrder: domainRank(ps.topic.domain.id),
-          skillOrder: skillRank(ps.topicId),
-          domainId: ps.topic.domain.id,
-          domainName: ps.topic.domain.name,
-          practiceArea: resolvePracticeArea({
-            practiceArea: ps.topic.domain.practiceArea,
-          }),
-          questionCount: ps.questions.length,
-          assignment: assignmentBySet.has(ps.id)
-            ? {
-                status: assignmentBySet.get(ps.id)!.status,
-                dueDate: assignmentBySet.get(ps.id)!.dueDate?.toISOString() ?? null,
-              }
-            : null,
-        }))}
+        practiceSets={practiceSets
+          .filter((ps) => !assignmentBySet.has(ps.id))
+          .map((ps) => ({
+            id: ps.id,
+            name: ps.name,
+            difficulty: ps.difficulty,
+            topicName: ps.topic.name,
+            topicId: ps.topicId,
+            domainOrder: domainRank(ps.topic.domain.id),
+            domainId: ps.topic.domain.id,
+            domainName: ps.topic.domain.name,
+            sourceId: ps.source?.id ?? DEFAULT_PRACTICE_SOURCE_ID,
+            sourceName: ps.source?.name ?? "College Board",
+            sourceOrder: ps.source?.sortOrder ?? 0,
+            practiceArea: resolvePracticeArea({ practiceArea: ps.topic.domain.practiceArea }),
+            questionCount: ps.questions.length,
+          }))}
+        editing={editing}
         groups={groups.map((g) => ({
           id: g.id,
           name: g.name,
@@ -118,10 +116,6 @@ export default async function AssignPage({ params, searchParams }: PageProps) {
         }))}
         groupAssignmentEnabled={teacherGroupManagementEnabled}
         initialArea={initialArea}
-        initialDomain={query.domain}
-        initialTopic={query.topic ?? query.skill}
-        initialDifficulty={query.difficulty}
-        initialSelected={(query.sets ?? "").split(",").filter(Boolean)}
       />
     </PageShell>
   );

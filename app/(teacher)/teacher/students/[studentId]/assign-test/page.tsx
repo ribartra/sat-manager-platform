@@ -29,6 +29,7 @@ export default async function AssignTestPage({ params, searchParams }: PageProps
       // Only Tests of a program the teacher teaches and the student is enrolled in.
       where: { status: "PUBLISHED", ...(session ? assignableContentWhere(session.user, studentId) : { id: "__no_session__" }) },
       include: {
+        source: { select: { id: true, name: true, sortOrder: true } },
         modules: {
           select: {
             id: true,
@@ -47,7 +48,10 @@ export default async function AssignTestPage({ params, searchParams }: PageProps
   if (!student) notFound();
   const overview = (await loadStudentOverviews([student.id])).get(student.id);
 
+  // Already assigned = never offered again (the student can retake it); "Due date" (?test=) edits an open one.
   const assignmentByTest = new Map(existing.map((row) => [row.testId, row]));
+  const editingRow = query.test ? assignmentByTest.get(query.test) : undefined;
+  const editingExam = editingRow && ["PENDING", "IN_PROGRESS"].includes(editingRow.status) ? exams.find((exam) => exam.id === query.test) : undefined;
   const returnParams = new URLSearchParams();
   for (const key of ["area", "topic", "difficulty", "from", "to"] as const) {
     if (query[key]) returnParams.set(key, query[key]!);
@@ -61,28 +65,29 @@ export default async function AssignTestPage({ params, searchParams }: PageProps
           { label: "Home", href: "/teacher" },
           { label: "Students", href: "/teacher/students" },
           { label: student.name, href: `/teacher/students/${studentId}?area=tests` },
-          { label: "Assign test" },
+          { label: editingExam ? "Due date" : "Assign test" },
         ]}
       />
-      <h1 className="mb-1 text-xl font-semibold text-gray-900">Assign a test</h1>
-      <p className="mb-4 text-sm text-gray-500">1. Check what the student has done · 2. Choose the tests · 3. Set a due date</p>
+      <h1 className="mb-1 text-xl font-semibold text-gray-900">{editingExam ? "Change the due date" : "Assign a test"}</h1>
+      <p className="mb-4 text-sm text-gray-500">
+        {editingExam ? "The student keeps the progress; nothing is assigned again." : "1. Check what the student has done · 2. Choose the tests · 3. Set a due date"}
+      </p>
       {overview ? <StudentDonePanel overview={overview} studentId={student.id} focus="tests" /> : null}
       <AssignTestForm
-        initialSelected={query.test ? [query.test] : []}
+        editing={editingExam ? { id: editingExam.id, name: editingExam.name, dueDate: editingRow?.dueDate?.toISOString() ?? null } : undefined}
         studentId={student.id}
         studentName={student.name}
-        exams={exams.map((exam) => ({
-          id: exam.id,
-          name: exam.name,
-          moduleCount: exam.modules.length,
-          questionCount: exam.modules.reduce((sum, module) => sum + module.questions.length, 0),
-          assignment: assignmentByTest.has(exam.id)
-            ? {
-                status: assignmentByTest.get(exam.id)!.status,
-                dueDate: assignmentByTest.get(exam.id)!.dueDate?.toISOString() ?? null,
-              }
-            : null,
-        }))}
+        exams={exams
+          .filter((exam) => !assignmentByTest.has(exam.id))
+          .map((exam) => ({
+            id: exam.id,
+            name: exam.name,
+            sourceId: exam.source?.id ?? "none",
+            sourceName: exam.source?.name ?? "No source",
+            sourceOrder: exam.source?.sortOrder ?? 999,
+            moduleCount: exam.modules.length,
+            questionCount: exam.modules.reduce((sum, module) => sum + module.questions.length, 0),
+          }))}
         returnHref={returnHref}
       />
     </PageShell>

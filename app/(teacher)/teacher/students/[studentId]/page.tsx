@@ -4,7 +4,6 @@ import {
   AttemptStatusBadge,
   ChevronCell,
   Delta,
-  DIFFICULTIES,
   EmptyState,
   LinkTabs,
   LinkTr,
@@ -13,12 +12,11 @@ import {
   PracticeAreaTabs,
   PracticeSetAttemptsAccordion,
   TestAttemptsAccordion,
-  DifficultySummaryCard,
   RowAction,
   RowLink,
   SectionHeader,
   SimpleTable,
-  SkillDifficultyMatrix,
+  SkillResults,
   StatGrid,
   StatTile,
   TD,
@@ -43,12 +41,12 @@ import { formatClock, formatDate, formatDuration } from "@/lib/utils";
 import { assignmentStatusLabel, difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { ProgressFilters } from "@/components/progress-filters";
 import { Hint, InfoHint } from "@/components/hint";
 import { ClipboardList, Eye, History, Pencil, Plus } from "lucide-react";
 import { Avatar } from "@/components/avatar";
 import { StudentDetailActions } from "./actions-client";
+import { UnlockRequestActions } from "../../unlock-request-actions-client";
 import { StudentSwitcher } from "./student-switcher";
 import { GenerateReportDialog } from "./generate-report-dialog";
 import { InvalidateAttemptButton } from "@/components/sat/invalidate-attempt-button";
@@ -70,9 +68,9 @@ import { applyTimeFilterSetting } from "@/lib/time-filters";
 import { officialSkillsFor } from "@/lib/taxonomy-order";
 
 // One page per student (replaces the former Student Analytics and Individual Report views).
-// Practice tabs (Math / Reading / Writing): Easy / Medium / Hard summary and the skill × difficulty
-// matrix (latest attempt of each set) in the main column; active assignments and teacher comments in
-// the side column; practice attempts grouped by set below. "Don't count" / comments live in History. "Generate Report" builds the same report as a PDF (server-side).
+// Practice tabs (Math / Reading / Writing): results by skill (SkillResults: weakest skill line, then
+// Easy / Medium / Hard per skill — last attempt of each set, weighted by questions — opening to each
+// source) in the main column; active assignments and teacher comments in the side column; practice attempts grouped by set below. "Don't count" / comments live in History. "Generate Report" builds the same report as a PDF (server-side).
 // Data comes from lib/student-report.ts, shared with the PDF so both show the same numbers.
 // Taxonomy note: the `topic` param / Topic table is the SKILL level (Section → Domain → Skill).
 
@@ -232,7 +230,8 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
         preserve={{ difficulty: filters.difficulty, from: filters.from, to: filters.to }}
         className="mb-3"
       />
-      {view !== "summary" && view !== "activity" && view !== "history" ? (
+      {/* Practice results have no filters (SAT-039); the Tests tab keeps its date filter. */}
+      {view === "tests" ? (
         <ProgressFilters
           action={`/teacher/students/${studentId}`}
           filters={filters}
@@ -246,24 +245,12 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
 
   // ---------------------------------------------------------------- Summary (mockup mejorada/teacher/student.html)
   if (view === "summary") {
-    const [overview, tests, pendingSets] = await Promise.all([
+    const [overview, tests] = await Promise.all([
       loadStudentOverviews([studentId], now).then((m) => m.get(studentId)!),
       loadStudentTests(studentId),
-      prisma.assignment.findMany({
-        where: { studentId, status: { in: ["PENDING", "IN_PROGRESS", "OVERDUE"] } },
-        select: { id: true, status: true, dueDate: true },
-      }),
     ]);
     const activity = await loadActivity(studentId, 4);
     const testItems = tests.filter((t) => t.attempts.length > 0 || t.state !== "done");
-    const suggestions = (["MATH", "READING", "WRITING"] as PracticeAreaCode[])
-      .map((code) => ({ code, w: overview.areas[code].weakestLast }))
-      .filter((x): x is { code: PracticeAreaCode; w: NonNullable<typeof x.w> } => Boolean(x.w))
-      .sort((a, b) => a.w.pct - b.w.pct);
-    const { pending: pendingTests } = sortTests(tests);
-    const pendingCount = pendingTests.length + pendingSets.length;
-    const overdueCount =
-      pendingTests.filter((t) => t.overdue).length + pendingSets.filter((a) => a.status === "OVERDUE" || (a.dueDate && a.dueDate < now)).length;
     return (
       <PageShell maxWidth={1180} width="wide">
         {header}
@@ -303,55 +290,10 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
           )}
         </section>
 
-        {/* report-10: Recent activity first, What to assign next below it (one column, not side by side). */}
-        <div className="mt-6 space-y-4">
-          <section>
-            <SectionHeader title="Recent activity" action={<Link href={`/teacher/students/${studentId}?area=history`} className="text-sm text-blue-600 hover:underline">History ›</Link>} />
-            <ActivityList items={activity} studentId={studentId} />
-          </section>
-          <Card padding="md">
-            <div className="flex items-baseline justify-between gap-2">
-              <h2 className="text-sm font-semibold text-gray-900">What to assign next</h2>
-              {suggestions.length > 0 ? (
-                <Link
-                  href={`/teacher/students/${studentId}?area=${suggestions[0].code.toLowerCase()}#performance`}
-                  className="whitespace-nowrap text-xs font-medium text-[var(--sat-primary)] hover:underline"
-                >
-                  View all ›
-                </Link>
-              ) : null}
-            </div>
-            <p className="mt-0.5 text-sm text-gray-600">Weakest skills for this student — assign a set to work on them.</p>
-            <p className="mb-3 mt-0.5 text-xs text-gray-500">
-              {pendingCount ? (
-                <>
-                  Already assigned: <b>{pendingCount}</b> not done yet{overdueCount ? <> · <b className="text-red-600">{overdueCount} overdue</b></> : null}
-                </>
-              ) : (
-                "Nothing assigned right now"
-              )}
-            </p>
-            {suggestions.length === 0 ? (
-              <p className="text-sm text-gray-400">Start with a practice set or a test.</p>
-            ) : (
-              <ul className="divide-y divide-gray-100 rounded-lg border border-gray-100">
-                {suggestions.slice(0, 2).map(({ code, w }) => (
-                  <li key={`${w.topicId}-${w.difficulty}`} className="flex items-center justify-between gap-2 px-3 py-2 text-sm">
-                    <span className="min-w-0 truncate">
-                      <b className="font-medium text-gray-800">{w.name}</b> <Pct value={w.pct} className="font-semibold" />
-                    </span>
-                    <Button asChild size="sm" variant="secondary">
-                      <Link href={`/teacher/students/${studentId}/assign?area=${code.toLowerCase()}&topic=${w.topicId}&difficulty=${w.difficulty}`}>Assign practice</Link>
-                    </Button>
-                  </li>
-                ))}
-              </ul>
-            )}
-            <Button asChild variant="secondary" className="mt-3 w-full">
-              <Link href={`/teacher/students/${studentId}/assign-test`}>Assign a test</Link>
-            </Button>
-          </Card>
-        </div>
+        <section className="mt-6">
+          <SectionHeader title="Recent activity" action={<Link href={`/teacher/students/${studentId}?area=history`} className="text-sm text-blue-600 hover:underline">History ›</Link>} />
+          <ActivityList items={activity} studentId={studentId} />
+        </section>
       </PageShell>
     );
   }
@@ -542,9 +484,8 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
           <aside className="min-w-0 space-y-6">
             <SidePanel id="active-tests" title="Active tests" count={report.activeExams.length} empty="No active tests.">
               {report.activeExams.map((a) => {
-                // Pre-select this test in Assign test (activeExams ids are assignment ids).
+                // Due-date edit of this test in Assign test (activeExams ids are assignment ids).
                 const testId = testIdByAssignment.get(a.id);
-                const assignHref = buildProgressHref(`/teacher/students/${studentId}/assign-test`, filters);
                 return (
                 <li key={a.id} className="flex items-start justify-between gap-3 px-3 py-2">
                   <div className="min-w-0">
@@ -566,14 +507,17 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                     </div>
                   </div>
                   <div className="flex shrink-0 items-center gap-3">
-                    <Hint label={a.status === "OVERDUE" ? "Give it to the student again with a new due date." : "Change the due date of this test."}>
-                      <Link
-                        href={testId ? `${assignHref}${assignHref.includes("?") ? "&" : "?"}test=${testId}` : assignHref}
-                        className="shrink-0 text-xs font-medium text-blue-600 hover:underline"
-                      >
-                        {a.status === "OVERDUE" ? "Reassign" : "Due date"}
-                      </Link>
-                    </Hint>
+                    {/* Already assigned: no "assign again"; only the due date while it is still open. */}
+                    {testId && a.status !== "OVERDUE" ? (
+                      <Hint label="Change the due date of this test.">
+                        <Link
+                          href={`/teacher/students/${studentId}/assign-test?test=${testId}`}
+                          className="shrink-0 text-xs font-medium text-blue-600 hover:underline"
+                        >
+                          Due date
+                        </Link>
+                      </Hint>
+                    ) : null}
                   </div>
                 </li>
                 );
@@ -587,21 +531,20 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
   }
 
   // ---------------------------------------------------------------- Practice (Math / Reading / Writing)
-  const report = await loadPracticeReport(studentId, practiceArea, reportFilters);
+  // Results by skill have no filters (product decision): the whole area, every source.
+  const report = await loadPracticeReport(studentId, practiceArea, {});
+  // Pending unlock requests of these sets (moved here from the former Home area tabs).
+  const unlockRequests = (await getFeatureSetting("STUDENT_UNLOCK_REQUESTS"))
+    ? await prisma.unlockRequest.findMany({
+        where: { status: "PENDING", assignmentId: { in: report.assignments.map((a) => a.id) } },
+        select: { id: true, assignmentId: true },
+      })
+    : [];
+  const unlockByAssignment = new Map(unlockRequests.map((request) => [request.assignmentId, request.id]));
   const { areaLabel } = report;
   // One row per practice set (its last attempt), opening to its latest tries; every try is in History.
   const practiceSets = practiceSetGroups(setsFromReportAttempts(report.attemptHistory));
   const setPage = paginate(practiceSets, pageFromParam(query.attemptsPage), HISTORY_PAGE_SIZE);
-  const assignHref = (overrides: { topic?: string; difficulty?: string }, extra: Record<string, string>) => {
-    const href = buildProgressHref(`/teacher/students/${studentId}/assign`, filters, overrides);
-    return `${href}${href.includes("?") ? "&" : "?"}${new URLSearchParams(extra).toString()}`;
-  };
-  // Low performance (moved here from Home): this student's last attempt of a skill × level under 50%,
-  // attempt level only, lowest first.
-  const LOW = 50;
-  const lowCells = report.skillMatrix
-    .flatMap((row) => DIFFICULTIES.flatMap((d) => (row.cells[d] && row.cells[d].percent < LOW ? [{ row, difficulty: d, cell: row.cells[d] }] : [])))
-    .sort((a, b) => a.cell.percent - b.cell.percent);
   return (
     <PageShell maxWidth={1180} width="wide">
       {header}
@@ -618,111 +561,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
 
       <div className="mt-4 grid gap-6 lg:grid-cols-3">
         <div id="performance" className="min-w-0 space-y-6 lg:col-span-2">
-          {lowCells.length > 0 ? (
-            <section className="min-w-0">
-              <div className="grid gap-3 md:grid-cols-3">
-                {lowCells.slice(0, 3).map(({ row, difficulty: d, cell }) => (
-                  <Card key={`${row.topicId}:${d}`} variant="danger" padding="sm" className="min-w-0">
-                    <p className="text-xs font-medium text-red-700">Low performance</p>
-                    <p className="mt-1 truncate text-sm font-semibold text-gray-900">{row.label} ({difficultyLabel(d)})</p>
-                    <p className="mt-1 text-xs text-gray-600">
-                      Last attempt{" "}
-                      <Link href={buildProgressHref(`/teacher/students/${studentId}/attempts/${cell.attemptId}`, filters)} className="font-semibold hover:underline">
-                        {cell.percent}%
-                      </Link>{" "}
-                      ({cell.correct} of {cell.total})
-                    </p>
-                    <Link
-                      href={assignHref({ topic: row.topicId, difficulty: d }, { domain: row.domainId })}
-                      className="mt-1 inline-block text-xs font-medium text-blue-600 hover:underline"
-                    >
-                      Assign a set
-                    </Link>
-                  </Card>
-                ))}
-              </div>
-              {lowCells.length > 3 ? (
-                <p className="mt-2 text-xs text-gray-500">
-                  +{lowCells.length - 3} more under {LOW}% — <a href="#skills-matrix" className="underline hover:no-underline">see the skills table below</a>
-                </p>
-              ) : null}
-            </section>
-          ) : null}
-
-          <DifficultySummaryCard
-            area={practiceArea}
-            label={`${areaLabel} practice`}
-            levels={DIFFICULTIES.map((d) => {
-              const last = report.difficultySummary[d];
-              return last
-                ? {
-                    key: d,
-                    label: difficultyLabel(d),
-                    correct: last.correct,
-                    total: last.total,
-                    percent: last.percent,
-                    caption: <>{last.setName}{last.submittedAt ? ` · ${formatDate(last.submittedAt)}` : ""}</>,
-                    href: buildProgressHref(`/teacher/students/${studentId}/attempts/${last.attemptId}`, filters),
-                  }
-                : { key: d, label: difficultyLabel(d), correct: 0, total: 0, percent: null };
-            })}
-            weakest={
-              report.weakestSkill ? (
-                <>
-                  Weakest skill: <b>{report.weakestSkill.label}</b> · {difficultyLabel(report.weakestSkill.difficulty)} · last attempt{" "}
-                  <Link href={buildProgressHref(`/teacher/students/${studentId}/attempts/${report.weakestSkill.attemptId}`, filters)} className="hover:underline">
-                    <Pct value={report.weakestSkill.percent} className="font-semibold" />
-                  </Link>{" "}
-                  <span className="text-xs text-gray-500">({report.weakestSkill.correct} of {report.weakestSkill.total})</span>
-                </>
-              ) : null
-            }
-            footer="Each level shows its most recent attempt · blank answers count as wrong"
-            emptyText={`No ${areaLabel} practice yet.`}
-          />
-
-          <section id="skills-matrix" className="min-w-0">
-            <SectionHeader
-              title={`${areaLabel} skills by difficulty`}
-              description="Practice only · each cell is the most recent attempt of that skill and level · click a cell to open it"
-            />
-            <SkillDifficultyMatrix
-              selected={{ skill: topicId, difficulty }}
-              actionHeader=""
-              emptyText={`No finished ${areaLabel} work for this student yet.`}
-              rows={report.skillMatrix.map((row) => ({
-                id: row.topicId,
-                label: row.label,
-                cells: Object.fromEntries(
-                  DIFFICULTIES.map((d) => {
-                    const c = row.cells[d];
-                    return [
-                      d,
-                      c
-                        ? {
-                            pct: c.percent,
-                            right: c.correct,
-                            total: c.total,
-                            tries: c.tries,
-                            href: buildProgressHref(`/teacher/students/${studentId}/attempts/${c.attemptId}`, filters),
-                          }
-                        : null,
-                    ];
-                  }),
-                ),
-                action: (
-                  <Link
-                    href={assignHref({ topic: row.topicId, difficulty: undefined }, { domain: row.domainId })}
-                    className="whitespace-nowrap font-medium text-blue-600 hover:underline"
-                  >
-                    Assign
-                  </Link>
-                ),
-              }))}
-            />
-          </section>
-
-
+          <SkillResults report={report} attemptHref={(id) => buildProgressHref(`/teacher/students/${studentId}/attempts/${id}`, filters)} />
         </div>
 
         <aside className="min-w-0 space-y-6">
@@ -734,17 +573,22 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                   <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
                     <StatusBadge status={a.status} />
                     {a.locked && <Badge variant="danger">Locked</Badge>}
+                    {unlockByAssignment.has(a.id) ? <Badge variant="info">Unlock requested</Badge> : null}
                     {a.dueDate && <span className="text-[11px] text-gray-400">Due {formatDate(a.dueDate)}</span>}
                   </div>
                 </div>
-                <Hint label={a.status === "OVERDUE" ? "Give it to the student again, with a new due date if you like." : "Change the due date, open date or when answers are shown. The student's progress is kept."}>
-                  <Link
-                    href={assignHref({ topic: a.topicId, difficulty: a.difficulty }, { sets: a.practiceSetId })}
-                    className="shrink-0 text-xs font-medium text-blue-600 hover:underline"
-                  >
-                    {a.status === "OVERDUE" ? "Reassign" : "Edit"}
-                  </Link>
-                </Hint>
+                {unlockByAssignment.has(a.id) ? <UnlockRequestActions requestId={unlockByAssignment.get(a.id)!} /> : null}
+                {/* Already assigned: no "assign again" (the student can retry any time); only its dates/settings. */}
+                {a.status !== "OVERDUE" ? (
+                  <Hint label="Change the due date, open date or when answers are shown. The student's progress is kept.">
+                    <Link
+                      href={`/teacher/students/${studentId}/assign?sets=${a.practiceSetId}`}
+                      className="shrink-0 text-xs font-medium text-blue-600 hover:underline"
+                    >
+                      Edit
+                    </Link>
+                  </Hint>
+                ) : null}
               </li>
             ))}
           </SidePanel>

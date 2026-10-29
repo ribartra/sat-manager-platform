@@ -6,16 +6,17 @@ import { writeAudit } from "@/lib/audit";
 
 type Ctx = { params: Promise<{ id: string }> };
 
-// PATCH /api/admin/sources/[id] — { name?, active? }: rename, or activate / deactivate. Sources are never
+// PATCH /api/admin/sources/[id] — { name?, active?, forPracticeSets?, forTests? }: rename, activate /
+// deactivate, or choose which content it is offered for. Sources are never
 // deleted (their sets and Tests keep them); an inactive source leaves the editors.
 export const PATCH = withApiErrors(async function PATCH(req: NextRequest, { params }: Ctx) {
   const session = await assertAdmin();
   const { id } = await params;
-  const body = (await req.json().catch(() => null)) as { name?: unknown; active?: unknown } | null;
-  const previous = await prisma.source.findUnique({ where: { id }, select: { name: true, active: true } });
+  const body = (await req.json().catch(() => null)) as { name?: unknown; active?: unknown; forPracticeSets?: unknown; forTests?: unknown } | null;
+  const previous = await prisma.source.findUnique({ where: { id }, select: { name: true, active: true, forPracticeSets: true, forTests: true } });
   if (!previous) throw new NotFoundError("Source not found.");
 
-  const data: { name?: string; active?: boolean } = {};
+  const data: { name?: string; active?: boolean; forPracticeSets?: boolean; forTests?: boolean } = {};
   if (body?.name !== undefined) {
     const name = typeof body.name === "string" ? body.name.trim() : "";
     if (!name || name.length > 80) throw new ValidationError("Validation failed.", ["Write a source name (up to 80 characters)."]);
@@ -27,6 +28,11 @@ export const PATCH = withApiErrors(async function PATCH(req: NextRequest, { para
   if (body?.active !== undefined) {
     if (typeof body.active !== "boolean") throw new ValidationError("Validation failed.", ["active must be true or false."]);
     data.active = body.active;
+  }
+  for (const key of ["forPracticeSets", "forTests"] as const) {
+    if (body?.[key] === undefined) continue;
+    if (typeof body[key] !== "boolean") throw new ValidationError("Validation failed.", [`${key} must be true or false.`]);
+    data[key] = body[key];
   }
   if (Object.keys(data).length === 0) throw new ValidationError("Validation failed.", ["Nothing to change."]);
 

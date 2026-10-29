@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import Link from "next/link";
 import { currentContentScope } from "@/lib/content-scope";
 import { redirect } from "next/navigation";
@@ -39,7 +40,7 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
       // The Tests of the programs the teacher teaches (shared bank).
       where: await currentContentScope(),
       include: {
-        source: { select: { name: true } },
+        source: { select: { id: true, name: true, sortOrder: true } },
         modules: { include: { questions: { select: { questionId: true, isPretest: true } } }, orderBy: { order: "asc" } },
         _count: { select: { assignments: true, attempts: true } },
         // Counts only for students this teacher can see (program scope).
@@ -50,7 +51,14 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
       },
       orderBy: { name: "asc" },
     })
-  ).sort((a, b) => a.name.localeCompare(b.name, "en", { numeric: true }));
+  )
+    // Grouped by source (SAT-022: Innovator, College Board 2025, College Board 2026, …), then by name.
+    .sort(
+      (a, b) =>
+        (a.source?.sortOrder ?? 999) - (b.source?.sortOrder ?? 999) ||
+        (a.source?.name ?? "").localeCompare(b.source?.name ?? "") ||
+        a.name.localeCompare(b.name, "en", { numeric: true }),
+    );
   // Search + filters (URL): name, status, assigned to the teacher's students or not.
   const status = ["PUBLISHED", "DRAFT", "ARCHIVED"].includes(query.status ?? "") ? query.status : undefined;
   const assigned = query.assigned === "yes" || query.assigned === "no" ? query.assigned : undefined;
@@ -99,7 +107,15 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
         <EmptyState title="No tests match these filters." />
       ) : (
         <div className="space-y-3.5">
-          {page.items.map((test) => {
+          {page.items.map((test, index) => {
+            // A heading where a new source starts (also at the top of each page).
+            const sourceHeading =
+              index === 0 || page.items[index - 1].source?.id !== test.source?.id ? (
+                <h2 className="pt-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  {test.source?.name ?? "No source"}{" "}
+                  <span className="font-normal normal-case text-gray-400">· {shown.filter((t) => t.source?.id === test.source?.id).length} tests</span>
+                </h2>
+              ) : null;
             const modules = moduleViewsForTest(test.modules.map((m) => ({ ...m, questions: m.questions })));
             const a = test.assignments;
             const completed = a.filter((x) => x.status === "COMPLETED").length;
@@ -110,7 +126,9 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
               .filter((x) => x.status !== "COMPLETED" && x.dueDate)
               .reduce<Date | null>((m, x) => (!m || x.dueDate! < m ? x.dueDate : m), null);
             return (
-              <div key={test.id} className="overflow-hidden rounded-[10px] border border-gray-200 bg-white shadow-sm">
+              <Fragment key={test.id}>
+              {sourceHeading}
+              <div className="overflow-hidden rounded-[10px] border border-gray-200 bg-white shadow-sm">
                 <div className="flex flex-wrap items-center justify-between gap-2 bg-[var(--sat-area-tests)] px-4 py-2.5 text-[var(--sat-tests-ink)]">
                   <div className="flex flex-wrap items-center gap-2">
                     <b className="text-base">{test.name}</b>
@@ -154,6 +172,7 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
                   </div>
                 </div>
               </div>
+              </Fragment>
             );
           })}
           <Pagination basePath="/teacher/tests" params={filterParams} pageSize={PAGE_SIZE} {...page} />

@@ -12,7 +12,9 @@ import {
 import { hashPublicToken } from "@/lib/token-security";
 import { writeAudit } from "@/lib/audit";
 import { InlineError } from "@/components/sat/alert";
-import { PracticeSetAttemptsAccordion } from "@/components/sat";
+import { PracticeSetAttemptsAccordion, SkillResults } from "@/components/sat";
+import { loadPracticeReport } from "@/lib/student-report";
+import type { PracticeAreaCode } from "@/lib/practice-area";
 import { practiceSetGroups, practiceSetTitle, type GroupableSet } from "@/lib/attempt-groups";
 
 interface PageProps {
@@ -138,6 +140,11 @@ export default async function ParentTemporaryAccessPage({ searchParams }: PagePr
     });
   }
   const groups = practiceSetGroups([...sets.values()]);
+  // Results by skill (same SkillResults as teacher and student), only for the areas this link covers.
+  const AREA_CODE: Record<string, PracticeAreaCode> = { mathematics: "MATH", reading: "READING", writing: "WRITING" };
+  const reports = (await Promise.all(areas.map((area) => loadPracticeReport(access.studentId, AREA_CODE[area], {})))).filter(
+    (report) => report.skillResults.length > 0,
+  );
 
   return (
     <div className="mx-auto max-w-[var(--sat-page-wide)] px-4 py-8">
@@ -153,7 +160,12 @@ export default async function ParentTemporaryAccessPage({ searchParams }: PagePr
       {groups.length === 0 ? (
         <Card><p className="p-8 text-center text-sm text-gray-400">No practice sets finished in these subjects yet.</p></Card>
       ) : (
-        <PracticeSetAttemptsAccordion sets={groups} />
+        <div className="space-y-5">
+          {reports.map((report) => (
+            <SkillResults key={report.practiceArea} report={report} id={`skills-${report.practiceArea}`} />
+          ))}
+          <PracticeSetAttemptsAccordion sets={groups} />
+        </div>
       )}
 
       <Link href="/login" className="mt-6 inline-block text-sm text-blue-600 hover:underline">Go to sign in</Link>

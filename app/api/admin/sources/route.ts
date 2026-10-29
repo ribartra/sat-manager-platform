@@ -9,7 +9,7 @@ export const GET = withApiErrors(async function GET() {
   await assertAdmin();
   const sources = await prisma.source.findMany({
     orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-    select: { id: true, name: true, active: true, _count: { select: { practiceSets: true, fullPracticeTests: true } } },
+    select: { id: true, name: true, active: true, forPracticeSets: true, forTests: true, _count: { select: { practiceSets: true, fullPracticeTests: true } } },
   });
   return NextResponse.json({ sources });
 });

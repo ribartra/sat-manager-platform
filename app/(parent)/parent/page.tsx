@@ -1,13 +1,18 @@
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
-import { EmptyState, PageContent, PageHeader, PageShell, PracticeSetAttemptsAccordion } from "@/components/sat";
+import { EmptyState, PageContent, PageHeader, PageShell, PracticeSetAttemptsAccordion, SkillResults } from "@/components/sat";
+import { loadPracticeReport } from "@/lib/student-report";
+import type { PracticeAreaCode } from "@/lib/practice-area";
 import { practiceSetGroups, practiceSetTitle, type GroupableSet } from "@/lib/attempt-groups";
 import { summarizeAllQuestionAnswers } from "@/lib/weighted-score";
 
+const AREAS: PracticeAreaCode[] = ["MATH", "READING", "WRITING"];
+
 /**
- * Parent home: each linked student's practice sets with the LAST attempt of each (same accordion as
- * the teacher and the student). Attempt level only: no average across sets.
+ * Parent home: each linked student's results by skill (same SkillResults as the teacher and the
+ * student: last attempt of each set, weighted by questions) and practice sets with the LAST attempt
+ * of each (same accordion).
  */
 export default async function ParentDashboardPage() {
   const session = await auth();
@@ -28,6 +33,12 @@ export default async function ParentDashboardPage() {
       },
     },
   });
+  // Results by skill per area, per linked student (only areas with results are shown).
+  const reports = new Map(
+    await Promise.all(
+      links.map(async (link) => [link.studentId, (await Promise.all(AREAS.map((area) => loadPracticeReport(link.studentId, area, {})))).filter((r) => r.skillResults.length > 0)] as const),
+    ),
+  );
 
   return (
     <PageShell width="default">
@@ -70,7 +81,12 @@ export default async function ParentDashboardPage() {
                   {groups.length === 0 ? (
                     <p className="text-sm text-muted-foreground">No practice finished yet.</p>
                   ) : (
-                    <PracticeSetAttemptsAccordion sets={groups} />
+                    <div className="space-y-5">
+                      {(reports.get(link.studentId) ?? []).map((report) => (
+                        <SkillResults key={report.practiceArea} report={report} id={`skills-${link.studentId}-${report.practiceArea}`} />
+                      ))}
+                      <PracticeSetAttemptsAccordion sets={groups} />
+                    </div>
                   )}
                 </Card>
               );

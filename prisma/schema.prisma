@@ -312,6 +312,10 @@ model Source {
   name              String             @unique
   active            Boolean            @default(true)
   sortOrder         Int                @default(0)
+  /// Offered in the Practice Set editor / Practice › By skill (Innovator is Tests-only).
+  forPracticeSets   Boolean            @default(true)
+  /// Offered in the Test editor.
+  forTests          Boolean            @default(true)
   createdAt         DateTime           @default(now())
   practiceSets      PracticeSet[]
   fullPracticeTests FullPracticeTest[]

@@ -14,7 +14,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
 
   const { name, topicId, difficulty, status, explanationVisibility, questionIds, sourceId, programId: requestedProgramId } = await req.json();
   const validationErrors = practiceSetEditorIssues({ name, topicId, difficulty, status, explanationVisibility, questionIds });
-  const sourceIssue = await sourceIdIssue(sourceId);
+  const sourceIssue = await sourceIdIssue(sourceId, "practice");
   if (sourceIssue) validationErrors.push(sourceIssue);
   // The set goes to the bank of a program the author teaches, with questions of that same bank.
   const programId = await contentProgramFor(session.user, typeof requestedProgramId === "string" ? requestedProgramId : null);

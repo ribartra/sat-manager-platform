@@ -17,8 +17,12 @@ export default async function AssignFullTestPage({ params }: PageProps) {
 
   const [test, students, groups] = await Promise.all([
     prisma.fullPracticeTest.findFirst({ where: { id: testId, ...(await currentContentScope()) } }),
+    // Students who already have this test are not offered (they can retake it; no "assign again").
     prisma.user.findMany({
-      where: session ? studentAccessWhereFor(session.user) : { role: "STUDENT", active: true, validationStatus: "APPROVED" },
+      where: {
+        ...(session ? studentAccessWhereFor(session.user) : { role: "STUDENT", active: true, validationStatus: "APPROVED" }),
+        fullTestAssignments: { none: { testId } },
+      },
       orderBy: { name: "asc" },
     }),
     teacherGroupManagementEnabled

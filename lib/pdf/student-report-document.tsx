@@ -196,19 +196,24 @@ function StatusText({ status }: { status: string }) {
   return <Text style={[s.bold, { color, fontSize: 7.5 }]}>{assignmentStatusLabel(status)}</Text>;
 }
 
-/** One attempt's result as a matrix cell (the report is attempt level: no pooled % across sets). */
-function attemptMetric(label: string, difficulty: string, cell: { correct: number; total: number }): ProgressMetric {
-  return { label, difficulty, correct: cell.correct, total: cell.total, attempts: 1, timeSeconds: 0, attemptDetails: [] };
+/** A skill × level result as a matrix cell (last attempt of each set, weighted by questions). */
+function levelMetric(label: string, difficulty: string, cell: { correct: number; total: number; tries: number }): ProgressMetric {
+  return { label, difficulty, correct: cell.correct, total: cell.total, attempts: cell.tries, timeSeconds: 0, attemptDetails: [] };
 }
 
 function PracticeSection({ report }: { report: PracticeReport }) {
   const k = report.kpis;
   const levels = ["EASY", "MEDIUM", "HARD"];
-  const lastByLevel = levels.flatMap((d) => {
-    const last = report.difficultySummary[d];
-    return last && last.total ? [attemptMetric("", d, last)] : [];
-  });
-  const cells = report.skillMatrix.flatMap((row) => Object.entries(row.cells).map(([d, cell]) => attemptMetric(row.label, d, cell)));
+  // One row per skill (all sources) and, under it, one row per source ("Skill — College Board").
+  const sourceLabel = (skill: string, source: string) => `${skill} — ${source}`;
+  const cells = report.skillResults.flatMap((row) => [
+    ...Object.entries(row.levels).map(([d, cell]) => levelMetric(row.label, d, cell!)),
+    ...row.bySource.flatMap((source) => Object.entries(source.levels).map(([d, cell]) => levelMetric(sourceLabel(row.label, source.sourceName), d, cell!))),
+  ]);
+  const domainGroups = [...new Map(report.skillResults.map((row) => [row.domainName || "Other", [] as string[]])).entries()].map(([label, rows]) => ({ label, rows }));
+  for (const row of report.skillResults) {
+    domainGroups.find((g) => g.label === (row.domainName || "Other"))!.rows.push(row.label, ...row.bySource.map((source) => sourceLabel(row.label, source.sourceName)));
+  }
   const dims = levels.filter((d) => cells.some((m) => m.difficulty === d));
   const latest = report.attempts[0];
   return (
@@ -229,44 +234,15 @@ function PracticeSection({ report }: { report: PracticeReport }) {
       {k.attempts === 0 ? (
         <View style={[s.table, s.section]}><Text style={s.empty}>No {report.areaLabel} practice finished yet.</Text></View>
       ) : (
-        <>
-          <Matrix
-            title="Performance by skill and difficulty"
-            hint="Each cell is the most recent attempt of that skill and level (skills A–Z). Skipped questions count as wrong."
-            rowLabel="Skill"
-            dimensions={dims.length ? dims : levels}
-            dimensionLabel={difficultyLabel}
-            summary={lastByLevel}
-            summaryLabel="Last attempt per level"
-            detail={cells}
-          />
-          <View style={s.section}>
-            <Text style={s.h2}>Skills to work on next</Text>
-            <Text style={s.hint}>Lowest last attempts first (one per skill and level), with what to do next.</Text>
-            <View style={s.table}>
-              <View style={s.th}>
-                <Text style={[s.thCell, { flex: 2.2 }]}>Skill (level)</Text>
-                <Text style={[s.thCell, { flex: 1.3 }]}>Correct</Text>
-                <Text style={[s.thCell, { flex: 0.8, textAlign: "right" }]}>Time per question</Text>
-                <Text style={[s.thCell, { flex: 2.6 }]}>Suggested next step</Text>
-              </View>
-              {report.weakSkills.map((w) => (
-                <View key={w.key} style={s.tr} wrap={false}>
-                  <View style={[s.td, { flex: 2.2, flexDirection: "row", alignItems: "center", gap: 4 }]}>
-                    <Text style={s.bold}>{w.label}</Text>
-                    <Text style={s.chip}>{difficultyLabel(w.difficulty)}</Text>
-                  </View>
-                  <View style={[s.td, { flex: 1.3 }]}>
-                    <Text style={[s.bold, { color: band(w.percent).text }]}>{w.percent}% <Text style={[s.tiny, { fontFamily: "Helvetica" }]}>({w.correct} of {w.total})</Text></Text>
-                    <Bar value={w.percent} width={60} />
-                  </View>
-                  <Text style={[s.td, s.muted, { flex: 0.8, textAlign: "right" }]}>{w.avgTime !== null ? time(w.avgTime) : "-"}</Text>
-                  <Text style={[s.td, { flex: 2.6, color: GRAY[700] }]}>{w.recommendation}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-        </>
+        <Matrix
+          title="Performance by skill and difficulty"
+          hint="Each level adds up the last attempt of every practice set of that skill (weighted by questions); the rows below a skill show each source. Skills A–Z. Skipped questions count as wrong."
+          rowLabel="Skill"
+          dimensions={dims.length ? dims : levels}
+          dimensionLabel={difficultyLabel}
+          detail={cells}
+          groups={domainGroups}
+        />
       )}
 
       {/* Side-by-side lists move to the next page as a block (flex rows do not split across pages). */}

@@ -13,6 +13,7 @@ export { Alert, InlineError, type AlertTone, type AlertLayout } from "./alert";
 export { NotFoundView } from "./not-found-view";
 export { Breadcrumbs, type Crumb } from "./breadcrumbs";
 export { SectionHeader } from "./section-header";
+export { SkillResults } from "./skill-results";
 export { StatTile, StatGrid, Delta, ChipStat } from "./stat-tile";
 export { LinkTr, RowLink, RowAction, ChevronCell, SimpleTable, TD } from "./link-table";
 export { LinkTabs } from "./link-tabs";

@@ -10,7 +10,7 @@ export default async function AdminSourcesPage() {
   if (!(await requireAdmin())) redirect("/teacher");
   const sources = await prisma.source.findMany({
     orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-    select: { id: true, name: true, active: true, _count: { select: { practiceSets: true, fullPracticeTests: true } } },
+    select: { id: true, name: true, active: true, forPracticeSets: true, forTests: true, _count: { select: { practiceSets: true, fullPracticeTests: true } } },
   });
 
   return (
@@ -18,11 +18,11 @@ export default async function AdminSourcesPage() {
       <Breadcrumbs items={[{ label: "Admin" }, { label: "Sources" }]} />
       <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Sources</h1>
       <p className="mb-4 mt-1 text-sm text-gray-500">
-        Where Practice Sets and Tests come from. Each set or test has one source; in Practice › By skill every active source is a row of each skill.
+        Where Practice Sets and Tests come from. Each set or test has one source; “Used for” sets where it can be chosen: Practice Sets (each opens per source in Practice › By skill) and/or Tests.
         A source in use can&apos;t be deleted — deactivate it to hide it from the editors.
       </p>
       <SourcesClient
-        sources={sources.map((s) => ({ id: s.id, name: s.name, active: s.active, practiceSets: s._count.practiceSets, tests: s._count.fullPracticeTests }))}
+        sources={sources.map((s) => ({ id: s.id, name: s.name, active: s.active, forPracticeSets: s.forPracticeSets, forTests: s.forTests, practiceSets: s._count.practiceSets, tests: s._count.fullPracticeTests }))}
       />
     </PageShell>
   );

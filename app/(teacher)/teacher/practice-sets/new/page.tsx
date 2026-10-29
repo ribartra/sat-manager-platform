@@ -18,7 +18,7 @@ export default async function NewPracticeSetPage({ searchParams }: PageProps) {
     prisma.topic.findMany({ where: academicTopicWhere, include: { taxonomyNode: true, domain: { include: { section: true } } }, orderBy: { name: "asc" } }),
     prisma.taxonomyNode.findMany({ where: { active: true }, orderBy: [{ sortOrder: "asc" }, { label: "asc" }] }),
     findQuestionsWithOptionMedia({ status: "PUBLISHED", topic: academicTopicWhere, ...(await currentContentScope()) }),
-    listSources({ activeOnly: true }),
+    listSources({ activeOnly: true, kind: "practice" }),
   ]);
   const { byId } = buildTaxonomyTree(taxonomyNodes);
 

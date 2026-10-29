@@ -46,7 +46,7 @@ export default async function EditPracticeSetPage({ params }: PageProps) {
           explanationVisibility: practiceSet.explanationVisibility,
           questionIds: practiceSet.questions.map((q) => q.questionId),
         }}
-        sources={sources.filter((s) => s.active || s.id === practiceSet.sourceId)}
+        sources={sources.filter((s) => s.id === practiceSet.sourceId || (s.active && s.forPracticeSets))}
         topics={topics.map((t) => ({
           id: t.id,
           name: t.name,

@@ -8,7 +8,7 @@ import { DEFAULT_TEST_SOURCE_ID, listSources } from "@/lib/content-source";
 export default async function NewFullTestPage() {
   const [questions, sources] = await Promise.all([
     findQuestionsWithOptionMediaAndSection({ status: "PUBLISHED", ...(await currentContentScope()) }),
-    listSources({ activeOnly: true }),
+    listSources({ activeOnly: true, kind: "tests" }),
   ]);
 
   return (
