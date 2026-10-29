@@ -500,6 +500,21 @@ const checks = [
     label: "Fuentes de Tests por edicion: College Board 2025 / 2026 (solo Tests)",
   },
   {
+    file: "app/(teacher)/teacher/students/[studentId]/assign/assign-form-client.tsx",
+    requires: ["lockOptionEnabled ? (", "locked: lockOptionEnabled && lockOnAssign"],
+    label: "Assign practice: 'Keep it locked' oculto salvo que el admin lo active",
+  },
+  {
+    file: "app/api/assignments/route.ts",
+    requires: ['getFeatureSetting("ASSIGN_LOCKED_OPTION")'],
+    label: "API de asignacion: sin bloqueo mientras la opcion esta apagada",
+  },
+  {
+    file: "lib/app-settings.ts",
+    requires: ["ASSIGN_LOCKED_OPTION"],
+    label: "Ajuste de admin para la opcion 'Keep it locked' (apagado por defecto)",
+  },
+  {
     file: "prisma/migrations/20261101_ingest_source_target/migration.sql",
     requires: ['ADD COLUMN "sourceId"', 'ADD COLUMN "importMode"', 'ADD COLUMN "targetJson"'],
     forbids: ["DROP TABLE"],

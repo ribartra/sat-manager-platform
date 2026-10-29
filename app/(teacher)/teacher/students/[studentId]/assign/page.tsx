@@ -115,6 +115,7 @@ export default async function AssignPage({ params, searchParams }: PageProps) {
           members: g.members.map((m) => ({ id: m.userId, name: m.user.name })),
         }))}
         groupAssignmentEnabled={teacherGroupManagementEnabled}
+        lockOptionEnabled={await getFeatureSetting("ASSIGN_LOCKED_OPTION")}
         initialArea={initialArea}
       />
     </PageShell>

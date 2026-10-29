@@ -68,6 +68,8 @@ interface AssignFormProps {
   editing?: EditingSetInfo[];
   groups: GroupInfo[];
   groupAssignmentEnabled: boolean;
+  /** Admin › Settings → "Keep it locked" option (ASSIGN_LOCKED_OPTION). */
+  lockOptionEnabled?: boolean;
   initialArea: "math" | "reading" | "writing";
 }
 
@@ -78,6 +80,7 @@ export function AssignForm({
   editing = [],
   groups,
   groupAssignmentEnabled,
+  lockOptionEnabled = false,
   initialArea,
 }: AssignFormProps) {
   const router = useRouter();
@@ -149,7 +152,7 @@ export function AssignForm({
         sourceGroupId: useGroup ? groupId : null,
         dueDate: dueDate || null,
         unlockAt: unlockAt || null,
-        locked: lockOnAssign,
+        locked: lockOptionEnabled && lockOnAssign,
         feedbackMode,
       }),
     });
@@ -356,17 +359,20 @@ export function AssignForm({
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
-        <Checkbox
-          id="lock"
-          checked={lockOnAssign}
-          onChange={(e) => setLockOnAssign(e.target.checked)}
-          className="rounded border-gray-300 text-blue-600"
-        />
-        <label htmlFor="lock" className="text-sm text-gray-700">
-          Keep it locked for now (you unlock it later)
-        </label>
-      </div>
+      {/* Admin › Settings "Keep it locked" option (off by default: hidden). */}
+      {lockOptionEnabled ? (
+        <div className="flex items-center gap-2">
+          <Checkbox
+            id="lock"
+            checked={lockOnAssign}
+            onChange={(e) => setLockOnAssign(e.target.checked)}
+            className="rounded border-gray-300 text-blue-600"
+          />
+          <label htmlFor="lock" className="text-sm text-gray-700">
+            Keep it locked for now (you unlock it later)
+          </label>
+        </div>
+      ) : null}
 
       <InlineError>{error}</InlineError>
       </div>

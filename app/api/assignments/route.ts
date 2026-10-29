@@ -80,7 +80,8 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
 
   const resolvedDueDate = parseDueDate(dueDate);
   const resolvedUnlockAt = parseUnlockDate(unlockAt);
-  const resolvedLocked = locked === true;
+  // "Keep it locked" only exists while Admin › Settings enables it (ASSIGN_LOCKED_OPTION, off by default).
+  const resolvedLocked = locked === true && (await getFeatureSetting("ASSIGN_LOCKED_OPTION"));
   if (sourceGroupId) {
     for (const practiceSetId of requestedPracticeSetIds) {
       await prisma.groupAssignment.upsert({

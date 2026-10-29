@@ -22,6 +22,13 @@ export const FEATURE_SETTINGS = {
     owner: "product",
     expiresAt: null as string | null,
   },
+  ASSIGN_LOCKED_OPTION: {
+    label: "\"Keep it locked\" option when assigning practice",
+    description: "Shows \"Keep it locked for now (you unlock it later)\" in Assign practice. When off it is hidden and new assignments are never locked.",
+    defaultValue: false,
+    owner: "product",
+    expiresAt: null as string | null,
+  },
   TEACHER_GROUP_MANAGEMENT: {
     label: "Teacher group management",
     description: "Lets teachers create groups of students and assign work to a whole group.",
