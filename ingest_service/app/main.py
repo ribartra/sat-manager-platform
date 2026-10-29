@@ -580,11 +580,9 @@ def init_db() -> None:
             "ALTER TABLE IngestImageArtifact ADD COLUMN height INTEGER",
             "ALTER TABLE IngestImageArtifact ADD COLUMN contentHash TEXT",
             "ALTER TABLE IngestImageArtifact ADD COLUMN status TEXT NOT NULL DEFAULT 'AVAILABLE'",
-            # Prisma migration 20261101_ingest_source_target (content source + simple AI-CSV import).
-            "ALTER TABLE IngestBatch ADD COLUMN sourceId TEXT",
-            "ALTER TABLE IngestBatch ADD COLUMN importMode TEXT",
-            "ALTER TABLE IngestBatch ADD COLUMN targetJson TEXT",
-            "ALTER TABLE IngestBatch ADD COLUMN createdById TEXT",
+            # NOTE: never add here columns that a Prisma migration also adds (e.g. IngestBatch.sourceId,
+            # 20261101_ingest_source_target): this service can start before the web container runs
+            # `prisma migrate deploy`, and the migration then fails with "duplicate column" (outage 2026-10-29).
         ]:
             try:
                 db.execute(statement)

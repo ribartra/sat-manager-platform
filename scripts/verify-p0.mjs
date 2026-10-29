@@ -546,7 +546,9 @@ const checks = [
   },
   {
     file: "ingest_service/app/main.py",
-    requires: ["/batches/{batch_id}/quick-prepare", "/batches/{batch_id}/artifacts.zip", "/batches/{batch_id}/image-zip", "ALTER TABLE IngestBatch ADD COLUMN sourceId TEXT"],
+    requires: ["/batches/{batch_id}/quick-prepare", "/batches/{batch_id}/artifacts.zip", "/batches/{batch_id}/image-zip"],
+    // Prisma-owned columns must not be ALTERed by the service (it can start first → migration fails).
+    forbids: ["ALTER TABLE IngestBatch ADD COLUMN"],
     label: "Servicio de ingesta: paginas sin OCR, zip de artefactos e imagenes por zip",
   },
   {
