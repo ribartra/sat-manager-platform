@@ -5,6 +5,7 @@ import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { normalizeIngestDifficulty } from "@/lib/ingest-promotion";
 import { ApiError, BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
+import { DEFAULT_PRACTICE_SOURCE_ID } from "@/lib/content-source";
 
 interface RouteContext {
   params: Promise<{ batchId: string }>;
@@ -83,6 +84,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
     const created = await tx.practiceSet.create({
       data: {
         programId,
+        sourceId: DEFAULT_PRACTICE_SOURCE_ID,
         name: partial ? `${name} (partial ${questionIds.length}/${totalSourceCandidates})` : name,
         topicId: [...topicIds][0],
         difficulty: normalizeIngestDifficulty(sourceFile.difficulty ?? candidates[0]?.difficulty),

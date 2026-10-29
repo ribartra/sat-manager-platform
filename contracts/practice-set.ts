@@ -6,6 +6,8 @@ export const practiceSetEditorSchema = z
     name: z.string(),
     topicId: z.string(),
     difficulty: z.enum(["EASY", "MEDIUM", "HARD"]),
+    /** Checked against the Source table by the API (sourceIdIssue). */
+    sourceId: z.string().optional(),
     status: z.enum(["DRAFT", "PUBLISHED", "BLOCKED", "ARCHIVED"]),
     explanationVisibility: z.enum(["IMMEDIATE", "AFTER_FINISH", "HIDDEN"]),
     questionIds: z.array(z.string()),

@@ -14,9 +14,13 @@ export function PracticeSetsFilter({
   topics,
   initialTopicId,
   initialDifficulty,
+  sources,
+  initialSource,
   initialStatus,
   initialQuery,
 }: {
+  sources: { id: string; name: string }[];
+  initialSource?: string;
   initialQuery?: string;
   area: string;
   sectionLabel: string;
@@ -28,6 +32,7 @@ export function PracticeSetsFilter({
   const router = useRouter();
   const [topicId, setTopicId] = useState(initialTopicId ?? "");
   const [difficulty, setDifficulty] = useState(initialDifficulty ?? "");
+  const [source, setSource] = useState(initialSource ?? "");
   const [status, setStatus] = useState(initialStatus ?? "");
   const [query, setQuery] = useState(initialQuery ?? "");
 
@@ -38,6 +43,7 @@ export function PracticeSetsFilter({
     params.set("view", "manage");
     if (topicId) params.set("topic", topicId);
     if (difficulty) params.set("difficulty", difficulty);
+    if (source) params.set("source", source);
     if (status) params.set("status", status);
     if (query.trim()) params.set("q", query.trim());
     router.push(`/teacher/practice-sets?${params.toString()}`);
@@ -53,6 +59,14 @@ export function PracticeSetsFilter({
           {difficultyOptions().map((opt) => (
             <option key={opt.value} value={opt.value}>
               {opt.label}
+            </option>
+          ))}
+        </Select>
+        <Select value={source} onChange={(e) => setSource(e.target.value)} aria-label="Source" className="text-sm">
+          <option value="">All sources</option>
+          {sources.map((option) => (
+            <option key={option.id} value={option.id}>
+              {option.name}
             </option>
           ))}
         </Select>

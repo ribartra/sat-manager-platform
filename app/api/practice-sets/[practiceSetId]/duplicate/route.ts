@@ -23,6 +23,7 @@ export const POST = withApiErrors(async function POST(_req: Request, { params }:
     data: {
       // The copy stays in the same program's bank.
       programId: practiceSet.programId,
+      sourceId: practiceSet.sourceId,
       name: `${practiceSet.name} Copy`,
       topicId: practiceSet.topicId,
       difficulty: practiceSet.difficulty,

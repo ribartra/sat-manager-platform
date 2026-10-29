@@ -23,6 +23,7 @@ export const POST = withApiErrors(async function POST(_req: Request, { params }:
     data: {
       // The copy stays in the same program's bank.
       programId: test.programId,
+      sourceId: test.sourceId,
       name: `${test.name} Copy`,
       status: "DRAFT",
       reviewEnabled: test.reviewEnabled,

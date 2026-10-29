@@ -39,6 +39,7 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
       // The Tests of the programs the teacher teaches (shared bank).
       where: await currentContentScope(),
       include: {
+        source: { select: { name: true } },
         modules: { include: { questions: { select: { questionId: true, isPretest: true } } }, orderBy: { order: "asc" } },
         _count: { select: { assignments: true, attempts: true } },
         // Counts only for students this teacher can see (program scope).
@@ -113,6 +114,7 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
                 <div className="flex flex-wrap items-center justify-between gap-2 bg-[var(--sat-area-tests)] px-4 py-2.5 text-[var(--sat-tests-ink)]">
                   <div className="flex flex-wrap items-center gap-2">
                     <b className="text-base">{test.name}</b>
+                    {test.source ? <span className="text-sm">· {test.source.name}</span> : null}
                     <span className="text-sm">
                       {firstAssigned ? `· assigned ${formatDate(firstAssigned)}` : "· not assigned yet"}
                       {nextDue ? ` · next due ${formatDate(nextDue)}` : ""}

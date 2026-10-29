@@ -33,8 +33,11 @@ import { readApiError } from "@/lib/api-client";
 
 export function FullTestEditor({
   questions,
+  sources,
   initial,
 }: {
+  /** Active sources, plus the Test's current one if it was deactivated. */
+  sources: { id: string; name: string }[];
   questions: {
     id: string;
     label: string;
@@ -52,6 +55,7 @@ export function FullTestEditor({
     status?: string;
     reviewEnabled?: boolean;
     breakMinutes?: number;
+    sourceId?: string | null;
     moduleQuestionIds?: string[][];
   };
 }) {
@@ -75,6 +79,7 @@ export function FullTestEditor({
       status: (initial?.status as FullTestEditorInput["status"]) ?? "DRAFT",
       reviewEnabled: initial?.reviewEnabled ?? true,
       breakMinutes: initial?.breakMinutes ?? 0,
+      sourceId: initial?.sourceId ?? sources[0]?.id ?? "",
       moduleQuestionIds: initial?.moduleQuestionIds ?? [[], [], [], []],
     },
   });
@@ -113,6 +118,7 @@ export function FullTestEditor({
         status: values.status,
         reviewEnabled: values.reviewEnabled,
         breakMinutes: values.breakMinutes,
+        sourceId: values.sourceId,
         moduleQuestionIds: values.moduleQuestionIds,
       }),
     });
@@ -179,6 +185,25 @@ export function FullTestEditor({
                       {fullTestStatusOptions().map((opt) => (
                         <option key={opt.value} value={opt.value}>
                           {opt.label}
+                        </option>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="sourceId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Source</FormLabel>
+                  <FormControl>
+                    <Select {...field}>
+                      {sources.map((source) => (
+                        <option key={source.id} value={source.id}>
+                          {source.name}
                         </option>
                       ))}
                     </Select>

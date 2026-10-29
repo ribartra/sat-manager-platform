@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Lock } from "lucide-react";
+import { ChevronRight, Lock } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Pct } from "@/components/sat/work-status";
 import { Badge } from "@/components/ui/badge";
@@ -73,6 +73,71 @@ export function SkillsMap({ domains }: { domains: { id: string; name: string; sk
             ))}
           </div>
         </Card>
+      ))}
+    </div>
+  );
+}
+
+export interface SkillsSourceRow {
+  id: string;
+  /** Source name (College Board, Innovator, …). */
+  name: string;
+  /** One chip per level, in DIFFICULTIES order. */
+  chips: SkillsMapChip[];
+}
+
+export interface SkillsSourceSkill {
+  id: string;
+  name: string;
+  sub: React.ReactNode;
+  rows: SkillsSourceRow[];
+}
+
+const SOURCE_GRID = "sm:grid sm:grid-cols-[minmax(8rem,1fr)_repeat(3,minmax(0,10rem))] sm:items-center sm:gap-2";
+
+/**
+ * Teacher catalogue by skill: one accordion per domain (native <details>, the first open); inside,
+ * each skill has a Source × level grid (rows = sources, columns = Easy / Medium / Hard) of the same
+ * chips as SkillsMap, so the teacher picks the source and level in one click.
+ */
+export function SkillsSourceMap({ domains }: { domains: { id: string; name: string; skills: SkillsSourceSkill[] }[] }) {
+  if (domains.length === 0) return <p className="rounded-lg border border-dashed border-gray-200 p-4 text-center text-sm text-gray-500">No skills in this area yet.</p>;
+  return (
+    <div className="space-y-3">
+      {domains.map((d, index) => (
+        <details key={d.id} open={index === 0} className="group overflow-hidden rounded-[var(--sat-radius)] border border-[var(--sat-border)] bg-white">
+          <summary className="flex cursor-pointer list-none items-center gap-3 px-4 py-3 hover:bg-[var(--sat-primary-soft)] [&::-webkit-details-marker]:hidden">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">{d.name}</h3>
+            <span className="ml-auto text-xs text-gray-400">{d.skills.length} skill{d.skills.length === 1 ? "" : "s"}</span>
+            <ChevronRight aria-hidden size={16} className="text-[var(--sat-blank)] transition-transform group-open:rotate-90" />
+          </summary>
+          <div className="divide-y divide-gray-100 border-t border-[var(--sat-border)] px-4">
+            {d.skills.map((skill) => (
+              <div key={skill.id} className="py-3">
+                <p className="text-sm font-semibold text-gray-900">{skill.name}</p>
+                <p className="text-xs text-gray-500">{skill.sub}</p>
+                <div className="mt-2 space-y-2 sm:space-y-1.5">
+                  <div className={cn("hidden text-[11px] font-medium uppercase tracking-wide text-[var(--sat-muted)]", SOURCE_GRID)} aria-hidden>
+                    <span>Source</span>
+                    {DIFFICULTIES.map((level) => <span key={level}>{difficultyLabel(level)}</span>)}
+                  </div>
+                  {skill.rows.map((row) => (
+                    <div key={row.id} className={SOURCE_GRID}>
+                      <p className="mb-1 text-xs font-semibold text-[var(--sat-text)] sm:mb-0">{row.name}</p>
+                      <div className="flex flex-wrap gap-1.5 sm:contents">
+                        {row.chips.map((chip) => (
+                          <div key={chip.difficulty} className="sm:min-w-0">
+                            <SkillChip chip={chip} />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </details>
       ))}
     </div>
   );

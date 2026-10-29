@@ -1,4 +1,4 @@
-import { PageShell, PracticeAreaTabs, SkillsMap, matchesQuery } from "@/components/sat";
+import { PageShell, PracticeAreaTabs, SkillsSourceMap, matchesQuery, type SkillsMapChip } from "@/components/sat";
 import { contentScopeFor } from "@/lib/program-scope";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
@@ -15,19 +15,21 @@ import { MoreLinks } from "@/components/sat/more-links";
 import { auth } from "@/lib/auth";
 import { getFeatureFlagValues } from "@/lib/feature-flags";
 import { TEACHER_MORE_LINKS, resolveLinks } from "@/lib/nav-config";
+import { DEFAULT_PRACTICE_SOURCE_ID, listSources } from "@/lib/content-source";
 
 interface SearchParams {
   area?: string;
   section?: string;
   topic?: string;
   difficulty?: string;
+  source?: string;
   status?: string;
   view?: string;
   q?: string;
 }
 
 function tabPreserve(filters: SearchParams) {
-  return { topic: filters.topic, difficulty: filters.difficulty, status: filters.status, view: filters.view };
+  return { topic: filters.topic, difficulty: filters.difficulty, source: filters.source, status: filters.status, view: filters.view };
 }
 
 const DIFFICULTIES = ["EASY", "MEDIUM", "HARD"] as const;
@@ -63,11 +65,13 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
   });
   const topicIds = topics.map((topic) => topic.id);
   const selectedTopicId = filters.topic && topicIds.includes(filters.topic) ? filters.topic : undefined;
+  const sources = await listSources();
   const practiceSets = await prisma.practiceSet.findMany({
     // The sets of the programs the teacher teaches (shared bank).
     where: { topicId: { in: topicIds }, ...(session ? contentScopeFor(session.user) : { id: "__no_session__" }) },
     include: {
       topic: { include: { domain: { include: { section: true } } } },
+      source: { select: { id: true, name: true } },
       questions: { select: { questionId: true } },
       assignments: { select: { id: true, studentId: true, status: true } },
     },
@@ -115,41 +119,53 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
       </nav>
       {view === "skills" ? (
         <div className="space-y-3">
-          <SkillsMap
+          <SkillsSourceMap
             domains={[...domains.entries()].map(([domainId, domain]) => ({
               id: domainId,
               name: domain.name,
               skills: domain.topics.map((topic) => {
-                const setsOfTopic = practiceSets.filter((set) => set.topicId === topic.id);
+                // A set saved without a source (seed data) counts as College Board, like the migration backfill.
+                const setsOfTopic = practiceSets
+                  .filter((set) => set.topicId === topic.id)
+                  .map((set) => ({ ...set, sourceId: set.sourceId ?? DEFAULT_PRACTICE_SOURCE_ID }));
                 const assigned = setsOfTopic.reduce((sum, set) => sum + set.assignments.length, 0);
+                // Rows: every active source (empty ones offer "+ New"), plus an inactive one that still has sets here.
+                const rows = sources.filter((source) => source.active || setsOfTopic.some((set) => set.sourceId === source.id));
                 return {
                   id: topic.id,
                   name: topic.name,
                   sub: `Assigned ${assigned} time${assigned === 1 ? "" : "s"}`,
-                  chips: DIFFICULTIES.map((difficulty) => {
-                    const sets = setsOfTopic.filter((set) => set.difficulty === difficulty);
-                    const published = sets.filter((set) => set.status === "PUBLISHED").length;
-                    return sets.length > 0
-                      ? {
+                  rows: rows.map((source) => ({
+                    id: source.id,
+                    name: source.active ? source.name : `${source.name} (inactive)`,
+                    chips: DIFFICULTIES.map((difficulty): SkillsMapChip => {
+                      const sets = setsOfTopic.filter((set) => set.sourceId === source.id && set.difficulty === difficulty);
+                      const published = sets.filter((set) => set.status === "PUBLISHED").length;
+                      if (sets.length > 0) {
+                        return {
                           difficulty,
-                          state: "available" as const,
-                          href: manageHref({ topic: topic.id, difficulty }),
-                          title: `${sets.length} set${sets.length === 1 ? "" : "s"} (${published} published): edit, preview or change status`,
+                          state: "available",
+                          href: manageHref({ topic: topic.id, difficulty, source: source.id }),
+                          title: `${source.name}: ${sets.length} set${sets.length === 1 ? "" : "s"} (${published} published): edit, preview or change status`,
                           extra: (
                             <span className="text-[var(--sat-muted)]">
                               {sets.length} set{sets.length === 1 ? "" : "s"}
                               {sets.length > published ? ` · ${sets.length - published} draft` : ""}
                             </span>
                           ),
-                        }
-                      : {
-                          difficulty,
-                          state: null,
-                          href: `/teacher/practice-sets/new?topicId=${topic.id}`,
-                          title: "No set at this level yet: create one",
-                          extra: <span className="text-[var(--sat-muted)]">+ New</span>,
                         };
-                  }),
+                      }
+                      return source.active
+                        ? {
+                            difficulty,
+                            state: null,
+                            href: `/teacher/practice-sets/new?${new URLSearchParams({ topicId: topic.id, difficulty, sourceId: source.id }).toString()}`,
+                            title: `No ${source.name} set at this level yet: create one`,
+                            extra: <span className="text-[var(--sat-muted)]">+ New</span>,
+                          }
+                        : { difficulty, state: null, title: `No ${source.name} set at this level` };
+                    }),
+                  })),
                 };
               }),
             }))}
@@ -164,12 +180,14 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
             topics={topics.map((topic) => ({ id: topic.id, name: topic.name, sectionLabel, domainName: topic.domain.name }))}
             initialTopicId={selectedTopicId}
             initialDifficulty={filters.difficulty}
+            sources={sources.map((source) => ({ id: source.id, name: source.name }))}
+            initialSource={filters.source}
             initialStatus={filters.status}
             initialQuery={filters.q}
           />
           <PracticeSetsTable
             rows={practiceSets
-              .filter((practiceSet) => (!selectedTopicId || practiceSet.topicId === selectedTopicId) && (!filters.difficulty || practiceSet.difficulty === filters.difficulty) && (!filters.status || practiceSet.status === filters.status) && matchesQuery(filters.q, practiceSet.name, practiceSet.topic.name))
+              .filter((practiceSet) => (!selectedTopicId || practiceSet.topicId === selectedTopicId) && (!filters.difficulty || practiceSet.difficulty === filters.difficulty) && (!filters.source || practiceSet.sourceId === filters.source) && (!filters.status || practiceSet.status === filters.status) && matchesQuery(filters.q, practiceSet.name, practiceSet.topic.name))
               .map((practiceSet): PracticeSetRow => ({
                 id: practiceSet.id,
                 name: practiceSet.name,
@@ -177,6 +195,7 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
                 skillDomain: practiceSet.topic.domain.name,
                 skillName: practiceSet.topic.name,
                 difficulty: practiceSet.difficulty,
+                sourceName: practiceSet.source?.name ?? "—",
                 questionCount: practiceSet.questions.length,
                 assignmentCount: practiceSet.assignments.length,
                 status: practiceSet.status,

@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { practiceSetEditorIssues } from "@/contracts/practice-set";
 import { ForbiddenError, ValidationError, withApiErrors } from "@/lib/api-error";
 import { contentProgramFor, sameProgramQuestionsIssue } from "@/lib/program-scope";
+import { sourceIdIssue } from "@/lib/content-source";
 
 export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
@@ -11,8 +12,10 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
     return new ForbiddenError("Forbidden").toResponse();
   }
 
-  const { name, topicId, difficulty, status, explanationVisibility, questionIds, programId: requestedProgramId } = await req.json();
+  const { name, topicId, difficulty, status, explanationVisibility, questionIds, sourceId, programId: requestedProgramId } = await req.json();
   const validationErrors = practiceSetEditorIssues({ name, topicId, difficulty, status, explanationVisibility, questionIds });
+  const sourceIssue = await sourceIdIssue(sourceId);
+  if (sourceIssue) validationErrors.push(sourceIssue);
   // The set goes to the bank of a program the author teaches, with questions of that same bank.
   const programId = await contentProgramFor(session.user, typeof requestedProgramId === "string" ? requestedProgramId : null);
   const programIssue = await sameProgramQuestionsIssue(Array.isArray(questionIds) ? questionIds : [], programId);
@@ -37,6 +40,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
   const practiceSet = await prisma.practiceSet.create({
     data: {
       programId,
+      sourceId,
       name,
       topicId,
       difficulty,
@@ -56,6 +60,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
       targetId: practiceSet.id,
       metadata: JSON.stringify({
         topicId,
+        sourceId,
         difficulty,
         status,
         explanationVisibility,

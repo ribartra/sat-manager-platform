@@ -420,6 +420,53 @@ const checks = [
     forbids: ["By Skill"],
     label: "Resultados FPT muestran review por modulo, tiempo extra y preguntas absolutas (sin By Skill)",
   },
+  {
+    file: "prisma/migrations/20261029_content_source/migration.sql",
+    requires: ['CREATE TABLE "Source"', "src_college_board", "src_innovator", 'UPDATE "PracticeSet" SET "sourceId"', 'UPDATE "FullPracticeTest" SET "sourceId"'],
+    // ADD-only: a table rebuild would drop the section triggers and the single-open-attempt indexes.
+    forbids: ["DROP TABLE", "new_PracticeSet", "new_FullPracticeTest"],
+    label: "Source: migracion ADD-only con College Board (PS) e Innovator (Tests) como backfill",
+  },
+  {
+    file: "app/api/practice-sets/route.ts",
+    requires: ["sourceIdIssue(sourceId)", "sourceId,"],
+    label: "Practice Set nuevo exige una fuente activa",
+  },
+  {
+    file: "app/api/practice-sets/[practiceSetId]/route.ts",
+    requires: ["sourceIdIssue(sourceId, previous.sourceId)", "explanationVisibility, sourceId }"],
+    label: "Practice Set editado valida la fuente (puede conservar una inactiva)",
+  },
+  {
+    file: "app/api/full-practice-tests/route.ts",
+    requires: ["sourceIdIssue(sourceId)", "sourceId,"],
+    label: "Test nuevo exige una fuente activa",
+  },
+  {
+    file: "app/api/full-practice-tests/[testId]/route.ts",
+    requires: ["sourceIdIssue(sourceId, previous.sourceId)"],
+    label: "Test editado valida la fuente",
+  },
+  {
+    file: "app/api/practice-sets/[practiceSetId]/duplicate/route.ts",
+    requires: ["sourceId: practiceSet.sourceId"],
+    label: "Duplicar Practice Set conserva la fuente",
+  },
+  {
+    file: "app/api/full-practice-tests/[testId]/duplicate/route.ts",
+    requires: ["sourceId: test.sourceId"],
+    label: "Duplicar Test conserva la fuente",
+  },
+  {
+    file: "app/(teacher)/teacher/practice-sets/page.tsx",
+    requires: ["SkillsSourceMap", "listSources()", "source: source.id", "sourceId: source.id"],
+    label: "Practice › By skill: Domain en acordeon y por skill una grilla Fuente × Easy/Medium/Hard",
+  },
+  {
+    file: "components/sat/skills-map.tsx",
+    requires: ["export function SkillsSourceMap", "<details", "SkillChip chip={chip}"],
+    label: "SkillsSourceMap: acordeon nativo por Domain con las chips de dificultad",
+  },
 ];
 
 let hasFailures = false;

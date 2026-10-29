@@ -53,6 +53,21 @@ const checks = [
     label: "Problem reports need a signed-in user, are rate limited and only accept real JPEG/PNG screenshots",
   },
   {
+    file: "app/api/admin/sources/route.ts",
+    requires: ["assertAdmin", "writeAudit", "SOURCE_CREATED"],
+    label: "Admin sources: solo admin crea fuentes (auditado)",
+  },
+  {
+    file: "app/api/admin/sources/[id]/route.ts",
+    requires: ["assertAdmin", "writeAudit", "SOURCE_UPDATED"],
+    label: "Admin sources: solo admin renombra/activa fuentes (auditado)",
+  },
+  {
+    file: "app/admin/sources/page.tsx",
+    requires: ["requireAdmin"],
+    label: "Admin › Sources solo para admin",
+  },
+  {
     file: "app/api/admin/issue-reports/[id]/route.ts",
     requires: ["assertAdmin"],
     label: "Problem report status/resend is admin-only",

@@ -3,6 +3,7 @@ import { contentScopeFor, sameProgramQuestionsIssue } from "@/lib/program-scope"
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { practiceSetEditorIssues } from "@/contracts/practice-set";
+import { sourceIdIssue } from "@/lib/content-source";
 import { validatePracticeSetPayload } from "@/lib/content-validation";
 import { BadRequestError, ConflictError, ForbiddenError, NotFoundError, ValidationError, withApiErrors } from "@/lib/api-error";
 
@@ -72,13 +73,16 @@ export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }
   }
 
   const { practiceSetId } = await params;
-  const { name, topicId, difficulty, status, explanationVisibility, questionIds } = await req.json();
+  const { name, topicId, difficulty, status, explanationVisibility, questionIds, sourceId: requestedSourceId } = await req.json();
   const previous = await prisma.practiceSet.findFirst({
     where: { id: practiceSetId, ...contentScopeFor(session.user) },
-    select: { status: true, topicId: true, difficulty: true, programId: true },
+    select: { status: true, topicId: true, difficulty: true, programId: true, sourceId: true },
   });
   if (!previous) return new NotFoundError("Practice Set not found.").toResponse();
+  const sourceId = requestedSourceId ?? previous.sourceId;
   const validationErrors = practiceSetEditorIssues({ name, topicId, difficulty, status, explanationVisibility, questionIds });
+  const sourceIssue = await sourceIdIssue(sourceId, previous.sourceId);
+  if (sourceIssue) validationErrors.push(sourceIssue);
   const programIssue = await sameProgramQuestionsIssue(Array.isArray(questionIds) ? questionIds : [], previous.programId);
   if (programIssue) validationErrors.push(programIssue);
   if ((status || "DRAFT") === "PUBLISHED" && Array.isArray(questionIds) && questionIds.length > 0) {
@@ -102,7 +106,7 @@ export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }
     prisma.practiceSetQuestion.deleteMany({ where: { practiceSetId } }),
     prisma.practiceSet.update({
       where: { id: practiceSetId },
-      data: { name, topicId, difficulty, status, explanationVisibility },
+      data: { name, topicId, difficulty, status, explanationVisibility, sourceId },
     }),
     ...((questionIds as string[]).map((questionId, order) =>
       prisma.practiceSetQuestion.create({ data: { practiceSetId, questionId, order } })
@@ -126,6 +130,7 @@ export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }
         status,
         previousTopicId: previous?.topicId ?? null,
         topicId,
+        sourceId,
         difficulty,
         explanationVisibility,
         questionCount: Array.isArray(questionIds) ? questionIds.length : 0,

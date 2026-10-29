@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { FullTestEditor } from "../../new/full-test-editor-client";
 import { findQuestionsWithOptionMediaAndSection } from "@/lib/question-list-media-query";
+import { listSources } from "@/lib/content-source";
 
 interface PageProps {
   params: Promise<{ testId: string }>;
@@ -14,12 +15,13 @@ export default async function EditFullTestPage({ params }: PageProps) {
   const { testId } = await params;
   // The bank of the programs the teacher teaches (shared by the program's teachers).
   const scope = await currentContentScope();
-  const [test, questions] = await Promise.all([
+  const [test, questions, sources] = await Promise.all([
     prisma.fullPracticeTest.findFirst({
       where: { id: testId, ...scope },
       include: { modules: { include: { questions: { orderBy: { order: "asc" } } }, orderBy: { order: "asc" } } },
     }),
     findQuestionsWithOptionMediaAndSection({ status: { in: ["PUBLISHED", "DRAFT"] }, ...scope }),
+    listSources(),
   ]);
   if (!test) notFound();
 
@@ -34,9 +36,11 @@ export default async function EditFullTestPage({ params }: PageProps) {
           status: test.status,
           reviewEnabled: test.reviewEnabled,
           breakMinutes: test.breakMinutes,
+          sourceId: test.sourceId,
           moduleQuestionIds: test.modules.map((module) => module.questions.map((item) => item.questionId)),
         }}
         questions={questions}
+        sources={sources.filter((s) => s.active || s.id === test.sourceId)}
       />
     </PageShell>
   );

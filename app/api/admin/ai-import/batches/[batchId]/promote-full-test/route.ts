@@ -14,6 +14,7 @@ import {
   type FullTestSection,
 } from "@/lib/full-test-modules";
 import { ApiError, BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
+import { DEFAULT_TEST_SOURCE_ID } from "@/lib/content-source";
 
 interface RouteContext {
   params: Promise<{ batchId: string }>;
@@ -134,6 +135,7 @@ export const POST = withApiErrors(async function POST(req: Request, { params }: 
     const created = await tx.fullPracticeTest.create({
       data: {
         programId,
+        sourceId: DEFAULT_TEST_SOURCE_ID,
         name: testName,
         status: "DRAFT",
         modules: {

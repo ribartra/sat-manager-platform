@@ -19,6 +19,7 @@ export type PracticeSetRow = {
   skillDomain: string;
   skillName: string;
   difficulty: string;
+  sourceName: string;
   questionCount: number;
   assignmentCount: number;
   status: string;
@@ -55,6 +56,12 @@ export function PracticeSetsTable({ rows }: { rows: PracticeSetRow[] }) {
             {difficultyLabel(row.original.difficulty)}
           </Badge>
         ),
+      },
+      {
+        id: "source",
+        header: "Source",
+        meta: { priority: "medium" },
+        cell: ({ row }) => <span className="text-sm text-muted-foreground">{row.original.sourceName}</span>,
       },
       {
         id: "questions",

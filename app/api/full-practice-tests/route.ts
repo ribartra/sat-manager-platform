@@ -7,12 +7,13 @@ import { FULL_TEST_MODULES } from "@/lib/full-test-modules";
 import { ForbiddenError, ValidationError, withApiErrors } from "@/lib/api-error";
 import { writeAudit } from "@/lib/audit";
 import { contentProgramFor, sameProgramQuestionsIssue } from "@/lib/program-scope";
+import { sourceIdIssue } from "@/lib/content-source";
 
 export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
   if (!session) return new ForbiddenError("Forbidden").toResponse();
 
-  const { name, status, moduleQuestionIds, reviewEnabled, breakMinutes, programId: requestedProgramId } = await req.json();
+  const { name, status, moduleQuestionIds, reviewEnabled, breakMinutes, sourceId, programId: requestedProgramId } = await req.json();
   // The Test goes to the bank of a program the author teaches, with questions of that same bank.
   const programId = await contentProgramFor(session.user, typeof requestedProgramId === "string" ? requestedProgramId : null);
   const targetStatus = status ?? "DRAFT";
@@ -44,6 +45,8 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
   );
   const programIssue = await sameProgramQuestionsIssue(questionIds, programId);
   if (programIssue) validation.errors.push(programIssue);
+  const sourceIssue = await sourceIdIssue(sourceId);
+  if (sourceIssue) validation.errors.push(sourceIssue);
   if (validation.errors.length > 0) {
     return new ValidationError("Validation failed.", [...new Set(validation.errors)], { extra: { warnings: validation.warnings } }).toResponse();
   }
@@ -54,6 +57,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
   const test = await prisma.fullPracticeTest.create({
     data: {
       programId,
+      sourceId,
       name,
       status: status ?? "DRAFT",
       reviewEnabled: reviewEnabled ?? true,

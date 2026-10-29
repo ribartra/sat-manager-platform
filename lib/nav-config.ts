@@ -18,6 +18,7 @@ import {
   Home,
   Clock,
   MessageSquareWarning,
+  Library,
 } from "lucide-react";
 import type { FeatureSettingKey } from "@/lib/app-settings";
 
@@ -159,6 +160,7 @@ export const ADMIN_NAV_GROUP: NavGroupDef = {
     { id: "admin.teachers", label: "Teachers", href: "/admin/teachers", icon: GraduationCap },
     { id: "admin.users", label: "Accounts", href: "/admin/users", icon: UserCog },
     { id: "admin.taxonomy", label: "Taxonomy", href: "/admin/taxonomy", icon: Layers },
+    { id: "admin.sources", label: "Sources", href: "/admin/sources", icon: Library },
     { id: "admin.import.ai", label: "AI Import", href: "/admin/import/ai", icon: FileText },
     { id: "admin.reports", label: "Reports", href: "/admin/reports", icon: MessageSquareWarning },
     { id: "admin.logs", label: "Audit Log", href: "/admin/logs", icon: FileText },

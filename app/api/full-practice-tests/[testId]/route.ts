@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { contentScopeFor, sameProgramQuestionsIssue } from "@/lib/program-scope";
+import { sourceIdIssue } from "@/lib/content-source";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { fullTestEditorFieldIssues } from "@/contracts/full-test";
@@ -85,10 +86,11 @@ export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }
   if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { testId } = await params;
-  const { name, status, moduleQuestionIds, reviewEnabled, breakMinutes } = await req.json();
+  const { name, status, moduleQuestionIds, reviewEnabled, breakMinutes, sourceId: requestedSourceId } = await req.json();
   const targetStatus = status ?? "DRAFT";
   const previous = await prisma.fullPracticeTest.findFirst({ where: { id: testId, ...contentScopeFor(session.user) } });
   if (!previous) return new NotFoundError("Test not found.").toResponse();
+  const sourceId = requestedSourceId ?? previous.sourceId;
 
   const normalizedModules = Array.from({ length: 4 }, (_, index) => (moduleQuestionIds?.[index] ?? []) as string[]);
   const questionIds = [...new Set(normalizedModules.flat())];
@@ -112,6 +114,8 @@ export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }
   );
   const programIssue = await sameProgramQuestionsIssue(questionIds, previous.programId);
   if (programIssue) validation.errors.push(programIssue);
+  const sourceIssue = await sourceIdIssue(sourceId, previous.sourceId);
+  if (sourceIssue) validation.errors.push(sourceIssue);
   if (validation.errors.length > 0) {
     return new ValidationError("Validation failed.", [...new Set(validation.errors)], { extra: { warnings: validation.warnings } }).toResponse();
   }
@@ -126,6 +130,7 @@ export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }
       where: { id: testId },
       data: {
         name: name.trim(),
+        sourceId,
         status: targetStatus,
         reviewEnabled: reviewEnabled ?? previous.reviewEnabled,
         breakMinutes: resolvedBreak,

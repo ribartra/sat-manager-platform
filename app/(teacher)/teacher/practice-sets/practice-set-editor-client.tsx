@@ -65,6 +65,7 @@ interface PracticeSetInitial {
   name?: string;
   topicId?: string;
   difficulty?: string;
+  sourceId?: string | null;
   status?: string;
   explanationVisibility?: string;
   questionIds?: string[];
@@ -83,10 +84,13 @@ function plainMathLabel(content: string, maxLength: number) {
 export function PracticeSetEditor({
   topics,
   questions,
+  sources,
   initial,
 }: {
   topics: TopicInfo[];
   questions: QuestionInfo[];
+  /** Active sources, plus the set's current one if it was deactivated. */
+  sources: { id: string; name: string }[];
   initial?: PracticeSetInitial;
 }) {
   const router = useRouter();
@@ -96,6 +100,7 @@ export function PracticeSetEditor({
       name: initial?.name ?? "",
       topicId: initial?.topicId ?? topics[0]?.id ?? "",
       difficulty: (initial?.difficulty as PracticeSetEditorInput["difficulty"]) ?? "EASY",
+      sourceId: initial?.sourceId ?? sources[0]?.id ?? "",
       status: (initial?.status as PracticeSetEditorInput["status"]) ?? "DRAFT",
       explanationVisibility:
         (initial?.explanationVisibility as PracticeSetEditorInput["explanationVisibility"]) ?? "AFTER_FINISH",
@@ -145,6 +150,7 @@ export function PracticeSetEditor({
       name: values.name,
       topicId: values.topicId,
       difficulty: values.difficulty,
+      sourceId: values.sourceId,
       status: values.status,
       explanationVisibility: values.explanationVisibility,
       questionIds: values.questionIds,
@@ -277,6 +283,25 @@ export function PracticeSetEditor({
                       {difficultyOptions().map((opt) => (
                         <option key={opt.value} value={opt.value}>
                           {opt.label}
+                        </option>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="sourceId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Source</FormLabel>
+                  <FormControl>
+                    <Select {...field}>
+                      {sources.map((source) => (
+                        <option key={source.id} value={source.id}>
+                          {source.name}
                         </option>
                       ))}
                     </Select>

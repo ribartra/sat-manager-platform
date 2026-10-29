@@ -290,16 +290,31 @@ model PracticeSet {
   explanationVisibility String   @default("HIDDEN") // IMMEDIATE | AFTER_FINISH | HIDDEN
   /// Tenant: the program whose bank holds this set.
   programId             String?
+  /// Where the content comes from (College Board, …).
+  sourceId              String?
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 
   program     Program?            @relation(fields: [programId], references: [id], onDelete: Restrict)
+  source      Source?             @relation(fields: [sourceId], references: [id], onDelete: Restrict)
   topic       Topic               @relation(fields: [topicId], references: [id])
   questions   PracticeSetQuestion[]
   assignments Assignment[]
   groupAssignments GroupAssignment[]
 
   @@index([programId])
+  @@index([sourceId])
+}
+
+/// Where Practice Sets and Tests come from (College Board, Innovator, …). Global, managed by admins.
+model Source {
+  id                String             @id @default(cuid())
+  name              String             @unique
+  active            Boolean            @default(true)
+  sortOrder         Int                @default(0)
+  createdAt         DateTime           @default(now())
+  practiceSets      PracticeSet[]
+  fullPracticeTests FullPracticeTest[]
 }
 
 model PracticeSetQuestion {
@@ -569,14 +584,18 @@ model FullPracticeTest {
   breakMinutes   Int      @default(0)
   /// Tenant: the program whose bank holds this Test.
   programId      String?
+  /// Where the content comes from (Innovator, …).
+  sourceId       String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   program        Program? @relation(fields: [programId], references: [id], onDelete: Restrict)
+  source         Source?  @relation(fields: [sourceId], references: [id], onDelete: Restrict)
   modules        FullPracticeTestModule[]
   assignments    FullPracticeTestAssignment[]
   attempts       FullPracticeTestAttempt[]
 
   @@index([programId])
+  @@index([sourceId])
 }
 
 model FullPracticeTestModule {

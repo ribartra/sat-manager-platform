@@ -7,6 +7,7 @@ import { PracticeSetEditor } from "../../practice-set-editor-client";
 import { academicTopicWhere, buildTaxonomyTree, taxonomyPathLabel } from "@/lib/taxonomy";
 import { domainSectionLabel } from "@/lib/practice-area";
 import { findQuestionsWithOptionMedia } from "@/lib/question-list-media-query";
+import { listSources } from "@/lib/content-source";
 
 interface PageProps {
   params: Promise<{ practiceSetId: string }>;
@@ -16,7 +17,7 @@ export default async function EditPracticeSetPage({ params }: PageProps) {
   const { practiceSetId } = await params;
   // The bank of the programs the teacher teaches (shared by the program's teachers).
   const scope = await currentContentScope();
-  const [practiceSet, topics, taxonomyNodes, questions] = await Promise.all([
+  const [practiceSet, topics, taxonomyNodes, questions, sources] = await Promise.all([
     prisma.practiceSet.findFirst({
       where: { id: practiceSetId, ...scope },
       include: { questions: { orderBy: { order: "asc" } } },
@@ -24,6 +25,7 @@ export default async function EditPracticeSetPage({ params }: PageProps) {
     prisma.topic.findMany({ where: academicTopicWhere, include: { taxonomyNode: true, domain: { include: { section: true } } }, orderBy: { name: "asc" } }),
     prisma.taxonomyNode.findMany({ where: { active: true }, orderBy: [{ sortOrder: "asc" }, { label: "asc" }] }),
     findQuestionsWithOptionMedia({ status: { in: ["PUBLISHED", "DRAFT"] }, topic: academicTopicWhere, ...scope }),
+    listSources(),
   ]);
   const { byId } = buildTaxonomyTree(taxonomyNodes);
 
@@ -39,10 +41,12 @@ export default async function EditPracticeSetPage({ params }: PageProps) {
           name: practiceSet.name,
           topicId: practiceSet.topicId,
           difficulty: practiceSet.difficulty,
+          sourceId: practiceSet.sourceId,
           status: practiceSet.status,
           explanationVisibility: practiceSet.explanationVisibility,
           questionIds: practiceSet.questions.map((q) => q.questionId),
         }}
+        sources={sources.filter((s) => s.active || s.id === practiceSet.sourceId)}
         topics={topics.map((t) => ({
           id: t.id,
           name: t.name,

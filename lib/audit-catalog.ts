@@ -75,6 +75,8 @@ export const AUDIT_ACTION_LABELS: Record<string, string> = {
   DELETE_QUESTION: "Question deleted",
   DUPLICATE_QUESTION: "Question duplicated",
   CREATE_PRACTICE_SET: "Practice Set created",
+  SOURCE_CREATED: "Content source added",
+  SOURCE_UPDATED: "Content source changed",
   UPDATE_PRACTICE_SET: "Practice Set updated",
   PUBLISH_PRACTICE_SET: "Practice Set published",
   ARCHIVE_PRACTICE_SET: "Practice Set archived",
@@ -224,7 +226,8 @@ export function actionCategory(action: string): AuditCategory {
     action.includes("FULL_PRACTICE_TEST") ||
     action.includes("STUDY_MATERIAL") ||
     action.includes("SUBSKILL") ||
-    action.includes("TAXONOMY")
+    action.includes("TAXONOMY") ||
+    action.startsWith("SOURCE_")
   ) {
     return "Content";
   }

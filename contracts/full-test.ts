@@ -6,6 +6,8 @@ export const fullTestEditorFieldsSchema = z.object({
   status: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"]),
   reviewEnabled: z.boolean(),
   breakMinutes: z.number().int().min(0, "breakMinutes must be a non-negative integer."),
+  /** Checked against the Source table by the API (sourceIdIssue). */
+  sourceId: z.string().optional(),
   moduleQuestionIds: z
     .array(z.array(z.string()))
     .length(4, "Full Practice Test must have exactly 4 modules."),
