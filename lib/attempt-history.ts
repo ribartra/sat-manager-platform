@@ -53,6 +53,8 @@ export interface HistoryFilters {
   area?: PracticeAreaCode;
   status?: "completed" | "progress";
   from?: Date;
+  /** Inclusive end (end of the day). */
+  to?: Date;
 }
 
 const COUNTED = "SUBMITTED";
@@ -215,6 +217,6 @@ export async function loadAttemptHistory(studentIds: string[], filters: HistoryF
 
   return rows
     .filter((r) => (filters.status === "completed" ? r.status !== "IN_PROGRESS" : filters.status === "progress" ? r.status === "IN_PROGRESS" : true))
-    .filter((r) => (filters.from ? r.at >= filters.from : true))
+    .filter((r) => (filters.from ? r.at >= filters.from : true) && (filters.to ? r.at <= filters.to : true))
     .sort((a, b) => b.at.getTime() - a.at.getTime());
 }

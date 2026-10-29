@@ -2,8 +2,9 @@ import { difficultyOptions } from "@/lib/domain-meta";
 import type { ProgressFilterValues } from "@/lib/progress-filters";
 import { buildProgressHref } from "@/lib/progress-filters";
 import { FilterActions, FilterBar, FilterField } from "@/components/sat/filter-bar";
-import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
+import { PeriodFilter } from "@/components/sat/period-filter";
+import type { PeriodValue } from "@/lib/period-filter";
 
 export interface ProgressFilterTopic {
   id: string;
@@ -39,16 +40,14 @@ export function ProgressFilters({
   action,
   filters,
   topics,
-  includeDates = true,
-  showEndDate = false,
+  period,
   preserve,
 }: {
   action: string;
   filters: ProgressFilterValues;
   topics: ProgressFilterTopic[];
-  includeDates?: boolean;
-  /** Show the "To" date (Admin → Settings → TIME_FILTER_END_DATE). Off: open-ended range. */
-  showEndDate?: boolean;
+  /** Date filter as a period (All time, Last week… Custom); omitted = no date filter. */
+  period?: PeriodValue;
   /** Extra query params kept when applying or clearing filters (e.g. the active page tab). */
   preserve?: Record<string, string | undefined>;
 }) {
@@ -56,7 +55,7 @@ export function ProgressFilters({
   const preserved = Object.entries(preserve ?? {}).filter((entry): entry is [string, string] => Boolean(entry[1]));
   const clearHref = buildProgressHref(action, { area: filters.area, studentId: filters.studentId });
   const clearQuery = new URLSearchParams(preserved).toString();
-  const active = [filters.topic, filters.difficulty, filters.from, showEndDate ? filters.to : undefined].filter(Boolean).length;
+  const active = [filters.topic, filters.difficulty, period && period.period !== "all" ? period.period : undefined].filter(Boolean).length;
 
   const clearTarget = clearQuery ? `${clearHref}${clearHref.includes("?") ? "&" : "?"}${clearQuery}` : clearHref;
 
@@ -81,18 +80,7 @@ export function ProgressFilters({
           </Select>
         </FilterField>
       )}
-      {includeDates && (
-        <>
-          <FilterField label="From" htmlFor="pf-from" className="@md:max-w-[11rem]">
-            <Input id="pf-from" name="from" type="date" defaultValue={filters.from ?? ""} title={showEndDate ? undefined : "Everything from this date until today."} />
-          </FilterField>
-          {showEndDate && (
-            <FilterField label="To" htmlFor="pf-to" className="@md:max-w-[11rem]">
-              <Input id="pf-to" name="to" type="date" defaultValue={filters.to ?? ""} />
-            </FilterField>
-          )}
-        </>
-      )}
+      {period ? <PeriodFilter value={period} /> : null}
       <FilterActions clearHref={active > 0 ? clearTarget : null} clearLabel={`Clear (${active})`} title="Blank answers count as wrong." />
     </FilterBar>
   );

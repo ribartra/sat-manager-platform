@@ -37,7 +37,7 @@ export function FilterBar({ label, action, className, children, ...props }: Filt
 /** One labelled control in a FilterBar (mockup `.field`): 12px muted label above, grows to fill. */
 export function FilterField({ label, htmlFor, className, children }: { label: string; htmlFor?: string; className?: string; children: React.ReactNode }) {
   return (
-    <div className={cn("flex min-w-[150px] flex-1 flex-col gap-1", className)}>
+    <div className={cn("flex min-w-[130px] flex-1 flex-col gap-1", className)}>
       <label htmlFor={htmlFor} className="text-xs font-medium text-[var(--sat-muted)]">{label}</label>
       {children}
     </div>
@@ -46,7 +46,7 @@ export function FilterField({ label, htmlFor, className, children }: { label: st
 
 /** Label class of a FilterField, for controls that render their own labels (TaxonomyPicker). */
 export const FILTER_LABEL_CLASS = "text-xs font-medium text-[var(--sat-muted)]";
-export const FILTER_FIELD_CLASS = "flex min-w-[150px] flex-1 flex-col gap-1";
+export const FILTER_FIELD_CLASS = "flex min-w-[130px] flex-1 flex-col gap-1";
 
 /** Apply (submit) and, when something is filtered, Clear — the end of every URL-driven FilterBar. */
 export function FilterActions({ clearHref, clearLabel = "Clear", title }: { clearHref?: string | null; clearLabel?: string; title?: string }) {

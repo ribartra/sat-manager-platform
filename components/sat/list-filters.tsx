@@ -1,5 +1,7 @@
 import { Search } from "lucide-react";
 import { FilterActions, FilterBar, FilterField } from "@/components/sat/filter-bar";
+import { PeriodFilter } from "@/components/sat/period-filter";
+import type { PeriodValue } from "@/lib/period-filter";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 
@@ -25,7 +27,7 @@ export function ListFilters({
   q,
   placeholder = "Search",
   filters = [],
-  dates = [],
+  period,
   hidden = {},
   qName = "q",
   children,
@@ -34,15 +36,15 @@ export function ListFilters({
   q?: string;
   placeholder?: string;
   filters?: ListFilterSelect[];
-  /** Date fields (e.g. From / To), sent as YYYY-MM-DD. */
-  dates?: { name: string; label: string; value?: string }[];
+  /** Date filter as a period (All time, Last week… Custom); read back with resolvePeriod. */
+  period?: PeriodValue;
   hidden?: Record<string, string | undefined>;
   /** Param name of the text search (default `q`). */
   qName?: string;
   /** Extra named controls inside the same form (e.g. a skill picker), placed before the selects. */
   children?: React.ReactNode;
 }) {
-  const active = Boolean(q) || filters.some((f) => f.value) || dates.some((d) => d.value);
+  const active = Boolean(q) || filters.some((f) => f.value) || Boolean(period && period.period !== "all");
   const keep = Object.entries(hidden).filter((entry): entry is [string, string] => Boolean(entry[1]));
   const clearHref = keep.length ? `${action}?${new URLSearchParams(keep).toString()}` : action;
   return (
@@ -63,11 +65,7 @@ export function ListFilters({
           </Select>
         </FilterField>
       ))}
-      {dates.map((d) => (
-        <FilterField key={d.name} label={d.label} htmlFor={`lf-${d.name}`} className="@md:max-w-[11rem]">
-          <Input id={`lf-${d.name}`} name={d.name} type="date" defaultValue={d.value ?? ""} />
-        </FilterField>
-      ))}
+      {period ? <PeriodFilter value={period} /> : null}
       <FilterActions clearHref={active ? clearHref : null} />
     </FilterBar>
   );

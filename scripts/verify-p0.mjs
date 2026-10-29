@@ -485,6 +485,18 @@ const checks = [
     requires: ["<FilterBar", "inFilterBar"],
     label: "Materiales: filtro en la barra comun",
   },
+  // Date filters are periods (All time, Last week / month / year, Custom → dialog with start and end).
+  {
+    file: "components/sat/period-filter.tsx",
+    requires: ["PERIODS", "Custom period", "Start date", "End date", "requestSubmit"],
+    label: "Filtro de fecha por periodo: All time, Last week/month/year y Custom con modal de fechas",
+  },
+  ...["app/(teacher)/teacher/history/page.tsx", "app/(student)/student/history/page.tsx"].map((file) => ({
+    file,
+    requires: ["resolvePeriod(", "periodParams("],
+    forbids: ['type="date"', 'label: "From"'],
+    label: `Historial filtra por periodo (sin campo From suelto): ${file}`,
+  })),
   // Account names "First Last" on every create / edit (lib/person-name.ts).
   ...[
     "app/api/students/invite/route.ts",

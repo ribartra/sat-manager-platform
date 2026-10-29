@@ -34,7 +34,10 @@ import {
   tabFromPracticeArea,
 } from "@/lib/practice-area";
 import { buildProgressHref, progressDateWhere, progressFilterEntries, progressFiltersFromParams } from "@/lib/progress-filters";
-import { applyTimeFilterSetting } from "@/lib/time-filters";
+import { periodDates, periodParams, resolvePeriod } from "@/lib/period-filter";
+import { FilterActions, FilterBar, FilterField } from "@/components/sat/filter-bar";
+import { PeriodFilter } from "@/components/sat/period-filter";
+import { Select } from "@/components/ui/select";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { AreaTag } from "@/components/sat/practice-set-row";
 import { loadStudentSessions, type StudentSession } from "@/lib/session-history";
@@ -44,6 +47,7 @@ interface PageProps {
     area?: string;
     topic?: string;
     difficulty?: string;
+    period?: string;
     from?: string;
     to?: string;
     page?: string;
@@ -71,11 +75,13 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
   const session = await auth();
   const userId = session!.user.id;
   const params = await searchParams;
-  const { filters, showEndDate } = await applyTimeFilterSetting(progressFiltersFromParams(params));
+  // Period (All time, Last week / month / year, Custom) → the from / to dates the queries use.
+  const period = resolvePeriod(params);
+  const filters = { ...progressFiltersFromParams(params), from: period.from, to: period.to };
   const area = filters.area;
   const practiceArea = practiceAreaFromTab(area);
   const dateFilter = progressDateWhere(filters);
-  const pageParams = Object.fromEntries(progressFilterEntries(filters));
+  const pageParams = { ...Object.fromEntries(progressFilterEntries({ ...filters, from: undefined, to: undefined })), ...periodParams(period) };
   const requestedPage = pageFromParam(params.page);
 
   const sessionsView = !params.area || params.area === "sessions";
@@ -89,7 +95,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
         href:
           t.key === "sessions"
             ? "/student/history?area=sessions"
-            : buildAreaHref("/student/history", t.key, { difficulty: filters.difficulty, from: filters.from, to: filters.to }),
+            : buildAreaHref("/student/history", t.key, { difficulty: filters.difficulty, ...periodParams(period) }),
       }))}
     />
   );
@@ -99,12 +105,12 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
     const source = params.source === "test" || params.source === "practice" ? params.source : "";
     const sarea = params.sarea === "math" || params.sarea === "reading" || params.sarea === "writing" ? params.sarea : "";
     const result = params.result === "ok" || params.result === "bad" || params.result === "blank" ? params.result : "";
-    const from = params.from && !Number.isNaN(new Date(`${params.from}T00:00:00`).getTime()) ? params.from : "";
+    const { from: fromDate, to: toDate } = periodDates(period);
     const areaMatch = (s: StudentSession) =>
       !sarea ||
       (sarea === "math" ? s.area === "MATH" || s.area === "math-test" : s.area === sarea.toUpperCase() || s.area === "rw");
     const listed = all
-      .filter((s) => (!source || s.source === source) && areaMatch(s) && (!from || s.at >= new Date(`${from}T00:00:00`)))
+      .filter((s) => (!source || s.source === source) && areaMatch(s) && (!fromDate || s.at >= fromDate) && (!toDate || s.at <= toDate))
       .map((s) => ({ s, rows: result ? s.rows.filter((r) => r.result === result) : s.rows }))
       .filter((x) => !result || x.rows.length > 0);
     const sessionPage = paginate(listed, requestedPage, HISTORY_PAGE_SIZE);
@@ -116,37 +122,34 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
         <Breadcrumbs items={[{ label: "Home", href: "/student" }, { label: "History", href: "/student/history" }, { label: "By session" }]} />
         <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">My history</h1>
         {historyTabs}
-        <form action="/student/history" className="flex flex-wrap items-end gap-2.5 rounded-[var(--sat-radius)] border border-[var(--sat-border)] bg-white p-3 text-sm">
+        <FilterBar action="/student/history">
           <input type="hidden" name="area" value="sessions" />
-          <label className="flex min-w-[150px] flex-1 flex-col gap-1 text-xs font-medium text-[var(--sat-muted)]">Source
-            <select name="source" defaultValue={source} className="rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]">
+          <FilterField label="Source" htmlFor="sh-source">
+            <Select id="sh-source" name="source" defaultValue={source}>
               <option value="">All sources</option>
               <option value="test">Test</option>
               <option value="practice">Practice</option>
-            </select>
-          </label>
-          <label className="flex min-w-[150px] flex-1 flex-col gap-1 text-xs font-medium text-[var(--sat-muted)]">Area
-            <select name="sarea" defaultValue={sarea} className="rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]">
+            </Select>
+          </FilterField>
+          <FilterField label="Area" htmlFor="sh-area">
+            <Select id="sh-area" name="sarea" defaultValue={sarea}>
               <option value="">All areas</option>
               <option value="math">Math</option>
               <option value="reading">Reading</option>
               <option value="writing">Writing</option>
-            </select>
-          </label>
-          <label className="flex min-w-[150px] flex-1 flex-col gap-1 text-xs font-medium text-[var(--sat-muted)]">Result
-            <select name="result" defaultValue={result} className="rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-2 text-sm text-[var(--sat-text)]">
+            </Select>
+          </FilterField>
+          <FilterField label="Result" htmlFor="sh-result">
+            <Select id="sh-result" name="result" defaultValue={result}>
               <option value="">All results</option>
               <option value="ok">Correct</option>
               <option value="bad">Incorrect</option>
               <option value="blank">Blank</option>
-            </select>
-          </label>
-          <label className="flex min-w-[150px] flex-1 flex-col gap-1 text-xs font-medium text-[var(--sat-muted)]">From
-            <input type="date" name="from" defaultValue={from} className="rounded-lg border border-[var(--sat-border-strong)] bg-white px-2.5 py-[7px] text-sm text-[var(--sat-text)]" />
-          </label>
-          <Button type="submit" size="sm" variant="secondary">Apply</Button>
-          {source || sarea || result || from ? <Link href="/student/history?area=sessions" className="pb-1.5 text-xs text-blue-600 hover:underline">Clear</Link> : null}
-        </form>
+            </Select>
+          </FilterField>
+          <PeriodFilter value={period} />
+          <FilterActions clearHref={source || sarea || result || period.period !== "all" ? "/student/history?area=sessions" : null} />
+        </FilterBar>
         <p className="text-xs text-gray-500">Each card is one session: a practice set or a test module. Click a session to see every question.</p>
         {sessionPage.items.length === 0 ? (
           <EmptyState title="No sessions match these filters." />
@@ -215,7 +218,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
         )}
         <Pagination
           basePath="/student/history"
-          params={{ area: "sessions", source, sarea, result, from }}
+          params={{ area: "sessions", source, sarea, result, ...periodParams(period) }}
           pageSize={HISTORY_PAGE_SIZE}
           {...sessionPage}
         />
@@ -249,7 +252,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
         <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">My history</h1>
         <p className="text-sm text-gray-500">Every Test attempt is saved, including tests you haven&apos;t finished. Open a test to see every try; click a try to see the results.</p>
         {historyTabs}
-        <ProgressFilters action="/student/history" filters={filters} topics={[]} showEndDate={showEndDate} />
+        <ProgressFilters action="/student/history" filters={filters} topics={[]} period={period} />
 
         <section>
           <SectionHeader

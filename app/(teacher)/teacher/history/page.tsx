@@ -31,11 +31,12 @@ import { loadAttemptHistory, type HistoryRow } from "@/lib/attempt-history";
 import { difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
 import { PRACTICE_AREA_TABS, type PracticeAreaCode } from "@/lib/practice-area";
 import { formatDate, formatDuration, relativeDay } from "@/lib/utils";
+import { periodDates, periodParams, resolvePeriod } from "@/lib/period-filter";
 
 export const dynamic = "force-dynamic";
 
 interface PageProps {
-  searchParams: Promise<{ student?: string; type?: string; area?: string; status?: string; from?: string; page?: string; q?: string }>;
+  searchParams: Promise<{ student?: string; type?: string; area?: string; status?: string; period?: string; from?: string; to?: string; page?: string; q?: string }>;
 }
 
 const PAGE_SIZE = 25;
@@ -59,19 +60,20 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
   // Choosing an area means practice (Tests have no area).
   const type = area ? "practice" : query.type === "tests" || query.type === "practice" ? query.type : "";
   const status = query.status === "completed" || query.status === "progress" ? query.status : "";
-  const from = query.from && !Number.isNaN(new Date(`${query.from}T00:00:00`).getTime()) ? query.from : "";
+  // Period: All time, Last week / month / year or Custom dates (older ?from= links count as Custom).
+  const period = resolvePeriod(query, now);
 
   const rows = await loadAttemptHistory(studentId ? [studentId] : students.map((s) => s.id), {
     kind: type === "tests" ? "test" : type === "practice" ? "practice" : undefined,
     area: area ?? undefined,
     status: status || undefined,
-    from: from ? new Date(`${from}T00:00:00`) : undefined,
+    ...periodDates(period),
   });
   // Text search: student name or practice set / Test name.
   const q = (query.q ?? "").trim();
   const shownRows = rows.filter((r) => matchesQuery(q, r.studentName, r.title));
   const page = paginate(shownRows, pageFromParam(query.page), PAGE_SIZE);
-  const params = { q, student: studentId, type, area: query.area && area ? query.area : "", status, from };
+  const params = { q, student: studentId, type, area: query.area && area ? query.area : "", status, ...periodParams(period) };
 
   return (
     <PageShell maxWidth={1180} width="wide">
@@ -91,7 +93,7 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
           { name: "area", label: "Practice area", value: area ? query.area : "", allLabel: "All areas", options: PRACTICE_AREA_TABS.map((t) => ({ value: t.key, label: t.label })) },
           { name: "status", label: "Status", value: status, allLabel: "Any", options: [{ value: "completed", label: "Completed" }, { value: "progress", label: "In progress" }] },
         ]}
-        dates={[{ name: "from", label: "From", value: from }]}
+        period={period}
       />
 
       <p className="mb-2 text-xs text-gray-500">{shownRows.length} attempt{shownRows.length === 1 ? "" : "s"}</p>
