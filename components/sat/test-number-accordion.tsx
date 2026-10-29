@@ -67,7 +67,7 @@ export function TestNumberAccordion({
             <div className={cn("space-y-4 border-t border-[var(--sat-border)] bg-[var(--sat-surface-2)]", compact ? "p-2.5" : "p-3")}>
               {group.versions.map((version) => (
                 <section key={version.key} className="space-y-1.5">
-                  <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">{version.sourceName}</h3>
+                  <h3 className="text-[13px] font-semibold text-gray-600">{version.sourceName}</h3>
                   {version.node}
                 </section>
               ))}

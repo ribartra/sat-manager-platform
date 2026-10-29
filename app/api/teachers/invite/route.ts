@@ -8,6 +8,7 @@ import { INVITE_DAYS, openInviteWhere } from "@/lib/consent";
 import { teacherProgramIds } from "@/lib/program-scope";
 import { formatDate } from "@/lib/utils";
 import { BadRequestError, ConflictError, withApiErrors } from "@/lib/api-error";
+import { formatPersonName } from "@/lib/person-name";
 
 /**
  * Master teacher invites a teacher (Teachers menu). Only accounts with User.canManageTeachers
@@ -17,7 +18,7 @@ import { BadRequestError, ConflictError, withApiErrors } from "@/lib/api-error";
 export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await assertTeacherManager();
   const body = (await req.json().catch(() => ({}))) as { name?: unknown; email?: unknown; programId?: unknown };
-  const name = String(body.name ?? "").trim();
+  const name = formatPersonName(String(body.name ?? ""));
   const email = String(body.email ?? "").trim().toLowerCase();
   if (!name || !email) throw new BadRequestError("Name and email are required.");
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new BadRequestError("Enter a valid email.");

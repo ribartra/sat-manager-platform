@@ -238,7 +238,7 @@ export function PracticeSetAttemptsAccordion(props: PracticeSetAccordionProps) {
                 .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name))
                 .map((source) => (
                   <section key={source.name} className="space-y-1.5">
-                    <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">{source.name}</h3>
+                    <h3 className="text-[13px] font-semibold text-gray-600">{source.name}</h3>
                     <PracticeSetRows {...props} sets={source.sets} />
                   </section>
                 ))}

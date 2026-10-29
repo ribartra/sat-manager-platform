@@ -14,6 +14,7 @@ import { CopyableTruncatedText } from "@/components/ui/copyable-truncated-text";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
+import { FilterBar, FilterField } from "@/components/sat/filter-bar";
 import { MathContent } from "@/components/math-content";
 import { FormattedTextField } from "@/components/formatted-text-field";
 import { PdfPageCropper, type CropTarget, type CropOcrResult } from "@/app/admin/import/ai/_components/pdf-page-cropper";
@@ -586,7 +587,7 @@ export function AiImportWorkflowClient({
             <DialogDescription>Retry OCR or review open incidents before promoting drafts.</DialogDescription>
           </DialogHeader>
           {selectedBatchId && <RetryFailedJobsButton batchId={selectedBatchId} pendingCount={counts.ocrPending} />}
-          <FilterBar query={incidentQuery} setQuery={setIncidentQuery} status={incidentStatus} setStatus={setIncidentStatus} statusOptions={["OPEN", "RESOLVED", "ALL"]} placeholder="Search incident, file or decision" />
+          <SearchStatusFilter query={incidentQuery} setQuery={setIncidentQuery} status={incidentStatus} setStatus={setIncidentStatus} statusOptions={["OPEN", "RESOLVED", "ALL"]} placeholder="Search incident, file or decision" />
           <IncidentList incidents={filteredIncidents} files={fileById} batchId={selectedBatchId} />
         </DialogContent>
       </Dialog>
@@ -610,7 +611,7 @@ export function AiImportWorkflowClient({
                       {selectedExtractedTest.title}
                     </p>
                   )}
-                  <FilterBar query={candidateQuery} setQuery={setCandidateQuery} status={candidateStatus} setStatus={setCandidateStatus} statusOptions={["ALL", "NEEDS_REVIEW", "READY", "REVIEWED", "REJECTED", "PROMOTED", "EDITING"]} placeholder="Search question, topic or file" />
+                  <SearchStatusFilter query={candidateQuery} setQuery={setCandidateQuery} status={candidateStatus} setStatus={setCandidateStatus} statusOptions={["ALL", "NEEDS_REVIEW", "READY", "REVIEWED", "REJECTED", "PROMOTED", "EDITING"]} placeholder="Search question, topic or file" />
                 </div>
                 <div className="max-h-[560px] divide-y divide-gray-100 overflow-auto">
                   {visibleCandidates.map((candidate) => (
@@ -695,7 +696,7 @@ export function AiImportWorkflowClient({
             </section>
             <section className="rounded-md border border-gray-200 p-3">
               <p className="mb-3 text-sm font-semibold text-gray-900">Incidents</p>
-              <FilterBar query={incidentQuery} setQuery={setIncidentQuery} status={incidentStatus} setStatus={setIncidentStatus} statusOptions={["OPEN", "RESOLVED", "ALL"]} placeholder="Search incident, file or decision" />
+              <SearchStatusFilter query={incidentQuery} setQuery={setIncidentQuery} status={incidentStatus} setStatus={setIncidentStatus} statusOptions={["OPEN", "RESOLVED", "ALL"]} placeholder="Search incident, file or decision" />
               <IncidentList incidents={filteredIncidents} files={fileById} batchId={selectedBatchId} />
             </section>
           </div>
@@ -914,7 +915,7 @@ function PromoteQuestionIdsButton({ batchId, candidateIds, label }: { batchId: s
   );
 }
 
-function FilterBar({
+function SearchStatusFilter({
   query,
   setQuery,
   status,
@@ -930,15 +931,19 @@ function FilterBar({
   placeholder: string;
 }) {
   return (
-    <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_160px]">
-      <label className="relative block">
-        <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-        <Input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={placeholder} className="pl-9" />
-      </label>
-      <select value={status} onChange={(event) => setStatus(event.target.value)} className="rounded-md border border-gray-300 px-3 py-2 text-sm">
-        {statusOptions.map((option) => <option key={option} value={option}>{option}</option>)}
-      </select>
-    </div>
+    <FilterBar className="mb-0 mt-3">
+      <FilterField label="Search" className="@md:flex-[2]">
+        <div className="relative">
+          <Search size={14} aria-hidden className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+          <Input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder={placeholder} aria-label="Search" className="pl-8" />
+        </div>
+      </FilterField>
+      <FilterField label="Status">
+        <Select value={status} onChange={(event) => setStatus(event.target.value)} aria-label="Status">
+          {statusOptions.map((option) => <option key={option} value={option}>{option}</option>)}
+        </Select>
+      </FilterField>
+    </FilterBar>
   );
 }
 
@@ -958,26 +963,32 @@ function FileFilters({
   setFileStatus: (value: string) => void;
 }) {
   return (
-    <div className="grid gap-2 md:grid-cols-[1fr_170px_140px]">
-      <label className="relative block">
-        <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-        <Input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search file, topic, path or test" className="pl-9" />
-      </label>
-      <select value={fileType} onChange={(event) => setFileType(event.target.value)} className="rounded-md border border-gray-300 px-3 py-2 text-sm">
-        <option value="ALL">All types</option>
-        <option value="PRACTICE_SET">Practice Sets</option>
-        <option value="FULL_PRACTICE_TEST">Full Tests</option>
-        <option value="PRACTICE_EXERCISE">Practice folders</option>
-        <option value="MOCK_EXAM">Mock exams</option>
-      </select>
-      <select value={fileStatus} onChange={(event) => setFileStatus(event.target.value)} className="rounded-md border border-gray-300 px-3 py-2 text-sm">
-        <option value="ALL">All status</option>
-        <option value="PENDING">PENDING</option>
-        <option value="PROCESSING">PROCESSING</option>
-        <option value="COMPLETED">COMPLETED</option>
-        <option value="FAILED">FAILED</option>
-      </select>
-    </div>
+    <FilterBar className="mb-0">
+      <FilterField label="Search" className="@md:flex-[2]">
+        <div className="relative">
+          <Search size={14} aria-hidden className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+          <Input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search file, topic, path or test" aria-label="Search" className="pl-8" />
+        </div>
+      </FilterField>
+      <FilterField label="Type">
+        <Select value={fileType} onChange={(event) => setFileType(event.target.value)} aria-label="Type">
+          <option value="ALL">All types</option>
+          <option value="PRACTICE_SET">Practice Sets</option>
+          <option value="FULL_PRACTICE_TEST">Full Tests</option>
+          <option value="PRACTICE_EXERCISE">Practice folders</option>
+          <option value="MOCK_EXAM">Mock exams</option>
+        </Select>
+      </FilterField>
+      <FilterField label="Status">
+        <Select value={fileStatus} onChange={(event) => setFileStatus(event.target.value)} aria-label="Status">
+          <option value="ALL">All status</option>
+          <option value="PENDING">PENDING</option>
+          <option value="PROCESSING">PROCESSING</option>
+          <option value="COMPLETED">COMPLETED</option>
+          <option value="FAILED">FAILED</option>
+        </Select>
+      </FilterField>
+    </FilterBar>
   );
 }
 

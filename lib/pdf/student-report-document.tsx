@@ -175,7 +175,7 @@ function Matrix({ title, hint, rowLabel, dimensions, dimensionLabel = (d) => d, 
           <View key={section.label ?? "rows"}>
             {section.label ? (
               <View style={[s.tr, { backgroundColor: "#ffffff" }]} wrap={false}>
-                <Text style={[s.td, { flex: 1, fontSize: 7, fontFamily: "Helvetica-Bold", color: GRAY[500], textTransform: "uppercase", letterSpacing: 0.5, paddingTop: 7, paddingBottom: 3 }]}>{section.label}</Text>
+                <Text style={[s.td, { flex: 1, fontSize: 7, fontFamily: "Helvetica-Bold", color: GRAY[500], paddingTop: 7, paddingBottom: 3 }]}>{section.label}</Text>
               </View>
             ) : null}
             {section.rows.map((label) => (

@@ -7,6 +7,7 @@ import { captureCaughtError, writeAudit } from "@/lib/audit";
 import { INVITE_DAYS, openInviteWhere, resolveIsMinor, resolveParentAccount, TERMS_VERSION } from "@/lib/consent";
 import { formatDate } from "@/lib/utils";
 import { BadRequestError, ConflictError, ForbiddenError, InternalServerError, NotFoundError, ValidationError, withApiErrors } from "@/lib/api-error";
+import { formatOptionalPersonName, formatPersonName } from "@/lib/person-name";
 
 export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
@@ -15,7 +16,9 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
   }
 
   try {
-    const { name, email: emailRaw, phone, startDate, birthDate: birthDateRaw, programId, parentName, parentEmail: parentEmailRaw, parentPhone } = await req.json();
+    const { name: nameRaw, email: emailRaw, phone, startDate, birthDate: birthDateRaw, programId, parentName: parentNameRaw, parentEmail: parentEmailRaw, parentPhone } = await req.json();
+    const name = formatPersonName(String(nameRaw ?? ""));
+    const parentName = formatOptionalPersonName(parentNameRaw);
     const email = String(emailRaw ?? "").trim().toLowerCase();
     const parentEmail = String(parentEmailRaw ?? "").trim().toLowerCase() || null;
     if (!name || !email || !programId) return new BadRequestError("Name, email, and program are required.").toResponse();

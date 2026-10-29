@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { PageShell } from "@/components/sat";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+import { FilterBar, FilterField } from "@/components/sat/filter-bar";
 import {
   filterExtractedTests,
   type ExtractedTestRow,
@@ -253,30 +255,25 @@ export function SetsIndexClient({ rows, batchId, batches }: SetsIndexClientProps
         ))}
       </div>
 
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="relative min-w-64 flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-          <Input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search Extracted Test, file, section, or test…"
-            className="pl-9"
-          />
-        </div>
-        <select
-          value={typeFilter}
-          onChange={(event) => setTypeFilter(event.target.value as SetTypeFilter)}
-          className="rounded-md border border-gray-300 px-3 py-2 text-sm"
-        >
-          <option value="ALL">All types</option>
-          <option value="PRACTICE_SET">Practice sets</option>
-          <option value="FULL_PRACTICE_TEST">Full practice tests</option>
-        </select>
-        <label className="flex items-center gap-2 text-sm text-gray-700">
+      <FilterBar className="mb-0">
+        <FilterField label="Search" htmlFor="sets-q" className="@md:flex-[2]">
+          <div className="relative">
+            <Search size={14} aria-hidden className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Input id="sets-q" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search Extracted Test, file, section, or test…" className="pl-8" />
+          </div>
+        </FilterField>
+        <FilterField label="Type" htmlFor="sets-type">
+          <Select id="sets-type" value={typeFilter} onChange={(event) => setTypeFilter(event.target.value as SetTypeFilter)}>
+            <option value="ALL">All types</option>
+            <option value="PRACTICE_SET">Practice sets</option>
+            <option value="FULL_PRACTICE_TEST">Full practice tests</option>
+          </Select>
+        </FilterField>
+        <label className="flex h-[38px] items-center gap-2 text-sm text-gray-700">
           <Checkbox checked={onlyPending} onChange={(event) => setOnlyPending(event.target.checked)} className="h-4 w-4 rounded border-gray-300" />
           Only with pending items
         </label>
-      </div>
+      </FilterBar>
 
       <div className="space-y-3">
         {filtered.map((row) => {

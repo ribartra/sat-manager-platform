@@ -67,7 +67,7 @@ export function PerformanceBreakdown({
                 {sections.map((section) => [
                   section.label ? (
                     <tr key={`group-${section.label}`}>
-                      <td colSpan={dimensions.length + 1} className="border-b border-gray-200 bg-white px-3 pb-1 pt-3 text-[11px] font-semibold uppercase tracking-wide text-gray-500">
+                      <td colSpan={dimensions.length + 1} className="border-b border-gray-200 bg-white px-3 pb-1 pt-3 text-xs font-semibold text-gray-600">
                         {section.label}
                       </td>
                     </tr>

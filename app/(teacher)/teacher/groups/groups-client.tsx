@@ -5,10 +5,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { FilterBar, FilterField } from "@/components/sat/filter-bar";
 import { Select } from "@/components/ui/select";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { StudentPicker } from "@/components/student-picker";
-import { Plus, UserMinus } from "lucide-react";
+import { Plus, Search, UserMinus } from "lucide-react";
 import { useConfirm } from "@/components/sat/confirm-dialog";
 import { apiFetch } from "@/lib/api-client";
 import { notify } from "@/lib/notify-ui";
@@ -135,26 +136,24 @@ export function GroupsClient({ groups: initialGroups, students }: { groups: Grou
         </CardBody>
       </Card>
 
-      <div className="flex flex-wrap gap-3">
-        <Input
-          value={groupSearch}
-          onChange={(event) => setGroupSearch(event.target.value)}
-          placeholder="Search group or member..."
-          aria-label="Search groups"
-          className="max-w-sm"
-        />
-        <Select value={groupSizeFilter} onChange={(event) => setGroupSizeFilter(event.target.value as "" | "members" | "empty")} aria-label="Filter groups" className="w-auto">
-          <option value="">All groups</option>
-          <option value="members">With students</option>
-          <option value="empty">Empty</option>
-        </Select>
-        <Input
-          value={studentSearch}
-          onChange={(event) => setStudentSearch(event.target.value)}
-          placeholder="Search student to add..."
-          className="max-w-sm"
-        />
-      </div>
+      <FilterBar className="mb-0">
+        <FilterField label="Search" htmlFor="groups-q" className="@md:flex-[2]">
+          <div className="relative">
+            <Search size={14} aria-hidden className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Input id="groups-q" type="search" value={groupSearch} onChange={(event) => setGroupSearch(event.target.value)} placeholder="Search group or member..." className="pl-8" />
+          </div>
+        </FilterField>
+        <FilterField label="Groups" htmlFor="groups-size">
+          <Select id="groups-size" value={groupSizeFilter} onChange={(event) => setGroupSizeFilter(event.target.value as "" | "members" | "empty")}>
+            <option value="">All groups</option>
+            <option value="members">With students</option>
+            <option value="empty">Empty</option>
+          </Select>
+        </FilterField>
+        <FilterField label="Student to add" htmlFor="groups-student">
+          <Input id="groups-student" type="search" value={studentSearch} onChange={(event) => setStudentSearch(event.target.value)} placeholder="Search student to add..." />
+        </FilterField>
+      </FilterBar>
 
       {visibleGroups.map((group) => {
         const excludeIds = group.members.map((m) => m.id);

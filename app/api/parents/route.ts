@@ -3,6 +3,7 @@ import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { studentAccessWhereFor } from "@/lib/program-scope";
 import { BadRequestError, ConflictError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
+import { formatPersonName } from "@/lib/person-name";
 
 async function allowedStudentIdsFor(sessionUser: { id: string; role: string }, studentIds: string[]) {
   if (studentIds.length === 0) return new Set<string>();
@@ -29,7 +30,8 @@ async function parentVisibleFor(sessionUser: { id: string; role: string }, paren
 export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
   if (!session) return new ForbiddenError("Forbidden").toResponse();
-  const { name, email, phone, studentIds } = await req.json();
+  const { name: nameRaw, email, phone, studentIds } = await req.json();
+  const name = formatPersonName(String(nameRaw ?? ""));
   if (!name || !email) {
     return new BadRequestError("Name and email are required.").toResponse();
   }
@@ -93,7 +95,8 @@ export const PATCH = withApiErrors(async function PATCH(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
   if (!session) return new ForbiddenError("Forbidden").toResponse();
 
-  const { action, parentId, studentId, studentIds, name, email, phone } = await req.json();
+  const { action, parentId, studentId, studentIds, name: nameRaw, email, phone } = await req.json();
+  const name = nameRaw === undefined ? undefined : formatPersonName(String(nameRaw));
   const parent = await prisma.user.findFirst({ where: { id: parentId, role: "PARENT" } });
   if (!parent) return new NotFoundError("Parent not found.").toResponse();
   if (!(await parentVisibleFor(session.user, parent.id))) {

@@ -7,6 +7,7 @@ import { hashPublicToken, newPublicToken } from "@/lib/token-security";
 import { absoluteAppUrl, sendParentAccessEmail } from "@/lib/email";
 import { writeAudit } from "@/lib/audit";
 import { BadRequestError, ConflictError, NotFoundError, withApiErrors } from "@/lib/api-error";
+import { formatOptionalPersonName } from "@/lib/person-name";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const ACCESS_LINK_DAYS = 7;
@@ -25,7 +26,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
 
   const body = await req.json().catch(() => ({}));
   const parentEmail = String(body?.parentEmail ?? "").trim().toLowerCase();
-  const parentName = String(body?.parentName ?? "").trim() || null;
+  const parentName = formatOptionalPersonName(String(body?.parentName ?? ""));
   if (!EMAIL_RE.test(parentEmail)) throw new BadRequestError("Enter the parent's email address.");
   if (parentEmail === student.email.toLowerCase()) {
     throw new BadRequestError("Use the parent's own email, not the student's.");

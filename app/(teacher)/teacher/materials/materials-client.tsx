@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, ExternalLink } from "lucide-react";
+import { Plus, ExternalLink, Search } from "lucide-react";
+import { FilterBar, FilterField } from "@/components/sat/filter-bar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -70,7 +71,7 @@ function SkillLine({ topic }: { topic: MaterialRow["topic"] }) {
   if (!topic) return <span className="text-xs text-gray-400">General</span>;
   return (
     <div>
-      <p className="text-[11px] uppercase tracking-wide text-gray-400">{topic.sectionLabel} · {topic.domainName}</p>
+      <p className="text-[11px] text-gray-400">{topic.sectionLabel} · {topic.domainName}</p>
       <p className="text-sm font-medium text-gray-700">{topic.name}</p>
     </div>
   );
@@ -216,26 +217,18 @@ export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; 
         ))}
       </div>
 
-      <div role="search" className="@container mb-3.5 space-y-2 rounded-[var(--sat-radius)] border border-[var(--sat-border)] bg-white p-3 flex flex-wrap items-end gap-3 space-y-0">
-        <div className="min-w-[220px]">
-          <label htmlFor="materials-search" className="mb-1 block text-sm font-medium text-gray-700">Search</label>
-          <Input id="materials-search" type="search" value={searchFilter} onChange={(e) => setSearchFilter(e.target.value)} placeholder="Title or description" className="text-sm" />
-        </div>
-        {activeTab !== "general" && (
-          <div className="min-w-[280px] flex-1">
-            <TaxonomyPicker
-              key={activeTab}
-              topics={sectionTopics}
-              value={skillFilter}
-              onChange={setSkillFilter}
-              allowAll
-              fixedSection={sectionLabel}
-            />
+      <FilterBar>
+        <FilterField label="Search" htmlFor="materials-search">
+          <div className="relative">
+            <Search size={14} aria-hidden className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Input id="materials-search" type="search" value={searchFilter} onChange={(e) => setSearchFilter(e.target.value)} placeholder="Title or description" className="pl-8" />
           </div>
+        </FilterField>
+        {activeTab !== "general" && (
+          <TaxonomyPicker key={activeTab} topics={sectionTopics} value={skillFilter} onChange={setSkillFilter} allowAll fixedSection={sectionLabel} inFilterBar />
         )}
-        <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">Status</label>
-          <Select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="text-sm">
+        <FilterField label="Status" htmlFor="materials-status">
+          <Select id="materials-status" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
             <option value="">All statuses</option>
             {contentStatusOptions().map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -243,8 +236,8 @@ export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; 
               </option>
             ))}
           </Select>
-        </div>
-      </div>
+        </FilterField>
+      </FilterBar>
 
       {visibleMaterials.length === 0 ? (
         <Card padding="lg" className="py-16 text-center text-gray-400">

@@ -4,7 +4,7 @@ export { LoadingState } from "./loading-state";
 export { ErrorState } from "./error-state";
 export { OfflineBanner, SaveIndicator, type SaveStatus } from "./save-indicator";
 export { DataTable, type DataTableResponsiveStrategy, type DataTableColumnMeta } from "./data-table";
-export { FilterBar, FilterField } from "./filter-bar";
+export { FilterActions, FilterBar, FilterField } from "./filter-bar";
 export { FormSection } from "./form-section";
 export { PracticeAreaTabs } from "./practice-area-tabs";
 export { AttemptStatusBadge, INVALIDATED, InvalidatedNotice, VoidableValue, invalidatedRowClass, isInvalidated } from "./attempt-status";

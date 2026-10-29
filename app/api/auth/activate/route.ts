@@ -7,6 +7,7 @@ import { captureCaughtError, writeAudit } from "@/lib/audit";
 import { inviteUnusableReason, resolveParentAccount, TERMS_VERSION } from "@/lib/consent";
 import { passwordPolicyError } from "@/lib/password-policy";
 import { BadRequestError, ConflictError, InternalServerError, ValidationError, withApiErrors } from "@/lib/api-error";
+import { formatOptionalPersonName, formatPersonName } from "@/lib/person-name";
 
 export const POST = withApiErrors(async function POST(req: NextRequest) {
   const { token, password, acceptTerms } = await req.json();
@@ -63,7 +64,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
       await prisma.$transaction(async (tx) => {
         const parent = await tx.user.create({
           data: {
-            name: invite.name,
+            name: formatPersonName(invite.name),
             email: invite.email,
             phone: invite.phone ?? null,
             passwordHash: hash,
@@ -125,7 +126,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
       await prisma.$transaction(async (tx) => {
         const teacher = await tx.user.create({
           data: {
-            name: invite.name,
+            name: formatPersonName(invite.name),
             email: invite.email,
             passwordHash: hash,
             role: "TEACHER",
@@ -177,7 +178,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
     await prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
         data: {
-          name: invite.name,
+          name: formatPersonName(invite.name),
           email: invite.email,
           phone: invite.phone ?? null,
           startDate: invite.startDate ?? null,
@@ -221,7 +222,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
               : (
                   await tx.user.create({
                     data: {
-                      name: invite.parentName ?? invite.parentEmail,
+                      name: formatOptionalPersonName(invite.parentName) ?? invite.parentEmail,
                       email: invite.parentEmail,
                       phone: invite.parentPhone ?? null,
                       role: "PARENT",

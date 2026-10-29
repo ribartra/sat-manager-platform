@@ -9,6 +9,8 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { FilterBar, FilterField } from "@/components/sat/filter-bar";
+import { Search } from "lucide-react";
 import { Select } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { enrollmentStatusLabel } from "@/lib/domain-meta";
@@ -557,19 +559,21 @@ export function AdminProgramsClient({
 
   return (
     <div>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <Input
-          value={programSearch}
-          onChange={(event) => setProgramSearch(event.target.value)}
-          placeholder="Search program, teacher or student..."
-          className="max-w-sm"
-        />
-        {!showCreate && (
+      {!showCreate && (
+        <div className="mb-3 flex justify-end">
           <Button size="sm" onClick={() => setShowCreate(true)}>
             + New Program
           </Button>
-        )}
-      </div>
+        </div>
+      )}
+      <FilterBar>
+        <FilterField label="Search" htmlFor="programs-q">
+          <div className="relative">
+            <Search size={14} aria-hidden className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Input id="programs-q" type="search" value={programSearch} onChange={(event) => setProgramSearch(event.target.value)} placeholder="Search program, teacher or student..." className="pl-8" />
+          </div>
+        </FilterField>
+      </FilterBar>
 
       {showCreate && (
         <CreateProgramForm teachers={teachers} onDone={() => setShowCreate(false)} />

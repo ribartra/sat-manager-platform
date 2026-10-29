@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { FilterBar, FilterField } from "@/components/sat/filter-bar";
 import { Select } from "@/components/ui/select";
 import {
   Dialog,
@@ -16,7 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Edit, FileDown, Link2, Plus } from "lucide-react";
+import { Edit, FileDown, Link2, Plus, Search } from "lucide-react";
 import { StudentPicker } from "@/components/student-picker";
 import { errorMessage, readApiError } from "@/lib/api-client";
 
@@ -194,24 +195,25 @@ export function ParentsClient({
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-gray-500">{parents.length} parent{parents.length === 1 ? "" : "s"} registered</p>
-        <div className="flex flex-wrap items-center gap-2">
-          <Input
-            value={parentSearch}
-            onChange={(event) => setParentSearch(event.target.value)}
-            placeholder="Search parent or student..."
-            aria-label="Search parents"
-            className="w-64 text-sm"
-          />
-          <Select value={parentLinkFilter} onChange={(event) => setParentLinkFilter(event.target.value as "" | "linked" | "unlinked")} aria-label="Filter parents" className="w-auto text-sm">
+        <Button type="button" onClick={() => openAdd()} className="flex items-center gap-1.5">
+          <Plus size={14} /> Add Parent
+        </Button>
+      </div>
+      <FilterBar className="mb-0">
+        <FilterField label="Search" htmlFor="parents-q" className="@md:flex-[2]">
+          <div className="relative">
+            <Search size={14} aria-hidden className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Input id="parents-q" type="search" value={parentSearch} onChange={(event) => setParentSearch(event.target.value)} placeholder="Search parent or student..." className="pl-8" />
+          </div>
+        </FilterField>
+        <FilterField label="Parents" htmlFor="parents-link">
+          <Select id="parents-link" value={parentLinkFilter} onChange={(event) => setParentLinkFilter(event.target.value as "" | "linked" | "unlinked")}>
             <option value="">All parents</option>
             <option value="linked">With students</option>
             <option value="unlinked">Without students</option>
           </Select>
-          <Button type="button" onClick={() => openAdd()} className="flex items-center gap-1.5">
-            <Plus size={14} /> Add Parent
-          </Button>
-        </div>
-      </div>
+        </FilterField>
+      </FilterBar>
 
       {studentsWithoutParent.length > 0 ? (
         <Card variant="warning" padding="md">

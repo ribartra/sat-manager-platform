@@ -21,7 +21,7 @@ import {
 import type { Crumb } from "@/components/sat/breadcrumbs";
 import { practiceSetGroups, setsFromStudentPractice, testGroups as groupTests } from "@/lib/attempt-groups";
 import { ListItem, ListStack } from "@/components/sat/list";
-import { FilterBar, FilterField } from "@/components/sat/filter-bar";
+import { FilterActions, FilterBar, FilterField } from "@/components/sat/filter-bar";
 import { Select } from "@/components/ui/select";
 import { PctBars, PracticeSetRow } from "@/components/sat/practice-set-row";
 import { Pct } from "@/components/sat/work-status";
@@ -350,10 +350,7 @@ async function AreaPracticeView({
               {STATUS_FILTERS.map((f) => <option key={f.key} value={f.key}>{f.label}</option>)}
             </Select>
           </FilterField>
-          <div className="flex items-center gap-2">
-            <Button type="submit" variant="secondary">Apply</Button>
-            {anyFilter ? <Button asChild variant="ghost"><Link href={`${links.home}?area=${tab}#sets`}>Clear</Link></Button> : null}
-          </div>
+          <FilterActions clearHref={anyFilter ? `${links.home}?area=${tab}#sets` : null} />
         </FilterBar>
         {filtered.length === 0 ? (
           <EmptyState title="No practice sets match these filters." />

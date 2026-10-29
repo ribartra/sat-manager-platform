@@ -7,6 +7,7 @@ import { passwordPolicyError } from "@/lib/password-policy";
 import { captureCaughtError, writeAudit } from "@/lib/audit";
 import { ApiError, BadRequestError, ConflictError, InternalServerError, withApiErrors } from "@/lib/api-error";
 import { PARENT_CONSENT_VERSION, resolveParentAccount } from "@/lib/consent";
+import { formatOptionalPersonName } from "@/lib/person-name";
 
 async function findInviteByParentConsentToken(token: string) {
   const parentConsentTokenHash = hashPublicToken(token);
@@ -148,7 +149,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
           ? await tx.user.findUniqueOrThrow({ where: { id: current.id } })
           : await tx.user.create({
               data: {
-                name: invite.parentName ?? parentEmail,
+                name: formatOptionalPersonName(invite.parentName) ?? parentEmail,
                 email: parentEmail,
                 phone: invite.parentPhone ?? null,
                 role: "PARENT",

@@ -62,7 +62,7 @@ export function SkillsMap({ domains }: { domains: { id: string; name: string; sk
       {domains.map((d) => (
         <Card key={d.id} padding="md">
           <div className="mb-2 flex items-baseline justify-between">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">{d.name}</h3>
+            <h3 className="text-[13px] font-semibold text-gray-600">{d.name}</h3>
             <span className="text-xs text-gray-400">{d.skills.length} skill{d.skills.length === 1 ? "" : "s"}</span>
           </div>
           <div className="divide-y divide-gray-100">
@@ -128,7 +128,7 @@ export function SkillsSourceMap({
       {domains.map((d) => (
         <Card key={d.id} padding="md">
           <div className="mb-2 flex items-baseline justify-between">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">{d.name}</h3>
+            <h3 className="text-[13px] font-semibold text-gray-600">{d.name}</h3>
             <span className="text-xs text-gray-400">{d.skills.length} skill{d.skills.length === 1 ? "" : "s"}</span>
           </div>
           <div className="divide-y divide-gray-100">

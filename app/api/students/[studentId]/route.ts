@@ -3,6 +3,7 @@ import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { studentAccessWhereFor } from "@/lib/program-scope";
 import { ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
+import { formatPersonName } from "@/lib/person-name";
 
 interface RouteContext {
   params: Promise<{ studentId: string }>;
@@ -15,7 +16,8 @@ export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }
   }
 
   const { studentId } = await params;
-  const { name, email, phone, startDate, active } = await req.json();
+  const { name: nameRaw, email, phone, startDate, active } = await req.json();
+  const name = nameRaw === undefined ? undefined : formatPersonName(String(nameRaw));
 
   const student = await prisma.user.findFirst({
     where: { id: studentId, ...studentAccessWhereFor(session.user) },

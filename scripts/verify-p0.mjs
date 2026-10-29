@@ -463,6 +463,45 @@ const checks = [
     requires: ["export function SkillsSourceMap", "<details", "<summary", "<SkillChip key={chip.difficulty} chip={chip}"],
     label: "SkillsSourceMap: tarjeta por Domain, cada skill se abre (details) con sus fuentes",
   },
+  // One filter bar (FilterBar) everywhere: same control height, same label and Apply / Clear.
+  {
+    file: "components/sat/filter-bar.tsx",
+    requires: ["export function FilterBar", "export function FilterActions", "h-[38px]"],
+    label: "Barra de filtros unica: misma altura de controles en todas las vistas",
+  },
+  {
+    file: "components/progress-filters.tsx",
+    requires: ["<FilterBar", "<FilterActions"],
+    forbids: ["fieldClass"],
+    label: "Filtros de progreso usan la barra comun",
+  },
+  {
+    file: "app/(teacher)/teacher/questions/questions-filter-client.tsx",
+    requires: ["<FilterBar", "inFilterBar"],
+    label: "Banco de preguntas: filtro en la barra comun (skill en la misma fila)",
+  },
+  {
+    file: "app/(teacher)/teacher/materials/materials-client.tsx",
+    requires: ["<FilterBar", "inFilterBar"],
+    label: "Materiales: filtro en la barra comun",
+  },
+  // Account names "First Last" on every create / edit (lib/person-name.ts).
+  ...[
+    "app/api/students/invite/route.ts",
+    "app/api/teachers/invite/route.ts",
+    "app/api/students/[studentId]/route.ts",
+    "app/api/students/[studentId]/parent/route.ts",
+    "app/api/parents/route.ts",
+    "app/api/auth/activate/route.ts",
+    "app/api/auth/parent-consent/route.ts",
+  ].map((file) => ({ file, requires: ["PersonName("], label: `Nombres de cuenta normalizados (Nombre Apellido): ${file}` })),
+  // Skill / domain / source names are shown as written, never forced to capitals.
+  ...["components/sat/skills-map.tsx", "components/sat/attempts-table.tsx", "components/sat/test-number-accordion.tsx"].map((file) => ({
+    file,
+    requires: [],
+    forbids: ["uppercase"],
+    label: `Nombres de skill/domain/fuente sin mayusculas forzadas: ${file}`,
+  })),
   {
     file: "components/sat/skill-results.tsx",
     requires: ["SkillsSourceMap", "Weakest skill", "skills by difficulty", "across all sources"],

@@ -106,6 +106,8 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
       </p>
 
       <QuestionsFilter
+        // Remount on a new URL (Clear / tab) so the fields show the applied filters.
+        key={[area, filters.topic, filters.difficulty, filters.status, q].join("|")}
         area={area}
         initialQuery={q}
         sectionLabel={sectionLabel}

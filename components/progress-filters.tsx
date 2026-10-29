@@ -1,7 +1,9 @@
 import { difficultyOptions } from "@/lib/domain-meta";
 import type { ProgressFilterValues } from "@/lib/progress-filters";
 import { buildProgressHref } from "@/lib/progress-filters";
-import Link from "next/link";
+import { FilterActions, FilterBar, FilterField } from "@/components/sat/filter-bar";
+import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
 
 export interface ProgressFilterTopic {
   id: string;
@@ -54,67 +56,45 @@ export function ProgressFilters({
   const preserved = Object.entries(preserve ?? {}).filter((entry): entry is [string, string] => Boolean(entry[1]));
   const clearHref = buildProgressHref(action, { area: filters.area, studentId: filters.studentId });
   const clearQuery = new URLSearchParams(preserved).toString();
-  const fieldClass = "mt-1 w-full rounded-md border border-gray-300 bg-white px-2 py-1.5 text-sm text-gray-900";
   const active = [filters.topic, filters.difficulty, filters.from, showEndDate ? filters.to : undefined].filter(Boolean).length;
 
+  const clearTarget = clearQuery ? `${clearHref}${clearHref.includes("?") ? "&" : "?"}${clearQuery}` : clearHref;
+
   return (
-    <form action={action} method="get" className="rounded-lg border border-gray-200 bg-white px-3 py-2.5 shadow-sm">
+    <FilterBar action={action}>
       <input type="hidden" name="area" value={filters.area} />
       {filters.studentId ? <input type="hidden" name="studentId" value={filters.studentId} /> : null}
       {preserved.map(([name, value]) => <input key={name} type="hidden" name={name} value={value} />)}
-      <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
-        {!isMocks && (
-          <label className="min-w-[14rem] flex-[2] text-xs font-medium text-gray-600">
-            Skill
-            <select name="topic" defaultValue={filters.topic ?? ""} className={fieldClass}>
-              <option value="">All skills</option>
-              <SkillOptions topics={topics} />
-            </select>
-          </label>
-        )}
-        {!isMocks && (
-          <label className="min-w-[8rem] flex-1 text-xs font-medium text-gray-600">
-            Difficulty
-            <select name="difficulty" defaultValue={filters.difficulty ?? ""} className={fieldClass}>
-              <option value="">All levels</option>
-              {difficultyOptions().map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-            </select>
-          </label>
-        )}
-        {includeDates && (
-          <>
-            <label className="min-w-[9rem] flex-1 text-xs font-medium text-gray-600" title={showEndDate ? undefined : "Everything from this date until today."}>
-              From
-              <input name="from" type="date" defaultValue={filters.from ?? ""} className={fieldClass} />
-            </label>
-            {showEndDate && (
-              <label className="min-w-[9rem] flex-1 text-xs font-medium text-gray-600">
-                To
-                <input name="to" type="date" defaultValue={filters.to ?? ""} className={fieldClass} />
-              </label>
-            )}
-          </>
-        )}
-        <div className="flex items-center gap-2">
-          <button
-            type="submit"
-            title="Blank answers count as wrong."
-            className="shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-3 py-1.5 text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]"
-          >
-            Apply
-          </button>
-          {active > 0 && (
-            <Link
-              href={clearQuery ? `${clearHref}${clearHref.includes("?") ? "&" : "?"}${clearQuery}` : clearHref}
-              title="Remove skill, difficulty and date filters"
-              className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >
-              Clear ({active})
-            </Link>
+      {!isMocks && (
+        <FilterField label="Skill" htmlFor="pf-topic" className="@md:flex-[2]">
+          <Select id="pf-topic" name="topic" defaultValue={filters.topic ?? ""}>
+            <option value="">All skills</option>
+            <SkillOptions topics={topics} />
+          </Select>
+        </FilterField>
+      )}
+      {!isMocks && (
+        <FilterField label="Difficulty" htmlFor="pf-difficulty">
+          <Select id="pf-difficulty" name="difficulty" defaultValue={filters.difficulty ?? ""}>
+            <option value="">All levels</option>
+            {difficultyOptions().map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+          </Select>
+        </FilterField>
+      )}
+      {includeDates && (
+        <>
+          <FilterField label="From" htmlFor="pf-from" className="@md:max-w-[11rem]">
+            <Input id="pf-from" name="from" type="date" defaultValue={filters.from ?? ""} title={showEndDate ? undefined : "Everything from this date until today."} />
+          </FilterField>
+          {showEndDate && (
+            <FilterField label="To" htmlFor="pf-to" className="@md:max-w-[11rem]">
+              <Input id="pf-to" name="to" type="date" defaultValue={filters.to ?? ""} />
+            </FilterField>
           )}
-        </div>
-      </div>
-    </form>
+        </>
+      )}
+      <FilterActions clearHref={active > 0 ? clearTarget : null} clearLabel={`Clear (${active})`} title="Blank answers count as wrong." />
+    </FilterBar>
   );
 }
 

@@ -1,7 +1,5 @@
-import Link from "next/link";
 import { Search } from "lucide-react";
-import { FilterBar, FilterField } from "@/components/sat/filter-bar";
-import { Button } from "@/components/ui/button";
+import { FilterActions, FilterBar, FilterField } from "@/components/sat/filter-bar";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 
@@ -48,7 +46,7 @@ export function ListFilters({
   const keep = Object.entries(hidden).filter((entry): entry is [string, string] => Boolean(entry[1]));
   const clearHref = keep.length ? `${action}?${new URLSearchParams(keep).toString()}` : action;
   return (
-    <FilterBar action={action} role="search">
+    <FilterBar action={action}>
       {keep.map(([name, value]) => <input key={name} type="hidden" name={name} value={value} />)}
       <FilterField label="Search" htmlFor={`lf-${qName}`} className="@md:flex-[2]">
         <div className="relative">
@@ -70,14 +68,7 @@ export function ListFilters({
           <Input id={`lf-${d.name}`} name={d.name} type="date" defaultValue={d.value ?? ""} />
         </FilterField>
       ))}
-      <div className="flex items-center gap-2">
-        <Button type="submit" variant="secondary">Apply</Button>
-        {active ? (
-          <Button asChild variant="ghost">
-            <Link href={clearHref}>Clear</Link>
-          </Button>
-        ) : null}
-      </div>
+      <FilterActions clearHref={active ? clearHref : null} />
     </FilterBar>
   );
 }

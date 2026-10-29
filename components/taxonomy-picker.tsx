@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Select } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { FILTER_FIELD_CLASS, FILTER_LABEL_CLASS } from "@/components/sat/filter-bar";
 
 export interface TaxonomyPickerTopic {
   id: string;
@@ -33,6 +34,7 @@ export function TaxonomyPicker({
   allowAll = false,
   fixedSection,
   stacked = false,
+  inFilterBar = false,
   className,
 }: {
   topics: TaxonomyPickerTopic[];
@@ -43,6 +45,8 @@ export function TaxonomyPicker({
   fixedSection?: string;
   /** Stack the selects vertically (for narrow columns) instead of side by side. */
   stacked?: boolean;
+  /** Inside a FilterBar: each select is one more field of the bar's row (same label and height). */
+  inFilterBar?: boolean;
   className?: string;
 }) {
   const selected = topics.find((t) => t.id === value);
@@ -65,12 +69,13 @@ export function TaxonomyPicker({
     [topics, section, domainState]
   );
 
-  const labelCls = "block text-sm font-medium text-gray-700 mb-1";
+  const labelCls = inFilterBar ? FILTER_LABEL_CLASS : "block text-sm font-medium text-gray-700 mb-1";
+  const fieldCls = inFilterBar ? FILTER_FIELD_CLASS : undefined;
 
   return (
-    <div className={cn("grid gap-3", stacked ? "grid-cols-1" : fixedSection ? "grid-cols-2" : "grid-cols-3", className)}>
+    <div className={cn(inFilterBar ? "contents" : ["grid gap-3", stacked ? "grid-cols-1" : fixedSection ? "grid-cols-2" : "grid-cols-3"], className)}>
       {!fixedSection && (
-        <div>
+        <div className={fieldCls}>
           <label className={labelCls}>Section{req ? " *" : ""}</label>
           <Select
             value={sectionState}
@@ -88,7 +93,7 @@ export function TaxonomyPicker({
           </Select>
         </div>
       )}
-      <div>
+      <div className={fieldCls}>
         <label className={labelCls}>Domain{req ? " *" : ""}</label>
         <Select
           value={domainState}
@@ -105,7 +110,7 @@ export function TaxonomyPicker({
           ))}
         </Select>
       </div>
-      <div>
+      <div className={fieldCls}>
         <label className={labelCls}>Skill{req ? " *" : ""}</label>
         <Select
           value={value}

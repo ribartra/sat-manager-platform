@@ -339,7 +339,7 @@ export function FullTestEditor({
                         indexLabel={<span className="text-xs font-medium text-gray-400">Q{qIndex + 1}</span>}
                         meta={
                           <>
-                            <span className="text-[10px] font-medium uppercase text-gray-400">
+                            <span className="text-[11px] font-medium text-gray-400">
                               {question.section === "MATH" ? "Math" : question.section === "RW" || question.section === "READING_WRITING" ? "Reading & Writing" : humanizeCode(question.section)} · {difficultyLabel(question.difficulty)}
                               {question.type ? ` · ${questionTypeLabel(question.type, true)}` : ""}
                             </span>
