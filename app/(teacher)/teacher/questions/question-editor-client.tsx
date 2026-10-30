@@ -124,10 +124,13 @@ export function QuestionEditor({
   initial,
   sourceContext,
   showGraphOption = false,
+  returnHref = "/teacher/questions",
 }: {
   topics: TopicInfo[];
   initial?: QuestionData;
   sourceContext?: SourceContext;
+  /** Where Save goes back to: the Question Bank on the question's area. */
+  returnHref?: string;
   /** Admin feature flag: QUESTION_GRAPH_VISUALIZATION */
   showGraphOption?: boolean;
 }) {
@@ -262,7 +265,7 @@ export function QuestionEditor({
       setErrors(error.details.length ? error.details : [error.message]);
       return;
     }
-    router.push("/teacher/questions");
+    router.push(returnHref);
   }
 
   function onInvalid() {

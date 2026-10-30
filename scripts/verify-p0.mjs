@@ -730,6 +730,21 @@ const checks = [
     "app/(teacher)/teacher/tests/page.tsx",
   ].map((file) => ({ file, requires: ["HEADER_SHORTCUT_CLASS}>Questions →</Link>", "/teacher/questions?area="], label: `Atajo azul Questions → al area de origen: ${file}` })),
   {
+    file: "lib/question-crumbs.ts",
+    requires: ['{ label: "Tests", href: "/teacher/tests" }', "Practice · ${practiceAreaLabel(", "questionsHref"],
+    label: "Breadcrumb del Question Bank segun el area: Practice · <area> o Tests",
+  },
+  ...[
+    "app/(teacher)/teacher/questions/page.tsx",
+    "app/(teacher)/teacher/questions/new/page.tsx",
+    "app/(teacher)/teacher/questions/[questionId]/edit/page.tsx",
+  ].map((file) => ({ file, requires: ["questionCrumbs("], label: `Breadcrumb de Questions por area: ${file}` })),
+  {
+    file: "components/app-shell.tsx",
+    requires: ["navPathname(usePathname(), selectedArea)"],
+    label: "Menu lateral: Question Bank > Tests resalta Tests",
+  },
+  {
     file: "app/(teacher)/teacher/students/page.tsx",
     requires: ['href="/teacher/parents" className={HEADER_SHORTCUT_CLASS}>Parents →</Link>'],
     label: "Atajo azul Parents → en Students",

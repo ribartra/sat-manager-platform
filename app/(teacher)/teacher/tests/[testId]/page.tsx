@@ -318,7 +318,7 @@ export default async function FullTestDetailPage({ params, searchParams }: PageP
                     <div key={item.questionId} className="px-5 py-3">
                       <QuestionListItem
                         question={toQuestionListMedia(item.question)}
-                        href={`/teacher/questions/${item.question.id}/edit`}
+                        href={`/teacher/questions/${item.question.id}/edit?area=tests`}
                         indexLabel={<span className="text-xs font-medium text-gray-400">Q{index + 1}</span>}
                         meta={
                           <>

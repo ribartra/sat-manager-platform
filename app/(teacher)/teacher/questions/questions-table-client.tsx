@@ -37,11 +37,14 @@ export function QuestionsTable({
   rows,
   fixed,
   labels = { both: "Domain / Skill", inner: "Skill" },
+  editQuery = "",
 }: {
   rows: QuestionBankRow[];
   fixed: QuestionsTableFixed;
   /** Header of the second column (Tests tab: "Test / Module"), whole or with its first part fixed. */
   labels?: { both: string; inner: string };
+  /** Query added to the Edit links (Tests tab: `?area=tests`, so the editor keeps the Tests context). */
+  editQuery?: string;
 }) {
   const columns = useMemo<ColumnDef<QuestionBankRow>[]>(
     () => [
@@ -51,7 +54,7 @@ export function QuestionsTable({
         meta: { priority: "high", cellClassName: "max-w-md" },
         cell: ({ row }) => (
           <QuestionListItem
-            href={`/teacher/questions/${row.original.id}/edit`}
+            href={`/teacher/questions/${row.original.id}/edit${editQuery}`}
             question={{
               stem: row.original.stem,
               imageUrl: row.original.imageUrl,
@@ -114,11 +117,12 @@ export function QuestionsTable({
           <QuestionActions
             questionId={row.original.id}
             usedCount={row.original.usedCount}
+            editHref={`/teacher/questions/${row.original.id}/edit${editQuery}`}
           />
         ),
       },
     ],
-    [fixed.domain, labels.both, labels.inner],
+    [fixed.domain, labels.both, labels.inner, editQuery],
   );
 
   return (

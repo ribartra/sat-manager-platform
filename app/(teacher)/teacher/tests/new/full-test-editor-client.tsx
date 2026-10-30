@@ -338,7 +338,7 @@ export function FullTestEditor({
                       <div className="min-w-0 flex-1">
                       <QuestionListItem
                         question={question}
-                        href={`/teacher/questions/${question.id}/edit`}
+                        href={`/teacher/questions/${question.id}/edit?area=tests`}
                         indexLabel={<span className="text-xs font-medium text-gray-400">Q{qIndex + 1}</span>}
                         meta={
                           <>

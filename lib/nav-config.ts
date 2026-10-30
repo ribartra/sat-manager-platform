@@ -251,6 +251,14 @@ const NAV_ALIASES: Record<string, string[]> = {
   "/teacher/teachers": [],
 };
 
+/**
+ * Path the sidebar highlights for: the Question Bank on its Tests tab belongs to Tests (the other tabs
+ * to Practice, via NAV_ALIASES).
+ */
+export function navPathname(pathname: string, area: string | null | undefined): string {
+  return pathname.startsWith("/teacher/questions") && area === "tests" ? "/teacher/tests/questions" : pathname;
+}
+
 export function linkIsActive(href: string, pathname: string, exact = false): boolean {
   if (exact || href === "/teacher" || href === "/student") return pathname === href;
   return [href, ...(NAV_ALIASES[href] ?? [])].some((base) => pathname === base || pathname.startsWith(`${base}/`));

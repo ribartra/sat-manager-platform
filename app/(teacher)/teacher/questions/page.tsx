@@ -17,6 +17,7 @@ import {
 } from "@/lib/practice-area";
 import { QuestionsFilter, QuestionsTestFilter } from "./questions-filter-client";
 import { QUESTION_STATUS_DEFAULT } from "@/lib/domain-meta";
+import { questionCrumbs } from "@/lib/question-crumbs";
 import { loadOptionImageUrlsByQuestionId } from "@/lib/question-list-media-query";
 import { QuestionsTable, type QuestionBankRow } from "./questions-table-client";
 import { resolveQuestionType } from "@/lib/question-type";
@@ -126,7 +127,7 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
 
   return (
     <PageShell>
-      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: isTests ? "Tests" : "Practice", href: back.href }, { label: "Questions" }]} />
+      <Breadcrumbs items={[...questionCrumbs(area).items.slice(0, 2), { label: "Questions" }]} />
       <PageHeader
         title="Question Bank"
         description={isTests ? "The questions of the Tests, by Test and module." : "Practice questions by domain and skill."}
@@ -136,7 +137,7 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
               <ArrowLeft size={14} aria-hidden /> Back to {back.label}
             </Link>
             {isTests ? null : (
-              <Link href="/teacher/questions/new" className={HEADER_ACTION_CLASS}>
+              <Link href={`/teacher/questions/new?area=${area}`} className={HEADER_ACTION_CLASS}>
                 <Plus size={14} aria-hidden /> New Question
               </Link>
             )}
@@ -184,6 +185,7 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
             : { domain: Boolean(selectedDomainId), skill: Boolean(selectedTopicId), difficulty: Boolean(filters.difficulty), status: Boolean(statusFilter) }
         }
         labels={isTests ? { both: "Test / Module", inner: "Module" } : undefined}
+        editQuery={isTests ? "?area=tests" : ""}
         rows={questions.map((q): QuestionBankRow => {
           const setUses = new Set(q.setItems.map((s) => s.practiceSetId)).size;
           const fullUses = q.fullTestItems.length;

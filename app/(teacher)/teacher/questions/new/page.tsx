@@ -6,13 +6,16 @@ import { getFeatureSetting } from "@/lib/app-settings";
 import { loadCandidateQuestionDraft } from "@/lib/ingest-promotion";
 import { academicTopicWhere, buildTaxonomyTree, taxonomyPathLabel } from "@/lib/taxonomy";
 import { domainSectionLabel } from "@/lib/practice-area";
+import { questionCrumbs } from "@/lib/question-crumbs";
 
 interface PageProps {
-  searchParams: Promise<{ ingestCandidateId?: string }>;
+  searchParams: Promise<{ ingestCandidateId?: string; area?: string }>;
 }
 
 export default async function NewQuestionPage({ searchParams }: PageProps) {
-  const { ingestCandidateId } = await searchParams;
+  const { ingestCandidateId, area: areaParam } = await searchParams;
+  // Opened from the Question Bank on an area: the breadcrumb and Save go back there.
+  const crumbs = questionCrumbs(areaParam === "reading" || areaParam === "writing" ? areaParam : "math");
   const [topics, taxonomyNodes, ingestDraft, showGraphOption] = await Promise.all([
     prisma.topic.findMany({
       where: academicTopicWhere,
@@ -27,9 +30,10 @@ export default async function NewQuestionPage({ searchParams }: PageProps) {
 
   return (
     <PageShell width="narrow">
-      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Practice", href: "/teacher/practice-sets" }, { label: "Questions", href: "/teacher/questions" }, { label: "New question" }]} />
+      <Breadcrumbs items={[...crumbs.items, { label: "New question" }]} />
       <h1 className="mb-6 text-[26px] font-bold tracking-[-0.3px] text-gray-900">New Question</h1>
       <QuestionEditor
+        returnHref={crumbs.questionsHref}
         showGraphOption={showGraphOption}
         initial={ingestDraft?.initial}
         sourceContext={

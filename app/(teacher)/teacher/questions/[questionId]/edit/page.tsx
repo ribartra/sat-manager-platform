@@ -6,7 +6,8 @@ import { notFound } from "next/navigation";
 import { QuestionEditor } from "../../question-editor-client";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { academicTopicWhere, buildTaxonomyTree, taxonomyPathLabel } from "@/lib/taxonomy";
-import { domainSectionLabel } from "@/lib/practice-area";
+import { domainSectionLabel, resolvePracticeArea, tabFromPracticeArea } from "@/lib/practice-area";
+import { questionCrumbs } from "@/lib/question-crumbs";
 
 interface PageProps {
   params: Promise<{ questionId: string }>;
@@ -19,7 +20,11 @@ export default async function EditQuestionPage({ params }: PageProps) {
     prisma.question.findFirst({
       // Only the bank of a program the teacher teaches.
       where: { id: questionId, ...(await currentContentScope()) },
-      include: { options: { orderBy: { label: "asc" } } },
+      include: {
+        options: { orderBy: { label: "asc" } },
+        topic: { select: { domain: { select: { practiceArea: true } } } },
+        _count: { select: { fullTestItems: true } },
+      },
     }),
     prisma.topic.findMany({
       where: academicTopicWhere,
@@ -32,12 +37,16 @@ export default async function EditQuestionPage({ params }: PageProps) {
   const { byId } = buildTaxonomyTree(taxonomyNodes);
 
   if (!question) notFound();
+  // Back to the Question Bank on this question's area: Tests (a Test question) or its practice area.
+  const area = question._count.fullTestItems > 0 ? "tests" : tabFromPracticeArea(resolvePracticeArea(question.topic.domain)) ?? "math";
+  const crumbs = questionCrumbs(area);
 
   return (
     <PageShell width="narrow">
-      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Practice", href: "/teacher/practice-sets" }, { label: "Questions", href: "/teacher/questions" }, { label: "Edit question" }]} />
+      <Breadcrumbs items={[...crumbs.items, { label: "Edit question" }]} />
       <h1 className="mb-6 text-[26px] font-bold tracking-[-0.3px] text-gray-900">Edit Question</h1>
       <QuestionEditor
+        returnHref={crumbs.questionsHref}
         showGraphOption={showGraphOption}
         initial={{
           id: question.id,

@@ -135,7 +135,7 @@ export default async function ContentMediaPage({ params }: { params: Promise<{ k
                     Crop from PDF / images ›
                   </Link>
                 ) : (
-                  <Link href={`/teacher/questions/${question.id}/edit`} className="shrink-0 text-xs text-gray-500 hover:underline">
+                  <Link href={`/teacher/questions/${question.id}/edit${kind === "tests" ? "?area=tests" : ""}`} className="shrink-0 text-xs text-gray-500 hover:underline">
                     Edit question ›
                   </Link>
                 )}

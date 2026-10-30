@@ -15,6 +15,7 @@ import {
   isPlayerPath,
   isResolvedNavGroup,
   linkIsActive,
+  navPathname,
   type ResolvedNavEntry,
   type ResolvedNavLink,
 } from "@/lib/nav-config";
@@ -58,9 +59,10 @@ export function AppShell({
   mainClassName,
   children,
 }: AppShellProps) {
-  const pathname = usePathname();
   const searchParams = useSearchParams();
   const selectedArea = searchParams.get("area");
+  // The path the sidebar highlights for (Question Bank › Tests belongs to Tests).
+  const pathname = navPathname(usePathname(), selectedArea);
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
