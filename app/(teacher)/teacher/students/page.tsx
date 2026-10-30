@@ -1,7 +1,9 @@
 import { RevokeInviteButton } from "./revoke-invite-button";
 import Link from "next/link";
-import { ChevronRight, UserPlus } from "lucide-react";
-import { DateCell, EmptyState, ListFilters, PageHeader, PageShell, StudentCell } from "@/components/sat";
+import { Clock, UserPlus } from "lucide-react";
+import { AttentionRow, EmptyState, ListFilters, PageHeader, PageShell, StudentCell } from "@/components/sat";
+import { StudentOverviewTable } from "@/components/sat/student-overview-table";
+import { assignHref } from "@/lib/assign-params";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { HEADER_SHORTCUT_CLASS, HeaderActions } from "@/components/sat/header-actions";
 import { Badge } from "@/components/ui/badge";
@@ -28,7 +30,10 @@ const SHOW = {
 } as const;
 type Show = keyof typeof SHOW;
 
-/** Students roster: search, a status filter, last activity, latest Test scores and pending Tests. */
+/**
+ * Students roster: the Home table (latest practice per area, latest Test, pending Tests) for every
+ * student, with search, a status filter, the Inactive notice and the Assign / Parents shortcuts.
+ */
 export default async function TeacherStudentsPage({ searchParams }: PageProps) {
   const session = await auth();
   const moreLinks = resolveLinks(TEACHER_MORE_LINKS.students, {
@@ -51,6 +56,7 @@ export default async function TeacherStudentsPage({ searchParams }: PageProps) {
   const overviews = await loadStudentOverviews(students.map((s) => s.id), now);
   const parentNames = new Map(students.map((s) => [s.id, s.childLinks.map((p) => p.parent.name).join(", ")]));
   const all = students.map((s) => overviews.get(s.id)).filter((o): o is StudentOverview => Boolean(o));
+  const inactive = all.filter((s) => isInactive(s.lastActiveAt, now));
   const rows = all.filter((s) => {
     if (show === "active") return !isInactive(s.lastActiveAt, now, 7);
     if (show === "inactive") return isInactive(s.lastActiveAt, now);
@@ -83,6 +89,8 @@ export default async function TeacherStudentsPage({ searchParams }: PageProps) {
         }
         actions={
           <HeaderActions>
+            {/* Assign: the student drop-down opens first, then that student's Assign view. */}
+            <Link href={assignHref({})} className={HEADER_SHORTCUT_CLASS}>Assign →</Link>
             {/* The students' parents (with the way back here). */}
             <Link href="/teacher/parents" className={HEADER_SHORTCUT_CLASS}>Parents →</Link>
             <Link href="/teacher/students/invite" className="inline-flex items-center gap-1.5 self-start shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]">
@@ -93,6 +101,22 @@ export default async function TeacherStudentsPage({ searchParams }: PageProps) {
       />
 
       <MoreLinks links={moreLinks} />
+
+      {/* Same notice as Home: who has not been active for 5+ days. */}
+      <Card padding="none" className="mb-4 flex flex-col gap-2 px-4 py-3">
+        <AttentionRow
+          icon={<Clock size={14} />}
+          label="Inactive 5+ days"
+          tone="warn"
+          viewAllHref="/teacher/students?show=inactive"
+          people={inactive.map((s) => ({
+            id: s.id,
+            name: s.name,
+            href: `/teacher/students/${s.id}`,
+            detail: s.lastActiveAt ? `Last active ${relativeDay(s.lastActiveAt, now)}` : "Never active",
+          }))}
+        />
+      </Card>
 
       <ListFilters
         action="/teacher/students"
@@ -105,39 +129,7 @@ export default async function TeacherStudentsPage({ searchParams }: PageProps) {
       {rows.length === 0 ? (
         <EmptyState title="No students match." />
       ) : (
-        <Card>
-          <ul className="divide-y divide-gray-100">
-            {rows.map((s) => {
-              const inactive = isInactive(s.lastActiveAt, now);
-              const parents = parentNames.get(s.id);
-              return (
-                <li key={s.id}>
-                  <Link href={`/teacher/students/${s.id}`} className="grid gap-2 px-4 py-3 hover:bg-gray-50 sm:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,1fr)_7rem_1rem] sm:items-center">
-                    <div className="min-w-0">
-                      <StudentCell name={s.name} email={`${s.email} · ${parents ? `Parent: ${parents}` : "No parent linked"}`} avatarUrl={s.avatarUrl} />
-                    </div>
-                    <div>
-                      <DateCell date={s.lastActiveAt} now={now} inactive={inactive} />
-                    </div>
-                    <div className="text-sm">
-                      <span className="block text-xs text-gray-500">Latest test</span>
-                      {s.tests.latest ? <><span className="text-[var(--sat-area-reading)]">R&amp;W</span> <b>{s.tests.latest.rw ?? "—"}</b> · <span className="text-[var(--sat-area-math)]">Math</span> <b>{s.tests.latest.math ?? "—"}</b></> : <span className="text-gray-400">—</span>}
-                    </div>
-                    <div className="text-sm">
-                      <span className="block text-xs text-gray-500">Pending tests</span>
-                      {s.tests.pending.length ? (
-                        <Badge variant={s.tests.pending.some((p) => p.overdue) ? "danger" : "warning"}>{s.tests.pending.length}</Badge>
-                      ) : (
-                        <span className="text-gray-400">0</span>
-                      )}
-                    </div>
-                    <ChevronRight size={16} className="hidden text-gray-300 sm:block" aria-hidden />
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </Card>
+        <StudentOverviewTable rows={rows} now={now} parents={parentNames} />
       )}
 
       {invited.length > 0 ? (

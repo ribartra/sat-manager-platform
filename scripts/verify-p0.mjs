@@ -143,13 +143,13 @@ const checks = [
   // Every list (teacher + admin) has a text search and filters.
   {
     file: "app/(teacher)/teacher/page.tsx",
-    requires: ["<ListFilters"],
-    forbids: ['Card as="form"', 'placeholder="Search a student…"'],
-    label: "Busqueda con filtros: Home del teacher con el mismo componente",
+    requires: ["<StudentOverviewTable", "HEADER_SHORTCUT_CLASS", "resolveTeacherNav(", "slice(0, HOME_STUDENTS)", "All {rows.length} students →"],
+    forbids: ["<ListFilters", "Invite student", "students/invite"],
+    label: "Home = vista resumen: sin busqueda ni Invite; atajos a cada vista; 5 alumnos + All students →",
   },
   {
     file: "app/(teacher)/teacher/students/page.tsx",
-    requires: ["<ListFilters"],
+    requires: ["<ListFilters", "<StudentOverviewTable", "Assign →", "assignHref({})", "Inactive 5+ days"],
     forbids: ['Card as="form"'],
     label: "Busqueda con filtros: Students con el mismo componente",
   },
@@ -766,6 +766,11 @@ const checks = [
     file: "components/app-shell.tsx",
     requires: ["navPathname(usePathname(), selectedArea)"],
     label: "Menu lateral: Question Bank > Tests resalta Tests",
+  },
+  {
+    file: "components/sat/student-overview-table.tsx",
+    requires: ["?area=${a.tab}", "?area=tests", "Parent: ", "pending"],
+    label: "Tabla de alumnos de Home y Students: celdas por area y Test, padre como tag",
   },
   {
     file: "app/(teacher)/teacher/students/page.tsx",

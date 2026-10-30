@@ -1,64 +1,50 @@
-import {
-  AttentionRow,
-  ChevronCell,
-  DateCell,
-  EmptyState,
-  LinkTr,
-  PageHeader,
-  PageShell,
-  RowAction,
-  RowLink,
-  SectionHeader,
-  SimpleTable,
-  StudentCell,
-  TD,
-} from "@/components/sat";
-import { ListFilters } from "@/components/sat";
-import { HeaderActions } from "@/components/sat/header-actions";
+import { AttentionRow, EmptyState, PageHeader, PageShell, SectionHeader } from "@/components/sat";
+import { HEADER_SHORTCUT_CLASS, HeaderActions } from "@/components/sat/header-actions";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import { StudentOverviewTable } from "@/components/sat/student-overview-table";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
-import { formatDate, relativeDay } from "@/lib/utils";
+import { relativeDay } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
-import { Clock, KeyRound, UserPlus } from "lucide-react";
+import { Clock, KeyRound } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { getFeatureSetting } from "@/lib/app-settings";
+import { getFeatureFlagValues } from "@/lib/feature-flags";
 import { refreshAssignmentStates } from "@/lib/assignments";
+import { isResolvedNavGroup, resolveTeacherNav } from "@/lib/nav-config";
 import { studentAccessWhereFor } from "@/lib/program-scope";
-import { practiceAreaLabel, resolvePracticeArea, tabFromPracticeArea, type PracticeAreaCode } from "@/lib/practice-area";
-import { Pct } from "@/components/sat/work-status";
+import { resolvePracticeArea, tabFromPracticeArea } from "@/lib/practice-area";
 import { isInactive, loadStudentOverviews, type StudentOverview } from "@/lib/teacher-overview";
-import { personSuggestions } from "@/lib/search-suggestions";
 
-interface PageProps {
-  searchParams: Promise<{ q?: string }>;
-}
-
-const PRACTICE_AREAS: { code: PracticeAreaCode; tab: "math" | "reading" | "writing" }[] = [
-  { code: "MATH", tab: "math" },
-  { code: "READING", tab: "reading" },
-  { code: "WRITING", tab: "writing" },
-];
+/** Students shown on Home; the rest are on Students ("All N students →"). */
+const HOME_STUDENTS = 5;
 
 /**
- * Teacher Home (one view, no section tabs — SAT-036/037): who needs attention (inactive 5+ days,
- * unlock requests) and every student with their latest practice per area and latest Test. Each row /
- * cell opens the student's page, where the per-area detail lives; the catalogue is Practice › By skill.
+ * Teacher Home (one view, no section tabs — SAT-036/037): a summary, not a place to manage students.
+ * Shortcuts to every other view, who needs attention (inactive 5+ days, unlock requests) and the 5
+ * most recently active students with their latest practice per area and latest Test. Search, Invite
+ * and the full table live on Students.
  */
-export default async function TeacherDashboard({ searchParams }: PageProps) {
+export default async function TeacherDashboard() {
   const session = await auth();
   const now = new Date();
   await refreshAssignmentStates(now);
-  const params = await searchParams;
-  const search = params.q?.trim() ?? "";
   const firstName = (session?.user.name ?? "teacher").split(" ")[0];
   const studentScope = session ? studentAccessWhereFor(session.user, now) : { role: "STUDENT", active: true, validationStatus: "APPROVED" };
-  const searchWhere = search ? { OR: [{ name: { contains: search } }, { email: { contains: search } }] } : {};
   const unlockRequestsEnabled = await getFeatureSetting("STUDENT_UNLOCK_REQUESTS");
+  // One shortcut per other sidebar view (same list as the sidebar: Teachers only for the master teacher).
+  const master = session?.user.role === "TEACHER"
+    ? Boolean((await prisma.user.findUnique({ where: { id: session.user.id }, select: { canManageTeachers: true } }))?.canManageTeachers)
+    : false;
+  const shortcuts = resolveTeacherNav({
+    role: session?.user.role,
+    flags: await getFeatureFlagValues({ role: session?.user.role, userId: session?.user.id }),
+    capabilities: master ? ["manageTeachers"] : [],
+  }).flatMap((item) => (isResolvedNavGroup(item) || item.href === "/teacher" ? [] : [item]));
 
   const [students, unlockRequests] = await Promise.all([
     prisma.user.findMany({
-      where: { ...studentScope, ...searchWhere },
+      where: studentScope,
       select: { id: true },
       orderBy: { name: "asc" },
     }),
@@ -95,12 +81,9 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
       }
       actions={
         <HeaderActions>
-          <Link
-            href="/teacher/students/invite"
-            className="flex items-center gap-1.5 shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]"
-          >
-            <UserPlus size={14} /> Invite student
-          </Link>
+          {shortcuts.map((item) => (
+            <Link key={item.href} href={item.href} className={HEADER_SHORTCUT_CLASS}>{item.label} →</Link>
+          ))}
         </HeaderActions>
       }
       />
@@ -108,10 +91,11 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
   );
 
   const inactive = rows.filter((s) => isInactive(s.lastActiveAt, now));
+  // Most recently active first; never active last.
+  const recent = [...rows].sort((a, b) => (b.lastActiveAt?.getTime() ?? 0) - (a.lastActiveAt?.getTime() ?? 0)).slice(0, HOME_STUDENTS);
   return (
     <PageShell className="space-y-4">
       {head(rows.length)}
-      <ListFilters action="/teacher" q={search} placeholder="Name or email" suggestions={await personSuggestions(studentScope)} />
       <Card padding="none" className="flex flex-col gap-2 px-4 py-3">
         <AttentionRow
           icon={<Clock size={14} />}
@@ -141,63 +125,15 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
       </Card>
 
       <section>
-        <SectionHeader title="Students" description="Click a row to see everything the student has done. Click an area cell to go straight to that area." />
+        <SectionHeader
+          title="Students"
+          description="The 5 most recently active. Click a row to see everything the student has done, or an area cell to go straight to that area."
+          action={rows.length ? <Link href="/teacher/students" className={HEADER_SHORTCUT_CLASS}>All {rows.length} students →</Link> : undefined}
+        />
         {rows.length === 0 ? (
-          <EmptyState title="No students yet" description="Invite your first student to get started." />
+          <EmptyState title="No students yet" description="Invite your first student from Students." />
         ) : (
-          <SimpleTable head={[
-            "Name",
-            "Last active",
-            ...PRACTICE_AREAS.map((a) => <span key={a.code} style={{ color: `var(--sat-area-${a.tab})` }}>{practiceAreaLabel(a.code)}</span>),
-            <span key="tests" className="text-[var(--sat-tests-ink)]">Tests</span>,
-            "",
-          ]}>
-            {rows.map((s) => (
-              <LinkTr key={s.id}>
-                <td className={TD}>
-                  <StudentCell name={s.name} email={s.email} avatarUrl={s.avatarUrl}>
-                    <RowLink href={`/teacher/students/${s.id}`} className="block truncate">{s.name}</RowLink>
-                  </StudentCell>
-                </td>
-                <td className={TD}><DateCell date={s.lastActiveAt} now={now} inactive={isInactive(s.lastActiveAt, now)} /></td>
-                {PRACTICE_AREAS.map((a) => {
-                  const o = s.areas[a.code];
-                  return (
-                    <td key={a.code} className={TD}>
-                      <RowAction>
-                        <Link href={`/teacher/students/${s.id}?area=${a.tab}`} className="-mx-2 -my-1 block rounded-md px-2 py-1 hover:bg-gray-100">
-                          {o.last ? (
-                            <>
-                              <b className="text-sm font-medium text-gray-800">{formatDate(o.last.at)}</b>
-                              <span className="block text-xs text-gray-500">Practice · <Pct value={o.last.pct} /></span>
-                            </>
-                          ) : (
-                            <span className="text-xs text-gray-400">No activity</span>
-                          )}
-                        </Link>
-                      </RowAction>
-                    </td>
-                  );
-                })}
-                <td className={TD}>
-                  <RowAction>
-                    <Link href={`/teacher/students/${s.id}?area=tests`} className="-mx-2 -my-1 block rounded-md px-2 py-1 hover:bg-gray-100">
-                      {s.tests.latest ? (
-                        <>
-                          <span className="whitespace-nowrap text-sm"><span className="text-[var(--sat-area-reading)]">R&amp;W</span> <b>{s.tests.latest.rw ?? "—"}</b> · <span className="text-[var(--sat-area-math)]">M</span> <b>{s.tests.latest.math ?? "—"}</b></span>
-                          <span className="block text-xs text-gray-500">{s.tests.latest.label}{s.tests.latest.submittedAt ? ` · ${formatDate(s.tests.latest.submittedAt)}` : ""}</span>
-                        </>
-                      ) : (
-                        <span className="text-xs text-gray-400">No test finished</span>
-                      )}
-                      {s.tests.inProgress ? <span className="block text-xs text-amber-700">{s.tests.inProgress} in progress</span> : null}
-                    </Link>
-                  </RowAction>
-                </td>
-                <ChevronCell />
-              </LinkTr>
-            ))}
-          </SimpleTable>
+          <StudentOverviewTable rows={recent} now={now} />
         )}
       </section>
     </PageShell>
