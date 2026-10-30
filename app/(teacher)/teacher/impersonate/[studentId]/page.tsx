@@ -127,7 +127,7 @@ export default async function ImpersonateStudentPage({ params, searchParams }: P
         <span className="font-medium">You are viewing as: {student.name}</span>
       </Alert>
       <PageShell>
-        <StudentHome studentId={student.id} firstName={student.name.split(" ")[0]} query={query} links={teacherViewLinks(student.id, student.name)} />
+        <StudentHome studentId={student.id} firstName={student.name.split(" ")[0]} links={teacherViewLinks(student.id, student.name)} />
       </PageShell>
     </div>
   );

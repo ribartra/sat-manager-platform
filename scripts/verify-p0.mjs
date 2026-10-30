@@ -138,9 +138,9 @@ const checks = [
   // Attempt level only, for every role: no averages, no best try, no chart across different Tests.
   {
     file: "app/(student)/student/student-home.tsx",
-    requires: ["PracticeSetAttemptsAccordion", "TestAttemptsAccordion"],
-    forbids: ["LineChart", "avgPct", "Average correct", "s.delta"],
-    label: "Home del alumno (y Student view): acordeones por set y por Test, sin promedios ni graficas entre Tests",
+    requires: ["<ViewSummaryCard", "loadPending([studentId])", "loadAttemptHistory([studentId]", "teacherViewLinks"],
+    forbids: ["LineChart", "avgPct", "Average correct", "s.delta", "PracticeAreaTabs", "ContinueCard"],
+    label: "Home del alumno (y Student view) = Home del profesor: un recuadro alto por vista, sin pestañas ni promedios",
   },
   {
     file: "app/(student)/student/tests/page.tsx",
@@ -150,9 +150,9 @@ const checks = [
   },
   {
     file: "app/(student)/student/history/page.tsx",
-    requires: ["PracticeSetAttemptsAccordion", "TestAttemptsAccordion", "loadPracticeReport"],
-    forbids: ["Average score", "bestByAssignment", "TopicDifficultyTrend", "PerformanceBreakdown"],
-    label: "Historial del alumno: acordeones y matriz de ultimo intento, sin promedios ni Best",
+    requires: ["loadAttemptHistory([userId]", "<HistoryTable", "historyColumns(filter, false)", "HISTORY_STATUS_DEFAULT"],
+    forbids: ["Average score", "bestByAssignment", "TopicDifficultyTrend", "PerformanceBreakdown", "studentHref=", "loadStudentSessions"],
+    label: "Historial del alumno = History del profesor solo con sus intentos (sin columna Student), sin promedios ni Best",
   },
   {
     file: "app/(student)/student/results/[attemptId]/page.tsx",
@@ -302,11 +302,6 @@ const checks = [
     requires: ["<TestCard"],
     forbids: ["BluebookCard"],
     label: "Tests del alumno: misma card de Test",
-  },
-  {
-    file: "app/(student)/student/student-home.tsx",
-    requires: ["<TestCard", 'layout="compact"', "TestCardsByNumber"],
-    label: "Home del alumno / Student view: card de Test compacta (mismo componente) al ancho de las de area",
   },
   {
     file: "components/question-list-item.tsx",

@@ -42,7 +42,7 @@ async function assertSourcePatterns() {
     },
     {
       file: "app/(student)/student/history/page.tsx",
-      requires: ["HISTORY_TABS", "LinkTabs", "practiceArea", 'area === "tests"'],
+      requires: ["PRACTICE_AREA_TABS", '"tests"', "<HistoryTable"],
       label: "History sin Section redundante y con Tests",
     },
     {
@@ -62,8 +62,8 @@ async function assertSourcePatterns() {
     },
     {
       file: "app/(student)/student/student-home.tsx",
-      requires: ["PracticeAreaTabs", "practiceArea", 'area === "tests"', "activeHomeTab", "AreaPracticeView", "TestsTab", "readOnly"],
-      label: "Student Home: Summary + Math/Reading/Writing (solo practica) + Tests aparte",
+      requires: ["practiceArea", "<ViewSummaryCard", 'title="Tests"', 'title="Practice"'],
+      label: "Student Home: practica por area y Tests en recuadros separados",
     },
     {
       file: "lib/pdf/build-student-report.ts",

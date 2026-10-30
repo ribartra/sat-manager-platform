@@ -43,10 +43,13 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
     if (!activeEnrollment) redirect("/student/program");
   }
 
+  // Older links to the Home tabs: the area lives on Practice, the Tests on Tests.
   const query = await searchParams;
+  if (query.area === "tests" || query.area === "mocks") redirect("/student/tests");
+  if (query.area === "math" || query.area === "reading" || query.area === "writing") redirect(`/student/practice?area=${query.area}`);
   return (
     <PageShell>
-      <StudentHome studentId={userId} firstName={session!.user.name.split(" ")[0]} query={query} />
+      <StudentHome studentId={userId} firstName={session!.user.name.split(" ")[0]} />
     </PageShell>
   );
 }
