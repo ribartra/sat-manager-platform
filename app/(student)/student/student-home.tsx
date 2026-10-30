@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PAGE_SIZE } from "@/components/sat/pagination";
 import { BookOpen, CheckCircle2, ClipboardList, Clock, Map as MapIcon, TrendingUp } from "lucide-react";
 import {
   AreaBoxGrid,
@@ -256,7 +257,7 @@ const STATUS_FILTERS = [
   { key: "done", label: "Completed" },
 ] as const;
 
-const SETS_PAGE_SIZE = 10;
+const SETS_PAGE_SIZE = PAGE_SIZE;
 
 /** Math / Reading / Writing tab (mockup area.html practiceView): practice only, % correct. */
 async function AreaPracticeView({
@@ -409,7 +410,7 @@ async function AreaPracticeView({
   );
 }
 
-const TEST_ROWS_PAGE_SIZE = 10;
+const TEST_ROWS_PAGE_SIZE = PAGE_SIZE;
 
 /** Tests tab (mockup area.html testsView): pending tests, then results grouped per Test (no chart across Tests). */
 function TestsTab({ tests, page, links }: { tests: StudentTestItem[]; page: number; links: HomeLinks }) {

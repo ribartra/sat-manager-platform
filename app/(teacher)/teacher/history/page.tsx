@@ -20,7 +20,7 @@ import {
   ListFilters,
   pageFromParam,
   paginate,
-  pageSizeFromParam,
+  PAGE_SIZE,
 } from "@/components/sat";
 import { AreaTag } from "@/components/sat/practice-set-row";
 import { InvalidateAttemptButton } from "@/components/sat/invalidate-attempt-button";
@@ -99,12 +99,12 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
   });
   // No free-text search here: the Student and Skill drop-downs search inside when they are long.
   const shownRows = rows;
-  // Consolidation table: 25 / 50 / 100 rows per page (`per`), kept with every filter.
-  const pageSize = pageSizeFromParam(query.per, 25);
+  // 25 rows per page, every filter kept when paging.
+  const pageSize = PAGE_SIZE;
   const page = paginate(shownRows, pageFromParam(query.page), pageSize);
   const current = { ...filter, q: undefined, student: studentId || undefined };
-  // Period and rows per page travel with every link of the page (chip, student cells, pager).
-  const keepExtra = { ...periodParams(period), per: String(pageSize) };
+  // The period travels with every link of the page (chip, student cells, pager).
+  const keepExtra = periodParams(period);
   const params = { ...current, ...keepExtra };
 
   // A fixed filter hides its column (it would repeat the same value on every row).
@@ -165,7 +165,7 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
       <ListFilters
         action="/teacher/history"
         search={false}
-        hidden={{ set: filter.set, test: filter.test, per: String(pageSize) }}
+        hidden={{ set: filter.set, test: filter.test }}
         filters={[
           { name: "student", label: "Student", value: studentId, allLabel: "All students", options: students.map((st) => ({ value: st.id, label: st.name })) },
           // Type and practice area in one select: Tests, Practice (every area) or one practice area.
@@ -217,7 +217,7 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
               );
             })}
           </SimpleTable>
-          <Pagination basePath="/teacher/history" params={params} pageSize={pageSize} pageSizeParam="per" {...page} />
+          <Pagination basePath="/teacher/history" params={params} pageSize={pageSize} {...page} />
         </>
       )}
     </PageShell>

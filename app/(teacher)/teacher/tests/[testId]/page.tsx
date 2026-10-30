@@ -15,7 +15,7 @@ import {
   TD,
   invalidatedRowClass,
   pageFromParam,
-  pageSizeFromParam,
+  PAGE_SIZE,
   paginate,
 } from "@/components/sat";
 import { TestModuleTiles } from "@/components/sat/test-module-tiles";
@@ -47,15 +47,14 @@ import { assignHref } from "@/lib/assign-params";
 
 interface PageProps {
   params: Promise<{ testId: string }>;
-  searchParams: Promise<{ attemptsPage?: string; per?: string }>;
+  searchParams: Promise<{ attemptsPage?: string }>;
 }
 
 
 export default async function FullTestDetailPage({ params, searchParams }: PageProps) {
   const { testId } = await params;
-  const { attemptsPage, per } = await searchParams;
-  // Students' results (consolidation table): 25 / 50 / 100 rows per page.
-  const pageSize = pageSizeFromParam(per, 25);
+  const { attemptsPage } = await searchParams;
+  const pageSize = PAGE_SIZE;
   const session = await requireTeacherOrAdmin();
   if (!session) notFound();
   const now = new Date();
@@ -241,7 +240,7 @@ export default async function FullTestDetailPage({ params, searchParams }: PageP
                 );
               })}
             </SimpleTable>
-            <Pagination basePath={`/teacher/tests/${test.id}`} params={{ per: String(pageSize) }} param="attemptsPage" anchor="students" pageSize={pageSize} pageSizeParam="per" {...rowPage} />
+            <Pagination basePath={`/teacher/tests/${test.id}`} params={{}} param="attemptsPage" anchor="students" pageSize={pageSize} {...rowPage} />
           </>
         )}
       </section>

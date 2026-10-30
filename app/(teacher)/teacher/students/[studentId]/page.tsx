@@ -1,3 +1,4 @@
+import { PAGE_SIZE } from "@/components/sat/pagination";
 import {
   AreaBoxGrid,
   CompactAreaBox,
@@ -66,7 +67,7 @@ interface PageProps {
   searchParams: Promise<{ area?: string; topic?: string; difficulty?: string; from?: string; to?: string; attemptsPage?: string; examsPage?: string; activityPage?: string; type?: string }>;
 }
 
-const HISTORY_PAGE_SIZE = 10;
+const HISTORY_PAGE_SIZE = PAGE_SIZE;
 
 export default async function StudentPage({ params, searchParams }: PageProps) {
   const { studentId } = await params;

@@ -165,9 +165,9 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/questions/questions-filter-client.tsx",
-    requires: ['params.set("domain"', 'params.set("per"'],
-    forbids: ['params.set("q"', 'label="Search"'],
-    label: "Banco de preguntas (tabla de consolidacion): sin busqueda libre; Domain/Skill, nivel, estado y filas por pagina en la URL",
+    requires: ['params.set("domain"'],
+    forbids: ['params.set("q"', 'label="Search"', 'params.set("per"'],
+    label: "Banco de preguntas (tabla de consolidacion): sin busqueda libre; Domain/Skill, nivel y estado en la URL; 25 filas fijas",
   },
   {
     file: "app/(teacher)/teacher/practice-sets/page.tsx",
@@ -542,6 +542,24 @@ const checks = [
     requires: ["SEARCHABLE_MIN_OPTIONS", "<SearchableSelect", "search = true", "<LiveSearch"],
     label: "Filtros: DDL con mas de 8 opciones con buscador dentro; buscador libre solo si la lista lo pide",
   },
+  // 25 rows per page everywhere; only admin lists offer 25 / 50 / 100.
+  {
+    file: "components/sat/pagination.tsx",
+    requires: ["export const PAGE_SIZE = 25", "pageSizeParam"],
+    label: "Paginacion: 25 filas fijas; selector de filas solo cuando se pasa pageSizeParam (admin)",
+  },
+  ...[
+    "app/(teacher)/teacher/history/page.tsx",
+    "app/(teacher)/teacher/questions/page.tsx",
+    "app/(teacher)/teacher/tests/[testId]/page.tsx",
+    "app/(student)/student/history/page.tsx",
+    "app/notifications/page.tsx",
+  ].map((file) => ({ file, requires: ["PAGE_SIZE"], forbids: ["pageSizeParam=", "pageSizeFromParam("], label: `25 filas fijas, sin selector de filas: ${file}` })),
+  ...["app/admin/logs/page.tsx", "app/admin/reports/page.tsx"].map((file) => ({
+    file,
+    requires: ['pageSizeParam="per"', "pageSizeFromParam(per, 25)"],
+    label: `Admin: selector de filas 25/50/100 (25 por defecto): ${file}`,
+  })),
   // Account names "First Last" on every create / edit (lib/person-name.ts).
   ...[
     "app/api/students/invite/route.ts",

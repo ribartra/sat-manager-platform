@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PAGE_SIZE } from "@/components/sat/pagination";
 import { redirect } from "next/navigation";
 import {
   AreaBoxGrid,
@@ -138,7 +139,7 @@ function SummaryView({ practice }: { practice: PracticeSetItem[] }) {
   );
 }
 
-const SETS_PAGE_SIZE = 10;
+const SETS_PAGE_SIZE = PAGE_SIZE;
 
 async function AreaView({ practice, area, page }: { practice: PracticeSetItem[]; area: PracticeAreaCode; page: number }) {
   const tab = tabFromPracticeArea(area)!;

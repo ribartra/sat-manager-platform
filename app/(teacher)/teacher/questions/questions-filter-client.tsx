@@ -15,11 +15,8 @@ export function QuestionsFilter({
   initialDomainId,
   initialDifficulty,
   initialStatus,
-  pageSize,
 }: {
   area: string;
-  /** Rows per page chosen in the pager (kept when the filters change). */
-  pageSize: number;
   sectionLabel: string;
   topics: TaxonomyPickerTopic[];
   initialTopicId?: string;
@@ -45,7 +42,6 @@ export function QuestionsFilter({
     if (topicId) params.set("topic", topicId);
     if (difficulty) params.set("difficulty", difficulty);
     if (status) params.set("status", status);
-    params.set("per", String(pageSize));
     router.push(`/teacher/questions?${params.toString()}`);
   }
 
@@ -73,7 +69,7 @@ export function QuestionsFilter({
           ))}
         </Select>
       </FilterField>
-      <FilterActions clearHref={topicId || domainName || difficulty || status ? `/teacher/questions?area=${area}&per=${pageSize}` : null} />
+      <FilterActions clearHref={topicId || domainName || difficulty || status ? `/teacher/questions?area=${area}` : null} />
     </FilterBar>
   );
 }

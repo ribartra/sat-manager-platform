@@ -1,5 +1,5 @@
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
-import { PageShell, Pagination, pageFromParam, pageSizeFromParam } from "@/components/sat";
+import { PAGE_SIZE, PageShell, Pagination, pageFromParam } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -10,12 +10,12 @@ import { homeHrefForRole } from "@/lib/nav-config";
 
 export const dynamic = "force-dynamic";
 
-/** Every notification of the user, newest first, paged in the database (25 / 50 / 100 per page). */
-export default async function NotificationsPage({ searchParams }: { searchParams: Promise<{ page?: string; per?: string }> }) {
+/** Every notification of the user, newest first, paged in the database (25 per page). */
+export default async function NotificationsPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
   const session = await requireApprovedSession();
   if (!session) redirect("/auth/pending-validation");
   const query = await searchParams;
-  const pageSize = pageSizeFromParam(query.per, 25);
+  const pageSize = PAGE_SIZE;
 
   const where = { userId: session.user.id };
   const total = await prisma.notification.count({ where });
@@ -48,7 +48,7 @@ export default async function NotificationsPage({ searchParams }: { searchParams
         ))}
         {notifications.length === 0 && <div className="p-10 text-center text-sm text-gray-400">No notifications yet.</div>}
       </Card>
-      <Pagination basePath="/notifications" params={{ per: String(pageSize) }} page={page} pageCount={pageCount} total={total} pageSize={pageSize} pageSizeParam="per" />
+      <Pagination basePath="/notifications" params={{}} page={page} pageCount={pageCount} total={total} pageSize={pageSize} />
     </PageShell>
   );
 }

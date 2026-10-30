@@ -2,7 +2,7 @@ import Link from "next/link";
 import { currentContentScope } from "@/lib/content-scope";
 import { redirect } from "next/navigation";
 import { Sparkles, User } from "lucide-react";
-import { EmptyState, ListFilters, PageShell, Pagination, TestNumberAccordion, groupTestVersions, matchesQuery, pageFromParam, paginate } from "@/components/sat";
+import { EmptyState, ListFilters, PageShell, Pagination, TestNumberAccordion, groupTestVersions, matchesQuery, pageFromParam, paginate, PAGE_SIZE } from "@/components/sat";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { TestModuleTiles } from "@/components/sat/test-module-tiles";
 import { Badge } from "@/components/ui/badge";
@@ -22,7 +22,6 @@ interface PageProps {
   searchParams: Promise<{ view?: string; page?: string; q?: string; status?: string; assigned?: string }>;
 }
 
-const PAGE_SIZE = 10;
 
 /**
  * Teacher Tests (mockup `mejorada/teacher/tests.html`): one card per Test with its 4 modules and how

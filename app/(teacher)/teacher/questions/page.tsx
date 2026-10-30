@@ -1,7 +1,7 @@
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { currentContentScope } from "@/lib/content-scope";
 import { PageShell, PracticeAreaTabs } from "@/components/sat";
-import { Pagination, pageFromParam, pageSizeFromParam } from "@/components/sat/pagination";
+import { PAGE_SIZE, Pagination, pageFromParam } from "@/components/sat/pagination";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -19,7 +19,7 @@ import { loadOptionImageUrlsByQuestionId } from "@/lib/question-list-media-query
 import { QuestionsTable, type QuestionBankRow } from "./questions-table-client";
 import { resolveQuestionType } from "@/lib/question-type";
 
-interface SearchParams { area?: string; section?: string; domain?: string; topic?: string; difficulty?: string; status?: string; page?: string; per?: string }
+interface SearchParams { area?: string; section?: string; domain?: string; topic?: string; difficulty?: string; status?: string; page?: string }
 
 const TOPIC_IN_CHUNK = 400;
 
@@ -55,8 +55,8 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
       ? { in: visibleTopicIds }
       : { in: visibleTopicIds.slice(0, TOPIC_IN_CHUNK) };
 
-  // Consolidation table: no free-text search (Domain / Skill / level / status filters), 25 / 50 / 100 per page.
-  const pageSize = pageSizeFromParam(filters.per, 50);
+  // Consolidation table: no free-text search (Domain / Skill / level / status filters), 25 per page.
+  const pageSize = PAGE_SIZE;
   const questionWhere = {
     // The bank of the programs the teacher teaches (shared by the program's teachers).
     ...(await currentContentScope()),
@@ -101,7 +101,7 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
         basePath="/teacher/questions"
         active={area}
         includeTests={false}
-        preserve={{ difficulty: filters.difficulty, status: filters.status, per: String(pageSize) }}
+        preserve={{ difficulty: filters.difficulty, status: filters.status }}
       />
       <p className="-mt-3 mb-3 text-xs text-gray-500">
         Questions of the Tests are managed in <Link href="/teacher/tests" className="text-blue-600 hover:underline">Tests</Link>.
@@ -109,9 +109,8 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
 
       <QuestionsFilter
         // Remount on a new URL (Clear / tab) so the fields show the applied filters.
-        key={[area, selectedDomainId, filters.topic, filters.difficulty, filters.status, pageSize].join("|")}
+        key={[area, selectedDomainId, filters.topic, filters.difficulty, filters.status].join("|")}
         area={area}
-        pageSize={pageSize}
         sectionLabel={sectionLabel}
         topics={visibleTopics.map((t) => ({
           id: t.id,
@@ -155,12 +154,11 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
       />
       <Pagination
         basePath="/teacher/questions"
-        params={{ area: filters.area, section: filters.section, domain: selectedDomainId, topic: filters.topic, difficulty: filters.difficulty, status: filters.status, per: String(pageSize) }}
+        params={{ area: filters.area, section: filters.section, domain: selectedDomainId, topic: filters.topic, difficulty: filters.difficulty, status: filters.status }}
         page={page}
         pageCount={pageCount}
         total={total}
         pageSize={pageSize}
-        pageSizeParam="per"
         className="mt-2"
       />
     </PageShell>

@@ -9,7 +9,10 @@ export function pageFromParam(value: string | string[] | undefined) {
   return Number.isFinite(page) && page > 0 ? page : 1;
 }
 
-/** Rows per page offered by consolidation tables (History, Questions, Logs…): never more than 100. */
+/** Rows per page of every paginated list. */
+export const PAGE_SIZE = 25;
+
+/** Rows per page offered in admin lists only (Logs, Reports): never more than 100. */
 export const PAGE_SIZES = [25, 50, 100] as const;
 
 /** Reads `per` (rows per page) from a search param: one of PAGE_SIZES, else `fallback`. */
@@ -27,8 +30,8 @@ export function paginate<T>(items: T[], page: number, pageSize: number) {
 
 /**
  * Prev / "Page X of Y" / Next links for server-rendered lists. Keeps every other search param
- * (filters, the other list's page) and only changes `param`. With `pageSizeParam` (consolidation
- * tables) it also offers 25 / 50 / 100 rows per page, keeping the filters and going back to page 1.
+ * (filters, the other list's page) and only changes `param`. Every list shows PAGE_SIZE (25) rows;
+ * admin lists pass `pageSizeParam` to also offer 25 / 50 / 100, keeping the filters (back to page 1).
  * Renders nothing when there is only one page and nothing to choose.
  */
 export function Pagination({

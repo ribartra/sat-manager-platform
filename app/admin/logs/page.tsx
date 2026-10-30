@@ -57,7 +57,8 @@ export default async function AdminLogsPage({ searchParams }: PageProps) {
   const roleFilter = ["STUDENT", "TEACHER", "PARENT", "ADMIN"].includes(rawRole ?? "") ? rawRole : undefined;
   const category = cat?.toLowerCase() ?? "all";
   const tab = TABS.find((t) => t.id === category) ?? TABS[0];
-  const pageSize = pageSizeFromParam(per, 50);
+  // Admin lists offer 25 / 50 / 100 rows per page (25 by default).
+  const pageSize = pageSizeFromParam(per, 25);
 
   // Every logged action and actor, for the tabs and the Action / User drop-downs (they search inside).
   const [actionRows, actorRows] = await Promise.all([

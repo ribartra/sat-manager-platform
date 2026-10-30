@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
-import { ListFilters, PageShell, Pagination, RoleBadge, pageFromParam, paginate } from "@/components/sat";
+import { ListFilters, PageShell, Pagination, RoleBadge, pageFromParam, pageSizeFromParam, paginate } from "@/components/sat";
 import { ChevronCell, LinkTr, RowLink, SimpleTable, TD } from "@/components/sat/link-table";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
@@ -9,7 +9,6 @@ import { formatDate } from "@/lib/utils";
 import { issueCategoryMeta } from "@/lib/issue-report";
 import { suggestionValues } from "@/lib/search-suggestions";
 
-const PAGE_SIZE = 20;
 
 const TABS = [
   { id: "open", label: "Open", where: { status: "OPEN" } },
@@ -21,12 +20,14 @@ const TABS = [
 const CATEGORY_OPTIONS = ["PROBLEM", "CONFUSING", "SUGGESTION", "PRAISE"].map((value) => ({ value, label: issueCategoryMeta(value).label }));
 
 /** Admin → Reports: what users sent with "Report a problem" (components/sat/issue-reporter.tsx). */
-export default async function AdminReportsPage({ searchParams }: { searchParams: Promise<{ status?: string; page?: string; q?: string; category?: string; from?: string }> }) {
+export default async function AdminReportsPage({ searchParams }: { searchParams: Promise<{ status?: string; page?: string; per?: string; q?: string; category?: string; from?: string }> }) {
   const session = await auth();
   if (!session) redirect("/login");
   if (session.user.role !== "ADMIN") redirect("/teacher");
 
-  const { status, page, q: rawQ, category: rawCategory, from: rawFrom } = await searchParams;
+  const { status, page, per, q: rawQ, category: rawCategory, from: rawFrom } = await searchParams;
+  // Admin lists offer 25 / 50 / 100 rows per page (25 by default).
+  const pageSize = pageSizeFromParam(per, 25);
   const tab = TABS.find((t) => t.id === status) ?? TABS[0];
   // Search + filters (URL): comment, reporter or page; type; who reported (account type).
   const q = (rawQ ?? "").trim();
@@ -63,7 +64,7 @@ export default async function AdminReportsPage({ searchParams }: { searchParams:
     resolved: count("RESOLVED"),
     all: counts.reduce((n, c) => n + c._count._all, 0),
   };
-  const reportPage = paginate(reports, pageFromParam(page), PAGE_SIZE);
+  const reportPage = paginate(reports, pageFromParam(page), pageSize);
 
   return (
     <PageShell width="wide">
@@ -77,7 +78,7 @@ export default async function AdminReportsPage({ searchParams }: { searchParams:
         {TABS.map((item) => (
           <a
             key={item.id}
-            href={item.id === "open" ? "/admin/reports" : `/admin/reports?status=${item.id}`}
+            href={`/admin/reports?${new URLSearchParams({ ...(item.id === "open" ? {} : { status: item.id }), per: String(pageSize) }).toString()}`}
             className={`rounded-md px-3 py-1.5 text-xs font-medium ${tab.id === item.id ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
           >
             {item.label} · {tabCount[item.id]}
@@ -90,7 +91,7 @@ export default async function AdminReportsPage({ searchParams }: { searchParams:
         q={q}
         placeholder="Comment, reporter or page"
         suggestions={suggestionValues((await prisma.issueReport.findMany({ select: { pageTitle: true, user: { select: { name: true } } }, take: 500 })).flatMap((r) => [r.pageTitle, r.user?.name]))}
-        hidden={{ status: tab.id === "open" ? undefined : tab.id }}
+        hidden={{ status: tab.id === "open" ? undefined : tab.id, per: String(pageSize) }}
         filters={[
           { name: "category", label: "Type", value: category, allLabel: "All types", options: CATEGORY_OPTIONS },
           { name: "from", label: "From", value: fromRole, allLabel: "Any account", options: ["STUDENT", "TEACHER", "PARENT", "ADMIN"].map((r) => ({ value: r, label: roleLabel(r) })) },
@@ -134,7 +135,7 @@ export default async function AdminReportsPage({ searchParams }: { searchParams:
           })}
         </SimpleTable>
       )}
-      <Pagination basePath="/admin/reports" params={{ status: tab.id === "open" ? undefined : tab.id, q: q || undefined, category, from: fromRole }} pageSize={PAGE_SIZE} {...reportPage} />
+      <Pagination basePath="/admin/reports" params={{ status: tab.id === "open" ? undefined : tab.id, q: q || undefined, category, from: fromRole, per: String(pageSize) }} pageSize={pageSize} pageSizeParam="per" {...reportPage} />
     </PageShell>
   );
 }

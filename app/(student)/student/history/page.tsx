@@ -13,7 +13,7 @@ import {
   TD,
   pageFromParam,
   paginate,
-  pageSizeFromParam,
+  PAGE_SIZE,
 } from "@/components/sat";
 import { Pct } from "@/components/sat/work-status";
 import { Button } from "@/components/ui/button";
@@ -52,7 +52,6 @@ interface PageProps {
     from?: string;
     to?: string;
     page?: string;
-    per?: string;
     source?: string;
     sarea?: string;
     result?: string;
@@ -82,9 +81,9 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
   const area = filters.area;
   const practiceArea = practiceAreaFromTab(area);
   const dateFilter = progressDateWhere(filters);
-  // Consolidation lists: 25 / 50 / 100 rows per page (`per`), kept with every filter.
-  const pageSize = pageSizeFromParam(params.per, 25);
-  const pageParams = { ...Object.fromEntries(progressFilterEntries({ ...filters, from: undefined, to: undefined })), ...periodParams(period), per: String(pageSize) };
+  // 25 rows per page, every filter kept when paging.
+  const pageSize = PAGE_SIZE;
+  const pageParams = { ...Object.fromEntries(progressFilterEntries({ ...filters, from: undefined, to: undefined })), ...periodParams(period) };
   const requestedPage = pageFromParam(params.page);
 
   const sessionsView = !params.area || params.area === "sessions";
@@ -127,7 +126,6 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
         {historyTabs}
         <FilterBar action="/student/history">
           <input type="hidden" name="area" value="sessions" />
-          <input type="hidden" name="per" value={pageSize} />
           <FilterField label="Source" htmlFor="sh-source">
             <Select id="sh-source" name="source" defaultValue={source}>
               <option value="">All sources</option>
@@ -222,9 +220,8 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
         )}
         <Pagination
           basePath="/student/history"
-          params={{ area: "sessions", source, sarea, result, ...periodParams(period), per: String(pageSize) }}
+          params={{ area: "sessions", source, sarea, result, ...periodParams(period) }}
           pageSize={pageSize}
-          pageSizeParam="per"
           {...sessionPage}
         />
       </PageShell>
@@ -257,7 +254,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
         <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">My history</h1>
         <p className="text-sm text-gray-500">Every Test attempt is saved, including tests you haven&apos;t finished. Open a test to see every try; click a try to see the results.</p>
         {historyTabs}
-        <ProgressFilters action="/student/history" filters={filters} topics={[]} period={period} preserve={{ per: String(pageSize) }} />
+        <ProgressFilters action="/student/history" filters={filters} topics={[]} period={period} />
 
         <section>
           <SectionHeader
@@ -273,7 +270,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
           ) : (
             <TestAttemptsAccordion tests={examPage.items} hrefFor={(id) => `/student/tests/results/${id}`} />
           )}
-          <Pagination basePath="/student/history" params={pageParams} pageSize={pageSize} pageSizeParam="per" {...examPage} />
+          <Pagination basePath="/student/history" params={pageParams} pageSize={pageSize} {...examPage} />
         </section>
       </PageShell>
     );
@@ -333,7 +330,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
               description="One row per practice set with your last attempt. Open it to see every try; click a try to see each question again."
             />
             <PracticeSetAttemptsAccordion sets={historyPage.items} hrefFor={(id) => buildProgressHref(`/student/results/${id}`, filters)} recentLimit={ALL_TRIES} />
-            <Pagination basePath="/student/history" params={pageParams} pageSize={pageSize} pageSizeParam="per" anchor="history" {...historyPage} />
+            <Pagination basePath="/student/history" params={pageParams} pageSize={pageSize} anchor="history" {...historyPage} />
           </section>
         </div>
       )}

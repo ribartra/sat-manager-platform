@@ -1,3 +1,4 @@
+import { PAGE_SIZE } from "@/components/sat/pagination";
 import { redirect } from "next/navigation";
 import {
   Breadcrumbs,
@@ -109,7 +110,7 @@ export default async function StudentTestsPage({ searchParams }: PageProps) {
   );
 }
 
-const TESTS_PAGE_SIZE = 10;
+const TESTS_PAGE_SIZE = PAGE_SIZE;
 
 /** The student's Test card links (same card as every view): start / continue modules, review, retake. */
 const STUDENT_TEST_CARD_LINKS: TestCardLinks = {
