@@ -183,6 +183,9 @@ export interface PracticeSetAttempts {
   /** Newest first, at most `recentLimit` (the rest is in History). */
   recent: PracticeAttemptRow[];
   /** Skill and source of the set: with them the accordion opens skill → source → sets. */
+  /** The practice set and its level (History links of the set). */
+  practiceSetId?: string | null;
+  difficulty?: string | null;
   skillId?: string | null;
   skillName?: string | null;
   sourceName?: string | null;
@@ -193,8 +196,8 @@ type PracticeSetAccordionProps = {
   sets: PracticeSetAttempts[];
   /** Omit for views without attempt pages (parents): rows are not links. */
   hrefFor?: (id: string) => string;
-  /** "See all N tries" link; omitted where there is no History (parents). */
-  historyHref?: string;
+  /** "See all N tries" link (one URL, or one per set: the teacher's History filtered to that set); omitted where there is no History (parents). */
+  historyHref?: string | ((set: PracticeSetAttempts) => string);
   recentLimit?: number;
 };
 
@@ -279,7 +282,7 @@ function PracticeSetRows({ sets, hrefFor, historyHref, recentLimit = 3 }: Practi
             />
             {set.tryCount > Math.min(recentLimit, set.recent.length) ? (
               historyHref ? (
-                <Link href={historyHref} className="mt-2 inline-block text-xs font-medium text-blue-600 hover:underline">
+                <Link href={typeof historyHref === "function" ? historyHref(set) : historyHref} className="mt-2 inline-block text-xs font-medium text-blue-600 hover:underline">
                   See all {set.tryCount} tries in History →
                 </Link>
               ) : (

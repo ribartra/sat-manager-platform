@@ -931,7 +931,7 @@ function SearchStatusFilter({
   placeholder: string;
 }) {
   return (
-    <FilterBar className="mb-0 mt-3">
+    <FilterBar className="mb-0 mt-3" sticky={false}>
       <FilterField label="Search" className="@md:flex-[2]">
         <div className="relative">
           <Search size={14} aria-hidden className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -963,7 +963,7 @@ function FileFilters({
   setFileStatus: (value: string) => void;
 }) {
   return (
-    <FilterBar className="mb-0">
+    <FilterBar className="mb-0" sticky={false}>
       <FilterField label="Search" className="@md:flex-[2]">
         <div className="relative">
           <Search size={14} aria-hidden className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />

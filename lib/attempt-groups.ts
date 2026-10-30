@@ -25,6 +25,9 @@ export interface GroupableSet {
   key: string;
   title: string;
   tries: GroupableTry[];
+  /** The practice set and its level (History links of the set). */
+  practiceSetId?: string | null;
+  difficulty?: string | null;
   /** Skill and source of the set: with them the accordion opens skill → source → sets. */
   skillId?: string | null;
   skillName?: string | null;
@@ -60,6 +63,8 @@ export function practiceSetGroups(sets: GroupableSet[], recentLimit = 3): Practi
       return {
         key: set.key,
         title: set.title,
+        practiceSetId: set.practiceSetId ?? null,
+        difficulty: set.difficulty ?? null,
         skillId: set.skillId ?? null,
         skillName: set.skillName ?? null,
         sourceName: set.sourceName ?? null,
@@ -86,7 +91,7 @@ export function setsFromReportAttempts(attempts: ReportAttempt[]): GroupableSet[
     const set =
       bySet.get(key) ??
       bySet
-        .set(key, { key, title: practiceSetTitle(a.name, a.difficulty), tries: [], skillId: a.skillId, skillName: a.skillName, sourceName: a.sourceName, sourceOrder: a.sourceOrder })
+        .set(key, { key, title: practiceSetTitle(a.name, a.difficulty), tries: [], practiceSetId: a.practiceSetId, difficulty: a.difficulty, skillId: a.skillId, skillName: a.skillName, sourceName: a.sourceName, sourceOrder: a.sourceOrder })
         .get(key)!;
     set.tries.push({ id: a.id, tryNumber: a.attemptNumber ?? 1, submittedAt: a.submittedAt, correct: a.correct, total: a.total, pct: a.percent, time: a.totalTime, status: a.status });
   }

@@ -38,12 +38,14 @@ export function ChevronCell({ className }: { className?: string }) {
 /** Shared table frame: header row style + body dividers. */
 export function SimpleTable({ head, children, className }: { head: React.ReactNode[]; children: React.ReactNode; className?: string }) {
   return (
-    <div className={cn("overflow-x-auto rounded-[var(--sat-radius)] border border-[var(--sat-border)] bg-white", className)}>
+    // From md up the box doesn't scroll sideways, so the header can stick to the page while it scrolls
+    // (right under a sticky FilterBar: --list-head-top).
+    <div className={cn("overflow-x-auto rounded-[var(--sat-radius)] border border-[var(--sat-border)] bg-white md:overflow-visible", className)}>
       <table className="w-full border-collapse text-sm">
         <thead className="bg-[var(--sat-surface-2)] text-left text-xs text-[var(--sat-muted)]">
           <tr>
             {head.map((h, i) => (
-              <th key={i} className="whitespace-nowrap border-b border-[var(--sat-border)] px-3 py-2.5 font-semibold">{h}</th>
+              <th key={i} className="whitespace-nowrap border-b border-[var(--sat-border)] bg-[var(--sat-surface-2)] px-3 py-2.5 font-semibold md:sticky md:top-[var(--list-head-top,0px)] md:z-10">{h}</th>
             ))}
           </tr>
         </thead>

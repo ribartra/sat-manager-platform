@@ -63,6 +63,7 @@ export type ReportAttempt = {
   /** Practice only: try number within its assignment and the set's difficulty. */
   attemptNumber?: number;
   assignmentId?: string | null;
+  practiceSetId?: string | null;
   difficulty?: string | null;
   /** Practice only: skill and source of the set (attempt accordions: skill → source → sets). */
   skillId?: string | null;
@@ -242,6 +243,7 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
       teacherComment: attempt.teacherComment,
       attemptNumber: attempt.attemptNumber,
       assignmentId: attempt.assignmentId,
+      practiceSetId: attempt.practiceSetId,
       difficulty: attempt.assignment?.practiceSet.difficulty ?? null,
       skillId: attempt.assignment?.practiceSet.topicId ?? snapshot?.topic?.id ?? null,
       skillName:

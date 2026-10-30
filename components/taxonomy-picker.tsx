@@ -10,6 +10,8 @@ export interface TaxonomyPickerTopic {
   name: string;
   sectionLabel: string;
   domainName: string;
+  /** Optional: filters that keep the chosen domain in the URL map its name to the id. */
+  domainId?: string;
 }
 
 // Preferred display order for sections; anything else falls after these.
@@ -35,6 +37,8 @@ export function TaxonomyPicker({
   fixedSection,
   stacked = false,
   inFilterBar = false,
+  initialDomain,
+  onDomainChange,
   className,
 }: {
   topics: TaxonomyPickerTopic[];
@@ -47,11 +51,15 @@ export function TaxonomyPicker({
   stacked?: boolean;
   /** Inside a FilterBar: each select is one more field of the bar's row (same label and height). */
   inFilterBar?: boolean;
+  /** Domain (name) chosen with no skill yet, e.g. a filter whose URL has `domain` only. */
+  initialDomain?: string;
+  /** Called with the Domain name when it changes ("" = all), for filters that keep the domain. */
+  onDomainChange?: (domainName: string) => void;
   className?: string;
 }) {
   const selected = topics.find((t) => t.id === value);
   const [sectionState, setSectionState] = useState(selected?.sectionLabel ?? "");
-  const [domainState, setDomainState] = useState(selected?.domainName ?? "");
+  const [domainState, setDomainState] = useState(selected?.domainName ?? initialDomain ?? "");
 
   const section = fixedSection ?? sectionState;
   const req = required && !allowAll;
@@ -99,6 +107,7 @@ export function TaxonomyPicker({
           value={domainState}
           onChange={(e) => {
             setDomainState(e.target.value);
+            onDomainChange?.(e.target.value);
             onChange("");
           }}
           required={req}

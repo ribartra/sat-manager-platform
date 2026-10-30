@@ -43,6 +43,7 @@ import { loadStudentTests, sortTests, type StudentTestItem } from "@/lib/test-as
 import { officialSkillsFor } from "@/lib/taxonomy-order";
 import { loadContinueWork } from "@/lib/continue-work";
 import { formatDate, relativeDay } from "@/lib/utils";
+import { historyHref } from "@/lib/history-params";
 
 /**
  * Student Home (mockup `mejorada` index.html + area.html). Tabs: Summary · Math · Reading · Writing · Tests.
@@ -98,7 +99,7 @@ export function teacherViewLinks(studentId: string, studentName: string): HomeLi
     practiceResult: (id) => `${student}/attempts/${id}`,
     testResult: (id) => `${student}/tests/${id}`,
     // From an area tab: that area on the student page, at its recent attempts.
-    history: (tab) => (tab ? `${student}?area=${tab}#recent-attempts` : `${student}?area=history`),
+    history: (tab) => (tab ? `${student}?area=${tab}#recent-attempts` : historyHref({ student: studentId })),
     practice: () => null,
     readOnly: true,
     crumbs: [

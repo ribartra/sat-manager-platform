@@ -19,7 +19,7 @@ import { loadOptionImageUrlsByQuestionId } from "@/lib/question-list-media-query
 import { QuestionsTable, type QuestionBankRow } from "./questions-table-client";
 import { resolveQuestionType } from "@/lib/question-type";
 
-interface SearchParams { area?: string; section?: string; topic?: string; difficulty?: string; status?: string; page?: string; q?: string }
+interface SearchParams { area?: string; section?: string; domain?: string; topic?: string; difficulty?: string; status?: string; page?: string; q?: string }
 
 const TOPIC_IN_CHUNK = 400;
 const PAGE_SIZE = 50;
@@ -43,7 +43,11 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
         practiceArea: t.domain.practiceArea,
       }) === practiceArea
   );
-  const visibleTopicIds = [...new Set(visibleTopics.map((topic) => topic.id))];
+  // Domain (`domain` = domain id): the skill's domain, or a domain chosen with no skill.
+  const topicDomain = visibleTopics.find((t) => t.id === filters.topic)?.domainId;
+  const selectedDomainId = topicDomain ?? (filters.domain && visibleTopics.some((t) => t.domainId === filters.domain) ? filters.domain : undefined);
+  const domainTopics = selectedDomainId ? visibleTopics.filter((t) => t.domainId === selectedDomainId) : visibleTopics;
+  const visibleTopicIds = [...new Set(domainTopics.map((topic) => topic.id))];
   const selectedTopicId = filters.topic && visibleTopicIds.includes(filters.topic) ? filters.topic : undefined;
 
   const topicFilter = selectedTopicId
@@ -107,7 +111,7 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
 
       <QuestionsFilter
         // Remount on a new URL (Clear / tab) so the fields show the applied filters.
-        key={[area, filters.topic, filters.difficulty, filters.status, q].join("|")}
+        key={[area, selectedDomainId, filters.topic, filters.difficulty, filters.status, q].join("|")}
         area={area}
         initialQuery={q}
         sectionLabel={sectionLabel}
@@ -118,13 +122,17 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
             practiceArea: t.domain.practiceArea,
           }),
           domainName: t.domain.name,
+          domainId: t.domainId,
         }))}
         initialTopicId={selectedTopicId}
+        initialDomainId={selectedDomainId}
         initialDifficulty={filters.difficulty}
         initialStatus={filters.status}
       />
 
       <QuestionsTable
+        // A filter fixed to one value hides its column (Domain only trims the Domain / Skill cell).
+        fixed={{ domain: Boolean(selectedDomainId), skill: Boolean(selectedTopicId), difficulty: Boolean(filters.difficulty), status: Boolean(filters.status) }}
         rows={questions.map((q): QuestionBankRow => {
           const setUses = new Set(q.setItems.map((s) => s.practiceSetId)).size;
           const fullUses = q.fullTestItems.length;
@@ -149,7 +157,7 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
       />
       <Pagination
         basePath="/teacher/questions"
-        params={{ area: filters.area, section: filters.section, topic: filters.topic, difficulty: filters.difficulty, status: filters.status, q: q || undefined }}
+        params={{ area: filters.area, section: filters.section, domain: selectedDomainId, topic: filters.topic, difficulty: filters.difficulty, status: filters.status, q: q || undefined }}
         page={page}
         pageCount={pageCount}
         total={total}

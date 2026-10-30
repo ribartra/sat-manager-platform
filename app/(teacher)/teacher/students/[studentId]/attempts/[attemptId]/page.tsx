@@ -29,6 +29,7 @@ import { teacherProgramEnrollmentScope } from "@/lib/program-scope";
 import { summarizeAllQuestionAnswers } from "@/lib/weighted-score";
 import { liveImagesOf } from "@/lib/question-media";
 import { buildProgressHref, progressFiltersFromParams } from "@/lib/progress-filters";
+import { historyHref } from "@/lib/history-params";
 
 interface PageProps {
   params: Promise<{ studentId: string; attemptId: string }>;
@@ -154,7 +155,16 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
             {practiceSet ? <Badge variant={difficultyBadgeVariant(practiceSet.difficulty)}>{difficultyLabel(practiceSet.difficulty)}</Badge> : null}
             <AttemptStatusBadge status={attempt.status} />
             {tries.length > 1 ? (
-              <Link href={`/teacher/students/${studentId}?area=history&type=practice`} className="text-xs font-medium text-[var(--sat-primary)] hover:underline">
+              <Link
+                href={historyHref({
+                  student: studentId,
+                  area: areaTab === "math" || areaTab === "reading" || areaTab === "writing" ? areaTab : undefined,
+                  skill: practiceSet?.topicId,
+                  difficulty: practiceSet?.difficulty,
+                  set: attempt.practiceSetId,
+                })}
+                className="text-xs font-medium text-[var(--sat-primary)] hover:underline"
+              >
                 All tries in History →
               </Link>
             ) : null}

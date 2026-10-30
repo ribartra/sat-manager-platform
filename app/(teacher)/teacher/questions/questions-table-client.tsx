@@ -30,7 +30,10 @@ export type QuestionBankRow = {
   usedCount: number;
 };
 
-export function QuestionsTable({ rows }: { rows: QuestionBankRow[] }) {
+/** Filters fixed to one value: their column (or part of it) is not shown, it would repeat. */
+export type QuestionsTableFixed = { domain: boolean; skill: boolean; difficulty: boolean; status: boolean };
+
+export function QuestionsTable({ rows, fixed }: { rows: QuestionBankRow[]; fixed: QuestionsTableFixed }) {
   const columns = useMemo<ColumnDef<QuestionBankRow>[]>(
     () => [
       {
@@ -51,14 +54,13 @@ export function QuestionsTable({ rows }: { rows: QuestionBankRow[] }) {
         ),
       },
       {
+        // "Domain / Skill"; with a Domain chosen only the skill (the domain would repeat).
         id: "skill",
-        header: "Skill",
+        header: fixed.domain ? "Skill" : "Domain / Skill",
         meta: { priority: "medium" },
         cell: ({ row }) => (
           <div>
-            <p className="text-xs text-muted-foreground">
-              {row.original.skillSection} / {row.original.skillDomain}
-            </p>
+            {fixed.domain ? null : <p className="text-xs text-muted-foreground">{row.original.skillDomain}</p>}
             <p className="text-sm text-foreground">{row.original.skillName}</p>
           </div>
         ),
@@ -107,7 +109,7 @@ export function QuestionsTable({ rows }: { rows: QuestionBankRow[] }) {
         ),
       },
     ],
-    [],
+    [fixed.domain],
   );
 
   return (
@@ -116,6 +118,7 @@ export function QuestionsTable({ rows }: { rows: QuestionBankRow[] }) {
       data={rows}
       getRowId={(row) => row.id}
       responsiveStrategy="priority"
+      hiddenColumns={[fixed.skill ? "skill" : "", fixed.difficulty ? "difficulty" : "", fixed.status ? "status" : ""].filter(Boolean)}
       emptyTitle="No questions found"
       emptyDescription="Create your first question to build the bank."
     />

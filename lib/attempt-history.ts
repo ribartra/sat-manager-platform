@@ -21,6 +21,10 @@ export interface HistoryRow {
   avatarUrl: string | null;
   /** Practice assignment or Test assignment (groups the tries). */
   groupId: string;
+  /** Skill (Topic), practice set and Test of the row: the History view filters by them. */
+  topicId: string | null;
+  practiceSetId: string | null;
+  testId: string | null;
   title: string;
   area: PracticeAreaCode | null;
   areaLabel: string | null;
@@ -51,26 +55,32 @@ export interface HistoryRow {
 export interface HistoryFilters {
   kind?: HistoryKind;
   area?: PracticeAreaCode;
-  status?: "completed" | "progress";
+  status?: "completed" | "progress" | "invalidated";
   from?: Date;
   /** Inclusive end (end of the day). */
   to?: Date;
+  /** Practice only: one skill, level or practice set. */
+  topicId?: string;
+  difficulty?: string;
+  practiceSetId?: string;
+  /** Tests only: one Test. */
+  testId?: string;
 }
 
 const COUNTED = "SUBMITTED";
 
 export async function loadAttemptHistory(studentIds: string[], filters: HistoryFilters = {}): Promise<HistoryRow[]> {
   if (studentIds.length === 0) return [];
-  const wantPractice = filters.kind !== "test";
-  const wantTests = filters.kind !== "practice" && !filters.area;
+  const practiceOnly = Boolean(filters.area || filters.topicId || filters.difficulty || filters.practiceSetId);
+  const wantPractice = filters.kind !== "test" && !filters.testId;
+  const wantTests = filters.kind !== "practice" && !practiceOnly;
   const [practice, tests] = await Promise.all([
     wantPractice
       ? prisma.attempt.findMany({
           where: {
             studentId: { in: studentIds },
             status: { in: ["SUBMITTED", "INVALIDATED", "IN_PROGRESS"] },
-            assignmentId: { not: null },
-            ...(filters.area ? { assignment: { practiceSet: { topic: { domain: { practiceArea: filters.area } } } } } : {}),
+            ...(filters.practiceSetId ? { practiceSetId: filters.practiceSetId } : {}),
           },
           orderBy: { startedAt: "asc" },
           select: {
@@ -81,26 +91,15 @@ export async function loadAttemptHistory(studentIds: string[], filters: HistoryF
             totalTime: true,
             scorePercent: true,
             assignmentId: true,
+            practiceSetId: true,
             student: { select: { id: true, name: true, avatarUrl: true } },
             answers: { select: { answer: true, isCorrect: true } },
-            assignment: {
-              select: {
-                practiceSet: {
-                  select: {
-                    name: true,
-                    difficulty: true,
-                    _count: { select: { questions: true } },
-                    topic: { select: { name: true, domain: { select: { practiceArea: true } } } },
-                  },
-                },
-              },
-            },
           },
         })
       : Promise.resolve([]),
     wantTests
       ? prisma.fullPracticeTestAttempt.findMany({
-          where: { studentId: { in: studentIds }, status: { in: ["SUBMITTED", "INVALIDATED", "IN_PROGRESS"] } },
+          where: { studentId: { in: studentIds }, status: { in: ["SUBMITTED", "INVALIDATED", "IN_PROGRESS"] }, ...(filters.testId ? { testId: filters.testId } : {}) },
           orderBy: { startedAt: "asc" },
           select: {
             id: true,
@@ -120,17 +119,34 @@ export async function loadAttemptHistory(studentIds: string[], filters: HistoryF
       : Promise.resolve([]),
   ]);
 
+  // The set of each attempt (also for attempts saved without an assignment).
+  const setIds = [...new Set(practice.map((a) => a.practiceSetId))];
+  const sets = setIds.length
+    ? await prisma.practiceSet.findMany({
+        where: { id: { in: setIds } },
+        select: {
+          id: true,
+          name: true,
+          difficulty: true,
+          topicId: true,
+          _count: { select: { questions: true } },
+          topic: { select: { name: true, domain: { select: { practiceArea: true } } } },
+        },
+      })
+    : [];
+  const setById = new Map(sets.map((set) => [set.id, set]));
+
   const rows: HistoryRow[] = [];
 
   const practiceGroups = new Map<string, typeof practice>();
   for (const a of practice) {
-    const key = a.assignmentId!;
+    const key = a.assignmentId ?? `${a.student.id}:${a.practiceSetId}`;
     (practiceGroups.get(key) ?? practiceGroups.set(key, []).get(key)!).push(a);
   }
   for (const [groupId, tries] of practiceGroups) {
     let previousPct: number | null = null;
     tries.forEach((a, i) => {
-      const set = a.assignment?.practiceSet;
+      const set = setById.get(a.practiceSetId);
       const questionCount = set?._count.questions ?? 0;
       const score = summarizeAllQuestionAnswers(a.answers);
       const total = Math.max(score.total, questionCount);
@@ -145,6 +161,9 @@ export async function loadAttemptHistory(studentIds: string[], filters: HistoryF
         studentName: a.student.name,
         avatarUrl: a.student.avatarUrl,
         groupId,
+        topicId: set?.topicId ?? null,
+        practiceSetId: a.practiceSetId,
+        testId: null,
         title: set?.topic.name ?? (set ? shortSetName(set.name) : "Practice set"),
         area,
         areaLabel: area ? practiceAreaLabel(area) : null,
@@ -188,6 +207,9 @@ export async function loadAttemptHistory(studentIds: string[], filters: HistoryF
         studentName: a.student.name,
         avatarUrl: a.student.avatarUrl,
         groupId,
+        topicId: null,
+        practiceSetId: null,
+        testId: a.testId,
         title: a.test.name,
         area: null,
         areaLabel: null,
@@ -215,8 +237,19 @@ export async function loadAttemptHistory(studentIds: string[], filters: HistoryF
     });
   }
 
+  // Filters that only narrow the list (try numbers and changes above use the whole history).
   return rows
-    .filter((r) => (filters.status === "completed" ? r.status !== "IN_PROGRESS" : filters.status === "progress" ? r.status === "IN_PROGRESS" : true))
+    .filter((r) => (filters.area ? r.area === filters.area : true))
+    .filter((r) => (filters.topicId ? r.topicId === filters.topicId : true) && (filters.difficulty ? r.difficulty === filters.difficulty : true))
+    .filter((r) =>
+      filters.status === "completed"
+        ? r.status === "SUBMITTED"
+        : filters.status === "progress"
+          ? r.status === "IN_PROGRESS"
+          : filters.status === "invalidated"
+            ? r.status === "INVALIDATED"
+            : true,
+    )
     .filter((r) => (filters.from ? r.at >= filters.from : true) && (filters.to ? r.at <= filters.to : true))
     .sort((a, b) => b.at.getTime() - a.at.getTime());
 }

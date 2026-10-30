@@ -32,10 +32,13 @@ export function InvalidateAttemptButton({
   attemptId,
   kind,
   status,
+  compact = false,
 }: {
   attemptId: string;
   kind: "practice" | "test";
   status: string;
+  /** Short label for table rows ("Invalidate"). */
+  compact?: boolean;
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -71,7 +74,7 @@ export function InvalidateAttemptButton({
   return (
     <>
       <button type="button" className={HEADER_ACTION_DANGER_CLASS} onClick={() => setOpen(true)} title="Keep it in the history but don't count it">
-        <Ban size={14} aria-hidden /> Invalidate attempt
+        <Ban size={14} aria-hidden /> {compact ? "Invalidate" : "Invalidate attempt"}
       </button>
       <Dialog open={open} onOpenChange={(next) => !working && setOpen(next)}>
         <DialogContent className="max-w-md">

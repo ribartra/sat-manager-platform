@@ -48,7 +48,7 @@ export function PeriodFilter({ value, label = "Period" }: { value: PeriodValue; 
 
   const custom = period === "custom";
   return (
-    <FilterField label={label} htmlFor="pf-period" className="@md:min-w-[11.5rem]">
+    <FilterField label={label} htmlFor="pf-period" className="@md:min-w-[10rem]">
         <Select
           id="pf-period"
           name="period"

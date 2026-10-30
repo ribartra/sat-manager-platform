@@ -329,9 +329,9 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
-    requires: ["loadPracticeReport", "SkillResults", "PracticeSetAttemptsAccordion", "TestAttemptsAccordion", "InvalidateAttemptButton", "HeaderActions", "Practice Sets", "Teacher Comments", "GenerateReportDialog"],
+    requires: ["loadPracticeReport", "SkillResults", "PracticeSetAttemptsAccordion", "TestAttemptsAccordion", "historyHref(", 'query.area === "history" || query.area === "activity"', "HeaderActions", "Practice Sets", "Teacher Comments", "GenerateReportDialog"],
     forbids: ["RestartExamButton", "TopicDifficultyTrend", "Best R&amp;W", "LineChart"],
-    label: "Pagina del alumno: resultados por skill (ultimo intento de cada set, ponderado por preguntas, detalle por fuente), acordeones por set y por test, Invalidar en History, acciones arriba, sin Restart ni graficas entre tests",
+    label: "Pagina del alumno: resultados por skill (ultimo intento de cada set, ponderado por preguntas, detalle por fuente), acordeones por set y por test, History unificada (redirige ?area=history/activity), acciones arriba, sin Restart ni graficas entre tests",
   },
   {
     file: "lib/student-report.ts",
@@ -496,6 +496,42 @@ const checks = [
     requires: ["resolvePeriod(", "periodParams("],
     forbids: ['type="date"', 'label: "From"'],
     label: `Historial filtra por periodo (sin campo From suelto): ${file}`,
+  })),
+  // One History view (practice + Tests + former Activity), driven by the URL, columns hidden when fixed.
+  {
+    file: "lib/history-params.ts",
+    requires: ["export function parseHistoryParams", "export function historyHref", "skill", "difficulty", "set", "test"],
+    label: "Contrato de URL de History: alumno, tipo, area, skill, nivel, set, test, estado",
+  },
+  {
+    file: "app/(teacher)/teacher/history/page.tsx",
+    requires: ["parseHistoryParams(", "InvalidateAttemptButton", "show.student", "show.title", "Back to", "dayLabel("],
+    label: "History unificada: contexto por URL, columnas ocultas con filtro fijo, volver al alumno, encabezado por dia",
+  },
+  {
+    file: "lib/attempt-history.ts",
+    requires: ["topicId?: string", "practiceSetId?: string", "testId?: string", "invalidated"],
+    forbids: ["assignmentId: { not: null }"],
+    label: "Historial: filtros de skill/nivel/set/test e intentos sin asignacion",
+  },
+  ...[
+    "app/(teacher)/teacher/students/[studentId]/attempts/[attemptId]/page.tsx",
+    "app/(teacher)/teacher/students/[studentId]/tests/[attemptId]/page.tsx",
+  ].map((file) => ({ file, requires: ["historyHref("], forbids: ["?area=history"], label: `"All tries in History" con contexto: ${file}` })),
+  {
+    file: "app/(teacher)/teacher/questions/questions-table-client.tsx",
+    requires: ['"Domain / Skill"', "hiddenColumns="],
+    label: "Questions: Domain / Skill y columnas ocultas cuando su filtro esta fijo",
+  },
+  {
+    file: "components/sat/filter-bar.tsx",
+    requires: ["md:sticky", "data-filter-bar", "<StickyOffset"],
+    label: "Barra de filtros fija arriba al desplazar (desktop)",
+  },
+  ...["components/sat/link-table.tsx", "components/sat/data-table.tsx"].map((file) => ({
+    file,
+    requires: ["md:sticky md:top-[var(--list-head-top,0px)]"],
+    label: `Cabecera de tabla fija bajo los filtros: ${file}`,
   })),
   // Account names "First Last" on every create / edit (lib/person-name.ts).
   ...[
