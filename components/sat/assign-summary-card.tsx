@@ -93,14 +93,14 @@ export function AssignSummaryCard({
 
       <div className="space-y-3 border-t border-gray-100 pt-3">
         <div>
-          <label htmlFor="assign-due" className="mb-1 block text-sm font-medium text-gray-700">Due date</label>
-          <Input id="assign-due" type="date" value={options.dueDate} onChange={(e) => set({ dueDate: e.target.value })} />
-          <p className="mt-1 text-xs text-gray-400">{dueHint ?? "Due at the end of that day."}</p>
-        </div>
-        <div>
           <label htmlFor="assign-open" className="mb-1 block text-sm font-medium text-gray-700">Open date (optional)</label>
           <Input id="assign-open" type="date" value={options.unlockAt} onChange={(e) => set({ unlockAt: e.target.value })} />
           <p className="mt-1 text-xs text-gray-400">The student can start it from that day. Today by default.</p>
+        </div>
+        <div>
+          <label htmlFor="assign-due" className="mb-1 block text-sm font-medium text-gray-700">Due date</label>
+          <Input id="assign-due" type="date" value={options.dueDate} onChange={(e) => set({ dueDate: e.target.value })} />
+          <p className="mt-1 text-xs text-gray-400">{dueHint ?? "Due at the end of that day."}</p>
           {dateError ? <p className="mt-1 text-xs text-red-600">{dateError}</p> : null}
         </div>
         <div>
