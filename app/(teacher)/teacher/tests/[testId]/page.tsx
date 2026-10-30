@@ -15,6 +15,7 @@ import {
   TD,
   invalidatedRowClass,
   pageFromParam,
+  pageSizeFromParam,
   paginate,
 } from "@/components/sat";
 import { TestModuleTiles } from "@/components/sat/test-module-tiles";
@@ -46,14 +47,15 @@ import { assignHref } from "@/lib/assign-params";
 
 interface PageProps {
   params: Promise<{ testId: string }>;
-  searchParams: Promise<{ attemptsPage?: string }>;
+  searchParams: Promise<{ attemptsPage?: string; per?: string }>;
 }
 
-const ATTEMPTS_PAGE_SIZE = 10;
 
 export default async function FullTestDetailPage({ params, searchParams }: PageProps) {
   const { testId } = await params;
-  const { attemptsPage } = await searchParams;
+  const { attemptsPage, per } = await searchParams;
+  // Students' results (consolidation table): 25 / 50 / 100 rows per page.
+  const pageSize = pageSizeFromParam(per, 25);
   const session = await requireTeacherOrAdmin();
   if (!session) notFound();
   const now = new Date();
@@ -133,7 +135,7 @@ export default async function FullTestDetailPage({ params, searchParams }: PageP
       return { st, assignment, attempt, view, status, tries: assignment ? attemptsByAssignment.get(assignment.id) ?? 0 : 0 };
     }),
   );
-  const rowPage = paginate(rows, pageFromParam(attemptsPage), ATTEMPTS_PAGE_SIZE);
+  const rowPage = paginate(rows, pageFromParam(attemptsPage), pageSize);
   const firstAssigned = test.assignments.reduce<Date | null>((m, a) => (!m || a.createdAt < m ? a.createdAt : m), null);
   const nextDue = test.assignments
     .filter((a) => a.status !== "COMPLETED" && a.dueDate)
@@ -239,7 +241,7 @@ export default async function FullTestDetailPage({ params, searchParams }: PageP
                 );
               })}
             </SimpleTable>
-            <Pagination basePath={`/teacher/tests/${test.id}`} params={{}} param="attemptsPage" anchor="students" pageSize={ATTEMPTS_PAGE_SIZE} {...rowPage} />
+            <Pagination basePath={`/teacher/tests/${test.id}`} params={{ per: String(pageSize) }} param="attemptsPage" anchor="students" pageSize={pageSize} pageSizeParam="per" {...rowPage} />
           </>
         )}
       </section>

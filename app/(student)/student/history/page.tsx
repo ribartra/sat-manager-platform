@@ -13,6 +13,7 @@ import {
   TD,
   pageFromParam,
   paginate,
+  pageSizeFromParam,
 } from "@/components/sat";
 import { Pct } from "@/components/sat/work-status";
 import { Button } from "@/components/ui/button";
@@ -51,13 +52,13 @@ interface PageProps {
     from?: string;
     to?: string;
     page?: string;
+    per?: string;
     source?: string;
     sarea?: string;
     result?: string;
   }>;
 }
 
-const HISTORY_PAGE_SIZE = 20;
 /** The student's own history lists every try of a set (the teacher's profile shows the last 3). */
 const ALL_TRIES = 1000;
 // Tabs in the mockup's order: By session (default), Tests, then practice by area. `area` keeps the old values.
@@ -81,7 +82,9 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
   const area = filters.area;
   const practiceArea = practiceAreaFromTab(area);
   const dateFilter = progressDateWhere(filters);
-  const pageParams = { ...Object.fromEntries(progressFilterEntries({ ...filters, from: undefined, to: undefined })), ...periodParams(period) };
+  // Consolidation lists: 25 / 50 / 100 rows per page (`per`), kept with every filter.
+  const pageSize = pageSizeFromParam(params.per, 25);
+  const pageParams = { ...Object.fromEntries(progressFilterEntries({ ...filters, from: undefined, to: undefined })), ...periodParams(period), per: String(pageSize) };
   const requestedPage = pageFromParam(params.page);
 
   const sessionsView = !params.area || params.area === "sessions";
@@ -113,7 +116,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
       .filter((s) => (!source || s.source === source) && areaMatch(s) && (!fromDate || s.at >= fromDate) && (!toDate || s.at <= toDate))
       .map((s) => ({ s, rows: result ? s.rows.filter((r) => r.result === result) : s.rows }))
       .filter((x) => !result || x.rows.length > 0);
-    const sessionPage = paginate(listed, requestedPage, HISTORY_PAGE_SIZE);
+    const sessionPage = paginate(listed, requestedPage, pageSize);
     const dayOf = (d: Date) => d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
     // A day heading before the first session of each day.
     const headings = sessionPage.items.map((x, i) => (i === 0 || dayOf(sessionPage.items[i - 1].s.at) !== dayOf(x.s.at) ? dayOf(x.s.at) : null));
@@ -124,6 +127,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
         {historyTabs}
         <FilterBar action="/student/history">
           <input type="hidden" name="area" value="sessions" />
+          <input type="hidden" name="per" value={pageSize} />
           <FilterField label="Source" htmlFor="sh-source">
             <Select id="sh-source" name="source" defaultValue={source}>
               <option value="">All sources</option>
@@ -218,8 +222,9 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
         )}
         <Pagination
           basePath="/student/history"
-          params={{ area: "sessions", source, sarea, result, ...periodParams(period) }}
-          pageSize={HISTORY_PAGE_SIZE}
+          params={{ area: "sessions", source, sarea, result, ...periodParams(period), per: String(pageSize) }}
+          pageSize={pageSize}
+          pageSizeParam="per"
           {...sessionPage}
         />
       </PageShell>
@@ -244,7 +249,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
     // the date filter keeps the tries listed by the query above.
     const inFilter = new Set(examAttempts.map((exam) => exam.id));
     const testRows = groupTests(tests, (a) => inFilter.has(a.id));
-    const examPage = paginate(testRows, requestedPage, HISTORY_PAGE_SIZE);
+    const examPage = paginate(testRows, requestedPage, pageSize);
 
     return (
       <PageShell width="wide" density="compact" className="space-y-4">
@@ -252,7 +257,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
         <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">My history</h1>
         <p className="text-sm text-gray-500">Every Test attempt is saved, including tests you haven&apos;t finished. Open a test to see every try; click a try to see the results.</p>
         {historyTabs}
-        <ProgressFilters action="/student/history" filters={filters} topics={[]} period={period} />
+        <ProgressFilters action="/student/history" filters={filters} topics={[]} period={period} preserve={{ per: String(pageSize) }} />
 
         <section>
           <SectionHeader
@@ -268,7 +273,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
           ) : (
             <TestAttemptsAccordion tests={examPage.items} hrefFor={(id) => `/student/tests/results/${id}`} />
           )}
-          <Pagination basePath="/student/history" params={pageParams} pageSize={HISTORY_PAGE_SIZE} {...examPage} />
+          <Pagination basePath="/student/history" params={pageParams} pageSize={pageSize} pageSizeParam="per" {...examPage} />
         </section>
       </PageShell>
     );
@@ -282,7 +287,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
   const timePracticing = counted.reduce((sum, a) => sum + a.totalTime, 0);
   // Practice sets with their last attempt; this is the student's history, so every try is listed.
   const setGroups = practiceSetGroups(setsFromReportAttempts(report.attemptHistory), ALL_TRIES);
-  const historyPage = paginate(setGroups, requestedPage, HISTORY_PAGE_SIZE);
+  const historyPage = paginate(setGroups, requestedPage, pageSize);
   return (
     <PageShell width="wide" density="compact" className="space-y-4">
       <Breadcrumbs items={[{ label: "Home", href: "/student" }, { label: "History", href: "/student/history" }, { label: `Practice · ${practiceAreaLabel(practiceArea)}` }]} />
@@ -328,7 +333,7 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
               description="One row per practice set with your last attempt. Open it to see every try; click a try to see each question again."
             />
             <PracticeSetAttemptsAccordion sets={historyPage.items} hrefFor={(id) => buildProgressHref(`/student/results/${id}`, filters)} recentLimit={ALL_TRIES} />
-            <Pagination basePath="/student/history" params={pageParams} pageSize={HISTORY_PAGE_SIZE} anchor="history" {...historyPage} />
+            <Pagination basePath="/student/history" params={pageParams} pageSize={pageSize} pageSizeParam="per" anchor="history" {...historyPage} />
           </section>
         </div>
       )}

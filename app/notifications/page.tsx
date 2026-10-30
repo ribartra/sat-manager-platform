@@ -1,5 +1,5 @@
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
-import { PageShell } from "@/components/sat";
+import { PageShell, Pagination, pageFromParam, pageSizeFromParam } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -10,14 +10,22 @@ import { homeHrefForRole } from "@/lib/nav-config";
 
 export const dynamic = "force-dynamic";
 
-export default async function NotificationsPage() {
+/** Every notification of the user, newest first, paged in the database (25 / 50 / 100 per page). */
+export default async function NotificationsPage({ searchParams }: { searchParams: Promise<{ page?: string; per?: string }> }) {
   const session = await requireApprovedSession();
   if (!session) redirect("/auth/pending-validation");
+  const query = await searchParams;
+  const pageSize = pageSizeFromParam(query.per, 25);
 
+  const where = { userId: session.user.id };
+  const total = await prisma.notification.count({ where });
+  const pageCount = Math.max(1, Math.ceil(total / pageSize));
+  const page = Math.min(pageFromParam(query.page), pageCount);
   const notifications = await prisma.notification.findMany({
-    where: { userId: session.user.id },
+    where,
     orderBy: { createdAt: "desc" },
-    take: 100,
+    skip: (page - 1) * pageSize,
+    take: pageSize,
   });
 
   return (
@@ -40,6 +48,7 @@ export default async function NotificationsPage() {
         ))}
         {notifications.length === 0 && <div className="p-10 text-center text-sm text-gray-400">No notifications yet.</div>}
       </Card>
+      <Pagination basePath="/notifications" params={{ per: String(pageSize) }} page={page} pageCount={pageCount} total={total} pageSize={pageSize} pageSizeParam="per" />
     </PageShell>
   );
 }

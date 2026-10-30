@@ -20,6 +20,7 @@ import {
   ListFilters,
   pageFromParam,
   paginate,
+  pageSizeFromParam,
 } from "@/components/sat";
 import { AreaTag } from "@/components/sat/practice-set-row";
 import { InvalidateAttemptButton } from "@/components/sat/invalidate-attempt-button";
@@ -45,7 +46,6 @@ interface PageProps {
   searchParams: Promise<Record<string, string | undefined>>;
 }
 
-const PAGE_SIZE = 25;
 const AREA_CODE: Record<HistoryArea, PracticeAreaCode> = { math: "MATH", reading: "READING", writing: "WRITING" };
 const STATUS_OPTIONS = [
   { value: "completed", label: "Completed" },
@@ -99,9 +99,13 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
   });
   // No free-text search here: the Student and Skill drop-downs search inside when they are long.
   const shownRows = rows;
-  const page = paginate(shownRows, pageFromParam(query.page), PAGE_SIZE);
+  // Consolidation table: 25 / 50 / 100 rows per page (`per`), kept with every filter.
+  const pageSize = pageSizeFromParam(query.per, 25);
+  const page = paginate(shownRows, pageFromParam(query.page), pageSize);
   const current = { ...filter, q: undefined, student: studentId || undefined };
-  const params = { ...current, ...periodParams(period) };
+  // Period and rows per page travel with every link of the page (chip, student cells, pager).
+  const keepExtra = { ...periodParams(period), per: String(pageSize) };
+  const params = { ...current, ...keepExtra };
 
   // A fixed filter hides its column (it would repeat the same value on every row).
   const show: Columns = {
@@ -160,7 +164,7 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
 
       <ListFilters
         action="/teacher/history"
-        hidden={{ set: filter.set, test: filter.test }}
+        hidden={{ set: filter.set, test: filter.test, per: String(pageSize) }}
         filters={[
           { name: "student", label: "Student", value: studentId, allLabel: "All students", options: students.map((st) => ({ value: st.id, label: st.name })) },
           // Type and practice area in one select: Tests, Practice (every area) or one practice area.
@@ -182,7 +186,7 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
         <p className="mb-2 flex flex-wrap items-center gap-2 text-xs text-gray-600">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--sat-border)] bg-white px-2.5 py-1 font-medium">
             {setName ? "Practice set" : "Test"}: {setName ?? testName}
-            <Link href={historyHref({ ...current, set: undefined, test: undefined }, periodParams(period))} aria-label="Show every set and Test" className="text-gray-400 hover:text-gray-700">
+            <Link href={historyHref({ ...current, set: undefined, test: undefined }, keepExtra)} aria-label="Show every set and Test" className="text-gray-400 hover:text-gray-700">
               <X size={12} aria-hidden />
             </Link>
           </span>
@@ -207,12 +211,12 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
                       </td>
                     </tr>
                   ) : null}
-                  <HistoryTableRow row={r} show={show} current={current} />
+                  <HistoryTableRow row={r} show={show} current={current} keep={keepExtra} />
                 </Fragment>
               );
             })}
           </SimpleTable>
-          <Pagination basePath="/teacher/history" params={params} pageSize={PAGE_SIZE} {...page} />
+          <Pagination basePath="/teacher/history" params={params} pageSize={pageSize} pageSizeParam="per" {...page} />
         </>
       )}
     </PageShell>
@@ -231,7 +235,7 @@ interface Columns {
 
 const dayLabel = (date: Date) => date.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric", year: "numeric" });
 
-function HistoryTableRow({ row: r, show, current }: { row: HistoryRow; show: Columns; current: HistoryParams }) {
+function HistoryTableRow({ row: r, show, current, keep }: { row: HistoryRow; show: Columns; current: HistoryParams; keep: Record<string, string | undefined> }) {
   const isTest = r.kind === "test";
   const href = `/teacher/students/${r.studentId}/${isTest ? "tests" : "attempts"}/${r.id}`;
   return (
@@ -244,7 +248,7 @@ function HistoryTableRow({ row: r, show, current }: { row: HistoryRow; show: Col
         <td className={TD}>
           <RowAction>
             {/* This student's History (same filters). */}
-            <Link href={historyHref({ ...current, student: r.studentId })} className="hover:underline">
+            <Link href={historyHref({ ...current, student: r.studentId }, keep)} className="hover:underline">
               <StudentCell name={r.studentName} avatarUrl={r.avatarUrl} />
             </Link>
           </RowAction>

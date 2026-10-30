@@ -1,5 +1,5 @@
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
-import { ListFilters, PageShell, Pagination, RoleBadge, matchesQuery, pageFromParam, paginate } from "@/components/sat";
+import { ListFilters, PageShell, Pagination, RoleBadge, pageFromParam, pageSizeFromParam } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
@@ -16,10 +16,8 @@ import {
 } from "@/lib/audit-catalog";
 import { AuditPayload } from "@/components/admin/audit-payload";
 
-const LOG_PAGE_SIZE = 50;
-
 interface PageProps {
-  searchParams: Promise<{ cat?: string; page?: string; q?: string; outcome?: string; role?: string }>;
+  searchParams: Promise<{ cat?: string; page?: string; per?: string; user?: string; action?: string; outcome?: string; role?: string }>;
 }
 
 const TABS: { id: string; label: string; match?: AuditCategory }[] = [
@@ -54,44 +52,69 @@ export default async function AdminLogsPage({ searchParams }: PageProps) {
   if (!session) redirect("/login");
   if (session.user.role !== "ADMIN") redirect("/teacher");
 
-  const { cat, page, q: rawQ, outcome: rawOutcome, role: rawRole } = await searchParams;
-  const q = (rawQ ?? "").trim();
+  const { cat, page, per, user: rawUser, action: rawAction, outcome: rawOutcome, role: rawRole } = await searchParams;
   const outcomeFilter = rawOutcome === "success" || rawOutcome === "failure" || rawOutcome === "info" ? rawOutcome : undefined;
   const roleFilter = ["STUDENT", "TEACHER", "PARENT", "ADMIN"].includes(rawRole ?? "") ? rawRole : undefined;
   const category = cat?.toLowerCase() ?? "all";
   const tab = TABS.find((t) => t.id === category) ?? TABS[0];
+  const pageSize = pageSizeFromParam(per, 50);
 
+  // Every logged action and actor, for the tabs and the Action / User drop-downs (they search inside).
+  const [actionRows, actorRows] = await Promise.all([
+    prisma.auditLog.groupBy({ by: ["action"] }),
+    prisma.auditLog.groupBy({ by: ["userId"], where: { userId: { not: null } } }),
+  ]);
+  const actions = actionRows.map((row) => row.action);
+  const tabActions = tab.id === "all" ? null : actions.filter((action) => actionCategory(action) === tab.match);
+  const actionFilter = rawAction && actions.includes(rawAction) && (!tabActions || tabActions.includes(rawAction)) ? rawAction : undefined;
+  const actors = await prisma.user.findMany({
+    where: { id: { in: actorRows.map((row) => row.userId!).filter(Boolean) } },
+    select: { id: true, name: true, email: true },
+    orderBy: { name: "asc" },
+  });
+  const userFilter = actors.some((actor) => actor.id === rawUser) ? rawUser : undefined;
+
+  // Filtered and paged in the database: every action is reachable (no "latest 500" cut).
+  const where = {
+    ...(actionFilter ? { action: actionFilter } : tabActions ? { action: { in: tabActions } } : {}),
+    ...(userFilter ? { userId: userFilter } : {}),
+    ...(roleFilter ? { user: { role: roleFilter } } : {}),
+    // writeAudit stores metadata as compact JSON ({"outcome":"success",…}).
+    ...(outcomeFilter ? { metadata: { contains: `"outcome":"${outcomeFilter}"` } } : {}),
+  };
+  const total = await prisma.auditLog.count({ where });
+  const pageCount = Math.max(1, Math.ceil(total / pageSize));
+  const current = Math.min(pageFromParam(page), pageCount);
   const logs = await prisma.auditLog.findMany({
+    where,
     include: { user: { select: { name: true, email: true, role: true } } },
     orderBy: { createdAt: "desc" },
-    take: 500,
+    skip: (current - 1) * pageSize,
+    take: pageSize,
   });
-
-  // The latest 500 actions, paginated (every one of them is reachable, nothing is cut).
-  // Search + filters (URL): who / what (user, email, action), outcome and account type, on top of the tab.
-  const filtered = logs.filter(
-    (log) =>
-      (tab.id === "all" || actionCategory(log.action) === tab.match) &&
-      matchesQuery(q, log.user?.name, log.user?.email, log.action, AUDIT_ACTION_LABELS[log.action] ?? humanizeAction(log.action), log.targetType) &&
-      (!outcomeFilter || outcomeFromMetadata(log.metadata) === outcomeFilter) &&
-      (!roleFilter || log.user?.role === roleFilter),
-  );
-  const logPage = paginate(filtered, pageFromParam(page), LOG_PAGE_SIZE);
+  const logPage = { items: logs, page: current, pageCount, total };
+  const params = { cat: tab.id === "all" ? undefined : tab.id, user: userFilter, action: actionFilter, outcome: outcomeFilter, role: roleFilter, per: String(pageSize) };
 
   return (
     <PageShell width="wide">
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Admin" }, { label: "Audit Log" }]} />
       <h1 className="mb-1 text-xl font-semibold text-gray-900">Activity log</h1>
-      <p className="mb-4 text-sm text-gray-500">
-        Recent actions by users (the latest 500).
-      </p>
+      <p className="mb-4 text-sm text-gray-500">Every action by users, newest first.</p>
 
       <ListFilters
         action="/admin/logs"
-        q={q}
-        placeholder="User, email or action"
-        hidden={{ cat: tab.id === "all" ? undefined : tab.id }}
+        hidden={{ cat: tab.id === "all" ? undefined : tab.id, per: String(pageSize) }}
         filters={[
+          { name: "user", label: "User", value: userFilter, allLabel: "Anyone", options: actors.map((actor) => ({ value: actor.id, label: `${actor.name} · ${actor.email}` })) },
+          {
+            name: "action",
+            label: "Action",
+            value: actionFilter,
+            allLabel: "Any action",
+            options: (tabActions ?? actions)
+              .map((action) => ({ value: action, label: AUDIT_ACTION_LABELS[action] ?? humanizeAction(action) }))
+              .sort((a, b) => a.label.localeCompare(b.label)),
+          },
           { name: "outcome", label: "Outcome", value: outcomeFilter, allLabel: "Any outcome", options: [{ value: "success", label: "Success" }, { value: "failure", label: "Failure" }, { value: "info", label: "Info" }] },
           { name: "role", label: "Account type", value: roleFilter, allLabel: "Any account", options: ["STUDENT", "TEACHER", "PARENT", "ADMIN"].map((r) => ({ value: r, label: roleLabel(r) })) },
         ]}
@@ -99,7 +122,9 @@ export default async function AdminLogsPage({ searchParams }: PageProps) {
       <div className="mb-4 flex flex-wrap gap-2">
         {TABS.map((item) => {
           const active = tab.id === item.id;
-          const href = item.id === "all" ? "/admin/logs" : `/admin/logs?cat=${item.id}`;
+          // Changing tab keeps the other filters (the action belongs to a tab, so it resets).
+          const keep = new URLSearchParams(Object.entries({ ...params, cat: item.id === "all" ? undefined : item.id, action: undefined }).filter((e): e is [string, string] => Boolean(e[1])));
+          const href = `/admin/logs${keep.toString() ? `?${keep.toString()}` : ""}`;
           return (
             <a
               key={item.id}
@@ -179,11 +204,11 @@ export default async function AdminLogsPage({ searchParams }: PageProps) {
             </tbody>
           </table>
         </div>
-        {filtered.length === 0 && (
+        {total === 0 && (
           <p className="py-10 text-center text-sm text-gray-400">No events recorded yet.</p>
         )}
       </Card>
-      <Pagination basePath="/admin/logs" params={{ cat: tab.id === "all" ? undefined : tab.id, q: q || undefined, outcome: outcomeFilter, role: roleFilter }} pageSize={LOG_PAGE_SIZE} {...logPage} />
+      <Pagination basePath="/admin/logs" params={params} pageSize={pageSize} pageSizeParam="per" {...logPage} />
     </PageShell>
   );
 }

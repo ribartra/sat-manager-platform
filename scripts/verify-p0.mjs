@@ -165,8 +165,9 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/questions/questions-filter-client.tsx",
-    requires: ['params.set("q"'],
-    label: "Busqueda con filtros: Banco de preguntas: texto + area, skill, nivel, estado",
+    requires: ['params.set("domain"', 'params.set("per"'],
+    forbids: ['params.set("q"', 'label="Search"'],
+    label: "Banco de preguntas (tabla de consolidacion): sin busqueda libre; Domain/Skill, nivel, estado y filas por pagina en la URL",
   },
   {
     file: "app/(teacher)/teacher/practice-sets/page.tsx",
@@ -212,8 +213,9 @@ const checks = [
   },
   {
     file: "app/admin/logs/page.tsx",
-    requires: ["ListFilters"],
-    label: "Busqueda con filtros: Log (admin): texto + resultado, cuenta",
+    requires: ["ListFilters", 'pageSizeParam="per"', "skip: (current - 1) * pageSize"],
+    forbids: ["take: 500", "q={q}"],
+    label: "Log (admin), tabla de consolidacion: sin busqueda libre (usuario y accion en DDL con busqueda), paginado en BD, hasta 100 por pagina",
   },
   // Attempts reference the question's images (live bank question by id); they never store them.
   {

@@ -9,6 +9,15 @@ export function pageFromParam(value: string | string[] | undefined) {
   return Number.isFinite(page) && page > 0 ? page : 1;
 }
 
+/** Rows per page offered by consolidation tables (History, Questions, Logs…): never more than 100. */
+export const PAGE_SIZES = [25, 50, 100] as const;
+
+/** Reads `per` (rows per page) from a search param: one of PAGE_SIZES, else `fallback`. */
+export function pageSizeFromParam(value: string | string[] | undefined, fallback: (typeof PAGE_SIZES)[number] = 25) {
+  const raw = Number.parseInt((Array.isArray(value) ? value[0] : value) ?? "", 10);
+  return (PAGE_SIZES as readonly number[]).includes(raw) ? raw : fallback;
+}
+
 /** The slice of `items` for `page`, with the page clamped to the available range. */
 export function paginate<T>(items: T[], page: number, pageSize: number) {
   const pageCount = Math.max(1, Math.ceil(items.length / pageSize));
@@ -18,7 +27,9 @@ export function paginate<T>(items: T[], page: number, pageSize: number) {
 
 /**
  * Prev / "Page X of Y" / Next links for server-rendered lists. Keeps every other search param
- * (filters, the other list's page) and only changes `param`. Renders nothing for a single page.
+ * (filters, the other list's page) and only changes `param`. With `pageSizeParam` (consolidation
+ * tables) it also offers 25 / 50 / 100 rows per page, keeping the filters and going back to page 1.
+ * Renders nothing when there is only one page and nothing to choose.
  */
 export function Pagination({
   basePath,
@@ -29,6 +40,7 @@ export function Pagination({
   total,
   pageSize,
   anchor,
+  pageSizeParam,
   className,
 }: {
   basePath: string;
@@ -40,12 +52,16 @@ export function Pagination({
   pageSize: number;
   /** Element id to scroll back to after navigating (e.g. the list section). */
   anchor?: string;
+  /** Param of the rows-per-page choice (e.g. "per"); omitted = fixed page size. */
+  pageSizeParam?: string;
   className?: string;
 }) {
-  if (pageCount <= 1) return null;
-  const hrefFor = (target: number) => {
+  const sizes = pageSizeParam && total > PAGE_SIZES[0];
+  if (pageCount <= 1 && !sizes) return null;
+  const hrefFor = (target: number, size = pageSize) => {
     const search = new URLSearchParams();
-    for (const [key, value] of Object.entries(params)) if (value && key !== param) search.set(key, value);
+    for (const [key, value] of Object.entries(params)) if (value && key !== param && key !== pageSizeParam) search.set(key, value);
+    if (pageSizeParam) search.set(pageSizeParam, String(size));
     if (target > 1) search.set(param, String(target));
     const query = search.toString();
     return `${basePath}${query ? `?${query}` : ""}${anchor ? `#${anchor}` : ""}`;
@@ -61,9 +77,22 @@ export function Pagination({
   const off = `${btn} cursor-default border-[var(--sat-border)] bg-white text-[var(--sat-blank)]`;
   return (
     <nav aria-label="Pagination" className={cn("mt-2.5 flex flex-wrap items-center justify-between gap-2.5 text-xs text-[var(--sat-muted)]", className)}>
-      <span>
+      <span className="flex flex-wrap items-center gap-2">
         Showing {first}–{last} of {total}
+        {sizes ? (
+          <span className="flex items-center gap-1" aria-label="Rows per page">
+            · Rows per page
+            {PAGE_SIZES.map((size) =>
+              size === pageSize ? (
+                <span key={size} aria-current="true" className="rounded-md bg-[var(--sat-primary-soft)] px-1.5 py-0.5 font-semibold text-[var(--sat-primary)]">{size}</span>
+              ) : (
+                <Link key={size} href={hrefFor(1, size)} className="rounded-md px-1.5 py-0.5 font-semibold text-[var(--sat-text)] hover:bg-[var(--sat-surface-2)]">{size}</Link>
+              ),
+            )}
+          </span>
+        ) : null}
       </span>
+      {pageCount > 1 ? (
       <div className="flex items-center gap-1.5">
         {page > 1 ? (
           <Link href={hrefFor(page - 1)} rel="prev" aria-label="Previous page" className={idle}><ChevronLeft size={14} /></Link>
@@ -86,6 +115,7 @@ export function Pagination({
           <span aria-disabled className={off}><ChevronRight size={14} /></span>
         )}
       </div>
+      ) : null}
     </nav>
   );
 }
