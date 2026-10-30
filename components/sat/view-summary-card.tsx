@@ -17,11 +17,22 @@ export interface ViewSummaryChip {
   tone?: keyof typeof CHIP_TONE;
   /** Area colour (Math / Reading / Writing), as on the practice and Test surfaces. */
   color?: string;
+  /** The view with this filter applied. */
+  href?: string;
+}
+
+export interface ViewSummaryItem {
+  key: string;
+  label: React.ReactNode;
+  detail?: React.ReactNode;
+  href: string;
 }
 
 /**
- * One tall box per view on the teacher Home: the view's name, its main number, its status (one chip
- * per line), a line of detail and the way in. The whole box links to the view (the title link covers it).
+ * One tall box per view on the teacher Home, as tall as the screen allows: the view's name, its main
+ * number, its status (one chip per line, each opening the view with that filter), a short list of the
+ * latest items (each opening it) and the way in. The rest of the box links to the view (the title link
+ * covers it; chips and items sit above that cover).
  */
 export function ViewSummaryCard({
   title,
@@ -30,6 +41,7 @@ export function ViewSummaryCard({
   value,
   valueLabel,
   chips = [],
+  list,
   line,
   action,
   accent = "primary",
@@ -40,13 +52,15 @@ export function ViewSummaryCard({
   value: React.ReactNode;
   valueLabel: React.ReactNode;
   chips?: ViewSummaryChip[];
+  /** Latest items (students, tries, Tests) with their status. */
+  list?: { title: string; items: ViewSummaryItem[]; empty: string };
   /** Icon badge colours: the Tests grey, or the primary blue. */
   accent?: "primary" | "tests";
   line?: React.ReactNode;
   action: string;
 }) {
   return (
-    <Card padding="md" className="relative flex min-h-[22rem] flex-col gap-3 hover:border-gray-400">
+    <Card padding="md" className="relative flex min-h-[22rem] flex-col gap-3 hover:border-gray-400 lg:min-h-[calc(100vh-11rem)]">
       <div className="flex items-center justify-between">
         <h2 className="flex items-center gap-2 text-base font-semibold text-[var(--sat-text)]">
           <span
@@ -68,18 +82,45 @@ export function ViewSummaryCard({
       </p>
       {chips.length > 0 ? (
         <div className="flex flex-col gap-1.5">
-          {chips.map((c) => (
-            <span
-              key={c.label}
-              className={cn("flex items-center justify-between gap-2 rounded-lg border px-2.5 py-1.5 text-xs leading-tight", c.color ? "border-current bg-white" : CHIP_TONE[c.tone ?? "default"])}
-              style={c.color ? { color: c.color } : undefined}
-            >
-              {c.label} <b>{c.value}</b>
-            </span>
-          ))}
+          {chips.map((c) => {
+            const className = cn(
+              "relative z-10 flex items-center justify-between gap-2 rounded-lg border px-2.5 py-1.5 text-xs leading-tight",
+              c.color ? "border-current bg-white" : CHIP_TONE[c.tone ?? "default"],
+              c.href && "hover:brightness-95 hover:underline",
+            );
+            const body = (
+              <>
+                <span>{c.label}</span> <b>{c.value}</b>
+              </>
+            );
+            return c.href ? (
+              <Link key={c.label} href={c.href} className={className} style={c.color ? { color: c.color } : undefined}>{body}</Link>
+            ) : (
+              <span key={c.label} className={className} style={c.color ? { color: c.color } : undefined}>{body}</span>
+            );
+          })}
         </div>
       ) : null}
       {line ? <p className="text-xs leading-relaxed text-gray-600">{line}</p> : null}
+      {list ? (
+        <div className="border-t border-gray-100 pt-2.5">
+          <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-[var(--sat-muted)]">{list.title}</p>
+          {list.items.length === 0 ? (
+            <p className="text-xs text-gray-400">{list.empty}</p>
+          ) : (
+            <ul className="space-y-1">
+              {list.items.map((item) => (
+                <li key={item.key}>
+                  <Link href={item.href} className="relative z-10 -mx-1.5 block rounded-md px-1.5 py-1 hover:bg-gray-50">
+                    <span className="line-clamp-2 block text-sm text-gray-800">{item.label}</span>
+                    {item.detail ? <span className="block text-xs text-gray-500">{item.detail}</span> : null}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ) : null}
       <div className="mt-auto border-t border-gray-100 pt-2 text-right text-xs font-medium text-blue-600">{action}</div>
     </Card>
   );

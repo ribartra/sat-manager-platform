@@ -126,7 +126,7 @@ export default async function TeachersPage({ searchParams }: PageProps) {
       )}
 
       {invites.length > 0 ? (
-        <section className="mt-6">
+        <section id="invitations" className="mt-6 scroll-mt-6">
           <h2 className="mb-2 text-sm font-semibold text-gray-900">Pending invitations</h2>
           <Card>
             <ul className="divide-y divide-gray-100">

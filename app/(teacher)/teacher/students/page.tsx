@@ -130,7 +130,7 @@ export default async function TeacherStudentsPage({ searchParams }: PageProps) {
       )}
 
       {invited.length > 0 ? (
-        <section className="mt-6">
+        <section id="invitations" className="mt-6 scroll-mt-6">
           <h2 className="mb-2 text-sm font-semibold text-gray-900">
             Pending invitations{invitedTotal > invited.length ? ` · showing ${invited.length} of ${invitedTotal}` : ""}
           </h2>
