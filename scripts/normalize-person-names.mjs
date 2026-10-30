@@ -14,10 +14,13 @@ const PARTICLES = new Set(["de", "del", "la", "las", "los", "y", "e", "da", "do"
 const capitalize = (part) => (part ? part.charAt(0).toLocaleUpperCase("es") + part.slice(1).toLocaleLowerCase("es") : part);
 function formatPersonName(raw) {
   const words = raw.trim().replace(/\s+/g, " ").split(" ").filter(Boolean);
+  // A short all-caps word in a name that is not all caps is an acronym ("SAT Teacher", "QA Admin").
+  const allCaps = words.join("") === words.join("").toLocaleUpperCase("es");
   return words
     .map((word, index) => {
       const lower = word.toLocaleLowerCase("es");
       if (index > 0 && index < words.length - 1 && PARTICLES.has(lower)) return lower;
+      if (!allCaps && word.length <= 3 && /^\p{Lu}+$/u.test(word)) return word;
       return word
         .split(/([-'’])/)
         .map((part) => (/^[-'’]$/.test(part) ? part : capitalize(part)))
