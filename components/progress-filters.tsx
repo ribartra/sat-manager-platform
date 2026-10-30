@@ -4,6 +4,8 @@ import { buildProgressHref } from "@/lib/progress-filters";
 import { FilterActions, FilterBar, FilterField } from "@/components/sat/filter-bar";
 import { Select } from "@/components/ui/select";
 import { PeriodFilter } from "@/components/sat/period-filter";
+import { SearchableSelect } from "@/components/sat/searchable-select";
+import { SEARCHABLE_MIN_OPTIONS } from "@/components/sat/filter-bar";
 import type { PeriodValue } from "@/lib/period-filter";
 
 export interface ProgressFilterTopic {
@@ -66,10 +68,21 @@ export function ProgressFilters({
       {preserved.map(([name, value]) => <input key={name} type="hidden" name={name} value={value} />)}
       {!isMocks && (
         <FilterField label="Skill" htmlFor="pf-topic" className="@md:flex-[2]">
-          <Select id="pf-topic" name="topic" defaultValue={filters.topic ?? ""}>
-            <option value="">All skills</option>
-            <SkillOptions topics={topics} />
-          </Select>
+          {topics.length > SEARCHABLE_MIN_OPTIONS ? (
+            <SearchableSelect
+              id="pf-topic"
+              name="topic"
+              defaultValue={filters.topic ?? ""}
+              allLabel="All skills"
+              options={topics.map((topic) => ({ value: topic.id, label: topic.name, group: topic.group }))}
+              searchPlaceholder="Search skill"
+            />
+          ) : (
+            <Select id="pf-topic" name="topic" defaultValue={filters.topic ?? ""}>
+              <option value="">All skills</option>
+              <SkillOptions topics={topics} />
+            </Select>
+          )}
         </FilterField>
       )}
       {!isMocks && (

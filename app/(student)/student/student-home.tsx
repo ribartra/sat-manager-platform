@@ -23,6 +23,8 @@ import { practiceSetGroups, setsFromStudentPractice, testGroups as groupTests } 
 import { ListItem, ListStack } from "@/components/sat/list";
 import { FilterActions, FilterBar, FilterField } from "@/components/sat/filter-bar";
 import { Select } from "@/components/ui/select";
+import { SearchableSelect } from "@/components/sat/searchable-select";
+import { SEARCHABLE_MIN_OPTIONS } from "@/components/sat/filter-bar";
 import { PctBars, PracticeSetRow } from "@/components/sat/practice-set-row";
 import { Pct } from "@/components/sat/work-status";
 import { Badge } from "@/components/ui/badge";
@@ -333,10 +335,14 @@ async function AreaPracticeView({
         <FilterBar action={links.home}>
           <input type="hidden" name="area" value={tab} />
           <FilterField label="Skill" htmlFor="f-skill" className="@md:flex-[2]">
-            <Select id="f-skill" name="skill" defaultValue={query.skill ?? ""}>
-              <option value="">All skills</option>
-              {skills.map(([id, name]) => <option key={id} value={id}>{name}</option>)}
-            </Select>
+            {skills.length > SEARCHABLE_MIN_OPTIONS ? (
+              <SearchableSelect id="f-skill" name="skill" defaultValue={query.skill ?? ""} allLabel="All skills" options={skills.map(([id, name]) => ({ value: id, label: name }))} searchPlaceholder="Search skill" />
+            ) : (
+              <Select id="f-skill" name="skill" defaultValue={query.skill ?? ""}>
+                <option value="">All skills</option>
+                {skills.map(([id, name]) => <option key={id} value={id}>{name}</option>)}
+              </Select>
+            )}
           </FilterField>
           <FilterField label="Difficulty" htmlFor="f-difficulty">
             <Select id="f-difficulty" name="difficulty" defaultValue={query.difficulty ?? ""}>

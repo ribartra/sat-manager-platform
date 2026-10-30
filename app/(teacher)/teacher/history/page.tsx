@@ -18,7 +18,6 @@ import {
   VoidableValue,
   invalidatedRowClass,
   ListFilters,
-  matchesQuery,
   pageFromParam,
   paginate,
 } from "@/components/sat";
@@ -98,11 +97,10 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
     status: filter.status,
     ...periodDates(period),
   });
-  // Text search: student name or practice set / Test name.
-  const q = filter.q ?? "";
-  const shownRows = rows.filter((r) => matchesQuery(q, r.studentName, r.title));
+  // No free-text search here: the Student and Skill drop-downs search inside when they are long.
+  const shownRows = rows;
   const page = paginate(shownRows, pageFromParam(query.page), PAGE_SIZE);
-  const current = { ...filter, student: studentId || undefined };
+  const current = { ...filter, q: undefined, student: studentId || undefined };
   const params = { ...current, ...periodParams(period) };
 
   // A fixed filter hides its column (it would repeat the same value on every row).
@@ -162,8 +160,6 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
 
       <ListFilters
         action="/teacher/history"
-        q={q}
-        placeholder="Student, practice set or Test"
         hidden={{ set: filter.set, test: filter.test }}
         filters={[
           { name: "student", label: "Student", value: studentId, allLabel: "All students", options: students.map((st) => ({ value: st.id, label: st.name })) },

@@ -1,6 +1,8 @@
 import { Search } from "lucide-react";
 import { FilterActions, FilterBar, FilterField } from "@/components/sat/filter-bar";
 import { PeriodFilter } from "@/components/sat/period-filter";
+import { SearchableSelect } from "@/components/sat/searchable-select";
+import { SEARCHABLE_MIN_OPTIONS } from "@/components/sat/filter-bar";
 import type { PeriodValue } from "@/lib/period-filter";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -50,19 +52,27 @@ export function ListFilters({
   return (
     <FilterBar action={action}>
       {keep.map(([name, value]) => <input key={name} type="hidden" name={name} value={value} />)}
-      <FilterField label="Search" htmlFor={`lf-${qName}`} className="@md:flex-[2]">
-        <div className="relative">
-          <Search size={14} aria-hidden className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
-          <Input id={`lf-${qName}`} name={qName} type="search" defaultValue={q ?? ""} placeholder={placeholder} className="pl-8" />
-        </div>
-      </FilterField>
+      {/* Free-text search only where the list asks for it (`q` given). */}
+      {q !== undefined ? (
+        <FilterField label="Search" htmlFor={`lf-${qName}`} className="@md:flex-[2]">
+          <div className="relative">
+            <Search size={14} aria-hidden className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Input id={`lf-${qName}`} name={qName} type="search" defaultValue={q} placeholder={placeholder} className="pl-8" />
+          </div>
+        </FilterField>
+      ) : null}
       {children}
       {filters.map((f) => (
         <FilterField key={f.name} label={f.label} htmlFor={`lf-${f.name}`}>
-          <Select id={`lf-${f.name}`} name={f.name} defaultValue={f.value ?? ""}>
-            <option value="">{f.allLabel}</option>
-            {f.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-          </Select>
+          {/* Long lists (students, skills…) get a search box inside the drop-down. */}
+          {f.options.length > SEARCHABLE_MIN_OPTIONS ? (
+            <SearchableSelect id={`lf-${f.name}`} name={f.name} defaultValue={f.value ?? ""} allLabel={f.allLabel} options={f.options} searchPlaceholder={`Search ${f.label.toLowerCase()}`} />
+          ) : (
+            <Select id={`lf-${f.name}`} name={f.name} defaultValue={f.value ?? ""}>
+              <option value="">{f.allLabel}</option>
+              {f.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </Select>
+          )}
         </FilterField>
       ))}
       {period ? <PeriodFilter value={period} /> : null}

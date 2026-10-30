@@ -506,6 +506,7 @@ const checks = [
   {
     file: "app/(teacher)/teacher/history/page.tsx",
     requires: ["parseHistoryParams(", "InvalidateAttemptButton", "show.student", "show.title", "Back to", "dayLabel("],
+    forbids: ["q={q}", 'placeholder="Student, practice set or Test"'],
     label: "History unificada: contexto por URL, columnas ocultas con filtro fijo, volver al alumno, encabezado por dia",
   },
   {
@@ -533,6 +534,12 @@ const checks = [
     requires: ["md:sticky md:top-[var(--list-head-top,0px)]"],
     label: `Cabecera de tabla fija bajo los filtros: ${file}`,
   })),
+  // No free-text search on its own in History; drop-downs with more than 8 options search inside.
+  {
+    file: "components/sat/list-filters.tsx",
+    requires: ["SEARCHABLE_MIN_OPTIONS", "<SearchableSelect", "q !== undefined"],
+    label: "Filtros: DDL con mas de 8 opciones con buscador dentro; buscador libre solo si la lista lo pide",
+  },
   // Account names "First Last" on every create / edit (lib/person-name.ts).
   ...[
     "app/api/students/invite/route.ts",

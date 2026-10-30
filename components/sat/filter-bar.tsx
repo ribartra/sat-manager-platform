@@ -52,6 +52,13 @@ export function FilterField({ label, htmlFor, className, children }: { label: st
   );
 }
 
+/**
+ * Above this many options a filter drop-down gets a search box inside (SearchableSelect). Lives here,
+ * not in the client component: a server page importing a constant from a "use client" file gets a
+ * reference, not the number.
+ */
+export const SEARCHABLE_MIN_OPTIONS = 8;
+
 /** Label class of a FilterField, for controls that render their own labels (TaxonomyPicker). */
 export const FILTER_LABEL_CLASS = "text-xs font-medium text-[var(--sat-muted)]";
 export const FILTER_FIELD_CLASS = "flex min-w-[108px] flex-1 flex-col gap-1";
