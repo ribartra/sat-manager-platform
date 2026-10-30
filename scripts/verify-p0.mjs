@@ -143,9 +143,9 @@ const checks = [
   // Every list (teacher + admin) has a text search and filters.
   {
     file: "app/(teacher)/teacher/page.tsx",
-    requires: ["<StudentOverviewTable", "HEADER_SHORTCUT_CLASS", "resolveTeacherNav(", "slice(0, HOME_STUDENTS)", "All {rows.length} students →"],
-    forbids: ["<ListFilters", "Invite student", "students/invite"],
-    label: "Home = vista resumen: sin busqueda ni Invite; atajos a cada vista; 5 alumnos + All students →",
+    requires: ["<StudentOverviewTable", "<ViewSummaryCard", 'href="/teacher/pending"', 'href="/teacher/history"', 'href="/teacher/tests"', 'href="/teacher/practice-sets"', "slice(0, HOME_STUDENTS)", "All {rows.length} students →"],
+    forbids: ["<ListFilters", "Invite student", "students/invite", "{item.label} →", "most recently active"],
+    label: "Home = vista resumen: sin busqueda ni Invite; un recuadro por vista (estado + atajo); 5 alumnos + All students →",
   },
   {
     file: "app/(teacher)/teacher/students/page.tsx",
