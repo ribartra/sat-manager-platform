@@ -109,7 +109,7 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/history/page.tsx",
-    requires: ["<ChevronCell />"],
+    requires: ["<HistoryTable"],
     forbids: ["InvalidateAttemptButton"],
     label: "History global: fila estandar con flecha; invalidar solo en la pagina del intento",
   },

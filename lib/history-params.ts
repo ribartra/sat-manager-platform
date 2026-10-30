@@ -67,11 +67,11 @@ export function parseHistoryParams(raw: RawParams): HistoryParams {
 }
 
 /** URL of the History view with these filters (plus any extra params, e.g. the period). */
-export function historyHref(params: HistoryParams, extra: Record<string, string | undefined> = {}): string {
+export function historyHref(params: HistoryParams, extra: Record<string, string | undefined> = {}, base: "/teacher/history" | "/student/history" = "/teacher/history"): string {
   const query = new URLSearchParams();
   for (const [key, value] of Object.entries({ ...params, ...extra })) {
     if (value) query.set(key, value);
   }
   const qs = query.toString();
-  return qs ? `/teacher/history?${qs}` : "/teacher/history";
+  return qs ? `${base}?${qs}` : base;
 }

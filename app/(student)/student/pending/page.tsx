@@ -1,16 +1,12 @@
 import { redirect } from "next/navigation";
-import { EmptyState, LinkTr, ListFilters, PAGE_SIZE, PageHeader, PageShell, Pagination, RowLink, SimpleTable, TD, ChevronCell, pageFromParam, paginate } from "@/components/sat";
+import { EmptyState, ListFilters, PAGE_SIZE, PageHeader, PageShell, Pagination, pageFromParam, paginate } from "@/components/sat";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
-import { AreaTag } from "@/components/sat/practice-set-row";
-import { SourceTag } from "@/components/sat/source-tag";
-import { Badge } from "@/components/ui/badge";
+import { PendingTable, pendingColumns } from "@/components/sat/pending-table";
 import { auth } from "@/lib/auth";
-import { difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
 import { PRACTICE_AREA_TABS, practiceAreaLabel, type PracticeAreaCode } from "@/lib/practice-area";
 import { parseHistoryParams, type HistoryArea } from "@/lib/history-params";
 import { loadPending, PENDING_STATUS_OPTIONS, type PendingStatus } from "@/lib/pending";
 import { periodDates, periodParams, resolvePeriod } from "@/lib/period-filter";
-import { formatDate, relativeDay } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -36,8 +32,7 @@ export default async function StudentPendingPage({ searchParams }: { searchParam
   });
   const page = paginate(rows, pageFromParam(query.page), PAGE_SIZE);
   const params = { type: filter.type, area: filter.area, status, ...periodParams(period) };
-  const show = { type: !filter.type || (filter.type === "practice" && !filter.area), typeBadge: !filter.type, area: !filter.area, status: !status };
-  const head = ["Due", ...(show.type ? [show.typeBadge ? "Type" : "Area"] : []), "Test / practice set", ...(show.status ? ["Status"] : []), "Assigned", "Opens", ""];
+  const show = pendingColumns(filter, status, false);
   const context = [
     filter.type === "tests" ? "Tests" : filter.type === "practice" ? "Practice" : null,
     filter.area ? practiceAreaLabel(AREA_CODE[filter.area]) : null,
@@ -76,52 +71,8 @@ export default async function StudentPendingPage({ searchParams }: { searchParam
         <EmptyState title="Nothing pending with these filters." />
       ) : (
         <>
-          <SimpleTable head={head}>
-            {page.items.map((r) => (
-              <LinkTr key={`${r.kind}-${r.id}`}>
-                <td className={`${TD} whitespace-nowrap`}>
-                  {r.dueDate ? (
-                    <>
-                      <span className={r.status === "OVERDUE" ? "font-medium text-[var(--sat-bad)]" : "text-gray-700"}>{formatDate(r.dueDate)}</span>
-                      <span className="block text-xs text-gray-400">{relativeDay(r.dueDate)}</span>
-                    </>
-                  ) : (
-                    <span className="text-xs text-gray-400">No due date</span>
-                  )}
-                </td>
-                {show.type ? (
-                  <td className={TD}>
-                    <span className="flex flex-wrap items-center gap-1.5">
-                      {show.typeBadge ? r.kind === "test" ? <Badge variant="test">Test</Badge> : <Badge>Practice</Badge> : null}
-                      {r.area && show.area ? <AreaTag area={r.area} /> : null}
-                    </span>
-                  </td>
-                ) : null}
-                <td className={TD}>
-                  <span className="flex flex-wrap items-center gap-2">
-                    {/* Opens the set / Test to start or continue it. */}
-                    <RowLink href={r.kind === "test" ? `/student/tests/${r.id}` : `/student/practice/assignment/${r.id}`}>{r.title}</RowLink>
-                    {r.difficulty ? <Badge variant={difficultyBadgeVariant(r.difficulty)}>{difficultyLabel(r.difficulty)}</Badge> : null}
-                    <SourceTag name={r.sourceName} />
-                  </span>
-                </td>
-                {show.status ? (
-                  <td className={TD}>
-                    <Badge variant={r.status === "OVERDUE" ? "danger" : r.status === "IN_PROGRESS" ? "warning" : "info"}>
-                      {r.status === "OVERDUE" ? "Overdue" : r.status === "IN_PROGRESS" ? "In progress" : "Not started"}
-                    </Badge>
-                  </td>
-                ) : null}
-                <td className={`${TD} whitespace-nowrap text-gray-600`}>{formatDate(r.assignedAt)}</td>
-                <td className={`${TD} whitespace-nowrap`}>
-                  {/* Open date: the assignment's, else the day it was assigned. */}
-                  <span className={r.opensAt > new Date() ? "text-amber-700" : "text-gray-600"}>{formatDate(r.opensAt)}</span>
-                  {r.opensAt > new Date() ? <span className="block text-xs text-amber-700">{relativeDay(r.opensAt)}</span> : r.locked ? <span className="block text-xs text-amber-700">Not open yet</span> : null}
-                </td>
-                <ChevronCell />
-              </LinkTr>
-            ))}
-          </SimpleTable>
+          {/* A row opens the set / Test to start or continue it. */}
+          <PendingTable rows={page.items} show={show} hrefFor={(r) => (r.kind === "test" ? `/student/tests/${r.id}` : `/student/practice/assignment/${r.id}`)} />
           <Pagination basePath="/student/pending" params={params} pageSize={PAGE_SIZE} {...page} />
         </>
       )}

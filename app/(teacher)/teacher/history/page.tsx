@@ -1,43 +1,17 @@
 import Link from "next/link";
-import { Fragment } from "react";
 import { ArrowLeft, X } from "lucide-react";
-import {
-  AttemptStatusBadge,
-  Breadcrumbs,
-  ChevronCell,
-  Delta,
-  EmptyState,
-  LinkTr,
-  PageHeader,
-  PageShell,
-  Pagination,
-  RowAction,
-  RowLink,
-  SimpleTable,
-  StudentCell,
-  TD,
-  VoidableValue,
-  invalidatedRowClass,
-  ListFilters,
-  pageFromParam,
-  paginate,
-  PAGE_SIZE,
-} from "@/components/sat";
-import { AreaTag } from "@/components/sat/practice-set-row";
-import { SourceTag } from "@/components/sat/source-tag";
-import { Pct } from "@/components/sat/work-status";
-import { Badge } from "@/components/ui/badge";
+import { Breadcrumbs, EmptyState, PageHeader, PageShell, Pagination, ListFilters, pageFromParam, paginate, PAGE_SIZE } from "@/components/sat";
+import { HistoryTable, historyColumns } from "@/components/sat/history-table";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { studentAccessWhereFor } from "@/lib/program-scope";
-import { loadAttemptHistory, type HistoryRow } from "@/lib/attempt-history";
-import { difficultyBadgeVariant, difficultyLabel, difficultyOptions } from "@/lib/domain-meta";
+import { loadAttemptHistory } from "@/lib/attempt-history";
+import { difficultyLabel, difficultyOptions } from "@/lib/domain-meta";
 import { PRACTICE_AREA_TABS, practiceAreaLabel, type PracticeAreaCode } from "@/lib/practice-area";
-import { historyHref, parseHistoryParams, type HistoryArea, type HistoryParams, HISTORY_STATUS_DEFAULT } from "@/lib/history-params";
+import { historyHref, parseHistoryParams, type HistoryArea, HISTORY_STATUS_DEFAULT } from "@/lib/history-params";
 import { officialSkillsFor } from "@/lib/taxonomy-order";
 import { practiceSetTitle } from "@/lib/attempt-groups";
 import { HEADER_ACTION_CLASS, HeaderActions } from "@/components/sat/header-actions";
-import { formatDuration, relativeDay } from "@/lib/utils";
 import { periodDates, periodParams, resolvePeriod } from "@/lib/period-filter";
 
 export const dynamic = "force-dynamic";
@@ -111,24 +85,7 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
   const params = { ...current, ...keepExtra };
 
   // A fixed filter hides its column (it would repeat the same value on every row).
-  const show: Columns = {
-    student: !studentId,
-    type: !filter.type || (filter.type === "practice" && !filter.area),
-    typeBadge: !filter.type,
-    area: !filter.area,
-    title: !filter.set && !filter.test,
-    difficulty: !filter.difficulty,
-  };
-  // No Date column: the day heading above each day's tries already says it.
-  const head = [
-    ...(show.student ? ["Student"] : []),
-    ...(show.type ? [show.typeBadge ? "Type" : "Area"] : []),
-    ...(show.title ? [filter.type === "tests" ? "Test" : filter.type === "practice" ? "Practice set" : "Test / practice set"] : []),
-    "Attempt",
-    "Score",
-    "Change",
-    "",
-  ];
+  const show = historyColumns(filter, !studentId);
   const context = [
     filter.type === "tests" ? "Tests" : filter.type === "practice" ? "Practice" : null,
     filter.area ? practiceAreaLabel(AREA_CODE[filter.area]) : null,
@@ -204,118 +161,17 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
         <EmptyState title="No attempts match these filters." />
       ) : (
         <>
-          <SimpleTable head={head}>
-            {page.items.map((r, index) => {
-              // A day heading before the first try of each day (former Activity list).
-              const day = dayLabel(r.at);
-              const newDay = index === 0 || dayLabel(page.items[index - 1].at) !== day;
-              return (
-                <Fragment key={r.id}>
-                  {newDay ? (
-                    <tr className="bg-[var(--sat-surface-2)]">
-                      <td colSpan={head.length} className="px-3 py-1.5 text-xs font-semibold text-gray-600">
-                        {day} <span className="font-normal text-gray-400">· {relativeDay(r.at)}</span>
-                      </td>
-                    </tr>
-                  ) : null}
-                  <HistoryTableRow row={r} show={show} current={current} keep={keepExtra} />
-                </Fragment>
-              );
-            })}
-          </SimpleTable>
+          {/* No Date column: the day heading above each day's tries already says it. */}
+          <HistoryTable
+            rows={page.items}
+            show={show}
+            type={filter.type}
+            hrefFor={(r) => `/teacher/students/${r.studentId}/${r.kind === "test" ? "tests" : "attempts"}/${r.id}`}
+            studentHref={(r) => historyHref({ ...current, student: r.studentId }, keepExtra)}
+          />
           <Pagination basePath="/teacher/history" params={params} pageSize={pageSize} {...page} />
         </>
       )}
     </PageShell>
-  );
-}
-
-interface Columns {
-  student: boolean;
-  type: boolean;
-  /** Test / Practice badge (hidden once the type is fixed). */
-  typeBadge: boolean;
-  area: boolean;
-  title: boolean;
-  difficulty: boolean;
-}
-
-const dayLabel = (date: Date) => date.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric", year: "numeric" });
-
-function HistoryTableRow({ row: r, show, current, keep }: { row: HistoryRow; show: Columns; current: HistoryParams; keep: Record<string, string | undefined> }) {
-  const isTest = r.kind === "test";
-  const href = `/teacher/students/${r.studentId}/${isTest ? "tests" : "attempts"}/${r.id}`;
-  return (
-    <LinkTr className={invalidatedRowClass(r.status)}>
-      {show.student ? (
-        <td className={TD}>
-          <RowAction>
-            {/* This student's History (same filters). */}
-            <Link href={historyHref({ ...current, student: r.studentId }, keep)} className="hover:underline">
-              <StudentCell name={r.studentName} avatarUrl={r.avatarUrl} />
-            </Link>
-          </RowAction>
-        </td>
-      ) : null}
-      {show.type ? (
-        <td className={TD}>
-          <span className="flex flex-wrap items-center gap-1.5">
-            {show.typeBadge ? isTest ? <Badge variant="test">Test</Badge> : <Badge>Practice</Badge> : null}
-            {r.area && show.area ? <AreaTag area={r.area} /> : null}
-          </span>
-        </td>
-      ) : null}
-      {show.title ? (
-        <td className={TD}>
-          <span className="flex flex-wrap items-center gap-2">
-            <RowLink href={href}>{r.title}</RowLink>
-            {r.difficulty && show.difficulty ? <Badge variant={difficultyBadgeVariant(r.difficulty)}>{difficultyLabel(r.difficulty)}</Badge> : null}
-            <SourceTag name={r.sourceName} />
-            {r.status === "INVALIDATED" ? <AttemptStatusBadge status={r.status} /> : null}
-          </span>
-        </td>
-      ) : null}
-      <td className={`${TD} whitespace-nowrap`}>
-        {show.title ? (
-          `Try ${r.tryNumber} of ${r.tryCount}`
-        ) : (
-          <RowLink href={href}>Try {r.tryNumber} of {r.tryCount}</RowLink>
-        )}
-        {!show.title && r.status === "INVALIDATED" ? <AttemptStatusBadge status={r.status} /> : null}
-        {r.status === "IN_PROGRESS" ? (
-          <span className="block text-xs text-amber-700">{isTest ? `${r.modulesDone ?? 0} of 4 modules` : "In progress"}</span>
-        ) : null}
-      </td>
-      <td className={TD}>
-        {isTest ? (
-          r.status === "IN_PROGRESS" ? (
-            <span className="text-xs text-gray-400">—</span>
-          ) : (
-            <VoidableValue status={r.status}>
-              <span className="whitespace-nowrap"><span className="text-[var(--sat-area-reading)]">R&amp;W</span> <b className="tabular-nums">{r.rw ?? "—"}</b> · <span className="text-[var(--sat-area-math)]">Math</span> <b className="tabular-nums">{r.math ?? "—"}</b></span>
-            </VoidableValue>
-          )
-        ) : r.pct !== null ? (
-          <VoidableValue status={r.status}>
-            <Pct value={r.pct} className="font-semibold" /> <span className="text-xs text-gray-500">{r.correct} of {r.total}</span>
-            {r.time ? <span className="block text-xs text-gray-400">{formatDuration(r.time)}</span> : null}
-          </VoidableValue>
-        ) : (
-          <span className="text-xs text-gray-400">—</span>
-        )}
-      </td>
-      <td className={TD}>
-        {isTest ? (
-          <span className="flex flex-col text-xs">
-            {r.changeRw !== null ? <span>R&amp;W <Delta value={r.changeRw} unit="" /></span> : null}
-            {r.changeMath !== null ? <span>Math <Delta value={r.changeMath} unit="" /></span> : null}
-          </span>
-        ) : (
-          <Delta value={r.change} unit="%" />
-        )}
-      </td>
-      {/* Standard row: the arrow opens the attempt (Invalidate lives on the attempt page). */}
-      <ChevronCell />
-    </LinkTr>
   );
 }

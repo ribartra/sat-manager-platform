@@ -39,10 +39,15 @@ const checks = [
     label: "Cambio de vista solo con Shift+flecha arriba/abajo",
   },
   // Source tag on every History and Pending row (practice set / Test source).
-  ...["app/(teacher)/teacher/history/page.tsx", "app/(teacher)/teacher/pending/page.tsx", "app/(student)/student/pending/page.tsx"].map((file) => ({
+  ...["components/sat/history-table.tsx", "components/sat/pending-table.tsx"].map((file) => ({
     file,
     requires: ["<SourceTag name={r.sourceName} />"],
     label: `Etiqueta de fuente en la fila: ${file}`,
+  })),
+  ...["app/(teacher)/teacher/pending/page.tsx", "app/(student)/student/pending/page.tsx"].map((file) => ({
+    file,
+    requires: ["<PendingTable", "pendingColumns("],
+    label: `Pending con la tabla compartida: ${file}`,
   })),
   // Results by skill (SAT-039/040/041): no Low performance, no summary card, no matrix, no Assign in results.
   {
@@ -541,7 +546,7 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/history/page.tsx",
-    requires: ["parseHistoryParams(", "<ChevronCell />", "show.student", "show.title", "Back to", "dayLabel(", "search={false}"],
+    requires: ["parseHistoryParams(", "<HistoryTable", "historyColumns(filter, !studentId)", "Back to", "search={false}"],
     forbids: ["q={q}", 'placeholder="Student, practice set or Test"'],
     label: "History unificada: contexto por URL, columnas ocultas con filtro fijo, volver al alumno, encabezado por dia",
   },
@@ -749,8 +754,14 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/history/page.tsx",
-    requires: ["HISTORY_STATUS_DEFAULT", 'allValue: "all"', "dayLabel("],
+    requires: ["HISTORY_STATUS_DEFAULT", 'allValue: "all"', "<HistoryTable"],
     forbids: ['    "Date",'],
+  },
+  {
+    file: "components/sat/history-table.tsx",
+    requires: ["dayLabel(", "show.student", "show.title", "<ChevronCell />", "<SourceTag name={r.sourceName} />"],
+    forbids: ["InvalidateAttemptButton", '    "Date",'],
+    label: "Tabla de History compartida (teacher y alumno): marca de dia, columnas ocultas, fila estandar con flecha",
     label: "History: Completed por defecto (status=all = todos); sin columna Date (la marca del dia ya la dice)",
   },
   {

@@ -1,36 +1,16 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import {
-  Breadcrumbs,
-  EmptyState,
-  LinkTr,
-  ListFilters,
-  PAGE_SIZE,
-  PageHeader,
-  PageShell,
-  Pagination,
-  RowLink,
-  SimpleTable,
-  StudentCell,
-  TD,
-  ChevronCell,
-  pageFromParam,
-  paginate,
-} from "@/components/sat";
-import { AreaTag } from "@/components/sat/practice-set-row";
-import { SourceTag } from "@/components/sat/source-tag";
+import { Breadcrumbs, EmptyState, ListFilters, PAGE_SIZE, PageHeader, PageShell, Pagination, pageFromParam, paginate } from "@/components/sat";
+import { PendingTable, pendingColumns } from "@/components/sat/pending-table";
 import { HEADER_ACTION_CLASS, HeaderActions } from "@/components/sat/header-actions";
-import { Badge } from "@/components/ui/badge";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { studentAccessWhereFor } from "@/lib/program-scope";
-import { difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
 import { PRACTICE_AREA_TABS, practiceAreaLabel, type PracticeAreaCode } from "@/lib/practice-area";
 import { parseHistoryParams, type HistoryArea } from "@/lib/history-params";
 import { loadPending, PENDING_STATUS_OPTIONS, type PendingRow, type PendingStatus } from "@/lib/pending";
 import { periodDates, periodParams, resolvePeriod } from "@/lib/period-filter";
 import { assignHref } from "@/lib/assign-params";
-import { formatDate, relativeDay } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -67,8 +47,7 @@ export default async function TeacherPendingPage({ searchParams }: { searchParam
   const params = { student: studentId || undefined, type: filter.type, area: filter.area, status, ...periodParams(period) };
 
   // A fixed filter hides its column (it would repeat on every row).
-  const show = { student: !studentId, type: !filter.type || (filter.type === "practice" && !filter.area), typeBadge: !filter.type, area: !filter.area, status: !status };
-  const head = ["Due", ...(show.student ? ["Student"] : []), ...(show.type ? [show.typeBadge ? "Type" : "Area"] : []), "Test / practice set", ...(show.status ? ["Status"] : []), "Assigned", "Opens", ""];
+  const show = pendingColumns(filter, status, !studentId);
   const backArea = filter.type === "tests" ? "tests" : filter.area ?? (filter.type === "practice" ? "math" : null);
   const backHref = student ? `/teacher/students/${student.id}${backArea ? `?area=${backArea}` : ""}` : null;
   const context = [
@@ -127,11 +106,8 @@ export default async function TeacherPendingPage({ searchParams }: { searchParam
         <EmptyState title="Nothing pending with these filters." />
       ) : (
         <>
-          <SimpleTable head={head}>
-            {page.items.map((r) => (
-              <PendingTableRow key={`${r.kind}-${r.id}`} row={r} show={show} />
-            ))}
-          </SimpleTable>
+          {/* A row opens the assignment's dates in Assign (the student keeps the progress). */}
+          <PendingTable rows={page.items} show={show} hrefFor={pendingAssignHref} />
           <Pagination basePath="/teacher/pending" params={params} pageSize={PAGE_SIZE} {...page} />
         </>
       )}
@@ -139,58 +115,9 @@ export default async function TeacherPendingPage({ searchParams }: { searchParam
   );
 }
 
-function PendingTableRow({ row: r, show }: { row: PendingRow; show: { student: boolean; type: boolean; typeBadge: boolean; area: boolean; status: boolean } }) {
-  // Open the assignment to change its dates (the student keeps the progress).
-  const href =
-    r.kind === "test"
-      ? assignHref({ studentId: r.studentId, test: r.testId ?? undefined })
-      : assignHref({ studentId: r.studentId, area: r.area === "READING" ? "reading" : r.area === "WRITING" ? "writing" : "math", edit: r.practiceSetId ? [r.practiceSetId] : [] });
-  return (
-    <LinkTr>
-      <td className={`${TD} whitespace-nowrap`}>
-        {r.dueDate ? (
-          <>
-            <span className={r.status === "OVERDUE" ? "font-medium text-[var(--sat-bad)]" : "text-gray-700"}>{formatDate(r.dueDate)}</span>
-            <span className="block text-xs text-gray-400">{relativeDay(r.dueDate)}</span>
-          </>
-        ) : (
-          <span className="text-xs text-gray-400">No due date</span>
-        )}
-      </td>
-      {show.student ? (
-        <td className={TD}>
-          <StudentCell name={r.studentName} avatarUrl={null} />
-        </td>
-      ) : null}
-      {show.type ? (
-        <td className={TD}>
-          <span className="flex flex-wrap items-center gap-1.5">
-            {show.typeBadge ? r.kind === "test" ? <Badge variant="test">Test</Badge> : <Badge>Practice</Badge> : null}
-            {r.area && show.area ? <AreaTag area={r.area} /> : null}
-          </span>
-        </td>
-      ) : null}
-      <td className={TD}>
-        <span className="flex flex-wrap items-center gap-2">
-          <RowLink href={href}>{r.title}</RowLink>
-          {r.difficulty ? <Badge variant={difficultyBadgeVariant(r.difficulty)}>{difficultyLabel(r.difficulty)}</Badge> : null}
-          <SourceTag name={r.sourceName} />
-        </span>
-      </td>
-      {show.status ? (
-        <td className={TD}>
-          <Badge variant={r.status === "OVERDUE" ? "danger" : r.status === "IN_PROGRESS" ? "warning" : "info"}>
-            {r.status === "OVERDUE" ? "Overdue" : r.status === "IN_PROGRESS" ? "In progress" : "Not started"}
-          </Badge>
-        </td>
-      ) : null}
-      <td className={`${TD} whitespace-nowrap text-gray-600`}>{formatDate(r.assignedAt)}</td>
-      <td className={`${TD} whitespace-nowrap`}>
-        {/* Open date: the assignment's, else the day it was assigned. */}
-        <span className={r.opensAt > new Date() ? "text-amber-700" : "text-gray-600"}>{formatDate(r.opensAt)}</span>
-        {r.opensAt > new Date() ? <span className="block text-xs text-amber-700">{relativeDay(r.opensAt)}</span> : r.locked ? <span className="block text-xs text-amber-700">Not open yet</span> : null}
-      </td>
-      <ChevronCell />
-    </LinkTr>
-  );
+/** Open the assignment to change its dates (the student keeps the progress). */
+function pendingAssignHref(r: PendingRow) {
+  return r.kind === "test"
+    ? assignHref({ studentId: r.studentId, test: r.testId ?? undefined })
+    : assignHref({ studentId: r.studentId, area: r.area === "READING" ? "reading" : r.area === "WRITING" ? "writing" : "math", edit: r.practiceSetId ? [r.practiceSetId] : [] });
 }
