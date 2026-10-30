@@ -164,6 +164,7 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
 
       <ListFilters
         action="/teacher/history"
+        search={false}
         hidden={{ set: filter.set, test: filter.test, per: String(pageSize) }}
         filters={[
           { name: "student", label: "Student", value: studentId, allLabel: "All students", options: students.map((st) => ({ value: st.id, label: st.name })) },

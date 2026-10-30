@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, ExternalLink, Search } from "lucide-react";
+import { Plus, ExternalLink } from "lucide-react";
 import { FilterBar, FilterField } from "@/components/sat/filter-bar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,6 +30,7 @@ import {
 import { useConfirm } from "@/components/sat/confirm-dialog";
 import { apiFetch } from "@/lib/api-client";
 import { notify } from "@/lib/notify-ui";
+import { LiveSearch } from "@/components/sat/live-search";
 
 type TopicOption = TaxonomyPickerTopic;
 
@@ -219,10 +220,7 @@ export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; 
 
       <FilterBar>
         <FilterField label="Search" htmlFor="materials-search">
-          <div className="relative">
-            <Search size={14} aria-hidden className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
-            <Input id="materials-search" type="search" value={searchFilter} onChange={(e) => setSearchFilter(e.target.value)} placeholder="Title or description" className="pl-8" />
-          </div>
+          <LiveSearch id="materials-search" value={searchFilter} onChange={setSearchFilter} placeholder="Title or description" suggestions={materials.map((m) => m.title)} />
         </FilterField>
         {activeTab !== "general" && (
           <TaxonomyPicker key={activeTab} topics={sectionTopics} value={skillFilter} onChange={setSkillFilter} allowAll fixedSection={sectionLabel} inFilterBar />

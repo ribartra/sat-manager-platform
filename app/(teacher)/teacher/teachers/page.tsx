@@ -11,6 +11,7 @@ import { requireTeacherManager } from "@/lib/rbac";
 import { teacherProgramIds } from "@/lib/program-scope";
 import { RevokeInviteButton } from "../students/revoke-invite-button";
 import { formatDate, relativeDay } from "@/lib/utils";
+import { personSuggestions } from "@/lib/search-suggestions";
 
 export const dynamic = "force-dynamic";
 
@@ -78,6 +79,7 @@ export default async function TeachersPage({ searchParams }: PageProps) {
         action="/teacher/teachers"
         q={q}
         placeholder="Name or email"
+        suggestions={await personSuggestions({ role: "TEACHER" })}
         filters={[{ name: "access", label: "Status", value: access, allLabel: "All teachers", options: [{ value: "enabled", label: "Active" }, { value: "disabled", label: "Deactivated" }] }]}
       />
 

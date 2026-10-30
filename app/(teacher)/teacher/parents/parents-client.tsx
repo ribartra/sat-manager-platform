@@ -17,9 +17,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Edit, FileDown, Link2, Plus, Search } from "lucide-react";
+import { Edit, FileDown, Link2, Plus } from "lucide-react";
 import { StudentPicker } from "@/components/student-picker";
 import { errorMessage, readApiError } from "@/lib/api-client";
+import { LiveSearch } from "@/components/sat/live-search";
 
 type Student = { id: string; name: string };
 type Parent = { id: string; name: string; email: string; phone: string; students: Student[] };
@@ -201,10 +202,7 @@ export function ParentsClient({
       </div>
       <FilterBar className="mb-0">
         <FilterField label="Search" htmlFor="parents-q" className="@md:flex-[2]">
-          <div className="relative">
-            <Search size={14} aria-hidden className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
-            <Input id="parents-q" type="search" value={parentSearch} onChange={(event) => setParentSearch(event.target.value)} placeholder="Search parent or student..." className="pl-8" />
-          </div>
+          <LiveSearch id="parents-q" value={parentSearch} onChange={setParentSearch} placeholder="Search parent or student..." suggestions={parents.flatMap((p) => [p.name, p.email, ...p.students.map((st) => st.name)])} />
         </FilterField>
         <FilterField label="Parents" htmlFor="parents-link">
           <Select id="parents-link" value={parentLinkFilter} onChange={(event) => setParentLinkFilter(event.target.value as "" | "linked" | "unlinked")}>

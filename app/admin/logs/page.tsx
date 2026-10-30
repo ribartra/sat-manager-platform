@@ -103,6 +103,7 @@ export default async function AdminLogsPage({ searchParams }: PageProps) {
 
       <ListFilters
         action="/admin/logs"
+        search={false}
         hidden={{ cat: tab.id === "all" ? undefined : tab.id, per: String(pageSize) }}
         filters={[
           { name: "user", label: "User", value: userFilter, allLabel: "Anyone", options: actors.map((actor) => ({ value: actor.id, label: `${actor.name} · ${actor.email}` })) },

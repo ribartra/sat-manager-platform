@@ -16,6 +16,7 @@ import { requireContentImporter } from "@/lib/rbac";
 import { getFeatureFlagValues } from "@/lib/feature-flags";
 import { TEACHER_MORE_LINKS, resolveLinks } from "@/lib/nav-config";
 import { DEFAULT_PRACTICE_SOURCE_ID, listSources } from "@/lib/content-source";
+import { suggestionValues } from "@/lib/search-suggestions";
 
 interface SearchParams {
   area?: string;
@@ -104,7 +105,13 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
       </header>
       <MoreLinks links={moreLinks} />
       <PracticeAreaTabs basePath="/teacher/practice-sets" active={area} includeTests={false} preserve={{ q: search || undefined }} />
-      <ListFilters action="/teacher/practice-sets" q={search} placeholder="Skill or practice set name" hidden={{ area }} />
+      <ListFilters
+        action="/teacher/practice-sets"
+        q={search}
+        placeholder="Skill or practice set name"
+        hidden={{ area }}
+        suggestions={suggestionValues([...topics.map((t) => t.name), ...practiceSets.map((set) => set.name)])}
+      />
       <div className="space-y-3">
         <SkillsSourceMap
           emptyText={search ? "No skill or practice set matches the search." : "No skills in this area yet."}

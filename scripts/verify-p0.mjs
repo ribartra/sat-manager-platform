@@ -213,7 +213,7 @@ const checks = [
   },
   {
     file: "app/admin/logs/page.tsx",
-    requires: ["ListFilters", 'pageSizeParam="per"', "skip: (current - 1) * pageSize"],
+    requires: ["ListFilters", 'pageSizeParam="per"', "skip: (current - 1) * pageSize", "search={false}"],
     forbids: ["take: 500", "q={q}"],
     label: "Log (admin), tabla de consolidacion: sin busqueda libre (usuario y accion en DDL con busqueda), paginado en BD, hasta 100 por pagina",
   },
@@ -507,7 +507,7 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/history/page.tsx",
-    requires: ["parseHistoryParams(", "InvalidateAttemptButton", "show.student", "show.title", "Back to", "dayLabel("],
+    requires: ["parseHistoryParams(", "InvalidateAttemptButton", "show.student", "show.title", "Back to", "dayLabel(", "search={false}"],
     forbids: ["q={q}", 'placeholder="Student, practice set or Test"'],
     label: "History unificada: contexto por URL, columnas ocultas con filtro fijo, volver al alumno, encabezado por dia",
   },
@@ -539,7 +539,7 @@ const checks = [
   // No free-text search on its own in History; drop-downs with more than 8 options search inside.
   {
     file: "components/sat/list-filters.tsx",
-    requires: ["SEARCHABLE_MIN_OPTIONS", "<SearchableSelect", "q !== undefined"],
+    requires: ["SEARCHABLE_MIN_OPTIONS", "<SearchableSelect", "search = true", "<LiveSearch"],
     label: "Filtros: DDL con mas de 8 opciones con buscador dentro; buscador libre solo si la lista lo pide",
   },
   // Account names "First Last" on every create / edit (lib/person-name.ts).

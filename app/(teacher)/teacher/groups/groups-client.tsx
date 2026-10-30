@@ -9,10 +9,11 @@ import { FilterBar, FilterField } from "@/components/sat/filter-bar";
 import { Select } from "@/components/ui/select";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { StudentPicker } from "@/components/student-picker";
-import { Plus, Search, UserMinus } from "lucide-react";
+import { Plus, UserMinus } from "lucide-react";
 import { useConfirm } from "@/components/sat/confirm-dialog";
 import { apiFetch } from "@/lib/api-client";
 import { notify } from "@/lib/notify-ui";
+import { LiveSearch } from "@/components/sat/live-search";
 
 interface Member {
   id: string;
@@ -138,10 +139,7 @@ export function GroupsClient({ groups: initialGroups, students }: { groups: Grou
 
       <FilterBar className="mb-0">
         <FilterField label="Search" htmlFor="groups-q" className="@md:flex-[2]">
-          <div className="relative">
-            <Search size={14} aria-hidden className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
-            <Input id="groups-q" type="search" value={groupSearch} onChange={(event) => setGroupSearch(event.target.value)} placeholder="Search group or member..." className="pl-8" />
-          </div>
+          <LiveSearch id="groups-q" value={groupSearch} onChange={setGroupSearch} placeholder="Search group or member..." suggestions={groups.flatMap((g) => [g.name, ...g.members.map((m) => m.name)])} />
         </FilterField>
         <FilterField label="Groups" htmlFor="groups-size">
           <Select id="groups-size" value={groupSizeFilter} onChange={(event) => setGroupSizeFilter(event.target.value as "" | "members" | "empty")}>

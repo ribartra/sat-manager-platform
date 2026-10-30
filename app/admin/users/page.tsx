@@ -5,6 +5,7 @@ import { roleLabel } from "@/lib/domain-meta";
 import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/rbac";
 import { AdminUsersTable, type AdminUserRow } from "./users-table-client";
+import { personSuggestions } from "@/lib/search-suggestions";
 
 export const dynamic = "force-dynamic";
 
@@ -70,6 +71,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
           action="/admin/users"
           q={q}
           placeholder="Name or email"
+          suggestions={await personSuggestions({})}
           filters={[
             { name: "role", label: "Account type", value: role, allLabel: "All types", options: ["STUDENT", "TEACHER", "PARENT", "ADMIN"].map((r) => ({ value: r, label: roleLabel(r) })) },
             { name: "validation", label: "Validation", value: validation, allLabel: "Any validation", options: [{ value: "PENDING", label: "Pending" }, { value: "APPROVED", label: "Approved" }, { value: "REJECTED", label: "Rejected" }] },

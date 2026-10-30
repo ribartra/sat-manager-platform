@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { ListFilters, PageContent, PageHeader, PageShell } from "@/components/sat";
 import { AdminTeachersTable, type AdminTeacherRow } from "./teachers-table-client";
+import { personSuggestions, suggestionValues } from "@/lib/search-suggestions";
 
 interface PageProps {
   searchParams: Promise<{ q?: string; access?: string; programs?: string }>;
@@ -73,6 +74,7 @@ export default async function AdminTeachersPage({ searchParams }: PageProps) {
           action="/admin/teachers"
           q={q}
           placeholder="Teacher, email or program"
+          suggestions={suggestionValues([...(await personSuggestions({ role: "TEACHER" })), ...(await prisma.program.findMany({ select: { name: true } })).map((p) => p.name)])}
           filters={[
             { name: "access", label: "Access", value: access, allLabel: "Any access", options: [{ value: "enabled", label: "Enabled" }, { value: "disabled", label: "Disabled" }] },
             { name: "programs", label: "Programs", value: programs, allLabel: "With or without programs", options: [{ value: "with", label: "With programs" }, { value: "without", label: "Without programs" }] },

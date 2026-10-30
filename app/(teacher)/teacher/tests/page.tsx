@@ -16,6 +16,7 @@ import { moduleViewsForTest } from "@/lib/test-view";
 import { formatDate } from "@/lib/utils";
 import { FullTestActions } from "./full-test-actions-client";
 import { assignHref } from "@/lib/assign-params";
+import { suggestionValues } from "@/lib/search-suggestions";
 
 interface PageProps {
   searchParams: Promise<{ view?: string; page?: string; q?: string; status?: string; assigned?: string }>;
@@ -107,6 +108,7 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
         action="/teacher/tests"
         q={query.q}
         placeholder="Test name"
+        suggestions={suggestionValues(tests.map((t) => t.name))}
         filters={[
           { name: "status", label: "Status", value: status, allLabel: "All statuses", options: ["PUBLISHED", "DRAFT", "ARCHIVED"].map((v) => ({ value: v, label: fullTestStatusLabel(v) })) },
           { name: "assigned", label: "Assigned", value: assigned, allLabel: "Assigned or not", options: [{ value: "yes", label: "Assigned to my students" }, { value: "no", label: "Not assigned yet" }] },

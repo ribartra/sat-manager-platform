@@ -25,6 +25,7 @@ import { studentAccessWhereFor } from "@/lib/program-scope";
 import { practiceAreaLabel, resolvePracticeArea, tabFromPracticeArea, type PracticeAreaCode } from "@/lib/practice-area";
 import { Pct } from "@/components/sat/work-status";
 import { isInactive, loadStudentOverviews, type StudentOverview } from "@/lib/teacher-overview";
+import { personSuggestions } from "@/lib/search-suggestions";
 
 interface PageProps {
   searchParams: Promise<{ q?: string }>;
@@ -101,7 +102,7 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
   return (
     <PageShell maxWidth={1180} width="wide" density="compact" className="space-y-4">
       {head(rows.length)}
-      <ListFilters action="/teacher" q={search} placeholder="Name or email" />
+      <ListFilters action="/teacher" q={search} placeholder="Name or email" suggestions={await personSuggestions(studentScope)} />
       <Card padding="none" className="flex flex-col gap-2 px-4 py-3">
         <AttentionRow
           icon={<Clock size={14} />}

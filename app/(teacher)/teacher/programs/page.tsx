@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { redirect } from "next/navigation";
 import { TeacherProgramsClient } from "./programs-client";
+import { suggestionValues } from "@/lib/search-suggestions";
 
 export const dynamic = "force-dynamic";
 
@@ -65,6 +66,7 @@ export default async function TeacherProgramsPage({ searchParams }: { searchPara
         action="/teacher/programs"
         q={query.q}
         placeholder="Program or student name"
+        suggestions={suggestionValues(programs.flatMap((p) => [p.name, ...p.enrollments.map((e) => e.student.name)]))}
         filters={[
           {
             name: "status",

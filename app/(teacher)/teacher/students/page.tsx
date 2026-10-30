@@ -13,6 +13,7 @@ import prisma from "@/lib/prisma";
 import { studentAccessWhereFor } from "@/lib/program-scope";
 import { isInactive, loadStudentOverviews, type StudentOverview } from "@/lib/teacher-overview";
 import { formatDate, relativeDay } from "@/lib/utils";
+import { personSuggestions } from "@/lib/search-suggestions";
 
 interface PageProps {
   searchParams: Promise<{ q?: string; show?: string }>;
@@ -90,6 +91,7 @@ export default async function TeacherStudentsPage({ searchParams }: PageProps) {
         action="/teacher/students"
         q={search}
         placeholder="Name or email"
+        suggestions={await personSuggestions(session ? studentAccessWhereFor(session.user, now) : { role: "STUDENT", active: true, validationStatus: "APPROVED" })}
         filters={[{ name: "show", label: "Show", value: show === "all" ? "" : show, allLabel: SHOW.all, options: (Object.keys(SHOW) as Show[]).filter((key) => key !== "all").map((key) => ({ value: key, label: SHOW[key] })) }]}
       />
 

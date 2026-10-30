@@ -1,10 +1,9 @@
-import { Search } from "lucide-react";
 import { FilterActions, FilterBar, FilterField } from "@/components/sat/filter-bar";
 import { PeriodFilter } from "@/components/sat/period-filter";
+import { LiveSearch } from "@/components/sat/live-search";
 import { SearchableSelect } from "@/components/sat/searchable-select";
 import { SEARCHABLE_MIN_OPTIONS } from "@/components/sat/filter-bar";
 import type { PeriodValue } from "@/lib/period-filter";
-import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 
 export interface ListFilterSelect {
@@ -32,6 +31,8 @@ export function ListFilters({
   period,
   hidden = {},
   qName = "q",
+  search = true,
+  suggestions,
   children,
 }: {
   action: string;
@@ -43,6 +44,10 @@ export function ListFilters({
   hidden?: Record<string, string | undefined>;
   /** Param name of the text search (default `q`). */
   qName?: string;
+  /** Text search box; false for consolidation tables (their long drop-downs search inside). */
+  search?: boolean;
+  /** Values offered while typing in the search (names, emails…). */
+  suggestions?: string[];
   /** Extra named controls inside the same form (e.g. a skill picker), placed before the selects. */
   children?: React.ReactNode;
 }) {
@@ -52,13 +57,11 @@ export function ListFilters({
   return (
     <FilterBar action={action}>
       {keep.map(([name, value]) => <input key={name} type="hidden" name={name} value={value} />)}
-      {/* Free-text search only where the list asks for it (`q` given). */}
-      {q !== undefined ? (
+      {/* Entity lists search by text; consolidation tables (History, Questions, Logs) don't (`search={false}`). */}
+      {search ? (
         <FilterField label="Search" htmlFor={`lf-${qName}`} className="@md:flex-[2]">
-          <div className="relative">
-            <Search size={14} aria-hidden className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
-            <Input id={`lf-${qName}`} name={qName} type="search" defaultValue={q} placeholder={placeholder} className="pl-8" />
-          </div>
+          {/* Entity lists: filters while typing and offers the matching values (LiveSearch). */}
+          <LiveSearch id={`lf-${qName}`} name={qName} defaultValue={q ?? ""} placeholder={placeholder} suggestions={suggestions} />
         </FilterField>
       ) : null}
       {children}

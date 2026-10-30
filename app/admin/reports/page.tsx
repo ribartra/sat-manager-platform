@@ -7,6 +7,7 @@ import prisma from "@/lib/prisma";
 import { roleLabel } from "@/lib/domain-meta";
 import { formatDate } from "@/lib/utils";
 import { issueCategoryMeta } from "@/lib/issue-report";
+import { suggestionValues } from "@/lib/search-suggestions";
 
 const PAGE_SIZE = 20;
 
@@ -88,6 +89,7 @@ export default async function AdminReportsPage({ searchParams }: { searchParams:
         action="/admin/reports"
         q={q}
         placeholder="Comment, reporter or page"
+        suggestions={suggestionValues((await prisma.issueReport.findMany({ select: { pageTitle: true, user: { select: { name: true } } }, take: 500 })).flatMap((r) => [r.pageTitle, r.user?.name]))}
         hidden={{ status: tab.id === "open" ? undefined : tab.id }}
         filters={[
           { name: "category", label: "Type", value: category, allLabel: "All types", options: CATEGORY_OPTIONS },
