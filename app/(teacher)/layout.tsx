@@ -1,33 +1,19 @@
-import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { TeacherShell } from "@/components/nav-teacher";
-import prisma from "@/lib/prisma";
-import { getFeatureFlagValues } from "@/lib/feature-flags";
+import { auth } from "@/lib/auth";
+import { homeHrefForRole } from "@/lib/nav-config";
+import { loadShellProps } from "@/lib/shell-props";
 
 export const dynamic = "force-dynamic";
 
+/** Teacher (and admin) portal; the menu comes from loadShellProps, as on every portal page. */
 export default async function TeacherLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
-  if (!session) redirect("/login");
-  if (!["TEACHER", "ADMIN"].includes(session.user.role)) redirect("/student");
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { active: true, validationStatus: true, avatarUrl: true, canManageTeachers: true },
-  });
-  if (!user?.active) redirect("/login");
-  if (user.validationStatus !== "APPROVED") redirect("/auth/pending-validation");
-
-  const flags = await getFeatureFlagValues({ role: session.user.role, userId: session.user.id });
-
+  const shell = await loadShellProps(session);
+  if (!["TEACHER", "ADMIN"].includes(shell.role)) redirect(homeHrefForRole(shell.role));
+  // Master teacher (Teachers menu): canManageTeachers → "manageTeachers" (lib/shell-props.ts).
   return (
-    <TeacherShell
-      userName={session.user.name}
-      avatarUrl={user.avatarUrl}
-      role={session.user.role}
-      flags={flags}
-      // Master teacher (Teachers menu): only TEACHER accounts with the flag (the SAT Teacher account).
-      capabilities={session.user.role === "TEACHER" && user.canManageTeachers ? ["manageTeachers"] : []}
-    >
+    <TeacherShell userName={shell.userName} avatarUrl={shell.avatarUrl} role={shell.role} flags={shell.flags} capabilities={shell.capabilities}>
       {children}
     </TeacherShell>
   );

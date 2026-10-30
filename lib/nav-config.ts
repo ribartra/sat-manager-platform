@@ -183,6 +183,9 @@ export const STUDENT_NAV_ENROLLED: NavLinkDef[] = [
   { id: "student.history", label: "History", href: "/student/history", icon: Clock },
 ];
 
+/** Parent portal: their students' results (Home); Notifications and Report a problem sit in the footer. */
+export const PARENT_NAV: NavLinkDef[] = [{ id: "parent.home", label: "Home", href: "/parent", icon: Home, exact: true }];
+
 export const STUDENT_NAV_RESTRICTED: NavLinkDef[] = [
   { id: "student.program", label: "Programs", href: "/student/program", icon: FolderOpen },
 ];
@@ -261,7 +264,7 @@ export function navPathname(pathname: string, area: string | null | undefined): 
 }
 
 export function linkIsActive(href: string, pathname: string, exact = false): boolean {
-  if (exact || href === "/teacher" || href === "/student") return pathname === href;
+  if (exact || href === "/teacher" || href === "/student" || href === "/parent") return pathname === href;
   return [href, ...(NAV_ALIASES[href] ?? [])].some((base) => pathname === base || pathname.startsWith(`${base}/`));
 }
 

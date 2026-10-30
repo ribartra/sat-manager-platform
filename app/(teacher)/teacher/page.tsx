@@ -34,6 +34,9 @@ export default async function TeacherDashboard() {
   const master = session?.user.role === "TEACHER"
     ? Boolean((await prisma.user.findUnique({ where: { id: session.user.id }, select: { canManageTeachers: true } }))?.canManageTeachers)
     : false;
+  // Admin inherits every teacher view; its teachers are managed in Admin › Teachers.
+  const isAdmin = session?.user.role === "ADMIN";
+  const teachersBase = isAdmin ? "/admin/teachers" : "/teacher/teachers";
   const contentScope = await currentContentScope();
   const inviteWhere = { role: "STUDENT", usedAt: null, revokedAt: null, expiresAt: { gt: now }, ...(session?.user.role === "TEACHER" ? { invitedById: session.user.id } : {}) };
 
@@ -52,13 +55,16 @@ export default async function TeacherDashboard() {
     loadAttemptHistory(studentIds, { status: "completed", from: new Date(now.getTime() - 7 * DAY) }),
     // Assigned and not finished (the Pending list): split by practice / Test and status.
     loadPending(studentIds),
-    master && session
+    // Teachers box: the master teacher (their teachers' invitations) and the admin (every invitation).
+    (master || isAdmin) && session
       ? Promise.all([
           prisma.user.count({ where: { role: "TEACHER", active: true } }),
           prisma.user.count({ where: { role: "TEACHER", active: false } }),
-          teacherProgramIds(session.user).then((programIds) =>
-            prisma.inviteToken.count({ where: { role: "TEACHER", usedAt: null, revokedAt: null, expiresAt: { gt: now }, OR: [{ invitedById: session.user.id }, { programId: { in: programIds } }] } }),
-          ),
+          isAdmin
+            ? prisma.inviteToken.count({ where: { role: "TEACHER", usedAt: null, revokedAt: null, expiresAt: { gt: now } } })
+            : teacherProgramIds(session.user).then((programIds) =>
+                prisma.inviteToken.count({ where: { role: "TEACHER", usedAt: null, revokedAt: null, expiresAt: { gt: now }, OR: [{ invitedById: session.user.id }, { programId: { in: programIds } }] } }),
+              ),
         ])
       : Promise.resolve(null),
   ]);
@@ -172,13 +178,13 @@ export default async function TeacherDashboard() {
           <ViewSummaryCard
             title="Teachers"
             icon={<GraduationCap size={16} />}
-            href="/teacher/teachers"
+            href={teachersBase}
             value={teachers[0] + teachers[1]}
             valueLabel={plural(teachers[0] + teachers[1], "teacher")}
             chips={[
-              { label: "Active", value: teachers[0], tone: tone(teachers[0], "success"), href: "/teacher/teachers?access=enabled" },
-              { label: "Deactivated", value: teachers[1], href: "/teacher/teachers?access=disabled" },
-              { label: "Invitations", value: teachers[2], tone: tone(teachers[2], "info"), href: "/teacher/teachers#invitations" },
+              { label: "Active", value: teachers[0], tone: tone(teachers[0], "success"), href: `${teachersBase}?access=enabled` },
+              { label: "Deactivated", value: teachers[1], href: `${teachersBase}?access=disabled` },
+              { label: "Invitations", value: teachers[2], tone: tone(teachers[2], "info"), href: isAdmin ? teachersBase : "/teacher/teachers#invitations" },
             ]}
             action="Open Teachers →"
           />

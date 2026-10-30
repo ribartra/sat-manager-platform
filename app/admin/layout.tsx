@@ -1,27 +1,18 @@
 import { redirect } from "next/navigation";
 import { TeacherShell } from "@/components/nav-teacher";
 import { auth } from "@/lib/auth";
-import { getFeatureFlagValues } from "@/lib/feature-flags";
-import prisma from "@/lib/prisma";
+import { homeHrefForRole } from "@/lib/nav-config";
+import { loadShellProps } from "@/lib/shell-props";
 
 export const dynamic = "force-dynamic";
 
+/** Admin pages: the teacher chrome (admin inherits it), with the same menu as the teacher pages. */
 export default async function AdminSectionLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
-  if (!session) redirect("/login");
-  if (!["TEACHER", "ADMIN"].includes(session.user.role)) redirect("/student");
-
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { active: true, validationStatus: true, avatarUrl: true },
-  });
-  if (!user?.active) redirect("/login");
-  if (user.validationStatus !== "APPROVED") redirect("/auth/pending-validation");
-
-  const flags = await getFeatureFlagValues({ role: session.user.role, userId: session.user.id });
-
+  const shell = await loadShellProps(session);
+  if (!["TEACHER", "ADMIN"].includes(shell.role)) redirect(homeHrefForRole(shell.role));
   return (
-    <TeacherShell userName={session.user.name} avatarUrl={user.avatarUrl} role={session.user.role} flags={flags}>
+    <TeacherShell userName={shell.userName} avatarUrl={shell.avatarUrl} role={shell.role} flags={shell.flags} capabilities={shell.capabilities}>
       {children}
     </TeacherShell>
   );

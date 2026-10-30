@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
 import { EmptyState, PageContent, PageHeader, PageShell, PracticeSetAttemptsAccordion, SkillResults } from "@/components/sat";
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { loadPracticeReport } from "@/lib/student-report";
 import type { PracticeAreaCode } from "@/lib/practice-area";
 import { practiceSetGroups, practiceSetTitle, type GroupableSet } from "@/lib/attempt-groups";
@@ -42,6 +43,8 @@ export default async function ParentDashboardPage() {
 
   return (
     <PageShell>
+      {/* The breadcrumb row keeps the title at the same height as on every other page. */}
+      <Breadcrumbs items={[{ label: "Home" }]} />
       <PageHeader title="Your student's progress" />
       <PageContent>
         {links.length === 0 ? (

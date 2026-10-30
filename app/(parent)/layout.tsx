@@ -1,30 +1,19 @@
-import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import Link from "next/link";
-import { IssueReportButton } from "@/components/sat/issue-reporter";
-import prisma from "@/lib/prisma";
+import { ParentShell } from "@/components/nav-parent";
+import { auth } from "@/lib/auth";
+import { homeHrefForRole } from "@/lib/nav-config";
+import { loadShellProps } from "@/lib/shell-props";
 
 export const dynamic = "force-dynamic";
 
+/** Parent portal: the same chrome as every portal (ParentShell on AppShell). */
 export default async function ParentLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
-  if (!session) redirect("/login");
-  const user = await prisma.user.findUnique({ where: { id: session.user.id }, select: { active: true, validationStatus: true } });
-  if (!user?.active) redirect("/login");
-  if (user.validationStatus !== "APPROVED") redirect("/auth/pending-validation");
-  if (session.user.role !== "PARENT") redirect("/");
+  const shell = await loadShellProps(session);
+  if (shell.role !== "PARENT") redirect(homeHrefForRole(shell.role));
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="border-b border-gray-200 bg-white py-3">
-        <div className="mx-auto flex max-w-[var(--sat-page-wide)] items-center justify-between px-4">
-          <span className="text-sm font-semibold text-blue-700">SAT Parent Portal</span>
-          <div className="flex items-center gap-3">
-            <IssueReportButton variant="bar" />
-            <Link href="/notifications" className="text-sm text-gray-600 hover:text-blue-600">Notifications</Link>
-          </div>
-        </div>
-      </nav>
+    <ParentShell userName={shell.userName} avatarUrl={shell.avatarUrl}>
       {children}
-    </div>
+    </ParentShell>
   );
 }

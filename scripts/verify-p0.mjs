@@ -49,6 +49,19 @@ const checks = [
     requires: ["<PendingTable", "pendingColumns("],
     label: `Pending con la tabla compartida: ${file}`,
   })),
+  // Every role on the same chrome: parent portal on AppShell, no duplicate parent dashboard in /student.
+  ...["app/(parent)/layout.tsx", "app/notifications/layout.tsx"].map((file) => ({ file, requires: ["<ParentShell"], forbids: ["SAT Parent Portal</"], label: `Portal de padres con el menu lateral comun: ${file}` })),
+  {
+    file: "app/(student)/student/page.tsx",
+    requires: ["<StudentHome"],
+    forbids: ["ParentDashboard"],
+    label: "Home del alumno sin dashboard de padres duplicado (los padres van a /parent)",
+  },
+  {
+    file: "app/(teacher)/teacher/page.tsx",
+    requires: ['isAdmin ? "/admin/teachers" : "/teacher/teachers"', "(master || isAdmin)"],
+    label: "Admin hereda el Home del profesor y su recuadro Teachers va a Admin › Teachers",
+  },
   // Results by skill (SAT-039/040/041): no Low performance, no summary card, no matrix, no Assign in results.
   {
     file: "app/(teacher)/teacher/students/[studentId]/page.tsx",

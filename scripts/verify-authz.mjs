@@ -12,10 +12,21 @@ const checks = [
     label: "Master teacher: capacidad por cuenta (canManageTeachers) verificada en la BD",
   },
   {
-    file: "app/(teacher)/layout.tsx",
-    requires: ["canManageTeachers", '"manageTeachers"'],
-    label: "Menu Teachers solo para la cuenta con la capacidad",
+    file: "lib/shell-props.ts",
+    requires: ["canManageTeachers", '"manageTeachers"', 'role === "TEACHER"', 'redirect("/login")', 'redirect("/auth/pending-validation")'],
+    label: "Menu Teachers solo para la cuenta con la capacidad; cuentas inactivas o sin aprobar fuera",
   },
+  ...["app/(teacher)/layout.tsx", "app/admin/layout.tsx", "app/(student)/layout.tsx", "app/(parent)/layout.tsx", "app/notifications/layout.tsx"].map((file) => ({
+    file,
+    requires: ["loadShellProps("],
+    label: `Mismo cargador de menu (rol, capacidades, flags) en ${file}`,
+  })),
+  ...[
+    ["app/(teacher)/layout.tsx", '["TEACHER", "ADMIN"].includes(shell.role)'],
+    ["app/admin/layout.tsx", '["TEACHER", "ADMIN"].includes(shell.role)'],
+    ["app/(student)/layout.tsx", 'shell.role !== "STUDENT"'],
+    ["app/(parent)/layout.tsx", 'shell.role !== "PARENT"'],
+  ].map(([file, check]) => ({ file, requires: [check, "homeHrefForRole("], label: `Cada rol en su portal: ${file}` })),
   {
     file: "app/api/teachers/invite/route.ts",
     requires: ["assertTeacherManager", 'role: "TEACHER"', 'openInviteWhere(email, now, "TEACHER")', "TEACHER_INVITED"],

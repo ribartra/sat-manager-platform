@@ -1,11 +1,8 @@
-import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { redirect } from "next/navigation";
-import { PageHeader, PageShell } from "@/components/sat";
-import { Card } from "@/components/ui/card";
+import { PageShell } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { refreshAssignmentStates } from "@/lib/assignments";
-import { enrollmentStatusLabel } from "@/lib/domain-meta";
 import { StudentHome } from "./student-home";
 
 export const dynamic = "force-dynamic";
@@ -14,16 +11,11 @@ interface PageProps {
   searchParams: Promise<{ area?: string; skill?: string; difficulty?: string; status?: string; page?: string }>;
 }
 
-/** Student Home (see StudentHome); parents get their own dashboard here. */
+/** Student Home (see StudentHome). Parents have their own portal (/parent); the layout sends them there. */
 export default async function StudentDashboard({ searchParams }: PageProps) {
   const session = await auth();
   const userId = session!.user.id;
   await refreshAssignmentStates();
-
-  // Parents see their own dashboard with children's enrollment requests
-  if (session!.user.role === "PARENT") {
-    return <ParentDashboard parentId={userId} parentName={session!.user.name} />;
-  }
 
   // Guard: only students without an active enrollment land on /student/program
   if (session!.user.role === "STUDENT") {
@@ -50,73 +42,6 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
   return (
     <PageShell>
       <StudentHome studentId={userId} firstName={session!.user.name.split(" ")[0]} />
-    </PageShell>
-  );
-}
-
-// ─── Parent Dashboard ─────────────────────────────────────────────────────────
-
-async function ParentDashboard({ parentId, parentName }: { parentId: string; parentName: string }) {
-  const children = await prisma.parentStudent.findMany({
-    where: { parentId },
-    include: {
-      student: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          active: true,
-          programEnrollments: {
-            include: { program: { select: { id: true, name: true } } },
-            orderBy: { enrolledAt: "desc" },
-          },
-        },
-      },
-    },
-  });
-
-  return (
-    <PageShell>
-      <Breadcrumbs items={[{ label: "Home" }]} />
-      <PageHeader title={`Hello, ${parentName.split(" ")[0]}!`} description="Parent dashboard" />
-
-      <section>
-        <h2 className="mb-3 text-base font-semibold text-gray-900">Your children</h2>
-        {children.length === 0 ? (
-          <p className="text-sm text-gray-400">No students are linked to your account yet.</p>
-        ) : (
-          <div className="space-y-3">
-            {children.map((link) => (
-              <Card key={link.student.id} className="px-4 py-3">
-                <p className="text-sm font-medium text-gray-900">{link.student.name}</p>
-                <p className="mt-0.5 text-xs text-gray-500">{link.student.email}</p>
-                {link.student.programEnrollments.length > 0 ? (
-                  <div className="mt-2 space-y-1">
-                    {link.student.programEnrollments.map((e) => (
-                      <div key={e.programId} className="flex items-center gap-2 text-xs">
-                        <span className="text-gray-600">{e.program.name}</span>
-                        <span
-                          className={`font-medium ${
-                            e.status === "APPROVED"
-                              ? "text-green-600"
-                              : e.status === "PENDING"
-                                ? "text-amber-600"
-                                : "text-red-500"
-                          }`}
-                        >
-                          {enrollmentStatusLabel(e.status)}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="mt-1 text-xs text-gray-400">Not in any program yet.</p>
-                )}
-              </Card>
-            ))}
-          </div>
-        )}
-      </section>
     </PageShell>
   );
 }
