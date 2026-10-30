@@ -101,6 +101,34 @@
   --font-sans: var(--font-inter), Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 
+/*
+ * Desktop scale: the whole app at 87.5% (what the browser shows at ~87% zoom), phones and tablets at
+ * 100%. The zoom is on the app wrapper (.app-zoom in app/layout.tsx), not on <html>, so menus and
+ * dialogs portaled to <body> are positioned right by Radix / floating-ui. CSS zoom also shrinks vh /
+ * dvh, so full-height layouts use --app-vh / --app-dvh (and .h-dvh / .min-h-screen are restored
+ * below) to keep filling the screen.
+ */
+:root {
+  --app-zoom: 1;
+  --app-vh: 100vh;
+  --app-dvh: 100dvh;
+}
+@media (min-width: 1024px) {
+  :root {
+    --app-zoom: 0.875;
+    --app-vh: calc(100vh / 0.875);
+    --app-dvh: calc(100dvh / 0.875);
+  }
+  .app-zoom {
+    zoom: 0.875;
+  }
+  .h-dvh { height: var(--app-dvh); }
+  .max-h-dvh { max-height: var(--app-dvh); }
+  .min-h-dvh { min-height: var(--app-dvh); }
+  .h-screen { height: var(--app-vh); }
+  .min-h-screen { min-height: var(--app-vh); }
+}
+
 /* Mockup font (Inter, self-hosted via next/font), size and colours. */
 body {
   background: var(--sat-bg);
@@ -119,7 +147,7 @@ body {
 .player-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  height: calc(100vh - 64px);
+  height: calc(var(--app-vh) - 64px);
   overflow: hidden;
 }
 

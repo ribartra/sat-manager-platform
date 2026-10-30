@@ -198,5 +198,7 @@ export function NotificationBell({ collapsed = false }: { collapsed?: boolean })
 /** Fixed position for a popover opening to the right of a sidebar button, bottom-aligned. */
 export function sidePopoverPosition(anchor: HTMLElement): React.CSSProperties {
   const r = anchor.getBoundingClientRect();
-  return { left: r.right + 8, bottom: Math.max(12, window.innerHeight - r.bottom) };
+  // The popover sits inside the zoomed app (globals.css --app-zoom): screen px → CSS px.
+  const zoom = Number(getComputedStyle(document.documentElement).getPropertyValue("--app-zoom")) || 1;
+  return { left: (r.right + 8) / zoom, bottom: Math.max(12, window.innerHeight - r.bottom) / zoom };
 }

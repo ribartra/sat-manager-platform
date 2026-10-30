@@ -1,9 +1,13 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
+import { ViewStepper } from "@/components/sat/view-stepper";
 
 export type Crumb = { label: string; href?: string };
 
-/** "Home › Tests › TEST 4" — the last item is the current page (no link). */
+/**
+ * "Home › Tests › TEST 4" — the last item is the current page (no link). On a main view the row also
+ * has the previous / next view links at the right (ViewStepper).
+ */
 export function Breadcrumbs({ items, className = "" }: { items: Crumb[]; className?: string }) {
   return (
     <nav aria-label="Breadcrumb" className={`mb-2.5 flex flex-wrap items-center gap-1.5 text-[13px] text-[var(--sat-muted)] ${className}`}>
@@ -17,6 +21,7 @@ export function Breadcrumbs({ items, className = "" }: { items: Crumb[]; classNa
           )}
         </span>
       ))}
+      <ViewStepper />
     </nav>
   );
 }

@@ -4,7 +4,10 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
-import { Camera, ChevronDown, ChevronLeft, ChevronRight, KeyRound, LogOut, Menu, X } from "lucide-react";
+import { Camera, ChevronDown, ChevronLeft, ChevronRight, Keyboard, KeyRound, LogOut, Menu, X } from "lucide-react";
+import { Hint } from "@/components/hint";
+import { NavViewsContext, viewShortcutsLabel } from "@/components/nav-views";
+import { useViewShortcuts } from "@/hooks/use-view-shortcuts";
 import { Avatar } from "@/components/avatar";
 import { IssueReportButton } from "@/components/sat/issue-reporter";
 import { NotificationBell, sidePopoverPosition } from "@/components/notification-bell";
@@ -100,7 +103,18 @@ export function AppShell({
     setMobileOpen(false);
   }, [pathname]);
 
-  if (isPlayerPath(pathname, searchParams)) return <>{children}</>;
+  // The main views (direct sidebar links, in order) for the previous / next links and the keys.
+  const directViews = items.flatMap((item) => (isResolvedNavGroup(item) ? [] : [{ href: item.href, label: item.label, exact: item.exact }]));
+  const currentView = directViews.findIndex((view) => linkIsActive(view.href, pathname, view.exact));
+  const navViews = {
+    views: directViews.map(({ href, label }) => ({ href, label })),
+    current: currentView,
+    isRoot: currentView >= 0 && pathname === directViews[currentView].href,
+  };
+  const inPlayer = isPlayerPath(pathname, searchParams);
+  useViewShortcuts(navViews.views, navViews.current, !inPlayer);
+
+  if (inPlayer) return <>{children}</>;
 
   function toggleCollapsed() {
     const next = !collapsed;
@@ -226,6 +240,19 @@ export function AppShell({
         </div>
 
         <div className="mt-auto flex flex-col gap-1 border-t border-gray-200 pt-2.5">
+          {navViews.views.length > 1 ? (
+            // The keyboard shortcuts between views (useViewShortcuts), always discoverable here.
+            <Hint label={viewShortcutsLabel(navViews.views.length)} side="right">
+              <button
+                type="button"
+                aria-label={`Keyboard shortcuts: ${viewShortcutsLabel(navViews.views.length)}`}
+                className={cn("flex items-center gap-3 whitespace-nowrap rounded-[9px] px-3 py-2 text-[13px] text-slate-500 hover:bg-slate-100", mini && "min-[860px]:justify-center min-[860px]:px-0")}
+              >
+                <Keyboard size={16} aria-hidden />
+                <span className={label}>Shortcuts</span>
+              </button>
+            </Hint>
+          ) : null}
           <IssueReportButton collapsed={mini} onStart={() => setMobileOpen(false)} />
           <NotificationBell collapsed={mini} />
           <div ref={userRef}>
@@ -289,7 +316,9 @@ export function AppShell({
         )}
       >
         {banner}
-        <main className={cn("flex min-h-0 flex-1 flex-col", mainClassName)}>{children}</main>
+        <main className={cn("flex min-h-0 flex-1 flex-col", mainClassName)}>
+          <NavViewsContext.Provider value={navViews}>{children}</NavViewsContext.Provider>
+        </main>
       </div>
 
       <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleAvatarChange} />

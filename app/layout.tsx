@@ -30,7 +30,10 @@ export default async function RootLayout({
         <CspNonce nonce={nonce} />
         <AuthSessionProvider>
           <AppQueryProvider>
-            <ConfirmProvider>{children}</ConfirmProvider>
+            {/* Desktop scale (globals.css): portals (menus, dialogs, toasts) stay outside it. */}
+            <div className="app-zoom min-h-full">
+              <ConfirmProvider>{children}</ConfirmProvider>
+            </div>
           </AppQueryProvider>
         </AuthSessionProvider>
         <Toaster />

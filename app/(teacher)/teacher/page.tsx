@@ -22,7 +22,7 @@ const LIST_SIZE = 4;
 
 /**
  * Teacher Home (one view, no section tabs — SAT-036/037): a summary, not a place to manage students.
- * One tall box per view (Students, Tests, Practice, History, Teachers for the master teacher) with its
+ * One tall box per view, in the menu's order (Students, Tests, Practice, Teachers for the master teacher, History) with its
  * main numbers (each opens the view with that filter), its latest items and the way in. Notices, search, Invite and the students table live on Students.
  */
 export default async function TeacherDashboard() {
@@ -168,6 +168,21 @@ export default async function TeacherDashboard() {
           ]}
           action="Open Practice →"
         />
+        {teachers ? (
+          <ViewSummaryCard
+            title="Teachers"
+            icon={<GraduationCap size={16} />}
+            href="/teacher/teachers"
+            value={teachers[0] + teachers[1]}
+            valueLabel={plural(teachers[0] + teachers[1], "teacher")}
+            chips={[
+              { label: "Active", value: teachers[0], tone: tone(teachers[0], "success"), href: "/teacher/teachers?access=enabled" },
+              { label: "Deactivated", value: teachers[1], href: "/teacher/teachers?access=disabled" },
+              { label: "Invitations", value: teachers[2], tone: tone(teachers[2], "info"), href: "/teacher/teachers#invitations" },
+            ]}
+            action="Open Teachers →"
+          />
+        ) : null}
         <ViewSummaryCard
           title="History"
           icon={<Clock size={16} />}
@@ -194,21 +209,6 @@ export default async function TeacherDashboard() {
           }}
           action="Open History →"
         />
-        {teachers ? (
-          <ViewSummaryCard
-            title="Teachers"
-            icon={<GraduationCap size={16} />}
-            href="/teacher/teachers"
-            value={teachers[0] + teachers[1]}
-            valueLabel={plural(teachers[0] + teachers[1], "teacher")}
-            chips={[
-              { label: "Active", value: teachers[0], tone: tone(teachers[0], "success"), href: "/teacher/teachers?access=enabled" },
-              { label: "Deactivated", value: teachers[1], href: "/teacher/teachers?access=disabled" },
-              { label: "Invitations", value: teachers[2], tone: tone(teachers[2], "info"), href: "/teacher/teachers#invitations" },
-            ]}
-            action="Open Teachers →"
-          />
-        ) : null}
       </div>
     </PageShell>
   );

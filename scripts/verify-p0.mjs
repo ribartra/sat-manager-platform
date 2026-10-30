@@ -11,6 +11,27 @@ const checks = [
     forbids: ["Overdue tests", "Section under 550", "Low performance", "PracticeAreaTabs", "TeacherStudentsTable"],
     label: "Teacher Home: one view (no Math/Reading/Writing/Tests tabs), one tall box per view",
   },
+  // Menu order: Teachers just before History; Home boxes in the same order.
+  {
+    file: "lib/nav-config.ts",
+    requires: ['capability: "manageTeachers" },\n  { id: "teacher.history"'],
+    label: "Menu del teacher: Teachers justo antes de History",
+  },
+  {
+    file: "app/globals.css",
+    requires: [".app-zoom {", "zoom: 0.875", "--app-vh: calc(100vh / 0.875)", ".h-dvh { height: var(--app-dvh); }"],
+    label: "Escala 87.5% en escritorio con alturas de pantalla compensadas",
+  },
+  {
+    file: "components/sat/breadcrumbs.tsx",
+    requires: ["<ViewStepper />"],
+    label: "Fila de breadcrumbs: vista anterior / siguiente en las vistas principales",
+  },
+  {
+    file: "components/app-shell.tsx",
+    requires: ["useViewShortcuts(", "NavViewsContext.Provider", "viewShortcutsLabel("],
+    label: "Atajos de teclado entre vistas ([ ] y g + numero) con ayuda visible en el menu",
+  },
   // Results by skill (SAT-039/040/041): no Low performance, no summary card, no matrix, no Assign in results.
   {
     file: "app/(teacher)/teacher/students/[studentId]/page.tsx",

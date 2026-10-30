@@ -60,7 +60,7 @@ export function ViewSummaryCard({
   action: string;
 }) {
   return (
-    <Card padding="md" className="relative flex min-h-[22rem] flex-col gap-3 hover:border-gray-400 lg:min-h-[calc(100vh-11rem)]">
+    <Card padding="md" className="relative flex min-h-[22rem] flex-col gap-3 hover:border-gray-400 lg:min-h-[calc(var(--app-vh)-11rem)]">
       <div className="flex items-center justify-between">
         <h2 className="flex items-center gap-2 text-base font-semibold text-[var(--sat-text)]">
           <span

@@ -89,7 +89,8 @@ function isNavGroupDef(item: TeacherNavEntryDef): item is NavGroupDef {
 }
 
 /**
- * Teacher sidebar (mockup `mejorada/teacher`): exactly Home · Students · Tests · Practice · History.
+ * Teacher sidebar (mockup `mejorada/teacher`): exactly Home · Students · Tests · Practice · History,
+ * with Teachers just before History for the master teacher (the Home boxes follow this order).
  * The other teacher pages are reached from in-page "More" rows (TEACHER_MORE_LINKS) and the user
  * menu (Programs); admins also get the Admin group.
  */
@@ -98,9 +99,9 @@ export const TEACHER_NAV: TeacherNavEntryDef[] = [
   { id: "teacher.students", label: "Students", href: "/teacher/students", icon: Users },
   { id: "teacher.tests", label: "Tests", href: "/teacher/tests", icon: ClipboardList },
   { id: "teacher.practice", label: "Practice", href: "/teacher/practice-sets", icon: BookOpen },
-  { id: "teacher.history", label: "History", href: "/teacher/history", icon: Clock },
   // Master teacher only (User.canManageTeachers): invite / deactivate teachers, see who their students are.
   { id: "teacher.teachers", label: "Teachers", href: "/teacher/teachers", icon: GraduationCap, capability: "manageTeachers" },
+  { id: "teacher.history", label: "History", href: "/teacher/history", icon: Clock },
 ];
 
 /** Secondary teacher pages, shown as a "More" row on the Students and Practice pages. */
