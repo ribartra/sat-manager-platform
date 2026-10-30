@@ -1,25 +1,12 @@
 import { PAGE_SIZE } from "@/components/sat/pagination";
+import Link from "next/link";
 import { redirect } from "next/navigation";
-import {
-  Breadcrumbs,
-  EmptyState,
-  LinkTabs,
-  PageHeader,
-  PageShell,
-  Pagination,
-  SectionHeader,
-  StatGrid,
-  StatTile,
-  TestAttemptsAccordion,
-  TestCardsByNumber,
-  type TestCardLinks,
-  pageFromParam,
-  paginate,
-} from "@/components/sat";
-import { testGroups as groupTests } from "@/lib/attempt-groups";
+import { HEADER_SHORTCUT_CLASS, HeaderActions } from "@/components/sat/header-actions";
+import { historyHref } from "@/lib/history-params";
+import { pendingHref } from "@/lib/pending";
+import { Breadcrumbs, EmptyState, LinkTabs, PageHeader, PageShell, Pagination, TestCardsByNumber, type TestCardLinks, pageFromParam, paginate } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import { loadStudentTests, sortTests } from "@/lib/test-assignments";
-import { formatDate } from "@/lib/utils";
 
 interface PageProps {
   searchParams: Promise<{ view?: string; page?: string }>;
@@ -28,7 +15,10 @@ interface PageProps {
 const VIEWS = ["pending", "completed", "all"] as const;
 type View = (typeof VIEWS)[number];
 
-/** Student Tests (mockup "tests.html"): pending / completed / all, module picker per Test, attempts grouped per Test. */
+/**
+ * Student Tests: the assigned Tests as cards (the same Test card as every view) — to take / completed /
+ * all — with Start / Continue per module, results and Retake. Every try is in History.
+ */
 export default async function StudentTestsPage({ searchParams }: PageProps) {
   const session = await auth();
   if (!session?.user) redirect("/login");
@@ -39,16 +29,6 @@ export default async function StudentTestsPage({ searchParams }: PageProps) {
   const { pending, done } = sortTests(items);
   const shown = view === "pending" ? pending : view === "completed" ? done : [...pending, ...done];
 
-  const submitted = items
-    .flatMap((t) => t.attempts.filter((a) => a.status === "SUBMITTED").map((a) => ({ test: t, attempt: a })))
-    .sort((a, b) => (a.attempt.submittedAt?.getTime() ?? 0) - (b.attempt.submittedAt?.getTime() ?? 0));
-  const latest = submitted[submitted.length - 1] ?? null;
-  const inProgress = pending.filter((t) => t.state === "progress").length;
-  const overdue = pending.filter((t) => t.overdue).length;
-  const attemptsTotal = submitted.length;
-  // Attempt level only: one row per Test with its last try (no best score, no chart across Tests).
-  const attemptGroups = groupTests(items, (a) => a.status !== "INVALIDATED");
-
   const page = paginate(shown, pageFromParam(query.page), TESTS_PAGE_SIZE);
 
   return (
@@ -57,35 +37,21 @@ export default async function StudentTestsPage({ searchParams }: PageProps) {
       <PageHeader
         title="Tests"
         description="Full-length SAT tests assigned by your teacher. You can take a whole test or choose one module at a time."
+        actions={
+          <HeaderActions>
+            <Link href={pendingHref("/student/pending", { type: "tests" })} className={HEADER_SHORTCUT_CLASS}>Pending →</Link>
+            {/* Every try of every Test (the cards show the last one). */}
+            <Link href={historyHref({ type: "tests" }, {}, "/student/history")} className={HEADER_SHORTCUT_CLASS}>History →</Link>
+          </HeaderActions>
+        }
       />
 
-      <StatGrid cols={3}>
-        <StatTile label="Tests to take" value={pending.length} sub={`${inProgress} in progress · ${overdue} overdue`} href="/student/tests?view=pending" />
-        <StatTile
-          label="Tests completed"
-          value={`${items.filter((t) => t.lastSubmitted).length} of ${items.length}`}
-          sub={`${attemptsTotal} attempt${attemptsTotal === 1 ? "" : "s"} in total · see them`}
-          href="/student/tests?view=completed"
-        />
-        {latest ? (
-          <StatTile
-            label="Latest total score"
-            value={latest.attempt.totalScore ?? "—"}
-            sub={<>{latest.test.name} · {formatDate(latest.attempt.submittedAt!)} · open ›</>}
-            href={`/student/tests/results/${latest.attempt.id}`}
-          />
-        ) : (
-          <StatTile label="Latest total score" value={<span className="text-gray-400">—</span>} sub="No finished test yet" />
-        )}
-      </StatGrid>
-
       <LinkTabs
-        className="mt-6"
         label="Tests view"
         active={view}
         tabs={VIEWS.map((v) => ({
           key: v,
-          label: v === "pending" ? "Pending" : v === "completed" ? "Completed" : "All",
+          label: v === "pending" ? "To take" : v === "completed" ? "Completed" : "All",
           count: v === "pending" ? pending.length : v === "completed" ? done.length : items.length,
           href: `/student/tests?view=${v}`,
         }))}
@@ -101,12 +67,6 @@ export default async function StudentTestsPage({ searchParams }: PageProps) {
         </div>
       )}
 
-      {view !== "pending" && attemptGroups.length > 0 ? (
-        <section className="mt-6">
-          <SectionHeader title="Your attempts" description="One row per test with its last try. Open a test to see every try." />
-          <TestAttemptsAccordion tests={attemptGroups} hrefFor={(id) => `/student/tests/results/${id}`} />
-        </section>
-      ) : null}
     </PageShell>
   );
 }

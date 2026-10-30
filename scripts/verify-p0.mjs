@@ -144,9 +144,9 @@ const checks = [
   },
   {
     file: "app/(student)/student/tests/page.tsx",
-    requires: ["TestAttemptsAccordion"],
-    forbids: ["LineChart", "Best total score"],
-    label: "Tests del alumno: ultimo intento por Test, sin mejor puntaje ni graficas entre Tests",
+    requires: ["TestCardsByNumber", "History →", "Pending →"],
+    forbids: ["LineChart", "Best total score", "StatTile", "TestAttemptsAccordion"],
+    label: "Tests del alumno: cards de Test (ultimo intento por Test), intentos en History, sin tiles repetidos ni graficas entre Tests",
   },
   {
     file: "app/(student)/student/history/page.tsx",
