@@ -156,7 +156,7 @@ export async function StudentHome({
       {tab === "summary" ? (
         <SummaryView practice={practice} tests={tests} links={links} />
       ) : area === "tests" ? (
-        <TestsTab tests={tests} page={pageFromParam(query.page)} links={links} />
+        <TestsTab tests={tests} links={links} />
       ) : practiceArea ? (
         <AreaPracticeView practice={practice} area={practiceArea} query={query} links={links} />
       ) : null}
@@ -410,14 +410,13 @@ async function AreaPracticeView({
   );
 }
 
-const TEST_ROWS_PAGE_SIZE = PAGE_SIZE;
 
 /** Tests tab (mockup area.html testsView): pending tests, then results grouped per Test (no chart across Tests). */
-function TestsTab({ tests, page, links }: { tests: StudentTestItem[]; page: number; links: HomeLinks }) {
+function TestsTab({ tests, links }: { tests: StudentTestItem[]; links: HomeLinks }) {
   const { pending } = sortTests(tests);
   // One row per Test (its last try), opening to every try; no chart across different Tests.
   const groups = groupTests(tests, (a) => a.status !== "INVALIDATED");
-  const rowsPage = paginate(groups, page, TEST_ROWS_PAGE_SIZE);
+
   return (
     <>
       <SectionHeader
@@ -437,8 +436,8 @@ function TestsTab({ tests, page, links }: { tests: StudentTestItem[]; page: numb
           <Card padding="md" className="text-sm text-gray-500">No tests taken yet.</Card>
         ) : (
           <>
-            <TestAttemptsAccordion tests={rowsPage.items} hrefFor={links.testResult} />
-            <Pagination basePath={links.home} params={{ area: "tests" }} pageSize={TEST_ROWS_PAGE_SIZE} {...rowsPage} />
+            {/* Test results: every Test, no pages. */}
+            <TestAttemptsAccordion tests={groups} hrefFor={links.testResult} />
           </>
         )}
       </section>

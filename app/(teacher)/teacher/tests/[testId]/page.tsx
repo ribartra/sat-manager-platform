@@ -6,7 +6,6 @@ import {
   PageContent,
   PageHeader,
   PageShell,
-  Pagination,
   RowAction,
   RowLink,
   SectionHeader,
@@ -14,9 +13,6 @@ import {
   StudentCell,
   TD,
   invalidatedRowClass,
-  pageFromParam,
-  PAGE_SIZE,
-  paginate,
 } from "@/components/sat";
 import { TestModuleTiles } from "@/components/sat/test-module-tiles";
 import { Pct } from "@/components/sat/work-status";
@@ -47,14 +43,10 @@ import { assignHref } from "@/lib/assign-params";
 
 interface PageProps {
   params: Promise<{ testId: string }>;
-  searchParams: Promise<{ attemptsPage?: string }>;
 }
 
-
-export default async function FullTestDetailPage({ params, searchParams }: PageProps) {
+export default async function FullTestDetailPage({ params }: PageProps) {
   const { testId } = await params;
-  const { attemptsPage } = await searchParams;
-  const pageSize = PAGE_SIZE;
   const session = await requireTeacherOrAdmin();
   if (!session) notFound();
   const now = new Date();
@@ -134,7 +126,7 @@ export default async function FullTestDetailPage({ params, searchParams }: PageP
       return { st, assignment, attempt, view, status, tries: assignment ? attemptsByAssignment.get(assignment.id) ?? 0 : 0 };
     }),
   );
-  const rowPage = paginate(rows, pageFromParam(attemptsPage), pageSize);
+  // Results of this Test per student: all of them, no pages.
   const firstAssigned = test.assignments.reduce<Date | null>((m, a) => (!m || a.createdAt < m ? a.createdAt : m), null);
   const nextDue = test.assignments
     .filter((a) => a.status !== "COMPLETED" && a.dueDate)
@@ -188,7 +180,7 @@ export default async function FullTestDetailPage({ params, searchParams }: PageP
                 "",
               ]}
             >
-              {rowPage.items.map(({ st, assignment, attempt, view, status, tries }) => {
+              {rows.map(({ st, assignment, attempt, view, status, tries }) => {
                 const href = attempt ? `/teacher/students/${st.id}/tests/${attempt.id}` : `/teacher/students/${st.id}?area=tests`;
                 const section = (code: "RW" | "MATH") => {
                   const sec = view?.sections[code];
@@ -240,7 +232,7 @@ export default async function FullTestDetailPage({ params, searchParams }: PageP
                 );
               })}
             </SimpleTable>
-            <Pagination basePath={`/teacher/tests/${test.id}`} params={{}} param="attemptsPage" anchor="students" pageSize={pageSize} {...rowPage} />
+
           </>
         )}
       </section>

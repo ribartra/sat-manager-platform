@@ -1,11 +1,9 @@
-import { PAGE_SIZE } from "@/components/sat/pagination";
 import {
   AreaBoxGrid,
   CompactAreaBox,
   AttemptStatusBadge,
   EmptyState,
   PageShell,
-  Pagination,
   PracticeAreaTabs,
   PracticeSetAttemptsAccordion,
   TestAttemptsAccordion,
@@ -17,8 +15,6 @@ import {
   type TestCardLinks,
   invalidatedRowClass,
   isInvalidated,
-  pageFromParam,
-  paginate,
 } from "@/components/sat";
 import { AreaTag } from "@/components/sat/practice-set-row";
 import { auth } from "@/lib/auth";
@@ -50,7 +46,7 @@ import { Pct } from "@/components/sat/work-status";
 import { loadStudentTests, sortTests } from "@/lib/test-assignments";
 import { loadStudentOverviews } from "@/lib/teacher-overview";
 import { relativeDay } from "@/lib/utils";
-import { buildProgressHref, progressFilterEntries, progressFiltersFromParams } from "@/lib/progress-filters";
+import { buildProgressHref, progressFiltersFromParams } from "@/lib/progress-filters";
 import { assignHref } from "@/lib/assign-params";
 import { historyHref } from "@/lib/history-params";
 import { officialSkillsFor } from "@/lib/taxonomy-order";
@@ -67,7 +63,6 @@ interface PageProps {
   searchParams: Promise<{ area?: string; topic?: string; difficulty?: string; from?: string; to?: string; attemptsPage?: string; examsPage?: string; activityPage?: string; type?: string }>;
 }
 
-const HISTORY_PAGE_SIZE = PAGE_SIZE;
 
 export default async function StudentPage({ params, searchParams }: PageProps) {
   const { studentId } = await params;
@@ -125,7 +120,6 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
     id: exam.id,
     label: `${exam.test.name} · ${exam.submittedAt ? formatDate(exam.submittedAt) : "—"} · ${exam.totalScore ?? "—"}`,
   }));
-  const pageParams: Record<string, string | undefined> = { ...Object.fromEntries(progressFilterEntries(filters)), attemptsPage: query.attemptsPage, examsPage: query.examsPage };
 
   const reportFilters = { topic: filters.topic, difficulty: filters.difficulty, from: filters.from, to: filters.to };
   const filterSummary = [
@@ -283,7 +277,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
     const finished = new Set(report.examHistory.map((exam) => exam.id));
     const testGroups = groupTests(tests, (a) => a.status === "IN_PROGRESS" || finished.has(a.id));
     const attemptCount = testGroups.reduce((sum, g) => sum + g.tries.length, 0);
-    const examPage = paginate(testGroups, pageFromParam(query.examsPage), HISTORY_PAGE_SIZE);
+
     return (
       <PageShell maxWidth={1180} width="wide">
         {header}
@@ -319,15 +313,8 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                 <EmptyState title="No test attempts yet." />
               ) : (
                 <>
-                  <TestAttemptsAccordion tests={examPage.items} hrefFor={(id) => buildProgressHref(`/teacher/students/${studentId}/tests/${id}`, filters)} />
-                  <Pagination
-                    basePath={`/teacher/students/${studentId}`}
-                    params={pageParams}
-                    param="examsPage"
-                    anchor="exam-history"
-                    pageSize={HISTORY_PAGE_SIZE}
-                    {...examPage}
-                  />
+                  {/* Results: every Test of the student, no pages (a few Tests, each opening to its tries). */}
+                  <TestAttemptsAccordion tests={testGroups} hrefFor={(id) => buildProgressHref(`/teacher/students/${studentId}/tests/${id}`, filters)} />
                 </>
               )}
             </section>
@@ -395,7 +382,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
   const { areaLabel } = report;
   // One row per practice set (its last attempt), opening to its latest tries; every try is in History.
   const practiceSets = practiceSetGroups(setsFromReportAttempts(report.attemptHistory));
-  const setPage = paginate(practiceSets, pageFromParam(query.attemptsPage), HISTORY_PAGE_SIZE);
+
   return (
     <PageShell maxWidth={1180} width="wide">
       {header}
@@ -475,19 +462,13 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
         ) : (
           <>
             <PracticeSetAttemptsAccordion
-              sets={setPage.items}
+              // Results: every practice set of the area, no pages (each opens to its last tries).
+              sets={practiceSets}
               hrefFor={(id) => buildProgressHref(`/teacher/students/${studentId}/attempts/${id}`, filters)}
               // "See all N tries": History of this student filtered to that set (skill, level, set).
               historyHref={(set) => historyHref({ student: studentId, area: area === "math" || area === "reading" || area === "writing" ? area : undefined, skill: set.skillId ?? undefined, difficulty: set.difficulty ?? undefined, set: set.practiceSetId ?? undefined })}
             />
-            <Pagination
-              basePath={`/teacher/students/${studentId}`}
-              params={pageParams}
-              param="attemptsPage"
-              anchor="recent-attempts"
-              pageSize={HISTORY_PAGE_SIZE}
-              {...setPage}
-            />
+
           </>
         )}
       </section>

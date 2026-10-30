@@ -551,10 +551,16 @@ const checks = [
   ...[
     "app/(teacher)/teacher/history/page.tsx",
     "app/(teacher)/teacher/questions/page.tsx",
-    "app/(teacher)/teacher/tests/[testId]/page.tsx",
     "app/(student)/student/history/page.tsx",
     "app/notifications/page.tsx",
   ].map((file) => ({ file, requires: ["PAGE_SIZE"], forbids: ["pageSizeParam=", "pageSizeFromParam("], label: `25 filas fijas, sin selector de filas: ${file}` })),
+  // Results of Tests and practice sets (a student's tabs, a Test's students): never paginated.
+  ...["app/(teacher)/teacher/students/[studentId]/page.tsx", "app/(teacher)/teacher/tests/[testId]/page.tsx"].map((file) => ({
+    file,
+    requires: [],
+    forbids: ["<Pagination", "paginate("],
+    label: `Resultados de Test / Practice Set sin paginacion: ${file}`,
+  })),
   ...["app/admin/logs/page.tsx", "app/admin/reports/page.tsx"].map((file) => ({
     file,
     requires: ['pageSizeParam="per"', "pageSizeFromParam(per, 25)"],
