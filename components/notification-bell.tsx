@@ -15,11 +15,15 @@ type Notification = {
   createdAt: string;
 };
 
-async function fetchNotifications(): Promise<Notification[]> {
+type NotificationFeed = { notifications: Notification[]; total: number; unread: number };
+
+/** The latest 10 notifications plus the total and unread counts (the rest: /notifications). */
+async function fetchNotifications(): Promise<NotificationFeed> {
   const res = await fetch("/api/notifications");
   if (!res.ok) throw new Error("Unable to load notifications.");
   const data = await res.json();
-  return data.notifications ?? [];
+  const notifications: Notification[] = data.notifications ?? [];
+  return { notifications, total: data.total ?? notifications.length, unread: data.unread ?? notifications.filter((n) => !n.readAt).length };
 }
 
 function timeAgo(dateStr: string) {
@@ -88,7 +92,7 @@ export function NotificationBell({ collapsed = false }: { collapsed?: boolean })
   const buttonRef = useRef<HTMLButtonElement>(null);
   const queryClient = useQueryClient();
 
-  const { data: notifications = [], isFetching, refetch } = useQuery({
+  const { data: feed, isFetching, refetch } = useQuery({
     queryKey: queryKeys.notifications.all,
     queryFn: fetchNotifications,
     staleTime: 30_000,
@@ -103,8 +107,8 @@ export function NotificationBell({ collapsed = false }: { collapsed?: boolean })
     },
     onSuccess: () => {
       const now = new Date().toISOString();
-      queryClient.setQueryData<Notification[]>(queryKeys.notifications.all, (prev) =>
-        (prev ?? []).map((n) => ({ ...n, readAt: n.readAt ?? now })),
+      queryClient.setQueryData<NotificationFeed>(queryKeys.notifications.all, (prev) =>
+        prev ? { ...prev, unread: 0, notifications: prev.notifications.map((n) => ({ ...n, readAt: n.readAt ?? now })) } : prev,
       );
     },
   });
@@ -123,15 +127,16 @@ export function NotificationBell({ collapsed = false }: { collapsed?: boolean })
     if (!open) {
       if (buttonRef.current) setPos(sidePopoverPosition(buttonRef.current));
       const result = await refetch();
-      const fetched = result.data ?? [];
-      if (fetched.some((n) => !n.readAt)) {
+      if ((result.data?.unread ?? 0) > 0) {
         markRead.mutate();
       }
     }
     setOpen((v) => !v);
   }
 
-  const unreadCount = notifications.filter((n) => !n.readAt).length;
+  const notifications = feed?.notifications ?? [];
+  const total = feed?.total ?? 0;
+  const unreadCount = feed?.unread ?? 0;
   const loading = open && isFetching && notifications.length === 0;
 
   return (
@@ -178,6 +183,12 @@ export function NotificationBell({ collapsed = false }: { collapsed?: boolean })
               ))
             )}
           </div>
+          {/* The latest 10 here; the rest on /notifications (25 per page, period filter). */}
+          {total > notifications.length ? (
+            <Link href="/notifications" onClick={() => setOpen(false)} className="block border-t border-gray-100 px-4 py-2.5 text-sm font-medium text-blue-600 hover:underline">
+              See all {total} notifications →
+            </Link>
+          ) : null}
         </div>
       )}
     </div>

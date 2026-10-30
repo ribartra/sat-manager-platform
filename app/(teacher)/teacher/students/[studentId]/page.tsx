@@ -49,6 +49,7 @@ import { relativeDay } from "@/lib/utils";
 import { buildProgressHref, progressFiltersFromParams } from "@/lib/progress-filters";
 import { assignHref } from "@/lib/assign-params";
 import { historyHref } from "@/lib/history-params";
+import { PENDING_PREVIEW, pendingHref } from "@/lib/pending";
 import { officialSkillsFor } from "@/lib/taxonomy-order";
 
 // One page per student (replaces the former Student Analytics and Individual Report views).
@@ -320,8 +321,14 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
             </section>
           </div>
           <aside className="min-w-0 space-y-6">
-            <SidePanel id="active-tests" title="Active tests" count={report.activeExams.length} empty="No active tests.">
-              {report.activeExams.map((a) => {
+            <SidePanel
+              id="active-tests"
+              title="Active tests"
+              count={report.activeExams.length}
+              empty="No active tests."
+              footer={<SeeAllPending total={report.activeExams.length} href={pendingHref("/teacher/pending", { student: studentId, type: "tests" })} />}
+            >
+              {report.activeExams.slice(0, PENDING_PREVIEW).map((a) => {
                 // Due-date edit of this test in Assign test (activeExams ids are assignment ids).
                 const testId = testIdByAssignment.get(a.id);
                 return (
@@ -403,8 +410,14 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
         </div>
 
         <aside className="min-w-0 space-y-6">
-          <SidePanel id="active-sets" title="Active practice sets" count={report.assignments.length} empty={`No active ${areaLabel} practice sets.`}>
-            {report.assignments.map((a) => (
+          <SidePanel
+            id="active-sets"
+            title="Active practice sets"
+            count={report.assignments.length}
+            empty={`No active ${areaLabel} practice sets.`}
+            footer={<SeeAllPending total={report.assignments.length} href={pendingHref("/teacher/pending", { student: studentId, type: "practice", area: assignPracticeArea })} />}
+          >
+            {report.assignments.slice(0, PENDING_PREVIEW).map((a) => (
               <li key={a.id} className="flex items-start justify-between gap-3 px-3 py-2">
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium text-gray-800" title={a.name}>{shortSetName(a.name)}</p>
@@ -500,6 +513,16 @@ function KpiStrip({ items }: { items: Array<{ label: string; value: string; clas
   );
 }
 
+/** Under a pending panel showing the first PENDING_PREVIEW items: the shortcut to the whole list. */
+function SeeAllPending({ total, href }: { total: number; href: string }) {
+  if (total <= PENDING_PREVIEW) return null;
+  return (
+    <Link href={href} className="block px-3 py-2 text-xs font-medium text-blue-600 hover:underline">
+      See all {total} pending →
+    </Link>
+  );
+}
+
 function SidePanel({ id, title, count, empty, children, footer }: { id?: string; title: string; count: number; empty: string; children: ReactNode; footer?: ReactNode }) {
   return (
     <section id={id}>
@@ -509,7 +532,7 @@ function SidePanel({ id, title, count, empty, children, footer }: { id?: string;
       </h2>
       <Card className="overflow-hidden">
         {count === 0 ? <p className="px-3 py-4 text-sm text-gray-400">{empty}</p> : <ul className="divide-y divide-gray-100">{children}</ul>}
-        {count > 0 && footer ? <div className="border-t border-gray-100">{footer}</div> : null}
+        {count > PENDING_PREVIEW && footer ? <div className="border-t border-gray-100">{footer}</div> : null}
       </Card>
     </section>
   );

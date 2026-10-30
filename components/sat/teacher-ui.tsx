@@ -109,15 +109,17 @@ export function AttentionRow({
       {people.length === 0 ? (
         <span className="text-sm text-gray-400">Nobody</span>
       ) : (
-        people.map((p) => (
+        // At most 10 here; the rest behind "See all N →".
+        people.slice(0, 10).map((p) => (
           <Link key={p.id} href={p.href} title={p.detail} className="rounded-full border border-gray-200 bg-white px-2.5 py-0.5 text-sm text-gray-800 hover:border-gray-400">
             {shortName(p.name)}
           </Link>
         ))
       )}
+      {people.length > 10 && !viewAllHref ? <span className="text-xs text-gray-500">+{people.length - 10} more</span> : null}
       {viewAllHref && people.length ? (
         <Link href={viewAllHref} className="ml-auto whitespace-nowrap text-xs font-medium text-[var(--sat-primary)] hover:underline">
-          View all ›
+          {people.length > 10 ? `See all ${people.length} →` : "View all ›"}
         </Link>
       ) : null}
     </div>

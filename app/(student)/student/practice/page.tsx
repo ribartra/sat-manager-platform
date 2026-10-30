@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PAGE_SIZE } from "@/components/sat/pagination";
+import { PENDING_PREVIEW, pendingHref } from "@/lib/pending";
 import { redirect } from "next/navigation";
 import {
   AreaBoxGrid,
@@ -66,7 +67,7 @@ export default async function StudentPracticePage({ searchParams }: PageProps) {
   );
 }
 
-/** Practice summary (mockup content-map.html): compact area boxes and the next 4 sets to do. */
+/** Practice summary (mockup content-map.html): compact area boxes and the next 10 sets to do ("See all N pending →" beyond). */
 function SummaryView({ practice }: { practice: PracticeSetItem[] }) {
   const todo = sortPracticeSets(practice.filter((p) => p.state !== "done"));
   return (
@@ -98,13 +99,13 @@ function SummaryView({ practice }: { practice: PracticeSetItem[] }) {
           title="Up next"
           description={`${todo.length} set${todo.length === 1 ? "" : "s"} to do · in progress first, then by due date`}
           action={
-            // Shortcut to the full to-do list of each area (Home area tab filtered by "To do").
+            // Shortcut to the pending list of each area (/student/pending).
             todo.length > 0 ? (
               <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
                 {PRACTICE_AREAS_IN_ORDER.map((code) => {
                   const n = todo.filter((p) => p.area === code).length;
                   return n ? (
-                    <Link key={code} href={`/student?area=${tabFromPracticeArea(code)}&status=todo#sets`} className="text-blue-600 hover:underline">
+                    <Link key={code} href={pendingHref("/student/pending", { type: "practice", area: tabFromPracticeArea(code) as "math" | "reading" | "writing" })} className="text-blue-600 hover:underline">
                       {practiceAreaLabel(code)} · {n} to do ›
                     </Link>
                   ) : null;
@@ -117,7 +118,7 @@ function SummaryView({ practice }: { practice: PracticeSetItem[] }) {
           <Card padding="md" className="text-sm text-gray-500">Nothing pending.</Card>
         ) : (
           <ListStack>
-            {todo.slice(0, 4).map((item) => (
+            {todo.slice(0, PENDING_PREVIEW).map((item) => (
               <ListItem compact key={item.assignmentId} href={`/student/practice/assignment/${item.assignmentId}`}>
                 <span className="flex min-w-0 flex-wrap items-center gap-1.5">
                   <AreaTag area={item.area} />
@@ -133,7 +134,11 @@ function SummaryView({ practice }: { practice: PracticeSetItem[] }) {
             ))}
           </ListStack>
         )}
-        {todo.length > 4 ? <p className="mt-2 text-xs text-gray-500">+ {todo.length - 4} more · use the area links above to see all of them</p> : null}
+        {todo.length > PENDING_PREVIEW ? (
+          <Link href={pendingHref("/student/pending", { type: "practice" })} className="mt-2 inline-block text-sm font-medium text-blue-600 hover:underline">
+            See all {todo.length} pending →
+          </Link>
+        ) : null}
       </section>
     </>
   );

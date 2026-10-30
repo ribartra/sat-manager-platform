@@ -1,5 +1,6 @@
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
-import { PAGE_SIZE, PageShell, Pagination, pageFromParam } from "@/components/sat";
+import { ListFilters, PAGE_SIZE, PageShell, Pagination, pageFromParam } from "@/components/sat";
+import { periodDates, periodParams, resolvePeriod } from "@/lib/period-filter";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -10,14 +11,19 @@ import { homeHrefForRole } from "@/lib/nav-config";
 
 export const dynamic = "force-dynamic";
 
-/** Every notification of the user, newest first, paged in the database (25 per page). */
-export default async function NotificationsPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
+/**
+ * Every notification of the user, newest first (the bell shows the latest 10 and links here): paged
+ * in the database, 25 per page, with the period filter of History.
+ */
+export default async function NotificationsPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const session = await requireApprovedSession();
   if (!session) redirect("/auth/pending-validation");
   const query = await searchParams;
   const pageSize = PAGE_SIZE;
 
-  const where = { userId: session.user.id };
+  const period = resolvePeriod(query);
+  const { from, to } = periodDates(period);
+  const where = { userId: session.user.id, ...(from || to ? { createdAt: { ...(from ? { gte: from } : {}), ...(to ? { lte: to } : {}) } } : {}) };
   const total = await prisma.notification.count({ where });
   const pageCount = Math.max(1, Math.ceil(total / pageSize));
   const page = Math.min(pageFromParam(query.page), pageCount);
@@ -31,7 +37,8 @@ export default async function NotificationsPage({ searchParams }: { searchParams
   return (
     <PageShell width="narrow">
       <Breadcrumbs items={[{ label: "Home", href: homeHrefForRole(session.user.role) }, { label: "Notifications" }]} />
-      <h1 className="mb-6 text-[26px] font-bold tracking-[-0.3px] text-gray-900">Notifications</h1>
+      <h1 className="mb-4 text-[26px] font-bold tracking-[-0.3px] text-gray-900">Notifications</h1>
+      <ListFilters action="/notifications" search={false} period={period} />
       <Card>
         {notifications.map((n) => (
           <Link
@@ -46,9 +53,9 @@ export default async function NotificationsPage({ searchParams }: { searchParams
             {n.body && <p className="mt-1 text-sm text-gray-500">{n.body}</p>}
           </Link>
         ))}
-        {notifications.length === 0 && <div className="p-10 text-center text-sm text-gray-400">No notifications yet.</div>}
+        {notifications.length === 0 && <div className="p-10 text-center text-sm text-gray-400">{period.period === "all" ? "No notifications yet." : "No notifications in this period."}</div>}
       </Card>
-      <Pagination basePath="/notifications" params={{}} page={page} pageCount={pageCount} total={total} pageSize={pageSize} />
+      <Pagination basePath="/notifications" params={periodParams(period)} page={page} pageCount={pageCount} total={total} pageSize={pageSize} />
     </PageShell>
   );
 }

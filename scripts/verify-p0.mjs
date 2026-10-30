@@ -566,6 +566,42 @@ const checks = [
     requires: ['pageSizeParam="per"', "pageSizeFromParam(per, 25)"],
     label: `Admin: selector de filas 25/50/100 (25 por defecto): ${file}`,
   })),
+  // Pending lists: panels show at most 10 and "See all N pending →" opens the full list (25 per page, period).
+  {
+    file: "lib/pending.ts",
+    requires: ["export const PENDING_PREVIEW = 10", "export async function loadPending", "export function pendingHref"],
+    label: "Pendientes: maximo 10 en las vistas, lista completa aparte",
+  },
+  {
+    file: "app/(teacher)/teacher/pending/page.tsx",
+    requires: ["studentAccessWhereFor", "loadPending(", "PAGE_SIZE", "period={period}", "search={false}", "Back to"],
+    label: "Pending (profesor): alumnos en alcance, 25 por pagina, filtro de periodo, sin busqueda libre, volver al alumno",
+  },
+  {
+    file: "app/(student)/student/pending/page.tsx",
+    requires: ["loadPending([session.user.id]", "PAGE_SIZE", "period={period}", "search={false}"],
+    label: "Pending (alumno): solo lo suyo, 25 por pagina, filtro de periodo",
+  },
+  {
+    file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
+    requires: ["slice(0, PENDING_PREVIEW)", "See all {total} pending"],
+    label: "Paneles de pendientes del alumno: maximo 10 y 'See all N pending'",
+  },
+  {
+    file: "components/notification-bell.tsx",
+    requires: ["See all {total} notifications"],
+    label: "Campana: ultimas 10 y 'See all N notifications'",
+  },
+  {
+    file: "app/api/notifications/route.ts",
+    requires: ["take: 10", "total", "unread"],
+    label: "API de notificaciones: 10 ultimas + totales",
+  },
+  {
+    file: "app/notifications/page.tsx",
+    requires: ["PAGE_SIZE", "period={period}", "periodDates(period)"],
+    label: "Notificaciones: 25 por pagina y filtro de periodo",
+  },
   // Account names "First Last" on every create / edit (lib/person-name.ts).
   ...[
     "app/api/students/invite/route.ts",
