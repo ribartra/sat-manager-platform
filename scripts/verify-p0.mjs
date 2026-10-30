@@ -284,7 +284,7 @@ const checks = [
   },
   {
     file: "lib/pdf/build-student-report.ts",
-    requires: ["teacherProgramEnrollmentScope", "return null"],
+    requires: ["practiceSetGroups", "loadStudentTests", "teacherProgramEnrollmentScope", "return null"],
     label: "PDF con scoping por programa",
   },
   {
@@ -350,9 +350,9 @@ const checks = [
   },
   {
     file: "lib/pdf/student-report-document.tsx",
-    requires: ["renderToBuffer", "Helvetica-Bold", "Latest practice", "report.skillResults", "Performance by skill and difficulty", "Teacher comments", "totalPages", "Scores by Test", "report.exams.length === 1"],
-    forbids: ["Questions correct", "Average time per question", "difficultyMetrics", "Last attempt per level"],
-    label: "PDF presentable (backend, sin navegador): nivel de intento (sin promedios), secciones por area, paginacion y resumen",
+    requires: ["renderToBuffer", "Helvetica-Bold", "report.skillResults", "skills by difficulty", "Weakest skill", "practice attempts", "Active practice sets", "Teacher comments", "Test attempts", "Active tests", "totalPages", "report.exams.length === 1"],
+    forbids: ["Questions correct", "Average time per question", "difficultyMetrics", "Last attempt per level", "twoCol", "ScoreChart", "Scores by Test"],
+    label: "PDF = calco de las pestanas del alumno (Practice por area y Tests), cada bloque a todo el ancho, sin grafica entre Tests",
   },
   {
     file: "scripts/verify-authz.mjs",

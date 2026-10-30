@@ -1,26 +1,22 @@
 import prisma from "@/lib/prisma";
 import { teacherProgramEnrollmentScope } from "@/lib/program-scope";
 import { loadMockReport, loadPracticeReport, type ReportFilters } from "@/lib/student-report";
+import { practiceSetGroups, setsFromReportAttempts, testGroups } from "@/lib/attempt-groups";
+import { loadStudentTests, sortTests } from "@/lib/test-assignments";
 import { renderStudentReportPdf, type ReportAreaKey, type StudentReportData } from "@/lib/pdf/student-report-document";
 import { formatDate } from "@/lib/utils";
-import { difficultyLabel } from "@/lib/domain-meta";
 
-// Builds the student progress report PDF from the same data as the teacher student page
-// (lib/student-report.ts), server-side and without a browser. Shared by the download/preview
-// route and the "email to parents" route.
+// Builds the student progress report PDF from the same data, computed the same way, as the
+// teacher's student page tabs (lib/student-report.ts, lib/attempt-groups.ts, lib/test-assignments.ts),
+// server-side and without a browser. Shared by the download/preview route and the "email to parents"
+// route. Like the page, it shows every result (no skill / level / date filters); the one narrowing
+// left is a single Test attempt ("Test report").
 
 export const REPORT_AREA_ORDER: ReportAreaKey[] = ["math", "reading", "writing", "mocks"];
 const PRACTICE_AREA = { math: "MATH", reading: "READING", writing: "WRITING" } as const;
 export const REPORT_AREA_LABEL: Record<ReportAreaKey, string> = { math: "Math", reading: "Reading", writing: "Writing", mocks: "Tests" };
 
 const FILE_SCOPE: Record<ReportAreaKey, string> = { math: "math", reading: "reading", writing: "writing", mocks: "full-practice-tests" };
-
-/** Filter dates arrive as "YYYY-MM-DD"; show them as "Oct 5, 2026" (read as a calendar day, not UTC midnight). */
-function reportDate(value: string) {
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
-  const parsed = match ? new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3])) : new Date(value);
-  return Number.isNaN(parsed.getTime()) ? value : formatDate(parsed);
-}
 
 export function parseReportAreas(value: string | null | undefined, legacy?: string | null): ReportAreaKey[] {
   const raw = (value || legacy || "").toLowerCase();
@@ -45,10 +41,11 @@ export async function buildStudentReportPdf(input: {
   viewer: { id: string; role: string };
   studentId: string;
   areas: ReportAreaKey[];
-  filters: ReportFilters;
+  /** Kept for the callers; the report, like the student page, shows every result. */
+  filters?: ReportFilters;
   fptAttemptId?: string | null;
 }): Promise<BuiltStudentReport | null> {
-  const { viewer, studentId, filters } = input;
+  const { viewer, studentId } = input;
   const programScope = viewer.role === "TEACHER" ? teacherProgramEnrollmentScope(viewer.id) : undefined;
   const student = await prisma.user.findFirst({
     where: { id: studentId, role: "STUDENT", ...(programScope ? { programEnrollments: programScope } : {}) },
@@ -66,23 +63,47 @@ export async function buildStudentReportPdf(input: {
   if (input.fptAttemptId && !exam) return null;
   const areas: ReportAreaKey[] = exam ? ["mocks"] : input.areas;
 
-  const skill = filters.topic ? await prisma.topic.findUnique({ where: { id: filters.topic }, select: { name: true } }) : null;
-  const filterSummary = exam
-    ? `Test: ${exam.test.name}${exam.submittedAt ? `, ${formatDate(exam.submittedAt)}` : ""}`
-    : [
-        skill ? `Skill: ${skill.name}` : null,
-        filters.difficulty ? `${difficultyLabel(filters.difficulty)} questions only` : null,
-        filters.from ? `From ${reportDate(filters.from)}` : null,
-        filters.to ? `To ${reportDate(filters.to)}` : null,
-      ].filter(Boolean).join(" · ");
+  const filterSummary = exam ? `Test: ${exam.test.name}${exam.submittedAt ? `, ${formatDate(exam.submittedAt)}` : ""}` : "All results";
 
   const sections: StudentReportData["sections"] = [];
   for (const area of areas) {
     if (area === "mocks") {
-      // Skill/difficulty do not apply to Tests; dates do.
-      sections.push({ area, mock: await loadMockReport(studentId, { from: filters.from, to: filters.to }, { attemptId: exam?.id }) });
+      // The Tests tab: KPI strip, Test cards (pending first), Test attempts and active Tests.
+      const [mock, allTests] = await Promise.all([loadMockReport(studentId, {}, { attemptId: exam?.id }), loadStudentTests(studentId)]);
+      const finished = new Set(mock.examHistory.map((row) => row.id));
+      const keep = exam ? (a: { id: string }) => a.id === exam.id : (a: { id: string; status: string }) => a.status === "IN_PROGRESS" || finished.has(a.id);
+      const ordered = sortTests(allTests);
+      const tests = [...ordered.pending, ...ordered.done].filter((t) => !exam || t.attempts.some((a) => a.id === exam.id));
+      sections.push({
+        area,
+        mock,
+        tests,
+        groups: testGroups(tests, keep).map((g) => ({
+          ...g,
+          title: String(g.title),
+          number: g.number ?? null,
+          sourceName: g.sourceName ?? "",
+          sourceOrder: g.sourceOrder ?? 0,
+          tryCount: tests.find((t) => t.assignmentId === g.key)?.attempts.length ?? g.tries.length,
+        })),
+      });
     } else {
-      sections.push({ area, practice: await loadPracticeReport(studentId, PRACTICE_AREA[area], filters) });
+      // A practice tab: skills by difficulty, active sets, comments and the practice-attempts accordion.
+      const practice = await loadPracticeReport(studentId, PRACTICE_AREA[area], {});
+      sections.push({
+        area,
+        practice,
+        groups: practiceSetGroups(setsFromReportAttempts(practice.attemptHistory)).map((g) => ({
+          key: g.key,
+          title: String(g.title),
+          skillName: g.skillName ?? null,
+          sourceName: g.sourceName ?? null,
+          sourceOrder: g.sourceOrder ?? null,
+          tryCount: g.tryCount,
+          last: g.last,
+          recent: g.recent,
+        })),
+      });
     }
   }
 
