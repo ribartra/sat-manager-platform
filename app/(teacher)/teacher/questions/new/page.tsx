@@ -1,5 +1,5 @@
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
-import { PageShell } from "@/components/sat";
+import { PageHeader, PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { QuestionEditor } from "../question-editor-client";
 import { getFeatureSetting } from "@/lib/app-settings";
@@ -29,9 +29,9 @@ export default async function NewQuestionPage({ searchParams }: PageProps) {
   const { byId } = buildTaxonomyTree(taxonomyNodes);
 
   return (
-    <PageShell width="narrow">
+    <PageShell>
       <Breadcrumbs items={[...crumbs.items, { label: "New question" }]} />
-      <h1 className="mb-6 text-[26px] font-bold tracking-[-0.3px] text-gray-900">New Question</h1>
+      <PageHeader title="New Question" />
       <QuestionEditor
         returnHref={crumbs.questionsHref}
         showGraphOption={showGraphOption}

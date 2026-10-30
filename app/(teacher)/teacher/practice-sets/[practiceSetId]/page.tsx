@@ -125,7 +125,7 @@ export default async function PracticeSetPage({ params, searchParams }: PageProp
     ]);
     const { byId } = buildTaxonomyTree(taxonomyNodes);
     return (
-      <PageShell maxWidth={1180} width="wide">
+      <PageShell>
         {header}
         <PracticeSetEditor
           mediaLinks={(await requireContentImporter()) ? await contentMediaLinks("practice-sets", practiceSet.id, practiceSet.questions.map((item) => item.questionId)) : null}
@@ -154,7 +154,7 @@ export default async function PracticeSetPage({ params, searchParams }: PageProp
   }
 
   return (
-    <PageShell maxWidth={1180} width="wide">
+    <PageShell>
       {header}
       <PageContent>
         <section>

@@ -35,7 +35,7 @@ function StudentViewUnavailable({
   backHref?: string;
 }) {
   return (
-    <PageShell width="narrow">
+    <PageShell>
       <Alert tone="warning" title={title} role="alert">
         <p>{message}</p>
         <Link href={backHref} className="mt-3 inline-flex text-sm font-medium underline">

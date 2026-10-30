@@ -144,7 +144,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
   const header = (
     <>
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Students", href: "/teacher/students" }, { label: student.name }]} />
-      <div className="mb-3 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+      <div className="mb-[18px] flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex min-w-0 items-start gap-3">
           <Avatar name={student.name} avatarUrl={student.avatarUrl} size="xl" />
           <div className="min-w-0">
@@ -225,7 +225,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
     const activity = await loadActivity(studentId, 4);
     const testItems = tests.filter((t) => t.attempts.length > 0 || t.state !== "done");
     return (
-      <PageShell maxWidth={1180} width="wide">
+      <PageShell>
         {header}
         {/* report-9: the area cards are practice sets; say so above them, like the Tests block below. */}
         <SectionHeader
@@ -280,7 +280,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
     const attemptCount = testGroups.reduce((sum, g) => sum + g.tries.length, 0);
 
     return (
-      <PageShell maxWidth={1180} width="wide">
+      <PageShell>
         {header}
         <KpiStrip
           items={[
@@ -391,7 +391,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
   const practiceSets = practiceSetGroups(setsFromReportAttempts(report.attemptHistory));
 
   return (
-    <PageShell maxWidth={1180} width="wide">
+    <PageShell>
       {header}
       {report.completedExamCount > 0 || report.pendingExamCount > 0 ? (
         <div className="mt-3 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700">

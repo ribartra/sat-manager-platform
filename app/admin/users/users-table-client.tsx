@@ -44,6 +44,10 @@ export function AdminUsersTable({ rows }: { rows: AdminUserRow[] }) {
               <p className="font-medium text-foreground">{row.original.name}</p>
             )}
             <p className="text-xs text-muted-foreground">{row.original.email}</p>
+            {/* Not filterable: a tag under the user instead of its own column. */}
+            {row.original.reviewedLabel ? (
+              <span className="mt-1 inline-block rounded bg-[var(--sat-surface-2)] px-1.5 py-0.5 text-[11px] text-gray-600">Reviewed {row.original.reviewedLabel}</span>
+            ) : null}
           </div>
         ),
       },
@@ -68,12 +72,6 @@ export function AdminUsersTable({ rows }: { rows: AdminUserRow[] }) {
         header: "Validation",
         meta: { priority: "high" },
         cell: ({ row }) => validationBadge(row.original.validationStatus),
-      },
-      {
-        id: "reviewed",
-        header: "Reviewed",
-        meta: { priority: "low" },
-        cell: ({ row }) => <span className="text-muted-foreground">{row.original.reviewedLabel}</span>,
       },
       {
         id: "actions",

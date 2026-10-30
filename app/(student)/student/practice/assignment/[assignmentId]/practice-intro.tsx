@@ -20,7 +20,7 @@ export async function PracticeIntro({ studentId, assignmentId }: { studentId: st
   const label =
     item.state === "progress" ? "Continue where you left off" : item.tries.length > 0 ? `Start try ${item.tries.length + 1}` : "Start practice";
   return (
-    <PageShell maxWidth={720}>
+    <PageShell>
       <Breadcrumbs
         items={[
           { label: "Home", href: "/student" },

@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { PageShell } from "@/components/sat";
+import { PageHeader, PageShell } from "@/components/sat";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { requireTeacherManager } from "@/lib/rbac";
 import { InviteTeacherForm } from "./invite-teacher-form";
@@ -15,12 +15,12 @@ export default async function InviteTeacherPage() {
   // The invited teacher joins one of the master's programs (shared bank; own students).
   const programs = await prisma.program.findMany({ where: teachingProgramWhere(session.user.id), select: { id: true, name: true }, orderBy: { createdAt: "asc" } });
   return (
-    <PageShell maxWidth={720}>
+    <PageShell>
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Teachers", href: "/teacher/teachers" }, { label: "Invite teacher" }]} />
-      <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Invite a teacher</h1>
-      <p className="mb-5 mt-0.5 text-sm text-gray-500">
-        They get an email to create their password and join your program: they share its question bank, sets and Tests, and invite and follow their own students. You will see who their students are, not their work.
-      </p>
+      <PageHeader
+        title="Invite a teacher"
+        description="They get an email to create their password and join your program: they share its question bank, sets and Tests, and invite and follow their own students. You will see who their students are, not their work."
+      />
       <InviteTeacherForm programs={programs} />
     </PageShell>
   );

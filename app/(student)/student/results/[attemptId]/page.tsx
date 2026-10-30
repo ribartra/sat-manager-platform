@@ -1,4 +1,5 @@
-import { Delta, InvalidatedNotice, PageShell, SectionHeader, VoidableValue } from "@/components/sat";
+import { Delta, InvalidatedNotice, PageHeader, PageShell, SectionHeader, VoidableValue } from "@/components/sat";
+import { PAGE_TITLE_CLASS } from "@/components/sat/page-shell";
 import { HEADER_ACTION_CLASS, HeaderActions } from "@/components/sat/header-actions";
 import { ReviewQuestionCard } from "@/components/sat/review-question-card";
 import { ResultFilterBar, ResultFilterEmpty, ResultFilterRoot, ResultFilterSegments } from "@/components/sat/result-filter";
@@ -123,7 +124,7 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
   };
 
   return (
-    <PageShell maxWidth={920}>
+    <PageShell>
       <Breadcrumbs
         items={[
           { label: "Home", href: "/student" },
@@ -140,26 +141,32 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
 
       {attempt.status === "INVALIDATED" ? <InvalidatedNotice audience="student" /> : null}
       {/* Header: title on the left, actions top right (same slot and style for every role). */}
-      <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-        <div className="min-w-0">
-          <div className="mb-1 flex flex-wrap items-center gap-2">
-            {practiceArea ? <AreaTag area={practiceArea} /> : null}
-            {practiceSet ? <Badge variant={difficultyBadgeVariant(practiceSet.difficulty)}>{difficultyLabel(practiceSet.difficulty)}</Badge> : null}
-          </div>
-          <h1 className="mb-1 text-xl font-semibold text-gray-900">
-            {practiceSet?.topic.name ?? shortSetName(practiceSetSnapshot?.name ?? "Practice set")}
-          </h1>
-          <div className="mb-1 mt-2">
-            <TryNavigator
-              current={thisTry?.tryNumber ?? attempt.attemptNumber}
-              tries={tries.map((t) => ({
-                number: t.tryNumber,
-                href: `/student/results/${t.id}${returnQuery.toString() ? `?${returnQuery.toString()}` : ""}`,
-                detail: [t.submittedAt ? formatDate(t.submittedAt) : null, t.pct !== null ? `${t.pct}%` : null].filter(Boolean).join(" · "),
-              }))}
-            />
-          </div>
-          <p className="text-xs text-gray-500">
+      <PageHeader
+        eyebrow={
+          practiceArea || practiceSet ? (
+            <>
+              {practiceArea ? <AreaTag area={practiceArea} /> : null}
+              {practiceSet ? <Badge variant={difficultyBadgeVariant(practiceSet.difficulty)}>{difficultyLabel(practiceSet.difficulty)}</Badge> : null}
+            </>
+          ) : undefined
+        }
+        title={
+          <>
+            <h1 className={PAGE_TITLE_CLASS}>{practiceSet?.topic.name ?? shortSetName(practiceSetSnapshot?.name ?? "Practice set")}</h1>
+            <div className="mt-2">
+              <TryNavigator
+                current={thisTry?.tryNumber ?? attempt.attemptNumber}
+                tries={tries.map((t) => ({
+                  number: t.tryNumber,
+                  href: `/student/results/${t.id}${returnQuery.toString() ? `?${returnQuery.toString()}` : ""}`,
+                  detail: [t.submittedAt ? formatDate(t.submittedAt) : null, t.pct !== null ? `${t.pct}%` : null].filter(Boolean).join(" · "),
+                }))}
+              />
+            </div>
+          </>
+        }
+        description={
+          <span className="text-xs">
             {attempt.submittedAt ? (
               <>
                 Completed <b className="font-medium text-gray-700">{formatDate(attempt.submittedAt)}</b> at {formatClock(attempt.submittedAt)} ({relativeDay(attempt.submittedAt)})
@@ -168,18 +175,20 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
             {practiceSet?.source ? <> · Source: <b className="font-medium text-gray-700">{practiceSet.source.name}</b></> : null}
             {attempt.assignment?.createdAt ? <> · Assigned {formatDate(attempt.assignment.createdAt)}</> : null}
             {` · ${explanationsInPlayerLabel(attempt.showExplanations ?? attempt.assignment?.showExplanations)}`}
-          </p>
-        </div>
-        <HeaderActions>
-          <Link href={tryAgainHref} className={HEADER_ACTION_CLASS}><RotateCcw size={14} aria-hidden /> Try Again</Link>
-          {nextAssignment ? (
-            <Link href={`/student/practice/assignment/${nextAssignment.assignmentId}`} className={`${HEADER_ACTION_CLASS} max-w-full`}>
-              <span className="truncate">Next: {nextAssignment.skill} · {difficultyLabel(nextAssignment.difficulty)}</span>
-            </Link>
-          ) : null}
-          <Link href="/student" className={HEADER_ACTION_CLASS}>Summary</Link>
-        </HeaderActions>
-      </div>
+          </span>
+        }
+        actions={
+          <HeaderActions>
+            <Link href={tryAgainHref} className={HEADER_ACTION_CLASS}><RotateCcw size={14} aria-hidden /> Try Again</Link>
+            {nextAssignment ? (
+              <Link href={`/student/practice/assignment/${nextAssignment.assignmentId}`} className={`${HEADER_ACTION_CLASS} max-w-full`}>
+                <span className="truncate">Next: {nextAssignment.skill} · {difficultyLabel(nextAssignment.difficulty)}</span>
+              </Link>
+            ) : null}
+            <Link href="/student" className={HEADER_ACTION_CLASS}>Summary</Link>
+          </HeaderActions>
+        }
+      />
 
       <ResultFilterRoot>
         {/* Score */}

@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ChevronRight, UserPlus } from "lucide-react";
-import { EmptyState, ListFilters, PageShell, RoleBadge, StudentCell } from "@/components/sat";
+import { EmptyState, ListFilters, PageHeader, PageShell, RoleBadge, StudentCell } from "@/components/sat";
+import { HeaderActions } from "@/components/sat/header-actions";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -61,19 +62,23 @@ export default async function TeachersPage({ searchParams }: PageProps) {
   const studentCount = (t: (typeof teachers)[number]) => t._count.ownedEnrollments;
 
   return (
-    <PageShell maxWidth={1100} width="wide">
+    <PageShell>
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Teachers" }]} />
-      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Teachers</h1>
-          <p className="mt-0.5 text-sm text-gray-500">
+      <PageHeader
+        title="Teachers"
+        description={
+          <>
             {teachers.length} teacher{teachers.length === 1 ? "" : "s"} · {invites.length} pending invitation{invites.length === 1 ? "" : "s"} · each teacher sees and manages only their own students
-          </p>
-        </div>
-        <Link href="/teacher/teachers/invite" className="inline-flex items-center gap-1.5 self-start shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]">
-          <UserPlus size={14} /> Invite teacher
-        </Link>
-      </div>
+          </>
+        }
+        actions={
+          <HeaderActions>
+            <Link href="/teacher/teachers/invite" className="inline-flex items-center gap-1.5 self-start shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]">
+              <UserPlus size={14} /> Invite teacher
+            </Link>
+          </HeaderActions>
+        }
+      />
 
       <ListFilters
         action="/teacher/teachers"

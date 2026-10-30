@@ -1,7 +1,7 @@
 "use client";
 
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
-import { PageShell } from "@/components/sat";
+import { PageHeader, PageShell } from "@/components/sat";
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -58,11 +58,9 @@ export default function InviteStudentPage() {
   }
 
   return (
-    <PageShell width="narrow">
+    <PageShell>
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Students", href: "/teacher/students" }, { label: "Invite student" }]} />
-      <div className="mb-6">
-        <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Invite Student</h1>
-      </div>
+      <PageHeader title="Invite Student" />
       <Card as="form" onSubmit={submit} padding="lg" className="space-y-4">
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">Program</label>

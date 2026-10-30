@@ -4,6 +4,7 @@ import {
   Breadcrumbs,
   Delta,
   InvalidatedNotice,
+  PageHeader,
   PageShell,
   SectionHeader,
   VoidableValue,
@@ -20,6 +21,7 @@ import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { formatClock, formatDate, formatDuration, formatTime, relativeDay } from "@/lib/utils";
+import { PAGE_TITLE_CLASS } from "@/components/sat/page-shell";
 import { AttemptHeaderActions } from "../../attempt-header-actions";
 import { TryNavigator } from "@/components/sat/try-navigator";
 import { practiceSetTitle } from "@/lib/attempt-groups";
@@ -128,7 +130,7 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
   const perQuestion = attempt.totalTime && total ? Math.round(attempt.totalTime / total) : null;
 
   return (
-    <PageShell maxWidth={1180}>
+    <PageShell>
       <Breadcrumbs
         items={[
           { label: "Home", href: "/teacher" },
@@ -147,9 +149,9 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
       {attempt.status === "INVALIDATED" ? <InvalidatedNotice audience="teacher" /> : null}
 
       {/* Header: title on the left, actions top right (same slot and style as the student profile). */}
-      <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-        <div className="min-w-0">
-          <div className="mb-1 flex flex-wrap items-center gap-2">
+      <PageHeader
+        eyebrow={
+          <>
             <Badge>Practice</Badge>
             {area ? <AreaTag area={area} /> : null}
             {practiceSet ? <Badge variant={difficultyBadgeVariant(practiceSet.difficulty)}>{difficultyLabel(practiceSet.difficulty)}</Badge> : null}
@@ -170,59 +172,65 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
                 All tries in History →
               </Link>
             ) : null}
-          </div>
-          <h1 className="text-xl font-semibold text-gray-900">
-            {practiceSet && areaTab ? (
-              // The skill opens this student's area tab filtered by the skill and level (performance section).
-              <Link
-                href={`${studentHref({ area: areaTab, topic: practiceSet.topicId, difficulty: practiceSet.difficulty })}#performance`}
-                className="hover:text-[var(--sat-primary)] hover:underline"
-                title={`${first}'s ${practiceSet.topic.name} results`}
-              >
-                {practiceSet.topic.name}
-              </Link>
-            ) : (
-              practiceSet?.topic.name ?? practiceSetSnapshot?.name ?? "Practice set"
-            )}{" "}
-            · {first}&apos;s results
-          </h1>
-          <div className="mt-2">
-            <TryNavigator
-              current={tryNumber}
-              tries={tries.map((t) => ({
-                number: t.tryNumber,
-                href: buildProgressHref(`/teacher/students/${studentId}/attempts/${t.id}`, filters, areaTab ? { area: areaTab } : undefined),
-                detail: [t.submittedAt ? formatDate(t.submittedAt) : null, t.pct !== null ? `${t.pct}%` : null].filter(Boolean).join(" · "),
-                invalidated: t.status === "INVALIDATED",
-              }))}
-            />
-          </div>
-          {practiceSet ? (
-            <p className="mt-0.5 text-xs text-gray-500">
-              Practice set:{" "}
-              <Link href={`/teacher/practice-sets/${practiceSet.id}/preview`} className="font-medium text-[var(--sat-primary)] hover:underline">
-                {practiceSet.name}
-              </Link>
-              {practiceSet.source ? <> · Source: <b className="font-medium text-gray-700">{practiceSet.source.name}</b></> : null}
+          </>
+        }
+        title={
+          <>
+            <h1 className={PAGE_TITLE_CLASS}>
+              {practiceSet && areaTab ? (
+                // The skill opens this student's area tab filtered by the skill and level (performance section).
+                <Link
+                  href={`${studentHref({ area: areaTab, topic: practiceSet.topicId, difficulty: practiceSet.difficulty })}#performance`}
+                  className="hover:text-[var(--sat-primary)] hover:underline"
+                  title={`${first}'s ${practiceSet.topic.name} results`}
+                >
+                  {practiceSet.topic.name}
+                </Link>
+              ) : (
+                practiceSet?.topic.name ?? practiceSetSnapshot?.name ?? "Practice set"
+              )}{" "}
+              · {first}&apos;s results
+            </h1>
+            <div className="mt-2">
+              <TryNavigator
+                current={tryNumber}
+                tries={tries.map((t) => ({
+                  number: t.tryNumber,
+                  href: buildProgressHref(`/teacher/students/${studentId}/attempts/${t.id}`, filters, areaTab ? { area: areaTab } : undefined),
+                  detail: [t.submittedAt ? formatDate(t.submittedAt) : null, t.pct !== null ? `${t.pct}%` : null].filter(Boolean).join(" · "),
+                  invalidated: t.status === "INVALIDATED",
+                }))}
+              />
+            </div>
+            {practiceSet ? (
+              <p className="mt-0.5 text-xs text-gray-500">
+                Practice set:{" "}
+                <Link href={`/teacher/practice-sets/${practiceSet.id}/preview`} className="font-medium text-[var(--sat-primary)] hover:underline">
+                  {practiceSet.name}
+                </Link>
+                {practiceSet.source ? <> · Source: <b className="font-medium text-gray-700">{practiceSet.source.name}</b></> : null}
+              </p>
+            ) : null}
+            <p className="mt-1 text-xs text-gray-500">
+              {attempt.submittedAt ? (
+                <>Completed <b className="font-medium text-gray-700">{formatDate(attempt.submittedAt)}</b> at {formatClock(attempt.submittedAt)} ({relativeDay(attempt.submittedAt)})</>
+              ) : "Not finished"}
+              {attempt.assignment?.dueDate ? <> · Due {formatDate(attempt.assignment.dueDate)}</> : null}
+              {attempt.pauses.length > 0 ? ` · Paused ${attempt.pauses.length} ${attempt.pauses.length === 1 ? "time" : "times"} (${formatTime(pauseSeconds)})` : ""}
+              {` · ${explanationsInPlayerLabel(attempt.showExplanations ?? attempt.assignment?.showExplanations)}`}
             </p>
-          ) : null}
-          <p className="mt-1 text-xs text-gray-500">
-            {attempt.submittedAt ? (
-              <>Completed <b className="font-medium text-gray-700">{formatDate(attempt.submittedAt)}</b> at {formatClock(attempt.submittedAt)} ({relativeDay(attempt.submittedAt)})</>
-            ) : "Not finished"}
-            {attempt.assignment?.dueDate ? <> · Due {formatDate(attempt.assignment.dueDate)}</> : null}
-            {attempt.pauses.length > 0 ? ` · Paused ${attempt.pauses.length} ${attempt.pauses.length === 1 ? "time" : "times"} (${formatTime(pauseSeconds)})` : ""}
-            {` · ${explanationsInPlayerLabel(attempt.showExplanations ?? attempt.assignment?.showExplanations)}`}
-          </p>
-        </div>
-        <AttemptHeaderActions
-          studentId={studentId}
-          studentName={attempt.student.name}
-          backHref={studentHref(areaTab ? { area: areaTab } : undefined)}
-          attempt={{ id: attempt.id, kind: "practice", status: attempt.status }}
-          report={{ area: (areaTab ?? "math") as "math" | "reading" | "writing" }}
-        />
-      </div>
+          </>
+        }
+        actions={
+          <AttemptHeaderActions
+            studentId={studentId}
+            studentName={attempt.student.name}
+            backHref={studentHref(areaTab ? { area: areaTab } : undefined)}
+            attempt={{ id: attempt.id, kind: "practice", status: attempt.status }}
+            report={{ area: (areaTab ?? "math") as "math" | "reading" | "writing" }}
+          />
+        }
+      />
 
       <ResultFilterRoot>
         <div className="mb-6">

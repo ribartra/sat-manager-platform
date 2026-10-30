@@ -232,7 +232,7 @@ export function CompactAreaBox({
  * so a Test card is exactly as wide as an area card (3 per row on desktop, 2 on tablets, 1 on phones).
  */
 export function CardGrid({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <div className={`grid gap-3 sm:grid-cols-2 lg:grid-cols-3 ${className ?? ""}`}>{children}</div>;
+  return <div className={`grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 [&>*]:min-w-0 ${className ?? ""}`}>{children}</div>;
 }
 
 /** Area cards (Math / Reading / Writing): the shared CardGrid. */

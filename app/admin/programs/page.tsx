@@ -1,5 +1,5 @@
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
-import { PageShell } from "@/components/sat";
+import { PageHeader, PageShell } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
@@ -60,10 +60,10 @@ export default async function AdminProgramsPage() {
   return (
     <PageShell>
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Admin" }, { label: "Program master" }]} />
-      <h1 className="mb-1 text-xl font-semibold text-gray-900">Programs Master</h1>
-      <p className="mb-6 text-sm text-gray-500">
-        Manage programs, teachers, and enrollment requests. Leave end date blank for indefinite programs.
-      </p>
+      <PageHeader
+        title="Programs Master"
+        description="Manage programs, teachers, and enrollment requests. Leave end date blank for indefinite programs."
+      />
       <AdminProgramsClient programs={serialized} teachers={teachers} />
     </PageShell>
   );

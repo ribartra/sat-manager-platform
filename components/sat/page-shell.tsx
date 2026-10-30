@@ -1,39 +1,35 @@
 import { cn } from "@/lib/utils";
 
-type PageWidth = "narrow" | "default" | "wide" | "full";
+type PageWidth = "default" | "full";
 type PageDensity = "comfortable" | "compact";
-/** Page widths of the mockup (`mejorada/*.html` `.page` max-width), in px. */
-export type PageMaxWidth = 720 | 920 | 960 | 1000 | 1080 | 1100 | 1180;
 
-// Legacy `width` names map to the mockup widths; `maxWidth` sets the exact mockup width per page.
-const WIDTH: Record<PageWidth, PageMaxWidth | null> = {
-  narrow: 1080,
-  default: 1080,
-  wide: 1080,
-  full: null,
-};
+/**
+ * The one page width of every view (px): every page starts at the same x and has the same width, so
+ * switching views never moves the content. `full` (no max width) is only for full-screen surfaces.
+ */
+export const PAGE_WIDTH = 1180;
+
+/** Title of every page (PageHeader; pages with their own header layout use the same class). */
+export const PAGE_TITLE_CLASS = "text-[26px] font-bold leading-tight tracking-[-0.3px] text-[var(--sat-text)]";
 
 interface PageShellProps extends React.HTMLAttributes<HTMLElement> {
   as?: React.ElementType;
   width?: PageWidth;
-  /** Mockup page width in px (default 1080). */
-  maxWidth?: PageMaxWidth;
   density?: PageDensity;
 }
 
-/** Page container (mockup `.page`): centred, mockup width, padding 22px 20px 70px. Prefer this over ad-hoc max-w-* wrappers. */
+/** Page container (mockup `.page`): centred, PAGE_WIDTH wide, padding 22px 20px 70px. Prefer this over ad-hoc max-w-* wrappers. */
 export function PageShell({
   as: Component = "div",
   className,
   width = "default",
-  maxWidth,
   density: _density,
   style,
   children,
   ...props
 }: PageShellProps) {
   void _density;
-  const px = maxWidth ?? WIDTH[width];
+  const px = width === "full" ? null : PAGE_WIDTH;
   return (
     <Component
       data-page-shell=""
@@ -47,8 +43,11 @@ export function PageShell({
   );
 }
 
-interface PageHeaderProps extends React.HTMLAttributes<HTMLElement> {
-  title: string;
+interface PageHeaderProps extends Omit<React.HTMLAttributes<HTMLElement>, "title"> {
+  /** Text, or a control that reads as the title (e.g. the student drop-down). */
+  title: React.ReactNode;
+  /** Small line above the title (chips: type, area, level, status). */
+  eyebrow?: React.ReactNode;
   description?: React.ReactNode;
   actions?: React.ReactNode;
   density?: PageDensity;
@@ -56,6 +55,7 @@ interface PageHeaderProps extends React.HTMLAttributes<HTMLElement> {
 
 export function PageHeader({
   title,
+  eyebrow,
   description,
   actions,
   className,
@@ -73,10 +73,11 @@ export function PageHeader({
       {...props}
     >
       <div className="min-w-0">
-        <h1 className="text-[26px] font-bold tracking-[-0.3px] text-[var(--sat-text)]">{title}</h1>
+        {eyebrow ? <div className="mb-1.5 flex flex-wrap items-center gap-2">{eyebrow}</div> : null}
+        {typeof title === "string" ? <h1 className={PAGE_TITLE_CLASS}>{title}</h1> : title}
         {description ? <p className="mt-1 text-sm text-[var(--sat-muted)]">{description}</p> : null}
       </div>
-      {actions ? <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div> : null}
+      {actions ? <div className="flex min-w-0 max-w-full flex-wrap items-center gap-2 sm:shrink-0">{actions}</div> : null}
     </header>
   );
 }

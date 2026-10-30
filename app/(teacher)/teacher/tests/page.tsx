@@ -76,7 +76,7 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
 
 
   return (
-    <PageShell maxWidth={1100} width="wide">
+    <PageShell>
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Tests" }]} />
       <PageHeader
         title="Tests"

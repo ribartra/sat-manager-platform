@@ -51,7 +51,7 @@ export default async function TeacherDetailPage({ params }: { params: Promise<{ 
   });
 
   return (
-    <PageShell maxWidth={1100} width="wide">
+    <PageShell>
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Teachers", href: "/teacher/teachers" }, { label: teacher.name }]} />
       <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
         <div className="min-w-0">

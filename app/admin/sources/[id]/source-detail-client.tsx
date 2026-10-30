@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { useConfirm } from "@/components/sat/confirm-dialog";
+import { PageHeader } from "@/components/sat";
 import { apiFetch } from "@/lib/api-client";
 import { notify } from "@/lib/notify-ui";
 import { difficultyLabel, fullTestStatusLabel, practiceSetStatusLabel } from "@/lib/domain-meta";
@@ -87,36 +88,34 @@ export function SourceDetailClient({
 
   return (
     <div className="space-y-6">
-      <header className="space-y-3">
-        <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">{source.name}</h1>
-        <Card padding="md" className="flex flex-wrap items-center gap-4">
-          <form
-            className="flex items-center gap-2"
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (name.trim() && name.trim() !== source.name) void save({ name: name.trim() }, "Source renamed.");
-            }}
-          >
-            <Input value={name} onChange={(e) => setName(e.target.value)} aria-label="Source name" maxLength={80} className="max-w-xs text-sm" />
-            <Button type="submit" size="sm" disabled={busy || !name.trim() || name.trim() === source.name}>Rename</Button>
-          </form>
-          <div className="flex flex-wrap items-center gap-3 text-sm">
-            <span className="text-gray-500">Used for</span>
-            {([["forPracticeSets", "Practice Sets"], ["forTests", "Tests"]] as const).map(([key, label]) => (
-              <label key={key} className="inline-flex items-center gap-1.5">
-                <Checkbox checked={source[key]} disabled={busy} onChange={(e) => save({ [key]: e.target.checked }, `${label}: ${e.target.checked ? "yes" : "no"}.`)} />
-                {label}
-              </label>
-            ))}
-          </div>
-          <div className="ml-auto flex items-center gap-2">
-            <Badge variant={source.active ? "success" : "default"}>{source.active ? "Active" : "Inactive"}</Badge>
-            <Button size="sm" variant="secondary" disabled={busy} onClick={() => save({ active: !source.active }, source.active ? "Deactivated." : "Activated.")}>
-              {source.active ? "Deactivate" : "Activate"}
-            </Button>
-          </div>
-        </Card>
-      </header>
+      <PageHeader title={source.name} />
+      <Card padding="md" className="flex flex-wrap items-center gap-4">
+        <form
+          className="flex items-center gap-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (name.trim() && name.trim() !== source.name) void save({ name: name.trim() }, "Source renamed.");
+          }}
+        >
+          <Input value={name} onChange={(e) => setName(e.target.value)} aria-label="Source name" maxLength={80} className="max-w-xs text-sm" />
+          <Button type="submit" size="sm" disabled={busy || !name.trim() || name.trim() === source.name}>Rename</Button>
+        </form>
+        <div className="flex flex-wrap items-center gap-3 text-sm">
+          <span className="text-gray-500">Used for</span>
+          {([["forPracticeSets", "Practice Sets"], ["forTests", "Tests"]] as const).map(([key, label]) => (
+            <label key={key} className="inline-flex items-center gap-1.5">
+              <Checkbox checked={source[key]} disabled={busy} onChange={(e) => save({ [key]: e.target.checked }, `${label}: ${e.target.checked ? "yes" : "no"}.`)} />
+              {label}
+            </label>
+          ))}
+        </div>
+        <div className="ml-auto flex items-center gap-2">
+          <Badge variant={source.active ? "success" : "default"}>{source.active ? "Active" : "Inactive"}</Badge>
+          <Button size="sm" variant="secondary" disabled={busy} onClick={() => save({ active: !source.active }, source.active ? "Deactivated." : "Activated.")}>
+            {source.active ? "Deactivate" : "Activate"}
+          </Button>
+        </div>
+      </Card>
 
       {source.forPracticeSets || practiceSets.some((row) => row.sourceId === source.id) ? (
         <ContentSection

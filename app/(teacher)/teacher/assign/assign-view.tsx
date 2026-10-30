@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { LinkTabs, PageShell } from "@/components/sat";
+import { LinkTabs, PageHeader, PageShell } from "@/components/sat";
+import { PAGE_TITLE_CLASS } from "@/components/sat/page-shell";
 import { Alert } from "@/components/sat/alert";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { auth } from "@/lib/auth";
@@ -99,30 +100,34 @@ export async function AssignView({ studentId, query }: { studentId: string | nul
               ]
         }
       />
-      <StudentSwitcher
-        prefix={editingNow ? "Edit what is assigned to" : "Assign to"}
-        name={student?.name ?? ""}
-        students={roster}
-        selectedStudentId={student?.id ?? null}
-        query={carry}
-        path="/teacher/students/:id/assign"
-        className="mb-1 text-xl font-semibold text-gray-900"
-        // No student yet: the list opens by itself.
-        defaultOpen={!student && roster.length > 0}
-        emptyText={everyoneHasIt ? "Every student already has it." : "You have no students yet."}
+      <PageHeader
+        title={
+          <StudentSwitcher
+            prefix={editingNow ? "Edit what is assigned to" : "Assign to"}
+            name={student?.name ?? ""}
+            students={roster}
+            selectedStudentId={student?.id ?? null}
+            query={carry}
+            path="/teacher/students/:id/assign"
+            className={PAGE_TITLE_CLASS}
+            // No student yet: the list opens by itself.
+            defaultOpen={!student && roster.length > 0}
+            emptyText={everyoneHasIt ? "Every student already has it." : "You have no students yet."}
+          />
+        }
+        // No student yet: what is being assigned is the page description.
+        description={
+          !student && itemLabel ? (
+            <>
+              You&apos;re assigning <b className="font-medium text-gray-700">{itemLabel}</b>. Choose the student in the title above.
+            </>
+          ) : !student ? (
+            "Choose the student in the title above."
+          ) : (
+            "1. Choose the student · 2. Check what they have done · 3. Choose practice sets or Tests · 4. Set a due date"
+          )
+        }
       />
-      {/* No student yet: what is being assigned is the page description. */}
-      <p className="mb-3 text-sm text-gray-500">
-        {!student && itemLabel ? (
-          <>
-            You&apos;re assigning <b className="font-medium text-gray-700">{itemLabel}</b>. Choose the student in the title above.
-          </>
-        ) : !student ? (
-          "Choose the student in the title above."
-        ) : (
-          "1. Choose the student · 2. Check what they have done · 3. Choose practice sets or Tests · 4. Set a due date"
-        )}
-      </p>
       <LinkTabs label="What to assign" active={params.area} tabs={tabs} />
     </>
   );
@@ -130,7 +135,7 @@ export async function AssignView({ studentId, query }: { studentId: string | nul
   // ------------------------------------------------------------ No student yet (from a Test / Practice Set)
   if (!student) {
     return (
-      <PageShell maxWidth={1180}>
+      <PageShell>
         {header()}
         {presetTest && presetTest.status !== "PUBLISHED" ? <Alert tone="warning">This Test isn&apos;t published yet: publish it before assigning it.</Alert> : null}
         {presetSet && presetSet.status !== "PUBLISHED" ? <Alert tone="warning">This practice set isn&apos;t published yet: publish it before assigning it.</Alert> : null}
@@ -169,7 +174,7 @@ export async function AssignView({ studentId, query }: { studentId: string | nul
     const presetRow = params.test ? assignmentByTest.get(params.test) : undefined;
     const editingExam = presetRow && ["PENDING", "IN_PROGRESS"].includes(presetRow.status) ? exams.find((exam) => exam.id === params.test) : undefined;
     return (
-      <PageShell maxWidth={1180}>
+      <PageShell>
         {header(Boolean(editingExam))}
         {presetTest && presetRow && !editingExam ? <Alert tone="info" className="mb-3">{first} already took {presetTest.name}; they can retake it from their Tests page.</Alert> : null}
         {overview ? <StudentDonePanel overview={overview} studentId={student.id} focus="tests" /> : null}
@@ -237,7 +242,7 @@ export async function AssignView({ studentId, query }: { studentId: string | nul
   const presetDone = presetSet && assignmentBySet.has(presetSet.id) && !editIds.has(presetSet.id);
 
   return (
-    <PageShell maxWidth={1180}>
+    <PageShell>
       {header(editing.length > 0)}
       {presetDone ? (
         <Alert tone="info" className="mb-3">

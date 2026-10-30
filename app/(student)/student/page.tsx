@@ -1,5 +1,6 @@
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { redirect } from "next/navigation";
-import { PageShell } from "@/components/sat";
+import { PageHeader, PageShell } from "@/components/sat";
 import { Card } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
@@ -72,13 +73,9 @@ async function ParentDashboard({ parentId, parentName }: { parentId: string; par
   });
 
   return (
-    <PageShell width="narrow">
-      <div className="mb-6">
-        <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">
-          Hello, {parentName.split(" ")[0]}!
-        </h1>
-        <p className="mt-0.5 text-sm text-gray-500">Parent dashboard</p>
-      </div>
+    <PageShell>
+      <Breadcrumbs items={[{ label: "Home" }]} />
+      <PageHeader title={`Hello, ${parentName.split(" ")[0]}!`} description="Parent dashboard" />
 
       <section>
         <h2 className="mb-3 text-base font-semibold text-gray-900">Your children</h2>

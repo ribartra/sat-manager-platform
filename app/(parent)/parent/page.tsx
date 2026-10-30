@@ -41,7 +41,7 @@ export default async function ParentDashboardPage() {
   );
 
   return (
-    <PageShell width="default">
+    <PageShell>
       <PageHeader title="Your student's progress" />
       <PageContent>
         {links.length === 0 ? (

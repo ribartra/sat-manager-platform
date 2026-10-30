@@ -6,6 +6,7 @@ import {
   LinkTr,
   ListFilters,
   PAGE_SIZE,
+  PageHeader,
   PageShell,
   Pagination,
   RowLink,
@@ -17,7 +18,7 @@ import {
   paginate,
 } from "@/components/sat";
 import { AreaTag } from "@/components/sat/practice-set-row";
-import { HEADER_ACTION_CLASS } from "@/components/sat/header-actions";
+import { HEADER_ACTION_CLASS, HeaderActions } from "@/components/sat/header-actions";
 import { Badge } from "@/components/ui/badge";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
@@ -76,7 +77,7 @@ export default async function TeacherPendingPage({ searchParams }: { searchParam
   ].filter(Boolean);
 
   return (
-    <PageShell maxWidth={1180} width="wide">
+    <PageShell>
       <Breadcrumbs
         items={
           student
@@ -84,20 +85,24 @@ export default async function TeacherPendingPage({ searchParams }: { searchParam
             : [{ label: "Home", href: "/teacher" }, { label: "Pending" }]
         }
       />
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">{student ? `Pending · ${student.name}` : "Pending"}</h1>
-          <p className="mb-4 mt-0.5 text-sm text-gray-500">
+      <PageHeader
+        title={student ? `Pending · ${student.name}` : "Pending"}
+        description={
+          <>
             {context.length ? <b className="font-medium text-gray-700">{context.join(" · ")} · </b> : null}
-            Practice sets and Tests assigned and not finished yet: overdue first, then by due date.
-          </p>
-        </div>
-        {backHref ? (
-          <Link href={backHref} className={HEADER_ACTION_CLASS}>
-            <ArrowLeft size={14} aria-hidden /> Back to {student!.name.split(" ")[0]}
-          </Link>
-        ) : null}
-      </div>
+              Practice sets and Tests assigned and not finished yet: overdue first, then by due date.
+          </>
+        }
+        actions={
+          backHref ? (
+            <HeaderActions>
+              <Link href={backHref} className={HEADER_ACTION_CLASS}>
+                <ArrowLeft size={14} aria-hidden /> Back to {student!.name.split(" ")[0]}
+              </Link>
+            </HeaderActions>
+          ) : null
+        }
+      />
 
       <ListFilters
         action="/teacher/pending"

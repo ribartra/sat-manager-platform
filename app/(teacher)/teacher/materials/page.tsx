@@ -1,6 +1,6 @@
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { currentContentScope } from "@/lib/content-scope";
-import { PageShell } from "@/components/sat";
+import { PageHeader, PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { academicTopicWhere } from "@/lib/taxonomy";
@@ -26,10 +26,9 @@ export default async function TeacherMaterialsPage() {
   ]);
 
   return (
-    <PageShell width="wide">
+    <PageShell>
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Practice", href: "/teacher/practice-sets" }, { label: "Materials" }]} />
-      <h1 className="mb-2 text-[26px] font-bold tracking-[-0.3px] text-gray-900">Study Materials</h1>
-      <p className="mb-6 text-sm text-gray-500">Publish theory notes and support links for students.</p>
+      <PageHeader title="Study Materials" description="Publish theory notes and support links for students." />
       <MaterialsClient
         topics={topics.map((t) => ({
           id: t.id,

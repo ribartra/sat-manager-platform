@@ -730,6 +730,29 @@ const checks = [
     "app/(teacher)/teacher/tests/page.tsx",
   ].map((file) => ({ file, requires: ["HEADER_SHORTCUT_CLASS}>Questions →</Link>", "/teacher/questions?area="], label: `Atajo azul Questions → al area de origen: ${file}` })),
   {
+    file: "components/sat/page-shell.tsx",
+    requires: ["export const PAGE_WIDTH = 1180", "PAGE_TITLE_CLASS", "eyebrow"],
+    forbids: ["maxWidth?: PageMaxWidth"],
+    label: "Un solo ancho de pagina y un solo estilo de titulo (PageShell / PageHeader)",
+  },
+  {
+    file: "lib/domain-meta.ts",
+    requires: ['if (compact && value === "MC") return "Multiple Choice";'],
+    label: "Tipo de pregunta legible: Multiple Choice (no MC)",
+  },
+  {
+    file: "app/(teacher)/teacher/questions/questions-table-client.tsx",
+    requires: ["questionTypeLabel(row.original.type, true)", "Used in ${row.original.uses}"],
+    forbids: ['id: "type"', 'id: "uses"'],
+    label: "Question Bank: Type y Used in (no filtrables) como tags, no columnas",
+  },
+  {
+    file: "app/admin/reports/page.tsx",
+    requires: ["Email sent"],
+    forbids: ['"Page", "Email"'],
+    label: "Reports: pagina y email como tags bajo el comentario",
+  },
+  {
     file: "lib/question-crumbs.ts",
     requires: ['{ label: "Tests", href: "/teacher/tests" }', "Practice · ${practiceAreaLabel(", "questionsHref"],
     label: "Breadcrumb del Question Bank segun el area: Practice · <area> o Tests",

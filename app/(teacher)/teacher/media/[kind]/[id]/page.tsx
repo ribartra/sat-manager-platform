@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { PageShell } from "@/components/sat";
+import { PageHeader, PageShell } from "@/components/sat";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { ImportMediaPanel } from "@/components/sat/import-media-panel";
 import { Card } from "@/components/ui/card";
@@ -68,7 +68,7 @@ export default async function ContentMediaPage({ params }: { params: Promise<{ k
   const isTest = kind === "tests";
 
   return (
-    <PageShell width="wide">
+    <PageShell>
       <Breadcrumbs
         items={[
           { label: "Home", href: "/teacher" },
@@ -77,10 +77,10 @@ export default async function ContentMediaPage({ params }: { params: Promise<{ k
           { label: "Images & source files" },
         ]}
       />
-      <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Images &amp; source files</h1>
-      <p className="mb-5 mt-1 text-sm text-gray-500">
-        {title} · Recover figures with an AI from the original files, or crop them from the PDF question by question.
-      </p>
+      <PageHeader
+        title="Images & source files"
+        description={<>{title} · Recover figures with an AI from the original files, or crop them from the PDF question by question.</>}
+      />
 
       {batches.length === 0 ? (
         <Card padding="md" className="mb-5 text-sm text-gray-500">These questions weren&apos;t imported, so there are no source files. Edit their images in each question.</Card>

@@ -4,6 +4,7 @@ import {
   DateCell,
   EmptyState,
   LinkTr,
+  PageHeader,
   PageShell,
   RowAction,
   RowLink,
@@ -13,6 +14,8 @@ import {
   TD,
 } from "@/components/sat";
 import { ListFilters } from "@/components/sat";
+import { HeaderActions } from "@/components/sat/header-actions";
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { formatDate, relativeDay } from "@/lib/utils";
@@ -79,28 +82,34 @@ export default async function TeacherDashboard({ searchParams }: PageProps) {
   const overviews = await loadStudentOverviews(students.map((s) => s.id), now);
   const rows = students.map((s) => overviews.get(s.id)).filter((o): o is StudentOverview => Boolean(o));
 
+  // The breadcrumb row keeps the title at the same height as on every other page.
   const head = (count: number) => (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-      <div>
-        <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Hello, {firstName}!</h1>
-        <p className="mt-0.5 text-sm text-gray-500">
+    <div>
+      <Breadcrumbs items={[{ label: "Home" }]} />
+      <PageHeader
+      title={`Hello, ${firstName}!`}
+      description={
+        <>
           {count} student{count === 1 ? "" : "s"} · Today is {now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}.
-        </p>
-      </div>
-      <div className="flex flex-wrap items-center gap-2">
-        <Link
-          href="/teacher/students/invite"
-          className="flex items-center gap-1.5 shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]"
-        >
-          <UserPlus size={14} /> Invite student
-        </Link>
-      </div>
+        </>
+      }
+      actions={
+        <HeaderActions>
+          <Link
+            href="/teacher/students/invite"
+            className="flex items-center gap-1.5 shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]"
+          >
+            <UserPlus size={14} /> Invite student
+          </Link>
+        </HeaderActions>
+      }
+      />
     </div>
   );
 
   const inactive = rows.filter((s) => isInactive(s.lastActiveAt, now));
   return (
-    <PageShell maxWidth={1180} width="wide" density="compact" className="space-y-4">
+    <PageShell className="space-y-4">
       {head(rows.length)}
       <ListFilters action="/teacher" q={search} placeholder="Name or email" suggestions={await personSuggestions(studentScope)} />
       <Card padding="none" className="flex flex-col gap-2 px-4 py-3">

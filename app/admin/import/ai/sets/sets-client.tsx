@@ -6,7 +6,8 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ChevronDown, ChevronRight, ScissorsSquare, Search } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { PageShell } from "@/components/sat";
+import { PageHeader, PageShell } from "@/components/sat";
+import { HeaderActions } from "@/components/sat/header-actions";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -132,7 +133,7 @@ function QuestionTable({
                 </Link>
                 {q.promoted && <span className="ml-1 text-emerald-500" title="Promovida a oficial">●</span>}
               </td>
-              <td className="px-2 py-1.5"><span className={`rounded px-1.5 py-0.5 font-mono ${q.type === "NUMERIC" ? "bg-sky-100 text-sky-700" : "bg-gray-100 text-gray-600"}`}>{q.type === "NUMERIC" ? "NUM" : "MC"}</span></td>
+              <td className="px-2 py-1.5"><span className={`rounded px-1.5 py-0.5 font-mono ${q.type === "NUMERIC" ? "bg-sky-100 text-sky-700" : "bg-gray-100 text-gray-600"}`}>{q.type === "NUMERIC" ? "Numeric" : "Multiple Choice"}</span></td>
               <td className={`px-2 py-1.5 font-mono ${q.answer ? "text-gray-800" : "text-rose-600"}`}>{q.answer || "—"}</td>
               <td className="px-2 py-1.5"><FieldDot state={q.fields.stem} label="" /></td>
               <td className="px-2 py-1.5"><FieldDot state={q.fields.stimulus} label="" /></td>
@@ -186,17 +187,18 @@ export function SetsIndexClient({ rows, batchId, batches }: SetsIndexClientProps
 
   return (
     <PageShell className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0">
-          <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Admin" }, { label: "AI Import", href: `/admin/import/ai?batch=${batchId}` }, { label: "Extracted Tests" }]} />
-          <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Extracted Tests to review</h1>
-          <p className="mt-1 text-sm text-gray-500">
+      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Admin" }, { label: "AI Import", href: `/admin/import/ai?batch=${batchId}` }, { label: "Extracted Tests" }]} />
+      <PageHeader
+        title="Extracted Tests to review"
+        description={
+          <>
             An Extracted Test groups the source files for one set — questions plus answers and/or explanations. Expand a row to see
             each question status (stem, stimulus, options, answer, explanation) and use <strong>Review / crop</strong>
             to open the question file.
-          </p>
-        </div>
-        {batches.length > 1 && (
+          </>
+        }
+        actions={batches.length > 1 ? (
+          <HeaderActions>
           <select
             value={batchId}
             onChange={(event) => {
@@ -210,8 +212,9 @@ export function SetsIndexClient({ rows, batchId, batches }: SetsIndexClientProps
               </option>
             ))}
           </select>
-        )}
-      </div>
+          </HeaderActions>
+        ) : undefined}
+      />
 
       <div className="grid gap-3 sm:grid-cols-4">
         <Card padding="md">

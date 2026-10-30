@@ -63,7 +63,7 @@ export default async function AdminTeachersPage({ searchParams }: PageProps) {
   }));
 
   return (
-    <PageShell width="default">
+    <PageShell>
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Admin" }, { label: "Teachers" }]} />
       <PageHeader
         title="Teachers"

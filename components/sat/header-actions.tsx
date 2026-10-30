@@ -15,5 +15,6 @@ export const HEADER_ACTION_DANGER_CLASS = `${HEADER_ACTION_CLASS} text-[var(--sa
 export const HEADER_SHORTCUT_CLASS = "inline-flex h-8 items-center whitespace-nowrap px-1 text-sm font-medium text-[var(--sat-primary)] hover:underline";
 
 export function HeaderActions({ className, children }: { className?: string; children: React.ReactNode }) {
-  return <div className={cn("flex shrink-0 flex-wrap items-center gap-2 lg:justify-end", className)}>{children}</div>;
+  // Wraps instead of pushing the page wider on phones; one row at the right of the title on desktop.
+  return <div className={cn("flex min-w-0 max-w-full flex-wrap items-center gap-2 sm:shrink-0 lg:justify-end", className)}>{children}</div>;
 }

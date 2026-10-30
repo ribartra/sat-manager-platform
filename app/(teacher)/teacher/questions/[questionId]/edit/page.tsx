@@ -1,6 +1,6 @@
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { currentContentScope } from "@/lib/content-scope";
-import { PageShell } from "@/components/sat";
+import { PageHeader, PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { QuestionEditor } from "../../question-editor-client";
@@ -42,9 +42,9 @@ export default async function EditQuestionPage({ params }: PageProps) {
   const crumbs = questionCrumbs(area);
 
   return (
-    <PageShell width="narrow">
+    <PageShell>
       <Breadcrumbs items={[...crumbs.items, { label: "Edit question" }]} />
-      <h1 className="mb-6 text-[26px] font-bold tracking-[-0.3px] text-gray-900">Edit Question</h1>
+      <PageHeader title="Edit Question" />
       <QuestionEditor
         returnHref={crumbs.questionsHref}
         showGraphOption={showGraphOption}

@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { PageShell } from "@/components/sat";
+import { PageHeader, PageShell } from "@/components/sat";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import prisma from "@/lib/prisma";
 import { requireContentImporter } from "@/lib/rbac";
@@ -86,7 +86,7 @@ export default async function QuickImportBatchPage({ params }: { params: Promise
       : `Test · ${target.testName}`;
 
   return (
-    <PageShell width="wide">
+    <PageShell>
       <Breadcrumbs
         items={[
           { label: "Home", href: "/teacher" },
@@ -96,10 +96,14 @@ export default async function QuickImportBatchPage({ params }: { params: Promise
           { label: rows.length ? "Step 3 · Review & Draft" : "Step 2 · AI file" },
         ]}
       />
-      <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Import with AI</h1>
-      <p className="mb-4 mt-1 text-sm text-gray-500">
-        {title} · Source: <b>{source?.name ?? "—"}</b> · PDF: {questionFile?.relativePath.split("/").pop() ?? "—"}
-      </p>
+      <PageHeader
+        title="Import with AI"
+        description={
+          <>
+            {title} · Source: <b>{source?.name ?? "—"}</b> · PDF: {questionFile?.relativePath.split("/").pop() ?? "—"}
+          </>
+        }
+      />
       {/* Step 1 is done (the import exists); steps 2 and 3 are on this page. */}
       <ImportSteps current={rows.length ? 3 : 2} hrefs={{ 2: "#step-2", 3: "#step-3" }} />
       <QuickImportWorkspace

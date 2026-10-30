@@ -1,5 +1,5 @@
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
-import { ListFilters, PAGE_SIZE, PageShell, Pagination, pageFromParam } from "@/components/sat";
+import { ListFilters, PAGE_SIZE, PageHeader, PageShell, Pagination, pageFromParam } from "@/components/sat";
 import { periodDates, periodParams, resolvePeriod } from "@/lib/period-filter";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
@@ -35,9 +35,9 @@ export default async function NotificationsPage({ searchParams }: { searchParams
   });
 
   return (
-    <PageShell width="narrow">
+    <PageShell>
       <Breadcrumbs items={[{ label: "Home", href: homeHrefForRole(session.user.role) }, { label: "Notifications" }]} />
-      <h1 className="mb-4 text-[26px] font-bold tracking-[-0.3px] text-gray-900">Notifications</h1>
+      <PageHeader title="Notifications" />
       <ListFilters
         action="/notifications" search={false} period={period} />
       <Card>

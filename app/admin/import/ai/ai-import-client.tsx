@@ -1187,8 +1187,8 @@ function QuestionStagingEditor({
             <label className="grid gap-1">
               <span className="text-xs font-medium text-gray-500">Type</span>
               <select value={draft.type} onChange={(event) => setDraft({ ...draft, type: event.target.value })} className="rounded-md border border-gray-300 px-3 py-2 text-sm">
-                <option value="MC">MC</option>
-                <option value="NUMERIC">NUMERIC</option>
+                <option value="MC">Multiple Choice</option>
+                <option value="NUMERIC">Numeric</option>
               </select>
             </label>
           </div>

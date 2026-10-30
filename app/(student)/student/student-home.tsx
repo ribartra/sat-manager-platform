@@ -7,6 +7,7 @@ import {
   CompactAreaBox,
   ContinueCard,
   EmptyState,
+  PageHeader,
   Pagination,
   PracticeAreaTabs,
   PracticeSetAttemptsAccordion,
@@ -137,17 +138,20 @@ export async function StudentHome({
         <Breadcrumbs items={[...(links.crumbs ?? [{ label: "Home", href: links.tab("summary") }]), { label: area === "tests" ? "Tests" : practiceAreaLabel(practiceArea) }]} />
       ) : links.crumbs ? (
         <Breadcrumbs items={links.crumbs.map((c, i) => (i === links.crumbs!.length - 1 ? { label: c.label } : c))} />
-      ) : null}
-      <div className="mb-4">
-        <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Hello, {firstName}!</h1>
-        <p className="mt-0.5 text-sm text-gray-500">
-          {tab === "summary"
+      ) : (
+        // Home: the breadcrumb row keeps the title at the same height as on every other page.
+        <Breadcrumbs items={[{ label: "Home" }]} />
+      )}
+      <PageHeader
+        title={`Hello, ${firstName}!`}
+        description={
+          tab === "summary"
             ? `Today is ${new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}.`
             : area === "tests"
               ? "Your test results by SAT section."
-              : `Your ${practiceAreaLabel(practiceArea)} practice.`}
-        </p>
-      </div>
+              : `Your ${practiceAreaLabel(practiceArea)} practice.`
+        }
+      />
 
       {tab === "summary" ? <ContinueCard work={continueWork} readOnly={links.readOnly} /> : null}
 

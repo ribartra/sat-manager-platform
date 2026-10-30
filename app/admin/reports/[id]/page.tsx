@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
-import { PageShell } from "@/components/sat";
+import { PageHeader, PageShell } from "@/components/sat";
+import { HeaderActions } from "@/components/sat/header-actions";
 import { Card } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
@@ -105,11 +106,11 @@ export default async function AdminReportPage({ params }: { params: Promise<{ id
   const about = target.kind === "page" ? "The whole screen" : target.kind === "area" ? "A dragged area" : "One element";
 
   return (
-    <PageShell width="wide">
+    <PageShell>
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Admin" }, { label: "Reports", href: "/admin/reports" }, { label: report.pageTitle || "Report" }]} />
-      <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <p className="mb-1 flex items-center gap-2">
+      <PageHeader
+        eyebrow={
+          <>
             <span className="rounded px-2 py-0.5 text-xs font-bold text-white" style={{ background: cat.color }}>{cat.label}</span>
             {report.status === "RESOLVED" ? (
               <span className="rounded bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">
@@ -120,14 +121,20 @@ export default async function AdminReportPage({ params }: { params: Promise<{ id
             ) : (
               <span className="rounded bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">Open</span>
             )}
-          </p>
-          <h1 className="text-xl font-semibold text-gray-900">{report.pageTitle || "Report"}</h1>
-          <p className="text-sm text-gray-500">
+          </>
+        }
+        title={report.pageTitle || "Report"}
+        description={
+          <>
             {report.user.name} ({report.user.email}, {roleLabel(report.user.role)}) · {report.createdAt.toISOString().replace("T", " ").slice(0, 16)} UTC
-          </p>
-        </div>
-        <ReportActions id={report.id} status={report.status} emailed={!!report.emailSentAt} agentEnabled={agent.enabled} sentToAgent={!!report.agentSentAt} />
-      </div>
+          </>
+        }
+        actions={
+          <HeaderActions>
+            <ReportActions id={report.id} status={report.status} emailed={!!report.emailSentAt} agentEnabled={agent.enabled} sentToAgent={!!report.agentSentAt} />
+          </HeaderActions>
+        }
+      />
 
       <blockquote className="mb-4 whitespace-pre-wrap rounded-lg border-l-4 bg-white px-4 py-3 text-[15px] text-gray-900" style={{ borderColor: cat.color }}>
         {report.comment}

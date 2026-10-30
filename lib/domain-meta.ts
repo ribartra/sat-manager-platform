@@ -80,7 +80,8 @@ export function difficultyBadgeVariant(value: string): BadgeVariant {
 }
 
 export function questionTypeLabel(value: string, compact = false): string {
-  if (compact && value === "MC") return "MC";
+  // Badges spell it out: "MC" is not readable for teachers and students.
+  if (compact && value === "MC") return "Multiple Choice";
   if (compact && value === "NUMERIC") return "Numeric";
   return questionTypeMeta[value as QuestionType]?.label ?? value;
 }

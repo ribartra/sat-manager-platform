@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { EmptyState, LinkTr, ListFilters, PAGE_SIZE, PageShell, Pagination, RowLink, SimpleTable, TD, ChevronCell, pageFromParam, paginate } from "@/components/sat";
+import { EmptyState, LinkTr, ListFilters, PAGE_SIZE, PageHeader, PageShell, Pagination, RowLink, SimpleTable, TD, ChevronCell, pageFromParam, paginate } from "@/components/sat";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { AreaTag } from "@/components/sat/practice-set-row";
 import { Badge } from "@/components/ui/badge";
@@ -44,13 +44,17 @@ export default async function StudentPendingPage({ searchParams }: { searchParam
   ].filter(Boolean);
 
   return (
-    <PageShell width="wide">
+    <PageShell>
       <Breadcrumbs items={[{ label: "Home", href: "/student" }, filter.type === "tests" ? { label: "Tests", href: "/student/tests" } : { label: "Practice", href: "/student/practice" }, { label: "Pending" }]} />
-      <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Pending</h1>
-      <p className="mb-4 mt-0.5 text-sm text-gray-500">
-        {context.length ? <b className="font-medium text-gray-700">{context.join(" · ")} · </b> : null}
-        Everything your teacher assigned that you haven&apos;t finished: overdue first, then by due date.
-      </p>
+      <PageHeader
+        title="Pending"
+        description={
+          <>
+            {context.length ? <b className="font-medium text-gray-700">{context.join(" · ")} · </b> : null}
+            Everything your teacher assigned that you haven&apos;t finished: overdue first, then by due date.
+          </>
+        }
+      />
       <ListFilters
         action="/student/pending"
         search={false}

@@ -97,7 +97,7 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
   }
 
   return (
-    <PageShell maxWidth={1000} width="wide" density="compact" className="space-y-4">
+    <PageShell className="space-y-4">
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Practice" }]} />
       <PageHeader
         title="Practice"

@@ -7,6 +7,7 @@ import {
   CompactAreaBox,
   DIFFICULTIES,
   EmptyState,
+  PageHeader,
   PageShell,
   Pagination,
   PracticeAreaTabs,
@@ -59,8 +60,7 @@ export default async function StudentPracticePage({ searchParams }: PageProps) {
           ...(area ? [{ label: "Practice", href: "/student/practice" }, { label: practiceAreaLabel(area) }] : [{ label: "Practice" }]),
         ]}
       />
-      <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Practice</h1>
-      <p className="mb-4 mt-1 text-sm text-gray-500">Practice sets by skill, assigned by your teacher. Use them to prepare for your tests.</p>
+      <PageHeader title="Practice" description="Practice sets by skill, assigned by your teacher. Use them to prepare for your tests." />
       <PracticeAreaTabs basePath="/student/practice" active={tab} includeSummary includeTests={false} />
       {area ? <AreaView practice={practice} area={area} page={pageFromParam(query.page)} /> : <SummaryView practice={practice} />}
     </PageShell>

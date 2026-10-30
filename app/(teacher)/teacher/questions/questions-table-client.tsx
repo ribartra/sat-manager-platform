@@ -62,6 +62,13 @@ export function QuestionsTable({
               optionImageUrls: row.original.optionImageUrls,
             }}
             stemClassName="group-hover:text-foreground"
+            // Not filterable: shown as tags on the question instead of their own columns.
+            meta={
+              <>
+                <Badge variant="default">{questionTypeLabel(row.original.type, true)}</Badge>
+                <Badge variant="default">{row.original.uses === 0 ? "Not used" : `Used in ${row.original.uses}`}</Badge>
+              </>
+            }
           />
         ),
       },
@@ -88,12 +95,6 @@ export function QuestionsTable({
         ),
       },
       {
-        id: "type",
-        header: "Type",
-        meta: { priority: "low" },
-        cell: ({ row }) => <Badge variant="default">{questionTypeLabel(row.original.type, true)}</Badge>,
-      },
-      {
         id: "status",
         header: "Status",
         meta: { priority: "medium" },
@@ -102,12 +103,6 @@ export function QuestionsTable({
             {questionStatusLabel(row.original.status)}
           </Badge>
         ),
-      },
-      {
-        id: "uses",
-        header: "Used in",
-        meta: { priority: "low", align: "right" },
-        cell: ({ row }) => <span className="text-muted-foreground">{row.original.uses} uses</span>,
       },
       {
         id: "actions",

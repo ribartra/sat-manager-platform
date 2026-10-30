@@ -198,7 +198,7 @@ export default async function FullTestDetailPage({ params, searchParams }: PageP
     const scope = await currentContentScope();
     const [questions, sources] = await Promise.all([findQuestionsWithOptionMediaAndSection({ status: { in: ["PUBLISHED", "DRAFT"] }, ...scope }), listSources()]);
     return (
-      <PageShell maxWidth={1180} width="wide">
+      <PageShell>
         {header}
         <FullTestEditor
           mediaLinks={(await requireContentImporter()) ? await contentMediaLinks("tests", test.id, test.modules.flatMap((module) => module.questions.map((item) => item.questionId))) : null}
@@ -220,7 +220,7 @@ export default async function FullTestDetailPage({ params, searchParams }: PageP
   }
 
   return (
-    <PageShell maxWidth={1180} width="wide">
+    <PageShell>
       {header}
       <PageContent>
       <TestModuleTiles modules={moduleViews} hrefFor={(m) => `#module-${m.key}`} />

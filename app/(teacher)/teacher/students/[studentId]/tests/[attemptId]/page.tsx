@@ -3,7 +3,8 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { SECTION_TEXT } from "@/components/sat/test-ui";
 import { notFound } from "next/navigation";
-import { AttemptStatusBadge, InvalidatedNotice, PageShell, TestResultSentence } from "@/components/sat";
+import { AttemptStatusBadge, InvalidatedNotice, PageHeader, PageShell, TestResultSentence } from "@/components/sat";
+import { PAGE_TITLE_CLASS } from "@/components/sat/page-shell";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
@@ -101,7 +102,7 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
   const first = attempt.student.name.split(" ")[0];
 
   return (
-    <PageShell maxWidth={1180}>
+    <PageShell>
       <Breadcrumbs
         items={[
           { label: "Home", href: "/teacher" },
@@ -117,9 +118,9 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
       {attempt.status === "INVALIDATED" ? <InvalidatedNotice audience="teacher" /> : null}
 
       {/* Header: same structure as a practice attempt (chips, title, tries, item line, info line). */}
-      <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-        <div className="min-w-0">
-          <div className="mb-1 flex flex-wrap items-center gap-2">
+      <PageHeader
+        eyebrow={
+          <>
             <Badge variant="test">Test</Badge>
             <AttemptStatusBadge status={attempt.status} />
             {siblings.length > 1 ? (
@@ -127,52 +128,58 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
                 All tries in History →
               </Link>
             ) : null}
-          </div>
-          <h1 className="text-xl font-semibold text-gray-900">
-            <Link href={`/teacher/tests/${attempt.testId}`} className="hover:text-[var(--sat-primary)] hover:underline" title="Open this test">
-              {attempt.test.name}
-            </Link>{" "}
-            · {first}&apos;s results
-          </h1>
-          <div className="mt-2">
-            <TryNavigator
-              current={tryNumber}
-              tries={siblings.map((s, i) => ({
-                number: i + 1,
-                href: buildProgressHref(`/teacher/students/${studentId}/tests/${s.id}`, filters, { area: "tests" }),
-                detail: [s.submittedAt ? formatDate(s.submittedAt) : "In progress", s.totalScore != null ? String(s.totalScore) : null].filter(Boolean).join(" · "),
-                invalidated: s.status === "INVALIDATED",
-              }))}
-            />
-          </div>
-          <p className="mt-0.5 text-xs text-gray-500">
-            Test:{" "}
-            <Link href={`/teacher/tests/${attempt.testId}`} className="font-medium text-[var(--sat-primary)] hover:underline">
-              {attempt.test.name}
-            </Link>
-            {attempt.test.source ? <> · Source: <b className="font-medium text-gray-700">{attempt.test.source.name}</b></> : null}
-          </p>
-          <p className="mt-1 text-xs text-gray-500">
-            Started <b className="font-medium text-gray-700">{formatDate(attempt.startedAt)}</b>
-            {" · "}
-            {attempt.submittedAt ? (
-              <>Completed <b className="font-medium text-gray-700">{formatDate(attempt.submittedAt)}</b> at {formatClock(attempt.submittedAt)} ({relativeDay(attempt.submittedAt)})</>
-            ) : "Not finished"}
-            {attempt.assignment?.dueDate ? <> · Due {formatDate(attempt.assignment.dueDate)}</> : null}
-            {attempt.pauses.length > 0 ? ` · Paused ${attempt.pauses.length} ${attempt.pauses.length === 1 ? "time" : "times"} (${formatDuration(pauseSeconds)})` : ""}
-            {attempt.timeExpiredEvents > 0 ? ` · Ran out of time ${attempt.timeExpiredEvents} ${attempt.timeExpiredEvents === 1 ? "time" : "times"}` : ""}
-            {attempt.extraTimeUsed > 0 ? ` · Extra time ${formatTime(attempt.extraTimeUsed)}` : ""}
-            {` · ${explanationsInPlayerLabel(attempt.showExplanations ?? attempt.assignment?.showExplanations)}`}
-          </p>
-        </div>
-        <AttemptHeaderActions
-          studentId={studentId}
-          studentName={attempt.student.name}
-          backHref={studentHref}
-          attempt={{ id: attempt.id, kind: "test", status: attempt.status }}
-          report={{ area: "tests", examLabel: `${attempt.test.name} · ${attempt.submittedAt ? formatDate(attempt.submittedAt) : ""} · ${attempt.totalScore ?? "—"}` }}
-        />
-      </div>
+          </>
+        }
+        title={
+          <>
+            <h1 className={PAGE_TITLE_CLASS}>
+              <Link href={`/teacher/tests/${attempt.testId}`} className="hover:text-[var(--sat-primary)] hover:underline" title="Open this test">
+                {attempt.test.name}
+              </Link>{" "}
+              · {first}&apos;s results
+            </h1>
+            <div className="mt-2">
+              <TryNavigator
+                current={tryNumber}
+                tries={siblings.map((s, i) => ({
+                  number: i + 1,
+                  href: buildProgressHref(`/teacher/students/${studentId}/tests/${s.id}`, filters, { area: "tests" }),
+                  detail: [s.submittedAt ? formatDate(s.submittedAt) : "In progress", s.totalScore != null ? String(s.totalScore) : null].filter(Boolean).join(" · "),
+                  invalidated: s.status === "INVALIDATED",
+                }))}
+              />
+            </div>
+            <p className="mt-0.5 text-xs text-gray-500">
+              Test:{" "}
+              <Link href={`/teacher/tests/${attempt.testId}`} className="font-medium text-[var(--sat-primary)] hover:underline">
+                {attempt.test.name}
+              </Link>
+              {attempt.test.source ? <> · Source: <b className="font-medium text-gray-700">{attempt.test.source.name}</b></> : null}
+            </p>
+            <p className="mt-1 text-xs text-gray-500">
+              Started <b className="font-medium text-gray-700">{formatDate(attempt.startedAt)}</b>
+              {" · "}
+              {attempt.submittedAt ? (
+                <>Completed <b className="font-medium text-gray-700">{formatDate(attempt.submittedAt)}</b> at {formatClock(attempt.submittedAt)} ({relativeDay(attempt.submittedAt)})</>
+              ) : "Not finished"}
+              {attempt.assignment?.dueDate ? <> · Due {formatDate(attempt.assignment.dueDate)}</> : null}
+              {attempt.pauses.length > 0 ? ` · Paused ${attempt.pauses.length} ${attempt.pauses.length === 1 ? "time" : "times"} (${formatDuration(pauseSeconds)})` : ""}
+              {attempt.timeExpiredEvents > 0 ? ` · Ran out of time ${attempt.timeExpiredEvents} ${attempt.timeExpiredEvents === 1 ? "time" : "times"}` : ""}
+              {attempt.extraTimeUsed > 0 ? ` · Extra time ${formatTime(attempt.extraTimeUsed)}` : ""}
+              {` · ${explanationsInPlayerLabel(attempt.showExplanations ?? attempt.assignment?.showExplanations)}`}
+            </p>
+          </>
+        }
+        actions={
+          <AttemptHeaderActions
+            studentId={studentId}
+            studentName={attempt.student.name}
+            backHref={studentHref}
+            attempt={{ id: attempt.id, kind: "test", status: attempt.status }}
+            report={{ area: "tests", examLabel: `${attempt.test.name} · ${attempt.submittedAt ? formatDate(attempt.submittedAt) : ""} · ${attempt.totalScore ?? "—"}` }}
+          />
+        }
+      />
 
       <TestResultSentence view={view} status={attempt.status} who={attempt.student.name.split(" ")[0]} />
 

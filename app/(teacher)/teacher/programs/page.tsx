@@ -1,5 +1,5 @@
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
-import { ListFilters, PageShell, matchesQuery } from "@/components/sat";
+import { ListFilters, PageHeader, PageShell, matchesQuery } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { getFeatureSetting } from "@/lib/app-settings";
@@ -58,10 +58,7 @@ export default async function TeacherProgramsPage({ searchParams }: { searchPara
   return (
     <PageShell>
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Programs" }]} />
-      <h1 className="mb-1 text-xl font-semibold text-gray-900">Programs</h1>
-      <p className="mb-6 text-sm text-gray-500">
-        Programs you teach. Leave end date blank for indefinite programs.
-      </p>
+      <PageHeader title="Programs" description="Programs you teach. Leave end date blank for indefinite programs." />
       <ListFilters
         action="/teacher/programs"
         q={query.q}

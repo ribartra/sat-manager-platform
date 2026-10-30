@@ -8,6 +8,7 @@ import {
   Delta,
   EmptyState,
   LinkTr,
+  PageHeader,
   PageShell,
   Pagination,
   RowAction,
@@ -35,7 +36,7 @@ import { PRACTICE_AREA_TABS, practiceAreaLabel, type PracticeAreaCode } from "@/
 import { historyHref, parseHistoryParams, type HistoryArea, type HistoryParams, HISTORY_STATUS_DEFAULT } from "@/lib/history-params";
 import { officialSkillsFor } from "@/lib/taxonomy-order";
 import { practiceSetTitle } from "@/lib/attempt-groups";
-import { HEADER_ACTION_CLASS } from "@/components/sat/header-actions";
+import { HEADER_ACTION_CLASS, HeaderActions } from "@/components/sat/header-actions";
 import { formatDuration, relativeDay } from "@/lib/utils";
 import { periodDates, periodParams, resolvePeriod } from "@/lib/period-filter";
 
@@ -141,7 +142,7 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
   const backHref = student ? `/teacher/students/${student.id}${backArea ? `?area=${backArea}` : ""}` : null;
 
   return (
-    <PageShell maxWidth={1180} width="wide">
+    <PageShell>
       <Breadcrumbs
         items={
           student
@@ -149,20 +150,24 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
             : [{ label: "Home", href: "/teacher" }, { label: "History" }]
         }
       />
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">{student ? `History · ${student.name}` : "History"}</h1>
-          <p className="mb-4 mt-0.5 text-sm text-gray-500">
+      <PageHeader
+        title={student ? `History · ${student.name}` : "History"}
+        description={
+          <>
             {context.length ? <b className="font-medium text-gray-700">{context.join(" · ")} · </b> : null}
-            Every practice set and Test {student ? student.name.split(" ")[0] : "your students"} took, newest first. Practice shows % correct; Tests show SAT section scores.
-          </p>
-        </div>
-        {backHref ? (
-          <Link href={backHref} className={HEADER_ACTION_CLASS}>
-            <ArrowLeft size={14} aria-hidden /> Back to {student!.name.split(" ")[0]}
-          </Link>
-        ) : null}
-      </div>
+              Every practice set and Test {student ? student.name.split(" ")[0] : "your students"} took, newest first. Practice shows % correct; Tests show SAT section scores.
+          </>
+        }
+        actions={
+          backHref ? (
+            <HeaderActions>
+              <Link href={backHref} className={HEADER_ACTION_CLASS}>
+                <ArrowLeft size={14} aria-hidden /> Back to {student!.name.split(" ")[0]}
+              </Link>
+            </HeaderActions>
+          ) : null
+        }
+      />
 
       <ListFilters
         action="/teacher/history"

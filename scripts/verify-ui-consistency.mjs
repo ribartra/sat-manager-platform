@@ -87,6 +87,17 @@ for (const file of files) {
   if (file.endsWith(".tsx")) {
     for (const problem of iconOnlyButtons(text)) failures.push(`${file}:${problem}`);
   }
+  // One page width and one title style for every view (PageShell / PageHeader).
+  // Sign-in / activation screens are centred cards, not pages.
+  const isCardScreen = file.startsWith(path.join("app", "(auth)")) || file.startsWith(path.join("app", "parent", "access"));
+  if (file.endsWith(".tsx") && !isUi && !isCardScreen) {
+    for (const m of text.matchAll(/<PageShell\b[^>]*\b(maxWidth=|width="(?:wide|narrow)")/g)) {
+      failures.push(`${file}:${lineOf(text, m.index)} PageShell width — every page uses the one PAGE_WIDTH`);
+    }
+    for (const m of text.matchAll(/<h1 className="[^"]*\btext-(?:xl|lg|2xl)\b/g)) {
+      failures.push(`${file}:${lineOf(text, m.index)} page title size — use PageHeader (PAGE_TITLE_CLASS)`);
+    }
+  }
   if (isApi) {
     for (const m of text.matchAll(/NextResponse\.json\(\s*\{\s*error\s*:/g)) {
       failures.push(`${file}:${lineOf(text, m.index)} inline error response — use an ApiError subclass`);

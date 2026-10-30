@@ -1,5 +1,5 @@
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
-import { ListFilters, PageShell, Pagination, RoleBadge, pageFromParam, pageSizeFromParam } from "@/components/sat";
+import { ListFilters, PageHeader, PageShell, Pagination, RoleBadge, pageFromParam, pageSizeFromParam } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
@@ -97,10 +97,9 @@ export default async function AdminLogsPage({ searchParams }: PageProps) {
   const params = { cat: tab.id === "all" ? undefined : tab.id, user: userFilter, action: actionFilter, outcome: outcomeFilter, role: roleFilter, per: String(pageSize) };
 
   return (
-    <PageShell width="wide">
+    <PageShell>
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Admin" }, { label: "Audit Log" }]} />
-      <h1 className="mb-1 text-xl font-semibold text-gray-900">Activity log</h1>
-      <p className="mb-4 text-sm text-gray-500">Every action by users, newest first.</p>
+      <PageHeader title="Activity log" description="Every action by users, newest first." />
 
       <ListFilters
         action="/admin/logs"

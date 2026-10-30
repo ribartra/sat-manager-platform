@@ -55,12 +55,12 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
     role: user.role,
     active: user.active,
     validationStatus: user.validationStatus,
-    reviewedLabel: user.validationReviewedAt ? user.validationReviewedAt.toLocaleString("en-US") : "-",
+    reviewedLabel: user.validationReviewedAt ? user.validationReviewedAt.toLocaleString("en-US") : "",
     isSelf: user.id === session.user.id,
   }));
 
   return (
-    <PageShell width="wide">
+    <PageShell>
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Admin" }, { label: "Accounts" }]} />
       <PageHeader
         title="Account Validation"

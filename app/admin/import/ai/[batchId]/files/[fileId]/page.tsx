@@ -6,7 +6,8 @@ import { parseTarget } from "@/lib/quick-import";
 import { randomUUID } from "crypto";
 import { redirect } from "next/navigation";
 import { Card } from "@/components/ui/card";
-import { PageShell } from "@/components/sat";
+import { PageHeader, PageShell } from "@/components/sat";
+import { HEADER_ACTION_CLASS, HeaderActions } from "@/components/sat/header-actions";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { computeCropImageSources } from "@/lib/ingest-crop-source";
@@ -180,8 +181,7 @@ export default async function AiImportFileReviewPage({ params, searchParams }: P
       </div>
 
       <div className="min-w-0 space-y-6">
-      <div className="flex items-center justify-between gap-3">
-        <div>
+      <div className="mb-0">
           {/* "Import with AI" batches come back to their wizard (step 3); OCR batches to AI Import. */}
           {batch?.importMode === "AI_CSV" ? (
             <>
@@ -201,20 +201,25 @@ export default async function AiImportFileReviewPage({ params, searchParams }: P
           ) : (
             <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Admin" }, { label: "AI Import", href: `/admin/import/ai?batch=${batchId}` }, { label: "Review file" }]} />
           )}
-          <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Review File</h1>
-          <p className="mt-1 text-sm text-gray-500">{file.relativePath}</p>
-        </div>
-        {batch?.importMode === "AI_CSV" ? (
-          <Link href={`/teacher/import/${batchId}#step-3`} className="shrink-0 self-start rounded-lg border border-[var(--sat-border)] bg-white px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-[var(--sat-primary-soft)]">
-            ← Back to step 3
-          </Link>
-        ) : (
-          <Card padding="md">
-            <p className="text-xs uppercase text-gray-400">Estimated processing time</p>
-            <p className="mt-1 text-lg font-semibold text-gray-900">{formatDuration(estimatedSeconds)}</p>
-            <p className="mt-1 text-xs text-gray-500">{estimatedPages} pages · {secondsPerPage.toFixed(1)} sec/page</p>
-          </Card>
-        )}
+          <PageHeader
+            title="Review File"
+            description={file.relativePath}
+            actions={
+              <HeaderActions>
+                {batch?.importMode === "AI_CSV" ? (
+                  <Link href={`/teacher/import/${batchId}#step-3`} className={HEADER_ACTION_CLASS}>
+                    ← Back to step 3
+                  </Link>
+                ) : (
+                  <Card padding="md">
+                    <p className="text-xs uppercase text-gray-400">Estimated processing time</p>
+                    <p className="mt-1 text-lg font-semibold text-gray-900">{formatDuration(estimatedSeconds)}</p>
+                    <p className="mt-1 text-xs text-gray-500">{estimatedPages} pages · {secondsPerPage.toFixed(1)} sec/page</p>
+                  </Card>
+                )}
+              </HeaderActions>
+            }
+          />
       </div>
 
       {extractedTest && (

@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { PageShell } from "@/components/sat";
+import { PageHeader, PageShell } from "@/components/sat";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { requireContentImporter } from "@/lib/rbac";
 import { listSources } from "@/lib/content-source";
@@ -27,7 +27,7 @@ export default async function QuickImportPage({ searchParams }: PageProps) {
     listSources({ activeOnly: true, kind: "tests" }),
   ]);
   return (
-    <PageShell width="wide">
+    <PageShell>
       <Breadcrumbs
         items={[
           { label: "Home", href: "/teacher" },
@@ -36,11 +36,15 @@ export default async function QuickImportPage({ searchParams }: PageProps) {
           { label: "Step 1 · What & PDF" },
         ]}
       />
-      <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Import with AI</h1>
-      <p className="mb-4 mt-1 text-sm text-gray-500">
-        Choose what you import and upload the PDF, ask an AI (ChatGPT, Claude, Gemini…) to turn it into a CSV, then check the questions, crop the figures and
-        create the Draft.
-      </p>
+      <PageHeader
+        title="Import with AI"
+        description={
+          <>
+            Choose what you import and upload the PDF, ask an AI (ChatGPT, Claude, Gemini…) to turn it into a CSV, then check the questions, crop the figures and
+            create the Draft.
+          </>
+        }
+      />
       <ImportSteps current={1} />
       <ImportTargetForm
         skills={{ MATH: math, READING: reading, WRITING: writing }}

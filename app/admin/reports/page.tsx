@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
-import { ListFilters, PageShell, Pagination, RoleBadge, pageFromParam, pageSizeFromParam, paginate } from "@/components/sat";
+import { ListFilters, PageHeader, PageShell, Pagination, RoleBadge, pageFromParam, pageSizeFromParam, paginate } from "@/components/sat";
 import { ChevronCell, LinkTr, RowLink, SimpleTable, TD } from "@/components/sat/link-table";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
@@ -67,12 +67,12 @@ export default async function AdminReportsPage({ searchParams }: { searchParams:
   const reportPage = paginate(reports, pageFromParam(page), pageSize);
 
   return (
-    <PageShell width="wide">
+    <PageShell>
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Admin" }, { label: "Reports" }]} />
-      <h1 className="mb-1 text-xl font-semibold text-gray-900">Reports</h1>
-      <p className="mb-4 text-sm text-gray-500">
-        Problems and suggestions users sent with “Report a problem”. Each one is emailed to the SAT team and, when set up, sent to the coding agent. An admin or the agent marks it fixed.
-      </p>
+      <PageHeader
+        title="Reports"
+        description="Problems and suggestions users sent with “Report a problem”. Each one is emailed to the SAT team and, when set up, sent to the coding agent. An admin or the agent marks it fixed."
+      />
 
       <div className="mb-4 flex flex-wrap gap-2">
         {TABS.map((item) => (
@@ -103,7 +103,7 @@ export default async function AdminReportsPage({ searchParams }: { searchParams:
           {tab.id === "open" ? "No open reports." : "No reports here yet."}
         </p>
       ) : (
-        <SimpleTable head={["When", "From", "Type", "Comment", "Page", "Email", ""]}>
+        <SimpleTable head={["When", "From", "Type", "Comment", ""]}>
           {reportPage.items.map((r) => {
             const cat = issueCategoryMeta(r.category);
             return (
@@ -123,12 +123,20 @@ export default async function AdminReportsPage({ searchParams }: { searchParams:
                     <span className="ml-1 rounded bg-blue-50 px-1.5 py-0.5 text-[11px] text-blue-700">In progress</span>
                   ) : null}
                 </td>
-                <td className={`${TD} max-w-[22rem]`}><p className="line-clamp-2 text-gray-800">{r.comment}</p></td>
-                <td className={`${TD} max-w-[14rem]`}>
-                  <p className="truncate text-gray-700">{r.pageTitle || "—"}</p>
-                  <p className="truncate font-mono text-[11px] text-gray-400">{new URL(r.url).pathname}</p>
+                <td className={TD}>
+                  <p className="line-clamp-2 text-gray-800">{r.comment}</p>
+                  {/* Not filterable: the page and the email go as tags under the comment, not as columns. */}
+                  <span className="mt-1 flex flex-wrap items-center gap-1.5 text-[11px]">
+                    <span className="max-w-[18rem] truncate rounded bg-[var(--sat-surface-2)] px-1.5 py-0.5 text-gray-600" title={r.url}>
+                      {r.pageTitle || new URL(r.url).pathname}
+                    </span>
+                    {r.emailSentAt ? (
+                      <span className="rounded bg-green-50 px-1.5 py-0.5 text-green-700">Email sent</span>
+                    ) : (
+                      <span className="rounded bg-red-50 px-1.5 py-0.5 text-red-600">Email not sent</span>
+                    )}
+                  </span>
                 </td>
-                <td className={`${TD} text-xs`}>{r.emailSentAt ? <span className="text-green-700">Sent</span> : <span className="text-red-600">Not sent</span>}</td>
                 <ChevronCell />
               </LinkTr>
             );

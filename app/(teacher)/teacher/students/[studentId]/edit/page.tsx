@@ -1,5 +1,5 @@
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
-import { PageShell } from "@/components/sat";
+import { PageHeader, PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import { studentAccessWhereFor } from "@/lib/program-scope";
@@ -21,9 +21,9 @@ export default async function EditStudentPage({ params }: PageProps) {
   if (!student) notFound();
 
   return (
-    <PageShell width="narrow">
+    <PageShell>
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Students", href: "/teacher/students" }, { label: student.name, href: `/teacher/students/${student.id}` }, { label: "Edit" }]} />
-      <h1 className="mb-6 text-[26px] font-bold tracking-[-0.3px] text-gray-900">Edit Student</h1>
+      <PageHeader title="Edit Student" />
       <EditStudentForm
         student={{
           id: student.id,

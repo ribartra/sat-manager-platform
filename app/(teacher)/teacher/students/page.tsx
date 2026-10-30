@@ -1,7 +1,7 @@
 import { RevokeInviteButton } from "./revoke-invite-button";
 import Link from "next/link";
 import { ChevronRight, UserPlus } from "lucide-react";
-import { DateCell, EmptyState, ListFilters, PageShell, StudentCell } from "@/components/sat";
+import { DateCell, EmptyState, ListFilters, PageHeader, PageShell, StudentCell } from "@/components/sat";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { HEADER_SHORTCUT_CLASS, HeaderActions } from "@/components/sat/header-actions";
 import { Badge } from "@/components/ui/badge";
@@ -72,23 +72,25 @@ export default async function TeacherStudentsPage({ searchParams }: PageProps) {
   ]);
 
   return (
-    <PageShell maxWidth={1100} width="wide">
+    <PageShell>
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Students" }]} />
-      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Students</h1>
-          <p className="mt-0.5 text-sm text-gray-500">
+      <PageHeader
+        title="Students"
+        description={
+          <>
             {all.length} student{all.length === 1 ? "" : "s"} · {invitedTotal} pending invitation{invitedTotal === 1 ? "" : "s"}
-          </p>
-        </div>
-        <HeaderActions>
-          {/* The students' parents (with the way back here). */}
-          <Link href="/teacher/parents" className={HEADER_SHORTCUT_CLASS}>Parents →</Link>
-          <Link href="/teacher/students/invite" className="inline-flex items-center gap-1.5 self-start shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]">
-          <UserPlus size={14} /> Invite student
-          </Link>
-        </HeaderActions>
-      </div>
+          </>
+        }
+        actions={
+          <HeaderActions>
+            {/* The students' parents (with the way back here). */}
+            <Link href="/teacher/parents" className={HEADER_SHORTCUT_CLASS}>Parents →</Link>
+            <Link href="/teacher/students/invite" className="inline-flex items-center gap-1.5 self-start shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]">
+            <UserPlus size={14} /> Invite student
+            </Link>
+          </HeaderActions>
+        }
+      />
 
       <MoreLinks links={moreLinks} />
 

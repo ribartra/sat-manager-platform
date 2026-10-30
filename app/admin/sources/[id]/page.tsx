@@ -57,7 +57,7 @@ export default async function AdminSourcePage({ params }: { params: Promise<{ id
     });
 
   return (
-    <PageShell width="wide">
+    <PageShell>
       <Breadcrumbs items={[{ label: "Admin" }, { label: "Sources", href: "/admin/sources" }, { label: source.name }]} />
       <SourceDetailClient
         source={{ id: source.id, name: source.name, active: source.active, forPracticeSets: source.forPracticeSets, forTests: source.forTests }}

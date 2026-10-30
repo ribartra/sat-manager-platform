@@ -1,6 +1,7 @@
 import {
   EmptyState,
   LinkTabs,
+  PageHeader,
   PageShell,
   PracticeSetAttemptsAccordion,
   Pagination,
@@ -40,6 +41,7 @@ import { FilterActions, FilterBar, FilterField } from "@/components/sat/filter-b
 import { PeriodFilter } from "@/components/sat/period-filter";
 import { Select } from "@/components/ui/select";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import { HeaderActions } from "@/components/sat/header-actions";
 import { AreaTag } from "@/components/sat/practice-set-row";
 import { loadStudentSessions, type StudentSession } from "@/lib/session-history";
 
@@ -120,9 +122,9 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
     // A day heading before the first session of each day.
     const headings = sessionPage.items.map((x, i) => (i === 0 || dayOf(sessionPage.items[i - 1].s.at) !== dayOf(x.s.at) ? dayOf(x.s.at) : null));
     return (
-      <PageShell width="wide" density="compact" className="space-y-4">
+      <PageShell className="space-y-4">
         <Breadcrumbs items={[{ label: "Home", href: "/student" }, { label: "History", href: "/student/history" }, { label: "By session" }]} />
-        <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">My history</h1>
+        <PageHeader title="My history" />
         {historyTabs}
         <FilterBar action="/student/history">
           <input type="hidden" name="area" value="sessions" />
@@ -249,10 +251,12 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
     const examPage = paginate(testRows, requestedPage, pageSize);
 
     return (
-      <PageShell width="wide" density="compact" className="space-y-4">
+      <PageShell className="space-y-4">
         <Breadcrumbs items={[{ label: "Home", href: "/student" }, { label: "History", href: "/student/history" }, { label: "Tests" }]} />
-        <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">My history</h1>
-        <p className="text-sm text-gray-500">Every Test attempt is saved, including tests you haven&apos;t finished. Open a test to see every try; click a try to see the results.</p>
+        <PageHeader
+          title="My history"
+          description="Every Test attempt is saved, including tests you haven't finished. Open a test to see every try; click a try to see the results."
+        />
         {historyTabs}
         <ProgressFilters action="/student/history" filters={filters} topics={[]} period={period} />
 
@@ -286,15 +290,17 @@ export default async function StudentHistoryPage({ searchParams }: PageProps) {
   const setGroups = practiceSetGroups(setsFromReportAttempts(report.attemptHistory), ALL_TRIES);
   const historyPage = paginate(setGroups, requestedPage, pageSize);
   return (
-    <PageShell width="wide" density="compact" className="space-y-4">
+    <PageShell className="space-y-4">
       <Breadcrumbs items={[{ label: "Home", href: "/student" }, { label: "History", href: "/student/history" }, { label: `Practice · ${practiceAreaLabel(practiceArea)}` }]} />
-      <header className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">My history</h1>
-          <p className="mt-0.5 text-sm text-gray-500">Review your {practiceAreaLabel(practiceArea).toLowerCase()} practice and find your next focus area.</p>
-        </div>
-        <p className="text-xs text-gray-500">{counted.length} finished attempt{counted.length === 1 ? "" : "s"}</p>
-      </header>
+      <PageHeader
+        title="My history"
+        description={<>Review your {practiceAreaLabel(practiceArea).toLowerCase()} practice and find your next focus area.</>}
+        actions={
+          <HeaderActions>
+            <p className="text-xs text-gray-500">{counted.length} finished attempt{counted.length === 1 ? "" : "s"}</p>
+          </HeaderActions>
+        }
+      />
       {historyTabs}
 
       {setGroups.length === 0 ? (

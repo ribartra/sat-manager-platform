@@ -1,4 +1,4 @@
-import { PageShell } from "@/components/sat";
+import { PageHeader, PageShell } from "@/components/sat";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
@@ -89,8 +89,9 @@ function EnrolledView({ enrollment }: { enrollment: Enrollment }) {
   const { program } = enrollment;
   const teachers = program.teachers.map((t) => t.teacher.name).join(", ") || "—";
   return (
-    <PageShell width="narrow">
+    <PageShell>
       <Breadcrumbs items={[{ label: "Home", href: "/student" }, { label: "Programs" }]} />
+      <PageHeader title="Programs" />
       <Card variant="success" padding="lg">
         <div className="flex items-center gap-3 mb-6">
           <div className="rounded-full bg-green-100 p-2.5">
@@ -98,7 +99,7 @@ function EnrolledView({ enrollment }: { enrollment: Enrollment }) {
           </div>
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-green-700">Your program</p>
-            <h1 className="text-xl font-semibold text-gray-900">{program.name}</h1>
+            <h2 className="text-xl font-semibold text-gray-900">{program.name}</h2>
           </div>
           <Badge variant="success" className="ml-auto">Active</Badge>
         </div>
@@ -133,14 +134,15 @@ function EnrolledView({ enrollment }: { enrollment: Enrollment }) {
 
 function PendingView({ program, requestedAt }: { program: { name: string }; requestedAt: Date }) {
   return (
-    <PageShell width="narrow">
+    <PageShell>
       <Breadcrumbs items={[{ label: "Home", href: "/student" }, { label: "Programs" }]} />
+      <PageHeader title="Programs" />
       <Card variant="warning" padding="lg" className="text-center">
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-amber-100">
           <Clock size={24} className="text-amber-600" />
         </div>
         <Badge variant="warning" className="mb-3">Waiting for approval</Badge>
-        <h1 className="text-lg font-semibold text-gray-900 mb-2">Request sent</h1>
+        <h2 className="text-lg font-semibold text-gray-900 mb-2">Request sent</h2>
         <p className="text-sm text-gray-600 mb-6">
           Your request to join <strong>{program.name}</strong> is waiting for your teacher to
           approve it. You&apos;ll be able to use everything once it&apos;s approved.
@@ -155,13 +157,14 @@ function PendingView({ program, requestedAt }: { program: { name: string }; requ
 
 function NoProgramView() {
   return (
-    <PageShell width="narrow">
+    <PageShell>
       <Breadcrumbs items={[{ label: "Home", href: "/student" }, { label: "Programs" }]} />
+      <PageHeader title="Programs" />
       <div className="mb-8 text-center">
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-100">
           <FolderOpen size={24} className="text-blue-600" />
         </div>
-        <h1 className="text-xl font-semibold text-gray-900">You&apos;re not in a program yet</h1>
+        <h2 className="text-xl font-semibold text-gray-900">You&apos;re not in a program yet</h2>
         <p className="mt-1 text-sm text-gray-500">
           Your teacher needs to add you to a program before you can start practicing.
         </p>

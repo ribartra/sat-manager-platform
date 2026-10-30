@@ -59,7 +59,7 @@ export default function ChangePasswordPage() {
   const loading = form.formState.isSubmitting;
 
   return (
-    <PageShell width="narrow" density="comfortable">
+    <PageShell>
       <PageHeader title="Change password" />
       <Card padding="lg">
         <Form {...form}>

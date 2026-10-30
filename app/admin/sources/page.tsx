@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
-import { PageShell } from "@/components/sat";
+import { PageHeader, PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/rbac";
 import { SourcesClient } from "./sources-client";
@@ -16,11 +16,15 @@ export default async function AdminSourcesPage() {
   return (
     <PageShell>
       <Breadcrumbs items={[{ label: "Admin" }, { label: "Sources" }]} />
-      <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Sources</h1>
-      <p className="mb-4 mt-1 text-sm text-gray-500">
-        Where Practice Sets and Tests come from. Each set or test has one source; “Used for” sets where it can be chosen: Practice Sets (each opens per source in Practice › By skill) and/or Tests.
-        A source in use can&apos;t be deleted — deactivate it to hide it from the editors.
-      </p>
+      <PageHeader
+        title="Sources"
+        description={
+          <>
+            Where Practice Sets and Tests come from. Each set or test has one source; “Used for” sets where it can be chosen: Practice Sets (each opens per source in Practice › By skill) and/or Tests.
+            A source in use can&apos;t be deleted — deactivate it to hide it from the editors.
+          </>
+        }
+      />
       <SourcesClient
         sources={sources.map((s) => ({ id: s.id, name: s.name, active: s.active, forPracticeSets: s.forPracticeSets, forTests: s.forTests, practiceSets: s._count.practiceSets, tests: s._count.fullPracticeTests }))}
       />

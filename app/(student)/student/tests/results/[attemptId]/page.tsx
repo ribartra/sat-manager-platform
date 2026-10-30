@@ -3,7 +3,8 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { SECTION_TEXT } from "@/components/sat/test-ui";
 import { notFound } from "next/navigation";
-import { InvalidatedNotice, PageShell, TestResultSentence, isInvalidated } from "@/components/sat";
+import { InvalidatedNotice, PageHeader, PageShell, TestResultSentence, isInvalidated } from "@/components/sat";
+import { PAGE_TITLE_CLASS } from "@/components/sat/page-shell";
 import { HEADER_ACTION_CLASS, HeaderActions } from "@/components/sat/header-actions";
 import { RetakeTestButton } from "@/components/sat/retake-test-button";
 import { Alert } from "@/components/sat/alert";
@@ -109,7 +110,7 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
   const pendingModules = view.modules.filter((m) => m.state !== "done");
 
   return (
-    <PageShell maxWidth={960}>
+    <PageShell>
       <Breadcrumbs
         items={[
           { label: "Home", href: "/student" },
@@ -135,25 +136,31 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
       {invalidated ? <InvalidatedNotice audience="student" /> : null}
 
       {/* Header: same structure as a practice result and as the teacher's view (chips, title, tries, info). */}
-      <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-        <div className="min-w-0">
-          <div className="mb-1 flex flex-wrap items-center gap-2">
+      <PageHeader
+        eyebrow={
+          <>
             <Badge variant="test">Test</Badge>
             {inProgress ? <Badge variant="warning">In progress</Badge> : invalidated ? null : <Badge variant="success">Completed</Badge>}
-          </div>
-          <h1 className="text-xl font-semibold text-gray-900">{attempt.test.name} results</h1>
-          <div className="mt-2">
-            <TryNavigator
-              current={tryNumber}
-              tries={siblings.map((s, i) => ({
-                number: i + 1,
-                href: `/student/tests/results/${s.id}`,
-                detail: [s.submittedAt ? formatDate(s.submittedAt) : "In progress", s.totalScore != null ? String(s.totalScore) : null].filter(Boolean).join(" · "),
-                invalidated: s.status === "INVALIDATED",
-              }))}
-            />
-          </div>
-          <p className="mt-1 text-xs text-gray-500">
+          </>
+        }
+        title={
+          <>
+            <h1 className={PAGE_TITLE_CLASS}>{attempt.test.name} results</h1>
+            <div className="mt-2">
+              <TryNavigator
+                current={tryNumber}
+                tries={siblings.map((s, i) => ({
+                  number: i + 1,
+                  href: `/student/tests/results/${s.id}`,
+                  detail: [s.submittedAt ? formatDate(s.submittedAt) : "In progress", s.totalScore != null ? String(s.totalScore) : null].filter(Boolean).join(" · "),
+                  invalidated: s.status === "INVALIDATED",
+                }))}
+              />
+            </div>
+          </>
+        }
+        description={
+          <span className="text-xs">
             {attempt.test.source ? <>Source: <b className="font-medium text-gray-700">{attempt.test.source.name}</b> · </> : null}
             Started <b className="font-medium text-gray-700">{formatDate(attempt.startedAt)}</b>
             {attempt.submittedAt ? (
@@ -161,13 +168,15 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
             ) : null}
             {attempt.assignment?.dueDate ? <> · Due {formatDate(attempt.assignment.dueDate)}</> : null}
             {` · ${explanationsInPlayerLabel(attempt.showExplanations ?? attempt.assignment?.showExplanations)}`}
-          </p>
-        </div>
-        <HeaderActions>
-          {canRetake && attempt.assignmentId ? <RetakeTestButton assignmentId={attempt.assignmentId} testName={attempt.test.name} /> : null}
-          <Link href="/student/tests?view=completed" className={HEADER_ACTION_CLASS}>All tests</Link>
-        </HeaderActions>
-      </div>
+          </span>
+        }
+        actions={
+          <HeaderActions>
+            {canRetake && attempt.assignmentId ? <RetakeTestButton assignmentId={attempt.assignmentId} testName={attempt.test.name} /> : null}
+            <Link href="/student/tests?view=completed" className={HEADER_ACTION_CLASS}>All tests</Link>
+          </HeaderActions>
+        }
+      />
 
       <TestResultSentence view={view} status={attempt.status} who="You" />
 

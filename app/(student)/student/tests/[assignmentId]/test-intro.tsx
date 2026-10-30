@@ -80,7 +80,7 @@ export async function TestIntro({
     );
 
   return (
-    <PageShell maxWidth={720}>
+    <PageShell>
       <Breadcrumbs
         items={[
           { label: "Home", href: "/student" },

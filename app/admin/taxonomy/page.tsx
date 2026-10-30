@@ -1,5 +1,5 @@
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
-import { PageShell } from "@/components/sat";
+import { PageHeader, PageShell } from "@/components/sat";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/rbac";
@@ -42,8 +42,7 @@ export default async function AdminTaxonomyPage() {
   return (
     <PageShell>
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Admin" }, { label: "Taxonomy" }]} />
-      <h1 className="mb-2 text-[26px] font-bold tracking-[-0.3px] text-gray-900">Taxonomy</h1>
-      <p className="mb-6 text-sm text-gray-500">Academic hierarchy used by Practice, the question bank and import review.</p>
+      <PageHeader title="Taxonomy" description="Academic hierarchy used by Practice, the question bank and import review." />
       <TaxonomyAliasesClient rows={rows} />
       <TaxonomyClient nodes={nodes.map((node) => ({
         id: node.id,
