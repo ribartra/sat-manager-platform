@@ -6,7 +6,6 @@ import {
   FolderOpen,
   Map,
   FileText,
-  HelpCircle,
   Layers,
   ClipboardList,
   BookOpen,
@@ -119,7 +118,7 @@ export const TEACHER_MORE_LINKS: Record<"students" | "practice", NavLinkDef[]> =
     { id: "teacher.students.parents", label: "Parents", href: "/teacher/parents", icon: UserCheck },
   ],
   practice: [
-    { id: "teacher.practice.questions", label: "Questions", href: "/teacher/questions", icon: HelpCircle },
+    // Questions: a "Questions →" shortcut in the Practice and Tests headers (same area), not a chip here.
     {
       id: "teacher.practice.materials",
       label: "Materials",

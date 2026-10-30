@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { PageSelect } from "@/components/sat/page-select";
 
 /** Reads a 1-based page number from a search param; anything invalid is page 1. */
 export function pageFromParam(value: string | string[] | undefined) {
@@ -29,10 +30,12 @@ export function paginate<T>(items: T[], page: number, pageSize: number) {
 }
 
 /**
- * Prev / "Page X of Y" / Next links for server-rendered lists. Keeps every other search param
- * (filters, the other list's page) and only changes `param`. Every list shows PAGE_SIZE (25) rows;
- * admin lists pass `pageSizeParam` to also offer 25 / 50 / 100, keeping the filters (back to page 1).
- * Renders nothing when there is only one page and nothing to choose.
+ * The page navigation of every paginated list: a bar under the list that stays on screen at the bottom
+ * while the list scrolls (the same white box and shadow as the sticky filter bar at the top), centered:
+ * Previous · Page [n] of N · Next, with "Showing x–y of n". Keeps every other search param (filters,
+ * the other list's page) and only changes `param`. Every list shows PAGE_SIZE (25) rows; admin lists
+ * pass `pageSizeParam` to also offer 25 / 50 / 100 (back to page 1). Renders nothing when there is
+ * only one page and nothing to choose.
  */
 export function Pagination({
   basePath,
@@ -44,7 +47,6 @@ export function Pagination({
   pageSize,
   anchor,
   pageSizeParam,
-  compact = false,
   className,
 }: {
   basePath: string;
@@ -58,11 +60,8 @@ export function Pagination({
   anchor?: string;
   /** Param of the rows-per-page choice (e.g. "per"); omitted = fixed page size. */
   pageSizeParam?: string;
-  /** Small "x–y of n ‹ ›" for the sticky filter bar (FilterBar `pager`); the full pager stays below the list. */
-  compact?: boolean;
   className?: string;
 }) {
-  if (compact && pageCount <= 1) return null;
   const sizes = pageSizeParam && total > PAGE_SIZES[0];
   if (pageCount <= 1 && !sizes) return null;
   const hrefFor = (target: number, size = pageSize) => {
@@ -75,39 +74,38 @@ export function Pagination({
   };
   const first = (page - 1) * pageSize + 1;
   const last = Math.min(page * pageSize, total);
-  // Mockup `.pager`: "Showing x–y of n" + 32px page buttons (current filled blue), windowed around the current page.
-  const pages = Array.from(new Set([1, page - 1, page, page + 1, pageCount]))
-    .filter((p) => p >= 1 && p <= pageCount)
-    .sort((x, y) => x - y);
-  if (compact) {
-    const small = "inline-flex size-7 items-center justify-center rounded-md border";
-    return (
-      <nav aria-label="Pages" className={cn("flex items-center gap-1.5 text-xs text-[var(--sat-muted)]", className)}>
-        <span className="whitespace-nowrap">{first}–{last} of {total}</span>
-        {page > 1 ? (
-          <Link href={hrefFor(page - 1)} rel="prev" aria-label="Previous page" className={`${small} border-[var(--sat-border-strong)] bg-white text-[var(--sat-text)] hover:bg-[var(--sat-surface-2)]`}><ChevronLeft size={14} /></Link>
-        ) : (
-          <span aria-disabled className={`${small} border-[var(--sat-border)] text-[var(--sat-blank)]`}><ChevronLeft size={14} /></span>
-        )}
-        <span className="whitespace-nowrap font-semibold text-[var(--sat-text)]">{page} / {pageCount}</span>
-        {page < pageCount ? (
-          <Link href={hrefFor(page + 1)} rel="next" aria-label="Next page" className={`${small} border-[var(--sat-border-strong)] bg-white text-[var(--sat-text)] hover:bg-[var(--sat-surface-2)]`}><ChevronRight size={14} /></Link>
-        ) : (
-          <span aria-disabled className={`${small} border-[var(--sat-border)] text-[var(--sat-blank)]`}><ChevronRight size={14} /></span>
-        )}
-      </nav>
-    );
-  }
-  const btn = "inline-flex h-8 min-w-8 items-center justify-center rounded-lg border px-2 text-sm font-semibold";
+  const btn = "inline-flex h-8 items-center gap-1 rounded-lg border px-2.5 text-sm font-semibold";
   const idle = `${btn} border-[var(--sat-border-strong)] bg-white text-[var(--sat-text)] hover:bg-[var(--sat-surface-2)]`;
   const off = `${btn} cursor-default border-[var(--sat-border)] bg-white text-[var(--sat-blank)]`;
   return (
-    <nav aria-label="Pagination" className={cn("mt-2.5 flex flex-wrap items-center justify-between gap-2.5 text-xs text-[var(--sat-muted)]", className)}>
-      <span className="flex flex-wrap items-center gap-2">
-        Showing {first}–{last} of {total}
+    <nav
+      aria-label="Pagination"
+      className={cn(
+        // Sticks to the bottom of the screen while the list scrolls (desktop), like the filter bar at the top.
+        "z-20 mt-3 flex justify-center md:sticky md:bottom-2",
+        className,
+      )}
+    >
+      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 rounded-[var(--sat-radius)] border border-[var(--sat-border)] bg-white px-3 py-2 text-xs text-[var(--sat-muted)] shadow-[0_-6px_14px_-12px_rgba(15,23,42,0.35)]">
+        <span className="whitespace-nowrap">Showing {first}–{last} of {total}</span>
+        {pageCount > 1 ? (
+          <div className="flex items-center gap-2 text-sm text-[var(--sat-text)]">
+            {page > 1 ? (
+              <Link href={hrefFor(page - 1)} rel="prev" className={idle}><ChevronLeft size={14} aria-hidden /> Previous</Link>
+            ) : (
+              <span aria-disabled className={off}><ChevronLeft size={14} aria-hidden /> Previous</span>
+            )}
+            <PageSelect page={page} hrefs={Array.from({ length: pageCount }, (_, index) => hrefFor(index + 1))} />
+            {page < pageCount ? (
+              <Link href={hrefFor(page + 1)} rel="next" className={idle}>Next <ChevronRight size={14} aria-hidden /></Link>
+            ) : (
+              <span aria-disabled className={off}>Next <ChevronRight size={14} aria-hidden /></span>
+            )}
+          </div>
+        ) : null}
         {sizes ? (
-          <span className="flex items-center gap-1" aria-label="Rows per page">
-            · Rows per page
+          <span className="flex items-center gap-1 whitespace-nowrap" aria-label="Rows per page">
+            Rows per page
             {PAGE_SIZES.map((size) =>
               size === pageSize ? (
                 <span key={size} aria-current="true" className="rounded-md bg-[var(--sat-primary-soft)] px-1.5 py-0.5 font-semibold text-[var(--sat-primary)]">{size}</span>
@@ -117,31 +115,7 @@ export function Pagination({
             )}
           </span>
         ) : null}
-      </span>
-      {pageCount > 1 ? (
-      <div className="flex items-center gap-1.5">
-        {page > 1 ? (
-          <Link href={hrefFor(page - 1)} rel="prev" aria-label="Previous page" className={idle}><ChevronLeft size={14} /></Link>
-        ) : (
-          <span aria-disabled className={off}><ChevronLeft size={14} /></span>
-        )}
-        {pages.map((p, i) => (
-          <span key={p} className="flex items-center gap-1.5">
-            {i > 0 && p - pages[i - 1] > 1 ? <span aria-hidden>…</span> : null}
-            {p === page ? (
-              <span aria-current="page" className={`${btn} border-[var(--sat-primary)] bg-[var(--sat-primary)] text-white`}>{p}</span>
-            ) : (
-              <Link href={hrefFor(p)} aria-label={`Page ${p}`} className={idle}>{p}</Link>
-            )}
-          </span>
-        ))}
-        {page < pageCount ? (
-          <Link href={hrefFor(page + 1)} rel="next" aria-label="Next page" className={idle}><ChevronRight size={14} /></Link>
-        ) : (
-          <span aria-disabled className={off}><ChevronRight size={14} /></span>
-        )}
       </div>
-      ) : null}
     </nav>
   );
 }

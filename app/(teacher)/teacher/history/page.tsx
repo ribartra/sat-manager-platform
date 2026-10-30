@@ -36,7 +36,7 @@ import { historyHref, parseHistoryParams, type HistoryArea, type HistoryParams, 
 import { officialSkillsFor } from "@/lib/taxonomy-order";
 import { practiceSetTitle } from "@/lib/attempt-groups";
 import { HEADER_ACTION_CLASS } from "@/components/sat/header-actions";
-import { formatDate, formatDuration, relativeDay } from "@/lib/utils";
+import { formatDuration, relativeDay } from "@/lib/utils";
 import { periodDates, periodParams, resolvePeriod } from "@/lib/period-filter";
 
 export const dynamic = "force-dynamic";
@@ -118,8 +118,8 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
     title: !filter.set && !filter.test,
     difficulty: !filter.difficulty,
   };
+  // No Date column: the day heading above each day's tries already says it.
   const head = [
-    "Date",
     ...(show.student ? ["Student"] : []),
     ...(show.type ? [show.typeBadge ? "Type" : "Area"] : []),
     ...(show.title ? [filter.type === "tests" ? "Test" : filter.type === "practice" ? "Practice set" : "Test / practice set"] : []),
@@ -165,8 +165,6 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
       </div>
 
       <ListFilters
-        pager={<Pagination basePath="/teacher/history" params={params} pageSize={pageSize} {...page} compact />}
-       
         action="/teacher/history"
         search={false}
         hidden={{ set: filter.set, test: filter.test }}
@@ -245,10 +243,6 @@ function HistoryTableRow({ row: r, show, current, keep }: { row: HistoryRow; sho
   const href = `/teacher/students/${r.studentId}/${isTest ? "tests" : "attempts"}/${r.id}`;
   return (
     <LinkTr className={invalidatedRowClass(r.status)}>
-      <td className={`${TD} whitespace-nowrap text-gray-600`}>
-        {formatDate(r.at)}
-        <span className="block text-xs text-gray-400">{r.status === "IN_PROGRESS" ? "Started" : "Completed"} {relativeDay(r.at)}</span>
-      </td>
       {show.student ? (
         <td className={TD}>
           <RowAction>

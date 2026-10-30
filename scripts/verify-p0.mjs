@@ -705,8 +705,9 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/questions/page.tsx",
-    requires: ["QUESTION_STATUS_DEFAULT", 'statusParam === "all"', "compact"],
-    label: "Question Bank: Published por defecto (status=all = todos) y paginador en la barra sticky",
+    requires: ["QUESTION_STATUS_DEFAULT", 'statusParam === "all"', "<QuestionsTestFilter", "Back to {back.label}", 'href: "/teacher/tests"'],
+    forbids: ["includeTests={false}", 'redirect("/teacher/tests")'],
+    label: "Question Bank: Math/Reading/Writing/Tests, Published por defecto (status=all), vuelta al area de origen",
   },
   {
     file: "app/(teacher)/teacher/questions/questions-filter-client.tsx",
@@ -715,13 +716,24 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/history/page.tsx",
-    requires: ["HISTORY_STATUS_DEFAULT", 'allValue: "all"', "compact"],
-    label: "History: Completed por defecto (status=all = todos) y paginador en la barra sticky",
+    requires: ["HISTORY_STATUS_DEFAULT", 'allValue: "all"', "dayLabel("],
+    forbids: ['    "Date",'],
+    label: "History: Completed por defecto (status=all = todos); sin columna Date (la marca del dia ya la dice)",
   },
   {
-    file: "components/sat/filter-bar.tsx",
-    requires: ["pager?: React.ReactNode", "has-[nav]:flex", "applyButton"],
-    label: "FilterBar: paginador compacto que sube con los filtros",
+    file: "components/sat/pagination.tsx",
+    requires: ["md:sticky md:bottom-2", "<PageSelect", "Previous", "Next"],
+    label: "Paginacion: barra inferior sticky centrada (Previous, pagina por numero, Next)",
+  },
+  ...[
+    "app/(teacher)/teacher/practice-sets/page.tsx",
+    "app/(teacher)/teacher/tests/page.tsx",
+  ].map((file) => ({ file, requires: ["HEADER_SHORTCUT_CLASS}>Questions →</Link>", "/teacher/questions?area="], label: `Atajo azul Questions → al area de origen: ${file}` })),
+  {
+    file: "lib/nav-config.ts",
+    requires: [],
+    forbids: ['label: "Questions", href: "/teacher/questions"'],
+    label: "Questions ya no es un chip de More (es el atajo Questions →)",
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/tests/[attemptId]/page.tsx",

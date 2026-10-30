@@ -10,8 +10,6 @@ interface FilterBarProps extends React.HTMLAttributes<HTMLElement> {
   sticky?: boolean;
   /** Render as a GET `<form>` (URL-driven filters) instead of a `<div>` (live, client-side filters). */
   action?: string;
-  /** Compact page navigation (Pagination `compact`): sticks with the filters, top right of the bar. */
-  pager?: React.ReactNode;
 }
 
 /**
@@ -20,7 +18,7 @@ interface FilterBarProps extends React.HTMLAttributes<HTMLElement> {
  * whatever its fields; on narrow containers the fields stack. On desktop it sticks to the top of the
  * page while a long list scrolls (`sticky={false}` for bars inside cards).
  */
-export function FilterBar({ label, action, sticky = true, pager, className, children, ...props }: FilterBarProps) {
+export function FilterBar({ label, action, sticky = true, className, children, ...props }: FilterBarProps) {
   const Component = action !== undefined ? "form" : "div";
   return (
     <Component
@@ -38,13 +36,7 @@ export function FilterBar({ label, action, sticky = true, pager, className, chil
       {...props}
     >
       {sticky ? <StickyOffset /> : null}
-      {label || pager ? (
-        // With no label the row only shows when the pager renders (more than one page).
-        <div className={cn("items-center justify-between gap-2", label ? "flex" : "hidden has-[nav]:flex")}>
-          {label ? <p className="text-xs font-medium text-[var(--sat-muted)]">{label}</p> : <span />}
-          {pager}
-        </div>
-      ) : null}
+      {label ? <p className="text-xs font-medium text-[var(--sat-muted)]">{label}</p> : null}
       <div className="flex flex-col gap-2.5 @md:flex-row @md:flex-wrap @md:items-end">{children}</div>
     </Component>
   );

@@ -39,7 +39,6 @@ export default async function NotificationsPage({ searchParams }: { searchParams
       <Breadcrumbs items={[{ label: "Home", href: homeHrefForRole(session.user.role) }, { label: "Notifications" }]} />
       <h1 className="mb-4 text-[26px] font-bold tracking-[-0.3px] text-gray-900">Notifications</h1>
       <ListFilters
-        pager={<Pagination basePath="/notifications" params={periodParams(period)} page={page} pageCount={pageCount} total={total} pageSize={pageSize} compact />}
         action="/notifications" search={false} period={period} />
       <Card>
         {notifications.map((n) => (

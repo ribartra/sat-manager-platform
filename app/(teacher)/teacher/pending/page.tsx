@@ -100,8 +100,6 @@ export default async function TeacherPendingPage({ searchParams }: { searchParam
       </div>
 
       <ListFilters
-        pager={<Pagination basePath="/teacher/pending" params={params} pageSize={PAGE_SIZE} {...page} compact />}
-       
         action="/teacher/pending"
         search={false}
         filters={[

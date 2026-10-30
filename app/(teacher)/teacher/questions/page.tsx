@@ -1,69 +1,101 @@
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { currentContentScope } from "@/lib/content-scope";
-import { PageShell, PracticeAreaTabs } from "@/components/sat";
+import { PageHeader, PageShell, PracticeAreaTabs } from "@/components/sat";
+import { HEADER_ACTION_CLASS, HeaderActions } from "@/components/sat/header-actions";
 import { PAGE_SIZE, Pagination, pageFromParam } from "@/components/sat/pagination";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { Plus } from "lucide-react";
+import { ArrowLeft, Plus } from "lucide-react";
 import { academicTopicWhere } from "@/lib/taxonomy";
 import {
   activeAreaTab,
   domainSectionLabel,
   practiceAreaFromTab,
+  practiceAreaLabel,
   practiceSectionLabel,
   resolvePracticeArea,
 } from "@/lib/practice-area";
-import { QuestionsFilter } from "./questions-filter-client";
+import { QuestionsFilter, QuestionsTestFilter } from "./questions-filter-client";
 import { QUESTION_STATUS_DEFAULT } from "@/lib/domain-meta";
 import { loadOptionImageUrlsByQuestionId } from "@/lib/question-list-media-query";
 import { QuestionsTable, type QuestionBankRow } from "./questions-table-client";
 import { resolveQuestionType } from "@/lib/question-type";
 
-interface SearchParams { area?: string; section?: string; domain?: string; topic?: string; difficulty?: string; status?: string; page?: string }
+interface SearchParams { area?: string; section?: string; domain?: string; topic?: string; test?: string; module?: string; difficulty?: string; status?: string; page?: string }
 
 const TOPIC_IN_CHUNK = 400;
 
+/** The 4 modules of every Test, by their order (0–3). */
+const TEST_MODULES = [
+  { value: "0", label: "R&W 1" },
+  { value: "1", label: "R&W 2" },
+  { value: "2", label: "Math 1" },
+  { value: "3", label: "Math 2" },
+];
+
+/**
+ * Question Bank: Math, Reading and Writing (practice questions, by Domain / Skill) and Tests (the
+ * questions of the Tests, by Test / module). Opened from Practice or Tests ("Questions →") on the same
+ * area, with the way back to it. Published by default; filters apply on change; 25 per page.
+ */
 export default async function QuestionBankPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const filters = await searchParams;
   const area = activeAreaTab(filters.area ?? filters.section, "math");
-  // "Full Practice Tests" is an exam surface, not a question-bank area.
-  if (area === "tests") redirect("/teacher/tests");
+  const isTests = area === "tests";
   const practiceArea = practiceAreaFromTab(area);
   const sectionLabel = practiceSectionLabel(practiceArea);
+  const scope = await currentContentScope();
 
-  const topics = await prisma.topic.findMany({
-    where: academicTopicWhere,
-    include: { domain: { include: { section: true } } },
-    orderBy: { name: "asc" },
-  });
-  const visibleTopics = topics.filter(
-    (t) =>
-      resolvePracticeArea({
-        practiceArea: t.domain.practiceArea,
-      }) === practiceArea
-  );
+  const topics = isTests
+    ? []
+    : await prisma.topic.findMany({
+        where: academicTopicWhere,
+        include: { domain: { include: { section: true } } },
+        orderBy: { name: "asc" },
+      });
+  const visibleTopics = topics.filter((t) => resolvePracticeArea({ practiceArea: t.domain.practiceArea }) === practiceArea);
   // Domain (`domain` = domain id): the skill's domain, or a domain chosen with no skill.
   const topicDomain = visibleTopics.find((t) => t.id === filters.topic)?.domainId;
   const selectedDomainId = topicDomain ?? (filters.domain && visibleTopics.some((t) => t.domainId === filters.domain) ? filters.domain : undefined);
   const domainTopics = selectedDomainId ? visibleTopics.filter((t) => t.domainId === selectedDomainId) : visibleTopics;
   const visibleTopicIds = [...new Set(domainTopics.map((topic) => topic.id))];
   const selectedTopicId = filters.topic && visibleTopicIds.includes(filters.topic) ? filters.topic : undefined;
-
   const topicFilter = selectedTopicId
     ? selectedTopicId
     : visibleTopicIds.length <= TOPIC_IN_CHUNK
       ? { in: visibleTopicIds }
       : { in: visibleTopicIds.slice(0, TOPIC_IN_CHUNK) };
 
-  // Consolidation table: no free-text search (Domain / Skill / level / status filters), 25 per page.
+  // Tests tab: the Tests of the teacher's programs, one module or all.
+  const tests = isTests
+    ? await prisma.fullPracticeTest.findMany({
+        where: scope,
+        select: { id: true, name: true, number: true, source: { select: { name: true, sortOrder: true } } },
+      })
+    : [];
+  tests.sort((a, b) => (a.number ?? 999) - (b.number ?? 999) || (a.source?.sortOrder ?? 999) - (b.source?.sortOrder ?? 999));
+  const selectedTestId = isTests && tests.some((t) => t.id === filters.test) ? filters.test : undefined;
+  const selectedModule = isTests && TEST_MODULES.some((m) => m.value === filters.module) ? filters.module : undefined;
+
+  // Consolidation table: no free-text search, 25 per page.
   const pageSize = PAGE_SIZE;
   const statusParam = filters.status || QUESTION_STATUS_DEFAULT;
   const statusFilter = statusParam === "all" ? undefined : statusParam;
   const questionWhere = {
     // The bank of the programs the teacher teaches (shared by the program's teachers).
-    ...(await currentContentScope()),
-    topicId: topicFilter,
+    ...scope,
+    ...(isTests
+      ? {
+          fullTestItems: {
+            some: {
+              module: {
+                ...(selectedModule ? { order: Number(selectedModule) } : {}),
+                test: selectedTestId ? { id: selectedTestId } : { id: { in: tests.map((t) => t.id) } },
+              },
+            },
+          },
+        }
+      : { topicId: topicFilter }),
     difficulty: (filters.difficulty as string | undefined) || undefined,
     // Published by default; `status=all` shows every status.
     status: statusFilter,
@@ -77,7 +109,7 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
       topic: { include: { domain: { include: { section: true } } } },
       options: { select: { text: true, imageUrl: true } },
       setItems: { select: { practiceSetId: true } },
-      fullTestItems: { select: { moduleId: true } },
+      fullTestItems: { select: { moduleId: true, module: { select: { order: true, testId: true, test: { select: { name: true, source: { select: { name: true } } } } } } } },
       _count: { select: { answers: true } },
     },
     orderBy: { createdAt: "desc" },
@@ -86,79 +118,86 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
   });
   const optionImages = await loadOptionImageUrlsByQuestionId(questions.map((q) => q.id));
 
+  // Back to where the Question Bank was opened from: Practice (same area) or Tests.
+  const back = isTests
+    ? { label: "Tests", href: "/teacher/tests" }
+    : { label: `Practice · ${practiceAreaLabel(practiceArea)}`, href: `/teacher/practice-sets?area=${area}` };
+  const testLabel = (t: { name: string; source: { name: string } | null }) => `${t.name} · ${t.source?.name ?? "No source"}`;
+
   return (
     <PageShell>
-      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Practice", href: "/teacher/practice-sets" }, { label: "Questions" }]} />
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Question Bank</h1>
-        <div className="flex items-center gap-2">
-          <Link
-            href="/teacher/questions/new"
-            className="flex items-center gap-1.5 shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]"
-          >
-            <Plus size={14} /> New Question
-          </Link>
-        </div>
-      </div>
-
-      <PracticeAreaTabs
-        basePath="/teacher/questions"
-        active={area}
-        includeTests={false}
-        preserve={{ difficulty: filters.difficulty, status: filters.status }}
-      />
-      <p className="-mt-3 mb-3 text-xs text-gray-500">
-        Questions of the Tests are managed in <Link href="/teacher/tests" className="text-blue-600 hover:underline">Tests</Link>.
-      </p>
-
-      <QuestionsFilter
-        // Remount on a new URL (Clear / tab) so the fields show the applied filters.
-        key={[area, selectedDomainId, filters.topic, filters.difficulty, filters.status].join("|")}
-        area={area}
-        sectionLabel={sectionLabel}
-        topics={visibleTopics.map((t) => ({
-          id: t.id,
-          name: t.name,
-          sectionLabel: domainSectionLabel({
-            practiceArea: t.domain.practiceArea,
-          }),
-          domainName: t.domain.name,
-          domainId: t.domainId,
-        }))}
-        initialTopicId={selectedTopicId}
-        initialDomainId={selectedDomainId}
-        initialDifficulty={filters.difficulty}
-        initialStatus={filters.status}
-        pager={
-          <Pagination
-            basePath="/teacher/questions"
-            params={{ area: filters.area, section: filters.section, domain: selectedDomainId, topic: filters.topic, difficulty: filters.difficulty, status: filters.status }}
-            page={page}
-            pageCount={pageCount}
-            total={total}
-            pageSize={pageSize}
-            compact
-          />
+      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: isTests ? "Tests" : "Practice", href: back.href }, { label: "Questions" }]} />
+      <PageHeader
+        title="Question Bank"
+        description={isTests ? "The questions of the Tests, by Test and module." : "Practice questions by domain and skill."}
+        actions={
+          <HeaderActions>
+            <Link href={back.href} className={HEADER_ACTION_CLASS}>
+              <ArrowLeft size={14} aria-hidden /> Back to {back.label}
+            </Link>
+            {isTests ? null : (
+              <Link href="/teacher/questions/new" className={HEADER_ACTION_CLASS}>
+                <Plus size={14} aria-hidden /> New Question
+              </Link>
+            )}
+          </HeaderActions>
         }
       />
 
+      <PracticeAreaTabs basePath="/teacher/questions" active={area} preserve={{ difficulty: filters.difficulty, status: filters.status }} />
+
+      {isTests ? (
+        <QuestionsTestFilter
+          key={[selectedTestId, selectedModule, filters.difficulty, filters.status].join("|")}
+          tests={tests.map((t) => ({ value: t.id, label: testLabel(t) }))}
+          modules={TEST_MODULES}
+          initialTestId={selectedTestId}
+          initialModule={selectedModule}
+          initialDifficulty={filters.difficulty}
+          initialStatus={filters.status}
+        />
+      ) : (
+        <QuestionsFilter
+          // Remount on a new URL (Clear / tab) so the fields show the applied filters.
+          key={[area, selectedDomainId, filters.topic, filters.difficulty, filters.status].join("|")}
+          area={area}
+          sectionLabel={sectionLabel}
+          topics={visibleTopics.map((t) => ({
+            id: t.id,
+            name: t.name,
+            sectionLabel: domainSectionLabel({ practiceArea: t.domain.practiceArea }),
+            domainName: t.domain.name,
+            domainId: t.domainId,
+          }))}
+          initialTopicId={selectedTopicId}
+          initialDomainId={selectedDomainId}
+          initialDifficulty={filters.difficulty}
+          initialStatus={filters.status}
+        />
+      )}
+
       <QuestionsTable
-        // A filter fixed to one value hides its column (Domain only trims the Domain / Skill cell).
-        fixed={{ domain: Boolean(selectedDomainId), skill: Boolean(selectedTopicId), difficulty: Boolean(filters.difficulty), status: Boolean(statusFilter) }}
+        // A filter fixed to one value hides its column (Domain / Test only trims the first line of the cell).
+        fixed={
+          isTests
+            ? { domain: Boolean(selectedTestId), skill: Boolean(selectedTestId && selectedModule), difficulty: Boolean(filters.difficulty), status: Boolean(statusFilter) }
+            : { domain: Boolean(selectedDomainId), skill: Boolean(selectedTopicId), difficulty: Boolean(filters.difficulty), status: Boolean(statusFilter) }
+        }
+        labels={isTests ? { both: "Test / Module", inner: "Module" } : undefined}
         rows={questions.map((q): QuestionBankRow => {
           const setUses = new Set(q.setItems.map((s) => s.practiceSetId)).size;
           const fullUses = q.fullTestItems.length;
+          // The chosen Test's copy (a question can sit in more than one Test).
+          const testItem = q.fullTestItems.find((item) => item.module.testId === selectedTestId) ?? q.fullTestItems[0];
           return {
             id: q.id,
             stem: q.stem,
             imageUrl: q.imageUrl,
             stimulus: q.stimulus,
             optionImageUrls: optionImages.get(q.id) ?? [],
-            skillSection: domainSectionLabel({
-              practiceArea: q.topic.domain.practiceArea,
-            }),
-            skillDomain: q.topic.domain.name,
-            skillName: q.topic.name,
+            skillSection: isTests ? "Tests" : domainSectionLabel({ practiceArea: q.topic.domain.practiceArea }),
+            skillDomain: isTests ? (testItem ? testLabel(testItem.module.test) : "") : q.topic.domain.name,
+            skillName: isTests ? (TEST_MODULES.find((m) => m.value === String(testItem?.module.order))?.label ?? "") : q.topic.name,
             difficulty: q.difficulty,
             type: resolveQuestionType(q.type, q.options),
             status: q.status,
@@ -169,12 +208,19 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
       />
       <Pagination
         basePath="/teacher/questions"
-        params={{ area: filters.area, section: filters.section, domain: selectedDomainId, topic: filters.topic, difficulty: filters.difficulty, status: filters.status }}
+        params={{
+          area,
+          domain: selectedDomainId,
+          topic: isTests ? undefined : filters.topic,
+          test: selectedTestId,
+          module: selectedModule,
+          difficulty: filters.difficulty,
+          status: filters.status,
+        }}
         page={page}
         pageCount={pageCount}
         total={total}
         pageSize={pageSize}
-        className="mt-2"
       />
     </PageShell>
   );

@@ -37,7 +37,6 @@ export function ListFilters({
   qName = "q",
   search = true,
   suggestions,
-  pager,
   children,
 }: {
   action: string;
@@ -53,8 +52,6 @@ export function ListFilters({
   search?: boolean;
   /** Values offered while typing in the search (names, emails…). */
   suggestions?: string[];
-  /** Compact page navigation (Pagination `compact`), kept on screen with the filters. */
-  pager?: React.ReactNode;
   /** Extra named controls inside the same form (e.g. a skill picker), placed before the selects. */
   children?: React.ReactNode;
 }) {
@@ -62,7 +59,7 @@ export function ListFilters({
   const keep = Object.entries(hidden).filter((entry): entry is [string, string] => Boolean(entry[1]));
   const clearHref = keep.length ? `${action}?${new URLSearchParams(keep).toString()}` : action;
   return (
-    <FilterBar action={action} pager={pager}>
+    <FilterBar action={action}>
       {keep.map(([name, value]) => <input key={name} type="hidden" name={name} value={value} />)}
       {/* Entity lists search by text; consolidation tables (History, Questions, Logs) don't (`search={false}`). */}
       {search ? (

@@ -15,7 +15,7 @@ import { studentAccessWhereFor } from "@/lib/program-scope";
 import { moduleViewsForTest } from "@/lib/test-view";
 import { formatDate } from "@/lib/utils";
 import { TestActionsMenu } from "./test-actions-menu-client";
-import { HEADER_ACTION_CLASS, HeaderActions } from "@/components/sat/header-actions";
+import { HEADER_ACTION_CLASS, HEADER_SHORTCUT_CLASS, HeaderActions } from "@/components/sat/header-actions";
 import { suggestionValues } from "@/lib/search-suggestions";
 
 interface PageProps {
@@ -83,6 +83,8 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
         description="Manage full-length tests. Each test has 4 modules: 2 of Reading & Writing and 2 of Math. Section scores (200–800) appear only on Test pages, never in practice."
         actions={
           <HeaderActions>
+            {/* The questions of the Tests in the Question Bank (with the way back here). */}
+            <Link href="/teacher/questions?area=tests" className={HEADER_SHORTCUT_CLASS}>Questions →</Link>
             <Link href="/teacher/tests/scoring" className={HEADER_ACTION_CLASS}>
               <Calculator size={14} aria-hidden /> How scores work
             </Link>
@@ -96,8 +98,6 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
       />
 
       <ListFilters
-        pager={<Pagination basePath="/teacher/tests" params={filterParams} pageSize={PAGE_SIZE} {...page} compact />}
-       
         action="/teacher/tests"
         q={q}
         placeholder="TEST number or source"

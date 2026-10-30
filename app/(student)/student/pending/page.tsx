@@ -52,8 +52,6 @@ export default async function StudentPendingPage({ searchParams }: { searchParam
         Everything your teacher assigned that you haven&apos;t finished: overdue first, then by due date.
       </p>
       <ListFilters
-        pager={<Pagination basePath="/student/pending" params={params} pageSize={PAGE_SIZE} {...page} compact />}
-       
         action="/student/pending"
         search={false}
         filters={[

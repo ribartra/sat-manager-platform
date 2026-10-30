@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { Sparkles } from "lucide-react";
 import { PracticeSetsMenu } from "./practice-sets-menu-client";
-import { HEADER_ACTION_CLASS, HeaderActions } from "@/components/sat/header-actions";
+import { HEADER_ACTION_CLASS, HEADER_SHORTCUT_CLASS, HeaderActions } from "@/components/sat/header-actions";
 import { assignHref } from "@/lib/assign-params";
 import { redirect } from "next/navigation";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
@@ -103,13 +103,15 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
         title="Practice"
         description="Manage practice sets: every SAT skill in Math, Reading and Writing has Easy, Medium and Hard levels, each with any number of sets. Results show as % correct only (SAT scores are for Tests)."
         actions={
-          canImport ? (
-            <HeaderActions>
+          <HeaderActions>
+            {/* This area's questions in the Question Bank (with the way back here). */}
+            <Link href={`/teacher/questions?area=${area}`} className={HEADER_SHORTCUT_CLASS}>Questions →</Link>
+            {canImport ? (
               <Link href="/teacher/import?kind=PRACTICE_SET" className={HEADER_ACTION_CLASS}>
                 <Sparkles size={14} aria-hidden /> Import with AI
               </Link>
-            </HeaderActions>
-          ) : undefined
+            ) : null}
+          </HeaderActions>
         }
       />
       <MoreLinks links={moreLinks} />

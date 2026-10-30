@@ -33,7 +33,16 @@ export type QuestionBankRow = {
 /** Filters fixed to one value: their column (or part of it) is not shown, it would repeat. */
 export type QuestionsTableFixed = { domain: boolean; skill: boolean; difficulty: boolean; status: boolean };
 
-export function QuestionsTable({ rows, fixed }: { rows: QuestionBankRow[]; fixed: QuestionsTableFixed }) {
+export function QuestionsTable({
+  rows,
+  fixed,
+  labels = { both: "Domain / Skill", inner: "Skill" },
+}: {
+  rows: QuestionBankRow[];
+  fixed: QuestionsTableFixed;
+  /** Header of the second column (Tests tab: "Test / Module"), whole or with its first part fixed. */
+  labels?: { both: string; inner: string };
+}) {
   const columns = useMemo<ColumnDef<QuestionBankRow>[]>(
     () => [
       {
@@ -56,7 +65,7 @@ export function QuestionsTable({ rows, fixed }: { rows: QuestionBankRow[]; fixed
       {
         // "Domain / Skill"; with a Domain chosen only the skill (the domain would repeat).
         id: "skill",
-        header: fixed.domain ? "Skill" : "Domain / Skill",
+        header: fixed.domain ? labels.inner : labels.both,
         meta: { priority: "medium" },
         cell: ({ row }) => (
           <div>
@@ -109,7 +118,7 @@ export function QuestionsTable({ rows, fixed }: { rows: QuestionBankRow[]; fixed
         ),
       },
     ],
-    [fixed.domain],
+    [fixed.domain, labels.both, labels.inner],
   );
 
   return (

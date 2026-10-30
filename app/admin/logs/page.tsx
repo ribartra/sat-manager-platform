@@ -103,8 +103,6 @@ export default async function AdminLogsPage({ searchParams }: PageProps) {
       <p className="mb-4 text-sm text-gray-500">Every action by users, newest first.</p>
 
       <ListFilters
-        pager={<Pagination basePath="/admin/logs" params={params} pageSize={pageSize} pageSizeParam="per" {...logPage} compact />}
-       
         action="/admin/logs"
         search={false}
         hidden={{ cat: tab.id === "all" ? undefined : tab.id, per: String(pageSize) }}
