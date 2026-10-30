@@ -42,6 +42,7 @@ import {
 } from "@/lib/domain-meta";
 import { resolveQuestionType } from "@/lib/question-type";
 import { FullTestActions } from "../full-test-actions-client";
+import { assignHref } from "@/lib/assign-params";
 
 interface PageProps {
   params: Promise<{ testId: string }>;
@@ -152,7 +153,7 @@ export default async function FullTestDetailPage({ params, searchParams }: PageP
           <div className="flex flex-col items-end gap-2">
             <div className="flex flex-wrap gap-2">
               <Button asChild variant="secondary"><Link href="/teacher/tests">All tests</Link></Button>
-              <Button asChild><Link href={`/teacher/tests/${test.id}/assign`}>Assign this test</Link></Button>
+              <Button asChild><Link href={assignHref({ test: test.id })}>Assign this test</Link></Button>
             </div>
             <div className="flex items-center gap-2">
               {test.status !== "PUBLISHED" ? <Badge variant={fullTestStatusBadgeVariant(test.status)}>{fullTestStatusLabel(test.status)}</Badge> : null}
@@ -229,7 +230,7 @@ export default async function FullTestDetailPage({ params, searchParams }: PageP
                       ) : (
                         <RowAction>
                           <Button asChild size="sm" variant="ghost">
-                            <Link href={`/teacher/students/${st.id}/assign-test?test=${test.id}`}>Assign</Link>
+                            <Link href={assignHref({ studentId: st.id, test: test.id })}>Assign</Link>
                           </Button>
                         </RowAction>
                       )}

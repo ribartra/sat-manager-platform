@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import { cn, localToday } from "@/lib/utils";
+import { localToday } from "@/lib/utils";
 import { Tag } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { assignmentStatusLabel, difficultyLabel } from "@/lib/domain-meta";
@@ -73,7 +73,12 @@ interface AssignFormProps {
   groupAssignmentEnabled: boolean;
   /** Admin › Settings → "Keep it locked" option (ASSIGN_LOCKED_OPTION). */
   lockOptionEnabled?: boolean;
-  initialArea: "math" | "reading" | "writing";
+  /** Practice area shown (from the URL: the Assign view's area tabs are links). */
+  area: "math" | "reading" | "writing";
+  /** Sets preselected from the URL (`set=`), e.g. "Assign" in Practice › By skill. */
+  initialSelected?: string[];
+  /** Skill opened from the URL (`topic=`, or the preselected set's skill). */
+  openSkillId?: string;
 }
 
 export function AssignForm({
@@ -84,13 +89,17 @@ export function AssignForm({
   groups,
   groupAssignmentEnabled,
   lockOptionEnabled = false,
-  initialArea,
+  area,
+  initialSelected = [],
+  openSkillId,
 }: AssignFormProps) {
   const router = useRouter();
   const editMode = editing.length > 0;
   const [target, setTarget] = useState<"student" | "group">("student");
   const [groupId, setGroupId] = useState(groups[0]?.id ?? "");
-  const [selected, setSelected] = useState<Set<string>>(() => new Set(editing.map((set) => set.id)));
+  const [selected, setSelected] = useState<Set<string>>(
+    () => new Set([...editing.map((set) => set.id), ...initialSelected.filter((id) => practiceSets.some((ps) => ps.id === id))]),
+  );
   // Due date starts one week after today (end of that day), or the set's current one when editing.
   const [dueDate, setDueDate] = useState(() => editing[0]?.dueDate?.slice(0, 10) ?? addDays(localToday(), 7));
   const [unlockAt, setUnlockAt] = useState(() => editing[0]?.unlockAt?.slice(0, 10) ?? "");
@@ -99,7 +108,6 @@ export function AssignForm({
   const [showExplanations, setShowExplanations] = useState(() => editing[0]?.showExplanations ?? true);
   const [lockOnAssign, setLockOnAssign] = useState(false);
   const [search, setSearch] = useState("");
-  const [area, setArea] = useState<AssignFormProps["initialArea"]>(initialArea);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -263,23 +271,7 @@ export function AssignForm({
       {/* Practice set picker: Practice › By skill cards, only sets the student doesn't have yet */}
       {editMode ? null : (
         <section className="space-y-3">
-          <div className="flex flex-wrap items-end justify-between gap-3">
-            <div role="tablist" aria-label="Practice area" className="flex gap-1 text-sm">
-              {AREAS.map((a) => (
-                <button
-                  key={a.key}
-                  type="button"
-                  role="tab"
-                  aria-selected={area === a.key}
-                  onClick={() => setArea(a.key)}
-                  className={cn("rounded-md px-3 py-1.5 font-medium", area === a.key ? "bg-gray-900 text-white" : "text-gray-600 hover:bg-gray-100")}
-                >
-                  {practiceAreaLabel(a.code)}
-                </button>
-              ))}
-            </div>
-            <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Skill or practice set name" aria-label="Search practice" className="max-w-xs text-sm" />
-          </div>
+          <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Skill or practice set name" aria-label="Search practice" className="max-w-xs text-sm" />
           <p className="text-xs text-gray-500">Open a skill and pick sets by source and level. Sets {first} already has are not listed (they can be retried any time).</p>
           <SkillsSourceMap
             emptyText={
@@ -300,7 +292,7 @@ export function AssignForm({
                   id: skill.id,
                   name: skill.name,
                   sub: `${skill.sets.length} set${skill.sets.length === 1 ? "" : "s"} to assign${picked ? ` · ${picked} selected` : ""}`,
-                  open: Boolean(needle) || picked > 0 ? true : undefined,
+                  open: Boolean(needle) || picked > 0 || skill.id === openSkillId ? true : undefined,
                   chips: DIFFICULTIES.map((level): SkillsMapChip => {
                     const count = skill.sets.filter((ps) => ps.difficulty === level).length;
                     return count

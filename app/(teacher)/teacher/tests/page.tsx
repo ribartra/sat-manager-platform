@@ -15,6 +15,7 @@ import { studentAccessWhereFor } from "@/lib/program-scope";
 import { moduleViewsForTest } from "@/lib/test-view";
 import { formatDate } from "@/lib/utils";
 import { FullTestActions } from "./full-test-actions-client";
+import { assignHref } from "@/lib/assign-params";
 
 interface PageProps {
   searchParams: Promise<{ view?: string; page?: string; q?: string; status?: string; assigned?: string }>;
@@ -147,7 +148,7 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
                   </div>
                   <div className="flex gap-2">
                     <Button asChild size="sm" variant="secondary">
-                      <Link href={`/teacher/tests/${test.id}/assign`}>Assign</Link>
+                      <Link href={assignHref({ test: test.id })}>Assign</Link>
                     </Button>
                     <Button asChild size="sm">
                       <Link href={`/teacher/tests/${test.id}`}>Open →</Link>

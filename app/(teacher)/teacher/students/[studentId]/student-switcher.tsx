@@ -8,20 +8,30 @@ import { matchesQuery } from "@/components/sat/list-filters";
 import { cn } from "@/lib/utils";
 
 /**
- * The student's name (page title) is a drop-down of the teacher's students: picking one opens their
- * page on the same tab (query kept). A search box narrows long lists.
+ * The student's name (page title) is a drop-down of the teacher's students: picking one opens the
+ * same page for that student (`path`, query kept). A search box narrows long lists. With no student
+ * chosen yet (Assign from a Test / Practice Set) it reads "Choose a student".
  */
 export function StudentSwitcher({
   name,
   students,
   selectedStudentId,
   query,
+  path = "/teacher/students/:id",
+  className = "text-[26px] font-bold tracking-[-0.3px] text-gray-900",
+  prefix,
 }: {
+  /** Shown as the title; empty = "Choose a student". */
   name: string;
   students: { id: string; name: string }[];
-  selectedStudentId: string;
+  selectedStudentId: string | null;
   /** Query string (without "?") to carry over to the other student. */
   query: string;
+  /** Page to open for the chosen student; `:id` is replaced by its id. */
+  path?: string;
+  className?: string;
+  /** Text before the name in the same title (e.g. "Assign to"). */
+  prefix?: React.ReactNode;
 }) {
   const router = useRouter();
   const [search, setSearch] = useState("");
@@ -29,12 +39,13 @@ export function StudentSwitcher({
 
   return (
     <DropdownMenu onOpenChange={(open) => !open && setSearch("")}>
-      <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">
+      <h1 className={className}>
+        {prefix ? <span className="mr-1.5">{prefix}</span> : null}
         <DropdownMenuTrigger
           className="-mx-1 inline-flex max-w-full items-center gap-1.5 rounded-lg px-1 text-left hover:bg-[var(--sat-primary-soft)] data-[state=open]:bg-[var(--sat-primary-soft)]"
           title="Choose another student"
         >
-          <span className="min-w-0 truncate">{name}</span>
+          <span className={cn("min-w-0 truncate", !name && "text-[var(--sat-primary)]")}>{name || "Choose a student"}</span>
           <ChevronDown size={20} aria-hidden className="shrink-0 text-[var(--sat-muted)]" />
         </DropdownMenuTrigger>
       </h1>
@@ -60,7 +71,7 @@ export function StudentSwitcher({
             <DropdownMenuItem
               key={student.id}
               onSelect={() => {
-                if (student.id !== selectedStudentId) router.push(`/teacher/students/${student.id}${query ? `?${query}` : ""}`);
+                if (student.id !== selectedStudentId) router.push(`${path.replace(":id", encodeURIComponent(student.id))}${query ? `?${query}` : ""}`);
               }}
               className={cn("gap-2", student.id === selectedStudentId && "font-semibold")}
             >

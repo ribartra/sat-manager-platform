@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { ArrowDown, ArrowUp, Copy, X } from "lucide-react";
+import { ArrowDown, ArrowUp, X } from "lucide-react";
 import { QuestionListItem } from "@/components/question-list-item";
 import { ContentMediaCard, CropShortcut, type ContentMediaLinks } from "@/components/sat/content-media-card";
 import { TaxonomyPicker } from "@/components/taxonomy-picker";
@@ -35,8 +35,7 @@ import {
   practiceSetEditorSchema,
   type PracticeSetEditorInput,
 } from "@/contracts/practice-set";
-import { apiFetch, readApiError } from "@/lib/api-client";
-import { notify } from "@/lib/notify-ui";
+import { readApiError } from "@/lib/api-client";
 import { Alert } from "@/components/sat/alert";
 
 interface TopicInfo {
@@ -177,41 +176,15 @@ export function PracticeSetEditor({
     .map((id) => questions.find((q) => q.id === id))
     .filter((q): q is QuestionInfo => Boolean(q));
   const saving = form.formState.isSubmitting;
-  const [secondaryLoading, setSecondaryLoading] = useState<string | null>(null);
-
-  async function duplicateSet() {
-    if (!initial?.id) return;
-    setSecondaryLoading("duplicate");
-    let data: { practiceSet?: { id?: string } };
-    try {
-      data = await apiFetch(`/api/practice-sets/${initial.id}/duplicate`, { method: "POST", fallback: "Unable to duplicate." });
-    } catch (error) {
-      notify.error(error);
-      return;
-    } finally {
-      setSecondaryLoading(null);
-    }
-    if (data?.practiceSet?.id) router.push(`/teacher/practice-sets/${data.practiceSet.id}/edit`);
-  }
+  // Status is changed with the header actions (Publish / Draft / Archive) of an existing set; Save
+  // sends the current one, so it never undoes a change made there.
+  useEffect(() => {
+    if (initial?.id && initial.status) form.setValue("status", initial.status as PracticeSetEditorInput["status"]);
+  }, [form, initial?.id, initial?.status]);
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} className="space-y-6" noValidate>
-        {initial?.id ? (
-          <div className="flex flex-wrap items-center justify-end gap-2">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={duplicateSet}
-              disabled={Boolean(secondaryLoading)}
-            >
-              <Copy size={14} />
-              Duplicate
-            </Button>
-          </div>
-        ) : null}
-
         <ContentMediaCard links={mediaLinks} />
 
         <FormSection title="Details">
@@ -282,25 +255,28 @@ export function PracticeSetEditor({
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Status</FormLabel>
-                  <FormControl>
-                    <Select {...field}>
-                      {practiceSetStatusOptions().map((opt) => (
-                        <option key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* A new set picks its status here; an existing one changes it with the header actions. */}
+            {initial?.id ? null : (
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <FormControl>
+                      <Select {...field}>
+                        {practiceSetStatusOptions().map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
             <FormField
               control={form.control}
               name="explanationVisibility"

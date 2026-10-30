@@ -62,6 +62,7 @@ import { loadStudentTests, sortTests } from "@/lib/test-assignments";
 import { loadStudentOverviews } from "@/lib/teacher-overview";
 import { relativeDay } from "@/lib/utils";
 import { buildProgressHref, progressFilterEntries, progressFiltersFromParams } from "@/lib/progress-filters";
+import { assignHref } from "@/lib/assign-params";
 import { officialSkillsFor } from "@/lib/taxonomy-order";
 
 // One page per student (replaces the former Student Analytics and Individual Report views).
@@ -141,6 +142,9 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
   ].filter(Boolean).join(" · ");
   const switcherQuery = buildProgressHref("", filters).replace(/^\?/, "");
   const secondaryButton = HEADER_ACTION_CLASS;
+  // Assign practice opens on the practice tab being viewed (Math by default), with its skill / level filters.
+  const assignPracticeArea = area === "reading" || area === "writing" ? area : "math";
+  const assignPracticeHref = assignHref({ studentId, area: assignPracticeArea, topic: filters.topic, difficulty: filters.difficulty });
 
   // Test cards for the teacher: completed modules open the attempt, nothing to start, no retake.
   const teacherTestLinks: TestCardLinks = {
@@ -196,12 +200,12 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <Hint label="Give this student one or more practice sets.">
-          <Link href={buildProgressHref(`/teacher/students/${studentId}/assign`, filters)} className="inline-flex h-9 items-center justify-center gap-1 shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-3.5 text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]">
+          <Link href={assignPracticeHref} className="inline-flex h-9 items-center justify-center gap-1 shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-3.5 text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]">
             <Plus size={14} /> Assign practice
           </Link>
         </Hint>
         <Hint label="Give this student a full-length Test (4 modules).">
-          <Link href={buildProgressHref(`/teacher/students/${studentId}/assign-test`, filters)} className="inline-flex h-9 items-center justify-center gap-1 rounded-md bg-[var(--sat-area-tests)] px-3.5 text-sm font-medium text-[var(--sat-tests-ink)] hover:brightness-95">
+          <Link href={assignHref({ studentId, area: "tests" })} className="inline-flex h-9 items-center justify-center gap-1 rounded-md bg-[var(--sat-area-tests)] px-3.5 text-sm font-medium text-[var(--sat-tests-ink)] hover:brightness-95">
             <ClipboardList size={14} /> Assign test
           </Link>
         </Hint>
@@ -441,7 +445,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                 title="Test attempts"
                 description={`${testGroups.length} test${testGroups.length === 1 ? "" : "s"} · ${attemptCount} attempt${attemptCount === 1 ? "" : "s"} · each row shows the last try; open it to see every try. "Not counted" tries don't count toward scores`}
                 action={
-                  <Link href={buildProgressHref(`/teacher/students/${studentId}/assign-test`, filters)} className="text-xs font-medium text-blue-600 hover:underline">
+                  <Link href={assignHref({ studentId, area: "tests" })} className="text-xs font-medium text-blue-600 hover:underline">
                     Assign test
                   </Link>
                 }
@@ -493,7 +497,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                     {testId && a.status !== "OVERDUE" ? (
                       <Hint label="Change the due date of this test.">
                         <Link
-                          href={`/teacher/students/${studentId}/assign-test?test=${testId}`}
+                          href={assignHref({ studentId, test: testId })}
                           className="shrink-0 text-xs font-medium text-blue-600 hover:underline"
                         >
                           Due date
@@ -564,7 +568,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                 {a.status !== "OVERDUE" ? (
                   <Hint label="Change the due date, open date or when answers are shown. The student's progress is kept.">
                     <Link
-                      href={`/teacher/students/${studentId}/assign?sets=${a.practiceSetId}`}
+                      href={assignHref({ studentId, area: assignPracticeArea, edit: [a.practiceSetId] })}
                       className="shrink-0 text-xs font-medium text-blue-600 hover:underline"
                     >
                       Edit
@@ -596,7 +600,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
           title={`${areaLabel} practice attempts`}
           description={`${practiceSets.length} practice set${practiceSets.length === 1 ? "" : "s"} · Last Attempt is the most recent try · open a set to see its last 3 tries`}
           action={
-            <Link href={buildProgressHref(`/teacher/students/${studentId}/assign`, filters)} className="text-xs font-medium text-blue-600 hover:underline">
+            <Link href={assignPracticeHref} className="text-xs font-medium text-blue-600 hover:underline">
               Assign practice
             </Link>
           }

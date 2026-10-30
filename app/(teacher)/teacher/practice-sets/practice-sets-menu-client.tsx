@@ -1,9 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { ChevronDown, Edit, Play, Trash2 } from "lucide-react";
+import { ChevronDown, Edit, Play, Trash2, UserPlus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
@@ -19,10 +17,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SKILL_CHIP_CLASS } from "@/components/sat/skills-map";
-import { useConfirm } from "@/components/sat/confirm-dialog";
-import { apiFetch } from "@/lib/api-client";
-import { notify } from "@/lib/notify-ui";
 import { difficultyBadgeVariant, difficultyLabel, practiceSetStatusBadgeVariant, practiceSetStatusLabel, practiceSetStatusOptions } from "@/lib/domain-meta";
+import { usePracticeSetMutations } from "./use-practice-set-mutations";
 import { cn } from "@/lib/utils";
 
 export interface MenuPracticeSet {
@@ -31,45 +27,16 @@ export interface MenuPracticeSet {
   status: string;
   questions: number;
   assignments: number;
+  /** The Assign view with this set preselected (student chosen there); null while it isn't published. */
+  assignHref: string | null;
 }
 
 /**
  * Level chip of Practice › By skill ("Easy · 2 sets"): opens a drop-down with the sets of that skill ×
- * level (× source) and, per set, Preview, Edit, Status and Delete (only when no student has it).
+ * level (× source) and, per set, Preview, Assign, Edit, Status and Delete (only when no student has it).
  */
 export function PracticeSetsMenu({ difficulty, sets, title, extra }: { difficulty: string; sets: MenuPracticeSet[]; title?: string; extra?: React.ReactNode }) {
-  const router = useRouter();
-  const confirm = useConfirm();
-  const [busy, setBusy] = useState(false);
-
-  async function changeStatus(set: MenuPracticeSet, next: string) {
-    if (next === set.status) return;
-    setBusy(true);
-    try {
-      await apiFetch(`/api/practice-sets/${set.id}`, { method: "PATCH", json: { status: next }, fallback: "Could not change the status." });
-      notify.success(`${set.name}: ${practiceSetStatusLabel(next)}.`);
-      router.refresh();
-    } catch (error) {
-      notify.error(error);
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function remove(set: MenuPracticeSet) {
-    if (set.assignments > 0) return;
-    const ok = await confirm({ title: "Delete this Practice Set?", description: "It is not used by any assignment. This cannot be undone.", tone: "danger", confirmLabel: "Delete" });
-    if (!ok) return;
-    setBusy(true);
-    try {
-      await apiFetch(`/api/practice-sets/${set.id}`, { method: "DELETE", fallback: "Could not delete the Practice Set." });
-      router.refresh();
-    } catch (error) {
-      notify.error(error);
-    } finally {
-      setBusy(false);
-    }
-  }
+  const { busy, changeStatus, remove } = usePracticeSetMutations();
 
   return (
     <DropdownMenu>
@@ -97,6 +64,15 @@ export function PracticeSetsMenu({ difficulty, sets, title, extra }: { difficult
             <DropdownMenuItem asChild>
               <Link href={`/teacher/practice-sets/${set.id}/preview`} className="gap-2"><Play size={14} aria-hidden /> Preview</Link>
             </DropdownMenuItem>
+            {set.assignHref ? (
+              <DropdownMenuItem asChild>
+                <Link href={set.assignHref} className="gap-2"><UserPlus size={14} aria-hidden /> Assign</Link>
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem disabled className="gap-2" title="Publish the set before assigning it.">
+                <UserPlus size={14} aria-hidden /> Assign <span className="ml-auto text-[11px] text-gray-400">publish it first</span>
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem asChild>
               <Link href={`/teacher/practice-sets/${set.id}/edit`} className="gap-2"><Edit size={14} aria-hidden /> Edit</Link>
             </DropdownMenuItem>
@@ -112,7 +88,7 @@ export function PracticeSetsMenu({ difficulty, sets, title, extra }: { difficult
             </DropdownMenuSub>
             <DropdownMenuItem
               disabled={busy || set.assignments > 0}
-              onSelect={() => remove(set)}
+              onSelect={() => set.assignments === 0 && remove(set)}
               title={set.assignments > 0 ? "Students already have this set. Archive it instead." : undefined}
               className="gap-2 text-red-600 focus:text-red-700"
             >

@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { Sparkles } from "lucide-react";
 import { PracticeSetsMenu } from "./practice-sets-menu-client";
+import { assignHref } from "@/lib/assign-params";
 import { redirect } from "next/navigation";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { compareSkills } from "@/lib/taxonomy-order";
@@ -131,7 +132,14 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
                       <PracticeSetsMenu
                         difficulty={difficulty}
                         title={`${prefix}${sets.length} set${sets.length === 1 ? "" : "s"} (${published} published): preview, edit or change status`}
-                        sets={sets.map((set) => ({ id: set.id, name: set.name, status: set.status, questions: set.questions.length, assignments: set.assignments.length }))}
+                        sets={sets.map((set) => ({
+                          id: set.id,
+                          name: set.name,
+                          status: set.status,
+                          questions: set.questions.length,
+                          assignments: set.assignments.length,
+                          assignHref: set.status === "PUBLISHED" ? assignHref({ area, set: [set.id], topic: topic.id }) : null,
+                        }))}
                         extra={
                           <span className="text-[var(--sat-muted)]">
                             {sets.length} set{sets.length === 1 ? "" : "s"}
@@ -171,7 +179,7 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
             }),
           }))}
         />
-        <p className="text-xs text-gray-500">Click a level to open its sets (preview, edit, status). To assign a set, open a student (Students → Assign practice).</p>
+        <p className="text-xs text-gray-500">Click a level to open its sets: preview, assign, edit or change their status.</p>
       </div>
     </PageShell>
   );

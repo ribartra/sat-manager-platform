@@ -521,8 +521,8 @@ const checks = [
     label: "SkillResults (profesor, alumno, padre): weakest skill bajo el titulo, chips agregadas sobre todas las fuentes (sin acordeon por fuente), sin Assign",
   },
   {
-    file: "app/(teacher)/teacher/students/[studentId]/assign/page.tsx",
-    requires: ["!assignmentBySet.has(ps.id)", '["PENDING", "IN_PROGRESS"]'],
+    file: "app/(teacher)/teacher/assign/assign-view.tsx",
+    requires: ["!assignmentBySet.has(ps.id)", '["PENDING", "IN_PROGRESS"]', "studentAccessWhereFor", "assignableContentWhere"],
     label: "Assign practice: lo ya asignado no se ofrece; Edit solo cambia fechas de lo abierto",
   },
   {
@@ -531,14 +531,51 @@ const checks = [
     label: "Assign practice: mismo componente que By skill, skills A–Z, una chip por set",
   },
   {
-    file: "app/(teacher)/teacher/students/[studentId]/assign-test/page.tsx",
-    requires: ["!assignmentByTest.has(exam.id)"],
-    label: "Assign test: los tests ya asignados no se ofrecen",
+    file: "app/(teacher)/teacher/assign/assign-view.tsx",
+    requires: ["!assignmentByTest.has(exam.id)", "already took"],
+    label: "Assign test: los tests ya asignados no se ofrecen; si el alumno elegido ya lo tiene, se avisa (o se edita si esta abierto)",
+  },
+  // One Assign view driven by the URL (practice sets and Tests; student chosen with a drop-down).
+  {
+    file: "lib/assign-params.ts",
+    requires: ["export function parseAssignParams", "export function assignHref", "activeAreaTab", "raw.sets"],
+    label: "Contrato de URL de Assign: area, set, test, topic, difficulty, source, edit (sets antiguo)",
   },
   {
-    file: "app/(teacher)/teacher/tests/[testId]/assign/page.tsx",
-    requires: ["fullTestAssignments: { none: { testId } }"],
-    label: "Asignar un test: no se ofrecen alumnos que ya lo tienen",
+    file: "app/(teacher)/teacher/assign/assign-view.tsx",
+    requires: ["<StudentSwitcher", 'path="/teacher/students/:id/assign"', "<LinkTabs", "initialSelected={params.set}", "initialSelected={params.test}"],
+    label: "Vista unica de Assign: alumno en DDL que conserva la URL, areas como links, preseleccion por URL",
+  },
+  ...[
+    "app/(teacher)/teacher/students/[studentId]/assign-test/page.tsx",
+    "app/(teacher)/teacher/tests/[testId]/assign/page.tsx",
+  ].map((file) => ({ file, requires: ["redirect(assignHref("], label: `URL antigua de asignar redirige a la vista unica: ${file}` })),
+  ...[
+    "app/(teacher)/teacher/students/[studentId]/page.tsx",
+    "app/(teacher)/teacher/tests/page.tsx",
+    "app/(teacher)/teacher/tests/[testId]/page.tsx",
+    "app/(teacher)/teacher/tests/full-test-actions-client.tsx",
+    "app/(teacher)/teacher/practice-sets/page.tsx",
+  ].map((file) => ({ file, requires: ["assignHref("], forbids: ["/assign-test", "/assign`", "/assign?sets="], label: `Enlaces de asignar con assignHref: ${file}` })),
+  {
+    file: "app/(teacher)/teacher/practice-sets/practice-sets-menu-client.tsx",
+    requires: ["set.assignHref", "Assign", "usePracticeSetMutations"],
+    label: "Practice › By skill: el desplegable del set incluye Assign (prellenado)",
+  },
+  {
+    file: "app/(teacher)/teacher/practice-sets/practice-set-actions-client.tsx",
+    requires: ["Preview", "Archive", "Delete", "Publish", "Duplicate", "Students already have this set. Archive it instead."],
+    label: "Editor de Practice Set: Preview, Assign, Publish/Draft/Archive, Duplicate, Delete",
+  },
+  {
+    file: "app/(teacher)/teacher/practice-sets/[practiceSetId]/edit/page.tsx",
+    requires: ["<PracticeSetActions", "groupAssignments", "prisma.attempt.count"],
+    label: "Editor de Practice Set: acciones en la cabecera; Delete con la misma regla que la API",
+  },
+  {
+    file: "app/(teacher)/teacher/students/[studentId]/tests/[attemptId]/page.tsx",
+    requires: ["All tries in History", '<Badge variant="test">Test</Badge>', "Test:{\" \"}", "formatClock(attempt.submittedAt)"],
+    label: "Intento de Test (profesor): cabecera como la de practica (chips, linea Test/Source, hora y dia relativo)",
   },
   {
     file: "app/(teacher)/teacher/tests/page.tsx",

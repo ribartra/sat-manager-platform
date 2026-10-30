@@ -23,7 +23,7 @@ import { getFeatureSetting } from "@/lib/app-settings";
 import { fullTestModulesForAttempt } from "@/lib/full-test-snapshot";
 import { moduleIndexFromKey, overtimeByModule } from "@/lib/full-test-progress";
 import { buildTestAttemptView, type ModuleView } from "@/lib/test-view";
-import { formatDate, formatDuration, formatTime, relativeDay } from "@/lib/utils";
+import { formatClock, formatDate, formatDuration, formatTime, relativeDay } from "@/lib/utils";
 
 interface PageProps {
   params: Promise<{ attemptId: string }>;
@@ -132,13 +132,16 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
         </Alert>
       ) : null}
 
-      {/* Header: title on the left, actions top right (same slot and style for every role). */}
+      {invalidated ? <InvalidatedNotice audience="student" /> : null}
+
+      {/* Header: same structure as a practice result and as the teacher's view (chips, title, tries, info). */}
       <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
         <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">{attempt.test.name} results</h1>
+          <div className="mb-1 flex flex-wrap items-center gap-2">
+            <Badge variant="test">Test</Badge>
             {inProgress ? <Badge variant="warning">In progress</Badge> : invalidated ? null : <Badge variant="success">Completed</Badge>}
           </div>
+          <h1 className="text-xl font-semibold text-gray-900">{attempt.test.name} results</h1>
           <div className="mt-2">
             <TryNavigator
               current={tryNumber}
@@ -154,7 +157,7 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
             {attempt.test.source ? <>Source: <b className="font-medium text-gray-700">{attempt.test.source.name}</b> · </> : null}
             Started <b className="font-medium text-gray-700">{formatDate(attempt.startedAt)}</b>
             {attempt.submittedAt ? (
-              <> · Completed <b className="font-medium text-gray-700">{formatDate(attempt.submittedAt)}</b> ({relativeDay(attempt.submittedAt)})</>
+              <> · Completed <b className="font-medium text-gray-700">{formatDate(attempt.submittedAt)}</b> at {formatClock(attempt.submittedAt)} ({relativeDay(attempt.submittedAt)})</>
             ) : null}
             {attempt.assignment?.dueDate ? <> · Due {formatDate(attempt.assignment.dueDate)}</> : null}
             {` · ${explanationsInPlayerLabel(attempt.showExplanations ?? attempt.assignment?.showExplanations)}`}
@@ -165,8 +168,6 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
           <Link href="/student/tests?view=completed" className={HEADER_ACTION_CLASS}>All tests</Link>
         </HeaderActions>
       </div>
-
-      {invalidated ? <InvalidatedNotice audience="student" /> : null}
 
       <TestResultSentence view={view} status={attempt.status} who="You" />
 

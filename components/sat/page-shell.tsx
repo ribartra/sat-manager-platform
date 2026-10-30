@@ -49,7 +49,7 @@ export function PageShell({
 
 interface PageHeaderProps extends React.HTMLAttributes<HTMLElement> {
   title: string;
-  description?: string;
+  description?: React.ReactNode;
   actions?: React.ReactNode;
   density?: PageDensity;
 }

@@ -16,7 +16,7 @@ import { fullTestModulesForAttempt } from "@/lib/full-test-snapshot";
 import { overtimeByModule } from "@/lib/full-test-progress";
 import { auth } from "@/lib/auth";
 import { teacherProgramEnrollmentScope } from "@/lib/program-scope";
-import { formatDate, formatDuration, formatTime } from "@/lib/utils";
+import { formatClock, formatDate, formatDuration, formatTime, relativeDay } from "@/lib/utils";
 import { InfoHint } from "@/components/hint";
 import { isAnswerCorrect } from "@/lib/answer-grading";
 import { resolveQuestionType } from "@/lib/question-type";
@@ -97,6 +97,7 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
   const studentHref = buildProgressHref(`/teacher/students/${studentId}`, filters, { area: "tests" });
   const inProgress = attempt.status === "IN_PROGRESS";
   const doneModules = view.modules.filter((m) => m.state === "done");
+  const first = attempt.student.name.split(" ")[0];
 
   return (
     <PageShell maxWidth={1180}>
@@ -112,18 +113,26 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
           { label: `Try ${tryNumber} of ${siblings.length}` },
         ]}
       />
+      {attempt.status === "INVALIDATED" ? <InvalidatedNotice audience="teacher" /> : null}
+
+      {/* Header: same structure as a practice attempt (chips, title, tries, item line, info line). */}
       <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
         <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">
-              <Link href={`/teacher/tests/${attempt.testId}`} className="hover:text-[var(--sat-primary)] hover:underline" title="Open this test">
-                {attempt.test.name}
-              </Link>{" "}
-              · {attempt.student.name}&apos;s results
-            </h1>
+          <div className="mb-1 flex flex-wrap items-center gap-2">
             <Badge variant="test">Test</Badge>
             <AttemptStatusBadge status={attempt.status} />
+            {siblings.length > 1 ? (
+              <Link href={`/teacher/students/${studentId}?area=history&type=tests`} className="text-xs font-medium text-[var(--sat-primary)] hover:underline">
+                All tries in History →
+              </Link>
+            ) : null}
           </div>
+          <h1 className="text-xl font-semibold text-gray-900">
+            <Link href={`/teacher/tests/${attempt.testId}`} className="hover:text-[var(--sat-primary)] hover:underline" title="Open this test">
+              {attempt.test.name}
+            </Link>{" "}
+            · {first}&apos;s results
+          </h1>
           <div className="mt-2">
             <TryNavigator
               current={tryNumber}
@@ -135,9 +144,20 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
               }))}
             />
           </div>
-          <p className="mt-1 text-sm text-gray-500">
-            {attempt.test.source ? `Source: ${attempt.test.source.name} · ` : ""}Started {formatDate(attempt.startedAt)} · {attempt.submittedAt ? `Completed ${formatDate(attempt.submittedAt)}` : "Not finished"}
-            {attempt.assignment?.dueDate ? ` · Due ${formatDate(attempt.assignment.dueDate)}` : ""}
+          <p className="mt-0.5 text-xs text-gray-500">
+            Test:{" "}
+            <Link href={`/teacher/tests/${attempt.testId}`} className="font-medium text-[var(--sat-primary)] hover:underline">
+              {attempt.test.name}
+            </Link>
+            {attempt.test.source ? <> · Source: <b className="font-medium text-gray-700">{attempt.test.source.name}</b></> : null}
+          </p>
+          <p className="mt-1 text-xs text-gray-500">
+            Started <b className="font-medium text-gray-700">{formatDate(attempt.startedAt)}</b>
+            {" · "}
+            {attempt.submittedAt ? (
+              <>Completed <b className="font-medium text-gray-700">{formatDate(attempt.submittedAt)}</b> at {formatClock(attempt.submittedAt)} ({relativeDay(attempt.submittedAt)})</>
+            ) : "Not finished"}
+            {attempt.assignment?.dueDate ? <> · Due {formatDate(attempt.assignment.dueDate)}</> : null}
             {attempt.pauses.length > 0 ? ` · Paused ${attempt.pauses.length} ${attempt.pauses.length === 1 ? "time" : "times"} (${formatDuration(pauseSeconds)})` : ""}
             {attempt.timeExpiredEvents > 0 ? ` · Ran out of time ${attempt.timeExpiredEvents} ${attempt.timeExpiredEvents === 1 ? "time" : "times"}` : ""}
             {attempt.extraTimeUsed > 0 ? ` · Extra time ${formatTime(attempt.extraTimeUsed)}` : ""}
@@ -152,8 +172,6 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
           report={{ area: "tests", examLabel: `${attempt.test.name} · ${attempt.submittedAt ? formatDate(attempt.submittedAt) : ""} · ${attempt.totalScore ?? "—"}` }}
         />
       </div>
-
-      {attempt.status === "INVALIDATED" ? <InvalidatedNotice audience="teacher" /> : null}
 
       <TestResultSentence view={view} status={attempt.status} who={attempt.student.name.split(" ")[0]} />
 

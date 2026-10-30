@@ -1,6 +1,7 @@
 "use client";
 
-import { Checkbox } from "@/components/ui/checkbox";
+import { Checkbox, Radio } from "@/components/ui/checkbox";
+import { Select } from "@/components/ui/select";
 import { useState } from "react";
 import { localToday } from "@/lib/utils";
 import { useRouter } from "next/navigation";
@@ -31,16 +32,31 @@ export function AssignTestForm({
   exams,
   returnHref,
   editing,
+  initialSelected,
+  groups = [],
+  groupAssignmentEnabled = false,
 }: {
   studentId: string;
   studentName: string;
   exams: ExamOption[];
+  /** The student's Tests tab (Cancel, and where it goes after assigning). */
   returnHref: string;
   /** Due-date edit of a test the student already has (open). */
   editing?: { id: string; name: string; dueDate: string | null; showExplanations: boolean };
+  /** Test preselected from the URL (`test=`): "Assign" on a Test. */
+  initialSelected?: string;
+  /** Groups (Admin › Settings group management): assign to every member at once. */
+  groups?: { id: string; name: string; memberIds: string[] }[];
+  groupAssignmentEnabled?: boolean;
 }) {
   const router = useRouter();
-  const [selected, setSelected] = useState<Set<string>>(() => new Set(editing ? [editing.id] : []));
+  const [selected, setSelected] = useState<Set<string>>(
+    () => new Set(editing ? [editing.id] : initialSelected && exams.some((exam) => exam.id === initialSelected) ? [initialSelected] : []),
+  );
+  const [target, setTarget] = useState<"student" | "group">("student");
+  const [groupId, setGroupId] = useState(groups[0]?.id ?? "");
+  const group = groups.find((g) => g.id === groupId);
+  const useGroup = groupAssignmentEnabled && target === "group" && !editing;
   // Due date starts on the day the test is assigned (end of that day), or the current one when editing.
   const [dueDate, setDueDate] = useState(() => editing?.dueDate?.slice(0, 10) ?? localToday());
   // Per student: Check + explanation per question in the Test player (on by default).
@@ -65,6 +81,11 @@ export function AssignTestForm({
 
   async function handleAssign() {
     if (selected.size === 0) return;
+    const studentIds = useGroup ? group?.memberIds ?? [] : [studentId];
+    if (studentIds.length === 0) {
+      setError("This group has no students yet.");
+      return;
+    }
     setLoading(true);
     setError("");
     try {
@@ -73,7 +94,7 @@ export function AssignTestForm({
           const res = await fetch(`/api/full-practice-tests/${testId}/assign`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ studentIds: [studentId], dueDate: dueDate || null, showExplanations }),
+            body: JSON.stringify({ studentIds, dueDate: dueDate || null, showExplanations }),
           });
           if (!res.ok) throw await readApiError(res, "Failed to assign the test.");
           return res.json();
@@ -96,11 +117,7 @@ export function AssignTestForm({
           updated ? `${updated} updated` : null,
         ].filter(Boolean).join(" · ") + ".",
       );
-      window.setTimeout(() => {
-        const query = new URLSearchParams(returnHref.split("?")[1] ?? "");
-        query.set("area", "tests");
-        router.push(`/teacher/students/${studentId}?${query.toString()}`);
-      }, 1000);
+      window.setTimeout(() => router.push(returnHref), 1000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to assign the test.");
       setLoading(false);
@@ -110,8 +127,27 @@ export function AssignTestForm({
   return (
     <Card padding="lg" className="space-y-4">
       <p className="text-sm text-gray-600">
-        {editing ? "Due date for" : "Assign tests to"} <span className="font-medium text-blue-700">{studentName}</span>
+        {editing ? "Due date for" : "Assign tests to"} <span className="font-medium text-blue-700">{useGroup ? group?.name ?? "Group" : studentName}</span>
       </p>
+      {groupAssignmentEnabled && !editing && groups.length ? (
+        <div className="flex flex-wrap items-center gap-4 text-sm text-gray-700">
+          <label className="flex items-center gap-2">
+            <Radio checked={target === "student"} onChange={() => setTarget("student")} /> This student
+          </label>
+          <label className="flex items-center gap-2">
+            <Radio checked={target === "group"} onChange={() => setTarget("group")} /> Group
+          </label>
+          {target === "group" ? (
+            <Select value={groupId} onChange={(e) => setGroupId(e.target.value)} aria-label="Group" className="max-w-xs">
+              {groups.map((g) => (
+                <option key={g.id} value={g.id}>
+                  {g.name} ({g.memberIds.length} students)
+                </option>
+              ))}
+            </Select>
+          ) : null}
+        </div>
+      ) : null}
 
       {editing ? (
         <p className="rounded-md border border-gray-200 px-3 py-2 text-sm font-medium text-gray-800">{editing.name}</p>
@@ -128,8 +164,9 @@ export function AssignTestForm({
                 number: exam.number,
                 sourceName: exam.sourceName,
                 sourceOrder: exam.sourceOrder,
-                // Searching opens the matches (selection doesn't drive it, so unticking never collapses it).
-                open: Boolean(term),
+                // Searching opens the matches, and so does the Test preselected from the URL (selection
+                // doesn't drive it, so unticking never collapses it).
+                open: Boolean(term) || exam.id === initialSelected,
                 node: (
                   <label className={cn("flex cursor-pointer items-start gap-3 rounded-md border border-[var(--sat-border)] bg-white px-3 py-2 hover:bg-gray-50", selected.has(exam.id) && "border-[var(--sat-primary)] bg-blue-50")}>
                     <Checkbox className="mt-1" checked={selected.has(exam.id)} onChange={() => toggle(exam.id)} />

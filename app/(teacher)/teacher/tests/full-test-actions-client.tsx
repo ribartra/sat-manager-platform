@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useConfirm } from "@/components/sat/confirm-dialog";
 import { apiFetch } from "@/lib/api-client";
 import { notify } from "@/lib/notify-ui";
+import { assignHref } from "@/lib/assign-params";
 
 type FullTestActionsProps = {
   testId: string;
@@ -116,7 +117,7 @@ export function FullTestActions({
       </Button>
       {canAssign ? (
         <Button asChild size="sm">
-          <Link href={`/teacher/tests/${testId}/assign`}>
+          <Link href={assignHref({ test: testId })}>
             <Send size={14} />
             Assign
           </Link>
