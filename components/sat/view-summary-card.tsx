@@ -1,6 +1,23 @@
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
-import { ChipStat } from "@/components/sat/stat-tile";
+import { cn } from "@/lib/utils";
+
+/** Same colours as the views: status badges (Completed / In progress / Not started / Overdue). */
+const CHIP_TONE = {
+  default: "border-transparent bg-[var(--sat-surface-2)] text-[var(--sat-muted)]",
+  success: "border-[var(--sat-ok-border)] bg-[var(--sat-ok-soft)] text-[var(--sat-ok)]",
+  warning: "border-[var(--sat-warn-border)] bg-[var(--sat-warn-soft)] text-[var(--sat-warn)]",
+  danger: "border-[var(--sat-bad-border)] bg-[var(--sat-bad-soft)] text-[var(--sat-bad)]",
+  info: "border-blue-200 bg-[var(--sat-primary-soft)] text-[var(--sat-primary)]",
+} as const;
+
+export interface ViewSummaryChip {
+  label: string;
+  value: React.ReactNode;
+  tone?: keyof typeof CHIP_TONE;
+  /** Area colour (Math / Reading / Writing), as on the practice and Test surfaces. */
+  color?: string;
+}
 
 /**
  * One box per view on the teacher Home: the view's name, its main number, a few status chips, one
@@ -15,13 +32,16 @@ export function ViewSummaryCard({
   chips = [],
   line,
   action,
+  accent = "primary",
 }: {
   title: string;
   icon: React.ReactNode;
   href: string;
   value: React.ReactNode;
   valueLabel: React.ReactNode;
-  chips?: { label: string; value: React.ReactNode; tone?: "default" | "danger" }[];
+  chips?: ViewSummaryChip[];
+  /** Icon badge colours: the Tests grey, or the primary blue. */
+  accent?: "primary" | "tests";
   line?: React.ReactNode;
   action: string;
 }) {
@@ -29,7 +49,15 @@ export function ViewSummaryCard({
     <Card as={Link} href={href} padding="md" className="flex min-h-[12rem] flex-col gap-2.5 hover:border-gray-400">
       <div className="flex items-center justify-between">
         <h2 className="flex items-center gap-2 text-base font-semibold text-[var(--sat-text)]">
-          <span aria-hidden className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--sat-primary-soft)] text-[var(--sat-primary)]">{icon}</span>
+          <span
+            aria-hidden
+            className={cn(
+              "flex h-8 w-8 items-center justify-center rounded-full",
+              accent === "tests" ? "bg-[var(--sat-area-tests)] text-[var(--sat-tests-ink)]" : "bg-[var(--sat-primary-soft)] text-[var(--sat-primary)]",
+            )}
+          >
+            {icon}
+          </span>
           {title}
         </h2>
         <span aria-hidden className="text-gray-400">›</span>
@@ -40,7 +68,15 @@ export function ViewSummaryCard({
       </p>
       {chips.length > 0 ? (
         <div className="flex flex-wrap gap-1.5">
-          {chips.map((c) => <ChipStat key={c.label} label={c.label} value={c.value} tone={c.tone} />)}
+          {chips.map((c) => (
+            <span
+              key={c.label}
+              className={cn("rounded-lg border px-2 py-1 text-xs leading-tight", c.color ? "border-current bg-white" : CHIP_TONE[c.tone ?? "default"])}
+              style={c.color ? { color: c.color } : undefined}
+            >
+              {c.label} <b>{c.value}</b>
+            </span>
+          ))}
         </div>
       ) : null}
       {line ? <p className="truncate text-xs text-gray-600">{line}</p> : null}

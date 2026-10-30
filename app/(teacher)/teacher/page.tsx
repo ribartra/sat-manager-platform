@@ -4,6 +4,7 @@ import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { CardGrid } from "@/components/sat/area-summary-card";
 import { StudentOverviewTable } from "@/components/sat/student-overview-table";
 import { ViewSummaryCard } from "@/components/sat/view-summary-card";
+import { Pct } from "@/components/sat/work-status";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { formatDate, relativeDay } from "@/lib/utils";
@@ -150,9 +151,9 @@ export default async function TeacherDashboard() {
           value={rows.length}
           valueLabel={plural(rows.length, "student")}
           chips={[
-            { label: "Active this week", value: activeThisWeek },
-            { label: "Inactive 5+ days", value: inactive.length, tone: inactive.length ? "danger" : "default" },
-            { label: "Invitations", value: invitations },
+            { label: "Active this week", value: activeThisWeek, tone: activeThisWeek ? "success" : "default" },
+            { label: "Inactive 5+ days", value: inactive.length, tone: inactive.length ? "warning" : "default" },
+            { label: "Invitations", value: invitations, tone: invitations ? "info" : "default" },
           ]}
           action="Open Students →"
         />
@@ -163,8 +164,8 @@ export default async function TeacherDashboard() {
           value={pending.length}
           valueLabel="assigned, not finished"
           chips={[
-            { label: "Not started", value: pendingBy("PENDING") },
-            { label: "In progress", value: pendingBy("IN_PROGRESS") },
+            { label: "Not started", value: pendingBy("PENDING"), tone: pendingBy("PENDING") ? "info" : "default" },
+            { label: "In progress", value: pendingBy("IN_PROGRESS"), tone: pendingBy("IN_PROGRESS") ? "warning" : "default" },
             { label: "Overdue", value: pendingBy("OVERDUE"), tone: pendingBy("OVERDUE") ? "danger" : "default" },
           ]}
           action="See all pending →"
@@ -173,14 +174,23 @@ export default async function TeacherDashboard() {
           title="Tests"
           icon={<ClipboardList size={16} />}
           href="/teacher/tests"
+          accent="tests"
           value={testCount}
           valueLabel={`${plural(testCount, "test")} published`}
           chips={[
-            { label: "Assigned", value: testAssignments.length },
-            { label: "Completed", value: testsCompleted },
+            { label: "Assigned", value: testAssignments.length, tone: testAssignments.length ? "info" : "default" },
+            { label: "Completed", value: testsCompleted, tone: testsCompleted ? "success" : "default" },
             { label: "Overdue", value: testsOverdue, tone: testsOverdue ? "danger" : "default" },
           ]}
-          line={latestTest ? `Latest: ${latestTest.student} · ${latestTest.label} · R&W ${latestTest.rw ?? "—"} · Math ${latestTest.math ?? "—"} · ${formatDate(latestTest.submittedAt)}` : "No test finished yet"}
+          line={
+            latestTest ? (
+              <>
+                Latest: {latestTest.student} · {latestTest.label} · <Scores rw={latestTest.rw} math={latestTest.math} /> · {formatDate(latestTest.submittedAt)}
+              </>
+            ) : (
+              "No test finished yet"
+            )
+          }
           action="Open Tests →"
         />
         <ViewSummaryCard
@@ -190,9 +200,9 @@ export default async function TeacherDashboard() {
           value={sets.length}
           valueLabel={`practice ${plural(sets.length, "set")} published`}
           chips={[
-            { label: "Math", value: setsIn("MATH") },
-            { label: "Reading", value: setsIn("READING") },
-            { label: "Writing", value: setsIn("WRITING") },
+            { label: "Math", value: setsIn("MATH"), color: "var(--sat-area-math)" },
+            { label: "Reading", value: setsIn("READING"), color: "var(--sat-area-reading)" },
+            { label: "Writing", value: setsIn("WRITING"), color: "var(--sat-area-writing)" },
           ]}
           line={`${practiceTries} practice ${(practiceTries === 1 ? "try" : "tries")} in the last 7 days`}
           action="Open Practice →"
@@ -205,7 +215,11 @@ export default async function TeacherDashboard() {
           valueLabel={`${(history.length === 1 ? "try" : "tries")} finished in the last 7 days`}
           line={
             latestTry
-              ? `Latest: ${latestTry.studentName} · ${latestTry.title} · ${latestTry.kind === "test" ? `R&W ${latestTry.rw ?? "—"} · Math ${latestTry.math ?? "—"}` : `${latestTry.pct ?? "—"}%`} · ${relativeDay(latestTry.at, now)}`
+              ? (
+                <>
+                  Latest: {latestTry.studentName} · {latestTry.title} · {latestTry.kind === "test" ? <Scores rw={latestTry.rw} math={latestTry.math} /> : <Pct value={latestTry.pct} />} · {relativeDay(latestTry.at, now)}
+                </>
+              )
               : "No tries in the last 7 days"
           }
           action="Open History →"
@@ -217,7 +231,7 @@ export default async function TeacherDashboard() {
             href="/teacher/teachers"
             value={teachers[0]}
             valueLabel={plural(teachers[0], "teacher")}
-            chips={[{ label: "Invitations", value: teachers[1] }]}
+            chips={[{ label: "Invitations", value: teachers[1], tone: teachers[1] ? "info" : "default" }]}
             action="Open Teachers →"
           />
         ) : null}
@@ -235,5 +249,14 @@ export default async function TeacherDashboard() {
         )}
       </section>
     </PageShell>
+  );
+}
+
+/** Test section scores in the area colours (R&W orange, Math blue), as in the students table. */
+function Scores({ rw, math }: { rw: number | null; math: number | null }) {
+  return (
+    <>
+      <span className="text-[var(--sat-area-reading)]">R&amp;W</span> <b>{rw ?? "—"}</b> · <span className="text-[var(--sat-area-math)]">Math</span> <b>{math ?? "—"}</b>
+    </>
   );
 }
