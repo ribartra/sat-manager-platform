@@ -618,8 +618,19 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
-    requires: ["slice(0, PENDING_PREVIEW)", "See all {total} pending"],
+    requires: ["slice(0, PENDING_PREVIEW)", "<SeeAllPending"],
     label: "Paneles de pendientes del alumno: maximo 10 y 'See all N pending'",
+  },
+  {
+    file: "components/sat/side-panel.tsx",
+    requires: ["See all {total} pending", "count > PENDING_PREVIEW"],
+    label: "Panel lateral compartido: maximo 10 y 'See all N pending'",
+  },
+  {
+    file: "app/(student)/student/practice/page.tsx",
+    requires: ["<SkillResults", "<SidePanel", "slice(0, PENDING_PREVIEW)", "<PracticeSetAttemptsAccordion", "loadPracticeReport(studentId"],
+    forbids: ["SummaryView", "CompactAreaBox", "includeSummary"],
+    label: "Practice del alumno = vista de practica del profesor (resultados por skill, sets a hacer, intentos por set), sin Summary repetido",
   },
   {
     file: "components/notification-bell.tsx",

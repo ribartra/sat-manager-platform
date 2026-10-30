@@ -1,226 +1,129 @@
 import Link from "next/link";
-import { PAGE_SIZE } from "@/components/sat/pagination";
-import { PENDING_PREVIEW, pendingHref } from "@/lib/pending";
 import { redirect } from "next/navigation";
-import {
-  AreaBoxGrid,
-  CompactAreaBox,
-  DIFFICULTIES,
-  EmptyState,
-  PageHeader,
-  PageShell,
-  Pagination,
-  PracticeAreaTabs,
-  SectionHeader,
-  SkillsMap,
-  SkillsMapLegend,
-  pageFromParam,
-  paginate,
-  type ChipState,
-  type SkillsMapChip,
-} from "@/components/sat";
+import { EmptyState, PageHeader, PageShell, PracticeAreaTabs, PracticeSetAttemptsAccordion, SectionHeader, SkillResults } from "@/components/sat";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
-import { ListItem, ListStack } from "@/components/sat/list";
-import { AreaTag, PracticeSetRow } from "@/components/sat/practice-set-row";
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
+import { HEADER_SHORTCUT_CLASS, HeaderActions } from "@/components/sat/header-actions";
+import { SeeAllPending, SidePanel, StatusBadge } from "@/components/sat/side-panel";
+import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
 import { refreshAssignmentStates } from "@/lib/assignments";
-import { difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
-import { activeHomeTab, practiceAreaFromTab, practiceAreaLabel, tabFromPracticeArea, type PracticeAreaCode } from "@/lib/practice-area";
-import { loadStudentPractice, sortPracticeSets, summarizeArea, PRACTICE_AREAS_IN_ORDER, type PracticeSetItem } from "@/lib/student-practice";
-import { officialSkillsFor } from "@/lib/taxonomy-order";
-import { formatDate, relativeDay } from "@/lib/utils";
+import { practiceSetGroups, setsFromReportAttempts } from "@/lib/attempt-groups";
+import { historyHref } from "@/lib/history-params";
+import { PENDING_PREVIEW, pendingHref } from "@/lib/pending";
+import { activeAreaTab, practiceAreaFromTab, practiceAreaLabel } from "@/lib/practice-area";
+import { loadPracticeReport, shortSetName } from "@/lib/student-report";
+import { formatDate, isAhead } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
 interface PageProps {
-  searchParams: Promise<{ area?: string; page?: string }>;
+  searchParams: Promise<{ area?: string }>;
 }
 
 /**
- * Practice (mockup content-map.html): Summary · Math · Reading · Writing. Practice sets by skill,
- * assigned by the teacher. Percentages only — SAT scores belong to Tests.
+ * The student's Practice, one area at a time (Math · Reading · Writing) — the same view the teacher
+ * has of the student's practice: results by skill (last try of each set, per source), the sets to do
+ * at the side (Start / Continue) and the tries of each set. Percentages only (SAT scores are Tests).
  */
 export default async function StudentPracticePage({ searchParams }: PageProps) {
   const session = await auth();
   if (!session?.user) redirect("/login");
+  const studentId = session.user.id;
   await refreshAssignmentStates();
   const query = await searchParams;
-  const tab = activeHomeTab(query.area === "tests" ? undefined : query.area);
   if (query.area === "tests" || query.area === "mocks") redirect("/student/tests");
-  const area = tab === "summary" ? null : practiceAreaFromTab(tab);
-  const practice = await loadStudentPractice(session.user.id);
+  const area = activeAreaTab(query.area, "math") as "math" | "reading" | "writing";
+  const practiceArea = practiceAreaFromTab(area) ?? "MATH";
+  // Results by skill have no filters (as on the teacher's view): the whole area, every source.
+  const report = await loadPracticeReport(studentId, practiceArea, {});
+  const areaLabel = practiceAreaLabel(practiceArea);
+  // One row per practice set (its last try), opening to its latest tries; every try is in History.
+  const practiceSets = practiceSetGroups(setsFromReportAttempts(report.attemptHistory));
 
   return (
     <PageShell>
-      <Breadcrumbs
-        items={[
-          { label: "Home", href: "/student" },
-          ...(area ? [{ label: "Practice", href: "/student/practice" }, { label: practiceAreaLabel(area) }] : [{ label: "Practice" }]),
-        ]}
+      <Breadcrumbs items={[{ label: "Home", href: "/student" }, { label: "Practice", href: "/student/practice" }, { label: areaLabel }]} />
+      <PageHeader
+        title="Practice"
+        description="Practice sets by skill, assigned by your teacher. Results show % correct (SAT scores are in Tests)."
+        actions={
+          <HeaderActions>
+            <Link href={pendingHref("/student/pending", { type: "practice", area })} className={HEADER_SHORTCUT_CLASS}>Pending →</Link>
+            <Link href={historyHref({ type: "practice", area }, {}, "/student/history")} className={HEADER_SHORTCUT_CLASS}>History →</Link>
+          </HeaderActions>
+        }
       />
-      <PageHeader title="Practice" description="Practice sets by skill, assigned by your teacher. Use them to prepare for your tests." />
-      <PracticeAreaTabs basePath="/student/practice" active={tab} includeSummary includeTests={false} />
-      {area ? <AreaView practice={practice} area={area} page={pageFromParam(query.page)} /> : <SummaryView practice={practice} />}
-    </PageShell>
-  );
-}
+      <PracticeAreaTabs basePath="/student/practice" active={area} includeTests={false} />
 
-/** Practice summary (mockup content-map.html): compact area boxes and the next 10 sets to do ("See all N pending →" beyond). */
-function SummaryView({ practice }: { practice: PracticeSetItem[] }) {
-  const todo = sortPracticeSets(practice.filter((p) => p.state !== "done"));
-  return (
-    <>
-      <AreaBoxGrid>
-        {PRACTICE_AREAS_IN_ORDER.map((area) => {
-          const s = summarizeArea(practice, area);
-          return (
-            <CompactAreaBox
-              key={area}
-              area={area}
-              label={s.label}
-              href={`/student/practice?area=${tabFromPracticeArea(area)}`}
-              pct={s.latest?.attempt.pct ?? null}
-              emptyText="No results"
-              line1={s.lastPracticed ? `Latest practice · ${relativeDay(s.lastPracticed)}` : "Not practiced yet"}
-              line1Right={<><b className="text-gray-800">{s.done}/{s.total}</b> done</>}
-              line2={
-                <>
-                  {s.todo} to do{s.overdue ? <> · <b className="text-red-600">{s.overdue} overdue</b></> : null}
-                </>
-              }
-            />
-          );
-        })}
-      </AreaBoxGrid>
-      <section className="mt-6">
-        <SectionHeader
-          title="Up next"
-          description={`${todo.length} set${todo.length === 1 ? "" : "s"} to do · in progress first, then by due date`}
-          action={
-            // Shortcut to the pending list of each area (/student/pending).
-            todo.length > 0 ? (
-              <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-                {PRACTICE_AREAS_IN_ORDER.map((code) => {
-                  const n = todo.filter((p) => p.area === code).length;
-                  return n ? (
-                    <Link key={code} href={pendingHref("/student/pending", { type: "practice", area: tabFromPracticeArea(code) as "math" | "reading" | "writing" })} className="text-blue-600 hover:underline">
-                      {practiceAreaLabel(code)} · {n} to do ›
-                    </Link>
-                  ) : null;
-                })}
-              </span>
-            ) : undefined
-          }
-        />
-        {todo.length === 0 ? (
-          <Card padding="md" className="text-sm text-gray-500">Nothing pending.</Card>
-        ) : (
-          <ListStack>
-            {todo.slice(0, PENDING_PREVIEW).map((item) => (
-              <ListItem compact key={item.assignmentId} href={`/student/practice/assignment/${item.assignmentId}`}>
-                <span className="flex min-w-0 flex-wrap items-center gap-1.5">
-                  <AreaTag area={item.area} />
-                  <b className="text-sm text-gray-900">{item.skill}</b>
-                  <Badge variant={difficultyBadgeVariant(item.difficulty)}>{difficultyLabel(item.difficulty)}</Badge>
-                  {item.overdue ? <Badge variant="danger">Overdue</Badge> : item.state === "progress" ? <Badge variant="warning">In progress</Badge> : null}
-                </span>
-                <span className="flex shrink-0 items-center gap-2 text-xs text-gray-500">
-                  {item.dueDate ? `Due ${formatDate(item.dueDate)}` : null}
-                  <span aria-hidden className="text-gray-400">›</span>
-                </span>
-              </ListItem>
+      <div className="mt-4 grid gap-6 lg:grid-cols-3">
+        <div id="performance" className="min-w-0 space-y-6 lg:col-span-2">
+          <SkillResults report={report} attemptHref={(id) => `/student/results/${id}`} />
+        </div>
+
+        <aside className="min-w-0 space-y-6">
+          <SidePanel
+            id="active-sets"
+            title="Your practice sets"
+            count={report.assignments.length}
+            empty={`No ${areaLabel} practice sets to do.`}
+            footer={<SeeAllPending total={report.assignments.length} href={pendingHref("/student/pending", { type: "practice", area })} />}
+          >
+            {report.assignments.slice(0, PENDING_PREVIEW).map((a) => (
+              <li key={a.id} className="flex items-start justify-between gap-3 px-3 py-2">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-gray-800" title={a.name}>{shortSetName(a.name)}</p>
+                  <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
+                    <StatusBadge status={a.status} />
+                    <span className={isAhead(a.opensAt) ? "text-[11px] text-amber-700" : "text-[11px] text-gray-400"}>Opens {formatDate(a.opensAt)}</span>
+                    {a.dueDate && <span className="text-[11px] text-gray-400">Due {formatDate(a.dueDate)}</span>}
+                  </div>
+                </div>
+                {/* Start or continue it (an open date ahead or a closed set can't start yet). */}
+                {a.locked ? (
+                  <Button size="sm" variant="secondary" disabledReason={isAhead(a.opensAt) ? `You can start it on ${formatDate(a.opensAt)}.` : "Your teacher will open it."}>
+                    {isAhead(a.opensAt) ? "Not open yet" : "Closed"}
+                  </Button>
+                ) : (
+                  <Button asChild size="sm">
+                    <Link href={`/student/practice/assignment/${a.id}`}>{a.status === "IN_PROGRESS" ? "Continue" : "Start"}</Link>
+                  </Button>
+                )}
+              </li>
             ))}
-          </ListStack>
-        )}
-        {todo.length > PENDING_PREVIEW ? (
-          <Link href={pendingHref("/student/pending", { type: "practice" })} className="mt-2 inline-block text-sm font-medium text-blue-600 hover:underline">
-            See all {todo.length} pending →
-          </Link>
-        ) : null}
-      </section>
-    </>
-  );
-}
+          </SidePanel>
 
-const SETS_PAGE_SIZE = PAGE_SIZE;
+          {report.comments.length > 0 && (
+            <SidePanel title="Teacher comments" count={report.comments.length} empty="">
+              {report.comments.map((entry) => (
+                <li key={entry.id}>
+                  {/* Each comment opens the try it was written on. */}
+                  <Link href={`/student/results/${entry.id}`} className="block px-3 py-2 hover:bg-[var(--sat-primary-soft)]">
+                    <p className="text-[11px] text-gray-400" title={entry.name}>{shortSetName(entry.name)} · {entry.submittedAt ? formatDate(entry.submittedAt) : "-"}</p>
+                    <p className="text-sm text-gray-800">{entry.teacherComment}</p>
+                  </Link>
+                </li>
+              ))}
+            </SidePanel>
+          )}
+        </aside>
+      </div>
 
-async function AreaView({ practice, area, page }: { practice: PracticeSetItem[]; area: PracticeAreaCode; page: number }) {
-  const tab = tabFromPracticeArea(area)!;
-  const mine = sortPracticeSets(practice.filter((p) => p.area === area));
-  const setsPage = paginate(mine, page, SETS_PAGE_SIZE);
-  const skills = await officialSkillsFor(area);
-  const domains = [...new Map(skills.map((s) => [s.domainId, s.domain])).entries()];
-  const setsFor = (skillId: string, diff: string) => mine.filter((p) => p.skillId === skillId && p.difficulty === diff);
-
-  const chipFor = (skillId: string, diff: string): SkillsMapChip => {
-    const sets = setsFor(skillId, diff);
-    if (sets.length === 0) return { difficulty: diff, state: null, title: `Your teacher hasn't assigned a ${difficultyLabel(diff)} set for this skill yet` };
-    const one = sets.length === 1 ? sets[0] : null;
-    const state: ChipState = sets.some((s) => s.overdue) ? "overdue" : sets.every((s) => s.state === "done") ? "done" : sets.some((s) => s.state === "progress") ? "progress" : "todo";
-    // Attempt level: the most recent attempt among this skill × level's sets (never the best one).
-    const lastPct = sets
-      .filter((s) => s.last)
-      .sort((a, b) => b.last!.submittedAt.getTime() - a.last!.submittedAt.getTime())[0]?.last?.pct ?? null;
-    return {
-      difficulty: diff,
-      state,
-      href: one
-        ? one.state === "done" && one.last
-          ? `/student/results/${one.last.id}`
-          : `/student/practice/assignment/${one.assignmentId}`
-        : `/student?area=${tab}&skill=${skillId}&difficulty=${diff}#sets`,
-      title: one ? (one.state === "done" ? "View results" : one.state === "progress" ? "Continue" : "Start") : `${sets.length} sets`,
-      extra: (
-        <>
-          {sets.length > 1 ? ` ×${sets.length}` : ""}
-          {state === "done" && lastPct !== null ? <span className="text-[var(--sat-muted)]">· last {lastPct}%</span> : null}
-        </>
-      ),
-    };
-  };
-
-  return (
-    <>
-      <section id="sets" className="mb-6 scroll-mt-6">
+      <section id="recent-attempts" className="mt-6 scroll-mt-6">
         <SectionHeader
-          title={`Your ${practiceAreaLabel(area)} practice sets`}
-          description={`${mine.length} set${mine.length === 1 ? "" : "s"} · in progress first, then by due date`}
-          action={<Link href={`/student/history?area=${tab}`} className="text-xs text-blue-600 hover:underline">History ›</Link>}
+          title={`${areaLabel} practice attempts`}
+          description={`${practiceSets.length} practice set${practiceSets.length === 1 ? "" : "s"} · Last Attempt is your most recent try · open a set to see its last 3 tries`}
         />
-        {mine.length === 0 ? (
-          <EmptyState title={`No ${practiceAreaLabel(area)} practice sets yet.`} description="Your teacher assigns practice sets for each skill." />
+        {practiceSets.length === 0 ? (
+          <EmptyState title={`No finished ${areaLabel} work yet.`} />
         ) : (
-          <ListStack>
-            {setsPage.items.map((item) => <PracticeSetRow key={item.assignmentId} item={item} />)}
-            <Pagination basePath="/student/practice" params={{ area: tab }} anchor="sets" pageSize={SETS_PAGE_SIZE} {...setsPage} />
-          </ListStack>
+          <PracticeSetAttemptsAccordion
+            sets={practiceSets}
+            hrefFor={(id) => `/student/results/${id}`}
+            // "See all N tries": your History filtered to that set.
+            historyHref={(set) => historyHref({ area, skill: set.skillId ?? undefined, difficulty: set.difficulty ?? undefined, set: set.practiceSetId ?? undefined }, {}, "/student/history")}
+          />
         )}
       </section>
-
-      <section>
-        <SectionHeader title="Skills map" description={`Every SAT skill in ${practiceAreaLabel(area)} and the sets assigned for each one.`} className="mb-0" />
-        <SkillsMapLegend />
-        <SkillsMap
-          domains={domains.map(([domainId, domainName]) => ({
-            id: domainId,
-            name: domainName,
-            skills: skills
-              .filter((s) => s.domainId === domainId)
-              .map((skill) => {
-                const assigned = mine.filter((p) => p.skillId === skill.id).length;
-                return {
-                  id: skill.id,
-                  name: skill.name,
-                  sub: assigned ? `${assigned} set${assigned === 1 ? "" : "s"} assigned` : "No sets assigned yet",
-                  chips: DIFFICULTIES.map((d) => chipFor(skill.id, d)),
-                  href: `/student?area=${tab}&skill=${skill.id}#sets`,
-                };
-              }),
-          }))}
-        />
-      </section>
-    </>
+    </PageShell>
   );
 }
