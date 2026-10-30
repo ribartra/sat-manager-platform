@@ -55,7 +55,6 @@ export function SearchableSelect({
     queueMicrotask(() => input.current?.dispatchEvent(new Event("change", { bubbles: true })));
   }
 
-  let lastGroup: string | undefined;
   return (
     <DropdownMenu onOpenChange={(open) => !open && setSearch("")}>
       {name ? <input ref={input} type="hidden" name={name} value={current} /> : null}
@@ -87,9 +86,9 @@ export function SearchableSelect({
             </Item>
           )}
           {shown.length === 0 ? <p className="px-2 py-1.5 text-sm text-gray-500">No match.</p> : null}
-          {shown.map((o) => {
-            const heading = o.group && o.group !== lastGroup ? o.group : null;
-            lastGroup = o.group;
+          {shown.map((o, index) => {
+            // A group heading before the first option of each group.
+            const heading = o.group && o.group !== shown[index - 1]?.group ? o.group : null;
             return (
               <div key={o.value}>
                 {heading ? <DropdownMenuLabel className="px-2 pb-0.5 pt-2 text-[11px] font-semibold text-gray-500">{heading}</DropdownMenuLabel> : null}
