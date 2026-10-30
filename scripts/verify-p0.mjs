@@ -7,9 +7,9 @@ const checks = [
   // Home is one view (SAT-036/037): no section tabs, inactivity + unlock requests, no low performance.
   {
     file: "app/(teacher)/teacher/page.tsx",
-    requires: ["Students inactive for 5+ days", "Students asking to unlock a set", "<ScrollSnapPage />", "title=\"Overview\""],
+    requires: ["<ViewSummaryCard", "lg:grid-cols-5"],
     forbids: ["Overdue tests", "Section under 550", "Low performance", "PracticeAreaTabs", "TeacherStudentsTable"],
-    label: "Teacher Home: one view (no Math/Reading/Writing/Tests tabs), inactivity and unlock requests only",
+    label: "Teacher Home: one view (no Math/Reading/Writing/Tests tabs), one tall box per view",
   },
   // Results by skill (SAT-039/040/041): no Low performance, no summary card, no matrix, no Assign in results.
   {
@@ -143,9 +143,9 @@ const checks = [
   // Every list (teacher + admin) has a text search and filters.
   {
     file: "app/(teacher)/teacher/page.tsx",
-    requires: ["<StudentOverviewTable", "<ViewSummaryCard", 'href="/teacher/pending"', 'href="/teacher/history"', 'href="/teacher/tests"', 'href="/teacher/practice-sets"', "slice(0, HOME_STUDENTS)", "All {rows.length} students →"],
-    forbids: ["<ListFilters", "Invite student", "students/invite", "{item.label} →", "most recently active", "Assign →"],
-    label: "Home = vista resumen: sin busqueda ni Invite; un recuadro por vista (estado + atajo); 5 alumnos + All students →",
+    requires: ["<ViewSummaryCard", 'href="/teacher/students"', 'href="/teacher/tests"', 'href="/teacher/practice-sets"', 'href="/teacher/history"'],
+    forbids: ["<ListFilters", "Invite student", "students/invite", "Assign →", "<AttentionRow", "<StudentOverviewTable", 'href="/teacher/pending"'],
+    label: "Home = solo recuadros altos por vista (estado + atajo); sin avisos, sin tabla de alumnos, sin Pending",
   },
   {
     file: "app/(teacher)/teacher/students/page.tsx",

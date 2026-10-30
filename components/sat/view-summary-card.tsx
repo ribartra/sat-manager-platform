@@ -20,8 +20,8 @@ export interface ViewSummaryChip {
 }
 
 /**
- * One box per view on the teacher Home: the view's name, its main number, a few status chips, one
- * line of detail and the way in. The whole box links to the view (the title link covers it).
+ * One tall box per view on the teacher Home: the view's name, its main number, its status (one chip
+ * per line), a line of detail and the way in. The whole box links to the view (the title link covers it).
  */
 export function ViewSummaryCard({
   title,
@@ -46,7 +46,7 @@ export function ViewSummaryCard({
   action: string;
 }) {
   return (
-    <Card padding="md" className="relative flex min-h-[12rem] flex-col gap-2.5 hover:border-gray-400">
+    <Card padding="md" className="relative flex min-h-[22rem] flex-col gap-3 hover:border-gray-400">
       <div className="flex items-center justify-between">
         <h2 className="flex items-center gap-2 text-base font-semibold text-[var(--sat-text)]">
           <span
@@ -62,16 +62,16 @@ export function ViewSummaryCard({
         </h2>
         <span aria-hidden className="text-gray-400">›</span>
       </div>
-      <p className="flex items-baseline gap-2">
-        <span className="text-3xl font-extrabold tabular-nums leading-none text-[var(--sat-text)]">{value}</span>
-        <span className="text-sm text-[var(--sat-muted)]">{valueLabel}</span>
+      <p>
+        <span className="block text-4xl font-extrabold tabular-nums leading-none text-[var(--sat-text)]">{value}</span>
+        <span className="mt-1 block text-sm text-[var(--sat-muted)]">{valueLabel}</span>
       </p>
       {chips.length > 0 ? (
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-col gap-1.5">
           {chips.map((c) => (
             <span
               key={c.label}
-              className={cn("rounded-lg border px-2 py-1 text-xs leading-tight", c.color ? "border-current bg-white" : CHIP_TONE[c.tone ?? "default"])}
+              className={cn("flex items-center justify-between gap-2 rounded-lg border px-2.5 py-1.5 text-xs leading-tight", c.color ? "border-current bg-white" : CHIP_TONE[c.tone ?? "default"])}
               style={c.color ? { color: c.color } : undefined}
             >
               {c.label} <b>{c.value}</b>
@@ -79,7 +79,7 @@ export function ViewSummaryCard({
           ))}
         </div>
       ) : null}
-      {line ? <p className="truncate text-xs text-gray-600">{line}</p> : null}
+      {line ? <p className="text-xs leading-relaxed text-gray-600">{line}</p> : null}
       <div className="mt-auto border-t border-gray-100 pt-2 text-right text-xs font-medium text-blue-600">{action}</div>
     </Card>
   );
