@@ -3,7 +3,6 @@ import Link from "next/link";
 import { Clock, UserPlus } from "lucide-react";
 import { AttentionRow, EmptyState, ListFilters, PageHeader, PageShell, StudentCell } from "@/components/sat";
 import { StudentOverviewTable } from "@/components/sat/student-overview-table";
-import { assignHref } from "@/lib/assign-params";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { HEADER_SHORTCUT_CLASS, HeaderActions } from "@/components/sat/header-actions";
 import { Badge } from "@/components/ui/badge";
@@ -32,7 +31,7 @@ type Show = keyof typeof SHOW;
 
 /**
  * Students roster: the Home table (latest practice per area, latest Test, pending Tests) for every
- * student, with search, a status filter, the Inactive notice and the Assign / Parents shortcuts.
+ * student, with search, a status filter, the Inactive notice and the Parents shortcut (Assign is on the Home Students box).
  */
 export default async function TeacherStudentsPage({ searchParams }: PageProps) {
   const session = await auth();
@@ -89,8 +88,6 @@ export default async function TeacherStudentsPage({ searchParams }: PageProps) {
         }
         actions={
           <HeaderActions>
-            {/* Assign: the student drop-down opens first, then that student's Assign view. */}
-            <Link href={assignHref({})} className={HEADER_SHORTCUT_CLASS}>Assign →</Link>
             {/* The students' parents (with the way back here). */}
             <Link href="/teacher/parents" className={HEADER_SHORTCUT_CLASS}>Parents →</Link>
             <Link href="/teacher/students/invite" className="inline-flex items-center gap-1.5 self-start shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]">
