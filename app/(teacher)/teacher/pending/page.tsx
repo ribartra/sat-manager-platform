@@ -67,7 +67,7 @@ export default async function TeacherPendingPage({ searchParams }: { searchParam
 
   // A fixed filter hides its column (it would repeat on every row).
   const show = { student: !studentId, type: !filter.type || (filter.type === "practice" && !filter.area), typeBadge: !filter.type, area: !filter.area, status: !status };
-  const head = ["Due", ...(show.student ? ["Student"] : []), ...(show.type ? [show.typeBadge ? "Type" : "Area"] : []), "Test / practice set", ...(show.status ? ["Status"] : []), "Assigned", ""];
+  const head = ["Due", ...(show.student ? ["Student"] : []), ...(show.type ? [show.typeBadge ? "Type" : "Area"] : []), "Test / practice set", ...(show.status ? ["Status"] : []), "Assigned", "Opens", ""];
   const backArea = filter.type === "tests" ? "tests" : filter.area ?? (filter.type === "practice" ? "math" : null);
   const backHref = student ? `/teacher/students/${student.id}${backArea ? `?area=${backArea}` : ""}` : null;
   const context = [
@@ -173,7 +173,6 @@ function PendingTableRow({ row: r, show }: { row: PendingRow; show: { student: b
         <span className="flex flex-wrap items-center gap-2">
           <RowLink href={href}>{r.title}</RowLink>
           {r.difficulty ? <Badge variant={difficultyBadgeVariant(r.difficulty)}>{difficultyLabel(r.difficulty)}</Badge> : null}
-          {r.locked ? <Badge variant="danger">Locked</Badge> : null}
         </span>
       </td>
       {show.status ? (
@@ -184,6 +183,11 @@ function PendingTableRow({ row: r, show }: { row: PendingRow; show: { student: b
         </td>
       ) : null}
       <td className={`${TD} whitespace-nowrap text-gray-600`}>{formatDate(r.assignedAt)}</td>
+      <td className={`${TD} whitespace-nowrap`}>
+        {/* Open date: the assignment's, else the day it was assigned. */}
+        <span className={r.opensAt > new Date() ? "text-amber-700" : "text-gray-600"}>{formatDate(r.opensAt)}</span>
+        {r.opensAt > new Date() ? <span className="block text-xs text-amber-700">{relativeDay(r.opensAt)}</span> : r.locked ? <span className="block text-xs text-amber-700">Not open yet</span> : null}
+      </td>
       <ChevronCell />
     </LinkTr>
   );

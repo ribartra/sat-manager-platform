@@ -6,6 +6,7 @@ import { difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
 import { practiceAreaLabel, tabFromPracticeArea } from "@/lib/practice-area";
 import type { PracticeSetItem } from "@/lib/student-practice";
 import { ListItem } from "@/components/sat/list";
+import { formatDate, isAhead } from "@/lib/utils";
 
 /** Area tag: coloured square + area name. */
 export function AreaTag({ area }: { area: PracticeSetItem["area"] }) {
@@ -44,6 +45,7 @@ export function PracticeSetRow({
         </div>
         <DueLine
           assignedAt={item.assignedAt}
+          opensAt={item.opensAt}
           dueDate={item.dueDate}
           completedAt={item.state === "done" ? item.last?.submittedAt ?? null : null}
           className="mt-0.5"
@@ -63,7 +65,7 @@ export function PracticeSetRow({
           </Button>
         ) : null}
         {readOnly ? null : item.locked ? (
-          <Button size="sm" variant="secondary" disabledReason="Your teacher hasn't opened this set yet.">Locked</Button>
+          <Button size="sm" variant="secondary" disabledReason={notOpenReason(item.opensAt)}>{notOpenLabel(item.opensAt)}</Button>
         ) : item.state === "progress" ? (
           <Button asChild size="sm"><Link href={player}>Continue ›</Link></Button>
         ) : item.state === "done" ? (
@@ -110,4 +112,13 @@ export function StripedBar({ pct, color }: { pct: number | null; color: string }
       <div className="h-full rounded-md" style={{ width: `${pct}%`, backgroundColor: color }} />
     </div>
   );
+}
+
+/** Button of a set that can't be started yet: its open date, or waiting for the teacher. */
+export function notOpenLabel(opensAt: Date) {
+  return isAhead(opensAt) ? `Opens ${formatDate(opensAt)}` : "Not open yet";
+}
+
+export function notOpenReason(opensAt: Date) {
+  return isAhead(opensAt) ? `You can start it on ${formatDate(opensAt)}.` : "Your teacher will open it.";
 }

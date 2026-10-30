@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageShell, PracticeAttemptsTable, SectionHeader } from "@/components/sat";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
-import { AreaTag } from "@/components/sat/practice-set-row";
+import { AreaTag, notOpenLabel, notOpenReason } from "@/components/sat/practice-set-row";
 import { DueLine, WorkStatusBadges } from "@/components/sat/work-status";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -38,7 +38,7 @@ export async function PracticeIntro({ studentId, assignmentId }: { studentId: st
         <p className="mt-1 text-sm text-gray-500">
           {practiceAreaLabel(item.area)} · {item.domain} · {item.questionCount} questions · no time limit
         </p>
-        <DueLine assignedAt={item.assignedAt} dueDate={item.dueDate} className="mt-1" />
+        <DueLine assignedAt={item.assignedAt} opensAt={item.opensAt} dueDate={item.dueDate} className="mt-1" />
 
         {item.tries.length > 0 ? (
           <div className="mt-5">
@@ -53,7 +53,7 @@ export async function PracticeIntro({ studentId, assignmentId }: { studentId: st
 
         <div className="mt-6 flex flex-wrap gap-2">
           {item.locked ? (
-            <Button size="lg" disabledReason="Your teacher hasn't opened this set yet.">Locked</Button>
+            <Button size="lg" disabledReason={notOpenReason(item.opensAt)}>{notOpenLabel(item.opensAt)}</Button>
           ) : (
             <Button asChild size="lg"><Link href={start}>{label}</Link></Button>
           )}

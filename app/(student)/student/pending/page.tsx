@@ -36,7 +36,7 @@ export default async function StudentPendingPage({ searchParams }: { searchParam
   const page = paginate(rows, pageFromParam(query.page), PAGE_SIZE);
   const params = { type: filter.type, area: filter.area, status, ...periodParams(period) };
   const show = { type: !filter.type || (filter.type === "practice" && !filter.area), typeBadge: !filter.type, area: !filter.area, status: !status };
-  const head = ["Due", ...(show.type ? [show.typeBadge ? "Type" : "Area"] : []), "Test / practice set", ...(show.status ? ["Status"] : []), "Assigned", ""];
+  const head = ["Due", ...(show.type ? [show.typeBadge ? "Type" : "Area"] : []), "Test / practice set", ...(show.status ? ["Status"] : []), "Assigned", "Opens", ""];
   const context = [
     filter.type === "tests" ? "Tests" : filter.type === "practice" ? "Practice" : null,
     filter.area ? practiceAreaLabel(AREA_CODE[filter.area]) : null,
@@ -101,7 +101,6 @@ export default async function StudentPendingPage({ searchParams }: { searchParam
                     {/* Opens the set / Test to start or continue it. */}
                     <RowLink href={r.kind === "test" ? `/student/tests/${r.id}` : `/student/practice/assignment/${r.id}`}>{r.title}</RowLink>
                     {r.difficulty ? <Badge variant={difficultyBadgeVariant(r.difficulty)}>{difficultyLabel(r.difficulty)}</Badge> : null}
-                    {r.locked ? <Badge variant="danger">Locked</Badge> : null}
                   </span>
                 </td>
                 {show.status ? (
@@ -112,6 +111,11 @@ export default async function StudentPendingPage({ searchParams }: { searchParam
                   </td>
                 ) : null}
                 <td className={`${TD} whitespace-nowrap text-gray-600`}>{formatDate(r.assignedAt)}</td>
+                <td className={`${TD} whitespace-nowrap`}>
+                  {/* Open date: the assignment's, else the day it was assigned. */}
+                  <span className={r.opensAt > new Date() ? "text-amber-700" : "text-gray-600"}>{formatDate(r.opensAt)}</span>
+                  {r.opensAt > new Date() ? <span className="block text-xs text-amber-700">{relativeDay(r.opensAt)}</span> : r.locked ? <span className="block text-xs text-amber-700">Not open yet</span> : null}
+                </td>
                 <ChevronCell />
               </LinkTr>
             ))}

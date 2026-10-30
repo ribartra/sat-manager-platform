@@ -98,6 +98,8 @@ export type PracticeReport = {
     difficulty: string;
     status: string;
     locked: boolean;
+    /** Open date: the assignment's, else the day it was assigned. */
+    opensAt: Date;
     dueDate: Date | null;
   }>;
   attempts: ReportAttempt[];
@@ -127,7 +129,7 @@ export type MockReport = {
   exams: Array<{ id: string; name: string; submittedAt: Date | null; totalScore: number | null; rwScore: number | null; mathScore: number | null }>;
   /** Submitted + invalidated exams, newest first, for the history list only (not in the PDF). */
   examHistory: Array<{ id: string; status: string; name: string; submittedAt: Date | null; totalScore: number | null; rwScore: number | null; mathScore: number | null }>;
-  activeExams: Array<{ id: string; name: string; status: string; dueDate: Date | null; openAttemptId: string | null; openAttemptStartedAt: Date | null }>;
+  activeExams: Array<{ id: string; name: string; status: string; opensAt: Date; dueDate: Date | null; openAttemptId: string | null; openAttemptStartedAt: Date | null }>;
 };
 
 /** "Advanced Math - Nonlinear Functions - EASY" -> "Nonlinear Functions (Easy)" (the area implies the domain). */
@@ -356,7 +358,8 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
       topicId: a.practiceSet.topicId,
       difficulty: a.practiceSet.difficulty,
       status: a.status,
-      locked: a.locked,
+      locked: a.locked || Boolean(a.unlockAt && a.unlockAt > new Date()),
+      opensAt: a.unlockAt ?? a.createdAt,
       dueDate: a.dueDate,
     })),
     attempts: scoredAttempts,
@@ -478,6 +481,8 @@ export async function loadMockReport(studentId: string, filters: ReportFilters, 
       id: a.id,
       name: a.test.name,
       status: a.status,
+      // Open date: the assignment's, else the day it was assigned.
+      opensAt: a.unlockAt ?? a.createdAt,
       dueDate: a.dueDate,
       openAttemptId: a.attempts[0]?.id ?? null,
       openAttemptStartedAt: a.attempts[0]?.startedAt ?? null,

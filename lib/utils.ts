@@ -73,3 +73,8 @@ export function relativeDay(date: Date | string, now: Date = new Date()): string
   const text = n < 14 ? `${n} days` : n < 60 ? `${Math.round(n / 7)} weeks` : `${Math.round(n / 30)} months`;
   return diff > 0 ? `in ${text}` : `${text} ago`;
 }
+
+/** True when the date is still ahead (an open date not reached yet). */
+export function isAhead(date: Date | string) {
+  return new Date(date).getTime() > Date.now();
+}

@@ -34,8 +34,8 @@ export interface StudentTestItem {
   sourceOrder: number;
   assignedAt: Date;
   dueDate: Date | null;
-  /** Open date still ahead: the student can't start the Test until then (null = open). */
-  opensAt: Date | null;
+  /** Open date: the assignment's, else the day it was assigned (can't start before it). */
+  opensAt: Date;
   status: string;
   state: WorkState;
   overdue: boolean;
@@ -119,7 +119,7 @@ export async function loadStudentTests(studentId: string): Promise<StudentTestIt
         sourceOrder: a.test.source?.sortOrder ?? 999,
         assignedAt: a.createdAt,
         dueDate: a.dueDate,
-        opensAt: a.unlockAt && a.unlockAt > new Date() ? a.unlockAt : null,
+        opensAt: a.unlockAt ?? a.createdAt,
         status: a.status,
         state,
         // A retake (the Test was already finished once) is never overdue.

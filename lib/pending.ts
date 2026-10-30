@@ -25,8 +25,11 @@ export interface PendingRow {
   areaLabel: string | null;
   difficulty: string | null;
   status: PendingStatus;
+  /** Can't be started yet: its open date is ahead, or the teacher keeps it closed. */
   locked: boolean;
   assignedAt: Date;
+  /** Open date: the assignment's, else the day it was assigned. */
+  opensAt: Date;
   dueDate: Date | null;
   practiceSetId: string | null;
   testId: string | null;
@@ -60,6 +63,7 @@ export async function loadPending(studentIds: string[], filters: PendingFilters 
             id: true,
             status: true,
             locked: true,
+            unlockAt: true,
             createdAt: true,
             dueDate: true,
             student: { select: { id: true, name: true } },
@@ -86,8 +90,9 @@ export async function loadPending(studentIds: string[], filters: PendingFilters 
         areaLabel: area ? practiceAreaLabel(area) : null,
         difficulty: a.practiceSet.difficulty,
         status: a.status as PendingStatus,
-        locked: a.locked,
+        locked: a.locked || Boolean(a.unlockAt && a.unlockAt > new Date()),
         assignedAt: a.createdAt,
+        opensAt: a.unlockAt ?? a.createdAt,
         dueDate: a.dueDate,
         practiceSetId: a.practiceSet.id,
         testId: null,
@@ -103,9 +108,10 @@ export async function loadPending(studentIds: string[], filters: PendingFilters 
       areaLabel: null,
       difficulty: null,
       status: a.status as PendingStatus,
-      // Open date still ahead: shown as locked until then.
+      // Open date still ahead: can't be started until then.
       locked: Boolean(a.unlockAt && a.unlockAt > new Date()),
       assignedAt: a.createdAt,
+      opensAt: a.unlockAt ?? a.createdAt,
       dueDate: a.dueDate,
       practiceSetId: null,
       testId: a.testId,

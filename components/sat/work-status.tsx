@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { formatDate, relativeDay } from "@/lib/utils";
+import { formatDate, isAhead, relativeDay } from "@/lib/utils";
 import { scoreBandTextClass } from "@/lib/score-band";
 
 import type { WorkState } from "@/lib/test-view";
@@ -21,20 +21,33 @@ export function WorkStatusBadges({ state, overdue }: { state: WorkState; overdue
   );
 }
 
-/** "Assigned Oct 1, 2026 · Due Oct 20, 2026 (in 3 days)" or "… · Completed Oct 12, 2026 (2 days ago)". */
+/**
+ * "Assigned Oct 1, 2026 · Opens Oct 1, 2026 · Due Oct 20, 2026 (in 3 days)" or "… · Completed Oct 12, 2026
+ * (2 days ago)". The open date is the assignment's, else the day it was assigned.
+ */
 export function DueLine({
   assignedAt,
+  opensAt,
   dueDate,
   completedAt,
   className = "",
 }: {
   assignedAt?: Date | string | null;
+  opensAt?: Date | string | null;
   dueDate?: Date | string | null;
   completedAt?: Date | string | null;
   className?: string;
 }) {
   const parts: React.ReactNode[] = [];
   if (assignedAt) parts.push(<span key="a">Assigned <b className="font-medium text-gray-700">{formatDate(assignedAt)}</b></span>);
+  if (opensAt && !completedAt) {
+    const ahead = isAhead(opensAt);
+    parts.push(
+      <span key="o" className={ahead ? "text-amber-700" : ""}>
+        Opens <b className="font-medium">{formatDate(opensAt)}</b>{ahead ? ` (${relativeDay(opensAt)})` : ""}
+      </span>,
+    );
+  }
   if (completedAt) {
     parts.push(
       <span key="c">

@@ -347,6 +347,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                     )}
                     <div className="mt-0.5 flex items-center gap-2">
                       <StatusBadge status={a.status} />
+                      <span className={a.opensAt > new Date() ? "text-[11px] text-amber-700" : "text-[11px] text-gray-400"}>Opens {formatDate(a.opensAt)}</span>
                       {a.dueDate && <span className="text-[11px] text-gray-400">Due {formatDate(a.dueDate)}</span>}
                       {a.openAttemptStartedAt && <span className="text-[11px] text-gray-400">Started {formatDate(a.openAttemptStartedAt)}</span>}
                     </div>
@@ -423,8 +424,9 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                   <p className="truncate text-sm font-medium text-gray-800" title={a.name}>{shortSetName(a.name)}</p>
                   <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
                     <StatusBadge status={a.status} />
-                    {a.locked && <Badge variant="danger">Locked</Badge>}
+                    {a.locked && a.opensAt <= new Date() ? <Badge variant="warning">Not open yet</Badge> : null}
                     {unlockByAssignment.has(a.id) ? <Badge variant="info">Unlock requested</Badge> : null}
+                    <span className={a.opensAt > new Date() ? "text-[11px] text-amber-700" : "text-[11px] text-gray-400"}>Opens {formatDate(a.opensAt)}</span>
                     {a.dueDate && <span className="text-[11px] text-gray-400">Due {formatDate(a.dueDate)}</span>}
                   </div>
                 </div>

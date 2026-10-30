@@ -15,6 +15,8 @@ import { buildTestAttemptView, moduleViewsForTest, type ModuleView } from "@/lib
 type IntroAssignment = {
   id: string;
   createdAt: Date;
+  /** Open date (null: the day it was assigned). */
+  unlockAt: Date | null;
   dueDate: Date | null;
   test: {
     id: string;
@@ -99,7 +101,7 @@ export async function TestIntro({
         <p className="mt-1 text-sm text-gray-500">
           {current.questionCount} questions · {current.minutes} minutes · the timer keeps your remaining time if you leave
         </p>
-        <DueLine assignedAt={assignment.createdAt} dueDate={assignment.dueDate} className="mt-1" />
+        <DueLine assignedAt={assignment.createdAt} opensAt={assignment.unlockAt ?? assignment.createdAt} dueDate={assignment.dueDate} className="mt-1" />
 
         <div className="mt-5 rounded-lg border border-gray-200 bg-gray-50 p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Directions</p>

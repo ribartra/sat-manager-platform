@@ -33,7 +33,10 @@ export interface PracticeSetItem {
   area: PracticeAreaCode;
   difficulty: string;
   assignedAt: Date;
+  /** Open date: the assignment's, else the day it was assigned. */
+  opensAt: Date;
   dueDate: Date | null;
+  /** Can't be started yet: its open date is ahead, or the teacher keeps it closed. */
   locked: boolean;
   state: WorkState;
   overdue: boolean;
@@ -120,6 +123,7 @@ export async function loadStudentPractice(studentId: string): Promise<PracticeSe
         area,
         difficulty: a.practiceSet.difficulty,
         assignedAt: a.createdAt,
+        opensAt: a.unlockAt ?? a.createdAt,
         dueDate: a.dueDate,
         locked,
         state,

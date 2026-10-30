@@ -6,7 +6,7 @@ import { TestNumberAccordion } from "@/components/sat/test-number-accordion";
 import { Button } from "@/components/ui/button";
 import type { ModuleView } from "@/lib/test-view";
 import type { StudentTestItem } from "@/lib/test-assignments";
-import { cn, formatDate } from "@/lib/utils";
+import { cn, formatDate, isAhead } from "@/lib/utils";
 
 /** Where a Test card's buttons go; one card for every role, only the links change. */
 export interface TestCardLinks {
@@ -39,7 +39,8 @@ export function TestCard({ item, links, layout = "row" }: { item: StudentTestIte
   const counted = item.attempts.filter((a) => a.status === "SUBMITTED").length;
   const compact = layout === "compact";
   // Open date ahead: nothing can be started yet (the server checks it too).
-  const startLink = item.opensAt ? null : links.module;
+  const notOpenYet = isAhead(item.opensAt);
+  const startLink = notOpenYet ? null : links.module;
 
   const moduleHref = (m: ModuleView) =>
     m.state === "done" && shownId
@@ -66,9 +67,9 @@ export function TestCard({ item, links, layout = "row" }: { item: StudentTestIte
           ? null
           : links.test?.(item.testId) ?? null;
   const mainLabel = done ? "Review results" : open ? (links.module ? "Continue" : "View progress") : links.module ? "Start test" : "Open test";
-  const dateText = item.opensAt && !done
-    ? `opens ${formatDate(item.opensAt)}${item.dueDate ? ` · due ${formatDate(item.dueDate)}` : ""}`
-    : done && last?.submittedAt ? `completed ${formatDate(last.submittedAt)}` : item.dueDate ? `due ${formatDate(item.dueDate)}` : "no due date";
+  const dateText = !done
+    ? `assigned ${formatDate(item.assignedAt)} · opens ${formatDate(item.opensAt)} · ${item.dueDate ? `due ${formatDate(item.dueDate)}` : "no due date"}`
+    : last?.submittedAt ? `completed ${formatDate(last.submittedAt)}` : item.dueDate ? `due ${formatDate(item.dueDate)}` : "no due date";
 
   const score = (code: "RW" | "MATH") => (done && last ? (code === "RW" ? last.rwScore : last.mathScore) : shownView?.sections[code].score ?? null);
   const scoreText = (value: number | null | undefined) => (value != null ? value : "—");
