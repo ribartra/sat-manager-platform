@@ -38,15 +38,29 @@ import {
   questionTypeLabel,
 } from "@/lib/domain-meta";
 import { resolveQuestionType } from "@/lib/question-type";
-import { FullTestActions } from "../full-test-actions-client";
+import { TestActionsMenu } from "../test-actions-menu-client";
+import { HEADER_ACTION_CLASS, HeaderActions } from "@/components/sat/header-actions";
+import { FullTestEditor } from "../new/full-test-editor-client";
+import { findQuestionsWithOptionMediaAndSection } from "@/lib/question-list-media-query";
+import { listSources } from "@/lib/content-source";
+import { requireContentImporter } from "@/lib/rbac";
+import { contentMediaLinks } from "@/lib/import-media.server";
 import { assignHref } from "@/lib/assign-params";
 
 interface PageProps {
   params: Promise<{ testId: string }>;
+  /** `?edit`: the same page in edit mode (the summaries give way to the editor). */
+  searchParams: Promise<{ edit?: string }>;
 }
 
-export default async function FullTestDetailPage({ params }: PageProps) {
+/**
+ * One Test's page: view (modules, students and their results, questions per module) and, with
+ * `?edit`, the same page and header with the editor instead of the summaries. The source shows in
+ * the breadcrumb and the description.
+ */
+export default async function FullTestDetailPage({ params, searchParams }: PageProps) {
   const { testId } = await params;
+  const editing = (await searchParams).edit !== undefined;
   const session = await requireTeacherOrAdmin();
   if (!session) notFound();
   const now = new Date();
@@ -72,6 +86,7 @@ export default async function FullTestDetailPage({ params }: PageProps) {
         },
         orderBy: { order: "asc" },
       },
+      source: { select: { name: true } },
       _count: { select: { assignments: true, attempts: true } },
       assignments: {
         where: studentScope,
@@ -136,31 +151,77 @@ export default async function FullTestDetailPage({ params }: PageProps) {
   const statusBadge = (status: string) =>
     status === "Completed" ? "success" : status === "In progress" ? "warning" : status === "Overdue" ? "danger" : status === "Not started" ? "info" : "default";
 
-  return (
-    <PageShell maxWidth={1180} width="wide">
-      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Tests", href: "/teacher/tests" }, { label: test.name }]} />
+  const sourceName = test.source?.name ?? "No source";
+  const header = (
+    <>
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/teacher" },
+          { label: "Tests", href: "/teacher/tests" },
+          { label: sourceName, href: `/teacher/tests?q=${encodeURIComponent(sourceName)}` },
+          editing ? { label: test.name, href: `/teacher/tests/${test.id}` } : { label: test.name },
+          ...(editing ? [{ label: "Edit" }] : []),
+        ]}
+      />
       <PageHeader
         title={test.name}
-        description={`${firstAssigned ? `Assigned ${formatDate(firstAssigned)}` : "Not assigned yet"}${nextDue ? ` · next due ${formatDate(nextDue)}` : ""} · 4 modules · ${test.breakMinutes > 0 ? "optional break" : "no break"} · review ${test.reviewEnabled ? "on" : "off"}`}
+        description={
+          <>
+            <b className="font-medium text-gray-700">Source: {sourceName}</b>
+            {test.number ? ` · TEST ${test.number}` : ""} · {test.status !== "PUBLISHED" ? `${fullTestStatusLabel(test.status)} · ` : ""}
+            {editing
+              ? "Editing: change the settings and the questions of each module, then save."
+              : `${firstAssigned ? `Assigned ${formatDate(firstAssigned)}` : "Not assigned yet"}${nextDue ? ` · next due ${formatDate(nextDue)}` : ""} · 4 modules · ${test.breakMinutes > 0 ? "optional break" : "no break"} · review ${test.reviewEnabled ? "on" : "off"}`}
+          </>
+        }
         actions={
-          <div className="flex flex-col items-end gap-2">
-            <div className="flex flex-wrap gap-2">
-              <Button asChild variant="secondary"><Link href="/teacher/tests">All tests</Link></Button>
-              <Button asChild><Link href={assignHref({ test: test.id })}>Assign this test</Link></Button>
-            </div>
-            <div className="flex items-center gap-2">
+          editing ? (
+            <HeaderActions>
+              <Link href={`/teacher/tests/${test.id}`} className={HEADER_ACTION_CLASS}>Back to the test</Link>
+            </HeaderActions>
+          ) : (
+            // One row: main button + the options drop-down (same as the Tests cards).
+            <HeaderActions>
               {test.status !== "PUBLISHED" ? <Badge variant={fullTestStatusBadgeVariant(test.status)}>{fullTestStatusLabel(test.status)}</Badge> : null}
-              <FullTestActions
-                testId={test.id}
-                status={test.status}
-                hasAssignments={test._count.assignments > 0}
-                hasAttempts={test._count.attempts > 0}
-                variant="detail"
-              />
-            </div>
-          </div>
+              <TestActionsMenu test={{ id: test.id, name: test.name, status: test.status }} canDelete={test._count.assignments === 0 && test._count.attempts === 0} afterDeleteHref="/teacher/tests" />
+              {test.status === "PUBLISHED" ? (
+                <Button asChild size="sm"><Link href={assignHref({ test: test.id })}>Assign this test</Link></Button>
+              ) : null}
+            </HeaderActions>
+          )
         }
       />
+    </>
+  );
+
+  if (editing) {
+    const scope = await currentContentScope();
+    const [questions, sources] = await Promise.all([findQuestionsWithOptionMediaAndSection({ status: { in: ["PUBLISHED", "DRAFT"] }, ...scope }), listSources()]);
+    return (
+      <PageShell maxWidth={1180} width="wide">
+        {header}
+        <FullTestEditor
+          mediaLinks={(await requireContentImporter()) ? await contentMediaLinks("tests", test.id, test.modules.flatMap((module) => module.questions.map((item) => item.questionId))) : null}
+          initial={{
+            id: test.id,
+            name: test.name,
+            number: test.number,
+            status: test.status,
+            reviewEnabled: test.reviewEnabled,
+            breakMinutes: test.breakMinutes,
+            sourceId: test.sourceId,
+            moduleQuestionIds: test.modules.map((module) => module.questions.map((item) => item.questionId)),
+          }}
+          questions={questions}
+          sources={sources.filter((src) => src.id === test.sourceId || (src.active && src.forTests))}
+        />
+      </PageShell>
+    );
+  }
+
+  return (
+    <PageShell maxWidth={1180} width="wide">
+      {header}
       <PageContent>
       <TestModuleTiles modules={moduleViews} hrefFor={(m) => `#module-${m.key}`} />
 

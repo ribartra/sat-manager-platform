@@ -12,8 +12,12 @@ export interface ListFilterSelect {
   label: string;
   /** Current value ("" = all). */
   value?: string;
-  /** First option, value "" (e.g. "All statuses"). */
+  /** First option, value `allValue` (e.g. "All statuses"). */
   allLabel: string;
+  /** Value of the "all" option (default ""); set it when the filter has a default other than all. */
+  allValue?: string;
+  /** Value the list shows with no param (e.g. History's "completed"): not counted as a filter for Clear. */
+  defaultValue?: string;
   options: { value: string; label: string }[];
 }
 
@@ -33,6 +37,7 @@ export function ListFilters({
   qName = "q",
   search = true,
   suggestions,
+  pager,
   children,
 }: {
   action: string;
@@ -48,14 +53,16 @@ export function ListFilters({
   search?: boolean;
   /** Values offered while typing in the search (names, emails…). */
   suggestions?: string[];
+  /** Compact page navigation (Pagination `compact`), kept on screen with the filters. */
+  pager?: React.ReactNode;
   /** Extra named controls inside the same form (e.g. a skill picker), placed before the selects. */
   children?: React.ReactNode;
 }) {
-  const active = Boolean(q) || filters.some((f) => f.value) || Boolean(period && period.period !== "all");
+  const active = Boolean(q) || filters.some((f) => f.value && f.value !== (f.defaultValue ?? "")) || Boolean(period && period.period !== "all");
   const keep = Object.entries(hidden).filter((entry): entry is [string, string] => Boolean(entry[1]));
   const clearHref = keep.length ? `${action}?${new URLSearchParams(keep).toString()}` : action;
   return (
-    <FilterBar action={action}>
+    <FilterBar action={action} pager={pager}>
       {keep.map(([name, value]) => <input key={name} type="hidden" name={name} value={value} />)}
       {/* Entity lists search by text; consolidation tables (History, Questions, Logs) don't (`search={false}`). */}
       {search ? (
@@ -69,10 +76,10 @@ export function ListFilters({
         <FilterField key={f.name} label={f.label} htmlFor={`lf-${f.name}`}>
           {/* Long lists (students, skills…) get a search box inside the drop-down. */}
           {f.options.length > SEARCHABLE_MIN_OPTIONS ? (
-            <SearchableSelect id={`lf-${f.name}`} name={f.name} defaultValue={f.value ?? ""} allLabel={f.allLabel} options={f.options} searchPlaceholder={`Search ${f.label.toLowerCase()}`} />
+            <SearchableSelect id={`lf-${f.name}`} name={f.name} defaultValue={f.value ?? ""} allLabel={f.allLabel} allValue={f.allValue} options={f.options} searchPlaceholder={`Search ${f.label.toLowerCase()}`} />
           ) : (
             <Select id={`lf-${f.name}`} name={f.name} defaultValue={f.value ?? ""}>
-              <option value="">{f.allLabel}</option>
+              <option value={f.allValue ?? ""}>{f.allLabel}</option>
               {f.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </Select>
           )}

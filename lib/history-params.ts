@@ -1,15 +1,19 @@
 // The one teacher History view (every practice and Test try) is driven by its URL:
 //   /teacher/history?student=<id>&type=practice|tests&area=math|reading|writing&skill=<topicId>
 //                   &difficulty=EASY|MEDIUM|HARD&set=<practiceSetId>&test=<testId>
-//                   &status=completed|progress|invalidated&period=…&from=…&to=…&q=…&page=…
-// The filter bar sends type and area as one select, `what` (read here as type + area).
+//                   &status=completed|progress|invalidated|all&period=…&from=…&to=…&q=…&page=…
+// The filter bar sends type and area as one select, `what` (read here as type + area). No status =
+// Completed (the counted tries, like the Question Bank's Published); `status=all` = every try.
 // Links from a student, an attempt or a set carry their context so the list opens filtered. Parsing
 // is tolerant: unknown or empty values are dropped. `skill`, `difficulty`, `set` and `area` mean
 // practice; `test` means Tests.
 
 export type HistoryType = "practice" | "tests";
 export type HistoryArea = "math" | "reading" | "writing";
-export type HistoryStatus = "completed" | "progress" | "invalidated";
+export type HistoryStatus = "completed" | "progress" | "invalidated" | "all";
+
+/** The status the History shows when the URL has none. */
+export const HISTORY_STATUS_DEFAULT = "completed";
 
 export interface HistoryParams {
   student?: string;
@@ -41,7 +45,7 @@ export function parseHistoryParams(raw: RawParams): HistoryParams {
   const difficultyRaw = first(raw.difficulty)?.toUpperCase();
   const difficulty = difficultyRaw && ["EASY", "MEDIUM", "HARD"].includes(difficultyRaw) ? difficultyRaw : undefined;
   const statusRaw = first(raw.status);
-  const status = statusRaw === "completed" || statusRaw === "progress" || statusRaw === "invalidated" ? statusRaw : undefined;
+  const status = statusRaw === "completed" || statusRaw === "progress" || statusRaw === "invalidated" || statusRaw === "all" ? statusRaw : undefined;
   const skill = id(raw.skill ?? raw.topic);
   const set = id(raw.set);
   const test = id(raw.test);

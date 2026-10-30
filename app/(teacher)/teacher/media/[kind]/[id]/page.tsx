@@ -35,7 +35,7 @@ export default async function ContentMediaPage({ params }: { params: Promise<{ k
     });
     if (!set) notFound();
     title = set.name;
-    editHref = `/teacher/practice-sets/${id}/edit`;
+    editHref = `/teacher/practice-sets/${id}?edit`;
     questions = set.questions.map((item, index) => ({
       id: item.question.id,
       label: `Q${index + 1}`,
@@ -53,7 +53,7 @@ export default async function ContentMediaPage({ params }: { params: Promise<{ k
     });
     if (!test) notFound();
     title = test.name;
-    editHref = `/teacher/tests/${id}/edit`;
+    editHref = `/teacher/tests/${id}?edit`;
     questions = test.modules.flatMap((module) =>
       module.questions.map((item, index) => ({
         id: item.question.id,

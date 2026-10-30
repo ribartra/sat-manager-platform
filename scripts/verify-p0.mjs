@@ -155,8 +155,9 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/tests/page.tsx",
-    requires: ["ListFilters", "matchesQuery(query.q"],
-    label: "Busqueda con filtros: Tests (teacher)",
+    requires: ["ListFilters", "qNumber", "matchesQuery(q, t.source?.name)", "<HeaderActions>", "<TestActionsMenu"],
+    forbids: ['name: "status"', 'name: "assigned"', "<FullTestActions"],
+    label: "Tests (teacher): busqueda solo por TEST N o fuente, cabecera estandar, acciones en desplegable",
   },
   {
     file: "app/(teacher)/teacher/programs/page.tsx",
@@ -657,10 +658,10 @@ const checks = [
   ].map((file) => ({ file, requires: ["redirect(assignHref("], label: `URL antigua de asignar redirige a la vista unica: ${file}` })),
   ...[
     "app/(teacher)/teacher/students/[studentId]/page.tsx",
-    "app/(teacher)/teacher/tests/page.tsx",
     "app/(teacher)/teacher/tests/[testId]/page.tsx",
-    "app/(teacher)/teacher/tests/full-test-actions-client.tsx",
+    "app/(teacher)/teacher/tests/test-actions-menu-client.tsx",
     "app/(teacher)/teacher/practice-sets/page.tsx",
+    "app/(teacher)/teacher/practice-sets/[practiceSetId]/page.tsx",
   ].map((file) => ({ file, requires: ["assignHref("], forbids: ["/assign-test", "/assign`", "/assign?sets="], label: `Enlaces de asignar con assignHref: ${file}` })),
   {
     file: "app/(teacher)/teacher/practice-sets/practice-sets-menu-client.tsx",
@@ -668,14 +669,59 @@ const checks = [
     label: "Practice › By skill: el desplegable del set incluye Assign (prellenado)",
   },
   {
-    file: "app/(teacher)/teacher/practice-sets/practice-set-actions-client.tsx",
-    requires: ["Preview", "Archive", "Delete", "Publish", "Duplicate", "Students already have this set. Archive it instead."],
-    label: "Editor de Practice Set: Preview, Assign, Publish/Draft/Archive, Duplicate, Delete",
+    file: "app/(teacher)/teacher/practice-sets/practice-set-options-menu-client.tsx",
+    requires: ["Preview", "Assign", "?edit", "practiceSetStatusOptions", "duplicate(set)", "Delete"],
+    label: "Practice Set: desplegable de opciones como el de Tests (Preview, Assign, Edit, Status, Duplicate, Delete)",
   },
   {
-    file: "app/(teacher)/teacher/practice-sets/[practiceSetId]/edit/page.tsx",
-    requires: ["<PracticeSetActions", "groupAssignments", "prisma.attempt.count"],
-    label: "Editor de Practice Set: acciones en la cabecera; Delete con la misma regla que la API",
+    file: "app/(teacher)/teacher/practice-sets/[practiceSetId]/page.tsx",
+    requires: ["<PracticeSetOptionsMenu", "groupAssignments", "prisma.attempt.count", "Source: {sourceName}", "<PracticeSetEditor", ".edit !== undefined", "studentAccessWhereFor"],
+    label: "Practice Set: una sola pagina vista/?edit con fuente en cabecera; Delete con la misma regla que la API",
+  },
+  {
+    file: "app/(teacher)/teacher/tests/test-actions-menu-client.tsx",
+    requires: ["Preview", "assignHref({ test: test.id })", "?edit", "fullTestStatusOptions", "Duplicate", "Delete"],
+    label: "Tests: desplegable de opciones (Preview, Assign, Edit, Status, Duplicate, Delete)",
+  },
+  {
+    file: "app/(teacher)/teacher/tests/[testId]/page.tsx",
+    requires: ["<TestActionsMenu", "<FullTestEditor", "Source: ", "edit !== undefined"],
+    label: "Test: una sola pagina vista/?edit con fuente en cabecera y breadcrumb",
+  },
+  ...[
+    "app/(teacher)/teacher/tests/[testId]/edit/page.tsx",
+    "app/(teacher)/teacher/practice-sets/[practiceSetId]/edit/page.tsx",
+  ].map((file) => ({ file, requires: ["?edit`)"], label: `URL antigua de editar redirige a ?edit: ${file}` })),
+  {
+    file: "app/(teacher)/teacher/practice-sets/practice-sets-menu-client.tsx",
+    requires: ["countsLabel(", "set.counts.overdue", "?edit`", "> Open</Link>"],
+    label: "Practice › By skill: hover con Assigned/Completed/In progress/Overdue, Open y Edit (?edit)",
+  },
+  {
+    file: "app/(teacher)/teacher/assign/assign-view.tsx",
+    requires: ["rosterWhere", "fullTestAssignments: { none: { testId: presetTest.id } }", "assignments: { none: { practiceSetId: presetSet.id } }", "defaultOpen={", "You&apos;re assigning"],
+    forbids: ['<Card padding="lg"'],
+    label: "Assign sin alumno: lo que se asigna en la descripcion, DDL abierto, sin alumnos que ya lo tienen",
+  },
+  {
+    file: "app/(teacher)/teacher/questions/page.tsx",
+    requires: ["QUESTION_STATUS_DEFAULT", 'statusParam === "all"', "compact"],
+    label: "Question Bank: Published por defecto (status=all = todos) y paginador en la barra sticky",
+  },
+  {
+    file: "app/(teacher)/teacher/questions/questions-filter-client.tsx",
+    requires: ["applyButton={false}", "router.push(next)", '<option value="all">'],
+    label: "Question Bank: los filtros se aplican al elegir (las columnas siguen al instante)",
+  },
+  {
+    file: "app/(teacher)/teacher/history/page.tsx",
+    requires: ["HISTORY_STATUS_DEFAULT", 'allValue: "all"', "compact"],
+    label: "History: Completed por defecto (status=all = todos) y paginador en la barra sticky",
+  },
+  {
+    file: "components/sat/filter-bar.tsx",
+    requires: ["pager?: React.ReactNode", "has-[nav]:flex", "applyButton"],
+    label: "FilterBar: paginador compacto que sube con los filtros",
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/tests/[attemptId]/page.tsx",

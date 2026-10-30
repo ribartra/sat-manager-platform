@@ -10,6 +10,8 @@ interface FilterBarProps extends React.HTMLAttributes<HTMLElement> {
   sticky?: boolean;
   /** Render as a GET `<form>` (URL-driven filters) instead of a `<div>` (live, client-side filters). */
   action?: string;
+  /** Compact page navigation (Pagination `compact`): sticks with the filters, top right of the bar. */
+  pager?: React.ReactNode;
 }
 
 /**
@@ -18,7 +20,7 @@ interface FilterBarProps extends React.HTMLAttributes<HTMLElement> {
  * whatever its fields; on narrow containers the fields stack. On desktop it sticks to the top of the
  * page while a long list scrolls (`sticky={false}` for bars inside cards).
  */
-export function FilterBar({ label, action, sticky = true, className, children, ...props }: FilterBarProps) {
+export function FilterBar({ label, action, sticky = true, pager, className, children, ...props }: FilterBarProps) {
   const Component = action !== undefined ? "form" : "div";
   return (
     <Component
@@ -36,7 +38,13 @@ export function FilterBar({ label, action, sticky = true, className, children, .
       {...props}
     >
       {sticky ? <StickyOffset /> : null}
-      {label ? <p className="text-xs font-medium text-[var(--sat-muted)]">{label}</p> : null}
+      {label || pager ? (
+        // With no label the row only shows when the pager renders (more than one page).
+        <div className={cn("items-center justify-between gap-2", label ? "flex" : "hidden has-[nav]:flex")}>
+          {label ? <p className="text-xs font-medium text-[var(--sat-muted)]">{label}</p> : <span />}
+          {pager}
+        </div>
+      ) : null}
       <div className="flex flex-col gap-2.5 @md:flex-row @md:flex-wrap @md:items-end">{children}</div>
     </Component>
   );
@@ -64,10 +72,21 @@ export const FILTER_LABEL_CLASS = "text-xs font-medium text-[var(--sat-muted)]";
 export const FILTER_FIELD_CLASS = "flex min-w-[108px] flex-1 flex-col gap-1";
 
 /** Apply (submit) and, when something is filtered, Clear — the end of every URL-driven FilterBar. */
-export function FilterActions({ clearHref, clearLabel = "Clear", title }: { clearHref?: string | null; clearLabel?: string; title?: string }) {
+export function FilterActions({
+  clearHref,
+  clearLabel = "Clear",
+  title,
+  applyButton = true,
+}: {
+  clearHref?: string | null;
+  clearLabel?: string;
+  title?: string;
+  /** false: the filters apply as soon as a value is chosen (no Apply button). */
+  applyButton?: boolean;
+}) {
   return (
     <div className="flex items-center gap-2">
-      <Button type="submit" variant="secondary" title={title}>Apply</Button>
+      {applyButton ? <Button type="submit" variant="secondary" title={title}>Apply</Button> : null}
       {clearHref ? (
         <Button asChild variant="ghost">
           <Link href={clearHref} data-filter-action="">{clearLabel}</Link>

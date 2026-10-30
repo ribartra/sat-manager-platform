@@ -113,7 +113,7 @@ export async function renderPracticePlayer({
         calculatorConfig={getPublicCalculatorConfig()}
         feedbackMode={feedbackMode}
         previewMode
-        exitHref={exitHref ?? `/teacher/practice-sets/${setId}/edit`}
+        exitHref={exitHref ?? `/teacher/practice-sets/${setId}`}
       />
     );
   }

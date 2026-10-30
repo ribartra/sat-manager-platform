@@ -168,3 +168,6 @@ export function humanizeCode(value: string | null | undefined): string {
 export function explanationsInPlayerLabel(shown: boolean | null | undefined): string {
   return `Explanations in the player: ${shown ? "shown" : "hidden"}`;
 }
+
+/** Question Bank status when the URL has none (`status=all` = every status). */
+export const QUESTION_STATUS_DEFAULT = "PUBLISHED";

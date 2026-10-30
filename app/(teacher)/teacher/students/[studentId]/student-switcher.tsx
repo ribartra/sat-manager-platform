@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 /**
  * The student's name (page title) is a drop-down of the teacher's students: picking one opens the
  * same page for that student (`path`, query kept). A search box narrows long lists. With no student
- * chosen yet (Assign from a Test / Practice Set) it reads "Choose a student".
+ * chosen yet (Assign from a Test / Practice Set) it reads "Choose a student" and can open by itself.
  */
 export function StudentSwitcher({
   name,
@@ -20,6 +20,8 @@ export function StudentSwitcher({
   path = "/teacher/students/:id",
   className = "text-[26px] font-bold tracking-[-0.3px] text-gray-900",
   prefix,
+  defaultOpen = false,
+  emptyText = "No student matches.",
 }: {
   /** Shown as the title; empty = "Choose a student". */
   name: string;
@@ -32,13 +34,17 @@ export function StudentSwitcher({
   className?: string;
   /** Text before the name in the same title (e.g. "Assign to"). */
   prefix?: React.ReactNode;
+  /** Opens by itself (Assign with no student chosen yet). */
+  defaultOpen?: boolean;
+  /** Shown when there is no student to pick. */
+  emptyText?: string;
 }) {
   const router = useRouter();
   const [search, setSearch] = useState("");
   const shown = useMemo(() => students.filter((student) => matchesQuery(search, student.name)), [students, search]);
 
   return (
-    <DropdownMenu onOpenChange={(open) => !open && setSearch("")}>
+    <DropdownMenu defaultOpen={defaultOpen} onOpenChange={(open) => !open && setSearch("")}>
       <h1 className={className}>
         {prefix ? <span className="mr-1.5">{prefix}</span> : null}
         <DropdownMenuTrigger
@@ -66,7 +72,7 @@ export function StudentSwitcher({
           </div>
         ) : null}
         <div className="max-h-80 overflow-y-auto p-1">
-          {shown.length === 0 ? <p className="px-2 py-1.5 text-sm text-gray-500">No student matches.</p> : null}
+          {shown.length === 0 ? <p className="px-2 py-1.5 text-sm text-gray-500">{search ? "No student matches." : emptyText}</p> : null}
           {shown.map((student) => (
             <DropdownMenuItem
               key={student.id}

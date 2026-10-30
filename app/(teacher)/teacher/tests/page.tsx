@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { currentContentScope } from "@/lib/content-scope";
 import { redirect } from "next/navigation";
-import { Sparkles, User } from "lucide-react";
-import { EmptyState, ListFilters, PageShell, Pagination, TestNumberAccordion, groupTestVersions, matchesQuery, pageFromParam, paginate, PAGE_SIZE } from "@/components/sat";
+import { Calculator, Sparkles, User } from "lucide-react";
+import { EmptyState, ListFilters, PageHeader, PageShell, Pagination, TestNumberAccordion, groupTestVersions, matchesQuery, pageFromParam, paginate, PAGE_SIZE } from "@/components/sat";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { TestModuleTiles } from "@/components/sat/test-module-tiles";
 import { Badge } from "@/components/ui/badge";
@@ -14,12 +14,12 @@ import { fullTestStatusBadgeVariant, fullTestStatusLabel } from "@/lib/domain-me
 import { studentAccessWhereFor } from "@/lib/program-scope";
 import { moduleViewsForTest } from "@/lib/test-view";
 import { formatDate } from "@/lib/utils";
-import { FullTestActions } from "./full-test-actions-client";
-import { assignHref } from "@/lib/assign-params";
+import { TestActionsMenu } from "./test-actions-menu-client";
+import { HEADER_ACTION_CLASS, HeaderActions } from "@/components/sat/header-actions";
 import { suggestionValues } from "@/lib/search-suggestions";
 
 interface PageProps {
-  searchParams: Promise<{ view?: string; page?: string; q?: string; status?: string; assigned?: string }>;
+  searchParams: Promise<{ view?: string; page?: string; q?: string }>;
 }
 
 
@@ -62,16 +62,11 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
         (a.source?.name ?? "").localeCompare(b.source?.name ?? "") ||
         a.name.localeCompare(b.name, "en", { numeric: true }),
     );
-  // Search + filters (URL): name, status, assigned to the teacher's students or not.
-  const status = ["PUBLISHED", "DRAFT", "ARCHIVED"].includes(query.status ?? "") ? query.status : undefined;
-  const assigned = query.assigned === "yes" || query.assigned === "no" ? query.assigned : undefined;
-  const shown = tests.filter(
-    (t) =>
-      matchesQuery(query.q, t.name) &&
-      (!status || t.status === status) &&
-      (!assigned || (assigned === "yes") === t.assignments.length > 0),
-  );
-  const filterParams = { q: query.q || undefined, status, assigned };
+  // One search, no other filter: a TEST number ("10", "TEST 10") or a source name ("Innovator").
+  const q = query.q?.trim() ?? "";
+  const qNumber = q.match(/^(?:test\s*)?(\d+)$/i)?.[1];
+  const shown = tests.filter((t) => !q || (qNumber ? String(t.number ?? "") === qNumber : matchesQuery(q, t.source?.name)));
+  const filterParams = { q: q || undefined };
   // Pagination counts "TEST N" groups (every version of a test stays on the same page).
   const testGroups = groupTestVersions(
     shown.map((test) => ({ key: test.id, number: test.number, sourceName: test.source?.name ?? "No source", sourceOrder: test.source?.sortOrder ?? 999, node: null })),
@@ -83,35 +78,33 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
   return (
     <PageShell maxWidth={1100} width="wide">
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Tests" }]} />
-      <header className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Tests</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Manage full-length tests. Each test has 4 modules: 2 of Reading &amp; Writing and 2 of Math. Section scores (200–800) appear only on
-            Test pages, never in practice.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Button asChild variant="secondary">
-            <Link href="/teacher/tests/scoring">How scores work</Link>
-          </Button>
-          {canImport ? (
-            <Button asChild variant="secondary">
-              <Link href="/teacher/import?kind=FULL_PRACTICE_TEST"><Sparkles size={14} /> Import with AI</Link>
-            </Button>
-          ) : null}
-        </div>
-      </header>
+      <PageHeader
+        title="Tests"
+        description="Manage full-length tests. Each test has 4 modules: 2 of Reading & Writing and 2 of Math. Section scores (200–800) appear only on Test pages, never in practice."
+        actions={
+          <HeaderActions>
+            <Link href="/teacher/tests/scoring" className={HEADER_ACTION_CLASS}>
+              <Calculator size={14} aria-hidden /> How scores work
+            </Link>
+            {canImport ? (
+              <Link href="/teacher/import?kind=FULL_PRACTICE_TEST" className={HEADER_ACTION_CLASS}>
+                <Sparkles size={14} aria-hidden /> Import with AI
+              </Link>
+            ) : null}
+          </HeaderActions>
+        }
+      />
 
       <ListFilters
+        pager={<Pagination basePath="/teacher/tests" params={filterParams} pageSize={PAGE_SIZE} {...page} compact />}
+       
         action="/teacher/tests"
-        q={query.q}
-        placeholder="Test name"
-        suggestions={suggestionValues(tests.map((t) => t.name))}
-        filters={[
-          { name: "status", label: "Status", value: status, allLabel: "All statuses", options: ["PUBLISHED", "DRAFT", "ARCHIVED"].map((v) => ({ value: v, label: fullTestStatusLabel(v) })) },
-          { name: "assigned", label: "Assigned", value: assigned, allLabel: "Assigned or not", options: [{ value: "yes", label: "Assigned to my students" }, { value: "no", label: "Not assigned yet" }] },
-        ]}
+        q={q}
+        placeholder="TEST number or source"
+        suggestions={suggestionValues([
+          ...tests.map((t) => (t.number ? `TEST ${t.number}` : null)),
+          ...tests.map((t) => t.source?.name),
+        ])}
       />
       {tests.length === 0 ? (
         <EmptyState title="No tests yet." description={canImport ? "Import one with Import with AI." : "Your program has no tests yet."} />
@@ -147,10 +140,9 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
                     </span>
                     {test.status !== "PUBLISHED" ? <Badge variant={fullTestStatusBadgeVariant(test.status)}>{fullTestStatusLabel(test.status)}</Badge> : null}
                   </div>
+                  {/* Main button + the options drop-down (same pattern as a practice set). */}
                   <div className="flex gap-2">
-                    <Button asChild size="sm" variant="secondary">
-                      <Link href={assignHref({ test: test.id })}>Assign</Link>
-                    </Button>
+                    <TestActionsMenu test={{ id: test.id, name: test.name, status: test.status }} canDelete={test._count.assignments === 0 && test._count.attempts === 0} />
                     <Button asChild size="sm">
                       <Link href={`/teacher/tests/${test.id}`}>Open →</Link>
                     </Button>
@@ -158,7 +150,7 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
                 </div>
                 <div className="grid gap-2.5 px-4 py-3">
                   <TestModuleTiles modules={modules} hrefFor={(m) => `/teacher/tests/${test.id}#module-${m.key}`} />
-                  <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     {/* Counts open the Test page's Students table (who is assigned, done, in progress, late). */}
                     <Link
                       href={`/teacher/tests/${test.id}#students`}
@@ -170,13 +162,6 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
                       <span className="text-amber-700"><b>{inProgress}</b> in progress</span>
                       {overdue ? <span className="text-red-600"><b>{overdue}</b> overdue</span> : null}
                     </Link>
-                    <FullTestActions
-                      testId={test.id}
-                      status={test.status}
-                      hasAssignments={test._count.assignments > 0}
-                      hasAttempts={test._count.attempts > 0}
-                      variant="list"
-                    />
                   </div>
                 </div>
               </div>

@@ -123,7 +123,7 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
             <Badge variant="test">Test</Badge>
             <AttemptStatusBadge status={attempt.status} />
             {siblings.length > 1 ? (
-              <Link href={historyHref({ student: studentId, test: attempt.testId })} className="text-xs font-medium text-[var(--sat-primary)] hover:underline">
+              <Link href={historyHref({ student: studentId, test: attempt.testId, status: "all" })} className="text-xs font-medium text-[var(--sat-primary)] hover:underline">
                 All tries in History →
               </Link>
             ) : null}

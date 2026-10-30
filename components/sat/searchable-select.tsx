@@ -26,6 +26,7 @@ export function SearchableSelect({
   name,
   options,
   allLabel,
+  allValue = "",
   defaultValue = "",
   value,
   onChange,
@@ -34,8 +35,9 @@ export function SearchableSelect({
   id?: string;
   name?: string;
   options: SearchableOption[];
-  /** First choice, value "" (e.g. "All students"). */
+  /** First choice, value `allValue` (default "", e.g. "All students"). */
   allLabel: string;
+  allValue?: string;
   defaultValue?: string;
   value?: string;
   onChange?: (value: string) => void;
@@ -81,7 +83,7 @@ export function SearchableSelect({
         </div>
         <div className="max-h-72 overflow-y-auto p-1">
           {search ? null : (
-            <Item selected={current === ""} onSelect={() => pick("")}>
+            <Item selected={current === allValue} onSelect={() => pick(allValue)}>
               {allLabel}
             </Item>
           )}

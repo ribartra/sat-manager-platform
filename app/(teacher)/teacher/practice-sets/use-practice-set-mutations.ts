@@ -8,8 +8,8 @@ import { notify } from "@/lib/notify-ui";
 import { practiceSetStatusLabel } from "@/lib/domain-meta";
 
 /**
- * Status change and delete of a Practice Set (Practice › By skill drop-down and the editor's action
- * bar): PATCH / DELETE /api/practice-sets/<id>, with the confirm dialog, toast and refresh. Delete is
+ * Status change, duplicate and delete of a Practice Set (Practice › By skill drop-down and the set's
+ * page options): PATCH / DELETE /api/practice-sets/<id>, with the confirm dialog, toast and refresh. Delete is
  * refused by the API when the set has assignments or attempts (archive it instead).
  */
 export function usePracticeSetMutations() {
@@ -49,5 +49,17 @@ export function usePracticeSetMutations() {
     }
   }
 
-  return { busy, changeStatus, remove };
+  async function duplicate(set: { id: string }) {
+    setBusy(true);
+    try {
+      const data = await apiFetch<{ practiceSet?: { id?: string } }>(`/api/practice-sets/${set.id}/duplicate`, { method: "POST", fallback: "Unable to duplicate." });
+      if (data?.practiceSet?.id) router.push(`/teacher/practice-sets/${data.practiceSet.id}?edit`);
+    } catch (error) {
+      notify.error(error);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return { busy, changeStatus, remove, duplicate };
 }

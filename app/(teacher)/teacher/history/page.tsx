@@ -32,7 +32,7 @@ import { studentAccessWhereFor } from "@/lib/program-scope";
 import { loadAttemptHistory, type HistoryRow } from "@/lib/attempt-history";
 import { difficultyBadgeVariant, difficultyLabel, difficultyOptions } from "@/lib/domain-meta";
 import { PRACTICE_AREA_TABS, practiceAreaLabel, type PracticeAreaCode } from "@/lib/practice-area";
-import { historyHref, parseHistoryParams, type HistoryArea, type HistoryParams } from "@/lib/history-params";
+import { historyHref, parseHistoryParams, type HistoryArea, type HistoryParams, HISTORY_STATUS_DEFAULT } from "@/lib/history-params";
 import { officialSkillsFor } from "@/lib/taxonomy-order";
 import { practiceSetTitle } from "@/lib/attempt-groups";
 import { HEADER_ACTION_CLASS } from "@/components/sat/header-actions";
@@ -87,6 +87,7 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
     filter.test ? prisma.fullPracticeTest.findUnique({ where: { id: filter.test }, select: { name: true } }).then((test) => test?.name ?? null) : null,
   ]);
 
+  const statusShown = filter.status ?? HISTORY_STATUS_DEFAULT;
   const rows = await loadAttemptHistory(studentId ? [studentId] : students.map((s) => s.id), {
     kind: filter.type === "tests" ? "test" : filter.type === "practice" ? "practice" : undefined,
     area: filter.area ? AREA_CODE[filter.area] : undefined,
@@ -94,7 +95,8 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
     difficulty: filter.difficulty,
     practiceSetId: filter.set,
     testId: filter.test,
-    status: filter.status,
+    // Completed by default (status=all: every try).
+    status: statusShown === "all" ? undefined : statusShown,
     ...periodDates(period),
   });
   // No free-text search here: the Student and Skill drop-downs search inside when they are long.
@@ -163,6 +165,8 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
       </div>
 
       <ListFilters
+        pager={<Pagination basePath="/teacher/history" params={params} pageSize={pageSize} {...page} compact />}
+       
         action="/teacher/history"
         search={false}
         hidden={{ set: filter.set, test: filter.test }}
@@ -178,7 +182,7 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
           },
           ...(filter.type === "tests" ? [] : [{ name: "skill", label: "Skill", value: filter.skill ?? "", allLabel: "All skills", options: skillOptions }]),
           ...(filter.type === "tests" ? [] : [{ name: "difficulty", label: "Difficulty", value: filter.difficulty ?? "", allLabel: "All levels", options: difficultyOptions() }]),
-          { name: "status", label: "Status", value: filter.status ?? "", allLabel: "Any", options: STATUS_OPTIONS },
+          { name: "status", label: "Status", value: statusShown, allLabel: "Any", allValue: "all", defaultValue: HISTORY_STATUS_DEFAULT, options: STATUS_OPTIONS },
         ]}
         period={period}
       />

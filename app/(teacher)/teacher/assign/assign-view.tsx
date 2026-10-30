@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { LinkTabs, PageShell } from "@/components/sat";
 import { Alert } from "@/components/sat/alert";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
-import { Card } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { getFeatureSetting } from "@/lib/app-settings";
@@ -53,12 +52,19 @@ export async function AssignView({ studentId, query }: { studentId: string | nul
     params.topic ??= presetSet.topicId;
   }
   const presetTest = params.test
-    ? await prisma.fullPracticeTest.findFirst({ where: { id: params.test, ...contentScopeFor(session.user) }, select: { id: true, name: true, status: true } })
+    ? await prisma.fullPracticeTest.findFirst({ where: { id: params.test, ...contentScopeFor(session.user) }, select: { id: true, name: true, status: true, source: { select: { name: true } } } })
     : null;
 
   const studentWhere = studentAccessWhereFor(session.user, now);
+  // Students to pick: those who don't have the preselected Test / practice set yet (a Test is one
+  // TEST number of one source, so the same row).
+  const rosterWhere = presetTest
+    ? { AND: [studentWhere, { fullTestAssignments: { none: { testId: presetTest.id } } }] }
+    : presetSet
+      ? { AND: [studentWhere, { assignments: { none: { practiceSetId: presetSet.id } } }] }
+      : studentWhere;
   const [roster, student] = await Promise.all([
-    prisma.user.findMany({ where: studentWhere, orderBy: { name: "asc" }, select: { id: true, name: true } }),
+    prisma.user.findMany({ where: rosterWhere, orderBy: { name: "asc" }, select: { id: true, name: true } }),
     studentId ? prisma.user.findFirst({ where: { id: studentId, ...studentWhere }, select: { id: true, name: true } }) : Promise.resolve(null),
   ]);
   if (studentId && !student) notFound();
@@ -66,7 +72,12 @@ export async function AssignView({ studentId, query }: { studentId: string | nul
   // Switching student keeps what is being assigned (not the per-student edit).
   const carry = assignQuery({ ...params, edit: [] });
   const tabs = AREA_TABS.map((t) => ({ key: t.key, label: t.label, href: assignHref({ studentId, area: t.key }) }));
-  const itemLabel = presetTest?.name ?? (presetSet ? `${presetSet.topic.name} (${difficultyLabel(presetSet.difficulty)})` : null);
+  const itemLabel = presetTest
+    ? `${presetTest.name} · ${presetTest.source?.name ?? "No source"}`
+    : presetSet
+      ? `${presetSet.topic.name} (${difficultyLabel(presetSet.difficulty)})`
+      : null;
+  const everyoneHasIt = roster.length === 0 && Boolean(presetTest || presetSet);
 
   // Title prefix: editing what the student already has (dates / settings) or assigning.
   const header = (editingNow = params.edit.length > 0) => (
@@ -83,7 +94,7 @@ export async function AssignView({ studentId, query }: { studentId: string | nul
             : [
                 { label: "Home", href: "/teacher" },
                 presetTest ? { label: "Tests", href: "/teacher/tests" } : { label: "Practice", href: "/teacher/practice-sets" },
-                ...(presetTest ? [{ label: presetTest.name, href: `/teacher/tests/${presetTest.id}` }] : presetSet ? [{ label: presetSet.name, href: `/teacher/practice-sets/${presetSet.id}/edit` }] : []),
+                ...(presetTest ? [{ label: presetTest.name, href: `/teacher/tests/${presetTest.id}` }] : presetSet ? [{ label: presetSet.name, href: `/teacher/practice-sets/${presetSet.id}` }] : []),
                 { label: "Assign" },
               ]
         }
@@ -96,8 +107,22 @@ export async function AssignView({ studentId, query }: { studentId: string | nul
         query={carry}
         path="/teacher/students/:id/assign"
         className="mb-1 text-xl font-semibold text-gray-900"
+        // No student yet: the list opens by itself.
+        defaultOpen={!student && roster.length > 0}
+        emptyText={everyoneHasIt ? "Every student already has it." : "You have no students yet."}
       />
-      <p className="mb-3 text-sm text-gray-500">1. Choose the student · 2. Check what they have done · 3. Choose practice sets or Tests · 4. Set a due date</p>
+      {/* No student yet: what is being assigned is the page description. */}
+      <p className="mb-3 text-sm text-gray-500">
+        {!student && itemLabel ? (
+          <>
+            You&apos;re assigning <b className="font-medium text-gray-700">{itemLabel}</b>. Choose the student in the title above.
+          </>
+        ) : !student ? (
+          "Choose the student in the title above."
+        ) : (
+          "1. Choose the student · 2. Check what they have done · 3. Choose practice sets or Tests · 4. Set a due date"
+        )}
+      </p>
       <LinkTabs label="What to assign" active={params.area} tabs={tabs} />
     </>
   );
@@ -107,18 +132,9 @@ export async function AssignView({ studentId, query }: { studentId: string | nul
     return (
       <PageShell maxWidth={1180}>
         {header()}
-        <Card padding="lg" className="space-y-2">
-          {itemLabel ? (
-            <p className="text-sm text-gray-700">
-              You&apos;re assigning <b>{itemLabel}</b>. Choose the student in the title above.
-            </p>
-          ) : (
-            <p className="text-sm text-gray-700">Choose the student in the title above.</p>
-          )}
-          {presetTest && presetTest.status !== "PUBLISHED" ? <Alert tone="warning">This Test isn&apos;t published yet: publish it before assigning it.</Alert> : null}
-          {presetSet && presetSet.status !== "PUBLISHED" ? <Alert tone="warning">This practice set isn&apos;t published yet: publish it before assigning it.</Alert> : null}
-          {roster.length === 0 ? <p className="text-sm text-gray-500">You have no students yet.</p> : null}
-        </Card>
+        {presetTest && presetTest.status !== "PUBLISHED" ? <Alert tone="warning">This Test isn&apos;t published yet: publish it before assigning it.</Alert> : null}
+        {presetSet && presetSet.status !== "PUBLISHED" ? <Alert tone="warning">This practice set isn&apos;t published yet: publish it before assigning it.</Alert> : null}
+        {everyoneHasIt ? <Alert tone="info">Every student already has {itemLabel}.</Alert> : roster.length === 0 ? <Alert tone="info">You have no students yet.</Alert> : null}
       </PageShell>
     );
   }

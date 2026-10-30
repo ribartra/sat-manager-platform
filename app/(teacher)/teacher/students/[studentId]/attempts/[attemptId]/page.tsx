@@ -162,6 +162,8 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
                   skill: practiceSet?.topicId,
                   difficulty: practiceSet?.difficulty,
                   set: attempt.practiceSetId,
+                  // Every try (in progress and not counted too), not only the completed ones.
+                  status: "all",
                 })}
                 className="text-xs font-medium text-[var(--sat-primary)] hover:underline"
               >

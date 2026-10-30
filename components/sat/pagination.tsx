@@ -44,6 +44,7 @@ export function Pagination({
   pageSize,
   anchor,
   pageSizeParam,
+  compact = false,
   className,
 }: {
   basePath: string;
@@ -57,8 +58,11 @@ export function Pagination({
   anchor?: string;
   /** Param of the rows-per-page choice (e.g. "per"); omitted = fixed page size. */
   pageSizeParam?: string;
+  /** Small "x–y of n ‹ ›" for the sticky filter bar (FilterBar `pager`); the full pager stays below the list. */
+  compact?: boolean;
   className?: string;
 }) {
+  if (compact && pageCount <= 1) return null;
   const sizes = pageSizeParam && total > PAGE_SIZES[0];
   if (pageCount <= 1 && !sizes) return null;
   const hrefFor = (target: number, size = pageSize) => {
@@ -75,6 +79,25 @@ export function Pagination({
   const pages = Array.from(new Set([1, page - 1, page, page + 1, pageCount]))
     .filter((p) => p >= 1 && p <= pageCount)
     .sort((x, y) => x - y);
+  if (compact) {
+    const small = "inline-flex size-7 items-center justify-center rounded-md border";
+    return (
+      <nav aria-label="Pages" className={cn("flex items-center gap-1.5 text-xs text-[var(--sat-muted)]", className)}>
+        <span className="whitespace-nowrap">{first}–{last} of {total}</span>
+        {page > 1 ? (
+          <Link href={hrefFor(page - 1)} rel="prev" aria-label="Previous page" className={`${small} border-[var(--sat-border-strong)] bg-white text-[var(--sat-text)] hover:bg-[var(--sat-surface-2)]`}><ChevronLeft size={14} /></Link>
+        ) : (
+          <span aria-disabled className={`${small} border-[var(--sat-border)] text-[var(--sat-blank)]`}><ChevronLeft size={14} /></span>
+        )}
+        <span className="whitespace-nowrap font-semibold text-[var(--sat-text)]">{page} / {pageCount}</span>
+        {page < pageCount ? (
+          <Link href={hrefFor(page + 1)} rel="next" aria-label="Next page" className={`${small} border-[var(--sat-border-strong)] bg-white text-[var(--sat-text)] hover:bg-[var(--sat-surface-2)]`}><ChevronRight size={14} /></Link>
+        ) : (
+          <span aria-disabled className={`${small} border-[var(--sat-border)] text-[var(--sat-blank)]`}><ChevronRight size={14} /></span>
+        )}
+      </nav>
+    );
+  }
   const btn = "inline-flex h-8 min-w-8 items-center justify-center rounded-lg border px-2 text-sm font-semibold";
   const idle = `${btn} border-[var(--sat-border-strong)] bg-white text-[var(--sat-text)] hover:bg-[var(--sat-surface-2)]`;
   const off = `${btn} cursor-default border-[var(--sat-border)] bg-white text-[var(--sat-blank)]`;

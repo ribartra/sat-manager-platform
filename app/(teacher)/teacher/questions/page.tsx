@@ -15,6 +15,7 @@ import {
   resolvePracticeArea,
 } from "@/lib/practice-area";
 import { QuestionsFilter } from "./questions-filter-client";
+import { QUESTION_STATUS_DEFAULT } from "@/lib/domain-meta";
 import { loadOptionImageUrlsByQuestionId } from "@/lib/question-list-media-query";
 import { QuestionsTable, type QuestionBankRow } from "./questions-table-client";
 import { resolveQuestionType } from "@/lib/question-type";
@@ -57,12 +58,15 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
 
   // Consolidation table: no free-text search (Domain / Skill / level / status filters), 25 per page.
   const pageSize = PAGE_SIZE;
+  const statusParam = filters.status || QUESTION_STATUS_DEFAULT;
+  const statusFilter = statusParam === "all" ? undefined : statusParam;
   const questionWhere = {
     // The bank of the programs the teacher teaches (shared by the program's teachers).
     ...(await currentContentScope()),
     topicId: topicFilter,
     difficulty: (filters.difficulty as string | undefined) || undefined,
-    status: (filters.status as string | undefined) || undefined,
+    // Published by default; `status=all` shows every status.
+    status: statusFilter,
   };
   const total = await prisma.question.count({ where: questionWhere });
   const pageCount = Math.max(1, Math.ceil(total / pageSize));
@@ -125,11 +129,22 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
         initialDomainId={selectedDomainId}
         initialDifficulty={filters.difficulty}
         initialStatus={filters.status}
+        pager={
+          <Pagination
+            basePath="/teacher/questions"
+            params={{ area: filters.area, section: filters.section, domain: selectedDomainId, topic: filters.topic, difficulty: filters.difficulty, status: filters.status }}
+            page={page}
+            pageCount={pageCount}
+            total={total}
+            pageSize={pageSize}
+            compact
+          />
+        }
       />
 
       <QuestionsTable
         // A filter fixed to one value hides its column (Domain only trims the Domain / Skill cell).
-        fixed={{ domain: Boolean(selectedDomainId), skill: Boolean(selectedTopicId), difficulty: Boolean(filters.difficulty), status: Boolean(filters.status) }}
+        fixed={{ domain: Boolean(selectedDomainId), skill: Boolean(selectedTopicId), difficulty: Boolean(filters.difficulty), status: Boolean(statusFilter) }}
         rows={questions.map((q): QuestionBankRow => {
           const setUses = new Set(q.setItems.map((s) => s.practiceSetId)).size;
           const fullUses = q.fullTestItems.length;

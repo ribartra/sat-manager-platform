@@ -136,7 +136,10 @@ export function FullTestEditor({
       setWarnings(Array.isArray(warnings) ? warnings.map(String) : []);
       return;
     }
-    router.push("/teacher/tests");
+    // Back to the Test's page (view mode), the new one after creating it.
+    const data = (await response.json()) as { id?: string; test?: { id?: string } } | null;
+    const id = initial?.id ?? data?.test?.id ?? data?.id;
+    router.push(id ? `/teacher/tests/${id}` : "/teacher/tests");
     router.refresh();
   }
 
@@ -375,9 +378,14 @@ export function FullTestEditor({
           </Alert>
         ) : null}
 
-        <Button type="submit" disabled={saving} disabledReason={!name?.trim() ? "Enter a name." : !moduleQuestionIds.every((ids) => ids.length > 0) ? "Every module needs at least one question." : null}>
-          {saving ? "Saving..." : initial?.id ? "Save test" : "Create test"}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button type="submit" disabled={saving} disabledReason={!name?.trim() ? "Enter a name." : !moduleQuestionIds.every((ids) => ids.length > 0) ? "Every module needs at least one question." : null}>
+            {saving ? "Saving..." : initial?.id ? "Save test" : "Create test"}
+          </Button>
+          <Button type="button" variant="secondary" onClick={() => router.push(initial?.id ? `/teacher/tests/${initial.id}` : "/teacher/tests")}>
+            Cancel
+          </Button>
+        </div>
       </form>
     </Form>
   );

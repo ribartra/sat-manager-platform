@@ -163,8 +163,14 @@ export function PracticeSetEditor({
       setErrors(error.details.length ? error.details : [error.message]);
       return;
     }
-    // Back to Practice › By skill with this skill × level × source open (its sets listed).
-    router.push(`/teacher/practice-sets?${new URLSearchParams({ topic: values.topicId, difficulty: values.difficulty, ...(values.sourceId ? { source: values.sourceId } : {}) }).toString()}#skill-${values.topicId}`);
+    // Back to the set's page (view mode), the new one after creating it.
+    const data = (await response.json()) as { id?: string; practiceSet?: { id?: string } } | null;
+    const id = initial?.id ?? data?.practiceSet?.id ?? data?.id;
+    router.push(
+      id
+        ? `/teacher/practice-sets/${id}`
+        : `/teacher/practice-sets?${new URLSearchParams({ topic: values.topicId, difficulty: values.difficulty, ...(values.sourceId ? { source: values.sourceId } : {}) }).toString()}#skill-${values.topicId}`,
+    );
     router.refresh();
   }
 
@@ -383,7 +389,7 @@ export function PracticeSetEditor({
           <Button type="submit" disabled={saving} disabledReason={!name?.trim() ? "Enter a name." : !topicId ? "Choose a skill." : questionIds.length === 0 ? "Add at least one question." : null}>
             {saving ? "Saving..." : initial?.id ? "Save Practice Set" : "Create Practice Set"}
           </Button>
-          <Button type="button" variant="secondary" onClick={() => router.back()}>
+          <Button type="button" variant="secondary" onClick={() => (initial?.id ? router.push(`/teacher/practice-sets/${initial.id}`) : router.back())}>
             Cancel
           </Button>
         </div>

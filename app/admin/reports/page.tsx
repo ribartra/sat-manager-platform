@@ -87,6 +87,8 @@ export default async function AdminReportsPage({ searchParams }: { searchParams:
       </div>
 
       <ListFilters
+        pager={<Pagination basePath="/admin/reports" params={{ status: tab.id === "open" ? undefined : tab.id, q: q || undefined, category, from: fromRole, per: String(pageSize) }} pageSize={pageSize} pageSizeParam="per" {...reportPage} compact />}
+       
         action="/admin/reports"
         q={q}
         placeholder="Comment, reporter or page"

@@ -108,7 +108,7 @@ export default async function QuickImportBatchPage({ params }: { params: Promise
         prompt={buildCsvPrompt(target)}
         rows={rows}
         reviewHref={questionFile ? `/admin/import/ai/${batchId}/files/${questionFile.id}` : null}
-        draftHref={artifact ? (artifact.artifactType === "PRACTICE_SET" ? `/teacher/practice-sets/${artifact.artifactId}/edit` : `/teacher/tests/${artifact.artifactId}/edit`) : null}
+        draftHref={artifact ? (artifact.artifactType === "PRACTICE_SET" ? `/teacher/practice-sets/${artifact.artifactId}?edit` : `/teacher/tests/${artifact.artifactId}?edit`) : null}
       />
     </PageShell>
   );

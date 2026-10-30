@@ -798,7 +798,7 @@ export function AiImportWorkflowClient({
                       />
                     )}
                     {set.artifactId ? (
-                      <Link href={`/teacher/practice-sets/${set.artifactId}/edit`} className="rounded-md border border-green-200 px-3 py-2 text-xs font-medium text-green-700 hover:bg-green-50">
+                      <Link href={`/teacher/practice-sets/${set.artifactId}?edit`} className="rounded-md border border-green-200 px-3 py-2 text-xs font-medium text-green-700 hover:bg-green-50">
                         Open Draft Set
                       </Link>
                     ) : selectedBatchId && set.promoted > 0 ? (

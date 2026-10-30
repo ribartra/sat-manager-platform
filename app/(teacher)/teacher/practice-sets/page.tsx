@@ -1,9 +1,10 @@
-import { ListFilters, PageShell, PracticeAreaTabs, SkillsSourceMap, matchesQuery, type SkillsMapChip } from "@/components/sat";
+import { ListFilters, PageHeader, PageShell, PracticeAreaTabs, SkillsSourceMap, matchesQuery, type SkillsMapChip } from "@/components/sat";
 import { contentScopeFor } from "@/lib/program-scope";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { Sparkles } from "lucide-react";
 import { PracticeSetsMenu } from "./practice-sets-menu-client";
+import { HEADER_ACTION_CLASS, HeaderActions } from "@/components/sat/header-actions";
 import { assignHref } from "@/lib/assign-params";
 import { redirect } from "next/navigation";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
@@ -16,6 +17,8 @@ import { requireContentImporter } from "@/lib/rbac";
 import { getFeatureFlagValues } from "@/lib/feature-flags";
 import { TEACHER_MORE_LINKS, resolveLinks } from "@/lib/nav-config";
 import { DEFAULT_PRACTICE_SOURCE_ID, listSources } from "@/lib/content-source";
+import { addCounts, assignmentCounts } from "@/lib/assignment-counts";
+import { studentAccessWhereFor } from "@/lib/program-scope";
 import { suggestionValues } from "@/lib/search-suggestions";
 
 interface SearchParams {
@@ -63,6 +66,7 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
   // A skill named in the URL (editor after saving, old links) starts opened.
   const selectedTopicId = filters.topic && topicIds.includes(filters.topic) ? filters.topic : undefined;
   const search = filters.q?.trim() ?? "";
+  const now = new Date();
   // Only sources used for Practice Sets (Innovator is Tests-only).
   const sources = await listSources({ kind: "practice" });
   const practiceSets = await prisma.practiceSet.findMany({
@@ -72,7 +76,13 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
       topic: { include: { domain: { include: { section: true } } } },
       source: { select: { id: true, name: true } },
       questions: { select: { questionId: true } },
-      assignments: { select: { id: true, studentId: true, status: true } },
+      // How each set is going with the teacher's students (hover: assigned, completed, in progress, overdue).
+      assignments: {
+        where: { student: session ? studentAccessWhereFor(session.user, now) : { id: "__no_session__" } },
+        select: { status: true, dueDate: true, attempts: { where: { status: "IN_PROGRESS" }, select: { id: true } } },
+      },
+      // Every assignment (any teacher): a set that has them can't be deleted.
+      _count: { select: { assignments: true } },
     },
     orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
   });
@@ -89,20 +99,19 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
   return (
     <PageShell maxWidth={1000} width="wide" density="compact" className="space-y-4">
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Practice" }]} />
-      <header className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h1 className="text-[26px] font-bold tracking-[-0.3px] text-gray-900">Practice</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Manage practice sets: every SAT skill in Math, Reading and Writing has Easy, Medium and Hard levels, each with any number of sets. Results show as % correct only
-            (SAT scores are for Tests).
-          </p>
-        </div>
-        <div className="flex shrink-0 flex-wrap gap-2 self-start">
-          {canImport ? (
-            <Link href="/teacher/import?kind=PRACTICE_SET" className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg border border-[var(--sat-border)] bg-white px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-[var(--sat-primary-soft)]"><Sparkles size={14} /> Import with AI</Link>
-          ) : null}
-        </div>
-      </header>
+      <PageHeader
+        title="Practice"
+        description="Manage practice sets: every SAT skill in Math, Reading and Writing has Easy, Medium and Hard levels, each with any number of sets. Results show as % correct only (SAT scores are for Tests)."
+        actions={
+          canImport ? (
+            <HeaderActions>
+              <Link href="/teacher/import?kind=PRACTICE_SET" className={HEADER_ACTION_CLASS}>
+                <Sparkles size={14} aria-hidden /> Import with AI
+              </Link>
+            </HeaderActions>
+          ) : undefined
+        }
+      />
       <MoreLinks links={moreLinks} />
       <PracticeAreaTabs basePath="/teacher/practice-sets" active={area} includeTests={false} preserve={{ q: search || undefined }} />
       <ListFilters
@@ -124,6 +133,7 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
                 .filter((set) => set.topicId === topic.id)
                 .map((set) => ({ ...set, sourceId: set.sourceId ?? DEFAULT_PRACTICE_SOURCE_ID }));
               const assigned = setsOfTopic.reduce((sum, set) => sum + set.assignments.length, 0);
+              const countsOf = (set: (typeof setsOfTopic)[number]) => assignmentCounts(set.assignments, now);
               const isSelected = selectedTopicId === topic.id;
               const searchHit = Boolean(search) && setsOfTopic.some(setMatches);
               // Chip of one level: a drop-down of its sets (all sources, or one); an empty level offers "+ Import".
@@ -139,12 +149,14 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
                       <PracticeSetsMenu
                         difficulty={difficulty}
                         title={`${prefix}${sets.length} set${sets.length === 1 ? "" : "s"} (${published} published): preview, edit or change status`}
+                        counts={addCounts(sets.map(countsOf))}
                         sets={sets.map((set) => ({
                           id: set.id,
                           name: set.name,
                           status: set.status,
                           questions: set.questions.length,
-                          assignments: set.assignments.length,
+                          assignments: set._count.assignments,
+                          counts: countsOf(set),
                           assignHref: set.status === "PUBLISHED" ? assignHref({ area, set: [set.id], topic: topic.id }) : null,
                         }))}
                         extra={

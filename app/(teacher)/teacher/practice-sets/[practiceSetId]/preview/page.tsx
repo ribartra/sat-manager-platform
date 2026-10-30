@@ -20,6 +20,6 @@ export default async function PracticeSetPreviewPage({ params }: PageProps) {
     setId: practiceSetId,
     feedbackMode: "AFTER_SET",
     previewMode: true,
-    exitHref: `/teacher/practice-sets/${practiceSetId}/edit`,
+    exitHref: `/teacher/practice-sets/${practiceSetId}`,
   });
 }

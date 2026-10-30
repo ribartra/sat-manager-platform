@@ -26,7 +26,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
 
   const existing = await prisma.ingestPromotionArtifact.findFirst({ where: { batchId, groupKey: ARTIFACT_KEY(batchId) } });
   if (existing) {
-    return NextResponse.json({ href: existing.artifactType === "PRACTICE_SET" ? `/teacher/practice-sets/${existing.artifactId}/edit` : `/teacher/tests/${existing.artifactId}/edit`, existing: true });
+    return NextResponse.json({ href: existing.artifactType === "PRACTICE_SET" ? `/teacher/practice-sets/${existing.artifactId}?edit` : `/teacher/tests/${existing.artifactId}?edit`, existing: true });
   }
 
   const candidates = await prisma.ingestQuestionCandidate.findMany({ where: { batchId, status: { not: "REJECTED" } } });
@@ -123,7 +123,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
     metadata: { batchId: batch.id, questions: questionIds.length, pendingLeftOut: pending.length, sourceId, errors: result.errors.length },
   });
   return NextResponse.json({
-    href: created.type === "PRACTICE_SET" ? `/teacher/practice-sets/${created.id}/edit` : `/teacher/tests/${created.id}/edit`,
+    href: created.type === "PRACTICE_SET" ? `/teacher/practice-sets/${created.id}?edit` : `/teacher/tests/${created.id}?edit`,
     questions: questionIds.length,
     leftOut: pending.length + result.errors.length + result.skipped.length,
   });
