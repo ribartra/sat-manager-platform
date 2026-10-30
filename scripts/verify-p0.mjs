@@ -101,6 +101,27 @@ const checks = [
     forbids: ["export async function notifyTeachers"],
     label: "Avisos de un alumno solo a su profesor y a los admins (no a todo el staff)",
   },
+  // Concurrency (phase 3): Test module state and late saves.
+  {
+    file: "lib/full-test-progress.ts",
+    requires: ["await atomic(", "Completed modules only grow", "...(stored?.completedModules ?? [])"],
+    label: "Estado de modulos del Test: leer-modificar-escribir atomico; los modulos completados nunca se pierden",
+  },
+  {
+    file: "lib/full-test-grading.ts",
+    requires: ["const locked = await atomic(", 'fresh?.status !== "IN_PROGRESS"', "return atomic(async () =>"],
+    label: "Autoguardado del Test y envio de modulo atomicos; un guardado tardio no escribe en un modulo enviado",
+  },
+  {
+    file: "app/api/attempts/[attemptId]/autosave/route.ts",
+    requires: ["await atomic(", 'fresh?.status !== "IN_PROGRESS"'],
+    label: "Autoguardado de practica: no escribe despues del envio (estado releido dentro de la transaccion)",
+  },
+  {
+    file: "app/(student)/student/tests/[assignmentId]/player-client.tsx",
+    requires: ["await enqueueSave(() =>\n        fetchWithTransientRetry(`/api/full-practice-tests/attempts/${attemptId}/modules/${index}/submit`"],
+    label: "Envio de modulo y del Test por la cola de guardado (despues del autoguardado pendiente)",
+  },
   // Results by skill (SAT-039/040/041): no Low performance, no summary card, no matrix, no Assign in results.
   {
     file: "app/(teacher)/teacher/students/[studentId]/page.tsx",

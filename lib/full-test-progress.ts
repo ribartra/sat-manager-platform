@@ -1,4 +1,4 @@
-import prisma from "@/lib/prisma";
+import prisma, { atomic } from "@/lib/prisma";
 
 export type FullTestTimerPhase = "MODULE" | "BREAK";
 
@@ -67,22 +67,31 @@ export async function getFullTestTimerState(attemptId: string) {
 }
 
 export async function saveFullTestProgressState(attemptId: string, state: FullTestProgressState) {
-  // completedModules is server-owned: keep what is stored unless the caller sets it explicitly.
-  const completedModules = Array.isArray(state.completedModules)
-    ? state.completedModules
-    : (await getFullTestProgressState(attemptId, state.timers.length || 4))?.completedModules ?? [];
-  const payload: FullTestProgressState = {
-    timers: state.timers.map((value) => Math.max(0, Number(value) || 0)),
-    phase: state.phase === "BREAK" ? "BREAK" : "MODULE",
-    breakRemaining: Math.max(0, Number(state.breakRemaining) || 0),
-    ...(Array.isArray(state.overtime) ? { overtime: state.overtime.map((value) => Math.max(0, Math.round(Number(value) || 0))) } : {}),
-    ...(completedModules.length ? { completedModules: [...new Set(completedModules)].sort() } : {}),
-  };
-  await prisma.$executeRaw`
-    UPDATE "FullPracticeTestAttempt"
-    SET "moduleTimerState" = ${JSON.stringify(payload)}
-    WHERE "id" = ${attemptId}
-  `;
+  // Read-modify-write in one transaction: completedModules is server-owned and must never be lost to a
+  // concurrent save (a late autosave racing a module submit, two module submits at once).
+  await atomic(async (db) => {
+    const rows = await db.$queryRaw<Array<{ moduleTimerState: string | null }>>`
+      SELECT "moduleTimerState" FROM "FullPracticeTestAttempt" WHERE "id" = ${attemptId}
+    `;
+    const stored = parseFullTestProgressState(rows[0]?.moduleTimerState, state.timers.length || 4);
+    // Completed modules only grow: what is stored is kept, plus what the caller (module submit) adds.
+    const completedModules = [...new Set([...(stored?.completedModules ?? []), ...(state.completedModules ?? [])])].sort();
+    const timers = state.timers.map((value) => Math.max(0, Number(value) || 0));
+    // A submitted module's timer stays at 0 whatever a late save says.
+    for (const index of completedModules) if (index < timers.length) timers[index] = 0;
+    const payload: FullTestProgressState = {
+      timers,
+      phase: state.phase === "BREAK" ? "BREAK" : "MODULE",
+      breakRemaining: Math.max(0, Number(state.breakRemaining) || 0),
+      ...(Array.isArray(state.overtime) ? { overtime: state.overtime.map((value) => Math.max(0, Math.round(Number(value) || 0))) } : {}),
+      ...(completedModules.length ? { completedModules } : {}),
+    };
+    await db.$executeRaw`
+      UPDATE "FullPracticeTestAttempt"
+      SET "moduleTimerState" = ${JSON.stringify(payload)}
+      WHERE "id" = ${attemptId}
+    `;
+  });
 }
 
 export async function saveFullTestTimerState(attemptId: string, moduleTimerState: unknown) {

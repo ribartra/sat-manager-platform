@@ -29,7 +29,9 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
   if (!attempt || attempt.status !== "IN_PROGRESS") return new NotFoundError("This test was already submitted or closed by your teacher.").toResponse();
 
   // Save the module's final state first (answers of modules submitted earlier stay locked).
-  const { modules } = await saveFullTestProgress(attempt, body, session.user.id);
+  const { modules, closed } = await saveFullTestProgress(attempt, body, session.user.id);
+  // Submitted or closed by the teacher while this request was on its way.
+  if (closed) return new NotFoundError("This test was already submitted or closed by your teacher.").toResponse();
   if (!Number.isInteger(moduleIndex) || moduleIndex < 0 || moduleIndex >= modules.length) {
     return new BadRequestError("Unknown module.").toResponse();
   }

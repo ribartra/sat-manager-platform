@@ -1,4 +1,4 @@
-import prisma from "@/lib/prisma";
+import prisma, { atomic } from "@/lib/prisma";
 import { notifyStudentTeachers } from "@/lib/notifications";
 import { NotFoundError } from "@/lib/api-error";
 import { markUserActive } from "@/lib/activity";
@@ -52,9 +52,20 @@ async function attemptModules(attempt: AttemptRow) {
 export async function saveFullTestProgress(attempt: AttemptRow, body: FullTestSaveBody, userId: string) {
   const { currentModule, currentQuestion, timeExpiredEvents, extraTimeUsed, moduleTimerState } = body;
   const modules = await attemptModules(attempt);
-  const locked = new Set(completedModulesOf(attempt.moduleTimerState, modules.length));
-  await Promise.all([
-    prisma.fullPracticeTestAttempt.update({
+  const answerMap = body.answers && typeof body.answers === "object" ? (body.answers as Record<string, string>) : {};
+  const timeMap =
+    body.timeSpentByQuestion && typeof body.timeSpentByQuestion === "object"
+      ? (body.timeSpentByQuestion as Record<string, number>)
+      : {};
+
+  // One transaction, with the attempt re-read inside it: a save that arrives late (debounce, the
+  // page-hide keepalive) can't write into a module submitted meanwhile, nor into a submitted or
+  // invalidated attempt, and the timer state keeps every completed module.
+  const locked = await atomic(async (db) => {
+    const fresh = await db.fullPracticeTestAttempt.findUnique({ where: { id: attempt.id }, select: { status: true, moduleTimerState: true } });
+    if (fresh?.status !== "IN_PROGRESS") return null;
+    const locked = new Set(completedModulesOf(fresh.moduleTimerState, modules.length));
+    await db.fullPracticeTestAttempt.update({
       where: { id: attempt.id },
       data: {
         currentModule: Number.isInteger(currentModule) ? (currentModule as number) : attempt.currentModule,
@@ -63,70 +74,66 @@ export async function saveFullTestProgress(attempt: AttemptRow, body: FullTestSa
         extraTimeUsed:
           Number.isInteger(extraTimeUsed) && (extraTimeUsed as number) >= 0 ? (extraTimeUsed as number) : attempt.extraTimeUsed,
       },
-    }),
-    markUserActive(userId),
-    saveFullTestTimerState(attempt.id, moduleTimerState),
-  ]);
+    });
+    await saveFullTestTimerState(attempt.id, moduleTimerState);
 
-  const moduleByQuestionId = new Map<string, string>();
-  modules.forEach((testModule, index) => {
-    if (locked.has(index)) return;
-    for (const item of testModule.questions) moduleByQuestionId.set(item.questionId, testModule.id);
-  });
-  const allowedIds = new Set(moduleByQuestionId.keys());
-  const answerMap = body.answers && typeof body.answers === "object" ? (body.answers as Record<string, string>) : {};
-  const timeMap =
-    body.timeSpentByQuestion && typeof body.timeSpentByQuestion === "object"
-      ? (body.timeSpentByQuestion as Record<string, number>)
-      : {};
-  const { byQuestion: reviewMeta, markedIds } = reviewMetaByQuestion(body, allowedIds);
-  // A checked question keeps the answer it was checked with ("Show explanations in the player").
-  const checkedIds = new Set(
-    (await prisma.fullPracticeTestAnswer.findMany({ where: { attemptId: attempt.id, checkedAt: { not: null } }, select: { questionId: true } })).map(
-      (row) => row.questionId,
-    ),
-  );
+    const moduleByQuestionId = new Map<string, string>();
+    modules.forEach((testModule, index) => {
+      if (locked.has(index)) return;
+      for (const item of testModule.questions) moduleByQuestionId.set(item.questionId, testModule.id);
+    });
+    const allowedIds = new Set(moduleByQuestionId.keys());
+    const { byQuestion: reviewMeta, markedIds } = reviewMetaByQuestion(body, allowedIds);
+    // A checked question keeps the answer it was checked with ("Show explanations in the player").
+    const checkedIds = new Set(
+      (await db.fullPracticeTestAnswer.findMany({ where: { attemptId: attempt.id, checkedAt: { not: null } }, select: { questionId: true } })).map(
+        (row) => row.questionId,
+      ),
+    );
 
-  // One upsert per question with everything the payload carries for it.
-  const questionIds = new Set<string>([...Object.keys(answerMap), ...Object.keys(timeMap), ...reviewMeta.keys()]);
-  await Promise.all(
-    [...questionIds].map((questionId) => {
+    // One upsert per question with everything the payload carries for it.
+    const questionIds = new Set<string>([...Object.keys(answerMap), ...Object.keys(timeMap), ...reviewMeta.keys()]);
+    for (const questionId of questionIds) {
       const moduleId = moduleByQuestionId.get(questionId);
-      if (!moduleId) return Promise.resolve();
+      if (!moduleId) continue;
       const data = {
         moduleId,
         ...(questionId in answerMap && !checkedIds.has(questionId) ? { answer: answerMap[questionId] || null } : {}),
         ...(questionId in timeMap ? { timeSpent: Number(timeMap[questionId]) || 0 } : {}),
         ...(reviewMeta.get(questionId) ?? {}),
       };
-      return prisma.fullPracticeTestAnswer.upsert({
+      await db.fullPracticeTestAnswer.upsert({
         where: { attemptId_questionId: { attemptId: attempt.id, questionId } },
         update: data,
         create: { attemptId: attempt.id, questionId, ...data },
       });
-    }),
-  );
-  if (markedIds) {
-    await prisma.fullPracticeTestAnswer.updateMany({
-      where: { attemptId: attempt.id, markedForReview: true, questionId: { in: [...allowedIds], notIn: [...markedIds] } },
-      data: { markedForReview: false },
-    });
-  }
-  return { modules, locked };
+    }
+    if (markedIds) {
+      await db.fullPracticeTestAnswer.updateMany({
+        where: { attemptId: attempt.id, markedForReview: true, questionId: { in: [...allowedIds], notIn: [...markedIds] } },
+        data: { markedForReview: false },
+      });
+    }
+    return locked;
+  });
+  await markUserActive(userId);
+  return { modules, locked: locked ?? new Set(modules.map((_, index) => index)), closed: locked === null };
 }
 
-/** Marks one module as submitted (idempotent). Returns the completed module indexes. */
+/** Marks one module as submitted (idempotent, atomic). Returns the completed module indexes. */
 export async function completeFullTestModule(attemptId: string, moduleIndex: number, moduleCount: number) {
-  const state = (await getFullTestProgressState(attemptId, moduleCount)) ?? {
-    timers: Array.from({ length: moduleCount }, () => 0),
-    phase: "MODULE" as const,
-    breakRemaining: 0,
-  };
-  const completedModules = [...new Set([...(state.completedModules ?? []), moduleIndex])].sort();
-  const timers = [...state.timers];
-  timers[moduleIndex] = 0;
-  await saveFullTestProgressState(attemptId, { ...state, timers, completedModules });
-  return completedModules;
+  return atomic(async () => {
+    const state = (await getFullTestProgressState(attemptId, moduleCount)) ?? {
+      timers: Array.from({ length: moduleCount }, () => 0),
+      phase: "MODULE" as const,
+      breakRemaining: 0,
+    };
+    const completedModules = [...new Set([...(state.completedModules ?? []), moduleIndex])].sort();
+    const timers = [...state.timers];
+    timers[moduleIndex] = 0;
+    await saveFullTestProgressState(attemptId, { ...state, timers, completedModules });
+    return completedModules;
+  });
 }
 
 /**

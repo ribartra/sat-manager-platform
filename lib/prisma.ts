@@ -97,6 +97,15 @@ function createPrisma(): PrismaClientType {
   }) as unknown as PrismaClientType;
 }
 
+/**
+ * Runs `work` atomically: inside a new (exclusive) transaction, or — when already called from inside
+ * one — as part of it (no nested transaction). Use it for read-modify-write sequences on one row.
+ */
+export async function atomic<T>(work: (db: PrismaClientType) => Promise<T>): Promise<T> {
+  if (inTransaction.getStore()) return work(prisma);
+  return prisma.$transaction((tx) => work(tx as unknown as PrismaClientType)) as Promise<T>;
+}
+
 // In production: singleton to avoid exhausting the connection pool.
 // In development: always fresh so HMR never serves a stale generated client
 // after `prisma generate` (SQLite handles multiple connections fine).

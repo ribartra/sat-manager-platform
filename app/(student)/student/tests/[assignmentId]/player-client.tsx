@@ -466,20 +466,23 @@ export function FullTestPlayer({
     const timeSpentSnapshot = recordQuestionTime();
     let response: Response;
     try {
-      response = await fetchWithTransientRetry(`/api/full-practice-tests/attempts/${attemptId}/submit`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        answers: answersRef.current,
-        timeSpentByQuestion: timeSpentSnapshot,
-        timeExpiredEvents: expiredEventsRef.current,
-        extraTimeUsed: extraTimeUsedRef.current,
-        moduleTimerState: buildProgressPayload(),
-        markedQuestionIds: Array.from(markedRef.current),
-        notes: notesRef.current,
-        eliminatedOptions: fromLabelSets(eliminatedRef.current),
-      }),
-      });
+      // Through the save queue: a pending autosave lands first, never after the Test is submitted.
+      response = await enqueueSave(() =>
+        fetchWithTransientRetry(`/api/full-practice-tests/attempts/${attemptId}/submit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          answers: answersRef.current,
+          timeSpentByQuestion: timeSpentSnapshot,
+          timeExpiredEvents: expiredEventsRef.current,
+          extraTimeUsed: extraTimeUsedRef.current,
+          moduleTimerState: buildProgressPayload(),
+          markedQuestionIds: Array.from(markedRef.current),
+          notes: notesRef.current,
+          eliminatedOptions: fromLabelSets(eliminatedRef.current),
+        }),
+        }),
+      );
     } catch {
       writeBuffer(offlineKey, buildAutosavePayload(answersRef.current, moduleIndexRef.current, questionIndexRef.current));
       notify.error("You're offline, so we couldn't submit. Your answers are safe — try again when you're back online.");
@@ -498,7 +501,7 @@ export function FullTestPlayer({
     }
     clearBuffer(offlineKey);
     router.push(`/student/tests/results/${attemptId}${resultQuery ? `?${resultQuery}` : ""}`);
-  }, [attemptId, buildAutosavePayload, buildProgressPayload, exitHref, offlineKey, previewMode, recordQuestionTime, resultQuery, router]);
+  }, [attemptId, buildAutosavePayload, buildProgressPayload, enqueueSave, exitHref, offlineKey, previewMode, recordQuestionTime, resultQuery, router]);
 
   const enterModule = useCallback(
     async (nextModule: number) => {
@@ -552,11 +555,14 @@ export function FullTestPlayer({
     const payload = buildAutosavePayload(answersRef.current, index, questionIndexRef.current);
     let response: Response;
     try {
-      response = await fetchWithTransientRetry(`/api/full-practice-tests/attempts/${attemptId}/modules/${index}/submit`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      // Through the save queue: a pending autosave lands first, never after the module is submitted.
+      response = await enqueueSave(() =>
+        fetchWithTransientRetry(`/api/full-practice-tests/attempts/${attemptId}/modules/${index}/submit`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }),
+      );
     } catch {
       writeBuffer(offlineKey, payload);
       notify.error("You're offline, so we couldn't submit this module. Your answers are safe — try again when you're back online.");
@@ -575,7 +581,7 @@ export function FullTestPlayer({
     const data = (await response.json()) as { done?: boolean; completedModules?: number[] };
     completedRef.current = new Set(data.completedModules ?? [...completedRef.current, index]);
     return data;
-  }, [attemptId, buildAutosavePayload, offlineKey, recordQuestionTime]);
+  }, [attemptId, buildAutosavePayload, enqueueSave, offlineKey, recordQuestionTime]);
 
   const resultsHref = useCallback(
     (submittedIndex?: number) => {
