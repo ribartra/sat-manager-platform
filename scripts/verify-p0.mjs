@@ -508,7 +508,7 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/history/page.tsx",
-    requires: ["parseHistoryParams(", "InvalidateAttemptButton", "show.student", "show.title", "Back to", "dayLabel(", "search={false}"],
+    requires: ["parseHistoryParams(", "<ChevronCell />", "show.student", "show.title", "Back to", "dayLabel(", "search={false}"],
     forbids: ["q={q}", 'placeholder="Student, practice set or Test"'],
     label: "History unificada: contexto por URL, columnas ocultas con filtro fijo, volver al alumno, encabezado por dia",
   },

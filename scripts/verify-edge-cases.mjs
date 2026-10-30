@@ -109,8 +109,9 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/history/page.tsx",
-    requires: ["InvalidateAttemptButton"],
-    label: "History global: invalidar con el mismo componente (unica accion sobre un intento)",
+    requires: ["<ChevronCell />"],
+    forbids: ["InvalidateAttemptButton"],
+    label: "History global: fila estandar con flecha; invalidar solo en la pagina del intento",
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/attempt-header-actions.tsx",

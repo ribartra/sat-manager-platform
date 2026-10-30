@@ -24,7 +24,6 @@ import {
   PAGE_SIZE,
 } from "@/components/sat";
 import { AreaTag } from "@/components/sat/practice-set-row";
-import { InvalidateAttemptButton } from "@/components/sat/invalidate-attempt-button";
 import { Pct } from "@/components/sat/work-status";
 import { Badge } from "@/components/ui/badge";
 import { auth } from "@/lib/auth";
@@ -127,7 +126,6 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
     "Attempt",
     "Score",
     "Change",
-    "",
     "",
   ];
   const context = [
@@ -314,10 +312,7 @@ function HistoryTableRow({ row: r, show, current, keep }: { row: HistoryRow; sho
           <Delta value={r.change} unit="%" />
         )}
       </td>
-      <td className={`${TD} text-right`}>
-        {/* The only action on an attempt, same component as the attempt pages and the student's History. */}
-        <RowAction><InvalidateAttemptButton attemptId={r.id} kind={isTest ? "test" : "practice"} status={r.status} compact /></RowAction>
-      </td>
+      {/* Standard row: the arrow opens the attempt (Invalidate lives on the attempt page). */}
       <ChevronCell />
     </LinkTr>
   );
