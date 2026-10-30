@@ -242,10 +242,10 @@ export function AppShell({
         <div className="mt-auto flex flex-col gap-1 border-t border-gray-200 pt-2.5">
           {navViews.views.length > 1 ? (
             // The keyboard shortcuts between views (useViewShortcuts), always discoverable here.
-            <Hint label={viewShortcutsLabel(navViews.views.length)} side="right">
+            <Hint label={viewShortcutsLabel()} side="right">
               <button
                 type="button"
-                aria-label={`Keyboard shortcuts: ${viewShortcutsLabel(navViews.views.length)}`}
+                aria-label={`Keyboard shortcuts: ${viewShortcutsLabel()}`}
                 className={cn("flex items-center gap-3 whitespace-nowrap rounded-[9px] px-3 py-2 text-[13px] text-slate-500 hover:bg-slate-100", mini && "min-[860px]:justify-center min-[860px]:px-0")}
               >
                 <Keyboard size={16} aria-hidden />

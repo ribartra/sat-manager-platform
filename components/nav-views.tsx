@@ -25,7 +25,7 @@ export function neighbourViews(views: NavView[], current: number) {
   return { previous: views[(current - 1 + views.length) % views.length], next: views[(current + 1) % views.length] };
 }
 
-/** "[ ] previous / next view · g 1–6 go to a view" (the sidebar's Shortcuts help). */
-export function viewShortcutsLabel(count: number) {
-  return `[ and ] go to the previous / next view · g then 1–${count} goes to a view in menu order`;
+/** The sidebar's Shortcuts help (useViewShortcuts). */
+export function viewShortcutsLabel() {
+  return "Shift+↑ / Shift+↓ go to the previous / next view (menu order)";
 }

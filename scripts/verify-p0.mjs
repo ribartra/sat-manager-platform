@@ -30,7 +30,13 @@ const checks = [
   {
     file: "components/app-shell.tsx",
     requires: ["useViewShortcuts(", "NavViewsContext.Provider", "viewShortcutsLabel("],
-    label: "Atajos de teclado entre vistas ([ ] y g + numero) con ayuda visible en el menu",
+    label: "Atajos de teclado entre vistas con ayuda visible en el menu",
+  },
+  {
+    file: "hooks/use-view-shortcuts.ts",
+    requires: ["event.shiftKey", '"ArrowDown"', '"ArrowUp"'],
+    forbids: ['event.key === "]"', 'event.key === "g"'],
+    label: "Cambio de vista solo con Shift+flecha arriba/abajo",
   },
   // Source tag on every History and Pending row (practice set / Test source).
   ...["app/(teacher)/teacher/history/page.tsx", "app/(teacher)/teacher/pending/page.tsx", "app/(student)/student/pending/page.tsx"].map((file) => ({
