@@ -26,6 +26,8 @@ export interface HistoryRow {
   practiceSetId: string | null;
   testId: string | null;
   title: string;
+  /** Content source of the set / Test (College Board, Innovator…). */
+  sourceName: string | null;
   area: PracticeAreaCode | null;
   areaLabel: string | null;
   difficulty: string | null;
@@ -113,7 +115,7 @@ export async function loadAttemptHistory(studentIds: string[], filters: HistoryF
             totalScore: true,
             moduleTimerState: true,
             student: { select: { id: true, name: true, avatarUrl: true } },
-            test: { select: { name: true, _count: { select: { modules: true } } } },
+            test: { select: { name: true, source: { select: { name: true } }, _count: { select: { modules: true } } } },
           },
         })
       : Promise.resolve([]),
@@ -130,6 +132,7 @@ export async function loadAttemptHistory(studentIds: string[], filters: HistoryF
           difficulty: true,
           topicId: true,
           _count: { select: { questions: true } },
+          source: { select: { name: true } },
           topic: { select: { name: true, domain: { select: { practiceArea: true } } } },
         },
       })
@@ -165,6 +168,7 @@ export async function loadAttemptHistory(studentIds: string[], filters: HistoryF
         practiceSetId: a.practiceSetId,
         testId: null,
         title: set?.topic.name ?? (set ? shortSetName(set.name) : "Practice set"),
+        sourceName: set?.source?.name ?? null,
         area,
         areaLabel: area ? practiceAreaLabel(area) : null,
         difficulty: set?.difficulty ?? null,
@@ -211,6 +215,7 @@ export async function loadAttemptHistory(studentIds: string[], filters: HistoryF
         practiceSetId: null,
         testId: a.testId,
         title: a.test.name,
+        sourceName: a.test.source?.name ?? null,
         area: null,
         areaLabel: null,
         difficulty: null,

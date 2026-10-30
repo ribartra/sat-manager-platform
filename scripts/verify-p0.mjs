@@ -32,6 +32,12 @@ const checks = [
     requires: ["useViewShortcuts(", "NavViewsContext.Provider", "viewShortcutsLabel("],
     label: "Atajos de teclado entre vistas ([ ] y g + numero) con ayuda visible en el menu",
   },
+  // Source tag on every History and Pending row (practice set / Test source).
+  ...["app/(teacher)/teacher/history/page.tsx", "app/(teacher)/teacher/pending/page.tsx", "app/(student)/student/pending/page.tsx"].map((file) => ({
+    file,
+    requires: ["<SourceTag name={r.sourceName} />"],
+    label: `Etiqueta de fuente en la fila: ${file}`,
+  })),
   // Results by skill (SAT-039/040/041): no Low performance, no summary card, no matrix, no Assign in results.
   {
     file: "app/(teacher)/teacher/students/[studentId]/page.tsx",

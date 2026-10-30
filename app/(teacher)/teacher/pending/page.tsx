@@ -18,6 +18,7 @@ import {
   paginate,
 } from "@/components/sat";
 import { AreaTag } from "@/components/sat/practice-set-row";
+import { SourceTag } from "@/components/sat/source-tag";
 import { HEADER_ACTION_CLASS, HeaderActions } from "@/components/sat/header-actions";
 import { Badge } from "@/components/ui/badge";
 import { auth } from "@/lib/auth";
@@ -173,6 +174,7 @@ function PendingTableRow({ row: r, show }: { row: PendingRow; show: { student: b
         <span className="flex flex-wrap items-center gap-2">
           <RowLink href={href}>{r.title}</RowLink>
           {r.difficulty ? <Badge variant={difficultyBadgeVariant(r.difficulty)}>{difficultyLabel(r.difficulty)}</Badge> : null}
+          <SourceTag name={r.sourceName} />
         </span>
       </td>
       {show.status ? (

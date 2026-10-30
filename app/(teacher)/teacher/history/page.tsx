@@ -24,6 +24,7 @@ import {
   PAGE_SIZE,
 } from "@/components/sat";
 import { AreaTag } from "@/components/sat/practice-set-row";
+import { SourceTag } from "@/components/sat/source-tag";
 import { Pct } from "@/components/sat/work-status";
 import { Badge } from "@/components/ui/badge";
 import { auth } from "@/lib/auth";
@@ -269,6 +270,7 @@ function HistoryTableRow({ row: r, show, current, keep }: { row: HistoryRow; sho
           <span className="flex flex-wrap items-center gap-2">
             <RowLink href={href}>{r.title}</RowLink>
             {r.difficulty && show.difficulty ? <Badge variant={difficultyBadgeVariant(r.difficulty)}>{difficultyLabel(r.difficulty)}</Badge> : null}
+            <SourceTag name={r.sourceName} />
             {r.status === "INVALIDATED" ? <AttemptStatusBadge status={r.status} /> : null}
           </span>
         </td>

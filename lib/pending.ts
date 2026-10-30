@@ -21,6 +21,8 @@ export interface PendingRow {
   studentId: string;
   studentName: string;
   title: string;
+  /** Content source of the set / Test (College Board, Innovator…). */
+  sourceName: string | null;
   area: PracticeAreaCode | null;
   areaLabel: string | null;
   difficulty: string | null;
@@ -67,14 +69,14 @@ export async function loadPending(studentIds: string[], filters: PendingFilters 
             createdAt: true,
             dueDate: true,
             student: { select: { id: true, name: true } },
-            practiceSet: { select: { id: true, name: true, difficulty: true, topic: { select: { name: true, domain: { select: { practiceArea: true } } } } } },
+            practiceSet: { select: { id: true, name: true, difficulty: true, source: { select: { name: true } }, topic: { select: { name: true, domain: { select: { practiceArea: true } } } } } },
           },
         }),
     filters.kind === "practice" || filters.area
       ? Promise.resolve([])
       : prisma.fullPracticeTestAssignment.findMany({
           where: { studentId: { in: studentIds }, status: { in: statuses }, ...assigned },
-          select: { id: true, status: true, createdAt: true, dueDate: true, unlockAt: true, testId: true, student: { select: { id: true, name: true } }, test: { select: { name: true } } },
+          select: { id: true, status: true, createdAt: true, dueDate: true, unlockAt: true, testId: true, student: { select: { id: true, name: true } }, test: { select: { name: true, source: { select: { name: true } } } } },
         }),
   ]);
   const rows: PendingRow[] = [
@@ -86,6 +88,7 @@ export async function loadPending(studentIds: string[], filters: PendingFilters 
         studentId: a.student.id,
         studentName: a.student.name,
         title: a.practiceSet.topic.name || shortSetName(a.practiceSet.name),
+        sourceName: a.practiceSet.source?.name ?? null,
         area,
         areaLabel: area ? practiceAreaLabel(area) : null,
         difficulty: a.practiceSet.difficulty,
@@ -104,6 +107,7 @@ export async function loadPending(studentIds: string[], filters: PendingFilters 
       studentId: a.student.id,
       studentName: a.student.name,
       title: a.test.name,
+      sourceName: a.test.source?.name ?? null,
       area: null,
       areaLabel: null,
       difficulty: null,

@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { EmptyState, LinkTr, ListFilters, PAGE_SIZE, PageHeader, PageShell, Pagination, RowLink, SimpleTable, TD, ChevronCell, pageFromParam, paginate } from "@/components/sat";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { AreaTag } from "@/components/sat/practice-set-row";
+import { SourceTag } from "@/components/sat/source-tag";
 import { Badge } from "@/components/ui/badge";
 import { auth } from "@/lib/auth";
 import { difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
@@ -101,6 +102,7 @@ export default async function StudentPendingPage({ searchParams }: { searchParam
                     {/* Opens the set / Test to start or continue it. */}
                     <RowLink href={r.kind === "test" ? `/student/tests/${r.id}` : `/student/practice/assignment/${r.id}`}>{r.title}</RowLink>
                     {r.difficulty ? <Badge variant={difficultyBadgeVariant(r.difficulty)}>{difficultyLabel(r.difficulty)}</Badge> : null}
+                    <SourceTag name={r.sourceName} />
                   </span>
                 </td>
                 {show.status ? (
