@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { PageShell } from "@/components/sat";
+import { PageHeader, PageShell } from "@/components/sat";
+import { HeaderActions } from "@/components/sat/header-actions";
+import { SourceTag } from "@/components/sat/source-tag";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { ModuleTiles } from "@/components/sat/test-ui";
 import { DueLine } from "@/components/sat/work-status";
@@ -21,6 +23,7 @@ type IntroAssignment = {
   test: {
     id: string;
     name: string;
+    source?: { name: string } | null;
     modules: Parameters<typeof moduleViewsForTest>[0];
   };
 };
@@ -91,19 +94,32 @@ export async function TestIntro({
           { label: current.short },
         ]}
       />
+      {/* Same header as every view: the module, its dates, and Start / Continue at the right. */}
+      <PageHeader
+        eyebrow={
+          <span className="flex flex-wrap items-center gap-1.5">
+            <Badge variant="test">{assignment.test.name}{tryNumber > 1 ? ` · try ${tryNumber}` : ""}</Badge>
+            <SourceTag name={assignment.test.source?.name} />
+            <Badge>{current.tier}</Badge>
+            {current.state === "progress" ? <Badge variant="warning">In progress</Badge> : null}
+          </span>
+        }
+        title={current.name}
+        description={
+          <>
+            {current.questionCount} questions · {current.minutes} minutes · the timer keeps your remaining time if you leave
+            <DueLine assignedAt={assignment.createdAt} opensAt={assignment.unlockAt ?? assignment.createdAt} dueDate={assignment.dueDate} className="mt-1" />
+          </>
+        }
+        actions={
+          <HeaderActions>
+            <Button asChild variant="secondary"><Link href={`/student/tests?view=all#test-${assignment.id}`}>Back</Link></Button>
+            <Button asChild><Link href={startHref}>{current.state === "progress" ? "Continue module" : "Start module"} ›</Link></Button>
+          </HeaderActions>
+        }
+      />
       <Card padding="lg">
-        <div className="flex flex-wrap items-center gap-1.5">
-          <Badge variant="test">{assignment.test.name}{tryNumber > 1 ? ` · try ${tryNumber}` : ""}</Badge>
-          <Badge>{current.tier}</Badge>
-          {current.state === "progress" ? <Badge variant="warning">In progress</Badge> : null}
-        </div>
-        <h1 className="mt-3 text-[26px] font-bold tracking-[-0.3px] text-gray-900">{current.name}</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          {current.questionCount} questions · {current.minutes} minutes · the timer keeps your remaining time if you leave
-        </p>
-        <DueLine assignedAt={assignment.createdAt} opensAt={assignment.unlockAt ?? assignment.createdAt} dueDate={assignment.dueDate} className="mt-1" />
-
-        <div className="mt-5 rounded-lg border border-gray-200 bg-gray-50 p-4">
+        <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Directions</p>
           <p className="mt-1 text-sm text-gray-700">
             {DIRECTIONS[current.section]}
@@ -120,15 +136,6 @@ export async function TestIntro({
           statusFor={statusFor}
           hrefFor={(m) => (m.state === "done" && attempt ? `/student/tests/results/${attempt.id}#mod-${m.key}` : `${base}?module=${m.key}`)}
         />
-
-        <div className="mt-6 flex flex-wrap gap-2">
-          <Button asChild size="lg">
-            <Link href={startHref}>{current.state === "progress" ? "Continue module" : "Start module"} ›</Link>
-          </Button>
-          <Button asChild variant="secondary" size="lg">
-            <Link href={`/student/tests?view=all#test-${assignment.id}`}>Back</Link>
-          </Button>
-        </div>
       </Card>
     </PageShell>
   );

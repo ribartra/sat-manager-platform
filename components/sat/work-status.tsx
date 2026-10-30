@@ -65,11 +65,12 @@ export function DueLine({
   }
   if (parts.length === 0) return null;
   return (
-    <p className={`text-xs text-gray-500 ${className}`}>
+    // A block span (not <p>): it also sits inside page descriptions, which are paragraphs.
+    <span className={`block text-xs text-gray-500 ${className}`}>
       {parts.map((p, i) => (
         <span key={i}>{i > 0 ? " · " : ""}{p}</span>
       ))}
-    </p>
+    </span>
   );
 }
 

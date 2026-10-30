@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PageShell, PracticeAttemptsTable, SectionHeader } from "@/components/sat";
+import { PageHeader, PageShell, PracticeAttemptsTable, SectionHeader } from "@/components/sat";
+import { HeaderActions } from "@/components/sat/header-actions";
+import { SourceTag } from "@/components/sat/source-tag";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { AreaTag, notOpenLabel, notOpenReason } from "@/components/sat/practice-set-row";
 import { DueLine, WorkStatusBadges } from "@/components/sat/work-status";
@@ -28,37 +30,46 @@ export async function PracticeIntro({ studentId, assignmentId }: { studentId: st
           { label: item.skill },
         ]}
       />
+      {/* Same header as every view: what it is, its dates, and Start / Continue at the right. */}
+      <PageHeader
+        eyebrow={
+          <span className="flex flex-wrap items-center gap-2">
+            <AreaTag area={item.area} />
+            <Badge variant={difficultyBadgeVariant(item.difficulty)}>{difficultyLabel(item.difficulty)}</Badge>
+            <SourceTag name={item.sourceName} />
+            <WorkStatusBadges state={item.state} overdue={item.overdue} />
+          </span>
+        }
+        title={item.skill}
+        description={
+          <>
+            {practiceAreaLabel(item.area)} · {item.domain} · {item.questionCount} questions · no time limit
+            <DueLine assignedAt={item.assignedAt} opensAt={item.opensAt} dueDate={item.dueDate} className="mt-1" />
+          </>
+        }
+        actions={
+          <HeaderActions>
+            <Button asChild variant="secondary"><Link href={`/student/practice?area=${tab}`}>Back</Link></Button>
+            {item.locked ? (
+              <Button disabledReason={notOpenReason(item.opensAt)}>{notOpenLabel(item.opensAt)}</Button>
+            ) : (
+              <Button asChild><Link href={start}>{label}</Link></Button>
+            )}
+          </HeaderActions>
+        }
+      />
       <Card padding="lg">
-        <div className="flex flex-wrap items-center gap-2">
-          <AreaTag area={item.area} />
-          <Badge variant={difficultyBadgeVariant(item.difficulty)}>{difficultyLabel(item.difficulty)}</Badge>
-          <WorkStatusBadges state={item.state} overdue={item.overdue} />
-        </div>
-        <h1 className="mt-2 text-[26px] font-bold tracking-[-0.3px] text-gray-900">{item.skill}</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          {practiceAreaLabel(item.area)} · {item.domain} · {item.questionCount} questions · no time limit
-        </p>
-        <DueLine assignedAt={item.assignedAt} opensAt={item.opensAt} dueDate={item.dueDate} className="mt-1" />
-
+        {item.state === "progress" && item.openAnswered !== null ? (
+          <p className="mb-4 text-sm text-gray-600">You answered {item.openAnswered} of {item.questionCount} questions so far.</p>
+        ) : null}
         {item.tries.length > 0 ? (
-          <div className="mt-5">
+          <div>
             <SectionHeader size="sm" title="Your previous attempts" description="Click a try to review it." />
             <PracticeAttemptsTable rows={item.tries} hrefFor={(id) => `/student/results/${id}`} />
           </div>
-        ) : null}
-
-        {item.state === "progress" && item.openAnswered !== null ? (
-          <p className="mt-4 text-sm text-gray-600">You answered {item.openAnswered} of {item.questionCount} questions so far.</p>
-        ) : null}
-
-        <div className="mt-6 flex flex-wrap gap-2">
-          {item.locked ? (
-            <Button size="lg" disabledReason={notOpenReason(item.opensAt)}>{notOpenLabel(item.opensAt)}</Button>
-          ) : (
-            <Button asChild size="lg"><Link href={start}>{label}</Link></Button>
-          )}
-          <Button asChild variant="secondary" size="lg"><Link href={`/student/practice?area=${tab}`}>Back</Link></Button>
-        </div>
+        ) : (
+          <p className="text-sm text-gray-500">No tries yet: your results will show here.</p>
+        )}
       </Card>
     </PageShell>
   );

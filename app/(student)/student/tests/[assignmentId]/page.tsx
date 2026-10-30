@@ -38,6 +38,7 @@ export default async function FullTestPlayerPage({ params, searchParams }: PageP
     include: {
       test: {
         include: {
+          source: { select: { name: true } },
           modules: { include: fullTestModulesInclude, orderBy: { order: "asc" } },
         },
       },
