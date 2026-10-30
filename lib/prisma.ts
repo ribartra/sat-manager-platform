@@ -1,34 +1,45 @@
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import { PrismaClient } from "@/app/generated/prisma/client";
+import { isRetryableSqliteError, SQLITE_BUSY_TIMEOUT_MS, sqliteRetryDelay, SQLITE_RETRY_ATTEMPTS } from "@/lib/sqlite-retry";
 
 type PrismaClientType = InstanceType<typeof PrismaClient>;
 
-function createPrisma(): PrismaClientType {
-  const url = process.env.DATABASE_URL ?? "file:./dev.db";
-  // `timeout` is better-sqlite3's busy_timeout (ms): retry instead of failing
-  // with SQLITE_BUSY when the ingest service holds a write lock on the shared
-  // dev.db file.
-  const adapter = new PrismaBetterSqlite3({ url, timeout: 5000 } as never);
-  const client: PrismaClientType = new PrismaClient({ adapter } as never);
-  applyPragmas(client);
-  return client;
+/**
+ * The connection is configured when it opens, before the first query runs: WAL lets readers and the
+ * single writer coexist (journal_mode is persisted in the file, so the ingest service gets it too);
+ * synchronous=NORMAL is the safe pairing for WAL and is per connection; busy_timeout is how long one
+ * statement waits for the write lock. better-sqlite3 waits synchronously (the event loop is blocked
+ * meanwhile), so the wait is short and longer contention is handled by async retries (below).
+ */
+class ConfiguredSqliteAdapter extends PrismaBetterSqlite3 {
+  async connect() {
+    const adapter = await super.connect();
+    await adapter.executeScript(`PRAGMA journal_mode = WAL; PRAGMA synchronous = NORMAL; PRAGMA busy_timeout = ${SQLITE_BUSY_TIMEOUT_MS};`);
+    return adapter;
+  }
 }
 
-/**
- * WAL lets readers and the single writer coexist (journal_mode is persisted in the DB file, so the
- * ingest service gets it too); synchronous=NORMAL is the safe pairing for WAL and is per
- * connection. Set explicitly at startup instead of relying on whatever mode the file was left in.
- */
-function applyPragmas(client: PrismaClientType) {
-  void (async () => {
-    try {
-      await client.$queryRawUnsafe("PRAGMA journal_mode = WAL");
-      await client.$queryRawUnsafe("PRAGMA synchronous = NORMAL");
-      await client.$queryRawUnsafe("PRAGMA busy_timeout = 5000");
-    } catch (error) {
-      console.error(JSON.stringify({ severity: "ERROR", level: "error", event: "db.pragma_failed", message: String(error) }));
-    }
-  })();
+function createPrisma(): PrismaClientType {
+  const url = process.env.DATABASE_URL ?? "file:./dev.db";
+  const adapter = new ConfiguredSqliteAdapter({ url, timeout: SQLITE_BUSY_TIMEOUT_MS } as never);
+  const base = new PrismaClient({ adapter } as never);
+  // Every operation (models and raw SQL, any role) retries when the write lock stays busy: a failed
+  // statement wrote nothing, so running it again is safe. The wait between tries is async, so other
+  // requests keep being served.
+  return base.$extends({
+    query: {
+      async $allOperations({ args, query }) {
+        for (let attempt = 1; ; attempt += 1) {
+          try {
+            return await query(args);
+          } catch (error) {
+            if (!isRetryableSqliteError(error) || attempt >= SQLITE_RETRY_ATTEMPTS) throw error;
+            await new Promise((resolve) => setTimeout(resolve, sqliteRetryDelay(attempt)));
+          }
+        }
+      },
+    },
+  }) as unknown as PrismaClientType;
 }
 
 // In production: singleton to avoid exhausting the connection pool.

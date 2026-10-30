@@ -313,7 +313,24 @@ class MistralOcrClient:
         return None, image_payload
 
 
+_SCHEMA_READY = False
+_SCHEMA_LOCK = threading.Lock()
+
+
 def init_db() -> None:
+    """Create / migrate the ingest tables once per process (at startup). Later calls are no-ops: the
+    DDL takes SQLite's write lock, which the web app shares, so it must not run on every request."""
+    global _SCHEMA_READY
+    if _SCHEMA_READY:
+        return
+    with _SCHEMA_LOCK:
+        if _SCHEMA_READY:
+            return
+        _init_db_schema()
+        _SCHEMA_READY = True
+
+
+def _init_db_schema() -> None:
     with conn() as db:
         db.executescript(
             """
@@ -1072,6 +1089,8 @@ def crop_candidate_region(
             )
             result["assigned"] = {"targetType": target_type, "optionLabel": option_label if target_type == "OPTION" else None}
         else:  # OCR
+            # Release the write lock before calling Mistral (it can take minutes): the web app shares this SQLite file.
+            db.commit()
             text, payload = run_mistral_ocr_image(base64.b64encode(image_bytes).decode("utf-8"), "image/jpeg")
             result["text"] = text
             if payload.get("warning"):
@@ -1978,6 +1997,8 @@ def infer_missing_source_metadata_from_pages(db: sqlite3.Connection, batch_id: s
         difficulty, variant, confidence, source = infer_difficulty_from_text(text)
         rationale = source
         if not difficulty:
+            # Release the write lock before calling Mistral (it can take minutes): the web app shares this SQLite file.
+            db.commit()
             ai_result = mistral_infer_source_metadata(text, row["relativePath"])
             if ai_result and ai_result.get("difficulty") and float(ai_result.get("confidence") or 0) >= 0.65:
                 difficulty = ai_result["difficulty"]
@@ -5005,6 +5026,8 @@ def retry_ocr_required(batch_id: str, limit: int = 100, source_file_id: str | No
         images = 0
         module_context_by_source: dict[str, str | None] = {}
         for index, row in enumerate(rows, start=1):
+            # Release the write lock before calling Mistral (it can take minutes): the web app shares this SQLite file.
+            db.commit()
             ocr_text, payload = run_mistral_ocr(Path(row["path"]), int(row["pageNumber"]))
             if ocr_text:
                 db.execute(
@@ -5434,8 +5457,12 @@ def _process_batch(batch_id: str) -> None:
                             if cache_row:
                                 ocr_payload = json.loads(cache_row["responseJson"])
                         elif docx_ocr_image:
+                            # Release the write lock before calling Mistral (it can take minutes): the web app shares this SQLite file.
+                            db.commit()
                             ocr_text, payload = run_mistral_ocr_image(docx_ocr_image["base64"], docx_ocr_image.get("mimeType"))
                         else:
+                            # Release the write lock before calling Mistral (it can take minutes): the web app shares this SQLite file.
+                            db.commit()
                             ocr_text, payload = run_mistral_ocr(path, int(page["page"]))
                         if cached is None:
                             if ocr_text:

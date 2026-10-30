@@ -62,6 +62,22 @@ const checks = [
     requires: ['isAdmin ? "/admin/teachers" : "/teacher/teachers"', "(master || isAdmin)"],
     label: "Admin hereda el Home del profesor y su recuadro Teachers va a Admin › Teachers",
   },
+  // Concurrency (phase 1): one SQLite writer shared by web + ingest; no lock held while waiting on the network.
+  {
+    file: "lib/sqlite-retry.ts",
+    requires: ['"P1008"', "operation has timed out", "SocketTimeout", "SQLITE_BUSY_TIMEOUT_MS"],
+    label: "Reintento SQLite reconoce el 'busy' tal como lo reporta el adaptador de Prisma (P1008 / timed out)",
+  },
+  {
+    file: "lib/prisma.ts",
+    requires: ["$allOperations", "isRetryableSqliteError(error)", "executeScript(", "PRAGMA synchronous = NORMAL"],
+    label: "Prisma: PRAGMAs al abrir la conexion y reintento de toda operacion ante 'busy' (todas las cuentas)",
+  },
+  {
+    file: "ingest_service/app/main.py",
+    requires: ["_SCHEMA_READY", "Release the write lock before calling Mistral"],
+    label: "Ingest: commit antes de cada llamada a Mistral y esquema creado una sola vez por proceso",
+  },
   // Results by skill (SAT-039/040/041): no Low performance, no summary card, no matrix, no Assign in results.
   {
     file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
