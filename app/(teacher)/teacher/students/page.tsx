@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ChevronRight, UserPlus } from "lucide-react";
 import { DateCell, EmptyState, ListFilters, PageShell, StudentCell } from "@/components/sat";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import { HEADER_SHORTCUT_CLASS, HeaderActions } from "@/components/sat/header-actions";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
@@ -80,9 +81,13 @@ export default async function TeacherStudentsPage({ searchParams }: PageProps) {
             {all.length} student{all.length === 1 ? "" : "s"} · {invitedTotal} pending invitation{invitedTotal === 1 ? "" : "s"}
           </p>
         </div>
-        <Link href="/teacher/students/invite" className="inline-flex items-center gap-1.5 self-start shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]">
+        <HeaderActions>
+          {/* The students' parents (with the way back here). */}
+          <Link href="/teacher/parents" className={HEADER_SHORTCUT_CLASS}>Parents →</Link>
+          <Link href="/teacher/students/invite" className="inline-flex items-center gap-1.5 self-start shrink-0 whitespace-nowrap rounded-lg bg-[var(--sat-primary)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--sat-primary-dark)]">
           <UserPlus size={14} /> Invite student
-        </Link>
+          </Link>
+        </HeaderActions>
       </div>
 
       <MoreLinks links={moreLinks} />

@@ -730,10 +730,20 @@ const checks = [
     "app/(teacher)/teacher/tests/page.tsx",
   ].map((file) => ({ file, requires: ["HEADER_SHORTCUT_CLASS}>Questions →</Link>", "/teacher/questions?area="], label: `Atajo azul Questions → al area de origen: ${file}` })),
   {
+    file: "app/(teacher)/teacher/students/page.tsx",
+    requires: ['href="/teacher/parents" className={HEADER_SHORTCUT_CLASS}>Parents →</Link>'],
+    label: "Atajo azul Parents → en Students",
+  },
+  {
+    file: "app/(teacher)/teacher/parents/page.tsx",
+    requires: ["Back to Students", 'href: "/teacher/students"'],
+    label: "Parents: vuelta a Students (boton y breadcrumb)",
+  },
+  {
     file: "lib/nav-config.ts",
     requires: [],
-    forbids: ['label: "Questions", href: "/teacher/questions"'],
-    label: "Questions ya no es un chip de More (es el atajo Questions →)",
+    forbids: ['label: "Questions", href: "/teacher/questions"', 'label: "Parents", href: "/teacher/parents"'],
+    label: "Questions y Parents ya no son chips de More (son atajos →)",
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/tests/[attemptId]/page.tsx",

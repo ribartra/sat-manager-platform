@@ -2,7 +2,6 @@ import type { LucideIcon } from "lucide-react";
 import {
   Users,
   UsersRound,
-  UserCheck,
   FolderOpen,
   Map,
   FileText,
@@ -115,7 +114,7 @@ export const TEACHER_MORE_LINKS: Record<"students" | "practice", NavLinkDef[]> =
       feature: "TEACHER_GROUP_MANAGEMENT",
       hideForAdmin: true,
     },
-    { id: "teacher.students.parents", label: "Parents", href: "/teacher/parents", icon: UserCheck },
+    // Parents: a "Parents →" shortcut in the Students header, not a chip here.
   ],
   practice: [
     // Questions: a "Questions →" shortcut in the Practice and Tests headers (same area), not a chip here.

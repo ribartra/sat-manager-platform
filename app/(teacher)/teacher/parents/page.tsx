@@ -1,5 +1,8 @@
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
-import { PageShell } from "@/components/sat";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import { PageHeader, PageShell } from "@/components/sat";
+import { HEADER_ACTION_CLASS, HeaderActions } from "@/components/sat/header-actions";
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { studentAccessWhereFor } from "@/lib/program-scope";
@@ -31,7 +34,17 @@ export default async function ParentsPage() {
   return (
     <PageShell>
       <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Students", href: "/teacher/students" }, { label: "Parents" }]} />
-      <h1 className="mb-6 text-[26px] font-bold tracking-[-0.3px] text-gray-900">Parents</h1>
+      <PageHeader
+        title="Parents"
+        description="Your students' parents and who they are linked to."
+        actions={
+          <HeaderActions>
+            <Link href="/teacher/students" className={HEADER_ACTION_CLASS}>
+              <ArrowLeft size={14} aria-hidden /> Back to Students
+            </Link>
+          </HeaderActions>
+        }
+      />
       <ParentsClient
         parents={visibleParents.map((p) => ({
           id: p.id,
