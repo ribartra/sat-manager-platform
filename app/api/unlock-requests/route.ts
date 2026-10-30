@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getFeatureSetting } from "@/lib/app-settings";
-import { notifyTeachers } from "@/lib/notifications";
+import { notifyStudentTeachers } from "@/lib/notifications";
 import { requireApprovedSession } from "@/lib/rbac";
 import { ApiError, NotFoundError, UnauthorizedError, withApiErrors } from "@/lib/api-error";
 import { writeAudit } from "@/lib/audit";
@@ -37,7 +37,8 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
     targetId: request.id,
     metadata: { assignmentId, practiceSetId: assignment.practiceSetId },
   });
-  await notifyTeachers(
+  await notifyStudentTeachers(
+    session.user.id,
     "Unlock requested",
     `${session.user.name} requested access to ${assignment.practiceSet.name}.`,
     `/teacher/students/${session.user.id}`

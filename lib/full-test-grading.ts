@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
-import { notifyTeachers } from "@/lib/notifications";
+import { notifyStudentTeachers } from "@/lib/notifications";
+import { NotFoundError } from "@/lib/api-error";
 import { markUserActive } from "@/lib/activity";
 import { scaledScore } from "@/lib/full-test-scoring";
 import { isAnswerCorrect } from "@/lib/answer-grading";
@@ -175,6 +176,7 @@ export async function finalizeFullTestAttempt(input: {
   let rwTotal = 0;
   let mathCorrect = 0;
   let mathTotal = 0;
+  const graded: { questionId: string; moduleId: string; answer: string; isCorrect: boolean; isLocked: boolean }[] = [];
   for (const testModule of modules) {
     for (const item of testModule.questions) {
       const answer = (answers?.[item.questionId] ?? "") as string;
@@ -193,42 +195,49 @@ export async function finalizeFullTestAttempt(input: {
           if (isCorrect) rwCorrect += 1;
         }
       }
-      const isLocked = lockedQuestionIds.has(item.questionId);
-      await prisma.fullPracticeTestAnswer.upsert({
-        where: { attemptId_questionId: { attemptId, questionId: item.questionId } },
-        update: {
-          moduleId: testModule.id,
-          answer: answer || null,
-          isCorrect,
-          ...(isLocked ? {} : { timeSpent: timeSpentByQuestion?.[item.questionId] ?? undefined }),
-          ...(reviewMeta.get(item.questionId) ?? {}),
-        },
-        create: {
-          attemptId,
-          moduleId: testModule.id,
-          questionId: item.questionId,
-          answer: answer || null,
-          isCorrect,
-          timeSpent: timeSpentByQuestion?.[item.questionId] ?? undefined,
-          ...(reviewMeta.get(item.questionId) ?? {}),
-        },
-      });
+      graded.push({ questionId: item.questionId, moduleId: testModule.id, answer, isCorrect, isLocked: lockedQuestionIds.has(item.questionId) });
     }
-  }
-
-  if (markedIds) {
-    await prisma.fullPracticeTestAnswer.updateMany({
-      where: { attemptId, markedForReview: true, questionId: { in: [...allowedIds], notIn: [...markedIds] } },
-      data: { markedForReview: false },
-    });
   }
 
   const rwScore = await scaledScore("RW", rwCorrect, rwTotal);
   const mathScore = await scaledScore("MATH", mathCorrect, mathTotal);
+  const scores = { rwScore, mathScore, totalScore: rwScore + mathScore };
+  const raw = { rwCorrect, rwTotal, mathCorrect, mathTotal };
   const submittedAt = new Date();
-  await Promise.all([
-    prisma.fullPracticeTestAttempt.update({
-      where: { id: attemptId },
+
+  // One transaction: every graded answer + the IN_PROGRESS → SUBMITTED transition. Only the request
+  // that makes the transition grades and notifies; a second submit (two tabs, a retried request) or a
+  // teacher's Invalidate in between leaves the attempt as it is.
+  const transitioned = await prisma.$transaction(async (tx) => {
+    for (const row of graded) {
+      await tx.fullPracticeTestAnswer.upsert({
+        where: { attemptId_questionId: { attemptId, questionId: row.questionId } },
+        update: {
+          moduleId: row.moduleId,
+          answer: row.answer || null,
+          isCorrect: row.isCorrect,
+          ...(row.isLocked ? {} : { timeSpent: timeSpentByQuestion?.[row.questionId] ?? undefined }),
+          ...(reviewMeta.get(row.questionId) ?? {}),
+        },
+        create: {
+          attemptId,
+          moduleId: row.moduleId,
+          questionId: row.questionId,
+          answer: row.answer || null,
+          isCorrect: row.isCorrect,
+          timeSpent: timeSpentByQuestion?.[row.questionId] ?? undefined,
+          ...(reviewMeta.get(row.questionId) ?? {}),
+        },
+      });
+    }
+    if (markedIds) {
+      await tx.fullPracticeTestAnswer.updateMany({
+        where: { attemptId, markedForReview: true, questionId: { in: [...allowedIds], notIn: [...markedIds] } },
+        data: { markedForReview: false },
+      });
+    }
+    const { count } = await tx.fullPracticeTestAttempt.updateMany({
+      where: { id: attemptId, status: "IN_PROGRESS" },
       data: {
         status: "SUBMITTED",
         submittedAt,
@@ -238,18 +247,42 @@ export async function finalizeFullTestAttempt(input: {
         timeExpiredEvents: timeExpiredEvents ?? 0,
         extraTimeUsed: extraTimeUsed ?? 0,
       },
-    }),
-    markUserActive(student.id, submittedAt),
-    // Keeps the per-module overtime even when the last autosave did not reach the server.
-    body.moduleTimerState ? saveFullTestTimerState(attemptId, body.moduleTimerState) : Promise.resolve(),
-  ]);
-  if (attempt.assignmentId) {
-    await prisma.fullPracticeTestAssignment.update({
-      where: { id: attempt.assignmentId },
-      data: { status: "COMPLETED" },
     });
+    // Lost the race: roll the grading back (the attempt keeps the result of whoever submitted it).
+    if (count === 0) throw new AttemptAlreadyClosed();
+    if (attempt.assignmentId) {
+      // Only an open assignment becomes COMPLETED.
+      await tx.fullPracticeTestAssignment.updateMany({
+        where: { id: attempt.assignmentId, status: { in: ["PENDING", "IN_PROGRESS", "OVERDUE"] } },
+        data: { status: "COMPLETED" },
+      });
+    }
+    // Keeps the per-module overtime even when the last autosave did not reach the server.
+    if (body.moduleTimerState) await saveFullTestTimerState(attemptId, body.moduleTimerState);
+    return true;
+  }).catch((error) => {
+    if (error instanceof AttemptAlreadyClosed) return false;
+    throw error;
+  });
+
+  if (!transitioned) {
+    const current = await prisma.fullPracticeTestAttempt.findUnique({
+      where: { id: attemptId },
+      select: { status: true, rwScore: true, mathScore: true, totalScore: true },
+    });
+    // Already submitted (the other request won): same answer as the first submit, nothing re-sent.
+    if (current?.status === "SUBMITTED") {
+      return {
+        alreadySubmitted: true,
+        raw,
+        scores: { rwScore: current.rwScore ?? rwScore, mathScore: current.mathScore ?? mathScore, totalScore: current.totalScore ?? scores.totalScore },
+      };
+    }
+    throw new NotFoundError("This test was already submitted or closed by your teacher.");
   }
-  await notifyTeachers("Test completed", `${student.name ?? "A student"} completed a Test.`, `/teacher/students/${student.id}/tests/${attemptId}`);
+
+  await markUserActive(student.id, submittedAt);
+  await notifyStudentTeachers(student.id, "Test completed", `${student.name ?? "A student"} completed a Test.`, `/teacher/students/${student.id}/tests/${attemptId}`);
 
   await writeAudit({
     userId: student.id,
@@ -259,12 +292,12 @@ export async function finalizeFullTestAttempt(input: {
     outcome: "success",
     metadata: {
       testId: attempt.testId,
-      scores: { rwScore, mathScore, totalScore: rwScore + mathScore },
+      scores,
     },
   });
 
-  return {
-    raw: { rwCorrect, rwTotal, mathCorrect, mathTotal },
-    scores: { rwScore, mathScore, totalScore: rwScore + mathScore },
-  };
+  return { alreadySubmitted: false, raw, scores };
 }
+
+/** Thrown inside the grading transaction when the attempt is no longer IN_PROGRESS (rolls it back). */
+class AttemptAlreadyClosed extends Error {}

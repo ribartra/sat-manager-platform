@@ -21,10 +21,12 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
   const { attemptId, moduleIndex: rawIndex } = await params;
   const moduleIndex = Number(rawIndex);
   const body = await req.json();
-  const attempt = await prisma.fullPracticeTestAttempt.findFirst({
-    where: { id: attemptId, studentId: session.user.id, status: "IN_PROGRESS" },
-  });
-  if (!attempt) return new NotFoundError("This test was already submitted or closed by your teacher.").toResponse();
+  const attempt = await prisma.fullPracticeTestAttempt.findFirst({ where: { id: attemptId, studentId: session.user.id } });
+  // Idempotent: the last module sent twice (a retried request) finds the Test already graded.
+  if (attempt?.status === "SUBMITTED") {
+    return NextResponse.json({ ok: true, done: true, alreadySubmitted: true, scores: { rwScore: attempt.rwScore, mathScore: attempt.mathScore, totalScore: attempt.totalScore } });
+  }
+  if (!attempt || attempt.status !== "IN_PROGRESS") return new NotFoundError("This test was already submitted or closed by your teacher.").toResponse();
 
   // Save the module's final state first (answers of modules submitted earlier stay locked).
   const { modules } = await saveFullTestProgress(attempt, body, session.user.id);

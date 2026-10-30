@@ -16,10 +16,12 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
 
   const { attemptId } = await params;
   const body = await req.json();
-  const attempt = await prisma.fullPracticeTestAttempt.findFirst({
-    where: { id: attemptId, studentId: session.user.id, status: "IN_PROGRESS" },
-  });
-  if (!attempt) return new NotFoundError("This test was already submitted or closed by your teacher.").toResponse();
+  const attempt = await prisma.fullPracticeTestAttempt.findFirst({ where: { id: attemptId, studentId: session.user.id } });
+  // Idempotent: a repeated submit (two tabs, a retried request) gets the same answer as the first.
+  if (attempt?.status === "SUBMITTED") {
+    return NextResponse.json({ ok: true, alreadySubmitted: true, scores: { rwScore: attempt.rwScore, mathScore: attempt.mathScore, totalScore: attempt.totalScore } });
+  }
+  if (!attempt || attempt.status !== "IN_PROGRESS") return new NotFoundError("This test was already submitted or closed by your teacher.").toResponse();
 
   const result = await finalizeFullTestAttempt({ attempt, body, student: { id: session.user.id, name: session.user.name } });
 

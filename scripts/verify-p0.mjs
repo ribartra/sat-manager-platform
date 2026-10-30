@@ -78,6 +78,29 @@ const checks = [
     requires: ["_SCHEMA_READY", "Release the write lock before calling Mistral"],
     label: "Ingest: commit antes de cada llamada a Mistral y esquema creado una sola vez por proceso",
   },
+  // Concurrency (phase 2): one transaction per request on the shared connection; idempotent, atomic submit.
+  {
+    file: "lib/prisma.ts",
+    requires: ["AsyncLocalStorage", "runExclusive(", "runShared(", 'property === "$transaction"'],
+    label: "Transacciones exclusivas en la conexion unica (las escrituras de otras peticiones no entran en una transaccion ajena)",
+  },
+  ...["app/api/attempts/[attemptId]/submit/route.ts", "lib/full-test-grading.ts"].map((file) => ({
+    file,
+    requires: [".$transaction(", 'status: "IN_PROGRESS" }', "AttemptAlreadyClosed", "notifyStudentTeachers(", 'status: { in: ["PENDING", "IN_PROGRESS", "OVERDUE"] }'],
+    forbids: ["notifyTeachers(", "prisma.attempt.update({\n      where: { id: attemptId }"],
+    label: `Envio atomico e idempotente (una transicion IN_PROGRESS → SUBMITTED, avisos solo a sus profesores): ${file}`,
+  })),
+  ...["app/api/attempts/[attemptId]/submit/route.ts", "app/api/full-practice-tests/attempts/[attemptId]/submit/route.ts", "app/api/full-practice-tests/attempts/[attemptId]/modules/[moduleIndex]/submit/route.ts"].map((file) => ({
+    file,
+    requires: ["alreadySubmitted: true"],
+    label: `Un envio repetido responde como el primero (sin 404 falso): ${file}`,
+  })),
+  {
+    file: "lib/notifications.ts",
+    requires: ["export async function notifyStudentTeachers", "createMany"],
+    forbids: ["export async function notifyTeachers"],
+    label: "Avisos de un alumno solo a su profesor y a los admins (no a todo el staff)",
+  },
   // Results by skill (SAT-039/040/041): no Low performance, no summary card, no matrix, no Assign in results.
   {
     file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
@@ -461,7 +484,7 @@ const checks = [
   },
   {
     file: "app/api/full-practice-tests/attempts/[attemptId]/modules/[moduleIndex]/submit/route.ts",
-    requires: ["requireApprovedSession", "studentId: session.user.id", "status: \"IN_PROGRESS\"", "completeFullTestModule", "finalizeFullTestAttempt"],
+    requires: ["requireApprovedSession", "studentId: session.user.id", "attempt.status !== \"IN_PROGRESS\"", "completeFullTestModule", "finalizeFullTestAttempt"],
     label: "Submit por modulo: propio intento abierto; califica al entrar el ultimo modulo",
   },
   {

@@ -209,7 +209,7 @@ const checks = [
   },
   {
     file: "app/api/full-practice-tests/attempts/[attemptId]/submit/route.ts",
-    requires: ["status: \"IN_PROGRESS\"", "finalizeFullTestAttempt"],
+    requires: ["attempt.status !== \"IN_PROGRESS\"", "finalizeFullTestAttempt"],
     label: "Submit FPT solo sobre intento abierto y usa la calificacion compartida",
   },
   {

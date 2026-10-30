@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { notifyTeachers } from "@/lib/notifications";
+import { notifyStudentTeachers } from "@/lib/notifications";
 import { requireApprovedSession } from "@/lib/rbac";
 import {
   buildPracticeSetSnapshot,
@@ -26,12 +26,14 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
   const { answers: submittedAnswers, totalTime, timeSpentByQuestion, markedQuestionIds, notes, eliminatedOptions } = await req.json();
 
   const attempt = await prisma.attempt.findFirst({
-    where: { id: attemptId, studentId: session.user.id, status: "IN_PROGRESS" },
+    where: { id: attemptId, studentId: session.user.id },
     include: {
       answers: true,
     },
   });
-  if (!attempt) return new NotFoundError("This practice set was already submitted or closed by your teacher.").toResponse();
+  // Idempotent: a repeated submit (two tabs, a retried request) gets the same answer as the first.
+  if (attempt?.status === "SUBMITTED") return NextResponse.json({ ok: true, alreadySubmitted: true });
+  if (!attempt || attempt.status !== "IN_PROGRESS") return new NotFoundError("This practice set was already submitted or closed by your teacher.").toResponse();
 
   // Get the practice set questions to check correct answers
   const psQuestions = await prisma.practiceSetQuestion.findMany({
@@ -79,9 +81,10 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
 
   let correctCount = 0;
 
+  // Grade every answer first; the writes go in one transaction with the status change (below).
+  const answerWrites: Parameters<typeof prisma.attemptAnswer.upsert>[0][] = [];
   // Score each answer
-  await Promise.all(
-    Object.entries(answers as Record<string, string>).filter(([questionId]) => allowedQuestionIds.has(questionId)).map(([questionId, answer]) => {
+    Object.entries(answers as Record<string, string>).filter(([questionId]) => allowedQuestionIds.has(questionId)).forEach(([questionId, answer]) => {
       const snapshot = questionSnapshotMap.get(questionId);
       const storedQuestion = questionById.get(questionId);
       const isCorrect = isAnswerCorrect(
@@ -91,7 +94,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
       );
       if (isCorrect) correctCount += 1;
       const existing = existingAnswers.get(questionId);
-      return prisma.attemptAnswer.upsert({
+      answerWrites.push({
         where: { attemptId_questionId: { attemptId, questionId } },
         update: {
           questionSnapshot: existing?.questionSnapshot ?? (snapshot ? stringifySnapshot(snapshot) : undefined),
@@ -118,18 +121,16 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
             : undefined,
         },
       });
-    })
-  );
+    });
 
   // Mark unanswered questions
-  await Promise.all(
     psQuestions
       .filter((item) => !answers[item.questionId])
-      .map((item) =>
+      .forEach((item) =>
         {
           const snapshot = questionSnapshotMap.get(item.questionId);
           const existing = existingAnswers.get(item.questionId);
-          return prisma.attemptAnswer.upsert({
+          answerWrites.push({
             where: { attemptId_questionId: { attemptId, questionId: item.questionId } },
             update: {
               questionSnapshot: existing?.questionSnapshot ?? (snapshot ? stringifySnapshot(snapshot) : undefined),
@@ -156,9 +157,8 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
                 : undefined,
             },
           });
-        }
-      )
-  );
+        },
+      );
 
   const submittedAt = new Date();
   const sectionMeta = psQuestions[0]?.practiceSet.topic.domain.section ?? null;
@@ -168,32 +168,47 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
     section: sectionMeta,
   });
 
-  await Promise.all([
-    prisma.attempt.update({
-      where: { id: attemptId },
-      data: {
-        status: "SUBMITTED",
-        submittedAt,
-        totalTime,
-        practiceSetSnapshot,
-        scorePercent: scored.scorePercent,
-        scaledScore: scored.scaledScore,
-        scoreSection: scored.scoreSection,
-      },
-    }),
-    markUserActive(session.user.id, submittedAt),
-  ]);
-
-  // Update assignment status
-  if (attempt.assignmentId) {
-    await prisma.assignment.update({
-      where: { id: attempt.assignmentId },
-      data: { status: "COMPLETED" },
+  // One transaction: every graded answer + the IN_PROGRESS → SUBMITTED transition + the assignment.
+  // Only the request that makes the transition notifies, unlocks the next set and audits; a second
+  // submit or a teacher's Invalidate in between leaves the attempt as it is.
+  const transitioned = await prisma
+    .$transaction(async (tx) => {
+      for (const write of answerWrites) await tx.attemptAnswer.upsert(write);
+      const { count } = await tx.attempt.updateMany({
+        where: { id: attemptId, status: "IN_PROGRESS" },
+        data: {
+          status: "SUBMITTED",
+          submittedAt,
+          totalTime,
+          practiceSetSnapshot,
+          scorePercent: scored.scorePercent,
+          scaledScore: scored.scaledScore,
+          scoreSection: scored.scoreSection,
+        },
+      });
+      if (count === 0) throw new AttemptAlreadyClosed();
+      if (attempt.assignmentId) {
+        // Only an open assignment becomes COMPLETED.
+        await tx.assignment.updateMany({
+          where: { id: attempt.assignmentId, status: { in: ["PENDING", "IN_PROGRESS", "OVERDUE"] } },
+          data: { status: "COMPLETED" },
+        });
+      }
+      return true;
+    })
+    .catch((error) => {
+      if (error instanceof AttemptAlreadyClosed) return false;
+      throw error;
     });
+  if (!transitioned) {
+    const current = await prisma.attempt.findUnique({ where: { id: attemptId }, select: { status: true } });
+    if (current?.status === "SUBMITTED") return NextResponse.json({ ok: true, alreadySubmitted: true });
+    return new NotFoundError("This practice set was already submitted or closed by your teacher.").toResponse();
   }
+  await markUserActive(session.user.id, submittedAt);
 
   const practiceSet = await prisma.practiceSet.findUnique({ where: { id: attempt.practiceSetId }, select: { name: true } });
-  await notifyTeachers("Practice completed", `${session.user.name} completed ${practiceSet?.name ?? "a practice set"}.`, `/teacher/students/${session.user.id}/attempts/${attemptId}`);
+  await notifyStudentTeachers(session.user.id, "Practice completed", `${session.user.name} completed ${practiceSet?.name ?? "a practice set"}.`, `/teacher/students/${session.user.id}/attempts/${attemptId}`);
   await applyPracticeProgression({
     studentId: session.user.id,
     practiceSetId: attempt.practiceSetId,
@@ -223,3 +238,6 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
 
   return NextResponse.json({ ok: true });
 });
+
+/** Thrown inside the grading transaction when the attempt is no longer IN_PROGRESS (rolls it back). */
+class AttemptAlreadyClosed extends Error {}
