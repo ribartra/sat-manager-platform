@@ -29,7 +29,7 @@ export interface ViewSummaryItem {
 }
 
 /**
- * One tall box per view on the teacher Home, as tall as the screen allows: the view's name, its main
+ * One tall box per view on the teacher and student Home (up to 70% of the screen tall): the view's name, its main
  * number, its status (one chip per line, each opening the view with that filter), a short list of the
  * latest items (each opening it) and the way in. The rest of the box links to the view (the title link
  * covers it; chips and items sit above that cover).
@@ -60,7 +60,8 @@ export function ViewSummaryCard({
   action: string;
 }) {
   return (
-    <Card padding="md" className="relative flex min-h-[22rem] flex-col gap-3 hover:border-gray-400 lg:min-h-[calc(var(--app-vh)-11rem)]">
+    // Tall, but capped at 70% of the screen: with fewer boxes (wider) they don't stretch to the bottom.
+    <Card padding="md" className="relative flex min-h-[22rem] flex-col gap-3 hover:border-gray-400 lg:min-h-[min(calc(var(--app-vh)-11rem),calc(var(--app-vh)*0.7))]">
       <div className="flex items-center justify-between">
         <h2 className="flex items-center gap-2 text-base font-semibold text-[var(--sat-text)]">
           <span
