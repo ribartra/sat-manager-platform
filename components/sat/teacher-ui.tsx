@@ -6,7 +6,7 @@ import { cn, formatDate, relativeDay } from "@/lib/utils";
 
 /** Teacher-side building blocks (mockup teacher.js): attention cards, last-active cell, student cell. */
 
-/** "Inactive 5+ days" / "Overdue tests" boxes on the teacher Home. */
+/** "Students inactive for 5+ days" / "Overdue tests" boxes on the teacher Home. */
 export function AttentionCard({
   title,
   icon,
@@ -49,13 +49,13 @@ export function AttentionItem({ name, avatarUrl, href, detail }: { name: string;
   );
 }
 
-/** Last-active date + relative day, "⚠ inactive" after `warnDays`, red "Never" when null. */
+/** Last-active date + relative day, "⚠ inactive 5+ days" when inactive, red "Never active" when null. */
 export function DateCell({ date, now = new Date(), inactive }: { date: Date | null; now?: Date; inactive?: boolean }) {
-  if (!date) return <span className="text-sm text-red-600">Never</span>;
+  if (!date) return <span className="text-sm text-red-600">Never active</span>;
   return (
     <span className={cn("text-sm", inactive ? "text-amber-700" : "text-gray-700")}>
       <b className="font-medium">{formatDate(date)}</b>
-      <span className="block text-xs">{relativeDay(date, now)}{inactive ? " · ⚠ inactive" : ""}</span>
+      <span className="block text-xs">{relativeDay(date, now)}{inactive ? " · ⚠ inactive 5+ days" : ""}</span>
     </span>
   );
 }
@@ -82,7 +82,7 @@ export function shortName(name: string) {
 
 /**
  * One line of the compact "Needs attention" card (mockup `mejorada/teacher/index.html`): coloured
- * label with icon and count, then a chip per student (details in the chip tooltip) and a "View all ›"
+ * label with icon and count, then a chip per student (details in the chip tooltip) and a "See them all →"
  * shortcut to the full list when there is one.
  */
 export function AttentionRow({
@@ -102,12 +102,12 @@ export function AttentionRow({
   const color = tone === "warn" ? "text-amber-700" : tone === "bad" ? "text-red-600" : "text-blue-600";
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <span className={cn("flex min-w-[190px] items-center gap-1.5 text-sm font-semibold", color)}>
+      <span className={cn("flex min-w-[17rem] items-center gap-1.5 text-sm font-semibold", color)}>
         {icon} {label}
         <Badge variant={people.length ? (tone === "bad" ? "danger" : tone === "warn" ? "warning" : "info") : "default"}>{people.length}</Badge>
       </span>
       {people.length === 0 ? (
-        <span className="text-sm text-gray-400">Nobody</span>
+        <span className="text-sm text-gray-400">No one right now</span>
       ) : (
         // At most 10 here; the rest behind "See all N →".
         people.slice(0, 10).map((p) => (
@@ -119,7 +119,7 @@ export function AttentionRow({
       {people.length > 10 && !viewAllHref ? <span className="text-xs text-gray-500">+{people.length - 10} more</span> : null}
       {viewAllHref && people.length ? (
         <Link href={viewAllHref} className="ml-auto whitespace-nowrap text-xs font-medium text-[var(--sat-primary)] hover:underline">
-          {people.length > 10 ? `See all ${people.length} →` : "View all ›"}
+          {people.length > 10 ? `See all ${people.length} →` : "See them all →"}
         </Link>
       ) : null}
     </div>

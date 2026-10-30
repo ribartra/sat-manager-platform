@@ -4,6 +4,7 @@ import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { CardGrid } from "@/components/sat/area-summary-card";
 import { StudentOverviewTable } from "@/components/sat/student-overview-table";
 import { ViewSummaryCard } from "@/components/sat/view-summary-card";
+import { ScrollSnapPage } from "@/components/sat/scroll-snap-page";
 import { Pct } from "@/components/sat/work-status";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
@@ -26,9 +27,9 @@ const DAY = 86_400_000;
 
 /**
  * Teacher Home (one view, no section tabs — SAT-036/037): a summary, not a place to manage students.
- * Who needs attention (inactive 5+ days, unlock requests), one box per view (Students, Pending, Tests,
- * Practice, History, Teachers for the master teacher) with its main numbers and the way in, and the
- * students active most recently. Search, Invite and the full table live on Students.
+ * Overview first (one box per view: Students, Pending, Tests, Practice, History, Teachers for the master
+ * teacher, with its main numbers and the way in), then who needs attention (inactive 5+ days, unlock
+ * requests), then the students active most recently (a firm scroll from the Overview lands there). Search, Invite and the full table live on Students.
  */
 export default async function TeacherDashboard() {
   const session = await auth();
@@ -101,8 +102,10 @@ export default async function TeacherDashboard() {
 
   return (
     <PageShell className="space-y-4">
-      {/* The breadcrumb row keeps the title at the same height as on every other page. */}
-      <div>
+      <ScrollSnapPage />
+      {/* The breadcrumb row keeps the title at the same height as on every other page. The top of the
+          page (greeting + Overview) is the first snap point; Students is the second. */}
+      <div className="snap-start scroll-mt-6">
         <Breadcrumbs items={[{ label: "Home" }]} />
         <PageHeader
           title={`Hello, ${firstName}!`}
@@ -114,10 +117,110 @@ export default async function TeacherDashboard() {
         />
       </div>
 
+      {/* Overview: one box per view, its main numbers and the way in. */}
+      <section>
+        <SectionHeader title="Overview" />
+        <CardGrid>
+          <ViewSummaryCard
+            title="Students"
+            icon={<Users size={16} />}
+            href="/teacher/students"
+            value={rows.length}
+            valueLabel={plural(rows.length, "student")}
+            chips={[
+              { label: "Active this week", value: activeThisWeek, tone: activeThisWeek ? "success" : "default" },
+              { label: "Inactive for 5+ days", value: inactive.length, tone: inactive.length ? "warning" : "default" },
+              { label: "Invitations", value: invitations, tone: invitations ? "info" : "default" },
+            ]}
+            action="Open Students →"
+          />
+          <ViewSummaryCard
+            title="Pending"
+            icon={<Hourglass size={16} />}
+            href="/teacher/pending"
+            value={pending.length}
+            valueLabel="assigned, not finished"
+            chips={[
+              { label: "Not started", value: pendingBy("PENDING"), tone: pendingBy("PENDING") ? "info" : "default" },
+              { label: "In progress", value: pendingBy("IN_PROGRESS"), tone: pendingBy("IN_PROGRESS") ? "warning" : "default" },
+              { label: "Overdue", value: pendingBy("OVERDUE"), tone: pendingBy("OVERDUE") ? "danger" : "default" },
+            ]}
+            action="See all pending →"
+          />
+          <ViewSummaryCard
+            title="Tests"
+            icon={<ClipboardList size={16} />}
+            href="/teacher/tests"
+            accent="tests"
+            value={testCount}
+            valueLabel={`${plural(testCount, "test")} published`}
+            chips={[
+              { label: "Assigned", value: testAssignments.length, tone: testAssignments.length ? "info" : "default" },
+              { label: "Completed", value: testsCompleted, tone: testsCompleted ? "success" : "default" },
+              { label: "Overdue", value: testsOverdue, tone: testsOverdue ? "danger" : "default" },
+            ]}
+            line={
+              latestTest ? (
+                <>
+                  Latest: {latestTest.student} · {latestTest.label} · <Scores rw={latestTest.rw} math={latestTest.math} /> · {formatDate(latestTest.submittedAt)}
+                </>
+              ) : (
+                "No test finished yet"
+              )
+            }
+            action="Open Tests →"
+          />
+          <ViewSummaryCard
+            title="Practice"
+            icon={<BookOpen size={16} />}
+            href="/teacher/practice-sets"
+            value={sets.length}
+            valueLabel={`practice ${plural(sets.length, "set")} published`}
+            chips={[
+              { label: "Math", value: setsIn("MATH"), color: "var(--sat-area-math)" },
+              { label: "Reading", value: setsIn("READING"), color: "var(--sat-area-reading)" },
+              { label: "Writing", value: setsIn("WRITING"), color: "var(--sat-area-writing)" },
+            ]}
+            line={`${practiceTries} practice ${(practiceTries === 1 ? "try" : "tries")} in the last 7 days`}
+            action="Open Practice →"
+          />
+          <ViewSummaryCard
+            title="History"
+            icon={<Clock size={16} />}
+            href="/teacher/history"
+            value={history.length}
+            valueLabel={`${(history.length === 1 ? "try" : "tries")} finished in the last 7 days`}
+            line={
+              latestTry
+                ? (
+                  <>
+                    Latest: {latestTry.studentName} · {latestTry.title} · {latestTry.kind === "test" ? <Scores rw={latestTry.rw} math={latestTry.math} /> : <Pct value={latestTry.pct} />} · {relativeDay(latestTry.at, now)}
+                  </>
+                )
+                : "No tries in the last 7 days"
+            }
+            action="Open History →"
+          />
+          {teachers ? (
+            <ViewSummaryCard
+              title="Teachers"
+              icon={<GraduationCap size={16} />}
+              href="/teacher/teachers"
+              value={teachers[0]}
+              valueLabel={plural(teachers[0], "teacher")}
+              chips={[{ label: "Invitations", value: teachers[1], tone: teachers[1] ? "info" : "default" }]}
+              action="Open Teachers →"
+            />
+          ) : null}
+        </CardGrid>
+      </section>
+
+
+      {/* Needs attention: who to follow up with. */}
       <Card padding="none" className="flex flex-col gap-2 px-4 py-3">
         <AttentionRow
           icon={<Clock size={14} />}
-          label="Inactive 5+ days"
+          label="Students inactive for 5+ days"
           tone="warn"
           viewAllHref="/teacher/students?show=inactive"
           people={inactive.map((s) => ({
@@ -130,114 +233,20 @@ export default async function TeacherDashboard() {
         {unlockRequestsEnabled ? (
           <AttentionRow
             icon={<KeyRound size={14} />}
-            label="Unlock requests"
+            label="Students asking to unlock a set"
             tone="info"
             people={unlockRequests.map((request) => ({
               id: request.id,
               name: request.assignment.student.name,
               href: `/teacher/students/${request.assignment.studentId}?area=${tabFromPracticeArea(resolvePracticeArea(request.assignment.practiceSet.topic.domain)) ?? "math"}#active-sets`,
-              detail: `Requested ${request.assignment.practiceSet.name}`,
+              detail: `Asked to unlock ${request.assignment.practiceSet.name}`,
             }))}
           />
         ) : null}
       </Card>
 
-      {/* One box per view: its main numbers and the way in. */}
-      <CardGrid>
-        <ViewSummaryCard
-          title="Students"
-          icon={<Users size={16} />}
-          href="/teacher/students"
-          value={rows.length}
-          valueLabel={plural(rows.length, "student")}
-          chips={[
-            { label: "Active this week", value: activeThisWeek, tone: activeThisWeek ? "success" : "default" },
-            { label: "Inactive 5+ days", value: inactive.length, tone: inactive.length ? "warning" : "default" },
-            { label: "Invitations", value: invitations, tone: invitations ? "info" : "default" },
-          ]}
-          action="Open Students →"
-        />
-        <ViewSummaryCard
-          title="Pending"
-          icon={<Hourglass size={16} />}
-          href="/teacher/pending"
-          value={pending.length}
-          valueLabel="assigned, not finished"
-          chips={[
-            { label: "Not started", value: pendingBy("PENDING"), tone: pendingBy("PENDING") ? "info" : "default" },
-            { label: "In progress", value: pendingBy("IN_PROGRESS"), tone: pendingBy("IN_PROGRESS") ? "warning" : "default" },
-            { label: "Overdue", value: pendingBy("OVERDUE"), tone: pendingBy("OVERDUE") ? "danger" : "default" },
-          ]}
-          action="See all pending →"
-        />
-        <ViewSummaryCard
-          title="Tests"
-          icon={<ClipboardList size={16} />}
-          href="/teacher/tests"
-          accent="tests"
-          value={testCount}
-          valueLabel={`${plural(testCount, "test")} published`}
-          chips={[
-            { label: "Assigned", value: testAssignments.length, tone: testAssignments.length ? "info" : "default" },
-            { label: "Completed", value: testsCompleted, tone: testsCompleted ? "success" : "default" },
-            { label: "Overdue", value: testsOverdue, tone: testsOverdue ? "danger" : "default" },
-          ]}
-          line={
-            latestTest ? (
-              <>
-                Latest: {latestTest.student} · {latestTest.label} · <Scores rw={latestTest.rw} math={latestTest.math} /> · {formatDate(latestTest.submittedAt)}
-              </>
-            ) : (
-              "No test finished yet"
-            )
-          }
-          action="Open Tests →"
-        />
-        <ViewSummaryCard
-          title="Practice"
-          icon={<BookOpen size={16} />}
-          href="/teacher/practice-sets"
-          value={sets.length}
-          valueLabel={`practice ${plural(sets.length, "set")} published`}
-          chips={[
-            { label: "Math", value: setsIn("MATH"), color: "var(--sat-area-math)" },
-            { label: "Reading", value: setsIn("READING"), color: "var(--sat-area-reading)" },
-            { label: "Writing", value: setsIn("WRITING"), color: "var(--sat-area-writing)" },
-          ]}
-          line={`${practiceTries} practice ${(practiceTries === 1 ? "try" : "tries")} in the last 7 days`}
-          action="Open Practice →"
-        />
-        <ViewSummaryCard
-          title="History"
-          icon={<Clock size={16} />}
-          href="/teacher/history"
-          value={history.length}
-          valueLabel={`${(history.length === 1 ? "try" : "tries")} finished in the last 7 days`}
-          line={
-            latestTry
-              ? (
-                <>
-                  Latest: {latestTry.studentName} · {latestTry.title} · {latestTry.kind === "test" ? <Scores rw={latestTry.rw} math={latestTry.math} /> : <Pct value={latestTry.pct} />} · {relativeDay(latestTry.at, now)}
-                </>
-              )
-              : "No tries in the last 7 days"
-          }
-          action="Open History →"
-        />
-        {teachers ? (
-          <ViewSummaryCard
-            title="Teachers"
-            icon={<GraduationCap size={16} />}
-            href="/teacher/teachers"
-            value={teachers[0]}
-            valueLabel={plural(teachers[0], "teacher")}
-            chips={[{ label: "Invitations", value: teachers[1], tone: teachers[1] ? "info" : "default" }]}
-            action="Open Teachers →"
-          />
-        ) : null}
-      </CardGrid>
-
-      <section>
+      {/* A firm scroll (or the arrow keys) from the Overview settles here. */}
+      <section className="snap-start scroll-mt-4">
         <SectionHeader
           title="Students"
           action={rows.length ? <Link href="/teacher/students" className={HEADER_SHORTCUT_CLASS}>All {rows.length} students →</Link> : undefined}

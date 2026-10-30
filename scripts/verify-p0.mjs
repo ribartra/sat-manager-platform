@@ -7,7 +7,7 @@ const checks = [
   // Home is one view (SAT-036/037): no section tabs, inactivity + unlock requests, no low performance.
   {
     file: "app/(teacher)/teacher/page.tsx",
-    requires: ["Inactive 5+ days", "Unlock requests"],
+    requires: ["Students inactive for 5+ days", "Students asking to unlock a set", "<ScrollSnapPage />", "title=\"Overview\""],
     forbids: ["Overdue tests", "Section under 550", "Low performance", "PracticeAreaTabs", "TeacherStudentsTable"],
     label: "Teacher Home: one view (no Math/Reading/Writing/Tests tabs), inactivity and unlock requests only",
   },
@@ -149,7 +149,7 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/students/page.tsx",
-    requires: ["<ListFilters", "<StudentOverviewTable", "parents={parentNames} assign />", "Inactive 5+ days"],
+    requires: ["<ListFilters", "<StudentOverviewTable", "parents={parentNames} assign />", "Students inactive for 5+ days"],
     forbids: ['Card as="form"', "Assign →"],
     label: "Busqueda con filtros: Students con el mismo componente",
   },

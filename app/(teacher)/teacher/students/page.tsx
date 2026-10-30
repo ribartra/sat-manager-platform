@@ -24,8 +24,8 @@ interface PageProps {
 const SHOW = {
   all: "All students",
   active: "Active this week",
-  inactive: "Inactive 5+ days",
-  "pending-tests": "With pending tests",
+  inactive: "Inactive for 5+ days",
+  "pending-tests": "With tests to take",
 } as const;
 type Show = keyof typeof SHOW;
 
@@ -103,7 +103,7 @@ export default async function TeacherStudentsPage({ searchParams }: PageProps) {
       <Card padding="none" className="mb-4 flex flex-col gap-2 px-4 py-3">
         <AttentionRow
           icon={<Clock size={14} />}
-          label="Inactive 5+ days"
+          label="Students inactive for 5+ days"
           tone="warn"
           viewAllHref="/teacher/students?show=inactive"
           people={inactive.map((s) => ({
