@@ -16,7 +16,6 @@ import { refreshAssignmentStates } from "@/lib/assignments";
 import { loadAttemptHistory } from "@/lib/attempt-history";
 import { currentContentScope } from "@/lib/content-scope";
 import { loadPending } from "@/lib/pending";
-import { assignHref } from "@/lib/assign-params";
 import { studentAccessWhereFor, teacherProgramIds } from "@/lib/program-scope";
 import { resolvePracticeArea, tabFromPracticeArea } from "@/lib/practice-area";
 import { isInactive, loadStudentOverviews, type StudentOverview } from "@/lib/teacher-overview";
@@ -156,7 +155,6 @@ export default async function TeacherDashboard() {
             { label: "Inactive 5+ days", value: inactive.length, tone: inactive.length ? "warning" : "default" },
             { label: "Invitations", value: invitations, tone: invitations ? "info" : "default" },
           ]}
-          secondary={{ label: "Assign →", href: assignHref({}) }}
           action="Open Students →"
         />
         <ViewSummaryCard

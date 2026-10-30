@@ -210,12 +210,16 @@ interface FullTestAssignmentInput {
   testName: string;
   assignedById: string;
   dueDate: Date | null;
-  /** Check + explanation per question in the Test player; per student. */
+  /** Open date: the student can start the Test from then (null = right away). */
+  unlockAt: Date | null;
+  /** IMMEDIATE: Check per question in the Test player; AFTER_SET: answers only in the results. */
+  feedbackMode: "IMMEDIATE" | "AFTER_SET";
+  /** The explanation with each checked answer (IMMEDIATE only); per student. */
   showExplanations: boolean;
 }
 
 export async function upsertFullTestAssignment(input: FullTestAssignmentInput): Promise<{ outcome: AssignmentOutcome; assignmentId: string }> {
-  const { studentId, testId, testName, assignedById, dueDate, showExplanations } = input;
+  const { studentId, testId, testName, assignedById, dueDate, unlockAt, feedbackMode, showExplanations } = input;
   const audit = (action: string, targetId: string, extra: Record<string, unknown> = {}) =>
     prisma.auditLog.create({
       data: {
@@ -223,7 +227,7 @@ export async function upsertFullTestAssignment(input: FullTestAssignmentInput): 
         action,
         targetType: "FullPracticeTestAssignment",
         targetId,
-        metadata: JSON.stringify({ studentId, testId, dueDate: dueDate?.toISOString() ?? null, showExplanations, ...extra }),
+        metadata: JSON.stringify({ studentId, testId, dueDate: dueDate?.toISOString() ?? null, unlockAt: unlockAt?.toISOString() ?? null, feedbackMode, showExplanations, ...extra }),
       },
     });
   const href = "/student/tests";
@@ -232,7 +236,7 @@ export async function upsertFullTestAssignment(input: FullTestAssignmentInput): 
   if (!existing) {
     try {
       const created = await prisma.fullPracticeTestAssignment.create({
-        data: { testId, studentId, assignedById, dueDate, showExplanations, status: "PENDING" },
+        data: { testId, studentId, assignedById, dueDate, unlockAt, feedbackMode, showExplanations, status: "PENDING" },
       });
       await notifyUser(studentId, "Test assigned", testName, href);
       await audit("ASSIGN_FULL_PRACTICE_TEST", created.id);
@@ -246,10 +250,15 @@ export async function upsertFullTestAssignment(input: FullTestAssignmentInput): 
 
   if (OPEN_STATUSES.has(existing.status)) {
     const nextDueDate = dueDate ?? existing.dueDate;
-    if (sameTime(existing.dueDate, nextDueDate) && existing.showExplanations === showExplanations) return { outcome: "unchanged", assignmentId: existing.id };
+    const unchanged =
+      sameTime(existing.dueDate, nextDueDate) &&
+      sameTime(existing.unlockAt, unlockAt) &&
+      existing.feedbackMode === feedbackMode &&
+      existing.showExplanations === showExplanations;
+    if (unchanged) return { outcome: "unchanged", assignmentId: existing.id };
     await prisma.fullPracticeTestAssignment.update({
       where: { id: existing.id },
-      data: { dueDate: nextDueDate, showExplanations, assignedById },
+      data: { dueDate: nextDueDate, unlockAt, feedbackMode, showExplanations, assignedById },
     });
     await notifyUser(studentId, "Test assignment updated", testName, href);
     await audit("UPDATE_FULL_PRACTICE_TEST_ASSIGNMENT", existing.id, { previousDueDate: existing.dueDate?.toISOString() ?? null });
@@ -262,7 +271,7 @@ export async function upsertFullTestAssignment(input: FullTestAssignmentInput): 
   });
   await prisma.fullPracticeTestAssignment.update({
     where: { id: existing.id },
-    data: { status: openAttempt ? "IN_PROGRESS" : "PENDING", dueDate, showExplanations, assignedById },
+    data: { status: openAttempt ? "IN_PROGRESS" : "PENDING", dueDate, unlockAt, feedbackMode, showExplanations, assignedById },
   });
   await notifyUser(studentId, "Test reassigned", testName, href);
   await audit("REASSIGN_FULL_PRACTICE_TEST", existing.id, { previousStatus: existing.status });

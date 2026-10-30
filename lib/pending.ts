@@ -70,7 +70,7 @@ export async function loadPending(studentIds: string[], filters: PendingFilters 
       ? Promise.resolve([])
       : prisma.fullPracticeTestAssignment.findMany({
           where: { studentId: { in: studentIds }, status: { in: statuses }, ...assigned },
-          select: { id: true, status: true, createdAt: true, dueDate: true, testId: true, student: { select: { id: true, name: true } }, test: { select: { name: true } } },
+          select: { id: true, status: true, createdAt: true, dueDate: true, unlockAt: true, testId: true, student: { select: { id: true, name: true } }, test: { select: { name: true } } },
         }),
   ]);
   const rows: PendingRow[] = [
@@ -103,7 +103,8 @@ export async function loadPending(studentIds: string[], filters: PendingFilters 
       areaLabel: null,
       difficulty: null,
       status: a.status as PendingStatus,
-      locked: false,
+      // Open date still ahead: shown as locked until then.
+      locked: Boolean(a.unlockAt && a.unlockAt > new Date()),
       assignedAt: a.createdAt,
       dueDate: a.dueDate,
       practiceSetId: null,

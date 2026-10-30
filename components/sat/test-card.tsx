@@ -38,12 +38,14 @@ export function TestCard({ item, links, layout = "row" }: { item: StudentTestIte
   const next = open?.view?.nextModule ?? null;
   const counted = item.attempts.filter((a) => a.status === "SUBMITTED").length;
   const compact = layout === "compact";
+  // Open date ahead: nothing can be started yet (the server checks it too).
+  const startLink = item.opensAt ? null : links.module;
 
   const moduleHref = (m: ModuleView) =>
     m.state === "done" && shownId
       ? `${links.attempt(shownId)}#mod-${m.key}`
-      : links.module && !done
-        ? links.module(item.assignmentId, m.key)
+      : startLink && !done
+        ? startLink(item.assignmentId, m.key)
         : null;
   const moduleResult = (m: ModuleView) =>
     m.state === "done" ? (
@@ -51,18 +53,22 @@ export function TestCard({ item, links, layout = "row" }: { item: StudentTestIte
     ) : m.state === "progress" ? (
       <span className="text-amber-700">In progress</span>
     ) : (
-      <span className="font-normal text-[var(--sat-muted)]">{links.module && !done ? "Start" : "Not taken"}</span>
+      <span className="font-normal text-[var(--sat-muted)]">{startLink && !done ? "Start" : "Not taken"}</span>
     );
 
   const mainHref = done && last
     ? links.attempt(last.id)
     : open && !links.module
       ? links.attempt(open.id)
-      : links.module
-        ? links.module(item.assignmentId, next?.key ?? "rw1")
-        : links.test?.(item.testId) ?? null;
+      : startLink
+        ? startLink(item.assignmentId, next?.key ?? "rw1")
+        : links.module
+          ? null
+          : links.test?.(item.testId) ?? null;
   const mainLabel = done ? "Review results" : open ? (links.module ? "Continue" : "View progress") : links.module ? "Start test" : "Open test";
-  const dateText = done && last?.submittedAt ? `completed ${formatDate(last.submittedAt)}` : item.dueDate ? `due ${formatDate(item.dueDate)}` : "no due date";
+  const dateText = item.opensAt && !done
+    ? `opens ${formatDate(item.opensAt)}${item.dueDate ? ` · due ${formatDate(item.dueDate)}` : ""}`
+    : done && last?.submittedAt ? `completed ${formatDate(last.submittedAt)}` : item.dueDate ? `due ${formatDate(item.dueDate)}` : "no due date";
 
   const score = (code: "RW" | "MATH") => (done && last ? (code === "RW" ? last.rwScore : last.mathScore) : shownView?.sections[code].score ?? null);
   const scoreText = (value: number | null | undefined) => (value != null ? value : "—");

@@ -5,6 +5,8 @@ import { Pct } from "@/components/sat/work-status";
 import { practiceAreaLabel, type PracticeAreaCode } from "@/lib/practice-area";
 import { isInactive, type StudentOverview } from "@/lib/teacher-overview";
 import { formatDate } from "@/lib/utils";
+import { assignHref } from "@/lib/assign-params";
+import { Button } from "@/components/ui/button";
 
 const PRACTICE_AREAS: { code: PracticeAreaCode; tab: "math" | "reading" | "writing" }[] = [
   { code: "MATH", tab: "math" },
@@ -15,15 +17,16 @@ const PRACTICE_AREAS: { code: PracticeAreaCode; tab: "math" | "reading" | "writi
 /**
  * The students table of Home and Students: latest practice per area and latest Test. A row opens the
  * student's page; an area cell goes straight to that area. `parents` (Students) adds the parent as a tag
- * under the name (not filterable, so not a column).
+ * under the name (not filterable, so not a column); `assign` (Students) adds an Assign button per student.
  */
-export function StudentOverviewTable({ rows, now, parents }: { rows: StudentOverview[]; now: Date; parents?: Map<string, string> }) {
+export function StudentOverviewTable({ rows, now, parents, assign = false }: { rows: StudentOverview[]; now: Date; parents?: Map<string, string>; assign?: boolean }) {
   return (
     <SimpleTable head={[
       "Name",
       "Last active",
       ...PRACTICE_AREAS.map((a) => <span key={a.code} style={{ color: `var(--sat-area-${a.tab})` }}>{practiceAreaLabel(a.code)}</span>),
       <span key="tests" className="text-[var(--sat-tests-ink)]">Tests</span>,
+      ...(assign ? [""] : []),
       "",
     ]}>
       {rows.map((s) => {
@@ -79,6 +82,15 @@ export function StudentOverviewTable({ rows, now, parents }: { rows: StudentOver
                 </Link>
               </RowAction>
             </td>
+            {assign ? (
+              <td className={TD}>
+                <RowAction>
+                  <Button asChild size="sm" variant="secondary">
+                    <Link href={assignHref({ studentId: s.id })}>Assign</Link>
+                  </Button>
+                </RowAction>
+              </td>
+            ) : null}
             <ChevronCell />
           </LinkTr>
         );

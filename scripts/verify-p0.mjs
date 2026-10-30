@@ -143,13 +143,13 @@ const checks = [
   // Every list (teacher + admin) has a text search and filters.
   {
     file: "app/(teacher)/teacher/page.tsx",
-    requires: ["<StudentOverviewTable", "<ViewSummaryCard", 'secondary={{ label: "Assign →", href: assignHref({}) }}', 'href="/teacher/pending"', 'href="/teacher/history"', 'href="/teacher/tests"', 'href="/teacher/practice-sets"', "slice(0, HOME_STUDENTS)", "All {rows.length} students →"],
-    forbids: ["<ListFilters", "Invite student", "students/invite", "{item.label} →", "most recently active"],
+    requires: ["<StudentOverviewTable", "<ViewSummaryCard", 'href="/teacher/pending"', 'href="/teacher/history"', 'href="/teacher/tests"', 'href="/teacher/practice-sets"', "slice(0, HOME_STUDENTS)", "All {rows.length} students →"],
+    forbids: ["<ListFilters", "Invite student", "students/invite", "{item.label} →", "most recently active", "Assign →"],
     label: "Home = vista resumen: sin busqueda ni Invite; un recuadro por vista (estado + atajo); 5 alumnos + All students →",
   },
   {
     file: "app/(teacher)/teacher/students/page.tsx",
-    requires: ["<ListFilters", "<StudentOverviewTable", "Inactive 5+ days"],
+    requires: ["<ListFilters", "<StudentOverviewTable", "parents={parentNames} assign />", "Inactive 5+ days"],
     forbids: ['Card as="form"', "Assign →"],
     label: "Busqueda con filtros: Students con el mismo componente",
   },
@@ -769,7 +769,7 @@ const checks = [
   },
   {
     file: "components/sat/student-overview-table.tsx",
-    requires: ["?area=${a.tab}", "?area=tests", "Parent: ", "pending"],
+    requires: ["?area=${a.tab}", "?area=tests", "Parent: ", "pending", "assignHref({ studentId: s.id })"],
     label: "Tabla de alumnos de Home y Students: celdas por area y Test, padre como tag",
   },
   {
@@ -826,13 +826,29 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/assign/assign-form-client.tsx",
-    requires: ["Show explanations in the player", "showExplanations,"],
-    label: "Assign practice: opcion por alumno 'Show explanations in the player'",
+    requires: ["<AssignSummaryCard", "defaultAssignOptions(7", "showExplanations: options.showExplanations"],
+    label: "Assign practice: opciones (due, open, answers, explanations) en la tarjeta Summary",
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/assign-test/assign-test-form-client.tsx",
-    requires: ["Show explanations in the player", "showExplanations }", "<TestNumberAccordion"],
-    label: "Assign test: opcion de explicaciones y acordeon TEST N por fuente",
+    requires: ["<AssignSummaryCard", "defaultAssignOptions(0", "unlockAt: options.unlockAt", "feedbackMode: options.feedbackMode", "<TestNumberAccordion"],
+    label: "Assign test: la misma tarjeta Summary con las mismas opciones y acordeon TEST N por fuente",
+  },
+  {
+    file: "components/sat/assign-summary-card.tsx",
+    requires: ["Show explanations in the player", "Open date (optional)", "When to show answers", "showExplanations: stored?.showExplanations ?? false", "unlockAt: stored?.unlockAt?.slice(0, 10) || today"],
+    label: "Summary de asignacion: explicaciones apagadas y apertura hoy por defecto",
+  },
+  {
+    file: "prisma/migrations/20261103_test_assignment_options/migration.sql",
+    requires: ['"FullPracticeTestAssignment" ADD COLUMN "unlockAt"', '"FullPracticeTestAssignment" ADD COLUMN "feedbackMode"', "SET \"feedbackMode\" = 'IMMEDIATE'"],
+    forbids: ["DROP TABLE"],
+    label: "Tests: open date y when to show answers (ADD-only; los que tenian Check lo conservan)",
+  },
+  {
+    file: "app/(student)/student/tests/[assignmentId]/page.tsx",
+    requires: ["assignment.unlockAt > new Date()", 'checkAnswers={assignment.feedbackMode === "IMMEDIATE"}'],
+    label: "Player de Test: no abre antes del open date; Check solo con respuestas por pregunta",
   },
   {
     file: "lib/immediate-check.ts",
@@ -841,7 +857,7 @@ const checks = [
   },
   {
     file: "app/api/full-practice-tests/attempts/[attemptId]/check/route.ts",
-    requires: ["Explanations are turned off for this test.", "checkedAt: new Date()", "This module was already submitted."],
+    requires: ['feedbackMode !== "IMMEDIATE"', "showExplanation ? question.explanation", "checkedAt: new Date()", "This module was already submitted."],
     label: "Check del player de Test: solo con la opcion activa, modulo abierto, respuesta bloqueada",
   },
   {

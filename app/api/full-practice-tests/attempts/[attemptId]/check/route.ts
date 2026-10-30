@@ -22,12 +22,15 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
 
   const attempt = await prisma.fullPracticeTestAttempt.findFirst({
     where: { id: attemptId, studentId: session.user.id, status: "IN_PROGRESS" },
-    select: { id: true, testId: true, testSnapshot: true, moduleTimerState: true, showExplanations: true, assignment: { select: { showExplanations: true } } },
+    select: { id: true, testId: true, testSnapshot: true, moduleTimerState: true, showExplanations: true, assignment: { select: { feedbackMode: true, showExplanations: true } } },
   });
   if (!attempt) return new NotFoundError("This test was already submitted or closed by your teacher.").toResponse();
-  if (!(attempt.showExplanations ?? attempt.assignment?.showExplanations ?? false)) {
-    return new ForbiddenError("Explanations are turned off for this test.").toResponse();
+  // "When to show answers": Check exists only with answers after each question (same rule as practice).
+  if (attempt.assignment?.feedbackMode !== "IMMEDIATE") {
+    return new ForbiddenError("Answers after each question are turned off for this test.").toResponse();
   }
+  // "Show explanations in the player" of this attempt (the assignment's choice when it started).
+  const showExplanation = attempt.showExplanations ?? attempt.assignment?.showExplanations ?? false;
 
   // The question must be in a module the student has not submitted yet (graded from the snapshot).
   const modules = await fullTestModulesForAttempt(attempt);
@@ -57,6 +60,6 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
     isCorrect,
     answerKey: question.correctAnswer,
     correctAnswer: formatCorrectAnswer(question.correctAnswer),
-    explanation: question.explanation ?? null,
+    explanation: showExplanation ? question.explanation ?? null : null,
   });
 });

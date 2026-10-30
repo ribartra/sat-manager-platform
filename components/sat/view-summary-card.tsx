@@ -21,8 +21,7 @@ export interface ViewSummaryChip {
 
 /**
  * One box per view on the teacher Home: the view's name, its main number, a few status chips, one
- * line of detail and the way in. The whole box links to the view (the title link covers it); a
- * secondary link sits above that cover.
+ * line of detail and the way in. The whole box links to the view (the title link covers it).
  */
 export function ViewSummaryCard({
   title,
@@ -34,7 +33,6 @@ export function ViewSummaryCard({
   line,
   action,
   accent = "primary",
-  secondary,
 }: {
   title: string;
   icon: React.ReactNode;
@@ -46,8 +44,6 @@ export function ViewSummaryCard({
   accent?: "primary" | "tests";
   line?: React.ReactNode;
   action: string;
-  /** A second way in from the box (e.g. Assign on Students), left of the main action. */
-  secondary?: { label: string; href: string };
 }) {
   return (
     <Card padding="md" className="relative flex min-h-[12rem] flex-col gap-2.5 hover:border-gray-400">
@@ -84,12 +80,7 @@ export function ViewSummaryCard({
         </div>
       ) : null}
       {line ? <p className="truncate text-xs text-gray-600">{line}</p> : null}
-      <div className="mt-auto flex items-center justify-end gap-4 border-t border-gray-100 pt-2 text-xs font-medium text-blue-600">
-        {secondary ? (
-          <Link href={secondary.href} className="relative z-10 mr-auto hover:underline">{secondary.label}</Link>
-        ) : null}
-        <span>{action}</span>
-      </div>
+      <div className="mt-auto border-t border-gray-100 pt-2 text-right text-xs font-medium text-blue-600">{action}</div>
     </Card>
   );
 }

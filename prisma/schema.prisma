@@ -640,8 +640,13 @@ model FullPracticeTestAssignment {
   studentId   String
   assignedById String?
   dueDate     DateTime?
+  /// Open date: the student can start the Test from this moment (null = right away).
+  unlockAt    DateTime?
   status      String    @default("PENDING")
-  /// Per-student choice: Check + explanation per question in the Test player.
+  /// When to show answers: IMMEDIATE (Check per question in the player) | AFTER_SET (only in the results).
+  feedbackMode String   @default("AFTER_SET")
+  /// Per-student choice: the explanation with each checked answer in the Test player (IMMEDIATE only).
+  /// The assign form starts it off and always sends it (the column default stays: no table rebuild).
   showExplanations Boolean @default(true)
   createdAt   DateTime  @default(now())
   test        FullPracticeTest @relation(fields: [testId], references: [id])

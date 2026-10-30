@@ -94,11 +94,12 @@ export function FullTestPlayer({
   resultQuery,
   completedModules = [],
   startModule = null,
-  showExplanations = false,
+  checkAnswers = false,
   savedChecks = {},
 }: {
-  /** Assignment option: a Check button per question shows the answer and its explanation. */
-  showExplanations?: boolean;
+  /** "Show the answer after each question": a Check button per question shows the answer (and the
+   *  explanation when the assignment allows it; the server leaves it out otherwise). */
+  checkAnswers?: boolean;
   /** Questions already checked in this attempt (their answer is locked). */
   savedChecks?: Record<string, CheckResult>;
   attemptId: string;
@@ -1065,7 +1066,7 @@ export function FullTestPlayer({
               disabled={Boolean(checked[question.id])}
             />
           )}
-          {showExplanations && !previewMode ? (
+          {checkAnswers && !previewMode ? (
             <div className="mt-3 space-y-2 rounded-md border border-gray-200 bg-gray-50 p-3">
               {!checked[question.id] ? (
                 <>

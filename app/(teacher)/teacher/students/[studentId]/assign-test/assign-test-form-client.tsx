@@ -3,14 +3,13 @@
 import { Checkbox, Radio } from "@/components/ui/checkbox";
 import { Select } from "@/components/ui/select";
 import { useState } from "react";
-import { localToday } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { InlineError } from "@/components/sat/alert";
 import { TestNumberAccordion } from "@/components/sat/test-number-accordion";
+import { AssignSummaryCard, defaultAssignOptions, type AssignOptions } from "@/components/sat/assign-summary-card";
 import { readApiError } from "@/lib/api-client";
 
 /** A test the student does NOT have yet (already assigned tests are never offered again). */
@@ -41,8 +40,8 @@ export function AssignTestForm({
   exams: ExamOption[];
   /** The student's Tests tab (Cancel, and where it goes after assigning). */
   returnHref: string;
-  /** Due-date edit of a test the student already has (open). */
-  editing?: { id: string; name: string; dueDate: string | null; showExplanations: boolean };
+  /** Settings edit of a test the student already has (open). */
+  editing?: { id: string; name: string; dueDate: string | null; unlockAt: string | null; feedbackMode: string; showExplanations: boolean };
   /** Test preselected from the URL (`test=`): "Assign" on a Test. */
   initialSelected?: string;
   /** Groups (Admin › Settings group management): assign to every member at once. */
@@ -57,10 +56,9 @@ export function AssignTestForm({
   const [groupId, setGroupId] = useState(groups[0]?.id ?? "");
   const group = groups.find((g) => g.id === groupId);
   const useGroup = groupAssignmentEnabled && target === "group" && !editing;
-  // Due date starts on the day the test is assigned (end of that day), or the current one when editing.
-  const [dueDate, setDueDate] = useState(() => editing?.dueDate?.slice(0, 10) ?? localToday());
-  // Per student: Check + explanation per question in the Test player (on by default).
-  const [showExplanations, setShowExplanations] = useState(() => editing?.showExplanations ?? true);
+  // Same options as practice: due the day it is assigned (end of that day), open today, answers at the
+  // end, explanations off; editing starts from the stored settings.
+  const [options, setOptions] = useState<AssignOptions>(() => defaultAssignOptions(0, editing));
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
@@ -94,7 +92,13 @@ export function AssignTestForm({
           const res = await fetch(`/api/full-practice-tests/${testId}/assign`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ studentIds, dueDate: dueDate || null, showExplanations }),
+            body: JSON.stringify({
+              studentIds,
+              dueDate: options.dueDate || null,
+              unlockAt: options.unlockAt || null,
+              feedbackMode: options.feedbackMode,
+              showExplanations: options.showExplanations,
+            }),
           });
           if (!res.ok) throw await readApiError(res, "Failed to assign the test.");
           return res.json();
@@ -105,7 +109,7 @@ export function AssignTestForm({
       const reassigned = total("reassigned");
       const updated = total("updated");
       if (created + reassigned + updated === 0) {
-        setError("Nothing changed: the selected tests are already assigned with this due date.");
+        setError("Nothing changed: the selected tests are already assigned with these settings.");
         setLoading(false);
         return;
       }
@@ -125,9 +129,10 @@ export function AssignTestForm({
   }
 
   return (
-    <Card padding="lg" className="space-y-4">
+    <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+    <Card padding="lg" className="min-w-0 space-y-4">
       <p className="text-sm text-gray-600">
-        {editing ? "Due date for" : "Assign tests to"} <span className="font-medium text-blue-700">{useGroup ? group?.name ?? "Group" : studentName}</span>
+        {editing ? "Settings for" : "Assign tests to"} <span className="font-medium text-blue-700">{useGroup ? group?.name ?? "Group" : studentName}</span>
       </p>
       {groupAssignmentEnabled && !editing && groups.length ? (
         <div className="flex flex-wrap items-center gap-4 text-sm text-gray-700">
@@ -184,27 +189,25 @@ export function AssignTestForm({
         </>
       )}
 
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700">Due date</label>
-        <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
-      </div>
-      <label className="flex items-center gap-2 text-sm text-gray-700">
-        <Checkbox checked={showExplanations} onChange={(e) => setShowExplanations(e.target.checked)} />
-        Show explanations in the player
-        <span className="text-xs text-gray-500">(a Check button per question shows the answer and its explanation)</span>
-      </label>
-
       <InlineError>{error}</InlineError>
       {done && <p className="text-sm font-medium text-green-600">✓ {doneMessage} Redirecting...</p>}
-
-      <div className="flex items-center gap-3">
-        <Button onClick={handleAssign} disabled={loading} disabledReason={done ? "Already assigned." : selected.size === 0 ? "Select at least one test." : null}>
-          {editing ? (loading ? "Saving..." : "Save changes") : loading ? "Assigning..." : `Assign test${selected.size ? ` (${selected.size})` : ""}`}
-        </Button>
-        <Button type="button" variant="ghost" onClick={() => router.push(returnHref)}>
-          Cancel
-        </Button>
-      </div>
     </Card>
+
+    <aside className="lg:sticky lg:top-6">
+      <AssignSummaryCard
+        to={useGroup ? group?.name ?? "Group" : studentName}
+        countLabel="Tests"
+        items={editing ? [editing.name] : exams.filter((exam) => selected.has(exam.id)).map((exam) => `${exam.name} · ${exam.sourceName}`)}
+        options={options}
+        onOptionsChange={setOptions}
+        dueHint="Due at the end of that day. Starts today; change it if needed."
+        submitLabel={editing ? (loading ? "Saving..." : "Save changes") : loading ? "Assigning..." : `Assign test${selected.size ? ` (${selected.size})` : ""}`}
+        onSubmit={handleAssign}
+        loading={loading}
+        disabledReason={done ? "Already assigned." : selected.size === 0 ? "Select at least one test." : null}
+        onCancel={() => router.push(returnHref)}
+      />
+    </aside>
+    </div>
   );
 }

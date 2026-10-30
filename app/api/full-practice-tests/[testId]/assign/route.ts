@@ -3,7 +3,7 @@ import { contentScopeFor } from "@/lib/program-scope";
 import { revalidatePath } from "next/cache";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
-import { parseDueDate, upsertFullTestAssignment, type AssignmentOutcome } from "@/lib/assignments";
+import { parseDueDate, parseUnlockDate, upsertFullTestAssignment, type AssignmentOutcome } from "@/lib/assignments";
 import { studentAccessWhereFor } from "@/lib/program-scope";
 import { BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
@@ -16,7 +16,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
   if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { testId } = await params;
-  const { studentIds, dueDate, showExplanations } = await req.json();
+  const { studentIds, dueDate, unlockAt, feedbackMode, showExplanations } = await req.json();
   const requestedStudentIds = Array.isArray(studentIds) ? studentIds.filter((id) => typeof id === "string") : [];
   if (requestedStudentIds.length === 0) {
     return new BadRequestError("Student selection is required.").toResponse();
@@ -46,6 +46,9 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
 
   const touchedStudentIds = new Set<string>();
   const resolvedDueDate = parseDueDate(dueDate);
+  const resolvedUnlockAt = parseUnlockDate(unlockAt);
+  // Same options as practice: answers after each question (Check) or only at the end.
+  const resolvedFeedbackMode = feedbackMode === "IMMEDIATE" ? "IMMEDIATE" : "AFTER_SET";
   for (const studentId of requestedStudentIds) {
     const { outcome } = await upsertFullTestAssignment({
       studentId,
@@ -53,8 +56,10 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
       testName: test.name,
       assignedById: session.user.id,
       dueDate: resolvedDueDate,
-      // Check + explanation per question in the player (on unless explicitly turned off).
-      showExplanations: showExplanations !== false,
+      unlockAt: resolvedUnlockAt,
+      feedbackMode: resolvedFeedbackMode,
+      // Explanations with each checked answer: off unless turned on, and only with Check.
+      showExplanations: resolvedFeedbackMode === "IMMEDIATE" && showExplanations === true,
     });
     counts[outcome] += 1;
     touchedStudentIds.add(studentId);

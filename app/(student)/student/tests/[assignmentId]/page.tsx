@@ -45,6 +45,8 @@ export default async function FullTestPlayerPage({ params, searchParams }: PageP
     },
   });
   if (!assignment) notFound();
+  // Open date: the Test can't be started before it (the Tests list shows "Opens …").
+  if (assignment.unlockAt && assignment.unlockAt > new Date()) redirect("/student/tests");
 
   let attempt = assignment.attempts[0];
   if (!attempt && assignment.status === "COMPLETED") {
@@ -143,8 +145,8 @@ export default async function FullTestPlayerPage({ params, searchParams }: PageP
         })),
       }))}
       savedAnswers={Object.fromEntries(attempt.answers.map((answer) => [answer.questionId, answer.answer ?? ""]))}
-      // "Show explanations in the player" of this attempt (assignment choice when it started).
-      showExplanations={attempt.showExplanations ?? assignment.showExplanations}
+      // "When to show answers": Check per question only with answers after each question.
+      checkAnswers={assignment.feedbackMode === "IMMEDIATE"}
       savedChecks={Object.fromEntries(
         attempt.answers.flatMap((answer) => {
           if (!answer.checkedAt || !answer.answer) return [];
@@ -154,7 +156,8 @@ export default async function FullTestPlayerPage({ params, searchParams }: PageP
             isCorrect: isAnswerCorrect(answer.answer, question.correctAnswer, resolveQuestionType(question.type, question.options)),
             answerKey: question.correctAnswer,
             correctAnswer: formatCorrectAnswer(question.correctAnswer),
-            explanation: question.explanation ?? null,
+            // "Show explanations in the player" of this attempt (assignment choice when it started).
+            explanation: (attempt.showExplanations ?? assignment.showExplanations) ? question.explanation ?? null : null,
           }]];
         }),
       )}

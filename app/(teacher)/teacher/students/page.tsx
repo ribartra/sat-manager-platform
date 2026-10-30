@@ -31,7 +31,7 @@ type Show = keyof typeof SHOW;
 
 /**
  * Students roster: the Home table (latest practice per area, latest Test, pending Tests) for every
- * student, with search, a status filter, the Inactive notice and the Parents shortcut (Assign is on the Home Students box).
+ * student, with search, a status filter, the Inactive notice, an Assign button per student and the Parents shortcut.
  */
 export default async function TeacherStudentsPage({ searchParams }: PageProps) {
   const session = await auth();
@@ -126,7 +126,7 @@ export default async function TeacherStudentsPage({ searchParams }: PageProps) {
       {rows.length === 0 ? (
         <EmptyState title="No students match." />
       ) : (
-        <StudentOverviewTable rows={rows} now={now} parents={parentNames} />
+        <StudentOverviewTable rows={rows} now={now} parents={parentNames} assign />
       )}
 
       {invited.length > 0 ? (

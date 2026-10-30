@@ -167,7 +167,7 @@ export async function AssignView({ studentId, query }: { studentId: string | nul
         include: { source: { select: { id: true, name: true, sortOrder: true } }, modules: { select: { id: true, questions: { select: { questionId: true } } } } },
         orderBy: { name: "asc" },
       }),
-      prisma.fullPracticeTestAssignment.findMany({ where: { studentId: student.id }, select: { testId: true, status: true, dueDate: true, showExplanations: true } }),
+      prisma.fullPracticeTestAssignment.findMany({ where: { studentId: student.id }, select: { testId: true, status: true, dueDate: true, unlockAt: true, feedbackMode: true, showExplanations: true } }),
     ]);
     // Already assigned = never offered again (the student can retake it); an open one opens to edit its due date.
     const assignmentByTest = new Map(existing.map((row) => [row.testId, row]));
@@ -179,7 +179,18 @@ export async function AssignView({ studentId, query }: { studentId: string | nul
         {presetTest && presetRow && !editingExam ? <Alert tone="info" className="mb-3">{first} already took {presetTest.name}; they can retake it from their Tests page.</Alert> : null}
         {overview ? <StudentDonePanel overview={overview} studentId={student.id} focus="tests" /> : null}
         <AssignTestForm
-          editing={editingExam ? { id: editingExam.id, name: editingExam.name, dueDate: presetRow?.dueDate?.toISOString() ?? null, showExplanations: presetRow?.showExplanations ?? true } : undefined}
+          editing={
+            editingExam && presetRow
+              ? {
+                  id: editingExam.id,
+                  name: editingExam.name,
+                  dueDate: presetRow.dueDate?.toISOString() ?? null,
+                  unlockAt: presetRow.unlockAt?.toISOString() ?? null,
+                  feedbackMode: presetRow.feedbackMode,
+                  showExplanations: presetRow.showExplanations,
+                }
+              : undefined
+          }
           initialSelected={params.test}
           studentId={student.id}
           studentName={student.name}
