@@ -1,0 +1,30 @@
+# What `gcloud builds submit` (deploy/cloudbuild.yaml) does NOT upload. Keep in sync with .dockerignore.
+#!include:.gitignore
+.git
+.github
+node_modules
+.next
+# Runtime data and local copies (real user data never goes into an image).
+dev.db
+dev.db*
+*.bak
+*.db
+backups
+.private
+.secrets
+public/uploads
+files_to_load
+# Docs, references and test artifacts (not needed by the build).
+docs
+deploy/terraform
+deploy/docs
+SAT platform
+reportes
+ui-referencias
+test-results
+playwright-report
+e2e
+*.docx
+*.xlsx
+*.pdf
+*.m4a

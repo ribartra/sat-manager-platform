@@ -1,6 +1,6 @@
 // Prepara un snapshot SANEADO de una BD SQLite local para empujar a producción.
 //
-// Lo usa deploy/push-db-to-cloud.sh, pero se puede correr solo. Produce una copia
+// Lo usa deploy/scripts/push-db-to-cloud.sh, pero se puede correr solo. Produce una copia
 // consolidada (incluye WAL) y, opcionalmente, la sanea para no arrastrar artefactos
 // de desarrollo a producción:
 //   • Purga AppSetting cifrados (no descifran con la SECRET_ENCRYPTION_KEY de prod).

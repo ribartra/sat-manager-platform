@@ -16,7 +16,7 @@ function statusFile() {
 }
 
 // Backup freshness probe for the Cloud Monitoring uptime check (RNF-15): 200 while the last
-// successful backup (deploy/sat-db-backup.sh → backup-status.json) is recent, 503 when it is
+// successful backup (deploy/vm/sat-db-backup.sh → backup-status.json) is recent, 503 when it is
 // stale or missing. Separate from /api/health so a backup problem never restarts the container.
 // Public on purpose: returns only the age, no file names or locations.
 export const GET = withApiErrors(async function GET() {

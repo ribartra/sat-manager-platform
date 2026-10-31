@@ -369,7 +369,7 @@ const checks = [
     label: "Internal reminders route requires the internal service token",
   },
   {
-    file: "deploy/Caddyfile",
+    file: "deploy/vm/Caddyfile",
     requires: ["@internal path /api/internal/*", "respond @internal 404"],
     label: "Internal API paths are not exposed publicly",
   },

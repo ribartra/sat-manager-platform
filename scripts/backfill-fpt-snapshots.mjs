@@ -2,7 +2,7 @@
 // CURRENT exam rows, flagged `backfilled: true` (RNF-17). New attempts get their snapshot at start
 // (lib/full-test-snapshot.ts); this freezes the older ones so future edits stop changing them.
 // Same shape as snapshotModules() in lib/full-test-snapshot.ts.
-// Runs from deploy/web-entrypoint.sh after `migrate deploy`, before the server starts (no concurrent writers).
+// Runs from deploy/vm/web-entrypoint.sh after `migrate deploy`, before the server starts (no concurrent writers).
 //   DATABASE_URL=file:./dev.db node scripts/backfill-fpt-snapshots.mjs [--dry]
 import Database from "better-sqlite3";
 

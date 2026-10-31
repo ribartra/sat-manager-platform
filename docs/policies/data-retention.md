@@ -30,8 +30,8 @@
 | On-site DB backups (every 6 h) | Kept (versioned bucket; superseded versions deleted after 30 days) | `gs://sat-sol-gsc-sat-data/backups/` |
 | Off-site DB backups (daily) | 190 days (≥ 6 months) | lifecycle rule on `gs://sat-sol-gsc-backups-offsite/db/` |
 | Off-site copies of question images and staging files | Kept | `gs://sat-sol-gsc-backups-offsite/files/` |
-| Local VM backup copies | 3 days | `deploy/sat-db-backup.sh` |
-| Pre-deploy DB copies on the VM | The 2 most recent | `deploy/deploy.sh` |
+| Local VM backup copies | 3 days | `deploy/vm/sat-db-backup.sh` |
+| Pre-deploy DB copies on the VM | The 2 most recent | `deploy/vm/deploy.sh` |
 
 ## Requests
 

@@ -146,7 +146,7 @@ Los campos `cpu`, `memoryMiB`, `concurrency`, `minInstances`, `maxInstances`, `c
 |---|---|---|
 | `output: "standalone"` + imagen multi-stage sin dependencias de desarrollo | La imagen pasa de 1,8 GB a ~200–300 MB, con menos lectura y extracción | [Next.js standalone en Cloud Run](https://oneuptime.com/blog/post/2026-02-17-how-to-build-a-docker-image-for-a-nextjs-application-with-standalone-output-and-deploy-to-cloud-run/view) |
 | **Startup CPU boost** | Dobla la CPU durante el arranque y los 10 s siguientes; ~30 % menos de arranque en Node | [Startup CPU boost](https://cloud.google.com/blog/products/serverless/announcing-startup-cpu-boost-for-cloud-run--cloud-functions), [CPU limits](https://docs.cloud.google.com/run/docs/configuring/services/cpu) |
-| **Migraciones fuera del arranque** | Hoy `deploy/web-entrypoint.sh` corre `prisma migrate deploy` y el backfill **en cada arranque**. Se pasa a un **Cloud Run Job** previo al despliegue | — |
+| **Migraciones fuera del arranque** | Hoy `deploy/vm/web-entrypoint.sh` corre `prisma migrate deploy` y el backfill **en cada arranque**. Se pasa a un **Cloud Run Job** previo al despliegue | — |
 | Carga perezosa de dependencias pesadas | `@react-pdf/renderer` con `await import()` dentro de las rutas de PDF; calculadora y gráficos con `next/dynamic` | [Prisma: arranque lento en Cloud Run](https://github.com/prisma/prisma/issues/12132) |
 | Prisma con driver adapter (`@prisma/adapter-pg`) | Sin motor binario y arranque más ligero | — |
 | Conexión a Cloud SQL perezosa con pool pequeño | Ver §8.3 | — |
@@ -421,7 +421,7 @@ Refs.: [Next.js — Streaming](https://nextjs.org/learn/dashboard-app/streaming)
 ### 8.4 Backups
 - Backups automáticos diarios de Cloud SQL + **PITR** (7 días de logs).
 - **Exportación mensual** con `gcloud sql export sql` al bucket off-site, que ya existe con 190 días de retención (RNF-14/15).
-- `deploy/sat-db-backup.sh` se retira junto con la VM.
+- `deploy/vm/sat-db-backup.sh` se retira junto con la VM.
 - **Ensayo de restore** en un clon (`gcloud sql instances clone`) cada trimestre (runbook).
 
 ---

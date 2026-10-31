@@ -272,12 +272,12 @@ const checks = [
     label: "Pausa / solicitud concurrente: devuelve la existente",
   })),
   {
-    file: "deploy/docker-compose.prod.yml",
+    file: "deploy/vm/docker-compose.prod.yml",
     requires: ["mem_limit: 1536m", "init: true", "stop_grace_period: 30s", "NODE_OPTIONS: --max-old-space-size=1024", "mem_limit: 256m"],
     label: "Contenedores con limite de memoria, init y tiempo de cierre",
   },
   {
-    file: "deploy/Caddyfile",
+    file: "deploy/vm/Caddyfile",
     requires: ["read_header 15s", "read_body 10m", "max_size 256MiB", "max_size 16MiB"],
     label: "Caddy: limite de subida por ruta y tiempos maximos",
   },

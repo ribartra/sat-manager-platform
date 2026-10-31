@@ -29,6 +29,8 @@ There is no Jest/Vitest suite. The `qa:*` scripts assert that specific security/
 
 Docker: `docker-compose.yml` runs `web` (:3000) and `ingest-service` (:8000) sharing the project via bind mount and the same SQLite `dev.db`.
 
+Deployment lives in `deploy/` (see `deploy/README.md`): Terraform for GCP under `deploy/terraform/` (modules + `environments/prod`, GCS state, production imported in `imports.tf`; `make plan` must never show a destroy/replace), VM files in `deploy/vm/` (installed by `apply-stack.sh`), and `make build` / `make release TAG=…` / `make rollback` from `deploy/`. `make preflight` runs the offline checks. Never commit `dev.db` (it can hold a production copy).
+
 ## Architecture
 
 **Prisma client is generated to `app/generated/prisma/`, not `@prisma/client`.** Import from `@/app/generated/prisma/client`. Always run `prisma:generate` after editing `prisma/schema.prisma`. `lib/prisma.ts` wires the `better-sqlite3` adapter and is a singleton in prod but fresh-per-call in dev (so HMR never serves a stale generated client).

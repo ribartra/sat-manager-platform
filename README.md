@@ -580,9 +580,12 @@ progreso al padre** y restablecimiento de contraseña (`lib/email.ts`).
 ### En producción (deploy GCP)
 
 `EMAIL_PASS` es secreto y va a **Secret Manager** (`email-pass`, cargado por
-`deploy/load-secrets.sh`); el resto de `EMAIL_*` no son secretos y se renderizan a
-`/data/app.env` desde variables de Terraform (`deploy/vm-startup.sh`). Alternativamente,
+`deploy/scripts/load-secrets.sh`); el resto de `EMAIL_*` no son secretos y se renderizan a
+`/data/app.env` desde variables de Terraform (`deploy/vm/vm-startup.sh`). Alternativamente,
 puede dejarse todo sin configurar en el deploy y ajustarse luego desde `/admin/settings`.
+
+El despliegue completo (Terraform en GCP, build de imágenes, release, rollback, backups y
+alertas) está en **`deploy/`**: ver `deploy/README.md` y `deploy/docs/runbook.md`.
 
 ---
 

@@ -48,3 +48,20 @@ jobs:
 
       - name: Build
         run: npm run build
+
+  deploy-preflight:
+    name: Deploy preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8
+
+      # Offline checks: terraform fmt/validate, shell syntax, compose, Caddyfile and deploy policies.
+      - name: Preflight
+        run: deploy/scripts/preflight.sh
