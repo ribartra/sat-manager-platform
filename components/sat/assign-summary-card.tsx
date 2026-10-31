@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import { localToday } from "@/lib/utils";
+import { appDateInputValue, localToday } from "@/lib/utils";
 
 export type FeedbackMode = "AFTER_SET" | "IMMEDIATE";
 
@@ -27,8 +27,10 @@ export function defaultAssignOptions(
 ): AssignOptions {
   const today = localToday();
   return {
-    dueDate: stored ? stored.dueDate?.slice(0, 10) ?? "" : addDays(today, dueInDays),
-    unlockAt: stored?.unlockAt?.slice(0, 10) || today,
+    // Stored dates are instants (due = 23:59 Lima): read them back as the Lima calendar day, not the
+    // UTC one (slice(0, 10) showed the due date one day later and saving pushed it a day).
+    dueDate: stored ? appDateInputValue(stored.dueDate) : addDays(today, dueInDays),
+    unlockAt: appDateInputValue(stored?.unlockAt) || today,
     feedbackMode: stored?.feedbackMode === "IMMEDIATE" ? "IMMEDIATE" : "AFTER_SET",
     showExplanations: stored?.showExplanations ?? false,
   };

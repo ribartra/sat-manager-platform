@@ -23,12 +23,27 @@ export function formatDuration(seconds: number): string {
   return `${s} s`;
 }
 
+/**
+ * The app's teaching time zone (Lima, UTC-5, same as APP_UTC_OFFSET in lib/assignments). Dates are
+ * shown in it everywhere, so the server (UTC container) and every browser show the same day the
+ * teacher picked: a due date stored as 23:59 Lima is no longer shown as the next day.
+ */
+export const APP_TIME_ZONE = "America/Lima";
+
 export function formatDate(date: Date | string): string {
   return new Date(date).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
+    timeZone: APP_TIME_ZONE,
   });
+}
+
+/** A stored date as the YYYY-MM-DD value of an <input type="date">, in the app's time zone. */
+export function appDateInputValue(date: Date | string | null | undefined): string {
+  if (!date) return "";
+  const value = new Date(date);
+  return Number.isNaN(value.getTime()) ? "" : value.toLocaleDateString("en-CA", { timeZone: APP_TIME_ZONE });
 }
 
 /** Time of day, "3:42 PM". */

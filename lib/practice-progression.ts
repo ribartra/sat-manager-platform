@@ -47,7 +47,8 @@ async function ensureUnlockedAssignment(studentId: string, practiceSetId: string
     if (existing.status === "COMPLETED") return;
     await prisma.assignment.update({
       where: { id: existing.id },
-      data: { locked: false, unlockAt: null },
+      // Opens now; a past open date is kept.
+      data: { locked: false, unlockAt: existing.unlockAt ?? new Date() },
     });
     await notifyUser(studentId, "Practice Set unlocked", `${shortSetName(existing.practiceSet.name)} is open now.`, "/student");
     await prisma.auditLog.create({
@@ -73,6 +74,7 @@ async function ensureUnlockedAssignment(studentId: string, practiceSetId: string
         studentId,
         practiceSetId,
         assignedById: null,
+        unlockAt: new Date(),
         locked: false,
         status: "PENDING",
       },

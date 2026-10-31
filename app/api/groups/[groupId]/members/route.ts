@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
+import { resolveOpenDate } from "@/lib/assignments";
 import prisma from "@/lib/prisma";
 import { ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 import { writeAudit } from "@/lib/audit";
@@ -52,7 +53,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
           practiceSetId: groupAssignment.practiceSetId,
           assignedById: session.user.id,
           dueDate: groupAssignment.dueDate,
-          unlockAt: groupAssignment.unlockAt,
+          unlockAt: resolveOpenDate(groupAssignment.unlockAt, new Date(), groupAssignment.locked),
           locked: groupAssignment.locked,
           showExplanations: groupAssignment.showExplanations,
           status: "PENDING",

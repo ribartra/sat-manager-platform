@@ -356,7 +356,7 @@ async function main() {
       id: seedPracticeIds.anaPs1Assignment,
       practiceSetId: ps1.id, studentId: students[0].id,
       assignedById: teacher.id, dueDate: new Date("2026-06-15"),
-      status: "PENDING", locked: false,
+      status: "PENDING", locked: false, unlockAt: new Date(),
     },
   });
   await prisma.assignment.upsert({
@@ -365,25 +365,25 @@ async function main() {
     create: {
       id: seedPracticeIds.luisPs1Assignment,
       practiceSetId: ps1.id, studentId: students[1].id,
-      assignedById: teacher.id, dueDate: new Date("2026-06-01"), status: "PENDING", locked: false,
+      assignedById: teacher.id, dueDate: new Date("2026-06-01"), status: "PENDING", locked: false, unlockAt: new Date(),
     },
   });
   await prisma.assignment.upsert({
     where: { id: seedPracticeIds.anaPs2Assignment },
-    update: { status: "PENDING", locked: false, unlockAt: null },
+    update: { status: "PENDING", locked: false, unlockAt: new Date() },
     create: {
       id: seedPracticeIds.anaPs2Assignment,
       practiceSetId: ps2.id, studentId: students[0].id,
-      assignedById: teacher.id, status: "PENDING", locked: false,
+      assignedById: teacher.id, status: "PENDING", locked: false, unlockAt: new Date(),
     },
   });
   await prisma.assignment.upsert({
     where: { id: seedPracticeIds.anaPs3Assignment },
-    update: { status: "COMPLETED", locked: false, unlockAt: null },
+    update: { status: "COMPLETED", locked: false, unlockAt: new Date() },
     create: {
       id: seedPracticeIds.anaPs3Assignment,
       practiceSetId: ps3.id, studentId: students[0].id,
-      assignedById: teacher.id, dueDate: new Date("2026-06-22"), status: "COMPLETED", locked: false,
+      assignedById: teacher.id, dueDate: new Date("2026-06-22"), status: "COMPLETED", locked: false, unlockAt: new Date(),
     },
   });
 
@@ -812,6 +812,7 @@ async function main() {
       assignedById: teacher.id,
       dueDate: new Date("2026-06-30"),
       status: "COMPLETED",
+      unlockAt: new Date(),
     },
   });
   await prisma.fullPracticeTestAssignment.upsert({
@@ -824,6 +825,7 @@ async function main() {
       assignedById: teacher.id,
       dueDate: new Date("2026-07-15"),
       status: "PENDING",
+      unlockAt: new Date(),
     },
   });
   const fptInProgressAssignment = await prisma.fullPracticeTestAssignment.upsert({
@@ -836,6 +838,7 @@ async function main() {
       assignedById: teacher.id,
       dueDate: new Date("2026-07-20"),
       status: "IN_PROGRESS",
+      unlockAt: new Date(),
     },
   });
 
