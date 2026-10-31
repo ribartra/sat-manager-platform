@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { contentScopeFor } from "@/lib/program-scope";
 import { revalidatePath } from "next/cache";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
-import prisma from "@/lib/prisma";
-import { parseDueDate, parseUnlockDate, upsertFullTestAssignment, type AssignmentOutcome } from "@/lib/assignments";
+import prisma, { atomicBatches } from "@/lib/prisma";
+import { ASSIGN_BATCH_SIZE, parseDueDate, parseUnlockDate, upsertFullTestAssignment, type AssignmentOutcome } from "@/lib/assignments";
 import { studentAccessWhereFor } from "@/lib/program-scope";
 import { BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
@@ -49,7 +49,8 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
   const resolvedUnlockAt = parseUnlockDate(unlockAt);
   // Same options as practice: answers after each question (Check) or only at the end.
   const resolvedFeedbackMode = feedbackMode === "IMMEDIATE" ? "IMMEDIATE" : "AFTER_SET";
-  for (const studentId of requestedStudentIds) {
+  // Writes go in batches of ASSIGN_BATCH_SIZE students per transaction (assignment, notification, audit).
+  await atomicBatches(requestedStudentIds, ASSIGN_BATCH_SIZE, async (studentId) => {
     const { outcome } = await upsertFullTestAssignment({
       studentId,
       testId,
@@ -63,7 +64,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
     });
     counts[outcome] += 1;
     touchedStudentIds.add(studentId);
-  }
+  });
 
   revalidatePath("/student");
   revalidatePath("/student/tests");

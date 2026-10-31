@@ -60,6 +60,8 @@ interface QuestionInfo {
 
 interface PracticeSetInitial {
   id?: string;
+  /** Version loaded by the editor; the save is refused (409) if someone else saved since. */
+  updatedAt?: string;
   name?: string;
   topicId?: string;
   difficulty?: string;
@@ -154,6 +156,7 @@ export function PracticeSetEditor({
       status: values.status,
       explanationVisibility: values.explanationVisibility,
       questionIds: values.questionIds,
+      expectedUpdatedAt: initial?.updatedAt,
     };
     const url = initial?.id ? `/api/practice-sets/${initial.id}` : "/api/practice-sets";
     const method = initial?.id ? "PUT" : "POST";

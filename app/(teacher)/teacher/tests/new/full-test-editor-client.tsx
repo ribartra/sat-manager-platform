@@ -54,6 +54,8 @@ export function FullTestEditor({
   }[];
   initial?: {
     id?: string;
+    /** Version loaded by the editor; the save is refused (409) if someone else saved since. */
+    updatedAt?: string;
     name?: string;
     number?: number | null;
     status?: string;
@@ -127,6 +129,7 @@ export function FullTestEditor({
         breakMinutes: values.breakMinutes,
         sourceId: values.sourceId,
         moduleQuestionIds: values.moduleQuestionIds,
+        expectedUpdatedAt: initial?.updatedAt,
       }),
     });
     if (!response.ok) {

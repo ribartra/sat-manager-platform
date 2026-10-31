@@ -36,7 +36,8 @@ export async function releaseScheduledUnlocks(now = new Date()) {
   if (due.length === 0) return 0;
   await withSqliteRetry(() => prisma.assignment.updateMany({
       where: { id: { in: due.map((assignment) => assignment.id) }, locked: true },
-      data: { locked: false, unlockAt: null },
+      // unlockAt stays: it is the date the set opened.
+      data: { locked: false },
     }),
   );
   for (const assignment of due) {
@@ -101,8 +102,21 @@ export function parseUnlockDate(value: unknown): Date | null {
 
 const OPEN_STATUSES = new Set(["PENDING", "IN_PROGRESS"]);
 
+/** Assign routes write this many student × item rows per transaction (see atomicBatches). */
+export const ASSIGN_BATCH_SIZE = 25;
+
 function sameTime(a: Date | null | undefined, b: Date | null | undefined) {
   return (a?.getTime() ?? null) === (b?.getTime() ?? null);
+}
+
+/**
+ * Every open assignment has an open date (unlockAt): the chosen date, else the date it was assigned.
+ * Only a manually locked assignment with no scheduled date has none yet; it gets one when unlocked
+ * (a past unlockAt on a locked row would make releaseScheduledUnlocks open it at once).
+ */
+export function resolveOpenDate(chosen: Date | null, fallback: Date | null, locked = false): Date | null {
+  if (chosen) return chosen;
+  return locked ? null : fallback ?? new Date();
 }
 
 
@@ -151,7 +165,7 @@ export async function upsertPracticeAssignment(input: PracticeAssignmentInput): 
   if (!existing) {
     try {
       const created = await prisma.assignment.create({
-        data: { studentId, practiceSetId, assignedById, dueDate, unlockAt, locked, feedbackMode, showExplanations, status: "PENDING" },
+        data: { studentId, practiceSetId, assignedById, dueDate, unlockAt: resolveOpenDate(unlockAt, new Date(), locked), locked, feedbackMode, showExplanations, status: "PENDING" },
       });
       await notifyUser(studentId, "New practice set assigned", practiceSetName, "/student");
       await audit("ASSIGN_PRACTICE_SET", created.id);
@@ -170,16 +184,18 @@ export async function upsertPracticeAssignment(input: PracticeAssignmentInput): 
   if (OPEN_STATUSES.has(existing.status)) {
     // Still pending: apply the new settings without duplicating. An empty due date keeps the current one.
     const nextDueDate = dueDate ?? existing.dueDate;
+    // An empty open date keeps the stored one (or the assignment date).
+    const nextUnlockAt = resolveOpenDate(unlockAt, existing.unlockAt ?? existing.createdAt, locked);
     const changed =
       !sameTime(existing.dueDate, nextDueDate) ||
-      !sameTime(existing.unlockAt, unlockAt) ||
+      !sameTime(existing.unlockAt, nextUnlockAt) ||
       existing.locked !== locked ||
       existing.feedbackMode !== feedbackMode ||
       existing.showExplanations !== showExplanations;
     if (!changed) return { outcome: "unchanged", assignmentId: existing.id };
     await prisma.assignment.update({
       where: { id: existing.id },
-      data: { dueDate: nextDueDate, unlockAt, locked, feedbackMode, showExplanations, assignedById },
+      data: { dueDate: nextDueDate, unlockAt: nextUnlockAt, locked, feedbackMode, showExplanations, assignedById },
     });
     await notifyUser(studentId, "Assignment updated", practiceSetName, "/student");
     await audit("UPDATE_ASSIGNMENT", existing.id, { previousDueDate: existing.dueDate?.toISOString() ?? null });
@@ -192,7 +208,7 @@ export async function upsertPracticeAssignment(input: PracticeAssignmentInput): 
     data: {
       status: existing.attempts.length > 0 ? "IN_PROGRESS" : "PENDING",
       dueDate,
-      unlockAt,
+      unlockAt: resolveOpenDate(unlockAt, new Date(), locked),
       locked,
       feedbackMode,
       showExplanations,
@@ -210,7 +226,7 @@ interface FullTestAssignmentInput {
   testName: string;
   assignedById: string;
   dueDate: Date | null;
-  /** Open date: the student can start the Test from then (null = right away). */
+  /** Open date: the student can start the Test from then (empty = the day it is assigned). */
   unlockAt: Date | null;
   /** IMMEDIATE: Check per question in the Test player; AFTER_SET: answers only in the results. */
   feedbackMode: "IMMEDIATE" | "AFTER_SET";
@@ -236,7 +252,7 @@ export async function upsertFullTestAssignment(input: FullTestAssignmentInput): 
   if (!existing) {
     try {
       const created = await prisma.fullPracticeTestAssignment.create({
-        data: { testId, studentId, assignedById, dueDate, unlockAt, feedbackMode, showExplanations, status: "PENDING" },
+        data: { testId, studentId, assignedById, dueDate, unlockAt: resolveOpenDate(unlockAt, new Date()), feedbackMode, showExplanations, status: "PENDING" },
       });
       await notifyUser(studentId, "Test assigned", testName, href);
       await audit("ASSIGN_FULL_PRACTICE_TEST", created.id);
@@ -250,15 +266,16 @@ export async function upsertFullTestAssignment(input: FullTestAssignmentInput): 
 
   if (OPEN_STATUSES.has(existing.status)) {
     const nextDueDate = dueDate ?? existing.dueDate;
+    const nextUnlockAt = resolveOpenDate(unlockAt, existing.unlockAt ?? existing.createdAt);
     const unchanged =
       sameTime(existing.dueDate, nextDueDate) &&
-      sameTime(existing.unlockAt, unlockAt) &&
+      sameTime(existing.unlockAt, nextUnlockAt) &&
       existing.feedbackMode === feedbackMode &&
       existing.showExplanations === showExplanations;
     if (unchanged) return { outcome: "unchanged", assignmentId: existing.id };
     await prisma.fullPracticeTestAssignment.update({
       where: { id: existing.id },
-      data: { dueDate: nextDueDate, unlockAt, feedbackMode, showExplanations, assignedById },
+      data: { dueDate: nextDueDate, unlockAt: nextUnlockAt, feedbackMode, showExplanations, assignedById },
     });
     await notifyUser(studentId, "Test assignment updated", testName, href);
     await audit("UPDATE_FULL_PRACTICE_TEST_ASSIGNMENT", existing.id, { previousDueDate: existing.dueDate?.toISOString() ?? null });
@@ -271,7 +288,7 @@ export async function upsertFullTestAssignment(input: FullTestAssignmentInput): 
   });
   await prisma.fullPracticeTestAssignment.update({
     where: { id: existing.id },
-    data: { status: openAttempt ? "IN_PROGRESS" : "PENDING", dueDate, unlockAt, feedbackMode, showExplanations, assignedById },
+    data: { status: openAttempt ? "IN_PROGRESS" : "PENDING", dueDate, unlockAt: resolveOpenDate(unlockAt, new Date()), feedbackMode, showExplanations, assignedById },
   });
   await notifyUser(studentId, "Test reassigned", testName, href);
   await audit("REASSIGN_FULL_PRACTICE_TEST", existing.id, { previousStatus: existing.status });

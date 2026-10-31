@@ -5,6 +5,7 @@ import { ConflictError, PayloadTooLargeError, ValidationError, withApiErrors } f
 import { writeAudit } from "@/lib/audit";
 import { loadQuickBatch } from "@/lib/quick-import.server";
 import { newCandidateId, readQuickImportCsv } from "@/lib/quick-import";
+import { CONTENT_JOB, exclusiveJob } from "@/lib/job-lock";
 
 type Ctx = { params: Promise<{ batchId: string }> };
 
@@ -13,7 +14,7 @@ const MAX_CSV_CHARS = 5_000_000;
 // POST /api/import/quick/[batchId]/csv — { csv, dryRun }: step 2, the CSV made by the external AI.
 // dryRun → preview (rows, errors, warnings); otherwise the valid rows replace the import's staging
 // questions (only while nothing has been turned into a Draft yet).
-export const POST = withApiErrors(async function POST(req: NextRequest, { params }: Ctx) {
+export const POST = withApiErrors(exclusiveJob(CONTENT_JOB, async function POST(req: NextRequest, { params }: Ctx) {
   const session = await assertContentImporter();
   const { batchId } = await params;
   const { batch, target, questionFile } = await loadQuickBatch(batchId, session.user);
@@ -62,4 +63,4 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
     metadata: { rows: rows.length, imported: valid.length, ready: preview.ready },
   });
   return NextResponse.json({ ...preview, dryRun: false });
-});
+}));

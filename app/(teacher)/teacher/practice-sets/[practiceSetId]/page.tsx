@@ -131,6 +131,7 @@ export default async function PracticeSetPage({ params, searchParams }: PageProp
           mediaLinks={(await requireContentImporter()) ? await contentMediaLinks("practice-sets", practiceSet.id, practiceSet.questions.map((item) => item.questionId)) : null}
           initial={{
             id: practiceSet.id,
+            updatedAt: practiceSet.updatedAt.toISOString(),
             name: practiceSet.name,
             topicId: practiceSet.topicId,
             difficulty: practiceSet.difficulty,

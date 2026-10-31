@@ -152,6 +152,73 @@ const checks = [
     requires: ["claimWriteSlot(`resumed:${attempt.id}`, RESUME_AUDIT_INTERVAL_MS)"],
     label: "Auditoria ATTEMPT_RESUMED una vez por sesion, no en cada carga",
   },
+  {
+    file: "app/api/assignments/route.ts",
+    requires: ["atomicBatches(pairs, ASSIGN_BATCH_SIZE", "resolveOpenDate(resolvedUnlockAt"],
+    label: "Asignacion masiva de practica en transacciones por lotes; siempre con fecha de apertura",
+  },
+  {
+    file: "app/api/full-practice-tests/[testId]/assign/route.ts",
+    requires: ["atomicBatches(requestedStudentIds, ASSIGN_BATCH_SIZE"],
+    label: "Asignacion masiva de Tests en transacciones por lotes",
+  },
+  {
+    file: "app/api/unlock-requests/[requestId]/route.ts",
+    requires: ['where: { id: requestId, status: "PENDING" }', "await atomic(", "unlockAt: new Date()"],
+    label: "Solicitud de desbloqueo: se resuelve una sola vez, en una transaccion, y abre con fecha",
+  },
+  ...[
+    "app/api/admin/ai-import/batches/[batchId]/promote-full-test/route.ts",
+    "app/api/admin/ai-import/batches/[batchId]/promote-practice-set/route.ts",
+    "app/api/admin/ai-import/batches/[batchId]/promote-questions/route.ts",
+    "app/api/import/quick/[batchId]/promote/route.ts",
+    "app/api/import/quick/[batchId]/csv/route.ts",
+    "app/api/admin/ai-import/candidates/[candidateId]/merge/route.ts",
+  ].map((file) => ({
+    file,
+    requires: ["exclusiveJob(CONTENT_JOB"],
+    label: "Promociones e importaciones: una a la vez",
+  })),
+  ...[
+    "app/api/practice-sets/[practiceSetId]/route.ts",
+    "app/api/full-practice-tests/[testId]/route.ts",
+    "app/api/questions/[questionId]/route.ts",
+  ].map((file) => ({
+    file,
+    requires: ["assertSameVersion(current.updatedAt, expectedVersion(expectedUpdatedAt))", "await atomic("],
+    label: "Edicion con control de version (409 si otro la cambio) y en una transaccion",
+  })),
+  ...[
+    "app/(teacher)/teacher/practice-sets/practice-set-editor-client.tsx",
+    "app/(teacher)/teacher/tests/new/full-test-editor-client.tsx",
+    "app/(teacher)/teacher/questions/question-editor-client.tsx",
+  ].map((file) => ({
+    file,
+    requires: ["expectedUpdatedAt: initial?.updatedAt"],
+    label: "El editor envia la version que cargo",
+  })),
+  {
+    file: "lib/assignments.ts",
+    requires: ["export function resolveOpenDate(", "unlockAt: resolveOpenDate(unlockAt, new Date(), locked)", "unlockAt: nextUnlockAt", "data: { locked: false },"],
+    forbids: ["unlockAt: null"],
+    label: "Toda asignacion abierta tiene fecha de apertura (unlockAt); la liberacion programada la conserva",
+  },
+  {
+    file: "lib/practice-progression.ts",
+    requires: ["unlockAt: existing.unlockAt ?? new Date()", "unlockAt: new Date(),"],
+    forbids: ["unlockAt: null"],
+    label: "Progresion: abre con fecha de apertura",
+  },
+  {
+    file: "prisma/migrations/20261104_assignment_open_date/migration.sql",
+    requires: ['UPDATE "Assignment" SET "unlockAt" = "createdAt" WHERE "unlockAt" IS NULL AND "locked" = false', 'UPDATE "FullPracticeTestAssignment" SET "unlockAt" = "createdAt" WHERE "unlockAt" IS NULL'],
+    label: "Datos: asignaciones sin fecha de apertura toman la fecha de asignacion",
+  },
+  {
+    file: "lib/utils.ts",
+    requires: ["timeZone: APP_TIME_ZONE", 'export const APP_TIME_ZONE = "America/Lima"'],
+    label: "Fechas mostradas en la zona horaria de la app (Lima)",
+  },
   // Results by skill (SAT-039/040/041): no Low performance, no summary card, no matrix, no Assign in results.
   {
     file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
@@ -989,7 +1056,7 @@ const checks = [
   },
   {
     file: "components/sat/assign-summary-card.tsx",
-    requires: ["Show explanations in the player", "Open date (optional)", "When to show answers", "showExplanations: stored?.showExplanations ?? false", "unlockAt: stored?.unlockAt?.slice(0, 10) || today"],
+    requires: ["Show explanations in the player", "Open date (optional)", "When to show answers", "showExplanations: stored?.showExplanations ?? false", "unlockAt: appDateInputValue(stored?.unlockAt) || today"],
     label: "Summary de asignacion: explicaciones apagadas y apertura hoy por defecto",
   },
   {

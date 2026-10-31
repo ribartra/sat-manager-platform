@@ -106,6 +106,20 @@ export async function atomic<T>(work: (db: PrismaClientType) => Promise<T>): Pro
   return prisma.$transaction((tx) => work(tx as unknown as PrismaClientType)) as Promise<T>;
 }
 
+/**
+ * Runs `work` for every item, `size` items per transaction: a bulk write (assign a set to a class)
+ * commits once per batch instead of once per statement, and other users' requests get the writer
+ * between batches. Writes made with the global client inside `work` join the batch's transaction.
+ */
+export async function atomicBatches<T>(items: readonly T[], size: number, work: (item: T) => Promise<void>) {
+  for (let start = 0; start < items.length; start += size) {
+    const batch = items.slice(start, start + size);
+    await atomic(async () => {
+      for (const item of batch) await work(item);
+    });
+  }
+}
+
 // In production: singleton to avoid exhausting the connection pool.
 // In development: always fresh so HMR never serves a stale generated client
 // after `prisma generate` (SQLite handles multiple connections fine).

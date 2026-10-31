@@ -4,6 +4,7 @@ import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { promoteCandidates } from "@/lib/ingest-promote-candidates";
 import { BadRequestError, ForbiddenError, PayloadTooLargeError, withApiErrors } from "@/lib/api-error";
+import { CONTENT_JOB, exclusiveJob } from "@/lib/job-lock";
 
 interface RouteContext {
   params: Promise<{ batchId: string }>;
@@ -20,7 +21,7 @@ type CandidatePayload = {
   resync?: unknown;
 };
 
-export const POST = withApiErrors(async function POST(req: NextRequest, { params }: RouteContext) {
+export const POST = withApiErrors(exclusiveJob(CONTENT_JOB, async function POST(req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
   if (!session) return new ForbiddenError("Forbidden").toResponse();
 
@@ -56,4 +57,4 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
     resyncedItems: resynced,
     skippedItems: skipped,
   });
-});
+}));

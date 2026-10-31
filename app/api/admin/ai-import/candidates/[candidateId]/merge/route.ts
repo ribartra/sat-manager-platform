@@ -3,6 +3,7 @@ import { randomUUID } from "crypto";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
+import { CONTENT_JOB, exclusiveJob } from "@/lib/job-lock";
 
 interface RouteContext {
   params: Promise<{ candidateId: string }>;
@@ -35,7 +36,7 @@ type ImageLinkInput = {
   sortOrder?: number;
 };
 
-export const POST = withApiErrors(async function POST(req: NextRequest, { params }: RouteContext) {
+export const POST = withApiErrors(exclusiveJob(CONTENT_JOB, async function POST(req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
   if (!session) return new ForbiddenError("Forbidden").toResponse();
 
@@ -177,4 +178,4 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
 
   const updatedTarget = await prisma.ingestQuestionCandidate.findUnique({ where: { id: targetId } });
   return NextResponse.json({ ok: true, target: updatedTarget, warnings, cleanedOfficialQuestionId });
-});
+}));

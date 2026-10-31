@@ -6,12 +6,13 @@ import prisma from "@/lib/prisma";
 import { normalizeIngestDifficulty } from "@/lib/ingest-promotion";
 import { ApiError, BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 import { promotionSourceId } from "@/lib/content-source";
+import { CONTENT_JOB, exclusiveJob } from "@/lib/job-lock";
 
 interface RouteContext {
   params: Promise<{ batchId: string }>;
 }
 
-export const POST = withApiErrors(async function POST(req: NextRequest, { params }: RouteContext) {
+export const POST = withApiErrors(exclusiveJob(CONTENT_JOB, async function POST(req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
   if (!session) return new ForbiddenError("Forbidden").toResponse();
 
@@ -120,4 +121,4 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
   });
 
   return NextResponse.json({ practiceSet, questionCount: questionIds.length, totalSourceCandidates, partial });
-});
+}));

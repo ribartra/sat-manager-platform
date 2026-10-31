@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { contentScopeFor, sameProgramQuestionsIssue } from "@/lib/program-scope";
 import { sourceIdIssue } from "@/lib/content-source";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
-import prisma from "@/lib/prisma";
+import prisma, { atomic } from "@/lib/prisma";
+import { assertSameVersion, expectedVersion } from "@/lib/edit-version";
 import { fullTestEditorFieldIssues } from "@/contracts/full-test";
 import { validateFullPracticeTestStructure } from "@/lib/full-test-validation";
 import { BadRequestError, ConflictError, ForbiddenError, NotFoundError, ValidationError, withApiErrors } from "@/lib/api-error";
@@ -86,7 +87,7 @@ export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }
   if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { testId } = await params;
-  const { name, number: requestedNumber, status, moduleQuestionIds, reviewEnabled, breakMinutes, sourceId: requestedSourceId } = await req.json();
+  const { name, number: requestedNumber, status, moduleQuestionIds, reviewEnabled, breakMinutes, sourceId: requestedSourceId, expectedUpdatedAt } = await req.json();
   const targetStatus = status ?? "DRAFT";
   const previous = await prisma.fullPracticeTest.findFirst({ where: { id: testId, ...contentScopeFor(session.user) } });
   if (!previous) return new NotFoundError("Test not found.").toResponse();
@@ -127,9 +128,12 @@ export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }
     Number.isInteger(breakMinutes) && breakMinutes >= 0 ? Number(breakMinutes) : previous.breakMinutes;
 
   const modules = await prisma.fullPracticeTestModule.findMany({ where: { testId }, orderBy: { order: "asc" } });
-  await prisma.$transaction([
-    ...modules.map((testModule) => prisma.fullPracticeTestQuestion.deleteMany({ where: { moduleId: testModule.id } })),
-    prisma.fullPracticeTest.update({
+  // One transaction; refused (409) when someone else saved this Test since the editor loaded it.
+  const saved = await atomic(async (db) => {
+    const current = await db.fullPracticeTest.findUniqueOrThrow({ where: { id: testId }, select: { updatedAt: true } });
+    assertSameVersion(current.updatedAt, expectedVersion(expectedUpdatedAt));
+    await db.fullPracticeTestQuestion.deleteMany({ where: { moduleId: { in: modules.map((testModule) => testModule.id) } } });
+    const updated = await db.fullPracticeTest.update({
       where: { id: testId },
       data: {
         name: name.trim(),
@@ -139,15 +143,15 @@ export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }
         reviewEnabled: reviewEnabled ?? previous.reviewEnabled,
         breakMinutes: resolvedBreak,
       },
-    }),
-    ...modules.flatMap((testModule, moduleIndex) =>
-      normalizedModules[moduleIndex].map((questionId, order) =>
-        prisma.fullPracticeTestQuestion.create({
-          data: { moduleId: testModule.id, questionId, order, isPretest: order < 2 },
-        }),
+      select: { updatedAt: true },
+    });
+    await db.fullPracticeTestQuestion.createMany({
+      data: modules.flatMap((testModule, moduleIndex) =>
+        normalizedModules[moduleIndex].map((questionId, order) => ({ moduleId: testModule.id, questionId, order, isPretest: order < 2 })),
       ),
-    ),
-  ]);
+    });
+    return updated;
+  });
 
   await prisma.auditLog.create({
     data: {
@@ -159,7 +163,7 @@ export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }
     },
   });
 
-  return NextResponse.json({ ok: true, warnings: validation.warnings });
+  return NextResponse.json({ ok: true, warnings: validation.warnings, updatedAt: saved.updatedAt.toISOString() });
 });
 
 export const DELETE = withApiErrors(async function DELETE(_req: NextRequest, { params }: RouteContext) {

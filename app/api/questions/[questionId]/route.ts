@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { contentScopeFor } from "@/lib/program-scope";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
-import prisma from "@/lib/prisma";
+import prisma, { atomic } from "@/lib/prisma";
+import { assertSameVersion, expectedVersion } from "@/lib/edit-version";
 import { questionEditorIssues } from "@/contracts/question";
 import { validateQuestionPayload } from "@/lib/content-validation";
 import { materializeOfficialImageUrl } from "@/lib/ingest-promotion";
@@ -71,7 +72,7 @@ export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }
   }
 
   const { questionId } = await params;
-  const { topicId, subskillId, difficulty, type, stem, stimulus, explanation, imageUrl, supportsGraph, correctAnswer, status, options } = await req.json();
+  const { topicId, subskillId, difficulty, type, stem, stimulus, explanation, imageUrl, supportsGraph, correctAnswer, status, options, expectedUpdatedAt } = await req.json();
   const previous = await prisma.question.findFirst({
     where: { id: questionId, ...contentScopeFor(session.user) },
     select: { status: true, topicId: true, difficulty: true, type: true },
@@ -101,37 +102,43 @@ export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }
       )
     : options;
 
-  await prisma.questionOption.deleteMany({ where: { questionId } });
+  // Options and question in one transaction (a failure can't leave the question without options);
+  // refused (409) when someone else saved this question since the editor loaded it.
+  const question = await atomic(async (db) => {
+    const current = await db.question.findUniqueOrThrow({ where: { id: questionId }, select: { updatedAt: true } });
+    assertSameVersion(current.updatedAt, expectedVersion(expectedUpdatedAt));
+    await db.questionOption.deleteMany({ where: { questionId } });
 
-  const question = await prisma.question.update({
-    where: { id: questionId },
-    data: {
-      topicId,
-      subskillId: subskillId || null,
-      difficulty,
-      type,
-      stem,
-      stimulus: stimulus || null,
-      explanation: explanation || null,
-      imageUrl: officialImageUrl || null,
-      supportsGraph: Boolean(supportsGraph),
-      correctAnswer,
-      status,
-      options:
-        type === "MC"
-          ? {
-              create: officialOptions
-                .filter((o: { text?: string; imageUrl?: string | null }) =>
-                  Boolean(o.text?.trim() || o.imageUrl?.trim()),
-                )
-                .map((o: { label: string; text?: string; imageUrl?: string | null }) => ({
-                  label: o.label,
-                  text: o.text ?? "",
-                  imageUrl: o.imageUrl || null,
-                })),
-            }
-          : undefined,
-    },
+    return db.question.update({
+      where: { id: questionId },
+      data: {
+        topicId,
+        subskillId: subskillId || null,
+        difficulty,
+        type,
+        stem,
+        stimulus: stimulus || null,
+        explanation: explanation || null,
+        imageUrl: officialImageUrl || null,
+        supportsGraph: Boolean(supportsGraph),
+        correctAnswer,
+        status,
+        options:
+          type === "MC"
+            ? {
+                create: officialOptions
+                  .filter((o: { text?: string; imageUrl?: string | null }) =>
+                    Boolean(o.text?.trim() || o.imageUrl?.trim()),
+                  )
+                  .map((o: { label: string; text?: string; imageUrl?: string | null }) => ({
+                    label: o.label,
+                    text: o.text ?? "",
+                    imageUrl: o.imageUrl || null,
+                  })),
+              }
+            : undefined,
+      },
+    });
   });
 
   const auditAction =

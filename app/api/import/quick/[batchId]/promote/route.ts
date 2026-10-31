@@ -10,6 +10,7 @@ import { testModuleIndex } from "@/lib/quick-import";
 import { promoteCandidates } from "@/lib/ingest-promote-candidates";
 import { promotionSourceId } from "@/lib/content-source";
 import { FULL_TEST_MODULES, difficultyFromFullTestModuleKey, fullTestTopicIdFor, moduleKeyFromOrder } from "@/lib/full-test-modules";
+import { CONTENT_JOB, exclusiveJob } from "@/lib/job-lock";
 
 type Ctx = { params: Promise<{ batchId: string }> };
 
@@ -18,7 +19,7 @@ const ARTIFACT_KEY = (batchId: string) => `quick:${batchId}`;
 // POST /api/import/quick/[batchId]/promote — { allowPartial? }: step 3 done → the reviewed questions
 // become official (Draft) questions in ONE new Practice Set or Test, under the import's source.
 // Questions still "needs review" stay out unless allowPartial (then the Draft is partial).
-export const POST = withApiErrors(async function POST(req: NextRequest, { params }: Ctx) {
+export const POST = withApiErrors(exclusiveJob(CONTENT_JOB, async function POST(req: NextRequest, { params }: Ctx) {
   const session = await assertContentImporter();
   const { batchId } = await params;
   const { batch, target, questionFile } = await loadQuickBatch(batchId, session.user);
@@ -127,4 +128,4 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
     questions: questionIds.length,
     leftOut: pending.length + result.errors.length + result.skipped.length,
   });
-});
+}));

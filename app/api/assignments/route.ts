@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
-import prisma from "@/lib/prisma";
-import { parseDueDate, parseUnlockDate, upsertPracticeAssignment, type AssignmentOutcome } from "@/lib/assignments";
+import prisma, { atomicBatches } from "@/lib/prisma";
+import { ASSIGN_BATCH_SIZE, parseDueDate, resolveOpenDate, parseUnlockDate, upsertPracticeAssignment, type AssignmentOutcome } from "@/lib/assignments";
 import { contentScopeFor, studentAccessWhereFor } from "@/lib/program-scope";
 import { BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 import { writeAudit } from "@/lib/audit";
@@ -91,7 +91,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
         update: {
           assignedById: session.user.id,
           dueDate: resolvedDueDate,
-          unlockAt: resolvedUnlockAt,
+          unlockAt: resolveOpenDate(resolvedUnlockAt, new Date(), resolvedLocked),
           locked: resolvedLocked,
           showExplanations: resolvedShowExplanations,
         },
@@ -100,7 +100,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
           practiceSetId,
           assignedById: session.user.id,
           dueDate: resolvedDueDate,
-          unlockAt: resolvedUnlockAt,
+          unlockAt: resolveOpenDate(resolvedUnlockAt, new Date(), resolvedLocked),
           locked: resolvedLocked,
           showExplanations: resolvedShowExplanations,
         },
@@ -123,25 +123,25 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
 
   // Assigning again never duplicates: pending assignments get the new settings,
   // completed/overdue ones are reopened (see upsertPracticeAssignment).
+  // Written in batches of ASSIGN_BATCH_SIZE pairs per transaction (assignment, notification, audit).
   const counts: Record<AssignmentOutcome, number> = { created: 0, updated: 0, reassigned: 0, unchanged: 0 };
-  for (const studentId of requestedStudentIds) {
-    for (const practiceSetId of requestedPracticeSetIds) {
-      const practiceSet = publishedPracticeSets.find((set) => set.id === practiceSetId);
-      const { outcome } = await upsertPracticeAssignment({
-        studentId,
-        practiceSetId,
-        practiceSetName: practiceSet?.name ?? "A practice set was assigned.",
-        assignedById: session.user.id,
-        dueDate: resolvedDueDate,
-        unlockAt: resolvedUnlockAt,
-        locked: resolvedLocked,
-        feedbackMode: resolvedFeedbackMode,
-        showExplanations: resolvedShowExplanations,
-        sourceGroupId: sourceGroupId ?? null,
-      });
-      counts[outcome] += 1;
-    }
-  }
+  const setNames = new Map(publishedPracticeSets.map((set) => [set.id, set.name]));
+  const pairs = requestedStudentIds.flatMap((studentId) => requestedPracticeSetIds.map((practiceSetId) => ({ studentId, practiceSetId })));
+  await atomicBatches(pairs, ASSIGN_BATCH_SIZE, async ({ studentId, practiceSetId }) => {
+    const { outcome } = await upsertPracticeAssignment({
+      studentId,
+      practiceSetId,
+      practiceSetName: setNames.get(practiceSetId) ?? "A practice set was assigned.",
+      assignedById: session.user.id,
+      dueDate: resolvedDueDate,
+      unlockAt: resolvedUnlockAt,
+      locked: resolvedLocked,
+      feedbackMode: resolvedFeedbackMode,
+      showExplanations: resolvedShowExplanations,
+      sourceGroupId: sourceGroupId ?? null,
+    });
+    counts[outcome] += 1;
+  });
 
   // `skipped` kept for older clients: assignments that needed no change.
   return NextResponse.json({ ...counts, skipped: counts.unchanged });

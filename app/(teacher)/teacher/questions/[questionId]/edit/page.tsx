@@ -50,6 +50,7 @@ export default async function EditQuestionPage({ params }: PageProps) {
         showGraphOption={showGraphOption}
         initial={{
           id: question.id,
+          updatedAt: question.updatedAt.toISOString(),
           topicId: question.topicId,
           subskillId: question.subskillId,
           difficulty: question.difficulty,

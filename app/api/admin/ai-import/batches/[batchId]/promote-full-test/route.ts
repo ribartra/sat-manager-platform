@@ -15,6 +15,7 @@ import {
 } from "@/lib/full-test-modules";
 import { ApiError, BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 import { promotionSourceId } from "@/lib/content-source";
+import { CONTENT_JOB, exclusiveJob } from "@/lib/job-lock";
 
 interface RouteContext {
   params: Promise<{ batchId: string }>;
@@ -22,7 +23,7 @@ interface RouteContext {
 
 const EXPECTED_MODULE_COUNTS = FULL_TEST_EXPECTED_COUNTS;
 
-export const POST = withApiErrors(async function POST(req: Request, { params }: RouteContext) {
+export const POST = withApiErrors(exclusiveJob(CONTENT_JOB, async function POST(req: Request, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
   if (!session) return new ForbiddenError("Forbidden").toResponse();
 
@@ -123,13 +124,13 @@ export const POST = withApiErrors(async function POST(req: Request, { params }: 
         where: { id: existingArtifact.artifactId },
         data: { name: testName, number: testNumber, status: "DRAFT" },
       });
+      // One insert per module (was one per question) keeps the transaction short.
       for (const testModule of existingModules) {
         const ids = moduleQuestionIds[testModule.order] ?? [];
-        for (const [order, questionId] of ids.entries()) {
-          await tx.fullPracticeTestQuestion.create({
-            data: { moduleId: testModule.id, questionId, order, isPretest: order < 2 },
-          });
-        }
+        if (ids.length === 0) continue;
+        await tx.fullPracticeTestQuestion.createMany({
+          data: ids.map((questionId, order) => ({ moduleId: testModule.id, questionId, order, isPretest: order < 2 })),
+        });
       }
       return tx.fullPracticeTest.findUniqueOrThrow({ where: { id: existingArtifact.artifactId } });
     }
@@ -199,4 +200,4 @@ export const POST = withApiErrors(async function POST(req: Request, { params }: 
   });
 
   return NextResponse.json({ test, moduleCounts, missingByModule, modules, partial });
-});
+}));

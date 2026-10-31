@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { contentScopeFor, sameProgramQuestionsIssue } from "@/lib/program-scope";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
-import prisma from "@/lib/prisma";
+import prisma, { atomic } from "@/lib/prisma";
+import { assertSameVersion, expectedVersion } from "@/lib/edit-version";
 import { practiceSetEditorIssues } from "@/contracts/practice-set";
 import { sourceIdIssue } from "@/lib/content-source";
 import { validatePracticeSetPayload } from "@/lib/content-validation";
@@ -73,7 +74,7 @@ export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }
   }
 
   const { practiceSetId } = await params;
-  const { name, topicId, difficulty, status, explanationVisibility, questionIds, sourceId: requestedSourceId } = await req.json();
+  const { name, topicId, difficulty, status, explanationVisibility, questionIds, sourceId: requestedSourceId, expectedUpdatedAt } = await req.json();
   const previous = await prisma.practiceSet.findFirst({
     where: { id: practiceSetId, ...contentScopeFor(session.user) },
     select: { status: true, topicId: true, difficulty: true, programId: true, sourceId: true },
@@ -102,16 +103,21 @@ export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }
     return new ValidationError("Validation failed.", validationErrors).toResponse();
   }
 
-  await prisma.$transaction([
-    prisma.practiceSetQuestion.deleteMany({ where: { practiceSetId } }),
-    prisma.practiceSet.update({
+  // One transaction; refused (409) when someone else saved this set since the editor loaded it.
+  const saved = await atomic(async (db) => {
+    const current = await db.practiceSet.findUniqueOrThrow({ where: { id: practiceSetId }, select: { updatedAt: true } });
+    assertSameVersion(current.updatedAt, expectedVersion(expectedUpdatedAt));
+    await db.practiceSetQuestion.deleteMany({ where: { practiceSetId } });
+    const updated = await db.practiceSet.update({
       where: { id: practiceSetId },
       data: { name, topicId, difficulty, status, explanationVisibility, sourceId },
-    }),
-    ...((questionIds as string[]).map((questionId, order) =>
-      prisma.practiceSetQuestion.create({ data: { practiceSetId, questionId, order } })
-    )),
-  ]);
+      select: { updatedAt: true },
+    });
+    await db.practiceSetQuestion.createMany({
+      data: (questionIds as string[]).map((questionId, order) => ({ practiceSetId, questionId, order })),
+    });
+    return updated;
+  });
 
   const auditAction =
     previous?.status !== "PUBLISHED" && status === "PUBLISHED"
@@ -138,7 +144,7 @@ export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }
     },
   });
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, updatedAt: saved.updatedAt.toISOString() });
 });
 
 export const DELETE = withApiErrors(async function DELETE(_req: NextRequest, { params }: RouteContext) {

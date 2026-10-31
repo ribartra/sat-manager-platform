@@ -204,6 +204,7 @@ export default async function FullTestDetailPage({ params, searchParams }: PageP
           mediaLinks={(await requireContentImporter()) ? await contentMediaLinks("tests", test.id, test.modules.flatMap((module) => module.questions.map((item) => item.questionId))) : null}
           initial={{
             id: test.id,
+            updatedAt: test.updatedAt.toISOString(),
             name: test.name,
             number: test.number,
             status: test.status,

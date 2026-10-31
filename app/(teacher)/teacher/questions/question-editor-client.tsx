@@ -60,6 +60,8 @@ interface TopicInfo {
 
 interface QuestionData {
   id?: string;
+  /** Version loaded by the editor; the save is refused (409) if someone else saved since. */
+  updatedAt?: string;
   topicId?: string;
   subskillId?: string | null;
   difficulty?: string;
@@ -256,6 +258,7 @@ export function QuestionEditor({
       status: values.status,
       options: values.type === "MC" ? values.options : [],
       ingestCandidateId: sourceContext?.ingestCandidateId,
+      expectedUpdatedAt: initial?.updatedAt,
     };
     const url = initial?.id ? `/api/questions/${initial.id}` : "/api/questions";
     const method = initial?.id ? "PUT" : "POST";
