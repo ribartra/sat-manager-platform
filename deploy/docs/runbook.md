@@ -45,6 +45,13 @@ El entrypoint del contenedor **no arranca si `prisma migrate deploy` falla**, de
 migración rota termina en rollback automático en lugar de servir código nuevo sobre un esquema
 viejo. Después de la migración corre `scripts/backfill-fpt-snapshots.mjs` (idempotente).
 
+### Cambios de datos
+
+Van como data patches en `prisma/data-patches/`. El entrypoint los aplica en cada release
+(`[entrypoint] data patches ...` en el log), una vez y en una transacción. Si uno falla, el
+contenedor no arranca y `deploy.sh` vuelve al TAG anterior. El registro de lo aplicado está en
+`AppSetting` (`DATA_PATCH:<archivo>`). Nunca se hacen `UPDATE` a mano en la VM.
+
 ### Archivos de la VM (compose, Caddyfile, scripts, Ops Agent, cron)
 
 Se editan en `deploy/vm/` y nunca a mano en la VM:

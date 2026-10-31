@@ -2,7 +2,7 @@
 # Replaces the local ./dev.db with a fresh copy of the production database.
 #   1. on the VM: sat-db-backup.sh (consistent sqlite3 .backup + integrity_check -> gs://<data>/backups/)
 #   2. download that copy to ./backups/prod-pull-<date>.db
-#   3. local safety copy (npm run db:backup), restore (npm run db:restore), migrate deploy
+#   3. local safety copy (npm run db:backup), restore (npm run db:restore), migrate deploy, data patches
 #   4. drop *_ENCRYPTED settings: encrypted with the production key, unreadable locally
 # Stop `npm run dev` / docker compose first: replacing dev.db under a running server corrupts it.
 # The result holds REAL user data: never commit dev.db.
@@ -34,4 +34,5 @@ console.log("integrity ok; encrypted settings removed:", removed);
 npm run -s db:backup
 BACKUP_FILE="$target" npm run -s db:restore
 npx prisma migrate deploy
-log "dev.db is now production as of $(basename "$object") (+ local migrations). Do not commit it."
+npm run -s db:patch
+log "dev.db is now production as of $(basename "$object") + the migrations and data patches pending in this repo. Do not commit it."

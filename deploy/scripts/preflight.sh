@@ -8,8 +8,17 @@ fail=0
 check() { if eval "$2" >/dev/null 2>&1; then echo "PASS $1"; else echo "FAIL $1"; fail=1; fi; }
 
 check "terraform fmt" "terraform fmt -check -recursive terraform"
+# Own data dir per root: validation never touches the real backend (no credentials needed).
+tf_validate() {
+  local data rc
+  data=$(mktemp -d)
+  TF_DATA_DIR="$data" terraform -chdir="$1" init -backend=false -input=false && TF_DATA_DIR="$data" terraform -chdir="$1" validate
+  rc=$?
+  rm -rf "$data"
+  return $rc
+}
 for root in terraform/bootstrap terraform/environments/prod; do
-  check "terraform validate $root" "terraform -chdir=$root init -backend=false -input=false && terraform -chdir=$root validate"
+  check "terraform validate $root" "tf_validate $root"
 done
 
 for script in vm/*.sh scripts/*.sh; do check "bash -n $script" "bash -n $script"; done

@@ -7,7 +7,7 @@ TOKEN   = GOOGLE_OAUTH_ACCESS_TOKEN=$$(gcloud auth print-access-token)
 TF      = $(TOKEN) terraform -chdir=terraform/environments/prod
 TFVARS  := -var-file=prod.tfvars
 
-.PHONY: help preflight bootstrap init plan apply build release rollback current sync-stack pull-db secrets ssh health
+.PHONY: help preflight bootstrap init plan apply build release rollback current sync-stack pull-db db-compare db-patch-status secrets ssh health
 
 help: ## list targets
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-12s %s\n", $$1, $$2}'
@@ -47,6 +47,12 @@ sync-stack: ## install deploy/vm/* on the VM and apply it (after make apply)
 
 pull-db: ## replace local dev.db with a fresh production copy (stop the dev server first)
 	scripts/pull-db-from-prod.sh
+
+db-compare: ## compare local dev.db with a fresh production copy (replaces nothing)
+	scripts/compare-with-prod.sh
+
+db-patch-status: ## data patches (prisma/data-patches) applied / pending in local dev.db
+	cd .. && npm run -s db:patch:status
 
 secrets: ## load secret values into Secret Manager (only missing ones unless FORCE=1)
 	scripts/load-secrets.sh

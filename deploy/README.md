@@ -69,10 +69,30 @@ make sync-stack     # instala vm/* en la VM y aplica (compose up -d + caddy relo
 **Regla:** si `make plan` muestra que algo se *destruye* o se *reemplaza*, no se aplica. La VM, el
 disco, la IP, los buckets y el registro tienen `prevent_destroy`.
 
+## Cambios de datos (sin tocar el esquema)
+
+Los cambios de datos (corregir contenido, rellenar un campo) son **data patches** en
+`prisma/data-patches/`: un `.sql` o un `.mjs` por cambio, solo DML. Cada deploy aplica los
+pendientes al arrancar, una sola vez y dentro de una transacción. Si uno falla, el contenedor no
+arranca y la versión vuelve atrás sola. El esquema solo cambia con una migración de Prisma, y solo
+cuando no hay otra forma.
+
+```bash
+make pull-db                       # local = producción
+# escribir prisma/data-patches/YYYYMMDDHHMM_<qué>.sql (con -- expect: <filas>)
+cd .. && npm run db:patch          # aplicarlo en local y revisar el resultado
+cd deploy && make build && make release TAG=…   # producción lo aplica al arrancar
+make db-compare                    # local y producción deben salir IDENTICAL
+```
+
+Detalles y reglas: `prisma/data-patches/README.md`. Nunca se ejecutan `UPDATE` a mano en la VM.
+
 ## Otras tareas
 
 ```bash
-make pull-db        # copia fresca de producción → ./dev.db (para el servidor local antes)
+make pull-db        # copia fresca de producción → ./dev.db (+ migraciones y data patches pendientes)
+make db-compare     # compara ./dev.db con producción sin reemplazar nada
+make db-patch-status  # data patches aplicados / pendientes en ./dev.db
 make secrets        # carga en Secret Manager los secretos que falten (FORCE=1 reescribe)
 make ssh            # shell en la VM por IAP
 scripts/push-db-to-cloud.sh   # sube una base local a producción (destructivo; ver el script)

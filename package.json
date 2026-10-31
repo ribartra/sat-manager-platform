@@ -23,6 +23,8 @@
     "db:reset": "prisma migrate reset --force && tsx prisma/seed.ts",
     "db:backup": "node scripts/backup-db.mjs",
     "db:restore": "node scripts/restore-db.mjs",
+    "db:patch": "node scripts/apply-data-patches.mjs",
+    "db:patch:status": "node scripts/apply-data-patches.mjs --status",
     "db:align-ingest-taxonomy": "node scripts/align-ingest-taxonomy.mjs",
     "notifications:generate": "tsx scripts/generate-notifications.ts",
     "sample:promote": "tsx scripts/promote-ingest-sample.ts",

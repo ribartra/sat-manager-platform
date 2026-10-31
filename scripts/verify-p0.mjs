@@ -287,6 +287,21 @@ const checks = [
     forbids: ['CMD ["npm", "run", "start"]'],
     label: "next es el proceso principal (recibe SIGTERM)",
   },
+  {
+    file: "deploy/vm/web-entrypoint.sh",
+    requires: ["node scripts/apply-data-patches.mjs", "data patch FAILED - refusing to start"],
+    label: "Cada deploy aplica los data patches pendientes y no arranca si uno falla",
+  },
+  {
+    file: "Dockerfile",
+    requires: ["COPY --from=build /app/scripts/apply-data-patches.mjs ./scripts/apply-data-patches.mjs"],
+    label: "La imagen lleva el runner de data patches",
+  },
+  {
+    file: "scripts/apply-data-patches.mjs",
+    requires: ['db.exec("BEGIN IMMEDIATE")', "DATA_STATEMENT", "patches are immutable", "expected ${expect} rows changed"],
+    label: "Data patches: una transaccion por patch, solo DML, inmutables, con guarda de filas",
+  },
   // Results by skill (SAT-039/040/041): no Low performance, no summary card, no matrix, no Assign in results.
   {
     file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
@@ -1300,6 +1315,28 @@ const checks = [
 ];
 
 let hasFailures = false;
+
+// Schema stays stable: migrations after this one are schema-only. Data changes go in
+// prisma/data-patches/ (applied by every deploy). A migration that really needs DML says why with
+// a `-- data-in-migration: <reason>` line.
+{
+  const { readdir } = await import("node:fs/promises");
+  const LAST_MIXED_MIGRATION = "20261105_single_open_pause_unlock_request";
+  const later = (await readdir(path.join(root, "prisma/migrations"))).filter((name) => /^\d/.test(name) && name > LAST_MIXED_MIGRATION);
+  const offenders = [];
+  for (const name of later) {
+    const sql = await readFile(path.join(root, "prisma/migrations", name, "migration.sql"), "utf8");
+    const code = sql.replace(/'(?:[^']|'')*'/g, "''").replace(/--[^\n]*/g, "");
+    if (/^\s*(UPDATE|INSERT|DELETE|REPLACE)\b/im.test(code) && !/^--\s*data-in-migration:\s*\S/m.test(sql)) offenders.push(name);
+  }
+  if (offenders.length === 0) {
+    console.log(`PASS - Migraciones nuevas solo de esquema (los datos van en prisma/data-patches): ${later.length} revisadas`);
+  } else {
+    hasFailures = true;
+    console.error("FAIL - Migraciones nuevas con cambios de datos (muevelos a prisma/data-patches o justifica con -- data-in-migration:)");
+    for (const name of offenders) console.error(`  ${name}`);
+  }
+}
 
 for (const check of checks) {
   const absolutePath = path.join(root, check.file);

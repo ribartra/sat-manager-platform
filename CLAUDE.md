@@ -31,6 +31,8 @@ Docker: `docker-compose.yml` runs `web` (:3000) and `ingest-service` (:8000) sha
 
 Deployment lives in `deploy/` (see `deploy/README.md`): Terraform for GCP under `deploy/terraform/` (modules + `environments/prod`, GCS state, production imported in `imports.tf`; `make plan` must never show a destroy/replace), VM files in `deploy/vm/` (installed by `apply-stack.sh`), and `make build` / `make release TAG=…` / `make rollback` from `deploy/`. `make preflight` runs the offline checks. Never commit `dev.db` (it can hold a production copy).
 
+**Schema stays stable; data changes are data patches.** Any data change (content fixes, backfills, normalizing values) is a file in `prisma/data-patches/` (`YYYYMMDDHHMM_name.sql|.mjs`, DML only, `-- expect: <rows>` guard, guarded `WHERE` on id + previous value), applied once per database by `scripts/apply-data-patches.mjs`: on every deploy by the web entrypoint (a failing patch stops the container → automatic rollback) and locally with `npm run db:patch`. The ledger is `AppSetting` keys `DATA_PATCH:<file>` (no extra table). Never put DML in a new Prisma migration (`qa:p0` fails after `20261105_…` unless `-- data-in-migration: <reason>`), never run `UPDATE`s by hand on the VM, never edit an applied patch. Local `dev.db` mirrors production: `cd deploy && make pull-db`; check with `make db-compare`. See `prisma/data-patches/README.md`.
+
 ## Architecture
 
 **Prisma client is generated to `app/generated/prisma/`, not `@prisma/client`.** Import from `@/app/generated/prisma/client`. Always run `prisma:generate` after editing `prisma/schema.prisma`. `lib/prisma.ts` wires the `better-sqlite3` adapter and is a singleton in prod but fresh-per-call in dev (so HMR never serves a stale generated client).
