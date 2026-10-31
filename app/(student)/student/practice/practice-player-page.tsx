@@ -11,6 +11,7 @@ import { getPublicCalculatorConfig } from "@/lib/calculator-config";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { extractQuestionGraphArtifacts } from "@/lib/question-graph";
 import { writeAudit } from "@/lib/audit";
+import { claimWriteSlot, RESUME_AUDIT_INTERVAL_MS } from "@/lib/write-throttle";
 import { withSqliteRetry } from "@/lib/sqlite-retry";
 import { isUniqueConstraintError } from "@/lib/db-errors";
 import { gradeCheck, type CheckResult } from "@/lib/immediate-check";
@@ -201,7 +202,9 @@ export async function renderPracticePlayer({
       outcome: "success",
       metadata: { practiceSetId: setId, assignmentId: assignmentId ?? null, attemptNumber: attempt.attemptNumber },
     });
-  } else if (attempt) {
+    claimWriteSlot(`resumed:${attempt.id}`, RESUME_AUDIT_INTERVAL_MS);
+  } else if (attempt && claimWriteSlot(`resumed:${attempt.id}`, RESUME_AUDIT_INTERVAL_MS)) {
+    // Logged once per sitting, not on every page load.
     await writeAudit({
       userId,
       action: "ATTEMPT_RESUMED",

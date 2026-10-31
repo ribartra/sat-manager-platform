@@ -40,6 +40,50 @@ export function clearBuffer(key: string) {
   }
 }
 
+function sameValue(a: unknown, b: unknown) {
+  return JSON.stringify(a) === JSON.stringify(b);
+}
+
+function sameList(a: unknown, b: unknown) {
+  return Array.isArray(a) && Array.isArray(b) ? sameValue([...a].sort(), [...b].sort()) : sameValue(a, b);
+}
+
+/**
+ * Autosave sends only what changed since the last payload the server confirmed (`confirmed`), so a
+ * save writes one or two questions instead of the whole attempt.
+ *  - `maps` (per-question records: answers, notes, …): only the changed ids; an id removed since
+ *    the confirmed payload is sent with the given empty value so the server clears it.
+ *  - `lists` (full sets such as the marked ids): sent whole, and only when they changed.
+ *  - every other field (position, timers) is always sent.
+ * With no confirmed payload the full payload is sent. A save that fails leaves `confirmed` as it was,
+ * so the next delta carries its changes again; resending a change is harmless (same values).
+ */
+export function autosaveDelta<T extends object>(
+  next: T,
+  confirmed: T | null,
+  maps: Partial<Record<keyof T, unknown>>,
+  lists: Array<keyof T> = [],
+): Partial<T> {
+  if (!confirmed) return next;
+  const delta: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(next)) {
+    const before = (confirmed as Record<string, unknown>)[key];
+    if (key in maps) {
+      const current = (value ?? {}) as Record<string, unknown>;
+      const previous = (before ?? {}) as Record<string, unknown>;
+      const changed: Record<string, unknown> = {};
+      for (const [id, item] of Object.entries(current)) if (!sameValue(item, previous[id])) changed[id] = item;
+      for (const id of Object.keys(previous)) if (!(id in current)) changed[id] = maps[key as keyof T];
+      if (Object.keys(changed).length) delta[key] = changed;
+    } else if (lists.includes(key as keyof T)) {
+      if (!sameList(value, before)) delta[key] = value;
+    } else {
+      delta[key] = value;
+    }
+  }
+  return delta as Partial<T>;
+}
+
 /** Runs saves one after another so an older payload can never land after a newer one. */
 export function useSaveQueue() {
   const tail = useRef<Promise<unknown>>(Promise.resolve());

@@ -16,7 +16,7 @@ import type { GraphArtifact } from "@/lib/question-graph";
 import { Calculator, ChevronLeft, ChevronRight, FileText, Flag, Highlighter, List as ListIcon, LogOut, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { OfflineBanner, SaveIndicator, type SaveStatus } from "@/components/sat";
-import { clearBuffer, readBuffer, sendKeepalive, useOnlineStatus, usePageHideFlush, useSaveQueue, writeBuffer } from "@/lib/player-persistence";
+import { autosaveDelta, clearBuffer, readBuffer, sendKeepalive, useOnlineStatus, usePageHideFlush, useSaveQueue, writeBuffer } from "@/lib/player-persistence";
 import { exitPlayerOnAuthLoss, isAuthFailureStatus } from "@/lib/player-session-exit";
 import { fetchWithTransientRetry } from "@/lib/transient-fetch";
 import { errorMessage, readApiError } from "@/lib/api-client";
@@ -102,6 +102,10 @@ function buildPayload(
   };
 }
 
+/** Per-question fields sent as a delta (removed ids are cleared with these values) and full lists. */
+const DELTA_MAPS = { answers: "", timeSpentByQuestion: 0, notes: "", eliminatedOptions: [] } as const;
+const DELTA_LISTS: Array<keyof AutosavePayload> = ["markedQuestionIds"];
+
 export function PracticeSetPlayer({
   attemptId,
   questions,
@@ -154,6 +158,19 @@ export function PracticeSetPlayer({
   const questionStartTime = useRef<number | null>(null);
   const timeSpentByQuestion = useRef<Record<string, number>>({ ...savedTimeSpent });
   const enqueueSave = useSaveQueue();
+  // What the server holds (the props, then each confirmed save): autosave sends only the difference.
+  const [initialSaved] = useState(() =>
+    buildPayload(
+      savedAnswers,
+      savedQuestion,
+      savedTime,
+      new Set(savedMarked),
+      savedNotes,
+      Object.fromEntries(Object.entries(savedEliminated).map(([id, labels]) => [id, new Set(labels)])),
+      { ...savedTimeSpent },
+    ),
+  );
+  const confirmedPayload = useRef<AutosavePayload | null>(initialSaved);
   const confirm = useConfirm();
   const online = useOnlineStatus();
 
@@ -199,13 +216,14 @@ export function PracticeSetPlayer({
           const response = await fetchWithTransientRetry(`/api/attempts/${attemptId}/autosave`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
+            body: JSON.stringify(autosaveDelta(payload, confirmedPayload.current, DELTA_MAPS, DELTA_LISTS)),
           });
           if (isAuthFailureStatus(response.status)) {
             await exitPlayerOnAuthLoss({ pauseUrl: `/api/attempts/${attemptId}/pause` });
             return;
           }
           if (!response.ok) throw new Error("Autosave failed");
+          confirmedPayload.current = payload;
           clearBuffer(offlineKey);
           setSaving("saved");
           setTimeout(() => setSaving("idle"), 2000);

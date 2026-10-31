@@ -21,7 +21,7 @@ import { fetchWithTransientRetry } from "@/lib/transient-fetch";
 import { readApiError } from "@/lib/api-client";
 import type { CheckResult } from "@/lib/immediate-check";
 import { notify } from "@/lib/notify-ui";
-import { clearBuffer, readBuffer, sendKeepalive, useOnlineStatus, usePageHideFlush, useSaveQueue, writeBuffer } from "@/lib/player-persistence";
+import { autosaveDelta, clearBuffer, readBuffer, sendKeepalive, useOnlineStatus, usePageHideFlush, useSaveQueue, writeBuffer } from "@/lib/player-persistence";
 import { Calculator, ChevronLeft, FileText, Flag, Highlighter, LogOut } from "lucide-react";
 import { EliminateIcon, ReferenceSheet, StrikeButton, ToolButton, useQuestionHighlights } from "@/components/sat/player-tools";
 import { IssueReportButton } from "@/components/sat/issue-reporter";
@@ -67,6 +67,10 @@ interface FullTestAutosavePayload {
 function toLabelSets(value: Record<string, string[]>) {
   return Object.fromEntries(Object.entries(value).map(([id, labels]) => [id, new Set(labels)]));
 }
+
+/** Per-question fields sent as a delta (removed ids are cleared with these values) and full lists. */
+const DELTA_MAPS = { answers: "", timeSpentByQuestion: 0, notes: "", eliminatedOptions: [] } as const;
+const DELTA_LISTS: Array<keyof FullTestAutosavePayload> = ["markedQuestionIds"];
 
 function fromLabelSets(value: Record<string, Set<string>>) {
   return Object.fromEntries(Object.entries(value).map(([id, labels]) => [id, Array.from(labels)]));
@@ -202,6 +206,20 @@ export function FullTestPlayer({
   const expiredEventsRef = useRef(expiredEvents);
   const typingSaveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const enqueueSave = useSaveQueue();
+  // What the server holds (the props, then each confirmed save): autosave sends only the difference.
+  const [initialSaved] = useState<FullTestAutosavePayload>(() => ({
+    answers: savedAnswers,
+    currentModule: savedModule,
+    currentQuestion: savedQuestion,
+    timeExpiredEvents: savedExpiredEvents,
+    extraTimeUsed: savedExtraTimeUsed,
+    moduleTimerState: savedProgressState ?? { timers: [], phase: "MODULE", breakRemaining: 0 },
+    timeSpentByQuestion: { ...savedTimeSpent },
+    markedQuestionIds: [...savedMarked],
+    notes: savedNotes,
+    eliminatedOptions: savedEliminated,
+  }));
+  const confirmedPayload = useRef<FullTestAutosavePayload | null>(initialSaved);
   const online = useOnlineStatus();
 
   useEffect(() => {
@@ -299,7 +317,7 @@ export function FullTestPlayer({
           const response = await fetchWithTransientRetry(`/api/full-practice-tests/attempts/${attemptId}/autosave`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
+            body: JSON.stringify(autosaveDelta(payload, confirmedPayload.current, DELTA_MAPS, DELTA_LISTS)),
           });
           if (isAuthFailureStatus(response.status)) {
             await exitPlayerOnAuthLoss({
@@ -308,6 +326,7 @@ export function FullTestPlayer({
             return;
           }
           if (!response.ok) throw new Error("Autosave failed");
+          confirmedPayload.current = payload;
           clearBuffer(offlineKey);
           setSaving("saved");
           setTimeout(() => setSaving("idle"), 1500);
@@ -577,6 +596,8 @@ export function FullTestPlayer({
       notify.error(await readApiError(response, "We couldn't submit this module. Your answers are safe — please try again."));
       return null;
     }
+    // The module submit saved this full payload.
+    confirmedPayload.current = payload;
     clearBuffer(offlineKey);
     const data = (await response.json()) as { done?: boolean; completedModules?: number[] };
     completedRef.current = new Set(data.completedModules ?? [...completedRef.current, index]);

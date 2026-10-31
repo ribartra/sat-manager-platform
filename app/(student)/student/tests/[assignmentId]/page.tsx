@@ -8,6 +8,7 @@ import { getPublicCalculatorConfig } from "@/lib/calculator-config";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { extractQuestionGraphArtifacts } from "@/lib/question-graph";
 import { writeAudit } from "@/lib/audit";
+import { claimWriteSlot, RESUME_AUDIT_INTERVAL_MS } from "@/lib/write-throttle";
 import { isUniqueConstraintError } from "@/lib/db-errors";
 import { buildFullTestSnapshot, fullTestModulesForAttempt, fullTestModulesInclude } from "@/lib/full-test-snapshot";
 import { formatCorrectAnswer, isAnswerCorrect } from "@/lib/answer-grading";
@@ -104,7 +105,9 @@ export default async function FullTestPlayerPage({ params, searchParams }: PageP
       outcome: "success",
       metadata: { testId: assignment.testId, assignmentId: assignment.id },
     });
-  } else {
+    claimWriteSlot(`resumed:${attempt.id}`, RESUME_AUDIT_INTERVAL_MS);
+  } else if (claimWriteSlot(`resumed:${attempt.id}`, RESUME_AUDIT_INTERVAL_MS)) {
+    // Logged once per sitting, not on every page load (module switches and refreshes reload the page).
     await writeAudit({
       userId: session!.user.id,
       action: "FPT_ATTEMPT_RESUMED",

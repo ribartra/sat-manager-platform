@@ -122,6 +122,36 @@ const checks = [
     requires: ["await enqueueSave(() =>\n        fetchWithTransientRetry(`/api/full-practice-tests/attempts/${attemptId}/modules/${index}/submit`"],
     label: "Envio de modulo y del Test por la cola de guardado (despues del autoguardado pendiente)",
   },
+  {
+    file: "app/(student)/student/practice/player-client.tsx",
+    requires: ["autosaveDelta(payload, confirmedPayload.current", "confirmedPayload.current = payload;"],
+    label: "Autoguardado de practica envia solo lo cambiado desde el ultimo guardado confirmado",
+  },
+  {
+    file: "app/(student)/student/tests/[assignmentId]/player-client.tsx",
+    requires: ["autosaveDelta(payload, confirmedPayload.current", "confirmedPayload.current = payload;"],
+    label: "Autoguardado del Test envia solo lo cambiado desde el ultimo guardado confirmado",
+  },
+  {
+    file: "app/api/attempts/[attemptId]/autosave/route.ts",
+    requires: ["reviewMetaByQuestion(body", "One upsert per question"],
+    label: "Autoguardado de practica: una escritura por pregunta",
+  },
+  {
+    file: "lib/activity.ts",
+    requires: ["claimWriteSlot(key, ACTIVE_STAMP_INTERVAL_MS)"],
+    label: "lastActiveAt se escribe como mucho una vez por minuto por usuario",
+  },
+  {
+    file: "app/(student)/student/tests/[assignmentId]/page.tsx",
+    requires: ["claimWriteSlot(`resumed:${attempt.id}`, RESUME_AUDIT_INTERVAL_MS)"],
+    label: "Auditoria FPT_ATTEMPT_RESUMED una vez por sesion, no en cada carga",
+  },
+  {
+    file: "app/(student)/student/practice/practice-player-page.tsx",
+    requires: ["claimWriteSlot(`resumed:${attempt.id}`, RESUME_AUDIT_INTERVAL_MS)"],
+    label: "Auditoria ATTEMPT_RESUMED una vez por sesion, no en cada carga",
+  },
   // Results by skill (SAT-039/040/041): no Low performance, no summary card, no matrix, no Assign in results.
   {
     file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
