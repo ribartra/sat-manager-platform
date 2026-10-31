@@ -25,6 +25,8 @@
 # production
 /build
 /backups
+# Safety copies left by npm run db:restore / make pull-db (they hold real data).
+dev.db.pre-restore.*
 /.private
 
 # local database/runtime state
