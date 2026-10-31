@@ -31,6 +31,8 @@ interface PracticeSetInfo {
   sourceOrder: number;
   practiceArea: PracticeAreaCode | null;
   questionCount: number;
+  /** The student already has it: shown with the "ALREADY ASSIGNED" stamp, never selectable. */
+  assigned: boolean;
 }
 
 /** A set the student already has, opened from "Edit" to change its dates/settings (never re-assigned). */
@@ -65,7 +67,7 @@ interface GroupInfo {
 interface AssignFormProps {
   studentId: string;
   studentName: string;
-  /** Only the sets the student does NOT have yet (already assigned ones are never offered again). */
+  /** Every assignable set; the ones the student already has come with `assigned` (shown, not selectable). */
   practiceSets: PracticeSetInfo[];
   /** Non-empty = edit mode: change the settings of these already-assigned sets. */
   editing?: EditingSetInfo[];
@@ -98,7 +100,7 @@ export function AssignForm({
   const [target, setTarget] = useState<"student" | "group">("student");
   const [groupId, setGroupId] = useState(groups[0]?.id ?? "");
   const [selected, setSelected] = useState<Set<string>>(
-    () => new Set([...editing.map((set) => set.id), ...initialSelected.filter((id) => practiceSets.some((ps) => ps.id === id))]),
+    () => new Set([...editing.map((set) => set.id), ...initialSelected.filter((id) => practiceSets.some((ps) => ps.id === id && !ps.assigned))]),
   );
   // Due date one week from today, open today, answers at the end, explanations off; editing starts
   // from the set's stored settings.
@@ -134,6 +136,8 @@ export function AssignForm({
   const first = studentName.split(" ")[0];
   const backHref = `/teacher/students/${studentId}?area=${area}`;
   function toggleSelect(id: string) {
+    // Already assigned: never selected or cleared from here.
+    if (practiceSets.some((ps) => ps.id === id && ps.assigned)) return;
     setSelected((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
@@ -281,19 +285,26 @@ export function AssignForm({
               id: domain.id,
               name: domain.name,
               skills: domain.skills.map((skill): SkillsSourceSkill => {
-                const picked = skill.sets.filter((ps) => selected.has(ps.id)).length;
+                const toAssign = skill.sets.filter((ps) => !ps.assigned);
+                const assignedCount = skill.sets.length - toAssign.length;
+                const picked = toAssign.filter((ps) => selected.has(ps.id)).length;
                 const sources = [...new Map(skill.sets.map((ps) => [ps.sourceId, { id: ps.sourceId, name: ps.sourceName, order: ps.sourceOrder }])).values()].sort(
                   (a, b) => a.order - b.order || a.name.localeCompare(b.name),
                 );
                 return {
                   id: skill.id,
                   name: skill.name,
-                  sub: `${skill.sets.length} set${skill.sets.length === 1 ? "" : "s"} to assign${picked ? ` · ${picked} selected` : ""}`,
+                  sub: `${toAssign.length} set${toAssign.length === 1 ? "" : "s"} to assign${assignedCount ? ` · ${assignedCount} already assigned` : ""}${picked ? ` · ${picked} selected` : ""}`,
                   open: Boolean(needle) || picked > 0 || skill.id === openSkillId ? true : undefined,
                   chips: DIFFICULTIES.map((level): SkillsMapChip => {
-                    const count = skill.sets.filter((ps) => ps.difficulty === level).length;
-                    return count
-                      ? { difficulty: level, state: "available", title: `${count} set${count === 1 ? "" : "s"} to assign`, extra: <span className="text-[var(--sat-muted)]">{count} set{count === 1 ? "" : "s"}</span> }
+                    const count = toAssign.filter((ps) => ps.difficulty === level).length;
+                    const assignedAtLevel = skill.sets.filter((ps) => ps.difficulty === level && ps.assigned).length;
+                    if (count) {
+                      return { difficulty: level, state: "available", title: `${count} set${count === 1 ? "" : "s"} to assign`, extra: <span className="text-[var(--sat-muted)]">{count} set{count === 1 ? "" : "s"}</span> };
+                    }
+                    // Everything at this level is already assigned: say so instead of "—".
+                    return assignedAtLevel
+                      ? { difficulty: level, state: "available", assigned: true, title: `${assignedAtLevel} set${assignedAtLevel === 1 ? "" : "s"}`, extra: <span className="text-[var(--sat-muted)]">{assignedAtLevel} set{assignedAtLevel === 1 ? "" : "s"}</span> }
                       : { difficulty: level, state: "none", title: "Nothing to assign at this level" };
                   }),
                   rows: sources.map((source) => {
@@ -309,8 +320,7 @@ export function AssignForm({
                           label: ofLevel.length > 1 ? setNumber(ps.name) : undefined,
                           title: `${ps.name} · ${ps.questionCount} questions`,
                           extra: <span className="text-[var(--sat-muted)]">{ps.questionCount} Q</span>,
-                          selected: selected.has(ps.id),
-                          onClick: () => toggleSelect(ps.id),
+                          ...(ps.assigned ? { assigned: true } : { selected: selected.has(ps.id), onClick: () => toggleSelect(ps.id) }),
                         }));
                       }),
                     };
@@ -331,7 +341,7 @@ export function AssignForm({
           to={target === "group" ? groups.find((g) => g.id === groupId)?.name ?? "Group" : studentName}
           countLabel="Practice sets"
           items={[
-            ...practiceSets.filter((ps) => selected.has(ps.id)).map((ps) => `${ps.topicName} · ${difficultyLabel(ps.difficulty)} · ${ps.sourceName}`),
+            ...practiceSets.filter((ps) => !ps.assigned && selected.has(ps.id)).map((ps) => `${ps.topicName} · ${difficultyLabel(ps.difficulty)} · ${ps.sourceName}`),
             ...editing.map((set) => set.name),
           ]}
           options={options}

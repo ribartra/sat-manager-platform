@@ -5,6 +5,8 @@ import { Pct } from "@/components/sat/work-status";
 import { Badge } from "@/components/ui/badge";
 import { difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
 import { cn } from "@/lib/utils";
+import { BLOCKED_SURFACE } from "@/components/ui/control-states";
+import { AssignedStamp, ASSIGNED_LABEL } from "@/components/sat/assigned-stamp";
 
 /**
  * Skills map (mockup content-map.html): one card per domain, one row per skill, an Easy / Medium /
@@ -43,6 +45,8 @@ export interface SkillsMapChip {
   selected?: boolean;
   /** Replaces the chip with this element (e.g. the catalogue's drop-down of the level's sets). */
   render?: React.ReactNode;
+  /** Assign view: the student already has it. Shown with the "ALREADY ASSIGNED" stamp, not selectable. */
+  assigned?: boolean;
 }
 
 export interface SkillsMapSkill {
@@ -189,6 +193,23 @@ export const SKILL_CHIP_CLASS = "inline-flex items-center gap-1.5 rounded-lg bor
 function SkillChip({ chip }: { chip: SkillsMapChip }) {
   if (chip.render) return <>{chip.render}</>;
   const levelText = chip.label ?? difficultyLabel(chip.difficulty);
+  if (chip.assigned) {
+    // Same chip, same size: disabled (nothing to select or clear) with the stamp laid over it.
+    return (
+      <button
+        type="button"
+        disabled
+        aria-label={`${chip.title ?? difficultyLabel(chip.difficulty)} · ${ASSIGNED_LABEL}`}
+        title={`${ASSIGNED_LABEL}${chip.title ? ` · ${chip.title}` : ""}`}
+        className={cn(SKILL_CHIP_CLASS, "relative bg-white text-[var(--sat-text)]", BLOCKED_SURFACE)}
+      >
+        <Badge variant={difficultyBadgeVariant(chip.difficulty)}>{difficultyLabel(chip.difficulty)}</Badge>
+        {chip.label ? <span>{chip.label}</span> : null}
+        {chip.extra}
+        <AssignedStamp />
+      </button>
+    );
+  }
   if (chip.onClick) {
     return (
       <button

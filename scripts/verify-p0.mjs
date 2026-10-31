@@ -302,6 +302,27 @@ const checks = [
     requires: ['db.exec("BEGIN IMMEDIATE")', "DATA_STATEMENT", "patches are immutable", "expected ${expect} rows changed"],
     label: "Data patches: una transaccion por patch, solo DML, inmutables, con guarda de filas",
   },
+  {
+    file: "app/(teacher)/teacher/assign/assign-view.tsx",
+    requires: ["assigned: assignmentBySet.has(ps.id)", "assigned: assignmentByTest.has(exam.id)"],
+    forbids: [".filter((ps) => !assignmentBySet.has(ps.id))", ".filter((exam) => !assignmentByTest.has(exam.id))"],
+    label: "Assign: lo ya asignado se muestra (con sello), no se oculta ni sale como '—'",
+  },
+  {
+    file: "components/sat/skills-map.tsx",
+    requires: ["if (chip.assigned) {", "disabled", "<AssignedStamp />", "BLOCKED_SURFACE"],
+    label: "Chip asignado: deshabilitado, mismo tamano, sello ALREADY ASSIGNED encima",
+  },
+  {
+    file: "app/(teacher)/teacher/students/[studentId]/assign/assign-form-client.tsx",
+    requires: ["if (practiceSets.some((ps) => ps.id === id && ps.assigned)) return;", "assigned: true"],
+    label: "Assign practice: un set asignado no se puede seleccionar ni desmarcar",
+  },
+  {
+    file: "app/(teacher)/teacher/students/[studentId]/assign-test/assign-test-form-client.tsx",
+    requires: ["if (exams.some((exam) => exam.id === id && exam.assigned)) return;", "disabled={exam.assigned}", '<AssignedStamp placement="end" />'],
+    label: "Assign Test: un Test asignado no se puede seleccionar ni desmarcar, con sello",
+  },
   // Results by skill (SAT-039/040/041): no Low performance, no summary card, no matrix, no Assign in results.
   {
     file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
@@ -925,8 +946,8 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/assign/assign-view.tsx",
-    requires: ["!assignmentBySet.has(ps.id)", '["PENDING", "IN_PROGRESS"]', "studentAccessWhereFor", "assignableContentWhere"],
-    label: "Assign practice: lo ya asignado no se ofrece; Edit solo cambia fechas de lo abierto",
+    requires: ["assigned: assignmentBySet.has(ps.id)", '["PENDING", "IN_PROGRESS"]', "studentAccessWhereFor", "assignableContentWhere"],
+    label: "Assign practice: lo ya asignado se muestra con sello y no se selecciona; Edit solo cambia fechas de lo abierto",
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/assign/assign-form-client.tsx",
@@ -935,8 +956,8 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/assign/assign-view.tsx",
-    requires: ["!assignmentByTest.has(exam.id)", "already took"],
-    label: "Assign test: los tests ya asignados no se ofrecen; si el alumno elegido ya lo tiene, se avisa (o se edita si esta abierto)",
+    requires: ["assigned: assignmentByTest.has(exam.id)", "already took"],
+    label: "Assign test: los tests ya asignados se muestran con sello y no se seleccionan; si el alumno elegido ya lo tiene, se avisa (o se edita si esta abierto)",
   },
   // One Assign view driven by the URL (practice sets and Tests; student chosen with a drop-down).
   {

@@ -9,12 +9,14 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { InlineError } from "@/components/sat/alert";
 import { TestNumberAccordion } from "@/components/sat/test-number-accordion";
+import { AssignedStamp, ASSIGNED_LABEL } from "@/components/sat/assigned-stamp";
 import { AssignSummaryCard, defaultAssignOptions, type AssignOptions } from "@/components/sat/assign-summary-card";
 import { readApiError } from "@/lib/api-client";
 
-/** A test the student does NOT have yet (already assigned tests are never offered again). */
+/** An assignable test; `assigned` = the student already has it (shown with the stamp, not selectable). */
 type ExamOption = {
   id: string;
+  assigned: boolean;
   name: string;
   /** "TEST N": the versions of a test across sources share one accordion. */
   number: number | null;
@@ -50,7 +52,7 @@ export function AssignTestForm({
 }) {
   const router = useRouter();
   const [selected, setSelected] = useState<Set<string>>(
-    () => new Set(editing ? [editing.id] : initialSelected && exams.some((exam) => exam.id === initialSelected) ? [initialSelected] : []),
+    () => new Set(editing ? [editing.id] : initialSelected && exams.some((exam) => exam.id === initialSelected && !exam.assigned) ? [initialSelected] : []),
   );
   const [target, setTarget] = useState<"student" | "group">("student");
   const [groupId, setGroupId] = useState(groups[0]?.id ?? "");
@@ -69,6 +71,8 @@ export function AssignTestForm({
   const visible = term ? exams.filter((exam) => exam.name.toLowerCase().includes(term) || exam.sourceName.toLowerCase().includes(term)) : exams;
 
   function toggle(id: string) {
+    // Already assigned: never selected or cleared from here.
+    if (exams.some((exam) => exam.id === id && exam.assigned)) return;
     setSelected((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
@@ -159,7 +163,7 @@ export function AssignTestForm({
       ) : (
         <>
           <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search tests..." />
-          <p className="text-xs text-gray-500">Tests {studentName.split(" ")[0]} already has are not listed (they can be retaken).</p>
+          <p className="text-xs text-gray-500">Tests {studentName.split(" ")[0]} already has are marked as already assigned (they can retake them from their Tests page).</p>
           {/* Same structure as the Tests list: one "TEST N" accordion, each source's version inside. */}
           <div className="max-h-[32rem] overflow-y-auto">
             <TestNumberAccordion
@@ -173,14 +177,28 @@ export function AssignTestForm({
                 // doesn't drive it, so unticking never collapses it).
                 open: Boolean(term) || exam.id === initialSelected,
                 node: (
-                  <label className={cn("flex cursor-pointer items-start gap-3 rounded-md border border-[var(--sat-border)] bg-white px-3 py-2 hover:bg-gray-50", selected.has(exam.id) && "border-[var(--sat-primary)] bg-blue-50")}>
-                    <Checkbox className="mt-1" checked={selected.has(exam.id)} onChange={() => toggle(exam.id)} />
+                  <label
+                    title={exam.assigned ? ASSIGNED_LABEL : undefined}
+                    className={cn(
+                      "relative flex items-start gap-3 rounded-md border border-[var(--sat-border)] bg-white px-3 py-2",
+                      exam.assigned ? "cursor-not-allowed" : "cursor-pointer hover:bg-gray-50",
+                      !exam.assigned && selected.has(exam.id) && "border-[var(--sat-primary)] bg-blue-50",
+                    )}
+                  >
+                    <Checkbox
+                      className="mt-1"
+                      checked={!exam.assigned && selected.has(exam.id)}
+                      disabled={exam.assigned}
+                      aria-label={exam.assigned ? `${exam.name} · ${ASSIGNED_LABEL}` : undefined}
+                      onChange={() => toggle(exam.id)}
+                    />
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm font-medium text-gray-900">{exam.name}</span>
                       <span className="block text-xs text-gray-500">
                         {exam.moduleCount} modules (2 Reading & Writing + 2 Math) · {exam.questionCount} questions
                       </span>
                     </span>
+                    {exam.assigned ? <AssignedStamp placement="end" /> : null}
                   </label>
                 ),
               }))}

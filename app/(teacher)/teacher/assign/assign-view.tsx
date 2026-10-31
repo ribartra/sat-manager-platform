@@ -169,7 +169,8 @@ export async function AssignView({ studentId, query }: { studentId: string | nul
       }),
       prisma.fullPracticeTestAssignment.findMany({ where: { studentId: student.id }, select: { testId: true, status: true, dueDate: true, unlockAt: true, feedbackMode: true, showExplanations: true } }),
     ]);
-    // Already assigned = never offered again (the student can retake it); an open one opens to edit its due date.
+    // Already assigned = shown with the "ALREADY ASSIGNED" stamp and not selectable (the student can
+    // retake it); an open one opens to edit its due date.
     const assignmentByTest = new Map(existing.map((row) => [row.testId, row]));
     const presetRow = params.test ? assignmentByTest.get(params.test) : undefined;
     const editingExam = presetRow && ["PENDING", "IN_PROGRESS"].includes(presetRow.status) ? exams.find((exam) => exam.id === params.test) : undefined;
@@ -195,9 +196,9 @@ export async function AssignView({ studentId, query }: { studentId: string | nul
           studentId={student.id}
           studentName={student.name}
           exams={exams
-            .filter((exam) => !assignmentByTest.has(exam.id))
             .map((exam) => ({
               id: exam.id,
+              assigned: assignmentByTest.has(exam.id),
               name: exam.name,
               number: exam.number,
               sourceId: exam.source?.id ?? "none",
@@ -231,8 +232,8 @@ export async function AssignView({ studentId, query }: { studentId: string | nul
       select: { practiceSetId: true, status: true, dueDate: true, unlockAt: true, feedbackMode: true, showExplanations: true },
     }),
   ]);
-  // Already assigned = never offered again (the student can retry it any time); only "Edit" (dates and
-  // settings) of an open one, via ?edit=.
+  // Already assigned = shown with the "ALREADY ASSIGNED" stamp and not selectable (the student can retry
+  // it any time); only "Edit" (dates and settings) of an open one, via ?edit=.
   const assignmentBySet = new Map(existing.map((a) => [a.practiceSetId, a]));
   const editIds = new Set([...params.edit, ...params.set.filter((id) => ["PENDING", "IN_PROGRESS"].includes(assignmentBySet.get(id)?.status ?? ""))]);
   const editing = practiceSets
@@ -267,9 +268,9 @@ export async function AssignView({ studentId, query }: { studentId: string | nul
         studentId={student.id}
         studentName={student.name}
         practiceSets={practiceSets
-          .filter((ps) => !assignmentBySet.has(ps.id))
           .map((ps) => ({
             id: ps.id,
+            assigned: assignmentBySet.has(ps.id),
             name: ps.name,
             difficulty: ps.difficulty,
             topicName: ps.topic.name,
