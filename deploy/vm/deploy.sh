@@ -66,7 +66,7 @@ compose up -d web ingest-service
 # 4) health or rollback
 if wait_healthy; then
   log "healthy on $NEW_TAG"
-  docker logs --since 5m "$WEB" 2>&1 | grep -E '^\[entrypoint\]|backfill' || true
+  docker logs --since 5m "$WEB" 2>&1 | grep -E '^\[(entrypoint|data-patches)\]|backfill' || true
   exit 0
 fi
 
