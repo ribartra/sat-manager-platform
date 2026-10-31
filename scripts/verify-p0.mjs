@@ -252,6 +252,41 @@ const checks = [
     requires: ["after(async () => {"],
     label: "Reportar un problema: correo y agente despues de la respuesta",
   },
+  {
+    file: "app/api/profile/avatar/route.ts",
+    requires: ["existing.avatarUrl !== avatarUrl", "Validate and store the new image first"],
+    label: "Avatar: la foto anterior se borra solo despues de guardar la nueva",
+  },
+  {
+    file: "prisma/migrations/20261105_single_open_pause_unlock_request/migration.sql",
+    requires: ['"AttemptPause_one_open_per_attempt"', '"FullPracticeTestPause_one_open_per_attempt"', '"UnlockRequest_one_pending_per_assignment"'],
+    label: "Una pausa abierta por intento y una solicitud de desbloqueo pendiente por asignacion (indices unicos)",
+  },
+  ...[
+    "app/api/attempts/[attemptId]/pause/route.ts",
+    "app/api/full-practice-tests/attempts/[attemptId]/pause/route.ts",
+    "app/api/unlock-requests/route.ts",
+  ].map((file) => ({
+    file,
+    requires: ["isUniqueConstraintError(error)"],
+    label: "Pausa / solicitud concurrente: devuelve la existente",
+  })),
+  {
+    file: "deploy/docker-compose.prod.yml",
+    requires: ["mem_limit: 1536m", "init: true", "stop_grace_period: 30s", "NODE_OPTIONS: --max-old-space-size=1024", "mem_limit: 256m"],
+    label: "Contenedores con limite de memoria, init y tiempo de cierre",
+  },
+  {
+    file: "deploy/Caddyfile",
+    requires: ["read_header 15s", "read_body 10m", "max_size 256MiB", "max_size 16MiB"],
+    label: "Caddy: limite de subida por ruta y tiempos maximos",
+  },
+  {
+    file: "Dockerfile",
+    requires: ['CMD ["node_modules/.bin/next", "start"]'],
+    forbids: ['CMD ["npm", "run", "start"]'],
+    label: "next es el proceso principal (recibe SIGTERM)",
+  },
   // Results by skill (SAT-039/040/041): no Low performance, no summary card, no matrix, no Assign in results.
   {
     file: "app/(teacher)/teacher/students/[studentId]/page.tsx",

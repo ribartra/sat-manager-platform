@@ -5,6 +5,7 @@ import { notifyStudentTeachers } from "@/lib/notifications";
 import { requireApprovedSession } from "@/lib/rbac";
 import { ApiError, NotFoundError, UnauthorizedError, withApiErrors } from "@/lib/api-error";
 import { writeAudit } from "@/lib/audit";
+import { isUniqueConstraintError } from "@/lib/db-errors";
 
 export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await requireApprovedSession();
@@ -27,9 +28,17 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
   });
   if (existing) return NextResponse.json(existing);
 
-  const request = await prisma.unlockRequest.create({
-    data: { assignmentId, studentId: session.user.id },
-  });
+  let request;
+  try {
+    request = await prisma.unlockRequest.create({
+      data: { assignmentId, studentId: session.user.id },
+    });
+  } catch (error) {
+    // One PENDING request per assignment (unique index): a concurrent request won; no second
+    // notification to the teachers.
+    if (!isUniqueConstraintError(error)) throw error;
+    return NextResponse.json(await prisma.unlockRequest.findFirst({ where: { assignmentId, status: "PENDING" } }));
+  }
   await writeAudit({
     userId: session.user.id,
     action: "CREATE_UNLOCK_REQUEST",

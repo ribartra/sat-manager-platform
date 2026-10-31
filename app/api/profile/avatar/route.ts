@@ -46,26 +46,27 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
     return new BadRequestError("Image must be under 5 MB.").toResponse();
   }
 
-  // Delete previous avatar file if it exists
-  const existing = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { avatarUrl: true },
-  });
-  if (existing?.avatarUrl) {
-    await deleteAvatar(existing.avatarUrl).catch(() => {});
-  }
-
+  // Validate and store the new image first; the previous one is deleted only once the new one is
+  // saved and linked (a rejected or failed upload keeps the current avatar).
   const buffer = Buffer.from(await file.arrayBuffer());
   const detectedType = detectedImageType(buffer);
   if (!detectedType || detectedType !== file.type) {
     return new BadRequestError("The uploaded file content does not match a supported image type.").toResponse();
   }
+  const existing = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { avatarUrl: true },
+  });
   const avatarUrl = await saveAvatar(buffer, detectedType, session.user.id);
 
   await prisma.user.update({
     where: { id: session.user.id },
     data: { avatarUrl },
   });
+  // Every avatar has a unique name (saveAvatar), so this never removes the new one.
+  if (existing?.avatarUrl && existing.avatarUrl !== avatarUrl) {
+    await deleteAvatar(existing.avatarUrl).catch(() => {});
+  }
 
   return NextResponse.json({ avatarUrl });
 });

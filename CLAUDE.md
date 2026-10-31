@@ -39,7 +39,7 @@ Docker: `docker-compose.yml` runs `web` (:3000) and `ingest-service` (:8000) sha
 
 **Auth** (`lib/auth.ts`, `lib/auth.config.ts`): NextAuth v5 beta, Credentials provider, JWT session strategy. Session carries `id`, `email`, `role`, `validationStatus`. Login is rate-limited via `lib/rate-limit.ts`. `AUTH_SECRET` is required in production (throws otherwise).
 
-**One open attempt per assignment.** Partial unique indexes (raw SQL, migration `20261005_single_open_attempt`, not expressible in `schema.prisma`) allow at most one `IN_PROGRESS` attempt per assignment; the players catch the P2002 (`lib/db-errors.ts`) and reuse the open attempt. A generated migration that drops these indexes is wrong — keep them.
+**One open attempt per assignment.** Partial unique indexes (raw SQL, migration `20261005_single_open_attempt`, not expressible in `schema.prisma`) allow at most one `IN_PROGRESS` attempt per assignment; the players catch the P2002 (`lib/db-errors.ts`) and reuse the open attempt. A generated migration that drops these indexes is wrong — keep them. The same applies to `20261105_single_open_pause_unlock_request` (one open `AttemptPause` / `FullPracticeTestPause` per attempt, one `PENDING` `UnlockRequest` per assignment; the routes catch P2002 and return the existing row).
 
 **Attempts use immutable snapshots.** On submit, the attempt stores `practiceSetSnapshot` / `questionSnapshot` (and full-test equivalents) so later edits to questions/sets don't change historical results. Submit requires the attempt to be `IN_PROGRESS`. Results rendering respects `canRevealSolutions` / `explanationVisibility`. See `lib/attempt-snapshots.ts`, `lib/full-test-scoring.ts`, `lib/full-test-progress.ts`.
 

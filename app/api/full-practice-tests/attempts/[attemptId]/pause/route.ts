@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireApprovedSession } from "@/lib/rbac";
 import { writeAudit } from "@/lib/audit";
+import { isUniqueConstraintError } from "@/lib/db-errors";
 import { NotFoundError, UnauthorizedError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
@@ -25,7 +26,14 @@ export const POST = withApiErrors(async function POST(_req: Request, { params }:
   });
   if (existing) return NextResponse.json(existing);
 
-  const pause = await prisma.fullPracticeTestPause.create({ data: { attemptId } });
+  let pause;
+  try {
+    pause = await prisma.fullPracticeTestPause.create({ data: { attemptId } });
+  } catch (error) {
+    // One open pause per attempt (unique index): a concurrent pause (double click, two tabs) won.
+    if (!isUniqueConstraintError(error)) throw error;
+    return NextResponse.json(await prisma.fullPracticeTestPause.findFirst({ where: { attemptId, resumedAt: null } }));
+  }
   await writeAudit({
     userId: session.user.id,
     action: "FPT_ATTEMPT_PAUSED",

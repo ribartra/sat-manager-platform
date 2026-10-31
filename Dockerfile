@@ -67,4 +67,6 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 
 EXPOSE 3000
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-CMD ["npm", "run", "start"]
+# next itself is the main process (the entrypoint execs it): SIGTERM on deploy reaches the server
+# directly and it closes open requests, instead of npm dropping them. compose adds `init: true`.
+CMD ["node_modules/.bin/next", "start"]
