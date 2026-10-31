@@ -2,7 +2,7 @@ import prisma from "@/lib/prisma";
 import { completedModulesOf } from "@/lib/full-test-progress";
 import { practiceAreaLabel, type PracticeAreaCode } from "@/lib/practice-area";
 import { shortSetName } from "@/lib/student-report";
-import { summarizeAllQuestionAnswers } from "@/lib/weighted-score";
+import { NO_ANSWERS, practiceAnswerStats } from "@/lib/answer-stats";
 
 /**
  * Every practice and Test attempt of a set of students, with try numbers ("Try 2 of 3") and the
@@ -95,7 +95,6 @@ export async function loadAttemptHistory(studentIds: string[], filters: HistoryF
             assignmentId: true,
             practiceSetId: true,
             student: { select: { id: true, name: true, avatarUrl: true } },
-            answers: { select: { answer: true, isCorrect: true } },
           },
         })
       : Promise.resolve([]),
@@ -138,6 +137,8 @@ export async function loadAttemptHistory(studentIds: string[], filters: HistoryF
       })
     : [];
   const setById = new Map(sets.map((set) => [set.id, set]));
+  // Correct / answered counts of finished tries, counted in SQL (no answer rows loaded).
+  const answerStats = await practiceAnswerStats(practice.filter((a) => a.status !== "IN_PROGRESS").map((a) => a.id));
 
   const rows: HistoryRow[] = [];
 
@@ -151,9 +152,9 @@ export async function loadAttemptHistory(studentIds: string[], filters: HistoryF
     tries.forEach((a, i) => {
       const set = setById.get(a.practiceSetId);
       const questionCount = set?._count.questions ?? 0;
-      const score = summarizeAllQuestionAnswers(a.answers);
+      const score = answerStats.get(a.id) ?? NO_ANSWERS;
       const total = Math.max(score.total, questionCount);
-      const answered = a.answers.filter((x) => x.answer && x.answer.trim()).length;
+      const answered = score.answered;
       const done = a.status !== "IN_PROGRESS";
       const pct = done ? a.scorePercent ?? (total ? Math.round((score.correct / total) * 100) : null) : null;
       const area = (set?.topic.domain.practiceArea ?? null) as PracticeAreaCode | null;

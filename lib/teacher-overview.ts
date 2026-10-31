@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
 import { resolvePracticeArea, type PracticeAreaCode } from "@/lib/practice-area";
-import { summarizeAllQuestionAnswers } from "@/lib/weighted-score";
+import { practiceAnswerStats, scoreFromStats } from "@/lib/answer-stats";
 
 /**
  * Per-student overview for the teacher Home, the Students roster and the assign panels.
@@ -71,7 +71,6 @@ export async function loadStudentOverviews(studentIds: string[], now = new Date(
           id: true,
           submittedAt: true,
           assignmentId: true,
-          answers: { select: { isCorrect: true } },
           assignment: {
             select: {
               practiceSet: {
@@ -102,6 +101,8 @@ export async function loadStudentOverviews(studentIds: string[], now = new Date(
     },
   });
 
+  // Correct / total per attempt, counted in SQL (no answer rows loaded).
+  const answerStats = await practiceAnswerStats(students.flatMap((s) => s.attempts.map((attempt) => attempt.id)));
   const result = new Map<string, StudentOverview>();
   for (const s of students) {
     const areas = Object.fromEntries(AREAS.map((a) => [a, emptyArea()])) as Record<PracticeAreaCode, AreaOverview>;
@@ -114,7 +115,7 @@ export async function loadStudentOverviews(studentIds: string[], now = new Date(
       if (!set) continue;
       const area = resolvePracticeArea({ practiceArea: set.topic.domain.practiceArea });
       if (!area) continue;
-      const score = summarizeAllQuestionAnswers(attempt.answers);
+      const score = scoreFromStats(answerStats.get(attempt.id));
       const o = areas[area];
       o.attempts += 1;
       if (!o.last && attempt.submittedAt) {

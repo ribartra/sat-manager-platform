@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { after, NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { assertApprovedSession } from "@/lib/rbac";
 import { checkRateLimit } from "@/lib/rate-limit";
@@ -81,8 +81,13 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
     select: { id: true },
   });
   await addIssueEvent(report.id, "SYSTEM", "CREATED", { userId: session.user.id });
-  const email = await emailIssueReport(report.id);
-  // Off while Admin → Settings → Coding agent has no URL; a failure is recorded, never fatal.
-  const agent = await sendIssueReportToAgent(report.id).catch(() => ({ sent: false }));
-  return NextResponse.json({ id: report.id, emailed: email.sent, sentToAgent: agent.sent }, { status: 201 });
+  // Email to the SAT team and the coding agent go after the response: the reporter doesn't wait on
+  // SMTP (with the screenshot attached) or the agent. Each outcome is recorded on the report
+  // (emailSentAt / emailError, agent events), where Admin › Reports shows it and can resend.
+  after(async () => {
+    await emailIssueReport(report.id).catch(() => undefined);
+    // Off while Admin → Settings → Coding agent has no URL; a failure is recorded, never fatal.
+    await sendIssueReportToAgent(report.id).catch(() => undefined);
+  });
+  return NextResponse.json({ id: report.id }, { status: 201 });
 });

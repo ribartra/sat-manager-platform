@@ -219,6 +219,39 @@ const checks = [
     requires: ["timeZone: APP_TIME_ZONE", 'export const APP_TIME_ZONE = "America/Lima"'],
     label: "Fechas mostradas en la zona horaria de la app (Lima)",
   },
+  {
+    file: "lib/attempt-history.ts",
+    requires: ["practiceAnswerStats("],
+    forbids: ["answers: { select: { answer: true, isCorrect: true } }"],
+    label: "History: aciertos contados en SQL, sin cargar las respuestas",
+  },
+  {
+    file: "lib/teacher-overview.ts",
+    requires: ["practiceAnswerStats(", "scoreFromStats("],
+    forbids: ["answers: { select: { isCorrect: true } }"],
+    label: "Resumen del profesor: aciertos contados en SQL, sin cargar las respuestas",
+  },
+  {
+    file: "lib/student-report.ts",
+    requires: ["answerSnapshotTaxonomy(", "REPORT_QUESTION"],
+    forbids: ["answers: { include: { question: { include: { topic: true } } } }", "answers: true,"],
+    label: "Informes: sin texto de preguntas ni snapshots de respuestas",
+  },
+  {
+    file: "lib/email.ts",
+    requires: ["connectionTimeout: SMTP_CONNECTION_TIMEOUT_MS", "socketTimeout: SMTP_SOCKET_TIMEOUT_MS"],
+    label: "SMTP con tiempos maximos (no 2 min por envio)",
+  },
+  {
+    file: "app/api/auth/forgot-password/route.ts",
+    requires: ["after(async () => {"],
+    label: "Recuperar contrasena: el correo sale despues de la respuesta (mismo tiempo exista o no la cuenta)",
+  },
+  {
+    file: "app/api/issue-reports/route.ts",
+    requires: ["after(async () => {"],
+    label: "Reportar un problema: correo y agente despues de la respuesta",
+  },
   // Results by skill (SAT-039/040/041): no Low performance, no summary card, no matrix, no Assign in results.
   {
     file: "app/(teacher)/teacher/students/[studentId]/page.tsx",

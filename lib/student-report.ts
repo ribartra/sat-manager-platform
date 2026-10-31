@@ -2,10 +2,11 @@
 // (/api/reports/students/[id]/pdf) so both show exactly the same numbers.
 // Taxonomy note: the Topic table is the SKILL level (Section → Domain → Skill).
 import prisma from "@/lib/prisma";
+import { Prisma } from "@/app/generated/prisma/client";
 import { snapshotModulesOf } from "@/lib/full-test-snapshot";
 import { scorePercent } from "@/lib/utils";
 import { difficultyLabel } from "@/lib/domain-meta";
-import { parseSnapshot, type PracticeSetSnapshot, type QuestionSnapshot } from "@/lib/attempt-snapshots";
+import { parseSnapshot, type PracticeSetSnapshot } from "@/lib/attempt-snapshots";
 import { isAnsweredAnswer, sumAttemptElapsedTime, summarizeAllQuestionAnswers } from "@/lib/weighted-score";
 import {
   aggregateDifficultyMetrics,
@@ -146,6 +147,38 @@ export function shortSetName(name: string) {
 
 const OPEN_STATUSES = ["PENDING", "IN_PROGRESS", "OVERDUE"];
 
+/** Question fields the practice report needs (skill, level); never the text. */
+const REPORT_QUESTION = { topicId: true, difficulty: true, topic: { select: { name: true, domainId: true } } } as const;
+
+type SnapshotTaxonomy = { topic?: { id?: string; name?: string }; difficulty?: string };
+
+/**
+ * Skill and level each answer had when it was taken (its questionSnapshot), read in SQL with
+ * json_extract instead of loading every snapshot. Keyed "attemptId:questionId".
+ */
+async function answerSnapshotTaxonomy(attemptIds: readonly string[]): Promise<Map<string, SnapshotTaxonomy>> {
+  const result = new Map<string, SnapshotTaxonomy>();
+  const ids = [...new Set(attemptIds)];
+  for (let start = 0; start < ids.length; start += 500) {
+    const chunk = ids.slice(start, start + 500);
+    const rows = await prisma.$queryRaw<Array<{ attemptId: string; questionId: string; topicId: string | null; topicName: string | null; difficulty: string | null }>>(Prisma.sql`
+      SELECT "attemptId", "questionId",
+             json_extract("questionSnapshot", '$.topic.id') AS "topicId",
+             json_extract("questionSnapshot", '$.topic.name') AS "topicName",
+             json_extract("questionSnapshot", '$.difficulty') AS "difficulty"
+      FROM "AttemptAnswer"
+      WHERE "attemptId" IN (${Prisma.join(chunk)}) AND json_valid("questionSnapshot")
+    `);
+    for (const row of rows) {
+      result.set(`${row.attemptId}:${row.questionId}`, {
+        topic: row.topicId || row.topicName ? { id: row.topicId ?? undefined, name: row.topicName ?? undefined } : undefined,
+        difficulty: row.difficulty ?? undefined,
+      });
+    }
+  }
+  return result;
+}
+
 export async function loadPracticeReport(studentId: string, practiceArea: PracticeAreaCode, filters: ReportFilters): Promise<PracticeReport> {
   const topicId = filters.topic ?? "";
   const difficulty = filters.difficulty ?? "";
@@ -160,14 +193,28 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
         ...dateFilter,
         assignment: { practiceSet: { topic: { domain: { practiceArea } } } },
       },
-      include: {
-        answers: { include: { question: { include: { topic: true } } } },
+      // Only what the report reads: no question text and no answer snapshots (each answer's
+      // questionSnapshot is ~2 KB; its skill and level come from answerSnapshotTaxonomy).
+      select: {
+        id: true,
+        status: true,
+        submittedAt: true,
+        totalTime: true,
+        teacherComment: true,
+        attemptNumber: true,
+        assignmentId: true,
+        practiceSetId: true,
+        practiceSetSnapshot: true,
+        answers: { select: { questionId: true, answer: true, isCorrect: true, timeSpent: true, question: { select: REPORT_QUESTION } } },
         assignment: {
-          include: {
+          select: {
             practiceSet: {
-              include: {
+              select: {
+                name: true,
+                difficulty: true,
+                topicId: true,
                 source: { select: { id: true, name: true, sortOrder: true } },
-                questions: { include: { question: { include: { topic: true } } } },
+                questions: { select: { questionId: true, question: { select: REPORT_QUESTION } } },
               },
             },
           },
@@ -200,6 +247,7 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
       select: { totalScore: true, submittedAt: true, test: { select: { name: true } } },
     }),
   ]);
+  const snapshotTaxonomy = await answerSnapshotTaxonomy(historyAttempts.map((attempt) => attempt.id));
   // Current skill name/domain by id: attempts keep a snapshot of the old names, but a renamed or
   // moved skill must be reported under its current name and domain (one row, not two).
   const currentTopic = new Map(areaTopics.map((topic) => [topic.id, topic]));
@@ -213,7 +261,7 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
       : attempt.answers.map((answer) => ({ question: answer.question, answer }));
     return sources
       .map(({ question, answer }) => {
-        const snapshot = parseSnapshot<QuestionSnapshot>(answer?.questionSnapshot);
+        const snapshot = answer ? snapshotTaxonomy.get(`${attempt.id}:${answer.questionId}`) : undefined;
         const topicId = snapshot?.topic?.id ?? question.topicId;
         const current = currentTopic.get(topicId);
         return {
@@ -383,9 +431,25 @@ export async function loadMockReport(studentId: string, filters: ReportFilters, 
   const [examAttempts, examAssignments, invalidatedExams] = await Promise.all([
     prisma.fullPracticeTestAttempt.findMany({
       where: { studentId, status: "SUBMITTED", ...(single ? { id: options.attemptId } : dateFilter) },
-      include: {
-        answers: true,
-        test: { include: { modules: { include: { questions: { select: { questionId: true } } }, orderBy: { order: "asc" } } } },
+      // Only what the report reads. testSnapshot stays: parsing it in JS is faster than reading its
+      // outline in SQL (json_each over ~190 KB was 2.5x slower in a measured run).
+      select: {
+        id: true,
+        status: true,
+        testId: true,
+        startedAt: true,
+        submittedAt: true,
+        totalScore: true,
+        rwScore: true,
+        mathScore: true,
+        testSnapshot: true,
+        answers: { select: { questionId: true, isCorrect: true, timeSpent: true } },
+        test: {
+          select: {
+            name: true,
+            modules: { select: { name: true, section: true, questions: { select: { questionId: true } } }, orderBy: { order: "asc" } },
+          },
+        },
       },
       orderBy: { submittedAt: "desc" },
     }),

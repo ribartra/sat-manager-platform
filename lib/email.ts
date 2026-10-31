@@ -42,6 +42,10 @@ export function absoluteAppUrl(path: string) {
   return new URL(path, configured).toString();
 }
 
+const SMTP_CONNECTION_TIMEOUT_MS = 10_000;
+const SMTP_GREETING_TIMEOUT_MS = 10_000;
+const SMTP_SOCKET_TIMEOUT_MS = 20_000;
+
 export async function sendTransactionalEmail(payload: EmailPayload) {
   const config = await getSmtpConfig();
   if (!config.configured) {
@@ -57,6 +61,11 @@ export async function sendTransactionalEmail(payload: EmailPayload) {
       user: config.user!,
       pass: config.pass!,
     },
+    // Bounded waits (nodemailer's defaults reach 2 min / 10 min): a slow or unreachable SMTP server
+    // fails the send in seconds instead of holding the request that is waiting for it.
+    connectionTimeout: SMTP_CONNECTION_TIMEOUT_MS,
+    greetingTimeout: SMTP_GREETING_TIMEOUT_MS,
+    socketTimeout: SMTP_SOCKET_TIMEOUT_MS,
   });
 
   try {

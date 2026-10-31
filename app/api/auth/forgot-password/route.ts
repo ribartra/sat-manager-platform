@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { after, NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { absoluteAppUrl, sendPasswordResetEmail } from "@/lib/email";
 import { checkRateLimit, rateLimitKey, rateLimitResponse } from "@/lib/rate-limit";
@@ -34,15 +34,18 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
     });
 
     const resetUrl = absoluteAppUrl(`/auth/reset-password?token=${token}`);
-    const emailResult = await sendPasswordResetEmail(email, user.name, resetUrl);
-
-    await writeAudit({
-      userId: user.id,
-      action: "PASSWORD_RESET_REQUESTED",
-      targetType: "User",
-      targetId: user.id,
-      outcome: emailResult.sent ? "success" : "failure",
-      metadata: { email, emailSent: emailResult.sent, reason: emailResult.sent ? undefined : emailResult.reason },
+    // Sent after the response: the answer is the same either way (it never says whether the email
+    // exists), so the user doesn't wait on SMTP and the response time doesn't reveal a real account.
+    after(async () => {
+      const emailResult = await sendPasswordResetEmail(email, user.name, resetUrl);
+      await writeAudit({
+        userId: user.id,
+        action: "PASSWORD_RESET_REQUESTED",
+        targetType: "User",
+        targetId: user.id,
+        outcome: emailResult.sent ? "success" : "failure",
+        metadata: { email, emailSent: emailResult.sent, reason: emailResult.sent ? undefined : emailResult.reason },
+      });
     });
 
     return NextResponse.json({ ok: true });

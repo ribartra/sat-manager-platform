@@ -1,3 +1,4 @@
+import { after } from "next/server";
 import prisma from "@/lib/prisma";
 import { absoluteAppUrl, sendIssueReportEmail, sendIssueReportResolvedEmail } from "@/lib/email";
 import { getCoderAgentConfig } from "@/lib/coder-agent-settings";
@@ -158,7 +159,8 @@ export async function resolveIssueReport(input: { id: string; source: "ADMIN" | 
     body: `${issueCategoryMeta(report.category).label} on ${where}: ${(note ?? report.comment).slice(0, 160)}`,
     href: pathOf(report.url),
   });
-  if (input.source === "AGENT") await sendIssueReportResolvedEmail({ id: report.id, comment: report.comment, url: report.url, note, ref });
+  // After the response: the agent's callback doesn't wait on SMTP (the email outcome is not part of it).
+  if (input.source === "AGENT") after(() => sendIssueReportResolvedEmail({ id: report.id, comment: report.comment, url: report.url, note, ref }).then(() => undefined));
   return true;
 }
 
