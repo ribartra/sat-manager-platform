@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { InlineError } from "@/components/sat/alert";
 import { TestNumberAccordion } from "@/components/sat/test-number-accordion";
-import { AssignedStamp, ASSIGNED_LABEL } from "@/components/sat/assigned-stamp";
+import { ASSIGNED_LABEL } from "@/components/sat/assigned-stamp";
 import { AssignSummaryCard, defaultAssignOptions, type AssignOptions } from "@/components/sat/assign-summary-card";
 import { readApiError } from "@/lib/api-client";
 
@@ -176,6 +176,8 @@ export function AssignTestForm({
                 // Searching opens the matches, and so does the Test preselected from the URL (selection
                 // doesn't drive it, so unticking never collapses it).
                 open: Boolean(term) || exam.id === initialSelected,
+                // Every source of this TEST N assigned = stamp on its header; one version alone is only disabled.
+                assigned: exam.assigned,
                 node: (
                   <label
                     title={exam.assigned ? ASSIGNED_LABEL : undefined}
@@ -193,12 +195,11 @@ export function AssignTestForm({
                       onChange={() => toggle(exam.id)}
                     />
                     <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-medium text-gray-900">{exam.name}</span>
+                      <span className={cn("block text-sm font-medium", exam.assigned ? "text-gray-400" : "text-gray-900")}>{exam.name}</span>
                       <span className="block text-xs text-gray-500">
                         {exam.moduleCount} modules (2 Reading & Writing + 2 Math) · {exam.questionCount} questions
                       </span>
                     </span>
-                    {exam.assigned ? <AssignedStamp placement="end" /> : null}
                   </label>
                 ),
               }))}

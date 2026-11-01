@@ -310,18 +310,23 @@ const checks = [
   },
   {
     file: "components/sat/skills-map.tsx",
-    requires: ["if (chip.assigned) {", "disabled", "<AssignedStamp />", "BLOCKED_SURFACE"],
-    label: "Chip asignado: deshabilitado, mismo tamano, sello ALREADY ASSIGNED encima",
+    requires: ["if (chip.assigned) {", "disabled", "{chip.stamp ? <AssignedStamp /> : null}", "BLOCKED_SURFACE"],
+    label: "Chip asignado: deshabilitado, mismo tamano; sello solo si todo el nivel (todas las fuentes) esta asignado",
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/assign/assign-form-client.tsx",
-    requires: ["if (practiceSets.some((ps) => ps.id === id && ps.assigned)) return;", "assigned: true"],
+    requires: ["if (practiceSets.some((ps) => ps.id === id && ps.assigned)) return;", "assigned: true, stamp: true"],
     label: "Assign practice: un set asignado no se puede seleccionar ni desmarcar",
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/assign-test/assign-test-form-client.tsx",
-    requires: ["if (exams.some((exam) => exam.id === id && exam.assigned)) return;", "disabled={exam.assigned}", '<AssignedStamp placement="end" />'],
-    label: "Assign Test: un Test asignado no se puede seleccionar ni desmarcar, con sello",
+    requires: ["if (exams.some((exam) => exam.id === id && exam.assigned)) return;", "disabled={exam.assigned}", "assigned: exam.assigned,"],
+    label: "Assign Test: una version asignada no se puede seleccionar ni desmarcar",
+  },
+  {
+    file: "components/sat/test-number-accordion.tsx",
+    requires: ["const allAssigned = group.versions.every((version) => version.assigned);", '{allAssigned ? <AssignedStamp placement="end" /> : null}'],
+    label: "TEST N: sello ALREADY ASSIGNED solo cuando todas sus fuentes estan asignadas",
   },
   // Results by skill (SAT-039/040/041): no Low performance, no summary card, no matrix, no Assign in results.
   {

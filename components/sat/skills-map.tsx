@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChevronRight, Lock, Plus } from "lucide-react";
+import { Check, ChevronRight, Lock, Plus } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Pct } from "@/components/sat/work-status";
 import { Badge } from "@/components/ui/badge";
@@ -45,8 +45,13 @@ export interface SkillsMapChip {
   selected?: boolean;
   /** Replaces the chip with this element (e.g. the catalogue's drop-down of the level's sets). */
   render?: React.ReactNode;
-  /** Assign view: the student already has it. Shown with the "ALREADY ASSIGNED" stamp, not selectable. */
+  /** Assign view: the student already has it: disabled (not selectable, not clearable). */
   assigned?: boolean;
+  /**
+   * With `assigned`: the whole group is covered (every source's set at this level), so the
+   * "ALREADY ASSIGNED" stamp is laid over it. A single assigned set among others is only disabled.
+   */
+  stamp?: boolean;
 }
 
 export interface SkillsMapSkill {
@@ -194,7 +199,8 @@ function SkillChip({ chip }: { chip: SkillsMapChip }) {
   if (chip.render) return <>{chip.render}</>;
   const levelText = chip.label ?? difficultyLabel(chip.difficulty);
   if (chip.assigned) {
-    // Same chip, same size: disabled (nothing to select or clear) with the stamp laid over it.
+    // Same chip, same size: disabled (nothing to select or clear); the stamp only when the whole level
+    // is covered (chip.stamp).
     return (
       <button
         type="button"
@@ -203,10 +209,14 @@ function SkillChip({ chip }: { chip: SkillsMapChip }) {
         title={`${ASSIGNED_LABEL}${chip.title ? ` · ${chip.title}` : ""}`}
         className={cn(SKILL_CHIP_CLASS, "relative bg-white text-[var(--sat-text)]", BLOCKED_SURFACE)}
       >
-        <Badge variant={difficultyBadgeVariant(chip.difficulty)}>{difficultyLabel(chip.difficulty)}</Badge>
+        {/* Quiet "assigned" mark for a single set: a check and a grayed level (the stamp is for whole levels). */}
+        <Check size={12} aria-hidden className="text-[var(--sat-ok)]" />
+        <span className="grayscale">
+          <Badge variant={difficultyBadgeVariant(chip.difficulty)}>{difficultyLabel(chip.difficulty)}</Badge>
+        </span>
         {chip.label ? <span>{chip.label}</span> : null}
         {chip.extra}
-        <AssignedStamp />
+        {chip.stamp ? <AssignedStamp /> : null}
       </button>
     );
   }

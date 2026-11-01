@@ -302,9 +302,9 @@ export function AssignForm({
                     if (count) {
                       return { difficulty: level, state: "available", title: `${count} set${count === 1 ? "" : "s"} to assign`, extra: <span className="text-[var(--sat-muted)]">{count} set{count === 1 ? "" : "s"}</span> };
                     }
-                    // Everything at this level is already assigned: say so instead of "—".
+                    // Every source's set at this level is already assigned: stamp the level (not "—").
                     return assignedAtLevel
-                      ? { difficulty: level, state: "available", assigned: true, title: `${assignedAtLevel} set${assignedAtLevel === 1 ? "" : "s"}`, extra: <span className="text-[var(--sat-muted)]">{assignedAtLevel} set{assignedAtLevel === 1 ? "" : "s"}</span> }
+                      ? { difficulty: level, state: "available", assigned: true, stamp: true, title: `${assignedAtLevel} set${assignedAtLevel === 1 ? "" : "s"}`, extra: <span className="text-[var(--sat-muted)]">{assignedAtLevel} set{assignedAtLevel === 1 ? "" : "s"}</span> }
                       : { difficulty: level, state: "none", title: "Nothing to assign at this level" };
                   }),
                   rows: sources.map((source) => {

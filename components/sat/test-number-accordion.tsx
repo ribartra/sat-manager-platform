@@ -1,5 +1,6 @@
 import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AssignedStamp } from "@/components/sat/assigned-stamp";
 
 /** One version of a Test (one source) to show inside its "TEST N" accordion. */
 export interface TestVersionItem {
@@ -12,6 +13,9 @@ export interface TestVersionItem {
   node: React.ReactNode;
   /** Opens its TEST N accordion (e.g. pending / in progress for the student). */
   open?: boolean;
+  /** Assign view: the student already has this version. When every version (source) of the TEST N
+   * is assigned, its header gets the "ALREADY ASSIGNED" stamp. */
+  assigned?: boolean;
 }
 
 /** Groups versions by test number (ascending, "Other tests" last), sources by their order. */
@@ -50,12 +54,14 @@ export function TestNumberAccordion({
       {groupTestVersions(items).map((group) => {
         const open = group.versions.some((version) => version.open);
         const sources = group.versions.map((version) => version.sourceName);
+        const allAssigned = group.versions.every((version) => version.assigned);
         return (
           <details key={group.number ?? "other"} open={open} className="group overflow-hidden rounded-[var(--sat-radius)] border border-[var(--sat-border)] bg-white">
             <summary
               className={cn(
                 "flex cursor-pointer list-none flex-wrap items-center gap-x-3 gap-y-1 hover:bg-[var(--sat-primary-soft)] [&::-webkit-details-marker]:hidden",
                 compact ? "px-3 py-2" : "px-4 py-3",
+                allAssigned && "relative",
               )}
             >
               <ChevronRight aria-hidden size={16} className="shrink-0 text-[var(--sat-blank)] transition-transform group-open:rotate-90" />
@@ -63,6 +69,7 @@ export function TestNumberAccordion({
               <span className="text-xs text-gray-500">
                 {group.versions.length} version{group.versions.length === 1 ? "" : "s"} · {sources.join(" · ")}
               </span>
+              {allAssigned ? <AssignedStamp placement="end" /> : null}
             </summary>
             <div className={cn("space-y-4 border-t border-[var(--sat-border)] bg-[var(--sat-surface-2)]", compact ? "p-2.5" : "p-3")}>
               {group.versions.map((version) => (
