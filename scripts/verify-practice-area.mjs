@@ -1,4 +1,5 @@
 import { readFile } from "node:fs/promises";
+import fs from "node:fs";
 import path from "node:path";
 import Database from "better-sqlite3";
 
@@ -107,6 +108,22 @@ function assertDatabaseConsistency() {
   const dbUrl = process.env.DATABASE_URL ?? "file:./dev.db";
   const filePath = dbUrl.replace(/^file:/, "");
   const absolute = path.isAbsolute(filePath) ? filePath : path.join(root, filePath);
+  // In CI dev.db is a Git LFS pointer (text), not a database: better-sqlite3 only fails at the first
+  // query, so check the SQLite header first and skip the DB asserts like a missing file.
+  let isSqlite = false;
+  try {
+    const fd = fs.openSync(absolute, "r");
+    const header = Buffer.alloc(16);
+    fs.readSync(fd, header, 0, 16, 0);
+    fs.closeSync(fd);
+    isSqlite = header.toString("latin1") === "SQLite format 3\0";
+  } catch {
+    isSqlite = false;
+  }
+  if (!isSqlite) {
+    console.warn(`⚠ ${absolute} no es una base SQLite (¿puntero LFS?); se omiten asserts de BD`);
+    return;
+  }
   let db;
   try {
     db = new Database(absolute, { readonly: true, fileMustExist: true });
