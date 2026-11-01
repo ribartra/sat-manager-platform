@@ -71,6 +71,7 @@ jobs:
             gcloud builds submit . \
               --project "$PROJECT" \
               --config deploy/cloudbuild.yaml \
+              --gcs-source-staging-dir "gs://${PROJECT}_cloudbuild/source" \
               --substitutions "_REGISTRY=${REGISTRY},_TAG=${TAG},_REVISION=${GITHUB_SHA}" \
               --service-account "projects/${PROJECT}/serviceAccounts/cloudbuild-web@${PROJECT}.iam.gserviceaccount.com"
           fi

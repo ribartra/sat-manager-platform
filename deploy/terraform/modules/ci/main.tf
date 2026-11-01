@@ -59,6 +59,14 @@ resource "google_storage_bucket_iam_member" "ci_source_upload" {
   member = "serviceAccount:${google_service_account.ci.email}"
 }
 
+# `gcloud builds submit` first reads the bucket itself (storage.buckets.get), which objectAdmin
+# doesn't include.
+resource "google_storage_bucket_iam_member" "ci_source_bucket_read" {
+  bucket = var.cloudbuild_source_bucket
+  role   = "roles/storage.legacyBucketReader"
+  member = "serviceAccount:${google_service_account.ci.email}"
+}
+
 # Check which tags exist (no push: Cloud Build pushes).
 resource "google_artifact_registry_repository_iam_member" "ci_reader" {
   location   = var.registry_location
