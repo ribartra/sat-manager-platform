@@ -278,7 +278,7 @@ Open invitations show under **Pending invitations**, with **Cancel invitation**.
 
 ### Importing content with AI
 
-In **Practice** and **Tests** the master teacher sees **Import with AI**, and the gaps can be imported: in **Practice**, when a skill is opened, a source's empty level shows **+ Hard** (or another level; the skill row shows **Hard —**); in **Tests**, a missing number appears as **TEST N —** and each source offers **+ Import TEST N**. The whole process is in the **AI import and maintenance guide**.
+In **Practice** and **Tests** the master teacher sees **Import with AI** while something is still missing (when everything is complete, the button is not shown), and the gaps can be imported: in **Practice**, when a skill is opened, a source's empty level shows **+ Hard** (or another level; the skill row shows **Hard —**); in **Tests**, a missing number appears as **TEST N —** and each source offers **+ Import TEST N**. The whole process is in the **AI import and maintenance guide**.
 
 ![An empty level ready to import](img/ai-practice-with-gap.png)
 

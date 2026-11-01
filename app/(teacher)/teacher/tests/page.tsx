@@ -73,6 +73,13 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
   // shows "—" ("+ Import TEST N" for admin / master teacher); a TEST N no source has shows "—".
   const testSources = await prisma.source.findMany({ where: { active: true, forTests: true }, select: { id: true, name: true, sortOrder: true } });
   const maxNumber = tests.reduce((m, t) => Math.max(m, t.number ?? 0), 0);
+  // "Import with AI" (header) only while something can be added: no Test yet, or an active Tests source
+  // missing a number from TEST 1 to the highest. Complete = no button.
+  const hasGap =
+    canImport &&
+    testSources.length > 0 &&
+    (maxNumber === 0 ||
+      testSources.some((source) => Array.from({ length: maxNumber }, (_, i) => i + 1).some((n) => !tests.some((t) => t.number === n && t.source?.id === source.id))));
   const gaps = Array.from({ length: maxNumber }, (_, i) => i + 1).flatMap((number) =>
     testSources
       .filter((source) => !tests.some((t) => t.number === number && t.source?.id === source.id))
@@ -101,7 +108,7 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
             <Link href="/teacher/tests/scoring" className={HEADER_ACTION_CLASS}>
               <Calculator size={14} aria-hidden /> How scores work
             </Link>
-            {canImport ? (
+            {hasGap ? (
               <Link href="/teacher/import?kind=FULL_PRACTICE_TEST" className={HEADER_ACTION_CLASS}>
                 <Sparkles size={14} aria-hidden /> Import with AI
               </Link>

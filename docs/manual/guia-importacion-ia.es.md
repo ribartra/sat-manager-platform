@@ -88,6 +88,13 @@ Un Test de la plataforma tiene **4 módulos** con un número fijo de preguntas:
 
 ## 3. Encontrar el hueco a llenar
 
+El botón **Import with AI** de **Practice** y de **Tests** solo aparece mientras haya algo por cargar en las fuentes activas:
+
+- **Practice:** alguna habilidad y nivel sin set en alguna fuente activa de Practice Sets (en cualquier área, no solo la pestaña abierta).
+- **Tests:** a alguna fuente activa de Tests le falta un número entre el TEST 1 y el más alto (o todavía no hay ningún Test).
+
+Si todo está completo, el botón desaparece. Para cargar más contenido hace falta un hueco: por ejemplo, un administrador crea o activa otra fuente en **Admin › Sources**. El enlace **Import with AI** del menú de administración sigue disponible para casos especiales.
+
 **Practice.** En el mapa de habilidades, un nivel que no tiene set en ninguna fuente aparece como **Hard —** en la fila de la habilidad. Al abrir la habilidad se ve una fila por fuente: ahí el nivel vacío aparece como **+ Hard** (o **+ Easy**, **+ Medium**). Al pulsarlo se abre la importación con la habilidad, el nivel y la fuente ya elegidos. Los niveles que ya tienen sets no muestran **+**.
 
 En el ejemplo, la habilidad *Nonlinear Functions* tiene Easy y Medium, pero no **Hard**:
