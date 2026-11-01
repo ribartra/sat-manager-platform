@@ -356,7 +356,16 @@ El estado se cambia en **Options → Status**. **Delete** solo está disponible 
 
 ### Fuentes
 
-Cada set y Test pertenece a una **fuente**. Un administrador las gestiona en **Admin › Sources**: crearlas, renombrarlas y desactivarlas. En **Assign**, cada fuente es una fila dentro de la habilidad o del TEST N.
+Cada set y Test pertenece a una **fuente**. Un administrador las gestiona en **Admin › Sources**:
+
+- **Add source**, **Rename** y el orden (flechas).
+- **Used for**: si la fuente se ofrece para **Practice Sets**, para **Tests** o para ambos. Solo las fuentes marcadas para Tests aparecen con **+ Import TEST N** en **Tests**.
+- **Deactivate / Activate**: una fuente inactiva desaparece, con sus sets y Tests, de **Practice**, **Tests**, los filtros y **Assign**; ya no se puede asignar ni importar nada en ella. Lo que los alumnos ya tienen asignado sigue funcionando (pueden terminarlo y ver sus resultados). Al reactivarla, todo vuelve a verse.
+- **Remove** (dar de baja): solo para una fuente vacía (sin sets, Tests ni importaciones). Si tiene contenido, el botón está bloqueado y hay que desactivarla.
+
+Hoy los Practice Sets son de **College Board** y los Tests de **Innovator**; College Board 2025 y 2026 están inactivas.
+
+En **Assign**, cada fuente activa es una fila dentro de la habilidad o del TEST N.
 
 ### Imágenes y archivos de origen
 

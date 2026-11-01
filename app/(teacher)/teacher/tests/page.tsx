@@ -17,6 +17,7 @@ import { formatDate } from "@/lib/utils";
 import { TestActionsMenu } from "./test-actions-menu-client";
 import { HEADER_ACTION_CLASS, HEADER_SHORTCUT_CLASS, HeaderActions } from "@/components/sat/header-actions";
 import { suggestionValues } from "@/lib/search-suggestions";
+import { ACTIVE_SOURCE_WHERE } from "@/lib/content-source";
 
 interface PageProps {
   searchParams: Promise<{ view?: string; page?: string; q?: string }>;
@@ -41,7 +42,8 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
   const tests = (
     await prisma.fullPracticeTest.findMany({
       // The Tests of the programs the teacher teaches (shared bank).
-      where: await currentContentScope(),
+      // Tests of an inactive source are hidden (assigned ones keep working for the students).
+      where: { ...(await currentContentScope()), ...ACTIVE_SOURCE_WHERE },
       include: {
         source: { select: { id: true, name: true, sortOrder: true } },
         modules: { include: { questions: { select: { questionId: true, isPretest: true } } }, orderBy: { order: "asc" } },

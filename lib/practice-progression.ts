@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import { notifyUser } from "@/lib/notifications";
 import { shortSetName } from "@/lib/student-report";
 import { isUniqueConstraintError } from "@/lib/db-errors";
+import { ACTIVE_SOURCE_WHERE } from "@/lib/content-source";
 
 const DIFFICULTY_ORDER = ["EASY", "MEDIUM", "HARD"];
 
@@ -110,6 +111,8 @@ export async function applyPracticeProgression({ studentId, practiceSetId, score
       topicId: current.topicId,
       difficulty: current.difficulty,
       status: "PUBLISHED",
+      // Never auto-assign a set of an inactive source (the current one stays in the list to find "next").
+      OR: [{ id: current.id }, ACTIVE_SOURCE_WHERE],
       // Only the next set of the same program's bank (program = tenant).
       programId: current.programId,
     },
@@ -132,6 +135,8 @@ export async function applyPracticeProgression({ studentId, practiceSetId, score
       topicId: current.topicId,
       difficulty: nextDifficulty,
       status: "PUBLISHED",
+      // Never auto-assign a set of an inactive source.
+      ...ACTIVE_SOURCE_WHERE,
       // Only the next set of the same program's bank (program = tenant).
       programId: current.programId,
     },

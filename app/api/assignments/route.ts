@@ -6,6 +6,7 @@ import { ASSIGN_BATCH_SIZE, parseDueDate, resolveOpenDate, parseUnlockDate, upse
 import { contentScopeFor, studentAccessWhereFor } from "@/lib/program-scope";
 import { BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 import { writeAudit } from "@/lib/audit";
+import { ACTIVE_SOURCE_WHERE } from "@/lib/content-source";
 
 export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
@@ -39,7 +40,8 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
     }),
     prisma.practiceSet.findMany({
       // Bank scope: sets of a program the teacher teaches.
-      where: { id: { in: requestedPracticeSetIds }, status: "PUBLISHED", ...contentScopeFor(session.user) },
+      // An inactive source's sets can't be assigned (unavailable).
+      where: { id: { in: requestedPracticeSetIds }, status: "PUBLISHED", ...ACTIVE_SOURCE_WHERE, ...contentScopeFor(session.user) },
       select: { id: true, name: true, programId: true },
     }),
   ]);

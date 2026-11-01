@@ -3,6 +3,7 @@ import { contentScopeFor } from "@/lib/program-scope";
 import { revalidatePath } from "next/cache";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma, { atomicBatches } from "@/lib/prisma";
+import { ACTIVE_SOURCE_WHERE } from "@/lib/content-source";
 import { ASSIGN_BATCH_SIZE, parseDueDate, parseUnlockDate, upsertFullTestAssignment, type AssignmentOutcome } from "@/lib/assignments";
 import { studentAccessWhereFor } from "@/lib/program-scope";
 import { BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
@@ -24,7 +25,8 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
 
   const counts: Record<AssignmentOutcome, number> = { created: 0, updated: 0, reassigned: 0, unchanged: 0 };
   // Only Tests of a program the teacher teaches (shared bank).
-  const test = await prisma.fullPracticeTest.findFirst({ where: { id: testId, ...contentScopeFor(session.user) } });
+  // A Test of an inactive source can't be assigned.
+  const test = await prisma.fullPracticeTest.findFirst({ where: { id: testId, ...ACTIVE_SOURCE_WHERE, ...contentScopeFor(session.user) } });
   if (!test) return new NotFoundError("Test not found.").toResponse();
   if (test.status !== "PUBLISHED") {
     return new BadRequestError("Only published exams can be assigned.").toResponse();

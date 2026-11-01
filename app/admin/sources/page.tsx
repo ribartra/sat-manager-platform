@@ -13,6 +13,11 @@ export default async function AdminSourcesPage() {
     select: { id: true, name: true, active: true, forPracticeSets: true, forTests: true, _count: { select: { practiceSets: true, fullPracticeTests: true } } },
   });
 
+  // AI imports pointing at a source also keep it from being removed.
+  const imports = new Map(
+    (await prisma.ingestBatch.groupBy({ by: ["sourceId"], where: { sourceId: { not: null } }, _count: { _all: true } })).map((g) => [g.sourceId, g._count._all]),
+  );
+
   return (
     <PageShell>
       <Breadcrumbs items={[{ label: "Admin" }, { label: "Sources" }]} />
@@ -21,12 +26,13 @@ export default async function AdminSourcesPage() {
         description={
           <>
             Where Practice Sets and Tests come from. Each set or test has one source; “Used for” sets where it can be chosen: Practice Sets (each opens per source in Practice › By skill) and/or Tests.
-            A source in use can&apos;t be deleted — deactivate it to hide it from the editors.
+            An inactive source is hidden, with its sets and Tests, from Practice, Tests, the filters and Assign (what students already have assigned keeps working).
+            Only an empty source can be removed; one in use is deactivated instead.
           </>
         }
       />
       <SourcesClient
-        sources={sources.map((s) => ({ id: s.id, name: s.name, active: s.active, forPracticeSets: s.forPracticeSets, forTests: s.forTests, practiceSets: s._count.practiceSets, tests: s._count.fullPracticeTests }))}
+        sources={sources.map((s) => ({ id: s.id, name: s.name, active: s.active, forPracticeSets: s.forPracticeSets, forTests: s.forTests, practiceSets: s._count.practiceSets, tests: s._count.fullPracticeTests, imports: imports.get(s.id) ?? 0 }))}
       />
     </PageShell>
   );

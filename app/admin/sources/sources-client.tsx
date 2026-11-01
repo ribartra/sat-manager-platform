@@ -11,14 +11,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { apiFetch } from "@/lib/api-client";
 import { notify } from "@/lib/notify-ui";
+import { useConfirm } from "@/components/sat/confirm-dialog";
 
-type SourceRow = { id: string; name: string; active: boolean; forPracticeSets: boolean; forTests: boolean; practiceSets: number; tests: number };
+type SourceRow = { id: string; name: string; active: boolean; forPracticeSets: boolean; forTests: boolean; practiceSets: number; tests: number; imports: number };
 
 export function SourcesClient({ sources }: { sources: SourceRow[] }) {
   const router = useRouter();
   const [newName, setNewName] = useState("");
   const [editing, setEditing] = useState<{ id: string; name: string } | null>(null);
   const [busy, setBusy] = useState(false);
+  const confirm = useConfirm();
 
   async function run(action: () => Promise<unknown>, success: string) {
     setBusy(true);
@@ -46,6 +48,17 @@ export function SourcesClient({ sources }: { sources: SourceRow[] }) {
     if (!editing) return;
     const { id, name } = editing;
     if (await run(() => apiFetch(`/api/admin/sources/${id}`, { method: "PATCH", json: { name: name.trim() } }), "Source renamed.")) setEditing(null);
+  }
+
+  // "Remove": only an empty source (the server checks again); one in use is deactivated instead.
+  async function remove(source: SourceRow) {
+    const ok = await confirm({
+      title: `Remove "${source.name}"?`,
+      description: "It has no practice sets, tests or AI imports. It disappears from every list; this can't be undone.",
+      confirmLabel: "Remove",
+      tone: "danger",
+    });
+    if (ok) await run(() => apiFetch(`/api/admin/sources/${source.id}`, { method: "DELETE" }), `"${source.name}" removed.`);
   }
 
   // Swap with the neighbour: rewrite every source's sortOrder as its new position (1..n).
@@ -139,6 +152,19 @@ export function SourcesClient({ sources }: { sources: SourceRow[] }) {
                         }
                       >
                         {source.active ? "Deactivate" : "Activate"}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="danger"
+                        disabled={busy || source.practiceSets + source.tests + source.imports > 0}
+                        disabledReason={
+                          source.practiceSets + source.tests + source.imports > 0
+                            ? `In use (${[source.practiceSets ? `${source.practiceSets} sets` : "", source.tests ? `${source.tests} tests` : "", source.imports ? `${source.imports} AI imports` : ""].filter(Boolean).join(", ")}): deactivate it instead.`
+                            : undefined
+                        }
+                        onClick={() => remove(source)}
+                      >
+                        Remove
                       </Button>
                     </div>
                   ) : null}

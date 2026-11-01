@@ -11,7 +11,7 @@ import { assignableContentWhere, contentScopeFor, studentAccessWhereFor } from "
 import { refreshAssignmentStates } from "@/lib/assignments";
 import { loadStudentOverviews } from "@/lib/teacher-overview";
 import { domainRank } from "@/lib/taxonomy-order";
-import { DEFAULT_PRACTICE_SOURCE_ID } from "@/lib/content-source";
+import { ACTIVE_SOURCE_WHERE, DEFAULT_PRACTICE_SOURCE_ID } from "@/lib/content-source";
 import { resolvePracticeArea, tabFromPracticeArea } from "@/lib/practice-area";
 import { assignHref, assignQuery, parseAssignParams, type AssignArea, type AssignParams } from "@/lib/assign-params";
 import { difficultyLabel } from "@/lib/domain-meta";
@@ -163,7 +163,7 @@ export async function AssignView({ studentId, query }: { studentId: string | nul
     const [exams, existing] = await Promise.all([
       prisma.fullPracticeTest.findMany({
         // Only Tests of a program the teacher teaches and the student is enrolled in.
-        where: { status: "PUBLISHED", ...assignableContentWhere(session.user, student.id) },
+        where: { status: "PUBLISHED", ...ACTIVE_SOURCE_WHERE, ...assignableContentWhere(session.user, student.id) },
         include: { source: { select: { id: true, name: true, sortOrder: true } }, modules: { select: { id: true, questions: { select: { questionId: true } } } } },
         orderBy: { name: "asc" },
       }),
@@ -219,7 +219,7 @@ export async function AssignView({ studentId, query }: { studentId: string | nul
   const [practiceSets, existing] = await Promise.all([
     prisma.practiceSet.findMany({
       // Only sets of a program the teacher teaches and the student is enrolled in.
-      where: { status: "PUBLISHED", ...assignableContentWhere(session.user, student.id) },
+      where: { status: "PUBLISHED", ...ACTIVE_SOURCE_WHERE, ...assignableContentWhere(session.user, student.id) },
       include: {
         topic: { include: { domain: { include: { section: true } } } },
         source: { select: { id: true, name: true, sortOrder: true } },

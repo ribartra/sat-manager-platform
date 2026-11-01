@@ -15,6 +15,7 @@ import { currentContentScope } from "@/lib/content-scope";
 import { studentAccessWhereFor, teacherProgramIds } from "@/lib/program-scope";
 import { resolvePracticeArea } from "@/lib/practice-area";
 import { isInactive, loadStudentOverviews, type StudentOverview } from "@/lib/teacher-overview";
+import { ACTIVE_SOURCE_WHERE } from "@/lib/content-source";
 
 const DAY = 86_400_000;
 /** Latest items listed in a box (students, Tests, tries). */
@@ -44,7 +45,7 @@ export default async function TeacherDashboard() {
     prisma.user.findMany({ where: studentScope, select: { id: true }, orderBy: { name: "asc" } }),
     prisma.inviteToken.count({ where: inviteWhere }).catch(() => 0),
     prisma.fullPracticeTest.count({ where: { ...contentScope, status: "PUBLISHED" } }),
-    prisma.practiceSet.findMany({ where: { ...contentScope, status: "PUBLISHED" }, select: { topic: { select: { domain: { select: { practiceArea: true } } } } } }),
+    prisma.practiceSet.findMany({ where: { ...contentScope, ...ACTIVE_SOURCE_WHERE, status: "PUBLISHED" }, select: { topic: { select: { domain: { select: { practiceArea: true } } } } } }),
     // Test assignments of the teacher's students (same counting rule as the Tests page).
     prisma.fullPracticeTestAssignment.findMany({ where: { student: studentScope }, select: { status: true, dueDate: true } }),
   ]);

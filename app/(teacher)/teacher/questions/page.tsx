@@ -21,6 +21,7 @@ import { questionCrumbs } from "@/lib/question-crumbs";
 import { loadOptionImageUrlsByQuestionId } from "@/lib/question-list-media-query";
 import { QuestionsTable, type QuestionBankRow } from "./questions-table-client";
 import { resolveQuestionType } from "@/lib/question-type";
+import { ACTIVE_SOURCE_WHERE } from "@/lib/content-source";
 
 interface SearchParams { area?: string; section?: string; domain?: string; topic?: string; test?: string; module?: string; difficulty?: string; status?: string; page?: string }
 
@@ -70,7 +71,8 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
   // Tests tab: the Tests of the teacher's programs, one module or all.
   const tests = isTests
     ? await prisma.fullPracticeTest.findMany({
-        where: scope,
+        // Filter: no Test of an inactive source.
+        where: { ...scope, ...ACTIVE_SOURCE_WHERE },
         select: { id: true, name: true, number: true, source: { select: { name: true, sortOrder: true } } },
       })
     : [];

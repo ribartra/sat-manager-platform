@@ -2,7 +2,8 @@ import prisma from "@/lib/prisma";
 
 /**
  * Content source: where a Practice Set or Test comes from (College Board, Innovator, …). Global list
- * managed by admins at /admin/sources; inactive sources stay on their content but leave the editors.
+ * managed by admins at /admin/sources; an inactive source leaves the editors, the catalogues, the filters and
+ * Assign (see ACTIVE_SOURCE_WHERE). Only an empty source can be deleted ("Remove").
  */
 
 /** Seeded by migration 20261029_content_source. */
@@ -19,6 +20,14 @@ export interface SourceOption {
 
 /** Which content a source is offered for (Source.forPracticeSets / Source.forTests). */
 export type SourceKind = "practice" | "tests";
+
+/**
+ * Content whose source is active (or has none: seed sets count as College Board, unnumbered tests as
+ * "No source"). Teacher catalogues (Practice, Tests, Question Bank filter, Home) and new assignments
+ * (Assign views, assign routes, auto progression) use it: an inactive source hides its sets and Tests
+ * there. What students already have assigned keeps working (attempts, results, history untouched).
+ */
+export const ACTIVE_SOURCE_WHERE = { NOT: { source: { is: { active: false } } } };
 
 function kindWhere(kind?: SourceKind) {
   return kind === "practice" ? { forPracticeSets: true } : kind === "tests" ? { forTests: true } : {};

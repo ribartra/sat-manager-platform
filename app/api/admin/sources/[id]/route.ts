@@ -7,8 +7,8 @@ import { writeAudit } from "@/lib/audit";
 type Ctx = { params: Promise<{ id: string }> };
 
 // PATCH /api/admin/sources/[id] — { name?, active?, forPracticeSets?, forTests?, sortOrder? }: rename, activate /
-// deactivate, or choose which content it is offered for. Sources are never
-// deleted (their sets and Tests keep them); an inactive source leaves the editors.
+// deactivate, or choose which content it is offered for. An inactive source leaves the editors, the
+// catalogues, the filters and Assign (ACTIVE_SOURCE_WHERE); its content keeps it.
 export const PATCH = withApiErrors(async function PATCH(req: NextRequest, { params }: Ctx) {
   const session = await assertAdmin();
   const { id } = await params;
@@ -43,4 +43,29 @@ export const PATCH = withApiErrors(async function PATCH(req: NextRequest, { para
   const source = await prisma.source.update({ where: { id }, data });
   await writeAudit({ userId: session.user.id, action: "SOURCE_UPDATED", targetType: "Source", targetId: id, metadata: { previous, ...data } });
   return NextResponse.json({ source });
+});
+
+// DELETE /api/admin/sources/[id] — "Remove": only an empty source (no Practice Set, no Test, no AI
+// import pointing at it). One with content is deactivated instead.
+export const DELETE = withApiErrors(async function DELETE(_req: NextRequest, { params }: Ctx) {
+  const session = await assertAdmin();
+  const { id } = await params;
+  const source = await prisma.source.findUnique({
+    where: { id },
+    select: { name: true, active: true, forPracticeSets: true, forTests: true, _count: { select: { practiceSets: true, fullPracticeTests: true } } },
+  });
+  if (!source) throw new NotFoundError("Source not found.");
+  const imports = await prisma.ingestBatch.count({ where: { sourceId: id } });
+  const { practiceSets, fullPracticeTests } = source._count;
+  if (practiceSets || fullPracticeTests || imports) {
+    const uses = [
+      practiceSets ? `${practiceSets} practice set${practiceSets === 1 ? "" : "s"}` : null,
+      fullPracticeTests ? `${fullPracticeTests} test${fullPracticeTests === 1 ? "" : "s"}` : null,
+      imports ? `${imports} AI import${imports === 1 ? "" : "s"}` : null,
+    ].filter(Boolean);
+    throw new ConflictError(`"${source.name}" is used by ${uses.join(", ")}: deactivate it instead.`, { code: "SOURCE_IN_USE" });
+  }
+  await prisma.source.delete({ where: { id } });
+  await writeAudit({ userId: session.user.id, action: "SOURCE_DELETED", targetType: "Source", targetId: id, metadata: { name: source.name, active: source.active, forPracticeSets: source.forPracticeSets, forTests: source.forTests } });
+  return NextResponse.json({ ok: true });
 });

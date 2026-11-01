@@ -16,7 +16,7 @@ import { auth } from "@/lib/auth";
 import { requireContentImporter } from "@/lib/rbac";
 import { getFeatureFlagValues } from "@/lib/feature-flags";
 import { TEACHER_MORE_LINKS, resolveLinks } from "@/lib/nav-config";
-import { DEFAULT_PRACTICE_SOURCE_ID, listSources } from "@/lib/content-source";
+import { ACTIVE_SOURCE_WHERE, DEFAULT_PRACTICE_SOURCE_ID, listSources } from "@/lib/content-source";
 import { addCounts, assignmentCounts } from "@/lib/assignment-counts";
 import { studentAccessWhereFor } from "@/lib/program-scope";
 import { suggestionValues } from "@/lib/search-suggestions";
@@ -68,10 +68,11 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
   const search = filters.q?.trim() ?? "";
   const now = new Date();
   // Only sources used for Practice Sets (Innovator is Tests-only).
-  const sources = await listSources({ kind: "practice" });
+  // An inactive source leaves this page with its sets (it is still in Admin › Sources).
+  const sources = await listSources({ activeOnly: true, kind: "practice" });
   const practiceSets = await prisma.practiceSet.findMany({
     // The sets of the programs the teacher teaches (shared bank).
-    where: { topicId: { in: topicIds }, ...(session ? contentScopeFor(session.user) : { id: "__no_session__" }) },
+    where: { topicId: { in: topicIds }, ...ACTIVE_SOURCE_WHERE, ...(session ? contentScopeFor(session.user) : { id: "__no_session__" }) },
     include: {
       topic: { include: { domain: { include: { section: true } } } },
       source: { select: { id: true, name: true } },
@@ -184,8 +185,8 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
                 }
                 return { difficulty, state: "none", title: `No ${source.name} set at this level yet` };
               };
-              // Rows: every active practice source (its empty levels offer "+ Easy"), plus an inactive one that still has sets here.
-              const rows = sources.filter((source) => source.active || setsOfTopic.some((set) => set.sourceId === source.id));
+              // Rows: every active practice source (its empty levels offer "+ Easy").
+              const rows = sources;
               return {
                 id: topic.id,
                 name: topic.name,
@@ -194,7 +195,7 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
                 chips: DIFFICULTIES.map((difficulty) => chipFor(difficulty)),
                 rows: rows.map((source) => ({
                   id: source.id,
-                  name: source.active ? source.name : `${source.name} (inactive)`,
+                  name: source.name,
                   chips: DIFFICULTIES.map((difficulty) => chipFor(difficulty, source)),
                 })),
               };
