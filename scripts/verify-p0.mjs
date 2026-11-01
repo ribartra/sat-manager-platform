@@ -325,7 +325,7 @@ const checks = [
   },
   {
     file: "components/sat/test-number-accordion.tsx",
-    requires: ["const allAssigned = group.versions.every((version) => version.assigned);", "if (allAssigned) {", '<AssignedStamp placement="end" />'],
+    requires: ["const allAssigned = real.length > 0 && real.every((version) => version.assigned);", "if (allAssigned) {", '<AssignedStamp placement="end" />'],
     label: "TEST N: con todas sus fuentes asignadas es una fila fija con sello (no se despliega)",
   },
   // Results by skill (SAT-039/040/041): no Low performance, no summary card, no matrix, no Assign in results.
@@ -770,8 +770,8 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/practice-sets/page.tsx",
-    requires: ["SkillsSourceMap", "listSources({ kind: \"practice\" })", "source: source.id"],
-    label: "Practice › By skill: chips por skill y, al abrirlo, una fila por fuente de Practice Sets (sin Innovator)",
+    requires: ["SkillsSourceMap", "listSources({ activeOnly: true, kind: \"practice\" })", "source: source.id", "ACTIVE_SOURCE_WHERE"],
+    label: "Practice › By skill: chips por skill y, al abrirlo, una fila por fuente activa de Practice Sets (sin Innovator ni inactivas)",
   },
   {
     file: "components/sat/skills-map.tsx",
