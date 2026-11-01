@@ -13,6 +13,7 @@ if [ ! -d "$WT/app" ]; then
   [ -e "$WT/app/generated/prisma/client.ts" ] || cp -r "$REPO/app/generated" "$WT/app/"
   rm -rf "$WT/files_to_load"
 fi
-grep -v '^EMAIL_' "$REPO/.env" > "$WT/.env"
+# No SMTP, and AUTH_URL on this port (with :3000 the login screen fails with MissingCSRF).
+{ grep -v -e '^EMAIL_' -e '^AUTH_URL=' "$REPO/.env"; echo 'AUTH_URL=http://localhost:3001'; } > "$WT/.env"
 cd "$WT"
 exec env DATABASE_URL="file:$MANUAL_WORK/man.db" AUTH_URL="http://localhost:3001" npx next dev --webpack -p 3001

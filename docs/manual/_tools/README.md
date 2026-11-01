@@ -29,7 +29,7 @@ Each script depends on the data the previous ones created. **To start over, stop
 
 ## Notes
 
-- **Login** goes through the NextAuth API inside the browser context (`login()` in `lib.cjs`). The UI login fails on :3001 with MissingCSRF because of the worktree's `AUTH_URL`.
+- **Login:** the scripts sign in through the NextAuth API inside the browser context (`login()` in `lib.cjs`). `server.sh` sets `AUTH_URL` to :3001, so you can also sign in from the login screen to use this copy by hand (for example, for the AI import screenshots). The very first try after starting can fail while the page compiles: just try again.
 - **No emails are sent:** `server.sh` leaves the `EMAIL_*` variables empty, so the screens show the activation links.
 - **The Next.js dev badge is hidden** by CSS in the screenshots.
 - **Accounts, passwords and removed content** are set in `config.cjs` and documented in `../cuentas-demo.md`.
