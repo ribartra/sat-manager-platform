@@ -25,30 +25,29 @@ test.describe("consideraciones smoke", () => {
     await expectPortal(page, "teacher");
     await expect(page.getByRole("link", { name: "Materials" })).toHaveCount(0);
     await page.goto("/teacher/materials");
-    await expect(page.getByRole("heading", { name: "Study Materials" })).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: "Study materials" })).toHaveCount(0);
 
     await page.context().clearCookies();
     await loginAs(page, studentBox.email, E2E.studentPassword);
     await expectPortal(page, "student");
     await expect(page.getByRole("link", { name: "Materials" })).toHaveCount(0);
     await page.goto("/student/materials");
-    await expect(page.getByRole("heading", { name: "Study Materials" })).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: "Study materials" })).toHaveCount(0);
   });
 
-  test("Practice Set import modal shows dual trays", async ({ page }) => {
+  test("Practice offers Import with AI (master teacher)", async ({ page }) => {
     await loginAs(page, E2E.teacherEmail, E2E.teacherPassword);
-    await page.goto("/teacher/practice-sets/new");
-    await page.getByRole("button", { name: "Import from PDF" }).click();
-    await expect(page.getByRole("heading", { name: "Import questions from PDF/DOCX" })).toBeVisible();
-    await expect(page.getByText("Answers / Explanations").first()).toBeVisible();
-    await expect(page.getByText("Choose file").first()).toBeVisible();
-    await expect(page.getByText(/answers with explanations/i).first()).toBeVisible();
+    await page.goto("/teacher/practice-sets");
+    await page.getByRole("link", { name: "Import with AI" }).click();
+    await expect(page.getByRole("heading", { name: "Import with AI" })).toBeVisible();
+    await expect(page.getByText("What are you importing?")).toBeVisible();
+    await expect(page.getByText("Questions PDF")).toBeVisible();
   });
 
   test("Student history does not show practice SAT averages", async ({ page }) => {
     await loginAs(page, studentBox.email, E2E.studentPassword);
     await page.goto("/student/history");
-    await expect(page.getByRole("heading", { name: "My History" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "My history" })).toBeVisible();
     await expect(page.getByText("SAT R&W average")).toHaveCount(0);
     await expect(page.getByText("SAT Math average")).toHaveCount(0);
     await expect(page.getByRole("link", { name: "Math", exact: true })).toBeVisible();

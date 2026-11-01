@@ -25,6 +25,8 @@
 # production
 /build
 /backups
+# Safety copies left by npm run db:restore / make pull-db (they hold real data).
+dev.db.pre-restore.*
 /.private
 
 # local database/runtime state
@@ -79,3 +81,12 @@ public/uploads/
 
 # Throwaway ingest/diagnostic scripts and plans
 scratchpad/
+
+# Business / management documents: kept locally, not in the repository
+/SAT platform/
+/Analisis de proyecto SAT*
+/SAT_Math_Skills_Tracker_clean.pdf
+.~lock.*#
+
+# Local recordings (meetings, demos) stay out of the repo.
+/*.m4a

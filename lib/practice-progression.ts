@@ -1,5 +1,8 @@
 import prisma from "@/lib/prisma";
 import { notifyUser } from "@/lib/notifications";
+import { shortSetName } from "@/lib/student-report";
+import { isUniqueConstraintError } from "@/lib/db-errors";
+import { ACTIVE_SOURCE_WHERE } from "@/lib/content-source";
 
 const DIFFICULTY_ORDER = ["EASY", "MEDIUM", "HARD"];
 
@@ -45,9 +48,10 @@ async function ensureUnlockedAssignment(studentId: string, practiceSetId: string
     if (existing.status === "COMPLETED") return;
     await prisma.assignment.update({
       where: { id: existing.id },
-      data: { locked: false, unlockAt: null },
+      // Opens now; a past open date is kept.
+      data: { locked: false, unlockAt: existing.unlockAt ?? new Date() },
     });
-    await notifyUser(studentId, "Practice set unlocked", existing.practiceSet.name, "/student");
+    await notifyUser(studentId, "Practice Set unlocked", `${shortSetName(existing.practiceSet.name)} is open now.`, "/student");
     await prisma.auditLog.create({
       data: {
         userId: studentId,
@@ -64,16 +68,23 @@ async function ensureUnlockedAssignment(studentId: string, practiceSetId: string
     where: { id: practiceSetId },
     select: { name: true },
   });
-  const assignment = await prisma.assignment.create({
-    data: {
-      studentId,
-      practiceSetId,
-      assignedById: null,
-      locked: false,
-      status: "PENDING",
-    },
-  });
-  await notifyUser(studentId, "Practice set unlocked", practiceSet?.name ?? "A practice set was unlocked.", "/student");
+  let assignment;
+  try {
+    assignment = await prisma.assignment.create({
+      data: {
+        studentId,
+        practiceSetId,
+        assignedById: null,
+        unlockAt: new Date(),
+        locked: false,
+        status: "PENDING",
+      },
+    });
+  } catch (error) {
+    if (!isUniqueConstraintError(error)) throw error;
+    return;
+  }
+  await notifyUser(studentId, "Practice Set unlocked", practiceSet?.name ? `${shortSetName(practiceSet.name)} is open now.` : "A new Practice Set is open now.", "/student");
   await prisma.auditLog.create({
     data: {
       userId: studentId,
@@ -85,10 +96,11 @@ async function ensureUnlockedAssignment(studentId: string, practiceSetId: string
   });
 }
 
+
 export async function applyPracticeProgression({ studentId, practiceSetId, scorePercent }: ProgressionInput) {
   const current = await prisma.practiceSet.findUnique({
     where: { id: practiceSetId },
-    select: { id: true, topicId: true, difficulty: true, createdAt: true, name: true },
+    select: { id: true, topicId: true, difficulty: true, createdAt: true, name: true, programId: true },
   });
   if (!current) return;
 
@@ -99,6 +111,10 @@ export async function applyPracticeProgression({ studentId, practiceSetId, score
       topicId: current.topicId,
       difficulty: current.difficulty,
       status: "PUBLISHED",
+      // Never auto-assign a set of an inactive source (the current one stays in the list to find "next").
+      OR: [{ id: current.id }, ACTIVE_SOURCE_WHERE],
+      // Only the next set of the same program's bank (program = tenant).
+      programId: current.programId,
     },
     orderBy: [{ createdAt: "asc" }, { name: "asc" }],
     select: { id: true },
@@ -119,6 +135,10 @@ export async function applyPracticeProgression({ studentId, practiceSetId, score
       topicId: current.topicId,
       difficulty: nextDifficulty,
       status: "PUBLISHED",
+      // Never auto-assign a set of an inactive source.
+      ...ACTIVE_SOURCE_WHERE,
+      // Only the next set of the same program's bank (program = tenant).
+      programId: current.programId,
     },
     orderBy: [{ createdAt: "asc" }, { name: "asc" }],
     select: { id: true },

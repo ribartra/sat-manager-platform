@@ -1,5 +1,7 @@
 "use client";
 
+import { BLOCKED_SURFACE } from "@/components/ui/control-states";
+import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
@@ -7,10 +9,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { CheckCircle2, FileArchive, FileSearch, RefreshCcw, Search, UploadCloud } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, DisabledReason } from "@/components/ui/button";
 import { CopyableTruncatedText } from "@/components/ui/copyable-truncated-text";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+import { FilterBar, FilterField } from "@/components/sat/filter-bar";
 import { MathContent } from "@/components/math-content";
 import { FormattedTextField } from "@/components/formatted-text-field";
 import { PdfPageCropper, type CropTarget, type CropOcrResult } from "@/app/admin/import/ai/_components/pdf-page-cropper";
@@ -18,6 +22,7 @@ import { ExtractedTestRail } from "@/app/admin/import/ai/_components/extracted-t
 import { queryKeys } from "@/lib/query-keys";
 import type { ExtractedTestRow } from "@/lib/ingest-sets";
 import { stripIngestImagePlaceholders } from "@/lib/ingest-text-sanitize";
+import { errorMessage, readApiError } from "@/lib/api-client";
 
 const MAX_UPLOAD_BYTES = 256 * 1024 * 1024;
 const targetTypes = [
@@ -155,6 +160,10 @@ type AiImportWorkflowProps = {
   fullTests: FullTestSummary[];
   cropImageSources: Record<string, { imageSourceFileId: string; pageNumbers: number[] }>;
   setRows: ExtractedTestRow[];
+  /** Active content sources (AI Import "Source": what the batch promotes is saved under it). */
+  sources?: { id: string; name: string; forPracticeSets: boolean; forTests: boolean }[];
+  /** Source the batch's Tests are promoted under ("TEST N · source"). */
+  testSourceName?: string;
   counts: {
     ocrPending: number;
     openIncidents: number;
@@ -278,6 +287,8 @@ export function AiImportWorkflowClient({
   fullTests,
   cropImageSources,
   setRows,
+  sources = [],
+  testSourceName,
   counts,
 }: AiImportWorkflowProps) {
   const router = useRouter();
@@ -398,14 +409,16 @@ export function AiImportWorkflowClient({
     label: WorkflowStep;
     description: string;
     enabled: boolean;
+    /** Shown when the step is not available yet. */
+    blockedReason?: string;
     count?: number;
     icon: typeof UploadCloud;
   }> = [
     { label: "Load", description: "Batches and ZIP/folder load", enabled: true, count: batches.length, icon: UploadCloud },
-    { label: "Process", description: "Extract text, answers and images", enabled: Boolean(selectedBatchId) && !processBlocked, count: files.length, icon: FileArchive },
-    { label: "Recover", description: "Retry OCR and failed work", enabled: Boolean(selectedBatchId) && (counts.ocrPending > 0 || counts.openIncidents > 0), count: counts.ocrPending + counts.openIncidents, icon: RefreshCcw },
-    { label: "Review", description: "Files, incidents and questions", enabled: Boolean(selectedBatchId) && (files.length > 0 || counts.candidates > 0 || counts.totalIncidents > 0), count: counts.reviewItems, icon: FileSearch },
-    { label: "Promote", description: "Create drafts from reviewed content", enabled: Boolean(selectedBatchId) && counts.candidates > 0, count: practiceSets.length, icon: CheckCircle2 },
+    { label: "Process", description: "Extract text, answers and images", enabled: Boolean(selectedBatchId) && !processBlocked, blockedReason: !selectedBatchId ? "Select or load a batch first." : "The batch is being processed; wait until it finishes.", count: files.length, icon: FileArchive },
+    { label: "Recover", description: "Retry OCR and failed work", enabled: Boolean(selectedBatchId) && (counts.ocrPending > 0 || counts.openIncidents > 0), blockedReason: !selectedBatchId ? "Select or load a batch first." : "Nothing to recover: no pending OCR or open incidents.", count: counts.ocrPending + counts.openIncidents, icon: RefreshCcw },
+    { label: "Review", description: "Files, incidents and questions", enabled: Boolean(selectedBatchId) && (files.length > 0 || counts.candidates > 0 || counts.totalIncidents > 0), blockedReason: !selectedBatchId ? "Select or load a batch first." : "Process the batch first; there is nothing to review yet.", count: counts.reviewItems, icon: FileSearch },
+    { label: "Promote", description: "Create drafts from reviewed content", enabled: Boolean(selectedBatchId) && counts.candidates > 0, blockedReason: !selectedBatchId ? "Select or load a batch first." : "No reviewed questions to promote yet.", count: practiceSets.length, icon: CheckCircle2 },
   ];
 
   async function saveDraft(status?: string) {
@@ -430,12 +443,12 @@ export function AiImportWorkflowClient({
         type: draft.type,
       }),
     });
-    const data = await response.json().catch(() => ({}));
     setSaving(false);
     if (!response.ok) {
-      setMessage(data.error || "Could not save question.");
+      setMessage(errorMessage(await readApiError(response, "Could not save question.")));
       return;
     }
+    const data = await response.json();
     setDraft(data);
     setSavedSignature(candidateContentSignature(data, optionsToJson(optionRows)));
     setMessage(status ? `Question marked ${status}.` : "Question saved.");
@@ -478,10 +491,14 @@ export function AiImportWorkflowClient({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ imageArtifactId }),
     });
-    const data = await response.json().catch(() => ({}));
     setParsingImageId(null);
-    if (!response.ok || !Array.isArray(data.options) || data.options.length !== 4) {
-      setMessage(data.error || data.warning || "Could not parse A-D options from this image.");
+    if (!response.ok) {
+      setMessage(errorMessage(await readApiError(response, "Could not parse A-D options from this image.")));
+      return;
+    }
+    const data = await response.json();
+    if (!Array.isArray(data.options) || data.options.length !== 4) {
+      setMessage(data.warning || "Could not parse A-D options from this image.");
       return;
     }
     setOptionRows(data.options);
@@ -495,23 +512,31 @@ export function AiImportWorkflowClient({
       <div className="grid gap-3 md:grid-cols-5">
         {steps.map((step) => {
           const Icon = step.icon;
-          return (
+          const card = (
             <button
               key={step.label}
               type="button"
               onClick={() => step.enabled && setOpenStep(step.label)}
               disabled={!step.enabled}
-              className="min-h-28 rounded-lg border border-gray-200 bg-white p-4 text-left shadow-sm transition hover:border-blue-300 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-gray-200 disabled:hover:bg-white"
+              aria-describedby={!step.enabled && step.blockedReason ? `step-blocked-${step.label}` : undefined}
+              className={`group min-h-28 rounded-lg border border-gray-200 bg-white p-4 text-left shadow-sm transition hover:border-blue-300 hover:bg-blue-50 ${BLOCKED_SURFACE}`}
             >
               <div className="flex items-start justify-between gap-3">
-                <span className="flex h-9 w-9 items-center justify-center rounded-md bg-gray-100 text-gray-700">
+                <span className="flex h-9 w-9 items-center justify-center rounded-md bg-gray-100 text-gray-700 group-disabled:text-gray-400">
                   <Icon className="h-4 w-4" />
                 </span>
                 {step.count !== undefined && <Badge variant={step.enabled ? "info" : "default"}>{step.count}</Badge>}
               </div>
-              <p className="mt-3 text-sm font-semibold text-gray-900">{step.label}</p>
-              <p className="mt-1 line-clamp-2 text-xs text-gray-500">{step.description}</p>
+              <p className="mt-3 text-sm font-semibold text-gray-900 group-disabled:text-gray-400">{step.label}</p>
+              <p className="mt-1 line-clamp-2 text-xs text-gray-500 group-disabled:text-gray-400">{step.description}</p>
             </button>
+          );
+          return !step.enabled && step.blockedReason ? (
+            <DisabledReason key={step.label} reason={step.blockedReason} id={`step-blocked-${step.label}`} fullWidth>
+              {card}
+            </DisabledReason>
+          ) : (
+            card
           );
         })}
       </div>
@@ -522,7 +547,7 @@ export function AiImportWorkflowClient({
             <DialogTitle>Load Sources</DialogTitle>
             <DialogDescription>Create a staging batch from the server folder or upload a ZIP package.</DialogDescription>
           </DialogHeader>
-          <AiImportActions selectedBatchId={selectedBatchId} />
+          <AiImportActions selectedBatchId={selectedBatchId} sources={sources} />
           <div className="rounded-md border border-gray-200">
             <div className="border-b border-gray-100 px-4 py-3 text-sm font-semibold text-gray-900">Batch selector</div>
             <div className="max-h-72 divide-y divide-gray-100 overflow-auto">
@@ -551,7 +576,7 @@ export function AiImportWorkflowClient({
             <DialogTitle>Process Batch</DialogTitle>
             <DialogDescription>Run extraction for the selected batch and monitor the result from the dashboard.</DialogDescription>
           </DialogHeader>
-          <AiImportActions selectedBatchId={selectedBatchId} />
+          <AiImportActions selectedBatchId={selectedBatchId} sources={sources} />
         </DialogContent>
       </Dialog>
 
@@ -562,7 +587,7 @@ export function AiImportWorkflowClient({
             <DialogDescription>Retry OCR or review open incidents before promoting drafts.</DialogDescription>
           </DialogHeader>
           {selectedBatchId && <RetryFailedJobsButton batchId={selectedBatchId} pendingCount={counts.ocrPending} />}
-          <FilterBar query={incidentQuery} setQuery={setIncidentQuery} status={incidentStatus} setStatus={setIncidentStatus} statusOptions={["OPEN", "RESOLVED", "ALL"]} placeholder="Search incident, file or decision" />
+          <SearchStatusFilter query={incidentQuery} setQuery={setIncidentQuery} status={incidentStatus} setStatus={setIncidentStatus} statusOptions={["OPEN", "RESOLVED", "ALL"]} placeholder="Search incident, file or decision" />
           <IncidentList incidents={filteredIncidents} files={fileById} batchId={selectedBatchId} />
         </DialogContent>
       </Dialog>
@@ -586,7 +611,7 @@ export function AiImportWorkflowClient({
                       {selectedExtractedTest.title}
                     </p>
                   )}
-                  <FilterBar query={candidateQuery} setQuery={setCandidateQuery} status={candidateStatus} setStatus={setCandidateStatus} statusOptions={["ALL", "NEEDS_REVIEW", "READY", "REVIEWED", "REJECTED", "PROMOTED", "EDITING"]} placeholder="Search question, topic or file" />
+                  <SearchStatusFilter query={candidateQuery} setQuery={setCandidateQuery} status={candidateStatus} setStatus={setCandidateStatus} statusOptions={["ALL", "NEEDS_REVIEW", "READY", "REVIEWED", "REJECTED", "PROMOTED", "EDITING"]} placeholder="Search question, topic or file" />
                 </div>
                 <div className="max-h-[560px] divide-y divide-gray-100 overflow-auto">
                   {visibleCandidates.map((candidate) => (
@@ -596,8 +621,7 @@ export function AiImportWorkflowClient({
                     >
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex min-w-0 items-center gap-2">
-                          <input
-                            type="checkbox"
+                          <Checkbox
                             checked={selectedCandidateIds.has(candidate.id)}
                             onChange={(event) => toggleCandidate(candidate.id, event.target.checked)}
                             disabled={!["READY", "REVIEWED"].includes(candidate.status) || candidate.promotionStatus === "PROMOTED"}
@@ -672,7 +696,7 @@ export function AiImportWorkflowClient({
             </section>
             <section className="rounded-md border border-gray-200 p-3">
               <p className="mb-3 text-sm font-semibold text-gray-900">Incidents</p>
-              <FilterBar query={incidentQuery} setQuery={setIncidentQuery} status={incidentStatus} setStatus={setIncidentStatus} statusOptions={["OPEN", "RESOLVED", "ALL"]} placeholder="Search incident, file or decision" />
+              <SearchStatusFilter query={incidentQuery} setQuery={setIncidentQuery} status={incidentStatus} setStatus={setIncidentStatus} statusOptions={["OPEN", "RESOLVED", "ALL"]} placeholder="Search incident, file or decision" />
               <IncidentList incidents={filteredIncidents} files={fileById} batchId={selectedBatchId} />
             </section>
           </div>
@@ -683,13 +707,13 @@ export function AiImportWorkflowClient({
         <DialogContent className="max-h-[90vh] max-w-6xl overflow-auto">
           <DialogHeader>
             <DialogTitle>Promote Reviewed Content</DialogTitle>
-            <DialogDescription>Create draft Practice Sets or Full Practice Tests only after staging review is clean.</DialogDescription>
+            <DialogDescription>Create draft Practice Sets or Tests only after staging review is clean.</DialogDescription>
           </DialogHeader>
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-gray-200 p-4">
             <div>
-              <p className="text-sm font-semibold text-gray-900">Full Practice Tests (standardized SAT)</p>
+              <p className="text-sm font-semibold text-gray-900">Tests (full-length SAT)</p>
               <p className="text-xs text-gray-500">
-                {fullTests.length} tests · staging review uses 2 Extracted Tests (R&amp;W + Math); promote assembles 4 groups
+                {fullTests.length} tests{testSourceName ? <> · promoted as TEST N of <b>{testSourceName}</b></> : null} · staging review uses 2 Extracted Tests (R&amp;W + Math); promote assembles 4 groups
                 (RW M1/M2 · Math M1/M2) with timers 32/32/35/35 and section scores.
               </p>
             </div>
@@ -699,7 +723,7 @@ export function AiImportWorkflowClient({
               <div key={test.testNumber} className="rounded-md border border-gray-200 p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">Full Practice Test {test.testNumber}</p>
+                    <p className="text-sm font-semibold text-gray-900">TEST {test.testNumber}{testSourceName ? <span className="font-normal text-gray-500"> · {testSourceName}</span> : null}</p>
                     <p className="mt-1 text-xs text-gray-500">
                       {test.promoted}/{test.total} official · 2 Extracted Tests → 4 SAT groups
                     </p>
@@ -735,7 +759,7 @@ export function AiImportWorkflowClient({
                     />
                   )}
                   {test.artifactId ? (
-                    <Link href="/teacher/practice-sets?area=mocks" className="rounded-md border border-green-200 px-3 py-2 text-xs font-medium text-green-700 hover:bg-green-50">
+                    <Link href="/teacher/tests" className="rounded-md border border-green-200 px-3 py-2 text-xs font-medium text-green-700 hover:bg-green-50">
                       Open Draft Test
                     </Link>
                   ) : test.promoted > 0 && selectedBatchId ? (
@@ -746,7 +770,7 @@ export function AiImportWorkflowClient({
                 </div>
               </div>
             ))}
-            {fullTests.length === 0 && <p className="col-span-full py-8 text-center text-sm text-gray-400">No Full Practice Tests detected in this batch.</p>}
+            {fullTests.length === 0 && <p className="col-span-full py-8 text-center text-sm text-gray-400">No Tests detected in this batch.</p>}
           </div>
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             {practiceSets.map((set) => {
@@ -774,7 +798,7 @@ export function AiImportWorkflowClient({
                       />
                     )}
                     {set.artifactId ? (
-                      <Link href={`/teacher/practice-sets/${set.artifactId}/edit`} className="rounded-md border border-green-200 px-3 py-2 text-xs font-medium text-green-700 hover:bg-green-50">
+                      <Link href={`/teacher/practice-sets/${set.artifactId}?edit`} className="rounded-md border border-green-200 px-3 py-2 text-xs font-medium text-green-700 hover:bg-green-50">
                         Open Draft Set
                       </Link>
                     ) : selectedBatchId && set.promoted > 0 ? (
@@ -825,12 +849,12 @@ function BulkPromoteQuestionsBar({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ candidateIds: selectedCandidateIds }),
     });
-    const data = await response.json().catch(() => ({}));
     setLoading(false);
     if (!response.ok) {
-      setMessage(data.error ?? "Could not promote selected questions.");
+      setMessage(errorMessage(await readApiError(response, "Could not promote selected questions.")));
       return;
     }
+    const data = await response.json();
     setMessage(`Promoted ${data.promoted ?? 0}; skipped ${data.skipped ?? 0}; errors ${(data.errors ?? []).length}.`);
     onClear();
     router.refresh();
@@ -843,13 +867,13 @@ function BulkPromoteQuestionsBar({
         <p className="text-xs text-gray-600">{selectedCandidateIds.length} selected · {visiblePromotableCount} promotable in current filter.</p>
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        <Button type="button" variant="secondary" size="sm" onClick={onSelectVisible} disabled={visiblePromotableCount === 0}>
+        <Button type="button" variant="secondary" size="sm" onClick={onSelectVisible} disabledReason={visiblePromotableCount === 0 ? "No promotable questions in this view." : null}>
           Select filtered ready
         </Button>
-        <Button type="button" variant="secondary" size="sm" onClick={onClear} disabled={selectedCandidateIds.length === 0}>
+        <Button type="button" variant="secondary" size="sm" onClick={onClear} disabledReason={selectedCandidateIds.length === 0 ? "Select at least one question." : null}>
           Clear
         </Button>
-        <Button type="button" size="sm" onClick={promoteSelected} disabled={!batchId || selectedCandidateIds.length === 0 || loading}>
+        <Button type="button" size="sm" onClick={promoteSelected} disabled={loading} disabledReason={!batchId ? "Select a batch first." : selectedCandidateIds.length === 0 ? "Select at least one question." : null}>
           {loading ? "Promoting..." : "Promote selected"}
         </Button>
         {message && <span className="text-xs text-gray-600">{message}</span>}
@@ -871,19 +895,19 @@ function PromoteQuestionIdsButton({ batchId, candidateIds, label }: { batchId: s
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ candidateIds }),
     });
-    const data = await response.json().catch(() => ({}));
     setLoading(false);
     if (!response.ok) {
-      setMessage(data.error ?? "Could not promote questions.");
+      setMessage(errorMessage(await readApiError(response, "Could not promote questions.")));
       return;
     }
+    const data = await response.json();
     setMessage(`Promoted ${data.promoted ?? 0}.`);
     router.refresh();
   }
 
   return (
     <div className="space-y-1">
-      <Button type="button" variant="secondary" size="sm" onClick={promote} disabled={loading || candidateIds.length === 0}>
+      <Button type="button" variant="secondary" size="sm" onClick={promote} disabled={loading} disabledReason={candidateIds.length === 0 ? "No questions to promote in this set." : null}>
         {loading ? "Promoting..." : label}
       </Button>
       {message && <p className="max-w-44 text-xs text-gray-500">{message}</p>}
@@ -891,7 +915,7 @@ function PromoteQuestionIdsButton({ batchId, candidateIds, label }: { batchId: s
   );
 }
 
-function FilterBar({
+function SearchStatusFilter({
   query,
   setQuery,
   status,
@@ -907,15 +931,19 @@ function FilterBar({
   placeholder: string;
 }) {
   return (
-    <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_160px]">
-      <label className="relative block">
-        <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-        <Input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={placeholder} className="pl-9" />
-      </label>
-      <select value={status} onChange={(event) => setStatus(event.target.value)} className="rounded-md border border-gray-300 px-3 py-2 text-sm">
-        {statusOptions.map((option) => <option key={option} value={option}>{option}</option>)}
-      </select>
-    </div>
+    <FilterBar className="mb-0 mt-3" sticky={false}>
+      <FilterField label="Search" className="@md:flex-[2]">
+        <div className="relative">
+          <Search size={14} aria-hidden className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+          <Input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder={placeholder} aria-label="Search" className="pl-8" />
+        </div>
+      </FilterField>
+      <FilterField label="Status">
+        <Select value={status} onChange={(event) => setStatus(event.target.value)} aria-label="Status">
+          {statusOptions.map((option) => <option key={option} value={option}>{option}</option>)}
+        </Select>
+      </FilterField>
+    </FilterBar>
   );
 }
 
@@ -935,26 +963,32 @@ function FileFilters({
   setFileStatus: (value: string) => void;
 }) {
   return (
-    <div className="grid gap-2 md:grid-cols-[1fr_170px_140px]">
-      <label className="relative block">
-        <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-        <Input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search file, topic, path or test" className="pl-9" />
-      </label>
-      <select value={fileType} onChange={(event) => setFileType(event.target.value)} className="rounded-md border border-gray-300 px-3 py-2 text-sm">
-        <option value="ALL">All types</option>
-        <option value="PRACTICE_SET">Practice Sets</option>
-        <option value="FULL_PRACTICE_TEST">Full Tests</option>
-        <option value="PRACTICE_EXERCISE">Practice folders</option>
-        <option value="MOCK_EXAM">Mock exams</option>
-      </select>
-      <select value={fileStatus} onChange={(event) => setFileStatus(event.target.value)} className="rounded-md border border-gray-300 px-3 py-2 text-sm">
-        <option value="ALL">All status</option>
-        <option value="PENDING">PENDING</option>
-        <option value="PROCESSING">PROCESSING</option>
-        <option value="COMPLETED">COMPLETED</option>
-        <option value="FAILED">FAILED</option>
-      </select>
-    </div>
+    <FilterBar className="mb-0" sticky={false}>
+      <FilterField label="Search" className="@md:flex-[2]">
+        <div className="relative">
+          <Search size={14} aria-hidden className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+          <Input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search file, topic, path or test" aria-label="Search" className="pl-8" />
+        </div>
+      </FilterField>
+      <FilterField label="Type">
+        <Select value={fileType} onChange={(event) => setFileType(event.target.value)} aria-label="Type">
+          <option value="ALL">All types</option>
+          <option value="PRACTICE_SET">Practice Sets</option>
+          <option value="FULL_PRACTICE_TEST">Full Tests</option>
+          <option value="PRACTICE_EXERCISE">Practice folders</option>
+          <option value="MOCK_EXAM">Mock exams</option>
+        </Select>
+      </FilterField>
+      <FilterField label="Status">
+        <Select value={fileStatus} onChange={(event) => setFileStatus(event.target.value)} aria-label="Status">
+          <option value="ALL">All status</option>
+          <option value="PENDING">PENDING</option>
+          <option value="PROCESSING">PROCESSING</option>
+          <option value="COMPLETED">COMPLETED</option>
+          <option value="FAILED">FAILED</option>
+        </Select>
+      </FilterField>
+    </FilterBar>
   );
 }
 
@@ -1153,8 +1187,8 @@ function QuestionStagingEditor({
             <label className="grid gap-1">
               <span className="text-xs font-medium text-gray-500">Type</span>
               <select value={draft.type} onChange={(event) => setDraft({ ...draft, type: event.target.value })} className="rounded-md border border-gray-300 px-3 py-2 text-sm">
-                <option value="MC">MC</option>
-                <option value="NUMERIC">NUMERIC</option>
+                <option value="MC">Multiple Choice</option>
+                <option value="NUMERIC">Numeric</option>
               </select>
             </label>
           </div>
@@ -1166,7 +1200,7 @@ function QuestionStagingEditor({
             formatPreview={stripMarkdownImageRefs}
           />
           <div className={`flex flex-wrap items-center gap-2 rounded-md border p-3 transition-colors ${dirty ? "border-amber-300 bg-amber-50" : "border-gray-200 bg-gray-50"}`}>
-            <Button type="button" onClick={() => saveDraft()} disabled={saving || !dirty}>
+            <Button type="button" onClick={() => saveDraft()} disabled={saving} disabledReason={!dirty ? "No changes to save." : null}>
               {saving ? "Saving…" : dirty ? "Save changes" : "Saved"}
             </Button>
             <Button type="button" variant="secondary" onClick={() => saveDraft("REVIEWED")} disabled={saving}>Mark Reviewed</Button>
@@ -1279,8 +1313,10 @@ function MiniStat({ label, value, warning }: { label: string; value: number | st
   );
 }
 
-export function AiImportActions({ selectedBatchId }: { selectedBatchId?: string }) {
+export function AiImportActions({ selectedBatchId, sources = [] }: { selectedBatchId?: string; sources?: AiImportWorkflowProps["sources"] }) {
   const router = useRouter();
+  // "" = the default (College Board for Practice Sets, Innovator for Tests).
+  const [sourceId, setSourceId] = useState("");
   const [name, setName] = useState("SAT files_to_load ingest");
   const [basePath, setBasePath] = useState("files_to_load");
   const [zipFile, setZipFile] = useState<File | null>(null);
@@ -1293,14 +1329,14 @@ export function AiImportActions({ selectedBatchId }: { selectedBatchId?: string 
     const res = await fetch("/api/admin/ai-import/batches", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, basePath }),
+      body: JSON.stringify({ name, basePath, sourceId }),
     });
-    const data = await res.json();
     setLoading(false);
     if (!res.ok) {
-      setMessage(data.error || "Could not create batch.");
+      setMessage(errorMessage(await readApiError(res, "Could not create batch.")));
       return;
     }
+    const data = await res.json();
     setMessage(`Batch created with ${data.totalFiles ?? 0} source files. Review the scan before processing.`);
     router.push(`/admin/import/ai?batch=${data.id}`);
     router.refresh();
@@ -1317,16 +1353,17 @@ export function AiImportActions({ selectedBatchId }: { selectedBatchId?: string 
     const formData = new FormData();
     formData.set("name", name || zipFile.name.replace(/\.zip$/i, ""));
     formData.set("file", zipFile);
+    formData.set("sourceId", sourceId);
     const res = await fetch("/api/admin/ai-import/upload", {
       method: "POST",
       body: formData,
     });
-    const data = await res.json().catch(() => ({}));
     setLoading(false);
     if (!res.ok) {
-      setMessage(data.error || "Could not upload ZIP.");
+      setMessage(errorMessage(await readApiError(res, "Could not upload ZIP.")));
       return;
     }
+    const data = await res.json();
     setZipFile(null);
     setMessage(`ZIP scanned into staging: ${data.totalFiles ?? 0} source files detected.`);
     router.push(`/admin/import/ai?batch=${data.id}`);
@@ -1338,10 +1375,9 @@ export function AiImportActions({ selectedBatchId }: { selectedBatchId?: string 
     setLoading(true);
     setMessage("Processing selected batch. OCR may continue in the background.");
     const res = await fetch(`/api/admin/ai-import/batches/${selectedBatchId}/process`, { method: "POST" });
-    const data = await res.json();
     setLoading(false);
     if (!res.ok) {
-      setMessage(data.error || "Could not start processing.");
+      setMessage(errorMessage(await readApiError(res, "Could not start processing.")));
       return;
     }
     setMessage("Processing started. Refresh this page to see files, incidents and candidates.");
@@ -1350,6 +1386,19 @@ export function AiImportActions({ selectedBatchId }: { selectedBatchId?: string 
 
   return (
     <div className="space-y-5">
+      <label className="grid max-w-md gap-1">
+        <span className="text-xs font-medium text-gray-500">Source</span>
+        <Select value={sourceId} onChange={(event) => setSourceId(event.target.value)} aria-label="Source">
+          <option value="">Default (College Board for Practice Sets, Innovator for Tests)</option>
+          {(sources ?? []).map((source) => (
+            <option key={source.id} value={source.id}>
+              {source.name}
+              {source.forPracticeSets && source.forTests ? "" : source.forTests ? " · Tests only" : " · Practice Sets only"}
+            </option>
+          ))}
+        </Select>
+        <span className="text-xs text-gray-500">The Practice Sets / Tests this batch creates are saved under this source (when it is used for that kind of content).</span>
+      </label>
       <div className="grid gap-4 lg:grid-cols-2">
         <section className="rounded-md border border-gray-200 bg-white p-4">
           <div className="mb-3">
@@ -1366,7 +1415,7 @@ export function AiImportActions({ selectedBatchId }: { selectedBatchId?: string 
               <Input value={basePath} onChange={(event) => setBasePath(event.target.value)} placeholder="files_to_load" />
             </label>
             <div className="flex justify-end">
-              <Button onClick={createBatch} disabled={loading || !name || !basePath}>
+              <Button onClick={createBatch} disabled={loading} disabledReason={!name ? "Enter a batch name." : !basePath ? "Enter the server folder path." : null}>
                 Scan Folder
               </Button>
             </div>
@@ -1384,7 +1433,7 @@ export function AiImportActions({ selectedBatchId }: { selectedBatchId?: string 
               <input
                 type="file"
                 accept=".zip,application/zip,application/x-zip-compressed"
-                className="mt-2 block w-full text-sm text-gray-700 file:mr-3 file:rounded-md file:border-0 file:bg-white file:px-3 file:py-2 file:text-sm file:font-medium file:text-gray-700"
+                className="mt-2 block w-full text-sm text-gray-700 file:mr-3 file:rounded-md file:border-0 file:bg-white file:px-3 file:py-2 file:text-sm file:font-medium file:text-gray-700 disabled:cursor-not-allowed disabled:text-gray-400 disabled:file:bg-gray-100 disabled:file:text-gray-400"
                 disabled={loading}
                 onChange={(event) => {
                   const file = event.target.files?.[0] ?? null;
@@ -1399,7 +1448,7 @@ export function AiImportActions({ selectedBatchId }: { selectedBatchId?: string 
               <span className="mt-1 block text-xs text-gray-500">ZIP files up to 256 MB. PDF and DOCX files go to staging.</span>
             </label>
             <div className="flex justify-end">
-              <Button type="button" variant="secondary" onClick={uploadZip} disabled={loading || !zipFile || zipFile.size > MAX_UPLOAD_BYTES}>
+              <Button type="button" variant="secondary" onClick={uploadZip} disabled={loading} disabledReason={!zipFile ? "Choose a ZIP file." : zipFile.size > MAX_UPLOAD_BYTES ? "The ZIP exceeds the 256 MB limit." : null}>
                 Upload ZIP
               </Button>
             </div>
@@ -1412,7 +1461,7 @@ export function AiImportActions({ selectedBatchId }: { selectedBatchId?: string 
           <p className="text-xs font-medium uppercase text-gray-400">Processing</p>
           <h2 className="text-sm font-semibold text-gray-900">Process selected batch</h2>
         </div>
-        <Button variant="secondary" onClick={processBatch} disabled={loading || !selectedBatchId}>
+        <Button variant="secondary" onClick={processBatch} disabled={loading} disabledReason={!selectedBatchId ? "Select a batch first." : null}>
           Process Selected
         </Button>
       </div>
@@ -1480,19 +1529,19 @@ export function RetryFailedJobsButton({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ sourceFileId, limit: pendingCount ?? 5000 }),
     });
-    const data = await response.json().catch(() => ({}));
     setLoading(false);
     if (!response.ok) {
-      setMessage(data.error || "Could not retry failed OCR.");
+      setMessage(errorMessage(await readApiError(response, "Could not retry failed OCR.")));
       return;
     }
+    const data = await response.json();
     setMessage(`Retried ${data.attempted ?? 0}; fixed ${data.fixed ?? 0}; still pending ${data.stillRequired ?? 0}.`);
     router.refresh();
   }
 
   return (
     <div className="space-y-1">
-      <Button type="button" variant="secondary" size={size} onClick={retry} disabled={loading || pendingCount === 0}>
+      <Button type="button" variant="secondary" size={size} onClick={retry} disabled={loading} disabledReason={pendingCount === 0 ? "Nothing pending in this batch." : null}>
         {loading ? "Retrying..." : sourceFileId ? "Retry File" : "Retry Failed OCR"}
       </Button>
       {message && <p className="max-w-64 text-xs text-gray-500">{message}</p>}
@@ -1543,9 +1592,14 @@ export function PromotePracticeSetButton({ batchId, sourceFileId, partial = fals
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ sourceFileId, allowPartial: partial }),
     });
-    const data = await response.json().catch(() => ({}));
     setLoading(false);
-    setMessage(response.ok ? `Draft set ready with ${data.questionCount ?? 0}/${data.totalSourceCandidates ?? data.questionCount ?? 0} questions.` : data.error ?? "Could not create draft set.");
+    if (!response.ok) {
+      setMessage(errorMessage(await readApiError(response, "Could not create draft set.")));
+      router.refresh();
+      return;
+    }
+    const data = await response.json();
+    setMessage(`Draft set ready with ${data.questionCount ?? 0}/${data.totalSourceCandidates ?? data.questionCount ?? 0} questions.`);
     router.refresh();
   }
 
@@ -1572,9 +1626,10 @@ export function PromoteFullTestButton({ batchId, testNumber, partial = false }: 
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ testNumber, allowPartial: partial }),
     });
-    const data = await response.json().catch(() => ({}));
     setLoading(false);
-    if (response.ok) {
+    const failure = response.ok ? null : await readApiError(response, "Could not create draft exam.");
+    const data = failure ? {} : await response.json();
+    if (!failure) {
       const modules = Array.isArray(data.modules)
         ? data.modules
             .map((m: { moduleKey?: string; section?: string; count?: number; expected?: number }) =>
@@ -1584,7 +1639,7 @@ export function PromoteFullTestButton({ batchId, testNumber, partial = false }: 
         : (data.moduleCounts ?? []).join("/");
       setMessage(`Standardized FPT ready (4 groups): ${modules}`);
     } else {
-      setMessage(data.error ?? "Could not create draft exam.");
+      setMessage(failure.message);
     }
     router.refresh();
   }

@@ -313,7 +313,24 @@ class MistralOcrClient:
         return None, image_payload
 
 
+_SCHEMA_READY = False
+_SCHEMA_LOCK = threading.Lock()
+
+
 def init_db() -> None:
+    """Create / migrate the ingest tables once per process (at startup). Later calls are no-ops: the
+    DDL takes SQLite's write lock, which the web app shares, so it must not run on every request."""
+    global _SCHEMA_READY
+    if _SCHEMA_READY:
+        return
+    with _SCHEMA_LOCK:
+        if _SCHEMA_READY:
+            return
+        _init_db_schema()
+        _SCHEMA_READY = True
+
+
+def _init_db_schema() -> None:
     with conn() as db:
         db.executescript(
             """
@@ -580,6 +597,9 @@ def init_db() -> None:
             "ALTER TABLE IngestImageArtifact ADD COLUMN height INTEGER",
             "ALTER TABLE IngestImageArtifact ADD COLUMN contentHash TEXT",
             "ALTER TABLE IngestImageArtifact ADD COLUMN status TEXT NOT NULL DEFAULT 'AVAILABLE'",
+            # NOTE: never add here columns that a Prisma migration also adds (e.g. IngestBatch.sourceId,
+            # 20261101_ingest_source_target): this service can start before the web container runs
+            # `prisma migrate deploy`, and the migration then fails with "duplicate column" (outage 2026-10-29).
         ]:
             try:
                 db.execute(statement)
@@ -1069,6 +1089,8 @@ def crop_candidate_region(
             )
             result["assigned"] = {"targetType": target_type, "optionLabel": option_label if target_type == "OPTION" else None}
         else:  # OCR
+            # Release the write lock before calling Mistral (it can take minutes): the web app shares this SQLite file.
+            db.commit()
             text, payload = run_mistral_ocr_image(base64.b64encode(image_bytes).decode("utf-8"), "image/jpeg")
             result["text"] = text
             if payload.get("warning"):
@@ -1176,11 +1198,18 @@ def normalize_taxonomy_key(value: str | None) -> str:
     return " ".join(replacements.get(token, token) for token in normalized.split())
 
 
+# Reference taxonomy names (web: lib/taxonomy-reference.ts ← Taxonomia-SAT.md).
+REFERENCE_DOMAIN_NAME = {
+    "Problem-Solving and Data Analysis": "Problem Solving & Data Analysis",
+    "Geometry and Trigonometry": "Geometry & Trigonometry",
+}
+
 PRACTICE_MATH_DOMAIN_MAP = {
     "advanced math": "Advanced Math",
     "algebra": "Algebra",
-    "geometry and trigonometry": "Geometry and Trigonometry",
-    "problem solving data analysis": "Problem Solving and Data Analysis",
+    "geometry and trigonometry": "Geometry & Trigonometry",
+    "problem solving data analysis": "Problem Solving & Data Analysis",
+    "problem solving and data analysis": "Problem Solving & Data Analysis",
 }
 
 PRACTICE_SKILL_MAP = {
@@ -1196,47 +1225,49 @@ PRACTICE_SKILL_MAP = {
     "linear equations in two variables": "Linear Equations in Two Variables",
     "linear functions": "Linear Functions",
     "linear inequalities": "Linear Inequalities",
-    "systems two linear equations and equations in two variables": "Systems of Two Linear Equations",
-    "areas and volumes": "Area and Volume",
-    "area and volume": "Area and Volume",
+    "systems two linear equations and equations in two variables": "Systems of Linear Equations",
+    "areas and volumes": "Area & Volume",
+    "area and volume": "Area & Volume",
     "circles": "Circles",
-    "lines angles triangles": "Lines, Angles, and Triangles",
-    "right triangles and trigonometry": "Right Triangles and Trigonometry",
-    "data and mean": "One-Variable Data: Distributions and Measures",
-    "inference and margin of error": "Inference and Margin of Error",
-    "one variable data": "One-Variable Data",
+    "lines angles triangles": "Lines, Angles & Triangles",
+    "right triangles and trigonometry": "Right Triangles & Trigonometry",
+    "data and mean": "Distributions, Center & Spread",
+    "inference and margin of error": "Statistical Inference",
+    "one variable data": "Distributions, Center & Spread",
     "percentages": "Percentages",
     "probability": "Probability",
-    "ratios rates proportions units": "Ratios, Rates, Proportions, and Units",
-    "statistical claims": "Statistical Claims",
-    "two variable data": "Two-Variable Data",
+    "ratios rates proportions units": "Ratios, Rates, Proportions & Units",
+    "statistical claims": "Data, Studies & Experiments",
+    "two variable data": "Scatterplots & Models",
     "command evidence": "Command of Evidence",
     "double passage": "Cross-Text Connections",
     "inferences": "Inferences",
-    "main idea and details": "Central Ideas and Details",
+    "main idea and details": "Main Ideas and Details",
     "text structure and purpose": "Text Structure and Purpose",
     "words in context": "Words in Context",
     "boundaries": "Boundaries",
-    "structure and form structure and sense": "Grammar and Structure",
-    "structure and grammar": "Grammar and Structure",
-    "form structure and sense": "Grammar and Structure",
-    "grammar and structure": "Grammar and Structure",
+    "structure and form structure and sense": "Form, Structure & Sense",
+    "structure and grammar": "Form, Structure & Sense",
+    "form structure and sense": "Form, Structure & Sense",
+    "grammar and structure": "Form, Structure & Sense",
     "student notes": "Rhetorical Synthesis",
     "transitions": "Transitions",
 }
 
+# Official College Board order/names (web: lib/taxonomy-order.ts).
 READING_SKILL_DOMAIN_MAP = {
+    "Main Ideas and Details": "Information and Ideas",
+    "Central Ideas and Details": "Information and Ideas",  # legacy name
     "Command of Evidence": "Information and Ideas",
-    "Cross-Text Connections": "Information and Ideas",
     "Inferences": "Information and Ideas",
-    "Central Ideas and Details": "Information and Ideas",
-    "Text Structure and Purpose": "Craft and Structure",
     "Words in Context": "Craft and Structure",
+    "Text Structure and Purpose": "Craft and Structure",
+    "Cross-Text Connections": "Craft and Structure",
 }
 
 WRITING_SKILL_DOMAIN_MAP = {
     "Boundaries": "Standard English Conventions",
-    "Grammar and Structure": "Standard English Conventions",
+    "Form, Structure & Sense": "Standard English Conventions",
     "Form, Structure, and Sense": "Standard English Conventions",  # legacy alias
     "Rhetorical Synthesis": "Expression of Ideas",
     "Transitions": "Expression of Ideas",
@@ -1287,16 +1318,18 @@ def internal_practice_metadata_from_text(text: str) -> dict[str, str] | None:
     for canonical_domain in [
         "Advanced Math",
         "Algebra",
-        "Problem Solving and Data Analysis",
+        "Problem-Solving and Data Analysis",
         "Geometry and Trigonometry",
         "Information and Ideas",
         "Craft and Structure",
         "Expression of Ideas",
         "Standard English Conventions",
     ]:
-        match = re.search(re.escape(canonical_domain), sample, re.IGNORECASE)
+        # "Problem-Solving" is printed with or without the hyphen in the sources.
+        match = re.search(re.escape(canonical_domain).replace(r"\-", "[- ]?"), sample, re.IGNORECASE)
         if match:
-            domain = canonical_domain
+            # Sources print the College Board names; the platform uses the reference names.
+            domain = REFERENCE_DOMAIN_NAME.get(canonical_domain, canonical_domain)
             after_domain = sample[match.end():]
             end_match = re.search(r"\b(?:ID:|Question ID|Easy|Medium|Med|Hard|Question Difficulty:)\b", after_domain, re.IGNORECASE)
             raw_skill = after_domain[: end_match.start() if end_match else 120].strip()
@@ -1964,6 +1997,8 @@ def infer_missing_source_metadata_from_pages(db: sqlite3.Connection, batch_id: s
         difficulty, variant, confidence, source = infer_difficulty_from_text(text)
         rationale = source
         if not difficulty:
+            # Release the write lock before calling Mistral (it can take minutes): the web app shares this SQLite file.
+            db.commit()
             ai_result = mistral_infer_source_metadata(text, row["relativePath"])
             if ai_result and ai_result.get("difficulty") and float(ai_result.get("confidence") or 0) >= 0.65:
                 difficulty = ai_result["difficulty"]
@@ -4991,6 +5026,8 @@ def retry_ocr_required(batch_id: str, limit: int = 100, source_file_id: str | No
         images = 0
         module_context_by_source: dict[str, str | None] = {}
         for index, row in enumerate(rows, start=1):
+            # Release the write lock before calling Mistral (it can take minutes): the web app shares this SQLite file.
+            db.commit()
             ocr_text, payload = run_mistral_ocr(Path(row["path"]), int(row["pageNumber"]))
             if ocr_text:
                 db.execute(
@@ -5420,8 +5457,12 @@ def _process_batch(batch_id: str) -> None:
                             if cache_row:
                                 ocr_payload = json.loads(cache_row["responseJson"])
                         elif docx_ocr_image:
+                            # Release the write lock before calling Mistral (it can take minutes): the web app shares this SQLite file.
+                            db.commit()
                             ocr_text, payload = run_mistral_ocr_image(docx_ocr_image["base64"], docx_ocr_image.get("mimeType"))
                         else:
+                            # Release the write lock before calling Mistral (it can take minutes): the web app shares this SQLite file.
+                            db.commit()
                             ocr_text, payload = run_mistral_ocr(path, int(page["page"]))
                         if cached is None:
                             if ocr_text:
@@ -5932,3 +5973,175 @@ def crop_candidate_region_endpoint(candidate_id: str, payload: dict[str, Any]) -
         payload.get("optionLabel"),
         str(image_source_file_id) if image_source_file_id else None,
     )
+
+
+# ---------------------------------------------------------------------------
+# "Import with AI" (simple import): the questions come from a CSV that an external AI made from
+# the PDF. The service only keeps the original PDFs for the crop tool and the artifacts zip; it
+# never runs OCR on these batches.
+# ---------------------------------------------------------------------------
+
+QUICK_IMAGE_NAME = re.compile(r"^(?:(rw1|rw2|math1|math2)[_\- ]+)?q0*(\d+)[_\- ]+(stem|stimulus|[abcd])(?:[_\- ]*\d+)?\.(png|jpe?g|webp)$", re.IGNORECASE)
+QUICK_MODULES = {"RW1": ("RW", "1"), "RW2": ("RW", "2"), "MATH1": ("MATH", "1"), "MATH2": ("MATH", "2")}
+
+
+@app.post("/batches/{batch_id}/quick-prepare")
+def quick_prepare_batch(batch_id: str) -> dict[str, Any]:
+    """Register the pages of each PDF (count + text layer, no OCR) so the crop tool can show them."""
+    pages_total = 0
+    with conn() as db:
+        sources = db.execute("SELECT id, path FROM IngestSourceFile WHERE batchId = ?", (batch_id,)).fetchall()
+        if not sources:
+            raise HTTPException(status_code=404, detail="Batch has no source files.")
+        for source in sources:
+            path = resolve_existing_source_path(source["path"])
+            if not path.exists() or path.suffix.lower() != ".pdf":
+                continue
+            with _PDF_RENDER_LOCK:
+                with pdfplumber.open(path) as pdf:
+                    texts = [(page.extract_text() or "") for page in pdf.pages]
+            for number, text in enumerate(texts, start=1):
+                db.execute(
+                    """
+                    INSERT OR IGNORE INTO IngestPageArtifact
+                      (id, batchId, sourceFileId, pageNumber, method, textDensity, extractedText, requiresOcr, status, createdAt, updatedAt)
+                    VALUES (?, ?, ?, ?, 'PDF_TEXT', ?, ?, 0, 'COMPLETED', ?, ?)
+                    """,
+                    (new_id("page"), batch_id, source["id"], number, float(len(text.strip())), text, now_iso(), now_iso()),
+                )
+            db.execute(
+                "UPDATE IngestSourceFile SET pageCount = ?, status = 'COMPLETED', updatedAt = ? WHERE id = ?",
+                (len(texts), now_iso(), source["id"]),
+            )
+            pages_total += len(texts)
+        db.execute(
+            "UPDATE IngestBatch SET status = 'COMPLETED', totalPages = ?, pagesProcessed = ?, filesProcessed = totalFiles, updatedAt = ? WHERE id = ?",
+            (pages_total, pages_total, now_iso(), batch_id),
+        )
+        db.commit()
+    return {"batchId": batch_id, "pages": pages_total}
+
+
+@app.post("/batches/{batch_id}/artifacts.zip")
+def quick_artifacts_zip(batch_id: str, payload: dict[str, Any]) -> Response:
+    """Original files + page images + the given text files (uploaded CSV, current candidates CSV,
+    image-recovery prompt), for reprocessing with an external AI."""
+    extra_files = payload.get("files") if isinstance(payload.get("files"), dict) else {}
+    output = BytesIO()
+    with conn() as db:
+        sources = db.execute("SELECT id, path, relativePath FROM IngestSourceFile WHERE batchId = ?", (batch_id,)).fetchall()
+    if not sources:
+        raise HTTPException(status_code=404, detail="Batch has no source files.")
+    with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        for source in sources:
+            path = resolve_existing_source_path(source["path"])
+            if not path.exists():
+                continue
+            archive.write(path, f"original/{safe_upload_filename(path.name)}")
+            if path.suffix.lower() != ".pdf":
+                continue
+            with _PDF_RENDER_LOCK:
+                with pdfplumber.open(path) as pdf:
+                    for number, page in enumerate(pdf.pages, start=1):
+                        image = page.to_image(resolution=150).original.convert("RGB")
+                        buffer = BytesIO()
+                        image.save(buffer, format="PNG", optimize=True)
+                        archive.writestr(f"pages/{Path(safe_upload_filename(path.name)).stem}-page-{number:03d}.png", buffer.getvalue())
+        for name, content in extra_files.items():
+            if isinstance(name, str) and isinstance(content, str) and re.fullmatch(r"[A-Za-z0-9._-]{1,80}", name):
+                archive.writestr(name, content)
+    return Response(
+        content=output.getvalue(),
+        media_type="application/zip",
+        headers={"Content-Disposition": f'attachment; filename="import-{batch_id}-artifacts.zip"'},
+    )
+
+
+@app.post("/batches/{batch_id}/image-zip")
+async def quick_image_zip(batch_id: str, file: UploadFile = File(...), candidateIds: str | None = Form(None)) -> dict[str, Any]:
+    """Images recovered by an external AI, named Q{n}_{STEM|STIMULUS|A|B|C|D}.png (Tests: RW1_Q{n}_…,
+    RW2_, MATH1_, MATH2_): each one is saved as an image artifact and linked to that question's slot
+    (replacing the slot's previous link)."""
+    data = await file.read()
+    if len(data) > MAX_UPLOAD_BYTES:
+        raise HTTPException(status_code=413, detail="ZIP exceeds the 256 MB limit.")
+    try:
+        archive = zipfile.ZipFile(BytesIO(data))
+    except zipfile.BadZipFile as exc:
+        raise HTTPException(status_code=400, detail="The file is not a valid ZIP.") from exc
+    linked: list[dict[str, Any]] = []
+    skipped: list[str] = []
+    with conn() as db:
+        rows = db.execute(
+            "SELECT id, sourceFileId, questionNumber, section, moduleLabel FROM IngestQuestionCandidate WHERE batchId = ? AND questionNumber IS NOT NULL",
+            (batch_id,),
+        ).fetchall()
+        # Optional scope (one Practice Set / Test of a large batch): only these candidates are matched.
+        scope = {value.strip() for value in (candidateIds or "").split(",") if value.strip()}
+        if scope:
+            rows = [row for row in rows if row["id"] in scope]
+        by_module = {(row["section"], row["moduleLabel"], row["questionNumber"]): row for row in rows}
+        by_number: dict[int, list[Any]] = {}
+        for row in rows:
+            by_number.setdefault(row["questionNumber"], []).append(row)
+        for info in archive.infolist():
+            if info.is_dir():
+                continue
+            name = Path(info.filename).name
+            match = QUICK_IMAGE_NAME.match(name)
+            if not match:
+                skipped.append(f"{name}: name must be Q<number>_<STEM|STIMULUS|A|B|C|D>.png")
+                continue
+            module, number, slot = (match.group(1) or "").upper(), int(match.group(2)), match.group(3).upper()
+            if module:
+                candidate = by_module.get((*QUICK_MODULES[module], number))
+            else:
+                matches = by_number.get(number, [])
+                candidate = matches[0] if len(matches) == 1 else None
+                if len(matches) > 1:
+                    skipped.append(f"{name}: question {number} exists in several modules; prefix the name with RW1_, RW2_, MATH1_ or MATH2_")
+                    continue
+            if not candidate:
+                skipped.append(f"{name}: no question {number}{' in ' + module if module else ''} in this import")
+                continue
+            raw = archive.read(info)
+            try:
+                with Image.open(BytesIO(raw)) as im:
+                    width, height = im.width, im.height
+                    buffer = BytesIO()
+                    im.convert("RGB").save(buffer, format="PNG", optimize=True)
+                    png = buffer.getvalue()
+            except Exception:
+                skipped.append(f"{name}: not a readable image")
+                continue
+            image_id = new_id("img")
+            file_url, content_hash = save_ingest_image(batch_id, image_id, png, "png")
+            next_index = db.execute(
+                "SELECT COALESCE(MAX(imageIndex), -1) + 1 FROM IngestImageArtifact WHERE sourceFileId = ? AND pageNumber = 0 AND origin = 'AI_ZIP'",
+                (candidate["sourceFileId"],),
+            ).fetchone()[0]
+            db.execute(
+                """
+                INSERT INTO IngestImageArtifact
+                  (id, batchId, sourceFileId, pageArtifactId, pageNumber, imageIndex, imageId, origin, bboxJson, mimeType, fileUrl, width, height, contentHash, status)
+                VALUES (?, ?, ?, NULL, 0, ?, ?, 'AI_ZIP', NULL, 'image/png', ?, ?, ?, ?, 'AVAILABLE')
+                """,
+                (image_id, batch_id, candidate["sourceFileId"], next_index, image_id, file_url, width, height, content_hash),
+            )
+            target_type = slot if slot in {"STEM", "STIMULUS"} else "OPTION"
+            option_label = slot if target_type == "OPTION" else None
+            db.execute(
+                "DELETE FROM IngestCandidateImageLink WHERE candidateId = ? AND targetType = ? AND COALESCE(optionLabel, '') = COALESCE(?, '')",
+                (candidate["id"], target_type, option_label),
+            )
+            db.execute(
+                """
+                INSERT INTO IngestCandidateImageLink
+                  (id, batchId, candidateId, imageArtifactId, targetType, optionLabel, sortOrder, createdAt, updatedAt)
+                VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?)
+                """,
+                (new_id("imglink"), batch_id, candidate["id"], image_id, target_type, option_label, now_iso(), now_iso()),
+            )
+            linked.append({"question": number, "slot": slot, "imageArtifactId": image_id, "candidateId": candidate["id"], "targetType": target_type, "optionLabel": option_label})
+        db.commit()
+    return {"linked": linked, "skipped": skipped}

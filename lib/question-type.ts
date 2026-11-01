@@ -5,9 +5,17 @@ export interface QuestionOptionContent {
   imageUrl?: string | null;
 }
 
+/**
+ * An option is answer content when it has text, or when it is an image-only choice (e.g. "which graph…"
+ * questions whose four choices are graphs). Spurious ingestion images were removed from the bank, and an
+ * option that has text keeps showing only its text.
+ */
+export function isAnswerOption(option: QuestionOptionContent) {
+  return Boolean(option.text?.trim() || option.imageUrl?.trim());
+}
+
 function hasUsableOption(option: QuestionOptionContent) {
-  // Option images produced by ingestion are not answer content in the player.
-  return Boolean(option.text?.trim());
+  return isAnswerOption(option);
 }
 
 /**
@@ -25,5 +33,5 @@ export function resolveQuestionType(
 }
 
 export function questionResponseLabel(type: ResolvedQuestionType) {
-  return type === "MC" ? "Answer choices" : "Numeric answer";
+  return type === "MC" ? "Choose one" : "Type your answer";
 }

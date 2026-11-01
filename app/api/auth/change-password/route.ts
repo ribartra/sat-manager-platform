@@ -4,14 +4,18 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { notify } from "@/lib/notify";
 import { captureCaughtError, writeAudit } from "@/lib/audit";
+import { passwordPolicyError } from "@/lib/password-policy";
+import { revokeUserSessions } from "@/lib/session-state";
+import { BadRequestError, InternalServerError, UnauthorizedError, withApiErrors } from "@/lib/api-error";
 
-export async function POST(req: NextRequest) {
+export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await auth();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session) return new UnauthorizedError("Please sign in again.").toResponse();
 
   try {
     const { currentPassword, newPassword } = await req.json();
-    if (!currentPassword || !newPassword || newPassword.length < 6) {
+    const policyError = passwordPolicyError(newPassword, session.user.email);
+    if (!currentPassword || policyError) {
       await writeAudit({
         userId: session.user.id,
         action: "PASSWORD_CHANGE_FAILED",
@@ -20,7 +24,7 @@ export async function POST(req: NextRequest) {
         outcome: "failure",
         metadata: { reason: "validation" },
       });
-      return NextResponse.json({ error: "New password must be at least 6 characters." }, { status: 400 });
+      return new BadRequestError(policyError ?? "Current password is required.").toResponse();
     }
 
     const user = await prisma.user.findUnique({ where: { id: session.user.id } });
@@ -33,7 +37,7 @@ export async function POST(req: NextRequest) {
         outcome: "failure",
         metadata: { reason: "no_password" },
       });
-      return NextResponse.json({ error: "User cannot change password." }, { status: 400 });
+      return new BadRequestError("This account can't change its password here.").toResponse();
     }
 
     const valid = await bcrypt.compare(currentPassword, user.passwordHash);
@@ -46,11 +50,13 @@ export async function POST(req: NextRequest) {
         outcome: "failure",
         metadata: { reason: "bad_current_password" },
       });
-      return NextResponse.json({ error: "Current password is incorrect." }, { status: 400 });
+      return new BadRequestError("Your current password isn't right.").toResponse();
     }
 
     const passwordHash = await bcrypt.hash(newPassword, 10);
     await prisma.user.update({ where: { id: user.id }, data: { passwordHash } });
+    // Sign out every other device; the client signs this one back in with the new password.
+    await revokeUserSessions(user.id);
 
     await writeAudit({
       userId: user.id,
@@ -65,9 +71,9 @@ export async function POST(req: NextRequest) {
       body: "Your password was updated successfully. If you did not make this change, contact support immediately.",
     }).catch(() => {});
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true, email: user.email, reauthenticate: true });
   } catch (error) {
     await captureCaughtError("auth.change-password", error, { userId: session.user.id });
-    return NextResponse.json({ error: "Password change failed." }, { status: 500 });
+    return new InternalServerError("We couldn't change your password. Please try again.").toResponse();
   }
-}
+});

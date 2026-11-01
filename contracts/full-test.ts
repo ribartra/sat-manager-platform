@@ -1,11 +1,15 @@
-import { z } from "zod";
+import { z } from "@/lib/zod-config";
 import { validateFullPracticeTestStructure } from "@/lib/full-test-validation";
 
 export const fullTestEditorFieldsSchema = z.object({
   name: z.string().trim().min(1, "Name is required."),
+  /** "TEST N": groups the versions of one test across sources. */
+  number: z.number({ message: "Test number is required." }).int("Test number must be a whole number.").min(1, "Test number is required.").max(999, "Test number must be 999 or less."),
   status: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"]),
   reviewEnabled: z.boolean(),
   breakMinutes: z.number().int().min(0, "breakMinutes must be a non-negative integer."),
+  /** Checked against the Source table by the API (sourceIdIssue). */
+  sourceId: z.string().optional(),
   moduleQuestionIds: z
     .array(z.array(z.string()))
     .length(4, "Full Practice Test must have exactly 4 modules."),
@@ -38,6 +42,7 @@ export function fullTestEditorFieldIssues(data: unknown): string[] {
   const raw = (data && typeof data === "object" ? data : {}) as Record<string, unknown>;
   const normalized = {
     name: typeof raw.name === "string" ? raw.name : "",
+    number: typeof raw.number === "number" ? raw.number : Number.isFinite(Number(raw.number)) && raw.number !== null && raw.number !== "" ? Number(raw.number) : 0,
     status: raw.status ?? "DRAFT",
     reviewEnabled: Boolean(raw.reviewEnabled ?? true),
     breakMinutes:

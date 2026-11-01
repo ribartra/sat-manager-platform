@@ -364,11 +364,11 @@ async function assignPracticeSets(practiceSetIds: string[], studentIds: string[]
       if (existing) {
         await prisma.assignment.update({
           where: { id: existing.id },
-          data: { assignedById: teacherId, dueDate, locked: false, status: "PENDING" },
+          data: { assignedById: teacherId, dueDate, unlockAt: existing.unlockAt ?? existing.createdAt, locked: false, status: "PENDING" },
         });
       } else {
         await prisma.assignment.create({
-          data: { practiceSetId, studentId, assignedById: teacherId, dueDate, locked: false, status: "PENDING" },
+          data: { practiceSetId, studentId, assignedById: teacherId, dueDate, unlockAt: new Date(), locked: false, status: "PENDING" },
         });
       }
     }

@@ -1,0 +1,722 @@
+[
+  {
+    "table": "Question",
+    "id": "cmsjrntym00dhqmt1nan99z1j",
+    "field": "stimulus",
+    "before": "Harcourt's worries are making her antisocial. Giant anteaters are neotropical mammals that, as their name suggests, consume ants, termites, and grubs, though they do occasionally eat fruit. Their habitat ranges from Central to South America in swamps, forests, and grasslands, where their favored prey is common. The solitary foragers have specialized tongues so they can consume thousands of ants in a few minutes after breaking open a nest, and they quickly abandon the site when soldier ants emerge to protect the colony.",
+    "after": "Giant anteaters are neotropical mammals that, as their name suggests, consume ants, termites, and grubs, though they do occasionally eat fruit. Their habitat ranges from Central to South America in swamps, forests, and grasslands, where their favored prey is common. The solitary foragers have specialized tongues so they can consume thousands of ants in a few minutes after breaking open a nest, and they quickly abandon the site when soldier ants emerge to protect the colony.",
+    "note": "T2 R&W M1 #8: bleed — stimulus starts with #7 option D text",
+    "class": "bleed",
+    "evidence": "IngestPageArtifact p4 (INNOVATOR TEST 2 R&W MOD 1 REV.pdf): passage starts 'Giant anteaters are…'; 'Mrs. Harcourt's worries are making her antisocial.' is #7 choice D"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "cmsjrntz800dtqmt13d3232sh",
+    "field": "text",
+    "before": "The H' value at Site 1 was lower than the H' value at Site 8. plant usage) and samples 3–8 were measures of the effluent (post usage) as it continued downstream, with 3 being the area closest to the power plant. The researchers concluded that, as the effluent moved further from the powerplant, the water quality continued to improve.",
+    "after": "The H' value at Site 1 was lower than the H' value at Site 8.",
+    "note": "T2 R&W M1 #10: bleed — option D contains the stimulus continuation",
+    "class": "bleed",
+    "evidence": "p6 OCR + page image: choice D ends 'than the H′ value at Site 8.'; 'plant usage) and samples 3–8…improve.' is the passage continuation below the graph"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrntz800dpqmt1kbv7yjkl",
+    "field": "stimulus",
+    "before": "Power plants use natural water sources in their operation. Assessing the algal makeup of the waters near a power plant is a useful method of determining water quality. H' is a count of algal species diversity in the water; thus, a high H' value indicates a healthy aqueous ecosystem. BOD (biological oxygen demand) indicates the amount of cellular respiration occurring in the water sample. Lower diversity causes runaway algal populations and, therefore, high BOD. Samples were taken from 8 areas near a power plant. Samples 1 and 2 were taken from the reservoirs (pre power",
+    "after": "Power plants use natural water sources in their operation. Assessing the algal makeup of the waters near a power plant is a useful method of determining water quality. H' is a count of algal species diversity in the water; thus, a high H' value indicates a healthy aqueous ecosystem. BOD (biological oxygen demand) indicates the amount of cellular respiration occurring in the water sample. Lower diversity causes runaway algal populations and, therefore, high BOD. Samples were taken from 8 areas near a power plant. Samples 1 and 2 were taken from the reservoirs (pre power plant usage) and samples 3–8 were measures of the effluent (post usage) as it continued downstream, with 3 being the area closest to the power plant. The researchers concluded that, as the effluent moved further from the powerplant, the water quality continued to improve.",
+    "note": "T2 R&W M1 #10: bleed — stimulus truncated at '(pre power'; its tail was in option D",
+    "class": "bleed",
+    "evidence": "p6 OCR + page image: passage reads '…reservoirs (pre power plant usage) and samples 3–8…'"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu1400fhqmt1pudev181",
+    "field": "stimulus",
+    "before": "Pointing Wheat and rice are the most common cereal crops in the world and are consumed as the staple part of diets in many countries, but there are many other cereal _____ that can be eaten directly or fed to livestock.",
+    "after": "Wheat and rice are the most common cereal crops in the world and are consumed as the staple part of diets in many countries, but there are many other cereal _____ that can be eaten directly or fed to livestock.",
+    "note": "T2 R&W M1 #18: bleed — stimulus starts with 'Pointing' (tail of #17 option D)",
+    "class": "bleed",
+    "evidence": "p11 OCR: #18 passage starts 'Wheat and rice…'; 'post-independence? Pointing' is #17 choice D"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu4m00g8qmt1ln8xwuho",
+    "field": "stimulus",
+    "before": "Moreover, The practice known as biological control, or biocontrol, refers to the reduction of pest populations by natural enemies instead of by synthetic pesticides. Biocontrol has already found its way onto some golf courses; _____ a 2018 survey by the Environmental Institute for Golf found that 42 percent of larger golf facilities (27 holes or more) sometimes or frequently use biocontrol in their pest management practices.",
+    "after": "The practice known as biological control, or biocontrol, refers to the reduction of pest populations by natural enemies instead of by synthetic pesticides. Biocontrol has already found its way onto some golf courses; _____ a 2018 survey by the Environmental Institute for Golf found that 42 percent of larger golf facilities (27 holes or more) sometimes or frequently use biocontrol in their pest management practices.",
+    "note": "T2 R&W M2 #25: bleed — stimulus starts with 'Moreover,' (#24 option D)",
+    "class": "bleed",
+    "evidence": "p34 OCR + page image: #25 passage starts 'The practice known as biological control…'"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu3x00ftqmt1ibkva47j",
+    "field": "stimulus",
+    "before": "As prices climb, employees reconsider how far they must drive to get to work. _____, remote opportunities become more attractive.",
+    "after": "Inflated gas prices can trigger a ripple effect that extends beyond travel plans. As prices climb, employees reconsider how far they must drive to get to work. _____, remote opportunities become more attractive.",
+    "note": "T2 R&W M1 #22: other — stimulus missing its first sentence (truncated_stimulus)",
+    "class": "other",
+    "evidence": "p13 OCR (INNOVATOR TEST 2 R&W MOD 1 REV.pdf)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu4400fvqmt1urag3ikr",
+    "field": "stimulus",
+    "before": "Both the glass and the atmosphere have imperfections that alter the appearance of what we see. Unlike the static flaws in the glass, however, the imperfections in the atmosphere are in constant motion, causing further blurring. Moreover, the atmosphere filters and modifies the colors of objects viewed from the Earth. _____ a telescope above the atmosphere provides a far more accurate depiction of objects in space.",
+    "after": "Viewing objects through the atmosphere is similar to peering through a stained glass window. Both the glass and the atmosphere have imperfections that alter the appearance of what we see. Unlike the static flaws in the glass, however, the imperfections in the atmosphere are in constant motion, causing further blurring. Moreover, the atmosphere filters and modifies the colors of objects viewed from the Earth. _____ a telescope above the atmosphere provides a far more accurate depiction of objects in space.",
+    "note": "T2 R&W M1 #23: other — stimulus missing its first sentence (truncated_stimulus)",
+    "class": "other",
+    "evidence": "p13 OCR (INNOVATOR TEST 2 R&W MOD 1 REV.pdf)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrntxj00ciqmt1l8bids96",
+    "field": "stimulus",
+    "before": "Khlestakov has just arrived at Anna's hometown in the Russian countryside and is recounting his travels. ANNA: You do me much honor. I don't deserve it. KHLESTAKOV: Why don't you deserve it? You do deserve it, madam. ANNA: I live in a village. KHLESTAKOV: Well, after all, a village too has something. It has its hills and brooks. Of course it's not to be compared with St. Petersburg. Ah, St. Petersburg! What a life, to be sure! Maybe you think I am only a copying clerk. No, I am on a friendly footing with the chief of our department.",
+    "after": "The following text is from Nikolai Gogol's 1836 play *The Government Inspector*. Khlestakov has just arrived at Anna's hometown in the Russian countryside and is recounting his travels. ANNA: You do me much honor. I don't deserve it. KHLESTAKOV: Why don't you deserve it? You do deserve it, madam. ANNA: I live in a village. KHLESTAKOV: Well, after all, a village too has something. It has its hills and brooks. Of course it's not to be compared with St. Petersburg. Ah, St. Petersburg! What a life, to be sure! Maybe you think I am only a copying clerk. No, I am on a friendly footing with the chief of our department.",
+    "note": "T2 R&W M2 #2: other — stimulus missing its first sentence (truncated_stimulus)",
+    "class": "other",
+    "evidence": "p18 OCR (INNOVATOR TEST 2 R&W MOD 1 REV.pdf)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrntxv00cuqmt1sup0n1ka",
+    "field": "stimulus",
+    "before": "Fortunately, it is possible to ______ the behavior of less studied animals, using data collected on those that have been studied in depth. Elise Zipkin of Michigan State University has been leading efforts of just this sort, evaluating the risks to \"data-poor\" animal populations by analyzing their \"data-rich\" counterparts.",
+    "after": "One obstacle to developing effective conservation tactics is the dearth of information about some at-risk species. Fortunately, it is possible to ______ the behavior of less studied animals, using data collected on those that have been studied in depth. Elise Zipkin of Michigan State University has been leading efforts of just this sort, evaluating the risks to \"data-poor\" animal populations by analyzing their \"data-rich\" counterparts.",
+    "note": "T2 R&W M2 #4: other — stimulus missing its first sentence (truncated_stimulus)",
+    "class": "other",
+    "evidence": "p19 OCR (INNOVATOR TEST 2 R&W MOD 1 REV.pdf)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu1800fmqmt17wfap4ek",
+    "field": "stimulus",
+    "before": "Previously, grocery store customers would hand their shopping lists to a clerk who would gather the requested items from behind a counter. Named \"Piggly Wiggly,\" the Memphis store was the first to place items on _____ customers—instead of a clerk—choose and collect their purchases.",
+    "after": "The first modern American supermarket in the US opened in Memphis, Tennessee in 1916. Previously, grocery store customers would hand their shopping lists to a clerk who would gather the requested items from behind a counter. Named \"Piggly Wiggly,\" the Memphis store was the first to place items on _____ customers—instead of a clerk—choose and collect their purchases.",
+    "note": "T2 R&W M2 #18: other — stimulus missing its first sentence (truncated_stimulus)",
+    "class": "other",
+    "evidence": "p31 OCR (INNOVATOR TEST 2 R&W MOD 1 REV.pdf)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu3e00fqqmt1h7f87jtv",
+    "field": "stimulus",
+    "before": "Most famous for the Monte Carlo Casino, _____. In fact, Monaco is a pioneer in marine conservation, with one of the first protected marine areas in the world.",
+    "after": "The second-smallest country by area in the world after Vatican City, Monaco is a mere 2.1 square kilometers. Most famous for the Monte Carlo Casino, _____. In fact, Monaco is a pioneer in marine conservation, with one of the first protected marine areas in the world.",
+    "note": "T2 R&W M2 #20: other — stimulus missing its first sentence (truncated_stimulus)",
+    "class": "other",
+    "evidence": "p32 OCR (INNOVATOR TEST 2 R&W MOD 1 REV.pdf)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu4000fuqmt15u6d0tq6",
+    "field": "stimulus",
+    "before": "In fact, by the 1940s, the comedy team enjoyed worldwide fame. ______ most famous routine, \"Who's on First,\" is considered to be one of the greatest comedy performances of all time.",
+    "after": "In the 1930s, comedians Bud Abbott and Lou Costello combined their talents to create a tremendously successful comedy duo, Abbott and Costello. In fact, by the 1940s, the comedy team enjoyed worldwide fame. ______ most famous routine, \"Who's on First,\" is considered to be one of the greatest comedy performances of all time.",
+    "note": "T2 R&W M2 #22: other — stimulus missing its first sentence (truncated_stimulus)",
+    "class": "other",
+    "evidence": "p33 OCR (INNOVATOR TEST 2 R&W MOD 1 REV.pdf)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu4f00g2qmt16j8izlxd",
+    "field": "stimulus",
+    "before": "_____ they can be used in many recipes, as their leaves are edible and perfect for salads. Mature flowers are bitter, but young buds are sweet and taste slightly like honey.",
+    "after": "Dandelions are usually considered to be useless weeds. _____ they can be used in many recipes, as their leaves are edible and perfect for salads. Mature flowers are bitter, but young buds are sweet and taste slightly like honey.",
+    "note": "T2 R&W M2 #24: other — stimulus missing its first sentence (truncated_stimulus)",
+    "class": "other",
+    "evidence": "p34 OCR + page image (INNOVATOR TEST 2 R&W MOD 1 REV.pdf)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrntyq00diqmt1mcdtavjn",
+    "field": "stimulus",
+    "before": "No connection has ever been shown between the Basque language and any other currently spoken language: it is considered an orphan language. But the theory that Basque might be related to other languages, in particular Georgian and other languages of the Caucasus, has interested scholars. In 1925, linguist Alberto Trombetti compiled supposed Caucasian-Basque cognates (words based on the same root). There are grammatical similarities between the two languages as well: both use an ergative case system, in which noun endings identify the sentence's subject. Since the search for a Caucasian-Basque link involves forty Caucasian languages, says linguist R.L. Trask, it's not surprising that resemblances can be found by chance. Although the presence of unusual grammar and common cognates has persuaded some linguists that there is a connection, Trask says this is simplistic. Similarities can occur without the languages having any common roots.",
+    "after": "Text 1\nNo connection has ever been shown between the Basque language and any other currently spoken language: it is considered an orphan language. But the theory that Basque might be related to other languages, in particular Georgian and other languages of the Caucasus, has interested scholars. In 1925, linguist Alberto Trombetti compiled supposed Caucasian-Basque cognates (words based on the same root). There are grammatical similarities between the two languages as well: both use an ergative case system, in which noun endings identify the sentence's subject.\n\nText 2\nSince the search for a Caucasian-Basque link involves forty Caucasian languages, says linguist R.L. Trask, it's not surprising that resemblances can be found by chance. Although the presence of unusual grammar and common cognates has persuaded some linguists that there is a connection, Trask says this is simplistic. Similarities can occur without the languages having any common roots.",
+    "note": "T2 R&W M2 #8: other — Text 1 / Text 2 labels missing although the stem asks about 'Text 2' and 'Text 1'",
+    "class": "other",
+    "evidence": "p23 OCR: '### Text 1 … ### Text 2 Since the search…'"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu1h00fpqmt1kj8xkmre",
+    "field": "explanation",
+    "before": "Choice C is the best answer because the sentence reads: \"Like _____ evolutionary ancestors, modern bamboo uses energy from an existing cane.\" The blank is a possessive adjective modifying \"evolutionary ancestors.\" The antecedent is \"modern bamboo,\" which is a singular non-human noun. The correct singular possessive pronoun for a non-human noun is \"its.\"\nChoice A \"their\" is a plural possessive pronoun. \"Modern bamboo\" is singular, so a plural pronoun does not agree with this antecedent. Choice B \"they're\" is a contraction of \"they are,\" not a possessive pronoun; it cannot modify \"evolutionary ancestors\" grammatically. Choice D \"it's\" is a contraction of \"it is,\" not a possessive pronoun. Substituting it in: \"Like it is evolutionary ancestors\" is grammatically incorrect.",
+    "after": "Choice B is the best answer. The tastes are associated with the residents, so the plural possessive form residents’ is appropriate. Since the residents are associated with the region, the singular possessive form region’s is also appropriate.\nChoice A fails to make residents possessive. Choice C incorrectly uses the singular resident’s. Choice D incorrectly uses the plural regions’ and fails to make residents possessive.",
+    "note": "T2 R&W M1 #20: bleed — explanation belonged to #21 (docx Q20 has no table → table-sequential shift); restored from docx paragraphs",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 1 Question 20 (paragraphs, not a table)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu3m00frqmt15zg5o9gi",
+    "field": "explanation",
+    "before": "Choice A is the best answer because the passage states that as gas prices rise, employees reconsider how far they must drive to work. The blank introduces the logical result of that reconsideration: remote opportunities become more attractive. \"Consequently\" (synonymous with \"as a result\") correctly signals that remote work becoming attractive is a direct consequence of employees reconsidering long commutes due to high gas prices.\nChoice B \"Second,\" signals a numbered sequence of points, but no first point has been introduced earlier in the passage. Choice C \"However,\" signals a contrast or opposing idea, but the increase in remote work attractiveness is not a contradiction of the previous statement—it is a natural result of it. Choice D \"Nevertheless,\" also signals a concession or contrast despite difficulty, which does not fit—remote opportunities becoming attractive is not happening in spite of anything.",
+    "after": "Choice C is the best answer because the sentence reads: \"Like _____ evolutionary ancestors, modern bamboo uses energy from an existing cane.\" The blank is a possessive adjective modifying \"evolutionary ancestors.\" The antecedent is \"modern bamboo,\" which is a singular non-human noun. The correct singular possessive pronoun for a non-human noun is \"its.\"\nChoice A \"their\" is a plural possessive pronoun. \"Modern bamboo\" is singular, so a plural pronoun does not agree with this antecedent. Choice B \"they're\" is a contraction of \"they are,\" not a possessive pronoun; it cannot modify \"evolutionary ancestors\" grammatically. Choice D \"it's\" is a contraction of \"it is,\" not a possessive pronoun. Substituting it in: \"Like it is evolutionary ancestors\" is grammatically incorrect.",
+    "note": "T2 R&W M1 #21: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 1 Question 21 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu3x00ftqmt1ibkva47j",
+    "field": "explanation",
+    "before": "Choice B is the best answer because the passage explains all the ways the atmosphere distorts observations—it blurs, filters, and modifies colors. Having established all these reasons why the atmosphere impairs astronomical observation, the blank logically introduces the conclusion: \"For these reasons, placing a telescope above the atmosphere provides a far more accurate depiction.\" The transition summarizes all the preceding causes and points to the logical solution.\nChoice A \"Nevertheless,\" signals that what follows is true despite what came before—but placing a telescope above the atmosphere is the logical solution to the problem described, not something that happens despite it. Choice C \"On the contrary,\" signals a direct contradiction of what was just stated, but placing a telescope above the atmosphere does not contradict any claim in the passage. Choice D \"In light of these advantages,\" is inappropriate because the passage has been discussing disadvantages (the atmosphere's distorting effects), not advantages.",
+    "after": "Choice A is the best answer because the passage states that as gas prices rise, employees reconsider how far they must drive to work. The blank introduces the logical result of that reconsideration: remote opportunities become more attractive. \"Consequently\" (synonymous with \"as a result\") correctly signals that remote work becoming attractive is a direct consequence of employees reconsidering long commutes due to high gas prices.\nChoice B \"Second,\" signals a numbered sequence of points, but no first point has been introduced earlier in the passage. Choice C \"However,\" signals a contrast or opposing idea, but the increase in remote work attractiveness is not a contradiction of the previous statement—it is a natural result of it. Choice D \"Nevertheless,\" also signals a concession or contrast despite difficulty, which does not fit—remote opportunities becoming attractive is not happening in spite of anything.",
+    "note": "T2 R&W M1 #22: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 1 Question 22 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu4400fvqmt1urag3ikr",
+    "field": "explanation",
+    "before": "Choice C is the best answer because the task is to emphasize adaptability. The notes state that the project \"is made of floating modules that can be built up over time\" and that capacity can grow from 10,000 to 100,000 people. Choice C—\"Composed of flexible-format modules, Oceanix Busan could eventually house between 10,000 and 100,000 people\"—directly ties the modular (flexible) structure to the massive scalability, making adaptability the central point.\nChoice A is incorrect because it identifies who conceptualized the project (the design firm Oceanix), which speaks to origin, not adaptability. Choice B is incorrect because it identifies the location of the project (Busan, South Korea), which speaks to geography, not adaptability. Choice D is incorrect because stating a maximum population of 100,000 addresses the project's capacity but does not explain why or how the project is adaptable.",
+    "after": "Choice B is the best answer because the passage explains all the ways the atmosphere distorts observations—it blurs, filters, and modifies colors. Having established all these reasons why the atmosphere impairs astronomical observation, the blank logically introduces the conclusion: \"For these reasons, placing a telescope above the atmosphere provides a far more accurate depiction.\" The transition summarizes all the preceding causes and points to the logical solution.\nChoice A \"Nevertheless,\" signals that what follows is true despite what came before—but placing a telescope above the atmosphere is the logical solution to the problem described, not something that happens despite it. Choice C \"On the contrary,\" signals a direct contradiction of what was just stated, but placing a telescope above the atmosphere does not contradict any claim in the passage. Choice D \"In light of these advantages,\" is inappropriate because the passage has been discussing disadvantages (the atmosphere's distorting effects), not advantages.",
+    "note": "T2 R&W M1 #23: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 1 Question 23 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu4b00fxqmt11cf4xmb8",
+    "field": "explanation",
+    "before": "Choice B is the best answer because the task asks for an outline of Kendall-Barr's findings—the results of the study. Choice B directly reports both key findings: seals sleep approximately two hours per day when water-bound and ten hours per day when land-bound. This is a direct, accurate summary of what the EEG readings revealed, which constitutes Kendall-Barr's actual findings.\nChoice A is incorrect because saying Kendall-Barr monitored seals both at sea and on land describes the study's scope, not the findings themselves. Choice C is incorrect because describing the EEG device used explains the methodology, not the findings. Choice D is incorrect because stating that EEG readings reveal brain activity and track sleep patterns describes how EEG works in general, not Kendall-Barr's specific findings about elephant seals.",
+    "after": "Choice C is the best answer because the task is to emphasize adaptability. The notes state that the project \"is made of floating modules that can be built up over time\" and that capacity can grow from 10,000 to 100,000 people. Choice C—\"Composed of flexible-format modules, Oceanix Busan could eventually house between 10,000 and 100,000 people\"—directly ties the modular (flexible) structure to the massive scalability, making adaptability the central point.\nChoice A is incorrect because it identifies who conceptualized the project (the design firm Oceanix), which speaks to origin, not adaptability. Choice B is incorrect because it identifies the location of the project (Busan, South Korea), which speaks to geography, not adaptability. Choice D is incorrect because stating a maximum population of 100,000 addresses the project's capacity but does not explain why or how the project is adaptable.",
+    "note": "T2 R&W M1 #24: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 1 Question 24 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu4i00g3qmt1okcoqpg6",
+    "field": "explanation",
+    "before": "Choice C is the best answer because the task asks for a key difference between care requirements. The notes state that saltwater fish must be monitored in a system with less than 2 degrees of temperature variation, while freshwater fish can tolerate temperatures from 18 to 26 degrees Celsius—a range of 8 degrees. Choice C accurately captures this meaningful difference: the acceptable temperature variation for saltwater tanks is far stricter than for freshwater tanks.\nChoice A is incorrect because the notes state that freshwater fish are often omnivores (eating both vegetables and meat) and that saltwater fish are omnivores or scavengers—this is a similarity, not a key difference. Choice B is incorrect because the notes state that freshwater fish are often kept in tanks with plants, but the notes do not say saltwater fish tanks do not have plants. This contrast is not clearly supported. Choice D is incorrect because while it mentions plants for freshwater and synthetic salt for saltwater, it conflates two different care requirements without establishing which one is the more meaningful distinguishing difference.",
+    "after": "Choice B is the best answer because the task asks for an outline of Kendall-Barr's findings—the results of the study. Choice B directly reports both key findings: seals sleep approximately two hours per day when water-bound and ten hours per day when land-bound. This is a direct, accurate summary of what the EEG readings revealed, which constitutes Kendall-Barr's actual findings.\nChoice A is incorrect because saying Kendall-Barr monitored seals both at sea and on land describes the study's scope, not the findings themselves. Choice C is incorrect because describing the EEG device used explains the methodology, not the findings. Choice D is incorrect because stating that EEG readings reveal brain activity and track sleep patterns describes how EEG works in general, not Kendall-Barr's specific findings about elephant seals.",
+    "note": "T2 R&W M1 #25: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 1 Question 25 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu4r00g9qmt1akkigxax",
+    "field": "explanation",
+    "before": "Choice B is the best answer because the task asks to emphasize an underlying theme in some of Angelou's books. The notes state that I Know Why the Caged Bird Sings 'publicly reveals details about her private life up to the age of 17' and that Mom & Me & Mom 'recounts her complex relationship with her own mother.' Both books are autobiographical—they draw directly from Angelou's own life. Choice B correctly identifies this as an underlying theme: many of her works are autobiographical.\nChoice A is incorrect because listing works from Angelou's later years (Down the Delta and Mom & Me & Mom) describes a period of her career, not a thematic thread across her books. Choice C is incorrect because describing her connections with world leaders relates to her public role and activities, not to a theme within her literary works. Choice D is incorrect because the notes do not indicate that any of Angelou's books were unpopular; stating that Mom & Me & Mom was not popular is not supported by the notes.",
+    "after": "Choice C is the best answer because the task asks for a key difference between care requirements. The notes state that saltwater fish must be monitored in a system with less than 2 degrees of temperature variation, while freshwater fish can tolerate temperatures from 18 to 26 degrees Celsius—a range of 8 degrees. Choice C accurately captures this meaningful difference: the acceptable temperature variation for saltwater tanks is far stricter than for freshwater tanks.\nChoice A is incorrect because the notes state that freshwater fish are often omnivores (eating both vegetables and meat) and that saltwater fish are omnivores or scavengers—this is a similarity, not a key difference. Choice B is incorrect because the notes state that freshwater fish are often kept in tanks with plants, but the notes do not say saltwater fish tanks do not have plants. This contrast is not clearly supported. Choice D is incorrect because while it mentions plants for freshwater and synthetic salt for saltwater, it conflates two different care requirements without establishing which one is the more meaningful distinguishing difference.",
+    "note": "T2 R&W M1 #26: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 1 Question 26 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu4z00gjqmt1c7bfpp5j",
+    "field": "explanation",
+    "before": "Choice D is the best answer because the passage describes Fisher forecasting perpetually high stock prices just before the 1929 crash, then claiming the decline was only temporary—predictions that turned out to be completely wrong, as the market did not fully recover for twenty-five years. These were not just inaccurate predictions but spectacularly wrong ones, making them \"erroneous\" (mistaken, incorrect) in the most consequential way.\nChoice A \"Impertinent\" means rude or disrespectful, which has no logical connection to the quality of economic predictions. Choice B \"Vague\" means unclear or imprecise, but Fisher's predictions were actually quite specific (prices would stay high, the decline was temporary)—their fault was being wrong, not being vague. Choice C \"Dire\" means extremely serious or urgent, which could describe consequences but not the nature of the predictions themselves. Fisher's predictions were optimistic, not dire.",
+    "after": "Choice B is the best answer because the task asks to emphasize an underlying theme in some of Angelou's books. The notes state that I Know Why the Caged Bird Sings 'publicly reveals details about her private life up to the age of 17' and that Mom & Me & Mom 'recounts her complex relationship with her own mother.' Both books are autobiographical—they draw directly from Angelou's own life. Choice B correctly identifies this as an underlying theme: many of her works are autobiographical.\nChoice A is incorrect because listing works from Angelou's later years (Down the Delta and Mom & Me & Mom) describes a period of her career, not a thematic thread across her books. Choice C is incorrect because describing her connections with world leaders relates to her public role and activities, not to a theme within her literary works. Choice D is incorrect because the notes do not indicate that any of Angelou's books were unpopular; stating that Mom & Me & Mom was not popular is not supported by the notes.",
+    "note": "T2 R&W M1 #27: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 1 Question 27 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrntxg00chqmt1vs1l3o7u",
+    "field": "explanation",
+    "before": "Choice C is the best answer because Khlestakov says the village \"is not to be compared with St. Petersburg\"—meaning the village cannot be placed on the same level or measured as equal to St. Petersburg. \"Equated\" best captures this meaning: the village cannot be equated with (treated as equivalent to) the grand city.\nChoice A \"Generalized\" means to make broad statements, which has no relevance to comparing a village with a city. Choice B \"Studied\" means examined carefully, which is not the meaning of \"compared\" in this context. Choice D \"Measured\" is close but implies a quantitative assessment, while \"equated\" better captures the idea of placing two things on equal footing, which is what \"compared\" means here.",
+    "after": "Choice D is the best answer because the passage describes Fisher forecasting perpetually high stock prices just before the 1929 crash, then claiming the decline was only temporary—predictions that turned out to be completely wrong, as the market did not fully recover for twenty-five years. These were not just inaccurate predictions but spectacularly wrong ones, making them \"erroneous\" (mistaken, incorrect) in the most consequential way.\nChoice A \"Impertinent\" means rude or disrespectful, which has no logical connection to the quality of economic predictions. Choice B \"Vague\" means unclear or imprecise, but Fisher's predictions were actually quite specific (prices would stay high, the decline was temporary)—their fault was being wrong, not being vague. Choice C \"Dire\" means extremely serious or urgent, which could describe consequences but not the nature of the predictions themselves. Fisher's predictions were optimistic, not dire.",
+    "note": "T2 R&W M2 #1: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 2B Question 1 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrntxj00ciqmt1l8bids96",
+    "field": "explanation",
+    "before": "Choice D is the best answer because the donkey is described as being in a \"state of profound abstraction: wondering, probably, whether he was destined to be regaled with a cabbage-stalk.\" The donkey is deeply lost in thought about a specific concern—his food. This kind of absorbed, distracted preoccupation with one thought is best described as \"preoccupation.\"\nChoice A \"Generalization\" means making broad statements from specific cases, which does not describe a donkey lost in thought about food. Choice B \"Hypothesis\" means a proposed explanation or theory, which implies a deliberate intellectual exercise rather than the absent-minded wondering the donkey exhibits. Choice C \"Intention\" implies a purposeful plan of action, but the donkey is described as wandering inattentively without noticing commands—his state is one of distracted thought, not purposeful intent.",
+    "after": "Choice C is the best answer because Khlestakov says the village \"is not to be compared with St. Petersburg\"—meaning the village cannot be placed on the same level or measured as equal to St. Petersburg. \"Equated\" best captures this meaning: the village cannot be equated with (treated as equivalent to) the grand city.\nChoice A \"Generalized\" means to make broad statements, which has no relevance to comparing a village with a city. Choice B \"Studied\" means examined carefully, which is not the meaning of \"compared\" in this context. Choice D \"Measured\" is close but implies a quantitative assessment, while \"equated\" better captures the idea of placing two things on equal footing, which is what \"compared\" means here.",
+    "note": "T2 R&W M2 #2: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 2B Question 2 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrntxp00coqmt13lkqams8",
+    "field": "explanation",
+    "before": "Choice A is the best answer because the passage explains that researchers can study well-documented \"data-rich\" species to infer information about less-studied \"data-poor\" species. This process of extending conclusions from known cases to unknown ones is called \"extrapolating.\" To extrapolate means to estimate or infer something unknown based on known data—exactly what Elise Zipkin's work does.\nChoice B \"Ameliorate\" means to improve or make better, but the sentence is not about improving the behavior of animals—it is about inferring information about them. Choice C \"Bolster\" means to strengthen or support, which does not describe the process of inferring behavior from one species to another. Choice D \"Nullify\" means to make invalid or void, which is the opposite of what researchers are doing—they are gaining insight, not invalidating it.",
+    "after": "Choice D is the best answer because the donkey is described as being in a \"state of profound abstraction: wondering, probably, whether he was destined to be regaled with a cabbage-stalk.\" The donkey is deeply lost in thought about a specific concern—his food. This kind of absorbed, distracted preoccupation with one thought is best described as \"preoccupation.\"\nChoice A \"Generalization\" means making broad statements from specific cases, which does not describe a donkey lost in thought about food. Choice B \"Hypothesis\" means a proposed explanation or theory, which implies a deliberate intellectual exercise rather than the absent-minded wondering the donkey exhibits. Choice C \"Intention\" implies a purposeful plan of action, but the donkey is described as wandering inattentively without noticing commands—his state is one of distracted thought, not purposeful intent.",
+    "note": "T2 R&W M2 #3: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 2B Question 3 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrntxv00cuqmt1sup0n1ka",
+    "field": "explanation",
+    "before": "Choice A is the best answer because the underlined portion states that his mother, sisters, and servants \"made a young god of him\"—they worshipped Harold, forgave him everything. This statement directly anticipates the reactions described in the remainder of the sentence: \"they worshipped Harold, they forgave him everything.\" The underlined portion introduces this pattern of adoration that the rest of the sentence then specifies.\nChoice B is incorrect because no tragedy is explained in the previous sentence—the previous sentence describes Harold's uncanny good looks, not a tragic event. Choice C is incorrect because no allusion to education appears in the underlined portion or the surrounding text; Harold's charm and forgiveness are the focus, not his schooling. Choice D is incorrect because the underlined portion does not describe a setting—it describes the reactions of the people around Harold, not a physical place.",
+    "after": "Choice A is the best answer because the passage explains that researchers can study well-documented \"data-rich\" species to infer information about less-studied \"data-poor\" species. This process of extending conclusions from known cases to unknown ones is called \"extrapolating.\" To extrapolate means to estimate or infer something unknown based on known data—exactly what Elise Zipkin's work does.\nChoice B \"Ameliorate\" means to improve or make better, but the sentence is not about improving the behavior of animals—it is about inferring information about them. Choice C \"Bolster\" means to strengthen or support, which does not describe the process of inferring behavior from one species to another. Choice D \"Nullify\" means to make invalid or void, which is the opposite of what researchers are doing—they are gaining insight, not invalidating it.",
+    "note": "T2 R&W M2 #4: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 2B Question 4 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnty300d0qmt1bv5dt3uu",
+    "field": "explanation",
+    "before": "Choice C is the best answer because the underlined sentence—\"Una, the initiate New Yorker, continued her study of city ways and city currents during her lunch-hours\"—introduces Una and establishes her as a newcomer (an \"initiate\") who is actively studying her urban environment. Everything that follows (the curb market, the newspaper offices, the pre-Revolutionary buildings) is a description of what she observes during these lunch-hour explorations. The sentence defines the character and her surroundings in anticipation of the details that follow.\nChoice A is incorrect because Una's interest is in the modern city in all its dimensions—commerce, architecture, and history—not primarily or exclusively from a historical perspective. Choice B is incorrect because there is no indication of emotional distance between Una and the people around her; she is marveling at and engaging with the city, not distancing herself from its inhabitants. Choice D is incorrect because the sentence does not describe Una as sociable; she is an observer studying the city on her own during lunch hours.",
+    "after": "Choice A is the best answer because the underlined portion states that his mother, sisters, and servants \"made a young god of him\"—they worshipped Harold, forgave him everything. This statement directly anticipates the reactions described in the remainder of the sentence: \"they worshipped Harold, they forgave him everything.\" The underlined portion introduces this pattern of adoration that the rest of the sentence then specifies.\nChoice B is incorrect because no tragedy is explained in the previous sentence—the previous sentence describes Harold's uncanny good looks, not a tragic event. Choice C is incorrect because no allusion to education appears in the underlined portion or the surrounding text; Harold's charm and forgiveness are the focus, not his schooling. Choice D is incorrect because the underlined portion does not describe a setting—it describes the reactions of the people around Harold, not a physical place.",
+    "note": "T2 R&W M2 #5: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 2B Question 5 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrntya00daqmt18tfej1ds",
+    "field": "explanation",
+    "before": "Choice B is the best answer because the narrator was about to speak to Lawrence, but \"the words were frozen on my lips.\" The very next sentence—the underlined one—\"Never have I seen such a ghastly look on any man's face\"—explains why the narrator was stopped in his tracks: Lawrence's appearance was so alarming that it prevented the narrator from speaking. The underlined sentence gives the reason for the narrator's stunned reaction in the previous sentence.\nChoice A is incorrect because the sentence does not cast doubt on the narrator's reliability; it is a vivid, direct observation that is immediately confirmed by the physical details that follow. Choice C is incorrect because the sentence does not reiterate uncertainty—it makes a definitive, emphatic claim about what the narrator witnessed. Choice D is incorrect because the sentence is not an exaggeration that is later moderated; the details that follow (chalk-white face, shaking candle, petrified eyes) confirm and elaborate on the ghastly look rather than qualifying it.",
+    "after": "Choice C is the best answer because the underlined sentence—\"Una, the initiate New Yorker, continued her study of city ways and city currents during her lunch-hours\"—introduces Una and establishes her as a newcomer (an \"initiate\") who is actively studying her urban environment. Everything that follows (the curb market, the newspaper offices, the pre-Revolutionary buildings) is a description of what she observes during these lunch-hour explorations. The sentence defines the character and her surroundings in anticipation of the details that follow.\nChoice A is incorrect because Una's interest is in the modern city in all its dimensions—commerce, architecture, and history—not primarily or exclusively from a historical perspective. Choice B is incorrect because there is no indication of emotional distance between Una and the people around her; she is marveling at and engaging with the city, not distancing herself from its inhabitants. Choice D is incorrect because the sentence does not describe Una as sociable; she is an observer studying the city on her own during lunch hours.",
+    "note": "T2 R&W M2 #6: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 2B Question 6 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrntyi00dgqmt1pfcj2g42",
+    "field": "explanation",
+    "before": "Choice C is the best answer because Text 2 presents Trask's position: since the search involves forty Caucasian languages, resemblances can arise by chance, and similarities do not prove common roots. Trask explicitly says the connection is simplistic and that similarities can occur without any historical link. He would therefore characterize the theory in Text 1 as unfounded—lacking solid evidence because the apparent connections could all be coincidental.\nChoice A is incorrect because Trask does not find the theory intriguing; he dismisses the grammatical and cognate similarities as potentially coincidental rather than compelling. Choice B is incorrect because Trask explicitly argues the opposite—the large number of Caucasian languages involved actually makes chance resemblances more likely, weakening the theory rather than supporting it. Choice D is incorrect because Text 2 does not mention an ergative case system being found in other languages beyond the context of the Basque-Caucasian comparison; this detail is from Text 1 and is not Trask's rebuttal point.",
+    "after": "Choice B is the best answer because the narrator was about to speak to Lawrence, but \"the words were frozen on my lips.\" The very next sentence—the underlined one—\"Never have I seen such a ghastly look on any man's face\"—explains why the narrator was stopped in his tracks: Lawrence's appearance was so alarming that it prevented the narrator from speaking. The underlined sentence gives the reason for the narrator's stunned reaction in the previous sentence.\nChoice A is incorrect because the sentence does not cast doubt on the narrator's reliability; it is a vivid, direct observation that is immediately confirmed by the physical details that follow. Choice C is incorrect because the sentence does not reiterate uncertainty—it makes a definitive, emphatic claim about what the narrator witnessed. Choice D is incorrect because the sentence is not an exaggeration that is later moderated; the details that follow (chalk-white face, shaking candle, petrified eyes) confirm and elaborate on the ghastly look rather than qualifying it.",
+    "note": "T2 R&W M2 #7: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 2B Question 7 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrntyq00diqmt1mcdtavjn",
+    "field": "explanation",
+    "before": "Choice B is the best answer because Sir Leicester has been described as spending his carriage time contemplating his own greatness and reviewing his importance to society. When Lady Dedlock asks about his correspondence, he dismisses it with \"Nothing in it, though. Nothing whatever\"—suggesting the letters are trivial—even though he has just been deeply absorbed in reviewing his own significance. He dismisses the letters as trifling while remaining clearly convinced of his own importance.\nChoice A is incorrect because the passage says he \"reads\" his letters and then leans back—there is no indication he has made little progress reading them; rather, he has read them and found them insignificant. Choice C is incorrect because Sir Leicester does not neglect Lady Dedlock's inquiry—he answers it directly with 'Nothing in it.' Nor is there any evidence he is interested in her opinion. Choice D is incorrect because Sir Leicester does not summarize the news he has received; he simply dismisses the correspondence as containing nothing of note.",
+    "after": "Choice C is the best answer because Text 2 presents Trask's position: since the search involves forty Caucasian languages, resemblances can arise by chance, and similarities do not prove common roots. Trask explicitly says the connection is simplistic and that similarities can occur without any historical link. He would therefore characterize the theory in Text 1 as unfounded—lacking solid evidence because the apparent connections could all be coincidental.\nChoice A is incorrect because Trask does not find the theory intriguing; he dismisses the grammatical and cognate similarities as potentially coincidental rather than compelling. Choice B is incorrect because Trask explicitly argues the opposite—the large number of Caucasian languages involved actually makes chance resemblances more likely, weakening the theory rather than supporting it. Choice D is incorrect because Text 2 does not mention an ergative case system being found in other languages beyond the context of the Basque-Caucasian comparison; this detail is from Text 1 and is not Trask's rebuttal point.",
+    "note": "T2 R&W M2 #8: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 2B Question 8 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrntz000doqmt19vmdxrxh",
+    "field": "explanation",
+    "before": "Choice A is the best answer because the passage states the survey revealed a significant increase in customer preference for audiobooks. The graph shows the audiobook line beginning at approximately 11% in 2011 and rising to nearly 25% by 2021—more than doubling over the decade. Choice A accurately describes this trend with specific data points that support the claim of significant increase.\nChoice B is incorrect because the graph does not show audiobooks growing from 17% to 30%. The audiobook line starts around 11%, not 17%, and ends around 25%, not 30%. Choice C is incorrect because while the audiobook percentage has grown, it has not reached 'nearly a third' of the print book percentage. Print books remain around 65-75%, so a third of that would be around 22-25%—technically close, but this framing misrepresents the graph's data. Choice D is incorrect because the audiobook line in the graph shows consistent growth from 2011 onwards; it did not decrease for the initial 7 years before rising.",
+    "after": "Choice B is the best answer because Sir Leicester has been described as spending his carriage time contemplating his own greatness and reviewing his importance to society. When Lady Dedlock asks about his correspondence, he dismisses it with \"Nothing in it, though. Nothing whatever\"—suggesting the letters are trivial—even though he has just been deeply absorbed in reviewing his own significance. He dismisses the letters as trifling while remaining clearly convinced of his own importance.\nChoice A is incorrect because the passage says he \"reads\" his letters and then leans back—there is no indication he has made little progress reading them; rather, he has read them and found them insignificant. Choice C is incorrect because Sir Leicester does not neglect Lady Dedlock's inquiry—he answers it directly with 'Nothing in it.' Nor is there any evidence he is interested in her opinion. Choice D is incorrect because Sir Leicester does not summarize the news he has received; he simply dismisses the correspondence as containing nothing of note.",
+    "note": "T2 R&W M2 #9: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 2B Question 9 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrntzg00duqmt1t01beiay",
+    "field": "explanation",
+    "before": "Choice B is the best answer because the scientists concluded that M. gigas probably appeared very much like the unrelated T. rex. This conclusion was based partly on the discovery of an extremely short arm bone similar to those of T. rex. If M. gigas skull bones were also oversized relative to the body—as T. rex skulls are—this would provide additional structural evidence that the two species independently evolved similar physical forms, strongly supporting the conclusion that they looked alike.\nChoice A is incorrect because the two species living in time periods separated by 20 million years would show they were not contemporaries, but would not directly support the conclusion that they looked similar. Choice C is incorrect because T. rex size variation is irrelevant to whether M. gigas resembled T. rex—it tells us about internal variation within T. rex, not about the comparison between the two species. Choice D is incorrect because both being carnivores that preyed on herbivores would show they shared a diet, not a physical appearance—the scientists' conclusion is about physical resemblance, not feeding habits.",
+    "after": "Choice A is the best answer because the passage states the survey revealed a significant increase in customer preference for audiobooks. The graph shows the audiobook line beginning at approximately 11% in 2011 and rising to nearly 25% by 2021—more than doubling over the decade. Choice A accurately describes this trend with specific data points that support the claim of significant increase.\nChoice B is incorrect because the graph does not show audiobooks growing from 17% to 30%. The audiobook line starts around 11%, not 17%, and ends around 25%, not 30%. Choice C is incorrect because while the audiobook percentage has grown, it has not reached 'nearly a third' of the print book percentage. Print books remain around 65-75%, so a third of that would be around 22-25%—technically close, but this framing misrepresents the graph's data. Choice D is incorrect because the audiobook line in the graph shows consistent growth from 2011 onwards; it did not decrease for the initial 7 years before rising.",
+    "note": "T2 R&W M2 #10: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 2B Question 10 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrntzq00e0qmt1ocwram6h",
+    "field": "explanation",
+    "before": "Choice A is the best answer because the historians claim the true motive for relocating glassmakers to Murano was to prevent them from disseminating trade secrets. If a glassmakers' guild was established there specifically to protect those secrets, and it was forbidden to contact foreign glassmakers, this directly supports the idea that the government's real intent was to control the flow of specialized knowledge—not merely to prevent fires.\nChoice B is incorrect because granting glass artisans high social status and allowing their daughters to marry into wealthy classes would be an incentive to keep artisans content, not necessarily to prevent secret-sharing. It does not directly address the containment of trade secrets. Choice C is incorrect because encouraging artisans to pass trade secrets to their children would keep knowledge within families—but it would not prevent dissemination to outsiders, and it does not address the government's isolationist motive. Choice D is incorrect because a 1295 law prohibiting glassmakers from leaving the city would indeed suggest containment, but it is a later, separate law—and its motivation could still be fire prevention or other concerns. The historians' claim is specifically about the 1291 relocation to Murano.",
+    "after": "Choice B is the best answer because the scientists concluded that M. gigas probably appeared very much like the unrelated T. rex. This conclusion was based partly on the discovery of an extremely short arm bone similar to those of T. rex. If M. gigas skull bones were also oversized relative to the body—as T. rex skulls are—this would provide additional structural evidence that the two species independently evolved similar physical forms, strongly supporting the conclusion that they looked alike.\nChoice A is incorrect because the two species living in time periods separated by 20 million years would show they were not contemporaries, but would not directly support the conclusion that they looked similar. Choice C is incorrect because T. rex size variation is irrelevant to whether M. gigas resembled T. rex—it tells us about internal variation within T. rex, not about the comparison between the two species. Choice D is incorrect because both being carnivores that preyed on herbivores would show they shared a diet, not a physical appearance—the scientists' conclusion is about physical resemblance, not feeding habits.",
+    "note": "T2 R&W M2 #11: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 2B Question 11 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrntzy00eaqmt15k1w8of2",
+    "field": "explanation",
+    "before": "Choice D is the best answer because Dr. Cavosie's claim is that a meteorite impact (not an airburst) created the Libyan desert glass, based on the presence of reidite, which he says could only form from meteorite-generated shockwaves. If small amounts of reidite have been detected at a known airburst site in Siberia, this would directly undermine his key premise—it would show that reidite can form without a meteorite impact, weakening his conclusion that a meteorite must have created the glass.\nChoice A is incorrect because identical zircon crystals found in other prehistoric glass worldwide would not weaken the meteorite hypothesis for Libyan desert glass specifically; it would just show similar glass forms elsewhere. Choice B is incorrect because finding reidite near a known meteorite impact site would actually support Dr. Cavosie's claim that reidite indicates meteorite activity. Choice C is incorrect because discovering a meteorite crater near the Sahara Desert would strengthen Dr. Cavosie's conclusion, not weaken it.",
+    "after": "Choice A is the best answer because the historians claim the true motive for relocating glassmakers to Murano was to prevent them from disseminating trade secrets. If a glassmakers' guild was established there specifically to protect those secrets, and it was forbidden to contact foreign glassmakers, this directly supports the idea that the government's real intent was to control the flow of specialized knowledge—not merely to prevent fires.\nChoice B is incorrect because granting glass artisans high social status and allowing their daughters to marry into wealthy classes would be an incentive to keep artisans content, not necessarily to prevent secret-sharing. It does not directly address the containment of trade secrets. Choice C is incorrect because encouraging artisans to pass trade secrets to their children would keep knowledge within families—but it would not prevent dissemination to outsiders, and it does not address the government's isolationist motive. Choice D is incorrect because a 1295 law prohibiting glassmakers from leaving the city would indeed suggest containment, but it is a later, separate law—and its motivation could still be fire prevention or other concerns. The historians' claim is specifically about the 1291 relocation to Murano.",
+    "note": "T2 R&W M2 #12: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 2B Question 12 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu0500egqmt1ft1572b5",
+    "field": "explanation",
+    "before": "Choice C is the best answer because the claim is that Sydney Carton fails to fully utilize his talents and affects an air of indifference. Choice C—\"When [Sydney] cared to talk, he talked well; but, the cloud of caring for nothing, which overshadowed him with such a fatal darkness, was very rarely pierced by the light within him\"—directly illustrates both elements: Sydney has talent (he talks well when he cares to), but he is habitually indifferent (\"caring for nothing\"), and that indifference prevents his abilities from showing.\nChoice A is incorrect because describing Sydney as \"an amazingly good jackal\" who serves Stryver shows his collaborative role, not the specific combination of untapped talent and cultivated indifference. Choice B is incorrect because Sydney working double tides to clear Stryver's papers shows diligent effort, which contradicts the claim that he affects indifference and fails to utilize his talents. Choice D is incorrect because this describes Sydney's manner as settled and resigned—like a tired man who has found his road—which suggests acceptance of his path, not the combination of concealed talent and performed indifference the claim describes.",
+    "after": "Choice D is the best answer because Dr. Cavosie's claim is that a meteorite impact (not an airburst) created the Libyan desert glass, based on the presence of reidite, which he says could only form from meteorite-generated shockwaves. If small amounts of reidite have been detected at a known airburst site in Siberia, this would directly undermine his key premise—it would show that reidite can form without a meteorite impact, weakening his conclusion that a meteorite must have created the glass.\nChoice A is incorrect because identical zircon crystals found in other prehistoric glass worldwide would not weaken the meteorite hypothesis for Libyan desert glass specifically; it would just show similar glass forms elsewhere. Choice B is incorrect because finding reidite near a known meteorite impact site would actually support Dr. Cavosie's claim that reidite indicates meteorite activity. Choice C is incorrect because discovering a meteorite crater near the Sahara Desert would strengthen Dr. Cavosie's conclusion, not weaken it.",
+    "note": "T2 R&W M2 #13: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 2B Question 13 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu0d00emqmt1jsmipbfp",
+    "field": "explanation",
+    "before": "Choice B is the best answer because the passage states that Eco had 30,000 books, many of which he had never opened, and that he saw his library as a collection of knowledge he still wished to acquire—not as a testament to what he already knew. The logical completion is that the library's principal task was \"to accumulate learning that he desired but had not yet accessed\"—representing knowledge yet to be gained, not knowledge already mastered.\nChoice A \"to store information he might someday need to know\" frames the library as a reference collection for future use—but the passage emphasizes Eco's relationship with unread books as a symbol of desired learning, not future utility. Choice C \"to display both the books he had read and those that he had not\" makes the library a showcase, but the passage explicitly says Eco did not view it as a testament to his wisdom—it was not meant for display. Choice D \"to contain writings that he was unlikely to ever read\" frames the library negatively, as if Eco accepted he would never read the books—but the passage says he \"still wished to acquire\" that knowledge, implying intention to read, not resignation to never reading.",
+    "after": "Choice C is the best answer because the claim is that Sydney Carton fails to fully utilize his talents and affects an air of indifference. Choice C—\"When [Sydney] cared to talk, he talked well; but, the cloud of caring for nothing, which overshadowed him with such a fatal darkness, was very rarely pierced by the light within him\"—directly illustrates both elements: Sydney has talent (he talks well when he cares to), but he is habitually indifferent (\"caring for nothing\"), and that indifference prevents his abilities from showing.\nChoice A is incorrect because describing Sydney as \"an amazingly good jackal\" who serves Stryver shows his collaborative role, not the specific combination of untapped talent and cultivated indifference. Choice B is incorrect because Sydney working double tides to clear Stryver's papers shows diligent effort, which contradicts the claim that he affects indifference and fails to utilize his talents. Choice D is incorrect because this describes Sydney's manner as settled and resigned—like a tired man who has found his road—which suggests acceptance of his path, not the combination of concealed talent and performed indifference the claim describes.",
+    "note": "T2 R&W M2 #14: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 2B Question 14 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu0k00ewqmt12oq2oyg0",
+    "field": "explanation",
+    "before": "Choice D is the best answer because the passage argues that biodiversity has not been maintained through random processes but through stabilizing forces. If a species became extinct, the neutral model (random chance) would predict replacement by a similar species randomly. But since the passage shows the neutral model does not apply here, the logical conclusion is that replacement would not happen through random chance—instead, the stabilizing forces would determine what replaces it.\nChoice A is incorrect because an increase in diversity following extinction contradicts the passage's finding that stabilizing forces maintain diversity—suggesting diversity would increase goes against this stabilization. Choice B is incorrect because no effect on overall diversity would be the neutral model's prediction only if the species were replaceable without consequence, which the passage's emphasis on stabilizing forces contradicts. Choice C is incorrect because replacement through random chance is exactly what the neutral model predicts—but the passage explicitly shows that random processes do not govern this ecosystem's biodiversity.",
+    "after": "Choice B is the best answer because the passage states that Eco had 30,000 books, many of which he had never opened, and that he saw his library as a collection of knowledge he still wished to acquire—not as a testament to what he already knew. The logical completion is that the library's principal task was \"to accumulate learning that he desired but had not yet accessed\"—representing knowledge yet to be gained, not knowledge already mastered.\nChoice A \"to store information he might someday need to know\" frames the library as a reference collection for future use—but the passage emphasizes Eco's relationship with unread books as a symbol of desired learning, not future utility. Choice C \"to display both the books he had read and those that he had not\" makes the library a showcase, but the passage explicitly says Eco did not view it as a testament to his wisdom—it was not meant for display. Choice D \"to contain writings that he was unlikely to ever read\" frames the library negatively, as if Eco accepted he would never read the books—but the passage says he \"still wished to acquire\" that knowledge, implying intention to read, not resignation to never reading.",
+    "note": "T2 R&W M2 #15: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 2B Question 15 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu0r00f6qmt1c2faa703",
+    "field": "explanation",
+    "before": "Choice C is the best answer because the sentence reads: \"the incoming solar _____ is composed of various wavelengths of light.\" The blank must be followed by \"which\" as a relative pronoun introducing a nonrestrictive clause. \"Radiation, which\" correctly uses a comma before the relative pronoun \"which\" to introduce a nonrestrictive clause that adds information about the radiation without restricting its meaning.\nChoice A \"radiation. Which\" creates a sentence fragment beginning with \"which\"—a relative pronoun cannot begin an independent sentence. Choice B \"radiation which\" omits the comma before \"which,\" incorrectly making the clause restrictive (implying there is a specific type of radiation that is composed of various wavelengths, as opposed to other radiation that is not). Choice D \"radiation; which\" incorrectly uses a semicolon before a relative clause. Semicolons join two independent clauses, but \"which is composed of various wavelengths\" is a dependent clause, not an independent one.",
+    "after": "Choice D is the best answer because the passage argues that biodiversity has not been maintained through random processes but through stabilizing forces. If a species became extinct, the neutral model (random chance) would predict replacement by a similar species randomly. But since the passage shows the neutral model does not apply here, the logical conclusion is that replacement would not happen through random chance—instead, the stabilizing forces would determine what replaces it.\nChoice A is incorrect because an increase in diversity following extinction contradicts the passage's finding that stabilizing forces maintain diversity—suggesting diversity would increase goes against this stabilization. Choice B is incorrect because no effect on overall diversity would be the neutral model's prediction only if the species were replaceable without consequence, which the passage's emphasis on stabilizing forces contradicts. Choice C is incorrect because replacement through random chance is exactly what the neutral model predicts—but the passage explicitly shows that random processes do not govern this ecosystem's biodiversity.",
+    "note": "T2 R&W M2 #16: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 2B Question 16 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu1100fgqmt1fw8awnrx",
+    "field": "explanation",
+    "before": "Choice D is the best answer because the sentence reads: \"the Memphis store was the first to place items on _____ customers—instead of a clerk—choose and collect their purchases.\" The blank needs to complete \"place items on shelves\" and then connect to the participial phrase \"letting customers choose.\" A comma after \"shelves\" correctly separates the noun from the participial phrase \"letting customers choose,\" which explains the purpose of placing items on shelves.\nChoice A \"shelves; letting\" uses a semicolon, which would need to be followed by an independent clause. \"Letting customers choose and collect their purchases\" is a participial phrase, not an independent clause, so a semicolon is incorrect here. Choice B \"shelves and they let\" introduces a new subject (\"they\") and creates a compound predicate that changes the sentence structure and introduces ambiguity about who \"they\" refers to. Choice C \"shelves letting\" omits any punctuation, creating an ambiguous modifier—it is unclear whether \"letting\" modifies the shelves (as if the shelves are doing the letting) or the store.",
+    "after": "Choice C is the best answer because the sentence reads: \"the incoming solar _____ is composed of various wavelengths of light.\" The blank must be followed by \"which\" as a relative pronoun introducing a nonrestrictive clause. \"Radiation, which\" correctly uses a comma before the relative pronoun \"which\" to introduce a nonrestrictive clause that adds information about the radiation without restricting its meaning.\nChoice A \"radiation. Which\" creates a sentence fragment beginning with \"which\"—a relative pronoun cannot begin an independent sentence. Choice B \"radiation which\" omits the comma before \"which,\" incorrectly making the clause restrictive (implying there is a specific type of radiation that is composed of various wavelengths, as opposed to other radiation that is not). Choice D \"radiation; which\" incorrectly uses a semicolon before a relative clause. Semicolons join two independent clauses, but \"which is composed of various wavelengths\" is a dependent clause, not an independent one.",
+    "note": "T2 R&W M2 #17: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 2B Question 17 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu1800fmqmt17wfap4ek",
+    "field": "explanation",
+    "before": "Choice A is the best answer because the sentence describes a belief that existed in the past but has now been updated by recent studies. \"Had long been considered\" is the past perfect tense, which correctly indicates that this was a long-held belief before the new research by the National Marine Mammal Foundation changed the understanding. The past perfect is appropriate here because it describes a prior state that has since been updated.\nChoice B \"have long been considered\" uses the present perfect, which implies the belief continues to the present. But the passage says recent studies have established that killer whale brains can also reach this size—suggesting the prior belief has been revised. Choice C \"long considered\" omits the auxiliary verb, creating a grammatically incomplete verb phrase—\"long considered to be\" without an auxiliary cannot function as the main verb of the clause. Choice D \"were long considered\" uses the simple past, which works in isolation but does not as precisely signal the sequence of events (a long-standing past belief now updated) as the past perfect does.",
+    "after": "Choice D is the best answer because the sentence reads: \"the Memphis store was the first to place items on _____ customers—instead of a clerk—choose and collect their purchases.\" The blank needs to complete \"place items on shelves\" and then connect to the participial phrase \"letting customers choose.\" A comma after \"shelves\" correctly separates the noun from the participial phrase \"letting customers choose,\" which explains the purpose of placing items on shelves.\nChoice A \"shelves; letting\" uses a semicolon, which would need to be followed by an independent clause. \"Letting customers choose and collect their purchases\" is a participial phrase, not an independent clause, so a semicolon is incorrect here. Choice B \"shelves and they let\" introduces a new subject (\"they\") and creates a compound predicate that changes the sentence structure and introduces ambiguity about who \"they\" refers to. Choice C \"shelves letting\" omits any punctuation, creating an ambiguous modifier—it is unclear whether \"letting\" modifies the shelves (as if the shelves are doing the letting) or the store.",
+    "note": "T2 R&W M2 #18: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 2B Question 18 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu1e00foqmt13x76j71u",
+    "field": "explanation",
+    "before": "Choice B is the best answer because the sentence reads: \"Most famous for the Monte Carlo Casino, _____, Monaco is a pioneer in marine conservation.\" The blank follows \"Monte Carlo Casino\" and must introduce additional information about Monaco before the main clause. \"The country is also home to a world-class oceanographic museum\" is an independent clause that correctly fits after the comma—it is an appositive-style addition that clarifies Monaco's other claim to fame.\nChoice A \"there is also an oceanographic museum in the country that is world-class\" is grammatically awkward and passive in structure; placing \"that is world-class\" at the end creates a dangling modifier relative to the sentence. Choice C \"a world-class oceanographic museum is also in the country\" uses passive word order and does not flow naturally as a parenthetical addition to the sentence about Monaco. Choice D \"the country's world-class museum of oceanography resides just a few kilometers away\" introduces location information (\"a few kilometers away\") that is not supported by the notes and adds unsupported detail.",
+    "after": "Choice A is the best answer because the sentence describes a belief that existed in the past but has now been updated by recent studies. \"Had long been considered\" is the past perfect tense, which correctly indicates that this was a long-held belief before the new research by the National Marine Mammal Foundation changed the understanding. The past perfect is appropriate here because it describes a prior state that has since been updated.\nChoice B \"have long been considered\" uses the present perfect, which implies the belief continues to the present. But the passage says recent studies have established that killer whale brains can also reach this size—suggesting the prior belief has been revised. Choice C \"long considered\" omits the auxiliary verb, creating a grammatically incomplete verb phrase—\"long considered to be\" without an auxiliary cannot function as the main verb of the clause. Choice D \"were long considered\" uses the simple past, which works in isolation but does not as precisely signal the sequence of events (a long-standing past belief now updated) as the past perfect does.",
+    "note": "T2 R&W M2 #19: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 2B Question 19 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu3e00fqqmt1h7f87jtv",
+    "field": "explanation",
+    "before": "Choice C is the best answer because the sentence reads: \"A prosthetic knee can now be made by a 3D printer for less than _____ thousands of dollars less than the cost of a traditionally manufactured knee.\" The phrase \"thousands of dollars less than…\" elaborates on the cost savings introduced by \"$500.\" An em dash after \"$500\" is the correct punctuation to introduce this amplifying detail, which is an aside that specifies just how much cheaper the 3D-printed version is.\nChoice A \"$500, that is\" uses a comma and \"that is\" to introduce the clarification, but \"that is\" implies a correction or restatement rather than an amplification—it suggests the previous statement was wrong, which it is not. Choice B \"$500; which is\" uses a semicolon before \"which,\" but semicolons must be followed by an independent clause—\"which is thousands of dollars less\" is a relative clause, not an independent clause. Choice D \"$500;\" uses a semicolon alone, which would need to be followed by an independent clause. \"Thousands of dollars less than the cost of a traditionally manufactured knee\" is a phrase, not an independent clause.",
+    "after": "Choice B is the best answer because the sentence reads: \"Most famous for the Monte Carlo Casino, _____, Monaco is a pioneer in marine conservation.\" The blank follows \"Monte Carlo Casino\" and must introduce additional information about Monaco before the main clause. \"The country is also home to a world-class oceanographic museum\" is an independent clause that correctly fits after the comma—it is an appositive-style addition that clarifies Monaco's other claim to fame.\nChoice A \"there is also an oceanographic museum in the country that is world-class\" is grammatically awkward and passive in structure; placing \"that is world-class\" at the end creates a dangling modifier relative to the sentence. Choice C \"a world-class oceanographic museum is also in the country\" uses passive word order and does not flow naturally as a parenthetical addition to the sentence about Monaco. Choice D \"the country's world-class museum of oceanography resides just a few kilometers away\" introduces location information (\"a few kilometers away\") that is not supported by the notes and adds unsupported detail.",
+    "note": "T2 R&W M2 #20: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 2B Question 20 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu3r00fsqmt1cpzuqowf",
+    "field": "explanation",
+    "before": "Choice A is the best answer because the blank refers to the most famous routine belonging to the comedy duo \"Abbott and Costello.\" When a compound noun (Abbott and Costello) acts as a single unit possessing something, the possessive apostrophe goes only at the end of the final name: \"Abbott and Costello's\" most famous routine. This follows the rule for joint possession.\nChoice B \"Abbott's and Costello's\" would indicate separate, individual possession—as if Abbott had one most-famous routine and Costello had a different one. Since they share one routine as a duo, the joint possessive \"Abbott and Costello's\" is correct. Choice C \"Abbott and Costellos'\" omits the apostrophe before the s on Costello (treating it as if \"Costellos\" is already a plural), which is incorrect—Costello is a proper name and its possessive is formed with 's. Choice D \"Abbotts' and Costellos'\" treats both names as if they are already plurals (adding s before the apostrophe), which is incorrect for proper names that are not naturally plural.",
+    "after": "Choice C is the best answer because the sentence reads: \"A prosthetic knee can now be made by a 3D printer for less than _____ thousands of dollars less than the cost of a traditionally manufactured knee.\" The phrase \"thousands of dollars less than…\" elaborates on the cost savings introduced by \"$500.\" An em dash after \"$500\" is the correct punctuation to introduce this amplifying detail, which is an aside that specifies just how much cheaper the 3D-printed version is.\nChoice A \"$500, that is\" uses a comma and \"that is\" to introduce the clarification, but \"that is\" implies a correction or restatement rather than an amplification—it suggests the previous statement was wrong, which it is not. Choice B \"$500; which is\" uses a semicolon before \"which,\" but semicolons must be followed by an independent clause—\"which is thousands of dollars less\" is a relative clause, not an independent clause. Choice D \"$500;\" uses a semicolon alone, which would need to be followed by an independent clause. \"Thousands of dollars less than the cost of a traditionally manufactured knee\" is a phrase, not an independent clause.",
+    "note": "T2 R&W M2 #21: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 2B Question 21 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu4000fuqmt15u6d0tq6",
+    "field": "explanation",
+    "before": "Choice A is the best answer because the passage states that early printers made reading materials increasingly available and furthered literacy. The blank introduces Gutenberg as the best known among those printers. \"Because of his innovative moveable type\" correctly signals that the reason Gutenberg is the most famous is his specific innovation—moveable type. The transition establishes the causal link between his invention and his fame.\nChoice B \"Regardless of\" signals that Gutenberg's fame exists despite some complicating factor—but no such obstacle is mentioned. His fame is directly due to his moveable type, not in spite of something. Choice C \"In contrast to\" would signal that Gutenberg's approach is opposite to something previously described, but no contrasting approach has been mentioned. Choice D \"In addition to\" would suggest that moveable type is one of several contributions, but the sentence specifically singles Gutenberg out as best known—which is due to his moveable type, not in addition to it.",
+    "after": "Choice A is the best answer because the blank refers to the most famous routine belonging to the comedy duo \"Abbott and Costello.\" When a compound noun (Abbott and Costello) acts as a single unit possessing something, the possessive apostrophe goes only at the end of the final name: \"Abbott and Costello's\" most famous routine. This follows the rule for joint possession.\nChoice B \"Abbott's and Costello's\" would indicate separate, individual possession—as if Abbott had one most-famous routine and Costello had a different one. Since they share one routine as a duo, the joint possessive \"Abbott and Costello's\" is correct. Choice C \"Abbott and Costellos'\" omits the apostrophe before the s on Costello (treating it as if \"Costellos\" is already a plural), which is incorrect—Costello is a proper name and its possessive is formed with 's. Choice D \"Abbotts' and Costellos'\" treats both names as if they are already plurals (adding s before the apostrophe), which is incorrect for proper names that are not naturally plural.",
+    "note": "T2 R&W M2 #22: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 2B Question 22 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu4700fwqmt15ur2xisp",
+    "field": "explanation",
+    "before": "Choice B is the best answer because the passage opens by acknowledging the common perception that dandelions are useless weeds, then pivots to explain their culinary uses. \"Nevertheless,\" correctly signals a contrast: despite being considered useless weeds, dandelions can in fact be used in many recipes. The word introduces information that contradicts or goes against the prior characterization.\nChoice A \"Otherwise\" signals an alternative condition or consequence, implying that if something different were true, the following would apply—which does not fit the structure of this sentence. Choice C \"Besides\" adds information as an additional point alongside what was just said, but the following sentence is not an additional negative point about dandelions—it is a rebuttal to the negative characterization. Choice D \"Moreover\" adds further supporting information in the same direction as what came before, but the following sentence goes against the prior claim, not with it.",
+    "after": "Choice A is the best answer because the passage states that early printers made reading materials increasingly available and furthered literacy. The blank introduces Gutenberg as the best known among those printers. \"Because of his innovative moveable type\" correctly signals that the reason Gutenberg is the most famous is his specific innovation—moveable type. The transition establishes the causal link between his invention and his fame.\nChoice B \"Regardless of\" signals that Gutenberg's fame exists despite some complicating factor—but no such obstacle is mentioned. His fame is directly due to his moveable type, not in spite of something. Choice C \"In contrast to\" would signal that Gutenberg's approach is opposite to something previously described, but no contrasting approach has been mentioned. Choice D \"In addition to\" would suggest that moveable type is one of several contributions, but the sentence specifically singles Gutenberg out as best known—which is due to his moveable type, not in addition to it.",
+    "note": "T2 R&W M2 #23: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 2B Question 23 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu4f00g2qmt16j8izlxd",
+    "field": "explanation",
+    "before": "Choice B is the best answer because the passage states that biocontrol has already found its way onto some golf courses. The blank introduces the 2018 survey finding as evidence that confirms and amplifies this claim. \"Indeed,\" correctly signals that the following information confirms or strengthens what was just stated—the survey provides concrete data that validates the claim about biocontrol's presence on golf courses.\nChoice A \"in other words\" signals a restatement or clarification of what was just said, but the survey data is new supporting evidence, not a rephrasing. Choice C \"nonetheless\" signals that the following information is true despite some complicating factor, but no obstacle or complication has been introduced. Choice D \"however\" signals a contrast or concession, but the survey data supports rather than contradicts the claim about biocontrol on golf courses.",
+    "after": "Choice B is the best answer because the passage opens by acknowledging the common perception that dandelions are useless weeds, then pivots to explain their culinary uses. \"Nevertheless,\" correctly signals a contrast: despite being considered useless weeds, dandelions can in fact be used in many recipes. The word introduces information that contradicts or goes against the prior characterization.\nChoice A \"Otherwise\" signals an alternative condition or consequence, implying that if something different were true, the following would apply—which does not fit the structure of this sentence. Choice C \"Besides\" adds information as an additional point alongside what was just said, but the following sentence is not an additional negative point about dandelions—it is a rebuttal to the negative characterization. Choice D \"Moreover\" adds further supporting information in the same direction as what came before, but the following sentence goes against the prior claim, not with it.",
+    "note": "T2 R&W M2 #24: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 2B Question 24 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu4m00g8qmt1ln8xwuho",
+    "field": "explanation",
+    "before": "Choice D is the best answer because the task requires two elements: the misconception and how it was disproved. Choice D accomplishes both: it states the coins were originally labeled as fakes (the misconception) because no Roman leader named Sponsian existed in the historical record, and then explains that scientific analysis of the coins' surfaces now indicates they are authentic (how it was disproved). Both elements are clearly and accurately represented.\nChoice A is incorrect because it describes what the scientific analysis revealed (patterns of usage and burial) without clearly establishing what the prior misconception was. Choice B is incorrect because it mentions the misconception (judged as fakes) and the conclusion (21st century scientists say they are real) but omits the specific scientific method that disproved the forgery claim—it lacks the 'how it was disproved' element. Choice C is incorrect because it states the coins were once considered counterfeit and are now considered genuine, but it adds the claim that Sponsian was a minor Roman military leader, which addresses his identity rather than focusing on the misconception about the coins and its disproof.",
+    "after": "Choice B is the best answer because the passage states that biocontrol has already found its way onto some golf courses. The blank introduces the 2018 survey finding as evidence that confirms and amplifies this claim. \"Indeed,\" correctly signals that the following information confirms or strengthens what was just stated—the survey provides concrete data that validates the claim about biocontrol's presence on golf courses.\nChoice A \"in other words\" signals a restatement or clarification of what was just said, but the survey data is new supporting evidence, not a rephrasing. Choice C \"nonetheless\" signals that the following information is true despite some complicating factor, but no obstacle or complication has been introduced. Choice D \"however\" signals a contrast or concession, but the survey data supports rather than contradicts the claim about biocontrol on golf courses.",
+    "note": "T2 R&W M2 #25: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 2B Question 25 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu4v00geqmt133tpelfl",
+    "field": "explanation",
+    "before": "Choice A is the best answer because the task asks to describe the differences between the two artists. Choice A contrasts them precisely and accurately: Makuzu Kozan's glazing techniques yielded richly colored and seemingly transparent (translucent) results, while Yabu Meizan's work was notable for intricate decoration with potentially thousands of flowers or hundreds of figures—a very different aesthetic approach. Each artist's distinctive method is captured.\nChoice B is incorrect because saying they 'employed different methods' is too vague—it identifies that differences exist without actually describing what those differences are, which is the task's requirement. Choice C is incorrect because tracing Japanese porcelain art from the 5th century to the 19th century provides historical context but does not describe the specific differences between the two artists' work. Choice D is incorrect because it accurately describes Kozan's work but then vaguely states Meizan 'took his porcelains in a completely different direction' without specifying what Meizan's approach actually was—it fails to describe the difference in concrete terms.",
+    "after": "Choice D is the best answer because the task requires two elements: the misconception and how it was disproved. Choice D accomplishes both: it states the coins were originally labeled as fakes (the misconception) because no Roman leader named Sponsian existed in the historical record, and then explains that scientific analysis of the coins' surfaces now indicates they are authentic (how it was disproved). Both elements are clearly and accurately represented.\nChoice A is incorrect because it describes what the scientific analysis revealed (patterns of usage and burial) without clearly establishing what the prior misconception was. Choice B is incorrect because it mentions the misconception (judged as fakes) and the conclusion (21st century scientists say they are real) but omits the specific scientific method that disproved the forgery claim—it lacks the 'how it was disproved' element. Choice C is incorrect because it states the coins were once considered counterfeit and are now considered genuine, but it adds the claim that Sponsian was a minor Roman military leader, which addresses his identity rather than focusing on the misconception about the coins and its disproof.",
+    "note": "T2 R&W M2 #26: bleed — explanation belonged to the next question (shift starting at R&W M1 #20); takes the explanation currently on the previous question",
+    "class": "bleed",
+    "evidence": "Test2 RW Answer Explanations.docx Module 2B Question 26 table"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrntee005jqmt1vi9rhybu",
+    "field": "stem",
+    "before": "12\n\nThe dot plots shown summarize the data in two sets, Set 1 and Set 2. Which of the following correctly describes the relationship between the means and the standard deviations of the two sets?",
+    "after": "The dot plots shown summarize the data in two sets, Set 1 and Set 2. Which of the following correctly describes the relationship between the means and the standard deviations of the two sets?",
+    "note": "T2 Math M1 #12: other — stray question number '12' at stem start (PDF numbering)",
+    "class": "other",
+    "evidence": "Innov. Test 2 Math Mod 1, 2B REV.pdf p5"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrntgb006lqmt1k63h2kpd",
+    "field": "stem",
+    "before": "19\n\nThe graph of the function $h(x)$ shows how high, in meters, a balloon is in the air after $x$ seconds. What is the best interpretation of the function $h(x) + 3$?\n\nA The balloon is released at the same height and the height of the balloon is tripled each second.\nThe balloon is released at a height of 3 meters and the height of the balloon increases at the same rate.\nThe balloon is released 3 seconds later and the height of the balloon increases by 3 meters each second.\nThe balloon is released at a height of 4 meters and the height of the balloon increases at the same rate.",
+    "after": "The graph of the function $h(x)$ shows how high, in meters, a balloon is in the air after $x$ seconds. What is the best interpretation of the function $h(x) + 3$?",
+    "note": "T2 Math M1 #19: options_in_stem — stem had leading '19' and the four answer choices ('A The balloon…') dumped after the question; real options also exist",
+    "class": "options_in_stem",
+    "evidence": "Innov. Test 2 Math Mod 1, 2B REV.pdf p9 OCR + page image"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "cmsjrntgc006mqmt1r8xfa9b9",
+    "field": "text",
+    "before": "Released at same height; height tripled each second.",
+    "after": "The balloon is released at the same height and the height of the balloon is tripled each second.",
+    "note": "T2 Math M1 #19: other — option abbreviated; full source wording was the text dumped in the stem",
+    "class": "other",
+    "evidence": "Innov. Test 2 Math Mod 1, 2B REV.pdf p9 OCR + page image"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "cmsjrntgc006nqmt1362luvlx",
+    "field": "text",
+    "before": "Released at height of 3 m; height increases at same rate.",
+    "after": "The balloon is released at a height of 3 meters and the height of the balloon increases at the same rate.",
+    "note": "T2 Math M1 #19: other — option abbreviated; full source wording was the text dumped in the stem",
+    "class": "other",
+    "evidence": "Innov. Test 2 Math Mod 1, 2B REV.pdf p9 OCR + page image"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "cmsjrntgc006oqmt1nshp2o1b",
+    "field": "text",
+    "before": "Released 3 seconds later; height increases by 3 m each second.",
+    "after": "The balloon is released 3 seconds later and the height of the balloon increases by 3 meters each second.",
+    "note": "T2 Math M1 #19: other — option abbreviated; full source wording was the text dumped in the stem",
+    "class": "other",
+    "evidence": "Innov. Test 2 Math Mod 1, 2B REV.pdf p9 OCR + page image"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "cmsjrntgc006pqmt1lvkaw7ay",
+    "field": "text",
+    "before": "The balloon is released at a height of 4 meters and increases at the same rate.",
+    "after": "The balloon is released at a height of 4 meters and the height of the balloon increases at the same rate.",
+    "note": "T2 Math M1 #19: other — option abbreviated; full source wording was the text dumped in the stem",
+    "class": "other",
+    "evidence": "Innov. Test 2 Math Mod 1, 2B REV.pdf p9 OCR + page image"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "cmsjrntee005kqmt1nfus5nwo",
+    "field": "text",
+    "before": "SD of Set 1 > SD of Set 2; mean of Set 1 < mean of Set 2.",
+    "after": "The standard deviation of Set 1 is greater than the standard deviation of Set 2, and the mean of Set 1 is less than the mean of Set 2.",
+    "note": "T2 Math M1 #12: other — option paraphrased/abbreviated vs source; restored source wording",
+    "class": "other",
+    "evidence": "Innov. Test 2 Math Mod 1, 2B REV.pdf p5 page image"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "cmsjrntee005lqmt1rbd5mkx1",
+    "field": "text",
+    "before": "SD of Set 1 < SD of Set 2; mean of Set 1 > mean of Set 2.",
+    "after": "The standard deviation of Set 1 is less than the standard deviation of Set 2, and the mean of Set 1 is greater than the mean of Set 2.",
+    "note": "T2 Math M1 #12: other — option paraphrased/abbreviated vs source; restored source wording",
+    "class": "other",
+    "evidence": "Innov. Test 2 Math Mod 1, 2B REV.pdf p5 page image"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "cmsjrntee005mqmt1jzxk52c2",
+    "field": "text",
+    "before": "Standard deviations are equal; mean of Set 1 < mean of Set 2.",
+    "after": "The standard deviation of the two sets is equal, and the mean of Set 1 is less than the mean of Set 2.",
+    "note": "T2 Math M1 #12: other — option paraphrased/abbreviated vs source; restored source wording",
+    "class": "other",
+    "evidence": "Innov. Test 2 Math Mod 1, 2B REV.pdf p5 page image"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "cmsjrntee005nqmt1quzqt0i0",
+    "field": "text",
+    "before": "Standard deviations are equal; mean of Set 1 > mean of Set 2.",
+    "after": "The standard deviation of the two sets is equal, and the mean of Set 1 is greater than the mean of Set 2.",
+    "note": "T2 Math M1 #12: other — option paraphrased/abbreviated vs source; restored source wording",
+    "class": "other",
+    "evidence": "Innov. Test 2 Math Mod 1, 2B REV.pdf p5 page image"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrntfh0063qmt1of57u7xi",
+    "field": "stem",
+    "before": "$$V(t) = 25(0.88)^{\\frac{1}{3}}$$\n\nThe given equation models the value that remains, $$V(t)$$, in millions of dollars, of a new piece of equipment after $$t$$ years. What is the meaning of 25 in this context?",
+    "after": "$$V(t) = 25(0.88)^{\\frac{t}{3}}$$\n\nThe given equation models the value that remains, $$V(t)$$, in millions of dollars, of a new piece of equipment after $$t$$ years. What is the meaning of 25 in this context?",
+    "note": "T2 Math M1 #16: other — exponent OCR'd as 1/3; source is t/3",
+    "class": "other",
+    "evidence": "Innov. Test 2 Math Mod 1, 2B REV.pdf p7 page image @300dpi"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "opt_0390b124-dd72-444b-a047-bbe835c3fd79",
+    "field": "text",
+    "before": "Number of years until the equipment has no value.",
+    "after": "The number of years until the piece of equipment has no value.",
+    "note": "T2 Math M1 #16: other — option paraphrased/abbreviated vs source; restored source wording",
+    "class": "other",
+    "evidence": "Innov. Test 2 Math Mod 1, 2B REV.pdf p7 page image"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "opt_d61873d7-b201-43c4-b880-11ad332bf2c2",
+    "field": "text",
+    "before": "Value after the first year.",
+    "after": "The value of the equipment, in millions of dollars, after the first year.",
+    "note": "T2 Math M1 #16: other — option paraphrased/abbreviated vs source; restored source wording",
+    "class": "other",
+    "evidence": "Innov. Test 2 Math Mod 1, 2B REV.pdf p7 page image"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "opt_b74acca1-29d3-47b8-b4af-3c9dcc8ebf8b",
+    "field": "text",
+    "before": "Number of years until replacement.",
+    "after": "The number of years until the company expects to replace this piece of equipment.",
+    "note": "T2 Math M1 #16: other — option paraphrased/abbreviated vs source; restored source wording",
+    "class": "other",
+    "evidence": "Innov. Test 2 Math Mod 1, 2B REV.pdf p7 page image"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnt4c0048qmt1eokpmvyk",
+    "field": "stem",
+    "before": "Which expression is equivalent to $\\frac{4x^3 - 3}{2x + \\sqrt{3}}$?",
+    "after": "Which expression is equivalent to $\\frac{4x^2 - 3}{2x + \\sqrt{3}}$?",
+    "note": "T2 Math M2 #2: other — numerator exponent OCR'd as 3; source is 4x²−3 (explanation also uses 4x²−3)",
+    "class": "other",
+    "evidence": "Innov. Test 2 Math Mod 1, 2B REV.pdf p11 page image"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrntct004uqmt1gxhecler",
+    "field": "stem",
+    "before": "$$p(t) = 2,034(3)^{\\frac{t}{14}}$$\n\nThe given function shows the number of bacteria in a pond after t days since the bacteria began to populate the pond. Which of the following is the best interpretation of (3) $\\frac{t}{14}$ in the equation?",
+    "after": "$$p(t) = 2,034(3)^{\\frac{t}{14}}$$\n\nThe given function shows the number of bacteria in a pond after t days since the bacteria began to populate the pond. Which of the following is the best interpretation of $(3)^{\\frac{t}{14}}$ in the equation?",
+    "note": "T2 Math M2 #7: other — exponent lost: '(3) t/14' should be (3)^(t/14)",
+    "class": "other",
+    "evidence": "Innov. Test 2 Math Mod 1, 2B REV.pdf p13 page image"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "cmsjrntcu004vqmt1ueglqf2z",
+    "field": "text",
+    "before": "Number of bacteria at the start of the study.",
+    "after": "The number of bacteria at the beginning of the study",
+    "note": "T2 Math M2 #7: other — option paraphrased/abbreviated vs source; restored source wording",
+    "class": "other",
+    "evidence": "Innov. Test 2 Math Mod 1, 2B REV.pdf p13 page image"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "cmsjrntcu004xqmt17gz5hwzq",
+    "field": "text",
+    "before": "Bacteria increases by 3 every two weeks.",
+    "after": "The number of bacteria increases by 3 every two weeks",
+    "note": "T2 Math M2 #7: other — option paraphrased/abbreviated vs source; restored source wording",
+    "class": "other",
+    "evidence": "Innov. Test 2 Math Mod 1, 2B REV.pdf p13 page image"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "cmsjrntcu004yqmt1m8pflorg",
+    "field": "text",
+    "before": "Number of bacteria in the pond after two weeks.",
+    "after": "The number of bacteria in the pond after two weeks",
+    "note": "T2 Math M2 #7: other — option paraphrased/abbreviated vs source; restored source wording",
+    "class": "other",
+    "evidence": "Innov. Test 2 Math Mod 1, 2B REV.pdf p13 page image"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrntdv0058qmt1psaqqhpu",
+    "field": "stem",
+    "before": "The exterior angle of an equilateral triangle is equal to $(8x - 20)^+$. What is the value of $x$?",
+    "after": "The exterior angle of an equilateral triangle is equal to $(8x - 20)^\\circ$. What is the value of $x$?",
+    "note": "T2 Math M2 #10: other — degree sign OCR'd as '^+'",
+    "class": "other",
+    "evidence": "Innov. Test 2 Math Mod 1, 2B REV.pdf p14 page image"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "opt_f8fde393-7446-4d51-a5a1-5a0314a14002",
+    "field": "text",
+    "before": "Mean of J < mean of K; SDs equal.",
+    "after": "The mean of Data Set J is less than the mean of Data Set K, and the standard deviations of the two sets are equal.",
+    "note": "T2 Math M2 #18: other — option paraphrased/abbreviated vs source; restored source wording",
+    "class": "other",
+    "evidence": "Innov. Test 2 Math Mod 1, 2B REV.pdf p18 OCR"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "opt_550786a0-2349-44a7-b5f5-01703571858a",
+    "field": "text",
+    "before": "Mean of J > mean of K; SDs equal.",
+    "after": "The mean of Data Set J is greater than the mean of Data Set K, and the standard deviations of the two sets are equal.",
+    "note": "T2 Math M2 #18: other — option paraphrased/abbreviated vs source; restored source wording",
+    "class": "other",
+    "evidence": "Innov. Test 2 Math Mod 1, 2B REV.pdf p18 OCR"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "opt_f8757431-8347-4ed6-b25f-f2f982574b21",
+    "field": "text",
+    "before": "Means equal; SD of J less than SD of K.",
+    "after": "The means of the two sets are equal, and the standard deviation of Data Set J is less than the standard deviation of Data Set K.",
+    "note": "T2 Math M2 #18: other — option paraphrased/abbreviated vs source; restored source wording",
+    "class": "other",
+    "evidence": "Innov. Test 2 Math Mod 1, 2B REV.pdf p18 OCR"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "opt_996032a9-6032-41c2-8eff-491c14125950",
+    "field": "text",
+    "before": "Means are equal; SD of Set J is greater than SD of Set K.",
+    "after": "The means of the two sets are equal, and the standard deviation of Data Set J is greater than the standard deviation of Data Set K.",
+    "note": "T2 Math M2 #18: other — option paraphrased/abbreviated vs source; restored source wording",
+    "class": "other",
+    "evidence": "Innov. Test 2 Math Mod 1, 2B REV.pdf p18 OCR"
+  }
+]

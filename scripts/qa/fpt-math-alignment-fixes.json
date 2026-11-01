@@ -1,0 +1,83 @@
+[
+ {
+  "t": "q",
+  "id": "cmsjrnvbl00sgqmt11s19j3if",
+  "field": "stem",
+  "old": "$$3x^2 - 6x - 11 = 0$$\n\nIf one of the solutions to the given quadratic equation is $\\frac{3+\\sqrt{9}}{3}$, what is the value of $g$?",
+  "new": "$$3x^2 - 6x - 11 = 0$$\n\nIf one of the solutions to the given quadratic equation is $\\frac{3+\\sqrt{g}}{3}$, what is the value of $g$?",
+  "ref": "T3 Math M2 #17",
+  "why": "OCR read the variable g as 9; source: (3+√g)/3, key g = 42"
+ },
+ {
+  "t": "q",
+  "id": "cmsjrnw32010iqmt16sn1nt02",
+  "field": "stem",
+  "old": "$$3x^2 - 6x - 11 = 0$$\n\nIf one of the solutions to the given quadratic equation is $\\frac{3+\\sqrt{2}}{3}$, what is the value of $g$?",
+  "new": "$$3x^2 - 6x - 11 = 0$$\n\nIf one of the solutions to the given quadratic equation is $\\frac{3+\\sqrt{g}}{3}$, what is the value of $g$?",
+  "ref": "T9 Math M2 #10",
+  "why": "OCR read the variable g as 2; source: (3+√g)/3, key g = 42"
+ },
+ {
+  "t": "opt",
+  "questionId": "cmsjrnvc900siqmt1cesowz8n",
+  "label": "A",
+  "old": "x moves right 2, y moves 3 units down — same as B, but stated differently.",
+  "new": "The $x$-coordinate moves to the right 2 units and the $y$-coordinate moves 3 units down.",
+  "ref": "T3 Math M2 #19",
+  "why": "options copied from the explanation doc; source A (correct)"
+ },
+ {
+  "t": "opt",
+  "questionId": "cmsjrnvc900siqmt1cesowz8n",
+  "label": "B",
+  "old": "The x-coordinate moves to the right 2 units and the y-coordinate moves 3 units down.",
+  "new": "The $x$-coordinate moves to the left 2 units and the $y$-coordinate moves 3 units down.",
+  "ref": "T3 Math M2 #19",
+  "why": "source B"
+ },
+ {
+  "t": "opt",
+  "questionId": "cmsjrnvc900siqmt1cesowz8n",
+  "label": "C",
+  "old": "x moves right 2, y moves 3 units up.",
+  "new": "The $x$-coordinate moves to the right 2 units and the $y$-coordinate moves 3 units up.",
+  "ref": "T3 Math M2 #19",
+  "why": "source C"
+ },
+ {
+  "t": "opt",
+  "questionId": "cmsjrnvc900siqmt1cesowz8n",
+  "label": "D",
+  "old": "x moves left 2, y moves 3 units up.",
+  "new": "The $x$-coordinate moves to the left 2 units and the $y$-coordinate moves 3 units up.",
+  "ref": "T3 Math M2 #19",
+  "why": "source D"
+ },
+ {
+  "t": "opt",
+  "questionId": "cmsjrnwvq01auqmt131k6z3ug",
+  "label": "C",
+  "old": "y = 200(3)¹/⁷",
+  "new": "$y = 200(3)^{\\frac{t}{7}}$",
+  "ref": "T7 Math M2 #7",
+  "why": "exponent lost the t: source y = 200(3)^(t/7)"
+ },
+ {
+  "t": "opt",
+  "questionId": "cmsjrntq2009hqmt1gwy03kdk",
+  "label": "D",
+  "old": "(4, 7) ■",
+  "new": "$$(4, 7)$$",
+  "ref": "T3 Math M1 #1",
+  "why": "OCR artifact ■ (flags the correct option)"
+ },
+ {
+  "t": "opt",
+  "questionId": "cmsnffux1000q0mmxic96gfpq",
+  "label": "D",
+  "old": "116 ■",
+  "new": "116",
+  "ref": "T10 Math M1 #8",
+  "why": "OCR artifact ■"
+ }
+]

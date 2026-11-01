@@ -1,137 +1,56 @@
 import type { PrismaClient } from "../app/generated/prisma/client.js";
+import { SAT_TAXONOMY, referenceAliases } from "../lib/taxonomy-reference";
 
 // Canonical academic taxonomy (Section → Domain → Topic[=Skill] → Subskill) plus
 // the parallel TaxonomyNode tree. Shared by both the demo seed (prisma/seed.ts)
 // and the production seed (prisma/seed.prod.ts) so there is a single source of
 // truth. See CLAUDE.md "Taxonomía" for the Topic↔Skill divergence this encodes.
 export async function seedTaxonomy(prisma: PrismaClient): Promise<void> {
+  // Official sections. Practice: MATH, READING, WRITING (Domain.practiceArea = section name, enforced
+  // by triggers from migration 20261018_practice_sections). READING_WRITING only holds the Test
+  // placeholder domain (Tests have 2 sections: Math and Reading & Writing).
   const mathSection = await prisma.section.upsert({
     where: { name: "MATH" },
-    update: {},
-    create: { name: "MATH", label: "Mathematics" },
+    update: { label: "Math" },
+    create: { name: "MATH", label: "Math" },
+  });
+  const readingSection = await prisma.section.upsert({
+    where: { name: "READING" },
+    update: { label: "Reading" },
+    create: { id: "sec-reading", name: "READING", label: "Reading" },
+  });
+  const writingSection = await prisma.section.upsert({
+    where: { name: "WRITING" },
+    update: { label: "Writing" },
+    create: { id: "sec-writing", name: "WRITING", label: "Writing" },
   });
   const rwSection = await prisma.section.upsert({
     where: { name: "READING_WRITING" },
-    update: {},
+    update: { label: "Reading & Writing" },
     create: { name: "READING_WRITING", label: "Reading & Writing" },
   });
 
-  const mathDomains = await Promise.all([
-    prisma.domain.upsert({
-      where: { id: "dom-algebra" },
-      update: { name: "Algebra", practiceArea: "MATH", sectionId: mathSection.id },
-      create: { id: "dom-algebra", name: "Algebra", sectionId: mathSection.id, practiceArea: "MATH" },
-    }),
-    prisma.domain.upsert({
-      where: { id: "dom-advmath" },
-      update: { name: "Advanced Math", practiceArea: "MATH", sectionId: mathSection.id },
-      create: { id: "dom-advmath", name: "Advanced Math", sectionId: mathSection.id, practiceArea: "MATH" },
-    }),
-    prisma.domain.upsert({
-      where: { id: "dom-psda" },
-      update: { name: "Problem Solving and Data Analysis", practiceArea: "MATH", sectionId: mathSection.id },
-      create: { id: "dom-psda", name: "Problem Solving and Data Analysis", sectionId: mathSection.id, practiceArea: "MATH" },
-    }),
-    prisma.domain.upsert({
-      where: { id: "dom-geotrig" },
-      update: { name: "Geometry and Trigonometry", practiceArea: "MATH", sectionId: mathSection.id },
-      create: { id: "dom-geotrig", name: "Geometry and Trigonometry", sectionId: mathSection.id, practiceArea: "MATH" },
-    }),
-  ]);
+  // Domains and skills from the reference taxonomy (lib/taxonomy-reference.ts ← Taxonomia-SAT.md).
+  const sectionByCode = { MATH: mathSection, READING: readingSection, WRITING: writingSection };
+  const allDomains: Array<{ id: string; name: string; sectionId: string }> = [];
+  for (const ref of SAT_TAXONOMY) {
+    const section = sectionByCode[ref.section];
+    allDomains.push(
+      await prisma.domain.upsert({
+        where: { id: ref.domainId },
+        update: { name: ref.domain, practiceArea: ref.section, sectionId: section.id },
+        create: { id: ref.domainId, name: ref.domain, sectionId: section.id, practiceArea: ref.section },
+      }),
+    );
+  }
+  const topicDefs: Record<string, { id: string; name: string }[]> = Object.fromEntries(SAT_TAXONOMY.map((ref) => [ref.domainId, ref.skills]));
+  // Domain ↔ Skill aliases (PDF spellings and former names), same ids as migration 20261020_taxonomy_aliases.
+  // Runs after the topics exist (see below); collected here so the reference stays the single source.
+  const aliasRows = referenceAliases();
+  // Subskill level = intended home of the real "Topic" level below Skill; empty until the
+  // topic catalogue is defined (the old test entry was removed 2026-09-29).
+  const subskillDefs: Record<string, { id: string; name: string }[]> = {};
 
-  const rwDomains = await Promise.all([
-    prisma.domain.upsert({
-      where: { id: "dom-info" },
-      update: { name: "Information and Ideas", practiceArea: "READING", sectionId: rwSection.id },
-      create: { id: "dom-info", name: "Information and Ideas", sectionId: rwSection.id, practiceArea: "READING" },
-    }),
-    prisma.domain.upsert({
-      where: { id: "dom-craft" },
-      update: { name: "Craft and Structure", practiceArea: "READING", sectionId: rwSection.id },
-      create: { id: "dom-craft", name: "Craft and Structure", sectionId: rwSection.id, practiceArea: "READING" },
-    }),
-    prisma.domain.upsert({
-      where: { id: "dom-expr" },
-      update: { name: "Expression of Ideas", practiceArea: "WRITING", sectionId: rwSection.id },
-      create: { id: "dom-expr", name: "Expression of Ideas", sectionId: rwSection.id, practiceArea: "WRITING" },
-    }),
-    prisma.domain.upsert({
-      where: { id: "dom-sec" },
-      update: { name: "Standard English Conventions", practiceArea: "WRITING", sectionId: rwSection.id },
-      create: { id: "dom-sec", name: "Standard English Conventions", sectionId: rwSection.id, practiceArea: "WRITING" },
-    }),
-  ]);
-
-  const topicDefs: Record<string, { id: string; name: string }[]> = {
-    "dom-algebra": [
-      { id: "top-lineq", name: "Linear Equations" },
-      { id: "top-lineq-one-var", name: "Linear Equations in One Variable" },
-      { id: "top-lineq-two-var", name: "Linear Equations in Two Variables" },
-      { id: "top-syseq", name: "Systems of Equations" },
-      { id: "top-systems-two-linear", name: "Systems of Two Linear Equations" },
-      { id: "top-ineq", name: "Inequalities" },
-      { id: "top-linineq", name: "Linear Inequalities" },
-      { id: "top-linfn", name: "Linear Functions" },
-    ],
-    "dom-advmath": [
-      { id: "top-equivalent-expressions", name: "Equivalent Expressions" },
-      { id: "top-nonlinear-equations", name: "Nonlinear Equations" },
-      { id: "top-quadfn", name: "Quadratic Functions" },
-      { id: "top-nonlinfn", name: "Nonlinear Functions" },
-      { id: "top-poly", name: "Polynomials" },
-      { id: "top-expfn", name: "Exponential Functions" },
-      { id: "top-radeq", name: "Radical Equations" },
-    ],
-    "dom-psda": [
-      { id: "top-ratprop", name: "Ratios and Proportions" },
-      { id: "top-ratios-rates-units", name: "Ratios, Rates, Proportions, and Units" },
-      { id: "top-pct", name: "Percentages" },
-      { id: "top-stats", name: "Statistics" },
-      { id: "top-data-mean", name: "One-Variable Data: Distributions and Measures of Center and Spread" },
-      { id: "top-two-var-data", name: "Two-Variable Data" },
-      { id: "top-inference-margin", name: "Inference and Margin of Error" },
-      { id: "top-statistical-claims", name: "Statistical Claims" },
-      { id: "top-prob", name: "Probability" },
-    ],
-    "dom-geotrig": [
-      { id: "top-circles", name: "Circles" },
-      { id: "top-tri", name: "Triangles" },
-      { id: "top-lines-angles-triangles", name: "Lines, Angles, and Triangles" },
-      { id: "top-area-volume", name: "Area and Volume" },
-      { id: "top-right-tri-trig", name: "Right Triangles and Trigonometry" },
-      { id: "top-trig", name: "Trigonometry" },
-      { id: "top-vol", name: "Volume and Area" },
-    ],
-    "dom-info": [
-      { id: "top-central", name: "Central Ideas" },
-      { id: "top-central-details", name: "Central Ideas and Details" },
-      { id: "top-command-evidence", name: "Command of Evidence" },
-      { id: "top-textev", name: "Textual Evidence" },
-      { id: "top-infer", name: "Inferences" },
-      { id: "top-cross", name: "Cross-Text Connections" },
-    ],
-    "dom-craft": [
-      { id: "top-wic", name: "Words in Context" },
-      { id: "top-texstr", name: "Text Structure" },
-      { id: "top-text-structure-purpose", name: "Text Structure and Purpose" },
-      { id: "top-authpur", name: "Author Purpose" },
-    ],
-    "dom-expr": [
-      { id: "top-rhet", name: "Rhetorical Synthesis" },
-      { id: "top-trans", name: "Transitions" },
-    ],
-    "dom-sec": [
-      { id: "top-bound", name: "Boundaries" },
-      { id: "top-fss", name: "Grammar and Structure" },
-    ],
-  };
-  const subskillDefs: Record<string, { id: string; name: string }[]> = {
-    "top-nonlinfn": [
-      { id: "sub-nonlin-transform-recip", name: "Function transformations / Reciprocal functions" },
-    ],
-  };
-
-  const allDomains = [...mathDomains, ...rwDomains];
   for (const domain of allDomains) {
     const defs = topicDefs[domain.id] ?? [];
     await Promise.all(
@@ -143,6 +62,13 @@ export async function seedTaxonomy(prisma: PrismaClient): Promise<void> {
         })
       )
     );
+  }
+  for (const row of aliasRows) {
+    await prisma.taxonomyAlias.upsert({
+      where: { kind_alias: { kind: row.kind, alias: row.alias } },
+      update: { domainId: row.domainId, topicId: row.topicId, source: row.source },
+      create: { id: row.id, alias: row.alias, kind: row.kind, domainId: row.domainId, topicId: row.topicId, source: row.source },
+    });
   }
   for (const [topicId, defs] of Object.entries(subskillDefs)) {
     await Promise.all(
@@ -156,13 +82,14 @@ export async function seedTaxonomy(prisma: PrismaClient): Promise<void> {
     );
   }
 
-  const allSections = [mathSection, rwSection];
+  const allSections = [mathSection, readingSection, writingSection, rwSection];
   await Promise.all(
     allSections.map((section, index) =>
       prisma.taxonomyNode.upsert({
         where: { id: `tax-area-${section.id}` },
-        update: { name: section.name, label: section.label, type: "AREA", parentId: null, sortOrder: index, active: true },
-        create: { id: `tax-area-${section.id}`, name: section.name, label: section.label, type: "AREA", sortOrder: index, active: true },
+        // READING_WRITING only holds the Test placeholder domain: not part of the practice tree.
+        update: { name: section.name, label: section.label, type: "AREA", parentId: null, sortOrder: index, active: section.name !== "READING_WRITING" },
+        create: { id: `tax-area-${section.id}`, name: section.name, label: section.label, type: "AREA", sortOrder: index, active: section.name !== "READING_WRITING" },
       })
     )
   );
@@ -175,13 +102,18 @@ export async function seedTaxonomy(prisma: PrismaClient): Promise<void> {
       })
     )
   );
-  const seededTopics = await prisma.topic.findMany({ include: { subskills: true } });
+  const skillOrder = new Map(SAT_TAXONOMY.flatMap((ref) => ref.skills).map((skill, index) => [skill.id, index]));
+  // Only reference skills get a SKILL node (Test placeholder topics "M1"/"M2" have none by design).
+  const seededTopics = await prisma.topic.findMany({
+    where: { domainId: { in: allDomains.map((domain) => domain.id) } },
+    include: { subskills: true },
+  });
   await Promise.all(
     seededTopics.map((topic, index) =>
       prisma.taxonomyNode.upsert({
         where: { id: `tax-skill-${topic.id}` },
-        update: { name: topic.name, label: topic.name, type: "SKILL", parentId: `tax-topic-${topic.domainId}`, sortOrder: index, active: true },
-        create: { id: `tax-skill-${topic.id}`, name: topic.name, label: topic.name, type: "SKILL", parentId: `tax-topic-${topic.domainId}`, sortOrder: index, active: true },
+        update: { name: topic.name, label: topic.name, type: "SKILL", parentId: `tax-topic-${topic.domainId}`, sortOrder: skillOrder.get(topic.id) ?? index, active: true },
+        create: { id: `tax-skill-${topic.id}`, name: topic.name, label: topic.name, type: "SKILL", parentId: `tax-topic-${topic.domainId}`, sortOrder: skillOrder.get(topic.id) ?? index, active: true },
       })
     )
   );

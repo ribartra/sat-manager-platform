@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -17,6 +18,8 @@ import {
 } from "@/components/ui/form";
 import { FormSection, PageHeader, PageShell } from "@/components/sat";
 import { changePasswordSchema, type ChangePasswordInput } from "@/contracts/auth";
+import { InlineError } from "@/components/sat/alert";
+import { apiFetch, errorMessage } from "@/lib/api-client";
 
 export default function ChangePasswordPage() {
   const router = useRouter();
@@ -30,18 +33,24 @@ export default function ChangePasswordPage() {
 
   async function onSubmit(values: ChangePasswordInput) {
     setServerError("");
-    const res = await fetch("/api/auth/change-password", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        currentPassword: values.currentPassword,
-        newPassword: values.newPassword,
-      }),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      setServerError(data.error ?? "Could not change password.");
+    let data: { email?: string; reauthenticate?: boolean };
+    try {
+      data = await apiFetch("/api/auth/change-password", {
+        method: "POST",
+        json: { currentPassword: values.currentPassword, newPassword: values.newPassword },
+        fallback: "We couldn't change your password. Please try again.",
+      });
+    } catch (error) {
+      setServerError(errorMessage(error));
       return;
+    }
+    // Changing the password signs out every session, this one included: sign back in here.
+    if (data.reauthenticate && data.email) {
+      const result = await signIn("credentials", { email: data.email, password: values.newPassword, redirect: false });
+      if (result?.error) {
+        router.push("/login");
+        return;
+      }
     }
     setSuccess(true);
     setTimeout(() => router.back(), 900);
@@ -50,8 +59,8 @@ export default function ChangePasswordPage() {
   const loading = form.formState.isSubmitting;
 
   return (
-    <PageShell width="narrow" density="comfortable">
-      <PageHeader title="Change Password" />
+    <PageShell>
+      <PageHeader title="Change password" />
       <Card padding="lg">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" noValidate>
@@ -87,7 +96,7 @@ export default function ChangePasswordPage() {
                 name="confirm"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Confirm new password</FormLabel>
+                    <FormLabel>Type the new password again</FormLabel>
                     <FormControl>
                       <Input type="password" {...field} />
                     </FormControl>
@@ -96,10 +105,10 @@ export default function ChangePasswordPage() {
                 )}
               />
             </FormSection>
-            {serverError ? <p className="text-sm text-destructive">{serverError}</p> : null}
-            {success ? <p className="text-sm text-success">Password updated.</p> : null}
+            <InlineError>{serverError}</InlineError>
+            {success ? <p className="text-sm text-success">Your password was changed.</p> : null}
             <Button type="submit" disabled={loading} className="w-full">
-              {loading ? "Saving..." : "Save Password"}
+              {loading ? "Saving…" : "Save password"}
             </Button>
           </form>
         </Form>

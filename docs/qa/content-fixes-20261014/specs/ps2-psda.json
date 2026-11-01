@@ -1,0 +1,902 @@
+[
+ {
+  "table": "Question",
+  "id": "cmsp3qmpz00010vmtwde2de6k",
+  "field": "explanation",
+  "before": "Choice C is correct. Because a random sample of the city council was polled, the proportion of the sample who supported the bill is expected to be approximately equal to the proportion of the total city council who supports the bill. Since 6 of the 20 polled, or 30%, supported the bill, it can be estimated that , or 15, city council members support the bill. Choice A is incorrect. This is the num",
+  "after": "Choice C is correct. Because a random sample of the city council was polled, the proportion of the sample who supported the bill is expected to be approximately equal to the proportion of the total city council who supports the bill. Since 6 of the 20 polled, or 30%, supported the bill, it can be estimated that $50\\times0.3$, or 15, city council members support the bill.\nChoice A is incorrect. This is the number of city council members in the sample who supported the bill. Choice B is incorrect and may result from a computational error. Choice D is incorrect. This is the number of city council members in the sample of city council members who were not polled.",
+  "class": "explanation_truncated",
+  "note": "PS Inference from Statistics and Margin of Error - EASY #1: explanation cut mid-word ('This is the num') at extraction; restored Choice A/B/D paragraph from ANS, plus stripped math 50×0.3",
+  "evidence": "ANS Inference Margin Error EASY.pdf p1 (Question ID 90eed2e5)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzz802f6qmt16k2zizu6",
+  "field": "explanation",
+  "before": "Choice B is correct. Let x be the number of people in the entire town that would be expected to name chocolate. Since the sample of 50 people\nwas selected at random, it is reasonable to expect that the proportion of people who named chocolate as their favorite ice-cream flavor would be\nthe same for both the sample and the town population. Symbolically, this can be expressed as . Using cross multiplication,\n; solving for x yields 2,083. The choice closest to the value of 2,083 is choice B, 2,100.\nChoices A, C, and D are incorrect and may be the result of errors when setting up the proportion, solving for the unknown, or incorrectly\ncomparing the choices to the number of people expected to name chocolate, 2,083.",
+  "after": "Choice B is correct. Let x be the number of people in the entire town that would be expected to name chocolate. Since the sample of 50 people was selected at random, it is reasonable to expect that the proportion of people who named chocolate as their favorite ice-cream flavor would be the same for both the sample and the town population. Symbolically, this can be expressed as $\\frac{7}{50}=\\frac{x}{14{,}878}$. Using cross multiplication, $7\\times14{,}878=x\\times50$; solving for x yields 2,083. The choice closest to the value of 2,083 is choice B, 2,100.\nChoices A, C, and D are incorrect and may be the result of errors when setting up the proportion, solving for the unknown, or incorrectly comparing the choices to the number of people expected to name chocolate, 2,083.",
+  "class": "stripped_math",
+  "note": "PS Inference from Statistics and Margin of Error - EASY #3: proportion 7/50 = x/14,878 and cross-multiplication restored",
+  "evidence": "ANS Inference Margin Error EASY.pdf p3 (Question ID e7d9649f)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzzc02fbqmt160c2rd9h",
+  "field": "explanation",
+  "before": "Choice C is correct. The mean of the 5 samples is trees per acre. The best estimate for the total number of\ntrees in the forest is the product of the mean number of trees per acre in the sample and the total number of acres in the forest. This is (56)(253)\n= 14,168, which is between 13,500 and 14,500.\nChoice A is incorrect and may result from multiplying the minimum number of trees per acre in the sample, 45, by the number of acres, 253.\nChoice B is incorrect and may result from multiplying the median number of trees per acre in the sample, 52, by the number of acres, 253. Choice\nD is incorrect and may result from multiplying the maximum number of trees per acre in the sample, 73, by the number of acres, 253.",
+  "after": "Choice C is correct. The mean of the 5 samples is $\\frac{51+59+45+52+73}{5}=56$ trees per acre. The best estimate for the total number of trees in the forest is the product of the mean number of trees per acre in the sample and the total number of acres in the forest. This is (56)(253) = 14,168, which is between 13,500 and 14,500.\nChoice A is incorrect and may result from multiplying the minimum number of trees per acre in the sample, 45, by the number of acres, 253.\nChoice B is incorrect and may result from multiplying the median number of trees per acre in the sample, 52, by the number of acres, 253. Choice D is incorrect and may result from multiplying the maximum number of trees per acre in the sample, 73, by the number of acres, 253.",
+  "class": "stripped_math",
+  "note": "PS Inference from Statistics and Margin of Error - EASY #4: mean (51+59+45+52+73)/5 = 56 restored",
+  "evidence": "ANS Inference Margin Error EASY.pdf p4 (Question ID f4b3672a)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0ja02npqmt135b8d7bp",
+  "field": "explanation",
+  "before": "Choice C is correct. It is given that 34.6% of 26 students in Mr. Camp’s class reported that they had at least two siblings. Since 34.6% of 26 is\n8.996, there must have been 9 students in the class who reported having at least two siblings and 17 students who reported that they had fewer\nthan two siblings. It is also given that the average eighth-grade class size in the state is 26 and that Mr. Camp’s class is representative of all\neighth-grade classes in the state. This means that in each eighth-grade class in the state there are about 17 students who have fewer than two\nsiblings. Therefore, the best estimate of the number of eighth-grade students in the state who have fewer than two siblings is 17 × (number of\neighth-grade classes in the state), or .\nChoice A is incorrect because 16,200 is the best estimate for the number of eighth-grade students in the state who have at least, not fewer than,\ntwo siblings. Choice B is incorrect because 23,400 is half of the estimated total number of eighth-grade students in the state; however, since the\nstudents in Mr. Camp’s class are representative of students in the eighth-grade classes in the state and more than half of the students in Mr.\nCamp’s class have fewer than two siblings, more than half of the students in each eighth-grade class in the state have fewer than two siblings,\ntoo. Choice D is incorrect because 46,800 is the estimated total number of eighth-grade students in the state.",
+  "after": "Choice C is correct. It is given that 34.6% of 26 students in Mr. Camp’s class reported that they had at least two siblings. Since 34.6% of 26 is 8.996, there must have been 9 students in the class who reported having at least two siblings and 17 students who reported that they had fewer than two siblings. It is also given that the average eighth-grade class size in the state is 26 and that Mr. Camp’s class is representative of all eighth-grade classes in the state. This means that in each eighth-grade class in the state there are about 17 students who have fewer than two siblings. Therefore, the best estimate of the number of eighth-grade students in the state who have fewer than two siblings is 17 × (number of eighth-grade classes in the state), or $17\\times1{,}800=30{,}600$.\nChoice A is incorrect because 16,200 is the best estimate for the number of eighth-grade students in the state who have at least, not fewer than, two siblings. Choice B is incorrect because 23,400 is half of the estimated total number of eighth-grade students in the state; however, since the students in Mr. Camp’s class are representative of students in the eighth-grade classes in the state and more than half of the students in Mr. Camp’s class have fewer than two siblings, more than half of the students in each eighth-grade class in the state have fewer than two siblings, too. Choice D is incorrect because 46,800 is the estimated total number of eighth-grade students in the state.",
+  "class": "stripped_math",
+  "note": "PS Inference from Statistics and Margin of Error - HARD #2: final product 17×1,800=30,600 restored",
+  "evidence": "ANS Inference Margin Error HARD.pdf p2 (Question ID 9ba3e283)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0gm02l1qmt1wxrz611l",
+  "field": "explanation",
+  "before": "Choice D is correct. The given estimated mean has an associated margin of error because from sample data, the population mean can’t be\ndetermined precisely. Rather, from the sample mean, an interval can be determined within which it’s plausible that the population’s mean is likely\nto lie. Since the estimated mean is 4.5 miles with an associated margin of error of 0.5 miles, it follows that between miles and\nmiles, or between 4 and 5 miles, is plausibly the mean distance hiked for all visitors.\nChoices A, B, and C are incorrect. Based on the estimated mean, no determination can be made about the number of miles hiked for all visitors\nto the park.",
+  "after": "Choice D is correct. The given estimated mean has an associated margin of error because from sample data, the population mean can’t be determined precisely. Rather, from the sample mean, an interval can be determined within which it’s plausible that the population’s mean is likely to lie. Since the estimated mean is 4.5 miles with an associated margin of error of 0.5 miles, it follows that between $4.5-0.5$ miles and $4.5+0.5$ miles, or between 4 and 5 miles, is plausibly the mean distance hiked for all visitors.\nChoices A, B, and C are incorrect. Based on the estimated mean, no determination can be made about the number of miles hiked for all visitors to the park.",
+  "class": "stripped_math",
+  "note": "PS Inference from Statistics and Margin of Error - MEDIUM #4: restored interval bounds 4.5−0.5 and 4.5+0.5",
+  "evidence": "ANS Inference Margin Error MED.pdf p4 (Question ID f8f79e11)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0h502llqmt1h7bxm4zo",
+  "field": "explanation",
+  "before": "Choice B is correct. It was estimated that 15% of the beads in the bag are red. Since the bag contains 10,000 beads, it follows that there are an\nestimated red beads. It’s given that the margin of error is 2%, or beads. If the estimate is\ntoo high, there could plausibly be red beads. If the estimate is too low, there could plausibly be\nred beads. Therefore, the most plausible statement of the actual number of red beads in the bag is\n.\nChoices A and D are incorrect and may result from misinterpreting the margin of error. It’s unlikely that more than 1,700 beads or fewer than\n1,300 beads in the bag are red. Choice C is incorrect because 200 is the margin of error for the number of red beads, not the lower bound of the\nrange of red beads.",
+  "after": "Choice B is correct. It was estimated that 15% of the beads in the bag are red. Since the bag contains 10,000 beads, it follows that there are an estimated $10{,}000\\times0.15=1{,}500$ red beads. It’s given that the margin of error is 2%, or $10{,}000\\times0.02=200$ beads. If the estimate is too high, there could plausibly be $1{,}500-200=1{,}300$ red beads. If the estimate is too low, there could plausibly be $1{,}500+200=1{,}700$ red beads. Therefore, the most plausible statement of the actual number of red beads in the bag is $1{,}300<r<1{,}700$.\nChoices A and D are incorrect and may result from misinterpreting the margin of error. It’s unlikely that more than 1,700 beads or fewer than 1,300 beads in the bag are red. Choice C is incorrect because 200 is the margin of error for the number of red beads, not the lower bound of the range of red beads.",
+  "class": "stripped_math",
+  "note": "PS Inference from Statistics and Margin of Error - MEDIUM #8: bead counts 10,000×0.15=1,500, 10,000×0.02=200, 1,500−200=1,300, 1,500+200=1,700, 1,300<r<1,700 restored",
+  "evidence": "ANS Inference Margin Error MED.pdf p8 (Question ID fc46af57)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0hq02lxqmt1n3f8z214",
+  "field": "explanation",
+  "before": "Choice A is correct. A frequency table is a table that lists the data value and shows the number of times the data value occurs. In the data listed,\nthe number occurs four times, the number occurs three times, and the number occurs two times. This corresponds to the table in choice\nA.\nChoice B is incorrect. This table has the values for number and frequency reversed.\nChoice C is incorrect because the frequency values don't represent the data listed.\nChoice D is incorrect. This table represents the listed number values as the frequency values.",
+  "after": "Choice A is correct. A frequency table is a table that lists the data value and shows the number of times the data value occurs. In the data listed, the number 4 occurs four times, the number 8 occurs three times, and the number 13 occurs two times. This corresponds to the table in choice A.\nChoice B is incorrect. This table has the values for number and frequency reversed.\nChoice C is incorrect because the frequency values don't represent the data listed.\nChoice D is incorrect. This table represents the listed number values as the frequency values.",
+  "class": "stripped_math",
+  "note": "PS One-variable data: Distributions and measures of center and spread - EASY #2: restored the stripped data values 4, 8, 13 (\"the number 4 occurs four times…\")",
+  "evidence": "ANS One Var. Data EASY.pdf p2 (Question ID 52f9a246)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0hw02m7qmt1uh6e4s7q",
+  "field": "explanation",
+  "before": "Choice A is correct. The average can be found by dividing the total number of boxes sold by the number of students, which is .\nChoices B, C, and D are incorrect. Each results from choosing measures that require the results of individual students, which are not given.",
+  "after": "Choice A is correct. The average can be found by dividing the total number of boxes sold by the number of students, which is $\\frac{90}{10}=9$.\nChoices B, C, and D are incorrect. Each results from choosing measures that require the results of individual students, which are not given.",
+  "class": "stripped_math",
+  "note": "PS One-variable data: Distributions and measures of center and spread - EASY #4: restored 90/10 = 9",
+  "evidence": "ANS One Var. Data EASY.pdf p4 (Question ID c88e0663)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0i402mdqmt1w9w0jf5x",
+  "field": "explanation",
+  "before": "Choice A is correct. The mean low temperature can be calculated by finding the sum of the low temperatures for all the days shown in the table,\n49 + 37 + 41 + 54 + 63 = 244, and then dividing the sum by the number of days the temperature was recorded, .\nChoice B is incorrect. This may be the result of choosing the median rather than calculating the mean. Choices C and D are incorrect and may be\nthe result of calculation errors.",
+  "after": "Choice A is correct. The mean low temperature can be calculated by finding the sum of the low temperatures for all the days shown in the table, 49 + 37 + 41 + 54 + 63 = 244, and then dividing the sum by the number of days the temperature was recorded, $244\\div5=48.8$.\nChoice B is incorrect. This may be the result of choosing the median rather than calculating the mean. Choices C and D are incorrect and may be the result of calculation errors.",
+  "class": "stripped_math",
+  "note": "PS One-variable data: Distributions and measures of center and spread - EASY #6: restored 244 ÷ 5 = 48.8",
+  "evidence": "ANS One Var. Data EASY.pdf p6 (Question ID fa7a0164)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0ie02msqmt1zmy6el2l",
+  "field": "explanation",
+  "before": "Choice B is correct. Range is defined as the difference between the greatest and least values from a set of data. The greatest number of wheels\nmade during a one-hour period was 24 wheels. The least number of wheels was 19. Hence, the range is , or 5.0.\nChoices A, C, and D are incorrect and may be the result of arithmetic errors or incorrectly identifying the greatest or least number of wheels made\nduring a one-hour period.",
+  "after": "Choice B is correct. Range is defined as the difference between the greatest and least values from a set of data. The greatest number of wheels made during a one-hour period was 24 wheels. The least number of wheels was 19. Hence, the range is $24-19=5$, or 5.0.\nChoices A, C, and D are incorrect and may be the result of arithmetic errors or incorrectly identifying the greatest or least number of wheels made during a one-hour period.",
+  "class": "stripped_math",
+  "note": "PS One-variable data: Distributions and measures of center and spread - EASY #9: restored 24 − 19 = 5",
+  "evidence": "ANS One Var. Data EASY.pdf p9 (Question ID c54b92a2)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0ih02mxqmt1d9x18rf1",
+  "field": "explanation",
+  "before": "Choice B is correct. The median of a data set with an odd number of data values is defined as the middle value of the ordered list of values. The\ndata set shown has nine values, so the median is the fifth value in the ordered list, which is .\nChoice A is incorrect. This is the minimum value of the data set, not the median.\nChoice C is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect. This is the mean of the data set, not the median.",
+  "after": "Choice B is correct. The median of a data set with an odd number of data values is defined as the middle value of the ordered list of values. The data set shown has nine values, so the median is the fifth value in the ordered list, which is 77.\nChoice A is incorrect. This is the minimum value of the data set, not the median.\nChoice C is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect. This is the mean of the data set, not the median.",
+  "class": "stripped_math",
+  "note": "PS One-variable data: Distributions and measures of center and spread - EASY #10: restored the median value 77",
+  "evidence": "ANS One Var. Data EASY.pdf p11 (Question ID 66f03086)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0it02ncqmt1s03c89w0",
+  "field": "explanation",
+  "before": "Choice D is correct. The range of a data set is the difference between the maximum and the minimum values in the set. The maximum value\namong the high temperatures in the table is 82°F and the minimum value is 80°F. Therefore, the range is 82°F – 80°F = 2°F.\nChoice A is incorrect. The median of a data set is the middle value when the values in the set are ordered from least to greatest. Ordering the\nhigh temperatures this way gives the list 80, 81, 81, 81, 82. Therefore, the median high temperature is 81°F. Choice B is incorrect. The mean high\ntemperature is . Choice C is incorrect. The mode is the value that occurs the greatest number of\ntimes. For the set of high temperatures shown, 81 is the value that occurs 3 times, and therefore, 81°F is the mode of the high temperatures.",
+  "after": "Choice D is correct. The range of a data set is the difference between the maximum and the minimum values in the set. The maximum value among the high temperatures in the table is 82°F and the minimum value is 80°F. Therefore, the range is 82°F – 80°F = 2°F.\nChoice A is incorrect. The median of a data set is the middle value when the values in the set are ordered from least to greatest. Ordering the high temperatures this way gives the list 80, 81, 81, 81, 82. Therefore, the median high temperature is 81°F. Choice B is incorrect. The mean high temperature is $\\frac{81+80+81+81+82}{5}=\\frac{405}{5}=81$. Choice C is incorrect. The mode is the value that occurs the greatest number of times. For the set of high temperatures shown, 81 is the value that occurs 3 times, and therefore, 81°F is the mode of the high temperatures.",
+  "class": "stripped_math",
+  "note": "PS One-variable data: Distributions and measures of center and spread - EASY #13: restored the mean (81+80+81+81+82)/5 = 405/5 = 81 in the Choice B paragraph",
+  "evidence": "ANS One Var. Data EASY.pdf p14 (Question ID 869a32f1)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0iy02nhqmt17ee66oxv",
+  "field": "explanation",
+  "before": "Choice B is correct. The numbers of defective lightbulbs found for the five trials are 4, 7, 1, 3, and 6, respectively. The mean is therefore\n.\nChoice A is incorrect. This is the median number of defective lightbulbs for the five trials. Choice C is incorrect and may result from an arithmetic\nerror. Choice D is incorrect and may result from mistaking the number of trials for the number of defective lightbulbs.",
+  "after": "Choice B is correct. The numbers of defective lightbulbs found for the five trials are 4, 7, 1, 3, and 6, respectively. The mean is therefore $\\frac{4+7+1+3+6}{5}=4.2$.\nChoice A is incorrect. This is the median number of defective lightbulbs for the five trials. Choice C is incorrect and may result from an arithmetic error. Choice D is incorrect and may result from mistaking the number of trials for the number of defective lightbulbs.",
+  "class": "stripped_math",
+  "note": "PS One-variable data: Distributions and measures of center and spread - EASY #14: restored the mean (4+7+1+3+6)/5 = 4.2",
+  "evidence": "ANS One Var. Data EASY.pdf p15 (Question ID a9647302)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0jw02ofqmt1lfzgrc83",
+  "field": "explanation",
+  "before": "Choice C is correct. The median of a data set represented in a box plot is represented by the vertical line within the box. It follows that the median mass of the\ngazelles in group 1 is 25 kilograms, and the median mass of the gazelles in group 2 is 24 kilograms. Since 25 kilograms is greater than 24 kilograms, the median\nmass of group 1 is greater than the median mass of group 2.\nChoice A is incorrect. The mean mass of each of the two groups cannot be determined from the box plots.",
+  "after": "Choice C is correct. The median of a data set represented in a box plot is represented by the vertical line within the box. It follows that the median mass of the gazelles in group 1 is 25 kilograms, and the median mass of the gazelles in group 2 is 24 kilograms. Since 25 kilograms is greater than 24 kilograms, the median mass of group 1 is greater than the median mass of group 2.\nChoice A is incorrect. The mean mass of each of the two groups cannot be determined from the box plots.\nChoice B is incorrect. The mean mass of each of the two groups cannot be determined from the box plots.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "class": "explanation_truncated",
+  "note": "PS One-variable data: Distributions and measures of center and spread - HARD - #1 #1: Choice B and Choice D paragraphs on the next ANS page were cut at the page break; appended verbatim (ANS repeats the Choice A sentence for B)",
+  "evidence": "Data Distribut, mean ANS HARD.pdf p1-2 (Question ID d3b9c8d8)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0k202olqmt1hqrsdu9b",
+  "field": "explanation",
+  "before": "The correct answer is 52. The mean of a data set is calculated by dividing the sum of the data values by the number of values. It’s given that data set A consists of\n10 values, 9 of which are shown. Let 𝑥 represent the 10th data value in data set A, which isn’t shown. The mean of data set A can be found using the expression\n43+45+44+43+38+39+40+46+40+𝑥 , or 378+𝑥 . It’s given that the mean of the 9 values shown is 42 and that the mean of all 10 numbers is greater than 42. Consequently,\n10 10\nthe 10th data value, 𝑥, is larger than 42. It’s also given that the data values in data set A are positive integers less than 60. Thus, 42<𝑥<60. Finally, it’s given that\nthe mean of data set A is an integer. This means that the sum of the 10 data values, 378+𝑥, is divisible by 10. Thus, 378+𝑥 must have a ones digit of 0. It follows\nthat 𝑥 must have a ones digit of 2. Since 42<𝑥<60 and 𝑥 has a ones digit of 2, the only possible value of 𝑥 is 52. Since 52 is larger than any of the integers shown,\nthe largest integer from data set A is 52.",
+  "after": "The correct answer is 52. The mean of a data set is calculated by dividing the sum of the data values by the number of values. It’s given that data set A consists of 10 values, 9 of which are shown. Let $x$ represent the 10th data value in data set A, which isn’t shown. The mean of data set A can be found using the expression $\\frac{43+45+44+43+38+39+40+46+40+x}{10}$, or $\\frac{378+x}{10}$. It’s given that the mean of the 9 values shown is 42 and that the mean of all 10 numbers is greater than 42. Consequently, the 10th data value, $x$, is larger than 42. It’s also given that the data values in data set A are positive integers less than 60. Thus, $42<x<60$. Finally, it’s given that the mean of data set A is an integer. This means that the sum of the 10 data values, $378+x$, is divisible by 10. Thus, $378+x$ must have a ones digit of 0. It follows that $x$ must have a ones digit of 2. Since $42<x<60$ and $x$ has a ones digit of 2, the only possible value of $x$ is 52. Since 52 is larger than any of the integers shown, the largest integer from data set A is 52.",
+  "class": "stripped_math",
+  "note": "PS One-variable data: Distributions and measures of center and spread - HARD - #1 #2: stacked fractions flattened (\"…+𝑥 , or 378+𝑥 .\" + stray \"10 10\" line) rebuilt as \\frac{…}{10}; Unicode math-italic 𝑥 converted to $x$ math",
+  "evidence": "Data Distribut, mean ANS HARD.pdf p5 (Question ID 190be2fc)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0kc02osqmt1j6zcxh72",
+  "field": "explanation",
+  "before": "Choice D is correct. When a data set has an odd number of elements, the median can be found by ordering the values from least to greatest and determining the\nmiddle value. Out of the 27 different numbers in this data set, 13 numbers are below the median, one number is exactly 33, and 13 numbers are above the median.\nWhen 7 is subtracted from each number below the median and added to each number above the median, the data spread out from the median. Since the median of\nthis data set, 33, is equivalent to the mean of the data set, the data also spread out from the mean. Since standard deviation is a measure of how spread out the\ndata are from the mean, a greater spread from the mean indicates an increased standard deviation.\nChoice A is incorrect. All the numbers less than the median decrease and all the numbers greater than the median increase, but the median itself doesn’t change.\nChoices B and C are incorrect. The mean of a data set is found by dividing the sum of the values by the number of values. The net change from subtracting 7 from",
+  "after": "Choice D is correct. When a data set has an odd number of elements, the median can be found by ordering the values from least to greatest and determining the middle value. Out of the 27 different numbers in this data set, 13 numbers are below the median, one number is exactly 33, and 13 numbers are above the median. When 7 is subtracted from each number below the median and added to each number above the median, the data spread out from the median. Since the median of this data set, 33, is equivalent to the mean of the data set, the data also spread out from the mean. Since standard deviation is a measure of how spread out the data are from the mean, a greater spread from the mean indicates an increased standard deviation.\nChoice A is incorrect. All the numbers less than the median decrease and all the numbers greater than the median increase, but the median itself doesn’t change.\nChoices B and C are incorrect. The mean of a data set is found by dividing the sum of the values by the number of values. The net change from subtracting 7 from 13 numbers and adding 7 to 13 numbers is zero. Therefore, neither the mean nor the sum of the numbers changes.",
+  "class": "explanation_truncated",
+  "note": "PS One-variable data: Distributions and measures of center and spread - HARD - #1 #4: Choices B and C paragraph cut at the page break (\"subtracting 7 from\"); appended the tail from the next page",
+  "evidence": "Data Distribut, mean ANS HARD.pdf p10-11 (Question ID 457d2f2c)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0p702pyqmt1aqzn4l7t",
+  "field": "explanation",
+  "before": "Choice D is correct. The mean amount of time that the 20 employees worked for the company is 6.7 years. This means that the total number of years all 20\nemployees worked for the company is (6.7)(20) = 134 years. After the employee left, the mean amount of time that the remaining 19 employees worked for the\ncompany is 6.25 years. Therefore, the total number of years all 19 employees worked for the company is (6.25)(19) = 118.75 years. It follows that the number of\nyears that the employee who left had worked for the company is 134 – 118.75 = 15.25 years.\nChoice A is incorrect; this is the change in the mean, which isn’t the same as the amount of time worked by the employee who left. Choice B is incorrect and likely\nresults from making the assumption that there were still 20 employees, rather than 19, at the company after the employee left and then subtracting the original",
+  "after": "Choice D is correct. The mean amount of time that the 20 employees worked for the company is 6.7 years. This means that the total number of years all 20 employees worked for the company is (6.7)(20) = 134 years. After the employee left, the mean amount of time that the remaining 19 employees worked for the company is 6.25 years. Therefore, the total number of years all 19 employees worked for the company is (6.25)(19) = 118.75 years. It follows that the number of years that the employee who left had worked for the company is 134 – 118.75 = 15.25 years.\nChoice A is incorrect; this is the change in the mean, which isn’t the same as the amount of time worked by the employee who left. Choice B is incorrect and likely results from making the assumption that there were still 20 employees, rather than 19, at the company after the employee left and then subtracting the original mean of 6.7 from that result. Choice C is incorrect and likely results from making the assumption that there were still 20 employees, rather than 19, at the company after the employee left.",
+  "class": "explanation_truncated",
+  "note": "PS One-variable data: Distributions and measures of center and spread - HARD - #1 #14: Choice B sentence cut at the page break (\"subtracting the original\"); appended the tail from the next page incl. the Choice C sentence",
+  "evidence": "Data Distribut, mean ANS HARD.pdf p33-34 (Question ID 4ff597db)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzyq02etqmt1pgs0y4vr",
+  "field": "explanation",
+  "before": "The correct answer is 1. When there are an odd number of values in a data set, the median of the data set is the middle number when the data\nvalues are ordered from least to greatest. The scores for group A, ordered from least to greatest, are 2, 3, 4, 4, 5, 6, 6, 6, and 9. The median of the\nscores for group A is therefore 5. The scores for group B, ordered from least to greatest, are 5, 5, 5, 5, 6, 6, 8, 8, 9, 10, and 10. The median of the\nscores for group B is therefore 6. The median score for group B is more than the median score for group A.",
+  "after": "The correct answer is 1. When there are an odd number of values in a data set, the median of the data set is the middle number when the data values are ordered from least to greatest. The scores for group A, ordered from least to greatest, are 2, 3, 4, 4, 5, 6, 6, 6, and 9. The median of the scores for group A is therefore 5. The scores for group B, ordered from least to greatest, are 5, 5, 5, 5, 6, 6, 8, 8, 9, 10, and 10. The median of the scores for group B is therefore 6. The median score for group B is $6-5=1$ more than the median score for group A.",
+  "class": "stripped_math",
+  "note": "PS One-variable data: Distributions and measures of center and spread - HARD - #2 #1: restored 6 − 5 = 1",
+  "evidence": "ANS One Var. Data HARD.pdf p1 (Question ID 94237701)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0tm02srqmt1ob3ask0d",
+  "field": "explanation",
+  "before": "Choice A is correct. Standard deviation measures the spread of a given data set from its mean. In a data set with a smaller standard deviation,\nthere are more values close to the mean. In a data set with a greater standard deviation, there are more values farther from the mean. The two\nhistograms shown have the same scale on the horizontal axis. Therefore, their standard deviations can be compared by visually comparing the\nspreads of their histograms. The distribution summarized by each histogram is symmetric. Therefore, the mean of the data set for each\nhistogram is a value in the middle bar of that histogram. The middle bar of each histogram has a value of at least thousand units sold but less\nthan thousand units sold. Therefore, the mean of the data set for each histogram is at least thousand and less than thousand. The\nhistogram for company A shows all the values in that data set are close to the mean. For company B, the histogram shows there are fewer values",
+  "after": "Choice A is correct. Standard deviation measures the spread of a given data set from its mean. In a data set with a smaller standard deviation, there are more values close to the mean. In a data set with a greater standard deviation, there are more values farther from the mean. The two histograms shown have the same scale on the horizontal axis. Therefore, their standard deviations can be compared by visually comparing the spreads of their histograms. The distribution summarized by each histogram is symmetric. Therefore, the mean of the data set for each histogram is a value in the middle bar of that histogram. The middle bar of each histogram has a value of at least 30 thousand units sold but less than 35 thousand units sold. Therefore, the mean of the data set for each histogram is at least 30 thousand and less than 35 thousand. The histogram for company A shows all the values in that data set are close to the mean. For company B, the histogram shows there are fewer values close to the mean and more values farther from the mean. Therefore, the standard deviation of number of units sold for company A is less than the standard deviation of number of units sold for company B.\nChoice B is incorrect and may result from conceptual or calculation errors.\nChoice C is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "class": "explanation_truncated",
+  "note": "PS One-variable data: Distributions and measures of center and spread - MEDIUM #1: restored stripped values 30 and 35 (thousand) and appended the tail cut at the page break (\"fewer values\" → close to the mean … Choice B/C/D paragraphs)",
+  "evidence": "ANS One Var. Data MED.pdf p1-2 (Question ID 25fc031a)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0wx02tdqmt1xutrmb0y",
+  "field": "explanation",
+  "before": "Choice C is correct. If the values in a data set are ordered from least to greatest, the median of the data set will be the middle value. Since each\ndata set in the choices is ordered and contains exactly 9 data values, the 5th value in each is the median. It follows that the median of the data\nset in choice C is 32. The sum of the positive differences between 32 and each of the values that are less than 32 is significantly smaller than the\nsum of the positive differences between 32 and each of the values that are greater than 32. If 32 were the mean, these sums would have been\nequal to each other. Therefore, the mean of this data set must be greater than 32. This can also be confirmed by calculating the mean as the sum\nof the values divided by the number of values in the data set: .\nChoices A and B are incorrect. Each of the data sets in these choices is symmetric with respect to its median, so the mean and the median for\neach of these choices are equivalent. Choice D is incorrect. The median of this data set is 207. Since the sum of the positive differences between\n207 and each of the values less than 207 is greater than the sum of the positive differences between 207 and each value greater than 207 in this\ndata set, the mean must be less than the median.",
+  "after": "Choice C is correct. If the values in a data set are ordered from least to greatest, the median of the data set will be the middle value. Since each data set in the choices is ordered and contains exactly 9 data values, the 5th value in each is the median. It follows that the median of the data set in choice C is 32. The sum of the positive differences between 32 and each of the values that are less than 32 is significantly smaller than the sum of the positive differences between 32 and each of the values that are greater than 32. If 32 were the mean, these sums would have been equal to each other. Therefore, the mean of this data set must be greater than 32. This can also be confirmed by calculating the mean as the sum of the values divided by the number of values in the data set: $\\frac{2 + 4 + 8 + 16 + 32 + 64 + 128 + 256 + 512}{9} = 113\\frac{5}{9}$.\nChoices A and B are incorrect. Each of the data sets in these choices is symmetric with respect to its median, so the mean and the median for each of these choices are equivalent. Choice D is incorrect. The median of this data set is 207. Since the sum of the positive differences between 207 and each of the values less than 207 is greater than the sum of the positive differences between 207 and each value greater than 207 in this data set, the mean must be less than the median.",
+  "class": "stripped_math",
+  "note": "PS One-variable data: Distributions and measures of center and spread - MEDIUM #7: mean fraction (2+4+…+512)/9 = 113 5/9 restored",
+  "evidence": "ANS One Var. Data MED.pdf p8 (Question ID be00d896)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0xd02tsqmt1qm7ef91v",
+  "field": "explanation",
+  "before": "The correct answer is 1.3. The median number of tourists is found by ordering the number of tourists from least to greatest and determining the\nmiddle value from this list. When the number of tourists in 2012 is ordered from least to greatest, the middle value, or the fifth number, is 46.4\nmillion. When the number of tourists in 2013 is ordered from least to greatest, the middle value, or the fifth number, is 47.7 million. The difference\nbetween these two medians is . Note that 1.3 and 13/10 are examples of ways to enter a\ncorrect answer.",
+  "after": "The correct answer is 1.3. The median number of tourists is found by ordering the number of tourists from least to greatest and determining the middle value from this list. When the number of tourists in 2012 is ordered from least to greatest, the middle value, or the fifth number, is 46.4 million. When the number of tourists in 2013 is ordered from least to greatest, the middle value, or the fifth number, is 47.7 million. The difference between these two medians is $47.7 \\text{ million} - 46.4 \\text{ million} = 1.3 \\text{ million}$. Note that 1.3 and 13/10 are examples of ways to enter a correct answer.",
+  "class": "stripped_math",
+  "note": "PS One-variable data: Distributions and measures of center and spread - MEDIUM #10: difference of medians 47.7 million − 46.4 million = 1.3 million restored",
+  "evidence": "ANS One Var. Data MED.pdf p11 (Question ID 07f2829b)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0xh02ttqmt1oq4nfvx6",
+  "field": "explanation",
+  "before": "Choice A is correct. The mode is the data value with the highest frequency. So for the data shown, the mode is 18. The median is the middle data\nvalue when the data values are sorted from least to greatest. Since there are 20 ages ordered, the median is the average of the two middle\nvalues, the 10th and 11th, which for these data are both 19. Therefore, the median is 19. The mean is the sum of the data values divided by the\nnumber of the data values. So for these data, the mean is\n.\nSince the mode is 18, the median is 19, and the mean is 20, .\nChoices B and D are incorrect because the mean is greater than the median. Choice C is incorrect because the median is greater than the mode.\nAlternate approach: After determining the mode, 18, and the median, 19, it remains to determine whether the mean is less than 19 or more than\n19. Because the mean is a balancing point, there is as much deviation below the mean as above the mean. It is possible to compare the data to",
+  "after": "Choice A is correct. The mode is the data value with the highest frequency. So for the data shown, the mode is 18. The median is the middle data value when the data values are sorted from least to greatest. Since there are 20 ages ordered, the median is the average of the two middle values, the 10th and 11th, which for these data are both 19. Therefore, the median is 19. The mean is the sum of the data values divided by the number of the data values. So for these data, the mean is $\\frac{(18 \\times 6) + (19 \\times 5) + (20 \\times 4) + (21 \\times 2) + (22 \\times 1) + (23 \\times 1) + (30 \\times 1)}{20} = 20$. Since the mode is 18, the median is 19, and the mean is 20, $\\text{mode} < \\text{median} < \\text{mean}$.\nChoices B and D are incorrect because the mean is greater than the median. Choice C is incorrect because the median is greater than the mode.\nAlternate approach: After determining the mode, 18, and the median, 19, it remains to determine whether the mean is less than 19 or more than 19. Because the mean is a balancing point, there is as much deviation below the mean as above the mean. It is possible to compare the data to 19 to determine the balance of deviation above and below the mean. There is a total deviation of only 6 below 19 (the 6 values of 18); however, the data value 30 alone deviates by 11 above 19. Thus the mean must be greater than 19.",
+  "class": "explanation_truncated",
+  "note": "PS One-variable data: Distributions and measures of center and spread - MEDIUM #11: tail of the Alternate approach cut at page break (\"19 to determine … greater than 19.\") appended; also restored stripped math: mean = weighted-sum/20 = 20 and mode < median < mean",
+  "evidence": "ANS One Var. Data MED.pdf p12-13 (Question ID 4c774b00)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0xo02u3qmt1ju4kyqna",
+  "field": "explanation",
+  "before": "Choice A is correct. If x is 6, then the five numbers in the given list are 15, 14, 18, 17, 6. The mean of these five numbers is the sum of all the\nvalues divided by the number of values, or . The median of these five numbers can be found by\nordering the numbers from least to greatest and determining the middle value. When ordered from least to greatest, the numbers in the given list\nare 6, 14, 15, 17, 18, and the middle value is 15. Since the mean is 14 and the median is 15, the mean and median aren’t equal when x is 6.\nChoices B, C, and D are incorrect. If any of these values is substituted for x, the mean and median of the data set would be equal.",
+  "after": "Choice A is correct. If x is 6, then the five numbers in the given list are 15, 14, 18, 17, 6. The mean of these five numbers is the sum of all the values divided by the number of values, or $\\frac{15 + 14 + 18 + 17 + 6}{5} = \\frac{70}{5} = 14$. The median of these five numbers can be found by ordering the numbers from least to greatest and determining the middle value. When ordered from least to greatest, the numbers in the given list are 6, 14, 15, 17, 18, and the middle value is 15. Since the mean is 14 and the median is 15, the mean and median aren’t equal when x is 6.\nChoices B, C, and D are incorrect. If any of these values is substituted for x, the mean and median of the data set would be equal.",
+  "class": "stripped_math",
+  "note": "PS One-variable data: Distributions and measures of center and spread - MEDIUM #13: mean (15+14+18+17+6)/5 = 70/5 = 14 restored",
+  "evidence": "ANS One Var. Data MED.pdf p15 (Question ID d0efc1dd)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro06o02hmqmt1wa5gf115",
+  "field": "explanation",
+  "before": "Choice B is correct. The decimal equivalent of 20% is 0.2. The number that is 20% greater than 60 is also 120% of 60. The decimal equivalent of\n120% is 1.2, and .\nAlternate approach: 10% of 60 is 6, and 20% of 60 is double that amount, or 12. It follows that the number that is 20% greater than 60 is 12 more\nthan 60, or .\nChoice A is incorrect and may result from dividing, instead of multiplying, 60 by 1.2. Choice C is incorrect because it’s 25% greater than 60, rather\nthan 20% greater than 60. Choice D is incorrect and may result from multiplying 60 by 2.2 instead of 1.2.",
+  "after": "Choice B is correct. The decimal equivalent of 20% is 0.2. The number that is 20% greater than 60 is also 120% of 60. The decimal equivalent of 120% is 1.2, and $1.2(60)=72$.\nAlternate approach: 10% of 60 is 6, and 20% of 60 is double that amount, or 12. It follows that the number that is 20% greater than 60 is 12 more than 60, or $60+12=72$.\nChoice A is incorrect and may result from dividing, instead of multiplying, 60 by 1.2. Choice C is incorrect because it’s 25% greater than 60, rather than 20% greater than 60. Choice D is incorrect and may result from multiplying 60 by 2.2 instead of 1.2.",
+  "class": "stripped_math",
+  "note": "PS Percentages - EASY #1: restored 1.2(60)=72 and 60+12=72 (dropped math images)",
+  "evidence": "ANS Percents EASY.pdf p1 (Question ID 41b71b4e)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro06t02hrqmt1khe060dp",
+  "field": "explanation",
+  "before": "Choice D is correct. The total bill was $25.00. The percentage 20% is equivalent to the decimal 0.2. The tip is the product of the percentage and\nthe total bill; therefore, , so the tip was $5.00.\nChoices A, B, and C are incorrect and may be the result of incorrectly converting the given percentage or a calculation error.",
+  "after": "Choice D is correct. The total bill was \\$25.00. The percentage 20% is equivalent to the decimal 0.2. The tip is the product of the percentage and the total bill; therefore, $0.2\\times25=5$, so the tip was \\$5.00.\nChoices A, B, and C are incorrect and may be the result of incorrectly converting the given percentage or a calculation error.",
+  "class": "stripped_math",
+  "note": "PS Percentages - EASY #2: restored tip product 0.2×25=5; escaped literal currency \\$25.00/\\$5.00",
+  "evidence": "ANS Percents EASY.pdf p2 (Question ID 6e4a60dd)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro07802i2qmt1xdp4uyw1",
+  "field": "explanation",
+  "before": "Choice D is correct. It’s given that the original price of the jacket has been reduced by 20%. Multiplying the original price, $50, by 20% gives the\namount, in dollars, that the price of the jacket is reduced by: . Subtracting this value from the original price results in the sale\nprice of the jacket: , or $40.\nChoices A, B, and C are incorrect and may result from a conceptual or calculation error.",
+  "after": "Choice D is correct. It’s given that the original price of the jacket has been reduced by 20%. Multiplying the original price, \\$50, by 20% gives the amount, in dollars, that the price of the jacket is reduced by: $50\\times .20=10$. Subtracting this value from the original price results in the sale price of the jacket: $\\$50-\\$10$, or \\$40.\nChoices A, B, and C are incorrect and may result from a conceptual or calculation error.",
+  "class": "stripped_math",
+  "note": "PS Percentages - EASY #5: restored 50×.20=10 and \\$50−\\$10; escaped literal currency $",
+  "evidence": "ANS Percents EASY.pdf p5 (Question ID 1c2f50a6)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro08002imqmt1p5uiwkyz",
+  "field": "explanation",
+  "before": "Choice D is correct. There are 60 minutes in one hour, so an 8-hour workday has minutes. To calculate 15% of 480, multiply\n0.15 by 480: . Therefore, Lani spent 72 minutes of her workday in meetings.\nChoice A is incorrect because 1.2 is 15% of 8, which gives the time Lani spent of her workday in meetings in hours, not minutes. Choices B and C\nare incorrect and may be the result of computation errors.",
+  "after": "Choice D is correct. There are 60 minutes in one hour, so an 8-hour workday has $(60)(8)=480$ minutes. To calculate 15% of 480, multiply 0.15 by 480: $(0.15)(480)=72$. Therefore, Lani spent 72 minutes of her workday in meetings.\nChoice A is incorrect because 1.2 is 15% of 8, which gives the time Lani spent of her workday in meetings in hours, not minutes. Choices B and C are incorrect and may be the result of computation errors.",
+  "class": "stripped_math",
+  "note": "PS Percentages - EASY #9: restored (60)(8)=480 and (0.15)(480)=72",
+  "evidence": "ANS Percents EASY.pdf p9 (Question ID 7ed0d098)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro08502irqmt1h5rw4u1r",
+  "field": "explanation",
+  "before": "Choice B is correct. The percent of Employee A’s calls that received a rating of 1 star is the number of Employee A’s 1-star calls divided by the\ntotal number of Employee A’s calls. This quotient, , is approximately equal to , or . To the nearest whole percent, this is\n11%.\nChoice A is incorrect. This is the percent of all calls taken by Employee A that received a rating of 1 star. Choice C is incorrect and may result\nfrom a conceptual error. For example, 16 is the number, not the percent, of calls taken by Employee A that received a rating of 1 star. Choice D is\nincorrect. This is the percent of all calls that received a rating of 1 star that were taken by Employee A.",
+  "after": "Choice B is correct. The percent of Employee A’s calls that received a rating of 1 star is the number of Employee A’s 1-star calls divided by the total number of Employee A’s calls. This quotient, $\\frac{16}{145}$, is approximately equal to $0.1103$, or $11.03\\%$. To the nearest whole percent, this is 11%.\nChoice A is incorrect. This is the percent of all calls taken by Employee A that received a rating of 1 star. Choice C is incorrect and may result from a conceptual error. For example, 16 is the number, not the percent, of calls taken by Employee A that received a rating of 1 star. Choice D is incorrect. This is the percent of all calls that received a rating of 1 star that were taken by Employee A.",
+  "class": "stripped_math",
+  "note": "PS Percentages - EASY #10: restored 16/145, 0.1103, 11.03%",
+  "evidence": "ANS Percents EASY.pdf p10 (Question ID 2d31caae)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro08b02iwqmt1ohlrap0b",
+  "field": "explanation",
+  "before": "Choice D is correct. The decimal equivalent of 29% is 0.29. It’s given that the 113,000 occupational therapy jobs in the United States in 2012 are\nprojected to increase by 29% by 2022. Increasing 113,000 by 29% can be expressed as , or .\nEvaluating this expression yields 145,770. The closest number is 145,800 in choice D.\nChoice A is incorrect and may result from increasing 113,000 by 2,900 instead of by 29%. Choice B is incorrect and may result from increasing\n113,000 by 2.9% instead of by 29%. Choice C is incorrect and may result from increasing 113,000 by 29,000 instead of by 29%.",
+  "after": "Choice D is correct. The decimal equivalent of 29% is 0.29. It’s given that the 113,000 occupational therapy jobs in the United States in 2012 are projected to increase by 29% by 2022. Increasing 113,000 by 29% can be expressed as $(113{,}000)(1+0.29)$, or $(113{,}000)(1.29)$. Evaluating this expression yields 145,770. The closest number is 145,800 in choice D.\nChoice A is incorrect and may result from increasing 113,000 by 2,900 instead of by 29%. Choice B is incorrect and may result from increasing 113,000 by 2.9% instead of by 29%. Choice C is incorrect and may result from increasing 113,000 by 29,000 instead of by 29%.",
+  "class": "stripped_math",
+  "note": "PS Percentages - EASY #11: restored (113,000)(1+0.29) and (113,000)(1.29)",
+  "evidence": "ANS Percents EASY.pdf p11 (Question ID 194ae3b1)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro08t02jcqmt1ti8yxehs",
+  "field": "explanation",
+  "before": "Choice B is correct. According to the table, the minimum wage in 1960 was $1.00 per hour, and in 1970 it was $1.60 per hour. The percentage\nchange is therefore .\nChoice A is incorrect and may result from averaging the two wages before calculating the percentage change. Choice C is incorrect. This is the\n1960 wage expressed as a percentage of the 1970 wage, not the percentage change between the two. Choice D is incorrect and may result from\na calculation error.",
+  "after": "Choice B is correct. According to the table, the minimum wage in 1960 was \\$1.00 per hour, and in 1970 it was \\$1.60 per hour. The percentage change is therefore $100\\left(\\frac{1.60-1.00}{1.00}\\right)=60\\%$.\nChoice A is incorrect and may result from averaging the two wages before calculating the percentage change. Choice C is incorrect. This is the 1960 wage expressed as a percentage of the 1970 wage, not the percentage change between the two. Choice D is incorrect and may result from a calculation error.",
+  "class": "stripped_math",
+  "note": "PS Percentages - EASY #15: restored 100((1.60−1.00)/1.00)=60%; escaped literal currency $",
+  "evidence": "ANS Percents EASY.pdf p15 (Question ID bd90f87e)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro14302vsqmt1bgqq2e9r",
+  "field": "explanation",
+  "before": "Choice B is correct. The percent increase from 2012 to 2013 was , or 5%. Since the percent increase from 2012 to\n2013 was estimated to be double the percent increase from 2013 to 2014, the percent increase from 2013 to 2014 was expected to be 2.5%.\nTherefore, the number of subscriptions sold in 2014 is expected to be the number of subscriptions sold in 2013 multiplied by , or\n.\nChoice A is incorrect and is the result of adding half of the value of the increase from 2012 to 2013 to the 2013 result. Choice C is incorrect and\nis the result adding twice the value of the increase from 2012 to 2013 to the 2013 result. Choice D is incorrect and is the result of interpreting the\npercent increase from 2013 to 2014 as double the percent increase from 2012 to 2013.",
+  "after": "Choice B is correct. The percent increase from 2012 to 2013 was $\\frac{5{,}880-5{,}600}{5{,}600}=0.05$, or 5%. Since the percent increase from 2012 to 2013 was estimated to be double the percent increase from 2013 to 2014, the percent increase from 2013 to 2014 was expected to be 2.5%. Therefore, the number of subscriptions sold in 2014 is expected to be the number of subscriptions sold in 2013 multiplied by $(1+0.025)$, or $5{,}880(1.025)=6{,}027$.\nChoice A is incorrect and is the result of adding half of the value of the increase from 2012 to 2013 to the 2013 result. Choice C is incorrect and is the result adding twice the value of the increase from 2012 to 2013 to the 2013 result. Choice D is incorrect and is the result of interpreting the percent increase from 2013 to 2014 as double the percent increase from 2012 to 2013.",
+  "class": "stripped_math",
+  "note": "PS Percentages - HARD #8: restored (5,880−5,600)/5,600=0.05, (1+0.025), 5,880(1.025)=6,027",
+  "evidence": "ANS Percents HARD.pdf p10 (Question ID 0ea56bb2)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro14702vxqmt1hxid0d6i",
+  "field": "explanation",
+  "before": "Choice B is correct. It’s given that each serving of Crunchy Grain cereal provides 5% of an adult’s daily allowance of potassium, so x servings\nwould provide x times 5%. The percentage of an adult’s daily allowance of potassium, p, is 5 times the number of servings, x. Therefore, the\npercentage of an adult’s daily allowance of potassium can be expressed as .\nChoices A, C, and D are incorrect and may result from incorrectly converting 5% to its decimal equivalent, which isn’t necessary since p is\nexpressed as a percentage. Additionally, choices C and D are incorrect because the context should be represented by a linear relationship, not by\nan exponential relationship.",
+  "after": "Choice B is correct. It’s given that each serving of Crunchy Grain cereal provides 5% of an adult’s daily allowance of potassium, so x servings would provide x times 5%. The percentage of an adult’s daily allowance of potassium, p, is 5 times the number of servings, x. Therefore, the percentage of an adult’s daily allowance of potassium can be expressed as $p=5x$.\nChoices A, C, and D are incorrect and may result from incorrectly converting 5% to its decimal equivalent, which isn’t necessary since p is expressed as a percentage. Additionally, choices C and D are incorrect because the context should be represented by a linear relationship, not by an exponential relationship.",
+  "class": "stripped_math",
+  "note": "PS Percentages - HARD #9: restored p=5x",
+  "evidence": "ANS Percents HARD.pdf p8 (Question ID 954943a4)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro14b02vyqmt1e2z7o26z",
+  "field": "explanation",
+  "before": "The correct answer is 8. The 6 students represent of those invited to join the committee. If x people were\ninvited to join the committee, then . Thus, there were people invited to join the committee. It follows that there were\nteachers and school and district administrators invited to join the committee. Therefore, there were 8 more\nteachers than school and district administrators invited to join the committee.",
+  "after": "The correct answer is 8. The 6 students represent $(100-15-45-25)\\%=15\\%$ of those invited to join the committee. If x people were invited to join the committee, then $0.15x=6$. Thus, there were $\\frac{6}{0.15}=40$ people invited to join the committee. It follows that there were $0.45(40)=18$ teachers and $0.25(40)=10$ school and district administrators invited to join the committee. Therefore, there were 8 more teachers than school and district administrators invited to join the committee.",
+  "class": "stripped_math",
+  "note": "PS Percentages - HARD #10: restored (100−15−45−25)%=15%, 0.15x=6, 6/0.15=40, 0.45(40)=18, 0.25(40)=10",
+  "evidence": "ANS Percents HARD.pdf p9 (Question ID 65c49824)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsp5ap4n00000vmk26qmalgl",
+  "field": "explanation",
+  "before": "Choice B is correct. If the stove’s value depreciates by 20% of the previous year’s estimated value, then each year it retains 100% – 20% = 80%, or 0.80, of the previous year’s estimated value. Since the stove’s value was $800 when Thomas installed it, the estimated value after two years would be (0.80)(0.80)($800) = $512. Choice A is incorrect. This is the value of the stove if each year it had",
+  "after": "Choice B is correct. If the stove’s value depreciates by 20% of the previous year’s estimated value, then each year it retains 100% – 20% = 80%, or 0.80, of the previous year’s estimated value. Since the stove’s value was \\$800 when Thomas installed it, the estimated value after two years would be (0.80)(0.80)(\\$800) = \\$512. Choice A is incorrect. This is the value of the stove if each year it had depreciated by 20% of the original value rather than by 20% of the previous year’s estimated value. Choice C is incorrect and may be the result of a computational error. Choice D is incorrect. This is the estimated value of the stove 1 year after Thomas installed it, not 2 years.",
+  "class": "explanation_truncated",
+  "note": "PS Percentages - MEDIUM #1: seed: explanation cut mid-sentence (\"if each year it had\"); appended rest of Choice A/C/D from ANS; escaped literal currency $",
+  "evidence": "ANS Percents MED.pdf p1 (Question ID 566759ef)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1up03ahqmt1uz7c50sc",
+  "field": "explanation",
+  "before": "Choice D is correct. To find the percent increase of the customer’s water bill, the absolute increase of the bill, in dollars, is divided by the original\namount of the bill, and the result is multiplied by 100%, as follows: ; .\nChoice A is incorrect. This choice is the difference rounded to the nearest tenth, which is the (absolute) increase of the bill’s\namount, not its percent increase. Choice B is incorrect and may be the result of some calculation errors. Choice C is incorrect and is the result of\ndividing the difference between the two bill amounts by the new bill amount instead of the original bill amount.",
+  "after": "Choice D is correct. To find the percent increase of the customer’s water bill, the absolute increase of the bill, in dollars, is divided by the original amount of the bill, and the result is multiplied by 100%, as follows: $\\frac{79.86-75.74}{75.74}\\approx0.054$; $0.054\\times100\\%=5.4\\%$.\nChoice A is incorrect. This choice is the difference $79.86-75.74$ rounded to the nearest tenth, which is the (absolute) increase of the bill’s amount, not its percent increase. Choice B is incorrect and may be the result of some calculation errors. Choice C is incorrect and is the result of dividing the difference between the two bill amounts by the new bill amount instead of the original bill amount.",
+  "class": "stripped_math",
+  "note": "PS Percentages - MEDIUM #3: restored (79.86−75.74)/75.74≈0.054; 0.054×100%=5.4% and the difference 79.86−75.74",
+  "evidence": "ANS Percents MED.pdf p3 (Question ID b2f6f17d)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1y003b3qmt1mvz6gwsy",
+  "field": "explanation",
+  "before": "Choice C is correct. Of the 1,300,000 units sold during the first month, 15% were returned, so units were\nreturned during the first month. If the units were sold and returned at the same rate for the next 5 months, then a total of\nsmartphone units were returned during the 6-month period.\nChoice A is incorrect. This is the number of units that were returned in 1 month. Choice B is incorrect. This is the number of units that were\nreturned in 5 months. Choice D is incorrect. This is the number of units sold and not returned during the first 6 months.",
+  "after": "Choice C is correct. Of the 1,300,000 units sold during the first month, 15% were returned, so $(1{,}300{,}000)(0.15)=195{,}000$ units were returned during the first month. If the units were sold and returned at the same rate for the next 5 months, then a total of $(195{,}000)(6)=1{,}170{,}000$ smartphone units were returned during the 6-month period.\nChoice A is incorrect. This is the number of units that were returned in 1 month. Choice B is incorrect. This is the number of units that were returned in 5 months. Choice D is incorrect. This is the number of units sold and not returned during the first 6 months.",
+  "class": "stripped_math",
+  "note": "PS Percentages - MEDIUM #9: restored (1,300,000)(0.15)=195,000 and (195,000)(6)=1,170,000",
+  "evidence": "ANS Percents MED.pdf p9 (Question ID 63573fea)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsp3qmqf00020vmta3qeyqf2",
+  "field": "explanation",
+  "before": "Choice A is correct. Multiplying the number of marbles in the bag by the probability of selecting a blue marble gives the number of blue marbles in the bag. Since the bag contains a total of 60 marbles and the probability that a blue marble will be selected from the bag is 0.35, there are a total of blue marbles in the bag. Choice B is incorrect and may result from subtracting 35 from 60. Choice",
+  "after": "Choice A is correct. Multiplying the number of marbles in the bag by the probability of selecting a blue marble gives the number of blue marbles in the bag. Since the bag contains a total of 60 marbles and the probability that a blue marble will be selected from the bag is 0.35, there are a total of $(0.35)(60)=21$ blue marbles in the bag. Choice B is incorrect and may result from subtracting 35 from 60. Choice C is incorrect. This would be the number of blue marbles in the bag if there were a total of 100 marbles, not 60 marbles. Choice D is incorrect. This is the number of marbles in the bag that aren’t blue.",
+  "class": "explanation_truncated",
+  "note": "PS Probability and conditional probability - EASY #1: explanation cut after \"Choice\"; restored Choice C/D sentences from ANS, plus stripped math (0.35)(60)=21",
+  "evidence": "ANS Probability EASY.pdf p1 (Question ID 1dcea480)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro23103f9qmt1uqgmjk8c",
+  "field": "explanation",
+  "before": "Choice D is correct. Based on the table, there are a total of customers who visited the car dealership in the last month, and of these\ncustomers are at least years old. If a customer from the last month is selected at random, the probability that the selected customer is at\nleast years old is equal to the number of customers who are at least years old divided by the total number of customers. Therefore, the\nprobability that the selected customer is at least years old is .\nChoice A is incorrect. This is the probability that the selected customer is less than years old.\nChoice B is incorrect. This is the probability that the selected customer visited the dealership time in the last month.\nChoice C is incorrect. This is the probability that the selected customer visited the dealership or more times in the last month.",
+  "after": "Choice D is correct. Based on the table, there are a total of $135$ customers who visited the car dealership in the last month, and $105$ of these customers are at least $40$ years old. If a customer from the last month is selected at random, the probability that the selected customer is at least $40$ years old is equal to the number of customers who are at least $40$ years old divided by the total number of customers. Therefore, the probability that the selected customer is at least $40$ years old is $\\frac{105}{135}$.\nChoice A is incorrect. This is the probability that the selected customer is less than $40$ years old.\nChoice B is incorrect. This is the probability that the selected customer visited the dealership $1$ time in the last month.\nChoice C is incorrect. This is the probability that the selected customer visited the dealership $2$ or more times in the last month.",
+  "class": "stripped_math",
+  "note": "PS Probability and conditional probability - EASY #2: restored stripped numbers 135, 105, 40 (x5), 105/135, 1, 2",
+  "evidence": "ANS Probability EASY.pdf p2 (Question ID dae79de4)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro23503faqmt1ugnkskgk",
+  "field": "explanation",
+  "before": "Choice B is correct. Since there are n nonfiction and 12 fiction books on the bookshelf, represents the total number of books. If one of\nthese books is selected at random, the probability of selecting a nonfiction book is equivalent to the number of nonfiction books divided by the\ntotal number of books. Therefore, the probability of selecting a nonfiction book, in terms of n, is .\nChoice A is incorrect. This expression represents the number of nonfiction books divided by the number of fiction books. Choice C is incorrect.\nThis expression represents the number of fiction books divided by the number of nonfiction books. Choice D is incorrect. This expression\nrepresents the probability of selecting a fiction book.",
+  "after": "Choice B is correct. Since there are n nonfiction and 12 fiction books on the bookshelf, $n+12$ represents the total number of books. If one of these books is selected at random, the probability of selecting a nonfiction book is equivalent to the number of nonfiction books divided by the total number of books. Therefore, the probability of selecting a nonfiction book, in terms of n, is $\\frac{n}{n+12}$.\nChoice A is incorrect. This expression represents the number of nonfiction books divided by the number of fiction books. Choice C is incorrect. This expression represents the number of fiction books divided by the number of nonfiction books. Choice D is incorrect. This expression represents the probability of selecting a fiction book.",
+  "class": "stripped_math",
+  "note": "PS Probability and conditional probability - EASY #3: restored n+12 and n/(n+12)",
+  "evidence": "ANS Probability EASY.pdf p3 (Question ID 2a08d878)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro23803fbqmt12jgc4pg5",
+  "field": "explanation",
+  "before": "Choice A is correct. The probability of randomly selecting a defective MP3 player from the shipment is equal to the number of defective MP3\nplayers divided by the total number of MP3 players in the shipment. Therefore, the probability is , which is equivalent to 0.004.\nChoice B is incorrect because 0.04 represents 4 defective MP3 players out of 100 rather than out of 1,000. Choice C is incorrect because 0.4\nrepresents 4 defective MP3 players out of 10 rather than out of 1,000. Choice D is incorrect. This is the number of defective MP3 players in the\nshipment.",
+  "after": "Choice A is correct. The probability of randomly selecting a defective MP3 player from the shipment is equal to the number of defective MP3 players divided by the total number of MP3 players in the shipment. Therefore, the probability is $\\frac{4}{1{,}000}$, which is equivalent to 0.004.\nChoice B is incorrect because 0.04 represents 4 defective MP3 players out of 100 rather than out of 1,000. Choice C is incorrect because 0.4 represents 4 defective MP3 players out of 10 rather than out of 1,000. Choice D is incorrect. This is the number of defective MP3 players in the shipment.",
+  "class": "stripped_math",
+  "note": "PS Probability and conditional probability - EASY #4: restored 4/1,000",
+  "evidence": "ANS Probability EASY.pdf p4 (Question ID 12dbe3de)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro23b03fgqmt1z5pg5im0",
+  "field": "explanation",
+  "before": "Choice B is correct. If one of the teens surveyed is selected at random, the probability that the teen talks on a cell phone daily is equal to the\nquotient of the total number of teens who reported that they talk on a cell phone daily, 415, and the total number of teens surveyed, 799.\nTherefore, this probability is equal to .\nChoice A is incorrect. This fraction represents the probability of selecting at random any one of the 799 teens surveyed. Choice C is incorrect and\nmay result from conceptual errors. Choice D is incorrect. This fraction represents the probability of selecting at random one of the 799 teens\nsurveyed who doesn’t talk on a cell phone daily.",
+  "after": "Choice B is correct. If one of the teens surveyed is selected at random, the probability that the teen talks on a cell phone daily is equal to the quotient of the total number of teens who reported that they talk on a cell phone daily, 415, and the total number of teens surveyed, 799. Therefore, this probability is equal to $\\frac{415}{799}$.\nChoice A is incorrect. This fraction represents the probability of selecting at random any one of the 799 teens surveyed. Choice C is incorrect and may result from conceptual errors. Choice D is incorrect. This fraction represents the probability of selecting at random one of the 799 teens surveyed who doesn’t talk on a cell phone daily.",
+  "class": "stripped_math",
+  "note": "PS Probability and conditional probability - EASY #5: restored 415/799",
+  "evidence": "ANS Probability EASY.pdf p5 (Question ID ec7b0eb8)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro23h03fjqmt1njro4jcq",
+  "field": "explanation",
+  "before": "Choice D is correct. If one of the rocks in the collection is selected at random, the probability of selecting a rock that is igneous is equal to the\nnumber of igneous rocks in the collection divided by the total number of rocks in the collection. According to the table, there are igneous\nrocks in the collection, and it's given that there's a total of rocks in the collection. Therefore, if one of the rocks in the collection is selected at\nrandom, the probability of selecting a rock that is igneous is .\nChoice A is incorrect. This is the number of igneous rocks in the collection divided by the number of sedimentary rocks in the collection, not\ndivided by the total number of rocks in the collection.\nChoice B is incorrect. This is the number of igneous rocks in the collection divided by the number of metamorphic rocks in the collection, not\ndivided by the total number of rocks in the collection.\nChoice C is incorrect. This is the number of igneous rocks in the collection divided by the number of rocks in the collection that aren't igneous,\nnot divided by the total number of rocks in the collection.",
+  "after": "Choice D is correct. If one of the rocks in the collection is selected at random, the probability of selecting a rock that is igneous is equal to the number of igneous rocks in the collection divided by the total number of rocks in the collection. According to the table, there are $10$ igneous rocks in the collection, and it's given that there's a total of $70$ rocks in the collection. Therefore, if one of the rocks in the collection is selected at random, the probability of selecting a rock that is igneous is $\\frac{10}{70}$.\nChoice A is incorrect. This is the number of igneous rocks in the collection divided by the number of sedimentary rocks in the collection, not divided by the total number of rocks in the collection.\nChoice B is incorrect. This is the number of igneous rocks in the collection divided by the number of metamorphic rocks in the collection, not divided by the total number of rocks in the collection.\nChoice C is incorrect. This is the number of igneous rocks in the collection divided by the number of rocks in the collection that aren't igneous, not divided by the total number of rocks in the collection.",
+  "class": "stripped_math",
+  "note": "PS Probability and conditional probability - EASY #7: restored 10, 70 and 10/70",
+  "evidence": "ANS Probability EASY.pdf p7 (Question ID 60caadfd)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro23p03fpqmt1j6edxvy3",
+  "field": "explanation",
+  "before": "Choice D is correct. If a marble is chosen at random from the bag, the probability of choosing a marble of a certain color is the number of\nmarbles of that color divided by the total number of marbles in the bag. Since there are 10 blue marbles in the bag, and there are 40 total marbles\nin the bag, the probability that the marble chosen will be blue is .\nChoices A, B, and C are incorrect. These represent the probability that the marble chosen won’t be blue (choice A), will be green (choice B), and\nwon’t be green (choice C).",
+  "after": "Choice D is correct. If a marble is chosen at random from the bag, the probability of choosing a marble of a certain color is the number of marbles of that color divided by the total number of marbles in the bag. Since there are 10 blue marbles in the bag, and there are 40 total marbles in the bag, the probability that the marble chosen will be blue is $\\frac{10}{40}$.\nChoices A, B, and C are incorrect. These represent the probability that the marble chosen won’t be blue (choice A), will be green (choice B), and won’t be green (choice C).",
+  "class": "stripped_math",
+  "note": "PS Probability and conditional probability - EASY #9: restored 10/40",
+  "evidence": "ANS Probability EASY.pdf p9 (Question ID 1353b86e)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro27003fqqmt1a4ozs83u",
+  "field": "explanation",
+  "before": "Choice D is correct. The total number of gas station customers on Tuesday was 135. The table shows that the number of customers who did not\npurchase gasoline was 50. Finding the ratio of the number of customers who did not purchase gasoline to the total number of customers gives\nthe probability that a customer selected at random on that day did not purchase gasoline, which is .\nChoice A is incorrect and may result from finding the probability that a customer did not purchase a beverage, given that the customer did not\npurchase gasoline. Choice B is incorrect and may result from finding the probability that a customer did not purchase gasoline, given that the\ncustomer did not purchase a beverage. Choice C is incorrect and may result from finding the probability that a customer did purchase a\nbeverage, given that the customer did not purchase gasoline.",
+  "after": "Choice D is correct. The total number of gas station customers on Tuesday was 135. The table shows that the number of customers who did not purchase gasoline was 50. Finding the ratio of the number of customers who did not purchase gasoline to the total number of customers gives the probability that a customer selected at random on that day did not purchase gasoline, which is $\\frac{50}{135}$.\nChoice A is incorrect and may result from finding the probability that a customer did not purchase a beverage, given that the customer did not purchase gasoline. Choice B is incorrect and may result from finding the probability that a customer did not purchase gasoline, given that the customer did not purchase a beverage. Choice C is incorrect and may result from finding the probability that a customer did purchase a beverage, given that the customer did not purchase gasoline.",
+  "class": "stripped_math",
+  "note": "PS Probability and conditional probability - EASY #10: restored 50/135",
+  "evidence": "ANS Probability EASY.pdf p10 (Question ID d89c1513)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro27j03frqmt1xyznb6xj",
+  "field": "explanation",
+  "before": "Choice B is correct. According to the table, 140 students from the two high schools completed summer internships in 2010. Of these, 65 were\nfrom Valley High School. Therefore, of the students who completed summer internships in 2010, represents the fraction who were from\nValley High School.\nChoice A is incorrect. This is the difference between the numbers of students from the two high schools who completed internships in 2010\ndivided by the total number of students from the two schools who completed internships that year. Choice C is incorrect. This is the fraction of\nstudents from Foothill High School who completed internships out of all the students who completed internships in 2010. Choice D is incorrect.\nThis is the number of students from Valley High School who completed internships in 2010 divided by the number of students from Foothill High\nSchool who completed internships in 2010.",
+  "after": "Choice B is correct. According to the table, 140 students from the two high schools completed summer internships in 2010. Of these, 65 were from Valley High School. Therefore, of the students who completed summer internships in 2010, $\\frac{65}{140}$ represents the fraction who were from Valley High School.\nChoice A is incorrect. This is the difference between the numbers of students from the two high schools who completed internships in 2010 divided by the total number of students from the two schools who completed internships that year. Choice C is incorrect. This is the fraction of students from Foothill High School who completed internships out of all the students who completed internships in 2010. Choice D is incorrect. This is the number of students from Valley High School who completed internships in 2010 divided by the number of students from Foothill High School who completed internships in 2010.",
+  "class": "stripped_math",
+  "note": "PS Probability and conditional probability - EASY #11: restored 65/140",
+  "evidence": "ANS Probability EASY.pdf p11 (Question ID 46545dd6)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro27t03fsqmt1tgpsl2zb",
+  "field": "explanation",
+  "before": "Choice B is correct. This probability is calculated by dividing the number of baritone singers by the total number of men registered for singing\nlessons. It’s given that a total of 25 men registered for singing lessons and that there are 10 baritones. Therefore, the probability of selecting a\nbaritone from this group at random is , which is equivalent to 0.40.\nChoice A is incorrect. This would be the probability of selecting a baritone at random if there were 100 total men who registered for singing\nlessons. Choice C is incorrect. This is the probability of selecting a singer at random who isn’t a baritone. Choice D is incorrect. This would be the\nprobability of selecting a baritone at random if there were 15 total men registered for singing lessons.",
+  "after": "Choice B is correct. This probability is calculated by dividing the number of baritone singers by the total number of men registered for singing lessons. It’s given that a total of 25 men registered for singing lessons and that there are 10 baritones. Therefore, the probability of selecting a baritone from this group at random is $\\frac{10}{25}$, which is equivalent to 0.40.\nChoice A is incorrect. This would be the probability of selecting a baritone at random if there were 100 total men who registered for singing lessons. Choice C is incorrect. This is the probability of selecting a singer at random who isn’t a baritone. Choice D is incorrect. This would be the probability of selecting a baritone at random if there were 15 total men registered for singing lessons.",
+  "class": "stripped_math",
+  "note": "PS Probability and conditional probability - EASY #12: restored 10/25",
+  "evidence": "ANS Probability EASY.pdf p12 (Question ID 16cea46c)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1yv03b9qmt12ibdojp8",
+  "field": "explanation",
+  "before": "The correct answer is 42. It's given that in Nigeria on September 30, 2015, the probability of selecting an MTN subscriber from all Internet subscribers is 0.43, that there were p million, or $p(1,000,000)$, MTN subscribers, and that there were 97 million, or 97,000,000, Internet subscribers. The probability of selecting an MTN subscriber from all Internet subscribers can be found by dividing the number of MTN subscribers by the total number of Internet subscribers. Therefore, the equation $\\frac{p(1,000,000)}{97,000,000} = 0.43$ can be used to solve for p. Dividing 1,000,000 from the numerator and denominator of the expression on the left-hand side yields $\\frac{p}{97} = 0.43$. Multiplying both sides of this equation by 97 yields $p = (0.43)(97) = 41.71$, which, to the nearest integer, is 42. #",
+  "after": "The correct answer is 42. It's given that in Nigeria on September 30, 2015, the probability of selecting an MTN subscriber from all Internet subscribers is 0.43, that there were p million, or $p(1,000,000)$, MTN subscribers, and that there were 97 million, or 97,000,000, Internet subscribers. The probability of selecting an MTN subscriber from all Internet subscribers can be found by dividing the number of MTN subscribers by the total number of Internet subscribers. Therefore, the equation $\\frac{p(1,000,000)}{97,000,000} = 0.43$ can be used to solve for p. Dividing 1,000,000 from the numerator and denominator of the expression on the left-hand side yields $\\frac{p}{97} = 0.43$. Multiplying both sides of this equation by 97 yields $p = (0.43)(97) = 41.71$, which, to the nearest integer, is 42.",
+  "class": "leaked_footer",
+  "note": "PS Probability and conditional probability - HARD #2: stray trailing \"#\" removed; ANS rationale ends at \"is 42.\" (math already present)",
+  "evidence": "ANS Probability HARD.pdf p2 (Question ID 585de39a)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1zc03bbqmt1mnrfmehp",
+  "field": "explanation",
+  "before": "Choice C is correct. The sum of the number of states with a state-level sales tax is . Of these states, 6 don’t have a state-level\nincome tax. Therefore, , or about 13.3%, of states with a state-level sales tax don’t have a state-level income tax.\nChoice A is incorrect. This is the number of states that have a state-level sales tax and no state-level income tax. Choice B is incorrect. This is the\npercent of states that have a state-level sales tax and no state-level income tax. Choice D is incorrect. This is the percent of states that have no\nstate-level income tax.",
+  "after": "Choice C is correct. The sum of the number of states with a state-level sales tax is $39+6=45$. Of these states, 6 don’t have a state-level income tax. Therefore, $\\frac{6}{45}=0.1333\\ldots$, or about 13.3%, of states with a state-level sales tax don’t have a state-level income tax.\nChoice A is incorrect. This is the number of states that have a state-level sales tax and no state-level income tax. Choice B is incorrect. This is the percent of states that have a state-level sales tax and no state-level income tax. Choice D is incorrect. This is the percent of states that have no state-level income tax.",
+  "class": "stripped_math",
+  "note": "PS Probability and conditional probability - HARD #4: restored 39+6=45 and 6/45=0.1333...",
+  "evidence": "ANS Probability HARD.pdf p4 (Question ID 5dc386fb)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro14u02weqmt1gl8r8mxk",
+  "field": "explanation",
+  "before": "Choice A is correct. It’s given that there are 2 hybrid cars priced at no more than $25,000. It’s also given that there are 14 cars total for sale.\nTherefore, the probability of selecting a hybrid priced at no more than $25,000 when one car is chosen at random is .\nChoice B is incorrect. This is the probability of selecting a hybrid car priced greater than $25,000 when choosing one car at random. Choice C is\nincorrect. This is the probability, when choosing randomly from only the hybrid cars, of selecting one priced at no more than $25,000. Choice D is\nincorrect. This is the probability of selecting a hybrid car when selecting at random from only the cars priced greater than $25,000.",
+  "after": "Choice A is correct. It’s given that there are 2 hybrid cars priced at no more than \\$25,000. It’s also given that there are 14 cars total for sale. Therefore, the probability of selecting a hybrid priced at no more than \\$25,000 when one car is chosen at random is $\\frac{2}{14}=\\frac{1}{7}$.\nChoice B is incorrect. This is the probability of selecting a hybrid car priced greater than \\$25,000 when choosing one car at random. Choice C is incorrect. This is the probability, when choosing randomly from only the hybrid cars, of selecting one priced at no more than \\$25,000. Choice D is incorrect. This is the probability of selecting a hybrid car when selecting at random from only the cars priced greater than \\$25,000.",
+  "class": "stripped_math",
+  "note": "PS Probability and conditional probability - MEDIUM #1: restored 2/14 = 1/7; escaped literal currency $25,000 (x5)",
+  "evidence": "ANS Probability Med.pdf p1 (Question ID b1b5300b)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro14x02wfqmt1r1vwtn4t",
+  "field": "explanation",
+  "before": "Choice D is correct. The table shows that there are a total of 16 kittens that have a chocolate-colored coat. Of the 16 with a chocolate-colored\ncoat, 12 have deep blue eyes. Therefore, the fraction of chocolate-colored kittens with deep blue eyes is simply the ratio of those two numbers,\nor .\nChoice A is incorrect; this is the fraction of all chocolate-colored kittens. Choice B is incorrect; this is the fraction of kittens with deep blue eyes\nthat have a chocolate-colored coat. Choice C is incorrect; this is the fraction of cream-tortoiseshell-colored kittens with deep blue eyes.",
+  "after": "Choice D is correct. The table shows that there are a total of 16 kittens that have a chocolate-colored coat. Of the 16 with a chocolate-colored coat, 12 have deep blue eyes. Therefore, the fraction of chocolate-colored kittens with deep blue eyes is simply the ratio of those two numbers, or $\\frac{12}{16}$.\nChoice A is incorrect; this is the fraction of all chocolate-colored kittens. Choice B is incorrect; this is the fraction of kittens with deep blue eyes that have a chocolate-colored coat. Choice C is incorrect; this is the fraction of cream-tortoiseshell-colored kittens with deep blue eyes.",
+  "class": "stripped_math",
+  "note": "PS Probability and conditional probability - MEDIUM #2: restored 12/16",
+  "evidence": "ANS Probability Med.pdf p2 (Question ID e1ad3d41)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro16402wiqmt13uep3edq",
+  "field": "explanation",
+  "before": "Choice A is correct. It is given that there are 180 female penguins in the exhibit. Therefore, of the female penguins is\npenguins. According to the table, there are 59 female chinstrap penguins, 27 female emperor penguins, 54 female gentoo penguins, and 40\nfemale macaroni penguins. So the female chinstrap penguin population is the closest to 60, or of the total female population in the exhibit.\nChoices B, C, and D are incorrect and may result from reading data from the table incorrectly. Since the total female penguin population is 180,\nof the total female penguin population is 60. The numbers of female emperor (27), female gentoo (54), and female macaroni (40) penguins\nare not as close to 60 as the number of female chinstrap penguins (59).",
+  "after": "Choice A is correct. It is given that there are 180 female penguins in the exhibit. Therefore, $\\frac{1}{3}$ of the female penguins is $\\frac{1}{3}\\times180=60$ penguins. According to the table, there are 59 female chinstrap penguins, 27 female emperor penguins, 54 female gentoo penguins, and 40 female macaroni penguins. So the female chinstrap penguin population is the closest to 60, or $\\frac{1}{3}$ of the total female population in the exhibit.\nChoices B, C, and D are incorrect and may result from reading data from the table incorrectly. Since the total female penguin population is 180, $\\frac{1}{3}$ of the total female penguin population is 60. The numbers of female emperor (27), female gentoo (54), and female macaroni (40) penguins are not as close to 60 as the number of female chinstrap penguins (59).",
+  "class": "stripped_math",
+  "note": "PS Probability and conditional probability - MEDIUM #5: restored 1/3 (x3) and 1/3×180=60",
+  "evidence": "ANS Probability Med.pdf p5 (Question ID a3384df0)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro18902woqmt137q4ddu2",
+  "field": "explanation",
+  "before": "Choice B is correct. There were 64 days with no rain. It was a weekend day for 16 of those 64 days. So 16 out of 64 of the days with no rain were\nweekend days. Because the day is selected at random, each day has an equal chance of being selected, so the probability is .\nChoice A is incorrect. It is the probability that a day selected at random from any one of the days during the 12 weeks is a weekend day with no\nrain. Choice C is incorrect. It is the probability that a day selected at random from the weekend days has no rain. Choice D is incorrect. It is the\nprobability that a day selected at random from the days with no rain is a weekday.",
+  "after": "Choice B is correct. There were 64 days with no rain. It was a weekend day for 16 of those 64 days. So 16 out of 64 of the days with no rain were weekend days. Because the day is selected at random, each day has an equal chance of being selected, so the probability is $\\frac{16}{64}=\\frac{1}{4}$.\nChoice A is incorrect. It is the probability that a day selected at random from any one of the days during the 12 weeks is a weekend day with no rain. Choice C is incorrect. It is the probability that a day selected at random from the weekend days has no rain. Choice D is incorrect. It is the probability that a day selected at random from the days with no rain is a weekday.",
+  "class": "stripped_math",
+  "note": "PS Probability and conditional probability - MEDIUM #7: restored 16/64 = 1/4",
+  "evidence": "ANS Probability Med.pdf p8 (Question ID 912cd125)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro18f02wqqmt1bb3ca9ec",
+  "field": "explanation",
+  "before": "Choice B is correct. If 1,200 customers register for new accounts every day, then (1,200)(5) = 6,000 customers registered for new accounts in the\nfirst 5 days. Therefore, of the first 60,000 new accounts that were registered, , or , were registered in the first 5 days.\nChoice A is incorrect. The fraction represents the fraction of accounts registered in 1 of the first 5 days. Choice C is incorrect and may result\nfrom conceptual or computation errors. Choice D is incorrect. The fraction represents the fraction of the first 60,000 accounts that were\nregistered in 1 day.",
+  "after": "Choice B is correct. If 1,200 customers register for new accounts every day, then (1,200)(5) = 6,000 customers registered for new accounts in the first 5 days. Therefore, of the first 60,000 new accounts that were registered, $\\frac{6{,}000}{60{,}000}$, or $\\frac{1}{10}$, were registered in the first 5 days.\nChoice A is incorrect. The fraction $\\frac{1}{5}$ represents the fraction of accounts registered in 1 of the first 5 days. Choice C is incorrect and may result from conceptual or computation errors. Choice D is incorrect. The fraction $\\frac{1}{50}$ represents the fraction of the first 60,000 accounts that were registered in 1 day.",
+  "class": "stripped_math",
+  "note": "PS Probability and conditional probability - MEDIUM #9: restored fractions 6,000/60,000 = 1/10, 1/5 (choice A) and 1/50 (choice D)",
+  "evidence": "ANS Probability Med.pdf p10 (Question ID 38a9ac45)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro2d903lcqmt1c8g3poe1",
+  "field": "explanation",
+  "before": "Choice B is correct. It’s given that the event will be in a 5,400-square-foot room and that there should be at least 8 square feet per person. The\nmaximum number of people that could attend the event can be found by dividing the total square feet in the room by the minimum number of\nsquare feet needed per person, which gives .\nChoices A and C are incorrect and may result from conceptual or computational errors. Choice D is incorrect and may result from multiplying,\nrather than dividing, 5,400 by 8.",
+  "after": "Choice B is correct. It’s given that the event will be in a 5,400-square-foot room and that there should be at least 8 square feet per person. The maximum number of people that could attend the event can be found by dividing the total square feet in the room by the minimum number of square feet needed per person, which gives $\\frac{5{,}400}{8}=675$.\nChoices A and C are incorrect and may result from conceptual or computational errors. Choice D is incorrect and may result from multiplying, rather than dividing, 5,400 by 8.",
+  "class": "stripped_math",
+  "note": "PS Ratios, rates, proportional relationships, and units - EASY #2: restored 5,400/8 = 675",
+  "evidence": "ANS Ratios Rates Propo Units EASY .pdf p2 (Question ID 99550621)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro2ko03liqmt1dgcb1lxr",
+  "field": "explanation",
+  "before": "Choice A is correct. At the exchange rate of 1 peso = 0.075 US dollars, 7,500 pesos would be converted to 7,500 × 0.075 = $562.50. However,\nsince Maria pays a 2% fee on the converted US dollar amount, she receives only (100 – 2)%, or 98%, of the converted US dollars, and 562.50 ×\n0.98 = $551.25.\nChoice B is incorrect. This is the number of US dollars Maria would receive if the exchange service did not charge a 2% fee. Choice C is incorrect\nand may result from a decimal point error made when calculating the conversion to US dollars and from not assessing the 2% fee. Choice D is\nincorrect and may result from reversing the units of the exchange rate.",
+  "after": "Choice A is correct. At the exchange rate of 1 peso = 0.075 US dollars, 7,500 pesos would be converted to 7,500 × 0.075 = \\$562.50. However, since Maria pays a 2% fee on the converted US dollar amount, she receives only (100 – 2)%, or 98%, of the converted US dollars, and 562.50 × 0.98 = \\$551.25.\nChoice B is incorrect. This is the number of US dollars Maria would receive if the exchange service did not charge a 2% fee. Choice C is incorrect and may result from a decimal point error made when calculating the conversion to US dollars and from not assessing the 2% fee. Choice D is incorrect and may result from reversing the units of the exchange rate.",
+  "class": "broken_math",
+  "note": "PS Ratios, rates, proportional relationships, and units - EASY #4: unescaped currency $ (two $ amounts would render as math span) escaped as \\$; text matches ANS",
+  "evidence": "ANS Ratios Rates Propo Units EASY .pdf p4 (Question ID 3ac09984)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro2ku03lnqmt1lc7iqwtv",
+  "field": "explanation",
+  "before": "Choice A is correct. If 2.5 ounces of chocolate are needed for each muffin, then the number of ounces of chocolate needed to make 48 muffins\nis ounces. Since 1 pound = 16 ounces, the number of pounds that is equivalent to 120 ounces is pounds.\nTherefore, 7.5 pounds of chocolate are needed to make the 48 muffins.\nChoice B is incorrect. If 10 pounds of chocolate were needed to make 48 muffins, then the total number of ounces of chocolate needed would be\nounces. The number of ounces of chocolate per muffin would then be ounces per muffin, not 2.5 ounces per\nmuffin. Choices C and D are also incorrect. Following the same procedures as used to test choice B gives 16.8 ounces per muffin for choice C\nand 40 ounces per muffin for choice D, not 2.5 ounces per muffin. Therefore, 50.5 and 120 pounds cannot be the number of pounds needed to\nmake 48 signature chocolate muffins.",
+  "after": "Choice A is correct. If 2.5 ounces of chocolate are needed for each muffin, then the number of ounces of chocolate needed to make 48 muffins is $48\\times2.5=120$ ounces. Since 1 pound = 16 ounces, the number of pounds that is equivalent to 120 ounces is $\\frac{120}{16}=7.5$ pounds. Therefore, 7.5 pounds of chocolate are needed to make the 48 muffins.\nChoice B is incorrect. If 10 pounds of chocolate were needed to make 48 muffins, then the total number of ounces of chocolate needed would be $10\\times16=160$ ounces. The number of ounces of chocolate per muffin would then be $\\frac{160}{48}=3.33$ ounces per muffin, not 2.5 ounces per muffin. Choices C and D are also incorrect. Following the same procedures as used to test choice B gives 16.8 ounces per muffin for choice C and 40 ounces per muffin for choice D, not 2.5 ounces per muffin. Therefore, 50.5 and 120 pounds cannot be the number of pounds needed to make 48 signature chocolate muffins.",
+  "class": "stripped_math",
+  "note": "PS Ratios, rates, proportional relationships, and units - EASY #5: restored 48×2.5=120, 120/16=7.5, 10×16=160, 160/48=3.33",
+  "evidence": "ANS Ratios Rates Propo Units EASY .pdf p5 (Question ID 06a152cd)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro2l803m2qmt17ephq6hu",
+  "field": "explanation",
+  "before": "Choice D is correct. Since the ratio of y to x is constant for each ordered pair in the table, the first row can be used to determine that the ratio of y\nto x is 4 to 1. The proportion can be used to solve for k. Multiplying each side of the equation by 40 yields .\nChoice A is incorrect. This is the value of y when the value of x is 7, not 40. Choice B is incorrect and may result from subtracting 4 from 40\ninstead of multiplying 40 by 4. Choice C is incorrect and may result from incorrectly setting up the proportion.",
+  "after": "Choice D is correct. Since the ratio of y to x is constant for each ordered pair in the table, the first row can be used to determine that the ratio of y to x is 4 to 1. The proportion $\\frac{4}{1}=\\frac{k}{40}$ can be used to solve for k. Multiplying each side of the equation by 40 yields $160=k$.\nChoice A is incorrect. This is the value of y when the value of x is 7, not 40. Choice B is incorrect and may result from subtracting 4 from 40 instead of multiplying 40 by 4. Choice C is incorrect and may result from incorrectly setting up the proportion.",
+  "class": "stripped_math",
+  "note": "PS Ratios, rates, proportional relationships, and units - EASY #8: restored proportion 4/1 = k/40 and 160 = k",
+  "evidence": "ANS Ratios Rates Propo Units EASY .pdf p8 (Question ID 3f236a64)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro2lc03m7qmt1jycb4ut5",
+  "field": "explanation",
+  "before": "Choice A is correct. Dividing the number of revolutions by the number of minutes gives the number of revolutions the turbine completes per\nminute. It’s given that the wind turbine completes revolutions in minutes. Therefore, at this rate, this turbine completes , or ,\nrevolutions per minute.\nChoice B is incorrect and may result from conceptual or calculation errors.\nChoice C is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "after": "Choice A is correct. Dividing the number of revolutions by the number of minutes gives the number of revolutions the turbine completes per minute. It’s given that the wind turbine completes $900$ revolutions in $50$ minutes. Therefore, at this rate, this turbine completes $\\frac{900}{50}$, or $18$, revolutions per minute.\nChoice B is incorrect and may result from conceptual or calculation errors.\nChoice C is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "class": "stripped_math",
+  "note": "PS Ratios, rates, proportional relationships, and units - EASY #9: restored 900 revolutions, 50 minutes, 900/50, or 18",
+  "evidence": "ANS Ratios Rates Propo Units EASY .pdf p9 (Question ID be35c117)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsp3qmqv00030vmtr5hbqvw1",
+  "field": "explanation",
+  "before": "Choice C is correct. If the butterfly traveled 2,100 miles in 120 days, then it traveled, on average, miles per day. Choice A is incorrect. This is approximately the average amount of time, in days, it took the butterfly to fly one mile: days per mile. Choice B is incorrect and may result from an arithmetic error. Choice D is incorrect. This is the number of hours in a day rather than the number",
+  "after": "Choice C is correct. If the butterfly traveled 2,100 miles in 120 days, then it traveled, on average, $\\frac{2{,}100 \\text{ miles}}{120 \\text{ days}}=17.5$ miles per day.\nChoice A is incorrect. This is approximately the average amount of time, in days, it took the butterfly to fly one mile: $\\frac{120 \\text{ days}}{2{,}100 \\text{ miles}}=0.057$ days per mile. Choice B is incorrect and may result from an arithmetic error. Choice D is incorrect. This is the number of hours in a day rather than the number of miles flown per day.",
+  "class": "explanation_truncated",
+  "note": "PS Ratios, rates, proportional relationships, and units - EASY #10: cut tail \"of miles flown per day.\" appended; also restored stripped math 2,100 miles/120 days = 17.5 and 120 days/2,100 miles = 0.057",
+  "evidence": "ANS Ratios Rates Propo Units EASY .pdf p10 (Question ID 000259aa)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro2lg03m8qmt1p9461a0c",
+  "field": "explanation",
+  "before": "Choice A is correct. It's given that a kangaroo has a mass of kilograms and that kilogram is equal to grams. Therefore, the kangaroo's\nmass, in grams, is , which is equivalent to grams.\nChoice B is incorrect and may result from conceptual or calculation errors.\nChoice C is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "after": "Choice A is correct. It's given that a kangaroo has a mass of $28$ kilograms and that $1$ kilogram is equal to $1{,}000$ grams. Therefore, the kangaroo's mass, in grams, is $28 \\text{ kilograms}\\left(\\frac{1{,}000 \\text{ grams}}{1 \\text{ kilogram}}\\right)$, which is equivalent to $28{,}000$ grams.\nChoice B is incorrect and may result from conceptual or calculation errors.\nChoice C is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "class": "stripped_math",
+  "note": "PS Ratios, rates, proportional relationships, and units - EASY #12: restored 28 kilograms, 1 kilogram, 1,000 grams, 28 kilograms(1,000 grams/1 kilogram), 28,000",
+  "evidence": "ANS Ratios Rates Propo Units EASY .pdf p12 (Question ID ba62b0b0)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro2lm03m9qmt123e05na8",
+  "field": "explanation",
+  "before": "Choice A is correct. If the object travels centimeters at a speed of centimeters per second, the time of travel can be determined by\ndividing the total distance by the speed. This results in , which is seconds.\nChoice B is incorrect and may result from conceptual or calculation errors.\nChoice C is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "after": "Choice A is correct. If the object travels $108$ centimeters at a speed of $12$ centimeters per second, the time of travel can be determined by dividing the total distance by the speed. This results in $\\frac{108 \\text{ centimeters}}{12 \\text{ centimeters/second}}$, which is $9$ seconds.\nChoice B is incorrect and may result from conceptual or calculation errors.\nChoice C is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "class": "stripped_math",
+  "note": "PS Ratios, rates, proportional relationships, and units - EASY #13: restored 108 centimeters, 12 centimeters per second, 108 cm/(12 cm/s), 9 seconds",
+  "evidence": "ANS Ratios Rates Propo Units EASY .pdf p13 (Question ID 7cd1c6db)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro2lq03maqmt1bakr6n9u",
+  "field": "explanation",
+  "before": "Choice C is correct. The weight of an object on Venus is approximately of its weight on Earth. If an object weighs 100 pounds on Earth,\nthen the object’s weight on Venus is approximately pounds. The same object’s weight on Jupiter is approximately of its\nweight on Earth; therefore, the object weighs approximately pounds on Jupiter. The difference between the object’s weight\non Jupiter and the object’s weight on Venus is approximately pounds. Therefore, an object that weighs 100 pounds on Earth\nweighs 140 more pounds on Jupiter than it weighs on Venus.\nChoice A is incorrect because it is the weight, in pounds, of the object on Venus. Choice B is incorrect because it is the weight, in pounds, of an\nobject on Earth if it weighs 100 pounds on Venus. Choice D is incorrect because it is the weight, in pounds, of the object on Jupiter.",
+  "after": "Choice C is correct. The weight of an object on Venus is approximately $\\frac{9}{10}$ of its weight on Earth. If an object weighs 100 pounds on Earth, then the object’s weight on Venus is approximately $\\frac{9}{10}(100)=90$ pounds. The same object’s weight on Jupiter is approximately $\\frac{23}{10}$ of its weight on Earth; therefore, the object weighs approximately $\\frac{23}{10}(100)=230$ pounds on Jupiter. The difference between the object’s weight on Jupiter and the object’s weight on Venus is approximately $230-90=140$ pounds. Therefore, an object that weighs 100 pounds on Earth weighs 140 more pounds on Jupiter than it weighs on Venus.\nChoice A is incorrect because it is the weight, in pounds, of the object on Venus. Choice B is incorrect because it is the weight, in pounds, of an object on Earth if it weighs 100 pounds on Venus. Choice D is incorrect because it is the weight, in pounds, of the object on Jupiter.",
+  "class": "stripped_math",
+  "note": "PS Ratios, rates, proportional relationships, and units - EASY #14: restored 9/10, 9/10(100)=90, 23/10, 23/10(100)=230, 230−90=140",
+  "evidence": "ANS Ratios Rates Propo Units EASY .pdf p14 (Question ID 24ad9dcb)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1sn039cqmt1dglodn3q",
+  "field": "explanation",
+  "before": "Choice A is correct. Since the distance is equal to the amount of time multiplied by a constant, the given equation represents a\nproportional relationship between distance and time in this situation. Since , the time when hours is 3 times the time when\nhours. Therefore, the distance traveled after hours is 3 times the distance after hours.\nChoices B and D are incorrect and may result from interpreting the proportional relationship between time and distance as additive rather than\nmultiplicative. Choice C is incorrect and may result from an arithmetic error.",
+  "after": "Choice A is correct. Since the distance is equal to the amount of time multiplied by a constant, the given equation $d=55t$ represents a proportional relationship between distance and time in this situation. Since $9k=3\\cdot3k$, the time when $t=9k$ hours is 3 times the time when $t=3k$ hours. Therefore, the distance traveled after $9k$ hours is 3 times the distance after $3k$ hours.\nChoices B and D are incorrect and may result from interpreting the proportional relationship between time and distance as additive rather than multiplicative. Choice C is incorrect and may result from an arithmetic error.",
+  "class": "stripped_math",
+  "note": "PS Ratios, rates, proportional relationships, and units - MEDIUM #2: restored d = 55t, 9k = 3·3k, t = 9k, t = 3k, 9k, 3k",
+  "evidence": "ANS Ratios Rates Proport. Units MED.pdf p2 (Question ID f6cbb04a)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1ss039fqmt17w5qprgk",
+  "field": "explanation",
+  "before": "Choice B is correct. The land area of the coastal city can be found by subtracting the area of the water from the total area of the coastal city; that\nis, square miles. The population density is the population divided by the land area, or , which is\nclosest to 7,690 people per square mile.\nChoice A is incorrect and may be the result of dividing the population by the total area, instead of the land area. Choice C is incorrect and may be\nthe result of dividing the population by the area of water. Choice D is incorrect and may be the result of making a computational error with the\ndecimal place.",
+  "after": "Choice B is correct. The land area of the coastal city can be found by subtracting the area of the water from the total area of the coastal city; that is, $92.1-11.3=80.8$ square miles. The population density is the population divided by the land area, or $\\frac{621{,}000}{80.8}=7{,}686$, which is closest to 7,690 people per square mile.\nChoice A is incorrect and may be the result of dividing the population by the total area, instead of the land area. Choice C is incorrect and may be the result of dividing the population by the area of water. Choice D is incorrect and may be the result of making a computational error with the decimal place.",
+  "class": "stripped_math",
+  "note": "PS Ratios, rates, proportional relationships, and units - MEDIUM #3: restored 92.1 − 11.3 = 80.8 and 621,000/80.8 = 7,686",
+  "evidence": "ANS Ratios Rates Proport. Units MED.pdf p3 (Question ID 1180401d)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1tb039rqmt1uiai0zuh",
+  "field": "explanation",
+  "before": "Choice A is correct. Since 1 kilometer is equal to 1,000 meters, it follows that 90 kilometers is equal to meters. Since 1\nhour is equal to 60 minutes and 1 minute is equal to 60 seconds, it follows that 1 hour is equal to seconds. Now\nis equal to , which reduces to or 25 meters per second.\nChoices B, C, and D are incorrect and may result from conceptual or calculation errors.",
+  "after": "Choice A is correct. Since 1 kilometer is equal to 1,000 meters, it follows that 90 kilometers is equal to $90(1{,}000)=90{,}000$ meters. Since 1 hour is equal to 60 minutes and 1 minute is equal to 60 seconds, it follows that 1 hour is equal to $60(60)=3{,}600$ seconds. Now $\\frac{90 \\text{ kilometers}}{1 \\text{ hour}}$ is equal to $\\frac{90{,}000 \\text{ meters}}{3{,}600 \\text{ seconds}}$, which reduces to $\\frac{25 \\text{ meters}}{1 \\text{ second}}$ or 25 meters per second.\nChoices B, C, and D are incorrect and may result from conceptual or calculation errors.",
+  "class": "stripped_math",
+  "note": "PS Ratios, rates, proportional relationships, and units - MEDIUM #7: restored 90(1,000) = 90,000, 60(60) = 3,600 and 90 km/1 h = 90,000 m/3,600 s → 25 m/1 s",
+  "evidence": "ANS Ratios Rates Proport. Units MED.pdf p7 (Question ID 8917ce38)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1tm039xqmt14d658ff5",
+  "field": "explanation",
+  "before": "Choice B is correct. It is given that the volume of the glass is approximately 16 fluid ounces. If Jenny has 1 gallon of water, which is 128 fluid\nounces, she could fill the glass times.\nChoice A is incorrect because Jenny would need fluid ounces = 256 fluid ounces, or 2 gallons, of water to fill the glass 16 times.\nChoice C is incorrect because Jenny would need only fluid ounces = 64 fluid ounces of water to fill the glass 4 times. Choice D is\nincorrect because Jenny would need only fluid ounces = 48 fluid ounces to fill the glass 3 times.",
+  "after": "Choice B is correct. It is given that the volume of the glass is approximately 16 fluid ounces. If Jenny has 1 gallon of water, which is 128 fluid ounces, she could fill the glass $\\frac{128}{16}=8$ times.\nChoice A is incorrect because Jenny would need $16\\times16$ fluid ounces = 256 fluid ounces, or 2 gallons, of water to fill the glass 16 times.\nChoice C is incorrect because Jenny would need only $4\\times16$ fluid ounces = 64 fluid ounces of water to fill the glass 4 times. Choice D is incorrect because Jenny would need only $3\\times16$ fluid ounces = 48 fluid ounces to fill the glass 3 times.",
+  "class": "stripped_math",
+  "note": "PS Ratios, rates, proportional relationships, and units - MEDIUM #9: restored 128/16 = 8, 16×16, 4×16, 3×16",
+  "evidence": "ANS Ratios Rates Proport. Units MED.pdf p9 (Question ID 939c46d1)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1tq03a2qmt1v7g17o7c",
+  "field": "explanation",
+  "before": "Choice A is correct. It’s given that when Tanya works z hours, she earns dollars. Since her hourly rate is constant, if she works 3 times\nas many hours, or hours, she will earn 3 times as many dollars, or .\nChoice B is incorrect. This expression represents adding 3 dollars to the dollars Tanya will earn. Choice C is incorrect. This expression\ncan be rewritten as , which implies that Tanya earns $16.50 per hour, not $13.50. Choice D is incorrect. This expression adds 3 to the\nnumber of hours Tanya works, rather than multiplying the hours she works by 3.",
+  "after": "Choice A is correct. It’s given that when Tanya works z hours, she earns $13.50z$ dollars. Since her hourly rate is constant, if she works 3 times as many hours, or $3z$ hours, she will earn 3 times as many dollars, or $3(13.50z)$.\nChoice B is incorrect. This expression represents adding 3 dollars to the $13.50z$ dollars Tanya will earn. Choice C is incorrect. This expression can be rewritten as $16.50z$, which implies that Tanya earns \\$16.50 per hour, not \\$13.50. Choice D is incorrect. This expression adds 3 to the number of hours Tanya works, rather than multiplying the hours she works by 3.",
+  "class": "stripped_math",
+  "note": "PS Ratios, rates, proportional relationships, and units - MEDIUM #10: restored 13.50z, 3z, 3(13.50z), 13.50z, 16.50z; escaped currency \\$16.50 / \\$13.50 (were pairing into a bogus math span)",
+  "evidence": "ANS Ratios Rates Proport. Units MED.pdf p10 (Question ID 445dd032)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1tx03a3qmt1bkbgon4j",
+  "field": "explanation",
+  "before": "Choice D is correct. Since 1 minute = 60 seconds and 1 hour = 60 minutes, it follows that 1 hour = (60)(60), or 3,600 seconds. Using this\nconversion factor, the space station’s average speed of 4.76 miles per second is equal to an average speed of\n, or 17,136 miles per hour.\nChoice A is incorrect. This is the space station’s average speed in miles per minute. Choice B is incorrect. This is double the space station’s\naverage speed in miles per minute, or the number of miles the space station travels on average in 2 minutes. Choice C is incorrect. This is triple\nthe space station’s average speed in miles per minute, or the number of miles the space station travels on average in 3 minutes.",
+  "after": "Choice D is correct. Since 1 minute = 60 seconds and 1 hour = 60 minutes, it follows that 1 hour = (60)(60), or 3,600 seconds. Using this conversion factor, the space station’s average speed of 4.76 miles per second is equal to an average speed of $\\frac{4.76 \\text{ miles}}{\\text{second}}\\times\\frac{3{,}600 \\text{ seconds}}{\\text{hour}}=\\frac{17{,}136 \\text{ miles}}{\\text{hour}}$, or 17,136 miles per hour.\nChoice A is incorrect. This is the space station’s average speed in miles per minute. Choice B is incorrect. This is double the space station’s average speed in miles per minute, or the number of miles the space station travels on average in 2 minutes. Choice C is incorrect. This is triple the space station’s average speed in miles per minute, or the number of miles the space station travels on average in 3 minutes.",
+  "class": "stripped_math",
+  "note": "PS Ratios, rates, proportional relationships, and units - MEDIUM #11: restored 4.76 miles/second × 3,600 seconds/hour = 17,136 miles/hour",
+  "evidence": "ANS Ratios Rates Proport. Units MED.pdf p11 (Question ID d28c29e1)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1u703adqmt1cqywu1cg",
+  "field": "explanation",
+  "before": "The correct answer is 4.44. The selling price, in dollars per cubic inch, is found by multiplying the density, in ounces per cubic inch, by the unit\nprice, in dollars per ounce: yields . Thus, the selling price, in dollars per cubic inch, is 4.44.",
+  "after": "The correct answer is 4.44. The selling price, in dollars per cubic inch, is found by multiplying the density, in ounces per cubic inch, by the unit price, in dollars per ounce: $\\left(\\frac{0.555 \\text{ ounce}}{1 \\text{ cubic inch}}\\right)\\left(\\frac{\\$8.00}{1 \\text{ ounce}}\\right)$ yields $\\frac{\\$4.44}{1 \\text{ cubic inch}}$. Thus, the selling price, in dollars per cubic inch, is 4.44.",
+  "class": "stripped_math",
+  "note": "PS Ratios, rates, proportional relationships, and units - MEDIUM #13: restored unit-price product (0.555 ounce / 1 cubic inch)($8.00 / 1 ounce) yields $4.44 / 1 cubic inch",
+  "evidence": "ANS Ratios Rates Proport. Units MED.pdf p13 (Question ID 8e528129)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1ub03aeqmt1d6psm1iz",
+  "field": "explanation",
+  "before": "The correct answer is 25.4. The average speed is the total distance divided by the total time. The total distance is 11 miles and the total time is\n26 minutes. Thus, the average speed is miles per minute. The question asks for the average speed in miles per hour, and there are 60\nminutes in an hour; converting miles per minute to miles per hour gives the following:\nTherefore, to the nearest tenth of a mile per hour, the average speed of Paul Revere’s ride would have been 25.4 miles per hour. Note that 25.4\nand 127/5 are examples of ways to enter a correct answer.",
+  "after": "The correct answer is 25.4. The average speed is the total distance divided by the total time. The total distance is 11 miles and the total time is 26 minutes. Thus, the average speed is $\\frac{11}{26}$ miles per minute. The question asks for the average speed in miles per hour, and there are 60 minutes in an hour; converting miles per minute to miles per hour gives the following:\n$$\\text{Average speed} = \\frac{11 \\text{ miles}}{26 \\text{ minutes}} \\times \\frac{60 \\text{ minutes}}{1 \\text{ hour}}$$\n$$= \\frac{660}{26} \\text{ miles per hour}$$\n$$\\approx 25.38 \\text{ miles per hour}$$\nTherefore, to the nearest tenth of a mile per hour, the average speed of Paul Revere’s ride would have been 25.4 miles per hour. Note that 25.4 and 127/5 are examples of ways to enter a correct answer.",
+  "class": "stripped_math",
+  "note": "PS Ratios, rates, proportional relationships, and units - MEDIUM #14: restored 11/26 miles per minute and the 3-line conversion display (11 miles/26 minutes × 60 minutes/1 hour = 660/26 ≈ 25.38 miles per hour); joined hard line breaks",
+  "evidence": "ANS Ratios Rates Proport. Units MED.pdf p14 (Question ID fea831fc)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro28l03gmqmt1b1ewujq5",
+  "field": "explanation",
+  "before": "Choice D is correct. When a study uses a randomly selected sample, the largest group to which the results of the study can be applied is the\npopulation from which the sample was selected. It's given that the scientist randomly selected the trees from the baobab trees in a certain\nhabitat that were years old. Therefore, the largest group to which the results of this study can be applied is all the baobab trees that were\nyears old in this habitat.\nChoice A is incorrect. Since the sample was randomly selected from a population, the results can be applied to a larger group than the sample.\nChoice B is incorrect. The sample was selected from a population of baobab trees that were years old, not years old.\nChoice C is incorrect. The sample was selected from a certain tree habitat in South Africa, not from all the baobab trees that were years old in\nSouth Africa.",
+  "after": "Choice D is correct. When a study uses a randomly selected sample, the largest group to which the results of the study can be applied is the population from which the sample was selected. It's given that the scientist randomly selected the trees from the baobab trees in a certain habitat that were 17 years old. Therefore, the largest group to which the results of this study can be applied is all the baobab trees that were 17 years old in this habitat.\nChoice A is incorrect. Since the sample was randomly selected from a population, the results can be applied to a larger group than the sample.\nChoice B is incorrect. The sample was selected from a population of baobab trees that were 17 years old, not 19 years old.\nChoice C is incorrect. The sample was selected from a certain tree habitat in South Africa, not from all the baobab trees that were 17 years old in South Africa.",
+  "class": "stripped_math",
+  "note": "PS Statistical Claims - HARD #6: restored the math-font numbers 17 (x4) and 19 dropped from the rationale",
+  "evidence": "ANS Stat. Claims HARD.pdf p6 (Question ID 6fca0144)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1oo037cqmt14nby61ls",
+  "field": "explanation",
+  "before": "Choice C is correct. According to the line of best fit, a planetoid with a distance from the Sun of 1.2 AU has a predicted density between\nand . The only choice in this range is 4.6.\nChoices A, B, and D are incorrect and may result from misreading the information in the scatterplot.",
+  "after": "Choice C is correct. According to the line of best fit, a planetoid with a distance from the Sun of 1.2 AU has a predicted density between $4.5 \\text{ g/cm}^3$ and $4.75 \\text{ g/cm}^3$. The only choice in this range is 4.6.\nChoices A, B, and D are incorrect and may result from misreading the information in the scatterplot.",
+  "class": "stripped_math",
+  "note": "PS Two-variable data: Models and scatterplots - EASY #1: restored density bounds 4.5 g/cm^3 and 4.75 g/cm^3",
+  "evidence": "ANS TWO Var. Data EASY.pdf p1 (Question ID cf0ae57a)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1p1037mqmt1iz5u0dsh",
+  "field": "explanation",
+  "before": "Choices A, B, and D are incorrect and may be the result of incorrectly reading the given quadratic model. The corresponding x-values to the y-\nvalues of 25 and 30 are not part of the model. The corresponding x-value to a y-value of 250 is approximately 60 mph, not 55 mph.",
+  "after": "Choice C is correct. According to the model, the stopping distance, in feet, of a vehicle traveling 55 miles per hour is about 200 feet. Of the choices given, the best estimate of the stopping distance for a car traveling 55 miles per hour is 210 feet.\nChoices A, B, and D are incorrect and may be the result of incorrectly reading the given quadratic model. The corresponding x-values to the y-values of 25 and 30 are not part of the model. The corresponding x-value to a y-value of 250 is approximately 60 mph, not 55 mph.",
+  "class": "explanation_truncated",
+  "note": "PS Two-variable data: Models and scatterplots - EASY #3: explanation was missing its whole \"Choice C is correct\" paragraph (only the incorrect-choices paragraph was kept); restored from ANS; fixed y-values line-wrap hyphen",
+  "evidence": "ANS TWO Var. Data EASY.pdf p3 (Question ID 5c24c861)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1pa037rqmt1qch3m3s4",
+  "field": "explanation",
+  "before": "The correct answer is 480. An average temperature of corresponds to the value 32 on the x-axis. On the line of best fit, an x-value of 32\ncorresponds to a y-value of 480. The values on the y-axis correspond to the number of people predicted to visit this beach. Therefore, 480 people\nare predicted to visit this beach on a day with an average temperature of .",
+  "after": "The correct answer is 480. An average temperature of $32^\\circ\\text{C}$ corresponds to the value 32 on the x-axis. On the line of best fit, an x-value of 32 corresponds to a y-value of 480. The values on the y-axis correspond to the number of people predicted to visit this beach. Therefore, 480 people are predicted to visit this beach on a day with an average temperature of $32^\\circ\\text{C}$.",
+  "class": "stripped_math",
+  "note": "PS Two-variable data: Models and scatterplots - EASY #4: restored 32°C (twice)",
+  "evidence": "ANS TWO Var. Data EASY.pdf p4 (Question ID 8156d446)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1pi037sqmt191vzs0rq",
+  "field": "explanation",
+  "before": "Choice B is correct. According to the graph, when the car is traveling at 50 miles per hour, the braking distance is approximately 225 feet, and\nwhen the car is traveling at 30 miles per hour, the braking distance is approximately 100 feet. The difference between these braking distances is\n, or 125 feet.\nChoice A is incorrect and may result from finding the braking distance for 20 miles per hour, the difference between the given speeds. Choice C\nis incorrect and may result from subtracting the speed from the braking distance at 50 miles per hour. Choice D is incorrect and may result from\nfinding the difference in the braking distances at 60 and 20 miles per hour.",
+  "after": "Choice B is correct. According to the graph, when the car is traveling at 50 miles per hour, the braking distance is approximately 225 feet, and when the car is traveling at 30 miles per hour, the braking distance is approximately 100 feet. The difference between these braking distances is $225 - 100$, or 125 feet.\nChoice A is incorrect and may result from finding the braking distance for 20 miles per hour, the difference between the given speeds. Choice C is incorrect and may result from subtracting the speed from the braking distance at 50 miles per hour. Choice D is incorrect and may result from finding the difference in the braking distances at 60 and 20 miles per hour.",
+  "class": "stripped_math",
+  "note": "PS Two-variable data: Models and scatterplots - EASY #5: restored difference 225 − 100",
+  "evidence": "ANS TWO Var. Data EASY.pdf p5 (Question ID d6121490)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1po037xqmt1ghnxk1ot",
+  "field": "explanation",
+  "before": "Choice A is correct. A line of best fit for the data in a scatterplot is a line that follows the trend of the data with approximately half the data points\nabove and half the data points below the line. Based on the given data, a line of best fit will have a positive y-intercept on or near the point\nand a negative slope. All of the choices are in slope-intercept form , where m is the slope and b is the y-coordinate of the y-\nintercept. Only choice A is an equation of a line with a positive y-intercept at and a negative slope, .\nChoice B is incorrect. This equation is for a line that has a negative y-intercept, not a positive y-intercept. Choices C and D are incorrect and may\nresult from one or more sign errors and from switching the values of the y-intercept and the slope in the equation.",
+  "after": "Choice A is correct. A line of best fit for the data in a scatterplot is a line that follows the trend of the data with approximately half the data points above and half the data points below the line. Based on the given data, a line of best fit will have a positive y-intercept on or near the point $(0, 6)$ and a negative slope. All of the choices are in slope-intercept form $y = mx + b$, where m is the slope and b is the y-coordinate of the y- intercept. Only choice A is an equation of a line with a positive y-intercept at $(0, 6)$ and a negative slope, $-1$.\nChoice B is incorrect. This equation is for a line that has a negative y-intercept, not a positive y-intercept. Choices C and D are incorrect and may result from one or more sign errors and from switching the values of the y-intercept and the slope in the equation.",
+  "class": "stripped_math",
+  "note": "PS Two-variable data: Models and scatterplots - EASY #6: restored point (0, 6) twice, y = mx + b, and slope −1",
+  "evidence": "ANS TWO Var. Data EASY.pdf p6 (Question ID 9296553d)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1px037yqmt11q8028sc",
+  "field": "explanation",
+  "before": "Choice D is correct. The change in the number of 3-D movies released between any two consecutive years can be found by first estimating the\nnumber of 3-D movies released for each of the two years and then finding the positive difference between these two estimates. Between 2003\nand 2004, this change is approximately movies; between 2008 and 2009, this change is approximately movies;\nbetween 2009 and 2010, this change is approximately movies; and between 2010 and 2011, this change is approximately\nmovies. Therefore, of the pairs of consecutive years in the choices, the greatest increase in the number of 3-D movies released\noccurred during the time period between 2010 and 2011.\nChoices A, B, and C are incorrect. Between 2010 and 2011, approximately 20 more 3-D movies were released. The change in the number of 3-D\nmovies released between any of the other pairs of consecutive years is significantly smaller than 20.",
+  "after": "Choice D is correct. The change in the number of 3-D movies released between any two consecutive years can be found by first estimating the number of 3-D movies released for each of the two years and then finding the positive difference between these two estimates. Between 2003 and 2004, this change is approximately $2-2=0$ movies; between 2008 and 2009, this change is approximately $20-8=12$ movies; between 2009 and 2010, this change is approximately $26-20=6$ movies; and between 2010 and 2011, this change is approximately $46-26=20$ movies. Therefore, of the pairs of consecutive years in the choices, the greatest increase in the number of 3-D movies released occurred during the time period between 2010 and 2011.\nChoices A, B, and C are incorrect. Between 2010 and 2011, approximately 20 more 3-D movies were released. The change in the number of 3-D movies released between any of the other pairs of consecutive years is significantly smaller than 20.",
+  "class": "stripped_math",
+  "note": "PS Two-variable data: Models and scatterplots - EASY #7: restored the four year-to-year differences 2−2=0, 20−8=12, 26−20=6, 46−26=20",
+  "evidence": "ANS TWO Var. Data EASY.pdf p7 (Question ID a6b2fcce)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1q50383qmt19v48wzny",
+  "field": "explanation",
+  "before": "Choice C is correct. The data in the scatterplot show an increasing linear trend. The density when the juice concentration is 60% will be between\n3\nthe densities shown at about 53% and 67% concentration, or between about 1,255 and 1,340 kg/m . Of the choices given, only 1,300 falls within\nthis range.\nChoices A, B, and D are incorrect. These are the approximate densities of grape juice with a concentration of 45%, 55%, and 70%, respectively.",
+  "after": "Choice C is correct. The data in the scatterplot show an increasing linear trend. The density when the juice concentration is 60% will be between the densities shown at about 53% and 67% concentration, or between about 1,255 and 1,340 $\\text{kg/m}^3$. Of the choices given, only 1,300 falls within this range.\nChoices A, B, and D are incorrect. These are the approximate densities of grape juice with a concentration of 45%, 55%, and 70%, respectively.",
+  "class": "broken_math",
+  "note": "PS Two-variable data: Models and scatterplots - EASY #8: superscript 3 of kg/m^3 had been split onto its own line (\"between\\n3\\nthe densities ... kg/m .\"); restored kg/m^3",
+  "evidence": "ANS TWO Var. Data EASY.pdf p8 (Question ID c9dd92b1)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1qu038iqmt106iz94m1",
+  "field": "explanation",
+  "before": "Choice B is correct. The line of best fit passes through the point . Therefore, the line of best fit predicts a temperature of 39°F for a\nlocation in Lake Tahoe Basin with an elevation of 8,500 feet.\nChoice A is incorrect. This is the lowest temperature listed on the scatterplot, and the line of best fit never crosses this value for any of the\nelevations shown. Choice C is incorrect. According to the line of best fit, the temperature of 41°F is predicted for an elevation of slightly greater\nthan 7,500 feet, not an elevation of 8,500 feet. Choice D is incorrect. According to the line of best fit, the temperature of 43°F is predicted for an\nelevation of roughly 6,700 feet, not an elevation of 8,500 feet.",
+  "after": "Choice B is correct. The line of best fit passes through the point $(8{,}500, 39)$. Therefore, the line of best fit predicts a temperature of 39°F for a location in Lake Tahoe Basin with an elevation of 8,500 feet.\nChoice A is incorrect. This is the lowest temperature listed on the scatterplot, and the line of best fit never crosses this value for any of the elevations shown. Choice C is incorrect. According to the line of best fit, the temperature of 41°F is predicted for an elevation of slightly greater than 7,500 feet, not an elevation of 8,500 feet. Choice D is incorrect. According to the line of best fit, the temperature of 43°F is predicted for an elevation of roughly 6,700 feet, not an elevation of 8,500 feet.",
+  "class": "stripped_math",
+  "note": "PS Two-variable data: Models and scatterplots - EASY #11: restored point (8,500, 39)",
+  "evidence": "ANS TWO Var. Data EASY.pdf p11 (Question ID ac5b6558)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro13n02vgqmt1kgz5rsr0",
+  "field": "explanation",
+  "before": "Choice C is correct. The predicted increase in total fat, in grams, for every increase of 1 gram in total protein is represented by the slope of the\nline of best fit. Any two points on the line can be used to calculate the slope of the line as the change in total fat over the change in total protein.\nFor instance, it can be estimated that the points and are on the line of best fit, and the slope of the line that passes through\nthem is , or 1.4. Of the choices given, 1.5 is the closest to the slope of the line of best fit.\nChoices A, B, and D are incorrect and may be the result of incorrectly finding ordered pairs that lie on the line of best fit or of incorrectly\ncalculating the slope.",
+  "after": "Choice C is correct. The predicted increase in total fat, in grams, for every increase of 1 gram in total protein is represented by the slope of the line of best fit. Any two points on the line can be used to calculate the slope of the line as the change in total fat over the change in total protein. For instance, it can be estimated that the points $(20, 34)$ and $(30, 48)$ are on the line of best fit, and the slope of the line that passes through them is $\\frac{48 - 34}{30 - 20} = \\frac{14}{10}$, or 1.4. Of the choices given, 1.5 is the closest to the slope of the line of best fit.\nChoices A, B, and D are incorrect and may be the result of incorrectly finding ordered pairs that lie on the line of best fit or of incorrectly calculating the slope.",
+  "class": "stripped_math",
+  "note": "PS Two-variable data: Models and scatterplots - HARD #4: restored points (20, 34), (30, 48) and slope (48−34)/(30−20) = 14/10",
+  "evidence": "ANS TWO Var. Data HARD.pdf p4 (Question ID 9d95e7ad)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro13q02vlqmt1sqt5heft",
+  "field": "explanation",
+  "before": "Choice A is correct. Account A starts with $500 and earns interest at 6% per year, so in the first year Account A earns (500)(0.06) = $30, which is\ngreater than the $25 that Account B earns that year. Compounding interest can be modeled by an increasing exponential function, so each year\nAccount A will earn more money than it did the previous year. Therefore, each year Account A earns at least $30 in interest. Since Account B\nalways earns $25 each year, Account A always earns more money per year than Account B.\nChoices B and D are incorrect. Account A earns $30 in the first year, which is greater than the $25 Account B earns in the first year. Therefore,\nneither the statement that Account A always earns less money per year than Account B nor the statement that Account A earns less money than\nAccount B at first can be true. Choice C is incorrect. Since compounding interest can be modeled by an increasing exponential function, each\nyear Account A will earn more money than it did the previous year. Therefore, Account A always earns at least $30 per year, which is more than\nthe $25 per year that Account B earns.",
+  "after": "Choice A is correct. Account A starts with \\$500 and earns interest at 6% per year, so in the first year Account A earns (500)(0.06) = \\$30, which is greater than the \\$25 that Account B earns that year. Compounding interest can be modeled by an increasing exponential function, so each year Account A will earn more money than it did the previous year. Therefore, each year Account A earns at least \\$30 in interest. Since Account B always earns \\$25 each year, Account A always earns more money per year than Account B.\nChoices B and D are incorrect. Account A earns \\$30 in the first year, which is greater than the \\$25 Account B earns in the first year. Therefore, neither the statement that Account A always earns less money per year than Account B nor the statement that Account A earns less money than Account B at first can be true. Choice C is incorrect. Since compounding interest can be modeled by an increasing exponential function, each year Account A will earn more money than it did the previous year. Therefore, Account A always earns at least \\$30 per year, which is more than the \\$25 per year that Account B earns.",
+  "class": "currency_dollar",
+  "note": "PS Two-variable data: Models and scatterplots - HARD #5: text matches ANS word for word, but literal currency dollars ($500, $30, $25) were unescaped and would pair up as math; escaped as \\$",
+  "evidence": "ANS TWO Var. Data HARD.pdf p5 (Question ID af142f8d)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro13y02vrqmt18ihfb28k",
+  "field": "explanation",
+  "before": "Choice D is correct. The data in the scatterplot roughly fall in the shape of a downward-opening parabola; therefore, the coefficient for the\nterm must be negative. Based on the location of the data points, the y-intercept of the parabola should be somewhere between 740 and 760.\nTherefore, of the equations given, the best model is .\nChoices A and C are incorrect. The positive coefficient of the term means that these equations each define upward-opening parabolas,\nwhereas a parabola that fits the data in the scatterplot must open downward. Choice B is incorrect because it defines a parabola with a y-\nintercept that has a negative y-coordinate, whereas a parabola that fits the data in the scatterplot must have a y-intercept with a positive y-\ncoordinate.",
+  "after": "Choice D is correct. The data in the scatterplot roughly fall in the shape of a downward-opening parabola; therefore, the coefficient for the $x^2$ term must be negative. Based on the location of the data points, the y-intercept of the parabola should be somewhere between 740 and 760. Therefore, of the equations given, the best model is $y = -1.674x^2 + 19.76x + 745.73$.\nChoices A and C are incorrect. The positive coefficient of the $x^2$ term means that these equations each define upward-opening parabolas, whereas a parabola that fits the data in the scatterplot must open downward. Choice B is incorrect because it defines a parabola with a y-intercept that has a negative y-coordinate, whereas a parabola that fits the data in the scatterplot must have a y-intercept with a positive y-coordinate.",
+  "class": "stripped_math",
+  "note": "PS Two-variable data: Models and scatterplots - HARD #7: restored x^2 (twice) and best model y = −1.674x^2 + 19.76x + 745.73; fixed y-intercept/y-coordinate line-wrap hyphens",
+  "evidence": "ANS TWO Var. Data HARD.pdf p7 (Question ID e821a26d)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0pm02q4qmt1ga5wfcw3",
+  "field": "explanation",
+  "before": "The correct answer is 285. The number of people predicted to visit the beach each day is represented by the y-values of the line of best fit, and the average\ntemperature, in degrees Celsius ( ), is represented by the x-values. Since the slope of the line of best fit is approximately 57, the y-value, or the number of people\npredicted to visit the beach each day, increases by 57 for every x-value increase of 1, or every increase in average temperature. Therefore, an increase of\nin average temperature corresponds to a y-value increase of additional people per day predicted to visit the beach.",
+  "after": "The correct answer is 285. The number of people predicted to visit the beach each day is represented by the y-values of the line of best fit, and the average temperature, in degrees Celsius (°C), is represented by the x-values. Since the slope of the line of best fit is approximately 57, the y-value, or the number of people predicted to visit the beach each day, increases by 57 for every x-value increase of 1, or every 1°C increase in average temperature. Therefore, an increase of 5°C in average temperature corresponds to a y-value increase of $57(5) = 285$ additional people per day predicted to visit the beach.",
+  "class": "stripped_math",
+  "note": "PS Two-variable data: Models and scatterplots - HARD #8: restored °C, 1°C, 5°C and 57(5) = 285",
+  "evidence": "Data Distribut, mean ANS HARD.pdf p37 (Question ID d0430601)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0jz02okqmt1701ofkw4",
+  "field": "explanation",
+  "before": "Choice A is correct. It's given that an equation for the exponential model shown can be written as 𝑦=𝑎𝑏𝑥 , where 𝑎 and 𝑏 are positive constants. For an exponential\nmodel written in this form, if the value of 𝑏 is greater than 0 but less than 1, the model is decreasing. If the value of 𝑏 is greater than 1, the model is increasing. The\nexponential model shown is decreasing. Therefore, the value of 𝑏 is greater than 0 but less than 1. Of the given choices, only 0.83 is a value greater than 0 but less\nthan 1. Thus, 0.83 is closest to the value of 𝑏.\nChoice B is incorrect and may result from conceptual or calculation errors.\nChoice C is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "after": "Choice A is correct. It's given that an equation for the exponential model shown can be written as $y = ab^x$, where $a$ and $b$ are positive constants. For an exponential model written in this form, if the value of $b$ is greater than 0 but less than 1, the model is decreasing. If the value of $b$ is greater than 1, the model is increasing. The exponential model shown is decreasing. Therefore, the value of $b$ is greater than 0 but less than 1. Of the given choices, only 0.83 is a value greater than 0 but less than 1. Thus, 0.83 is closest to the value of $b$.\nChoice B is incorrect and may result from conceptual or calculation errors.\nChoice C is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "class": "unicode_math_italic",
+  "note": "PS Two-variable data: Models and scatterplots - HARD #9: Unicode math-italic 𝑦=𝑎𝑏𝑥 / 𝑎 / 𝑏 replaced with $y = ab^x$, $a$, $b$ as in rendered ANS p4",
+  "evidence": "Data Distribut, mean ANS HARD.pdf p4 (Question ID fb866265)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0k502omqmt1mvtvw4zk",
+  "field": "explanation",
+  "before": "Choice A is correct. An equation of a line of best fit for data set F can be written in the form 𝑦=𝑎+𝑏𝑥, where 𝑎 is the y-coordinate of the y-intercept of the line of\nbest fit and 𝑏 is the slope. The line of best fit shown for data set E has a y-intercept at approximately 0,12. It's given that data set F is created by multiplying the y-\ncoordinate of each data point from data set E by 3.9. It follows that a line of best fit for data set F has a y-intercept at approximately 0,123.9, or 0,46.8. Therefore, the\n𝑦 -𝑦\nvalue of 𝑎 is approximately 46.8. The slope of a line that passes through points 𝑥 1 ,𝑦 1 and 𝑥 2 ,𝑦 2 can be calculated as 𝑥 2 -𝑥 1. Since the line of best fit shown for data\n2 1\nset E passes approximately through the point 12,30, it follows that a line of best fit for data set F passes approximately through the point 12,303.9, or 12,117.\n𝑦 -𝑦 117-46.8 70.2\nSubstituting 0,46.8 and 12,117 for 𝑥 1 ,𝑦 1 and 𝑥 2 ,𝑦 2 , respectively, in 𝑥 2 -𝑥 1 yields 12-0 , which is equivalent to 12 , or 5.85. Therefore, the value of 𝑏 is approximately\n2 1\n5.85, or approximately 5.9. Thus, 𝑦=46.8+5.9𝑥 could be an equation of a line of best fit for data set F.\nChoice B is incorrect and may result from conceptual or calculation errors.\nChoice C is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect. This could be an equation of a line of best fit for data set E, not data set F.",
+  "after": "Choice A is correct. An equation of a line of best fit for data set F can be written in the form $y = a + bx$, where $a$ is the y-coordinate of the y-intercept of the line of best fit and $b$ is the slope. The line of best fit shown for data set E has a y-intercept at approximately 0, 12. It's given that data set F is created by multiplying the y-coordinate of each data point from data set E by 3.9. It follows that a line of best fit for data set F has a y-intercept at approximately 0, 123.9, or 0, 46.8. Therefore, the value of $a$ is approximately 46.8. The slope of a line that passes through points $x_1, y_1$ and $x_2, y_2$ can be calculated as $\\frac{y_2 - y_1}{x_2 - x_1}$. Since the line of best fit shown for data set E passes approximately through the point 12, 30, it follows that a line of best fit for data set F passes approximately through the point 12, 303.9, or 12, 117. Substituting 0, 46.8 and 12, 117 for $x_1, y_1$ and $x_2, y_2$, respectively, in $\\frac{y_2 - y_1}{x_2 - x_1}$ yields $\\frac{117 - 46.8}{12 - 0}$, which is equivalent to $\\frac{70.2}{12}$, or 5.85. Therefore, the value of $b$ is approximately 5.85, or approximately 5.9. Thus, $y = 46.8 + 5.9x$ could be an equation of a line of best fit for data set F.\nChoice B is incorrect and may result from conceptual or calculation errors.\nChoice C is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect. This could be an equation of a line of best fit for data set E, not data set F.",
+  "class": "unicode_math_italic",
+  "note": "PS Two-variable data: Models and scatterplots - HARD #10: Unicode math-italic and flattened fractions (𝑦 -𝑦 / 2 1 / 𝑥 2 -𝑥 1, 117-46.8 / 12-0, 70.2 / 12) rebuilt as LaTeX from rendered ANS p7; subscripts x_1,y_1,x_2,y_2 restored; coordinate pairs kept exactly as the ANS prints them (no parentheses: 0, 12 / 0, 123.9 / 12, 303.9); see needs_review note in findings",
+  "evidence": "Data Distribut, mean ANS HARD.pdf p7 (Question ID 2e8027b0)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1rn038wqmt1obu1s7w3",
+  "field": "explanation",
+  "before": "Choice A is correct. An equation of a line of best fit can be written in the form $y = a + bx$, where a is the y-intercept of the line and b is the slope. In the scatterplot shown, the line of best fit intersects the y-axis just over halfway between 10,000 and 20,000, or approximately 16,000. The line of best fit also intersects the graph at (5,40,000). Using the slope formula $b = \\frac{y_2 - y_1}{x_2 - x_1}$ and two points that lie on the graph such as (5,40,000) and (0,16,000), the slope can be approximated as $\\frac{40,000 - 16,000}{5 - 0}$, or 4,800. Only choice A has a y-intercept near the estimate of 16,000 and a slope near the estimate of 4,800. Therefore, an equation of the line of best fit could be $n = 16,090 + 4,680t$. Choice B is incorrect because the values for the slope and the y-coordinate of the y-intercept are switched. Choice C is incorrect because the value for the slope is approximately double the actual slope. Choice D is incorrect because the values for the slope and the y-intercept are switched and because the slope is approximately double the actual slope.",
+  "after": "Choice A is correct. An equation of a line of best fit can be written in the form $y = a + bx$, where a is the y-intercept of the line and b is the slope. In the scatterplot shown, the line of best fit intersects the y-axis just over halfway between 10,000 and 20,000, or approximately 16,000. The line of best fit also intersects the graph at (5,40,000). Using the slope formula $b = \\frac{y_2 - y_1}{x_2 - x_1}$ and two points that lie on the graph such as (5,40,000) and (0,16,000), the slope can be approximated as $\\frac{40{,}000 - 16{,}000}{5 - 0}$, or 4,800. Only choice A has a y-intercept near the estimate of 16,000 and a slope near the estimate of 4,800. Therefore, an equation of the line of best fit could be $n = 16{,}090 + 4{,}680t$. Choice B is incorrect because the values for the slope and the y-coordinate of the y-intercept are switched. Choice C is incorrect because the value for the slope is approximately double the actual slope. Choice D is incorrect because the values for the slope and the y-intercept are switched and because the slope is approximately double the actual slope.",
+  "class": "broken_math",
+  "note": "PS Two-variable data: Models and scatterplots - MEDIUM #4: math matches ANS p4; thousands commas inside $…$ (40,000, 16,000, 16,090, 4,680) rendered by KaTeX as list commas with a space; rewritten as {,}",
+  "evidence": "ANS TWO Var. Data MED.pdf p4 (Question ID 3c5b19ef)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsp5ap5600010vmkwuarngfj",
+  "field": "explanation",
+  "before": "Choice B is correct. Since the work is done at a constant rate, a linear model best models the situation. The number of shirts remaining is dependent on the length of time the inspector has worked; therefore, if the relationship were graphed, time would be the variable of the horizontal axis and the number of remaining shirts would be the variable of the vertical axis. Since the number of shirts",
+  "after": "Choice B is correct. Since the work is done at a constant rate, a linear model best models the situation. The number of shirts remaining is dependent on the length of time the inspector has worked; therefore, if the relationship were graphed, time would be the variable of the horizontal axis and the number of remaining shirts would be the variable of the vertical axis. Since the number of shirts decreases as the time worked increases, it follows that the slope of this graph is negative.\nChoice A is incorrect and may result from incorrectly reasoning about the slope. Choices C and D are incorrect and may result from not identifying the constant rate of work as a characteristic of a linear model.",
+  "class": "explanation_truncated",
+  "note": "PS Two-variable data: Models and scatterplots - MEDIUM #7: explanation cut mid-sentence (\"Since the number of shirts\"); appended the rest of the sentence and the Choice A / Choices C and D paragraph from ANS",
+  "evidence": "ANS TWO Var. Data MED.pdf p7 (Question ID 7ac5d686)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0oo02peqmt1n208ut5p",
+  "field": "stem",
+  "before": "Value Frequency\n1 a\n2 2a\n3 3a\n4 2a\n5 a\nThe frequency distribution above summarizes a set of data, where a is a positive integer. How much\ngreater is the mean of the set of data than the median?",
+  "after": "| Value | Frequency |\n| --- | --- |\n| 1 | $a$ |\n| 2 | $2a$ |\n| 3 | $3a$ |\n| 4 | $2a$ |\n| 5 | $a$ |\n\nThe frequency distribution above summarizes a set of data, where $a$ is a positive integer. How much greater is the mean of the set of data than the median?",
+  "class": "flattened_table",
+  "note": "PS One-variable data: Distributions and measures of center and spread - HARD - #1 #10: Value/Frequency table flattened into \"1 a / 2 2a …\" lines; rebuilt as a pipe table with the source headers; italic a as $a$",
+  "evidence": "Data Distribut, mean ANS HARD.pdf p23 (Question ID 1142af44); also ANS One Var. Data HARD.pdf p7"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1q50383qmt19v48wzny",
+  "field": "stem",
+  "before": "The densities of different concentrations of grape juice are shown in the scatterplot above. According to the trend shown by the data, which of\n3\nthe following is closest to the predicted density, in kilograms per cubic meter (kg/m ), for grape juice with a concentration of 60%?",
+  "after": "The densities of different concentrations of grape juice are shown in the scatterplot above. According to the trend shown by the data, which of the following is closest to the predicted density, in kilograms per cubic meter ($\\text{kg/m}^3$), for grape juice with a concentration of 60%?",
+  "class": "broken_math",
+  "note": "PS Two-variable data: Models and scatterplots - EASY #8: superscript 3 of kg/m^3 had been split onto its own line (\"which of\\n3\\nthe following … (kg/m )\"); restored kg/m^3 in place",
+  "evidence": "ANS TWO Var. Data EASY.pdf p8 (Question ID c9dd92b1)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro18202wnqmt1rrn3oggr",
+  "field": "stem",
+  "before": "United States\n\nPresidents\n\nfrom 1789 to\n\n2015\n\nThe table above gives the number of United States presidents from 1789 to 2015 whose age at the time they first took office is within the interval listed. Of those presidents who were at least 50 years old when they first took office, what fraction were at least 60 years old?",
+  "after": "The table above gives the number of United States presidents from 1789 to 2015 whose age at the time they first took office is within the interval listed. Of those presidents who were at least 50 years old when they first took office, what fraction were at least 60 years old?",
+  "class": "other_artifact",
+  "note": "PS Probability and conditional probability - MEDIUM #6: table title \"United States Presidents from 1789 to 2015\" leaked into the stem as 4 broken fragments; the title is already part of the question image (26f7ffe6…png), so the fragments are removed",
+  "evidence": "ANS Probability Med.pdf p6 (Question ID b6569d0e); question image includes the title"
+ }
+]

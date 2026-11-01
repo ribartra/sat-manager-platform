@@ -1,19 +1,35 @@
 .git
+.github
 node_modules
 .next
-# Runtime data — never bake into the image (they live on the VM's data disk).
+# Runtime data and local copies: never baked into an image (they live on the VM's data disk).
 dev.db
-dev.db-*
-prisma/dev.db
-.private
-public/uploads
+dev.db*
+*.bak
+**/*.db
+!prisma/migrations
 backups
+.private
+.secrets
+public/uploads
 files_to_load
-# Local/infra artifacts.
-terraform
+# Infra, docs and local artifacts.
+deploy/terraform
+deploy/docs
+docs
+SAT platform
+reportes
+ui-referencias
+test-results
+playwright-report
+e2e
 tmp_inspect_pages
 scratchpad
 scripts/ingest_patch
+*.docx
+*.xlsx
+*.pdf
+*.m4a
 .env
 .env.*
 !.env.example

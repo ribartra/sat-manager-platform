@@ -15,11 +15,15 @@ type Notification = {
   createdAt: string;
 };
 
-async function fetchNotifications(): Promise<Notification[]> {
+type NotificationFeed = { notifications: Notification[]; total: number; unread: number };
+
+/** The latest 10 notifications plus the total and unread counts (the rest: /notifications). */
+async function fetchNotifications(): Promise<NotificationFeed> {
   const res = await fetch("/api/notifications");
   if (!res.ok) throw new Error("Unable to load notifications.");
   const data = await res.json();
-  return data.notifications ?? [];
+  const notifications: Notification[] = data.notifications ?? [];
+  return { notifications, total: data.total ?? notifications.length, unread: data.unread ?? notifications.filter((n) => !n.readAt).length };
 }
 
 function timeAgo(dateStr: string) {
@@ -77,12 +81,18 @@ function NotificationItem({
   return <div>{inner}</div>;
 }
 
-export function NotificationBell() {
+/**
+ * Notifications button for the left sidebar (mockup `.sbtn#bellBtn`): bell + label + unread dot.
+ * The panel opens to the right of the button, bottom-aligned (full width on phones).
+ */
+export function NotificationBell({ collapsed = false }: { collapsed?: boolean }) {
   const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState<React.CSSProperties>({});
   const ref = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const queryClient = useQueryClient();
 
-  const { data: notifications = [], isFetching, refetch } = useQuery({
+  const { data: feed, isFetching, refetch } = useQuery({
     queryKey: queryKeys.notifications.all,
     queryFn: fetchNotifications,
     staleTime: 30_000,
@@ -97,8 +107,8 @@ export function NotificationBell() {
     },
     onSuccess: () => {
       const now = new Date().toISOString();
-      queryClient.setQueryData<Notification[]>(queryKeys.notifications.all, (prev) =>
-        (prev ?? []).map((n) => ({ ...n, readAt: n.readAt ?? now })),
+      queryClient.setQueryData<NotificationFeed>(queryKeys.notifications.all, (prev) =>
+        prev ? { ...prev, unread: 0, notifications: prev.notifications.map((n) => ({ ...n, readAt: n.readAt ?? now })) } : prev,
       );
     },
   });
@@ -115,42 +125,49 @@ export function NotificationBell() {
 
   async function toggle() {
     if (!open) {
+      if (buttonRef.current) setPos(sidePopoverPosition(buttonRef.current));
       const result = await refetch();
-      const fetched = result.data ?? [];
-      if (fetched.some((n) => !n.readAt)) {
+      if ((result.data?.unread ?? 0) > 0) {
         markRead.mutate();
       }
     }
     setOpen((v) => !v);
   }
 
-  const unreadCount = notifications.filter((n) => !n.readAt).length;
+  const notifications = feed?.notifications ?? [];
+  const total = feed?.total ?? 0;
+  const unreadCount = feed?.unread ?? 0;
   const loading = open && isFetching && notifications.length === 0;
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref}>
       <button
+        ref={buttonRef}
+        type="button"
         onClick={toggle}
-        className="relative flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100"
+        aria-label="Notifications"
+        title="Notifications"
+        className="relative flex w-full items-center gap-2.5 whitespace-nowrap rounded-[9px] px-2.5 py-2 text-left text-sm text-gray-700 hover:bg-slate-100"
       >
-        <Bell size={14} />
-        <span>Notifications</span>
+        <Bell size={18} className="shrink-0" />
+        <span className={collapsed ? "min-[860px]:hidden" : ""}>Notifications</span>
         {unreadCount > 0 && (
-          <span className="absolute -right-1 -top-1 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-red-500 px-0.5 text-[10px] font-bold text-white">
+          <span className="absolute left-[17px] top-0.5 grid h-[15px] min-w-[15px] place-items-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
       </button>
 
       {open && (
-        <div className="absolute right-0 z-50 mt-1 w-80 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-xl">
+        <div
+          style={pos}
+          className="fixed z-50 w-[330px] overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl max-[859px]:!left-3 max-[859px]:!right-3 max-[859px]:!w-auto"
+        >
           <div className="flex items-center justify-between border-b border-gray-100 px-4 py-2.5">
             <span className="text-sm font-semibold text-gray-900">Notifications</span>
             {notifications.length > 0 && (
               <span className="text-xs text-gray-400">
-                {notifications.filter((n) => !n.readAt).length === 0
-                  ? "All read"
-                  : `${notifications.filter((n) => !n.readAt).length} unread`}
+                {unreadCount === 0 ? "All read" : `${unreadCount} unread`}
               </span>
             )}
           </div>
@@ -166,8 +183,22 @@ export function NotificationBell() {
               ))
             )}
           </div>
+          {/* The latest 10 here; the rest on /notifications (25 per page, period filter). */}
+          {total > notifications.length ? (
+            <Link href="/notifications" onClick={() => setOpen(false)} className="block border-t border-gray-100 px-4 py-2.5 text-sm font-medium text-blue-600 hover:underline">
+              See all {total} notifications →
+            </Link>
+          ) : null}
         </div>
       )}
     </div>
   );
+}
+
+/** Fixed position for a popover opening to the right of a sidebar button, bottom-aligned. */
+export function sidePopoverPosition(anchor: HTMLElement): React.CSSProperties {
+  const r = anchor.getBoundingClientRect();
+  // The popover sits inside the zoomed app (globals.css --app-zoom): screen px → CSS px.
+  const zoom = Number(getComputedStyle(document.documentElement).getPropertyValue("--app-zoom")) || 1;
+  return { left: (r.right + 8) / zoom, bottom: Math.max(12, window.innerHeight - r.bottom) / zoom };
 }

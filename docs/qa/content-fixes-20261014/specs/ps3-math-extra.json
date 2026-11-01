@@ -1,0 +1,12 @@
+[
+ {
+  "table": "Question",
+  "id": "cmsjro14302vsqmt1bgqq2e9r",
+  "field": "stem",
+  "before": "Subscriptions\nYear\nsold\n2012 5,600\n2013 5,880\nThe manager of an online news service received the report above on the number of subscriptions sold by the service. The manager estimated\nthat the percent increase from 2012 to 2013 would be double the percent increase from 2013 to 2014. How many subscriptions did the manager\nexpect would be sold in 2014?",
+  "after": "| Year | Subscriptions sold |\n| --- | --- |\n| 2012 | 5,600 |\n| 2013 | 5,880 |\n\nThe manager of an online news service received the report above on the number of subscriptions sold by the service. The manager estimated that the percent increase from 2012 to 2013 would be double the percent increase from 2013 to 2014. How many subscriptions did the manager expect would be sold in 2014?",
+  "class": "flattened_table+pdf_hard_wrap",
+  "note": "PSDA Percentages HARD #7: Year/Subscriptions sold table flattened into lines; rebuilt as pipe table; prose wraps joined",
+  "evidence": "Percents HARD.pdf p8 (0ea56bb2)"
+ }
+]

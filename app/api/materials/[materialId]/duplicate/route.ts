@@ -1,22 +1,24 @@
 import { NextResponse } from "next/server";
+import { contentScopeFor } from "@/lib/program-scope";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { getFeatureSetting } from "@/lib/app-settings";
+import { ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
   params: Promise<{ materialId: string }>;
 }
 
-export async function POST(_req: Request, { params }: RouteContext) {
+export const POST = withApiErrors(async function POST(_req: Request, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
   if (!(await getFeatureSetting("MATERIALS_MODULE"))) {
-    return NextResponse.json({ error: "Materials module is disabled." }, { status: 403 });
+    return new ForbiddenError("Materials module is disabled.").toResponse();
   }
 
   const { materialId } = await params;
-  const material = await prisma.studyMaterial.findUnique({ where: { id: materialId } });
-  if (!material) return NextResponse.json({ error: "Study material not found." }, { status: 404 });
+  const material = await prisma.studyMaterial.findFirst({ where: { id: materialId, ...contentScopeFor(session.user) } });
+  if (!material) return new NotFoundError("Study material not found.").toResponse();
 
   const copy = await prisma.studyMaterial.create({
     data: {
@@ -27,6 +29,8 @@ export async function POST(_req: Request, { params }: RouteContext) {
       topicId: material.topicId,
       status: "DRAFT",
       createdById: session.user.id,
+      // The copy stays in the same program's bank.
+      programId: material.programId,
     },
   });
 
@@ -41,4 +45,4 @@ export async function POST(_req: Request, { params }: RouteContext) {
   });
 
   return NextResponse.json({ material: copy });
-}
+});

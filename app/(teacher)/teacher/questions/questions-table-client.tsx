@@ -30,7 +30,22 @@ export type QuestionBankRow = {
   usedCount: number;
 };
 
-export function QuestionsTable({ rows }: { rows: QuestionBankRow[] }) {
+/** Filters fixed to one value: their column (or part of it) is not shown, it would repeat. */
+export type QuestionsTableFixed = { domain: boolean; skill: boolean; difficulty: boolean; status: boolean };
+
+export function QuestionsTable({
+  rows,
+  fixed,
+  labels = { both: "Domain / Skill", inner: "Skill" },
+  editQuery = "",
+}: {
+  rows: QuestionBankRow[];
+  fixed: QuestionsTableFixed;
+  /** Header of the second column (Tests tab: "Test / Module"), whole or with its first part fixed. */
+  labels?: { both: string; inner: string };
+  /** Query added to the Edit links (Tests tab: `?area=tests`, so the editor keeps the Tests context). */
+  editQuery?: string;
+}) {
   const columns = useMemo<ColumnDef<QuestionBankRow>[]>(
     () => [
       {
@@ -39,7 +54,7 @@ export function QuestionsTable({ rows }: { rows: QuestionBankRow[] }) {
         meta: { priority: "high", cellClassName: "max-w-md" },
         cell: ({ row }) => (
           <QuestionListItem
-            href={`/teacher/questions/${row.original.id}/edit`}
+            href={`/teacher/questions/${row.original.id}/edit${editQuery}`}
             question={{
               stem: row.original.stem,
               imageUrl: row.original.imageUrl,
@@ -47,18 +62,24 @@ export function QuestionsTable({ rows }: { rows: QuestionBankRow[] }) {
               optionImageUrls: row.original.optionImageUrls,
             }}
             stemClassName="group-hover:text-foreground"
+            // Not filterable: shown as tags on the question instead of their own columns.
+            meta={
+              <>
+                <Badge variant="default">{questionTypeLabel(row.original.type, true)}</Badge>
+                <Badge variant="default">{row.original.uses === 0 ? "Not used" : `Used in ${row.original.uses}`}</Badge>
+              </>
+            }
           />
         ),
       },
       {
+        // "Domain / Skill"; with a Domain chosen only the skill (the domain would repeat).
         id: "skill",
-        header: "Skill",
+        header: fixed.domain ? labels.inner : labels.both,
         meta: { priority: "medium" },
         cell: ({ row }) => (
           <div>
-            <p className="text-xs text-muted-foreground">
-              {row.original.skillSection} / {row.original.skillDomain}
-            </p>
+            {fixed.domain ? null : <p className="text-xs text-muted-foreground">{row.original.skillDomain}</p>}
             <p className="text-sm text-foreground">{row.original.skillName}</p>
           </div>
         ),
@@ -74,12 +95,6 @@ export function QuestionsTable({ rows }: { rows: QuestionBankRow[] }) {
         ),
       },
       {
-        id: "type",
-        header: "Type",
-        meta: { priority: "low" },
-        cell: ({ row }) => <Badge variant="default">{questionTypeLabel(row.original.type, true)}</Badge>,
-      },
-      {
         id: "status",
         header: "Status",
         meta: { priority: "medium" },
@@ -90,12 +105,6 @@ export function QuestionsTable({ rows }: { rows: QuestionBankRow[] }) {
         ),
       },
       {
-        id: "uses",
-        header: "Used in",
-        meta: { priority: "low", align: "right" },
-        cell: ({ row }) => <span className="text-muted-foreground">{row.original.uses} uses</span>,
-      },
-      {
         id: "actions",
         header: "Actions",
         meta: { priority: "high", align: "right" },
@@ -103,11 +112,12 @@ export function QuestionsTable({ rows }: { rows: QuestionBankRow[] }) {
           <QuestionActions
             questionId={row.original.id}
             usedCount={row.original.usedCount}
+            editHref={`/teacher/questions/${row.original.id}/edit${editQuery}`}
           />
         ),
       },
     ],
-    [],
+    [fixed.domain, labels.both, labels.inner, editQuery],
   );
 
   return (
@@ -116,6 +126,7 @@ export function QuestionsTable({ rows }: { rows: QuestionBankRow[] }) {
       data={rows}
       getRowId={(row) => row.id}
       responsiveStrategy="priority"
+      hiddenColumns={[fixed.skill ? "skill" : "", fixed.difficulty ? "difficulty" : "", fixed.status ? "status" : ""].filter(Boolean)}
       emptyTitle="No questions found"
       emptyDescription="Create your first question to build the bank."
     />

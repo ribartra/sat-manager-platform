@@ -1,4 +1,6 @@
-import { PageShell } from "@/components/sat";
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import { PageHeader, PageShell } from "@/components/sat";
+import { HEADER_ACTION_CLASS, HeaderActions } from "@/components/sat/header-actions";
 import { redirect } from "next/navigation";
 import { Activity, AlertTriangle, CheckCircle2, Clock3, FileSearch, RefreshCcw } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +12,8 @@ import { computeCropImageSources } from "@/lib/ingest-crop-source";
 import { computeExtractedTests } from "@/lib/ingest-sets.server";
 import { FULL_TEST_EXPECTED_COUNTS, moduleIndexForCandidate } from "@/lib/full-test-modules";
 import { AiImportWorkflowClient, IngestAutoRefresh } from "./ai-import-client";
+import { listSources, promotionSourceId } from "@/lib/content-source";
+import { InlineError } from "@/components/sat/alert";
 
 export const dynamic = "force-dynamic";
 
@@ -425,32 +429,29 @@ export default async function AiImportPage({ searchParams }: PageProps) {
     };
   });
   return (
-    <PageShell width="wide" className="space-y-6">
+    <PageShell className="space-y-6">
       <IngestAutoRefresh batchId={selectedBatchId} enabled={autoRefresh} />
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Admin / AI Import</p>
-          <h1 className="mt-1 text-2xl font-semibold text-gray-900">AI Batch Import</h1>
-          <p className="mt-1 max-w-3xl text-sm text-gray-500">
-            Work through staging in order: load files, process extraction, recover OCR issues, review candidates and promote clean drafts.
-          </p>
-          {selectedBatchId && (
-            <a
-              href={`/admin/import/ai/sets?batch=${selectedBatchId}`}
-              className="mt-3 inline-flex items-center gap-1 rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
-            >
-              <FileSearch className="h-3.5 w-3.5" /> Extracted Tests to review
-            </a>
-          )}
-        </div>
-        {selectedBatch && (
-          <div className="min-w-0 rounded-lg border border-gray-200 bg-white px-4 py-3 text-right shadow-sm">
-            <p className="text-xs uppercase text-gray-400">Selected batch</p>
-            <CopyableTruncatedText value={selectedBatch.name} className="mt-1 max-w-72 justify-end text-sm font-semibold text-gray-900" />
-            <p className="mt-1 text-xs text-gray-500">Updated {fmtDate(selectedBatch.updatedAt)}</p>
-          </div>
-        )}
-      </div>
+      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Admin" }, { label: "AI Import" }]} />
+      <PageHeader
+        title="AI Batch Import"
+        description="Work through staging in order: load files, process extraction, recover OCR issues, review candidates and promote clean drafts."
+        actions={selectedBatchId || selectedBatch ? (
+          <HeaderActions>
+            {selectedBatchId && (
+              <a href={`/admin/import/ai/sets?batch=${selectedBatchId}`} className={HEADER_ACTION_CLASS}>
+                <FileSearch className="h-3.5 w-3.5" /> Extracted Tests to review
+              </a>
+            )}
+            {selectedBatch && (
+              <div className="min-w-0 rounded-lg border border-gray-200 bg-white px-4 py-3 text-right shadow-sm">
+                <p className="text-xs uppercase text-gray-400">Selected batch</p>
+                <CopyableTruncatedText value={selectedBatch.name} className="mt-1 max-w-72 justify-end text-sm font-semibold text-gray-900" />
+                <p className="mt-1 text-xs text-gray-500">Updated {fmtDate(selectedBatch.updatedAt)}</p>
+              </div>
+            )}
+          </HeaderActions>
+        ) : undefined}
+      />
 
       {selectedBatch && statusSummary && StatusIcon && (
         <Card padding="md" variant={statusSummary.variant === "danger" ? "danger" : statusSummary.variant === "warning" ? "warning" : statusSummary.variant === "success" ? "success" : "default"}>
@@ -465,7 +466,7 @@ export default async function AiImportPage({ searchParams }: PageProps) {
                   <Badge variant={badgeVariant(selectedBatch.status)}>{selectedBatch.status}</Badge>
                 </div>
                 <p className="mt-2 text-sm font-medium text-gray-900">{statusSummary.description}</p>
-                {selectedBatch.lastError && <p className="mt-1 text-sm text-red-700">{selectedBatch.lastError}</p>}
+                <InlineError className="mt-1">{selectedBatch.lastError}</InlineError>
               </div>
             </div>
             <div className="grid min-w-64 gap-3 text-xs text-gray-600">
@@ -489,6 +490,8 @@ export default async function AiImportPage({ searchParams }: PageProps) {
       )}
 
       <AiImportWorkflowClient
+        sources={(await listSources({ activeOnly: true })).filter((source) => source.forPracticeSets || source.forTests)}
+        testSourceName={selectedBatch ? (await prisma.source.findUnique({ where: { id: await promotionSourceId(selectedBatch.id, "tests") }, select: { name: true } }))?.name : undefined}
         selectedBatchId={selectedBatch?.id}
         selectedBatchStatus={selectedBatch?.status}
         batches={batches.map((batch) => ({

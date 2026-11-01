@@ -1,33 +1,20 @@
-import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { NavTeacher } from "@/components/nav-teacher";
-import prisma from "@/lib/prisma";
-import { getFeatureFlagValues } from "@/lib/feature-flags";
+import { TeacherShell } from "@/components/nav-teacher";
+import { auth } from "@/lib/auth";
+import { homeHrefForRole } from "@/lib/nav-config";
+import { loadShellProps } from "@/lib/shell-props";
 
 export const dynamic = "force-dynamic";
 
+/** Teacher (and admin) portal; the menu comes from loadShellProps, as on every portal page. */
 export default async function TeacherLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
-  if (!session) redirect("/login");
-  if (!["TEACHER", "ADMIN"].includes(session.user.role)) redirect("/student");
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { active: true, validationStatus: true, avatarUrl: true },
-  });
-  if (!user?.active) redirect("/login");
-  if (user.validationStatus !== "APPROVED") redirect("/auth/pending-validation");
-
-  const flags = await getFeatureFlagValues({ role: session.user.role, userId: session.user.id });
-
+  const shell = await loadShellProps(session);
+  if (!["TEACHER", "ADMIN"].includes(shell.role)) redirect(homeHrefForRole(shell.role));
+  // Master teacher (Teachers menu): canManageTeachers → "manageTeachers" (lib/shell-props.ts).
   return (
-    <div className="min-h-screen flex flex-col">
-      <NavTeacher
-        userName={session.user.name}
-        avatarUrl={user.avatarUrl}
-        role={session.user.role}
-        flags={flags}
-      />
-      <main className="flex-1 bg-gray-50">{children}</main>
-    </div>
+    <TeacherShell userName={shell.userName} avatarUrl={shell.avatarUrl} role={shell.role} flags={shell.flags} capabilities={shell.capabilities}>
+      {children}
+    </TeacherShell>
   );
 }

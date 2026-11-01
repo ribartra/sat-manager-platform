@@ -1,12 +1,19 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { FilterBar, FilterField } from "@/components/sat/filter-bar";
+import { Select } from "@/components/ui/select";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { StudentPicker } from "@/components/student-picker";
 import { Plus, UserMinus } from "lucide-react";
+import { useConfirm } from "@/components/sat/confirm-dialog";
+import { apiFetch } from "@/lib/api-client";
+import { notify } from "@/lib/notify-ui";
+import { LiveSearch } from "@/components/sat/live-search";
 
 interface Member {
   id: string;
@@ -21,7 +28,10 @@ interface Group {
 }
 
 export function GroupsClient({ groups: initialGroups, students }: { groups: Group[]; students: Member[] }) {
+  // Members the viewer can open (program scope): their name links to the student's page.
+  const inScope = new Set(students.map((student) => student.id));
   const router = useRouter();
+  const confirm = useConfirm();
   const [groups, setGroups] = useState<Group[]>(initialGroups);
   const [newName, setNewName] = useState("");
   const [newSchedule, setNewSchedule] = useState("");
@@ -30,9 +40,11 @@ export function GroupsClient({ groups: initialGroups, students }: { groups: Grou
   const [editName, setEditName] = useState("");
   const [editSchedule, setEditSchedule] = useState("");
   const [groupSearch, setGroupSearch] = useState("");
+  const [groupSizeFilter, setGroupSizeFilter] = useState<"" | "members" | "empty">("");
   const [studentSearch, setStudentSearch] = useState("");
 
   const visibleGroups = groups.filter((group) => {
+    if (groupSizeFilter && (groupSizeFilter === "members") !== group.members.length > 0) return false;
     const term = groupSearch.trim().toLowerCase();
     if (!term) return true;
     return (
@@ -79,14 +91,10 @@ export function GroupsClient({ groups: initialGroups, students }: { groups: Grou
   }
 
   async function saveGroup(groupId: string) {
-    const response = await fetch(`/api/groups/${groupId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: editName, schedule: editSchedule }),
-    });
-    if (!response.ok) {
-      const data = await response.json().catch(() => ({}));
-      window.alert(data.error || "Could not update group.");
+    try {
+      await apiFetch(`/api/groups/${groupId}`, { method: "PATCH", json: { name: editName, schedule: editSchedule }, fallback: "Could not update group." });
+    } catch (error) {
+      notify.error(error);
       return;
     }
     setEditingGroupId(null);
@@ -94,11 +102,12 @@ export function GroupsClient({ groups: initialGroups, students }: { groups: Grou
   }
 
   async function deleteGroup(groupId: string) {
-    if (!window.confirm("Delete this group? Members will be unlinked from the group.")) return;
-    const response = await fetch(`/api/groups/${groupId}`, { method: "DELETE" });
-    if (!response.ok) {
-      const data = await response.json().catch(() => ({}));
-      window.alert(data.error || "Could not delete group.");
+    const ok = await confirm({ title: "Delete this group?", description: "Members will be unlinked from the group.", tone: "danger", confirmLabel: "Delete" });
+    if (!ok) return;
+    try {
+      await apiFetch(`/api/groups/${groupId}`, { method: "DELETE", fallback: "Could not delete group." });
+    } catch (error) {
+      notify.error(error);
       return;
     }
     setGroups((prev) => prev.filter((group) => group.id !== groupId));
@@ -121,27 +130,28 @@ export function GroupsClient({ groups: initialGroups, students }: { groups: Grou
               <label className="mb-1 block text-xs font-medium text-gray-700">Schedule (optional)</label>
               <Input value={newSchedule} onChange={(e) => setNewSchedule(e.target.value)} placeholder="Mon/Wed 9am" />
             </div>
-            <Button onClick={createGroup} disabled={creating || !newName.trim()} className="flex items-center gap-1">
+            <Button onClick={createGroup} disabled={creating} disabledReason={!newName.trim() ? "Enter a group name." : null} className="flex items-center gap-1">
               <Plus size={14} /> Create
             </Button>
           </div>
         </CardBody>
       </Card>
 
-      <div className="flex flex-wrap gap-3">
-        <Input
-          value={groupSearch}
-          onChange={(event) => setGroupSearch(event.target.value)}
-          placeholder="Search group or member..."
-          className="max-w-sm"
-        />
-        <Input
-          value={studentSearch}
-          onChange={(event) => setStudentSearch(event.target.value)}
-          placeholder="Search student to add..."
-          className="max-w-sm"
-        />
-      </div>
+      <FilterBar className="mb-0">
+        <FilterField label="Search" htmlFor="groups-q" className="@md:flex-[2]">
+          <LiveSearch id="groups-q" value={groupSearch} onChange={setGroupSearch} placeholder="Search group or member..." suggestions={groups.flatMap((g) => [g.name, ...g.members.map((m) => m.name)])} />
+        </FilterField>
+        <FilterField label="Groups" htmlFor="groups-size">
+          <Select id="groups-size" value={groupSizeFilter} onChange={(event) => setGroupSizeFilter(event.target.value as "" | "members" | "empty")}>
+            <option value="">All groups</option>
+            <option value="members">With students</option>
+            <option value="empty">Empty</option>
+          </Select>
+        </FilterField>
+        <FilterField label="Student to add" htmlFor="groups-student">
+          <Input id="groups-student" type="search" value={studentSearch} onChange={(event) => setStudentSearch(event.target.value)} placeholder="Search student to add..." />
+        </FilterField>
+      </FilterBar>
 
       {visibleGroups.map((group) => {
         const excludeIds = group.members.map((m) => m.id);
@@ -197,10 +207,18 @@ export function GroupsClient({ groups: initialGroups, students }: { groups: Grou
                 {group.members.map((m) => (
                   <div key={m.id} className="flex items-center justify-between text-sm">
                     <div>
-                      <span className="font-medium text-gray-800">{m.name}</span>
+                      {inScope.has(m.id) ? (
+                        <Link href={`/teacher/students/${m.id}`} className="font-medium text-gray-800 hover:text-[var(--sat-primary)] hover:underline">
+                          {m.name}
+                        </Link>
+                      ) : (
+                        <span className="font-medium text-gray-800">{m.name}</span>
+                      )}
                       <span className="ml-2 text-gray-400">{m.email}</span>
                     </div>
                     <button
+                      type="button"
+                      aria-label={`Remove ${m.name} from ${group.name}`}
                       onClick={() => removeMember(group.id, m.id)}
                       className="text-gray-400 transition-colors hover:text-red-500"
                     >

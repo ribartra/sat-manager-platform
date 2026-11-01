@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { ingestAuthHeaders, ingestUrl } from "@/lib/internal-ingest";
+import { ApiError, BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
   params: Promise<{ sourceFileId: string; pageNumber: string }>;
@@ -9,18 +10,18 @@ interface RouteContext {
 
 // Renders a source PDF page to JPEG for the crop tool. Proxies the ingest service
 // (which reads the PDF from disk) so the internal token never reaches the browser.
-export async function GET(req: NextRequest, { params }: RouteContext) {
+export const GET = withApiErrors(async function GET(req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { sourceFileId, pageNumber } = await params;
   const pageNum = Number(pageNumber);
   if (!Number.isInteger(pageNum) || pageNum < 1) {
-    return NextResponse.json({ error: "Invalid page number." }, { status: 400 });
+    return new BadRequestError("Invalid page number.").toResponse();
   }
 
   const source = await prisma.ingestSourceFile.findUnique({ where: { id: sourceFileId }, select: { id: true, extension: true } });
-  if (!source) return NextResponse.json({ error: "Source file not found." }, { status: 404 });
+  if (!source) return new NotFoundError("Source file not found.").toResponse();
 
   // The FastAPI renderer only handles PDFs (pdfplumber). For a DOCX source (or if
   // the PDF render fails) fall back to the per-page image already extracted at
@@ -43,7 +44,7 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
   if ((source.extension ?? "").toLowerCase() !== "pdf") {
     const fallback = await extractedPageFallback();
     if (fallback) return fallback;
-    return NextResponse.json({ error: "No page image is available for this file." }, { status: 404 });
+    return new NotFoundError("No page image is available for this file.").toResponse();
   }
 
   const response = await fetch(ingestUrl(`/sources/${sourceFileId}/pages/${pageNum}/image?dpi=${dpi}`), {
@@ -53,7 +54,7 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
     const fallback = await extractedPageFallback();
     if (fallback) return fallback;
     const data = await response.json().catch(() => ({}));
-    return NextResponse.json({ error: data.detail || "Could not render page." }, { status: response.status });
+    return ApiError.fromStatus(response.status, data.detail || "Could not render page.").toResponse();
   }
 
   const buffer = await response.arrayBuffer();
@@ -66,4 +67,4 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
       "X-Page-Height": response.headers.get("X-Page-Height") ?? "",
     },
   });
-}
+});

@@ -1,0 +1,133 @@
+[
+ {
+  "qid": "cmsjrntg7006kqmt10mtirx79",
+  "loc": "TEST 2 Math M2 Q18",
+  "test": "TEST 2",
+  "type": "imageFile",
+  "file": "/home/turista/Descargas/Github/sat-manager-platform/docs/qa/fpt-image-restore/crops/cmsjrntg7006kqmt10mtirx79.png",
+  "confidence": "high",
+  "defect": "incomplete_figure",
+  "evidence": "Existing image showed only Data Set K; source PDF screenshot TEST 2/i-018-039.png bbox=[355,60,745,610] contains both dot plots (J and K) with labels"
+ },
+ {
+  "qid": "cmsjrntg7006kqmt10mtirx79",
+  "loc": "TEST 2 Math M2 Q18",
+  "test": "TEST 2",
+  "type": "text",
+  "field": "stem",
+  "new": "18.\n\nWhich of the statements best compares the means and standard deviations of Data Set J and Data Set K?",
+  "confidence": "high",
+  "defect": "leaked_options_in_stem",
+  "evidence": "Stem contained figure labels and the 4 answer choices ('✗ A …') captured from the legacy UI; kept only the question text (labels are now inside the figure)"
+ },
+ {
+  "qid": "cmsjrntg7006kqmt10mtirx79",
+  "loc": "TEST 2 Math M2 Q18",
+  "test": "TEST 2",
+  "type": "text",
+  "field": "explanation",
+  "new": "✓ Correct Answer: D — The means of the two sets are equal, and the standard deviation of Data Set J is greater than the standard deviation of Data Set K.\nBoth dot plots are symmetric about 4, so both means equal 4. Data Set J has 3 values at 2, 4 values at 4, and 3 values at 6 (10 values). Data Set K has 3 values at 2, 6 values at 4, and 3 values at 6 (12 values). Both sets have the same 6 values away from the mean, but K has more values exactly at the mean, so K's values are, on average, closer to the mean. Therefore the standard deviation of J is greater than the standard deviation of K.\n✗ Why the other choices are wrong:\nA — Both plots are centered at 4, so the means are equal, not different.\nB — Both plots are centered at 4, so the means are equal, not different.\nC — Data Set K has a larger share of its values at the mean, so K is less spread out than J; the standard deviation of J is greater, not less.",
+  "confidence": "high",
+  "defect": "author_draft_explanation",
+  "evidence": "Key D (no separate ANS key for Test 2; verified by reading the source figure: J = 3/4/3, K = 3/6/3 at 2/4/6 → SD(J) ≈ 1.55 > SD(K) ≈ 1.41); removed author draft ('Wait — if K is more spread…')"
+ },
+ {
+  "qid": "cmsjrnu8j00htqmt1iahai9w7",
+  "loc": "TEST 10 Math M2 Q20",
+  "test": "TEST 10",
+  "type": "text",
+  "field": "explanation",
+  "new": "✓ Correct Answer: B   With x-intercepts at a and b and leading coefficient 1: f(x) = (x-a)(x-b). The vertex x-coordinate is the midpoint: x = (a+b)/2. The y-value at the vertex: f((a+b)/2) = ((a+b)/2 - a)((a+b)/2 - b) = ((b-a)/2)((a-b)/2) = -(b-a)²/4 = -1/4(a-b)².\n✗ Why the other choices are wrong:\nA — -1/4(b-3a)(b-a): This expression is not derivable from the standard vertex calculation.\nC — 1/4(a-b)²: This has the wrong sign. The leading coefficient is 1, so the parabola opens upward and dips below the x-axis between its two x-intercepts; the vertex is the minimum and its y-coordinate is negative (or 0 if a = b).\nD — 1/4(b-3a)(b-a): Not derivable from the vertex formula.",
+  "confidence": "high",
+  "defect": "author_draft_explanation",
+  "evidence": "Key B (key confirmed by official answer key: TEST 10 ANS KEY, MATH MODULE 2B #20); removed author draft in choice C ('Wait — actually…')"
+ },
+ {
+  "qid": "cmsjrnulh00joqmt1laiwfyta",
+  "loc": "TEST 5 Math M2 Q22",
+  "test": "TEST 5",
+  "type": "text",
+  "field": "explanation",
+  "new": "✓ Correct Answer: B — -5 Consecutive odd integers starting at A: A, A+2, A+4, A+6, A+8, A+10 • 3rd integer = A+4 • 4th integer = A+6 • 6th integer = A+10 Condition: the product of 12 and the 3rd integer is at most 18 less than the sum of the 4th and 6th integers: 12(A+4) ≤ [(A+6)+(A+10)] - 18 12A + 48 ≤ 2A + 16 - 18 12A + 48 ≤ 2A - 2 10A ≤ -50 A ≤ -5 Greatest value of A = -5. Verify with A = -5: integers are -5,-3,-1,1,3,5 12×(-1) = -12 (1+5) - 18 = -12 -12 ≤ -12 ✓\n✗ Why the other choices are wrong: A — -6: This is an even number, so it cannot be the first of six consecutive odd integers (and it is less than -5, so it would not be the greatest value anyway). C — 3: Substituting A=3: 12×7=84; (9+15)-18=6; 84 ≤ 6 is FALSE. D — 11: Even larger, clearly fails the inequality.",
+  "confidence": "high",
+  "defect": "author_draft_explanation",
+  "evidence": "Key B (key confirmed by official answer key: ANSWERS KEY TEST 5, MATH MOD. 2 #22); removed author draft ('Wait — … means:'); fixed choice A rationale (−6 is even, not a valid odd integer)"
+ },
+ {
+  "qid": "cmsjrnuve00n3qmt1y8ftlknw",
+  "loc": "TEST 5 R&W M2 Q7",
+  "test": "TEST 5",
+  "type": "text",
+  "field": "explanation",
+  "new": "✓ Correct Answer: A — To note parallels between The Grapes of Wrath and a few of Steinbeck's unpublished writings. The text presents The Grapes of Wrath as the culmination of Steinbeck's concern with the hardships of migrant farm workers, then describes two earlier works on the same subject: L'Affaire Lettuceberg, a satirical portrayal of the injustices farm workers faced, which Steinbeck never published and destroyed, and a 1930s play with impoverished farm workers as its protagonists, which also never reached the press. The purpose is to note these parallels between the novel and those unpublished writings.\n ✗ Why the other choices are wrong: B — 'To contrast The Grapes of Wrath with some of the author's less ambitious projects.' The text never describes the other works as less ambitious; it emphasizes what they share with the novel (their subject), not how they differ. C — 'To show how Steinbeck's approach to writing evolved during the composition of The Grapes of Wrath.' The text mentions earlier works that PRECEDED The Grapes of Wrath, not changes that happened DURING its composition. D — 'To imply that the Steinbeck publications that followed The Grapes of Wrath were dissatisfying.' The text doesn't mention works that came after The Grapes of Wrath.",
+  "confidence": "high",
+  "defect": "author_draft_explanation",
+  "evidence": "Key A (key confirmed by official answer key: ANSWERS KEY TEST 5, R&W MOD. 2 #7); removed author draft ('Wait — let's re-examine. The answer key says A.'); fixed choice B rationale (it wrongly said L'Affaire Lettuceberg was described as 'expansive' — that word describes The Grapes of Wrath)"
+ },
+ {
+  "qid": "cmsjrnv2800pdqmt16ka7tqk6",
+  "loc": "TEST 5 R&W M2 Q20",
+  "test": "TEST 5",
+  "type": "text",
+  "field": "explanation",
+  "new": "✓ Correct Answer: C — life, however; The text contains two independent clauses. The first is 'Experienced observers can spot uniquely wintry signs of life, however.' Here 'however' belongs to the first clause: it signals a contrast with the previous sentence (the natural world might appear to be in hibernation), so it is set off from 'life' with a comma. The second clause, 'the distinct footprints of rabbits, porcupines and other small mammals, as well as the variety of birds' nests left in barren trees, are best appreciated against the stark white backdrop of a fresh layer of snow,' is also independent, so a semicolon after 'however' is needed to join the two clauses.\n ✗ Why the other choices are wrong: A — 'life, however,': Joining two independent clauses with only commas creates a comma splice. B — 'life however,': Also a comma splice, and 'however' is not separated from 'life.' D — 'life; however,': Placing the semicolon before 'however' attaches the transition to the second clause, signaling a contrast between spotting signs of life and the footprints being best appreciated against the snow. There is no such contrast — the second clause gives examples of those signs; the contrast is with the previous sentence.",
+  "confidence": "high",
+  "defect": "author_draft_explanation",
+  "evidence": "Key C (key confirmed by official answer key: ANSWERS KEY TEST 5, R&W MOD. 2 #20); removed self-contradicting author draft ('Wait — re-examining… The correct answer per the key is C.') and rewrote the rationale consistently"
+ },
+ {
+  "qid": "cmsjrnvaj00s0qmt17wksnibl",
+  "loc": "TEST 4 Math M1 Q20",
+  "test": "TEST 4",
+  "type": "text",
+  "field": "explanation",
+  "new": "✓  Correct Answer: D\n(D) y = 2x − 4  Midpoint of AB = ((1+5)/2, (3+1)/2) = (3, 2). Slope of AB = (1−3)/(5−1) = −2/4 = −1/2. Perpendicular slope = 2 (negative reciprocal). Line through (3, 2) with slope 2: y − 2 = 2(x − 3) → y = 2x − 4.\nWhy the other choices are wrong:\n(A)\ny = (1/2)x + 1/2  —  This has slope 1/2. The slope of AB is −1/2, so the perpendicular slope is its negative reciprocal, 2, not 1/2.\n(B)\ny = (1/2)x + 5/2  —  Again slope 1/2 — same error. The perpendicular slope to −1/2 is 2, not 1/2.\n(C)\ny = 2x − 1  —  This has the correct perpendicular slope (2) but passes through the wrong point. At x = 3 it gives y = 2(3) − 1 = 5, not 2, so it doesn't pass through the midpoint (3, 2). The correct intercept is −4.",
+  "confidence": "high",
+  "defect": "author_draft_explanation",
+  "evidence": "Key D (key confirmed by official answer key: TEST 4 ANS KEY, MATH MODULE 1 #20); removed author draft in choice A ('…negative reciprocal of −2… Wait —') and clarified choice C"
+ },
+ {
+  "qid": "cmsjrnvw400y7qmt1r47em8md",
+  "loc": "TEST 6 Math M1 Q17",
+  "test": "TEST 6",
+  "type": "text",
+  "field": "explanation",
+  "new": "✓ Correct Answer: D — −10x + 18y = −40\n\nSlope = 5/9, x-intercept at (4, 0).\n\nPoint-slope form: y − 0 = (5/9)(x − 4)\n  y = (5/9)x − 20/9\n\nMultiply by 9: 9y = 5x − 20 → 5x − 9y = 20\n\nMultiply by −2: −10x + 18y = −40 ✓\n\n✗ Why the other choices are wrong:\nA — 5x + 9y = 4: Solving for y gives y = −(5/9)x + 4/9, so the slope is −5/9 (wrong sign).\nB — 5x − 9y = −36: At x=4: 20−9y=−36 → y=56/9 ≠ 0. Doesn't pass through (4,0).\nC — −10x − 18y = 8: Solving for y gives y = −(5/9)x − 4/9, so the slope is −5/9 (wrong sign).",
+  "confidence": "high",
+  "defect": "author_draft_explanation",
+  "evidence": "Key D (key confirmed by official answer key: TEST 6 ANS KEY, Math MOD 1 #17); removed author draft in choice C ('…wait this gives slope 10/18 rearranged…'); added missing answer header; clarified choice A slope"
+ },
+ {
+  "qid": "cmsjrnvzm00zsqmt1zrot3nj8",
+  "loc": "TEST 9 Math M2 Q5",
+  "test": "TEST 9",
+  "type": "text",
+  "field": "explanation",
+  "new": "From the graph, the line g(x) passes through (0, −1) and (6, −5) (slope −2/3), so g(6) = −5. Then h(6) = g(6) + 4 = −5 + 4 = −1.",
+  "confidence": "high",
+  "defect": "author_draft_explanation",
+  "evidence": "Key −1 (key confirmed by official answer key: Test 9 Ans Key, MATH MODULE 2B #5); graph read from question image (y-intercept −1, passes (−6, 3) and (6, −5)); removed wrong first reading 'g(6) ≈ −6 … Hmm — key says −1'"
+ },
+ {
+  "qid": "cmsjrnwpi018pqmt1yrd5m4an",
+  "loc": "TEST 7 R&W M1 Q20",
+  "test": "TEST 7",
+  "type": "text",
+  "field": "explanation",
+  "new": "✓ Correct Answer: B — States, however; due\nThe text contains two independent clauses. The first is 'It is far from the rainiest city in the United States, however.' Here 'however' belongs to the first clause: it signals a contrast with the previous sentence (Seattle's reputation as a perennially overcast, rainy city), so it is set off with a comma. The second clause, 'due to the heavy rainfall that visits the east coast of the United States, the volume of rain in the east surpasses the drizzling that is more common in the northwest,' is also independent (its subject and verb are 'the volume … surpasses'), so a semicolon after 'however' is needed to join the two clauses.\n✗ Why the other choices are wrong:\nA — States; however, due: Placing the semicolon before 'however' attaches the transition to the second clause, signaling that the east coast's heavier rainfall contrasts with Seattle not being the rainiest city. It doesn't — it supports that point; the contrast is with the previous sentence.\nC — States, however, due: Joining two independent clauses with only commas creates a comma splice.\nD — States however due: With no punctuation, the two independent clauses run together (a run-on sentence), and 'however' is not set off.",
+  "confidence": "high",
+  "defect": "author_draft_explanation",
+  "evidence": "Key B (key confirmed by official answer key: TEST 7 ANS KEY, R&W 1 #20); removed self-contradicting author draft ('— wait, the correct SAT pattern… which is incorrect') and fixed choice A rationale (it wrongly called the second part a fragment)"
+ },
+ {
+  "qid": "cmsjrnwxx01bfqmt1dqsbjcuh",
+  "loc": "TEST 7 Math M1 Q16",
+  "test": "TEST 7",
+  "type": "text",
+  "field": "explanation",
+  "new": "✓ Correct Answer: A — 256 − 64π\nThe radius shown is 8 inches, so the diameter is 16 inches. Because the circle is inscribed in the square, the diameter equals the side of the square: 16 inches. Area of square = 16² = 256. Area of circle = π × 8² = 64π. Shaded area = 256 − 64π.\n✗ Why the other choices are wrong:\nB — 256 − 32π: 32π is only half the circle's area (π × 8² ÷ 2). The full circle area is π × 8² = 64π.\nC — 256 − 16π: This uses πr² with r² = 16, implying r = 4. The radius is 8, so r² = 64 and the circle area = 64π.\nD — 256 − 8π: This uses π × 8 (circumference-like calculation) instead of π × 8² for the area.",
+  "confidence": "high",
+  "defect": "author_draft_explanation",
+  "evidence": "Key A (key confirmed by official answer key: TEST 7 ANS KEY, MATH 1 #16); radius 8 confirmed in figure; removed author draft ('Wait — the radius shown is 8…') and fixed choice B rationale"
+ }
+]

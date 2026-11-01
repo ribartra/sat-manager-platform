@@ -1,24 +1,28 @@
 import { NextResponse } from "next/server";
+import { contentScopeFor } from "@/lib/program-scope";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
+import { ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
   params: Promise<{ questionId: string }>;
 }
 
-export async function POST(_req: Request, { params }: RouteContext) {
+export const POST = withApiErrors(async function POST(_req: Request, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { questionId } = await params;
-  const question = await prisma.question.findUnique({
-    where: { id: questionId },
+  const question = await prisma.question.findFirst({
+    where: { id: questionId, ...contentScopeFor(session.user) },
     include: { options: { orderBy: { label: "asc" } } },
   });
-  if (!question) return NextResponse.json({ error: "Question not found." }, { status: 404 });
+  if (!question) return new NotFoundError("Question not found.").toResponse();
 
   const copy = await prisma.question.create({
     data: {
+      // The copy stays in the same program's bank.
+      programId: question.programId,
       stem: question.stem,
       stimulus: question.stimulus,
       type: question.type,
@@ -53,4 +57,4 @@ export async function POST(_req: Request, { params }: RouteContext) {
   });
 
   return NextResponse.json({ question: copy });
-}
+});

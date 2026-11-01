@@ -1,0 +1,30 @@
+# Builds the web and ingest images and pushes them with the same immutable tag.
+# Used by deploy/scripts/build-and-push.sh (laptop) and .github/workflows/build-images.yml (CI):
+#   gcloud builds submit --config deploy/cloudbuild.yaml \
+#     --substitutions=_REGISTRY=<registry>,_TAG=<tag> --service-account=<cloudbuild SA>
+# The Next.js build needs ~6 GB of heap (Dockerfile), hence the 8-vCPU / 8 GB machine.
+steps:
+  - id: web
+    name: gcr.io/cloud-builders/docker
+    args: ["build", "-f", "Dockerfile", "-t", "${_REGISTRY}/web:${_TAG}", "--label", "org.opencontainers.image.revision=${_REVISION}", "."]
+  - id: ingest
+    name: gcr.io/cloud-builders/docker
+    waitFor: ["-"]
+    args: ["build", "-f", "ingest_service/Dockerfile", "-t", "${_REGISTRY}/ingest:${_TAG}", "--label", "org.opencontainers.image.revision=${_REVISION}", "."]
+
+images:
+  - "${_REGISTRY}/web:${_TAG}"
+  - "${_REGISTRY}/ingest:${_TAG}"
+
+substitutions:
+  _REGISTRY: ""
+  _TAG: ""
+  _REVISION: "unknown"
+
+options:
+  machineType: E2_HIGHCPU_8
+  # A user-managed build service account needs an explicit logging mode.
+  logging: CLOUD_LOGGING_ONLY
+  dynamicSubstitutions: true
+
+timeout: 3600s

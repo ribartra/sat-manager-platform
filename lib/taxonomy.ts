@@ -1,10 +1,3 @@
-export const TAXONOMY_SECTION_TABS = [
-  { key: "math", label: "Math" },
-  { key: "rw", label: "R&W" },
-] as const;
-
-export type TaxonomySectionKey = (typeof TAXONOMY_SECTION_TABS)[number]["key"];
-
 /** Domain used only for Full Practice Test module skills (M1/M2) — not an academic SAT skill. */
 export const FULL_PRACTICE_TEST_DOMAIN_NAME = "Full Practice Test";
 
@@ -30,23 +23,6 @@ export type TaxonomyNodeBase = {
 export type TaxonomyTreeNode<T extends TaxonomyNodeBase = TaxonomyNodeBase> = T & {
   children: TaxonomyTreeNode<T>[];
 };
-
-export function activeTaxonomySection(value: string | undefined | null): TaxonomySectionKey {
-  return TAXONOMY_SECTION_TABS.some((tab) => tab.key === value) ? (value as TaxonomySectionKey) : "math";
-}
-
-/** Map a section display label (e.g. "Mathematics") to the content-map tab key. */
-export function taxonomySectionKeyFromLabel(label: string | null | undefined): TaxonomySectionKey {
-  return isMathTaxonomyLabel({ name: label ?? "", label: label ?? "" }) ? "math" : "rw";
-}
-
-export function isMathTaxonomyLabel(value: { name: string; label: string }) {
-  return `${value.name} ${value.label}`.toLowerCase().includes("math");
-}
-
-export function matchesTaxonomySection(value: { name: string; label: string }, section: TaxonomySectionKey) {
-  return section === "math" ? isMathTaxonomyLabel(value) : !isMathTaxonomyLabel(value);
-}
 
 /** Case-insensitive match for domain deep-links (`?domain=Algebra`). */
 export function matchesTaxonomyDomainName(

@@ -39,5 +39,5 @@ Para activarlo:
 - **Uniform bucket-level access** (sin ACLs por objeto).
 - **Versioning** activado (recuperación ante sobrescritura/borrado).
 - Acceso desde la VM vía **Service Account** con `roles/storage.objectAdmin` **solo** sobre
-  ese bucket (ya lo crea Terraform en `terraform/main.tf`).
+  ese bucket (ya lo crea Terraform en `deploy/terraform/modules/storage/main.tf`).
 - Lifecycle para expirar versiones archivadas (30 días) y controlar coste.

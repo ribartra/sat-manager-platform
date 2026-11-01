@@ -1,16 +1,23 @@
 /**
  * Canonical Practice area classification (Math / Reading / Writing) and
- * report/analytics tab keys including Full Practice Tests (`mocks` URL key).
+ * report/analytics tab keys including Tests (`tests` URL key; legacy `mocks` still accepted).
  *
- * Source of truth for practice content is Domain.practiceArea (persisted).
- * Heuristic domain-name lists remain only as a fallback for null rows.
+ * Source of truth: the Section of a domain. Practice sections are MATH, READING and WRITING
+ * (READING_WRITING exists only for the Test placeholder domain: Tests have 2 sections).
+ * Domain.practiceArea is a copy of the section name kept in sync by database triggers
+ * (migration 20261018_practice_sections), so queries can filter on it directly.
+ * No name-based guessing: a domain without practiceArea is not practice content.
  */
 
 export const PRACTICE_AREAS = ["MATH", "READING", "WRITING"] as const;
 export type PracticeAreaCode = (typeof PRACTICE_AREAS)[number];
 
-/** URL / UI tab keys for practice + Full Practice Tests. */
-export const AREA_TAB_KEYS = ["math", "reading", "writing", "mocks"] as const;
+/** User-facing name of the full-length SAT exams (product decision: "Tests", never "Exams"/"Full Practice Tests"). */
+export const TESTS_LABEL = "Tests";
+export const TEST_LABEL = "Test";
+
+/** URL / UI tab keys for practice + Tests. */
+export const AREA_TAB_KEYS = ["math", "reading", "writing", "tests"] as const;
 export type AreaTabKey = (typeof AREA_TAB_KEYS)[number];
 
 export const PRACTICE_AREA_TABS = [
@@ -19,24 +26,25 @@ export const PRACTICE_AREA_TABS = [
   { key: "writing", label: "Writing", practiceArea: "WRITING" as const },
 ] as const;
 
-export const AREA_TABS_WITH_MOCKS = [
+export const AREA_TABS_WITH_TESTS = [
   ...PRACTICE_AREA_TABS,
-  { key: "mocks" as const, label: "Full Practice Tests", practiceArea: null },
+  { key: "tests" as const, label: TESTS_LABEL, practiceArea: null },
 ];
+
+/** Home pages add a Summary tab in front of the area tabs (no `area` param). */
+export const HOME_TAB_KEYS = ["summary", ...AREA_TAB_KEYS] as const;
+export type HomeTabKey = (typeof HOME_TAB_KEYS)[number];
+
+export function activeHomeTab(value: string | null | undefined): HomeTabKey {
+  if (!value || value === "summary") return "summary";
+  return activeAreaTab(value, "math");
+}
 
 /** Legacy report-area keys used by parent tokens / PDF query params. */
 export type ReportAreaKey = "mathematics" | "reading" | "writing";
 
-export const READING_DOMAIN_NAMES = ["Information and Ideas", "Craft and Structure"] as const;
-export const WRITING_DOMAIN_NAMES = ["Expression of Ideas", "Standard English Conventions"] as const;
-export const MATH_DOMAIN_NAMES = [
-  "Algebra",
-  "Advanced Math",
-  "Problem Solving and Data Analysis",
-  "Geometry and Trigonometry",
-] as const;
-
-export const GRAMMAR_AND_STRUCTURE_TOPIC = "Grammar and Structure";
+/** Writing skill formerly called "Grammar and Structure" (reference taxonomy name). */
+export const FORM_STRUCTURE_SENSE_TOPIC = "Form, Structure & Sense";
 export const LEGACY_FORM_STRUCTURE_TOPIC = "Form, Structure, and Sense";
 
 export function isAreaTabKey(value: string | null | undefined): value is AreaTabKey {
@@ -47,6 +55,7 @@ export function activeAreaTab(value: string | null | undefined, fallback: AreaTa
   // Legacy pages used `rw` for a combined Reading & Writing tab. Reading is
   // the safest destination now that the combined surface is split in two.
   if (value === "rw") return "reading";
+  if (value === "mocks") return "tests";
   return isAreaTabKey(value) ? value : fallback;
 }
 
@@ -71,35 +80,25 @@ export function practiceAreaLabel(area: PracticeAreaCode | null | undefined): st
   return "Unclassified";
 }
 
-/**
- * Section-style label used to GROUP practice content in pickers, tables and
- * breadcrumbs (Math uses the long form "Mathematics" to match SECTION_ORDER).
- * Reading and Writing are surfaced separately; the combined "Reading & Writing"
- * label is reserved for exam/full-test surfaces.
- */
+/** Section label used to GROUP practice content in pickers, tables and breadcrumbs (= Section.label). */
 export function practiceSectionLabel(area: PracticeAreaCode | null | undefined): string {
-  if (area === "MATH") return "Mathematics";
+  if (area === "MATH") return "Math";
   if (area === "READING") return "Reading";
   if (area === "WRITING") return "Writing";
   return "Unclassified";
 }
 
-/** Convenience: resolve a topic's domain to its practice section label in one call. */
-export function domainSectionLabel(input: {
-  practiceArea?: PracticeAreaCode | string | null;
-  sectionName?: string | null;
-  sectionLabel?: string | null;
-  domainName?: string | null;
-}): string {
-  return practiceSectionLabel(resolvePracticeArea(input));
+/** Convenience: a domain's practice section label in one call. */
+export function domainSectionLabel(domain: { practiceArea?: PracticeAreaCode | string | null }): string {
+  return practiceSectionLabel(resolvePracticeArea(domain));
 }
 
-export function reportAreaFromTab(tab: Exclude<AreaTabKey, "mocks">): ReportAreaKey {
+export function reportAreaFromTab(tab: Exclude<AreaTabKey, "tests">): ReportAreaKey {
   if (tab === "math") return "mathematics";
   return tab;
 }
 
-export function tabFromReportArea(area: ReportAreaKey): Exclude<AreaTabKey, "mocks"> {
+export function tabFromReportArea(area: ReportAreaKey): Exclude<AreaTabKey, "tests"> {
   if (area === "mathematics") return "math";
   return area;
 }
@@ -120,7 +119,7 @@ export function areaTabClass(tab: AreaTabKey, active: boolean): string {
     math: "blue",
     reading: "amber",
     writing: "green",
-    mocks: "orange",
+    tests: "orange",
   }[tab];
   if (active) {
     return `border-${color}-600 text-${color}-700 border-b-2`;
@@ -129,69 +128,28 @@ export function areaTabClass(tab: AreaTabKey, active: boolean): string {
 }
 
 /** Explicit active/inactive classes (Tailwind needs full class names). */
-export function areaTabLinkClass(tab: AreaTabKey, active: boolean): string {
-  if (!active) return "border-b-2 border-transparent px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-800";
-  switch (tab) {
-    case "math":
-      return "border-b-2 border-[var(--sat-area-math)] px-3 py-2 text-sm font-medium text-[var(--sat-area-math)]";
-    case "reading":
-      return "border-b-2 border-[var(--sat-area-reading)] px-3 py-2 text-sm font-medium text-[var(--sat-area-reading)]";
-    case "writing":
-      return "border-b-2 border-[var(--sat-area-writing)] px-3 py-2 text-sm font-medium text-[var(--sat-area-writing)]";
-    case "mocks":
-      return "border-b-2 border-[var(--sat-area-mocks)] px-3 py-2 text-sm font-medium text-[var(--sat-area-mocks)]";
-  }
+export function areaTabLinkClass(_tab: HomeTabKey, active: boolean): string {
+  // Mockup `.tabs a`: the active tab is primary blue for every section (the section colour lives in the content).
+  void _tab;
+  return active ? TAB_LINK_ACTIVE : TAB_LINK_IDLE;
 }
 
-function normalizeName(value: string | null | undefined): string {
-  return String(value ?? "")
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, " ");
-}
+/** Mockup `.tabs a` / `.tabs a.active`, shared by every link tab bar. */
+export const TAB_LINK_BASE = "-mb-px whitespace-nowrap border-b-2 px-3.5 py-[9px] text-sm";
+export const TAB_LINK_IDLE = `${TAB_LINK_BASE} border-transparent font-medium text-[var(--sat-muted)] hover:text-[var(--sat-text)]`;
+export const TAB_LINK_ACTIVE = `${TAB_LINK_BASE} border-[var(--sat-primary)] font-semibold text-[var(--sat-primary)]`;
+/** Mockup `.tabs`: 1px rule below, horizontal scroll without a scrollbar. */
+export const TAB_BAR = "overflow-x-auto overflow-y-hidden border-b border-[var(--sat-border)] [scrollbar-width:none]";
 
-/** Fallback when Domain.practiceArea is null (legacy / placeholder rows). */
-export function inferPracticeAreaFromNames(input: {
-  sectionName?: string | null;
-  sectionLabel?: string | null;
-  domainName?: string | null;
-}): PracticeAreaCode | null {
-  const section = normalizeName(`${input.sectionName ?? ""} ${input.sectionLabel ?? ""}`);
-  const domain = normalizeName(input.domainName);
-
-  if (!domain && !section) return null;
-  if (domain === "full practice test") return null;
-  if (MATH_DOMAIN_NAMES.some((name) => domain === normalizeName(name))) return "MATH";
-  if (READING_DOMAIN_NAMES.some((name) => domain === normalizeName(name))) return "READING";
-  if (WRITING_DOMAIN_NAMES.some((name) => domain === normalizeName(name))) return "WRITING";
-  if (section.includes("math")) return "MATH";
-  return null;
-}
-
-export function resolvePracticeArea(input: {
-  practiceArea?: PracticeAreaCode | string | null;
-  sectionName?: string | null;
-  sectionLabel?: string | null;
-  domainName?: string | null;
-}): PracticeAreaCode | null {
-  const persisted = input.practiceArea;
-  if (persisted === "MATH" || persisted === "READING" || persisted === "WRITING") return persisted;
-  return inferPracticeAreaFromNames(input);
+/** A domain's practice area (its Section: MATH, READING or WRITING); null for Test placeholders. */
+export function resolvePracticeArea(domain: { practiceArea?: PracticeAreaCode | string | null }): PracticeAreaCode | null {
+  const area = domain.practiceArea;
+  return area === "MATH" || area === "READING" || area === "WRITING" ? area : null;
 }
 
 /** Prisma where clause for practice content in a given area. */
 export function practiceAreaDomainWhere(area: PracticeAreaCode) {
-  const fallbackNames = area === "MATH"
-    ? MATH_DOMAIN_NAMES
-    : area === "READING"
-      ? READING_DOMAIN_NAMES
-      : WRITING_DOMAIN_NAMES;
-  return {
-    OR: [
-      { practiceArea: area },
-      { practiceArea: null, name: { in: [...fallbackNames] } },
-    ],
-  };
+  return { practiceArea: area };
 }
 
 export function practiceAreaTopicWhere(area: PracticeAreaCode) {
@@ -204,11 +162,11 @@ export function practiceAreaPracticeSetWhere(area: PracticeAreaCode) {
 
 export function buildAreaHref(
   basePath: string,
-  area: AreaTabKey,
+  area: HomeTabKey,
   extra?: Record<string, string | undefined | null>
 ): string {
   const params = new URLSearchParams();
-  params.set("area", area);
+  if (area !== "summary") params.set("area", area);
   if (extra) {
     for (const [key, value] of Object.entries(extra)) {
       if (value) params.set(key, value);

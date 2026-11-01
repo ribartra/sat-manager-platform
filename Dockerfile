@@ -1,7 +1,7 @@
 # Production image for the Next.js web app (Node runtime — required by
 # better-sqlite3 + Prisma adapter). Multi-stage: build with dev deps, then run
 # `next start`. Migrations are applied at container start against the mounted
-# SQLite DB (see deploy/web-entrypoint.sh).
+# SQLite DB (see deploy/vm/web-entrypoint.sh).
 
 # ---- build ----
 FROM node:24-slim AS build
@@ -61,9 +61,13 @@ COPY --from=build /app/app/generated ./app/generated
 COPY --from=build /app/prisma ./prisma
 COPY --from=build /app/prisma.config.ts ./prisma.config.ts
 COPY --from=build /app/next.config.ts ./next.config.ts
-COPY deploy/web-entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY --from=build /app/scripts/backfill-fpt-snapshots.mjs ./scripts/backfill-fpt-snapshots.mjs
+COPY --from=build /app/scripts/apply-data-patches.mjs ./scripts/apply-data-patches.mjs
+COPY deploy/vm/web-entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 EXPOSE 3000
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-CMD ["npm", "run", "start"]
+# next itself is the main process (the entrypoint execs it): SIGTERM on deploy reaches the server
+# directly and it closes open requests, instead of npm dropping them. compose adds `init: true`.
+CMD ["node_modules/.bin/next", "start"]

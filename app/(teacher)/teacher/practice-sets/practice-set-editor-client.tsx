@@ -1,18 +1,17 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { ArrowDown, ArrowUp, Copy, Send, X } from "lucide-react";
+import { ArrowDown, ArrowUp, X } from "lucide-react";
 import { QuestionListItem } from "@/components/question-list-item";
-import { ImportQuestionnaireButton } from "@/components/import-questionnaire-button";
+import { ContentMediaCard, CropShortcut, type ContentMediaLinks } from "@/components/sat/content-media-card";
 import { TaxonomyPicker } from "@/components/taxonomy-picker";
 import {
   Form,
@@ -29,12 +28,15 @@ import {
   difficultyOptions,
   explanationVisibilityOptions,
   practiceSetStatusOptions,
+  questionTypeLabel,
 } from "@/lib/domain-meta";
 import { validatePracticeSetPayload } from "@/lib/content-validation";
 import {
   practiceSetEditorSchema,
   type PracticeSetEditorInput,
 } from "@/contracts/practice-set";
+import { readApiError } from "@/lib/api-client";
+import { Alert } from "@/components/sat/alert";
 
 interface TopicInfo {
   id: string;
@@ -58,9 +60,12 @@ interface QuestionInfo {
 
 interface PracticeSetInitial {
   id?: string;
+  /** Version loaded by the editor; the save is refused (409) if someone else saved since. */
+  updatedAt?: string;
   name?: string;
   topicId?: string;
   difficulty?: string;
+  sourceId?: string | null;
   status?: string;
   explanationVisibility?: string;
   questionIds?: string[];
@@ -79,10 +84,16 @@ function plainMathLabel(content: string, maxLength: number) {
 export function PracticeSetEditor({
   topics,
   questions,
+  sources,
   initial,
+  mediaLinks = null,
 }: {
+  /** Imported set (admin / master teacher): images & source files + crop per question. */
+  mediaLinks?: ContentMediaLinks | null;
   topics: TopicInfo[];
   questions: QuestionInfo[];
+  /** Active Practice Set sources, plus the set's current one (even if deactivated or Tests-only). */
+  sources: { id: string; name: string }[];
   initial?: PracticeSetInitial;
 }) {
   const router = useRouter();
@@ -92,6 +103,7 @@ export function PracticeSetEditor({
       name: initial?.name ?? "",
       topicId: initial?.topicId ?? topics[0]?.id ?? "",
       difficulty: (initial?.difficulty as PracticeSetEditorInput["difficulty"]) ?? "EASY",
+      sourceId: initial?.sourceId ?? sources[0]?.id ?? "",
       status: (initial?.status as PracticeSetEditorInput["status"]) ?? "DRAFT",
       explanationVisibility:
         (initial?.explanationVisibility as PracticeSetEditorInput["explanationVisibility"]) ?? "AFTER_FINISH",
@@ -101,7 +113,6 @@ export function PracticeSetEditor({
 
   const name = form.watch("name");
   const topicId = form.watch("topicId");
-  const difficulty = form.watch("difficulty");
   const questionIds = form.watch("questionIds");
 
   const [errors, setErrors] = useState<string[]>([]);
@@ -141,19 +152,28 @@ export function PracticeSetEditor({
       name: values.name,
       topicId: values.topicId,
       difficulty: values.difficulty,
+      sourceId: values.sourceId,
       status: values.status,
       explanationVisibility: values.explanationVisibility,
       questionIds: values.questionIds,
+      expectedUpdatedAt: initial?.updatedAt,
     };
     const url = initial?.id ? `/api/practice-sets/${initial.id}` : "/api/practice-sets";
     const method = initial?.id ? "PUT" : "POST";
     const response = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     if (!response.ok) {
-      const payload = await response.json().catch(() => null);
-      setErrors(Array.isArray(payload?.errors) ? payload.errors : [payload?.error ?? "Unable to save Practice Set."]);
+      const error = await readApiError(response, "Unable to save Practice Set.");
+      setErrors(error.details.length ? error.details : [error.message]);
       return;
     }
-    router.push(`/teacher/content/${values.topicId}`);
+    // Back to the set's page (view mode), the new one after creating it.
+    const data = (await response.json()) as { id?: string; practiceSet?: { id?: string } } | null;
+    const id = initial?.id ?? data?.practiceSet?.id ?? data?.id;
+    router.push(
+      id
+        ? `/teacher/practice-sets/${id}`
+        : `/teacher/practice-sets?${new URLSearchParams({ topic: values.topicId, difficulty: values.difficulty, ...(values.sourceId ? { source: values.sourceId } : {}) }).toString()}#skill-${values.topicId}`,
+    );
     router.refresh();
   }
 
@@ -164,73 +184,17 @@ export function PracticeSetEditor({
   const selectedQuestions = questionIds
     .map((id) => questions.find((q) => q.id === id))
     .filter((q): q is QuestionInfo => Boolean(q));
-  const selectedTopic = topics.find((topic) => topic.id === topicId);
   const saving = form.formState.isSubmitting;
-  const canSave = Boolean(name?.trim() && topicId && questionIds.length > 0);
-  const status = form.watch("status");
-  const canAssign = status === "PUBLISHED" && Boolean(initial?.id);
-  const [secondaryLoading, setSecondaryLoading] = useState<string | null>(null);
-
-  async function duplicateSet() {
-    if (!initial?.id) return;
-    setSecondaryLoading("duplicate");
-    const response = await fetch(`/api/practice-sets/${initial.id}/duplicate`, { method: "POST" });
-    const data = await response.json().catch(() => ({}));
-    setSecondaryLoading(null);
-    if (!response.ok) {
-      window.alert(data.errors?.join("\n") || data.error || "Unable to duplicate.");
-      return;
-    }
-    if (data?.practiceSet?.id) router.push(`/teacher/practice-sets/${data.practiceSet.id}/edit`);
-  }
+  // Status is changed with the header actions (Publish / Draft / Archive) of an existing set; Save
+  // sends the current one, so it never undoes a change made there.
+  useEffect(() => {
+    if (initial?.id && initial.status) form.setValue("status", initial.status as PracticeSetEditorInput["status"]);
+  }, [form, initial?.id, initial?.status]);
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} className="space-y-6" noValidate>
-        {initial?.id ? (
-          <div className="flex flex-wrap items-center justify-end gap-2">
-            {canAssign ? (
-              <Button asChild variant="secondary" size="sm" type="button">
-                <Link href={`/teacher?assignPracticeSet=${initial.id}`}>
-                  <Send size={14} />
-                  Assign
-                </Link>
-              </Button>
-            ) : (
-              <Button type="button" variant="ghost" size="sm" disabled title="Publish the Practice Set before assigning.">
-                <Send size={14} />
-                Assign
-              </Button>
-            )}
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={duplicateSet}
-              disabled={Boolean(secondaryLoading)}
-            >
-              <Copy size={14} />
-              Duplicate
-            </Button>
-          </div>
-        ) : null}
-
-        <Card padding="md" className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="text-xs font-medium uppercase text-gray-400">PDF/DOCX Import</p>
-            <h2 className="text-sm font-semibold text-gray-900">Create a review batch for this Practice Set</h2>
-            <p className="mt-1 text-xs text-gray-500">
-              Upload the question file plus any answer or explanation files, then review extracted questions before promotion.
-            </p>
-          </div>
-          <ImportQuestionnaireButton
-            mode="PRACTICE_SET"
-            defaultName={name || "Practice Set PDF import"}
-            topicName={selectedTopic?.name}
-            domainName={selectedTopic?.domainName}
-            difficulty={difficulty}
-          />
-        </Card>
+        <ContentMediaCard links={mediaLinks} />
 
         <FormSection title="Details">
           <div className="grid grid-cols-2 gap-4">
@@ -283,15 +247,15 @@ export function PracticeSetEditor({
             />
             <FormField
               control={form.control}
-              name="status"
+              name="sourceId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Status</FormLabel>
+                  <FormLabel>Source</FormLabel>
                   <FormControl>
                     <Select {...field}>
-                      {practiceSetStatusOptions().map((opt) => (
-                        <option key={opt.value} value={opt.value}>
-                          {opt.label}
+                      {sources.map((source) => (
+                        <option key={source.id} value={source.id}>
+                          {source.name}
                         </option>
                       ))}
                     </Select>
@@ -300,6 +264,28 @@ export function PracticeSetEditor({
                 </FormItem>
               )}
             />
+            {/* A new set picks its status here; an existing one changes it with the header actions. */}
+            {initial?.id ? null : (
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <FormControl>
+                      <Select {...field}>
+                        {practiceSetStatusOptions().map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
             <FormField
               control={form.control}
               name="explanationVisibility"
@@ -337,19 +323,21 @@ export function PracticeSetEditor({
                     meta={
                       <>
                         <Badge variant={difficultyBadgeVariant(q.difficulty)}>{difficultyLabel(q.difficulty)}</Badge>
-                        <Badge variant="default">{q.type}</Badge>
+                        <Badge variant="default">{questionTypeLabel(q.type, true)}</Badge>
                       </>
                     }
                     stemClassName="font-medium text-gray-900"
                   />
                 </div>
-                <Button type="button" variant="ghost" size="sm" onClick={() => moveQuestion(index, -1)} disabled={index === 0}>
+                <CropShortcut href={mediaLinks?.cropByQuestion[q.id]} />
+                <Button type="button" variant="ghost" size="sm" aria-label={`Move question ${index + 1} up`} onClick={() => moveQuestion(index, -1)} disabled={index === 0}>
                   <ArrowUp size={14} />
                 </Button>
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
+                  aria-label={`Move question ${index + 1} down`}
                   onClick={() => moveQuestion(index, 1)}
                   disabled={index === selectedQuestions.length - 1}
                 >
@@ -359,6 +347,7 @@ export function PracticeSetEditor({
                   type="button"
                   variant="ghost"
                   size="sm"
+                  aria-label={`Remove question ${index + 1} from the set`}
                   onClick={() => setQuestionIds((ids) => ids.filter((id) => id !== q.id))}
                 >
                   <X size={14} />
@@ -383,28 +372,27 @@ export function PracticeSetEditor({
             <option value="">Select a published question...</option>
             {visibleAvailableQuestions.map((q) => (
               <option key={q.id} value={q.id}>
-                {q.difficulty} / {q.type} / {plainMathLabel(q.stem, 90)}
+                {difficultyLabel(q.difficulty)} / {questionTypeLabel(q.type, true)} / {plainMathLabel(q.stem, 90)}
               </option>
             ))}
           </Select>
         </div>
 
         {errors.length > 0 ? (
-          <Card variant="danger" padding="sm" className="text-sm text-red-700">
-            <p className="font-medium">Fix these issues before saving:</p>
-            <ul className="mt-1 list-disc pl-5">
+          <Alert tone="error" title="Fix these issues before saving:">
+            <ul className="list-disc pl-5">
               {errors.map((error) => (
                 <li key={error}>{error}</li>
               ))}
             </ul>
-          </Card>
+          </Alert>
         ) : null}
 
         <div className="flex items-center gap-3">
-          <Button type="submit" disabled={saving || !canSave}>
+          <Button type="submit" disabled={saving} disabledReason={!name?.trim() ? "Enter a name." : !topicId ? "Choose a skill." : questionIds.length === 0 ? "Add at least one question." : null}>
             {saving ? "Saving..." : initial?.id ? "Save Practice Set" : "Create Practice Set"}
           </Button>
-          <Button type="button" variant="secondary" onClick={() => router.back()}>
+          <Button type="button" variant="secondary" onClick={() => (initial?.id ? router.push(`/teacher/practice-sets/${initial.id}`) : router.back())}>
             Cancel
           </Button>
         </div>

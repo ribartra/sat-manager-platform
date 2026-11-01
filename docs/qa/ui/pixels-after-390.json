@@ -1,0 +1,402 @@
+[
+ {
+  "role": "admin",
+  "route": "/admin/import",
+  "inkLeft": 16,
+  "inkRight": 356,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "admin",
+  "route": "/admin/import/ai",
+  "inkLeft": 16,
+  "inkRight": 347,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "admin",
+  "route": "/admin/import/ai/batch_e877446f45e144eda0a1e4199465e3d2/files/src_8e2ae0ecccf74c6384cab47992a4f883",
+  "inkLeft": 17,
+  "inkRight": 372,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "admin",
+  "route": "/admin/import/ai/sets",
+  "inkLeft": 15,
+  "inkRight": 363,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "admin",
+  "route": "/admin/logs",
+  "inkLeft": 16,
+  "inkRight": 371,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "admin",
+  "route": "/admin/programs",
+  "inkLeft": 16,
+  "inkRight": 373,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "admin",
+  "route": "/admin/settings",
+  "inkLeft": 17,
+  "inkRight": 368,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "admin",
+  "route": "/admin/taxonomy",
+  "inkLeft": 16,
+  "inkRight": 356,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "admin",
+  "route": "/admin/teachers",
+  "inkLeft": 16,
+  "inkRight": 373,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "admin",
+  "route": "/admin/users",
+  "inkLeft": 16,
+  "inkRight": 373,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher",
+  "inkLeft": 16,
+  "inkRight": 373,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/compare",
+  "inkLeft": 16,
+  "inkRight": 345,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/content",
+  "inkLeft": 16,
+  "inkRight": 373,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/content/top-equivalent-expressions",
+  "inkLeft": 16,
+  "inkRight": 373,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/full-tests",
+  "inkLeft": 16,
+  "inkRight": 373,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/full-tests/new",
+  "inkLeft": 17,
+  "inkRight": 349,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/full-tests/scoring",
+  "inkLeft": 16,
+  "inkRight": 373,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/full-tests/cmsjrp00s06bnqmt1dyiuqw2t",
+  "inkLeft": 16,
+  "inkRight": 363,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/full-tests/cmsjrp00s06bnqmt1dyiuqw2t/assign",
+  "inkLeft": 16,
+  "inkRight": 348,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/full-tests/cmsjrp00s06bnqmt1dyiuqw2t/edit",
+  "inkLeft": 17,
+  "inkRight": 349,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/groups",
+  "inkLeft": 16,
+  "inkRight": 373,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/impersonate/ui-student",
+  "inkLeft": 0,
+  "inkRight": 389,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/materials",
+  "inkLeft": 16,
+  "inkRight": 359,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/parents",
+  "inkLeft": 16,
+  "inkRight": 271,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/practice-sets",
+  "inkLeft": 16,
+  "inkRight": 369,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/practice-sets/new",
+  "inkLeft": 17,
+  "inkRight": 348,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/practice-sets/cmsjrokq5066pqmt1j8870wx9/edit",
+  "inkLeft": 17,
+  "inkRight": 361,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/programs",
+  "inkLeft": 16,
+  "inkRight": 373,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/questions",
+  "inkLeft": 16,
+  "inkRight": 373,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/questions/new",
+  "inkLeft": 16,
+  "inkRight": 373,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/questions/cmsjrnsw10000qmt1eqc6f6pv/edit",
+  "inkLeft": 16,
+  "inkRight": 373,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/students/invite",
+  "inkLeft": 17,
+  "inkRight": 175,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/students/ui-student",
+  "inkLeft": 16,
+  "inkRight": 373,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/students/ui-student/assign",
+  "inkLeft": 16,
+  "inkRight": 356,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/students/ui-student/assign-exam",
+  "inkLeft": 16,
+  "inkRight": 348,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/students/ui-student/attempts/ui-att0",
+  "inkLeft": 20,
+  "inkRight": 376,
+  "domShellX": 0,
+  "domH1X": 33
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/students/ui-student/edit",
+  "inkLeft": 17,
+  "inkRight": 348,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "teacher",
+  "route": "/teacher/subskills",
+  "inkLeft": 16,
+  "inkRight": 369,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "teacher",
+  "route": "/notifications",
+  "inkLeft": 17,
+  "inkRight": 356,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "student",
+  "route": "/student",
+  "inkLeft": 16,
+  "inkRight": 373,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "student",
+  "route": "/student/content-map",
+  "inkLeft": 16,
+  "inkRight": 373,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "student",
+  "route": "/student/content-map/top-equivalent-expressions/EASY",
+  "inkLeft": 16,
+  "inkRight": 373,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "student",
+  "route": "/student/full-tests",
+  "inkLeft": 16,
+  "inkRight": 373,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "student",
+  "route": "/student/full-tests/results/ui-fat0",
+  "inkLeft": 16,
+  "inkRight": 373,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "student",
+  "route": "/student/history",
+  "inkLeft": 16,
+  "inkRight": 373,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "student",
+  "route": "/student/materials",
+  "inkLeft": 16,
+  "inkRight": 360,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "student",
+  "route": "/student/practice-sets",
+  "inkLeft": 16,
+  "inkRight": 373,
+  "domShellX": 0,
+  "domH1X": 16
+ },
+ {
+  "role": "student",
+  "route": "/student/program",
+  "inkLeft": 16,
+  "inkRight": 373,
+  "domShellX": 0,
+  "domH1X": 93
+ },
+ {
+  "role": "student",
+  "route": "/student/results/ui-att0",
+  "inkLeft": 16,
+  "inkRight": 373,
+  "domShellX": 0,
+  "domH1X": 41
+ },
+ {
+  "role": "parent",
+  "route": "/parent",
+  "inkLeft": 17,
+  "inkRight": 182,
+  "domShellX": 0,
+  "domH1X": 16
+ }
+]

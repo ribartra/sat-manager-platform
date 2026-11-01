@@ -1,17 +1,21 @@
 import Link from "next/link";
 import prisma from "@/lib/prisma";
-import { formatDate, scorePercent } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
+import { summarizeAllQuestionAnswers } from "@/lib/weighted-score";
 import { Card } from "@/components/ui/card";
 import {
   accessWindow,
   areasLabel,
-  classifyPracticeSetArea,
   parseAreas,
-  practiceSetAreaLabel,
   practiceSetMatchesArea,
 } from "@/lib/parent-access";
 import { hashPublicToken } from "@/lib/token-security";
 import { writeAudit } from "@/lib/audit";
+import { InlineError } from "@/components/sat/alert";
+import { PracticeSetAttemptsAccordion, SkillResults } from "@/components/sat";
+import { loadPracticeReport } from "@/lib/student-report";
+import type { PracticeAreaCode } from "@/lib/practice-area";
+import { practiceSetGroups, practiceSetTitle, type GroupableSet } from "@/lib/attempt-groups";
 
 interface PageProps {
   searchParams: Promise<{ token?: string }>;
@@ -22,13 +26,13 @@ type AccessFailReason = "missing" | "unknown" | "expired" | "revoked";
 function failMessage(reason: AccessFailReason): string {
   switch (reason) {
     case "missing":
-      return "This report link is missing a token.";
+      return "This link is incomplete. Please use the full link from the email.";
     case "unknown":
-      return "This report link is invalid.";
+      return "This link doesn't work.";
     case "revoked":
-      return "This report link has been revoked.";
+      return "This link is no longer active. Ask the teacher for a new one.";
     case "expired":
-      return "This report link has expired.";
+      return "This link has expired. Ask the teacher for a new one.";
   }
 }
 
@@ -43,11 +47,11 @@ async function AccessDenied({ reason, tokenPrefix }: { reason: AccessFailReason;
 
   return (
     <div className="mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center px-4 py-8 text-center">
-      <h1 className="text-lg font-semibold text-gray-900">Unable to open report</h1>
-      <p className="mt-2 text-sm text-red-600">{failMessage(reason)}</p>
-      <p className="mt-3 text-sm text-gray-500">Ask the teacher to share a new link if you still need access.</p>
+      <h1 className="text-lg font-semibold text-gray-900">We couldn&apos;t open this report</h1>
+      <InlineError className="mt-2">{failMessage(reason)}</InlineError>
+      <p className="mt-3 text-sm text-gray-500">If you still need the report, ask the teacher to send you a new link.</p>
       <Link href="/login" className="mt-6 text-sm text-blue-600 hover:underline">
-        Return to login
+        Go to sign in
       </Link>
     </div>
   );
@@ -66,10 +70,9 @@ export default async function ParentTemporaryAccessPage({ searchParams }: PagePr
             where: { status: "SUBMITTED" },
             include: {
               answers: true,
-              assignment: { include: { practiceSet: { include: { topic: { include: { domain: { include: { section: true } } } } } } } },
+              assignment: { include: { practiceSet: { include: { source: { select: { name: true, sortOrder: true } }, topic: { include: { domain: { include: { section: true } } } } } } } },
             },
             orderBy: { submittedAt: "desc" },
-            take: 30,
           },
         },
       },
@@ -110,75 +113,75 @@ export default async function ParentTemporaryAccessPage({ searchParams }: PagePr
   const areas = parseAreas(access.areas);
   const allAreas = areas.length === 3;
 
-  const attempts = access.student.attempts
-    .filter((attempt) => {
+  const attempts = access.student.attempts.filter((attempt) => {
       const taxonomy = attempt.assignment?.practiceSet.topic.domain;
       const section = taxonomy?.section;
       if (!taxonomy || !section) return allAreas;
-      return areas.some((area) => practiceSetMatchesArea({
-        sectionName: section.name,
-        sectionLabel: section.label,
-        domainName: taxonomy.name,
-      }, area));
-    })
-    .slice(0, 10);
+      return areas.some((area) => practiceSetMatchesArea({ practiceArea: taxonomy.practiceArea, sectionName: section.name }, area));
+    });
 
-  const totalAnswers = attempts.flatMap((attempt) => attempt.answers);
-  const correct = totalAnswers.filter((answer) => answer.isCorrect).length;
-  const pct = scorePercent(correct, totalAnswers.length);
+  // Attempt level only (same accordion as teacher and student): one row per practice set with its
+  // LAST attempt, opening to its last 3 tries. No average across sets.
+  const sets = new Map<string, GroupableSet>();
+  for (const attempt of attempts) {
+    const practiceSet = attempt.assignment?.practiceSet;
+    const key = attempt.assignmentId ?? attempt.id;
+    const set =
+      sets.get(key) ??
+      sets
+        .set(key, {
+          key,
+          title: practiceSet ? practiceSetTitle(practiceSet.name, practiceSet.difficulty) : "Practice set",
+          tries: [],
+          // Skill → source → sets, like the teacher and student views.
+          skillId: practiceSet?.topicId ?? null,
+          skillName: practiceSet?.topic.name ?? null,
+          sourceName: practiceSet?.source?.name ?? null,
+          sourceOrder: practiceSet?.source?.sortOrder ?? null,
+        })
+        .get(key)!;
+    const attemptScore = summarizeAllQuestionAnswers(attempt.answers);
+    set.tries.push({
+      id: attempt.id,
+      tryNumber: attempt.attemptNumber,
+      submittedAt: attempt.submittedAt,
+      correct: attemptScore.correct,
+      total: attemptScore.total,
+      pct: attemptScore.percent,
+      time: attempt.totalTime,
+      status: attempt.status,
+    });
+  }
+  const groups = practiceSetGroups([...sets.values()]);
+  // Results by skill (same SkillResults as teacher and student), only for the areas this link covers.
+  const AREA_CODE: Record<string, PracticeAreaCode> = { mathematics: "MATH", reading: "READING", writing: "WRITING" };
+  const reports = (await Promise.all(areas.map((area) => loadPracticeReport(access.studentId, AREA_CODE[area], {})))).filter(
+    (report) => report.skillResults.length > 0,
+  );
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
+    <div className="mx-auto max-w-[var(--sat-page-wide)] px-4 py-8">
       <div className="mb-6">
         <p className="text-xs font-medium uppercase text-gray-400">Progress report · {areasLabel(areas)}</p>
-        <h1 className="mt-1 text-2xl font-semibold text-gray-900">{access.student.name}</h1>
-        <p className="mt-1 text-sm text-gray-500">Access available until {formatDate(state.effectiveExpiresAt)}</p>
+        <h1 className="mt-1 text-[26px] font-bold tracking-[-0.3px] text-gray-900">{access.student.name}</h1>
+        <p className="mt-1 text-sm text-gray-500">You can open this report until {formatDate(state.effectiveExpiresAt)}.</p>
       </div>
 
-      <div className="mb-6 grid gap-4 md:grid-cols-3">
-        <Metric label="Completed attempts" value={attempts.length.toString()} />
-        <Metric label="Answered questions" value={totalAnswers.length.toString()} />
-        <Metric label="Average accuracy" value={totalAnswers.length ? `${pct}%` : "-"} />
-      </div>
+      <p className="mb-3 text-sm text-gray-600">
+        {groups.length} practice set{groups.length === 1 ? "" : "s"} finished · each row shows the last attempt; open it to see the latest tries.
+      </p>
+      {groups.length === 0 ? (
+        <Card><p className="p-8 text-center text-sm text-gray-400">No practice sets finished in these subjects yet.</p></Card>
+      ) : (
+        <div className="space-y-5">
+          {reports.map((report) => (
+            <SkillResults key={report.practiceArea} report={report} id={`skills-${report.practiceArea}`} />
+          ))}
+          <PracticeSetAttemptsAccordion sets={groups} />
+        </div>
+      )}
 
-      <Card>
-        {attempts.map((attempt) => {
-          const attemptCorrect = attempt.answers.filter((answer) => answer.isCorrect).length;
-          const total = attempt.answers.length;
-          return (
-            <div key={attempt.id} className="border-b border-gray-100 px-4 py-3 last:border-b-0">
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="text-sm font-medium text-gray-900">{attempt.assignment?.practiceSet.name ?? "Practice Set"}</p>
-                  <p className="mt-0.5 text-xs text-gray-500">
-                    {practiceSetAreaLabel(classifyPracticeSetArea({
-                      sectionName: attempt.assignment?.practiceSet.topic.domain.section.name,
-                      sectionLabel: attempt.assignment?.practiceSet.topic.domain.section.label,
-                      domainName: attempt.assignment?.practiceSet.topic.domain.name,
-                    })) ?? attempt.assignment?.practiceSet.topic.domain.section.label} · {attempt.assignment?.practiceSet.topic.name}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-semibold text-gray-900">{attemptCorrect}/{total} · {scorePercent(attemptCorrect, total)}%</p>
-                  <p className="text-xs text-gray-400">{attempt.submittedAt ? formatDate(attempt.submittedAt) : ""}</p>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-        {attempts.length === 0 && <p className="p-8 text-center text-sm text-gray-400">No completed practice in the selected sections yet.</p>}
-      </Card>
-
-      <Link href="/login" className="mt-6 inline-block text-sm text-blue-600 hover:underline">Return to login</Link>
+      <Link href="/login" className="mt-6 inline-block text-sm text-blue-600 hover:underline">Go to sign in</Link>
     </div>
-  );
-}
-
-function Metric({ label, value }: { label: string; value: string }) {
-  return (
-    <Card padding="md">
-      <p className="text-xs font-medium uppercase text-gray-400">{label}</p>
-      <p className="mt-1 text-2xl font-semibold text-gray-900">{value}</p>
-    </Card>
   );
 }

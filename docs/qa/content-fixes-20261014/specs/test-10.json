@@ -1,0 +1,252 @@
+[
+  {
+    "table": "Question",
+    "id": "cmsjrnsxq0008qmt1wxyfhfiq",
+    "field": "stimulus",
+    "before": "A study led by Jeffrey M. Ellenbogen demonstrates that individuals who slept after learning were significantly more likely to recall the information with greater accuracy compared to those who remained awake. The findings of the study suggest that sleep plays a crucial role in improving the ability to recall information through processing and combining newly acquired knowledge.",
+    "after": "While all the benefits of sleep have yet to be discovered, research has shown that the brain works to ____ memories during a sleep cycle. A study led by Jeffrey M. Ellenbogen demonstrates that individuals who slept after learning were significantly more likely to recall the information with greater accuracy compared to those who remained awake. The findings of the study suggest that sleep plays a crucial role in improving the ability to recall information through processing and combining newly acquired knowledge.",
+    "note": "T10 R&W M1 #4: other — stimulus truncated: opening sentence holding the ____ blank (\"While all the benefits of sleep … works to ____ memories during a sleep cycle.\") was lost; without it the question has no blank",
+    "class": "other",
+    "evidence": "IngestPageArtifact p2 of files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf (Q4 passage)"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "opt_96ad4de311b44d55ac02b9a060d25b29",
+    "field": "text",
+    "before": "He vocally opposed government interference in church organization and teaching. The following text",
+    "after": "He vocally opposed government interference in church organization and teaching.",
+    "note": "T10 R&W M1 #7 opt D: bleed — option D ended with \" The following text\" = start of Q8's intro line",
+    "class": "bleed",
+    "evidence": "IngestPageArtifact p4 of files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf: Q7 option D ends \"…church organization and teaching.\"; \"The following text comes from…\" begins Q8"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnsz50014qmt1na9sbtet",
+    "field": "stimulus",
+    "before": "The following text comes from the 11th-century work *The Chronicle of Ahimaaz* written by Ahimaaz ben Paltiel. In those days there was in Bari, Saudan, the chieftain of the Arabians at the time, who held sway over the entire country. He sent messengers to the famous city of Oria, to make a treaty of peace with its inhabitants, promising not to deliver their land to destruction, only to exact tribute of them. But this was just a ruse, by which he planned to fall upon the city suddenly and overthrow it, and lay it waste.",
+    "after": "The following text comes from the 11th-century work *The Chronicle of Ahimaaz* written by Ahimaaz ben Paltiel.\n\nIn those days there was in Bari, Saudan, the chieftain of the Arabians at the time, who held sway over the entire country. He sent messengers to the famous city of Oria, to make a treaty of peace with its inhabitants, promising not to deliver their land to destruction, only to exact tribute of them. But this was just a ruse, by which he planned to fall upon the city suddenly and overthrow it, and lay it waste.",
+    "note": "T10 R&W M1 #8: other — intro line and passage run together; restore paragraph break (text identical)",
+    "class": "other",
+    "evidence": "IngestPageArtifact p4 of files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "opt_ef7c463f6e084a0d807a053935a23dbf",
+    "field": "text",
+    "before": "the growth mindset may not produce desired out",
+    "after": "the growth mindset may not produce desired outcomes without additional factors like continual practice and hard work.",
+    "note": "T10 R&W M1 #13 opt D: other — option D (the key) truncated mid-word (\"…may not produce desired out\"); restored full text",
+    "class": "other",
+    "evidence": "IngestPageArtifact p9 of files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf: D \"the growth mindset may not produce desired outcomes without additional factors like continual practice and hard work.\""
+  },
+  {
+    "table": "QuestionOption",
+    "id": "opt_d43dbfa2e62a4b51b91b365d0e90370a",
+    "field": "text",
+    "before": "advancements and for ➤",
+    "after": "advancements and for",
+    "note": "T10 R&W M1 #14 opt D: other — stray \"➤\" (COME BACK LATER UI arrow) at end of option D",
+    "class": "other",
+    "evidence": "IngestPageArtifact p10 of files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf: \"☒ D advancements and for\" then \"➤ COME BACK LATER\""
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnt1w002hqmt10ya7zghr",
+    "field": "stimulus",
+    "before": "In the early 2020s, supporters of the Independent State Legislature theory argued that state legislatures could write election laws without restrictions, but in the 2023 case of *Moore v. Harper*, the Supreme _____ unbridled authority in establishing election rules, confirming that legislative actions must adhere to constitutional and legal limitations.",
+    "after": "One objective of the Supreme Court is to ensure the democratic integrity of not only federal elections but state elections as well. In the early 2020s, supporters of the Independent State Legislature theory argued that state legislatures could write election laws without restrictions, but in the 2023 case of *Moore v. Harper*, the Supreme _____ unbridled authority in establishing election rules, confirming that legislative actions must adhere to constitutional and legal limitations.",
+    "note": "T10 R&W M1 #19: other — stimulus truncated: opening sentence \"One objective of the Supreme Court … state elections as well.\" dropped",
+    "class": "other",
+    "evidence": "IngestPageArtifact p12 of files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf (Q19 passage)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnt2a002lqmt1ctzcykx6",
+    "field": "stimulus",
+    "before": "The In 1834, Myra Clark Gaines initiated a lawsuit, leading to one of the lengthiest cases in US court history. Upon discovering the wealth of her biological father, Daniel Clark, Gaines fought for recognition as his lawful heir. The case took many years due to conflicting wills: one favoring Gaines, the other bequeathing the inheritance to Clark's mother. ______ in 1889, the Supreme Court ruled in favor of Gaines, though her children inherited the fortune instead as she had passed away by then.",
+    "after": "In 1834, Myra Clark Gaines initiated a lawsuit, leading to one of the lengthiest cases in US court history. Upon discovering the wealth of her biological father, Daniel Clark, Gaines fought for recognition as his lawful heir. The case took many years due to conflicting wills: one favoring Gaines, the other bequeathing the inheritance to Clark's mother. ______ in 1889, the Supreme Court ruled in favor of Gaines, though her children inherited the fortune instead as she had passed away by then.",
+    "note": "T10 R&W M1 #21: other — stray leading word \"The \" (passage begins \"In 1834,\")",
+    "class": "other",
+    "evidence": "IngestPageArtifact p13 of files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf (Q21 passage)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnt2x002zqmt194kfilxx",
+    "field": "stimulus",
+    "before": "notes: - According to the United States Geological Survey (USGS), amphibian populations are in a state of worldwide decline. - Statistics from the USGS indicate that amphibian populations in the United States decrease by 3.79 percent every year. - Pesticide use may be responsible for some of the US decline. - Climate change may also be responsible for both US and worldwide declines.",
+    "after": "notes:\n\n- According to the United States Geological Survey (USGS), amphibian populations are in a state of worldwide decline.\n- Statistics from the USGS indicate that amphibian populations in the United States decrease by 3.79 percent every year.\n- Pesticide use may be responsible for some of the US decline.\n- Climate change may also be responsible for both US and worldwide declines.",
+    "note": "T10 R&W M1 #24: other — notes bullets flattened into one line; one bullet per line (text identical; source screenshot itself starts at \"notes:\")",
+    "class": "other",
+    "evidence": "IngestPageArtifact p15 of files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf + rendered page"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnt340035qmt16wj1iupc",
+    "field": "stimulus",
+    "before": "- In Franz Kafka's 1913 short story \"The Judgment,\" a young clerk named Georg Bendemann and his elderly father have a heated argument. - Some literary critics claim that the argument is mostly nonsensical. - The story was published in Kafka's lifetime. - In Kafka's unfinished novel *The Trial*, a bank clerk named Josef K. is arrested and prosecuted. - The reasons for Josef K.'s arrest and trial are never specified. - The novel was published after Kafka's death by Kafka's friend and executor Max Brod.",
+    "after": "- In Franz Kafka's 1913 short story \"The Judgment,\" a young clerk named Georg Bendemann and his elderly father have a heated argument.\n- Some literary critics claim that the argument is mostly nonsensical.\n- The story was published in Kafka's lifetime.\n- In Kafka's unfinished novel *The Trial*, a bank clerk named Josef K. is arrested and prosecuted.\n- The reasons for Josef K.'s arrest and trial are never specified.\n- The novel was published after Kafka's death by Kafka's friend and executor Max Brod.",
+    "note": "T10 R&W M1 #25: other — notes bullets flattened into one line; one bullet per line (text identical; screenshot has no intro line)",
+    "class": "other",
+    "evidence": "IngestPageArtifact p16 of files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf + rendered page"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnsyc000jqmt1zsjwuywp",
+    "field": "stimulus",
+    "before": "The following text comes from Polybius' second-century work *Histories*. In my former book I explained the causes of the second war between Rome and Carthage; and described Hannibal's invasion of Italy, and the engagements which took place between them up to the battle of Cannae, on the banks of the Aufidus. I shall now take up the history of Greece during the same period, ending at the same date, and commencing from the 140th Olympiad.",
+    "after": "The following text comes from Polybius' second-century work *Histories*.\n\nIn my former book I explained the causes of the second war between Rome and Carthage; and described Hannibal's invasion of Italy, and the engagements which took place between them up to the battle of Cannae, on the banks of the Aufidus. I shall now take up the history of Greece during the same period, ending at the same date, and commencing from the 140th Olympiad.",
+    "note": "T10 R&W M2 #5: other — intro line and passage run together; restore paragraph break (text identical)",
+    "class": "other",
+    "evidence": "IngestPageArtifact p21 of files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnsyp000tqmt176iwhq7b",
+    "field": "stimulus",
+    "before": "The following text comes from the 17th-century work *History of Al Maggari* written by Ahmed Al Maggari. In this text, a general addresses his soldiers.\n\nRemember that I place myself in the front of this glorious charge which I exhort you to make. At the moment when the two armies meet hand to hand, you will see me, never doubt it, seeking out this Roderick, tyrant of his people, challenging him to combat, if God is willing. If I perish after this, I will have had at least the satisfaction of delivering you, and++ you will easily find among you an experienced hero, to whom you can confidently give the task of directing you++. But should I fall before I reach to Roderick, redouble your ardor, force yourselves to the attack and achieve the conquest of this country.",
+    "after": "The following text comes from the 17th-century work *History of Al Maggari* written by Ahmed Al Maggari. In this text, a general addresses his soldiers.\n\nRemember that I place myself in the front of this glorious charge which I exhort you to make. At the moment when the two armies meet hand to hand, you will see me, never doubt it, seeking out this Roderick, tyrant of his people, challenging him to combat, if God is willing. If I perish after this, I will have had at least the satisfaction of delivering you, and ++you will easily find among you an experienced hero, to whom you can confidently give the task of directing you++. But should I fall before I reach to Roderick, redouble your ardor, force yourselves to the attack and achieve the conquest of this country.",
+    "note": "T10 R&W M2 #6: other — underline marker started before the space (\"and++ you\"); move it to the underlined words",
+    "class": "other",
+    "evidence": "rendered p21 of files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf: underline spans \"you will easily find … task of directing you\""
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnsyz000zqmt1vzi20rcg",
+    "field": "stimulus",
+    "before": "The following text is from Josephus's first-century work *The Wars of the Jews*, which covers the history of the Roman-Jewish wars. While some men who were not concerned in the affairs themselves have gotten together vain and contradictory stories by hearsay, and have written them down after a sophistical manner; and while those that were there present have given false accounts of things; and while their writings contain sometimes accusations, and sometimes encomiums, but no where the accurate truth of the facts; I have proposed to myself, for the sake of such as live under the government of the Romans, to translate those books into the Greek tongue, which I formerly composed in the language of our country, and sent to the Upper Barbarians; Joseph, the son of Matthias, by birth a Hebrew, a priest also, and one who at first fought against the Romans myself, and was forced to be present at what was done afterwards.",
+    "after": "The following text is from Josephus's first-century work *The Wars of the Jews*, which covers the history of the Roman-Jewish wars.\n\nWhile some men who were not concerned in the affairs themselves have gotten together vain and contradictory stories by hearsay, and have written them down after a sophistical manner; and while those that were there present have given false accounts of things; and while their writings contain sometimes accusations, and sometimes encomiums, but no where the accurate truth of the facts; I have proposed to myself, for the sake of such as live under the government of the Romans, to translate those books into the Greek tongue, which I formerly composed in the language of our country, and sent to the Upper Barbarians; Joseph, the son of Matthias, by birth a Hebrew, a priest also, and one who at first fought against the Romans myself, and was forced to be present at what was done afterwards.",
+    "note": "T10 R&W M2 #7: other — intro line and passage run together; restore paragraph break (text identical)",
+    "class": "other",
+    "evidence": "IngestPageArtifact p22 of files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnsza0015qmt1bf7ttfky",
+    "field": "stimulus",
+    "before": "The following text comes from Theodore Roosevelt's 1910 speech \"Citizenship in a Republic.\" It is not the critic who counts; not the man who points out how the strong man stumbles, or where the doer of deeds could have done them better. The credit belongs to the man who is actually in the arena, whose face is marred by dust and sweat and blood; who strives valiantly; who errs, who comes short again and again, because there is no effort without error and shortcoming; but who does actually strive to do the deeds; who knows the great enthusiasms, the great devotions; who spends himself in a worthy cause; who at the best knows in the end the triumph of high achievement, and who at the worst, if he fails, at least fails while daring greatly, so that his place shall never be with those cold and timid souls who neither know victory nor defeat.",
+    "after": "The following text comes from Theodore Roosevelt's 1910 speech \"Citizenship in a Republic.\"\n\nIt is not the critic who counts; not the man who points out how the strong man stumbles, or where the doer of deeds could have done them better. The credit belongs to the man who is actually in the arena, whose face is marred by dust and sweat and blood; who strives valiantly; who errs, who comes short again and again, because there is no effort without error and shortcoming; but who does actually strive to do the deeds; who knows the great enthusiasms, the great devotions; who spends himself in a worthy cause; who at the best knows in the end the triumph of high achievement, and who at the worst, if he fails, at least fails while daring greatly, so that his place shall never be with those cold and timid souls who neither know victory nor defeat.",
+    "note": "T10 R&W M2 #8: other — intro line and passage run together; restore paragraph break (text identical)",
+    "class": "other",
+    "evidence": "IngestPageArtifact p23 of files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnt06001lqmt16edse07w",
+    "field": "stimulus",
+    "before": "The following text is from Samuel Taylor Coleridge's 1816 poem \"Kubla Khan.\" In Xanadu did Kubla Khan A stately pleasure-dome decree: Where Alph, the sacred river, ran Through caverns measureless to man Down to a sunless sea. So twice five miles of fertile ground With walls and towers were girdled round; And there were gardens bright with sinuous rills, Where blossomed many an incense-bearing tree; And here were forests ancient as the hills, Enfolding sunny spots of greenery.",
+    "after": "The following text is from Samuel Taylor Coleridge's 1816 poem \"Kubla Khan.\"\n\nIn Xanadu did Kubla Khan\nA stately pleasure-dome decree:\nWhere Alph, the sacred river, ran\nThrough caverns measureless to man\nDown to a sunless sea.\nSo twice five miles of fertile ground\nWith walls and towers were girdled round;\nAnd there were gardens bright with sinuous rills,\nWhere blossomed many an incense-bearing tree;\nAnd here were forests ancient as the hills,\nEnfolding sunny spots of greenery.",
+    "note": "T10 R&W M2 #10: other — poem lines and intro squashed into one paragraph; restore intro break and one verse per line (text identical)",
+    "class": "other",
+    "evidence": "IngestPageArtifact p24 of files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "cmsojfkny000418pphjkv93qb",
+    "field": "imageUrl",
+    "before": "/uploads/questions/550fefb968242bdbbe37e1e1.jpg",
+    "after": null,
+    "note": "T10 R&W M2 #12 opt D: other — option D carries the question's bar-graph image (same file as Question.imageUrl) → graph shown twice, once under D; source option D is text only",
+    "class": "other",
+    "evidence": "rendered p25 of files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf: option D is text only"
+  },
+  {
+    "table": "Question",
+    "id": "cmsnffuvs00050mmxg91q2rf1",
+    "field": "stem",
+    "before": "$2x - 3y = -15$\n\n$$3x + 3y = 30$$\n\nWhat is the solution $(x, y)$ to the given system of equations?",
+    "after": "$$2x - 3y = -15$$\n\n$$3x + 3y = 30$$\n\nWhat is the solution $(x, y)$ to the given system of equations?",
+    "note": "T10 Math M1 #3: other — first equation of the system inline, second display; both are centred display equations in the source",
+    "class": "other",
+    "evidence": "rendered p1 of files_to_load/MOCK EXAMS/TEST 10/MATH/Test 10 Innov. Math.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsnffuzb00270mmxj89q3is6",
+    "field": "stem",
+    "before": "The table shows various input and output values for the linear function $f(x)$ — for $x = -20, -17, -14, -11$ the outputs $f(x)$ are $25, 19, 13, 7$ respectively. If $f(x)$ is graphed on the $xy$-plane, which coordinate is the $x$-intercept of the graph?",
+    "after": "| x | f(x) |\n| --- | --- |\n| -20 | 25 |\n| -17 | 19 |\n| -14 | 13 |\n| -11 | 7 |\n\nThe table shows various input and output values for the linear function $f(x)$. If $f(x)$ is graphed on the $xy$-plane, which coordinate is the $x$-intercept of the graph?",
+    "note": "T10 Math M1 #21: flattened_table — table (OCR [tbl-0.html]) had been paraphrased into the stem as prose (\"— for x = -20, -17, -14, -11 the outputs … respectively\"); rebuilt as pipe table + source sentence",
+    "class": "flattened_table",
+    "evidence": "rendered p8 of files_to_load/MOCK EXAMS/TEST 10/MATH/Test 10 Innov. Math.pdf: table x | f(x): -20 25, -17 19, -14 13, -11 7; IngestPageArtifact p8 sentence"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu8400hiqmt1hq2iv0yf",
+    "field": "stem",
+    "before": "Note: Figure not drawn to scale\n\nIn the image shown, line m is parallel to line n, all four triangles formed by the intersecting lines are isosceles triangles, and the two smaller triangles are congruent. If the measure of angle 3 is  \\( 104^{\\circ} \\) , what is the sum of angle 1 and angle 2, in degrees?",
+    "after": "Note: Figure not drawn to scale\n\nIn the image shown, line m is parallel to line n, all four triangles formed by the intersecting lines are isosceles triangles, and the two smaller triangles are congruent. If the measure of angle 3 is $104^{\\circ}$, what is the sum of angle 1 and angle 2, in degrees?",
+    "note": "T10 Math M2 #17: other — OCR inline math with stray spaces (\"  \\( 104^{\\circ} \\) ,\"); normalise to $104^{\\circ}$,",
+    "class": "other",
+    "evidence": "rendered p17 of files_to_load/MOCK EXAMS/TEST 10/MATH/Test 10 Innov. Math.pdf"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "cmsjrnu8800hoqmt1maranylh",
+    "field": "text",
+    "before": "\\( 3.50t + 5.25r \\leq 50 \\) \\( t \\leq 3r \\)",
+    "after": "\\(3.50t + 5.25r \\leq 50\\)\n\\(t \\leq 3r\\)",
+    "note": "T10 Math M2 #18 opt A: other — system of two inequalities on one line; source stacks them (one per line)",
+    "class": "other",
+    "evidence": "rendered p17 of files_to_load/MOCK EXAMS/TEST 10/MATH/Test 10 Innov. Math.pdf: each option shows 3.50t + 5.25r ≤ 50 over the second inequality"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "cmsjrnu8800hpqmt1mnz4fvlg",
+    "field": "text",
+    "before": "\\( 3.50t + 5.25r \\leq 50 \\) \\( 3t \\leq r \\)",
+    "after": "\\(3.50t + 5.25r \\leq 50\\)\n\\(3t \\leq r\\)",
+    "note": "T10 Math M2 #18 opt B: other — system of two inequalities on one line; source stacks them (one per line)",
+    "class": "other",
+    "evidence": "rendered p17 of files_to_load/MOCK EXAMS/TEST 10/MATH/Test 10 Innov. Math.pdf: each option shows 3.50t + 5.25r ≤ 50 over the second inequality"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "cmsjrnu8800hqqmt16bcervtc",
+    "field": "text",
+    "before": "\\( 3.50t + 5.25r \\leq 50 \\) \\( t \\geq 3r \\)",
+    "after": "\\(3.50t + 5.25r \\leq 50\\)\n\\(t \\geq 3r\\)",
+    "note": "T10 Math M2 #18 opt C: other — system of two inequalities on one line; source stacks them (one per line)",
+    "class": "other",
+    "evidence": "rendered p17 of files_to_load/MOCK EXAMS/TEST 10/MATH/Test 10 Innov. Math.pdf: each option shows 3.50t + 5.25r ≤ 50 over the second inequality"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "cmsjrnu8800hrqmt1zwljbf3e",
+    "field": "text",
+    "before": "\\( 3.50t + 5.25r \\leq 50 \\) \\( 3t \\geq r \\)",
+    "after": "\\(3.50t + 5.25r \\leq 50\\)\n\\(3t \\geq r\\)",
+    "note": "T10 Math M2 #18 opt D: other — system of two inequalities on one line; source stacks them (one per line)",
+    "class": "other",
+    "evidence": "rendered p17 of files_to_load/MOCK EXAMS/TEST 10/MATH/Test 10 Innov. Math.pdf: each option shows 3.50t + 5.25r ≤ 50 over the second inequality"
+  },
+  {
+    "table": "Question",
+    "id": "cmsnffuz700220mmxj997lph9",
+    "field": "explanation",
+    "before": "Choice C is correct. This can be solved by graphing the answer choices in the graphing calculator to see which equation yields the graph shown. As a result, Choice C is the equation of the graph.\nAlternatively, it can be solved by choosing a point on the graph and substituting the coordinate points for  and  respectively into the equations in the answer choices.\nChoice A is incorrect as even though the intercepts are correct, the vertex of the graph is at , and this equation has a vertex at . Choice B is incorrect as this has the incorrect sign for the middle term. Choice D is incorrect as this would be a graph that opens upward because the coefficient for  is positive.\nCalculator tip: Enter the equation into the equation entry field in Desmos and evaluate whether it matches the shape and position of the original graph, as well as confirm that the graph passes through the same critical data points corresponding to the original graph in the test question. To save time, start by screening the answer choices according to their  intercepts, which are the \"c\" term in the  equation. Since the graph includes a  intercept of , only look to compare answers B and C in Desmos with the  \"\" value. Then, look at a comparison between other points (such as the intercepts) on their respective graphs that would separate the equations. Find which one matches the original graph in the test question. You can visually confirm that only Choice C matches.",
+    "after": "Choice C is correct. This can be solved by graphing the answer choices in the graphing calculator to see which equation yields the graph shown. As a result, Choice C is the equation of the graph.\nAlternatively, it can be solved by choosing a point on the graph and substituting the coordinate points for $x$ and $y$ respectively into the equations in the answer choices.\nChoice A is incorrect as even though the intercepts are correct, the vertex of the graph is at $(1, 2)$, and this equation has a vertex at $(1, 4)$. Choice B is incorrect as this has the incorrect sign for the middle term. Choice D is incorrect as this would be a graph that opens upward because the coefficient for $x^{2}$ is positive.\nCalculator tip: Enter the equation into the equation entry field in Desmos and evaluate whether it matches the shape and position of the original graph, as well as confirm that the graph passes through the same critical data points corresponding to the original graph in the test question. To save time, start by screening the answer choices according to their $y$ intercepts, which are the \"c\" term in the $h(x) = ax^{2} + bx + c$ equation. Since the graph includes a $y$ intercept of $(0, 1.5)$, only look to compare answers B and C in Desmos with the $\\frac{3}{2}$ \"$c$\" value. Then, look at a comparison between other points (such as the $x$-intercepts) on their respective graphs that would separate the equations. Find which one matches the original graph in the test question. You can visually confirm that only Choice C matches.",
+    "note": "T10 Math M1 #20: stripped_math — Word equations stripped at import (e.g. \"vertex of the graph is at , and\" / \"angle  measures .\"); rebuilt the OMML as LaTeX, prose identical",
+    "class": "stripped_math",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 10/Test10_Math_Answer_Explanations.docx Q20 (MODULE 1) OMML equations"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu7o00heqmt13yzsvmfz",
+    "field": "explanation",
+    "before": "Choice D is correct. This question requires determining which options I, II, or III are incorrect. The leading coefficient is not reduced by  during horizontal shifts to the left or right by a certain value. I is incorrect. The other two options are correct. The reason II is correct is that when shifted left, one solution passes through the origin, therefore one of the values of , or  is . The third option is also correct because the y intercept would occur at  which is the origin.\nChoice A is incorrect because option I is incorrect, The leading coefficient is not reduced by  during horizontal shifts to the left or right by a certain value. Choice B is incorrect because option I is incorrect. Choice C is incorrect because option III is also correct.",
+    "after": "Choice D is correct. This question requires determining which options I, II, or III are incorrect. The leading coefficient is not reduced by $1$ during horizontal shifts to the left or right by a certain value. I is incorrect. The other two options are correct. The reason II is correct is that when shifted left, one solution passes through the origin, therefore one of the values of $m,n$, or $o$ is $0$. The third option is also correct because the y intercept would occur at $(0, 0)$ which is the origin.\nChoice A is incorrect because option I is incorrect, The leading coefficient is not reduced by $1$ during horizontal shifts to the left or right by a certain value. Choice B is incorrect because option I is incorrect. Choice C is incorrect because option III is also correct.",
+    "note": "T10 Math M2 #13: stripped_math — Word equations stripped at import (e.g. \"vertex of the graph is at , and\" / \"angle  measures .\"); rebuilt the OMML as LaTeX, prose identical",
+    "class": "stripped_math",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 10/Test10_Math_Answer_Explanations.docx Q13 (MODULE 2B) OMML equations"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnu8400hiqmt1hq2iv0yf",
+    "field": "explanation",
+    "before": "Choice B is correct.\n\nFor the top-right triangle, angle  and the bottom angle of the triangle are supplementary. Therefore, . It is an isosceles triangle, so the remaining two angles are equal. The sum of the remaining two angles is\n, and divide by two to yield  for both the top angles of the top right triangle. Since the two small triangles are congruent, the angles are the same. The top-right angle of the triangle is supplementary to the angle adjacent to it:  As such, angle  measures .\nBecause they are alternate interior angles, the top-left angle of the top-left triangle and the bottom-left angle of the bottom right triangle are equal. Therefore, the bottom-left angle of the bottom-right triangle measures . The sum of angle  and this angle is  as they are alternate interior angles. As such,\n, which is the measure of angle . Finally,\nangle  angle .\nChoice A is incorrect as this is the measure of angle . Choice C is incorrect as this is double the measure of angle . Choice D is incorrect as this is double the measure of angle .",
+    "after": "Choice B is correct.\n\nFor the top-right triangle, angle $3$ and the bottom angle of the triangle are supplementary. Therefore, $180^{\\circ} - 104^{\\circ} = 76^{\\circ}$. It is an isosceles triangle, so the remaining two angles are equal. The sum of the remaining two angles is\n$180^{\\circ} - 76^{\\circ} = 104^{\\circ}$, and divide by two to yield $52^{\\circ}$ for both the top angles of the top right triangle. Since the two small triangles are congruent, the angles are the same. The top-right angle of the triangle is supplementary to the angle adjacent to it: $180^{\\circ} - 52^{\\circ} = 128^{\\circ}$. As such, angle $1$ measures $128^{\\circ}$.\nBecause they are alternate interior angles, the top-left angle of the top-left triangle and the bottom-left angle of the bottom right triangle are equal. Therefore, the bottom-left angle of the bottom-right triangle measures $52^{\\circ}$. The sum of angle $2$ and this angle is $128$ as they are alternate interior angles. As such,\n$128^{\\circ} - 52^{\\circ} = 76^{\\circ}$, which is the measure of angle $2$. Finally,\nangle $1 +$ angle $2 = 128^{\\circ} + 76^{\\circ} = 204^{\\circ}$.\nChoice A is incorrect as this is the measure of angle $1$. Choice C is incorrect as this is double the measure of angle $3$. Choice D is incorrect as this is double the measure of angle $1$.",
+    "note": "T10 Math M2 #17: stripped_math — Word equations stripped at import (e.g. \"vertex of the graph is at , and\" / \"angle  measures .\"); rebuilt the OMML as LaTeX, prose identical",
+    "class": "stripped_math",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 10/Test10_Math_Answer_Explanations.docx Q17 (MODULE 2B) OMML equations"
+  }
+]

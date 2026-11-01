@@ -3,8 +3,6 @@
 // deadline). The first open records `usedAt`; from then the report stays
 // available for PARENT_ACCESS_WINDOW_DAYS.
 import {
-  READING_DOMAIN_NAMES,
-  WRITING_DOMAIN_NAMES,
   practiceAreaFromReportArea,
   resolvePracticeArea,
   type ReportAreaKey,
@@ -17,11 +15,6 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 export type ReportArea = ReportAreaKey;
 export type PracticeSetArea = ReportArea | "reading_writing";
 const ALL_AREAS: ReportArea[] = ["mathematics", "reading", "writing"];
-
-/** @deprecated Prefer Domain.practiceArea; kept for ingest/legacy fallbacks. */
-export const READING_DOMAINS = READING_DOMAIN_NAMES;
-/** @deprecated Prefer Domain.practiceArea; kept for ingest/legacy fallbacks. */
-export const WRITING_DOMAINS = WRITING_DOMAIN_NAMES;
 
 export function parseAreas(csv: string | null | undefined): ReportArea[] {
   if (!csv) return [...ALL_AREAS];
@@ -44,37 +37,22 @@ export function normalizeAreasInput(input: unknown): string {
 export function areasLabel(areas: ReportArea[]): string {
   const hasMath = areas.includes("mathematics");
   const hasRW = areas.includes("reading") || areas.includes("writing");
-  if (hasMath && hasRW) return "Mathematics and Reading & Writing";
-  if (hasMath) return "Mathematics";
+  if (hasMath && hasRW) return "Math and Reading & Writing";
+  if (hasMath) return "Math";
   if (hasRW) return "Reading & Writing";
   return "All sections";
 }
 
-function normalizeTaxonomyName(value: string | null | undefined): string {
-  return String(value ?? "")
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, " ");
-}
-
-/** Classify a Practice Set using persisted practiceArea when available. */
-export function classifyPracticeSetArea(input: {
-  practiceArea?: string | null;
-  sectionName?: string | null;
-  sectionLabel?: string | null;
-  domainName?: string | null;
-}): PracticeSetArea | null {
-  const domain = normalizeTaxonomyName(input.domainName);
-  if (domain === "full practice test") return "reading_writing";
-
+/**
+ * Classify content by its Section: MATH / READING / WRITING are practice sections; the
+ * READING_WRITING section only holds Test content ("Reading & Writing").
+ */
+export function classifyPracticeSetArea(input: { practiceArea?: string | null; sectionName?: string | null }): PracticeSetArea | null {
   const resolved = resolvePracticeArea(input);
   if (resolved === "MATH") return "mathematics";
   if (resolved === "READING") return "reading";
   if (resolved === "WRITING") return "writing";
-
-  const section = normalizeTaxonomyName(`${input.sectionName ?? ""} ${input.sectionLabel ?? ""}`);
-  if (section.includes("reading & writing") || section.includes("reading and writing")) return "reading_writing";
-  return null;
+  return input.sectionName === "READING_WRITING" ? "reading_writing" : null;
 }
 
 /** Whether a Practice Set classification belongs in a selected report area. */
@@ -95,13 +73,6 @@ export function practiceSetAreaLabel(classification: PracticeSetArea | null): st
   if (classification === "writing") return "Writing";
   if (classification === "reading_writing") return "Reading & Writing";
   return null;
-}
-
-/** Whether a data-model section label is included by the selected areas. */
-export function sectionMatchesAreas(sectionLabel: string | null | undefined, areas: ReportArea[]): boolean {
-  const isMath = /math/i.test(sectionLabel ?? "");
-  if (isMath) return areas.includes("mathematics");
-  return areas.includes("reading") || areas.includes("writing");
 }
 
 /** Prisma-friendly practice area for a report area key. */

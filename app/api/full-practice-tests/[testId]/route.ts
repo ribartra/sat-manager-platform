@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+import { contentScopeFor, sameProgramQuestionsIssue } from "@/lib/program-scope";
+import { sourceIdIssue } from "@/lib/content-source";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
-import prisma from "@/lib/prisma";
+import prisma, { atomic } from "@/lib/prisma";
+import { assertSameVersion, expectedVersion } from "@/lib/edit-version";
 import { fullTestEditorFieldIssues } from "@/contracts/full-test";
 import { validateFullPracticeTestStructure } from "@/lib/full-test-validation";
+import { BadRequestError, ConflictError, ForbiddenError, NotFoundError, ValidationError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
   params: Promise<{ testId: string }>;
@@ -26,9 +30,9 @@ async function validateStructureForStatus(testId: string, status: string) {
   return validateFullPracticeTestStructure({ status, moduleQuestionIds, questionSections });
 }
 
-export async function PATCH(req: NextRequest, { params }: RouteContext) {
+export const PATCH = withApiErrors(async function PATCH(req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { testId } = await params;
   const body = (await req.json().catch(() => ({}))) as {
@@ -37,31 +41,32 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
     reviewEnabled?: boolean;
     breakMinutes?: number;
   };
-  const test = await prisma.fullPracticeTest.findUnique({ where: { id: testId } });
-  if (!test) return NextResponse.json({ error: "Exam not found." }, { status: 404 });
+  // Only Tests of a program the teacher teaches (shared bank).
+  const test = await prisma.fullPracticeTest.findFirst({ where: { id: testId, ...contentScopeFor(session.user) } });
+  if (!test) return new NotFoundError("Test not found.").toResponse();
 
   const data: { status?: string; name?: string; reviewEnabled?: boolean; breakMinutes?: number } = {};
   if (body.status !== undefined) {
-    if (!allowedStatuses.has(body.status)) return NextResponse.json({ error: "Invalid status." }, { status: 400 });
+    if (!allowedStatuses.has(body.status)) return new BadRequestError("Invalid status.").toResponse();
     const validation = await validateStructureForStatus(testId, body.status);
     if (validation.errors.length > 0) {
-      return NextResponse.json({ error: "Validation failed.", errors: validation.errors, warnings: validation.warnings }, { status: 400 });
+      return new ValidationError("Validation failed.", validation.errors, { extra: { warnings: validation.warnings } }).toResponse();
     }
     data.status = body.status;
   }
   if (body.name !== undefined) {
     const name = body.name.trim();
-    if (!name) return NextResponse.json({ error: "Name is required." }, { status: 400 });
+    if (!name) return new BadRequestError("Name is required.").toResponse();
     data.name = name;
   }
   if (body.reviewEnabled !== undefined) data.reviewEnabled = Boolean(body.reviewEnabled);
   if (body.breakMinutes !== undefined) {
     if (!Number.isInteger(body.breakMinutes) || body.breakMinutes < 0) {
-      return NextResponse.json({ error: "breakMinutes must be a non-negative integer." }, { status: 400 });
+      return new BadRequestError("breakMinutes must be a non-negative integer.").toResponse();
     }
     data.breakMinutes = body.breakMinutes;
   }
-  if (Object.keys(data).length === 0) return NextResponse.json({ error: "No changes provided." }, { status: 400 });
+  if (Object.keys(data).length === 0) return new BadRequestError("No changes provided.").toResponse();
 
   const updated = await prisma.fullPracticeTest.update({ where: { id: testId }, data });
   await prisma.auditLog.create({
@@ -75,17 +80,20 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
   });
 
   return NextResponse.json({ test: updated });
-}
+});
 
-export async function PUT(req: NextRequest, { params }: RouteContext) {
+export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { testId } = await params;
-  const { name, status, moduleQuestionIds, reviewEnabled, breakMinutes } = await req.json();
+  const { name, number: requestedNumber, status, moduleQuestionIds, reviewEnabled, breakMinutes, sourceId: requestedSourceId, expectedUpdatedAt } = await req.json();
   const targetStatus = status ?? "DRAFT";
-  const previous = await prisma.fullPracticeTest.findUnique({ where: { id: testId } });
-  if (!previous) return NextResponse.json({ error: "Exam not found." }, { status: 404 });
+  const previous = await prisma.fullPracticeTest.findFirst({ where: { id: testId, ...contentScopeFor(session.user) } });
+  if (!previous) return new NotFoundError("Test not found.").toResponse();
+  const sourceId = requestedSourceId ?? previous.sourceId;
+  // "TEST N": a client that doesn't send it keeps the stored number.
+  const number = requestedNumber ?? previous.number;
 
   const normalizedModules = Array.from({ length: 4 }, (_, index) => (moduleQuestionIds?.[index] ?? []) as string[]);
   const questionIds = [...new Set(normalizedModules.flat())];
@@ -100,6 +108,7 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
   validation.errors.push(
     ...fullTestEditorFieldIssues({
       name,
+      number,
       status: targetStatus,
       reviewEnabled: reviewEnabled ?? previous.reviewEnabled,
       breakMinutes:
@@ -107,33 +116,42 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
       moduleQuestionIds: normalizedModules,
     }),
   );
+  const programIssue = await sameProgramQuestionsIssue(questionIds, previous.programId);
+  if (programIssue) validation.errors.push(programIssue);
+  const sourceIssue = await sourceIdIssue(sourceId, "tests", previous.sourceId);
+  if (sourceIssue) validation.errors.push(sourceIssue);
   if (validation.errors.length > 0) {
-    return NextResponse.json({ error: "Validation failed.", errors: [...new Set(validation.errors)], warnings: validation.warnings }, { status: 400 });
+    return new ValidationError("Validation failed.", [...new Set(validation.errors)], { extra: { warnings: validation.warnings } }).toResponse();
   }
 
   const resolvedBreak =
     Number.isInteger(breakMinutes) && breakMinutes >= 0 ? Number(breakMinutes) : previous.breakMinutes;
 
   const modules = await prisma.fullPracticeTestModule.findMany({ where: { testId }, orderBy: { order: "asc" } });
-  await prisma.$transaction([
-    ...modules.map((testModule) => prisma.fullPracticeTestQuestion.deleteMany({ where: { moduleId: testModule.id } })),
-    prisma.fullPracticeTest.update({
+  // One transaction; refused (409) when someone else saved this Test since the editor loaded it.
+  const saved = await atomic(async (db) => {
+    const current = await db.fullPracticeTest.findUniqueOrThrow({ where: { id: testId }, select: { updatedAt: true } });
+    assertSameVersion(current.updatedAt, expectedVersion(expectedUpdatedAt));
+    await db.fullPracticeTestQuestion.deleteMany({ where: { moduleId: { in: modules.map((testModule) => testModule.id) } } });
+    const updated = await db.fullPracticeTest.update({
       where: { id: testId },
       data: {
         name: name.trim(),
+        number: Number(number),
+        sourceId,
         status: targetStatus,
         reviewEnabled: reviewEnabled ?? previous.reviewEnabled,
         breakMinutes: resolvedBreak,
       },
-    }),
-    ...modules.flatMap((testModule, moduleIndex) =>
-      normalizedModules[moduleIndex].map((questionId, order) =>
-        prisma.fullPracticeTestQuestion.create({
-          data: { moduleId: testModule.id, questionId, order, isPretest: order < 2 },
-        }),
+      select: { updatedAt: true },
+    });
+    await db.fullPracticeTestQuestion.createMany({
+      data: modules.flatMap((testModule, moduleIndex) =>
+        normalizedModules[moduleIndex].map((questionId, order) => ({ moduleId: testModule.id, questionId, order, isPretest: order < 2 })),
       ),
-    ),
-  ]);
+    });
+    return updated;
+  });
 
   await prisma.auditLog.create({
     data: {
@@ -145,22 +163,22 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
     },
   });
 
-  return NextResponse.json({ ok: true, warnings: validation.warnings });
-}
+  return NextResponse.json({ ok: true, warnings: validation.warnings, updatedAt: saved.updatedAt.toISOString() });
+});
 
-export async function DELETE(_req: NextRequest, { params }: RouteContext) {
+export const DELETE = withApiErrors(async function DELETE(_req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { testId } = await params;
   const [test, assignments, attempts] = await Promise.all([
-    prisma.fullPracticeTest.findUnique({ where: { id: testId } }),
+    prisma.fullPracticeTest.findFirst({ where: { id: testId, ...contentScopeFor(session.user) } }),
     prisma.fullPracticeTestAssignment.count({ where: { testId } }),
     prisma.fullPracticeTestAttempt.count({ where: { testId } }),
   ]);
-  if (!test) return NextResponse.json({ error: "Exam not found." }, { status: 404 });
+  if (!test) return new NotFoundError("Test not found.").toResponse();
   if (assignments > 0 || attempts > 0) {
-    return NextResponse.json({ error: "Archive this exam instead. Exams with assignments or attempts cannot be deleted." }, { status: 409 });
+    return new ConflictError("Archive this Test instead. Tests with assignments or attempts cannot be deleted.").toResponse();
   }
 
   await prisma.fullPracticeTest.delete({ where: { id: testId } });
@@ -175,4 +193,4 @@ export async function DELETE(_req: NextRequest, { params }: RouteContext) {
   });
 
   return NextResponse.json({ ok: true });
-}
+});

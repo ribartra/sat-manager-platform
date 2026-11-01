@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { Checkbox } from "@/components/ui/checkbox";
 import React, { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -7,8 +9,10 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { FilterBar, FilterField } from "@/components/sat/filter-bar";
 import { Select } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { enrollmentStatusLabel } from "@/lib/domain-meta";
 import {
   Form,
   FormControl,
@@ -22,6 +26,7 @@ import {
   type CreateProgramInput,
   type EditProgramInput,
 } from "@/contracts/admin";
+import { LiveSearch } from "@/components/sat/live-search";
 
 type Teacher = { id: string; name: string; email: string };
 
@@ -332,8 +337,7 @@ function EditProgramForm({
             render={({ field }) => (
               <FormItem>
                 <label className="flex items-center gap-1.5 text-sm text-gray-700 whitespace-nowrap">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     checked={field.value}
                     onChange={(e) => field.onChange(e.target.checked)}
                     onBlur={field.onBlur}
@@ -403,7 +407,7 @@ function EditProgramForm({
                   size="sm"
                   variant="outline"
                   onClick={addTeacher}
-                  disabled={!newTeacherId || teacherLoading === "add"}
+                  disabled={teacherLoading === "add"} disabledReason={!newTeacherId ? "Choose a teacher." : null}
                 >
                   {teacherLoading === "add" ? "..." : "Assign"}
                 </Button>
@@ -445,11 +449,16 @@ function EnrollmentRow({
   return (
     <div className="flex items-center justify-between py-2">
       <div className="flex items-center gap-3">
-        <span className="text-sm font-medium text-gray-800">
-          {enrollment.student.name}
-        </span>
+        {/* Approved, active students open their page; pending ones are not in the program yet. */}
+        {enrollment.status === "APPROVED" && enrollment.active ? (
+          <Link href={`/teacher/students/${enrollment.studentId}`} className="text-sm font-medium text-gray-800 hover:text-[var(--sat-primary)] hover:underline">
+            {enrollment.student.name}
+          </Link>
+        ) : (
+          <span className="text-sm font-medium text-gray-800">{enrollment.student.name}</span>
+        )}
         <Badge variant={ENROLLMENT_VARIANT[enrollment.status]}>
-          {enrollment.status}
+          {enrollmentStatusLabel(enrollment.status)}
         </Badge>
         <span className="text-xs text-gray-400">{fmt(enrollment.enrolledAt)}</span>
       </div>
@@ -550,19 +559,18 @@ export function AdminProgramsClient({
 
   return (
     <div>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <Input
-          value={programSearch}
-          onChange={(event) => setProgramSearch(event.target.value)}
-          placeholder="Search program, teacher or student..."
-          className="max-w-sm"
-        />
-        {!showCreate && (
+      {!showCreate && (
+        <div className="mb-3 flex justify-end">
           <Button size="sm" onClick={() => setShowCreate(true)}>
             + New Program
           </Button>
-        )}
-      </div>
+        </div>
+      )}
+      <FilterBar>
+        <FilterField label="Search" htmlFor="programs-q">
+          <LiveSearch id="programs-q" value={programSearch} onChange={setProgramSearch} placeholder="Search program, teacher or student..." suggestions={programs.flatMap((p) => [p.name, ...p.teachers.map((t) => t.teacher.name), ...p.enrollments.map((e) => e.student.name)])} />
+        </FilterField>
+      </FilterBar>
 
       {showCreate && (
         <CreateProgramForm teachers={teachers} onDone={() => setShowCreate(false)} />

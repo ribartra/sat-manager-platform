@@ -4,6 +4,7 @@ import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { propagateAssignedImageToOfficial } from "@/lib/ingest-promotion";
 import { cleanupAfterStemImageAssigned } from "@/lib/ingest-image-cleanup";
+import { BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
   params: Promise<{ candidateId: string }>;
@@ -11,9 +12,9 @@ interface RouteContext {
 
 const allowedTargets = new Set(["STEM", "STIMULUS", "OPTION", "OPTION_BLOCK", "ANSWER_FIELD", "EXPLANATION", "PAGE_CONTEXT"]);
 
-export async function GET(_req: NextRequest, { params }: RouteContext) {
+export const GET = withApiErrors(async function GET(_req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { candidateId } = await params;
   const links = await prisma.ingestCandidateImageLink.findMany({
@@ -47,11 +48,11 @@ export async function GET(_req: NextRequest, { params }: RouteContext) {
       image: imageById.get(link.imageArtifactId) ?? null,
     }))
   );
-}
+});
 
-export async function POST(req: NextRequest, { params }: RouteContext) {
+export const POST = withApiErrors(async function POST(req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { candidateId } = await params;
   const body = (await req.json().catch(() => ({}))) as {
@@ -61,16 +62,16 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     sortOrder?: number;
   };
 
-  if (!body.imageArtifactId) return NextResponse.json({ error: "Image is required." }, { status: 400 });
+  if (!body.imageArtifactId) return new BadRequestError("Image is required.").toResponse();
   const targetType = body.targetType || "STEM";
-  if (!allowedTargets.has(targetType)) return NextResponse.json({ error: "Invalid image target." }, { status: 400 });
+  if (!allowedTargets.has(targetType)) return new BadRequestError("Invalid image target.").toResponse();
 
   const [candidate, image] = await Promise.all([
     prisma.ingestQuestionCandidate.findUnique({ where: { id: candidateId } }),
     prisma.ingestImageArtifact.findUnique({ where: { id: body.imageArtifactId } }),
   ]);
-  if (!candidate) return NextResponse.json({ error: "Candidate not found." }, { status: 404 });
-  if (!image || image.batchId !== candidate.batchId) return NextResponse.json({ error: "Image not found for this batch." }, { status: 404 });
+  if (!candidate) return new NotFoundError("Candidate not found.").toResponse();
+  if (!image || image.batchId !== candidate.batchId) return new NotFoundError("Image not found for this batch.").toResponse();
 
   const existing = await prisma.ingestCandidateImageLink.findFirst({
     where: {
@@ -128,19 +129,19 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
   });
 
   return NextResponse.json({ ...link, officialPropagation });
-}
+});
 
-export async function DELETE(req: NextRequest, { params }: RouteContext) {
+export const DELETE = withApiErrors(async function DELETE(req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { candidateId } = await params;
   const { searchParams } = new URL(req.url);
   const linkId = searchParams.get("linkId");
-  if (!linkId) return NextResponse.json({ error: "linkId is required." }, { status: 400 });
+  if (!linkId) return new BadRequestError("linkId is required.").toResponse();
 
   const link = await prisma.ingestCandidateImageLink.findFirst({ where: { id: linkId, candidateId } });
-  if (!link) return NextResponse.json({ error: "Image link not found." }, { status: 404 });
+  if (!link) return new NotFoundError("Image link not found.").toResponse();
   await prisma.ingestCandidateImageLink.delete({ where: { id: link.id } });
 
   await prisma.auditLog.create({
@@ -154,4 +155,4 @@ export async function DELETE(req: NextRequest, { params }: RouteContext) {
   });
 
   return NextResponse.json({ ok: true });
-}
+});

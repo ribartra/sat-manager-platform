@@ -2,14 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "crypto";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
+import { ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
   params: Promise<{ batchId: string }>;
 }
 
-export async function PATCH(req: NextRequest, { params }: RouteContext) {
+export const PATCH = withApiErrors(async function PATCH(req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { batchId } = await params;
   const body = (await req.json().catch(() => ({}))) as {
@@ -20,7 +21,7 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
   };
 
   const batch = await prisma.ingestBatch.findUnique({ where: { id: batchId } });
-  if (!batch) return NextResponse.json({ error: "Batch not found." }, { status: 404 });
+  if (!batch) return new NotFoundError("Batch not found.").toResponse();
 
   const reviewSession = await prisma.ingestReviewSession.upsert({
     where: { batchId },
@@ -51,4 +52,4 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
   });
 
   return NextResponse.json(reviewSession);
-}
+});

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import type { TopicTrendPoint } from "@/lib/progress-analytics";
 
 const SERIES = [
@@ -9,12 +9,15 @@ const SERIES = [
   { key: "hard", label: "Hard", color: "#dc2626" },
 ] as const;
 
-export function TopicDifficultyTrend({ topics, pointsByTopic }: {
+export function TopicDifficultyTrend({ topics, pointsByTopic, selectedTopic, selectedDifficulty }: {
   topics: string[];
   pointsByTopic: Record<string, TopicTrendPoint[]>;
+  selectedTopic: string;
+  selectedDifficulty: string;
 }) {
-  const [topic, setTopic] = useState(topics[0] ?? "");
+  const topic = selectedTopic || topics[0] || "";
   const points = useMemo(() => pointsByTopic[topic] ?? [], [pointsByTopic, topic]);
+  const series = SERIES.filter((item) => item.key === selectedDifficulty.toLowerCase());
   const width = 640;
   const height = 240;
   const left = 42;
@@ -30,36 +33,31 @@ export function TopicDifficultyTrend({ topics, pointsByTopic }: {
     <section className="rounded-md border border-gray-200 bg-white p-4 shadow-sm">
       <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h3 className="text-sm font-semibold text-gray-900">Score progress by topic and difficulty</h3>
-          <p className="mt-1 text-xs text-gray-500">Question-weighted accuracy for each submitted attempt</p>
+          <h3 className="text-sm font-semibold text-gray-900">Progress over time</h3>
+          <p className="mt-1 text-xs text-gray-500">% correct each time. Blank answers count as wrong.</p>
         </div>
-        <label className="text-xs font-medium text-gray-600">
-          Topic
-          <select value={topic} onChange={(event) => setTopic(event.target.value)} className="ml-2 max-w-56 rounded-md border border-gray-300 bg-white px-2 py-1.5 text-sm text-gray-800">
-            {topics.map((item) => <option key={item} value={item}>{item}</option>)}
-          </select>
-        </label>
+        <p className="text-xs font-medium text-gray-600">{topic} · {selectedDifficulty.toLowerCase()}</p>
       </div>
       {points.length === 0 ? (
-        <p className="flex min-h-40 items-center justify-center text-sm text-gray-400">No submitted attempts yet.</p>
+        <p className="flex min-h-40 items-center justify-center text-sm text-gray-400">No finished work yet.</p>
       ) : (
         <>
           <div className="mb-2 flex flex-wrap gap-x-4 gap-y-1">
-            {SERIES.map((series) => (
+            {series.map((series) => (
               <span key={series.key} className="inline-flex items-center gap-1.5 text-xs text-gray-600">
                 <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: series.color }} />{series.label}
               </span>
             ))}
           </div>
           <div className="overflow-x-auto">
-            <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`Accuracy over attempts for ${topic}`} className="h-56 min-w-[34rem] w-full">
+            <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`Progress over time for ${topic}`} className="h-56 min-w-[34rem] w-full">
               {[0, 25, 50, 75, 100].map((value) => (
                 <g key={value}>
                   <line x1={left} x2={width - right} y1={y(value)} y2={y(value)} stroke="#e5e7eb" />
                   <text x={left - 8} y={y(value) + 4} textAnchor="end" fontSize="10" fill="#6b7280">{value}%</text>
                 </g>
               ))}
-              {SERIES.map((series) => {
+              {series.map((series) => {
                 const segments: { index: number; value: number }[][] = [];
                 points.forEach((point, index) => {
                   const value = point[series.key];
@@ -82,7 +80,7 @@ export function TopicDifficultyTrend({ topics, pointsByTopic }: {
               ))}
             </svg>
           </div>
-          <p className="mt-1 text-right text-[11px] text-gray-400">Attempts in chronological order</p>
+          <p className="mt-1 text-right text-[11px] text-gray-400">Oldest to newest</p>
         </>
       )}
     </section>

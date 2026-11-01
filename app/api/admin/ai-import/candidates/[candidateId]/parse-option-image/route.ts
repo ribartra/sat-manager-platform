@@ -2,21 +2,22 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { ingestAuthHeaders, ingestUrl } from "@/lib/internal-ingest";
+import { ApiError, BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
   params: Promise<{ candidateId: string }>;
 }
 
-export async function POST(req: NextRequest, { params }: RouteContext) {
+export const POST = withApiErrors(async function POST(req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { candidateId } = await params;
   const body = (await req.json().catch(() => ({}))) as { imageArtifactId?: string };
-  if (!body.imageArtifactId) return NextResponse.json({ error: "imageArtifactId is required." }, { status: 400 });
+  if (!body.imageArtifactId) return new BadRequestError("imageArtifactId is required.").toResponse();
 
   const candidate = await prisma.ingestQuestionCandidate.findUnique({ where: { id: candidateId } });
-  if (!candidate) return NextResponse.json({ error: "Candidate not found." }, { status: 404 });
+  if (!candidate) return new NotFoundError("Candidate not found.").toResponse();
 
   const response = await fetch(ingestUrl(`/candidates/${candidateId}/parse-option-image`), {
     method: "POST",
@@ -25,7 +26,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
   });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    return NextResponse.json({ error: data.detail || "Could not parse option image." }, { status: response.status });
+    return ApiError.fromStatus(response.status, data.detail || "Could not parse option image.").toResponse();
   }
 
   await prisma.auditLog.create({
@@ -39,4 +40,4 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
   });
 
   return NextResponse.json(data);
-}
+});

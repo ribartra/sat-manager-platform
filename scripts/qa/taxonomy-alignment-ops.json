@@ -1,0 +1,1045 @@
+[
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-lineq-one-var",
+  "field": "sortOrder",
+  "old": 20,
+  "new": 0
+ },
+ {
+  "table": "Topic",
+  "id": "top-lineq-one-var",
+  "field": "name",
+  "old": "Linear Equations in One Variable",
+  "new": "Linear equations in one variable"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-lineq-one-var",
+  "field": "name",
+  "old": "Linear Equations in One Variable",
+  "new": "Linear equations in one variable"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-lineq-one-var",
+  "field": "label",
+  "old": "Linear Equations in One Variable",
+  "new": "Linear equations in one variable"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjrol830675qmt185jyxfj9",
+  "field": "name",
+  "old": "Algebra - Linear Equations in One Variable - HARD",
+  "new": "Algebra - Linear equations in one variable - HARD"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjrolb30677qmt1g5ib2611",
+  "field": "name",
+  "old": "Algebra - Linear Equations in One Variable - EASY",
+  "new": "Algebra - Linear equations in one variable - EASY"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjrole10679qmt16i99x3nl",
+  "field": "name",
+  "old": "Algebra - Linear Equations in One Variable - MEDIUM",
+  "new": "Algebra - Linear equations in one variable - MEDIUM"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-linfn",
+  "field": "sortOrder",
+  "old": 0,
+  "new": 1
+ },
+ {
+  "table": "Topic",
+  "id": "top-linfn",
+  "field": "name",
+  "old": "Linear Functions",
+  "new": "Linear functions"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-linfn",
+  "field": "name",
+  "old": "Linear Functions",
+  "new": "Linear functions"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-linfn",
+  "field": "label",
+  "old": "Linear Functions",
+  "new": "Linear functions"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjrolnl067hqmt1k4znj7ma",
+  "field": "name",
+  "old": "Algebra - Linear Functions - HARD",
+  "new": "Algebra - Linear functions - HARD"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjrolpc067jqmt1b8tg8qgj",
+  "field": "name",
+  "old": "Algebra - Linear Functions - MEDIUM",
+  "new": "Algebra - Linear functions - MEDIUM"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjroltz067lqmt172ck5qko",
+  "field": "name",
+  "old": "Algebra - Linear Functions - EASY",
+  "new": "Algebra - Linear functions - EASY"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-lineq-two-var",
+  "field": "sortOrder",
+  "old": 20,
+  "new": 2
+ },
+ {
+  "table": "Topic",
+  "id": "top-lineq-two-var",
+  "field": "name",
+  "old": "Linear Equations in Two Variables",
+  "new": "Linear equations in two variables"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-lineq-two-var",
+  "field": "name",
+  "old": "Linear Equations in Two Variables",
+  "new": "Linear equations in two variables"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-lineq-two-var",
+  "field": "label",
+  "old": "Linear Equations in Two Variables",
+  "new": "Linear equations in two variables"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjrolga067bqmt1qy4h9kkj",
+  "field": "name",
+  "old": "Algebra - Linear Equations in Two Variables - EASY",
+  "new": "Algebra - Linear equations in two variables - EASY"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjrolig067dqmt11l08grw7",
+  "field": "name",
+  "old": "Algebra - Linear Equations in Two Variables - HARD",
+  "new": "Algebra - Linear equations in two variables - HARD"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjrolkk067fqmt1zhtgoak9",
+  "field": "name",
+  "old": "Algebra - Linear Equations in Two Variables - MEDIUM",
+  "new": "Algebra - Linear equations in two variables - MEDIUM"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-systems-two-linear",
+  "field": "sortOrder",
+  "old": 20,
+  "new": 3
+ },
+ {
+  "table": "Topic",
+  "id": "top-systems-two-linear",
+  "field": "name",
+  "old": "Systems of Two Linear Equations",
+  "new": "Systems of two linear equations in two variables"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-systems-two-linear",
+  "field": "name",
+  "old": "Systems of Two Linear Equations",
+  "new": "Systems of two linear equations in two variables"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-systems-two-linear",
+  "field": "label",
+  "old": "Systems of Two Linear Equations",
+  "new": "Systems of two linear equations in two variables"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjromb5067tqmt1nxc91ae0",
+  "field": "name",
+  "old": "Algebra - Systems of Two Linear Equations - EASY",
+  "new": "Algebra - Systems of two linear equations in two variables - EASY"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjromcs067vqmt16g57edj4",
+  "field": "name",
+  "old": "Algebra - Systems of Two Linear Equations - MEDIUM",
+  "new": "Algebra - Systems of two linear equations in two variables - MEDIUM"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjromej067xqmt1lh3j2m9p",
+  "field": "name",
+  "old": "Algebra - Systems of Two Linear Equations - HARD",
+  "new": "Algebra - Systems of two linear equations in two variables - HARD"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-linineq",
+  "field": "sortOrder",
+  "old": 20,
+  "new": 4
+ },
+ {
+  "table": "Topic",
+  "id": "top-linineq",
+  "field": "name",
+  "old": "Linear Inequalities",
+  "new": "Linear inequalities in one or two variables"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-linineq",
+  "field": "name",
+  "old": "Linear Inequalities",
+  "new": "Linear inequalities in one or two variables"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-linineq",
+  "field": "label",
+  "old": "Linear Inequalities",
+  "new": "Linear inequalities in one or two variables"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjrom0v067nqmt122dfwkci",
+  "field": "name",
+  "old": "Algebra - Linear Inequalities - HARD",
+  "new": "Algebra - Linear inequalities in one or two variables - HARD"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjrom5j067pqmt1n2z9npxv",
+  "field": "name",
+  "old": "Algebra - Linear Inequalities - MEDIUM",
+  "new": "Algebra - Linear inequalities in one or two variables - MEDIUM"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjrom8w067rqmt1vr7jf524",
+  "field": "name",
+  "old": "Algebra - Linear Inequalities - EASY",
+  "new": "Algebra - Linear inequalities in one or two variables - EASY"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-topic-dom-advmath",
+  "field": "sortOrder",
+  "old": 0,
+  "new": 1
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-nonlinfn",
+  "field": "sortOrder",
+  "old": 10,
+  "new": 0
+ },
+ {
+  "table": "Topic",
+  "id": "top-nonlinfn",
+  "field": "name",
+  "old": "Nonlinear Functions",
+  "new": "Nonlinear functions"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-nonlinfn",
+  "field": "name",
+  "old": "Nonlinear Functions",
+  "new": "Nonlinear functions"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-nonlinfn",
+  "field": "label",
+  "old": "Nonlinear Functions",
+  "new": "Nonlinear functions"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjrol29066zqmt1k0gjfzt0",
+  "field": "name",
+  "old": "Advanced Math - Nonlinear Functions - HARD",
+  "new": "Advanced Math - Nonlinear functions - HARD"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjrol480671qmt1q22ge6x3",
+  "field": "name",
+  "old": "Advanced Math - Nonlinear Functions - EASY",
+  "new": "Advanced Math - Nonlinear functions - EASY"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjrol670673qmt12t2nanmb",
+  "field": "name",
+  "old": "Advanced Math - Nonlinear Functions - MEDIUM",
+  "new": "Advanced Math - Nonlinear functions - MEDIUM"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-nonlinear-equations",
+  "field": "sortOrder",
+  "old": 20,
+  "new": 1
+ },
+ {
+  "table": "Topic",
+  "id": "top-nonlinear-equations",
+  "field": "name",
+  "old": "Nonlinear Equations",
+  "new": "Nonlinear equations in one variable and systems of equations in two variables"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-nonlinear-equations",
+  "field": "name",
+  "old": "Nonlinear Equations",
+  "new": "Nonlinear equations in one variable and systems of equations in two variables"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-nonlinear-equations",
+  "field": "label",
+  "old": "Nonlinear Equations",
+  "new": "Nonlinear equations in one variable and systems of equations in two variables"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjrokv5066tqmt1kk0y19x1",
+  "field": "name",
+  "old": "Advanced Math - Nonlinear Equations - EASY",
+  "new": "Advanced Math - Nonlinear equations in one variable and systems of equations in two variables - EASY"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjrokxh066vqmt1vktl70iu",
+  "field": "name",
+  "old": "Advanced Math - Nonlinear Equations - HARD - #1",
+  "new": "Advanced Math - Nonlinear equations in one variable and systems of equations in two variables - HARD - #1"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjrokzu066xqmt1ox99soly",
+  "field": "name",
+  "old": "Advanced Math - Nonlinear Equations - MEDIUM",
+  "new": "Advanced Math - Nonlinear equations in one variable and systems of equations in two variables - MEDIUM"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-equivalent-expressions",
+  "field": "sortOrder",
+  "old": 20,
+  "new": 2
+ },
+ {
+  "table": "Topic",
+  "id": "top-equivalent-expressions",
+  "field": "name",
+  "old": "Equivalent Expressions",
+  "new": "Equivalent expressions"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-equivalent-expressions",
+  "field": "name",
+  "old": "Equivalent Expressions",
+  "new": "Equivalent expressions"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-equivalent-expressions",
+  "field": "label",
+  "old": "Equivalent Expressions",
+  "new": "Equivalent expressions"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjrokmt066nqmt1ixggg948",
+  "field": "name",
+  "old": "Advanced Math - Equivalent Expressions - HARD - #1",
+  "new": "Advanced Math - Equivalent expressions - HARD - #1"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjrokq5066pqmt1j8870wx9",
+  "field": "name",
+  "old": "Advanced Math - Equivalent Expressions - EASY",
+  "new": "Advanced Math - Equivalent expressions - EASY"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjrokso066rqmt1zhhmvkec",
+  "field": "name",
+  "old": "Advanced Math - Equivalent Expressions - MEDIUM",
+  "new": "Advanced Math - Equivalent expressions - MEDIUM"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-topic-dom-psda",
+  "field": "sortOrder",
+  "old": 0,
+  "new": 2
+ },
+ {
+  "table": "Domain",
+  "id": "dom-psda",
+  "field": "name",
+  "old": "Problem Solving and Data Analysis",
+  "new": "Problem-Solving and Data Analysis"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-topic-dom-psda",
+  "field": "name",
+  "old": "Problem Solving and Data Analysis",
+  "new": "Problem-Solving and Data Analysis"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-topic-dom-psda",
+  "field": "label",
+  "old": "Problem Solving and Data Analysis",
+  "new": "Problem-Solving and Data Analysis"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-ratios-rates-units",
+  "field": "sortOrder",
+  "old": 20,
+  "new": 0
+ },
+ {
+  "table": "Topic",
+  "id": "top-ratios-rates-units",
+  "field": "name",
+  "old": "Ratios, Rates, Proportions, and Units",
+  "new": "Ratios, rates, proportional relationships, and units"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-ratios-rates-units",
+  "field": "name",
+  "old": "Ratios, Rates, Proportions, and Units",
+  "new": "Ratios, rates, proportional relationships, and units"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-ratios-rates-units",
+  "field": "label",
+  "old": "Ratios, Rates, Proportions, and Units",
+  "new": "Ratios, rates, proportional relationships, and units"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjroo34069dqmt1h80y2516",
+  "field": "name",
+  "old": "Problem Solving and Data Analysis - Ratios, Rates, Proportions, and Units - EASY",
+  "new": "Problem-Solving and Data Analysis - Ratios, rates, proportional relationships, and units - EASY"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjroo50069fqmt1dqmavmda",
+  "field": "name",
+  "old": "Problem Solving and Data Analysis - Ratios, Rates, Proportions, and Units - HARD",
+  "new": "Problem-Solving and Data Analysis - Ratios, rates, proportional relationships, and units - HARD"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjroo6o069hqmt17qb40ao1",
+  "field": "name",
+  "old": "Problem Solving and Data Analysis - Ratios, Rates, Proportions, and Units - MEDIUM",
+  "new": "Problem-Solving and Data Analysis - Ratios, rates, proportional relationships, and units - MEDIUM"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-pct",
+  "field": "sortOrder",
+  "old": 0,
+  "new": 1
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjronnm0691qmt1238fxpjb",
+  "field": "name",
+  "old": "Problem Solving and Data Analysis - Percentages - EASY",
+  "new": "Problem-Solving and Data Analysis - Percentages - EASY"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjronps0693qmt19m07n3pf",
+  "field": "name",
+  "old": "Problem Solving and Data Analysis - Percentages - HARD",
+  "new": "Problem-Solving and Data Analysis - Percentages - HARD"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjronrr0695qmt1yr36jz67",
+  "field": "name",
+  "old": "Problem Solving and Data Analysis - Percentages - MEDIUM",
+  "new": "Problem-Solving and Data Analysis - Percentages - MEDIUM"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-data-mean",
+  "field": "sortOrder",
+  "old": 20,
+  "new": 2
+ },
+ {
+  "table": "Topic",
+  "id": "top-data-mean",
+  "field": "name",
+  "old": "One-Variable Data: Distributions and Measures of Center and Spread",
+  "new": "One-variable data: Distributions and measures of center and spread"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-data-mean",
+  "field": "name",
+  "old": "One-Variable Data: Distributions and Measures of Center and Spread",
+  "new": "One-variable data: Distributions and measures of center and spread"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-data-mean",
+  "field": "label",
+  "old": "One-Variable Data: Distributions and Measures of Center and Spread",
+  "new": "One-variable data: Distributions and measures of center and spread"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjron67068nqmt1xgavoopb",
+  "field": "name",
+  "old": "Problem Solving and Data Analysis - One-Variable Data: Distributions and Measures - HARD",
+  "new": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - HARD - #1"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjronk7068xqmt1crefirfr",
+  "field": "name",
+  "old": "Problem Solving and Data Analysis - One-Variable Data - HARD",
+  "new": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - HARD - #2"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjroni3068vqmt1guubp1ns",
+  "field": "name",
+  "old": "Problem Solving and Data Analysis - One-Variable Data - EASY",
+  "new": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - EASY"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjronlw068zqmt1q1r8vyfl",
+  "field": "name",
+  "old": "Problem Solving and Data Analysis - One-Variable Data - MEDIUM",
+  "new": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - MEDIUM"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-two-var-data",
+  "field": "sortOrder",
+  "old": 20,
+  "new": 3
+ },
+ {
+  "table": "Topic",
+  "id": "top-two-var-data",
+  "field": "name",
+  "old": "Two-Variable Data",
+  "new": "Two-variable data: Models and scatterplots"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-two-var-data",
+  "field": "name",
+  "old": "Two-Variable Data",
+  "new": "Two-variable data: Models and scatterplots"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-two-var-data",
+  "field": "label",
+  "old": "Two-Variable Data",
+  "new": "Two-variable data: Models and scatterplots"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjroof0069pqmt1l9pzylyn",
+  "field": "name",
+  "old": "Problem Solving and Data Analysis - Two-Variable Data - HARD",
+  "new": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - HARD"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjrooig069rqmt1y5ly7sve",
+  "field": "name",
+  "old": "Problem Solving and Data Analysis - Two-Variable Data - MEDIUM",
+  "new": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - MEDIUM"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjroolb069tqmt1gpm3g8px",
+  "field": "name",
+  "old": "Problem Solving and Data Analysis - Two-Variable Data - EASY",
+  "new": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - EASY"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-prob",
+  "field": "sortOrder",
+  "old": 0,
+  "new": 4
+ },
+ {
+  "table": "Topic",
+  "id": "top-prob",
+  "field": "name",
+  "old": "Probability",
+  "new": "Probability and conditional probability"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-prob",
+  "field": "name",
+  "old": "Probability",
+  "new": "Probability and conditional probability"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-prob",
+  "field": "label",
+  "old": "Probability",
+  "new": "Probability and conditional probability"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjronvk0697qmt1mik7stgs",
+  "field": "name",
+  "old": "Problem Solving and Data Analysis - Probability - EASY",
+  "new": "Problem-Solving and Data Analysis - Probability and conditional probability - EASY"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjronya0699qmt160kuwri9",
+  "field": "name",
+  "old": "Problem Solving and Data Analysis - Probability - HARD",
+  "new": "Problem-Solving and Data Analysis - Probability and conditional probability - HARD"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjroo0l069bqmt13o7ht2f9",
+  "field": "name",
+  "old": "Problem Solving and Data Analysis - Probability - MEDIUM",
+  "new": "Problem-Solving and Data Analysis - Probability and conditional probability - MEDIUM"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-inference-margin",
+  "field": "sortOrder",
+  "old": 20,
+  "new": 5
+ },
+ {
+  "table": "Topic",
+  "id": "top-inference-margin",
+  "field": "name",
+  "old": "Inference and Margin of Error",
+  "new": "Inference from Statistics and Margin of Error"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-inference-margin",
+  "field": "name",
+  "old": "Inference and Margin of Error",
+  "new": "Inference from Statistics and Margin of Error"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-inference-margin",
+  "field": "label",
+  "old": "Inference and Margin of Error",
+  "new": "Inference from Statistics and Margin of Error"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjron9n068pqmt142nib7ga",
+  "field": "name",
+  "old": "Problem Solving and Data Analysis - Inference and Margin of Error - EASY",
+  "new": "Problem-Solving and Data Analysis - Inference from Statistics and Margin of Error - EASY"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjronct068rqmt1qpr4cs70",
+  "field": "name",
+  "old": "Problem Solving and Data Analysis - Inference and Margin of Error - HARD",
+  "new": "Problem-Solving and Data Analysis - Inference from Statistics and Margin of Error - HARD"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjronfl068tqmt1h8czyxxp",
+  "field": "name",
+  "old": "Problem Solving and Data Analysis - Inference and Margin of Error - MEDIUM",
+  "new": "Problem-Solving and Data Analysis - Inference from Statistics and Margin of Error - MEDIUM"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-statistical-claims",
+  "field": "sortOrder",
+  "old": 20,
+  "new": 6
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjroo8h069jqmt1ch3nztht",
+  "field": "name",
+  "old": "Problem Solving and Data Analysis - Statistical Claims - HARD",
+  "new": "Problem-Solving and Data Analysis - Statistical Claims - HARD"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjrooa4069lqmt1yy2olrg2",
+  "field": "name",
+  "old": "Problem Solving and Data Analysis - Statistical Claims - MEDIUM",
+  "new": "Problem-Solving and Data Analysis - Statistical Claims - MEDIUM"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjroocm069nqmt1ei281boa",
+  "field": "name",
+  "old": "Problem Solving and Data Analysis - Statistical Claims - EASY",
+  "new": "Problem-Solving and Data Analysis - Statistical Claims - EASY"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-topic-dom-geotrig",
+  "field": "sortOrder",
+  "old": 0,
+  "new": 3
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-area-volume",
+  "field": "sortOrder",
+  "old": 20,
+  "new": 0
+ },
+ {
+  "table": "Topic",
+  "id": "top-area-volume",
+  "field": "name",
+  "old": "Area and Volume",
+  "new": "Area and volume"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-area-volume",
+  "field": "name",
+  "old": "Area and Volume",
+  "new": "Area and volume"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-area-volume",
+  "field": "label",
+  "old": "Area and Volume",
+  "new": "Area and volume"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjromge067zqmt1wh4rw4pn",
+  "field": "name",
+  "old": "Geometry and Trigonometry - Area and Volume - EASY",
+  "new": "Geometry and Trigonometry - Area and volume - EASY"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjromi20681qmt1t0q8if56",
+  "field": "name",
+  "old": "Geometry and Trigonometry - Area and Volume - HARD",
+  "new": "Geometry and Trigonometry - Area and volume - HARD"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjromju0683qmt1iqylznx6",
+  "field": "name",
+  "old": "Geometry and Trigonometry - Area and Volume - MEDIUM",
+  "new": "Geometry and Trigonometry - Area and volume - MEDIUM"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-lines-angles-triangles",
+  "field": "sortOrder",
+  "old": 20,
+  "new": 1
+ },
+ {
+  "table": "Topic",
+  "id": "top-lines-angles-triangles",
+  "field": "name",
+  "old": "Lines, Angles, and Triangles",
+  "new": "Lines, angles, and triangles"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-lines-angles-triangles",
+  "field": "name",
+  "old": "Lines, Angles, and Triangles",
+  "new": "Lines, angles, and triangles"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-lines-angles-triangles",
+  "field": "label",
+  "old": "Lines, Angles, and Triangles",
+  "new": "Lines, angles, and triangles"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjromt1068bqmt1yk55i6tu",
+  "field": "name",
+  "old": "Geometry and Trigonometry - Lines, Angles, and Triangles - EASY",
+  "new": "Geometry and Trigonometry - Lines, angles, and triangles - EASY"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjromvb068dqmt1fywp49p7",
+  "field": "name",
+  "old": "Geometry and Trigonometry - Lines, Angles, and Triangles - HARD",
+  "new": "Geometry and Trigonometry - Lines, angles, and triangles - HARD"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjromx8068fqmt19av7vqek",
+  "field": "name",
+  "old": "Geometry and Trigonometry - Lines, Angles, and Triangles - MEDIUM",
+  "new": "Geometry and Trigonometry - Lines, angles, and triangles - MEDIUM"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-right-tri-trig",
+  "field": "sortOrder",
+  "old": 20,
+  "new": 2
+ },
+ {
+  "table": "Topic",
+  "id": "top-right-tri-trig",
+  "field": "name",
+  "old": "Right Triangles and Trigonometry",
+  "new": "Right triangles and trigonometry"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-right-tri-trig",
+  "field": "name",
+  "old": "Right Triangles and Trigonometry",
+  "new": "Right triangles and trigonometry"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-right-tri-trig",
+  "field": "label",
+  "old": "Right Triangles and Trigonometry",
+  "new": "Right triangles and trigonometry"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjromzl068hqmt1fws7zu84",
+  "field": "name",
+  "old": "Geometry and Trigonometry - Right Triangles and Trigonometry - EASY",
+  "new": "Geometry and Trigonometry - Right triangles and trigonometry - EASY"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjron1h068jqmt11j9fe5gg",
+  "field": "name",
+  "old": "Geometry and Trigonometry - Right Triangles and Trigonometry - HARD",
+  "new": "Geometry and Trigonometry - Right triangles and trigonometry - HARD"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjron4b068lqmt157321e9j",
+  "field": "name",
+  "old": "Geometry and Trigonometry - Right Triangles and Trigonometry - MEDIUM",
+  "new": "Geometry and Trigonometry - Right triangles and trigonometry - MEDIUM"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-circles",
+  "field": "sortOrder",
+  "old": 0,
+  "new": 3
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-central-details",
+  "field": "sortOrder",
+  "old": 20,
+  "new": 0
+ },
+ {
+  "table": "Topic",
+  "id": "top-central-details",
+  "field": "name",
+  "old": "Central Ideas and Details",
+  "new": "Main Ideas and Details"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-central-details",
+  "field": "name",
+  "old": "Central Ideas and Details",
+  "new": "Main Ideas and Details"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-central-details",
+  "field": "label",
+  "old": "Central Ideas and Details",
+  "new": "Main Ideas and Details"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjrop8606adqmt1lk3ro00p",
+  "field": "name",
+  "old": "Information and Ideas - Central Ideas and Details - HARD",
+  "new": "Information and Ideas - Main Ideas and Details - HARD"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjropb806afqmt1ilt42wgg",
+  "field": "name",
+  "old": "Information and Ideas - Central Ideas and Details - EASY",
+  "new": "Information and Ideas - Main Ideas and Details - EASY"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjrope206ahqmt15nc3w2rc",
+  "field": "name",
+  "old": "Information and Ideas - Central Ideas and Details - MEDIUM",
+  "new": "Information and Ideas - Main Ideas and Details - MEDIUM"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-command-evidence",
+  "field": "sortOrder",
+  "old": 20,
+  "new": 1
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-infer",
+  "field": "sortOrder",
+  "old": 0,
+  "new": 2
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-topic-dom-craft",
+  "field": "sortOrder",
+  "old": 0,
+  "new": 1
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-text-structure-purpose",
+  "field": "sortOrder",
+  "old": 20,
+  "new": 1
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-cross",
+  "field": "sortOrder",
+  "old": 0,
+  "new": 2
+ },
+ {
+  "table": "Topic",
+  "id": "top-cross",
+  "field": "domainId",
+  "old": "dom-info",
+  "new": "dom-craft"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-cross",
+  "field": "parentId",
+  "old": "tax-topic-dom-info",
+  "new": "tax-topic-dom-craft"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjroovg06a1qmt1xkvswscb",
+  "field": "name",
+  "old": "Information and Ideas - Cross-Text Connections - EASY",
+  "new": "Craft and Structure - Cross-Text Connections - EASY"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjroox206a3qmt1b4ncgngb",
+  "field": "name",
+  "old": "Information and Ideas - Cross-Text Connections - HARD",
+  "new": "Craft and Structure - Cross-Text Connections - HARD"
+ },
+ {
+  "table": "PracticeSet",
+  "id": "cmsjrooyo06a5qmt1pploy9kk",
+  "field": "name",
+  "old": "Information and Ideas - Cross-Text Connections - MEDIUM",
+  "new": "Craft and Structure - Cross-Text Connections - MEDIUM"
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-topic-dom-expr",
+  "field": "sortOrder",
+  "old": 0,
+  "new": 2
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-trans",
+  "field": "sortOrder",
+  "old": 0,
+  "new": 1
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-topic-dom-sec",
+  "field": "sortOrder",
+  "old": 0,
+  "new": 3
+ },
+ {
+  "table": "TaxonomyNode",
+  "id": "tax-skill-top-fss",
+  "field": "sortOrder",
+  "old": 0,
+  "new": 1
+ }
+]

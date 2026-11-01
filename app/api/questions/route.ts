@@ -4,15 +4,19 @@ import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { questionEditorIssues } from "@/contracts/question";
 import { materializeOfficialImageUrl } from "@/lib/ingest-promotion";
+import { contentProgramFor } from "@/lib/program-scope";
+import { ForbiddenError, NotFoundError, ValidationError, withApiErrors } from "@/lib/api-error";
 
-export async function POST(req: NextRequest) {
+export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
   if (!session) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return new ForbiddenError("Forbidden").toResponse();
   }
 
   const data = await req.json();
-  const { topicId, subskillId, difficulty, type, stem, stimulus, explanation, imageUrl, supportsGraph, correctAnswer, status, options, ingestCandidateId } = data;
+  const { topicId, subskillId, difficulty, type, stem, stimulus, explanation, imageUrl, supportsGraph, correctAnswer, status, options, ingestCandidateId, programId: requestedProgramId } = data;
+  // The question goes to the bank of a program the author teaches (shared by its teachers).
+  const programId = await contentProgramFor(session.user, typeof requestedProgramId === "string" ? requestedProgramId : null);
   const validationErrors = questionEditorIssues({
     topicId,
     difficulty,
@@ -25,14 +29,14 @@ export async function POST(req: NextRequest) {
     options,
   });
   if (validationErrors.length > 0) {
-    return NextResponse.json({ error: "Validation failed.", errors: validationErrors }, { status: 400 });
+    return new ValidationError("Validation failed.", validationErrors).toResponse();
   }
 
   const ingestCandidate = ingestCandidateId
     ? await prisma.ingestQuestionCandidate.findUnique({ where: { id: ingestCandidateId } })
     : null;
   if (ingestCandidateId && !ingestCandidate) {
-    return NextResponse.json({ error: "Ingest candidate not found." }, { status: 404 });
+    return new NotFoundError("Ingest candidate not found.").toResponse();
   }
   const officialImageUrl = await materializeOfficialImageUrl(imageUrl);
   const officialOptions = type === "MC"
@@ -47,6 +51,7 @@ export async function POST(req: NextRequest) {
   const question = await prisma.$transaction(async (tx) => {
     const created = await tx.question.create({
       data: {
+        programId,
         topicId,
         subskillId: subskillId || null,
         difficulty,
@@ -119,4 +124,4 @@ export async function POST(req: NextRequest) {
     });
 
   return NextResponse.json(question);
-}
+});

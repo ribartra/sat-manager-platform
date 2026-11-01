@@ -8,14 +8,9 @@ export type PracticeSetScoreResult = {
   rawEquiv: number;
 };
 
-/** Map taxonomy section name/label to SAT RW | MATH. */
-export function satSectionFromTopicSection(section?: {
-  name?: string | null;
-  label?: string | null;
-} | null): SatSection {
-  const text = `${section?.name ?? ""} ${section?.label ?? ""}`.toLowerCase();
-  if (text.includes("math")) return "MATH";
-  return "RW";
+/** SAT scoring section for a taxonomy Section: MATH, or RW for READING / WRITING / READING_WRITING. */
+export function satSectionFromTopicSection(section?: { name?: string | null } | null): SatSection {
+  return section?.name === "MATH" ? "MATH" : "RW";
 }
 
 /**

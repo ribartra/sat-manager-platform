@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 
-export default async function StudentFullTestsPage() {
-  redirect("/student/content-map?area=mocks");
+/** Legacy URL: Tests now live at /student/tests. */
+export default function LegacyFullTestsPage() {
+  redirect("/student/tests");
 }

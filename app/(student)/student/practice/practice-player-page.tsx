@@ -11,22 +11,30 @@ import { getPublicCalculatorConfig } from "@/lib/calculator-config";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { extractQuestionGraphArtifacts } from "@/lib/question-graph";
 import { writeAudit } from "@/lib/audit";
+import { claimWriteSlot, RESUME_AUDIT_INTERVAL_MS } from "@/lib/write-throttle";
 import { withSqliteRetry } from "@/lib/sqlite-retry";
+import { isUniqueConstraintError } from "@/lib/db-errors";
+import { gradeCheck, type CheckResult } from "@/lib/immediate-check";
 
 interface PracticePlayerInput {
   setId: string;
   assignmentId?: string;
   feedbackMode?: "IMMEDIATE" | "AFTER_SET";
+  /** The assignment's "Show explanations in the player" (recorded on the attempt). */
+  showExplanations?: boolean;
   previewMode?: boolean;
   exitHref?: string;
+  resultQuery?: string;
 }
 
 export async function renderPracticePlayer({
   setId,
   assignmentId,
   feedbackMode = "AFTER_SET",
+  showExplanations = true,
   previewMode = false,
   exitHref,
+  resultQuery,
 }: PracticePlayerInput) {
   const session = await auth();
   if (!session) redirect("/login");
@@ -71,7 +79,9 @@ export async function renderPracticePlayer({
     difficulty: item.question.difficulty,
     options: item.question.options,
     graphArtifacts: item.question.supportsGraph ? extractQuestionGraphArtifacts(item.question) : [],
-    ...(feedbackMode === "IMMEDIATE" || previewMode
+    // The answer key only reaches the browser in the teacher preview. Immediate feedback is
+    // graded on the server (/api/attempts/[id]/check) and returned per checked question.
+    ...(previewMode
       ? {
           correctAnswer: item.question.correctAnswer,
           explanation: item.question.explanation,
@@ -98,11 +108,13 @@ export async function renderPracticePlayer({
         savedTime={0}
         savedTimeSpent={{}}
         setName={practiceSet.name}
+        skillName={practiceSet.topic.name}
+        isMath={practiceSet.topic.domain.section.name === "MATH"}
         showCalculator={calculatorEnabled}
         calculatorConfig={getPublicCalculatorConfig()}
         feedbackMode={feedbackMode}
         previewMode
-        exitHref={exitHref ?? `/teacher/practice-sets/${setId}/edit`}
+        exitHref={exitHref ?? `/teacher/practice-sets/${setId}`}
       />
     );
   }
@@ -121,36 +133,51 @@ export async function renderPracticePlayer({
     questionSnapshot: stringifySnapshot(buildQuestionSnapshot(item)),
   }));
 
-  let attempt = await withSqliteRetry(() => prisma.attempt.findFirst({
-    where: { studentId: userId, practiceSetId: setId, assignmentId: assignmentId ?? null, status: "IN_PROGRESS" },
-    include: { answers: true },
-    orderBy: { startedAt: "desc" },
-  }));
+  const findOpenAttempt = () =>
+    withSqliteRetry(() => prisma.attempt.findFirst({
+      where: { studentId: userId, practiceSetId: setId, assignmentId: assignmentId ?? null, status: "IN_PROGRESS" },
+      include: { answers: true },
+      orderBy: { startedAt: "desc" },
+    }));
+  let attempt = await findOpenAttempt();
 
+  let createdAttemptId: string | null = null;
   if (!attempt) {
     const prevAttempts = await withSqliteRetry(() => prisma.attempt.count({
       where: { studentId: userId, practiceSetId: setId },
     }));
-    attempt = await withSqliteRetry(() => prisma.attempt.create({
-      data: {
-        studentId: userId,
-        practiceSetId: setId,
-        practiceSetSnapshot,
-        assignmentId: assignmentId ?? null,
-        attemptNumber: prevAttempts + 1,
-        status: "IN_PROGRESS",
-        currentQuestion: 0,
-      },
-      include: { answers: true },
-    }));
-    const createdAttemptId = attempt.id;
+    try {
+      const created = await withSqliteRetry(() => prisma.attempt.create({
+        data: {
+          studentId: userId,
+          practiceSetId: setId,
+          practiceSetSnapshot,
+          assignmentId: assignmentId ?? null,
+          attemptNumber: prevAttempts + 1,
+          showExplanations,
+          status: "IN_PROGRESS",
+          currentQuestion: 0,
+        },
+        select: { id: true },
+      }));
+      createdAttemptId = created.id;
+    } catch (error) {
+      // Another request (second tab, double click) opened it first: the partial unique index allows
+      // one IN_PROGRESS attempt per assignment, so reuse that one (it seeds its own snapshots).
+      if (!isUniqueConstraintError(error)) throw error;
+      attempt = await findOpenAttempt();
+    }
+  }
+
+  if (createdAttemptId) {
+    const newAttemptId = createdAttemptId;
     await Promise.all(
       questionSnapshots.map((snapshot) =>
       withSqliteRetry(() => prisma.attemptAnswer.upsert({
-          where: { attemptId_questionId: { attemptId: createdAttemptId, questionId: snapshot.questionId } },
+          where: { attemptId_questionId: { attemptId: newAttemptId, questionId: snapshot.questionId } },
           update: { questionSnapshot: snapshot.questionSnapshot },
           create: {
-            attemptId: createdAttemptId,
+            attemptId: newAttemptId,
             questionId: snapshot.questionId,
             questionSnapshot: snapshot.questionSnapshot,
           },
@@ -164,7 +191,7 @@ export async function renderPracticePlayer({
       }));
     }
     attempt = await withSqliteRetry(() => prisma.attempt.findUniqueOrThrow({
-      where: { id: createdAttemptId },
+      where: { id: newAttemptId },
       include: { answers: true },
     }));
     await writeAudit({
@@ -175,7 +202,9 @@ export async function renderPracticePlayer({
       outcome: "success",
       metadata: { practiceSetId: setId, assignmentId: assignmentId ?? null, attemptNumber: attempt.attemptNumber },
     });
-  } else {
+    claimWriteSlot(`resumed:${attempt.id}`, RESUME_AUDIT_INTERVAL_MS);
+  } else if (attempt && claimWriteSlot(`resumed:${attempt.id}`, RESUME_AUDIT_INTERVAL_MS)) {
+    // Logged once per sitting, not on every page load.
     await writeAudit({
       userId,
       action: "ATTEMPT_RESUMED",
@@ -218,7 +247,15 @@ export async function renderPracticePlayer({
   const savedMarked: string[] = [];
   const savedNotes: Record<string, string> = {};
   const savedEliminated: Record<string, string[]> = {};
+  const savedChecks: Record<string, CheckResult> = {};
+  const questionById = new Map(practiceSet.questions.map((item) => [item.questionId, item.question]));
   attempt.answers.forEach((answer) => {
+    const checkedQuestion = questionById.get(answer.questionId);
+    if (feedbackMode === "IMMEDIATE" && answer.checkedAt && answer.answer && checkedQuestion) {
+      savedChecks[answer.questionId] = gradeCheck(answer.answer, checkedQuestion, answer.questionSnapshot, {
+        showExplanation: attempt.showExplanations ?? showExplanations,
+      });
+    }
     if (answer.answer) savedAnswers[answer.questionId] = answer.answer;
     if (answer.timeSpent) savedTimeSpent[answer.questionId] = answer.timeSpent;
     if (answer.markedForReview) savedMarked.push(answer.questionId);
@@ -242,13 +279,18 @@ export async function renderPracticePlayer({
       savedMarked={savedMarked}
       savedNotes={savedNotes}
       savedEliminated={savedEliminated}
+      savedChecks={savedChecks}
       savedQuestion={attempt.currentQuestion}
       savedTime={attempt.totalTime ?? 0}
       savedTimeSpent={savedTimeSpent}
       setName={practiceSet.name}
+      skillName={practiceSet.topic.name}
+      isMath={practiceSet.topic.domain.section.name === "MATH"}
       showCalculator={calculatorEnabled}
       calculatorConfig={getPublicCalculatorConfig()}
       feedbackMode={feedbackMode}
+      exitHref={exitHref ?? "/student/practice"}
+      resultHref={`/student/results/${attempt.id}?new=1${resultQuery ? `&${resultQuery}` : ""}`}
     />
   );
 }

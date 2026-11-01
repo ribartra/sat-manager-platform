@@ -4,12 +4,12 @@ type CardVariant = "default" | "subtle" | "info" | "warning" | "danger" | "succe
 type CardPadding = "none" | "sm" | "md" | "lg";
 
 const CARD_VARIANTS: Record<CardVariant, string> = {
-  default: "border-gray-200 bg-white",
-  subtle: "border-gray-200 bg-gray-50",
-  info: "border-blue-200 bg-blue-50",
-  warning: "border-amber-200 bg-amber-50",
-  danger: "border-red-200 bg-red-50",
-  success: "border-green-200 bg-green-50",
+  default: "border-[var(--sat-border)] bg-white",
+  subtle: "border-[var(--sat-border)] bg-[var(--sat-surface-2)]",
+  info: "border-blue-200 bg-[var(--sat-primary-soft)]",
+  warning: "border-[var(--sat-warn-border)] bg-[var(--sat-warn-soft)]",
+  danger: "border-[var(--sat-bad-border)] bg-[var(--sat-bad-soft)]",
+  success: "border-[var(--sat-ok-border)] bg-[var(--sat-ok-soft)]",
   ghost: "border-transparent bg-transparent",
 };
 
@@ -27,9 +27,24 @@ interface CardProps extends React.HTMLAttributes<HTMLElement> {
   padding?: CardPadding;
 }
 
+// Mockup `.card`: radius 10, slate border, hairline shadow; linked cards get the blue hover.
+const CARD_LINK_HOVER =
+  "cursor-pointer transition-[border-color,box-shadow] hover:border-[#93c5fd] hover:shadow-[0_4px_14px_rgba(37,99,235,.1)]";
+
 export function Card({ as: Component = "div", className, children, variant = "default", padding = "none", ...props }: CardProps) {
+  const clickable = Boolean(props.href) || Component === "button";
   return (
-    <Component className={cn("rounded-lg border", CARD_VARIANTS[variant], CARD_PADDING[padding], className)} {...props}>
+    <Component
+      className={cn(
+        "rounded-[var(--sat-radius)] border",
+        variant !== "ghost" && "shadow-[var(--sat-shadow)]",
+        CARD_VARIANTS[variant],
+        CARD_PADDING[padding],
+        clickable && CARD_LINK_HOVER,
+        className,
+      )}
+      {...props}
+    >
       {children}
     </Component>
   );
@@ -37,7 +52,7 @@ export function Card({ as: Component = "div", className, children, variant = "de
 
 export function CardHeader({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn("border-b border-gray-200 px-5 py-4", className)} {...props}>
+    <div className={cn("border-b border-[var(--sat-border)] px-4 py-3", className)} {...props}>
       {children}
     </div>
   );
@@ -45,7 +60,7 @@ export function CardHeader({ className, children, ...props }: React.HTMLAttribut
 
 export function CardBody({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn("px-5 py-4", className)} {...props}>
+    <div className={cn("px-4 py-4", className)} {...props}>
       {children}
     </div>
   );
@@ -53,7 +68,7 @@ export function CardBody({ className, children, ...props }: React.HTMLAttributes
 
 export function CardFooter({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn("border-t border-gray-200 px-5 py-4", className)} {...props}>
+    <div className={cn("border-t border-[var(--sat-border)] px-4 py-3", className)} {...props}>
       {children}
     </div>
   );

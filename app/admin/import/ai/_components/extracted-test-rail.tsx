@@ -1,5 +1,6 @@
 "use client";
 
+import { Checkbox } from "@/components/ui/checkbox";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { PanelLeftClose, PanelLeftOpen, Search } from "lucide-react";
@@ -83,7 +84,7 @@ export function ExtractedTestRail({ rows, batchId, currentFileId, onSelect }: Ex
   }
 
   return (
-    <aside className="flex max-h-[calc(100vh-2rem)] flex-col rounded-md border border-gray-200 bg-white">
+    <aside className="flex max-h-[calc(var(--app-vh)-2rem)] min-w-0 flex-col rounded-md border border-gray-200 bg-white">
       <div className="flex items-center justify-between gap-2 border-b border-gray-100 px-3 py-2">
         <div className="min-w-0">
           <p className="text-sm font-semibold text-gray-900">Extracted Tests</p>
@@ -136,8 +137,7 @@ export function ExtractedTestRail({ rows, batchId, currentFileId, onSelect }: Ex
           <option value="FULL_PRACTICE_TEST">Full practice tests</option>
         </select>
         <label className="flex items-center gap-2 text-xs text-gray-700">
-          <input
-            type="checkbox"
+          <Checkbox
             checked={onlyPending}
             onChange={(event) => setOnlyPending(event.target.checked)}
             className="h-3.5 w-3.5 rounded border-gray-300"

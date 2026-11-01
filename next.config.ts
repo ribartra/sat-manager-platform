@@ -1,6 +1,24 @@
 import type { NextConfig } from "next";
+import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+import path from "node:path";
+
+/**
+ * sha256 of the <style> sonner inserts at runtime (it cannot take a nonce). Allowed by hash in
+ * the page CSP (lib/csp.ts); recomputed on every build so a sonner upgrade cannot silently break toasts.
+ * The page Content-Security-Policy itself is set per request, with a nonce, in proxy.ts.
+ */
+function sonnerStyleHash() {
+  const source = readFileSync(path.join(process.cwd(), "node_modules/sonner/dist/index.mjs"), "utf8");
+  const literal = source.match(/__insertCSS\(("(?:[^"\\]|\\.)*")\)/)?.[1];
+  if (!literal) throw new Error("sonner: inline style not found; update sonnerStyleHash in next.config.ts");
+  return createHash("sha256").update(JSON.parse(literal) as string).digest("base64");
+}
 
 const nextConfig: NextConfig = {
+  env: {
+    SONNER_STYLE_HASH: sonnerStyleHash(),
+  },
   experimental: {
     proxyClientMaxBodySize: "256mb",
   },
@@ -10,24 +28,10 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: process.env.DOCKER_BUILD === "1",
   },
   async headers() {
-    const csp = [
-      "default-src 'self'",
-      "base-uri 'self'",
-      "frame-ancestors 'self'",
-      "object-src 'none'",
-      "img-src 'self' data: blob:",
-      "font-src 'self' data:",
-      "style-src 'self' 'unsafe-inline'",
-      "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
-      "connect-src 'self'",
-      "form-action 'self'",
-    ].join("; ");
-
     return [
       {
         source: "/:path*",
         headers: [
-          { key: "Content-Security-Policy", value: csp },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
@@ -42,16 +46,21 @@ const nextConfig: NextConfig = {
     "@prisma/client",
     "bcryptjs",
     "@google-cloud/storage",
+    // Server-side PDF reports (lib/pdf/*): keep the renderer and its native-ish deps out of the bundle.
+    "@react-pdf/renderer",
   ],
   async rewrites() {
-    // Serve question media via Node handler (GCS + disk fallback). Public/ still
-    // wins when a file exists on disk; GCS-only objects hit this route.
-    return [
-      {
-        source: "/uploads/questions/:path*",
-        destination: "/api/media/questions/:path*",
-      },
-    ];
+    // Question media and avatars go through Node handlers (session check; GCS + disk fallback).
+    // beforeFiles: these run BEFORE public/ is checked, so files on disk under
+    // public/uploads/{questions,avatars} are never served statically without a session.
+    return {
+      beforeFiles: [
+        { source: "/uploads/questions/:path*", destination: "/api/media/questions/:path*" },
+        { source: "/uploads/avatars/:file", destination: "/api/media/avatars/:file" },
+      ],
+      afterFiles: [],
+      fallback: [],
+    };
   },
 };
 

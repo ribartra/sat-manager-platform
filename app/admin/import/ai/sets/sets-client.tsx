@@ -1,11 +1,17 @@
 "use client";
 
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, ChevronDown, ChevronRight, ScissorsSquare, Search } from "lucide-react";
+import { ChevronDown, ChevronRight, ScissorsSquare, Search } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { PageHeader, PageShell } from "@/components/sat";
+import { HeaderActions } from "@/components/sat/header-actions";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+import { FilterBar, FilterField } from "@/components/sat/filter-bar";
 import {
   filterExtractedTests,
   type ExtractedTestRow,
@@ -127,7 +133,7 @@ function QuestionTable({
                 </Link>
                 {q.promoted && <span className="ml-1 text-emerald-500" title="Promovida a oficial">●</span>}
               </td>
-              <td className="px-2 py-1.5"><span className={`rounded px-1.5 py-0.5 font-mono ${q.type === "NUMERIC" ? "bg-sky-100 text-sky-700" : "bg-gray-100 text-gray-600"}`}>{q.type === "NUMERIC" ? "NUM" : "MC"}</span></td>
+              <td className="px-2 py-1.5"><span className={`rounded px-1.5 py-0.5 font-mono ${q.type === "NUMERIC" ? "bg-sky-100 text-sky-700" : "bg-gray-100 text-gray-600"}`}>{q.type === "NUMERIC" ? "Numeric" : "Multiple Choice"}</span></td>
               <td className={`px-2 py-1.5 font-mono ${q.answer ? "text-gray-800" : "text-rose-600"}`}>{q.answer || "—"}</td>
               <td className="px-2 py-1.5"><FieldDot state={q.fields.stem} label="" /></td>
               <td className="px-2 py-1.5"><FieldDot state={q.fields.stimulus} label="" /></td>
@@ -180,20 +186,19 @@ export function SetsIndexClient({ rows, batchId, batches }: SetsIndexClientProps
   }
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6 px-4 py-8">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0">
-          <Link href={`/admin/import/ai?batch=${batchId}`} className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline">
-            <ArrowLeft className="h-3.5 w-3.5" /> Back to batch
-          </Link>
-          <h1 className="mt-2 text-2xl font-semibold text-gray-900">Extracted Tests to review</h1>
-          <p className="mt-1 text-sm text-gray-500">
+    <PageShell className="space-y-6">
+      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Admin" }, { label: "AI Import", href: `/admin/import/ai?batch=${batchId}` }, { label: "Extracted Tests" }]} />
+      <PageHeader
+        title="Extracted Tests to review"
+        description={
+          <>
             An Extracted Test groups the source files for one set — questions plus answers and/or explanations. Expand a row to see
             each question status (stem, stimulus, options, answer, explanation) and use <strong>Review / crop</strong>
             to open the question file.
-          </p>
-        </div>
-        {batches.length > 1 && (
+          </>
+        }
+        actions={batches.length > 1 ? (
+          <HeaderActions>
           <select
             value={batchId}
             onChange={(event) => {
@@ -207,8 +212,9 @@ export function SetsIndexClient({ rows, batchId, batches }: SetsIndexClientProps
               </option>
             ))}
           </select>
-        )}
-      </div>
+          </HeaderActions>
+        ) : undefined}
+      />
 
       <div className="grid gap-3 sm:grid-cols-4">
         <Card padding="md">
@@ -219,7 +225,15 @@ export function SetsIndexClient({ rows, batchId, batches }: SetsIndexClientProps
           <p className="text-xs uppercase text-gray-400">Questions</p>
           <p className="mt-1 text-2xl font-semibold text-gray-900">{totals.total}</p>
         </Card>
-        <Card padding="md">
+        {/* Opens the list filtered to what still needs review (same as the "pending only" box). */}
+        <Card
+          as="button"
+          padding="md"
+          aria-pressed={onlyPending}
+          title="Show only the Extracted Tests that need review"
+          onClick={() => setOnlyPending(true)}
+          className="text-left"
+        >
           <p className="text-xs uppercase text-gray-400">Needs review</p>
           <p className="mt-1 text-2xl font-semibold text-rose-600">{totals.needsReview}</p>
         </Card>
@@ -244,30 +258,25 @@ export function SetsIndexClient({ rows, batchId, batches }: SetsIndexClientProps
         ))}
       </div>
 
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="relative min-w-64 flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-          <Input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search Extracted Test, file, section, or test…"
-            className="pl-9"
-          />
-        </div>
-        <select
-          value={typeFilter}
-          onChange={(event) => setTypeFilter(event.target.value as SetTypeFilter)}
-          className="rounded-md border border-gray-300 px-3 py-2 text-sm"
-        >
-          <option value="ALL">All types</option>
-          <option value="PRACTICE_SET">Practice sets</option>
-          <option value="FULL_PRACTICE_TEST">Full practice tests</option>
-        </select>
-        <label className="flex items-center gap-2 text-sm text-gray-700">
-          <input type="checkbox" checked={onlyPending} onChange={(event) => setOnlyPending(event.target.checked)} className="h-4 w-4 rounded border-gray-300" />
+      <FilterBar className="mb-0">
+        <FilterField label="Search" htmlFor="sets-q" className="@md:flex-[2]">
+          <div className="relative">
+            <Search size={14} aria-hidden className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Input id="sets-q" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search Extracted Test, file, section, or test…" className="pl-8" />
+          </div>
+        </FilterField>
+        <FilterField label="Type" htmlFor="sets-type">
+          <Select id="sets-type" value={typeFilter} onChange={(event) => setTypeFilter(event.target.value as SetTypeFilter)}>
+            <option value="ALL">All types</option>
+            <option value="PRACTICE_SET">Practice sets</option>
+            <option value="FULL_PRACTICE_TEST">Full practice tests</option>
+          </Select>
+        </FilterField>
+        <label className="flex h-[38px] items-center gap-2 text-sm text-gray-700">
+          <Checkbox checked={onlyPending} onChange={(event) => setOnlyPending(event.target.checked)} className="h-4 w-4 rounded border-gray-300" />
           Only with pending items
         </label>
-      </div>
+      </FilterBar>
 
       <div className="space-y-3">
         {filtered.map((row) => {
@@ -326,6 +335,6 @@ export function SetsIndexClient({ rows, batchId, batches }: SetsIndexClientProps
           <Card padding="lg"><p className="text-center text-sm text-gray-400">No Extracted Tests match this filter.</p></Card>
         )}
       </div>
-    </div>
+    </PageShell>
   );
 }

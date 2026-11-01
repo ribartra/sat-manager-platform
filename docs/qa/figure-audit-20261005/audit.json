@@ -1,0 +1,1626 @@
+[
+ {
+  "n": 1,
+  "id": "cmsjrnxhg01goqmt1t1hhhwf6",
+  "where": "Advanced Math - Nonlinear equations in one variable and systems of equations in two variables - MEDIUM #2",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 2,
+  "id": "cmsjrnxjt01i6qmt15nad36a9",
+  "where": "Advanced Math - Nonlinear equations in one variable and systems of equations in two variables - MEDIUM #24",
+  "term": "graphs",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 3,
+  "id": "cmsjrnxho01guqmt1kmacjlbu",
+  "where": "Advanced Math - Nonlinear equations in one variable and systems of equations in two variables - MEDIUM #4",
+  "term": "graphed",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 4,
+  "id": "cmsjrnxra01n0qmt198kbds32",
+  "where": "Advanced Math - Nonlinear functions - EASY #17",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 5,
+  "id": "cmsjrnx9u01dqqmt1py4ivoen",
+  "where": "Advanced Math - Nonlinear functions - HARD #17",
+  "term": "graphed",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 6,
+  "id": "cmsjrnx9x01drqmt1k1wq1g4n",
+  "where": "Advanced Math - Nonlinear functions - HARD #18",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 7,
+  "id": "cmsjrnxa101dsqmt17euqje2e",
+  "where": "Advanced Math - Nonlinear functions - HARD #19",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 8,
+  "id": "cmsjrnx8301cnqmt13d6pvsr5",
+  "where": "Advanced Math - Nonlinear functions - HARD #2",
+  "term": "as shown",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 9,
+  "id": "cmsjrnxaj01dxqmt1gsmlgt2r",
+  "where": "Advanced Math - Nonlinear functions - HARD #24",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 10,
+  "id": "cmsjrnxao01dyqmt11l4tmxq8",
+  "where": "Advanced Math - Nonlinear functions - HARD #25",
+  "term": "table",
+  "class": "TABLA_MARKDOWN_CRUDA",
+  "note": null
+ },
+ {
+  "n": 11,
+  "id": "cmsjrnx8701csqmt1xbuwdx38",
+  "where": "Advanced Math - Nonlinear functions - HARD #3",
+  "term": "graphed",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 12,
+  "id": "cmsjrnxbb01e4qmt1ml439wkz",
+  "where": "Advanced Math - Nonlinear functions - HARD #31",
+  "term": "graphed",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 13,
+  "id": "cmsjrnxbe01e9qmt12rwoi5qe",
+  "where": "Advanced Math - Nonlinear functions - HARD #32",
+  "term": "table",
+  "class": "TABLA_MARKDOWN_CRUDA",
+  "note": null
+ },
+ {
+  "n": 14,
+  "id": "cmsjrnx8c01ctqmt18j1s1xf6",
+  "where": "Advanced Math - Nonlinear functions - HARD #4",
+  "term": "graphed",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 15,
+  "id": "cmsjrnx8g01cyqmt135ttxd18",
+  "where": "Advanced Math - Nonlinear functions - HARD #5",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 16,
+  "id": "cmsjrnx8k01czqmt1txo80byt",
+  "where": "Advanced Math - Nonlinear functions - HARD #6",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 17,
+  "id": "cmsjrnx8s01d9qmt19dk1vprv",
+  "where": "Advanced Math - Nonlinear functions - HARD #8",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 18,
+  "id": "cmsjrny6p01vkqmt1padmxa75",
+  "where": "Advanced Math - Nonlinear functions - MEDIUM #16",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 19,
+  "id": "cmsjrnya601vwqmt1jx2yaz9p",
+  "where": "Advanced Math - Nonlinear functions - MEDIUM #20",
+  "term": "graphed",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 20,
+  "id": "cmsjrnyb301wcqmt1bmuiqmqe",
+  "where": "Advanced Math - Nonlinear functions - MEDIUM #24",
+  "term": "graphed",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 21,
+  "id": "cmsjrnzfz02avqmt1d6h95opj",
+  "where": "Advanced Math - Nonlinear functions - MEDIUM #34",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 22,
+  "id": "cmsjrny5x01uzqmt1rsj67y7i",
+  "where": "Advanced Math - Nonlinear functions - MEDIUM #7",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 23,
+  "id": "cmsjrny6301v5qmt1m0xkbk5y",
+  "where": "Advanced Math - Nonlinear functions - MEDIUM #9",
+  "term": "graphed",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 24,
+  "id": "cmsjrnyz2023vqmt1hfxur4ls",
+  "where": "Algebra - Linear equations in two variables - EASY #11",
+  "term": "table",
+  "class": "TABLA_EN_TEXTO_OK",
+  "note": null
+ },
+ {
+  "n": 25,
+  "id": "cmsjrnyzc0242qmt1i4701xav",
+  "where": "Algebra - Linear equations in two variables - EASY #14",
+  "term": "table",
+  "class": "TABLA_EN_TEXTO_OK",
+  "note": null
+ },
+ {
+  "n": 26,
+  "id": "cmsjrnyzk0244qmt11g2ft2cc",
+  "where": "Algebra - Linear equations in two variables - EASY #16",
+  "term": "table",
+  "class": "TABLA_EN_TEXTO_OK",
+  "note": null
+ },
+ {
+  "n": 27,
+  "id": "cmsjrnyy50236qmt1v9z1mkq0",
+  "where": "Algebra - Linear equations in two variables - EASY #2",
+  "term": "table",
+  "class": "TABLA_EN_TEXTO_OK",
+  "note": null
+ },
+ {
+  "n": 28,
+  "id": "cmsjrnyzz0248qmt12w1lpoq9",
+  "where": "Algebra - Linear equations in two variables - EASY #20",
+  "term": "table",
+  "class": "TABLA_EN_TEXTO_OK",
+  "note": null
+ },
+ {
+  "n": 29,
+  "id": "cmsjrnz06024aqmt1t311rf6s",
+  "where": "Algebra - Linear equations in two variables - EASY #22",
+  "term": "table",
+  "class": "TABLA_EN_TEXTO_OK",
+  "note": null
+ },
+ {
+  "n": 30,
+  "id": "cmsjrnz0a024bqmt1bge45g2a",
+  "where": "Algebra - Linear equations in two variables - EASY #23",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 31,
+  "id": "cmsjrnz3p024mqmt193yp03oh",
+  "where": "Algebra - Linear equations in two variables - EASY #30",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 32,
+  "id": "cmsjrnzgy02bdqmt1rgy2w8oa",
+  "where": "Algebra - Linear equations in two variables - HARD #1",
+  "term": "table",
+  "class": "TABLA_EN_TEXTO_OK",
+  "note": null
+ },
+ {
+  "n": 33,
+  "id": "cmsjrnzl502btqmt1otq5itul",
+  "where": "Algebra - Linear equations in two variables - HARD #11",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 34,
+  "id": "cmsjrnzm402c5qmt13rx4n5ax",
+  "where": "Algebra - Linear equations in two variables - HARD #19",
+  "term": "table",
+  "class": "TABLA_EN_TEXTO_OK",
+  "note": null
+ },
+ {
+  "n": 35,
+  "id": "cmsjrnzm702c6qmt1imh52bmk",
+  "where": "Algebra - Linear equations in two variables - HARD #20",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 36,
+  "id": "cmsjrnzmb02c9qmt1wylzgetu",
+  "where": "Algebra - Linear equations in two variables - HARD #21",
+  "term": "table",
+  "class": "TABLA_MARKDOWN_CRUDA",
+  "note": null
+ },
+ {
+  "n": 37,
+  "id": "cmsjrnzh802bgqmt14276i4fx",
+  "where": "Algebra - Linear equations in two variables - HARD #4",
+  "term": "graphed",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 38,
+  "id": "cmsjrnzkv02boqmt1zcj0m9dc",
+  "where": "Algebra - Linear equations in two variables - HARD #8",
+  "term": "table",
+  "class": "TABLA_EN_TEXTO_OK",
+  "note": null
+ },
+ {
+  "n": 39,
+  "id": "cmsjrnzkx02bpqmt16ubtjpy8",
+  "where": "Algebra - Linear equations in two variables - HARD #9",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 40,
+  "id": "cmsjrnyik01xuqmt10g7pzpu4",
+  "where": "Algebra - Linear equations in two variables - MEDIUM #10",
+  "term": "table",
+  "class": "TABLA_EN_TEXTO_OK",
+  "note": null
+ },
+ {
+  "n": 41,
+  "id": "cmsjrnyio01xvqmt1r6pxp5yx",
+  "where": "Algebra - Linear equations in two variables - MEDIUM #11",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 42,
+  "id": "cmsjrnyji01ydqmt10u55pia4",
+  "where": "Algebra - Linear equations in two variables - MEDIUM #17",
+  "term": "graphed",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 43,
+  "id": "cmsjrnyjq01yfqmt1mx9gz4bx",
+  "where": "Algebra - Linear equations in two variables - MEDIUM #19",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 44,
+  "id": "cmsjrnyjt01ygqmt11o9mmtpw",
+  "where": "Algebra - Linear equations in two variables - MEDIUM #20",
+  "term": "Figure",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 45,
+  "id": "cmsjrnyjx01ylqmt1rqsenzra",
+  "where": "Algebra - Linear equations in two variables - MEDIUM #21",
+  "term": "table",
+  "class": "TABLA_EN_TEXTO_OK",
+  "note": null
+ },
+ {
+  "n": 46,
+  "id": "cmsjrnyk501yrqmt1e7zu814f",
+  "where": "Algebra - Linear equations in two variables - MEDIUM #23",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 47,
+  "id": "cmsjrnyi901xrqmt1thqagli9",
+  "where": "Algebra - Linear equations in two variables - MEDIUM #7",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 48,
+  "id": "cmsjrnyig01xtqmt17w0tdh36",
+  "where": "Algebra - Linear equations in two variables - MEDIUM #9",
+  "term": "table",
+  "class": "TABLA_EN_TEXTO_OK",
+  "note": null
+ },
+ {
+  "n": 49,
+  "id": "cmsjrnzd9029aqmt1rgl7hzu5",
+  "where": "Algebra - Linear functions - EASY #15",
+  "term": "table",
+  "class": "TABLA_EN_TEXTO_OK",
+  "note": null
+ },
+ {
+  "n": 50,
+  "id": "cmsjrnzdc029bqmt187awbtoy",
+  "where": "Algebra - Linear functions - EASY #16",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 51,
+  "id": "cmsjrnzdu029tqmt1gwh4k39b",
+  "where": "Algebra - Linear functions - EASY #22",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 52,
+  "id": "cmsjrnzf802afqmt1yc8dz5v4",
+  "where": "Algebra - Linear functions - HARD #11",
+  "term": "table",
+  "class": "TABLA_EN_TEXTO_OK",
+  "note": null
+ },
+ {
+  "n": 53,
+  "id": "cmsjrnzfg02alqmt192hmchr3",
+  "where": "Algebra - Linear functions - HARD #13",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 54,
+  "id": "cmsjrnzfq02aoqmt1puhjz0l1",
+  "where": "Algebra - Linear functions - HARD #16",
+  "term": "table",
+  "class": "TABLA_EN_TEXTO_OK",
+  "note": null
+ },
+ {
+  "n": 55,
+  "id": "cmsjrnzeo02a9qmt14arxr9gt",
+  "where": "Algebra - Linear functions - HARD #5",
+  "term": "table",
+  "class": "TABLA_EN_TEXTO_OK",
+  "note": null
+ },
+ {
+  "n": 56,
+  "id": "cmsjrnywf022lqmt1i8km6hpv",
+  "where": "Algebra - Linear functions - MEDIUM #11",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 57,
+  "id": "cmsjrnyx1022pqmt145bp8w1d",
+  "where": "Algebra - Linear functions - MEDIUM #15",
+  "term": "graph",
+  "class": "FALTA_VISUAL_NO_ESENCIAL",
+  "note": "Gráfica de la recta; resoluble conceptualmente. Fuente: Linear Funct MED.pdf p.16"
+ },
+ {
+  "n": 58,
+  "id": "cmsjrnyx7022uqmt1gkvkpedj",
+  "where": "Algebra - Linear functions - MEDIUM #16",
+  "term": "graphed",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 59,
+  "id": "cmsjrnyxd022zqmt1x8xmj8kb",
+  "where": "Algebra - Linear functions - MEDIUM #17",
+  "term": "table",
+  "class": "TABLA_EN_TEXTO_OK",
+  "note": null
+ },
+ {
+  "n": 60,
+  "id": "cmsjrnysc021yqmt1j54dvde4",
+  "where": "Algebra - Linear functions - MEDIUM #2",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 61,
+  "id": "cmsjrnyxr0232qmt1fwcsyt5e",
+  "where": "Algebra - Linear functions - MEDIUM #20",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 62,
+  "id": "cmsjrnyv9021zqmt1l31z8me6",
+  "where": "Algebra - Linear functions - MEDIUM #3",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 63,
+  "id": "cmsjrnyvk0225qmt1zbbo40kc",
+  "where": "Algebra - Linear functions - MEDIUM #5",
+  "term": "table",
+  "class": "TABLA_EN_TEXTO_OK",
+  "note": null
+ },
+ {
+  "n": 64,
+  "id": "cmsjrnyvu022bqmt1154mut91",
+  "where": "Algebra - Linear functions - MEDIUM #7",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 65,
+  "id": "cmsjrnyoy020qqmt1i402tyy4",
+  "where": "Algebra - Linear inequalities in one or two variables - MEDIUM #7",
+  "term": "tables",
+  "class": "TABLA_EN_TEXTO_OK",
+  "note": null
+ },
+ {
+  "n": 66,
+  "id": "cmsjro0qv02qvqmt1gzbch0u9",
+  "where": "Algebra - Systems of two linear equations in two variables - HARD #13",
+  "term": "graphs",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 67,
+  "id": "cmsjrnyrr021hqmt15w3ssr3g",
+  "where": "Algebra - Systems of two linear equations in two variables - MEDIUM #11",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 68,
+  "id": "cmsjro0r402r1qmt1mmbbfcc5",
+  "where": "Algebra - Systems of two linear equations in two variables - MEDIUM #16",
+  "term": "graphs",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 69,
+  "id": "cmsjro21803dbqmt1z3lag0df",
+  "where": "Craft and Structure - Cross-Text Connections - EASY #14",
+  "term": "figures",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 70,
+  "id": "cmsjro38e03ziqmt1rui1uztv",
+  "where": "Craft and Structure - Text Structure and Purpose - HARD #6",
+  "term": "figure",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 71,
+  "id": "cmsjro2ry03ojqmt1g93s02hy",
+  "where": "Craft and Structure - Text Structure and Purpose - MEDIUM #12",
+  "term": "figure",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 72,
+  "id": "cmsjro5ba056tqmt1zgvg0gu8",
+  "where": "Craft and Structure - Words in Context - EASY #106",
+  "term": "figures",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 73,
+  "id": "cmsjro5bz057sqmt14zse8t6p",
+  "where": "Craft and Structure - Words in Context - EASY #113",
+  "term": "figures",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 74,
+  "id": "cmsjro3gi045rqmt1fjblfpr0",
+  "where": "Craft and Structure - Words in Context - EASY #37",
+  "term": "figure",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 75,
+  "id": "cmsjro3gs0466qmt1yx4vdrdc",
+  "where": "Craft and Structure - Words in Context - EASY #40",
+  "term": "figure",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 76,
+  "id": "cmsjro4sm04sxqmt1iozurw2x",
+  "where": "Craft and Structure - Words in Context - MEDIUM #6",
+  "term": "figure",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 77,
+  "id": "cmsjro6o5061dqmt1kaqvmgjz",
+  "where": "Expression of Ideas - Rhetorical Synthesis - EASY #12",
+  "term": "figures",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 78,
+  "id": "cmsjro6km0609qmt1yyoca5h4",
+  "where": "Expression of Ideas - Rhetorical Synthesis - EASY #4",
+  "term": "figures",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 79,
+  "id": "cmsjrnzqq02cpqmt14e343ey1",
+  "where": "Geometry and Trigonometry - Area and volume - MEDIUM #7",
+  "term": "Figure",
+  "class": "FALTA_VISUAL_ESENCIAL",
+  "note": "Medidas 12 in, 5 in, 10 in solo en la figura: no resoluble. Fuente: Area and Volume MED.pdf p.7"
+ },
+ {
+  "n": 80,
+  "id": "cmsjro0jt02oeqmt154w9ddhs",
+  "where": "Geometry and Trigonometry - Circles - EASY #3",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 81,
+  "id": "cmsjro0y002ubqmt1iuvho37i",
+  "where": "Geometry and Trigonometry - Circles - HARD #4",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 82,
+  "id": "cmsjro0yd02ufqmt1n0tzha9n",
+  "where": "Geometry and Trigonometry - Circles - HARD #8",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 83,
+  "id": "cmsjro05b02h7qmt1vlmdymel",
+  "where": "Geometry and Trigonometry - Circles - MEDIUM #1",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 84,
+  "id": "cmsjro06g02hlqmt1mll20k3j",
+  "where": "Geometry and Trigonometry - Circles - MEDIUM #11",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 85,
+  "id": "cmsjro0t602sfqmt1s39wpgec",
+  "where": "Geometry and Trigonometry - Lines, angles, and triangles - EASY #14",
+  "term": "Figures",
+  "class": "FALTA_VISUAL_ESENCIAL",
+  "note": "Ángulo 60° solo en la figura: no resoluble. Fuente: Lines Angles Triangles EASY.pdf p.14"
+ },
+ {
+  "n": 86,
+  "id": "cmsjro0g902klqmt18v0lhr1f",
+  "where": "Geometry and Trigonometry - Lines, angles, and triangles - MEDIUM #11",
+  "term": "Figure",
+  "class": "FALTA_VISUAL_NO_ESENCIAL",
+  "note": "Resoluble con los ángulos del texto. Fuente: Lines Angles Triangles MED.pdf p.11"
+ },
+ {
+  "n": 87,
+  "id": "cmsjro0f702k6qmt100jb3xiw",
+  "where": "Geometry and Trigonometry - Lines, angles, and triangles - MEDIUM #4",
+  "term": "Figure",
+  "class": "FALTA_VISUAL_NO_ESENCIAL",
+  "note": "Resoluble con el texto. Fuente: Lines Angles Triangles MED.pdf p.4"
+ },
+ {
+  "n": 88,
+  "id": "cmsjro19m02x4qmt1djzsg1zf",
+  "where": "Information and Ideas - Command of Evidence - EASY #1",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 89,
+  "id": "cmsjro1aj02ydqmt1eqfcs2g6",
+  "where": "Information and Ideas - Command of Evidence - EASY #10",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 90,
+  "id": "cmsjro1av02yxqmt1k19qmxpr",
+  "where": "Information and Ideas - Command of Evidence - EASY #14",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 91,
+  "id": "cmsjro1c8030lqmt1vdvn1v96",
+  "where": "Information and Ideas - Command of Evidence - EASY #26",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 92,
+  "id": "cmsjro1cc030qqmt107nff1sk",
+  "where": "Information and Ideas - Command of Evidence - EASY #27",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 93,
+  "id": "cmsjro1cf030vqmt1brfq2slr",
+  "where": "Information and Ideas - Command of Evidence - EASY #28",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 94,
+  "id": "cmsjro1cl0310qmt1dnwgkimn",
+  "where": "Information and Ideas - Command of Evidence - EASY #29",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 95,
+  "id": "cmsjro1cw031fqmt1yezodzlm",
+  "where": "Information and Ideas - Command of Evidence - EASY #32",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 96,
+  "id": "cmsjro1g2031kqmt1hv11tyxr",
+  "where": "Information and Ideas - Command of Evidence - EASY #33",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 97,
+  "id": "cmsjro1ga031pqmt1ca77mjsu",
+  "where": "Information and Ideas - Command of Evidence - EASY #34",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 98,
+  "id": "cmsjro1ge031uqmt1jihc9oyl",
+  "where": "Information and Ideas - Command of Evidence - EASY #35",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 99,
+  "id": "cmsjro1a802xyqmt1t7564wxj",
+  "where": "Information and Ideas - Command of Evidence - EASY #7",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 100,
+  "id": "cmsjro1ii033nqmt14vqrkx08",
+  "where": "Information and Ideas - Command of Evidence - HARD #10",
+  "term": "grid",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 101,
+  "id": "cmsjro1jm034wqmt1pnbn1egk",
+  "where": "Information and Ideas - Command of Evidence - HARD #19",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 102,
+  "id": "cmsjro1kf035tqmt1j694oh0r",
+  "where": "Information and Ideas - Command of Evidence - HARD #26",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 103,
+  "id": "cmsjro1kq0363qmt16cchfkl8",
+  "where": "Information and Ideas - Command of Evidence - HARD #28",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 104,
+  "id": "cmsjro1kv0368qmt1oxt4ta8k",
+  "where": "Information and Ideas - Command of Evidence - HARD #29",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": "Superíndices del isótopo (15N/14N) salen como números sueltos"
+ },
+ {
+  "n": 105,
+  "id": "cmsjro1l6036iqmt1r6wkdnmn",
+  "where": "Information and Ideas - Command of Evidence - HARD #31",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 106,
+  "id": "cmsjro1lb036nqmt1gftu21ii",
+  "where": "Information and Ideas - Command of Evidence - HARD #32",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 107,
+  "id": "cmsjro1nz036sqmt1og4h07um",
+  "where": "Information and Ideas - Command of Evidence - HARD #33",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 108,
+  "id": "cmsjro1hn032zqmt1cixv2udc",
+  "where": "Information and Ideas - Command of Evidence - HARD #5",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 109,
+  "id": "cmsjro2a203i0qmt1is3kvl3r",
+  "where": "Information and Ideas - Command of Evidence - MEDIUM #10",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 110,
+  "id": "cmsjro2ad03iaqmt1dsr5d602",
+  "where": "Information and Ideas - Command of Evidence - MEDIUM #12",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 111,
+  "id": "cmsjro2an03ikqmt172j0bcb1",
+  "where": "Information and Ideas - Command of Evidence - MEDIUM #14",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 112,
+  "id": "cmsjro2ba03j9qmt1rrabv0on",
+  "where": "Information and Ideas - Command of Evidence - MEDIUM #19",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 113,
+  "id": "cmsjro2c603k8qmt1mlddbnnt",
+  "where": "Information and Ideas - Command of Evidence - MEDIUM #26",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 114,
+  "id": "cmsjro29o03hlqmt1sxwv94oo",
+  "where": "Information and Ideas - Command of Evidence - MEDIUM #7",
+  "term": "map",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 115,
+  "id": "cmsjro37003xzqmt1wivusj8w",
+  "where": "Information and Ideas - Inferences - HARD #21",
+  "term": "Table",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 116,
+  "id": "cmsjro2sx03pnqmt1wlvp43c0",
+  "where": "Information and Ideas - Inferences - MEDIUM #3",
+  "term": "tables",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 117,
+  "id": "cmsjro2xx03rqqmt1pdm37ugx",
+  "where": "Information and Ideas - Main Ideas and Details - EASY #5",
+  "term": "figures",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 118,
+  "id": "cmsjro3yx04h8qmt11lnx5kmr",
+  "where": "Information and Ideas - Main Ideas and Details - HARD #7",
+  "term": "figure",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 119,
+  "id": "cmsjro3xm04f7qmt10mwl1w2k",
+  "where": "Information and Ideas - Main Ideas and Details - MEDIUM #7",
+  "term": "figures",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 120,
+  "id": "cmsjro0je02nuqmt1autna8vg",
+  "where": "Problem-Solving and Data Analysis - Inference from Statistics and Margin of Error - HARD #3",
+  "term": "are shown",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 121,
+  "id": "cmsjro0ji02nzqmt1zfb4jzl6",
+  "where": "Problem-Solving and Data Analysis - Inference from Statistics and Margin of Error - HARD #4",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 122,
+  "id": "cmsjro0il02n2qmt1ft2vei7b",
+  "where": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - EASY #11",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 123,
+  "id": "cmsjro0io02n7qmt1saoknm4e",
+  "where": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - EASY #12",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": "Además: afirmaciones numeradas 1./2. y opciones citan I/II"
+ },
+ {
+  "n": 124,
+  "id": "cmsjro0it02ncqmt1s03c89w0",
+  "where": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - EASY #13",
+  "term": "are shown",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 125,
+  "id": "cmsjro0hq02lxqmt1n3f8z214",
+  "where": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - EASY #2",
+  "term": "table",
+  "class": "TABLA_EN_TEXTO_OK",
+  "note": null
+ },
+ {
+  "n": 126,
+  "id": "cmsjro0hz02mcqmt1ix37d3ay",
+  "where": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - EASY #5",
+  "term": "is shown",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 127,
+  "id": "cmsjro0ie02msqmt1zmy6el2l",
+  "where": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - EASY #9",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 128,
+  "id": "cmsjro0p302puqmt1p38eg710",
+  "where": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - HARD - #1 #13",
+  "term": "tables",
+  "class": "TABLA_EN_TEXTO_OK",
+  "note": null
+ },
+ {
+  "n": 129,
+  "id": "cmsjrnzyq02etqmt1pgs0y4vr",
+  "where": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - HARD - #2 #1",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 130,
+  "id": "cmsjrnzyt02euqmt18iagq73n",
+  "where": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - HARD - #2 #2",
+  "term": "are shown",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 131,
+  "id": "cmsjro0xd02tsqmt1qm7ef91v",
+  "where": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - MEDIUM #10",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 132,
+  "id": "cmsjro0xh02ttqmt1oq4nfvx6",
+  "where": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - MEDIUM #11",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 133,
+  "id": "cmsjro0xk02tyqmt13nczjfg0",
+  "where": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - MEDIUM #12",
+  "term": "are shown",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 134,
+  "id": "cmsjro0x402tiqmt1jxnhss59",
+  "where": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - MEDIUM #8",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 135,
+  "id": "cmsjro08502irqmt1h5rw4u1r",
+  "where": "Problem-Solving and Data Analysis - Percentages - EASY #10",
+  "term": "are shown",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 136,
+  "id": "cmsjro08t02jcqmt1ti8yxehs",
+  "where": "Problem-Solving and Data Analysis - Percentages - EASY #15",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 137,
+  "id": "cmsjro27t03fsqmt1tgpsl2zb",
+  "where": "Problem-Solving and Data Analysis - Probability and conditional probability - EASY #12",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 138,
+  "id": "cmsjro1zc03bbqmt1mnrfmehp",
+  "where": "Problem-Solving and Data Analysis - Probability and conditional probability - HARD #4",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 139,
+  "id": "cmsjro16402wiqmt13uep3edq",
+  "where": "Problem-Solving and Data Analysis - Probability and conditional probability - MEDIUM #5",
+  "term": "is shown",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 140,
+  "id": "cmsjro2l803m2qmt17ephq6hu",
+  "where": "Problem-Solving and Data Analysis - Ratios, rates, proportional relationships, and units - EASY #8",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 141,
+  "id": "cmsjro1t2039lqmt1rv4ekgxa",
+  "where": "Problem-Solving and Data Analysis - Ratios, rates, proportional relationships, and units - MEDIUM #5",
+  "term": "table",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 142,
+  "id": "cmsjro1tm039xqmt14d658ff5",
+  "where": "Problem-Solving and Data Analysis - Ratios, rates, proportional relationships, and units - MEDIUM #9",
+  "term": "pictured",
+  "class": "FALTA_VISUAL_ESENCIAL",
+  "note": "Falta la figura del vaso y el dato (1 gallon = 128 fluid ounces). Fuente: Ratios Rates Proport. Units MED.pdf p.9"
+ },
+ {
+  "n": 143,
+  "id": "cmsjro13q02vlqmt1sqt5heft",
+  "where": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - HARD #5",
+  "term": "as shown",
+  "class": "TABLA_APLANADA",
+  "note": null
+ },
+ {
+  "n": 144,
+  "id": "cmsjro5ho05bjqmt16zb47v1o",
+  "where": "Standard English Conventions - Boundaries - HARD - #1 #9",
+  "term": "figure",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 145,
+  "id": "cmsjro4qk04roqmt1m3p0ijla",
+  "where": "Standard English Conventions - Boundaries - MEDIUM - #1 #7",
+  "term": "figures",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 146,
+  "id": "cmsjro4d304nxqmt1i20nk1d2",
+  "where": "Standard English Conventions - Form, Structure, and Sense - EASY #13",
+  "term": "graphs",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 147,
+  "id": "cmsjro5ze05kqqmt1nwfx0sqq",
+  "where": "Standard English Conventions - Form, Structure, and Sense - HARD #15",
+  "term": "figure",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 148,
+  "id": "cmsjrntmr008hqmt1n6r20seg",
+  "where": "TEST 1 · Math Module 1 #11",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 149,
+  "id": "cmsjrntnp008oqmt16z1xx1kd",
+  "where": "TEST 1 · Math Module 2 #14",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 150,
+  "id": "cmsjrntpb0098qmt1cfd1el8j",
+  "where": "TEST 1 · Math Module 2 #20",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 151,
+  "id": "cmsjro6si062kqmt1jo98vchm",
+  "where": "TEST 1 · Reading & Writing Module 1 #5",
+  "term": "table",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 152,
+  "id": "cmsjro6t6062nqmt10kq3jw8w",
+  "where": "TEST 1 · Reading & Writing Module 2 #6",
+  "term": "figure",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 153,
+  "id": "cmsnffuyb00160mmx4sqfeqxu",
+  "where": "TEST 10 · Math Module 1 #12",
+  "term": "graphed",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 154,
+  "id": "cmsnffuzb00270mmxj89q3is6",
+  "where": "TEST 10 · Math Module 1 #21",
+  "term": "table",
+  "class": "TABLA_EN_TEXTO_OK",
+  "note": null
+ },
+ {
+  "n": 155,
+  "id": "cmsnffuw4000f0mmxy7tueets",
+  "where": "TEST 10 · Math Module 1 #5",
+  "term": "graphs",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 156,
+  "id": "cmsjrnu6500guqmt1nhv8hez2",
+  "where": "TEST 10 · Math Module 2 #1",
+  "term": "graphed",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 157,
+  "id": "cmsjrnthc0070qmt1wnnqrm06",
+  "where": "TEST 2 · Math Module 2 #22",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 158,
+  "id": "cmsjro67q05q2qmt10fxc3d8b",
+  "where": "TEST 2 · Reading & Writing Module 1 #1",
+  "term": "figures",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 159,
+  "id": "cmsjrnvbg00sfqmt1qw1em9ub",
+  "where": "TEST 3 · Math Module 2 #16",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 160,
+  "id": "cmsjrntsf00ayqmt113z3vi92",
+  "where": "TEST 3 · Math Module 2 #9",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 161,
+  "id": "cmsjrnvhd00ubqmt1oy49iejm",
+  "where": "TEST 3 · Reading & Writing Module 1 #14",
+  "term": "figure",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 162,
+  "id": "cmsjrnvhq00urqmt1rdne3bnq",
+  "where": "TEST 3 · Reading & Writing Module 1 #16",
+  "term": "figure",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 163,
+  "id": "cmsjrnvd600t6qmt1panu970a",
+  "where": "TEST 3 · Reading & Writing Module 1 #3",
+  "term": "as shown",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 164,
+  "id": "cmsjrnvj000w2qmt1cnyl2uui",
+  "where": "TEST 3 · Reading & Writing Module 2 #23",
+  "term": "figure",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 165,
+  "id": "cmsjrnv9l00rhqmt1x67ft34i",
+  "where": "TEST 4 · Math Module 2 #16",
+  "term": "table",
+  "class": "TABLA_EN_TEXTO_OK",
+  "note": null
+ },
+ {
+  "n": 166,
+  "id": "cmsjrnv9v00rjqmt1yy8qnov9",
+  "where": "TEST 4 · Math Module 2 #17",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 167,
+  "id": "cmsjrnv3r00q5qmt1jckooeke",
+  "where": "TEST 4 · Math Module 2 #2",
+  "term": "table",
+  "class": "TABLA_EN_TEXTO_OK",
+  "note": null
+ },
+ {
+  "n": 168,
+  "id": "cmsjrnusc00lmqmt1c3klgwya",
+  "where": "TEST 4 · Reading & Writing Module 1 #23",
+  "term": "figures",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 169,
+  "id": "cmsjrnucs00hxqmt1ur5wcui7",
+  "where": "TEST 5 · Math Module 1 #1",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 170,
+  "id": "cmsjrnuir00ixqmt1wfszdlwo",
+  "where": "TEST 5 · Math Module 1 #15",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 171,
+  "id": "cmsjrnukh00jdqmt1prczoged",
+  "where": "TEST 5 · Math Module 1 #19",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 172,
+  "id": "cmsjrnud900i0qmt1s5jz2zeb",
+  "where": "TEST 5 · Math Module 2 #2",
+  "term": "graphs",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 173,
+  "id": "cmsjrnukv00jgqmt1ra2twtmo",
+  "where": "TEST 5 · Math Module 2 #20",
+  "term": "graphed",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 174,
+  "id": "cmsjrnv2s00pqqmt1rew7cu53",
+  "where": "TEST 5 · Reading & Writing Module 1 #24",
+  "term": "grid",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 175,
+  "id": "cmsjrnuuy00mwqmt156obl2h2",
+  "where": "TEST 5 · Reading & Writing Module 1 #6",
+  "term": "table",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 176,
+  "id": "cmsjrnv1p00p3qmt11x8u0yf7",
+  "where": "TEST 5 · Reading & Writing Module 2 #17",
+  "term": "figure",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 177,
+  "id": "cmsjrnwac011wqmt14eysu7el",
+  "where": "TEST 5 · Reading & Writing Module 2 #27",
+  "term": "map",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 178,
+  "id": "cmsjrnuv300mxqmt1zg5ieis9",
+  "where": "TEST 5 · Reading & Writing Module 2 #6",
+  "term": "figure",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 179,
+  "id": "cmsjrnvw400y7qmt1r47em8md",
+  "where": "TEST 6 · Math Module 1 #17",
+  "term": "graphed",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 180,
+  "id": "cmsjrnvsm00xpqmt1r7yupxmu",
+  "where": "TEST 6 · Math Module 1 #8",
+  "term": "are shown",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 181,
+  "id": "cmsjrnwh60155qmt1u16p1fqt",
+  "where": "TEST 6 · Reading & Writing Module 1 #18",
+  "term": "tables",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 182,
+  "id": "cmsjrnwg3013qqmt1cesl3eba",
+  "where": "TEST 6 · Reading & Writing Module 2 #12",
+  "term": "figure",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 183,
+  "id": "cmsjrnwdk012bqmt1b8712ddo",
+  "where": "TEST 6 · Reading & Writing Module 2 #4",
+  "term": "figures",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 184,
+  "id": "cmsjrnwvv01azqmt1mfieaq2s",
+  "where": "TEST 7 · Math Module 1 #8",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 185,
+  "id": "cmsjrnwwo01b6qmt1q7u7zo6f",
+  "where": "TEST 7 · Math Module 2 #11",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 186,
+  "id": "cmsjrnwxb01baqmt1s1u8sv5b",
+  "where": "TEST 7 · Math Module 2 #13",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 187,
+  "id": "cmsjrnwv501agqmt13icfwcp1",
+  "where": "TEST 7 · Math Module 2 #4",
+  "term": "graphed",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 188,
+  "id": "cmsjrnwla016bqmt1hkvh001y",
+  "where": "TEST 7 · Reading & Writing Module 1 #3",
+  "term": "the image",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 189,
+  "id": "cmsnb3g20001o0mpdbh9bejs6",
+  "where": "TEST 8 · Math Module 1 #19",
+  "term": "shown above",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 190,
+  "id": "cmsnb3g26001t0mpdtt9ogs9t",
+  "where": "TEST 8 · Math Module 1 #20",
+  "term": "graphed",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 191,
+  "id": "cmsnb3fz8000f0mpdhil7l0kw",
+  "where": "TEST 8 · Math Module 1 #6",
+  "term": "table",
+  "class": "TABLA_EN_TEXTO_OK",
+  "note": "Tabla descrita en prosa; el staging tiene la tabla como imagen (STEM)"
+ },
+ {
+  "n": 192,
+  "id": "cmsnb3g3j002z0mpdzv7yhrhu",
+  "where": "TEST 8 · Math Module 2 #10",
+  "term": "is shown",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 193,
+  "id": "cmsnb3g4e003z0mpd4udukjcd",
+  "where": "TEST 8 · Math Module 2 #18",
+  "term": "table",
+  "class": "TABLA_EN_TEXTO_OK",
+  "note": "Tabla descrita en prosa; el staging tiene la tabla como imagen (STEM)"
+ },
+ {
+  "n": 194,
+  "id": "cmsnb3g2m00280mpd0k0wyj5p",
+  "where": "TEST 8 · Math Module 2 #2",
+  "term": "graphed",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 195,
+  "id": "cmsojfkq1001j18ppot71l183",
+  "where": "TEST 8 · Reading & Writing Module 1 #7",
+  "term": "figures",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 196,
+  "id": "cmsojfkyv005u18pp4o3cdnfq",
+  "where": "TEST 8 · Reading & Writing Module 2 #22",
+  "term": "figures",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 197,
+  "id": "cmsjrnw3s010lqmt1p4c4t6bn",
+  "where": "TEST 9 · Math Module 1 #12",
+  "term": "graphed",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 198,
+  "id": "cmsjrnvz300zhqmt1m5rv6t87",
+  "where": "TEST 9 · Math Module 1 #4",
+  "term": "graphed",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 199,
+  "id": "cmsjrnw620112qmt17bze9zdf",
+  "where": "TEST 9 · Math Module 2 #16",
+  "term": "graph",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 200,
+  "id": "cmsjrnvyz00zcqmt1v9omj5p5",
+  "where": "TEST 9 · Math Module 2 #3",
+  "term": "graphed",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": 201,
+  "id": "cmsjrny0m01rzqmt1529vggas",
+  "where": "TEST 9 · Reading & Writing Module 1 #13",
+  "term": "figures",
+  "class": "FALSO_POSITIVO",
+  "note": null
+ },
+ {
+  "n": "extra",
+  "id": "cmsjro06202hiqmt196ercuz4",
+  "where": "Geometry and Trigonometry - Circles - MEDIUM #8",
+  "term": "shown",
+  "class": "FALTA_VISUAL_NO_ESENCIAL",
+  "note": "Resoluble con el texto. Fuente: Circles MED.pdf p.8"
+ },
+ {
+  "n": "extra",
+  "id": "cmsjro0y602udqmt1n5a3ux5w",
+  "where": "Geometry and Trigonometry - Circles - HARD #6",
+  "term": "shown",
+  "class": "FALTA_VISUAL_NO_ESENCIAL",
+  "note": "Resoluble con la ecuación. Fuente: Circles HARD.pdf p.6"
+ }
+]

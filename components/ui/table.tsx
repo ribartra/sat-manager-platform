@@ -2,14 +2,14 @@ import { HTMLAttributes, TdHTMLAttributes, ThHTMLAttributes, forwardRef } from "
 import { cn } from "@/lib/utils";
 
 const Table = forwardRef<HTMLTableElement, HTMLAttributes<HTMLTableElement>>(({ className, ...props }, ref) => (
-  <div className="w-full overflow-auto">
-    <table ref={ref} className={cn("w-full caption-bottom text-sm", className)} {...props} />
+  <div className="w-full overflow-auto rounded-[var(--sat-radius)] border border-[var(--sat-border)]">
+    <table ref={ref} className={cn("w-full caption-bottom border-collapse bg-white text-sm", className)} {...props} />
   </div>
 ));
 Table.displayName = "Table";
 
 const TableHeader = forwardRef<HTMLTableSectionElement, HTMLAttributes<HTMLTableSectionElement>>(
-  ({ className, ...props }, ref) => <thead ref={ref} className={cn("[&_tr]:border-b", className)} {...props} />
+  ({ className, ...props }, ref) => <thead ref={ref} className={cn("bg-[var(--sat-surface-2)] [&_tr]:border-b [&_tr]:hover:bg-transparent", className)} {...props} />
 );
 TableHeader.displayName = "TableHeader";
 
@@ -20,25 +20,25 @@ TableBody.displayName = "TableBody";
 
 const TableFooter = forwardRef<HTMLTableSectionElement, HTMLAttributes<HTMLTableSectionElement>>(
   ({ className, ...props }, ref) => (
-    <tfoot ref={ref} className={cn("border-t bg-gray-50 font-medium [&>tr]:last:border-b-0", className)} {...props} />
+    <tfoot ref={ref} className={cn("border-t bg-[var(--sat-surface-2)] font-medium [&>tr]:last:border-b-0", className)} {...props} />
   )
 );
 TableFooter.displayName = "TableFooter";
 
 const TableRow = forwardRef<HTMLTableRowElement, HTMLAttributes<HTMLTableRowElement>>(({ className, ...props }, ref) => (
-  <tr ref={ref} className={cn("border-b border-gray-200 transition-colors hover:bg-gray-50", className)} {...props} />
+  <tr ref={ref} className={cn("border-b border-[var(--sat-border)] transition-colors hover:bg-[var(--sat-primary-soft)]", className)} {...props} />
 ));
 TableRow.displayName = "TableRow";
 
 const TableHead = forwardRef<HTMLTableCellElement, ThHTMLAttributes<HTMLTableCellElement>>(
   ({ className, ...props }, ref) => (
-    <th ref={ref} className={cn("h-10 px-3 text-left align-middle text-xs font-semibold uppercase text-gray-500", className)} {...props} />
+    <th ref={ref} className={cn("px-3 py-2.5 text-left align-middle text-xs font-semibold text-[var(--sat-muted)]", className)} {...props} />
   )
 );
 TableHead.displayName = "TableHead";
 
 const TableCell = forwardRef<HTMLTableCellElement, TdHTMLAttributes<HTMLTableCellElement>>(
-  ({ className, ...props }, ref) => <td ref={ref} className={cn("px-3 py-3 align-middle", className)} {...props} />
+  ({ className, ...props }, ref) => <td ref={ref} className={cn("px-3 py-[11px] align-middle", className)} {...props} />
 );
 TableCell.displayName = "TableCell";
 

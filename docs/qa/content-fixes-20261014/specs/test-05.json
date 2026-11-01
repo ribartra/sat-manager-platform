@@ -1,0 +1,272 @@
+[
+  {
+    "table": "Question",
+    "id": "cmsjrnuty00mkqmt1rl2lbkh5",
+    "field": "stimulus",
+    "before": "In order for the mission to land successfully, NASA's aerospace engineers _____ a complex sequence of maneuvers that facilitated a decrease in the speed of the descending rover so that it could be safely lowered to the planet's surface.",
+    "after": "The Mars Science Laboratory's Curiosity rover landed on Mars on August 5, 2012. In order for the mission to land successfully, NASA's aerospace engineers _____ a complex sequence of maneuvers that facilitated a decrease in the speed of the descending rover so that it could be safely lowered to the planet's surface.",
+    "note": "T5 R&W M1 #2: other — stimulus truncated: opening sentence \"The Mars Science Laboratory's Curiosity rover landed…\" dropped by parser",
+    "class": "other",
+    "evidence": "IngestPageArtifact p1 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q2 block)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnuug00moqmt19gv4u1s2",
+    "field": "stimulus",
+    "before": "Sara often thought afterward that the house was somehow exactly like Miss Minchin. ++It was respectable and well furnished, but everything in it was ugly++; and the very armchairs seemed to have hard bones in them. In the hall everything was hard and polished—even the red cheeks of the moon face on the tall clock in the corner had a severe varnished look. The drawing room into which they were ushered was covered by a carpet with a square pattern upon it, the chairs were square, and a heavy marble timepiece stood upon the heavy marble mantel.",
+    "after": "The following text is from Frances Hodgson Burnett's 1905 novel *A Little Princess*. Sara often thought afterward that the house was somehow exactly like Miss Minchin. ++It was respectable and well furnished, but everything in it was ugly++; and the very armchairs seemed to have hard bones in them. In the hall everything was hard and polished—even the red cheeks of the moon face on the tall clock in the corner had a severe varnished look. The drawing room into which they were ushered was covered by a carpet with a square pattern upon it, the chairs were square, and a heavy marble timepiece stood upon the heavy marble mantel.",
+    "note": "T5 R&W M1 #4: other — source intro line (\"The following text is from … *A Little Princess*.\") dropped by parser",
+    "class": "other",
+    "evidence": "IngestPageArtifact p2 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q4 block); page image p2 checked"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnuuy00mwqmt156obl2h2",
+    "field": "stimulus",
+    "before": "The following paragraph is from the 1749 novel *The History* of Tom Jones, a Foundling by Henry Fielding. The passage opens a chapter in which Mr. Allworthy discovers Tom, an abandoned infant. I have told my reader, in the preceding chapter, that Mr. Allworthy inherited a large fortune; that ++he had a good heart and no family. Hence, doubtless, it will be concluded by many that he lived like an honest man, owed no one a shilling, took nothing but what was his own, kept a good house, entertained his neighbors with a hearty welcome at his table, and was charitable to the poor.++",
+    "after": "The following paragraph is from the 1749 novel *The History* of Tom Jones, a Foundling by Henry Fielding. The passage opens a chapter in which Mr. Allworthy discovers Tom, an abandoned infant. I have told my reader, in the preceding chapter, that Mr. Allworthy inherited a large fortune; that he had a good heart and no family. Hence, doubtless, it will be concluded by many that ++he lived like an honest man, owed no one a shilling, took nothing but what was his own, kept a good house, entertained his neighbors with a hearty welcome at his table, and was charitable to the poor.++",
+    "note": "T5 R&W M1 #6: other — underline span too wide: source underlines only \"he lived like an honest man, … charitable to the poor.\"",
+    "class": "other",
+    "evidence": "IngestPageArtifact p4 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q6 block); page image p4 checked (underline starts at \"he lived like\")"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnuv800n2qmt1xezqm9ve",
+    "field": "stimulus",
+    "before": "According to Nicole Kay Peterson of Iowa State University, the evolution of office spaces followed a twisted path through eras and contexts. Peterson first traced the birth of individualized office areas, or cubicles, to fifth-century monasteries. She then saw evidence of modern cubicles in Italian city-states such as Florence, which developed centrally-located administrative offices in the 1500s, and British trading firms, which built offices with dedicated conference rooms in the 1700s. *Cubed: A Secret History of the Workplace* functions as a hard-edged social commentary for author Nikil Saval, who largely attributes the development of today's cubicle culture to questionable 1800s ideals. Cubicles, for Saval, offer the illusion of self-directed and fulfilling individual work but align with an approach that treats workers as the implements of corporations. Saval notes, however, that such alienation has recently begun to abate as companies embrace more communal office plans.",
+    "after": "**Text 1**\n\nAccording to Nicole Kay Peterson of Iowa State University, the evolution of office spaces followed a twisted path through eras and contexts. Peterson first traced the birth of individualized office areas, or cubicles, to fifth-century monasteries. She then saw evidence of modern cubicles in Italian city-states such as Florence, which developed centrally-located administrative offices in the 1500s, and British trading firms, which built offices with dedicated conference rooms in the 1700s.\n\n**Text 2**\n\n*Cubed: A Secret History of the Workplace* functions as a hard-edged social commentary for author Nikil Saval, who largely attributes the development of today's cubicle culture to questionable 1800s ideals. Cubicles, for Saval, offer the illusion of self-directed and fulfilling individual work but align with an approach that treats workers as the implements of corporations. Saval notes, however, that such alienation has recently begun to abate as companies embrace more communal office plans.",
+    "note": "T5 R&W M1 #7: other — \"Text 1\"/\"Text 2\" labels missing although the stem cites them; restored as separate paragraphs",
+    "class": "other",
+    "evidence": "IngestPageArtifact p5 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q7 block); source shows bold Text 1 / Text 2 headings"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnv0300o8qmt1poncffke",
+    "field": "stimulus",
+    "before": "Cost to deliver 1 MBtu As people have become increasingly conscious of their impact on the environment, “green” products—those that have a less negative environmental impact from their production or use, compared to standard products—have been developed for home use, from paint on the walls to sources of heat. While these products often have a larger upfront cost, the positive ecological impact is often not the only benefit. For example, geothermal heat pumps, widely considered the most eco-friendly way to heat a house, _____",
+    "after": "Cost to deliver 1 MBtu\n\nAs people have become increasingly conscious of their impact on the environment, “green” products—those that have a less negative environmental impact from their production or use, compared to standard products—have been developed for home use, from paint on the walls to sources of heat. While these products often have a larger upfront cost, the positive ecological impact is often not the only benefit. For example, geothermal heat pumps, widely considered the most eco-friendly way to heat a house, _____",
+    "note": "T5 R&W M1 #12: other — graph title \"Cost to deliver 1 MBtu\" (not in the image) glued onto the passage's first sentence; put on its own line",
+    "class": "other",
+    "evidence": "IngestPageArtifact p9 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q12 block); graph title sits above the chart, image /uploads/questions/575c6f17… has no title"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnv0d00oeqmt1kaggzver",
+    "field": "stimulus",
+    "before": "In the midst of the Romantic period, authors such as Jane Austen and Charlotte Brontë crafted novels that centered around marriage, delving into the complexities of courtship and societal expectations. Austen's *Pride and Prejudice* and Brontë's *Jane Eyre* dedicated substantial attention to exploring the intricacies of romantic relationships and the impact of marriage on individuals' lives. At the same time, such novels challenged convention: women in these stories, as was the case for actual women during the time, had limited agency as they aimed to adhere to the strict rules of courtship, rigid social hierarchies, and restricting gender roles, thus suggesting writers such as Austen and Brontë _____ It is often asserted that \"history is written by the winners,\" and for several centuries, the reputation of King Richard III of England has been one of the clearest examples of this claim. Richard III was defeated and killed in 1485 in battle with the soon-to-be Henry VII, and his story was spread by the victorious monarch, who portrayed Richard III as a manipulative, power-hungry tyrant who murdered his own nephews to reach the throne. However, historians in the twentieth century have uncovered physical and documentary evidence that has greatly revised the way Richard III is now portrayed in most history books, and he has been cleared of many earlier accusations. Thus, even if history is initially written by the winners, _____",
+    "after": "In the midst of the Romantic period, authors such as Jane Austen and Charlotte Brontë crafted novels that centered around marriage, delving into the complexities of courtship and societal expectations. Austen's *Pride and Prejudice* and Brontë's *Jane Eyre* dedicated substantial attention to exploring the intricacies of romantic relationships and the impact of marriage on individuals' lives. At the same time, such novels challenged convention: women in these stories, as was the case for actual women during the time, had limited agency as they aimed to adhere to the strict rules of courtship, rigid social hierarchies, and restricting gender roles, thus suggesting writers such as Austen and Brontë _____",
+    "note": "T5 R&W M1 #13: bleed — stimulus carries #14's Richard III passage after its own Austen/Brontë passage; drop it (it is #14's stimulus verbatim)",
+    "class": "bleed",
+    "evidence": "IngestPageArtifact p10 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q13 block); p10 holds two passages: Austen/Brontë → Q13 options, Richard III → Q14 options; docx explanations Q13/Q14 confirm"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnv1c00owqmt1qqdqdbp6",
+    "field": "stimulus",
+    "before": "This shows that what may appear like stark color contrast to the human eye does not necessarily provide a meaningful disadvantage in certain animal feeding behaviors.",
+    "after": "_____ the Red-headed woodpecker is surprisingly adept at catching flying insects midair. This shows that what may appear like stark color contrast to the human eye does not necessarily provide a meaningful disadvantage in certain animal feeding behaviors.",
+    "note": "T5 R&W M1 #16: other — stimulus truncated: first sentence with the blank (\"_____ the Red-headed woodpecker is…\") dropped, item unanswerable",
+    "class": "other",
+    "evidence": "IngestPageArtifact p11 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q16 block); page image p11 checked"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnv1s00p4qmt18fsi1i6a",
+    "field": "stimulus",
+    "before": "Since its discovery, biologists have noted how external factors, such as the detection of blue light, can impact _____. Blue light in particular can suppress the production of melatonin, which is directly related to sleep-wake cycles.",
+    "after": "The circadian rhythm is an internal process that functions as the biological clock of the human body. Since its discovery, biologists have noted how external factors, such as the detection of blue light, can impact _____. Blue light in particular can suppress the production of melatonin, which is directly related to sleep-wake cycles.",
+    "note": "T5 R&W M1 #18: other — stimulus truncated: opening sentence \"The circadian rhythm is…\" dropped (antecedent of \"its\"/\"it\")",
+    "class": "other",
+    "evidence": "IngestPageArtifact p12 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q18 block)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnv2s00pqqmt1rew7cu53",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes: - Vineyard Wind 1 is an offshore wind farm under construction about 13 nautical miles off the coast of Massachusetts. - Vineyard Wind 1 will include 62 wind turbines, providing enough power for about 400,000 local homes. - The Massachusetts Department of Public Utilities approved the project in 2019, and construction began in November 2021. - To address environmental concerns, construction will be suspended during whale activity, and the University of New Hampshire will monitor marine mammal sounds to assess potential stress to local marine life. - The project is expected to both reduce greenhouse gas emissions and reduce electricity costs for Massachusetts consumers. - The developers will sell the power for $0.09/kWh and agreed to provide $15 million to support the expansion of the electric grid in low-income communities.",
+    "after": "While researching a topic, a student has taken the following notes:\n- Vineyard Wind 1 is an offshore wind farm under construction about 13 nautical miles off the coast of Massachusetts.\n- Vineyard Wind 1 will include 62 wind turbines, providing enough power for about 400,000 local homes.\n- The Massachusetts Department of Public Utilities approved the project in 2019, and construction began in November 2021.\n- To address environmental concerns, construction will be suspended during whale activity, and the University of New Hampshire will monitor marine mammal sounds to assess potential stress to local marine life.\n- The project is expected to both reduce greenhouse gas emissions and reduce electricity costs for Massachusetts consumers.\n- The developers will sell the power for $0.09/kWh and agreed to provide $15 million to support the expansion of the electric grid in low-income communities.",
+    "note": "T5 R&W M1 #24: other — notes bullets flattened into one line; one bullet per line (text identical)",
+    "class": "other",
+    "evidence": "IngestPageArtifact p16 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q24 block)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnv2w00prqmt1kx284u6i",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes: - The Bundesautobahn, or autobahn, is a network of highways in Germany. - The autobahn covers 13,192 kilometers. - Famed for its general lack of a speed limit, the autobahn does have enforced speed limits in urbanized or accident-prone areas, which account for 23.4 percent of the total area. - The autobahn does not have a posted speed limit across 70.4 percent of its distance, but on these stretches of highway, there is an advisory speed limit of 130 kilometers per hour. - It is legal to exceed the advisory speed limit, but exceeding it can result in increased liability for a driver should a collision occur. - The autobahn has a fatality rate of just 1.6 deaths per billion travel-kilometers (compared to 4.6 on urban streets in Germany and 6.5 on rural roads in Germany).",
+    "after": "While researching a topic, a student has taken the following notes:\n- The Bundesautobahn, or autobahn, is a network of highways in Germany.\n- The autobahn covers 13,192 kilometers.\n- Famed for its general lack of a speed limit, the autobahn does have enforced speed limits in urbanized or accident-prone areas, which account for 23.4 percent of the total area.\n- The autobahn does not have a posted speed limit across 70.4 percent of its distance, but on these stretches of highway, there is an advisory speed limit of 130 kilometers per hour.\n- It is legal to exceed the advisory speed limit, but exceeding it can result in increased liability for a driver should a collision occur.\n- The autobahn has a fatality rate of just 1.6 deaths per billion travel-kilometers (compared to 4.6 on urban streets in Germany and 6.5 on rural roads in Germany).",
+    "note": "T5 R&W M1 #25: other — notes bullets flattened into one line; one bullet per line (text identical)",
+    "class": "other",
+    "evidence": "IngestPageArtifact p17 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q25 block)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnv3400pxqmt139tcv9hk",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes: - M104, also known as the Sombrero Galaxy, is a lenticular galaxy, and is considered to be one of the largest objects within the Virgo galaxy cluster. - The Sombrero Galaxy has a bright nucleus, a bulging center, and a prominent dark dust lane that crosses in front of it, giving it the appearance of a wide-brimmed hat on its edge. - The Sombrero Galaxy has a diameter of about 49,000 light-years and lies approximately 31.1 million light-years from Earth. - With an apparent magnitude of +8.0, the Sombrero Galaxy can be observed using amateur astronomy telescopes. - The estimated mass of the Sombrero Galaxy is equivalent to 800 billion suns. - In 2004, NASA released a mosaic photo of the Sombrero Galaxy, one of the largest mosaics ever assembled by images captured by the Hubble telescope.",
+    "after": "While researching a topic, a student has taken the following notes:\n- M104, also known as the Sombrero Galaxy, is a lenticular galaxy, and is considered to be one of the largest objects within the Virgo galaxy cluster.\n- The Sombrero Galaxy has a bright nucleus, a bulging center, and a prominent dark dust lane that crosses in front of it, giving it the appearance of a wide-brimmed hat on its edge.\n- The Sombrero Galaxy has a diameter of about 49,000 light-years and lies approximately 31.1 million light-years from Earth.\n- With an apparent magnitude of +8.0, the Sombrero Galaxy can be observed using amateur astronomy telescopes.\n- The estimated mass of the Sombrero Galaxy is equivalent to 800 billion suns.\n- In 2004, NASA released a mosaic photo of the Sombrero Galaxy, one of the largest mosaics ever assembled by images captured by the Hubble telescope.",
+    "note": "T5 R&W M1 #27: other — notes bullets flattened into one line; one bullet per line (text identical)",
+    "class": "other",
+    "evidence": "IngestPageArtifact p19 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q27 block)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnv3000psqmt1trpw9nor",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes: - Shakespeare's plays are known for their enduring popularity and widespread influence. - The most recognized and frequently performed Shakespearean plays include *Romeo and Juliet*, *Hamlet*, and *Macbeth*. - Shakespeare's works have been translated into numerous languages and performed in various countries worldwide. - While it is hard to quantify the exact number of adaptations, there are at least over 30 film adaptations of *Romeo and Juliet*. - There are at least over 50 film adaptations of *Hamlet*. - *The Tragedy of Macbeth* is a movie adaptation of *Macbeth* that was released in 2021. 26. A student wants to convey the relevancy of Shakespeare's plays in the modern age.",
+    "after": "While researching a topic, a student has taken the following notes:\n- Shakespeare's plays are known for their enduring popularity and widespread influence.\n- The most recognized and frequently performed Shakespearean plays include *Romeo and Juliet*, *Hamlet*, and *Macbeth*.\n- Shakespeare's works have been translated into numerous languages and performed in various countries worldwide.\n- While it is hard to quantify the exact number of adaptations, there are at least over 30 film adaptations of *Romeo and Juliet*.\n- There are at least over 50 film adaptations of *Hamlet*.\n- *The Tragedy of Macbeth* is a movie adaptation of *Macbeth* that was released in 2021.",
+    "note": "T5 R&W M1 #26: other — question lead \"26. A student wants…\" leaked to the end of the stimulus + notes bullets flattened; remove lead, one bullet per line",
+    "class": "other",
+    "evidence": "IngestPageArtifact p18 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q26 block)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnv3000psqmt1trpw9nor",
+    "field": "stem",
+    "before": "Which choice most effectively uses relevant information from the notes to accomplish this goal?",
+    "after": "A student wants to convey the relevancy of Shakespeare's plays in the modern age. Which choice most effectively uses relevant information from the notes to accomplish this goal?",
+    "note": "T5 R&W M1 #26: other — stem missing its first sentence (it was left in the stimulus as \"26. A student wants…\")",
+    "class": "other",
+    "evidence": "IngestPageArtifact p18 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q26 block)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnuuj00mpqmt1aqqs9ps0",
+    "field": "stimulus",
+    "before": "Despite her own claim to the throne and her royal bloodline, Lady Katherine's life was marked by tragedy and _____. Because she married without the Queen's permission, Lady Katherine faced harsh punishments, including imprisonment in the Tower of London.",
+    "after": "Lady Katherine Grey was a Tudor noblewoman and the younger sister of Lady Jane Grey, who briefly reigned as Queen of England. Despite her own claim to the throne and her royal bloodline, Lady Katherine's life was marked by tragedy and _____. Because she married without the Queen's permission, Lady Katherine faced harsh punishments, including imprisonment in the Tower of London.",
+    "note": "T5 R&W M2 #4: other — stimulus truncated: opening sentence \"Lady Katherine Grey was a Tudor noblewoman…\" dropped",
+    "class": "other",
+    "evidence": "IngestPageArtifact p21 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q4 block)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnuv300mxqmt1zg5ieis9",
+    "field": "stimulus",
+    "before": "Pip meets Miss Havisham, a wealthy spinster, for the first time. ++But I saw that everything within my view which ought to be white, had been white long ago, and had lost its lustre and was faded and yellow.++ I saw that the bride within the bridal dress had withered like the dress, and like the flowers, and had no brightness left but the brightness of her sunken eyes. I saw that the dress had been put upon the rounded figure of a young woman, and that the figure upon which it now hung loose had shrunk to skin and bone.",
+    "after": "The following text is from Charles Dickens's 1861 novel *Great Expectations*. Pip meets Miss Havisham, a wealthy spinster, for the first time. ++But I saw that everything within my view which ought to be white, had been white long ago, and had lost its lustre and was faded and yellow.++ I saw that the bride within the bridal dress had withered like the dress, and like the flowers, and had no brightness left but the brightness of her sunken eyes. I saw that the dress had been put upon the rounded figure of a young woman, and that the figure upon which it now hung loose had shrunk to skin and bone.",
+    "note": "T5 R&W M2 #6: other — intro truncated: \"The following text is from Charles Dickens's 1861 novel *Great Expectations*.\" dropped (only \"Pip meets…\" kept)",
+    "class": "other",
+    "evidence": "IngestPageArtifact p22 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q6 block); page image p22 checked"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnuv300mxqmt1zg5ieis9",
+    "field": "stem",
+    "before": "Which choice best describes\nthe function of the underlined\nportion in the text as a whole?",
+    "after": "Which choice best describes the function of the underlined portion in the text as a whole?",
+    "note": "T5 R&W M2 #6: other — stem has hard line breaks from the PDF layout; join into one line",
+    "class": "other",
+    "evidence": "IngestPageArtifact p22 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q6 block)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnuvq00ndqmt1hj2clfxy",
+    "field": "stimulus",
+    "before": "**Text 1** The Baader-Meinhof phenomenon, also known as frequency illusion, occurs when something recently learned or experienced seems to suddenly appear everywhere. This creates a sense of heightened awareness towards that new idea, whether it's exposure to a new word or new artist on the radio. Consequently, individuals may perceive an increased frequency of encounters with the new concept in their lives. **Text 2** Cognitive biases are systematic patterns of deviation from objective rationality in thinking processes. They are inherent shortcuts and tendencies employed by the brain to facilitate decision-making and judgment formation, though they can lead to distortions in perception. Such biases are typically unconscious and can influence information processing and pattern recognition.",
+    "after": "**Text 1**\n\nThe Baader-Meinhof phenomenon, also known as frequency illusion, occurs when something recently learned or experienced seems to suddenly appear everywhere. This creates a sense of heightened awareness towards that new idea, whether it's exposure to a new word or new artist on the radio. Consequently, individuals may perceive an increased frequency of encounters with the new concept in their lives.\n\n**Text 2**\n\nCognitive biases are systematic patterns of deviation from objective rationality in thinking processes. They are inherent shortcuts and tendencies employed by the brain to facilitate decision-making and judgment formation, though they can lead to distortions in perception. Such biases are typically unconscious and can influence information processing and pattern recognition.",
+    "note": "T5 R&W M2 #8: other — \"Text 1\"/\"Text 2\" labels inline with the passages; put each label/passage on its own paragraph",
+    "class": "other",
+    "evidence": "IngestPageArtifact p24 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q8 block)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnwa3011qqmt1wsejspei",
+    "field": "stimulus",
+    "before": "The ratio of these isotopes depends on the temperature of the surrounding water when the shell was formed. ____ scientists consider ammonites to be environmental historical \"records\" because the shells act as sensitive indicators of their original environments and can be compared to each other in efforts to track local climate change over time.",
+    "after": "Ammonite shells consist mostly of calcium carbonate, which contains varying amounts of two distinct oxygen isotopes. The ratio of these isotopes depends on the temperature of the surrounding water when the shell was formed. ____ scientists consider ammonites to be environmental historical \"records\" because the shells act as sensitive indicators of their original environments and can be compared to each other in efforts to track local climate change over time.",
+    "note": "T5 R&W M2 #25: other — stimulus truncated: opening sentence \"Ammonite shells consist mostly of calcium carbonate…\" dropped (antecedent of \"these isotopes\")",
+    "class": "other",
+    "evidence": "IngestPageArtifact p36 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q25 block)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnwa7011rqmt16u4ur7c8",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes: - Alpaca fleece is the natural fiber harvested from an alpaca, a species of South American camelid mammal. - There are two different types of alpaca fleece: Huacaya fiber, which looks similar to sheep's wool, and Suri fiber, which is similar to natural silk. - Huacaya fiber is warmer and softer than sheep's wool, and it contains no lanolin, which makes it hypoallergenic. - Alpaca fiber is naturally water-repellent and fire resistant. - The designer Giorgio Armani has used Suri alpaca fiber to fashion men's and women's suits. - The General Assembly of the United Nations declared 2009 to be the International Year of Natural Fibers, intending to increase awareness of alpaca and other natural fibers.",
+    "after": "While researching a topic, a student has taken the following notes:\n- Alpaca fleece is the natural fiber harvested from an alpaca, a species of South American camelid mammal.\n- There are two different types of alpaca fleece: Huacaya fiber, which looks similar to sheep's wool, and Suri fiber, which is similar to natural silk.\n- Huacaya fiber is warmer and softer than sheep's wool, and it contains no lanolin, which makes it hypoallergenic.\n- Alpaca fiber is naturally water-repellent and fire resistant.\n- The designer Giorgio Armani has used Suri alpaca fiber to fashion men's and women's suits.\n- The General Assembly of the United Nations declared 2009 to be the International Year of Natural Fibers, intending to increase awareness of alpaca and other natural fibers.",
+    "note": "T5 R&W M2 #26: other — notes bullets flattened into one line; one bullet per line (text identical)",
+    "class": "other",
+    "evidence": "IngestPageArtifact p37 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q26 block)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnwac011wqmt14eysu7el",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes: - Dialectometry studies the variance of languages across regions by measuring the relationship between geographic distance and linguistic differences. - This variance includes phonetics, grammar, and vocabulary. - Linguistic variables are charted on a dialect map to identify patterns. - An isogloss is a line of a dialect map that marks the boundary between linguistic features. - Lexical variation refers to the use of different words to describe the same thing. - Dialectologists found that approximately 44% of UK residents use “dinner” to refer to their evening meal, 52% use “tea,” and the rest use “supper.” 27. A student wants to provide an example of how a dialectologist might depict linguistic variations based on location.",
+    "after": "While researching a topic, a student has taken the following notes:\n- Dialectometry studies the variance of languages across regions by measuring the relationship between geographic distance and linguistic differences.\n- This variance includes phonetics, grammar, and vocabulary.\n- Linguistic variables are charted on a dialect map to identify patterns.\n- An isogloss is a line of a dialect map that marks the boundary between linguistic features.\n- Lexical variation refers to the use of different words to describe the same thing.\n- Dialectologists found that approximately 44% of UK residents use “dinner” to refer to their evening meal, 52% use “tea,” and the rest use “supper.”",
+    "note": "T5 R&W M2 #27: other — question lead \"27. A student wants…\" leaked to the end of the stimulus + notes bullets flattened; remove lead, one bullet per line",
+    "class": "other",
+    "evidence": "IngestPageArtifact p38 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q27 block)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnwac011wqmt14eysu7el",
+    "field": "stem",
+    "before": "Which choice most effectively uses relevant information from the notes to accomplish this goal?",
+    "after": "A student wants to provide an example of how a dialectologist might depict linguistic variations based on location. Which choice most effectively uses relevant information from the notes to accomplish this goal?",
+    "note": "T5 R&W M2 #27: other — stem missing its first sentence (it was left in the stimulus as \"27. A student wants…\")",
+    "class": "other",
+    "evidence": "IngestPageArtifact p38 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q27 block)"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "cmsjrnude00i2qmt1ilisoxp2",
+    "field": "text",
+    "before": "[tbl-0.html](tbl-0.html)",
+    "after": "| Distance | Frequency |\n| --- | --- |\n| 3 | 2 |\n| 5 | 6 |\n| 7 | 7 |\n| 10 | 9 |",
+    "note": "T5 Math M1 #3: flattened_table — option A text is the OCR placeholder \"[tbl-0.html](tbl-0.html)\" (table lost; full-test player does not render option images); rebuild Distance/Frequency table",
+    "class": "flattened_table",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 5/MATHS/INNOV. TEST 5 MATH  MOD 1&2.pdf p2 rendered at 150 dpi (option A table); NOTE option image /uploads/questions/26f7ec2d02e8bc217d3abc5a.jpg wrongly shows B's table (3/2,5/4,7/1,10/2) — needs_review"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "cmsjrnude00i3qmt1snhzbrti",
+    "field": "text",
+    "before": "[tbl-1.html](tbl-1.html)",
+    "after": "| Distance | Frequency |\n| --- | --- |\n| 3 | 2 |\n| 5 | 4 |\n| 7 | 1 |\n| 10 | 2 |",
+    "note": "T5 Math M1 #3: flattened_table — option B text is the OCR placeholder \"[tbl-1.html](tbl-1.html)\" (table lost; full-test player does not render option images); rebuild Distance/Frequency table",
+    "class": "flattened_table",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 5/MATHS/INNOV. TEST 5 MATH  MOD 1&2.pdf p2 rendered at 150 dpi (option B table); matches option image /uploads/questions/6df0fd07ce13681566a826c8.jpg"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "cmsjrnude00i4qmt1d0kxmhje",
+    "field": "text",
+    "before": "[tbl-2.html](tbl-2.html)",
+    "after": "| Distance | Frequency |\n| --- | --- |\n| 1 | 7 |\n| 2 | 3 |\n| 2 | 10 |\n| 4 | 5 |",
+    "note": "T5 Math M1 #3: flattened_table — option C text is the OCR placeholder \"[tbl-2.html](tbl-2.html)\" (table lost; full-test player does not render option images); rebuild Distance/Frequency table",
+    "class": "flattened_table",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 5/MATHS/INNOV. TEST 5 MATH  MOD 1&2.pdf p2 rendered at 150 dpi (option C table); matches option image /uploads/questions/6cc3d066bb2f5d5dfa0cb668.jpg"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "cmsjrnude00i5qmt1uetr9pby",
+    "field": "text",
+    "before": "[tbl-3.html](tbl-3.html)",
+    "after": "| Distance | Frequency |\n| --- | --- |\n| 6 | 2 |\n| 7 | 1 |\n| 20 | 2 |\n| 20 | 4 |",
+    "note": "T5 Math M1 #3: flattened_table — option D text is the OCR placeholder \"[tbl-3.html](tbl-3.html)\" (table lost; full-test player does not render option images); rebuild Distance/Frequency table",
+    "class": "flattened_table",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 5/MATHS/INNOV. TEST 5 MATH  MOD 1&2.pdf p2 rendered at 150 dpi (option D table); matches option image /uploads/questions/a45b4aec6ff703d061d2ca10.jpg"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "opt_e03fb23b16164f86915e37c9b812faaa",
+    "field": "text",
+    "before": "It takes $a$ days for the population to reach 80.",
+    "after": "It takes $a$ days in the year for the population to reach 80.",
+    "note": "T5 Math M1 #21: other — option A shortened: \"in the year\" dropped vs source",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 5/MATHS/INNOV. TEST 5 MATH  MOD 1&2.pdf p9 rendered at 150 dpi: \"It takes a days in the year for the population to reach 80.\""
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnudx00icqmt1p1cmv3f2",
+    "field": "explanation",
+    "before": null,
+    "after": "Choice C is correct. The amount of money the company made in 1995 is 6% more than the amount in 1994. The question then states that for the next 10 years, the earnings increase by that same dollar amount each year. Since the increase each year is the same dollar amount, that represents a linear function that is increasing, where the slope of the line is the dollar amount increase.\n\nChoice A is incorrect. The company is making money, so it cannot be decreasing. Choice B is incorrect. The company is making money, so it cannot be decreasing. Choice D is incorrect. The question models a situation where the growth was the same every year, so it cannot be exponential growth. Even though the first amount states it increases by 6%, the amount of money the company makes is not increasing by 6% each year for the next ten years.",
+    "note": "T5 Math M2 #4: other — explanation missing (NULL); restore from the Answer Explanations docx (OMML numbers 1995/6%/1994/10 re-inserted)",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 5/Test5_Math_Answer_Explanations.docx, MODULE 2B Question 4 (text + m:t math runs)"
+  }
+]

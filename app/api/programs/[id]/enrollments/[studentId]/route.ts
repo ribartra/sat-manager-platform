@@ -2,28 +2,29 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import { notify } from "@/lib/notify";
+import { BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
 // PATCH /api/programs/[id]/enrollments/[studentId]
 // body: { action: "approve" | "reject" | "remove" }
-export async function PATCH(
+export const PATCH = withApiErrors(async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string; studentId: string }> }
 ) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { id, studentId } = await params;
   const { action } = await req.json();
 
   if (!["approve", "reject", "remove"].includes(action)) {
-    return NextResponse.json({ error: "Invalid action." }, { status: 400 });
+    return new BadRequestError("Invalid action.").toResponse();
   }
 
   if (session.user.role === "TEACHER") {
     const assignment = await prisma.programTeacher.findFirst({
       where: { programId: id, teacherId: session.user.id, endDate: null },
     });
-    if (!assignment) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (!assignment) return new ForbiddenError("Forbidden").toResponse();
   }
 
   const enrollment = await prisma.programEnrollment.findUnique({
@@ -33,21 +34,18 @@ export async function PATCH(
       student: { select: { name: true } },
     },
   });
-  if (!enrollment) return NextResponse.json({ error: "Enrollment not found." }, { status: 404 });
-
-  // Block teacher approval if parental consent is still pending
-  if (action === "approve" && enrollment.parentApprovalStatus === "PENDING") {
-    return NextResponse.json(
-      { error: "Parent consent is required before this enrollment can be approved." },
-      { status: 422 }
-    );
+  if (!enrollment) return new NotFoundError("Enrollment not found.").toResponse();
+  // A teacher only manages the students they own; an enrollment without owner (self-enrollment)
+  // becomes theirs when they approve it.
+  if (session.user.role === "TEACHER" && enrollment.teacherId && enrollment.teacherId !== session.user.id) {
+    return new NotFoundError("Enrollment not found.").toResponse();
   }
 
   let data: Record<string, unknown>;
   let auditAction: string;
 
   if (action === "approve") {
-    data = { status: "APPROVED", active: true };
+    data = { status: "APPROVED", active: true, ...(session.user.role === "TEACHER" && !enrollment.teacherId ? { teacherId: session.user.id } : {}) };
     auditAction = "APPROVE_ENROLLMENT";
   } else if (action === "reject") {
     data = { status: "REJECTED", active: false };
@@ -95,4 +93,4 @@ export async function PATCH(
   }
 
   return NextResponse.json({ enrollment: updated });
-}
+});

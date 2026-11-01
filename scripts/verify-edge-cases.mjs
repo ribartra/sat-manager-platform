@@ -33,8 +33,8 @@ const checks = [
     file: "app/(student)/student/results/[attemptId]/page.tsx",
     requires: [
       "canRevealSolutions",
-      "Correct answers and explanations are hidden",
-      "Unanswered - no explanation shown",
+      "Your teacher has hidden the answers for this set.",
+      "You left this blank.",
       "Try Again",
       "parseSnapshot<QuestionSnapshot>",
       "parseSnapshot<PracticeSetSnapshot>",
@@ -44,19 +44,22 @@ const checks = [
   {
     file: "app/(student)/student/practice/player-client.tsx",
     requires: [
-      "localStorage.setItem(offlineKey",
-      "window.addEventListener(\"online\", syncOffline)",
+      "writeBuffer(offlineKey",
+      "readBuffer<AutosavePayload>(offlineKey)",
+      "window.addEventListener(\"online\", onOnline)",
+      "usePageHideFlush",
       "SaveIndicator",
       "timeSpentByQuestion",
       "markedQuestionIds",
       "eliminatedOptions",
-      "Submit this Practice Set with",
+      "useConfirm",
+      "Blank questions count as wrong.",
     ],
     label: "Player Practice Set cubre autosave offline, reconexion, tiempo y confirmacion con blanks",
   },
   {
     file: "components/sat/save-indicator.tsx",
-    requires: ["Saved locally", "Saving…", "Sync problem", "SaveStatus"],
+    requires: ["Saved (offline)", "Saving…", "Not saved yet", "SaveStatus"],
     label: "SaveIndicator unifica copy de persistencia (Saved locally)",
   },
   {
@@ -94,16 +97,29 @@ const checks = [
     label: "Publicacion de Practice Set valida preguntas publicadas y mismo topic",
   },
   {
-    file: "app/(teacher)/teacher/students/[studentId]/attempts/[attemptId]/attempt-actions-client.tsx",
+    file: "components/sat/invalidate-attempt-button.tsx",
     requires: [
-      "Optional reason for reopen/invalidate",
-      "body: JSON.stringify({ reason: actionReason })",
-      "setActionReason(\"\")",
+      '{ value: "HEALTH", label: "Health" }',
+      '{ value: "CONNECTION", label: "Connection problem" }',
+      '{ value: "OTHER", label: "Other (explain)" }',
+      "/invalidate`, { method: \"POST\", json: { reason: text }",
+      'if (status !== "SUBMITTED") return null;',
     ],
-    label: "Reopen/invalidate capturan razon operativa para auditoria",
+    label: "Invalidar intento: unica accion del teacher, razon obligatoria (salud, conexion, otra con detalle) auditada, solo intentos contados",
   },
   {
-    file: "app/(student)/student/full-tests/[assignmentId]/player-client.tsx",
+    file: "app/(teacher)/teacher/history/page.tsx",
+    requires: ["<HistoryTable"],
+    forbids: ["InvalidateAttemptButton"],
+    label: "History global: fila estandar con flecha; invalidar solo en la pagina del intento",
+  },
+  {
+    file: "app/(teacher)/teacher/students/[studentId]/attempt-header-actions.tsx",
+    requires: ["HeaderActions", "GenerateReportDialog", "InvalidateAttemptButton"],
+    label: "Paginas de intento: Back · Report · Invalidar arriba a la derecha, mismo componente en practice y Test",
+  },
+  {
+    file: "app/(student)/student/tests/[assignmentId]/player-client.tsx",
     requires: [
       "savedProgressState",
       "moduleTimerState",
@@ -111,13 +127,22 @@ const checks = [
       "advanceAfterModule",
       "phase === \"BREAK\"",
       "remaining <= 60",
-      "Pause & Exit",
+      "Save & exit",
       "MathToolPanel",
       "context=\"full-test\"",
-      "localStorage.setItem(offlineKey",
+      "writeBuffer(offlineKey",
+      "readBuffer<FullTestAutosavePayload>(offlineKey)",
+      "usePageHideFlush",
+      "fetchWithTransientRetry",
       "SaveIndicator",
+      "overtimeRef",
+      "Extra time",
+      "extraTimeUsed: extraTimeUsedRef.current",
+      "Submit module",
     ],
-    label: "Full Practice Test: timers por modulo, auto-advance, break, timer rojo <=1min y offline parity",
+    // Time running out never ends the module: the student keeps working and overtime is recorded.
+    forbids: ["autoAdvanceTriggered"],
+    label: "Full Practice Test: timers por modulo, tiempo extra registrado (sin auto-advance), envio anticipado, break, timer rojo <=1min y offline parity",
   },
   {
     file: "components/math-tool-panel.tsx",
@@ -164,24 +189,28 @@ const checks = [
     label: "Practice player respeta CALCULATOR_PRACTICE_SETS",
   },
   {
-    file: "app/(student)/student/full-tests/[assignmentId]/page.tsx",
+    file: "app/(student)/student/tests/[assignmentId]/page.tsx",
     requires: ['getFeatureSetting("CALCULATOR_FULL_TESTS")', "showCalculator={showCalculator}"],
     label: "FPT player respeta CALCULATOR_FULL_TESTS",
   },
   {
-    file: "app/api/full-practice-tests/attempts/[attemptId]/submit/route.ts",
+    file: "lib/full-test-grading.ts",
     requires: [
       "scaledScore(\"RW\"",
       "scaledScore(\"MATH\"",
       "totalScore: rwScore + mathScore",
       "timeExpiredEvents: timeExpiredEvents ?? 0",
       "extraTimeUsed: extraTimeUsed ?? 0",
-      "status: \"IN_PROGRESS\"",
       "FPT_PRETEST_EXCLUSION",
       "countsTowardScore",
       "!excludePretest || !item.isPretest",
     ],
     label: "Submit FPT respeta FPT_PRETEST_EXCLUSION al contar raw y guarda eventos de tiempo",
+  },
+  {
+    file: "app/api/full-practice-tests/attempts/[attemptId]/submit/route.ts",
+    requires: ["attempt.status !== \"IN_PROGRESS\"", "finalizeFullTestAttempt"],
+    label: "Submit FPT solo sobre intento abierto y usa la calificacion compartida",
   },
   {
     file: "prisma/seed.ts",
@@ -210,14 +239,13 @@ const checks = [
     label: "Seed QA deja permisos apagados y no crea contenido academico sintetico por defecto",
   },
   {
-    file: "app/(teacher)/teacher/analytics/page.tsx",
+    file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
+    // "skills by difficulty" / "Weakest skill" live in the shared SkillResults component.
     requires: [
-      "Skill performance by difficulty",
-      "selectedStudentId",
-      "topic.name",
-      "recommendation",
+      "SkillResults",
+      "StudentSwitcher",
       "studentAccessWhereFor",
-      "timeSpent",
+      "loadPracticeReport",
     ],
     label: "Analytics docente cubre alumno, skills fallados, dificultad, tiempo y scoping",
   },
@@ -243,7 +271,7 @@ const checks = [
   },
   {
     file: "app/(student)/student/practice/player-client.tsx",
-    requires: ["text-4xl font-bold", "fixed inset-0 z-40", "immediateFeedback", "Check"],
+    requires: ["text-[28px] font-extrabold", "fixed inset-0 z-40", "immediateFeedback", "Check"],
     label: "Practice player: número grande, overlay fixed y Check IMMEDIATE",
   },
   {
@@ -257,6 +285,36 @@ const checks = [
     label: "Activacion de alumno crea y vincula padre capturado",
   },
   {
+    file: "app/api/auth/activate/route.ts",
+    requires: ["inviteUnusableReason(invite)", "acceptTerms !== true", "termsVersion: TERMS_VERSION", "termsAcceptedAt"],
+    label: "Activacion exige aceptar T&C (consentimiento, incluido menores) y guarda version/fecha; rechaza enlaces usados, anulados o vencidos",
+  },
+  {
+    file: "app/api/students/invite/route.ts",
+    requires: ["openInviteWhere(email, now)", "$transaction", "INVITE_ALREADY_OPEN", "resolveParentAccount", "parentConsentRequired: false"],
+    label: "Una sola invitacion abierta por alumno hasta que vence; email del apoderado opcional y nunca de otra cuenta",
+  },
+  {
+    file: "lib/consent.ts",
+    requires: ["revokedAt: null", "expiresAt: { gt: now }", "TERMS_VERSION"],
+    label: "Invitacion abierta = no usada, no anulada, no vencida; version de T&C",
+  },
+  {
+    file: "app/api/students/[studentId]/parent/route.ts",
+    requires: ["studentAccessWhereFor", "resolveParentAccount", "parentId_studentId", "authorizedAt: now", "PARENT_LINKED", "passwordResetToken.create"],
+    label: "Add parent email: alcance del docente, sin aprobacion del padre, vincula al instante, nunca convierte otra cuenta, auditado",
+  },
+  {
+    file: "app/api/auth/parent-consent/resend/route.ts",
+    requires: ["checkRateLimit", "requiresParentAuthorization", "invite.usedAt"],
+    label: "Reenvio del correo al apoderado limitado y solo para invitaciones pendientes",
+  },
+  {
+    file: "app/(teacher)/teacher/students/[studentId]/page.tsx",
+    requires: ["completedExamCount", "See test results"],
+    label: "Pestanas de practica avisan de Tests terminados sin mostrar sus puntajes (no parece inactivo)",
+  },
+  {
     file: "app/(teacher)/teacher/parents/parents-client.tsx",
     requires: ["Share report by email", "Download PDF", "mathematics", "reading", "writing", "Edit Parent", "Associated students"],
     label: "Vista de padres gestiona asociaciones desde modal, comparte reporte y PDF por tipo",
@@ -267,8 +325,35 @@ const checks = [
     label: "Restore local exige backup y genera copia previa",
   },
   {
-    file: "scripts/generate-notifications.ts",
-    requires: ["Practice Set due soon", "Practice Set overdue", "Practice Set unlocked", "notifyOnce", "notifications.generated"],
+    file: "app/(student)/student/tests/[assignmentId]/page.tsx",
+    requires: ['assignment.status === "COMPLETED"', "redirect(", "isUniqueConstraintError", "createdHere"],
+    label: "Player FPT: un examen COMPLETED no crea un intento nuevo al abrir su URL",
+  },
+  {
+    file: "prisma/migrations/20261005_single_open_attempt/migration.sql",
+    requires: ["FullPracticeTestAttempt_one_open_per_assignment", "Attempt_one_open_per_assignment", "Attempt_one_open_unassigned", "WHERE \"status\" = 'IN_PROGRESS'"],
+    label: "BD: como mucho un intento IN_PROGRESS por asignacion (indices unicos parciales)",
+  },
+  {
+    file: "app/(student)/student/practice/practice-player-page.tsx",
+    requires: ["isUniqueConstraintError", "findOpenAttempt"],
+    label: "Player practica: colision al crear intento reutiliza el intento abierto",
+  },
+  {
+    file: "components/math-content.tsx",
+    // Data tables in questions are pipe tables rendered as real HTML tables (cells wrap; math inside cells).
+    requires: ["splitContentBlocks", "<table", "renderInline"],
+    label: "MathContent: tablas markdown se renderizan como tabla HTML",
+  },
+  {
+    file: "lib/math-text.ts",
+    // Ingested stems use $$…$$ mid-sentence; only a formula alone on its line renders as a block.
+    requires: ["isStandaloneDisplay", "\\displaystyle "],
+    label: "MathContent: $$ en linea se renderiza inline (display solo si va sola en su linea)",
+  },
+  {
+    file: "lib/deadline-notifications.ts",
+    requires: ["due soon", "overdue", "notifyOnce", "releaseScheduledUnlocks", "DEDUPE_WINDOW_DAYS"],
     label: "Job de notificaciones genera recordatorios idempotentes",
   },
 ];

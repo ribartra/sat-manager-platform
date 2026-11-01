@@ -462,7 +462,7 @@ Admin usa layout `app/admin/layout.tsx` → `NavTeacher`.
 
 #### `/teacher/full-tests`
 **Stack:** RSC + Client actions · Tailwind · Lucide · ui/card+badge · Prisma SSR · fetch status/duplicate
-- Scoring Table · New Exam  
+- How scores work · New Exam  
 - Lista cards: name · status · meta modules/Q/break · Actions View/Edit/Assign/Publish/Draft/Archive/Duplicate/Delete
 
 #### `/teacher/full-tests/[testId]`
@@ -526,7 +526,7 @@ Admin usa layout `app/admin/layout.tsx` → `NavTeacher`.
 
 #### `/student/full-tests/results/[attemptId]`
 **Stack:** RSC · Tailwind · Lucide · ui/card · MathContent + QuestionMedia · Prisma SSR
-- Score RW/Math/Total · Stats By Module/Difficulty/Skill · Review por módulo si `reviewEnabled`
+- Score RW/Math/Total · Tiempo extra (total y por módulo) · Stats By Module · Review por módulo si `reviewEnabled` (sin "By Skill": los temas FPT son placeholders por sección)
 
 #### `/student/practice/assignment/[assignmentId]`
 **Stack:** RSC shell → Client `PracticeSetPlayer` · Tailwind · Lucide · MathContent + QuestionMedia · MathToolPanel · fetch attempts APIs — ver §4.4

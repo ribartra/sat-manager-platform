@@ -4,10 +4,13 @@ import bcrypt from "bcryptjs";
 import { checkRateLimit, rateLimitKey, rateLimitResponse } from "@/lib/rate-limit";
 import { hashPublicToken } from "@/lib/token-security";
 import { captureCaughtError, writeAudit } from "@/lib/audit";
+import { passwordPolicyError } from "@/lib/password-policy";
+import { forgetSessionState } from "@/lib/session-state";
+import { BadRequestError, InternalServerError, withApiErrors } from "@/lib/api-error";
 
-export async function POST(req: NextRequest) {
+export const POST = withApiErrors(async function POST(req: NextRequest) {
   const { token, password } = await req.json();
-  if (!token || !password) return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+  if (!token || !password) return new BadRequestError("Something is missing. Please fill in the form again.").toResponse();
   const limited = checkRateLimit(rateLimitKey(req, "reset-password", token.slice(0, 12)), 10, 15 * 60 * 1000);
   if (!limited.allowed) return rateLimitResponse(limited.resetAt);
 
@@ -24,18 +27,24 @@ export async function POST(req: NextRequest) {
           reason: !reset ? "not_found" : reset.usedAt ? "already_used" : "expired",
         },
       });
-      return NextResponse.json({ error: "This link is invalid or has expired." }, { status: 400 });
+      return new BadRequestError("This link doesn't work or has expired. Ask for a new reset link.").toResponse();
     }
     if (!reset.tokenHash) {
       await prisma.passwordResetToken.update({ where: { id: reset.id }, data: { tokenHash, token: `hashed:${tokenHash}` } });
     }
 
+    const account = await prisma.user.findUnique({ where: { id: reset.userId }, select: { email: true } });
+    const policyError = passwordPolicyError(password, account?.email);
+    if (policyError) return new BadRequestError(policyError).toResponse();
+
     const hash = await bcrypt.hash(password, 10);
+    // A reset signs the account out on every device (sessionVersion bump).
     await prisma.$transaction([
-      prisma.user.update({ where: { id: reset.userId }, data: { passwordHash: hash } }),
+      prisma.user.update({ where: { id: reset.userId }, data: { passwordHash: hash, sessionVersion: { increment: 1 } } }),
       prisma.passwordResetToken.update({ where: { id: reset.id }, data: { usedAt: new Date() } }),
     ]);
 
+    forgetSessionState(reset.userId);
     await writeAudit({
       userId: reset.userId,
       action: "PASSWORD_RESET_COMPLETED",
@@ -49,6 +58,6 @@ export async function POST(req: NextRequest) {
     await captureCaughtError("auth.reset-password", error, {
       metadata: { tokenPrefix: String(token).slice(0, 8) },
     });
-    return NextResponse.json({ error: "Password reset failed." }, { status: 500 });
+    return new InternalServerError("We couldn't reset your password. Please try again.").toResponse();
   }
-}
+});

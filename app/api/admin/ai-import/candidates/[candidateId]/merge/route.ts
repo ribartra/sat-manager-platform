@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "crypto";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
+import { BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
+import { CONTENT_JOB, exclusiveJob } from "@/lib/job-lock";
 
 interface RouteContext {
   params: Promise<{ candidateId: string }>;
@@ -34,9 +36,9 @@ type ImageLinkInput = {
   sortOrder?: number;
 };
 
-export async function POST(req: NextRequest, { params }: RouteContext) {
+export const POST = withApiErrors(exclusiveJob(CONTENT_JOB, async function POST(req: NextRequest, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { candidateId: targetId } = await params;
   const body = (await req.json().catch(() => ({}))) as {
@@ -48,17 +50,17 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
   };
 
   const sourceId = body.sourceId;
-  if (!sourceId) return NextResponse.json({ error: "sourceId is required." }, { status: 400 });
-  if (sourceId === targetId) return NextResponse.json({ error: "Source and target must differ." }, { status: 400 });
+  if (!sourceId) return new BadRequestError("sourceId is required.").toResponse();
+  if (sourceId === targetId) return new BadRequestError("Source and target must differ.").toResponse();
 
   const [target, source] = await Promise.all([
     prisma.ingestQuestionCandidate.findUnique({ where: { id: targetId } }),
     prisma.ingestQuestionCandidate.findUnique({ where: { id: sourceId } }),
   ]);
-  if (!target) return NextResponse.json({ error: "Target candidate not found." }, { status: 404 });
-  if (!source) return NextResponse.json({ error: "Source candidate not found." }, { status: 404 });
+  if (!target) return new NotFoundError("Target candidate not found.").toResponse();
+  if (!source) return new NotFoundError("Source candidate not found.").toResponse();
   if (target.batchId !== source.batchId || target.sourceFileId !== source.sourceFileId) {
-    return NextResponse.json({ error: "Candidates must belong to the same file to merge." }, { status: 400 });
+    return new BadRequestError("Candidates must belong to the same file to merge.").toResponse();
   }
 
   const resolved = body.resolved ?? {};
@@ -176,4 +178,4 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
 
   const updatedTarget = await prisma.ingestQuestionCandidate.findUnique({ where: { id: targetId } });
   return NextResponse.json({ ok: true, target: updatedTarget, warnings, cleanedOfficialQuestionId });
-}
+}));

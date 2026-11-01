@@ -1,4 +1,8 @@
-import { PageShell } from "@/components/sat";
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import { PageHeader, PageShell } from "@/components/sat";
+import { HEADER_ACTION_CLASS, HeaderActions } from "@/components/sat/header-actions";
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { studentAccessWhereFor } from "@/lib/program-scope";
@@ -13,7 +17,11 @@ export default async function ParentsPage() {
       include: { parentLinks: { include: { student: true } } },
       orderBy: { name: "asc" },
     }),
-    prisma.user.findMany({ where: studentWhere, orderBy: { name: "asc" } }),
+    prisma.user.findMany({
+      where: studentWhere,
+      orderBy: { name: "asc" },
+      select: { id: true, name: true, email: true, _count: { select: { childLinks: true } } },
+    }),
   ]);
   const visibleStudentIds = new Set(students.map((student) => student.id));
   const visibleParents = session?.user.role === "ADMIN"
@@ -25,7 +33,18 @@ export default async function ParentsPage() {
 
   return (
     <PageShell>
-      <h1 className="mb-6 text-xl font-semibold text-gray-900">Parents</h1>
+      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Students", href: "/teacher/students" }, { label: "Parents" }]} />
+      <PageHeader
+        title="Parents"
+        description="Your students' parents and who they are linked to."
+        actions={
+          <HeaderActions>
+            <Link href="/teacher/students" className={HEADER_ACTION_CLASS}>
+              <ArrowLeft size={14} aria-hidden /> Back to Students
+            </Link>
+          </HeaderActions>
+        }
+      />
       <ParentsClient
         parents={visibleParents.map((p) => ({
           id: p.id,
@@ -37,6 +56,7 @@ export default async function ParentsPage() {
             .map((l) => ({ id: l.studentId, name: l.student.name })),
         }))}
         students={students.map((s) => ({ id: s.id, name: s.name }))}
+        studentsWithoutParent={students.filter((s) => s._count.childLinks === 0).map((s) => ({ id: s.id, name: s.name, email: s.email }))}
       />
     </PageShell>
   );

@@ -2,22 +2,22 @@ import type { LucideIcon } from "lucide-react";
 import {
   Users,
   UsersRound,
-  UserCheck,
   FolderOpen,
   Map,
   FileText,
-  HelpCircle,
   Layers,
   ClipboardList,
-  BarChart2,
   BookOpen,
   ShieldCheck,
   FolderCog,
   GraduationCap,
   UserCog,
   Settings,
+  Sparkles,
   Home,
   Clock,
+  MessageSquareWarning,
+  Library,
 } from "lucide-react";
 import type { FeatureSettingKey } from "@/lib/app-settings";
 
@@ -37,7 +37,15 @@ export type NavLinkDef = {
    */
   hideForAdmin?: boolean;
   exact?: boolean;
+  /**
+   * Per-account capability (not a feature flag): shown only to accounts that have it, e.g. the
+   * master teacher's Teachers menu. The pages and APIs re-check it on the server (lib/rbac.ts).
+   */
+  capability?: NavCapability;
 };
+
+/** Per-account capabilities that unlock nav items (User.canManageTeachers → "manageTeachers"). */
+export type NavCapability = "manageTeachers";
 
 export type NavGroupDef = {
   id: string;
@@ -67,6 +75,7 @@ export type ResolvedNavDirect = {
   href: string;
   label: string;
   icon: LucideIcon;
+  exact?: boolean;
 };
 
 export type ResolvedNavEntry = ResolvedNavGroup | ResolvedNavDirect;
@@ -79,26 +88,49 @@ function isNavGroupDef(item: TeacherNavEntryDef): item is NavGroupDef {
   return "links" in item;
 }
 
-/** Declarative Teacher (+ Admin) navigation. Desktop, drawer and future crumbs share this. */
+/**
+ * Teacher sidebar (mockup `mejorada/teacher`): exactly Home · Students · Tests · Practice · History,
+ * with Teachers just before History for the master teacher (the Home boxes follow this order).
+ * The other teacher pages are reached from in-page "More" rows (TEACHER_MORE_LINKS) and the user
+ * menu (Programs); admins also get the Admin group.
+ */
 export const TEACHER_NAV: TeacherNavEntryDef[] = [
-  {
-    id: "teacher.students",
-    label: "Students",
-    icon: Users,
-    links: [
-      { id: "teacher.students.list", label: "Students", href: "/teacher", icon: Users },
-      { id: "teacher.students.analytics", label: "Student Analytics", href: "/teacher/analytics", icon: BarChart2 },
-      {
-        id: "teacher.students.groups",
-        label: "Groups",
-        href: "/teacher/groups",
-        icon: UsersRound,
-        feature: "TEACHER_GROUP_MANAGEMENT",
-        hideForAdmin: true,
-      },
-      { id: "teacher.students.parents", label: "Parents", href: "/teacher/parents", icon: UserCheck },
-    ],
-  },
+  { id: "teacher.home", label: "Home", href: "/teacher", icon: Home, exact: true },
+  { id: "teacher.students", label: "Students", href: "/teacher/students", icon: Users },
+  { id: "teacher.tests", label: "Tests", href: "/teacher/tests", icon: ClipboardList },
+  { id: "teacher.practice", label: "Practice", href: "/teacher/practice-sets", icon: BookOpen },
+  // Master teacher only (User.canManageTeachers): invite / deactivate teachers, see who their students are.
+  { id: "teacher.teachers", label: "Teachers", href: "/teacher/teachers", icon: GraduationCap, capability: "manageTeachers" },
+  { id: "teacher.history", label: "History", href: "/teacher/history", icon: Clock },
+];
+
+/** Secondary teacher pages, shown as a "More" row on the Students and Practice pages. */
+export const TEACHER_MORE_LINKS: Record<"students" | "practice", NavLinkDef[]> = {
+  students: [
+    {
+      id: "teacher.students.groups",
+      label: "Groups",
+      href: "/teacher/groups",
+      icon: UsersRound,
+      feature: "TEACHER_GROUP_MANAGEMENT",
+      hideForAdmin: true,
+    },
+    // Parents: a "Parents →" shortcut in the Students header, not a chip here.
+  ],
+  practice: [
+    // Questions: a "Questions →" shortcut in the Practice and Tests headers (same area), not a chip here.
+    {
+      id: "teacher.practice.materials",
+      label: "Materials",
+      href: "/teacher/materials",
+      icon: FileText,
+      feature: "MATERIALS_MODULE",
+    },
+  ],
+};
+
+/** Teacher user-menu links (Programs lives here since the sidebar keeps the 5 mockup items). */
+export const TEACHER_USER_MENU_LINKS: NavLinkDef[] = [
   {
     id: "teacher.programs",
     label: "Programs",
@@ -107,32 +139,16 @@ export const TEACHER_NAV: TeacherNavEntryDef[] = [
     feature: "TEACHER_PROGRAM_MANAGEMENT",
     hideForAdmin: true,
   },
-  {
-    id: "teacher.content",
-    label: "Content",
-    icon: FileText,
-    links: [
-      { id: "teacher.content.map", label: "Content Map", href: "/teacher/content", icon: Map },
-      {
-        id: "teacher.content.materials",
-        label: "Materials",
-        href: "/teacher/materials",
-        icon: FileText,
-        feature: "MATERIALS_MODULE",
-      },
-      { id: "teacher.content.questions", label: "Questions", href: "/teacher/questions", icon: HelpCircle },
-    ],
-  },
-  {
-    id: "teacher.assessments",
-    label: "Assessments",
-    icon: ClipboardList,
-    links: [
-      { id: "teacher.assessments.practice-sets", label: "Practice & Exams", href: "/teacher/practice-sets", icon: BookOpen },
-      { id: "teacher.assessments.compare", label: "Compare", href: "/teacher/compare", icon: BarChart2 },
-    ],
-  },
 ];
+
+export function resolveLinks(
+  links: NavLinkDef[],
+  opts: { role?: string; flags: Partial<Record<FeatureSettingKey, boolean>> },
+): ResolvedNavLink[] {
+  return links
+    .filter((link) => linkVisible(link, opts))
+    .map((link) => ({ href: link.href, label: link.label, icon: link.icon, exact: link.exact }));
+}
 
 export const ADMIN_NAV_GROUP: NavGroupDef = {
   id: "admin",
@@ -144,7 +160,10 @@ export const ADMIN_NAV_GROUP: NavGroupDef = {
     { id: "admin.teachers", label: "Teachers", href: "/admin/teachers", icon: GraduationCap },
     { id: "admin.users", label: "Accounts", href: "/admin/users", icon: UserCog },
     { id: "admin.taxonomy", label: "Taxonomy", href: "/admin/taxonomy", icon: Layers },
+    { id: "admin.sources", label: "Sources", href: "/admin/sources", icon: Library },
+    { id: "admin.import.quick", label: "Import with AI", href: "/teacher/import", icon: Sparkles },
     { id: "admin.import.ai", label: "AI Import", href: "/admin/import/ai", icon: FileText },
+    { id: "admin.reports", label: "Reports", href: "/admin/reports", icon: MessageSquareWarning },
     { id: "admin.logs", label: "Audit Log", href: "/admin/logs", icon: FileText },
     { id: "admin.settings", label: "Settings", href: "/admin/settings", icon: Settings },
   ],
@@ -152,7 +171,8 @@ export const ADMIN_NAV_GROUP: NavGroupDef = {
 
 export const STUDENT_NAV_ENROLLED: NavLinkDef[] = [
   { id: "student.home", label: "Home", href: "/student", icon: Home, exact: true },
-  { id: "student.content-map", label: "Content Map", href: "/student/content-map", icon: Map },
+  { id: "student.tests", label: "Tests", href: "/student/tests", icon: ClipboardList },
+  { id: "student.practice", label: "Practice", href: "/student/practice", icon: Map },
   {
     id: "student.materials",
     label: "Materials",
@@ -163,15 +183,19 @@ export const STUDENT_NAV_ENROLLED: NavLinkDef[] = [
   { id: "student.history", label: "History", href: "/student/history", icon: Clock },
 ];
 
+/** Parent portal: their students' results (Home); Notifications and Report a problem sit in the footer. */
+export const PARENT_NAV: NavLinkDef[] = [{ id: "parent.home", label: "Home", href: "/parent", icon: Home, exact: true }];
+
 export const STUDENT_NAV_RESTRICTED: NavLinkDef[] = [
   { id: "student.program", label: "Programs", href: "/student/program", icon: FolderOpen },
 ];
 
 function linkVisible(
   link: NavLinkDef,
-  opts: { role?: string; flags: Partial<Record<FeatureSettingKey, boolean>> },
+  opts: { role?: string; flags: Partial<Record<FeatureSettingKey, boolean>>; capabilities?: NavCapability[] },
 ): boolean {
   if (link.hideForAdmin && opts.role === "ADMIN") return false;
+  if (link.capability && !opts.capabilities?.includes(link.capability)) return false;
   if (!link.feature) return true;
   return Boolean(opts.flags[link.feature]);
 }
@@ -179,6 +203,7 @@ function linkVisible(
 export function resolveTeacherNav(opts: {
   role?: string;
   flags: Partial<Record<FeatureSettingKey, boolean>>;
+  capabilities?: NavCapability[];
 }): ResolvedNavEntry[] {
   const entries: ResolvedNavEntry[] = [];
 
@@ -192,7 +217,7 @@ export function resolveTeacherNav(opts: {
       continue;
     }
     if (!linkVisible(item, opts)) continue;
-    entries.push({ href: item.href, label: item.label, icon: item.icon });
+    entries.push({ href: item.href, label: item.label, icon: item.icon, exact: item.exact });
   }
 
   if (opts.role === "ADMIN") {
@@ -220,11 +245,64 @@ export function resolveStudentNav(opts: {
     .map((link) => ({ href: link.href, label: link.label, icon: link.icon, exact: link.exact }));
 }
 
+/** Other paths that belong to a nav item (detail pages living outside its prefix, legacy URLs). */
+const NAV_ALIASES: Record<string, string[]> = {
+  "/student/tests": ["/student/full-tests"],
+  "/student/practice": ["/student/content-map", "/student/results"],
+  "/teacher/tests": ["/teacher/full-tests"],
+  "/teacher/students": ["/teacher/groups", "/teacher/parents", "/teacher/impersonate"],
+  "/teacher/practice-sets": ["/teacher/questions", "/teacher/materials"],
+  "/teacher/teachers": [],
+};
+
+/**
+ * Path the sidebar highlights for: the Question Bank on its Tests tab belongs to Tests (the other tabs
+ * to Practice, via NAV_ALIASES).
+ */
+export function navPathname(pathname: string, area: string | null | undefined): string {
+  return pathname.startsWith("/teacher/questions") && area === "tests" ? "/teacher/tests/questions" : pathname;
+}
+
 export function linkIsActive(href: string, pathname: string, exact = false): boolean {
-  if (exact || href === "/teacher" || href === "/student") return pathname === href;
-  return pathname === href || pathname.startsWith(`${href}/`);
+  if (exact || href === "/teacher" || href === "/student" || href === "/parent") return pathname === href;
+  return [href, ...(NAV_ALIASES[href] ?? [])].some((base) => pathname === base || pathname.startsWith(`${base}/`));
 }
 
 export function groupIsActive(group: ResolvedNavGroup, pathname: string): boolean {
   return group.links.some((link) => linkIsActive(link.href, pathname, link.exact));
+}
+
+export function hrefWithArea(href: string, area: string | null | undefined): string {
+  if (!area || !["math", "reading", "writing", "tests"].includes(area)) return href;
+  const areaAware = [
+    "/student/practice",
+    "/student/history",
+    "/student/materials",
+    "/teacher/questions",
+    "/teacher/practice-sets",
+  ];
+  const url = new URL(href, "http://sat.local");
+  if (!areaAware.includes(url.pathname)) return href;
+  if (!url.searchParams.has("area")) url.searchParams.set("area", area);
+  return `${url.pathname}?${url.searchParams.toString()}`;
+}
+
+export function isPlayerPath(pathname: string, search?: { get(name: string): string | null } | null): boolean {
+  // Student practice sets and Tests open on an intro page with the normal chrome; the player
+  // itself (full screen, no nav) is the same URL with ?start=1.
+  const studentPlayer = [/^\/student\/practice\/assignment\/[^/]+$/, /^\/student\/tests\/(?!results$)[^/]+$/];
+  if (studentPlayer.some((pattern) => pattern.test(pathname))) return search?.get("start") === "1";
+  return [
+    /^\/student\/full-tests\/[^/]+$/,
+    /^\/teacher\/practice-sets\/[^/]+\/preview$/,
+    /^\/teacher\/full-tests\/[^/]+\/preview$/,
+    /^\/teacher\/tests\/[^/]+\/preview$/,
+  ].some((pattern) => pattern.test(pathname));
+}
+
+/** The Home of each portal (first breadcrumb on pages shared by several roles). */
+export function homeHrefForRole(role: string | null | undefined): string {
+  if (role === "STUDENT") return "/student";
+  if (role === "PARENT") return "/parent";
+  return "/teacher";
 }

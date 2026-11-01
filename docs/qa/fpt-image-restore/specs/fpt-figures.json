@@ -1,0 +1,222 @@
+[
+ {
+  "qid": "cmsjrntdd0051qmt1fn2h436w",
+  "loc": "TEST 2 Math M1 Q9",
+  "test": "TEST 2",
+  "type": "imageFile",
+  "file": "/home/turista/Descargas/Github/sat-manager-platform/docs/qa/fpt-image-restore/crops/cmsjrntdd0051qmt1fn2h436w.png",
+  "confidence": "high",
+  "defect": "missing_figure",
+  "evidence": "Stem references a figure/table ('9.  The circle shown has center O. If the measure of angle D'); figure present only in source PDF screenshot TEST 2/i-004-008.png bbox=[300, 45, 830, 570]; never captured at ingest (legacy crop kept only the answer panel)"
+ },
+ {
+  "qid": "cmsjrnten005tqmt1ezjpso1b",
+  "loc": "TEST 2 Math M1 Q13",
+  "test": "TEST 2",
+  "type": "imageFile",
+  "file": "/home/turista/Descargas/Github/sat-manager-platform/docs/qa/fpt-image-restore/crops/cmsjrnten005tqmt1ezjpso1b.png",
+  "confidence": "high",
+  "defect": "missing_figure",
+  "evidence": "Stem references a figure/table ('13.  The complete graph of the function $f$ in the $xy$-plan'); figure present only in source PDF screenshot TEST 2/i-006-012.png bbox=[50, 30, 650, 580]; never captured at ingest (legacy crop kept only the answer panel)"
+ },
+ {
+  "qid": "cmsjrnth9006zqmt1bp2vnfpl",
+  "loc": "TEST 2 Math M1 Q22",
+  "test": "TEST 2",
+  "type": "imageFile",
+  "file": "/home/turista/Descargas/Github/sat-manager-platform/docs/qa/fpt-image-restore/crops/cmsjrnth9006zqmt1bp2vnfpl.png",
+  "confidence": "high",
+  "defect": "missing_figure",
+  "evidence": "Stem references a figure/table ('22. The table shows the average weekly bread sales at Max's '); figure present only in source PDF screenshot TEST 2/i-010-021.png bbox=[250, 125, 825, 385]; never captured at ingest (legacy crop kept only the answer panel)"
+ },
+ {
+  "qid": "cmsjrntc9004qqmt1k5l1svjy",
+  "loc": "TEST 2 Math M2 Q5",
+  "test": "TEST 2",
+  "type": "imageFile",
+  "file": "/home/turista/Descargas/Github/sat-manager-platform/docs/qa/fpt-image-restore/crops/cmsjrntc9004qqmt1k5l1svjy.png",
+  "confidence": "high",
+  "defect": "missing_figure",
+  "evidence": "Stem references a figure/table ('5.  For the function $f$, the table shows some values of $x$'); figure present only in source PDF screenshot TEST 2/i-012-026.png bbox=[335, 30, 730, 490]; never captured at ingest (legacy crop kept only the answer panel)"
+ },
+ {
+  "qid": "cmsjrntcl004sqmt1ohglwlql",
+  "loc": "TEST 2 Math M2 Q6",
+  "test": "TEST 2",
+  "type": "imageFile",
+  "file": "/home/turista/Descargas/Github/sat-manager-platform/docs/qa/fpt-image-restore/crops/cmsjrntcl004sqmt1ohglwlql.png",
+  "confidence": "high",
+  "defect": "missing_figure",
+  "evidence": "Stem references a figure/table ('6.  The chart shows the average cost of housing, in dollars '); figure present only in source PDF screenshot TEST 2/i-013-027.png bbox=[100, 30, 975, 720]; never captured at ingest (legacy crop kept only the answer panel)"
+ },
+ {
+  "qid": "cmsjrntgr006wqmt1u73v9xcp",
+  "loc": "TEST 2 Math M2 Q20",
+  "test": "TEST 2",
+  "type": "imageFile",
+  "file": "/home/turista/Descargas/Github/sat-manager-platform/docs/qa/fpt-image-restore/crops/cmsjrntgr006wqmt1u73v9xcp.png",
+  "confidence": "high",
+  "defect": "missing_figure",
+  "evidence": "Stem references a figure/table ('20.  In the triangle shown, $\\angle ABC = 90^{\\circ}$. Line '); figure present only in source PDF screenshot TEST 2/i-019-041.png bbox=[120, 30, 935, 415]; never captured at ingest (legacy crop kept only the answer panel)"
+ },
+ {
+  "qid": "cmsjrntvy00bzqmt1w6x7sigd",
+  "loc": "TEST 3 Math M1 Q14",
+  "test": "TEST 3",
+  "type": "imageFile",
+  "file": "/home/turista/Descargas/Github/sat-manager-platform/docs/qa/fpt-image-restore/crops/cmsjrntvy00bzqmt1w6x7sigd.png",
+  "confidence": "high",
+  "defect": "missing_figure",
+  "evidence": "Stem references a figure/table ('14.  What is the equation of the graph?'); figure present only in source PDF screenshot TEST 3/i-005-013.png bbox=[170, 25, 870, 740]; never captured at ingest (legacy crop kept only the answer panel)"
+ },
+ {
+  "qid": "cmsjrntxd00cgqmt1omxmx93a",
+  "loc": "TEST 3 Math M1 Q22",
+  "test": "TEST 3",
+  "type": "imageFile",
+  "file": "/home/turista/Descargas/Github/sat-manager-platform/docs/qa/fpt-image-restore/crops/cmsjrntxd00cgqmt1omxmx93a.png",
+  "confidence": "high",
+  "defect": "missing_figure_referenced",
+  "evidence": "Stem references a figure/table ('22.  Shown is Square $ABCD$, circumscribed by Circle $O$. Th'); figure present only in source PDF screenshot TEST 3/i-008-021.png bbox=[80, 35, 625, 580]; never captured at ingest (legacy crop kept only the answer panel)"
+ },
+ {
+  "qid": "cmsjrnvck00soqmt1vn0qou8q",
+  "loc": "TEST 3 Math M2 Q21",
+  "test": "TEST 3",
+  "type": "imageFile",
+  "file": "/home/turista/Descargas/Github/sat-manager-platform/docs/qa/fpt-image-restore/crops/cmsjrnvck00soqmt1vn0qou8q.png",
+  "confidence": "high",
+  "defect": "missing_figure",
+  "evidence": "Stem references a figure/table ('21.  $$f(x) = 24x^2 + bx + c$$  For the given function $f, b'); figure present only in source PDF screenshot TEST 3/i-016-044.png bbox=[345, 285, 735, 638]; never captured at ingest (legacy crop kept only the answer panel)"
+ },
+ {
+  "qid": "cmsjrnv8600qwqmt13tbb16ds",
+  "loc": "TEST 4 Math M1 Q12",
+  "test": "TEST 4",
+  "type": "imageFile",
+  "file": "/home/turista/Descargas/Github/sat-manager-platform/docs/qa/fpt-image-restore/crops/cmsjrnv8600qwqmt13tbb16ds.png",
+  "confidence": "high",
+  "defect": "missing_figure",
+  "evidence": "Stem references a figure/table ('12.  The table shows three values of $x$ and their correspon'); figure present only in source PDF screenshot TEST 4/i-004-011.png bbox=[340, 85, 575, 470]; never captured at ingest (legacy crop kept only the answer panel)"
+ },
+ {
+  "qid": "cmsjrnv9i00rgqmt1fwndeqs6",
+  "loc": "TEST 4 Math M1 Q16",
+  "test": "TEST 4",
+  "type": "imageFile",
+  "file": "/home/turista/Descargas/Github/sat-manager-platform/docs/qa/fpt-image-restore/crops/cmsjrnv9i00rgqmt1fwndeqs6.png",
+  "confidence": "high",
+  "defect": "missing_figure",
+  "evidence": "Stem references a figure/table ('16.  A teacher asked the students in two of his classes how '); figure present only in source PDF screenshot TEST 4/i-006-015.png bbox=[105, 20, 818, 285]; never captured at ingest (legacy crop kept only the answer panel)"
+ },
+ {
+  "qid": "cmsjrnvpu00xbqmt156zmd2xc",
+  "loc": "TEST 6 Math M1 Q5",
+  "test": "TEST 6",
+  "type": "imageFile",
+  "file": "/home/turista/Descargas/Github/sat-manager-platform/docs/qa/fpt-image-restore/crops/cmsjrnvpu00xbqmt156zmd2xc.png",
+  "confidence": "high",
+  "defect": "missing_figure",
+  "evidence": "Stem references a figure/table ('5.  Katy is rolling a 4-sided die and determined the percent'); figure present only in source PDF screenshot TEST 6/i-002-004.png bbox=[293, 22, 790, 475]; never captured at ingest (legacy crop kept only the answer panel); NEW: not caught by keyword scan"
+ },
+ {
+  "qid": "cmsjrnvuh00xzqmt1pw9qt91q",
+  "loc": "TEST 6 Math M1 Q13",
+  "test": "TEST 6",
+  "type": "imageFile",
+  "file": "/home/turista/Descargas/Github/sat-manager-platform/docs/qa/fpt-image-restore/crops/cmsjrnvuh00xzqmt1pw9qt91q.png",
+  "confidence": "high",
+  "defect": "missing_figure",
+  "evidence": "Stem references a figure/table ('13.  The graph shows the sales of ice cream at a store and t'); figure present only in source PDF screenshot TEST 6/i-005-012.png bbox=[115, 25, 945, 855]; never captured at ingest (legacy crop kept only the answer panel)"
+ },
+ {
+  "qid": "cmsjrnvxg00yrqmt1xateifju",
+  "loc": "TEST 6 Math M1 Q21",
+  "test": "TEST 6",
+  "type": "imageFile",
+  "file": "/home/turista/Descargas/Github/sat-manager-platform/docs/qa/fpt-image-restore/crops/cmsjrnvxg00yrqmt1xateifju.png",
+  "confidence": "high",
+  "defect": "missing_figure",
+  "evidence": "Stem references a figure/table ('21.  The values for two functions $f(x)$ and $g(x)$ are show'); figure present only in source PDF screenshot TEST 6/i-008-020.png bbox=[195, 40, 870, 825]; never captured at ingest (legacy crop kept only the answer panel)"
+ },
+ {
+  "qid": "cmsjrnvoe00x7qmt1c3n1ln3s",
+  "loc": "TEST 6 Math M2 Q2",
+  "test": "TEST 6",
+  "type": "imageFile",
+  "file": "/home/turista/Descargas/Github/sat-manager-platform/docs/qa/fpt-image-restore/crops/cmsjrnvoe00x7qmt1c3n1ln3s.png",
+  "confidence": "high",
+  "defect": "missing_figure",
+  "evidence": "Stem references a figure/table ('2.  The graph of linear function g(x) is shown above. What i'); figure present only in source PDF screenshot TEST 6/i-010-023.png bbox=[215, 30, 830, 650]; never captured at ingest (legacy crop kept only the answer panel)"
+ },
+ {
+  "qid": "cmsjrnvpf00x9qmt1cl5jfhm8",
+  "loc": "TEST 6 Math M2 Q3",
+  "test": "TEST 6",
+  "type": "imageFile",
+  "file": "/home/turista/Descargas/Github/sat-manager-platform/docs/qa/fpt-image-restore/crops/cmsjrnvpf00x9qmt1cl5jfhm8.png",
+  "confidence": "high",
+  "defect": "missing_figure",
+  "evidence": "Stem references a figure/table ('3.  A system of linear equations is graphed above. What is t'); figure present only in source PDF screenshot TEST 6/i-010-024.png bbox=[215, 25, 830, 645]; never captured at ingest (legacy crop kept only the answer panel)"
+ },
+ {
+  "qid": "cmsjrnvst00xqqmt167kc59z8",
+  "loc": "TEST 6 Math M2 Q8",
+  "test": "TEST 6",
+  "type": "imageFile",
+  "file": "/home/turista/Descargas/Github/sat-manager-platform/docs/qa/fpt-image-restore/crops/cmsjrnvst00xqqmt167kc59z8.png",
+  "confidence": "high",
+  "defect": "missing_figure",
+  "evidence": "Stem references a figure/table ('8.  A study asked voluntary participants to record the numbe'); figure present only in source PDF screenshot TEST 6/i-012-029.png bbox=[115, 20, 935, 840]; never captured at ingest (legacy crop kept only the answer panel)"
+ },
+ {
+  "qid": "cmsjrnwuo01a8qmt11c9v1qtn",
+  "loc": "TEST 7 Math M2 Q2",
+  "test": "TEST 7",
+  "type": "imageFile",
+  "file": "/home/turista/Descargas/Github/sat-manager-platform/docs/qa/fpt-image-restore/crops/cmsjrnwuo01a8qmt11c9v1qtn.png",
+  "confidence": "high",
+  "defect": "missing_figure",
+  "evidence": "Stem references a figure/table ('2.  The graph of line $q$ is shown above. Line $r$ is perpen'); figure present only in source PDF screenshot TEST 7/i-010-023.png bbox=[255, 35, 835, 625]; never captured at ingest (legacy crop kept only the answer panel)"
+ },
+ {
+  "qid": "cmsnb3g2h00230mpdixue08j3",
+  "loc": "TEST 8 Math M1 Q22",
+  "test": "TEST 8",
+  "type": "imageFile",
+  "file": "/home/turista/Descargas/Github/sat-manager-platform/docs/qa/fpt-image-restore/crops/cmsnb3g2h00230mpdixue08j3.png",
+  "confidence": "high",
+  "defect": "missing_figure",
+  "evidence": "Stem references a figure/table ('22.  The graph shows the height of a tree after a certain nu'); figure present only in source PDF screenshot TEST 8/i-009-021.png bbox=[260, 45, 915, 790]; never captured at ingest (legacy crop kept only the answer panel)"
+ },
+ {
+  "qid": "cmsnb3g38002s0mpdwn9a43dy",
+  "loc": "TEST 8 Math M2 Q7",
+  "test": "TEST 8",
+  "type": "imageFile",
+  "file": "/home/turista/Descargas/Github/sat-manager-platform/docs/qa/fpt-image-restore/crops/cmsnb3g38002s0mpdwn9a43dy.png",
+  "confidence": "high",
+  "defect": "missing_figure_referenced",
+  "evidence": "Stem references a figure/table ('7.  The graph of line $a$ is shown, and the equation of line'); figure present only in source PDF screenshot TEST 8/i-012-028.png bbox=[300, 40, 1005, 800]; never captured at ingest (legacy crop kept only the answer panel)"
+ },
+ {
+  "qid": "cmsnb3g4v004j0mpdk86h3pmn",
+  "loc": "TEST 8 Math M2 Q22",
+  "test": "TEST 8",
+  "type": "imageFile",
+  "file": "/home/turista/Descargas/Github/sat-manager-platform/docs/qa/fpt-image-restore/crops/cmsnb3g4v004j0mpdk86h3pmn.png",
+  "confidence": "high",
+  "defect": "missing_figure_referenced",
+  "evidence": "Stem references a figure/table ('22.  Note: Figure not drawn to scale.  A rectangular pyramid'); figure present only in source PDF screenshot TEST 8/i-019-043.png bbox=[250, 60, 845, 750]; never captured at ingest (legacy crop kept only the answer panel)"
+ },
+ {
+  "qid": "cmsjrnvyi00z1qmt1j1x9sal6",
+  "loc": "TEST 9 Math M1 Q2",
+  "test": "TEST 9",
+  "type": "imageFile",
+  "file": "/home/turista/Descargas/Github/sat-manager-platform/docs/qa/fpt-image-restore/crops/cmsjrnvyi00z1qmt1j1x9sal6.png",
+  "confidence": "high",
+  "defect": "missing_figure",
+  "evidence": "Stem references a figure/table ('2.  The graph of the function $f(x)$ is shown. What value(s)'); figure present only in source PDF screenshot TEST 9/i-001-001.png bbox=[130, 30, 910, 860]; never captured at ingest (legacy crop kept only the answer panel)"
+ }
+]

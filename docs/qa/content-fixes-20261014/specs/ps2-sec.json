@@ -1,0 +1,42 @@
+[
+  {
+    "table": "Question",
+    "id": "cmsjro51u0519qmt1cj8cbiaj",
+    "field": "stem",
+    "before": "In 2000, Nora de Hoyos Comstock, herself an owner of a successful consulting firm, sought to increase Latina representation in corporate ______\nfoundedLas Comadres para las Americas, an international community that for over two decades has served as a resource and information\nnetwork for Latina business professionals.\nWhich choice completes the text so that it conforms to the conventions of Standard English?",
+    "after": "In 2000, Nora de Hoyos Comstock, herself an owner of a successful consulting firm, sought to increase Latina representation in corporate ______\nfounded Las Comadres para las Americas, an international community that for over two decades has served as a resource and information\nnetwork for Latina business professionals.\nWhich choice completes the text so that it conforms to the conventions of Standard English?",
+    "class": "missing_space",
+    "note": "space dropped at an italic-run boundary by the ingest text extraction: \"______\nfoundedLas\" -> \"______\nfounded Las\"",
+    "evidence": "Boundaries Easy.pdf (Question ID 7b950fc2) and ANS Boundaries Easy.pdf: pdftotext -raw shows the space; page image confirms (7b950fc2 p10)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjro5hd05b4qmt1noyaqkv0",
+    "field": "stem",
+    "before": "To serve local families during the Great Depression, innovative New York City librarian Pura Belpré offered storytelling in both English and\nSpanish, an uncommon ______ celebrated el Día de los Tres Reyes Magos,an important community holiday; and put on puppet shows dramatizing\nPuerto Rican folktales.\nWhich choice completes the text so that it conforms to the conventions of Standard English?",
+    "after": "To serve local families during the Great Depression, innovative New York City librarian Pura Belpré offered storytelling in both English and\nSpanish, an uncommon ______ celebrated el Día de los Tres Reyes Magos, an important community holiday; and put on puppet shows dramatizing\nPuerto Rican folktales.\nWhich choice completes the text so that it conforms to the conventions of Standard English?",
+    "class": "missing_space",
+    "note": "space dropped at an italic-run boundary by the ingest text extraction: \"Magos,an\" -> \"Magos, an\"",
+    "evidence": "BOUNDARIES H1.pdf (Question ID aaa1907f) and ANS BOUNDARIES H1.pdf: pdftotext -raw shows the space; page image confirms (7b950fc2 p10)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjro5ya05k1qmt1rhynt815",
+    "field": "stem",
+    "before": "When they were first discovered in Australia in 1798, duck-billed, beaver-tailed platypuses so defied categorization that one scientist assigned\nthem the name Ornithorhynchusparadoxus: “paradoxical bird-snout.” The animal,which lays eggs but also nurses ______ young with milk, has\nsince been classified as belonging to the monotremes group.\nWhich choice completes the text so that it conforms to the conventions of Standard English?",
+    "after": "When they were first discovered in Australia in 1798, duck-billed, beaver-tailed platypuses so defied categorization that one scientist assigned\nthem the name Ornithorhynchus paradoxus: “paradoxical bird-snout.” The animal, which lays eggs but also nurses ______ young with milk, has\nsince been classified as belonging to the monotremes group.\nWhich choice completes the text so that it conforms to the conventions of Standard English?",
+    "class": "missing_space",
+    "note": "space dropped at an italic-run boundary by the ingest text extraction: \"Ornithorhynchusparadoxus:\" -> \"Ornithorhynchus paradoxus:\"; \"animal,which\" -> \"animal, which\"",
+    "evidence": "GRAMMAR HARD .pdf (Question ID 3bceeb93) and ANS GRAMMAR HARD.pdf: pdftotext -raw shows the space; page image confirms (7b950fc2 p10)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjro6i705ybqmt1wiow2v83",
+    "field": "stem",
+    "before": "Slam poet Elizabeth Acevedo’s debut novel The Poet X,winner of the 2018 National Book Award for Young People’s Literature, is composed of\n______ protagonist, fifteen-year-old Xiomara Batista.\nWhich choice completes the text so that it conforms to the conventions of Standard English?",
+    "after": "Slam poet Elizabeth Acevedo’s debut novel The Poet X, winner of the 2018 National Book Award for Young People’s Literature, is composed of\n______ protagonist, fifteen-year-old Xiomara Batista.\nWhich choice completes the text so that it conforms to the conventions of Standard English?",
+    "class": "missing_space",
+    "note": "space dropped at an italic-run boundary by the ingest text extraction: \"X,winner\" -> \"X, winner\"",
+    "evidence": "GRAMMAR MED .pdf (Question ID 8d53e7a0) and ANS GRAMMAR MED .pdf: pdftotext -raw shows the space; page image confirms (7b950fc2 p10)"
+  }
+]

@@ -14,7 +14,10 @@ import { cleanupOfficialQuestionPlaceholders } from "@/lib/ingest-image-cleanup"
 type TopicWithRelations = {
   id: string;
   name: string;
-  domain: { name: string; section: { name: string; label: string } };
+  domainId: string;
+  domain: { name: string; section: { name: string; label: string }; aliases?: { alias: string }[] };
+  /** TaxonomyAlias rows (PDF spellings, former names): the file may use any of them. */
+  aliases?: { alias: string }[];
   subskills: { id: string; name: string }[];
 };
 
@@ -217,8 +220,24 @@ export async function propagateAssignedImageToOfficial(args: {
   return { propagated: true, target: `OPTION ${optionLabel}`, imageUrl: publicUrl };
 }
 
+const DATA_URI_PATTERN = /^data:(image\/(png|jpe?g|webp|gif));base64,([A-Za-z0-9+/=\s]+)$/i;
+
+/**
+ * Official question images are files in storage, referenced by URL — never base64 in the database.
+ * Private ingest assets are copied to public storage; a `data:` image is decoded and saved the same
+ * way (sha256 name), so no write path can store a data URI on a Question or QuestionOption.
+ */
 export async function materializeOfficialImageUrl(imageUrl: string | null | undefined) {
   if (!imageUrl) return null;
+  if (imageUrl.startsWith("data:")) {
+    const parsed = DATA_URI_PATTERN.exec(imageUrl.trim());
+    if (!parsed) return null;
+    const data = Buffer.from(parsed[3].replace(/\s+/g, ""), "base64");
+    const extension = parsed[2].toLowerCase() === "jpeg" ? ".jpg" : `.${parsed[2].toLowerCase()}`;
+    const digest = crypto.createHash("sha256").update(data).digest("hex").slice(0, 24);
+    const { putQuestionImage } = await import("@/lib/object-storage");
+    return putQuestionImage(`${digest}${extension}`, data);
+  }
   const match = PRIVATE_ASSET_PATTERN.exec(imageUrl);
   if (!match) return imageUrl;
 
@@ -247,6 +266,11 @@ function normalizeLoose(value: string | null | undefined) {
     .filter(Boolean)
     .map((part) => part.length > 3 && part.endsWith("s") ? part.slice(0, -1) : part)
     .join(" ");
+}
+
+/** Name or any TaxonomyAlias of a domain / skill (Domain ↔ Skill correspondence table). */
+function matchesNameOrAlias(name: string, aliases: { alias: string }[] | undefined, value: string | null | undefined) {
+  return sameTaxonomyName(name, value) || (aliases ?? []).some((a) => sameTaxonomyName(a.alias, value));
 }
 
 function sameTaxonomyName(left: string | null | undefined, right: string | null | undefined) {
@@ -296,14 +320,14 @@ export function resolveTopicFromCandidate(candidate: CandidateForDraft, topics: 
     const wantsMath = section === "MATH";
     const byName = topics.find((item) => {
       if (normalize(item.domain.name) !== "full practice test") return false;
-      if (normalize(item.domain.section.name).includes("math") !== wantsMath) return false;
+      if ((item.domain.section.name === "MATH") !== wantsMath) return false;
       return normalize(item.name) === normalize(moduleKey);
     });
     if (byName) return { topicId: byName.id, subskillId: "" };
 
     const legacy = topics.find((item) => {
       if (normalize(item.domain.name) !== "full practice test") return false;
-      return normalize(item.domain.section.name).includes("math") === wantsMath;
+      return (item.domain.section.name === "MATH") === wantsMath;
     });
     if (legacy) return { topicId: legacy.id, subskillId: "" };
   }
@@ -312,20 +336,18 @@ export function resolveTopicFromCandidate(candidate: CandidateForDraft, topics: 
   const domainTerm = normalize(candidate.domainName);
   const sectionTerm = normalize(candidate.section);
   const topic = topics.find((item) => {
-    if (!topicTerm || !sameTaxonomyName(item.name, candidate.topicName)) return false;
-    if (domainTerm && !sameTaxonomyName(item.domain.name, candidate.domainName)) return false;
+    // Staging keeps the names the file had; former names map to the reference skill/domain ids.
+    if (!topicTerm || !matchesNameOrAlias(item.name, item.aliases, candidate.topicName)) return false;
+    if (domainTerm && !matchesNameOrAlias(item.domain.name, item.domain.aliases, candidate.domainName)) return false;
     if (sectionTerm) {
-      const sectionName = normalize(item.domain.section.name);
-      const sectionLabel = normalize(item.domain.section.label);
-      // Acepta el código interno de la ingesta ("RW"/"MATH") además del nombre/label
-      // oficial, para que el candidato resuelva sin importar cómo quedó guardada la sección.
-      const accepted = new Set([sectionName, sectionLabel]);
-      if (sectionName.includes("reading") || sectionLabel.includes("reading")) {
-        accepted.add("rw").add("r and w").add("reading and writing");
+      // Sections are official codes (MATH, READING, WRITING; READING_WRITING = Test placeholder).
+      // The ingest stores "MATH" or "RW": a Reading & Writing candidate belongs to READING or WRITING.
+      const code = item.domain.section.name;
+      const accepted = new Set([normalize(code), normalize(item.domain.section.label)]);
+      if (code === "READING" || code === "WRITING" || code === "READING_WRITING") {
+        accepted.add("rw").add("r and w").add("reading and writing").add("reading_writing");
       }
-      if (sectionName.includes("math") || sectionLabel.includes("math")) {
-        accepted.add("math");
-      }
+      if (code === "MATH") accepted.add("mathematics");
       return accepted.has(sectionTerm);
     }
     return true;
@@ -499,7 +521,7 @@ export function reconcileOfficialUpdate(draft: QuestionDraft, official: Official
 export async function loadCandidateQuestionDraft(candidateId: string) {
   const [candidate, topics, rawLinks] = await Promise.all([
     prisma.ingestQuestionCandidate.findUnique({ where: { id: candidateId } }),
-    prisma.topic.findMany({ include: { domain: { include: { section: true } }, subskills: true }, orderBy: { name: "asc" } }),
+    prisma.topic.findMany({ include: { domain: { include: { section: true, aliases: { select: { alias: true } } } }, subskills: true, aliases: { select: { alias: true } } }, orderBy: { name: "asc" } }),
     prisma.ingestCandidateImageLink.findMany({
       where: { candidateId },
       orderBy: [{ targetType: "asc" }, { sortOrder: "asc" }],

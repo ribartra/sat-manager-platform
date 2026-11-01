@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import { auth } from "@/lib/auth";
+import { BadRequestError, ForbiddenError, NotFoundError, UnauthorizedError, withApiErrors } from "@/lib/api-error";
 
 function isAvailable(p: { active: boolean; startDate: Date; endDate: Date | null }) {
   const now = new Date();
@@ -13,9 +14,9 @@ function isAvailable(p: { active: boolean; startDate: Date; endDate: Date | null
 // Admin → all programs (maestro)
 // Teacher → their active assignments only
 // Student/Parent → their APPROVED enrollments
-export async function GET() {
+export const GET = withApiErrors(async function GET() {
   const session = await auth();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session) return new UnauthorizedError("Unauthorized").toResponse();
 
   const role = session.user.role;
 
@@ -41,7 +42,8 @@ export async function GET() {
           include: { teacher: { select: { id: true, name: true, email: true, active: true } } },
           orderBy: { startDate: "asc" },
         },
-        enrollments: { select: { studentId: true, status: true, active: true } },
+        // Only the enrollments this teacher owns (students they invited), not the whole shared program.
+        enrollments: { where: { teacherId: session.user.id }, select: { studentId: true, status: true, active: true } },
       },
       orderBy: { name: "asc" },
     });
@@ -57,26 +59,26 @@ export async function GET() {
   });
   const programs = enrollments.map((e) => ({ ...e.program, enrolledAt: e.enrolledAt }));
   return NextResponse.json({ programs });
-}
+});
 
 // POST /api/programs — Admin by default; teachers only when enabled by admin.
-export async function POST(req: NextRequest) {
+export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   if (session.user.role === "TEACHER") {
     const enabled = await getFeatureSetting("TEACHER_PROGRAM_MANAGEMENT");
-    if (!enabled) return NextResponse.json({ error: "Teacher program management is disabled." }, { status: 403 });
+    if (!enabled) return new ForbiddenError("Teacher program management is disabled.").toResponse();
   }
 
   const { name, teacherId, startDate, endDate } = await req.json();
-  if (!name) return NextResponse.json({ error: "Name is required." }, { status: 400 });
+  if (!name) return new BadRequestError("Name is required.").toResponse();
 
   const ownerTeacherId = session.user.role === "ADMIN" ? teacherId : session.user.id;
-  if (!ownerTeacherId) return NextResponse.json({ error: "Teacher is required." }, { status: 400 });
+  if (!ownerTeacherId) return new BadRequestError("Teacher is required.").toResponse();
 
   const teacher = await prisma.user.findFirst({ where: { id: ownerTeacherId, role: "TEACHER", active: true } });
-  if (!teacher) return NextResponse.json({ error: "Active teacher not found." }, { status: 404 });
+  if (!teacher) return new NotFoundError("Active teacher not found.").toResponse();
 
   const resolvedStart = startDate ? new Date(startDate) : new Date();
 
@@ -96,4 +98,4 @@ export async function POST(req: NextRequest) {
   });
 
   return NextResponse.json({ program });
-}
+});

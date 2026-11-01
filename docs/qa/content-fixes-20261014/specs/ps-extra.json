@@ -1,0 +1,22 @@
+[
+ {
+  "table": "Question",
+  "id": "cmsjrnzd20294qmt1jtmya7vo",
+  "field": "explanation",
+  "before": "Choice C is correct. It’s given that the city’s minimum hourly wage will increase by $0.50 on the first day of the year for the 5 years after January\n1, 2015. Therefore, the total increase, in dollars, in the minimum hourly wage x years after January 1, 2015, is represented by . Since the\nminimum hourly wage on January 1, 2015, was $9.25, it follows that the minimum hourly wage, in dollars, x years after January 1, 2015, is\nrepresented by . Therefore, the function best models this situation.\nChoices A, B, and D are incorrect. In choice A, the function models a situation where the minimum hourly wage is $9.25 on January 1, 2015, but\ndecreases by $0.50 on the first day of the year for the next 5 years. The functions in choices B and D both model a situation where the minimum\nhourly wage is increasing by $9.25 on the first day of the year for the 5 years after January 1, 2015.",
+  "after": "Choice C is correct. It’s given that the city’s minimum hourly wage will increase by \\$0.50 on the first day of the year for the 5 years after January 1, 2015. Therefore, the total increase, in dollars, in the minimum hourly wage x years after January 1, 2015, is represented by $0.50x$. Since the minimum hourly wage on January 1, 2015, was \\$9.25, it follows that the minimum hourly wage, in dollars, x years after January 1, 2015, is represented by $9.25+0.50x$. Therefore, the function $f(x)=9.25+0.50x$ best models this situation.\nChoices A, B, and D are incorrect. In choice A, the function models a situation where the minimum hourly wage is \\$9.25 on January 1, 2015, but decreases by \\$0.50 on the first day of the year for the next 5 years. The functions in choices B and D both model a situation where the minimum hourly wage is increasing by \\$9.25 on the first day of the year for the 5 years after January 1, 2015.",
+  "note": "PS Algebra - Linear functions - EASY #13: stripped_math — math restored; prose prices written as \\$ (literal dollar)",
+  "class": "stripped_math",
+  "evidence": "ANS Linear Functions EASY p13 (de6fe450); key C"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro08p02j7qmt1ddjbydsd",
+  "field": "explanation",
+  "before": "Choice C is correct. The total cost to purchase the shirt is the $20 cost of the shirt plus the 5% sales tax. The value of the 5% sales tax on the $20\nshirt is equivalent to , or $1. Therefore, the total cost to purchase the shirt is , or $21.\nChoice A is incorrect and may result from neglecting to multiply by $20 when finding the value of the sales tax. Choice B is incorrect and may\nresult from dividing by 10, instead of by 100, and then neglecting to multiply by $20 when finding the sales tax. Choice D is incorrect and may\nresult from interpreting the sales tax of 5% as $5.",
+  "after": "Choice C is correct. The total cost to purchase the shirt is the \\$20 cost of the shirt plus the 5% sales tax. The value of the 5% sales tax on the \\$20 shirt is equivalent to $(0.05)(\\$20)$, or \\$1. Therefore, the total cost to purchase the shirt is $\\$20+\\$1$, or \\$21.\nChoice A is incorrect and may result from neglecting to multiply by \\$20 when finding the value of the sales tax. Choice B is incorrect and may result from dividing by 10, instead of by 100, and then neglecting to multiply by \\$20 when finding the sales tax. Choice D is incorrect and may result from interpreting the sales tax of 5% as \\$5.",
+  "note": "PS PSDA - Percentages - EASY #14: stripped_math — (0.05)($20) and $20+$1 restored; prose prices written as \\$",
+  "class": "stripped_math",
+  "evidence": "ANS Percents EASY p14 (8705ecba)"
+ }
+]

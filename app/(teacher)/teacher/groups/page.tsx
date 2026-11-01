@@ -1,4 +1,5 @@
-import { PageShell } from "@/components/sat";
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import { PageHeader, PageShell } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import { getFeatureSetting } from "@/lib/app-settings";
 import prisma from "@/lib/prisma";
@@ -32,7 +33,8 @@ export default async function GroupsPage() {
 
   return (
     <PageShell>
-      <h1 className="text-2xl font-semibold text-gray-900 mb-6">Groups & Cycles</h1>
+      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Students", href: "/teacher/students" }, { label: "Groups" }]} />
+      <PageHeader title="Groups & Cycles" />
       <GroupsClient
         groups={groups.map((g) => ({
           id: g.id,

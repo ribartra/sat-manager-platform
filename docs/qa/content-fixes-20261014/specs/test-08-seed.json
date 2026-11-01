@@ -1,0 +1,22 @@
+[
+ {
+  "table": "Question",
+  "id": "cmsnb3fyo000a0mpdhp76a4hs",
+  "field": "stem",
+  "before": "$$10x + 5 = 75$$\n\n$$x + y^2 = 43$$\n\nThe solution to the given system of equations is $(x, y)$. If $y > 0$, what is the value of $y$?\n\n× A\n\n$$\\sqrt{35}$$\n\n× B",
+  "after": "$$10x + 5 = 75$$\n\n$$x + y^2 = 43$$\n\nThe solution to the given system of equations is $(x, y)$. If $y > 0$, what is the value of $y$?",
+  "note": "T8 Math M1 #4: options_in_stem — '× A √35 × B' (player cross-out UI + option A) pasted into the stem",
+  "class": "options_in_stem",
+  "evidence": "IngestPageArtifact page 2 OCR: options follow 'NEXT QUESTION' as × A..× D; real options A-D present"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3fz8000f0mpdhil7l0kw",
+  "field": "stem",
+  "before": "The table shows how much money is in Aditya's bank account over time: Week 1 = $200, Week 2 = $225, Week 3 = $250, Week 4 = $275, Week 5 = $300. Based on the table, how much money, in dollars, will Aditya have in his bank account on week 7?",
+  "after": "| Week | Bank Account |\n| --- | --- |\n| 1 | $200 |\n| 2 | $225 |\n| 3 | $250 |\n| 4 | $275 |\n| 5 | $300 |\n\nThe table shows how much money is in Aditya's bank account over time. Based on the table, how much money, in dollars, will Aditya have in his bank account on week 7?",
+  "note": "T8 Math M1 #6: flattened_table — Week/Bank Account table flattened into the sentence",
+  "class": "flattened_table",
+  "evidence": "source PDF page 3: table Week | Bank Account, 1-5 → $200..$300 above the question"
+ }
+]

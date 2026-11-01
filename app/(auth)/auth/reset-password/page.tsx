@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/form";
 import { FormSection } from "@/components/sat";
 import { setPasswordSchema, type SetPasswordInput } from "@/contracts/auth";
+import { InlineError } from "@/components/sat/alert";
+import { apiFetch, errorMessage } from "@/lib/api-client";
 
 export default function ResetPasswordPage() {
   const params = useSearchParams();
@@ -32,14 +34,10 @@ export default function ResetPasswordPage() {
 
   async function onSubmit(values: SetPasswordInput) {
     setServerError("");
-    const res = await fetch("/api/auth/reset-password", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token, password: values.password }),
-    });
-    const data = await res.json();
-    if (data.error) {
-      setServerError(data.error);
+    try {
+      await apiFetch("/api/auth/reset-password", { method: "POST", json: { token, password: values.password } });
+    } catch (error) {
+      setServerError(errorMessage(error));
       return;
     }
     router.push("/login?reset=1");
@@ -51,7 +49,7 @@ export default function ResetPasswordPage() {
     <div className="flex min-h-screen items-center justify-center bg-muted">
       <div className="w-full max-w-sm">
         <Card padding="lg">
-          <h1 className="mb-1 text-lg font-semibold text-foreground">Set new password</h1>
+          <h1 className="mb-1 text-lg font-semibold text-foreground">Choose a new password</h1>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="mt-4 space-y-4" noValidate>
               <FormSection>
@@ -60,7 +58,7 @@ export default function ResetPasswordPage() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>New Password</FormLabel>
+                      <FormLabel>New password</FormLabel>
                       <FormControl>
                         <Input type="password" {...field} />
                       </FormControl>
@@ -73,7 +71,7 @@ export default function ResetPasswordPage() {
                   name="confirm"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Confirm Password</FormLabel>
+                      <FormLabel>Type it again</FormLabel>
                       <FormControl>
                         <Input type="password" {...field} />
                       </FormControl>
@@ -82,9 +80,9 @@ export default function ResetPasswordPage() {
                   )}
                 />
               </FormSection>
-              {serverError ? <p className="text-sm text-destructive">{serverError}</p> : null}
+              <InlineError>{serverError}</InlineError>
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Saving..." : "Save Password"}
+                {loading ? "Saving…" : "Save password"}
               </Button>
             </form>
           </Form>

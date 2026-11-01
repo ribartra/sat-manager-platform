@@ -27,30 +27,31 @@ test.describe("area tabs smoke", () => {
     await loginAs(page, studentBox.email, E2E.studentPassword);
     await expectPortal(page, "student");
     await page.goto("/student/history");
-    await expect(page.getByRole("heading", { name: "My History" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "My history" })).toBeVisible();
     await expectAreaTabs(page, { basePath: "/student/history" });
     await expect(page.locator('label:text-is("Section")')).toHaveCount(0);
     await expect(page.locator('select[name="section"], input[name="section"]')).toHaveCount(0);
 
     await clickAreaTab(page, "Full Practice Tests");
     await expect(page).toHaveURL(/area=mocks/);
-    await expect(page.getByRole("columnheader", { name: "R&W" })).toBeVisible();
+    await expect(page.getByRole("columnheader", { name: "Reading & Writing" })).toBeVisible();
     await expect(page.getByRole("columnheader", { name: "Math" })).toBeVisible();
     await expect(page.getByRole("columnheader", { name: "Practice Set" })).toHaveCount(0);
     await expect(page.getByRole("heading", { name: "Practice History" })).toHaveCount(0);
   });
 
-  test("Teacher Analytics / View Student / Impersonate expose 4 tabs", async ({ page }) => {
+  test("Student page (single view) and Impersonate expose 4 tabs", async ({ page }) => {
     await loginAs(page, E2E.teacherEmail, E2E.teacherPassword);
     await expectPortal(page, "teacher");
 
+    // The former Student Analytics view now lands on the student page (performance section).
     await page.goto(`/teacher/analytics?studentId=${studentId}`);
-    await expect(page.getByRole("heading", { name: "Student Analytics" })).toBeVisible();
-    await expectAreaTabs(page);
-    await expect(page.getByText("Roster-wide signal")).toBeVisible();
+    await expect(page).toHaveURL(new RegExp(`/teacher/students/${studentId}\\?.*#performance`));
+    await expect(page.getByRole("heading", { name: studentBox.name })).toBeVisible();
+    await expectAreaTabs(page, { basePath: `/teacher/students/${studentId}` });
+    await expect(page.getByRole("heading", { name: "Skill performance by difficulty" })).toBeVisible();
     await clickAreaTab(page, "Full Practice Tests");
     await expect(page).toHaveURL(/area=mocks/);
-    await expect(page.getByText("Full Practice Tests").first()).toBeVisible();
     await expect(page.getByText("Inactive 5+ Days")).toHaveCount(0);
 
     await page.goto(`/teacher/students/${studentId}`);
@@ -58,7 +59,8 @@ test.describe("area tabs smoke", () => {
     await expectAreaTabs(page, { basePath: `/teacher/students/${studentId}` });
     await clickAreaTab(page, "Writing");
     await expect(page).toHaveURL(/area=writing/);
-    await expect(page.getByText(/Practice History/i)).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Active practice sets/ })).toBeVisible();
+    await expect(page.getByText(/No finished Writing work yet/i)).toBeVisible();
     await clickAreaTab(page, "Full Practice Tests");
     await expect(page).toHaveURL(/area=mocks/);
     await expect(page.getByRole("columnheader", { name: "R&W" })).toBeVisible();
@@ -71,18 +73,17 @@ test.describe("area tabs smoke", () => {
     await expect(page.getByRole("heading", { name: "Assigned to Student" })).toBeVisible();
     await clickAreaTab(page, "Full Practice Tests");
     await expect(page).toHaveURL(/area=mocks/);
-    await expect(page.getByText(/No active Full Practice Tests|Full Practice Test · R&W/i).first()).toBeVisible();
+    await expect(page.getByText(/No active Full Practice Tests|No finished exams yet|Full Practice Test · R&W/i).first()).toBeVisible();
   });
 
-  test("Individual Report keeps Practice out of Full Practice Tests tab", async ({ page }) => {
+  test("Individual Report link lands on the student page and keeps Practice out of FPT", async ({ page }) => {
     await loginAs(page, E2E.teacherEmail, E2E.teacherPassword);
     await page.goto(`/teacher/students/${studentId}/report`);
-    await expectAreaTabs(page, { basePath: `/teacher/students/${studentId}/report` });
+    await expect(page).toHaveURL(/#performance/);
+    await expect(page.getByRole("button", { name: /Generate Report/ })).toBeVisible();
     await clickAreaTab(page, "Full Practice Tests");
     await expect(page).toHaveURL(/area=mocks/);
-    await expect(page.getByRole("heading", { name: "Full Practice Tests" })).toBeVisible();
-    await expect(page.getByRole("columnheader", { name: "R&W" })).toBeVisible();
-    await expect(page.getByRole("columnheader", { name: "Math" })).toBeVisible();
+    await expect(page.getByText("No submitted Full Practice Tests for this student yet.")).toBeVisible();
     await expect(page.getByText("Progress by Skill")).toHaveCount(0);
   });
 });

@@ -3,18 +3,19 @@ import prisma from "@/lib/prisma";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { requireTeacherOrAdmin, requireAdmin } from "@/lib/rbac";
 import { notifyMany } from "@/lib/notify";
+import { ConflictError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
 // GET /api/programs/[id] — full program details (teacher or admin)
-export async function GET(
+export const GET = withApiErrors(async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   if (session.user.role === "TEACHER") {
     const enabled = await getFeatureSetting("TEACHER_PROGRAM_MANAGEMENT");
-    if (!enabled) return NextResponse.json({ error: "Teacher program management is disabled." }, { status: 403 });
+    if (!enabled) return new ForbiddenError("Teacher program management is disabled.").toResponse();
   }
 
   const { id } = await params;
@@ -27,43 +28,45 @@ export async function GET(
         orderBy: { startDate: "asc" },
       },
       enrollments: {
+        // A teacher only sees the enrollments they own (students they invited); admins see all.
+        ...(session.user.role === "TEACHER" ? { where: { teacherId: session.user.id } } : {}),
         include: { student: { select: { id: true, name: true } } },
         orderBy: { enrolledAt: "desc" },
       },
     },
   });
 
-  if (!program) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!program) return new NotFoundError("Not found").toResponse();
 
   if (session.user.role === "TEACHER") {
     const isAssigned = program.teachers.some(
       (t) => t.teacherId === session.user.id && !t.endDate
     );
-    if (!isAssigned) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (!isAssigned) return new ForbiddenError("Forbidden").toResponse();
   }
 
   return NextResponse.json({ program });
-}
+});
 
 // PATCH /api/programs/[id] — update name, dates, active; admin can restore
-export async function PATCH(
+export const PATCH = withApiErrors(async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { id } = await params;
   const body = await req.json();
 
   const program = await prisma.program.findUnique({ where: { id } });
-  if (!program) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!program) return new NotFoundError("Not found").toResponse();
 
   if (session.user.role === "TEACHER") {
     const assignment = await prisma.programTeacher.findFirst({
       where: { programId: id, teacherId: session.user.id, endDate: null },
     });
-    if (!assignment) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (!assignment) return new ForbiddenError("Forbidden").toResponse();
   }
 
   const data: Record<string, unknown> = {};
@@ -89,15 +92,15 @@ export async function PATCH(
   });
 
   return NextResponse.json({ program: updated });
-}
+});
 
 // DELETE /api/programs/[id] — soft delete (admin only)
-export async function DELETE(
+export const DELETE = withApiErrors(async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await requireAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { id } = await params;
 
@@ -108,8 +111,8 @@ export async function DELETE(
       enrollments: { where: { status: "APPROVED", active: true }, select: { studentId: true } },
     },
   });
-  if (!program) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  if (program.deletedAt) return NextResponse.json({ error: "Already deleted." }, { status: 409 });
+  if (!program) return new NotFoundError("Not found").toResponse();
+  if (program.deletedAt) return new ConflictError("Already deleted.").toResponse();
 
   const updated = await prisma.program.update({
     where: { id },
@@ -136,4 +139,4 @@ export async function DELETE(
   ]).catch(() => {});
 
   return NextResponse.json({ program: updated });
-}
+});

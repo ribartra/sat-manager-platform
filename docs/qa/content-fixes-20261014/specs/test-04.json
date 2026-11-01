@@ -1,0 +1,172 @@
+[
+  {
+    "table": "Question",
+    "id": "cmsjrnulq00jrqmt1389yvmk2",
+    "field": "stimulus",
+    "before": "Johnson Presidential Library hosted a three-day civil rights summit to _____ the 50th anniversary of the signing of the Civil Rights Act of 1968. Additionally, the event celebrated the historical significance of the Voting Rights Act of 1965 and the Fair Housing Act of 1968, both of which were important legal steps toward ensuring equality for all Americans.",
+    "after": "In 2014, the Lyndon B. Johnson Presidential Library hosted a three-day civil rights summit to _____ the 50th anniversary of the signing of the Civil Rights Act of 1968. Additionally, the event celebrated the historical significance of the Voting Rights Act of 1965 and the Fair Housing Act of 1968, both of which were important legal steps toward ensuring equality for all Americans.",
+    "note": "T4 R&W M1 #2: other — stimulus truncated: lead-in \"In 2014, the Lyndon B.…\" dropped by parser",
+    "class": "other",
+    "evidence": "IngestPageArtifact p1 of files_to_load/MOCK EXAMS/TEST 4/READING AND WRITING/INNOVATOR TEST 4 RW MOD 1 &2 REV.pdf (Q2 passage)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnum200jvqmt109upui44",
+    "field": "stimulus",
+    "before": "Although the origins of the fire remain a matter of some debate, historians have arrived at a consensus on the factors that _____ the fire's spread, including the wooden makeup of the city's infrastructure and the dry winds that are especially severe in the Midwest.",
+    "after": "For years, the Great Chicago Fire of 1871 has been a widely discussed topic in academic circles. Although the origins of the fire remain a matter of some debate, historians have arrived at a consensus on the factors that _____ the fire's spread, including the wooden makeup of the city's infrastructure and the dry winds that are especially severe in the Midwest.",
+    "note": "T4 R&W M1 #4: other — stimulus truncated: lead-in \"For years, the Great Chicago Fire of 1871 has been a widely …\" dropped by parser",
+    "class": "other",
+    "evidence": "IngestPageArtifact p2 of files_to_load/MOCK EXAMS/TEST 4/READING AND WRITING/INNOVATOR TEST 4 RW MOD 1 &2 REV.pdf (Q4 passage)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnuqf00l8qmt1f61d19vt",
+    "field": "stimulus",
+    "before": "However, due to the extensive scale of wildfires, volatile organic compounds (VOCs) such as benzene and butene permeate the air and can carry a smell comparable to rubber or _______ many VOCs are carcinogens, experts recommend limited exposure to outside environments affected by wildfire smoke.",
+    "after": "It is a common misconception that wildfire smoke smells like a campfire. However, due to the extensive scale of wildfires, volatile organic compounds (VOCs) such as benzene and butene permeate the air and can carry a smell comparable to rubber or _______ many VOCs are carcinogens, experts recommend limited exposure to outside environments affected by wildfire smoke.",
+    "note": "T4 R&W M1 #16: other — stimulus truncated: lead-in \"It is a common misconception that wildfire smoke smells like…\" dropped by parser",
+    "class": "other",
+    "evidence": "IngestPageArtifact p12 of files_to_load/MOCK EXAMS/TEST 4/READING AND WRITING/INNOVATOR TEST 4 RW MOD 1 &2 REV.pdf (Q16 passage)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnuri00lgqmt1mxlaq4qz",
+    "field": "stimulus",
+    "before": "She was also one of the major fashion designers of her _____ hosted ground-breaking and influential fashion shows in the US and the UK. She had moved to America two years before her Titanic voyage and was crossing the Atlantic with some personal items when the ship sank.",
+    "after": "Lady Duff Gordon, known professionally as Lucile, was one of the few survivors of the sinking of the Titanic. She was also one of the major fashion designers of her _____ hosted ground-breaking and influential fashion shows in the US and the UK. She had moved to America two years before her Titanic voyage and was crossing the Atlantic with some personal items when the ship sank.",
+    "note": "T4 R&W M1 #20: other — stimulus truncated: lead-in \"Lady Duff Gordon, known professionally as Lucile, was one of…\" dropped by parser",
+    "class": "other",
+    "evidence": "IngestPageArtifact p14 of files_to_load/MOCK EXAMS/TEST 4/READING AND WRITING/INNOVATOR TEST 4 RW MOD 1 &2 REV.pdf (Q20 passage)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnusl00loqmt1s8ktk357",
+    "field": "stimulus",
+    "before": "John Fremont, fired for emancipating Missouri slaves without consulting the White House, ran as the nominee of the Radical Democracy Party, formed by Republicans who viewed Lincoln as excessively moderate. _____ the Democratic Party, which sought a negotiated truce with the South, nominated George McClellan, whom Lincoln fired for battlefield incompetence.",
+    "after": "Two generals fired by President Abraham Lincoln challenged him in the 1864 presidential election. John Fremont, fired for emancipating Missouri slaves without consulting the White House, ran as the nominee of the Radical Democracy Party, formed by Republicans who viewed Lincoln as excessively moderate. _____ the Democratic Party, which sought a negotiated truce with the South, nominated George McClellan, whom Lincoln fired for battlefield incompetence.",
+    "note": "T4 R&W M1 #24: other — stimulus truncated: lead-in \"Two generals fired by President Abraham Lincoln challenged h…\" dropped by parser",
+    "class": "other",
+    "evidence": "IngestPageArtifact p16 of files_to_load/MOCK EXAMS/TEST 4/READING AND WRITING/INNOVATOR TEST 4 RW MOD 1 &2 REV.pdf (Q24 passage)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnult00jsqmt11bclwxwi",
+    "field": "stimulus",
+    "before": "which promises the possibility of wealth and comfort, while acknowledging that such aspirations can also be illusory. The story centers around Morris Bober, a struggling grocer who lives in the midst of the post-World War II economic boom of the 1950s, which has brought prosperity to many of his fellow peers.",
+    "after": "The novel *The Assistant* by Bernard Malamud explores the _____ of the \"American Dream,\" which promises the possibility of wealth and comfort, while acknowledging that such aspirations can also be illusory. The story centers around Morris Bober, a struggling grocer who lives in the midst of the post-World War II economic boom of the 1950s, which has brought prosperity to many of his fellow peers.",
+    "note": "T4 R&W M2 #2: other — stimulus truncated: lead-in \"The novel *The Assistant* by Bernard Malamud explores the __…\" dropped by parser (blank _____ was in the lost part; item unanswerable)",
+    "class": "other",
+    "evidence": "IngestPageArtifact p20 of files_to_load/MOCK EXAMS/TEST 4/READING AND WRITING/INNOVATOR TEST 4 RW MOD 1 &2 REV.pdf (Q2 passage)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnumk00k0qmt197fv9xq2",
+    "field": "stimulus",
+    "before": "However, the validity of such distinctions is debatable given their basis in arbitrary 15-year divisions. For instance, \"Gen Z\" spans from 1997 to 2012. ++It remains questionable whether a 25-year-old today has more shared experiences with a 10-year-old than a 27-year-old.++ While some generalizations hold true, others may not be helpful or completely accurate.",
+    "after": "In contemporary cultural conversations in the United States, there has been increasing emphasis on generational differences. However, the validity of such distinctions is debatable given their basis in arbitrary 15-year divisions. For instance, \"Gen Z\" spans from 1997 to 2012. ++It remains questionable whether a 25-year-old today has more shared experiences with a 10-year-old than a 27-year-old.++ While some generalizations hold true, others may not be helpful or completely accurate.",
+    "note": "T4 R&W M2 #6: other — stimulus truncated: lead-in \"In contemporary cultural conversations in the United States,…\" dropped by parser",
+    "class": "other",
+    "evidence": "IngestPageArtifact p22 of files_to_load/MOCK EXAMS/TEST 4/READING AND WRITING/INNOVATOR TEST 4 RW MOD 1 &2 REV.pdf (Q6 passage)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnumx00k8qmt1qcvbkuhl",
+    "field": "stimulus",
+    "before": "You are not wrong who deem That my days have been a dream; Yet if hope has flown away In a night, or in a day, In a vision, or in none, Is it therefore the less gone? All that we see or seem Is but a dream within a dream.",
+    "after": "This text is adapted from Edgar Allan Poe's 1820 poem \"A Dream Within a Dream.\"\n\nYou are not wrong who deem That my days have been a dream; Yet if hope has flown away In a night, or in a day, In a vision, or in none, Is it therefore the less gone? All that we see or seem Is but a dream within a dream.",
+    "note": "T4 R&W M2 #8: other — stimulus truncated: lead-in \"This text is adapted from Edgar Allan Poe's 1820 poem \"A Dre…\" dropped by parser",
+    "class": "other",
+    "evidence": "IngestPageArtifact p23 of files_to_load/MOCK EXAMS/TEST 4/READING AND WRITING/INNOVATOR TEST 4 RW MOD 1 &2 REV.pdf (Q8 passage)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnurb00lfqmt10dkeh6z4",
+    "field": "stimulus",
+    "before": "Such as _____ massive stones erected around 2500 BCE—is one of the most famous Neolithic monuments in the world, though it was constructed on a circular site made of timber and pounded earth that had been built about 500 years earlier.",
+    "after": "As tempting as it can be to trace similarities between novelist Haruki Murakami and some of his candid and emotional first-person narrators, the temptation should be _____ part because Murakami himself has warned readers that his own life is not meant to be confused with the lives of his most famous characters, such as the narrator of *Norwegian Wood*.",
+    "note": "T4 R&W M2 #19: bleed — stimulus is neighbour #18 Stonehenge passage with \"Such as\" (from #17 option D) prefixed; options/answer belong to the source passage for Q19",
+    "class": "bleed",
+    "evidence": "IngestPageArtifact p32 of files_to_load/MOCK EXAMS/TEST 4/READING AND WRITING/INNOVATOR TEST 4 RW MOD 1 &2 REV.pdf, Q19 block; page image p32 checked"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnurx00ljqmt14zfpdbq5",
+    "field": "stimulus",
+    "before": "The aquatic mound of pollution known as the Great Pacific Garbage Patch, for instance, serves as an unlikely _____ that created the mess of plastics have drawn in creatures who feed off of the debris.",
+    "after": "Travel to countries such as Poland, Peru, and the Philippines _____ the painter's landscape works, granting each of his pieces local specificity and his oeuvre with a sense of cosmopolitanism.",
+    "note": "T4 R&W M2 #21: bleed — stimulus is neighbour #20 Garbage Patch passage (tail); options/answer belong to the source passage for Q21",
+    "class": "bleed",
+    "evidence": "IngestPageArtifact p33 of files_to_load/MOCK EXAMS/TEST 4/READING AND WRITING/INNOVATOR TEST 4 RW MOD 1 &2 REV.pdf, Q21 block; page image p33 checked"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnush00lnqmt1h59b2xff",
+    "field": "stimulus",
+    "before": "The 1840s witnessed significant shifts in fashion, marked by notable features including low shoulder lines, pointed waistlines, and bell-shaped skirts that progressively grew larger throughout the decade. To complement such attire, _____ often included paisley or crochet shawls, linen caps, and the now-obsolete bonnets.",
+    "after": "Architects have long considered the Wilson Tower to be the gold standard of skyscraper design, and its influence is evident in skylines around the world. _____ according to a survey of the Global Architects Guild in 2019, the Commercial Complex of Taipei has become increasingly influential on a new generation and may overtake the Wilson as the world's most iconic building by 2025.",
+    "note": "T4 R&W M2 #23: bleed — stimulus is neighbour #22 1840s fashion passage; options/answer belong to the source passage for Q23",
+    "class": "bleed",
+    "evidence": "IngestPageArtifact p34 of files_to_load/MOCK EXAMS/TEST 4/READING AND WRITING/INNOVATOR TEST 4 RW MOD 1 &2 REV.pdf, Q23 block; page image p34 checked"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnusy00luqmt1cbphanc8",
+    "field": "stimulus",
+    "before": "Architects have long considered the Wilson Tower to be the gold standard of skyscraper design, and its influence is evident in skylines around the world. _____ according to a survey of the Global Architects Guild in 2019, the Commercial Complex of Taipei has become increasingly influential on a new generation and may overtake the Wilson as the world's most iconic building by 2025.",
+    "after": "In locations where plants do not have access to plentiful sunlight, they evolved other mechanisms for sustaining themselves. Some of these plants no longer depend on chlorophyll, the molecule that creates a green color. _____ according to one hypothesis, the white and red color of a plant indigenous to a particular Northwest forest is a sign that it was once untouched by sunlight.",
+    "note": "T4 R&W M2 #25: bleed — stimulus is neighbour #23 Wilson Tower passage (chain shift); options/answer belong to the source passage for Q25",
+    "class": "bleed",
+    "evidence": "IngestPageArtifact p35 of files_to_load/MOCK EXAMS/TEST 4/READING AND WRITING/INNOVATOR TEST 4 RW MOD 1 &2 REV.pdf, Q25 block; page image p35 checked (p35 rendered: plants/chlorophyll passage with Subsequently/Thus/Nevertheless/Besides)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnut200lzqmt1vaqa2x9z",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes: - The origin of the Maya civilization is generally dated from 1500 BCE and was found around the Yucatán Peninsula of Mexico. - The Maya used a vigesimal system for calculations, which means that their number system used a base system of 20, rather than 10 like the current Hindu-Arabic number system. - The Maya used their number system to track current and future calendar events, as well as historical timelines. - Only three symbols were used in the Maya number system: a dot, a bar, and a shell to represent one, five, and zero, respectively. - The Maya produced accurate astronomical observations and were able to measure the length of the solar year, as well as the length of the lunar month.",
+    "after": "While researching a topic, a student has taken the following notes:\n- The origin of the Maya civilization is generally dated from 1500 BCE and was found around the Yucatán Peninsula of Mexico.\n- The Maya used a vigesimal system for calculations, which means that their number system used a base system of 20, rather than 10 like the current Hindu-Arabic number system.\n- The Maya used their number system to track current and future calendar events, as well as historical timelines.\n- Only three symbols were used in the Maya number system: a dot, a bar, and a shell to represent one, five, and zero, respectively.\n- The Maya produced accurate astronomical observations and were able to measure the length of the solar year, as well as the length of the lunar month.",
+    "note": "T4 R&W M1 #26: other — notes bullets flattened into one line; restore list line breaks (text identical)",
+    "class": "other",
+    "evidence": "IngestPageArtifact p18 of files_to_load/MOCK EXAMS/TEST 4/READING AND WRITING/INNOVATOR TEST 4 RW MOD 1 &2 REV.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnuta00m9qmt1wtbg0yst",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes: - Born in Spain in 1908, Remedios Varo was a Spanish-born surrealist painter who lived in Mexico for most of her career until her death in 1963. - Varo cited her father as an early influence for her work, as he shared texts about science, mysticism, and philosophy with her as a child. He also offered her technical drawings to copy. - As a member of the Surrealist movement, Varo participated in the International Surrealist Exhibitions in Paris and Amsterdam in 1938. - Varo's art often combined scientific imagery with fantastical elements, reflecting her fascination with both the scientific world and the mystical world. - In 1971, a retrospective exhibition at the Museum of Modern Art in Mexico City drew the largest audiences in the museum's history. - In 2019, Varo's 1955 painting Sympathy (The Madness of the Cat) sold for $3.1 million at an auction in New York City.",
+    "after": "While researching a topic, a student has taken the following notes:\n- Born in Spain in 1908, Remedios Varo was a Spanish-born surrealist painter who lived in Mexico for most of her career until her death in 1963.\n- Varo cited her father as an early influence for her work, as he shared texts about science, mysticism, and philosophy with her as a child. He also offered her technical drawings to copy.\n- As a member of the Surrealist movement, Varo participated in the International Surrealist Exhibitions in Paris and Amsterdam in 1938.\n- Varo's art often combined scientific imagery with fantastical elements, reflecting her fascination with both the scientific world and the mystical world.\n- In 1971, a retrospective exhibition at the Museum of Modern Art in Mexico City drew the largest audiences in the museum's history.\n- In 2019, Varo's 1955 painting Sympathy (The Madness of the Cat) sold for $3.1 million at an auction in New York City.",
+    "note": "T4 R&W M1 #27: other — notes bullets flattened into one line; restore list line breaks (text identical)",
+    "class": "other",
+    "evidence": "IngestPageArtifact p19 of files_to_load/MOCK EXAMS/TEST 4/READING AND WRITING/INNOVATOR TEST 4 RW MOD 1 &2 REV.pdf"
+  },
+  {
+    "table": "Question",
+    "id": "cmsox4p4h0001d7ppk2bxq18m",
+    "field": "stimulus",
+    "before": "A 2022 study on food preferences examined the impact of visual appeal on taste perception. The study revealed that the more visually appealing a dish, the higher the likelihood of it being enjoyed. \\_\\_\\_\\_\\_ the influence of visual appeal on taste perception was less than the impact of a person's hunger level.",
+    "after": "A 2022 study on food preferences examined the impact of visual appeal on taste perception. The study revealed that the more visually appealing a dish, the higher the likelihood of it being enjoyed. _____ the influence of visual appeal on taste perception was less than the impact of a person's hunger level.",
+    "note": "T4 R&W M2 #24: other — escaped blank \\_\\_\\_\\_\\_ renders literally; use _____",
+    "class": "other",
+    "evidence": "IngestPageArtifact p35 of files_to_load/MOCK EXAMS/TEST 4/READING AND WRITING/INNOVATOR TEST 4 RW MOD 1 &2 REV.pdf shows \"_____\""
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnv3r00q5qmt1jckooeke",
+    "field": "stem",
+    "before": "The table shows some values of the linear function $f$ — for $a = 3, 6, 9, 12$ the values of $f(a)$ are $-2, -1, 0, 1$ respectively. Which of the following defines $f$?",
+    "after": "The table shows some values of the linear function $f$.\n\n| $a$ | $3$ | $6$ | $9$ | $12$ |\n| --- | --- | --- | --- | --- |\n| $f(a)$ | $-2$ | $-1$ | $0$ | $1$ |\n\nWhich of the following defines $f$?",
+    "note": "T4 Math M2 #2: flattened_table — table values inlined as prose (no table, no image); rebuild 2-row table",
+    "class": "flattened_table",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 4/MATHS/INNOVATOR TEST 4 Math MOD 1&2.pdf p8 (rendered; OCR has [tbl-0.html] placeholder): a=3,6,9,12 / f(a)=-2,-1,0,1"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnv9l00rhqmt1x67ft34i",
+    "field": "stem",
+    "before": "The table shows the distribution of test scores in Mrs. Keaton's English class (Vocabulary Test Scores): a test score of $100$ has $1$ student, $90$ has $5$ students, $80$ has $10$ students, $70$ has $8$ students, and $60$ has $2$ students. Which of the following sets of test scores, if added, would change the standard deviation of the distribution the least?",
+    "after": "The table shows the distribution of test scores in Mrs. Keaton's English class.\n\nVocabulary Test Scores\n\n| Test Score | Number of Students |\n| --- | --- |\n| $100$ | $1$ |\n| $90$ | $5$ |\n| $80$ | $10$ |\n| $70$ | $8$ |\n| $60$ | $2$ |\n\nWhich of the following sets of test scores, if added, would change the standard deviation of the distribution the least?",
+    "note": "T4 Math M2 #16: flattened_table — \"Vocabulary Test Scores\" table inlined as prose (no table, no image); rebuild table",
+    "class": "flattened_table",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 4/MATHS/INNOVATOR TEST 4 Math MOD 1&2.pdf p14 (rendered; OCR has [tbl-0.html] placeholder): 100→1, 90→5, 80→10, 70→8, 60→2"
+  }
+]

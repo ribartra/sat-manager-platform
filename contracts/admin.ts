@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod-config";
 
 export const mistralKeySchema = z.object({
   apiKey: z.string().trim().min(20, "API key is too short."),

@@ -1,435 +1,222 @@
-import { PageShell, PracticeAreaTabs } from "@/components/sat";
+import { PageHeader, PageShell } from "@/components/sat";
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import { ViewSummaryCard, type ViewSummaryChip } from "@/components/sat/view-summary-card";
+import { Scores } from "@/components/sat/test-scores";
+import { Pct } from "@/components/sat/work-status";
 import prisma from "@/lib/prisma";
-import Link from "next/link";
-import { formatDate } from "@/lib/utils";
-import { Card, CardBody } from "@/components/ui/card";
-import { AlertTriangle, UserPlus } from "lucide-react";
-import { UnlockRequestActions } from "./unlock-request-actions-client";
+import { cn, formatDate, relativeDay } from "@/lib/utils";
+import { BookOpen, ClipboardList, Clock, GraduationCap, Users } from "lucide-react";
 import { auth } from "@/lib/auth";
-import { getFeatureSetting } from "@/lib/app-settings";
 import { refreshAssignmentStates } from "@/lib/assignments";
-import { studentAccessWhereFor, teacherProgramEnrollmentScope } from "@/lib/program-scope";
-import { academicTopicWhere } from "@/lib/taxonomy";
-import { difficultyOptions } from "@/lib/domain-meta";
-import { TeacherStudentsTable, type TeacherStudentRow } from "./students-table-client";
-import { activeAreaTab, practiceAreaFromTab } from "@/lib/practice-area";
+import { loadAttemptHistory } from "@/lib/attempt-history";
+import { historyHref } from "@/lib/history-params";
+import { loadPending, pendingHref, type PendingStatus } from "@/lib/pending";
+import { currentContentScope } from "@/lib/content-scope";
+import { studentAccessWhereFor, teacherProgramIds } from "@/lib/program-scope";
+import { resolvePracticeArea } from "@/lib/practice-area";
+import { isInactive, loadStudentOverviews, type StudentOverview } from "@/lib/teacher-overview";
+import { ACTIVE_SOURCE_WHERE } from "@/lib/content-source";
 
-interface PageProps {
-  searchParams: Promise<{
-    q?: string;
-    area?: string;
-    group?: string;
-    topic?: string;
-    difficulty?: string;
-    from?: string;
-    to?: string;
-    incorporatedFrom?: string;
-    incorporatedTo?: string;
-  }>;
-}
+const DAY = 86_400_000;
+/** Latest items listed in a box (students, Tests, tries). */
+const LIST_SIZE = 4;
 
-function parseDateParam(value?: string, endOfDay = false) {
-  if (!value) return undefined;
-  const date = new Date(`${value}T${endOfDay ? "23:59:59.999" : "00:00:00.000"}`);
-  return Number.isNaN(date.getTime()) ? undefined : date;
-}
-
-export default async function TeacherDashboard({ searchParams }: PageProps) {
+/**
+ * Teacher Home (one view, no section tabs — SAT-036/037): a summary, not a place to manage students.
+ * One tall box per view, in the menu's order (Students, Tests, Practice, Teachers for the master teacher, History) with its
+ * main numbers (each opens the view with that filter), its latest items and the way in. Notices, search, Invite and the students table live on Students.
+ */
+export default async function TeacherDashboard() {
   const session = await auth();
   const now = new Date();
   await refreshAssignmentStates(now);
-  const programScope =
-    session?.user.role === "TEACHER"
-      ? teacherProgramEnrollmentScope(session.user.id, now)
-      : undefined;
-  const params = await searchParams;
-  const search = params.q?.trim() ?? "";
-  const area = activeAreaTab(params.area, "math");
-  const practiceArea = practiceAreaFromTab(area);
-  const teacherGroupManagementEnabled =
-    session?.user.role === "ADMIN" || (await getFeatureSetting("TEACHER_GROUP_MANAGEMENT"));
-  const groupId = teacherGroupManagementEnabled ? params.group || "" : "";
-  const topicId = params.topic || "";
-  const difficulty = params.difficulty || "";
-  const fromDate = parseDateParam(params.incorporatedFrom ?? params.from);
-  const toDate = parseDateParam(params.incorporatedTo ?? params.to, true);
-  const practiceSetFilter = {
-    ...(topicId ? { topicId } : {}),
-    ...(difficulty ? { difficulty } : {}),
-    ...(practiceArea ? { topic: { domain: { practiceArea } } } : {}),
-  };
-  const hasAttemptFilter = Boolean(topicId || difficulty || fromDate || toDate);
+  const firstName = (session?.user.name ?? "teacher").split(" ")[0];
+  const studentScope = session ? studentAccessWhereFor(session.user, now) : { role: "STUDENT", active: true, validationStatus: "APPROVED" };
+  const master = session?.user.role === "TEACHER"
+    ? Boolean((await prisma.user.findUnique({ where: { id: session.user.id }, select: { canManageTeachers: true } }))?.canManageTeachers)
+    : false;
+  // Admin inherits every teacher view; its teachers are managed in Admin › Teachers.
+  const isAdmin = session?.user.role === "ADMIN";
+  const teachersBase = isAdmin ? "/admin/teachers" : "/teacher/teachers";
+  const contentScope = await currentContentScope();
+  const inviteWhere = { role: "STUDENT", usedAt: null, revokedAt: null, expiresAt: { gt: now }, ...(session?.user.role === "TEACHER" ? { invitedById: session.user.id } : {}) };
 
-  const studentWhere = {
-    ...(session ? studentAccessWhereFor(session.user, now) : { role: "STUDENT", active: true, validationStatus: "APPROVED" }),
-    ...(search
-      ? {
-          OR: [
-            { name: { contains: search } },
-            { email: { contains: search } },
-          ],
-        }
-      : {}),
-    ...(teacherGroupManagementEnabled && groupId ? { groups: { some: { groupId } } } : {}),
-    ...(fromDate || toDate
-      ? {
-          startDate: {
-            ...(fromDate ? { gte: fromDate } : {}),
-            ...(toDate ? { lte: toDate } : {}),
-          },
-        }
-      : {}),
-  };
-
-  const studentUnlockRequestsEnabled = await getFeatureSetting("STUDENT_UNLOCK_REQUESTS");
-
-  const [students, groups, topics] = await Promise.all([
-    prisma.user.findMany({
-      where: studentWhere,
-      include: {
-        groups: { include: { group: true } },
-        programEnrollments: { include: { program: true }, where: { active: true, status: "APPROVED" } },
-        attempts: {
-          where: {
-            status: "SUBMITTED",
-            ...(area === "mocks" ? { id: "__no_practice_attempt__" } : {}),
-            ...(area !== "mocks" && (topicId || difficulty || practiceArea)
-              ? {
-                  assignment: {
-                    practiceSet: practiceSetFilter,
-                  },
-                }
-              : {}),
-          },
-          orderBy: { submittedAt: "desc" },
-          take: 20,
-          include: {
-            answers: true,
-            assignment: { include: { practiceSet: { include: { topic: true } } } },
-          },
-        },
-        assignments: {
-          where: {
-            status: { in: ["PENDING", "OVERDUE"] },
-            ...(area === "mocks" ? { id: "__no_practice_assignment__" } : {}),
-            ...(area !== "mocks" && practiceArea ? { practiceSet: { topic: { domain: { practiceArea } } } } : {}),
-          },
-        },
-        fullTestAttempts: {
-          where: {
-            status: "SUBMITTED",
-            ...(area === "mocks" ? {} : { id: "__no_full_test_attempt__" }),
-          },
-          orderBy: { submittedAt: "desc" },
-          take: 20,
-          include: { answers: true, test: { select: { name: true } } },
-        },
-        fullTestAssignments: {
-          where: {
-            status: { in: ["PENDING", "OVERDUE"] },
-            ...(area === "mocks" ? {} : { id: "__no_full_test_assignment__" }),
-          },
-        },
-      },
-      orderBy: { name: "asc" },
-    }),
-    teacherGroupManagementEnabled ? prisma.group.findMany({ orderBy: { name: "asc" } }) : Promise.resolve([]),
-    prisma.topic.findMany({
-      where: {
-        AND: [academicTopicWhere, ...(practiceArea ? [{ domain: { practiceArea } }] : [])],
-      },
-      include: { domain: { include: { section: true } } },
-      orderBy: { name: "asc" },
-    }),
+  const [students, invitations, testCount, sets, testAssignments] = await Promise.all([
+    prisma.user.findMany({ where: studentScope, select: { id: true }, orderBy: { name: "asc" } }),
+    prisma.inviteToken.count({ where: inviteWhere }).catch(() => 0),
+    prisma.fullPracticeTest.count({ where: { ...contentScope, status: "PUBLISHED" } }),
+    prisma.practiceSet.findMany({ where: { ...contentScope, ...ACTIVE_SOURCE_WHERE, status: "PUBLISHED" }, select: { topic: { select: { domain: { select: { practiceArea: true } } } } } }),
+    // Test assignments of the teacher's students (same counting rule as the Tests page).
+    prisma.fullPracticeTestAssignment.findMany({ where: { student: studentScope }, select: { status: true, dueDate: true } }),
   ]);
-
-  const [overdueAssignments, overdueFullTestAssignments, unlockRequests] = await Promise.all([
-    prisma.assignment.findMany({
-      where: {
-        dueDate: { lt: new Date() },
-        status: { in: ["PENDING", "IN_PROGRESS"] },
-        ...(area === "mocks" ? { id: "__no_practice_overdue__" } : {}),
-        ...(area !== "mocks" && practiceArea ? { practiceSet: { topic: { domain: { practiceArea } } } } : {}),
-        student: {
-          active: true,
-          validationStatus: "APPROVED",
-          ...(programScope ? { programEnrollments: programScope } : {}),
-        },
-      },
-      include: { student: true, practiceSet: true },
-      take: 5,
-      orderBy: { dueDate: "asc" },
-    }),
-    prisma.fullPracticeTestAssignment.findMany({
-      where: {
-        status: { in: ["PENDING", "IN_PROGRESS"] },
-        dueDate: { lt: new Date() },
-        ...(area === "mocks" ? {} : { id: "__no_full_test_overdue__" }),
-        student: {
-          active: true,
-          validationStatus: "APPROVED",
-          ...(programScope ? { programEnrollments: programScope } : {}),
-        },
-      },
-      include: { student: true, test: true },
-      take: 5,
-      orderBy: { dueDate: "asc" },
-    }),
-    studentUnlockRequestsEnabled
-      ? prisma.unlockRequest.findMany({
-          where: {
-            status: "PENDING",
-            ...(area === "mocks" ? { id: "__no_unlock_request__" } : {}),
-            assignment: {
-              ...(practiceArea ? { practiceSet: { topic: { domain: { practiceArea } } } } : {}),
-              student: {
-                active: true,
-                validationStatus: "APPROVED",
-                ...(programScope ? { programEnrollments: programScope } : {}),
-              },
-            },
-          },
-          include: { assignment: { include: { student: true, practiceSet: true } } },
-          orderBy: { createdAt: "desc" },
-          take: 5,
-        })
-      : Promise.resolve([]),
+  const studentIds = students.map((s) => s.id);
+  const [overviews, history, pending, teachers] = await Promise.all([
+    loadStudentOverviews(studentIds, now),
+    // Tries finished in the last 7 days (counted tries only, as History by default).
+    loadAttemptHistory(studentIds, { status: "completed", from: new Date(now.getTime() - 7 * DAY) }),
+    // Assigned and not finished (the Pending list): split by practice / Test and status.
+    loadPending(studentIds),
+    // Teachers box: the master teacher (their teachers' invitations) and the admin (every invitation).
+    (master || isAdmin) && session
+      ? Promise.all([
+          prisma.user.count({ where: { role: "TEACHER", active: true } }),
+          prisma.user.count({ where: { role: "TEACHER", active: false } }),
+          isAdmin
+            ? prisma.inviteToken.count({ where: { role: "TEACHER", usedAt: null, revokedAt: null, expiresAt: { gt: now } } })
+            : teacherProgramIds(session.user).then((programIds) =>
+                prisma.inviteToken.count({ where: { role: "TEACHER", usedAt: null, revokedAt: null, expiresAt: { gt: now }, OR: [{ invitedById: session.user.id }, { programId: { in: programIds } }] } }),
+              ),
+        ])
+      : Promise.resolve(null),
   ]);
+  const rows = students.map((s) => overviews.get(s.id)).filter((o): o is StudentOverview => Boolean(o));
 
-  const fiveDaysAgo = new Date();
-  fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
-  const inactiveStudents = students.filter((s) => {
-    const areaActivity = area === "mocks"
-      ? s.fullTestAttempts.map((attempt) => attempt.submittedAt).filter((value): value is Date => Boolean(value))
-      : s.attempts.map((attempt) => attempt.submittedAt).filter((value): value is Date => Boolean(value));
-    const lastActiveAt = areaActivity.sort((a, b) => b.getTime() - a.getTime())[0];
-    if (!lastActiveAt) return true;
-    return lastActiveAt < fiveDaysAgo;
-  });
-  const performanceBuckets = new Map<string, { label: string; correct: number; total: number; attempts: number }>();
-  for (const student of students) {
-    if (area === "mocks") {
-      for (const attempt of student.fullTestAttempts) {
-        const key = `full-test:${attempt.testId}`;
-        const bucket = performanceBuckets.get(key) ?? {
-          label: `${attempt.test.name} · Full Practice Test`,
-          correct: 0,
-          total: 0,
-          attempts: 0,
-        };
-        bucket.correct += attempt.answers.filter((answer) => answer.isCorrect).length;
-        bucket.total += attempt.answers.length;
-        bucket.attempts += 1;
-        performanceBuckets.set(key, bucket);
-      }
-      continue;
-    }
-    for (const attempt of student.attempts) {
-      const practiceSet = attempt.assignment?.practiceSet;
-      if (!practiceSet) continue;
-      const key = `${practiceSet.topicId}:${practiceSet.difficulty}`;
-      const bucket =
-        performanceBuckets.get(key) ?? {
-          label: `${practiceSet.topic.name} · ${practiceSet.difficulty}`,
-          correct: 0,
-          total: 0,
-          attempts: 0,
-        };
-      bucket.correct += attempt.answers.filter((answer) => answer.isCorrect).length;
-      bucket.total += attempt.answers.length;
-      bucket.attempts += 1;
-      performanceBuckets.set(key, bucket);
-    }
-  }
-  const lowPerformance = Array.from(performanceBuckets.values())
-    .filter((bucket) => bucket.total > 0)
-    .map((bucket) => ({ ...bucket, score: Math.round((bucket.correct / bucket.total) * 100) }))
-    .sort((a, b) => a.score - b.score)
-    .slice(0, 3);
+  const inactive = rows.filter((s) => isInactive(s.lastActiveAt, now));
+  const activeThisWeek = rows.filter((s) => !isInactive(s.lastActiveAt, now, 7)).length;
+  const withTests = rows.filter((s) => s.tests.pending.length > 0).length;
+  const recentStudents = [...rows].sort((a, b) => (b.lastActiveAt?.getTime() ?? 0) - (a.lastActiveAt?.getTime() ?? 0)).slice(0, LIST_SIZE);
+  const testsCompleted = testAssignments.filter((a) => a.status === "COMPLETED").length;
+  const pendingCount = (kind: "practice" | "test", status: PendingStatus) => pending.filter((p) => p.kind === kind && p.status === status).length;
+  const setsIn = (area: string) => sets.filter((s) => resolvePracticeArea(s.topic.domain) === area).length;
+  const latestTests = rows
+    .flatMap((s) => (s.tests.latest?.submittedAt ? [{ ...s.tests.latest, studentId: s.id, student: s.name, submittedAt: s.tests.latest.submittedAt }] : []))
+    .sort((a, b) => b.submittedAt.getTime() - a.submittedAt.getTime())
+    .slice(0, LIST_SIZE);
+  const practiceTries = history.filter((h) => h.kind === "practice").length;
+  const latestTries = [...history].sort((a, b) => b.at.getTime() - a.at.getTime()).slice(0, LIST_SIZE);
+  const plural = (n: number, word: string) => `${word}${n === 1 ? "" : "s"}`;
+  const tone = (n: number, t: "success" | "warning" | "danger" | "info"): ViewSummaryChip["tone"] => (n ? t : "default");
+  const statusChips = (kind: "practice" | "test", type: "practice" | "tests"): ViewSummaryChip[] => [
+    { label: "Not started", value: pendingCount(kind, "PENDING"), tone: tone(pendingCount(kind, "PENDING"), "info"), href: pendingHref("/teacher/pending", { type, status: "PENDING" }) },
+    { label: "In progress", value: pendingCount(kind, "IN_PROGRESS"), tone: tone(pendingCount(kind, "IN_PROGRESS"), "warning"), href: pendingHref("/teacher/pending", { type, status: "IN_PROGRESS" }) },
+    { label: "Overdue", value: pendingCount(kind, "OVERDUE"), tone: tone(pendingCount(kind, "OVERDUE"), "danger"), href: pendingHref("/teacher/pending", { type, status: "OVERDUE" }) },
+  ];
 
   return (
-    <PageShell width="wide" density="compact" className="space-y-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-semibold text-gray-900">Students</h1>
-        <Link
-          href="/teacher/students/invite"
-          className="flex items-center gap-1.5 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-        >
-          <UserPlus size={14} /> Invite Student
-        </Link>
+    <PageShell className="space-y-4">
+      {/* The breadcrumb row keeps the title at the same height as on every other page. */}
+      <div>
+        <Breadcrumbs items={[{ label: "Home" }]} />
+        <PageHeader
+          title={`Hello, ${firstName}!`}
+          description={
+            <>
+              {rows.length} {plural(rows.length, "student")} · Today is {now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}.
+            </>
+          }
+        />
       </div>
 
-      <PracticeAreaTabs
-        basePath="/teacher"
-        active={area}
-        preserve={{ q: search, group: groupId, topic: topicId, difficulty, incorporatedFrom: params.incorporatedFrom ?? params.from, incorporatedTo: params.incorporatedTo ?? params.to }}
-      />
-
-      <Card as="form" padding="md" className="grid gap-3 md:grid-cols-6">
-        <input type="hidden" name="area" value={area} />
-        <label className="text-xs font-medium text-gray-600 md:col-span-2">
-          Search
-          <input
-            name="q"
-            defaultValue={search}
-            placeholder="Name or email"
-            className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900"
+      {/* One tall box per view: its main numbers and the way in. */}
+      <div className={cn("grid grid-cols-1 gap-3 sm:grid-cols-2 [&>*]:min-w-0", teachers ? "lg:grid-cols-5" : "lg:grid-cols-4")}>
+        <ViewSummaryCard
+          title="Students"
+          icon={<Users size={16} />}
+          href="/teacher/students"
+          value={rows.length}
+          valueLabel={plural(rows.length, "student")}
+          chips={[
+            { label: "Active this week", value: activeThisWeek, tone: tone(activeThisWeek, "success"), href: "/teacher/students?show=active" },
+            { label: "Inactive for 5+ days", value: inactive.length, tone: tone(inactive.length, "warning"), href: "/teacher/students?show=inactive" },
+            { label: "With tests to take", value: withTests, tone: tone(withTests, "info"), href: "/teacher/students?show=pending-tests" },
+            { label: "Invitations", value: invitations, tone: tone(invitations, "info"), href: "/teacher/students#invitations" },
+          ]}
+          list={{
+            title: "Recently active",
+            empty: "No students yet.",
+            items: recentStudents.map((s) => ({
+              key: s.id,
+              label: s.name,
+              detail: s.lastActiveAt ? `Active ${relativeDay(s.lastActiveAt, now)}${isInactive(s.lastActiveAt, now) ? " · ⚠ inactive 5+ days" : ""}` : "Never active",
+              href: `/teacher/students/${s.id}`,
+            })),
+          }}
+          action="Open Students →"
+        />
+        <ViewSummaryCard
+          title="Tests"
+          icon={<ClipboardList size={16} />}
+          href="/teacher/tests"
+          accent="tests"
+          value={testCount}
+          valueLabel={`${plural(testCount, "test")} published`}
+          chips={[
+            ...statusChips("test", "tests"),
+            { label: "Completed", value: testsCompleted, tone: tone(testsCompleted, "success"), href: historyHref({ type: "tests" }) },
+          ]}
+          list={{
+            title: "Latest finished",
+            empty: "No test finished yet.",
+            items: latestTests.map((t) => ({
+              key: t.id,
+              label: `${t.student} · ${t.label}`,
+              detail: (
+                <>
+                  <Scores rw={t.rw} math={t.math} /> · {formatDate(t.submittedAt)}
+                </>
+              ),
+              href: `/teacher/students/${t.studentId}/tests/${t.id}`,
+            })),
+          }}
+          action="Open Tests →"
+        />
+        <ViewSummaryCard
+          title="Practice"
+          icon={<BookOpen size={16} />}
+          href="/teacher/practice-sets"
+          value={sets.length}
+          valueLabel={`practice ${plural(sets.length, "set")} published`}
+          chips={[
+            { label: "Math", value: setsIn("MATH"), color: "var(--sat-area-math)", href: "/teacher/practice-sets?area=math" },
+            { label: "Reading", value: setsIn("READING"), color: "var(--sat-area-reading)", href: "/teacher/practice-sets?area=reading" },
+            { label: "Writing", value: setsIn("WRITING"), color: "var(--sat-area-writing)", href: "/teacher/practice-sets?area=writing" },
+            ...statusChips("practice", "practice"),
+            { label: "Tries in the last 7 days", value: practiceTries, tone: tone(practiceTries, "success"), href: historyHref({ type: "practice" }, { period: "week" }) },
+          ]}
+          action="Open Practice →"
+        />
+        {teachers ? (
+          <ViewSummaryCard
+            title="Teachers"
+            icon={<GraduationCap size={16} />}
+            href={teachersBase}
+            value={teachers[0] + teachers[1]}
+            valueLabel={plural(teachers[0] + teachers[1], "teacher")}
+            chips={[
+              { label: "Active", value: teachers[0], tone: tone(teachers[0], "success"), href: `${teachersBase}?access=enabled` },
+              { label: "Deactivated", value: teachers[1], href: `${teachersBase}?access=disabled` },
+              { label: "Invitations", value: teachers[2], tone: tone(teachers[2], "info"), href: isAdmin ? teachersBase : "/teacher/teachers#invitations" },
+            ]}
+            action="Open Teachers →"
           />
-        </label>
-        {teacherGroupManagementEnabled && (
-          <label className="text-xs font-medium text-gray-600">
-            Group
-            <select name="group" defaultValue={groupId} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900">
-              <option value="">All</option>
-              {groups.map((group) => (
-                <option key={group.id} value={group.id}>
-                  {group.name}
-                </option>
-              ))}
-            </select>
-          </label>
-        )}
-        {area !== "mocks" && (
-          <>
-            <label className="text-xs font-medium text-gray-600">
-              Topic
-              <select name="topic" defaultValue={topicId} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900">
-                <option value="">All</option>
-                {topics.map((topic) => (
-                  <option key={topic.id} value={topic.id}>{topic.name}</option>
-                ))}
-              </select>
-            </label>
-            <label className="text-xs font-medium text-gray-600">
-              Difficulty
-              <select name="difficulty" defaultValue={difficulty} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900">
-                <option value="">All</option>
-                {difficultyOptions().map((opt) => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
-            </label>
-          </>
-        )}
-        <label className="text-xs font-medium text-gray-600">
-          Incorporated from
-          <input name="incorporatedFrom" type="date" defaultValue={params.incorporatedFrom || params.from || ""} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900" />
-        </label>
-        <label className="text-xs font-medium text-gray-600">
-          Incorporated to
-          <input name="incorporatedTo" type="date" defaultValue={params.incorporatedTo || params.to || ""} className="mt-1 w-full rounded-md border border-gray-300 px-2 py-2 text-sm text-gray-900" />
-        </label>
-        <div className="flex items-center gap-2 md:col-span-6">
-          <button type="submit" className="rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700">
-            Apply filters
-          </button>
-          <Link href={`/teacher?area=${area}`} className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-            Clear
-          </Link>
-        </div>
-      </Card>
-
-      {/* Alerts */}
-      {(inactiveStudents.length > 0 || overdueAssignments.length > 0 || overdueFullTestAssignments.length > 0 || unlockRequests.length > 0) && (
-        <Card variant="warning" padding="sm" className="mb-5">
-          <div className="flex items-center gap-2">
-            <AlertTriangle size={16} className="shrink-0 text-amber-600" />
-            <div className="text-sm text-amber-800">
-              {inactiveStudents.length > 0 && <p><strong>{inactiveStudents.length} student{inactiveStudents.length > 1 ? "s" : ""}</strong> haven&apos;t practiced in 5+ days: {inactiveStudents.map((s) => s.name).join(", ")}</p>}
-              {(overdueAssignments.length > 0 || overdueFullTestAssignments.length > 0) && <p><strong>{overdueAssignments.length + overdueFullTestAssignments.length}</strong> overdue assignment{overdueAssignments.length + overdueFullTestAssignments.length > 1 ? "s" : ""} need attention.</p>}
-              {unlockRequests.length > 0 && <p><strong>{unlockRequests.length}</strong> pending unlock request{unlockRequests.length > 1 ? "s" : ""}.</p>}
-            </div>
-          </div>
-        </Card>
-      )}
-
-      {lowPerformance.length > 0 && (
-        <div className="mb-5 grid gap-3 md:grid-cols-3">
-          {lowPerformance.map((bucket) => (
-            <Card key={bucket.label} variant="danger" padding="sm">
-              <p className="text-xs font-medium text-red-700">Low performance</p>
-              <p className="mt-1 truncate text-sm font-semibold text-gray-900">{bucket.label}</p>
-              <p className="mt-1 text-xs text-gray-600">
-                {bucket.score}% avg · {bucket.attempts} attempt{bucket.attempts !== 1 ? "s" : ""}
-              </p>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      {/* Students table */}
-      {unlockRequests.length > 0 && (
-        <Card className="mb-6">
-          <CardBody className="p-4">
-            <h2 className="mb-3 text-sm font-semibold text-gray-900">Unlock Requests</h2>
-            <div className="space-y-2">
-              {unlockRequests.map((request) => (
-                <div key={request.id} className="flex items-center justify-between border-b border-gray-100 pb-2 last:border-b-0 last:pb-0">
-                  <p className="text-sm text-gray-700">
-                    <strong>{request.assignment.student.name}</strong> requested <strong>{request.assignment.practiceSet.name}</strong>
-                  </p>
-                  <UnlockRequestActions requestId={request.id} />
-                </div>
-              ))}
-            </div>
-          </CardBody>
-        </Card>
-      )}
-
-      {/* Students table */}
-      <TeacherStudentsTable
-        showGroups={teacherGroupManagementEnabled}
-        rows={students.map((student): TeacherStudentRow => {
-          const areaActivity = area === "mocks"
-            ? student.fullTestAttempts.map((attempt) => attempt.submittedAt).filter((value): value is Date => Boolean(value))
-            : student.attempts.map((attempt) => attempt.submittedAt).filter((value): value is Date => Boolean(value));
-          const lastActiveAt = areaActivity.sort((a, b) => b.getTime() - a.getTime())[0];
-          const inactive = !lastActiveAt || lastActiveAt < fiveDaysAgo;
-          const studentGroups = teacherGroupManagementEnabled
-            ? student.groups.map((gm) => gm.group.name).join(", ")
-            : "";
-          const programs = student.programEnrollments.map((pe) => pe.program.name).join(", ");
-          const avgScore = area === "mocks"
-            ? student.fullTestAttempts.length
-              ? Math.round(
-                  (student.fullTestAttempts.reduce((sum, attempt) => {
-                    const correct = attempt.answers.filter((answer) => answer.isCorrect).length;
-                    return sum + correct / Math.max(attempt.answers.length, 1);
-                  }, 0) /
-                    student.fullTestAttempts.length) *
-                  100,
-                )
-              : null
-            : student.attempts.length
-            ? Math.round(
-                (student.attempts.reduce((sum, attempt) => {
-                  const correct = attempt.answers.filter((a) => a.isCorrect).length;
-                  return sum + correct / Math.max(attempt.answers.length, 1);
-                }, 0) /
-                  student.attempts.length) *
-                  100,
-              )
-            : null;
-
-          return {
-            id: student.id,
-            name: student.name,
-            email: student.email,
-            programsLabel: programs || "—",
-            groupsLabel: teacherGroupManagementEnabled ? studentGroups || "—" : null,
-            lastActiveLabel: lastActiveAt
-              ? `${formatDate(lastActiveAt)}${inactive ? " ⚠" : ""}`
-              : "Never",
-            lastActiveTone: !lastActiveAt ? "never" : inactive ? "warn" : "ok",
-            pendingCount: area === "mocks" ? student.fullTestAssignments.length : student.assignments.length,
-            avgScoreLabel: avgScore !== null ? `${avgScore}%` : "—",
-            avgScoreTone:
-              avgScore === null ? "none" : avgScore >= 80 ? "high" : avgScore >= 60 ? "mid" : "low",
-            avgScoreFiltered: avgScore !== null && hasAttemptFilter,
-            active: student.active,
-          };
-        })}
-      />
+        ) : null}
+        <ViewSummaryCard
+          title="History"
+          icon={<Clock size={16} />}
+          href="/teacher/history"
+          value={history.length}
+          valueLabel={`${history.length === 1 ? "try" : "tries"} finished in the last 7 days`}
+          chips={[
+            { label: "Practice", value: practiceTries, tone: tone(practiceTries, "success"), href: historyHref({ type: "practice" }, { period: "week" }) },
+            { label: "Tests", value: history.length - practiceTries, tone: tone(history.length - practiceTries, "success"), href: historyHref({ type: "tests" }, { period: "week" }) },
+          ]}
+          list={{
+            title: "Latest tries",
+            empty: "No tries in the last 7 days.",
+            items: latestTries.map((t) => ({
+              key: t.id,
+              label: `${t.studentName} · ${t.title}`,
+              detail: (
+                <>
+                  {t.kind === "test" ? <Scores rw={t.rw} math={t.math} /> : <Pct value={t.pct} />} · {relativeDay(t.at, now)}
+                </>
+              ),
+              href: `/teacher/students/${t.studentId}/${t.kind === "test" ? "tests" : "attempts"}/${t.id}`,
+            })),
+          }}
+          action="Open History →"
+        />
+      </div>
     </PageShell>
   );
 }

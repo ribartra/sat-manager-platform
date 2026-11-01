@@ -1,0 +1,852 @@
+[
+ {
+  "table": "Question",
+  "id": "cmsjrnwip0167qmt12sr8cbf9",
+  "field": "stimulus",
+  "before": "According to researchers François de Médicis and Steven Huebner, Claude Debussy's influence on modern music is ______. Even to this day, many people are familiar with his 1905 piece \"Clair de Lune,\" which has been featured in movies and TikTok videos alike due to its poignant melancholy tones. A recent study suggests that millennials, as well as members of Generation X and Generation Z, prioritize flexible work schedules and the opportunity for telework in their professional pursuits, rather than the more traditional 9-to-5 schedule in a brick-and-mortar building. Indeed, in the last decade, many companies have shifted to a virtual office model, challenging the previous generation's idealization of the coveted corner office as the ______ of professional success.",
+  "after": "According to researchers François de Médicis and Steven Huebner, Claude Debussy's influence on modern music is ______. Even to this day, many people are familiar with his 1905 piece \"Clair de Lune,\" which has been featured in movies and TikTok videos alike due to its poignant melancholy tones.",
+  "note": "T8 R&W M1 #1: bleed — stimulus had Q2's remote-work/corner-office passage (with its own ______ blank) appended after the Debussy passage; removed (Q2 stimulus already holds it)",
+  "class": "bleed",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/READING AND WRITING/TEST 8 R&W MOD 1 AND 2.pdf p1 (IngestPageArtifact): Debussy passage = Q1, millennials/telework passage = Q2 (two passages on one page)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsojfkp9000u18ppy3lyfgdg",
+  "field": "stem",
+  "before": "Which choice completes the\ntext with the most logical and\nprecise word or phrase?",
+  "after": "Which choice completes the text with the most logical and precise word or phrase?",
+  "note": "T8 R&W M2 #4: other — stem kept the PDF column line breaks (renders on 3 lines); joined into one line (text identical)",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/READING AND WRITING/TEST 8 R&W MOD 1 AND 2.pdf p21 OCR/page: same sentence as all other words-in-context stems"
+ },
+ {
+  "table": "Question",
+  "id": "cmsojfkqf001y18ppgsj880tj",
+  "field": "stimulus",
+  "before": "The following text is from Sultan Murad II's 15th-century poem \"Ruba'i.\"\n\nCupbearer, bring, bring here again my yester even's wine;\nMy harp and rebec bring, them bid address this heart of mine:\n\nWhile still I live, 'tis meet that I should mirth and glee enjoy;\nThe day shall come when none may e'en my resting-place Divine.",
+  "after": "The following text is from Sultan Murad II's 15th-century poem \"Ruba'i.\"\n\nCupbearer, bring, bring here again my yester even's wine;\nMy harp and rebec bring, them bid address this heart of mine:\nWhile still I live, 'tis meet that I should mirth and glee enjoy;\nThe day shall come when none may e'en my resting-place Divine.",
+  "note": "T8 R&W M2 #8: other — spurious stanza break between couplet lines 2 and 3; the source shows the 4 lines as one block (text identical)",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/READING AND WRITING/TEST 8 R&W MOD 1 AND 2.pdf p24 (rendered): four consecutive verse lines, no blank line"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3g0c000v0mpd7syi3zod",
+  "field": "stem",
+  "before": "Given the equations 3x + 4y = 20 and y = x(-x - 4), how many solutions (x, y) exist for the system?",
+  "after": "Given the equations $3x + 4y = 20$ and $y = x(-x - 4)$, how many solutions $(x, y)$ exist for the system?",
+  "note": "T8 Math M1 #10: other — equations typed as plain text; restore as inline math (text identical)",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf p4 (rendered): 3x+4y=20, y=x(−x−4), (x, y) typeset as math"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3g1d001l0mpd1lt129hz",
+  "field": "stem",
+  "before": "$$c(t) = 4,000(0.5)^{\\frac{t}{0.730}}$$\n\nThe function $c(t)$ is used to determine the amount of carbon-14 left in a sample $t$ years after the sample is initially measured. How many years will it take the sample to contain half as much carbon-14 from when it was initially measured?",
+  "after": "$$c(t) = 4,000(0.5)^{\\frac{t}{5{,}730}}$$\n\nThe function $c(t)$ is used to determine the amount of carbon-14 left in a sample $t$ years after the sample is initially measured. How many years will it take the sample to contain half as much carbon-14 from when it was initially measured?",
+  "note": "T8 Math M1 #16: other — OCR digit loss in exponent: t/0.730 → t/5,730 (carbon-14 half-life; key 5730 depends on it)",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf p7 rendered at 300 dpi: exponent t over 5,730; docx heading 'c(t) = 4000(0.5)^(t/5730)'"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3g20001o0mpdbh9bejs6",
+  "field": "stem",
+  "before": "$$\\frac{(a^2)^{-2}b^5c^{\\frac{3}{2}}c^{-1}}{a^6b^{-5}c^{\\frac{3}{2}}}$$\n\nWhich of the following is equivalent to the expression shown above?",
+  "after": "$$\\frac{(a^3)^{-2}b^5c^{\\frac{3}{2}}c^{-1}}{a^6b^{-5}c^{\\frac{1}{2}}}$$\n\nWhich of the following is equivalent to the expression shown above?",
+  "note": "T8 Math M1 #19: other — OCR misread the expression: (a^2)^{-2} → (a^3)^{-2} and denominator c^{3/2} → c^{1/2} (as stored no option was correct)",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf p8 rendered at 300 dpi; docx explanation Q19 (a-term (a^3)^{-2}/a^6, c-term c^{3/2}c^{-1}/c^{1/2})"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsnb3g21001r0mpd0mzsq7ol",
+  "field": "text",
+  "before": "$\\frac{b^{10}}{a^{13}}$",
+  "after": "$\\frac{b^{10}}{a^{12}}$",
+  "note": "T8 Math M1 #19: other — option C (the key) OCR'd as b^10/a^13; source shows b^10/a^12",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf p8 rendered at 300 dpi: C = b^10/a^12; docx 'Altogether, the expression is b^10/a^12'"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrnw99011hqmt14n9yibu3",
+  "field": "text",
+  "before": "c + b = 5 6c + 4b = 32",
+  "after": "$c + b = 5$\n$6c + 4b = 32$",
+  "note": "T8 Math M2 #1: flattened_table — option A is a 2-equation system flattened onto one line; one equation per line, as math",
+  "class": "flattened_table",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf p10 (rendered): each option shows two stacked equations"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrnw99011iqmt1zta6fgqt",
+  "field": "text",
+  "before": "2c + 3b = 19 4c + b = 13",
+  "after": "$2c + 3b = 19$\n$4c + b = 13$",
+  "note": "T8 Math M2 #1: flattened_table — option B is a 2-equation system flattened onto one line; one equation per line, as math",
+  "class": "flattened_table",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf p10 (rendered): each option shows two stacked equations"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrnw99011jqmt1uabkjaqn",
+  "field": "text",
+  "before": "5c = 19b 5b = 13c",
+  "after": "$5c = 19b$\n$5b = 13c$",
+  "note": "T8 Math M2 #1: flattened_table — option C is a 2-equation system flattened onto one line; one equation per line, as math",
+  "class": "flattened_table",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf p10 (rendered): each option shows two stacked equations"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrnw99011kqmt1081517yu",
+  "field": "text",
+  "before": "6c = 19 4b = 13",
+  "after": "$6c = 19$\n$4b = 13$",
+  "note": "T8 Math M2 #1: flattened_table — option D is a 2-equation system flattened onto one line; one equation per line, as math",
+  "class": "flattened_table",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf p10 (rendered): each option shows two stacked equations"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3g2m00280mpd0k0wyj5p",
+  "field": "stem",
+  "before": "$$y = \\frac{1}{3}x$$\n\n$$y = -2x - 7$$\n\nThe given system of equations is graphed in the xy-plane, and the two lines intersect at the coordinate point (-3, y). What is the value of y?",
+  "after": "$$y = \\frac{1}{3}x$$\n\n$$y = -2x - 7$$\n\nThe given system of equations is graphed in the $xy$-plane, and the two lines intersect at the coordinate point $(-3, y)$. What is the value of $y$?",
+  "note": "T8 Math M2 #2: other — xy-plane, (-3, y) and y typed as plain text; restore as inline math (text identical)",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf p10 (rendered)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3g4e003z0mpd4udukjcd",
+  "field": "stem",
+  "before": "The table shows the price for ordering different quantities of shirts (Number of shirts / Cost of Shirts / Delivery Cost / Tax / Total Cost): 6 / $210.00 / $25.20 / $23.52 / $258.72; 15 / $525.00 / $63.00 / $58.80 / $646.80; 21 / $735.00 / $88.20 / $82.32 / $905.52. A delivery fee is calculated as a percentage of the base cost of the shirts. Then, a tax is applied to the combined cost of the shirts and the delivery. If p is the percentage added for delivery and q is the percentage added for taxes, what is the value of p - q?",
+  "after": "| Number of shirts | Cost of Shirts | Delivery Cost | Tax | Total Cost |\n| --- | --- | --- | --- | --- |\n| 6 | $210.00 | $25.20 | $23.52 | $258.72 |\n| 15 | $525.00 | $63.00 | $58.80 | $646.80 |\n| 21 | $735.00 | $88.20 | $82.32 | $905.52 |\n\nThe table above shows the price for ordering different quantities of shirts. A delivery fee is calculated as a percentage of the base cost of the shirts. Then, a tax is applied to the combined cost of the shirts and the delivery. If $p$ is the percentage added for delivery and $q$ is the percentage added for taxes, what is the value of $p - q$?",
+  "note": "T8 Math M2 #18: flattened_table — 5-column shirts table flattened into one sentence ('6 / $210.00 / …'); rebuilt as pipe table above the source wording",
+  "class": "flattened_table",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf p17 (rendered): table Number of shirts | Cost of Shirts | Delivery Cost | Tax | Total Cost, rows 6/15/21; OCR [tbl-0.html] + 'The table above shows…'"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3g4i00440mpdfj0egqr8",
+  "field": "stem",
+  "before": "In the right triangle ABC, angle C is a right angle. If cos(A) = (x - k)/(x + k), where k is a constant and x is the side length of BC, what is the value of x, in terms of k?",
+  "after": "In the right triangle $ABC$, angle $C$ is a right angle. If $\\cos(A) = \\frac{x-k}{x+k}$, where $k$ is a constant and $x$ is the side length of $BC$, what is the value of $x$, in terms of $k$?",
+  "note": "T8 Math M2 #19: other — fraction typed as '(x - k)/(x + k)' and variables as plain text; restore as math (text identical)",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf p17 (rendered): cos(A) = (x−k)/(x+k) as stacked fraction"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3g4v004j0mpdk86h3pmn",
+  "field": "stem",
+  "before": "Note: Figure not drawn to scale.\n\nA rectangular pyramid has a base length measuring b centimeters, a base width measuring 2b centimeters, and a height measuring c centimeters, as shown. A similar rectangular pyramid is 2/3 the size of the given rectangular pyramid. What is the volume of the smaller rectangular pyramid?",
+  "after": "Note: Figure not drawn to scale.\n\nA rectangular pyramid has a base length measuring $b$ centimeters, a base width measuring $2b$ centimeters, and a height measuring $c$ centimeters, as shown. A similar rectangular pyramid is $\\frac{2}{3}$ the size of the given rectangular pyramid. What is the volume of the smaller rectangular pyramid?",
+  "note": "T8 Math M2 #22: other — '2/3' and b, 2b, c typed as plain text; restore as math (text identical)",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/MATH/TEST 8 INNOV MATH MOD 1&2.pdf p19 (rendered): stacked fraction 2/3, italic b, 2b, c"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3fye00050mpd53sirb23",
+  "field": "explanation",
+  "before": "Choice A is correct. A point that is a solution to a system of equations must satisfy all the equations in the system. On a graph, this would correspond to the intersection(s) of the equations. It can be seen that the two equations in the given system have the same slope  and different –intercepts ( and ). Two lines with the same slope but different –intercepts are parallel lines. Therefore, the two lines will never intersect, and the system has zero solutions.\nChoice B is incorrect as this would happen if the two lines have different slopes. Choice C is incorrect as it is impossible for two lines to intersect only two times. Choice D is incorrect as this would happen if the two lines have the same slope and the same –intercept.\nCalculator tip: The two equations can be graphed in separate lines in Desmos to see how many intersections they have. Two parallel lines will appear in the coordinate plane; therefore, the system of equations has zero solutions.",
+  "after": "Choice A is correct. A point that is a solution to a system of equations must satisfy all the equations in the system. On a graph, this would correspond to the intersection(s) of the equations. It can be seen that the two equations in the given system have the same slope $\\left(-\\frac{1}{5}\\right)$ and different $y$–intercepts ($7$ and $-3$). Two lines with the same slope but different $y$–intercepts are parallel lines. Therefore, the two lines will never intersect, and the system has zero solutions.\nChoice B is incorrect as this would happen if the two lines have different slopes. Choice C is incorrect as it is impossible for two lines to intersect only two times. Choice D is incorrect as this would happen if the two lines have the same slope and the same $y$–intercept.\nCalculator tip: The two equations can be graphed in separate lines in Desmos to see how many intersections they have. Two parallel lines will appear in the coordinate plane; therefore, the system of equations has zero solutions.",
+  "note": "T8 Math M1 #3: stripped_math — explanation lost every Word equation (OMML) (blank gaps where the values belong); rebuilt as LaTeX from the docx, prose unchanged",
+  "class": "stripped_math",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/Test8_Math_Answer_Explanations.docx, Question 3 (MODULE 1), m:oMath elements"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3g20001o0mpdbh9bejs6",
+  "field": "explanation",
+  "before": "Choice C is correct. Simplify the expression by looking at each variable separately.\nFor the  term,  becomes , which simplifies to .\nFor the  term,  becomes .\nFor the  term,  becomes , which simplifies to .\nAltogether, the expression is\nChoice A is incorrect and may result from assuming all the exponents reduced the terms to . Choice B is incorrect as this is the reciprocal of the correct answer. Choice D is incorrect and could result from incorrectly combining the exponents for the  term.",
+  "after": "Choice C is correct. Simplify the expression by looking at each variable separately.\nFor the $a$ term, $\\frac{(a^{3})^{-2}}{a^{6}}$ becomes $\\frac{a^{-6}}{a^{6}}$, which simplifies to $\\frac{1}{a^{12}}$.\nFor the $b$ term, $\\frac{b^{5}}{b^{-5}}$ becomes $b^{10}$.\nFor the $c$ term, $\\frac{c^{\\frac{3}{2}}c^{-1}}{c^{\\frac{1}{2}}}$ becomes $\\frac{c^{\\frac{1}{2}}}{c^{\\frac{1}{2}}}$, which simplifies to $1$.\nAltogether, the expression is $\\frac{1}{a^{12}}\\cdot b^{10}\\cdot 1=\\frac{b^{10}}{a^{12}}$\nChoice A is incorrect and may result from assuming all the exponents reduced the terms to $1$. Choice B is incorrect as this is the reciprocal of the correct answer. Choice D is incorrect and could result from incorrectly combining the exponents for the $c$ term.",
+  "note": "T8 Math M1 #19: stripped_math — explanation lost every Word equation (OMML) (blank gaps where the values belong); rebuilt as LaTeX from the docx, prose unchanged",
+  "class": "stripped_math",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/Test8_Math_Answer_Explanations.docx, Question 19 (MODULE 1), m:oMath elements"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3g2c001y0mpd76881utf",
+  "field": "explanation",
+  "before": "Choice C is correct. The largest possible mean would be the result of the largest possible sum divided by the number of people. This can be found by multiplying the frequency of each range times the largest value of each range plus the sum of  or more. This yields . Taking this sum and dividing by the total number of attendees  results in , which is approximately .\nChoice A is incorrect as this is the minimum possible value for the mean. Choice B is incorrect as this is the result of using the middle value for each range instead of the largest possible value. Choice D is incorrect and may be the result of taking the average of the distance traveled for less than  and averaged it with the mean of the range of greater than .",
+  "after": "Choice C is correct. The largest possible mean would be the result of the largest possible sum divided by the number of people. This can be found by multiplying the frequency of each range times the largest value of each range plus the sum of $50$ or more. This yields $100(9.99)+60(19.99)+80(29.99)+30(39.99)+20(49.99)+120(57.82)=13{,}735.5$. Taking this sum and dividing by the total number of attendees $410$ results in $\\frac{13{,}735.5}{410}$, which is approximately $33.50$.\nChoice A is incorrect as this is the minimum possible value for the mean. Choice B is incorrect as this is the result of using the middle value for each range instead of the largest possible value. Choice D is incorrect and may be the result of taking the average of the distance traveled for less than $50$ and averaged it with the mean of the range of greater than $50$.",
+  "note": "T8 Math M1 #21: stripped_math — explanation lost every Word equation (OMML) (blank gaps where the values belong); rebuilt as LaTeX from the docx, prose unchanged",
+  "class": "stripped_math",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/Test8_Math_Answer_Explanations.docx, Question 21 (MODULE 1), m:oMath elements"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3g2h00230mpdixue08j3",
+  "field": "explanation",
+  "before": "Choice A is correct. This question asks for the input value (in  years) that corresponds with an output of  years. Since the graph represents a linear relationship, use the slope-intercept form for a linear equation . To find the slope, use the slope formula . Using points  and , substitute the coordinate values into the slope formula, yielding . To find the –coordinate of the –intercept, locate the part of the graph where the line intersects the –axis, which is at point . Therefore, in the slope-intercept form, . Substituting the slope () and  into the slope-intercept form results in , or in function form, . Substituting  for  results in . Subtract  from both sides to yield . Finally, multiply both sides by the reciprocal of the slope to get , which results in .\nChoice B is incorrect and may be the result of inverting the slope and using  for . Choice C is incorrect and may result from inverting the slope. Choice D is incorrect and may be the result of substituting  for  instead of for .\nCalculator tip: Use Desmos to create a linear regression equation with the data points given.\nStep 1) Press the add item \"+\" button to create a table. Input  and  in the  and  columns of the table\nStep 2) Write the regression equation \"{1}\\sim mx{1}+b\" into a separate equation entry line. The graph of the regression line will appear.\nStep 3) To find the value of  when the function equals , write the equation  in a separate line and find the intersection point. The intersection occurs at , so the value for  in the original function is .",
+  "after": "Choice A is correct. This question asks for the input value (in $t$ years) that corresponds with an output of $260$ years. Since the graph represents a linear relationship, use the slope-intercept form for a linear equation $y=mx+b$. To find the slope, use the slope formula $\\frac{y_{2}-y_{1}}{x_{2}-x_{1}}$. Using points $(0,20)$ and $(14,100)$, substitute the coordinate values into the slope formula, yielding $\\frac{100-20}{14-0}=\\frac{80}{14}=\\frac{40}{7}$. To find the $y$–coordinate of the $y$–intercept, locate the part of the graph where the line intersects the $y$–axis, which is at point $(0,20)$. Therefore, in the slope-intercept form, $b=20$. Substituting the slope ($m$) and $b$ into the slope-intercept form results in $y=\\frac{40}{7}x+20$, or in function form, $h(t)=\\frac{40}{7}t+20$. Substituting $260$ for $h(t)$ results in $260=\\frac{40}{7}t+20$. Subtract $20$ from both sides to yield $260-20=\\frac{40}{7}t$. Finally, multiply both sides by the reciprocal of the slope to get $240(\\frac{7}{40})=t$, which results in $t=42$.\nChoice B is incorrect and may be the result of inverting the slope and using $260$ for $t$. Choice C is incorrect and may result from inverting the slope. Choice D is incorrect and may be the result of substituting $260$ for $t$ instead of for $h(t)$.\nCalculator tip: Use Desmos to create a linear regression equation with the data points given.\nStep 1) Press the add item \"+\" button to create a table. Input $(0,20)$ and $(14,100)$ in the $x_{1}$ and $y_{1}$ columns of the table\nStep 2) Write the regression equation \"$y_{1}\\sim mx_{1}+b$\" into a separate equation entry line. The graph of the regression line will appear.\nStep 3) To find the value of $x$ when the function equals $260$, write the equation $y=260$ in a separate line and find the intersection point. The intersection occurs at $(42,260)$, so the value for $t$ in the original function is $42$.",
+  "note": "T8 Math M1 #22: stripped_math — explanation lost every Word equation (OMML) (blank gaps where the values belong); rebuilt as LaTeX from the docx, prose unchanged; docx typos fixed: 'output of 280' / '280−20' → 260 (the question asks h(t)=260; next step uses 240), and a stray '{1}\\sim mx{1}+b' tail dropped",
+  "class": "stripped_math",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/Test8_Math_Answer_Explanations.docx, Question 22 (MODULE 1), m:oMath elements"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3g3d002t0mpdhh5lit47",
+  "field": "explanation",
+  "before": "Choice A is correct. For a coordinate point to be a solution to an inequality when graphed in the –plane, it needs to be in the shaded area. Since the coordinate  is in the shaded area, Choice A is correct.\nChoice B is incorrect as this coordinate point is not in the shaded area. Choice C is incorrect as this is on the dashed line; since the line is not solid, points on the dashed line are not included in the inequality. Choice D is incorrect as this is not in the shaded area.",
+  "after": "Choice A is correct. For a coordinate point to be a solution to an inequality when graphed in the $xy$–plane, it needs to be in the shaded area. Since the coordinate $(-3,-4)$ is in the shaded area, Choice A is correct.\nChoice B is incorrect as this coordinate point is not in the shaded area. Choice C is incorrect as this is on the dashed line; since the line is not solid, points on the dashed line are not included in the inequality. Choice D is incorrect as this is not in the shaded area.",
+  "note": "T8 Math M2 #8: stripped_math — explanation lost every Word equation (OMML) (blank gaps where the values belong); rebuilt as LaTeX from the docx, prose unchanged",
+  "class": "stripped_math",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 8/Test8_Math_Answer_Explanations.docx, Question 8 (MODULE 2B), m:oMath elements"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwam0122qmt1x4y1l4ou",
+  "field": "stimulus",
+  "before": "Paleoclimatologist Anders Carlson compares sea levels to water in a bathtub with multiple running faucets and drains. However, where water rises and falls depends on a number of factors. For example, as long as ice sheets near Greenland and Antarctica continue to melt into the ocean, Carlson predicts _____ rise in sea levels around those regions.",
+  "after": "Scientists closely monitor global sea levels due to their impact on coastal regions. Paleoclimatologist Anders Carlson compares sea levels to water in a bathtub with multiple running faucets and drains. However, where water rises and falls depends on a number of factors. For example, as long as ice sheets near Greenland and Antarctica continue to melt into the ocean, Carlson predicts _____ rise in sea levels around those regions.",
+  "note": "T9 R&W M1 #2: other — stimulus truncated: opening sentence \"Scientists closely monitor global sea levels due to their impact on coastal regions.\" dropped",
+  "class": "other",
+  "evidence": "IngestPageArtifact p1 of files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf (Q2 passage)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnxzb01qtqmt1kdb9ltlz",
+  "field": "stimulus",
+  "before": "If they say bimetallism is good, but that we cannot have it until other nations help us, we reply that, instead of having a gold standard because England has, we will restore bimetallism, and then let England have bimetallism because the United States has it. If they dare to come out in the open field and defend the gold standard as a good thing we will fight them to the uttermost. Having behind us the producing masses of this nation and the world, supported by the commercial interests, the laboring interests, and the toilers everywhere, we will answer their demand for a gold standard by saying to them: ++You shall not press down upon the brow of labor this crown of thorns; you shall not crucify mankind upon a cross of gold.++",
+  "after": "The following text comes from William Jennings Bryan's 1896 speech \"A Cross of Gold.\"\n\nIf they say bimetallism is good, but that we cannot have it until other nations help us, we reply that, instead of having a gold standard because England has, we will restore bimetallism, and then let England have bimetallism because the United States has it. If they dare to come out in the open field and defend the gold standard as a good thing we will fight them to the uttermost. Having behind us the producing masses of this nation and the world, supported by the commercial interests, the laboring interests, and the toilers everywhere, we will answer their demand for a gold standard by saying to them: ++You shall not press down upon the brow of labor this crown of thorns; you shall not crucify mankind upon a cross of gold.++",
+  "note": "T9 R&W M1 #6: other — stimulus truncated: intro line \"The following text comes from William Jennings Bryan's 1896 speech \"A Cross of Gold.\"\" dropped",
+  "class": "other",
+  "evidence": "IngestPageArtifact p3 of files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf (Q6 passage)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnxzh01r3qmt1v5kajuh8",
+  "field": "stimulus",
+  "before": "Conventional wisdom views wasps as harmful, aggressive pests. Participants in a 2018 study conducted by The University College in London reported twice as many negative feelings about wasps as they did about bees. Wasps, unlike bees, can sting multiple times, and they often build nests near garbage cans to forage for sugary foods, which can pose a hazard to people passing by. At the sight of a wasp, most people either recoil in disgust or swing at it to eliminate the insect. Biology professors Scarlett Howard and Adrian Dyer categorize wasps as exceptionally intelligent creatures. They found that wasps can recognize human faces and can be trained to differentiate between colors. Howard and Dyer also say that despite their painful stings, wasps are crucial pollinators and pest control agents. Numerous plants depend on them for pollination, and they eat potentially harmful insects like spiders, cockroaches, and flies; many organic farmers use wasps as a natural pest management tool.",
+  "after": "Text 1\n\nConventional wisdom views wasps as harmful, aggressive pests. Participants in a 2018 study conducted by The University College in London reported twice as many negative feelings about wasps as they did about bees. Wasps, unlike bees, can sting multiple times, and they often build nests near garbage cans to forage for sugary foods, which can pose a hazard to people passing by. At the sight of a wasp, most people either recoil in disgust or swing at it to eliminate the insect.\n\nText 2\n\nBiology professors Scarlett Howard and Adrian Dyer categorize wasps as exceptionally intelligent creatures. They found that wasps can recognize human faces and can be trained to differentiate between colors. Howard and Dyer also say that despite their painful stings, wasps are crucial pollinators and pest control agents. Numerous plants depend on them for pollination, and they eat potentially harmful insects like spiders, cockroaches, and flies; many organic farmers use wasps as a natural pest management tool.",
+  "note": "T9 R&W M1 #7: other — \"Text 1\"/\"Text 2\" labels missing (stem refers to Text 1/Text 2) and the two texts run together; labels + paragraph break restored",
+  "class": "other",
+  "evidence": "IngestPageArtifact p4 of files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf (\"### Text 1\" / \"### Text 2\" headings)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnxzv01rfqmt1j98dkmq6",
+  "field": "stimulus",
+  "before": "The following text is from Emily Dickinson's 1890 poem \"Tell all the truth but tell it slant.\" Tell all the truth but tell it slant — Success in Circuit lies Too bright for our infirm Delight The Truth's superb surprise As Lightning to the Children eased With explanation kind The Truth must dazzle gradually Or every man be blind —",
+  "after": "The following text is from Emily Dickinson's 1890 poem \"Tell all the truth but tell it slant.\"\n\nTell all the truth but tell it slant —\nSuccess in Circuit lies\nToo bright for our infirm Delight\nThe Truth's superb surprise\nAs Lightning to the Children eased\nWith explanation kind\nThe Truth must dazzle gradually\nOr every man be blind —",
+  "note": "T9 R&W M1 #9: other — poem lines flattened into one line and intro run into the poem; line breaks restored (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p5 of files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf (Q9 poem, one verse per line)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrny0701rrqmt1am7guns9",
+  "field": "stimulus",
+  "before": "Fatality Density by Distance Daniel Choi and his colleagues conducted a study on the effects of wind facilities on bat and bird populations in the Northeastern United States. Researchers examined data on bat and bird carcasses near wind turbines and analyzed the relationship between animal fatality rates and the distance from the turbine base. It was initially believed that turbine blades, which range from 2 to 80 meters in length, were the primary causes of mortality. However, researchers concluded that while both birds and bats did fatally collide with the blades, birds were more prone to lethal collisions with the pole situated on the turbine base.",
+  "after": "Fatality Density by Distance\n\nDaniel Choi and his colleagues conducted a study on the effects of wind facilities on bat and bird populations in the Northeastern United States. Researchers examined data on bat and bird carcasses near wind turbines and analyzed the relationship between animal fatality rates and the distance from the turbine base. It was initially believed that turbine blades, which range from 2 to 80 meters in length, were the primary causes of mortality. However, researchers concluded that while both birds and bats did fatally collide with the blades, birds were more prone to lethal collisions with the pole situated on the turbine base.",
+  "note": "T9 R&W M1 #11: other — graph title run into the passage (\"…by Distance Daniel Choi…\"); title put on its own line (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p7 of files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf (title above the chart, passage below)"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrny0m01s3qmt16y2feea2",
+  "field": "text",
+  "before": "the Yazilikaya was the most religiously significant site in the Hittite Empire. Discovering a new animal is always a scientific achievement, but it is even more notable when that animal displays a distinct ability. The recently discovered snow fly, for instance, has a unique strategy for surviving at freezing temperatures: self-amputation. Whereas most animals living in extreme cold have protective adaptations such as thick coats or biological antifreeze in their blood, snow flies simply detach parts of their body as they begin to freeze. This process is controlled by specialized neurons in the insect's brain. In cold temperatures where the snow fly thrives, most animals' neuron channels typically slow down, indicating that",
+  "after": "the Yazilikaya was the most religiously significant site in the Hittite Empire.",
+  "note": "T9 R&W M1 #13: bleed — option D had Q14's whole snow-fly passage appended; trimmed to the option text",
+  "class": "bleed",
+  "evidence": "IngestPageArtifact p9 of files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf (Q13 option D ends \"…in the Hittite Empire.\"; snow-fly passage is Q14's stimulus (already stored there))"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrny3501sjqmt14w1g3tfs",
+  "field": "stimulus",
+  "before": "Quartz—the second most abundant mineral in the Earth's _____ of silicon and oxygen atoms arranged in a tetrahedral crystal lattice structure. Quartz can form through a variety of geological processes, but most of it is formed within igneous rock. Neoplatonism is a philosophical movement that emerged in the 3rd century _____ heavily from the ideas of the ancient Greek philosopher Plato. Neoplatonists sought to decipher and develop Plato's teachings, focusing on metaphysics, cosmology, and the nature of reality.",
+  "after": "Quartz—the second most abundant mineral in the Earth's _____ of silicon and oxygen atoms arranged in a tetrahedral crystal lattice structure. Quartz can form through a variety of geological processes, but most of it is formed within igneous rock.",
+  "note": "T9 R&W M1 #15: bleed — stimulus had Q16's Neoplatonism passage (with its own blank) appended; removed",
+  "class": "bleed",
+  "evidence": "IngestPageArtifact p10 of files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf (two passages on the page; Q16 stimulus already holds the Neoplatonism one)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrny3c01spqmt1ug3au5z9",
+  "field": "stem",
+  "before": "Which choice completes the\ntext so that it conforms to the\nconventions of Standard\nEnglish?",
+  "after": "Which choice completes the text so that it conforms to the conventions of Standard English?",
+  "note": "T9 R&W M1 #16: other — stem broken over 4 lines by OCR column wrap; joined (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p10 of files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf (Q16 question)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrny4001sxqmt14mslvmk7",
+  "field": "stimulus",
+  "before": "As sound waves hit the eardrum, _____ will vibrate, moving the ossicles. The third bone in the ossicles, the stapes, directs vibrations from the eardrum to the inner ear's oval window. This motion amplifies and transfers sound to the cochlea, where it's converted into electrical signals for the brain to perceive sound.",
+  "after": "The ossicles are made up of three tiny bones in the middle ear and transmit sound to the inner ear. As sound waves hit the eardrum, _____ will vibrate, moving the ossicles. The third bone in the ossicles, the stapes, directs vibrations from the eardrum to the inner ear's oval window. This motion amplifies and transfers sound to the cochlea, where it's converted into electrical signals for the brain to perceive sound.",
+  "note": "T9 R&W M1 #20: other — stimulus truncated: opening sentence \"The ossicles are made up of three tiny bones…\" dropped (\"the ossicles\" had no referent)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p12 of files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf (Q20 passage)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrny4601t3qmt1v3cma883",
+  "field": "stimulus",
+  "before": "Although the term “Ponzi scheme” comes from the 1920s con artist Charles Ponzi, the first scam of this kind was conducted by Sarah Howe in 1879 when she opened the first-ever women’s-only bank, promising a high rate of return on savings _____ made possible through relying on the money of new depositors. Her fraudulent scheme sullied the idea of female financial services to such a degree that the next bank that catered exclusively to women did not open until forty years later. Although there are no cures available for many genetic disorders, there are treatments that can help manage symptoms. One of the most common genetic disorders is cystic fibrosis, which affects various organs throughout the body. _____ some medications can reduce inflammation though researchers are looking into gene therapies as a more effective solution.",
+  "after": "Although the term “Ponzi scheme” comes from the 1920s con artist Charles Ponzi, the first scam of this kind was conducted by Sarah Howe in 1879 when she opened the first-ever women’s-only bank, promising a high rate of return on savings _____ made possible through relying on the money of new depositors. Her fraudulent scheme sullied the idea of female financial services to such a degree that the next bank that catered exclusively to women did not open until forty years later.",
+  "note": "T9 R&W M1 #21: bleed — stimulus had Q22's cystic-fibrosis passage (with its blank) appended; removed",
+  "class": "bleed",
+  "evidence": "IngestPageArtifact p13 of files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf (Ponzi passage = Q21, cystic-fibrosis passage = Q22 (already stored there))"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrny4n01thqmt1pg5vkn8r",
+  "field": "stimulus",
+  "before": "This phenomenon can be explained by the structural connections between specific areas of the brain: some individuals have more nerve fibers to support these connections, which in turn enhance communication between different brain regions. ____ the more fibers connecting the auditory cortex to brain regions that process emotion, the stronger the stimulation. This stimulation is what creates a sensation of chills.",
+  "after": "A study led by Matthew Sachs has found that only 50 percent of people experience chills when listening to music. This phenomenon can be explained by the structural connections between specific areas of the brain: some individuals have more nerve fibers to support these connections, which in turn enhance communication between different brain regions. ____ the more fibers connecting the auditory cortex to brain regions that process emotion, the stronger the stimulation. This stimulation is what creates a sensation of chills.",
+  "note": "T9 R&W M1 #24: other — stimulus truncated: opening sentence \"A study led by Matthew Sachs has found…\" dropped (\"This phenomenon\" had no referent)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p14 of files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf (Q24 passage)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrny4u01tnqmt1p6hpksx7",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes: - NASA scientists have used the James Webb Space Telescope to examine GJ 486-b. - GJ 486-b orbits a red dwarf star while the Earth orbits the sun, which is a yellow dwarf star. - Compared to yellow dwarf stars, red dwarf stars are smaller (up to 92%) and cooler (by thousands of degrees) - GJ 486-b is larger than Earth by 30 percent and has much stronger gravity. - The James Webb Space Telescope has revealed that there is water vapor in the vicinity of GJ 486-b. - It is unclear whether the vapor is part of the planet's atmosphere or has simply been ejected from the red dwarf star.",
+  "after": "While researching a topic, a student has taken the following notes:\n\n- NASA scientists have used the James Webb Space Telescope to examine GJ 486-b.\n- GJ 486-b orbits a red dwarf star while the Earth orbits the sun, which is a yellow dwarf star.\n- Compared to yellow dwarf stars, red dwarf stars are smaller (up to 92%) and cooler (by thousands of degrees)\n- GJ 486-b is larger than Earth by 30 percent and has much stronger gravity.\n- The James Webb Space Telescope has revealed that there is water vapor in the vicinity of GJ 486-b.\n- It is unclear whether the vapor is part of the planet's atmosphere or has simply been ejected from the red dwarf star.",
+  "note": "T9 R&W M1 #25: other — notes bullets flattened into one line; one bullet per line restored (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p15 of files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrny4z01ttqmt1jfb6drv1",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes: - Julien Pollack and Petr Matous of the University of Sydney have investigated work-based team building activities. - They argue that adventure-based team events (like mountain biking trips) distract from goals relevant to the workplace. - The most effective team-building activities, according to Pollack and Matous, emphasize developing existing relationships to maximize trust and efficiency. - For one team event, Pollack and Matous ask employers to pair up employees to discuss a curated list of 36 questions to build familiarity.",
+  "after": "While researching a topic, a student has taken the following notes:\n\n- Julien Pollack and Petr Matous of the University of Sydney have investigated work-based team building activities.\n- They argue that adventure-based team events (like mountain biking trips) distract from goals relevant to the workplace.\n- The most effective team-building activities, according to Pollack and Matous, emphasize developing existing relationships to maximize trust and efficiency.\n- For one team event, Pollack and Matous ask employers to pair up employees to discuss a curated list of 36 questions to build familiarity.",
+  "note": "T9 R&W M1 #26: other — notes bullets flattened into one line; one bullet per line restored (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p16 of files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrny5701u3qmt1h8pre1u0",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes: - Kagome is a traditional Japanese pattern that consists of interlocking triangles and hexagons. - Basket weavers use this pattern when working with strips of wood or bamboo even though the hexagons create considerable open spaces in the basket. - Inspired by kagome, researchers from the Massachusetts Institute of Technology have created a crystalline structure of iron and tin atoms. - The kagome structure accounts for the anomalous behavior of the crystal, which deflects electric charges rather than acting as a typical metal conductor. - Researcher Linda Ye notes that the empty spaces of the structure could be filled with another \"type of atom\" to change the structure's behavior.",
+  "after": "While researching a topic, a student has taken the following notes:\n\n- Kagome is a traditional Japanese pattern that consists of interlocking triangles and hexagons.\n- Basket weavers use this pattern when working with strips of wood or bamboo even though the hexagons create considerable open spaces in the basket.\n- Inspired by kagome, researchers from the Massachusetts Institute of Technology have created a crystalline structure of iron and tin atoms.\n- The kagome structure accounts for the anomalous behavior of the crystal, which deflects electric charges rather than acting as a typical metal conductor.\n- Researcher Linda Ye notes that the empty spaces of the structure could be filled with another \"type of atom\" to change the structure's behavior.",
+  "note": "T9 R&W M1 #27: other — notes bullets flattened into one line; one bullet per line restored (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p17 of files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnxz001qiqmt13f5e83pt",
+  "field": "stimulus",
+  "before": "While their popularity has significantly diminished with the advent of digital technologies, fax machines were, at one time, a business necessity. In 1966, it took six minutes to transmit a page by what was then called a \"telecopier.\" However, by the mid-1980s, a page could be transmitted in about twenty seconds, and an office couldn't run without a fax machine.",
+  "after": "Fax machines were once _____ in offices around the world. While their popularity has significantly diminished with the advent of digital technologies, fax machines were, at one time, a business necessity. In 1966, it took six minutes to transmit a page by what was then called a \"telecopier.\" However, by the mid-1980s, a page could be transmitted in about twenty seconds, and an office couldn't run without a fax machine.",
+  "note": "T9 R&W M2 #4: other — stimulus truncated: opening sentence \"Fax machines were once _____ in offices around the world.\" dropped — it holds the blank the question asks to fill",
+  "class": "other",
+  "evidence": "IngestPageArtifact p19 of files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf (Q4 passage; explanation also quotes \"fax machines as having been ______ in offices around the world\")"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnxze01qyqmt1e6lpyoc2",
+  "field": "stimulus",
+  "before": "Sturgis Public Schools*, authored by Justice Neal Gorsuch. From ages 9 through 20, Miguel Luna Perez attended schools in Michigan's Sturgis Public School District (Sturgis). Because Mr. Perez is deaf, Sturgis provided him with aides to translate classroom instruction into sign language. For years, Mr. Perez and his parents allege, Sturgis assigned aides who were either unqualified (including one who attempted to teach herself sign language) or absent from the classroom for hours on end. Along the way, Sturgis allegedly misrepresented Mr. Perez's educational progress too, awarding him inflated grades and advancing him from grade to grade regardless of his progress. Based on Sturgis's misrepresentations, Mr. Perez and his parents say, they believed he was on track to graduate from high school with his class. But then, months before graduation, Sturgis revealed that it would not award him a diploma.",
+  "after": "The following text comes from the majority opinion in the 2023 Supreme Court case *Luna Perez v. Sturgis Public Schools*, authored by Justice Neal Gorsuch.\n\nFrom ages 9 through 20, Miguel Luna Perez attended schools in Michigan's Sturgis Public School District (Sturgis). Because Mr. Perez is deaf, Sturgis provided him with aides to translate classroom instruction into sign language. For years, Mr. Perez and his parents allege, Sturgis assigned aides who were either unqualified (including one who attempted to teach herself sign language) or absent from the classroom for hours on end. Along the way, Sturgis allegedly misrepresented Mr. Perez's educational progress too, awarding him inflated grades and advancing him from grade to grade regardless of his progress. Based on Sturgis's misrepresentations, Mr. Perez and his parents say, they believed he was on track to graduate from high school with his class. But then, months before graduation, Sturgis revealed that it would not award him a diploma.",
+  "note": "T9 R&W M2 #6: other — stimulus truncated: intro began mid-title \"Sturgis Public Schools*, authored by…\" (orphan italic marker); full intro line restored",
+  "class": "other",
+  "evidence": "IngestPageArtifact p20 of files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf (Q6 intro \"The following text comes from the majority opinion in the 2023 Supreme Court case Luna Perez v. Sturgis Public Schools…\")"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnxzk01r8qmt1ara5q19c",
+  "field": "stimulus",
+  "before": "The following text comes from Marquis de Nasaillac's 1887 article \"Megalithic Monuments in Spain and Portugal.\" Nothing in the ancient history of man is of more considerable interest than are those monuments, at once rudely grand and mysteriously simple, which have been designated megalithic. They may be simply raised stones, isolated menhirs, cromlechs arranged in a circle, or artificial caves formed by placing flat flags horizontally on standing supports. Dolmens or covered passages were usually buried under masses of earth or stones, so as to form veritable tumuli; but they always present the common character of being constructed in rough blocks, virgin of all human labor.",
+  "after": "The following text comes from Marquis de Nasaillac's 1887 article \"Megalithic Monuments in Spain and Portugal.\"\n\nNothing in the ancient history of man is of more considerable interest than are those monuments, at once rudely grand and mysteriously simple, which have been designated megalithic. They may be simply raised stones, isolated menhirs, cromlechs arranged in a circle, or artificial caves formed by placing flat flags horizontally on standing supports. Dolmens or covered passages were usually buried under masses of earth or stones, so as to form veritable tumuli; but they always present the common character of being constructed in rough blocks, virgin of all human labor.",
+  "note": "T9 R&W M2 #7: other — intro line and passage run together; paragraph break restored (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p21 of files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnxzr01reqmt1tdvgevk5",
+  "field": "stimulus",
+  "before": "The following text is from the 1954 *Brown v. Board of Education* ruling, authored by chief justice Earl Warren. Compulsory school attendance laws and the great expenditures for education both demonstrate our recognition of the importance of education to our democratic society. It is required in the performance of our most basic public responsibilities, even service in the armed forces. It is the very foundation of good citizenship. Today it is a principal instrument in awakening the child to cultural values, in preparing him for later professional training, and in helping him to adjust normally to his environment.++ In these days, it is doubtful that any child may reasonably be expected to succeed in life if he is denied the opportunity of an education++. Such an opportunity, where the state has undertaken to provide it, is a right which must be made available to all on equal terms.",
+  "after": "The following text is from the 1954 *Brown v. Board of Education* ruling, authored by chief justice Earl Warren.\n\nCompulsory school attendance laws and the great expenditures for education both demonstrate our recognition of the importance of education to our democratic society. It is required in the performance of our most basic public responsibilities, even service in the armed forces. It is the very foundation of good citizenship. Today it is a principal instrument in awakening the child to cultural values, in preparing him for later professional training, and in helping him to adjust normally to his environment. ++In these days, it is doubtful that any child may reasonably be expected to succeed in life if he is denied the opportunity of an education++. Such an opportunity, where the state has undertaken to provide it, is a right which must be made available to all on equal terms.",
+  "note": "T9 R&W M2 #8: other — malformed underline \"environment.++ In these days…++\" (space after the opening marker, so the underlined sentence the stem asks about does not render underlined) + intro/passage paragraph break",
+  "class": "other",
+  "evidence": "IngestPageArtifact p22 of files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf (underlined sentence \"In these days, … of an education\" on the rendered page)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnxzx01rgqmt1jawlydzg",
+  "field": "stimulus",
+  "before": "Historians have long grappled with the question of how fundamental shifts occur within societies, encompassing changes in social structures, cultural norms, and political systems. According to Thomas Carlyle's 'great man theory,' these transformative processes are often attributed to the influence of charismatic leaders who inspire mass movements. This perspective suggests that influential individuals play a central role in shaping historical events, with their actions determining the course of societal changes. Researcher Dr. Hahrie Han of Johns Hopkins University has challenged the notion that charismatic leaders alone are responsible for driving societal transformations. Rather, there is a growing recognition of the importance of collective action and grassroots movements in instigating significant shifts across various aspects of society. True societal change encompasses the cumulative impact of numerous individuals and groups working together towards common goals, rather than being solely reliant on the actions of leaders.",
+  "after": "Text 1\n\nHistorians have long grappled with the question of how fundamental shifts occur within societies, encompassing changes in social structures, cultural norms, and political systems. According to Thomas Carlyle's 'great man theory,' these transformative processes are often attributed to the influence of charismatic leaders who inspire mass movements. This perspective suggests that influential individuals play a central role in shaping historical events, with their actions determining the course of societal changes.\n\nText 2\n\nResearcher Dr. Hahrie Han of Johns Hopkins University has challenged the notion that charismatic leaders alone are responsible for driving societal transformations. Rather, there is a growing recognition of the importance of collective action and grassroots movements in instigating significant shifts across various aspects of society. True societal change encompasses the cumulative impact of numerous individuals and groups working together towards common goals, rather than being solely reliant on the actions of leaders.",
+  "note": "T9 R&W M2 #9: other — \"Text 1\"/\"Text 2\" labels missing (stem refers to Text 1/Text 2) and the two texts run together; labels + paragraph break restored",
+  "class": "other",
+  "evidence": "IngestPageArtifact p23 of files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf (\"Text 1\" / \"Text 2\" headings)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrny0a01rsqmt1e4bkiwc1",
+  "field": "stimulus",
+  "before": "*Northanger Abbey* is an 1803 novel by Jane Austen. In the book, the main character Catherine Morland expresses dissatisfaction with history because she struggles to relate to it: ______ BEST QUESTION",
+  "after": "*Northanger Abbey* is an 1803 novel by Jane Austen. In the book, the main character Catherine Morland expresses dissatisfaction with history because she struggles to relate to it: ______",
+  "note": "T9 R&W M2 #11: other — stray UI text \"BEST QUESTION\" (OCR of the \"NEXT QUESTION\" button) at the end of the stimulus; removed",
+  "class": "other",
+  "evidence": "IngestPageArtifact p25 of files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf (passage ends \"…struggles to relate to it: ______\")"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrny0a01rtqmt1kvyp53jr",
+  "field": "text",
+  "before": "'That is, I can read poetry and plays, and things of that sort, and do not dislike travels. But history, real solemn history, I cannot be interested in.'",
+  "after": "“That is, I can read poetry and plays, and things of that sort, and do not dislike travels. But history, real solemn history, I cannot be interested in.”",
+  "note": "T9 R&W M2 #11: other — option A: quotation marks are single quotes from OCR; source shows double curly quotes (“…”)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p25 of files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf (rendered page, options A–D)"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrny0a01ruqmt1qf4vmd1o",
+  "field": "text",
+  "before": "'I read it a little as a duty, but it tells me nothing that does not either vex or weary me: the quarrels of popes and kings, with wars or pestilences, in every page.'",
+  "after": "“I read it a little as a duty, but it tells me nothing that does not either vex or weary me: the quarrels of popes and kings, with wars or pestilences, in every page.”",
+  "note": "T9 R&W M2 #11: other — option B: quotation marks are single quotes from OCR; source shows double curly quotes (“…”)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p25 of files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf (rendered page, options A–D)"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrny0a01rvqmt1pp8i9lok",
+  "field": "text",
+  "before": "'You are fond of history! And so are Mr. Allen and my father, and I have two brothers who do not dislike it. So many instances within my small circle of friends—remarkable!",
+  "after": "“You are fond of history! And so are Mr. Allen and my father, and I have two brothers who do not dislike it. So many instances within my small circle of friends—remarkable!",
+  "note": "T9 R&W M2 #11: other — option C: quotation marks are single quotes from OCR; source shows double curly quotes (“…”) — source C has no closing quote, kept as is",
+  "class": "other",
+  "evidence": "IngestPageArtifact p25 of files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf (rendered page, options A–D)"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrny0a01rwqmt18g4cltvs",
+  "field": "text",
+  "before": "'To be at so much trouble in filling great volumes, which, as I used to think, nobody would willingly ever look into, always struck me as a hard fate.'",
+  "after": "“To be at so much trouble in filling great volumes, which, as I used to think, nobody would willingly ever look into, always struck me as a hard fate.”",
+  "note": "T9 R&W M2 #11: other — option D: quotation marks are single quotes from OCR; source shows double curly quotes (“…”)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p25 of files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf (rendered page, options A–D)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrny0j01ryqmt1k6kl94mk",
+  "field": "stimulus",
+  "before": "Oxygen Production and Light Intensity Huesemann and colleagues studied the impact of limiting pigments in algae photosynthesis in 2008. They hypothesized that with fewer pigments, the algae would more efficiently utilize light. After initial testing against the wild-type (WT) control strain of Cyclotella during exponential growth, two genetically modified pigment-reduced strains, CM1 and CM1-1, were studied. The rate of photosynthesis \"saturates\" at the level of light intensity in which increasing the intensity no longer yields large increases in oxygen production. In lab experiments, the researchers discovered that CM1-1 saturates ____.",
+  "after": "Oxygen Production and Light Intensity\n\nHuesemann and colleagues studied the impact of limiting pigments in algae photosynthesis in 2008. They hypothesized that with fewer pigments, the algae would more efficiently utilize light. After initial testing against the wild-type (WT) control strain of Cyclotella during exponential growth, two genetically modified pigment-reduced strains, CM1 and CM1-1, were studied. The rate of photosynthesis \"saturates\" at the level of light intensity in which increasing the intensity no longer yields large increases in oxygen production. In lab experiments, the researchers discovered that CM1-1 saturates ____.",
+  "note": "T9 R&W M2 #12: other — graph title run into the passage; title put on its own line (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p26 of files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf (title above the chart)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrny3001seqmt1h5dd0zhb",
+  "field": "stimulus",
+  "before": "William Shakespeare was considered a genius of his time, authoring thirty-seven plays and 154 sonnets. Because his works exhibit erudite references to classical literature, foreign languages, and courtly life, some skeptics challenge the notion that an actor from modest beginnings could possess such sophistication. As such, these doubters suggest that \"Shakespeare\" is a pseudonym concealing a more privileged author. Scholar Jonathan Bate refutes this theory, citing Shakespeare's acting troupe involvement and court performances as sources for his knowledge of courtesan life. Hence, Bate contends that skeptics question Shakespeare's identity as a man from a small English town because _____ In his first essay arguing for the ratification of the new constitution, Alexander Hamilton discusses the motives of both supporters and opponents of the document. Hamilton argues that many individuals oppose the new constitution because they benefit from the status quo. However, he concedes that this is a minority; most of the opposition is sincere and seeks to better the country. Hamilton also admits that some of the constitution's supporters are motivated by greed and selfishness. As a result, _____.",
+  "after": "William Shakespeare was considered a genius of his time, authoring thirty-seven plays and 154 sonnets. Because his works exhibit erudite references to classical literature, foreign languages, and courtly life, some skeptics challenge the notion that an actor from modest beginnings could possess such sophistication. As such, these doubters suggest that \"Shakespeare\" is a pseudonym concealing a more privileged author. Scholar Jonathan Bate refutes this theory, citing Shakespeare's acting troupe involvement and court performances as sources for his knowledge of courtesan life. Hence, Bate contends that skeptics question Shakespeare's identity as a man from a small English town because _____",
+  "note": "T9 R&W M2 #14: bleed — stimulus had Q15's Hamilton passage appended; removed (Q15 stimulus already holds it)",
+  "class": "bleed",
+  "evidence": "IngestPageArtifact p28 of files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf (Shakespeare passage = Q14, Hamilton passage = Q15)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrny4901t4qmt1vst48gdk",
+  "field": "stimulus",
+  "before": "In traditional batik, ______ is applied to a silk or cotton fabric. When the fabric is soaked in a color, the areas under the wax remain undyed. Once dry, the beeswax is removed from these areas and applied to others, and the process is repeated.",
+  "after": "Batik is an Indonesian technique of fabric dyeing that uses wax. In traditional batik, ______ is applied to a silk or cotton fabric. When the fabric is soaked in a color, the areas under the wax remain undyed. Once dry, the beeswax is removed from these areas and applied to others, and the process is repeated.",
+  "note": "T9 R&W M2 #21: other — stimulus truncated: opening sentence \"Batik is an Indonesian technique of fabric dyeing that uses wax.\" dropped",
+  "class": "other",
+  "evidence": "IngestPageArtifact p31 of files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf (Q21 passage)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrny4k01tgqmt16un61jz0",
+  "field": "stem",
+  "before": "23\n\nWhich choice completes the text with the most logical transition?",
+  "after": "Which choice completes the text with the most logical transition?",
+  "note": "T9 R&W M2 #23: other — question number \"23\" left at the start of the stem; removed",
+  "class": "other",
+  "evidence": "IngestPageArtifact p33 of files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf (Q23 question)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrny4r01tmqmt1z34yxa1p",
+  "field": "stimulus",
+  "before": "Similarly, University of Leeds glaciologist Anna Hogg states that Antarctica has lost an enormous percentage of its ice—equivalent to 836,330 square miles, the size of Greenland. This ice loss will have significant implications for the Earth's temperature, as the ice helps cool the Earth by reflecting the sun's rays. _____ with less ice, less sunlight will get reflected into the atmosphere, warming the Earth's climate.",
+  "after": "University of Leeds glaciologist Anna Hogg states that Antarctica has lost an enormous percentage of its ice—equivalent to 836,330 square miles, the size of Greenland. This ice loss will have significant implications for the Earth's temperature, as the ice helps cool the Earth by reflecting the sun's rays. _____ with less ice, less sunlight will get reflected into the atmosphere, warming the Earth's climate.",
+  "note": "T9 R&W M2 #24: bleed — stimulus began with \"Similarly, \" — Q23's option D fragment glued to the passage; removed",
+  "class": "bleed",
+  "evidence": "IngestPageArtifact p33 of files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf (Q24 passage starts \"University of Leeds glaciologist…\"; \"Similarly,\" is Q23 option D)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrny4w01toqmt16ry48u6g",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes: - The Fluxus art movement was founded by George Maciunas in the early 1960s and originally focused on experimental music rather than visual art. - Derived from the Latin word for “flowing,” the term “Fluxus” represents the artistic philosophy of the movement, characterized by the absence of rigid definitions regarding the nature of art. - It challenged the notion that museums were the sole authority in determining the value of art, while also questioning the idea that only the educated could appreciate art. - The Fluxus movement focused on experimental works that emphasized audience participation as active observers in the artistic experience. - Conceptual art prioritizes ideas over aesthetics, challenging the boundaries of art and encouraging critical engagement with artistic intention and intellectual exploration. - It can use any kind of material and be expressed through any type of medium, whether through performance or sculpture.",
+  "after": "While researching a topic, a student has taken the following notes:\n\n- The Fluxus art movement was founded by George Maciunas in the early 1960s and originally focused on experimental music rather than visual art.\n- Derived from the Latin word for “flowing,” the term “Fluxus” represents the artistic philosophy of the movement, characterized by the absence of rigid definitions regarding the nature of art.\n- It challenged the notion that museums were the sole authority in determining the value of art, while also questioning the idea that only the educated could appreciate art.\n- The Fluxus movement focused on experimental works that emphasized audience participation as active observers in the artistic experience.\n- Conceptual art prioritizes ideas over aesthetics, challenging the boundaries of art and encouraging critical engagement with artistic intention and intellectual exploration.\n- It can use any kind of material and be expressed through any type of medium, whether through performance or sculpture.",
+  "note": "T9 R&W M2 #25: other — notes bullets flattened into one line; one bullet per line restored (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p34 of files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrny5301tyqmt1znb79x3y",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes: - Cognitive Load Theory (CLT) is an idea popularized by psychologist John Sweller. - This theory posits that the mind depends on \"working memory\" to learn new tasks. - Working memory involves the effort or attention needed to absorb and store a new body of information. - According to psychologist Christian Jarrett, working memory is different from \"long-term memory.\" - Long-term memory involves the use of facts that can be recalled almost effortlessly in order to complete tasks.",
+  "after": "While researching a topic, a student has taken the following notes:\n\n- Cognitive Load Theory (CLT) is an idea popularized by psychologist John Sweller.\n- This theory posits that the mind depends on \"working memory\" to learn new tasks.\n- Working memory involves the effort or attention needed to absorb and store a new body of information.\n- According to psychologist Christian Jarrett, working memory is different from \"long-term memory.\"\n- Long-term memory involves the use of facts that can be recalled almost effortlessly in order to complete tasks.",
+  "note": "T9 R&W M2 #26: other — notes bullets flattened into one line; one bullet per line restored (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p35 of files_to_load/MOCK EXAMS/TEST 9/READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnw2p010bqmt19wxr7md8",
+  "field": "stem",
+  "before": "The expression $$(ax + 2)(bx - 3)$$ is equivalent to the expression $$4x^2 + 5x - 6$$. What is the product of $$a$$ and $$b$$?",
+  "after": "The expression $(ax + 2)(bx - 3)$ is equivalent to the expression $4x^2 + 5x - 6$. What is the product of $a$ and $b$?",
+  "note": "T9 Math M1 #9: other — inline expressions wrapped in display $$…$$ (each renders as its own centered block, breaking the sentence); converted to inline $…$",
+  "class": "other",
+  "evidence": "p4 of files_to_load/MOCK EXAMS/TEST 9/MATH/TEST 9 MATH MOD 1, 2B.pdf (Q9 one-sentence stem)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnw7k0117qmt19tzlqenb",
+  "field": "explanation",
+  "before": "The correct answer is . It is given that  percent of a random sample of  people own a car. Therefore, if the sample was taken from a total of  people, it can be expected that approximately  percent of the greater population also owns a car. Since the expected percentage of people who own a car is represented by , , and .",
+  "after": "The correct answer is $1$. It is given that $p$ percent of a random sample of $n$ people own a car. Therefore, if the sample was taken from a total of $4n$ people, it can be expected that approximately $p$ percent of the greater population also owns a car. Since the expected percentage of people who own a car is represented by $kp$, $kp=p$, and $k=1$.",
+  "note": "T9 Math M1 #19: stripped_math — explanation lost all Word equations (\"The correct answer is . It is given that  percent…\"); rebuilt from the docx OMML, prose identical",
+  "class": "stripped_math",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 9/Test9_Math ANS Explanations.docx Q19 (OMML)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnw4o010qqmt15p9zquem",
+  "field": "explanation",
+  "before": null,
+  "after": "Choice D is correct. Triangle $ABC$ is a $30$-$60$-$90$ special right triangle, where the ratios of the hypotenuse, longer leg, and shorter leg are $2x:x\\sqrt{3}:x$. It is given that the length of the longer leg is $12$. Therefore, setting it equal to $x\\sqrt{3}$ results in $12=x\\sqrt{3}$. Divide both sides of the equation by $\\sqrt{3}$ to yield $x=\\frac{12}{\\sqrt{3}}$. Multiply the right side of the equation by $\\frac{\\sqrt{3}}{\\sqrt{3}}$ to yield $\\frac{12\\sqrt{3}}{3}$, or $4\\sqrt{3}$. This is the length of $CB$. Side $AC$ is the hypotenuse, which is $2x$. Substituting $4\\sqrt{3}$ for $x$ results in $2(4\\sqrt{3})=8\\sqrt{3}$.\nTriangle $ADC$ is a $45$-$45$-$90$ special right triangle, where the ratio of the hypotenuse to the legs is $x\\sqrt{2}:x$, which means the hypotenuse is $\\sqrt{2}$ times larger than the leg. Since leg $AC$ has a length of $8\\sqrt{3}$ centimeters, that means the the hypotenuse $CD$ has a length of $(8\\sqrt{3})(\\sqrt{2})=8\\sqrt{6}$ centimeters.\nChoice A is incorrect as this is the result of dividing the length of $AC$ by $\\sqrt{2}$ instead of multiplying. Choice B is incorrect as this is the length of $AC$. Choice C is incorrect and may be the result of finding $BC$ by dividing by $2$, multiplying by $\\sqrt{3}$, and then multiplying by $\\sqrt{2}$.",
+  "note": "T9 Math M2 #14: other — explanation missing (null); the docx has it as paragraphs after the Q14 table (importer only read table cells) — added verbatim with equations as LaTeX",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 9/Test9_Math ANS Explanations.docx Module 2B Q14 (paragraphs after the table); argues D = 8√6 = key"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnw4w010wqmt1lxiguftt",
+  "field": "explanation",
+  "before": null,
+  "after": "Choice A is correct. Adding the frequencies of each column, there are $18+24+22+10+4+2=80$ total test scores. To find the number that represents the median, divide total number of tests by $2$, resulting in $\\frac{80}{2}=40$. Therefore, the median will be between the $40$th and $41$st test scores. Looking at the histogram, the $41$st test score is in the $51-60$ range. Since the histogram represents the scores after adding the $10$ extra points, subtract $10$ from both $51$ and $60$ to find the median before the $10$ extra points, which is between $41$ and $50$. Only Choice A fits this range.\nChoice B is incorrect as this is the median of the histogram with the $10$ extra points. Choice C is incorrect as this is where the median would be if $10$ additional points were added to the histogram. Choice D is incorrect and may be the result of conceptual errors.",
+  "note": "T9 Math M2 #15: other — explanation missing (null); the docx has it as paragraphs after the Q15 table — added verbatim (equations as LaTeX; space added in \"resulting in $\\frac{80}{2}=40$\")",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 9/Test9_Math ANS Explanations.docx Module 2B Q15 (\"Solution\" paragraphs); frequencies 18+24+22+10+4+2 match the histogram on p17 of files_to_load/MOCK EXAMS/TEST 9/MATH/TEST 9 MATH MOD 1, 2B.pdf; argues A = key"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnw7p0118qmt1pz7agqly",
+  "field": "stem",
+  "before": "$$0.84y^2 - 7.2y + 1.56$$\n\nThe given expression is equivalent to\n$$k(-7y^2 + 60y - 13)$$, where $$k$$ is a constant. What is the\nvalue of $$k$$?",
+  "after": "$$0.84y^2 - 7.2y + 1.56$$\n\nThe given expression is equivalent to $k(-7y^2 + 60y - 13)$, where $k$ is a constant. What is the value of $k$?",
+  "note": "T9 Math M2 #19: other — sentence broken by OCR line wraps and inline k(…)/k as display $$…$$; joined and made inline",
+  "class": "other",
+  "evidence": "p19 of files_to_load/MOCK EXAMS/TEST 9/MATH/TEST 9 MATH MOD 1, 2B.pdf (Q19)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnw80011aqmt1ujrd01x3",
+  "field": "stem",
+  "before": "A ramen restaurant tracked how many orders they\nreceived during the first 6 hours of opening. The\nscatterplot shows the results. Which of the following\nequations best models the data in the scatterplot?",
+  "after": "A ramen restaurant tracked how many orders they received during the first 6 hours of opening. The scatterplot shows the results. Which of the following equations best models the data in the scatterplot?",
+  "note": "T9 Math M2 #20: other — stem broken over 4 lines by OCR column wrap; joined (text identical)",
+  "class": "other",
+  "evidence": "p19 of files_to_load/MOCK EXAMS/TEST 9/MATH/TEST 9 MATH MOD 1, 2B.pdf (Q20)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnw80011aqmt1ujrd01x3",
+  "field": "explanation",
+  "before": null,
+  "after": "The ramen orders start low (~10), rise sharply to ~50 at x=3, then decrease. This is an inverted parabola (opens downward). The leading coefficient must be NEGATIVE. Among the choices, A and B have negative leading coefficients. The data rises from x=1 to x=3, so the vertex is around x=3. Only A has the correct positive middle coefficient (+26.97x) that produces this left-right behavior with a peak around x=3.\n✗ B: −4.21x²−26.97x−2.09: negative middle coefficient would shift the peak to negative x values.\n✗ C: Positive leading coefficient (4.21x²) opens upward — data clearly shows an arch shape.\n✗ D: Positive leading coefficient — same problem as C.",
+  "note": "T9 Math M2 #20: other — explanation missing (null); docx Q20 table has it — added verbatim",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 9/Test9_Math ANS Explanations.docx Module 2B Q20 table; argues A = key; matches scatterplot on p19 of files_to_load/MOCK EXAMS/TEST 9/MATH/TEST 9 MATH MOD 1, 2B.pdf (rises to ~50 near x=3, then falls)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnsxq0008qmt1wxyfhfiq",
+  "field": "stimulus",
+  "before": "A study led by Jeffrey M. Ellenbogen demonstrates that individuals who slept after learning were significantly more likely to recall the information with greater accuracy compared to those who remained awake. The findings of the study suggest that sleep plays a crucial role in improving the ability to recall information through processing and combining newly acquired knowledge.",
+  "after": "While all the benefits of sleep have yet to be discovered, research has shown that the brain works to ____ memories during a sleep cycle. A study led by Jeffrey M. Ellenbogen demonstrates that individuals who slept after learning were significantly more likely to recall the information with greater accuracy compared to those who remained awake. The findings of the study suggest that sleep plays a crucial role in improving the ability to recall information through processing and combining newly acquired knowledge.",
+  "note": "T10 R&W M1 #4: other — stimulus truncated: opening sentence holding the ____ blank (\"While all the benefits of sleep … works to ____ memories during a sleep cycle.\") was lost; without it the question has no blank",
+  "class": "other",
+  "evidence": "IngestPageArtifact p2 of files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf (Q4 passage)"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "opt_96ad4de311b44d55ac02b9a060d25b29",
+  "field": "text",
+  "before": "He vocally opposed government interference in church organization and teaching. The following text",
+  "after": "He vocally opposed government interference in church organization and teaching.",
+  "note": "T10 R&W M1 #7 opt D: bleed — option D ended with \" The following text\" = start of Q8's intro line",
+  "class": "bleed",
+  "evidence": "IngestPageArtifact p4 of files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf: Q7 option D ends \"…church organization and teaching.\"; \"The following text comes from…\" begins Q8"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnsz50014qmt1na9sbtet",
+  "field": "stimulus",
+  "before": "The following text comes from the 11th-century work *The Chronicle of Ahimaaz* written by Ahimaaz ben Paltiel. In those days there was in Bari, Saudan, the chieftain of the Arabians at the time, who held sway over the entire country. He sent messengers to the famous city of Oria, to make a treaty of peace with its inhabitants, promising not to deliver their land to destruction, only to exact tribute of them. But this was just a ruse, by which he planned to fall upon the city suddenly and overthrow it, and lay it waste.",
+  "after": "The following text comes from the 11th-century work *The Chronicle of Ahimaaz* written by Ahimaaz ben Paltiel.\n\nIn those days there was in Bari, Saudan, the chieftain of the Arabians at the time, who held sway over the entire country. He sent messengers to the famous city of Oria, to make a treaty of peace with its inhabitants, promising not to deliver their land to destruction, only to exact tribute of them. But this was just a ruse, by which he planned to fall upon the city suddenly and overthrow it, and lay it waste.",
+  "note": "T10 R&W M1 #8: other — intro line and passage run together; restore paragraph break (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p4 of files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "opt_ef7c463f6e084a0d807a053935a23dbf",
+  "field": "text",
+  "before": "the growth mindset may not produce desired out",
+  "after": "the growth mindset may not produce desired outcomes without additional factors like continual practice and hard work.",
+  "note": "T10 R&W M1 #13 opt D: other — option D (the key) truncated mid-word (\"…may not produce desired out\"); restored full text",
+  "class": "other",
+  "evidence": "IngestPageArtifact p9 of files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf: D \"the growth mindset may not produce desired outcomes without additional factors like continual practice and hard work.\""
+ },
+ {
+  "table": "QuestionOption",
+  "id": "opt_d43dbfa2e62a4b51b91b365d0e90370a",
+  "field": "text",
+  "before": "advancements and for ➤",
+  "after": "advancements and for",
+  "note": "T10 R&W M1 #14 opt D: other — stray \"➤\" (COME BACK LATER UI arrow) at end of option D",
+  "class": "other",
+  "evidence": "IngestPageArtifact p10 of files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf: \"☒ D advancements and for\" then \"➤ COME BACK LATER\""
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnt1w002hqmt10ya7zghr",
+  "field": "stimulus",
+  "before": "In the early 2020s, supporters of the Independent State Legislature theory argued that state legislatures could write election laws without restrictions, but in the 2023 case of *Moore v. Harper*, the Supreme _____ unbridled authority in establishing election rules, confirming that legislative actions must adhere to constitutional and legal limitations.",
+  "after": "One objective of the Supreme Court is to ensure the democratic integrity of not only federal elections but state elections as well. In the early 2020s, supporters of the Independent State Legislature theory argued that state legislatures could write election laws without restrictions, but in the 2023 case of *Moore v. Harper*, the Supreme _____ unbridled authority in establishing election rules, confirming that legislative actions must adhere to constitutional and legal limitations.",
+  "note": "T10 R&W M1 #19: other — stimulus truncated: opening sentence \"One objective of the Supreme Court … state elections as well.\" dropped",
+  "class": "other",
+  "evidence": "IngestPageArtifact p12 of files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf (Q19 passage)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnt2a002lqmt1ctzcykx6",
+  "field": "stimulus",
+  "before": "The In 1834, Myra Clark Gaines initiated a lawsuit, leading to one of the lengthiest cases in US court history. Upon discovering the wealth of her biological father, Daniel Clark, Gaines fought for recognition as his lawful heir. The case took many years due to conflicting wills: one favoring Gaines, the other bequeathing the inheritance to Clark's mother. ______ in 1889, the Supreme Court ruled in favor of Gaines, though her children inherited the fortune instead as she had passed away by then.",
+  "after": "In 1834, Myra Clark Gaines initiated a lawsuit, leading to one of the lengthiest cases in US court history. Upon discovering the wealth of her biological father, Daniel Clark, Gaines fought for recognition as his lawful heir. The case took many years due to conflicting wills: one favoring Gaines, the other bequeathing the inheritance to Clark's mother. ______ in 1889, the Supreme Court ruled in favor of Gaines, though her children inherited the fortune instead as she had passed away by then.",
+  "note": "T10 R&W M1 #21: other — stray leading word \"The \" (passage begins \"In 1834,\")",
+  "class": "other",
+  "evidence": "IngestPageArtifact p13 of files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf (Q21 passage)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnt2x002zqmt194kfilxx",
+  "field": "stimulus",
+  "before": "notes: - According to the United States Geological Survey (USGS), amphibian populations are in a state of worldwide decline. - Statistics from the USGS indicate that amphibian populations in the United States decrease by 3.79 percent every year. - Pesticide use may be responsible for some of the US decline. - Climate change may also be responsible for both US and worldwide declines.",
+  "after": "notes:\n\n- According to the United States Geological Survey (USGS), amphibian populations are in a state of worldwide decline.\n- Statistics from the USGS indicate that amphibian populations in the United States decrease by 3.79 percent every year.\n- Pesticide use may be responsible for some of the US decline.\n- Climate change may also be responsible for both US and worldwide declines.",
+  "note": "T10 R&W M1 #24: other — notes bullets flattened into one line; one bullet per line (text identical; source screenshot itself starts at \"notes:\")",
+  "class": "other",
+  "evidence": "IngestPageArtifact p15 of files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf + rendered page"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnt340035qmt16wj1iupc",
+  "field": "stimulus",
+  "before": "- In Franz Kafka's 1913 short story \"The Judgment,\" a young clerk named Georg Bendemann and his elderly father have a heated argument. - Some literary critics claim that the argument is mostly nonsensical. - The story was published in Kafka's lifetime. - In Kafka's unfinished novel *The Trial*, a bank clerk named Josef K. is arrested and prosecuted. - The reasons for Josef K.'s arrest and trial are never specified. - The novel was published after Kafka's death by Kafka's friend and executor Max Brod.",
+  "after": "- In Franz Kafka's 1913 short story \"The Judgment,\" a young clerk named Georg Bendemann and his elderly father have a heated argument.\n- Some literary critics claim that the argument is mostly nonsensical.\n- The story was published in Kafka's lifetime.\n- In Kafka's unfinished novel *The Trial*, a bank clerk named Josef K. is arrested and prosecuted.\n- The reasons for Josef K.'s arrest and trial are never specified.\n- The novel was published after Kafka's death by Kafka's friend and executor Max Brod.",
+  "note": "T10 R&W M1 #25: other — notes bullets flattened into one line; one bullet per line (text identical; screenshot has no intro line)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p16 of files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf + rendered page"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnsyc000jqmt1zsjwuywp",
+  "field": "stimulus",
+  "before": "The following text comes from Polybius' second-century work *Histories*. In my former book I explained the causes of the second war between Rome and Carthage; and described Hannibal's invasion of Italy, and the engagements which took place between them up to the battle of Cannae, on the banks of the Aufidus. I shall now take up the history of Greece during the same period, ending at the same date, and commencing from the 140th Olympiad.",
+  "after": "The following text comes from Polybius' second-century work *Histories*.\n\nIn my former book I explained the causes of the second war between Rome and Carthage; and described Hannibal's invasion of Italy, and the engagements which took place between them up to the battle of Cannae, on the banks of the Aufidus. I shall now take up the history of Greece during the same period, ending at the same date, and commencing from the 140th Olympiad.",
+  "note": "T10 R&W M2 #5: other — intro line and passage run together; restore paragraph break (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p21 of files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnsyp000tqmt176iwhq7b",
+  "field": "stimulus",
+  "before": "The following text comes from the 17th-century work *History of Al Maggari* written by Ahmed Al Maggari. In this text, a general addresses his soldiers.\n\nRemember that I place myself in the front of this glorious charge which I exhort you to make. At the moment when the two armies meet hand to hand, you will see me, never doubt it, seeking out this Roderick, tyrant of his people, challenging him to combat, if God is willing. If I perish after this, I will have had at least the satisfaction of delivering you, and++ you will easily find among you an experienced hero, to whom you can confidently give the task of directing you++. But should I fall before I reach to Roderick, redouble your ardor, force yourselves to the attack and achieve the conquest of this country.",
+  "after": "The following text comes from the 17th-century work *History of Al Maggari* written by Ahmed Al Maggari. In this text, a general addresses his soldiers.\n\nRemember that I place myself in the front of this glorious charge which I exhort you to make. At the moment when the two armies meet hand to hand, you will see me, never doubt it, seeking out this Roderick, tyrant of his people, challenging him to combat, if God is willing. If I perish after this, I will have had at least the satisfaction of delivering you, and ++you will easily find among you an experienced hero, to whom you can confidently give the task of directing you++. But should I fall before I reach to Roderick, redouble your ardor, force yourselves to the attack and achieve the conquest of this country.",
+  "note": "T10 R&W M2 #6: other — underline marker started before the space (\"and++ you\"); move it to the underlined words",
+  "class": "other",
+  "evidence": "rendered p21 of files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf: underline spans \"you will easily find … task of directing you\""
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnsyz000zqmt1vzi20rcg",
+  "field": "stimulus",
+  "before": "The following text is from Josephus's first-century work *The Wars of the Jews*, which covers the history of the Roman-Jewish wars. While some men who were not concerned in the affairs themselves have gotten together vain and contradictory stories by hearsay, and have written them down after a sophistical manner; and while those that were there present have given false accounts of things; and while their writings contain sometimes accusations, and sometimes encomiums, but no where the accurate truth of the facts; I have proposed to myself, for the sake of such as live under the government of the Romans, to translate those books into the Greek tongue, which I formerly composed in the language of our country, and sent to the Upper Barbarians; Joseph, the son of Matthias, by birth a Hebrew, a priest also, and one who at first fought against the Romans myself, and was forced to be present at what was done afterwards.",
+  "after": "The following text is from Josephus's first-century work *The Wars of the Jews*, which covers the history of the Roman-Jewish wars.\n\nWhile some men who were not concerned in the affairs themselves have gotten together vain and contradictory stories by hearsay, and have written them down after a sophistical manner; and while those that were there present have given false accounts of things; and while their writings contain sometimes accusations, and sometimes encomiums, but no where the accurate truth of the facts; I have proposed to myself, for the sake of such as live under the government of the Romans, to translate those books into the Greek tongue, which I formerly composed in the language of our country, and sent to the Upper Barbarians; Joseph, the son of Matthias, by birth a Hebrew, a priest also, and one who at first fought against the Romans myself, and was forced to be present at what was done afterwards.",
+  "note": "T10 R&W M2 #7: other — intro line and passage run together; restore paragraph break (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p22 of files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnsza0015qmt1bf7ttfky",
+  "field": "stimulus",
+  "before": "The following text comes from Theodore Roosevelt's 1910 speech \"Citizenship in a Republic.\" It is not the critic who counts; not the man who points out how the strong man stumbles, or where the doer of deeds could have done them better. The credit belongs to the man who is actually in the arena, whose face is marred by dust and sweat and blood; who strives valiantly; who errs, who comes short again and again, because there is no effort without error and shortcoming; but who does actually strive to do the deeds; who knows the great enthusiasms, the great devotions; who spends himself in a worthy cause; who at the best knows in the end the triumph of high achievement, and who at the worst, if he fails, at least fails while daring greatly, so that his place shall never be with those cold and timid souls who neither know victory nor defeat.",
+  "after": "The following text comes from Theodore Roosevelt's 1910 speech \"Citizenship in a Republic.\"\n\nIt is not the critic who counts; not the man who points out how the strong man stumbles, or where the doer of deeds could have done them better. The credit belongs to the man who is actually in the arena, whose face is marred by dust and sweat and blood; who strives valiantly; who errs, who comes short again and again, because there is no effort without error and shortcoming; but who does actually strive to do the deeds; who knows the great enthusiasms, the great devotions; who spends himself in a worthy cause; who at the best knows in the end the triumph of high achievement, and who at the worst, if he fails, at least fails while daring greatly, so that his place shall never be with those cold and timid souls who neither know victory nor defeat.",
+  "note": "T10 R&W M2 #8: other — intro line and passage run together; restore paragraph break (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p23 of files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnt06001lqmt16edse07w",
+  "field": "stimulus",
+  "before": "The following text is from Samuel Taylor Coleridge's 1816 poem \"Kubla Khan.\" In Xanadu did Kubla Khan A stately pleasure-dome decree: Where Alph, the sacred river, ran Through caverns measureless to man Down to a sunless sea. So twice five miles of fertile ground With walls and towers were girdled round; And there were gardens bright with sinuous rills, Where blossomed many an incense-bearing tree; And here were forests ancient as the hills, Enfolding sunny spots of greenery.",
+  "after": "The following text is from Samuel Taylor Coleridge's 1816 poem \"Kubla Khan.\"\n\nIn Xanadu did Kubla Khan\nA stately pleasure-dome decree:\nWhere Alph, the sacred river, ran\nThrough caverns measureless to man\nDown to a sunless sea.\nSo twice five miles of fertile ground\nWith walls and towers were girdled round;\nAnd there were gardens bright with sinuous rills,\nWhere blossomed many an incense-bearing tree;\nAnd here were forests ancient as the hills,\nEnfolding sunny spots of greenery.",
+  "note": "T10 R&W M2 #10: other — poem lines and intro squashed into one paragraph; restore intro break and one verse per line (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p24 of files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsojfkny000418pphjkv93qb",
+  "field": "imageUrl",
+  "before": "/uploads/questions/550fefb968242bdbbe37e1e1.jpg",
+  "after": null,
+  "note": "T10 R&W M2 #12 opt D: other — option D carries the question's bar-graph image (same file as Question.imageUrl) → graph shown twice, once under D; source option D is text only",
+  "class": "other",
+  "evidence": "rendered p25 of files_to_load/MOCK EXAMS/TEST 10/READING AND WRITING/INNOVATORS TEST 10 RW 1, 2B.pdf: option D is text only"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnffuvs00050mmxg91q2rf1",
+  "field": "stem",
+  "before": "$2x - 3y = -15$\n\n$$3x + 3y = 30$$\n\nWhat is the solution $(x, y)$ to the given system of equations?",
+  "after": "$$2x - 3y = -15$$\n\n$$3x + 3y = 30$$\n\nWhat is the solution $(x, y)$ to the given system of equations?",
+  "note": "T10 Math M1 #3: other — first equation of the system inline, second display; both are centred display equations in the source",
+  "class": "other",
+  "evidence": "rendered p1 of files_to_load/MOCK EXAMS/TEST 10/MATH/Test 10 Innov. Math.pdf"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnffuzb00270mmxj89q3is6",
+  "field": "stem",
+  "before": "The table shows various input and output values for the linear function $f(x)$ — for $x = -20, -17, -14, -11$ the outputs $f(x)$ are $25, 19, 13, 7$ respectively. If $f(x)$ is graphed on the $xy$-plane, which coordinate is the $x$-intercept of the graph?",
+  "after": "| x | f(x) |\n| --- | --- |\n| -20 | 25 |\n| -17 | 19 |\n| -14 | 13 |\n| -11 | 7 |\n\nThe table shows various input and output values for the linear function $f(x)$. If $f(x)$ is graphed on the $xy$-plane, which coordinate is the $x$-intercept of the graph?",
+  "note": "T10 Math M1 #21: flattened_table — table (OCR [tbl-0.html]) had been paraphrased into the stem as prose (\"— for x = -20, -17, -14, -11 the outputs … respectively\"); rebuilt as pipe table + source sentence",
+  "class": "flattened_table",
+  "evidence": "rendered p8 of files_to_load/MOCK EXAMS/TEST 10/MATH/Test 10 Innov. Math.pdf: table x | f(x): -20 25, -17 19, -14 13, -11 7; IngestPageArtifact p8 sentence"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnu8400hiqmt1hq2iv0yf",
+  "field": "stem",
+  "before": "Note: Figure not drawn to scale\n\nIn the image shown, line m is parallel to line n, all four triangles formed by the intersecting lines are isosceles triangles, and the two smaller triangles are congruent. If the measure of angle 3 is  \\( 104^{\\circ} \\) , what is the sum of angle 1 and angle 2, in degrees?",
+  "after": "Note: Figure not drawn to scale\n\nIn the image shown, line m is parallel to line n, all four triangles formed by the intersecting lines are isosceles triangles, and the two smaller triangles are congruent. If the measure of angle 3 is $104^{\\circ}$, what is the sum of angle 1 and angle 2, in degrees?",
+  "note": "T10 Math M2 #17: other — OCR inline math with stray spaces (\"  \\( 104^{\\circ} \\) ,\"); normalise to $104^{\\circ}$,",
+  "class": "other",
+  "evidence": "rendered p17 of files_to_load/MOCK EXAMS/TEST 10/MATH/Test 10 Innov. Math.pdf"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrnu8800hoqmt1maranylh",
+  "field": "text",
+  "before": "\\( 3.50t + 5.25r \\leq 50 \\) \\( t \\leq 3r \\)",
+  "after": "\\(3.50t + 5.25r \\leq 50\\)\n\\(t \\leq 3r\\)",
+  "note": "T10 Math M2 #18 opt A: other — system of two inequalities on one line; source stacks them (one per line)",
+  "class": "other",
+  "evidence": "rendered p17 of files_to_load/MOCK EXAMS/TEST 10/MATH/Test 10 Innov. Math.pdf: each option shows 3.50t + 5.25r ≤ 50 over the second inequality"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrnu8800hpqmt1mnz4fvlg",
+  "field": "text",
+  "before": "\\( 3.50t + 5.25r \\leq 50 \\) \\( 3t \\leq r \\)",
+  "after": "\\(3.50t + 5.25r \\leq 50\\)\n\\(3t \\leq r\\)",
+  "note": "T10 Math M2 #18 opt B: other — system of two inequalities on one line; source stacks them (one per line)",
+  "class": "other",
+  "evidence": "rendered p17 of files_to_load/MOCK EXAMS/TEST 10/MATH/Test 10 Innov. Math.pdf: each option shows 3.50t + 5.25r ≤ 50 over the second inequality"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrnu8800hqqmt16bcervtc",
+  "field": "text",
+  "before": "\\( 3.50t + 5.25r \\leq 50 \\) \\( t \\geq 3r \\)",
+  "after": "\\(3.50t + 5.25r \\leq 50\\)\n\\(t \\geq 3r\\)",
+  "note": "T10 Math M2 #18 opt C: other — system of two inequalities on one line; source stacks them (one per line)",
+  "class": "other",
+  "evidence": "rendered p17 of files_to_load/MOCK EXAMS/TEST 10/MATH/Test 10 Innov. Math.pdf: each option shows 3.50t + 5.25r ≤ 50 over the second inequality"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrnu8800hrqmt1zwljbf3e",
+  "field": "text",
+  "before": "\\( 3.50t + 5.25r \\leq 50 \\) \\( 3t \\geq r \\)",
+  "after": "\\(3.50t + 5.25r \\leq 50\\)\n\\(3t \\geq r\\)",
+  "note": "T10 Math M2 #18 opt D: other — system of two inequalities on one line; source stacks them (one per line)",
+  "class": "other",
+  "evidence": "rendered p17 of files_to_load/MOCK EXAMS/TEST 10/MATH/Test 10 Innov. Math.pdf: each option shows 3.50t + 5.25r ≤ 50 over the second inequality"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnffuz700220mmxj997lph9",
+  "field": "explanation",
+  "before": "Choice C is correct. This can be solved by graphing the answer choices in the graphing calculator to see which equation yields the graph shown. As a result, Choice C is the equation of the graph.\nAlternatively, it can be solved by choosing a point on the graph and substituting the coordinate points for  and  respectively into the equations in the answer choices.\nChoice A is incorrect as even though the intercepts are correct, the vertex of the graph is at , and this equation has a vertex at . Choice B is incorrect as this has the incorrect sign for the middle term. Choice D is incorrect as this would be a graph that opens upward because the coefficient for  is positive.\nCalculator tip: Enter the equation into the equation entry field in Desmos and evaluate whether it matches the shape and position of the original graph, as well as confirm that the graph passes through the same critical data points corresponding to the original graph in the test question. To save time, start by screening the answer choices according to their  intercepts, which are the \"c\" term in the  equation. Since the graph includes a  intercept of , only look to compare answers B and C in Desmos with the  \"\" value. Then, look at a comparison between other points (such as the intercepts) on their respective graphs that would separate the equations. Find which one matches the original graph in the test question. You can visually confirm that only Choice C matches.",
+  "after": "Choice C is correct. This can be solved by graphing the answer choices in the graphing calculator to see which equation yields the graph shown. As a result, Choice C is the equation of the graph.\nAlternatively, it can be solved by choosing a point on the graph and substituting the coordinate points for $x$ and $y$ respectively into the equations in the answer choices.\nChoice A is incorrect as even though the intercepts are correct, the vertex of the graph is at $(1, 2)$, and this equation has a vertex at $(1, 4)$. Choice B is incorrect as this has the incorrect sign for the middle term. Choice D is incorrect as this would be a graph that opens upward because the coefficient for $x^{2}$ is positive.\nCalculator tip: Enter the equation into the equation entry field in Desmos and evaluate whether it matches the shape and position of the original graph, as well as confirm that the graph passes through the same critical data points corresponding to the original graph in the test question. To save time, start by screening the answer choices according to their $y$ intercepts, which are the \"c\" term in the $h(x) = ax^{2} + bx + c$ equation. Since the graph includes a $y$ intercept of $(0, 1.5)$, only look to compare answers B and C in Desmos with the $\\frac{3}{2}$ \"$c$\" value. Then, look at a comparison between other points (such as the $x$-intercepts) on their respective graphs that would separate the equations. Find which one matches the original graph in the test question. You can visually confirm that only Choice C matches.",
+  "note": "T10 Math M1 #20: stripped_math — Word equations stripped at import (e.g. \"vertex of the graph is at , and\" / \"angle  measures .\"); rebuilt the OMML as LaTeX, prose identical",
+  "class": "stripped_math",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 10/Test10_Math_Answer_Explanations.docx Q20 (MODULE 1) OMML equations"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnu7o00heqmt13yzsvmfz",
+  "field": "explanation",
+  "before": "Choice D is correct. This question requires determining which options I, II, or III are incorrect. The leading coefficient is not reduced by  during horizontal shifts to the left or right by a certain value. I is incorrect. The other two options are correct. The reason II is correct is that when shifted left, one solution passes through the origin, therefore one of the values of , or  is . The third option is also correct because the y intercept would occur at  which is the origin.\nChoice A is incorrect because option I is incorrect, The leading coefficient is not reduced by  during horizontal shifts to the left or right by a certain value. Choice B is incorrect because option I is incorrect. Choice C is incorrect because option III is also correct.",
+  "after": "Choice D is correct. This question requires determining which options I, II, or III are incorrect. The leading coefficient is not reduced by $1$ during horizontal shifts to the left or right by a certain value. I is incorrect. The other two options are correct. The reason II is correct is that when shifted left, one solution passes through the origin, therefore one of the values of $m,n$, or $o$ is $0$. The third option is also correct because the y intercept would occur at $(0, 0)$ which is the origin.\nChoice A is incorrect because option I is incorrect, The leading coefficient is not reduced by $1$ during horizontal shifts to the left or right by a certain value. Choice B is incorrect because option I is incorrect. Choice C is incorrect because option III is also correct.",
+  "note": "T10 Math M2 #13: stripped_math — Word equations stripped at import (e.g. \"vertex of the graph is at , and\" / \"angle  measures .\"); rebuilt the OMML as LaTeX, prose identical",
+  "class": "stripped_math",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 10/Test10_Math_Answer_Explanations.docx Q13 (MODULE 2B) OMML equations"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnu8400hiqmt1hq2iv0yf",
+  "field": "explanation",
+  "before": "Choice B is correct.\n\nFor the top-right triangle, angle  and the bottom angle of the triangle are supplementary. Therefore, . It is an isosceles triangle, so the remaining two angles are equal. The sum of the remaining two angles is\n, and divide by two to yield  for both the top angles of the top right triangle. Since the two small triangles are congruent, the angles are the same. The top-right angle of the triangle is supplementary to the angle adjacent to it:  As such, angle  measures .\nBecause they are alternate interior angles, the top-left angle of the top-left triangle and the bottom-left angle of the bottom right triangle are equal. Therefore, the bottom-left angle of the bottom-right triangle measures . The sum of angle  and this angle is  as they are alternate interior angles. As such,\n, which is the measure of angle . Finally,\nangle  angle .\nChoice A is incorrect as this is the measure of angle . Choice C is incorrect as this is double the measure of angle . Choice D is incorrect as this is double the measure of angle .",
+  "after": "Choice B is correct.\n\nFor the top-right triangle, angle $3$ and the bottom angle of the triangle are supplementary. Therefore, $180^{\\circ} - 104^{\\circ} = 76^{\\circ}$. It is an isosceles triangle, so the remaining two angles are equal. The sum of the remaining two angles is\n$180^{\\circ} - 76^{\\circ} = 104^{\\circ}$, and divide by two to yield $52^{\\circ}$ for both the top angles of the top right triangle. Since the two small triangles are congruent, the angles are the same. The top-right angle of the triangle is supplementary to the angle adjacent to it: $180^{\\circ} - 52^{\\circ} = 128^{\\circ}$. As such, angle $1$ measures $128^{\\circ}$.\nBecause they are alternate interior angles, the top-left angle of the top-left triangle and the bottom-left angle of the bottom right triangle are equal. Therefore, the bottom-left angle of the bottom-right triangle measures $52^{\\circ}$. The sum of angle $2$ and this angle is $128$ as they are alternate interior angles. As such,\n$128^{\\circ} - 52^{\\circ} = 76^{\\circ}$, which is the measure of angle $2$. Finally,\nangle $1 +$ angle $2 = 128^{\\circ} + 76^{\\circ} = 204^{\\circ}$.\nChoice A is incorrect as this is the measure of angle $1$. Choice C is incorrect as this is double the measure of angle $3$. Choice D is incorrect as this is double the measure of angle $1$.",
+  "note": "T10 Math M2 #17: stripped_math — Word equations stripped at import (e.g. \"vertex of the graph is at , and\" / \"angle  measures .\"); rebuilt the OMML as LaTeX, prose identical",
+  "class": "stripped_math",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 10/Test10_Math_Answer_Explanations.docx Q17 (MODULE 2B) OMML equations"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnw88011bqmt1xskeplzv",
+  "field": "explanation",
+  "before": "Zeros of a polynomial are where the function crosses the x-axis. From the graph of the degree-4 polynomial, the curve appears to cross the x-axis near x = −2 (among other locations). If f(x) has a zero at x = −2, then (x+2) must be a factor.\n✗ A: (x−5) would require a zero at x = 5; the graph doesn't clearly show this.\n✗ B: (x−4) would require a zero at x = 4; not supported by the graph.\n✗ C: (x+1) would require a zero at x = −1; graph doesn't cross there clearly.",
+  "after": "Choice C is correct. If $(x-k)$ is a factor of $f(x)$, then $f(k)=0$, so the graph of $y=f(x)$ meets the $x$-axis at $x=k$. The graph crosses the $x$-axis at $x=-5$ and $x=-1$. Since $f(-1)=0$, $x-(-1)$, or $(x+1)$, must be a factor of $f(x)$.\nChoice A is incorrect. $(x-5)$ would require $f(5)=0$, but the graph is above the $x$-axis at $x=5$.\nChoice B is incorrect. $(x-4)$ would require $f(4)=0$, but at $x=4$ the graph is above the $x$-axis and doesn't touch it.\nChoice D is incorrect. $(x+2)$ would require $f(-2)=0$, but the graph is below the $x$-axis at $x=-2$.",
+  "note": "T9 Math M1 #21: explanation argued for D (x+2) while the key is C; rewritten for C from the graph (zeros at -5 and -1)",
+  "class": "other",
+  "evidence": "graph /uploads/questions/b6b1e564…; key C = Ans Key docx; docx explanation itself wrong"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnw8l011dqmt1owbpkau5",
+  "field": "explanation",
+  "before": null,
+  "after": "Choice D is correct. The line shown is the graph of $y=g(x)-5$. It passes through the points $(-6,-2)$ and $(0,3)$, so its slope is $\\frac{3-(-2)}{0-(-6)}=\\frac{5}{6}$ and its $y$-intercept is $3$. So $g(x)-5=\\frac{5}{6}x+3$. Adding $5$ to both sides gives $g(x)=\\frac{5}{6}x+8$.\nChoice A is incorrect. It has the wrong $y$-intercept: $g(0)=3+5=8$, not $-5$.\nChoice B is incorrect. This is the result of subtracting $5$ from the line's equation instead of adding $5$.\nChoice C is incorrect. This is the equation of the line shown, $y=g(x)-5$, not of $g(x)$.",
+  "note": "T9 Math M1 #22: explanation was missing; written from the graph (docx text had a wrong point (0, -2))",
+  "class": "other",
+  "evidence": "graph /uploads/questions/41ed2994… passes (-6,-2) and (0,3); key D"
+ }
+]

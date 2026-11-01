@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { contentProgramFor } from "@/lib/program-scope";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { validateQuestionPayload } from "@/lib/content-validation";
 import { captureCaughtError } from "@/lib/audit";
+import { BadRequestError, ForbiddenError, withApiErrors } from "@/lib/api-error";
+import { parseCsv } from "@/lib/csv";
 
 type CsvRow = Record<string, string>;
 
@@ -10,55 +13,6 @@ interface ValidatedRow {
   rowNumber: number;
   row: CsvRow;
   errors: string[];
-}
-
-function parseCsv(text: string) {
-  const rows: string[][] = [];
-  let row: string[] = [];
-  let field = "";
-  let quoted = false;
-
-  for (let i = 0; i < text.length; i += 1) {
-    const char = text[i];
-    const next = text[i + 1];
-
-    if (char === "\"") {
-      if (quoted && next === "\"") {
-        field += "\"";
-        i += 1;
-      } else {
-        quoted = !quoted;
-      }
-      continue;
-    }
-
-    if (char === "," && !quoted) {
-      row.push(field.trim());
-      field = "";
-      continue;
-    }
-
-    if ((char === "\n" || char === "\r") && !quoted) {
-      if (char === "\r" && next === "\n") i += 1;
-      row.push(field.trim());
-      if (row.some((value) => value.length > 0)) rows.push(row);
-      row = [];
-      field = "";
-      continue;
-    }
-
-    field += char;
-  }
-
-  row.push(field.trim());
-  if (row.some((value) => value.length > 0)) rows.push(row);
-
-  const [headerRow, ...dataRows] = rows;
-  if (!headerRow) return [];
-  const headers = headerRow.map((header) => header.trim());
-  return dataRows.map((values) =>
-    Object.fromEntries(headers.map((header, index) => [header, values[index] ?? ""]))
-  );
 }
 
 function normalizeRow(row: CsvRow): CsvRow {
@@ -105,14 +59,14 @@ function validateRows(rows: CsvRow[]) {
   return validated;
 }
 
-export async function POST(req: NextRequest) {
+export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
   if (!session) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return new ForbiddenError("Forbidden").toResponse();
   }
 
   const { csv, dryRun } = (await req.json()) as { csv?: string; dryRun?: boolean };
-  if (!csv) return NextResponse.json({ error: "CSV content is required." }, { status: 400 });
+  if (!csv) return new BadRequestError("CSV content is required.").toResponse();
 
   const rows = parseCsv(csv);
   const validatedRows = validateRows(rows);
@@ -137,6 +91,8 @@ export async function POST(req: NextRequest) {
 
   let created = 0;
   const errors: string[] = [];
+  // Imported questions go to the importer's program bank (program = tenant).
+  const programId = await contentProgramFor(session.user);
 
   for (const validated of validatedRows) {
     try {
@@ -163,6 +119,7 @@ export async function POST(req: NextRequest) {
           imageUrl: row.imageUrl || null,
           explanation: row.explanation || null,
           correctAnswer: row.correctAnswer,
+          programId,
           options: type === "MC" ? { create: options } : undefined,
         },
       });
@@ -191,4 +148,4 @@ export async function POST(req: NextRequest) {
   });
 
   return NextResponse.json({ created, errors });
-}
+});

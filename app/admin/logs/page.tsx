@@ -1,8 +1,10 @@
-import { PageShell } from "@/components/sat";
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import { ListFilters, PageHeader, PageShell, Pagination, RoleBadge, pageFromParam, pageSizeFromParam } from "@/components/sat";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { formatDate } from "@/lib/utils";
+import { roleLabel } from "@/lib/domain-meta";
 import { Card } from "@/components/ui/card";
 import {
   AUDIT_ACTION_LABELS,
@@ -15,14 +17,14 @@ import {
 import { AuditPayload } from "@/components/admin/audit-payload";
 
 interface PageProps {
-  searchParams: Promise<{ cat?: string }>;
+  searchParams: Promise<{ cat?: string; page?: string; per?: string; user?: string; action?: string; outcome?: string; role?: string }>;
 }
 
 const TABS: { id: string; label: string; match?: AuditCategory }[] = [
   { id: "all", label: "All" },
-  { id: "auth", label: "Auth", match: "Auth" },
+  { id: "auth", label: "Sign-in", match: "Auth" },
   { id: "users", label: "Users", match: "Users" },
-  { id: "attempts", label: "Attempts", match: "Attempts" },
+  { id: "attempts", label: "Student work", match: "Attempts" },
   { id: "content", label: "Content", match: "Content" },
   { id: "import", label: "Import", match: "Import" },
   { id: "programs", label: "Programs", match: "Programs" },
@@ -50,31 +52,80 @@ export default async function AdminLogsPage({ searchParams }: PageProps) {
   if (!session) redirect("/login");
   if (session.user.role !== "ADMIN") redirect("/teacher");
 
-  const { cat } = await searchParams;
+  const { cat, page, per, user: rawUser, action: rawAction, outcome: rawOutcome, role: rawRole } = await searchParams;
+  const outcomeFilter = rawOutcome === "success" || rawOutcome === "failure" || rawOutcome === "info" ? rawOutcome : undefined;
+  const roleFilter = ["STUDENT", "TEACHER", "PARENT", "ADMIN"].includes(rawRole ?? "") ? rawRole : undefined;
   const category = cat?.toLowerCase() ?? "all";
   const tab = TABS.find((t) => t.id === category) ?? TABS[0];
+  // Admin lists offer 25 / 50 / 100 rows per page (25 by default).
+  const pageSize = pageSizeFromParam(per, 25);
 
+  // Every logged action and actor, for the tabs and the Action / User drop-downs (they search inside).
+  const [actionRows, actorRows] = await Promise.all([
+    prisma.auditLog.groupBy({ by: ["action"] }),
+    prisma.auditLog.groupBy({ by: ["userId"], where: { userId: { not: null } } }),
+  ]);
+  const actions = actionRows.map((row) => row.action);
+  const tabActions = tab.id === "all" ? null : actions.filter((action) => actionCategory(action) === tab.match);
+  const actionFilter = rawAction && actions.includes(rawAction) && (!tabActions || tabActions.includes(rawAction)) ? rawAction : undefined;
+  const actors = await prisma.user.findMany({
+    where: { id: { in: actorRows.map((row) => row.userId!).filter(Boolean) } },
+    select: { id: true, name: true, email: true },
+    orderBy: { name: "asc" },
+  });
+  const userFilter = actors.some((actor) => actor.id === rawUser) ? rawUser : undefined;
+
+  // Filtered and paged in the database: every action is reachable (no "latest 500" cut).
+  const where = {
+    ...(actionFilter ? { action: actionFilter } : tabActions ? { action: { in: tabActions } } : {}),
+    ...(userFilter ? { userId: userFilter } : {}),
+    ...(roleFilter ? { user: { role: roleFilter } } : {}),
+    // writeAudit stores metadata as compact JSON ({"outcome":"success",…}).
+    ...(outcomeFilter ? { metadata: { contains: `"outcome":"${outcomeFilter}"` } } : {}),
+  };
+  const total = await prisma.auditLog.count({ where });
+  const pageCount = Math.max(1, Math.ceil(total / pageSize));
+  const current = Math.min(pageFromParam(page), pageCount);
   const logs = await prisma.auditLog.findMany({
+    where,
     include: { user: { select: { name: true, email: true, role: true } } },
     orderBy: { createdAt: "desc" },
-    take: 500,
+    skip: (current - 1) * pageSize,
+    take: pageSize,
   });
-
-  const filtered = (
-    tab.id === "all" ? logs : logs.filter((log) => actionCategory(log.action) === tab.match)
-  ).slice(0, 250);
+  const logPage = { items: logs, page: current, pageCount, total };
+  const params = { cat: tab.id === "all" ? undefined : tab.id, user: userFilter, action: actionFilter, outcome: outcomeFilter, role: roleFilter, per: String(pageSize) };
 
   return (
-    <PageShell width="wide">
-      <h1 className="mb-1 text-xl font-semibold text-gray-900">Audit Log</h1>
-      <p className="mb-4 text-sm text-gray-500">
-        Latest system events with full payload. Unknown codes are humanized automatically.
-      </p>
+    <PageShell>
+      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Admin" }, { label: "Audit Log" }]} />
+      <PageHeader title="Activity log" description="Every action by users, newest first." />
 
+      <ListFilters
+        action="/admin/logs"
+        search={false}
+        hidden={{ cat: tab.id === "all" ? undefined : tab.id, per: String(pageSize) }}
+        filters={[
+          { name: "user", label: "User", value: userFilter, allLabel: "Anyone", options: actors.map((actor) => ({ value: actor.id, label: `${actor.name} · ${actor.email}` })) },
+          {
+            name: "action",
+            label: "Action",
+            value: actionFilter,
+            allLabel: "Any action",
+            options: (tabActions ?? actions)
+              .map((action) => ({ value: action, label: AUDIT_ACTION_LABELS[action] ?? humanizeAction(action) }))
+              .sort((a, b) => a.label.localeCompare(b.label)),
+          },
+          { name: "outcome", label: "Outcome", value: outcomeFilter, allLabel: "Any outcome", options: [{ value: "success", label: "Success" }, { value: "failure", label: "Failure" }, { value: "info", label: "Info" }] },
+          { name: "role", label: "Account type", value: roleFilter, allLabel: "Any account", options: ["STUDENT", "TEACHER", "PARENT", "ADMIN"].map((r) => ({ value: r, label: roleLabel(r) })) },
+        ]}
+      />
       <div className="mb-4 flex flex-wrap gap-2">
         {TABS.map((item) => {
           const active = tab.id === item.id;
-          const href = item.id === "all" ? "/admin/logs" : `/admin/logs?cat=${item.id}`;
+          // Changing tab keeps the other filters (the action belongs to a tab, so it resets).
+          const keep = new URLSearchParams(Object.entries({ ...params, cat: item.id === "all" ? undefined : item.id, action: undefined }).filter((e): e is [string, string] => Boolean(e[1])));
+          const href = `/admin/logs${keep.toString() ? `?${keep.toString()}` : ""}`;
           return (
             <a
               key={item.id}
@@ -97,12 +148,13 @@ export default async function AdminLogsPage({ searchParams }: PageProps) {
                 <th className="px-4 py-3 text-left font-medium text-gray-500">When</th>
                 <th className="px-4 py-3 text-left font-medium text-gray-500">Who</th>
                 <th className="px-4 py-3 text-left font-medium text-gray-500">Event</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-500">Target / payload</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-500">Details</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filtered.map((log) => {
-                const categoryLabel = actionCategory(log.action);
+              {logPage.items.map((log) => {
+                const eventCategory = actionCategory(log.action);
+                const categoryLabel = TABS.find((t) => t.match === eventCategory)?.label ?? eventCategory;
                 const label = humanizeAction(log.action);
                 const outcome = outcomeFromMetadata(log.metadata);
                 const payload = formatAuditPayload(log.metadata);
@@ -120,12 +172,12 @@ export default async function AdminLogsPage({ searchParams }: PageProps) {
                       {log.user ? (
                         <>
                           <p className="font-medium text-gray-800">{log.user.name}</p>
-                          <p className="text-xs text-gray-400">{log.user.role}</p>
+                          <span className="mt-0.5 block"><RoleBadge role={log.user.role} /></span>
                           <p className="text-[10px] text-gray-400">{log.user.email}</p>
                         </>
                       ) : (
                         <>
-                          <p className="font-medium text-gray-800">Anonymous / System</p>
+                          <p className="font-medium text-gray-800">System</p>
                           <p className="text-xs text-gray-400">—</p>
                         </>
                       )}
@@ -142,10 +194,7 @@ export default async function AdminLogsPage({ searchParams }: PageProps) {
                           </span>
                         )}
                       </div>
-                      <p className="mt-1 font-medium text-gray-900">{label}</p>
-                      <p className="mt-0.5 font-mono text-[10px] text-gray-400" title="Internal event code">
-                        {log.action}
-                      </p>
+                      <p className="mt-1 font-medium text-gray-900" title={log.action}>{label}</p>
                     </td>
                     <td className="px-4 py-3">
                       <AuditPayload payload={payload} targetType={log.targetType} targetId={log.targetId} />
@@ -156,10 +205,11 @@ export default async function AdminLogsPage({ searchParams }: PageProps) {
             </tbody>
           </table>
         </div>
-        {filtered.length === 0 && (
+        {total === 0 && (
           <p className="py-10 text-center text-sm text-gray-400">No events recorded yet.</p>
         )}
       </Card>
+      <Pagination basePath="/admin/logs" params={params} pageSize={pageSize} pageSizeParam="per" {...logPage} />
     </PageShell>
   );
 }

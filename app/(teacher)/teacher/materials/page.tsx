@@ -1,4 +1,6 @@
-import { PageShell } from "@/components/sat";
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import { currentContentScope } from "@/lib/content-scope";
+import { PageHeader, PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { academicTopicWhere } from "@/lib/taxonomy";
@@ -16,20 +18,22 @@ export default async function TeacherMaterialsPage() {
       include: { domain: { include: { section: true } } },
     }),
     prisma.studyMaterial.findMany({
+      // The materials of the programs the teacher teaches (shared bank).
+      where: await currentContentScope(),
       orderBy: { updatedAt: "desc" },
       include: { topic: { include: { domain: { include: { section: true } } } } },
     }),
   ]);
 
   return (
-    <PageShell width="wide">
-      <h1 className="mb-2 text-xl font-semibold text-gray-900">Study Materials</h1>
-      <p className="mb-6 text-sm text-gray-500">Publish theory notes and support links for students.</p>
+    <PageShell>
+      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Practice", href: "/teacher/practice-sets" }, { label: "Materials" }]} />
+      <PageHeader title="Study Materials" description="Publish theory notes and support links for students." />
       <MaterialsClient
         topics={topics.map((t) => ({
           id: t.id,
           name: t.name,
-          sectionLabel: domainSectionLabel({ practiceArea: t.domain.practiceArea, sectionName: t.domain.section.name, sectionLabel: t.domain.section.label, domainName: t.domain.name }),
+          sectionLabel: domainSectionLabel({ practiceArea: t.domain.practiceArea }),
           domainName: t.domain.name,
         }))}
         materials={materials.map((m) => ({
@@ -44,7 +48,7 @@ export default async function TeacherMaterialsPage() {
             ? {
                 name: m.topic.name,
                 domainName: m.topic.domain.name,
-                sectionLabel: domainSectionLabel({ practiceArea: m.topic.domain.practiceArea, sectionName: m.topic.domain.section.name, sectionLabel: m.topic.domain.section.label, domainName: m.topic.domain.name }),
+                sectionLabel: domainSectionLabel({ practiceArea: m.topic.domain.practiceArea }),
               }
             : null,
         }))}

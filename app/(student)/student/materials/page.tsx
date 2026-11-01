@@ -1,23 +1,28 @@
-import { PageShell } from "@/components/sat";
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import { PageHeader, PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { MathContent } from "@/components/math-content";
 import { getFeatureSetting } from "@/lib/app-settings";
+import { auth } from "@/lib/auth";
 
 export default async function StudentMaterialsPage() {
   if (!(await getFeatureSetting("MATERIALS_MODULE"))) notFound();
+  const session = await auth();
 
   const materials = await prisma.studyMaterial.findMany({
-    where: { status: "PUBLISHED" },
+    // Materials of the programs the student is enrolled in (program = tenant).
+    where: { status: "PUBLISHED", program: { deletedAt: null, enrollments: { some: { studentId: session?.user?.id ?? "__no_session__", active: true, status: "APPROVED" } } } },
     orderBy: { updatedAt: "desc" },
     include: { topic: { include: { domain: { include: { section: true } } } } },
   });
 
   return (
     <PageShell>
-      <h1 className="mb-6 text-2xl font-semibold text-gray-900">Study Materials</h1>
+      <Breadcrumbs items={[{ label: "Home", href: "/student" }, { label: "Materials" }]} />
+      <PageHeader title="Study materials" />
       <div className="space-y-4">
         {materials.map((material) => (
           <Card as="article" key={material.id} padding="md">
@@ -42,7 +47,7 @@ export default async function StudentMaterialsPage() {
         ))}
         {materials.length === 0 && (
           <Card padding="lg" className="border-dashed text-center text-sm text-gray-500">
-            No study materials have been published yet.
+            There are no study materials yet.
           </Card>
         )}
       </div>

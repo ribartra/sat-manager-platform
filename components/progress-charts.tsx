@@ -11,26 +11,27 @@ const AREA_COLORS: Record<AreaTabKey, string> = {
   math: "var(--sat-area-math)",
   reading: "var(--sat-area-reading)",
   writing: "var(--sat-area-writing)",
-  mocks: "var(--sat-area-mocks)",
+  tests: "var(--sat-area-tests)",
 };
 
 // Neutral, non-evaluative bar color for accuracy bars: magnitude lives in the bar,
 // judgement lives only in the semantic % text (see scoreBandTextClass).
 const NEUTRAL_BAR = "#94a3b8"; // slate-400
 
-export function DifficultyAccuracyChart({ metrics }: { metrics: ProgressMetric[]; area?: AreaTabKey }) {
-  // Always show Easy/Medium/Hard (missing → "No data"; 0% ≠ no data), plus any extra difficulties present.
+export function DifficultyAccuracyChart({ metrics, selectedDifficulty }: { metrics: ProgressMetric[]; area?: AreaTabKey; selectedDifficulty?: string }) {
+  // Show all standard levels by default; a difficulty filter narrows the chart to that level.
+  const difficultyCells = selectedDifficulty ? [selectedDifficulty] : DIFFICULTY_ORDER;
   const cells: { difficulty: string; metric: ProgressMetric | null }[] = [
-    ...DIFFICULTY_ORDER.map((difficulty) => ({
+    ...difficultyCells.map((difficulty) => ({
       difficulty,
       metric: metrics.find((metric) => metric.difficulty === difficulty) ?? null,
     })),
-    ...metrics
+    ...(selectedDifficulty ? [] : metrics
       .filter((metric) => !DIFFICULTY_ORDER.includes(metric.difficulty as (typeof DIFFICULTY_ORDER)[number]))
-      .map((metric) => ({ difficulty: metric.difficulty, metric })),
+      .map((metric) => ({ difficulty: metric.difficulty, metric }))),
   ];
   return (
-    <ChartFrame title="Accuracy by difficulty" description="Correct answers ÷ answered questions">
+    <ChartFrame title="Accuracy by difficulty" description="% of questions answered correctly">
       {metrics.length === 0 ? (
         <EmptyChart />
       ) : (
@@ -77,7 +78,7 @@ export function DifficultyAccuracyChart({ metrics }: { metrics: ProgressMetric[]
                 <div key={difficulty} className="flex min-w-16 flex-1 flex-col items-center text-center">
                   <span className="text-xs font-medium text-gray-600">{difficultyLabel(difficulty)}</span>
                   <span className="text-[11px] text-gray-500">
-                    {metric ? `${metric.correct}/${metric.total} · ${metric.attempts} attempt${metric.attempts === 1 ? "" : "s"}` : "No questions answered"}
+                    {metric ? `${metric.correct} of ${metric.total} correct` : "No data"}
                   </span>
                 </div>
               ))}
@@ -89,16 +90,18 @@ export function DifficultyAccuracyChart({ metrics }: { metrics: ProgressMetric[]
   );
 }
 
-export function TopicDifficultyChart({ metrics }: { metrics: ProgressMetric[]; area?: AreaTabKey }) {
+export function TopicDifficultyChart({ metrics, selectedDifficulty }: { metrics: ProgressMetric[]; area?: AreaTabKey; selectedDifficulty?: string }) {
   const topics = [...new Set(metrics.map((metric) => metric.label))];
-  const difficulties = metrics.some((metric) => !DIFFICULTY_ORDER.includes(metric.difficulty as (typeof DIFFICULTY_ORDER)[number]))
+  const difficulties = selectedDifficulty
+    ? [selectedDifficulty]
+    : metrics.some((metric) => !DIFFICULTY_ORDER.includes(metric.difficulty as (typeof DIFFICULTY_ORDER)[number]))
     ? [...DIFFICULTY_ORDER, "UNSPECIFIED"]
     : DIFFICULTY_ORDER;
   const difficultyGridClass = difficulties.length === 4
     ? "sm:grid-cols-[minmax(11rem,1.3fr)_repeat(4,minmax(5rem,1fr))]"
     : "sm:grid-cols-[minmax(11rem,1.3fr)_repeat(3,minmax(5rem,1fr))]";
   return (
-    <ChartFrame title="Accuracy by skill and difficulty" description="Correct answers ÷ answered questions, with distinct attempts">
+    <ChartFrame title="Accuracy by skill and difficulty" description="% correct for each skill and level">
       {topics.length === 0 ? (
         <EmptyChart />
       ) : (
@@ -120,7 +123,7 @@ export function TopicDifficultyChart({ metrics }: { metrics: ProgressMetric[]; a
                     <div>
                       <div className="mb-1 flex justify-between text-[11px]">
                         <span className={accuracy === null ? "text-gray-400" : `font-semibold ${scoreBandTextClass(accuracy)}`}>{accuracy === null ? "No data" : `${accuracy}%`}</span>
-                        {metric ? <span className="text-gray-500">{metric.correct}/{metric.total} · {metric.attempts} attempt{metric.attempts === 1 ? "" : "s"}</span> : null}
+                        {metric ? <span className="text-gray-500">{metric.correct} of {metric.total} correct</span> : null}
                       </div>
                       <div className="h-2 rounded-full bg-gray-100">
                         <div className="h-2 rounded-full" style={{ width: `${accuracy ?? 0}%`, backgroundColor: accuracy === null ? "transparent" : NEUTRAL_BAR }} />
@@ -140,7 +143,7 @@ export function TopicDifficultyChart({ metrics }: { metrics: ProgressMetric[]; a
 
 export function MockSectionChart({ metrics }: { metrics: MockSectionMetric[] }) {
   return (
-    <ChartFrame title="Full Practice Test progress" description="SAT score by exam attempt and section">
+    <ChartFrame title="Test progress" description="SAT score for each Test, by section">
       {metrics.length === 0 ? (
         <EmptyChart />
       ) : (
@@ -149,10 +152,10 @@ export function MockSectionChart({ metrics }: { metrics: MockSectionMetric[] }) 
             <div key={`${metric.label}-${metric.submittedAt ?? "pending"}`}>
               <div className="mb-1 flex items-center justify-between gap-3 text-xs">
                 <span className="truncate font-medium text-gray-700" title={metric.label}>{metric.label}</span>
-                <span className="shrink-0 text-gray-500">Total {metric.totalScore ?? "-"} · {metric.attempts} attempt{metric.attempts === 1 ? "" : "s"}</span>
+                <span className="shrink-0 text-gray-500">Total {metric.totalScore ?? "-"}</span>
               </div>
               <ScoreBar label="Math" value={metric.mathScore} color={AREA_COLORS.math} />
-              <ScoreBar label="Reading & Writing" value={metric.rwScore} color={AREA_COLORS.mocks} />
+              <ScoreBar label="Reading & Writing" value={metric.rwScore} color={AREA_COLORS.reading} />
             </div>
           ))}
         </div>

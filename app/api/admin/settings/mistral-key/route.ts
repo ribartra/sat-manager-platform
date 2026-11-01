@@ -2,23 +2,24 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/rbac";
 import { encryptSecret, MISTRAL_API_KEY_SETTING, secretSummary } from "@/lib/secret-settings";
+import { BadRequestError, ForbiddenError, withApiErrors } from "@/lib/api-error";
 
-export async function GET() {
+export const GET = withApiErrors(async function GET() {
   const session = await requireAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const row = await prisma.appSetting.findUnique({ where: { key: MISTRAL_API_KEY_SETTING } });
   return NextResponse.json(secretSummary(row?.value));
-}
+});
 
-export async function PATCH(req: NextRequest) {
+export const PATCH = withApiErrors(async function PATCH(req: NextRequest) {
   const session = await requireAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const body = (await req.json().catch(() => ({}))) as { apiKey?: string };
   const apiKey = typeof body.apiKey === "string" ? body.apiKey.trim() : "";
-  if (!apiKey) return NextResponse.json({ error: "API key is required." }, { status: 400 });
-  if (apiKey.length < 20) return NextResponse.json({ error: "API key is too short." }, { status: 400 });
+  if (!apiKey) return new BadRequestError("API key is required.").toResponse();
+  if (apiKey.length < 20) return new BadRequestError("API key is too short.").toResponse();
 
   const encrypted = encryptSecret(apiKey);
   await prisma.appSetting.upsert({
@@ -39,4 +40,4 @@ export async function PATCH(req: NextRequest) {
   });
 
   return NextResponse.json(summary);
-}
+});

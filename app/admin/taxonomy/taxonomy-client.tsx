@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { humanizeCode } from "@/lib/domain-meta";
 import {
   Form,
   FormControl,
@@ -84,7 +85,7 @@ export function TaxonomyClient({ nodes }: TaxonomyClientProps) {
                 onBlur={(event) => renameNode(node, event.target.value)}
                 className="h-8 max-w-[360px] text-sm"
               />
-              <Badge variant={node.active ? "success" : "default"}>{node.type}</Badge>
+              <Badge variant={node.active ? "success" : "default"}>{humanizeCode(node.type)}</Badge>
               {!node.active && <Badge variant="warning">Inactive</Badge>}
             </div>
             <p className="mt-1 truncate text-xs text-gray-400">{taxonomyPathLabel(node.id, byId, node.label)}</p>

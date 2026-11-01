@@ -22,6 +22,12 @@ model User {
   validationReviewedAt   DateTime?
   validationReviewedById String?
   lastActiveAt DateTime?
+  termsAcceptedAt DateTime? // when the user accepted the Terms of Use (activation)
+  termsVersion String?      // TERMS_VERSION accepted (lib/consent.ts)
+  /// Bumped on password change/reset and anonymization; JWTs carrying an older value are rejected.
+  sessionVersion Int     @default(0)
+  /// Master teacher: may manage teachers (Teachers menu: invite, deactivate, see each teacher's students). Only for the SAT Teacher account.
+  canManageTeachers Boolean @default(false)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
@@ -30,13 +36,19 @@ model User {
   attempts    Attempt[]
   resetTokens    PasswordResetToken[]
   auditLogs   AuditLog[]
+  issueReports IssueReport[] @relation("IssueReportAuthor")
+  issueReportsResolved IssueReport[] @relation("IssueReportResolver")
   parentLinks ParentStudent[] @relation("ParentLinks")
   childLinks  ParentStudent[] @relation("ChildLinks")
+  parentPromptsDismissed ParentLinkPromptDismissal[] @relation("ParentPromptDismisser")
+  parentPromptDismissals ParentLinkPromptDismissal[] @relation("ParentPromptStudent")
   notifications Notification[]
   fullTestAssignments FullPracticeTestAssignment[]
   fullTestAttempts FullPracticeTestAttempt[]
   programTeachingAssignments ProgramTeacher[]
-  programEnrollments ProgramEnrollment[]
+  programEnrollments ProgramEnrollment[] @relation("EnrollmentStudent")
+  /// Enrollments this teacher owns (students they invited): a teacher sees and manages only these.
+  ownedEnrollments ProgramEnrollment[] @relation("EnrollmentOwner")
   parentAccessTokensCreated ParentAccessToken[] @relation("ParentAccessCreatedBy")
   parentAccessTokensForStudent ParentAccessToken[] @relation("ParentAccessStudent")
 }
@@ -60,6 +72,11 @@ model Program {
   teachers    ProgramTeacher[]
   enrollments ProgramEnrollment[]
   invites     InviteToken[]
+  // The program is the tenant: its bank (questions, sets, Tests, materials) is shared by its teachers.
+  questions    Question[]
+  practiceSets PracticeSet[]
+  fullTests    FullPracticeTest[]
+  materials    StudyMaterial[]
 }
 
 model ProgramTeacher {
@@ -82,11 +99,15 @@ model ProgramEnrollment {
   active     Boolean  @default(true)
   parentApprovalStatus  String?    // null = not required | PENDING | APPROVED | REJECTED
   parentApprovedAt      DateTime?
+  /// Owner teacher (who invited the student). Within a shared program each teacher sees only their students.
+  teacherId             String?
 
   program Program @relation(fields: [programId], references: [id], onDelete: Cascade)
-  student User    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  student User    @relation("EnrollmentStudent", fields: [studentId], references: [id], onDelete: Restrict)
+  teacher User?   @relation("EnrollmentOwner", fields: [teacherId], references: [id], onDelete: SetNull)
 
   @@id([programId, studentId])
+  @@index([teacherId])
 }
 
 model Group {
@@ -113,6 +134,8 @@ model GroupAssignment {
   dueDate       DateTime?
   unlockAt      DateTime?
   locked        Boolean  @default(false)
+  /// Explanations in the player for the members (copied to each member's Assignment).
+  showExplanations Boolean @default(true)
   createdAt     DateTime @default(now())
 
   group       Group       @relation(fields: [groupId], references: [id], onDelete: Cascade)
@@ -128,6 +151,8 @@ enum PracticeArea {
   WRITING
 }
 
+/// Official sections. Practice: MATH, READING, WRITING. READING_WRITING holds only the Test
+/// placeholder domain (Tests have 2 sections). Labels: Math, Reading, Writing, Reading & Writing.
 model Section {
   id      String   @id @default(cuid())
   name    String   @unique
@@ -139,10 +164,12 @@ model Domain {
   id           String        @id @default(cuid())
   name         String
   sectionId    String
-  /// Persisted practice classification. Null only for non-academic placeholders (e.g. Full Practice Test).
+  /// Copy of the Section name (MATH | READING | WRITING), kept equal by database triggers
+  /// (migration 20261018_practice_sections). Null only for Test placeholders (Full Practice Test).
   practiceArea PracticeArea?
   section      Section       @relation(fields: [sectionId], references: [id])
   topics       Topic[]
+  aliases      TaxonomyAlias[]
 
   @@index([practiceArea])
 }
@@ -158,8 +185,30 @@ model Topic {
   questions Question[]
   practiceSets PracticeSet[]
   materials StudyMaterial[]
+  aliases   TaxonomyAlias[]
 
   @@index([taxonomyNodeId])
+}
+
+/// Domain ↔ Skill correspondence aliases (lib/taxonomy-reference.ts ← Taxonomia-SAT.md + PDFs): other
+/// names a domain or skill is printed with (PDF), the source folder name in files_to_load (FILE), a name
+/// it had before (LEGACY), or one added by an admin (MANUAL).
+/// The platform always shows Domain.name / Topic.name; aliases are used to match ingest files.
+model TaxonomyAlias {
+  id        String   @id @default(cuid())
+  alias     String
+  kind      String   // DOMAIN | SKILL
+  domainId  String
+  topicId   String?  // set for SKILL aliases
+  source    String   @default("MANUAL") // PDF | FILE | LEGACY | MANUAL
+  createdAt DateTime @default(now())
+
+  domain Domain @relation(fields: [domainId], references: [id], onDelete: Cascade)
+  topic  Topic? @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@unique([kind, alias])
+  @@index([domainId])
+  @@index([topicId])
 }
 
 model Subskill {
@@ -208,15 +257,21 @@ model Question {
   status        String   @default("DRAFT") // DRAFT | PUBLISHED | ARCHIVED
   imageUrl      String?
   supportsGraph Boolean  @default(false)
+  /// Tenant: the program whose bank holds this question.
+  programId     String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
+  program  Program?  @relation(fields: [programId], references: [id], onDelete: Restrict)
   topic    Topic     @relation(fields: [topicId], references: [id])
   subskill Subskill? @relation(fields: [subskillId], references: [id])
   options  QuestionOption[]
   setItems PracticeSetQuestion[]
   answers  AttemptAnswer[]
   fullTestItems FullPracticeTestQuestion[]
+  @@index([topicId, difficulty, status])
+  @@index([createdAt])
+  @@index([programId])
 }
 
 model QuestionOption {
@@ -235,13 +290,37 @@ model PracticeSet {
   difficulty            String   @default("EASY")
   status                String   @default("DRAFT") // DRAFT | PUBLISHED | BLOCKED | ARCHIVED
   explanationVisibility String   @default("HIDDEN") // IMMEDIATE | AFTER_FINISH | HIDDEN
+  /// Tenant: the program whose bank holds this set.
+  programId             String?
+  /// Where the content comes from (College Board, …).
+  sourceId              String?
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 
+  program     Program?            @relation(fields: [programId], references: [id], onDelete: Restrict)
+  source      Source?             @relation(fields: [sourceId], references: [id], onDelete: Restrict)
   topic       Topic               @relation(fields: [topicId], references: [id])
   questions   PracticeSetQuestion[]
   assignments Assignment[]
   groupAssignments GroupAssignment[]
+
+  @@index([programId])
+  @@index([sourceId])
+}
+
+/// Where Practice Sets and Tests come from (College Board, Innovator, …). Global, managed by admins.
+model Source {
+  id                String             @id @default(cuid())
+  name              String             @unique
+  active            Boolean            @default(true)
+  sortOrder         Int                @default(0)
+  /// Offered in the Practice Set editor / Practice › By skill (Innovator is Tests-only).
+  forPracticeSets   Boolean            @default(true)
+  /// Offered in the Test editor.
+  forTests          Boolean            @default(true)
+  createdAt         DateTime           @default(now())
+  practiceSets      PracticeSet[]
+  fullPracticeTests FullPracticeTest[]
 }
 
 model PracticeSetQuestion {
@@ -264,14 +343,22 @@ model Assignment {
   status        String    @default("PENDING")
   /// Per-assignment practice feedback: IMMEDIATE (Check per question) | AFTER_SET (only after submit).
   feedbackMode  String    @default("AFTER_SET")
+  /// Per-student choice: explanations are shown in the player (after Check). Default on.
+  showExplanations Boolean @default(true)
   createdAt     DateTime  @default(now())
 
   practiceSet PracticeSet @relation(fields: [practiceSetId], references: [id])
   student     User        @relation(fields: [studentId], references: [id])
   attempts    Attempt[]
   unlockRequests UnlockRequest[]
+
+  @@unique([studentId, practiceSetId])
+  @@index([status, dueDate])
+  @@index([locked, unlockAt])
 }
 
+/// Partial unique indexes (raw migration 20261005_single_open_attempt): at most one IN_PROGRESS attempt
+/// per assignment, and per student+set when unassigned. Keep them when generating new migrations.
 model Attempt {
   id              String    @id @default(cuid())
   assignmentId    String?
@@ -283,6 +370,8 @@ model Attempt {
   submittedAt     DateTime?
   totalTime       Int?
   status          String    @default("IN_PROGRESS") // IN_PROGRESS | SUBMITTED | INVALIDATED
+  /// The assignment's "Show explanations in the player" when this attempt was taken.
+  showExplanations Boolean?
   currentQuestion Int       @default(0)
   teacherComment  String?
   /// Percent correct 0–100 at submit (also drives the 75% unlock rule).
@@ -296,6 +385,9 @@ model Attempt {
   student    User        @relation(fields: [studentId], references: [id])
   answers    AttemptAnswer[]
   pauses     AttemptPause[]
+  @@index([studentId, status])
+  @@index([assignmentId])
+  @@index([practiceSetId])
 }
 
 model AttemptPause {
@@ -305,7 +397,7 @@ model AttemptPause {
   resumedAt       DateTime?
   durationSeconds Int?
 
-  attempt Attempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  attempt Attempt @relation(fields: [attemptId], references: [id], onDelete: Restrict)
 }
 
 model AttemptAnswer {
@@ -319,10 +411,13 @@ model AttemptAnswer {
   markedForReview Boolean @default(false)
   note            String?
   eliminatedOptions String?
+  /// Set when the student used "Check" (immediate feedback); the answer can no longer change.
+  checkedAt       DateTime?
 
-  attempt  Attempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  attempt  Attempt  @relation(fields: [attemptId], references: [id], onDelete: Restrict)
   question Question @relation(fields: [questionId], references: [id])
   @@unique([attemptId, questionId])
+  @@index([questionId])
 }
 
 model InviteToken {
@@ -335,6 +430,8 @@ model InviteToken {
   invitedById String?
   programId String?
   isMinor   Boolean   @default(false)
+  birthDate DateTime? // when set, isMinor is derived from it (lib/consent.ts)
+  parentConsentRequired Boolean @default(false) // teacher asked for parent authorization (always true for minors)
   parentName String?
   parentEmail String?
   parentPhone String?
@@ -343,10 +440,14 @@ model InviteToken {
   parentConsentTokenHash String? @unique
   parentConsentAt DateTime?
   parentConsentIp String?
+  parentConsentVersion String? // PARENT_CONSENT_VERSION the parent accepted
   token     String    @unique
   tokenHash String?   @unique
   expiresAt DateTime
   usedAt    DateTime?
+  revokedAt DateTime? // cancelled: the link no longer works and a new invitation may be sent
+  termsAcceptedAt DateTime?
+  termsVersion String?
   program   Program?  @relation(fields: [programId], references: [id], onDelete: SetNull)
 }
 
@@ -369,6 +470,59 @@ model AuditLog {
   metadata   String?
   createdAt  DateTime @default(now())
   user       User?    @relation(fields: [userId], references: [id])
+  @@index([createdAt])
+  @@index([targetId])
+}
+
+/// "Report a problem" (components/sat/issue-reporter.tsx): a user points at part of a screen and
+/// comments. Saved here and emailed to ISSUE_REPORT_EMAIL; listed in Admin → Reports.
+model IssueReport {
+  id             String    @id @default(cuid())
+  userId         String
+  role           String
+  category       String // PROBLEM | CONFUSING | SUGGESTION | PRAISE
+  comment        String
+  url            String
+  pageTitle      String?
+  viewport       String?
+  userAgent      String?
+  target         String // JSON: selected element(s), page context, JS errors
+  screenshot     Bytes?
+  screenshotType String?
+  status         String    @default("OPEN") // OPEN | IN_PROGRESS | RESOLVED
+  emailSentAt    DateTime?
+  emailError     String?
+  resolvedById   String?
+  resolvedAt     DateTime?
+  /// Who fixed it: ADMIN (Admin → Reports) or AGENT (coding agent via /api/agent/issue-reports/[id]).
+  resolvedBySource String?
+  resolutionNote String?
+  /// Commit / PR / ticket link given with the fix.
+  resolutionRef  String?
+  /// Coding agent (lib/coder-agent-settings.ts): its ticket id and the last send.
+  agentTicketId  String?
+  agentSentAt    DateTime?
+  agentError     String?
+  createdAt      DateTime  @default(now())
+  user           User      @relation("IssueReportAuthor", fields: [userId], references: [id], onDelete: Cascade)
+  resolvedBy     User?     @relation("IssueReportResolver", fields: [resolvedById], references: [id], onDelete: SetNull)
+  events         IssueReportEvent[]
+  @@index([status, createdAt])
+  @@index([userId])
+}
+
+/// Timeline of an IssueReport: emails, coding agent sends/updates, admin resolve/reopen.
+model IssueReportEvent {
+  id        String      @id @default(cuid())
+  reportId  String
+  source    String // ADMIN | AGENT | SYSTEM
+  type      String // CREATED | EMAILED | EMAIL_FAILED | SENT_TO_AGENT | AGENT_ERROR | IN_PROGRESS | RESOLVED | REOPENED | NOTE
+  message   String?
+  ref       String?
+  userId    String?
+  createdAt DateTime    @default(now())
+  report    IssueReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  @@index([reportId, createdAt])
 }
 
 model UnlockRequest {
@@ -378,7 +532,7 @@ model UnlockRequest {
   status       String    @default("PENDING") // PENDING | APPROVED | DENIED
   createdAt    DateTime  @default(now())
   resolvedAt   DateTime?
-  assignment   Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  assignment   Assignment @relation(fields: [assignmentId], references: [id], onDelete: Restrict)
 }
 
 model Notification {
@@ -390,16 +544,29 @@ model Notification {
   readAt    DateTime?
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId, readAt])
 }
 
 model ParentStudent {
   parentId  String
   studentId String
   authorizedAt DateTime?
-  parent    User @relation("ParentLinks", fields: [parentId], references: [id], onDelete: Cascade)
-  student   User @relation("ChildLinks", fields: [studentId], references: [id], onDelete: Cascade)
+  parent    User @relation("ParentLinks", fields: [parentId], references: [id], onDelete: Restrict)
+  student   User @relation("ChildLinks", fields: [studentId], references: [id], onDelete: Restrict)
 
   @@id([parentId, studentId])
+}
+
+/// A teacher chose "Don't ask again" for linking a parent to this student (report → email to an address).
+model ParentLinkPromptDismissal {
+  userId    String
+  studentId String
+  createdAt DateTime @default(now())
+  user      User     @relation("ParentPromptDismisser", fields: [userId], references: [id], onDelete: Cascade)
+  student   User     @relation("ParentPromptStudent", fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@id([userId, studentId])
+  @@index([studentId])
 }
 
 model ParentAccessToken {
@@ -421,15 +588,27 @@ model ParentAccessToken {
 model FullPracticeTest {
   id             String   @id @default(cuid())
   name           String
+  /// "TEST N": groups the versions of one test across sources.
+  number         Int?
   status         String   @default("DRAFT") // DRAFT | PUBLISHED | ARCHIVED
   reviewEnabled  Boolean  @default(true)
   /// Break between RW Module 2 and Math Module 1 (minutes). 0 = no break.
   breakMinutes   Int      @default(0)
+  /// Tenant: the program whose bank holds this Test.
+  programId      String?
+  /// Where the content comes from (Innovator, …).
+  sourceId       String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  program        Program? @relation(fields: [programId], references: [id], onDelete: Restrict)
+  source         Source?  @relation(fields: [sourceId], references: [id], onDelete: Restrict)
   modules        FullPracticeTestModule[]
   assignments    FullPracticeTestAssignment[]
   attempts       FullPracticeTestAttempt[]
+
+  @@index([programId])
+  @@index([sourceId])
+  @@index([number])
 }
 
 model FullPracticeTestModule {
@@ -461,13 +640,25 @@ model FullPracticeTestAssignment {
   studentId   String
   assignedById String?
   dueDate     DateTime?
+  /// Open date: the student can start the Test from this moment (null = right away).
+  unlockAt    DateTime?
   status      String    @default("PENDING")
+  /// When to show answers: IMMEDIATE (Check per question in the player) | AFTER_SET (only in the results).
+  feedbackMode String   @default("AFTER_SET")
+  /// Per-student choice: the explanation with each checked answer in the Test player (IMMEDIATE only).
+  /// The assign form starts it off and always sends it (the column default stays: no table rebuild).
+  showExplanations Boolean @default(true)
   createdAt   DateTime  @default(now())
   test        FullPracticeTest @relation(fields: [testId], references: [id])
   student     User             @relation(fields: [studentId], references: [id])
   attempts    FullPracticeTestAttempt[]
+
+  @@unique([studentId, testId])
+  @@index([status, dueDate])
 }
 
+/// Partial unique index (raw migration 20261005_single_open_attempt): at most one IN_PROGRESS attempt
+/// per assignment. Keep it when generating new migrations.
 model FullPracticeTestAttempt {
   id             String    @id @default(cuid())
   testId         String
@@ -476,6 +667,8 @@ model FullPracticeTestAttempt {
   startedAt      DateTime  @default(now())
   submittedAt    DateTime?
   status         String    @default("IN_PROGRESS")
+  /// The assignment's "Show explanations in the player" when this attempt was taken.
+  showExplanations Boolean?
   currentModule  Int       @default(0)
   currentQuestion Int      @default(0)
   moduleTimerState String?
@@ -484,11 +677,17 @@ model FullPracticeTestAttempt {
   totalScore     Int?
   timeExpiredEvents Int    @default(0)
   extraTimeUsed  Int       @default(0)
+  // Immutable copy of modules/questions/keys taken when the attempt starts (lib/attempt-snapshots.ts):
+  // grading and results read it, so later edits to the exam or its questions never change history.
+  testSnapshot   String?
   test           FullPracticeTest @relation(fields: [testId], references: [id])
   assignment     FullPracticeTestAssignment? @relation(fields: [assignmentId], references: [id])
   student        User @relation(fields: [studentId], references: [id])
   answers        FullPracticeTestAnswer[]
   pauses         FullPracticeTestPause[]
+  @@index([studentId, status])
+  @@index([assignmentId])
+  @@index([testId])
 }
 
 model FullPracticeTestPause {
@@ -498,7 +697,7 @@ model FullPracticeTestPause {
   resumedAt       DateTime?
   durationSeconds Int?
 
-  attempt FullPracticeTestAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  attempt FullPracticeTestAttempt @relation(fields: [attemptId], references: [id], onDelete: Restrict)
 }
 
 model FullPracticeTestAnswer {
@@ -509,9 +708,15 @@ model FullPracticeTestAnswer {
   answer          String?
   isCorrect       Boolean?
   timeSpent       Int?
-  attempt         FullPracticeTestAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  markedForReview Boolean @default(false)
+  note            String?
+  eliminatedOptions String?
+  /// Set when the student used Check (answer locked from then on).
+  checkedAt       DateTime?
+  attempt         FullPracticeTestAttempt @relation(fields: [attemptId], references: [id], onDelete: Restrict)
 
   @@unique([attemptId, questionId])
+  @@index([questionId])
 }
 
 model FullPracticeTestScoreConversion {
@@ -532,10 +737,15 @@ model StudyMaterial {
   topicId     String?
   status      String   @default("PUBLISHED") // DRAFT | PUBLISHED | ARCHIVED
   createdById String?
+  /// Tenant: the program whose bank holds this material.
+  programId   String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  topic Topic? @relation(fields: [topicId], references: [id], onDelete: SetNull)
+  program Program? @relation(fields: [programId], references: [id], onDelete: Restrict)
+  topic   Topic?   @relation(fields: [topicId], references: [id], onDelete: SetNull)
+
+  @@index([programId])
 }
 
 model IngestBatch {
@@ -550,6 +760,13 @@ model IngestBatch {
   candidatesDetected Int      @default(0)
   errorCount         Int      @default(0)
   lastError          String?
+  /// Content Source given to what this batch promotes (null = College Board / Innovator default).
+  sourceId           String?
+  /// null = OCR pipeline; "AI_CSV" = simple import (CSV made by an external AI from the PDF).
+  importMode         String?
+  /// Simple import target: { kind, topicId?, difficulty?, testName? }.
+  targetJson         String?
+  createdById        String?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 }

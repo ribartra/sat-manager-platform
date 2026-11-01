@@ -1,24 +1,28 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { forgetSessionState } from "@/lib/session-state";
 import { requireAdmin } from "@/lib/rbac";
 import { notify } from "@/lib/notify";
+import { ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
   params: Promise<{ teacherId: string }>;
 }
 
-export async function POST(_req: Request, { params }: RouteContext) {
+export const POST = withApiErrors(async function POST(_req: Request, { params }: RouteContext) {
   const session = await requireAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { teacherId } = await params;
   const teacher = await prisma.user.findFirst({ where: { id: teacherId, role: "TEACHER" } });
-  if (!teacher) return NextResponse.json({ error: "Teacher not found" }, { status: 404 });
+  if (!teacher) return new NotFoundError("Teacher not found").toResponse();
 
   const updated = await prisma.user.update({
     where: { id: teacherId },
     data: { active: !teacher.active },
   });
+  // Deactivation ends the user's sessions on their next request.
+  forgetSessionState(teacherId);
 
   await prisma.auditLog.create({
     data: {
@@ -43,4 +47,4 @@ export async function POST(_req: Request, { params }: RouteContext) {
   }
 
   return NextResponse.json({ active: updated.active });
-}
+});

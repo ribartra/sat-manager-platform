@@ -1,0 +1,90 @@
+name: Build images
+
+# Builds web + ingest in Cloud Build (deploy/cloudbuild.yaml) and pushes them to Artifact Registry
+# with an immutable tag <yyyymmdd>-<short sha>. It does NOT deploy: production changes only with
+# `make release TAG=<tag>` from deploy/ (see deploy/README.md).
+#
+# Authentication: Workload Identity Federation (no key files). Repository variables, from
+# `terraform output` in deploy/terraform/environments/prod:
+#   GCP_PROJECT_ID, GCP_REGION, GCP_WIF_PROVIDER, GCP_WIF_SERVICE_ACCOUNT
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "app/**"
+      - "components/**"
+      - "lib/**"
+      - "contracts/**"
+      - "prisma/**"
+      - "public/**"
+      - "scripts/backfill-fpt-snapshots.mjs"
+      - "ingest_service/**"
+      - "package.json"
+      - "package-lock.json"
+      - "next.config.ts"
+      - "Dockerfile"
+      - "deploy/cloudbuild.yaml"
+      - "deploy/vm/web-entrypoint.sh"
+  workflow_dispatch:
+
+concurrency:
+  group: build-images-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build:
+    name: Cloud Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    if: ${{ vars.GCP_WIF_PROVIDER != '' }}
+    env:
+      PROJECT: ${{ vars.GCP_PROJECT_ID }}
+      REGION: ${{ vars.GCP_REGION }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud (WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_WIF_SERVICE_ACCOUNT }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Tag
+        id: tag
+        run: echo "tag=$(date -u +%Y%m%d)-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          REGISTRY="${REGION}-docker.pkg.dev/${PROJECT}/sat-images"
+          if gcloud artifacts docker images describe "${REGISTRY}/web:${TAG}" --project "$PROJECT" >/dev/null 2>&1; then
+            echo "web:${TAG} already exists - nothing to build"
+          else
+            gcloud builds submit . \
+              --project "$PROJECT" \
+              --config deploy/cloudbuild.yaml \
+              --substitutions "_REGISTRY=${REGISTRY},_TAG=${TAG},_REVISION=${GITHUB_SHA}" \
+              --service-account "projects/${PROJECT}/serviceAccounts/cloudbuild-web@${PROJECT}.iam.gserviceaccount.com"
+          fi
+          {
+            echo "### Images ready"
+            echo ""
+            echo "\`${REGISTRY}/web:${TAG}\` and \`${REGISTRY}/ingest:${TAG}\`"
+            echo ""
+            echo "Deploy from deploy/: \`make release TAG=${TAG}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  skipped:
+    name: Cloud Build (not configured)
+    runs-on: ubuntu-latest
+    if: ${{ vars.GCP_WIF_PROVIDER == '' }}
+    steps:
+      - run: echo "GCP_WIF_PROVIDER is not set; images are not built in CI (see deploy/docs/ci-wif.md)."

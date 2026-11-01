@@ -3,18 +3,21 @@
 import { useMemo, useState } from "react";
 import { Select } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { FILTER_FIELD_CLASS, FILTER_LABEL_CLASS } from "@/components/sat/filter-bar";
 
 export interface TaxonomyPickerTopic {
   id: string;
   name: string;
   sectionLabel: string;
   domainName: string;
+  /** Optional: filters that keep the chosen domain in the URL map its name to the id. */
+  domainId?: string;
 }
 
 // Preferred display order for sections; anything else falls after these.
 // Reading and Writing are surfaced as separate practice areas (the combined
 // "Reading & Writing" label is kept only for exam/full-test contexts).
-const SECTION_ORDER = ["Mathematics", "Reading", "Writing", "Reading & Writing"];
+const SECTION_ORDER = ["Math", "Reading", "Writing", "Reading & Writing"];
 
 /**
  * Cascading Section -> Domain -> Skill picker over the taxonomy, replacing flat
@@ -33,6 +36,9 @@ export function TaxonomyPicker({
   allowAll = false,
   fixedSection,
   stacked = false,
+  inFilterBar = false,
+  initialDomain,
+  onDomainChange,
   className,
 }: {
   topics: TaxonomyPickerTopic[];
@@ -43,11 +49,17 @@ export function TaxonomyPicker({
   fixedSection?: string;
   /** Stack the selects vertically (for narrow columns) instead of side by side. */
   stacked?: boolean;
+  /** Inside a FilterBar: each select is one more field of the bar's row (same label and height). */
+  inFilterBar?: boolean;
+  /** Domain (name) chosen with no skill yet, e.g. a filter whose URL has `domain` only. */
+  initialDomain?: string;
+  /** Called with the Domain name when it changes ("" = all), for filters that keep the domain. */
+  onDomainChange?: (domainName: string) => void;
   className?: string;
 }) {
   const selected = topics.find((t) => t.id === value);
   const [sectionState, setSectionState] = useState(selected?.sectionLabel ?? "");
-  const [domainState, setDomainState] = useState(selected?.domainName ?? "");
+  const [domainState, setDomainState] = useState(selected?.domainName ?? initialDomain ?? "");
 
   const section = fixedSection ?? sectionState;
   const req = required && !allowAll;
@@ -65,12 +77,13 @@ export function TaxonomyPicker({
     [topics, section, domainState]
   );
 
-  const labelCls = "block text-sm font-medium text-gray-700 mb-1";
+  const labelCls = inFilterBar ? FILTER_LABEL_CLASS : "block text-sm font-medium text-gray-700 mb-1";
+  const fieldCls = inFilterBar ? FILTER_FIELD_CLASS : undefined;
 
   return (
-    <div className={cn("grid gap-3", stacked ? "grid-cols-1" : fixedSection ? "grid-cols-2" : "grid-cols-3", className)}>
+    <div className={cn(inFilterBar ? "contents" : ["grid gap-3", stacked ? "grid-cols-1" : fixedSection ? "grid-cols-2" : "grid-cols-3"], className)}>
       {!fixedSection && (
-        <div>
+        <div className={fieldCls}>
           <label className={labelCls}>Section{req ? " *" : ""}</label>
           <Select
             value={sectionState}
@@ -88,12 +101,13 @@ export function TaxonomyPicker({
           </Select>
         </div>
       )}
-      <div>
+      <div className={fieldCls}>
         <label className={labelCls}>Domain{req ? " *" : ""}</label>
         <Select
           value={domainState}
           onChange={(e) => {
             setDomainState(e.target.value);
+            onDomainChange?.(e.target.value);
             onChange("");
           }}
           required={req}
@@ -105,7 +119,7 @@ export function TaxonomyPicker({
           ))}
         </Select>
       </div>
-      <div>
+      <div className={fieldCls}>
         <label className={labelCls}>Skill{req ? " *" : ""}</label>
         <Select
           value={value}

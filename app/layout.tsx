@@ -1,8 +1,15 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import { headers } from "next/headers";
 import "./globals.css";
 import { AuthSessionProvider } from "@/components/session-provider";
 import { AppQueryProvider } from "@/components/query-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { ConfirmProvider } from "@/components/sat/confirm-dialog";
+import { CspNonce } from "@/components/csp-nonce";
+
+// Mockup typeface, self-hosted at build time (no runtime request to Google).
+const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-inter" });
 
 export const metadata: Metadata = {
   title: "SAT Practice Platform",
@@ -11,16 +18,23 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   return (
-    <html lang="en" className="h-full">
-      <body className="min-h-full bg-white text-gray-900 antialiased">
+    <html lang="en" className={`h-full ${inter.variable}`}>
+      <body className="min-h-full antialiased">
+        <CspNonce nonce={nonce} />
         <AuthSessionProvider>
-          <AppQueryProvider>{children}</AppQueryProvider>
+          <AppQueryProvider>
+            {/* Desktop scale (globals.css): portals (menus, dialogs, toasts) stay outside it. */}
+            <div className="app-zoom min-h-full">
+              <ConfirmProvider>{children}</ConfirmProvider>
+            </div>
+          </AppQueryProvider>
         </AuthSessionProvider>
         <Toaster />
       </body>

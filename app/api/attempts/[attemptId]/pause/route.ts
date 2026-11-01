@@ -3,21 +3,23 @@ import prisma from "@/lib/prisma";
 import { requireApprovedSession } from "@/lib/rbac";
 import { writeAudit } from "@/lib/audit";
 import { withSqliteRetry } from "@/lib/sqlite-retry";
+import { isUniqueConstraintError } from "@/lib/db-errors";
+import { NotFoundError, UnauthorizedError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
   params: Promise<{ attemptId: string }>;
 }
 
-export async function POST(_req: Request, { params }: RouteContext) {
+export const POST = withApiErrors(async function POST(_req: Request, { params }: RouteContext) {
   const session = await requireApprovedSession();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session) return new UnauthorizedError("Unauthorized").toResponse();
 
   const { attemptId } = await params;
   const attempt = await withSqliteRetry(() => prisma.attempt.findFirst({
     where: { id: attemptId, studentId: session.user.id, status: "IN_PROGRESS" },
     select: { id: true },
   }));
-  if (!attempt) return NextResponse.json({ error: "Attempt not found." }, { status: 404 });
+  if (!attempt) return new NotFoundError("Attempt not found.").toResponse();
 
   const existing = await withSqliteRetry(() => prisma.attemptPause.findFirst({
     where: { attemptId, resumedAt: null },
@@ -25,7 +27,14 @@ export async function POST(_req: Request, { params }: RouteContext) {
   }));
   if (existing) return NextResponse.json(existing);
 
-  const pause = await withSqliteRetry(() => prisma.attemptPause.create({ data: { attemptId } }));
+  let pause;
+  try {
+    pause = await withSqliteRetry(() => prisma.attemptPause.create({ data: { attemptId } }));
+  } catch (error) {
+    // One open pause per attempt (unique index): a concurrent pause (double click, two tabs) won.
+    if (!isUniqueConstraintError(error)) throw error;
+    return NextResponse.json(await prisma.attemptPause.findFirst({ where: { attemptId, resumedAt: null } }));
+  }
   await writeAudit({
     userId: session.user.id,
     action: "ATTEMPT_PAUSED",
@@ -34,4 +43,4 @@ export async function POST(_req: Request, { params }: RouteContext) {
     outcome: "info",
   });
   return NextResponse.json(pause);
-}
+});

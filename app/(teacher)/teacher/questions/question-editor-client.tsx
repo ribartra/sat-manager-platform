@@ -1,5 +1,6 @@
 "use client";
 
+import { Checkbox, Radio } from "@/components/ui/checkbox";
 import { useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -44,6 +45,9 @@ import {
   type QuestionEditorInput,
 } from "@/contracts/question";
 import { resolveQuestionType } from "@/lib/question-type";
+import { apiFetch, readApiError } from "@/lib/api-client";
+import { notify } from "@/lib/notify-ui";
+import { Alert } from "@/components/sat/alert";
 
 interface TopicInfo {
   id: string;
@@ -56,6 +60,8 @@ interface TopicInfo {
 
 interface QuestionData {
   id?: string;
+  /** Version loaded by the editor; the save is refused (409) if someone else saved since. */
+  updatedAt?: string;
   topicId?: string;
   subskillId?: string | null;
   difficulty?: string;
@@ -120,10 +126,13 @@ export function QuestionEditor({
   initial,
   sourceContext,
   showGraphOption = false,
+  returnHref = "/teacher/questions",
 }: {
   topics: TopicInfo[];
   initial?: QuestionData;
   sourceContext?: SourceContext;
+  /** Where Save goes back to: the Question Bank on the question's area. */
+  returnHref?: string;
   /** Admin feature flag: QUESTION_GRAPH_VISUALIZATION */
   showGraphOption?: boolean;
 }) {
@@ -172,7 +181,7 @@ export function QuestionEditor({
   const fieldRefs = useRef<Record<string, HTMLTextAreaElement | null>>({});
 
   const selectedTopic = useMemo(() => topics.find((topic) => topic.id === topicId), [topicId, topics]);
-  const isMathQuestion = selectedTopic?.sectionLabel === "Mathematics";
+  const isMathQuestion = selectedTopic?.sectionLabel === "Math";
 
   function bindFieldRef(key: string) {
     return (node: HTMLTextAreaElement | null) => {
@@ -249,16 +258,17 @@ export function QuestionEditor({
       status: values.status,
       options: values.type === "MC" ? values.options : [],
       ingestCandidateId: sourceContext?.ingestCandidateId,
+      expectedUpdatedAt: initial?.updatedAt,
     };
     const url = initial?.id ? `/api/questions/${initial.id}` : "/api/questions";
     const method = initial?.id ? "PUT" : "POST";
     const response = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     if (!response.ok) {
-      const payload = await response.json().catch(() => null);
-      setErrors(Array.isArray(payload?.errors) ? payload.errors : [payload?.error ?? "Unable to save question."]);
+      const error = await readApiError(response, "Unable to save question.");
+      setErrors(error.details.length ? error.details : [error.message]);
       return;
     }
-    router.push("/teacher/questions");
+    router.push(returnHref);
   }
 
   function onInvalid() {
@@ -266,18 +276,19 @@ export function QuestionEditor({
   }
 
   const saving = form.formState.isSubmitting;
-  const canSave = Boolean(stem?.trim() && topicId && correctAnswer?.trim());
   const [duplicating, setDuplicating] = useState(false);
 
   async function duplicateQuestion() {
     if (!initial?.id) return;
     setDuplicating(true);
-    const response = await fetch(`/api/questions/${initial.id}/duplicate`, { method: "POST" });
-    const data = await response.json().catch(() => ({}));
-    setDuplicating(false);
-    if (!response.ok) {
-      window.alert(data.errors?.join("\n") || data.error || "Unable to duplicate.");
+    let data: { question?: { id?: string } };
+    try {
+      data = await apiFetch(`/api/questions/${initial.id}/duplicate`, { method: "POST", fallback: "Unable to duplicate." });
+    } catch (error) {
+      notify.error(error);
       return;
+    } finally {
+      setDuplicating(false);
     }
     if (data?.question?.id) router.push(`/teacher/questions/${data.question.id}/edit`);
   }
@@ -382,8 +393,7 @@ export function QuestionEditor({
               render={({ field }) => (
                 <FormItem>
                   <Card as="label" padding="sm" className="flex items-start gap-3">
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       checked={field.value}
                       onChange={(event) => field.onChange(event.target.checked)}
                       onBlur={field.onBlur}
@@ -392,9 +402,9 @@ export function QuestionEditor({
                       className="mt-1 rounded border-gray-300"
                     />
                     <span>
-                      <span className="block text-sm font-medium text-gray-800">Enable graph visualization</span>
+                      <span className="block text-sm font-medium text-gray-800">Show a graph for this question</span>
                       <span className="mt-0.5 block text-xs text-gray-500">
-                        Use this only when the question should preload graph data into the calculator or local renderer.
+                        Turn on if the question includes a graph.
                       </span>
                     </span>
                   </Card>
@@ -413,8 +423,8 @@ export function QuestionEditor({
             placeholder="Reading passage, graph description, or any context..."
             hint={
               isMathQuestion
-                ? "Bold/Underline wrap selection; Formula inserts LaTeX."
-                : "Select text then Bold/Underline. Appears in the left column of the player."
+                ? "Select text to bold or underline. Use Formula for math."
+                : "Select text to bold or underline. Shown on the left side of the question."
             }
             collapsible
             collapseLabel="Add passage"
@@ -445,8 +455,7 @@ export function QuestionEditor({
               <div className="space-y-3">
                 {options.map((opt) => (
                   <div key={opt.label} className="grid grid-cols-[auto_1.5rem_1fr] items-start gap-3">
-                    <input
-                      type="radio"
+                    <Radio
                       name="correct"
                       value={opt.label}
                       checked={correctAnswer === opt.label}
@@ -540,18 +549,17 @@ export function QuestionEditor({
         </div>
 
         {errors.length > 0 ? (
-          <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-            <p className="font-medium">Fix these issues before saving:</p>
-            <ul className="mt-1 list-disc pl-5">
+          <Alert tone="error" title="Fix these issues before saving:">
+            <ul className="list-disc pl-5">
               {errors.map((error) => (
                 <li key={error}>{error}</li>
               ))}
             </ul>
-          </div>
+          </Alert>
         ) : null}
 
         <div className="flex items-center gap-3">
-          <Button type="submit" disabled={saving || !canSave}>
+          <Button type="submit" disabled={saving} disabledReason={!stem?.trim() ? "Write the question stem." : !topicId ? "Choose a skill." : !correctAnswer?.trim() ? "Set the correct answer." : null}>
             {saving ? "Saving..." : initial?.id ? "Update Question" : "Create Question"}
           </Button>
           <Button type="button" variant="secondary" onClick={() => router.back()}>
@@ -609,8 +617,7 @@ export function QuestionEditor({
                   className="font-mono text-sm"
                 />
                 <label className="mt-3 flex items-center gap-2 text-sm text-gray-700">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     checked={formulaDisplayMode}
                     onChange={(event) => setFormulaDisplayMode(event.target.checked)}
                     className="rounded border-gray-300"
@@ -633,7 +640,7 @@ export function QuestionEditor({
               <Button type="button" variant="secondary" onClick={() => setFormulaOpen(false)}>
                 Cancel
               </Button>
-              <Button type="button" onClick={insertFormula} disabled={!formulaLatex.trim()}>
+              <Button type="button" onClick={insertFormula} disabledReason={!formulaLatex.trim() ? "Type a formula first." : null}>
                 <Sigma size={14} />
                 Insert Formula
               </Button>

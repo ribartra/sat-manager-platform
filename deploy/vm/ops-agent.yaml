@@ -1,0 +1,27 @@
+# SAT platform: ship container logs (Docker json-file under /data/docker) to Cloud Logging.
+# App lines are JSON (lib/observability.ts); their `severity` becomes the LogEntry severity.
+logging:
+  receivers:
+    sat_docker:
+      type: files
+      include_paths:
+        - /data/docker/containers/*/*-json.log
+      record_log_file_path: true
+  processors:
+    sat_docker_json:
+      type: parse_json
+      time_key: time
+      time_format: "%Y-%m-%dT%H:%M:%S.%LZ"
+    sat_app_json:
+      type: parse_json
+      field: log
+    sat_severity:
+      type: modify_fields
+      fields:
+        severity:
+          move_from: jsonPayload.severity
+  service:
+    pipelines:
+      sat_docker:
+        receivers: [sat_docker]
+        processors: [sat_docker_json, sat_app_json, sat_severity]

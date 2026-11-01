@@ -7,6 +7,30 @@ export type ProgressMetric = {
   total: number;
   attempts: number;
   timeSeconds: number;
+  attemptDetails: ProgressAttemptDetail[];
+};
+
+export type ProgressAttemptDetail = {
+  attemptId: string;
+  label: string;
+  submittedAt: string | null;
+  correct: number;
+  total: number;
+};
+
+type ProgressRow = {
+  difficulty: string | null | undefined;
+  correct: boolean;
+  timeSeconds?: number | null;
+  attemptId?: string;
+  attemptLabel?: string;
+  submittedAt?: Date | string | null;
+};
+
+type TopicProgressRow = ProgressRow & { topic: string | null | undefined };
+type InternalProgressMetric = Omit<ProgressMetric, "attemptDetails"> & {
+  attemptIds: Set<string>;
+  details: Map<string, ProgressAttemptDetail>;
 };
 
 export type MockSectionMetric = {
@@ -16,6 +40,8 @@ export type MockSectionMetric = {
   rwScore: number | null;
   totalScore: number | null;
   attempts: number;
+  /** Tests only: seconds spent answering. */
+  timeSeconds?: number | null;
 };
 
 export type TopicTrendPoint = {
@@ -42,9 +68,9 @@ export function sortDifficultyMetrics(metrics: ProgressMetric[]) {
 }
 
 export function aggregateDifficultyMetrics(
-  rows: Array<{ difficulty: string | null | undefined; correct: boolean; timeSeconds?: number | null; attemptId?: string }>,
+  rows: ProgressRow[],
 ): ProgressMetric[] {
-  const map = new Map<string, ProgressMetric & { attemptIds: Set<string> }>();
+  const map = new Map<string, InternalProgressMetric>();
   for (const row of rows) {
     const difficulty = row.difficulty || "UNSPECIFIED";
     const metric = map.get(difficulty) ?? {
@@ -55,26 +81,37 @@ export function aggregateDifficultyMetrics(
       attempts: 0,
       timeSeconds: 0,
       attemptIds: new Set<string>(),
+      details: new Map<string, ProgressAttemptDetail>(),
     };
     metric.total += 1;
     if (row.correct) metric.correct += 1;
     metric.timeSeconds += row.timeSeconds ?? 0;
-    if (row.attemptId) metric.attemptIds.add(row.attemptId);
+    if (row.attemptId) {
+      metric.attemptIds.add(row.attemptId);
+      const detail = metric.details.get(row.attemptId) ?? {
+        attemptId: row.attemptId,
+        label: row.attemptLabel ?? "Submitted attempt",
+        submittedAt: row.submittedAt ? new Date(row.submittedAt).toISOString() : null,
+        correct: 0,
+        total: 0,
+      };
+      detail.total += 1;
+      if (row.correct) detail.correct += 1;
+      metric.details.set(row.attemptId, detail);
+    }
     map.set(difficulty, metric);
   }
-  return sortDifficultyMetrics([...map.values()].map(({ attemptIds, ...metric }) => ({ ...metric, attempts: attemptIds.size })));
+  return sortDifficultyMetrics([...map.values()].map(({ attemptIds, details, ...metric }) => ({
+    ...metric,
+    attempts: attemptIds.size,
+    attemptDetails: sortAttemptDetails(details),
+  })));
 }
 
 export function aggregateTopicDifficultyMetrics(
-  rows: Array<{
-    topic: string | null | undefined;
-    difficulty: string | null | undefined;
-    correct: boolean;
-    timeSeconds?: number | null;
-    attemptId?: string;
-  }>,
+  rows: TopicProgressRow[],
 ): ProgressMetric[] {
-  const map = new Map<string, ProgressMetric & { attemptIds: Set<string> }>();
+  const map = new Map<string, InternalProgressMetric>();
   for (const row of rows) {
     const label = row.topic || "Unclassified topic";
     const difficulty = row.difficulty || "UNSPECIFIED";
@@ -87,20 +124,45 @@ export function aggregateTopicDifficultyMetrics(
       attempts: 0,
       timeSeconds: 0,
       attemptIds: new Set<string>(),
+      details: new Map<string, ProgressAttemptDetail>(),
     };
     metric.total += 1;
     if (row.correct) metric.correct += 1;
     metric.timeSeconds += row.timeSeconds ?? 0;
-    if (row.attemptId) metric.attemptIds.add(row.attemptId);
+    if (row.attemptId) {
+      metric.attemptIds.add(row.attemptId);
+      const detail = metric.details.get(row.attemptId) ?? {
+        attemptId: row.attemptId,
+        label: row.attemptLabel ?? "Submitted attempt",
+        submittedAt: row.submittedAt ? new Date(row.submittedAt).toISOString() : null,
+        correct: 0,
+        total: 0,
+      };
+      detail.total += 1;
+      if (row.correct) detail.correct += 1;
+      metric.details.set(row.attemptId, detail);
+    }
     map.set(key, metric);
   }
-  return [...map.values()].map(({ attemptIds, ...metric }) => ({ ...metric, attempts: attemptIds.size })).sort(
+  return [...map.values()].map(({ attemptIds, details, ...metric }) => ({
+    ...metric,
+    attempts: attemptIds.size,
+    attemptDetails: sortAttemptDetails(details),
+  })).sort(
     (a, b) => {
       const aOrder = DIFFICULTY_ORDER.indexOf(a.difficulty as Difficulty);
       const bOrder = DIFFICULTY_ORDER.indexOf(b.difficulty as Difficulty);
       return a.label.localeCompare(b.label) || (aOrder < 0 ? DIFFICULTY_ORDER.length : aOrder) - (bOrder < 0 ? DIFFICULTY_ORDER.length : bOrder);
     },
   );
+}
+
+function sortAttemptDetails(details: Map<string, ProgressAttemptDetail>): ProgressAttemptDetail[] {
+  return [...details.values()].sort((a, b) => {
+    const aTime = a.submittedAt ? new Date(a.submittedAt).getTime() : 0;
+    const bTime = b.submittedAt ? new Date(b.submittedAt).getTime() : 0;
+    return bTime - aTime || a.label.localeCompare(b.label);
+  });
 }
 
 export function aggregateTopicDifficultyTrend(

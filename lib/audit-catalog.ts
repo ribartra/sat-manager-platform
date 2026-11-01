@@ -29,10 +29,12 @@ export const AUDIT_ACTION_LABELS: Record<string, string> = {
   UPDATE_STUDENT: "Student updated",
   UPDATE_PARENT: "Parent updated",
   LINK_PARENT_STUDENT: "Parent linked to student",
+  PARENT_LINKED: "Parent added to student",
   UNLINK_PARENT_STUDENT: "Parent unlinked from student",
   PARENT_CONSENT_VIEWED: "Parent consent link reviewed",
   PARENT_CONSENT_VIEW_FAILED: "Parent consent link failed",
   PARENT_CONSENT_RECORDED: "Parent consent recorded",
+  PARENT_LINK_SKIPPED: "Parent link skipped (email belongs to another account type)",
   PARENT_REPORT_LINK_CREATED: "Parent report link created",
   SHARE_PARENT_REPORT_LINK: "Parent report link shared",
   CREATE_PARENT_ACCESS_LINK: "Parent access link created",
@@ -45,20 +47,23 @@ export const AUDIT_ACTION_LABELS: Record<string, string> = {
   ATTEMPT_RESUMED: "Practice attempt resumed",
   ATTEMPT_PAUSED: "Practice attempt paused",
   ATTEMPT_SUBMITTED: "Practice attempt submitted",
-  FPT_ATTEMPT_STARTED: "Exam attempt started",
-  FPT_ATTEMPT_RESUMED: "Exam attempt resumed",
-  FPT_ATTEMPT_PAUSED: "Exam attempt paused",
-  FPT_ATTEMPT_SUBMITTED: "Exam attempt submitted",
+  FPT_ATTEMPT_STARTED: "Test attempt started",
+  FPT_ATTEMPT_RESUMED: "Test attempt resumed",
+  FPT_ATTEMPT_PAUSED: "Test attempt paused",
+  FPT_ATTEMPT_SUBMITTED: "Test attempt submitted",
+  FPT_MODULE_SUBMITTED: "Test module submitted",
   INVALIDATE_ATTEMPT: "Attempt invalidated",
   REOPEN_ATTEMPT: "Attempt reopened",
   COMMENT_ATTEMPT: "Attempt commented",
   ASSIGN_PRACTICE_SET: "Practice Set assigned",
-  ASSIGN_FULL_PRACTICE_TEST: "Exam assigned",
+  ASSIGN_FULL_PRACTICE_TEST: "Test assigned",
   AUTO_CREATE_ASSIGNMENT: "Assignment auto-created",
   AUTO_UNLOCK_ASSIGNMENT: "Assignment auto-unlocked",
   AUTO_UNLOCK_SKIPPED_MANUAL_LOCK: "Auto-unlock skipped (manual lock)",
   AUTO_UNLOCK_SKIPPED_SCHEDULED_LOCK: "Auto-unlock skipped (scheduled lock)",
+  CREATE_UNLOCK_REQUEST: "Unlock requested",
   APPROVE_UNLOCK_REQUEST: "Unlock request approved",
+  ASSIGN_GROUP_PRACTICE_SET: "Practice Set assigned to group",
   DENY_UNLOCK_REQUEST: "Unlock request denied",
 
   // Content
@@ -70,17 +75,20 @@ export const AUDIT_ACTION_LABELS: Record<string, string> = {
   DELETE_QUESTION: "Question deleted",
   DUPLICATE_QUESTION: "Question duplicated",
   CREATE_PRACTICE_SET: "Practice Set created",
+  SOURCE_CREATED: "Content source added",
+  SOURCE_UPDATED: "Content source changed",
+  SOURCE_CONTENT_ASSIGNED: "Practice Sets / Tests moved to a content source",
   UPDATE_PRACTICE_SET: "Practice Set updated",
   PUBLISH_PRACTICE_SET: "Practice Set published",
   ARCHIVE_PRACTICE_SET: "Practice Set archived",
   DELETE_PRACTICE_SET: "Practice Set deleted",
   DUPLICATE_PRACTICE_SET: "Practice Set duplicated",
-  CREATE_FULL_PRACTICE_TEST: "Exam created",
-  UPDATE_FULL_PRACTICE_TEST: "Exam updated",
-  PUBLISH_FULL_PRACTICE_TEST: "Exam published",
-  ARCHIVE_FULL_PRACTICE_TEST: "Exam archived",
-  DELETE_FULL_PRACTICE_TEST: "Exam deleted",
-  DUPLICATE_FULL_PRACTICE_TEST: "Exam duplicated",
+  CREATE_FULL_PRACTICE_TEST: "Test created",
+  UPDATE_FULL_PRACTICE_TEST: "Test updated",
+  PUBLISH_FULL_PRACTICE_TEST: "Test published",
+  ARCHIVE_FULL_PRACTICE_TEST: "Test archived",
+  DELETE_FULL_PRACTICE_TEST: "Test deleted",
+  DUPLICATE_FULL_PRACTICE_TEST: "Test duplicated",
   CREATE_STUDY_MATERIAL: "Study material created",
   UPDATE_STUDY_MATERIAL: "Study material updated",
   DELETE_STUDY_MATERIAL: "Study material deleted",
@@ -102,10 +110,15 @@ export const AUDIT_ACTION_LABELS: Record<string, string> = {
   REJECT_ENROLLMENT: "Enrollment rejected",
   REMOVE_ENROLLMENT: "Enrollment removed",
   ADD_PROGRAM_TEACHER: "Teacher added to program",
+  TEACHER_INVITED: "Teacher invited",
+  ENABLE_TEACHER: "Teacher activated",
+  DISABLE_TEACHER: "Teacher deactivated",
   REMOVE_PROGRAM_TEACHER: "Teacher removed from program",
   CREATE_GROUP: "Group created",
   UPDATE_GROUP: "Group updated",
   DELETE_GROUP: "Group deleted",
+  ADD_GROUP_MEMBER: "Student added to group",
+  REMOVE_GROUP_MEMBER: "Student removed from group",
 
   // Settings
   UPDATE_APP_SETTING: "App setting updated",
@@ -126,7 +139,11 @@ export const AUDIT_ACTION_LABELS: Record<string, string> = {
   PARSE_AI_IMPORT_OPTION_IMAGE: "AI import option image parsed",
   PROMOTE_AI_IMPORT_QUESTIONS: "AI import questions promoted",
   PROMOTE_AI_IMPORT_PRACTICE_SET: "AI import Practice Set promoted",
-  PROMOTE_AI_IMPORT_FULL_TEST: "AI import Exam promoted",
+  PROMOTE_AI_IMPORT_FULL_TEST: "AI import Test promoted",
+  QUICK_IMPORT_STARTED: "Import with AI started",
+  QUICK_IMPORT_CSV_LOADED: "Import with AI: CSV loaded",
+  QUICK_IMPORT_IMAGES_LOADED: "Import with AI: images loaded",
+  QUICK_IMPORT_PROMOTED: "Import with AI: Draft created",
   ATTACH_QUESTION_IMAGE_FROM_GALLERY: "Question image attached from gallery",
   UPLOAD_QUESTION_IMAGE: "Question image uploaded",
   AI_IMPORT_CROP_OCR: "AI import crop OCR",
@@ -175,7 +192,10 @@ export function actionCategory(action: string): AuditCategory {
     action === "UNLINK_PARENT_STUDENT" ||
     action === "IMPERSONATE_STUDENT_VIEW" ||
     action === "SHARE_PARENT_REPORT_LINK" ||
-    action === "CREATE_PARENT_ACCESS_LINK"
+    action === "CREATE_PARENT_ACCESS_LINK" ||
+    action === "TEACHER_INVITED" ||
+    action === "ENABLE_TEACHER" ||
+    action === "DISABLE_TEACHER"
   ) {
     return "Users";
   }
@@ -211,7 +231,8 @@ export function actionCategory(action: string): AuditCategory {
     action.includes("FULL_PRACTICE_TEST") ||
     action.includes("STUDY_MATERIAL") ||
     action.includes("SUBSKILL") ||
-    action.includes("TAXONOMY")
+    action.includes("TAXONOMY") ||
+    action.startsWith("SOURCE_")
   ) {
     return "Content";
   }

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { contentProgramFor } from "@/lib/program-scope";
 import { randomUUID } from "crypto";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
@@ -12,6 +13,9 @@ import {
   moduleKeyFromOrder,
   type FullTestSection,
 } from "@/lib/full-test-modules";
+import { ApiError, BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
+import { promotionSourceId } from "@/lib/content-source";
+import { CONTENT_JOB, exclusiveJob } from "@/lib/job-lock";
 
 interface RouteContext {
   params: Promise<{ batchId: string }>;
@@ -19,16 +23,16 @@ interface RouteContext {
 
 const EXPECTED_MODULE_COUNTS = FULL_TEST_EXPECTED_COUNTS;
 
-export async function POST(req: Request, { params }: RouteContext) {
+export const POST = withApiErrors(exclusiveJob(CONTENT_JOB, async function POST(req: Request, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { batchId } = await params;
   const body = (await req.json().catch(() => ({}))) as { testNumber?: number; allowPartial?: boolean };
   const batch = await prisma.ingestBatch.findUnique({ where: { id: batchId } });
-  if (!batch) return NextResponse.json({ error: "Batch not found." }, { status: 404 });
+  if (!batch) return new NotFoundError("Batch not found.").toResponse();
   if (!Number.isInteger(body.testNumber)) {
-    return NextResponse.json({ error: "testNumber is required." }, { status: 400 });
+    return new BadRequestError("testNumber is required.").toResponse();
   }
 
   const candidates = await prisma.ingestQuestionCandidate.findMany({
@@ -42,20 +46,25 @@ export async function POST(req: Request, { params }: RouteContext) {
     orderBy: [{ testNumber: "asc" }, { moduleLabel: "asc" }, { questionNumber: "asc" }, { createdAt: "asc" }],
   });
   if (candidates.length === 0) {
-    return NextResponse.json({ error: "No promoted Full Practice Test questions found for this test." }, { status: 400 });
+    return new BadRequestError("No promoted Test questions found for this test.").toResponse();
   }
 
   const questionIds = candidates.map((candidate) => candidate.officialQuestionId).filter((id): id is string => Boolean(id));
   if (new Set(questionIds).size !== questionIds.length) {
-    return NextResponse.json({ error: "Duplicated promoted questions found in this batch." }, { status: 400 });
+    return new BadRequestError("Duplicated promoted questions found in this batch.").toResponse();
   }
   const questions = await prisma.question.findMany({
     where: { id: { in: questionIds } },
     include: { topic: { include: { domain: { include: { section: true } } } } },
   });
   if (questions.length !== questionIds.length) {
-    return NextResponse.json({ error: "Some promoted questions no longer exist." }, { status: 400 });
+    return new BadRequestError("Some promoted questions no longer exist.").toResponse();
   }
+  // The Test lives in its questions' program bank (all from one program).
+  const questionPrograms = new Set(questions.map((question) => question.programId));
+  if (questionPrograms.size !== 1) return new BadRequestError("All questions must come from this program's question bank.").toResponse();
+  const programId = [...questionPrograms][0] ?? (await contentProgramFor(session.user));
+  await contentProgramFor(session.user, programId);
   const sectionByQuestion = new Map(
     questions.map((question) => [question.id, question.topic.domain.section.name === "MATH" ? "MATH" : "RW"]),
   );
@@ -68,10 +77,7 @@ export async function POST(req: Request, { params }: RouteContext) {
     const expectedSection = index >= 2 ? "MATH" : "RW";
     const actualSection = sectionByQuestion.get(questionId);
     if (actualSection !== expectedSection) {
-      return NextResponse.json(
-        { error: `Question ${questionId} belongs to ${actualSection}, but target module requires ${expectedSection}.` },
-        { status: 400 },
-      );
+      return new BadRequestError(`Question ${questionId} belongs to ${actualSection}, but target module requires ${expectedSection}.`).toResponse();
     }
     moduleQuestionIds[index].push(questionId);
   }
@@ -81,16 +87,7 @@ export async function POST(req: Request, { params }: RouteContext) {
   const partial = missingByModule.some((missing) => missing > 0);
   const modules = fullTestModuleBuckets(moduleCounts);
   if (partial && !body.allowPartial) {
-    return NextResponse.json(
-      {
-        error: "This Full Practice Test is partial. Confirm allowPartial to create/update a draft with promoted questions only.",
-        moduleCounts,
-        missingByModule,
-        modules,
-        partial,
-      },
-      { status: 409 },
-    );
+    return ApiError.fromStatus(409, "This Test is partial. Confirm allowPartial to create/update a draft with promoted questions only.", { moduleCounts, missingByModule, modules, partial }).toResponse();
   }
 
   const testNumber = body.testNumber;
@@ -101,6 +98,8 @@ export async function POST(req: Request, { params }: RouteContext) {
   // Canonical display name for standardized SAT exams (no "Imported" / partial suffix).
   const testName = `TEST ${testNumber}`;
 
+  // The AI Import "Source" of the batch (default College Board / Innovator).
+  const sourceId = await promotionSourceId(batchId, "tests");
   const test = await prisma.$transaction(async (tx) => {
     // Stamp M1/M2 skill + EASY/HARD before wiring so the draft exam is standardized.
     for (let order = 0; order < 4; order++) {
@@ -123,22 +122,25 @@ export async function POST(req: Request, { params }: RouteContext) {
       }
       await tx.fullPracticeTest.update({
         where: { id: existingArtifact.artifactId },
-        data: { name: testName, status: "DRAFT" },
+        data: { name: testName, number: testNumber, status: "DRAFT" },
       });
+      // One insert per module (was one per question) keeps the transaction short.
       for (const testModule of existingModules) {
         const ids = moduleQuestionIds[testModule.order] ?? [];
-        for (const [order, questionId] of ids.entries()) {
-          await tx.fullPracticeTestQuestion.create({
-            data: { moduleId: testModule.id, questionId, order, isPretest: order < 2 },
-          });
-        }
+        if (ids.length === 0) continue;
+        await tx.fullPracticeTestQuestion.createMany({
+          data: ids.map((questionId, order) => ({ moduleId: testModule.id, questionId, order, isPretest: order < 2 })),
+        });
       }
       return tx.fullPracticeTest.findUniqueOrThrow({ where: { id: existingArtifact.artifactId } });
     }
 
     const created = await tx.fullPracticeTest.create({
       data: {
+        programId,
+        sourceId,
         name: testName,
+        number: testNumber,
         status: "DRAFT",
         modules: {
           create: FULL_TEST_MODULES.map((module, order) => ({
@@ -198,4 +200,4 @@ export async function POST(req: Request, { params }: RouteContext) {
   });
 
   return NextResponse.json({ test, moduleCounts, missingByModule, modules, partial });
-}
+}));

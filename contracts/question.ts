@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod-config";
 import { validateQuestionPayload } from "@/lib/content-validation";
 
 export const questionOptionSchema = z.object({

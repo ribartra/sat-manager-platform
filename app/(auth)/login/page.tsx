@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/form";
 import { FormSection } from "@/components/sat";
 import { loginSchema, type LoginInput } from "@/contracts/auth";
+import { LegalLinks } from "@/components/legal/legal-page";
+import { Alert, InlineError } from "@/components/sat/alert";
 
 function isLocalCallbackUrl(value: string) {
   return value.startsWith("/") && !value.startsWith("//");
@@ -50,9 +52,9 @@ export default function LoginPage() {
   const reason = params.get("reason");
   const reasonMessage =
     reason === "idle"
-      ? "Your session ended after 10 minutes of inactivity. Please sign in again."
+      ? "You were signed out after 10 minutes without activity. Your answers were saved — sign in to continue."
       : reason === "session"
-        ? "Your session is no longer valid. Please sign in again."
+        ? "Please sign in again."
         : "";
 
   async function onSubmit(values: LoginInput) {
@@ -64,7 +66,7 @@ export default function LoginPage() {
     });
 
     if (res?.error) {
-      setServerError("Invalid email or password.");
+      setServerError("That email and password don't match. Please try again.");
       return;
     }
     router.replace(await resolvePostLoginUrl(callbackUrl));
@@ -85,9 +87,7 @@ export default function LoginPage() {
 
         <Card padding="lg">
           {reasonMessage ? (
-            <p className="mb-4 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-              {reasonMessage}
-            </p>
+            <Alert tone="warning" className="mb-4">{reasonMessage}</Alert>
           ) : null}
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" noValidate>
@@ -119,9 +119,9 @@ export default function LoginPage() {
                   )}
                 />
               </FormSection>
-              {serverError ? <p className="text-sm text-destructive">{serverError}</p> : null}
+              <InlineError>{serverError}</InlineError>
               <Button type="submit" className="w-full" disabled={loading} size="lg">
-                {loading ? "Signing in..." : "Log In"}
+                {loading ? "Signing in…" : "Log In"}
               </Button>
             </form>
           </Form>
@@ -132,6 +132,7 @@ export default function LoginPage() {
             </Link>
           </div>
         </Card>
+        <LegalLinks className="mt-4" />
       </div>
     </div>
   );

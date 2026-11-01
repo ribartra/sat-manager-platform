@@ -2,15 +2,18 @@ import { NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { teacherProgramEnrollmentScope } from "@/lib/program-scope";
+import { applyAttemptLifecycle } from "@/lib/attempt-lifecycle";
+import { ApiError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
   params: Promise<{ attemptId: string }>;
 }
 
-export async function POST(req: Request, { params }: RouteContext) {
+/** Invalidate: the attempt stays recorded as it is, marked INVALIDATED, and stops counting toward any score. */
+export const POST = withApiErrors(async function POST(req: Request, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
   if (!session) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return new ForbiddenError("Forbidden").toResponse();
   }
 
   const body = (await req.json().catch(() => ({}))) as { reason?: unknown };
@@ -20,25 +23,18 @@ export async function POST(req: Request, { params }: RouteContext) {
     session.user.role === "TEACHER"
       ? teacherProgramEnrollmentScope(session.user.id)
       : undefined;
-  const attempt = await prisma.attempt.findFirst({
+  const existing = await prisma.attempt.findFirst({
     where: {
       id: attemptId,
       ...(programScope ? { student: { programEnrollments: programScope } } : {}),
     },
     select: { id: true },
   });
-  if (!attempt) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!existing) return new NotFoundError("Not found").toResponse();
 
-  await prisma.attempt.update({ where: { id: attemptId }, data: { status: "INVALIDATED" } });
-  await prisma.auditLog.create({
-    data: {
-      userId: session.user.id,
-      action: "INVALIDATE_ATTEMPT",
-      targetType: "Attempt",
-      targetId: attemptId,
-      metadata: reason ? JSON.stringify({ reason }) : null,
-    },
-  });
-
-  return NextResponse.json({ ok: true });
-}
+  const result = await applyAttemptLifecycle({ kind: "practice", action: "invalidate", attemptId, actorId: session.user.id, reason });
+  if (!result.ok) {
+    return ApiError.fromStatus(result.error === "ALREADY_INVALIDATED" ? 409 : 404, result.error === "ALREADY_INVALIDATED" ? "This attempt is already invalidated." : "Not found").toResponse();
+  }
+  return NextResponse.json({ ok: true, assignmentStatus: result.assignmentStatus ?? null });
+});

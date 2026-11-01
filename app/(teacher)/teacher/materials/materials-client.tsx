@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, ExternalLink } from "lucide-react";
+import { FilterBar, FilterField } from "@/components/sat/filter-bar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -20,11 +21,16 @@ import {
 } from "@/components/ui/dialog";
 import { TaxonomyPicker, type TaxonomyPickerTopic } from "@/components/taxonomy-picker";
 import { cn } from "@/lib/utils";
+import { matchesQuery } from "@/components/sat/list-filters";
 import {
   contentStatusOptions,
   questionStatusBadgeVariant,
   questionStatusLabel,
 } from "@/lib/domain-meta";
+import { useConfirm } from "@/components/sat/confirm-dialog";
+import { apiFetch } from "@/lib/api-client";
+import { notify } from "@/lib/notify-ui";
+import { LiveSearch } from "@/components/sat/live-search";
 
 type TopicOption = TaxonomyPickerTopic;
 
@@ -49,14 +55,14 @@ const TABS: { key: SectionKey; label: string }[] = [
 ];
 
 const SECTION_LABEL_BY_TAB: Record<SectionKey, string> = {
-  math: "Mathematics",
+  math: "Math",
   reading: "Reading",
   writing: "Writing",
   general: "",
 };
 
 function sectionKeyOf(sectionLabel: string | null | undefined): SectionKey {
-  if (sectionLabel === "Mathematics") return "math";
+  if (sectionLabel === "Math") return "math";
   if (sectionLabel === "Reading") return "reading";
   if (sectionLabel === "Writing") return "writing";
   return "general";
@@ -66,7 +72,7 @@ function SkillLine({ topic }: { topic: MaterialRow["topic"] }) {
   if (!topic) return <span className="text-xs text-gray-400">General</span>;
   return (
     <div>
-      <p className="text-[11px] uppercase tracking-wide text-gray-400">{topic.sectionLabel} · {topic.domainName}</p>
+      <p className="text-[11px] text-gray-400">{topic.sectionLabel} · {topic.domainName}</p>
       <p className="text-sm font-medium text-gray-700">{topic.name}</p>
     </div>
   );
@@ -74,6 +80,7 @@ function SkillLine({ topic }: { topic: MaterialRow["topic"] }) {
 
 export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; materials: MaterialRow[] }) {
   const router = useRouter();
+  const confirm = useConfirm();
 
   // Form / modal state
   const [title, setTitle] = useState("");
@@ -91,6 +98,7 @@ export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; 
   const [activeTab, setActiveTab] = useState<SectionKey>("math");
   const [skillFilter, setSkillFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [searchFilter, setSearchFilter] = useState("");
 
   const counts = useMemo(() => {
     const c: Record<SectionKey, number> = { math: 0, reading: 0, writing: 0, general: 0 };
@@ -110,9 +118,10 @@ export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; 
         if (sectionKeyOf(m.topic?.sectionLabel) !== activeTab) return false;
         if (activeTab !== "general" && skillFilter && m.topicId !== skillFilter) return false;
         if (statusFilter && m.status !== statusFilter) return false;
+        if (!matchesQuery(searchFilter, m.title, m.description, m.topic?.name)) return false;
         return true;
       }),
-    [materials, activeTab, skillFilter, statusFilter]
+    [materials, activeTab, skillFilter, statusFilter, searchFilter]
   );
 
   function selectTab(key: SectionKey) {
@@ -148,16 +157,17 @@ export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; 
 
   async function saveMaterial() {
     setSaving(true);
-    const response = await fetch(editingId ? `/api/materials/${editingId}` : "/api/materials", {
-      method: editingId ? "PATCH" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, description, body, url, topicId, status }),
-    });
-    setSaving(false);
-    if (!response.ok) {
-      const data = await response.json().catch(() => ({}));
-      window.alert(data.error || "Could not save material.");
+    try {
+      await apiFetch(editingId ? `/api/materials/${editingId}` : "/api/materials", {
+        method: editingId ? "PATCH" : "POST",
+        json: { title, description, body, url, topicId, status },
+        fallback: "Could not save material.",
+      });
+    } catch (error) {
+      notify.error(error);
       return;
+    } finally {
+      setSaving(false);
     }
     setEditorOpen(false);
     resetForm();
@@ -165,18 +175,23 @@ export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; 
   }
 
   async function duplicateMaterial(materialId: string) {
-    const response = await fetch(`/api/materials/${materialId}/duplicate`, { method: "POST" });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) window.alert(data.error || "Could not duplicate material.");
-    else setViewing(null);
+    try {
+      await apiFetch(`/api/materials/${materialId}/duplicate`, { method: "POST", fallback: "Could not duplicate material." });
+      setViewing(null);
+    } catch (error) {
+      notify.error(error);
+    }
     router.refresh();
   }
 
   async function deleteMaterial(materialId: string) {
-    if (!window.confirm("Delete this study material? This cannot be undone.")) return;
-    const response = await fetch(`/api/materials/${materialId}`, { method: "DELETE" });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) window.alert(data.error || "Could not delete material.");
+    const ok = await confirm({ title: "Delete this study material?", description: "This cannot be undone.", tone: "danger", confirmLabel: "Delete" });
+    if (!ok) return;
+    try {
+      await apiFetch(`/api/materials/${materialId}`, { method: "DELETE", fallback: "Could not delete material." });
+    } catch (error) {
+      notify.error(error);
+    }
     router.refresh();
   }
 
@@ -203,22 +218,15 @@ export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; 
         ))}
       </div>
 
-      <div className="mb-5 flex flex-wrap items-end gap-3">
+      <FilterBar>
+        <FilterField label="Search" htmlFor="materials-search">
+          <LiveSearch id="materials-search" value={searchFilter} onChange={setSearchFilter} placeholder="Title or description" suggestions={materials.map((m) => m.title)} />
+        </FilterField>
         {activeTab !== "general" && (
-          <div className="min-w-[280px] flex-1">
-            <TaxonomyPicker
-              key={activeTab}
-              topics={sectionTopics}
-              value={skillFilter}
-              onChange={setSkillFilter}
-              allowAll
-              fixedSection={sectionLabel}
-            />
-          </div>
+          <TaxonomyPicker key={activeTab} topics={sectionTopics} value={skillFilter} onChange={setSkillFilter} allowAll fixedSection={sectionLabel} inFilterBar />
         )}
-        <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">Status</label>
-          <Select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="text-sm">
+        <FilterField label="Status" htmlFor="materials-status">
+          <Select id="materials-status" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
             <option value="">All statuses</option>
             {contentStatusOptions().map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -226,8 +234,8 @@ export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; 
               </option>
             ))}
           </Select>
-        </div>
-      </div>
+        </FilterField>
+      </FilterBar>
 
       {visibleMaterials.length === 0 ? (
         <Card padding="lg" className="py-16 text-center text-gray-400">
@@ -292,7 +300,7 @@ export function MaterialsClient({ topics, materials }: { topics: TopicOption[]; 
           </div>
           <DialogFooter>
             <Button variant="secondary" onClick={() => setEditorOpen(false)} disabled={saving}>Cancel</Button>
-            <Button onClick={saveMaterial} disabled={saving || !title.trim()}>
+            <Button onClick={saveMaterial} disabled={saving} disabledReason={!title.trim() ? "Enter a title." : null}>
               {saving ? "Saving..." : editingId ? "Save material" : "Create material"}
             </Button>
           </DialogFooter>

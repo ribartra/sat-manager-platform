@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
+import { ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
   params: Promise<{ batchId: string }>;
@@ -10,9 +11,9 @@ interface RouteContext {
  * Lightweight progress fingerprint for AI Import polling (TanStack Query).
  * RSC page still owns the full review UI; this endpoint only drives refresh.
  */
-export async function GET(_req: Request, { params }: RouteContext) {
+export const GET = withApiErrors(async function GET(_req: Request, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { batchId } = await params;
   const batch = await prisma.ingestBatch.findUnique({
@@ -28,7 +29,7 @@ export async function GET(_req: Request, { params }: RouteContext) {
       lastError: true,
     },
   });
-  if (!batch) return NextResponse.json({ error: "Batch not found." }, { status: 404 });
+  if (!batch) return new NotFoundError("Batch not found.").toResponse();
 
   const [candidates, incidents, latestEvent] = await Promise.all([
     prisma.ingestQuestionCandidate.count({ where: { batchId } }),
@@ -66,4 +67,4 @@ export async function GET(_req: Request, { params }: RouteContext) {
     latestEventStatus: latestEvent?.status ?? null,
     fingerprint,
   });
-}
+});

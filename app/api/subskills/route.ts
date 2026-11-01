@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
+import { BadRequestError, ForbiddenError, withApiErrors } from "@/lib/api-error";
 
-export async function POST(req: NextRequest) {
+export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { topicId, name } = await req.json();
-  if (!topicId || !name) return NextResponse.json({ error: "Topic and name are required." }, { status: 400 });
+  if (!topicId || !name) return new BadRequestError("Topic and name are required.").toResponse();
 
   const topic = await prisma.topic.findUnique({ where: { id: topicId }, select: { taxonomyNodeId: true } });
   const subskill = await prisma.subskill.create({ data: { topicId, name } });
@@ -35,4 +36,4 @@ export async function POST(req: NextRequest) {
     },
   });
   return NextResponse.json(subskill);
-}
+});

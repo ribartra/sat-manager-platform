@@ -1,8 +1,13 @@
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import Link from "next/link";
+import { promotionSourceId } from "@/lib/content-source";
+import { ImportSteps } from "@/components/sat/import-steps";
+import { parseTarget } from "@/lib/quick-import";
 import { randomUUID } from "crypto";
 import { redirect } from "next/navigation";
 import { Card } from "@/components/ui/card";
-import { PageShell } from "@/components/sat";
+import { PageHeader, PageShell } from "@/components/sat";
+import { HEADER_ACTION_CLASS, HeaderActions } from "@/components/sat/header-actions";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { computeCropImageSources } from "@/lib/ingest-crop-source";
@@ -55,6 +60,8 @@ export default async function AiImportFileReviewPage({ params, searchParams }: P
   ]);
 
   if (!batch || !file) redirect("/admin/import/ai");
+  // "Import with AI" target (breadcrumb + stepper) when this batch comes from it.
+  const quickTarget = batch.importMode === "AI_CSV" ? parseTarget(batch.targetJson) : null;
 
   // Extracted Test grouping + crop siblings first — candidates for FPT/PS often
   // live on the answer/explanation file while images live on the question file.
@@ -123,11 +130,18 @@ export default async function AiImportFileReviewPage({ params, searchParams }: P
   // often has images but no candidates, so there's no per-candidate board to use).
   let assignTargets: { questionId: string; label: string }[] = [];
   if (file.contentType === "FULL_PRACTICE_TEST" && file.testNumber != null) {
-    const tests = await prisma.fullPracticeTest.findMany({ select: { id: true, name: true } });
-    const match = tests.find((t) => {
-      const m = t.name.match(/test\s*0*(\d+)/i);
-      return m && Number(m[1]) === file.testNumber;
+    // The Test this batch promoted for that number, else TEST N of the batch's source (several
+    // sources can each have a TEST N, so the number alone is not enough).
+    const promotedTest = await prisma.ingestPromotionArtifact.findFirst({
+      where: { batchId, artifactType: "FULL_PRACTICE_TEST", groupKey: `full-test:${file.testNumber}` },
+      select: { artifactId: true },
     });
+    const match = promotedTest
+      ? { id: promotedTest.artifactId }
+      : await prisma.fullPracticeTest.findFirst({
+          where: { number: file.testNumber, sourceId: await promotionSourceId(batchId, "tests") },
+          select: { id: true },
+        });
     if (match) {
       const wantSection = file.section ? (file.section.toUpperCase().includes("MATH") ? "MATH" : "RW") : null;
       const ftqs = await prisma.fullPracticeTestQuestion.findMany({
@@ -161,28 +175,51 @@ export default async function AiImportFileReviewPage({ params, searchParams }: P
   const estimatedSeconds = Math.ceil(estimatedPages * secondsPerPage);
 
   return (
-    <PageShell
-      width="full"
-      className="grid max-w-[100rem] gap-6 lg:grid-cols-[300px_minmax(0,1fr)]"
-    >
-      <div className="lg:sticky lg:top-4 lg:self-start">
+    <PageShell className="grid grid-cols-1 gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+      <div className="min-w-0 lg:sticky lg:top-4 lg:self-start">
         <ExtractedTestRail rows={setRows} batchId={batchId} currentFileId={file.id} />
       </div>
 
       <div className="min-w-0 space-y-6">
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <Link href={`/admin/import/ai?batch=${batchId}`} className="text-sm text-blue-600 hover:underline">
-            Back to batch
-          </Link>
-          <h1 className="mt-2 text-2xl font-semibold text-gray-900">Review File</h1>
-          <p className="mt-1 text-sm text-gray-500">{file.relativePath}</p>
-        </div>
-        <Card padding="md">
-          <p className="text-xs uppercase text-gray-400">Estimated processing time</p>
-          <p className="mt-1 text-lg font-semibold text-gray-900">{formatDuration(estimatedSeconds)}</p>
-          <p className="mt-1 text-xs text-gray-500">{estimatedPages} pages · {secondsPerPage.toFixed(1)} sec/page</p>
-        </Card>
+      <div className="mb-0">
+          {/* "Import with AI" batches come back to their wizard (step 3); OCR batches to AI Import. */}
+          {batch?.importMode === "AI_CSV" ? (
+            <>
+              <Breadcrumbs
+                items={[
+                  { label: "Home", href: "/teacher" },
+                  quickTarget?.kind === "FULL_PRACTICE_TEST" ? { label: "Tests", href: "/teacher/tests" } : { label: "Practice", href: "/teacher/practice-sets" },
+                  { label: "Import with AI", href: `/teacher/import/${batchId}` },
+                  ...(quickTarget
+                    ? [{ label: quickTarget.kind === "PRACTICE_SET" ? quickTarget.topicName : quickTarget.testNumber ? `TEST ${quickTarget.testNumber}` : quickTarget.testName, href: `/teacher/import/${batchId}` }]
+                    : []),
+                  { label: "Step 3 · Review & crop" },
+                ]}
+              />
+              <ImportSteps current={3} hrefs={{ 2: `/teacher/import/${batchId}#step-2`, 3: `/teacher/import/${batchId}#step-3` }} />
+            </>
+          ) : (
+            <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Admin" }, { label: "AI Import", href: `/admin/import/ai?batch=${batchId}` }, { label: "Review file" }]} />
+          )}
+          <PageHeader
+            title="Review File"
+            description={file.relativePath}
+            actions={
+              <HeaderActions>
+                {batch?.importMode === "AI_CSV" ? (
+                  <Link href={`/teacher/import/${batchId}#step-3`} className={HEADER_ACTION_CLASS}>
+                    ← Back to step 3
+                  </Link>
+                ) : (
+                  <Card padding="md">
+                    <p className="text-xs uppercase text-gray-400">Estimated processing time</p>
+                    <p className="mt-1 text-lg font-semibold text-gray-900">{formatDuration(estimatedSeconds)}</p>
+                    <p className="mt-1 text-xs text-gray-500">{estimatedPages} pages · {secondsPerPage.toFixed(1)} sec/page</p>
+                  </Card>
+                )}
+              </HeaderActions>
+            }
+          />
       </div>
 
       {extractedTest && (

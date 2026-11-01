@@ -48,8 +48,8 @@ test.describe("Parent links + audit smoke", () => {
     const passwords = page.locator('input[type="password"]');
     await passwords.nth(0).fill(E2E.parentPassword);
     await passwords.nth(1).fill(E2E.parentPassword);
-    await page.getByRole("button", { name: /Authorize enrollment/i }).click();
-    await expect(page.getByText(/Authorization recorded/i)).toBeVisible({ timeout: 20_000 });
+    await page.getByRole("button", { name: /^Approve$/i }).click();
+    await expect(page.getByText(/can now finish setting up/i)).toBeVisible({ timeout: 20_000 });
 
     const audits = countAuditActions(
       ["PARENT_CONSENT_VIEWED", "PARENT_CONSENT_RECORDED", "PARENT_CONSENT_VIEW_FAILED"],
@@ -61,12 +61,12 @@ test.describe("Parent links + audit smoke", () => {
 
   test("parent report page explains missing / invalid tokens", async ({ page }) => {
     await page.goto("/parent/access");
-    await expect(page.getByText(/Unable to open report/i)).toBeVisible();
-    await expect(page.getByText(/missing a token/i)).toBeVisible();
+    await expect(page.getByText(/We couldn't open this report/i)).toBeVisible();
+    await expect(page.getByText(/This link is incomplete/i)).toBeVisible();
 
     await page.goto("/parent/access?token=not-a-real-token");
-    await expect(page.getByText(/Unable to open report/i)).toBeVisible();
-    await expect(page.getByText(/invalid/i)).toBeVisible();
+    await expect(page.getByText(/We couldn't open this report/i)).toBeVisible();
+    await expect(page.getByText(/This link doesn't work/i)).toBeVisible();
 
     const audits = countAuditActions(["PARENT_REPORT_OPEN_FAILED"], sinceIso);
     expect(audits.PARENT_REPORT_OPEN_FAILED ?? 0).toBeGreaterThanOrEqual(2);

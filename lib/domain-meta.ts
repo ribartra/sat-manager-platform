@@ -80,7 +80,8 @@ export function difficultyBadgeVariant(value: string): BadgeVariant {
 }
 
 export function questionTypeLabel(value: string, compact = false): string {
-  if (compact && value === "MC") return "MC";
+  // Badges spell it out: "MC" is not readable for teachers and students.
+  if (compact && value === "MC") return "Multiple Choice";
   if (compact && value === "NUMERIC") return "Numeric";
   return questionTypeMeta[value as QuestionType]?.label ?? value;
 }
@@ -126,3 +127,48 @@ export function difficultyChipClass(value: string): string {
       return "text-gray-600 bg-gray-50";
   }
 }
+
+/** Plain-language labels for status codes shown to students, parents and teachers. */
+const ASSIGNMENT_STATUS_LABELS: Record<string, string> = {
+  PENDING: "Not started",
+  IN_PROGRESS: "In progress",
+  OVERDUE: "Overdue",
+  COMPLETED: "Completed",
+  LOCKED: "Not open yet",
+};
+
+export function assignmentStatusLabel(value: string): string {
+  return ASSIGNMENT_STATUS_LABELS[value] ?? humanizeCode(value);
+}
+
+const ENROLLMENT_STATUS_LABELS: Record<string, string> = {
+  PENDING: "Waiting for approval",
+  APPROVED: "Approved",
+  REJECTED: "Not approved",
+  DENIED: "Not approved",
+};
+
+export function enrollmentStatusLabel(value: string): string {
+  return ENROLLMENT_STATUS_LABELS[value] ?? humanizeCode(value);
+}
+
+const ROLE_LABELS: Record<string, string> = { ADMIN: "Admin", TEACHER: "Teacher", STUDENT: "Student", PARENT: "Parent" };
+
+export function roleLabel(value: string): string {
+  return ROLE_LABELS[value] ?? humanizeCode(value);
+}
+
+/** Last resort for any other code: "SOME_VALUE" → "Some value" (never show raw codes). */
+export function humanizeCode(value: string | null | undefined): string {
+  if (!value) return "";
+  const text = value.replace(/_/g, " ").toLowerCase();
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+/** Attempt general info: the assignment's "Show explanations in the player" this attempt was given. */
+export function explanationsInPlayerLabel(shown: boolean | null | undefined): string {
+  return `Explanations in the player: ${shown ? "shown" : "hidden"}`;
+}
+
+/** Question Bank status when the URL has none (`status=all` = every status). */
+export const QUESTION_STATUS_DEFAULT = "PUBLISHED";

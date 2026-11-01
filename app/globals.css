@@ -26,11 +26,36 @@
   --sat-orange-600: #ea580c;
   --sat-mustard-600: #c4a035;
 
-  /* Practice / Mock area colors (Analytics, History, Reports) */
-  --sat-area-math: #0ea5e9; /* sky blue */
-  --sat-area-reading: #c4a035; /* mustard */
-  --sat-area-writing: #16a34a; /* green */
-  --sat-area-mocks: #ea580c; /* orange */
+  /* Area colors (mockup `mejorada`): practice areas and Tests */
+  --sat-area-math: #305bab; /* blue */
+  --sat-area-reading: #e89600; /* orange; also R&W on Test surfaces */
+  --sat-area-writing: #09a63b; /* green */
+  --sat-area-tests: #b0b0b0; /* grey: text on it uses --sat-tests-ink, never white */
+  --sat-tests-ink: #1f2937;
+  --sat-tests-soft: #f2f2f2;
+  --sat-ok: #16a34a;
+
+  /* Mockup `mejorada` design tokens (assets/styles.css :root) */
+  --sat-bg: #f8fafc;
+  --sat-surface-2: #f1f5f9;
+  --sat-border: #e2e8f0;
+  --sat-border-strong: #cbd5e1;
+  --sat-text: #0f172a;
+  --sat-muted: #64748b;
+  --sat-primary: #2563eb;
+  --sat-primary-dark: #1d4ed8;
+  --sat-primary-soft: #eff6ff;
+  --sat-ok-soft: #f0fdf4;
+  --sat-ok-border: #bbf7d0;
+  --sat-bad: #dc2626;
+  --sat-bad-soft: #fef2f2;
+  --sat-bad-border: #fecaca;
+  --sat-warn: #b45309;
+  --sat-warn-soft: #fffbeb;
+  --sat-warn-border: #fde68a;
+  --sat-blank: #94a3b8;
+  --sat-radius: 10px;
+  --sat-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
 
   /* Semantic */
   --background: var(--sat-white);
@@ -48,9 +73,10 @@
   --ring: var(--sat-blue-600);
 
   /* Layout */
-  --sat-page-narrow: 42rem;
-  --sat-page-default: 64rem;
+  /* Single page width for every view, next to the left sidebar (narrow/default kept as aliases). */
   --sat-page-wide: 72rem;
+  --sat-page-narrow: var(--sat-page-wide);
+  --sat-page-default: var(--sat-page-wide);
   --sat-page-pad-x: 1rem;
   --sat-page-pad-y: 2rem;
 }
@@ -72,19 +98,56 @@
   --spacing-page-narrow: var(--sat-page-narrow);
   --spacing-page-default: var(--sat-page-default);
   --spacing-page-wide: var(--sat-page-wide);
+  --font-sans: var(--font-inter), Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 
+/*
+ * Desktop scale: the whole app at 87.5% (what the browser shows at ~87% zoom), phones and tablets at
+ * 100%. The zoom is on the app wrapper (.app-zoom in app/layout.tsx), not on <html>, so menus and
+ * dialogs portaled to <body> are positioned right by Radix / floating-ui. CSS zoom also shrinks vh /
+ * dvh, so full-height layouts use --app-vh / --app-dvh (and .h-dvh / .min-h-screen are restored
+ * below) to keep filling the screen.
+ */
+:root {
+  --app-zoom: 1;
+  --app-vh: 100vh;
+  --app-dvh: 100dvh;
+}
+@media (min-width: 1024px) {
+  :root {
+    --app-zoom: 0.875;
+    --app-vh: calc(100vh / 0.875);
+    --app-dvh: calc(100dvh / 0.875);
+  }
+  .app-zoom {
+    zoom: 0.875;
+  }
+  .h-dvh { height: var(--app-dvh); }
+  .max-h-dvh { max-height: var(--app-dvh); }
+  .min-h-dvh { min-height: var(--app-dvh); }
+  .h-screen { height: var(--app-vh); }
+  .min-h-screen { min-height: var(--app-vh); }
+}
+
+/* Mockup font (Inter, self-hosted via next/font), size and colours. */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Inter, Arial, Helvetica, sans-serif;
+  background: var(--sat-bg);
+  color: var(--sat-text);
+  font-family: var(--font-inter), Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+:focus-visible {
+  outline: 3px solid #93c5fd;
+  outline-offset: 2px;
 }
 
 /* Practice Set Player: two-column layout */
 .player-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  height: calc(100vh - 64px);
+  height: calc(var(--app-vh) - 64px);
   overflow: hidden;
 }
 
@@ -114,4 +177,28 @@ body {
 
 .math-content strong {
   font-weight: 600;
+}
+
+/* Player "Highlight" tool (CSS Custom Highlight API, components/sat/player-tools.tsx). */
+::highlight(sat-hl) {
+  background-color: #fde68a;
+  color: inherit;
+}
+
+/* Mockup question typeface (`.stimulus`, `.qstem`, `.opt`, `.choice`): Georgia serif. */
+@utility font-serif-q {
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+/* "Report a problem" selection mode (components/sat/issue-reporter.tsx). */
+body.issue-reporter-on,
+body.issue-reporter-on * {
+  cursor: crosshair !important;
+}
+body.issue-reporter-on [data-issue-reporter],
+body.issue-reporter-on [data-issue-reporter] * {
+  cursor: default !important;
+}
+body.issue-reporter-on [data-issue-reporter] button {
+  cursor: pointer !important;
 }

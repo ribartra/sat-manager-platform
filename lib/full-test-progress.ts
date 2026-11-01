@@ -1,4 +1,4 @@
-import prisma from "@/lib/prisma";
+import prisma, { atomic } from "@/lib/prisma";
 
 export type FullTestTimerPhase = "MODULE" | "BREAK";
 
@@ -6,7 +6,19 @@ export type FullTestProgressState = {
   timers: number[];
   phase: FullTestTimerPhase;
   breakRemaining: number;
+  /** Seconds worked past each module's time limit (overtime is allowed and recorded, never enforced). */
+  overtime?: number[];
+  /**
+   * Indexes (module order) the student has submitted. Students may take modules in any order; a
+   * submitted module is locked. Written only by the module-submit endpoint, never by autosave.
+   */
+  completedModules?: number[];
 };
+
+function normalizeCompleted(values: unknown, moduleCount: number): number[] {
+  if (!Array.isArray(values)) return [];
+  return [...new Set(values.map((v) => Number(v)).filter((v) => Number.isInteger(v) && v >= 0 && v < moduleCount))].sort();
+}
 
 function normalizeTimers(values: unknown, moduleCount: number): number[] {
   if (!Array.isArray(values)) return Array.from({ length: moduleCount }, () => 0);
@@ -27,6 +39,8 @@ export function parseFullTestProgressState(raw: string | null | undefined, modul
         timers: normalizeTimers(parsed.timers, moduleCount),
         phase: parsed.phase === "BREAK" ? "BREAK" : "MODULE",
         breakRemaining: Math.max(0, Number(parsed.breakRemaining) || 0),
+        overtime: normalizeTimers(parsed.overtime, moduleCount),
+        completedModules: normalizeCompleted(parsed.completedModules, moduleCount),
       };
     }
   } catch {
@@ -53,16 +67,31 @@ export async function getFullTestTimerState(attemptId: string) {
 }
 
 export async function saveFullTestProgressState(attemptId: string, state: FullTestProgressState) {
-  const payload: FullTestProgressState = {
-    timers: state.timers.map((value) => Math.max(0, Number(value) || 0)),
-    phase: state.phase === "BREAK" ? "BREAK" : "MODULE",
-    breakRemaining: Math.max(0, Number(state.breakRemaining) || 0),
-  };
-  await prisma.$executeRaw`
-    UPDATE "FullPracticeTestAttempt"
-    SET "moduleTimerState" = ${JSON.stringify(payload)}
-    WHERE "id" = ${attemptId}
-  `;
+  // Read-modify-write in one transaction: completedModules is server-owned and must never be lost to a
+  // concurrent save (a late autosave racing a module submit, two module submits at once).
+  await atomic(async (db) => {
+    const rows = await db.$queryRaw<Array<{ moduleTimerState: string | null }>>`
+      SELECT "moduleTimerState" FROM "FullPracticeTestAttempt" WHERE "id" = ${attemptId}
+    `;
+    const stored = parseFullTestProgressState(rows[0]?.moduleTimerState, state.timers.length || 4);
+    // Completed modules only grow: what is stored is kept, plus what the caller (module submit) adds.
+    const completedModules = [...new Set([...(stored?.completedModules ?? []), ...(state.completedModules ?? [])])].sort();
+    const timers = state.timers.map((value) => Math.max(0, Number(value) || 0));
+    // A submitted module's timer stays at 0 whatever a late save says.
+    for (const index of completedModules) if (index < timers.length) timers[index] = 0;
+    const payload: FullTestProgressState = {
+      timers,
+      phase: state.phase === "BREAK" ? "BREAK" : "MODULE",
+      breakRemaining: Math.max(0, Number(state.breakRemaining) || 0),
+      ...(Array.isArray(state.overtime) ? { overtime: state.overtime.map((value) => Math.max(0, Math.round(Number(value) || 0))) } : {}),
+      ...(completedModules.length ? { completedModules } : {}),
+    };
+    await db.$executeRaw`
+      UPDATE "FullPracticeTestAttempt"
+      SET "moduleTimerState" = ${JSON.stringify(payload)}
+      WHERE "id" = ${attemptId}
+    `;
+  });
 }
 
 export async function saveFullTestTimerState(attemptId: string, moduleTimerState: unknown) {
@@ -72,6 +101,8 @@ export async function saveFullTestTimerState(attemptId: string, moduleTimerState
       timers: Array.isArray(raw.timers) ? raw.timers.map((value) => Math.max(0, Number(value) || 0)) : [],
       phase: raw.phase === "BREAK" ? "BREAK" : "MODULE",
       breakRemaining: Math.max(0, Number(raw.breakRemaining) || 0),
+      overtime: Array.isArray(raw.overtime) ? raw.overtime : undefined,
+      // never trust the client for completedModules (see saveFullTestProgressState)
     });
     return;
   }
@@ -82,3 +113,15 @@ export async function saveFullTestTimerState(attemptId: string, moduleTimerState
     breakRemaining: 0,
   });
 }
+
+/** Overtime seconds per module, for results pages (0 for attempts saved before overtime existed). */
+export function overtimeByModule(raw: string | null | undefined, moduleCount: number): number[] {
+  return parseFullTestProgressState(raw, moduleCount)?.overtime ?? Array.from({ length: moduleCount }, () => 0);
+}
+
+/** Module indexes the student already submitted (empty for attempts started before module choice). */
+export function completedModulesOf(raw: string | null | undefined, moduleCount: number): number[] {
+  return parseFullTestProgressState(raw, moduleCount)?.completedModules ?? [];
+}
+
+export { MODULE_KEYS, moduleIndexFromKey, moduleKeyFromIndex, type ModuleKey } from "@/lib/test-module-keys";

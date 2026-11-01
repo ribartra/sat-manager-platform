@@ -36,6 +36,7 @@ export type ContentPart = MathToken | { kind: "prose"; segments: ProseSegment[] 
  */
 function isProseDollarBody(body: string): boolean {
   if (/[\\^_{}]/.test(body)) return false; // LaTeX markup → real math
+  if (/^\d[\d,.]*\s/.test(body) && /\s$/.test(body)) return true; // "$25 (Week 1: $200" → two prices, not math
   if (!/\s/.test(body)) return false; // no spaces → math token
   return (body.match(/[A-Za-z]{3,}/g) || []).length >= 2; // ≥2 real words → prose/currency
 }
@@ -102,14 +103,130 @@ export function parseProseSegments(prose: string): ProseSegment[] {
   return segments;
 }
 
+export type ContentBlock =
+  | { kind: "text"; content: string }
+  | { kind: "table"; header: string[]; rows: string[][] };
+
+const TABLE_ROW_RE = /^\s*\|.*\|\s*$/;
+const TABLE_SEPARATOR_RE = /^\s*\|(\s*:?-{3,}:?\s*\|)+\s*$/;
+
+/** Split a markdown table row into cells; a `|` inside a math token or escaped as `\|` is not a separator. */
+export function splitTableCells(line: string): string[] {
+  const body = line.trim().replace(/^\|/, "").replace(/\|$/, "");
+  const cells: string[] = [];
+  let current = "";
+  let i = 0;
+  while (i < body.length) {
+    const rest = body.slice(i);
+    // Single-$ math never spans a cell separator: "| $210.00 | $25.20 |" are two prices, not one formula.
+    const math = rest.match(/^(\$\$[^|]+?\$\$|\$[^$\n|]+?\$|\\\([^|]+?\\\))/);
+    if (math) {
+      current += math[0];
+      i += math[0].length;
+      continue;
+    }
+    if (rest.startsWith("\\|")) {
+      current += "|";
+      i += 2;
+      continue;
+    }
+    if (body[i] === "|") {
+      cells.push(current.trim());
+      current = "";
+      i += 1;
+      continue;
+    }
+    current += body[i];
+    i += 1;
+  }
+  cells.push(current.trim());
+  return cells;
+}
+
+/**
+ * Split content into prose/math text and GitHub-style pipe tables (header row, `| --- |` separator,
+ * body rows). Tables are rendered as real HTML tables so long cell text wraps.
+ */
+export function splitContentBlocks(content: string): ContentBlock[] {
+  const lines = String(content ?? "").split("\n");
+  const blocks: ContentBlock[] = [];
+  let text: string[] = [];
+  const flushText = () => {
+    if (text.length) blocks.push({ kind: "text", content: text.join("\n") });
+    text = [];
+  };
+  let i = 0;
+  while (i < lines.length) {
+    if (TABLE_ROW_RE.test(lines[i]) && i + 1 < lines.length && TABLE_SEPARATOR_RE.test(lines[i + 1])) {
+      const header = splitTableCells(lines[i]);
+      const rows: string[][] = [];
+      i += 2;
+      while (i < lines.length && TABLE_ROW_RE.test(lines[i])) {
+        const cells = splitTableCells(lines[i]);
+        while (cells.length < header.length) cells.push("");
+        rows.push(cells.slice(0, header.length));
+        i += 1;
+      }
+      // Drop the blank line that separated text from the table; the table is its own block.
+      if (text.length && !text[text.length - 1].trim()) text.pop();
+      flushText();
+      blocks.push({ kind: "table", header, rows });
+      if (i < lines.length && !lines[i].trim()) i += 1;
+      continue;
+    }
+    text.push(lines[i]);
+    i += 1;
+  }
+  flushText();
+  return blocks;
+}
+
 /** Tokenize full content into math blocks + prose (with markup segments). */
+/**
+ * A `$$…$$` / `\[…\]` token is a real display block only when it sits alone on its line inside
+ * longer content. Ingested stems often use `$$` mid-sentence ("If $$x$$ and $$y$$, what is…?");
+ * rendering those as blocks breaks the sentence into centered fragments.
+ */
+function isStandaloneDisplay(parts: string[], index: number): boolean {
+  if (parts.length === 1) return false; // the whole content is the formula (e.g. an answer choice)
+  const before = parts.slice(0, index).join("").split("\n").pop() ?? "";
+  const after = parts.slice(index + 1).join("").split("\n")[0] ?? "";
+  return !before.trim() && !after.trim();
+}
+
+/** `\$` is a literal dollar sign: it never opens or closes math. Hidden while splitting, restored per part. */
+const ESCAPED_DOLLAR = "\uE000";
+
 export function tokenizeMathContent(content: string): ContentPart[] {
-  const parts = String(content ?? "").split(MATH_TOKEN_PATTERN).filter((part) => part.length > 0);
-  return parts.map((part) => {
+  const source = String(content ?? "").replace(/\\\$/g, ESCAPED_DOLLAR);
+  const parts = source.split(MATH_TOKEN_PATTERN).filter((part) => part.length > 0);
+  const maths = parts.map((part, index) => {
     const math = parseMathToken(part);
-    if (math) return normalizeMathToken(math);
-    return { kind: "prose" as const, segments: parseProseSegments(part) };
+    if (!math) return null;
+    // Inside math the escape stays (KaTeX renders `\$` as a dollar sign).
+    const restored = { ...math, raw: math.raw.replaceAll(ESCAPED_DOLLAR, "\\$"), math: math.math.replaceAll(ESCAPED_DOLLAR, "\\$") };
+    if (restored.displayMode && !isStandaloneDisplay(parts, index)) {
+      // Inline, but keep display-size fractions/roots.
+      return { ...restored, displayMode: false, math: `\\displaystyle ${restored.math.trim()}` };
+    }
+    return normalizeMathToken(restored);
   });
+  const isBlock = (index: number) => Boolean(maths[index]?.displayMode);
+  const result: ContentPart[] = [];
+  parts.forEach((part, index) => {
+    const math = maths[index];
+    if (math) {
+      result.push(math);
+      return;
+    }
+    // A display block already starts its own line: the blank lines around it would add an empty
+    // line on top of the formula's margin (big gaps between "$$…$$\n\n$$…$$" equations).
+    let prose = part.replaceAll(ESCAPED_DOLLAR, "$");
+    if (isBlock(index - 1)) prose = prose.replace(/^[ \t]*\n\s*/, "");
+    if (isBlock(index + 1)) prose = prose.replace(/\s*\n[ \t]*$/, "");
+    if (prose) result.push({ kind: "prose", segments: parseProseSegments(prose) });
+  });
+  return result;
 }
 
 /**

@@ -1,5 +1,6 @@
 "use client";
 
+import { Checkbox } from "@/components/ui/checkbox";
 import { useMemo, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -27,6 +28,8 @@ import {
   isIngestWarningInfo,
   reconcileWarningsJson,
 } from "@/lib/ingest-warnings";
+import { Alert, InlineError } from "@/components/sat/alert";
+import { errorMessage, readApiError } from "@/lib/api-client";
 
 type SourceFile = {
   id: string;
@@ -265,7 +268,7 @@ function OptionsEditor({
 
       {showRaw ? (
         <>
-          {jsonInvalid && <p className="text-xs text-rose-600">Invalid JSON — fix it here; the table re-enables once valid.</p>}
+          {jsonInvalid && <InlineError className="text-xs">Invalid JSON — fix it here; the table re-enables once valid.</InlineError>}
           <textarea
             value={raw}
             onChange={(event) => onChange({ optionsJson: event.target.value })}
@@ -445,7 +448,7 @@ function PageTextPreview({ page }: { page: PageArtifact }) {
           )}
         </div>
       ) : (
-        <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">{page.warning || "No text extracted."}</p>
+        <Alert tone="warning" className="text-xs">{page.warning || "No text extracted."}</Alert>
       )}
       {page.warning && hasText && <p className="text-xs text-amber-700">{page.warning}</p>}
     </div>
@@ -535,8 +538,7 @@ export function FileReviewClient({
       body: JSON.stringify({ imageArtifactId, questionId }),
     });
     setAssigning(false);
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) { setMessage(data.error || "Could not assign the image."); return; }
+    if (!res.ok) { setMessage(errorMessage(await readApiError(res, "Could not assign the image."))); return; }
     setGalleryAssign(null);
     setMessage(`Image assigned to ${assignTargets.find((t) => t.questionId === questionId)?.label ?? "the question"}.`);
     router.refresh();
@@ -763,10 +765,14 @@ export function FileReviewClient({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ imageArtifactId: imageId }),
     });
-    const data = await response.json().catch(() => ({}));
     setParsingImageId(null);
-    if (!response.ok || !Array.isArray(data.options) || data.options.length !== 4) {
-      setMessage(data.error || data.warning || "Could not read A–D answer choices from this image.");
+    if (!response.ok) {
+      setMessage(errorMessage(await readApiError(response, "Could not read A–D answer choices from this image.")));
+      return;
+    }
+    const data = await response.json();
+    if (!Array.isArray(data.options) || data.options.length !== 4) {
+      setMessage(data.warning || "Could not read A–D answer choices from this image.");
       return;
     }
     setDraft({ ...selected, type: "MC", optionsJson: JSON.stringify(data.options), status: data.status ?? selected.status });
@@ -809,7 +815,7 @@ export function FileReviewClient({
   }
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[260px_1fr]">
+    <div className="grid grid-cols-1 gap-6 xl:grid-cols-[260px_minmax(0,1fr)]">
       <aside className="space-y-4">
         <Card padding="md">
           <p className="text-xs uppercase text-gray-400">File</p>
@@ -866,8 +872,7 @@ export function FileReviewClient({
           )}
           <div className="border-b border-gray-100 px-3 py-2">
             <label className="flex items-center gap-2 text-[11px] text-gray-600">
-              <input
-                type="checkbox"
+              <Checkbox
                 checked={onlyPending}
                 onChange={(event) => setOnlyPending(event.target.checked)}
                 className="h-3.5 w-3.5 rounded border-gray-300"
@@ -917,7 +922,7 @@ export function FileReviewClient({
         </Card>
       </aside>
 
-      <main className="space-y-4">
+      <div className="min-w-0 space-y-4">
         {selected && draft ? (
           <>
             {/* Sticky context + actions bar (shared across all sections). */}
@@ -951,7 +956,7 @@ export function FileReviewClient({
                     <Button type="button" variant="secondary" size="sm" onClick={() => openQuestionEditor(draft.id)}>Open in editor</Button>
                   )}
                   <Button type="button" variant="ghost" size="sm" onClick={() => saveCandidate("REJECTED")} disabled={saving}>Reject</Button>
-                  <Button type="button" variant={dirty ? "primary" : "secondary"} size="sm" onClick={() => saveCandidate()} disabled={saving || !dirty}>
+                  <Button type="button" variant={dirty ? "primary" : "secondary"} size="sm" onClick={() => saveCandidate()} disabled={saving} disabledReason={!dirty ? "No changes to save." : null}>
                     {saving ? "Saving…" : dirty ? "Save changes" : "Saved"}
                   </Button>
                   <Button type="button" variant="secondary" size="sm" onClick={() => saveCandidate("REVIEWED")} disabled={saving}>Mark reviewed</Button>
@@ -1328,14 +1333,18 @@ export function FileReviewClient({
                               <option key={t.questionId} value={t.questionId}>{t.label}</option>
                             ))}
                           </select>
-                          <button
+                          <Button
                             type="button"
-                            disabled={assigning || galleryAssign?.imageId !== image.id || !galleryAssign?.questionId}
+                            size="sm"
+                            className="h-7 shrink-0 px-2"
+                            disabled={assigning}
+                            disabledReason={
+                              galleryAssign?.imageId !== image.id || !galleryAssign?.questionId ? "Choose the question for this image first." : null
+                            }
                             onClick={() => galleryAssign && assignGalleryImage(image.id, galleryAssign.questionId)}
-                            className="shrink-0 rounded bg-blue-600 px-2 py-1 text-xs font-medium text-white disabled:opacity-40"
                           >
                             OK
-                          </button>
+                          </Button>
                         </div>
                       )}
                     </figure>
@@ -1361,7 +1370,7 @@ export function FileReviewClient({
             {pages.length === 0 && <p className="py-4 text-sm text-gray-400">No pages recorded.</p>}
           </div>
         </Section>
-      </main>
+      </div>
 
       {mergeOpen && selected && (
         <MergeDialog

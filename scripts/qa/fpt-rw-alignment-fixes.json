@@ -1,0 +1,209 @@
+[
+ {
+  "t": "q",
+  "id": "cmsjrntxm00cjqmt10muq61eu",
+  "field": "stimulus",
+  "old": "The following text is from Ricard Harding Davis's 1905 play *Miss Civilization*. Hatch, a burglar, is trying to defend his life of crime. HATCH: Stupid? Why, I make a living at it. ALICE: How much of a living? HATCH: Ten thousand a year. ALICE: Ten thousand—well, suppose you made FIFTY thousand. What good is even a hundred thousand for ONE year, if to get it you risk going to prison for twenty years? That's not sensible. Merely as a business proposition, to take the risk you do for ten thousand dollars is stupid isn't it? The following text is from Angelina Weld Grimké's 1916 text *Rachel: A Play in Three Acts*. RACHEL: It's quite a climb up to our flat, don't you think? STRONG: Why, no! It didn't strike me so. I'm not old enough yet to mind stairs. RACHEL (Nervously): Oh! I didn't mean that you are old! Anyone can see you are quite young, that is, of course, not too young, but—(Strong laughs quietly). There! I don't blame you for laughing. I'm always clumsy just like that.",
+  "new": "The following text is from Ricard Harding Davis's 1905 play *Miss Civilization*. Hatch, a burglar, is trying to defend his life of crime. HATCH: Stupid? Why, I make a living at it. ALICE: How much of a living? HATCH: Ten thousand a year. ALICE: Ten thousand—well, suppose you made FIFTY thousand. What good is even a hundred thousand for ONE year, if to get it you risk going to prison for twenty years? That's not sensible. Merely as a business proposition, to take the risk you do for ten thousand dollars is stupid isn't it?",
+  "ref": "T2 RW M1 #3",
+  "why": "passage of #4 appended to the stimulus"
+ },
+ {
+  "t": "q",
+  "id": "cmsjrnvd600t6qmt1panu970a",
+  "field": "stimulus",
+  "old": "Breaking from a tendency of Irish authors to be immensely critical of life in Ireland itself, poet Seamus Heaney instead depicted his home culture with ____, as shown in poems such as \"Digging\" and \"Alphabets.\" These compositions suggest an appreciation for Irish rural life while also registering Heaney's sense of unease when returning to his roots. In his 1981 work *From Bauhaus to Our House*, Tom Wolfe argued that a spirit of ____ had overwhelmed architecture in the United States: where the 1800s and the early 1900s accommodated an array of styles, the mid-1900s were increasingly dominated by predictable \"glass boxes,\" in Wolfe's view. The jiroft culture is a hypothetical society that lived in modern-day Iran in the third millennium BCE. The first indication of the culture was found in 2001 when scientists evaluated confiscated artifacts, but many were skeptical of the find because it did not have an archaeological context and may have contained forgeries. However, the site of Konar Sandal in Iran is now being excavated, and archaeologists have discovered two mounds, a citadel, and tablets with an unknown script that may prove to be a vital link to understanding whether the jiroft culture actually existed.",
+  "new": "Breaking from a tendency of Irish authors to be immensely critical of life in Ireland itself, poet Seamus Heaney instead depicted his home culture with ____, as shown in poems such as \"Digging\" and \"Alphabets.\" These compositions suggest an appreciation for Irish rural life while also registering Heaney's sense of unease when returning to his roots.",
+  "ref": "T3 RW M1 #3",
+  "why": "passage of #4 appended to the stimulus"
+ },
+ {
+  "t": "q",
+  "id": "cmsjrnvdq00tcqmt1rda8hrr5",
+  "field": "stimulus",
+  "old": "The following text is from George Eliot's 1866 novel *Felix Holt, The Radical*. Harold Transome did not choose to spend the whole evening with his mother. ++It was his habit to compress a great deal of effective conversation into a short space of time, asking rapidly all the questions he wanted to get answered, and diluting no subject with irrelevancies, paraphrase, or repetitions++. He volunteered no information about himself and his past life at Smyrna, but answered pleasantly enough, though briefly, whenever his mother asked for any detail. This text is adapted from Harriet Beecher Stowe's sketch \"Aunt Esther's Stories,\" one of the entries in Stowe's 1867 book *Queer Little Folks*. Aunt Esther used to be a constant attendant upon us young ones whenever we were a little ill, or any of the numerous accidents of childhood overtook us. In such seasons of adversity she always came to sit by our bedside, and take care of us. She did not, as some people do, bring a long face and a doleful whining voice into a sick-room, but was always so bright, and cheerful, and chatty, that we began to think it was almost worth while to be sick to have her about us.",
+  "new": "The following text is from George Eliot's 1866 novel *Felix Holt, The Radical*. Harold Transome did not choose to spend the whole evening with his mother. ++It was his habit to compress a great deal of effective conversation into a short space of time, asking rapidly all the questions he wanted to get answered, and diluting no subject with irrelevancies, paraphrase, or repetitions++. He volunteered no information about himself and his past life at Smyrna, but answered pleasantly enough, though briefly, whenever his mother asked for any detail.",
+  "ref": "T3 RW M1 #6",
+  "why": "passage of #7 appended to the stimulus"
+ },
+ {
+  "t": "q",
+  "id": "cmsjrnve100tgqmt16c33qeyh",
+  "field": "stimulus",
+  "old": "The following text is from Alice Moore Dunbar-Nelson's short story \"In Our Neighborhood,\" an entry from the 1895 collection Violets and Other Tales. The Harts were going to give a party. Neither Mrs. Hart, nor the Misses Hart, nor the small and busy Harts who amused themselves and the neighborhood by continually falling in the gutter on special occasions, had mentioned this fact to anyone, but all the interested denizens of that particular square could tell by the unusual air of bustle and activity which pervaded the Hart domicile. Lillian, the aesthetic, who furnished theme for many spirited discussions, leaned airily out of the window; her auburn (red) tresses carefully done in curl papers. Martha, the practical, flourished the broom and duster with unwonted activity. This text is adapted from Stephen Crane's 1897 short story \"The Open Boat.\" A few men are adrift at sea in the small vessel named in the title. It would be difficult to describe the subtle brotherhood of men that was here established on the seas. No one said that it was so. No one mentioned it. But it dwelt in the boat, and each man felt it warm him. They were a captain, an oiler, a cook, and a correspondent, and they were friends, friends in a more curiously iron-bound degree than may be common. The hurt captain, lying against the water-jar in the bow, spoke always in a low voice and calmly, but he could never command a more ready and swiftly obedient crew than the motley three of the dingey.",
+  "new": "The following text is from Alice Moore Dunbar-Nelson's short story \"In Our Neighborhood,\" an entry from the 1895 collection Violets and Other Tales. The Harts were going to give a party. Neither Mrs. Hart, nor the Misses Hart, nor the small and busy Harts who amused themselves and the neighborhood by continually falling in the gutter on special occasions, had mentioned this fact to anyone, but all the interested denizens of that particular square could tell by the unusual air of bustle and activity which pervaded the Hart domicile. Lillian, the aesthetic, who furnished theme for many spirited discussions, leaned airily out of the window; her auburn (red) tresses carefully done in curl papers. Martha, the practical, flourished the broom and duster with unwonted activity.",
+  "ref": "T3 RW M1 #8",
+  "why": "passage of #9 appended to the stimulus"
+ },
+ {
+  "t": "q",
+  "id": "cmsjrnwhr015jqmt13y29sxg3",
+  "field": "stimulus",
+  "old": "Unlike in narrative fiction, the writing in cookbooks tends to adopt a more instructional style, aiming to provide clear, practical instructions and culinary inspiration. ____ a new hybrid genre has emerged in recent years: narrative cookbooks. More than a mere compilation of ingredients and directions, narrative cookbooks strive to provide context for the recipes, as well as the inspiration leading to their inception. The expedition led by Lewis and Clark in the early 1800s was considered a failure in finding a direct water route to East Asia. ____ it had a significant impact on American exploration and how the West was perceived. It marked the end of the French and Spanish influence on the depiction of the American Northwest and the beginning of a new era, where explorers embarked on journeys to the mysterious “Wild West” beyond the Mississippi.",
+  "new": "Unlike in narrative fiction, the writing in cookbooks tends to adopt a more instructional style, aiming to provide clear, practical instructions and culinary inspiration. ____ a new hybrid genre has emerged in recent years: narrative cookbooks. More than a mere compilation of ingredients and directions, narrative cookbooks strive to provide context for the recipes, as well as the inspiration leading to their inception.",
+  "ref": "T6 RW M1 #22",
+  "why": "passage of #23 appended to the stimulus"
+ },
+ {
+  "t": "q",
+  "id": "cmsjrnwgw014qqmt11sl2gzpf",
+  "field": "stimulus",
+  "old": "A concept within psychology known as social facilitation claims that individuals perform better on tasks when in the presence of others. This phenomena can primarily be observed in tasks in which the individual is already proficient. Psychologist Robert Zajonc argued that this is a result of a “dominant response” effect: the presence of others increases physiological arousal and reduces reliance on conscious thought, leading individuals to respond automatically based on their practiced, trained behaviors. When faced with an unfamiliar and complex task, however, Zajonc would argue that the individual is likely to _____ In 2006, Laura Bush, accompanied by Secretary of State Condoleezza Rice, traveled to West Africa in order to witness the historic inauguration of Liberian President Ellen Johnson Sirleaf. A primary objective of the trip, which also included visits to Cape Verde, Ghana, and Nigeria, _____ to strengthen international partnerships as well as foster cultural understanding.",
+  "new": "A concept within psychology known as social facilitation claims that individuals perform better on tasks when in the presence of others. This phenomena can primarily be observed in tasks in which the individual is already proficient. Psychologist Robert Zajonc argued that this is a result of a “dominant response” effect: the presence of others increases physiological arousal and reduces reliance on conscious thought, leading individuals to respond automatically based on their practiced, trained behaviors. When faced with an unfamiliar and complex task, however, Zajonc would argue that the individual is likely to _____",
+  "ref": "T6 RW M2 #16",
+  "why": "passage of #17 appended to the stimulus"
+ },
+ {
+  "t": "q",
+  "id": "cmsjrnwha0156qmt1ec89rwme",
+  "field": "stimulus",
+  "old": "The critically endangered Chacoan peccary of Argentina has proven elusive to researchers—including Micaela _____ who has spent the past 13 years working to safeguard this bristly, pig-like mammal. During that stretch of time, Camino has spotted only one of these creatures in the wild. Photographer Jennie Ross Cobb produced images that trace how the Cherokee Nation of Oklahoma adapted to modern life. These photographs of Cobb's fellow Cherokees hold significance that extends beyond their historical and ethnographic value; indeed, by capturing her subjects as they ambled to _____ Cobb succeeded in introducing a spontaneous, candid sensibility into the often stately photography of the late 1800s.",
+  "new": "The critically endangered Chacoan peccary of Argentina has proven elusive to researchers—including Micaela _____ who has spent the past 13 years working to safeguard this bristly, pig-like mammal. During that stretch of time, Camino has spotted only one of these creatures in the wild.",
+  "ref": "T6 RW M2 #18",
+  "why": "passage of #19 appended to the stimulus"
+ },
+ {
+  "t": "q",
+  "id": "cmsjrnwhl015hqmt1rrn10fxa",
+  "field": "stimulus",
+  "old": "Near the boundary between France and Switzerland _____ the interconnected superconducting magnet array, particle accelerator system, and helium-supplied tube network of the Large Hadron Collider. This vast experimental apparatus, which boasts a circumference of 27 kilometers, has offered researchers insights into the dynamics of high-velocity particles since it began operations in 2008. Tetrachromacy, a condition that endows those born with it to perceive colors invisible to most observers, can serve as a potential source of inspiration for artists like Concetta Antico. In a British Broadcasting Corporation feature, Antico elaborated on her _____ how mundane pebbles, commonly perceived as uniform gray, become vividly adorned with oranges, yellows, greens, blues, and pinks, as if the little stones themselves come alive with pops of color.",
+  "new": "Near the boundary between France and Switzerland _____ the interconnected superconducting magnet array, particle accelerator system, and helium-supplied tube network of the Large Hadron Collider. This vast experimental apparatus, which boasts a circumference of 27 kilometers, has offered researchers insights into the dynamics of high-velocity particles since it began operations in 2008.",
+  "ref": "T6 RW M2 #20",
+  "why": "passage of #21 appended to the stimulus"
+ },
+ {
+  "t": "q",
+  "id": "cmsjrnwi5015oqmt1pcip1a0a",
+  "field": "stimulus",
+  "old": "Judge Sweet of the Southern District of New York ruled that genes are not patentable. Myriad Genetics appealed this ruling, and the case was heard two years later by the US Court of Appeals for the Federal Circuit. _____ both the plaintiffs and defendants were dissatisfied with the US Court of Appeals' ambiguous ruling, so they petitioned for a rehearing by the Supreme Court in August 2011. Most people are familiar with the four basic tastes—sweet, salty, sour, and bitter—but many may not know about a fifth type of taste, umami. Umami's name was coined by Dr. Kikunae Ikeda, who wanted to convey the appeal of this intriguing savory flavor. _____ the name roughly translates to \"essence of deliciousness\" in Japanese.",
+  "new": "Judge Sweet of the Southern District of New York ruled that genes are not patentable. Myriad Genetics appealed this ruling, and the case was heard two years later by the US Court of Appeals for the Federal Circuit. _____ both the plaintiffs and defendants were dissatisfied with the US Court of Appeals' ambiguous ruling, so they petitioned for a rehearing by the Supreme Court in August 2011.",
+  "ref": "T6 RW M2 #24",
+  "why": "passage of #25 appended to the stimulus"
+ },
+ {
+  "t": "q",
+  "id": "cmsjrnwol0186qmt14xounb14",
+  "field": "stimulus",
+  "old": "Researchers Valentina Marinescu and Ecaterina Balica have studied the popularity of Korean pop music (K-Pop) in Romania. Despite the lack of contact or cultural connection between the two countries, Romania has many well-organized K-Pop fan clubs. Members of these clubs connect online and in person to learn the Korean language, enjoy Korean cuisine, and listen to K-Pop music, suggesting that _____ The Chidon Ha-Tanach is a global trivia competition designed for middle and high school students from the Jewish community. It focuses on testing their knowledge of the Tanach, the Hebrew scriptures. The finals are televised in Jerusalem, Israel's capital, and the final question is asked by the Israeli prime minister. In 2010, the prime minister's son competed in the Chidon Ha-Tanach and placed third. Thus, _____",
+  "new": "Researchers Valentina Marinescu and Ecaterina Balica have studied the popularity of Korean pop music (K-Pop) in Romania. Despite the lack of contact or cultural connection between the two countries, Romania has many well-organized K-Pop fan clubs. Members of these clubs connect online and in person to learn the Korean language, enjoy Korean cuisine, and listen to K-Pop music, suggesting that _____",
+  "ref": "T7 RW M2 #14",
+  "why": "passage of #15 appended to the stimulus"
+ },
+ {
+  "t": "q",
+  "id": "cmsjrnsza0015qmt1bf7ttfky",
+  "field": "stimulus",
+  "old": "The following text comes from Theodore Roosevelt's 1910 speech \"Citizenship in a Republic.\" It is not the critic who counts; not the man who points out how the strong man stumbles, or where the doer of deeds could have done them better. The credit belongs to the man who is actually in the arena, whose face is marred by dust and sweat and blood; who strives valiantly; who errs, who comes short again and again, because there is no effort without error and shortcoming; but who does actually strive to do the deeds; who knows the great enthusiasms, the great devotions; who spends himself in a worthy cause; who at the best knows in the end the triumph of high achievement, and who at the worst, if he fails, at least fails while daring greatly, so that his place shall never be with those cold and timid souls who neither know victory nor defeat. Text 1 Tulip Mania was an infamous economic phenomenon that took place in Holland in the 1630s. As the colorful flowers' popularity and value as status symbols grew, so did their price. Eventually, the most expensive tulips were selling for the price of mansions even before they were planted. By 1637, prices finally peaked, and this financial bubble experienced a legendary downturn. The government had to intervene and restore financial stability to those who had become bankrupt, but many investors were left financially ruined. Text 2 Financial bubbles are an economic event where the price of an item skyrockets past its real value and then collapses when investors begin to realize that they will not be able to sell the product. In short, the existence of a financial bubble hinges on the participation of investors who fuel the frenzy. One notable example is the Tulip Mania bubble, in which investors had bet on the future demand for tulips, often trading contracts for bulbs that didn't yet exist. All investors should beware any investment opportunity that seems too good to be true;",
+  "new": "The following text comes from Theodore Roosevelt's 1910 speech \"Citizenship in a Republic.\" It is not the critic who counts; not the man who points out how the strong man stumbles, or where the doer of deeds could have done them better. The credit belongs to the man who is actually in the arena, whose face is marred by dust and sweat and blood; who strives valiantly; who errs, who comes short again and again, because there is no effort without error and shortcoming; but who does actually strive to do the deeds; who knows the great enthusiasms, the great devotions; who spends himself in a worthy cause; who at the best knows in the end the triumph of high achievement, and who at the worst, if he fails, at least fails while daring greatly, so that his place shall never be with those cold and timid souls who neither know victory nor defeat.",
+  "ref": "T10 RW M2 #8",
+  "why": "Text 1/Text 2 of #9 appended to the stimulus"
+ },
+ {
+  "t": "q",
+  "id": "cmsjrnty700d5qmt13js7g42m",
+  "field": "stimulus",
+  "old": "In this passage, the narrator describes his father's early years as an apprentice to a London merchant. ++My father was not fortunate in the character of him under whose care he was now placed++. He was treated with rigor, and full employment was provided for every hour of his time. His duties were laborious and mechanical. He had been educated with a view to this profession, and, therefore, was not tormented with unsatisfied desires. He did not hold his present occupations in abhorrence, because they withheld him from paths more flowery and more smooth, but he found in unintermitted labour, and in the sternness of his master, sufficient occasions for discontent.",
+  "new": "The following text is from Charles Brockden Brown’s 1798 novel *Wieland; or the Transformation*. In this passage, the narrator describes his father's early years as an apprentice to a London merchant. ++My father was not fortunate in the character of him under whose care he was now placed++. He was treated with rigor, and full employment was provided for every hour of his time. His duties were laborious and mechanical. He had been educated with a view to this profession, and, therefore, was not tormented with unsatisfied desires. He did not hold his present occupations in abhorrence, because they withheld him from paths more flowery and more smooth, but he found in unintermitted labour, and in the sternness of his master, sufficient occasions for discontent.",
+  "ref": "T2 RW M1 #6",
+  "why": "attribution line missing"
+ },
+ {
+  "t": "q",
+  "id": "cmsjrnvcy00t0qmt19mju2ii4",
+  "field": "stimulus",
+  "old": "Tommy is one of the founders of a detective agency, Young Adventurers Ltd, and is following a suspect. It was at this juncture that Tommy lost his head. What he ought to have done, what any sane man would have done, was to remain patiently where he was and wait for his man to come out again. What he did do was entirely foreign to the sober common sense which was, as a rule, his leading characteristic.",
+  "new": "The following text is from Agatha Christie’s 1922 novel *The Secret Adversary*. Tommy is one of the founders of a detective agency, Young Adventurers Ltd, and is following a suspect. It was at this juncture that Tommy lost his head. What he ought to have done, what any sane man would have done, was to remain patiently where he was and wait for his man to come out again. What he did do was entirely foreign to the sober common sense which was, as a rule, his leading characteristic.",
+  "ref": "T3 RW M1 #2",
+  "why": "attribution line missing"
+ },
+ {
+  "t": "q",
+  "id": "cmsjrnve400thqmt1d3h89d67",
+  "field": "stimulus",
+  "old": "Mrs. Sommers, the central character, has recently discovered a sum of money that could be useful to her and her children. The neighbors sometimes talked of certain \"better days\" that little Mrs. Sommers had known before she had ever thought of being Mrs. Sommers. She herself indulged in no such morbid retrospection. She had no time—no second of time to devote to the past. ++The needs of the present absorbed her every faculty++. A vision of the future like some dim, gaunt monster sometimes appalled her, but luckily to-morrow never comes.",
+  "new": "The following text is from Kate Chopin’s 1897 short story “A Pair of Silk Stockings.” Mrs. Sommers, the central character, has recently discovered a sum of money that could be useful to her and her children. The neighbors sometimes talked of certain \"better days\" that little Mrs. Sommers had known before she had ever thought of being Mrs. Sommers. She herself indulged in no such morbid retrospection. She had no time—no second of time to devote to the past. ++The needs of the present absorbed her every faculty++. A vision of the future like some dim, gaunt monster sometimes appalled her, but luckily to-morrow never comes.",
+  "ref": "T3 RW M2 #8",
+  "why": "attribution line missing"
+ },
+ {
+  "t": "q",
+  "id": "cmsjrnvd100t1qmt1b41ylzbx",
+  "field": "stimulus",
+  "old": "In order to better depict the education of one of her central characters, the ambitious Ted Kim, she visited Harvard to audit the sort of business seminars that a real-life Ted would have absorbed.",
+  "new": "Korean-American author Min Jin Lee _____ in the world of finance while writing *Free Food for Millionaires*, her 2007 debut novel. In order to better depict the education of one of her central characters, the ambitious Ted Kim, she visited Harvard to audit the sort of business seminars that a real-life Ted would have absorbed.",
+  "ref": "T3 RW M2 #2",
+  "why": "sentence with the blank missing (unanswerable)"
+ },
+ {
+  "t": "q",
+  "id": "cmsjrnw9u011oqmt1le8k3p3s",
+  "field": "stimulus",
+  "old": "The rebels took control of the city but never created a coherent organization, and government troops crushed the insurrection within two months. _____ the government arrested over 38,000 revolutionaries and deported more than 7,000 people.",
+  "new": "The Paris Commune was an attempt by French republicans to overthrow the royalist French government. The rebels took control of the city but never created a coherent organization, and government troops crushed the insurrection within two months. _____ the government arrested over 38,000 revolutionaries and deported more than 7,000 people.",
+  "ref": "T5 RW M2 #23",
+  "why": "opening sentence missing"
+ },
+ {
+  "t": "q",
+  "id": "cmsjrnv1100olqmt1ddk8eg1v",
+  "field": "imageUrl",
+  "old": "/uploads/questions/29f4a49bdbf600f3f36b5a68.jpg",
+  "new": "/uploads/questions/d98a7e4d6dc62cdc1367be8d.png",
+  "ref": "T5 RW M2 #14",
+  "why": "graph required by the question was missing (cropped from source p.30)"
+ },
+ {
+  "t": "q",
+  "id": "cmsjrnwhl015hqmt1rrn10fxa",
+  "field": "correctAnswer",
+  "old": "D",
+  "new": "C",
+  "ref": "T6 RW M2 #20",
+  "why": "compound subject (array, system, and network) takes plural \"sit\"; ANS KEY = C"
+ },
+ {
+  "t": "q",
+  "id": "cmsjrnwhl015hqmt1rrn10fxa",
+  "field": "explanation",
+  "old": "✓ Correct Answer: D — sits The sentence reads: 'Near the boundary between France and Switzerland _____ the interconnected superconducting magnet array, particle accelerator system, and helium-supplied tube network of the Large Hadron Collider.' This is an inverted sentence structure — the subject follows the verb. The subject is the list of components (the array, system, and network) — a compound subject but treated as a collective entity. 'Sits' is singular present tense, appropriate for describing the permanent location of the LHC.\n ✗ Why the other choices are wrong: A — is sitting: Present progressive. For a permanent location, simple present ('sits') is more appropriate than progressive ('is sitting' implies temporary). B — has sat: Present perfect implies a completed past action. The LHC is permanently located there. C — sit: Plural present. While there are multiple components, the sentence treats the entire apparatus as one entity (the LHC sits there).",
+  "new": "Choice C is the best answer. The convention being tested is subject-verb agreement. In this inverted sentence the subject follows the verb: “the interconnected superconducting magnet array, particle accelerator system, and helium-supplied tube network of the Large Hadron Collider.” Three nouns joined by “and” form a compound (plural) subject, so the plural present-tense verb “sit” is required.\n\nChoice A is incorrect because “is sitting” is singular and does not agree with the plural compound subject. Choice B is incorrect because “has sat” is singular and does not agree with the plural compound subject. Choice D is incorrect because “sits” is singular and does not agree with the plural compound subject.",
+  "ref": "T6 RW M2 #20",
+  "why": "explanation argued for the wrong key D"
+ },
+ {
+  "t": "opt",
+  "questionId": "cmsjro6up062wqmt1xl1noqst",
+  "label": "D",
+  "old": "MKX transcription factors have also been found to control genes that instruct the body to create neurons. [tbl-0.html](tbl-0.html)",
+  "new": "MKX transcription factors have also been found to control genes that instruct the body to create neurons.",
+  "ref": "T1 RW cmsjro6up0",
+  "why": "asset placeholder leaked into option D"
+ },
+ {
+  "t": "opt",
+  "questionId": "cmsjro6wt063aqmt1085omb2i",
+  "label": "D",
+  "old": "administrators and [tbl-0.html](tbl-0.html)",
+  "new": "administrators and",
+  "ref": "T1 RW cmsjro6wt0",
+  "why": "asset placeholder leaked into option D"
+ },
+ {
+  "t": "opt",
+  "questionId": "cmsjro6tx062rqmt118kzhi2v",
+  "label": "D",
+  "old": "The speaker begins with a psychological portrait of war, then shifts to a religious one. [tbl-0.html](tbl-0.html)",
+  "new": "The speaker begins with a psychological portrait of war, then shifts to a religious one.",
+  "ref": "T1 RW cmsjro6tx0",
+  "why": "asset placeholder leaked into option D"
+ },
+ {
+  "t": "opt",
+  "questionId": "cmsjro6xm063hqmt1ffor3loj",
+  "label": "D",
+  "old": "highly stylized, over-muscled, blocky, figures surrounded by cluttered, geometric shapes, all [tbl-0.html](tbl-0.html)",
+  "new": "highly stylized, over-muscled, blocky, figures surrounded by cluttered, geometric shapes, all",
+  "ref": "T1 RW cmsjro6xm0",
+  "why": "asset placeholder leaked into option D"
+ }
+]

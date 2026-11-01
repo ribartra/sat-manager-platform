@@ -1,0 +1,892 @@
+[
+ {
+  "table": "Question",
+  "id": "cmsjrnuty00mkqmt1rl2lbkh5",
+  "field": "stimulus",
+  "before": "In order for the mission to land successfully, NASA's aerospace engineers _____ a complex sequence of maneuvers that facilitated a decrease in the speed of the descending rover so that it could be safely lowered to the planet's surface.",
+  "after": "The Mars Science Laboratory's Curiosity rover landed on Mars on August 5, 2012. In order for the mission to land successfully, NASA's aerospace engineers _____ a complex sequence of maneuvers that facilitated a decrease in the speed of the descending rover so that it could be safely lowered to the planet's surface.",
+  "note": "T5 R&W M1 #2: other — stimulus truncated: opening sentence \"The Mars Science Laboratory's Curiosity rover landed…\" dropped by parser",
+  "class": "other",
+  "evidence": "IngestPageArtifact p1 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q2 block)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnuug00moqmt19gv4u1s2",
+  "field": "stimulus",
+  "before": "Sara often thought afterward that the house was somehow exactly like Miss Minchin. ++It was respectable and well furnished, but everything in it was ugly++; and the very armchairs seemed to have hard bones in them. In the hall everything was hard and polished—even the red cheeks of the moon face on the tall clock in the corner had a severe varnished look. The drawing room into which they were ushered was covered by a carpet with a square pattern upon it, the chairs were square, and a heavy marble timepiece stood upon the heavy marble mantel.",
+  "after": "The following text is from Frances Hodgson Burnett's 1905 novel *A Little Princess*. Sara often thought afterward that the house was somehow exactly like Miss Minchin. ++It was respectable and well furnished, but everything in it was ugly++; and the very armchairs seemed to have hard bones in them. In the hall everything was hard and polished—even the red cheeks of the moon face on the tall clock in the corner had a severe varnished look. The drawing room into which they were ushered was covered by a carpet with a square pattern upon it, the chairs were square, and a heavy marble timepiece stood upon the heavy marble mantel.",
+  "note": "T5 R&W M1 #4: other — source intro line (\"The following text is from … *A Little Princess*.\") dropped by parser",
+  "class": "other",
+  "evidence": "IngestPageArtifact p2 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q4 block); page image p2 checked"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnuuy00mwqmt156obl2h2",
+  "field": "stimulus",
+  "before": "The following paragraph is from the 1749 novel *The History* of Tom Jones, a Foundling by Henry Fielding. The passage opens a chapter in which Mr. Allworthy discovers Tom, an abandoned infant. I have told my reader, in the preceding chapter, that Mr. Allworthy inherited a large fortune; that ++he had a good heart and no family. Hence, doubtless, it will be concluded by many that he lived like an honest man, owed no one a shilling, took nothing but what was his own, kept a good house, entertained his neighbors with a hearty welcome at his table, and was charitable to the poor.++",
+  "after": "The following paragraph is from the 1749 novel *The History* of Tom Jones, a Foundling by Henry Fielding. The passage opens a chapter in which Mr. Allworthy discovers Tom, an abandoned infant. I have told my reader, in the preceding chapter, that Mr. Allworthy inherited a large fortune; that he had a good heart and no family. Hence, doubtless, it will be concluded by many that ++he lived like an honest man, owed no one a shilling, took nothing but what was his own, kept a good house, entertained his neighbors with a hearty welcome at his table, and was charitable to the poor.++",
+  "note": "T5 R&W M1 #6: other — underline span too wide: source underlines only \"he lived like an honest man, … charitable to the poor.\"",
+  "class": "other",
+  "evidence": "IngestPageArtifact p4 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q6 block); page image p4 checked (underline starts at \"he lived like\")"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnuv800n2qmt1xezqm9ve",
+  "field": "stimulus",
+  "before": "According to Nicole Kay Peterson of Iowa State University, the evolution of office spaces followed a twisted path through eras and contexts. Peterson first traced the birth of individualized office areas, or cubicles, to fifth-century monasteries. She then saw evidence of modern cubicles in Italian city-states such as Florence, which developed centrally-located administrative offices in the 1500s, and British trading firms, which built offices with dedicated conference rooms in the 1700s. *Cubed: A Secret History of the Workplace* functions as a hard-edged social commentary for author Nikil Saval, who largely attributes the development of today's cubicle culture to questionable 1800s ideals. Cubicles, for Saval, offer the illusion of self-directed and fulfilling individual work but align with an approach that treats workers as the implements of corporations. Saval notes, however, that such alienation has recently begun to abate as companies embrace more communal office plans.",
+  "after": "**Text 1**\n\nAccording to Nicole Kay Peterson of Iowa State University, the evolution of office spaces followed a twisted path through eras and contexts. Peterson first traced the birth of individualized office areas, or cubicles, to fifth-century monasteries. She then saw evidence of modern cubicles in Italian city-states such as Florence, which developed centrally-located administrative offices in the 1500s, and British trading firms, which built offices with dedicated conference rooms in the 1700s.\n\n**Text 2**\n\n*Cubed: A Secret History of the Workplace* functions as a hard-edged social commentary for author Nikil Saval, who largely attributes the development of today's cubicle culture to questionable 1800s ideals. Cubicles, for Saval, offer the illusion of self-directed and fulfilling individual work but align with an approach that treats workers as the implements of corporations. Saval notes, however, that such alienation has recently begun to abate as companies embrace more communal office plans.",
+  "note": "T5 R&W M1 #7: other — \"Text 1\"/\"Text 2\" labels missing although the stem cites them; restored as separate paragraphs",
+  "class": "other",
+  "evidence": "IngestPageArtifact p5 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q7 block); source shows bold Text 1 / Text 2 headings"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnv0300o8qmt1poncffke",
+  "field": "stimulus",
+  "before": "Cost to deliver 1 MBtu As people have become increasingly conscious of their impact on the environment, “green” products—those that have a less negative environmental impact from their production or use, compared to standard products—have been developed for home use, from paint on the walls to sources of heat. While these products often have a larger upfront cost, the positive ecological impact is often not the only benefit. For example, geothermal heat pumps, widely considered the most eco-friendly way to heat a house, _____",
+  "after": "Cost to deliver 1 MBtu\n\nAs people have become increasingly conscious of their impact on the environment, “green” products—those that have a less negative environmental impact from their production or use, compared to standard products—have been developed for home use, from paint on the walls to sources of heat. While these products often have a larger upfront cost, the positive ecological impact is often not the only benefit. For example, geothermal heat pumps, widely considered the most eco-friendly way to heat a house, _____",
+  "note": "T5 R&W M1 #12: other — graph title \"Cost to deliver 1 MBtu\" (not in the image) glued onto the passage's first sentence; put on its own line",
+  "class": "other",
+  "evidence": "IngestPageArtifact p9 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q12 block); graph title sits above the chart, image /uploads/questions/575c6f17… has no title"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnv0d00oeqmt1kaggzver",
+  "field": "stimulus",
+  "before": "In the midst of the Romantic period, authors such as Jane Austen and Charlotte Brontë crafted novels that centered around marriage, delving into the complexities of courtship and societal expectations. Austen's *Pride and Prejudice* and Brontë's *Jane Eyre* dedicated substantial attention to exploring the intricacies of romantic relationships and the impact of marriage on individuals' lives. At the same time, such novels challenged convention: women in these stories, as was the case for actual women during the time, had limited agency as they aimed to adhere to the strict rules of courtship, rigid social hierarchies, and restricting gender roles, thus suggesting writers such as Austen and Brontë _____ It is often asserted that \"history is written by the winners,\" and for several centuries, the reputation of King Richard III of England has been one of the clearest examples of this claim. Richard III was defeated and killed in 1485 in battle with the soon-to-be Henry VII, and his story was spread by the victorious monarch, who portrayed Richard III as a manipulative, power-hungry tyrant who murdered his own nephews to reach the throne. However, historians in the twentieth century have uncovered physical and documentary evidence that has greatly revised the way Richard III is now portrayed in most history books, and he has been cleared of many earlier accusations. Thus, even if history is initially written by the winners, _____",
+  "after": "In the midst of the Romantic period, authors such as Jane Austen and Charlotte Brontë crafted novels that centered around marriage, delving into the complexities of courtship and societal expectations. Austen's *Pride and Prejudice* and Brontë's *Jane Eyre* dedicated substantial attention to exploring the intricacies of romantic relationships and the impact of marriage on individuals' lives. At the same time, such novels challenged convention: women in these stories, as was the case for actual women during the time, had limited agency as they aimed to adhere to the strict rules of courtship, rigid social hierarchies, and restricting gender roles, thus suggesting writers such as Austen and Brontë _____",
+  "note": "T5 R&W M1 #13: bleed — stimulus carries #14's Richard III passage after its own Austen/Brontë passage; drop it (it is #14's stimulus verbatim)",
+  "class": "bleed",
+  "evidence": "IngestPageArtifact p10 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q13 block); p10 holds two passages: Austen/Brontë → Q13 options, Richard III → Q14 options; docx explanations Q13/Q14 confirm"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnv1c00owqmt1qqdqdbp6",
+  "field": "stimulus",
+  "before": "This shows that what may appear like stark color contrast to the human eye does not necessarily provide a meaningful disadvantage in certain animal feeding behaviors.",
+  "after": "_____ the Red-headed woodpecker is surprisingly adept at catching flying insects midair. This shows that what may appear like stark color contrast to the human eye does not necessarily provide a meaningful disadvantage in certain animal feeding behaviors.",
+  "note": "T5 R&W M1 #16: other — stimulus truncated: first sentence with the blank (\"_____ the Red-headed woodpecker is…\") dropped, item unanswerable",
+  "class": "other",
+  "evidence": "IngestPageArtifact p11 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q16 block); page image p11 checked"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnv1s00p4qmt18fsi1i6a",
+  "field": "stimulus",
+  "before": "Since its discovery, biologists have noted how external factors, such as the detection of blue light, can impact _____. Blue light in particular can suppress the production of melatonin, which is directly related to sleep-wake cycles.",
+  "after": "The circadian rhythm is an internal process that functions as the biological clock of the human body. Since its discovery, biologists have noted how external factors, such as the detection of blue light, can impact _____. Blue light in particular can suppress the production of melatonin, which is directly related to sleep-wake cycles.",
+  "note": "T5 R&W M1 #18: other — stimulus truncated: opening sentence \"The circadian rhythm is…\" dropped (antecedent of \"its\"/\"it\")",
+  "class": "other",
+  "evidence": "IngestPageArtifact p12 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q18 block)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnv2s00pqqmt1rew7cu53",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes: - Vineyard Wind 1 is an offshore wind farm under construction about 13 nautical miles off the coast of Massachusetts. - Vineyard Wind 1 will include 62 wind turbines, providing enough power for about 400,000 local homes. - The Massachusetts Department of Public Utilities approved the project in 2019, and construction began in November 2021. - To address environmental concerns, construction will be suspended during whale activity, and the University of New Hampshire will monitor marine mammal sounds to assess potential stress to local marine life. - The project is expected to both reduce greenhouse gas emissions and reduce electricity costs for Massachusetts consumers. - The developers will sell the power for $0.09/kWh and agreed to provide $15 million to support the expansion of the electric grid in low-income communities.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Vineyard Wind 1 is an offshore wind farm under construction about 13 nautical miles off the coast of Massachusetts.\n- Vineyard Wind 1 will include 62 wind turbines, providing enough power for about 400,000 local homes.\n- The Massachusetts Department of Public Utilities approved the project in 2019, and construction began in November 2021.\n- To address environmental concerns, construction will be suspended during whale activity, and the University of New Hampshire will monitor marine mammal sounds to assess potential stress to local marine life.\n- The project is expected to both reduce greenhouse gas emissions and reduce electricity costs for Massachusetts consumers.\n- The developers will sell the power for $0.09/kWh and agreed to provide $15 million to support the expansion of the electric grid in low-income communities.",
+  "note": "T5 R&W M1 #24: other — notes bullets flattened into one line; one bullet per line (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p16 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q24 block)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnv2w00prqmt1kx284u6i",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes: - The Bundesautobahn, or autobahn, is a network of highways in Germany. - The autobahn covers 13,192 kilometers. - Famed for its general lack of a speed limit, the autobahn does have enforced speed limits in urbanized or accident-prone areas, which account for 23.4 percent of the total area. - The autobahn does not have a posted speed limit across 70.4 percent of its distance, but on these stretches of highway, there is an advisory speed limit of 130 kilometers per hour. - It is legal to exceed the advisory speed limit, but exceeding it can result in increased liability for a driver should a collision occur. - The autobahn has a fatality rate of just 1.6 deaths per billion travel-kilometers (compared to 4.6 on urban streets in Germany and 6.5 on rural roads in Germany).",
+  "after": "While researching a topic, a student has taken the following notes:\n- The Bundesautobahn, or autobahn, is a network of highways in Germany.\n- The autobahn covers 13,192 kilometers.\n- Famed for its general lack of a speed limit, the autobahn does have enforced speed limits in urbanized or accident-prone areas, which account for 23.4 percent of the total area.\n- The autobahn does not have a posted speed limit across 70.4 percent of its distance, but on these stretches of highway, there is an advisory speed limit of 130 kilometers per hour.\n- It is legal to exceed the advisory speed limit, but exceeding it can result in increased liability for a driver should a collision occur.\n- The autobahn has a fatality rate of just 1.6 deaths per billion travel-kilometers (compared to 4.6 on urban streets in Germany and 6.5 on rural roads in Germany).",
+  "note": "T5 R&W M1 #25: other — notes bullets flattened into one line; one bullet per line (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p17 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q25 block)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnv3400pxqmt139tcv9hk",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes: - M104, also known as the Sombrero Galaxy, is a lenticular galaxy, and is considered to be one of the largest objects within the Virgo galaxy cluster. - The Sombrero Galaxy has a bright nucleus, a bulging center, and a prominent dark dust lane that crosses in front of it, giving it the appearance of a wide-brimmed hat on its edge. - The Sombrero Galaxy has a diameter of about 49,000 light-years and lies approximately 31.1 million light-years from Earth. - With an apparent magnitude of +8.0, the Sombrero Galaxy can be observed using amateur astronomy telescopes. - The estimated mass of the Sombrero Galaxy is equivalent to 800 billion suns. - In 2004, NASA released a mosaic photo of the Sombrero Galaxy, one of the largest mosaics ever assembled by images captured by the Hubble telescope.",
+  "after": "While researching a topic, a student has taken the following notes:\n- M104, also known as the Sombrero Galaxy, is a lenticular galaxy, and is considered to be one of the largest objects within the Virgo galaxy cluster.\n- The Sombrero Galaxy has a bright nucleus, a bulging center, and a prominent dark dust lane that crosses in front of it, giving it the appearance of a wide-brimmed hat on its edge.\n- The Sombrero Galaxy has a diameter of about 49,000 light-years and lies approximately 31.1 million light-years from Earth.\n- With an apparent magnitude of +8.0, the Sombrero Galaxy can be observed using amateur astronomy telescopes.\n- The estimated mass of the Sombrero Galaxy is equivalent to 800 billion suns.\n- In 2004, NASA released a mosaic photo of the Sombrero Galaxy, one of the largest mosaics ever assembled by images captured by the Hubble telescope.",
+  "note": "T5 R&W M1 #27: other — notes bullets flattened into one line; one bullet per line (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p19 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q27 block)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnv3000psqmt1trpw9nor",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes: - Shakespeare's plays are known for their enduring popularity and widespread influence. - The most recognized and frequently performed Shakespearean plays include *Romeo and Juliet*, *Hamlet*, and *Macbeth*. - Shakespeare's works have been translated into numerous languages and performed in various countries worldwide. - While it is hard to quantify the exact number of adaptations, there are at least over 30 film adaptations of *Romeo and Juliet*. - There are at least over 50 film adaptations of *Hamlet*. - *The Tragedy of Macbeth* is a movie adaptation of *Macbeth* that was released in 2021. 26. A student wants to convey the relevancy of Shakespeare's plays in the modern age.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Shakespeare's plays are known for their enduring popularity and widespread influence.\n- The most recognized and frequently performed Shakespearean plays include *Romeo and Juliet*, *Hamlet*, and *Macbeth*.\n- Shakespeare's works have been translated into numerous languages and performed in various countries worldwide.\n- While it is hard to quantify the exact number of adaptations, there are at least over 30 film adaptations of *Romeo and Juliet*.\n- There are at least over 50 film adaptations of *Hamlet*.\n- *The Tragedy of Macbeth* is a movie adaptation of *Macbeth* that was released in 2021.",
+  "note": "T5 R&W M1 #26: other — question lead \"26. A student wants…\" leaked to the end of the stimulus + notes bullets flattened; remove lead, one bullet per line",
+  "class": "other",
+  "evidence": "IngestPageArtifact p18 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q26 block)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnv3000psqmt1trpw9nor",
+  "field": "stem",
+  "before": "Which choice most effectively uses relevant information from the notes to accomplish this goal?",
+  "after": "A student wants to convey the relevancy of Shakespeare's plays in the modern age. Which choice most effectively uses relevant information from the notes to accomplish this goal?",
+  "note": "T5 R&W M1 #26: other — stem missing its first sentence (it was left in the stimulus as \"26. A student wants…\")",
+  "class": "other",
+  "evidence": "IngestPageArtifact p18 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q26 block)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnuuj00mpqmt1aqqs9ps0",
+  "field": "stimulus",
+  "before": "Despite her own claim to the throne and her royal bloodline, Lady Katherine's life was marked by tragedy and _____. Because she married without the Queen's permission, Lady Katherine faced harsh punishments, including imprisonment in the Tower of London.",
+  "after": "Lady Katherine Grey was a Tudor noblewoman and the younger sister of Lady Jane Grey, who briefly reigned as Queen of England. Despite her own claim to the throne and her royal bloodline, Lady Katherine's life was marked by tragedy and _____. Because she married without the Queen's permission, Lady Katherine faced harsh punishments, including imprisonment in the Tower of London.",
+  "note": "T5 R&W M2 #4: other — stimulus truncated: opening sentence \"Lady Katherine Grey was a Tudor noblewoman…\" dropped",
+  "class": "other",
+  "evidence": "IngestPageArtifact p21 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q4 block)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnuv300mxqmt1zg5ieis9",
+  "field": "stimulus",
+  "before": "Pip meets Miss Havisham, a wealthy spinster, for the first time. ++But I saw that everything within my view which ought to be white, had been white long ago, and had lost its lustre and was faded and yellow.++ I saw that the bride within the bridal dress had withered like the dress, and like the flowers, and had no brightness left but the brightness of her sunken eyes. I saw that the dress had been put upon the rounded figure of a young woman, and that the figure upon which it now hung loose had shrunk to skin and bone.",
+  "after": "The following text is from Charles Dickens's 1861 novel *Great Expectations*. Pip meets Miss Havisham, a wealthy spinster, for the first time. ++But I saw that everything within my view which ought to be white, had been white long ago, and had lost its lustre and was faded and yellow.++ I saw that the bride within the bridal dress had withered like the dress, and like the flowers, and had no brightness left but the brightness of her sunken eyes. I saw that the dress had been put upon the rounded figure of a young woman, and that the figure upon which it now hung loose had shrunk to skin and bone.",
+  "note": "T5 R&W M2 #6: other — intro truncated: \"The following text is from Charles Dickens's 1861 novel *Great Expectations*.\" dropped (only \"Pip meets…\" kept)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p22 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q6 block); page image p22 checked"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnuv300mxqmt1zg5ieis9",
+  "field": "stem",
+  "before": "Which choice best describes\nthe function of the underlined\nportion in the text as a whole?",
+  "after": "Which choice best describes the function of the underlined portion in the text as a whole?",
+  "note": "T5 R&W M2 #6: other — stem has hard line breaks from the PDF layout; join into one line",
+  "class": "other",
+  "evidence": "IngestPageArtifact p22 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q6 block)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnuvq00ndqmt1hj2clfxy",
+  "field": "stimulus",
+  "before": "**Text 1** The Baader-Meinhof phenomenon, also known as frequency illusion, occurs when something recently learned or experienced seems to suddenly appear everywhere. This creates a sense of heightened awareness towards that new idea, whether it's exposure to a new word or new artist on the radio. Consequently, individuals may perceive an increased frequency of encounters with the new concept in their lives. **Text 2** Cognitive biases are systematic patterns of deviation from objective rationality in thinking processes. They are inherent shortcuts and tendencies employed by the brain to facilitate decision-making and judgment formation, though they can lead to distortions in perception. Such biases are typically unconscious and can influence information processing and pattern recognition.",
+  "after": "**Text 1**\n\nThe Baader-Meinhof phenomenon, also known as frequency illusion, occurs when something recently learned or experienced seems to suddenly appear everywhere. This creates a sense of heightened awareness towards that new idea, whether it's exposure to a new word or new artist on the radio. Consequently, individuals may perceive an increased frequency of encounters with the new concept in their lives.\n\n**Text 2**\n\nCognitive biases are systematic patterns of deviation from objective rationality in thinking processes. They are inherent shortcuts and tendencies employed by the brain to facilitate decision-making and judgment formation, though they can lead to distortions in perception. Such biases are typically unconscious and can influence information processing and pattern recognition.",
+  "note": "T5 R&W M2 #8: other — \"Text 1\"/\"Text 2\" labels inline with the passages; put each label/passage on its own paragraph",
+  "class": "other",
+  "evidence": "IngestPageArtifact p24 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q8 block)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwa3011qqmt1wsejspei",
+  "field": "stimulus",
+  "before": "The ratio of these isotopes depends on the temperature of the surrounding water when the shell was formed. ____ scientists consider ammonites to be environmental historical \"records\" because the shells act as sensitive indicators of their original environments and can be compared to each other in efforts to track local climate change over time.",
+  "after": "Ammonite shells consist mostly of calcium carbonate, which contains varying amounts of two distinct oxygen isotopes. The ratio of these isotopes depends on the temperature of the surrounding water when the shell was formed. ____ scientists consider ammonites to be environmental historical \"records\" because the shells act as sensitive indicators of their original environments and can be compared to each other in efforts to track local climate change over time.",
+  "note": "T5 R&W M2 #25: other — stimulus truncated: opening sentence \"Ammonite shells consist mostly of calcium carbonate…\" dropped (antecedent of \"these isotopes\")",
+  "class": "other",
+  "evidence": "IngestPageArtifact p36 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q25 block)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwa7011rqmt16u4ur7c8",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes: - Alpaca fleece is the natural fiber harvested from an alpaca, a species of South American camelid mammal. - There are two different types of alpaca fleece: Huacaya fiber, which looks similar to sheep's wool, and Suri fiber, which is similar to natural silk. - Huacaya fiber is warmer and softer than sheep's wool, and it contains no lanolin, which makes it hypoallergenic. - Alpaca fiber is naturally water-repellent and fire resistant. - The designer Giorgio Armani has used Suri alpaca fiber to fashion men's and women's suits. - The General Assembly of the United Nations declared 2009 to be the International Year of Natural Fibers, intending to increase awareness of alpaca and other natural fibers.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Alpaca fleece is the natural fiber harvested from an alpaca, a species of South American camelid mammal.\n- There are two different types of alpaca fleece: Huacaya fiber, which looks similar to sheep's wool, and Suri fiber, which is similar to natural silk.\n- Huacaya fiber is warmer and softer than sheep's wool, and it contains no lanolin, which makes it hypoallergenic.\n- Alpaca fiber is naturally water-repellent and fire resistant.\n- The designer Giorgio Armani has used Suri alpaca fiber to fashion men's and women's suits.\n- The General Assembly of the United Nations declared 2009 to be the International Year of Natural Fibers, intending to increase awareness of alpaca and other natural fibers.",
+  "note": "T5 R&W M2 #26: other — notes bullets flattened into one line; one bullet per line (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p37 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q26 block)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwac011wqmt14eysu7el",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes: - Dialectometry studies the variance of languages across regions by measuring the relationship between geographic distance and linguistic differences. - This variance includes phonetics, grammar, and vocabulary. - Linguistic variables are charted on a dialect map to identify patterns. - An isogloss is a line of a dialect map that marks the boundary between linguistic features. - Lexical variation refers to the use of different words to describe the same thing. - Dialectologists found that approximately 44% of UK residents use “dinner” to refer to their evening meal, 52% use “tea,” and the rest use “supper.” 27. A student wants to provide an example of how a dialectologist might depict linguistic variations based on location.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Dialectometry studies the variance of languages across regions by measuring the relationship between geographic distance and linguistic differences.\n- This variance includes phonetics, grammar, and vocabulary.\n- Linguistic variables are charted on a dialect map to identify patterns.\n- An isogloss is a line of a dialect map that marks the boundary between linguistic features.\n- Lexical variation refers to the use of different words to describe the same thing.\n- Dialectologists found that approximately 44% of UK residents use “dinner” to refer to their evening meal, 52% use “tea,” and the rest use “supper.”",
+  "note": "T5 R&W M2 #27: other — question lead \"27. A student wants…\" leaked to the end of the stimulus + notes bullets flattened; remove lead, one bullet per line",
+  "class": "other",
+  "evidence": "IngestPageArtifact p38 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q27 block)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwac011wqmt14eysu7el",
+  "field": "stem",
+  "before": "Which choice most effectively uses relevant information from the notes to accomplish this goal?",
+  "after": "A student wants to provide an example of how a dialectologist might depict linguistic variations based on location. Which choice most effectively uses relevant information from the notes to accomplish this goal?",
+  "note": "T5 R&W M2 #27: other — stem missing its first sentence (it was left in the stimulus as \"27. A student wants…\")",
+  "class": "other",
+  "evidence": "IngestPageArtifact p38 of files_to_load/MOCK EXAMS/TEST 5/READING AND WRITING/INNOVATOR TEST 5 RW MOD 1&2.pdf (Q27 block)"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrnude00i2qmt1ilisoxp2",
+  "field": "text",
+  "before": "[tbl-0.html](tbl-0.html)",
+  "after": "| Distance | Frequency |\n| --- | --- |\n| 3 | 2 |\n| 5 | 6 |\n| 7 | 7 |\n| 10 | 9 |",
+  "note": "T5 Math M1 #3: flattened_table — option A text is the OCR placeholder \"[tbl-0.html](tbl-0.html)\" (table lost; full-test player does not render option images); rebuild Distance/Frequency table",
+  "class": "flattened_table",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 5/MATHS/INNOV. TEST 5 MATH  MOD 1&2.pdf p2 rendered at 150 dpi (option A table); NOTE option image /uploads/questions/26f7ec2d02e8bc217d3abc5a.jpg wrongly shows B's table (3/2,5/4,7/1,10/2) — needs_review"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrnude00i3qmt1snhzbrti",
+  "field": "text",
+  "before": "[tbl-1.html](tbl-1.html)",
+  "after": "| Distance | Frequency |\n| --- | --- |\n| 3 | 2 |\n| 5 | 4 |\n| 7 | 1 |\n| 10 | 2 |",
+  "note": "T5 Math M1 #3: flattened_table — option B text is the OCR placeholder \"[tbl-1.html](tbl-1.html)\" (table lost; full-test player does not render option images); rebuild Distance/Frequency table",
+  "class": "flattened_table",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 5/MATHS/INNOV. TEST 5 MATH  MOD 1&2.pdf p2 rendered at 150 dpi (option B table); matches option image /uploads/questions/6df0fd07ce13681566a826c8.jpg"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrnude00i4qmt1d0kxmhje",
+  "field": "text",
+  "before": "[tbl-2.html](tbl-2.html)",
+  "after": "| Distance | Frequency |\n| --- | --- |\n| 1 | 7 |\n| 2 | 3 |\n| 2 | 10 |\n| 4 | 5 |",
+  "note": "T5 Math M1 #3: flattened_table — option C text is the OCR placeholder \"[tbl-2.html](tbl-2.html)\" (table lost; full-test player does not render option images); rebuild Distance/Frequency table",
+  "class": "flattened_table",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 5/MATHS/INNOV. TEST 5 MATH  MOD 1&2.pdf p2 rendered at 150 dpi (option C table); matches option image /uploads/questions/6cc3d066bb2f5d5dfa0cb668.jpg"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrnude00i5qmt1uetr9pby",
+  "field": "text",
+  "before": "[tbl-3.html](tbl-3.html)",
+  "after": "| Distance | Frequency |\n| --- | --- |\n| 6 | 2 |\n| 7 | 1 |\n| 20 | 2 |\n| 20 | 4 |",
+  "note": "T5 Math M1 #3: flattened_table — option D text is the OCR placeholder \"[tbl-3.html](tbl-3.html)\" (table lost; full-test player does not render option images); rebuild Distance/Frequency table",
+  "class": "flattened_table",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 5/MATHS/INNOV. TEST 5 MATH  MOD 1&2.pdf p2 rendered at 150 dpi (option D table); matches option image /uploads/questions/a45b4aec6ff703d061d2ca10.jpg"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "opt_e03fb23b16164f86915e37c9b812faaa",
+  "field": "text",
+  "before": "It takes $a$ days for the population to reach 80.",
+  "after": "It takes $a$ days in the year for the population to reach 80.",
+  "note": "T5 Math M1 #21: other — option A shortened: \"in the year\" dropped vs source",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 5/MATHS/INNOV. TEST 5 MATH  MOD 1&2.pdf p9 rendered at 150 dpi: \"It takes a days in the year for the population to reach 80.\""
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnudx00icqmt1p1cmv3f2",
+  "field": "explanation",
+  "before": null,
+  "after": "Choice C is correct. The amount of money the company made in 1995 is 6% more than the amount in 1994. The question then states that for the next 10 years, the earnings increase by that same dollar amount each year. Since the increase each year is the same dollar amount, that represents a linear function that is increasing, where the slope of the line is the dollar amount increase.\n\nChoice A is incorrect. The company is making money, so it cannot be decreasing. Choice B is incorrect. The company is making money, so it cannot be decreasing. Choice D is incorrect. The question models a situation where the growth was the same every year, so it cannot be exponential growth. Even though the first amount states it increases by 6%, the amount of money the company makes is not increasing by 6% each year for the next ten years.",
+  "note": "T5 Math M2 #4: other — explanation missing (NULL); restore from the Answer Explanations docx (OMML numbers 1995/6%/1994/10 re-inserted)",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 5/Test5_Math_Answer_Explanations.docx, MODULE 2B Question 4 (text + m:t math runs)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwau0124qmt1maz72mj9",
+  "field": "stimulus",
+  "before": "MODULE 1 R&W One of the largest empires in history was the Mongol Empire. Led by charismatic generals, the Mongols conquered peoples from Central Asia to Central Europe. Though brutal in warfare, Mongol kings, or khans, were _____ rulers and permitted their subjects to travel, trade, and practice religion without restrictions as long as they paid an annual tribute.",
+  "after": "One of the largest empires in history was the Mongol Empire. Led by charismatic generals, the Mongols conquered peoples from Central Asia to Central Europe. Though brutal in warfare, Mongol kings, or khans, were _____ rulers and permitted their subjects to travel, trade, and practice religion without restrictions as long as they paid an annual tribute.",
+  "note": "T6 R&W M1 #1: other — page header \"MODULE 1 R&W\" glued to the start of the passage",
+  "class": "other",
+  "evidence": "IngestPageArtifact p1 of files_to_load/MOCK EXAMS/TEST 6/READING AND WRITING/INNOVATOR TEST 6 RW.pdf (header line above the passage)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwbn012aqmt1z3x4mrbh",
+  "field": "stimulus",
+  "before": "In politics, the two great forces, commerce and empire, which would otherwise have shaped the destiny of the country, have been made to pander and cater to Southern notions. \"Cotton is King\" meant the South must be allowed to dictate or there would be no fun. Every statesman from 1830 to 1860 exhausted his genius in persuasion and compromises to smooth out her ruffled temper and gratify her petulant demands. But like a sullen younger sister, the South has pouted and sulked and cried: \"I won't play with you now; so there!\" and the big brother at the North has coaxed and compromised and given in, and—ended by letting her have her way.",
+  "after": "The following text is from Anna Julia Cooper's 1892 book *A Voice From the South*. In politics, the two great forces, commerce and empire, which would otherwise have shaped the destiny of the country, have been made to pander and cater to Southern notions. \"Cotton is King\" meant the South must be allowed to dictate or there would be no fun. Every statesman from 1830 to 1860 exhausted his genius in persuasion and compromises to smooth out her ruffled temper and gratify her petulant demands. But like a sullen younger sister, the South has pouted and sulked and cried: \"I won't play with you now; so there!\" and the big brother at the North has coaxed and compromised and given in, and—ended by letting her have her way.",
+  "note": "T6 R&W M1 #4: other — passage intro line (source attribution) dropped; explanation refers to Cooper",
+  "class": "other",
+  "evidence": "IngestPageArtifact p2 of files_to_load/MOCK EXAMS/TEST 6/READING AND WRITING/INNOVATOR TEST 6 RW.pdf (Q4: intro line above passage)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwe1012eqmt111s0ocfy",
+  "field": "stimulus",
+  "before": "By admitting that ebooks are only suitable for people who prioritize convenience over the overall reading experience The following text is from Horatio Alger's 1872 novel *Strive and Succeed; or the Progress of Walter Conrad*. Here, Allen Barclay has offered Walter a teaching position. Allen Barclay, accompanied by Walter, approached the schoolhouse. It was a plain wooden building of two stories, painted white. Beside it was a good-sized playground, on which from a dozen to twenty boys were engaged in a game of ball. As Walter saw the ball flying across the field, impelled by a hard knock from the bat, he felt a strong impulse to join in the game. When a student at the Essex Institute he had played ball a good deal, and was considered quite a superior player. But since his departure he had not joined in a game.",
+  "after": "The following text is from Horatio Alger's 1872 novel *Strive and Succeed; or the Progress of Walter Conrad*. Here, Allen Barclay has offered Walter a teaching position. Allen Barclay, accompanied by Walter, approached the schoolhouse. It was a plain wooden building of two stories, painted white. Beside it was a good-sized playground, on which from a dozen to twenty boys were engaged in a game of ball. As Walter saw the ball flying across the field, impelled by a hard knock from the bat, he felt a strong impulse to join in the game. When a student at the Essex Institute he had played ball a good deal, and was considered quite a superior player. But since his departure he had not joined in a game.",
+  "note": "T6 R&W M1 #6: bleed — #5 option D text glued to the start of the passage",
+  "class": "bleed",
+  "evidence": "IngestPageArtifact p3 of files_to_load/MOCK EXAMS/TEST 6/READING AND WRITING/INNOVATOR TEST 6 RW.pdf: that sentence is Q5 option D; Q6 passage starts \"The following text is from Horatio Alger's…\""
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwfo013fqmt1vzmkgsij",
+  "field": "stem",
+  "before": "Which choice most effectively uses data from the table to complete the statement? -",
+  "after": "Which choice most effectively uses data from the table to complete the statement?",
+  "note": "T6 R&W M1 #11: other — stray \" -\" at the end of the stem",
+  "class": "other",
+  "evidence": "IngestPageArtifact p7 of files_to_load/MOCK EXAMS/TEST 6/READING AND WRITING/INNOVATOR TEST 6 RW.pdf"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrnwfz013oqmt1txlvo9a9",
+  "field": "text",
+  "before": "The number of Papilionidae species was notably high in the wet season",
+  "after": "The number of Papilionidae species was notably high in the wet season and slightly decreased in the dry season, whereas the Lycaenidae species proliferated in the dry seasons.",
+  "note": "T6 R&W M1 #12: other — option C truncated mid-sentence (the page OCR split it across a column break)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p8 of files_to_load/MOCK EXAMS/TEST 6/READING AND WRITING/INNOVATOR TEST 6 RW.pdf (second, complete \"C\" line) + rendered page image p8; explanation quotes the full option"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwgg0145qmt1ut696w4u",
+  "field": "stimulus",
+  "before": "Jazz is an incredibly complex musical genre. Each musician must be deeply proficient with their own instrument as well as attuned with the styles and abilities of their bandmates. This allows each player to essentially improvise their own part without clashing with anyone else's. Jazz is therefore often chaotic and unstructured, leading to the genre being regarded as inaccessible. However, the mainstream success of jazz-inspired musicians such as Louis Armstrong suggests that _____ Soft robotics is an emerging field of _____ on the development of robots made of soft and flexible materials, such as rubber and silicone. One of the main advantages of \"soft robots\" is that they can adapt to complex and dynamic environments, making them suitable for a wide range of applications, including healthcare, agriculture, and exploration.",
+  "after": "Jazz is an incredibly complex musical genre. Each musician must be deeply proficient with their own instrument as well as attuned with the styles and abilities of their bandmates. This allows each player to essentially improvise their own part without clashing with anyone else's. Jazz is therefore often chaotic and unstructured, leading to the genre being regarded as inaccessible. However, the mainstream success of jazz-inspired musicians such as Louis Armstrong suggests that _____",
+  "note": "T6 R&W M1 #14: bleed — stimulus carried #15's full passage appended after the blank; cut it",
+  "class": "bleed",
+  "evidence": "IngestPageArtifact p10 of files_to_load/MOCK EXAMS/TEST 6/READING AND WRITING/INNOVATOR TEST 6 RW.pdf: Q14 and Q15 are separate passages on the same page; #15 already holds its own passage"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwgt014lqmt17m35ggyt",
+  "field": "stimulus",
+  "before": "Monarch butterflies are known for their impressive migration journey, in which they travel thousands of miles each year to their wintering grounds. To prepare for this journey, adult monarchs _____ on milkweed plants, which contain toxins that protect them from predators. Wyoming, notable for being the least populated state in the US, currently has a population of _____ its vast stretches of untouched wilderness, rugged mountain ranges, and sweeping plains, Wyoming offers a sense of solitude that would be hard to find in a state such as California, which hosts a population of over 40 million.",
+  "after": "Monarch butterflies are known for their impressive migration journey, in which they travel thousands of miles each year to their wintering grounds. To prepare for this journey, adult monarchs _____ on milkweed plants, which contain toxins that protect them from predators.",
+  "note": "T6 R&W M1 #16: bleed — stimulus carried #17's full passage appended after the blank; cut it",
+  "class": "bleed",
+  "evidence": "IngestPageArtifact p11 of files_to_load/MOCK EXAMS/TEST 6/READING AND WRITING/INNOVATOR TEST 6 RW.pdf: Q16 and Q17 are separate passages on the same page; #17 already holds its own passage"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwh60155qmt1u16p1fqt",
+  "field": "stimulus",
+  "before": "Alexander von Humboldt's 1814 travelogue *The Personal Narrative*, which is perhaps his most widely read work, captivates readers with thrilling adventures that are coupled with insightful commentary. While he does dedicate some attention to describing the beauty of his destinations, the book primarily consists of an abundance of factual _____ tables, temperature logs, and even Humboldt's personally crafted maps of Cuba. Languages are rich with idiomatic expressions that can be both amusing and confusing for non-native speakers. One such example is \"It's raining cats and dogs,\" which is used to express that it is raining heavily. Interestingly, the Welsh have their own way of expressing this idea: \"It's raining old women and sticks.\" While the origins of this phrase are not entirely _____ the same can certainly be said for the English equivalent.",
+  "after": "Alexander von Humboldt's 1814 travelogue *The Personal Narrative*, which is perhaps his most widely read work, captivates readers with thrilling adventures that are coupled with insightful commentary. While he does dedicate some attention to describing the beauty of his destinations, the book primarily consists of an abundance of factual _____ tables, temperature logs, and even Humboldt's personally crafted maps of Cuba.",
+  "note": "T6 R&W M1 #18: bleed — stimulus carried #19's full passage appended after the blank; cut it",
+  "class": "bleed",
+  "evidence": "IngestPageArtifact p12 of files_to_load/MOCK EXAMS/TEST 6/READING AND WRITING/INNOVATOR TEST 6 RW.pdf: Q18 and Q19 are separate passages on the same page; #19 already holds its own passage"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro62j05nxqmt14ice94zf",
+  "field": "stem",
+  "before": "Which choice completes the text so that it conforms to the conventions of Standard English? (Candide / Leonard Bernstein / satirical undertones made _____ a favorite)",
+  "after": "Which choice completes the text so that it conforms to the conventions of Standard English?",
+  "note": "T6 R&W M1 #20: other — topic annotation in parentheses (from the explanations docx heading) appended to the stem",
+  "class": "other",
+  "evidence": "rendered page image p13 of files_to_load/MOCK EXAMS/TEST 6/READING AND WRITING/INNOVATOR TEST 6 RW.pdf (stem has no annotation); annotation text = Question 20 heading in Test6_RW_Answer_Explanations.docx"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro63d05nyqmt1ywr1rvg1",
+  "field": "stem",
+  "before": "Which choice completes the text so that it conforms to the conventions of Standard English? (Long Beach earthquake / _____ proved particularly damaging to school buildings)",
+  "after": "Which choice completes the text so that it conforms to the conventions of Standard English?",
+  "note": "T6 R&W M1 #21: other — topic annotation in parentheses (from the explanations docx heading) appended to the stem",
+  "class": "other",
+  "evidence": "rendered page image p13 of files_to_load/MOCK EXAMS/TEST 6/READING AND WRITING/INNOVATOR TEST 6 RW.pdf (stem has no annotation); annotation text = Question 21 heading in Test6_RW_Answer_Explanations.docx"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwi2015nqmt1j5ryyc6x",
+  "field": "stimulus",
+  "before": "According to the USDA Forest Service, the risks from forest fires are growing. Over the last three decades, the durations of fire seasons have increased by 60–80 days, and the annual area burned has more than doubled to over 7 million acres. _____ growing housing development in forests has put more people and houses in harm’s way, making firefighting efforts more expensive. The Oxford comma can lead to legal disputes, as demonstrated in a lawsuit filed by dairy drivers in Maine. They argued that the phrasing of the contract, which left out the Oxford comma in a clause defining what qualifies as overtime pay, was vague. _____ a federal appeals court ruled in favor of the dairy drivers, stating that the absence of an Oxford comma created enough ambiguity to warrant an interpretation that the exemption did not apply to the drivers’ work.",
+  "after": "According to the USDA Forest Service, the risks from forest fires are growing. Over the last three decades, the durations of fire seasons have increased by 60–80 days, and the annual area burned has more than doubled to over 7 million acres. _____ growing housing development in forests has put more people and houses in harm’s way, making firefighting efforts more expensive.",
+  "note": "T6 R&W M1 #24: bleed — stimulus carried #25's full passage appended after the blank; cut it",
+  "class": "bleed",
+  "evidence": "IngestPageArtifact p15 of files_to_load/MOCK EXAMS/TEST 6/READING AND WRITING/INNOVATOR TEST 6 RW.pdf: Q24 and Q25 are separate passages on the same page; #25 already holds its own passage"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwid015rqmt1mqzo7guo",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes: - UC Berkeley researchers investigated the link between sleep disruption in elderly people and memory loss conditions. - Slow-wave sleep is responsible for memory consolidation and clearing amyloid-beta plaques, the latter of which may contribute to the development of Alzheimer's disease. - Aging results in a reduction of slow-wave sleep - Researchers recommend interventions such as cognitive-behavioral therapy, which involves working with a clinician to change the way the patient sleeps. - The study found that quality sleep is crucial to one's health regardless of age and can help prevent more serious conditions in the future.",
+  "after": "While researching a topic, a student has taken the following notes:\n- UC Berkeley researchers investigated the link between sleep disruption in elderly people and memory loss conditions.\n- Slow-wave sleep is responsible for memory consolidation and clearing amyloid-beta plaques, the latter of which may contribute to the development of Alzheimer's disease.\n- Aging results in a reduction of slow-wave sleep\n- Researchers recommend interventions such as cognitive-behavioral therapy, which involves working with a clinician to change the way the patient sleeps.\n- The study found that quality sleep is crucial to one's health regardless of age and can help prevent more serious conditions in the future.",
+  "note": "T6 R&W M1 #26: other — notes bullets flattened into one line; restore one bullet per line (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p16 of files_to_load/MOCK EXAMS/TEST 6/READING AND WRITING/INNOVATOR TEST 6 RW.pdf (one bullet per line)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwij015xqmt1do3zv42b",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes: - Sir Frederick William Herschel, a musician and astronomer, lived from 1738 to 1822. - He discovered the planet Uranus in the 1780s. - Herschel observed star clusters and developed theories of star formation from the 1780s onwards. - He used a prism to detect infrared radiation, publicizing this discovery in the early 1800s. - Infrared radiation is characterized by low frequencies and can only be seen by humans with the assistance of devices, such as infrared telescopes.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Sir Frederick William Herschel, a musician and astronomer, lived from 1738 to 1822.\n- He discovered the planet Uranus in the 1780s.\n- Herschel observed star clusters and developed theories of star formation from the 1780s onwards.\n- He used a prism to detect infrared radiation, publicizing this discovery in the early 1800s.\n- Infrared radiation is characterized by low frequencies and can only be seen by humans with the assistance of devices, such as infrared telescopes.",
+  "note": "T6 R&W M1 #27: other — notes bullets flattened into one line; restore one bullet per line (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p17 of files_to_load/MOCK EXAMS/TEST 6/READING AND WRITING/INNOVATOR TEST 6 RW.pdf (one bullet per line)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwe7012fqmt1fxiy6t5e",
+  "field": "stimulus",
+  "before": "spider is often mischaracterized as the most dangerous in the world. In reality, the spider’s venom is not at all threatening to people; a daddy longlegs bite would have the effect of a small pinch on human skin. Moreover, these spiders actually benefit humans because they eat harmful domestic insects, like black widows. Despite their name, daddy longlegs can be male or female. Female daddy longlegs are nurturing mothers, as they carry their eggs around in a small bag made of web until they are ready to hatch.",
+  "after": "The Australian “daddy longlegs” spider is often mischaracterized as the most dangerous in the world. In reality, the spider’s venom is not at all threatening to people; a daddy longlegs bite would have the effect of a small pinch on human skin. Moreover, these spiders actually benefit humans because they eat harmful domestic insects, like black widows. Despite their name, daddy longlegs can be male or female. Female daddy longlegs are nurturing mothers, as they carry their eggs around in a small bag made of web until they are ready to hatch.",
+  "note": "T6 R&W M2 #6: other — passage missing its opening words \"The Australian “daddy longlegs”\"",
+  "class": "other",
+  "evidence": "IngestPageArtifact p20 of files_to_load/MOCK EXAMS/TEST 6/READING AND WRITING/INNOVATOR TEST 6 RW.pdf (Q6 passage); explanation quotes the full first sentence"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwel012lqmt1nl1zxrxv",
+  "field": "stimulus",
+  "before": "Robin Dunbar aimed to investigate the role of laughter in social bonding and prosocial, or altruistic, behavior. The experiment recruited 66 subjects to watch a comedy or control video alone or in groups. The researchers then measured the subjects' laughter response and then asked the subjects to complete a social or donation-related task. ++The study found that laughter triggers the endorphin system and enhances social bonding, but it does not reliably influence donation-related behavior.++ The findings suggest that social bonding and prosociality may be driven by different factors and may have different impacts depending on the individual.",
+  "after": "A study led by Dr. Robin Dunbar aimed to investigate the role of laughter in social bonding and prosocial, or altruistic, behavior. The experiment recruited 66 subjects to watch a comedy or control video alone or in groups. The researchers then measured the subjects' laughter response and then asked the subjects to complete a social or donation-related task. ++The study found that laughter triggers the endorphin system and enhances social bonding, but it does not reliably influence donation-related behavior.++ The findings suggest that social bonding and prosociality may be driven by different factors and may have different impacts depending on the individual.",
+  "note": "T6 R&W M2 #7: other — passage missing its opening words \"A study led by Dr.\"",
+  "class": "other",
+  "evidence": "IngestPageArtifact p21 of files_to_load/MOCK EXAMS/TEST 6/READING AND WRITING/INNOVATOR TEST 6 RW.pdf"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwel012lqmt1nl1zxrxv",
+  "field": "stem",
+  "before": "Which choice best states the function of the underlined sentence in the text as a whole? (Dr. Robin Dunbar / laughter study / underlined: 'The study found that laughter triggers the endorphin system and enhances social bonding, but it does not reliably influence donation-related behavior.')",
+  "after": "Which choice best states the function of the underlined sentence in the text as a whole?",
+  "note": "T6 R&W M2 #7: other — topic annotation in parentheses (from the explanations docx heading) appended to the stem",
+  "class": "other",
+  "evidence": "IngestPageArtifact p21 of files_to_load/MOCK EXAMS/TEST 6/READING AND WRITING/INNOVATOR TEST 6 RW.pdf (stem has no annotation)"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrnwen012mqmt1v9vq515p",
+  "field": "text",
+  "before": "study led by Dr. Robin Dunbar aimed to investigate the role of laughter in social bonding and prosocial, or altruistic, behavior. The experiment recruited 66 subjects to watch a comedy or control video alone or in groups. The researchers then measured the subjects' laughter response and then asked the subjects to complete a social or donation-related task. The study found that laughter triggers the endorphin system and enhances social bonding, but it does not reliably influence donation-related behavior. The findings suggest that social bonding and prosociality may be driven by different factors and may have different impacts depending on the individual.",
+  "after": "To provide a summary of the study's findings related to how laughter positively influences some behavior but not others.",
+  "note": "T6 R&W M2 #7: bleed — option A held a copy of the passage instead of the answer choice (A is the key)",
+  "class": "bleed",
+  "evidence": "IngestPageArtifact p21 of files_to_load/MOCK EXAMS/TEST 6/READING AND WRITING/INNOVATOR TEST 6 RW.pdf option A; explanation \"Correct Answer: A — To provide a summary…\""
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwf1012vqmt165a9nfs4",
+  "field": "stimulus",
+  "before": "According to the Food Pairing Theory, the more flavors ingredients share, the tastier their combination. For instance, macaroni, cheese, butter, flour, and milk have similar flavors and come together in a delicious dish: mac and cheese. Applying this principle, combining pineapple, tomato sauce, cheese, and bread would be unappealing, as pineapples theoretically pair better with citrus or tropical fruits rather than pizza. In her 2012 book *Taste*, Barb Stuckey claims that the human body has a natural affinity for the combination of sweet and salty foods. Humans enjoy sweet foods because the sweet taste denotes high calories, thus providing energy. On the other hand, humans crave salty foods because the human body lacks a storage system for sodium, unlike minerals such as calcium, which are stored in bone tissue. When sweet and salty tastes are combined, they create a satisfying flavor experience, which could explain why many people enjoy seemingly conflicting pairings.",
+  "after": "Text 1\n\nAccording to the Food Pairing Theory, the more flavors ingredients share, the tastier their combination. For instance, macaroni, cheese, butter, flour, and milk have similar flavors and come together in a delicious dish: mac and cheese. Applying this principle, combining pineapple, tomato sauce, cheese, and bread would be unappealing, as pineapples theoretically pair better with citrus or tropical fruits rather than pizza.\n\nText 2\n\nIn her 2012 book *Taste*, Barb Stuckey claims that the human body has a natural affinity for the combination of sweet and salty foods. Humans enjoy sweet foods because the sweet taste denotes high calories, thus providing energy. On the other hand, humans crave salty foods because the human body lacks a storage system for sodium, unlike minerals such as calcium, which are stored in bone tissue. When sweet and salty tastes are combined, they create a satisfying flavor experience, which could explain why many people enjoy seemingly conflicting pairings.",
+  "note": "T6 R&W M2 #8: other — \"Text 1\"/\"Text 2\" labels missing although the stem cites them",
+  "class": "other",
+  "evidence": "IngestPageArtifact p22 of files_to_load/MOCK EXAMS/TEST 6/READING AND WRITING/INNOVATOR TEST 6 RW.pdf (\"### Text 1\" / \"### Text 2\" headings)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwgk014aqmt1lv54oj89",
+  "field": "stem",
+  "before": "Which choice best describes data from the table that support the researcher's conclusion? -",
+  "after": "Which choice best describes data from the table that support the researcher's conclusion?",
+  "note": "T6 R&W M2 #14: other — stray \" -\" at the end of the stem",
+  "class": "other",
+  "evidence": "IngestPageArtifact p28 of files_to_load/MOCK EXAMS/TEST 6/READING AND WRITING/INNOVATOR TEST 6 RW.pdf"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwgw014qqmt11sl2gzpf",
+  "field": "stem",
+  "before": "Which choice most logically completes the text? (Zajonc 'dominant response' effect / presence of others improves proficient tasks / unfamiliar complex task / individual is likely to _____)",
+  "after": "Which choice most logically completes the text?",
+  "note": "T6 R&W M2 #16: other — topic annotation in parentheses (from the explanations docx heading) appended to the stem",
+  "class": "other",
+  "evidence": "IngestPageArtifact p30 of files_to_load/MOCK EXAMS/TEST 6/READING AND WRITING/INNOVATOR TEST 6 RW.pdf (stem has no annotation)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwht015kqmt1qqwaiggw",
+  "field": "stimulus",
+  "before": "The word “onomatopoeia” refers to the creation of words that imitate or suggest the sounds they describe. Onomatopoeic words have been used since ancient times to create vivid and expressive descriptions of sounds, such as “buzz” or _____ the epic poem *Iliad*, Homer describes the sound of the Trojan army advancing on the Greek camp with onomatopoeic words to convey the powerful, thunderous sound of the Trojan army’s advance. From 2000 to 2006, the price of residential housing in the New York City area nearly doubled. Driving this price increase were gains in employment and income in both the financial and legal services industries. _____ low-interest rates and wider availability of loans and mortgages contributed to increased demand and thus higher prices for residential housing.",
+  "after": "The word “onomatopoeia” refers to the creation of words that imitate or suggest the sounds they describe. Onomatopoeic words have been used since ancient times to create vivid and expressive descriptions of sounds, such as “buzz” or _____ the epic poem *Iliad*, Homer describes the sound of the Trojan army advancing on the Greek camp with onomatopoeic words to convey the powerful, thunderous sound of the Trojan army’s advance.",
+  "note": "T6 R&W M2 #22: bleed — stimulus carried #23's full passage appended after the blank; cut it",
+  "class": "bleed",
+  "evidence": "IngestPageArtifact p33 of files_to_load/MOCK EXAMS/TEST 6/READING AND WRITING/INNOVATOR TEST 6 RW.pdf: Q22 and Q23 are separate passages on the same page; #23 already holds its own passage"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwif015sqmt1osjyo64w",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes: - The Chinese paddlefish can grow up to 23 feet in length. - It was last seen in the wild in 2003. - This freshwater fish was declared extinct in 2020. - The largetooth sawfish, a type of saltwater fish, can grow up to 23 feet in length. - It is one of the species on display at the National Aquarium in Baltimore. - It is currently classified as critically endangered.",
+  "after": "While researching a topic, a student has taken the following notes:\n- The Chinese paddlefish can grow up to 23 feet in length.\n- It was last seen in the wild in 2003.\n- This freshwater fish was declared extinct in 2020.\n- The largetooth sawfish, a type of saltwater fish, can grow up to 23 feet in length.\n- It is one of the species on display at the National Aquarium in Baltimore.\n- It is currently classified as critically endangered.",
+  "note": "T6 R&W M2 #26: other — notes bullets flattened into one line; restore one bullet per line (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p35 of files_to_load/MOCK EXAMS/TEST 6/READING AND WRITING/INNOVATOR TEST 6 RW.pdf (one bullet per line)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwim0162qmt18wl0n7uu",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes: - Bob Ross hosted the television show *The Joy of Painting* from 1974 to 1982. - Ross encouraged his viewers to paint purely from imagination. - During each short episode, Ross created a complete landscape using oil paints. - Ross's own paintings of pine trees, mountains, and snowy terrain recall the landscape of Alaska. - Ross was stationed in Alaska while serving in the Air Force in the 1960s.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Bob Ross hosted the television show *The Joy of Painting* from 1974 to 1982.\n- Ross encouraged his viewers to paint purely from imagination.\n- During each short episode, Ross created a complete landscape using oil paints.\n- Ross's own paintings of pine trees, mountains, and snowy terrain recall the landscape of Alaska.\n- Ross was stationed in Alaska while serving in the Air Force in the 1960s.",
+  "note": "T6 R&W M2 #27: other — notes bullets flattened into one line; restore one bullet per line (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p36 of files_to_load/MOCK EXAMS/TEST 6/READING AND WRITING/INNOVATOR TEST 6 RW.pdf (one bullet per line)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnvuv00y1qmt18u6xmqr1",
+  "field": "explanation",
+  "before": "Solution\nChoice A is the correct answer. The equations are given in vertex form:\n, where  is the vertex of the parabola. The coefficient in the front does not affect the quadrant of the vertex. Since the vertex is in Quadrant ,  and  must both be positive. Note that in vertex form, because  is written as . So, if  is positive, the equation will show “”. This means the equation should have “” and “”. Only Choice A fits this requirement.\nChoice B is incorrect because the vertex would be in Quadrant . Choice C is incorrect because the vertex would be in Quadrant . Choice D is incorrect because the vertex would be in Quadrant .\nCalculator tip: Alternately enter the answer choices in the equation entry field in Desmos to determine which one best matches the position of the graph. To save time, avoid erasing and reentering the answer choices multiple times; just make changes to the values given on the outside and inside of the parenthesis. When graphed,  matches the first quadrant position of the vertex of the parabola.",
+  "after": "Solution\nChoice A is the correct answer. The equations are given in vertex form: $y = a(x - h)^2 + k$, where $(h, k)$ is the vertex of the parabola. The coefficient in the front does not affect the quadrant of the vertex. Since the vertex is in Quadrant I, $h$ and $k$ must both be positive. Note that in vertex form, because $h$ is written as $(x - h)$. So, if $h$ is positive, the equation will show “$-h$”. This means the equation should have “$-h$” and “$+k$”. Only Choice A fits this requirement.\nChoice B is incorrect because the vertex would be in Quadrant II. Choice C is incorrect because the vertex would be in Quadrant IV. Choice D is incorrect because the vertex would be in Quadrant III.\nCalculator tip: Alternately enter the answer choices in the equation entry field in Desmos to determine which one best matches the position of the graph. To save time, avoid erasing and reentering the answer choices multiple times; just make changes to the values given on the outside and inside of the parenthesis. When graphed, $f(x) = 2[(x - 60)^2 + 30]$ matches the first quadrant position of the vertex of the parabola.",
+  "note": "T6 Math M1 #14: other — explanation had empty holes where the docx equations (OMML) were dropped; restored as LaTeX",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 6/Test6_Math_Answer_Explanations.docx Question 14 (OMML: y=a(x−h)^2+k, (h,k), Quadrant I/II/IV/III, −h, +k, f(x)=2[(x−60)^2+30])"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnvwf00ydqmt1f7d5ajep",
+  "field": "explanation",
+  "before": "Choice A is correct. Start by making all the negative exponents positive by taking their reciprocal (flipping them to the numerator or denominator, respectively). This yields . Next, reduce  and simplify the exponents. This results in .\nChoice B is incorrect as this is the result of dividing the exponents; however, when dividing two terms with the same base, the exponents are subtracted. Choice C is incorrect as this incorrectly places  in the denominator. Choice D is incorrect as this adds the exponents of  and .",
+  "after": "Choice A is correct. Start by making all the negative exponents positive by taking their reciprocal (flipping them to the numerator or denominator, respectively). This yields $\\frac{12w^6x^8y^4y^{12}z}{20w^3x^2z^3}$. Next, reduce $\\frac{12}{20}$ and simplify the exponents. This results in $\\frac{3w^3x^6y^{16}}{5z^2}$.\nChoice B is incorrect as this is the result of dividing the exponents; however, when dividing two terms with the same base, the exponents are subtracted. Choice C is incorrect as this incorrectly places $x^6$ in the denominator. Choice D is incorrect as this adds the exponents of $x$ and $y$.",
+  "note": "T6 Math M1 #18: other — explanation had empty holes where the docx equations (OMML) were dropped; restored as LaTeX",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 6/Test6_Math_Answer_Explanations.docx Question 18 (OMML fractions / x^6 / x and y)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnvu200xwqmt111o4h2v6",
+  "field": "stem",
+  "before": "$$(x - 4)^2 + (y + 6)^2 = 576$$\n\nThe given equation represents a circle in the $xy$-plane.\nWhat is the distance between the center of the circle and\nthe point on the circle with the greatest value of $y$?",
+  "after": "$$(x - 4)^2 + (y + 6)^2 = 576$$\n\nThe given equation represents a circle in the $xy$-plane. What is the distance between the center of the circle and the point on the circle with the greatest value of $y$?",
+  "note": "T6 Math M2 #11: other — sentence hard-wrapped with OCR line breaks; join into one paragraph (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p14 of files_to_load/MOCK EXAMS/TEST 6/MATH/INNO TEST 6 MATH MOD 1, 2B.pdf + rendered page image (column wrap only)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnvua00xyqmt14touuur7",
+  "field": "stem",
+  "before": "In a data set, the mean is 10, the median is 10, the middle\nthree values are 10, and the largest value is greater than\n10. If the largest value is removed from the data set, which\nof the following correctly represents the changes to the\nmean and median?",
+  "after": "In a data set, the mean is 10, the median is 10, the middle three values are 10, and the largest value is greater than 10. If the largest value is removed from the data set, which of the following correctly represents the changes to the mean and median?",
+  "note": "T6 Math M2 #12: other — sentence hard-wrapped with OCR line breaks; join into one paragraph (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p14 of files_to_load/MOCK EXAMS/TEST 6/MATH/INNO TEST 6 MATH MOD 1, 2B.pdf (column wrap only)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnvy000yuqmt1dmcha9vm",
+  "field": "stem",
+  "before": "In the figure, the measure of $\\angle 1 = a^{*}$, the measure of $\\angle 3 = b^{*}$, and the measure of $\\angle 5 = c^{*}$. What is the sum of the measure of $\\angle 2$ and the measure of $\\angle 4$, in degrees?",
+  "after": "In the figure, the measure of $\\angle 1 = a^{\\circ}$, the measure of $\\angle 3 = b^{\\circ}$, and the measure of $\\angle 5 = c^{\\circ}$. What is the sum of the measure of $\\angle 2$ and the measure of $\\angle 4$, in degrees?",
+  "note": "T6 Math M2 #22: other — OCR degree sign read as ^{*} (a*, b*, c*); use ^{\\circ}",
+  "class": "other",
+  "evidence": "rendered page image p19 of files_to_load/MOCK EXAMS/TEST 6/MATH/INNO TEST 6 MATH MOD 1, 2B.pdf (a°, b°, c°)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwlk016dqmt136bxx94k",
+  "field": "stimulus",
+  "before": "Alexander Fleming's fortuitous discovery of an unexpected patch of mold growing on a Petri dish of staphylococcus bacteria. Fleming noted the mold's apparent ability to inhibit bacterial growth, ______ scientific breakthrough that laid the foundations for the development of modern antibiotics.",
+  "after": "Penicillin, a common antibiotic, was developed in the late 1920s after Dr. Alexander Fleming's fortuitous discovery of an unexpected patch of mold growing on a Petri dish of staphylococcus bacteria. Fleming noted the mold's apparent ability to inhibit bacterial growth, ______ scientific breakthrough that laid the foundations for the development of modern antibiotics.",
+  "note": "T7 R&W M1 #4: other — stimulus truncated: lead-in \"Penicillin, a common antibiotic, was developed in the late 1920s after Dr.\" dropped (passage started mid-sentence)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p2 of files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf (Q4 passage)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwly016lqmt16nw9dxca",
+  "field": "stimulus",
+  "before": "In this excerpt, the narrator, Dr. Watson, explains how Holmes views emotions in his work. Holmes was, I take it, the most perfect reasoning and observing machine that the world has seen, but he never spoke of the softer passions, save with a gibe and a sneer. They were admirable things for the observer—excellent for drawing the veil from men's motives and actions. But for the trained reasoner to admit such intrusions into his own delicate and finely adjusted temperament was to introduce a distracting factor which might throw a doubt upon all his mental results. Grit in a sensitive instrument, or a crack in one of his own high-power lenses, would not be more disturbing than a strong emotion in a nature such as his.",
+  "after": "The following is adapted from Arthur Conan Doyle's 1891 Sherlock Holmes short story \"A Scandal in Bohemia.\" In this excerpt, the narrator, Dr. Watson, explains how Holmes views emotions in his work.\n\nHolmes was, I take it, the most perfect reasoning and observing machine that the world has seen, but he never spoke of the softer passions, save with a gibe and a sneer. They were admirable things for the observer—excellent for drawing the veil from men's motives and actions. But for the trained reasoner to admit such intrusions into his own delicate and finely adjusted temperament was to introduce a distracting factor which might throw a doubt upon all his mental results. Grit in a sensitive instrument, or a crack in one of his own high-power lenses, would not be more disturbing than a strong emotion in a nature such as his.",
+  "note": "T7 R&W M1 #6: other — stimulus truncated: intro \"The following is adapted from Arthur Conan Doyle's 1891 … \"A Scandal in Bohemia.\"\" dropped; intro/passage paragraph break restored",
+  "class": "other",
+  "evidence": "IngestPageArtifact p3 of files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf (Q6 passage)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwmb0171qmt1c23v95x4",
+  "field": "stimulus",
+  "before": "The following is adapted from E.M. Forster's 1909 novella *The Machine Stops*, a dystopian story in which humans live in entirely artificial environments. Imagine, if you can, a small room, hexagonal in shape, like the cell of a bee. It is lighted neither by window nor by lamp, yet it is filled with a soft radiance. There are no apertures for ventilation, yet the air is fresh. There are no musical instruments, and yet, at this moment, this room is throbbing with melodious sounds. An armchair is in the center, by its side a reading-desk — that is all the furniture. ++And in the armchair there sits a swaddled lump of flesh — a woman, about five feet high, with a face as white as a fungus.++",
+  "after": "The following is adapted from E.M. Forster's 1909 novella *The Machine Stops*, a dystopian story in which humans live in entirely artificial environments.\n\nImagine, if you can, a small room, hexagonal in shape, like the cell of a bee. It is lighted neither by window nor by lamp, yet it is filled with a soft radiance. There are no apertures for ventilation, yet the air is fresh. There are no musical instruments, and yet, at this moment, this room is throbbing with melodious sounds. An armchair is in the center, by its side a reading-desk — that is all the furniture. ++And in the armchair there sits a swaddled lump of flesh — a woman, about five feet high, with a face as white as a fungus.++",
+  "note": "T7 R&W M1 #8: other — intro line and passage run together; restore paragraph break (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p5 of files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwmi017bqmt1bpv3sgv7",
+  "field": "stimulus",
+  "before": "The following text is from Horace Smith's 1817 poem \"On a Stupendous Leg of Granite, Discovered Standing by Itself in the Deserts of Egypt, with the Inscription Inserted Below.\" In Egypt's sandy silence, all alone, Stands a gigantic Leg, which far off throws The only shadow that the Desert knows. \"I am great Ozymandias,\" saith the stone, \"The King of kings: this mighty city shows The wonders of my hand.\" The city's gone! Naught but the leg remaining to disclose The sight of that forgotten Babylon. We wonder, and some hunter may express Wonder like ours, when through the wilderness Where London stood, holding the wolf in chase, He met some fragment huge, and stops to guess What wonderful, but unrecorded race Once dwelt in that annihilated place. The Art of War is a book by Sun Tzu that was written in fifth century BCE. It is perhaps the most widely quoted military work in human history. One reason for this is likely due to adages that are applicable not only to generals but also to the general population: ______",
+  "after": "The following text is from Horace Smith's 1817 poem \"On a Stupendous Leg of Granite, Discovered Standing by Itself in the Deserts of Egypt, with the Inscription Inserted Below.\"\n\nIn Egypt's sandy silence, all alone,\nStands a gigantic Leg, which far off throws\nThe only shadow that the Desert knows.\n\"I am great Ozymandias,\" saith the stone,\n\"The King of kings: this mighty city shows\nThe wonders of my hand.\" The city's gone!\nNaught but the leg remaining to disclose\nThe sight of that forgotten Babylon.\n\nWe wonder, and some hunter may express\nWonder like ours, when through the wilderness\nWhere London stood, holding the wolf in chase,\nHe met some fragment huge, and stops to guess\nWhat wonderful, but unrecorded race\nOnce dwelt in that annihilated place.",
+  "note": "T7 R&W M1 #9: bleed — stimulus had Q10's Art of War passage (incl. its \"______\" blank) appended after the poem; removed it and restored the poem's line/stanza breaks",
+  "class": "bleed",
+  "evidence": "IngestPageArtifact p6 of files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf: poem block for Q9, Art of War passage belongs to Q10 (same page); Q10 stimulus already holds it"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwou018hqmt1lrr54z4g",
+  "field": "stimulus",
+  "before": "Although they were previously thought to prefer damp environments, recent studies _____ that they can thrive in dry habitats too. Despite their slight physique, rusty-spotted cats are efficient and ambitious hunters, capable of capturing prey larger than themselves.",
+  "after": "Indigenous to India, the rusty-spotted cat (*Prionailurus rubiginosus*) is considered one of the world's smallest cat species. Although they were previously thought to prefer damp environments, recent studies _____ that they can thrive in dry habitats too. Despite their slight physique, rusty-spotted cats are efficient and ambitious hunters, capable of capturing prey larger than themselves.",
+  "note": "T7 R&W M1 #16: other — stimulus truncated: opening sentence \"Indigenous to India, the rusty-spotted cat … smallest cat species.\" dropped (\"they\" had no referent)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p10 of files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf (Q16 passage)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwp7018lqmt1fjl59nf9",
+  "field": "stimulus",
+  "before": "Some plants are able to release toxins—ones that often have no effect on humans—to protect _____ from insects or other invasive threats.",
+  "after": "Plants rely on a number of nearly invisible tools for their survival. Some plants are able to release toxins—ones that often have no effect on humans—to protect _____ from insects or other invasive threats.",
+  "note": "T7 R&W M1 #18: other — stimulus truncated: opening sentence \"Plants rely on a number of nearly invisible tools for their survival.\" dropped",
+  "class": "other",
+  "evidence": "IngestPageArtifact p11 of files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf (Q18 passage)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwpt018xqmt1fqlh3ksc",
+  "field": "stimulus",
+  "before": "is a common logical fallacy that assumes an event is caused by what preceded it. Many superstitions are classic examples of this, such as one assuming that a black cat crossing the street is a harbinger of bad luck. _____ the “cum hoc ergo propter hoc” fallacy assumes causation between two things that happen simultaneously (for example, the assumption that a victorious sports game was brought about by the family heirloom worn during the match).",
+  "after": "“Post hoc ergo propter hoc” is a common logical fallacy that assumes an event is caused by what preceded it. Many superstitions are classic examples of this, such as one assuming that a black cat crossing the street is a harbinger of bad luck. _____ the “cum hoc ergo propter hoc” fallacy assumes causation between two things that happen simultaneously (for example, the assumption that a victorious sports game was brought about by the family heirloom worn during the match).",
+  "note": "T7 R&W M1 #22: other — stimulus truncated: subject \"“Post hoc ergo propter hoc”\" dropped (passage began \"is a common logical fallacy\")",
+  "class": "other",
+  "evidence": "IngestPageArtifact p13 of files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf (Q22 passage)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwsp0193qmt1o7t4skqv",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes: - The ginkgo tree, also known as *Ginkgo biloba*, is a tree native to China. - The ginkgo is called a \"living fossil\" because it is the sole surviving member of an ancient order of trees called Ginkgoales which dates back more than 290 million years. - Since the 14th century, ginkgo trees have been widely cultivated in Japan and Korea. Six ginkgo trees survived the 1945 atom bomb explosion in Hiroshima, Japan, during the Second World War. - ginkgo leaves have a distinct fan-like shape with veins that radiate from a central point. - Ginkgo seeds, also called ginkgo nuts, are commonly used in Chinese, Japanese, and Korean cuisine, while the leaves are often used to make an herbal tea.",
+  "after": "While researching a topic, a student has taken the following notes:\n- The ginkgo tree, also known as *Ginkgo biloba*, is a tree native to China.\n- The ginkgo is called a \"living fossil\" because it is the sole surviving member of an ancient order of trees called Ginkgoales which dates back more than 290 million years.\n- Since the 14th century, ginkgo trees have been widely cultivated in Japan and Korea. Six ginkgo trees survived the 1945 atom bomb explosion in Hiroshima, Japan, during the Second World War.\n- ginkgo leaves have a distinct fan-like shape with veins that radiate from a central point.\n- Ginkgo seeds, also called ginkgo nuts, are commonly used in Chinese, Japanese, and Korean cuisine, while the leaves are often used to make an herbal tea.",
+  "note": "T7 R&W M1 #25: other — notes bullets flattened into one line; restore one bullet per line (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p15 of files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwt7019dqmt14cfxvtbt",
+  "field": "stimulus",
+  "before": "notes: - One of the largest art thefts in modern history occurred at The Isabella Stewart Gardner Museum in Boston, Massachusetts, on March 18, 1990. - The stolen artworks were worth an estimated $500 million and included masterpieces by renowned artists such as Rembrandt Harmenszoon van Rijn and Johannes Vermeer, including his piece *The Concert*, which is considered one of the most valuable paintings in the world. - Among the stolen artworks was a bronze *gu*, a vessel used for serving wine in ancient China that was worth only a few thousand dollars. - The stolen artworks were cut out from their frames, leaving empty frames hanging on the museum walls, which still serve as a haunting reminder of the missing masterpieces and the unsolved crime. - Despite extensive investigations by the Federal Bureau of Investigation to recover the stolen artworks, the case remains unsolved. - As of 2017, The Gardner Museum offered a reward of $10 million for information leading to the recovery of the stolen pieces.",
+  "after": "notes:\n- One of the largest art thefts in modern history occurred at The Isabella Stewart Gardner Museum in Boston, Massachusetts, on March 18, 1990.\n- The stolen artworks were worth an estimated $500 million and included masterpieces by renowned artists such as Rembrandt Harmenszoon van Rijn and Johannes Vermeer, including his piece *The Concert*, which is considered one of the most valuable paintings in the world.\n- Among the stolen artworks was a bronze *gu*, a vessel used for serving wine in ancient China that was worth only a few thousand dollars.\n- The stolen artworks were cut out from their frames, leaving empty frames hanging on the museum walls, which still serve as a haunting reminder of the missing masterpieces and the unsolved crime.\n- Despite extensive investigations by the Federal Bureau of Investigation to recover the stolen artworks, the case remains unsolved.\n- As of 2017, The Gardner Museum offered a reward of $10 million for information leading to the recovery of the stolen pieces.",
+  "note": "T7 R&W M1 #26: other — notes bullets flattened into one line; restore one bullet per line (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p16 of files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwty019nqmt1tmo3l2en",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes: - Antipater of Sidon was a Greek author who lived in the second century BCE. - He composed a list of the seven wonders of the ancient world, highlighting notable monuments and works of public architecture. - Two sites from ancient Babylon, the Hanging Gardens and the Ishtar Gate, appeared on Antipater's list. - Other lists include the Hanging Gardens but omit the Ishtar Gate in favor of monuments more directly inspired by ancient Greece. - The Temple of Artemis at Ephesus, the Colossus of Rhodes, and the Statue of Zeus at Olympia were all products of Greek art.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Antipater of Sidon was a Greek author who lived in the second century BCE.\n- He composed a list of the seven wonders of the ancient world, highlighting notable monuments and works of public architecture.\n- Two sites from ancient Babylon, the Hanging Gardens and the Ishtar Gate, appeared on Antipater's list.\n- Other lists include the Hanging Gardens but omit the Ishtar Gate in favor of monuments more directly inspired by ancient Greece.\n- The Temple of Artemis at Ephesus, the Colossus of Rhodes, and the Statue of Zeus at Olympia were all products of Greek art.",
+  "note": "T7 R&W M1 #27: other — notes bullets flattened into one line; restore one bullet per line (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p17 of files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf"
+ },
+ {
+  "table": "Question",
+  "id": "cmson6g1w000518pp9ognfh6z",
+  "field": "stimulus",
+  "before": "One of the most famous criminals in modern history was Charles Ponzi who was notorious for his \\_\\_\\_\\_\\_, wrongly assuming himself to be immune to legal investigation so long as he treated his investors generously and generated positive press for his business.",
+  "after": "One of the most famous criminals in modern history was Charles Ponzi who was notorious for his _____, wrongly assuming himself to be immune to legal investigation so long as he treated his investors generously and generated positive press for his business.",
+  "note": "T7 R&W M2 #2: other — escaped blank \\_\\_\\_\\_\\_ renders literally; use _____",
+  "class": "other",
+  "evidence": "IngestPageArtifact p18 of files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf (Q2 passage shows _____)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwm8016wqmt1j6ur57yy",
+  "field": "stimulus",
+  "before": "The following text comes from a 10th-century account of an Arab ambassador to Constantinople titled “An Embassy from Baghdad to the Emperor Basil II.” The Byzantine Sovereign said: “You have come on a reprehensible errand; your envoy came and procured our consent to certain terms, which included the restoring of the fortresses taken during the revolt; you are now asking to have other fortresses which were taken by my predecessors. Either consent to what was originally stipulated or go in peace.” I replied: “But we agreed on nothing, for, as for the document we brought, you deprived us under its terms of half our territory; how can we admit such a thing against ourselves?” Here the Chamberlain interposed, saying: “This envoy is skilled in controversy and can make up a fine story: death is better for us than submission to these terms: let him return to his master.” The Sovereign then rose, and I withdrew.",
+  "after": "The following text comes from a 10th-century account of an Arab ambassador to Constantinople titled “An Embassy from Baghdad to the Emperor Basil II.”\n\nThe Byzantine Sovereign said: “You have come on a reprehensible errand; your envoy came and procured our consent to certain terms, which included the restoring of the fortresses taken during the revolt; you are now asking to have other fortresses which were taken by my predecessors. Either consent to what was originally stipulated or go in peace.” I replied: “But we agreed on nothing, for, as for the document we brought, you deprived us under its terms of half our territory; how can we admit such a thing against ourselves?” Here the Chamberlain interposed, saying: “This envoy is skilled in controversy and can make up a fine story: death is better for us than submission to these terms: let him return to his master.” The Sovereign then rose, and I withdrew.",
+  "note": "T7 R&W M2 #7: other — intro line and passage run together; restore paragraph break (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p21 of files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwmf0176qmt1mo1aok2h",
+  "field": "stimulus",
+  "before": "The following text comes from the first-century work *A Record of Buddhistic Kingdoms* by Fa-Hien. After travelling for seventeen days, the pilgrims reached the kingdom of Shen-shen, a country rugged and hilly, with a thin and barren soil. The clothes of the common people are coarse, and like those worn in our land of Han, some wearing felt and others coarse serge or cloth of hair; this was the only difference seen among them. The king professed our Law, and there might be in the country more than four thousand monks, who were all students of the hinayana. The common people of this and other kingdoms in that region, as well as the sramans, all practise the rules of India, only that the latter do so more exactly, and the former more loosely.",
+  "after": "The following text comes from the first-century work *A Record of Buddhistic Kingdoms* by Fa-Hien.\n\nAfter travelling for seventeen days, the pilgrims reached the kingdom of Shen-shen, a country rugged and hilly, with a thin and barren soil. The clothes of the common people are coarse, and like those worn in our land of Han, some wearing felt and others coarse serge or cloth of hair; this was the only difference seen among them. The king professed our Law, and there might be in the country more than four thousand monks, who were all students of the hinayana. The common people of this and other kingdoms in that region, as well as the sramans, all practise the rules of India, only that the latter do so more exactly, and the former more loosely.",
+  "note": "T7 R&W M2 #8: other — intro line and passage run together; restore paragraph break (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p22 of files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwt00198qmt199lbpf45",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes: - Bruges, a city founded in the 12th century in northwestern Belgium, is known for its medieval architecture and picturesque canals. - Since 2000, Bruges's city center has been a UNESCO (United Nations Educational, Scientific, and Cultural Organization) World Heritage Site. - Bruges was occupied by German forces during World War I and World War II but suffered virtually no destruction. Today, it is one of the best-preserved medieval towns in Europe. - Over eight million tourists visit Bruges each year. - Bruges is commercially important due to its port, Zeebrugge, which handles approximately 45 million tons of cargo annually.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Bruges, a city founded in the 12th century in northwestern Belgium, is known for its medieval architecture and picturesque canals.\n- Since 2000, Bruges's city center has been a UNESCO (United Nations Educational, Scientific, and Cultural Organization) World Heritage Site.\n- Bruges was occupied by German forces during World War I and World War II but suffered virtually no destruction. Today, it is one of the best-preserved medieval towns in Europe.\n- Over eight million tourists visit Bruges each year.\n- Bruges is commercially important due to its port, Zeebrugge, which handles approximately 45 million tons of cargo annually.",
+  "note": "T7 R&W M2 #25: other — notes bullets flattened into one line; restore one bullet per line (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p33 of files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwtt019iqmt1x1ja4rz6",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes: - *The Great Wave off Kanagawa* is a woodblock print created in 1831 by Japanese artist Katsushika Hokusai. - *The Great Wave off Kanagawa* reportedly inspired French composer Claude Debussy's symphony *La Mer* (The Sea) in 1905 and Austrian poet Rainer Maria Rilke's \"Der Berg\" (The Mountain) in 1907. - *The Great Wave off Kanagawa* is an example of *ukiyo-e*, a Japanese printmaking technique that dates to the 17th century. - *The Great Wave off Kanagawa* depicts a giant wave that suggests tsunami-like conditions off the shore of Mount Fuji, the highest mountain in Japan. - The Japanese government will release a redesign of the 1000-yen bill in 2024 that will feature *The Great Wave off Kanagawa* on one side of the currency. - *The Great Wave off Kanagawa* features a sense of depth between the foreground and the background of the print, reflecting Western influence that emerged via Dutch trade in Japan in the 18th century.",
+  "after": "While researching a topic, a student has taken the following notes:\n- *The Great Wave off Kanagawa* is a woodblock print created in 1831 by Japanese artist Katsushika Hokusai.\n- *The Great Wave off Kanagawa* reportedly inspired French composer Claude Debussy's symphony *La Mer* (The Sea) in 1905 and Austrian poet Rainer Maria Rilke's \"Der Berg\" (The Mountain) in 1907.\n- *The Great Wave off Kanagawa* is an example of *ukiyo-e*, a Japanese printmaking technique that dates to the 17th century.\n- *The Great Wave off Kanagawa* depicts a giant wave that suggests tsunami-like conditions off the shore of Mount Fuji, the highest mountain in Japan.\n- The Japanese government will release a redesign of the 1000-yen bill in 2024 that will feature *The Great Wave off Kanagawa* on one side of the currency.\n- *The Great Wave off Kanagawa* features a sense of depth between the foreground and the background of the print, reflecting Western influence that emerged via Dutch trade in Japan in the 18th century.",
+  "note": "T7 R&W M2 #26: other — notes bullets flattened into one line; restore one bullet per line (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p34 of files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwu2019sqmt10whohlet",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes: - Wuyi teas are a category of Chinese black and oolong teas grown in and around the Wuyi Mountains in China. - The Wuyi Mountains, a UNESCO World Heritage Site since 1999, provide an ideal environment for cultivating these teas. - Wuyi teas are known for their complex and robust flavors with notes of charcoal, caramel, and fresh herbs. - The production of Wuyi teas involves plucking, withering, bruising, drying, and multiple roastings to enhance flavors. - One of the most famous varieties of Wuyi tea is the most expensive tea in the world: Da Hong Pao, which costs over one million dollars per kilogram.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Wuyi teas are a category of Chinese black and oolong teas grown in and around the Wuyi Mountains in China.\n- The Wuyi Mountains, a UNESCO World Heritage Site since 1999, provide an ideal environment for cultivating these teas.\n- Wuyi teas are known for their complex and robust flavors with notes of charcoal, caramel, and fresh herbs.\n- The production of Wuyi teas involves plucking, withering, bruising, drying, and multiple roastings to enhance flavors.\n- One of the most famous varieties of Wuyi tea is the most expensive tea in the world: Da Hong Pao, which costs over one million dollars per kilogram.",
+  "note": "T7 R&W M2 #27: other — notes bullets flattened into one line; restore one bullet per line (text identical)",
+  "class": "other",
+  "evidence": "IngestPageArtifact p35 of files_to_load/MOCK EXAMS/TEST 7/READING AND WRITING/ Test 7 RW.pdf"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwwl01b5qmt1oln4m8lr",
+  "field": "stem",
+  "before": "A soccer coach wants to purchase new uniforms for his 22 players. The athletic department's budget allows for a maximum of \\$2,800 to be spent on these uniforms, which includes a 6% sales tax. Which of the following is the maximum amount of money per uniform, before sales tax, that the coach can spend?",
+  "after": "A soccer coach wants to purchase new uniforms for his 22 players. The athletic department's budget allows for a maximum of $2,800 to be spent on these uniforms, which includes a 6% sales tax. Which of the following is the maximum amount of money per uniform, before sales tax, that the coach can spend?",
+  "note": "T7 Math M1 #11: other — escaped dollar \"\\$2,800\" renders with a literal backslash (renderer does not unescape \\$); single $ price is prose",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 7/MATH/TEST 7 INNOVATOR MATH.pdf p4 (rendered): \"maximum of $2,800\""
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwyd01bnqmt1l4vwq4sj",
+  "field": "stem",
+  "before": "The table shows select values for the function  \\( f(x) \\) . What is the equation for the function  \\( f(x) \\) ?",
+  "after": "The table shows select values for the function $f(x)$. What is the equation for the function $f(x)$?",
+  "note": "T7 Math M1 #18: other — OCR inline-math delimiters \"  \\( f(x) \\) \" with stray spaces; normalise to $f(x)$ (table is the image; options clean)",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 7/MATH/TEST 7 INNOVATOR MATH.pdf p7 (rendered)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwym01btqmt1846xul16",
+  "field": "stem",
+  "before": "Note: Figure not drawn to scale\n\nIn the figure shown, the length of BC is 6 centimeters. What is the length of AB, in centimeters?\n\n\\[\n\\times \\boxed {A} 3\n\\]\n\n\\[\n\\times \\boxed {B} 3 \\sqrt {2}\n\\]\n\n\\[\n\\times \\boxed {c} 6\n\\]\n\n\\[\n\\times \\boxed {D} 6 \\sqrt {2}\n\\]",
+  "after": "Note: Figure not drawn to scale\n\nIn the figure shown, the length of BC is 6 centimeters. What is the length of AB, in centimeters?",
+  "note": "T7 Math M1 #19: options_in_stem — options A–D left in the stem as OCR \"\\[ \\times \\boxed{A} 3 \\]…\" blocks (× = cross-out UI); options table already holds 3, 3√2, 6, 6√2",
+  "class": "options_in_stem",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 7/MATH/TEST 7 INNOVATOR MATH.pdf p7 (rendered): Q19 options panel A 3 / B 3√2 / C 6 / D 6√2"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrnwvr01avqmt1ywsjoaep",
+  "field": "text",
+  "before": "y = 200(3)ᵗ",
+  "after": "$y = 200(3)^t$",
+  "note": "T7 Math M2 #7: other — option A uses Unicode superscripts (\"y = 200(3)ᵗ\"); rewrite as LaTeX like option C",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 7/MATH/TEST 7 INNOVATOR MATH.pdf p12 rendered at 250 dpi: A y=200(3)^t, B y=3(200)^t, C y=200(3)^{t/7}, D y=200^{3t}"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrnwvr01awqmt1rlgb7o3q",
+  "field": "text",
+  "before": "y = 3(200)ᵗ",
+  "after": "$y = 3(200)^t$",
+  "note": "T7 Math M2 #7: other — option B uses Unicode superscripts (\"y = 3(200)ᵗ\"); rewrite as LaTeX like option C",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 7/MATH/TEST 7 INNOVATOR MATH.pdf p12 rendered at 250 dpi: A y=200(3)^t, B y=3(200)^t, C y=200(3)^{t/7}, D y=200^{3t}"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrnwvr01ayqmt1nv6p0vzt",
+  "field": "text",
+  "before": "y = 200³ᵗ",
+  "after": "$y = 200^{3t}$",
+  "note": "T7 Math M2 #7: other — option D uses Unicode superscripts (\"y = 200³ᵗ\"); rewrite as LaTeX like option C",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 7/MATH/TEST 7 INNOVATOR MATH.pdf p12 rendered at 250 dpi: A y=200(3)^t, B y=3(200)^t, C y=200(3)^{t/7}, D y=200^{3t}"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnww001b0qmt192ba8rnz",
+  "field": "stem",
+  "before": "24x + 24y = -8y + 2/3\n\n-ky = 3x - 1/12\n\nIn the given system of equations, k is a constant. If the system has infinite solutions, what is the value of k?",
+  "after": "$24x + 24y = -8y + \\frac{2}{3}$\n\n$-ky = 3x - \\frac{1}{12}$\n\nIn the given system of equations, $k$ is a constant. If the system has infinite solutions, what is the value of $k$?",
+  "note": "T7 Math M2 #8: other — system typed as plain text with slash fractions; restore as math ($$…\\frac{2}{3}$$, $$…\\frac{1}{12}$$)",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 7/MATH/TEST 7 INNOVATOR MATH.pdf p12 (rendered): stacked fractions 2/3 and 1/12"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwxb01baqmt1s1u8sv5b",
+  "field": "stem",
+  "before": "The graph of $$x^{2} + 3x + y^{2} - y = \\frac{13}{2}$$ in the $$xy$$-plane is a circle. What is the length of the circle's radius?",
+  "after": "The graph of $x^{2} + 3x + y^{2} - y = \\frac{13}{2}$ in the $xy$-plane is a circle. What is the length of the circle's radius?",
+  "note": "T7 Math M2 #13: other — inline math wrapped in display $$…$$ (breaks the sentence into blocks, \"xy\" on its own line); use inline $…$",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 7/MATH/TEST 7 INNOVATOR MATH.pdf p14 (rendered): equation inline in the sentence"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnx2701c2qmt18m37uycw",
+  "field": "explanation",
+  "before": "Choice D is correct. If , then the –value for  when  is . So, . As a result, the value of  is the value of . The –value of  when  is .\nChoice A is incorrect as this is the value of . Choice B is incorrect as this is the value of  or . Choice C is incorrect and may be the result of choosing  because of the –value in .",
+  "after": "Choice D is correct. If $g(2)=q$, then the $y$–value for $g(x)$ when $x=2$ is $0$. So, $q=0$. As a result, the value of $f(q)$ is the value of $f(0)$. The $y$–value of $f(x)$ when $x=0$ is $5$.\nChoice A is incorrect as this is the value of $q$. Choice B is incorrect as this is the value of $f(2)$ or $g(0)$. Choice C is incorrect and may be the result of choosing $2$ because of the $x$–value in $g(2)$.",
+  "note": "T7 Math M1 #22: other — explanation lost every Word-equation (OMML) value (\"If , then the –value for  when  is .\") — restored with LaTeX from the docx equations; prose unchanged",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 7/Test7_Math_Answer_Explanations.docx, table for Question 22 (MODULE 1), m:oMath elements"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwuo01a8qmt11c9v1qtn",
+  "field": "explanation",
+  "before": "Choice B is correct. Using  between the coordinate points  and  yields a slope of  for line . If two lines are perpendicular, then the slopes of the lines are opposite reciprocals. So, since the slope for line  is , the slope of line  is .\nChoice A is incorrect and is the result of taking the negative of the slope of line  but not the reciprocal. Choice C is incorrect and is the result of taking the reciprocal of line  but not the negative. Choice D is incorrect as this would be the slope of line  if the lines were parallel.",
+  "after": "Choice B is correct. Using $\\frac{rise}{run}$ between the coordinate points $(0,1)$ and $(1,6)$ yields a slope of $\\frac{5}{1}=5$ for line $q$. If two lines are perpendicular, then the slopes of the lines are opposite reciprocals. So, since the slope for line $q$ is $5$, the slope of line $r$ is $-\\frac{1}{5}$.\nChoice A is incorrect and is the result of taking the negative of the slope of line $q$ but not the reciprocal. Choice C is incorrect and is the result of taking the reciprocal of line $q$ but not the negative. Choice D is incorrect as this would be the slope of line $r$ if the lines were parallel.",
+  "note": "T7 Math M2 #2: other — explanation lost every Word-equation (OMML) value (\"If , then the –value for  when  is .\") — restored with LaTeX from the docx equations; prose unchanged",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 7/Test7_Math_Answer_Explanations.docx, table for Question 2 (MODULE 2B), m:oMath elements"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwy001bgqmt1mj7a9ibd",
+  "field": "explanation",
+  "before": "Choice D is correct. Focusing on the term in the denominator,  can be combined into a singular term. To combine fractions, they must have the same denominator. The common denominator of  and  is\n. Multiplying the first term by  yields . Similarly, multiplying the second term by  yields . Adding these fractions yields . Adding like terms simplifies this to . Since this expression is equivalent to the denominator of the original expression, the original expression can be rewritten as . This is the same as . Using the rules for dividing fractions in which dividing by a fraction is the same as multiplying by the reciprocal of the second fraction, this becomes , which simplifies to .\nChoice A is incorrect and may result from adding the terms directly instead of finding a common denominator for the two fractions. Additionally, the reciprocal of the fraction was not found in the last step. Choice B is incorrect and may result from adding the terms directly instead of finding a common denominator for the two fractions. Choice C is incorrect and may result from not finding the reciprocal in the last step.\nCalculator tip: Enter the original expression  into an equation line to get a defined graph in the coordinate plane. Enter the answer choice expressions in a separate equation entry line to find which one produces a graph in exactly alignment with the original expression. Since Choice D,, produces a graph that is a perfect match, it is equivalent.",
+  "after": "Choice D is correct. Focusing on the term in the denominator, $\\frac{1}{x+5}+\\frac{1}{x-2}$ can be combined into a singular term. To combine fractions, they must have the same denominator. The common denominator of $(x+5)$ and $(x-2)$ is $(x+5)(x-2)$. Multiplying the first term by $\\frac{x-2}{x-2}$ yields $\\frac{x-2}{(x+5)(x-2)}$. Similarly, multiplying the second term by $\\frac{x+5}{x+5}$ yields $\\frac{x+5}{(x+5)(x-2)}$. Adding these fractions yields $\\frac{x-2+x+5}{(x+5)(x-2)}$. Adding like terms simplifies this to $\\frac{2x+3}{x^{2}+3x-10}$. Since this expression is equivalent to the denominator of the original expression, the original expression can be rewritten as $\\frac{1}{\\frac{2x+3}{x^{2}+3x-10}}$. This is the same as $1÷\\frac{2x+3}{x^{2}+3x-10}$. Using the rules for dividing fractions in which dividing by a fraction is the same as multiplying by the reciprocal of the second fraction, this becomes $1×\\frac{x^{2}+3x-10}{2x+3}$, which simplifies to $\\frac{x^{2}+3x-10}{2x+3}$.\nChoice A is incorrect and may result from adding the terms directly instead of finding a common denominator for the two fractions. Additionally, the reciprocal of the fraction was not found in the last step. Choice B is incorrect and may result from adding the terms directly instead of finding a common denominator for the two fractions. Choice C is incorrect and may result from not finding the reciprocal in the last step.\nCalculator tip: Enter the original expression $\\frac{1}{\\frac{1}{x+5}+\\frac{1}{x-2}}$ into an equation line to get a defined graph in the coordinate plane. Enter the answer choice expressions in a separate equation entry line to find which one produces a graph in exactly alignment with the original expression. Since Choice D, $\\frac{x^{2}+3x-10}{2x+3}$, produces a graph that is a perfect match, it is equivalent.",
+  "note": "T7 Math M2 #16: other — explanation lost every Word-equation (OMML) value (\"If , then the –value for  when  is .\") — restored with LaTeX from the docx equations; prose unchanged",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 7/Test7_Math_Answer_Explanations.docx, table for Question 16 (MODULE 2B), m:oMath elements"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnx1k01c1qmt111g85jey",
+  "field": "explanation",
+  "before": "The correct answer is . It is given that  has two distinct values such that . Since  is a polynomial function with a degree of , one of the solutions must be a perfect square. It is given that , so  must be a perfect square (note that since  is not a factor of\n,  cannot be written with  as a term). Since that term is a perfect square, , so the term can be rewritten as . This means that  can be written as  which means that .\nAlternatively, since  has two different forms of being written, both forms can be set equal to each other. This gives\n. Dividing both sides by  yields the equation , which means . Since it is a requirement that this factor is a perfect square, the discriminant of this factor must by . So, , which can be solved for  to yield . Setting the  values equal to each other gives , which means .",
+  "after": "The correct answer is $4$. It is given that $g(x)$ has two distinct values such that $g(x)=0$. Since $g(x)$ is a polynomial function with a degree of $3$, one of the solutions must be a perfect square. It is given that $g(x)=(x^{2}+bx+c)(x+a)$, so $(x^{2}+bx+c)$ must be a perfect square (note that since $x+a$ is not a factor of $x^{2}+bx+c$, $g(x)$ cannot be written with ${(x+a)}^{2}$ as a term). Since that term is a perfect square, $(\\frac{b}{2})^{2}=c$, so the term can be rewritten as $(x^{2}+bx+\\frac{b^{2}}{4})$. This means that $g(x)$ can be written as $g(x)=(x^{2}+bx+\\frac{b^{2}}{4})(x+a)$ which means that $m=4$.\nAlternatively, since $g(x)$ has two different forms of being written, both forms can be set equal to each other. This gives $(x^{2}+bx+c)(x+a)=(x^{2}+bx+\\frac{b^{2}}{m})(x+a)$. Dividing both sides by $x+a$ yields the equation $x^{2}+bx+c=x^{2}+bx+\\frac{b^{2}}{m}$, which means $c=\\frac{b^{2}}{m}$. Since it is a requirement that this factor is a perfect square, the discriminant of this factor must by $0$. So, $b^{2}-4ac=0$, which can be solved for $c$ to yield $c=\\frac{b^{2}}{4}$. Setting the $c$ values equal to each other gives $\\frac{b^{2}}{m}=\\frac{b^{2}}{4}$, which means $m=4$.",
+  "note": "T7 Math M2 #21: other — explanation lost every Word-equation (OMML) value (\"If , then the –value for  when  is .\") — restored with LaTeX from the docx equations; prose unchanged",
+  "class": "other",
+  "evidence": "files_to_load/MOCK EXAMS/TEST 7/Test7_Math_Answer_Explanations.docx, table for Question 21 (MODULE 2B), m:oMath elements"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrnude00i2qmt1ilisoxp2",
+  "field": "imageUrl",
+  "before": "/uploads/questions/26f7ec2d02e8bc217d3abc5a.jpg",
+  "after": null,
+  "note": "T5 Math M1 #3: option image dropped — table now in the option text (image A wrongly showed B's table)",
+  "class": "other",
+  "evidence": "TEST 5 MATHS PDF p2: A=3/2,5/6,7/7,10/9; image 26f7ec2d… = B's table"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrnude00i3qmt1snhzbrti",
+  "field": "imageUrl",
+  "before": "/uploads/questions/6df0fd07ce13681566a826c8.jpg",
+  "after": null,
+  "note": "T5 Math M1 #3: option image dropped — table now in the option text (image A wrongly showed B's table)",
+  "class": "other",
+  "evidence": "TEST 5 MATHS PDF p2: A=3/2,5/6,7/7,10/9; image 26f7ec2d… = B's table"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrnude00i4qmt1d0kxmhje",
+  "field": "imageUrl",
+  "before": "/uploads/questions/6cc3d066bb2f5d5dfa0cb668.jpg",
+  "after": null,
+  "note": "T5 Math M1 #3: option image dropped — table now in the option text (image A wrongly showed B's table)",
+  "class": "other",
+  "evidence": "TEST 5 MATHS PDF p2: A=3/2,5/6,7/7,10/9; image 26f7ec2d… = B's table"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrnude00i5qmt1uetr9pby",
+  "field": "imageUrl",
+  "before": "/uploads/questions/a45b4aec6ff703d061d2ca10.jpg",
+  "after": null,
+  "note": "T5 Math M1 #3: option image dropped — table now in the option text (image A wrongly showed B's table)",
+  "class": "other",
+  "evidence": "TEST 5 MATHS PDF p2: A=3/2,5/6,7/7,10/9; image 26f7ec2d… = B's table"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnulb00jjqmt1ij3wojjk",
+  "field": "explanation",
+  "before": "Correct answer: B — 60°. From $\\angle HAC=100^\\circ$ and the straight line through $H,A,B$, $\\angle BAC=180^\\circ-100^\\circ=80^\\circ$. Triangle $ABC$ is isosceles, so the base angles are $\\angle ABC=\\angle ACB=\\dfrac{180^\\circ-80^\\circ}{2}=50^\\circ$. Applying the isosceles conditions $CF=CD$ and $FE=DE$ together with $\\angle GFC=40^\\circ$ and the angle relationships in the figure yields $\\angle E=60^\\circ$. (Derivation abbreviated; verify against the figure.)",
+  "after": "Correct answer: B — 60°. Points $H$, $A$, $B$ lie on a line, so $\\angle BAC=180^\\circ-100^\\circ=80^\\circ$. Triangle $ABC$ is isosceles with $AC=BC$, so $\\angle ABC=\\angle BAC=80^\\circ$ and $\\angle ACB=180^\\circ-80^\\circ-80^\\circ=20^\\circ$. Angles $FCD$ and $ACB$ are vertical angles, so $\\angle FCD=20^\\circ$. Since $CF=CD$, $\\angle CFD=\\angle CDF=\\dfrac{180^\\circ-20^\\circ}{2}=80^\\circ$. Points $G$, $F$, $E$ lie on a line, so $\\angle CFE=180^\\circ-40^\\circ=140^\\circ$ and $\\angle DFE=140^\\circ-80^\\circ=60^\\circ$. Since $FE=DE$, $\\angle FDE=\\angle DFE=60^\\circ$, so $\\angle E=180^\\circ-60^\\circ-60^\\circ=60^\\circ$.",
+  "note": "T5 Math M1 #22: explanation rewritten — old derivation (base angles 50°) contradicted the figure and ended with a placeholder",
+  "class": "other",
+  "evidence": "figure /uploads/questions/c626793c…; derivation checked by main session"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "cmsjrnwgq014hqmt16zw4rt40",
+  "field": "text",
+  "before": "rural workers had strong community ties allowing them to change higher rates for their products.",
+  "after": "rural workers had strong community ties allowing them to charge higher rates for their products.",
+  "note": "T6 R&W M2 #15: option A typo 'change' → 'charge' (source typo; explanation says charge)",
+  "class": "other",
+  "evidence": "test-06-findings.md needs_review"
+ }
+]

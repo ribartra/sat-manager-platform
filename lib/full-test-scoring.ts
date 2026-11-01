@@ -1,5 +1,3 @@
-import prisma from "@/lib/prisma";
-
 export type SatSection = "RW" | "MATH";
 
 /** Caps when every question counts (FPT_PRETEST_EXCLUSION off — default). */
@@ -15,117 +13,39 @@ export function rawMaxForPretestExclusion(excludePretest: boolean) {
   return excludePretest ? PRETEST_EXCLUDED_RAW_MAX : FULL_RAW_MAX;
 }
 
-export interface ScoreConversionInput {
-  section: string;
-  rawCorrect: number;
-  score: number;
-}
-
-export interface ScoreConversionRow {
-  section: SatSection;
-  rawCorrect: number;
-  score: number;
-}
-
-export interface ValidatedScoreConversions {
-  rows: ScoreConversionRow[];
-  errors: string[];
-  warnings: string[];
-}
-
-function isSatSection(value: string): value is SatSection {
-  return value === "RW" || value === "MATH";
-}
-
-export function validateScoreConversions(
-  inputRows: ScoreConversionInput[],
-  options?: { excludePretest?: boolean },
-): ValidatedScoreConversions {
-  const errors: string[] = [];
-  const warnings: string[] = [];
-  const rows: ScoreConversionRow[] = [];
-  const seen = new Set<string>();
-  const rawMax = rawMaxForPretestExclusion(Boolean(options?.excludePretest));
-
-  inputRows.forEach((input, index) => {
-    const rowNumber = index + 1;
-    const section = String(input.section ?? "").trim().toUpperCase();
-    const rawCorrect = Number(input.rawCorrect);
-    const score = Number(input.score);
-
-    if (!isSatSection(section)) {
-      errors.push(`Row ${rowNumber}: section must be RW or MATH.`);
-      return;
-    }
-    if (!Number.isInteger(rawCorrect) || rawCorrect < 0) {
-      errors.push(`Row ${rowNumber}: rawCorrect must be a non-negative integer.`);
-      return;
-    }
-    if (!Number.isInteger(score) || score < 200 || score > 800 || score % 10 !== 0) {
-      errors.push(`Row ${rowNumber}: score must be a 200-800 integer in 10 point increments.`);
-      return;
-    }
-
-    const key = `${section}:${rawCorrect}`;
-    if (seen.has(key)) {
-      errors.push(`Row ${rowNumber}: duplicate conversion for ${section} raw ${rawCorrect}.`);
-      return;
-    }
-    seen.add(key);
-    rows.push({ section, rawCorrect, score });
-  });
-
-  for (const section of ["RW", "MATH"] as const) {
-    const sectionRows = rows.filter((row) => row.section === section).sort((a, b) => a.rawCorrect - b.rawCorrect);
-    if (sectionRows.length === 0) {
-      warnings.push(`${section}: no conversion rows configured; submissions will use approximate fallback.`);
-      continue;
-    }
-    if (sectionRows[0].rawCorrect !== 0) {
-      warnings.push(`${section}: no rawCorrect 0 row; low raw scores may be extrapolated.`);
-    }
-    const maxExpected = rawMax[section];
-    const maxConfigured = sectionRows[sectionRows.length - 1]?.rawCorrect ?? 0;
-    if (maxConfigured < maxExpected) {
-      warnings.push(`${section}: max rawCorrect ${maxConfigured} < expected max ${maxExpected}.`);
-    }
-    for (let index = 1; index < sectionRows.length; index += 1) {
-      if (sectionRows[index].score < sectionRows[index - 1].score) {
-        errors.push(`${section}: scores must be non-decreasing as rawCorrect increases.`);
-        break;
-      }
-    }
-  }
-
-  return { rows, errors, warnings };
-}
-
 /**
- * Convert raw correct to a 200–800 section score.
- * `total` should match the counted items for the active pretest setting.
+ * Section score (200–800) as the share of counted questions answered correctly:
+ * 200 + 600 × correct ÷ counted, rounded to the nearest 10.
+ * `counted` is the number of questions that count toward the score (all of them, or
+ * without the pretest items when FPT_PRETEST_EXCLUSION is on), so the scale always
+ * reaches 800 exactly at a perfect section.
+ *
+ * The official Digital SAT uses adaptive, form-specific (IRT) scoring; without the
+ * official table for each test this proportional estimate is used instead. The former
+ * editable conversion table (FullPracticeTestScoreConversion) encoded the same line for
+ * 50/40 counted items and is no longer read.
  */
-export async function scaledScore(section: SatSection, correct: number, total: number) {
-  const rows = await prisma.fullPracticeTestScoreConversion.findMany({
-    where: { section },
-    orderBy: { rawCorrect: "asc" },
-  });
+export function sectionScore(correct: number, counted: number) {
+  if (!counted || counted <= 0) return 200;
+  const ratio = Math.min(Math.max(correct / counted, 0), 1);
+  return Math.round((200 + 600 * ratio) / 10) * 10;
+}
 
-  if (rows.length === 0) {
-    if (!total) return 200;
-    return Math.max(200, Math.min(800, Math.round((200 + (correct / total) * 600) / 10) * 10));
-  }
+/** Convert raw correct to a 200–800 section score over the counted items (`total`). */
+export async function scaledScore(_section: SatSection, correct: number, total: number) {
+  return sectionScore(correct, total);
+}
 
-  const exact = rows.find((row) => row.rawCorrect === correct);
-  if (exact) return exact.score;
-
-  const lower = [...rows].reverse().find((row) => row.rawCorrect < correct);
-  const upper = rows.find((row) => row.rawCorrect > correct);
-
-  if (!lower && upper) return upper.score;
-  if (lower && !upper) return lower.score;
-  if (!lower || !upper) return 200;
-
-  const ratio = (correct - lower.rawCorrect) / Math.max(upper.rawCorrect - lower.rawCorrect, 1);
-  const interpolated = lower.score + (upper.score - lower.score) * ratio;
-  return Math.max(200, Math.min(800, Math.round(interpolated / 10) * 10));
+/** Worked examples shown on the teacher scoring page, per section, for one counting mode. */
+export function scoringExamples(excludePretest: boolean) {
+  const counted = rawMaxForPretestExclusion(excludePretest);
+  const shares = [0, 0.25, 0.5, 0.6, 0.75, 0.9, 1];
+  return (["RW", "MATH"] as const).map((section) => ({
+    section,
+    counted: counted[section],
+    rows: shares.map((share) => {
+      const correct = Math.round(share * counted[section]);
+      return { correct, percent: Math.round((correct / counted[section]) * 100), score: sectionScore(correct, counted[section]) };
+    }),
+  }));
 }

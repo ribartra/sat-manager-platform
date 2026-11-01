@@ -104,13 +104,14 @@ export function buildQuestionSnapshot(item: {
     difficulty: item.question.difficulty,
     correctAnswer: item.question.correctAnswer,
     explanation: item.question.explanation,
-    imageUrl: item.question.imageUrl ?? null,
+    // Images are referenced, not stored: results read them from the live question (lib/question-media.ts).
+    imageUrl: null,
     supportsGraph: item.question.supportsGraph ?? false,
     order: item.order,
     options: item.question.options?.map((option) => ({
       label: option.label,
       text: option.text,
-      imageUrl: option.imageUrl ?? null,
+      imageUrl: null,
     })),
     topic: item.question.topic,
   };

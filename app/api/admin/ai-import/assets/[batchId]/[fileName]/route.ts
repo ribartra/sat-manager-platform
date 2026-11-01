@@ -1,7 +1,8 @@
+import { NextResponse } from "next/server";
 import { readFile } from "fs/promises";
 import path from "path";
-import { NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
+import { ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
   params: Promise<{ batchId: string; fileName: string }>;
@@ -17,19 +18,19 @@ function contentTypeFor(fileName: string) {
   return "image/jpeg";
 }
 
-export async function GET(_req: Request, { params }: RouteContext) {
+export const GET = withApiErrors(async function GET(_req: Request, { params }: RouteContext) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { batchId, fileName } = await params;
   if (!SAFE_BATCH.test(batchId) || !SAFE_FILE.test(fileName)) {
-    return NextResponse.json({ error: "Not found." }, { status: 404 });
+    return new NotFoundError("Not found.").toResponse();
   }
 
   const root = path.resolve(PRIVATE_INGEST_UPLOAD_ROOT);
   const filePath = path.resolve(root, batchId, fileName);
   if (!filePath.startsWith(`${root}${path.sep}`)) {
-    return NextResponse.json({ error: "Not found." }, { status: 404 });
+    return new NotFoundError("Not found.").toResponse();
   }
 
   try {
@@ -42,6 +43,6 @@ export async function GET(_req: Request, { params }: RouteContext) {
       },
     });
   } catch {
-    return NextResponse.json({ error: "Not found." }, { status: 404 });
+    return new NotFoundError("Not found.").toResponse();
   }
-}
+});

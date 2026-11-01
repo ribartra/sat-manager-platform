@@ -1,0 +1,862 @@
+[
+ {
+  "table": "Question",
+  "id": "cmsjrnzyb02epqmt1fpnmbg18",
+  "field": "explanation",
+  "before": "Choice D is correct. The area of a rectangle is given by , where is the length of the rectangle and is the width of the rectangle. It's given\nthat a rectangle has a length of units and a width of units. It follows that the area of the rectangle is square units. Therefore, the\nexpression that gives the area, in square units, of this rectangle, is .\nChoice A is incorrect. This expression gives the perimeter, in units, of this rectangle.\nChoice B is incorrect and may result from conceptual errors.\nChoice C is incorrect and may result from conceptual errors.",
+  "after": "Choice D is correct. The area of a rectangle is given by $\\ell w$, where $\\ell$ is the length of the rectangle and $w$ is the width of the rectangle. It's given that a rectangle has a length of $3$ units and a width of $39$ units. It follows that the area of the rectangle is $3\\cdot 39$ square units. Therefore, the expression that gives the area, in square units, of this rectangle, is $3\\cdot 39$.\nChoice A is incorrect. This expression gives the perimeter, in units, of this rectangle.\nChoice B is incorrect and may result from conceptual errors.\nChoice C is incorrect and may result from conceptual errors.",
+  "note": "PS Geometry and Trigonometry - Area and volume EASY #10: stripped_math — restored area formula, 3 and 39, 3·39; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/AREAS AND VOLUMES/ANS Area and Volume Easy.pdf p10 (Question ID 0e40dfb0); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzr402csqmt1frwspnyz",
+  "field": "explanation",
+  "before": "The correct answer is . The circumference of a circle is equal to centimeters, where represents the radius, in centimeters, of the circle,\nand the diameter of the circle is equal to centimeters. It's given that a circle has a circumference of centimeters. Therefore, .\nDividing both sides of this equation by yields . Since the diameter of the circle is equal to centimeters, it follows that the diameter,\nin centimeters, of the circle is .",
+  "after": "The correct answer is $31$. The circumference of a circle is equal to $2\\pi r$ centimeters, where $r$ represents the radius, in centimeters, of the circle, and the diameter of the circle is equal to $2r$ centimeters. It's given that a circle has a circumference of $31\\pi$ centimeters. Therefore, $31\\pi=2\\pi r$. Dividing both sides of this equation by $\\pi$ yields $31=2r$. Since the diameter of the circle is equal to $2r$ centimeters, it follows that the diameter, in centimeters, of the circle is $31$.",
+  "note": "PS Geometry and Trigonometry - Area and volume MEDIUM #10: stripped_math — restored 31, 2πr, 31π=2πr, 31=2r; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/AREAS AND VOLUMES/ANS Area and Volume MED.pdf p11 (Question ID 38517165); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0jq02o9qmt1622n8v5v",
+  "field": "explanation",
+  "before": "Choice A is correct. A circle has 360 degrees of arc. In the circle shown, O is the center of the circle and is a central angle of the circle.\nFrom the figure, the two diameters that meet to form are perpendicular, so the measure of is . Therefore, the length of\nminor arc is of the circumference of the circle. Since the circumference of the circle is 36, the length of minor arc is\n.\nChoices B, C, and D are incorrect. The perpendicular diameters divide the circumference of the circle into four equal arcs; therefore, minor arc\nis of the circumference. However, the lengths in choices B and C are, respectively, and the circumference of the circle, and the\nlength in choice D is the length of the entire circumference. None of these lengths is the circumference.",
+  "after": "Choice A is correct. A circle has 360 degrees of arc. In the circle shown, O is the center of the circle and $\\angle AOC$ is a central angle of the circle. From the figure, the two diameters that meet to form $\\angle AOC$ are perpendicular, so the measure of $\\angle AOC$ is $90^\\circ$. Therefore, the length of minor arc $\\widehat{AC}$ is $\\frac{90}{360}$ of the circumference of the circle. Since the circumference of the circle is 36, the length of minor arc $\\widehat{AC}$ is $\\frac{90}{360}\\times 36=9$.\nChoices B, C, and D are incorrect. The perpendicular diameters divide the circumference of the circle into four equal arcs; therefore, minor arc $\\widehat{AC}$ is $\\frac{1}{4}$ of the circumference. However, the lengths in choices B and C are, respectively, $\\frac{1}{3}$ and $\\frac{1}{2}$ the circumference of the circle, and the length in choice D is the length of the entire circumference. None of these lengths is $\\frac{1}{4}$ the circumference.",
+  "note": "PS Geometry and Trigonometry - Circles EASY #2: stripped_math — restored ∠AOC, 90°, arc AC, 90/360×36=9, 1/4, 1/3, 1/2; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/CIRCLES/ANS Circles EASY.pdf p2 (Question ID 23c5fcce); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0ym02ukqmt1zm4p2vnm",
+  "field": "explanation",
+  "before": "The correct answer is 11. A circle with equation , where a, b, and r are constants, has center and radius r.\nTherefore, the radius of the given circle is , or 11.",
+  "after": "The correct answer is 11. A circle with equation $(x-a)^2+(y-b)^2=r^2$, where a, b, and r are constants, has center $(a,b)$ and radius r. Therefore, the radius of the given circle is $\\sqrt{121}$, or 11.",
+  "note": "PS Geometry and Trigonometry - Circles HARD #11: stripped_math — restored standard circle equation, (a,b), √121; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/CIRCLES/ANS Circles HARD.pdf p11 (Question ID ab176ad6); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0yu02umqmt1678vv1mk",
+  "field": "explanation",
+  "before": "Choice D is correct. It's given that the circle is a unit circle, which means the circle has a radius of . It's also given that point is the center of\nthe circle and has coordinates and that point lies on the circle and has coordinates . Since the radius of the circle is , the value\nof must be , as all other points with an x-coordinate of are a distance greater than away from point . Since and are points on the\nunit circle centered at , let side be the starting side of the angle and side be the terminal side of the angle. Since side is on the\npositive x-axis and side is on the negative x-axis, side is half of a rotation around the unit circle, or radians, away from side .\nTherefore, the positive measure of angle , in radians, is equal to plus an integer multiple of . In other words, the positive measure of\nangle , in radians, is an odd integer multiple of . Of the given choices, only is an odd integer multiple of .\nChoice A is incorrect. This could be the positive measure of an angle where the starting side is and the terminal side contains the point\n, not .\nChoice B is incorrect. This could be the positive measure of an angle where the starting side is and the terminal side contains the point\n, not .\nChoice C is incorrect. This could be the positive measure of an angle where the starting side is and the terminal side contains the point\n, not .",
+  "after": "Choice D is correct. It's given that the circle is a unit circle, which means the circle has a radius of $1$. It's also given that point $G$ is the center of the circle and has coordinates $(0,0)$ and that point $H$ lies on the circle and has coordinates $(-1,y)$. Since the radius of the circle is $1$, the value of $y$ must be $0$, as all other points with an x-coordinate of $-1$ are a distance greater than $1$ away from point $G$. Since $F$ and $H$ are points on the unit circle centered at $G$, let side $FG$ be the starting side of the angle and side $GH$ be the terminal side of the angle. Since side $FG$ is on the positive x-axis and side $GH$ is on the negative x-axis, side $FG$ is half of a rotation around the unit circle, or $\\pi$ radians, away from side $GH$. Therefore, the positive measure of angle $FGH$, in radians, is equal to $\\pi$ plus an integer multiple of $2\\pi$. In other words, the positive measure of angle $FGH$, in radians, is an odd integer multiple of $\\pi$. Of the given choices, only $25\\pi$ is an odd integer multiple of $\\pi$.\nChoice A is incorrect. This could be the positive measure of an angle where the starting side is $FG$ and the terminal side contains the point $(0,-1)$, not $(-1,0)$.\nChoice B is incorrect. This could be the positive measure of an angle where the starting side is $FG$ and the terminal side contains the point $(0,1)$, not $(-1,0)$.\nChoice C is incorrect. This could be the positive measure of an angle where the starting side is $FG$ and the terminal side contains the point $(1,0)$, not $(-1,0)$.",
+  "note": "PS Geometry and Trigonometry - Circles HARD #13: stripped_math — restored unit circle points F,G,H, coordinates, π, 2π, 25π; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/CIRCLES/ANS Circles HARD.pdf p13 (Question ID 35d37640); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0z402uoqmt15f1z1kge",
+  "field": "explanation",
+  "before": "Choice B is correct. Because segments OA and OB are radii of the circle centered at point O, these segments have equal lengths. Therefore,\ntriangle AOB is an isosceles triangle, where angles OAB and OBA are congruent base angles of the triangle. It’s given that angle OAB measures\n. Therefore, angle OBA also measures . Let represent the measure of angle AOB. Since the sum of the measures of the three\nangles of any triangle is , it follows that , or . Subtracting from both sides of this\nequation yields , or radians. Therefore, the measure of angle AOB, and thus the measure of arc , is radians. Since\nis a radius of the given circle and its length is 18, the length of the radius of the circle is 18. Therefore, the length of arc can be\ncalculated as , or .\nChoices A, C, and D are incorrect and may result from conceptual or computational errors.",
+  "after": "Choice B is correct. Because segments OA and OB are radii of the circle centered at point O, these segments have equal lengths. Therefore, triangle AOB is an isosceles triangle, where angles OAB and OBA are congruent base angles of the triangle. It’s given that angle OAB measures $30^\\circ$. Therefore, angle OBA also measures $30^\\circ$. Let $x^\\circ$ represent the measure of angle AOB. Since the sum of the measures of the three angles of any triangle is $180^\\circ$, it follows that $30^\\circ+30^\\circ+x^\\circ=180^\\circ$, or $60^\\circ+x^\\circ=180^\\circ$. Subtracting $60^\\circ$ from both sides of this equation yields $x^\\circ=120^\\circ$, or $\\frac{2\\pi}{3}$ radians. Therefore, the measure of angle AOB, and thus the measure of arc $\\widehat{AB}$, is $\\frac{2\\pi}{3}$ radians. Since $\\overline{OC}$ is a radius of the given circle and its length is 18, the length of the radius of the circle is 18. Therefore, the length of arc $\\widehat{AB}$ can be calculated as $\\left(\\frac{2\\pi}{3}\\right)(18)$, or $12\\pi$.\nChoices A, C, and D are incorrect and may result from conceptual or computational errors.",
+  "note": "PS Geometry and Trigonometry - Circles HARD #15: stripped_math — restored 30°, x°, 180° sums, 2π/3, arc AB, OC, (2π/3)(18)=12π; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/CIRCLES/ANS Circles HARD.pdf p15 (Question ID 69b0d79d); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro05y02hhqmt1z27xhrx5",
+  "field": "explanation",
+  "before": "The correct answer is 4. There are radians in a angle. An angle measure of is 4 times greater than an angle measure of .\nTherefore, the number of radians in a angle is .",
+  "after": "The correct answer is 4. There are $\\pi$ radians in a $180^\\circ$ angle. An angle measure of $720^\\circ$ is 4 times greater than an angle measure of $180^\\circ$. Therefore, the number of radians in a $720^\\circ$ angle is $4\\pi$.",
+  "note": "PS Geometry and Trigonometry - Circles MEDIUM #7: stripped_math — restored π, 180°, 720°, 4π; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/CIRCLES/ANS Circles MED.pdf p7 (Question ID 8e7689e0); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0rs02r3qmt1wn9gbsj6",
+  "field": "explanation",
+  "before": "Choice D is correct. It's given that lines and are parallel. Since line intersects both lines and , it's a transversal. The angles in the figure\nmarked as and are on the same side of the transversal, where one is an interior angle with line as a side, and the other is an exterior\nangle with line as a side. Thus, the marked angles are corresponding angles. When two parallel lines are intersected by a transversal,\ncorresponding angles are congruent and, therefore, have equal measure. It follows that . Therefore, the value of is .\nChoice A is incorrect and may result from conceptual or calculation errors.\nChoice B is incorrect and may result from conceptual or calculation errors.\nChoice C is incorrect and may result from conceptual or calculation errors.",
+  "after": "Choice D is correct. It's given that lines $m$ and $n$ are parallel. Since line $t$ intersects both lines $m$ and $n$, it's a transversal. The angles in the figure marked as $170^\\circ$ and $w^\\circ$ are on the same side of the transversal, where one is an interior angle with line $m$ as a side, and the other is an exterior angle with line $n$ as a side. Thus, the marked angles are corresponding angles. When two parallel lines are intersected by a transversal, corresponding angles are congruent and, therefore, have equal measure. It follows that $w^\\circ=170^\\circ$. Therefore, the value of $w$ is $170$.\nChoice A is incorrect and may result from conceptual or calculation errors.\nChoice B is incorrect and may result from conceptual or calculation errors.\nChoice C is incorrect and may result from conceptual or calculation errors.",
+  "note": "PS Geometry and Trigonometry - Lines, angles, and triangles EASY #1: stripped_math — restored lines m,n,t, 170°, w°=170°; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/LINES ANGLES TRIANGLES/ANS Lines Angles Triangles EASY.pdf p1 (Question ID 5207e508); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzx502dvqmt1vvfsd1x3",
+  "field": "explanation",
+  "before": "Choice C is correct. Since , it follows that is an isosceles triangle with base RU. Therefore, and are the\nbase angles of an isosceles triangle and are congruent. Let the measures of both and be . According to the triangle sum\ntheorem, the sum of the measures of the three angles of a triangle is . Therefore, , so .\nNote that is the same angle as . Thus, the measure of is . According to the triangle exterior angle theorem, an\nexternal angle of a triangle is equal to the sum of the opposite interior angles. Therefore, is equal to the sum of the measures of\nand ; that is, . Thus, the value of x is 64.\nChoice B is incorrect. This is the measure of , but is not congruent to . Choices A and D are incorrect and may result\nfrom a calculation error.",
+  "after": "Choice C is correct. Since $RT=TU$, it follows that $\\triangle RTU$ is an isosceles triangle with base RU. Therefore, $\\angle TRU$ and $\\angle TUR$ are the base angles of an isosceles triangle and are congruent. Let the measures of both $\\angle TRU$ and $\\angle TUR$ be $t^\\circ$. According to the triangle sum theorem, the sum of the measures of the three angles of a triangle is $180^\\circ$. Therefore, $114^\\circ+2t^\\circ=180^\\circ$, so $t=33$.\nNote that $\\angle TUR$ is the same angle as $\\angle SUV$. Thus, the measure of $\\angle SUV$ is $33^\\circ$. According to the triangle exterior angle theorem, an external angle of a triangle is equal to the sum of the opposite interior angles. Therefore, $x^\\circ$ is equal to the sum of the measures of $\\angle VSU$ and $\\angle SUV$; that is, $31^\\circ+33^\\circ=64^\\circ$. Thus, the value of x is 64.\nChoice B is incorrect. This is the measure of $\\angle STR$, but $\\angle STR$ is not congruent to $\\angle SVR$. Choices A and D are incorrect and may result from a calculation error.",
+  "note": "PS Geometry and Trigonometry - Lines, angles, and triangles HARD #12: stripped_math — restored RT=TU, angle names, 114°+2t°=180°, t=33, 31°+33°=64°; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/LINES ANGLES TRIANGLES/ANS Lines Angles Triangles HARD.pdf p12 (Question ID bd7f6e30); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzw402drqmt1aassoc9v",
+  "field": "explanation",
+  "before": "The correct answer is . In the figure, lines , , and form a triangle. One interior angle of this triangle is vertical to the angle marked ;\ntherefore, the interior angle also has measure . It's given that . Therefore, the interior angle of the triangle has measure . A second\ninterior angle of the triangle forms a straight line, , with the angle marked . Therefore, the sum of the measures of these two angles is .\nIt's given that . Therefore, the angle marked has measure and the second interior angle of the triangle has measure\n, or . The sum of the interior angles of a triangle is . Therefore, the measure of the third interior angle of the triangle is\n, or . It's given that parallel lines and are intersected by line . It follows that the triangle's interior angle with measure\nis congruent to the same side interior angle between lines and formed by lines and . Since this angle is supplementary to the two\nangles marked , the sum of , , and is . It follows that , or . Subtracting from both sides\nof this equation yields . Dividing both sides of this equation by yields . Note that 101/2 and 50.5 are examples of ways to\nenter a correct answer.",
+  "after": "The correct answer is $\\frac{101}{2}$. In the figure, lines $q$, $r$, and $s$ form a triangle. One interior angle of this triangle is vertical to the angle marked $a^\\circ$; therefore, the interior angle also has measure $a^\\circ$. It's given that $a=43$. Therefore, the interior angle of the triangle has measure $43^\\circ$. A second interior angle of the triangle forms a straight line, $q$, with the angle marked $b^\\circ$. Therefore, the sum of the measures of these two angles is $180^\\circ$. It's given that $b=122$. Therefore, the angle marked $b^\\circ$ has measure $122^\\circ$ and the second interior angle of the triangle has measure $(180-122)^\\circ$, or $58^\\circ$. The sum of the interior angles of a triangle is $180^\\circ$. Therefore, the measure of the third interior angle of the triangle is $(180-43-58)^\\circ$, or $79^\\circ$. It's given that parallel lines $q$ and $t$ are intersected by line $r$. It follows that the triangle's interior angle with measure $79^\\circ$ is congruent to the same side interior angle between lines $q$ and $t$ formed by lines $t$ and $r$. Since this angle is supplementary to the two angles marked $w^\\circ$, the sum of $79^\\circ$, $w^\\circ$, and $w^\\circ$ is $180^\\circ$. It follows that $79+w+w=180$, or $79+2w=180$. Subtracting $79$ from both sides of this equation yields $2w=101$. Dividing both sides of this equation by $2$ yields $w=\\frac{101}{2}$. Note that 101/2 and 50.5 are examples of ways to enter a correct answer.",
+  "note": "PS Geometry and Trigonometry - Lines, angles, and triangles HARD #8: stripped_math — restored 101/2, lines q,r,s,t, a°,b°,w°, angle arithmetic; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/LINES ANGLES TRIANGLES/ANS Lines Angles Triangles HARD.pdf p8 (Question ID 17912810); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro01p02ggqmt1k54mow12",
+  "field": "explanation",
+  "before": "Choice B is correct. By the Pythagorean theorem, if a right triangle has a hypotenuse with length and legs with lengths and , then\n. It's given in the right triangle shown that the legs have lengths of and and the hypotenuse has a length of . Substituting for , for ,\nand for in yields , or . Taking the square root of both sides of this equation yields . Since\nthe length of a side of a triangle must be positive, the value of is , which is approximately equal to . Of the choices, is the\nclosest to the value of .\nChoice A is incorrect and may result from conceptual or calculation errors.\nChoice C is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "after": "Choice B is correct. By the Pythagorean theorem, if a right triangle has a hypotenuse with length $t$ and legs with lengths $r$ and $s$, then $r^2+s^2=t^2$. It's given in the right triangle shown that the legs have lengths of $9$ and $6$ and the hypotenuse has a length of $c$. Substituting $9$ for $r$, $6$ for $s$, and $c$ for $t$ in $r^2+s^2=t^2$ yields $9^2+6^2=c^2$, or $117=c^2$. Taking the square root of both sides of this equation yields $\\pm\\sqrt{117}=c$. Since the length of a side of a triangle must be positive, the value of $c$ is $\\sqrt{117}$, which is approximately equal to $10.8167$. Of the choices, $10.8$ is the closest to the value of $c$.\nChoice A is incorrect and may result from conceptual or calculation errors.\nChoice C is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "note": "PS Geometry and Trigonometry - Right triangles and trigonometry EASY #3: stripped_math — restored Pythagorean r²+s²=t², 9, 6, c, 117=c², √117≈10.8167, 10.8; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/RIGHT TRIANGLES AND TRIGONOMETRY/ANS Right Triangles and Trig EASY.pdf p3 (Question ID 36661021); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro01u02ghqmt1h6yc6n9h",
+  "field": "explanation",
+  "before": "Choice A is correct. Since the two acute angles have the same measure and the third angle is a right angle, the triangle shown is an isosceles\nright triangle. In an isosceles right triangle, the two legs have the same length. The figure shows that the length of one leg of the triangle is\nand the length of the other leg of the triangle is . It follows that the value of is .\nChoice B is incorrect. This is the measure, in degrees, of one of the angles shown.\nChoice C is incorrect and may result from conceptual errors.\nChoice D is incorrect and may result from conceptual errors.",
+  "after": "Choice A is correct. Since the two acute angles have the same measure and the third angle is a right angle, the triangle shown is an isosceles right triangle. In an isosceles right triangle, the two legs have the same length. The figure shows that the length of one leg of the triangle is $24$ and the length of the other leg of the triangle is $x$. It follows that the value of $x$ is $24$.\nChoice B is incorrect. This is the measure, in degrees, of one of the angles shown.\nChoice C is incorrect and may result from conceptual errors.\nChoice D is incorrect and may result from conceptual errors.",
+  "note": "PS Geometry and Trigonometry - Right triangles and trigonometry EASY #4: stripped_math — restored 24, x, x is 24; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/RIGHT TRIANGLES AND TRIGONOMETRY/ANS Right Triangles and Trig EASY.pdf p4 (Question ID 145337bc); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnz8q027xqmt1r7q5jztz",
+  "field": "explanation",
+  "before": "The correct answer is 24. Multiplying both sides of the given equation by 3 yields . Using the distributive property to rewrite the\nleft-hand side of this equation yields .",
+  "after": "The correct answer is 24. Multiplying both sides of the given equation by 3 yields $3(3x+2)=24$. Using the distributive property to rewrite the left-hand side of this equation yields $9x+6=24$.",
+  "note": "PS Algebra - Linear equations in one variable - EASY #15: stripped_math — restored 3(3x+2)=24, 9x+6=24; joined hard line break",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR EQUATIONS ONE VARIABLE/ANS Linear Eq. One Variable EASY.pdf p15 (Question ID 4f7981a0); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnyo40205qmt1njo0htjg",
+  "field": "explanation",
+  "before": "Choice B is correct. It is given that the width of the dance floor is w feet. The length is 6 feet longer than the width; therefore, the length of the\ndance floor is . So the perimeter is .\nChoice A is incorrect because it is the sum of one length and one width, which is only half the perimeter. Choice C is incorrect and may result\nfrom using the formula for the area instead of the formula for the perimeter and making a calculation error. Choice D is incorrect because this is\nthe area, not the perimeter, of the dance floor.",
+  "after": "Choice B is correct. It is given that the width of the dance floor is w feet. The length is 6 feet longer than the width; therefore, the length of the dance floor is $w+6$. So the perimeter is $w+w+(w+6)+(w+6)=4w+12$.\nChoice A is incorrect because it is the sum of one length and one width, which is only half the perimeter. Choice C is incorrect and may result from using the formula for the area instead of the formula for the perimeter and making a calculation error. Choice D is incorrect because this is the area, not the perimeter, of the dance floor.",
+  "note": "PS Algebra - Linear equations in one variable - MEDIUM #16: stripped_math — restored w+6, perimeter sum = 4w+12; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR EQUATIONS ONE VARIABLE/ANS Linear Eq One Variable MED.pdf p17 (Question ID 5ad9eff0); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnyna01zgqmt1owydghx4",
+  "field": "explanation",
+  "before": "Choice C is correct. Subtracting from both sides of the given equation yields . Therefore, the value of is .\nChoice A is incorrect and may result from conceptual or calculation errors.\nChoice B is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "after": "Choice C is correct. Subtracting $16$ from both sides of the given equation yields $30=2(x-8)$. Therefore, the value of $2(x-8)$ is $30$.\nChoice A is incorrect and may result from conceptual or calculation errors.\nChoice B is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "note": "PS Algebra - Linear equations in one variable - MEDIUM #6: stripped_math — restored 16, 30=2(x-8), 2(x-8), 30",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR EQUATIONS ONE VARIABLE/ANS Linear Eq One Variable MED.pdf p7 (Question ID 018a2704); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnyz2023vqmt1hfxur4ls",
+  "field": "explanation",
+  "before": "Choice C is correct. Each of the given choices gives three values of : , , and . Substituting for in the given equation yields\n, or . Therefore, when , the corresponding value of for the given equation is . Substituting for in the given equation\nyields , or . Therefore, when , the corresponding value of for the given equation is . Substituting for in the\ngiven equation yields , or . Therefore, when , the corresponding value of for the given equation is . Choice C\ngives three values of , , , and , and their corresponding values of , , , and , respectively, for the given equation.\nChoice A is incorrect. This table gives three values of and their corresponding values of for the equation .\nChoice B is incorrect. This table gives three values of and their corresponding values of for the equation .\nChoice D is incorrect. This table gives three values of and their corresponding values of for the equation .",
+  "after": "Choice C is correct. Each of the given choices gives three values of $x$: $0$, $1$, and $2$. Substituting $0$ for $x$ in the given equation yields $y = -4(0) + 40$, or $y = 40$. Therefore, when $x = 0$, the corresponding value of $y$ for the given equation is $40$. Substituting $1$ for $x$ in the given equation yields $y = -4(1) + 40$, or $y = 36$. Therefore, when $x = 1$, the corresponding value of $y$ for the given equation is $36$. Substituting $2$ for $x$ in the given equation yields $y = -4(2) + 40$, or $y = 32$. Therefore, when $x = 2$, the corresponding value of $y$ for the given equation is $32$. Choice C gives three values of $x$, $0$, $1$, and $2$, and their corresponding values of $y$, $40$, $36$, and $32$, respectively, for the given equation.\nChoice A is incorrect. This table gives three values of $x$ and their corresponding values of $y$ for the equation $y = -4x$.\nChoice B is incorrect. This table gives three values of $x$ and their corresponding values of $y$ for the equation $y = 4x + 40$.\nChoice D is incorrect. This table gives three values of $x$ and their corresponding values of $y$ for the equation $y = 4x$.",
+  "note": "PS Algebra - Linear equations in two variables - EASY #11: stripped_math — restored x-values 0,1,2, y=-4x+40 substitutions, 40/36/32, choice equations; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR EQUATIONS TWO VARIABLES/ANS Linear Eq TWO Variables EASY.pdf p10 (Question ID e7343559); rendered page transcribed; ingest candidate LaTeX used for expressions (bare numbers it left unwrapped wrapped as math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnyzc0242qmt1i4701xav",
+  "field": "explanation",
+  "before": "Choice A is correct. To verify which table represents this linear relationship, the values in each table can be checked by substituting them into the\ngiven equation. The table in choice A shows that when , . Substituting these values into the given equation yields\n, or , which is true. Additionally, the table in choice A shows that when , . Substituting these values into the given\nequation yields , or , which is true. Finally, the table in choice A shows that when , . Substituting\nthese values into the given equation yields , or , which is true. Therefore, the table in choice A gives three\nvalues of and their corresponding values of .\nChoice B is incorrect. The table in choice B shows that when , . Substituting these values into the given equation yields\n, or , which is not true.\nChoice C is incorrect. The table in choice C shows that when , . Substituting these values into the given equation yields\n, or , which is not true.\nChoice D is incorrect. The table in choice D shows that when , . Substituting these values into the given equation yields\n, or , which is not true.",
+  "after": "Choice A is correct. To verify which table represents this linear relationship, the values in each table can be checked by substituting them into the given equation. The table in choice A shows that when $x = 0$, $y = 21$. Substituting these values into the given equation yields $7(0) - 4(21) = -84$, or $-84 = -84$, which is true. Additionally, the table in choice A shows that when $x = 4$, $y = 28$. Substituting these values into the given equation yields $7(4) - 4(28) = -84$, or $-84 = -84$, which is true. Finally, the table in choice A shows that when $x = 8$, $y = 35$. Substituting these values into the given equation yields $7(8) - 4(35) = -84$, or $-84 = -84$, which is true. Therefore, the table in choice A gives three values of $x$ and their corresponding values of $y$.\nChoice B is incorrect. The table in choice B shows that when $x = 0$, $y = 35$. Substituting these values into the given equation yields $7(0) - 4(35) = -84$, or $-140 = -84$, which is not true.\nChoice C is incorrect. The table in choice C shows that when $x = 21$, $y = 0$. Substituting these values into the given equation yields $7(21) - 4(0) = -84$, or $147 = -84$, which is not true.\nChoice D is incorrect. The table in choice D shows that when $x = 21$, $y = 8$. Substituting these values into the given equation yields $7(21) - 4(8) = -84$, or $115 = -84$, which is not true.",
+  "note": "PS Algebra - Linear equations in two variables - EASY #14: stripped_math — restored x/y table values and 7x-4y=-84 substitutions per choice; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR EQUATIONS TWO VARIABLES/ANS Linear Eq TWO Variables EASY.pdf p13 (Question ID cea27ab2); rendered page transcribed; ingest candidate LaTeX used for expressions (bare numbers it left unwrapped wrapped as math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnyy50236qmt1v9z1mkq0",
+  "field": "explanation",
+  "before": "Choice A is correct. Substituting for into the given equation yields , or . Therefore, when , the corresponding value of\nfor the given equation is . Substituting for into the given equation yields , or . Therefore, when , the corresponding\nvalue of for the given equation is . Substituting for into the given equation yields , or . Therefore, when , the\ncorresponding value of for the given equation is . Of the choices given, only the table in choice A gives these three values of and their\ncorresponding values of for the given equation.\nChoice B is incorrect. This table gives three values of and their corresponding values of for the equation .\nChoice C is incorrect. This table gives three values of and their corresponding values of for the equation .\nChoice D is incorrect. This table gives three values of and their corresponding values of for the equation .",
+  "after": "Choice A is correct. Substituting $0$ for $x$ into the given equation yields $y = 0 + 4$, or $y = 4$. Therefore, when $x = 0$, the corresponding value of $y$ for the given equation is $4$. Substituting $1$ for $x$ into the given equation yields $y = 1 + 4$, or $y = 5$. Therefore, when $x = 1$, the corresponding value of $y$ for the given equation is $5$. Substituting $2$ for $x$ into the given equation yields $y = 2 + 4$, or $y = 6$. Therefore, when $x = 2$, the corresponding value of $y$ for the given equation is $6$. Of the choices given, only the table in choice A gives these three values of $x$ and their corresponding values of $y$ for the given equation.\nChoice B is incorrect. This table gives three values of $x$ and their corresponding values of $y$ for the equation $y = -x + 6$.\nChoice C is incorrect. This table gives three values of $x$ and their corresponding values of $y$ for the equation $y = -x + 2$.\nChoice D is incorrect. This table gives three values of $x$ and their corresponding values of $y$ for the equation $y = x$.",
+  "note": "PS Algebra - Linear equations in two variables - EASY #2: stripped_math — restored y=x+4 substitutions 0/1/2 -> 4/5/6, choice equations; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR EQUATIONS TWO VARIABLES/ANS Linear Eq TWO Variables EASY.pdf p1 (Question ID 83f2c3bf); rendered page transcribed; ingest candidate LaTeX used for expressions (bare numbers it left unwrapped wrapped as math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnz06024aqmt1t311rf6s",
+  "field": "explanation",
+  "before": "Choice A is correct. Each of the given choices gives three values of : , , and . Substituting for in the given equation yields\n, or . Therefore, when , the corresponding value of for the given equation is . Substituting for in the given equation yields\n, or . Therefore, when , the corresponding value of for the given equation is . Substituting for in the given\nequation yields , or . Therefore, when , the corresponding value of for the given equation is . Thus, if the\nthree values of are , , and , then their corresponding values of are , , and , respectively, for the given equation.\nChoice B is incorrect. This table gives three values of and their corresponding values of for the equation .\nChoice C is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "after": "Choice A is correct. Each of the given choices gives three values of $x$: $0$, $2$, and $4$. Substituting $0$ for $x$ in the given equation yields $y = 70(0) + 8$, or $y = 8$. Therefore, when $x = 0$, the corresponding value of $y$ for the given equation is $8$. Substituting $2$ for $x$ in the given equation yields $y = 70(2) + 8$, or $y = 148$. Therefore, when $x = 2$, the corresponding value of $y$ for the given equation is $148$. Substituting $4$ for $x$ in the given equation yields $y = 70(4) + 8$, or $y = 288$. Therefore, when $x = 4$, the corresponding value of $y$ for the given equation is $288$. Thus, if the three values of $x$ are $0$, $2$, and $4$, then their corresponding values of $y$ are $8$, $148$, and $288$, respectively, for the given equation.\nChoice B is incorrect. This table gives three values of $x$ and their corresponding values of $y$ for the equation $y = 4x + 70$.\nChoice C is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "note": "PS Algebra - Linear equations in two variables - EASY #22: stripped_math — restored y=70x+8 substitutions 0/2/4 -> 8/148/288, choice B equation; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR EQUATIONS TWO VARIABLES/ANS Linear Eq TWO Variables EASY.pdf p22 (Question ID 1efd8202); rendered page transcribed; ingest candidate LaTeX used for expressions (bare numbers it left unwrapped wrapped as math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzgy02bdqmt1rgy2w8oa",
+  "field": "explanation",
+  "before": "Choice D is correct. The linear relationship between and can be represented by the equation , where is the slope of the graph\nof this equation in the xy-plane and is the y-coordinate of the y-intercept. The slope of a line between any two points and on\nthe line can be calculated using the slope formula . Based on the table, the graph contains the points and .\nSubstituting and for and , respectively, in the slope formula yields , which is equivalent to\n, or . Substituting for , for , and for in the equation yields , or\n. Adding to both sides of this equation yields . Therefore, and . Substituting for and for in the equation\nyields . Thus, the equation represents the linear relationship between and . It's also given that the\ngraph of the linear equation representing this relationship in the xy-plane passes through the point . Substituting for and for in the\nequation yields , which is equivalent to , or .\nChoice A is incorrect and may result from conceptual or calculation errors.\nChoice B is incorrect and may result from conceptual or calculation errors.\nChoice C is incorrect and may result from conceptual or calculation errors.",
+  "after": "Choice D is correct. The linear relationship between $x$ and $y$ can be represented by the equation $y=mx+b$, where $m$ is the slope of the graph of this equation in the xy-plane and $b$ is the y-coordinate of the y-intercept. The slope of a line between any two points $(x_1, y_1)$ and $(x_2, y_2)$ on the line can be calculated using the slope formula $m=\\frac{y_2-y_1}{x_2-x_1}$. Based on the table, the graph contains the points $(-18, -48)$ and $(7, 52)$. Substituting $(-18, -48)$ and $(7, 52)$ for $(x_1, y_1)$ and $(x_2, y_2)$, respectively, in the slope formula yields $m=\\frac{52-(-48)}{7-(-18)}$, which is equivalent to $m=\\frac{100}{25}$, or $m=4$. Substituting $4$ for $m$, $-18$ for $x$, and $-48$ for $y$ in the equation $y=mx+b$ yields $-48=4(-18)+b$, or $-48=-72+b$. Adding $72$ to both sides of this equation yields $24=b$. Therefore, $m=4$ and $b=24$. Substituting $4$ for $m$ and $24$ for $b$ in the equation $y=mx+b$ yields $y=4x+24$. Thus, the equation $y=4x+24$ represents the linear relationship between $x$ and $y$. It's also given that the graph of the linear equation representing this relationship in the xy-plane passes through the point $\\left(\\frac{1}{7}, a\\right)$. Substituting $\\frac{1}{7}$ for $x$ and $a$ for $y$ in the equation $y=4x+24$ yields $a=4\\left(\\frac{1}{7}\\right)+24$, which is equivalent to $a=\\frac{4}{7}+\\frac{168}{7}$, or $a=\\frac{172}{7}$.\nChoice A is incorrect and may result from conceptual or calculation errors.\nChoice B is incorrect and may result from conceptual or calculation errors.\nChoice C is incorrect and may result from conceptual or calculation errors.",
+  "note": "PS Algebra - Linear equations in two variables - HARD #1: stripped_math — restored y=mx+b, slope formula, points (-18,-48),(7,52), m=4, b=24, y=4x+24, a=172/7; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR EQUATIONS TWO VARIABLES/ANS Linear Eq TWO Variables HARD.pdf p1 (Question ID 49800634); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnymm01yuqmt1k6h2o9n3",
+  "field": "explanation",
+  "before": "Choice B is correct. A line in the xy-plane can be written as , where is the slope of the line and is the y-coordinate of the y-\nintercept. The graph shown is a line passing through the points and . Substituting for and for in the equation\nyields , or . Substituting for , for , and for in the equation yields .\nSubtracting from both sides of this equation yields . Dividing both sides of this equation by yields , or .\nSubstituting for and for in the equation yields . Multiplying both sides of this equation by yields\n, or . Adding to both sides of this equation yields . Therefore, the equation\nrepresents the relationship between and modeled by the graph.\nChoice A is incorrect. The point is not on the graph of this equation, since , not .\nChoice C is incorrect. The point is not on the graph of this equation, since , not .\nChoice D is incorrect. The point is not on the graph of this equation, since , not .",
+  "after": "Choice B is correct. A line in the xy-plane can be written as $y=mx+b$, where $m$ is the slope of the line and $b$ is the y-coordinate of the y-intercept. The graph shown is a line passing through the points $(0, 35)$ and $(90, 0)$. Substituting $0$ for $x$ and $35$ for $y$ in the equation $y=mx+b$ yields $35=m(0)+b$, or $35=b$. Substituting $35$ for $b$, $90$ for $x$, and $0$ for $y$ in the equation $y=mx+b$ yields $0=90m+35$. Subtracting $35$ from both sides of this equation yields $-35=90m$. Dividing both sides of this equation by $90$ yields $-\\frac{35}{90}=m$, or $-\\frac{7}{18}=m$. Substituting $-\\frac{7}{18}$ for $m$ and $35$ for $b$ in the equation $y=mx+b$ yields $y=-\\frac{7}{18}x+35$. Multiplying both sides of this equation by $18$ yields $18y=-7x+35(18)$, or $18y=-7x+630$. Adding $7x$ to both sides of this equation yields $7x+18y=630$. Therefore, the equation $7x+18y=630$ represents the relationship between $x$ and $y$ modeled by the graph.\nChoice A is incorrect. The point $(0, 35)$ is not on the graph of this equation, since $7(0)+18=18$, not $35$.\nChoice C is incorrect. The point $(0, 35)$ is not on the graph of this equation, since $18(0)+7=7$, not $35$.\nChoice D is incorrect. The point $(90, 0)$ is not on the graph of this equation, since $18(90)+7(0)=1{,}620$, not $630$.",
+  "note": "PS Algebra - Linear equations in two variables - MEDIUM #26: stripped_math — restored y=mx+b, points (0,35),(90,0), m=-7/18, 7x+18y=630, choice checks; joined hard line breaks (incl. y-/intercept)",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR EQUATIONS TWO VARIABLES/ANS Linear Eq TWO Variables MED.pdf p26 (Question ID 00b9bd37); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzdm029iqmt14vy8g7wy",
+  "field": "explanation",
+  "before": "Choice C is correct. It’s given that represents the population of snow leopards t years after 1990. corresponds to\nand . It follows that corresponds to 30 years after 1990, or 2020. Thus, the best interpretation of is that the\nsnow leopard population in this area is predicted to be 550 in the year 2020.\nChoices A and B are incorrect and may result from reversing the interpretations of t and . Choice D is incorrect and may result from\ndetermining that 30 years after 1990 is 2030, not 2020.",
+  "after": "Choice C is correct. It’s given that $P(t)$ represents the population of snow leopards t years after 1990. $P(30)=550$ corresponds to $t=30$ and $P(t)=550$. It follows that $t=30$ corresponds to 30 years after 1990, or 2020. Thus, the best interpretation of $P(30)=550$ is that the snow leopard population in this area is predicted to be 550 in the year 2020.\nChoices A and B are incorrect and may result from reversing the interpretations of t and $P(t)$. Choice D is incorrect and may result from determining that 30 years after 1990 is 2030, not 2020.",
+  "note": "PS Algebra - Linear functions - EASY #19: stripped_math — restored P(t), P(30)=550, t=30, P(t)=550; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR FUNCTIONS/ANS Linear Functions EASY.pdf p20 (Question ID 8643d906); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnz980286qmt1rkl8gmbu",
+  "field": "explanation",
+  "before": "Choice C is correct. If , then .\nChoice A is incorrect and may result from not multiplying x by 2 in the numerator. Choice B is incorrect and may result from dividing 2x by 3 and\nthen subtracting 1. Choice D is incorrect and may result from evaluating only the numerator 2x – 1.",
+  "after": "Choice C is correct. If $f(x)=\\frac{2x-1}{3}$, then $f(5)=\\frac{2(5)-1}{3}=\\frac{10-1}{3}=\\frac{9}{3}=3$.\nChoice A is incorrect and may result from not multiplying x by 2 in the numerator. Choice B is incorrect and may result from dividing 2x by 3 and then subtracting 1. Choice D is incorrect and may result from evaluating only the numerator 2x – 1.",
+  "note": "PS Algebra - Linear functions - EASY #3: stripped_math — restored f(x)=(2x-1)/3 and f(5) evaluation chain = 3; joined hard line break",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR FUNCTIONS/ANS Linear Functions EASY.pdf p3 (Question ID 06fc1726); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzfq02aoqmt1puhjz0l1",
+  "field": "explanation",
+  "before": "The correct answer is . The linear relationship between and can be represented by the equation , where and are\nconstants. It's given in the table that when , . Substituting for and for in the equation yields\n, which can be rewritten as . It's also given in the table that when , . Substituting for and for\nin the equation yields , which can be rewritten as . Substituting for in this equation\nyields . Adding to both sides of this equation yields . Adding to both sides of this equation\nyields . Dividing both sides of this equation by yields , or . Substituting for , for , and for in the\nequation yields , or . Adding to both sides of this equation yields . Therefore,\nand . Substituting for and for in the equation yields . Thus, the equation\nrepresents the linear relationship between and . It’s also given that the graph of the linear equation representing this relationship passes\nthrough the point . Substituting for and for in the equation yields , which is equivalent to\n, or . Note that 65/4 and 16.25 are examples of ways to enter a correct answer.",
+  "after": "The correct answer is $\\frac{65}{4}$. The linear relationship between $x$ and $y$ can be represented by the equation $y=mx+b$, where $m$ and $b$ are constants. It's given in the table that when $x=-12$, $y=-45$. Substituting $-12$ for $x$ and $-45$ for $y$ in the equation $y=mx+b$ yields $-45=-12m+b$, which can be rewritten as $-45+12m=b$. It's also given in the table that when $x=6$, $y=45$. Substituting $6$ for $x$ and $45$ for $y$ in the equation $y=mx+b$ yields $45=6m+b$, which can be rewritten as $45-6m=b$. Substituting $-45+12m$ for $b$ in this equation yields $45-6m=-45+12m$. Adding $6m$ to both sides of this equation yields $45=-45+18m$. Adding $45$ to both sides of this equation yields $90=18m$. Dividing both sides of this equation by $18$ yields $5=m$, or $m=5$. Substituting $5$ for $m$, $-12$ for $x$, and $-45$ for $y$ in the equation $y=mx+b$ yields $-45=5(-12)+b$, or $-45=-60+b$. Adding $60$ to both sides of this equation yields $15=b$. Therefore, $m=5$ and $b=15$. Substituting $5$ for $m$ and $15$ for $b$ in the equation $y=mx+b$ yields $y=5x+15$. Thus, the equation $y=5x+15$ represents the linear relationship between $x$ and $y$. It’s also given that the graph of the linear equation representing this relationship passes through the point $\\left(\\frac{1}{4}, a\\right)$. Substituting $\\frac{1}{4}$ for $x$ and $a$ for $y$ in the equation $y=5x+15$ yields $a=5\\left(\\frac{1}{4}\\right)+15$, which is equivalent to $a=\\frac{5}{4}+15$, or $a=\\frac{65}{4}$. Note that 65/4 and 16.25 are examples of ways to enter a correct answer.",
+  "note": "PS Algebra - Linear functions - HARD #16: stripped_math — restored 65/4, y=mx+b, table points (-12,-45),(6,45), system solving m=5, b=15, y=5x+15, a=65/4; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR FUNCTIONS/ANS Linear Funct HARD.pdf p16 (Question ID e25f0807); rendered page transcribed; 200 dpi render for small fractions"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnywj022mqmt1uw8ndtuz",
+  "field": "explanation",
+  "before": "Choice A is correct. The line passes through the origin. Therefore, this is a relationship of the form , where k is a constant representing\nthe slope of the graph. To find the value of k, choose a point on the graph of the line other than the origin and substitute the values of m\nand d into the equation. For example, if the point is chosen, then , and . Therefore, the equation of the line is .\nChoice B is incorrect and may result from calculating the slope of the line as the change in time over the change in distance traveled instead of\nthe change in distance traveled over the change in time. Choices C and D are incorrect because each of these equations represents a line with a\nd-intercept of 2. However, the graph shows a line with a d-intercept of 0.",
+  "after": "Choice A is correct. The line passes through the origin. Therefore, this is a relationship of the form $d=km$, where k is a constant representing the slope of the graph. To find the value of k, choose a point $(m, d)$ on the graph of the line other than the origin and substitute the values of m and d into the equation. For example, if the point $(2, 4)$ is chosen, then $4=k(2)$, and $k=2$. Therefore, the equation of the line is $d=2m$.\nChoice B is incorrect and may result from calculating the slope of the line as the change in time over the change in distance traveled instead of the change in distance traveled over the change in time. Choices C and D are incorrect because each of these equations represents a line with a d-intercept of 2. However, the graph shows a line with a d-intercept of 0.",
+  "note": "PS Algebra - Linear functions - MEDIUM #12: stripped_math — restored d=km, (m, d), (2, 4), 4=k(2), k=2, d=2m; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR FUNCTIONS/ANS Linear Funct MED.pdf p13 (Question ID 11e1ab81); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnyfq01wuqmt1u9vk6sw5",
+  "field": "explanation",
+  "before": "The correct answer is 4. The equation , where h is the number of hours the boat has been rented, can be written to represent\nthe situation. Subtracting 10 from both sides and then dividing by 60 yields . Since the boat can be rented only for whole numbers of\nhours, the maximum number of hours for which Maria can rent the boat is 4.",
+  "after": "The correct answer is 4. The equation $60h+10\\le 280$, where h is the number of hours the boat has been rented, can be written to represent the situation. Subtracting 10 from both sides and then dividing by 60 yields $h\\le 4.5$. Since the boat can be rented only for whole numbers of hours, the maximum number of hours for which Maria can rent the boat is 4.",
+  "note": "PS Algebra - Linear inequalities in one or two variables - EASY #1: stripped_math — restored 60h+10≤280, h≤4.5; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR INEQUALITIES/ANS Linear Inequalities EASY.pdf p1 (Question ID b75f7812); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnyh501xaqmt160yp3iwt",
+  "field": "explanation",
+  "before": "Choice C is correct. The mean of the four scores (G,85, 78, and 98) can be expressed as . The inequality that expresses\nthe condition that the mean score is at least 90 can therefore be written as .\nChoice A is incorrect. The sum of the scores (G,85, 78, and 98) isn’t divided by 4 to express the mean. Choice B is incorrect and may be the result\nof an algebraic error when multiplying both sides of the inequality by 4. Choice D is incorrect because it doesn’t include G in the mean with the\nother three scores.",
+  "after": "Choice C is correct. The mean of the four scores (G,85, 78, and 98) can be expressed as $\\frac{G+85+78+98}{4}$. The inequality that expresses the condition that the mean score is at least 90 can therefore be written as $\\frac{G+85+78+98}{4}\\ge 90$.\nChoice A is incorrect. The sum of the scores (G,85, 78, and 98) isn’t divided by 4 to express the mean. Choice B is incorrect and may be the result of an algebraic error when multiplying both sides of the inequality by 4. Choice D is incorrect because it doesn’t include G in the mean with the other three scores.",
+  "note": "PS Algebra - Linear inequalities in one or two variables - EASY #9: stripped_math — restored (G+85+78+98)/4 and ≥90 inequality; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR INEQUALITIES/ANS Linear Inequalities EASY.pdf p9 (Question ID df32b09c); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnyod020cqmt1oc8tvc2z",
+  "field": "explanation",
+  "before": "Choice C is correct. Let a equal the number of 120-pound packages, and let b equal the number of 100-pound packages. It’s given that the total\nweight of the packages can be at most 1,100 pounds: the inequality represents this situation. It’s also given that the\nhelicopter must carry at least 10 packages: the inequality represents this situation. Values of a and b that satisfy these two\ninequalities represent the allowable numbers of 120-pound packages and 100-pound packages the helicopter can transport. To maximize the\nnumber of 120-pound packages, a, in the helicopter, the number of 100-pound packages, b, in the helicopter needs to be minimized. Expressing b\nin terms of a in the second inequality yields , so the minimum value of b is equal to . Substituting for b in the first\ninequality results in . Using the distributive property to rewrite this inequality yields\n, or . Subtracting 1,000 from both sides of this inequality yields .\nDividing both sides of this inequality by 20 results in . This means that the maximum number of 120-pound packages that the helicopter\ncan carry per trip is 5.\nChoices A, B, and D are incorrect and may result from incorrectly creating or solving the system of inequalities.",
+  "after": "Choice C is correct. Let a equal the number of 120-pound packages, and let b equal the number of 100-pound packages. It’s given that the total weight of the packages can be at most 1,100 pounds: the inequality $120a+100b\\le 1{,}100$ represents this situation. It’s also given that the helicopter must carry at least 10 packages: the inequality $a+b\\ge 10$ represents this situation. Values of a and b that satisfy these two inequalities represent the allowable numbers of 120-pound packages and 100-pound packages the helicopter can transport. To maximize the number of 120-pound packages, a, in the helicopter, the number of 100-pound packages, b, in the helicopter needs to be minimized. Expressing b in terms of a in the second inequality yields $b\\ge 10-a$, so the minimum value of b is equal to $10-a$. Substituting $10-a$ for b in the first inequality results in $120a+100(10-a)\\le 1{,}100$. Using the distributive property to rewrite this inequality yields $120a+1{,}000-100a\\le 1{,}100$, or $20a+1{,}000\\le 1{,}100$. Subtracting 1,000 from both sides of this inequality yields $20a\\le 100$. Dividing both sides of this inequality by 20 results in $a\\le 5$. This means that the maximum number of 120-pound packages that the helicopter can carry per trip is 5.\nChoices A, B, and D are incorrect and may result from incorrectly creating or solving the system of inequalities.",
+  "note": "PS Algebra - Linear inequalities in one or two variables - MEDIUM #1: stripped_math — restored 120a+100b≤1,100, a+b≥10, b≥10-a, substitution chain to a≤5; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR INEQUALITIES/ANS Linear Inequalities MED.pdf p1 (Question ID f224df07); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnypa020tqmt107mu6ebc",
+  "field": "explanation",
+  "before": "Choice D is correct. Any point (x, y) that is a solution to the given system of inequalities must satisfy both inequalities in the system. The second\ninequality in the system can be rewritten as . Of the given answer choices, only choice D satisfies this inequality, because inequality\nis a true statement. The point also satisfies the first inequality.\nAlternate approach: Substituting into the first inequality gives , or , which is a true statement. Substituting\ninto the second inequality gives , or , which is a true statement. Therefore, since satisfies both\ninequalities, it is a solution to the system.\nChoice A is incorrect because substituting −2 for x and −1 for y in the first inequality gives , or , which is false.\nChoice B is incorrect because substituting −1 for x and 3 for y in the first inequality gives , or , which is false. Choice C\nis incorrect because substituting 1 for x and 5 for y in the first inequality gives , or , which is false.",
+  "after": "Choice D is correct. Any point (x, y) that is a solution to the given system of inequalities must satisfy both inequalities in the system. The second inequality in the system can be rewritten as $x>y+1$. Of the given answer choices, only choice D satisfies this inequality, because inequality $2>-1+1$ is a true statement. The point $(2, -1)$ also satisfies the first inequality.\nAlternate approach: Substituting $(2, -1)$ into the first inequality gives $-1\\le 3(2)+1$, or $-1\\le 7$, which is a true statement. Substituting $(2, -1)$ into the second inequality gives $2-(-1)>1$, or $3>1$, which is a true statement. Therefore, since $(2, -1)$ satisfies both inequalities, it is a solution to the system.\nChoice A is incorrect because substituting −2 for x and −1 for y in the first inequality gives $-1\\le 3(-2)+1$, or $-1\\le -5$, which is false. Choice B is incorrect because substituting −1 for x and 3 for y in the first inequality gives $3\\le 3(-1)+1$, or $3\\le -2$, which is false. Choice C is incorrect because substituting 1 for x and 5 for y in the first inequality gives $5\\le 3(1)+1$, or $5\\le 4$, which is false.",
+  "note": "PS Algebra - Linear inequalities in one or two variables - MEDIUM #10: stripped_math — restored x>y+1, 2>-1+1, (2, -1), substitution checks for D and A/B/C; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR INEQUALITIES/ANS Linear Inequalities MED.pdf p10 (Question ID 948087f2); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnz6n026hqmt1hjhcecl7",
+  "field": "explanation",
+  "before": "Choice A is correct. The solution to this system of linear equations is the point that lies on both lines graphed, or the point of intersection of the\ntwo lines. According to the graphs, the point of intersection occurs when and , or at the point .\nChoices B and D are incorrect. Each of these points lies on one line, but not on both lines in the xy-plane. Choice C is incorrect. This point doesn’t\nlie on either of the lines graphed in the xy-plane.",
+  "after": "Choice A is correct. The solution to this system of linear equations is the point that lies on both lines graphed, or the point of intersection of the two lines. According to the graphs, the point of intersection occurs when $x=3$ and $y=9$, or at the point $(3, 9)$.\nChoices B and D are incorrect. Each of these points lies on one line, but not on both lines in the xy-plane. Choice C is incorrect. This point doesn’t lie on either of the lines graphed in the xy-plane.",
+  "note": "PS Algebra - Systems of two linear equations in two variables - EASY #14: stripped_math — restored x=3, y=9, (3, 9); joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/SYSTEMS TWO LINEAR EQUATIONS & EQUATIONS IN TWO VARIABLES/ANS Systems 2 Lin Equat 2 Var EASY.pdf p14 (Question ID e1259a5a); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnz5i025pqmt1qy19ww4x",
+  "field": "explanation",
+  "before": "Choice B is correct. The number of coins collected can be multiplied by c to give the score from the points earned from coins. Similarly, the\nnumber of stars collected can be multiplied by s to give the score from the points earned from the stars. Therefore, the total score each time\nAngela played is , and the total score the second time she played is .\nChoices A, C, and D are incorrect and may result from misidentifying the terms of the equation. Choice A switches coins and stars, choice C\nswitches stars and points, and choice D misidentifies coins, stars, and points.",
+  "after": "Choice B is correct. The number of coins collected can be multiplied by c to give the score from the points earned from coins. Similarly, the number of stars collected can be multiplied by s to give the score from the points earned from the stars. Therefore, the total score each time Angela played is $20c+10s=700$, and the total score the second time she played is $25c+12s=850$.\nChoices A, C, and D are incorrect and may result from misidentifying the terms of the equation. Choice A switches coins and stars, choice C switches stars and points, and choice D misidentifies coins, stars, and points.",
+  "note": "PS Algebra - Systems of two linear equations in two variables - EASY #2: stripped_math — restored 20c+10s=700, 25c+12s=850; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/SYSTEMS TWO LINEAR EQUATIONS & EQUATIONS IN TWO VARIABLES/ANS Systems 2 Lin Equat 2 Var EASY.pdf p2 (Question ID 44d65912); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0qo02qpqmt13a4exyes",
+  "field": "explanation",
+  "before": "Choice D is correct. A system of linear equations can be solved by the elimination method. Multiplying the equation by yields\n. Adding this equation to the equation yields , which has no solution. It follows that the system of linear\nequations consisting of and has no solution.\nChoice A is incorrect. This system of linear equations has infinitely many solutions, rather than no solution.\nChoice B is incorrect. This system of linear equations has one solution, rather than no solution.\nChoice C is incorrect. This system of linear equations has infinitely\nmany solutions, rather than no solution.",
+  "after": "Choice D is correct. A system of linear equations can be solved by the elimination method. Multiplying the equation $-2x+3y=9$ by $2$ yields $-4x+6y=18$. Adding this equation to the equation $4x-6y=18$ yields $0=36$, which has no solution. It follows that the system of linear equations consisting of $-2x+3y=9$ and $4x-6y=18$ has no solution.\nChoice A is incorrect. This system of linear equations has infinitely many solutions, rather than no solution.\nChoice B is incorrect. This system of linear equations has one solution, rather than no solution.\nChoice C is incorrect. This system of linear equations has infinitely many solutions, rather than no solution.",
+  "note": "PS Algebra - Systems of two linear equations in two variables - HARD #11: stripped_math — restored -2x+3y=9, 2, -4x+6y=18, 4x-6y=18, 0=36; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/SYSTEMS TWO LINEAR EQUATIONS & EQUATIONS IN TWO VARIABLES/ANS Systems Two Lin Eq. Two Var HARD.pdf p11 (Question ID 1e0a46e4); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnypx0213qmt1wvpd8dbq",
+  "field": "explanation",
+  "before": "Choice A is correct. The solution to a system of equations is the coordinates of the intersection point of the graphs of the equations in the xy-\nplane. Based on the graph, the solution to the given system of equations is best approximated as . In the xy-plane, the graph of is\na horizontal line on which every y-coordinate is 0, and the graph of is a vertical line on which every x-coordinate is . These graphs\nintersect at the point . Therefore, the system of equations in choice A has the same solution as the given system.",
+  "after": "Choice A is correct. The solution to a system of equations is the coordinates of the intersection point of the graphs of the equations in the xy-plane. Based on the graph, the solution to the given system of equations is best approximated as $\\left(\\frac{3}{2}, 0\\right)$. In the xy-plane, the graph of $y=0$ is a horizontal line on which every y-coordinate is 0, and the graph of $x=\\frac{3}{2}$ is a vertical line on which every x-coordinate is $\\frac{3}{2}$. These graphs intersect at the point $\\left(\\frac{3}{2}, 0\\right)$. Therefore, the system of equations in choice A has the same solution as the given system.",
+  "note": "PS Algebra - Systems of two linear equations in two variables - MEDIUM #3: stripped_math — restored (3/2, 0), y=0, x=3/2, 3/2; joined hard line breaks (incl. xy-/plane)",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/SYSTEMS TWO LINEAR EQUATIONS & EQUATIONS IN TWO VARIABLES/ANS Systems 2 Lin Equat 2 Var MED.pdf p3 (Question ID 2704399f); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzzf02fgqmt1hph8a39o",
+  "field": "explanation",
+  "before": "Choice C is correct. It’s given that an estimated 38% of sampled students at the school were in support of a menu change, with a margin of error\nof 5.5%. It follows that the percent of the students at the school who support a menu change is 38% plus or minus 5.5%. The lower bound of this\nestimation is , or 32.5%. The upper bound of this estimation is , or 43.5%. Therefore, plausible values of the percent of the\nstudents at the school who support a menu change are between 32.5% and 43.5%.\nChoice A is incorrect. This is the percent of the sampled students at the school who support a menu change. Choices B and D are incorrect and\nmay result from misinterpreting the margin of error.",
+  "after": "Choice C is correct. It’s given that an estimated 38% of sampled students at the school were in support of a menu change, with a margin of error of 5.5%. It follows that the percent of the students at the school who support a menu change is 38% plus or minus 5.5%. The lower bound of this estimation is $38-5.5$, or 32.5%. The upper bound of this estimation is $38+5.5$, or 43.5%. Therefore, plausible values of the percent of the students at the school who support a menu change are between 32.5% and 43.5%.\nChoice A is incorrect. This is the percent of the sampled students at the school who support a menu change. Choices B and D are incorrect and may result from misinterpreting the margin of error.",
+  "note": "PS Inference from Statistics and Margin of Error - EASY #5: stripped_math — restored 38−5.5, 38+5.5; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/INFERENCE & MARGIN OF ERROR/ANS Inference Margin Error EASY.pdf p5 (Question ID 0108ac2d); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0j702noqmt1mbo41mn0",
+  "field": "explanation",
+  "before": "Choice B is correct. It's given that out of voters responded that they would vote for Angel Cruz. Therefore, the proportion of voters from\nthe poll who responded they would vote for Angel Cruz is . It’s also given that there are a total of voters in the election. Therefore, the\ntotal number of people who would be expected to vote for Angel Cruz is , or . Since of the total voters would be\nexpected to vote for Angel Cruz, it follows that , or voters would be expected not to vote for Angel Cruz. The difference in\nthe number of votes for and against Angel Cruz is , or votes. Therefore, if people vote in the election, Angel Cruz\nwould be expected to win by votes.\nChoice A is incorrect. This is the difference in the number of voters from the poll who responded that they would vote for and against Angel Cruz.\nChoice C is incorrect. This is the total number of people who would be expected to vote for Angel Cruz.\nChoice D is incorrect. This is the difference between the total number of people who vote in the election and the number of voters from the poll.",
+  "after": "Choice B is correct. It's given that $483$ out of $803$ voters responded that they would vote for Angel Cruz. Therefore, the proportion of voters from the poll who responded they would vote for Angel Cruz is $\\frac{483}{803}$. It’s also given that there are a total of $6{,}424$ voters in the election. Therefore, the total number of people who would be expected to vote for Angel Cruz is $6{,}424\\left(\\frac{483}{803}\\right)$, or $3{,}864$. Since $3{,}864$ of the $6{,}424$ total voters would be expected to vote for Angel Cruz, it follows that $6{,}424-3{,}864$, or $2{,}560$ voters would be expected not to vote for Angel Cruz. The difference in the number of votes for and against Angel Cruz is $3{,}864-2{,}560$, or $1{,}304$ votes. Therefore, if $6{,}424$ people vote in the election, Angel Cruz would be expected to win by $1{,}304$ votes.\nChoice A is incorrect. This is the difference in the number of voters from the poll who responded that they would vote for and against Angel Cruz.\nChoice C is incorrect. This is the total number of people who would be expected to vote for Angel Cruz.\nChoice D is incorrect. This is the difference between the total number of people who vote in the election and the number of voters from the poll.",
+  "note": "PS Inference from Statistics and Margin of Error - HARD #1: stripped_math — restored 483/803, 6,424, 3,864, 2,560, 1,304 and arithmetic; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/INFERENCE & MARGIN OF ERROR/ANS Inference Margin Error HARD.pdf p1 (Question ID 916ffe9b); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0gg02krqmt1s31wfjg6",
+  "field": "explanation",
+  "before": "Choice A is correct. It’s given that the estimate for the proportion of the population that has the characteristic is with an associated margin\nof error of . Subtracting the margin of error from the estimate and adding the margin of error to the estimate gives an interval of plausible\nvalues for the true proportion of the population that has the characteristic. Therefore, it’s plausible that the proportion of the population that has\nthis characteristic is between and .\nChoice B is incorrect. A value less than is outside the interval of plausible values for the proportion of the population that has the\ncharacteristic.\nChoice C is incorrect. The value is an estimate for the proportion based on this sample. However, since the margin of error for this estimate\nis known, the most appropriate conclusion is not that the proportion is exactly one value but instead lies in an interval of plausible values.\nChoice D is incorrect. A value greater than is outside the interval of plausible values for the proportion of the population that has the\ncharacteristic.",
+  "after": "Choice A is correct. It’s given that the estimate for the proportion of the population that has the characteristic is $0.49$ with an associated margin of error of $0.04$. Subtracting the margin of error from the estimate and adding the margin of error to the estimate gives an interval of plausible values for the true proportion of the population that has the characteristic. Therefore, it’s plausible that the proportion of the population that has this characteristic is between $0.45$ and $0.53$.\nChoice B is incorrect. A value less than $0.45$ is outside the interval of plausible values for the proportion of the population that has the characteristic.\nChoice C is incorrect. The value $0.49$ is an estimate for the proportion based on this sample. However, since the margin of error for this estimate is known, the most appropriate conclusion is not that the proportion is exactly one value but instead lies in an interval of plausible values.\nChoice D is incorrect. A value greater than $0.53$ is outside the interval of plausible values for the proportion of the population that has the characteristic.",
+  "note": "PS Inference from Statistics and Margin of Error - MEDIUM #2: stripped_math — restored 0.49, 0.04, 0.45, 0.53; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/INFERENCE & MARGIN OF ERROR/ANS Inference Margin Error MED.pdf p2 (Question ID 1e562f24); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0io02n7qmt1saoknm4e",
+  "field": "explanation",
+  "before": "Choice C is correct. The mean of a data set is found by dividing the sum of the values by the number of values. Therefore, the mean number of\nstudents who completed summer internships from Foothill High School is , or 77.6. Similarly, the mean\nnumber from Valley High School is , or 64.2. Thus, the mean number from Foothill High School is greater\nthan the mean number from Valley High School. When a data set has an odd number of elements, the median can be found by ordering the\nvalues from least to greatest and determining the value in the middle. Since there are five values in each data set, the third value in each ordered\nlist is the median. Therefore, the median number from Foothill High School is 76 and the median number from Valley High School is 65. Thus, the\nmedian number from Foothill High School is greater than the median number from Valley High School.\nChoices A, B, and D are incorrect and may result from various misconceptions or miscalculations.",
+  "after": "Choice C is correct. The mean of a data set is found by dividing the sum of the values by the number of values. Therefore, the mean number of students who completed summer internships from Foothill High School is $\\frac{87+80+75+76+70}{5}=\\frac{388}{5}$, or 77.6. Similarly, the mean number from Valley High School is $\\frac{44+54+65+76+82}{5}=\\frac{321}{5}$, or 64.2. Thus, the mean number from Foothill High School is greater than the mean number from Valley High School. When a data set has an odd number of elements, the median can be found by ordering the values from least to greatest and determining the value in the middle. Since there are five values in each data set, the third value in each ordered list is the median. Therefore, the median number from Foothill High School is 76 and the median number from Valley High School is 65. Thus, the median number from Foothill High School is greater than the median number from Valley High School.\nChoices A, B, and D are incorrect and may result from various misconceptions or miscalculations.",
+  "note": "PS One-variable data: Distributions and measures of center and spread - EASY #12: stripped_math — restored the two mean fractions (388/5, 321/5); joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/ONE VARIABLE DATA/ANS One Var. Data EASY.pdf p13 (Question ID 6670e407); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0j102nmqmt15f57wmm2",
+  "field": "explanation",
+  "before": "Choice D is correct. It's given that the bar graph shows the number of students from one school who were born in either July, August, September,\nor October. The bar representing the number of students born in August has a height of ; therefore, students were born in August. The bar\nrepresenting the number of students born in July has a height of ; therefore, students were born in July. Thus, there were , or\nmore students born in August than in July.\nChoice A is incorrect. This is the total number of students born in July and August.\nChoice B is incorrect. This is the number of students born in August.",
+  "after": "Choice D is correct. It's given that the bar graph shows the number of students from one school who were born in either July, August, September, or October. The bar representing the number of students born in August has a height of $50$; therefore, $50$ students were born in August. The bar representing the number of students born in July has a height of $40$; therefore, $40$ students were born in July. Thus, there were $50-40$, or $10$ more students born in August than in July.\nChoice A is incorrect. This is the total number of students born in July and August.\nChoice B is incorrect. This is the number of students born in August.\nChoice C is incorrect. This is the number of students born in July.",
+  "note": "PS One-variable data: Distributions and measures of center and spread - EASY #15: stripped_math — restored 50, 40, 50−40, 10; joined hard line breaks + last Choice paragraph (on the next PDF page) restored",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/ONE VARIABLE DATA/ANS One Var. Data EASY.pdf p16 (Question ID a067c926); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0j402nnqmt19tbhmp2b",
+  "field": "explanation",
+  "before": "The correct answer is . The height of each bar in the bar graph shown represents the number of books collected by the group specified at the\nbottom of the bar. The bar for group reaches a height of . Therefore, group collected books.",
+  "after": "The correct answer is $30$. The height of each bar in the bar graph shown represents the number of books collected by the group specified at the bottom of the bar. The bar for group $1$ reaches a height of $30$. Therefore, group $1$ collected $30$ books.",
+  "note": "PS One-variable data: Distributions and measures of center and spread - EASY #16: stripped_math — restored 30, group 1; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/ONE VARIABLE DATA/ANS One Var. Data EASY.pdf p18 (Question ID 79340403); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0i802miqmt1nbi95jnd",
+  "field": "explanation",
+  "before": "Choice D is correct. The mean of a data set is found by dividing the sum of the values in the data set by the number of values in the data set.\nTherefore, the mean of data set A is , or 4. The mean of data set B is\n, or approximately 2.2857. Therefore, the mean of data set A is greater than the mean of data set B.\nAlternate approach: Data set A and data set B are both ordered from least to greatest value. Besides the first value in each data set, which is 1,\neach value in ordered data set B is less than the respective value in ordered data set A. Therefore, conceptually, the mean of data set A must be\ngreater than the mean of data set B.\nChoices A, B, and C are incorrect and may result from various misconceptions or miscalculations.",
+  "after": "Choice D is correct. The mean of a data set is found by dividing the sum of the values in the data set by the number of values in the data set. Therefore, the mean of data set A is $\\frac{1+2+3+4+5+6+7}{7}=\\frac{28}{7}$, or 4. The mean of data set B is $\\frac{1+1+2+2+3+3+4}{7}=\\frac{16}{7}$, or approximately 2.2857. Therefore, the mean of data set A is greater than the mean of data set B.\nAlternate approach: Data set A and data set B are both ordered from least to greatest value. Besides the first value in each data set, which is 1, each value in ordered data set B is less than the respective value in ordered data set A. Therefore, conceptually, the mean of data set A must be greater than the mean of data set B.\nChoices A, B, and C are incorrect and may result from various misconceptions or miscalculations.",
+  "note": "PS One-variable data: Distributions and measures of center and spread - EASY #7: stripped_math — restored the two mean fractions (28/7, 16/7); joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/ONE VARIABLE DATA/ANS One Var. Data EASY.pdf p7 (Question ID 708590d7); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzz002f0qmt1s9ifqiau",
+  "field": "explanation",
+  "before": "The correct answer is . The mean of a data set is computed by dividing the sum of the values in the data set by the number of values in the\ndata set. It’s given that data set A consists of the heights of objects and has a mean of meters. This can be represented by the equation\n, where represents the sum of the heights of the objects, in meters, in data set A. Multiplying both sides of this equation by yields\n, or meters. Therefore, the sum of the heights of the objects in data set A is meters. It’s also given that data set B\nconsists of the heights of objects and has a mean of meters. This can be represented by the equation , where represents the\nsum of the heights of the objects, in meters, in data set B. Multiplying both sides of this equation by yields , or meters.\nTherefore, the sum of the heights of the objects in data set B is meters. Since it’s given that data set C consists of the heights of the\nobjects from data sets A and B, it follows that the mean of data set C is the sum of the heights of the objects, in meters, in data sets A and B\ndivided by the number of objects represented in data sets A and B, or , which is equivalent to meters. Therefore, the mean, in\nmeters, of data set C is .",
+  "after": "The correct answer is $41$. The mean of a data set is computed by dividing the sum of the values in the data set by the number of values in the data set. It’s given that data set A consists of the heights of $75$ objects and has a mean of $25$ meters. This can be represented by the equation $\\frac{x}{75}=25$, where $x$ represents the sum of the heights of the objects, in meters, in data set A. Multiplying both sides of this equation by $75$ yields $x=75(25)$, or $x=1{,}875$ meters. Therefore, the sum of the heights of the objects in data set A is $1{,}875$ meters. It’s also given that data set B consists of the heights of $50$ objects and has a mean of $65$ meters. This can be represented by the equation $\\frac{y}{50}=65$, where $y$ represents the sum of the heights of the objects, in meters, in data set B. Multiplying both sides of this equation by $50$ yields $y=50(65)$, or $y=3{,}250$ meters. Therefore, the sum of the heights of the objects in data set B is $3{,}250$ meters. Since it’s given that data set C consists of the heights of the $125$ objects from data sets A and B, it follows that the mean of data set C is the sum of the heights of the objects, in meters, in data sets A and B divided by the number of objects represented in data sets A and B, or $\\frac{1{,}875+3{,}250}{125}$, which is equivalent to $41$ meters. Therefore, the mean, in meters, of data set C is $41$.",
+  "note": "PS One-variable data: Distributions and measures of center and spread - HARD - #2 #4: stripped_math — restored 41, 75, 25, x/75=25, x=1,875, 50, 65, y/50=65, y=3,250, (1,875+3,250)/125; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/ONE VARIABLE DATA/ANS One Var. Data HARD.pdf p4 (Question ID 98958ae8); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0vt02swqmt1tz7te094",
+  "field": "explanation",
+  "before": "The correct answer is . The mean of the list of numbers is found by dividing the sum of the numbers by the number of values in the list. Since\nthere are 5 numbers in the list, the mean is of the sum of the numbers. Note that 1/5 and .2 are examples of ways to enter a correct answer.",
+  "after": "The correct answer is $\\frac{1}{5}$. The mean of the list of numbers is found by dividing the sum of the numbers by the number of values in the list. Since there are 5 numbers in the list, the mean is $\\frac{1}{5}$ of the sum of the numbers. Note that 1/5 and .2 are examples of ways to enter a correct answer.",
+  "note": "PS One-variable data: Distributions and measures of center and spread - MEDIUM #2: stripped_math — restored 1/5 (x2); joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/ONE VARIABLE DATA/ANS One Var. Data MED.pdf p3 (Question ID 8193e8cd); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro0wj02t3qmt1j0b6a9hq",
+  "field": "explanation",
+  "before": "Choice A is correct. The mean of a data set is the sum of the values divided by the number of values. The mean of data set A is , or 5. The\nmean of data set B is , or 14.5. Thus, the means are different. The median of a data set is the middle value when the values are ordered\nfrom least to greatest. The medians of data sets A and B are both 5. Therefore, the medians are the same, so only the means are different.\nChoices B, C, and D are incorrect and may result from conceptual or calculation errors.",
+  "after": "Choice A is correct. The mean of a data set is the sum of the values divided by the number of values. The mean of data set A is $\\frac{45}{9}$, or 5. The mean of data set B is $\\frac{145}{10}$, or 14.5. Thus, the means are different. The median of a data set is the middle value when the values are ordered from least to greatest. The medians of data sets A and B are both 5. Therefore, the medians are the same, so only the means are different.\nChoices B, C, and D are incorrect and may result from conceptual or calculation errors.",
+  "note": "PS One-variable data: Distributions and measures of center and spread - MEDIUM #5: stripped_math — restored 45/9, 145/10; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/ONE VARIABLE DATA/ANS One Var. Data MED.pdf p6 (Question ID 9110c120); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzt202dbqmt1pzivfk4d",
+  "field": "explanation",
+  "before": "The correct answer is 75. The percent decrease between two values is found by dividing the difference between the two values by the original\nvalue and multiplying by 100. The line graph shows that the annual snowfall in 2003 was 40 inches, and the annual snowfall in 2007 was 10\ninches. Therefore, the percent decrease in the annual snowfall from 2003 to 2007 is , or 75. It’s given that this is equivalent\nto , so the value of p is 75.",
+  "after": "The correct answer is 75. The percent decrease between two values is found by dividing the difference between the two values by the original value and multiplying by 100. The line graph shows that the annual snowfall in 2003 was 40 inches, and the annual snowfall in 2007 was 10 inches. Therefore, the percent decrease in the annual snowfall from 2003 to 2007 is $\\left(\\frac{40-10}{40}\\right)(100)$, or 75. It’s given that this is equivalent to $p\\%$, so the value of p is 75.",
+  "note": "PS Percentages - HARD #7: stripped_math — restored ((40−10)/40)(100), p%; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/PERCENTAGES/ANS Percents HARD.pdf p7 (Question ID 0231050d); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1v703b2qmt1ehawfbmw",
+  "field": "explanation",
+  "before": "The correct answer is . It’s given that people attended the first information session, and that of the people who attended the first\ninformation session attended the second information session. Therefore, the number of people who attended the first and second information\nsessions can be found by calculating of , which is equal to , or . It’s also given that of the people who attended\nthe first and second information sessions attended the third information session. Since people attended the first and second information\nsessions, the number of people who attended the first, second, and third information sessions can be found by calculating of , which is\nequal to , or . Therefore, people attended all three information sessions.",
+  "after": "The correct answer is $324$. It’s given that $1{,}250$ people attended the first information session, and that $72\\%$ of the people who attended the first information session attended the second information session. Therefore, the number of people who attended the first and second information sessions can be found by calculating $72\\%$ of $1{,}250$, which is equal to $1{,}250\\left(\\frac{72}{100}\\right)$, or $900$. It’s also given that $36\\%$ of the people who attended the first and second information sessions attended the third information session. Since $900$ people attended the first and second information sessions, the number of people who attended the first, second, and third information sessions can be found by calculating $36\\%$ of $900$, which is equal to $900\\left(\\frac{36}{100}\\right)$, or $324$. Therefore, $324$ people attended all three information sessions.",
+  "note": "PS Percentages - MEDIUM #8: stripped_math — restored 324, 1,250, 72%, 36%, 900 and the two products; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/PERCENTAGES/ANS Percents MED.pdf p8 (Question ID 022e9894); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro23e03fhqmt1arg6znlr",
+  "field": "explanation",
+  "before": "Choice C is correct. If one of these planets is selected at random, the probability that the selected planet will be rocky is calculated by dividing\nthe number of planets that are considered rocky by the total number of planets. It’s given that 4 of the 8 total planets are considered rocky.\nTherefore, the probability that the selected planet will be rocky is , which is equivalent to .\nChoices A and B are incorrect. These represent the probability if 1 of the 8 planets was considered rocky (choice A) and if 2 of the 8 planets were\nconsidered rocky (choice B). Choice D is incorrect and may result from dividing the total number of planets by the number of planets that are\nconsidered rocky.",
+  "after": "Choice C is correct. If one of these planets is selected at random, the probability that the selected planet will be rocky is calculated by dividing the number of planets that are considered rocky by the total number of planets. It’s given that 4 of the 8 total planets are considered rocky. Therefore, the probability that the selected planet will be rocky is $\\frac{4}{8}$, which is equivalent to $\\frac{1}{2}$.\nChoices A and B are incorrect. These represent the probability if 1 of the 8 planets was considered rocky (choice A) and if 2 of the 8 planets were considered rocky (choice B). Choice D is incorrect and may result from dividing the total number of planets by the number of planets that are considered rocky.",
+  "note": "PS Probability and conditional probability - EASY #6: stripped_math — restored 4/8, 1/2; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/PROBABILITY/ANS Probability EASY.pdf p6 (Question ID e5b5fbdd); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro18q02wsqmt14tzzxuei",
+  "field": "explanation",
+  "before": "Choice A is correct. The total number of state parks in the state is . According to the table, 5 of these have camping\nfacilities but not bicycle paths. Therefore, if a state park is selected at random, the probability that it has camping facilities but not bicycle paths\nis .\nChoice B is incorrect. This is the probability that a state park selected at random from the state parks with camping facilities does not have\nbicycle paths. Choice C is incorrect. This is the probability that a state park selected at random from the state parks with bicycle paths does not\nhave camping facilities. Choice D is incorrect. This is the probability that a state park selected at random from the state parks without bicycle\npaths does have camping facilities.",
+  "after": "Choice A is correct. The total number of state parks in the state is $20+5+8+4=37$. According to the table, 5 of these have camping facilities but not bicycle paths. Therefore, if a state park is selected at random, the probability that it has camping facilities but not bicycle paths is $\\frac{5}{37}$.\nChoice B is incorrect. This is the probability that a state park selected at random from the state parks with camping facilities does not have bicycle paths. Choice C is incorrect. This is the probability that a state park selected at random from the state parks with bicycle paths does not have camping facilities. Choice D is incorrect. This is the probability that a state park selected at random from the state parks without bicycle paths does have camping facilities.",
+  "note": "PS Probability and conditional probability - MEDIUM #11: stripped_math — restored 20+5+8+4=37, 5/37; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/PROBABILITY/ANS Probability Med.pdf p12 (Question ID 0301c5dc); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro15x02wgqmt14vc11nqr",
+  "field": "explanation",
+  "before": "Choice B is correct. In total, there are 6 people in the Human Resources department. Of those 6, 2 have a master’s degree as their highest level of\neducation. Therefore, the probability of an employee selected at random from the Human Resources department having a master’s degree is\n, which simplifies to .\nChoice A is incorrect; it is the probability that an employee selected at random from either department will be in the Human Resources\ndepartment and have a master’s degree. Choice C is incorrect; it is the probability that an employee with a master’s degree selected at random\nwill be in the Human Resources department. Choice D is incorrect; it is the probability that an employee selected at random from either\ndepartment will have a master’s degree.",
+  "after": "Choice B is correct. In total, there are 6 people in the Human Resources department. Of those 6, 2 have a master’s degree as their highest level of education. Therefore, the probability of an employee selected at random from the Human Resources department having a master’s degree is $\\frac{2}{6}$, which simplifies to $\\frac{1}{3}$.\nChoice A is incorrect; it is the probability that an employee selected at random from either department will be in the Human Resources department and have a master’s degree. Choice C is incorrect; it is the probability that an employee with a master’s degree selected at random will be in the Human Resources department. Choice D is incorrect; it is the probability that an employee selected at random from either department will have a master’s degree.",
+  "note": "PS Probability and conditional probability - MEDIUM #3: stripped_math — restored 2/6, 1/3; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/PROBABILITY/ANS Probability Med.pdf p3 (Question ID f8696cd8); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro19a02x0qmt1szysgyie",
+  "field": "explanation",
+  "before": "The correct answer is . The volume of a cube is given by the formula , where is the length of an edge of the cube. It’s given that each\nedge of the cube has a length of centimeters. Substituting centimeters for in the formula yields\n, or cubic centimeters. It’s given that the cube has a mass of grams. Dividing the mass, in grams, of the\ncube by the volume, in cubic centimeters, of the cube gives its density, in grams per cubic centimeters. Therefore, the density of the cube is\n, or grams per cubic centimeter. Note that .32 and 8/25 are examples of ways to enter a correct answer.",
+  "after": "The correct answer is $.32$. The volume of a cube is given by the formula $V=s^3$, where $s$ is the length of an edge of the cube. It’s given that each edge of the cube has a length of $2.00$ centimeters. Substituting $2.00$ centimeters for $s$ in the formula $V=s^3$ yields $V=(2.00\\text{ centimeters})^3$, or $V=8.00$ cubic centimeters. It’s given that the cube has a mass of $2.56$ grams. Dividing the mass, in grams, of the cube by the volume, in cubic centimeters, of the cube gives its density, in grams per cubic centimeters. Therefore, the density of the cube is $\\frac{2.56\\text{ grams}}{8.00\\text{ cubic centimeters}}$, or $.32$ grams per cubic centimeter. Note that .32 and 8/25 are examples of ways to enter a correct answer.",
+  "note": "PS Ratios, rates, proportional relationships, and units - HARD #4: stripped_math — restored .32, V=s^3, s, 2.00, (2.00 cm)^3, V=8.00, 2.56, density fraction; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/RATIOS RATES PROPORTIONS UNITS/ANS Ratios Rates Proport. Units HARD.pdf p4 (Question ID 61f61789); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro19d02x1qmt1xhlkopsl",
+  "field": "explanation",
+  "before": "Choice B is correct. It’s given that the density of a certain type of wood is kilograms per cubic meter , and a sample of this type of\nwood has a mass of . Let represent the volume, in , of the sample. It follows that the relationship between the density, mass, and\nvolume of this sample can be written\nas , or . Multiplying both sides of this equation by yields . Dividing both sides of this equation by\nyields . Therefore, the volume of this sample is . Since it’s given that the sample of this type of wood is a cube, it follows that\nthe length of one edge of this sample can be found using the volume formula for a cube, , where represents the volume, in , and\nrepresents the length, in m, of one edge of the cube. Substituting for in this formula yields . Taking the cube root of both sides of\nthis equation yields , or . Therefore, the length of one edge of this sample to the nearest hundredth of a meter is .\nChoices A, C, and D are incorrect and may result from conceptual or calculation errors.",
+  "after": "Choice B is correct. It’s given that the density of a certain type of wood is $353$ kilograms per cubic meter $\\left(\\text{kg/m}^3\\right)$, and a sample of this type of wood has a mass of $345\\text{ kg}$. Let $x$ represent the volume, in $\\text{m}^3$, of the sample. It follows that the relationship between the density, mass, and volume of this sample can be written as $\\frac{353\\text{ kg}}{1\\text{ m}^3}=\\frac{345\\text{ kg}}{x\\text{ m}^3}$, or $353=\\frac{345}{x}$. Multiplying both sides of this equation by $x$ yields $353x=345$. Dividing both sides of this equation by $353$ yields $x=\\frac{345}{353}$. Therefore, the volume of this sample is $\\frac{345}{353}\\text{ m}^3$. Since it’s given that the sample of this type of wood is a cube, it follows that the length of one edge of this sample can be found using the volume formula for a cube, $V=s^3$, where $V$ represents the volume, in $\\text{m}^3$, and $s$ represents the length, in m, of one edge of the cube. Substituting $\\frac{345}{353}$ for $V$ in this formula yields $\\frac{345}{353}=s^3$. Taking the cube root of both sides of this equation yields $\\sqrt[3]{\\frac{345}{353}}=s$, or $s\\approx 0.99$. Therefore, the length of one edge of this sample to the nearest hundredth of a meter is $0.99$.\nChoices A, C, and D are incorrect and may result from conceptual or calculation errors.",
+  "note": "PS Ratios, rates, proportional relationships, and units - HARD #5: stripped_math — restored 353, kg/m^3, 345 kg, x, m^3, density equation, 353x=345, x=345/353, V=s^3, cube root, s≈0.99; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/RATIOS RATES PROPORTIONS UNITS/ANS Ratios Rates Proport. Units HARD.pdf p5 (Question ID 7d721177); rendered page transcribed (250 dpi crop)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1sx039kqmt16gqcma1p",
+  "field": "explanation",
+  "before": "The correct answer is . It's given that teaspoons is equivalent to tablespoon. Therefore, teaspoons is equivalent to\n, or tablespoons. Note that 14/3, 4.666, and 4.667 are examples of ways to enter a correct answer.",
+  "after": "The correct answer is $\\frac{14}{3}$. It's given that $3$ teaspoons is equivalent to $1$ tablespoon. Therefore, $14$ teaspoons is equivalent to $(14\\text{ teaspoons})\\left(\\frac{1\\text{ tablespoon}}{3\\text{ teaspoons}}\\right)$, or $\\frac{14}{3}$ tablespoons. Note that 14/3, 4.666, and 4.667 are examples of ways to enter a correct answer.",
+  "note": "PS Ratios, rates, proportional relationships, and units - MEDIUM #4: stripped_math — restored 14/3, 3, 1, 14, unit-conversion product; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/RATIOS RATES PROPORTIONS UNITS/ANS Ratios Rates Proport. Units MED.pdf p4 (Question ID eb672707); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1r9038sqmt19lje3i7n",
+  "field": "explanation",
+  "before": "Choice B is correct. The graphical model that most closely fits the data in the scatterplot is a model in which the number of data points above\nand below the model are approximately balanced. Fitting a graphical model to the data shown results in an upward-facing parabola with a y-\nintercept near and a vertex with an approximate x-value of 2.5. Of the given choices, only choice B gives an equation of an upward-facing\nparabola with a y-intercept at . Furthermore, substituting 2.5 for x into the equation in choice B yields . This is approximately the y-\nvalue of the vertex of the model.\nChoices A, C, and D are incorrect. These equations don’t give a graphical model that best fits the data. At , they have y-values of ,\n, and 3, respectively. At , they have y-values of , , and 3, respectively.",
+  "after": "Choice B is correct. The graphical model that most closely fits the data in the scatterplot is a model in which the number of data points above and below the model are approximately balanced. Fitting a graphical model to the data shown results in an upward-facing parabola with a y-intercept near $(0,20)$ and a vertex with an approximate x-value of 2.5. Of the given choices, only choice B gives an equation of an upward-facing parabola with a y-intercept at $(0,20)$. Furthermore, substituting 2.5 for x into the equation in choice B yields $y=5$. This is approximately the y-value of the vertex of the model.\nChoices A, C, and D are incorrect. These equations don’t give a graphical model that best fits the data. At $x=0$, they have y-values of $-20$, $-3$, and 3, respectively. At $x=2.5$, they have y-values of $-35$, $-3$, and 3, respectively.",
+  "note": "PS Two-variable data: Models and scatterplots - EASY #13: stripped_math — restored (0,20), y=5, x=0, x=2.5, −20, −35, −3; joined hard line breaks (incl. hyphenated y-intercept/y-value)",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/ANS TWO Var. Data EASY.pdf p13 (Question ID 82aaa0a1); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1sd039aqmt18qgr3d06",
+  "field": "explanation",
+  "before": "Choice B is correct. A line of best fit is shown in the scatterplot such that as the value of increases, the value of decreases. Thus, the slope of\nthe line of best fit shown is negative. The slope of a line passing through two points, and , can be calculated as . The line\nof best fit shown passes approximately through the points and . Substituting and for and ,\nrespectively, in gives , which is equivalent to , or . Therefore, of the given choices, is closest to the slope of the line\nof best fit shown.\nChoice A is incorrect and may result from conceptual or calculation errors.\nChoice C is incorrect. The line of best fit shown has a negative slope, not a positive slope.",
+  "after": "Choice B is correct. A line of best fit is shown in the scatterplot such that as the value of $x$ increases, the value of $y$ decreases. Thus, the slope of the line of best fit shown is negative. The slope of a line passing through two points, $(x_1,y_1)$ and $(x_2,y_2)$, can be calculated as $\\frac{y_2-y_1}{x_2-x_1}$. The line of best fit shown passes approximately through the points $(1,12)$ and $(11,4)$. Substituting $(1,12)$ and $(11,4)$ for $(x_1,y_1)$ and $(x_2,y_2)$, respectively, in $\\frac{y_2-y_1}{x_2-x_1}$ gives $\\frac{4-12}{11-1}$, which is equivalent to $-\\frac{8}{10}$, or $-0.8$. Therefore, of the given choices, $-0.8$ is closest to the slope of the line of best fit shown.\nChoice A is incorrect and may result from conceptual or calculation errors.\nChoice C is incorrect. The line of best fit shown has a negative slope, not a positive slope.\nChoice D is incorrect. The line of best fit shown has a negative slope, not a positive slope.",
+  "note": "PS Two-variable data: Models and scatterplots - MEDIUM #11: stripped_math — restored x, y, (x1,y1), (x2,y2), slope formula, (1,12), (11,4), (4−12)/(11−1), −8/10, −0.8; joined hard line breaks + last Choice paragraph (on the next PDF page) restored",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/ANS TWO Var. Data MED.pdf p11 (Question ID 03a16790); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1rr038xqmt10mgsbptn",
+  "field": "explanation",
+  "before": "Choice C is correct. A line that most closely fits the data is a line with an approximately balanced number of data points above and below the\nline. Fitting a line to the data shown results in a line with an approximate slope of 3 and a y-intercept near the point . An equation for the\nline can be written in slope-intercept form, , where m is the slope and b is the y-coordinate of the y-intercept. The equation\nin choice C fits the data most closely.\nChoices A and B are incorrect because the slope of the lines of these equations is 0.82, which is a value that is too small to be the slope of the\nline that fits the data shown. Choice D is incorrect. The graph of this equation has a y-intercept at , not . This line would lie\nbelow all of the data points, and therefore would not closely fit the data.",
+  "after": "Choice C is correct. A line that most closely fits the data is a line with an approximately balanced number of data points above and below the line. Fitting a line to the data shown results in a line with an approximate slope of 3 and a y-intercept near the point $(0,1)$. An equation for the line can be written in slope-intercept form, $y=mx+b$, where m is the slope and b is the y-coordinate of the y-intercept. The equation $y=3.30x+0.82$ in choice C fits the data most closely.\nChoices A and B are incorrect because the slope of the lines of these equations is 0.82, which is a value that is too small to be the slope of the line that fits the data shown. Choice D is incorrect. The graph of this equation has a y-intercept at $(0,-3.30)$, not $(0,0.82)$. This line would lie below all of the data points, and therefore would not closely fit the data.",
+  "note": "PS Two-variable data: Models and scatterplots - MEDIUM #5: stripped_math — restored (0,1), y=mx+b, y=3.30x+0.82, (0,−3.30), (0,0.82); joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/ANS TWO Var. Data MED.pdf p5 (Question ID 3d985614); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1ry038zqmt1x1siifxe",
+  "field": "explanation",
+  "before": "Choice C is correct. On the line of best fit, an x-value of corresponds to a y-value between and . Therefore, at , is closest\nto the y-value predicted by the line of best fit.\nChoice A is incorrect and may result from conceptual errors.\nChoice B is incorrect and may result from conceptual errors.\nChoice D is incorrect and may result from conceptual errors.",
+  "after": "Choice C is correct. On the line of best fit, an x-value of $25.5$ corresponds to a y-value between $8$ and $8.5$. Therefore, at $x=25.5$, $8.2$ is closest to the y-value predicted by the line of best fit.\nChoice A is incorrect and may result from conceptual errors.\nChoice B is incorrect and may result from conceptual errors.\nChoice D is incorrect and may result from conceptual errors.",
+  "note": "PS Two-variable data: Models and scatterplots - MEDIUM #8: stripped_math — restored 25.5, 8, 8.5, x=25.5, 8.2; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/ANS TWO Var. Data MED.pdf p8 (Question ID f46139df); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro1s10390qmt11dgeqn1n",
+  "field": "explanation",
+  "before": "Choice A is correct. The data point with has a y-coordinate of 12. The y-value predicted by the line of best fit at is approximately\n11. The difference between the y-coordinate of the data point and the y-value predicted by the line of best fit at is , or 1.\nChoices B and C are incorrect and may result from incorrectly reading the scatterplot. Choice D is incorrect. This is the y-coordinate of the data\npoint at .",
+  "after": "Choice A is correct. The data point with $x=1$ has a y-coordinate of 12. The y-value predicted by the line of best fit at $x=1$ is approximately 11. The difference between the y-coordinate of the data point and the y-value predicted by the line of best fit at $x=1$ is $12-11$, or 1.\nChoices B and C are incorrect and may result from incorrectly reading the scatterplot. Choice D is incorrect. This is the y-coordinate of the data point at $x=1$.",
+  "note": "PS Two-variable data: Models and scatterplots - MEDIUM #9: stripped_math — restored x=1 (x3), 12−11; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/ANS TWO Var. Data MED.pdf p9 (Question ID 1adb39f0); rendered page transcribed"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnxel01eqqmt15q77tgvt",
+  "field": "explanation",
+  "before": "Choice C is correct. If the equation is true for all x, then the expressions on both sides of the equation will be equivalent. Multiplying the polynomials on the left-\nhand side of the equation gives . On the right-hand side of the equation, the only -term is . Since the expressions\non both sides of the equation are equivalent, it follows that , which can be rewritten as . Therefore,\n, which gives .\nChoice A is incorrect. If , then the coefficient of on the left-hand side of the equation would be , which doesn’t equal the coefficient of\n, , on the right-hand side. Choice B is incorrect. If , then the coefficient of on the left-hand side of the equation would be , which",
+  "after": "Choice C is correct. If the equation is true for all x, then the expressions on both sides of the equation will be equivalent. Multiplying the polynomials on the left-hand side of the equation gives $5ax^{3}-abx^{2}+4ax+15x^{2}-3bx+12$. On the right-hand side of the equation, the only $x^{2}$-term is $-9x^{2}$. Since the expressions on both sides of the equation are equivalent, it follows that $-abx^{2}+15x^{2}=-9x^{2}$, which can be rewritten as $(-ab+15)x^{2}=-9x^{2}$. Therefore, $-ab+15=-9$, which gives $ab=24$.\nChoice A is incorrect. If $ab=18$, then the coefficient of $x^{2}$ on the left-hand side of the equation would be $-18+15=-3$, which doesn’t equal the coefficient of $x^{2}$, $-9$, on the right-hand side. Choice B is incorrect. If $ab=20$, then the coefficient of $x^{2}$ on the left-hand side of the equation would be $-20+15=-5$, which doesn’t equal the coefficient of $x^{2}$, $-9$, on the right-hand side. Choice D is incorrect. If $ab=40$, then the coefficient of $x^{2}$ on the left-hand side of the equation would be $-40+15=-25$, which doesn’t equal the coefficient of $x^{2}$, $-9$, on the right-hand side.",
+  "note": "PS Equivalent expressions HARD-1 #1: stripped_math — restored polynomial product, x²-terms, -ab+15=-9, ab=24 and per-choice arithmetic; joined hard line breaks; restored the Choice B/D tail cut at the page break (p2)",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/EQUIVALENT EXPRESSION/ANS HARD 1EQUIV EXPRES .pdf p1 (Question ID 371cbf6b); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnxfr01ftqmt1wj4k7nt2",
+  "field": "explanation",
+  "before": "Choice D is correct. Factoring out the coefficient , the given expression can be rewritten as . The expression can be approached as a\ndifference of squares and rewritten as . Therefore, k must be .\nChoice A is incorrect. If k were 2, then the expression given would be rewritten as , which is equivalent to , not .\nChoice B is incorrect. This may result from incorrectly factoring the expression and finding as the factored form of the expression. Choice C is\nincorrect. This may result from incorrectly distributing the and rewriting the expression as .",
+  "after": "Choice D is correct. Factoring out the coefficient $\\frac{1}{3}$, the given expression can be rewritten as $\\frac{1}{3}(x^{2}-6)$. The expression $x^{2}-6$ can be approached as a difference of squares and rewritten as $(x-\\sqrt{6})(x+\\sqrt{6})$. Therefore, k must be $\\sqrt{6}$.\nChoice A is incorrect. If k were 2, then the expression given would be rewritten as $\\frac{1}{3}(x-2)(x+2)$, which is equivalent to $\\frac{1}{3}x^{2}-\\frac{4}{3}$, not $\\frac{1}{3}x^{2}-2$.\nChoice B is incorrect. This may result from incorrectly factoring the expression and finding $(x-6)(x+6)$ as the factored form of the expression. Choice C is incorrect. This may result from incorrectly distributing the $\\frac{1}{3}$ and rewriting the expression as $\\frac{1}{3}(x^{2}-2)$.",
+  "note": "PS Equivalent expressions HARD-1 #13: stripped_math — restored 1/3, x²−6, (x−√6)(x+√6), √6 and choice-A/B/C expressions; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/EQUIVALENT EXPRESSION/ANS HARD 1EQUIV EXPRES .pdf p19 (Question ID a0b4103e); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnxfu01fwqmt10doytpcg",
+  "field": "explanation",
+  "before": "Choice D is correct. The expression can be rewritten as . Using the distributive property, the expression yields\n. Combining like terms gives .",
+  "after": "Choice D is correct. The expression $\\left(a+\\frac{b}{2}\\right)^{2}$ can be rewritten as $\\left(a+\\frac{b}{2}\\right)\\left(a+\\frac{b}{2}\\right)$. Using the distributive property, the expression yields $\\left(a+\\frac{b}{2}\\right)\\left(a+\\frac{b}{2}\\right)=a^{2}+\\frac{ab}{2}+\\frac{ab}{2}+\\frac{b^{2}}{4}$. Combining like terms gives $a^{2}+ab+\\frac{b^{2}}{4}$.\nChoices A, B, and C are incorrect and may result from errors using the distributive property on the given expression or combining like terms.",
+  "note": "PS Equivalent expressions HARD-1 #14: stripped_math — restored (a+b/2)², its expansion and a²+ab+b²/4; joined hard line breaks; restored the Choices A–C paragraph cut at the page break (p22)",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/EQUIVALENT EXPRESSION/ANS HARD 1EQUIV EXPRES .pdf p21 (Question ID ad038c19); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnxg101g2qmt1t7c0bqt3",
+  "field": "explanation",
+  "before": "Choice C is correct. Since the expression can be factored as , the given equation can be rewritten as . Since\n, is also not equal to 0, so both the numerator and denominator of can be divided by . This gives . Equating the\ncoefficient of x on each side of the equation gives . Equating the constant terms gives . The sum is .\nChoice A is incorrect and may result from incorrectly simplifying the equation. Choices B and D are incorrect. They are the values of d and a, respectively, not .",
+  "after": "Choice C is correct. Since the expression $x^{2}+6x-7$ can be factored as $(x+7)(x-1)$, the given equation can be rewritten as $\\frac{(x+7)(x-1)}{x+7}=ax+d$. Since $x\\neq -7$, $x+7$ is also not equal to 0, so both the numerator and denominator of $\\frac{(x+7)(x-1)}{x+7}$ can be divided by $x+7$. This gives $x-1=ax+d$. Equating the coefficient of x on each side of the equation gives $a=1$. Equating the constant terms gives $d=-1$. The sum is $1+(-1)=0$.\nChoice A is incorrect and may result from incorrectly simplifying the equation. Choices B and D are incorrect. They are the values of d and a, respectively, not $a+d$.",
+  "note": "PS Equivalent expressions HARD-1 #16: stripped_math — restored factoring (x+7)(x−1), rewritten equation, x≠−7, a=1, d=−1, 1+(−1)=0, a+d; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/EQUIVALENT EXPRESSION/ANS HARD 1EQUIV EXPRES .pdf p24 (Question ID 12e7faf8); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnxg501g7qmt1tkea9b5o",
+  "field": "explanation",
+  "before": "Choice D is correct. The numerator of the given expression can be rewritten in terms of the denominator, , as follows: ,\nwhich is equivalent to . So the given expression is equivalent to . Since the given\nexpression is defined for , the expression can be rewritten as .",
+  "after": "Choice D is correct. The numerator of the given expression can be rewritten in terms of the denominator, $x-3$, as follows: $x^{2}-2x-5=x^{2}-3x+x-3-2$, which is equivalent to $x(x-3)+(x-3)-2$. So the given expression is equivalent to $\\frac{x(x-3)+(x-3)-2}{x-3}=\\frac{x(x-3)}{x-3}+\\frac{x-3}{x-3}-\\frac{2}{x-3}$. Since the given expression is defined for $x\\neq 3$, the expression can be rewritten as $x+1-\\frac{2}{x-3}$.\nLong division can also be used as an alternate approach. Choices A, B, and C are incorrect and may result from errors made when dividing the two polynomials or making use of structure.",
+  "note": "PS Equivalent expressions HARD-1 #17: stripped_math — restored x−3, numerator rewrite, fraction split, x≠3, x+1−2/(x−3); joined hard line breaks; restored the long-division/Choices A–C paragraph cut at the page break (p27)",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/EQUIVALENT EXPRESSION/ANS HARD 1EQUIV EXPRES .pdf p26 (Question ID 89fc23af); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnxg801gcqmt11tq3fgv3",
+  "field": "explanation",
+  "before": "The correct answer is 6632. Applying the distributive property to the expression yields . Then adding together\nand and collecting like terms results in . This is written in the form , where and . Therefore\n.",
+  "after": "The correct answer is 6632. Applying the distributive property to the expression yields $(7532+100y^{2})+(100y^{2}-1100)$. Then adding together $7532+100y^{2}$ and $100y^{2}-1100$ and collecting like terms results in $200y^{2}+6432$. This is written in the form $ay^{2}+b$, where $a=200$ and $b=6432$. Therefore $a+b=200+6432=6632$.",
+  "note": "PS Equivalent expressions HARD-1 #18: stripped_math — restored distributed expression, 200y²+6432, ay²+b, a=200, b=6432, a+b=6632; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/EQUIVALENT EXPRESSION/ANS HARD 1EQUIV EXPRES .pdf p28 (Question ID 911c415b); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnxep01evqmt19m7s33gg",
+  "field": "explanation",
+  "before": "Choice A is correct. If the given expression is equivalent to , then , where x isn’t equal to b. Multiplying both sides of this equation by\nyields . Since the right-hand side of this equation is in factored form for the difference of squares, the value of c must be a perfect square.\nOnly choice A gives a perfect square for the value of c.",
+  "after": "Choice A is correct. If the given expression is equivalent to $x+b$, then $\\frac{x^{2}-c}{x-b}=x+b$, where x isn’t equal to b. Multiplying both sides of this equation by $x-b$ yields $x^{2}-c=(x+b)(x-b)$. Since the right-hand side of this equation is in factored form for the difference of squares, the value of c must be a perfect square. Only choice A gives a perfect square for the value of c.\nChoices B, C, and D are incorrect. None of these values of c produces a difference of squares. For example, when 6 is substituted for c in the given expression, the result is $\\frac{x^{2}-6}{x-b}$. The expression $x^{2}-6$ can’t be factored with integer values, and therefore $\\frac{x^{2}-6}{x-b}$ isn’t equivalent to $x+b$.",
+  "note": "PS Equivalent expressions HARD-1 #2: stripped_math — restored x+b, (x²−c)/(x−b)=x+b, x−b, x²−c=(x+b)(x−b); joined hard line breaks; restored the Choices B–D paragraph cut at the page break (p4)",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/EQUIVALENT EXPRESSION/ANS HARD 1EQUIV EXPRES .pdf p3 (Question ID d8789a4c); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnxet01f0qmt1umsqgwd0",
+  "field": "explanation",
+  "before": "Choice D is correct. The expression 4 - 1 can be rewritten as 4 + -1 . To add the two terms of this expression, the terms can be rewritten with a common\n4𝑥-5 𝑥+1 4𝑥-5 𝑥+1\ndenominator. Since 𝑥+1 =1, the expression 4 can be rewritten as 𝑥+14 . Since 4𝑥-5 =1, the expression -1 can be rewritten as 4𝑥-5-1 . Therefore, the\n𝑥+1 4𝑥-5 𝑥+14𝑥-5 4𝑥-5 𝑥+1 4𝑥-5𝑥+1\nexpression 4 + -1 can be rewritten as 𝑥+14 + 4𝑥-5-1 , which is equivalent to 𝑥+14+4𝑥-5-1 . Applying the distributive property to each term of the numerator\n4𝑥-5 𝑥+1 𝑥+14𝑥-5 4𝑥-5𝑥+1 𝑥+14𝑥-5\n4𝑥+4+-4𝑥+5 4𝑥+-4𝑥+4+5 9\nyields , or . Adding like terms in the numerator yields .\n𝑥+14𝑥-5 𝑥+14𝑥-5 𝑥+14𝑥-5\nChoice A is incorrect and may result from conceptual or calculation errors.\nChoice B is incorrect and may result from conceptual or calculation errors.\nChoice C is incorrect and may result from conceptual or calculation errors.",
+  "after": "Choice D is correct. The expression $\\frac{4}{4x-5}-\\frac{1}{x+1}$ can be rewritten as $\\frac{4}{4x-5}+\\frac{-1}{x+1}$. To add the two terms of this expression, the terms can be rewritten with a common denominator. Since $\\frac{x+1}{x+1}=1$, the expression $\\frac{4}{4x-5}$ can be rewritten as $\\frac{(x+1)(4)}{(x+1)(4x-5)}$. Since $\\frac{4x-5}{4x-5}=1$, the expression $\\frac{-1}{x+1}$ can be rewritten as $\\frac{(4x-5)(-1)}{(4x-5)(x+1)}$. Therefore, the expression $\\frac{4}{4x-5}+\\frac{-1}{x+1}$ can be rewritten as $\\frac{(x+1)(4)}{(x+1)(4x-5)}+\\frac{(4x-5)(-1)}{(4x-5)(x+1)}$, which is equivalent to $\\frac{(x+1)(4)+(4x-5)(-1)}{(x+1)(4x-5)}$. Applying the distributive property to each term of the numerator yields $\\frac{4x+4+(-4x)+5}{(x+1)(4x-5)}$, or $\\frac{4x+(-4x)+4+5}{(x+1)(4x-5)}$. Adding like terms in the numerator yields $\\frac{9}{(x+1)(4x-5)}$.\nChoice A is incorrect and may result from conceptual or calculation errors.\nChoice B is incorrect and may result from conceptual or calculation errors.\nChoice C is incorrect and may result from conceptual or calculation errors.",
+  "note": "PS Equivalent expressions HARD-1 #3: stripped_math — replaced the flattened fraction residue (e.g. '4 - 1', '𝑥+14') with the fractions and common-denominator steps ending in 9/((x+1)(4x−5)); joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/EQUIVALENT EXPRESSION/ANS HARD 1EQUIV EXPRES .pdf p5 (Question ID 433184f1); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnxf601fbqmt1avybp1mn",
+  "field": "explanation",
+  "before": "The correct answer is . The value of can be found by first rewriting the left-hand side of the given equation as . Using the properties of exponents, this\nexpression can be rewritten as . This expression can be rewritten by subtracting the fractions in the exponent, which yields . Thus, is . Note\nthat 7/6, 1.166, and 1.167 are examples of ways to enter a correct answer.",
+  "after": "The correct answer is $\\frac{7}{6}$. The value of $\\frac{a}{b}$ can be found by first rewriting the left-hand side of the given equation as $\\frac{x^{\\frac{5}{2}}}{x^{\\frac{4}{3}}}$. Using the properties of exponents, this expression can be rewritten as $x^{\\left(\\frac{5}{2}-\\frac{4}{3}\\right)}$. This expression can be rewritten by subtracting the fractions in the exponent, which yields $x^{\\frac{7}{6}}$. Thus, $\\frac{a}{b}$ is $\\frac{7}{6}$. Note that 7/6, 1.166, and 1.167 are examples of ways to enter a correct answer.",
+  "note": "PS Equivalent expressions HARD-1 #7: stripped_math — restored 7/6, a/b, x^(5/2)/x^(4/3), x^(5/2−4/3), x^(7/6); joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/EQUIVALENT EXPRESSION/ANS HARD 1EQUIV EXPRES .pdf p10 (Question ID 40c09d66); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnxxy01puqmt1ghid1gnm",
+  "field": "explanation",
+  "before": "Choice C is correct. The solution to the system of two equations corresponds to the point where the graphs of the equations intersect. The\ngraphs of the linear equation and the nonlinear equation shown intersect at the point . Thus, the solution to the system is .\nChoice A is incorrect and may result from conceptual or calculation errors.\nChoice B is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "after": "Choice C is correct. The solution to the system of two equations corresponds to the point where the graphs of the equations intersect. The graphs of the linear equation and the nonlinear equation shown intersect at the point $(2, 4)$. Thus, the solution to the system is $(2, 4)$.\nChoice A is incorrect and may result from conceptual or calculation errors.\nChoice B is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "note": "PS Nonlinear equations in one variable and systems of equations in two variables EASY #12: stripped_math — restored the intersection point (2, 4) twice; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR EQUATIONS/ANS Non Linear Equations EASY.pdf p12 (Question ID 4ca30186); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnxhw01h0qmt1rgdtzg0x",
+  "field": "explanation",
+  "before": "Choice C is correct. Multiplying both sides of the given equation by yields . Therefore, the value of is .\nChoice A is incorrect and may result from conceptual or calculation errors.\nChoice B is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "after": "Choice C is correct. Multiplying both sides of the given equation by $x$ yields $42=7x^{2}$. Therefore, the value of $7x^{2}$ is $42$.\nChoice A is incorrect and may result from conceptual or calculation errors.\nChoice B is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "note": "PS Nonlinear equations in one variable and systems of equations in two variables MEDIUM #6: stripped_math — restored x, 42=7x², 7x², 42",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR EQUATIONS/ANS Non Linear Equations MED.pdf p5 (Question ID 09e5e4d3); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnxi601hbqmt1cq6h3q8u",
+  "field": "explanation",
+  "before": "Choice A is correct. Substituting for y in the second equation gives . This equation can be solved as follows:\nApply the distributive property.\nSubtract 2x and 6 from both sides of the equation.\nCombine like terms.\nFactor both terms on the left side of the equation\nby 2x.\nThus, and are the solutions to the system. Since , only needs to be considered. The value of y when is\n. Therefore, the value of xy is .\nChoices B, C, and D are incorrect and likely result from a computational or conceptual error when solving this system of equations.",
+  "after": "Choice A is correct. Substituting $x^{2}$ for y in the second equation gives $2(x^{2})+6=2(x+3)$. This equation can be solved as follows:\n| $2x^{2}+6=2x+6$ | Apply the distributive property. |\n| --- | --- |\n| $2x^{2}+6-2x-6=0$ | Subtract 2x and 6 from both sides of the equation. |\n| $2x^{2}-2x=0$ | Combine like terms. |\n| $2x(x-1)=0$ | Factor both terms on the left side of the equation by 2x. |\n\nThus, $x=0$ and $x=1$ are the solutions to the system. Since $x>0$, only $x=1$ needs to be considered. The value of y when $x=1$ is $y=x^{2}=1^{2}=1$. Therefore, the value of xy is $(1)(1)=1$.\nChoices B, C, and D are incorrect and likely result from a computational or conceptual error when solving this system of equations.",
+  "note": "PS Nonlinear equations in one variable and systems of equations in two variables MEDIUM #9: stripped_math — restored x², 2(x²)+6=2(x+3); rebuilt the 4-step solving table (math | justification) as a pipe table; x=0, x=1, x>0, y=x²=1²=1, (1)(1)=1; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR EQUATIONS/ANS Non Linear Equations MED.pdf p8 (Question ID 876a731c); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnxqi01mdqmt11g0xkr4e",
+  "field": "explanation",
+  "before": "Choice A is correct. It’s given that the function gives a company’s predicted annual revenue, in dollars, years after the company started\nselling jewelry online. Since the value of is the value of when , it follows that “ is approximately equal to ” means\nthat is approximately equal to when . Therefore, the best interpretation of the given statement is that years after the\ncompany started selling jewelry online, its predicted annual revenue is approximately dollars.\nChoice B is incorrect. The function gives the predicted annual revenue, not the predicted increase in annual revenue.\nChoice C is incorrect and may result from conceptual errors.\nChoice D is incorrect. In the given function, represents the number of years after the company started selling jewelry online, not the percent\nincrease in revenue from the previous year.",
+  "after": "Choice A is correct. It’s given that the function $f$ gives a company’s predicted annual revenue, in dollars, $x$ years after the company started selling jewelry online. Since the value of $f(5)$ is the value of $f(x)$ when $x=5$, it follows that “$f(5)$ is approximately equal to $648{,}650$” means that $f(x)$ is approximately equal to $648{,}650$ when $x=5$. Therefore, the best interpretation of the given statement is that $5$ years after the company started selling jewelry online, its predicted annual revenue is approximately $648{,}650$ dollars.\nChoice B is incorrect. The function $f$ gives the predicted annual revenue, not the predicted increase in annual revenue.\nChoice C is incorrect and may result from conceptual errors.\nChoice D is incorrect. In the given function, $x$ represents the number of years after the company started selling jewelry online, not the percent increase in revenue from the previous year.",
+  "note": "PS Nonlinear functions EASY #10: stripped_math — restored f, x, f(5), f(x), x=5, 648,650, 5; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/ANS Non Linear Functions EASY.pdf p11 (Question ID d84a514a); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnxqz01mtqmt1xdv9pr38",
+  "field": "explanation",
+  "before": "The correct answer is . The y-intercept of the graph of a function in the xy-plane is the point where the graph crosses the y-axis. The graph of\nthe polynomial function shown crosses the y-axis at the point . It's given that the y-intercept of the graph is . Thus, the value of is\n.",
+  "after": "The correct answer is $-3$. The y-intercept of the graph of a function in the xy-plane is the point where the graph crosses the y-axis. The graph of the polynomial function shown crosses the y-axis at the point $(0, -3)$. It's given that the y-intercept of the graph is $(0, y)$. Thus, the value of $y$ is $-3$.",
+  "note": "PS Nonlinear functions EASY #14: stripped_math — restored −3, (0, −3), (0, y), y; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/ANS Non Linear Functions EASY.pdf p16 (Question ID 50418728); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnxpq01lnqmt1bldb1u22",
+  "field": "explanation",
+  "before": "Choice B is correct. The y-intercept of a graph in the xy-plane is the point at which the graph crosses the y-axis. The graph shown crosses the y-\naxis at the point . Therefore, the y-intercept of the graph shown is .\nChoice A is incorrect and may result from conceptual or calculation errors.\nChoice C is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "after": "Choice B is correct. The y-intercept of a graph in the xy-plane is the point at which the graph crosses the y-axis. The graph shown crosses the y-axis at the point $(0, 2)$. Therefore, the y-intercept of the graph shown is $(0, 2)$.\nChoice A is incorrect and may result from conceptual or calculation errors.\nChoice C is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "note": "PS Nonlinear functions EASY #4: stripped_math — restored (0, 2) twice; joined hard line breaks (incl. 'y-/axis')",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/ANS Non Linear Functions EASY.pdf p5 (Question ID b5c43226); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnxpy01ltqmt1u969pf1n",
+  "field": "explanation",
+  "before": "Choice A is correct. Substituting –1 for x in the equation that defines f gives . Simplifying the expressions in\nthe numerator and denominator yields , which is equal to or –5.\nChoices B, C, and D are incorrect and may result from misapplying the order of operations when substituting –1 for x.",
+  "after": "Choice A is correct. Substituting –1 for x in the equation that defines f gives $f(-1)=\\frac{(-1)^{2}-6(-1)+3}{(-1)-1}$. Simplifying the expressions in the numerator and denominator yields $\\frac{1+6+3}{-2}$, which is equal to $\\frac{10}{-2}$ or –5.\nChoices B, C, and D are incorrect and may result from misapplying the order of operations when substituting –1 for x.",
+  "note": "PS Nonlinear functions EASY #6: stripped_math — restored f(−1)=((−1)²−6(−1)+3)/((−1)−1), (1+6+3)/(−2), 10/(−2); joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/ANS Non Linear Functions EASY.pdf p7 (Question ID 5377d9cf); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnxqe01m8qmt1m0ndg1em",
+  "field": "explanation",
+  "before": "Choice B is correct. The y-intercept of a graph is the point at which the graph intersects the y-axis. The graph shown intersects the y-axis at the\npoint . Therefore, the y-intercept of the graph is . It’s given that is the height of the marble above the ground, in inches, and is the\nnumber of seconds after the marble started moving. It follows that the marble's height was inches above the ground seconds after it started\nmoving. Therefore, the best interpretation of the y-intercept of the graph is that the marble’s height was inches above the ground when it\nstarted moving.\nChoice A is incorrect and may result from conceptual errors.\nChoice C is incorrect and may result from conceptual errors.\nChoice D is incorrect and may result from conceptual errors.",
+  "after": "Choice B is correct. The y-intercept of a graph is the point at which the graph intersects the y-axis. The graph shown intersects the y-axis at the point $(0, 8)$. Therefore, the y-intercept of the graph is $(0, 8)$. It’s given that $y$ is the height of the marble above the ground, in inches, and $x$ is the number of seconds after the marble started moving. It follows that the marble's height was $8$ inches above the ground $0$ seconds after it started moving. Therefore, the best interpretation of the y-intercept of the graph is that the marble’s height was $8$ inches above the ground when it started moving.\nChoice A is incorrect and may result from conceptual errors.\nChoice C is incorrect and may result from conceptual errors.\nChoice D is incorrect and may result from conceptual errors.",
+  "note": "PS Nonlinear functions EASY #9: stripped_math — restored (0, 8), y, x, 8, 0; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/ANS Non Linear Functions EASY.pdf p10 (Question ID 5e63b9cf); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnx9c01diqmt1glembo2t",
+  "field": "explanation",
+  "before": "Choice B is correct. It’s given that function 𝑔 is defined by 𝑔(𝑡) =𝑓(𝑡) +3 and that 𝑓(𝑡) =55𝑡-2𝑡2 . Substituting 55𝑡-2𝑡2 for 𝑓(𝑡) in 𝑔(𝑡) =𝑓(𝑡) +3 yields\n𝑔(𝑡) =55𝑡-2𝑡2+3, or 𝑔(𝑡) = -2𝑡2+55𝑡+3. The maximum value of 𝑔(𝑡) can be found by completing the square to rewrite the equation defining 𝑔 in the form\n𝑔𝑡=𝑎(𝑡-ℎ)2+𝑘, where the maximum value of the function is 𝑘, which occurs when 𝑡=ℎ, and 𝑎 is a negative constant. The equation 𝑔𝑡= -2𝑡2+55𝑡+3 is\n2 2 2 2\nequivalent to 𝑔(𝑡) = -2(𝑡2- 55𝑡) +3, which can be rewritten as 𝑔𝑡= -2(𝑡2- 55𝑡+ (55) ) +3+2(55) , or 𝑔𝑡= -2(𝑡- 55) +3+2(55) . This equation is in the form\n2 2 4 4 4 4\n2 2\n𝑔𝑡=𝑎(𝑡-ℎ)2+𝑘, where 𝑎= -2, ℎ= 55 , and 𝑘=3+2(55) . Thus, the maximum value of 𝑔(𝑡) is 3+2(55) .\n4 4 4\nAlternate approach: Since the function 𝑓 is a quadratic function, the maximum value of 𝑓(𝑡) occurs at the value of 𝑡 that’s halfway between the two zeros of the\nfunction. The zeros of function 𝑓 can be found by substituting 0 for 𝑓(𝑡) in the equation defining 𝑓, which yields 0=55𝑡-2𝑡2 . This equation can be rewritten as\n0=𝑡(55-2𝑡). By the zero product property, it follows that 𝑡=0 or 55-2𝑡=0. Subtracting 55 from each side of the equation 55-2𝑡=0 yields -2𝑡= -55. Dividing\n55 55 55\neach side of this equation by -2 yields 𝑡= . Therefore, the zeros of function 𝑓 are 0 and . The value that’s halfway between 0 and can be found by calculating\n2 2 2\nthe average of 0 and 55 , which is\n0+5\n2\n5\n, or 55 . It follows that the maximum of function 𝑓 occurs when 𝑡= 55 . Substituting 55 for 𝑡 in the equation defining function 𝑓\n2 2 4 4 4\n55 55 55 2 55 552 552 552 4\nyields 𝑓( ) =55( ) -2( ) , which is equivalent to 𝑓( ) = -2( ). Multiplying by in this equation to get a common denominator yields\n4 4 4 4 4 42 4 4",
+  "after": "Choice B is correct. It’s given that function $g$ is defined by $g(t)=f(t)+3$ and that $f(t)=55t-2t^{2}$. Substituting $55t-2t^{2}$ for $f(t)$ in $g(t)=f(t)+3$ yields $g(t)=55t-2t^{2}+3$, or $g(t)=-2t^{2}+55t+3$. The maximum value of $g(t)$ can be found by completing the square to rewrite the equation defining $g$ in the form $g(t)=a(t-h)^{2}+k$, where the maximum value of the function is $k$, which occurs when $t=h$, and $a$ is a negative constant. The equation $g(t)=-2t^{2}+55t+3$ is equivalent to $g(t)=-2\\left(t^{2}-\\frac{55}{2}t\\right)+3$, which can be rewritten as $g(t)=-2\\left(t^{2}-\\frac{55}{2}t+\\left(\\frac{55}{4}\\right)^{2}\\right)+3+2\\left(\\frac{55}{4}\\right)^{2}$, or $g(t)=-2\\left(t-\\frac{55}{4}\\right)^{2}+3+2\\left(\\frac{55}{4}\\right)^{2}$. This equation is in the form $g(t)=a(t-h)^{2}+k$, where $a=-2$, $h=\\frac{55}{4}$, and $k=3+2\\left(\\frac{55}{4}\\right)^{2}$. Thus, the maximum value of $g(t)$ is $3+2\\left(\\frac{55}{4}\\right)^{2}$.\nAlternate approach: Since the function $f$ is a quadratic function, the maximum value of $f(t)$ occurs at the value of $t$ that’s halfway between the two zeros of the function. The zeros of function $f$ can be found by substituting $0$ for $f(t)$ in the equation defining $f$, which yields $0=55t-2t^{2}$. This equation can be rewritten as $0=t(55-2t)$. By the zero product property, it follows that $t=0$ or $55-2t=0$. Subtracting $55$ from each side of the equation $55-2t=0$ yields $-2t=-55$. Dividing each side of this equation by $-2$ yields $t=\\frac{55}{2}$. Therefore, the zeros of function $f$ are $0$ and $\\frac{55}{2}$. The value that’s halfway between $0$ and $\\frac{55}{2}$ can be found by calculating the average of $0$ and $\\frac{55}{2}$, which is $\\frac{0+\\frac{55}{2}}{2}$, or $\\frac{55}{4}$. It follows that the maximum of function $f$ occurs when $t=\\frac{55}{4}$. Substituting $\\frac{55}{4}$ for $t$ in the equation defining function $f$ yields $f\\left(\\frac{55}{4}\\right)=55\\left(\\frac{55}{4}\\right)-2\\left(\\frac{55}{4}\\right)^{2}$, which is equivalent to $f\\left(\\frac{55}{4}\\right)=\\frac{55^{2}}{4}-2\\left(\\frac{55^{2}}{4^{2}}\\right)$. Multiplying $\\frac{55^{2}}{4}$ by $\\frac{4}{4}$ in this equation to get a common denominator yields $f\\left(\\frac{55}{4}\\right)=4\\left(\\frac{55^{2}}{4^{2}}\\right)-2\\left(\\frac{55^{2}}{4^{2}}\\right)$, or $f\\left(\\frac{55}{4}\\right)=2\\left(\\frac{55^{2}}{4^{2}}\\right)$, which is equivalent to $f\\left(\\frac{55}{4}\\right)=2\\left(\\frac{55}{4}\\right)^{2}$. Thus, the maximum value of $f(t)$ is $2\\left(\\frac{55}{4}\\right)^{2}$. Since the equation defining $g(t)$ is $g(t)=f(t)+3$, the maximum value of $g(t)$ is $3$ greater than the maximum value of $f(t)$. It follows that the maximum value of $g(t)$ is $3+2\\left(\\frac{55}{4}\\right)^{2}$.\nChoice A is incorrect and may result from conceptual or calculation errors.\nChoice C is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "note": "PS Nonlinear functions HARD #13: stripped_math — replaced the flattened residue with g(t)/f(t) completing-the-square and alternate zeros approach (max 3+2(55/4)²; source prints 'gt' for g(t)); joined hard line breaks; restored the tail cut at the page break (p23: end of alternate approach + Choices A/C/D)",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/ANS NON LINEAR FUNCT HARD .pdf p22 (Question ID d139cf4b); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnx8301cnqmt13d6pvsr5",
+  "field": "explanation",
+  "before": "Choice D is correct. It’s given that the graph of intersects the x-axis at and , where t is a constant. Since this graph intersects the x-axis when\nor when , it follows that and . If , then . Adding 32 to both sides of this equation yields .\nDividing both sides of this equation by 2 yields . Taking the square root of both sides of this equation yields . Adding 4 to both sides of this\nequation yields . Therefore, the value of t is 8.\nChoices A, B, and C are incorrect and may result from calculation errors.",
+  "after": "Choice D is correct. It’s given that the graph of $y=h(x)$ intersects the x-axis at $(0,0)$ and $(t,0)$, where t is a constant. Since this graph intersects the x-axis when $y=0$ or when $h(x)=0$, it follows that $h(0)=0$ and $h(t)=0$. If $h(t)=0$, then $0=2(t-4)^{2}-32$. Adding 32 to both sides of this equation yields $32=2(t-4)^{2}$. Dividing both sides of this equation by 2 yields $16=(t-4)^{2}$. Taking the square root of both sides of this equation yields $4=t-4$. Adding 4 to both sides of this equation yields $8=t$. Therefore, the value of t is 8.\nChoices A, B, and C are incorrect and may result from calculation errors.",
+  "note": "PS Nonlinear functions HARD #2: stripped_math — restored y=h(x), (0,0), (t,0), h(0)=0, h(t)=0, 0=2(t−4)²−32 … 8=t; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/ANS NON LINEAR FUNCT HARD .pdf p2 (Question ID 91e7ea5e); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnxa501dtqmt1b64fm7ne",
+  "field": "explanation",
+  "before": "The correct answer is 13. Let w represent the width of the rectangular garden, in feet. Since the length of the garden will be 5 feet longer than the width of the\ngarden, the length of the garden will be feet. Thus the area of the garden will be . It is also given that the area of the garden will be 104 square feet.\nTherefore, , which is equivalent to . Factoring this equation results in . Therefore, and .\nBecause width cannot be negative, the width of the garden must be 8 feet. This means the length of the garden must be feet.",
+  "after": "The correct answer is 13. Let w represent the width of the rectangular garden, in feet. Since the length of the garden will be 5 feet longer than the width of the garden, the length of the garden will be $w+5$ feet. Thus the area of the garden will be $w(w+5)$. It is also given that the area of the garden will be 104 square feet. Therefore, $w(w+5)=104$, which is equivalent to $w^{2}+5w-104=0$. Factoring this equation results in $(w+13)(w-8)=0$. Therefore, $w=8$ and $w=-13$. Because width cannot be negative, the width of the garden must be 8 feet. This means the length of the garden must be $8+5=13$ feet.",
+  "note": "PS Nonlinear functions HARD #20: stripped_math — restored w+5, w(w+5)=104, w²+5w−104=0, (w+13)(w−8)=0, w=8, w=−13, 8+5=13; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/ANS NON LINEAR FUNCT HARD .pdf p33 (Question ID 58dcc59f); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnxac01dvqmt1cgvtud8e",
+  "field": "explanation",
+  "before": "Choice A is correct. In 1 year, there are 4 quarter years, so the number of quarter years, q, is 4 times the number of years, t ; that is, . This is equivalent to\n, and substituting this into the expression for M in terms of t gives .\nChoices B and D are incorrect and may be the result of incorrectly using instead of . (Choices B and D are nearly the same since is equivalent\nto , which is approximately .) Choice C is incorrect and may be the result of incorrectly using and unnecessarily dividing 0.02 by 4.",
+  "after": "Choice A is correct. In 1 year, there are 4 quarter years, so the number of quarter years, q, is 4 times the number of years, t ; that is, $q=4t$. This is equivalent to $t=\\frac{q}{4}$, and substituting this into the expression for M in terms of t gives $M=1{,}800(1.02)^{\\frac{q}{4}}$.\nChoices B and D are incorrect and may be the result of incorrectly using $t=4q$ instead of $q=4t$. (Choices B and D are nearly the same since $1.02^{4q}$ is equivalent to $(1.02^{4})^{q}$, which is approximately $1.082^{q}$.) Choice C is incorrect and may be the result of incorrectly using $t=4q$ and unnecessarily dividing 0.02 by 4.",
+  "note": "PS Nonlinear functions HARD #22: stripped_math — restored q=4t, t=q/4, M=1,800(1.02)^(q/4), t=4q, 1.02^(4q), (1.02⁴)^q, 1.082^q; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/ANS NON LINEAR FUNCT HARD .pdf p35 (Question ID 59d1f4b5); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnxag01dwqmt1kuxrtwic",
+  "field": "explanation",
+  "before": "Choice B is correct. A cube has 6 faces of equal area, so if the total surface area of a cube is , then the area of one face is . Likewise, the area of one\nface of a cube is the square of one of its edges; therefore, if the area of one face is , then the length of one edge of the cube is . Since the perimeter of one\nface of a cube is four times the length of one edge, the perimeter is .",
+  "after": "Choice B is correct. A cube has 6 faces of equal area, so if the total surface area of a cube is $6\\left(\\frac{a}{4}\\right)^{2}$, then the area of one face is $\\left(\\frac{a}{4}\\right)^{2}$. Likewise, the area of one face of a cube is the square of one of its edges; therefore, if the area of one face is $\\left(\\frac{a}{4}\\right)^{2}$, then the length of one edge of the cube is $\\frac{a}{4}$. Since the perimeter of one face of a cube is four times the length of one edge, the perimeter is $4\\left(\\frac{a}{4}\\right)=a$.\nChoice A is incorrect because if the perimeter of one face of the cube is $\\frac{a}{4}$, then the total surface area of the cube is $6\\left(\\frac{\\frac{a}{4}}{4}\\right)^{2}=6\\left(\\frac{a}{16}\\right)^{2}$, which is not $6\\left(\\frac{a}{4}\\right)^{2}$. Choice C is incorrect because if the perimeter of one face of the cube is 4a, then the total surface area of the cube is $6\\left(\\frac{4a}{4}\\right)^{2}=6a^{2}$, which is not $6\\left(\\frac{a}{4}\\right)^{2}$. Choice D is incorrect because if the perimeter of one face of the cube is 6a, then the total surface area of the cube is $6\\left(\\frac{6a}{4}\\right)^{2}=6\\left(\\frac{3a}{2}\\right)^{2}$, which is not $6\\left(\\frac{a}{4}\\right)^{2}$.",
+  "note": "PS Nonlinear functions HARD #23: stripped_math — restored 6(a/4)², (a/4)², a/4, 4(a/4)=a; joined hard line breaks; restored the Choices A/C/D paragraph cut at the page break (p38)",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/ANS NON LINEAR FUNCT HARD .pdf p37 (Question ID 635f54ee); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnxaz01e1qmt1wrnj5kzg",
+  "field": "explanation",
+  "before": "The correct answer is 210. Since , 6, and 7 are zeros of the function, the function can be rewritten as . Expanding the function yields\n. Thus, , , and . Therefore, the value of c is 210.",
+  "after": "The correct answer is 210. Since $-5$, 6, and 7 are zeros of the function, the function can be rewritten as $h(x)=(x+5)(x-6)(x-7)$. Expanding the function yields $h(x)=x^{3}-8x^{2}-23x+210$. Thus, $a=-8$, $b=-23$, and $c=210$. Therefore, the value of c is 210.",
+  "note": "PS Nonlinear functions HARD #28: stripped_math — restored −5, h(x)=(x+5)(x−6)(x−7), x³−8x²−23x+210, a=−8, b=−23, c=210; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/ANS NON LINEAR FUNCT HARD .pdf p46 (Question ID 9f2ecade); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnxbe01e9qmt12rwoi5qe",
+  "field": "explanation",
+  "before": "The correct answer is 8. The values of for the exponential function f shown in the table increase by a factor of for each increase of 1 in x. This relationship\ncan be represented by the equation , where b is a constant. It’s given that when , . Substituting 2 for x and for into\nyields . Since , it follows that . Thus, an equation that defines the function f is . It follows that the\nvalue of k such that can be found by solving the equation , which yields .",
+  "after": "The correct answer is 8. The values of $f(x)$ for the exponential function f shown in the table increase by a factor of $a^{4}$ for each increase of 1 in x. This relationship can be represented by the equation $f(x)=a^{4x+b}$, where b is a constant. It’s given that when $x=2$, $f(x)=a^{5}$. Substituting 2 for x and $a^{5}$ for $f(x)$ into $f(x)=a^{4x+b}$ yields $a^{5}=a^{4(2)+b}$. Since $4(2)+b=5$, it follows that $b=-3$. Thus, an equation that defines the function f is $f(x)=a^{4x-3}$. It follows that the value of k such that $f(k)=a^{29}$ can be found by solving the equation $4k-3=29$, which yields $k=8$.",
+  "note": "PS Nonlinear functions HARD #32: stripped_math — restored f(x), a⁴, f(x)=a^(4x+b), x=2, f(x)=a⁵, a⁵=a^(4(2)+b), b=−3, f(x)=a^(4x−3), f(k)=a²⁹, 4k−3=29, k=8; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/ANS NON LINEAR FUNCT HARD .pdf p52 (Question ID 43926bd9); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnxbq01egqmt1g9tw9oc0",
+  "field": "explanation",
+  "before": "Choice A is correct. The given quadratic function f is in vertex form, , where is the vertex of the graph of in the xy-plane.\nTherefore, the vertex of the graph of is . In addition, the y-coordinate of the vertex represents either the minimum or maximum value of a quadratic\nfunction, depending on whether the graph of the function opens upward or downward. Since the leading coefficient of f (the coefficient of the term ) is 1,\nwhich is positive, the graph of opens upward. It follows that at , the minimum value of the function f is .\nChoice B is incorrect and may result from making a sign error and from using the x-coordinate of the vertex. Choice C is incorrect and may result from using the x-\ncoordinate of the vertex. Choice D is incorrect and may result from making a sign error.",
+  "after": "Choice A is correct. The given quadratic function f is in vertex form, $f(x)=(x-h)^{2}+k$, where $(h,k)$ is the vertex of the graph of $y=f(x)$ in the xy-plane. Therefore, the vertex of the graph of $y=f(x)$ is $(2,-4)$. In addition, the y-coordinate of the vertex represents either the minimum or maximum value of a quadratic function, depending on whether the graph of the function opens upward or downward. Since the leading coefficient of f (the coefficient of the term $(x-2)^{2}$) is 1, which is positive, the graph of $y=f(x)$ opens upward. It follows that at $x=2$, the minimum value of the function f is $-4$.\nChoice B is incorrect and may result from making a sign error and from using the x-coordinate of the vertex. Choice C is incorrect and may result from using the x-coordinate of the vertex. Choice D is incorrect and may result from making a sign error.",
+  "note": "PS Nonlinear functions HARD #35: stripped_math — restored f(x)=(x−h)²+k, (h,k), y=f(x), (2,−4), (x−2)², x=2, −4; joined hard line breaks (incl. 'x-/coordinate')",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/ANS NON LINEAR FUNCT HARD .pdf p56 (Question ID a7711fe8); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnx8k01czqmt1txo80byt",
+  "field": "explanation",
+  "before": "Choice C is correct. By definition, the y-value when a function intersects the x-axis is 0. It’s given that the graph of the function intersects the x-axis at 0 and a, that x\nis the unit price, in dollars, of a product, and that , where , is the revenue, in dollars, that a company receives from the sales of the product. Since the\nvalue of a occurs when , a is the unit price, in dollars, of the product that will result in a revenue of $0.\nChoice A is incorrect. The revenue, in dollars, when the unit price of the product is $0 is represented by , when . Choice B is incorrect. The unit price, in\ndollars, of the product that will result in maximum revenue is represented by the x-coordinate of the maximum of f. Choice D is incorrect. The maximum revenue, in\ndollars, that the company can make is represented by the y-coordinate of the maximum of f.",
+  "after": "Choice C is correct. By definition, the y-value when a function intersects the x-axis is 0. It’s given that the graph of the function intersects the x-axis at 0 and a, that x is the unit price, in dollars, of a product, and that $f(x)$, where $y=f(x)$, is the revenue, in dollars, that a company receives from the sales of the product. Since the value of a occurs when $y=0$, a is the unit price, in dollars, of the product that will result in a revenue of \\(\\$0\\).\nChoice A is incorrect. The revenue, in dollars, when the unit price of the product is \\(\\$0\\) is represented by $f(x)$, when $x=0$. Choice B is incorrect. The unit price, in dollars, of the product that will result in maximum revenue is represented by the x-coordinate of the maximum of f. Choice D is incorrect. The maximum revenue, in dollars, that the company can make is represented by the y-coordinate of the maximum of f.",
+  "note": "PS Nonlinear functions HARD #6: stripped_math — restored f(x), y=f(x), y=0, x=0; joined hard line breaks; currency $0 written as \\(\\$0\\) (repo convention, avoids $-token capture)",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/ANS NON LINEAR FUNCT HARD .pdf p9 (Question ID 9654add7); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnyb901weqmt14hir6f3i",
+  "field": "explanation",
+  "before": "Choice C is correct. The function f is quadratic, so it will have either a maximum or a minimum at the vertex of the graph. Since the coefficient of\nthe quadratic term (–0.28) is negative, the vertex will be at a maximum. The equation f( ) = –0.28( – 27) 2 + 880 is given in vertex form, so the\nvertex is at = 27. Therefore, an angle of 27 degrees gives the greatest airflow.\nChoices A and B are incorrect and may be the result of misidentifying which value in a quadratic equation in vertex form represents the\nvertex. Choice D is incorrect. This choice identifies the maximum value of f( ) rather than the value of for which f( ) is maximized.",
+  "after": "Choice C is correct. The function f is quadratic, so it will have either a maximum or a minimum at the vertex of the graph. Since the coefficient of the quadratic term (–0.28) is negative, the vertex will be at a maximum. The equation $f(\\theta)=-0.28(\\theta-27)^{2}+880$ is given in vertex form, so the vertex is at $\\theta=27$. Therefore, an angle of 27 degrees gives the greatest airflow.\nChoices A and B are incorrect and may be the result of misidentifying which value in a quadratic equation in vertex form represents the vertex. Choice D is incorrect. This choice identifies the maximum value of $f(\\theta)$ rather than the value of $\\theta$ for which $f(\\theta)$ is maximized.",
+  "note": "PS Nonlinear functions MEDIUM #26: stripped_math — restored the dropped θ: f(θ)=−0.28(θ−27)²+880 (replacing the flattened 'f( ) = –0.28( – 27) 2 + 880'), θ=27, f(θ), θ; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/ANS Non Linear Functions MED.pdf p28 (Question ID 6676f055); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnybj01wlqmt1p488w8bu",
+  "field": "explanation",
+  "before": "Choice B is correct. It’s given that the relationship between and is exponential. The table shows that the value of increases as the value of\nincreases. Therefore, the relationship between and can be represented by an increasing exponential equation of the form ,\nwhere and are positive constants. The table shows that when , . Substituting for and for in the equation\nyields , which is equivalent to , or . Substituting for in the equation\nyields . The table also shows that when , . Substituting for and for in the equation\nyields , or . Dividing both sides of this equation by yields .\nSubtracting from both sides of this equation yields . Substituting for in the equation yields\n. Therefore, of the choices, choice B best represents the relationship between and .\nChoice A is incorrect and may result from conceptual or calculation errors.\nChoice C is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "after": "Choice B is correct. It’s given that the relationship between $t$ and $d$ is exponential. The table shows that the value of $d$ increases as the value of $t$ increases. Therefore, the relationship between $t$ and $d$ can be represented by an increasing exponential equation of the form $d=a(1+b)^{t}$, where $a$ and $b$ are positive constants. The table shows that when $t=0$, $d=670$. Substituting $0$ for $t$ and $670$ for $d$ in the equation $d=a(1+b)^{t}$ yields $670=a(1+b)^{0}$, which is equivalent to $670=a(1)$, or $670=a$. Substituting $670$ for $a$ in the equation $d=a(1+b)^{t}$ yields $d=670(1+b)^{t}$. The table also shows that when $t=1$, $d=674.02$. Substituting $1$ for $t$ and $674.02$ for $d$ in the equation $d=670(1+b)^{t}$ yields $674.02=670(1+b)^{1}$, or $674.02=670(1+b)$. Dividing both sides of this equation by $670$ yields $1.006=1+b$. Subtracting $1$ from both sides of this equation yields $b=0.006$. Substituting $0.006$ for $b$ in the equation $d=670(1+b)^{t}$ yields $d=670(1+0.006)^{t}$. Therefore, of the choices, choice B best represents the relationship between $t$ and $d$.\nChoice A is incorrect and may result from conceptual or calculation errors.\nChoice C is incorrect and may result from conceptual or calculation errors.\nChoice D is incorrect and may result from conceptual or calculation errors.",
+  "note": "PS Nonlinear functions MEDIUM #29: stripped_math — restored t, d, d=a(1+b)^t, a, b, t=0, d=670 … b=0.006, d=670(1+0.006)^t; joined hard line breaks",
+  "class": "stripped_math",
+  "evidence": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/ANS Non Linear Functions MED.pdf p31 (Question ID dd8ac009); rendered page transcribed (ANS PDF text layer + ingest candidate both lack the math)"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnzd20294qmt1jtmya7vo",
+  "field": "explanation",
+  "before": "Choice C is correct. It’s given that the city’s minimum hourly wage will increase by $0.50 on the first day of the year for the 5 years after January\n1, 2015. Therefore, the total increase, in dollars, in the minimum hourly wage x years after January 1, 2015, is represented by . Since the\nminimum hourly wage on January 1, 2015, was $9.25, it follows that the minimum hourly wage, in dollars, x years after January 1, 2015, is\nrepresented by . Therefore, the function best models this situation.\nChoices A, B, and D are incorrect. In choice A, the function models a situation where the minimum hourly wage is $9.25 on January 1, 2015, but\ndecreases by $0.50 on the first day of the year for the next 5 years. The functions in choices B and D both model a situation where the minimum\nhourly wage is increasing by $9.25 on the first day of the year for the 5 years after January 1, 2015.",
+  "after": "Choice C is correct. It’s given that the city’s minimum hourly wage will increase by \\$0.50 on the first day of the year for the 5 years after January 1, 2015. Therefore, the total increase, in dollars, in the minimum hourly wage x years after January 1, 2015, is represented by $0.50x$. Since the minimum hourly wage on January 1, 2015, was \\$9.25, it follows that the minimum hourly wage, in dollars, x years after January 1, 2015, is represented by $9.25+0.50x$. Therefore, the function $f(x)=9.25+0.50x$ best models this situation.\nChoices A, B, and D are incorrect. In choice A, the function models a situation where the minimum hourly wage is \\$9.25 on January 1, 2015, but decreases by \\$0.50 on the first day of the year for the next 5 years. The functions in choices B and D both model a situation where the minimum hourly wage is increasing by \\$9.25 on the first day of the year for the 5 years after January 1, 2015.",
+  "note": "PS Algebra - Linear functions - EASY #13: stripped_math — math restored; prose prices written as \\$ (literal dollar)",
+  "class": "stripped_math",
+  "evidence": "ANS Linear Functions EASY p13 (de6fe450); key C"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjro08p02j7qmt1ddjbydsd",
+  "field": "explanation",
+  "before": "Choice C is correct. The total cost to purchase the shirt is the $20 cost of the shirt plus the 5% sales tax. The value of the 5% sales tax on the $20\nshirt is equivalent to , or $1. Therefore, the total cost to purchase the shirt is , or $21.\nChoice A is incorrect and may result from neglecting to multiply by $20 when finding the value of the sales tax. Choice B is incorrect and may\nresult from dividing by 10, instead of by 100, and then neglecting to multiply by $20 when finding the sales tax. Choice D is incorrect and may\nresult from interpreting the sales tax of 5% as $5.",
+  "after": "Choice C is correct. The total cost to purchase the shirt is the \\$20 cost of the shirt plus the 5% sales tax. The value of the 5% sales tax on the \\$20 shirt is equivalent to $(0.05)(\\$20)$, or \\$1. Therefore, the total cost to purchase the shirt is $\\$20+\\$1$, or \\$21.\nChoice A is incorrect and may result from neglecting to multiply by \\$20 when finding the value of the sales tax. Choice B is incorrect and may result from dividing by 10, instead of by 100, and then neglecting to multiply by \\$20 when finding the sales tax. Choice D is incorrect and may result from interpreting the sales tax of 5% as \\$5.",
+  "note": "PS PSDA - Percentages - EASY #14: stripped_math — (0.05)($20) and $20+$1 restored; prose prices written as \\$",
+  "class": "stripped_math",
+  "evidence": "ANS Percents EASY p14 (8705ecba)"
+ }
+]

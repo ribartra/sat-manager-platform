@@ -4,20 +4,21 @@ import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { materializeOfficialImageUrl } from "@/lib/ingest-promotion";
 import { cleanupOfficialQuestionPlaceholders } from "@/lib/ingest-image-cleanup";
+import { BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
 // Attach an extracted ingest image directly to a promoted Question.
 // Used by the file-review image gallery to assign a page screenshot to a
 // question when the per-candidate crop board isn't available (e.g. a docx
 // question source that produced images but no candidates).
-export async function POST(req: NextRequest) {
+export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const body = await req.json().catch(() => ({}));
   const imageArtifactId = typeof body.imageArtifactId === "string" ? body.imageArtifactId : null;
   const questionId = typeof body.questionId === "string" ? body.questionId : null;
   if (!imageArtifactId || !questionId) {
-    return NextResponse.json({ error: "imageArtifactId and questionId are required" }, { status: 400 });
+    return new BadRequestError("imageArtifactId and questionId are required").toResponse();
   }
 
   const [image, question] = await Promise.all([
@@ -27,18 +28,19 @@ export async function POST(req: NextRequest) {
     }),
     prisma.question.findUnique({ where: { id: questionId }, select: { id: true, imageUrl: true } }),
   ]);
-  if (!image) return NextResponse.json({ error: "Image not found" }, { status: 404 });
-  if (!question) return NextResponse.json({ error: "Question not found" }, { status: 404 });
+  if (!image) return new NotFoundError("Image not found").toResponse();
+  if (!question) return new NotFoundError("Question not found").toResponse();
 
-  // Prefer the private asset URL (copied into public/uploads/questions); fall back to a data URI.
+  // The private asset, or the inline image data, becomes a file in storage referenced by URL
+  // (materializeOfficialImageUrl) — never a base64 data URI stored on the question.
   let imageUrl: string | null = null;
   if (image.fileUrl) imageUrl = await materializeOfficialImageUrl(image.fileUrl);
   if (!imageUrl && image.base64Data) {
-    imageUrl = image.base64Data.startsWith("data:")
-      ? image.base64Data
-      : `data:${image.mimeType || "image/jpeg"};base64,${image.base64Data}`;
+    imageUrl = await materializeOfficialImageUrl(
+      image.base64Data.startsWith("data:") ? image.base64Data : `data:${image.mimeType || "image/jpeg"};base64,${image.base64Data}`,
+    );
   }
-  if (!imageUrl) return NextResponse.json({ error: "Could not resolve image data" }, { status: 400 });
+  if (!imageUrl) return new BadRequestError("Could not resolve image data").toResponse();
 
   await prisma.question.update({ where: { id: questionId }, data: { imageUrl } });
   await cleanupOfficialQuestionPlaceholders(questionId).catch(() => null);
@@ -54,4 +56,4 @@ export async function POST(req: NextRequest) {
   });
 
   return NextResponse.json({ imageUrl });
-}
+});

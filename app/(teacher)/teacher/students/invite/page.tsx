@@ -1,11 +1,15 @@
 "use client";
 
-import { PageShell } from "@/components/sat";
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import { PageHeader, PageShell } from "@/components/sat";
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { InlineError } from "@/components/sat/alert";
+import { errorMessage, readApiError } from "@/lib/api-client";
+import { ADULT_AGE, ageOn } from "@/lib/consent";
 
 export default function InviteStudentPage() {
   const [programs, setPrograms] = useState<{ id: string; name: string; teachers: { teacher: { name: string } }[] }[]>([]);
@@ -14,7 +18,9 @@ export default function InviteStudentPage() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [startDate, setStartDate] = useState("");
-  const [isMinor, setIsMinor] = useState(false);
+  const [birthDate, setBirthDate] = useState("");
+  // Under 18 is shown for information: consent is the student accepting the Terms at activation.
+  const derivedMinor = birthDate ? ageOn(new Date(birthDate)) < ADULT_AGE : null;
   const [parentName, setParentName] = useState("");
   const [parentEmail, setParentEmail] = useState("");
   const [parentPhone, setParentPhone] = useState("");
@@ -40,23 +46,21 @@ export default function InviteStudentPage() {
     const res = await fetch("/api/students/invite", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, phone, startDate, programId, isMinor, parentName, parentEmail, parentPhone }),
+      body: JSON.stringify({ name, email, phone, startDate, birthDate, programId, parentName, parentEmail, parentPhone }),
     });
-    const data = await res.json();
     setLoading(false);
     if (!res.ok) {
-      setError(data.error ?? "Could not create invite.");
+      setError(errorMessage(await readApiError(res, "Could not create invite.")));
       return;
     }
+    const data = await res.json();
     setInviteUrl(data.inviteUrl);
   }
 
   return (
-    <PageShell width="narrow">
-      <div className="mb-6">
-        <Link href="/teacher" className="text-sm text-blue-600 hover:underline">← Students</Link>
-        <h1 className="mt-3 text-xl font-semibold text-gray-900">Invite Student</h1>
-      </div>
+    <PageShell>
+      <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Students", href: "/teacher/students" }, { label: "Invite student" }]} />
+      <PageHeader title="Invite Student" />
       <Card as="form" onSubmit={submit} padding="lg" className="space-y-4">
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">Program</label>
@@ -83,6 +87,7 @@ export default function InviteStudentPage() {
             </select>
           )}
         </div>
+        <div className="grid gap-4 md:grid-cols-2">
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">Name</label>
           <Input value={name} onChange={(e) => setName(e.target.value)} required />
@@ -99,49 +104,46 @@ export default function InviteStudentPage() {
           <label className="mb-1 block text-sm font-medium text-gray-700">Start date</label>
           <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
         </div>
-
-        <div className="border-t border-gray-200 pt-4">
-          <label className="flex items-center gap-2 cursor-pointer select-none">
-            <input
-              type="checkbox"
-              checked={isMinor}
-              onChange={(e) => setIsMinor(e.target.checked)}
-              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-            />
-            <span className="text-sm font-medium text-gray-700">Student is a minor (under 18)</span>
+        <div>
+          <label className="mb-1 block text-sm font-medium text-gray-700">
+            Birth date <span className="text-red-500">*</span>
           </label>
-          <p className="mt-1 text-xs text-gray-500 ml-6">
-            If checked, parent information will be linked when the student accepts the invitation.
+          <Input type="date" required value={birthDate} max={new Date().toISOString().slice(0, 10)} onChange={(e) => setBirthDate(e.target.value)} />
+          <p className="mt-1 text-xs text-gray-500">
+            {derivedMinor === true
+              ? "Under 18: when activating, the student confirms their parent or guardian agrees (Terms of Use)."
+              : "Kept on the student's record."}
           </p>
         </div>
+        </div>
 
-        {isMinor && (
-          <div className="rounded-md border border-blue-200 bg-blue-50 p-4 space-y-3">
-            <h2 className="text-sm font-semibold text-blue-900">Parent / guardian account</h2>
-            <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Parent name</label>
-              <Input value={parentName} onChange={(e) => setParentName(e.target.value)} />
-            </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
-                Parent email <span className="text-red-500">*</span>
-              </label>
-              <Input
-                type="email"
-                value={parentEmail}
-                onChange={(e) => setParentEmail(e.target.value)}
-                required={isMinor}
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Parent phone</label>
-              <Input value={parentPhone} onChange={(e) => setParentPhone(e.target.value)} />
-            </div>
+        <div className="rounded-md border border-gray-200 bg-gray-50 p-4 space-y-3">
+          <div>
+            <h2 className="text-sm font-semibold text-gray-900">Parent / guardian (optional)</h2>
+            <p className="mt-0.5 text-xs text-gray-500">
+              Links a parent account when the student activates, so the parent can see reports. It is not needed to activate.
+            </p>
           </div>
-        )}
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Parent name</label>
+            <Input value={parentName} onChange={(e) => setParentName(e.target.value)} />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Parent email</label>
+            <Input type="email" value={parentEmail} onChange={(e) => setParentEmail(e.target.value)} />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Parent phone</label>
+            <Input value={parentPhone} onChange={(e) => setParentPhone(e.target.value)} />
+          </div>
+        </div>
 
-        {error && <p className="text-sm text-red-600" role="alert">{error}</p>}
-        <Button type="submit" disabled={loading || !programId}>
+        <p className="text-xs text-gray-500">
+          The student gets an email with a link to set up their account. The link works for 7 days; until then you
+          can&apos;t send another invitation to the same email.
+        </p>
+        <InlineError>{error}</InlineError>
+        <Button type="submit" disabled={loading || !programId || !birthDate} disabledReason={!programId ? "Choose a program." : !birthDate ? "Enter the student's birth date." : null}>
           {loading ? "Creating..." : "Create Invite"}
         </Button>
       </Card>

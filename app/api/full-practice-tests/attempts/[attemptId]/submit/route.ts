@@ -1,129 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { notifyTeachers } from "@/lib/notifications";
 import { requireApprovedSession } from "@/lib/rbac";
-import { markUserActive } from "@/lib/activity";
-import { scaledScore } from "@/lib/full-test-scoring";
-import { isAnswerCorrect } from "@/lib/answer-grading";
-import { writeAudit } from "@/lib/audit";
-import { getFeatureSetting } from "@/lib/app-settings";
-import { resolveQuestionType } from "@/lib/question-type";
+import { log, REQUEST_ID_HEADER } from "@/lib/observability";
+import { finalizeFullTestAttempt } from "@/lib/full-test-grading";
+import { NotFoundError, UnauthorizedError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
   params: Promise<{ attemptId: string }>;
 }
 
-export async function POST(req: NextRequest, { params }: RouteContext) {
+/** Whole-test submit (all remaining modules at once). Grading lives in lib/full-test-grading.ts. */
+export const POST = withApiErrors(async function POST(req: NextRequest, { params }: RouteContext) {
   const session = await requireApprovedSession();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session) return new UnauthorizedError("Please sign in again.").toResponse();
 
   const { attemptId } = await params;
-  const { answers, timeSpentByQuestion, timeExpiredEvents, extraTimeUsed } = await req.json();
-  const attempt = await prisma.fullPracticeTestAttempt.findFirst({
-    where: { id: attemptId, studentId: session.user.id, status: "IN_PROGRESS" },
-  });
-  if (!attempt) return NextResponse.json({ error: "Not found" }, { status: 404 });
-
-  const excludePretest = await getFeatureSetting("FPT_PRETEST_EXCLUSION");
-
-  const modules = await prisma.fullPracticeTestModule.findMany({
-    where: { testId: attempt.testId },
-    include: {
-      questions: {
-        include: { question: { include: { options: true } } },
-        orderBy: { order: "asc" },
-      },
-    },
-    orderBy: { order: "asc" },
-  });
-
-  let rwCorrect = 0;
-  let rwTotal = 0;
-  let mathCorrect = 0;
-  let mathTotal = 0;
-  for (const testModule of modules) {
-    for (const item of testModule.questions) {
-      const answer = (answers?.[item.questionId] ?? "") as string;
-      const isCorrect = isAnswerCorrect(
-        answer,
-        item.question.correctAnswer,
-        resolveQuestionType(item.question.type, item.question.options),
-      );
-      const countsTowardScore = !excludePretest || !item.isPretest;
-      if (countsTowardScore) {
-        if (testModule.section === "MATH") {
-          mathTotal += 1;
-          if (isCorrect) mathCorrect += 1;
-        } else {
-          rwTotal += 1;
-          if (isCorrect) rwCorrect += 1;
-        }
-      }
-      await prisma.fullPracticeTestAnswer.upsert({
-        where: { attemptId_questionId: { attemptId, questionId: item.questionId } },
-        update: {
-          moduleId: testModule.id,
-          answer: answer || null,
-          isCorrect,
-          timeSpent: timeSpentByQuestion?.[item.questionId] ?? undefined,
-        },
-        create: {
-          attemptId,
-          moduleId: testModule.id,
-          questionId: item.questionId,
-          answer: answer || null,
-          isCorrect,
-          timeSpent: timeSpentByQuestion?.[item.questionId] ?? undefined,
-        },
-      });
-    }
+  const body = await req.json();
+  const attempt = await prisma.fullPracticeTestAttempt.findFirst({ where: { id: attemptId, studentId: session.user.id } });
+  // Idempotent: a repeated submit (two tabs, a retried request) gets the same answer as the first.
+  if (attempt?.status === "SUBMITTED") {
+    return NextResponse.json({ ok: true, alreadySubmitted: true, scores: { rwScore: attempt.rwScore, mathScore: attempt.mathScore, totalScore: attempt.totalScore } });
   }
+  if (!attempt || attempt.status !== "IN_PROGRESS") return new NotFoundError("This test was already submitted or closed by your teacher.").toResponse();
 
-  const rwScore = await scaledScore("RW", rwCorrect, rwTotal);
-  const mathScore = await scaledScore("MATH", mathCorrect, mathTotal);
-  const submittedAt = new Date();
-  await Promise.all([
-    prisma.fullPracticeTestAttempt.update({
-      where: { id: attemptId },
-      data: {
-        status: "SUBMITTED",
-        submittedAt,
-        rwScore,
-        mathScore,
-        totalScore: rwScore + mathScore,
-        timeExpiredEvents: timeExpiredEvents ?? 0,
-        extraTimeUsed: extraTimeUsed ?? 0,
-      },
-    }),
-    markUserActive(session.user.id, submittedAt),
-  ]);
-  if (attempt.assignmentId) {
-    await prisma.fullPracticeTestAssignment.update({
-      where: { id: attempt.assignmentId },
-      data: { status: "COMPLETED" },
-    });
-  }
-  await notifyTeachers(
-    "Exam completed",
-    `${session.user.name} completed an Exam.`,
-    `/student/full-tests/results/${attemptId}`,
-  );
+  const result = await finalizeFullTestAttempt({ attempt, body, student: { id: session.user.id, name: session.user.name } });
 
-  await writeAudit({
+  log.info("attempt.submit", {
+    kind: "full_test",
+    attemptId,
     userId: session.user.id,
-    action: "FPT_ATTEMPT_SUBMITTED",
-    targetType: "FullPracticeTestAttempt",
-    targetId: attemptId,
-    outcome: "success",
-    metadata: {
-      testId: attempt.testId,
-      scores: { rwScore, mathScore, totalScore: rwScore + mathScore },
-    },
+    testId: attempt.testId,
+    snapshot: Boolean(attempt.testSnapshot),
+    totalScore: result.scores.totalScore,
+    requestId: req.headers.get(REQUEST_ID_HEADER) ?? undefined,
   });
 
-  return NextResponse.json({
-    ok: true,
-    raw: { rwCorrect, rwTotal, mathCorrect, mathTotal },
-    scores: { rwScore, mathScore, totalScore: rwScore + mathScore },
-  });
-}
+  return NextResponse.json({ ok: true, ...result });
+});

@@ -61,7 +61,8 @@ La protección de rutas vive en layouts y helpers server-side. No hay `middlewar
 - Usuarios con estados `PENDING`, `APPROVED`, `REJECTED`.
 - Admin valida usuarios y puede activar/desactivar cuentas.
 - Estudiante invitado activa cuenta desde token.
-- Si la invitación del estudiante incluye padre, el padre se crea/vincula durante la activación del alumno; no requiere invitación separada.
+- Política de invitación (2026-10-22): **una sola invitación abierta por alumno hasta que vence** (7 días); el alumno recibe por correo el enlace para activar su cuenta. El **consentimiento se documenta en los T&C** (`/terms`, sección "Students under 18"): al activar, el alumno (también si es menor) acepta los Términos y se guardan `termsVersion` / `termsAcceptedAt`. La autorización del apoderado por correo ya no bloquea la activación. En la activación la casilla "I have read and accept the Terms of Use and the Privacy Policy" viene marcada (enlaces clicables); si se desmarca no se puede continuar. Solo un **admin** puede anular una invitación abierta ("Cancel invitation" en Students → Pending invitations), lo que libera el cupo.
+- Si la invitación del estudiante incluye padre (opcional; nunca el correo de otra cuenta), el padre se crea/vincula durante la activación del alumno; no requiere invitación separada.
 - Padres se administran desde un maestro de padres con asociación/desasociación de alumnos.
 
 ### Programas, Grupos y Permisos
@@ -140,12 +141,13 @@ Puntos clave:
 - Relación de preguntas mediante `FullPracticeTestQuestion`.
 - Asignación vía `FullPracticeTestAssignment`.
 - Intentos con autosave, pausa, reanudación y submit.
-- Scoring mediante `FullPracticeTestScoreConversion`.
+- Scoring proporcional sobre las preguntas que cuentan: `200 + 600 × aciertos ÷ preguntas que cuentan`, redondeado a 10 (54/44, o 50/40 si `FPT_PRETEST_EXCLUSION` excluye las pretest). Ver `lib/full-test-scoring.ts`.
 - El flujo tiene ciclo de vida completo: crear, editar, duplicar, asignar, resolver, revisar y reportar.
 
 ### Reportes, Analytics y Padres
 
 - Reporte individual por alumno.
+- Enviar el reporte por correo: a los padres vinculados o, si el alumno no tiene padre, a una dirección escrita. Tras "Report sent" se ofrece vincular esa dirección como padre (nombre + correo autocompletado, **Assign parent** / **Skip**, "Don't ask again for this student", guardado por docente en `ParentLinkPromptDismissal`). La vista **Parents** lista los alumnos sin padre/tutor con "Add parent".
 - Reporte PDF por áreas configurables.
 - Vista de padre con hijos asociados y progreso.
 - Analytics por alumno, pregunta, skill, dificultad y tiempo.
@@ -157,6 +159,8 @@ Puntos clave:
 - `AuditLog` registra eventos administrativos y de programa.
 - `/admin/logs` muestra registros de auditoría como vista de administrador.
 - La ingesta IA además registra `IngestIncident` e `IngestJobEvent` para observabilidad documental.
+- **Reportar un problema**: todos los portales (barra lateral, menú de padres y barra de herramientas de los players) tienen "Report a problem". El usuario señala un elemento o arrastra un área (o reporta la pantalla entera) y escribe un comentario con categoría. Se guarda en `IssueReport` (captura JPEG del viewport tomada en el navegador + selector, clases, atributos, HTML y ancestros del elemento + errores JS recientes), se envía por correo a `ISSUE_REPORT_EMAIL` (por defecto `admin@nordmetric.com`) con la captura y `report.json` adjuntos, y se gestiona en `/admin/reports` (resolver/reabrir, reenviar correo).
+- **Agente de código** (opcional, Admin → Settings → Coding agent; URL vacía = apagado): cada reporte nuevo se envía por POST al agente (`issue_report.created`, con captura y elementos), y el agente avisa por `POST /api/agent/issue-reports/<id>` (`IN_PROGRESS` / `RESOLVED` = levantado / `NOTE`, con `Authorization: Bearer <callback token>`). Un reporte se resuelve desde Admin o por el agente; se guarda quién lo resolvió, la nota y el enlace al cambio, queda en la línea de tiempo (`IssueReportEvent`) y se notifica a quien lo reportó. Contrato: `docs/coder-agent-api.md`.
 
 ---
 
@@ -399,15 +403,15 @@ Estados importantes:
 | `/teacher/parents` | Maestro de padres y asociaciones. |
 | `/teacher/questions` | Repositorio de preguntas. |
 | `/teacher/questions/new` | Crear pregunta o partir desde candidato de ingesta. |
-| `/teacher/practice-sets` | Maestro de Practice Sets. |
+| `/teacher/practice-sets` | Practice: mapa por skill (Easy/Medium/Hard por color) y "Manage sets". Reemplaza al antiguo Content map. |
 | `/teacher/practice-sets/new` | Crear Practice Set o importar cuestionario. |
 | `/teacher/full-tests` | Maestro de Full Practice Tests. |
 | `/teacher/full-tests/new` | Crear Full Practice Test o importar cuestionario. |
-| `/teacher/full-tests/scoring` | Tabla de conversión SAT. |
-| `/teacher/content` | Mapa de contenido por Math / R&W. |
+| `/teacher/full-tests/scoring` | Explicación del cálculo del puntaje SAT (fórmula y ejemplos). |
+| `/teacher/content` | Redirige a Practice (el Content map se unió a Practice). |
 | `/teacher/materials` | Materiales de estudio. |
 | `/teacher/analytics` | Analytics. |
-| `/teacher/compare` | Comparación de alumnos activos. |
+| `/teacher/compare` | Redirige al Home del profesor (pestaña del área). |
 
 ### Student
 
@@ -576,9 +580,12 @@ progreso al padre** y restablecimiento de contraseña (`lib/email.ts`).
 ### En producción (deploy GCP)
 
 `EMAIL_PASS` es secreto y va a **Secret Manager** (`email-pass`, cargado por
-`deploy/load-secrets.sh`); el resto de `EMAIL_*` no son secretos y se renderizan a
-`/data/app.env` desde variables de Terraform (`deploy/vm-startup.sh`). Alternativamente,
+`deploy/scripts/load-secrets.sh`); el resto de `EMAIL_*` no son secretos y se renderizan a
+`/data/app.env` desde variables de Terraform (`deploy/vm/vm-startup.sh`). Alternativamente,
 puede dejarse todo sin configurar en el deploy y ajustarse luego desde `/admin/settings`.
+
+El despliegue completo (Terraform en GCP, build de imágenes, release, rollback, backups y
+alertas) está en **`deploy/`**: ver `deploy/README.md` y `deploy/docs/runbook.md`.
 
 ---
 

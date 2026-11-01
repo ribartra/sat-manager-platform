@@ -1,0 +1,830 @@
+[
+ {
+  "table": "Question",
+  "id": "cmsjrntj0007tqmt1c2t8cksm",
+  "field": "imageUrl",
+  "before": "/uploads/questions/500e85a98b7eb51a9fbe3261.jpg",
+  "after": "/uploads/questions/045f36af9c3aa56215b3ae54.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 1 Math Module 1 #7: native crop x3.4512 (246->849 px), ncc 0.975"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrntj4007yqmt1xyt9s8g3",
+  "field": "imageUrl",
+  "before": "/uploads/questions/d9847f69708d0a46211b95b2.jpg",
+  "after": "/uploads/questions/b5b27882ab05a8dd72746505.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 1 Math Module 2 #7: native crop x1.4145 (487->689 px), ncc 0.9744"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnffuwf000l0mmx4vvrlqaw",
+  "field": "imageUrl",
+  "before": "/uploads/questions/76d05ee217b4e2d20bdfd85f.jpg",
+  "after": "/uploads/questions/52abe75817a382ff2d2e8a83.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 10 Math Module 1 #7: native crop x2.8306 (155->439 px), ncc 0.9794"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnffux1000q0mmxic96gfpq",
+  "field": "imageUrl",
+  "before": "/uploads/questions/76147a0e63599f3529b3babb.jpg",
+  "after": "/uploads/questions/e292a30fc033be311bc8a2e6.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 10 Math Module 1 #8: native crop x2.7753 (191->593 px), ncc 0.9819"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnffuyr001q0mmxjm8sgd11",
+  "field": "imageUrl",
+  "before": "/uploads/questions/1f68e3a67c31cbba9b1016e6.jpg",
+  "after": "/uploads/questions/a9cfdcfa7640ee3e1a2ef434.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 10 Math Module 1 #16: native crop x2.8164 (224->631 px), ncc 0.9759"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnffuz3001x0mmxlkruutzz",
+  "field": "imageUrl",
+  "before": "/uploads/questions/52de89fc2d20562248a26d3c.png",
+  "after": "/uploads/questions/de6ddad0a610b10a9569b015.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 10 Math Module 1 #19: native crop x1.7331 (529->917 px), ncc 0.9908"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnffuz700220mmxj997lph9",
+  "field": "imageUrl",
+  "before": "/uploads/questions/44d61c6ddded83dfbc768470.jpg",
+  "after": "/uploads/questions/d42f02329670a1f3647ffa6c.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 10 Math Module 1 #20: native crop x2.8022 (293->821 px), ncc 0.9878"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnu6l00gxqmt14e4kzksy",
+  "field": "imageUrl",
+  "before": "/uploads/questions/155ea453079736b8f3fa0dd3.jpg",
+  "after": "/uploads/questions/0bbbe9a46e24192068d16359.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 10 Math Module 2 #4: native crop x2.8591 (190->543 px), ncc 0.9811"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnu6v00gzqmt13qh62boa",
+  "field": "imageUrl",
+  "before": "/uploads/questions/95510b85ed48bf3a9756eb7a.jpg",
+  "after": "/uploads/questions/810693aff17764874e59b53c.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 10 Math Module 2 #6: native crop x2.7889 (221->616 px), ncc 0.9739"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnu7e00hcqmt1l368ga84",
+  "field": "imageUrl",
+  "before": "/uploads/questions/ff77d5f80b080ffd452e93a7.jpg",
+  "after": "/uploads/questions/5d7511cd12f8667e92b494de.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 10 Math Module 2 #11: native crop x2.8022 (279->782 px), ncc 0.9949"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnu7o00heqmt13yzsvmfz",
+  "field": "imageUrl",
+  "before": "/uploads/questions/6a07f4abbec28332e9f1d875.jpg",
+  "after": "/uploads/questions/a55e9f3355f845dc09cb100e.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 10 Math Module 2 #13: native crop x3.2842 (213->700 px), ncc 0.9898"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnu7u00hgqmt1pj9fonr8",
+  "field": "imageUrl",
+  "before": "/uploads/questions/919052b47cdbd9101e14cfea.jpg",
+  "after": "/uploads/questions/32a6f4780917daeb8bee499e.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 10 Math Module 2 #15: native crop x1.4572 (338->493 px), ncc 0.9657"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnu8400hiqmt1hq2iv0yf",
+  "field": "imageUrl",
+  "before": "/uploads/questions/f95624696c100aeedce67e20.jpg",
+  "after": "/uploads/questions/87a3c527bdc2f0f8e531fec2.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 10 Math Module 2 #17: native crop x2.8164 (156->439 px), ncc 0.9792"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnt0a001mqmt1cup0z4r9",
+  "field": "imageUrl",
+  "before": "/uploads/questions/277ad0072c39bc483591c521.jpg",
+  "after": "/uploads/questions/50708b5792a8d48dfbcd74fc.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 10 Reading & Writing Module 1 #11: native crop x1.4645 (654->958 px), ncc 0.9379"
+ },
+ {
+  "table": "Question",
+  "id": "cmsojfknx000018ppjdthonh9",
+  "field": "imageUrl",
+  "before": "/uploads/questions/550fefb968242bdbbe37e1e1.jpg",
+  "after": "/uploads/questions/025616a7c2bc0dd3606c8918.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 10 Reading & Writing Module 2 #12: native crop x2.7616 (338->933 px), ncc 0.9943"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnt0z0020qmt12o9tqbuq",
+  "field": "imageUrl",
+  "before": "/uploads/questions/a5818cb5481c75fb0f729ca5.jpg",
+  "after": "/uploads/questions/5c13b9d935d04b23d3ac8738.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 10 Reading & Writing Module 2 #14: native crop x1.4282 (681->973 px), ncc 0.9798"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrntee005jqmt1vi9rhybu",
+  "field": "imageUrl",
+  "before": "/uploads/questions/51b7479140e458e000a704f2.jpg",
+  "after": "/uploads/questions/49adfba6249de6741272ac31.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 2 Math Module 1 #12: native crop x2.6674 (322->859 px), ncc 0.9936"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrntg0006fqmt1dri8c2kr",
+  "field": "imageUrl",
+  "before": "/uploads/questions/336acca2ce04438bb334816a.jpg",
+  "after": "/uploads/questions/cc26cba1d002b521392370cf.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 2 Math Module 1 #18: native crop x2.4627 (219->539 px), ncc 0.9631"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrntgb006lqmt1k63h2kpd",
+  "field": "imageUrl",
+  "before": "/uploads/questions/60197de4e1b31832d76c2e98.jpg",
+  "after": "/uploads/questions/7e9910986dfcc5d1265f4b2c.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 2 Math Module 1 #19: native crop x2.6674 (263->702 px), ncc 0.9661"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrntz800dpqmt1kbv7yjkl",
+  "field": "imageUrl",
+  "before": "/uploads/questions/4389e2bb6ac99455e1effab1.jpg",
+  "after": "/uploads/questions/4abbd308e15a821f763a364c.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 2 Reading & Writing Module 1 #10: native crop x2.2538 (338->762 px), ncc 0.9801"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrntzg00duqmt1t01beiay",
+  "field": "imageUrl",
+  "before": "/uploads/questions/b342e8f0df6c33fb54447e42.jpg",
+  "after": "/uploads/questions/ccd5e802d01cdbdeb82948aa.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 2 Reading & Writing Module 2 #10: native crop x2.7343 (233->637 px), ncc 0.9849"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrntwp00c3qmt1009fvz2k",
+  "field": "imageUrl",
+  "before": "/uploads/questions/99767ab194cafca2f9b6e5e4.png",
+  "after": "/uploads/questions/a89c0cf21513c41f7d3b9b1a.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 3 Math Module 1 #17: native crop x1.143 (561->641 px), ncc 0.9871"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrntx000c9qmt1igaxp017",
+  "field": "imageUrl",
+  "before": "/uploads/questions/a6ae7a739794a3b6d688631e.jpg",
+  "after": "/uploads/questions/557a5f4554f69537ccff2f4b.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 3 Math Module 1 #19: native crop x1.8577 (166->308 px), ncc 0.9571"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnvcn00spqmt1cg2v4a6v",
+  "field": "imageUrl",
+  "before": "/uploads/questions/bd820a11fb21dfdf430e86c9.jpg",
+  "after": "/uploads/questions/ef21266aa8f85f644e0522c3.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 3 Math Module 2 #22: native crop x1.4282 (356->508 px), ncc 0.9943"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnvgn00tqqmt19m9y0ui2",
+  "field": "imageUrl",
+  "before": "/uploads/questions/7a3f17ebc7595de573fd5dff.jpg",
+  "after": "/uploads/questions/be4d49e1427f3213577f8914.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 3 Reading & Writing Module 1 #11: native crop x1.1544 (555->641 px), ncc 0.9387"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnvh100txqmt10n9r6csg",
+  "field": "imageUrl",
+  "before": "/uploads/questions/fd383d6f96b6ed52b6d837bf.jpg",
+  "after": "/uploads/questions/5165c5127efe9268a4af4e6c.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 3 Reading & Writing Module 2 #12: native crop x2.7479 (344->945 px), ncc 0.9822"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnvad00rqqmt1dkutaaga",
+  "field": "imageUrl",
+  "before": "/uploads/questions/a96d1a8a8c09757ce2226f41.jpg",
+  "after": "/uploads/questions/ef0328a13dea0fd1c81e0343.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 4 Math Module 1 #19: native crop x2.3791 (248->590 px), ncc 0.9824"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnv8g00qxqmt1cmsb6ze7",
+  "field": "imageUrl",
+  "before": "/uploads/questions/3a02ed29dbe94b4bd7585666.jpg",
+  "after": "/uploads/questions/a50f8c611b236f2887af0442.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 4 Math Module 2 #12: native crop x2.3566 (302->712 px), ncc 0.9865"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnva700rlqmt11otks7wt",
+  "field": "imageUrl",
+  "before": "/uploads/questions/9c185772814b40d470a9b6e4.jpg",
+  "after": "/uploads/questions/6d6349522b72bb7ff62d2f67.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 4 Math Module 2 #18: native crop x2.3912 (207->495 px), ncc 0.9708"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnuna00kfqmt18j8hku4p",
+  "field": "imageUrl",
+  "before": "/uploads/questions/07c611f877b190c92deb9315.jpg",
+  "after": "/uploads/questions/49c33678f387ba43d2eaca35.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 4 Reading & Writing Module 1 #10: native crop x2.4519 (353->866 px), ncc 0.9959"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnupf00kmqmt11b72urtn",
+  "field": "imageUrl",
+  "before": "/uploads/questions/50106b5ce1087f8522a1fef0.jpg",
+  "after": "/uploads/questions/1af2c7f36f01a52815ab79b9.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 4 Reading & Writing Module 2 #11: native crop x1.4355 (626->899 px), ncc 0.9647"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnuq300kzqmt1gxiw1leu",
+  "field": "imageUrl",
+  "before": "/uploads/questions/382af2b01c9aa0f71c599979.jpg",
+  "after": "/uploads/questions/daa49500440e01a1115c6dd0.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 4 Reading & Writing Module 2 #14: native crop x1.4355 (654->939 px), ncc 0.9788"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnugu00ijqmt1szmnlak6",
+  "field": "imageUrl",
+  "before": "/uploads/questions/f38422293f217d11d8b303b8.jpg",
+  "after": "/uploads/questions/520285d7bb170491024377be.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 5 Math Module 1 #8: native crop x2.7616 (295->815 px), ncc 0.9863"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnuh400ilqmt1obq908v1",
+  "field": "imageUrl",
+  "before": "/uploads/questions/c10861991e9b9ec9308120dc.jpg",
+  "after": "/uploads/questions/9d4d6718c9dddf253e68be41.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 5 Math Module 1 #9: native crop x2.7889 (253->706 px), ncc 0.9806"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnuhc00inqmt1t1hr8hpk",
+  "field": "imageUrl",
+  "before": "/uploads/questions/3715835e3420e42cc330cdd3.jpg",
+  "after": "/uploads/questions/4583cc0352a4e62e8a5f2e1a.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 5 Math Module 1 #10: native crop x1.4006 (546->765 px), ncc 0.9171"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnul000jhqmt1q1p9ey2x",
+  "field": "imageUrl",
+  "before": "/uploads/questions/736aa28304adaf1530094470.jpg",
+  "after": "/uploads/questions/e1d3234db1468f553d105133.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 5 Math Module 1 #21: native crop x2.7879 (211->588 px), ncc 0.9885"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnulb00jjqmt1ij3wojjk",
+  "field": "imageUrl",
+  "before": "/uploads/questions/c626793cfdf58227e4896132.jpg",
+  "after": "/uploads/questions/5657ddd60cd58e4af0dbfc23.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 5 Math Module 1 #22: native crop x2.7879 (168->468 px), ncc 0.9854"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnuh900imqmt1xpf8w377",
+  "field": "imageUrl",
+  "before": "/uploads/questions/5c8cdf7af2e5abe4ba77d4a3.jpg",
+  "after": "/uploads/questions/1bf2d961b030a895979416a2.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 5 Math Module 2 #9: native crop x2.7616 (84->232 px), ncc 0.981"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnuj600j0qmt1zq99t5h3",
+  "field": "imageUrl",
+  "before": "/uploads/questions/56200442015666107877381c.jpg",
+  "after": "/uploads/questions/98710cc1dbad994da3fe4e7f.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 5 Math Module 2 #16: native crop x2.8164 (247->696 px), ncc 0.9846"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnukm00jeqmt19xq4o5db",
+  "field": "imageUrl",
+  "before": "/uploads/questions/5219f1ff3301bce4601ffd17.jpg",
+  "after": "/uploads/questions/ec981443e1e86e899bfc9f97.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 5 Math Module 2 #19: native crop x2.8022 (278->779 px), ncc 0.9905"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnv0300o8qmt1poncffke",
+  "field": "imageUrl",
+  "before": "/uploads/questions/575c6f17e2043e09ba20e04f.jpg",
+  "after": "/uploads/questions/725bd8c6b038acf969a4659f.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 5 Reading & Writing Module 1 #12: native crop x2.7343 (338->924 px), ncc 0.9982"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnv0i00ofqmt1hqtxt8gl",
+  "field": "imageUrl",
+  "before": "/uploads/questions/079b25889c66016201ed4b53.jpg",
+  "after": "/uploads/questions/44ff5c0e1c1671eeb67702f5.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 5 Reading & Writing Module 2 #13: native crop x1.4075 (690->971 px), ncc 0.9754"
+ },
+ {
+  "table": "Question",
+  "id": "cq6m1q4919a54dc531b4e438",
+  "field": "imageUrl",
+  "before": "/uploads/questions/765716dc1c89ddda97e603b4.jpg",
+  "after": "/uploads/questions/7ae9fd2f23c74d195ea5bd45.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 6 Math Module 1 #4: native crop x1.4427 (528->762 px), ncc 0.9945"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnvuv00y1qmt18u6xmqr1",
+  "field": "imageUrl",
+  "before": "/uploads/questions/032dcb8c54b7c328aa831050.jpg",
+  "after": "/uploads/questions/62454ed5d39486db9b386a3c.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 6 Math Module 1 #14: native crop x2.7879 (202->563 px), ncc 0.9906"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnvy000yuqmt1dmcha9vm",
+  "field": "imageUrl",
+  "before": "/uploads/questions/c7f5d6b799d8a861bb67bd43.jpg",
+  "after": "/uploads/questions/a09ea105d58e5fe7cf86d770.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 6 Math Module 2 #22: native crop x2.7753 (184->511 px), ncc 0.9785"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwf60130qmt1vh7yp7es",
+  "field": "imageUrl",
+  "before": "/uploads/questions/6ebba2b85db2192b304cb41d.jpg",
+  "after": "/uploads/questions/a83568875f033fc413336757.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 6 Reading & Writing Module 1 #9: native crop x1.4215 (640->910 px), ncc 0.9717"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwfo013fqmt1vzmkgsij",
+  "field": "imageUrl",
+  "before": "/uploads/questions/0009fa916244769aaacf0af6.jpg",
+  "after": "/uploads/questions/37cc3bce041841dd1400099b.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 6 Reading & Writing Module 1 #11: native crop x1.4282 (656->937 px), ncc 0.9824"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwfz013lqmt1u394h52b",
+  "field": "imageUrl",
+  "before": "/uploads/questions/03ada6ad07534a8dc4867650.jpg",
+  "after": "/uploads/questions/c9d0618df5e8ff7e41fdc14a.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 6 Reading & Writing Module 1 #12: native crop x2.7753 (337->935 px), ncc 0.9873"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwg9013vqmt1b6a4r33l",
+  "field": "imageUrl",
+  "before": "/uploads/questions/f4935e44dbb057ed1b4238d0.jpg",
+  "after": "/uploads/questions/e47384c7c3141f1d867e7b2e.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 6 Reading & Writing Module 1 #13: native crop x2.7343 (318->869 px), ncc 0.9973"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwgk014aqmt1lv54oj89",
+  "field": "imageUrl",
+  "before": "/uploads/questions/e540c6e8e2437c74d1edad9f.jpg",
+  "after": "/uploads/questions/435a0769427a440af9de3ab8.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 6 Reading & Writing Module 2 #14: native crop x1.4282 (644->920 px), ncc 0.9737"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwxx01bfqmt1dqsbjcuh",
+  "field": "imageUrl",
+  "before": "/uploads/questions/5173d34a039f193bac6a37a8.jpg",
+  "after": "/uploads/questions/eb3a6cd1f259e935ff198279.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 7 Math Module 1 #16: native crop x2.7753 (221->613 px), ncc 0.9955"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwy501bhqmt1rs7o5c3c",
+  "field": "imageUrl",
+  "before": "/uploads/questions/78463f391dbc8c1544a78418.png",
+  "after": "/uploads/questions/2694623549577453ab3b5d9c.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 7 Math Module 1 #17: native crop x1.7076 (447->763 px), ncc 0.9769"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwyd01bnqmt1l4vwq4sj",
+  "field": "imageUrl",
+  "before": "/uploads/questions/a199d4bfd16d4d11552c4287.png",
+  "after": "/uploads/questions/b50b9adbfea405716f7eb927.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 7 Math Module 1 #18: native crop x1.7246 (306->528 px), ncc 0.9811"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwym01btqmt1846xul16",
+  "field": "imageUrl",
+  "before": "/uploads/questions/cb3f3446054d7f62bf950671.jpg",
+  "after": "/uploads/questions/a5007b9b841e053d03b04b6a.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 7 Math Module 1 #19: native crop x2.7753 (153->425 px), ncc 0.9813"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnx2701c2qmt18m37uycw",
+  "field": "imageUrl",
+  "before": "/uploads/questions/67f33f97bbccf50c456d9895.jpg",
+  "after": "/uploads/questions/bbc030f5975d7d50f5eab2ab.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 7 Math Module 1 #22: native crop x2.7879 (272->758 px), ncc 0.9826"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwya01biqmt1cdbusd7c",
+  "field": "imageUrl",
+  "before": "/uploads/questions/c6f516ca8b51734bc9c935c0.jpg",
+  "after": "/uploads/questions/5f0095caf85109d22c160147.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 7 Math Module 2 #17: native crop x2.7616 (299->826 px), ncc 0.9743"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwyh01boqmt18xmt7cc9",
+  "field": "imageUrl",
+  "before": "/uploads/questions/aede96fb5cf4912236bdd59d.jpg",
+  "after": "/uploads/questions/70070af6a5b4b6a50d62e31e.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 7 Math Module 2 #18: native crop x2.8022 (278->779 px), ncc 0.9931"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwzg01bwqmt1kj5hz9qu",
+  "field": "imageUrl",
+  "before": "/uploads/questions/9175a6a6a7bbc22015ae3457.jpg",
+  "after": "/uploads/questions/78c62405c1300a68b3e8a9fe.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 7 Math Module 2 #20: native crop x2.7753 (133->369 px), ncc 0.9849"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwnp017nqmt1wpirbbk3",
+  "field": "imageUrl",
+  "before": "/uploads/questions/bbf0a1fcda0c60b4a2e8c7a7.jpg",
+  "after": "/uploads/questions/bb45c5f1b40a20771d4395c0.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 7 Reading & Writing Module 1 #11: native crop x2.7206 (346->941 px), ncc 0.9953"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnwo5017wqmt1oupeqir8",
+  "field": "imageUrl",
+  "before": "/uploads/questions/a39adb1502560f04d40ba42f.jpg",
+  "after": "/uploads/questions/2abd194e57f359d591c5af09.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 7 Reading & Writing Module 2 #12: native crop x2.7616 (338->933 px), ncc 0.9943"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3fzg000k0mpdb3ur9ziu",
+  "field": "imageUrl",
+  "before": "/uploads/questions/8ad1996ebe3409bd8fb2674f.jpg",
+  "after": "/uploads/questions/f6d76f3d88267a3d703aebdf.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 8 Math Module 1 #7: native crop x2.5132 (215->540 px), ncc 0.9812"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3fzo000p0mpd20puzuf4",
+  "field": "imageUrl",
+  "before": "/uploads/questions/b78174b42a89c2d8e7a30247.jpg",
+  "after": "/uploads/questions/4c9ce781d6ccd4a27f73a108.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 8 Math Module 1 #8: native crop x2.5132 (269->676 px), ncc 0.9961"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3g0u00160mpd2e7gq53l",
+  "field": "imageUrl",
+  "before": "/uploads/questions/a2971e09575d6dba6c386253.jpg",
+  "after": "/uploads/questions/34b45888e62e722557bb2185.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 8 Math Module 1 #13: native crop x2.4762 (256->634 px), ncc 0.9821"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3g2c001y0mpd76881utf",
+  "field": "imageUrl",
+  "before": "/uploads/questions/6ad65c3584059d7843545131.jpg",
+  "after": "/uploads/questions/eeb4f0b453af0f45ace953b9.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 8 Math Module 1 #21: native crop x2.9747 (293->872 px), ncc 0.9978"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3g2v002i0mpdrimxrlt4",
+  "field": "imageUrl",
+  "before": "/uploads/questions/1cca36cb78ae20aa76b07f60.jpg",
+  "after": "/uploads/questions/4c41eb8d799f14d1d3f985d9.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 8 Math Module 2 #4: native crop x3.5032 (205->718 px), ncc 0.9889"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3g3d002t0mpdhh5lit47",
+  "field": "imageUrl",
+  "before": "/uploads/questions/cddaec76e007b3d8d49152a1.jpg",
+  "after": "/uploads/questions/9f9dd88c7f1455ff9720dbca.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 8 Math Module 2 #8: native crop x3.5547 (209->743 px), ncc 0.9899"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3g40003e0mpde64fpbyr",
+  "field": "imageUrl",
+  "before": "/uploads/questions/103bff3261c7202a56c5174d.jpg",
+  "after": "/uploads/questions/7c6df283d6b9f0989943e760.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 8 Math Module 2 #13: native crop x3.6984 (233->862 px), ncc 0.9881"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3g43003f0mpdgnh8uvk7",
+  "field": "imageUrl",
+  "before": "/uploads/questions/811eac11867d22d3708b13bf.jpg",
+  "after": "/uploads/questions/4c8fa9024573e0417feb0cc5.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 8 Math Module 2 #14: native crop x3.0043 (146->439 px), ncc 0.9826"
+ },
+ {
+  "table": "Question",
+  "id": "cmsnb3g4m00490mpd1v3v3lb8",
+  "field": "imageUrl",
+  "before": "/uploads/questions/142457fafc49f90a9bfb014e.jpg",
+  "after": "/uploads/questions/8f2d9a5262813feed7742b05.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 8 Math Module 2 #20: native crop x3.5547 (294->1045 px), ncc 0.9688"
+ },
+ {
+  "table": "Question",
+  "id": "cmsojfkra002n18ppgiwi84ht",
+  "field": "imageUrl",
+  "before": "/uploads/questions/d11dd8aa37901b099c44ff17.jpg",
+  "after": "/uploads/questions/5789e2589ffaad60b9b57332.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 8 Reading & Writing Module 1 #11: native crop x2.7206 (339->922 px), ncc 0.9975"
+ },
+ {
+  "table": "Question",
+  "id": "cmsojfkrm002s18ppn4eddu0o",
+  "field": "imageUrl",
+  "before": "/uploads/questions/c7a955b1ba654c2d3f3ea594.jpg",
+  "after": "/uploads/questions/d4a2ef5f5f09c7ad5034870d.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 8 Reading & Writing Module 2 #11: native crop x2.2762 (334->760 px), ncc 0.9978"
+ },
+ {
+  "table": "Question",
+  "id": "cmsojfkrv003218pphx1qk2j3",
+  "field": "imageUrl",
+  "before": "/uploads/questions/a4fbeb018a128c4054e92d2d.jpg",
+  "after": "/uploads/questions/760b3db62b296469811f84be.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 8 Reading & Writing Module 2 #12: native crop x2.7616 (343->947 px), ncc 0.9777"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnw0g0105qmt1875wgsir",
+  "field": "imageUrl",
+  "before": "/uploads/questions/da7f44d2ece84457ad4c1bc4.jpg",
+  "after": "/uploads/questions/cfd97d2e761e04fed38ddeae.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 9 Math Module 1 #8: native crop x2.7753 (300->833 px), ncc 0.9845"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnw47010nqmt1p748vpt9",
+  "field": "imageUrl",
+  "before": "/uploads/questions/d7ca33552417a5b516338297.jpg",
+  "after": "/uploads/questions/1289d344b3412ad8e8ffed7e.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 9 Math Module 1 #13: native crop x2.7879 (292->814 px), ncc 0.9768"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnw4r010rqmt1ygntzggz",
+  "field": "imageUrl",
+  "before": "/uploads/questions/5a35019500f7ecdf697b4dc7.jpg",
+  "after": "/uploads/questions/414d5f3703ec4f2a885c5b14.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 9 Math Module 1 #15: native crop x1.4215 (372->529 px), ncc 0.9886"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnw5v010xqmt1rmkqr3lc",
+  "field": "imageUrl",
+  "before": "/uploads/questions/ca0f52aabdacb946dfa0c630.jpg",
+  "after": "/uploads/questions/c680ee28ce1f3d5d52a5597f.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 9 Math Module 1 #16: native crop x2.8164 (156->439 px), ncc 0.9815"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnw6y0115qmt1n6l2xku6",
+  "field": "imageUrl",
+  "before": "/uploads/questions/72a2daa0cf1c57f33618dbde.jpg",
+  "after": "/uploads/questions/4008954acc863f8dc8745b10.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 9 Math Module 1 #18: native crop x2.7889 (300->837 px), ncc 0.9584"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnw7u0119qmt1b5z6rb0r",
+  "field": "imageUrl",
+  "before": "/uploads/questions/772cd25ff740ddc7c40a1d12.jpg",
+  "after": "/uploads/questions/b6540ed581432087a6b86648.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 9 Math Module 1 #20: native crop x2.8022 (245->687 px), ncc 0.9747"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnw88011bqmt1xskeplzv",
+  "field": "imageUrl",
+  "before": "/uploads/questions/b6b1e564a282f8b0d3ef4cb6.jpg",
+  "after": "/uploads/questions/a362cb20ee0d6860057bb4c0.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 9 Math Module 1 #21: native crop x2.8022 (227->636 px), ncc 0.9749"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnw8l011dqmt1owbpkau5",
+  "field": "imageUrl",
+  "before": "/uploads/questions/41ed29941f28c0ded9594324.jpg",
+  "after": "/uploads/questions/5509bf3cc13f01d0166b7092.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 9 Math Module 1 #22: native crop x2.8022 (285->799 px), ncc 0.9606"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "opt_773843b2-5c5d-4887-a73d-8525861875da",
+  "field": "imageUrl",
+  "before": "/uploads/questions/1af0bf51af5ef79305ef1f9a.jpg",
+  "after": "/uploads/questions/df3755e70ce86342bbfa8c55.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 9 Math Module 2 #4 opt A: native crop x1.4282 (356->508 px), ncc 0.985"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "opt_5b6b85c8-1ffd-4759-89c6-02b8905d3610",
+  "field": "imageUrl",
+  "before": "/uploads/questions/b531619a22617f5f10e46d8f.jpg",
+  "after": "/uploads/questions/6456582c31ba7343a83f86c5.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 9 Math Module 2 #4 opt B: native crop x1.4282 (349->498 px), ncc 0.9743"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "opt_03508cea-8583-4e29-9fd9-feb034a930c7",
+  "field": "imageUrl",
+  "before": "/uploads/questions/86a04dd03c75b3b604550ca8.jpg",
+  "after": "/uploads/questions/a4d73acd2b3129f13cc428c3.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 9 Math Module 2 #4 opt C: native crop x1.4355 (352->505 px), ncc 0.9829"
+ },
+ {
+  "table": "QuestionOption",
+  "id": "opt_b01521be-0db6-4e55-8ebc-dc000c0a90b6",
+  "field": "imageUrl",
+  "before": "/uploads/questions/2f8f573cbc1ef9576e22017c.jpg",
+  "after": "/uploads/questions/d09b52abe2e1ffd9f03c1fbf.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 9 Math Module 2 #4 opt D: native crop x1.4427 (349->504 px), ncc 0.9711"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnvzm00zsqmt1zrot3nj8",
+  "field": "imageUrl",
+  "before": "/uploads/questions/2b0b2c0bd81dbf7a8cf97212.jpg",
+  "after": "/uploads/questions/7aa367f1bd48cc0d5a2ef18a.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 9 Math Module 2 #5: native crop x2.8591 (223->638 px), ncc 0.9835"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnw090104qmt1g7ge6fle",
+  "field": "imageUrl",
+  "before": "/uploads/questions/a4ce3b29885313ad39512372.jpg",
+  "after": "/uploads/questions/f38bc02056b1dead04bdb922.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 9 Math Module 2 #7: native crop x2.8306 (270->764 px), ncc 0.9761"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnw4o010qqmt15p9zquem",
+  "field": "imageUrl",
+  "before": "/uploads/questions/e74c96984cb9202a07704d52.jpg",
+  "after": "/uploads/questions/284c08c5bf170bd601df4bdb.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 9 Math Module 2 #14: native crop x2.8306 (167->473 px), ncc 0.9761"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnw4w010wqmt1lxiguftt",
+  "field": "imageUrl",
+  "before": "/uploads/questions/1f8200194587eda6c05451e4.jpg",
+  "after": "/uploads/questions/a67b90acf6700c2d7ccffd63.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 9 Math Module 2 #15: native crop x2.8306 (287->812 px), ncc 0.9981"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnw80011aqmt1ujrd01x3",
+  "field": "imageUrl",
+  "before": "/uploads/questions/5ca237f0d68b047efaab2db0.jpg",
+  "after": "/uploads/questions/eb9da3d49aed9be8b7e23904.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 9 Math Module 2 #20: native crop x2.8306 (283->801 px), ncc 0.9858"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrny0701rrqmt1am7guns9",
+  "field": "imageUrl",
+  "before": "/uploads/questions/08c5b537ee5ddc3a8e8e53bc.jpg",
+  "after": "/uploads/questions/1763b88b8ce1f31a0250b737.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 9 Reading & Writing Module 1 #11: native crop x2.7753 (334->927 px), ncc 0.9696"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrny0j01ryqmt1k6kl94mk",
+  "field": "imageUrl",
+  "before": "/uploads/questions/4115bf0ff184f7bef4cb5b4d.jpg",
+  "after": "/uploads/questions/984202ee344a884e82ead981.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 9 Reading & Writing Module 2 #12: native crop x2.7616 (338->933 px), ncc 0.984"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrny2o01s4qmt152hy9n2j",
+  "field": "imageUrl",
+  "before": "/uploads/questions/d572c19261379f8bdbd5bdd7.jpg",
+  "after": "/uploads/questions/ea2b767f873b415a9f86ca5b.png",
+  "class": "fpt_native_recrop",
+  "note": "TEST 9 Reading & Writing Module 2 #13: native crop x2.7343 (340->930 px), ncc 0.9706"
+ }
+]

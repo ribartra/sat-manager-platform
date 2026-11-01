@@ -1,0 +1,7670 @@
+[
+ {
+  "qid": "cmsjrnxxf01phqmt1fsh7fx65",
+  "url": "/uploads/questions/95ca162df3b202db7049d2b1.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Advanced Math",
+  "ps": "Advanced Math - Nonlinear equations in one variable and systems of equations in two variables - EASY",
+  "ord": 6,
+  "old": {
+   "w": 740,
+   "h": 700
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR EQUATIONS/Non Linear Equations EASY.pdf",
+  "hex": "d0e8e8f5",
+  "page": 7,
+  "ncc": 0.9381,
+  "second": 0.2767,
+  "rect_pt": [
+   169.15,
+   71.54,
+   436.05,
+   324.02
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "f039e05b57aabb2b02258b14.png",
+   "w": 1484,
+   "h": 1404
+  }
+ },
+ {
+  "qid": "cmsjrnxxy01puqmt1ghid1gnm",
+  "url": "/uploads/questions/95acb04330e053cf394a51b5.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Advanced Math",
+  "ps": "Advanced Math - Nonlinear equations in one variable and systems of equations in two variables - EASY",
+  "ord": 11,
+  "old": {
+   "w": 740,
+   "h": 730
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR EQUATIONS/Non Linear Equations EASY.pdf",
+  "hex": "4ca30186",
+  "page": 12,
+  "ncc": 0.9572,
+  "second": 0.2837,
+  "rect_pt": [
+   176.2,
+   71.67,
+   443.1,
+   334.97
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "e05803fd6e0e0bc298f3d9dc.png",
+   "w": 1484,
+   "h": 1463
+  }
+ },
+ {
+  "qid": "cmsjrnxjj01hzqmt1tq5nhspe",
+  "url": "/uploads/questions/7d8de103b33b74a6aa0ce3b5.jpg",
+  "optId": "opt_56aa01c7-d11c-454d-98d1-d9836f61dbf0",
+  "label": "A",
+  "section": "MATH",
+  "domain": "Advanced Math",
+  "ps": "Advanced Math - Nonlinear equations in one variable and systems of equations in two variables - MEDIUM",
+  "ord": 20,
+  "old": {
+   "w": 309,
+   "h": 314
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR EQUATIONS/Non Linear Equations MED.pdf",
+  "hex": "75a32330",
+  "page": 20,
+  "ncc": 0.9717,
+  "second": 0.7449,
+  "rect_pt": [
+   190.11,
+   164.56,
+   429.01,
+   407.33
+  ],
+  "kind": "VECTOR",
+  "dpi": 300,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "b0ae526ac3ecf5e599d14508.png",
+   "w": 996,
+   "h": 1013
+  }
+ },
+ {
+  "qid": "cmsjrnxjj01hzqmt1tq5nhspe",
+  "url": "/uploads/questions/d7bde6563bdad25cd1cfa1a4.jpg",
+  "optId": "opt_2f71e757-9362-43cf-a40e-e04b08f49c99",
+  "label": "B",
+  "section": "MATH",
+  "domain": "Advanced Math",
+  "ps": "Advanced Math - Nonlinear equations in one variable and systems of equations in two variables - MEDIUM",
+  "ord": 20,
+  "old": {
+   "w": 309,
+   "h": 316
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR EQUATIONS/Non Linear Equations MED.pdf",
+  "hex": "75a32330",
+  "page": 20,
+  "ncc": 0.9799,
+  "second": 0.7406,
+  "rect_pt": [
+   190.11,
+   448.67,
+   429.01,
+   692.98
+  ],
+  "kind": "VECTOR",
+  "dpi": 300,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "e25809c7df557cd59f047ded.png",
+   "w": 996,
+   "h": 1019
+  }
+ },
+ {
+  "qid": "cmsjrnxjj01hzqmt1tq5nhspe",
+  "url": "/uploads/questions/f168a7d5e7810a9a43e601e3.jpg",
+  "optId": "opt_908c0f84-9df2-4868-b4ca-d4e1be69eef0",
+  "label": "C",
+  "section": "MATH",
+  "domain": "Advanced Math",
+  "ps": "Advanced Math - Nonlinear equations in one variable and systems of equations in two variables - MEDIUM",
+  "ord": 20,
+  "old": {
+   "w": 310,
+   "h": 320
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR EQUATIONS/Non Linear Equations MED.pdf",
+  "hex": "75a32330",
+  "page": 21,
+  "ncc": 0.9823,
+  "second": 0.7643,
+  "rect_pt": [
+   189.73,
+   30.22,
+   429.91,
+   278.14
+  ],
+  "kind": "VECTOR",
+  "dpi": 300,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "3597d42a9a7c45c20807b870.png",
+   "w": 1002,
+   "h": 1034
+  },
+  "note": "needs_review (similar option graphs, 2nd peak high); match order A-D and content checked by eye"
+ },
+ {
+  "qid": "cmsjrnxjj01hzqmt1tq5nhspe",
+  "url": "/uploads/questions/c2bbdace12fd0d841214a5db.jpg",
+  "optId": "opt_d8cdf8e2-7e02-4801-8dba-1d7ad8544886",
+  "label": "D",
+  "section": "MATH",
+  "domain": "Advanced Math",
+  "ps": "Advanced Math - Nonlinear equations in one variable and systems of equations in two variables - MEDIUM",
+  "ord": 20,
+  "old": {
+   "w": 310,
+   "h": 317
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR EQUATIONS/Non Linear Equations MED.pdf",
+  "hex": "75a32330",
+  "page": 21,
+  "ncc": 0.9852,
+  "second": 0.7407,
+  "rect_pt": [
+   189.73,
+   315.72,
+   429.91,
+   561.32
+  ],
+  "kind": "VECTOR",
+  "dpi": 300,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "2d5dc14dc115f0aed13d3786.png",
+   "w": 1002,
+   "h": 1024
+  }
+ },
+ {
+  "qid": "cmsjrnxmo01itqmt1bajti7cy",
+  "url": "/uploads/questions/767d91472c6af9729697834e.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Advanced Math",
+  "ps": "Advanced Math - Nonlinear equations in one variable and systems of equations in two variables - MEDIUM",
+  "ord": 30,
+  "old": {
+   "w": 238,
+   "h": 247
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR EQUATIONS/Non Linear Equations MED.pdf",
+  "hex": "a5663025",
+  "page": 31,
+  "ncc": 0.9518,
+  "second": 0.3312,
+  "rect_pt": [
+   18.12,
+   64.51,
+   112.85,
+   162.83
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "4160c94878b74ca514169ab7.jpg",
+   "w": 198,
+   "h": 206
+  }
+ },
+ {
+  "qid": "cmsjrnxpa01lcqmt1r4k2drkr",
+  "url": "/uploads/questions/8b2664f02e671addc351c35d.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Advanced Math",
+  "ps": "Advanced Math - Nonlinear functions - EASY",
+  "ord": 0,
+  "old": {
+   "w": 315,
+   "h": 317
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/Non Linear Functions EASY.pdf",
+  "hex": "6abec9a8",
+  "page": 1,
+  "ncc": 0.9689,
+  "second": 0.3382,
+  "rect_pt": [
+   187.26,
+   74.81,
+   431.75,
+   320.85
+  ],
+  "kind": "VECTOR",
+  "dpi": 300,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "faddac732613260fd8eba333.png",
+   "w": 1019,
+   "h": 1026
+  }
+ },
+ {
+  "qid": "cmsjrnxpl01lmqmt1pmalx901",
+  "url": "/uploads/questions/0fb43a6d6c7c60d8b1b0c302.jpg",
+  "optId": "opt_88f3d840262143d1ba968160a5b0c3f6",
+  "label": "A",
+  "section": "MATH",
+  "domain": "Advanced Math",
+  "ps": "Advanced Math - Nonlinear functions - EASY",
+  "ord": 2,
+  "old": {
+   "w": 217,
+   "h": 226
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/Non Linear Functions EASY.pdf",
+  "hex": "b39d74a0",
+  "page": 3,
+  "ncc": 0.9385,
+  "second": 0.7586,
+  "rect_pt": [
+   28.25,
+   251.98,
+   115.31,
+   342.65
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "b1b073e4b41351c427c38f43.jpg",
+   "w": 181,
+   "h": 189
+  },
+  "note": "needs_review (similar option graphs, 2nd peak high); match order A-D and content checked by eye"
+ },
+ {
+  "qid": "cmsjrnxpl01lmqmt1pmalx901",
+  "url": "/uploads/questions/49101ba60b31d288e4c60623.jpg",
+  "optId": "opt_9fb6fa17f68f4aecb1f49e503a8f81ea",
+  "label": "B",
+  "section": "MATH",
+  "domain": "Advanced Math",
+  "ps": "Advanced Math - Nonlinear functions - EASY",
+  "ord": 2,
+  "old": {
+   "w": 217,
+   "h": 226
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/Non Linear Functions EASY.pdf",
+  "hex": "b39d74a0",
+  "page": 3,
+  "ncc": 0.9508,
+  "second": 0.7996,
+  "rect_pt": [
+   28.25,
+   407.05,
+   115.31,
+   497.72
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "94d02430882ea114faa02dd9.jpg",
+   "w": 181,
+   "h": 189
+  },
+  "note": "needs_review (similar option graphs, 2nd peak high); match order A-D and content checked by eye"
+ },
+ {
+  "qid": "cmsjrnxpl01lmqmt1pmalx901",
+  "url": "/uploads/questions/110bcd7b5fe8d273ab067c85.jpg",
+  "optId": "opt_36fe7055750c4ec3976f11a7cce2b78f",
+  "label": "C",
+  "section": "MATH",
+  "domain": "Advanced Math",
+  "ps": "Advanced Math - Nonlinear functions - EASY",
+  "ord": 2,
+  "old": {
+   "w": 217,
+   "h": 226
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/Non Linear Functions EASY.pdf",
+  "hex": "b39d74a0",
+  "page": 3,
+  "ncc": 0.9397,
+  "second": 0.7787,
+  "rect_pt": [
+   28.25,
+   562.98,
+   115.31,
+   653.65
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "5b6692ab19a2aedef84f6dc6.jpg",
+   "w": 181,
+   "h": 189
+  },
+  "note": "needs_review (similar option graphs, 2nd peak high); match order A-D and content checked by eye"
+ },
+ {
+  "qid": "cmsjrnxpl01lmqmt1pmalx901",
+  "url": "/uploads/questions/0b6909158fe3401d8128be19.jpg",
+  "optId": "opt_0e34f4ac9abf4105b86d190e98dbcf1f",
+  "label": "D",
+  "section": "MATH",
+  "domain": "Advanced Math",
+  "ps": "Advanced Math - Nonlinear functions - EASY",
+  "ord": 2,
+  "old": {
+   "w": 217,
+   "h": 226
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/Non Linear Functions EASY.pdf",
+  "hex": "b39d74a0",
+  "page": 4,
+  "ncc": 0.9467,
+  "second": 0.3751,
+  "rect_pt": [
+   28.25,
+   17.98,
+   115.31,
+   108.65
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "b58d69750d1623c8670020d9.jpg",
+   "w": 181,
+   "h": 189
+  }
+ },
+ {
+  "qid": "cmsjrnxpq01lnqmt1bldb1u22",
+  "url": "/uploads/questions/929e68c9649202414b560b5f.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Advanced Math",
+  "ps": "Advanced Math - Nonlinear functions - EASY",
+  "ord": 3,
+  "old": {
+   "w": 308,
+   "h": 319
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/Non Linear Functions EASY.pdf",
+  "hex": "b5c43226",
+  "page": 5,
+  "ncc": 0.9635,
+  "second": 0.2696,
+  "rect_pt": [
+   189.5,
+   74.84,
+   428.13,
+   321.99
+  ],
+  "kind": "VECTOR",
+  "dpi": 300,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "88fad127427f11bc3221621e.png",
+   "w": 995,
+   "h": 1031
+  }
+ },
+ {
+  "qid": "cmsjrnxqe01m8qmt1m0ndg1em",
+  "url": "/uploads/questions/5391c4340ea3b25b6b1aa6ae.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Advanced Math",
+  "ps": "Advanced Math - Nonlinear functions - EASY",
+  "ord": 8,
+  "old": {
+   "w": 735,
+   "h": 715
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/Non Linear Functions EASY.pdf",
+  "hex": "5e63b9cf",
+  "page": 10,
+  "ncc": 0.9357,
+  "second": 0.2735,
+  "rect_pt": [
+   176.09,
+   61.18,
+   441.19,
+   319.06
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "bb4881a5a14df3fb9f1af80d.png",
+   "w": 1474,
+   "h": 1434
+  }
+ },
+ {
+  "qid": "cmsjrnxqm01miqmt1t676opuh",
+  "url": "/uploads/questions/adceb40330be7e7ced32908f.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Advanced Math",
+  "ps": "Advanced Math - Nonlinear functions - EASY",
+  "ord": 10,
+  "old": {
+   "w": 386,
+   "h": 431
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/Non Linear Functions EASY.pdf",
+  "hex": "ebe4bde0",
+  "page": 12,
+  "ncc": 0.9493,
+  "second": 0.1888,
+  "rect_pt": [
+   17.98,
+   64.31,
+   172.23,
+   236.54
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 201,
+  "status": "ok",
+  "new": {
+   "file": "d8f73b2460391345fe5aed67.jpg",
+   "w": 431,
+   "h": 480
+  }
+ },
+ {
+  "qid": "cmsjrnxqr01mnqmt117fncea8",
+  "url": "/uploads/questions/1659366cddc4f814b80a32c9.jpg",
+  "optId": "opt_c9ebf249213943eb8a94abe841d7a1ff",
+  "label": "A",
+  "section": "MATH",
+  "domain": "Advanced Math",
+  "ps": "Advanced Math - Nonlinear functions - EASY",
+  "ord": 11,
+  "old": {
+   "w": 213,
+   "h": 221
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/Non Linear Functions EASY.pdf",
+  "hex": "d46da42c",
+  "page": 13,
+  "ncc": 0.9374,
+  "second": 0.7703,
+  "rect_pt": [
+   28.18,
+   132.38,
+   113.63,
+   221.05
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "f4aa437a938699e08c65a7fa.jpg",
+   "w": 178,
+   "h": 184
+  },
+  "note": "needs_review (similar option graphs, 2nd peak high); match order A-D and content checked by eye"
+ },
+ {
+  "qid": "cmsjrnxqr01mnqmt117fncea8",
+  "url": "/uploads/questions/71ae9ebaf88463bdddfe8c80.jpg",
+  "optId": "opt_833d0ab5d4044029a97365564a725f18",
+  "label": "B",
+  "section": "MATH",
+  "domain": "Advanced Math",
+  "ps": "Advanced Math - Nonlinear functions - EASY",
+  "ord": 11,
+  "old": {
+   "w": 213,
+   "h": 221
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/Non Linear Functions EASY.pdf",
+  "hex": "d46da42c",
+  "page": 13,
+  "ncc": 0.9362,
+  "second": 0.8035,
+  "rect_pt": [
+   28.46,
+   264.65,
+   113.24,
+   352.62
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "2b908be3cef4c4c6010a71b6.jpg",
+   "w": 178,
+   "h": 184
+  },
+  "note": "needs_review (similar option graphs, 2nd peak high); match order A-D and content checked by eye"
+ },
+ {
+  "qid": "cmsjrnxqr01mnqmt117fncea8",
+  "url": "/uploads/questions/633153065e7e62cc6f8c8c29.jpg",
+  "optId": "opt_208bdd471ee0484295ab387e1d65f734",
+  "label": "C",
+  "section": "MATH",
+  "domain": "Advanced Math",
+  "ps": "Advanced Math - Nonlinear functions - EASY",
+  "ord": 11,
+  "old": {
+   "w": 213,
+   "h": 221
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/Non Linear Functions EASY.pdf",
+  "hex": "d46da42c",
+  "page": 13,
+  "ncc": 0.9471,
+  "second": 0.8081,
+  "rect_pt": [
+   28.18,
+   395.65,
+   113.63,
+   484.31
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "3a6f1709720d158d51655cb6.jpg",
+   "w": 178,
+   "h": 184
+  },
+  "note": "needs_review (similar option graphs, 2nd peak high); match order A-D and content checked by eye"
+ },
+ {
+  "qid": "cmsjrnxqr01mnqmt117fncea8",
+  "url": "/uploads/questions/8e36127f83a05ee2d50bb323.jpg",
+  "optId": "opt_18dd95afbdd042dba1dc186bc300abca",
+  "label": "D",
+  "section": "MATH",
+  "domain": "Advanced Math",
+  "ps": "Advanced Math - Nonlinear functions - EASY",
+  "ord": 11,
+  "old": {
+   "w": 213,
+   "h": 221
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/Non Linear Functions EASY.pdf",
+  "hex": "d46da42c",
+  "page": 13,
+  "ncc": 0.9438,
+  "second": 0.7989,
+  "rect_pt": [
+   28.18,
+   527.65,
+   113.63,
+   616.31
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "d247de96b9a23719652a14f7.jpg",
+   "w": 178,
+   "h": 184
+  },
+  "note": "needs_review (similar option graphs, 2nd peak high); match order A-D and content checked by eye"
+ },
+ {
+  "qid": "cmsjrnxqz01mtqmt1xdv9pr38",
+  "url": "/uploads/questions/155203e7eaf3d5ec7ec9dd81.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Advanced Math",
+  "ps": "Advanced Math - Nonlinear functions - EASY",
+  "ord": 13,
+  "old": {
+   "w": 740,
+   "h": 715
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/Non Linear Functions EASY.pdf",
+  "hex": "50418728",
+  "page": 15,
+  "ncc": 0.9388,
+  "second": 0.2788,
+  "rect_pt": [
+   176.01,
+   73.78,
+   442.91,
+   331.67
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "4f17747fec707b99603ae2d9.png",
+   "w": 1484,
+   "h": 1434
+  }
+ },
+ {
+  "qid": "cmsjrnxr601mzqmt1untahx0h",
+  "url": "/uploads/questions/860a31031e900296ef89b85e.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Advanced Math",
+  "ps": "Advanced Math - Nonlinear functions - EASY",
+  "ord": 15,
+  "old": {
+   "w": 730,
+   "h": 720
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/Non Linear Functions EASY.pdf",
+  "hex": "d45572cc",
+  "page": 17,
+  "ncc": 0.9341,
+  "second": 0.2219,
+  "rect_pt": [
+   176.55,
+   73.9,
+   438.81,
+   332.57
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "fd976fd883af92c375c7d09e.png",
+   "w": 1458,
+   "h": 1438
+  }
+ },
+ {
+  "qid": "cmsjrnx8p01d4qmt1rcuyj79f",
+  "url": "/uploads/questions/0fb2820e6b48babf25da1926.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Advanced Math",
+  "ps": "Advanced Math - Nonlinear functions - HARD",
+  "ord": 6,
+  "old": {
+   "w": 500,
+   "h": 430
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/NON LINEAR FUNCTIONS HARD.pdf",
+  "hex": "263f9937",
+  "page": 7,
+  "ncc": 0.9398,
+  "second": 0.3809,
+  "rect_pt": [
+   25.51,
+   54.07,
+   205.14,
+   208.55
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "638725d0fd04d1e57c534e32.png",
+   "w": 999,
+   "h": 859
+  }
+ },
+ {
+  "qid": "cmsjrnx9l01dkqmt10z6hae2n",
+  "url": "/uploads/questions/12072415a67e2af6a7df0223.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Advanced Math",
+  "ps": "Advanced Math - Nonlinear functions - HARD",
+  "ord": 14,
+  "old": {
+   "w": 730,
+   "h": 705
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/NON LINEAR FUNCTIONS HARD.pdf",
+  "hex": "df71424b",
+  "page": 15,
+  "ncc": 0.9293,
+  "second": 0.295,
+  "rect_pt": [
+   24.89,
+   53.95,
+   288.18,
+   308.23
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "9e1ce157644fa822266a7c5a.png",
+   "w": 1464,
+   "h": 1414
+  }
+ },
+ {
+  "qid": "cmsjrnx9q01dpqmt12qclxdgq",
+  "url": "/uploads/questions/ffbacf8b7b0807e6a1b654db.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Advanced Math",
+  "ps": "Advanced Math - Nonlinear functions - HARD",
+  "ord": 15,
+  "old": {
+   "w": 230,
+   "h": 480
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/NON LINEAR FUNCTIONS HARD.pdf",
+  "hex": "0121a235",
+  "page": 16,
+  "ncc": 0.9351,
+  "second": 0.2772,
+  "rect_pt": [
+   25.09,
+   54.05,
+   108.05,
+   227.18
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "41a1c12cbb5bfa6d0da07368.png",
+   "w": 462,
+   "h": 963
+  }
+ },
+ {
+  "qid": "cmsjrny5r01uxqmt1lqr91cvn",
+  "url": "/uploads/questions/b12454412340cf8caeb197aa.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Advanced Math",
+  "ps": "Advanced Math - Nonlinear functions - MEDIUM",
+  "ord": 4,
+  "old": {
+   "w": 680,
+   "h": 700
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/Non Linear Functions MED.pdf",
+  "hex": "252a3b3a",
+  "page": 5,
+  "ncc": 0.9511,
+  "second": 0.2895,
+  "rect_pt": [
+   187.42,
+   73.9,
+   431.72,
+   325.39
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "eb158a68582fdf08c680769a.png",
+   "w": 1358,
+   "h": 1398
+  }
+ },
+ {
+  "qid": "cmsjrny9p01vvqmt14dhfb8gb",
+  "url": "/uploads/questions/f05ffd96661fa578c99be61e.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Advanced Math",
+  "ps": "Advanced Math - Nonlinear functions - MEDIUM",
+  "ord": 18,
+  "old": {
+   "w": 255,
+   "h": 475
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/Non Linear Functions MED.pdf",
+  "hex": "dba7432e",
+  "page": 19,
+  "ncc": 0.9593,
+  "second": 0.2836,
+  "rect_pt": [
+   15.09,
+   64.3,
+   106.7,
+   234.95
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "a35124821cf43274d5d640ed.png",
+   "w": 510,
+   "h": 949
+  }
+ },
+ {
+  "qid": "cmsjrnybj01wlqmt1p488w8bu",
+  "url": "/uploads/questions/b8b8d9ee067a75893eb383c5.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Advanced Math",
+  "ps": "Advanced Math - Nonlinear functions - MEDIUM",
+  "ord": 28,
+  "old": {
+   "w": 1620,
+   "h": 215
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/Non Linear Functions MED.pdf",
+  "hex": "dd8ac009",
+  "page": 29,
+  "ncc": 0.9461,
+  "second": 0.1673,
+  "rect_pt": [
+   15.81,
+   62.04,
+   597.82,
+   139.28
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "3378cd5ffc70dcf90f75d432.png",
+   "w": 3235,
+   "h": 430
+  }
+ },
+ {
+  "qid": "cmsjrnyc801wnqmt1qs9bjmpb",
+  "url": "/uploads/questions/37a5ae94f3ae37407f363546.jpg",
+  "optId": "opt_161737bb57744719bec3d796058b005a",
+  "label": "A",
+  "section": "MATH",
+  "domain": "Advanced Math",
+  "ps": "Advanced Math - Nonlinear functions - MEDIUM",
+  "ord": 30,
+  "old": {
+   "w": 309,
+   "h": 221
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/Non Linear Functions MED.pdf",
+  "hex": "d675744f",
+  "page": 31,
+  "ncc": 0.9636,
+  "second": 0.8037,
+  "rect_pt": [
+   28.51,
+   154.32,
+   151.99,
+   242.63
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "41026e32a90e853101a70efc.jpg",
+   "w": 257,
+   "h": 185
+  },
+  "note": "needs_review (similar option graphs, 2nd peak high); match order A-D and content checked by eye"
+ },
+ {
+  "qid": "cmsjrnyc801wnqmt1qs9bjmpb",
+  "url": "/uploads/questions/b3690522fd746c33dcf3c848.jpg",
+  "optId": "opt_4bc4718ccec0430ca2d77df9c831d5b3",
+  "label": "B",
+  "section": "MATH",
+  "domain": "Advanced Math",
+  "ps": "Advanced Math - Nonlinear functions - MEDIUM",
+  "ord": 30,
+  "old": {
+   "w": 309,
+   "h": 221
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/Non Linear Functions MED.pdf",
+  "hex": "d675744f",
+  "page": 31,
+  "ncc": 0.9674,
+  "second": 0.8036,
+  "rect_pt": [
+   28.51,
+   307.25,
+   151.99,
+   395.57
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "d1c5de6db1492a7e0ae638d7.jpg",
+   "w": 257,
+   "h": 185
+  },
+  "note": "needs_review (similar option graphs, 2nd peak high); match order A-D and content checked by eye"
+ },
+ {
+  "qid": "cmsjrnyc801wnqmt1qs9bjmpb",
+  "url": "/uploads/questions/542b66222ba1bc9982b8740f.jpg",
+  "optId": "opt_6069fd5abe204b7ca9d40e7965912bc0",
+  "label": "C",
+  "section": "MATH",
+  "domain": "Advanced Math",
+  "ps": "Advanced Math - Nonlinear functions - MEDIUM",
+  "ord": 30,
+  "old": {
+   "w": 309,
+   "h": 221
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/Non Linear Functions MED.pdf",
+  "hex": "d675744f",
+  "page": 31,
+  "ncc": 0.9684,
+  "second": 0.8044,
+  "rect_pt": [
+   28.2,
+   460.98,
+   152.17,
+   549.65
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "30aa6ef7ac32954aebbd05e7.jpg",
+   "w": 257,
+   "h": 185
+  },
+  "note": "needs_review (similar option graphs, 2nd peak high); match order A-D and content checked by eye"
+ },
+ {
+  "qid": "cmsjrnyc801wnqmt1qs9bjmpb",
+  "url": "/uploads/questions/e10f31ad81bea4c0b725fa06.jpg",
+  "optId": "opt_a54d8cc3d26a4aea9a7c9422f9684e4e",
+  "label": "D",
+  "section": "MATH",
+  "domain": "Advanced Math",
+  "ps": "Advanced Math - Nonlinear functions - MEDIUM",
+  "ord": 30,
+  "old": {
+   "w": 309,
+   "h": 221
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ADVANCED MATH/NON LINEAR FUNCTIONS/Non Linear Functions MED.pdf",
+  "hex": "d675744f",
+  "page": 31,
+  "ncc": 0.965,
+  "second": 0.8261,
+  "rect_pt": [
+   28.51,
+   614.05,
+   151.99,
+   702.37
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "204ba977a2dda83d92712dc2.jpg",
+   "w": 257,
+   "h": 185
+  },
+  "note": "needs_review (similar option graphs, 2nd peak high); match order A-D and content checked by eye"
+ },
+ {
+  "qid": "cmsjrnz800275qmt1z0ev1fb2",
+  "url": "/uploads/questions/92e72b2c749e254e30199368.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Linear equations in one variable - EASY",
+  "ord": 6,
+  "old": {
+   "w": 144,
+   "h": 41
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR EQUATIONS ONE VARIABLE/Linear Eq. One Variable EASY.pdf",
+  "hex": "550b352c",
+  "page": 7,
+  "ncc": 0.9647,
+  "second": 0.4155,
+  "rect_pt": [
+   17.9,
+   64.22,
+   75.67,
+   80.67
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 96,
+  "status": "ok",
+  "new": {
+   "file": "c3a783a6bed569bb4389d578.png",
+   "w": 77,
+   "h": 22
+  }
+ },
+ {
+  "qid": "cmsjrnyyw023tqmt1heotosww",
+  "url": "/uploads/questions/bc31c64f241aa2ab936430d5.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Linear equations in two variables - EASY",
+  "ord": 8,
+  "old": {
+   "w": 292,
+   "h": 180
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR EQUATIONS TWO VARIABLES/Linear Eq TWO Variables EASY.pdf",
+  "hex": "b2845d88",
+  "page": 8,
+  "ncc": 0.9583,
+  "second": 0.3569,
+  "rect_pt": [
+   18.31,
+   140.2,
+   134.53,
+   211.84
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 148,
+  "status": "ok",
+  "new": {
+   "file": "b6439259651e80674d2dbd49.jpg",
+   "w": 240,
+   "h": 147
+  }
+ },
+ {
+  "qid": "cmsjrnyzw0247qmt1z4q6h0bj",
+  "url": "/uploads/questions/546b89e1cbdfffcf099aeaf4.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Linear equations in two variables - EASY",
+  "ord": 18,
+  "old": {
+   "w": 689,
+   "h": 692
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR EQUATIONS TWO VARIABLES/Linear Eq TWO Variables EASY.pdf",
+  "hex": "4acd05cd",
+  "page": 18,
+  "ncc": 0.9385,
+  "second": 0.2508,
+  "rect_pt": [
+   183.79,
+   151.65,
+   432.3,
+   401.24
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "bc291efb44bef527d9efe544.png",
+   "w": 1381,
+   "h": 1388
+  }
+ },
+ {
+  "qid": "cmsjrnz0d024cqmt1kk05hyfn",
+  "url": "/uploads/questions/6e6325ce320968bab9d420ff.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Linear equations in two variables - EASY",
+  "ord": 23,
+  "old": {
+   "w": 707,
+   "h": 688
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR EQUATIONS TWO VARIABLES/Linear Eq TWO Variables EASY.pdf",
+  "hex": "eeebe166",
+  "page": 24,
+  "ncc": 0.9341,
+  "second": 0.3354,
+  "rect_pt": [
+   180.9,
+   151.48,
+   435.9,
+   399.63
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "4fdcd55d7b669afd1810b1ba.png",
+   "w": 1418,
+   "h": 1380
+  }
+ },
+ {
+  "qid": "cmsjrnz0w024lqmt1mmufoxwl",
+  "url": "/uploads/questions/e3aaa327e6b674ab49a18059.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Linear equations in two variables - EASY",
+  "ord": 28,
+  "old": {
+   "w": 695,
+   "h": 689
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR EQUATIONS TWO VARIABLES/Linear Eq TWO Variables EASY.pdf",
+  "hex": "f40552a9",
+  "page": 29,
+  "ncc": 0.9609,
+  "second": 0.3244,
+  "rect_pt": [
+   180.57,
+   151.54,
+   431.24,
+   400.05
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "592aab692b817d5cb0ccba58.png",
+   "w": 1393,
+   "h": 1382
+  }
+ },
+ {
+  "qid": "cmsjrnz3v024nqmt18jifuzjf",
+  "url": "/uploads/questions/bbb7e28d9633dbb6d1075b1a.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Linear equations in two variables - EASY",
+  "ord": 30,
+  "old": {
+   "w": 322,
+   "h": 333
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR EQUATIONS TWO VARIABLES/Linear Eq TWO Variables EASY.pdf",
+  "hex": "8a1544f1",
+  "page": 31,
+  "ncc": 0.9605,
+  "second": 0.3517,
+  "rect_pt": [
+   17.98,
+   139.98,
+   146.66,
+   273.05
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "62843c38d345a51eb230bde4.jpg",
+   "w": 269,
+   "h": 278
+  }
+ },
+ {
+  "qid": "cmsjrnzk902bhqmt181tfqqhz",
+  "url": "/uploads/questions/08b8bf8860fab167bb9208a5.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Linear equations in two variables - HARD",
+  "ord": 4,
+  "old": {
+   "w": 348,
+   "h": 200
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR EQUATIONS TWO VARIABLES/Linear Eq TWO Variables HARD.pdf",
+  "hex": "c4ea43ef",
+  "page": 5,
+  "ncc": 0.9378,
+  "second": 0.2685,
+  "rect_pt": [
+   17.98,
+   64.45,
+   157.05,
+   144.38
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "3492f7ad8d5753c09420658a.jpg",
+   "w": 290,
+   "h": 167
+  }
+ },
+ {
+  "qid": "cmsjrnzkp02bnqmt15jryorva",
+  "url": "/uploads/questions/e3a6214b7836338356589c55.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Linear equations in two variables - HARD",
+  "ord": 6,
+  "old": {
+   "w": 697,
+   "h": 689
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR EQUATIONS TWO VARIABLES/Linear Eq TWO Variables HARD.pdf",
+  "hex": "6d8ad460",
+  "page": 7,
+  "ncc": 0.9378,
+  "second": 0.3692,
+  "rect_pt": [
+   181.11,
+   76.42,
+   431.52,
+   323.95
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "8fa8bd15e8427cb21b668ca3.png",
+   "w": 1392,
+   "h": 1376
+  }
+ },
+ {
+  "qid": "cmsjrnzlb02buqmt14xwwo7l3",
+  "url": "/uploads/questions/a1849a512a6fb54de728d38a.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Linear equations in two variables - HARD",
+  "ord": 11,
+  "old": {
+   "w": 363,
+   "h": 406
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR EQUATIONS TWO VARIABLES/Linear Eq TWO Variables HARD.pdf",
+  "hex": "c362c210",
+  "page": 12,
+  "ncc": 0.8884,
+  "second": 0.2159,
+  "rect_pt": [
+   17.98,
+   64.44,
+   163.04,
+   226.69
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 212,
+  "status": "ok",
+  "new": {
+   "file": "6e443d95bb2c1e74cabddfab.jpg",
+   "w": 429,
+   "h": 480
+  }
+ },
+ {
+  "qid": "cmsjrnzld02bvqmt1j9k8uv17",
+  "url": "/uploads/questions/43f6fcf1ddf6e9bb769c7426.jpg",
+  "optId": "opt_91f06ed596a64fb0b9601e42cd8ef685",
+  "label": "A",
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Linear equations in two variables - HARD",
+  "ord": 12,
+  "old": {
+   "w": 153,
+   "h": 166
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR EQUATIONS TWO VARIABLES/Linear Eq TWO Variables HARD.pdf",
+  "hex": "0b46bad5",
+  "page": 13,
+  "ncc": 0.9485,
+  "second": 0.7558,
+  "rect_pt": [
+   28.67,
+   152.07,
+   89.57,
+   218.14
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "e83cc206da1eed120447fd31.png",
+   "w": 128,
+   "h": 139
+  },
+  "note": "needs_review (similar option graphs, 2nd peak high); match order A-D and content checked by eye"
+ },
+ {
+  "qid": "cmsjrnzld02bvqmt1j9k8uv17",
+  "url": "/uploads/questions/2c516ee779573f799803caf1.jpg",
+  "optId": "opt_96a056f88d94498697b1811b1f33b182",
+  "label": "B",
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Linear equations in two variables - HARD",
+  "ord": 12,
+  "old": {
+   "w": 153,
+   "h": 166
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR EQUATIONS TWO VARIABLES/Linear Eq TWO Variables HARD.pdf",
+  "hex": "0b46bad5",
+  "page": 13,
+  "ncc": 0.9457,
+  "second": 0.6473,
+  "rect_pt": [
+   28.32,
+   283.39,
+   89.46,
+   349.72
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 151,
+  "status": "ok",
+  "new": {
+   "file": "35a6c3af98fb09f23c70f44e.png",
+   "w": 129,
+   "h": 139
+  }
+ },
+ {
+  "qid": "cmsjrnzld02bvqmt1j9k8uv17",
+  "url": "/uploads/questions/03bb24af85a3fde2ec3d35c3.jpg",
+  "optId": "opt_bbf2c130187d4211aacba21b0faecb0e",
+  "label": "C",
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Linear equations in two variables - HARD",
+  "ord": 12,
+  "old": {
+   "w": 153,
+   "h": 166
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR EQUATIONS TWO VARIABLES/Linear Eq TWO Variables HARD.pdf",
+  "hex": "0b46bad5",
+  "page": 13,
+  "ncc": 0.9441,
+  "second": 0.74,
+  "rect_pt": [
+   28.37,
+   414.44,
+   89.75,
+   481.04
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "8ab5e4fe908d68d48185d0b6.png",
+   "w": 128,
+   "h": 139
+  }
+ },
+ {
+  "qid": "cmsjrnzld02bvqmt1j9k8uv17",
+  "url": "/uploads/questions/181bb6cadad85c15d8d90144.jpg",
+  "optId": "opt_da5775c18448410ea43322c19e197001",
+  "label": "D",
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Linear equations in two variables - HARD",
+  "ord": 12,
+  "old": {
+   "w": 153,
+   "h": 166
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR EQUATIONS TWO VARIABLES/Linear Eq TWO Variables HARD.pdf",
+  "hex": "0b46bad5",
+  "page": 13,
+  "ncc": 0.9506,
+  "second": 0.7226,
+  "rect_pt": [
+   28.37,
+   546.44,
+   89.75,
+   613.04
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "0a5a21a1f2245f7ae8ebfe7d.png",
+   "w": 128,
+   "h": 139
+  }
+ },
+ {
+  "qid": "cmsjrnzlm02bwqmt1suqhsdvu",
+  "url": "/uploads/questions/633e8ff7b07dd84814f81f30.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Linear equations in two variables - HARD",
+  "ord": 13,
+  "old": {
+   "w": 319,
+   "h": 316
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR EQUATIONS TWO VARIABLES/Linear Eq TWO Variables HARD.pdf",
+  "hex": "05bb1af9",
+  "page": 14,
+  "ncc": 0.9458,
+  "second": 0.2227,
+  "rect_pt": [
+   184.5,
+   77.06,
+   431.66,
+   321.89
+  ],
+  "kind": "VECTOR",
+  "dpi": 300,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "b763bae5df5d414b402aa3b0.png",
+   "w": 1031,
+   "h": 1021
+  }
+ },
+ {
+  "qid": "cmsjrnyhp01xiqmt1aw1ztg4p",
+  "url": "/uploads/questions/819eab21b24cf9f451264333.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Linear equations in two variables - MEDIUM",
+  "ord": 1,
+  "old": {
+   "w": 698,
+   "h": 689
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR EQUATIONS TWO VARIABLES/Linear Eq TWO Variables MED.pdf",
+  "hex": "9b0a4eae",
+  "page": 2,
+  "ncc": 0.948,
+  "second": 0.2434,
+  "rect_pt": [
+   179.8,
+   76.06,
+   430.57,
+   323.59
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "0463f9f539f3c22fea53dde1.png",
+   "w": 1395,
+   "h": 1376
+  }
+ },
+ {
+  "qid": "cmsjrnyiv01xwqmt1bed1mne8",
+  "url": "/uploads/questions/ec5aa35ef4b5ef79e0fa9930.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Linear equations in two variables - MEDIUM",
+  "ord": 11,
+  "old": {
+   "w": 324,
+   "h": 318
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR EQUATIONS TWO VARIABLES/Linear Eq TWO Variables MED.pdf",
+  "hex": "c307283c",
+  "page": 12,
+  "ncc": 0.9856,
+  "second": 0.2789,
+  "rect_pt": [
+   183.43,
+   77.44,
+   433.92,
+   323.3
+  ],
+  "kind": "VECTOR",
+  "dpi": 300,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "9810395fa1387bb9320a9200.png",
+   "w": 1045,
+   "h": 1026
+  }
+ },
+ {
+  "qid": "cmsjrnyj901y7qmt1otx241i9",
+  "url": "/uploads/questions/9358a7e2b2f312d94647c1db.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Linear equations in two variables - MEDIUM",
+  "ord": 14,
+  "old": {
+   "w": 604,
+   "h": 225
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR EQUATIONS TWO VARIABLES/Linear Eq TWO Variables MED.pdf",
+  "hex": "d62ad380",
+  "page": 15,
+  "ncc": 0.9617,
+  "second": 0.4891,
+  "rect_pt": [
+   15.19,
+   91.25,
+   256.55,
+   181.17
+  ],
+  "kind": "VECTOR",
+  "dpi": 361,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "1492baa2903c607157c98fdd.png",
+   "w": 1211,
+   "h": 452
+  }
+ },
+ {
+  "qid": "cmsjrnymm01yuqmt1k6h2o9n3",
+  "url": "/uploads/questions/f7cd1330bd4e4c913dcb0d79.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Linear equations in two variables - MEDIUM",
+  "ord": 25,
+  "old": {
+   "w": 747,
+   "h": 452
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR EQUATIONS TWO VARIABLES/Linear Eq TWO Variables MED.pdf",
+  "hex": "00b9bd37",
+  "page": 26,
+  "ncc": 0.9464,
+  "second": 0.1761,
+  "rect_pt": [
+   169.6,
+   60.89,
+   437.97,
+   223.28
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "893f6f67fa60b79cf504ae3f.png",
+   "w": 1492,
+   "h": 903
+  }
+ },
+ {
+  "qid": "cmsjrnzbg028hqmt1wqhxrh6a",
+  "url": "/uploads/questions/118f49c05dbdc11eaad81a37.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Linear functions - EASY",
+  "ord": 5,
+  "old": {
+   "w": 320,
+   "h": 367
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR FUNCTIONS/Linear Functions EASY.pdf",
+  "hex": "3f5375d9",
+  "page": 6,
+  "ncc": 0.9434,
+  "second": 0.1735,
+  "rect_pt": [
+   17.98,
+   93.71,
+   145.86,
+   240.37
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "c3b564e3c0e2f06fb04c14ec.jpg",
+   "w": 267,
+   "h": 306
+  }
+ },
+ {
+  "qid": "cmsjrnzc0028mqmt1chk4on61",
+  "url": "/uploads/questions/56ea19ac7ed897a87b9ef916.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Linear functions - EASY",
+  "ord": 6,
+  "old": {
+   "w": 112,
+   "h": 125
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR FUNCTIONS/Linear Functions EASY.pdf",
+  "hex": "12983c1e",
+  "page": 7,
+  "ncc": 0.9408,
+  "second": 0.3233,
+  "rect_pt": [
+   17.96,
+   64.36,
+   62.9,
+   114.51
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "5bd1f6183f3983f0558e642e.png",
+   "w": 94,
+   "h": 104
+  }
+ },
+ {
+  "qid": "cmsjrnzdf029cqmt185a2bgmt",
+  "url": "/uploads/questions/424c64f5fa4651881cfb8201.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Linear functions - EASY",
+  "ord": 16,
+  "old": {
+   "w": 805,
+   "h": 754
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR FUNCTIONS/Linear Functions EASY.pdf",
+  "hex": "0ea7ef01",
+  "page": 17,
+  "ncc": 0.9402,
+  "second": 0.1877,
+  "rect_pt": [
+   156.5,
+   116.98,
+   446.85,
+   388.93
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "836ad89515bcec734ea7caed.png",
+   "w": 1614,
+   "h": 1512
+  }
+ },
+ {
+  "qid": "cmsjrnze9029uqmt1lvqmwse9",
+  "url": "/uploads/questions/af6fedfdb6f186014dd9b8c6.jpg",
+  "optId": "opt_8e83848c-4fe6-4110-81fb-81f9bb874fa2",
+  "label": "A",
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Linear functions - EASY",
+  "ord": 22,
+  "old": {
+   "w": 134,
+   "h": 128
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR FUNCTIONS/Linear Functions EASY.pdf",
+  "hex": "a8e6bd75",
+  "page": 23,
+  "ncc": 0.9865,
+  "second": 0.7436,
+  "rect_pt": [
+   19.01,
+   136.01,
+   122.61,
+   234.97
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "92ee6e47c96f1898b9f8d13a.jpg",
+   "w": 194,
+   "h": 204
+  }
+ },
+ {
+  "qid": "cmsjrnze9029uqmt1lvqmwse9",
+  "url": "/uploads/questions/fba9b1b5eff64005c4dd130b.jpg",
+  "optId": "opt_cd4e1d9e-954c-442d-a61f-70629fd4c645",
+  "label": "B",
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Linear functions - EASY",
+  "ord": 22,
+  "old": {
+   "w": 134,
+   "h": 127
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR FUNCTIONS/Linear Functions EASY.pdf",
+  "hex": "a8e6bd75",
+  "page": 23,
+  "ncc": 0.9867,
+  "second": 0.7409,
+  "rect_pt": [
+   18.78,
+   299.68,
+   122.38,
+   397.86
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "ad59798f65b8904861a5084f.jpg",
+   "w": 194,
+   "h": 204
+  }
+ },
+ {
+  "qid": "cmsjrnze9029uqmt1lvqmwse9",
+  "url": "/uploads/questions/dde8a233dc94a2c85f3e1da4.jpg",
+  "optId": "opt_f101cab3-c01d-4f12-b17d-2b215de6cad9",
+  "label": "C",
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Linear functions - EASY",
+  "ord": 22,
+  "old": {
+   "w": 134,
+   "h": 127
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR FUNCTIONS/Linear Functions EASY.pdf",
+  "hex": "a8e6bd75",
+  "page": 23,
+  "ncc": 0.986,
+  "second": 0.7408,
+  "rect_pt": [
+   18.78,
+   462.34,
+   122.38,
+   560.53
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "e362f6f797f2d307fb3a0ea1.jpg",
+   "w": 194,
+   "h": 204
+  }
+ },
+ {
+  "qid": "cmsjrnze9029uqmt1lvqmwse9",
+  "url": "/uploads/questions/b99a8017040c45bd5d56f32f.jpg",
+  "optId": "opt_d818c705-58cf-469b-abd5-66ee86f8533b",
+  "label": "D",
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Linear functions - EASY",
+  "ord": 22,
+  "old": {
+   "w": 134,
+   "h": 127
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR FUNCTIONS/Linear Functions EASY.pdf",
+  "hex": "a8e6bd75",
+  "page": 23,
+  "ncc": 0.9877,
+  "second": 0.7363,
+  "rect_pt": [
+   18.94,
+   626.28,
+   122.13,
+   724.08
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "c91f87b55dd13cd1e60e1a1e.png",
+   "w": 194,
+   "h": 201
+  }
+ },
+ {
+  "qid": "cmsjrnyvq0226qmt107flle78",
+  "url": "/uploads/questions/6e217b2a6c07ace9bf50b1a2.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Linear functions - MEDIUM",
+  "ord": 5,
+  "old": {
+   "w": 681,
+   "h": 650
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR FUNCTIONS/Linear Funct MED.pdf",
+  "hex": "5cf1bbc9",
+  "page": 6,
+  "ncc": 0.9217,
+  "second": 0.2923,
+  "rect_pt": [
+   202.83,
+   152.0,
+   447.49,
+   385.53
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "6759ccbc076a5f8a19cc7a80.png",
+   "w": 1361,
+   "h": 1298
+  }
+ },
+ {
+  "qid": "cmsjrnyw9022gqmt12ekc83wd",
+  "url": "/uploads/questions/f22c1aab831795d51bfd1338.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Linear functions - MEDIUM",
+  "ord": 9,
+  "old": {
+   "w": 146,
+   "h": 136
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR FUNCTIONS/Linear Funct MED.pdf",
+  "hex": "c651cc56",
+  "page": 11,
+  "ncc": 0.9459,
+  "second": 0.4375,
+  "rect_pt": [
+   18.23,
+   138.77,
+   76.11,
+   192.68
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 149,
+  "status": "ok",
+  "new": {
+   "file": "523fc58ba0e813e631ff66e1.png",
+   "w": 121,
+   "h": 115
+  }
+ },
+ {
+  "qid": "cmsjrnywj022mqmt1uw8ndtuz",
+  "url": "/uploads/questions/b1505babc7980b6790ca33e0.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Linear functions - MEDIUM",
+  "ord": 11,
+  "old": {
+   "w": 277,
+   "h": 277
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR FUNCTIONS/Linear Funct MED.pdf",
+  "hex": "11e1ab81",
+  "page": 13,
+  "ncc": 0.9596,
+  "second": 0.2197,
+  "rect_pt": [
+   17.98,
+   138.58,
+   128.68,
+   249.27
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 156,
+  "status": "ok",
+  "new": {
+   "file": "127933d5d229bf4ff85b9738.jpg",
+   "w": 240,
+   "h": 240
+  }
+ },
+ {
+  "qid": "cmsjrnywq022nqmt11sawy3io",
+  "url": "/uploads/questions/47f87cf5a266a126bbd941a2.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Linear functions - MEDIUM",
+  "ord": 12,
+  "old": {
+   "w": 241,
+   "h": 138
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR FUNCTIONS/Linear Funct MED.pdf",
+  "hex": "41fdc0b8",
+  "page": 14,
+  "ncc": 0.9056,
+  "second": 0.3781,
+  "rect_pt": [
+   18.18,
+   138.46,
+   114.49,
+   193.6
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "3d783057035808cbe4c88efe.png",
+   "w": 201,
+   "h": 115
+  }
+ },
+ {
+  "qid": "cmsjrnyx1022pqmt145bp8w1d",
+  "url": "/uploads/questions/d4e3b1c0db62dd529d047fec.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Linear functions - MEDIUM",
+  "ord": 14,
+  "old": {
+   "w": 890,
+   "h": 878
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR FUNCTIONS/Linear Funct MED.pdf",
+  "hex": "f0773a55",
+  "page": 16,
+  "ncc": 0.991,
+  "second": 0.4735,
+  "rect_pt": [
+   157.46,
+   132.11,
+   454.9,
+   425.54
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "119cba9d511e38ae271cccc7.png",
+   "w": 1654,
+   "h": 1632
+  }
+ },
+ {
+  "qid": "cmsjrnyxn0231qmt1u8uip15r",
+  "url": "/uploads/questions/fae89421db5cfd656f04e675.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Linear functions - MEDIUM",
+  "ord": 18,
+  "old": {
+   "w": 358,
+   "h": 193
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/LINEAR FUNCTIONS/Linear Funct MED.pdf",
+  "hex": "868fc236",
+  "page": 21,
+  "ncc": 0.9332,
+  "second": 0.4406,
+  "rect_pt": [
+   17.98,
+   138.32,
+   161.05,
+   215.45
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "8507615e06f77441b513a45e.jpg",
+   "w": 298,
+   "h": 161
+  }
+ },
+ {
+  "qid": "cmsjrnz6d026aqmt1mtkbzizr",
+  "url": "/uploads/questions/6642ac7f564cd24022625507.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Systems of two linear equations in two variables - EASY",
+  "ord": 10,
+  "old": {
+   "w": 695,
+   "h": 684
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/SYSTEMS TWO LINEAR EQUATIONS & EQUATIONS IN TWO VARIABLES/Systems 2 Lin Equat 2 Var EASY.pdf",
+  "hex": "b0fc3166",
+  "page": 11,
+  "ncc": 0.9497,
+  "second": 0.2562,
+  "rect_pt": [
+   184.2,
+   73.87,
+   434.88,
+   320.58
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "05216bc4a7fe88ef22a53bf1.png",
+   "w": 1393,
+   "h": 1371
+  }
+ },
+ {
+  "qid": "cmsjrnz6n026hqmt1hjhcecl7",
+  "url": "/uploads/questions/30d355a8daaeb5379008d611.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Systems of two linear equations in two variables - EASY",
+  "ord": 13,
+  "old": {
+   "w": 371,
+   "h": 444
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/SYSTEMS TWO LINEAR EQUATIONS & EQUATIONS IN TWO VARIABLES/Systems 2 Lin Equat 2 Var EASY.pdf",
+  "hex": "e1259a5a",
+  "page": 14,
+  "ncc": 0.9548,
+  "second": 0.3351,
+  "rect_pt": [
+   17.98,
+   78.57,
+   166.24,
+   256.0
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 194,
+  "status": "ok",
+  "new": {
+   "file": "4247dd16dd4f948e78cc4c3e.jpg",
+   "w": 401,
+   "h": 480
+  }
+ },
+ {
+  "qid": "cmsjrnypx0213qmt1wvpd8dbq",
+  "url": "/uploads/questions/4251e241d253394b7ea5544e.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Systems of two linear equations in two variables - MEDIUM",
+  "ord": 2,
+  "old": {
+   "w": 346,
+   "h": 358
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/SYSTEMS TWO LINEAR EQUATIONS & EQUATIONS IN TWO VARIABLES/Systems 2 Lin Equat 2 Var MED.pdf",
+  "hex": "2704399f",
+  "page": 3,
+  "ncc": 0.9401,
+  "second": 0.2755,
+  "rect_pt": [
+   18.38,
+   64.58,
+   156.65,
+   207.64
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "45ca57bdd40a1fbb02fe2c58.jpg",
+   "w": 289,
+   "h": 298
+  }
+ },
+ {
+  "qid": "cmsjrnys1021rqmt1vgfhxm3a",
+  "url": "/uploads/questions/6af4de5e4a76c147976a26da.jpg",
+  "optId": "opt_3ef4871b22a74817a9a6b77023fdbe22",
+  "label": "A",
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Systems of two linear equations in two variables - MEDIUM",
+  "ord": 12,
+  "old": {
+   "w": 161,
+   "h": 172
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/SYSTEMS TWO LINEAR EQUATIONS & EQUATIONS IN TWO VARIABLES/Systems 2 Lin Equat 2 Var MED.pdf",
+  "hex": "6e6a3241",
+  "page": 13,
+  "ncc": 0.9471,
+  "second": 0.5801,
+  "rect_pt": [
+   28.4,
+   138.74,
+   92.49,
+   207.2
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "d4ae38f6a8cabe0f15641b35.png",
+   "w": 134,
+   "h": 144
+  }
+ },
+ {
+  "qid": "cmsjrnys1021rqmt1vgfhxm3a",
+  "url": "/uploads/questions/44051aed9d753a1bd6b9fc2e.jpg",
+  "optId": "opt_67888ff4a1f74fc2b9ad15efc2d0b81a",
+  "label": "B",
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Systems of two linear equations in two variables - MEDIUM",
+  "ord": 12,
+  "old": {
+   "w": 161,
+   "h": 170
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/SYSTEMS TWO LINEAR EQUATIONS & EQUATIONS IN TWO VARIABLES/Systems 2 Lin Equat 2 Var MED.pdf",
+  "hex": "6e6a3241",
+  "page": 13,
+  "ncc": 0.9477,
+  "second": 0.6304,
+  "rect_pt": [
+   28.4,
+   216.47,
+   92.49,
+   284.13
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "1f4cb5f18033f1b03bc060d5.png",
+   "w": 134,
+   "h": 142
+  }
+ },
+ {
+  "qid": "cmsjrnys1021rqmt1vgfhxm3a",
+  "url": "/uploads/questions/7f9c862551d27a92cd10bf1a.jpg",
+  "optId": "opt_471d41c262de4a3f89bc999c20be9546",
+  "label": "C",
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Systems of two linear equations in two variables - MEDIUM",
+  "ord": 12,
+  "old": {
+   "w": 163,
+   "h": 170
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/SYSTEMS TWO LINEAR EQUATIONS & EQUATIONS IN TWO VARIABLES/Systems 2 Lin Equat 2 Var MED.pdf",
+  "hex": "6e6a3241",
+  "page": 13,
+  "ncc": 0.9495,
+  "second": 0.7296,
+  "rect_pt": [
+   28.39,
+   293.79,
+   93.53,
+   361.72
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 149,
+  "status": "ok",
+  "new": {
+   "file": "ce8e94e917598a082e670d90.png",
+   "w": 135,
+   "h": 143
+  }
+ },
+ {
+  "qid": "cmsjrnys1021rqmt1vgfhxm3a",
+  "url": "/uploads/questions/520de974d005006c1e6c3dee.jpg",
+  "optId": "opt_8abd550a4350438d97f979379ab203fe",
+  "label": "D",
+  "section": "MATH",
+  "domain": "Algebra",
+  "ps": "Algebra - Systems of two linear equations in two variables - MEDIUM",
+  "ord": 12,
+  "old": {
+   "w": 163,
+   "h": 174
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/ALGEBRA/SYSTEMS TWO LINEAR EQUATIONS & EQUATIONS IN TWO VARIABLES/Systems 2 Lin Equat 2 Var MED.pdf",
+  "hex": "6e6a3241",
+  "page": 13,
+  "ncc": 0.9494,
+  "second": 0.7551,
+  "rect_pt": [
+   28.39,
+   370.79,
+   93.53,
+   440.32
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "db76b7949c6df4eaec420634.png",
+   "w": 136,
+   "h": 145
+  },
+  "note": "needs_review (similar option graphs, 2nd peak high); match order A-D and content checked by eye"
+ },
+ {
+  "qid": "cmsjrnzxe02e1qmt1yeq5hv36",
+  "url": "/uploads/questions/ef80cff122e023f56593a29a.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Area and volume - EASY",
+  "ord": 1,
+  "old": {
+   "w": 290,
+   "h": 165
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/AREAS AND VOLUMES/Area and Volume Easy.pdf",
+  "hex": "d683a9cc",
+  "page": 2,
+  "ncc": 0.9774,
+  "second": 0.3573,
+  "rect_pt": [
+   17.98,
+   64.45,
+   133.87,
+   130.39
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 149,
+  "status": "ok",
+  "new": {
+   "file": "4d26b6b211ea68f05561affc.jpg",
+   "w": 240,
+   "h": 135
+  }
+ },
+ {
+  "qid": "cmsjrnzy802eoqmt1bzeg44vh",
+  "url": "/uploads/questions/02873ed45186dfc888d56bc5.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Area and volume - EASY",
+  "ord": 8,
+  "old": {
+   "w": 430,
+   "h": 244
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/AREAS AND VOLUMES/Area and Volume Easy.pdf",
+  "hex": "fc5ef8d3",
+  "page": 9,
+  "ncc": 0.9709,
+  "second": 0.2715,
+  "rect_pt": [
+   228.82,
+   77.14,
+   383.3,
+   164.8
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "87be24ad7ae0b6f1bea42de1.png",
+   "w": 859,
+   "h": 488
+  }
+ },
+ {
+  "qid": "cmsjrnzyk02erqmt1h5sc7fvy",
+  "url": "/uploads/questions/ac0ce684ee1ad04dbc327769.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Area and volume - EASY",
+  "ord": 11,
+  "old": {
+   "w": 617,
+   "h": 351
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/AREAS AND VOLUMES/Area and Volume Easy.pdf",
+  "hex": "babd7461",
+  "page": 12,
+  "ncc": 0.9773,
+  "second": 0.3093,
+  "rect_pt": [
+   172.03,
+   52.51,
+   418.59,
+   192.78
+  ],
+  "kind": "VECTOR",
+  "dpi": 361,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "79cf9b2b1112a284511a5ca3.png",
+   "w": 1237,
+   "h": 704
+  }
+ },
+ {
+  "qid": "cmsjro02502goqmt1bz8awepk",
+  "url": "/uploads/questions/0bdb3d092b9c8333bb4e7223.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Area and volume - HARD",
+  "ord": 2,
+  "old": {
+   "w": 710,
+   "h": 690
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/AREAS AND VOLUMES/Area and Volume HARD.pdf",
+  "hex": "b2528e6b",
+  "page": 3,
+  "ncc": 0.9435,
+  "second": 0.3473,
+  "rect_pt": [
+   175.04,
+   75.93,
+   431.12,
+   324.8
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "9bb3615e32f08550b9a4cc9e.png",
+   "w": 1424,
+   "h": 1384
+  }
+ },
+ {
+  "qid": "cmsjro02s02gzqmt1lek7ga7r",
+  "url": "/uploads/questions/0f36986f2c59d4fb10e60041.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Area and volume - HARD",
+  "ord": 10,
+  "old": {
+   "w": 715,
+   "h": 690
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/AREAS AND VOLUMES/Area and Volume HARD.pdf",
+  "hex": "eb70d2d0",
+  "page": 11,
+  "ncc": 0.9241,
+  "second": 0.3283,
+  "rect_pt": [
+   178.04,
+   75.87,
+   435.92,
+   324.74
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "a42b09ce77eec6faedfaa00f.png",
+   "w": 1433,
+   "h": 1384
+  }
+ },
+ {
+  "qid": "cmsjrnzpy02cbqmt1xu6tu1sv",
+  "url": "/uploads/questions/dc9031aab52bcce2145187a7.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Area and volume - MEDIUM",
+  "ord": 0,
+  "old": {
+   "w": 260,
+   "h": 270
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/AREAS AND VOLUMES/Area and Volume MED.pdf",
+  "hex": "cf53cb56",
+  "page": 1,
+  "ncc": 0.9779,
+  "second": 0.3151,
+  "rect_pt": [
+   17.98,
+   64.45,
+   121.88,
+   172.35
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "7dfdd04e582cbf56a85cbfe4.jpg",
+   "w": 217,
+   "h": 225
+  }
+ },
+ {
+  "qid": "cmsjrnzq302cgqmt1s3y0hqw3",
+  "url": "/uploads/questions/2358624aa7c77e18361b02fc.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Area and volume - MEDIUM",
+  "ord": 1,
+  "old": {
+   "w": 286,
+   "h": 223
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/AREAS AND VOLUMES/Area and Volume MED.pdf",
+  "hex": "37dde49f",
+  "page": 2,
+  "ncc": 0.9469,
+  "second": 0.2516,
+  "rect_pt": [
+   18.38,
+   64.32,
+   132.67,
+   153.43
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 151,
+  "status": "ok",
+  "new": {
+   "file": "19ffed44e69d4f89af59afae.jpg",
+   "w": 240,
+   "h": 186
+  }
+ },
+ {
+  "qid": "cmsjrnzqq02cpqmt14e343ey1",
+  "url": "/uploads/questions/1983c1697d49c338e44a354e.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Area and volume - MEDIUM",
+  "ord": 6,
+  "old": {
+   "w": 966,
+   "h": 422
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/AREAS AND VOLUMES/Area and Volume MED.pdf",
+  "hex": "e9c5bfb2",
+  "page": 7,
+  "ncc": 0.9705,
+  "second": 0.1622,
+  "rect_pt": [
+   145.27,
+   58.3,
+   466.84,
+   198.78
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "3131ca0562b458d101402338.png",
+   "w": 1787,
+   "h": 782
+  }
+ },
+ {
+  "qid": "cmsjrnzrn02d0qmt1o13gwbqd",
+  "url": "/uploads/questions/461c7ee4a91cadcb2b05ebfd.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Area and volume - MEDIUM",
+  "ord": 12,
+  "old": {
+   "w": 710,
+   "h": 690
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/AREAS AND VOLUMES/Area and Volume MED.pdf",
+  "hex": "096c7ef5",
+  "page": 13,
+  "ncc": 0.9447,
+  "second": 0.325,
+  "rect_pt": [
+   175.6,
+   76.47,
+   430.67,
+   324.36
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "052c1eefaddc3b67e887683f.png",
+   "w": 1418,
+   "h": 1378
+  }
+ },
+ {
+  "qid": "cmsjro0jq02o9qmt1622n8v5v",
+  "url": "/uploads/questions/19d83a4a953eba3aa2acf2ef.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Circles - EASY",
+  "ord": 1,
+  "old": {
+   "w": 153,
+   "h": 153
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/CIRCLES/Circles EASY.pdf",
+  "hex": "23c5fcce",
+  "page": 2,
+  "ncc": 0.9664,
+  "second": 0.1561,
+  "rect_pt": [
+   17.97,
+   64.3,
+   79.35,
+   125.69
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "aca17f321c7dcc0fdf12d41f.png",
+   "w": 128,
+   "h": 128
+  }
+ },
+ {
+  "qid": "cmsjro0y602udqmt1n5a3ux5w",
+  "url": "/uploads/questions/27b59cb79f4c0638309b4452.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Circles - HARD",
+  "ord": 5,
+  "old": {
+   "w": 794,
+   "h": 757
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/CIRCLES/Circles HARD.pdf",
+  "hex": "1b2b20b9",
+  "page": 6,
+  "ncc": 0.9519,
+  "second": 0.2125,
+  "rect_pt": [
+   173.28,
+   74.62,
+   437.6,
+   326.62
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "2d1c424dd9d1ba58416620a8.png",
+   "w": 1470,
+   "h": 1401
+  }
+ },
+ {
+  "qid": "cmsjro0yq02ulqmt13xhh5yaw",
+  "url": "/uploads/questions/7556902e577c44bb863052e8.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Circles - HARD",
+  "ord": 11,
+  "old": {
+   "w": 159,
+   "h": 142
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/CIRCLES/Circles HARD.pdf",
+  "hex": "c8345903",
+  "page": 12,
+  "ncc": 0.9711,
+  "second": 0.1771,
+  "rect_pt": [
+   17.99,
+   64.52,
+   81.53,
+   121.27
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 149,
+  "status": "ok",
+  "new": {
+   "file": "8f1d38025a94e365201ea509.png",
+   "w": 132,
+   "h": 118
+  }
+ },
+ {
+  "qid": "cmsjro0z402uoqmt15f1z1kge",
+  "url": "/uploads/questions/fba50cba6836df69842ac943.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Circles - HARD",
+  "ord": 14,
+  "old": {
+   "w": 210,
+   "h": 226
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/CIRCLES/Circles HARD.pdf",
+  "hex": "69b0d79d",
+  "page": 15,
+  "ncc": 0.9568,
+  "second": 0.3198,
+  "rect_pt": [
+   17.85,
+   64.32,
+   101.77,
+   154.63
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 149,
+  "status": "ok",
+  "new": {
+   "file": "fe9cd520e4f26a6bdf1eb09d.jpg",
+   "w": 174,
+   "h": 190
+  }
+ },
+ {
+  "qid": "cmsjro05i02h9qmt1nzk40o50",
+  "url": "/uploads/questions/a8a9b4391afacfadf661c173.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Circles - MEDIUM",
+  "ord": 2,
+  "old": {
+   "w": 283,
+   "h": 213
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/CIRCLES/Circles MED.pdf",
+  "hex": "95ba2d09",
+  "page": 3,
+  "ncc": 0.9688,
+  "second": 0.3807,
+  "rect_pt": [
+   17.65,
+   64.25,
+   131.19,
+   149.7
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 153,
+  "status": "ok",
+  "new": {
+   "file": "bd0ac26d0fd4436ec9d0726b.jpg",
+   "w": 240,
+   "h": 181
+  }
+ },
+ {
+  "qid": "cmsjro06202hiqmt196ercuz4",
+  "url": "/uploads/questions/6676d0cef494268ab7cbc969.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Circles - MEDIUM",
+  "ord": 7,
+  "old": {
+   "w": 362,
+   "h": 370
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/CIRCLES/Circles MED.pdf",
+  "hex": "800e71b8",
+  "page": 8,
+  "ncc": 0.9676,
+  "second": 0.2234,
+  "rect_pt": [
+   245.31,
+   58.64,
+   365.81,
+   181.81
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "48c8d0a6f4c45e361858d06c.png",
+   "w": 671,
+   "h": 686
+  }
+ },
+ {
+  "qid": "cmsjro0rs02r3qmt1wn9gbsj6",
+  "url": "/uploads/questions/02ef94d8afe13847d04ad231.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Lines, angles, and triangles - EASY",
+  "ord": 0,
+  "old": {
+   "w": 256,
+   "h": 237
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/LINES ANGLES TRIANGLES/Lines Angles Triangles EASY.pdf",
+  "hex": "5207e508",
+  "page": 1,
+  "ncc": 0.9902,
+  "second": 0.3916,
+  "rect_pt": [
+   206.76,
+   62.1,
+   405.1,
+   245.72
+  ],
+  "kind": "VECTOR",
+  "dpi": 300,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "383b4178474663dd72ea785f.png",
+   "w": 827,
+   "h": 766
+  }
+ },
+ {
+  "qid": "cmsjro0rv02r8qmt1dhrrrgvz",
+  "url": "/uploads/questions/9d2fc40b2bc87f25b455796a.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Lines, angles, and triangles - EASY",
+  "ord": 1,
+  "old": {
+   "w": 166,
+   "h": 189
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/LINES ANGLES TRIANGLES/Lines Angles Triangles EASY.pdf",
+  "hex": "c8d60e48",
+  "page": 2,
+  "ncc": 0.9642,
+  "second": 0.2484,
+  "rect_pt": [
+   18.12,
+   64.25,
+   84.46,
+   139.78
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "f93e1e340673e77ade2bceb7.png",
+   "w": 139,
+   "h": 158
+  }
+ },
+ {
+  "qid": "cmsjro0ry02rdqmt1md0r8y80",
+  "url": "/uploads/questions/69c4193f766161d0f1378c37.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Lines, angles, and triangles - EASY",
+  "ord": 2,
+  "old": {
+   "w": 361,
+   "h": 189
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/LINES ANGLES TRIANGLES/Lines Angles Triangles EASY.pdf",
+  "hex": "a6dbad6b",
+  "page": 3,
+  "ncc": 0.965,
+  "second": 0.3201,
+  "rect_pt": [
+   18.38,
+   64.32,
+   162.64,
+   139.85
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "75561138be2f3583570b650e.jpg",
+   "w": 301,
+   "h": 158
+  }
+ },
+ {
+  "qid": "cmsjro0s702rjqmt1g54tjxce",
+  "url": "/uploads/questions/162b01439b45b7090a2c042d.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Lines, angles, and triangles - EASY",
+  "ord": 4,
+  "old": {
+   "w": 255,
+   "h": 237
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/LINES ANGLES TRIANGLES/Lines Angles Triangles EASY.pdf",
+  "hex": "c24e1bda",
+  "page": 5,
+  "ncc": 0.989,
+  "second": 0.3795,
+  "rect_pt": [
+   207.36,
+   62.05,
+   404.51,
+   245.28
+  ],
+  "kind": "VECTOR",
+  "dpi": 300,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "a7eacf6f94c3a6ca50f5092c.png",
+   "w": 822,
+   "h": 764
+  }
+ },
+ {
+  "qid": "cmsjro0sa02roqmt1acttd0gp",
+  "url": "/uploads/questions/bedb1cf93a5350989cb89f2e.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Lines, angles, and triangles - EASY",
+  "ord": 5,
+  "old": {
+   "w": 655,
+   "h": 580
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/LINES ANGLES TRIANGLES/Lines Angles Triangles EASY.pdf",
+  "hex": "9d078710",
+  "page": 6,
+  "ncc": 0.9734,
+  "second": 0.4235,
+  "rect_pt": [
+   191.26,
+   70.39,
+   426.58,
+   278.76
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "5e24999c44e543c034c997ef.png",
+   "w": 1308,
+   "h": 1158
+  }
+ },
+ {
+  "qid": "cmsjro0se02rpqmt1p4tbrst9",
+  "url": "/uploads/questions/5c1b46a81aaf0393de76f6ed.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Lines, angles, and triangles - EASY",
+  "ord": 7,
+  "old": {
+   "w": 343,
+   "h": 226
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/LINES ANGLES TRIANGLES/Lines Angles Triangles EASY.pdf",
+  "hex": "dfc420b2",
+  "page": 8,
+  "ncc": 0.9611,
+  "second": 0.3724,
+  "rect_pt": [
+   17.98,
+   64.32,
+   155.05,
+   154.63
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "28dfb2dc84ca52f6b1820863.jpg",
+   "w": 286,
+   "h": 189
+  }
+ },
+ {
+  "qid": "cmsjro0sj02ruqmt1yc9uxxwy",
+  "url": "/uploads/questions/e0676b96cd629077c52c8bb1.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Lines, angles, and triangles - EASY",
+  "ord": 8,
+  "old": {
+   "w": 97,
+   "h": 96
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/LINES ANGLES TRIANGLES/Lines Angles Triangles EASY.pdf",
+  "hex": "410bdbe6",
+  "page": 9,
+  "ncc": 0.9836,
+  "second": 0.2149,
+  "rect_pt": [
+   14.86,
+   61.53,
+   89.56,
+   135.46
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "2af83d46c1e91f890c4fd51c.png",
+   "w": 148,
+   "h": 148
+  }
+ },
+ {
+  "qid": "cmsjro0sm02rzqmt1l5ziigre",
+  "url": "/uploads/questions/ac1f77cade5a2f2f21f2b3cc.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Lines, angles, and triangles - EASY",
+  "ord": 9,
+  "old": {
+   "w": 249,
+   "h": 174
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/LINES ANGLES TRIANGLES/Lines Angles Triangles EASY.pdf",
+  "hex": "087cdcfd",
+  "page": 10,
+  "ncc": 0.959,
+  "second": 0.3739,
+  "rect_pt": [
+   17.92,
+   64.19,
+   117.42,
+   133.72
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "e1e052bf21dfb500ca720d34.jpg",
+   "w": 208,
+   "h": 145
+  }
+ },
+ {
+  "qid": "cmsjro0ss02s4qmt1imesn9lx",
+  "url": "/uploads/questions/4d14720ce164f08772fcdf8a.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Lines, angles, and triangles - EASY",
+  "ord": 10,
+  "old": {
+   "w": 273,
+   "h": 200
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/LINES ANGLES TRIANGLES/Lines Angles Triangles EASY.pdf",
+  "hex": "992f4e93",
+  "page": 11,
+  "ncc": 0.9582,
+  "second": 0.3957,
+  "rect_pt": [
+   18.05,
+   64.38,
+   127.58,
+   144.62
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "8fc0a609ea4c3e34c0519273.jpg",
+   "w": 228,
+   "h": 168
+  }
+ },
+ {
+  "qid": "cmsjro0t202saqmt1curanwe6",
+  "url": "/uploads/questions/8b4fcac76f841ab11f086624.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Lines, angles, and triangles - EASY",
+  "ord": 12,
+  "old": {
+   "w": 146,
+   "h": 153
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/LINES ANGLES TRIANGLES/Lines Angles Triangles EASY.pdf",
+  "hex": "36200a38",
+  "page": 13,
+  "ncc": 0.9554,
+  "second": 0.1893,
+  "rect_pt": [
+   17.92,
+   64.32,
+   76.27,
+   125.46
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "1903a781626a185b576d089b.png",
+   "w": 122,
+   "h": 128
+  }
+ },
+ {
+  "qid": "cmsjro0t602sfqmt1s39wpgec",
+  "url": "/uploads/questions/7f520f67f8057ea01be5a55f.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Lines, angles, and triangles - EASY",
+  "ord": 13,
+  "old": {
+   "w": 876,
+   "h": 488
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/LINES ANGLES TRIANGLES/Lines Angles Triangles EASY.pdf",
+  "hex": "e0d2e21a",
+  "page": 14,
+  "ncc": 0.9731,
+  "second": 0.331,
+  "rect_pt": [
+   160.27,
+   58.63,
+   451.89,
+   221.08
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "b8cf0323f47cbab768d8a6c1.png",
+   "w": 1621,
+   "h": 904
+  }
+ },
+ {
+  "qid": "cmsjro0tb02sgqmt1dfmcyvz7",
+  "url": "/uploads/questions/af40fe036bc75e30686a16a1.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Lines, angles, and triangles - EASY",
+  "ord": 14,
+  "old": {
+   "w": 260,
+   "h": 200
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/LINES ANGLES TRIANGLES/Lines Angles Triangles EASY.pdf",
+  "hex": "3828f53d",
+  "page": 15,
+  "ncc": 0.954,
+  "second": 0.3223,
+  "rect_pt": [
+   17.98,
+   64.45,
+   121.88,
+   144.38
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "d1262aa54d011bc7c371810f.jpg",
+   "w": 217,
+   "h": 167
+  }
+ },
+ {
+  "qid": "cmsjro0tg02slqmt1h4dx6e0n",
+  "url": "/uploads/questions/2231f49d7023540bcebaf0b2.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Lines, angles, and triangles - EASY",
+  "ord": 15,
+  "old": {
+   "w": 237,
+   "h": 218
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/LINES ANGLES TRIANGLES/Lines Angles Triangles EASY.pdf",
+  "hex": "3b4b5b1e",
+  "page": 16,
+  "ncc": 0.9729,
+  "second": 0.425,
+  "rect_pt": [
+   214.01,
+   69.12,
+   398.37,
+   238.7
+  ],
+  "kind": "VECTOR",
+  "dpi": 300,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "d5232b8e0070e9bf499eae70.png",
+   "w": 769,
+   "h": 708
+  }
+ },
+ {
+  "qid": "cmsjro0tj02smqmt1zsejxty0",
+  "url": "/uploads/questions/000663bb8eeb7b3d22ca01dd.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Lines, angles, and triangles - EASY",
+  "ord": 16,
+  "old": {
+   "w": 260,
+   "h": 215
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/LINES ANGLES TRIANGLES/Lines Angles Triangles EASY.pdf",
+  "hex": "5733ce30",
+  "page": 17,
+  "ncc": 0.9601,
+  "second": 0.3496,
+  "rect_pt": [
+   18.05,
+   64.11,
+   122.37,
+   150.37
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "198ca777e5bc66b722bc2482.jpg",
+   "w": 217,
+   "h": 180
+  }
+ },
+ {
+  "qid": "cmsjrnzt602dcqmt13e3s281r",
+  "url": "/uploads/questions/531f249d6a0d5869d90e4550.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Lines, angles, and triangles - HARD",
+  "ord": 0,
+  "old": {
+   "w": 880,
+   "h": 410
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/LINES ANGLES TRIANGLES/Lines Angles Triangles HARD.pdf",
+  "hex": "e10d8313",
+  "page": 1,
+  "ncc": 0.9832,
+  "second": 0.3859,
+  "rect_pt": [
+   145.58,
+   57.58,
+   462.36,
+   205.17
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "279e04e8eb48f8a23194cb83.png",
+   "w": 1761,
+   "h": 821
+  }
+ },
+ {
+  "qid": "cmsjrnztc02ddqmt1tuwesk3k",
+  "url": "/uploads/questions/208a734a9183b5efc5304eba.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Lines, angles, and triangles - HARD",
+  "ord": 1,
+  "old": {
+   "w": 156,
+   "h": 84
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/LINES ANGLES TRIANGLES/Lines Angles Triangles HARD.pdf",
+  "hex": "f88f27e5",
+  "page": 2,
+  "ncc": 0.9792,
+  "second": 0.2873,
+  "rect_pt": [
+   16.3,
+   78.98,
+   137.38,
+   144.17
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 149,
+  "status": "ok",
+  "new": {
+   "file": "c2f2396c9939730273cfb983.jpg",
+   "w": 240,
+   "h": 135
+  }
+ },
+ {
+  "qid": "cmsjrnztg02deqmt16wf22hxl",
+  "url": "/uploads/questions/7d3e4c332ddde20ab663f81a.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Lines, angles, and triangles - HARD",
+  "ord": 2,
+  "old": {
+   "w": 268,
+   "h": 151
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/LINES ANGLES TRIANGLES/Lines Angles Triangles HARD.pdf",
+  "hex": "947a3cde",
+  "page": 3,
+  "ncc": 0.9534,
+  "second": 0.2563,
+  "rect_pt": [
+   18.31,
+   64.34,
+   124.98,
+   124.44
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "2b1604a4bfb6eedb763f629a.jpg",
+   "w": 223,
+   "h": 126
+  }
+ },
+ {
+  "qid": "cmsjrnzts02dkqmt17phtzri6",
+  "url": "/uploads/questions/f7f2388fe784b2efefaec6b3.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Lines, angles, and triangles - HARD",
+  "ord": 4,
+  "old": {
+   "w": 137,
+   "h": 77
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/LINES ANGLES TRIANGLES/Lines Angles Triangles HARD.pdf",
+  "hex": "740bf79f",
+  "page": 5,
+  "ncc": 0.9896,
+  "second": 0.357,
+  "rect_pt": [
+   16.2,
+   63.68,
+   121.91,
+   123.09
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 149,
+  "status": "ok",
+  "new": {
+   "file": "66697297b30a9ced4f3879b6.jpg",
+   "w": 210,
+   "h": 123
+  }
+ },
+ {
+  "qid": "cmsjrnzu102dqqmt1kmsxcyjc",
+  "url": "/uploads/questions/65c0ac1bbdb7b0148e5b19fe.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Lines, angles, and triangles - HARD",
+  "ord": 6,
+  "old": {
+   "w": 114,
+   "h": 69
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/LINES ANGLES TRIANGLES/Lines Angles Triangles HARD.pdf",
+  "hex": "6a3fbec3",
+  "page": 7,
+  "ncc": 0.9834,
+  "second": 0.3284,
+  "rect_pt": [
+   23.69,
+   63.82,
+   111.83,
+   117.17
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 151,
+  "status": "ok",
+  "new": {
+   "file": "4844f26ba3ea79003a4c70be.png",
+   "w": 185,
+   "h": 109
+  }
+ },
+ {
+  "qid": "cmsjrnzw402drqmt1aassoc9v",
+  "url": "/uploads/questions/51943807a6097197330ed840.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Lines, angles, and triangles - HARD",
+  "ord": 7,
+  "old": {
+   "w": 640,
+   "h": 560
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/LINES ANGLES TRIANGLES/Lines Angles Triangles HARD.pdf",
+  "hex": "17912810",
+  "page": 8,
+  "ncc": 0.9917,
+  "second": 0.3328,
+  "rect_pt": [
+   190.68,
+   57.43,
+   421.52,
+   259.42
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "2c17aed3a401de2cd191ac37.png",
+   "w": 1283,
+   "h": 1123
+  }
+ },
+ {
+  "qid": "cmsjrnzwt02dtqmt1yrh4beba",
+  "url": "/uploads/questions/598cd0c0dc04832500531360.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Lines, angles, and triangles - HARD",
+  "ord": 9,
+  "old": {
+   "w": 249,
+   "h": 187
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/LINES ANGLES TRIANGLES/Lines Angles Triangles HARD.pdf",
+  "hex": "eeb4143c",
+  "page": 10,
+  "ncc": 0.9556,
+  "second": 0.3729,
+  "rect_pt": [
+   17.92,
+   64.59,
+   117.42,
+   139.32
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 149,
+  "status": "ok",
+  "new": {
+   "file": "5fa7c022cef874788fc866f9.jpg",
+   "w": 207,
+   "h": 156
+  }
+ },
+ {
+  "qid": "cmsjrnzx502dvqmt1vvfsd1x3",
+  "url": "/uploads/questions/295a7a51330601749852c82f.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Lines, angles, and triangles - HARD",
+  "ord": 11,
+  "old": {
+   "w": 153,
+   "h": 109
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/LINES ANGLES TRIANGLES/Lines Angles Triangles HARD.pdf",
+  "hex": "bd7f6e30",
+  "page": 12,
+  "ncc": 0.9818,
+  "second": 0.3407,
+  "rect_pt": [
+   16.88,
+   64.24,
+   134.23,
+   147.85
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "21bd42c125d0c52a0bea48d9.png",
+   "w": 240,
+   "h": 173
+  }
+ },
+ {
+  "qid": "cmsjro0cy02jzqmt1zpype2pb",
+  "url": "/uploads/questions/d5b943fb2c9f7bc6ba713405.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Lines, angles, and triangles - MEDIUM",
+  "ord": 0,
+  "old": {
+   "w": 200,
+   "h": 153
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/LINES ANGLES TRIANGLES/Lines Angles Triangles MED.pdf",
+  "hex": "81b664bc",
+  "page": 1,
+  "ncc": 0.9584,
+  "second": 0.3113,
+  "rect_pt": [
+   18.05,
+   64.32,
+   97.98,
+   125.46
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "0aef4cb9be4f79d8ba6245e6.png",
+   "w": 167,
+   "h": 128
+  }
+ },
+ {
+  "qid": "cmsjro0d602k5qmt1u7a75gbo",
+  "url": "/uploads/questions/b88060a0b9addc7bff72ac74.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Lines, angles, and triangles - MEDIUM",
+  "ord": 2,
+  "old": {
+   "w": 322,
+   "h": 161
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/LINES ANGLES TRIANGLES/Lines Angles Triangles MED.pdf",
+  "hex": "933fee1a",
+  "page": 3,
+  "ncc": 0.9644,
+  "second": 0.4655,
+  "rect_pt": [
+   18.31,
+   64.61,
+   146.47,
+   128.69
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "47bb2d870538d054e199239e.jpg",
+   "w": 268,
+   "h": 134
+  }
+ },
+ {
+  "qid": "cmsjro0f702k6qmt100jb3xiw",
+  "url": "/uploads/questions/0a2f5fdec1177bb211b9a674.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Lines, angles, and triangles - MEDIUM",
+  "ord": 3,
+  "old": {
+   "w": 605,
+   "h": 575
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/LINES ANGLES TRIANGLES/Lines Angles Triangles MED.pdf",
+  "hex": "2f7c92ad",
+  "page": 4,
+  "ncc": 0.9814,
+  "second": 0.4587,
+  "rect_pt": [
+   204.75,
+   58.07,
+   406.94,
+   250.24
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "3472f7ab6751cb752de41153.png",
+   "w": 1124,
+   "h": 1069
+  }
+ },
+ {
+  "qid": "cmsjro0fz02keqmt1zik6stqs",
+  "url": "/uploads/questions/c7bad4710b275b57119f8af8.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Lines, angles, and triangles - MEDIUM",
+  "ord": 7,
+  "old": {
+   "w": 268,
+   "h": 253
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/LINES ANGLES TRIANGLES/Lines Angles Triangles MED.pdf",
+  "hex": "6dd463ca",
+  "page": 8,
+  "ncc": 0.9475,
+  "second": 0.4107,
+  "rect_pt": [
+   17.98,
+   64.65,
+   125.08,
+   165.75
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "43d628f9c28599b6ec52a809.jpg",
+   "w": 224,
+   "h": 210
+  }
+ },
+ {
+  "qid": "cmsjro0g602kkqmt1eag573sw",
+  "url": "/uploads/questions/176b130e74fe554a2d533942.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Lines, angles, and triangles - MEDIUM",
+  "ord": 9,
+  "old": {
+   "w": 393,
+   "h": 155
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/LINES ANGLES TRIANGLES/Lines Angles Triangles MED.pdf",
+  "hex": "1c3d613c",
+  "page": 10,
+  "ncc": 0.9601,
+  "second": 0.4294,
+  "rect_pt": [
+   17.65,
+   64.23,
+   175.33,
+   126.42
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 219,
+  "status": "ok",
+  "new": {
+   "file": "59cfa96599e5633c9859bb4b.jpg",
+   "w": 480,
+   "h": 189
+  }
+ },
+ {
+  "qid": "cmsjro0g902klqmt18v0lhr1f",
+  "url": "/uploads/questions/bf75542d18619c022566636a.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Lines, angles, and triangles - MEDIUM",
+  "ord": 10,
+  "old": {
+   "w": 698,
+   "h": 471
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/LINES ANGLES TRIANGLES/Lines Angles Triangles MED.pdf",
+  "hex": "014edcb7",
+  "page": 11,
+  "ncc": 0.9715,
+  "second": 0.4459,
+  "rect_pt": [
+   189.76,
+   58.07,
+   423.04,
+   215.48
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "b2bf0fcf2824132e942f2997.png",
+   "w": 1297,
+   "h": 876
+  }
+ },
+ {
+  "qid": "cmsjro01k02gbqmt1e1od4uks",
+  "url": "/uploads/questions/092c18883ba433cb66307ea7.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Right triangles and trigonometry - EASY",
+  "ord": 1,
+  "old": {
+   "w": 243,
+   "h": 203
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/RIGHT TRIANGLES AND TRIGONOMETRY/Right Triangles and Trig EASY.pdf",
+  "hex": "a6097ec2",
+  "page": 2,
+  "ncc": 0.9774,
+  "second": 0.47,
+  "rect_pt": [
+   216.43,
+   81.23,
+   404.7,
+   238.5
+  ],
+  "kind": "VECTOR",
+  "dpi": 300,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "02626c46250bbc987b9cb34e.png",
+   "w": 786,
+   "h": 656
+  }
+ },
+ {
+  "qid": "cmsjro01p02ggqmt1k54mow12",
+  "url": "/uploads/questions/31c93bd1967d00f95d59f279.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Right triangles and trigonometry - EASY",
+  "ord": 2,
+  "old": {
+   "w": 600,
+   "h": 451
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/RIGHT TRIANGLES AND TRIGONOMETRY/Right Triangles and Trig EASY.pdf",
+  "hex": "36661021",
+  "page": 3,
+  "ncc": 0.9901,
+  "second": 0.4393,
+  "rect_pt": [
+   192.29,
+   78.3,
+   408.7,
+   240.97
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "fa46da869c4f1f869011259e.png",
+   "w": 1203,
+   "h": 904
+  }
+ },
+ {
+  "qid": "cmsjro01u02ghqmt1h6yc6n9h",
+  "url": "/uploads/questions/d91e4bc738400393be170747.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Right triangles and trigonometry - EASY",
+  "ord": 3,
+  "old": {
+   "w": 283,
+   "h": 216
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/RIGHT TRIANGLES AND TRIGONOMETRY/Right Triangles and Trig EASY.pdf",
+  "hex": "145337bc",
+  "page": 4,
+  "ncc": 0.9918,
+  "second": 0.4321,
+  "rect_pt": [
+   199.63,
+   76.55,
+   418.89,
+   243.9
+  ],
+  "kind": "VECTOR",
+  "dpi": 300,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "24aa8435488b50133f97d285.png",
+   "w": 915,
+   "h": 699
+  }
+ },
+ {
+  "qid": "cmsjro09902jjqmt12gzt9nmm",
+  "url": "/uploads/questions/af93dfbb9b14dd7402bcf216.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Right triangles and trigonometry - HARD",
+  "ord": 2,
+  "old": {
+   "w": 129,
+   "h": 100
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/RIGHT TRIANGLES AND TRIGONOMETRY/Right Triangles and Trig HARD.pdf",
+  "hex": "dba6a25a",
+  "page": 3,
+  "ncc": 0.9843,
+  "second": 0.352,
+  "rect_pt": [
+   16.24,
+   63.14,
+   115.97,
+   140.46
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 149,
+  "status": "ok",
+  "new": {
+   "file": "ac8dac34c42a79e73866e7a2.png",
+   "w": 199,
+   "h": 159
+  }
+ },
+ {
+  "qid": "cmsjro09l02jmqmt1udkzdiq8",
+  "url": "/uploads/questions/c66461a52301fc8be6a3bc2e.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Right triangles and trigonometry - HARD",
+  "ord": 5,
+  "old": {
+   "w": 279,
+   "h": 216
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/RIGHT TRIANGLES AND TRIGONOMETRY/Right Triangles and Trig HARD.pdf",
+  "hex": "a67b9f88",
+  "page": 6,
+  "ncc": 0.9893,
+  "second": 0.4156,
+  "rect_pt": [
+   191.63,
+   71.11,
+   407.79,
+   238.46
+  ],
+  "kind": "VECTOR",
+  "dpi": 300,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "998c2d47c84010829d75f59e.png",
+   "w": 902,
+   "h": 698
+  }
+ },
+ {
+  "qid": "cmsjro0bd02jqqmt19g9v61y2",
+  "url": "/uploads/questions/86f3109c8ea8af0064871b7e.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Right triangles and trigonometry - HARD",
+  "ord": 9,
+  "old": {
+   "w": 114,
+   "h": 51
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/RIGHT TRIANGLES AND TRIGONOMETRY/Right Triangles and Trig HARD.pdf",
+  "hex": "6933b3d9",
+  "page": 10,
+  "ncc": 0.9957,
+  "second": 0.3723,
+  "rect_pt": [
+   19.01,
+   65.1,
+   106.45,
+   104.22
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "2b0622c3b83295e019c90385.jpg",
+   "w": 184,
+   "h": 84
+  }
+ },
+ {
+  "qid": "cmsjro0bk02jrqmt105hxmatn",
+  "url": "/uploads/questions/d134e08e8b437c7850285189.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Right triangles and trigonometry - HARD",
+  "ord": 10,
+  "old": {
+   "w": 98,
+   "h": 120
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/RIGHT TRIANGLES AND TRIGONOMETRY/Right Triangles and Trig HARD.pdf",
+  "hex": "55bb437a",
+  "page": 11,
+  "ncc": 0.9898,
+  "second": 0.3044,
+  "rect_pt": [
+   16.47,
+   64.11,
+   91.64,
+   156.15
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "c55d1435a116bb6368009505.png",
+   "w": 150,
+   "h": 190
+  }
+ },
+ {
+  "qid": "cmsjro0bw02juqmt19jbg94td",
+  "url": "/uploads/questions/3912532304516c6166d5be5b.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Right triangles and trigonometry - HARD",
+  "ord": 13,
+  "old": {
+   "w": 232,
+   "h": 101
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/RIGHT TRIANGLES AND TRIGONOMETRY/Right Triangles and Trig HARD.pdf",
+  "hex": "4c95c7d4",
+  "page": 14,
+  "ncc": 0.9795,
+  "second": 0.4348,
+  "rect_pt": [
+   17.71,
+   64.49,
+   110.79,
+   105.01
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 149,
+  "status": "ok",
+  "new": {
+   "file": "386a21134dc5264563c923fd.jpg",
+   "w": 193,
+   "h": 84
+  }
+ },
+ {
+  "qid": "cmsjro0c202jwqmt12pxgsbfs",
+  "url": "/uploads/questions/86a4d14e395d67377c25f4a5.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Right triangles and trigonometry - HARD",
+  "ord": 14,
+  "old": {
+   "w": 243,
+   "h": 204
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/RIGHT TRIANGLES AND TRIGONOMETRY/Right Triangles and Trig HARD.pdf",
+  "hex": "1429dcdf",
+  "page": 15,
+  "ncc": 0.994,
+  "second": 0.4596,
+  "rect_pt": [
+   216.71,
+   81.41,
+   404.58,
+   239.13
+  ],
+  "kind": "VECTOR",
+  "dpi": 300,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "c3bb5eced6d7817f6330e75c.png",
+   "w": 784,
+   "h": 658
+  }
+ },
+ {
+  "qid": "cmsjro0cv02jyqmt1oe9p2bm5",
+  "url": "/uploads/questions/3768a90e1403475a541768b9.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Right triangles and trigonometry - HARD",
+  "ord": 16,
+  "old": {
+   "w": 62,
+   "h": 112
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/RIGHT TRIANGLES AND TRIGONOMETRY/Right Triangles and Trig HARD.pdf",
+  "hex": "bd87bc09",
+  "page": 17,
+  "ncc": 0.9854,
+  "second": 0.2338,
+  "rect_pt": [
+   16.6,
+   64.28,
+   63.97,
+   149.85
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 149,
+  "status": "ok",
+  "new": {
+   "file": "100c1d9e8bc07c5171a0b80e.jpg",
+   "w": 90,
+   "h": 179
+  }
+ },
+ {
+  "qid": "cmsjro00902fqqmt1sybdv5qa",
+  "url": "/uploads/questions/0d46fd883871153957a4b23d.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Right triangles and trigonometry - MEDIUM",
+  "ord": 0,
+  "old": {
+   "w": 101,
+   "h": 60
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/RIGHT TRIANGLES AND TRIGONOMETRY/Right Triangles and Trig.pdf",
+  "hex": "13d9a1c3",
+  "page": 1,
+  "ncc": 0.9701,
+  "second": 0.3459,
+  "rect_pt": [
+   15.97,
+   63.98,
+   94.36,
+   110.55
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 149,
+  "status": "ok",
+  "new": {
+   "file": "072b5d5d73714ed22e62ddb3.png",
+   "w": 154,
+   "h": 98
+  }
+ },
+ {
+  "qid": "cmsjro00i02fsqmt1jgz9tx9w",
+  "url": "/uploads/questions/70da848d321569065527e412.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Right triangles and trigonometry - MEDIUM",
+  "ord": 2,
+  "old": {
+   "w": 283,
+   "h": 215
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/RIGHT TRIANGLES AND TRIGONOMETRY/Right Triangles and Trig.pdf",
+  "hex": "a71617d3",
+  "page": 3,
+  "ncc": 0.9907,
+  "second": 0.4539,
+  "rect_pt": [
+   199.63,
+   78.55,
+   418.89,
+   245.12
+  ],
+  "kind": "VECTOR",
+  "dpi": 300,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "5901f1c00cb678efdd2c8024.png",
+   "w": 915,
+   "h": 695
+  }
+ },
+ {
+  "qid": "cmsjro00n02ftqmt15imiquoo",
+  "url": "/uploads/questions/a9d8bc044a0357f76b0ff2b4.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Right triangles and trigonometry - MEDIUM",
+  "ord": 3,
+  "old": {
+   "w": 115,
+   "h": 104
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/RIGHT TRIANGLES AND TRIGONOMETRY/Right Triangles and Trig.pdf",
+  "hex": "bf8d843e",
+  "page": 4,
+  "ncc": 0.9775,
+  "second": 0.2631,
+  "rect_pt": [
+   16.08,
+   63.64,
+   105.34,
+   144.36
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "1c0350638098031c889cfefe.png",
+   "w": 178,
+   "h": 167
+  }
+ },
+ {
+  "qid": "cmsjro00u02fyqmt1s6f5wgxa",
+  "url": "/uploads/questions/34ec15a3d7b04e0f4bd1c21b.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Right triangles and trigonometry - MEDIUM",
+  "ord": 4,
+  "old": {
+   "w": 270,
+   "h": 214
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/RIGHT TRIANGLES AND TRIGONOMETRY/Right Triangles and Trig.pdf",
+  "hex": "de550be0",
+  "page": 5,
+  "ncc": 0.9788,
+  "second": 0.4857,
+  "rect_pt": [
+   200.19,
+   78.11,
+   409.38,
+   243.91
+  ],
+  "kind": "VECTOR",
+  "dpi": 300,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "b94f6f380579ad079652301f.png",
+   "w": 872,
+   "h": 692
+  }
+ },
+ {
+  "qid": "cmsjro01402g4qmt19upecd83",
+  "url": "/uploads/questions/8679209b61b306d1a427f86d.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Right triangles and trigonometry - MEDIUM",
+  "ord": 6,
+  "old": {
+   "w": 106,
+   "h": 101
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/RIGHT TRIANGLES AND TRIGONOMETRY/Right Triangles and Trig.pdf",
+  "hex": "902dc959",
+  "page": 7,
+  "ncc": 0.978,
+  "second": 0.2674,
+  "rect_pt": [
+   16.3,
+   63.3,
+   98.58,
+   141.7
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "94ccd9934b02c9e4d48cf1da.png",
+   "w": 162,
+   "h": 163
+  }
+ },
+ {
+  "qid": "cmsjro01a02g9qmt1zds7x4ms",
+  "url": "/uploads/questions/3bd531740f45ac6ce8eca3f0.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Geometry and Trigonometry",
+  "ps": "Geometry and Trigonometry - Right triangles and trigonometry - MEDIUM",
+  "ord": 7,
+  "old": {
+   "w": 640,
+   "h": 466
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/GEOMETRY & TRIGONOMETRY/RIGHT TRIANGLES AND TRIGONOMETRY/Right Triangles and Trig.pdf",
+  "hex": "659cb706",
+  "page": 8,
+  "ncc": 0.987,
+  "second": 0.3036,
+  "rect_pt": [
+   185.59,
+   72.25,
+   415.52,
+   239.67
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "bc0dfc8a493c5a8428709b19.png",
+   "w": 1278,
+   "h": 931
+  }
+ },
+ {
+  "qid": "cmsjro19x02xjqmt1vj8tnuk2",
+  "url": "/uploads/questions/85e9d97e0bcf4f1a9a67f97b.jpg",
+  "optId": null,
+  "label": null,
+  "section": "READING_WRITING",
+  "domain": "Information and Ideas",
+  "ps": "Information and Ideas - Command of Evidence - EASY",
+  "ord": 3,
+  "old": {
+   "w": 830,
+   "h": 815
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES READING/COMMAND EVIDENCE/CE EASY.pdf",
+  "hex": "a9040290",
+  "page": 4,
+  "ncc": 0.977,
+  "second": 0.1675,
+  "rect_pt": [
+   158.88,
+   66.91,
+   457.07,
+   359.71
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "12fd3f519e60afb0b13cde65.png",
+   "w": 1658,
+   "h": 1628
+  }
+ },
+ {
+  "qid": "cmsjro1af02y8qmt1cz0wfhfw",
+  "url": "/uploads/questions/2d4ce3e0774bc73e39a72678.jpg",
+  "optId": null,
+  "label": null,
+  "section": "READING_WRITING",
+  "domain": "Information and Ideas",
+  "ps": "Information and Ideas - Command of Evidence - EASY",
+  "ord": 8,
+  "old": {
+   "w": 800,
+   "h": 955
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES READING/COMMAND EVIDENCE/CE EASY.pdf",
+  "hex": "30c3aa98",
+  "page": 9,
+  "ncc": 0.9402,
+  "second": 0.2155,
+  "rect_pt": [
+   156.88,
+   66.79,
+   444.29,
+   409.88
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "9a581380eceabf3d5d3c582b.png",
+   "w": 1598,
+   "h": 1907
+  }
+ },
+ {
+  "qid": "cmsjro1ap02ynqmt1m2v68i5x",
+  "url": "/uploads/questions/829ba293d634b006f516bbac.jpg",
+  "optId": null,
+  "label": null,
+  "section": "READING_WRITING",
+  "domain": "Information and Ideas",
+  "ps": "Information and Ideas - Command of Evidence - EASY",
+  "ord": 11,
+  "old": {
+   "w": 800,
+   "h": 945
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES READING/COMMAND EVIDENCE/CE EASY.pdf",
+  "hex": "a9ac31e4",
+  "page": 12,
+  "ncc": 0.9809,
+  "second": 0.2098,
+  "rect_pt": [
+   156.88,
+   66.76,
+   444.29,
+   406.26
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "7b959d346da290ea51ad0757.png",
+   "w": 1598,
+   "h": 1888
+  }
+ },
+ {
+  "qid": "cmsjro1b302z7qmt1nd9d0vfo",
+  "url": "/uploads/questions/5f79f27930163918d13300e5.jpg",
+  "optId": null,
+  "label": null,
+  "section": "READING_WRITING",
+  "domain": "Information and Ideas",
+  "ps": "Information and Ideas - Command of Evidence - EASY",
+  "ord": 15,
+  "old": {
+   "w": 935,
+   "h": 905
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES READING/COMMAND EVIDENCE/CE EASY.pdf",
+  "hex": "e441da80",
+  "page": 16,
+  "ncc": 0.9438,
+  "second": 0.2398,
+  "rect_pt": [
+   139.04,
+   66.91,
+   474.95,
+   392.05
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "36f9d3f0100002673689c65b.png",
+   "w": 1867,
+   "h": 1808
+  }
+ },
+ {
+  "qid": "cmsjro1bn02zwqmt1mddhcob3",
+  "url": "/uploads/questions/0dcf76efb1363f3b272b263e.jpg",
+  "optId": null,
+  "label": null,
+  "section": "READING_WRITING",
+  "domain": "Information and Ideas",
+  "ps": "Information and Ideas - Command of Evidence - EASY",
+  "ord": 20,
+  "old": {
+   "w": 800,
+   "h": 1085
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES READING/COMMAND EVIDENCE/CE EASY.pdf",
+  "hex": "37a49687",
+  "page": 21,
+  "ncc": 0.9448,
+  "second": 0.1484,
+  "rect_pt": [
+   151.5,
+   66.97,
+   438.91,
+   456.77
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "e8d75c67adcb810f5ec076e9.png",
+   "w": 1598,
+   "h": 2166
+  }
+ },
+ {
+  "qid": "cmsjro1c0030bqmt1vdkehstr",
+  "url": "/uploads/questions/d9aa1a5e069709fb29c48f8e.jpg",
+  "optId": null,
+  "label": null,
+  "section": "READING_WRITING",
+  "domain": "Information and Ideas",
+  "ps": "Information and Ideas - Command of Evidence - EASY",
+  "ord": 23,
+  "old": {
+   "w": 830,
+   "h": 888
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES READING/COMMAND EVIDENCE/CE EASY.pdf",
+  "hex": "89f71526",
+  "page": 24,
+  "ncc": 0.9354,
+  "second": 0.2649,
+  "rect_pt": [
+   152.64,
+   68.3,
+   452.01,
+   388.59
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "4273cf6b13504fa665c36f62.png",
+   "w": 1664,
+   "h": 1780
+  }
+ },
+ {
+  "qid": "cmsjro1h2032fqmt10ig9of9m",
+  "url": "/uploads/questions/8736b7c7a55bbc64f1635052.jpg",
+  "optId": null,
+  "label": null,
+  "section": "READING_WRITING",
+  "domain": "Information and Ideas",
+  "ps": "Information and Ideas - Command of Evidence - HARD",
+  "ord": 0,
+  "old": {
+   "w": 830,
+   "h": 1195
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES READING/COMMAND EVIDENCE/CE HARD.pdf",
+  "hex": "a15b3219",
+  "page": 1,
+  "ncc": 0.9529,
+  "second": 0.1604,
+  "rect_pt": [
+   153.37,
+   68.67,
+   451.56,
+   497.99
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "35c7dfc4cbb55160928ac9fd.png",
+   "w": 1657,
+   "h": 2386
+  }
+ },
+ {
+  "qid": "cmsjro1hi032uqmt19pia9uok",
+  "url": "/uploads/questions/3a08badef7ec8ba4f3c65dd8.jpg",
+  "optId": null,
+  "label": null,
+  "section": "READING_WRITING",
+  "domain": "Information and Ideas",
+  "ps": "Information and Ideas - Command of Evidence - HARD",
+  "ord": 3,
+  "old": {
+   "w": 835,
+   "h": 990
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES READING/COMMAND EVIDENCE/CE HARD.pdf",
+  "hex": "040583a5",
+  "page": 4,
+  "ncc": 0.9706,
+  "second": 0.2006,
+  "rect_pt": [
+   154.91,
+   68.86,
+   454.89,
+   424.54
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "3796b695a029f55634b194fc.png",
+   "w": 1668,
+   "h": 1977
+  }
+ },
+ {
+  "qid": "cmsjro1i00339qmt1ec3zgdif",
+  "url": "/uploads/questions/9438aaf519651ba59698c830.jpg",
+  "optId": null,
+  "label": null,
+  "section": "READING_WRITING",
+  "domain": "Information and Ideas",
+  "ps": "Information and Ideas - Command of Evidence - HARD",
+  "ord": 6,
+  "old": {
+   "w": 815,
+   "h": 985
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES READING/COMMAND EVIDENCE/CE HARD.pdf",
+  "hex": "ccb1ab92",
+  "page": 7,
+  "ncc": 0.9791,
+  "second": 0.2971,
+  "rect_pt": [
+   149.55,
+   70.58,
+   442.35,
+   424.46
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "89445f4add416d878b5ce919.png",
+   "w": 1628,
+   "h": 1967
+  }
+ },
+ {
+  "qid": "cmsjro1i7033eqmt1to9sai8l",
+  "url": "/uploads/questions/18beffda2613343be147da6d.jpg",
+  "optId": null,
+  "label": null,
+  "section": "READING_WRITING",
+  "domain": "Information and Ideas",
+  "ps": "Information and Ideas - Command of Evidence - HARD",
+  "ord": 7,
+  "old": {
+   "w": 810,
+   "h": 1165
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES READING/COMMAND EVIDENCE/CE HARD.pdf",
+  "hex": "be19faa1",
+  "page": 8,
+  "ncc": 0.9556,
+  "second": 0.3981,
+  "rect_pt": [
+   152.67,
+   69.84,
+   444.82,
+   490.03
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "eded8ff8071a9982dadabf54.png",
+   "w": 1624,
+   "h": 2335
+  }
+ },
+ {
+  "qid": "cmsjro1j9034hqmt1rtqkziil",
+  "url": "/uploads/questions/663bcddbde0aa64056b0bdb3.jpg",
+  "optId": null,
+  "label": null,
+  "section": "READING_WRITING",
+  "domain": "Information and Ideas",
+  "ps": "Information and Ideas - Command of Evidence - HARD",
+  "ord": 15,
+  "old": {
+   "w": 910,
+   "h": 1135
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES READING/COMMAND EVIDENCE/CE HARD.pdf",
+  "hex": "53c6c179",
+  "page": 17,
+  "ncc": 0.9474,
+  "second": 0.1638,
+  "rect_pt": [
+   138.3,
+   68.06,
+   466.52,
+   477.44
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "af35fa6855ed52bd3892cc0b.png",
+   "w": 1824,
+   "h": 2275
+  }
+ },
+ {
+  "qid": "cmsjro1jt0356qmt1nerolyji",
+  "url": "/uploads/questions/1f328e65d3c16ad30a3762eb.jpg",
+  "optId": null,
+  "label": null,
+  "section": "READING_WRITING",
+  "domain": "Information and Ideas",
+  "ps": "Information and Ideas - Command of Evidence - HARD",
+  "ord": 20,
+  "old": {
+   "w": 830,
+   "h": 1285
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES READING/COMMAND EVIDENCE/CE HARD.pdf",
+  "hex": "d5da74be",
+  "page": 22,
+  "ncc": 0.9622,
+  "second": 0.1693,
+  "rect_pt": [
+   152.64,
+   69.89,
+   452.01,
+   533.37
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "7809ca1446f92c89f791e255.png",
+   "w": 1664,
+   "h": 2576
+  }
+ },
+ {
+  "qid": "cmsjro1k3035jqmt1dg5cwyxv",
+  "url": "/uploads/questions/5a16c7021281d82716658d58.jpg",
+  "optId": null,
+  "label": null,
+  "section": "READING_WRITING",
+  "domain": "Information and Ideas",
+  "ps": "Information and Ideas - Command of Evidence - HARD",
+  "ord": 23,
+  "old": {
+   "w": 785,
+   "h": 975
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES READING/COMMAND EVIDENCE/CE HARD.pdf",
+  "hex": "df37c087",
+  "page": 26,
+  "ncc": 0.9843,
+  "second": 0.1785,
+  "rect_pt": [
+   162.09,
+   70.4,
+   444.11,
+   420.68
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "3e8348b561f2eaaacee3dffb.png",
+   "w": 1568,
+   "h": 1947
+  }
+ },
+ {
+  "qid": "cmsjro28z03gxqmt1tjx58bkm",
+  "url": "/uploads/questions/ba0b04307a80cb9f6c6215cf.jpg",
+  "optId": null,
+  "label": null,
+  "section": "READING_WRITING",
+  "domain": "Information and Ideas",
+  "ps": "Information and Ideas - Command of Evidence - MEDIUM",
+  "ord": 1,
+  "old": {
+   "w": 820,
+   "h": 1275
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES READING/COMMAND EVIDENCE/CE MED.pdf",
+  "hex": "d5b9ed0d",
+  "page": 2,
+  "ncc": 0.9738,
+  "second": 0.1669,
+  "rect_pt": [
+   152.75,
+   69.92,
+   448.51,
+   529.79
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "3909f12e8303e403a45e2b5e.png",
+   "w": 1644,
+   "h": 2556
+  }
+ },
+ {
+  "qid": "cmsjro29903h6qmt1v50via14",
+  "url": "/uploads/questions/5c6e6ade0a4532d535999a85.jpg",
+  "optId": null,
+  "label": null,
+  "section": "READING_WRITING",
+  "domain": "Information and Ideas",
+  "ps": "Information and Ideas - Command of Evidence - MEDIUM",
+  "ord": 3,
+  "old": {
+   "w": 800,
+   "h": 945
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES READING/COMMAND EVIDENCE/CE MED.pdf",
+  "hex": "8a584241",
+  "page": 5,
+  "ncc": 0.9314,
+  "second": 0.2296,
+  "rect_pt": [
+   156.36,
+   69.83,
+   444.91,
+   410.67
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "0c96a800b00692960dec5166.png",
+   "w": 1604,
+   "h": 1895
+  }
+ },
+ {
+  "qid": "cmsjro29j03hgqmt1pedgajtu",
+  "url": "/uploads/questions/97dd006f4a82eaa0e4343467.jpg",
+  "optId": null,
+  "label": null,
+  "section": "READING_WRITING",
+  "domain": "Information and Ideas",
+  "ps": "Information and Ideas - Command of Evidence - MEDIUM",
+  "ord": 5,
+  "old": {
+   "w": 790,
+   "h": 878
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES READING/COMMAND EVIDENCE/CE MED.pdf",
+  "hex": "7edfb2c5",
+  "page": 7,
+  "ncc": 0.9742,
+  "second": 0.2636,
+  "rect_pt": [
+   160.24,
+   70.22,
+   444.62,
+   386.28
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "17573e45f03a690408c9cc8b.png",
+   "w": 1581,
+   "h": 1757
+  }
+ },
+ {
+  "qid": "cmsjro2ar03ipqmt16xm5xh5j",
+  "url": "/uploads/questions/1927df7540c12601435acfaa.jpg",
+  "optId": null,
+  "label": null,
+  "section": "READING_WRITING",
+  "domain": "Information and Ideas",
+  "ps": "Information and Ideas - Command of Evidence - MEDIUM",
+  "ord": 14,
+  "old": {
+   "w": 815,
+   "h": 1015
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES READING/COMMAND EVIDENCE/CE MED.pdf",
+  "hex": "d74b9bc6",
+  "page": 16,
+  "ncc": 0.9767,
+  "second": 0.3061,
+  "rect_pt": [
+   158.34,
+   69.88,
+   452.29,
+   435.97
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "8c2afa0d320c9ec9d889b33c.png",
+   "w": 1634,
+   "h": 2035
+  }
+ },
+ {
+  "qid": "cmsjro2aw03iuqmt1cs6rep55",
+  "url": "/uploads/questions/b4c4be6388016181fab215d7.jpg",
+  "optId": null,
+  "label": null,
+  "section": "READING_WRITING",
+  "domain": "Information and Ideas",
+  "ps": "Information and Ideas - Command of Evidence - MEDIUM",
+  "ord": 15,
+  "old": {
+   "w": 910,
+   "h": 1070
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES READING/COMMAND EVIDENCE/CE MED.pdf",
+  "hex": "a2b0fc3b",
+  "page": 17,
+  "ncc": 0.9498,
+  "second": 0.2386,
+  "rect_pt": [
+   138.3,
+   70.1,
+   466.52,
+   452.5
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "d72d8657cb0027f97262c323.png",
+   "w": 1824,
+   "h": 2125
+  }
+ },
+ {
+  "qid": "cmsjro2bj03jjqmt1l16vdo5d",
+  "url": "/uploads/questions/f5b1ae5d78726654f1000c92.jpg",
+  "optId": null,
+  "label": null,
+  "section": "READING_WRITING",
+  "domain": "Information and Ideas",
+  "ps": "Information and Ideas - Command of Evidence - MEDIUM",
+  "ord": 20,
+  "old": {
+   "w": 835,
+   "h": 1195
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES READING/COMMAND EVIDENCE/CE MED.pdf",
+  "hex": "ff18829b",
+  "page": 22,
+  "ncc": 0.9657,
+  "second": 0.2322,
+  "rect_pt": [
+   154.91,
+   69.0,
+   454.89,
+   498.32
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "1e0768253233115de14ad873.png",
+   "w": 1668,
+   "h": 2386
+  }
+ },
+ {
+  "qid": "cmsjro2bo03joqmt1ezs9707c",
+  "url": "/uploads/questions/31aba37bf0de075712362d96.jpg",
+  "optId": null,
+  "label": null,
+  "section": "READING_WRITING",
+  "domain": "Information and Ideas",
+  "ps": "Information and Ideas - Command of Evidence - MEDIUM",
+  "ord": 21,
+  "old": {
+   "w": 900,
+   "h": 1045
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES READING/COMMAND EVIDENCE/CE MED.pdf",
+  "hex": "e2829dd7",
+  "page": 23,
+  "ncc": 0.9442,
+  "second": 0.194,
+  "rect_pt": [
+   140.86,
+   67.12,
+   464.2,
+   442.55
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "ceba913c39a837b6a60e7df0.png",
+   "w": 1797,
+   "h": 2087
+  }
+ },
+ {
+  "qid": "cmsjro2bx03jyqmt1xw0nfdmw",
+  "url": "/uploads/questions/c335d6a61905c2c56737eb54.jpg",
+  "optId": null,
+  "label": null,
+  "section": "READING_WRITING",
+  "domain": "Information and Ideas",
+  "ps": "Information and Ideas - Command of Evidence - MEDIUM",
+  "ord": 23,
+  "old": {
+   "w": 915,
+   "h": 1060
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES READING/COMMAND EVIDENCE/CE MED.pdf",
+  "hex": "2df730d0",
+  "page": 25,
+  "ncc": 0.9472,
+  "second": 0.1772,
+  "rect_pt": [
+   138.25,
+   70.02,
+   468.27,
+   452.34
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "f6964dd5721955ee2db33e18.png",
+   "w": 1834,
+   "h": 2125
+  }
+ },
+ {
+  "qid": "cmsjro2cb03kdqmt1q2ameh4p",
+  "url": "/uploads/questions/e89076d0a5ed3531d828763f.jpg",
+  "optId": null,
+  "label": null,
+  "section": "READING_WRITING",
+  "domain": "Information and Ideas",
+  "ps": "Information and Ideas - Command of Evidence - MEDIUM",
+  "ord": 26,
+  "old": {
+   "w": 815,
+   "h": 725
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES READING/COMMAND EVIDENCE/CE MED.pdf",
+  "hex": "1db1a9a6",
+  "page": 28,
+  "ncc": 0.9757,
+  "second": 0.2979,
+  "rect_pt": [
+   156.36,
+   70.04,
+   450.32,
+   331.53
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "b7f481017afd4c7673c6273a.png",
+   "w": 1634,
+   "h": 1453
+  }
+ },
+ {
+  "qid": "cmsjro2cf03kiqmt1bs26p3rj",
+  "url": "/uploads/questions/a120dce51d66d9517fbfe68f.jpg",
+  "optId": null,
+  "label": null,
+  "section": "READING_WRITING",
+  "domain": "Information and Ideas",
+  "ps": "Information and Ideas - Command of Evidence - MEDIUM",
+  "ord": 27,
+  "old": {
+   "w": 795,
+   "h": 1215
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES READING/COMMAND EVIDENCE/CE MED.pdf",
+  "hex": "23e2421a",
+  "page": 29,
+  "ncc": 0.9227,
+  "second": 0.2679,
+  "rect_pt": [
+   161.98,
+   69.98,
+   448.72,
+   508.21
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "b446f18913e32be3d42b3bb6.png",
+   "w": 1594,
+   "h": 2436
+  }
+ },
+ {
+  "qid": "cmsjro0j702noqmt1mbo41mn0",
+  "url": "/uploads/questions/7cd914598e811276c8125896.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Inference from Statistics and Margin of Error - HARD",
+  "ord": 0,
+  "old": {
+   "w": 660,
+   "h": 196
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/INFERENCE & MARGIN OF ERROR/Inference Margin Error Hard.pdf",
+  "hex": "916ffe9b",
+  "page": 1,
+  "ncc": 0.9443,
+  "second": 0.3096,
+  "rect_pt": [
+   187.12,
+   63.26,
+   425.17,
+   133.96
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "fa231b510f834838f5e6b356.png",
+   "w": 1324,
+   "h": 394
+  }
+ },
+ {
+  "qid": "cmsjro0hm02lsqmt17bzienvz",
+  "url": "/uploads/questions/efd4e9243621df93c7a37fc5.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - EASY",
+  "ord": 0,
+  "old": {
+   "w": 225,
+   "h": 41
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/ONE VARIABLE DATA/One Var. Data EASY.pdf",
+  "hex": "f890dc20",
+  "page": 1,
+  "ncc": 0.9638,
+  "second": 0.3449,
+  "rect_pt": [
+   17.98,
+   64.28,
+   108.25,
+   80.73
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 96,
+  "status": "ok",
+  "new": {
+   "file": "e260cf74b0984b6b93d93de2.png",
+   "w": 120,
+   "h": 22
+  }
+ },
+ {
+  "qid": "cmsjro0i402mdqmt1w9w0jf5x",
+  "url": "/uploads/questions/4eacb9d5336886985329faff.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - EASY",
+  "ord": 5,
+  "old": {
+   "w": 596,
+   "h": 150
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/ONE VARIABLE DATA/One Var. Data EASY.pdf",
+  "hex": "fa7a0164",
+  "page": 6,
+  "ncc": 0.9392,
+  "second": 0.3872,
+  "rect_pt": [
+   17.98,
+   78.59,
+   256.15,
+   138.53
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 145,
+  "status": "ok",
+  "new": {
+   "file": "d55b17a3f889bde9eadf8a31.jpg",
+   "w": 480,
+   "h": 121
+  }
+ },
+ {
+  "qid": "cmsjro0ib02mnqmt1w57uicda",
+  "url": "/uploads/questions/68975eb8351d44329cca4241.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - EASY",
+  "ord": 7,
+  "old": {
+   "w": 403,
+   "h": 133
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/ONE VARIABLE DATA/One Var. Data EASY.pdf",
+  "hex": "374b18f9",
+  "page": 8,
+  "ncc": 0.9352,
+  "second": 0.4784,
+  "rect_pt": [
+   17.98,
+   64.52,
+   179.03,
+   117.67
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 214,
+  "status": "ok",
+  "new": {
+   "file": "713da101aef0cca9b837b65f.jpg",
+   "w": 480,
+   "h": 159
+  }
+ },
+ {
+  "qid": "cmsjro0iy02nhqmt17ee66oxv",
+  "url": "/uploads/questions/3c37ea6d1c846810e1b40b31.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - EASY",
+  "ord": 13,
+  "old": {
+   "w": 369,
+   "h": 311
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/ONE VARIABLE DATA/One Var. Data EASY.pdf",
+  "hex": "a9647302",
+  "page": 14,
+  "ncc": 0.9559,
+  "second": 0.2017,
+  "rect_pt": [
+   17.98,
+   64.11,
+   165.44,
+   188.39
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "d56f2fc65e192bc8040f1e84.jpg",
+   "w": 307,
+   "h": 259
+  }
+ },
+ {
+  "qid": "cmsjro0j102nmqmt15f57wmm2",
+  "url": "/uploads/questions/4553f3b2b74b8135306f0f2d.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - EASY",
+  "ord": 14,
+  "old": {
+   "w": 770,
+   "h": 690
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/ONE VARIABLE DATA/One Var. Data EASY.pdf",
+  "hex": "a067c926",
+  "page": 15,
+  "ncc": 0.954,
+  "second": 0.3764,
+  "rect_pt": [
+   166.95,
+   116.59,
+   444.67,
+   365.46
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "a06ea3cacdf67b076d2cce5b.png",
+   "w": 1544,
+   "h": 1384
+  }
+ },
+ {
+  "qid": "cmsjro0j402nnqmt19tbhmp2b",
+  "url": "/uploads/questions/a1d2a553dc2195325d9790e9.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - EASY",
+  "ord": 15,
+  "old": {
+   "w": 864,
+   "h": 532
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/ONE VARIABLE DATA/One Var. Data EASY.pdf",
+  "hex": "79340403",
+  "page": 16,
+  "ncc": 0.9632,
+  "second": 0.0038,
+  "rect_pt": [
+   150.01,
+   62.15,
+   460.42,
+   253.28
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "7f7a9ba4c1f2bcfe765365b1.png",
+   "w": 1725,
+   "h": 1063
+  }
+ },
+ {
+  "qid": "cmsjro0jw02ofqmt1lfzgrc83",
+  "url": "/uploads/questions/5da69950204f94fd2268124f.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - HARD - #1",
+  "ord": 0,
+  "old": {
+   "w": 744,
+   "h": 276
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/DATA AND MEAN/Data Distribut, mean Hard.pdf",
+  "hex": "d3b9c8d8",
+  "page": 1,
+  "ncc": 0.9664,
+  "second": 0.2704,
+  "rect_pt": [
+   9.74,
+   48.9,
+   278.09,
+   148.45
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "aa8a6c9414d6526ea546f3a3.png",
+   "w": 1491,
+   "h": 554
+  }
+ },
+ {
+  "qid": "cmsjro0k802onqmt1ffhbjeba",
+  "url": "/uploads/questions/6e24985ebdedba3485f67991.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - HARD - #1",
+  "ord": 2,
+  "old": {
+   "w": 1152,
+   "h": 424
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/DATA AND MEAN/Data Distribut, mean Hard.pdf",
+  "hex": "c178d4da",
+  "page": 5,
+  "ncc": 0.9367,
+  "second": 0.4757,
+  "rect_pt": [
+   11.18,
+   70.55,
+   426.69,
+   223.48
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "236bb51af8ffec7addd69dbe.png",
+   "w": 2309,
+   "h": 851
+  }
+ },
+ {
+  "qid": "cmsjro0nt02p2qmt1r4dj2w5m",
+  "url": "/uploads/questions/cbb85940814a29ffb3bd08be.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - HARD - #1",
+  "ord": 4,
+  "old": {
+   "w": 744,
+   "h": 276
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/DATA AND MEAN/Data Distribut, mean Hard.pdf",
+  "hex": "6c9444cd",
+  "page": 8,
+  "ncc": 0.96,
+  "second": 0.2563,
+  "rect_pt": [
+   9.74,
+   67.65,
+   278.09,
+   167.19
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "abf0c90de80fedff63756714.png",
+   "w": 1491,
+   "h": 554
+  }
+ },
+ {
+  "qid": "cmsjro0o502p3qmt1lq2qc8ge",
+  "url": "/uploads/questions/532626380c9066a834e452e2.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - HARD - #1",
+  "ord": 5,
+  "old": {
+   "w": 828,
+   "h": 310
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/DATA AND MEAN/Data Distribut, mean Hard.pdf",
+  "hex": "d65b9a87",
+  "page": 9,
+  "ncc": 0.9779,
+  "second": 0.5601,
+  "rect_pt": [
+   9.74,
+   87.09,
+   308.38,
+   198.9
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "08930d8d8a4eb13305ccced7.png",
+   "w": 1660,
+   "h": 622
+  }
+ },
+ {
+  "qid": "cmsjro0oe02p8qmt1zl7gdabj",
+  "url": "/uploads/questions/b55dcb889c8c0bf0ba64061b.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - HARD - #1",
+  "ord": 6,
+  "old": {
+   "w": 576,
+   "h": 628
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/DATA AND MEAN/Data Distribut, mean Hard.pdf",
+  "hex": "241f1db7",
+  "page": 10,
+  "ncc": 0.9322,
+  "second": 0.4658,
+  "rect_pt": [
+   12.62,
+   70.37,
+   220.38,
+   296.88
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "c9d6b919ec1299c42f9a0392.png",
+   "w": 1155,
+   "h": 1260
+  }
+ },
+ {
+  "qid": "cmsjro0oj02pdqmt1xid6a3qh",
+  "url": "/uploads/questions/0635c68bffbfc00e7bfe5d8b.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - HARD - #1",
+  "ord": 7,
+  "old": {
+   "w": 804,
+   "h": 420
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/DATA AND MEAN/Data Distribut, mean Hard.pdf",
+  "hex": "ecbdbe84",
+  "page": 11,
+  "ncc": 0.9417,
+  "second": 0.595,
+  "rect_pt": [
+   13.29,
+   87.84,
+   302.14,
+   238.73
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "8372d838f6ffe6f172fd728b.png",
+   "w": 1606,
+   "h": 839
+  }
+ },
+ {
+  "qid": "cmsp5xn8o00010vo02ttre16s",
+  "url": "/uploads/questions/4d3d7ea18674221b1223f7f8.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - HARD - #1",
+  "ord": 8,
+  "old": {
+   "w": 872,
+   "h": 508
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/DATA AND MEAN/Data Distribut, mean Hard.pdf",
+  "hex": "f8a322d9",
+  "page": 12,
+  "ncc": 0.961,
+  "second": 0.4402,
+  "rect_pt": [
+   10.42,
+   67.72,
+   323.7,
+   250.22
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "5d80eebab137704c42318773.png",
+   "w": 1742,
+   "h": 1015
+  }
+ },
+ {
+  "qid": "cmsjro0oz02ppqmt1rlgzr4q2",
+  "url": "/uploads/questions/c3e0fe746f866206fafe1829.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - HARD - #1",
+  "ord": 11,
+  "old": {
+   "w": 316,
+   "h": 284
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/DATA AND MEAN/Data Distribut, mean Hard.pdf",
+  "hex": "e7d48c8a",
+  "page": 16,
+  "ncc": 0.986,
+  "second": 0.3858,
+  "rect_pt": [
+   11.54,
+   67.67,
+   125.52,
+   170.11
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "cfb20a274ef616d7fdb34ea4.png",
+   "w": 634,
+   "h": 571
+  }
+ },
+ {
+  "qid": "cmsjrnzyw02evqmt18qvf94lm",
+  "url": "/uploads/questions/6a21a545f5b9627c8b609b6d.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - HARD - #2",
+  "ord": 2,
+  "old": {
+   "w": 262,
+   "h": 373
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/ONE VARIABLE DATA/One Var. Data HARD.pdf",
+  "hex": "9d935bd8",
+  "page": 3,
+  "ncc": 0.9559,
+  "second": 0.3681,
+  "rect_pt": [
+   17.98,
+   64.38,
+   122.68,
+   213.43
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 151,
+  "status": "ok",
+  "new": {
+   "file": "ecc7e4e72fa10a6d43ce878d.jpg",
+   "w": 220,
+   "h": 310
+  }
+ },
+ {
+  "qid": "cmsjro0tm02srqmt1ob3ask0d",
+  "url": "/uploads/questions/682c8f7d62ad217fca318ba4.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - MEDIUM",
+  "ord": 0,
+  "old": {
+   "w": 740,
+   "h": 784
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/ONE VARIABLE DATA/One Var. Data MED.pdf",
+  "hex": "25fc031a",
+  "page": 1,
+  "ncc": 0.9602,
+  "second": 0.2956,
+  "rect_pt": [
+   172.4,
+   60.2,
+   439.3,
+   342.97
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "fc4b630635cfa69ab54c3d22.png",
+   "w": 1484,
+   "h": 1572
+  }
+ },
+ {
+  "qid": "cmsjro0x802tnqmt1zkrwmlip",
+  "url": "/uploads/questions/d687bcff0cd1c86197998d0c.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - One-variable data: Distributions and measures of center and spread - MEDIUM",
+  "ord": 8,
+  "old": {
+   "w": 360,
+   "h": 284
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/ONE VARIABLE DATA/One Var. Data MED.pdf",
+  "hex": "578e26ae",
+  "page": 9,
+  "ncc": 0.9941,
+  "second": 0.3655,
+  "rect_pt": [
+   241.2,
+   60.55,
+   370.53,
+   162.58
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "12314324526002f06f6353d8.png",
+   "w": 720,
+   "h": 568
+  }
+ },
+ {
+  "qid": "cmsjro07n02icqmt1n3myv0g0",
+  "url": "/uploads/questions/7f051bce71a7bc6d67da2761.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Percentages - EASY",
+  "ord": 6,
+  "old": {
+   "w": 352,
+   "h": 311
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/PERCENTAGES/Percents EASY.pdf",
+  "hex": "28c6bd8c",
+  "page": 7,
+  "ncc": 0.9557,
+  "second": 0.2028,
+  "rect_pt": [
+   17.98,
+   64.45,
+   158.65,
+   188.73
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 151,
+  "status": "ok",
+  "new": {
+   "file": "d0dc364778a7e12c1c2a2ae1.jpg",
+   "w": 295,
+   "h": 259
+  }
+ },
+ {
+  "qid": "cmsjrnzt202dbqmt1pzivfk4d",
+  "url": "/uploads/questions/dccaf794793bcd13bd87c65f.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Percentages - HARD",
+  "ord": 6,
+  "old": {
+   "w": 406,
+   "h": 283
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/PERCENTAGES/Percents HARD.pdf",
+  "hex": "0231050d",
+  "page": 7,
+  "ncc": 0.9482,
+  "second": 0.3109,
+  "rect_pt": [
+   17.98,
+   64.25,
+   180.23,
+   177.34
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 212,
+  "status": "ok",
+  "new": {
+   "file": "a9cbf37e43b3ed4d0dc214f2.jpg",
+   "w": 480,
+   "h": 335
+  }
+ },
+ {
+  "qid": "cmsjro1um03agqmt12iof2uzv",
+  "url": "/uploads/questions/6afc675fead146892a5aef45.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Percentages - MEDIUM",
+  "ord": 1,
+  "old": {
+   "w": 428,
+   "h": 400
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/PERCENTAGES/Percents MED.pdf",
+  "hex": "7f84b136",
+  "page": 2,
+  "ncc": 0.9551,
+  "second": 0.2474,
+  "rect_pt": [
+   228.89,
+   76.72,
+   383.26,
+   221.0
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "3b68f479c58b9b578ecf246d.png",
+   "w": 859,
+   "h": 802
+  }
+ },
+ {
+  "qid": "cmsjro23103f9qmt1uqgmjk8c",
+  "url": "/uploads/questions/8fc1a8f98607bb66d40d298c.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Probability and conditional probability - EASY",
+  "ord": 1,
+  "old": {
+   "w": 872,
+   "h": 370
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/PROBABILITY/Probability EASY.pdf",
+  "hex": "dae79de4",
+  "page": 2,
+  "ncc": 0.957,
+  "second": 0.1654,
+  "rect_pt": [
+   148.7,
+   61.27,
+   461.98,
+   194.2
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "6c7fe2c1ad47c6dff601fa34.png",
+   "w": 1741,
+   "h": 739
+  }
+ },
+ {
+  "qid": "cmsjro23b03fgqmt1z5pg5im0",
+  "url": "/uploads/questions/22630d77daeb787f8bc9d129.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Probability and conditional probability - EASY",
+  "ord": 4,
+  "old": {
+   "w": 820,
+   "h": 345
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/PROBABILITY/Probability EASY.pdf",
+  "hex": "ec7b0eb8",
+  "page": 5,
+  "ncc": 0.9687,
+  "second": 0.5196,
+  "rect_pt": [
+   158.7,
+   61.32,
+   453.88,
+   185.51
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "b1125bb7846e6f5aef791a80.png",
+   "w": 1641,
+   "h": 691
+  }
+ },
+ {
+  "qid": "cmsjro23h03fjqmt1njro4jcq",
+  "url": "/uploads/questions/f30aca04b2b150044e9b8073.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Probability and conditional probability - EASY",
+  "ord": 6,
+  "old": {
+   "w": 417,
+   "h": 245
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/PROBABILITY/Probability EASY.pdf",
+  "hex": "60caadfd",
+  "page": 7,
+  "ncc": 0.9457,
+  "second": 0.4626,
+  "rect_pt": [
+   229.43,
+   77.47,
+   379.24,
+   165.49
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "486ac925b5c7b9c7e7390baf.png",
+   "w": 833,
+   "h": 490
+  }
+ },
+ {
+  "qid": "cmsjro23k03fkqmt1fj5g1vcn",
+  "url": "/uploads/questions/58b8abc77ae290c541eaf1e2.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Probability and conditional probability - EASY",
+  "ord": 7,
+  "old": {
+   "w": 470,
+   "h": 117
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/PROBABILITY/Probability EASY.pdf",
+  "hex": "b680e76d",
+  "page": 8,
+  "ncc": 0.9649,
+  "second": 0.296,
+  "rect_pt": [
+   14.07,
+   92.32,
+   183.59,
+   134.52
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 212,
+  "status": "skip_native",
+  "new": {
+   "file": "32490fae8c4cfae5754a85a6.png",
+   "w": 480,
+   "h": 118
+  }
+ },
+ {
+  "qid": "cmsjro23p03fpqmt1j6edxvy3",
+  "url": "/uploads/questions/9ede82256c8fc9ea1a2229b0.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Probability and conditional probability - EASY",
+  "ord": 8,
+  "old": {
+   "w": 280,
+   "h": 380
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/PROBABILITY/Probability EASY.pdf",
+  "hex": "1353b86e",
+  "page": 9,
+  "ncc": 0.9394,
+  "second": 0.2749,
+  "rect_pt": [
+   14.43,
+   63.0,
+   115.42,
+   200.06
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "fa58521dd69325ab4662f6f3.png",
+   "w": 562,
+   "h": 762
+  }
+ },
+ {
+  "qid": "cmsjro27003fqqmt1a4ozs83u",
+  "url": "/uploads/questions/5f0d2c5b5c90a37a68b1b4a1.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Probability and conditional probability - EASY",
+  "ord": 9,
+  "old": {
+   "w": 1205,
+   "h": 282
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/PROBABILITY/Probability EASY.pdf",
+  "hex": "d89c1513",
+  "page": 10,
+  "ncc": 0.9316,
+  "second": 0.2658,
+  "rect_pt": [
+   14.07,
+   77.29,
+   448.69,
+   179.0
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "bdba5bea973bd17a74b41492.png",
+   "w": 2415,
+   "h": 566
+  }
+ },
+ {
+  "qid": "cmsjro27j03frqmt1xyznb6xj",
+  "url": "/uploads/questions/e28eb853bccabfb7297e7270.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Probability and conditional probability - EASY",
+  "ord": 10,
+  "old": {
+   "w": 745,
+   "h": 380
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/PROBABILITY/Probability EASY.pdf",
+  "hex": "46545dd6",
+  "page": 11,
+  "ncc": 0.9512,
+  "second": 0.2834,
+  "rect_pt": [
+   14.73,
+   62.97,
+   282.38,
+   199.49
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "30c99b733ad111cbaaff6762.png",
+   "w": 1488,
+   "h": 760
+  }
+ },
+ {
+  "qid": "cmsjro1yi03b8qmt1s09vbmaj",
+  "url": "/uploads/questions/e87e1b31adad7f8e5bd32b8a.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Probability and conditional probability - HARD",
+  "ord": 0,
+  "old": {
+   "w": 720,
+   "h": 250
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/PROBABILITY/Probability HARD.pdf",
+  "hex": "d4413871",
+  "page": 1,
+  "ncc": 0.9435,
+  "second": 0.3429,
+  "rect_pt": [
+   14.43,
+   75.48,
+   274.12,
+   165.65
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "feee214e67d7093137186971.png",
+   "w": 1443,
+   "h": 502
+  }
+ },
+ {
+  "qid": "cmsjro1z503baqmt1zlc9lrm9",
+  "url": "/uploads/questions/bb75d6b4e6210a989aa36062.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Probability and conditional probability - HARD",
+  "ord": 2,
+  "old": {
+   "w": 835,
+   "h": 345
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/PROBABILITY/Probability HARD.pdf",
+  "hex": "6a715bed",
+  "page": 3,
+  "ncc": 0.9462,
+  "second": 0.2206,
+  "rect_pt": [
+   155.47,
+   77.17,
+   456.64,
+   201.61
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "8edc6aca80c76b62a0aafc74.png",
+   "w": 1674,
+   "h": 693
+  }
+ },
+ {
+  "qid": "cmsjro1zk03bgqmt1gdcgk8sj",
+  "url": "/uploads/questions/aa5ec56a6f4ab6c80246a932.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Probability and conditional probability - HARD",
+  "ord": 4,
+  "old": {
+   "w": 510,
+   "h": 242
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/PROBABILITY/Probability HARD.pdf",
+  "hex": "014c47ab",
+  "page": 5,
+  "ncc": 0.9541,
+  "second": 0.2795,
+  "rect_pt": [
+   214.46,
+   63.14,
+   397.68,
+   150.08
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "86c50c504dd47cdb25837b7a.png",
+   "w": 1019,
+   "h": 484
+  }
+ },
+ {
+  "qid": "cmsjro1zo03bhqmt132hr627q",
+  "url": "/uploads/questions/d045778c34dde1a6864236c3.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Probability and conditional probability - HARD",
+  "ord": 5,
+  "old": {
+   "w": 835,
+   "h": 345
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/PROBABILITY/Probability HARD.pdf",
+  "hex": "89f20d9e",
+  "page": 6,
+  "ncc": 0.946,
+  "second": 0.2184,
+  "rect_pt": [
+   155.47,
+   77.17,
+   456.64,
+   201.61
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "ae8fc7db3e2e718c1dad27d7.png",
+   "w": 1674,
+   "h": 693
+  }
+ },
+ {
+  "qid": "cmsjro14u02weqmt1gl8r8mxk",
+  "url": "/uploads/questions/a22a62b830bb46025c936d67.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Probability and conditional probability - MEDIUM",
+  "ord": 0,
+  "old": {
+   "w": 830,
+   "h": 330
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/PROBABILITY/Probability Med.pdf",
+  "hex": "b1b5300b",
+  "page": 1,
+  "ncc": 0.9438,
+  "second": 0.296,
+  "rect_pt": [
+   14.73,
+   61.14,
+   312.92,
+   179.7
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "e0e4b1cdd2af0cdbfc229ef8.png",
+   "w": 1658,
+   "h": 660
+  }
+ },
+ {
+  "qid": "cmsjro14x02wfqmt1r1vwtn4t",
+  "url": "/uploads/questions/1e6c5d6149061afa991add36.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Probability and conditional probability - MEDIUM",
+  "ord": 1,
+  "old": {
+   "w": 810,
+   "h": 305
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/PROBABILITY/Probability Med.pdf",
+  "hex": "e1ad3d41",
+  "page": 2,
+  "ncc": 0.9368,
+  "second": 0.2296,
+  "rect_pt": [
+   16.23,
+   64.62,
+   308.38,
+   174.63
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "fecbfb15aa715ecdff8b8310.png",
+   "w": 1624,
+   "h": 613
+  }
+ },
+ {
+  "qid": "cmsjro15x02wgqmt14vc11nqr",
+  "url": "/uploads/questions/4b159ff4f4ba28aa957b5c91.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Probability and conditional probability - MEDIUM",
+  "ord": 2,
+  "old": {
+   "w": 785,
+   "h": 200
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/PROBABILITY/Probability Med.pdf",
+  "hex": "f8696cd8",
+  "page": 3,
+  "ncc": 0.9235,
+  "second": 0.361,
+  "rect_pt": [
+   16.53,
+   63.01,
+   298.55,
+   134.86
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "ae057d6674b60bdce7bcf782.png",
+   "w": 1568,
+   "h": 400
+  }
+ },
+ {
+  "qid": "cmsjro18202wnqmt1rrn3oggr",
+  "url": "/uploads/questions/26f7ffe6417bf29f8490035e.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Probability and conditional probability - MEDIUM",
+  "ord": 5,
+  "old": {
+   "w": 280,
+   "h": 585
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/PROBABILITY/Probability Med.pdf",
+  "hex": "b6569d0e",
+  "page": 6,
+  "ncc": 0.9222,
+  "second": 0.2341,
+  "rect_pt": [
+   14.43,
+   61.16,
+   115.42,
+   272.15
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "7fa067e0cf1e5ba320df5b02.png",
+   "w": 562,
+   "h": 1173
+  }
+ },
+ {
+  "qid": "cmsjro18902woqmt137q4ddu2",
+  "url": "/uploads/questions/ea5baa9b8cf2e05d07597fa7.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Probability and conditional probability - MEDIUM",
+  "ord": 6,
+  "old": {
+   "w": 780,
+   "h": 290
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/PROBABILITY/Probability Med.pdf",
+  "hex": "912cd125",
+  "page": 7,
+  "ncc": 0.9304,
+  "second": 0.3722,
+  "rect_pt": [
+   14.43,
+   90.09,
+   295.76,
+   194.69
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "d4b1733b55921cd21bcbe21e.png",
+   "w": 1564,
+   "h": 582
+  }
+ },
+ {
+  "qid": "cmsjro18q02wsqmt14tzzxuei",
+  "url": "/uploads/questions/c1cc674df1f30b5041cbc5e0.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Probability and conditional probability - MEDIUM",
+  "ord": 10,
+  "old": {
+   "w": 1245,
+   "h": 182
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/PROBABILITY/Probability Med.pdf",
+  "hex": "0301c5dc",
+  "page": 11,
+  "ncc": 0.9268,
+  "second": 0.1739,
+  "rect_pt": [
+   14.07,
+   77.29,
+   463.12,
+   142.93
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "9d1584bf802abdce6ce3f97f.png",
+   "w": 2495,
+   "h": 366
+  }
+ },
+ {
+  "qid": "cmsjro1tm039xqmt14d658ff5",
+  "url": "/uploads/questions/f05d9195b1aa1f179da8141b.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Ratios, rates, proportional relationships, and units - MEDIUM",
+  "ord": 8,
+  "old": {
+   "w": 393,
+   "h": 291
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/RATIOS RATES PROPORTIONS UNITS/Ratios Rates Proport. Units MED.pdf",
+  "hex": "939c46d1",
+  "page": 9,
+  "ncc": 0.9659,
+  "second": 0.2483,
+  "rect_pt": [
+   10.32,
+   62.98,
+   141.15,
+   159.85
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 151,
+  "status": "ok",
+  "new": {
+   "file": "19ffed44e69d4f89af59afae.jpg",
+   "w": 240,
+   "h": 186
+  }
+ },
+ {
+  "qid": "cmsjro28403g2qmt1z5yfnjbz",
+  "url": "/uploads/questions/3e3300ac281449d6aaa211cf.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Statistical Claims - HARD",
+  "ord": 1,
+  "old": {
+   "w": 950,
+   "h": 375
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/STATISTICAL CLAIMS/Stat. Claims HARD.pdf",
+  "hex": "7d68096f",
+  "page": 2,
+  "ncc": 0.9515,
+  "second": 0.278,
+  "rect_pt": [
+   135.43,
+   108.25,
+   476.73,
+   242.97
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "de1dff1c08277d3403125a44.png",
+   "w": 1897,
+   "h": 749
+  }
+ },
+ {
+  "qid": "cmsjro1oo037cqmt14nby61ls",
+  "url": "/uploads/questions/6f0d7e205921ff9edbd0b6e2.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - EASY",
+  "ord": 0,
+  "old": {
+   "w": 386,
+   "h": 298
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/Two Var. Data  EASY.pdf",
+  "hex": "cf0ae57a",
+  "page": 1,
+  "ncc": 0.9511,
+  "second": 0.1454,
+  "rect_pt": [
+   17.98,
+   64.31,
+   172.23,
+   183.4
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 224,
+  "status": "ok",
+  "new": {
+   "file": "a10fc8a430a5caa0d2f5195e.jpg",
+   "w": 480,
+   "h": 372
+  }
+ },
+ {
+  "qid": "cmsjro1ov037hqmt1e7d30t0r",
+  "url": "/uploads/questions/4f905277fa66ac974617a208.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - EASY",
+  "ord": 1,
+  "old": {
+   "w": 397,
+   "h": 313
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/Two Var. Data  EASY.pdf",
+  "hex": "661dfddd",
+  "page": 2,
+  "ncc": 0.9434,
+  "second": 0.2261,
+  "rect_pt": [
+   17.98,
+   64.25,
+   176.63,
+   189.33
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 217,
+  "status": "ok",
+  "new": {
+   "file": "34f9261229bc13b600c9a2af.jpg",
+   "w": 480,
+   "h": 379
+  }
+ },
+ {
+  "qid": "cmsjro1p1037mqmt1iz5u0dsh",
+  "url": "/uploads/questions/7a1270726151e82e77e884f5.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - EASY",
+  "ord": 2,
+  "old": {
+   "w": 330,
+   "h": 311
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/Two Var. Data  EASY.pdf",
+  "hex": "5c24c861",
+  "page": 3,
+  "ncc": 0.9388,
+  "second": 0.1974,
+  "rect_pt": [
+   17.98,
+   93.51,
+   149.86,
+   217.79
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 151,
+  "status": "ok",
+  "new": {
+   "file": "30528267e528c1c03e6f73a2.jpg",
+   "w": 276,
+   "h": 259
+  }
+ },
+ {
+  "qid": "cmsjro1pa037rqmt1qch3m3s4",
+  "url": "/uploads/questions/e02bdf2954f1a5fb412299c4.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - EASY",
+  "ord": 3,
+  "old": {
+   "w": 350,
+   "h": 384
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/Two Var. Data  EASY.pdf",
+  "hex": "8156d446",
+  "page": 4,
+  "ncc": 0.9261,
+  "second": 0.1698,
+  "rect_pt": [
+   17.98,
+   64.58,
+   157.85,
+   218.03
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 225,
+  "status": "ok",
+  "new": {
+   "file": "a210cc4932cd4288eb9f2b91.jpg",
+   "w": 438,
+   "h": 480
+  }
+ },
+ {
+  "qid": "cmsjro1pi037sqmt191vzs0rq",
+  "url": "/uploads/questions/deceef43584c682e39b0e45f.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - EASY",
+  "ord": 4,
+  "old": {
+   "w": 328,
+   "h": 279
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/Two Var. Data  EASY.pdf",
+  "hex": "d6121490",
+  "page": 5,
+  "ncc": 0.9553,
+  "second": 0.241,
+  "rect_pt": [
+   17.98,
+   64.45,
+   149.06,
+   175.94
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "25d7d93505aa4f7eaba0e7bb.jpg",
+   "w": 273,
+   "h": 232
+  }
+ },
+ {
+  "qid": "cmsjro1po037xqmt1ghnxk1ot",
+  "url": "/uploads/questions/daeef0ccd3e6f214795db363.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - EASY",
+  "ord": 5,
+  "old": {
+   "w": 195,
+   "h": 245
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/Two Var. Data  EASY.pdf",
+  "hex": "9296553d",
+  "page": 6,
+  "ncc": 0.9579,
+  "second": 0.2889,
+  "rect_pt": [
+   18.05,
+   64.58,
+   95.98,
+   162.49
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "6bc4ca11e06a1be8850b9812.jpg",
+   "w": 162,
+   "h": 204
+  }
+ },
+ {
+  "qid": "cmsjro1px037yqmt11q8028sc",
+  "url": "/uploads/questions/0a5fbf9e8d48cf2c49771147.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - EASY",
+  "ord": 6,
+  "old": {
+   "w": 444,
+   "h": 296
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/Two Var. Data  EASY.pdf",
+  "hex": "a6b2fcce",
+  "page": 7,
+  "ncc": 0.9496,
+  "second": 0.2143,
+  "rect_pt": [
+   17.98,
+   64.38,
+   195.41,
+   182.67
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 194,
+  "status": "ok",
+  "new": {
+   "file": "e4f24e63032237e25918cc60.jpg",
+   "w": 480,
+   "h": 321
+  }
+ },
+ {
+  "qid": "cmsjro1q50383qmt19v48wzny",
+  "url": "/uploads/questions/7210a8c85b1d03a42498c461.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - EASY",
+  "ord": 7,
+  "old": {
+   "w": 375,
+   "h": 358
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/Two Var. Data  EASY.pdf",
+  "hex": "c9dd92b1",
+  "page": 8,
+  "ncc": 0.9374,
+  "second": 0.2085,
+  "rect_pt": [
+   17.98,
+   64.31,
+   167.84,
+   207.37
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "1f1469b3bc952690cb88f8bb.jpg",
+   "w": 312,
+   "h": 298
+  }
+ },
+ {
+  "qid": "cmsjro1qe0388qmt1m8ss0490",
+  "url": "/uploads/questions/21ff5155e47d1de57c13d41e.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - EASY",
+  "ord": 8,
+  "old": {
+   "w": 388,
+   "h": 300
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/Two Var. Data  EASY.pdf",
+  "hex": "9d88a3e3",
+  "page": 9,
+  "ncc": 0.9317,
+  "second": 0.1908,
+  "rect_pt": [
+   17.98,
+   64.51,
+   173.03,
+   184.4
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 223,
+  "status": "ok",
+  "new": {
+   "file": "96df919db386de86734be4c2.jpg",
+   "w": 480,
+   "h": 373
+  }
+ },
+ {
+  "qid": "cmsjro1qm038dqmt1f4h9sopj",
+  "url": "/uploads/questions/3170894d42e503b73362e039.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - EASY",
+  "ord": 9,
+  "old": {
+   "w": 395,
+   "h": 258
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/Two Var. Data  EASY.pdf",
+  "hex": "74dee52b",
+  "page": 10,
+  "ncc": 0.9548,
+  "second": 0.1949,
+  "rect_pt": [
+   17.98,
+   64.58,
+   175.83,
+   167.68
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 218,
+  "status": "ok",
+  "new": {
+   "file": "10f2c9eb79b154ee9676de35.jpg",
+   "w": 480,
+   "h": 314
+  }
+ },
+ {
+  "qid": "cmsjro1qu038iqmt106iz94m1",
+  "url": "/uploads/questions/4f905277fa66ac974617a208.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - EASY",
+  "ord": 10,
+  "old": {
+   "w": 397,
+   "h": 313
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/Two Var. Data  EASY.pdf",
+  "hex": "ac5b6558",
+  "page": 11,
+  "ncc": 0.9434,
+  "second": 0.2261,
+  "rect_pt": [
+   17.98,
+   64.25,
+   176.63,
+   189.33
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 217,
+  "status": "ok",
+  "new": {
+   "file": "34f9261229bc13b600c9a2af.jpg",
+   "w": 480,
+   "h": 379
+  }
+ },
+ {
+  "qid": "cmsjro1r3038nqmt1qdkthx87",
+  "url": "/uploads/questions/82391a61d26b200b43b9b9f7.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - EASY",
+  "ord": 11,
+  "old": {
+   "w": 390,
+   "h": 335
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/Two Var. Data  EASY.pdf",
+  "hex": "83272c51",
+  "page": 12,
+  "ncc": 0.9207,
+  "second": 0.1992,
+  "rect_pt": [
+   17.98,
+   64.44,
+   173.83,
+   198.32
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 222,
+  "status": "ok",
+  "new": {
+   "file": "f14f09c951a81ba4e30317c6.jpg",
+   "w": 480,
+   "h": 412
+  }
+ },
+ {
+  "qid": "cmsjro1r9038sqmt19lje3i7n",
+  "url": "/uploads/questions/09f6c80b4d2b17a1241f191e.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - EASY",
+  "ord": 12,
+  "old": {
+   "w": 290,
+   "h": 301
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/Two Var. Data  EASY.pdf",
+  "hex": "82aaa0a1",
+  "page": 13,
+  "ncc": 0.9806,
+  "second": 0.4305,
+  "rect_pt": [
+   17.98,
+   64.51,
+   133.87,
+   184.8
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 143,
+  "status": "ok",
+  "new": {
+   "file": "4f96f93fe76fa79bbe6b6548.jpg",
+   "w": 231,
+   "h": 240
+  }
+ },
+ {
+  "qid": "cmsjro0mu02oxqmt115tm7jux",
+  "url": "/uploads/questions/256934f30c7752cc8de3604b.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - HARD",
+  "ord": 0,
+  "old": {
+   "w": 397,
+   "h": 322
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/DATA AND MEAN/Data Distribut, mean Hard.pdf",
+  "hex": "d6af3572",
+  "page": 7,
+  "ncc": 0.9146,
+  "second": 0.2244,
+  "rect_pt": [
+   15.13,
+   72.76,
+   173.14,
+   200.93
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 217,
+  "status": "ok",
+  "new": {
+   "file": "7337992d3a8e6d4bc155b205.png",
+   "w": 477,
+   "h": 388
+  }
+ },
+ {
+  "qid": "cmsjro0ov02poqmt1i2bj7y3i",
+  "url": "/uploads/questions/e539937413291902d4228035.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - HARD",
+  "ord": 1,
+  "old": {
+   "w": 389,
+   "h": 256
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/DATA AND MEAN/Data Distribut, mean Hard.pdf",
+  "hex": "1e1027a7",
+  "page": 15,
+  "ncc": 0.9361,
+  "second": 0.2092,
+  "rect_pt": [
+   29.71,
+   72.52,
+   185.16,
+   174.82
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 222,
+  "status": "ok",
+  "new": {
+   "file": "9d190e59aaefdf9e39d7d1ff.png",
+   "w": 477,
+   "h": 314
+  }
+ },
+ {
+  "qid": "cmsjro0pa02q3qmt1mcedz699",
+  "url": "/uploads/questions/78b00ab414ebeb49a855c090.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - HARD",
+  "ord": 2,
+  "old": {
+   "w": 784,
+   "h": 740
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/DATA AND MEAN/Data Distribut, mean Hard.pdf",
+  "hex": "7b52985c",
+  "page": 20,
+  "ncc": 0.9388,
+  "second": 0.3014,
+  "rect_pt": [
+   17.6,
+   99.6,
+   299.27,
+   365.45
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "73090e6b781f24a1e2ad245d.png",
+   "w": 1566,
+   "h": 1478
+  }
+ },
+ {
+  "qid": "cmsjro13n02vgqmt1kgz5rsr0",
+  "url": "/uploads/questions/f4d26e2072006570cb827daf.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - HARD",
+  "ord": 3,
+  "old": {
+   "w": 401,
+   "h": 264
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/TWO Var. Data HARD.pdf",
+  "hex": "9d95e7ad",
+  "page": 4,
+  "ncc": 0.9626,
+  "second": 0.1755,
+  "rect_pt": [
+   17.98,
+   64.32,
+   178.23,
+   169.81
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 215,
+  "status": "ok",
+  "new": {
+   "file": "60f0f8ae16b5ac6bd24dc9cb.jpg",
+   "w": 480,
+   "h": 316
+  }
+ },
+ {
+  "qid": "cmsjro13v02vqqmt1x61kj4dx",
+  "url": "/uploads/questions/a14f51cdfcaf9d98283ea093.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - HARD",
+  "ord": 5,
+  "old": {
+   "w": 354,
+   "h": 373
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/TWO Var. Data HARD.pdf",
+  "hex": "79137c1b",
+  "page": 6,
+  "ncc": 0.9571,
+  "second": 0.2134,
+  "rect_pt": [
+   17.98,
+   64.31,
+   159.45,
+   213.37
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "2345de6d1e898712f3657d45.jpg",
+   "w": 295,
+   "h": 310
+  }
+ },
+ {
+  "qid": "cmsjro13y02vrqmt18ihfb28k",
+  "url": "/uploads/questions/59ebf7f5a4231bc534be660f.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - HARD",
+  "ord": 6,
+  "old": {
+   "w": 427,
+   "h": 382
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/TWO Var. Data HARD.pdf",
+  "hex": "e821a26d",
+  "page": 7,
+  "ncc": 0.9593,
+  "second": 0.2092,
+  "rect_pt": [
+   17.98,
+   78.51,
+   188.62,
+   231.16
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 202,
+  "status": "ok",
+  "new": {
+   "file": "addf232f0d57a2f1a7cb5f1f.jpg",
+   "w": 480,
+   "h": 429
+  }
+ },
+ {
+  "qid": "cmsjro0pm02q4qmt1ga5wfcw3",
+  "url": "/uploads/questions/bc34e743fea0cfacbf5feb61.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - HARD",
+  "ord": 7,
+  "old": {
+   "w": 350,
+   "h": 384
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/DATA AND MEAN/Data Distribut, mean Hard.pdf",
+  "hex": "d0430601",
+  "page": 21,
+  "ncc": 0.9416,
+  "second": 0.1761,
+  "rect_pt": [
+   14.79,
+   72.58,
+   154.65,
+   226.03
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 225,
+  "status": "ok",
+  "new": {
+   "file": "eb0694024e3b3bf70959b51c.png",
+   "w": 438,
+   "h": 480
+  }
+ },
+ {
+  "qid": "cmsjro0jz02okqmt1701ofkw4",
+  "url": "/uploads/questions/7bf8066e371ccf2fc9c02df6.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - HARD",
+  "ord": 8,
+  "old": {
+   "w": 724,
+   "h": 700
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/DATA AND MEAN/Data Distribut, mean Hard.pdf",
+  "hex": "fb866265",
+  "page": 2,
+  "ncc": 0.9544,
+  "second": 0.2889,
+  "rect_pt": [
+   27.05,
+   81.82,
+   288.18,
+   334.29
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "801c898e813ff73f6e243432.png",
+   "w": 1452,
+   "h": 1404
+  }
+ },
+ {
+  "qid": "cmsjro0k502omqmt1mvtvw4zk",
+  "url": "/uploads/questions/3a1792584816c9a4e649a4e5.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - HARD",
+  "ord": 9,
+  "old": {
+   "w": 712,
+   "h": 700
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/DATA AND MEAN/Data Distribut, mean Hard.pdf",
+  "hex": "2e8027b0",
+  "page": 4,
+  "ncc": 0.9514,
+  "second": 0.2777,
+  "rect_pt": [
+   27.66,
+   82.47,
+   283.46,
+   333.95
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "f34422762f7cca349aab1ff1.png",
+   "w": 1422,
+   "h": 1398
+  }
+ },
+ {
+  "qid": "cmsjro1rc038tqmt1ql0ibuy2",
+  "url": "/uploads/questions/172a8cd2d4e1dbc9bab1df39.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - MEDIUM",
+  "ord": 0,
+  "old": {
+   "w": 737,
+   "h": 605
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/TWO Var. Data MED.pdf",
+  "hex": "fdfc90e4",
+  "page": 1,
+  "ncc": 0.9344,
+  "second": 0.1568,
+  "rect_pt": [
+   162.19,
+   81.46,
+   426.96,
+   298.82
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "dfc13815961e1bf9fe74976e.png",
+   "w": 1472,
+   "h": 1209
+  }
+ },
+ {
+  "qid": "cmsjro1rg038uqmt16t8niie6",
+  "url": "/uploads/questions/40ec0632078b32e22d835600.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - MEDIUM",
+  "ord": 1,
+  "old": {
+   "w": 333,
+   "h": 247
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/TWO Var. Data MED.pdf",
+  "hex": "9eb896c5",
+  "page": 2,
+  "ncc": 0.9488,
+  "second": 0.2899,
+  "rect_pt": [
+   17.98,
+   64.52,
+   151.06,
+   163.22
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "738e79f309487049f221b023.jpg",
+   "w": 278,
+   "h": 206
+  }
+ },
+ {
+  "qid": "cmsjro1rk038vqmt1n9attatf",
+  "url": "/uploads/questions/b50eb2da1475ea9a6eb318a9.jpg",
+  "optId": "opt_3e661cb19b5a4d6a91e27d5a7ca776d5",
+  "label": "A",
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - MEDIUM",
+  "ord": 2,
+  "old": {
+   "w": 228,
+   "h": 63
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/TWO Var. Data MED.pdf",
+  "hex": "ab7740a8",
+  "page": 3,
+  "ncc": 0.9394,
+  "second": 0.9336,
+  "rect_pt": [
+   28.32,
+   117.79,
+   119.43,
+   142.97
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "c59cbf627519753d797ec716.png",
+   "w": 190,
+   "h": 53
+  },
+  "note": "needs_review (similar option graphs, 2nd peak high); match order A-D and content checked by eye"
+ },
+ {
+  "qid": "cmsjro1rk038vqmt1n9attatf",
+  "url": "/uploads/questions/64194825200136af1452f322.jpg",
+  "optId": "opt_0973d05b64814c2faaacbbfbf71252c4",
+  "label": "B",
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - MEDIUM",
+  "ord": 2,
+  "old": {
+   "w": 228,
+   "h": 63
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/TWO Var. Data MED.pdf",
+  "hex": "ab7740a8",
+  "page": 3,
+  "ncc": null,
+  "second": null,
+  "rect_pt": [
+   28.5,
+   155.25,
+   120.0,
+   180.75
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "68525d15583137d34624b555.png",
+   "w": 190,
+   "h": 53
+  },
+  "note": "matcher picked option C (near-identical tables); replaced by the embedded image placed at option B (xref 109), checked by eye"
+ },
+ {
+  "qid": "cmsjro1rk038vqmt1n9attatf",
+  "url": "/uploads/questions/0c982626e9ded8261f3d1be9.jpg",
+  "optId": "opt_0291f781c56242d79f94175cb8def09e",
+  "label": "C",
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - MEDIUM",
+  "ord": 2,
+  "old": {
+   "w": 228,
+   "h": 63
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/TWO Var. Data MED.pdf",
+  "hex": "ab7740a8",
+  "page": 3,
+  "ncc": 0.9525,
+  "second": 0.9293,
+  "rect_pt": [
+   28.65,
+   192.77,
+   119.4,
+   217.84
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "643c0d2380f42c4a17ad1e06.png",
+   "w": 190,
+   "h": 53
+  },
+  "note": "needs_review (similar option graphs, 2nd peak high); match order A-D and content checked by eye"
+ },
+ {
+  "qid": "cmsjro1rk038vqmt1n9attatf",
+  "url": "/uploads/questions/e51fffa32d172beb8b1ee08d.jpg",
+  "optId": "opt_900a5af9798b49f8b97a98827aec3eab",
+  "label": "D",
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - MEDIUM",
+  "ord": 2,
+  "old": {
+   "w": 228,
+   "h": 63
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/TWO Var. Data MED.pdf",
+  "hex": "ab7740a8",
+  "page": 3,
+  "ncc": 0.9572,
+  "second": 0.9343,
+  "rect_pt": [
+   28.32,
+   230.06,
+   119.43,
+   255.24
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "cf63ec6011b425d61999212d.png",
+   "w": 190,
+   "h": 53
+  },
+  "note": "needs_review (similar option graphs, 2nd peak high); match order A-D and content checked by eye"
+ },
+ {
+  "qid": "cmsjro1rn038wqmt1obu1s7w3",
+  "url": "/uploads/questions/0b589ba14080ce4f574b1a94.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - MEDIUM",
+  "ord": 3,
+  "old": {
+   "w": 341,
+   "h": 255
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/TWO Var. Data MED.pdf",
+  "hex": "3c5b19ef",
+  "page": 4,
+  "ncc": 0.9575,
+  "second": 0.2179,
+  "rect_pt": [
+   17.98,
+   64.32,
+   154.25,
+   166.22
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "96ef5e448767962c4b97e7f9.jpg",
+   "w": 284,
+   "h": 213
+  }
+ },
+ {
+  "qid": "cmsjro1rr038xqmt10mgsbptn",
+  "url": "/uploads/questions/a96792bdb9bfa80dccfd5f77.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - MEDIUM",
+  "ord": 4,
+  "old": {
+   "w": 305,
+   "h": 335
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/TWO Var. Data MED.pdf",
+  "hex": "3d985614",
+  "page": 5,
+  "ncc": 0.942,
+  "second": 0.2073,
+  "rect_pt": [
+   17.98,
+   64.44,
+   139.87,
+   198.32
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 150,
+  "status": "ok",
+  "new": {
+   "file": "716ad899413946d76b0f9926.jpg",
+   "w": 254,
+   "h": 279
+  }
+ },
+ {
+  "qid": "cmsjro1ru038yqmt1zgd1w3p5",
+  "url": "/uploads/questions/464c908e645e48fb71395d09.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - MEDIUM",
+  "ord": 5,
+  "old": {
+   "w": 436,
+   "h": 301
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/TWO Var. Data MED.pdf",
+  "hex": "7fd284ac",
+  "page": 6,
+  "ncc": 0.9526,
+  "second": 0.2163,
+  "rect_pt": [
+   18.38,
+   64.38,
+   192.62,
+   184.66
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 198,
+  "status": "ok",
+  "new": {
+   "file": "f0e3ffdd3e87f253df2a1254.jpg",
+   "w": 480,
+   "h": 332
+  }
+ },
+ {
+  "qid": "cmsjro1ry038zqmt1x1siifxe",
+  "url": "/uploads/questions/f1cbb15ab6bc4aba4b69d067.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - MEDIUM",
+  "ord": 7,
+  "old": {
+   "w": 745,
+   "h": 605
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/TWO Var. Data MED.pdf",
+  "hex": "f46139df",
+  "page": 8,
+  "ncc": 0.9717,
+  "second": 0.1119,
+  "rect_pt": [
+   162.0,
+   81.05,
+   430.18,
+   298.84
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "32b9e95659d2c49af85df790.png",
+   "w": 1491,
+   "h": 1211
+  }
+ },
+ {
+  "qid": "cmsjro1s10390qmt11dgeqn1n",
+  "url": "/uploads/questions/9c1383c25bc4ba824250d1f9.jpg",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - MEDIUM",
+  "ord": 8,
+  "old": {
+   "w": 266,
+   "h": 279
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/TWO Var. Data MED.pdf",
+  "hex": "1adb39f0",
+  "page": 9,
+  "ncc": 0.9733,
+  "second": 0.3115,
+  "rect_pt": [
+   17.98,
+   97.12,
+   124.28,
+   208.61
+  ],
+  "kind": "RASTER",
+  "dpi": null,
+  "native_ppi": 154,
+  "status": "ok",
+  "new": {
+   "file": "cf5428c79dc3c4cfd4d56a09.jpg",
+   "w": 228,
+   "h": 240
+  }
+ },
+ {
+  "qid": "cmsjro1sd039aqmt18qgr3d06",
+  "url": "/uploads/questions/8b70ca833109e57c88b9427a.png",
+  "optId": null,
+  "label": null,
+  "section": "MATH",
+  "domain": "Problem-Solving and Data Analysis",
+  "ps": "Problem-Solving and Data Analysis - Two-variable data: Models and scatterplots - MEDIUM",
+  "ord": 10,
+  "old": {
+   "w": 737,
+   "h": 720
+  },
+  "source": "files_to_load/PRACTICE EXERCISES/EXERCISES MATH/PROBLEM SOLVING DATA ANALYSIS/TWO VARIABLE DATA/TWO Var. Data MED.pdf",
+  "hex": "03a16790",
+  "page": 11,
+  "ncc": 0.9302,
+  "second": 0.2233,
+  "rect_pt": [
+   166.12,
+   93.31,
+   431.94,
+   353.0
+  ],
+  "kind": "VECTOR",
+  "dpi": 400,
+  "native_ppi": null,
+  "status": "ok",
+  "new": {
+   "file": "700d79da5662bbf319125122.png",
+   "w": 1478,
+   "h": 1444
+  }
+ }
+]

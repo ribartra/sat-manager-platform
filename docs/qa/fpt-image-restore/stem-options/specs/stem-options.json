@@ -1,0 +1,233 @@
+[
+ {
+  "qid": "cmsjrntgh006qqmt1kcr9rxh8",
+  "loc": "TEST 2 Math Module 2 Q19",
+  "test": "TEST 2",
+  "type": "text",
+  "field": "stem",
+  "new": "19. What is the circumference of the circle with an equation of $$x^{2} + 6x + y^{2} - 4y = 51$$?",
+  "confidence": "high",
+  "defect": "leaked_options_in_stem",
+  "evidence": "Answer choices (legacy-UI list, e.g. \"✗/☑/x A …\") captured into the stem at ingest; options already exist as QuestionOption rows; kept only the question text"
+ },
+ {
+  "qid": "cmsjrnu7e00hcqmt1l368ga84",
+  "loc": "TEST 10 Math Module 2 Q11",
+  "test": "TEST 10",
+  "type": "text",
+  "field": "stem",
+  "new": "11.\n\nThe histogram shows the data collected from set X. Data set Y takes all the values from set X and subtracts 17.5 to every value. Which of the following correctly compares the median and the range between set X and set Y?",
+  "confidence": "high",
+  "defect": "leaked_options_in_stem",
+  "evidence": "Answer choices (legacy-UI list, e.g. \"✗/☑/x A …\") captured into the stem at ingest; options already exist as QuestionOption rows; kept only the question text"
+ },
+ {
+  "qid": "cmsjrnuhu00irqmt1y4592ec4",
+  "loc": "TEST 5 Math Module 1 Q12",
+  "test": "TEST 5",
+  "type": "text",
+  "field": "stem",
+  "new": "12. As part of a mark-recapture study, a random sample of cricket frogs was selected from a previously surveyed population to estimate what percentage of the population had already been tagged. Based on the sample, it was estimated that 68% of the entire population of cricket frogs in the study region had been tagged, with an associated margin of error of 3%. Based on this estimate and margin of error, which of the following is the most appropriate conclusion about the percentage of the population that was tagged?",
+  "confidence": "high",
+  "defect": "leaked_options_in_stem",
+  "evidence": "Answer choices (legacy-UI list, e.g. \"✗/☑/x A …\") captured into the stem at ingest; options already exist as QuestionOption rows; kept only the question text"
+ },
+ {
+  "qid": "cmsjrnumx00k8qmt1qcvbkuhl",
+  "loc": "TEST 4 R&W Module 2 Q8",
+  "test": "TEST 4",
+  "type": "text",
+  "field": "stem",
+  "new": "8. Which choice best describes the overall structure of the text?",
+  "confidence": "high",
+  "defect": "leaked_options_in_stem",
+  "evidence": "Answer choices (legacy-UI list, e.g. \"✗/☑/x A …\") captured into the stem at ingest; options already exist as QuestionOption rows; kept only the question text"
+ },
+ {
+  "qid": "cmsjrnv2500pcqmt1x83duysn",
+  "loc": "TEST 5 R&W Module 1 Q20",
+  "test": "TEST 5",
+  "type": "text",
+  "field": "stem",
+  "new": "20. Which choice completes the text so that it conforms to the conventions of Standard English?",
+  "confidence": "high",
+  "defect": "leaked_options_in_stem",
+  "evidence": "Answer choices (legacy-UI list, e.g. \"✗/☑/x A …\") captured into the stem at ingest; options already exist as QuestionOption rows; kept only the question text"
+ },
+ {
+  "qid": "cmsjrnwq60191qmt141m6qsvf",
+  "loc": "TEST 7 R&W Module 1 Q24",
+  "test": "TEST 7",
+  "type": "text",
+  "field": "stem",
+  "new": "24. Which choice completes the text with the most logical transition?",
+  "confidence": "high",
+  "defect": "leaked_options_in_stem",
+  "evidence": "Answer choices (legacy-UI list, e.g. \"✗/☑/x A …\") captured into the stem at ingest; options already exist as QuestionOption rows; kept only the question text"
+ },
+ {
+  "qid": "cmsojfksi003r18pp9dfz4mvz",
+  "loc": "TEST 8 R&W Module 1 Q15",
+  "test": "TEST 8",
+  "type": "text",
+  "field": "stem",
+  "new": "15. Which choice completes the text so that it conforms to the conventions of Standard English?",
+  "confidence": "high",
+  "defect": "leaked_options_in_stem",
+  "evidence": "Answer choices (legacy-UI list, e.g. \"✗/☑/x A …\") captured into the stem at ingest; options already exist as QuestionOption rows; kept only the question text; stem also repeated the whole passage (already in stimulus) → removed"
+ },
+ {
+  "qid": "cmsjrnumh00jzqmt1g28ulhej",
+  "loc": "TEST 4 R&W Module 1 Q6",
+  "test": "TEST 4",
+  "type": "text",
+  "field": "stem",
+  "new": "Which choice best states the main purpose of the text?",
+  "confidence": "high",
+  "defect": "leaked_options_in_stem",
+  "evidence": "Answer choices (legacy-UI list, e.g. \"✗/☑/x A …\") captured into the stem at ingest; options already exist as QuestionOption rows; kept only the question text"
+ },
+ {
+  "qid": "cmsjrnup800klqmt1keigju8b",
+  "loc": "TEST 4 R&W Module 1 Q11",
+  "test": "TEST 4",
+  "type": "text",
+  "field": "stem",
+  "new": "Which finding, if true, would most directly support the scientists' claim?",
+  "confidence": "high",
+  "defect": "leaked_options_in_stem",
+  "evidence": "Answer choices (legacy-UI list, e.g. \"✗/☑/x A …\") captured into the stem at ingest; options already exist as QuestionOption rows; kept only the question text"
+ },
+ {
+  "qid": "cmsjrnvfy00tiqmt1ds6b6mtd",
+  "loc": "TEST 3 R&W Module 1 Q9",
+  "test": "TEST 3",
+  "type": "text",
+  "field": "stem",
+  "new": "9. Which choice best states the main idea of the text?",
+  "confidence": "high",
+  "defect": "leaked_options_in_stem",
+  "evidence": "Answer choices (legacy-UI list, e.g. \"✗/☑/x A …\") captured into the stem at ingest; options already exist as QuestionOption rows; kept only the question text"
+ },
+ {
+  "qid": "cmsjrnvir00vzqmt1xxam8v0b",
+  "loc": "TEST 3 R&W Module 1 Q22",
+  "test": "TEST 3",
+  "type": "text",
+  "field": "stem",
+  "new": "22. Which choice completes the text so that it conforms to the conventions of Standard English?",
+  "confidence": "high",
+  "defect": "leaked_options_in_stem",
+  "evidence": "Answer choices (legacy-UI list, e.g. \"✗/☑/x A …\") captured into the stem at ingest; options already exist as QuestionOption rows; kept only the question text"
+ },
+ {
+  "qid": "cmsjrny0701rrqmt1am7guns9",
+  "loc": "TEST 9 R&W Module 1 Q11",
+  "test": "TEST 9",
+  "type": "text",
+  "field": "stem",
+  "new": "Which choice best describes data from the graph that support the researchers' conclusion?",
+  "confidence": "high",
+  "defect": "leaked_options_in_stem",
+  "evidence": "Answer choices (legacy-UI list, e.g. \"✗/☑/x A …\") captured into the stem at ingest; options already exist as QuestionOption rows; kept only the question text"
+ },
+ {
+  "qid": "cmsjrny4u01tnqmt1p6hpksx7",
+  "loc": "TEST 9 R&W Module 1 Q25",
+  "test": "TEST 9",
+  "type": "text",
+  "field": "stem",
+  "new": "The student wants to describe how GJ 486-b and Earth differ to an audience already familiar with space terminology. Which choice most effectively uses relevant information from the notes to accomplish this goal?",
+  "confidence": "high",
+  "defect": "leaked_options_in_stem",
+  "evidence": "Answer choices (legacy-UI list, e.g. \"✗/☑/x A …\") captured into the stem at ingest; options already exist as QuestionOption rows; kept only the question text"
+ },
+ {
+  "qid": "cmsojfkpe000z18ppx5ay5hxn",
+  "loc": "TEST 8 R&W Module 1 Q5",
+  "test": "TEST 8",
+  "type": "text",
+  "field": "stem",
+  "new": "5. Which choice best states the main purpose of the text?",
+  "confidence": "high",
+  "defect": "leaked_options_in_stem",
+  "evidence": "Answer choices (legacy-UI list, e.g. \"✗/☑/x A …\") captured into the stem at ingest; options already exist as QuestionOption rows; kept only the question text; stem also repeated the whole passage (already in stimulus) → removed; the tail with the next question’s (Q6) passage was also removed"
+ },
+ {
+  "qid": "cmsojfkpr001918ppg4h6e8l5",
+  "loc": "TEST 8 R&W Module 1 Q6",
+  "test": "TEST 8",
+  "type": "text",
+  "field": "stem",
+  "new": "6. Which choice best states the main purpose of the text?",
+  "confidence": "high",
+  "defect": "leaked_options_in_stem",
+  "evidence": "Answer choices (legacy-UI list, e.g. \"✗/☑/x A …\") captured into the stem at ingest; options already exist as QuestionOption rows; kept only the question text"
+ },
+ {
+  "qid": "cmsjrnvcy00t0qmt19mju2ii4",
+  "loc": "TEST 3 R&W Module 1 Q2",
+  "test": "TEST 3",
+  "type": "text",
+  "field": "stem",
+  "new": "2. As used in the text, what does the word \"foreign\" most nearly mean?",
+  "confidence": "high",
+  "defect": "leaked_options_in_stem",
+  "evidence": "Answer choices (legacy-UI list, e.g. \"✗/☑/x A …\") captured into the stem at ingest; options already exist as QuestionOption rows; kept only the question text"
+ },
+ {
+  "qid": "cmsjrnvil00vxqmt109g32q09",
+  "loc": "TEST 3 R&W Module 1 Q21",
+  "test": "TEST 3",
+  "type": "text",
+  "field": "stem",
+  "new": "21. Which choice completes the text so that it conforms to the conventions of Standard English?",
+  "confidence": "high",
+  "defect": "leaked_options_in_stem",
+  "evidence": "Answer choices (legacy-UI list, e.g. \"✗/☑/x A …\") captured into the stem at ingest; options already exist as QuestionOption rows; kept only the question text"
+ },
+ {
+  "qid": "cmsjrnwyq01buqmt1p4128am4",
+  "loc": "TEST 7 Math Module 2 Q19",
+  "test": "TEST 7",
+  "type": "text",
+  "field": "stem",
+  "new": "19.\n\n$$0.6x^2 - 1.5x + 2.01 = 0$$\n\nHow many distinct real solutions does the given equation have?",
+  "confidence": "high",
+  "defect": "leaked_options_in_stem",
+  "evidence": "Answer choices (legacy-UI list, e.g. \"✗/☑/x A …\") captured into the stem at ingest; options already exist as QuestionOption rows; kept only the question text"
+ },
+ {
+  "qid": "cmsjrnwzg01bwqmt1kj5hz9qu",
+  "loc": "TEST 7 Math Module 2 Q20",
+  "test": "TEST 7",
+  "type": "text",
+  "field": "stem",
+  "new": "20. A regular hexagon is inscribed in a rectangle as shown.\n\nThe perimeter of the hexagon is 6a units. What is the area of the shaded region, in square units?",
+  "confidence": "high",
+  "defect": "leaked_options_in_stem",
+  "evidence": "Answer choices (legacy-UI list, e.g. \"✗/☑/x A …\") captured into the stem at ingest; options already exist as QuestionOption rows; kept only the question text"
+ },
+ {
+  "qid": "cmsjrnwq60191qmt141m6qsvf",
+  "loc": "TEST 7 R&W Module 1 Q24",
+  "test": "TEST 7",
+  "type": "text",
+  "field": "stimulus",
+  "new": "Divergent evolution is the process by which population groups that were once a single species evolve and accumulate differences, forming new species. This evolutionary process may occur as a response to changes in abiotic factors, such as a change in environmental conditions or when a new ecological niche becomes available. _____ divergent evolution may occur in response to changes in biotic factors, such as increased or decreased pressure from competition or predation.",
+  "confidence": "high",
+  "defect": "leaked_option_in_stimulus",
+  "evidence": "Passage began with answer choice \"Consequently,\" captured at ingest; removed"
+ },
+ {
+  "qid": "cmsjrnus100lkqmt188m9ersd",
+  "loc": "TEST 4 R&W Module 1 Q22",
+  "test": "TEST 4",
+  "type": "text",
+  "field": "stimulus",
+  "new": "When crafting each screenplay, Matías Piñeiro typically adapts the work of Shakespeare by placing the playwright's themes in contemporary Argentina. The screenwriter has admitted that this formula provides the comfort he needs to experiment in other ways, and he attributes his success so far to this familiar approach. ______ Piñeiro has recently hinted that his next script will be completely original, not indebted to Shakespeare or any other canonical writer.",
+  "confidence": "high",
+  "defect": "leaked_option_in_stimulus",
+  "evidence": "Passage began with answer choice \"Likewise,\" captured at ingest; removed"
+ }
+]

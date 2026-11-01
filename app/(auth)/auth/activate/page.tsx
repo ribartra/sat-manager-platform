@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -17,6 +18,11 @@ import {
 } from "@/components/ui/form";
 import { ErrorState, FormSection, LoadingState } from "@/components/sat";
 import { activateSchema, type ActivateInput } from "@/contracts/auth";
+import { LegalLinks } from "@/components/legal/legal-page";
+import { Alert, InlineError } from "@/components/sat/alert";
+import { Checkbox } from "@/components/ui/checkbox";
+import { apiFetch, errorMessage } from "@/lib/api-client";
+import { PASSWORD_MIN_LENGTH } from "@/lib/password-policy";
 
 interface InviteInfo {
   role: string;
@@ -25,8 +31,7 @@ interface InviteInfo {
   phone?: string;
   startDate?: string | null;
   programName?: string | null;
-  requiresParentConsent?: boolean;
-  parentConsentApproved?: boolean;
+  isMinor?: boolean;
 }
 
 export default function ActivatePage() {
@@ -36,6 +41,9 @@ export default function ActivatePage() {
   const [invite, setInvite] = useState<InviteInfo | null>(null);
   const [tokenError, setTokenError] = useState(false);
   const [serverError, setServerError] = useState("");
+  // Consent is recorded as accepting the Terms of Use (with the clause for students under 18).
+  // Checked by default (policy 2026-10-22); the student can uncheck it, and then cannot continue.
+  const [acceptTerms, setAcceptTerms] = useState(true);
 
   const form = useForm<ActivateInput>({
     resolver: zodResolver(activateSchema),
@@ -58,14 +66,10 @@ export default function ActivatePage() {
 
   async function onSubmit(values: ActivateInput) {
     setServerError("");
-    const res = await fetch("/api/auth/activate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token, password: values.password }),
-    });
-    const data = await res.json();
-    if (data.error) {
-      setServerError(data.error);
+    try {
+      await apiFetch("/api/auth/activate", { method: "POST", json: { token, password: values.password, acceptTerms } });
+    } catch (error) {
+      setServerError(errorMessage(error));
       return;
     }
     router.push("/login?activated=1");
@@ -76,7 +80,7 @@ export default function ActivatePage() {
       <div className="flex min-h-screen items-center justify-center bg-muted px-4">
         <ErrorState
           className="max-w-sm"
-          title="This invitation link is invalid or has expired."
+          title="This invitation link doesn't work or has expired. Ask your teacher for a new one."
         />
       </div>
     );
@@ -91,7 +95,7 @@ export default function ActivatePage() {
   }
 
   const isParent = invite.role === "PARENT";
-  const blockedByConsent = !isParent && invite.requiresParentConsent && !invite.parentConsentApproved;
+  const isTeacher = invite.role === "TEACHER";
   const loading = form.formState.isSubmitting;
 
   return (
@@ -103,15 +107,11 @@ export default function ActivatePage() {
           </h1>
           <p className="mb-5 text-sm text-muted-foreground">
             {isParent
-              ? "Create your parent account to follow your child's progress and approve their enrollment."
-              : "Set a password to activate your account."}
+              ? "Create your parent account to follow your child's progress."
+              : isTeacher
+                ? "You were invited as a teacher. Choose a password; then you can invite and follow your own students."
+                : "Choose a password to finish setting up your account."}
           </p>
-          {blockedByConsent ? (
-            <div className="mb-5 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
-              Parent or guardian authorization is still pending. You can set your password after authorization is
-              recorded.
-            </div>
-          ) : null}
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" noValidate>
               <FormSection>
@@ -144,7 +144,7 @@ export default function ActivatePage() {
                     <FormItem>
                       <FormLabel>Password</FormLabel>
                       <FormControl>
-                        <Input type="password" placeholder="At least 6 characters" {...field} />
+                        <Input type="password" placeholder={`At least ${PASSWORD_MIN_LENGTH} characters`} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -155,7 +155,7 @@ export default function ActivatePage() {
                   name="confirm"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Confirm Password</FormLabel>
+                      <FormLabel>Type the password again</FormLabel>
                       <FormControl>
                         <Input type="password" placeholder="Repeat your password" {...field} />
                       </FormControl>
@@ -164,13 +164,40 @@ export default function ActivatePage() {
                   )}
                 />
               </FormSection>
-              {serverError ? <p className="text-sm text-destructive">{serverError}</p> : null}
-              <Button type="submit" className="w-full" disabled={loading || Boolean(blockedByConsent)}>
-                {loading ? "Activating..." : isParent ? "Create Account" : "Activate Account"}
+              <Alert tone="info">
+                <p>
+                  <strong>Before you start:</strong> creating your password means you accept the{" "}
+                  <Link href="/terms" target="_blank" className="font-medium text-blue-700 underline">Terms of Use</Link> and the{" "}
+                  <Link href="/privacy" target="_blank" className="font-medium text-blue-700 underline">Privacy Policy</Link>.
+                  {!isParent && invite.isMinor ? (
+                    <>
+                      {" "}You are under 18, so your parent or guardian must know about and agree to your account (see
+                      &quot;Students under 18&quot; in the Terms).
+                    </>
+                  ) : null}
+                </p>
+              </Alert>
+              <label className="flex items-start gap-2 text-sm text-foreground">
+                <Checkbox className="mt-0.5" checked={acceptTerms} onChange={(e) => setAcceptTerms(e.target.checked)} required />
+                <span>
+                  I have read and accept the{" "}
+                  <Link href="/terms" target="_blank" className="text-blue-600 underline hover:text-blue-800">Terms of Use</Link> and the{" "}
+                  <Link href="/privacy" target="_blank" className="text-blue-600 underline hover:text-blue-800">Privacy Policy</Link>.
+                </span>
+              </label>
+              <InlineError>{serverError}</InlineError>
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={loading || !acceptTerms}
+                disabledReason={!acceptTerms ? "Accept the Terms of Use and the Privacy Policy to continue." : null}
+              >
+                {loading ? "Setting up…" : isParent ? "Create account" : "Finish setup"}
               </Button>
             </form>
           </Form>
         </Card>
+        <LegalLinks className="mt-4" />
       </div>
     </div>
   );

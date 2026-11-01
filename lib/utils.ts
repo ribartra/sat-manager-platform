@@ -12,12 +12,43 @@ export function formatTime(seconds: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
+/** Durations for totals and averages, in words: 65 → "1 min 5 s", 18760 → "5 h 13 min". */
+export function formatDuration(seconds: number): string {
+  const total = Math.max(0, Math.round(seconds));
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  if (h > 0) return m > 0 ? `${h} h ${m} min` : `${h} h`;
+  if (m > 0) return s > 0 ? `${m} min ${s} s` : `${m} min`;
+  return `${s} s`;
+}
+
+/**
+ * The app's teaching time zone (Lima, UTC-5, same as APP_UTC_OFFSET in lib/assignments). Dates are
+ * shown in it everywhere, so the server (UTC container) and every browser show the same day the
+ * teacher picked: a due date stored as 23:59 Lima is no longer shown as the next day.
+ */
+export const APP_TIME_ZONE = "America/Lima";
+
 export function formatDate(date: Date | string): string {
   return new Date(date).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
+    timeZone: APP_TIME_ZONE,
   });
+}
+
+/** A stored date as the YYYY-MM-DD value of an <input type="date">, in the app's time zone. */
+export function appDateInputValue(date: Date | string | null | undefined): string {
+  if (!date) return "";
+  const value = new Date(date);
+  return Number.isNaN(value.getTime()) ? "" : value.toLocaleDateString("en-CA", { timeZone: APP_TIME_ZONE });
+}
+
+/** Time of day, "3:42 PM". */
+export function formatClock(date: Date | string): string {
+  return new Date(date).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
 }
 
 export function scorePercent(correct: number, total: number): number {
@@ -37,4 +68,28 @@ export function statusColor(status: string): string {
     case "OVERDUE": return "text-red-600 bg-red-50";
     default: return "text-gray-600 bg-gray-50";
   }
+}
+
+/** Today's date in the browser's time zone as YYYY-MM-DD (value for <input type="date">). */
+export function localToday(): string {
+  const now = new Date();
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+}
+
+/** Relative day in plain words: "today", "tomorrow", "in 3 days", "2 weeks ago", "3 months ago". */
+export function relativeDay(date: Date | string, now: Date = new Date()): string {
+  const day = (d: Date) => Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+  const diff = Math.round((day(new Date(date)) - day(now)) / 86_400_000);
+  if (diff === 0) return "today";
+  if (diff === 1) return "tomorrow";
+  if (diff === -1) return "yesterday";
+  const n = Math.abs(diff);
+  const text = n < 14 ? `${n} days` : n < 60 ? `${Math.round(n / 7)} weeks` : `${Math.round(n / 30)} months`;
+  return diff > 0 ? `in ${text}` : `${text} ago`;
+}
+
+/** True when the date is still ahead (an open date not reached yet). */
+export function isAhead(date: Date | string) {
+  return new Date(date).getTime() > Date.now();
 }

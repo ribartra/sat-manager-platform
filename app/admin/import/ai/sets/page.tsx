@@ -1,4 +1,5 @@
-import { PageShell } from "@/components/sat";
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import { PageHeader, PageShell } from "@/components/sat";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
@@ -30,8 +31,8 @@ export default async function AiImportSetsPage({ searchParams }: PageProps) {
   if (!selectedBatchId) {
     return (
       <PageShell>
-        <h1 className="text-2xl font-semibold text-gray-900">Extracted Tests to review</h1>
-        <p className="mt-2 text-sm text-gray-500">No ingest batches yet.</p>
+        <Breadcrumbs items={[{ label: "Home", href: "/teacher" }, { label: "Admin" }, { label: "AI Import", href: "/admin/import/ai" }, { label: "Extracted Tests" }]} />
+        <PageHeader title="Extracted Tests to review" description="No ingest batches yet." />
         <Link href="/admin/import/ai" className="mt-4 inline-block text-sm text-blue-600 hover:underline">
           Go to AI Import
         </Link>

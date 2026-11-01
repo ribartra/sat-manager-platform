@@ -1,18 +1,19 @@
 "use client";
 
+import Link from "next/link";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { enrollmentStatusLabel } from "@/lib/domain-meta";
 
 type Enrollment = {
   studentId: string;
   status: string;
   active: boolean;
   enrolledAt: string;
-  parentApprovalStatus: string | null;
   parentApprovedAt: string | null;
   student: { id: string; name: string };
 };
@@ -194,8 +195,6 @@ function PendingRow({
     router.refresh();
   }
 
-  const parentPending = enrollment.parentApprovalStatus === "PENDING";
-
   return (
     <div className="flex items-center justify-between py-2">
       <div className="flex items-center gap-2 flex-wrap">
@@ -203,21 +202,14 @@ function PendingRow({
         <span className="text-amber-300">·</span>
         <span className="text-sm text-amber-800">{enrollment.student.name}</span>
         <span className="text-xs text-amber-500">{fmt(enrollment.enrolledAt)}</span>
-        {parentPending && (
-          <Badge variant="warning" className="text-xs">Awaiting parent</Badge>
-        )}
-        {enrollment.parentApprovalStatus === "APPROVED" && (
-          <Badge variant="success" className="text-xs">Parent ✓</Badge>
-        )}
       </div>
       <div className="flex gap-1">
         <Button
           size="sm"
           variant="ghost"
-          className="h-7 px-2 text-green-700 hover:bg-green-50 disabled:opacity-40"
+          className="h-7 px-2 text-green-700 hover:bg-green-50"
           onClick={() => act("approve")}
-          disabled={!!loading || parentPending}
-          title={parentPending ? "Parent consent required first" : undefined}
+          disabled={!!loading}
         >
           {loading === "approve" ? "..." : "Approve"}
         </Button>
@@ -258,21 +250,18 @@ function EnrollmentRow({
     router.refresh();
   }
 
-  const parentPending = enrollment.parentApprovalStatus === "PENDING";
-
   return (
     <div className="flex items-center justify-between py-2">
       <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-sm font-medium text-gray-800">
-          {enrollment.student.name}
-        </span>
-        <Badge variant={ENROLLMENT_VARIANT[enrollment.status]}>{enrollment.status}</Badge>
-        {parentPending && (
-          <Badge variant="warning" className="text-xs">Awaiting parent</Badge>
+        {/* Approved, active students open their page; pending ones are not in the program yet. */}
+        {enrollment.status === "APPROVED" && enrollment.active ? (
+          <Link href={`/teacher/students/${enrollment.studentId}`} className="text-sm font-medium text-gray-800 hover:text-[var(--sat-primary)] hover:underline">
+            {enrollment.student.name}
+          </Link>
+        ) : (
+          <span className="text-sm font-medium text-gray-800">{enrollment.student.name}</span>
         )}
-        {enrollment.parentApprovalStatus === "APPROVED" && (
-          <Badge variant="success" className="text-xs">Parent ✓</Badge>
-        )}
+        <Badge variant={ENROLLMENT_VARIANT[enrollment.status]}>{enrollmentStatusLabel(enrollment.status)}</Badge>
         <span className="text-xs text-gray-400">{fmt(enrollment.enrolledAt)}</span>
       </div>
       <div className="flex gap-1">
@@ -281,10 +270,9 @@ function EnrollmentRow({
             <Button
               size="sm"
               variant="ghost"
-              className="h-7 px-2 text-green-700 hover:bg-green-50 disabled:opacity-40"
+              className="h-7 px-2 text-green-700 hover:bg-green-50"
               onClick={() => act("approve")}
-              disabled={!!loading || parentPending}
-              title={parentPending ? "Parent consent required first" : undefined}
+              disabled={!!loading}
             >
               {loading === "approve" ? "..." : "Approve"}
             </Button>
@@ -342,7 +330,7 @@ export function TeacherProgramsClient({ programs }: { programs: Program[] }) {
       {allPending.length > 0 && (
         <Card variant="warning" padding="md" className="mb-6">
           <h2 className="mb-3 text-sm font-semibold text-amber-900">
-            Pending Enrollment Requests
+            Requests waiting for approval
           </h2>
           <div className="divide-y divide-amber-100">
             {allPending.map(({ program, enrollment }) => (
@@ -402,7 +390,7 @@ export function TeacherProgramsClient({ programs }: { programs: Program[] }) {
                       <p className="font-medium text-gray-900">{program.name}</p>
                       {pendingCount > 0 && (
                         <span className="text-xs text-amber-600">
-                          {pendingCount} pending
+                          {pendingCount} waiting for approval
                         </span>
                       )}
                     </td>

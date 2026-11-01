@@ -137,7 +137,7 @@ export function MathToolPanel({ config, graphArtifacts = [], enabled = true, cla
 function GraphArtifactList({ artifacts }: { artifacts: GraphArtifact[] }) {
   return (
     <div className="mb-2 rounded-md border border-blue-100 bg-blue-50 px-3 py-2">
-      <p className="mb-1 text-xs font-medium uppercase text-blue-700">Question graph data</p>
+      <p className="mb-1 text-xs font-medium uppercase text-blue-700">Equations and points from this question</p>
       <div className="flex flex-wrap gap-2">
         {artifacts.map((artifact) => (
           <span key={`${artifact.kind}-${artifact.label}-${artifact.latex}`} className="inline-flex items-center gap-1 rounded bg-white px-2 py-1 text-xs text-gray-700">

@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { Flag } from "lucide-react";
 import { MathContent } from "@/components/math-content";
+import { OptionContent } from "@/components/option-content";
 import { QuestionMedia } from "@/components/question-media";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { questionResponseLabel, resolveQuestionType } from "@/lib/question-type";
+import { questionResponseLabel, resolveQuestionType, isAnswerOption } from "@/lib/question-type";
 
 export type PlayerPreviewOption = {
   label: string;
@@ -98,7 +99,7 @@ export function QuestionPlayerPreview({
 
           {responseType === "MC" ? (
             <div className="space-y-2.5">
-              {options.filter((opt) => opt.text.trim()).map((opt) => {
+              {options.filter(isAnswerOption).map((opt) => {
                 const isEliminated = eliminated.has(opt.label);
                 return (
                   <div
@@ -123,8 +124,8 @@ export function QuestionPlayerPreview({
                         {opt.label}
                       </span>
                       <span className="min-w-0 flex-1">
-                        {opt.text.trim() ? (
-                          <MathContent content={opt.text} className="text-base text-gray-800" />
+                        {isAnswerOption(opt) ? (
+                          <OptionContent text={opt.text} imageUrl={opt.imageUrl} label={opt.label} className="text-base text-gray-800" />
                         ) : (
                           <span className="text-gray-300">Empty</span>
                         )}

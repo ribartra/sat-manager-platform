@@ -17,6 +17,11 @@ import {
 } from "@/components/ui/form";
 import { ErrorState, FormSection, LoadingState } from "@/components/sat";
 import { parentConsentSchema, type ParentConsentInput } from "@/contracts/auth";
+import { LegalLinks } from "@/components/legal/legal-page";
+import { Alert, InlineError } from "@/components/sat/alert";
+import { apiFetch, errorMessage } from "@/lib/api-client";
+import { PARENT_CONSENT_STATEMENT } from "@/lib/consent";
+import { formatDate } from "@/lib/utils";
 
 interface ConsentInfo {
   studentName: string;
@@ -24,6 +29,11 @@ interface ConsentInfo {
   parentName: string | null;
   parentEmail: string;
   approved: boolean;
+  isMinor?: boolean;
+  studentHasAccount?: boolean;
+  existingParent?: boolean;
+  accountConflict?: boolean;
+  consentVersion?: string;
 }
 
 export default function ParentConsentPage() {
@@ -41,35 +51,34 @@ export default function ParentConsentPage() {
 
   useEffect(() => {
     if (!token) {
-      queueMicrotask(() => setLoadError("Missing authorization token."));
+      queueMicrotask(() => setLoadError("This link is incomplete or has expired. Ask the teacher for a new one."));
       return;
     }
 
-    fetch(`/api/auth/parent-consent?token=${token}`)
-      .then((response) => response.json())
+    apiFetch<Parameters<typeof setInfo>[0] & { approved?: boolean }>(`/api/auth/parent-consent?token=${token}`)
       .then((data) => {
-        if (data.error) setLoadError(data.error);
-        else {
-          setInfo(data);
-          setApproved(Boolean(data.approved));
-        }
-      });
+        setInfo(data);
+        setApproved(Boolean(data?.approved));
+      })
+      .catch((error) => setLoadError(errorMessage(error)));
   }, [token]);
 
-  async function onSubmit(values: ParentConsentInput) {
+  async function submitConsent(password?: string) {
     setServerError("");
-    const response = await fetch("/api/auth/parent-consent", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token, password: values.password }),
-    });
-    const data = await response.json();
-    if (data.error) {
-      setServerError(data.error);
+    try {
+      await apiFetch("/api/auth/parent-consent", { method: "POST", json: { token, password } });
+    } catch (error) {
+      setServerError(errorMessage(error));
       return;
     }
     setApproved(true);
   }
+
+  async function onSubmit(values: ParentConsentInput) {
+    await submitConsent(values.password);
+  }
+
+  const [linking, setLinking] = useState(false);
 
   if (loadError) {
     return (
@@ -90,11 +99,14 @@ export default function ParentConsentPage() {
   const loading = form.formState.isSubmitting;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted px-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-muted px-4">
       <Card padding="lg" className="w-full max-w-md">
-        <h1 className="mb-2 text-lg font-semibold text-foreground">Parent Authorization</h1>
+        <h1 className="mb-2 text-lg font-semibold text-foreground">Parent approval</h1>
         <p className="mb-5 text-sm text-muted-foreground">
-          {info.parentName ?? info.parentEmail}, please authorize this SAT Practice account enrollment.
+          Hi {info.parentName ?? info.parentEmail}!{" "}
+          {info.isMinor
+            ? `Because ${info.studentName} is under 18, we need your OK to enroll them.`
+            : `${info.studentName}'s teacher asks for your OK. Once you accept, you can also receive their progress reports.`}
         </p>
         <div className="mb-5 rounded-md bg-muted p-4 text-sm text-foreground">
           <p>
@@ -108,23 +120,47 @@ export default function ParentConsentPage() {
           </p>
         </div>
         {approved ? (
-          <div className="rounded-md border border-green-200 bg-green-50 p-4 text-sm text-green-800">
-            Authorization recorded. The student can now activate their account.
+          <Alert tone="success">
+            {info.studentHasAccount
+              ? `Thanks! You have authorized ${info.studentName}'s account.`
+              : `Thanks! ${info.studentName} can now finish setting up their account.`}
+          </Alert>
+        ) : info.accountConflict ? (
+          <Alert tone="error" title="This email can't be used for a parent account">
+            It&apos;s already used by a different kind of account. Ask the teacher to send the invitation to a different
+            parent or guardian email.
+          </Alert>
+        ) : info.existingParent ? (
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">{PARENT_CONSENT_STATEMENT}</p>
+            <p className="text-sm text-muted-foreground">
+              You already have a parent account with this email. Approving adds this student to it — your password stays the
+              same.
+            </p>
+            <InlineError>{serverError}</InlineError>
+            <Button
+              className="w-full"
+              disabled={linking}
+              onClick={async () => {
+                setLinking(true);
+                await submitConsent();
+                setLinking(false);
+              }}
+            >
+              {linking ? "Approving…" : "Approve"}
+            </Button>
           </div>
         ) : (
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" noValidate>
-              <p className="text-sm text-muted-foreground">
-                By authorizing, you confirm that this student may create an account and be associated with the teacher
-                who issued the invitation.
-              </p>
+              <p className="text-sm text-muted-foreground">{PARENT_CONSENT_STATEMENT}</p>
               <FormSection>
                 <FormField
                   control={form.control}
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Parent account password</FormLabel>
+                      <FormLabel>Create a password for your parent account</FormLabel>
                       <FormControl>
                         <Input type="password" {...field} />
                       </FormControl>
@@ -146,14 +182,19 @@ export default function ParentConsentPage() {
                   )}
                 />
               </FormSection>
-              {serverError ? <p className="text-sm text-destructive">{serverError}</p> : null}
+              <InlineError>{serverError}</InlineError>
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Authorizing..." : "Authorize enrollment"}
+                {loading ? "Approving…" : "Approve"}
               </Button>
             </form>
           </Form>
         )}
       </Card>
+      <p className="mt-4 max-w-md text-center text-xs text-gray-500">
+        By approving, you accept the Terms of Use and the Privacy Policy.
+        {info.consentVersion ? ` Terms updated ${formatDate(`${info.consentVersion}T12:00:00`)}.` : ""}
+      </p>
+      <LegalLinks className="mt-1" />
     </div>
   );
 }

@@ -83,7 +83,7 @@ test.describe.serial("Incremental — Tutor → Alumno → Practice Set EASY", (
     const passwords = page.locator('input[type="password"]');
     await passwords.nth(0).fill(E2E.studentPassword);
     await passwords.nth(1).fill(E2E.studentPassword);
-    await page.getByRole("button", { name: "Activate Account" }).click();
+    await page.getByRole("button", { name: "Finish setup" }).click();
     await expect(page).toHaveURL(/\/login/, { timeout: 20_000 });
 
     await loginAs(page, student.email, E2E.studentPassword);
@@ -154,7 +154,7 @@ test.describe.serial("Incremental — Tutor → Alumno → Practice Set EASY", (
     await expect(page.getByRole("link", { name: "Full Practice Tests", exact: true })).toBeVisible();
 
     // Completed attempt appears (no longer empty state).
-    await expect(page.getByText(/No completed .*attempts yet/i)).toHaveCount(0);
+    await expect(page.getByText(/No finished .* sets yet/i)).toHaveCount(0);
     await expect(
       page.getByText(new RegExp(ps.name.split(" - ")[0] || "Circles|Attempt|Completed|%", "i")).first()
     ).toBeVisible({ timeout: 20_000 });
@@ -163,7 +163,7 @@ test.describe.serial("Incremental — Tutor → Alumno → Practice Set EASY", (
     await page.getByRole("link", { name: "Full Practice Tests", exact: true }).click();
     await expect(page).toHaveURL(/area=mocks/);
     await expect(page.getByText(ps.name)).toHaveCount(0);
-    await expect(page.getByRole("columnheader", { name: "R&W" })).toBeVisible();
+    await expect(page.getByRole("columnheader", { name: "Reading & Writing" })).toBeVisible();
 
     // Optional: open report for a progress summary.
     await page.goto(`/teacher/students/${ctx.studentId}/report?area=math`);

@@ -1,28 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
-import prisma from "@/lib/prisma";
-import { notifyUser } from "@/lib/notifications";
-import { studentAccessWhereFor } from "@/lib/program-scope";
+import prisma, { atomicBatches } from "@/lib/prisma";
+import { ASSIGN_BATCH_SIZE, parseDueDate, resolveOpenDate, parseUnlockDate, upsertPracticeAssignment, type AssignmentOutcome } from "@/lib/assignments";
+import { contentScopeFor, studentAccessWhereFor } from "@/lib/program-scope";
+import { BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
+import { writeAudit } from "@/lib/audit";
+import { ACTIVE_SOURCE_WHERE } from "@/lib/content-source";
 
-export async function POST(req: NextRequest) {
+export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await requireTeacherOrAdmin();
   if (!session) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return new ForbiddenError("Forbidden").toResponse();
   }
 
-  const { studentIds, practiceSetIds, dueDate, unlockAt, locked, sourceGroupId, feedbackMode } = await req.json();
+  const { studentIds, practiceSetIds, dueDate, unlockAt, locked, sourceGroupId, feedbackMode, showExplanations } = await req.json();
+  // "Show explanations in the player" (per student; on unless explicitly turned off).
+  const resolvedShowExplanations = showExplanations !== false;
   const resolvedFeedbackMode = feedbackMode === "IMMEDIATE" ? "IMMEDIATE" : "AFTER_SET";
   if (sourceGroupId && session.user.role !== "ADMIN") {
     const enabled = await getFeatureSetting("TEACHER_GROUP_MANAGEMENT");
-    if (!enabled) return NextResponse.json({ error: "Teacher group assignment is disabled." }, { status: 403 });
+    if (!enabled) return new ForbiddenError("Teacher group assignment is disabled.").toResponse();
   }
 
   const requestedStudentIds = Array.isArray(studentIds) ? studentIds.filter((id) => typeof id === "string") : [];
   const requestedPracticeSetIds = Array.isArray(practiceSetIds) ? practiceSetIds.filter((id) => typeof id === "string") : [];
 
   if (requestedStudentIds.length === 0 || requestedPracticeSetIds.length === 0) {
-    return NextResponse.json({ error: "Student and practice set selection is required." }, { status: 400 });
+    return new BadRequestError("Student and practice set selection is required.").toResponse();
   }
 
   const [allowedStudents, publishedPracticeSets] = await Promise.all([
@@ -34,8 +39,10 @@ export async function POST(req: NextRequest) {
       select: { id: true },
     }),
     prisma.practiceSet.findMany({
-      where: { id: { in: requestedPracticeSetIds }, status: "PUBLISHED" },
-      select: { id: true, name: true },
+      // Bank scope: sets of a program the teacher teaches.
+      // An inactive source's sets can't be assigned (unavailable).
+      where: { id: { in: requestedPracticeSetIds }, status: "PUBLISHED", ...ACTIVE_SOURCE_WHERE, ...contentScopeFor(session.user) },
+      select: { id: true, name: true, programId: true },
     }),
   ]);
 
@@ -45,11 +52,22 @@ export async function POST(req: NextRequest) {
   const unavailablePracticeSetIds = requestedPracticeSetIds.filter((practiceSetId) => !publishedPracticeSetIds.has(practiceSetId));
 
   if (inaccessibleStudentIds.length > 0) {
-    return NextResponse.json({ error: "One or more students are outside your program scope." }, { status: 403 });
+    return new ForbiddenError("One or more students are outside your program scope.").toResponse();
   }
 
   if (unavailablePracticeSetIds.length > 0) {
-    return NextResponse.json({ error: "Only published practice sets can be assigned." }, { status: 400 });
+    return new BadRequestError("Only published practice sets can be assigned.").toResponse();
+  }
+
+  // Each student must be enrolled in the program of every set assigned to them.
+  const setProgramIds = [...new Set(publishedPracticeSets.map((practiceSet) => practiceSet.programId ?? "__none__"))];
+  const enrollments = await prisma.programEnrollment.findMany({
+    where: { studentId: { in: requestedStudentIds }, programId: { in: setProgramIds }, active: true, status: "APPROVED" },
+    select: { studentId: true, programId: true },
+  });
+  const enrolled = new Set(enrollments.map((enrollment) => `${enrollment.studentId}:${enrollment.programId}`));
+  if (requestedStudentIds.some((studentId) => setProgramIds.some((programId) => !enrolled.has(`${studentId}:${programId}`)))) {
+    return new BadRequestError("Only practice sets from the student's program can be assigned.").toResponse();
   }
 
   if (sourceGroupId) {
@@ -57,82 +75,76 @@ export async function POST(req: NextRequest) {
       where: { id: sourceGroupId },
       include: { members: { select: { userId: true } } },
     });
-    if (!group) return NextResponse.json({ error: "Group not found." }, { status: 404 });
+    if (!group) return new NotFoundError("Group not found.").toResponse();
     const groupMemberIds = new Set(group.members.map((member) => member.userId));
     if (requestedStudentIds.some((studentId) => !groupMemberIds.has(studentId))) {
-      return NextResponse.json({ error: "Group assignment can only target current group members." }, { status: 400 });
+      return new BadRequestError("Group assignment can only target current group members.").toResponse();
     }
   }
 
-  const results = [];
+  const resolvedDueDate = parseDueDate(dueDate);
+  const resolvedUnlockAt = parseUnlockDate(unlockAt);
+  // "Keep it locked" only exists while Admin › Settings enables it (ASSIGN_LOCKED_OPTION, off by default).
+  const resolvedLocked = locked === true && (await getFeatureSetting("ASSIGN_LOCKED_OPTION"));
   if (sourceGroupId) {
     for (const practiceSetId of requestedPracticeSetIds) {
       await prisma.groupAssignment.upsert({
         where: { groupId_practiceSetId: { groupId: sourceGroupId, practiceSetId } },
         update: {
           assignedById: session.user.id,
-          dueDate: dueDate ? new Date(dueDate) : null,
-          unlockAt: unlockAt ? new Date(unlockAt) : null,
-          locked: locked ?? false,
+          dueDate: resolvedDueDate,
+          unlockAt: resolveOpenDate(resolvedUnlockAt, new Date(), resolvedLocked),
+          locked: resolvedLocked,
+          showExplanations: resolvedShowExplanations,
         },
         create: {
           groupId: sourceGroupId,
           practiceSetId,
           assignedById: session.user.id,
-          dueDate: dueDate ? new Date(dueDate) : null,
-          unlockAt: unlockAt ? new Date(unlockAt) : null,
-          locked: locked ?? false,
+          dueDate: resolvedDueDate,
+          unlockAt: resolveOpenDate(resolvedUnlockAt, new Date(), resolvedLocked),
+          locked: resolvedLocked,
+          showExplanations: resolvedShowExplanations,
         },
       });
     }
+    // Group-level rule (inherited by future members); per-student rows are audited in upsertPracticeAssignment.
+    await writeAudit({
+      userId: session.user.id,
+      action: "ASSIGN_GROUP_PRACTICE_SET",
+      targetType: "Group",
+      targetId: sourceGroupId,
+      metadata: {
+        practiceSetIds: requestedPracticeSetIds,
+        dueDate: resolvedDueDate?.toISOString() ?? null,
+        unlockAt: resolvedUnlockAt?.toISOString() ?? null,
+        locked: resolvedLocked,
+      },
+    });
   }
 
-  for (const studentId of requestedStudentIds) {
-    for (const practiceSetId of requestedPracticeSetIds) {
-      const existing = await prisma.assignment.findFirst({
-        where: { studentId, practiceSetId },
-      });
-      if (!existing) {
-        const a = await prisma.assignment.create({
-          data: {
-            studentId,
-            practiceSetId,
-            assignedById: session.user.id,
-            dueDate: dueDate ? new Date(dueDate) : null,
-            unlockAt: unlockAt ? new Date(unlockAt) : null,
-            locked: locked ?? false,
-            feedbackMode: resolvedFeedbackMode,
-            status: "PENDING",
-          },
-        });
-        const practiceSet = publishedPracticeSets.find((set) => set.id === practiceSetId);
-        await notifyUser(
-          studentId,
-          "New practice set assigned",
-          practiceSet?.name ?? "A practice set was assigned.",
-          "/student"
-        );
-        await prisma.auditLog.create({
-          data: {
-            userId: session.user.id,
-            action: "ASSIGN_PRACTICE_SET",
-            targetType: "Assignment",
-            targetId: a.id,
-            metadata: JSON.stringify({
-              studentId,
-              practiceSetId,
-              dueDate,
-              unlockAt,
-              locked: locked ?? false,
-              feedbackMode: resolvedFeedbackMode,
-              sourceGroupId: sourceGroupId ?? null,
-            }),
-          },
-        });
-        results.push(a as never);
-      }
-    }
-  }
+  // Assigning again never duplicates: pending assignments get the new settings,
+  // completed/overdue ones are reopened (see upsertPracticeAssignment).
+  // Written in batches of ASSIGN_BATCH_SIZE pairs per transaction (assignment, notification, audit).
+  const counts: Record<AssignmentOutcome, number> = { created: 0, updated: 0, reassigned: 0, unchanged: 0 };
+  const setNames = new Map(publishedPracticeSets.map((set) => [set.id, set.name]));
+  const pairs = requestedStudentIds.flatMap((studentId) => requestedPracticeSetIds.map((practiceSetId) => ({ studentId, practiceSetId })));
+  await atomicBatches(pairs, ASSIGN_BATCH_SIZE, async ({ studentId, practiceSetId }) => {
+    const { outcome } = await upsertPracticeAssignment({
+      studentId,
+      practiceSetId,
+      practiceSetName: setNames.get(practiceSetId) ?? "A practice set was assigned.",
+      assignedById: session.user.id,
+      dueDate: resolvedDueDate,
+      unlockAt: resolvedUnlockAt,
+      locked: resolvedLocked,
+      feedbackMode: resolvedFeedbackMode,
+      showExplanations: resolvedShowExplanations,
+      sourceGroupId: sourceGroupId ?? null,
+    });
+    counts[outcome] += 1;
+  });
 
-  return NextResponse.json({ created: results.length });
-}
+  // `skipped` kept for older clients: assignments that needed no change.
+  return NextResponse.json({ ...counts, skipped: counts.unchanged });
+});

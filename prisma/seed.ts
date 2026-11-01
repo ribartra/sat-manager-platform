@@ -25,7 +25,7 @@ async function main() {
     where: { email: "admin@sat.com" },
     update: { active: true, validationStatus: "APPROVED" },
     create: {
-      name: "SAT Admin",
+      name: "Sat Admin",
       email: "admin@sat.com",
       passwordHash: adminHash,
       role: "ADMIN",
@@ -86,14 +86,16 @@ async function main() {
   const teacherHash = await bcrypt.hash("teacher123", 10);
   const teacher = await prisma.user.upsert({
     where: { email: "teacher@sat.com" },
-    update: { active: true, validationStatus: "APPROVED" },
+    // The SAT Teacher account is the master teacher (Teachers menu).
+    update: { active: true, validationStatus: "APPROVED", canManageTeachers: true },
     create: {
-      name: "SAT Teacher",
+      name: "Sat Teacher",
       email: "teacher@sat.com",
       passwordHash: teacherHash,
       role: "TEACHER",
       active: true,
       validationStatus: "APPROVED",
+      canManageTeachers: true,
     },
   });
 

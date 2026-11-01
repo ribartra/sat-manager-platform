@@ -1,0 +1,22 @@
+[
+ {
+  "table": "Question",
+  "id": "cmsjrnw88011bqmt1xskeplzv",
+  "field": "explanation",
+  "before": "Zeros of a polynomial are where the function crosses the x-axis. From the graph of the degree-4 polynomial, the curve appears to cross the x-axis near x = −2 (among other locations). If f(x) has a zero at x = −2, then (x+2) must be a factor.\n✗ A: (x−5) would require a zero at x = 5; the graph doesn't clearly show this.\n✗ B: (x−4) would require a zero at x = 4; not supported by the graph.\n✗ C: (x+1) would require a zero at x = −1; graph doesn't cross there clearly.",
+  "after": "Choice C is correct. If $(x-k)$ is a factor of $f(x)$, then $f(k)=0$, so the graph of $y=f(x)$ meets the $x$-axis at $x=k$. The graph crosses the $x$-axis at $x=-5$ and $x=-1$. Since $f(-1)=0$, $x-(-1)$, or $(x+1)$, must be a factor of $f(x)$.\nChoice A is incorrect. $(x-5)$ would require $f(5)=0$, but the graph is above the $x$-axis at $x=5$.\nChoice B is incorrect. $(x-4)$ would require $f(4)=0$, but at $x=4$ the graph is above the $x$-axis and doesn't touch it.\nChoice D is incorrect. $(x+2)$ would require $f(-2)=0$, but the graph is below the $x$-axis at $x=-2$.",
+  "note": "T9 Math M1 #21: explanation argued for D (x+2) while the key is C; rewritten for C from the graph (zeros at -5 and -1)",
+  "class": "other",
+  "evidence": "graph /uploads/questions/b6b1e564…; key C = Ans Key docx; docx explanation itself wrong"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnw8l011dqmt1owbpkau5",
+  "field": "explanation",
+  "before": null,
+  "after": "Choice D is correct. The line shown is the graph of $y=g(x)-5$. It passes through the points $(-6,-2)$ and $(0,3)$, so its slope is $\\frac{3-(-2)}{0-(-6)}=\\frac{5}{6}$ and its $y$-intercept is $3$. So $g(x)-5=\\frac{5}{6}x+3$. Adding $5$ to both sides gives $g(x)=\\frac{5}{6}x+8$.\nChoice A is incorrect. It has the wrong $y$-intercept: $g(0)=3+5=8$, not $-5$.\nChoice B is incorrect. This is the result of subtracting $5$ from the line's equation instead of adding $5$.\nChoice C is incorrect. This is the equation of the line shown, $y=g(x)-5$, not of $g(x)$.",
+  "note": "T9 Math M1 #22: explanation was missing; written from the graph (docx text had a wrong point (0, -2))",
+  "class": "other",
+  "evidence": "graph /uploads/questions/41ed2994… passes (-6,-2) and (0,3); key D"
+ }
+]

@@ -1,32 +1,52 @@
-import { PageShell } from "@/components/sat";
+import { Delta, InvalidatedNotice, PageHeader, PageShell, SectionHeader, VoidableValue } from "@/components/sat";
+import { PAGE_TITLE_CLASS } from "@/components/sat/page-shell";
+import { HEADER_ACTION_CLASS, HeaderActions } from "@/components/sat/header-actions";
+import { ReviewQuestionCard } from "@/components/sat/review-question-card";
+import { ResultFilterBar, ResultFilterEmpty, ResultFilterRoot, ResultFilterSegments } from "@/components/sat/result-filter";
+import { parseEliminatedOptions } from "@/lib/answer-review-meta";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
-import { formatDate, formatTime, scorePercent } from "@/lib/utils";
+import { formatClock, formatDate, formatDuration } from "@/lib/utils";
+import { shortSetName } from "@/lib/student-report";
 import { scoreBandTextClass } from "@/lib/score-band";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { MathContent } from "@/components/math-content";
-import { QuestionMedia } from "@/components/question-media";
-import { CheckCircle, XCircle, MinusCircle, ChevronLeft, RotateCcw } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 import { parseSnapshot, PracticeSetSnapshot, QuestionSnapshot } from "@/lib/attempt-snapshots";
-import { formatCorrectAnswer } from "@/lib/answer-grading";
-import { resolveQuestionType } from "@/lib/question-type";
-import { difficultyBadgeVariant, difficultyLabel } from "@/lib/domain-meta";
+import { difficultyBadgeVariant, difficultyLabel, explanationsInPlayerLabel } from "@/lib/domain-meta";
+import { isAnsweredAnswer, summarizeAllQuestionAnswers } from "@/lib/weighted-score";
+import { Alert } from "@/components/sat/alert";
+import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import { TryNavigator } from "@/components/sat/try-navigator";
+import { practiceSetTitle } from "@/lib/attempt-groups";
+import { AreaTag } from "@/components/sat/practice-set-row";
+import { AnswerGrid, AnswerGridLegend } from "@/components/sat/test-ui";
+import { tabFromPracticeArea, type PracticeAreaCode } from "@/lib/practice-area";
+import { loadStudentPractice, sortPracticeSets } from "@/lib/student-practice";
+import { relativeDay } from "@/lib/utils";
+import { liveImagesOf } from "@/lib/question-media";
 
 interface PageProps {
   params: Promise<{ attemptId: string }>;
+  searchParams: Promise<{ area?: string; topic?: string; difficulty?: string; from?: string; to?: string; new?: string }>;
 }
 
-export default async function ResultsPage({ params }: PageProps) {
+export default async function ResultsPage({ params, searchParams }: PageProps) {
   const { attemptId } = await params;
   const session = await auth();
   if (!session) redirect("/login");
   const userId = session.user.id;
+  const query = await searchParams;
+  const returnQuery = new URLSearchParams();
+  for (const key of ["area", "topic", "difficulty", "from", "to"] as const) {
+    if (query[key]) returnQuery.set(key, query[key]!);
+  }
+  const historyHref = returnQuery.toString() ? `/student/history?${returnQuery.toString()}` : "/student/history";
 
   const attempt = await prisma.attempt.findFirst({
-    where: { id: attemptId, studentId: userId, status: "SUBMITTED" },
+    where: { id: attemptId, studentId: userId, status: { in: ["SUBMITTED", "INVALIDATED"] } },
     include: {
       answers: {
         include: {
@@ -40,7 +60,7 @@ export default async function ResultsPage({ params }: PageProps) {
       },
       assignment: {
         include: {
-          practiceSet: { include: { topic: { include: { domain: { include: { section: true } } } } } },
+          practiceSet: { include: { source: { select: { name: true } }, topic: { include: { domain: { include: { section: true } } } } } },
         },
       },
       pauses: true,
@@ -58,10 +78,15 @@ export default async function ResultsPage({ params }: PageProps) {
 
   const snapshotQuestionOrder = practiceSetSnapshot?.questions?.map((question) => question.id) ?? [];
   const totalQuestions = snapshotQuestionOrder.length || psQuestions.length;
-  const correct = attempt.answers.filter((a) => a.isCorrect).length;
-  const incorrect = attempt.answers.filter((a) => !a.isCorrect && a.answer !== null).length;
-  const unanswered = totalQuestions - correct - incorrect;
-  const pct = scorePercent(correct, totalQuestions);
+  const scoreRows = attempt.answers.length >= totalQuestions
+    ? attempt.answers
+    : [...attempt.answers, ...Array.from({ length: totalQuestions - attempt.answers.length }, () => ({ answer: null, isCorrect: false }))];
+  const score = summarizeAllQuestionAnswers(scoreRows);
+  const correct = score.correct;
+  const answeredTotal = attempt.answers.filter(isAnsweredAnswer).length;
+  const incorrect = attempt.answers.filter((a) => a.answer?.trim() && !a.isCorrect).length;
+  const unanswered = Math.max(0, totalQuestions - answeredTotal);
+  const pct = score.percent ?? 0;
   const completedPauses = attempt.pauses.filter((pause) => pause.durationSeconds !== null);
   const pauseSeconds = completedPauses.reduce((sum, pause) => sum + (pause.durationSeconds ?? 0), 0);
 
@@ -79,198 +104,211 @@ export default async function ResultsPage({ params }: PageProps) {
     : psQuestions.map((psq) => psq.questionId);
   const orderedAnswers = orderedQuestionIds.map((questionId) => answersMap[questionId]).filter(Boolean);
 
-  const displayPct = typeof attempt.scorePercent === "number" ? attempt.scorePercent : pct;
+  const displayPct = pct;
+  const practiceArea = (practiceSet?.topic.domain.practiceArea ?? null) as PracticeAreaCode | null;
+  const areaTab = practiceArea ? tabFromPracticeArea(practiceArea) : null;
+  const allPractice = await loadStudentPractice(userId);
+  const thisSet = attempt.assignmentId ? allPractice.find((p) => p.assignmentId === attempt.assignmentId) : undefined;
+  const tries = thisSet?.tries ?? [];
+  const thisTry = tries.find((t) => t.id === attempt.id);
+  const prevTry = thisTry ? tries[thisTry.tryNumber - 2] : undefined;
+  const delta = prevTry && prevTry.pct !== null ? displayPct - prevTry.pct : null;
+  const nextAssignment = sortPracticeSets(allPractice.filter((p) => p.state !== "done" && p.assignmentId !== attempt.assignmentId && !p.locked))[0];
+  const perQuestion = attempt.totalTime && totalQuestions ? Math.round(attempt.totalTime / totalQuestions) : null;
+  const tryAgainHref = attempt.assignmentId ? `/student/practice/assignment/${attempt.assignmentId}?start=1` : "/student/practice";
+
+  const counts = {
+    ok: canRevealSolutions ? correct : 0,
+    bad: canRevealSolutions ? incorrect : 0,
+    blank: unanswered,
+  };
 
   return (
-    <PageShell width="narrow">
-      {/* Back */}
-      <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-        <Link href="/student/history" className="hover:text-blue-600 flex items-center gap-1">
-          <ChevronLeft size={14} /> History
-        </Link>
-      </div>
+    <PageShell>
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/student" },
+          { label: "Practice", href: areaTab ? `/student/practice?area=${areaTab}` : "/student/practice" },
+          // Back to the same History list the student came from (area, skill, level and dates kept).
+          { label: "History", href: query.area || !areaTab ? historyHref : `/student/history?area=${areaTab}` },
+          // Source › <Practice set (Level)> › Try M of N — the same pattern as a Test attempt.
+          ...(practiceSet?.source ? [{ label: practiceSet.source.name }] : []),
+          { label: practiceSetTitle(practiceSet?.name ?? practiceSetSnapshot?.name ?? "Practice set", practiceSet?.difficulty) },
+          { label: `Try ${thisTry?.tryNumber ?? attempt.attemptNumber} of ${Math.max(tries.length, 1)}` },
+        ]}
+      />
+      {query.new === "1" ? <Alert tone="success" className="mb-4">Practice submitted. Here are your results.</Alert> : null}
 
-      {/* Score header */}
-      <div className="rounded-xl border border-gray-200 bg-white p-6 mb-6">
-        <h1 className="text-lg font-semibold text-gray-900 mb-1">
-          {practiceSetSnapshot?.name ?? practiceSet?.name ?? "Practice Set"}
-        </h1>
-        <p className="text-xs text-gray-400 mb-4">
-          Attempt #{attempt.attemptNumber} · {attempt.submittedAt ? formatDate(attempt.submittedAt) : ""}
-        </p>
-
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <div className="text-center">
-            <p className="text-3xl font-bold text-gray-900">{correct}/{totalQuestions}</p>
-            <p className="text-xs text-gray-500 mt-0.5">Correct</p>
-          </div>
-          <div className="text-center">
-            <p className={`text-3xl font-bold ${scoreBandTextClass(displayPct)}`}>
-              {displayPct}%
-            </p>
-            <p className="text-xs text-gray-500 mt-0.5">Percent</p>
-          </div>
-          <div className="text-center">
-            <p className="text-3xl font-bold text-gray-900">{attempt.totalTime ? formatTime(attempt.totalTime) : "—"}</p>
-            <p className="text-xs text-gray-500 mt-0.5">Time</p>
-          </div>
-          <div className="text-center">
-            <div className="flex justify-center gap-2 text-sm">
-              <span className="text-green-600">✓ {correct}</span>
-              <span className="text-red-500">✗ {incorrect}</span>
-              <span className="text-gray-400">– {unanswered}</span>
+      {attempt.status === "INVALIDATED" ? <InvalidatedNotice audience="student" /> : null}
+      {/* Header: title on the left, actions top right (same slot and style for every role). */}
+      <PageHeader
+        eyebrow={
+          practiceArea || practiceSet ? (
+            <>
+              {practiceArea ? <AreaTag area={practiceArea} /> : null}
+              {practiceSet ? <Badge variant={difficultyBadgeVariant(practiceSet.difficulty)}>{difficultyLabel(practiceSet.difficulty)}</Badge> : null}
+            </>
+          ) : undefined
+        }
+        title={
+          <>
+            <h1 className={PAGE_TITLE_CLASS}>{practiceSet?.topic.name ?? shortSetName(practiceSetSnapshot?.name ?? "Practice set")}</h1>
+            <div className="mt-2">
+              <TryNavigator
+                current={thisTry?.tryNumber ?? attempt.attemptNumber}
+                tries={tries.map((t) => ({
+                  number: t.tryNumber,
+                  href: `/student/results/${t.id}${returnQuery.toString() ? `?${returnQuery.toString()}` : ""}`,
+                  detail: [t.submittedAt ? formatDate(t.submittedAt) : null, t.pct !== null ? `${t.pct}%` : null].filter(Boolean).join(" · "),
+                }))}
+              />
             </div>
-            <p className="text-xs text-gray-500 mt-0.5">Breakdown</p>
+          </>
+        }
+        description={
+          <span className="text-xs">
+            {attempt.submittedAt ? (
+              <>
+                Completed <b className="font-medium text-gray-700">{formatDate(attempt.submittedAt)}</b> at {formatClock(attempt.submittedAt)} ({relativeDay(attempt.submittedAt)})
+              </>
+            ) : null}
+            {practiceSet?.source ? <> · Source: <b className="font-medium text-gray-700">{practiceSet.source.name}</b></> : null}
+            {attempt.assignment?.createdAt ? <> · Assigned {formatDate(attempt.assignment.createdAt)}</> : null}
+            {` · ${explanationsInPlayerLabel(attempt.showExplanations ?? attempt.assignment?.showExplanations)}`}
+          </span>
+        }
+        actions={
+          <HeaderActions>
+            <Link href={tryAgainHref} className={HEADER_ACTION_CLASS}><RotateCcw size={14} aria-hidden /> Try Again</Link>
+            {nextAssignment ? (
+              <Link href={`/student/practice/assignment/${nextAssignment.assignmentId}`} className={`${HEADER_ACTION_CLASS} max-w-full`}>
+                <span className="truncate">Next: {nextAssignment.skill} · {difficultyLabel(nextAssignment.difficulty)}</span>
+              </Link>
+            ) : null}
+            <Link href="/student" className={HEADER_ACTION_CLASS}>Summary</Link>
+          </HeaderActions>
+        }
+      />
+
+      <ResultFilterRoot>
+        {/* Score */}
+        <Card padding="lg" className="mb-6">
+
+          <div className="grid gap-5 md:grid-cols-[auto_1fr] md:items-center">
+            <div>
+              <p className={`text-5xl font-bold leading-none ${scoreBandTextClass(displayPct)}`}>
+                <VoidableValue status={attempt.status}>{displayPct}%</VoidableValue>
+              </p>
+              <p className="mt-1 text-sm text-gray-600">
+                <VoidableValue status={attempt.status}>{correct} of {totalQuestions} correct</VoidableValue>
+              </p>
+              {delta !== null ? <Delta value={delta} unit="%" suffix={`vs. try ${prevTry!.tryNumber} (${prevTry!.pct}%)`} className="mt-1 block" /> : null}
+            </div>
+            <div>
+              <p className="text-sm text-gray-700">
+                You answered <b className="text-green-700">{correct} correctly</b>, <b className="text-red-600">{incorrect} incorrectly</b> and left{" "}
+                <b className="text-gray-600">{unanswered} blank</b>.
+              </p>
+              <div className="mt-1.5">
+                <ResultFilterBar counts={{ ok: correct, bad: incorrect, blank: unanswered }} interactive={canRevealSolutions} />
+              </div>
+              <p className="mt-1 text-xs text-gray-500">
+                {canRevealSolutions ? "Click a colour to see only those questions. " : ""}
+                {attempt.totalTime ? <>{formatDuration(attempt.totalTime)} total{perQuestion ? ` · ${formatDuration(perQuestion)} per question on average` : ""}</> : null}
+              </p>
+            </div>
           </div>
-        </div>
 
-        {attempt.pauses.length > 0 && (
-          <p className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
-            Paused {attempt.pauses.length} time{attempt.pauses.length === 1 ? "" : "s"}
-            {pauseSeconds > 0 ? ` · total pause time ${formatTime(pauseSeconds)}` : ""}
-          </p>
-        )}
-
-        <div className="mt-5 flex items-center gap-3">
-          <Link
-            href={attempt.assignmentId ? `/student/practice/assignment/${attempt.assignmentId}` : "/student/practice-sets"}
-            className="flex items-center gap-1.5 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-          >
-            <RotateCcw size={14} /> Try Again
-          </Link>
-          <Link
-            href="/student"
-            className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-          >
-            ← Dashboard
-          </Link>
-        </div>
-      </div>
-
-      {attempt.teacherComment && (
-        <Card variant="info" padding="md" className="mb-6 text-sm text-blue-900">
-          <p className="mb-1 font-medium">Teacher comment</p>
-          <p>{attempt.teacherComment}</p>
+          {attempt.pauses.length > 0 && (
+            <Alert tone="note" className="mt-4 text-xs">
+              Paused {attempt.pauses.length} time{attempt.pauses.length === 1 ? "" : "s"}
+              {pauseSeconds > 0 ? ` (${formatDuration(pauseSeconds)})` : ""}
+            </Alert>
+          )}
         </Card>
-      )}
 
-      {/* Per-question review */}
-      <div>
-        <h2 className="text-base font-semibold text-gray-900 mb-3">Question Review</h2>
-        {!canRevealSolutions && (
-          <p className="mb-3 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-500">
-            Correct answers and explanations are hidden for this Practice Set.
-          </p>
+        {attempt.teacherComment && (
+          <Card variant="info" padding="md" className="mb-6 text-sm text-blue-900">
+            <p className="mb-1 font-medium">Note from your teacher</p>
+            <p>{attempt.teacherComment}</p>
+          </Card>
         )}
-        <div className="space-y-4">
-          {orderedAnswers.map((ans, i) => {
-            if (!ans) return null;
-            const snapshot = parseSnapshot<QuestionSnapshot>(ans.questionSnapshot);
-            const question = snapshot ?? ans.question;
-            const options = snapshot?.options?.length ? snapshot.options : ans.question.options;
-            const responseType = resolveQuestionType(question.type, options);
-            const topicName = snapshot?.topic?.name ?? ans.question.topic.name;
-            const isUnanswered = !ans.answer;
-            const isCorrect = ans.isCorrect;
-            const statusClass = !canRevealSolutions
-              ? isUnanswered
-                ? "border-gray-200 bg-gray-50"
-                : "border-blue-100 bg-blue-50"
-              : isCorrect
-              ? "border-green-200 bg-green-50"
-              : isUnanswered
-              ? "border-gray-200 bg-gray-50"
-              : "border-red-200 bg-red-50";
 
-            return (
-              <Card key={ans.id} padding="md" className={statusClass}>
-                  <div className="flex items-start justify-between gap-3 mb-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-gray-500">Q{i + 1}</span>
-                      {isUnanswered ? (
-                        <MinusCircle size={16} className="text-gray-400" />
-                      ) : canRevealSolutions && isCorrect ? (
-                        <CheckCircle size={16} className="text-green-600" />
-                      ) : canRevealSolutions ? (
-                        <XCircle size={16} className="text-red-500" />
-                      ) : (
-                        <span className="h-4 w-4 rounded-full border border-blue-300 bg-white" />
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant={difficultyBadgeVariant(question.difficulty)}>
-                        {difficultyLabel(question.difficulty)}
-                      </Badge>
-                      {ans.timeSpent !== null && (
-                        <span className="text-xs text-gray-500">{formatTime(ans.timeSpent)}</span>
-                      )}
-                      <span className="text-xs text-gray-500">{topicName}</span>
-                    </div>
-                  </div>
+        {canRevealSolutions && orderedAnswers.length > 0 ? (
+          <Card padding="md" className="mb-6">
+            <SectionHeader
+              size="sm"
+              title="Your answers at a glance"
+              description="Each square is a question. Click one to see it."
+              action={<ResultFilterSegments counts={counts} />}
+            />
+            <div className="mt-2">
+              <AnswerGrid
+                idPrefix="q-"
+                items={orderedAnswers.map((a) => ({ state: !a?.answer ? ("blank" as const) : a.isCorrect ? ("ok" as const) : ("bad" as const) }))}
+              />
+            </div>
+            <AnswerGridLegend />
+          </Card>
+        ) : null}
 
-                  <MathContent content={question.stem} className="text-sm text-gray-800 mb-3" />
-                  <QuestionMedia imageUrl={question.imageUrl} alt={`Question ${i + 1} image`} className="mb-3" />
-
-                  {responseType === "MC" && (
-                    <div className="space-y-1 mb-3">
-                      {options.filter((opt) => opt.text.trim()).map((opt) => {
-                        const studentPick = ans.answer === opt.label;
-                        const isRight = canRevealSolutions && question.correctAnswer === opt.label;
-                        const optionClass = isRight
-                          ? "bg-green-100 text-green-800"
-                          : studentPick && canRevealSolutions
-                          ? "bg-red-100 text-red-700 line-through"
-                          : studentPick
-                          ? "bg-blue-100 text-blue-800"
-                          : "text-gray-600";
-                        return (
-                          <div key={opt.label} className={`flex items-start gap-2 text-sm px-2 py-1 rounded ${optionClass}`}>
-                            <span className="font-medium w-4">{opt.label})</span>
-                            <span className="min-w-0 flex-1">
-                              <MathContent content={opt.text} />
-                            </span>
-                          </div>
-            );
-          })}
-                    </div>
-                  )}
-
-                  {responseType === "NUMERIC" && (
-                    <div className="mb-3 flex flex-wrap gap-4 text-sm">
-                      <span className="text-gray-600">Your answer: <span className="font-medium text-gray-900">{ans.answer || "—"}</span></span>
-                      {canRevealSolutions && (
-                        <span className={isCorrect ? "text-green-700" : "text-red-700"}>
-                          Correct answer: <span className="font-medium">{formatCorrectAnswer(question.correctAnswer)}</span>
-                        </span>
-                      )}
-                    </div>
-                  )}
-
-                  {isUnanswered && (
-                    <p className="text-xs text-gray-400 italic">Unanswered - no explanation shown</p>
-                  )}
-
-                  {(ans.markedForReview || ans.note || ans.eliminatedOptions) && (
-                    <div className="mt-2 rounded border border-gray-200 bg-white p-2 text-xs text-gray-600">
-                      {ans.markedForReview && <p className="font-medium text-amber-700">Marked for review</p>}
-                      {ans.note && <p className="mt-1">Note: {ans.note}</p>}
-                      {ans.eliminatedOptions && (
-                        <p className="mt-1">Eliminated: {JSON.parse(ans.eliminatedOptions).join(", ")}</p>
-                      )}
-                    </div>
-                  )}
-
-                  {canRevealSolutions && !isUnanswered && question.explanation && (
-                    <div className="mt-2 pt-2 border-t border-gray-200">
-                      <p className="text-xs font-medium text-gray-500 mb-1">Explanation</p>
-                      <MathContent content={question.explanation} className="text-sm text-gray-700" />
-                    </div>
-                  )}
-              </Card>
+        {/* Per-question review */}
+        <section>
+          <h2 className="mb-3 text-base font-semibold text-gray-900">Your answers, question by question</h2>
+          {!canRevealSolutions && (
+            <p className="mb-3 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-500">
+              Your teacher has hidden the answers for this set.
+            </p>
+          )}
+          <ResultFilterEmpty counts={counts} />
+          <div className="space-y-4">
+            {orderedAnswers.map((ans, i) => {
+              if (!ans) return null;
+              // Historic attempts render the question as it was when answered (questionSnapshot).
+              const snapshot = parseSnapshot<QuestionSnapshot>(ans.questionSnapshot);
+              const question = snapshot ?? ans.question;
+              // Text and options as answered (snapshot); images from the live bank question (only referenced).
+              const media = liveImagesOf(ans.question, snapshot?.options?.length ? snapshot.options : ans.question.options);
+              const options = media.options;
+              const topicName = snapshot?.topic?.name ?? ans.question.topic.name;
+              const state = !ans.answer ? "blank" : ans.isCorrect ? "ok" : "bad";
+              return (
+                <div key={ans.id} data-q-state={canRevealSolutions ? state : state === "blank" ? "blank" : "answered"}>
+                  <ReviewQuestionCard
+                    id={`q-${i + 1}`}
+                    number={i + 1}
+                    question={{ ...question, options, imageUrl: media.imageUrl }}
+                    answer={ans.answer}
+                    isCorrect={Boolean(ans.isCorrect)}
+                    timeSpent={ans.timeSpent}
+                    reveal={canRevealSolutions}
+                    blankNote="You left this blank."
+                    tags={
+                      <>
+                        <Badge variant={difficultyBadgeVariant(question.difficulty)}>{difficultyLabel(question.difficulty)}</Badge>
+                        <span>{topicName}</span>
+                      </>
+                    }
+                  >
+                    <ReviewTools marked={Boolean(ans.markedForReview)} note={ans.note} eliminated={parseEliminatedOptions(ans.eliminatedOptions)} />
+                  </ReviewQuestionCard>
+                </div>
               );
-          })}
-        </div>
-      </div>
+            })}
+          </div>
+        </section>
+      </ResultFilterRoot>
     </PageShell>
+  );
+}
+
+function ReviewTools({ marked, note, eliminated }: { marked: boolean; note: string | null; eliminated: string[] }) {
+  if (!marked && !note && eliminated.length === 0) return null;
+  return (
+    <div className="mb-2 rounded border border-gray-200 bg-white p-2 text-xs text-gray-600">
+      {marked ? <p className="font-medium text-amber-700">Marked for review</p> : null}
+      {note ? <p className="mt-1">Your note: {note}</p> : null}
+      {eliminated.length > 0 ? <p className="mt-1">Crossed out: {eliminated.join(", ")}</p> : null}
+    </div>
   );
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/rbac";
 import { notify } from "@/lib/notify";
+import { BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
   params: Promise<{ userId: string }>;
@@ -9,25 +10,25 @@ interface RouteContext {
 
 const VALID_STATUSES = new Set(["PENDING", "APPROVED", "REJECTED"]);
 
-export async function POST(req: NextRequest, { params }: RouteContext) {
+export const POST = withApiErrors(async function POST(req: NextRequest, { params }: RouteContext) {
   const session = await requireAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const { userId } = await params;
   const { validationStatus } = await req.json();
   if (typeof validationStatus !== "string" || !VALID_STATUSES.has(validationStatus)) {
-    return NextResponse.json({ error: "Invalid validation status" }, { status: 400 });
+    return new BadRequestError("Invalid validation status").toResponse();
   }
 
   if (userId === session.user.id && validationStatus !== "APPROVED") {
-    return NextResponse.json({ error: "Administrators cannot revoke their own validation." }, { status: 400 });
+    return new BadRequestError("Administrators cannot revoke their own validation.").toResponse();
   }
 
   const target = await prisma.user.findUnique({
     where: { id: userId },
     select: { id: true, name: true, role: true },
   });
-  if (!target) return NextResponse.json({ error: "User not found" }, { status: 404 });
+  if (!target) return new NotFoundError("User not found").toResponse();
 
   const reviewed = validationStatus !== "PENDING";
   const updated = await prisma.user.update({
@@ -63,4 +64,4 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
   }
 
   return NextResponse.json(updated);
-}
+});

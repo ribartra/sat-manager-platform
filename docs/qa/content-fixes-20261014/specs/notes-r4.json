@@ -1,0 +1,122 @@
+[
+ {
+  "table": "Question",
+  "id": "cmsjrnwt7019dqmt14cfxvtbt",
+  "field": "stimulus",
+  "before": "notes:\n- One of the largest art thefts in modern history occurred at The Isabella Stewart Gardner Museum in Boston, Massachusetts, on March 18, 1990.\n- The stolen artworks were worth an estimated $500 million and included masterpieces by renowned artists such as Rembrandt Harmenszoon van Rijn and Johannes Vermeer, including his piece *The Concert*, which is considered one of the most valuable paintings in the world.\n- Among the stolen artworks was a bronze *gu*, a vessel used for serving wine in ancient China that was worth only a few thousand dollars.\n- The stolen artworks were cut out from their frames, leaving empty frames hanging on the museum walls, which still serve as a haunting reminder of the missing masterpieces and the unsolved crime.\n- Despite extensive investigations by the Federal Bureau of Investigation to recover the stolen artworks, the case remains unsolved.\n- As of 2017, The Gardner Museum offered a reward of $10 million for information leading to the recovery of the stolen pieces.",
+  "after": "While researching a topic, a student has taken the following notes:\n- One of the largest art thefts in modern history occurred at The Isabella Stewart Gardner Museum in Boston, Massachusetts, on March 18, 1990.\n- The stolen artworks were worth an estimated $500 million and included masterpieces by renowned artists such as Rembrandt Harmenszoon van Rijn and Johannes Vermeer, including his piece *The Concert*, which is considered one of the most valuable paintings in the world.\n- Among the stolen artworks was a bronze *gu*, a vessel used for serving wine in ancient China that was worth only a few thousand dollars.\n- The stolen artworks were cut out from their frames, leaving empty frames hanging on the museum walls, which still serve as a haunting reminder of the missing masterpieces and the unsolved crime.\n- Despite extensive investigations by the Federal Bureau of Investigation to recover the stolen artworks, the case remains unsolved.\n- As of 2017, The Gardner Museum offered a reward of $10 million for information leading to the recovery of the stolen pieces.",
+  "note": "T7 R&W M1 #26: other — source screenshot cropped above \"notes:\"; standard intro sentence restored",
+  "class": "other",
+  "evidence": "source page cropped at top; same intro as the 48 other notes questions"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnt2x002zqmt194kfilxx",
+  "field": "stimulus",
+  "before": "notes:\n\n- According to the United States Geological Survey (USGS), amphibian populations are in a state of worldwide decline.\n- Statistics from the USGS indicate that amphibian populations in the United States decrease by 3.79 percent every year.\n- Pesticide use may be responsible for some of the US decline.\n- Climate change may also be responsible for both US and worldwide declines.",
+  "after": "While researching a topic, a student has taken the following notes:\n- According to the United States Geological Survey (USGS), amphibian populations are in a state of worldwide decline.\n- Statistics from the USGS indicate that amphibian populations in the United States decrease by 3.79 percent every year.\n- Pesticide use may be responsible for some of the US decline.\n- Climate change may also be responsible for both US and worldwide declines.",
+  "note": "T10 R&W M1 #24: other — source screenshot cropped above \"notes:\"; standard intro sentence restored",
+  "class": "other",
+  "evidence": "source page cropped at top; same intro as the 48 other notes questions"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnu4b00fxqmt11cf4xmb8",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes: - In 2022, the design firm Oceanix revealed a plan for a floating city district in Busan, South Korea. - The project is known as Oceanix Busan and is meant to be highly adaptable. - The Oceanix district is made of floating modules that can be built up over time. - In its initial form, Oceanix Busan is meant to house up to 10,000 people. - In its final form, Oceanix Busan could house up to 100,000 people.",
+  "after": "While researching a topic, a student has taken the following notes:\n- In 2022, the design firm Oceanix revealed a plan for a floating city district in Busan, South Korea.\n- The project is known as Oceanix Busan and is meant to be highly adaptable.\n- The Oceanix district is made of floating modules that can be built up over time.\n- In its initial form, Oceanix Busan is meant to house up to 10,000 people.\n- In its final form, Oceanix Busan could house up to 100,000 people.",
+  "note": "T2 R&W M1 #24: other — notes bullets on one line; one bullet per line (text identical)",
+  "class": "other",
+  "evidence": "source page: bulleted list"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnu4i00g3qmt1okcoqpg6",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes: - Biologist Jessica Kendall-Barr investigated the sleep cycles of elephant seals. - As part of a study begun in 2017, Kendall-Barr used a device known as an electroencephalogram (EEG) to monitor the brain activity of the seals. - One set of EEG readings revealed that the seals sleep for roughly two hours per day when at sea. - Another set of EEG readings revealed that the seals sleep for roughly ten hours per day when on land.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Biologist Jessica Kendall-Barr investigated the sleep cycles of elephant seals.\n- As part of a study begun in 2017, Kendall-Barr used a device known as an electroencephalogram (EEG) to monitor the brain activity of the seals.\n- One set of EEG readings revealed that the seals sleep for roughly two hours per day when at sea.\n- Another set of EEG readings revealed that the seals sleep for roughly ten hours per day when on land.",
+  "note": "T2 R&W M1 #25: other — notes bullets on one line; one bullet per line (text identical)",
+  "class": "other",
+  "evidence": "source page: bulleted list"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnu4r00g9qmt1akkigxax",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes: - Freshwater tropical fish can tolerate temperatures from 18 to 26 degrees Celsius and may require a heater in the winter. - Freshwater tropical fish are often kept in tanks with water plants, but since most eat vegetables as well as meat, these fish may consume the plants. - Because ocean water temperatures remain relatively constant throughout the year, saltwater tropical fish must be monitored in a system with less than 2 degrees of variation. - Saltwater tanks are usually maintained at the proper balance of minerals using synthetic salt. - Most tropical saltwater aquarium fish are omnivores or scavengers.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Freshwater tropical fish can tolerate temperatures from 18 to 26 degrees Celsius and may require a heater in the winter.\n- Freshwater tropical fish are often kept in tanks with water plants, but since most eat vegetables as well as meat, these fish may consume the plants.\n- Because ocean water temperatures remain relatively constant throughout the year, saltwater tropical fish must be monitored in a system with less than 2 degrees of variation.\n- Saltwater tanks are usually maintained at the proper balance of minerals using synthetic salt.\n- Most tropical saltwater aquarium fish are omnivores or scavengers.",
+  "note": "T2 R&W M1 #26: other — notes bullets on one line; one bullet per line (text identical)",
+  "class": "other",
+  "evidence": "source page: bulleted list"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnu4z00gjqmt1c7bfpp5j",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes: - Maya Angelou was a famous civil rights activist, poet, and author, though she held many other roles throughout her life. - I Know Why the Caged Bird Sings (1969) is one of her most acclaimed books; it publicly reveals details about her private life up to the age of 17. - She was asked to read the poem \"On the Pulse of Morning\" at President Bill Clinton's inaugural ceremony in 1993. - She directed her first movie, Down the Delta, in 1996. - Published in 2013 when she was 85 years old, Mom & Me & Mom recounts her complex relationship with her own mother. - At her death in 2014, she was working on a new book about her experiences with different world leaders.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Maya Angelou was a famous civil rights activist, poet, and author, though she held many other roles throughout her life.\n- I Know Why the Caged Bird Sings (1969) is one of her most acclaimed books; it publicly reveals details about her private life up to the age of 17.\n- She was asked to read the poem \"On the Pulse of Morning\" at President Bill Clinton's inaugural ceremony in 1993.\n- She directed her first movie, Down the Delta, in 1996.\n- Published in 2013 when she was 85 years old, Mom & Me & Mom recounts her complex relationship with her own mother.\n- At her death in 2014, she was working on a new book about her experiences with different world leaders.",
+  "note": "T2 R&W M1 #27: other — notes bullets on one line; one bullet per line (text identical)",
+  "class": "other",
+  "evidence": "source page: bulleted list"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnu4v00geqmt133tpelfl",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes: - In 1713, ancient Roman coins were found bearing the name and image of “Emperor Sponsian.” - No record of a Roman leader named Sponsian exists, so, in the 19th century, the discovery was branded a forgery. - In 2022, using microscopes to inspect the coins, scientist Paul Pearson and his team were able to see patterns typical of coins that were in circulation. - The researchers also analyzed soil deposits on the coins, finding evidence that the coins were buried for centuries. - The scientific evidence demonstrates that the Sponsian coins are genuine. - Historians now theorize that Sponsian was the military leader of a minor Roman outpost in the 3rd century CE.",
+  "after": "While researching a topic, a student has taken the following notes:\n- In 1713, ancient Roman coins were found bearing the name and image of “Emperor Sponsian.”\n- No record of a Roman leader named Sponsian exists, so, in the 19th century, the discovery was branded a forgery.\n- In 2022, using microscopes to inspect the coins, scientist Paul Pearson and his team were able to see patterns typical of coins that were in circulation.\n- The researchers also analyzed soil deposits on the coins, finding evidence that the coins were buried for centuries.\n- The scientific evidence demonstrates that the Sponsian coins are genuine.\n- Historians now theorize that Sponsian was the military leader of a minor Roman outpost in the 3rd century CE.",
+  "note": "T2 R&W M2 #26: other — notes bullets on one line; one bullet per line (text identical)",
+  "class": "other",
+  "evidence": "source page: bulleted list"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnvjg00wfqmt1y5ulsrm2",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes: - The First Dynasty of Egypt was the period after Lower and Upper Egypt were unified into one country by the first ruler. - The seat of the First Dynasty was Thinis. - While the exact dates of the First Dynasty are unknown, historians have approximated them to be in the Bronze Age, most likely from 3100 BCE to 2900 BCE. - Tombs of the period were mostly made from wood, mud, and bricks; stones were typically used only for decoration, though some tombs were made of stone. - The first ruler was Narmer, and the last ruler was Qa'a.",
+  "after": "While researching a topic, a student has taken the following notes:\n- The First Dynasty of Egypt was the period after Lower and Upper Egypt were unified into one country by the first ruler.\n- The seat of the First Dynasty was Thinis.\n- While the exact dates of the First Dynasty are unknown, historians have approximated them to be in the Bronze Age, most likely from 3100 BCE to 2900 BCE.\n- Tombs of the period were mostly made from wood, mud, and bricks; stones were typically used only for decoration, though some tombs were made of stone.\n- The first ruler was Narmer, and the last ruler was Qa'a.",
+  "note": "T3 R&W M1 #26: other — notes bullets on one line; one bullet per line (text identical)",
+  "class": "other",
+  "evidence": "source page: bulleted list"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnvjp00wpqmt1hwtengaj",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes: - The North Pole is located in the Arctic Ocean, and temperatures there are routinely above freezing in the summer. - Due to the position of the Earth's axis, there is only one sunset and one sunrise at the poles per year. - The South Pole is in Antarctica, and research at the Amundsen–Scott South Pole Station has provided compelling evidence about continental drift. - Ground at the South Pole is about 100 meters above sea level, but there are 2,700 meters of ice, so the high altitude contributes to the arid desert environment. - The highest temperature recorded at the South Pole was -12.3° C, and the lowest was -82.8° C.",
+  "after": "While researching a topic, a student has taken the following notes:\n- The North Pole is located in the Arctic Ocean, and temperatures there are routinely above freezing in the summer.\n- Due to the position of the Earth's axis, there is only one sunset and one sunrise at the poles per year.\n- The South Pole is in Antarctica, and research at the Amundsen–Scott South Pole Station has provided compelling evidence about continental drift.\n- Ground at the South Pole is about 100 meters above sea level, but there are 2,700 meters of ice, so the high altitude contributes to the arid desert environment.\n- The highest temperature recorded at the South Pole was -12.3° C, and the lowest was -82.8° C.",
+  "note": "T3 R&W M1 #27: other — notes bullets on one line; one bullet per line (text identical)",
+  "class": "other",
+  "evidence": "source page: bulleted list"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnvjk00wkqmt1askebdku",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes: - Ada Lovelace (née Byron) was born in 1815 and was very interested in science and math from an early age, so her tutor introduced her to the mathematician Charles Babbage. - Babbage is considered the “father of the computer” because he invented the “Analytical Engine,” which he used to calculate numbers. - Lovelace may have written the first computer program in the world because she helped design programs for the Analytical Engine. - In 1842–1843, she wrote down a program in an appendix that was not in the original materials provided by Babbage. - She realized that the Analytical Engine could be used for non-numerical purposes if other symbols such as letters or musical notes were substituted.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Ada Lovelace (née Byron) was born in 1815 and was very interested in science and math from an early age, so her tutor introduced her to the mathematician Charles Babbage.\n- Babbage is considered the “father of the computer” because he invented the “Analytical Engine,” which he used to calculate numbers.\n- Lovelace may have written the first computer program in the world because she helped design programs for the Analytical Engine.\n- In 1842–1843, she wrote down a program in an appendix that was not in the original materials provided by Babbage.\n- She realized that the Analytical Engine could be used for non-numerical purposes if other symbols such as letters or musical notes were substituted.",
+  "note": "T3 R&W M2 #26: other — notes bullets on one line; one bullet per line (text identical)",
+  "class": "other",
+  "evidence": "source page: bulleted list"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnvju00wuqmt1nc8nnmo2",
+  "field": "stimulus",
+  "before": "While researching a topic, a student has taken the following notes: - Greg Daniels and Michael Schur are comedy writers who live in the United States. - The duo is best known for their award-winning comedy series *The Office* and *Parks and Recreation*, which premiered in 2005 and 2009, respectively. - Both series were celebrated for their biting humor and comedic characters; *The Office* won several Emmy Awards while *Parks and Recreation* was nominated multiple times. - Daniels and Schur produced lesser-known television shows, including the 2020s comedy series *Upload* by Daniels and *Rutherford Falls* by Schur. - *The Office* and *Parks and Recreation* remain the only series the two have written in tandem.",
+  "after": "While researching a topic, a student has taken the following notes:\n- Greg Daniels and Michael Schur are comedy writers who live in the United States.\n- The duo is best known for their award-winning comedy series *The Office* and *Parks and Recreation*, which premiered in 2005 and 2009, respectively.\n- Both series were celebrated for their biting humor and comedic characters; *The Office* won several Emmy Awards while *Parks and Recreation* was nominated multiple times.\n- Daniels and Schur produced lesser-known television shows, including the 2020s comedy series *Upload* by Daniels and *Rutherford Falls* by Schur.\n- *The Office* and *Parks and Recreation* remain the only series the two have written in tandem.",
+  "note": "T3 R&W M2 #27: other — notes bullets on one line; one bullet per line (text identical)",
+  "class": "other",
+  "evidence": "source page: bulleted list"
+ },
+ {
+  "table": "Question",
+  "id": "cmsjrnszz001fqmt14wbig9k6",
+  "field": "stimulus",
+  "before": "Text 1\n\nTulip Mania was an infamous economic phenomenon that took place in Holland in the 1630s. As the colorful flowers' popularity and value as status symbols grew, so did their price. Eventually, the most expensive tulips were selling for the price of mansions even before they were planted. By 1637, prices finally peaked, and this financial bubble experienced a legendary downturn. The government had to intervene and restore financial stability to those who had become bankrupt, but many investors were left financially ruined.\n\nText 2\n\nFinancial bubbles are an economic event where the price of an item skyrockets past its real value and then collapses when investors begin to realize that they will not be able to sell the product. In short, the existence of a financial bubble hinges on the participation of investors who fuel the frenzy. One notable example is the Tulip Mania bubble, in which investors had bet on the future demand for tulips, often trading contracts for bulbs that didn't yet exist. All investors should beware any investment opportunity that seems too good to be true;",
+  "after": "Text 1\n\nTulip Mania was an infamous economic phenomenon that took place in Holland in the 1630s. As the colorful flowers' popularity and value as status symbols grew, so did their price. Eventually, the most expensive tulips were selling for the price of mansions even before they were planted. By 1637, prices finally peaked, and this financial bubble experienced a legendary downturn. The government had to intervene and restore financial stability to those who had become bankrupt, but many investors were left financially ruined.\n\nText 2\n\nFinancial bubbles are an economic event where the price of an item skyrockets past its real value and then collapses when investors begin to realize that they will not be able to sell the product. In short, the existence of a financial bubble hinges on the participation of investors who fuel the frenzy. One notable example is the Tulip Mania bubble, in which investors had bet on the future demand for tulips, often trading contracts for bulbs that didn't yet exist. All investors should beware any investment opportunity that seems too good to be true.",
+  "note": "T10 R&W M2 #9: other — Text 2 ends with ';' (source typo); end with '.'",
+  "class": "other",
+  "evidence": "source page 23: text complete, ends with ';'"
+ }
+]

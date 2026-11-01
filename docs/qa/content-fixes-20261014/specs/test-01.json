@@ -1,0 +1,212 @@
+[
+  {
+    "table": "QuestionOption",
+    "id": "cmsjrntl60085qmt1i6vd3bmp",
+    "field": "text",
+    "before": "$\\frac{7}{27}$",
+    "after": "$\\left(\\frac{1}{2}, 1\\frac{2}{3}\\right)$",
+    "note": "T1 Math M2 #8: bleed — option A: options duplicated from previous question #7 (probability fractions); source shows coordinate points",
+    "class": "bleed",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 1/MATH/TEST 1 INNOVATOR MATH MOD 1 AND 2.pdf p.10 (image; OCR page artifact and candidate also carry #7's fractions — OCR bleed). Key C=(2,−6⅓) unchanged and verified: y=−5+(4/3)(2−3)"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "cmsjrntl60086qmt1q29v0z9o",
+    "field": "text",
+    "before": "$\\frac{7}{16}$",
+    "after": "$\\left(1\\frac{2}{3}, -5\\right)$",
+    "note": "T1 Math M2 #8: bleed — option B: options duplicated from previous question #7 (probability fractions); source shows coordinate points",
+    "class": "bleed",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 1/MATH/TEST 1 INNOVATOR MATH MOD 1 AND 2.pdf p.10 (image; OCR page artifact and candidate also carry #7's fractions — OCR bleed). Key C=(2,−6⅓) unchanged and verified: y=−5+(4/3)(2−3)"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "cmsjrntl60087qmt1akkrhlyn",
+    "field": "text",
+    "before": "$\\frac{7}{11}$",
+    "after": "$\\left(2, -6\\frac{1}{3}\\right)$",
+    "note": "T1 Math M2 #8: bleed — option C: options duplicated from previous question #7 (probability fractions); source shows coordinate points",
+    "class": "bleed",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 1/MATH/TEST 1 INNOVATOR MATH MOD 1 AND 2.pdf p.10 (image; OCR page artifact and candidate also carry #7's fractions — OCR bleed). Key C=(2,−6⅓) unchanged and verified: y=−5+(4/3)(2−3)"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "cmsjrntl60088qmt1s8h7azrw",
+    "field": "text",
+    "before": "$\\frac{7}{8}$",
+    "after": "$\\left(5, -5\\frac{1}{4}\\right)$",
+    "note": "T1 Math M2 #8: bleed — option D: options duplicated from previous question #7 (probability fractions); source shows coordinate points",
+    "class": "bleed",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 1/MATH/TEST 1 INNOVATOR MATH MOD 1 AND 2.pdf p.10 (image; OCR page artifact and candidate also carry #7's fractions — OCR bleed). Key C=(2,−6⅓) unchanged and verified: y=−5+(4/3)(2−3)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrntn6008kqmt1kjoqv4xn",
+    "field": "stem",
+    "before": "If $$\\frac{a^{2x^2}}{a^4} = a^{12}$$, what is the value of $$2^x$$?",
+    "after": "If $$\\frac{a^{2x^3}}{a^4} = a^{12}$$, what is the value of $$2^x$$?",
+    "note": "T1 Math M2 #12: other — OCR misread exponent 2x^3 as 2x^2 (key 4 requires 2x^3=16 → x=2)",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 1/MATH/TEST 1 INNOVATOR MATH MOD 1 AND 2.pdf p.12 (image, zoomed 500dpi)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrnti6007iqmt1mbb06uid",
+    "field": "stem",
+    "before": "An angle opposite a leg of a right triangle measures $w^*$, and $\\tan(w^*) = \\frac{3}{4}$. What is $\\sin(90^\\circ - w^*)$?",
+    "after": "An angle opposite a leg of a right triangle measures $w^\\circ$, and $\\tan(w^\\circ) = \\frac{3}{4}$. What is $\\sin(90^\\circ - w^\\circ)$?",
+    "note": "T1 Math M2 #3: other — degree sign OCR'd as ^* (w°)",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 1/MATH/TEST 1 INNOVATOR MATH MOD 1 AND 2.pdf p.9 (image)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjrntp10096qmt18e3tdg19",
+    "field": "stem",
+    "before": "Wendy spent $174.40 on a bulk supply of pens. Each box of pens costs $25. A shipping charge of $p is added. A 9% tax is applied to both the total order and the shipping charge. If Wendy ordered 6 boxes, what is the value of $p$?",
+    "after": "Wendy spent $174.40 on a bulk supply of pens. Each box of pens costs $25. A shipping charge of $p is added. A 9% tax is applied to both the total order and the shipping charge. If Wendy ordered 6 boxes, what is the value of *p*?",
+    "note": "T1 Math M2 #19: other — currency $ signs pair with the $p$ math delimiters → renders 'value of p$?'; variable p set in italics instead",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 1/MATH/TEST 1 INNOVATOR MATH MOD 1 AND 2.pdf p.14 (image: '…what is the value of p?'); tokenizeMathContent check"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "opt_348b2a0750b54a729f512eea380115ed",
+    "field": "text",
+    "before": "A pilot error was reduced significantly and performance was boosted by as much as 100 percent by taking short naps while on duty.",
+    "after": "pilot error was reduced significantly and performance was boosted by as much as 100 percent by taking short naps while on duty.",
+    "note": "T1 RW M2 #22: other — option A: option letter leaked into text ('A pilot error' → 'pilot error')",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 1/Reading and Writing/ Test 1 Module 1, 2B R&W.docx PDF p.31 (image); Test1 RW Answer Explanations.docx: 'Choice A \"pilot error was reduced\"'"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "opt_7ca834f47f494227b8f62db2b16a6b69",
+    "field": "text",
+    "before": "D a discovery was made that short naps while on duty reduced pilot error and boosted performance by as much as 100 percent.",
+    "after": "a discovery was made that short naps while on duty reduced pilot error and boosted performance by as much as 100 percent.",
+    "note": "T1 RW M2 #22: other — option D: option letter leaked into text ('D a discovery' → 'a discovery')",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 1/Reading and Writing/ Test 1 Module 1, 2B R&W.docx PDF p.31 (image); Answer Explanations.docx: 'Choice D \"a discovery was made\"'"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "opt_a5d5b3ca-4b9f-4ef2-9223-7152d89c5fa9",
+    "field": "text",
+    "before": "The muscle mass in the genetically engineered mice exhibited no changes. -",
+    "after": "The muscle mass in the genetically engineered mice exhibited no changes.",
+    "note": "T1 RW M1 #11: other — option C: trailing ' -' parse artifact",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 1/Reading and Writing/ Test 1 Module 1, 2B R&W.docx PDF p.6 (image)"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "opt_23bb5d47-cee9-442f-8d4b-1f6b7c2007a6",
+    "field": "text",
+    "before": "Although native to the Red Sea, the Red Sea tonguesole is dwarfed by many larger fish that share its habitat. -",
+    "after": "Although native to the Red Sea, the Red Sea tonguesole is dwarfed by many larger fish that share its habitat.",
+    "note": "T1 RW M1 #25: other — option B: trailing ' -' parse artifact",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 1/Reading and Writing/ Test 1 Module 1, 2B R&W.docx PDF p.14 (image)"
+  },
+  {
+    "table": "QuestionOption",
+    "id": "opt_04269f1b-0550-4635-b21a-9d7fba173027",
+    "field": "text",
+    "before": "All organisms with a vertebra are members of the phylum Chordata, which includes the Red Sea tonguesole. -",
+    "after": "All organisms with a vertebra are members of the phylum Chordata, which includes the Red Sea tonguesole.",
+    "note": "T1 RW M1 #25: other — option C: trailing ' -' parse artifact",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 1/Reading and Writing/ Test 1 Module 1, 2B R&W.docx PDF p.14 (image)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjro6rj062gqmt1oqq2nq4j",
+    "field": "stimulus",
+    "before": "In explaining the title *A Different Mirror* for his own historical account of multiculturalism and immigration, Ronald Takaki has acknowledged that metaphorical “mirrors” have been \\_\\_\\_\\_\\_ by earlier historians such as Carlos Fuentes (author of *The Buried Mirror*) and Barbara W. Tuchman (author of *A Distant Mirror*). Takaki’s analysis, however, is “different” in its expanded scope and intensified self-consciousness.",
+    "after": "In explaining the title *A Different Mirror* for his own historical account of multiculturalism and immigration, Ronald Takaki has acknowledged that metaphorical “mirrors” have been _____ by earlier historians such as Carlos Fuentes (author of *The Buried Mirror*) and Barbara W. Tuchman (author of *A Distant Mirror*). Takaki’s analysis, however, is “different” in its expanded scope and intensified self-consciousness.",
+    "note": "T1 RW M1 #3: other — blank written as escaped '\\_\\_\\_\\_\\_' renders literally with backslashes",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 1/Reading and Writing/ Test 1 Module 1, 2B R&W.docx (source shows a plain blank line); renderer has no markdown-escape handling"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjro6wh0638qmt1huhh5s6l",
+    "field": "stimulus",
+    "before": "Known for incorporating unique instruments like the didgeridoo, the djembe, and conga drums into his music, Ganga Giri has created unforgettable tracks that cannot fit neatly into a single musical genre. As a nod to his ancestral roots, \\_\\_\\_\\_\\_ making his music difficult to define.",
+    "after": "Known for incorporating unique instruments like the didgeridoo, the djembe, and conga drums into his music, Ganga Giri has created unforgettable tracks that cannot fit neatly into a single musical genre. As a nod to his ancestral roots, _____ making his music difficult to define.",
+    "note": "T1 RW M1 #17: other — blank written as escaped '\\_\\_\\_\\_\\_' renders literally with backslashes",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 1/Reading and Writing/ Test 1 Module 1, 2B R&W.docx (source shows a plain blank line); renderer has no markdown-escape handling"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjro70i063kqmt1zlfv8shx",
+    "field": "stimulus",
+    "before": "Higher education has long been a respected field as professors have traditionally been seen as essential contributors to the vast store of thought and knowledge; they are also considered to be indispensable mentors and educators to young people entering their specific fields. \\_\\_\\_\\_\\_ the reality of higher education in the 21st century has dramatically changed the position of “professor,” and both students and professors are among those who suffer from the changing economics of higher education.",
+    "after": "Higher education has long been a respected field as professors have traditionally been seen as essential contributors to the vast store of thought and knowledge; they are also considered to be indispensable mentors and educators to young people entering their specific fields. _____ the reality of higher education in the 21st century has dramatically changed the position of “professor,” and both students and professors are among those who suffer from the changing economics of higher education.",
+    "note": "T1 RW M1 #23: other — blank written as escaped '\\_\\_\\_\\_\\_' renders literally with backslashes",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 1/Reading and Writing/ Test 1 Module 1, 2B R&W.docx (source shows a plain blank line); renderer has no markdown-escape handling"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjro71h063pqmt1t05jqp02",
+    "field": "stimulus",
+    "before": "St. Joseph Atoll in the Seychelles was made a marine-protected area in 2020 because it contains large seabird colonies and has a large amount of marine biodiversity. \\_\\_\\_\\_\\_ it is home to one of the healthiest inland shark populations in the Indian Ocean.",
+    "after": "St. Joseph Atoll in the Seychelles was made a marine-protected area in 2020 because it contains large seabird colonies and has a large amount of marine biodiversity. _____ it is home to one of the healthiest inland shark populations in the Indian Ocean.",
+    "note": "T1 RW M2 #25: other — blank written as escaped '\\_\\_\\_\\_\\_' renders literally with backslashes",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 1/Reading and Writing/ Test 1 Module 1, 2B R&W.docx (source shows a plain blank line); renderer has no markdown-escape handling"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjro6t2062mqmt1ygsnfw41",
+    "field": "stimulus",
+    "before": "The following text opens the \"Preface\" of Henry James's book of travel writing, *A Little Tour in France*, originally published in 1884. WE GOOD AMERICANS—I say it without presumption—are too apt to think that France is Paris, just as we are accused of being too apt to think that Paris is the celestial city. This is by no means the case . . . It had already been intimated to the author of these light pages that there are many good things in the *doux pays de France\\** of which you get no hint in a walk between those ornaments of the capital; but the truth had been revealed only in quick-flashing glimpses, and he was conscious of a desire to look it well in the face. To this end he started, one rainy morning in mid-September, for the charming little city of Tours, from which point it seemed possible to make a variety of fruitful excursions. \\*sweet country of France",
+    "after": "The following text opens the \"Preface\" of Henry James's book of travel writing, *A Little Tour in France*, originally published in 1884. WE GOOD AMERICANS—I say it without presumption—are too apt to think that France is Paris, just as we are accused of being too apt to think that Paris is the celestial city. This is by no means the case . . . It had already been intimated to the author of these light pages that there are many good things in the *doux pays de France** of which you get no hint in a walk between those ornaments of the capital; but the truth had been revealed only in quick-flashing glimpses, and he was conscious of a desire to look it well in the face. To this end he started, one rainy morning in mid-September, for the charming little city of Tours, from which point it seemed possible to make a variety of fruitful excursions.\n\n*sweet country of France",
+    "note": "T1 RW M1 #6: other — escaped footnote '\\*' breaks italics (most of passage italicised, backslashes shown); footnote moved to own line as in source",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 1/Reading and Writing/ Test 1 Module 1, 2B R&W.docx PDF p.3 (image: 'doux pays de France*' italic + separate '*sweet country of France' footnote)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjro71e063oqmt1o35w3kgi",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes: - The Red Sea tonguesole is a species of tonguefish that lives in the Red Sea. - It migrated through the Suez Canal to the Mediterranean Sea in the 20th century. - It usually grows to about half a foot in length. - The phylum Chordata, of which Red Sea tonguesole is a member, includes all vertebrate species. - It has a rounded snout, separated eyes, and numerous scales.",
+    "after": "While researching a topic, a student has taken the following notes:\n- The Red Sea tonguesole is a species of tonguefish that lives in the Red Sea.\n- It migrated through the Suez Canal to the Mediterranean Sea in the 20th century.\n- It usually grows to about half a foot in length.\n- The phylum Chordata, of which Red Sea tonguesole is a member, includes all vertebrate species.\n- It has a rounded snout, separated eyes, and numerous scales.",
+    "note": "T1 RW M1 #25: other — notes bullet list flattened into one line (' - ' inline); restored one bullet per line like RW M2 #26",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 1/Reading and Writing/ Test 1 Module 1, 2B R&W.docx PDF p.14 (image: 5 bullets)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjro71p063qqmt1keboinuy",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes: - KMTR is a television station based in Eugene, Oregon, owned by Roberts Media, LLC. - It maintains facilities in Springfield, Oregon, and has agreements to share capacity with KTCW and KMBC. - It was initially formed to replace a former NBC affiliate that had begun replacing NBC prime time broadcasts with those of rival CBS. - It has broadcasted from October 4, 1982, through the present. - KMTR changed ownership in 1995 when it was purchased by New York City-based Wicks Broadcast Group, and again in 2012 when it was acquired by Roberts Media.",
+    "after": "While researching a topic, a student has taken the following notes:\n- KMTR is a television station based in Eugene, Oregon, owned by Roberts Media, LLC.\n- It maintains facilities in Springfield, Oregon, and has agreements to share capacity with KTCW and KMBC.\n- It was initially formed to replace a former NBC affiliate that had begun replacing NBC prime time broadcasts with those of rival CBS.\n- It has broadcasted from October 4, 1982, through the present.\n- KMTR changed ownership in 1995 when it was purchased by New York City-based Wicks Broadcast Group, and again in 2012 when it was acquired by Roberts Media.",
+    "note": "T1 RW M1 #26: other — notes bullet list flattened into one line; restored one bullet per line",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 1/Reading and Writing/ Test 1 Module 1, 2B R&W.docx PDF p.15 (image: 5 bullets)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjro71y063sqmt19xsrpx6b",
+    "field": "stimulus",
+    "before": "A student has taken the following notes on the history and effectiveness of the polio vaccine in the United States: - Paralytic poliomyelitis is commonly called polio. - More than 20,000 cases per year of polio were reported in the 1950s. - Vaccines started in 1950 but were not approved in the US. - Jonas Salk introduced an inactive (non-living) vaccine in 1955, approved for use in the US. - Case numbers dropped dramatically with widespread use of the vaccine. - Within 10 years, there were almost no cases in the US; the last case was reported in 1979.",
+    "after": "A student has taken the following notes on the history and effectiveness of the polio vaccine in the United States:\n- Paralytic poliomyelitis is commonly called polio.\n- More than 20,000 cases per year of polio were reported in the 1950s.\n- Vaccines started in 1950 but were not approved in the US.\n- Jonas Salk introduced an inactive (non-living) vaccine in 1955, approved for use in the US.\n- Case numbers dropped dramatically with widespread use of the vaccine.\n- Within 10 years, there were almost no cases in the US; the last case was reported in 1979.",
+    "note": "T1 RW M1 #27: other — notes bullet list flattened into one line; restored one bullet per line",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 1/Reading and Writing/ Test 1 Module 1, 2B R&W.docx PDF p.16 (image: 6 bullets)"
+  },
+  {
+    "table": "Question",
+    "id": "cmsjro725063tqmt1hnfcs3et",
+    "field": "stimulus",
+    "before": "While researching a topic, a student has taken the following notes: - Route 330 is a Canadian highway that runs from Gander, Newfoundland, to New-Wes-Valley after which it connects to Route 320. - It is maintained by the Newfoundland and Labrador Department of Transportation and Infrastructure. - It follows the coastline of Gander Bay before moving inland through towns such as Aspen Cove, Ladle Cover, Musgrave Harbour, Deadman’s Bay, Lumsden, and others. - In addition to providing access to several towns, Route 330 also connects to an access road to Jonathan’s Pond Campground as well as an access road to the main entrance of Banting Memorial Municipal Park. - Locals refer to Route 330 as “the loop.”",
+    "after": "While researching a topic, a student has taken the following notes:\n- Route 330 is a Canadian highway that runs from Gander, Newfoundland, to New-Wes-Valley after which it connects to Route 320.\n- It is maintained by the Newfoundland and Labrador Department of Transportation and Infrastructure.\n- It follows the coastline of Gander Bay before moving inland through towns such as Aspen Cove, Ladle Cover, Musgrave Harbour, Deadman’s Bay, Lumsden, and others.\n- In addition to providing access to several towns, Route 330 also connects to an access road to Jonathan’s Pond Campground as well as an access road to the main entrance of Banting Memorial Municipal Park.\n- Locals refer to Route 330 as “the loop.”",
+    "note": "T1 RW M2 #27: other — notes bullet list flattened into one line; restored one bullet per line",
+    "class": "other",
+    "evidence": "files_to_load/MOCK EXAMS/TEST 1/Reading and Writing/ Test 1 Module 1, 2B R&W.docx PDF p.35 (image: 5 bullets)"
+  }
+]
