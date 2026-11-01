@@ -307,7 +307,9 @@ export function AssignForm({
                       ? { difficulty: level, state: "available", assigned: true, stamp: true, title: `${assignedAtLevel} set${assignedAtLevel === 1 ? "" : "s"}`, extra: <span className="text-[var(--sat-muted)]">{assignedAtLevel} set{assignedAtLevel === 1 ? "" : "s"}</span> }
                       : { difficulty: level, state: "none", title: "Nothing to assign at this level" };
                   }),
-                  rows: sources.map((source) => {
+                  // Every source and level already assigned: a fixed row with the stamped levels (no rows
+                  // to open, nothing to pick).
+                  rows: toAssign.length === 0 ? undefined : sources.map((source) => {
                     const sets = skill.sets.filter((ps) => ps.sourceId === source.id);
                     return {
                       id: source.id,

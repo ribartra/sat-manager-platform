@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Check, ChevronRight, Lock, Plus } from "lucide-react";
+import { ChevronRight, Lock, Plus } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Pct } from "@/components/sat/work-status";
 import { Badge } from "@/components/ui/badge";
@@ -209,8 +209,7 @@ function SkillChip({ chip }: { chip: SkillsMapChip }) {
         title={`${ASSIGNED_LABEL}${chip.title ? ` · ${chip.title}` : ""}`}
         className={cn(SKILL_CHIP_CLASS, "relative bg-white text-[var(--sat-text)]", BLOCKED_SURFACE)}
       >
-        {/* Quiet "assigned" mark for a single set: a check and a grayed level (the stamp is for whole levels). */}
-        <Check size={12} aria-hidden className="text-[var(--sat-ok)]" />
+        {/* A single assigned set: grayed and disabled (the stamp is only for levels every source covers). */}
         <span className="grayscale">
           <Badge variant={difficultyBadgeVariant(chip.difficulty)}>{difficultyLabel(chip.difficulty)}</Badge>
         </span>

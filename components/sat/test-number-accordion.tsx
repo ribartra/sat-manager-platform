@@ -14,7 +14,7 @@ export interface TestVersionItem {
   /** Opens its TEST N accordion (e.g. pending / in progress for the student). */
   open?: boolean;
   /** Assign view: the student already has this version. When every version (source) of the TEST N
-   * is assigned, its header gets the "ALREADY ASSIGNED" stamp. */
+   * is assigned, the TEST N is a fixed row with the "ALREADY ASSIGNED" stamp (it does not open). */
   assigned?: boolean;
 }
 
@@ -55,21 +55,33 @@ export function TestNumberAccordion({
         const open = group.versions.some((version) => version.open);
         const sources = group.versions.map((version) => version.sourceName);
         const allAssigned = group.versions.every((version) => version.assigned);
+        const title = group.number === null ? "Other tests" : `TEST ${group.number}`;
+        const versionsText = `${group.versions.length} version${group.versions.length === 1 ? "" : "s"} · ${sources.join(" · ")}`;
+        if (allAssigned) {
+          // Every source of this TEST N is assigned: a fixed row with the stamp (nothing to open or
+          // pick). Same box and paddings as the accordion header; the chevron's place is kept.
+          return (
+            <div key={group.number ?? "other"} title="Already assigned" className="relative overflow-hidden rounded-[var(--sat-radius)] border border-[var(--sat-border)] bg-white">
+              <div className={cn("flex flex-wrap items-center gap-x-3 gap-y-1", compact ? "px-3 py-2" : "px-4 py-3")}>
+                <span aria-hidden className="w-4 shrink-0" />
+                <span className="font-bold text-[var(--sat-tests-ink)]">{title}</span>
+                <span className="text-xs text-gray-500">{versionsText}</span>
+              </div>
+              <AssignedStamp placement="end" />
+            </div>
+          );
+        }
         return (
           <details key={group.number ?? "other"} open={open} className="group overflow-hidden rounded-[var(--sat-radius)] border border-[var(--sat-border)] bg-white">
             <summary
               className={cn(
                 "flex cursor-pointer list-none flex-wrap items-center gap-x-3 gap-y-1 hover:bg-[var(--sat-primary-soft)] [&::-webkit-details-marker]:hidden",
                 compact ? "px-3 py-2" : "px-4 py-3",
-                allAssigned && "relative",
               )}
             >
               <ChevronRight aria-hidden size={16} className="shrink-0 text-[var(--sat-blank)] transition-transform group-open:rotate-90" />
-              <span className="font-bold text-[var(--sat-tests-ink)]">{group.number === null ? "Other tests" : `TEST ${group.number}`}</span>
-              <span className="text-xs text-gray-500">
-                {group.versions.length} version{group.versions.length === 1 ? "" : "s"} · {sources.join(" · ")}
-              </span>
-              {allAssigned ? <AssignedStamp placement="end" /> : null}
+              <span className="font-bold text-[var(--sat-tests-ink)]">{title}</span>
+              <span className="text-xs text-gray-500">{versionsText}</span>
             </summary>
             <div className={cn("space-y-4 border-t border-[var(--sat-border)] bg-[var(--sat-surface-2)]", compact ? "p-2.5" : "p-3")}>
               {group.versions.map((version) => (

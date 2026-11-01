@@ -315,7 +315,7 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/assign/assign-form-client.tsx",
-    requires: ["if (practiceSets.some((ps) => ps.id === id && ps.assigned)) return;", "assigned: true, stamp: true"],
+    requires: ["if (practiceSets.some((ps) => ps.id === id && ps.assigned)) return;", "assigned: true, stamp: true", "rows: toAssign.length === 0 ? undefined"],
     label: "Assign practice: un set asignado no se puede seleccionar ni desmarcar",
   },
   {
@@ -325,8 +325,8 @@ const checks = [
   },
   {
     file: "components/sat/test-number-accordion.tsx",
-    requires: ["const allAssigned = group.versions.every((version) => version.assigned);", '{allAssigned ? <AssignedStamp placement="end" /> : null}'],
-    label: "TEST N: sello ALREADY ASSIGNED solo cuando todas sus fuentes estan asignadas",
+    requires: ["const allAssigned = group.versions.every((version) => version.assigned);", "if (allAssigned) {", '<AssignedStamp placement="end" />'],
+    label: "TEST N: con todas sus fuentes asignadas es una fila fija con sello (no se despliega)",
   },
   // Results by skill (SAT-039/040/041): no Low performance, no summary card, no matrix, no Assign in results.
   {
