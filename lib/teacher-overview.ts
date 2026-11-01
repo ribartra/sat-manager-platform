@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import { nameWithSource } from "@/lib/test-name";
 import { resolvePracticeArea, type PracticeAreaCode } from "@/lib/practice-area";
 import { practiceAnswerStats, scoreFromStats } from "@/lib/answer-stats";
 
@@ -163,7 +164,7 @@ export async function loadStudentOverviews(studentIds: string[], now = new Date(
         ? {
             id: latest.id,
             name: latest.test.name,
-            label: [latest.test.number ? `TEST ${latest.test.number}` : latest.test.name, latest.test.source?.name].filter(Boolean).join(" · "),
+            label: nameWithSource(latest.test.name, latest.test.source?.name),
             submittedAt: latest.submittedAt,
             rw: latest.rwScore,
             math: latest.mathScore,

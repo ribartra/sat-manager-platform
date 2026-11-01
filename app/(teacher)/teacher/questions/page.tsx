@@ -1,4 +1,5 @@
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
+import { nameWithSource } from "@/lib/test-name";
 import { currentContentScope } from "@/lib/content-scope";
 import { PageHeader, PageShell, PracticeAreaTabs } from "@/components/sat";
 import { HEADER_ACTION_CLASS, HeaderActions } from "@/components/sat/header-actions";
@@ -125,7 +126,7 @@ export default async function QuestionBankPage({ searchParams }: { searchParams:
   const back = isTests
     ? { label: "Tests", href: "/teacher/tests" }
     : { label: `Practice · ${practiceAreaLabel(practiceArea)}`, href: `/teacher/practice-sets?area=${area}` };
-  const testLabel = (t: { name: string; source: { name: string } | null }) => `${t.name} · ${t.source?.name ?? "No source"}`;
+  const testLabel = (t: { name: string; source: { name: string } | null }) => nameWithSource(t.name, t.source?.name ?? "No source");
 
   return (
     <PageShell>

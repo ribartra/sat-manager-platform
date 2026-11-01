@@ -12,6 +12,8 @@ import { Input } from "@/components/ui/input";
 import { apiFetch, errorMessage, readApiError } from "@/lib/api-client";
 import { notify } from "@/lib/notify-ui";
 import { useRouter } from "next/navigation";
+import { PeriodFilter } from "@/components/sat/period-filter";
+import { periodParams, periodSummary, type PeriodValue } from "@/lib/period-filter";
 
 const AREAS = [
   { key: "math", label: "Math", color: "var(--sat-area-math)" },
@@ -27,6 +29,8 @@ type AreaKey = (typeof AREAS)[number]["key"];
  * The preview regenerates by itself whenever the selection changes; the iframe points at the
  * same-origin PDF endpoint (inline) and the download at the same endpoint as an attachment,
  * so both are exactly the same document.
+ * The period (All time, Last 30 / 60 / 90 days, Custom) limits the tries and results in the PDF to that
+ * time (pending work always shows); the header of the PDF names it.
  * With Full Practice Tests selected, the teacher can narrow the report to one exam. The same PDF
  * can be emailed as an attachment to the parents linked to the student.
  */
@@ -65,8 +69,8 @@ export function GenerateReportDialog({
   studentName: string;
   currentArea: AreaKey;
   filters: { topic?: string; difficulty?: string; from?: string; to?: string };
-  /** Human-readable summary of the active filters, e.g. "Skill: Circles · Difficulty: HARD". */
-  filterSummary: string;
+  /** Kept for the callers; the dialog shows the period it applies instead. */
+  filterSummary?: string;
   /** Submitted Full Practice Test attempts the report can be narrowed to. */
   exams?: ReportExamOption[];
   /** Parents linked to the student (only those with an email can receive the PDF). */
@@ -78,6 +82,7 @@ export function GenerateReportDialog({
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<Set<AreaKey>>(new Set([currentArea]));
   const [examId, setExamId] = useState(initialExamId);
+  const [period, setPeriod] = useState<PeriodValue>({ period: "all" });
   const [previewQuery, setPreviewQuery] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const emailParents = parents.filter((parent) => parent.email);
@@ -96,23 +101,25 @@ export function GenerateReportDialog({
 
   // One exam only makes sense with Full Practice Tests selected; it replaces the other areas.
   const effectiveExamId = selected.has("tests") ? examId : "";
-  const queryFor = (areas: Set<AreaKey>, exam: string) => {
+  // Skill / level filters travel as before; the dates are the period's.
+  const baseFilters = { topic: filters.topic, difficulty: filters.difficulty };
+  const queryFor = (areas: Set<AreaKey>, exam: string, range: PeriodValue = period) => {
     const keys = AREAS.filter((area) => areas.has(area.key)).map((area) => area.key);
     if (keys.length === 0) return null;
     const params = new URLSearchParams({ areas: keys.join(",") });
-    for (const [key, value] of Object.entries(filters)) if (value) params.set(key, value);
+    for (const [key, value] of Object.entries({ ...baseFilters, ...periodParams(range) })) if (value) params.set(key, value);
     if (exam && areas.has("tests")) params.set("fptAttemptId", exam);
     return params.toString();
   };
   const query = queryFor(selected, effectiveExamId);
 
   /** Rebuild the preview for this selection (debounced so quick clicks produce one PDF). */
-  function schedulePreview(areas: Set<AreaKey>, delay = 350, exam = examId) {
+  function schedulePreview(areas: Set<AreaKey>, delay = 350, exam = examId, range = period) {
     if (timer.current) clearTimeout(timer.current);
     setSendResults(null);
     setSentTo(null);
     setAskToLink(false);
-    const next = queryFor(areas, exam);
+    const next = queryFor(areas, exam, range);
     if (!next) {
       setPreviewQuery(null);
       setLoading(false);
@@ -133,6 +140,11 @@ export function GenerateReportDialog({
   function chooseExam(value: string) {
     setExamId(value);
     schedulePreview(selected, 0, value);
+  }
+
+  function choosePeriod(value: PeriodValue) {
+    setPeriod(value);
+    schedulePreview(selected, 0, examId, value);
   }
 
   function toggleRecipient(id: string) {
@@ -157,7 +169,7 @@ export function GenerateReportDialog({
       body: JSON.stringify({
         ...(toAddress ? { toEmail: toAddress } : { parentIds: [...recipients] }),
         areas: keys,
-        filters,
+        filters: { ...baseFilters, ...periodParams(period) },
         fptAttemptId: effectiveExamId || null,
       }),
     });
@@ -197,11 +209,16 @@ export function GenerateReportDialog({
         <DialogHeader>
           <DialogTitle>Progress report · {studentName}</DialogTitle>
           <DialogDescription>
-            One section per area, in a single PDF. {filterSummary ? `Filters: ${filterSummary}.` : "No filters (all activity)."}
+            One section per area, in a single PDF. {effectiveExamId ? "One exam only." : `Period: ${periodSummary(period)}.`}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-end gap-2">
+          {effectiveExamId ? null : (
+            <div className="w-48">
+              <PeriodFilter id="report-period" value={period} onChange={choosePeriod} />
+            </div>
+          )}
           {AREAS.map((area) => (
             <label
               key={area.key}

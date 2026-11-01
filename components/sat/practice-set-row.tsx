@@ -41,7 +41,7 @@ export function PracticeSetRow({
           {showArea ? <AreaTag area={item.area} /> : null}
           <span className="font-semibold text-[var(--sat-text)]">{item.skill}</span>
           <Badge variant={difficultyBadgeVariant(item.difficulty)}>{difficultyLabel(item.difficulty)}</Badge>
-          <WorkStatusBadges state={item.state} overdue={item.overdue} />
+          <WorkStatusBadges state={item.state} overdue={item.overdue} retryOpen={item.retryOpen} />
         </div>
         <DueLine
           assignedAt={item.assignedAt}
@@ -53,6 +53,7 @@ export function PracticeSetRow({
         {item.tries.length > 0 ? (
           <p className="text-xs text-[var(--sat-muted)]">
             {item.tries.length} attempt{item.tries.length === 1 ? "" : "s"} · last attempt <Pct value={item.last?.pct} className="font-semibold" />
+            {item.retryOpen && item.openAnswered !== null ? ` · try ${item.tries.length + 1}: ${item.openAnswered} of ${item.questionCount} answered` : ""}
           </p>
         ) : item.openAnswered !== null ? (
           <p className="text-xs text-[var(--sat-muted)]">{item.openAnswered} of {item.questionCount} answered so far</p>
@@ -66,7 +67,7 @@ export function PracticeSetRow({
         ) : null}
         {readOnly ? null : item.locked ? (
           <Button size="sm" variant="secondary" disabledReason={notOpenReason(item.opensAt)}>{notOpenLabel(item.opensAt)}</Button>
-        ) : item.state === "progress" ? (
+        ) : item.state === "progress" || item.retryOpen ? (
           <Button asChild size="sm"><Link href={player}>Continue ›</Link></Button>
         ) : item.state === "done" ? (
           <Button asChild size="sm" variant="secondary"><Link href={`${player}?start=1`}>↻ Try again</Link></Button>

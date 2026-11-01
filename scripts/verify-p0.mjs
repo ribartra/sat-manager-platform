@@ -41,7 +41,7 @@ const checks = [
   // Source tag on every History and Pending row (practice set / Test source).
   ...["components/sat/history-table.tsx", "components/sat/pending-table.tsx"].map((file) => ({
     file,
-    requires: ["<SourceTag name={r.sourceName} />"],
+    requires: ["<SourceTag name={r.sourceName} unlessIn={r.title} />"],
     label: `Etiqueta de fuente en la fila: ${file}`,
   })),
   ...["app/(teacher)/teacher/pending/page.tsx", "app/(student)/student/pending/page.tsx"].map((file) => ({
@@ -655,7 +655,7 @@ const checks = [
   },
   {
     file: "app/api/reports/students/[studentId]/pdf/route.ts",
-    requires: ["requireTeacherOrAdmin", "buildStudentReportPdf", "TIME_FILTER_END_DATE", "Not found", "fptAttemptId"],
+    requires: ["requireTeacherOrAdmin", "buildStudentReportPdf", "resolvePeriod", "Not found", "fptAttemptId"],
     label: "PDF generado en backend por area (Math/Reading/Writing/FPT) con scope y filtros de tiempo",
   },
   {
@@ -1044,7 +1044,7 @@ const checks = [
   },
   {
     file: "components/sat/history-table.tsx",
-    requires: ["dayLabel(", "show.student", "show.title", "<ChevronCell />", "<SourceTag name={r.sourceName} />"],
+    requires: ["dayLabel(", "show.student", "show.title", "<ChevronCell />", "<SourceTag name={r.sourceName} unlessIn={r.title} />"],
     forbids: ["InvalidateAttemptButton", '    "Date",'],
     label: "Tabla de History compartida (teacher y alumno): marca de dia, columnas ocultas, fila estandar con flecha",
     label: "History: Completed por defecto (status=all = todos); sin columna Date (la marca del dia ya la dice)",

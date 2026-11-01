@@ -14,11 +14,12 @@ data_disk_gb = 50
 # Only used if the VM is ever recreated. The running version is set by `make release`.
 initial_image_tag = "ws-20261030-student-roles"
 
-# SMTP (non-secret part; the password is the sat-email-pass secret).
-email_from = "tester1.poc.turismo@gmail.com"
+# SMTP fallback (non-secret part; the password is the sat-email-pass secret). Admin › Settings › SMTP
+# overrides these field by field (that is where the Gmail app password is entered).
+email_from = "sgadeab@gmail.com"
 email_host = "smtp.gmail.com"
 email_port = 587
-email_user = "tester1.poc.turismo@gmail.com"
+email_user = "sgadeab@gmail.com"
 
 alert_email = "admin@nordmetric.com"
 

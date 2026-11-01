@@ -185,8 +185,10 @@ export async function renderPracticePlayer({
       )
     );
     if (assignmentId) {
-      await withSqliteRetry(() => prisma.assignment.update({
-        where: { id: assignmentId },
+      // A set finished at least once stays COMPLETED while the student retries it (the open try shows
+      // as "Retry in progress"); only a set not done yet moves to IN_PROGRESS.
+      await withSqliteRetry(() => prisma.assignment.updateMany({
+        where: { id: assignmentId, status: { in: ["PENDING", "OVERDUE"] } },
         data: { status: "IN_PROGRESS" },
       }));
     }

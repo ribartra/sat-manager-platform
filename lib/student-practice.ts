@@ -44,6 +44,8 @@ export interface PracticeSetItem {
   last: PracticeTry | null;
   /** Answers saved in the open try (for "k of n answered so far"). */
   openAnswered: number | null;
+  /** A finished set the student is trying again: it stays "done" (Completed), with this open try. */
+  retryOpen: boolean;
   questionCount: number;
 }
 
@@ -109,7 +111,9 @@ export async function loadStudentPractice(studentId: string): Promise<PracticeSe
       });
       const open = a.attempts.find((t) => t.status === "IN_PROGRESS");
       const last = tries[tries.length - 1] ?? null;
-      const state: WorkState = open ? "progress" : tries.length > 0 || a.status === "COMPLETED" ? "done" : "todo";
+      // Finished once = Completed for good: an open retry doesn't move it back to "in progress".
+      const finished = tries.length > 0 || a.status === "COMPLETED";
+      const state: WorkState = finished ? "done" : open ? "progress" : "todo";
       const locked = a.locked || Boolean(a.unlockAt && a.unlockAt > now);
       return {
         assignmentId: a.id,
@@ -131,6 +135,7 @@ export async function loadStudentPractice(studentId: string): Promise<PracticeSe
         tries,
         last,
         openAnswered: open ? open.answers.filter((x) => x.answer && x.answer.trim()).length : null,
+        retryOpen: finished && Boolean(open),
         questionCount: a.practiceSet._count.questions,
       };
     })

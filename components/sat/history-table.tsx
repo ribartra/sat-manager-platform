@@ -114,7 +114,7 @@ function HistoryTableRow({ row: r, show, href, studentHref }: { row: HistoryRow;
           <span className="flex flex-wrap items-center gap-2">
             <RowLink href={href}>{r.title}</RowLink>
             {r.difficulty && show.difficulty ? <Badge variant={difficultyBadgeVariant(r.difficulty)}>{difficultyLabel(r.difficulty)}</Badge> : null}
-            <SourceTag name={r.sourceName} />
+            <SourceTag name={r.sourceName} unlessIn={r.title} />
             {r.status === "INVALIDATED" ? <AttemptStatusBadge status={r.status} /> : null}
           </span>
         </td>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { nameWithSource } from "@/lib/test-name";
 import { notFound } from "next/navigation";
 import { LinkTabs, PageHeader, PageShell } from "@/components/sat";
 import { PAGE_TITLE_CLASS } from "@/components/sat/page-shell";
@@ -74,7 +75,7 @@ export async function AssignView({ studentId, query }: { studentId: string | nul
   const carry = assignQuery({ ...params, edit: [] });
   const tabs = AREA_TABS.map((t) => ({ key: t.key, label: t.label, href: assignHref({ studentId, area: t.key }) }));
   const itemLabel = presetTest
-    ? `${presetTest.name} · ${presetTest.source?.name ?? "No source"}`
+    ? nameWithSource(presetTest.name, presetTest.source?.name ?? "No source")
     : presetSet
       ? `${presetSet.topic.name} (${difficultyLabel(presetSet.difficulty)})`
       : null;

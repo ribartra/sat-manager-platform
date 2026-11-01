@@ -67,38 +67,27 @@ export function StrikeButton({ label, struck, onClick, disabled }: { label: stri
   );
 }
 
-const FORMULAS: { title: string; lines: string[] }[] = [
-  { title: "Circle", lines: ["A = πr²", "C = 2πr"] },
-  { title: "Rectangle", lines: ["A = ℓw"] },
-  { title: "Triangle", lines: ["A = ½bh"] },
-  { title: "Pythagorean theorem", lines: ["c² = a² + b²"] },
-  { title: "Special right triangles", lines: ["30°-60°-90°: x, x√3, 2x", "45°-45°-90°: s, s, s√2"] },
-  { title: "Volume", lines: ["Box: V = ℓwh", "Cylinder: V = πr²h", "Sphere: V = ⁴⁄₃πr³", "Cone: V = ⅓πr²h", "Pyramid: V = ⅓ℓwh"] },
-];
+/** The reference sheet as given (meeting with Soledad, T07): public/reference-sheet.svg, from her PDF. */
+export const REFERENCE_SHEET_SRC = "/reference-sheet.svg";
 
-/** SAT Math reference sheet (formulas given on test day). */
+/** SAT Math reference sheet (formulas given on test day), shown as the original sheet. */
 export function ReferenceSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-xl">
+      <DialogContent className="max-h-[92vh] max-w-4xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Reference sheet</DialogTitle>
-          <DialogDescription>Formulas you can use in the Math section.</DialogDescription>
+          <DialogDescription>
+            Formulas you can use in the Math section.{" "}
+            <a href={REFERENCE_SHEET_SRC} target="_blank" rel="noreferrer" className="underline">Open full size</a>
+          </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-2 sm:grid-cols-2">
-          {FORMULAS.map((f) => (
-            <div key={f.title} className="rounded-lg border border-gray-200 p-3">
-              <p className="text-sm font-semibold text-gray-900">{f.title}</p>
-              {f.lines.map((line) => (
-                <p key={line} className="font-serif text-sm text-gray-700">{line}</p>
-              ))}
-            </div>
-          ))}
-        </div>
-        <p className="text-xs text-gray-500">
-          The number of degrees of arc in a circle is 360. The number of radians of arc in a circle is 2π. The sum of the measures in degrees of the
-          angles of a triangle is 180.
-        </p>
+        {/* eslint-disable-next-line @next/next/no-img-element -- a static vector sheet; next/image adds nothing here. */}
+        <img
+          src={REFERENCE_SHEET_SRC}
+          alt="SAT Math reference sheet: area of a circle (A = πr², C = 2πr), rectangle (A = ℓw), triangle (A = ½bh), Pythagorean theorem (c² = a² + b²), special right triangles 30°-60°-90° (x, x√3, 2x) and 45°-45°-90° (s, s, s√2), volumes of a box (V = ℓwh), cylinder (V = πr²h), sphere (V = 4/3 πr³), cone (V = 1/3 πr²h) and pyramid (V = 1/3 ℓwh). The number of degrees of arc in a circle is 360; the number of radians of arc in a circle is 2π; the sum of the measures in degrees of the angles of a triangle is 180."
+          className="h-auto w-full rounded-md border border-gray-200 bg-white"
+        />
       </DialogContent>
     </Dialog>
   );

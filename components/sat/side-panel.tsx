@@ -36,8 +36,9 @@ export function SeeAllPending({ total, href }: { total: number; href: string }) 
 
 /** Status of an assignment not finished: Not started / In progress / Overdue, with a short hint. */
 export function StatusBadge({ status }: { status: string }) {
-  const variant = status === "IN_PROGRESS" ? "warning" : status === "OVERDUE" ? "danger" : "info";
+  const variant = status === "IN_PROGRESS" ? "warning" : status === "OVERDUE" ? "danger" : status === "COMPLETED" ? "success" : "info";
   const help: Record<string, string> = {
+    COMPLETED: "Finished at least once.",
     PENDING: "Assigned, not started yet.",
     IN_PROGRESS: "Started but not finished.",
     OVERDUE: "The due date passed before it was finished.",

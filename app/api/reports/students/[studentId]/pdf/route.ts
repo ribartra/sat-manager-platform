@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import { type ReportFilters } from "@/lib/student-report";
-import { getFeatureSetting } from "@/lib/app-settings";
+import { resolvePeriod } from "@/lib/period-filter";
 import { buildStudentReportPdf, parseReportAreas } from "@/lib/pdf/build-student-report";
 import { ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 
@@ -10,7 +10,8 @@ import { ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
 // concatenated in one file): math,reading,writing,mocks. `fptAttemptId` limits the report to one
 // submitted Full Practice Test. Legacy aliases kept for older links (parents page):
 // mathematics, fpt/exams, and the single `area=` param.
-//   GET /api/reports/students/[id]/pdf?areas=math,mocks&topic=&difficulty=&from=&to=&fptAttemptId=&disposition=inline
+// `period` (all | 30d | 60d | 90d | custom + from / to) limits tries and results to that time.
+//   GET /api/reports/students/[id]/pdf?areas=math,mocks&period=30d&from=&to=&fptAttemptId=&disposition=inline
 export const runtime = "nodejs";
 
 interface RouteContext {
@@ -22,20 +23,19 @@ export const GET = withApiErrors(async function GET(req: Request, { params }: Ro
   if (!session) return new ForbiddenError("Forbidden").toResponse();
 
   const url = new URL(req.url);
-  const showEndDate = await getFeatureSetting("TIME_FILTER_END_DATE");
   const filters: ReportFilters = {
     topic: url.searchParams.get("topic") || undefined,
     difficulty: url.searchParams.get("difficulty") || undefined,
-    from: url.searchParams.get("from") || undefined,
-    // Time filters are open-ended unless Admin → Settings enables the end date.
-    to: showEndDate ? url.searchParams.get("to") || undefined : undefined,
   };
+  // The period chosen in the report dialog (the end date always applies).
+  const period = resolvePeriod({ period: url.searchParams.get("period"), from: url.searchParams.get("from"), to: url.searchParams.get("to") });
   const { studentId } = await params;
   const report = await buildStudentReportPdf({
     viewer: session.user,
     studentId,
     areas: parseReportAreas(url.searchParams.get("areas"), url.searchParams.get("area")),
     filters,
+    period,
     fptAttemptId: url.searchParams.get("fptAttemptId"),
   });
   if (!report) return new NotFoundError("Not found").toResponse();

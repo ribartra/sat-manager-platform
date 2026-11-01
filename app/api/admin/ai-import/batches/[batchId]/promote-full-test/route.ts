@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { defaultTestName } from "@/lib/test-name";
 import { contentProgramFor } from "@/lib/program-scope";
 import { randomUUID } from "crypto";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
@@ -95,11 +96,11 @@ export const POST = withApiErrors(exclusiveJob(CONTENT_JOB, async function POST(
   const existingArtifact = await prisma.ingestPromotionArtifact.findUnique({
     where: { batchId_artifactType_groupKey: { batchId, artifactType: "FULL_PRACTICE_TEST", groupKey } },
   });
-  // Canonical display name for standardized SAT exams (no "Imported" / partial suffix).
-  const testName = `TEST ${testNumber}`;
-
   // The AI Import "Source" of the batch (default College Board / Innovator).
   const sourceId = await promotionSourceId(batchId, "tests");
+  // Canonical display name: source + number ("Innovator Test 1"), no "Imported" / partial suffix.
+  const sourceName = sourceId ? (await prisma.source.findUnique({ where: { id: sourceId }, select: { name: true } }))?.name : null;
+  const testName = defaultTestName(sourceName, testNumber);
   const test = await prisma.$transaction(async (tx) => {
     // Stamp M1/M2 skill + EASY/HARD before wiring so the draft exam is standardized.
     for (let order = 0; order < 4; order++) {
