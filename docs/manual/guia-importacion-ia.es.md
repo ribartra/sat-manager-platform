@@ -1,21 +1,27 @@
 # Guía de importación y mantenimiento de sets con IA
 
-Esta guía explica cómo cargar **contenido nuevo** (un Practice Set o un Test completo) a partir de un PDF usando una IA externa (ChatGPT, Claude, Gemini…), y cómo **mantener** después los sets, Tests y preguntas.
+Esta guía explica cómo cargar **contenido nuevo** con ayuda de una IA externa (ChatGPT, Claude, Gemini…) a partir de los archivos originales:
 
-> Los pasos que se hacen fuera de la plataforma, en la IA externa, se marcan con **[CAPTURA PENDIENTE: …]**. Ahí falta añadir la captura real cuando se haga la primera importación.
+- un **Practice Set** de una habilidad y una dificultad concretas;
+- un **Test** completo, **módulo por módulo** (Reading & Writing 1 y 2, Math 1 y 2).
+
+También explica cómo **refinar** lo cargado y **mantener** después los sets, Tests y preguntas.
+
+> Los pasos que se hacen en la IA externa, o que dependen de su resultado, se marcan con **[CAPTURA PENDIENTE: …]**. Ahí falta añadir la captura real cuando se haga la primera importación.
 
 ## Contenido
 
 1. [Quién puede importar y qué se necesita](#1-quién-puede-importar-y-qué-se-necesita)
-2. [Encontrar el hueco a llenar](#2-encontrar-el-hueco-a-llenar)
-3. [Paso 1 — Qué importas y el PDF](#3-paso-1--qué-importas-y-el-pdf)
-4. [Paso 2 — Pedir el CSV a la IA](#4-paso-2--pedir-el-csv-a-la-ia)
-5. [El archivo CSV: columnas y reglas](#5-el-archivo-csv-columnas-y-reglas)
-6. [Paso 3 — Revisar, recortar figuras y crear el Draft](#6-paso-3--revisar-recortar-figuras-y-crear-el-draft)
-7. [Publicar](#7-publicar)
-8. [Mantenimiento de sets, Tests y preguntas](#8-mantenimiento-de-sets-tests-y-preguntas)
-9. [Correcciones masivas de datos (equipo técnico)](#9-correcciones-masivas-de-datos-equipo-técnico)
-10. [Problemas frecuentes](#10-problemas-frecuentes)
+2. [Cómo vienen los archivos originales](#2-cómo-vienen-los-archivos-originales)
+3. [Encontrar el hueco a llenar](#3-encontrar-el-hueco-a-llenar)
+4. [Cargar un Practice Set (una habilidad y una dificultad)](#4-cargar-un-practice-set-una-habilidad-y-una-dificultad)
+5. [Cargar un Test, módulo por módulo](#5-cargar-un-test-módulo-por-módulo)
+6. [El archivo CSV: columnas y reglas](#6-el-archivo-csv-columnas-y-reglas)
+7. [Refinar: revisar y recortar figuras](#7-refinar-revisar-y-recortar-figuras)
+8. [Publicar](#8-publicar)
+9. [Mantenimiento de sets, Tests y preguntas](#9-mantenimiento-de-sets-tests-y-preguntas)
+10. [Correcciones masivas de datos (equipo técnico)](#10-correcciones-masivas-de-datos-equipo-técnico)
+11. [Problemas frecuentes](#11-problemas-frecuentes)
 
 ---
 
@@ -23,93 +29,180 @@ Esta guía explica cómo cargar **contenido nuevo** (un Practice Set o un Test c
 
 - **Quién:** el **administrador** y el **profesor maestro**. Los demás profesores no ven **Import with AI**.
 - **Qué se necesita:**
-  - El **PDF de las preguntas** (obligatorio).
-  - El **PDF de respuestas / explicaciones** (opcional, muy recomendado: la IA lo usa para llenar respuestas y explicaciones).
-  - Una **fuente** activa (por ejemplo *College Board*, *Innovator*). Si no existe, un administrador la crea en **Admin › Sources**.
-  - Acceso a una IA que **lea PDF y devuelva archivos** (ChatGPT, Claude o Gemini).
+  - Los **archivos originales** (sección 2).
+  - Una **fuente** activa. Hoy los Practice Sets son de **College Board** y los Tests de **Innovator**. Si hace falta otra, un administrador la crea en **Admin › Sources**.
+  - Una IA que **lea PDF y Word y devuelva archivos** (ChatGPT, Claude o Gemini).
 
-**Qué produce la importación:** siempre **un** Practice Set nuevo (una habilidad, un nivel, una fuente) **o un** Test nuevo (4 módulos, una fuente), en estado **Draft**. Nada se publica ni llega a los alumnos hasta que lo publiques (sección 7).
+**Qué produce la importación:** siempre **un** Practice Set nuevo (una habilidad, un nivel, una fuente) **o un** Test nuevo (4 módulos, una fuente), en estado **Draft**. Nada llega a los alumnos hasta que lo publiques (sección 8).
 
-> Regla de contenido: hay **un set por fuente y nivel** en cada habilidad. Si un nivel ya tiene set para esa fuente, no se importa otro: se mantiene el existente (sección 8).
+> Regla de contenido: hay **un set por fuente y nivel** en cada habilidad, y **una versión por fuente** de cada TEST N. Si ya existe, no se importa otro: se mantiene el existente (sección 9).
 
-## 2. Encontrar el hueco a llenar
+## 2. Cómo vienen los archivos originales
 
-**Practice.** En el mapa de habilidades, un nivel que no tiene set aparece como **+ Hard** (o **+ Easy**, **+ Medium**). Al pulsarlo se abre la importación con la habilidad, el nivel y la fuente ya elegidos.
+### Practice Sets
 
-En el ejemplo, la habilidad *Nonlinear Functions* no tiene set **Hard**:
+Hay una carpeta por habilidad, dentro de su área y su dominio. En ella hay **un PDF de preguntas por nivel** y, al lado, su PDF de respuestas, que empieza por **ANS**.
+
+| Archivo | Qué es | Dónde va en el paso 1 |
+|---|---|---|
+| `NON LINEAR FUNCTIONS HARD.pdf` | Las preguntas del nivel Hard | **Questions PDF** |
+| `ANS NON LINEAR FUNCT HARD .pdf` | Respuestas y explicaciones de ese nivel | **Answers / explanations** |
+
+Ruta de ejemplo: `PRACTICE EXERCISES / EXERCISES MATH / ADVANCED MATH / NON LINEAR FUNCTIONS /`.
+
+### Tests
+
+Hay una carpeta por Test (`MOCK EXAMS / TEST N /`). Cada sección viene en **un solo PDF con sus dos módulos, uno detrás de otro**. Al lado van la clave de respuestas y las explicaciones, en Word.
+
+| Archivo (ejemplo TEST 9) | Qué es | Dónde va en el paso 1 |
+|---|---|---|
+| `READING AND WRITING / TEST 9 RW MOD 1, 2, REV PDF.pdf` | R&W: Módulo 1 (págs. 1–17) y Módulo 2 (págs. 18–36) | **Reading and Writing questions** |
+| `MATH / TEST 9 MATH MOD 1, 2B.pdf` | Math: Módulo 1 (págs. 1–10) y Módulo 2B "harder" (págs. 11–20) | **Math questions** |
+| `Test 9 Ans Key.docx` | Clave de respuestas de los 4 módulos | **Answer key & explanations** |
+| `Test9_RW_Answer_Explanations FINAL.docx` | Explicaciones de R&W | **Answer key & explanations** |
+| `Test9_Math ANS Explanations.docx` | Explicaciones de Math | **Answer key & explanations** |
+
+Un Test de la plataforma tiene **4 módulos** con un número fijo de preguntas:
+
+| Módulo | Preguntas | Sale de |
+|---|---|---|
+| Reading and Writing, Module 1 (RW1) | 27 | Primera parte del PDF de R&W |
+| Reading and Writing, Module 2 (RW2) | 27 | Segunda parte del PDF de R&W |
+| Math, Module 1 (MATH1) | 22 | Primera parte del PDF de Math |
+| Math, Module 2 (MATH2) | 22 | Segunda parte del PDF de Math |
+
+**Casos especiales:**
+
+- **Módulo 2A y 2B.** Algunos PDF traen dos versiones del Módulo 2 (por ejemplo, el Math del TEST 3). La plataforma usa la **2B (la difícil)**; el prompt ya se lo indica a la IA.
+- **Una sección en Word.** Por ejemplo, el R&W del TEST 1 viene en `.docx`. Ábrelo y guárdalo como PDF (**Archivo › Guardar como › PDF**) antes del paso 1, para poder recortar figuras.
+- **Orden de los nombres.** Los nombres de archivo cambian de un Test a otro (`MOD 1&2`, `Mod 1, 2B`, `modules 1&2 (A and B)`…). Fíjate en lo que contienen, no en el nombre.
+
+## 3. Encontrar el hueco a llenar
+
+**Practice.** En el mapa de habilidades, un nivel que no tiene set aparece como **+ Hard** (o **+ Easy**, **+ Medium**). Al pulsarlo se abre la importación con la habilidad y el nivel ya elegidos.
+
+En el ejemplo, la habilidad *Nonlinear Functions* tiene Easy y Medium, pero no **Hard**:
 
 ![Practice con un nivel vacío](img/ai-practice-with-gap.png)
 
 ![El nivel vacío "+ Hard"](img/ai-gap-chip.png)
 
-**Tests.** En **Tests** se ve qué números de Test (**TEST N**) existen. En el ejemplo falta **TEST 9**. Pulsa **Import with AI** para crearlo.
+**Tests.** En **Tests** se ve qué números (**TEST N**) existen. En el ejemplo falta **TEST 9**. Pulsa **Import with AI** para crearlo.
 
 ![Tests: falta el TEST 9](img/ai-tests-list.png)
 
-> También puedes abrir la importación directamente con **Import with AI** en **Practice** o **Tests** y elegirlo todo en el paso 1.
+## 4. Cargar un Practice Set (una habilidad y una dificultad)
 
-## 3. Paso 1 — Qué importas y el PDF
+Ejemplo: *Advanced Math › Nonlinear Functions › Hard*, fuente College Board.
 
-Arriba se ven los tres pasos: **What & PDF**, **AI file** y **Review & Draft**.
+### Paso 1 — What & PDF
 
-**Para un Practice Set:**
+1. Pulsa el chip **+ Hard** de la habilidad. La importación se abre con **Section**, **Domain**, **Skill** y **Difficulty** ya elegidos. Si entraste por **Import with AI**, marca **A new Practice Set (one skill and level)** y elígelos tú.
+2. Revisa la **Source** (College Board).
+3. En **Questions PDF** pulsa **Choose PDF** y elige `NON LINEAR FUNCTIONS HARD.pdf`.
+4. En **Answers / explanations** elige `ANS NON LINEAR FUNCT HARD .pdf` (también acepta Word).
+5. Pulsa **Continue to step 2**.
 
-1. En **Content** marca **A new Practice Set (one skill and level)**.
-2. Elige **Section** (Math, Reading o Writing), **Domain** (opcional, sirve para filtrar), **Skill** y **Difficulty**.
-3. Elige la **Source**.
-4. En **Questions PDF** pulsa **Choose PDF** y sube el PDF de las preguntas.
-5. Opcional: en **Answers / explanations PDF** sube el PDF de respuestas.
-6. Pulsa **Continue to step 2**.
+![Paso 1 de un Practice Set, con los archivos originales](img/ai-step1-practice.png)
 
-![Paso 1 para un Practice Set](img/ai-step1-practice.png)
+> Si falta algo, **Continue to step 2** queda bloqueado y, al pasar el cursor, dice qué falta.
 
-**Para un Test:**
+### Paso 2 — AI file
 
-1. En **Content** marca **A new Test (4 modules)**.
-2. Escribe el **Test number** (el N de **TEST N**; agrupa las versiones del mismo Test de distintas fuentes) y el **Test name** (lo ven los alumnos; por defecto "TEST N").
-3. Elige la **Source** y sube los PDF como arriba.
-4. Pulsa **Continue to step 2**.
+1. Pulsa **Copy prompt**. El prompt ya dice la sección, el dominio, la habilidad y el nivel. Con **See the prompt** puedes leerlo.
+2. Abre tu IA, adjunta **los dos PDF** del paso 1, pega el prompt y envíalo.
 
-![Paso 1 para un Test](img/ai-step1-test.png)
+   [CAPTURA PENDIENTE: chat de la IA con los dos PDF adjuntos y el prompt pegado]
 
-> Si falta algo, el botón **Continue to step 2** queda bloqueado y al pasar el cursor dice qué falta (por ejemplo "Upload the questions PDF.").
-
-## 4. Paso 2 — Pedir el CSV a la IA
-
-La plataforma prepara un **prompt** (instrucciones en inglés) hecho a la medida de lo que importas: ya incluye la sección, el dominio, la habilidad y el nivel (o los 4 módulos del Test).
-
-1. Pulsa **Copy prompt**. Con **See the prompt** puedes leerlo.
-
-   [CAPTURA PENDIENTE: paso 2 "Ask an AI for the CSV" con el botón **Copy prompt**]
-
-2. Abre tu IA, **adjunta los PDF** del paso 1, pega el prompt y envíalo.
-
-   [CAPTURA PENDIENTE: chat de la IA con los PDF adjuntos y el prompt pegado]
-
-3. La IA devuelve un archivo **import.csv**. Descárgalo. Si solo muestra texto en el chat, pídele de nuevo "send it as a downloadable file".
+3. La IA devuelve un archivo **import.csv**. Descárgalo. Si solo muestra texto, pídele "send it as a downloadable file".
 
    [CAPTURA PENDIENTE: la IA entregando import.csv]
 
-4. De vuelta en la plataforma, en **Upload the CSV** elige el archivo. Verás una **vista previa**: cuántas filas hay, cuántas se pueden importar, cuántas están listas sin cambios y cuántas tienen errores (estas se dejan fuera).
+4. En la plataforma, en **Upload the CSV**, elige el archivo. Verás una **vista previa**: filas, cuántas se pueden importar, cuántas están listas y cuáles tienen errores o avisos (sección 6).
 
-   [CAPTURA PENDIENTE: vista previa del CSV con la tabla Question / Problems]
+   [CAPTURA PENDIENTE: vista previa del CSV del set]
 
-5. Si la vista previa está bien, pulsa **Import N questions**. Si no, pulsa **Cancel**, corrige el CSV (o pídele a la IA que lo corrija) y súbelo otra vez. Mientras no se haya creado el Draft puedes subir otro con **Replace with a new CSV**.
+5. Si está bien, pulsa **Import N questions**. Si no, pulsa **Cancel**, pide a la IA que corrija el CSV y súbelo otra vez. Hasta crear el Draft puedes cambiarlo con **Replace with a new CSV**.
 
-**Imágenes (opcional): Reprocess with AI (artifacts and images).** Si hay muchas figuras, puedes pedirle a la IA que las recorte:
+### Paso 3 — Review & Draft
 
-1. Descarga el zip (PDF original, cada página como imagen, las preguntas y los prompts).
-2. Pulsa **Copy image prompt** y dáselo a la IA junto con el zip.
-3. La IA devuelve un zip de imágenes con nombres como `Q3_STEM.png`, `Q5_A.png` (en Tests: `RW1_Q3_STEM.png`, `MATH2_Q12_A.png`).
-4. Súbelo con **Upload images (zip)**: cada imagen va a su pregunta.
+1. Refina las preguntas en **Open Review (edit and crop)** (sección 7).
+2. Pulsa **Create Draft Practice Set**. Se crea el set *Advanced Math - Nonlinear Functions - HARD* en **Draft** y se abre su editor.
 
-[CAPTURA PENDIENTE: panel "Reprocess with AI" con el zip de imágenes subido]
+   [CAPTURA PENDIENTE: el Draft del set recién creado]
 
-## 5. El archivo CSV: columnas y reglas
+3. Publícalo (sección 8).
+
+## 5. Cargar un Test, módulo por módulo
+
+Ejemplo: **TEST 9**, fuente Innovator. El Test se crea una vez y se llena **un módulo a la vez**. Puedes hacer un módulo hoy y otro mañana: la importación queda guardada.
+
+### Paso 1 — Todos los archivos del Test
+
+1. En **Tests** pulsa **Import with AI** y marca **A new Test (4 modules)**.
+2. **Test number**: `9`. **Test name** se llena solo con "TEST 9" (es lo que ven los alumnos).
+3. **Source**: Innovator.
+4. Sube los archivos tal como vienen:
+   - **Reading and Writing questions**: `TEST 9 RW MOD 1, 2, REV PDF.pdf`.
+   - **Math questions**: `TEST 9 MATH MOD 1, 2B.pdf`.
+   - **Answer key & explanations**: los tres Word a la vez (`Test 9 Ans Key.docx` y las dos explicaciones).
+5. Pulsa **Continue to step 2**.
+
+![Paso 1 de un Test, con los archivos originales del TEST 9](img/ai-step1-test.png)
+
+> Si solo tienes una sección, puedes subir solo ese PDF. Los módulos de la otra sección quedan bloqueados en esta importación.
+
+### Paso 2 — Un módulo a la vez
+
+El paso 2 muestra **4 tarjetas**, una por módulo. Cada tarjeta dice cuántas preguntas debe tener, qué PDF darle a la IA y cómo va (**Not loaded**, **27/27 loaded · 27 ready**, **In the Draft**).
+
+![Paso 2: una tarjeta por módulo](img/ai-step2-modules.png)
+
+Para **cada módulo**, en este orden: R&W 1 → R&W 2 → Math 1 → Math 2:
+
+1. Pulsa **Copy prompt (RW1)** (o el del módulo). El prompt le dice a la IA **qué módulo** sacar del PDF, cuántas preguntas debe tener y que ignore el otro módulo.
+
+   ![El prompt de un módulo](img/ai-step2-prompt.png)
+
+2. Abre **una conversación nueva** en tu IA. Adjunta el **PDF de esa sección** (R&W o Math) y **los Word de respuestas y explicaciones**, pega el prompt y envíalo.
+
+   [CAPTURA PENDIENTE: chat de la IA con el PDF de R&W, los Word y el prompt de RW1]
+
+3. Descarga el **import.csv** que devuelve.
+
+   [CAPTURA PENDIENTE: la IA entregando el import.csv de RW1]
+
+4. En la tarjeta del módulo, en **Upload the CSV**, elige el archivo y revisa la vista previa. **Fíjate en el número de preguntas.** Si no coincide (por ejemplo 21 de 22), la vista previa avisa: "This module should have 22 questions and the CSV brings 21". Pide a la IA que revise qué pregunta saltó o si mezcló módulos.
+
+   [CAPTURA PENDIENTE: vista previa del CSV de RW1 con 27 filas]
+
+5. Pulsa **Import N questions**. La tarjeta pasa a **27/27 loaded**.
+6. Sigue con el siguiente módulo.
+
+> **Rehacer un módulo:** mientras el módulo no esté en el Draft, sube otro CSV con **Replace with a new CSV**. Solo se reemplaza **ese** módulo; los demás no se tocan.
+
+> **Una conversación por módulo:** pedirle a la IA un módulo a la vez evita respuestas cortadas y mezclas entre módulos. Si tu IA lo permite, puedes seguir en la misma conversación con el prompt del módulo siguiente.
+
+### Paso 3 — Refinar y armar el Draft del Test
+
+1. Refina cada módulo (sección 7). Hay un botón de revisión por sección: **Review Reading and Writing** y **Review Math**. Cada uno abre el PDF de su sección, para recortar las figuras de ese PDF.
+2. Cuando tengas módulos listos, pulsa **Create Draft Test**. Se crea **TEST 9** en Draft con los módulos cargados hasta ese momento.
+
+   [CAPTURA PENDIENTE: paso 3 del Test con los módulos cargados]
+
+3. ¿Cargaste más módulos después? Vuelve a la importación (paso 2, el módulo siguiente) y, en el paso 3, pulsa **Add N questions to the Draft**. Se agregan a su módulo dentro del mismo TEST 9, sin repetir lo que ya estaba.
+4. Cuando el Draft tenga los 4 módulos completos (27 / 27 / 22 / 22), publícalo (sección 8).
+
+> **Refina antes de llevar un módulo al Draft.** Un módulo que ya está en el Draft no acepta otro CSV. Después:
+> - los **recortes de figuras** en **Review** siguen pasando a sus preguntas del Draft;
+> - los **textos, opciones y respuestas** se corrigen en el editor de la pregunta (desde el editor del Test o el **Question Bank**);
+> - el **orden** o **quitar** preguntas se hace en el editor del Test.
+
+## 6. El archivo CSV: columnas y reglas
 
 El prompt ya le explica todo esto a la IA. Esta sección sirve para revisar o corregir el CSV a mano.
 
-**Formato:** UTF-8, separado por comas, cada campo entre comillas dobles. Primera línea, exactamente:
+**Formato:** UTF-8, separado por comas, cada campo entre comillas dobles. La primera línea es exactamente:
 
 ```
 number,module,domain,skill,difficulty,type,stimulus,stem,optionA,optionB,optionC,optionD,correctAnswer,explanation,figure,figurePage,notes
@@ -117,15 +210,15 @@ number,module,domain,skill,difficulty,type,stimulus,stem,optionA,optionB,optionC
 
 | Columna | Qué lleva |
 |---|---|
-| `number` | Número de la pregunta tal como aparece en el PDF. |
-| `module` | Solo Tests: `RW1`, `RW2`, `MATH1` o `MATH2`. En un Practice Set va vacío. La numeración empieza en 1 en cada módulo. |
-| `domain`, `skill`, `difficulty` | Practice Set: los valores elegidos en el paso 1. En Tests son opcionales. |
+| `number` | Número de la pregunta tal como aparece en el PDF. En un Test empieza en 1 en cada módulo. |
+| `module` | Vacío: el módulo lo da la tarjeta donde subes el CSV. |
+| `domain`, `skill`, `difficulty` | Practice Set: los valores elegidos en el paso 1. En Tests van vacíos. |
 | `type` | `MC` (4 opciones) o `NUMERIC` (respuesta escrita). |
 | `stimulus` | El texto, pasaje o tabla al que se refiere la pregunta. Vacío si no hay. |
 | `stem` | La pregunta en sí, sin las opciones. |
 | `optionA` … `optionD` | El texto de cada opción, sin la letra. Vacío en `NUMERIC`. |
 | `correctAnswer` | `MC`: una letra A–D. `NUMERIC`: el valor (`7/2` o `3.5`); varias respuestas válidas separadas por `\|`, por ejemplo `7/2\|3.5`. |
-| `explanation` | La explicación del PDF de respuestas. Vacía si no hay (no se inventa). |
+| `explanation` | La explicación de los archivos de respuestas. Vacía si no hay (no se inventa). |
 | `figure` | Dónde hay una figura que no se puede escribir como texto: `NONE`, `STEM`, `STIMULUS` u `OPTIONS`. |
 | `figurePage` | Página del PDF donde está la figura (1 = primera). |
 | `notes` | Dudas de la IA (texto ilegible, respuesta faltante…). |
@@ -140,59 +233,64 @@ number,module,domain,skill,difficulty,type,stimulus,stem,optionA,optionB,optionC
 
 - **Errores** (la fila **no se importa**):
   - `type` distinto de MC o NUMERIC;
-  - `module` inválido en un Test;
   - pregunta repetida;
   - `stem` vacío sin figura;
   - en MC, una respuesta que no es A–D.
-- **Avisos** (la fila se importa pero queda **Needs review**):
+- **Avisos** (la fila se importa, pero queda **Needs review**):
   - falta la respuesta;
   - menos de 4 opciones con texto;
   - hay una figura que recortar;
   - `$` desbalanceado (LaTeX roto);
   - una nota de la IA;
   - el nivel del CSV no coincide con el elegido (se usa el del paso 1).
-- Faltan columnas obligatorias (`number`, `type`, `stem`, `correctAnswer`, y `module` en Tests): el CSV se rechaza entero.
+- Faltan columnas obligatorias (`number`, `type`, `stem`, `correctAnswer`): el CSV se rechaza entero.
+- En un Test, la vista previa avisa si el número de preguntas no es el del módulo (27 o 22).
 - Límite: el CSV no puede pasar de **5.000.000 de caracteres**.
 
-## 6. Paso 3 — Revisar, recortar figuras y crear el Draft
+## 7. Refinar: revisar y recortar figuras
 
-El paso 3 lista todas las preguntas importadas con su revisión (**Check**) y su estado:
+El paso 3 lista las preguntas cargadas (en un Test, con su módulo: `RW1 · 3`, `MATH2 · 12`…), con su revisión (**Check**) y su estado:
 
 - **Ready**: lista, sin problemas.
 - **Needs review**: hay algo que mirar (respuesta faltante, figura, opciones incompletas…).
 - **Reviewed**: la marcaste como revisada.
-- **In the Draft**: ya está en el Draft creado.
+- **In the Draft**: ya está en el Draft.
 
-[CAPTURA PENDIENTE: paso 3 "Review, crop figures and create the Draft" con la tabla de preguntas]
+Para refinar:
 
-1. Pulsa **Open Review (edit and crop)**.
-2. En cada pregunta con problemas corrige el texto, las opciones o la respuesta.
-3. Si tiene figura: **Crop** sobre la página del PDF y asígnala a la pregunta, al pasaje o a una opción.
+1. Pulsa **Open Review (edit and crop)**. En un Test, **Review Reading and Writing** o **Review Math**. También puedes pulsar el texto de una pregunta en la tabla.
+2. Corrige el texto, las opciones, la respuesta o la explicación.
+3. Si tiene figura: **Crop** sobre la página del PDF y asígnala a la pregunta, al pasaje o a una opción. La columna `figurePage` del CSV dice en qué página está.
 4. Marca la pregunta como **Reviewed**.
 
    [CAPTURA PENDIENTE: Review con el recorte de una figura del PDF]
 
-5. Vuelve al paso 3 y pulsa **Create Draft Practice Set** (o **Create Draft Test**).
+> Haz estas correcciones **antes de crear el Draft** (o, en un Test, antes de añadir el módulo al Draft). Después, los recortes de figuras siguen pasando al Draft, pero los textos y respuestas se corrigen en el editor de la pregunta (sección 9).
 
-Solo entran al Draft las preguntas **Ready** o **Reviewed**. Si quedan otras, la plataforma pregunta **Create a partial Draft?**: con **Create partial Draft** se crea el Draft con las que están listas, y las demás se quedan en la importación para revisarlas después.
+Solo entran al Draft las preguntas **Ready** o **Reviewed**. Si quedan otras, la plataforma pregunta si quieres seguir solo con las listas: **Create partial Draft** (o **Add the ready ones**). Las demás se quedan en la importación para agregarlas después.
 
-Al terminar se abre el Draft. Más tarde puedes volver con **Open the Draft**.
+**Muchas figuras: Reprocess with AI (artifacts and images).** En el paso 2 puedes pedirle a la IA que recorte las figuras por ti:
 
-[CAPTURA PENDIENTE: el Draft recién creado]
+1. Descarga el zip (PDF original, cada página como imagen, las preguntas y los prompts).
+2. Pulsa **Copy image prompt** y dáselo a la IA junto con el zip.
+3. La IA devuelve un zip de imágenes con nombres como `Q3_STEM.png` o `Q5_A.png` (en Tests: `RW1_Q3_STEM.png`, `MATH2_Q12_A.png`).
+4. Súbelo con **Upload images (zip)**: cada imagen va a su pregunta.
 
-## 7. Publicar
+[CAPTURA PENDIENTE: panel "Reprocess with AI" con el zip de imágenes subido]
+
+## 8. Publicar
 
 El Draft no lo ven los alumnos. Para publicarlo:
 
-1. **Primero las preguntas.** En el **Question Bank** (o desde el editor del set/Test) cambia las preguntas del Draft a **Published**. Un set o Test solo se publica con preguntas publicadas.
+1. **Primero las preguntas.** En el **Question Bank** (o desde el editor del set o Test) cambia las preguntas del Draft a **Published**. Un set o Test solo se publica con preguntas publicadas.
 2. **Después el set o Test.** Ábrelo, pulsa **Options → Status** y elige **Published**.
-3. **Regla de los Tests:** para publicar, cada módulo debe tener exactamente **27 / 27 / 22 / 22** preguntas (R&W 1, R&W 2, Math 1, Math 2), sin repetidas entre módulos y cada una en su sección. Mientras falten, el editor avisa "currently has N/27…".
+3. **Regla de los Tests:** cada módulo debe tener exactamente **27 / 27 / 22 / 22** preguntas (R&W 1, R&W 2, Math 1, Math 2), sin repetidas entre módulos y cada una en su sección. Mientras falten, el editor avisa "currently has N/27…".
 
 [CAPTURA PENDIENTE: cambiar el estado del set importado a Published]
 
-Una vez publicado, el set ocupa su nivel en **Practice** (el chip **+ Hard** desaparece) y se puede asignar.
+Una vez publicado, el set ocupa su nivel en **Practice** (el chip **+ Hard** desaparece) o el Test aparece como **TEST 9**, y se puede asignar.
 
-## 8. Mantenimiento de sets, Tests y preguntas
+## 9. Mantenimiento de sets, Tests y preguntas
 
 ### Editar un set
 
@@ -206,19 +304,26 @@ Pulsa **Save Practice Set** (o **Cancel**).
 
 ![Editor de un set](img/maint-set-editor.png)
 
-El menú **Options** del set tiene **Preview** (verlo como alumno), **Assign**, **Edit**, **Status** (Draft / Published / Archived), **Duplicate** y **Delete** (bloqueado si ya se asignó: "assigned · archive it").
+El menú **Options** del set tiene **Preview** (verlo como alumno), **Assign**, **Edit**, **Status** (Draft / Published / Archived), **Duplicate** y **Delete**. **Delete** está bloqueado si el set ya se asignó ("assigned · archive it").
 
 ![Opciones de un set](img/maint-set-options.png)
 
 ### Editar un Test
 
-Abre el Test y pulsa **Options → Edit**. Se editan sus datos (nombre, número, fuente) y las preguntas de cada módulo.
+Abre el Test y pulsa **Options → Edit**. Se editan sus datos (nombre, número, fuente) y las preguntas de cada módulo: orden, quitar y añadir.
 
 ![Editor de un Test](img/maint-test-editor.png)
 
 ### Editar una pregunta
 
-En el **Question Bank** abre la pregunta. Puedes cambiar el pasaje, el enunciado, las opciones, la respuesta correcta, la explicación, la imagen, la habilidad, la dificultad y el estado. Usa `$…$` para las matemáticas, igual que en el CSV.
+En el **Question Bank** abre la pregunta. Puedes cambiar:
+
+- el pasaje, el enunciado y las opciones;
+- la respuesta correcta y la explicación;
+- la imagen;
+- la habilidad, la dificultad y el estado.
+
+Usa `$…$` para las matemáticas, igual que en el CSV.
 
 ![Banco de preguntas con todos los estados](img/maint-question-bank.png)
 
@@ -230,7 +335,7 @@ En el **Question Bank** abre la pregunta. Puedes cambiar el pasaje, el enunciado
 
 - **Draft**: en preparación; los alumnos no lo ven.
 - **Published**: disponible para asignar.
-- **Archived**: retirado. No se puede asignar, pero se conservan los intentos e informes.
+- **Archived**: retirado. No se puede asignar, pero se conservan los intentos y los informes.
 
 El estado se cambia en **Options → Status**. **Delete** solo está disponible si el set **nunca se asignó**; si ya se asignó, archívalo (**Status → Archived**).
 
@@ -240,23 +345,29 @@ El estado se cambia en **Options → Status**. **Delete** solo está disponible 
 
 ### Fuentes
 
-Cada set y Test pertenece a una **fuente**. Un administrador las gestiona en **Admin › Sources**: crearlas, renombrarlas y desactivarlas. En **Assign**, cada fuente es una fila dentro de la habilidad.
+Cada set y Test pertenece a una **fuente**. Un administrador las gestiona en **Admin › Sources**: crearlas, renombrarlas y desactivarlas. En **Assign**, cada fuente es una fila dentro de la habilidad o del TEST N.
 
 ### Imágenes y archivos de origen
 
-En el editor de un set o Test **importado** aparece el recuadro **Images & source files** con **Open**: ahí están el zip con el PDF original y las páginas, el prompt de imágenes y la subida del zip de imágenes (igual que en el paso 2). Cada pregunta tiene además **Images / crop** para recortar su figura del PDF.
+En el editor de un set o Test **importado** aparece el recuadro **Images & source files** con **Open**. Ahí están:
+
+- el zip con los archivos originales y sus páginas;
+- el prompt de imágenes;
+- la subida del zip de imágenes (igual que en la sección 7).
+
+Cada pregunta tiene además **Images / crop**, para recortar su figura del PDF.
 
 [CAPTURA PENDIENTE: recuadro "Images & source files" en el editor de un set importado]
 
 ### "Someone else changed this since you opened it"
 
-Si dos personas editan lo mismo a la vez, al guardar la segunda aparece este aviso y **no se guarda nada**. Recarga la página para ver los cambios de la otra persona y vuelve a hacer los tuyos.
+Si dos personas editan lo mismo a la vez, al guardar la segunda aparece este aviso y **no se guarda nada**. Recarga la página para ver los cambios de la otra persona y vuelve a hacer los tuyos. También aparece si tenías abierto el editor de un Test mientras se le agregaba un módulo desde la importación.
 
-## 9. Correcciones masivas de datos (equipo técnico)
+## 10. Correcciones masivas de datos (equipo técnico)
 
-Para corregir muchas preguntas a la vez (por ejemplo, la misma errata en 200 preguntas) no se edita la base de datos a mano. El equipo técnico crea un **data patch**: un archivo en `prisma/data-patches/` que se aplica automáticamente, una sola vez, en el siguiente despliegue. Si falla, el despliegue se revierte solo. Detalles en `prisma/data-patches/README.md`.
+Para corregir muchas preguntas a la vez (por ejemplo, la misma errata en 200 preguntas) no se edita la base de datos a mano. El equipo técnico crea un **data patch**: un archivo en `prisma/data-patches/` que se aplica automáticamente, una sola vez, en el siguiente despliegue. Si falla, el despliegue se revierte solo. Los detalles están en `prisma/data-patches/README.md`.
 
-## 10. Problemas frecuentes
+## 11. Problemas frecuentes
 
 **No veo Import with AI.**
 Solo el administrador y el profesor maestro lo ven.
@@ -264,17 +375,29 @@ Solo el administrador y el profesor maestro lo ven.
 **"No active source for this kind of content".**
 No hay fuente activa. Pide a un administrador que la cree en **Admin › Sources**.
 
+**"The import service is not available".**
+El servicio que guarda los archivos no responde. Espera unos minutos y vuelve a intentarlo; si sigue, avisa al equipo técnico.
+
 **La IA respondió con texto y no con un archivo.**
 Pídele "send it as a downloadable file". Si no puede, copia el bloque de código en un archivo `import.csv` (UTF-8).
 
+**El módulo trae menos (o más) preguntas de las que debe.**
+La IA se saltó una pregunta o tomó preguntas del otro módulo. Pídele que revise: "Module 1 should have 27 questions; check which one is missing". Después sube el CSV corregido con **Replace with a new CSV**.
+
 **Muchas filas con error.**
-Revisa que la primera línea sea exactamente la cabecera de la sección 5 y que `type` y `correctAnswer` sigan las reglas. Puedes pegar los errores en la IA y pedirle que corrija el CSV.
+Revisa que la primera línea sea exactamente la cabecera de la sección 6 y que `type` y `correctAnswer` sigan las reglas. Puedes pegar los errores en la IA y pedirle que corrija el CSV.
 
 **Las fórmulas se ven raras.**
 Busca `$` sin cerrar (aviso "unbalanced $"). Recuerda que el dinero se escribe `\$`.
 
+**"… is already in the Draft".**
+Ese módulo ya está en el Draft del Test y no acepta otro CSV. Corrige sus preguntas en el editor del Test (o recorta figuras en **Review**).
+
+**"The Test is no longer a Draft".**
+El Test ya se publicó: los cambios se hacen en el editor del Test, no desde la importación.
+
 **"All questions must be published before publishing a Practice Set."**
-Publica primero las preguntas del set (sección 7, paso 1).
+Publica primero las preguntas del set (sección 8, paso 1).
 
 **El Test no se deja publicar.**
 Revisa que cada módulo tenga exactamente 27 / 27 / 22 / 22 preguntas publicadas.

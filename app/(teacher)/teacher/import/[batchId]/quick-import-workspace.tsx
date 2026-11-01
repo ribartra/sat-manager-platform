@@ -25,14 +25,38 @@ export type QuickQuestionRow = {
   level: "ok" | "info" | "warn" | "crit";
   notes: string[];
   images: number;
+  /** Review (edit and crop) on the PDF this question comes from. */
+  reviewHref: string | null;
+};
+
+/** One Test module in step 2: its PDF, its prompt and what is loaded. */
+export type ModuleCardInfo = {
+  code: string;
+  name: string;
+  expected: number;
+  /** The section's questions PDF (null: none was uploaded). */
+  fileName: string | null;
+  prompt: string;
+  loaded: number;
+  ready: number;
+  inDraft: number;
 };
 
 type Preview = {
+  module: string | null;
+  expected: number | null;
   total: number;
   valid: number;
   ready: number;
   dryRun: boolean;
-  rows: Array<{ rowNumber: number; number: number; module: string | null; errors: string[]; warnings: string[]; stem: string }>;
+  rows: Array<{
+    rowNumber: number;
+    number: number;
+    module: string | null;
+    errors: string[];
+    warnings: string[];
+    stem: string;
+  }>;
 };
 
 const LEVEL: Record<QuickQuestionRow["level"], { label: string; variant: "danger" | "warning" | "success" | "info" }> = {
@@ -42,74 +66,65 @@ const LEVEL: Record<QuickQuestionRow["level"], { label: string; variant: "danger
   ok: { label: "OK", variant: "success" },
 };
 
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
+
 export function QuickImportWorkspace({
   batchId,
   kind,
   prompt,
+  modules,
   rows,
-  reviewHref,
+  reviewLinks,
   draftHref,
 }: {
   batchId: string;
   kind: "PRACTICE_SET" | "FULL_PRACTICE_TEST";
+  /** Practice Set: the one prompt. A Test uses one prompt per module (`modules`). */
   prompt: string;
+  modules: ModuleCardInfo[] | null;
   rows: QuickQuestionRow[];
-  reviewHref: string | null;
+  reviewLinks: Array<{ label: string; href: string }>;
   draftHref: string | null;
 }) {
   const router = useRouter();
   const confirm = useConfirm();
-  const [copied, setCopied] = useState(false);
-  const [csv, setCsv] = useState<{ name: string; text: string } | null>(null);
-  const [preview, setPreview] = useState<Preview | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const locked = Boolean(draftHref);
-  const counts = { crit: rows.filter((r) => r.level === "crit").length, warn: rows.filter((r) => r.level === "warn").length, needsReview: rows.filter((r) => r.status === "NEEDS_REVIEW").length };
-
-  async function copyPrompt() {
-    try {
-      await navigator.clipboard.writeText(prompt);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2500);
-    } catch {
-      notify.error("Could not copy: select the prompt text and copy it by hand.");
-    }
-  }
-
-  async function sendCsv(dryRun: boolean, text = csv?.text ?? "") {
-    setBusy(true);
-    setError("");
-    try {
-      const result = await apiFetch<Preview>(`/api/import/quick/${batchId}/csv`, { method: "POST", json: { csv: text, dryRun } });
-      setPreview(result);
-      if (!dryRun) {
-        notify.success(`${result.valid} question${result.valid === 1 ? "" : "s"} imported.`);
-        setCsv(null);
-        setPreview(null);
-        router.refresh();
-      }
-    } catch (err) {
-      setError(errorMessage(err));
-    } finally {
-      setBusy(false);
-    }
-  }
+  const counts = {
+    crit: rows.filter((r) => r.level === "crit").length,
+    warn: rows.filter((r) => r.level === "warn").length,
+    needsReview: rows.filter((r) => r.status === "NEEDS_REVIEW" && !r.promoted).length,
+  };
+  // A Test's Draft grows module by module: questions loaded after it was created can be added.
+  const notInDraft = rows.filter((r) => !r.promoted).length;
 
   async function createDraft(allowPartial = false) {
     setBusy(true);
     setError("");
     try {
-      const result = await apiFetch<{ href: string; questions?: number; leftOut?: number }>(`/api/import/quick/${batchId}/promote`, { method: "POST", json: { allowPartial } });
-      notify.success(result.questions ? `Draft created with ${result.questions} question${result.questions === 1 ? "" : "s"}.` : "Draft opened.");
+      const result = await apiFetch<{
+        href: string;
+        questions?: number;
+        added?: boolean;
+      }>(`/api/import/quick/${batchId}/promote`, {
+        method: "POST",
+        json: { allowPartial },
+      });
+      notify.success(
+        result.added
+          ? `${plural(result.questions ?? 0, "question")} added to the Draft.`
+          : result.questions
+            ? `Draft created with ${plural(result.questions, "question")}.`
+            : "Draft opened.",
+      );
       router.push(result.href);
     } catch (err) {
       setBusy(false);
-      if (err instanceof ApiClientError && err.status === 409 && !allowPartial) {
+      if (err instanceof ApiClientError && err.code === "NEEDS_REVIEW" && !allowPartial) {
         const ok = await confirm({
-          title: "Create a partial Draft?",
-          description: `${err.message} The questions left out stay in this import; you can review them and import again later.`,
-          confirmLabel: "Create partial Draft",
+          title: draftHref ? "Add only the ready questions?" : "Create a partial Draft?",
+          description: `${err.message} The questions left out stay in this import; you can review them and add them later.`,
+          confirmLabel: draftHref ? "Add the ready ones" : "Create partial Draft",
         });
         if (ok) await createDraft(true);
         return;
@@ -125,60 +140,46 @@ export function QuickImportWorkspace({
         <ImportStepHeader
           step={2}
           title="Ask an AI for the CSV"
-          help="Copy the prompt, give it to your AI with the PDF, and upload the CSV it makes."
-          aside={rows.length ? `${rows.length} question${rows.length === 1 ? "" : "s"} loaded` : null}
+          help={
+            modules
+              ? "One module at a time: copy its prompt, give it to your AI with that section's PDF, and upload the CSV it makes."
+              : "Copy the prompt, give it to your AI with the PDF, and upload the CSV it makes."
+          }
+          aside={rows.length ? `${plural(rows.length, "question")} loaded` : null}
         />
         <ol className="list-decimal space-y-1 pl-5 text-sm text-gray-700">
-          <li>Copy the prompt and open your AI chat (ChatGPT, Claude, Gemini…).</li>
-          <li>Attach the PDF(s) you uploaded in step 1, paste the prompt and send it.</li>
-          <li>Download the <b>import.csv</b> file the AI makes (ask for it again if it only shows text).</li>
-          <li>Upload it here, check the preview and import it.</li>
+          <li>Copy the prompt{modules ? " of the module" : ""} and open your AI chat (ChatGPT, Claude, Gemini…).</li>
+          <li>
+            {modules
+              ? "Attach that section's questions PDF and the answer key / explanations, paste the prompt and send it."
+              : "Attach the PDF(s) you uploaded in step 1, paste the prompt and send it."}
+          </li>
+          <li>
+            Download the <b>import.csv</b> file the AI makes (ask for it again if it only shows text).
+          </li>
+          <li>
+            Upload it here, check the preview and import it.
+            {modules ? " Then go on with the next module." : ""}
+          </li>
         </ol>
-        <div className="flex flex-wrap gap-2">
-          <Button onClick={copyPrompt} variant={copied ? "secondary" : "default"}>
-            {copied ? <Check size={14} /> : <Copy size={14} />} {copied ? "Prompt copied" : "Copy prompt"}
-          </Button>
-          <details className="w-full text-sm">
-            <summary className="cursor-pointer text-blue-600">See the prompt</summary>
-            <pre className="mt-2 max-h-80 overflow-auto whitespace-pre-wrap rounded-md border border-gray-200 bg-gray-50 p-3 text-xs text-gray-700">{prompt}</pre>
-          </details>
-        </div>
 
-        <div className="space-y-2 border-t border-gray-100 pt-4">
-          <label className="block text-sm font-medium text-gray-700">
-            {rows.length ? "Replace with a new CSV" : "Upload the CSV"}
-            <input
-              type="file"
-              accept=".csv,text/csv"
-              disabled={busy || locked}
-              className="mt-1 block w-full text-sm text-gray-700 file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-2 file:text-sm file:font-medium"
-              onChange={async (e) => {
-                const file = e.target.files?.[0];
-                e.target.value = "";
-                if (!file) return;
-                const text = await file.text();
-                setCsv({ name: file.name, text });
-                await sendCsv(true, text);
-              }}
+        {modules ? (
+          <div className="grid gap-3 lg:grid-cols-2">
+            {modules.map((module) => (
+              <ModuleCard key={module.code} batchId={batchId} module={module} />
+            ))}
+          </div>
+        ) : (
+          <div className="border-t border-gray-100 pt-4">
+            <CsvLoader
+              batchId={batchId}
+              module={null}
+              prompt={prompt}
+              hasRows={rows.length > 0}
+              lockedReason={draftHref ? "The Draft was already created from this import." : null}
             />
-          </label>
-          {locked ? <p className="text-xs text-gray-500">The Draft was already created from this import.</p> : null}
-          {preview ? (
-            <div className="space-y-2">
-              <p className="text-sm text-gray-700">
-                <b>{csv?.name}</b>: {preview.total} row{preview.total === 1 ? "" : "s"} · <b>{preview.valid}</b> can be imported · {preview.ready} ready without changes
-                {preview.total - preview.valid ? <> · <span className="text-red-600">{preview.total - preview.valid} with errors (left out)</span></> : null}
-              </p>
-              <PreviewTable rows={preview.rows} />
-              <div className="flex gap-2">
-                <Button onClick={() => sendCsv(false)} disabled={busy} disabledReason={!preview.valid ? "No valid row to import." : null}>
-                  Import {preview.valid} question{preview.valid === 1 ? "" : "s"}
-                </Button>
-                <Button variant="secondary" onClick={() => { setPreview(null); setCsv(null); }}>Cancel</Button>
-              </div>
-            </div>
-          ) : null}
-        </div>
+          </div>
+        )}
 
         <details className="rounded-md border border-gray-200 bg-white text-sm">
           <summary className="cursor-pointer px-3 py-2 font-medium text-gray-800">Reprocess with AI (artifacts and images)</summary>
@@ -198,7 +199,11 @@ export function QuickImportWorkspace({
         <ImportStepHeader
           step={3}
           title="Review, crop figures and create the Draft"
-          help="Fix what the check flags, crop figures from the PDF, then create the Draft."
+          help={
+            modules
+              ? "Fix what the check flags, crop figures from each section's PDF, then create the Draft; add later modules to it the same way."
+              : "Fix what the check flags, crop figures from the PDF, then create the Draft."
+          }
           aside={
             rows.length ? (
               <>
@@ -214,17 +219,22 @@ export function QuickImportWorkspace({
         ) : (
           <>
             <p className="text-sm text-gray-700">
-              Open <b>Review</b> to fix text, answers and choices, and to crop figures from the PDF (Crop → assign to the question, the passage or a choice). Mark each
-              fixed question as <i>Reviewed</i>. Only questions that are Ready or Reviewed go into the Draft.
+              Open <b>Review</b> to fix text, answers and choices, and to crop figures from the PDF (Crop → assign to the question, the passage or a choice). Mark each fixed
+              question as <i>Reviewed</i>. Only questions that are Ready or Reviewed go into the Draft.
             </p>
             <div className="flex flex-wrap gap-2">
-              {reviewHref ? (
-                <Button asChild variant="secondary">
-                  <Link href={reviewHref}>Open Review (edit and crop)</Link>
+              {reviewLinks.map((link) => (
+                <Button key={link.href} asChild variant="secondary">
+                  <Link href={link.href}>{link.label}</Link>
+                </Button>
+              ))}
+              {draftHref && kind === "FULL_PRACTICE_TEST" && notInDraft > 0 ? (
+                <Button onClick={() => createDraft(false)} disabled={busy}>
+                  Add {plural(notInDraft, "question")} to the Draft
                 </Button>
               ) : null}
               {draftHref ? (
-                <Button asChild>
+                <Button asChild variant={kind === "FULL_PRACTICE_TEST" && notInDraft > 0 ? "secondary" : "default"}>
                   <Link href={draftHref}>Open the Draft</Link>
                 </Button>
               ) : (
@@ -233,11 +243,184 @@ export function QuickImportWorkspace({
                 </Button>
               )}
             </div>
-            <QuestionTable rows={rows} reviewHref={reviewHref} />
+            <QuestionTable rows={rows} />
           </>
         )}
         <InlineError>{error}</InlineError>
       </Card>
+    </div>
+  );
+}
+
+/** A Test module in step 2: its PDF, its prompt, its CSV and how far it got. */
+function ModuleCard({ batchId, module }: { batchId: string; module: ModuleCardInfo }) {
+  const state =
+    module.inDraft > 0
+      ? {
+          label: `In the Draft · ${module.inDraft}/${module.expected}`,
+          variant: "success" as const,
+        }
+      : module.loaded > 0
+        ? {
+            label: `${module.loaded}/${module.expected} loaded · ${module.ready} ready`,
+            variant: module.loaded === module.expected ? ("info" as const) : ("warning" as const),
+          }
+        : { label: "Not loaded", variant: "default" as const };
+  return (
+    <section className="space-y-3 rounded-[var(--sat-radius)] border border-[var(--sat-border)] p-4">
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div>
+          <h3 className="text-sm font-semibold text-gray-900">{module.name}</h3>
+          <p className="text-xs text-gray-500">
+            {module.expected} questions ·{" "}
+            {module.fileName ? (
+              <>
+                give the AI <b>{module.fileName}</b> + the answer key / explanations
+              </>
+            ) : (
+              "no questions PDF for this section"
+            )}
+          </p>
+        </div>
+        <Badge variant={state.variant}>{state.label}</Badge>
+      </div>
+      <CsvLoader
+        batchId={batchId}
+        module={module}
+        prompt={module.prompt}
+        hasRows={module.loaded > 0}
+        lockedReason={
+          module.inDraft > 0
+            ? "This module is in the Draft: fix its questions in the Test editor (figures can still be cropped in Review)."
+            : !module.fileName
+              ? "This import has no PDF for this section: start a new import with it."
+              : null
+        }
+      />
+    </section>
+  );
+}
+
+/** Copy the prompt, upload the AI's CSV, check the preview and import it (the whole set, or one module). */
+function CsvLoader({
+  batchId,
+  module,
+  prompt,
+  hasRows,
+  lockedReason,
+}: {
+  batchId: string;
+  module: ModuleCardInfo | null;
+  prompt: string;
+  hasRows: boolean;
+  lockedReason: string | null;
+}) {
+  const router = useRouter();
+  const [copied, setCopied] = useState(false);
+  const [csv, setCsv] = useState<{ name: string; text: string } | null>(null);
+  const [preview, setPreview] = useState<Preview | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  async function copyPrompt() {
+    try {
+      await navigator.clipboard.writeText(prompt);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2500);
+    } catch {
+      notify.error("Could not copy: select the prompt text and copy it by hand.");
+    }
+  }
+
+  async function sendCsv(dryRun: boolean, text = csv?.text ?? "") {
+    setBusy(true);
+    setError("");
+    try {
+      const result = await apiFetch<Preview>(`/api/import/quick/${batchId}/csv`, { method: "POST", json: { csv: text, dryRun, module: module?.code } });
+      setPreview(result);
+      if (!dryRun) {
+        notify.success(`${plural(result.valid, "question")} imported${module ? ` into ${module.name}` : ""}.`);
+        setCsv(null);
+        setPreview(null);
+        router.refresh();
+      }
+    } catch (err) {
+      setError(errorMessage(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-wrap items-center gap-2">
+        <Button
+          onClick={copyPrompt}
+          variant={copied ? "secondary" : "default"}
+          disabled={Boolean(lockedReason) && !hasRows}
+          disabledReason={lockedReason && !hasRows ? lockedReason : null}
+        >
+          {copied ? <Check size={14} /> : <Copy size={14} />} {copied ? "Prompt copied" : module ? `Copy prompt (${module.code})` : "Copy prompt"}
+        </Button>
+        <details className="w-full text-sm">
+          <summary className="cursor-pointer text-blue-600">See the prompt</summary>
+          <pre className="mt-2 max-h-80 overflow-auto whitespace-pre-wrap rounded-md border border-gray-200 bg-gray-50 p-3 text-xs text-gray-700">{prompt}</pre>
+        </details>
+      </div>
+      {lockedReason ? null : (
+        <label className="block text-sm font-medium text-gray-700">
+          {hasRows ? "Replace with a new CSV" : "Upload the CSV"}
+          <input
+            type="file"
+            accept=".csv,text/csv"
+            disabled={busy}
+            className="mt-1 block w-full text-sm text-gray-700 file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-2 file:text-sm file:font-medium"
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              e.target.value = "";
+              if (!file) return;
+              const text = await file.text();
+              setCsv({ name: file.name, text });
+              await sendCsv(true, text);
+            }}
+          />
+        </label>
+      )}
+      {lockedReason ? <p className="text-xs text-gray-500">{lockedReason}</p> : null}
+      {preview ? (
+        <div className="space-y-2">
+          <p className="text-sm text-gray-700">
+            <b>{csv?.name}</b>: {plural(preview.total, "row")} · <b>{preview.valid}</b> can be imported · {preview.ready} ready without changes
+            {preview.total - preview.valid ? (
+              <>
+                {" "}
+                · <span className="text-red-600">{preview.total - preview.valid} with errors (left out)</span>
+              </>
+            ) : null}
+          </p>
+          {preview.expected && preview.valid !== preview.expected ? (
+            <p className="text-sm text-amber-700">
+              This module should have {preview.expected} questions and the CSV brings {preview.valid}. Check that the AI used only this module and did not skip any question.
+            </p>
+          ) : null}
+          <PreviewTable rows={preview.rows} />
+          <div className="flex gap-2">
+            <Button onClick={() => sendCsv(false)} disabled={busy} disabledReason={!preview.valid ? "No valid row to import." : null}>
+              Import {plural(preview.valid, "question")}
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setPreview(null);
+                setCsv(null);
+              }}
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      ) : null}
+      <InlineError>{error}</InlineError>
     </div>
   );
 }
@@ -271,7 +454,7 @@ function PreviewTable({ rows }: { rows: Preview["rows"] }) {
   );
 }
 
-function QuestionTable({ rows, reviewHref }: { rows: QuickQuestionRow[]; reviewHref: string | null }) {
+function QuestionTable({ rows }: { rows: QuickQuestionRow[] }) {
   return (
     <div className="max-h-[32rem] overflow-auto rounded-md border border-gray-200">
       <table className="w-full text-left text-sm">
@@ -288,8 +471,8 @@ function QuestionTable({ rows, reviewHref }: { rows: QuickQuestionRow[]; reviewH
             <tr key={row.id}>
               <td className="whitespace-nowrap px-3 py-2 text-gray-700">{row.module ? `${row.module} · ` : ""}{row.number}</td>
               <td className="px-3 py-2">
-                {reviewHref ? (
-                  <Link href={`${reviewHref}?candidate=${row.id}`} className="text-gray-900 hover:underline">{row.stem || "(image only)"}</Link>
+                {row.reviewHref ? (
+                  <Link href={`${row.reviewHref}?candidate=${row.id}`} className="text-gray-900 hover:underline">{row.stem || "(image only)"}</Link>
                 ) : (
                   row.stem
                 )}

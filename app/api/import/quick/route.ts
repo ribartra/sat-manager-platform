@@ -3,12 +3,12 @@ import prisma from "@/lib/prisma";
 import { assertContentImporter } from "@/lib/rbac";
 import { contentProgramFor } from "@/lib/program-scope";
 import { ingestAuthHeaders, ingestUrl } from "@/lib/internal-ingest";
-import { ApiError, BadRequestError, PayloadTooLargeError, ValidationError, withApiErrors } from "@/lib/api-error";
+import { ApiError, BadRequestError, PayloadTooLargeError, ServiceUnavailableError, ValidationError, withApiErrors } from "@/lib/api-error";
 import { sourceIdIssue } from "@/lib/content-source";
 import { resolvePracticeArea } from "@/lib/practice-area";
 import { isOfficialSkill } from "@/lib/taxonomy-order";
 import { writeAudit } from "@/lib/audit";
-import { QUICK_IMPORT_MODE, type QuickImportTarget } from "@/lib/quick-import";
+import { QUICK_IMPORT_MODE, SECTION_FILE_PREFIX, type QuickImportTarget } from "@/lib/quick-import";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -17,24 +17,41 @@ const MAX_UPLOAD_BYTES = 256 * 1024 * 1024;
 const LEVELS = new Set(["EASY", "MEDIUM", "HARD"]);
 
 // POST /api/import/quick — "Import with AI", step 1: the target (Practice Set: skill + level; Test:
-// name) + source + the original PDF (kept for cropping and the artifacts zip; no OCR is run).
-// Form: kind, topicId?, difficulty?, testName?, sourceId, file (PDF), answers? (PDF, optional).
+// number + name) + source + the original files (kept for cropping and the artifacts zip; no OCR).
+// Form: kind, sourceId,
+//   Practice Set: topicId, difficulty, file (questions PDF), answers? (PDF or DOCX)
+//   Test: testNumber, testName, rwFile? + mathFile? (questions PDF of each section, at least one),
+//         answers* (answer key / explanations, PDF or DOCX, several)
+const isFile = (value: FormDataEntryValue | null): value is File => value instanceof File && value.size > 0;
+const named = (file: File, name: string) => new File([file], name, { type: file.type });
 export const POST = withApiErrors(async function POST(req: NextRequest) {
   const session = await assertContentImporter();
   const programId = await contentProgramFor(session.user);
   const form = await req.formData();
   const kind = String(form.get("kind") || "PRACTICE_SET").toUpperCase();
   const sourceId = String(form.get("sourceId") || "");
-  const file = form.get("file");
-  const answers = form.get("answers");
+  const answers = form.getAll("answers").filter(isFile);
 
   if (kind !== "PRACTICE_SET" && kind !== "FULL_PRACTICE_TEST") throw new BadRequestError("Choose Practice Set or Test.");
   const sourceIssue = await sourceIdIssue(sourceId, kind === "PRACTICE_SET" ? "practice" : "tests");
   if (sourceIssue) throw new ValidationError("Validation failed.", [sourceIssue]);
-  const pdfs = [file, answers].filter((value): value is File => value instanceof File && value.size > 0);
-  if (!(file instanceof File) || file.size === 0) throw new ValidationError("Validation failed.", ["Upload the questions PDF."]);
-  if (pdfs.some((pdf) => !pdf.name.toLowerCase().endsWith(".pdf"))) throw new ValidationError("Validation failed.", ["Upload PDF files."]);
-  if (pdfs.reduce((sum, pdf) => sum + pdf.size, 0) > MAX_UPLOAD_BYTES) throw new PayloadTooLargeError("Upload exceeds the 256 MB limit.");
+  // Questions: one PDF (Practice Set) or one PDF per section (Test), renamed so each section's PDF is
+  // found again for cropping. Answers / explanations: PDF or DOCX, only context for the AI and the zip.
+  const questions: File[] = [];
+  if (kind === "PRACTICE_SET") {
+    const file = form.get("file");
+    if (isFile(file)) questions.push(file);
+  } else {
+    const rw = form.get("rwFile");
+    const math = form.get("mathFile");
+    if (isFile(rw)) questions.push(named(rw, `${SECTION_FILE_PREFIX.RW}${rw.name}`));
+    if (isFile(math)) questions.push(named(math, `${SECTION_FILE_PREFIX.MATH}${math.name}`));
+  }
+  if (questions.length === 0) throw new ValidationError("Validation failed.", [kind === "PRACTICE_SET" ? "Upload the questions PDF." : "Upload the Reading and Writing or the Math questions PDF."]);
+  if (questions.some((pdf) => !pdf.name.toLowerCase().endsWith(".pdf"))) throw new ValidationError("Validation failed.", ["The questions must be PDF files (save a Word file as PDF)."]);
+  if (answers.some((doc) => !/\.(pdf|docx)$/i.test(doc.name))) throw new ValidationError("Validation failed.", ["Answer keys and explanations must be PDF or Word (.docx) files."]);
+  if (answers.length > 6) throw new ValidationError("Validation failed.", ["Upload at most 6 answer / explanation files."]);
+  if ([...questions, ...answers].reduce((sum, doc) => sum + doc.size, 0) > MAX_UPLOAD_BYTES) throw new PayloadTooLargeError("Upload exceeds the 256 MB limit.");
 
   let target: QuickImportTarget;
   if (kind === "PRACTICE_SET") {
@@ -65,15 +82,19 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
     upstream.set("domainName", target.domainName);
     upstream.set("difficulty", target.difficulty);
   }
-  upstream.append("files", file, file.name);
-  upstream.append("roles", "QUESTION");
-  if (answers instanceof File && answers.size > 0) {
-    upstream.append("files", answers, answers.name);
+  for (const file of questions) {
+    upstream.append("files", file, file.name);
+    upstream.append("roles", "QUESTION");
+  }
+  for (const file of answers) {
+    upstream.append("files", file, file.name);
     upstream.append("roles", "ANSWER_EXPLANATION");
   }
-  const res = await fetch(ingestUrl("/batches/upload-sources"), { method: "POST", headers: ingestAuthHeaders(), body: upstream });
+  const res = await fetch(ingestUrl("/batches/upload-sources"), { method: "POST", headers: ingestAuthHeaders(), body: upstream }).catch(() => {
+    throw new ServiceUnavailableError("The import service is not available. Try again in a few minutes.");
+  });
   const data = (await res.json().catch(() => ({}))) as { id?: string; detail?: string };
-  if (!res.ok || !data.id) throw ApiError.fromStatus(res.ok ? 502 : res.status, data.detail || "The import service could not save the PDF.");
+  if (!res.ok || !data.id) throw ApiError.fromStatus(res.ok ? 502 : res.status, data.detail || "The import service could not save the files.");
 
   await prisma.ingestBatch.update({
     where: { id: data.id },

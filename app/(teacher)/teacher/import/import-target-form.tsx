@@ -20,7 +20,11 @@ const AREAS: Array<{ code: Area; label: string }> = [
   { code: "WRITING", label: "Writing" },
 ];
 
-/** Step 1: Practice Set (section → domain → skill → level) or Test (name), source and the PDF. */
+/**
+ * Step 1: Practice Set (section → domain → skill → level) or Test (number + name), source and the
+ * original files. A Test comes as the originals do: one questions PDF per section (each with its two
+ * modules) plus the answer key and explanations (PDF or Word); step 2 then goes module by module.
+ */
 export function ImportTargetForm({
   skills,
   practiceSources,
@@ -45,7 +49,9 @@ export function ImportTargetForm({
   const [testNumber, setTestNumber] = useState("");
   const [testName, setTestName] = useState("");
   const [file, setFile] = useState<File | null>(null);
-  const [answers, setAnswers] = useState<File | null>(null);
+  const [rwFile, setRwFile] = useState<File | null>(null);
+  const [mathFile, setMathFile] = useState<File | null>(null);
+  const [answers, setAnswers] = useState<File[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
@@ -57,7 +63,8 @@ export function ImportTargetForm({
     kind === "PRACTICE_SET" && !difficulty ? "Choose the level." :
     kind === "FULL_PRACTICE_TEST" && !(Number(testNumber) >= 1) ? "Write the test number." :
     kind === "FULL_PRACTICE_TEST" && !testName.trim() ? "Write the test name." :
-    !file ? "Upload the questions PDF." : null;
+    kind === "PRACTICE_SET" && !file ? "Upload the questions PDF." :
+    kind === "FULL_PRACTICE_TEST" && !rwFile && !mathFile ? "Upload the Reading and Writing or the Math questions PDF." : null;
 
   function changeKind(next: typeof kind) {
     setKind(next);
@@ -66,7 +73,7 @@ export function ImportTargetForm({
   }
 
   async function submit() {
-    if (missing || !file) return;
+    if (missing) return;
     setBusy(true);
     setError("");
     const form = new FormData();
@@ -79,8 +86,12 @@ export function ImportTargetForm({
       form.set("testNumber", testNumber);
       form.set("testName", testName.trim());
     }
-    form.set("file", file);
-    if (answers) form.set("answers", answers);
+    if (kind === "PRACTICE_SET" && file) form.set("file", file);
+    if (kind === "FULL_PRACTICE_TEST") {
+      if (rwFile) form.set("rwFile", rwFile);
+      if (mathFile) form.set("mathFile", mathFile);
+    }
+    for (const doc of answers) form.append("answers", doc);
     try {
       const data = await apiFetch<{ batchId: string }>("/api/import/quick", { method: "POST", body: form });
       router.push(`/teacher/import/${data.batchId}`);
@@ -92,7 +103,7 @@ export function ImportTargetForm({
 
   return (
     <Card padding="lg" className="space-y-5">
-      <ImportStepHeader step={1} title="What are you importing?" help="A new Draft Practice Set (one skill and level) or a new Test, its source and the original PDF." />
+      <ImportStepHeader step={1} title="What are you importing?" help="A new Draft Practice Set (one skill and level) or a new Test, its source and the original files." />
 
       <fieldset className="space-y-2">
         <legend className="text-sm font-medium text-gray-700">Content</legend>
@@ -162,10 +173,37 @@ export function ImportTargetForm({
         </Field>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <FileTray label="Questions PDF" required hint="Kept to crop figures in step 3 and for the artifacts zip." file={file} onChange={setFile} />
-        <FileTray label="Answers / explanations PDF" hint="Give it to the AI too, so it can fill answers and explanations." file={answers} onChange={setAnswers} />
-      </div>
+      {kind === "PRACTICE_SET" ? (
+        <div className="grid gap-4 sm:grid-cols-2">
+          <FileTray label="Questions PDF" required hint="Kept to crop figures in step 3 and for the artifacts zip." files={file ? [file] : []} onChange={(files) => setFile(files[0] ?? null)} />
+          <FileTray
+            label="Answers / explanations"
+            hint="PDF or Word. Give it to the AI too, so it can fill answers and explanations."
+            accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            files={answers}
+            onChange={(files) => setAnswers(files.slice(0, 1))}
+          />
+        </div>
+      ) : (
+        <>
+          <p className="text-sm text-gray-600">
+            Upload the files as they come: one PDF per section, each with its <b>Module 1 and Module 2</b>. In step 2 you load the Test one module at a time. If a
+            section comes as Word, save it as PDF first (File › Save as › PDF) so figures can be cropped.
+          </p>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <FileTray label="Reading and Writing questions" hint="The R&W PDF (Module 1 and Module 2)." files={rwFile ? [rwFile] : []} onChange={(files) => setRwFile(files[0] ?? null)} />
+            <FileTray label="Math questions" hint="The Math PDF (Module 1 and Module 2)." files={mathFile ? [mathFile] : []} onChange={(files) => setMathFile(files[0] ?? null)} />
+            <FileTray
+              label="Answer key & explanations"
+              hint="PDF or Word, several files (answer key, R&W and Math explanations)."
+              accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+              multiple
+              files={answers}
+              onChange={setAnswers}
+            />
+          </div>
+        </>
+      )}
 
       <InlineError>{error}</InlineError>
       <div className="flex justify-end gap-2 border-t border-gray-100 pt-4">
@@ -186,8 +224,25 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
   );
 }
 
-/** PDF picker in the AI Import tray style: dashed box, file name, choose button. */
-function FileTray({ label, hint, required = false, file, onChange }: { label: string; hint: string; required?: boolean; file: File | null; onChange: (file: File | null) => void }) {
+/** File picker in the AI Import tray style: dashed box, file name(s), choose button. */
+function FileTray({
+  label,
+  hint,
+  required = false,
+  accept = ".pdf,application/pdf",
+  multiple = false,
+  files,
+  onChange,
+}: {
+  label: string;
+  hint: string;
+  required?: boolean;
+  accept?: string;
+  multiple?: boolean;
+  files: File[];
+  onChange: (files: File[]) => void;
+}) {
+  const word = accept.includes("docx") ? "file" : "PDF";
   return (
     <div className="flex h-full flex-col gap-2 rounded-[var(--sat-radius)] border border-dashed border-[var(--sat-border-strong)] bg-[var(--sat-surface-2)] p-4">
       <div className="flex items-baseline justify-between gap-2">
@@ -196,10 +251,14 @@ function FileTray({ label, hint, required = false, file, onChange }: { label: st
       </div>
       <p className="text-xs text-gray-500">{hint}</p>
       <label className="mt-auto inline-flex cursor-pointer items-center gap-2 self-start rounded-lg border border-[var(--sat-border)] bg-white px-3 py-1.5 text-sm font-medium hover:bg-[var(--sat-primary-soft)]">
-        {file ? "Change file" : "Choose PDF"}
-        <input type="file" accept=".pdf,application/pdf" className="sr-only" onChange={(e) => onChange(e.target.files?.[0] ?? null)} />
+        {files.length ? (multiple ? "Change files" : "Change file") : multiple ? `Choose ${word}s` : `Choose ${word}`}
+        <input type="file" accept={accept} multiple={multiple} className="sr-only" onChange={(e) => onChange(Array.from(e.target.files ?? []))} />
       </label>
-      <p className="truncate text-xs text-gray-600" title={file?.name}>{file ? file.name : "No file chosen"}</p>
+      {files.length ? (
+        files.map((f) => <p key={f.name} className="truncate text-xs text-gray-600" title={f.name}>{f.name}</p>)
+      ) : (
+        <p className="text-xs text-gray-600">No file chosen</p>
+      )}
     </div>
   );
 }

@@ -5,11 +5,11 @@ import prisma from "@/lib/prisma";
 import { requireContentImporter } from "@/lib/rbac";
 import { NotFoundError } from "@/lib/api-error";
 import { loadQuickBatch } from "@/lib/quick-import.server";
-import { buildCsvPrompt, TEST_MODULES, testModuleIndex } from "@/lib/quick-import";
+import { buildCsvPrompt, TEST_MODULE_INFO, TEST_MODULES, testModuleIndex } from "@/lib/quick-import";
 import { buildQuestionContent, classifyQuestion } from "@/lib/ingest-sets";
 import { difficultyLabel } from "@/lib/domain-meta";
 import { practiceAreaLabel, type PracticeAreaCode } from "@/lib/practice-area";
-import { QuickImportWorkspace, type QuickQuestionRow } from "./quick-import-workspace";
+import { QuickImportWorkspace, type ModuleCardInfo, type QuickQuestionRow } from "./quick-import-workspace";
 import { ImportSteps } from "@/components/sat/import-steps";
 
 /**
@@ -28,7 +28,10 @@ export default async function QuickImportBatchPage({ params }: { params: Promise
     if (error instanceof NotFoundError) notFound();
     throw error;
   }
-  const { batch, target, questionFile } = loaded;
+  const { batch, target, questionFile, sectionFiles } = loaded;
+  const isTest = target.kind === "FULL_PRACTICE_TEST";
+  // Review (edit and crop) opens the questions PDF the question comes from: a Test's R&W or Math PDF.
+  const reviewFor = (fileId: string | null | undefined) => (fileId ? `/admin/import/ai/${batchId}/files/${fileId}` : null);
   const [candidates, links, source, artifact] = await Promise.all([
     prisma.ingestQuestionCandidate.findMany({ where: { batchId } }),
     prisma.ingestCandidateImageLink.findMany({ where: { batchId }, select: { candidateId: true, targetType: true } }),
@@ -70,7 +73,8 @@ export default async function QuickImportBatchPage({ params }: { params: Promise
       return {
         id: c.id,
         number: c.questionNumber ?? 0,
-        module: target.kind === "FULL_PRACTICE_TEST" ? TEST_MODULES[testModuleIndex(c)] : null,
+        module: isTest ? TEST_MODULES[testModuleIndex(c)] : null,
+        reviewHref: reviewFor(c.sourceFileId ?? questionFile?.id),
         stem: (c.stem ?? "").slice(0, 120),
         status: c.status,
         promoted: c.promotionStatus === "PROMOTED",
@@ -79,6 +83,35 @@ export default async function QuickImportBatchPage({ params }: { params: Promise
         images: own.length,
       };
     });
+
+  // A Test is loaded one module at a time: one card per module (its PDF, prompt and what is loaded).
+  const modules: ModuleCardInfo[] | null = isTest
+    ? TEST_MODULES.map((code) => {
+        const info = TEST_MODULE_INFO[code];
+        const own = rows.filter((row) => row.module === code);
+        const file = sectionFiles[info.section];
+        return {
+          code,
+          name: info.name,
+          expected: info.expected,
+          fileName: file ? file.relativePath.split("/").pop()!.replace(/^(RW|Math) questions - /, "") : null,
+          prompt: buildCsvPrompt(target, code),
+          loaded: own.length,
+          ready: own.filter((row) => row.status === "READY" || row.status === "REVIEWED").length,
+          inDraft: own.filter((row) => row.promoted).length,
+        };
+      })
+    : null;
+  const pdfNames = isTest
+    ? [sectionFiles.RW, sectionFiles.MATH].filter(Boolean).map((file) => file!.relativePath.split("/").pop()!.replace(/^(RW|Math) questions - /, "")).join(" · ")
+    : questionFile?.relativePath.split("/").pop();
+
+  // Older Test imports (one PDF for the whole Test) keep the single Review link.
+  const sectionLinks = [
+    { label: "Review Reading and Writing", href: isTest ? reviewFor(sectionFiles.RW?.id) : null },
+    { label: "Review Math", href: isTest ? reviewFor(sectionFiles.MATH?.id) : null },
+  ].filter((link): link is { label: string; href: string } => Boolean(link.href));
+  const reviewLinks = sectionLinks.length ? sectionLinks : questionFile ? [{ label: "Open Review (edit and crop)", href: reviewFor(questionFile.id)! }] : [];
 
   const title =
     target.kind === "PRACTICE_SET"
@@ -100,7 +133,7 @@ export default async function QuickImportBatchPage({ params }: { params: Promise
         title="Import with AI"
         description={
           <>
-            {title} · Source: <b>{source?.name ?? "—"}</b> · PDF: {questionFile?.relativePath.split("/").pop() ?? "—"}
+            {title} · Source: <b>{source?.name ?? "—"}</b> · PDF: {pdfNames || "—"}
           </>
         }
       />
@@ -110,8 +143,9 @@ export default async function QuickImportBatchPage({ params }: { params: Promise
         batchId={batchId}
         kind={target.kind}
         prompt={buildCsvPrompt(target)}
+        modules={modules}
         rows={rows}
-        reviewHref={questionFile ? `/admin/import/ai/${batchId}/files/${questionFile.id}` : null}
+        reviewLinks={reviewLinks}
         draftHref={artifact ? (artifact.artifactType === "PRACTICE_SET" ? `/teacher/practice-sets/${artifact.artifactId}?edit` : `/teacher/tests/${artifact.artifactId}?edit`) : null}
       />
     </PageShell>

@@ -40,6 +40,39 @@ export const QUICK_IMPORT_COLUMNS = [
 
 /** Test modules in order (R&W 1, R&W 2, Math 1, Math 2). */
 export const TEST_MODULES = ["RW1", "RW2", "MATH1", "MATH2"] as const;
+export type TestModuleCode = (typeof TEST_MODULES)[number];
+
+/** A Test is imported one module at a time: what each module is, its PDF and its question count. */
+export const TEST_MODULE_INFO: Record<TestModuleCode, { name: string; section: "RW" | "MATH"; second: boolean; expected: number; minutes: number }> = {
+  RW1: { name: "Reading and Writing, Module 1", section: "RW", second: false, expected: 27, minutes: 32 },
+  RW2: { name: "Reading and Writing, Module 2", section: "RW", second: true, expected: 27, minutes: 32 },
+  MATH1: { name: "Math, Module 1", section: "MATH", second: false, expected: 22, minutes: 35 },
+  MATH2: { name: "Math, Module 2", section: "MATH", second: true, expected: 22, minutes: 35 },
+};
+
+export function parseTestModule(value: unknown): TestModuleCode | null {
+  const code = String(value ?? "").toUpperCase().replace(/[\s_-]/g, "");
+  return (TEST_MODULES as readonly string[]).includes(code) ? (code as TestModuleCode) : null;
+}
+
+/**
+ * A Test's question files come one per section (the originals bring R&W modules 1-2 in one PDF and
+ * Math modules 1-2 in another). The upload names them with this prefix so each module is cropped from
+ * its own section's PDF.
+ */
+export const SECTION_FILE_PREFIX = { RW: "RW questions - ", MATH: "Math questions - " } as const;
+
+export function sectionOfFile(relativePath: string): "RW" | "MATH" | null {
+  const name = relativePath.split("/").pop() ?? "";
+  if (name.startsWith(SECTION_FILE_PREFIX.RW)) return "RW";
+  if (name.startsWith(SECTION_FILE_PREFIX.MATH)) return "MATH";
+  return null;
+}
+
+/** The module code of a staged Test question (section + module label). */
+export function candidateTestModule(candidate: { section: string | null; moduleLabel: string | null }): TestModuleCode {
+  return TEST_MODULES[testModuleIndex(candidate)];
+}
 const FIGURES = new Set(["NONE", "STEM", "STIMULUS", "OPTIONS"]);
 
 export function parseTarget(json: string | null | undefined): QuickImportTarget | null {
@@ -92,11 +125,14 @@ function normalizeAnswer(type: "MC" | "NUMERIC", value: string) {
   return raw.replace(/\s*(\||;|\bor\b)\s*/gi, "|");
 }
 
-/** CSV text → rows checked against the target (Practice Set: target taxonomy; Test: `module` column). */
-export function readQuickImportCsv(csv: string, target: QuickImportTarget): { rows: QuickRow[]; missingColumns: string[] } {
+/**
+ * CSV text → rows checked against the target (Practice Set: target taxonomy; Test: the `module`
+ * column, or every row in `onlyModule` when the Test is loaded one module at a time).
+ */
+export function readQuickImportCsv(csv: string, target: QuickImportTarget, onlyModule: TestModuleCode | null = null): { rows: QuickRow[]; missingColumns: string[] } {
   const records = parseCsv(csv);
   const headers = new Set(Object.keys(records[0] ?? {}).map((h) => h.trim()));
-  const required = target.kind === "FULL_PRACTICE_TEST" ? ["number", "module", "type", "stem", "correctAnswer"] : ["number", "type", "stem", "correctAnswer"];
+  const required = target.kind === "FULL_PRACTICE_TEST" && !onlyModule ? ["number", "module", "type", "stem", "correctAnswer"] : ["number", "type", "stem", "correctAnswer"];
   const missingColumns = records.length ? required.filter((column) => !headers.has(column)) : required;
   const seen = new Set<string>();
 
@@ -116,7 +152,7 @@ export function readQuickImportCsv(csv: string, target: QuickImportTarget): { ro
     let topicName = "";
     let difficulty = "";
     if (target.kind === "FULL_PRACTICE_TEST") {
-      const moduleCode = get("module").toUpperCase().replace(/[\s_-]/g, "");
+      const moduleCode = onlyModule ?? get("module").toUpperCase().replace(/[\s_-]/g, "");
       const moduleIndex = TEST_MODULES.indexOf(moduleCode as (typeof TEST_MODULES)[number]);
       if (moduleIndex < 0) errors.push(`module must be one of ${TEST_MODULES.join(", ")} (got "${get("module")}").`);
       // Same staging shape as the OCR pipeline's Test candidates (lib/full-test-modules.ts).
@@ -193,9 +229,15 @@ export function testModuleIndex(candidate: { section: string | null; moduleLabel
 const difficultyWord = (d: string) => (d === "MEDIUM" ? "Medium" : d === "HARD" ? "Hard" : "Easy");
 
 /** Detailed English prompt for the external AI: read the PDF visually and return the CSV file. */
-export function buildCsvPrompt(target: QuickImportTarget) {
+export function buildCsvPrompt(target: QuickImportTarget, onlyModule: TestModuleCode | null = null) {
+  const moduleInfo = onlyModule ? TEST_MODULE_INFO[onlyModule] : null;
   const scope =
-    target.kind === "PRACTICE_SET"
+    target.kind === "FULL_PRACTICE_TEST" && onlyModule && moduleInfo
+      ? `This is ONE module of a full-length digital SAT practice test ("${target.testName}"): ${moduleInfo.name} (${onlyModule}).
+The attached ${moduleInfo.section === "RW" ? "Reading and Writing" : "Math"} PDF contains BOTH modules of that section, one after the other. Use ONLY ${moduleInfo.name}${moduleInfo.second ? ' (it starts where the PDF says "Module 2"; it may be labeled 2B or "harder"; if there is a 2A and a 2B, use 2B)' : ' (it ends where "Module 2" starts)'} and ignore the other module.
+It should have ${moduleInfo.expected} questions, numbered from 1. Use the answer key and explanations only for this module's questions.
+Leave "module", "domain", "skill" and "difficulty" empty.`
+      : target.kind === "PRACTICE_SET"
       ? `This is ONE SAT practice set. Every question belongs to:
 - Section: ${target.section === "MATH" ? "Math" : target.section === "READING" ? "Reading" : "Writing"}
 - Domain: ${target.domainName}
@@ -223,7 +265,7 @@ ${QUICK_IMPORT_COLUMNS.join(",")}
 
 COLUMNS:
 - number: the question number as printed (integer).
-- module: ${target.kind === "FULL_PRACTICE_TEST" ? "RW1, RW2, MATH1 or MATH2." : "leave empty."}
+- module: ${target.kind === "FULL_PRACTICE_TEST" && !onlyModule ? "RW1, RW2, MATH1 or MATH2." : "leave empty."}
 - domain, skill, difficulty: ${target.kind === "PRACTICE_SET" ? "the values given above." : "optional."}
 - type: MC (4 answer choices) or NUMERIC (student-produced response / grid-in).
 - stimulus: the passage, text excerpt, table or data the question refers to (Reading & Writing passages, Math tables). Empty if none. Keep paragraph breaks.
@@ -242,12 +284,12 @@ MATH AND FORMATTING (the platform renders KaTeX):
 - Keep italics/underlines only if they matter for the question (use *word*); otherwise plain text.
 - Do not add text that is not in the PDF. Keep the original wording, punctuation and spelling.
 
-QUALITY CHECK before you answer: the number of rows equals the number of questions in the PDF; every MC row has 4 choices and a letter answer; every NUMERIC row has a value; LaTeX braces and $ are balanced; the header is exactly as above.
+QUALITY CHECK before you answer: the number of rows equals the number of questions in ${moduleInfo ? `${moduleInfo.name} (${moduleInfo.expected})` : "the PDF"}; every MC row has 4 choices and a letter answer; every NUMERIC row has a value; LaTeX braces and $ are balanced; the header is exactly as above.
 
 Small example of the expected rows:
 ${QUICK_IMPORT_COLUMNS.join(",")}
-"1","${target.kind === "FULL_PRACTICE_TEST" ? "MATH1" : ""}","${target.kind === "PRACTICE_SET" ? target.domainName : ""}","${target.kind === "PRACTICE_SET" ? target.topicName : ""}","${target.kind === "PRACTICE_SET" ? difficultyWord(target.difficulty) : ""}","MC","","If $3x + 5 = 20$, what is the value of $x$?","$3$","$5$","$15$","$25$","B","Subtracting 5 from both sides gives $3x = 15$, so $x = 5$.","NONE","",""
-"2","${target.kind === "FULL_PRACTICE_TEST" ? "MATH1" : ""}","${target.kind === "PRACTICE_SET" ? target.domainName : ""}","${target.kind === "PRACTICE_SET" ? target.topicName : ""}","${target.kind === "PRACTICE_SET" ? difficultyWord(target.difficulty) : ""}","NUMERIC","| x | f(x) |\n|---|---|\n| 1 | 4 |\n| 3 | 10 |","The table shows values of the linear function $f$. What is $f(5)$?","","","","","16","","NONE","",""`;
+"1","${target.kind === "FULL_PRACTICE_TEST" && !onlyModule ? "MATH1" : ""}","${target.kind === "PRACTICE_SET" ? target.domainName : ""}","${target.kind === "PRACTICE_SET" ? target.topicName : ""}","${target.kind === "PRACTICE_SET" ? difficultyWord(target.difficulty) : ""}","MC","","If $3x + 5 = 20$, what is the value of $x$?","$3$","$5$","$15$","$25$","B","Subtracting 5 from both sides gives $3x = 15$, so $x = 5$.","NONE","",""
+"2","${target.kind === "FULL_PRACTICE_TEST" && !onlyModule ? "MATH1" : ""}","${target.kind === "PRACTICE_SET" ? target.domainName : ""}","${target.kind === "PRACTICE_SET" ? target.topicName : ""}","${target.kind === "PRACTICE_SET" ? difficultyWord(target.difficulty) : ""}","NUMERIC","| x | f(x) |\n|---|---|\n| 1 | 4 |\n| 3 | 10 |","The table shows values of the linear function $f$. What is $f(5)$?","","","","","16","","NONE","",""`;
 }
 
 /** Prompt that goes inside the artifacts zip: recover the figures as image files named per slot. */

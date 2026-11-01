@@ -7,7 +7,7 @@ if (!WORK) throw new Error("Set MANUAL_WORK to a temporary folder outside the re
 module.exports = {
   REPO,
   WORK,
-  DB: path.join(WORK, "man.db"),
+  DB: process.env.MANUAL_DB ?? path.join(WORK, "man.db"),
   WT: path.join(WORK, "wt"),
   IMG: path.join(REPO, "docs/manual/img"),
   BASE: process.env.MANUAL_BASE ?? "http://localhost:3001",

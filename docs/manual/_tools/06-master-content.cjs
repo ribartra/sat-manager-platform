@@ -1,5 +1,4 @@
-// Master teacher: the empty slot and "Import with AI" step 1 (filled, NOT submitted: the import is
-// done by hand), the Test version of step 1, the set and question editors, a teacher's page.
+// Master teacher: the empty slot for "Import with AI", the set, Test and question editors, a teacher's page.
 const L = require("./lib.cjs");
 const D = require("./db.cjs");
 const { ACCOUNTS: A, MISSING } = require("./config.cjs");
@@ -12,11 +11,7 @@ L.run(async () => {
     const skill = page.locator("details", { hasText: "Nonlinear Functions" }).first();
     await L.shot(page, "ai-gap-chip", skill);
   });
-  const topic = D.one("select id from Topic where name = 'Nonlinear Functions'").id;
-  await L.go(page, `/teacher/import?kind=PRACTICE_SET&topic=${topic}&difficulty=HARD`);
-  await L.shot(page, "ai-step1-practice", "full");
-  await L.go(page, "/teacher/import?kind=FULL_PRACTICE_TEST");
-  await L.shot(page, "ai-step1-test", "full");
+  // The import steps themselves (ai-step1-*, ai-step2-modules) are taken by 07-import-steps.cjs.
   await L.go(page, "/teacher/tests");
   await L.shot(page, "ai-tests-list", "full");
   const set = D.setId("Algebra - Linear Equations in One Variable - EASY");
