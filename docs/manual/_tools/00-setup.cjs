@@ -1,6 +1,7 @@
 // 1) Copies dev.db (a production copy) into MANUAL_WORK, 2) removes one practice set and one Test
 // (the empty slots the AI import guide fills), 3) removes pending invitations of real people,
-// 4) creates the master teacher (no screen creates the first teacher). Never touches dev.db.
+// 4) creates the master teacher (no screen creates the first teacher) and a fictional admin. Never
+// touches dev.db.
 const fs = require("fs");
 const path = require("path");
 const bcrypt = require(path.join(__dirname, "../../../node_modules/bcryptjs"));
@@ -33,6 +34,10 @@ const { REPO, WORK, DB, PROGRAM, ACCOUNTS, MISSING } = require("./config.cjs");
     db.prepare(`insert into User (id,name,email,passwordHash,role,active,validationStatus,validationReviewedAt,termsAcceptedAt,termsVersion,sessionVersion,canManageTeachers,createdAt,updatedAt)
       values ('demo-master', ?, ?, ?, 'TEACHER', 1, 'APPROVED', ?, ?, '2026-10-28', 0, 1, ?, ?)`).run(m.name, m.email, bcrypt.hashSync(m.password, 10), now, now, now, now);
     db.prepare("insert into ProgramTeacher (programId, teacherId, startDate) values (?, 'demo-master', ?)").run(PROGRAM, now);
+    // A fictional admin (the copy's real admins keep their own passwords): same fields as production's.
+    const a = ACCOUNTS.admin;
+    db.prepare(`insert into User (id,name,email,passwordHash,role,active,validationStatus,validationReviewedAt,sessionVersion,canManageTeachers,createdAt,updatedAt)
+      values ('demo-admin', ?, ?, ?, 'ADMIN', 1, 'APPROVED', ?, 0, 0, ?, ?)`).run(a.name, a.email, bcrypt.hashSync(a.password, 10), now, now, now);
   })();
   const check = db.pragma("integrity_check", { simple: true });
   db.close();

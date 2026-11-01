@@ -14,6 +14,7 @@ module.exports = {
   PROGRAM: "program-sat-core",
   // Emulated accounts (fictional people, example.com). Same passwords as docs/manual/cuentas-demo.md.
   ACCOUNTS: {
+    admin: { name: "Sofía Navarro", email: "sofia.navarro@example.com", password: "Sofia#Demo2026" },
     master: { name: "Mariana Torres", email: "mariana.torres@example.com", password: "Mariana#Demo2026" },
     teacher: { name: "Diego Ramírez", email: "diego.ramirez@example.com", password: "Diego#Demo2026" },
     lucia: { name: "Lucía Fernández", email: "lucia.fernandez@example.com", password: "Lucia#Demo2026", phone: "+51 987 654 321", birth: "2009-03-14",

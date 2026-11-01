@@ -7,6 +7,7 @@ Cuentas **ficticias** creadas para tomar las capturas de los manuales.
 
 | Rol | Nombre | Email | Contraseña | Cómo se creó |
 |---|---|---|---|---|
+| Administrador | Sofía Navarro | sofia.navarro@example.com | `Sofia#Demo2026` | Insertado por `00-setup.cjs` (los admins reales de la copia conservan sus contraseñas; no se usan) |
 | Profesor maestro | Mariana Torres | mariana.torres@example.com | `Mariana#Demo2026` | Insertado por `00-setup.cjs` (ninguna pantalla crea al primer profesor) |
 | Profesor | Diego Ramírez | diego.ramirez@example.com | `Diego#Demo2026` | Invitado por Mariana y activado (flujo real) |
 | Alumna | Lucía Fernández | lucia.fernandez@example.com | `Lucia#Demo2026` | Invitada por Diego, con padre; activada |
