@@ -102,9 +102,12 @@ export function TestNumberAccordion({
             <div className={cn("space-y-4 border-t border-[var(--sat-border)] bg-[var(--sat-surface-2)]", compact ? "p-2.5" : "p-3")}>
               {group.versions.map((version) => (
                 <section key={version.key} className="space-y-1.5">
-                  <h3 className="flex items-center gap-2 text-sm font-semibold text-[var(--sat-text)]">
-                    <SourceTag name={version.sourceName} prominent />
-                  </h3>
+                  {/* A version's own card / row is titled "<Source> Test N"; a source's empty slot says which source. */}
+                  {version.empty ? (
+                    <h3 className="flex items-center gap-2 text-sm font-semibold text-[var(--sat-text)]">
+                      <SourceTag name={version.sourceName} prominent />
+                    </h3>
+                  ) : null}
                   {version.node}
                 </section>
               ))}
