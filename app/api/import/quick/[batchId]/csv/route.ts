@@ -18,7 +18,7 @@ const MAX_CSV_CHARS = 5_000_000;
 export const POST = withApiErrors(exclusiveJob(CONTENT_JOB, async function POST(req: NextRequest, { params }: Ctx) {
   const session = await assertContentImporter();
   const { batchId } = await params;
-  const { batch, target, questionFile, sectionFiles } = await loadQuickBatch(batchId, session.user);
+  const { batch, target, questionFile, moduleFile } = await loadQuickBatch(batchId, session.user);
   const body = (await req.json().catch(() => null)) as { csv?: unknown; dryRun?: unknown; module?: unknown } | null;
   const onlyModule = target.kind === "FULL_PRACTICE_TEST" ? parseTestModule(body?.module) : null;
   if (body?.module != null && target.kind === "FULL_PRACTICE_TEST" && !onlyModule) throw new ValidationError("Validation failed.", ["Unknown module."]);
@@ -40,9 +40,9 @@ export const POST = withApiErrors(exclusiveJob(CONTENT_JOB, async function POST(
   };
   if (body?.dryRun !== false) return NextResponse.json({ ...preview, dryRun: true });
 
-  // Each module is staged against its own section's PDF (so Review crops from the right file).
-  const sourceFile = moduleInfo ? sectionFiles[moduleInfo.section] ?? questionFile : questionFile;
-  if (!sourceFile) throw new ValidationError("Validation failed.", [moduleInfo ? `Upload the ${moduleInfo.section === "RW" ? "Reading and Writing" : "Math"} PDF first.` : "The import has no PDF."]);
+  // Each module is staged against its own questions file (so Review crops from the right PDF).
+  const sourceFile = onlyModule ? moduleFile(onlyModule) : questionFile;
+  if (!sourceFile) throw new ValidationError("Validation failed.", [moduleInfo ? `This import has no questions file for ${moduleInfo.name}.` : "The import has no PDF."]);
   if (valid.length === 0) throw new ValidationError("Validation failed.", ["No valid row to import."]);
 
   // What this CSV replaces: the whole import, or only the chosen module's questions.

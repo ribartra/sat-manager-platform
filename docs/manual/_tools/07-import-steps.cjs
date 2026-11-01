@@ -23,20 +23,23 @@ L.run(async () => {
   await files.nth(1).setInputFiles(path.join(NLF, "ANS NON LINEAR FUNCT HARD .pdf"));
   await L.shot(page, "ai-step1-practice", "full");
 
-  // Test: TEST 9 as the originals come.
+  // Test: TEST 9 as the originals come: R&W and Math each in one file with both modules, each
+  // section's explanations in its tray, and one answer key for the whole Test.
   await L.go(page, "/teacher/import?kind=FULL_PRACTICE_TEST");
   await page.getByLabel("Test number").fill("9");
   await page.locator("select").last().selectOption(D.one("select id from Source where name like 'Innovator%'").id);
-  files = page.locator('input[type="file"]');
-  await files.nth(0).setInputFiles(path.join(T9, "READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf"));
-  await files.nth(1).setInputFiles(path.join(T9, "MATH/TEST 9 MATH MOD 1, 2B.pdf"));
-  await files.nth(2).setInputFiles(["Test 9 Ans Key.docx", "Test9_Math ANS Explanations.docx", "Test9_RW_Answer_Explanations FINAL.docx"].map((f) => path.join(T9, f)));
+  const tray = (name) => page.locator("fieldset").filter({ has: page.locator("legend", { hasText: new RegExp(`^${name}$`) }) }).locator('input[type="file"]');
+  await tray("Reading and Writing").nth(0).setInputFiles(path.join(T9, "READING AND WRITING/TEST 9 RW MOD 1, 2, REV PDF.pdf"));
+  await tray("Reading and Writing").nth(1).setInputFiles(path.join(T9, "Test9_RW_Answer_Explanations FINAL.docx"));
+  await tray("Math").nth(0).setInputFiles(path.join(T9, "MATH/TEST 9 MATH MOD 1, 2B.pdf"));
+  await tray("Math").nth(1).setInputFiles(path.join(T9, "Test9_Math ANS Explanations.docx"));
+  await page.getByText("Answer key for the whole Test").locator('xpath=ancestor::div[contains(@class,"border-dashed")][1]').locator('input[type="file"]').setInputFiles(path.join(T9, "Test 9 Ans Key.docx"));
   await L.shot(page, "ai-step1-test", "full");
   await page.getByRole("button", { name: "Continue to step 2" }).click();
   await page.waitForURL(/\/teacher\/import\/[^?/]+$/, { timeout: 180000 });
   await L.settle(page, 1000);
   await L.shot(page, "ai-step2-modules", page.locator("#step-2"));
-  // One module's prompt opened (what is pasted into the AI).
+  // One module's card with its files and its prompt opened (what is pasted into the AI).
   const card = page.locator("section", { hasText: "Reading and Writing, Module 1" });
   await card.getByText("See the prompt").click();
   await page.waitForTimeout(300);

@@ -6,6 +6,19 @@ import { parseCsv } from "@/lib/csv";
 
 export const QUICK_IMPORT_MODE = "AI_CSV";
 
+/**
+ * What each uploaded file is, as chosen in step 1 (never inferred from its name or path: on the
+ * deployed app the teacher only uploads files).
+ *   Practice Set: Q (questions PDF), ANS (answers / explanations).
+ *   Test: per section, RW_Q (Module 1 + 2 in one file) or RW1_Q + RW2_Q (one file per module), the
+ *   same for MATH; RW_ANS / MATH_ANS (that section's answers / explanations); KEY (one answer key for
+ *   the whole Test).
+ */
+export type QuickFileSlot = "Q" | "ANS" | "RW_Q" | "RW1_Q" | "RW2_Q" | "MATH_Q" | "MATH1_Q" | "MATH2_Q" | "RW_ANS" | "MATH_ANS" | "KEY";
+export type SectionLayout = "COMBINED" | "PER_MODULE";
+/** Uploaded files by IngestSourceFile id: their slot and original name. */
+export type QuickFiles = Record<string, { slot: QuickFileSlot; name: string }>;
+
 export type QuickImportTarget =
   | {
       kind: "PRACTICE_SET";
@@ -15,8 +28,19 @@ export type QuickImportTarget =
       /** MATH | READING | WRITING */
       section: string;
       difficulty: "EASY" | "MEDIUM" | "HARD";
+      files?: QuickFiles;
     }
-  | { kind: "FULL_PRACTICE_TEST"; testName: string; /** "TEST N" (groups versions across sources). */ testNumber?: number };
+  | {
+      kind: "FULL_PRACTICE_TEST";
+      testName: string;
+      /** "TEST N" (groups versions across sources). */
+      testNumber?: number;
+      /** How each section's questions came: one file with both modules, or one file per module. */
+      layout?: Record<"RW" | "MATH", SectionLayout>;
+      files?: QuickFiles;
+    };
+
+export const QUESTION_SLOTS: ReadonlySet<QuickFileSlot> = new Set(["Q", "RW_Q", "RW1_Q", "RW2_Q", "MATH_Q", "MATH1_Q", "MATH2_Q"]);
 
 export const QUICK_IMPORT_COLUMNS = [
   "number",
@@ -55,19 +79,42 @@ export function parseTestModule(value: unknown): TestModuleCode | null {
   return (TEST_MODULES as readonly string[]).includes(code) ? (code as TestModuleCode) : null;
 }
 
-/**
- * A Test's question files come one per section (the originals bring R&W modules 1-2 in one PDF and
- * Math modules 1-2 in another). The upload names them with this prefix so each module is cropped from
- * its own section's PDF.
- */
-export const SECTION_FILE_PREFIX = { RW: "RW questions - ", MATH: "Math questions - " } as const;
+const fileIdsIn = (target: QuickImportTarget, slots: QuickFileSlot[]) =>
+  Object.entries(target.files ?? {})
+    .filter(([, file]) => slots.includes(file.slot))
+    .map(([id]) => id);
 
-export function sectionOfFile(relativePath: string): "RW" | "MATH" | null {
-  const name = relativePath.split("/").pop() ?? "";
-  if (name.startsWith(SECTION_FILE_PREFIX.RW)) return "RW";
-  if (name.startsWith(SECTION_FILE_PREFIX.MATH)) return "MATH";
-  return null;
+/** The questions file a Test module is read from (by the section's layout), or null. */
+export function moduleQuestionFileId(target: QuickImportTarget, code: TestModuleCode): string | null {
+  if (target.kind !== "FULL_PRACTICE_TEST") return null;
+  const section = TEST_MODULE_INFO[code].section;
+  const combined = (target.layout?.[section] ?? "COMBINED") === "COMBINED";
+  return fileIdsIn(target, [combined ? (`${section}_Q` as QuickFileSlot) : (`${code}_Q` as QuickFileSlot)])[0] ?? null;
 }
+
+/** Whether a Test module's questions file also holds the section's other module. */
+export function moduleFileIsCombined(target: QuickImportTarget, code: TestModuleCode) {
+  return target.kind === "FULL_PRACTICE_TEST" && (target.layout?.[TEST_MODULE_INFO[code].section] ?? "COMBINED") === "COMBINED";
+}
+
+/** The answer / explanation files to give the AI with a module (its section's + the Test's key), or with a set. */
+export function answerFileIds(target: QuickImportTarget, code: TestModuleCode | null = null): string[] {
+  if (target.kind === "PRACTICE_SET") return fileIdsIn(target, ["ANS"]);
+  return code ? fileIdsIn(target, [`${TEST_MODULE_INFO[code].section}_ANS` as QuickFileSlot, "KEY"]) : fileIdsIn(target, ["RW_ANS", "MATH_ANS", "KEY"]);
+}
+
+/** Every questions file of the import, in module order (no repeats). */
+export function questionFileIds(target: QuickImportTarget): string[] {
+  if (target.kind === "PRACTICE_SET") return fileIdsIn(target, ["Q"]);
+  return [...new Set(TEST_MODULES.map((code) => moduleQuestionFileId(target, code)).filter((id): id is string => Boolean(id)))];
+}
+
+/** The modules a Test questions file holds (one, or both of its section). */
+export function modulesOfFile(target: QuickImportTarget, fileId: string): TestModuleCode[] {
+  return TEST_MODULES.filter((code) => moduleQuestionFileId(target, code) === fileId);
+}
+
+export const fileName = (target: QuickImportTarget, id: string) => target.files?.[id]?.name ?? null;
 
 /** The module code of a staged Test question (section + module label). */
 export function candidateTestModule(candidate: { section: string | null; moduleLabel: string | null }): TestModuleCode {
@@ -231,11 +278,18 @@ const difficultyWord = (d: string) => (d === "MEDIUM" ? "Medium" : d === "HARD" 
 /** Detailed English prompt for the external AI: read the PDF visually and return the CSV file. */
 export function buildCsvPrompt(target: QuickImportTarget, onlyModule: TestModuleCode | null = null) {
   const moduleInfo = onlyModule ? TEST_MODULE_INFO[onlyModule] : null;
+  const sectionWord = moduleInfo?.section === "RW" ? "Reading and Writing" : "Math";
+  const whichPart =
+    onlyModule && moduleInfo && moduleFileIsCombined(target, onlyModule)
+      ? `The attached ${sectionWord} questions PDF contains BOTH modules of that section, one after the other. Use ONLY ${moduleInfo.name}${moduleInfo.second ? ' (it starts where the PDF says "Module 2"; it may be labeled 2B or "harder"; if there is a 2A and a 2B, use 2B)' : ' (it ends where "Module 2" starts)'} and ignore the other module.`
+      : moduleInfo
+        ? `The attached questions PDF is ${moduleInfo.name} only${moduleInfo.second ? ' (if it holds a 2A and a 2B version, use 2B, the "harder" one)' : ""}.`
+        : "";
   const scope =
     target.kind === "FULL_PRACTICE_TEST" && onlyModule && moduleInfo
       ? `This is ONE module of a full-length digital SAT practice test ("${target.testName}"): ${moduleInfo.name} (${onlyModule}).
-The attached ${moduleInfo.section === "RW" ? "Reading and Writing" : "Math"} PDF contains BOTH modules of that section, one after the other. Use ONLY ${moduleInfo.name}${moduleInfo.second ? ' (it starts where the PDF says "Module 2"; it may be labeled 2B or "harder"; if there is a 2A and a 2B, use 2B)' : ' (it ends where "Module 2" starts)'} and ignore the other module.
-It should have ${moduleInfo.expected} questions, numbered from 1. Use the answer key and explanations only for this module's questions.
+${whichPart}
+It should have ${moduleInfo.expected} questions, numbered from 1. The answer key and explanations attached may also cover other modules or the other section: use only what belongs to this module's questions.
 Leave "module", "domain", "skill" and "difficulty" empty.`
       : target.kind === "PRACTICE_SET"
       ? `This is ONE SAT practice set. Every question belongs to:

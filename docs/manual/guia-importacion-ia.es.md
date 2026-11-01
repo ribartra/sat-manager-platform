@@ -12,7 +12,7 @@ También explica cómo **refinar** lo cargado y **mantener** después los sets, 
 ## Contenido
 
 1. [Quién puede importar y qué se necesita](#1-quién-puede-importar-y-qué-se-necesita)
-2. [Cómo vienen los archivos originales](#2-cómo-vienen-los-archivos-originales)
+2. [Qué archivos tienes y en qué bandeja va cada uno](#2-qué-archivos-tienes-y-en-qué-bandeja-va-cada-uno)
 3. [Encontrar el hueco a llenar](#3-encontrar-el-hueco-a-llenar)
 4. [Cargar un Practice Set (una habilidad y una dificultad)](#4-cargar-un-practice-set-una-habilidad-y-una-dificultad)
 5. [Cargar un Test, módulo por módulo](#5-cargar-un-test-módulo-por-módulo)
@@ -29,7 +29,7 @@ También explica cómo **refinar** lo cargado y **mantener** después los sets, 
 
 - **Quién:** el **administrador** y el **profesor maestro**. Los demás profesores no ven **Import with AI**.
 - **Qué se necesita:**
-  - Los **archivos originales** (sección 2).
+  - Los **archivos** del set o del Test, tal como los tengas (sección 2). Solo se suben archivos: la plataforma no mira nombres ni carpetas.
   - Una **fuente** activa. Hoy los Practice Sets son de **College Board** y los Tests de **Innovator**. Si hace falta otra, un administrador la crea en **Admin › Sources**.
   - Una IA que **lea PDF y Word y devuelva archivos** (ChatGPT, Claude o Gemini).
 
@@ -37,45 +37,54 @@ También explica cómo **refinar** lo cargado y **mantener** después los sets, 
 
 > Regla de contenido: hay **un set por fuente y nivel** en cada habilidad, y **una versión por fuente** de cada TEST N. Si ya existe, no se importa otro: se mantiene el existente (sección 9).
 
-## 2. Cómo vienen los archivos originales
+## 2. Qué archivos tienes y en qué bandeja va cada uno
 
-### Practice Sets
+En el paso 1 **cada archivo va en una casilla**. Lo que la plataforma sabe de cada archivo (si son preguntas o respuestas, de qué sección, de qué módulo) sale **de la casilla donde lo pones y de las opciones que eliges**, nunca de su nombre. Un archivo de preguntas que se llame "ANS…" sigue siendo de preguntas si lo pones en una casilla de preguntas.
 
-Hay una carpeta por habilidad, dentro de su área y su dominio. En ella hay **un PDF de preguntas por nivel** y, al lado, su PDF de respuestas, que empieza por **ANS**.
+### Practice Set
 
-| Archivo | Qué es | Dónde va en el paso 1 |
+Normalmente tienes **un PDF de preguntas** del nivel y **un archivo de respuestas y explicaciones** de ese mismo nivel.
+
+| Archivo (ejemplo) | Qué contiene | Casilla del paso 1 |
 |---|---|---|
 | `NON LINEAR FUNCTIONS HARD.pdf` | Las preguntas del nivel Hard | **Questions PDF** |
 | `ANS NON LINEAR FUNCT HARD .pdf` | Respuestas y explicaciones de ese nivel | **Answers / explanations** |
 
-Ruta de ejemplo: `PRACTICE EXERCISES / EXERCISES MATH / ADVANCED MATH / NON LINEAR FUNCTIONS /`.
+### Test
 
-### Tests
+El paso 1 tiene **dos bandejas, una por sección**: **Reading and Writing** y **Math**. En cada bandeja eliges cómo vienen sus preguntas:
 
-Hay una carpeta por Test (`MOCK EXAMS / TEST N /`). Cada sección viene en **un solo PDF con sus dos módulos, uno detrás de otro**. Al lado van la clave de respuestas y las explicaciones, en Word.
+- **One file, Module 1 + 2**: un solo PDF con los dos módulos, uno detrás de otro (lo habitual). Hay una casilla de preguntas.
+- **One file per module**: un PDF con el Módulo 1 y otro con el Módulo 2. Hay dos casillas: **Module 1 questions** y **Module 2 questions**.
 
-| Archivo (ejemplo TEST 9) | Qué es | Dónde va en el paso 1 |
+Cada bandeja tiene además su casilla **Answers / explanations**, para las respuestas y explicaciones de **esa sección** (PDF o Word, varios archivos). Debajo de las dos bandejas está **Answer key for the whole Test**, para una clave de respuestas que cubre las dos secciones.
+
+Ejemplo, TEST 9:
+
+| Archivo | Qué contiene | Dónde va |
 |---|---|---|
-| `READING AND WRITING / TEST 9 RW MOD 1, 2, REV PDF.pdf` | R&W: Módulo 1 (págs. 1–17) y Módulo 2 (págs. 18–36) | **Reading and Writing questions** |
-| `MATH / TEST 9 MATH MOD 1, 2B.pdf` | Math: Módulo 1 (págs. 1–10) y Módulo 2B "harder" (págs. 11–20) | **Math questions** |
-| `Test 9 Ans Key.docx` | Clave de respuestas de los 4 módulos | **Answer key & explanations** |
-| `Test9_RW_Answer_Explanations FINAL.docx` | Explicaciones de R&W | **Answer key & explanations** |
-| `Test9_Math ANS Explanations.docx` | Explicaciones de Math | **Answer key & explanations** |
+| `TEST 9 RW MOD 1, 2, REV PDF.pdf` | R&W, Módulo 1 y Módulo 2 | Bandeja **Reading and Writing** · **One file, Module 1 + 2** |
+| `Test9_RW_Answer_Explanations FINAL.docx` | Explicaciones de R&W | Bandeja **Reading and Writing** · **Answers / explanations** |
+| `TEST 9 MATH MOD 1, 2B.pdf` | Math, Módulo 1 y Módulo 2 (2B "harder") | Bandeja **Math** · **One file, Module 1 + 2** |
+| `Test9_Math ANS Explanations.docx` | Explicaciones de Math | Bandeja **Math** · **Answers / explanations** |
+| `Test 9 Ans Key.docx` | Clave de los 4 módulos | **Answer key for the whole Test** |
+
+Si una sección viene **en un archivo por módulo** (por ejemplo `Math Module 1.pdf` y `Math Module 2.pdf`), elige **One file per module** en esa bandeja y pon cada archivo en su casilla.
 
 Un Test de la plataforma tiene **4 módulos** con un número fijo de preguntas:
 
-| Módulo | Preguntas | Sale de |
-|---|---|---|
-| Reading and Writing, Module 1 (RW1) | 27 | Primera parte del PDF de R&W |
-| Reading and Writing, Module 2 (RW2) | 27 | Segunda parte del PDF de R&W |
-| Math, Module 1 (MATH1) | 22 | Primera parte del PDF de Math |
-| Math, Module 2 (MATH2) | 22 | Segunda parte del PDF de Math |
+| Módulo | Preguntas |
+|---|---|
+| Reading and Writing, Module 1 (RW1) | 27 |
+| Reading and Writing, Module 2 (RW2) | 27 |
+| Math, Module 1 (MATH1) | 22 |
+| Math, Module 2 (MATH2) | 22 |
 
 **Casos especiales:**
 
-- **Módulo 2A y 2B.** Algunos PDF traen dos versiones del Módulo 2 (por ejemplo, el Math del TEST 3). La plataforma usa la **2B (la difícil)**; el prompt ya se lo indica a la IA.
-- **Una sección en Word.** Por ejemplo, el R&W del TEST 1 viene en `.docx`. Ábrelo y guárdalo como PDF (**Archivo › Guardar como › PDF**) antes del paso 1, para poder recortar figuras.
-- **Orden de los nombres.** Los nombres de archivo cambian de un Test a otro (`MOD 1&2`, `Mod 1, 2B`, `modules 1&2 (A and B)`…). Fíjate en lo que contienen, no en el nombre.
+- **Módulo 2A y 2B.** Algunos PDF traen dos versiones del Módulo 2. La plataforma usa la **2B (la difícil)**; el prompt ya se lo indica a la IA.
+- **Una sección en Word.** Si las preguntas vienen en `.docx`, ábrelo y guárdalo como PDF (**Archivo › Guardar como › PDF**) antes del paso 1. Las casillas de preguntas solo aceptan PDF, para poder recortar figuras.
+- **Solo una sección.** Puedes subir solo R&W o solo Math. Los módulos de la sección vacía quedan bloqueados en esa importación.
 
 ## 3. Encontrar el hueco a llenar
 
@@ -100,7 +109,7 @@ Ejemplo: *Advanced Math › Nonlinear Functions › Hard*, fuente College Board.
 1. Pulsa el chip **+ Hard** de la habilidad. La importación se abre con **Section**, **Domain**, **Skill** y **Difficulty** ya elegidos. Si entraste por **Import with AI**, marca **A new Practice Set (one skill and level)** y elígelos tú.
 2. Revisa la **Source** (College Board).
 3. En **Questions PDF** pulsa **Choose PDF** y elige `NON LINEAR FUNCTIONS HARD.pdf`.
-4. En **Answers / explanations** elige `ANS NON LINEAR FUNCT HARD .pdf` (también acepta Word).
+4. En **Answers / explanations** elige `ANS NON LINEAR FUNCT HARD .pdf` (acepta PDF o Word, uno o varios).
 5. Pulsa **Continue to step 2**.
 
 ![Paso 1 de un Practice Set, con los archivos originales](img/ai-step1-practice.png)
@@ -142,19 +151,19 @@ Ejemplo: **TEST 9**, fuente Innovator. El Test se crea una vez y se llena **un m
 1. En **Tests** pulsa **Import with AI** y marca **A new Test (4 modules)**.
 2. **Test number**: `9`. **Test name** se llena solo con "TEST 9" (es lo que ven los alumnos).
 3. **Source**: Innovator.
-4. Sube los archivos tal como vienen:
-   - **Reading and Writing questions**: `TEST 9 RW MOD 1, 2, REV PDF.pdf`.
-   - **Math questions**: `TEST 9 MATH MOD 1, 2B.pdf`.
-   - **Answer key & explanations**: los tres Word a la vez (`Test 9 Ans Key.docx` y las dos explicaciones).
-5. Pulsa **Continue to step 2**.
+4. Bandeja **Reading and Writing**:
+   - en **Questions come as** deja **One file, Module 1 + 2**;
+   - en **Questions (Module 1 + 2)**, el PDF de R&W;
+   - en **Answers / explanations**, las explicaciones de R&W.
+5. Bandeja **Math**: lo mismo con el PDF de Math y sus explicaciones. Si Math viniera en dos archivos, elige **One file per module** y usa **Module 1 questions** y **Module 2 questions**.
+6. En **Answer key for the whole Test**, la clave de respuestas única (`Test 9 Ans Key.docx`).
+7. Pulsa **Continue to step 2**.
 
-![Paso 1 de un Test, con los archivos originales del TEST 9](img/ai-step1-test.png)
-
-> Si solo tienes una sección, puedes subir solo ese PDF. Los módulos de la otra sección quedan bloqueados en esta importación.
+![Paso 1 de un Test: dos bandejas y la clave común](img/ai-step1-test.png)
 
 ### Paso 2 — Un módulo a la vez
 
-El paso 2 muestra **4 tarjetas**, una por módulo. Cada tarjeta dice cuántas preguntas debe tener, qué PDF darle a la IA y cómo va (**Not loaded**, **27/27 loaded · 27 ready**, **In the Draft**).
+El paso 2 muestra **4 tarjetas**, una por módulo. Cada tarjeta dice cuántas preguntas debe tener, cómo va (**Not loaded**, **27/27 loaded · 27 ready**, **In the Draft**) y, en **Give the AI**, **exactamente qué archivos darle a la IA**: el de preguntas de ese módulo, las respuestas y explicaciones de su sección, y la clave común.
 
 ![Paso 2: una tarjeta por módulo](img/ai-step2-modules.png)
 
@@ -164,7 +173,7 @@ Para **cada módulo**, en este orden: R&W 1 → R&W 2 → Math 1 → Math 2:
 
    ![El prompt de un módulo](img/ai-step2-prompt.png)
 
-2. Abre **una conversación nueva** en tu IA. Adjunta el **PDF de esa sección** (R&W o Math) y **los Word de respuestas y explicaciones**, pega el prompt y envíalo.
+2. Abre **una conversación nueva** en tu IA. Adjunta **los archivos de "Give the AI"** de la tarjeta, pega el prompt y envíalo.
 
    [CAPTURA PENDIENTE: chat de la IA con el PDF de R&W, los Word y el prompt de RW1]
 
@@ -185,7 +194,7 @@ Para **cada módulo**, en este orden: R&W 1 → R&W 2 → Math 1 → Math 2:
 
 ### Paso 3 — Refinar y armar el Draft del Test
 
-1. Refina cada módulo (sección 7). Hay un botón de revisión por sección: **Review Reading and Writing** y **Review Math**. Cada uno abre el PDF de su sección, para recortar las figuras de ese PDF.
+1. Refina cada módulo (sección 7). Hay un botón de revisión por archivo de preguntas: **Review Reading and Writing** y **Review Math** (o **Review Math · Module 1** y **· Module 2** si Math vino en dos archivos). Cada uno abre su PDF, para recortar las figuras de ahí.
 2. Cuando tengas módulos listos, pulsa **Create Draft Test**. Se crea **TEST 9** en Draft con los módulos cargados hasta ese momento.
 
    [CAPTURA PENDIENTE: paso 3 del Test con los módulos cargados]
@@ -258,7 +267,7 @@ El paso 3 lista las preguntas cargadas (en un Test, con su módulo: `RW1 · 3`, 
 
 Para refinar:
 
-1. Pulsa **Open Review (edit and crop)**. En un Test, **Review Reading and Writing** o **Review Math**. También puedes pulsar el texto de una pregunta en la tabla.
+1. Pulsa **Open Review (edit and crop)**. En un Test, el **Review** del archivo de esa pregunta. También puedes pulsar el texto de una pregunta en la tabla.
 2. Corrige el texto, las opciones, la respuesta o la explicación.
 3. Si tiene figura: **Crop** sobre la página del PDF y asígnala a la pregunta, al pasaje o a una opción. La columna `figurePage` del CSV dice en qué página está.
 4. Marca la pregunta como **Reviewed**.

@@ -14,6 +14,21 @@ import { difficultyOptions } from "@/lib/domain-meta";
 
 type Skill = { id: string; name: string; domainId: string; domain: string };
 type Area = "MATH" | "READING" | "WRITING";
+type Section = "RW" | "MATH";
+type Layout = "COMBINED" | "PER_MODULE";
+const SECTIONS: Array<{ code: Section; label: string }> = [
+  { code: "RW", label: "Reading and Writing" },
+  { code: "MATH", label: "Math" },
+];
+const DOCS_ACCEPT = ".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+/** The questions fields a section shows for its layout (the form field names the API reads). */
+const questionSlots = (section: Section, layout: Layout) =>
+  layout === "COMBINED"
+    ? [{ slot: `${section}_Q`, label: "Questions (Module 1 + 2)", hint: "One PDF with both modules." }]
+    : [
+        { slot: `${section}1_Q`, label: "Module 1 questions", hint: "PDF with Module 1 only." },
+        { slot: `${section}2_Q`, label: "Module 2 questions", hint: "PDF with Module 2 only." },
+      ];
 const AREAS: Array<{ code: Area; label: string }> = [
   { code: "MATH", label: "Math" },
   { code: "READING", label: "Reading" },
@@ -48,10 +63,16 @@ export function ImportTargetForm({
   const [sourceId, setSourceId] = useState(() => (sources.some((s) => s.id === initial.sourceId) ? initial.sourceId : sources[0]?.id ?? ""));
   const [testNumber, setTestNumber] = useState("");
   const [testName, setTestName] = useState("");
-  const [file, setFile] = useState<File | null>(null);
-  const [rwFile, setRwFile] = useState<File | null>(null);
-  const [mathFile, setMathFile] = useState<File | null>(null);
-  const [answers, setAnswers] = useState<File[]>([]);
+  // Every file goes in a named field (its slot): what it is comes from where it was put, never from its name.
+  const [files, setFiles] = useState<Record<string, File[]>>({});
+  const [layout, setLayout] = useState<Record<Section, Layout>>({ RW: "COMBINED", MATH: "COMBINED" });
+  const filesOf = (slot: string) => files[slot] ?? [];
+  const setSlot = (slot: string) => (list: File[]) => setFiles((current) => ({ ...current, [slot]: list }));
+  const activeSlots =
+    kind === "PRACTICE_SET"
+      ? ["Q", "ANS"]
+      : [...SECTIONS.flatMap((s) => [...questionSlots(s.code, layout[s.code]).map((q) => q.slot), `${s.code}_ANS`]), "KEY"];
+  const hasQuestions = activeSlots.some((slot) => slot.endsWith("Q") && filesOf(slot).length > 0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
@@ -63,8 +84,7 @@ export function ImportTargetForm({
     kind === "PRACTICE_SET" && !difficulty ? "Choose the level." :
     kind === "FULL_PRACTICE_TEST" && !(Number(testNumber) >= 1) ? "Write the test number." :
     kind === "FULL_PRACTICE_TEST" && !testName.trim() ? "Write the test name." :
-    kind === "PRACTICE_SET" && !file ? "Upload the questions PDF." :
-    kind === "FULL_PRACTICE_TEST" && !rwFile && !mathFile ? "Upload the Reading and Writing or the Math questions PDF." : null;
+    !hasQuestions ? (kind === "PRACTICE_SET" ? "Upload the questions PDF." : "Upload the questions of Reading and Writing or of Math.") : null;
 
   function changeKind(next: typeof kind) {
     setKind(next);
@@ -86,12 +106,11 @@ export function ImportTargetForm({
       form.set("testNumber", testNumber);
       form.set("testName", testName.trim());
     }
-    if (kind === "PRACTICE_SET" && file) form.set("file", file);
     if (kind === "FULL_PRACTICE_TEST") {
-      if (rwFile) form.set("rwFile", rwFile);
-      if (mathFile) form.set("mathFile", mathFile);
+      form.set("layoutRW", layout.RW);
+      form.set("layoutMATH", layout.MATH);
     }
-    for (const doc of answers) form.append("answers", doc);
+    for (const slot of activeSlots) for (const doc of filesOf(slot)) form.append(slot, doc);
     try {
       const data = await apiFetch<{ batchId: string }>("/api/import/quick", { method: "POST", body: form });
       router.push(`/teacher/import/${data.batchId}`);
@@ -175,33 +194,61 @@ export function ImportTargetForm({
 
       {kind === "PRACTICE_SET" ? (
         <div className="grid gap-4 sm:grid-cols-2">
-          <FileTray label="Questions PDF" required hint="Kept to crop figures in step 3 and for the artifacts zip." files={file ? [file] : []} onChange={(files) => setFile(files[0] ?? null)} />
+          <FileTray label="Questions PDF" required hint="Kept to crop figures in step 3 and for the artifacts zip." files={filesOf("Q")} onChange={setSlot("Q")} />
           <FileTray
             label="Answers / explanations"
             hint="PDF or Word. Give it to the AI too, so it can fill answers and explanations."
-            accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            files={answers}
-            onChange={(files) => setAnswers(files.slice(0, 1))}
+            accept={DOCS_ACCEPT}
+            multiple
+            files={filesOf("ANS")}
+            onChange={setSlot("ANS")}
           />
         </div>
       ) : (
         <>
           <p className="text-sm text-gray-600">
-            Upload the files as they come: one PDF per section, each with its <b>Module 1 and Module 2</b>. In step 2 you load the Test one module at a time. If a
-            section comes as Word, save it as PDF first (File › Save as › PDF) so figures can be cropped.
+            Put each file in its section and say how the questions come. What each file is comes from where you put it, not from its name. If a section comes as
+            Word, save it as PDF first (File › Save as › PDF) so figures can be cropped. In step 2 you load the Test one module at a time.
           </p>
-          <div className="grid gap-4 sm:grid-cols-3">
-            <FileTray label="Reading and Writing questions" hint="The R&W PDF (Module 1 and Module 2)." files={rwFile ? [rwFile] : []} onChange={(files) => setRwFile(files[0] ?? null)} />
-            <FileTray label="Math questions" hint="The Math PDF (Module 1 and Module 2)." files={mathFile ? [mathFile] : []} onChange={(files) => setMathFile(files[0] ?? null)} />
-            <FileTray
-              label="Answer key & explanations"
-              hint="PDF or Word, several files (answer key, R&W and Math explanations)."
-              accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-              multiple
-              files={answers}
-              onChange={setAnswers}
-            />
+          <div className="grid gap-4 lg:grid-cols-2">
+            {SECTIONS.map((section) => (
+              <fieldset key={section.code} className="space-y-3 rounded-[var(--sat-radius)] border border-[var(--sat-border)] p-4">
+                <legend className="px-1 text-sm font-semibold text-gray-900">{section.label}</legend>
+                <div className="space-y-1 text-sm">
+                  <p className="font-medium text-gray-700">Questions come as</p>
+                  <div className="flex flex-wrap gap-x-5 gap-y-1">
+                    <label className="inline-flex items-center gap-2">
+                      <Radio checked={layout[section.code] === "COMBINED"} onChange={() => setLayout((l) => ({ ...l, [section.code]: "COMBINED" }))} /> One file, Module 1 + 2
+                    </label>
+                    <label className="inline-flex items-center gap-2">
+                      <Radio checked={layout[section.code] === "PER_MODULE"} onChange={() => setLayout((l) => ({ ...l, [section.code]: "PER_MODULE" }))} /> One file per module
+                    </label>
+                  </div>
+                </div>
+                <div className={layout[section.code] === "COMBINED" ? "grid gap-3" : "grid gap-3 sm:grid-cols-2"}>
+                  {questionSlots(section.code, layout[section.code]).map((q) => (
+                    <FileTray key={q.slot} label={q.label} hint={q.hint} files={filesOf(q.slot)} onChange={setSlot(q.slot)} />
+                  ))}
+                </div>
+                <FileTray
+                  label="Answers / explanations"
+                  hint={`PDF or Word, several files: this section's answers and explanations.`}
+                  accept={DOCS_ACCEPT}
+                  multiple
+                  files={filesOf(`${section.code}_ANS`)}
+                  onChange={setSlot(`${section.code}_ANS`)}
+                />
+              </fieldset>
+            ))}
           </div>
+          <FileTray
+            label="Answer key for the whole Test"
+            hint="One answer key that covers both sections (PDF or Word). Each module's card lists it for the AI."
+            accept={DOCS_ACCEPT}
+            multiple
+            files={filesOf("KEY")}
+            onChange={setSlot("KEY")}
+          />
         </>
       )}
 

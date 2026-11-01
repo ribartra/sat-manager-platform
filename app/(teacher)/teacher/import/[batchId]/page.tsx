@@ -5,7 +5,18 @@ import prisma from "@/lib/prisma";
 import { requireContentImporter } from "@/lib/rbac";
 import { NotFoundError } from "@/lib/api-error";
 import { loadQuickBatch } from "@/lib/quick-import.server";
-import { buildCsvPrompt, TEST_MODULE_INFO, TEST_MODULES, testModuleIndex } from "@/lib/quick-import";
+import {
+  answerFileIds,
+  buildCsvPrompt,
+  fileName,
+  moduleFileIsCombined,
+  moduleQuestionFileId,
+  modulesOfFile,
+  questionFileIds,
+  TEST_MODULE_INFO,
+  TEST_MODULES,
+  testModuleIndex,
+} from "@/lib/quick-import";
 import { buildQuestionContent, classifyQuestion } from "@/lib/ingest-sets";
 import { difficultyLabel } from "@/lib/domain-meta";
 import { practiceAreaLabel, type PracticeAreaCode } from "@/lib/practice-area";
@@ -28,9 +39,9 @@ export default async function QuickImportBatchPage({ params }: { params: Promise
     if (error instanceof NotFoundError) notFound();
     throw error;
   }
-  const { batch, target, questionFile, sectionFiles } = loaded;
+  const { batch, target, questionFile } = loaded;
   const isTest = target.kind === "FULL_PRACTICE_TEST";
-  // Review (edit and crop) opens the questions PDF the question comes from: a Test's R&W or Math PDF.
+  // Review (edit and crop) opens the questions PDF the question comes from (a Test may have up to 4).
   const reviewFor = (fileId: string | null | undefined) => (fileId ? `/admin/import/ai/${batchId}/files/${fileId}` : null);
   const [candidates, links, source, artifact] = await Promise.all([
     prisma.ingestQuestionCandidate.findMany({ where: { batchId } }),
@@ -84,17 +95,22 @@ export default async function QuickImportBatchPage({ params }: { params: Promise
       };
     });
 
-  // A Test is loaded one module at a time: one card per module (its PDF, prompt and what is loaded).
+  // A Test is loaded one module at a time: one card per module with the files to give the AI (its
+  // questions file + its section's answers / explanations + the Test's answer key), its prompt and
+  // what is loaded. Which file is which comes from the fields chosen in step 1.
+  const names = (ids: string[]) => ids.map((id) => fileName(target, id)).filter((name): name is string => Boolean(name));
   const modules: ModuleCardInfo[] | null = isTest
     ? TEST_MODULES.map((code) => {
         const info = TEST_MODULE_INFO[code];
         const own = rows.filter((row) => row.module === code);
-        const file = sectionFiles[info.section];
+        const fileId = target.files ? moduleQuestionFileId(target, code) : questionFile?.id ?? null;
         return {
           code,
           name: info.name,
           expected: info.expected,
-          fileName: file ? file.relativePath.split("/").pop()!.replace(/^(RW|Math) questions - /, "") : null,
+          questionsFile: fileId ? fileName(target, fileId) ?? questionFile?.relativePath.split("/").pop() ?? null : null,
+          combined: moduleFileIsCombined(target, code),
+          answerFiles: names(answerFileIds(target, code)),
           prompt: buildCsvPrompt(target, code),
           loaded: own.length,
           ready: own.filter((row) => row.status === "READY" || row.status === "REVIEWED").length,
@@ -102,16 +118,22 @@ export default async function QuickImportBatchPage({ params }: { params: Promise
         };
       })
     : null;
-  const pdfNames = isTest
-    ? [sectionFiles.RW, sectionFiles.MATH].filter(Boolean).map((file) => file!.relativePath.split("/").pop()!.replace(/^(RW|Math) questions - /, "")).join(" · ")
-    : questionFile?.relativePath.split("/").pop();
+  const questionIds = questionFileIds(target);
+  const pdfNames = target.files ? names(questionIds).join(" · ") : questionFile?.relativePath.split("/").pop();
 
-  // Older Test imports (one PDF for the whole Test) keep the single Review link.
-  const sectionLinks = [
-    { label: "Review Reading and Writing", href: isTest ? reviewFor(sectionFiles.RW?.id) : null },
-    { label: "Review Math", href: isTest ? reviewFor(sectionFiles.MATH?.id) : null },
-  ].filter((link): link is { label: string; href: string } => Boolean(link.href));
-  const reviewLinks = sectionLinks.length ? sectionLinks : questionFile ? [{ label: "Open Review (edit and crop)", href: reviewFor(questionFile.id)! }] : [];
+  // One Review per questions file (a Test: R&W / Math, or each module when it came in its own file).
+  const sectionLabel = (id: string) => {
+    const codes = modulesOfFile(target, id);
+    const section = codes[0] ? TEST_MODULE_INFO[codes[0]].section : null;
+    const word = section === "RW" ? "Reading and Writing" : "Math";
+    return codes.length === 1 ? `Review ${word} · Module ${TEST_MODULE_INFO[codes[0]].second ? 2 : 1}` : `Review ${word}`;
+  };
+  const reviewLinks =
+    isTest && questionIds.length
+      ? questionIds.map((id) => ({ label: sectionLabel(id), href: reviewFor(id)! }))
+      : questionFile
+        ? [{ label: "Open Review (edit and crop)", href: reviewFor(questionFile.id)! }]
+        : [];
 
   const title =
     target.kind === "PRACTICE_SET"

@@ -34,8 +34,12 @@ export type ModuleCardInfo = {
   code: string;
   name: string;
   expected: number;
-  /** The section's questions PDF (null: none was uploaded). */
-  fileName: string | null;
+  /** The module's questions file (null: none was uploaded for it). */
+  questionsFile: string | null;
+  /** The questions file also holds the section's other module. */
+  combined: boolean;
+  /** Its section's answers / explanations and the Test's answer key. */
+  answerFiles: string[];
   prompt: string;
   loaded: number;
   ready: number;
@@ -142,7 +146,7 @@ export function QuickImportWorkspace({
           title="Ask an AI for the CSV"
           help={
             modules
-              ? "One module at a time: copy its prompt, give it to your AI with that section's PDF, and upload the CSV it makes."
+              ? "One module at a time: copy its prompt, give it to your AI with the files its card lists, and upload the CSV it makes."
               : "Copy the prompt, give it to your AI with the PDF, and upload the CSV it makes."
           }
           aside={rows.length ? `${plural(rows.length, "question")} loaded` : null}
@@ -151,7 +155,7 @@ export function QuickImportWorkspace({
           <li>Copy the prompt{modules ? " of the module" : ""} and open your AI chat (ChatGPT, Claude, Gemini…).</li>
           <li>
             {modules
-              ? "Attach that section's questions PDF and the answer key / explanations, paste the prompt and send it."
+              ? "Attach the files listed under “Give the AI” in the module's card, paste the prompt and send it."
               : "Attach the PDF(s) you uploaded in step 1, paste the prompt and send it."}
           </li>
           <li>
@@ -271,19 +275,23 @@ function ModuleCard({ batchId, module }: { batchId: string; module: ModuleCardIn
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <h3 className="text-sm font-semibold text-gray-900">{module.name}</h3>
-          <p className="text-xs text-gray-500">
-            {module.expected} questions ·{" "}
-            {module.fileName ? (
-              <>
-                give the AI <b>{module.fileName}</b> + the answer key / explanations
-              </>
-            ) : (
-              "no questions PDF for this section"
-            )}
-          </p>
+          <p className="text-xs text-gray-500">{module.expected} questions</p>
         </div>
         <Badge variant={state.variant}>{state.label}</Badge>
       </div>
+      {module.questionsFile ? (
+        <div className="text-xs text-gray-600">
+          <p className="font-medium text-gray-700">Give the AI:</p>
+          <ul className="mt-0.5 list-disc space-y-0.5 pl-4">
+            <li>
+              <b>{module.questionsFile}</b> {module.combined ? "(questions, Module 1 + 2: the prompt says which one)" : "(questions)"}
+            </li>
+            {module.answerFiles.map((name) => (
+              <li key={name}>{name}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
       <CsvLoader
         batchId={batchId}
         module={module}
@@ -292,8 +300,8 @@ function ModuleCard({ batchId, module }: { batchId: string; module: ModuleCardIn
         lockedReason={
           module.inDraft > 0
             ? "This module is in the Draft: fix its questions in the Test editor (figures can still be cropped in Review)."
-            : !module.fileName
-              ? "This import has no PDF for this section: start a new import with it."
+            : !module.questionsFile
+              ? "No questions file was uploaded for this module."
               : null
         }
       />

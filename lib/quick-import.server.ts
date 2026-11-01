@@ -1,11 +1,12 @@
 import prisma from "@/lib/prisma";
 import { NotFoundError } from "@/lib/api-error";
-import { parseTarget, QUICK_IMPORT_MODE, sectionOfFile } from "@/lib/quick-import";
+import { moduleQuestionFileId, parseTarget, QUICK_IMPORT_MODE, questionFileIds, type TestModuleCode } from "@/lib/quick-import";
 
 /**
  * An "Import with AI" batch the session may work on: admins see every one, the master teacher only
- * the ones they started. Returns the batch, its target, its question source file (the PDF) and, for a
- * Test, the questions PDF of each section.
+ * the ones they started. Returns the batch, its target, its files and its (first) questions file.
+ * What each file is comes from the slots chosen in step 1 (target.files, by file id), never from its
+ * name or path.
  */
 export async function loadQuickBatch(batchId: string, user: { id: string; role: string }) {
   const batch = await prisma.ingestBatch.findUnique({ where: { id: batchId } });
@@ -14,11 +15,14 @@ export async function loadQuickBatch(batchId: string, user: { id: string; role: 
   const target = parseTarget(batch.targetJson);
   if (!target) throw new NotFoundError("Import target is missing.");
   const files = await prisma.ingestSourceFile.findMany({ where: { batchId }, orderBy: { relativePath: "asc" } });
-  // The questions PDF (answer / explanation files are only context for the AI and the zip).
-  // A Test brings one questions PDF per section (named with SECTION_FILE_PREFIX at upload).
-  const sectionFiles = { RW: files.find((file) => sectionOfFile(file.relativePath) === "RW") ?? null, MATH: files.find((file) => sectionOfFile(file.relativePath) === "MATH") ?? null };
-  const questionFile =
-    sectionFiles.RW ?? sectionFiles.MATH ?? files.find((file) => file.isQuestionSource && !file.isAnswerFile && !file.isExplanationFile) ?? files[0] ?? null;
-  return { batch, target, files, questionFile, sectionFiles };
+  const byId = new Map(files.map((file) => [file.id, file]));
+  // Imports made before slots were recorded: the first file flagged as questions.
+  const legacy = files.find((file) => file.isQuestionSource && !file.isAnswerFile && !file.isExplanationFile) ?? files[0] ?? null;
+  const questionFile = questionFileIds(target).map((id) => byId.get(id)).find(Boolean) ?? legacy;
+  /** The questions file a Test module is read from (falls back to the import's questions file). */
+  const moduleFile = (code: TestModuleCode) => {
+    const id = moduleQuestionFileId(target, code);
+    return id ? byId.get(id) ?? null : target.files ? null : legacy;
+  };
+  return { batch, target, files, questionFile, moduleFile };
 }
-
