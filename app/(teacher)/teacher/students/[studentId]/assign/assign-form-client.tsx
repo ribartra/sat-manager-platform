@@ -273,7 +273,7 @@ export function AssignForm({
       {editMode ? null : (
         <section className="space-y-3">
           <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Skill or practice set name" aria-label="Search practice" className="max-w-xs text-sm" />
-          <p className="text-xs text-gray-500">Open a skill and pick sets by source and level. Sets {first} already has are not listed (they can be retried any time).</p>
+          <p className="text-xs text-gray-500">Open a skill and pick sets by source and level. Sets {first} already has are grayed out and can't be picked again (they can retry them any time); a level is marked Already assigned when every source is.</p>
           <SkillsSourceMap
             emptyText={
               needle
