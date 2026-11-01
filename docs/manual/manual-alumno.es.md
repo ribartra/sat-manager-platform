@@ -56,7 +56,7 @@ El menú de la izquierda tiene **Home**, **Tests**, **Practice** e **History**. 
 Home resume todo en tres tarjetas:
 
 - **Tests**: cuántos Tests tienes por rendir y su estado (**Not started**, **In progress**, **Overdue**, **Completed**) y la lista **Up next**.
-- **Practice**: los sets de práctica por hacer, por área (**Math**, **Reading**, **Writing**) y por estado.
+- **Practice**: los sets de práctica por hacer, por área (**Math**, **Reading**, **Writing**) y por estado, incluidos los **Completed**.
 - **History**: lo que terminaste en los últimos 7 días y tus intentos más recientes con su porcentaje.
 
 Cada número es un enlace que abre la lista ya filtrada.
@@ -122,7 +122,7 @@ Si tu profesor eligió mostrar la respuesta después de cada pregunta, aparece e
 
 - **Highlight**: selecciona texto del pasaje o la pregunta y pulsa Highlight para resaltarlo.
 - **Eliminate**: activa el modo para tachar opciones que descartas.
-- **Reference** (solo Math): abre la hoja de fórmulas.
+- **Reference** (solo Math): abre la hoja de fórmulas oficial (con **Open full size** la ves en grande).
 - **Calculator** (solo Math, si el administrador la activó).
 - **Mark for review**: marca la pregunta para volver a ella.
 - **Personal note**: una nota solo para ti.
@@ -176,13 +176,13 @@ Al enviar ves tus resultados:
 
 > Si tu profesor ocultó las respuestas de un set, verás el aviso correspondiente en lugar de las correctas.
 
-**Puedes repetir un set las veces que quieras** con **Try Again**: cada intento queda guardado y verás tu progreso.
+**Puedes repetir un set las veces que quieras** con **Try Again**: cada intento queda guardado y verás tu progreso. Mientras lo repites, el set sigue como **Completed** con la marca **Retry in progress**; pulsa **Continue** para seguir ese intento.
 
 > Cuando apruebas un nivel, la plataforma puede **abrirte automáticamente el siguiente** (por ejemplo, Medium después de Easy).
 
 ## 7. Tests: el SAT completo
 
-**Tests** reúne los SAT completos que te asignó tu profesor. Cada Test tiene **4 módulos**: **Reading & Writing 1 y 2** y **Math 1 y 2**. Las pestañas son **To take**, **Completed** y **All**.
+**Tests** reúne los SAT completos que te asignó tu profesor. Cada Test tiene **4 módulos**: **Reading & Writing 1 y 2** y **Math 1 y 2**. Las pestañas son **To take**, **Completed** y **All**. Cada Test lleva el nombre de su fuente, por ejemplo **Innovator Test 1**.
 
 ![Lista de Tests](img/student-tests.png)
 
@@ -219,13 +219,13 @@ Cuando termines un Test, puedes rendirlo de nuevo con **Retake**.
 
 ## 8. Pending e History
 
-**Pending** lista todo lo que tienes pendiente, primero lo vencido y luego por fecha límite. Puedes filtrar por tipo, estado y período.
+**Pending** lista todo lo que tienes pendiente, primero lo vencido y luego por fecha límite. Puedes filtrar por tipo, estado y período (**All time**, **Last 30 days**, **Last 60 days**, **Last 90 days** o **Custom**, con fecha de inicio y fin).
 
 ![Pending](img/student-pending.png)
 
 ![Pending con un set vencido](img/student-pending-overdue.png)
 
-**History** muestra todo lo que hiciste, lo más reciente primero, con tu puntaje y el cambio respecto al intento anterior. Puedes filtrar por tipo, habilidad, dificultad, estado y período. Pulsa una fila para ver ese intento.
+**History** muestra todo lo que hiciste, lo más reciente primero, con tu puntaje y el cambio respecto al intento anterior. Puedes filtrar por tipo, habilidad, dificultad, estado y período (**All time**, **Last 30 days**, **Last 60 days**, **Last 90 days** o **Custom**, con fecha de inicio y fin). Pulsa una fila para ver ese intento.
 
 ![History](img/student-history.png)
 

@@ -40,7 +40,7 @@ Este manual explica cómo usar la plataforma como **profesor**: invitar alumnos,
 
 ## 2. Home
 
-Home resume tu trabajo en tarjetas: **Students** (activos esta semana, inactivos 5+ días, con Tests por hacer, invitaciones), **Tests** y **Practice** (sin empezar, en curso, vencidos, completados) e **History** (intentos de los últimos 7 días). Cada número abre la lista filtrada.
+Home resume tu trabajo en tarjetas: **Students** (activos esta semana, inactivos 5+ días, con Tests por hacer, invitaciones), **Tests** y **Practice** (sin empezar, en curso, vencidos, completados) e **History** (intentos de los últimos 7 días). Cada número abre la lista filtrada. Un set que el alumno ya terminó cuenta como **completado** aunque lo esté repitiendo.
 
 ![Home al empezar](img/teacher-home-empty.png)
 
@@ -132,7 +132,7 @@ La vista **Assign** es la misma para práctica y Tests. Se abre desde **Assign**
 
 ### Asignar un Test
 
-1. Pestaña **Tests**: cada **TEST N** se despliega con sus versiones (una por fuente activa; hoy, Innovator).
+1. Pestaña **Tests**: cada **TEST N** se despliega con sus versiones, una por fuente activa (hoy, Innovator). Cada versión lleva el nombre de su fuente, por ejemplo **Innovator Test 1**.
 2. Marca la versión, revisa la fecha y las opciones y pulsa **Assign test**.
 
 Un TEST N con todas sus versiones asignadas aparece fijo con el sello **ALREADY ASSIGNED**.
@@ -147,11 +147,11 @@ Desde la ficha del alumno, en sus sets activos, pulsa **Edit** (o abre una fila 
 
 ## 6. Pending e History
 
-**Pending** lista todo lo asignado y sin terminar de tus alumnos: primero lo vencido. Filtra por alumno, tipo, estado y período. Pulsa una fila para editar sus fechas.
+**Pending** lista todo lo asignado y sin terminar de tus alumnos: primero lo vencido. Filtra por alumno, tipo, estado y período (**All time**, **Last 30 days**, **Last 60 days**, **Last 90 days** o **Custom**, con fecha de inicio y fin). Pulsa una fila para editar sus fechas.
 
 ![Pending](img/teacher-pending.png)
 
-**History** lista todos los intentos (práctica y Tests), lo más reciente primero. Filtra por alumno, tipo, habilidad, dificultad, estado (**Completed**, **In progress**, **Not counted**, **Any**) y período. La práctica muestra el % de aciertos; los Tests, los puntajes SAT. Pulsa una fila para abrir el intento.
+**History** lista todos los intentos (práctica y Tests), lo más reciente primero. Filtra por alumno, tipo, habilidad, dificultad, estado (**Completed**, **In progress**, **Not counted**, **Any**) y período (**All time**, **Last 30 days**, **Last 60 days**, **Last 90 days** o **Custom**, con fecha de inicio y fin). La práctica muestra el % de aciertos; los Tests, los puntajes SAT. Pulsa una fila para abrir el intento.
 
 ![History](img/teacher-history.png)
 
@@ -180,8 +180,9 @@ El intento queda en el historial tachado como **Not counted** y no cuenta en pun
 ### Informe PDF
 
 1. En la ficha del alumno pulsa **Generate Report**.
-2. Marca las áreas (**Math**, **Reading**, **Writing**, **Tests**) y revisa la vista previa.
-3. Pulsa **Download PDF**, o en **Email to parents** marca a los padres y pulsa **Send PDF**.
+2. Elige el **Period**: **All time** (todo), **Last 30 days**, **Last 60 days**, **Last 90 days** o **Custom** (fecha de inicio y fin). El PDF incluye solo los intentos entregados en ese período; lo pendiente aparece siempre. El período queda impreso en la cabecera del PDF.
+3. Marca las áreas (**Math**, **Reading**, **Writing**, **Tests**) y revisa la vista previa.
+4. Pulsa **Download PDF**, o en **Email to parents** marca a los padres y pulsa **Send PDF**.
 
 ![Informe PDF](img/teacher-report-dialog.png)
 
@@ -199,7 +200,7 @@ El intento queda en el historial tachado como **Not counted** y no cuenta en pun
 
 ## 9. Tests
 
-**Tests** agrupa los SAT completos por número (**TEST N**) con una versión por fuente. Aparecen todos los números, del TEST 1 al más alto: si ninguna fuente tiene un número, se ve como **TEST N —** (en la imagen, **TEST 9**). Cada Test tiene 4 módulos (R&W 1 y 2, Math 1 y 2). **How scores work** explica cómo se calculan los puntajes.
+**Tests** agrupa los SAT completos por número (**TEST N**) con una versión por fuente. Junto a cada TEST N se ven, como etiquetas, las fuentes que lo tienen; cada versión se llama por su fuente (**Innovator Test 1**). Aparecen todos los números, del TEST 1 al más alto: si ninguna fuente tiene un número, se ve como **TEST N —** (en la imagen, **TEST 9**). Cada Test tiene 4 módulos (R&W 1 y 2, Math 1 y 2). **How scores work** explica cómo se calculan los puntajes.
 
 ![Tests](img/teacher-tests.png)
 
@@ -288,7 +289,7 @@ En **Practice** y **Tests** el profesor maestro ve **Import with AI** mientras q
 Revisa el correo y la carpeta de spam. Puedes copiar el **Student activation link** y enviárselo. Si pasaron 7 días, invítalo de nuevo.
 
 **¿Puedo asignar dos veces el mismo set?**
-No hace falta: el alumno puede repetirlo cuando quiera con **Try Again**. Para cambiar fechas usa **Edit**.
+No hace falta: el alumno puede repetirlo cuando quiera con **Try Again**. El set sigue como **Completed** mientras lo repite (verás **Retry in progress**) y nunca pasa a vencido. Para cambiar fechas usa **Edit**.
 
 **¿Por qué no veo a algunos alumnos?**
 Cada profesor ve solo a los alumnos que invitó.

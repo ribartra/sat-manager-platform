@@ -56,7 +56,7 @@ The left menu has **Home**, **Tests**, **Practice** and **History**. At the bott
 Home sums everything up in three cards:
 
 - **Tests**: how many Tests you have to take and their status (**Not started**, **In progress**, **Overdue**, **Completed**), plus the **Up next** list.
-- **Practice**: practice sets to do, by area (**Math**, **Reading**, **Writing**) and by status.
+- **Practice**: practice sets to do, by area (**Math**, **Reading**, **Writing**) and by status, including **Completed**.
 - **History**: what you finished in the last 7 days and your latest tries with their percentage.
 
 Every number is a link that opens the list already filtered.
@@ -122,7 +122,7 @@ If your teacher chose to show the answer after each question, a **Check** button
 
 - **Highlight**: select text in the passage or question and click Highlight.
 - **Eliminate**: turns on a mode to cross out choices you rule out.
-- **Reference** (Math only): opens the formula sheet.
+- **Reference** (Math only): opens the official formula sheet (**Open full size** shows it larger).
 - **Calculator** (Math only, when the administrator enabled it).
 - **Mark for review**: flags the question so you can come back.
 - **Personal note**: a note just for you.
@@ -176,13 +176,13 @@ After submitting you see your results:
 
 > If your teacher hid the answers for a set, you'll see a notice instead of the right answers.
 
-**You can repeat a set as often as you like** with **Try Again**: every try is kept and you can follow your progress.
+**You can repeat a set as often as you like** with **Try Again**: every try is kept and you can follow your progress. While you repeat it, the set stays **Completed** with the **Retry in progress** mark; click **Continue** to go on with that try.
 
 > When you pass a level, the platform may **open the next one for you automatically** (for example Medium after Easy).
 
 ## 7. Tests: the full SAT
 
-**Tests** holds the full SATs your teacher assigned. Each Test has **4 modules**: **Reading & Writing 1 and 2** and **Math 1 and 2**. The tabs are **To take**, **Completed** and **All**.
+**Tests** holds the full SATs your teacher assigned. Each Test has **4 modules**: **Reading & Writing 1 and 2** and **Math 1 and 2**. The tabs are **To take**, **Completed** and **All**. Each Test is named after its source, e.g. **Innovator Test 1**.
 
 ![Tests list](img/student-tests.png)
 
@@ -219,13 +219,13 @@ When you finish a Test you can take it again with **Retake**.
 
 ## 8. Pending and History
 
-**Pending** lists everything you still have to do, overdue first and then by due date. Filter by type, status and period.
+**Pending** lists everything you still have to do, overdue first and then by due date. Filter by type, status and period (**All time**, **Last 30 days**, **Last 60 days**, **Last 90 days** or **Custom**, with a start and end date).
 
 ![Pending](img/student-pending.png)
 
 ![Pending with an overdue set](img/student-pending-overdue.png)
 
-**History** shows everything you did, newest first, with your score and the change from the previous try. Filter by type, skill, difficulty, status and period. Click a row to open that try.
+**History** shows everything you did, newest first, with your score and the change from the previous try. Filter by type, skill, difficulty, status and period (**All time**, **Last 30 days**, **Last 60 days**, **Last 90 days** or **Custom**, with a start and end date). Click a row to open that try.
 
 ![History](img/student-history.png)
 
