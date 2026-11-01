@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Manual screenshot tools: plain CommonJS Node scripts (Playwright), not app code.
+    "docs/manual/_tools/**",
   ]),
 ]);
 
