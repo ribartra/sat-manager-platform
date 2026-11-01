@@ -105,7 +105,7 @@ La vista **Assign** es la misma para práctica y Tests. Se abre desde **Assign**
 ### Asignar sets de práctica
 
 1. Elige el área en las pestañas (**Math**, **Reading**, **Writing**).
-2. Abre una habilidad: verás una fila por **fuente** (por ejemplo College Board) con un botón por nivel (**Easy**, **Medium**, **Hard**). Pulsa los sets que quieres asignar.
+2. Abre una habilidad: verás una fila por **fuente** activa (hoy, College Board) con un botón por nivel (**Easy**, **Medium**, **Hard**). Pulsa los sets que quieres asignar. Un nivel sin sets muestra **—**.
 3. En el resumen de la derecha define:
    - **Open date (optional)**: desde cuándo puede empezar (por defecto hoy).
    - **Due date**: fecha límite (por defecto en una semana).
@@ -132,7 +132,7 @@ La vista **Assign** es la misma para práctica y Tests. Se abre desde **Assign**
 
 ### Asignar un Test
 
-1. Pestaña **Tests**: cada **TEST N** se despliega con sus versiones (una por fuente).
+1. Pestaña **Tests**: cada **TEST N** se despliega con sus versiones (una por fuente activa; hoy, Innovator).
 2. Marca la versión, revisa la fecha y las opciones y pulsa **Assign test**.
 
 Un TEST N con todas sus versiones asignadas aparece fijo con el sello **ALREADY ASSIGNED**.
@@ -199,7 +199,7 @@ El intento queda en el historial tachado como **Not counted** y no cuenta en pun
 
 ## 9. Tests
 
-**Tests** agrupa los SAT completos por número (**TEST N**) con una versión por fuente. Cada Test tiene 4 módulos (R&W 1 y 2, Math 1 y 2). **How scores work** explica cómo se calculan los puntajes.
+**Tests** agrupa los SAT completos por número (**TEST N**) con una versión por fuente. Aparecen todos los números, del TEST 1 al más alto: si ninguna fuente tiene un número, se ve como **TEST N —** (en la imagen, **TEST 9**). Cada Test tiene 4 módulos (R&W 1 y 2, Math 1 y 2). **How scores work** explica cómo se calculan los puntajes.
 
 ![Tests](img/teacher-tests.png)
 
@@ -209,9 +209,11 @@ La página de un Test muestra sus módulos, la tabla **Students** (estado, acier
 
 ## 10. Practice y el banco de preguntas
 
-**Practice** muestra el mapa de habilidades por área: cada habilidad con sus niveles **Easy / Medium / Hard** por fuente y cuántas veces se asignó.
+**Practice** muestra el mapa de habilidades por área: cada habilidad con sus niveles **Easy / Medium / Hard** y cuántas veces se asignó. Un nivel sin sets en ninguna fuente se ve como **Hard —**. Al abrir una habilidad aparece una fila por fuente con sus propios niveles.
 
 ![Practice](img/teacher-practice.png)
+
+![Una habilidad abierta: el nivel Hard sin sets (—) y la fila de College Board](img/teacher-practice-sources.png)
 
 Al pulsar un nivel se abre su menú: cuántos lo tienen asignado, completado, en curso o vencido, y las acciones **Open**, **Preview**, **Assign**, **Edit**, **Status** y **Delete** (solo si nunca se asignó; si no, archívalo).
 
@@ -224,6 +226,14 @@ La página de un set muestra cómo va con tus alumnos y sus preguntas. **Assign 
 **Questions →** abre el **Question Bank**: todas las preguntas por área, con filtros por dominio, habilidad, dificultad y estado.
 
 ![Banco de preguntas](img/teacher-questions.png)
+
+### Las fuentes
+
+Cada set y cada Test viene de una **fuente** (de dónde salió el contenido). Hoy los Practice Sets son de **College Board** y los Tests de **Innovator**.
+
+- Solo se ven las fuentes **activas**: en **Practice**, **Tests**, los filtros y **Assign**.
+- Si un administrador **desactiva** una fuente, sus sets y Tests dejan de verse y no se pueden asignar. Lo que tus alumnos ya tenían asignado sigue funcionando: pueden terminarlo y ver sus resultados, y tú los ves en su página y en **History**.
+- Las fuentes las gestiona un administrador en **Admin › Sources** (ver la Guía de importación y mantenimiento con IA).
 
 > Crear, importar y mantener sets, Tests y preguntas se explica en la **Guía de importación y mantenimiento con IA**.
 
@@ -268,7 +278,7 @@ Las invitaciones abiertas aparecen en **Pending invitations**, con **Cancel invi
 
 ### Importar contenido con IA
 
-En **Practice** y **Tests** el profesor maestro ve **Import with AI**, y los huecos se pueden importar: en **Practice**, al abrir una habilidad, el nivel vacío de una fuente muestra **+ Hard** (u otro nivel; la fila de la habilidad muestra **Hard —**); en **Tests**, un número que falta aparece como **TEST N —** y cada fuente ofrece **+ Import TEST N**. Todo el proceso está en la **Guía de importación y mantenimiento con IA**.
+En **Practice** y **Tests** el profesor maestro ve **Import with AI** mientras quede algo por cargar (si todo está completo, el botón no aparece), y los huecos se pueden importar: en **Practice**, al abrir una habilidad, el nivel vacío de una fuente muestra **+ Hard** (u otro nivel; la fila de la habilidad muestra **Hard —**); en **Tests**, un número que falta aparece como **TEST N —** y cada fuente ofrece **+ Import TEST N**. Todo el proceso está en la **Guía de importación y mantenimiento con IA**.
 
 ![Un nivel vacío listo para importar](img/ai-practice-with-gap.png)
 
@@ -285,6 +295,9 @@ Cada profesor ve solo a los alumnos que invitó.
 
 **¿Qué pasa si invalido un intento?**
 Queda visible pero tachado (**Not counted**) y deja de contar en puntajes e informes.
+
+**Ya no veo los sets o Tests de una fuente.**
+Un administrador la desactivó. Lo que ya estaba asignado sigue en la página de cada alumno y en **History**. Para volver a verlos, pide que la reactive en **Admin › Sources**.
 
 **¿Un padre necesita contraseña para ver el progreso?**
 No, si le compartes un enlace desde **Parents → Reports**: lo abre sin contraseña durante unos días.

@@ -105,7 +105,7 @@ The **Assign** view is the same for practice and Tests. Open it from **Assign** 
 ### Assigning practice sets
 
 1. Choose the area in the tabs (**Math**, **Reading**, **Writing**).
-2. Open a skill: you'll see one row per **source** (for example College Board) with one button per level (**Easy**, **Medium**, **Hard**). Click the sets you want to assign.
+2. Open a skill: you'll see one row per active **source** (today, College Board) with one button per level (**Easy**, **Medium**, **Hard**). Click the sets you want to assign. A level with no sets shows **—**.
 3. In the summary on the right set:
    - **Open date (optional)**: from when they can start (today by default).
    - **Due date**: the deadline (one week by default).
@@ -132,7 +132,7 @@ The **Assign** view is the same for practice and Tests. Open it from **Assign** 
 
 ### Assigning a Test
 
-1. **Tests** tab: each **TEST N** expands into its versions (one per source).
+1. **Tests** tab: each **TEST N** expands into its versions (one per active source; today, Innovator).
 2. Tick the version, check the date and options and click **Assign test**.
 
 A TEST N with every version assigned shows as a fixed row with the **ALREADY ASSIGNED** stamp.
@@ -199,7 +199,7 @@ The try stays in the history crossed out as **Not counted** and doesn't count in
 
 ## 9. Tests
 
-**Tests** groups the full SATs by number (**TEST N**) with one version per source. Each Test has 4 modules (R&W 1 and 2, Math 1 and 2). **How scores work** explains how scores are calculated.
+**Tests** groups the full SATs by number (**TEST N**) with one version per source. Every number from TEST 1 to the highest is listed: a number no source has shows as **TEST N —** (in the picture, **TEST 9**). Each Test has 4 modules (R&W 1 and 2, Math 1 and 2). **How scores work** explains how scores are calculated.
 
 ![Tests](img/teacher-tests.png)
 
@@ -209,9 +209,11 @@ A Test's page shows its modules, the **Students** table (status, correct answers
 
 ## 10. Practice and the question bank
 
-**Practice** shows the skill map per area: each skill with its **Easy / Medium / Hard** levels per source and how many times it was assigned.
+**Practice** shows the skill map per area: each skill with its **Easy / Medium / Hard** levels and how many times it was assigned. A level with no set in any source shows as **Hard —**. Opening a skill shows one row per source with its own levels.
 
 ![Practice](img/teacher-practice.png)
+
+![A skill opened: the Hard level with no sets (—) and the College Board row](img/teacher-practice-sources.png)
 
 Clicking a level opens its menu: how many students have it assigned, completed, in progress or overdue, and the actions **Open**, **Preview**, **Assign**, **Edit**, **Status** and **Delete** (only if it was never assigned; otherwise archive it).
 
@@ -224,6 +226,14 @@ A set's page shows how it's going with your students and its questions. **Assign
 **Questions →** opens the **Question Bank**: every question by area, with filters by domain, skill, difficulty and status.
 
 ![Question bank](img/teacher-questions.png)
+
+### Sources
+
+Every set and Test comes from a **source** (where the content came from). Today Practice Sets come from **College Board** and Tests from **Innovator**.
+
+- Only **active** sources are shown: in **Practice**, **Tests**, the filters and **Assign**.
+- If an administrator **deactivates** a source, its sets and Tests are no longer shown and can't be assigned. What your students already had assigned keeps working: they can finish it and see their results, and you see it on their page and in **History**.
+- Sources are managed by an administrator in **Admin › Sources** (see the AI import and maintenance guide).
 
 > Creating, importing and maintaining sets, Tests and questions is covered in the **AI import and maintenance guide** (Spanish).
 
@@ -268,7 +278,7 @@ Open invitations show under **Pending invitations**, with **Cancel invitation**.
 
 ### Importing content with AI
 
-In **Practice** and **Tests** the master teacher sees **Import with AI**, and the gaps can be imported: in **Practice**, when a skill is opened, a source's empty level shows **+ Hard** (or another level; the skill row shows **Hard —**); in **Tests**, a missing number appears as **TEST N —** and each source offers **+ Import TEST N**. The whole process is in the **AI import and maintenance guide**.
+In **Practice** and **Tests** the master teacher sees **Import with AI** while something is still missing (when everything is complete, the button is not shown), and the gaps can be imported: in **Practice**, when a skill is opened, a source's empty level shows **+ Hard** (or another level; the skill row shows **Hard —**); in **Tests**, a missing number appears as **TEST N —** and each source offers **+ Import TEST N**. The whole process is in the **AI import and maintenance guide**.
 
 ![An empty level ready to import](img/ai-practice-with-gap.png)
 
@@ -285,6 +295,9 @@ Each teacher only sees the students they invited.
 
 **What happens if I invalidate a try?**
 It stays visible but crossed out (**Not counted**) and stops counting in scores and reports.
+
+**I no longer see a source's sets or Tests.**
+An administrator deactivated it. What was already assigned is still on each student's page and in **History**. To see them again, ask for it to be reactivated in **Admin › Sources**.
 
 **Does a parent need a password to see progress?**
 Not if you share a link from **Parents → Reports**: they open it without a password for a few days.

@@ -32,6 +32,21 @@ interface SearchParams {
 
 const DIFFICULTIES = ["EASY", "MEDIUM", "HARD"] as const;
 
+/** Whether some skill × level × active practice source (any area) has no set yet in the teacher's bank. */
+async function practiceBankHasGap(user: Parameters<typeof contentScopeFor>[0], sourceIds: string[]) {
+  if (sourceIds.length === 0) return false;
+  const [skills, filled] = await Promise.all([
+    prisma.topic.findMany({ where: academicTopicWhere, select: { id: true } }),
+    prisma.practiceSet.groupBy({
+      by: ["topicId", "difficulty", "sourceId"],
+      where: { ...ACTIVE_SOURCE_WHERE, ...contentScopeFor(user), topic: academicTopicWhere },
+    }),
+  ]);
+  // A set without a source counts as College Board (like the catalogue).
+  const have = new Set(filled.map((g) => `${g.topicId}|${g.difficulty}|${g.sourceId ?? DEFAULT_PRACTICE_SOURCE_ID}`));
+  return skills.some((skill) => DIFFICULTIES.some((d) => sourceIds.some((sourceId) => !have.has(`${skill.id}|${d}|${sourceId}`))));
+}
+
 export default async function TeacherPracticeSetsPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const filters = await searchParams;
   // Links that only know the skill (editor after saving, old Content map URLs) land on its area.
@@ -49,7 +64,8 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
   // Tests have their own section; old links to the Tests tab land there.
   if (area === "tests") redirect("/teacher/tests");
   const session = await auth();
-  // Admin and master teacher import content with AI ("+ Easy" on a source's empty level, header button).
+  // Admin and master teacher import content with AI ("+ Easy" on a source's empty level, header button
+  // while the bank has a gap).
   const canImport = Boolean(await requireContentImporter());
   const moreLinks = resolveLinks(TEACHER_MORE_LINKS.practice, {
     role: session?.user.role,
@@ -89,6 +105,9 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
   });
   // One search box (SAT-042): a skill shows when its name or one of its sets matches.
   const setMatches = (set: (typeof practiceSets)[number]) => matchesQuery(search, set.name);
+  // "Import with AI" (header) only while something can be added: some skill × level × active practice
+  // source (every area, not only this tab) still has no set. Complete bank = no button.
+  const hasGap = canImport && session ? await practiceBankHasGap(session.user, sources.map((source) => source.id)) : false;
   const domains = new Map<string, { name: string; topics: typeof topics }>();
   for (const topic of [...topics].sort(compareSkills)) {
     if (search && !matchesQuery(search, topic.name) && !practiceSets.some((set) => set.topicId === topic.id && setMatches(set))) continue;
@@ -107,7 +126,7 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
           <HeaderActions>
             {/* This area's questions in the Question Bank (with the way back here). */}
             <Link href={`/teacher/questions?area=${area}`} className={HEADER_SHORTCUT_CLASS}>Questions →</Link>
-            {canImport ? (
+            {hasGap ? (
               <Link href="/teacher/import?kind=PRACTICE_SET" className={HEADER_ACTION_CLASS}>
                 <Sparkles size={14} aria-hidden /> Import with AI
               </Link>

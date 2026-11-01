@@ -43,5 +43,10 @@ L.run(async () => {
   await L.shot(page, "master-teacher-detail");
   await L.go(page, "/teacher/teachers");
   await L.shot(page, "master-teachers-list");
+  // Admin › Sources (admin only): status, "Used for", Deactivate / Activate, Remove.
+  const admin = await L.open();
+  await L.login(admin, A.admin);
+  await L.go(admin, "/admin/sources");
+  await L.shot(admin, "admin-sources");
   console.log("master ok", MISSING.practiceSet);
 });

@@ -59,6 +59,13 @@ L.run(async () => {
   await L.shot(page, "teacher-test-page");
   await L.go(page, "/teacher/practice-sets?area=math");
   await L.shot(page, "teacher-practice", "full");
+  await L.soft("skill by source", async () => {
+    // A skill opened: "Hard —" on the skill row, one row per active source (no "+" for a teacher).
+    const skill = page.locator("details", { hasText: "Nonlinear Functions" }).first();
+    await skill.locator("summary").click(); await page.waitForTimeout(400);
+    await L.shot(page, "teacher-practice-sources", skill);
+    await skill.locator("summary").click(); await page.waitForTimeout(300);
+  });
   await L.soft("set menu", async () => {
     const chip = page.locator("button", { hasText: "Easy" }).first();
     await chip.click(); await page.waitForTimeout(500);
