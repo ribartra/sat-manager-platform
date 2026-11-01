@@ -3,7 +3,7 @@ import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma from "@/lib/prisma";
 import { studentAccessWhereFor } from "@/lib/program-scope";
 import { type ReportFilters } from "@/lib/student-report";
-import { getFeatureSetting } from "@/lib/app-settings";
+import { resolvePeriod } from "@/lib/period-filter";
 import { buildStudentReportPdf, parseReportAreas } from "@/lib/pdf/build-student-report";
 import { sendParentReportPdfEmail } from "@/lib/email";
 import { writeAudit } from "@/lib/audit";
@@ -17,7 +17,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // the parents the teacher picks. Only parents linked to the student and with an email qualify.
 // A student with no parent linked can be sent to one address instead (toEmail); the response then
 // says whether to offer linking that address as the parent (askToLinkParent).
-//   POST /api/reports/students/[id]/email  { parentIds | toEmail, areas, filters?, fptAttemptId? }
+//   POST /api/reports/students/[id]/email  { parentIds | toEmail, areas, filters? (period, from, to), fptAttemptId? }
 export const runtime = "nodejs";
 
 interface RouteContext {
@@ -32,7 +32,7 @@ export const POST = withApiErrors(async function POST(req: Request, { params }: 
   const body = (await req.json().catch(() => ({}))) as {
     parentIds?: unknown;
     areas?: unknown;
-    filters?: { topic?: string; difficulty?: string; from?: string; to?: string };
+    filters?: { topic?: string; difficulty?: string; period?: string; from?: string; to?: string };
     fptAttemptId?: unknown;
     toEmail?: unknown;
   };
@@ -68,16 +68,15 @@ export const POST = withApiErrors(async function POST(req: Request, { params }: 
     }
   }
 
-  const showEndDate = await getFeatureSetting("TIME_FILTER_END_DATE");
   const filters: ReportFilters = {
     topic: body.filters?.topic || undefined,
     difficulty: body.filters?.difficulty || undefined,
-    from: body.filters?.from || undefined,
-    to: showEndDate ? body.filters?.to || undefined : undefined,
   };
+  // The period chosen in the report dialog (the end date always applies).
+  const period = resolvePeriod({ period: body.filters?.period, from: body.filters?.from, to: body.filters?.to });
   const areas = parseReportAreas(Array.isArray(body.areas) ? body.areas.join(",") : typeof body.areas === "string" ? body.areas : "");
   const fptAttemptId = typeof body.fptAttemptId === "string" && body.fptAttemptId ? body.fptAttemptId : null;
-  const report = await buildStudentReportPdf({ viewer: session.user, studentId, areas, filters, fptAttemptId });
+  const report = await buildStudentReportPdf({ viewer: session.user, studentId, areas, filters, period, fptAttemptId });
   if (!report) return new NotFoundError("Not found").toResponse();
 
   const results: { parentId: string | null; name: string; email: string | null; sent: boolean; reason: string | null }[] = [];

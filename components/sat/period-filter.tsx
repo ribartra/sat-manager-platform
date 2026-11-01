@@ -7,15 +7,26 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { FilterField } from "@/components/sat/filter-bar";
-import { isoDay, periodLabel, PERIODS, type Period, type PeriodValue } from "@/lib/period-filter";
+import { isOfferedPeriod, isoDay, periodLabel, periodName, PERIODS, resolvePeriod, type Period, type PeriodValue } from "@/lib/period-filter";
 
 /**
- * The date filter of every FilterBar: a "Period" select (All time, Last week, Last month, Last year,
- * Custom…). Custom opens a dialog to pick the start and end dates ("Change dates…" reopens it);
- * applying it submits the bar's form.
- * Sends `period` (+ `from` / `to` for Custom) — pages read them with resolvePeriod.
+ * The date filter of every FilterBar: a "Period" select (All time, Last 30 / 60 / 90 days, Custom…).
+ * Custom opens a dialog to pick the start and end dates ("Change dates…" reopens it).
+ * In a form (default) it sends `period` (+ `from` / `to` for Custom) and applying Custom submits the
+ * form — pages read them with resolvePeriod. With `onChange` (e.g. the PDF report dialog) it is
+ * controlled: no form fields, each change calls onChange with the resolved period.
  */
-export function PeriodFilter({ value, label = "Period" }: { value: PeriodValue; label?: string }) {
+export function PeriodFilter({
+  value,
+  label = "Period",
+  onChange,
+  id = "pf-period",
+}: {
+  value: PeriodValue;
+  label?: string;
+  onChange?: (value: PeriodValue) => void;
+  id?: string;
+}) {
   const [period, setPeriod] = useState<Period>(value.period);
   const [range, setRange] = useState({ from: value.from ?? "", to: value.to ?? "" });
   const [open, setOpen] = useState(false);
@@ -43,24 +54,30 @@ export function PeriodFilter({ value, label = "Period" }: { value: PeriodValue; 
       setPeriod("custom");
       setOpen(false);
     });
-    anchor.current?.form?.requestSubmit();
+    if (onChange) onChange({ period: "custom", from: draft.from || undefined, to: draft.to || undefined });
+    else anchor.current?.form?.requestSubmit();
   }
 
   const custom = period === "custom";
   return (
-    <FilterField label={label} htmlFor="pf-period" className="@md:min-w-[10rem]">
+    <FilterField label={label} htmlFor={id} className="@md:min-w-[10rem]">
         <Select
-          id="pf-period"
-          name="period"
+          id={id}
+          name={onChange ? undefined : "period"}
           value={period}
           onChange={(e) => {
             const next = e.target.value;
             // "Custom…" and, once a custom range is set, "Change dates…" open the dialog.
             if (next === "custom" || next === "edit") openCustom();
-            else setPeriod(next as Period);
+            else {
+              setPeriod(next as Period);
+              onChange?.(resolvePeriod({ period: next }));
+            }
           }}
           title={custom ? periodLabel({ period: "custom", from: range.from || undefined, to: range.to || undefined }) : undefined}
         >
+          {/* An older period (a "last 7 days" link) shows while it is the current one. */}
+          {isOfferedPeriod(period) ? null : <option value={period}>{periodName(period)}</option>}
           {PERIODS.map((p) => (
             <option key={p.value} value={p.value}>
               {p.value === "custom" && custom ? periodLabel({ period: "custom", from: range.from || undefined, to: range.to || undefined }, true) : p.label}
@@ -69,8 +86,12 @@ export function PeriodFilter({ value, label = "Period" }: { value: PeriodValue; 
           {custom ? <option value="edit">Change dates…</option> : null}
         </Select>
       {/* Custom dates travel with the form; the other periods are resolved on the server. */}
-      <input ref={anchor} type="hidden" name="from" value={custom ? range.from : ""} disabled={!custom || !range.from} />
-      <input type="hidden" name="to" value={custom ? range.to : ""} disabled={!custom || !range.to} />
+      {onChange ? null : (
+        <>
+          <input ref={anchor} type="hidden" name="from" value={custom ? range.from : ""} disabled={!custom || !range.from} />
+          <input type="hidden" name="to" value={custom ? range.to : ""} disabled={!custom || !range.to} />
+        </>
+      )}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
@@ -79,7 +100,7 @@ export function PeriodFilter({ value, label = "Period" }: { value: PeriodValue; 
           </DialogHeader>
           <div className="flex flex-wrap gap-1.5">
             <Button type="button" size="sm" variant="secondary" onClick={() => quick(30)}>Last 30 days</Button>
-            <Button type="button" size="sm" variant="secondary" onClick={() => quick(90)}>Last 3 months</Button>
+            <Button type="button" size="sm" variant="secondary" onClick={() => quick(90)}>Last 90 days</Button>
             <Button type="button" size="sm" variant="secondary" onClick={() => quick("year")}>This year</Button>
           </div>
           <div className="grid grid-cols-2 gap-3">

@@ -12,9 +12,9 @@ const OPEN_FOR_OVERDUE = { in: ["PENDING", "IN_PROGRESS"] };
  * page loads call this, and an UPDATE takes SQLite's write lock even when it matches no row.
  */
 export async function markOverdueAssignments(now = new Date()) {
-  const where = { dueDate: { lt: now }, status: OPEN_FOR_OVERDUE };
-  // A Test finished at least once met its due date: a student's retake is never "overdue".
-  const examWhere = { ...where, attempts: { none: { status: "SUBMITTED" } } };
+  // A set or Test finished at least once met its due date: a student's retry is never "overdue".
+  const where = { dueDate: { lt: now }, status: OPEN_FOR_OVERDUE, attempts: { none: { status: "SUBMITTED" as const } } };
+  const examWhere = where;
   const [practice, exams] = await Promise.all([
     withSqliteRetry(() => prisma.assignment.count({ where })),
     withSqliteRetry(() => prisma.fullPracticeTestAssignment.count({ where: examWhere })),

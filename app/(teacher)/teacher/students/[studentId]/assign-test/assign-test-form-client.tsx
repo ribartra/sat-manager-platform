@@ -1,5 +1,6 @@
 "use client";
 
+import { nameWithSource } from "@/lib/test-name";
 import { Checkbox, Radio } from "@/components/ui/checkbox";
 import { Select } from "@/components/ui/select";
 import { useState } from "react";
@@ -216,7 +217,7 @@ export function AssignTestForm({
       <AssignSummaryCard
         to={useGroup ? group?.name ?? "Group" : studentName}
         countLabel="Tests"
-        items={editing ? [editing.name] : exams.filter((exam) => selected.has(exam.id)).map((exam) => `${exam.name} · ${exam.sourceName}`)}
+        items={editing ? [editing.name] : exams.filter((exam) => selected.has(exam.id)).map((exam) => nameWithSource(exam.name, exam.sourceName))}
         options={options}
         onOptionsChange={setOptions}
         dueHint="Due at the end of that day. Starts today; change it if needed."

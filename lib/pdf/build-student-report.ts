@@ -5,12 +5,14 @@ import { practiceSetGroups, setsFromReportAttempts, testGroups } from "@/lib/att
 import { loadStudentTests, sortTests } from "@/lib/test-assignments";
 import { renderStudentReportPdf, type ReportAreaKey, type StudentReportData } from "@/lib/pdf/student-report-document";
 import { formatDate } from "@/lib/utils";
+import { periodSummary, resolvePeriod, type PeriodValue } from "@/lib/period-filter";
 
 // Builds the student progress report PDF from the same data, computed the same way, as the
 // teacher's student page tabs (lib/student-report.ts, lib/attempt-groups.ts, lib/test-assignments.ts),
 // server-side and without a browser. Shared by the download/preview route and the "email to parents"
-// route. Like the page, it shows every result (no skill / level / date filters); the one narrowing
-// left is a single Test attempt ("Test report").
+// route. Like the page it covers every skill and level; the teacher picks the period (All time, Last
+// 30 / 60 / 90 days, Custom): tries and results submitted in it (pending work always shows). A single
+// Test attempt ("Test report") narrows it to that exam.
 
 export const REPORT_AREA_ORDER: ReportAreaKey[] = ["math", "reading", "writing", "mocks"];
 const PRACTICE_AREA = { math: "MATH", reading: "READING", writing: "WRITING" } as const;
@@ -41,8 +43,10 @@ export async function buildStudentReportPdf(input: {
   viewer: { id: string; role: string };
   studentId: string;
   areas: ReportAreaKey[];
-  /** Kept for the callers; the report, like the student page, shows every result. */
+  /** Kept for the callers: only `from` / `to` are read when no `period` is given. */
   filters?: ReportFilters;
+  /** The report's period (resolved with resolvePeriod); default: from / to of `filters`, else All time. */
+  period?: PeriodValue;
   fptAttemptId?: string | null;
 }): Promise<BuiltStudentReport | null> {
   const { viewer, studentId } = input;
@@ -63,13 +67,16 @@ export async function buildStudentReportPdf(input: {
   if (input.fptAttemptId && !exam) return null;
   const areas: ReportAreaKey[] = exam ? ["mocks"] : input.areas;
 
-  const filterSummary = exam ? `Test: ${exam.test.name}${exam.submittedAt ? `, ${formatDate(exam.submittedAt)}` : ""}` : "All results";
+  const period = input.period ?? resolvePeriod({ from: input.filters?.from, to: input.filters?.to });
+  // Tries are filtered by their submission date (lib/progress-filters.ts progressDateWhere).
+  const dates: ReportFilters = exam ? {} : { from: period.from, to: period.to };
+  const filterSummary = exam ? `Test: ${exam.test.name}${exam.submittedAt ? `, ${formatDate(exam.submittedAt)}` : ""}` : `Period: ${periodSummary(period)}`;
 
   const sections: StudentReportData["sections"] = [];
   for (const area of areas) {
     if (area === "mocks") {
       // The Tests tab: KPI strip, Test cards (pending first), Test attempts and active Tests.
-      const [mock, allTests] = await Promise.all([loadMockReport(studentId, {}, { attemptId: exam?.id }), loadStudentTests(studentId)]);
+      const [mock, allTests] = await Promise.all([loadMockReport(studentId, dates, { attemptId: exam?.id }), loadStudentTests(studentId)]);
       const finished = new Set(mock.examHistory.map((row) => row.id));
       const keep = exam ? (a: { id: string }) => a.id === exam.id : (a: { id: string; status: string }) => a.status === "IN_PROGRESS" || finished.has(a.id);
       const ordered = sortTests(allTests);
@@ -89,7 +96,7 @@ export async function buildStudentReportPdf(input: {
       });
     } else {
       // A practice tab: skills by difficulty, active sets, comments and the practice-attempts accordion.
-      const practice = await loadPracticeReport(studentId, PRACTICE_AREA[area], {});
+      const practice = await loadPracticeReport(studentId, PRACTICE_AREA[area], dates);
       sections.push({
         area,
         practice,

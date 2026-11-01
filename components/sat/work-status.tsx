@@ -1,16 +1,21 @@
 import { Badge } from "@/components/ui/badge";
 import { formatDate, isAhead, relativeDay } from "@/lib/utils";
-import { scoreBandTextClass } from "@/lib/score-band";
 
 import type { WorkState } from "@/lib/test-view";
 export type { WorkState };
 
-/** Not started / In progress / Completed, plus "Overdue" when the due date passed and it is not completed. */
-export function WorkStatusBadges({ state, overdue }: { state: WorkState; overdue?: boolean }) {
+/**
+ * Not started / In progress / Completed, plus "Overdue" when the due date passed and it is not completed.
+ * A completed set the student is trying again stays Completed, with "Retry in progress".
+ */
+export function WorkStatusBadges({ state, overdue, retryOpen }: { state: WorkState; overdue?: boolean; retryOpen?: boolean }) {
   return (
     <span className="inline-flex flex-wrap items-center gap-1">
       {state === "done" ? (
-        <Badge variant="success">Completed</Badge>
+        <>
+          <Badge variant="success">Completed</Badge>
+          {retryOpen ? <Badge variant="default">Retry in progress</Badge> : null}
+        </>
       ) : state === "progress" ? (
         <Badge variant="warning">In progress</Badge>
       ) : (
@@ -81,11 +86,12 @@ function startOfToday() {
 }
 
 /**
- * Percentage coloured with the shared accuracy bands (practice and per-area results only, never SAT scores).
- * `color` overrides the band, e.g. the section colour on area boxes.
+ * Percentage in lists, tables and boxes: black whatever the score (meeting with Soledad, T03; the
+ * red / yellow / green bands stay only on the big result % of an attempt and in charts).
+ * `color` overrides it, e.g. the section colour on area boxes.
  */
 export function Pct({ value, className = "", color }: { value: number | null | undefined; className?: string; color?: string }) {
   if (value === null || value === undefined) return <span className={`text-gray-400 ${className}`}>—</span>;
   if (color) return <span className={className} style={{ color }}>{value}%</span>;
-  return <span className={`${scoreBandTextClass(value)} ${className}`}>{value}%</span>;
+  return <span className={`text-[var(--sat-text)] ${className}`}>{value}%</span>;
 }

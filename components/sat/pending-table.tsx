@@ -59,7 +59,7 @@ export function PendingTable({ rows, show, hrefFor }: { rows: PendingRow[]; show
             <span className="flex flex-wrap items-center gap-2">
               <RowLink href={hrefFor(r)}>{r.title}</RowLink>
               {r.difficulty ? <Badge variant={difficultyBadgeVariant(r.difficulty)}>{difficultyLabel(r.difficulty)}</Badge> : null}
-              <SourceTag name={r.sourceName} />
+              <SourceTag name={r.sourceName} unlessIn={r.title} />
             </span>
           </td>
           {show.status ? (

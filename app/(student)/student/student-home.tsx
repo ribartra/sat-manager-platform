@@ -1,4 +1,5 @@
 import { BookOpen, ClipboardList, Clock, FileText } from "lucide-react";
+import { nameWithSource } from "@/lib/test-name";
 import { Breadcrumbs, PageHeader } from "@/components/sat";
 import type { Crumb } from "@/components/sat/breadcrumbs";
 import { Scores } from "@/components/sat/test-scores";
@@ -115,6 +116,8 @@ export async function StudentHome({ studentId, firstName, links = STUDENT_HOME_L
     .flatMap((t) => (t.lastSubmitted?.submittedAt ? [{ name: t.name, source: t.sourceName, attempt: t.lastSubmitted, at: t.lastSubmitted.submittedAt }] : []))
     .sort((a, b) => b.at.getTime() - a.at.getTime())[0];
   const practiceTodo = sortPracticeSets(practice).filter((p) => p.state !== "done");
+  // Sets finished at least once (a retry in progress still counts here).
+  const practiceDone = practice.filter((p) => p.state === "done").length;
   const practiceTries = history.filter((h) => h.kind === "practice").length;
   const latestTries = [...history].sort((a, b) => b.at.getTime() - a.at.getTime()).slice(0, LIST_SIZE);
   const boxes = 3 + (materials !== null ? 1 : 0);
@@ -140,8 +143,7 @@ export async function StudentHome({ studentId, firstName, links = STUDENT_HOME_L
           line={
             latestTest ? (
               <>
-                Latest: {latestTest.name}
-                {latestTest.source ? ` · ${latestTest.source}` : ""} · <Scores rw={latestTest.attempt.rwScore} math={latestTest.attempt.mathScore} /> · {formatDate(latestTest.at)}
+                Latest: {nameWithSource(latestTest.name, latestTest.source)} · <Scores rw={latestTest.attempt.rwScore} math={latestTest.attempt.mathScore} /> · {formatDate(latestTest.at)}
               </>
             ) : (
               "No test finished yet"
@@ -152,7 +154,7 @@ export async function StudentHome({ studentId, firstName, links = STUDENT_HOME_L
             empty: "No test to take.",
             items: testsTodo.slice(0, LIST_SIZE).map((t) => ({
               key: t.assignmentId,
-              label: `${t.name}${t.sourceName ? ` · ${t.sourceName}` : ""}`,
+              label: nameWithSource(t.name, t.sourceName),
               detail: statusLabel(t.assignmentId, t.dueDate),
               href: links.testStart ? links.testStart(t.assignmentId) : links.tests,
             })),
@@ -173,6 +175,7 @@ export async function StudentHome({ studentId, firstName, links = STUDENT_HOME_L
               href: links.practice(t.key),
             })),
             ...statusChips("practice", "practice"),
+            { label: "Completed", value: practiceDone, tone: tone(practiceDone, "success"), href: links.history("practice") },
           ]}
           list={{
             title: "Up next",

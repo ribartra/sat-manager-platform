@@ -99,7 +99,7 @@ export async function TestIntro({
         eyebrow={
           <span className="flex flex-wrap items-center gap-1.5">
             <Badge variant="test">{assignment.test.name}{tryNumber > 1 ? ` · try ${tryNumber}` : ""}</Badge>
-            <SourceTag name={assignment.test.source?.name} />
+            <SourceTag name={assignment.test.source?.name} unlessIn={assignment.test.name} />
             <Badge>{current.tier}</Badge>
             {current.state === "progress" ? <Badge variant="warning">In progress</Badge> : null}
           </span>

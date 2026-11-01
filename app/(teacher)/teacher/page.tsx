@@ -41,13 +41,15 @@ export default async function TeacherDashboard() {
   const contentScope = await currentContentScope();
   const inviteWhere = { role: "STUDENT", usedAt: null, revokedAt: null, expiresAt: { gt: now }, ...(session?.user.role === "TEACHER" ? { invitedById: session.user.id } : {}) };
 
-  const [students, invitations, testCount, sets, testAssignments] = await Promise.all([
+  const [students, invitations, testCount, sets, testAssignments, practiceCompleted] = await Promise.all([
     prisma.user.findMany({ where: studentScope, select: { id: true }, orderBy: { name: "asc" } }),
     prisma.inviteToken.count({ where: inviteWhere }).catch(() => 0),
     prisma.fullPracticeTest.count({ where: { ...contentScope, status: "PUBLISHED" } }),
     prisma.practiceSet.findMany({ where: { ...contentScope, ...ACTIVE_SOURCE_WHERE, status: "PUBLISHED" }, select: { topic: { select: { domain: { select: { practiceArea: true } } } } } }),
     // Test assignments of the teacher's students (same counting rule as the Tests page).
     prisma.fullPracticeTestAssignment.findMany({ where: { student: studentScope }, select: { status: true, dueDate: true } }),
+    // Practice sets finished at least once (a retry in progress still counts, as the student sees it).
+    prisma.assignment.count({ where: { student: studentScope, OR: [{ status: "COMPLETED" }, { attempts: { some: { status: "SUBMITTED" } } }] } }),
   ]);
   const studentIds = students.map((s) => s.id);
   const [overviews, history, pending, teachers] = await Promise.all([
@@ -171,6 +173,7 @@ export default async function TeacherDashboard() {
             { label: "Reading", value: setsIn("READING"), color: "var(--sat-area-reading)", href: "/teacher/practice-sets?area=reading" },
             { label: "Writing", value: setsIn("WRITING"), color: "var(--sat-area-writing)", href: "/teacher/practice-sets?area=writing" },
             ...statusChips("practice", "practice"),
+            { label: "Completed", value: practiceCompleted, tone: tone(practiceCompleted, "success"), href: historyHref({ type: "practice" }) },
             { label: "Tries in the last 7 days", value: practiceTries, tone: tone(practiceTries, "success"), href: historyHref({ type: "practice" }, { period: "week" }) },
           ]}
           action="Open Practice →"

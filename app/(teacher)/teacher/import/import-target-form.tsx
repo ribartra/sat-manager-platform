@@ -1,5 +1,6 @@
 "use client";
 
+import { defaultTestName } from "@/lib/test-name";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -62,7 +63,9 @@ export function ImportTargetForm({
   const sources = kind === "PRACTICE_SET" ? practiceSources : testSources;
   const [sourceId, setSourceId] = useState(() => (sources.some((s) => s.id === initial.sourceId) ? initial.sourceId : sources[0]?.id ?? ""));
   const [testNumber, setTestNumber] = useState(initial.testNumber ?? "");
-  const [testName, setTestName] = useState("");
+  // The name follows source + number ("Innovator Test 9") until the teacher writes their own.
+  const [customName, setCustomName] = useState<string | null>(null);
+  const testName = customName ?? defaultTestName(sources.find((s) => s.id === sourceId)?.name, testNumber);
   // Every file goes in a named field (its slot): what it is comes from where it was put, never from its name.
   const [files, setFiles] = useState<Record<string, File[]>>({});
   const [layout, setLayout] = useState<Record<Section, Layout>>({ RW: "COMBINED", MATH: "COMBINED" });
@@ -172,16 +175,12 @@ export function ImportTargetForm({
                 min={1}
                 max={999}
                 value={testNumber}
-                onChange={(e) => {
-                  setTestNumber(e.target.value);
-                  // Default name "TEST N" until the teacher writes their own.
-                  if (!testName || /^TEST \d*$/.test(testName)) setTestName(e.target.value ? `TEST ${e.target.value}` : "");
-                }}
+                onChange={(e) => setTestNumber(e.target.value)}
                 placeholder="1"
               />
             </Field>
             <Field label="Test name" hint="Shown to students.">
-              <Input value={testName} onChange={(e) => setTestName(e.target.value)} placeholder="TEST 1" maxLength={120} />
+              <Input value={testName} onChange={(e) => setCustomName(e.target.value || null)} placeholder="Innovator Test 1" maxLength={120} />
             </Field>
           </>
         )}

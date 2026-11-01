@@ -20,7 +20,7 @@ export async function PracticeIntro({ studentId, assignmentId }: { studentId: st
   const tab = tabFromPracticeArea(item.area);
   const start = `/student/practice/assignment/${assignmentId}?start=1`;
   const label =
-    item.state === "progress" ? "Continue where you left off" : item.tries.length > 0 ? `Start try ${item.tries.length + 1}` : "Start practice";
+    item.state === "progress" || item.retryOpen ? "Continue where you left off" : item.tries.length > 0 ? `Start try ${item.tries.length + 1}` : "Start practice";
   return (
     <PageShell>
       <Breadcrumbs
@@ -37,7 +37,7 @@ export async function PracticeIntro({ studentId, assignmentId }: { studentId: st
             <AreaTag area={item.area} />
             <Badge variant={difficultyBadgeVariant(item.difficulty)}>{difficultyLabel(item.difficulty)}</Badge>
             <SourceTag name={item.sourceName} />
-            <WorkStatusBadges state={item.state} overdue={item.overdue} />
+            <WorkStatusBadges state={item.state} overdue={item.overdue} retryOpen={item.retryOpen} />
           </span>
         }
         title={item.skill}
@@ -59,7 +59,7 @@ export async function PracticeIntro({ studentId, assignmentId }: { studentId: st
         }
       />
       <Card padding="lg">
-        {item.state === "progress" && item.openAnswered !== null ? (
+        {(item.state === "progress" || item.retryOpen) && item.openAnswered !== null ? (
           <p className="mb-4 text-sm text-gray-600">You answered {item.openAnswered} of {item.questionCount} questions so far.</p>
         ) : null}
         {item.tries.length > 0 ? (
