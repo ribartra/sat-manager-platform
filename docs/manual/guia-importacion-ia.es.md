@@ -365,6 +365,8 @@ Cada set y Test pertenece a una **fuente**. Un administrador las gestiona en **A
 
 Hoy los Practice Sets son de **College Board** y los Tests de **Innovator**; College Board 2025 y 2026 están inactivas.
 
+![Admin › Sources: estado, Used for, Deactivate / Activate y Remove (bloqueado en las fuentes con contenido)](img/admin-sources.png)
+
 En **Assign**, cada fuente activa es una fila dentro de la habilidad o del TEST N.
 
 ### Imágenes y archivos de origen
