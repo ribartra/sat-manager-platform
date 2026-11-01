@@ -268,7 +268,7 @@ Las invitaciones abiertas aparecen en **Pending invitations**, con **Cancel invi
 
 ### Importar contenido con IA
 
-En **Practice** y **Tests** el profesor maestro ve **Import with AI**, y los niveles vacíos muestran **+ Hard** (u otro nivel) para importarlos. Todo el proceso está en la **Guía de importación y mantenimiento con IA**.
+En **Practice** y **Tests** el profesor maestro ve **Import with AI**, y los huecos se pueden importar: en **Practice**, al abrir una habilidad, el nivel vacío de una fuente muestra **+ Hard** (u otro nivel; la fila de la habilidad muestra **Hard —**); en **Tests**, un número que falta aparece como **TEST N —** y cada fuente ofrece **+ Import TEST N**. Todo el proceso está en la **Guía de importación y mantenimiento con IA**.
 
 ![Un nivel vacío listo para importar](img/ai-practice-with-gap.png)
 

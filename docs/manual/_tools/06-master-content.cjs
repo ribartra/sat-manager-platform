@@ -8,12 +8,20 @@ L.run(async () => {
   await L.go(page, "/teacher/practice-sets?area=math");
   await L.shot(page, "ai-practice-with-gap", "full");
   await L.soft("gap chip", async () => {
+    // Skill row "Hard —"; opened, the source row offers "+ Hard".
     const skill = page.locator("details", { hasText: "Nonlinear Functions" }).first();
+    await skill.locator("summary").click(); await page.waitForTimeout(400);
     await L.shot(page, "ai-gap-chip", skill);
   });
   // The import steps themselves (ai-step1-*, ai-step2-modules) are taken by 07-import-steps.cjs.
   await L.go(page, "/teacher/tests");
   await L.shot(page, "ai-tests-list", "full");
+  await L.soft("empty test", async () => {
+    // TEST 9 with "—"; opened, each Tests source offers "+ Import TEST 9".
+    const test9 = page.locator("details", { has: page.locator("summary", { hasText: /^\s*TEST 9(?!\d)/ }) });
+    await test9.locator("summary").click(); await page.waitForTimeout(400);
+    await L.shot(page, "ai-tests-gap", test9);
+  });
   const set = D.setId("Algebra - Linear Equations in One Variable - EASY");
   await L.go(page, `/teacher/practice-sets/${set}?edit`);
   await L.shot(page, "maint-set-editor", "full");

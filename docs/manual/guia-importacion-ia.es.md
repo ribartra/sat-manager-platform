@@ -88,17 +88,19 @@ Un Test de la plataforma tiene **4 módulos** con un número fijo de preguntas:
 
 ## 3. Encontrar el hueco a llenar
 
-**Practice.** En el mapa de habilidades, un nivel que no tiene set aparece como **+ Hard** (o **+ Easy**, **+ Medium**). Al pulsarlo se abre la importación con la habilidad y el nivel ya elegidos.
+**Practice.** En el mapa de habilidades, un nivel que no tiene set en ninguna fuente aparece como **Hard —** en la fila de la habilidad. Al abrir la habilidad se ve una fila por fuente: ahí el nivel vacío aparece como **+ Hard** (o **+ Easy**, **+ Medium**). Al pulsarlo se abre la importación con la habilidad, el nivel y la fuente ya elegidos. Los niveles que ya tienen sets no muestran **+**.
 
 En el ejemplo, la habilidad *Nonlinear Functions* tiene Easy y Medium, pero no **Hard**:
 
 ![Practice con un nivel vacío](img/ai-practice-with-gap.png)
 
-![El nivel vacío "+ Hard"](img/ai-gap-chip.png)
+![La habilidad abierta: "Hard —" y, en la fila de College Board, "+ Hard"](img/ai-gap-chip.png)
 
-**Tests.** En **Tests** se ve qué números (**TEST N**) existen. En el ejemplo falta **TEST 9**. Pulsa **Import with AI** para crearlo.
+**Tests.** En **Tests** aparecen todos los números, del **TEST 1** al más alto. Un número que ninguna fuente tiene se ve con **—**; en el ejemplo, **TEST 9**. Al abrirlo, cada fuente de Tests ofrece **+ Import TEST 9**, que abre la importación con el número y la fuente ya elegidos. Dentro de un TEST que ya existe, las fuentes que no lo tienen también ofrecen **+ Import TEST N**.
 
-![Tests: falta el TEST 9](img/ai-tests-list.png)
+![Tests: el TEST 9 aparece con "—"](img/ai-tests-list.png)
+
+![TEST 9 abierto: "+ Import TEST 9" en cada fuente](img/ai-tests-gap.png)
 
 ## 4. Cargar un Practice Set (una habilidad y una dificultad)
 
@@ -106,7 +108,7 @@ Ejemplo: *Advanced Math › Nonlinear Functions › Hard*, fuente College Board.
 
 ### Paso 1 — What & PDF
 
-1. Pulsa el chip **+ Hard** de la habilidad. La importación se abre con **Section**, **Domain**, **Skill** y **Difficulty** ya elegidos. Si entraste por **Import with AI**, marca **A new Practice Set (one skill and level)** y elígelos tú.
+1. Abre la habilidad y pulsa **+ Hard** en la fila de la fuente. La importación se abre con **Section**, **Domain**, **Skill**, **Difficulty** y **Source** ya elegidos. Si entraste por **Import with AI**, marca **A new Practice Set (one skill and level)** y elígelos tú.
 2. Revisa la **Source** (College Board).
 3. En **Questions PDF** pulsa **Choose PDF** y elige `NON LINEAR FUNCTIONS HARD.pdf`.
 4. En **Answers / explanations** elige `ANS NON LINEAR FUNCT HARD .pdf` (acepta PDF o Word, uno o varios).
@@ -148,7 +150,7 @@ Ejemplo: **TEST 9**, fuente Innovator. El Test se crea una vez y se llena **un m
 
 ### Paso 1 — Todos los archivos del Test
 
-1. En **Tests** pulsa **Import with AI** y marca **A new Test (4 modules)**.
+1. En **Tests** abre **TEST 9** y pulsa **+ Import TEST 9** en la fila de **Innovator**: la importación se abre con **A new Test (4 modules)**, **Test number** `9` y **Source** Innovator ya elegidos. (También puedes pulsar **Import with AI**, marcar **A new Test (4 modules)** y llenarlos tú.)
 2. **Test number**: `9`. **Test name** se llena solo con "TEST 9" (es lo que ven los alumnos).
 3. **Source**: Innovator.
 4. Bandeja **Reading and Writing**:
@@ -297,7 +299,7 @@ El Draft no lo ven los alumnos. Para publicarlo:
 
 [CAPTURA PENDIENTE: cambiar el estado del set importado a Published]
 
-Una vez publicado, el set ocupa su nivel en **Practice** (el chip **+ Hard** desaparece) o el Test aparece como **TEST 9**, y se puede asignar.
+Una vez publicado, el set ocupa su nivel en **Practice** (el **+ Hard** de la fuente desaparece) o el **TEST 9** muestra su versión en lugar de **—**, y se puede asignar.
 
 ## 9. Mantenimiento de sets, Tests y preguntas
 

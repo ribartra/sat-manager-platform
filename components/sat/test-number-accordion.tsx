@@ -16,6 +16,9 @@ export interface TestVersionItem {
   /** Assign view: the student already has this version. When every version (source) of the TEST N
    * is assigned, the TEST N is a fixed row with the "ALREADY ASSIGNED" stamp (it does not open). */
   assigned?: boolean;
+  /** Tests catalogue: a source that has no version of this TEST N yet ("—", "+ Import TEST N"). Not
+   * counted as a version; a TEST N with only these shows "—". */
+  empty?: boolean;
 }
 
 /** Groups versions by test number (ascending, "Other tests" last), sources by their order. */
@@ -30,7 +33,10 @@ export function groupTestVersions(items: TestVersionItem[]) {
     .sort((a, b) => (a.number ?? Number.MAX_SAFE_INTEGER) - (b.number ?? Number.MAX_SAFE_INTEGER))
     .map((group) => ({
       ...group,
-      versions: group.versions.sort((a, b) => a.sourceOrder - b.sourceOrder || a.sourceName.localeCompare(b.sourceName)),
+      // Real versions first (by source order), then the sources that don't have it yet.
+      versions: group.versions.sort(
+        (a, b) => Number(Boolean(a.empty)) - Number(Boolean(b.empty)) || a.sourceOrder - b.sourceOrder || a.sourceName.localeCompare(b.sourceName),
+      ),
     }));
 }
 
@@ -53,10 +59,12 @@ export function TestNumberAccordion({
     <div className={compact ? "space-y-2" : "space-y-3"}>
       {groupTestVersions(items).map((group) => {
         const open = group.versions.some((version) => version.open);
-        const sources = group.versions.map((version) => version.sourceName);
-        const allAssigned = group.versions.every((version) => version.assigned);
+        const real = group.versions.filter((version) => !version.empty);
+        const sources = real.map((version) => version.sourceName);
+        const allAssigned = real.length > 0 && real.every((version) => version.assigned);
         const title = group.number === null ? "Other tests" : `TEST ${group.number}`;
-        const versionsText = `${group.versions.length} version${group.versions.length === 1 ? "" : "s"} · ${sources.join(" · ")}`;
+        // No source has this TEST N yet: "—" (opens to each source's "+ Import TEST N").
+        const versionsText = real.length === 0 ? "—" : `${real.length} version${real.length === 1 ? "" : "s"} · ${sources.join(" · ")}`;
         if (allAssigned) {
           // Every source of this TEST N is assigned: a fixed row with the stamp (nothing to open or
           // pick). Same box and paddings as the accordion header; the chevron's place is kept.

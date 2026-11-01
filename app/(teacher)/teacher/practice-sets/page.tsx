@@ -49,7 +49,7 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
   // Tests have their own section; old links to the Tests tab land there.
   if (area === "tests") redirect("/teacher/tests");
   const session = await auth();
-  // Admin and master teacher import content with AI ("+ Import" on empty levels, header button).
+  // Admin and master teacher import content with AI ("+ Easy" on a source's empty level, header button).
   const canImport = Boolean(await requireContentImporter());
   const moreLinks = resolveLinks(TEACHER_MORE_LINKS.practice, {
     role: session?.user.role,
@@ -138,7 +138,7 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
               const countsOf = (set: (typeof setsOfTopic)[number]) => assignmentCounts(set.assignments, now);
               const isSelected = selectedTopicId === topic.id;
               const searchHit = Boolean(search) && setsOfTopic.some(setMatches);
-              // Chip of one level: a drop-down of its sets (all sources, or one); an empty level offers "+ Import".
+              // Chip of one level: a drop-down of its sets (all sources, or one); empty: "—" (skill row) or "+ Easy" (source row).
               const chipFor = (difficulty: string, source?: { id: string; name: string; active: boolean }): SkillsMapChip => {
                 const sets = setsOfTopic.filter((set) => set.difficulty === difficulty && (!source || set.sourceId === source.id));
                 const published = sets.filter((set) => set.status === "PUBLISHED").length;
@@ -171,19 +171,20 @@ export default async function TeacherPracticeSetsPage({ searchParams }: { search
                     ),
                   };
                 }
-                if (source && !source.active) return { difficulty, state: null, title: `No ${source.name} set at this level` };
-                // Empty level: admin / master teacher import it with AI (pre-filled); others just see it's empty.
-                if (canImport) {
+                // Empty level on the skill row (every source): "Easy —", like Assign. The "+" is only per source.
+                if (!source) return { difficulty, state: "none", title: "No set at this level yet" };
+                // Empty level of one active source: admin / master teacher import it with AI (pre-filled "+ Easy").
+                if (canImport && source.active) {
                   return {
                     difficulty,
                     state: null,
-                    href: `/teacher/import?${new URLSearchParams({ kind: "PRACTICE_SET", topic: topic.id, difficulty, ...(source ? { source: source.id } : {}) }).toString()}`,
-                    title: source ? `No ${source.name} set at this level yet: import one with AI` : "No set at this level yet: import one with AI",
+                    href: `/teacher/import?${new URLSearchParams({ kind: "PRACTICE_SET", topic: topic.id, difficulty, source: source.id }).toString()}`,
+                    title: `No ${source.name} set at this level yet: import one with AI`,
                   };
                 }
-                return { difficulty, state: null, title: source ? `No ${source.name} set at this level yet` : "No set at this level yet" };
+                return { difficulty, state: "none", title: `No ${source.name} set at this level yet` };
               };
-              // Rows: every active practice source (empty levels offer "+ Import"), plus an inactive one that still has sets here.
+              // Rows: every active practice source (its empty levels offer "+ Easy"), plus an inactive one that still has sets here.
               const rows = sources.filter((source) => source.active || setsOfTopic.some((set) => set.sourceId === source.id));
               return {
                 id: topic.id,

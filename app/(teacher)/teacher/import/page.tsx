@@ -8,13 +8,13 @@ import { ImportTargetForm } from "./import-target-form";
 import { ImportSteps } from "@/components/sat/import-steps";
 
 interface PageProps {
-  searchParams: Promise<{ kind?: string; topic?: string; difficulty?: string; source?: string }>;
+  searchParams: Promise<{ kind?: string; topic?: string; difficulty?: string; source?: string; number?: string }>;
 }
 
 /**
  * "Import with AI", step 1 (admin and master teacher): what is imported — a new Practice Set for one
  * skill × level, or a new Test — its source, and the original PDF. Practice › By skill and Tests open
- * it pre-filled (?kind, topic, difficulty, source).
+ * it pre-filled (?kind, topic, difficulty, source, number).
  */
 export default async function QuickImportPage({ searchParams }: PageProps) {
   if (!(await requireContentImporter())) redirect("/teacher");
@@ -55,6 +55,8 @@ export default async function QuickImportPage({ searchParams }: PageProps) {
           topicId: query.topic ?? "",
           difficulty: ["EASY", "MEDIUM", "HARD"].includes(query.difficulty ?? "") ? query.difficulty! : "",
           sourceId: query.source ?? "",
+          // Tests › an empty TEST N "+ Import TEST N" (with its source).
+          testNumber: /^[1-9]\d{0,2}$/.test(query.number ?? "") ? query.number : "",
         }}
       />
     </PageShell>

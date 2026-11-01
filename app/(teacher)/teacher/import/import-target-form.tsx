@@ -49,7 +49,7 @@ export function ImportTargetForm({
   skills: Record<Area, Skill[]>;
   practiceSources: { id: string; name: string }[];
   testSources: { id: string; name: string }[];
-  initial: { kind: "PRACTICE_SET" | "FULL_PRACTICE_TEST"; topicId: string; difficulty: string; sourceId: string };
+  initial: { kind: "PRACTICE_SET" | "FULL_PRACTICE_TEST"; topicId: string; difficulty: string; sourceId: string; testNumber?: string };
 }) {
   const router = useRouter();
   const initialArea = (Object.keys(skills) as Area[]).find((area) => skills[area].some((s) => s.id === initial.topicId)) ?? "MATH";
@@ -61,7 +61,7 @@ export function ImportTargetForm({
   const [difficulty, setDifficulty] = useState(initial.difficulty);
   const sources = kind === "PRACTICE_SET" ? practiceSources : testSources;
   const [sourceId, setSourceId] = useState(() => (sources.some((s) => s.id === initial.sourceId) ? initial.sourceId : sources[0]?.id ?? ""));
-  const [testNumber, setTestNumber] = useState("");
+  const [testNumber, setTestNumber] = useState(initial.testNumber ?? "");
   const [testName, setTestName] = useState("");
   // Every file goes in a named field (its slot): what it is comes from where it was put, never from its name.
   const [files, setFiles] = useState<Record<string, File[]>>({});
