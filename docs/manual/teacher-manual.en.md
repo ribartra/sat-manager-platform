@@ -40,7 +40,7 @@ This manual explains how to use the platform as a **teacher**: invite students, 
 
 ## 2. Home
 
-Home sums up your work in cards: **Students** (active this week, inactive 5+ days, with Tests to take, invitations), **Tests** and **Practice** (not started, in progress, overdue, completed) and **History** (tries in the last 7 days). Every number opens the filtered list.
+Home sums up your work in cards: **Students** (active this week, inactive 5+ days, with Tests to take, invitations), **Tests** and **Practice** (not started, in progress, overdue, completed) and **History** (tries in the last 7 days). Every number opens the filtered list. A set the student already finished counts as **completed** even while they repeat it.
 
 ![Home at the start](img/teacher-home-empty.png)
 
@@ -132,7 +132,7 @@ The **Assign** view is the same for practice and Tests. Open it from **Assign** 
 
 ### Assigning a Test
 
-1. **Tests** tab: each **TEST N** expands into its versions (one per active source; today, Innovator).
+1. **Tests** tab: each **TEST N** expands into its versions, one per active source (today, Innovator). Each version is named after its source, e.g. **Innovator Test 1**.
 2. Tick the version, check the date and options and click **Assign test**.
 
 A TEST N with every version assigned shows as a fixed row with the **ALREADY ASSIGNED** stamp.
@@ -147,11 +147,11 @@ From the student's page, in their active sets, click **Edit** (or open a row in 
 
 ## 6. Pending and History
 
-**Pending** lists everything assigned to your students and not finished yet: overdue first. Filter by student, type, status and period. Click a row to edit its dates.
+**Pending** lists everything assigned to your students and not finished yet: overdue first. Filter by student, type, status and period (**All time**, **Last 30 days**, **Last 60 days**, **Last 90 days** or **Custom**, with a start and end date). Click a row to edit its dates.
 
 ![Pending](img/teacher-pending.png)
 
-**History** lists every try (practice and Tests), newest first. Filter by student, type, skill, difficulty, status (**Completed**, **In progress**, **Not counted**, **Any**) and period. Practice shows the % correct; Tests show SAT scores. Click a row to open the try.
+**History** lists every try (practice and Tests), newest first. Filter by student, type, skill, difficulty, status (**Completed**, **In progress**, **Not counted**, **Any**) and period (**All time**, **Last 30 days**, **Last 60 days**, **Last 90 days** or **Custom**, with a start and end date). Practice shows the % correct; Tests show SAT scores. Click a row to open the try.
 
 ![History](img/teacher-history.png)
 
@@ -180,8 +180,9 @@ The try stays in the history crossed out as **Not counted** and doesn't count in
 ### PDF report
 
 1. On the student's page click **Generate Report**.
-2. Tick the areas (**Math**, **Reading**, **Writing**, **Tests**) and check the preview.
-3. Click **Download PDF**, or under **Email to parents** tick the parents and click **Send PDF**.
+2. Choose the **Period**: **All time**, **Last 30 days**, **Last 60 days**, **Last 90 days** or **Custom** (start and end date). The PDF includes only the tries submitted in that period; pending work always shows. The period is printed at the top of the PDF.
+3. Tick the areas (**Math**, **Reading**, **Writing**, **Tests**) and check the preview.
+4. Click **Download PDF**, or under **Email to parents** tick the parents and click **Send PDF**.
 
 ![PDF report](img/teacher-report-dialog.png)
 
@@ -199,7 +200,7 @@ The try stays in the history crossed out as **Not counted** and doesn't count in
 
 ## 9. Tests
 
-**Tests** groups the full SATs by number (**TEST N**) with one version per source. Every number from TEST 1 to the highest is listed: a number no source has shows as **TEST N —** (in the picture, **TEST 9**). Each Test has 4 modules (R&W 1 and 2, Math 1 and 2). **How scores work** explains how scores are calculated.
+**Tests** groups the full SATs by number (**TEST N**) with one version per source. Next to each TEST N, tags show the sources that have it; each version is named after its source (**Innovator Test 1**). Every number from TEST 1 to the highest is listed: a number no source has shows as **TEST N —** (in the picture, **TEST 9**). Each Test has 4 modules (R&W 1 and 2, Math 1 and 2). **How scores work** explains how scores are calculated.
 
 ![Tests](img/teacher-tests.png)
 
@@ -288,7 +289,7 @@ In **Practice** and **Tests** the master teacher sees **Import with AI** while s
 Check their email and spam folder. You can copy the **Student activation link** and send it to them. If 7 days have passed, invite them again.
 
 **Can I assign the same set twice?**
-There's no need: the student can repeat it any time with **Try Again**. To change dates use **Edit**.
+There's no need: the student can repeat it any time with **Try Again**. The set stays **Completed** while they repeat it (you'll see **Retry in progress**) and never turns overdue. To change dates use **Edit**.
 
 **Why can't I see some students?**
 Each teacher only sees the students they invited.

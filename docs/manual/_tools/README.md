@@ -39,6 +39,11 @@ MANUAL_DB=$MANUAL_WORK/man-shots.db node docs/manual/_tools/07-import-steps.cjs 
 # then stop both, delete man-shots.db and start them again without MANUAL_DB
 ```
 
+`08-review-update.cjs` retakes the screenshots changed by the review with Soledad (tests named
+"Innovator Test N", Completed chip, report Period, reference sheet). It also runs on a throwaway copy
+with the tests renamed as production (`prisma/data-patches/202611011800_tests_named_by_source.sql`
+fails on `man.db` by design, it has no TEST 9: run its UPDATEs on the copy).
+
 Each script depends on the data the previous ones created. **To start over, stop the server, then run `00-setup.cjs` again.** Never replace `man.db` while the server has it open, or the database can be corrupted.
 
 ## Notes
