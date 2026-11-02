@@ -192,8 +192,11 @@ export function SkillsSourceMap({
   );
 }
 
-/** Mockup `.chip`: 5px 10px, radius 8, 12px/600, slate border. */
-export const SKILL_CHIP_CLASS = "inline-flex items-center gap-1.5 rounded-lg border border-[var(--sat-border)] px-2.5 py-[5px] text-xs font-semibold";
+/**
+ * Mockup `.chip`: 5px 10px, radius 8, 12px/600, slate border. One minimum width with the content centred,
+ * so Easy / Medium / Hard line up in columns whatever each chip says ("1 set", "18 Q", "—").
+ */
+export const SKILL_CHIP_CLASS = "inline-flex min-w-[7rem] items-center justify-center gap-1.5 rounded-lg border border-[var(--sat-border)] px-2.5 py-[5px] text-xs font-semibold";
 
 function SkillChip({ chip }: { chip: SkillsMapChip }) {
   if (chip.render) return <>{chip.render}</>;
