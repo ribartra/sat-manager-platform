@@ -100,18 +100,21 @@ Botones de la ficha:
 
 ## 5. Asignar práctica y Tests
 
-La vista **Assign** es la misma para práctica y Tests. Se abre desde **Assign** en la lista de alumnos, desde la ficha del alumno o desde un set o Test.
+La vista **Assign** es la misma para práctica y Tests. Se abre desde **Assign** en la lista de alumnos, desde la ficha del alumno o desde un set o Test. Los pasos van numerados de arriba hacia abajo, cada uno con su subtítulo.
 
 ### Asignar sets de práctica
 
-1. Elige el área en las pestañas (**Math**, **Reading**, **Writing**).
-2. Abre una habilidad: verás una fila por **fuente** activa (hoy, College Board) con un botón por nivel (**Easy**, **Medium**, **Hard**). Pulsa los sets que quieres asignar. Un nivel sin sets muestra **—**.
-3. En el resumen de la derecha define:
+1. **Choose the student**: el nombre del título es una lista; ábrela para cambiar de alumno.
+2. **Check what … has done**: lo que el alumno ya hizo (última actividad, habilidades más débiles).
+3. **Choose Classroom or Homework**: elige una de las dos pestañas (ver [Classroom y Homework](#classroom-y-homework)).
+4. **Choose what to assign**: elige el área (**Math**, **Reading**, **Writing**; **Tests** lleva a los Tests) y abre una habilidad. Verás una fila por **fuente** activa (hoy, College Board) con un botón por nivel (**Easy**, **Medium**, **Hard**). Pulsa los sets que quieres asignar. Un nivel sin sets muestra **—**.
+5. **Set the dates and assign**: en el resumen de la derecha define:
    - **Open date (optional)**: desde cuándo puede empezar (por defecto hoy).
    - **Due date**: fecha límite (por defecto en una semana).
    - **When to show answers**: **Show answers at the end** o **Show the answer after each question** (el alumno pulsa **Check** en cada pregunta).
    - **Show explanations in the player**: muestra la explicación al comprobar (solo con respuestas después de cada pregunta).
-4. Pulsa **Assign (n)**.
+
+   Y pulsa **Assign (n)**.
 
 ![Vista para asignar práctica](img/teacher-assign-practice-empty.png)
 

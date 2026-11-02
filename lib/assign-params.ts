@@ -17,6 +17,8 @@ export interface AssignParams {
   difficulty?: string;
   source?: string;
   edit: string[];
+  /** Practice: the Classroom / Homework tab already chosen (kept when switching Math / Reading / Writing). */
+  context?: "CLASSROOM" | "HOMEWORK";
 }
 
 type RawParams = Record<string, string | string[] | undefined | null>;
@@ -43,6 +45,7 @@ export function parseAssignParams(raw: RawParams): AssignParams {
   const tab = test ? "tests" : activeAreaTab(areaRaw, "math");
   const area: AssignArea = tab === "reading" || tab === "writing" || tab === "tests" ? tab : "math";
   const difficulty = first(raw.difficulty)?.toUpperCase();
+  const context = first(raw.context)?.toUpperCase();
   return {
     area,
     set: ids(raw.set),
@@ -50,6 +53,7 @@ export function parseAssignParams(raw: RawParams): AssignParams {
     topic: oneId(raw.topic),
     difficulty: difficulty && ["EASY", "MEDIUM", "HARD"].includes(difficulty) ? difficulty : undefined,
     source: oneId(raw.source),
+    context: context === "CLASSROOM" || context === "HOMEWORK" ? context : undefined,
     edit: [...new Set([raw.edit, raw.sets].flatMap((v) => (Array.isArray(v) ? v : [v ?? ""])).flatMap((v) => v.split(",")).map((v) => v.trim()).filter((v) => EDIT_REF.test(v)))],
   };
 }
@@ -65,6 +69,7 @@ export function assignHref(params: Partial<AssignParams> & { studentId?: string 
   if (params.difficulty) query.set("difficulty", params.difficulty);
   if (params.source) query.set("source", params.source);
   if (params.edit?.length) query.set("edit", params.edit.join(","));
+  if (params.context && area !== "tests") query.set("context", params.context);
   const path = params.studentId ? `/teacher/students/${encodeURIComponent(params.studentId)}/assign` : "/teacher/assign";
   return `${path}?${query.toString()}`;
 }

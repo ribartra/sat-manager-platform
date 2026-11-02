@@ -21,6 +21,9 @@ async function setOptions(page, { feedback, explanations, open, due } = {}) {
 }
 async function assignPractice(page, student, area, picks, opts = {}, shots = {}) {
   await L.go(page, `/teacher/students/${D.userId(A[student].email)}/assign?area=${area}`);
+  // Step 3: Classroom or Homework (the sets show once one is chosen).
+  await page.getByRole("tab", { name: opts.context ?? "Homework" }).click();
+  await page.waitForTimeout(400);
   if (shots.empty) await L.shot(page, shots.empty);
   for (const pick of picks) {
     const skill = await openSkill(page, pick);

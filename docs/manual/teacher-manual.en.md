@@ -100,18 +100,21 @@ Buttons on the page:
 
 ## 5. Assigning practice and Tests
 
-The **Assign** view is the same for practice and Tests. Open it from **Assign** in the student list, from the student's page or from a set or Test.
+The **Assign** view is the same for practice and Tests. Open it from **Assign** in the student list, from the student's page or from a set or Test. The steps are numbered from top to bottom, each with its own heading.
 
 ### Assigning practice sets
 
-1. Choose the area in the tabs (**Math**, **Reading**, **Writing**).
-2. Open a skill: you'll see one row per active **source** (today, College Board) with one button per level (**Easy**, **Medium**, **Hard**). Click the sets you want to assign. A level with no sets shows **—**.
-3. In the summary on the right set:
+1. **Choose the student**: the name in the title is a list; open it to switch student.
+2. **Check what … has done**: what the student has already done (last activity, weakest skills).
+3. **Choose Classroom or Homework**: pick one of the two tabs (see [Classroom and Homework](#classroom-and-homework)).
+4. **Choose what to assign**: pick the area (**Math**, **Reading**, **Writing**; **Tests** goes to Tests) and open a skill. You'll see one row per active **source** (today, College Board) with one button per level (**Easy**, **Medium**, **Hard**). Click the sets you want to assign. A level with no sets shows **—**.
+5. **Set the dates and assign**: in the summary on the right set:
    - **Open date (optional)**: from when they can start (today by default).
    - **Due date**: the deadline (one week by default).
    - **When to show answers**: **Show answers at the end** or **Show the answer after each question** (the student clicks **Check** on each question).
    - **Show explanations in the player**: shows the explanation when checking (only with answers after each question).
-4. Click **Assign (n)**.
+
+   Then click **Assign (n)**.
 
 ![Assign view for practice](img/teacher-assign-practice-empty.png)
 
