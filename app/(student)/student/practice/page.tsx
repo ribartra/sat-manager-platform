@@ -13,11 +13,14 @@ import { PENDING_PREVIEW, pendingHref } from "@/lib/pending";
 import { activeAreaTab, practiceAreaFromTab, practiceAreaLabel } from "@/lib/practice-area";
 import { loadPracticeReport, shortSetName } from "@/lib/student-report";
 import { formatDate, isAhead } from "@/lib/utils";
+import { ContextTabs } from "@/components/sat/context-tabs";
+import { ContextTag } from "@/components/sat/attempts-table";
+import { contextViewFromParam } from "@/lib/assignment-context";
 
 export const dynamic = "force-dynamic";
 
 interface PageProps {
-  searchParams: Promise<{ area?: string }>;
+  searchParams: Promise<{ area?: string; context?: string }>;
 }
 
 /**
@@ -34,8 +37,10 @@ export default async function StudentPracticePage({ searchParams }: PageProps) {
   if (query.area === "tests" || query.area === "mocks") redirect("/student/tests");
   const area = activeAreaTab(query.area, "math") as "math" | "reading" | "writing";
   const practiceArea = practiceAreaFromTab(area) ?? "MATH";
-  // Results by skill have no filters (as on the teacher's view): the whole area, every source.
-  const report = await loadPracticeReport(studentId, practiceArea, {});
+  // Results by skill have no skill/level filters (as on the teacher's view): the whole area, every
+  // source; All / Classroom / Homework picks the work shown (scores always come from Homework).
+  const context = contextViewFromParam(query.context);
+  const report = await loadPracticeReport(studentId, practiceArea, { context });
   const areaLabel = practiceAreaLabel(practiceArea);
   // One row per practice set (its last try), opening to its latest tries; every try is in History.
   const practiceSets = practiceSetGroups(setsFromReportAttempts(report.attemptHistory));
@@ -53,11 +58,22 @@ export default async function StudentPracticePage({ searchParams }: PageProps) {
           </HeaderActions>
         }
       />
-      <PracticeAreaTabs basePath="/student/practice" active={area} includeTests={false} />
+      <PracticeAreaTabs basePath="/student/practice" active={area} includeTests={false} preserve={{ context: context === "all" ? undefined : context }} />
+      <ContextTabs basePath="/student/practice" active={context} params={{ area }} />
 
       <div className="mt-4 grid gap-6 lg:grid-cols-3">
         <div id="performance" className="min-w-0 space-y-6 lg:col-span-2">
-          <SkillResults report={report} attemptHref={(id) => `/student/results/${id}`} />
+          <SkillResults
+            report={report}
+            attemptHref={(id) => `/student/results/${id}`}
+            description={
+              context === "classroom"
+                ? "Work done in class: what you answered at each level (Classroom is not scored)"
+                : context === "all"
+                  ? "Homework results (last try of every set, by questions); levels done only in class show what you answered"
+                  : undefined
+            }
+          />
         </div>
 
         <aside className="min-w-0 space-y-6">
@@ -73,6 +89,7 @@ export default async function StudentPracticePage({ searchParams }: PageProps) {
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium text-gray-800" title={a.name}>{shortSetName(a.name)}</p>
                   <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
+                    <ContextTag context={a.context} />
                     <StatusBadge status={a.status} />
                     <span className={isAhead(a.opensAt) ? "text-[11px] text-amber-700" : "text-[11px] text-gray-400"}>Opens {formatDate(a.opensAt)}</span>
                     {a.dueDate && <span className="text-[11px] text-gray-400">Due {formatDate(a.dueDate)}</span>}

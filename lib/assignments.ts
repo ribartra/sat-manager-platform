@@ -4,6 +4,8 @@ import { withSqliteRetry } from "@/lib/sqlite-retry";
 import { notifyUser } from "@/lib/notifications";
 import { shortSetName } from "@/lib/student-report";
 import { isUniqueConstraintError } from "@/lib/db-errors";
+import { gradeAndSubmitPracticeAttempt } from "@/lib/practice-attempt-submit";
+import type { AssignmentContext } from "@/lib/assignment-context";
 
 const OPEN_FOR_OVERDUE = { in: ["PENDING", "IN_PROGRESS"] };
 
@@ -131,11 +133,13 @@ interface PracticeAssignmentInput {
   feedbackMode: "IMMEDIATE" | "AFTER_SET";
   /** Explanations in the player (after Check); per student. */
   showExplanations: boolean;
+  /** Classroom or Homework: fixed once assigned; one assignment per student × set × context. */
+  context: AssignmentContext;
   sourceGroupId?: string | null;
 }
 
 export async function upsertPracticeAssignment(input: PracticeAssignmentInput): Promise<{ outcome: AssignmentOutcome; assignmentId: string }> {
-  const { studentId, practiceSetId, practiceSetName, assignedById, dueDate, unlockAt, locked, feedbackMode, showExplanations } = input;
+  const { studentId, practiceSetId, practiceSetName, assignedById, dueDate, unlockAt, locked, feedbackMode, showExplanations, context } = input;
   const audit = (action: string, targetId: string, extra: Record<string, unknown> = {}) =>
     prisma.auditLog.create({
       data: {
@@ -151,6 +155,7 @@ export async function upsertPracticeAssignment(input: PracticeAssignmentInput): 
           locked,
           feedbackMode,
           showExplanations,
+          context,
           sourceGroupId: input.sourceGroupId ?? null,
           ...extra,
         }),
@@ -158,14 +163,14 @@ export async function upsertPracticeAssignment(input: PracticeAssignmentInput): 
     });
 
   let existing = await prisma.assignment.findFirst({
-    where: { studentId, practiceSetId },
+    where: { studentId, practiceSetId, context },
     include: { attempts: { where: { status: "IN_PROGRESS" }, select: { id: true }, take: 1 } },
   });
 
   if (!existing) {
     try {
       const created = await prisma.assignment.create({
-        data: { studentId, practiceSetId, assignedById, dueDate, unlockAt: resolveOpenDate(unlockAt, new Date(), locked), locked, feedbackMode, showExplanations, status: "PENDING" },
+        data: { studentId, practiceSetId, assignedById, dueDate, unlockAt: resolveOpenDate(unlockAt, new Date(), locked), locked, feedbackMode, showExplanations, context, status: "PENDING" },
       });
       await notifyUser(studentId, "New practice set assigned", practiceSetName, "/student");
       await audit("ASSIGN_PRACTICE_SET", created.id);
@@ -174,7 +179,7 @@ export async function upsertPracticeAssignment(input: PracticeAssignmentInput): 
       if (!isUniqueConstraintError(error)) throw error;
       // Lost a race with a concurrent assign: fall through to the update/reassign rules.
       existing = await prisma.assignment.findFirst({
-        where: { studentId, practiceSetId },
+        where: { studentId, practiceSetId, context },
         include: { attempts: { where: { status: "IN_PROGRESS" }, select: { id: true }, take: 1 } },
       });
       if (!existing) throw error;
@@ -218,6 +223,40 @@ export async function upsertPracticeAssignment(input: PracticeAssignmentInput): 
   await notifyUser(studentId, "Practice set reassigned", practiceSetName, "/student");
   await audit("REASSIGN_PRACTICE_SET", existing.id, { previousStatus: existing.status });
   return { outcome: "reassigned", assignmentId: existing.id };
+}
+
+/**
+ * "Assign as Homework" closes the student's Classroom assignment of that set (pendiente-p2.md): its
+ * unfinished try is submitted as it is (the answers given so far; Classroom never shows a score) and
+ * the assignment becomes COMPLETED, so it can't be continued; history keeps it. Homework starts from
+ * zero. Runs outside the assign batch transaction (grading opens its own). Returns whether it closed one.
+ */
+export async function closeClassroomAssignment(input: { studentId: string; practiceSetId: string; closedById: string }) {
+  const { studentId, practiceSetId, closedById } = input;
+  const classroom = await prisma.assignment.findFirst({
+    where: { studentId, practiceSetId, context: "CLASSROOM", status: { not: "COMPLETED" } },
+    select: { id: true },
+  });
+  if (!classroom) return false;
+  const open = await prisma.attempt.findFirst({
+    where: { assignmentId: classroom.id, status: "IN_PROGRESS" },
+    include: { answers: true },
+  });
+  if (open) {
+    const answers = Object.fromEntries(open.answers.filter((a) => a.answer && a.answer.trim()).map((a) => [a.questionId, a.answer as string]));
+    await gradeAndSubmitPracticeAttempt(open, { answers, totalTime: open.totalTime });
+  }
+  // With no open try (not started, or already submitted) it is just marked done.
+  await prisma.assignment.updateMany({ where: { id: classroom.id, status: { not: "COMPLETED" } }, data: { status: "COMPLETED" } });
+  await writeAudit({
+    userId: closedById,
+    action: "CLASSROOM_CLOSED_BY_HOMEWORK",
+    targetType: "Assignment",
+    targetId: classroom.id,
+    outcome: "success",
+    metadata: { studentId, practiceSetId, submittedAttemptId: open?.id ?? null },
+  });
+  return true;
 }
 
 interface FullTestAssignmentInput {

@@ -119,5 +119,5 @@ export default async function TeacherPendingPage({ searchParams }: { searchParam
 function pendingAssignHref(r: PendingRow) {
   return r.kind === "test"
     ? assignHref({ studentId: r.studentId, test: r.testId ?? undefined })
-    : assignHref({ studentId: r.studentId, area: r.area === "READING" ? "reading" : r.area === "WRITING" ? "writing" : "math", edit: r.practiceSetId ? [r.practiceSetId] : [] });
+    : assignHref({ studentId: r.studentId, area: r.area === "READING" ? "reading" : r.area === "WRITING" ? "writing" : "math", edit: r.practiceSetId ? [`${r.practiceSetId}:${r.context ?? "HOMEWORK"}`] : [] });
 }

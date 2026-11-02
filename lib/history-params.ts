@@ -24,6 +24,8 @@ export interface HistoryParams {
   set?: string;
   test?: string;
   status?: HistoryStatus;
+  /** Practice only: Classroom or Homework (empty = both). */
+  context?: "classroom" | "homework";
   q?: string;
 }
 
@@ -51,8 +53,10 @@ export function parseHistoryParams(raw: RawParams): HistoryParams {
   const test = id(raw.test);
   const typeRaw = first(raw.type);
   // Practice context wins over a stale type; a Test means the Tests list.
-  const type: HistoryType | undefined = test ? "tests" : area || skill || difficulty || set ? "practice" : typeRaw === "tests" || typeRaw === "practice" ? typeRaw : undefined;
+  const type: HistoryType | undefined = test ? "tests" : area || skill || difficulty || set || first(raw.context) === "classroom" || first(raw.context) === "homework" ? "practice" : typeRaw === "tests" || typeRaw === "practice" ? typeRaw : undefined;
   const q = first(raw.q)?.trim().slice(0, 100) || undefined;
+  const contextRaw = first(raw.context);
+  const context = contextRaw === "classroom" || contextRaw === "homework" ? contextRaw : undefined;
   return {
     student: id(raw.student),
     type,
@@ -62,6 +66,7 @@ export function parseHistoryParams(raw: RawParams): HistoryParams {
     set: type === "tests" ? undefined : set,
     test: type === "practice" ? undefined : test,
     status,
+    context: type === "tests" ? undefined : context,
     q,
   };
 }

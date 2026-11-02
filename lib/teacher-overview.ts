@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import { SCORED_PRACTICE_ATTEMPT_WHERE } from "@/lib/assignment-context";
 import { nameWithSource } from "@/lib/test-name";
 import { resolvePracticeArea, type PracticeAreaCode } from "@/lib/practice-area";
 import { practiceAnswerStats, scoreFromStats } from "@/lib/answer-stats";
@@ -66,7 +67,8 @@ export async function loadStudentOverviews(studentIds: string[], now = new Date(
       active: true,
       lastActiveAt: true,
       attempts: {
-        where: { status: "SUBMITTED" },
+        // Scores, averages and weakest skill count Homework only (Classroom is never scored).
+        where: SCORED_PRACTICE_ATTEMPT_WHERE,
         orderBy: { submittedAt: "desc" },
         select: {
           id: true,

@@ -70,6 +70,7 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
     difficulty: filter.difficulty,
     practiceSetId: filter.set,
     testId: filter.test,
+    context: filter.context === "classroom" ? "CLASSROOM" : filter.context === "homework" ? "HOMEWORK" : undefined,
     // Completed by default (status=all: every try).
     status: statusShown === "all" ? undefined : statusShown,
     ...periodDates(period),
@@ -141,6 +142,8 @@ export default async function TeacherHistoryPage({ searchParams }: PageProps) {
           },
           ...(filter.type === "tests" ? [] : [{ name: "skill", label: "Skill", value: filter.skill ?? "", allLabel: "All skills", options: skillOptions }]),
           ...(filter.type === "tests" ? [] : [{ name: "difficulty", label: "Difficulty", value: filter.difficulty ?? "", allLabel: "All levels", options: difficultyOptions() }]),
+          // Practice only: Classroom (not scored) or Homework.
+          ...(filter.type === "tests" ? [] : [{ name: "context", label: "Context", value: filter.context ?? "", allLabel: "Classroom and Homework", options: [{ value: "classroom", label: "Classroom" }, { value: "homework", label: "Homework" }] }]),
           { name: "status", label: "Status", value: statusShown, allLabel: "Any", allValue: "all", defaultValue: HISTORY_STATUS_DEFAULT, options: STATUS_OPTIONS },
         ]}
         period={period}

@@ -4,7 +4,7 @@ import { SkillsSourceMap, DIFFICULTIES, type SkillsMapChip } from "@/components/
 import { Pct } from "@/components/sat/work-status";
 import { difficultyLabel } from "@/lib/domain-meta";
 import { formatDate } from "@/lib/utils";
-import type { LevelResult, PracticeReport, SkillResultRow } from "@/lib/student-report";
+import type { ClassroomLevel, LevelResult, PracticeReport, SkillResultRow } from "@/lib/student-report";
 
 /**
  * Practice results by skill (teacher, student and parent views): the By-skill cards (domains in
@@ -49,13 +49,18 @@ export function SkillResults({
         domains={groupByDomain(report.skillResults).map((domain) => ({
           ...domain,
           skills: domain.rows.map((row) => {
-            const tries = Object.values(row.levels).reduce((sum, level) => sum + (level?.tries ?? 0), 0);
+            const tries =
+              Object.values(row.levels).reduce((sum, level) => sum + (level?.tries ?? 0), 0) +
+              Object.values(row.classroom ?? {}).reduce((sum, level) => sum + (level?.tries ?? 0), 0);
             return {
               id: row.topicId,
               name: row.label,
               sub: `${tries} ${tries === 1 ? "try" : "tries"}`,
               // One chip per level over every source (no per-source breakdown here).
-              chips: DIFFICULTIES.map((level) => resultChip(level, row.levels[level], attemptHref)),
+              // Homework result when there is one; otherwise the Classroom work (no score).
+              chips: DIFFICULTIES.map((level) =>
+                row.levels[level] || !row.classroom?.[level] ? resultChip(level, row.levels[level], attemptHref) : classroomChip(level, row.classroom[level]!, attemptHref),
+              ),
             };
           }),
         }))}
@@ -75,6 +80,22 @@ function resultChip(level: string, result: LevelResult | undefined, attemptHref:
     extra: (
       <span className="text-[var(--sat-muted)]">
         <Pct value={result.percent} className="font-semibold" /> · {result.correct}/{result.total}
+      </span>
+    ),
+  };
+}
+
+/** A level done only in Classroom: what was answered, never a score (pendiente-p2.md). */
+function classroomChip(level: string, cell: ClassroomLevel, attemptHref: ((id: string) => string) | undefined): SkillsMapChip {
+  const date = cell.lastAt ? formatDate(cell.lastAt) : "";
+  return {
+    difficulty: level,
+    state: "available",
+    href: attemptHref?.(cell.latestAttemptId),
+    title: `${difficultyLabel(level)}: Classroom · ${cell.answered} of ${cell.total} answered · ${cell.tries} ${cell.tries === 1 ? "try" : "tries"}${date ? ` · last ${date}` : ""} (not scored)`,
+    extra: (
+      <span className="text-[var(--sat-muted)]">
+        Class · {cell.answered}/{cell.total}
       </span>
     ),
   };

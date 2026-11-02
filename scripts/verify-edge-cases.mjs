@@ -16,7 +16,7 @@ const checks = [
     label: "Practice Try Again crea intento nuevo si no hay IN_PROGRESS y conserva snapshots",
   },
   {
-    file: "app/api/attempts/[attemptId]/submit/route.ts",
+    file: "lib/practice-attempt-submit.ts",
     requires: [
       "status: \"IN_PROGRESS\"",
       "filter((item) => !answers[item.questionId])",
@@ -24,7 +24,6 @@ const checks = [
       "isCorrect: false",
       "scorePercent: scored.scorePercent",
       "scaledScore: scored.scaledScore",
-      "applyPracticeProgression",
       "practiceSetSnapshot",
     ],
     label: "Submit maneja blanks, evita re-submit y aplica progreso sobre total",

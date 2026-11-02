@@ -1,4 +1,5 @@
 import { auth } from "@/lib/auth";
+import { SCORED_PRACTICE_ATTEMPT_WHERE } from "@/lib/assignment-context";
 import prisma from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
 import { EmptyState, PageContent, PageHeader, PageShell, PracticeSetAttemptsAccordion, SkillResults } from "@/components/sat";
@@ -23,7 +24,8 @@ export default async function ParentDashboardPage() {
       student: {
         include: {
           attempts: {
-            where: { status: "SUBMITTED", assignmentId: { not: null } },
+            // Parents see Homework only (Classroom work is never scored nor reported).
+            where: { ...SCORED_PRACTICE_ATTEMPT_WHERE, assignmentId: { not: null } },
             include: {
               answers: { select: { answer: true, isCorrect: true } },
               assignment: { select: { practiceSet: { select: { name: true, difficulty: true, topicId: true, topic: { select: { name: true } }, source: { select: { name: true, sortOrder: true } }, _count: { select: { questions: true } } } } } },

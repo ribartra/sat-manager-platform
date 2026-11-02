@@ -1,4 +1,7 @@
 import { AreaBoxGrid, CompactAreaBox, AttemptStatusBadge, EmptyState, PageShell, PracticeAreaTabs, PracticeSetAttemptsAccordion, TestAttemptsAccordion, SectionHeader, SkillResults, StatGrid, StatTile, TestCardsByNumber, type TestCardLinks, invalidatedRowClass, isInvalidated } from "@/components/sat";
+import { ContextTabs } from "@/components/sat/context-tabs";
+import { ContextTag } from "@/components/sat/attempts-table";
+import { contextViewFromParam } from "@/lib/assignment-context";
 import { AreaTag } from "@/components/sat/practice-set-row";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
@@ -44,7 +47,7 @@ import { officialSkillsFor } from "@/lib/taxonomy-order";
 
 interface PageProps {
   params: Promise<{ studentId: string }>;
-  searchParams: Promise<{ area?: string; topic?: string; difficulty?: string; from?: string; to?: string; attemptsPage?: string; examsPage?: string; activityPage?: string; type?: string }>;
+  searchParams: Promise<{ area?: string; topic?: string; difficulty?: string; from?: string; to?: string; attemptsPage?: string; examsPage?: string; activityPage?: string; type?: string; context?: string }>;
 }
 
 
@@ -192,7 +195,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
         basePath={`/teacher/students/${studentId}`}
         active={view}
         includeSummary
-        preserve={{ difficulty: filters.difficulty }}
+        preserve={{ difficulty: filters.difficulty, context: query.context }}
         className="mb-3"
       />
     </>
@@ -360,8 +363,10 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
   }
 
   // ---------------------------------------------------------------- Practice (Math / Reading / Writing)
-  // Results by skill have no filters (product decision): the whole area, every source.
-  const report = await loadPracticeReport(studentId, practiceArea, {});
+  // Results by skill have no skill/level filters (product decision): the whole area, every source.
+  // All / Classroom / Homework picks the work shown; scores always come from Homework only.
+  const context = contextViewFromParam(query.context);
+  const report = await loadPracticeReport(studentId, practiceArea, { context });
   // Pending unlock requests of these sets (moved here from the former Home area tabs).
   const unlockRequests = (await getFeatureSetting("STUDENT_UNLOCK_REQUESTS"))
     ? await prisma.unlockRequest.findMany({
@@ -377,6 +382,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
   return (
     <PageShell>
       {header}
+      <ContextTabs basePath={`/teacher/students/${studentId}`} active={context} params={{ area: view, difficulty: filters.difficulty }} />
       {report.completedExamCount > 0 || report.pendingExamCount > 0 ? (
         <div className="mt-3 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700">
           Test results are kept apart from practice
@@ -390,7 +396,17 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
 
       <div className="mt-4 grid gap-6 lg:grid-cols-3">
         <div id="performance" className="min-w-0 space-y-6 lg:col-span-2">
-          <SkillResults report={report} attemptHref={(id) => buildProgressHref(`/teacher/students/${studentId}/attempts/${id}`, filters)} />
+          <SkillResults
+            report={report}
+            attemptHref={(id) => buildProgressHref(`/teacher/students/${studentId}/attempts/${id}`, filters)}
+            description={
+              context === "classroom"
+                ? "Work done in class: what was answered at each level (Classroom is not scored and never counts in reports)"
+                : context === "all"
+                  ? "Homework results (last try of every set, by questions); levels done only in class show what was answered"
+                  : undefined
+            }
+          />
         </div>
 
         <aside className="min-w-0 space-y-6">
@@ -406,6 +422,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium text-gray-800" title={a.name}>{shortSetName(a.name)}</p>
                   <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
+                    <ContextTag context={a.context} />
                     <StatusBadge status={a.status} />
                     {a.locked && a.opensAt <= new Date() ? <Badge variant="warning">Not open yet</Badge> : null}
                     {unlockByAssignment.has(a.id) ? <Badge variant="info">Unlock requested</Badge> : null}
@@ -418,7 +435,7 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
                 {a.status !== "OVERDUE" ? (
                   <Hint label="Change the due date, open date or when answers are shown. The student's progress is kept.">
                     <Link
-                      href={assignHref({ studentId, area: assignPracticeArea, edit: [a.practiceSetId] })}
+                      href={assignHref({ studentId, area: assignPracticeArea, edit: [`${a.practiceSetId}:${a.context}`] })}
                       className="shrink-0 text-xs font-medium text-blue-600 hover:underline"
                     >
                       Edit

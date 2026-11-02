@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { isAssignmentContext, type AssignmentContext } from "@/lib/assignment-context";
 import { nameWithSource } from "@/lib/test-name";
 import { notFound } from "next/navigation";
 import { LinkTabs, PageHeader, PageShell } from "@/components/sat";
@@ -230,18 +231,25 @@ export async function AssignView({ studentId, query }: { studentId: string | nul
     }),
     prisma.assignment.findMany({
       where: { studentId: student.id },
-      select: { practiceSetId: true, status: true, dueDate: true, unlockAt: true, feedbackMode: true, showExplanations: true },
+      select: { practiceSetId: true, status: true, dueDate: true, unlockAt: true, feedbackMode: true, showExplanations: true, context: true },
     }),
   ]);
-  // Already assigned = shown with the "ALREADY ASSIGNED" stamp and not selectable (the student can retry
-  // it any time); only "Edit" (dates and settings) of an open one, via ?edit=.
-  const assignmentBySet = new Map(existing.map((a) => [a.practiceSetId, a]));
-  const editIds = new Set([...params.edit, ...params.set.filter((id) => ["PENDING", "IN_PROGRESS"].includes(assignmentBySet.get(id)?.status ?? ""))]);
-  const editing = practiceSets
-    .filter((ps) => editIds.has(ps.id) && ["PENDING", "IN_PROGRESS"].includes(assignmentBySet.get(ps.id)?.status ?? ""))
-    .map((ps) => {
-      const current = assignmentBySet.get(ps.id)!;
-      return {
+  // A set can be assigned once per context (Classroom / Homework): it is grayed out ("ALREADY ASSIGNED")
+  // in the context the student already has it, and still pickable in the other. Only "Edit" (dates and
+  // settings) of an open one, via ?edit=<set>[:<context>] (the context never changes).
+  const contextsBySet = new Map<string, AssignmentContext[]>();
+  for (const a of existing) if (isAssignmentContext(a.context)) contextsBySet.set(a.practiceSetId, [...(contextsBySet.get(a.practiceSetId) ?? []), a.context]);
+  const openOf = (setId: string, context?: string) =>
+    existing.find((a) => a.practiceSetId === setId && (!context || a.context === context) && ["PENDING", "IN_PROGRESS"].includes(a.status));
+  const editing = params.edit
+    .map((ref) => {
+      const [setId, context] = ref.split(":");
+      return { setId, current: openOf(setId, context) };
+    })
+    .flatMap(({ setId, current }) => {
+      const ps = practiceSets.find((item) => item.id === setId);
+      if (!ps || !current) return [];
+      return [{
         id: ps.id,
         name: ps.name,
         difficulty: ps.difficulty,
@@ -250,9 +258,10 @@ export async function AssignView({ studentId, query }: { studentId: string | nul
         unlockAt: current.unlockAt?.toISOString() ?? null,
         feedbackMode: current.feedbackMode === "IMMEDIATE" ? ("IMMEDIATE" as const) : ("AFTER_SET" as const),
         showExplanations: current.showExplanations,
-      };
+        context: (isAssignmentContext(current.context) ? current.context : "HOMEWORK") as AssignmentContext,
+      }];
     });
-  const presetDone = presetSet && assignmentBySet.has(presetSet.id) && !editIds.has(presetSet.id);
+  const presetDone = presetSet && (contextsBySet.get(presetSet.id)?.length ?? 0) === 2 && !editing.some((e) => e.id === presetSet.id);
 
   return (
     <PageShell>
@@ -271,7 +280,7 @@ export async function AssignView({ studentId, query }: { studentId: string | nul
         practiceSets={practiceSets
           .map((ps) => ({
             id: ps.id,
-            assigned: assignmentBySet.has(ps.id),
+            assignedIn: contextsBySet.get(ps.id) ?? [],
             name: ps.name,
             difficulty: ps.difficulty,
             topicName: ps.topic.name,

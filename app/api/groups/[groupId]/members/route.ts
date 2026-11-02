@@ -42,7 +42,8 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
   const inheritedPracticeSetIds: string[] = [];
   for (const groupAssignment of groupAssignments) {
     const existing = await prisma.assignment.findFirst({
-      where: { studentId: userId, practiceSetId: groupAssignment.practiceSetId },
+      // Group rules assign Homework.
+      where: { studentId: userId, practiceSetId: groupAssignment.practiceSetId, context: "HOMEWORK" },
     });
     if (existing) continue;
 
@@ -57,6 +58,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
           locked: groupAssignment.locked,
           showExplanations: groupAssignment.showExplanations,
           status: "PENDING",
+          context: "HOMEWORK",
         },
       });
       inheritedAssignments += 1;

@@ -310,7 +310,7 @@ const checks = [
   },
   {
     file: "app/api/attempts/[attemptId]/submit/route.ts",
-    requires: ["requireApprovedSession", "studentId: session.user.id", "status: \"IN_PROGRESS\""],
+    requires: ["requireApprovedSession", "studentId: session.user.id", "attempt.status !== \"IN_PROGRESS\""],
     label: "Student submit limited to own in-progress attempt",
   },
   {

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ContextTag } from "@/components/sat/attempts-table";
 import { Fragment } from "react";
 import { AttemptStatusBadge, VoidableValue, invalidatedRowClass } from "@/components/sat/attempt-status";
 import { ChevronCell, LinkTr, RowAction, RowLink, SimpleTable, TD } from "@/components/sat/link-table";
@@ -115,6 +116,7 @@ function HistoryTableRow({ row: r, show, href, studentHref }: { row: HistoryRow;
             <RowLink href={href}>{r.title}</RowLink>
             {r.difficulty && show.difficulty ? <Badge variant={difficultyBadgeVariant(r.difficulty)}>{difficultyLabel(r.difficulty)}</Badge> : null}
             <SourceTag name={r.sourceName} unlessIn={r.title} />
+            {r.context ? <ContextTag context={r.context} /> : null}
             {r.status === "INVALIDATED" ? <AttemptStatusBadge status={r.status} /> : null}
           </span>
         </td>
@@ -135,6 +137,12 @@ function HistoryTableRow({ row: r, show, href, studentHref }: { row: HistoryRow;
               <span className="whitespace-nowrap"><span className="text-[var(--sat-area-reading)]">R&amp;W</span> <b className="tabular-nums">{r.rw ?? "—"}</b> · <span className="text-[var(--sat-area-math)]">Math</span> <b className="tabular-nums">{r.math ?? "—"}</b></span>
             </VoidableValue>
           )
+        ) : r.context === "CLASSROOM" ? (
+          // Classroom work is never scored: what was answered only.
+          <span className="text-xs text-[var(--sat-muted)]">
+            Not scored · {r.answered ?? 0} of {r.total ?? 0} answered
+            {r.time ? <span className="block text-gray-400">{formatDuration(r.time)}</span> : null}
+          </span>
         ) : r.pct !== null ? (
           <VoidableValue status={r.status}>
             <Pct value={r.pct} className="font-semibold" /> <span className="text-xs text-gray-500">{r.correct} of {r.total}</span>

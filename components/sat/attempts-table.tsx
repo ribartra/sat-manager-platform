@@ -50,6 +50,9 @@ export interface PracticeAttemptRow {
   title?: React.ReactNode;
   /** % points vs. the previous counted try of the same set; shown as a "Change" column when present. */
   change?: number | null;
+  /** Classroom try: never scored; Score shows "Not scored" and Correct what was answered. */
+  classroom?: boolean;
+  answered?: number;
 }
 
 export function PracticeAttemptsTable({
@@ -82,9 +85,9 @@ export function PracticeAttemptsTable({
           <td className={`${TD} text-gray-600`}>
             {r.submittedAt ? <>{formatDate(r.submittedAt)}<span className="block text-xs text-gray-400">{relativeDay(r.submittedAt)}</span></> : "—"}
           </td>
-          <td className={TD}><VoidableValue status={r.status}><Pct value={r.pct} className="font-semibold" /></VoidableValue></td>
+          <td className={TD}>{r.classroom ? <NotScored /> : <VoidableValue status={r.status}><Pct value={r.pct} className="font-semibold" /></VoidableValue>}</td>
           {withChange ? <td className={TD}>{r.change !== null && r.change !== undefined ? <Delta value={r.change} unit="%" /> : <span className="text-gray-300">—</span>}</td> : null}
-          <td className={TD}>{r.correct} of {r.total}</td>
+          <td className={TD}>{r.classroom ? <>{r.answered ?? 0} of {r.total} answered</> : <>{r.correct} of {r.total}</>}</td>
           <td className={`${TD} text-gray-600`}>{r.time ? formatDuration(r.time) : "—"}</td>
           {r.id === viewingId || !hrefFor ? null : <ChevronCell />}
         </AttemptTr>
@@ -174,6 +177,8 @@ function TriesCount({ count }: { count: number }) {
 export interface PracticeSetAttempts {
   /** Assignment id (one row per practice set). */
   key: string;
+  /** Classroom (no scores) or Homework; the row carries its tag. */
+  context?: "CLASSROOM" | "HOMEWORK";
   /** Set name + badges. */
   title: React.ReactNode;
   /** Tries of the set (highest try number), invalidated ones included. */
@@ -261,12 +266,16 @@ function PracticeSetRows({ sets, hrefFor, historyHref, recentLimit = 3 }: Practi
       groups={sets.map((set) => ({
         key: set.key,
         summary: [
-          <>{set.title}<TriesCount count={set.tryCount} /></>,
-          <span key="pct" className="whitespace-nowrap">
-            <VoidableValue status={set.last.status}><Pct value={set.last.pct} className="font-semibold" /></VoidableValue>
-            {set.last.change !== null && set.last.change !== undefined ? <Delta value={set.last.change} unit="%" className="ml-1.5" /> : null}
-          </span>,
-          <>{set.last.correct} of {set.last.total}</>,
+          <>{set.title}{set.context ? <ContextTag context={set.context} className="ml-2" /> : null}<TriesCount count={set.tryCount} /></>,
+          set.context === "CLASSROOM" ? (
+            <NotScored key="pct" />
+          ) : (
+            <span key="pct" className="whitespace-nowrap">
+              <VoidableValue status={set.last.status}><Pct value={set.last.pct} className="font-semibold" /></VoidableValue>
+              {set.last.change !== null && set.last.change !== undefined ? <Delta value={set.last.change} unit="%" className="ml-1.5" /> : null}
+            </span>
+          ),
+          set.context === "CLASSROOM" ? <>{set.last.answered ?? 0} of {set.last.total} answered</> : <>{set.last.correct} of {set.last.total}</>,
           <span key="t" className="text-gray-600">{set.last.time ? formatDuration(set.last.time) : "—"}</span>,
           <span key="d" className="text-gray-600">{set.last.submittedAt ? formatDate(set.last.submittedAt) : "—"}</span>,
         ],
@@ -359,5 +368,20 @@ function TestAttemptRows({ tests, hrefFor }: { tests: TestAttempts[]; hrefFor?: 
         ),
       }))}
     />
+  );
+}
+
+/** Classroom work is never scored (pendiente-p2.md). */
+function NotScored() {
+  return <span className="text-xs text-[var(--sat-muted)]" title="Classroom work: not scored">Not scored</span>;
+}
+
+/** "Classroom" / "Homework" tag of a practice assignment. */
+export function ContextTag({ context, className }: { context: string | null | undefined; className?: string }) {
+  const classroom = context === "CLASSROOM";
+  return (
+    <Badge variant={classroom ? "default" : "info"} className={className}>
+      {classroom ? "Classroom" : "Homework"}
+    </Badge>
   );
 }

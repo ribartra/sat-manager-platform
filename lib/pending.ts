@@ -35,6 +35,8 @@ export interface PendingRow {
   dueDate: Date | null;
   practiceSetId: string | null;
   testId: string | null;
+  /** Practice only: Classroom or Homework. */
+  context: "CLASSROOM" | "HOMEWORK" | null;
 }
 
 export interface PendingFilters {
@@ -68,6 +70,7 @@ export async function loadPending(studentIds: string[], filters: PendingFilters 
             unlockAt: true,
             createdAt: true,
             dueDate: true,
+            context: true,
             student: { select: { id: true, name: true } },
             practiceSet: { select: { id: true, name: true, difficulty: true, source: { select: { name: true } }, topic: { select: { name: true, domain: { select: { practiceArea: true } } } } } },
           },
@@ -99,6 +102,7 @@ export async function loadPending(studentIds: string[], filters: PendingFilters 
         dueDate: a.dueDate,
         practiceSetId: a.practiceSet.id,
         testId: null,
+        context: a.context === "CLASSROOM" ? ("CLASSROOM" as const) : ("HOMEWORK" as const),
       };
     }),
     ...tests.map((a) => ({
@@ -119,6 +123,7 @@ export async function loadPending(studentIds: string[], filters: PendingFilters 
       dueDate: a.dueDate,
       practiceSetId: null,
       testId: a.testId,
+      context: null,
     })),
   ];
   // Overdue first, then by due date (no due date last), then newest assigned.

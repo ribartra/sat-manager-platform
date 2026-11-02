@@ -22,6 +22,8 @@ export interface AssignParams {
 type RawParams = Record<string, string | string[] | undefined | null>;
 
 const ID = /^[A-Za-z0-9_-]{1,64}$/;
+/** An `edit` entry: the set id, optionally with the assignment's context ("<set>:CLASSROOM"). */
+const EDIT_REF = /^[A-Za-z0-9_-]{1,64}(:(CLASSROOM|HOMEWORK))?$/;
 const first = (value: string | string[] | undefined | null) => (Array.isArray(value) ? value[0] : value) ?? undefined;
 const ids = (...values: Array<string | string[] | undefined | null>) => [
   ...new Set(
@@ -48,7 +50,7 @@ export function parseAssignParams(raw: RawParams): AssignParams {
     topic: oneId(raw.topic),
     difficulty: difficulty && ["EASY", "MEDIUM", "HARD"].includes(difficulty) ? difficulty : undefined,
     source: oneId(raw.source),
-    edit: ids(raw.edit, raw.sets),
+    edit: [...new Set([raw.edit, raw.sets].flatMap((v) => (Array.isArray(v) ? v : [v ?? ""])).flatMap((v) => v.split(",")).map((v) => v.trim()).filter((v) => EDIT_REF.test(v)))],
   };
 }
 

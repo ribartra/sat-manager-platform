@@ -144,7 +144,8 @@ export async function renderPracticePlayer({
   let createdAttemptId: string | null = null;
   if (!attempt) {
     const prevAttempts = await withSqliteRetry(() => prisma.attempt.count({
-      where: { studentId: userId, practiceSetId: setId },
+      // Tries are numbered per assignment: Classroom and Homework of a set each start at Try 1.
+      where: { studentId: userId, practiceSetId: setId, assignmentId: assignmentId ?? null },
     }));
     try {
       const created = await withSqliteRetry(() => prisma.attempt.create({
