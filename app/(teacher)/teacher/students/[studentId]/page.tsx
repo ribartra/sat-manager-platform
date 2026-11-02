@@ -1,6 +1,6 @@
 import { AreaBoxGrid, CompactAreaBox, AttemptStatusBadge, EmptyState, PageShell, PracticeAreaTabs, PracticeSetAttemptsAccordion, TestAttemptsAccordion, SectionHeader, SkillResults, StatGrid, StatTile, TestCardsByNumber, type TestCardLinks, invalidatedRowClass, isInvalidated } from "@/components/sat";
 import { ContextTabs } from "@/components/sat/context-tabs";
-import { ContextTag } from "@/components/sat/attempts-table";
+import { ContextTag } from "@/components/sat/context-tag";
 import { contextViewFromParam } from "@/lib/assignment-context";
 import { AreaTag } from "@/components/sat/practice-set-row";
 import { auth } from "@/lib/auth";

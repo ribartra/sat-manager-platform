@@ -52,6 +52,8 @@ export interface SkillsMapChip {
    * "ALREADY ASSIGNED" stamp is laid over it. A single assigned set among others is only disabled.
    */
   stamp?: boolean;
+  /** With `assigned`: why it is taken, instead of "Already assigned" (e.g. "In Homework"). */
+  assignedLabel?: string;
 }
 
 export interface SkillsMapSkill {
@@ -210,8 +212,8 @@ function SkillChip({ chip }: { chip: SkillsMapChip }) {
       <button
         type="button"
         disabled
-        aria-label={`${chip.title ?? difficultyLabel(chip.difficulty)} · ${ASSIGNED_LABEL}`}
-        title={`${ASSIGNED_LABEL}${chip.title ? ` · ${chip.title}` : ""}`}
+        aria-label={`${chip.title ?? difficultyLabel(chip.difficulty)} · ${chip.assignedLabel ?? ASSIGNED_LABEL}`}
+        title={`${chip.assignedLabel ?? ASSIGNED_LABEL}${chip.title ? ` · ${chip.title}` : ""}`}
         className={cn(SKILL_CHIP_CLASS, "relative bg-white text-[var(--sat-text)]", BLOCKED_SURFACE)}
       >
         {/* A single assigned set: grayed and disabled (the stamp is only for levels every source covers). */}
@@ -220,7 +222,7 @@ function SkillChip({ chip }: { chip: SkillsMapChip }) {
         </span>
         {chip.label ? <span>{chip.label}</span> : null}
         {chip.extra}
-        {chip.stamp ? <AssignedStamp /> : null}
+        {chip.stamp ? <AssignedStamp label={chip.assignedLabel} /> : null}
       </button>
     );
   }

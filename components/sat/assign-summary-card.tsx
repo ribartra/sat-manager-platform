@@ -6,7 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { appDateInputValue, cn, localToday } from "@/lib/utils";
-import { ASSIGNMENT_CONTEXTS, contextLabel, type AssignmentContext } from "@/lib/assignment-context";
+import { contextLabel, type AssignmentContext } from "@/lib/assignment-context";
 
 export type FeedbackMode = "AFTER_SET" | "IMMEDIATE";
 
@@ -70,8 +70,8 @@ export function AssignSummaryCard({
   loading: boolean;
   disabledReason?: string | null;
   onCancel: () => void;
-  /** Practice only: Classroom (in class, no scores) or Homework (scored). No onChange = fixed (shown). */
-  context?: { value: AssignmentContext | null; onChange?: (context: AssignmentContext) => void; fixedReason?: string };
+  /** Practice only: the Classroom / Homework tab chosen above the sets, shown here (read-only). */
+  context?: { value: AssignmentContext | null; note?: string };
 }) {
   const set = (patch: Partial<AssignOptions>) => onOptionsChange({ ...options, ...patch });
   // YYYY-MM-DD strings compare as dates.
@@ -88,7 +88,25 @@ export function AssignSummaryCard({
           <dt className="text-gray-500">{countLabel}</dt>
           <dd className="font-medium text-gray-900">{items.length}</dd>
         </div>
+        {context ? (
+          <div className="flex justify-between gap-2">
+            <dt className="text-gray-500">Context</dt>
+            <dd className={cn("text-right font-medium", context.value ? "text-[var(--sat-primary)]" : "text-gray-400")}>
+              {context.value ? contextLabel(context.value) : "Not chosen"}
+            </dd>
+          </div>
+        ) : null}
       </dl>
+      {context ? (
+        <p className="text-xs text-gray-500">
+          {context.value === "CLASSROOM"
+            ? "Work in class: the student sees what they did, no scores; it never counts in reports."
+            : context.value === "HOMEWORK"
+              ? "Scored: results, reports and the next level count only Homework."
+              : "Choose Classroom or Homework above the sets."}
+          {context.note ? ` ${context.note}` : ""}
+        </p>
+      ) : null}
       {items.length > 0 ? (
         <ul className="max-h-40 space-y-1 overflow-y-auto border-t border-gray-100 pt-2 text-xs text-gray-600">
           {items.map((item, index) => (
@@ -98,38 +116,6 @@ export function AssignSummaryCard({
       ) : null}
 
       <div className="space-y-3 border-t border-gray-100 pt-3">
-        {context ? (
-          <div>
-            <p id="assign-context" className="mb-1 text-sm font-medium text-gray-700">Classroom or Homework</p>
-            <div role="radiogroup" aria-labelledby="assign-context" className="grid grid-cols-2 gap-1 rounded-lg border border-[var(--sat-border)] p-1">
-              {ASSIGNMENT_CONTEXTS.map((value) => {
-                const active = context.value === value;
-                return (
-                  <Button
-                    key={value}
-                    type="button"
-                    size="sm"
-                    variant={active ? "primary" : "ghost"}
-                    role="radio"
-                    aria-checked={active}
-                    className={cn("w-full", active && "pointer-events-none")}
-                    onClick={() => context.onChange?.(value)}
-                    disabledReason={!context.onChange && !active ? context.fixedReason ?? "Fixed." : null}
-                  >
-                    {contextLabel(value)}
-                  </Button>
-                );
-              })}
-            </div>
-            <p className="mt-1 text-xs text-gray-500">
-              {context.value === "CLASSROOM"
-                ? "Work in class: the student sees what they did, no scores; it never counts in reports."
-                : context.value === "HOMEWORK"
-                  ? "Scored: results, reports and the next level count only Homework."
-                  : "Choose one to assign."}
-            </p>
-          </div>
-        ) : null}
         <div>
           <label htmlFor="assign-open" className="mb-1 block text-sm font-medium text-gray-700">Open date (optional)</label>
           <Input id="assign-open" type="date" value={options.unlockAt} onChange={(e) => set({ unlockAt: e.target.value })} />

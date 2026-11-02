@@ -14,7 +14,7 @@ import { activeAreaTab, practiceAreaFromTab, practiceAreaLabel } from "@/lib/pra
 import { loadPracticeReport, shortSetName } from "@/lib/student-report";
 import { formatDate, isAhead } from "@/lib/utils";
 import { ContextTabs } from "@/components/sat/context-tabs";
-import { ContextTag } from "@/components/sat/attempts-table";
+import { ContextTag } from "@/components/sat/context-tag";
 import { contextViewFromParam } from "@/lib/assignment-context";
 
 export const dynamic = "force-dynamic";

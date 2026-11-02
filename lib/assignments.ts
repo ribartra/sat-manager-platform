@@ -78,6 +78,8 @@ export async function refreshAssignmentStates(now = new Date()) {
 // ---------------------------------------------------------------------------
 
 export type AssignmentOutcome = "created" | "updated" | "reassigned" | "unchanged";
+/** Practice adds one: Classroom asked for a set the student already has as Homework (nothing written). */
+export type PracticeAssignmentOutcome = AssignmentOutcome | "blockedByHomework";
 
 /** Offset of the app's teaching timezone (America/Lima, no DST). A due date is the end of that local day. */
 export const APP_UTC_OFFSET = "-05:00";
@@ -138,7 +140,7 @@ interface PracticeAssignmentInput {
   sourceGroupId?: string | null;
 }
 
-export async function upsertPracticeAssignment(input: PracticeAssignmentInput): Promise<{ outcome: AssignmentOutcome; assignmentId: string }> {
+export async function upsertPracticeAssignment(input: PracticeAssignmentInput): Promise<{ outcome: PracticeAssignmentOutcome; assignmentId: string | null }> {
   const { studentId, practiceSetId, practiceSetName, assignedById, dueDate, unlockAt, locked, feedbackMode, showExplanations, context } = input;
   const audit = (action: string, targetId: string, extra: Record<string, unknown> = {}) =>
     prisma.auditLog.create({
@@ -161,6 +163,12 @@ export async function upsertPracticeAssignment(input: PracticeAssignmentInput): 
         }),
       },
     });
+
+  // Once a set is Homework, Classroom is closed for good: no new Classroom assignment, no reopening it.
+  if (context === "CLASSROOM") {
+    const homework = await prisma.assignment.findFirst({ where: { studentId, practiceSetId, context: "HOMEWORK" }, select: { id: true } });
+    if (homework) return { outcome: "blockedByHomework", assignmentId: null };
+  }
 
   let existing = await prisma.assignment.findFirst({
     where: { studentId, practiceSetId, context },

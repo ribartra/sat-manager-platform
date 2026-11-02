@@ -1,5 +1,5 @@
 import { Delta, InvalidatedNotice, PageHeader, PageShell, SectionHeader, VoidableValue } from "@/components/sat";
-import { ContextTag } from "@/components/sat/attempts-table";
+import { ContextTag } from "@/components/sat/context-tag";
 import { PAGE_TITLE_CLASS } from "@/components/sat/page-shell";
 import { HEADER_ACTION_CLASS, HeaderActions } from "@/components/sat/header-actions";
 import { ReviewQuestionCard } from "@/components/sat/review-question-card";

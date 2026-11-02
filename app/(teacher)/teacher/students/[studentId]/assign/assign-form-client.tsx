@@ -15,7 +15,8 @@ import { SkillsSourceMap, DIFFICULTIES, type SkillsMapChip, type SkillsSourceSki
 import { InlineError } from "@/components/sat/alert";
 import { AssignSummaryCard, defaultAssignOptions, type AssignOptions } from "@/components/sat/assign-summary-card";
 import { errorMessage, readApiError } from "@/lib/api-client";
-import { contextLabel, type AssignmentContext } from "@/lib/assignment-context";
+import { type AssignmentContext } from "@/lib/assignment-context";
+import { ContextToggle } from "@/components/sat/context-tabs";
 
 interface PracticeSetInfo {
   id: string;
@@ -105,8 +106,16 @@ export function AssignForm({
   // Classroom or Homework: always chosen by the teacher (no default); fixed when editing; groups are Homework.
   const [chosenContext, setChosenContext] = useState<AssignmentContext | null>(editing[0]?.context ?? null);
   const context: AssignmentContext | null = editMode ? editing[0].context : target === "group" ? "HOMEWORK" : chosenContext;
-  // Already assigned in the chosen context (before choosing: only when it has both).
-  const isAssigned = (ps: PracticeSetInfo) => (context ? ps.assignedIn.includes(context) : ps.assignedIn.length >= 2);
+  // Already taken in the chosen tab: Homework = it has it as Homework; Classroom = it has it in Classroom
+  // or as Homework (after Homework, Classroom is closed for that set).
+  const isAssigned = (ps: PracticeSetInfo) =>
+    context === "CLASSROOM" ? ps.assignedIn.length > 0 : context ? ps.assignedIn.includes(context) : ps.assignedIn.length >= 2;
+  const inHomeworkOnly = (ps: PracticeSetInfo) => context === "CLASSROOM" && ps.assignedIn.includes("HOMEWORK");
+  function chooseContext(next: AssignmentContext) {
+    setChosenContext(next);
+    // Switching tabs drops the selected sets that are already taken in the new one.
+    setSelected((prev) => new Set([...prev].filter((id) => !practiceSets.some((ps) => ps.id === id && (next === "CLASSROOM" ? ps.assignedIn.length > 0 : ps.assignedIn.includes(next))))));
+  }
   const [selected, setSelected] = useState<Set<string>>(
     () => new Set([...editing.map((set) => set.id), ...initialSelected.filter((id) => practiceSets.some((ps) => ps.id === id && ps.assignedIn.length < 2))]),
   );
@@ -192,9 +201,14 @@ export function AssignForm({
     const updated = Number(data.updated) || 0;
     const reassigned = Number(data.reassigned) || 0;
     const classroomClosed = Number(data.classroomClosed) || 0;
+    const blockedByHomework = Number(data.blockedByHomework) || 0;
     if (created + updated + reassigned === 0) {
       setSuccess(false);
-      setError("Nothing changed: the selected sets are already assigned with these settings.");
+      setError(
+        blockedByHomework
+          ? "Nothing changed: the selected sets are already Homework, so they can't be Classroom work any more."
+          : "Nothing changed: the selected sets are already assigned with these settings.",
+      );
       return;
     }
     setSuccessMessage(
@@ -203,6 +217,7 @@ export function AssignForm({
         reassigned ? `${reassigned} reassigned` : null,
         updated ? `${updated} updated` : null,
         classroomClosed ? `${classroomClosed} Classroom ${classroomClosed === 1 ? "set" : "sets"} closed (Homework starts from zero)` : null,
+        blockedByHomework ? `${blockedByHomework} already Homework (not assigned as Classroom)` : null,
       ].filter(Boolean).join(" · "),
     );
     setSuccess(true);
@@ -283,9 +298,22 @@ export function AssignForm({
       {/* Practice set picker: Practice › By skill cards, only sets the student doesn't have yet */}
       {editMode ? null : (
         <section className="space-y-3">
+          <ContextToggle
+            value={context}
+            onChange={target === "group" ? undefined : chooseContext}
+            fixedReason="Group assignments are Homework."
+          />
+          {!context ? (
+            <p className="rounded-lg border border-dashed border-[var(--sat-border)] bg-white px-4 py-6 text-center text-sm text-[var(--sat-muted)]">
+              Choose Classroom or Homework to pick sets.
+            </p>
+          ) : (
+          <>
           <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Skill or practice set name" aria-label="Search practice" className="max-w-xs text-sm" />
           <p className="text-xs text-gray-500">
-            Open a skill and pick sets by source and level. Sets {first} already has {context ? `as ${contextLabel(context)}` : "as Classroom and Homework"} are grayed out and can&apos;t be picked again (they can retry them any time); a level is marked Already assigned when every source is. A set done in Classroom can be assigned as Homework: it starts from zero and closes the Classroom work.
+            {context === "HOMEWORK"
+              ? <>Open a skill and pick sets by source and level. Sets {first} already has as Homework are grayed out (they can retry them any time); a level is marked Already assigned when every source is. A set done in Classroom can be assigned as Homework: it starts from zero and closes the Classroom work.</>
+              : <>Open a skill and pick sets by source and level. Sets {first} already has in Classroom or as Homework are grayed out: once a set is Homework, Classroom is closed for it. A level is marked when every source is.</>}
           </p>
           <SkillsSourceMap
             emptyText={
@@ -316,8 +344,9 @@ export function AssignForm({
                       return { difficulty: level, state: "available", title: `${count} set${count === 1 ? "" : "s"} to assign`, extra: <span className="text-[var(--sat-muted)]">{count} set{count === 1 ? "" : "s"}</span> };
                     }
                     // Every source's set at this level is already assigned: stamp the level (not "—").
+                    const homeworkAtLevel = skill.sets.filter((ps) => ps.difficulty === level && inHomeworkOnly(ps)).length;
                     return assignedAtLevel
-                      ? { difficulty: level, state: "available", assigned: true, stamp: true, title: `${assignedAtLevel} set${assignedAtLevel === 1 ? "" : "s"}`, extra: <span className="text-[var(--sat-muted)]">{assignedAtLevel} set{assignedAtLevel === 1 ? "" : "s"}</span> }
+                      ? { difficulty: level, state: "available", assigned: true, stamp: true, assignedLabel: homeworkAtLevel === assignedAtLevel ? "In Homework" : undefined, title: `${assignedAtLevel} set${assignedAtLevel === 1 ? "" : "s"}`, extra: <span className="text-[var(--sat-muted)]">{assignedAtLevel} set{assignedAtLevel === 1 ? "" : "s"}</span> }
                       : { difficulty: level, state: "none", title: "Nothing to assign at this level" };
                   }),
                   // Every source and level already assigned: a fixed row with the stamped levels (no rows
@@ -335,7 +364,7 @@ export function AssignForm({
                           label: ofLevel.length > 1 ? setNumber(ps.name) : undefined,
                           title: `${ps.name} · ${ps.questionCount} questions`,
                           extra: <span className="text-[var(--sat-muted)]">{ps.questionCount} Q</span>,
-                          ...(isAssigned(ps) ? { assigned: true } : { selected: selected.has(ps.id), onClick: () => toggleSelect(ps.id) }),
+                          ...(isAssigned(ps) ? { assigned: true, assignedLabel: inHomeworkOnly(ps) ? "In Homework" : undefined } : { selected: selected.has(ps.id), onClick: () => toggleSelect(ps.id) }),
                         }));
                       }),
                     };
@@ -345,6 +374,8 @@ export function AssignForm({
             }))}
           />
           <p className="text-xs text-gray-400">{selected.size} selected</p>
+          </>
+          )}
         </section>
       )}
 
@@ -361,15 +392,8 @@ export function AssignForm({
           ]}
           options={options}
           onOptionsChange={setOptions}
-          context={{
-            value: context,
-            // Picking a context drops the selected sets the student already has in it.
-            onChange: editMode || target === "group" ? undefined : (next) => {
-              setChosenContext(next);
-              setSelected((prev) => new Set([...prev].filter((id) => !practiceSets.some((ps) => ps.id === id && ps.assignedIn.includes(next)))));
-            },
-            fixedReason: editMode ? "The context is fixed once assigned." : target === "group" ? "Group assignments are Homework." : undefined,
-          }}
+          // The tab chosen above the sets (read-only here).
+          context={{ value: context, note: editMode ? "Fixed once assigned." : target === "group" ? "Group assignments are Homework." : undefined }}
           dueHint="Due at the end of that day. Starts one week from today; change it if needed."
           extra={
             // Admin › Settings "Keep it locked" option (off by default: hidden).

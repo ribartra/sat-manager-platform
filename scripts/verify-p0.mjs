@@ -17,6 +17,22 @@ const checks = [
     label: "Una asignacion por alumno × set × contexto; cerrar Classroom entrega el intento tal cual",
   },
   {
+    file: "lib/assignments.ts",
+    requires: ['if (homework) return { outcome: "blockedByHomework", assignmentId: null };'],
+    label: "Con Homework ya asignado, el set no se asigna ni se reabre como Classroom",
+  },
+  {
+    file: "app/(teacher)/teacher/students/[studentId]/assign/assign-form-client.tsx",
+    requires: ["<ContextToggle", "Choose Classroom or Homework to pick sets.", 'context === "CLASSROOM" ? ps.assignedIn.length > 0'],
+    label: "Assign: pestanas Classroom / Homework sobre los sets (nada elegido al abrir); en Classroom lo que es Homework no se elige",
+  },
+  {
+    file: "components/sat/assign-summary-card.tsx",
+    requires: ["contextLabel(context.value)"],
+    forbids: ['role="radiogroup"'],
+    label: "Summary de asignacion muestra la pestana elegida (solo lectura)",
+  },
+  {
     file: "lib/student-report.ts",
     requires: ['assignmentContextWhere(filters.context ?? "homework")', "submitted.filter(isHomework)", "classroom ? null"],
     label: "Reporte de practica: por defecto Homework (PDF, padres); puntajes solo de Homework; Classroom sin %",
@@ -355,7 +371,7 @@ const checks = [
   },
   {
     file: "components/sat/skills-map.tsx",
-    requires: ["if (chip.assigned) {", "disabled", "{chip.stamp ? <AssignedStamp /> : null}", "BLOCKED_SURFACE"],
+    requires: ["if (chip.assigned) {", "disabled", "{chip.stamp ? <AssignedStamp label={chip.assignedLabel} /> : null}", "BLOCKED_SURFACE"],
     label: "Chip asignado: deshabilitado, mismo tamano; sello solo si todo el nivel (todas las fuentes) esta asignado",
   },
   {

@@ -125,11 +125,12 @@ The **Assign** view is the same for practice and Tests. Open it from **Assign** 
 
 ### Classroom and Homework
 
-Every practice set is assigned as **Classroom** (work in class) or **Homework**. You always choose it at the top of the summary: **Assign** stays disabled until you do.
+Every practice set is assigned as **Classroom** (work in class) or **Homework**. You choose it with the **Classroom · Homework** tabs above the sets: none is chosen at first and the sets appear once you pick one. The tab filters the sets (grayed out: what the student already has in that context) and the summary shows it under **Context**; **Assign** stays disabled until you choose.
 
 - **Classroom** shows what the student did (status and "k of N answered"), **never a percentage**. It doesn't count in results, the PDF report, the parents' view or the auto-open of the next level.
 - **Homework** is the evaluation: it is scored and it is the only practice that results and reports count.
 - One set can be assigned once as Classroom and once as Homework. Assigning as **Homework** a set the student started in class **closes** the class work: it is saved as it is, with no score, and can't be continued. Homework **starts from zero**.
+- Once a set is **Homework** it can't be Classroom work any more: in the Classroom tab it is grayed out with the **In Homework** stamp, and the student keeps trying it only as Homework.
 - The context can't be changed later: **Edit** only changes dates and options.
 
 ![Choosing Classroom or Homework](img/teacher-assign-context.png)

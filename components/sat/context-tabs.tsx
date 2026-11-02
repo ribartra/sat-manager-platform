@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import type { ContextView } from "@/lib/assignment-context";
+import { Button } from "@/components/ui/button";
+import { ASSIGNMENT_CONTEXTS, contextLabel, type AssignmentContext, type ContextView } from "@/lib/assignment-context";
 
 const VIEWS: { key: ContextView; label: string; hint: string }[] = [
   { key: "all", label: "All", hint: "Classroom and Homework. Scores come from Homework only." },
@@ -48,5 +49,45 @@ export function ContextTabs({
         </Link>
       ))}
     </nav>
+  );
+}
+
+/**
+ * Assign view: the Classroom · Homework choice above the sets (client trees only). Nothing is chosen
+ * at first; the chosen tab filters which sets are already taken and is what gets assigned.
+ */
+export function ContextToggle({
+  value,
+  onChange,
+  fixedReason,
+  className,
+}: {
+  value: AssignmentContext | null;
+  /** Missing: the context is fixed (`value`); the other tab says why (`fixedReason`). */
+  onChange?: (context: AssignmentContext) => void;
+  fixedReason?: string;
+  className?: string;
+}) {
+  return (
+    <div role="tablist" aria-label="Classroom or Homework" className={cn("inline-flex gap-0.5 rounded-lg border border-[var(--sat-border)] bg-white p-0.5", className)}>
+      {ASSIGNMENT_CONTEXTS.map((context) => {
+        const active = value === context;
+        return (
+          <Button
+            key={context}
+            type="button"
+            size="sm"
+            variant={active ? "primary" : "ghost"}
+            role="tab"
+            aria-selected={active}
+            className={cn("h-7 rounded-md px-3 text-xs font-semibold", active ? "pointer-events-none" : "text-[var(--sat-muted)] hover:text-[var(--sat-text)]")}
+            onClick={() => onChange?.(context)}
+            disabledReason={!onChange && !active ? fixedReason ?? "Fixed." : null}
+          >
+            {contextLabel(context)}
+          </Button>
+        );
+      })}
+    </div>
   );
 }

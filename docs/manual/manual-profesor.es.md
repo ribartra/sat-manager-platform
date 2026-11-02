@@ -125,11 +125,12 @@ La vista **Assign** es la misma para práctica y Tests. Se abre desde **Assign**
 
 ### Classroom y Homework
 
-Cada set de práctica se asigna como **Classroom** (trabajo en clase) o como **Homework** (tarea). Hay que elegirlo siempre en el resumen, arriba: **Assign** queda desactivado hasta que lo elijas.
+Cada set de práctica se asigna como **Classroom** (trabajo en clase) o como **Homework** (tarea). Se elige con las pestañas **Classroom · Homework** que están encima de los sets: al abrir no hay ninguna elegida y los sets no aparecen hasta que elijas una. La pestaña filtra los sets (en gris los que el alumno ya tiene en ese contexto) y el resumen muestra la elegida en **Context**; **Assign** queda desactivado mientras no elijas.
 
 - **Classroom** muestra lo que el alumno hizo (estado y «k of N answered»), **nunca un porcentaje**. No cuenta en los resultados, en el informe PDF, en la vista de los padres ni para abrir el siguiente nivel.
 - **Homework** es la evaluación: tiene porcentaje y es lo único que cuentan los resultados y los informes.
 - Un mismo set puede asignarse una vez como Classroom y otra como Homework. Al asignar como **Homework** un set que el alumno empezó en clase, el trabajo de clase **se cierra**: se guarda tal cual, sin nota, y no se puede continuar. El Homework **empieza desde cero**.
+- Cuando un set ya es **Homework**, ya no se puede hacer como Classroom: en la pestaña Classroom aparece en gris con el sello **In Homework**, y el alumno solo puede seguir intentándolo como Homework.
 - El contexto no se cambia después: **Edit** solo cambia fechas y opciones.
 
 ![Elegir Classroom o Homework](img/teacher-assign-context.png)

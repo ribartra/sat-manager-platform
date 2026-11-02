@@ -16,9 +16,10 @@ L.run(async () => {
   let page = await L.open();
   await L.login(page, A.teacher);
   await L.go(page, `/teacher/students/${lucia}/assign?area=math`);
-  await page.getByRole("radio", { name: "Classroom" }).click();
-  await page.waitForTimeout(300);
-  await L.shot(page, "teacher-assign-context", page.locator("aside").first());
+  // The Classroom · Homework tabs above the sets, and the summary showing the chosen one.
+  await page.getByRole("tab", { name: "Classroom" }).click();
+  await page.waitForTimeout(400);
+  await L.shot(page, "teacher-assign-context");
   await L.go(page, `/teacher/students/${lucia}?area=math`);
   await L.shot(page, "teacher-student-context");
   await L.go(page, `/teacher/history?student=${lucia}&context=classroom`);

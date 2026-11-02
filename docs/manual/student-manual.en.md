@@ -93,7 +93,7 @@ Your teacher assigns each set as **Classroom** (work in class) or **Homework**; 
 
 - **Classroom** has no score: you see what you answered ("k of N answered"), no percentage.
 - **Homework** is scored (percentage) and it is what counts in your results.
-- If a set you started in class is assigned to you as Homework, the class work is closed and the Homework starts from zero.
+- If a set you started in class is assigned to you as Homework, the class work is closed (you can't try it again as Classroom) and the Homework starts from zero; from then on you practice it only as Homework.
 
 At the top, **All · Classroom · Homework** filters what you see.
 

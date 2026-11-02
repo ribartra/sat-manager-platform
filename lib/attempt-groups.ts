@@ -19,8 +19,6 @@ export interface GroupableTry {
   time: number | null;
   /** SUBMITTED counts; INVALIDATED is listed crossed out but never "last" nor a change baseline. */
   status: string;
-  /** Classroom try: no score; shows what was answered. */
-  answered?: number;
 }
 
 export interface GroupableSet {
@@ -35,8 +33,6 @@ export interface GroupableSet {
   skillName?: string | null;
   sourceName?: string | null;
   sourceOrder?: number | null;
-  /** Classroom (no scores) or Homework. */
-  context?: "CLASSROOM" | "HOMEWORK";
 }
 
 const newestFirst = (a: { submittedAt: Date | null; id: string }, b: { submittedAt: Date | null; id: string }) =>
@@ -61,10 +57,11 @@ export function practiceSetGroups(sets: GroupableSet[], recentLimit = 3): Practi
           time: t.time,
           status: t.status,
           change: previous ? t.pct! - previous.pct! : null,
-          ...(set.context === "CLASSROOM" ? { classroom: true, answered: t.answered ?? 0 } : {}),
         };
       };
-      const lastIndex = Math.max(0, tries.findIndex((t) => t.status === "SUBMITTED"));
+      // Last Attempt = the last scored try (Classroom tries have no score); else the last submitted one.
+      const scoredIndex = tries.findIndex(counted);
+      const lastIndex = scoredIndex >= 0 ? scoredIndex : Math.max(0, tries.findIndex((t) => t.status === "SUBMITTED"));
       return {
         key: set.key,
         title: set.title,
@@ -74,7 +71,6 @@ export function practiceSetGroups(sets: GroupableSet[], recentLimit = 3): Practi
         skillName: set.skillName ?? null,
         sourceName: set.sourceName ?? null,
         sourceOrder: set.sourceOrder ?? null,
-        context: set.context,
         tryCount: Math.max(...tries.map((t) => t.tryNumber)),
         last: row(tries[lastIndex], lastIndex),
         recent: tries.slice(0, recentLimit).map(row),
@@ -89,17 +85,32 @@ export function practiceSetTitle(name: string, difficulty: string | null | undef
   return difficulty && !short.includes(`(${difficultyLabel(difficulty)})`) ? `${short} (${difficultyLabel(difficulty)})` : short;
 }
 
-/** Teacher report attempts (SUBMITTED + INVALIDATED), grouped by assignment. */
+/**
+ * Report attempts (SUBMITTED + INVALIDATED), one group per practice set. A set done in Classroom and
+ * as Homework is one row (All): its tries are numbered in the order they were taken, whatever the
+ * context (each context numbers its own tries, so a single-context view keeps the same numbers).
+ */
 export function setsFromReportAttempts(attempts: ReportAttempt[]): GroupableSet[] {
   const bySet = new Map<string, GroupableSet>();
   for (const a of attempts) {
-    const key = a.assignmentId ?? a.id;
+    const key = a.practiceSetId ?? a.assignmentId ?? a.id;
     const set =
       bySet.get(key) ??
       bySet
-        .set(key, { key, title: practiceSetTitle(a.name, a.difficulty), tries: [], practiceSetId: a.practiceSetId, difficulty: a.difficulty, skillId: a.skillId, skillName: a.skillName, sourceName: a.sourceName, sourceOrder: a.sourceOrder, context: a.context })
+        .set(key, { key, title: practiceSetTitle(a.name, a.difficulty), tries: [], practiceSetId: a.practiceSetId, difficulty: a.difficulty, skillId: a.skillId, skillName: a.skillName, sourceName: a.sourceName, sourceOrder: a.sourceOrder })
         .get(key)!;
-    set.tries.push({ id: a.id, tryNumber: a.attemptNumber ?? 1, submittedAt: a.submittedAt, correct: a.correct, total: a.total, pct: a.percent, time: a.totalTime, status: a.status, answered: a.answered });
+    set.tries.push({ id: a.id, tryNumber: a.attemptNumber ?? 1, submittedAt: a.submittedAt, correct: a.correct, total: a.total, pct: a.percent, time: a.totalTime, status: a.status });
+  }
+  const contextsBySet = new Map<string, Set<string>>();
+  for (const a of attempts) {
+    const key = a.practiceSetId ?? a.assignmentId ?? a.id;
+    (contextsBySet.get(key) ?? contextsBySet.set(key, new Set()).get(key)!).add(a.context ?? "HOMEWORK");
+  }
+  for (const set of bySet.values()) {
+    if ((contextsBySet.get(set.key)?.size ?? 0) < 2) continue;
+    [...set.tries]
+      .sort((x, y) => (x.submittedAt?.getTime() ?? 0) - (y.submittedAt?.getTime() ?? 0) || x.id.localeCompare(y.id))
+      .forEach((t, index) => { t.tryNumber = index + 1; });
   }
   return [...bySet.values()];
 }
@@ -113,8 +124,7 @@ export function setsFromStudentPractice(items: PracticeSetItem[]): GroupableSet[
     skillName: item.skill,
     sourceName: item.sourceName,
     sourceOrder: item.sourceOrder,
-    context: item.context,
-    tries: item.tries.map((t) => ({ id: t.id, tryNumber: t.tryNumber, submittedAt: t.submittedAt, correct: t.correct, total: t.total, pct: t.pct, time: t.time, status: "SUBMITTED", answered: t.answered })),
+    tries: item.tries.map((t) => ({ id: t.id, tryNumber: t.tryNumber, submittedAt: t.submittedAt, correct: t.correct, total: t.total, pct: t.pct, time: t.time, status: "SUBMITTED" })),
   }));
 }
 

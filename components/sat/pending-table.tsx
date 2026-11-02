@@ -1,5 +1,5 @@
 import { ChevronCell, LinkTr, RowLink, SimpleTable, TD } from "@/components/sat/link-table";
-import { ContextTag } from "@/components/sat/attempts-table";
+import { ContextTag } from "@/components/sat/context-tag";
 import { AreaTag } from "@/components/sat/practice-set-row";
 import { SourceTag } from "@/components/sat/source-tag";
 import { StudentCell } from "@/components/sat/teacher-ui";

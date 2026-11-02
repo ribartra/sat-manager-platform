@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ContextTag } from "@/components/sat/attempts-table";
+import { ContextTag } from "@/components/sat/context-tag";
 import {
   AttemptStatusBadge,
   Breadcrumbs,

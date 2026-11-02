@@ -93,7 +93,7 @@ Tu profesor asigna cada set como **Classroom** (trabajo en clase) o **Homework**
 
 - **Classroom** no tiene nota: ves lo que respondiste («k of N answered»), sin porcentaje.
 - **Homework** tiene nota (porcentaje) y es lo que cuenta en tus resultados.
-- Si un set que empezaste en clase se te asigna como Homework, el trabajo de clase queda cerrado y el Homework empieza desde cero.
+- Si un set que empezaste en clase se te asigna como Homework, el trabajo de clase queda cerrado (ya no puedes volver a intentarlo en Classroom) y el Homework empieza desde cero; desde entonces lo practicas solo como Homework.
 
 Arriba, **All · Classroom · Homework** filtra lo que ves.
 

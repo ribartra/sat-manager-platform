@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ContextTag } from "@/components/sat/attempts-table";
+import { ContextTag } from "@/components/sat/context-tag";
 import { Fragment } from "react";
 import { AttemptStatusBadge, VoidableValue, invalidatedRowClass } from "@/components/sat/attempt-status";
 import { ChevronCell, LinkTr, RowAction, RowLink, SimpleTable, TD } from "@/components/sat/link-table";

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ContextTag } from "@/components/sat/attempts-table";
+import { ContextTag } from "@/components/sat/context-tag";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DueLine, Pct, WorkStatusBadges } from "@/components/sat/work-status";
