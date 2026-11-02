@@ -6,6 +6,7 @@ import { Select } from "@/components/ui/select";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
+import { AssignStep } from "@/components/sat/assign-step";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { InlineError } from "@/components/sat/alert";
@@ -37,7 +38,10 @@ export function AssignTestForm({
   initialSelected,
   groups = [],
   groupAssignmentEnabled = false,
+  areaTabs,
 }: {
+  /** Math / Reading / Writing / Tests tabs (links), shown in the "Choose the Test" step. */
+  areaTabs?: React.ReactNode;
   studentId: string;
   studentName: string;
   exams: ExamOption[];
@@ -135,6 +139,8 @@ export function AssignTestForm({
 
   return (
     <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+    <AssignStep n={3} title={editing ? "What you are changing" : "Choose the Test"}>
+    {editing ? null : areaTabs}
     <Card padding="lg" className="min-w-0 space-y-4">
       <p className="text-sm text-gray-600">
         {editing ? "Settings for" : "Assign tests to"} <span className="font-medium text-blue-700">{useGroup ? group?.name ?? "Group" : studentName}</span>
@@ -212,8 +218,10 @@ export function AssignTestForm({
       <InlineError>{error}</InlineError>
       {done && <p className="text-sm font-medium text-green-600">✓ {doneMessage} Redirecting...</p>}
     </Card>
+    </AssignStep>
 
     <aside className="lg:sticky lg:top-6">
+      <AssignStep n={4} title={editing ? "Change the dates and save" : "Set the dates and assign"}>
       <AssignSummaryCard
         to={useGroup ? group?.name ?? "Group" : studentName}
         countLabel="Tests"
@@ -227,6 +235,7 @@ export function AssignTestForm({
         disabledReason={done ? "Already assigned." : selected.size === 0 ? "Select at least one test." : null}
         onCancel={() => router.push(returnHref)}
       />
+      </AssignStep>
     </aside>
     </div>
   );

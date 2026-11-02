@@ -17,6 +17,7 @@ import { AssignSummaryCard, defaultAssignOptions, type AssignOptions } from "@/c
 import { errorMessage, readApiError } from "@/lib/api-client";
 import { type AssignmentContext } from "@/lib/assignment-context";
 import { ContextToggle } from "@/components/sat/context-tabs";
+import { AssignStep } from "@/components/sat/assign-step";
 
 interface PracticeSetInfo {
   id: string;
@@ -85,6 +86,10 @@ interface AssignFormProps {
   initialSelected?: string[];
   /** Skill opened from the URL (`topic=`, or the preselected set's skill). */
   openSkillId?: string;
+  /** Math / Reading / Writing / Tests tabs (links), shown in the "Choose what to assign" step. */
+  areaTabs?: React.ReactNode;
+  /** Classroom / Homework already chosen (`context=` in the URL, kept when switching area). */
+  initialContext?: AssignmentContext;
 }
 
 export function AssignForm({
@@ -98,13 +103,15 @@ export function AssignForm({
   area,
   initialSelected = [],
   openSkillId,
+  areaTabs,
+  initialContext,
 }: AssignFormProps) {
   const router = useRouter();
   const editMode = editing.length > 0;
   const [target, setTarget] = useState<"student" | "group">("student");
   const [groupId, setGroupId] = useState(groups[0]?.id ?? "");
   // Classroom or Homework: always chosen by the teacher (no default); fixed when editing; groups are Homework.
-  const [chosenContext, setChosenContext] = useState<AssignmentContext | null>(editing[0]?.context ?? null);
+  const [chosenContext, setChosenContext] = useState<AssignmentContext | null>(editing[0]?.context ?? initialContext ?? null);
   const context: AssignmentContext | null = editMode ? editing[0].context : target === "group" ? "HOMEWORK" : chosenContext;
   // Already taken in the chosen tab: Homework = it has it as Homework; Classroom = it has it in Classroom
   // or as Homework (after Homework, Classroom is closed for that set).
@@ -113,6 +120,10 @@ export function AssignForm({
   const inHomeworkOnly = (ps: PracticeSetInfo) => context === "CLASSROOM" && ps.assignedIn.includes("HOMEWORK");
   function chooseContext(next: AssignmentContext) {
     setChosenContext(next);
+    // In the URL too, so the Math / Reading / Writing tabs keep it.
+    const url = new URL(window.location.href);
+    url.searchParams.set("context", next);
+    router.replace(`${url.pathname}${url.search}`, { scroll: false });
     // Switching tabs drops the selected sets that are already taken in the new one.
     setSelected((prev) => new Set([...prev].filter((id) => !practiceSets.some((ps) => ps.id === id && (next === "CLASSROOM" ? ps.assignedIn.length > 0 : ps.assignedIn.includes(next))))));
   }
@@ -228,6 +239,8 @@ export function AssignForm({
   return (
     <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
       <div className="min-w-0 space-y-6">
+      {/* "Assign to" only when there is a choice (groups on); editing lists what changes. */}
+      {editMode || groupAssignmentEnabled ? (
       <Card padding="md">
         {editMode ? (
           <>
@@ -294,15 +307,21 @@ export function AssignForm({
         </>
         )}
       </Card>
+      ) : null}
 
-      {/* Practice set picker: Practice › By skill cards, only sets the student doesn't have yet */}
+      {/* Step 3: Classroom or Homework. Step 4: the sets (Practice › By skill cards). */}
       {editMode ? null : (
-        <section className="space-y-3">
+        <>
+        <AssignStep n={3} title="Choose Classroom or Homework" hint="Classroom: work in class, not scored. Homework: scored; results and reports count only Homework.">
           <ContextToggle
             value={context}
             onChange={target === "group" ? undefined : chooseContext}
             fixedReason="Group assignments are Homework."
           />
+        </AssignStep>
+        <AssignStep n={4} title="Choose what to assign">
+        {areaTabs}
+        <div className="space-y-3">
           {!context ? (
             <p className="rounded-lg border border-dashed border-[var(--sat-border)] bg-white px-4 py-6 text-center text-sm text-[var(--sat-muted)]">
               Choose Classroom or Homework to pick sets.
@@ -376,13 +395,16 @@ export function AssignForm({
           <p className="text-xs text-gray-400">{selected.size} selected</p>
           </>
           )}
-        </section>
+        </div>
+        </AssignStep>
+        </>
       )}
 
       <InlineError>{error}</InlineError>
       </div>
 
       <aside className="lg:sticky lg:top-6">
+        <AssignStep n={editMode ? 3 : 5} title={editMode ? "Change the dates and save" : "Set the dates and assign"}>
         <AssignSummaryCard
           to={target === "group" ? groups.find((g) => g.id === groupId)?.name ?? "Group" : studentName}
           countLabel="Practice sets"
@@ -410,6 +432,7 @@ export function AssignForm({
           disabledReason={!context ? "Choose Classroom or Homework." : selected.size === 0 ? "Select at least one practice set." : null}
           onCancel={() => router.back()}
         />
+        </AssignStep>
       </aside>
 
       <Dialog open={success} onOpenChange={setSuccess}>

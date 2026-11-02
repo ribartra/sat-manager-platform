@@ -11,7 +11,7 @@ import prisma from "@/lib/prisma";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { assignableContentWhere, contentScopeFor, studentAccessWhereFor } from "@/lib/program-scope";
 import { refreshAssignmentStates } from "@/lib/assignments";
-import { loadStudentOverviews } from "@/lib/teacher-overview";
+import { loadStudentOverviews, type StudentOverview } from "@/lib/teacher-overview";
 import { domainRank } from "@/lib/taxonomy-order";
 import { ACTIVE_SOURCE_WHERE, DEFAULT_PRACTICE_SOURCE_ID } from "@/lib/content-source";
 import { resolvePracticeArea, tabFromPracticeArea } from "@/lib/practice-area";
@@ -19,6 +19,7 @@ import { assignHref, assignQuery, parseAssignParams, type AssignArea, type Assig
 import { difficultyLabel } from "@/lib/domain-meta";
 import { StudentSwitcher } from "../students/[studentId]/student-switcher";
 import { StudentDonePanel } from "../students/[studentId]/student-done-panel";
+import { AssignStep } from "@/components/sat/assign-step";
 import { AssignForm } from "../students/[studentId]/assign/assign-form-client";
 import { AssignTestForm } from "../students/[studentId]/assign-test/assign-test-form-client";
 
@@ -74,7 +75,9 @@ export async function AssignView({ studentId, query }: { studentId: string | nul
 
   // Switching student keeps what is being assigned (not the per-student edit).
   const carry = assignQuery({ ...params, edit: [] });
-  const tabs = AREA_TABS.map((t) => ({ key: t.key, label: t.label, href: assignHref({ studentId, area: t.key }) }));
+  // Math / Reading / Writing keep the Classroom / Homework tab already chosen.
+  const tabs = AREA_TABS.map((t) => ({ key: t.key, label: t.label, href: assignHref({ studentId, area: t.key, context: params.context }) }));
+  const areaTabs = <LinkTabs label="What to assign" active={params.area} tabs={tabs} />;
   const itemLabel = presetTest
     ? nameWithSource(presetTest.name, presetTest.source?.name ?? "No source")
     : presetSet
@@ -126,13 +129,24 @@ export async function AssignView({ studentId, query }: { studentId: string | nul
           ) : !student ? (
             "Choose the student in the title above."
           ) : (
-            "1. Choose the student · 2. Check what they have done · 3. Choose practice sets or Tests · 4. Set a due date"
+            "Follow the steps from top to bottom."
           )
         }
       />
-      <LinkTabs label="What to assign" active={params.area} tabs={tabs} />
+      {/* No student yet: only the area tabs (the steps start once a student is chosen). */}
+      {student ? null : areaTabs}
     </>
   );
+  // Steps 1–2 (the rest is in the form): the student (the name in the title) and what they have done.
+  const firstSteps = (overview: StudentOverview | undefined, focus: "practice" | "tests") =>
+    student ? (
+      <div className="mb-6 space-y-6">
+        <AssignStep n={1} title="Choose the student" hint={<>Assigning to <b className="font-medium text-[var(--sat-text)]">{student.name}</b>. Open the name in the title to pick another student.</>} />
+        <AssignStep n={2} title={`Check what ${student.name.split(" ")[0]} has done`}>
+          {overview ? <StudentDonePanel overview={overview} studentId={student.id} focus={focus} /> : <p className="text-sm text-[var(--sat-muted)]">Nothing done yet.</p>}
+        </AssignStep>
+      </div>
+    ) : null;
 
   // ------------------------------------------------------------ No student yet (from a Test / Practice Set)
   if (!student) {
@@ -180,8 +194,9 @@ export async function AssignView({ studentId, query }: { studentId: string | nul
       <PageShell>
         {header(Boolean(editingExam))}
         {presetTest && presetRow && !editingExam ? <Alert tone="info" className="mb-3">{first} already took {presetTest.name}; they can retake it from their Tests page.</Alert> : null}
-        {overview ? <StudentDonePanel overview={overview} studentId={student.id} focus="tests" /> : null}
+        {firstSteps(overview, "tests")}
         <AssignTestForm
+          areaTabs={areaTabs}
           editing={
             editingExam && presetRow
               ? {
@@ -272,8 +287,10 @@ export async function AssignView({ studentId, query }: { studentId: string | nul
           <Link href={`/teacher/students/${student.id}?area=${params.area}`} className="font-medium underline">See their results</Link>
         </Alert>
       ) : null}
-      {overview ? <StudentDonePanel overview={overview} studentId={student.id} focus="practice" /> : null}
+      {firstSteps(overview, "practice")}
       <AssignForm
+        areaTabs={areaTabs}
+        initialContext={params.context}
         key={`${student.id}-${params.area}`}
         studentId={student.id}
         studentName={student.name}

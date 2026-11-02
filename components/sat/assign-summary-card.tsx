@@ -103,7 +103,7 @@ export function AssignSummaryCard({
             ? "Work in class: the student sees what they did, no scores; it never counts in reports."
             : context.value === "HOMEWORK"
               ? "Scored: results, reports and the next level count only Homework."
-              : "Choose Classroom or Homework above the sets."}
+              : "Choose Classroom or Homework in step 3."}
           {context.note ? ` ${context.note}` : ""}
         </p>
       ) : null}
