@@ -216,6 +216,12 @@ const SET_COLS = [
 ];
 
 /**
+ * A table with up to this many rows moves to the next page whole (title, head and rows) when it doesn't
+ * fit; a longer one breaks between rows (never inside one).
+ */
+const WHOLE_TABLE_ROWS = 12;
+
+/**
  * A long list as a flat run of unbreakable blocks (react-pdf moves a whole block to the next page;
  * nested wrappers or an outer box break that). The section heading and the column header travel with
  * the first block, so they are never left alone at the bottom of a page.
@@ -413,7 +419,7 @@ function PracticeSection({ report, groups }: { report: PracticeReport; groups: P
       ) : null}
       <SkillsByDifficulty report={report} />
 
-      <View style={s.section}>
+      <View style={s.section} wrap={report.assignments.length > WHOLE_TABLE_ROWS}>
         <Heading title={`Active practice sets (${report.assignments.length})`} />
         <View style={s.table}>
           {report.assignments.length === 0 ? (
@@ -437,7 +443,7 @@ function PracticeSection({ report, groups }: { report: PracticeReport; groups: P
       </View>
 
       {report.comments.length > 0 ? (
-        <View style={s.section}>
+        <View style={s.section} wrap={report.comments.length > WHOLE_TABLE_ROWS}>
           <Heading title="Teacher comments" />
           <View style={s.table}>
             {report.comments.map((c) => (
@@ -658,8 +664,9 @@ function TestsSection({ report, tests, groups }: { report: MockReport; tests: St
           <View style={s.table}><Text style={s.empty}>No tests assigned yet.</Text></View>
         ) : (
           byTestNumber(tests).map((number) => (
-            <View key={number.label}>
-              <Text style={[s.bold, { fontSize: 9.5, marginBottom: 4, marginTop: 2 }]} minPresenceAhead={60}>
+            // "TEST N" travels with its cards: a group that doesn't fit moves whole to the next page.
+            <View key={number.label} wrap={false}>
+              <Text style={[s.bold, { fontSize: 9.5, marginBottom: 4, marginTop: 2 }]}>
                 {number.label} <Text style={s.tiny}>· {number.items.map((t) => t.sourceName).join(" · ")}</Text>
               </Text>
               {number.items.map((item) => <TestCardPdf key={item.assignmentId} item={item} />)}
@@ -670,7 +677,7 @@ function TestsSection({ report, tests, groups }: { report: MockReport; tests: St
 
       <TestAttemptsPdf groups={groups} />
 
-      <View style={s.section}>
+      <View style={s.section} wrap={report.activeExams.length > WHOLE_TABLE_ROWS}>
         <Heading title={`Active tests (${report.activeExams.length})`} />
         <View style={s.table}>
           {report.activeExams.length === 0 ? (
