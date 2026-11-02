@@ -71,7 +71,7 @@ L.run(async () => {
   await page.getByRole("dialog").waitFor();
 
   // The view after assigning: what Lucía already has is grayed / stamped.
-  await L.go(page, `/teacher/students/${D.userId(A.lucia.email)}/assign?area=math`);
+  await L.go(page, `/teacher/students/${D.userId(A.lucia.email)}/assign?area=math&context=HOMEWORK`);
   const skill = await openSkill(page, { skill: "Linear Equations in One Variable" });
   await L.shot(page, "teacher-assign-already-assigned", skill);
   console.log("assign ok");
