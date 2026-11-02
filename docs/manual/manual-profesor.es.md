@@ -200,7 +200,7 @@ El intento queda en el historial tachado como **Not counted** y no cuenta en pun
 
 ## 9. Tests
 
-**Tests** agrupa los SAT completos por número (**TEST N**) con una versión por fuente. Junto a cada TEST N se ven, como etiquetas, las fuentes que lo tienen; cada versión se llama por su fuente (**Innovator Test 1**). Aparecen todos los números, del TEST 1 al más alto: si ninguna fuente tiene un número, se ve como **TEST N —** (en la imagen, **TEST 9**). Cada Test tiene 4 módulos (R&W 1 y 2, Math 1 y 2). **How scores work** explica cómo se calculan los puntajes.
+**Tests** agrupa los SAT completos por número (**TEST N**) con una versión por fuente. Cada versión se llama por su fuente (**Innovator Test 1**). Aparecen todos los números, del TEST 1 al más alto: si ninguna fuente tiene un número, se ve como **TEST N —** (en la imagen, **TEST 9**). Cada Test tiene 4 módulos (R&W 1 y 2, Math 1 y 2). **How scores work** explica cómo se calculan los puntajes.
 
 ![Tests](img/teacher-tests.png)
 

@@ -1,7 +1,6 @@
 import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AssignedStamp } from "@/components/sat/assigned-stamp";
-import { SourceTag } from "@/components/sat/source-tag";
 
 /** One version of a Test (one source) to show inside its "TEST N" accordion. */
 export interface TestVersionItem {
@@ -61,18 +60,11 @@ export function TestNumberAccordion({
       {groupTestVersions(items).map((group) => {
         const open = group.versions.some((version) => version.open);
         const real = group.versions.filter((version) => !version.empty);
-        const sources = [...new Set(real.map((version) => version.sourceName))];
+        const sources = real.map((version) => version.sourceName);
         const allAssigned = real.length > 0 && real.every((version) => version.assigned);
         const title = group.number === null ? "Other tests" : `TEST ${group.number}`;
-        // Which sources have this TEST N, as tags; none yet: "—" (opens to each source's "+ Import TEST N").
-        const versionsText =
-          real.length === 0 ? (
-            <span className="text-xs text-gray-500">—</span>
-          ) : (
-            <span className="inline-flex flex-wrap items-center gap-1.5">
-              {sources.map((source) => <SourceTag key={source} name={source} prominent />)}
-            </span>
-          );
+        // No source has this TEST N yet: "—" (opens to each source's "+ Import TEST N").
+        const versionsText = real.length === 0 ? "—" : `${real.length} version${real.length === 1 ? "" : "s"} · ${sources.join(" · ")}`;
         if (allAssigned) {
           // Every source of this TEST N is assigned: a fixed row with the stamp (nothing to open or
           // pick). Same box and paddings as the accordion header; the chevron's place is kept.
@@ -81,7 +73,7 @@ export function TestNumberAccordion({
               <div className={cn("flex flex-wrap items-center gap-x-3 gap-y-1", compact ? "px-3 py-2" : "px-4 py-3")}>
                 <span aria-hidden className="w-4 shrink-0" />
                 <span className="font-bold text-[var(--sat-tests-ink)]">{title}</span>
-                {versionsText}
+                <span className="text-xs text-gray-500">{versionsText}</span>
               </div>
               <AssignedStamp placement="end" />
             </div>
@@ -97,17 +89,12 @@ export function TestNumberAccordion({
             >
               <ChevronRight aria-hidden size={16} className="shrink-0 text-[var(--sat-blank)] transition-transform group-open:rotate-90" />
               <span className="font-bold text-[var(--sat-tests-ink)]">{title}</span>
-              {versionsText}
+              <span className="text-xs text-gray-500">{versionsText}</span>
             </summary>
             <div className={cn("space-y-4 border-t border-[var(--sat-border)] bg-[var(--sat-surface-2)]", compact ? "p-2.5" : "p-3")}>
               {group.versions.map((version) => (
                 <section key={version.key} className="space-y-1.5">
-                  {/* A version's own card / row is titled "<Source> Test N"; a source's empty slot says which source. */}
-                  {version.empty ? (
-                    <h3 className="flex items-center gap-2 text-sm font-semibold text-[var(--sat-text)]">
-                      <SourceTag name={version.sourceName} prominent />
-                    </h3>
-                  ) : null}
+                  <h3 className="text-[13px] font-semibold text-gray-600">{version.sourceName}</h3>
                   {version.node}
                 </section>
               ))}
