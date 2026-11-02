@@ -14,10 +14,12 @@ export interface PracticeTry {
   id: string;
   tryNumber: number;
   submittedAt: Date;
+  /** Classroom: never scored (correct 0, pct null); `answered` is what it shows. */
   correct: number;
   total: number;
   pct: number | null;
   time: number | null;
+  answered: number;
 }
 
 export interface PracticeSetItem {
@@ -46,6 +48,10 @@ export interface PracticeSetItem {
   openAnswered: number | null;
   /** A finished set the student is trying again: it stays "done" (Completed), with this open try. */
   retryOpen: boolean;
+  /** Classroom (in class, no scores) or Homework (scored). */
+  context: "CLASSROOM" | "HOMEWORK";
+  /** Classroom work whose set was then assigned as Homework: closed (no retry; the Homework goes on). */
+  closedByHomework: boolean;
   questionCount: number;
 }
 
@@ -91,11 +97,13 @@ export async function loadStudentPractice(studentId: string): Promise<PracticeSe
     },
     orderBy: [{ dueDate: "asc" }, { createdAt: "desc" }],
   });
+  const homeworkSets = new Set(assignments.filter((a) => a.context === "HOMEWORK").map((a) => a.practiceSetId));
   return assignments
     .map((a): PracticeSetItem | null => {
       const area = a.practiceSet.topic.domain.practiceArea as PracticeAreaCode | null;
       if (!area) return null;
       const submitted = a.attempts.filter((t) => t.status === "SUBMITTED");
+      const classroom = a.context === "CLASSROOM";
       const tries: PracticeTry[] = submitted.map((t, i) => {
         const s = summarizeAllQuestionAnswers(t.answers);
         const total = Math.max(s.total, a.practiceSet._count.questions);
@@ -103,10 +111,12 @@ export async function loadStudentPractice(studentId: string): Promise<PracticeSe
           id: t.id,
           tryNumber: i + 1,
           submittedAt: t.submittedAt ?? t.startedAt,
-          correct: s.correct,
+          // Classroom work is never scored (pendiente-p2.md).
+          correct: classroom ? 0 : s.correct,
           total,
-          pct: t.scorePercent ?? (total ? Math.round((s.correct / total) * 100) : null),
+          pct: classroom ? null : t.scorePercent ?? (total ? Math.round((s.correct / total) * 100) : null),
           time: t.totalTime,
+          answered: t.answers.filter((x) => x.answer && x.answer.trim()).length,
         };
       });
       const open = a.attempts.find((t) => t.status === "IN_PROGRESS");
@@ -136,6 +146,8 @@ export async function loadStudentPractice(studentId: string): Promise<PracticeSe
         last,
         openAnswered: open ? open.answers.filter((x) => x.answer && x.answer.trim()).length : null,
         retryOpen: finished && Boolean(open),
+        context: classroom ? "CLASSROOM" : "HOMEWORK",
+        closedByHomework: classroom && homeworkSets.has(a.practiceSetId),
         questionCount: a.practiceSet._count.questions,
       };
     })

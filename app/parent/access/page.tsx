@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SCORED_PRACTICE_ATTEMPT_WHERE } from "@/lib/assignment-context";
 import prisma from "@/lib/prisma";
 import { formatDate } from "@/lib/utils";
 import { summarizeAllQuestionAnswers } from "@/lib/weighted-score";
@@ -67,7 +68,8 @@ export default async function ParentTemporaryAccessPage({ searchParams }: PagePr
       student: {
         include: {
           attempts: {
-            where: { status: "SUBMITTED" },
+            // Parents see Homework only (Classroom work is never scored nor reported).
+            where: SCORED_PRACTICE_ATTEMPT_WHERE,
             include: {
               answers: true,
               assignment: { include: { practiceSet: { include: { source: { select: { name: true, sortOrder: true } }, topic: { include: { domain: { include: { section: true } } } } } } } },

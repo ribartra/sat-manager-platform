@@ -1,4 +1,5 @@
 import { ChevronCell, LinkTr, RowLink, SimpleTable, TD } from "@/components/sat/link-table";
+import { ContextTag } from "@/components/sat/context-tag";
 import { AreaTag } from "@/components/sat/practice-set-row";
 import { SourceTag } from "@/components/sat/source-tag";
 import { StudentCell } from "@/components/sat/teacher-ui";
@@ -60,6 +61,7 @@ export function PendingTable({ rows, show, hrefFor }: { rows: PendingRow[]; show
               <RowLink href={hrefFor(r)}>{r.title}</RowLink>
               {r.difficulty ? <Badge variant={difficultyBadgeVariant(r.difficulty)}>{difficultyLabel(r.difficulty)}</Badge> : null}
               <SourceTag name={r.sourceName} unlessIn={r.title} />
+              {r.context ? <ContextTag context={r.context} /> : null}
             </span>
           </td>
           {show.status ? (

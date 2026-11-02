@@ -3,6 +3,7 @@ import { notifyUser } from "@/lib/notifications";
 import { shortSetName } from "@/lib/student-report";
 import { isUniqueConstraintError } from "@/lib/db-errors";
 import { ACTIVE_SOURCE_WHERE } from "@/lib/content-source";
+import { SCORED_CONTEXT } from "@/lib/assignment-context";
 
 const DIFFICULTY_ORDER = ["EASY", "MEDIUM", "HARD"];
 
@@ -12,9 +13,10 @@ interface ProgressionInput {
   scorePercent: number;
 }
 
+/** The next level opens as Homework (only Homework scores open it; Classroom never does). */
 async function ensureUnlockedAssignment(studentId: string, practiceSetId: string, reason: string) {
   const existing = await prisma.assignment.findFirst({
-    where: { studentId, practiceSetId },
+    where: { studentId, practiceSetId, context: SCORED_CONTEXT },
     include: { practiceSet: true },
   });
 
@@ -78,6 +80,7 @@ async function ensureUnlockedAssignment(studentId: string, practiceSetId: string
         unlockAt: new Date(),
         locked: false,
         status: "PENDING",
+        context: SCORED_CONTEXT,
       },
     });
   } catch (error) {

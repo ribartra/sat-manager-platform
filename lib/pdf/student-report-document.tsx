@@ -216,6 +216,12 @@ const SET_COLS = [
 ];
 
 /**
+ * A table with up to this many rows moves to the next page whole (title, head and rows) when it doesn't
+ * fit; a longer one breaks between rows (never inside one).
+ */
+const WHOLE_TABLE_ROWS = 12;
+
+/**
  * A long list as a flat run of unbreakable blocks (react-pdf moves a whole block to the next page;
  * nested wrappers or an outer box break that). The section heading and the column header travel with
  * the first block, so they are never left alone at the bottom of a page.
@@ -320,10 +326,14 @@ function SkillsByDifficulty({ report }: { report: PracticeReport }) {
 function TryRow({ t, tryCount }: { t: PdfPracticeTry; tryCount: number }) {
   return (
     <View style={[s.tr, { backgroundColor: GRAY[50] }]}>
-      <Text style={[s.td, s.muted, { flex: SET_COLS[0].flex, paddingLeft: 18, fontSize: 8 }]}>
-        Try {t.tryNumber} of {tryCount}
-        {t.status === "INVALIDATED" ? " · not counted" : ""}
-      </Text>
+      {/* The indent is a margin inside the cell: a wider padding would take width from the other columns
+          and shift them away from their titles. */}
+      <View style={[s.td, { flex: SET_COLS[0].flex }]}>
+        <Text style={[s.muted, { marginLeft: 12, fontSize: 8 }]}>
+          Try {t.tryNumber} of {tryCount}
+          {t.status === "INVALIDATED" ? " · not counted" : ""}
+        </Text>
+      </View>
       <Text style={[s.td, { flex: SET_COLS[1].flex, fontSize: 8 }]}>
         <Text style={{ color: band(t.pct).text }}>{t.pct !== null ? `${t.pct}%` : "-"}</Text>
         {t.change !== null && t.change !== undefined ? <Text style={[s.tiny, { color: t.change >= 0 ? "#16a34a" : "#dc2626" }]}> {change(t.change)}</Text> : null}
@@ -409,7 +419,7 @@ function PracticeSection({ report, groups }: { report: PracticeReport; groups: P
       ) : null}
       <SkillsByDifficulty report={report} />
 
-      <View style={s.section}>
+      <View style={s.section} wrap={report.assignments.length > WHOLE_TABLE_ROWS}>
         <Heading title={`Active practice sets (${report.assignments.length})`} />
         <View style={s.table}>
           {report.assignments.length === 0 ? (
@@ -433,7 +443,7 @@ function PracticeSection({ report, groups }: { report: PracticeReport; groups: P
       </View>
 
       {report.comments.length > 0 ? (
-        <View style={s.section}>
+        <View style={s.section} wrap={report.comments.length > WHOLE_TABLE_ROWS}>
           <Heading title="Teacher comments" />
           <View style={s.table}>
             {report.comments.map((c) => (
@@ -567,10 +577,12 @@ function TestAttemptsPdf({ groups }: { groups: PdfTestGroup[] }) {
             const sc = tryScores(t);
             return (
               <View key={t.id} style={[s.tr, { backgroundColor: GRAY[50] }]}>
-                <Text style={[s.td, s.muted, { flex: TRY_COLS[0].flex, paddingLeft: 18, fontSize: 8 }]}>
-                  Try {t.tryNumber} of {group.tryCount}
-                  {t.status === "INVALIDATED" ? " · not counted" : t.status === "IN_PROGRESS" ? " · in progress" : ""}
-                </Text>
+                <View style={[s.td, { flex: TRY_COLS[0].flex }]}>
+                  <Text style={[s.muted, { marginLeft: 12, fontSize: 8 }]}>
+                    Try {t.tryNumber} of {group.tryCount}
+                    {t.status === "INVALIDATED" ? " · not counted" : t.status === "IN_PROGRESS" ? " · in progress" : ""}
+                  </Text>
+                </View>
                 <Text style={[s.td, { flex: TRY_COLS[1].flex, textAlign: "right", fontSize: 8 }]}>{sc.rw}</Text>
                 <Text style={[s.td, { flex: TRY_COLS[2].flex, textAlign: "right", fontSize: 8 }]}>{sc.math}</Text>
                 <Text style={[s.td, { flex: TRY_COLS[3].flex, textAlign: "right", fontSize: 8 }]}>{sc.total}</Text>
@@ -652,8 +664,9 @@ function TestsSection({ report, tests, groups }: { report: MockReport; tests: St
           <View style={s.table}><Text style={s.empty}>No tests assigned yet.</Text></View>
         ) : (
           byTestNumber(tests).map((number) => (
-            <View key={number.label}>
-              <Text style={[s.bold, { fontSize: 9.5, marginBottom: 4, marginTop: 2 }]} minPresenceAhead={60}>
+            // "TEST N" travels with its cards: a group that doesn't fit moves whole to the next page.
+            <View key={number.label} wrap={false}>
+              <Text style={[s.bold, { fontSize: 9.5, marginBottom: 4, marginTop: 2 }]}>
                 {number.label} <Text style={s.tiny}>· {number.items.map((t) => t.sourceName).join(" · ")}</Text>
               </Text>
               {number.items.map((item) => <TestCardPdf key={item.assignmentId} item={item} />)}
@@ -664,7 +677,7 @@ function TestsSection({ report, tests, groups }: { report: MockReport; tests: St
 
       <TestAttemptsPdf groups={groups} />
 
-      <View style={s.section}>
+      <View style={s.section} wrap={report.activeExams.length > WHOLE_TABLE_ROWS}>
         <Heading title={`Active tests (${report.activeExams.length})`} />
         <View style={s.table}>
           {report.activeExams.length === 0 ? (

@@ -345,6 +345,9 @@ model Assignment {
   feedbackMode  String    @default("AFTER_SET")
   /// Per-student choice: explanations are shown in the player (after Check). Default on.
   showExplanations Boolean @default(true)
+  /// CLASSROOM (work in class: no scores, never in reports) | HOMEWORK (scored; what reports count).
+  /// Fixed once assigned; a set can have one assignment per context (lib/assignment-context.ts).
+  context       String    @default("HOMEWORK")
   createdAt     DateTime  @default(now())
 
   practiceSet PracticeSet @relation(fields: [practiceSetId], references: [id])
@@ -352,7 +355,7 @@ model Assignment {
   attempts    Attempt[]
   unlockRequests UnlockRequest[]
 
-  @@unique([studentId, practiceSetId])
+  @@unique([studentId, practiceSetId, context])
   @@index([status, dueDate])
   @@index([locked, unlockAt])
 }

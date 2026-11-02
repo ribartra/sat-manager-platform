@@ -123,6 +123,24 @@ The **Assign** view is the same for practice and Tests. Open it from **Assign** 
 
 > **Automatic level progression:** when the student passes a level, the platform may assign the next one by itself (for example Medium after Easy), with no due date. You'll see it in their active sets and in **Pending**.
 
+### Classroom and Homework
+
+Every practice set is assigned as **Classroom** (work in class) or **Homework**. You choose it with the **Classroom · Homework** tabs above the sets: none is chosen at first and the sets appear once you pick one. The tab filters the sets (grayed out: what the student already has in that context) and the summary shows it under **Context**; **Assign** stays disabled until you choose.
+
+- **Classroom** shows what the student did (status and "k of N answered"), **never a percentage**. It doesn't count in results, the PDF report, the parents' view or the auto-open of the next level.
+- **Homework** is the evaluation: it is scored and it is the only practice that results and reports count.
+- One set can be assigned once as Classroom and once as Homework. Assigning as **Homework** a set the student started in class **closes** the class work: it is saved as it is, with no score, and can't be continued. Homework **starts from zero**.
+- Once a set is **Homework** it can't be Classroom work any more: in the Classroom tab it is grayed out with the **In Homework** stamp, and the student keeps trying it only as Homework.
+- The context can't be changed later: **Edit** only changes dates and options.
+
+![Choosing Classroom or Homework](img/teacher-assign-context.png)
+
+On the student's page (Math, Reading, Writing) the **All · Classroom · Homework** selector filters what you see. In **All**, a level shows the Homework percentage when there is one; if it was done only in class it shows "Class · k/N". **History** has a **Context** filter.
+
+![All, Classroom and Homework on the student's page](img/teacher-student-context.png)
+
+![History filtered by Classroom](img/teacher-history-context.png)
+
 ### What is already assigned
 
 - A set the student already has shows **grayed out and can't be picked again** (the student can retry it any time).

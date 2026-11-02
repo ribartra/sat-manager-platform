@@ -59,7 +59,9 @@ export function practiceSetGroups(sets: GroupableSet[], recentLimit = 3): Practi
           change: previous ? t.pct! - previous.pct! : null,
         };
       };
-      const lastIndex = Math.max(0, tries.findIndex((t) => t.status === "SUBMITTED"));
+      // Last Attempt = the last scored try (Classroom tries have no score); else the last submitted one.
+      const scoredIndex = tries.findIndex(counted);
+      const lastIndex = scoredIndex >= 0 ? scoredIndex : Math.max(0, tries.findIndex((t) => t.status === "SUBMITTED"));
       return {
         key: set.key,
         title: set.title,
@@ -83,17 +85,32 @@ export function practiceSetTitle(name: string, difficulty: string | null | undef
   return difficulty && !short.includes(`(${difficultyLabel(difficulty)})`) ? `${short} (${difficultyLabel(difficulty)})` : short;
 }
 
-/** Teacher report attempts (SUBMITTED + INVALIDATED), grouped by assignment. */
+/**
+ * Report attempts (SUBMITTED + INVALIDATED), one group per practice set. A set done in Classroom and
+ * as Homework is one row (All): its tries are numbered in the order they were taken, whatever the
+ * context (each context numbers its own tries, so a single-context view keeps the same numbers).
+ */
 export function setsFromReportAttempts(attempts: ReportAttempt[]): GroupableSet[] {
   const bySet = new Map<string, GroupableSet>();
   for (const a of attempts) {
-    const key = a.assignmentId ?? a.id;
+    const key = a.practiceSetId ?? a.assignmentId ?? a.id;
     const set =
       bySet.get(key) ??
       bySet
         .set(key, { key, title: practiceSetTitle(a.name, a.difficulty), tries: [], practiceSetId: a.practiceSetId, difficulty: a.difficulty, skillId: a.skillId, skillName: a.skillName, sourceName: a.sourceName, sourceOrder: a.sourceOrder })
         .get(key)!;
     set.tries.push({ id: a.id, tryNumber: a.attemptNumber ?? 1, submittedAt: a.submittedAt, correct: a.correct, total: a.total, pct: a.percent, time: a.totalTime, status: a.status });
+  }
+  const contextsBySet = new Map<string, Set<string>>();
+  for (const a of attempts) {
+    const key = a.practiceSetId ?? a.assignmentId ?? a.id;
+    (contextsBySet.get(key) ?? contextsBySet.set(key, new Set()).get(key)!).add(a.context ?? "HOMEWORK");
+  }
+  for (const set of bySet.values()) {
+    if ((contextsBySet.get(set.key)?.size ?? 0) < 2) continue;
+    [...set.tries]
+      .sort((x, y) => (x.submittedAt?.getTime() ?? 0) - (y.submittedAt?.getTime() ?? 0) || x.id.localeCompare(y.id))
+      .forEach((t, index) => { t.tryNumber = index + 1; });
   }
   return [...bySet.values()];
 }

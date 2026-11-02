@@ -68,6 +68,14 @@ export async function renderPracticePlayer({
       where: { id: assignmentId, studentId: userId, practiceSetId: setId, locked: false },
     }));
     if (!assignment || (assignment.unlockAt && assignment.unlockAt > new Date())) redirect("/student");
+    // Class work closed by its Homework can't be continued or retried: the set goes on as Homework.
+    if (assignment.context === "CLASSROOM") {
+      const homework = await withSqliteRetry(() => prisma.assignment.findFirst({
+        where: { studentId: userId, practiceSetId: setId, context: "HOMEWORK" },
+        select: { id: true },
+      }));
+      if (homework) redirect(`/student/practice/assignment/${homework.id}`);
+    }
   }
 
   const questions = practiceSet.questions.map((item) => ({
@@ -144,7 +152,8 @@ export async function renderPracticePlayer({
   let createdAttemptId: string | null = null;
   if (!attempt) {
     const prevAttempts = await withSqliteRetry(() => prisma.attempt.count({
-      where: { studentId: userId, practiceSetId: setId },
+      // Tries are numbered per assignment: Classroom and Homework of a set each start at Try 1.
+      where: { studentId: userId, practiceSetId: setId, assignmentId: assignmentId ?? null },
     }));
     try {
       const created = await withSqliteRetry(() => prisma.attempt.create({

@@ -4,6 +4,60 @@ import path from "node:path";
 const root = process.cwd();
 
 const checks = [
+  // Classroom / Homework (pendiente-p2.md): context chosen on every practice assignment, Classroom never
+  // scored nor reported, the next level only from Homework, one assignment per student × set × context.
+  {
+    file: "app/api/assignments/route.ts",
+    requires: ["isAssignmentContext(resolvedContext)", "Choose Classroom or Homework.", "closeClassroomAssignment("],
+    label: "Asignar practica exige Classroom/Homework; Homework cierra el Classroom del set",
+  },
+  {
+    file: "lib/assignments.ts",
+    requires: ["where: { studentId, practiceSetId, context }", "gradeAndSubmitPracticeAttempt(open", "CLASSROOM_CLOSED_BY_HOMEWORK"],
+    label: "Una asignacion por alumno × set × contexto; cerrar Classroom entrega el intento tal cual",
+  },
+  {
+    file: "lib/assignments.ts",
+    requires: ['if (homework) return { outcome: "blockedByHomework", assignmentId: null };'],
+    label: "Con Homework ya asignado, el set no se asigna ni se reabre como Classroom",
+  },
+  {
+    file: "app/(teacher)/teacher/students/[studentId]/assign/assign-form-client.tsx",
+    requires: ["<ContextToggle", "Choose Classroom or Homework to pick sets.", 'context === "CLASSROOM" ? ps.assignedIn.length > 0'],
+    label: "Assign: pestanas Classroom / Homework sobre los sets (nada elegido al abrir); en Classroom lo que es Homework no se elige",
+  },
+  {
+    file: "components/sat/assign-summary-card.tsx",
+    requires: ["contextLabel(context.value)"],
+    forbids: ['role="radiogroup"'],
+    label: "Summary de asignacion muestra la pestana elegida (solo lectura)",
+  },
+  {
+    file: "lib/student-report.ts",
+    requires: ['assignmentContextWhere(filters.context ?? "homework")', "submitted.filter(isHomework)", "classroom ? null"],
+    label: "Reporte de practica: por defecto Homework (PDF, padres); puntajes solo de Homework; Classroom sin %",
+  },
+  {
+    file: "lib/teacher-overview.ts",
+    requires: ["where: SCORED_PRACTICE_ATTEMPT_WHERE"],
+    label: "Resumen del profesor: promedios y skill mas debil solo de Homework",
+  },
+  ...["app/(parent)/parent/page.tsx", "app/parent/access/page.tsx"].map((file) => ({
+    file,
+    requires: ["SCORED_PRACTICE_ATTEMPT_WHERE"],
+    label: `Padres ven solo Homework: ${file}`,
+  })),
+  {
+    file: "lib/practice-progression.ts",
+    requires: ["context: SCORED_CONTEXT"],
+    label: "El siguiente nivel se abre como Homework",
+  },
+  {
+    file: "prisma/migrations/20261106_assignment_context/migration.sql",
+    requires: ['ADD COLUMN "context" TEXT NOT NULL DEFAULT \'HOMEWORK\'', '"Assignment_studentId_practiceSetId_context_key"'],
+    forbids: ["Attempt_one_open", "DROP TRIGGER", "UPDATE "],
+    label: "Migracion de contexto: solo esquema, conserva indices parciales y triggers",
+  },
   // Home is one view (SAT-036/037): no section tabs, inactivity + unlock requests, no low performance.
   {
     file: "app/(teacher)/teacher/page.tsx",
@@ -84,9 +138,16 @@ const checks = [
     requires: ["AsyncLocalStorage", "runExclusive(", "runShared(", 'property === "$transaction"'],
     label: "Transacciones exclusivas en la conexion unica (las escrituras de otras peticiones no entran en una transaccion ajena)",
   },
-  ...["app/api/attempts/[attemptId]/submit/route.ts", "lib/full-test-grading.ts"].map((file) => ({
+  // Practice grading lives in lib/practice-attempt-submit.ts (shared with "assign as Homework" closing Classroom).
+  {
+    file: "app/api/attempts/[attemptId]/submit/route.ts",
+    requires: ["gradeAndSubmitPracticeAttempt(", "notifyStudentTeachers(", "isScoredContext(attempt.assignment?.context)", "applyPracticeProgression"],
+    forbids: ["notifyTeachers("],
+    label: "Envio de practica: califica con la funcion compartida, avisa solo a sus profesores, progreso solo en Homework",
+  },
+  ...["lib/practice-attempt-submit.ts", "lib/full-test-grading.ts"].map((file) => ({
     file,
-    requires: [".$transaction(", 'status: "IN_PROGRESS" }', "AttemptAlreadyClosed", "notifyStudentTeachers(", 'status: { in: ["PENDING", "IN_PROGRESS", "OVERDUE"] }'],
+    requires: [".$transaction(", 'status: "IN_PROGRESS" }', "AttemptAlreadyClosed", ...(file.includes("full-test") ? ["notifyStudentTeachers("] : []), 'status: { in: ["PENDING", "IN_PROGRESS", "OVERDUE"] }'],
     forbids: ["notifyTeachers(", "prisma.attempt.update({\n      where: { id: attemptId }"],
     label: `Envio atomico e idempotente (una transicion IN_PROGRESS → SUBMITTED, avisos solo a sus profesores): ${file}`,
   })),
@@ -304,18 +365,18 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/assign/assign-view.tsx",
-    requires: ["assigned: assignmentBySet.has(ps.id)", "assigned: assignmentByTest.has(exam.id)"],
+    requires: ["assignedIn: contextsBySet.get(ps.id) ?? []", "assigned: assignmentByTest.has(exam.id)"],
     forbids: [".filter((ps) => !assignmentBySet.has(ps.id))", ".filter((exam) => !assignmentByTest.has(exam.id))"],
     label: "Assign: lo ya asignado se muestra (con sello), no se oculta ni sale como '—'",
   },
   {
     file: "components/sat/skills-map.tsx",
-    requires: ["if (chip.assigned) {", "disabled", "{chip.stamp ? <AssignedStamp /> : null}", "BLOCKED_SURFACE"],
+    requires: ["if (chip.assigned) {", "disabled", "{chip.stamp ? <AssignedStamp label={chip.assignedLabel} /> : null}", "BLOCKED_SURFACE"],
     label: "Chip asignado: deshabilitado, mismo tamano; sello solo si todo el nivel (todas las fuentes) esta asignado",
   },
   {
     file: "app/(teacher)/teacher/students/[studentId]/assign/assign-form-client.tsx",
-    requires: ["if (practiceSets.some((ps) => ps.id === id && ps.assigned)) return;", "assigned: true, stamp: true", "rows: toAssign.length === 0 ? undefined"],
+    requires: ["if (practiceSets.some((ps) => ps.id === id && isAssigned(ps))) return;", "ps.assignedIn.includes(context)", "assigned: true, stamp: true", "rows: toAssign.length === 0 ? undefined"],
     label: "Assign practice: un set asignado no se puede seleccionar ni desmarcar",
   },
   {
@@ -389,7 +450,7 @@ const checks = [
     label: "Teacher Test module table has a Total row",
   },
   {
-    file: "app/api/attempts/[attemptId]/submit/route.ts",
+    file: "lib/practice-attempt-submit.ts",
     requires: ["status: \"IN_PROGRESS\"", "practiceSetSnapshot", "questionSnapshot"],
     label: "Submit guarda snapshots y exige intento IN_PROGRESS",
   },
@@ -951,7 +1012,7 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/assign/assign-view.tsx",
-    requires: ["assigned: assignmentBySet.has(ps.id)", '["PENDING", "IN_PROGRESS"]', "studentAccessWhereFor", "assignableContentWhere"],
+    requires: ["assignedIn: contextsBySet.get(ps.id) ?? []", '["PENDING", "IN_PROGRESS"]', "studentAccessWhereFor", "assignableContentWhere"],
     label: "Assign practice: lo ya asignado se muestra con sello y no se selecciona; Edit solo cambia fechas de lo abierto",
   },
   {

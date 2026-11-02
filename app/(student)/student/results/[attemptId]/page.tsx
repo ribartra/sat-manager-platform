@@ -1,4 +1,5 @@
 import { Delta, InvalidatedNotice, PageHeader, PageShell, SectionHeader, VoidableValue } from "@/components/sat";
+import { ContextTag } from "@/components/sat/context-tag";
 import { PAGE_TITLE_CLASS } from "@/components/sat/page-shell";
 import { HEADER_ACTION_CLASS, HeaderActions } from "@/components/sat/header-actions";
 import { ReviewQuestionCard } from "@/components/sat/review-question-card";
@@ -105,6 +106,8 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
   const orderedAnswers = orderedQuestionIds.map((questionId) => answersMap[questionId]).filter(Boolean);
 
   const displayPct = pct;
+  // Classroom work is never scored (pendiente-p2.md): no %, no correct count; what was answered.
+  const classroom = attempt.assignment?.context === "CLASSROOM";
   const practiceArea = (practiceSet?.topic.domain.practiceArea ?? null) as PracticeAreaCode | null;
   const areaTab = practiceArea ? tabFromPracticeArea(practiceArea) : null;
   const allPractice = await loadStudentPractice(userId);
@@ -112,7 +115,7 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
   const tries = thisSet?.tries ?? [];
   const thisTry = tries.find((t) => t.id === attempt.id);
   const prevTry = thisTry ? tries[thisTry.tryNumber - 2] : undefined;
-  const delta = prevTry && prevTry.pct !== null ? displayPct - prevTry.pct : null;
+  const delta = !classroom && prevTry && prevTry.pct !== null ? displayPct - prevTry.pct : null;
   const nextAssignment = sortPracticeSets(allPractice.filter((p) => p.state !== "done" && p.assignmentId !== attempt.assignmentId && !p.locked))[0];
   const perQuestion = attempt.totalTime && totalQuestions ? Math.round(attempt.totalTime / totalQuestions) : null;
   const tryAgainHref = attempt.assignmentId ? `/student/practice/assignment/${attempt.assignmentId}?start=1` : "/student/practice";
@@ -159,7 +162,7 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
                 tries={tries.map((t) => ({
                   number: t.tryNumber,
                   href: `/student/results/${t.id}${returnQuery.toString() ? `?${returnQuery.toString()}` : ""}`,
-                  detail: [t.submittedAt ? formatDate(t.submittedAt) : null, t.pct !== null ? `${t.pct}%` : null].filter(Boolean).join(" · "),
+                  detail: [t.submittedAt ? formatDate(t.submittedAt) : null, t.pct !== null ? `${t.pct}%` : `${t.answered} of ${t.total} answered`].filter(Boolean).join(" · "),
                 }))}
               />
             </div>
@@ -179,7 +182,8 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
         }
         actions={
           <HeaderActions>
-            <Link href={tryAgainHref} className={HEADER_ACTION_CLASS}><RotateCcw size={14} aria-hidden /> Try Again</Link>
+            {/* Class work closed by its Homework: no retry here (the set goes on as Homework). */}
+            {thisSet?.closedByHomework ? null : <Link href={tryAgainHref} className={HEADER_ACTION_CLASS}><RotateCcw size={14} aria-hidden /> Try Again</Link>}
             {nextAssignment ? (
               <Link href={`/student/practice/assignment/${nextAssignment.assignmentId}`} className={`${HEADER_ACTION_CLASS} max-w-full`}>
                 <span className="truncate">Next: {nextAssignment.skill} · {difficultyLabel(nextAssignment.difficulty)}</span>
@@ -194,6 +198,19 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
         {/* Score */}
         <Card padding="lg" className="mb-6">
 
+          {classroom ? (
+            <div>
+              <p className="flex flex-wrap items-center gap-2 text-sm text-gray-700">
+                <ContextTag context="CLASSROOM" /> Work done in class: not scored.
+              </p>
+              <p className="mt-2 text-sm text-gray-700">
+                You answered <b>{answeredTotal} of {totalQuestions}</b> questions{unanswered ? <> and left <b>{unanswered} blank</b></> : null}.
+              </p>
+              <p className="mt-1 text-xs text-gray-500">
+                {attempt.totalTime ? <>{formatDuration(attempt.totalTime)} total{perQuestion ? ` · ${formatDuration(perQuestion)} per question on average` : ""}</> : null}
+              </p>
+            </div>
+          ) : (
           <div className="grid gap-5 md:grid-cols-[auto_1fr] md:items-center">
             <div>
               <p className={`text-5xl font-bold leading-none ${scoreBandTextClass(displayPct)}`}>
@@ -218,6 +235,7 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
               </p>
             </div>
           </div>
+          )}
 
           {attempt.pauses.length > 0 && (
             <Alert tone="note" className="mt-4 text-xs">
@@ -240,7 +258,7 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
               size="sm"
               title="Your answers at a glance"
               description="Each square is a question. Click one to see it."
-              action={<ResultFilterSegments counts={counts} />}
+              action={<ResultFilterSegments counts={counts} hideCounts={classroom} />}
             />
             <div className="mt-2">
               <AnswerGrid

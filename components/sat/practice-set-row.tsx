@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ContextTag } from "@/components/sat/context-tag";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DueLine, Pct, WorkStatusBadges } from "@/components/sat/work-status";
@@ -42,6 +43,7 @@ export function PracticeSetRow({
           <span className="font-semibold text-[var(--sat-text)]">{item.skill}</span>
           <Badge variant={difficultyBadgeVariant(item.difficulty)}>{difficultyLabel(item.difficulty)}</Badge>
           <WorkStatusBadges state={item.state} overdue={item.overdue} retryOpen={item.retryOpen} />
+          <ContextTag context={item.context} />
         </div>
         <DueLine
           assignedAt={item.assignedAt}
@@ -52,7 +54,13 @@ export function PracticeSetRow({
         />
         {item.tries.length > 0 ? (
           <p className="text-xs text-[var(--sat-muted)]">
-            {item.tries.length} attempt{item.tries.length === 1 ? "" : "s"} · last attempt <Pct value={item.last?.pct} className="font-semibold" />
+            {item.tries.length} attempt{item.tries.length === 1 ? "" : "s"} ·{" "}
+            {item.context === "CLASSROOM" ? (
+              // Classroom work is never scored: what was answered.
+              <>last attempt {item.last?.answered ?? 0} of {item.last?.total ?? item.questionCount} answered</>
+            ) : (
+              <>last attempt <Pct value={item.last?.pct} className="font-semibold" /></>
+            )}
             {item.retryOpen && item.openAnswered !== null ? ` · try ${item.tries.length + 1}: ${item.openAnswered} of ${item.questionCount} answered` : ""}
           </p>
         ) : item.openAnswered !== null ? (
@@ -65,7 +73,7 @@ export function PracticeSetRow({
             <Link href={resultHref(item.last.id)}>View results</Link>
           </Button>
         ) : null}
-        {readOnly ? null : item.locked ? (
+        {readOnly || item.closedByHomework ? null : item.locked ? (
           <Button size="sm" variant="secondary" disabledReason={notOpenReason(item.opensAt)}>{notOpenLabel(item.opensAt)}</Button>
         ) : item.state === "progress" || item.retryOpen ? (
           <Button asChild size="sm"><Link href={player}>Continue ›</Link></Button>

@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { getFeatureSetting } from "@/lib/app-settings";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import prisma, { atomicBatches } from "@/lib/prisma";
-import { ASSIGN_BATCH_SIZE, parseDueDate, resolveOpenDate, parseUnlockDate, upsertPracticeAssignment, type AssignmentOutcome } from "@/lib/assignments";
+import { ASSIGN_BATCH_SIZE, closeClassroomAssignment, parseDueDate, resolveOpenDate, parseUnlockDate, upsertPracticeAssignment, type PracticeAssignmentOutcome } from "@/lib/assignments";
 import { contentScopeFor, studentAccessWhereFor } from "@/lib/program-scope";
-import { BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
+import { BadRequestError, ForbiddenError, NotFoundError, ValidationError, withApiErrors } from "@/lib/api-error";
+import { isAssignmentContext } from "@/lib/assignment-context";
 import { writeAudit } from "@/lib/audit";
 import { ACTIVE_SOURCE_WHERE } from "@/lib/content-source";
 
@@ -14,7 +15,12 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
     return new ForbiddenError("Forbidden").toResponse();
   }
 
-  const { studentIds, practiceSetIds, dueDate, unlockAt, locked, sourceGroupId, feedbackMode, showExplanations } = await req.json();
+  const { studentIds, practiceSetIds, dueDate, unlockAt, locked, sourceGroupId, feedbackMode, showExplanations, context } = await req.json();
+  // Classroom or Homework is always chosen by the teacher (no default); group rules are Homework.
+  const resolvedContext = sourceGroupId ? "HOMEWORK" : context;
+  if (!isAssignmentContext(resolvedContext)) {
+    return new ValidationError("Choose Classroom or Homework.", ["context"]).toResponse();
+  }
   // "Show explanations in the player" (per student; on unless explicitly turned off).
   const resolvedShowExplanations = showExplanations !== false;
   const resolvedFeedbackMode = feedbackMode === "IMMEDIATE" ? "IMMEDIATE" : "AFTER_SET";
@@ -126,7 +132,7 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
   // Assigning again never duplicates: pending assignments get the new settings,
   // completed/overdue ones are reopened (see upsertPracticeAssignment).
   // Written in batches of ASSIGN_BATCH_SIZE pairs per transaction (assignment, notification, audit).
-  const counts: Record<AssignmentOutcome, number> = { created: 0, updated: 0, reassigned: 0, unchanged: 0 };
+  const counts: Record<PracticeAssignmentOutcome, number> = { created: 0, updated: 0, reassigned: 0, unchanged: 0, blockedByHomework: 0 };
   const setNames = new Map(publishedPracticeSets.map((set) => [set.id, set.name]));
   const pairs = requestedStudentIds.flatMap((studentId) => requestedPracticeSetIds.map((practiceSetId) => ({ studentId, practiceSetId })));
   await atomicBatches(pairs, ASSIGN_BATCH_SIZE, async ({ studentId, practiceSetId }) => {
@@ -140,11 +146,20 @@ export const POST = withApiErrors(async function POST(req: NextRequest) {
       locked: resolvedLocked,
       feedbackMode: resolvedFeedbackMode,
       showExplanations: resolvedShowExplanations,
+      context: resolvedContext,
       sourceGroupId: sourceGroupId ?? null,
     });
     counts[outcome] += 1;
   });
 
+  // Homework of a set closes the student's Classroom work on it (submitted as it is, no score shown).
+  let classroomClosed = 0;
+  if (resolvedContext === "HOMEWORK") {
+    for (const { studentId, practiceSetId } of pairs) {
+      if (await closeClassroomAssignment({ studentId, practiceSetId, closedById: session.user.id })) classroomClosed += 1;
+    }
+  }
+
   // `skipped` kept for older clients: assignments that needed no change.
-  return NextResponse.json({ ...counts, skipped: counts.unchanged });
+  return NextResponse.json({ ...counts, skipped: counts.unchanged, classroomClosed });
 });

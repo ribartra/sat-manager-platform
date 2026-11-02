@@ -84,7 +84,8 @@ export function PracticeAttemptsTable({
           </td>
           <td className={TD}><VoidableValue status={r.status}><Pct value={r.pct} className="font-semibold" /></VoidableValue></td>
           {withChange ? <td className={TD}>{r.change !== null && r.change !== undefined ? <Delta value={r.change} unit="%" /> : <span className="text-gray-300">—</span>}</td> : null}
-          <td className={TD}>{r.correct} of {r.total}</td>
+          {/* No score (Classroom work): no correct count either. */}
+          <td className={TD}>{r.pct === null ? <span className="text-gray-400">—</span> : <>{r.correct} of {r.total}</>}</td>
           <td className={`${TD} text-gray-600`}>{r.time ? formatDuration(r.time) : "—"}</td>
           {r.id === viewingId || !hrefFor ? null : <ChevronCell />}
         </AttemptTr>
@@ -266,7 +267,7 @@ function PracticeSetRows({ sets, hrefFor, historyHref, recentLimit = 3 }: Practi
             <VoidableValue status={set.last.status}><Pct value={set.last.pct} className="font-semibold" /></VoidableValue>
             {set.last.change !== null && set.last.change !== undefined ? <Delta value={set.last.change} unit="%" className="ml-1.5" /> : null}
           </span>,
-          <>{set.last.correct} of {set.last.total}</>,
+          set.last.pct === null ? <span key="c" className="text-gray-400">—</span> : <>{set.last.correct} of {set.last.total}</>,
           <span key="t" className="text-gray-600">{set.last.time ? formatDuration(set.last.time) : "—"}</span>,
           <span key="d" className="text-gray-600">{set.last.submittedAt ? formatDate(set.last.submittedAt) : "—"}</span>,
         ],

@@ -52,6 +52,8 @@ export interface SkillsMapChip {
    * "ALREADY ASSIGNED" stamp is laid over it. A single assigned set among others is only disabled.
    */
   stamp?: boolean;
+  /** With `assigned`: why it is taken, instead of "Already assigned" (e.g. "In Homework"). */
+  assignedLabel?: string;
 }
 
 export interface SkillsMapSkill {
@@ -116,6 +118,8 @@ export interface SkillsSourceSkill extends SkillsMapSkill {
 }
 
 const SOURCE_GRID = "sm:grid sm:grid-cols-[minmax(8rem,1fr)_auto] sm:items-center sm:gap-2";
+/** A skill's chips end where its source rows' chips end (the source panel has a 0.75rem inner padding). */
+const SKILL_CHIPS_RIGHT = "flex flex-wrap items-center gap-1.5 sm:pr-3";
 
 /**
  * Teacher catalogue by skill: the SkillsMap card per domain (one row per skill, Easy / Medium / Hard
@@ -148,7 +152,7 @@ export function SkillsSourceMap({
                     <p className="text-sm font-semibold text-gray-900">{skill.name}</p>
                     <p className="text-xs text-gray-500">{skill.sub}</p>
                   </div>
-                  <div className="flex flex-wrap items-center gap-1.5">
+                  <div className={SKILL_CHIPS_RIGHT}>
                     {skill.chips.map((chip) => <SkillChip key={chip.difficulty} chip={chip} />)}
                     {skill.action}
                   </div>
@@ -163,7 +167,7 @@ export function SkillsSourceMap({
                       <p className="text-xs text-gray-500">{skill.sub}</p>
                     </div>
                   </div>
-                  <div className="flex flex-wrap items-center gap-1.5">
+                  <div className={SKILL_CHIPS_RIGHT}>
                     {skill.chips.map((chip) => <SkillChip key={chip.difficulty} chip={chip} />)}
                     {skill.action}
                   </div>
@@ -192,8 +196,11 @@ export function SkillsSourceMap({
   );
 }
 
-/** Mockup `.chip`: 5px 10px, radius 8, 12px/600, slate border. */
-export const SKILL_CHIP_CLASS = "inline-flex items-center gap-1.5 rounded-lg border border-[var(--sat-border)] px-2.5 py-[5px] text-xs font-semibold";
+/**
+ * Mockup `.chip`: 5px 10px, radius 8, 12px/600, slate border. From sm up, one minimum width with the content centred,
+ * so Easy / Medium / Hard line up in columns whatever each chip says ("1 set", "18 Q", "—").
+ */
+export const SKILL_CHIP_CLASS = "inline-flex items-center sm:min-w-[7.5rem] justify-center gap-1.5 rounded-lg border border-[var(--sat-border)] px-2.5 py-[5px] text-xs font-semibold";
 
 function SkillChip({ chip }: { chip: SkillsMapChip }) {
   if (chip.render) return <>{chip.render}</>;
@@ -205,8 +212,8 @@ function SkillChip({ chip }: { chip: SkillsMapChip }) {
       <button
         type="button"
         disabled
-        aria-label={`${chip.title ?? difficultyLabel(chip.difficulty)} · ${ASSIGNED_LABEL}`}
-        title={`${ASSIGNED_LABEL}${chip.title ? ` · ${chip.title}` : ""}`}
+        aria-label={`${chip.title ?? difficultyLabel(chip.difficulty)} · ${chip.assignedLabel ?? ASSIGNED_LABEL}`}
+        title={`${chip.assignedLabel ?? ASSIGNED_LABEL}${chip.title ? ` · ${chip.title}` : ""}`}
         className={cn(SKILL_CHIP_CLASS, "relative bg-white text-[var(--sat-text)]", BLOCKED_SURFACE)}
       >
         {/* A single assigned set: grayed and disabled (the stamp is only for levels every source covers). */}
@@ -215,7 +222,7 @@ function SkillChip({ chip }: { chip: SkillsMapChip }) {
         </span>
         {chip.label ? <span>{chip.label}</span> : null}
         {chip.extra}
-        {chip.stamp ? <AssignedStamp /> : null}
+        {chip.stamp ? <AssignedStamp label={chip.assignedLabel} /> : null}
       </button>
     );
   }

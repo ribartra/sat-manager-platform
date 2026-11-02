@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
  */
 export const ASSIGNED_LABEL = "Already assigned";
 
-export function AssignedStamp({ placement = "edge" }: { placement?: "edge" | "end" }) {
+export function AssignedStamp({ placement = "edge", label = ASSIGNED_LABEL }: { placement?: "edge" | "end"; label?: string }) {
   return (
     <span aria-hidden className="pointer-events-none absolute inset-0 rounded-[inherit] bg-white/45">
       <span
@@ -19,7 +19,7 @@ export function AssignedStamp({ placement = "edge" }: { placement?: "edge" | "en
           placement === "edge" ? "left-1/2 top-0 -translate-x-1/2 -translate-y-1/2" : "right-3 top-1/2 -translate-y-1/2",
         )}
       >
-        {ASSIGNED_LABEL}
+        {label}
       </span>
     </span>
   );

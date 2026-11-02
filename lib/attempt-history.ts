@@ -50,6 +50,9 @@ export interface HistoryRow {
   modulesDone: number | null;
   /** Practice: % points; Test: { rw, math } points; vs. the previous counted try. */
   change: number | null;
+  /** Practice: Classroom (never scored: pct/correct null, `answered` shown) or Homework. */
+  context: "CLASSROOM" | "HOMEWORK" | null;
+  answered: number | null;
   changeRw: number | null;
   changeMath: number | null;
 }
@@ -67,13 +70,15 @@ export interface HistoryFilters {
   practiceSetId?: string;
   /** Tests only: one Test. */
   testId?: string;
+  /** Practice only: Classroom or Homework. */
+  context?: "CLASSROOM" | "HOMEWORK";
 }
 
 const COUNTED = "SUBMITTED";
 
 export async function loadAttemptHistory(studentIds: string[], filters: HistoryFilters = {}): Promise<HistoryRow[]> {
   if (studentIds.length === 0) return [];
-  const practiceOnly = Boolean(filters.area || filters.topicId || filters.difficulty || filters.practiceSetId);
+  const practiceOnly = Boolean(filters.area || filters.topicId || filters.difficulty || filters.practiceSetId || filters.context);
   const wantPractice = filters.kind !== "test" && !filters.testId;
   const wantTests = filters.kind !== "practice" && !practiceOnly;
   const [practice, tests] = await Promise.all([
@@ -83,6 +88,7 @@ export async function loadAttemptHistory(studentIds: string[], filters: HistoryF
             studentId: { in: studentIds },
             status: { in: ["SUBMITTED", "INVALIDATED", "IN_PROGRESS"] },
             ...(filters.practiceSetId ? { practiceSetId: filters.practiceSetId } : {}),
+            ...(filters.context ? { assignment: { context: filters.context } } : {}),
           },
           orderBy: { startedAt: "asc" },
           select: {
@@ -94,6 +100,7 @@ export async function loadAttemptHistory(studentIds: string[], filters: HistoryF
             scorePercent: true,
             assignmentId: true,
             practiceSetId: true,
+            assignment: { select: { context: true } },
             student: { select: { id: true, name: true, avatarUrl: true } },
           },
         })
@@ -156,7 +163,10 @@ export async function loadAttemptHistory(studentIds: string[], filters: HistoryF
       const total = Math.max(score.total, questionCount);
       const answered = score.answered;
       const done = a.status !== "IN_PROGRESS";
-      const pct = done ? a.scorePercent ?? (total ? Math.round((score.correct / total) * 100) : null) : null;
+      // Classroom work is never scored: no %, no correct / wrong counts, no change (pendiente-p2.md).
+      const classroom = a.assignment?.context === "CLASSROOM";
+      const scored = done && !classroom;
+      const pct = scored ? a.scorePercent ?? (total ? Math.round((score.correct / total) * 100) : null) : null;
       const area = (set?.topic.domain.practiceArea ?? null) as PracticeAreaCode | null;
       rows.push({
         id: a.id,
@@ -180,10 +190,10 @@ export async function loadAttemptHistory(studentIds: string[], filters: HistoryF
         tryCount: tries.length,
         time: a.totalTime,
         pct,
-        correct: done ? score.correct : null,
-        total: done ? total : null,
-        wrong: done ? answered - score.correct : null,
-        blank: done ? total - answered : null,
+        correct: scored ? score.correct : null,
+        total: done || classroom ? total : null,
+        wrong: scored ? answered - score.correct : null,
+        blank: scored ? total - answered : null,
         rw: null,
         math: null,
         totalScore: null,
@@ -191,6 +201,8 @@ export async function loadAttemptHistory(studentIds: string[], filters: HistoryF
         change: a.status === COUNTED && pct !== null && previousPct !== null ? pct - previousPct : null,
         changeRw: null,
         changeMath: null,
+        context: classroom ? "CLASSROOM" : "HOMEWORK",
+        answered: classroom ? answered : null,
       });
       if (a.status === COUNTED && pct !== null) previousPct = pct;
     });
@@ -238,6 +250,8 @@ export async function loadAttemptHistory(studentIds: string[], filters: HistoryF
         change: null,
         changeRw: counted && previous?.rw != null && a.rwScore != null ? a.rwScore - previous.rw : null,
         changeMath: counted && previous?.math != null && a.mathScore != null ? a.mathScore - previous.math : null,
+        context: null,
+        answered: null,
       });
       if (counted) previous = { rw: a.rwScore, math: a.mathScore };
     });

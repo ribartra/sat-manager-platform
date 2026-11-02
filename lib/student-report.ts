@@ -1,6 +1,7 @@
 // Student progress report data, shared by the teacher student page and the PDF report
 // (/api/reports/students/[id]/pdf) so both show exactly the same numbers.
 // Taxonomy note: the Topic table is the SKILL level (Section → Domain → Skill).
+import { assignmentContextWhere, isAssignmentContext, type AssignmentContext, type ContextView } from "@/lib/assignment-context";
 import prisma from "@/lib/prisma";
 import { Prisma } from "@/app/generated/prisma/client";
 import { snapshotModulesOf } from "@/lib/full-test-snapshot";
@@ -20,7 +21,24 @@ import { domainRank } from "@/lib/taxonomy-order";
 
 const DIFFICULTY_LEVELS = ["EASY", "MEDIUM", "HARD"] as const;
 
-export type ReportFilters = { topic?: string; difficulty?: string; from?: string; to?: string };
+export type ReportFilters = {
+  topic?: string;
+  difficulty?: string;
+  from?: string;
+  to?: string;
+  /** All / Classroom / Homework (practice). Default Homework: reports and overviews count only Homework. */
+  context?: ContextView;
+};
+
+/** A skill × level done in Classroom: what was done, never a score (no %, no correct count). */
+export type ClassroomLevel = {
+  /** Questions answered in the latest Classroom try of each set of the cell, and their questions. */
+  answered: number;
+  total: number;
+  tries: number;
+  lastAt: Date | null;
+  latestAttemptId: string;
+};
 
 /**
  * One skill × level result: the last counted attempt of EACH practice set of that cell, summed and
@@ -43,8 +61,10 @@ export type SkillResultRow = {
   domainId: string;
   domainName: string;
   label: string;
-  /** EASY / MEDIUM / HARD → result over every source. */
+  /** EASY / MEDIUM / HARD → result over every source (Homework only). */
   levels: Partial<Record<string, LevelResult>>;
+  /** EASY / MEDIUM / HARD → Classroom work (no score); shown only where there is no Homework result. */
+  classroom?: Partial<Record<string, ClassroomLevel>>;
 };
 
 /** One attempt's result (the only level the student profile reports at). */
@@ -71,6 +91,9 @@ export type ReportAttempt = {
   skillName?: string | null;
   sourceName?: string | null;
   sourceOrder?: number | null;
+  /** Practice: CLASSROOM tries carry no score (percent null, correct 0); `answered` is what they show. */
+  context?: AssignmentContext;
+  answered?: number;
 };
 
 export type PracticeReport = {
@@ -93,6 +116,7 @@ export type PracticeReport = {
   latestSetCount: number;
   assignments: Array<{
     id: string;
+    context: AssignmentContext;
     practiceSetId: string;
     name: string;
     topicId: string;
@@ -183,6 +207,7 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
   const topicId = filters.topic ?? "";
   const difficulty = filters.difficulty ?? "";
   const dateFilter = progressDateWhere(filters);
+  const contextFilter = assignmentContextWhere(filters.context ?? "homework");
 
   const [historyAttempts, assignments, pendingExamCount, areaTopics, completedExamCount, latestExamRow] = await Promise.all([
     // Invalidated attempts are loaded only for the history list; every score uses SUBMITTED.
@@ -191,7 +216,7 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
         studentId,
         status: { in: ["SUBMITTED", "INVALIDATED"] },
         ...dateFilter,
-        assignment: { practiceSet: { topic: { domain: { practiceArea } } } },
+        assignment: { ...contextFilter, practiceSet: { topic: { domain: { practiceArea } } } },
       },
       // Only what the report reads: no question text and no answer snapshots (each answer's
       // questionSnapshot is ~2 KB; its skill and level come from answerSnapshotTaxonomy).
@@ -208,6 +233,7 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
         answers: { select: { questionId: true, answer: true, isCorrect: true, timeSpent: true, question: { select: REPORT_QUESTION } } },
         assignment: {
           select: {
+            context: true,
             practiceSet: {
               select: {
                 name: true,
@@ -226,6 +252,7 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
       where: {
         studentId,
         status: { in: OPEN_STATUSES },
+        ...contextFilter,
         practiceSet: {
           topic: { domain: { practiceArea } },
           ...(topicId ? { topicId } : {}),
@@ -281,15 +308,20 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
   const scoreAttempt = (attempt: (typeof historyAttempts)[number], rows: ReturnType<typeof rowsForAttempt>): ReportAttempt => {
     const score = summarizeAllQuestionAnswers(rows);
     const snapshot = parseSnapshot<PracticeSetSnapshot>(attempt.practiceSetSnapshot);
+    const context: AssignmentContext = isAssignmentContext(attempt.assignment?.context) ? attempt.assignment.context : "HOMEWORK";
+    // Classroom work is never scored: no %, no correct count; what was answered is what it shows.
+    const classroom = context === "CLASSROOM";
     return {
       id: attempt.id,
       status: attempt.status,
       name: snapshot?.name ?? attempt.assignment?.practiceSet.name ?? "Practice Set",
       submittedAt: attempt.submittedAt,
       totalTime: attempt.totalTime ?? 0,
-      correct: score.correct,
+      correct: classroom ? 0 : score.correct,
       total: score.total,
-      percent: rows.some(isAnsweredAnswer) ? score.percent : null,
+      percent: classroom ? null : rows.some(isAnsweredAnswer) ? score.percent : null,
+      context,
+      answered: rows.filter(isAnsweredAnswer).length,
       teacherComment: attempt.teacherComment,
       attemptNumber: attempt.attemptNumber,
       assignmentId: attempt.assignmentId,
@@ -302,12 +334,18 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
       sourceOrder: attempt.assignment?.practiceSet.source?.sortOrder ?? null,
     };
   };
-  const attempts = historyAttempts.filter((attempt) => attempt.status === "SUBMITTED");
-  const rowsByAttempt = attempts.map(rowsForAttempt);
-  const scoredAttempts: ReportAttempt[] = attempts.map((attempt, index) => scoreAttempt(attempt, rowsByAttempt[index] ?? []));
+  const submitted = historyAttempts.filter((attempt) => attempt.status === "SUBMITTED");
+  const submittedScored = submitted.map((attempt) => scoreAttempt(attempt, rowsForAttempt(attempt)));
   const attemptHistory: ReportAttempt[] = historyAttempts.map((attempt) =>
-    attempt.status === "SUBMITTED" ? scoredAttempts.find((scored) => scored.id === attempt.id)! : scoreAttempt(attempt, rowsForAttempt(attempt)),
+    attempt.status === "SUBMITTED" ? submittedScored.find((scored) => scored.id === attempt.id)! : scoreAttempt(attempt, rowsForAttempt(attempt)),
   );
+  // Every score (skills by difficulty, weakest skill, KPIs) comes from Homework only.
+  const isHomework = (attempt: (typeof historyAttempts)[number]) => attempt.assignment?.context !== "CLASSROOM";
+  const attempts = submitted.filter(isHomework);
+  const rowsByAttempt = attempts.map(rowsForAttempt);
+  const scoredAttempts: ReportAttempt[] = attempts.map((attempt) => submittedScored.find((scored) => scored.id === attempt.id)!);
+  const classroomAttempts = submitted.filter((attempt) => !isHomework(attempt));
+  const classroomScored = classroomAttempts.map((attempt) => submittedScored.find((scored) => scored.id === attempt.id)!);
 
   // Skill results (SAT-001): per skill × level, the last counted attempt of EACH set, summed and
   // weighted by questions across sets and sources. Attempts stay identifiable in the history lists.
@@ -366,11 +404,45 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
         return result ? [[level, result]] : [];
       }),
     );
+  // Classroom per skill × level: the latest Classroom try of each set (newest first), what was answered.
+  const classroomByCell = new Map<string, ClassroomLevel>();
+  const classroomSeenSets = new Set<string>();
+  classroomAttempts.forEach((attempt, index) => {
+    const set = attempt.assignment?.practiceSet;
+    if (!set) return;
+    const scored = classroomScored[index];
+    if (!scored.total) return;
+    const cell = `${set.topicId}:${set.difficulty}`;
+    const acc = classroomByCell.get(cell);
+    const firstOfSet = !classroomSeenSets.has(attempt.assignmentId ?? attempt.id);
+    classroomSeenSets.add(attempt.assignmentId ?? attempt.id);
+    if (!acc) {
+      classroomByCell.set(cell, { answered: scored.answered ?? 0, total: scored.total, tries: 1, lastAt: scored.submittedAt, latestAttemptId: scored.id });
+    } else {
+      acc.tries += 1;
+      if (firstOfSet) {
+        acc.answered += scored.answered ?? 0;
+        acc.total += scored.total;
+      }
+    }
+    if (!skillsSeen.has(set.topicId)) {
+      const current = currentTopic.get(set.topicId);
+      skillsSeen.set(set.topicId, { domainId: current?.domainId ?? "", domainName: current?.domain.name ?? "", label: current?.name ?? shortSetName(scored.name) });
+    }
+  });
+  const classroomFor = (topic: string) => {
+    const entries = DIFFICULTY_LEVELS.flatMap((level) => {
+      const cell = classroomByCell.get(`${topic}:${level}`);
+      return cell ? [[level, cell] as const] : [];
+    });
+    return entries.length ? Object.fromEntries(entries) : undefined;
+  };
   const skillResults: SkillResultRow[] = [...skillsSeen.entries()]
     .map(([topic, skill]) => ({
       topicId: topic,
       ...skill,
       levels: levelsFor(topic),
+      classroom: classroomFor(topic),
     }))
     .sort((x, y) => domainRank(x.domainId) - domainRank(y.domainId) || x.label.localeCompare(y.label, "en", { numeric: true, sensitivity: "base" }));
   // Weakest skill: the skill × level with the lowest weighted result.
@@ -401,6 +473,7 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
     latestSetCount: latestIndexBySet.size,
     assignments: assignments.map((a) => ({
       id: a.id,
+      context: (isAssignmentContext(a.context) ? a.context : "HOMEWORK") as AssignmentContext,
       practiceSetId: a.practiceSetId,
       name: a.practiceSet.name,
       topicId: a.practiceSet.topicId,
@@ -412,7 +485,7 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
     })),
     attempts: scoredAttempts,
     attemptHistory,
-    comments: scoredAttempts.filter((attempt) => attempt.teacherComment),
+    comments: submittedScored.filter((attempt) => attempt.teacherComment),
     pendingExamCount,
     completedExamCount,
     latestExam: latestExamRow

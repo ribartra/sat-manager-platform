@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ContextTag } from "@/components/sat/context-tag";
 import {
   AttemptStatusBadge,
   Breadcrumbs,
@@ -96,16 +97,19 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
         select: { id: true, status: true, submittedAt: true, totalTime: true, attemptNumber: true, answers: { select: { answer: true, isCorrect: true } } },
       })
     : [];
+  // Classroom work is never scored (pendiente-p2.md): no %, no correct count; what was answered.
+  const classroom = attempt.assignment?.context === "CLASSROOM";
   const tries = siblings.map((t, i) => {
     const rows = t.answers.length >= total ? t.answers : [...t.answers, ...Array.from({ length: total - t.answers.length }, () => ({ answer: null, isCorrect: false }))];
     const sc = summarizeAllQuestionAnswers(rows);
-    return { id: t.id, tryNumber: i + 1, submittedAt: t.submittedAt, correct: sc.correct, total: sc.total, pct: sc.percent, time: t.totalTime, status: t.status };
+    const answered = t.answers.filter((a) => a.answer && a.answer.trim()).length;
+    return { id: t.id, tryNumber: i + 1, submittedAt: t.submittedAt, correct: sc.correct, total: sc.total, pct: classroom ? null : sc.percent, time: t.totalTime, status: t.status, answered };
   });
   const thisTry = tries.find((t) => t.id === attempt.id);
   const tryNumber = thisTry?.tryNumber ?? attempt.attemptNumber;
   const tryCount = Math.max(tries.length, 1);
   const prevTry = thisTry ? [...tries.slice(0, thisTry.tryNumber - 1)].reverse().find((t) => t.status === "SUBMITTED") : undefined;
-  const delta = prevTry && prevTry.pct !== null && attempt.status === "SUBMITTED" ? pct - prevTry.pct : null;
+  const delta = !classroom && prevTry && prevTry.pct !== null && attempt.status === "SUBMITTED" ? pct - prevTry.pct : null;
 
   const ordered = orderedQuestionIds
     .map((questionId) => {
@@ -197,7 +201,7 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
                 tries={tries.map((t) => ({
                   number: t.tryNumber,
                   href: buildProgressHref(`/teacher/students/${studentId}/attempts/${t.id}`, filters, areaTab ? { area: areaTab } : undefined),
-                  detail: [t.submittedAt ? formatDate(t.submittedAt) : null, t.pct !== null ? `${t.pct}%` : null].filter(Boolean).join(" · "),
+                  detail: [t.submittedAt ? formatDate(t.submittedAt) : null, t.pct !== null ? `${t.pct}%` : classroom ? `${t.answered} of ${t.total} answered` : null].filter(Boolean).join(" · "),
                   invalidated: t.status === "INVALIDATED",
                 }))}
               />
@@ -235,6 +239,19 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
       <ResultFilterRoot>
         <div className="mb-6">
           <Card padding="lg">
+            {classroom ? (
+              <div>
+                <p className="flex flex-wrap items-center gap-2 text-sm text-gray-700">
+                  <ContextTag context="CLASSROOM" /> Work done in class: not scored and never counted in results or reports.
+                </p>
+                <p className="mt-2 text-sm text-gray-700">
+                  {first} answered <b>{total - counts.blank} of {total}</b> questions{counts.blank ? <> and left <b>{counts.blank} blank</b></> : null}.
+                </p>
+                <p className="mt-1 text-xs text-gray-500">
+                  {attempt.totalTime ? <>{formatDuration(attempt.totalTime)} total{perQuestion ? ` · ${formatDuration(perQuestion)} per question on average` : ""}</> : null}
+                </p>
+              </div>
+            ) : (
             <div className="grid gap-5 md:grid-cols-[auto_1fr] md:items-center">
               <div>
                 <p className={`text-5xl font-bold leading-none ${scoreBandTextClass(pct)}`}>
@@ -255,6 +272,7 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
                 </p>
               </div>
             </div>
+            )}
           </Card>
         </div>
 
@@ -267,7 +285,7 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
 
         {ordered.length > 0 ? (
           <Card padding="md" className="mb-6">
-            <SectionHeader size="sm" title="Answers at a glance" description="Each square is a question. Click one to see it." action={<ResultFilterSegments counts={counts} />} />
+            <SectionHeader size="sm" title="Answers at a glance" description="Each square is a question. Click one to see it." action={<ResultFilterSegments counts={counts} hideCounts={classroom} />} />
             <div className="mt-2">
               <AnswerGrid idPrefix="q-" items={ordered.map((q) => ({ state: q.state }))} />
             </div>

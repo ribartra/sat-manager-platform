@@ -5,7 +5,8 @@ import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import { appDateInputValue, localToday } from "@/lib/utils";
+import { appDateInputValue, cn, localToday } from "@/lib/utils";
+import { contextLabel, type AssignmentContext } from "@/lib/assignment-context";
 
 export type FeedbackMode = "AFTER_SET" | "IMMEDIATE";
 
@@ -54,6 +55,7 @@ export function AssignSummaryCard({
   loading,
   disabledReason,
   onCancel,
+  context,
 }: {
   to: string;
   countLabel: string;
@@ -68,6 +70,8 @@ export function AssignSummaryCard({
   loading: boolean;
   disabledReason?: string | null;
   onCancel: () => void;
+  /** Practice only: the Classroom / Homework tab chosen above the sets, shown here (read-only). */
+  context?: { value: AssignmentContext | null; note?: string };
 }) {
   const set = (patch: Partial<AssignOptions>) => onOptionsChange({ ...options, ...patch });
   // YYYY-MM-DD strings compare as dates.
@@ -84,7 +88,25 @@ export function AssignSummaryCard({
           <dt className="text-gray-500">{countLabel}</dt>
           <dd className="font-medium text-gray-900">{items.length}</dd>
         </div>
+        {context ? (
+          <div className="flex justify-between gap-2">
+            <dt className="text-gray-500">Context</dt>
+            <dd className={cn("text-right font-medium", context.value ? "text-[var(--sat-primary)]" : "text-gray-400")}>
+              {context.value ? contextLabel(context.value) : "Not chosen"}
+            </dd>
+          </div>
+        ) : null}
       </dl>
+      {context ? (
+        <p className="text-xs text-gray-500">
+          {context.value === "CLASSROOM"
+            ? "Work in class: the student sees what they did, no scores; it never counts in reports."
+            : context.value === "HOMEWORK"
+              ? "Scored: results, reports and the next level count only Homework."
+              : "Choose Classroom or Homework above the sets."}
+          {context.note ? ` ${context.note}` : ""}
+        </p>
+      ) : null}
       {items.length > 0 ? (
         <ul className="max-h-40 space-y-1 overflow-y-auto border-t border-gray-100 pt-2 text-xs text-gray-600">
           {items.map((item, index) => (
