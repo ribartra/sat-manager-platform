@@ -320,10 +320,14 @@ function SkillsByDifficulty({ report }: { report: PracticeReport }) {
 function TryRow({ t, tryCount }: { t: PdfPracticeTry; tryCount: number }) {
   return (
     <View style={[s.tr, { backgroundColor: GRAY[50] }]}>
-      <Text style={[s.td, s.muted, { flex: SET_COLS[0].flex, paddingLeft: 18, fontSize: 8 }]}>
-        Try {t.tryNumber} of {tryCount}
-        {t.status === "INVALIDATED" ? " · not counted" : ""}
-      </Text>
+      {/* The indent is a margin inside the cell: a wider padding would take width from the other columns
+          and shift them away from their titles. */}
+      <View style={[s.td, { flex: SET_COLS[0].flex }]}>
+        <Text style={[s.muted, { marginLeft: 12, fontSize: 8 }]}>
+          Try {t.tryNumber} of {tryCount}
+          {t.status === "INVALIDATED" ? " · not counted" : ""}
+        </Text>
+      </View>
       <Text style={[s.td, { flex: SET_COLS[1].flex, fontSize: 8 }]}>
         <Text style={{ color: band(t.pct).text }}>{t.pct !== null ? `${t.pct}%` : "-"}</Text>
         {t.change !== null && t.change !== undefined ? <Text style={[s.tiny, { color: t.change >= 0 ? "#16a34a" : "#dc2626" }]}> {change(t.change)}</Text> : null}
@@ -567,10 +571,12 @@ function TestAttemptsPdf({ groups }: { groups: PdfTestGroup[] }) {
             const sc = tryScores(t);
             return (
               <View key={t.id} style={[s.tr, { backgroundColor: GRAY[50] }]}>
-                <Text style={[s.td, s.muted, { flex: TRY_COLS[0].flex, paddingLeft: 18, fontSize: 8 }]}>
-                  Try {t.tryNumber} of {group.tryCount}
-                  {t.status === "INVALIDATED" ? " · not counted" : t.status === "IN_PROGRESS" ? " · in progress" : ""}
-                </Text>
+                <View style={[s.td, { flex: TRY_COLS[0].flex }]}>
+                  <Text style={[s.muted, { marginLeft: 12, fontSize: 8 }]}>
+                    Try {t.tryNumber} of {group.tryCount}
+                    {t.status === "INVALIDATED" ? " · not counted" : t.status === "IN_PROGRESS" ? " · in progress" : ""}
+                  </Text>
+                </View>
                 <Text style={[s.td, { flex: TRY_COLS[1].flex, textAlign: "right", fontSize: 8 }]}>{sc.rw}</Text>
                 <Text style={[s.td, { flex: TRY_COLS[2].flex, textAlign: "right", fontSize: 8 }]}>{sc.math}</Text>
                 <Text style={[s.td, { flex: TRY_COLS[3].flex, textAlign: "right", fontSize: 8 }]}>{sc.total}</Text>
