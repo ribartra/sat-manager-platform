@@ -50,6 +50,8 @@ export interface PracticeSetItem {
   retryOpen: boolean;
   /** Classroom (in class, no scores) or Homework (scored). */
   context: "CLASSROOM" | "HOMEWORK";
+  /** Classroom work whose set was then assigned as Homework: closed (no retry; the Homework goes on). */
+  closedByHomework: boolean;
   questionCount: number;
 }
 
@@ -95,6 +97,7 @@ export async function loadStudentPractice(studentId: string): Promise<PracticeSe
     },
     orderBy: [{ dueDate: "asc" }, { createdAt: "desc" }],
   });
+  const homeworkSets = new Set(assignments.filter((a) => a.context === "HOMEWORK").map((a) => a.practiceSetId));
   return assignments
     .map((a): PracticeSetItem | null => {
       const area = a.practiceSet.topic.domain.practiceArea as PracticeAreaCode | null;
@@ -144,6 +147,7 @@ export async function loadStudentPractice(studentId: string): Promise<PracticeSe
         openAnswered: open ? open.answers.filter((x) => x.answer && x.answer.trim()).length : null,
         retryOpen: finished && Boolean(open),
         context: classroom ? "CLASSROOM" : "HOMEWORK",
+        closedByHomework: classroom && homeworkSets.has(a.practiceSetId),
         questionCount: a.practiceSet._count.questions,
       };
     })

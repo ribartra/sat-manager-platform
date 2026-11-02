@@ -73,7 +73,7 @@ export function PracticeSetRow({
             <Link href={resultHref(item.last.id)}>View results</Link>
           </Button>
         ) : null}
-        {readOnly ? null : item.locked ? (
+        {readOnly || item.closedByHomework ? null : item.locked ? (
           <Button size="sm" variant="secondary" disabledReason={notOpenReason(item.opensAt)}>{notOpenLabel(item.opensAt)}</Button>
         ) : item.state === "progress" || item.retryOpen ? (
           <Button asChild size="sm"><Link href={player}>Continue ›</Link></Button>

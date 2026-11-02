@@ -87,6 +87,20 @@ Opening a set shows its card: area, difficulty, source, number of questions, due
 
 ![A set's card after one try](img/student-practice-intro-retry.png)
 
+### Classroom and Homework
+
+Your teacher assigns each set as **Classroom** (work in class) or **Homework**; every set carries its tag.
+
+- **Classroom** has no score: you see what you answered ("k of N answered"), no percentage.
+- **Homework** is scored (percentage) and it is what counts in your results.
+- If a set you started in class is assigned to you as Homework, the class work is closed and the Homework starts from zero.
+
+At the top, **All · Classroom · Homework** filters what you see.
+
+![Practice in Classroom](img/student-practice-context.png)
+
+![Result of a class set, no score](img/student-classroom-result.png)
+
 ## 5. Working on a practice set
 
 The player uses the whole screen:

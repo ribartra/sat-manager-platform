@@ -285,7 +285,7 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
 
         {ordered.length > 0 ? (
           <Card padding="md" className="mb-6">
-            <SectionHeader size="sm" title="Answers at a glance" description="Each square is a question. Click one to see it." action={<ResultFilterSegments counts={counts} />} />
+            <SectionHeader size="sm" title="Answers at a glance" description="Each square is a question. Click one to see it." action={<ResultFilterSegments counts={counts} hideCounts={classroom} />} />
             <div className="mt-2">
               <AnswerGrid idPrefix="q-" items={ordered.map((q) => ({ state: q.state }))} />
             </div>

@@ -87,6 +87,20 @@ Al abrir un set ves su ficha: área, dificultad, fuente, número de preguntas, f
 
 ![Ficha de un set con un intento previo](img/student-practice-intro-retry.png)
 
+### Classroom y Homework
+
+Tu profesor asigna cada set como **Classroom** (trabajo en clase) o **Homework** (tarea); cada set lleva su etiqueta.
+
+- **Classroom** no tiene nota: ves lo que respondiste («k of N answered»), sin porcentaje.
+- **Homework** tiene nota (porcentaje) y es lo que cuenta en tus resultados.
+- Si un set que empezaste en clase se te asigna como Homework, el trabajo de clase queda cerrado y el Homework empieza desde cero.
+
+Arriba, **All · Classroom · Homework** filtra lo que ves.
+
+![Practice en Classroom](img/student-practice-context.png)
+
+![Resultado de un set de clase, sin nota](img/student-classroom-result.png)
+
 ## 5. Resolver un set de práctica
 
 El reproductor ocupa toda la pantalla:

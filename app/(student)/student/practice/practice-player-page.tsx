@@ -68,6 +68,14 @@ export async function renderPracticePlayer({
       where: { id: assignmentId, studentId: userId, practiceSetId: setId, locked: false },
     }));
     if (!assignment || (assignment.unlockAt && assignment.unlockAt > new Date())) redirect("/student");
+    // Class work closed by its Homework can't be continued or retried: the set goes on as Homework.
+    if (assignment.context === "CLASSROOM") {
+      const homework = await withSqliteRetry(() => prisma.assignment.findFirst({
+        where: { studentId: userId, practiceSetId: setId, context: "HOMEWORK" },
+        select: { id: true },
+      }));
+      if (homework) redirect(`/student/practice/assignment/${homework.id}`);
+    }
   }
 
   const questions = practiceSet.questions.map((item) => ({

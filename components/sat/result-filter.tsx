@@ -81,7 +81,8 @@ export function ResultFilterBar({ counts, interactive = true }: { counts: Result
 }
 
 /** Segmented control "All (n) · Incorrect (n) · Blank (n) · Correct (n)". */
-export function ResultFilterSegments({ counts }: { counts: ResultCounts }) {
+/** `hideCounts`: Classroom work (never scored) shows the groups without how many are right or wrong. */
+export function ResultFilterSegments({ counts, hideCounts = false }: { counts: ResultCounts; hideCounts?: boolean }) {
   const { filter, setFilter } = useFilter();
   const total = counts.ok + counts.bad + counts.blank;
   return (
@@ -97,7 +98,7 @@ export function ResultFilterSegments({ counts }: { counts: ResultCounts }) {
             aria-pressed={on}
             className={cn("border-r border-gray-200 px-3 py-1.5 last:border-r-0", on ? "bg-gray-900 text-white" : "bg-white text-gray-600 hover:bg-gray-50")}
           >
-            {s.label} ({n})
+            {hideCounts && s.key !== "all" ? s.label : `${s.label} (${n})`}
           </button>
         );
       })}

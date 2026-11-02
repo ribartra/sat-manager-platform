@@ -182,7 +182,8 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
         }
         actions={
           <HeaderActions>
-            <Link href={tryAgainHref} className={HEADER_ACTION_CLASS}><RotateCcw size={14} aria-hidden /> Try Again</Link>
+            {/* Class work closed by its Homework: no retry here (the set goes on as Homework). */}
+            {thisSet?.closedByHomework ? null : <Link href={tryAgainHref} className={HEADER_ACTION_CLASS}><RotateCcw size={14} aria-hidden /> Try Again</Link>}
             {nextAssignment ? (
               <Link href={`/student/practice/assignment/${nextAssignment.assignmentId}`} className={`${HEADER_ACTION_CLASS} max-w-full`}>
                 <span className="truncate">Next: {nextAssignment.skill} · {difficultyLabel(nextAssignment.difficulty)}</span>
@@ -257,7 +258,7 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
               size="sm"
               title="Your answers at a glance"
               description="Each square is a question. Click one to see it."
-              action={<ResultFilterSegments counts={counts} />}
+              action={<ResultFilterSegments counts={counts} hideCounts={classroom} />}
             />
             <div className="mt-2">
               <AnswerGrid
