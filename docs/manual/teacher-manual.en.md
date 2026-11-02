@@ -200,7 +200,7 @@ The try stays in the history crossed out as **Not counted** and doesn't count in
 
 ## 9. Tests
 
-**Tests** groups the full SATs by number (**TEST N**) with one version per source. Next to each TEST N, tags show the sources that have it; each version is named after its source (**Innovator Test 1**). Every number from TEST 1 to the highest is listed: a number no source has shows as **TEST N —** (in the picture, **TEST 9**). Each Test has 4 modules (R&W 1 and 2, Math 1 and 2). **How scores work** explains how scores are calculated.
+**Tests** groups the full SATs by number (**TEST N**) with one version per source. Each version is named after its source (**Innovator Test 1**). Every number from TEST 1 to the highest is listed: a number no source has shows as **TEST N —** (in the picture, **TEST 9**). Each Test has 4 modules (R&W 1 and 2, Math 1 and 2). **How scores work** explains how scores are calculated.
 
 ![Tests](img/teacher-tests.png)
 
