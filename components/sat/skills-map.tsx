@@ -116,6 +116,8 @@ export interface SkillsSourceSkill extends SkillsMapSkill {
 }
 
 const SOURCE_GRID = "sm:grid sm:grid-cols-[minmax(8rem,1fr)_auto] sm:items-center sm:gap-2";
+/** A skill's chips end where its source rows' chips end (the source panel has a 0.75rem inner padding). */
+const SKILL_CHIPS_RIGHT = "flex flex-wrap items-center gap-1.5 sm:pr-3";
 
 /**
  * Teacher catalogue by skill: the SkillsMap card per domain (one row per skill, Easy / Medium / Hard
@@ -148,7 +150,7 @@ export function SkillsSourceMap({
                     <p className="text-sm font-semibold text-gray-900">{skill.name}</p>
                     <p className="text-xs text-gray-500">{skill.sub}</p>
                   </div>
-                  <div className="flex flex-wrap items-center gap-1.5">
+                  <div className={SKILL_CHIPS_RIGHT}>
                     {skill.chips.map((chip) => <SkillChip key={chip.difficulty} chip={chip} />)}
                     {skill.action}
                   </div>
@@ -163,7 +165,7 @@ export function SkillsSourceMap({
                       <p className="text-xs text-gray-500">{skill.sub}</p>
                     </div>
                   </div>
-                  <div className="flex flex-wrap items-center gap-1.5">
+                  <div className={SKILL_CHIPS_RIGHT}>
                     {skill.chips.map((chip) => <SkillChip key={chip.difficulty} chip={chip} />)}
                     {skill.action}
                   </div>
