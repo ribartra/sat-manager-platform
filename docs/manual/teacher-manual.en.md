@@ -92,11 +92,24 @@ Buttons on the page:
 - **Assign practice** / **Assign test**: open the Assign view (see section 5).
 - **History**: that student's history.
 - **Generate Report**: the PDF report (section 8).
-- **Student view**: see the platform **as the student sees it**, read only. Leave with **Exit Student View**.
+- **Student view**: see the platform **as the student sees it** (see [Student view](#student-view)).
 - **Edit**: change name, email, phone or start date. **Deactivate / Activate**: block or restore their access.
 - If the parent's email is missing you'll see **Parent email: missing** and the **Add parent email** button.
 
-![Student view](img/teacher-student-view.png)
+### Student view
+
+**Student view** shows you the student's own pages as they see them: their Home, Practice, Tests, History, Pending and results, with their menu and name. The **"Student view: you are viewing as …"** banner with the **Exit Student View** button stays at the top.
+
+- **It lasts the whole visit**: you stay in Student view while moving through their pages. If you open a teacher page (another tab, a bookmark or a typed address), you are taken back to the student's view. You leave only with **Exit Student View**, which takes you to their page, or by signing out.
+- **You can try what they see**: **Start**, **Continue** and **Try again** open the player as for the student, starting where they are. That try is **simulated**: the banner says **"this try is simulated — nothing is saved or scored"**, and submitting or leaving saves nothing.
+- **Nothing is recorded as the student**: their "Last active" doesn't change, no tries or answers are created and their notifications aren't marked as read. Only your own visit is recorded, under your name.
+- You can only view your own students. **Retake** of a finished Test isn't shown here.
+
+![Student view: the student's pages, with the banner](img/teacher-student-view.png)
+
+![A student's set in Student view](img/teacher-student-view-intro.png)
+
+![Simulated try: nothing is saved](img/teacher-student-view-simulated.png)
 
 ## 5. Assigning practice and Tests
 
@@ -104,13 +117,13 @@ The **Assign** view is the same for practice and Tests. Open it from **Assign** 
 
 ### Assigning practice sets
 
-1. **Choose the student**: the name in the title is a list; open it to switch student.
+1. **Choose the student**: a list with a search; pick another student to switch. The title says who you are assigning to ("Assign to …").
 2. **Check what … has done**: what the student has already done (last activity, weakest skills).
 3. **Choose Classroom or Homework**: pick one of the two tabs (see [Classroom and Homework](#classroom-and-homework)).
-4. **Choose what to assign**: pick the area (**Math**, **Reading**, **Writing**; **Tests** goes to Tests) and open a skill. You'll see one row per active **source** (today, College Board) with one button per level (**Easy**, **Medium**, **Hard**). Click the sets you want to assign. A level with no sets shows **—**.
+4. **Choose what to assign**: pick the area (**Math**, **Reading**, **Writing**; **Tests** goes to Tests) and open a skill. You'll see one row per active **source** (today, College Board) with one button per level (**Easy**, **Medium**, **Hard**). Click the sets you want to assign. A level with no sets shows **—**. Above the list, three filters (all on **All** when it opens): **Skill** (one skill), **Assignment status** (**Not assigned** / **Already assigned**) and **Source**. There is no search box.
 5. **Set the dates and assign**: in the summary on the right set:
    - **Open date (optional)**: from when they can start (today by default).
-   - **Due date**: the deadline (one week by default).
+   - **Due date**: the deadline (one week by default). Homework only: **Classroom has no due date** (the summary says **None**).
    - **When to show answers**: **Show answers at the end** or **Show the answer after each question** (the student clicks **Check** on each question).
    - **Show explanations in the player**: shows the explanation when checking (only with answers after each question).
 
@@ -138,6 +151,20 @@ Every practice set is assigned as **Classroom** (work in class) or **Homework**.
 
 ![Choosing Classroom or Homework](img/teacher-assign-context.png)
 
+#### Class work stays open until you finish it
+
+- **Classroom** work has no due date and **never becomes Overdue**. It stays open until you finish it or assign it as Homework. Meanwhile the student can go on, submit it and try it again.
+- In their result, the student sees **only the questions they answered in class**, with the solution. The ones left blank show as gray numbers that don't open, so they don't see a future Homework's answers ahead of time. You see them all.
+- **Finish class work for this student**: on the student's page, only when they have open class work. It lists the sets and asks first. It submits what they have as it is (no score) and closes the sets.
+
+![Finish class work from the student's page](img/teacher-finish-classroom-button.png)
+
+![Confirmation: the open class sets](img/teacher-finish-classroom-dialog.png)
+
+- **When you sign out**: if any of your students has open class work, a prompt lists them. **Finish and sign out** finishes it all and signs you out; **Cancel** changes nothing. If you close the browser or the session expires there is no prompt, and the work stays open.
+
+![Sign-out prompt with open class work](img/teacher-signout-classroom.png)
+
 On the student's page (Math, Reading, Writing) the **All · Classroom · Homework** selector filters what you see. In **All**, a level shows the Homework percentage when there is one; if it was done only in class it shows "Class · k/N". **History** has a **Context** filter.
 
 ![All, Classroom and Homework on the student's page](img/teacher-student-context.png)
@@ -155,6 +182,8 @@ On the student's page (Math, Reading, Writing) the **All · Classroom · Homewor
 
 1. **Tests** tab: each **TEST N** expands into its versions, one per active source (today, Innovator). Each version is named after its source, e.g. **Innovator Test 1**.
 2. Tick the version, check the date and options and click **Assign test**.
+
+Above the list, the **Assignment status** and **Source** filters (on **All** when it opens).
 
 A TEST N with every version assigned shows as a fixed row with the **ALREADY ASSIGNED** stamp.
 
@@ -265,7 +294,7 @@ Every set and Test comes from a **source** (where the content came from). Today 
 
 ![Teacher notifications](img/teacher-notifications.png)
 
-**Account menu** (your name, at the bottom): **Change photo**, **Change password** and **Sign out**.
+**Account menu** (your name, at the bottom): **Change photo**, **Change password** and **Sign out**. If your students have open class work, **Sign out** tells you first (see [Classroom and Homework](#classroom-and-homework)).
 
 ![Account menu](img/common-account-menu.png)
 

@@ -91,7 +91,8 @@ Opening a set shows its card: area, difficulty, source, number of questions, due
 
 Your teacher assigns each set as **Classroom** (work in class) or **Homework**; every set carries its tag.
 
-- **Classroom** has no score: you see what you answered ("k of N answered"), no percentage.
+- **Classroom** has no score: you see what you answered ("k of N answered"), no percentage. In the result you see **only the questions you answered**, with the solution; the ones you left blank stay gray.
+- Class work **has no due date** and stays open until your teacher finishes it: meanwhile you can go on, submit it and try it again.
 - **Homework** is scored (percentage) and it is what counts in your results.
 - If a set you started in class is assigned to you as Homework, the class work is closed (you can't try it again as Classroom) and the Homework starts from zero; from then on you practice it only as Homework.
 

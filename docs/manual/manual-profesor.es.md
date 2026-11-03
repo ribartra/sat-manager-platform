@@ -92,11 +92,24 @@ Botones de la ficha:
 - **Assign practice** / **Assign test**: abren la vista de asignar (ver sección 5).
 - **History**: el historial de ese alumno.
 - **Generate Report**: el informe PDF (sección 8).
-- **Student view**: ves la plataforma **como la ve el alumno**, solo lectura. Sal con **Exit Student View**.
+- **Student view**: ves la plataforma **como la ve el alumno** (ver [Student view](#student-view)).
 - **Edit**: cambia nombre, correo, teléfono o fecha de inicio. **Deactivate / Activate**: bloquea o reactiva su acceso.
 - Si falta el correo del padre, verás **Parent email: missing** y el botón **Add parent email**.
 
-![Vista como alumno](img/teacher-student-view.png)
+### Student view
+
+**Student view** te muestra las páginas del alumno tal como las ve él: su Home, Practice, Tests, History, Pending y sus resultados, con su menú y su nombre. Arriba aparece siempre la franja **«Student view: you are viewing as …»** con el botón **Exit Student View**.
+
+- **Dura toda la visita**: sigues en Student view al moverte por sus páginas. Si abres una página del profesor (otra pestaña, un marcador o una dirección escrita), vuelves a la vista del alumno. Solo se sale con **Exit Student View**, que te lleva a su ficha, o cerrando sesión.
+- **Puedes probar lo que él ve**: **Start**, **Continue** y **Try again** abren el player como para el alumno, empezando donde él va. Ese intento es **simulado**: la franja dice **«this try is simulated — nothing is saved or scored»**, y al enviar o salir no se guarda nada.
+- **No queda rastro a nombre del alumno**: no cambia su «Last active», no se crean intentos ni respuestas, y no se marcan sus notificaciones. Solo queda registrado, a tu nombre, que entraste a su vista.
+- Solo puedes ver a tus alumnos. **Retake** de un Test terminado no aparece aquí.
+
+![Student view: las páginas del alumno, con la franja](img/teacher-student-view.png)
+
+![Un set del alumno en Student view](img/teacher-student-view-intro.png)
+
+![Intento simulado: no se guarda nada](img/teacher-student-view-simulated.png)
 
 ## 5. Asignar práctica y Tests
 
@@ -104,13 +117,13 @@ La vista **Assign** es la misma para práctica y Tests. Se abre desde **Assign**
 
 ### Asignar sets de práctica
 
-1. **Choose the student**: el nombre del título es una lista; ábrela para cambiar de alumno.
+1. **Choose the student**: una lista con buscador; elige otro alumno para cambiar. El título dice a quién asignas («Assign to …»).
 2. **Check what … has done**: lo que el alumno ya hizo (última actividad, habilidades más débiles).
 3. **Choose Classroom or Homework**: elige una de las dos pestañas (ver [Classroom y Homework](#classroom-y-homework)).
-4. **Choose what to assign**: elige el área (**Math**, **Reading**, **Writing**; **Tests** lleva a los Tests) y abre una habilidad. Verás una fila por **fuente** activa (hoy, College Board) con un botón por nivel (**Easy**, **Medium**, **Hard**). Pulsa los sets que quieres asignar. Un nivel sin sets muestra **—**.
+4. **Choose what to assign**: elige el área (**Math**, **Reading**, **Writing**; **Tests** lleva a los Tests) y abre una habilidad. Verás una fila por **fuente** activa (hoy, College Board) con un botón por nivel (**Easy**, **Medium**, **Hard**). Pulsa los sets que quieres asignar. Un nivel sin sets muestra **—**. Encima de la lista, tres filtros (todos en **All** al abrir): **Skill** (una habilidad), **Assignment status** (**Not assigned** / **Already assigned**) y **Source** (la fuente). No hay caja de búsqueda.
 5. **Set the dates and assign**: en el resumen de la derecha define:
    - **Open date (optional)**: desde cuándo puede empezar (por defecto hoy).
-   - **Due date**: fecha límite (por defecto en una semana).
+   - **Due date**: fecha límite (por defecto en una semana). Solo en Homework: **Classroom no tiene fecha límite** (el resumen dice **None**).
    - **When to show answers**: **Show answers at the end** o **Show the answer after each question** (el alumno pulsa **Check** en cada pregunta).
    - **Show explanations in the player**: muestra la explicación al comprobar (solo con respuestas después de cada pregunta).
 
@@ -138,6 +151,20 @@ Cada set de práctica se asigna como **Classroom** (trabajo en clase) o como **H
 
 ![Elegir Classroom o Homework](img/teacher-assign-context.png)
 
+#### El trabajo de clase queda abierto hasta que lo finalizas
+
+- El trabajo de **Classroom** no tiene fecha límite y **nunca pasa a Overdue**. Queda abierto hasta que lo finalizas o lo asignas como Homework. Mientras tanto, el alumno puede seguir, enviarlo y volver a intentarlo.
+- En su resultado, el alumno ve **solo las preguntas que respondió en clase**, con su solución. Las que dejó en blanco aparecen como números grises que no se abren, así no ve de antemano las respuestas de un Homework futuro. Tú ves todas.
+- **Finish class work for this student**: en la ficha del alumno, solo cuando tiene trabajo de clase abierto. Lista los sets y pide confirmación. Envía lo que tenga tal cual (sin nota) y los cierra.
+
+![Finalizar el trabajo de clase desde la ficha](img/teacher-finish-classroom-button.png)
+
+![Confirmación: los sets de clase abiertos](img/teacher-finish-classroom-dialog.png)
+
+- **Al cerrar sesión**: si alguno de tus alumnos tiene trabajo de clase abierto, aparece un aviso con la lista. **Finish and sign out** lo finaliza todo y cierra la sesión; **Cancel** no cambia nada. Si cierras el navegador o la sesión expira, no hay aviso y el trabajo sigue abierto.
+
+![Aviso al cerrar sesión con trabajo de clase abierto](img/teacher-signout-classroom.png)
+
 En la ficha del alumno (Math, Reading, Writing) el selector **All · Classroom · Homework** filtra lo que ves. En **All**, un nivel muestra el porcentaje de Homework si existe; si solo se hizo en clase, muestra «Class · k/N». **History** tiene el filtro **Context**.
 
 ![All, Classroom y Homework en la ficha del alumno](img/teacher-student-context.png)
@@ -155,6 +182,8 @@ En la ficha del alumno (Math, Reading, Writing) el selector **All · Classroom �
 
 1. Pestaña **Tests**: cada **TEST N** se despliega con sus versiones, una por fuente activa (hoy, Innovator). Cada versión lleva el nombre de su fuente, por ejemplo **Innovator Test 1**.
 2. Marca la versión, revisa la fecha y las opciones y pulsa **Assign test**.
+
+Encima de la lista, los filtros **Assignment status** y **Source** (en **All** al abrir).
 
 Un TEST N con todas sus versiones asignadas aparece fijo con el sello **ALREADY ASSIGNED**.
 
@@ -265,7 +294,7 @@ Cada set y cada Test viene de una **fuente** (de dónde salió el contenido). Ho
 
 ![Notificaciones del profesor](img/teacher-notifications.png)
 
-**Menú de cuenta** (tu nombre, abajo): **Change photo**, **Change password** y **Sign out**.
+**Menú de cuenta** (tu nombre, abajo): **Change photo**, **Change password** y **Sign out**. Si tus alumnos tienen trabajo de clase abierto, **Sign out** te lo avisa antes (ver [Classroom y Homework](#classroom-y-homework)).
 
 ![Menú de cuenta](img/common-account-menu.png)
 
