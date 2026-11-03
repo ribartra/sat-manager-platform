@@ -1,4 +1,5 @@
-import { NextResponse, type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
+import { relativeRedirect } from "@/lib/relative-redirect";
 import prisma from "@/lib/prisma";
 import { requireTeacherOrAdmin } from "@/lib/rbac";
 import { studentAccessWhereFor } from "@/lib/program-scope";
@@ -12,10 +13,10 @@ export const runtime = "nodejs";
 // (studentAccessWhereFor; an admin, any student). Audited as IMPERSONATE_STUDENT_VIEW.
 export async function GET(req: NextRequest, { params }: { params: Promise<{ studentId: string }> }) {
   const session = await requireTeacherOrAdmin();
-  if (!session) return NextResponse.redirect(new URL("/login", req.url));
+  if (!session) return relativeRedirect("/login");
   const { studentId } = await params;
   const unavailable = (reason: "not-found" | "out-of-scope") =>
-    NextResponse.redirect(new URL(`/teacher/students?studentView=${reason}`, req.url));
+    relativeRedirect(`/teacher/students?studentView=${reason}`);
 
   const student = await withSqliteRetry(() =>
     prisma.user.findUnique({ where: { id: studentId }, select: { id: true, email: true, role: true } }),
@@ -59,7 +60,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ stud
   const area = req.nextUrl.searchParams.get("area");
   const target =
     area && ["math", "reading", "writing"].includes(area) ? `/student/practice?area=${area}` : area === "tests" ? "/student/tests" : "/student";
-  const response = NextResponse.redirect(new URL(target, req.url));
+  const response = relativeRedirect(target);
   response.cookies.set(STUDENT_VIEW_COOKIE, student.id, STUDENT_VIEW_COOKIE_OPTIONS);
   return response;
 }
