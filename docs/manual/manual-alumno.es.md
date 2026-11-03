@@ -91,7 +91,8 @@ Al abrir un set ves su ficha: área, dificultad, fuente, número de preguntas, f
 
 Tu profesor asigna cada set como **Classroom** (trabajo en clase) o **Homework** (tarea); cada set lleva su etiqueta.
 
-- **Classroom** no tiene nota: ves lo que respondiste («k of N answered»), sin porcentaje.
+- **Classroom** no tiene nota: ves lo que respondiste («k of N answered»), sin porcentaje. En el resultado ves **solo las preguntas que respondiste**, con su solución; las que dejaste en blanco quedan en gris.
+- El trabajo de clase **no tiene fecha límite** y queda abierto hasta que tu profesor lo finaliza: mientras tanto puedes seguir, enviarlo y volver a intentarlo.
 - **Homework** tiene nota (porcentaje) y es lo que cuenta en tus resultados.
 - Si un set que empezaste en clase se te asigna como Homework, el trabajo de clase queda cerrado (ya no puedes volver a intentarlo en Classroom) y el Homework empieza desde cero; desde entonces lo practicas solo como Homework.
 

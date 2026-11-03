@@ -45,7 +45,8 @@ async function assignTest(page, student, number, opts = {}, shots = {}) {
   await setOptions(page, opts);
   if (shots.ready) await L.shot(page, shots.ready, "full");
   await page.getByRole("button", { name: /^Assign test/ }).click();
-  await page.waitForSelector("text=/Redirecting|assigned/i", { timeout: 60000 });
+  // "N assigned." once it is saved (not the hidden "Not assigned" option of the status filter).
+  await page.locator("text=/\\d+ (assigned|reassigned|updated)\\./ >> visible=true").first().waitFor({ timeout: 60000 });
   await page.waitForTimeout(800);
 }
 L.run(async () => {

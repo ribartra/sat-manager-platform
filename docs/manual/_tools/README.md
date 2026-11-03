@@ -39,14 +39,18 @@ MANUAL_DB=$MANUAL_WORK/man-shots.db node docs/manual/_tools/07-import-steps.cjs 
 # then stop both, delete man-shots.db and start them again without MANUAL_DB
 ```
 
-`08-review-update.cjs` retakes the screenshots changed by the review with Soledad (tests named
-"Innovator Test N", Completed chip, report Period, reference sheet). It also runs on a throwaway copy
-with the tests renamed as production (`prisma/data-patches/202611011800_tests_named_by_source.sql`
-fails on `man.db` by design, it has no TEST 9: run its UPDATEs on the copy).
+`07`–`10` create tries or imports, so they all run on the **same throwaway copy** (`MANUAL_DB=$MANUAL_WORK/man-shots.db`), made from `man.db` after `06`, in this order:
 
-`09-classroom-homework.cjs` (Classroom / Homework screenshots) also runs on a throwaway copy, after
-Lucía has Classroom work: "Linear Inequalities · Medium" done in class (10 of 13 answered) and then
-assigned as Homework, and "Systems of Linear Equations · Easy" done in class.
+```bash
+MANUAL_DB=$MANUAL_WORK/man-shots.db node docs/manual/_tools/10-classroom-finish-student-view.cjs  # builds Lucía's class work
+MANUAL_DB=$MANUAL_WORK/man-shots.db node docs/manual/_tools/09-classroom-homework.cjs             # uses that class work
+MANUAL_DB=$MANUAL_WORK/man-shots.db node docs/manual/_tools/08-review-update.cjs
+MANUAL_DB=$MANUAL_WORK/man-shots.db node docs/manual/_tools/07-import-steps.cjs
+```
+
+- `10-classroom-finish-student-view.cjs`: Lucía works in class ("Linear Inequalities · Medium", 10 of 13 answered; "Systems of Linear Equations · Easy", 3 answered); the teacher's sign-out prompt (Cancel), **Finish class work** from Lucía's page, the set assigned as Homework (8 of 13), then the durable Student view and a simulated try.
+- `09-classroom-homework.cjs`: the Classroom / Homework tabs, filters and the class result (only the answered questions).
+- `08-review-update.cjs`: the screens of the review with Soledad (tests named "Innovator Test N", Completed chip, report Period, reference sheet). Production already has the tests renamed, so a fresh `make pull-db` needs no extra step.
 
 Each script depends on the data the previous ones created. **To start over, stop the server, then run `00-setup.cjs` again.** Never replace `man.db` while the server has it open, or the database can be corrupted.
 
