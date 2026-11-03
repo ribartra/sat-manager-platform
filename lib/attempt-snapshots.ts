@@ -1,36 +1,8 @@
-interface SnapshotOption {
-  label: string;
-  text: string;
-  imageUrl?: string | null;
-}
-
-interface SnapshotQuestion {
-  id: string;
-  stem: string;
-  stimulus: string | null;
-  type: string;
-  difficulty: string;
-  correctAnswer: string;
-  explanation: string | null;
-  imageUrl?: string | null;
-  supportsGraph?: boolean;
-  order?: number;
-  options?: SnapshotOption[];
-  topic?: {
-    id: string;
-    name: string;
-    domain?: {
-      id: string;
-      name: string;
-      section?: {
-        id: string;
-        name: string;
-        label: string;
-      };
-    };
-  };
-}
-
+/**
+ * Practice attempt structure: the set as the attempt saw it (question order, explanation visibility,
+ * name). Attempts never copy question content: results and grading read the current question, and a
+ * fixed answer key re-grades submitted attempts (lib/attempt-regrade.ts).
+ */
 interface SnapshotPracticeSet {
   id: string;
   name: string;
@@ -52,7 +24,6 @@ interface SnapshotPracticeSet {
   questions?: { id: string; order: number }[];
 }
 
-export type QuestionSnapshot = SnapshotQuestion;
 export type PracticeSetSnapshot = SnapshotPracticeSet;
 
 export function stringifySnapshot(value: unknown) {
@@ -66,55 +37,6 @@ export function parseSnapshot<T>(value: string | null | undefined): T | null {
   } catch {
     return null;
   }
-}
-
-export function buildQuestionSnapshot(item: {
-  order?: number;
-  question: {
-    id: string;
-    stem: string;
-    stimulus: string | null;
-    type: string;
-    difficulty: string;
-    correctAnswer: string;
-    explanation: string | null;
-    imageUrl?: string | null;
-    supportsGraph?: boolean;
-    options?: SnapshotOption[];
-    topic?: {
-      id: string;
-      name: string;
-      domain?: {
-        id: string;
-        name: string;
-        section?: {
-          id: string;
-          name: string;
-          label: string;
-        };
-      };
-    };
-  };
-}): QuestionSnapshot {
-  return {
-    id: item.question.id,
-    stem: item.question.stem,
-    stimulus: item.question.stimulus,
-    type: item.question.type,
-    difficulty: item.question.difficulty,
-    correctAnswer: item.question.correctAnswer,
-    explanation: item.question.explanation,
-    // Images are referenced, not stored: results read them from the live question (lib/question-media.ts).
-    imageUrl: null,
-    supportsGraph: item.question.supportsGraph ?? false,
-    order: item.order,
-    options: item.question.options?.map((option) => ({
-      label: option.label,
-      text: option.text,
-      imageUrl: null,
-    })),
-    topic: item.question.topic,
-  };
 }
 
 export function buildPracticeSetSnapshot(practiceSet: {

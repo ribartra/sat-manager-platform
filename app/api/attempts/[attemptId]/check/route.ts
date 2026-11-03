@@ -39,13 +39,13 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
 
   const existing = await withSqliteRetry(() => prisma.attemptAnswer.findUnique({
     where: { attemptId_questionId: { attemptId, questionId } },
-    select: { answer: true, checkedAt: true, questionSnapshot: true },
+    select: { answer: true, checkedAt: true },
   }));
   // Already checked: return the stored result; the answer cannot change any more.
   const finalAnswer = existing?.checkedAt && existing.answer ? existing.answer : answer;
   // Explanations only when this attempt was given "Show explanations in the player".
   const showExplanation = attempt.showExplanations ?? attempt.assignment?.showExplanations ?? true;
-  const result = gradeCheck(finalAnswer, item.question, existing?.questionSnapshot, { showExplanation });
+  const result = gradeCheck(finalAnswer, item.question, { showExplanation });
 
   if (!existing?.checkedAt) {
     await withSqliteRetry(() => prisma.attemptAnswer.upsert({

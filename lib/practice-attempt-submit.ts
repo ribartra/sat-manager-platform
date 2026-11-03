@@ -1,9 +1,6 @@
 import prisma from "@/lib/prisma";
 import {
   buildPracticeSetSnapshot,
-  buildQuestionSnapshot,
-  parseSnapshot,
-  QuestionSnapshot,
   stringifySnapshot,
 } from "@/lib/attempt-snapshots";
 import { isAnswerCorrect } from "@/lib/answer-grading";
@@ -45,7 +42,6 @@ export async function gradeAndSubmitPracticeAttempt(attempt: OpenAttempt, input:
     orderBy: { order: "asc" },
   });
 
-  const existingAnswers = new Map(attempt.answers.map((answer) => [answer.questionId, answer]));
   // Answers already checked with immediate feedback are locked: the stored answer wins.
   const answers: Record<string, string> = { ...((submittedAnswers ?? {}) as Record<string, string>) };
   for (const answer of attempt.answers) {
@@ -53,15 +49,6 @@ export async function gradeAndSubmitPracticeAttempt(attempt: OpenAttempt, input:
   }
   const allowedQuestionIds = new Set(psQuestions.map((item) => item.questionId));
   const questionById = new Map(psQuestions.map((item) => [item.questionId, item.question]));
-  const questionSnapshotMap = new Map(
-    psQuestions.map((item) => {
-      const existing = existingAnswers.get(item.questionId);
-      const snapshot =
-        parseSnapshot<QuestionSnapshot>(existing?.questionSnapshot) ??
-        buildQuestionSnapshot(item);
-      return [item.questionId, snapshot] as const;
-    })
-  );
   const practiceSetForSnapshot = psQuestions[0]?.practiceSet;
   const practiceSetSnapshot =
     attempt.practiceSetSnapshot ??
@@ -80,19 +67,13 @@ export async function gradeAndSubmitPracticeAttempt(attempt: OpenAttempt, input:
   const answerWrites: Parameters<typeof prisma.attemptAnswer.upsert>[0][] = [];
   // Score each answer
     Object.entries(answers as Record<string, string>).filter(([questionId]) => allowedQuestionIds.has(questionId)).forEach(([questionId, answer]) => {
-      const snapshot = questionSnapshotMap.get(questionId);
-      const storedQuestion = questionById.get(questionId);
-      const isCorrect = isAnswerCorrect(
-        answer,
-        snapshot?.correctAnswer,
-        resolveQuestionType(snapshot?.type ?? storedQuestion?.type ?? "MC", snapshot?.options?.length ? snapshot.options : storedQuestion?.options),
-      );
+      // Graded with the current question; a later key fix re-grades it (lib/attempt-regrade.ts).
+      const question = questionById.get(questionId);
+      const isCorrect = isAnswerCorrect(answer, question?.correctAnswer, resolveQuestionType(question?.type ?? "MC", question?.options));
       if (isCorrect) correctCount += 1;
-      const existing = existingAnswers.get(questionId);
       answerWrites.push({
         where: { attemptId_questionId: { attemptId, questionId } },
         update: {
-          questionSnapshot: existing?.questionSnapshot ?? (snapshot ? stringifySnapshot(snapshot) : undefined),
           answer,
           isCorrect,
           timeSpent: timeSpentByQuestion?.[questionId] ?? undefined,
@@ -105,7 +86,6 @@ export async function gradeAndSubmitPracticeAttempt(attempt: OpenAttempt, input:
         create: {
           attemptId,
           questionId,
-          questionSnapshot: snapshot ? stringifySnapshot(snapshot) : undefined,
           answer,
           isCorrect,
           timeSpent: timeSpentByQuestion?.[questionId] ?? undefined,
@@ -123,12 +103,9 @@ export async function gradeAndSubmitPracticeAttempt(attempt: OpenAttempt, input:
       .filter((item) => !answers[item.questionId])
       .forEach((item) =>
         {
-          const snapshot = questionSnapshotMap.get(item.questionId);
-          const existing = existingAnswers.get(item.questionId);
           answerWrites.push({
             where: { attemptId_questionId: { attemptId, questionId: item.questionId } },
             update: {
-              questionSnapshot: existing?.questionSnapshot ?? (snapshot ? stringifySnapshot(snapshot) : undefined),
               answer: null,
               isCorrect: false,
               timeSpent: timeSpentByQuestion?.[item.questionId] ?? undefined,
@@ -141,7 +118,6 @@ export async function gradeAndSubmitPracticeAttempt(attempt: OpenAttempt, input:
             create: {
               attemptId,
               questionId: item.questionId,
-              questionSnapshot: snapshot ? stringifySnapshot(snapshot) : undefined,
               answer: null,
               isCorrect: false,
               timeSpent: timeSpentByQuestion?.[item.questionId] ?? undefined,

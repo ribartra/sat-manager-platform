@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 import prisma from "@/lib/prisma";
 import { buildQuestionDraft, materializeOfficialImageUrl, reconcileOfficialUpdate } from "@/lib/ingest-promotion";
 import { validateQuestionPayload } from "@/lib/content-validation";
+import { regradeQuestions } from "@/lib/attempt-regrade";
 
 /**
  * Promote staging candidates to official questions (AI Import "promote" and "Import with AI").
@@ -145,6 +146,10 @@ export async function promoteCandidates({
           });
         }
       });
+      // Attempts store only answers: a re-synced key or options re-grade the submitted ones.
+      if (result.questionData.correctAnswer !== undefined || result.questionData.type !== undefined || result.replaceOptions) {
+        await regradeQuestions([official.id], { userId, reason: "ai import re-sync" });
+      }
       resynced.push({ candidateId: candidate.id, questionId: official.id, changed: result.changed });
       continue;
     }

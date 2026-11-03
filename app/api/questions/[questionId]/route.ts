@@ -6,6 +6,7 @@ import { assertSameVersion, expectedVersion } from "@/lib/edit-version";
 import { questionEditorIssues } from "@/contracts/question";
 import { validateQuestionPayload } from "@/lib/content-validation";
 import { materializeOfficialImageUrl } from "@/lib/ingest-promotion";
+import { gradingFieldsChanged, regradeQuestions } from "@/lib/attempt-regrade";
 import { BadRequestError, ConflictError, ForbiddenError, NotFoundError, ValidationError, withApiErrors } from "@/lib/api-error";
 
 interface RouteContext {
@@ -75,7 +76,7 @@ export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }
   const { topicId, subskillId, difficulty, type, stem, stimulus, explanation, imageUrl, supportsGraph, correctAnswer, status, options, expectedUpdatedAt } = await req.json();
   const previous = await prisma.question.findFirst({
     where: { id: questionId, ...contentScopeFor(session.user) },
-    select: { status: true, topicId: true, difficulty: true, type: true },
+    select: { status: true, topicId: true, difficulty: true, type: true, correctAnswer: true, options: { select: { label: true, text: true } } },
   });
   if (!previous) return new NotFoundError("Question not found.").toResponse();
   const validationErrors = questionEditorIssues({
@@ -141,6 +142,15 @@ export const PUT = withApiErrors(async function PUT(req: NextRequest, { params }
     });
   });
 
+  // Attempts store only answers: a changed key, type or options re-grades the submitted ones.
+  const saved = await prisma.question.findUniqueOrThrow({
+    where: { id: questionId },
+    select: { correctAnswer: true, type: true, options: { select: { label: true, text: true } } },
+  });
+  if (gradingFieldsChanged(previous, saved)) {
+    await regradeQuestions([questionId], { userId: session.user.id, reason: "question edited" });
+  }
+
   const auditAction =
     previous?.status !== "PUBLISHED" && status === "PUBLISHED"
       ? "PUBLISH_QUESTION"
@@ -175,14 +185,15 @@ export const DELETE = withApiErrors(async function DELETE(_req: NextRequest, { p
   }
 
   const { questionId } = await params;
-  const [question, practiceSetLinks, fullTestLinks, attemptAnswers] = await Promise.all([
+  const [question, practiceSetLinks, fullTestLinks, attemptAnswers, testAnswers] = await Promise.all([
     prisma.question.findFirst({ where: { id: questionId, ...contentScopeFor(session.user) } }),
     prisma.practiceSetQuestion.count({ where: { questionId } }),
     prisma.fullPracticeTestQuestion.count({ where: { questionId } }),
     prisma.attemptAnswer.count({ where: { questionId } }),
+    prisma.fullPracticeTestAnswer.count({ where: { questionId } }),
   ]);
   if (!question) return new NotFoundError("Question not found.").toResponse();
-  if (practiceSetLinks > 0 || fullTestLinks > 0 || attemptAnswers > 0) {
+  if (practiceSetLinks > 0 || fullTestLinks > 0 || attemptAnswers > 0 || testAnswers > 0) {
     return new ConflictError("Archive this question instead. Questions with usage cannot be deleted.").toResponse();
   }
 

@@ -1,17 +1,17 @@
 import prisma from "@/lib/prisma";
-import { loadLiveQuestionMedia, withLiveMedia } from "@/lib/question-media";
 import { parseSnapshot, stringifySnapshot } from "@/lib/attempt-snapshots";
 
 /**
- * Immutable exam snapshot (RNF-17). Taken when a FullPracticeTestAttempt starts and stored in
- * FullPracticeTestAttempt.testSnapshot: the player, submit grading and both results pages read
- * the exam from it, so editing the exam (modules, order, pretest flags) or its questions (stem,
- * options, answer key, explanation) never changes an attempt that already started.
- * Attempts from before snapshots existed fall back to the live rows (and were backfilled once,
- * flagged `backfilled: true`, see scripts/backfill-fpt-snapshots.ts).
+ * Exam structure of an attempt (RNF-17). Taken when a FullPracticeTestAttempt starts and stored in
+ * FullPracticeTestAttempt.testSnapshot: which modules, in which order, which questions (ids, order,
+ * pretest flags). It never stores question content: the stem, options, answer key and explanation
+ * always come from the live bank question (a fixed key re-grades submitted attempts, see
+ * lib/attempt-regrade.ts), so editing the exam's structure never changes an attempt that started,
+ * while fixing a question reaches every attempt.
+ * Version 1 snapshots (they also copied the question content) are read as structure only.
  */
 
-export const FULL_TEST_SNAPSHOT_VERSION = 1;
+export const FULL_TEST_SNAPSHOT_VERSION = 2;
 
 /** Prisma include that loads everything the snapshot needs. */
 export const fullTestModulesInclude = {
@@ -49,21 +49,32 @@ export interface FullTestSnapshotQuestion {
   options: FullTestSnapshotOption[];
 }
 
-export interface FullTestSnapshotModule {
+/** A module as the attempt saw it, with the live question content (fullTestModulesForAttempt). */
+export interface FullTestSnapshotModule extends FullTestStructureModule {
+  questions: (FullTestStructureItem & { question: FullTestSnapshotQuestion })[];
+}
+
+export interface FullTestStructureItem {
+  questionId: string;
+  order: number;
+  isPretest: boolean;
+}
+
+/** What testSnapshot stores per module: no question content. */
+export interface FullTestStructureModule {
   id: string;
   name: string;
   section: string;
   order: number;
   timeLimit: number;
-  questions: { questionId: string; order: number; isPretest: boolean; question: FullTestSnapshotQuestion }[];
+  questions: FullTestStructureItem[];
 }
 
 export interface FullTestSnapshot {
   version: number;
   takenAt: string;
-  backfilled?: boolean;
   testId: string;
-  modules: FullTestSnapshotModule[];
+  modules: FullTestStructureModule[];
 }
 
 type LiveModule = {
@@ -92,7 +103,35 @@ type LiveModule = {
   }[];
 };
 
-export function snapshotModules(modules: LiveModule[]): FullTestSnapshotModule[] {
+const questionContentInclude = {
+  topic: { include: { domain: true } },
+  options: { orderBy: { label: "asc" as const } },
+} as const;
+
+type LiveQuestion = LiveModule["questions"][number]["question"];
+
+function questionContent(question: LiveQuestion): FullTestSnapshotQuestion {
+  return {
+    id: question.id,
+    stem: question.stem,
+    stimulus: question.stimulus,
+    type: question.type,
+    difficulty: question.difficulty,
+    correctAnswer: question.correctAnswer,
+    explanation: question.explanation,
+    imageUrl: question.imageUrl,
+    supportsGraph: question.supportsGraph,
+    topic: { id: question.topic.id, name: question.topic.name, domain: { id: question.topic.domain.id, name: question.topic.domain.name } },
+    options: [...question.options]
+      .sort((a, b) => a.label.localeCompare(b.label))
+      .map((option) => ({ id: option.id, label: option.label, text: option.text, imageUrl: option.imageUrl })),
+  };
+}
+
+/** The exam's structure (modules, order, question ids, pretest flags), without question content. */
+export function structureOf(
+  modules: { id: string; name: string; section: string; order: number; timeLimit: number; questions: FullTestStructureItem[] }[],
+): FullTestStructureModule[] {
   return [...modules]
     .sort((a, b) => a.order - b.order)
     .map((module) => ({
@@ -103,78 +142,48 @@ export function snapshotModules(modules: LiveModule[]): FullTestSnapshotModule[]
       timeLimit: module.timeLimit,
       questions: [...module.questions]
         .sort((a, b) => a.order - b.order)
-        .map((item) => ({
-          questionId: item.questionId,
-          order: item.order,
-          isPretest: item.isPretest,
-          question: {
-            id: item.question.id,
-            stem: item.question.stem,
-            stimulus: item.question.stimulus,
-            type: item.question.type,
-            difficulty: item.question.difficulty,
-            correctAnswer: item.question.correctAnswer,
-            explanation: item.question.explanation,
-            imageUrl: item.question.imageUrl,
-            supportsGraph: item.question.supportsGraph,
-            topic: {
-              id: item.question.topic.id,
-              name: item.question.topic.name,
-              domain: { id: item.question.topic.domain.id, name: item.question.topic.domain.name },
-            },
-            options: [...item.question.options]
-              .sort((a, b) => a.label.localeCompare(b.label))
-              .map((option) => ({ id: option.id, label: option.label, text: option.text, imageUrl: option.imageUrl })),
-          },
-        })),
+        .map((item) => ({ questionId: item.questionId, order: item.order, isPretest: item.isPretest })),
     }));
 }
 
-export function buildFullTestSnapshot(testId: string, modules: LiveModule[], opts: { backfilled?: boolean } = {}) {
-  // The attempt references the questions' images (by questionId), it never stores them: images are
-  // read from the live bank question (fullTestModulesForAttempt), so a fixed crop reaches old attempts.
-  const withoutImages = snapshotModules(modules).map((module) => ({
-    ...module,
-    questions: module.questions.map((item) => ({
-      ...item,
-      question: { ...item.question, imageUrl: null, options: item.question.options.map((option) => ({ ...option, imageUrl: null })) },
-    })),
-  }));
+export function buildFullTestSnapshot(testId: string, modules: FullTestStructureModule[]) {
   const snapshot: FullTestSnapshot = {
     version: FULL_TEST_SNAPSHOT_VERSION,
     takenAt: new Date().toISOString(),
-    ...(opts.backfilled ? { backfilled: true } : {}),
     testId,
-    modules: withoutImages,
+    modules: structureOf(modules),
   };
   return stringifySnapshot(snapshot);
 }
 
-export async function loadLiveFullTestModules(testId: string) {
-  const modules = await prisma.fullPracticeTestModule.findMany({
-    where: { testId },
-    include: fullTestModulesInclude,
-    orderBy: { order: "asc" },
-  });
-  return snapshotModules(modules);
-}
-
-/** Snapshot modules, or null when the attempt has none (legacy). Synchronous, for list views. */
-export function snapshotModulesOf(testSnapshot: string | null | undefined) {
+/** Structure stored in the attempt, or null when the attempt has none (legacy). Synchronous, for list views. */
+export function snapshotModulesOf(testSnapshot: string | null | undefined): FullTestStructureModule[] | null {
   const snapshot = parseSnapshot<FullTestSnapshot>(testSnapshot);
-  return snapshot?.modules?.length ? snapshot.modules : null;
+  return snapshot?.modules?.length ? structureOf(snapshot.modules) : null;
 }
 
 /**
- * The exam as the attempt saw it: the stored snapshot (text, options, answer key), or (legacy
- * attempts without one) the live exam rows in the same shape. Images always come from the live bank
- * question (an attempt only references them), never from the snapshot.
+ * The exam of an attempt: its stored structure (or, legacy attempts without one, the live exam's)
+ * filled with the live content of each question (text, options, answer key, explanation, images).
  */
-export async function fullTestModulesForAttempt(attempt: { testId: string; testSnapshot: string | null }) {
-  const modules = snapshotModulesOf(attempt.testSnapshot) ?? (await loadLiveFullTestModules(attempt.testId));
-  const media = await loadLiveQuestionMedia(modules.flatMap((module) => module.questions.map((item) => item.questionId)));
-  return modules.map((module) => ({
+export async function fullTestModulesForAttempt(attempt: { testId: string; testSnapshot: string | null }): Promise<FullTestSnapshotModule[]> {
+  const structure =
+    snapshotModulesOf(attempt.testSnapshot) ??
+    structureOf(
+      await prisma.fullPracticeTestModule.findMany({
+        where: { testId: attempt.testId },
+        include: { questions: { select: { questionId: true, order: true, isPretest: true } } },
+      }),
+    );
+  const ids = [...new Set(structure.flatMap((module) => module.questions.map((item) => item.questionId)))];
+  const rows = ids.length ? await prisma.question.findMany({ where: { id: { in: ids } }, include: questionContentInclude }) : [];
+  const questions = new Map(rows.map((row) => [row.id, questionContent(row)]));
+  // Questions used by an attempt cannot be deleted (archived instead); a missing one is skipped.
+  return structure.map((module) => ({
     ...module,
-    questions: module.questions.map((item) => ({ ...item, question: withLiveMedia(item.question, media) })),
+    questions: module.questions.flatMap((item) => {
+      const question = questions.get(item.questionId);
+      return question ? [{ ...item, question }] : [];
+    }),
   }));
 }

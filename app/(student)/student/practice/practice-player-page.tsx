@@ -5,7 +5,6 @@ import { notFound, redirect } from "next/navigation";
 import { PracticeSetPlayer } from "./player-client";
 import {
   buildPracticeSetSnapshot,
-  buildQuestionSnapshot,
   stringifySnapshot,
 } from "@/lib/attempt-snapshots";
 import { getPublicCalculatorConfig } from "@/lib/calculator-config";
@@ -154,10 +153,6 @@ export async function renderPracticePlayer({
       })),
     })
   );
-  const questionSnapshots = practiceSet.questions.map((item) => ({
-    questionId: item.questionId,
-    questionSnapshot: stringifySnapshot(buildQuestionSnapshot(item)),
-  }));
 
   const findOpenAttempt = () =>
     withSqliteRetry(() => prisma.attempt.findFirst({
@@ -190,7 +185,7 @@ export async function renderPracticePlayer({
       createdAttemptId = created.id;
     } catch (error) {
       // Another request (second tab, double click) opened it first: the partial unique index allows
-      // one IN_PROGRESS attempt per assignment, so reuse that one (it seeds its own snapshots).
+      // one IN_PROGRESS attempt per assignment, so reuse that one.
       if (!isUniqueConstraintError(error)) throw error;
       attempt = await findOpenAttempt();
     }
@@ -198,19 +193,6 @@ export async function renderPracticePlayer({
 
   if (createdAttemptId) {
     const newAttemptId = createdAttemptId;
-    await Promise.all(
-      questionSnapshots.map((snapshot) =>
-      withSqliteRetry(() => prisma.attemptAnswer.upsert({
-          where: { attemptId_questionId: { attemptId: newAttemptId, questionId: snapshot.questionId } },
-          update: { questionSnapshot: snapshot.questionSnapshot },
-          create: {
-            attemptId: newAttemptId,
-            questionId: snapshot.questionId,
-            questionSnapshot: snapshot.questionSnapshot,
-          },
-      }))
-      )
-    );
     if (assignmentId) {
       // A set finished at least once stays COMPLETED while the student retries it (the open try shows
       // as "Retry in progress"); only a set not done yet moves to IN_PROGRESS.
@@ -252,19 +234,6 @@ export async function renderPracticePlayer({
       where: { id: activeAttemptId },
       data: { practiceSetSnapshot },
     }));
-    await Promise.all(
-      questionSnapshots.map((snapshot) =>
-        withSqliteRetry(() => prisma.attemptAnswer.upsert({
-          where: { attemptId_questionId: { attemptId: activeAttemptId, questionId: snapshot.questionId } },
-          update: { questionSnapshot: snapshot.questionSnapshot },
-          create: {
-            attemptId: activeAttemptId,
-            questionId: snapshot.questionId,
-            questionSnapshot: snapshot.questionSnapshot,
-          },
-        }))
-      )
-    );
     attempt = await withSqliteRetry(() => prisma.attempt.findUniqueOrThrow({
       where: { id: activeAttemptId },
       include: { answers: true },
@@ -281,7 +250,7 @@ export async function renderPracticePlayer({
   attempt.answers.forEach((answer) => {
     const checkedQuestion = questionById.get(answer.questionId);
     if (feedbackMode === "IMMEDIATE" && answer.checkedAt && answer.answer && checkedQuestion) {
-      savedChecks[answer.questionId] = gradeCheck(answer.answer, checkedQuestion, answer.questionSnapshot, {
+      savedChecks[answer.questionId] = gradeCheck(answer.answer, checkedQuestion, {
         showExplanation: attempt.showExplanations ?? showExplanations,
       });
     }

@@ -339,9 +339,9 @@ const checks = [
   },
   {
     file: "lib/student-report.ts",
-    requires: ["answerSnapshotTaxonomy(", "REPORT_QUESTION"],
-    forbids: ["answers: { include: { question: { include: { topic: true } } } }", "answers: true,"],
-    label: "Informes: sin texto de preguntas ni snapshots de respuestas",
+    requires: ["REPORT_QUESTION"],
+    forbids: ["answers: { include: { question: { include: { topic: true } } } }", "answers: true,", "questionSnapshot"],
+    label: "Informes: sin texto de preguntas; skill y nivel de la pregunta actual",
   },
   {
     file: "lib/email.ts",
@@ -496,8 +496,9 @@ const checks = [
   },
   {
     file: "lib/practice-attempt-submit.ts",
-    requires: ["status: \"IN_PROGRESS\"", "practiceSetSnapshot", "questionSnapshot"],
-    label: "Submit guarda snapshots y exige intento IN_PROGRESS",
+    requires: ["status: \"IN_PROGRESS\"", "practiceSetSnapshot", "questionById.get(questionId)"],
+    forbids: ["questionSnapshot"],
+    label: "Submit guarda la estructura del set (no copia preguntas), califica con la pregunta actual y exige intento IN_PROGRESS",
   },
   {
     file: "app/api/attempts/[attemptId]/invalidate/route.ts",
@@ -644,19 +645,37 @@ const checks = [
   // Attempts reference the question's images (live bank question by id); they never store them.
   {
     file: "lib/full-test-snapshot.ts",
-    requires: ["loadLiveQuestionMedia", "withLiveMedia", "imageUrl: null"],
-    label: "Tests: el intento referencia la imagen de la pregunta (se lee del banco), no la guarda",
+    requires: ["FULL_TEST_SNAPSHOT_VERSION = 2", "modules: structureOf(modules)", "prisma.question.findMany({ where: { id: { in: ids } }"],
+    forbids: ["correctAnswer: item.question.correctAnswer"],
+    label: "Tests: el intento guarda solo la estructura (modulos, orden, pretest); el contenido sale de la pregunta actual",
   },
   {
     file: "lib/attempt-snapshots.ts",
-    requires: ["imageUrl: null"],
-    forbids: ["imageUrl: item.question.imageUrl", "imageUrl: option.imageUrl"],
-    label: "Practice: el snapshot de la pregunta no guarda imagenes",
+    requires: ["buildPracticeSetSnapshot"],
+    forbids: ["buildQuestionSnapshot", "correctAnswer"],
+    label: "Practice: el intento guarda solo la estructura del set, nunca la pregunta",
   },
   {
     file: "app/(student)/student/results/[attemptId]/page.tsx",
-    requires: ["liveImagesOf"],
-    label: "Resultado de practice: imagenes desde la pregunta viva",
+    requires: ["const question = ans.question;"],
+    forbids: ["questionSnapshot"],
+    label: "Resultado de practice: la pregunta actual (texto, opciones e imagenes)",
+  },
+  {
+    file: "lib/attempt-regrade.ts",
+    requires: ["regradeQuestions", "REGRADE_ATTEMPTS", 'status: "SUBMITTED"', "if (answerUpdates.length === 0) return null;", "gradeFullTestModules"],
+    forbids: ["notify", "unlock"],
+    label: "Recalcular: clave corregida recalifica intentos entregados, sin notificar ni desbloquear",
+  },
+  {
+    file: "app/api/questions/[questionId]/route.ts",
+    requires: ["gradingFieldsChanged(previous, saved)", "regradeQuestions([questionId]", "fullPracticeTestAnswer.count({ where: { questionId } })"],
+    label: "Editar pregunta: cambio de clave/tipo/opciones recalifica; no se borra si tiene intentos de practica o Test",
+  },
+  {
+    file: "lib/ingest-promote-candidates.ts",
+    requires: ["regradeQuestions([official.id]"],
+    label: "Re-sync de AI Import: clave u opciones nuevas recalifican los intentos",
   },
   {
     file: "lib/ingest-promotion.ts",
@@ -715,8 +734,8 @@ const checks = [
   },
   {
     file: "app/(student)/student/results/[attemptId]/page.tsx",
-    requires: ["canRevealSolutions", "explanationVisibility", "ReviewQuestionCard", "reveal={canRevealSolutions}", "questionSnapshot"],
-    label: "Resultados respetan visibilidad de soluciones y snapshots/media",
+    requires: ["canRevealSolutions", "explanationVisibility", "ReviewQuestionCard", "reveal={canRevealSolutions}", "practiceSetSnapshot"],
+    label: "Resultados respetan visibilidad de soluciones y el orden del intento",
   },
   {
     file: "components/sat/review-question-card.tsx",

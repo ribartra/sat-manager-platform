@@ -1,6 +1,5 @@
 import { formatCorrectAnswer, isAnswerCorrect } from "@/lib/answer-grading";
 import { resolveQuestionType } from "@/lib/question-type";
-import { parseSnapshot, type QuestionSnapshot } from "@/lib/attempt-snapshots";
 
 /**
  * Immediate-feedback grading (RNF-11). The answer key and explanation stay on the server until
@@ -24,22 +23,18 @@ interface GradableQuestion {
 }
 
 /**
- * Grades against the attempt's question snapshot when present, so a later edit does not change it.
+ * Grades against the current question (a later key fix re-grades the attempt, lib/attempt-regrade.ts).
  * `showExplanation` is the attempt's "Show explanations in the player" (per assignment).
  */
 export function gradeCheck(
   answer: string | null | undefined,
   question: GradableQuestion,
-  questionSnapshot?: string | null,
   { showExplanation = true }: { showExplanation?: boolean } = {},
 ): CheckResult {
-  const snapshot = parseSnapshot<QuestionSnapshot>(questionSnapshot);
-  const correctAnswer = snapshot?.correctAnswer ?? question.correctAnswer;
-  const options = snapshot?.options?.length ? snapshot.options : question.options;
   return {
-    isCorrect: isAnswerCorrect(answer, correctAnswer, resolveQuestionType(snapshot?.type ?? question.type, options)),
-    answerKey: correctAnswer,
-    correctAnswer: formatCorrectAnswer(correctAnswer),
-    explanation: showExplanation ? ((snapshot ? snapshot.explanation : question.explanation) ?? null) : null,
+    isCorrect: isAnswerCorrect(answer, question.correctAnswer, resolveQuestionType(question.type, question.options)),
+    answerKey: question.correctAnswer,
+    correctAnswer: formatCorrectAnswer(question.correctAnswer),
+    explanation: showExplanation ? (question.explanation ?? null) : null,
   };
 }
