@@ -1,6 +1,6 @@
 import { PageHeader, PageShell } from "@/components/sat";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
-import { auth } from "@/lib/auth";
+import { getStudentViewer } from "@/lib/student-viewer";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
@@ -9,11 +9,13 @@ import { FolderOpen, Clock, CheckCircle, BookOpen } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
 export default async function StudentProgramPage() {
-  const session = await auth();
-  if (!session) redirect("/login");
-  if (!["STUDENT", "PARENT"].includes(session.user.role)) redirect("/teacher");
+  // The student shown: the signed-in student, or the teacher's Student view (read only).
+  const viewer = await getStudentViewer();
+  if (!viewer) redirect("/login");
+  const session = viewer.session;
+  if (!viewer.readOnly && !["STUDENT", "PARENT"].includes(session.user.role)) redirect("/teacher");
 
-  const studentId = session.user.id;
+  const studentId = viewer.studentId;
   const now = new Date();
 
   // Active enrollment in a currently active program

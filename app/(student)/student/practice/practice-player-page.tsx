@@ -1,4 +1,5 @@
 import { auth } from "@/lib/auth";
+import { getStudentViewer } from "@/lib/student-viewer";
 import prisma from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import { PracticeSetPlayer } from "./player-client";
@@ -36,9 +37,16 @@ export async function renderPracticePlayer({
   exitHref,
   resultQuery,
 }: PracticePlayerInput) {
-  const session = await auth();
-  if (!session) redirect("/login");
-  const userId = session.user.id;
+  // Teacher preview: the teacher's own (nothing is scored or saved). Otherwise the student shown: the
+  // signed-in student, or the teacher's Student view, where the try is simulated (a preview of the
+  // student's assignment: nothing is created, saved or scored).
+  const previewSession = previewMode ? await auth() : null;
+  if (previewMode && !previewSession) redirect("/login");
+  const viewer = previewMode ? null : await getStudentViewer();
+  if (!previewMode && !viewer) redirect("/login");
+  const simulated = Boolean(viewer?.readOnly);
+  const session = (previewSession ?? viewer!.session)!;
+  const userId = viewer?.studentId ?? session.user.id;
 
   const practiceSet = await withSqliteRetry(() => prisma.practiceSet.findUnique({
     where: { id: setId },
@@ -62,7 +70,7 @@ export async function renderPracticePlayer({
   // Teacher preview may open drafts; students only get published sets.
   if (!previewMode && practiceSet.status !== "PUBLISHED") notFound();
 
-  if (!previewMode && session.user.role === "STUDENT") {
+  if (!previewMode && (session.user.role === "STUDENT" || simulated)) {
     if (!assignmentId) redirect("/student");
     const assignment = await withSqliteRetry(() => prisma.assignment.findFirst({
       where: { id: assignmentId, studentId: userId, practiceSetId: setId, locked: false },
@@ -101,20 +109,29 @@ export async function renderPracticePlayer({
     practiceSet.topic.domain.section.name === "MATH" &&
     (await getFeatureSetting("CALCULATOR_PRACTICE_SETS"));
 
-  if (previewMode) {
+  if (previewMode || simulated) {
+    // Student view: start where the student is (their open try, read only); nothing is written.
+    const open = simulated
+      ? await withSqliteRetry(() => prisma.attempt.findFirst({
+          where: { studentId: userId, practiceSetId: setId, assignmentId: assignmentId ?? null, status: "IN_PROGRESS" },
+          include: { answers: true },
+          orderBy: { startedAt: "desc" },
+        }))
+      : null;
+    const openAnswers = open?.answers ?? [];
     return (
       <PracticeSetPlayer
         practiceSetId={setId}
         assignmentId={null}
         attemptId="preview"
         questions={questions}
-        savedAnswers={{}}
-        savedMarked={[]}
-        savedNotes={{}}
+        savedAnswers={Object.fromEntries(openAnswers.filter((a) => a.answer).map((a) => [a.questionId, a.answer ?? ""]))}
+        savedMarked={openAnswers.filter((a) => a.markedForReview).map((a) => a.questionId)}
+        savedNotes={Object.fromEntries(openAnswers.filter((a) => a.note).map((a) => [a.questionId, a.note ?? ""]))}
         savedEliminated={{}}
-        savedQuestion={0}
-        savedTime={0}
-        savedTimeSpent={{}}
+        savedQuestion={open?.currentQuestion ?? 0}
+        savedTime={open?.totalTime ?? 0}
+        savedTimeSpent={Object.fromEntries(openAnswers.map((a) => [a.questionId, a.timeSpent ?? 0]))}
         setName={practiceSet.name}
         skillName={practiceSet.topic.name}
         isMath={practiceSet.topic.domain.section.name === "MATH"}
@@ -122,7 +139,8 @@ export async function renderPracticePlayer({
         calculatorConfig={getPublicCalculatorConfig()}
         feedbackMode={feedbackMode}
         previewMode
-        exitHref={exitHref ?? `/teacher/practice-sets/${setId}`}
+        previewNotice={simulated ? `Student view of ${viewer!.studentName}: this try is simulated — nothing is saved or scored.` : undefined}
+        exitHref={simulated ? (assignmentId ? `/student/practice/assignment/${assignmentId}` : "/student/practice") : exitHref ?? `/teacher/practice-sets/${setId}`}
       />
     );
   }

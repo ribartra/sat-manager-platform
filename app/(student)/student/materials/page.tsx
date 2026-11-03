@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { PageHeader, PageShell } from "@/components/sat";
 import prisma from "@/lib/prisma";
@@ -6,15 +7,17 @@ import { notFound } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { MathContent } from "@/components/math-content";
 import { getFeatureSetting } from "@/lib/app-settings";
-import { auth } from "@/lib/auth";
+import { getStudentViewer } from "@/lib/student-viewer";
 
 export default async function StudentMaterialsPage() {
   if (!(await getFeatureSetting("MATERIALS_MODULE"))) notFound();
-  const session = await auth();
+  // The student shown: the signed-in student, or the teacher's Student view (read only).
+  const viewer = await getStudentViewer();
+  if (!viewer) redirect("/login");
 
   const materials = await prisma.studyMaterial.findMany({
     // Materials of the programs the student is enrolled in (program = tenant).
-    where: { status: "PUBLISHED", program: { deletedAt: null, enrollments: { some: { studentId: session?.user?.id ?? "__no_session__", active: true, status: "APPROVED" } } } },
+    where: { status: "PUBLISHED", program: { deletedAt: null, enrollments: { some: { studentId: viewer.studentId ?? "__no_session__", active: true, status: "APPROVED" } } } },
     orderBy: { updatedAt: "desc" },
     include: { topic: { include: { domain: { include: { section: true } } } } },
   });

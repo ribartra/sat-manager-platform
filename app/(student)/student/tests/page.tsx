@@ -5,7 +5,7 @@ import { HEADER_SHORTCUT_CLASS, HeaderActions } from "@/components/sat/header-ac
 import { historyHref } from "@/lib/history-params";
 import { pendingHref } from "@/lib/pending";
 import { Breadcrumbs, EmptyState, LinkTabs, PageHeader, PageShell, Pagination, TestCardsByNumber, type TestCardLinks, pageFromParam, paginate } from "@/components/sat";
-import { auth } from "@/lib/auth";
+import { getStudentViewer } from "@/lib/student-viewer";
 import { loadStudentTests, sortTests } from "@/lib/test-assignments";
 
 interface PageProps {
@@ -20,12 +20,13 @@ type View = (typeof VIEWS)[number];
  * all — with Start / Continue per module, results and Retake. Every try is in History.
  */
 export default async function StudentTestsPage({ searchParams }: PageProps) {
-  const session = await auth();
-  if (!session?.user) redirect("/login");
+  // The student shown: the signed-in student, or the teacher's Student view (read only).
+  const viewer = await getStudentViewer();
+  if (!viewer) redirect("/login");
   const query = await searchParams;
   const view: View = VIEWS.includes(query.view as View) ? (query.view as View) : "pending";
 
-  const items = await loadStudentTests(session.user.id);
+  const items = await loadStudentTests(viewer.studentId);
   const { pending, done } = sortTests(items);
   const shown = view === "pending" ? pending : view === "completed" ? done : [...pending, ...done];
 
@@ -62,7 +63,7 @@ export default async function StudentTestsPage({ searchParams }: PageProps) {
         <EmptyState title={view === "pending" ? "No pending tests. Great job!" : "No tests here yet."} />
       ) : (
         <div id="tests" className="scroll-mt-6">
-          <TestCardsByNumber items={page.items} links={STUDENT_TEST_CARD_LINKS} openPending />
+          <TestCardsByNumber items={page.items} links={viewer.readOnly ? { ...STUDENT_TEST_CARD_LINKS, canRetake: false } : STUDENT_TEST_CARD_LINKS} openPending />
           <Pagination basePath="/student/tests" params={{ view }} anchor="tests" pageSize={TESTS_PAGE_SIZE} {...page} />
         </div>
       )}

@@ -1,5 +1,5 @@
 import { parseEliminatedOptions } from "@/lib/answer-review-meta";
-import { auth } from "@/lib/auth";
+import { getStudentViewer } from "@/lib/student-viewer";
 import prisma from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import { FullTestPlayer } from "./player-client";
@@ -33,9 +33,11 @@ export default async function FullTestPlayerPage({ params, searchParams }: PageP
     if (query[key]) returnParams.set(key, query[key]!);
   }
   const requestedModule = moduleIndexFromKey(query.module);
-  const session = await auth();
+  // The student shown: the signed-in student, or the teacher's Student view (read only).
+  const viewer = await getStudentViewer();
+  if (!viewer) redirect("/login");
   const assignment = await prisma.fullPracticeTestAssignment.findFirst({
-    where: { id: assignmentId, studentId: session!.user.id },
+    where: { id: assignmentId, studentId: viewer.studentId },
     include: {
       test: {
         include: {
@@ -64,6 +66,53 @@ export default async function FullTestPlayerPage({ params, searchParams }: PageP
     // Intro: nothing is created until the student presses Start (the attempt starts with the module).
     return <TestIntro assignment={assignment} attempt={attempt ?? null} moduleIndex={requestedModule} />;
   }
+  if (viewer.readOnly) {
+    // Teacher's Student view: a simulated sitting of this module (the player's preview mode): it starts
+    // where the student is (their open attempt, read only) and creates, saves or scores nothing.
+    const modules = attempt ? await fullTestModulesForAttempt(attempt) : assignment.test.modules;
+    const completedModules = attempt ? completedModulesOf(attempt.moduleTimerState, modules.length) : [];
+    if (attempt && requestedModule !== null && completedModules.includes(requestedModule)) {
+      redirect(`/student/tests/results/${attempt.id}#mod-${moduleKeyFromIndex(requestedModule)}`);
+    }
+    const answers = attempt?.answers ?? [];
+    return (
+      <FullTestPlayer
+        attemptId="preview"
+        assignmentId={assignment.id}
+        testName={assignment.test.name}
+        breakMinutes={assignment.test.breakMinutes}
+        modules={modules.map((module) => ({
+          id: module.id,
+          name: module.name,
+          section: module.section,
+          timeLimit: module.timeLimit,
+          questions: module.questions.map((item) => ({
+            id: item.question.id,
+            stem: item.question.stem,
+            stimulus: item.question.stimulus,
+            type: item.question.type,
+            imageUrl: item.question.imageUrl,
+            options: item.question.options,
+            graphArtifacts: item.question.supportsGraph ? extractQuestionGraphArtifacts(item.question) : [],
+          })),
+        }))}
+        savedAnswers={Object.fromEntries(answers.map((answer) => [answer.questionId, answer.answer ?? ""]))}
+        savedTimeSpent={Object.fromEntries(answers.map((answer) => [answer.questionId, answer.timeSpent ?? 0]))}
+        savedModule={requestedModule ?? attempt?.currentModule ?? 0}
+        savedQuestion={requestedModule === null || requestedModule === attempt?.currentModule ? attempt?.currentQuestion ?? 0 : 0}
+        savedExpiredEvents={0}
+        savedExtraTimeUsed={0}
+        savedProgressState={null}
+        calculatorConfig={getPublicCalculatorConfig()}
+        showCalculator={await getFeatureSetting("CALCULATOR_FULL_TESTS")}
+        previewMode
+        previewNotice={`Student view of ${viewer.studentName}: this try is simulated — nothing is saved or scored.`}
+        exitHref={`/student/tests/${assignment.id}${query.module ? `?module=${encodeURIComponent(query.module)}` : ""}`}
+        completedModules={completedModules}
+        startModule={requestedModule}
+      />
+    );
+  }
   let createdHere = false;
   if (!attempt) {
     try {
@@ -71,7 +120,7 @@ export default async function FullTestPlayerPage({ params, searchParams }: PageP
         data: {
           testId: assignment.testId,
           assignmentId: assignment.id,
-          studentId: session!.user.id,
+          studentId: viewer.studentId,
           // RNF-17: freeze the exam as it is now; later edits never change this attempt.
           testSnapshot: buildFullTestSnapshot(assignment.testId, assignment.test.modules),
           // The assignment's "Show explanations in the player" when this attempt starts.
@@ -98,7 +147,7 @@ export default async function FullTestPlayerPage({ params, searchParams }: PageP
       await prisma.fullPracticeTestAssignment.update({ where: { id: assignment.id }, data: { status: "IN_PROGRESS" } });
     }
     await writeAudit({
-      userId: session!.user.id,
+      userId: viewer.studentId,
       action: "FPT_ATTEMPT_STARTED",
       targetType: "FullPracticeTestAttempt",
       targetId: attempt.id,
@@ -109,7 +158,7 @@ export default async function FullTestPlayerPage({ params, searchParams }: PageP
   } else if (claimWriteSlot(`resumed:${attempt.id}`, RESUME_AUDIT_INTERVAL_MS)) {
     // Logged once per sitting, not on every page load (module switches and refreshes reload the page).
     await writeAudit({
-      userId: session!.user.id,
+      userId: viewer.studentId,
       action: "FPT_ATTEMPT_RESUMED",
       targetType: "FullPracticeTestAttempt",
       targetId: attempt.id,

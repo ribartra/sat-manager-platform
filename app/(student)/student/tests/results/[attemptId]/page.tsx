@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { explanationsInPlayerLabel } from "@/lib/domain-meta";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -15,7 +16,7 @@ import { AnswerGrid, AnswerGridLegend, ModuleResultLegend, ModuleResultRows, Sco
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { auth } from "@/lib/auth";
+import { getStudentViewer } from "@/lib/student-viewer";
 import prisma from "@/lib/prisma";
 import { parseEliminatedOptions } from "@/lib/answer-review-meta";
 import { isAnswerCorrect } from "@/lib/answer-grading";
@@ -38,9 +39,11 @@ interface PageProps {
 export default async function FullTestResultsPage({ params, searchParams }: PageProps) {
   const { attemptId } = await params;
   const query = await searchParams;
-  const session = await auth();
+  // The student shown: the signed-in student, or the teacher's Student view (read only).
+  const viewer = await getStudentViewer();
+  if (!viewer) redirect("/login");
   const attempt = await prisma.fullPracticeTestAttempt.findFirst({
-    where: { id: attemptId, studentId: session!.user.id },
+    where: { id: attemptId, studentId: viewer.studentId },
     include: {
       test: { select: { name: true, reviewEnabled: true, number: true, source: { select: { name: true } } } },
       assignment: { select: { id: true, dueDate: true, createdAt: true, status: true, showExplanations: true } },
@@ -66,12 +69,13 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
   });
 
   const siblings = await prisma.fullPracticeTestAttempt.findMany({
-    where: { studentId: session!.user.id, testId: attempt.testId, ...(attempt.assignmentId ? { assignmentId: attempt.assignmentId } : {}) },
+    where: { studentId: viewer.studentId, testId: attempt.testId, ...(attempt.assignmentId ? { assignmentId: attempt.assignmentId } : {}) },
     orderBy: { startedAt: "asc" },
     select: { id: true, status: true, startedAt: true, submittedAt: true, rwScore: true, mathScore: true, totalScore: true },
   });
   const tryNumber = siblings.findIndex((s) => s.id === attempt.id) + 1;
-  const canRetake = attempt.assignment?.status === "COMPLETED" && !siblings.some((s) => s.status === "IN_PROGRESS");
+  // Student view (read only): no Retake.
+  const canRetake = !viewer.readOnly && attempt.assignment?.status === "COMPLETED" && !siblings.some((s) => s.status === "IN_PROGRESS");
   const timeByModule = modules.map((m) => m.questions.reduce((sum, q) => sum + (attempt.answers.find((a) => a.questionId === q.questionId)?.timeSpent ?? 0), 0));
 
   const answersByQuestion = new Map(attempt.answers.map((answer) => [answer.questionId, answer]));

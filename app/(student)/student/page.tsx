@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { PageShell } from "@/components/sat";
-import { auth } from "@/lib/auth";
+import { getStudentViewer } from "@/lib/student-viewer";
 import prisma from "@/lib/prisma";
 import { refreshAssignmentStates } from "@/lib/assignments";
 import { StudentHome } from "./student-home";
@@ -13,8 +13,11 @@ interface PageProps {
 
 /** Student Home (see StudentHome). Parents have their own portal (/parent); the layout sends them there. */
 export default async function StudentDashboard({ searchParams }: PageProps) {
-  const session = await auth();
-  const userId = session!.user.id;
+  // The student shown: the signed-in student, or the teacher's Student view (read only).
+  const viewer = await getStudentViewer();
+  if (!viewer) redirect("/login");
+  const session = viewer.session;
+  const userId = viewer.studentId;
   await refreshAssignmentStates();
 
   // Guard: only students without an active enrollment land on /student/program
@@ -41,7 +44,7 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
   if (query.area === "math" || query.area === "reading" || query.area === "writing") redirect(`/student/practice?area=${query.area}`);
   return (
     <PageShell>
-      <StudentHome studentId={userId} firstName={session!.user.name.split(" ")[0]} />
+      <StudentHome studentId={userId} firstName={viewer.studentName.split(" ")[0]} />
     </PageShell>
   );
 }

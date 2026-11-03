@@ -15,8 +15,9 @@ const OPEN_FOR_OVERDUE = { in: ["PENDING", "IN_PROGRESS"] };
  */
 export async function markOverdueAssignments(now = new Date()) {
   // A set or Test finished at least once met its due date: a student's retry is never "overdue".
-  const where = { dueDate: { lt: now }, status: OPEN_FOR_OVERDUE, attempts: { none: { status: "SUBMITTED" as const } } };
-  const examWhere = where;
+  const examWhere = { dueDate: { lt: now }, status: OPEN_FOR_OVERDUE, attempts: { none: { status: "SUBMITTED" as const } } };
+  // Classroom work stays open until the teacher finishes it or assigns it as Homework: never Overdue.
+  const where = { ...examWhere, context: "HOMEWORK" };
   const [practice, exams] = await Promise.all([
     withSqliteRetry(() => prisma.assignment.count({ where })),
     withSqliteRetry(() => prisma.fullPracticeTestAssignment.count({ where: examWhere })),
@@ -234,38 +235,49 @@ export async function upsertPracticeAssignment(input: PracticeAssignmentInput): 
 }
 
 /**
- * "Assign as Homework" closes the student's Classroom assignment of that set (pendiente-p2.md): its
- * unfinished try is submitted as it is (the answers given so far; Classroom never shows a score) and
- * the assignment becomes COMPLETED, so it can't be continued; history keeps it. Homework starts from
- * zero. Runs outside the assign batch transaction (grading opens its own). Returns whether it closed one.
+ * Closes one Classroom assignment (pendiente-p2.md): its unfinished try is submitted as it is (the
+ * answers given so far; Classroom never shows a score) and the assignment becomes COMPLETED, so it
+ * can't be continued; history keeps it. A set never started is just marked done. Runs outside any
+ * transaction (grading opens its own). Returns whether it closed it.
  */
-export async function closeClassroomAssignment(input: { studentId: string; practiceSetId: string; closedById: string }) {
-  const { studentId, practiceSetId, closedById } = input;
-  const classroom = await prisma.assignment.findFirst({
-    where: { studentId, practiceSetId, context: "CLASSROOM", status: { not: "COMPLETED" } },
-    select: { id: true },
-  });
-  if (!classroom) return false;
+export async function finishClassroomAssignment(
+  assignment: { id: string; studentId: string; practiceSetId: string },
+  options: { closedById: string; action: "CLASSROOM_CLOSED_BY_HOMEWORK" | "CLASSROOM_FINISHED_BY_TEACHER" },
+) {
   const open = await prisma.attempt.findFirst({
-    where: { assignmentId: classroom.id, status: "IN_PROGRESS" },
+    where: { assignmentId: assignment.id, status: "IN_PROGRESS" },
     include: { answers: true },
   });
   if (open) {
     const answers = Object.fromEntries(open.answers.filter((a) => a.answer && a.answer.trim()).map((a) => [a.questionId, a.answer as string]));
     await gradeAndSubmitPracticeAttempt(open, { answers, totalTime: open.totalTime });
   }
-  // With no open try (not started, or already submitted) it is just marked done.
-  await prisma.assignment.updateMany({ where: { id: classroom.id, status: { not: "COMPLETED" } }, data: { status: "COMPLETED" } });
+  const { count } = await prisma.assignment.updateMany({ where: { id: assignment.id, context: "CLASSROOM", status: { not: "COMPLETED" } }, data: { status: "COMPLETED" } });
+  if (!count && !open) return false;
   await writeAudit({
-    userId: closedById,
-    action: "CLASSROOM_CLOSED_BY_HOMEWORK",
+    userId: options.closedById,
+    action: options.action,
     targetType: "Assignment",
-    targetId: classroom.id,
+    targetId: assignment.id,
     outcome: "success",
-    metadata: { studentId, practiceSetId, submittedAttemptId: open?.id ?? null },
+    metadata: { studentId: assignment.studentId, practiceSetId: assignment.practiceSetId, submittedAttemptId: open?.id ?? null },
   });
   return true;
 }
+
+/** "Assign as Homework" closes the student's Classroom work on that set; Homework starts from zero. */
+export async function closeClassroomAssignment(input: { studentId: string; practiceSetId: string; closedById: string }) {
+  const { studentId, practiceSetId, closedById } = input;
+  const classroom = await prisma.assignment.findFirst({
+    where: { studentId, practiceSetId, context: "CLASSROOM", status: { not: "COMPLETED" } },
+    select: { id: true, studentId: true, practiceSetId: true },
+  });
+  if (!classroom) return false;
+  return finishClassroomAssignment(classroom, { closedById, action: "CLASSROOM_CLOSED_BY_HOMEWORK" });
+}
+
+/** Open Classroom work = Classroom assignments not finished yet (not started or in progress). */
+export const OPEN_CLASSROOM_WHERE = { context: "CLASSROOM", status: { in: ["PENDING", "IN_PROGRESS", "OVERDUE"] } };
 
 interface FullTestAssignmentInput {
   studentId: string;

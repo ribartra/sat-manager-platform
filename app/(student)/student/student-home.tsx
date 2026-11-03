@@ -49,28 +49,6 @@ export const STUDENT_HOME_LINKS: HomeLinks = {
   testStart: (id) => `/student/tests/${id}`,
 };
 
-/** Teacher "Student view": the boxes open the teacher's pages for this student. */
-export function teacherViewLinks(studentId: string, studentName: string): HomeLinks {
-  const student = `/teacher/students/${studentId}`;
-  const home = `/teacher/impersonate/${studentId}`;
-  return {
-    tests: `${student}?area=tests`,
-    practice: (area) => `${student}?area=${area ?? "math"}`,
-    pending: (type, status) => pendingHref("/teacher/pending", { student: studentId, type, status }),
-    history: (type, extra) => historyHref({ student: studentId, type }, extra),
-    practiceResult: (id) => `${student}/attempts/${id}`,
-    testResult: (id) => `${student}/tests/${id}`,
-    practiceStart: null,
-    testStart: null,
-    crumbs: [
-      { label: "Home", href: "/teacher" },
-      { label: "Students", href: "/teacher/students" },
-      { label: studentName, href: student },
-      { label: "View as student", href: home },
-    ],
-  };
-}
-
 /**
  * Student Home (same pattern as the teacher Home): one tall box per view, in the menu's order — Tests,
  * Practice, Materials (when on), History — with the main numbers (each opens the view with that

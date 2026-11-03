@@ -94,6 +94,7 @@ export function FullTestPlayer({
   calculatorConfig,
   showCalculator = false,
   previewMode = false,
+  previewNotice = "Preview: nothing is scored or saved.",
   exitHref = "/student/tests",
   resultQuery,
   completedModules = [],
@@ -125,6 +126,8 @@ export function FullTestPlayer({
   /** Admin CALCULATOR_FULL_TESTS ∩ Math — passed from server. */
   showCalculator?: boolean;
   previewMode?: boolean;
+  /** Preview banner text (a teacher's Student view: the try is simulated, nothing is saved). */
+  previewNotice?: string;
   exitHref?: string;
   resultQuery?: string;
   /** Modules already submitted (locked). Students may take the modules in any order. */
@@ -470,7 +473,7 @@ export function FullTestPlayer({
 
   const submit = useCallback(async () => {
     if (previewMode) {
-      notify.info("Preview", "Nothing is scored or saved.");
+      notify.info("Nothing was saved", previewNotice);
       router.push(exitHref);
       return;
     }
@@ -520,7 +523,7 @@ export function FullTestPlayer({
     }
     clearBuffer(offlineKey);
     router.push(`/student/tests/results/${attemptId}${resultQuery ? `?${resultQuery}` : ""}`);
-  }, [attemptId, buildAutosavePayload, buildProgressPayload, enqueueSave, exitHref, offlineKey, previewMode, recordQuestionTime, resultQuery, router]);
+  }, [attemptId, buildAutosavePayload, buildProgressPayload, enqueueSave, exitHref, offlineKey, previewMode, previewNotice, recordQuestionTime, resultQuery, router]);
 
   const enterModule = useCallback(
     async (nextModule: number) => {
@@ -896,7 +899,7 @@ export function FullTestPlayer({
             </button>
           }
         >
-          <span className="font-medium">Preview: nothing is scored or saved.</span>
+          <span className="font-medium">{previewNotice}</span>
         </Alert>
       )}
       {/* Top bar (mockup `.take-top`): title · centred timer · tools */}

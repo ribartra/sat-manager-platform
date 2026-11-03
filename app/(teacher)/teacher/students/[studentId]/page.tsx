@@ -1,5 +1,7 @@
 import { AreaBoxGrid, CompactAreaBox, AttemptStatusBadge, EmptyState, PageShell, PracticeAreaTabs, PracticeSetAttemptsAccordion, TestAttemptsAccordion, SectionHeader, SkillResults, StatGrid, StatTile, TestCardsByNumber, type TestCardLinks, invalidatedRowClass, isInvalidated } from "@/components/sat";
 import { ContextTabs } from "@/components/sat/context-tabs";
+import { FinishClassroomButton } from "@/components/sat/finish-classroom-button";
+import { openClassroomWorkFor } from "@/lib/classroom-work";
 import { ContextTag } from "@/components/sat/context-tag";
 import { contextViewFromParam } from "@/lib/assignment-context";
 import { AreaTag } from "@/components/sat/practice-set-row";
@@ -151,9 +153,10 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
           <HeaderActions>
             <Link href="/teacher" className={secondaryButton}>Back to Home</Link>
             <Hint label="See the app the way this student sees it (view only).">
-              <Link href={buildProgressHref(`/teacher/impersonate/${studentId}`, filters)} className={secondaryButton}>
+              {/* A plain link: the route sets the Student view and opens the student's own pages. */}
+              <a href={buildProgressHref(`/teacher/impersonate/${studentId}`, filters)} className={secondaryButton}>
                 <Eye size={14} /> Student view
-              </Link>
+              </a>
             </Hint>
             <Link href={historyHref({ student: studentId })} className={secondaryButton}>
               <History size={14} /> History
@@ -367,6 +370,8 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
   // All / Classroom / Homework picks the work shown; scores always come from Homework only.
   const context = contextViewFromParam(query.context);
   const report = await loadPracticeReport(studentId, practiceArea, { context });
+  // Open Classroom work (every area): "Finish class work for this student" only while there is some.
+  const openClassroom = (await openClassroomWorkFor(session!.user, [studentId]))[0];
   // Pending unlock requests of these sets (moved here from the former Home area tabs).
   const unlockRequests = (await getFeatureSetting("STUDENT_UNLOCK_REQUESTS"))
     ? await prisma.unlockRequest.findMany({
@@ -410,6 +415,9 @@ export default async function StudentPage({ params, searchParams }: PageProps) {
         </div>
 
         <aside className="min-w-0 space-y-6">
+          {openClassroom ? (
+            <FinishClassroomButton studentId={studentId} studentName={student.name} sets={openClassroom.sets.map((set) => set.name)} />
+          ) : null}
           <SidePanel
             id="active-sets"
             title="Active practice sets"

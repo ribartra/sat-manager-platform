@@ -7,8 +7,10 @@ import { resolveStudentNav } from "@/lib/nav-config";
 interface StudentShellProps {
   userName: string;
   avatarUrl?: string | null;
-  /** A teacher/admin looking at a student page. */
+  /** A teacher/admin's Student view (read only, across every student page until Exit). */
   isImpersonated?: boolean;
+  /** Who is looking (the teacher), in the Student view banner. */
+  viewerName?: string;
   hasActiveEnrollment?: boolean;
   /** Platform feature flags (UI visibility only — not authorization). */
   flags?: Partial<Record<FeatureSettingKey, boolean>>;
@@ -16,13 +18,18 @@ interface StudentShellProps {
 }
 
 /** Student chrome: left sidebar Home · Tests · Practice · History (mockup `mejorada`), collapsible. */
-export function StudentShell({ userName, avatarUrl, isImpersonated, hasActiveEnrollment = true, flags, children }: StudentShellProps) {
+export function StudentShell({ userName, avatarUrl, isImpersonated, viewerName, hasActiveEnrollment = true, flags, children }: StudentShellProps) {
   const items = resolveStudentNav({ hasActiveEnrollment, flags: { MATERIALS_MODULE: flags?.MATERIALS_MODULE ?? false } });
   const banner = (
     <>
       {isImpersonated ? (
-        <div className="border-b border-amber-200 bg-amber-50 px-4 py-2 text-sm font-medium text-amber-800">
-          ⚠ You are viewing as: <strong>{userName}</strong>
+        <div role="status" className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-2 border-b border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-900">
+          <span>
+            <span className="font-medium">Student view:</span> you are viewing as <strong>{userName}</strong> · read only
+            {viewerName ? <span className="text-amber-700"> · signed in as {viewerName}</span> : null}
+          </span>
+          {/* A plain link: the route clears the Student view and goes back to the student's teacher page. */}
+          <a href="/api/student-view/exit" className="font-medium underline">Exit Student View</a>
         </div>
       ) : null}
       {!hasActiveEnrollment ? (
@@ -33,7 +40,7 @@ export function StudentShell({ userName, avatarUrl, isImpersonated, hasActiveEnr
     </>
   );
   return (
-    <AppShell brand="SAT Practice" roleLabel="Student" userName={userName} avatarUrl={avatarUrl} items={items} collapsible banner={banner}>
+    <AppShell brand="SAT Practice" roleLabel={isImpersonated ? "Student view" : "Student"} userName={userName} avatarUrl={avatarUrl} items={items} collapsible banner={banner} studentView={isImpersonated}>
       {children}
     </AppShell>
   );

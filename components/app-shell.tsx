@@ -23,6 +23,9 @@ import {
   type ResolvedNavLink,
 } from "@/lib/nav-config";
 import { cn } from "@/lib/utils";
+import { useConfirm } from "@/components/sat/confirm-dialog";
+import { apiFetch } from "@/lib/api-client";
+import { notify } from "@/lib/notify-ui";
 
 /**
  * App chrome from the mockup (`mejorada`): a persistent left sidebar (228px; 68px when collapsed)
@@ -44,6 +47,10 @@ export interface AppShellProps {
   /** Banners shown above the page (impersonation, enrollment). */
   banner?: React.ReactNode;
   mainClassName?: string;
+  /** Teachers: before signing out, their students' open Classroom work is listed and finished (asked first). */
+  finishClassroomOnSignOut?: boolean;
+  /** A teacher's Student view (read only): no notifications of their own; signing out ends it. */
+  studentView?: boolean;
   children: React.ReactNode;
 }
 
@@ -60,8 +67,46 @@ export function AppShell({
   collapsible = false,
   banner,
   mainClassName,
+  finishClassroomOnSignOut = false,
+  studentView = false,
   children,
 }: AppShellProps) {
+  const confirm = useConfirm();
+  const [signingOut, setSigningOut] = useState(false);
+  // Classroom work stays open until the teacher finishes it (pendiente-p2.md): leaving with some open,
+  // the teacher is told which students' work will be finished, and it is finished on confirming.
+  async function handleSignOut() {
+    // Student view ends with the session (its cookie is cleared on the way to the login page).
+    if (studentView) return signOut({ callbackUrl: "/api/student-view/exit?next=/login" });
+    if (!finishClassroomOnSignOut) return signOut({ callbackUrl: "/login" });
+    setSigningOut(true);
+    try {
+      const { students } = await apiFetch<{ students: { id: string; name: string; sets: { name: string }[] }[] }>("/api/teacher/classroom-work");
+      if (students.length) {
+        const ok = await confirm({
+          title: "Finish class work before signing out?",
+          description: (
+            <>
+              <p>All open Classroom work of these students will be finished (submitted as it is, not scored):</p>
+              <ul className="mt-2 list-disc space-y-0.5 pl-5">
+                {students.map((s) => (
+                  <li key={s.id}>{s.name} · {s.sets.length} {s.sets.length === 1 ? "set" : "sets"}</li>
+                ))}
+              </ul>
+            </>
+          ),
+          confirmLabel: "Finish and sign out",
+        });
+        if (!ok) return;
+        await apiFetch("/api/teacher/classroom-work", { method: "POST", json: {} });
+      }
+      await signOut({ callbackUrl: "/login" });
+    } catch (error) {
+      notify.error(error, "Unable to finish the class work. Try again.");
+    } finally {
+      setSigningOut(false);
+    }
+  }
   const searchParams = useSearchParams();
   const selectedArea = searchParams.get("area");
   // The path the sidebar highlights for (Question Bank › Tests belongs to Tests).
@@ -111,6 +156,7 @@ export function AppShell({
     current: currentView,
     isRoot: currentView >= 0 && pathname === directViews[currentView].href,
   };
+  // Players are full screen (in Student view the player shows its own "simulated" banner).
   const inPlayer = isPlayerPath(pathname, searchParams);
   useViewShortcuts(navViews.views, navViews.current, !inPlayer);
 
@@ -254,7 +300,7 @@ export function AppShell({
             </Hint>
           ) : null}
           <IssueReportButton collapsed={mini} onStart={() => setMobileOpen(false)} />
-          <NotificationBell collapsed={mini} />
+          {studentView ? null : <NotificationBell collapsed={mini} />}
           <div ref={userRef}>
             <button
               ref={userButtonRef}
@@ -283,6 +329,8 @@ export function AppShell({
                     {link.label}
                   </Link>
                 ))}
+                {/* Student view: the account is the teacher's, not the student shown: no photo / password here. */}
+                {studentView ? null : (<>
                 <button
                   type="button"
                   onClick={() => {
@@ -299,9 +347,10 @@ export function AppShell({
                   <KeyRound size={14} />
                   Change password
                 </Link>
-                <button type="button" onClick={() => signOut({ callbackUrl: "/login" })} className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50">
+                </>)}
+                <button type="button" onClick={handleSignOut} disabled={signingOut} className={`flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 ${BLOCKED_TEXT}`}>
                   <LogOut size={14} />
-                  Sign out
+                  {signingOut ? "Signing out..." : "Sign out"}
                 </button>
               </div>
             ) : null}

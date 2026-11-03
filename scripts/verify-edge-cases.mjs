@@ -264,8 +264,8 @@ const checks = [
     label: "Importacion real queda auditada con conteos",
   },
   {
-    file: "app/(teacher)/teacher/impersonate/[studentId]/page.tsx",
-    requires: ["IMPERSONATE_STUDENT_VIEW", "studentEmail", "Student view is not available", "redirect(\"/login\")"],
+    file: "app/(teacher)/teacher/impersonate/[studentId]/route.ts",
+    requires: ["IMPERSONATE_STUDENT_VIEW", "studentEmail", "studentView=${reason}", 'new URL("/login", req.url)'],
     label: "Impersonation queda auditado y no usa 404 genérico",
   },
   {

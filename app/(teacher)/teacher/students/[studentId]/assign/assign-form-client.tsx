@@ -5,7 +5,6 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Tag } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -18,6 +17,8 @@ import { errorMessage, readApiError } from "@/lib/api-client";
 import { type AssignmentContext } from "@/lib/assignment-context";
 import { ContextToggle } from "@/components/sat/context-tabs";
 import { AssignStep } from "@/components/sat/assign-step";
+import { FilterBar, FilterField } from "@/components/sat/filter-bar";
+import { SearchableSelect } from "@/components/sat/searchable-select";
 
 interface PracticeSetInfo {
   id: string;
@@ -134,7 +135,10 @@ export function AssignForm({
   // from the set's stored settings.
   const [options, setOptions] = useState<AssignOptions>(() => defaultAssignOptions(7, editing[0]));
   const [lockOnAssign, setLockOnAssign] = useState(false);
-  const [search, setSearch] = useState("");
+  // Step 4 filters (no search box): skill, assignment status in the chosen tab, source; "All" by default.
+  const [skillFilter, setSkillFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"" | "available" | "assigned">("");
+  const [sourceFilter, setSourceFilter] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -142,12 +146,24 @@ export function AssignForm({
   const [showAllMembers, setShowAllMembers] = useState(false);
 
   const areaCode = AREAS.find((a) => a.key === area)!.code;
-  const needle = search.trim().toLowerCase();
+  const filtering = Boolean(skillFilter || statusFilter || sourceFilter);
+  // The filter options: the area's skills (A–Z) and sources.
+  const areaAll = practiceSets.filter((ps) => ps.practiceArea === areaCode);
+  const skillOptions = [...new Map(areaAll.map((ps) => [ps.topicId, ps.topicName])).entries()]
+    .sort((a, b) => a[1].localeCompare(b[1], "en", { numeric: true, sensitivity: "base" }))
+    .map(([value, label]) => ({ value, label }));
+  const sourceOptions = [...new Map(areaAll.map((ps) => [ps.sourceId, { name: ps.sourceName, order: ps.sourceOrder }])).entries()]
+    .sort((a, b) => a[1].order - b[1].order || a[1].name.localeCompare(b[1].name))
+    .map(([value, source]) => ({ value, label: source.name }));
   // The By-skill cards (same component as Practice › By skill): domains in official order, skills A–Z;
   // a skill opens to one row per source with one toggle chip per set the student doesn't have yet.
   const domains = useMemo(() => {
     const areaSets = practiceSets.filter(
-      (ps) => ps.practiceArea === areaCode && (!needle || ps.name.toLowerCase().includes(needle) || ps.topicName.toLowerCase().includes(needle)),
+      (ps) =>
+        ps.practiceArea === areaCode &&
+        (!skillFilter || ps.topicId === skillFilter) &&
+        (!sourceFilter || ps.sourceId === sourceFilter) &&
+        (!statusFilter || (statusFilter === "assigned") === isAssigned(ps)),
     );
     const byDomain = new Map<string, { id: string; name: string; order: number; skills: Map<string, { id: string; name: string; sets: PracticeSetInfo[] }> }>();
     for (const ps of areaSets) {
@@ -160,7 +176,9 @@ export function AssignForm({
       name: domain.name,
       skills: [...domain.skills.values()].sort((a, b) => a.name.localeCompare(b.name, "en", { numeric: true, sensitivity: "base" })),
     }));
-  }, [practiceSets, areaCode, needle]);
+    // isAssigned follows the chosen tab (context).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [practiceSets, areaCode, skillFilter, sourceFilter, statusFilter, context]);
   const first = studentName.split(" ")[0];
   const backHref = `/teacher/students/${studentId}?area=${area}`;
   function toggleSelect(id: string) {
@@ -192,7 +210,7 @@ export function AssignForm({
         studentIds,
         practiceSetIds: [...selected],
         sourceGroupId: useGroup ? groupId : null,
-        dueDate: options.dueDate || null,
+        dueDate: context === "CLASSROOM" ? null : options.dueDate || null,
         unlockAt: options.unlockAt || null,
         locked: lockOptionEnabled && lockOnAssign,
         feedbackMode: options.feedbackMode,
@@ -328,7 +346,24 @@ export function AssignForm({
             </p>
           ) : (
           <>
-          <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Skill or practice set name" aria-label="Search practice" className="max-w-xs text-sm" />
+          <FilterBar sticky={false} className="mb-0">
+            <FilterField label="Skill" htmlFor="assign-filter-skill">
+              <SearchableSelect id="assign-filter-skill" options={skillOptions} allLabel="All" value={skillFilter} onChange={setSkillFilter} searchPlaceholder="Search skills" />
+            </FilterField>
+            <FilterField label="Assignment status" htmlFor="assign-filter-status">
+              <Select id="assign-filter-status" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as "" | "available" | "assigned")}>
+                <option value="">All</option>
+                <option value="available">Not assigned</option>
+                <option value="assigned">{context === "CLASSROOM" ? "Already assigned or in Homework" : "Already assigned"}</option>
+              </Select>
+            </FilterField>
+            <FilterField label="Source" htmlFor="assign-filter-source">
+              <Select id="assign-filter-source" value={sourceFilter} onChange={(e) => setSourceFilter(e.target.value)}>
+                <option value="">All</option>
+                {sourceOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </Select>
+            </FilterField>
+          </FilterBar>
           <p className="text-xs text-gray-500">
             {context === "HOMEWORK"
               ? <>Open a skill and pick sets by source and level. Sets {first} already has as Homework are grayed out (they can retry them any time); a level is marked Already assigned when every source is. A set done in Classroom can be assigned as Homework: it starts from zero and closes the Classroom work.</>
@@ -336,8 +371,8 @@ export function AssignForm({
           </p>
           <SkillsSourceMap
             emptyText={
-              needle
-                ? "No practice set matches the search."
+              filtering
+                ? "No practice set matches the filters."
                 : `No ${practiceAreaLabel(areaCode)} practice set to assign: ${first} already has every published set of their program, or there is none yet.`
             }
             emptySourcesText="No set to assign."
@@ -355,7 +390,7 @@ export function AssignForm({
                   id: skill.id,
                   name: skill.name,
                   sub: `${toAssign.length} set${toAssign.length === 1 ? "" : "s"} to assign${assignedCount ? ` · ${assignedCount} already assigned` : ""}${picked ? ` · ${picked} selected` : ""}`,
-                  open: Boolean(needle) || picked > 0 || skill.id === openSkillId ? true : undefined,
+                  open: Boolean(skillFilter) || picked > 0 || skill.id === openSkillId ? true : undefined,
                   chips: DIFFICULTIES.map((level): SkillsMapChip => {
                     const count = toAssign.filter((ps) => ps.difficulty === level).length;
                     const assignedAtLevel = skill.sets.filter((ps) => ps.difficulty === level && isAssigned(ps)).length;
