@@ -9,7 +9,7 @@ import { FolderOpen, Clock, CheckCircle, BookOpen } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
 export default async function StudentProgramPage() {
-  // The student shown: the signed-in student, or the teacher's Student view (read only).
+  // The student shown: the signed-in student, or the teacher's Student view (nothing is saved as the student).
   const viewer = await getStudentViewer();
   if (!viewer) redirect("/login");
   const session = viewer.session;

@@ -18,7 +18,7 @@ const AREA_CODE: Record<HistoryArea, PracticeAreaCode> = { math: "MATH", reading
  * (type / area, status, period on the assigned date), 25 per page; a fixed filter hides its column.
  */
 export default async function StudentPendingPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
-  // The student shown: the signed-in student, or the teacher's Student view (read only).
+  // The student shown: the signed-in student, or the teacher's Student view (nothing is saved as the student).
   const viewer = await getStudentViewer();
   if (!viewer) redirect("/login");
   const query = await searchParams;

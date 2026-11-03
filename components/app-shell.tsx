@@ -79,7 +79,8 @@ export function AppShell({
     // Student view ends with the session (its cookie is cleared on the way to the login page).
     if (studentView) return signOut({ callbackUrl: "/api/student-view/exit?next=/login" });
     if (!finishClassroomOnSignOut) return signOut({ callbackUrl: "/login" });
-    setSigningOut(true);
+    // The menu closes first; "Signing out..." shows only once the teacher has answered the prompt.
+    setMenuOpen(false);
     try {
       const { students } = await apiFetch<{ students: { id: string; name: string; sets: { name: string }[] }[] }>("/api/teacher/classroom-work");
       if (students.length) {
@@ -98,8 +99,10 @@ export function AppShell({
           confirmLabel: "Finish and sign out",
         });
         if (!ok) return;
+        setSigningOut(true);
         await apiFetch("/api/teacher/classroom-work", { method: "POST", json: {} });
       }
+      setSigningOut(true);
       await signOut({ callbackUrl: "/login" });
     } catch (error) {
       notify.error(error, "Unable to finish the class work. Try again.");

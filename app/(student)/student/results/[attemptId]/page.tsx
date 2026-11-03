@@ -36,7 +36,7 @@ interface PageProps {
 
 export default async function ResultsPage({ params, searchParams }: PageProps) {
   const { attemptId } = await params;
-  // The student shown: the signed-in student, or the teacher's Student view (read only).
+  // The student shown: the signed-in student, or the teacher's Student view (nothing is saved as the student).
   const viewer = await getStudentViewer();
   if (!viewer) redirect("/login");
   const userId = viewer.studentId;

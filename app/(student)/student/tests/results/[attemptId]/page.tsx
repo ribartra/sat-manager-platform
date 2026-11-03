@@ -39,7 +39,7 @@ interface PageProps {
 export default async function FullTestResultsPage({ params, searchParams }: PageProps) {
   const { attemptId } = await params;
   const query = await searchParams;
-  // The student shown: the signed-in student, or the teacher's Student view (read only).
+  // The student shown: the signed-in student, or the teacher's Student view (nothing is saved as the student).
   const viewer = await getStudentViewer();
   if (!viewer) redirect("/login");
   const attempt = await prisma.fullPracticeTestAttempt.findFirst({
@@ -74,7 +74,7 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
     select: { id: true, status: true, startedAt: true, submittedAt: true, rwScore: true, mathScore: true, totalScore: true },
   });
   const tryNumber = siblings.findIndex((s) => s.id === attempt.id) + 1;
-  // Student view (read only): no Retake.
+  // Student view (nothing is saved as the student): no Retake.
   const canRetake = !viewer.readOnly && attempt.assignment?.status === "COMPLETED" && !siblings.some((s) => s.status === "IN_PROGRESS");
   const timeByModule = modules.map((m) => m.questions.reduce((sum, q) => sum + (attempt.answers.find((a) => a.questionId === q.questionId)?.timeSpent ?? 0), 0));
 

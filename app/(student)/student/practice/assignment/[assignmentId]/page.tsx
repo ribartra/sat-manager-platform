@@ -18,7 +18,7 @@ export default async function PracticeAssignmentPlayerPage({ params, searchParam
   for (const key of ["topic", "difficulty", "from", "to"] as const) {
     if (query[key]) returnParams.set(key, query[key]!);
   }
-  // The student shown: the signed-in student, or the teacher's Student view (read only).
+  // The student shown: the signed-in student, or the teacher's Student view (nothing is saved as the student).
   const viewer = await getStudentViewer();
   if (!viewer) redirect("/login");
 

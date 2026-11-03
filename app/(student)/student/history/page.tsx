@@ -30,7 +30,7 @@ const STATUS_OPTIONS = [
  * row opens the try's results (with every question).
  */
 export default async function StudentHistoryPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
-  // The student shown: the signed-in student, or the teacher's Student view (read only).
+  // The student shown: the signed-in student, or the teacher's Student view (nothing is saved as the student).
   const viewer = await getStudentViewer();
   if (!viewer) redirect("/login");
   const userId = viewer.studentId;

@@ -33,7 +33,7 @@ export default async function FullTestPlayerPage({ params, searchParams }: PageP
     if (query[key]) returnParams.set(key, query[key]!);
   }
   const requestedModule = moduleIndexFromKey(query.module);
-  // The student shown: the signed-in student, or the teacher's Student view (read only).
+  // The student shown: the signed-in student, or the teacher's Student view (nothing is saved as the student).
   const viewer = await getStudentViewer();
   if (!viewer) redirect("/login");
   const assignment = await prisma.fullPracticeTestAssignment.findFirst({
