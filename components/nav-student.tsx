@@ -7,7 +7,7 @@ import { resolveStudentNav } from "@/lib/nav-config";
 interface StudentShellProps {
   userName: string;
   avatarUrl?: string | null;
-  /** A teacher/admin's Student view (read only, across every student page until Exit). */
+  /** A teacher/admin's Student view (across every student page until Exit; tries are simulated, nothing is saved). */
   isImpersonated?: boolean;
   /** Who is looking (the teacher), in the Student view banner. */
   viewerName?: string;
@@ -25,7 +25,7 @@ export function StudentShell({ userName, avatarUrl, isImpersonated, viewerName, 
       {isImpersonated ? (
         <div role="status" className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-2 border-b border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-900">
           <span>
-            <span className="font-medium">Student view:</span> you are viewing as <strong>{userName}</strong> · read only
+            <span className="font-medium">Student view:</span> you are viewing as <strong>{userName}</strong> · nothing you do here is saved
             {viewerName ? <span className="text-amber-700"> · signed in as {viewerName}</span> : null}
           </span>
           {/* A plain link: the route clears the Student view and goes back to the student's teacher page. */}

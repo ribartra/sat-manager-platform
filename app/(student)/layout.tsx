@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * Student portal: the signed-in student, or a teacher / admin's Student view (started at
- * /teacher/impersonate/[id]: the student's own pages, read only, until "Exit Student View").
+ * /teacher/impersonate/[id]: the student's own pages, tries simulated and nothing saved, until "Exit Student View").
  * Anyone else goes to their own portal.
  */
 export default async function StudentLayout({ children }: { children: React.ReactNode }) {

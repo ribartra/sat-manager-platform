@@ -11,7 +11,7 @@ import { getStudentViewer } from "@/lib/student-viewer";
 
 export default async function StudentMaterialsPage() {
   if (!(await getFeatureSetting("MATERIALS_MODULE"))) notFound();
-  // The student shown: the signed-in student, or the teacher's Student view (read only).
+  // The student shown: the signed-in student, or the teacher's Student view (nothing is saved as the student).
   const viewer = await getStudentViewer();
   if (!viewer) redirect("/login");
 

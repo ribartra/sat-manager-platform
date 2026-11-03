@@ -13,7 +13,7 @@ interface PageProps {
 
 /** Student Home (see StudentHome). Parents have their own portal (/parent); the layout sends them there. */
 export default async function StudentDashboard({ searchParams }: PageProps) {
-  // The student shown: the signed-in student, or the teacher's Student view (read only).
+  // The student shown: the signed-in student, or the teacher's Student view (nothing is saved as the student).
   const viewer = await getStudentViewer();
   if (!viewer) redirect("/login");
   const session = viewer.session;

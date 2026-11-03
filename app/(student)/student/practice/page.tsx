@@ -29,7 +29,7 @@ interface PageProps {
  * at the side (Start / Continue) and the tries of each set. Percentages only (SAT scores are Tests).
  */
 export default async function StudentPracticePage({ searchParams }: PageProps) {
-  // The student shown: the signed-in student, or the teacher's Student view (read only).
+  // The student shown: the signed-in student, or the teacher's Student view (nothing is saved as the student).
   const viewer = await getStudentViewer();
   if (!viewer) redirect("/login");
   const studentId = viewer.studentId;

@@ -20,7 +20,7 @@ type View = (typeof VIEWS)[number];
  * all — with Start / Continue per module, results and Retake. Every try is in History.
  */
 export default async function StudentTestsPage({ searchParams }: PageProps) {
-  // The student shown: the signed-in student, or the teacher's Student view (read only).
+  // The student shown: the signed-in student, or the teacher's Student view (nothing is saved as the student).
   const viewer = await getStudentViewer();
   if (!viewer) redirect("/login");
   const query = await searchParams;
