@@ -264,9 +264,16 @@ const checks = [
     label: "Importacion real queda auditada con conteos",
   },
   {
+    file: "app/api/student-view/exit/route.ts",
+    requires: ["relativeRedirect(target)", "maxAge: 0"],
+    forbids: ["req.url"],
+    label: "Exit Student View redirige con Location relativa (no al host interno)",
+  },
+  {
     file: "app/(teacher)/teacher/impersonate/[studentId]/route.ts",
-    requires: ["IMPERSONATE_STUDENT_VIEW", "studentEmail", "studentView=${reason}", 'new URL("/login", req.url)'],
-    label: "Impersonation queda auditado y no usa 404 genérico",
+    requires: ["IMPERSONATE_STUDENT_VIEW", "studentEmail", "studentView=${reason}", 'relativeRedirect("/login")'],
+    forbids: ["req.url"],
+    label: "Impersonation queda auditado, no usa 404 genérico y redirige con Location relativa (detrás del proxy req.url es localhost:3000)",
   },
   {
     file: "app/(student)/student/practice/player-client.tsx",
