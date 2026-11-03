@@ -68,6 +68,8 @@ interface PlayerProps {
   calculatorConfig: CalculatorConfig;
   feedbackMode?: "IMMEDIATE" | "AFTER_SET";
   previewMode?: boolean;
+  /** Preview banner text (a teacher's Student view: the try is simulated, nothing is saved). */
+  previewNotice?: string;
   exitHref?: string;
   resultHref?: string;
 }
@@ -124,6 +126,7 @@ export function PracticeSetPlayer({
   calculatorConfig,
   feedbackMode = "AFTER_SET",
   previewMode = false,
+  previewNotice = "Preview: nothing is scored or saved.",
   exitHref = "/student/practice",
   resultHref,
 }: PlayerProps) {
@@ -222,6 +225,14 @@ export function PracticeSetPlayer({
             await exitPlayerOnAuthLoss({ pauseUrl: `/api/attempts/${attemptId}/pause` });
             return;
           }
+          // The try was closed meanwhile (the teacher finished the class work, or another tab submitted
+          // it): nothing more can be saved here, so go to its results instead of buffering answers.
+          if (response.status === 404) {
+            clearBuffer(offlineKey);
+            notify.info("This practice was closed", "Your teacher finished it, or it was submitted from another tab.");
+            router.push(resultHref ?? `/student/results/${attemptId}`);
+            return;
+          }
           if (!response.ok) throw new Error("Autosave failed");
           confirmedPayload.current = payload;
           clearBuffer(offlineKey);
@@ -232,7 +243,7 @@ export function PracticeSetPlayer({
           setSaving("offline");
         }
       }),
-    [attemptId, enqueueSave, offlineKey]
+    [attemptId, enqueueSave, offlineKey, resultHref, router]
   );
 
   const saveProgress = useCallback(
@@ -398,7 +409,7 @@ export function PracticeSetPlayer({
   const handleSubmit = async () => {
     if (submitting) return;
     if (previewMode) {
-      notify.info("Preview", "Nothing is scored or saved.");
+      notify.info("Nothing was saved", previewNotice);
       router.push(exitHref);
       return;
     }
@@ -483,7 +494,7 @@ export function PracticeSetPlayer({
             </button>
           }
         >
-          <span className="font-medium">Preview: nothing is scored or saved.</span>
+          <span className="font-medium">{previewNotice}</span>
         </Alert>
       )}
       <OfflineBanner online={online} />
@@ -511,7 +522,7 @@ export function PracticeSetPlayer({
               </button>
             </span>
           )}
-          <SaveIndicator compact status={saving} />
+          {!previewMode && <SaveIndicator compact status={saving} />}
         </div>
         <div className="flex shrink-0 items-center justify-end gap-0.5">
           <ToolButton icon={<Highlighter size={18} />} label="Highlight" onClick={highlights.highlightSelection} title="Highlight the selected text" />
@@ -519,7 +530,7 @@ export function PracticeSetPlayer({
           {isMath && showCalculator ? <ToolButton icon={<Calculator size={18} />} label="Calculator" active={calcOpen} onClick={() => setCalcOpen((v) => !v)} /> : null}
           {isMath ? <ToolButton icon={<FileText size={18} />} label="Reference" onClick={() => setRefOpen(true)} /> : null}
           <IssueReportButton variant="tool" />
-          <ToolButton icon={<LogOut size={18} />} label="Save & exit" onClick={() => void handlePauseExit()} title="The timer stops. You'll continue where you left off." />
+          <ToolButton icon={<LogOut size={18} />} label={previewMode ? "Exit preview" : "Save & exit"} onClick={() => void handlePauseExit()} title={previewMode ? "Exit preview" : "The timer stops. You'll continue where you left off."} />
         </div>
       </div>
       <ReferenceSheet open={refOpen} onOpenChange={setRefOpen} />
@@ -810,7 +821,7 @@ export function PracticeSetPlayer({
 
       {/* Bottom navigation (mockup `.take-foot`): saved note · question navigator · Back / Next */}
       <div className="z-10 grid shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-2 border-t border-[var(--sat-border)] bg-[var(--sat-surface-2)] px-3 py-2.5 sm:px-5">
-        <span className="text-xs text-[var(--sat-muted)] max-[859px]:hidden">Your answers are saved automatically</span>
+        <span className="text-xs text-[var(--sat-muted)] max-[859px]:hidden">{previewMode ? "Preview: nothing is saved" : "Your answers are saved automatically"}</span>
         <Button
           variant="secondary"
           className="col-start-2 border-0 bg-[var(--sat-text)] text-white hover:bg-[#1e293b]"

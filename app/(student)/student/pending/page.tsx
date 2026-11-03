@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { EmptyState, ListFilters, PAGE_SIZE, PageHeader, PageShell, Pagination, pageFromParam, paginate } from "@/components/sat";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { PendingTable, pendingColumns } from "@/components/sat/pending-table";
-import { auth } from "@/lib/auth";
+import { getStudentViewer } from "@/lib/student-viewer";
 import { PRACTICE_AREA_TABS, practiceAreaLabel, type PracticeAreaCode } from "@/lib/practice-area";
 import { parseHistoryParams, type HistoryArea } from "@/lib/history-params";
 import { loadPending, PENDING_STATUS_OPTIONS, type PendingStatus } from "@/lib/pending";
@@ -18,13 +18,14 @@ const AREA_CODE: Record<HistoryArea, PracticeAreaCode> = { math: "MATH", reading
  * (type / area, status, period on the assigned date), 25 per page; a fixed filter hides its column.
  */
 export default async function StudentPendingPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
-  const session = await auth();
-  if (!session?.user) redirect("/login");
+  // The student shown: the signed-in student, or the teacher's Student view (read only).
+  const viewer = await getStudentViewer();
+  if (!viewer) redirect("/login");
   const query = await searchParams;
   const filter = parseHistoryParams(query);
   const status = PENDING_STATUS_OPTIONS.some((o) => o.value === query.status) ? (query.status as PendingStatus) : undefined;
   const period = resolvePeriod(query);
-  const rows = await loadPending([session.user.id], {
+  const rows = await loadPending([viewer.studentId], {
     kind: filter.type === "tests" ? "test" : filter.type === "practice" ? "practice" : undefined,
     area: filter.area ? AREA_CODE[filter.area] : undefined,
     status,

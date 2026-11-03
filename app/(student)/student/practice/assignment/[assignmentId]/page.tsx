@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { getStudentViewer } from "@/lib/student-viewer";
 import prisma from "@/lib/prisma";
 import { withSqliteRetry } from "@/lib/sqlite-retry";
 import { notFound, redirect } from "next/navigation";
@@ -18,21 +18,23 @@ export default async function PracticeAssignmentPlayerPage({ params, searchParam
   for (const key of ["topic", "difficulty", "from", "to"] as const) {
     if (query[key]) returnParams.set(key, query[key]!);
   }
-  const session = await auth();
-  if (!session) redirect("/login");
+  // The student shown: the signed-in student, or the teacher's Student view (read only).
+  const viewer = await getStudentViewer();
+  if (!viewer) redirect("/login");
 
   const assignment = await withSqliteRetry(() => prisma.assignment.findFirst({
     where: {
       id: assignmentId,
-      ...(session.user.role === "STUDENT" ? { studentId: session.user.id } : {}),
+      studentId: viewer.studentId,
     },
     select: { id: true, practiceSetId: true, feedbackMode: true, showExplanations: true },
   }));
 
   if (!assignment) notFound();
   // Intro first (mockup practice.html): previous tries, dates, Start/Continue. `?start=1` opens the player.
-  if (query.start !== "1" && session.user.role === "STUDENT") {
-    return <PracticeIntro studentId={session.user.id} assignmentId={assignment.id} />;
+  // In a teacher's Student view, Start / Continue open a simulated try (nothing is saved).
+  if (query.start !== "1") {
+    return <PracticeIntro studentId={viewer.studentId} assignmentId={assignment.id} />;
   }
 
   return renderPracticePlayer({

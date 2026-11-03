@@ -4,6 +4,7 @@ import { StudentShell } from "@/components/nav-student";
 import { TeacherShell } from "@/components/nav-teacher";
 import { auth } from "@/lib/auth";
 import { loadShellProps } from "@/lib/shell-props";
+import { currentStudentView } from "@/lib/student-viewer";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +13,8 @@ export default async function NotificationsLayout({ children }: { children: Reac
   const session = await auth();
   const shell = await loadShellProps(session);
 
+  // Student view lasts until "Exit Student View".
+  if ((shell.role === "TEACHER" || shell.role === "ADMIN") && (await currentStudentView(session))) redirect("/student");
   if (shell.role === "TEACHER" || shell.role === "ADMIN") {
     return (
       <TeacherShell userName={shell.userName} avatarUrl={shell.avatarUrl} role={shell.role} flags={shell.flags} capabilities={shell.capabilities}>

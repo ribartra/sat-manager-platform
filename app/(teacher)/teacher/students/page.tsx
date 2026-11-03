@@ -1,3 +1,4 @@
+import { Alert } from "@/components/sat/alert";
 import { RevokeInviteButton } from "./revoke-invite-button";
 import Link from "next/link";
 import { Clock, UserPlus } from "lucide-react";
@@ -18,7 +19,7 @@ import { formatDate, relativeDay } from "@/lib/utils";
 import { personSuggestions } from "@/lib/search-suggestions";
 
 interface PageProps {
-  searchParams: Promise<{ q?: string; show?: string }>;
+  searchParams: Promise<{ q?: string; show?: string; studentView?: string }>;
 }
 
 const SHOW = {
@@ -97,6 +98,12 @@ export default async function TeacherStudentsPage({ searchParams }: PageProps) {
         }
       />
 
+      {/* /teacher/impersonate/[id] could not open the Student view. */}
+      {query.studentView === "not-found" ? (
+        <Alert tone="warning" title="Student view is not available" className="mb-3">We could not find an active student for this link. Check the student id or return to the students list.</Alert>
+      ) : query.studentView === "out-of-scope" ? (
+        <Alert tone="warning" title="Student view is not available" className="mb-3">This student is not currently assigned to one of your active programs.</Alert>
+      ) : null}
       <MoreLinks links={moreLinks} />
 
       {/* Same notice as Home: who has not been active for 5+ days. */}

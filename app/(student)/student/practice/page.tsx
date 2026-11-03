@@ -5,7 +5,7 @@ import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { HEADER_SHORTCUT_CLASS, HeaderActions } from "@/components/sat/header-actions";
 import { SeeAllPending, SidePanel, StatusBadge } from "@/components/sat/side-panel";
 import { Button } from "@/components/ui/button";
-import { auth } from "@/lib/auth";
+import { getStudentViewer } from "@/lib/student-viewer";
 import { refreshAssignmentStates } from "@/lib/assignments";
 import { practiceSetGroups, setsFromReportAttempts } from "@/lib/attempt-groups";
 import { historyHref } from "@/lib/history-params";
@@ -29,9 +29,10 @@ interface PageProps {
  * at the side (Start / Continue) and the tries of each set. Percentages only (SAT scores are Tests).
  */
 export default async function StudentPracticePage({ searchParams }: PageProps) {
-  const session = await auth();
-  if (!session?.user) redirect("/login");
-  const studentId = session.user.id;
+  // The student shown: the signed-in student, or the teacher's Student view (read only).
+  const viewer = await getStudentViewer();
+  if (!viewer) redirect("/login");
+  const studentId = viewer.studentId;
   await refreshAssignmentStates();
   const query = await searchParams;
   if (query.area === "tests" || query.area === "mocks") redirect("/student/tests");

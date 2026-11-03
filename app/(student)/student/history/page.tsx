@@ -4,7 +4,7 @@ import { X } from "lucide-react";
 import { Breadcrumbs, EmptyState, ListFilters, PAGE_SIZE, PageHeader, PageShell, Pagination, pageFromParam, paginate } from "@/components/sat";
 import { HistoryTable, historyColumns } from "@/components/sat/history-table";
 import { HEADER_SHORTCUT_CLASS, HeaderActions } from "@/components/sat/header-actions";
-import { auth } from "@/lib/auth";
+import { getStudentViewer } from "@/lib/student-viewer";
 import prisma from "@/lib/prisma";
 import { loadAttemptHistory } from "@/lib/attempt-history";
 import { practiceSetTitle } from "@/lib/attempt-groups";
@@ -30,9 +30,10 @@ const STATUS_OPTIONS = [
  * row opens the try's results (with every question).
  */
 export default async function StudentHistoryPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
-  const session = await auth();
-  if (!session?.user) redirect("/login");
-  const userId = session.user.id;
+  // The student shown: the signed-in student, or the teacher's Student view (read only).
+  const viewer = await getStudentViewer();
+  if (!viewer) redirect("/login");
+  const userId = viewer.studentId;
   const raw = await searchParams;
   // Older links: ?area=tests meant the Tests tab, ?area=sessions the default list.
   const query = raw.area === "tests" ? { ...raw, area: undefined, type: "tests" } : raw.area === "sessions" ? { ...raw, area: undefined } : raw;

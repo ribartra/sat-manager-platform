@@ -17,6 +17,51 @@ const checks = [
     label: "Una asignacion por alumno × set × contexto; cerrar Classroom entrega el intento tal cual",
   },
   {
+    file: "lib/student-viewer.ts",
+    requires: ["...studentAccessWhereFor(user)", 'session.user.role === "STUDENT"', "readOnly: true"],
+    label: "Student view: el alumno se re-verifica en cada peticion (alcance del profesor) y es solo lectura",
+  },
+  {
+    file: "app/(student)/student/practice/practice-player-page.tsx",
+    requires: ["const simulated = Boolean(viewer?.readOnly);", "if (previewMode || simulated) {", "previewMode\n"],
+    label: "Student view: el intento es simulado (preview del player, no crea ni guarda nada)",
+  },
+  {
+    file: "app/(student)/student/tests/[assignmentId]/page.tsx",
+    requires: ["if (viewer.readOnly) {", 'attemptId="preview"', "previewMode"],
+    label: "Student view: el modulo del Test es simulado (no crea intento)",
+  },
+  {
+    file: "app/(teacher)/layout.tsx",
+    requires: ['if (await currentStudentView(session)) redirect("/student");'],
+    label: "Student view dura hasta Exit: las paginas del profesor vuelven a ella",
+  },
+  {
+    file: "app/(student)/student/results/[attemptId]/page.tsx",
+    requires: ["classroom ? numberedAnswers.filter((row) => isAnsweredAnswer(row.ans)) : numberedAnswers", "Only the questions you answered in class are shown."],
+    label: "Classroom (alumno): solo las preguntas respondidas y su solucion (sin leakage al Homework del set)",
+  },
+  {
+    file: "lib/assignments.ts",
+    requires: ['const where = { ...examWhere, context: "HOMEWORK" };', '"CLASSROOM_FINISHED_BY_TEACHER"'],
+    label: "Classroom nunca Overdue; la profesora puede finalizarlo",
+  },
+  {
+    file: "app/api/assignments/route.ts",
+    requires: ['resolvedContext === "CLASSROOM" ? null : parseDueDate(dueDate)'],
+    label: "Classroom sin fecha limite",
+  },
+  {
+    file: "lib/classroom-work.ts",
+    requires: ["...studentAccessWhereFor(user)", "OPEN_CLASSROOM_WHERE"],
+    label: "Trabajo de clase abierto: solo de los alumnos de la profesora",
+  },
+  {
+    file: "components/app-shell.tsx",
+    requires: ['"/api/teacher/classroom-work"', "Finish and sign out"],
+    label: "Al cerrar sesion la profesora finaliza el trabajo de clase abierto (con aviso)",
+  },
+  {
     file: "lib/assignments.ts",
     requires: ['if (homework) return { outcome: "blockedByHomework", assignmentId: null };'],
     label: "Con Homework ya asignado, el set no se asigna ni se reabre como Classroom",
@@ -478,7 +523,7 @@ const checks = [
   // Attempt level only, for every role: no averages, no best try, no chart across different Tests.
   {
     file: "app/(student)/student/student-home.tsx",
-    requires: ["<ViewSummaryCard", "loadPending([studentId])", "loadAttemptHistory([studentId]", "teacherViewLinks"],
+    requires: ["<ViewSummaryCard", "loadPending([studentId])", "loadAttemptHistory([studentId]", "STUDENT_HOME_LINKS"],
     forbids: ["LineChart", "avgPct", "Average correct", "s.delta", "PracticeAreaTabs", "ContinueCard"],
     label: "Home del alumno (y Student view) = Home del profesor: un recuadro alto por vista, sin pestañas ni promedios",
   },
@@ -953,7 +998,7 @@ const checks = [
   },
   {
     file: "app/(student)/student/pending/page.tsx",
-    requires: ["loadPending([session.user.id]", "PAGE_SIZE", "period={period}", "search={false}"],
+    requires: ["loadPending([viewer.studentId]", "PAGE_SIZE", "period={period}", "search={false}"],
     label: "Pending (alumno): solo lo suyo, 25 por pagina, filtro de periodo",
   },
   {
@@ -1033,8 +1078,8 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/assign/assign-view.tsx",
-    requires: ["<StudentSwitcher", 'path="/teacher/students/:id/assign"', "<LinkTabs", "initialSelected={params.set}", "initialSelected={params.test}"],
-    label: "Vista unica de Assign: alumno en DDL que conserva la URL, areas como links, preseleccion por URL",
+    requires: ["<AssignStudentSelect", "query={carry}", "<LinkTabs", "initialSelected={params.set}", "initialSelected={params.test}"],
+    label: "Vista unica de Assign: alumno en DDL del paso 1 que conserva la URL, areas como links, preseleccion por URL",
   },
   ...[
     "app/(teacher)/teacher/students/[studentId]/assign-test/page.tsx",
@@ -1083,9 +1128,9 @@ const checks = [
   },
   {
     file: "app/(teacher)/teacher/assign/assign-view.tsx",
-    requires: ["rosterWhere", "fullTestAssignments: { none: { testId: presetTest.id } }", "assignments: { none: { practiceSetId: presetSet.id } }", "defaultOpen={", "You&apos;re assigning"],
+    requires: ["rosterWhere", "fullTestAssignments: { none: { testId: presetTest.id } }", "assignments: { none: { practiceSetId: presetSet.id } }", '<AssignStep n={1} title="Choose the student"', "You&apos;re assigning"],
     forbids: ['<Card padding="lg"'],
-    label: "Assign sin alumno: lo que se asigna en la descripcion, DDL abierto, sin alumnos que ya lo tienen",
+    label: "Assign sin alumno: lo que se asigna en la descripcion, paso 1 con el DDL, sin alumnos que ya lo tienen",
   },
   {
     file: "app/(teacher)/teacher/questions/page.tsx",

@@ -5,7 +5,7 @@ import { HEADER_ACTION_CLASS, HeaderActions } from "@/components/sat/header-acti
 import { ReviewQuestionCard } from "@/components/sat/review-question-card";
 import { ResultFilterBar, ResultFilterEmpty, ResultFilterRoot, ResultFilterSegments } from "@/components/sat/result-filter";
 import { parseEliminatedOptions } from "@/lib/answer-review-meta";
-import { auth } from "@/lib/auth";
+import { getStudentViewer } from "@/lib/student-viewer";
 import prisma from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
@@ -36,9 +36,10 @@ interface PageProps {
 
 export default async function ResultsPage({ params, searchParams }: PageProps) {
   const { attemptId } = await params;
-  const session = await auth();
-  if (!session) redirect("/login");
-  const userId = session.user.id;
+  // The student shown: the signed-in student, or the teacher's Student view (read only).
+  const viewer = await getStudentViewer();
+  if (!viewer) redirect("/login");
+  const userId = viewer.studentId;
   const query = await searchParams;
   const returnQuery = new URLSearchParams();
   for (const key of ["area", "topic", "difficulty", "from", "to"] as const) {
@@ -103,11 +104,17 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
   const orderedQuestionIds = snapshotQuestionOrder.length
     ? snapshotQuestionOrder
     : psQuestions.map((psq) => psq.questionId);
-  const orderedAnswers = orderedQuestionIds.map((questionId) => answersMap[questionId]).filter(Boolean);
+  // Each answer keeps its question number in the set.
+  const numberedAnswers = orderedQuestionIds
+    .map((questionId, index) => ({ ans: answersMap[questionId], number: index + 1 }))
+    .filter((row) => Boolean(row.ans));
 
   const displayPct = pct;
   // Classroom work is never scored (pendiente-p2.md): no %, no correct count; what was answered.
   const classroom = attempt.assignment?.context === "CLASSROOM";
+  // Classroom work shows the student only what they answered (and its solution): the questions left
+  // blank are not revealed, so the set's Homework stays unseen (no leakage). Teachers see every question.
+  const orderedAnswers = classroom ? numberedAnswers.filter((row) => isAnsweredAnswer(row.ans)) : numberedAnswers;
   const practiceArea = (practiceSet?.topic.domain.practiceArea ?? null) as PracticeAreaCode | null;
   const areaTab = practiceArea ? tabFromPracticeArea(practiceArea) : null;
   const allPractice = await loadStudentPractice(userId);
@@ -123,7 +130,7 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
   const counts = {
     ok: canRevealSolutions ? correct : 0,
     bad: canRevealSolutions ? incorrect : 0,
-    blank: unanswered,
+    blank: classroom ? 0 : unanswered,
   };
 
   return (
@@ -263,7 +270,10 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
             <div className="mt-2">
               <AnswerGrid
                 idPrefix="q-"
-                items={orderedAnswers.map((a) => ({ state: !a?.answer ? ("blank" as const) : a.isCorrect ? ("ok" as const) : ("bad" as const) }))}
+                // Every question keeps its square; in Classroom work the ones left blank aren't opened ("na").
+                items={numberedAnswers.map(({ ans: a }) => ({
+                  state: !a?.answer ? (classroom ? ("na" as const) : ("blank" as const)) : a.isCorrect ? ("ok" as const) : ("bad" as const),
+                }))}
               />
             </div>
             <AnswerGridLegend />
@@ -273,6 +283,11 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
         {/* Per-question review */}
         <section>
           <h2 className="mb-3 text-base font-semibold text-gray-900">Your answers, question by question</h2>
+          {classroom ? (
+            <p className="mb-3 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-500">
+              Only the questions you answered in class are shown.
+            </p>
+          ) : null}
           {!canRevealSolutions && (
             <p className="mb-3 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-500">
               Your teacher has hidden the answers for this set.
@@ -280,7 +295,7 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
           )}
           <ResultFilterEmpty counts={counts} />
           <div className="space-y-4">
-            {orderedAnswers.map((ans, i) => {
+            {orderedAnswers.map(({ ans, number }) => {
               if (!ans) return null;
               // Historic attempts render the question as it was when answered (questionSnapshot).
               const snapshot = parseSnapshot<QuestionSnapshot>(ans.questionSnapshot);
@@ -293,8 +308,8 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
               return (
                 <div key={ans.id} data-q-state={canRevealSolutions ? state : state === "blank" ? "blank" : "answered"}>
                   <ReviewQuestionCard
-                    id={`q-${i + 1}`}
-                    number={i + 1}
+                    id={`q-${number}`}
+                    number={number}
                     question={{ ...question, options, imageUrl: media.imageUrl }}
                     answer={ans.answer}
                     isCorrect={Boolean(ans.isCorrect)}

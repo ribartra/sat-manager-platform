@@ -25,6 +25,8 @@ export function TeacherShell({ userName, avatarUrl, role, flags = {}, capabiliti
       brand="SAT Platform"
       caption={role === "ADMIN" ? "ADMIN" : "TEACHER"}
       roleLabel={role === "ADMIN" ? "Admin" : master ? "Master teacher" : "Teacher"}
+      // Teachers: open Classroom work of their students is finished when they sign out (asked first).
+      finishClassroomOnSignOut={role === "TEACHER"}
       userName={userName}
       avatarUrl={avatarUrl}
       items={items}

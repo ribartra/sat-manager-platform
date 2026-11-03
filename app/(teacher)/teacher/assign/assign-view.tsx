@@ -3,7 +3,6 @@ import { isAssignmentContext, type AssignmentContext } from "@/lib/assignment-co
 import { nameWithSource } from "@/lib/test-name";
 import { notFound } from "next/navigation";
 import { LinkTabs, PageHeader, PageShell } from "@/components/sat";
-import { PAGE_TITLE_CLASS } from "@/components/sat/page-shell";
 import { Alert } from "@/components/sat/alert";
 import { Breadcrumbs } from "@/components/sat/breadcrumbs";
 import { auth } from "@/lib/auth";
@@ -17,9 +16,9 @@ import { ACTIVE_SOURCE_WHERE, DEFAULT_PRACTICE_SOURCE_ID } from "@/lib/content-s
 import { resolvePracticeArea, tabFromPracticeArea } from "@/lib/practice-area";
 import { assignHref, assignQuery, parseAssignParams, type AssignArea, type AssignParams } from "@/lib/assign-params";
 import { difficultyLabel } from "@/lib/domain-meta";
-import { StudentSwitcher } from "../students/[studentId]/student-switcher";
 import { StudentDonePanel } from "../students/[studentId]/student-done-panel";
 import { AssignStep } from "@/components/sat/assign-step";
+import { AssignStudentSelect } from "@/components/sat/assign-student-select";
 import { AssignForm } from "../students/[studentId]/assign/assign-form-client";
 import { AssignTestForm } from "../students/[studentId]/assign-test/assign-test-form-client";
 
@@ -106,42 +105,34 @@ export async function AssignView({ studentId, query }: { studentId: string | nul
         }
       />
       <PageHeader
-        title={
-          <StudentSwitcher
-            prefix={editingNow ? "Edit what is assigned to" : "Assign to"}
-            name={student?.name ?? ""}
-            students={roster}
-            selectedStudentId={student?.id ?? null}
-            query={carry}
-            path="/teacher/students/:id/assign"
-            className={PAGE_TITLE_CLASS}
-            // No student yet: the list opens by itself.
-            defaultOpen={!student && roster.length > 0}
-            emptyText={everyoneHasIt ? "Every student already has it." : "You have no students yet."}
-          />
-        }
+        title={student ? `${editingNow ? "Edit what is assigned to" : "Assign to"} ${student.name}` : "Assign"}
         // No student yet: what is being assigned is the page description.
         description={
           !student && itemLabel ? (
             <>
-              You&apos;re assigning <b className="font-medium text-gray-700">{itemLabel}</b>. Choose the student in the title above.
+              You&apos;re assigning <b className="font-medium text-gray-700">{itemLabel}</b>. Follow the steps from top to bottom.
             </>
-          ) : !student ? (
-            "Choose the student in the title above."
           ) : (
             "Follow the steps from top to bottom."
           )
         }
       />
-      {/* No student yet: only the area tabs (the steps start once a student is chosen). */}
-      {student ? null : areaTabs}
+      {/* Step 1 (always): the student drop-down. The other steps show once a student is chosen. */}
+      <AssignStep n={1} title="Choose the student" className="mb-6">
+        <AssignStudentSelect
+          // The chosen student is always listed (the roster leaves out who already has a preset item).
+          students={student && !roster.some((r) => r.id === student.id) ? [student, ...roster] : roster}
+          selectedStudentId={student?.id ?? null}
+          query={carry}
+          emptyText={everyoneHasIt ? "Every student already has it." : "You have no students yet."}
+        />
+      </AssignStep>
     </>
   );
   // Steps 1–2 (the rest is in the form): the student (the name in the title) and what they have done.
   const firstSteps = (overview: StudentOverview | undefined, focus: "practice" | "tests") =>
     student ? (
       <div className="mb-6 space-y-6">
-        <AssignStep n={1} title="Choose the student" hint={<>Assigning to <b className="font-medium text-[var(--sat-text)]">{student.name}</b>. Open the name in the title to pick another student.</>} />
         <AssignStep n={2} title={`Check what ${student.name.split(" ")[0]} has done`}>
           {overview ? <StudentDonePanel overview={overview} studentId={student.id} focus={focus} /> : <p className="text-sm text-[var(--sat-muted)]">Nothing done yet.</p>}
         </AssignStep>

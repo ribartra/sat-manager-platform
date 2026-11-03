@@ -24,7 +24,7 @@ const checks = [
   ...[
     ["app/(teacher)/layout.tsx", '["TEACHER", "ADMIN"].includes(shell.role)'],
     ["app/admin/layout.tsx", '["TEACHER", "ADMIN"].includes(shell.role)'],
-    ["app/(student)/layout.tsx", 'shell.role !== "STUDENT"'],
+    ["app/(student)/layout.tsx", 'own.role !== "STUDENT" && !viewer'],
     ["app/(parent)/layout.tsx", 'shell.role !== "PARENT"'],
   ].map(([file, check]) => ({ file, requires: [check, "homeHrefForRole("], label: `Cada rol en su portal: ${file}` })),
   {
@@ -409,8 +409,8 @@ const checks = [
     label: "Taxonomy page is admin-only (the admin layout also admits teachers)",
   },
   {
-    file: "app/(teacher)/teacher/impersonate/[studentId]/page.tsx",
-    requires: ["requireTeacherOrAdmin", "studentAccessWhereFor", "IMPERSONATE_STUDENT_VIEW", "teacherViewLinks"],
+    file: "app/(teacher)/teacher/impersonate/[studentId]/route.ts",
+    requires: ["requireTeacherOrAdmin", "studentAccessWhereFor", "IMPERSONATE_STUDENT_VIEW", "STUDENT_VIEW_COOKIE"],
     label: "Student view is program-scoped, audited and read-only",
   },
   {

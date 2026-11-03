@@ -57,8 +57,8 @@ async function assertSourcePatterns() {
       label: "View Student con 4 tabs y filtro por área",
     },
     {
-      file: "app/(teacher)/teacher/impersonate/[studentId]/page.tsx",
-      requires: ["StudentHome", "teacherViewLinks", "studentAccessWhereFor", "IMPERSONATE_STUDENT_VIEW"],
+      file: "app/(teacher)/teacher/impersonate/[studentId]/route.ts",
+      requires: ["STUDENT_VIEW_COOKIE", "studentAccessWhereFor", "IMPERSONATE_STUDENT_VIEW"],
       label: "Student view = Home real del alumno (solo lectura), con alcance de programa y auditoria",
     },
     {

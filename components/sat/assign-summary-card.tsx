@@ -75,7 +75,9 @@ export function AssignSummaryCard({
 }) {
   const set = (patch: Partial<AssignOptions>) => onOptionsChange({ ...options, ...patch });
   // YYYY-MM-DD strings compare as dates.
-  const dateError = options.dueDate && options.unlockAt && options.dueDate < options.unlockAt ? "The due date is before the open date." : null;
+  // Classroom work has no due date: it stays open until the teacher finishes it or assigns it as Homework.
+  const noDueDate = context?.value === "CLASSROOM";
+  const dateError = !noDueDate && options.dueDate && options.unlockAt && options.dueDate < options.unlockAt ? "The due date is before the open date." : null;
   return (
     <Card padding="md" className="space-y-3">
       <h2 className="text-sm font-semibold text-gray-900">Summary</h2>
@@ -121,12 +123,19 @@ export function AssignSummaryCard({
           <Input id="assign-open" type="date" value={options.unlockAt} onChange={(e) => set({ unlockAt: e.target.value })} />
           <p className="mt-1 text-xs text-gray-400">The student can start it from that day. Today by default.</p>
         </div>
-        <div>
-          <label htmlFor="assign-due" className="mb-1 block text-sm font-medium text-gray-700">Due date</label>
-          <Input id="assign-due" type="date" value={options.dueDate} onChange={(e) => set({ dueDate: e.target.value })} />
-          <p className="mt-1 text-xs text-gray-400">{dueHint ?? "Due at the end of that day."}</p>
-          {dateError ? <p className="mt-1 text-xs text-red-600">{dateError}</p> : null}
-        </div>
+        {noDueDate ? (
+          <div>
+            <p className="mb-1 text-sm font-medium text-gray-700">Due date</p>
+            <p className="text-xs text-gray-500">None: Classroom work stays open until you finish it or assign it as Homework.</p>
+          </div>
+        ) : (
+          <div>
+            <label htmlFor="assign-due" className="mb-1 block text-sm font-medium text-gray-700">Due date</label>
+            <Input id="assign-due" type="date" value={options.dueDate} onChange={(e) => set({ dueDate: e.target.value })} />
+            <p className="mt-1 text-xs text-gray-400">{dueHint ?? "Due at the end of that day."}</p>
+            {dateError ? <p className="mt-1 text-xs text-red-600">{dateError}</p> : null}
+          </div>
+        )}
         <div>
           <label htmlFor="assign-feedback" className="mb-1 block text-sm font-medium text-gray-700">When to show answers</label>
           <Select id="assign-feedback" value={options.feedbackMode} onChange={(e) => {

@@ -7,7 +7,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { AssignStep } from "@/components/sat/assign-step";
-import { Input } from "@/components/ui/input";
+import { FilterBar, FilterField } from "@/components/sat/filter-bar";
 import { cn } from "@/lib/utils";
 import { InlineError } from "@/components/sat/alert";
 import { TestNumberAccordion } from "@/components/sat/test-number-accordion";
@@ -66,14 +66,21 @@ export function AssignTestForm({
   // Same options as practice: due the day it is assigned (end of that day), open today, answers at the
   // end, explanations off; editing starts from the stored settings.
   const [options, setOptions] = useState<AssignOptions>(() => defaultAssignOptions(0, editing));
-  const [search, setSearch] = useState("");
+  // Filters (no search box): source and assignment status; "All" by default.
+  const [sourceFilter, setSourceFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"" | "available" | "assigned">("");
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
   const [doneMessage, setDoneMessage] = useState("");
 
-  const term = search.trim().toLowerCase();
-  const visible = term ? exams.filter((exam) => exam.name.toLowerCase().includes(term) || exam.sourceName.toLowerCase().includes(term)) : exams;
+  const filtering = Boolean(sourceFilter || statusFilter);
+  const sourceOptions = [...new Map(exams.map((exam) => [exam.sourceId, { name: exam.sourceName, order: exam.sourceOrder }])).entries()]
+    .sort((a, b) => a[1].order - b[1].order || a[1].name.localeCompare(b[1].name))
+    .map(([value, source]) => ({ value, label: source.name }));
+  const visible = exams.filter(
+    (exam) => (!sourceFilter || exam.sourceId === sourceFilter) && (!statusFilter || (statusFilter === "assigned") === exam.assigned),
+  );
 
   function toggle(id: string) {
     // Already assigned: never selected or cleared from here.
@@ -169,20 +176,34 @@ export function AssignTestForm({
         <p className="rounded-md border border-gray-200 px-3 py-2 text-sm font-medium text-gray-800">{editing.name}</p>
       ) : (
         <>
-          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search tests..." />
+          <FilterBar sticky={false} className="mb-0">
+            <FilterField label="Assignment status" htmlFor="assign-test-filter-status">
+              <Select id="assign-test-filter-status" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as "" | "available" | "assigned")}>
+                <option value="">All</option>
+                <option value="available">Not assigned</option>
+                <option value="assigned">Already assigned</option>
+              </Select>
+            </FilterField>
+            <FilterField label="Source" htmlFor="assign-test-filter-source">
+              <Select id="assign-test-filter-source" value={sourceFilter} onChange={(e) => setSourceFilter(e.target.value)}>
+                <option value="">All</option>
+                {sourceOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </Select>
+            </FilterField>
+          </FilterBar>
           <p className="text-xs text-gray-500">Tests {studentName.split(" ")[0]} already has are marked as already assigned (they can retake them from their Tests page).</p>
           {/* Same structure as the Tests list: one "TEST N" accordion, each source's version inside. */}
           <div className="max-h-[32rem] overflow-y-auto">
             <TestNumberAccordion
-              emptyText={search ? "No test matches the search." : "Every published test is already assigned."}
+              emptyText={filtering ? "No test matches the filters." : "Every published test is already assigned."}
               items={visible.map((exam) => ({
                 key: exam.id,
                 number: exam.number,
                 sourceName: exam.sourceName,
                 sourceOrder: exam.sourceOrder,
-                // Searching opens the matches, and so does the Test preselected from the URL (selection
+                // The Test preselected from the URL opens (selection
                 // doesn't drive it, so unticking never collapses it).
-                open: Boolean(term) || exam.id === initialSelected,
+                open: exam.id === initialSelected,
                 // Every source of this TEST N assigned = stamp on its header; one version alone is only disabled.
                 assigned: exam.assigned,
                 node: (
