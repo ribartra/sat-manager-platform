@@ -14,9 +14,23 @@ import { getFeatureSetting } from "@/lib/app-settings";
  * question), so when a question's key, type or options change, every SUBMITTED practice / Test attempt
  * that has it is graded again against the current question. Only an attempt where some answer turns
  * right/wrong is re-scored (isCorrect, % and scores; never because the score curve changed). Nothing else
- * changes: no messages to anyone, no set locks, no status or dates. Each attempt whose result changed is
- * listed in one REGRADE_ATTEMPTS audit entry.
+ * changes: no messages to anyone, no set locks, no status or dates. Each re-graded attempt gets an
+ * ATTEMPT_REGRADED audit entry (its results page shows "Re-graded on …", latestRegrade).
  */
+
+export const ATTEMPT_REGRADED = "ATTEMPT_REGRADED";
+
+/** The last re-grade of an attempt, for the note on its results page. */
+export async function latestRegrade(attemptId: string): Promise<{ at: Date; before: string; after: string } | null> {
+  const row = await prisma.auditLog.findFirst({
+    where: { targetId: attemptId, action: ATTEMPT_REGRADED },
+    orderBy: { createdAt: "desc" },
+    select: { createdAt: true, metadata: true },
+  });
+  if (!row) return null;
+  const meta = parseSnapshot<{ before?: string; after?: string }>(row.metadata) ?? {};
+  return { at: row.createdAt, before: meta.before ?? "", after: meta.after ?? "" };
+}
 export type RegradeChange = {
   kind: "practice" | "test";
   attemptId: string;
@@ -173,15 +187,18 @@ async function regrade(practiceIds: string[], testIds: string[], options: Option
     const change = await regradeTestAttempt(id, excludePretest, dryRun);
     if (change) changed.push(change);
   }
-  if (!dryRun && changed.length > 0) {
-    await writeAudit({
-      userId: options.userId ?? null,
-      action: "REGRADE_ATTEMPTS",
-      targetType: options.questionIds?.length === 1 ? "Question" : null,
-      targetId: options.questionIds?.length === 1 ? options.questionIds[0] : null,
-      outcome: "success",
-      metadata: { reason: options.reason ?? null, questionIds: options.questionIds ?? null, changed },
-    });
+  if (!dryRun) {
+    // One entry per re-graded attempt (indexed by targetId): the results pages show "Re-graded on …".
+    for (const change of changed) {
+      await writeAudit({
+        userId: options.userId ?? null,
+        action: ATTEMPT_REGRADED,
+        targetType: change.kind === "practice" ? "Attempt" : "FullPracticeTestAttempt",
+        targetId: change.attemptId,
+        outcome: "success",
+        metadata: { reason: options.reason ?? null, questionIds: options.questionIds ?? null, studentId: change.studentId, before: change.before, after: change.after },
+      });
+    }
   }
   return { checked: practiceIds.length + testIds.length, changed };
 }

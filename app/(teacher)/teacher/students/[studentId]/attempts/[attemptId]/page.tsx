@@ -4,7 +4,7 @@ import {
   AttemptStatusBadge,
   Breadcrumbs,
   Delta,
-  InvalidatedNotice,
+  InvalidatedNotice, RegradedNotice,
   PageHeader,
   PageShell,
   SectionHeader,
@@ -38,6 +38,7 @@ interface PageProps {
   searchParams: Promise<{ area?: string; topic?: string; difficulty?: string; from?: string; to?: string }>;
 }
 
+import { latestRegrade } from "@/lib/attempt-regrade";
 export default async function TeacherAttemptDetailPage({ params, searchParams }: PageProps) {
   const { studentId, attemptId } = await params;
   const filters = progressFiltersFromParams(await searchParams);
@@ -146,6 +147,7 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
         ]}
       />
       {attempt.status === "INVALIDATED" ? <InvalidatedNotice audience="teacher" /> : null}
+      <RegradedNotice regrade={await latestRegrade(attempt.id)} />
 
       {/* Header: title on the left, actions top right (same slot and style as the student profile). */}
       <PageHeader

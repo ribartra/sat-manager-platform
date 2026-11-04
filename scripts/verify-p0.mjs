@@ -663,7 +663,7 @@ const checks = [
   },
   {
     file: "lib/attempt-regrade.ts",
-    requires: ["regradeQuestions", "REGRADE_ATTEMPTS", 'status: "SUBMITTED"', "if (answerUpdates.length === 0) return null;", "gradeFullTestModules"],
+    requires: ["regradeQuestions", "ATTEMPT_REGRADED", "latestRegrade", 'status: "SUBMITTED"', "if (answerUpdates.length === 0) return null;", "gradeFullTestModules"],
     forbids: ["notify", "unlock"],
     label: "Recalcular: clave corregida recalifica intentos entregados, sin notificar ni desbloquear",
   },
@@ -673,8 +673,48 @@ const checks = [
     label: "Editar pregunta: cambio de clave/tipo/opciones recalifica; no se borra si tiene intentos de practica o Test",
   },
   {
+    file: "app/api/questions/[questionId]/route.ts",
+    requires: ["answerMeaningIssues(previous", "questionAnswerCount(questionId)", "previousContent"],
+    label: "Pregunta respondida: no cambia tipo ni letras de opciones (Duplicate); la auditoria guarda el contenido anterior",
+  },
+  {
+    file: "lib/question-usage.ts",
+    requires: ["before.type !== after.type", "beforeLabels !== afterLabels", "movedFrom"],
+    label: "Reglas: tipo fijo, mismas letras, una opcion no se mueve de letra",
+  },
+  {
+    file: "app/(teacher)/teacher/questions/question-editor-client.tsx",
+    requires: ["answeredCount > 0", "use Duplicate"],
+    label: "Editor avisa cuantas veces se respondio la pregunta",
+  },
+  {
+    file: "scripts/apply-data-patches.mjs",
+    requires: ['REGRADE_PENDING_KEY = "REGRADE_PENDING"', 'if (mode === "apply")'],
+    label: "Patches aplicados dejan pendiente recalificar",
+  },
+  {
+    file: "instrumentation.ts",
+    requires: ["process.env.NEXT_RUNTIME === \"nodejs\"", "./instrumentation-node"],
+    label: "Al arrancar, la app recalifica si hubo patches (en segundo plano, borra la marca al terminar)",
+  },
+  {
+    file: "instrumentation-node.ts",
+    requires: ['key: "REGRADE_PENDING"', "regradeAllAttempts", "void (async"],
+    label: "Recalificar tras patches: solo runtime Node, en segundo plano",
+  },
+  {
+    file: "app/(student)/student/results/[attemptId]/page.tsx",
+    requires: ["<RegradedNotice regrade={await latestRegrade(attempt.id)} />"],
+    label: "Resultado de practice: aviso de recalificacion",
+  },
+  {
+    file: "app/(student)/student/tests/results/[attemptId]/page.tsx",
+    requires: ["<RegradedNotice regrade={await latestRegrade(attempt.id)} />"],
+    label: "Resultado de Test: aviso de recalificacion",
+  },
+  {
     file: "lib/ingest-promote-candidates.ts",
-    requires: ["regradeQuestions([official.id]"],
+    requires: ["regradeQuestions([official.id]", "UPDATE_QUESTION_FROM_AI_IMPORT", "previousContent"],
     label: "Re-sync de AI Import: clave u opciones nuevas recalifican los intentos",
   },
   {

@@ -3,6 +3,8 @@ import prisma from "@/lib/prisma";
 import { buildQuestionDraft, materializeOfficialImageUrl, reconcileOfficialUpdate } from "@/lib/ingest-promotion";
 import { validateQuestionPayload } from "@/lib/content-validation";
 import { regradeQuestions } from "@/lib/attempt-regrade";
+import { questionAnswerCount } from "@/lib/question-usage";
+import { writeAudit } from "@/lib/audit";
 
 /**
  * Promote staging candidates to official questions (AI Import "promote" and "Import with AI").
@@ -149,6 +151,30 @@ export async function promoteCandidates({
       // Attempts store only answers: a re-synced key or options re-grade the submitted ones.
       if (result.questionData.correctAnswer !== undefined || result.questionData.type !== undefined || result.replaceOptions) {
         await regradeQuestions([official.id], { userId, reason: "ai import re-sync" });
+      }
+      // The official question as it was, when students had answered it (their attempts show the new one).
+      const answeredCount = await questionAnswerCount(official.id);
+      if (answeredCount > 0) {
+        await writeAudit({
+          userId,
+          action: "UPDATE_QUESTION_FROM_AI_IMPORT",
+          targetType: "Question",
+          targetId: official.id,
+          metadata: {
+            candidateId: candidate.id,
+            changed: result.changed,
+            answeredCount,
+            previousContent: {
+              stem: official.stem,
+              stimulus: official.stimulus,
+              explanation: official.explanation,
+              imageUrl: official.imageUrl,
+              type: official.type,
+              correctAnswer: official.correctAnswer,
+              options: official.options,
+            },
+          },
+        });
       }
       resynced.push({ candidateId: candidate.id, questionId: official.id, changed: result.changed });
       continue;

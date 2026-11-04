@@ -7,7 +7,7 @@ export { DataTable, type DataTableResponsiveStrategy, type DataTableColumnMeta }
 export { FilterActions, FilterBar, FilterField } from "./filter-bar";
 export { FormSection } from "./form-section";
 export { PracticeAreaTabs } from "./practice-area-tabs";
-export { AttemptStatusBadge, INVALIDATED, InvalidatedNotice, VoidableValue, invalidatedRowClass, isInvalidated } from "./attempt-status";
+export { AttemptStatusBadge, INVALIDATED, InvalidatedNotice, RegradedNotice, VoidableValue, invalidatedRowClass, isInvalidated } from "./attempt-status";
 export { PAGE_SIZE, PAGE_SIZES, Pagination, pageFromParam, pageSizeFromParam, paginate } from "./pagination";
 export { Alert, InlineError, type AlertTone, type AlertLayout } from "./alert";
 export { NotFoundView } from "./not-found-view";

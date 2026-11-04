@@ -18,7 +18,7 @@ if ! node scripts/apply-data-patches.mjs; then
   exit 1
 fi
 
-# Data backfills that must run before traffic (idempotent).
-node scripts/backfill-fpt-snapshots.mjs || echo "[entrypoint] FPT snapshot backfill failed (attempts fall back to the live exam)" >&2
+# After patches that applied, the app re-grades submitted attempts on start (instrumentation.ts,
+# AppSetting REGRADE_PENDING), with the same code as the question editor.
 
 exec "$@"

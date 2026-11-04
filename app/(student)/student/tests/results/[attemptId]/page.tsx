@@ -4,7 +4,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { SECTION_TEXT } from "@/components/sat/test-ui";
 import { notFound } from "next/navigation";
-import { InvalidatedNotice, PageHeader, PageShell, TestResultSentence, isInvalidated } from "@/components/sat";
+import { InvalidatedNotice, RegradedNotice, PageHeader, PageShell, TestResultSentence, isInvalidated } from "@/components/sat";
 import { PAGE_TITLE_CLASS } from "@/components/sat/page-shell";
 import { HEADER_ACTION_CLASS, HeaderActions } from "@/components/sat/header-actions";
 import { RetakeTestButton } from "@/components/sat/retake-test-button";
@@ -36,6 +36,7 @@ interface PageProps {
  * Test results (mockup "test-result.html"). An open attempt shows the modules already submitted;
  * a section score appears only when both of its modules are done and the total when all 4 are.
  */
+import { latestRegrade } from "@/lib/attempt-regrade";
 export default async function FullTestResultsPage({ params, searchParams }: PageProps) {
   const { attemptId } = await params;
   const query = await searchParams;
@@ -138,6 +139,7 @@ export default async function FullTestResultsPage({ params, searchParams }: Page
       ) : null}
 
       {invalidated ? <InvalidatedNotice audience="student" /> : null}
+      <RegradedNotice regrade={await latestRegrade(attempt.id)} />
 
       {/* Header: same structure as a practice result and as the teacher's view (chips, title, tries, info). */}
       <PageHeader

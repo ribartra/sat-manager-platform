@@ -1,4 +1,4 @@
-import { Delta, InvalidatedNotice, PageHeader, PageShell, SectionHeader, VoidableValue } from "@/components/sat";
+import { Delta, InvalidatedNotice, RegradedNotice, PageHeader, PageShell, SectionHeader, VoidableValue } from "@/components/sat";
 import { ContextTag } from "@/components/sat/context-tag";
 import { PAGE_TITLE_CLASS } from "@/components/sat/page-shell";
 import { HEADER_ACTION_CLASS, HeaderActions } from "@/components/sat/header-actions";
@@ -33,6 +33,7 @@ interface PageProps {
   searchParams: Promise<{ area?: string; topic?: string; difficulty?: string; from?: string; to?: string; new?: string }>;
 }
 
+import { latestRegrade } from "@/lib/attempt-regrade";
 export default async function ResultsPage({ params, searchParams }: PageProps) {
   const { attemptId } = await params;
   // The student shown: the signed-in student, or the teacher's Student view (nothing is saved as the student).
@@ -149,6 +150,7 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
       {query.new === "1" ? <Alert tone="success" className="mb-4">Practice submitted. Here are your results.</Alert> : null}
 
       {attempt.status === "INVALIDATED" ? <InvalidatedNotice audience="student" /> : null}
+      <RegradedNotice regrade={await latestRegrade(attempt.id)} />
       {/* Header: title on the left, actions top right (same slot and style for every role). */}
       <PageHeader
         eyebrow={
