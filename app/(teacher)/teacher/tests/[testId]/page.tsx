@@ -46,6 +46,8 @@ import { listSources } from "@/lib/content-source";
 import { requireContentImporter } from "@/lib/rbac";
 import { contentMediaLinks } from "@/lib/import-media.server";
 import { assignHref } from "@/lib/assign-params";
+import { Alert } from "@/components/sat/alert";
+import { importOfDraftTest } from "@/lib/quick-import.server";
 
 interface PageProps {
   params: Promise<{ testId: string }>;
@@ -152,6 +154,9 @@ export default async function FullTestDetailPage({ params, searchParams }: PageP
     status === "Completed" ? "success" : status === "In progress" ? "warning" : status === "Overdue" ? "danger" : status === "Not started" ? "info" : "default";
 
   const sourceName = test.source?.name ?? "No source";
+  // A Draft made with Import with AI and questions still out of it (they need review): back to the import.
+  const importer = test.status === "DRAFT" ? await requireContentImporter() : null;
+  const fromImport = importer ? await importOfDraftTest(test.id, importer.user) : null;
   const header = (
     <>
       <Breadcrumbs
@@ -191,6 +196,13 @@ export default async function FullTestDetailPage({ params, searchParams }: PageP
           )
         }
       />
+      {fromImport ? (
+        <Alert tone="info" title="Created with Import with AI" className="mb-4">
+          {fromImport.notInDraft} question{fromImport.notInDraft === 1 ? " is" : "s are"} not in this Draft yet (they need review or a figure).{" "}
+          <Link href={`${fromImport.href}#step-3`} className="font-semibold text-[var(--sat-primary)] hover:underline">Continue the import</Link> to review them and add
+          them to this Draft.
+        </Alert>
+      ) : null}
     </>
   );
 

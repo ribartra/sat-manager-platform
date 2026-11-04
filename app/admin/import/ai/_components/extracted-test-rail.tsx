@@ -17,6 +17,8 @@ interface ExtractedTestRailProps {
   // Select-mode: pass onSelect to keep selection in-place (used inside the wizard
   // Review modal, where navigating away would close the modal).
   onSelect?: (row: ExtractedTestRow) => void;
+  /** Offers the hide button (default). Off where hiding cannot give the space back to the page. */
+  collapsible?: boolean;
 }
 
 const SECTION_TABS: { value: SetSectionFilter; label: string }[] = [
@@ -49,7 +51,7 @@ function CompletenessBar({ row }: { row: ExtractedTestRow }) {
 // Extracted Test navigation rail shown inside the per-file review workspace and
 // the dashboard Review modal. An Extracted Test is the group of files that form
 // one staging set; selecting one lists that set's questions. Mirrors /sets filters.
-export function ExtractedTestRail({ rows, batchId, currentFileId, onSelect }: ExtractedTestRailProps) {
+export function ExtractedTestRail({ rows, batchId, currentFileId, onSelect, collapsible = true }: ExtractedTestRailProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<SetTypeFilter>("ALL");
@@ -68,7 +70,7 @@ export function ExtractedTestRail({ rows, batchId, currentFileId, onSelect }: Ex
 
   const totalPending = useMemo(() => rows.reduce((acc, row) => acc + row.needsReview + row.attention, 0), [rows]);
 
-  if (collapsed) {
+  if (collapsed && collapsible) {
     return (
       <div className="flex flex-col items-center">
         <button
@@ -89,18 +91,20 @@ export function ExtractedTestRail({ rows, batchId, currentFileId, onSelect }: Ex
         <div className="min-w-0">
           <p className="text-sm font-semibold text-gray-900">Extracted Tests</p>
           <p className="text-xs text-gray-400">
-            {filtered.length} de {rows.length}
+            {filtered.length} of {rows.length}
             {totalPending > 0 ? ` · ${totalPending} to review` : ""}
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => setCollapsed(true)}
-          className="rounded-md border border-gray-200 p-1.5 text-gray-500 hover:bg-gray-50"
-          title="Hide Extracted Tests"
-        >
-          <PanelLeftClose className="h-4 w-4" />
-        </button>
+        {collapsible && (
+          <button
+            type="button"
+            onClick={() => setCollapsed(true)}
+            className="rounded-md border border-gray-200 p-1.5 text-gray-500 hover:bg-gray-50"
+            title="Hide Extracted Tests"
+          >
+            <PanelLeftClose className="h-4 w-4" />
+          </button>
+        )}
       </div>
 
       <div className="space-y-2 border-b border-gray-100 p-3">

@@ -5,6 +5,7 @@ import { ingestAuthHeaders, ingestUrl } from "@/lib/internal-ingest";
 import { propagateAssignedImageToOfficial } from "@/lib/ingest-promotion";
 import { cleanupAfterStemImageAssigned } from "@/lib/ingest-image-cleanup";
 import { ApiError, BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
+import { reconcileFigureReview } from "@/lib/ingest-review";
 
 interface RouteContext {
   params: Promise<{ candidateId: string }>;
@@ -99,6 +100,8 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
     if (targetType === "STEM" || targetType === "STIMULUS") {
       await cleanupAfterStemImageAssigned(candidateId).catch(() => null);
     }
+    // A figure now attached resolves its "crop it" review reason.
+    await reconcileFigureReview([candidateId]);
   }
 
   await prisma.auditLog.create({

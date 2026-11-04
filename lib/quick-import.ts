@@ -313,9 +313,9 @@ OUTPUT: produce a downloadable file named "import.csv" (send it as a file I can 
 
 CSV FORMAT (strict):
 - UTF-8, comma-separated, RFC 4180. Wrap EVERY field in double quotes; write a literal double quote as "". Line breaks inside a field are allowed inside the quotes.
-- First line is this exact header:
+- First line is this exact header (the last column, "notes", is optional: leave it empty when there is nothing to review):
 ${QUICK_IMPORT_COLUMNS.join(",")}
-- One row per question, in the order they appear. Never merge or split questions. Do not skip any question, even if it is hard to read — mark it in "notes".
+- One row per question, in the order they appear. Never merge or split questions. Do not skip any question, even if it is hard to read — say what is unreadable in "notes".
 
 COLUMNS:
 - number: the question number as printed (integer).
@@ -329,13 +329,19 @@ COLUMNS:
 - explanation: the full rationale from the answer explanations, if provided; otherwise empty. Do not invent explanations.
 - figure: NONE, STEM, STIMULUS or OPTIONS — where a graph, diagram, geometric figure or image appears that cannot be written as text or a table.
 - figurePage: the PDF page number (1 = first page of the file) where that figure is; empty if figure is NONE.
-- notes: anything you were unsure about (illegible text, missing answer, ambiguous choice). Empty if all is clear.
+- notes: OPTIONAL. Every note sends the question to a person for review, so write one ONLY when someone must check or fix something:
+  - text you could not read or that is cut off in the PDF;
+  - an answer that is missing, or that you are not sure of;
+  - an ambiguous or duplicated answer choice;
+  - an explanation that contradicts the answer key;
+  - a figure whose content the question needs and that you could not describe or crop.
+  Leave it EMPTY for anything that only describes formatting or how you wrote something: bold or underlined text, headings, layout, marks from a screenshot (strike-throughs, highlights, navigation), equivalent answers you added, or "content is complete".
 
 MATH AND FORMATTING (the platform renders KaTeX):
 - Every mathematical expression goes in LaTeX: inline $...$ (e.g. $\\frac{3}{4}x + 2 = 11$, $x^{2}$, $\\sqrt{5}$, $\\pi r^{2}$, $\\le$, $\\ne$). A formula alone on its own line may use $$...$$.
 - A literal dollar sign (money) is written \\$ (e.g. \\$12.50). Never leave a $ unbalanced.
 - Tables: Markdown pipe tables with a header row, e.g. | x | y |, then |---|---|, then | 1 | 3 |.
-- Keep italics/underlines only if they matter for the question (use *word*); otherwise plain text.
+- Underlined text that the question refers to ("the underlined portion"): write it as ++text++. Bold that matters: **text**. Italics that matter: *text*. Otherwise plain text. These are the platform's own marks: do not mention them in "notes".
 - Do not add text that is not in the PDF. Keep the original wording, punctuation and spelling.
 
 QUALITY CHECK before you answer: the number of rows equals the number of questions in ${moduleInfo ? `${moduleInfo.name} (${moduleInfo.expected})` : "the PDF"}; every MC row has 4 choices and a letter answer; every NUMERIC row has a value; LaTeX braces and $ are balanced; the header is exactly as above.
@@ -351,16 +357,34 @@ export function buildImagePrompt(questions: Array<{ number: number; module: stri
   const list = questions.length
     ? questions.map((q) => `- Question ${q.number}${q.module ? ` (${q.module})` : ""}: ${q.figure}`).join("\n")
     : "- (no question was flagged; check every page for graphs, diagrams and image-only answer choices)";
-  return `You are helping recover the images of SAT questions. This zip contains the original PDF (folder "original"), every page rendered as PNG (folder "pages") and the questions already imported ("candidates.csv").
+  const isTest = questions.some((q) => q.module);
+  const slotExample = isTest ? "MATH1_Q7_STEM" : "Q7_STEM";
+  return `You are helping recover the figures of SAT questions in the BEST quality the source allows. This zip contains:
+- original/  → the original PDF(s): the real source of every figure (vector figures can be rendered at any resolution);
+- pages/     → every page as PNG at 200 dpi, only to FIND the figures (do not cut final images from these);
+- pages.json → for each page: its file, page number, size in PDF points, the PNG's dpi and size, and the embedded pictures (screenshots) with their box and native pixel size;
+- candidates.csv → the questions already imported.
 
-Crop, from the page images or the PDF, every figure that a question needs and that cannot be written as text: graphs, diagrams, geometric figures, images used as answer choices, and tables that only exist as pictures.
+Find every figure a question needs and that cannot be written as text: graphs, diagrams, geometric figures, images used as answer choices, and tables that only exist as pictures.
 
-Return ONE zip file with PNG images named exactly:
-- Q<number>_STEM.png       → the figure of the question
-- Q<number>_STIMULUS.png   → the figure of the passage / data shown before the question
-- Q<number>_A.png … Q<number>_D.png → answer choices that are images
-${questions.some((q) => q.module) ? "Full test: question numbers restart in every module, so prefix each name with its module: RW1_Q3_STEM.png, MATH2_Q12_A.png (modules RW1, RW2, MATH1, MATH2).\n" : ""}
-Rules: crop tightly around the figure (no page headers, question numbers, or answer letters), keep the original resolution or higher, white background, no compression artifacts. Do not redraw or alter the figure.
+Slots (one figure each):
+- Q<number>_STEM → the figure of the question
+- Q<number>_STIMULUS → the figure of the passage / data shown before the question
+- Q<number>_A … Q<number>_D → answer choices that are images
+${isTest ? "Full test: question numbers restart in every module, so prefix every slot with its module: RW1_Q3_STEM, MATH2_Q12_A (modules RW1, RW2, MATH1, MATH2).\n" : ""}
+RETURN ONE ZIP, in one of these two ways (you may mix them; crops.json wins for a slot that has both):
+
+A) RECOMMENDED — crops.json (best quality: the platform renders each box from the original PDF itself, sharp vector figures and screenshots at their native resolution). A JSON list:
+[{"slot": "${slotExample}", "file": "<PDF name in original/>", "page": 3, "bbox": {"x0": 72.5, "top": 210.0, "x1": 540.0, "bottom": 430.0}}]
+- page: 1 = first page of that PDF. bbox in PDF points (1/72 inch), origin at the top-left of the page.
+- Convert from the page PNG with pages.json: points = pixels × 72 / dpi (dpi is 200).
+- If you are a coding assistant that can view images, look at each page PNG, measure the figure's box in pixels, convert it, and check it by rendering that box (e.g. pdfplumber page.crop(bbox).to_image(resolution=300)) before you answer.
+- The box: tight around the figure, including its own labels, axis titles, legend and caption ("Note: Figure not drawn to scale."); excluding the question number, the question text, answer letters and the page header/footer or navigation bar.
+
+B) PNG files named <slot>.png (e.g. ${slotExample}.png), if you cut the images yourself:
+- Render them FROM THE PDF in original/, not from pages/: vector content at 300–600 dpi so the long side is at least 1920 px; a figure that is an embedded picture (pages.json → embeddedImages) at its native pixels (extract it, e.g. pdfimages, or render at its native dpi).
+- Never upscale beyond the source pixels, never redraw, sharpen or "enhance" with AI; white background; PNG (no JPEG compression).
+- Same box rules as in A.
 
 Questions flagged with a figure:
 ${list}`;

@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import { propagateAssignedImageToOfficial } from "@/lib/ingest-promotion";
 import { cleanupAfterStemImageAssigned } from "@/lib/ingest-image-cleanup";
 import { BadRequestError, ForbiddenError, NotFoundError, withApiErrors } from "@/lib/api-error";
+import { reconcileFigureReview } from "@/lib/ingest-review";
 
 interface RouteContext {
   params: Promise<{ candidateId: string }>;
@@ -97,6 +98,9 @@ export const POST = withApiErrors(async function POST(req: NextRequest, { params
       sortOrder: body.sortOrder ?? 0,
         },
       });
+
+  // A figure now attached resolves its "crop it" review reason.
+  await reconcileFigureReview([candidateId]);
 
   // Mirror onto the official Question when already promoted — same path as
   // crop-region. Without this, the UI "asignar imagen" only updates staging and

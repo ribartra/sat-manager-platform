@@ -39,12 +39,15 @@ export type OpenQuickImport = {
   topicId: string | null;
   difficulty: string | null;
   questionsLoaded: number;
+  /** A Test's Draft already exists but questions are still out of it (they need review): "Add N to the Draft". */
+  draft: { href: string; notInDraft: number } | null;
 };
 
 /**
- * "Import with AI" runs still open: created by this user (admin: anyone) and with no Draft yet (the
- * promotion artifact `quick:<batchId>`). Everything is saved as it goes, so an import interrupted by a
- * sign-out is continued from here (Step 1, the Tests "TEST N" gap) instead of starting a second one.
+ * "Import with AI" runs still open: created by this user (admin: anyone) and either with no Draft yet
+ * (the promotion artifact `quick:<batchId>`), or a Test whose Draft is still a Draft with questions left
+ * out (they needed review; "Add N to the Draft" adds them later). Everything is saved as it goes, so an
+ * interrupted import is continued from here (Step 1, Tests, the Test page) instead of starting another.
  */
 export async function openQuickImports(user: { id: string; role: string }): Promise<OpenQuickImport[]> {
   const batches = await prisma.ingestBatch.findMany({
@@ -55,18 +58,30 @@ export async function openQuickImports(user: { id: string; role: string }): Prom
   });
   if (batches.length === 0) return [];
   const ids = batches.map((batch) => batch.id);
-  const [promoted, loaded, sources] = await Promise.all([
-    prisma.ingestPromotionArtifact.findMany({ where: { groupKey: { in: ids.map((id) => `quick:${id}`) } }, select: { batchId: true } }),
+  const [promoted, loaded, outOfDraft, sources] = await Promise.all([
+    prisma.ingestPromotionArtifact.findMany({ where: { groupKey: { in: ids.map((id) => `quick:${id}`) } }, select: { batchId: true, artifactType: true, artifactId: true } }),
     prisma.ingestQuestionCandidate.groupBy({ by: ["batchId"], where: { batchId: { in: ids }, status: { not: "REJECTED" } }, _count: { _all: true } }),
+    prisma.ingestQuestionCandidate.groupBy({ by: ["batchId"], where: { batchId: { in: ids }, status: { not: "REJECTED" }, promotionStatus: { not: "PROMOTED" } }, _count: { _all: true } }),
     prisma.source.findMany({ where: { id: { in: batches.flatMap((batch) => (batch.sourceId ? [batch.sourceId] : [])) } }, select: { id: true, name: true } }),
   ]);
-  const done = new Set(promoted.map((row) => row.batchId));
+  const draftTests = await prisma.fullPracticeTest.findMany({
+    where: { id: { in: promoted.filter((row) => row.artifactType === "FULL_PRACTICE_TEST").map((row) => row.artifactId) }, status: "DRAFT" },
+    select: { id: true },
+  });
+  const openDraft = new Set(draftTests.map((test) => test.id));
+  const artifactBy = new Map(promoted.map((row) => [row.batchId, row]));
   const loadedBy = new Map(loaded.map((row) => [row.batchId, row._count._all]));
+  const outBy = new Map(outOfDraft.map((row) => [row.batchId, row._count._all]));
   const sourceName = new Map(sources.map((source) => [source.id, source.name]));
   const level = (difficulty: string) => difficulty.charAt(0) + difficulty.slice(1).toLowerCase();
   return batches.flatMap((batch) => {
     const target = parseTarget(batch.targetJson);
-    if (!target || done.has(batch.id)) return [];
+    if (!target) return [];
+    const artifact = artifactBy.get(batch.id);
+    const notInDraft = outBy.get(batch.id) ?? 0;
+    // Done: a Draft exists and nothing can be added to it (a Practice Set Draft is final; a Test's is
+    // open while it is a Draft and questions are still out).
+    if (artifact && !(artifact.artifactType === "FULL_PRACTICE_TEST" && openDraft.has(artifact.artifactId) && notInDraft > 0)) return [];
     const source = batch.sourceId ? sourceName.get(batch.sourceId) ?? null : null;
     const what = target.kind === "FULL_PRACTICE_TEST"
       ? target.testNumber ? `TEST ${target.testNumber}` : target.testName
@@ -82,6 +97,18 @@ export async function openQuickImports(user: { id: string; role: string }): Prom
       topicId: target.kind === "PRACTICE_SET" ? target.topicId : null,
       difficulty: target.kind === "PRACTICE_SET" ? target.difficulty : null,
       questionsLoaded: loadedBy.get(batch.id) ?? 0,
+      draft: artifact ? { href: `/teacher/tests/${artifact.artifactId}?edit`, notInDraft } : null,
     }];
   });
+}
+
+/** The import a Draft Test came from, while questions of it are still out of the Draft (for "Continue"). */
+export async function importOfDraftTest(testId: string, user: { id: string; role: string }) {
+  const artifact = await prisma.ingestPromotionArtifact.findFirst({
+    where: { artifactType: "FULL_PRACTICE_TEST", artifactId: testId, groupKey: { startsWith: "quick:" } },
+    select: { batchId: true },
+  });
+  if (!artifact) return null;
+  const open = (await openQuickImports(user)).find((item) => item.id === artifact.batchId);
+  return open?.draft ? { href: open.href, notInDraft: open.draft.notInDraft } : null;
 }

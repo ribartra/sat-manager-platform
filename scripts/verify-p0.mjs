@@ -662,6 +662,67 @@ const checks = [
     label: "Resultado de practice: la pregunta actual (texto, opciones e imagenes)",
   },
   {
+    file: "lib/ingest-review.ts",
+    requires: ["export async function reconcileFigureReview", "figureWarningResolved(warning, own)", 'status: "READY", confidence: 0.9'],
+    label: "A figure attached resolves its review reason (question becomes READY when nothing else is pending)",
+  },
+  {
+    file: "lib/import-media.server.ts",
+    requires: ["await reconcileFigureReview("],
+    label: "Images zip: linked figures resolve their review reason",
+  },
+  {
+    file: "app/api/import/quick/[batchId]/promote/route.ts",
+    requires: ["await reconcileFigureReview(notPromoted.map"],
+    label: "Draft: questions whose figure is attached go in",
+  },
+  {
+    file: "lib/quick-import.server.ts",
+    requires: ["export async function importOfDraftTest", "notInDraft > 0", "draft: artifact ?"],
+    label: "A partial Test Draft keeps its import listed (Continue)",
+  },
+  {
+    file: "app/(teacher)/teacher/tests/[testId]/page.tsx",
+    requires: ["importOfDraftTest(test.id", "Continue the import"],
+    label: "Test page: Continue the import while questions are out of the Draft",
+  },
+  {
+    file: "lib/quick-import.ts",
+    requires: ["RECOMMENDED — crops.json", "pages.json", "Never upscale beyond the source pixels", "Render them FROM THE PDF in original/"],
+    label: "Image prompt: crops.json (platform cuts from the PDF) or PNGs rendered from the PDF at full quality, never upscaled",
+  },
+  {
+    file: "ingest_service/app/main.py",
+    requires: ["def render_pdf_region_hq(", "FIGURE_TARGET_LONG_SIDE = 1920", '"raster"', 'crops.json first: rendered by the platform from the PDF', '"pages.json"', "ARTIFACT_PAGE_DPI = 200"],
+    label: "Figures: rendered from the PDF (vector ≥1920 px, screenshots at native resolution), crops.json upload, pages.json in the artifacts zip",
+  },
+  {
+    file: "lib/math-text.ts",
+    requires: ["export function textFormatState", "1. The selection itself carries the markers", "2. Inside a formatted run", "the run closes before the selection and reopens after it"],
+    label: "Bold/Underline toggle like a word processor (remove when already formatted, split a run, word under caret)",
+  },
+  {
+    file: "components/text-format-toolbar.tsx",
+    requires: ["aria-pressed={active.bold}", "aria-pressed={active.underline}", "selectionchange", 'key !== "b" && key !== "u"'],
+    label: "Format toolbar: pressed state follows the caret; Ctrl/Cmd+B and +U",
+  },
+  {
+    file: "lib/quick-import.ts",
+    requires: ['the last column, \"notes\", is optional', "notes: OPTIONAL. Every note sends the question to a person for review", "write it as ++text++"],
+    forbids: ["(use *word*)"],
+    label: "Import with AI prompt: notes optional, only for real review; platform underline/bold marks",
+  },
+  {
+    file: "app/admin/import/ai/[batchId]/files/[fileId]/review-client.tsx",
+    requires: ["reviewReasons(draft.warningsJson", 'title="Needs review"', "AI note", "quick ?"],
+    label: "Review: the AI note and checks in a Needs review box at the top; quick import uses the full width",
+  },
+  {
+    file: "app/admin/import/ai/[batchId]/files/[fileId]/page.tsx",
+    requires: ["{!quick && (", "collapsible={false}", 'aria-label="Sections of this import"'],
+    label: "Review page: no Extracted Tests rail (nor hide button) in Import with AI; sections in the summary card",
+  },
+  {
     file: "lib/attempt-regrade.ts",
     requires: ["regradeQuestions", "ATTEMPT_REGRADED", "latestRegrade", 'status: "SUBMITTED"', "if (answerUpdates.length === 0) return null;", "gradeFullTestModules"],
     forbids: ["notify", "unlock"],
@@ -1465,7 +1526,7 @@ const checks = [
   },
   {
     file: "lib/quick-import.ts",
-    requires: ["QUICK_IMPORT_COLUMNS", "$...$", "\\$", "pipe tables", "import.csv", "Q<number>_STEM.png", "unbalancedDollars"],
+    requires: ["QUICK_IMPORT_COLUMNS", "$...$", "\\$", "pipe tables", "import.csv", "Q<number>_STEM → the figure of the question", "unbalancedDollars"],
     label: "Import with AI: prompt detallado (columnas CSV, LaTeX, tablas, archivo descargable) y prompt de imagenes",
   },
   {

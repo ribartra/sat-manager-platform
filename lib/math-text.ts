@@ -229,45 +229,127 @@ export function tokenizeMathContent(content: string): ContentPart[] {
   return result;
 }
 
-/**
- * Wrap a selection in a textarea value.
- * - Inside a math token ($…$ / $$…$$ / \[…\] / \(...\)): use LaTeX command.
- * - Otherwise: use prose markers **…** / ++…++.
- */
-export function wrapTextFormat(
-  value: string,
-  selectionStart: number,
-  selectionEnd: number,
-  format: "bold" | "underline",
-): { next: string; selectionStart: number; selectionEnd: number } {
-  const start = Math.max(0, Math.min(selectionStart, selectionEnd, value.length));
-  const end = Math.max(0, Math.max(selectionStart, selectionEnd, start));
-  const selected = value.slice(start, end) || (format === "bold" ? "text" : "text");
-  const inMath = isInsideMathToken(value, start, end);
+type TextFormat = "bold" | "underline";
+type FormatResult = { next: string; selectionStart: number; selectionEnd: number };
 
-  let wrapped: string;
-  if (inMath) {
-    const cmd = format === "bold" ? "\\textbf" : "\\underline";
-    wrapped = `${cmd}{${selected}}`;
-  } else {
-    const marker = format === "bold" ? "**" : "++";
-    // Avoid double-wrapping the same markers.
-    if (
-      (format === "bold" && selected.startsWith("**") && selected.endsWith("**")) ||
-      (format === "underline" && selected.startsWith("++") && selected.endsWith("++"))
-    ) {
-      wrapped = selected;
+const PROSE_MARK: Record<TextFormat, string> = { bold: "**", underline: "++" };
+const MATH_CMD: Record<TextFormat, string> = { bold: "\\textbf{", underline: "\\underline{" };
+
+/** Paired marker runs (open, close) on the line holding `pos`: [openStart, closeEnd). */
+function markerRuns(value: string, pos: number, mark: string): Array<{ open: number; close: number }> {
+  const lineStart = value.lastIndexOf("\n", Math.max(0, pos - 1)) + 1;
+  const lineEndRaw = value.indexOf("\n", pos);
+  const lineEnd = lineEndRaw === -1 ? value.length : lineEndRaw;
+  const hits: number[] = [];
+  for (let i = value.indexOf(mark, lineStart); i !== -1 && i + mark.length <= lineEnd; i = value.indexOf(mark, i + mark.length)) hits.push(i);
+  const runs: Array<{ open: number; close: number }> = [];
+  for (let i = 0; i + 1 < hits.length; i += 2) runs.push({ open: hits[i], close: hits[i + 1] });
+  return runs;
+}
+
+/** The marked run whose inside holds [start, end] (prose markers), if any. */
+function enclosingRun(value: string, start: number, end: number, mark: string) {
+  return markerRuns(value, start, mark).find((run) => run.open + mark.length <= start && end <= run.close) ?? null;
+}
+
+/** Whether the selection / caret is bold or underlined (prose markers or LaTeX commands). */
+export function textFormatState(value: string, selectionStart: number, selectionEnd: number): Record<TextFormat, boolean> {
+  const start = Math.min(selectionStart, selectionEnd);
+  const end = Math.max(selectionStart, selectionEnd);
+  const state = (format: TextFormat) => {
+    const selected = value.slice(start, end);
+    const mark = PROSE_MARK[format];
+    if (selected.length >= mark.length * 2 && selected.startsWith(mark) && selected.endsWith(mark)) return true;
+    if (enclosingRun(value, start, end, mark)) return true;
+    const cmd = MATH_CMD[format];
+    const open = value.lastIndexOf(cmd, start);
+    return open !== -1 && open + cmd.length <= start && value.indexOf("}", open) >= end;
+  };
+  return { bold: state("bold"), underline: state("underline") };
+}
+
+/**
+ * Bold / Underline like a word processor: the button toggles.
+ * - Selection already formatted (markers inside or around it, or inside a formatted run) → the format
+ *   is removed from it (a part of a run splits the run).
+ * - Otherwise the selection is wrapped (surrounding spaces stay outside the markers).
+ * - No selection: inside a formatted run → that run is unformatted; inside a word → the word is
+ *   formatted; elsewhere → an empty pair with the caret in it (typing goes formatted; pressing again
+ *   removes the empty pair).
+ * Prose uses **…** / ++…++; inside a math token ($…$ …) the LaTeX \textbf{…} / \underline{…}.
+ */
+export function wrapTextFormat(value: string, selectionStart: number, selectionEnd: number, format: TextFormat): FormatResult {
+  let start = Math.max(0, Math.min(selectionStart, selectionEnd, value.length));
+  let end = Math.min(value.length, Math.max(selectionStart, selectionEnd, start));
+
+  if (isInsideMathToken(value, start, end)) {
+    const cmd = MATH_CMD[format];
+    const selected = value.slice(start, end);
+    if (selected.startsWith(cmd) && selected.endsWith("}")) {
+      const inner = selected.slice(cmd.length, -1);
+      return { next: value.slice(0, start) + inner + value.slice(end), selectionStart: start, selectionEnd: start + inner.length };
+    }
+    if (value.slice(start - cmd.length, start) === cmd && value[end] === "}") {
+      const next = value.slice(0, start - cmd.length) + value.slice(start, end) + value.slice(end + 1);
+      return { next, selectionStart: start - cmd.length, selectionEnd: end - cmd.length };
+    }
+    const next = value.slice(0, start) + cmd + value.slice(start, end) + "}" + value.slice(end);
+    return { next, selectionStart: start + cmd.length, selectionEnd: end + cmd.length };
+  }
+
+  const mark = PROSE_MARK[format];
+  const m = mark.length;
+  // Marks a piece keeping its edge spaces outside (** word** would show a bold space); empty → nothing.
+  const marked = (piece: string) => {
+    const core = piece.trim();
+    if (!core) return piece;
+    const lead = piece.slice(0, piece.length - piece.trimStart().length);
+    const trail = piece.slice(piece.trimEnd().length);
+    return `${lead}${mark}${core}${mark}${trail}`;
+  };
+
+  // 1. The selection itself carries the markers: **word** selected → word.
+  const selected = value.slice(start, end);
+  if (selected.length >= m * 2 && selected.startsWith(mark) && selected.endsWith(mark)) {
+    const inner = selected.slice(m, -m);
+    return { next: value.slice(0, start) + inner + value.slice(end), selectionStart: start, selectionEnd: start + inner.length };
+  }
+
+  // 2. Inside a formatted run (also the caret, or an empty pair **|**).
+  const run = enclosingRun(value, start, end, mark);
+  if (run) {
+    const innerStart = run.open + m;
+    const innerEnd = run.close;
+    if (start === end || (start === innerStart && end === innerEnd)) {
+      // The whole run (or the caret in it): remove its markers.
+      const next = value.slice(0, run.open) + value.slice(innerStart, innerEnd) + value.slice(innerEnd + m);
+      return { next, selectionStart: start - m, selectionEnd: end - m };
+    }
+    // A part of the run: the run closes before the selection and reopens after it.
+    const left = marked(value.slice(innerStart, start));
+    const mid = value.slice(start, end);
+    const right = marked(value.slice(end, innerEnd));
+    const head = value.slice(0, run.open) + left;
+    return { next: head + mid + right + value.slice(innerEnd + m), selectionStart: head.length, selectionEnd: head.length + mid.length };
+  }
+
+  // 3. No selection: format the word under the caret, or open an empty pair.
+  if (start === end) {
+    const isWord = (ch: string | undefined) => Boolean(ch && /[\p{L}\p{N}'’-]/u.test(ch));
+    if (isWord(value[start - 1]) || isWord(value[start])) {
+      while (start > 0 && isWord(value[start - 1])) start -= 1;
+      while (end < value.length && isWord(value[end])) end += 1;
     } else {
-      wrapped = `${marker}${selected}${marker}`;
+      const next = value.slice(0, start) + mark + mark + value.slice(start);
+      return { next, selectionStart: start + m, selectionEnd: start + m };
     }
   }
 
-  const next = value.slice(0, start) + wrapped + value.slice(end);
-  return {
-    next,
-    selectionStart: start,
-    selectionEnd: start + wrapped.length,
-  };
+  // 4. Wrap; spaces at the edges stay outside the markers (** word** would not render).
+  while (start < end && /\s/.test(value[start])) start += 1;
+  while (end > start && /\s/.test(value[end - 1])) end -= 1;
+  const next = value.slice(0, start) + mark + value.slice(start, end) + mark + value.slice(end);
+  return { next, selectionStart: start + m, selectionEnd: end + m };
 }
 
 function isInsideMathToken(value: string, start: number, end: number): boolean {

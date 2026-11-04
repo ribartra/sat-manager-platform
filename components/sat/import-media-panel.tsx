@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Copy, Download, Upload } from "lucide-react";
+import { Check, Copy, Download, FileText, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { InlineError } from "@/components/sat/alert";
 import { apiFetch, errorMessage } from "@/lib/api-client";
@@ -50,6 +50,19 @@ export function ImportMediaPanel({
     }
   }
 
+  // The image prompt as a file, to attach it to the AI chat next to the zip.
+  function downloadPrompt() {
+    if (!imagePrompt) return;
+    const url = URL.createObjectURL(new Blob([imagePrompt], { type: "text/markdown;charset=utf-8" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "PROMPT-images.md";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
   async function copy() {
     if (!imagePrompt) return;
     try {
@@ -64,9 +77,10 @@ export function ImportMediaPanel({
   return (
     <div className="space-y-3 text-sm text-gray-700">
       <p>
-        Download the zip (original PDF, every page as an image, the questions and the prompts), give it to your AI with <b>PROMPT-images.md</b> and ask for a zip of
-        images named <code>Q3_STEM.png</code>, <code>Q5_A.png</code>
-        {isTest ? <> (Tests: <code>RW1_Q3_STEM.png</code>, <code>MATH2_Q12_A.png</code>)</> : null}. Upload it here: each image goes to its question.
+        Download the zip (original PDF, every page as an image, the questions and the prompts) and give it to your AI with <b>PROMPT-images.md</b>. Best
+        quality: ask it for <code>crops.json</code> (where each figure is), and the platform cuts every figure from the original PDF itself — sharp at any size. It may
+        also return images named <code>Q3_STEM.png</code>, <code>Q5_A.png</code>
+        {isTest ? <> (Tests: <code>RW1_Q3_STEM.png</code>, <code>MATH2_Q12_A.png</code>)</> : null}. Upload its zip here: each figure goes to its question.
       </p>
       <div className="flex flex-wrap items-center gap-2">
         <Button asChild variant="secondary">
@@ -75,9 +89,14 @@ export function ImportMediaPanel({
           </a>
         </Button>
         {imagePrompt ? (
-          <Button type="button" variant="secondary" onClick={copy}>
-            {copied ? <Check size={14} /> : <Copy size={14} />} {copied ? "Prompt copied" : "Copy image prompt"}
-          </Button>
+          <>
+            <Button type="button" variant="secondary" onClick={downloadPrompt}>
+              <FileText size={14} /> Download PROMPT-images.md
+            </Button>
+            <Button type="button" variant="secondary" onClick={copy}>
+              {copied ? <Check size={14} /> : <Copy size={14} />} {copied ? "Prompt copied" : "Copy image prompt"}
+            </Button>
+          </>
         ) : null}
         <label
           className={cn(
