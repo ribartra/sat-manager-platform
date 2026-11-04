@@ -32,6 +32,15 @@ function formatDuration(seconds: number) {
   return rest ? `${hours}h ${rest}m` : `${hours}h`;
 }
 
+function pageFromBbox(bboxJson: string | null | undefined): number {
+  try {
+    const page = Number((JSON.parse(bboxJson ?? "{}") as { page?: unknown }).page);
+    return Number.isInteger(page) && page > 0 ? page : 0;
+  } catch {
+    return 0;
+  }
+}
+
 export default async function AiImportFileReviewPage({ params, searchParams }: PageProps) {
   const session = await auth();
   if (!session) redirect("/login");
@@ -370,6 +379,8 @@ export default async function AiImportFileReviewPage({ params, searchParams }: P
           promotionStatus: candidate.promotionStatus,
           warningsJson: reconcileWarningsJson(candidate.warningsJson, {
             correctAnswer: candidate.correctAnswer,
+            // A figure already attached no longer asks to be cropped.
+            links: candidateLinks.filter((link) => link.candidateId === candidate.id),
           }).json,
         }))}
         answers={answers.map((answer) => ({
@@ -383,7 +394,8 @@ export default async function AiImportFileReviewPage({ params, searchParams }: P
         images={images.map((image) => ({
           id: image.id,
           pageArtifactId: image.pageArtifactId,
-          pageNumber: image.pageNumber,
+          // Figures from the AI's crops.json saved before their page was stored: the page is in bboxJson.
+          pageNumber: image.pageNumber || pageFromBbox(image.bboxJson),
           imageIndex: image.imageIndex,
           origin: image.origin,
           fileUrl: image.fileUrl,

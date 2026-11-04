@@ -19,6 +19,7 @@ import { HEADER_ACTION_CLASS, HEADER_SHORTCUT_CLASS, HeaderActions } from "@/com
 import { suggestionValues } from "@/lib/search-suggestions";
 import { ACTIVE_SOURCE_WHERE } from "@/lib/content-source";
 import { openQuickImports } from "@/lib/quick-import.server";
+import { Alert } from "@/components/sat/alert";
 
 interface PageProps {
   searchParams: Promise<{ view?: string; page?: string; q?: string }>;
@@ -38,7 +39,7 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
   // A TEST N already being imported (saved, no Draft yet): its gap offers "Continue TEST N", not a new import.
   const openImports = importer ? await openQuickImports(importer.user) : [];
   const openImportFor = (sourceId: string, number: number) =>
-    openImports.find((item) => item.kind === "FULL_PRACTICE_TEST" && item.sourceId === sourceId && item.testNumber === number);
+    openImports.find((item) => item.kind === "FULL_PRACTICE_TEST" && !item.draft && item.sourceId === sourceId && item.testNumber === number);
   const now = new Date();
   const query = await searchParams;
   // The students × tests matrix was replaced by the per-test page (mockup); old links land here.
@@ -123,6 +124,21 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
         }
       />
 
+      {/* Test Drafts made with Import with AI whose questions are not all in yet: back to the import. */}
+      {openImports.some((item) => item.kind === "FULL_PRACTICE_TEST" && item.draft) ? (
+        <Alert tone="info" title="Imports with questions still out of their Draft" className="mb-4">
+          <ul className="mt-1 space-y-1">
+            {openImports
+              .filter((item) => item.kind === "FULL_PRACTICE_TEST" && item.draft)
+              .map((item) => (
+                <li key={item.id}>
+                  {item.label} · {item.draft!.notInDraft} question{item.draft!.notInDraft === 1 ? "" : "s"} not in the Draft yet ·{" "}
+                  <Link href={`${item.href}#step-3`} className="font-semibold text-[var(--sat-primary)] hover:underline">Continue the import</Link>
+                </li>
+              ))}
+          </ul>
+        </Alert>
+      ) : null}
       <ListFilters
         action="/teacher/tests"
         q={q}

@@ -1212,16 +1212,17 @@ export function FileReviewClient({
                 onOcrText={applyCropOcr}
               />
 
-              <div className="mt-4 flex items-center justify-between">
-                <p className="text-xs font-medium uppercase text-gray-500">Extracted images ({images.length})</p>
-                {activeSlot && (
-                  <span className="text-xs text-blue-700">
-                    Assigning to <strong>{activeSlot.label}</strong>
-                  </span>
-                )}
-              </div>
-              <div className="mt-2 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                {images.map((image) => {
+              {(() => {
+                // This question's images first, then the ones on its page(s); every other image of the
+                // file stays folded (a Test file holds the figures of all its questions).
+                const linkedIds = new Set(selectedLinks.map((link) => link.imageArtifactId));
+                const linkedPages = images.filter((image) => linkedIds.has(image.id)).map((image) => image.pageNumber);
+                const notedPages = [...(draft.warningsJson ?? "").matchAll(/page (\d+)/g)].map((m) => Number(m[1]));
+                const questionPages = new Set([...linkedPages, ...notedPages].filter((n) => n > 0));
+                const mine = images.filter((image) => linkedIds.has(image.id));
+                const onPage = images.filter((image) => !linkedIds.has(image.id) && questionPages.has(image.pageNumber));
+                const rest = images.filter((image) => !linkedIds.has(image.id) && !questionPages.has(image.pageNumber));
+                const renderCard = (image: ImageArtifact) => {
                   const assignments = assignmentsByImage.get(image.id) ?? [];
                   return (
                     <div key={image.id} className={`rounded-md border p-2 ${assignments.length ? "border-blue-300 bg-blue-50" : "border-gray-200"}`}>
@@ -1269,9 +1270,37 @@ export function FileReviewClient({
                       </div>
                     </div>
                   );
-                })}
-                {images.length === 0 && <p className="text-sm text-gray-400">No extracted images for this file yet.</p>}
-              </div>
+                };
+                const grid = (list: ImageArtifact[]) => <div className="mt-2 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">{list.map(renderCard)}</div>;
+                return (
+                  <>
+                    <div className="mt-4 flex items-center justify-between">
+                      <p className="text-xs font-medium uppercase text-gray-500">This question&apos;s images ({mine.length})</p>
+                      {activeSlot && (
+                        <span className="text-xs text-blue-700">
+                          Assigning to <strong>{activeSlot.label}</strong>
+                        </span>
+                      )}
+                    </div>
+                    {mine.length ? grid(mine) : <p className="mt-1 text-sm text-gray-400">No image attached yet: crop one above, or pick one below.</p>}
+                    {onPage.length > 0 && (
+                      <>
+                        <p className="mt-4 text-xs font-medium uppercase text-gray-500">
+                          On page {[...questionPages].sort((x, y) => x - y).join(", ")} ({onPage.length})
+                        </p>
+                        {grid(onPage)}
+                      </>
+                    )}
+                    {rest.length > 0 && (
+                      <details className="mt-4 rounded-md border border-gray-200 p-3">
+                        <summary className="cursor-pointer text-xs font-medium text-gray-600">Other images of this file ({rest.length})</summary>
+                        {grid(rest)}
+                      </details>
+                    )}
+                    {images.length === 0 && <p className="mt-2 text-sm text-gray-400">No extracted images for this file yet.</p>}
+                  </>
+                );
+              })()}
 
               <details className="mt-4 rounded-md border border-gray-200 p-3">
                 <summary className="cursor-pointer text-xs font-medium text-gray-600">Advanced targets</summary>

@@ -993,7 +993,7 @@ def find_page_image_disk_path(db: Any, source_file_id: str, page_number: int) ->
     del recorte mapeen sobre la misma imagen."""
     rows = db.execute(
         "SELECT fileUrl, COALESCE(width,0) w, COALESCE(height,0) h FROM IngestImageArtifact "
-        "WHERE sourceFileId = ? AND pageNumber = ? AND origin <> 'MANUAL_CROP' "
+        "WHERE sourceFileId = ? AND pageNumber = ? AND origin NOT IN ('MANUAL_CROP', 'AI_CROP', 'AI_ZIP') "
         "ORDER BY imageIndex ASC",
         (source_file_id, page_number),
     ).fetchall()
@@ -6177,17 +6177,22 @@ async def quick_image_zip(batch_id: str, file: UploadFile = File(...), candidate
         def link_image(label: str, candidate: Any, number: int, slot: str, png: bytes, width: int, height: int, origin: str, bbox: dict[str, Any] | None, source_file_id: str):
             image_id = new_id("img")
             file_url, content_hash = save_ingest_image(batch_id, image_id, png, "png")
+            # A crop knows its page (the Review gallery groups images by page); a PNG from the AI does not.
+            page_number = int(bbox.get("page") or 0) if bbox else 0
+            page_artifact = db.execute(
+                "SELECT id FROM IngestPageArtifact WHERE sourceFileId = ? AND pageNumber = ?", (source_file_id, page_number)
+            ).fetchone() if page_number else None
             next_index = db.execute(
-                "SELECT COALESCE(MAX(imageIndex), -1) + 1 FROM IngestImageArtifact WHERE sourceFileId = ? AND pageNumber = 0 AND origin = ?",
-                (source_file_id, origin),
+                "SELECT COALESCE(MAX(imageIndex), -1) + 1 FROM IngestImageArtifact WHERE sourceFileId = ? AND pageNumber = ? AND origin = ?",
+                (source_file_id, page_number, origin),
             ).fetchone()[0]
             db.execute(
                 """
                 INSERT INTO IngestImageArtifact
                   (id, batchId, sourceFileId, pageArtifactId, pageNumber, imageIndex, imageId, origin, bboxJson, mimeType, fileUrl, width, height, contentHash, status)
-                VALUES (?, ?, ?, NULL, 0, ?, ?, ?, ?, 'image/png', ?, ?, ?, ?, 'AVAILABLE')
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'image/png', ?, ?, ?, ?, 'AVAILABLE')
                 """,
-                (image_id, batch_id, source_file_id, next_index, image_id, origin, json.dumps(bbox) if bbox else None, file_url, width, height, content_hash),
+                (image_id, batch_id, source_file_id, page_artifact["id"] if page_artifact else None, page_number, next_index, image_id, origin, json.dumps(bbox) if bbox else None, file_url, width, height, content_hash),
             )
             target_type = slot if slot in {"STEM", "STIMULUS"} else "OPTION"
             option_label = slot if target_type == "OPTION" else None

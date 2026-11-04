@@ -9,6 +9,7 @@ import { ingestAuthHeaders, ingestUrl } from "@/lib/internal-ingest";
 import { propagateAssignedImageToOfficial } from "@/lib/ingest-promotion";
 import { toCsv } from "@/lib/csv";
 import { buildCsvPrompt, buildImagePrompt, parseTarget, QUICK_IMPORT_COLUMNS, TEST_MODULES, testModuleIndex } from "@/lib/quick-import";
+import { reconcileFigureReview } from "@/lib/ingest-review";
 
 type User = { id: string; role: string };
 
@@ -118,6 +119,8 @@ export async function uploadImagesZip(batchId: string, file: File, candidateIds:
     });
     if (result.propagated) propagated += 1;
   }
+  // A figure now attached resolves its "crop it" review reason (the question may become READY).
+  await reconcileFigureReview((data.linked ?? []).flatMap((link) => (link.candidateId ? [link.candidateId] : [])));
   return { linked: data.linked?.length ?? 0, propagated, skipped: data.skipped ?? [] };
 }
 

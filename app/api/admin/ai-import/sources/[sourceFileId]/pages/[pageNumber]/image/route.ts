@@ -30,7 +30,7 @@ export const GET = withApiErrors(async function GET(req: NextRequest, { params }
     const img = await prisma.ingestImageArtifact.findFirst({
       // Exclude manual crops and order by imageIndex asc so the displayed page image
       // matches the one the ingest service crops from (find_page_image_disk_path).
-      where: { sourceFileId, pageNumber: pageNum, origin: { not: "MANUAL_CROP" } },
+      where: { sourceFileId, pageNumber: pageNum, origin: { notIn: ["MANUAL_CROP", "AI_CROP", "AI_ZIP"] } },
       orderBy: { imageIndex: "asc" },
       select: { fileUrl: true },
     });

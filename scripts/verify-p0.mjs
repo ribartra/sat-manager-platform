@@ -662,6 +662,31 @@ const checks = [
     label: "Resultado de practice: la pregunta actual (texto, opciones e imagenes)",
   },
   {
+    file: "lib/ingest-review.ts",
+    requires: ["export async function reconcileFigureReview", "figureWarningResolved(warning, own)", 'status: "READY", confidence: 0.9'],
+    label: "A figure attached resolves its review reason (question becomes READY when nothing else is pending)",
+  },
+  {
+    file: "lib/import-media.server.ts",
+    requires: ["await reconcileFigureReview("],
+    label: "Images zip: linked figures resolve their review reason",
+  },
+  {
+    file: "app/api/import/quick/[batchId]/promote/route.ts",
+    requires: ["await reconcileFigureReview(notPromoted.map"],
+    label: "Draft: questions whose figure is attached go in",
+  },
+  {
+    file: "lib/quick-import.server.ts",
+    requires: ["export async function importOfDraftTest", "notInDraft > 0", "draft: artifact ?"],
+    label: "A partial Test Draft keeps its import listed (Continue)",
+  },
+  {
+    file: "app/(teacher)/teacher/tests/[testId]/page.tsx",
+    requires: ["importOfDraftTest(test.id", "Continue the import"],
+    label: "Test page: Continue the import while questions are out of the Draft",
+  },
+  {
     file: "lib/quick-import.ts",
     requires: ["RECOMMENDED — crops.json", "pages.json", "Never upscale beyond the source pixels", "Render them FROM THE PDF in original/"],
     label: "Image prompt: crops.json (platform cuts from the PDF) or PNGs rendered from the PDF at full quality, never upscaled",

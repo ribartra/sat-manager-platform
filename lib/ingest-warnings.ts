@@ -26,9 +26,24 @@ export function isIngestWarningInfo(message: string): boolean {
   return RECTIFIED_ANSWER_RE.test(message.trim());
 }
 
+/** "Figure in stimulus (page 7): crop it from the PDF in Review." (lib/quick-import.ts) */
+const FIGURE_WARNING_RE = /^Figure in (stem|stimulus|options)\b.*crop it/i;
+
+/**
+ * Whether a "Figure in …: crop it" warning is already resolved by the question's image links: the
+ * stem or the passage has an image (the AI and the reviewer may pick either slot), or, for image
+ * answer choices, at least one choice has one.
+ */
+export function figureWarningResolved(warning: string, links: ReadonlyArray<{ targetType: string }>): boolean {
+  const match = FIGURE_WARNING_RE.exec(warning.trim());
+  if (!match) return false;
+  const types = new Set(links.map((link) => link.targetType));
+  return match[1].toLowerCase() === "options" ? types.has("OPTION") : types.has("STEM") || types.has("STIMULUS");
+}
+
 export function reconcileIngestWarnings(
   warnings: string[],
-  opts: { correctAnswer?: string | null },
+  opts: { correctAnswer?: string | null; links?: ReadonlyArray<{ targetType: string }> },
 ): { warnings: string[]; info: string[] } {
   const hasAnswer = Boolean(opts.correctAnswer?.trim());
   const warnOut: string[] = [];
@@ -53,6 +68,9 @@ export function reconcileIngestWarnings(
     // Obsolete once any answer (letter or numeric) is present.
     if (hasAnswer && IMAGE_ANSWER_HINT_RE.test(warning)) continue;
 
+    // The figure is already attached (crop, gallery or the AI's images zip).
+    if (opts.links && figureWarningResolved(warning, opts.links)) continue;
+
     warnOut.push(warning);
   }
 
@@ -73,7 +91,7 @@ export function stringifyReconciledIngestWarnings(warnings: string[], info: stri
 
 export function reconcileWarningsJson(
   raw: string | null | undefined,
-  opts: { correctAnswer?: string | null },
+  opts: { correctAnswer?: string | null; links?: ReadonlyArray<{ targetType: string }> },
 ): { list: string[]; warnings: string[]; info: string[]; json: string } {
   const reconciled = reconcileIngestWarnings(parseIngestWarningsJson(raw), opts);
   const list = [...reconciled.warnings, ...reconciled.info];

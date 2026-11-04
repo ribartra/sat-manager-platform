@@ -23,6 +23,7 @@ import { practiceAreaLabel, type PracticeAreaCode } from "@/lib/practice-area";
 import { QuickImportWorkspace, type ModuleCardInfo, type QuickQuestionRow } from "./quick-import-workspace";
 import { ImportSteps } from "@/components/sat/import-steps";
 import { imagePromptFor } from "@/lib/import-media.server";
+import { reconcileFigureReview } from "@/lib/ingest-review";
 
 /**
  * "Import with AI", steps 2 and 3: copy the prompt, upload the CSV the AI made (and, to reprocess,
@@ -44,6 +45,10 @@ export default async function QuickImportBatchPage({ params }: { params: Promise
   const isTest = target.kind === "FULL_PRACTICE_TEST";
   // Review (edit and crop) opens the questions PDF the question comes from (a Test may have up to 4).
   const reviewFor = (fileId: string | null | undefined) => (fileId ? `/admin/import/ai/${batchId}/files/${fileId}` : null);
+  // Self-healing and idempotent: a question whose figure is already attached no longer waits for it.
+  await reconcileFigureReview(
+    (await prisma.ingestQuestionCandidate.findMany({ where: { batchId, status: "NEEDS_REVIEW", promotionStatus: { not: "PROMOTED" } }, select: { id: true } })).map((c) => c.id),
+  );
   const [candidates, links, source, artifact] = await Promise.all([
     prisma.ingestQuestionCandidate.findMany({ where: { batchId } }),
     prisma.ingestCandidateImageLink.findMany({ where: { batchId }, select: { candidateId: true, targetType: true } }),

@@ -31,7 +31,7 @@ export async function computeCropImageSources(batchId: string): Promise<Record<s
     }),
     prisma.ingestImageArtifact.groupBy({
       by: ["sourceFileId", "pageNumber"],
-      where: { batchId, origin: { not: "MANUAL_CROP" } },
+      where: { batchId, origin: { notIn: ["MANUAL_CROP", "AI_CROP", "AI_ZIP"] } },
       _count: { _all: true },
     }),
   ]);

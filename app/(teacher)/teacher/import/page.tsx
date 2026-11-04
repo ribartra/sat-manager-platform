@@ -72,13 +72,16 @@ export default async function QuickImportPage({ searchParams }: PageProps) {
       {open.length > 0 ? (
         <section aria-labelledby="open-imports" className="mb-6 rounded-[10px] border border-[var(--sat-border)] bg-white p-4">
           <h2 id="open-imports" className="text-sm font-semibold text-[var(--sat-text)]">Imports in progress</h2>
-          <p className="mt-0.5 text-xs text-[var(--sat-muted)]">Started and saved, no Draft yet. Continue one where you left it.</p>
+          <p className="mt-0.5 text-xs text-[var(--sat-muted)]">Started and saved, with no Draft yet or questions still out of it. Continue one where you left it.</p>
           <ul className="mt-3 divide-y divide-[var(--sat-border)]">
             {open.slice(0, 10).map((item) => (
               <li key={item.id} className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm">
                 <span>
                   <span className="font-medium">{item.label}</span>
-                  <span className="text-[var(--sat-muted)]"> · started {formatDate(item.createdAt)} · {loadedText(item.questionsLoaded)}</span>
+                  <span className="text-[var(--sat-muted)]">
+                    {" "}· started {formatDate(item.createdAt)} ·{" "}
+                    {item.draft ? `Draft created · ${item.draft.notInDraft} question${item.draft.notInDraft === 1 ? "" : "s"} not in it yet` : loadedText(item.questionsLoaded)}
+                  </span>
                 </span>
                 <Link href={item.href} className="rounded-lg border border-[var(--sat-border)] px-2.5 py-1 text-xs font-semibold hover:border-[var(--sat-primary)] hover:text-[var(--sat-primary)]">
                   Continue

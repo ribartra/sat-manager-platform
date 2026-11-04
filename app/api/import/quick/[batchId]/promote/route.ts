@@ -11,6 +11,7 @@ import { promoteCandidates } from "@/lib/ingest-promote-candidates";
 import { promotionSourceId } from "@/lib/content-source";
 import { FULL_TEST_MODULES, difficultyFromFullTestModuleKey, fullTestTopicIdFor, moduleKeyFromOrder } from "@/lib/full-test-modules";
 import { CONTENT_JOB, exclusiveJob } from "@/lib/job-lock";
+import { reconcileFigureReview } from "@/lib/ingest-review";
 
 type Ctx = { params: Promise<{ batchId: string }> };
 
@@ -31,6 +32,10 @@ export const POST = withApiErrors(exclusiveJob(CONTENT_JOB, async function POST(
   const existingHref = existing ? (existing.artifactType === "PRACTICE_SET" ? `/teacher/practice-sets/${existing.artifactId}?edit` : `/teacher/tests/${existing.artifactId}?edit`) : null;
   if (existing && existing.artifactType === "PRACTICE_SET") return NextResponse.json({ href: existingHref, existing: true });
 
+  // Questions whose figure was attached after loading (AI images zip, Review crop) stop needing review
+  // for it, so they go into the Draft now.
+  const notPromoted = await prisma.ingestQuestionCandidate.findMany({ where: { batchId, promotionStatus: { not: "PROMOTED" }, status: "NEEDS_REVIEW" }, select: { id: true } });
+  await reconcileFigureReview(notPromoted.map((c) => c.id));
   const candidates = await prisma.ingestQuestionCandidate.findMany({ where: { batchId, status: { not: "REJECTED" } } });
   if (candidates.length === 0) throw new ValidationError("Validation failed.", ["Load the CSV first."]);
   const pending = candidates.filter((c) => !["READY", "REVIEWED"].includes(c.status) && c.promotionStatus !== "PROMOTED");
