@@ -47,7 +47,7 @@ Al terminar llegas a la pantalla de inicio de sesión con el aviso de que tu cue
 
 ![Recuperar la contraseña](img/common-forgot-password.png)
 
-> Por seguridad, la sesión se cierra sola tras **10 minutos sin actividad**. Tus respuestas quedan guardadas: vuelve a entrar y continúa donde lo dejaste.
+> Por seguridad, la sesión se cierra sola tras **30 minutos sin actividad** (contando todas las pestañas abiertas de la plataforma). Tus respuestas quedan guardadas: vuelve a entrar y continúa donde lo dejaste.
 
 ## 3. La pantalla de inicio (Home)
 

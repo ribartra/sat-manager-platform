@@ -301,7 +301,22 @@ const checks = [
   {
     file: "lib/auth.ts",
     requires: ["maxAge: SESSION_MAX_AGE_SECONDS", "loadSessionState", "state.sessionVersion", "!state.active", "return null"],
-    label: "JWT sessions expire in 7 days and end on deactivation, role change or password change",
+    label: "JWT sessions expire 30 min after the last renewal and end on deactivation, role change or password change",
+  },
+  {
+    file: "lib/session-policy.ts",
+    requires: ["SESSION_IDLE_MINUTES = 30", "SESSION_MAX_AGE_SECONDS = SESSION_IDLE_MINUTES * 60", "/api/student-view/exit?next="],
+    label: "Inactivity sign-out: 30 minutes, same limit in the browser and the session cookie; ends Student view",
+  },
+  {
+    file: "hooks/use-session-guards.ts",
+    requires: ["SESSION_IDLE_MS", "LAST_ACTIVITY_KEY", "readSharedActivity()", "signOutCallbackUrl(reason)"],
+    label: "Idle guard counts activity in every tab before signing out",
+  },
+  {
+    file: "components/session-provider.tsx",
+    requires: ["refetchInterval={SESSION_REFRESH_SECONDS}"],
+    label: "An open tab renews the 30-minute session cookie",
   },
   {
     file: "app/api/media/questions/[...path]/route.ts",

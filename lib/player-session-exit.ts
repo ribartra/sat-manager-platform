@@ -1,6 +1,7 @@
 "use client";
 
 import { signOut } from "next-auth/react";
+import { signOutCallbackUrl } from "@/lib/session-policy";
 
 /** Best-effort pause then force login when auth is gone (401/403 or health fail). */
 export async function exitPlayerOnAuthLoss(options: {
@@ -14,7 +15,7 @@ export async function exitPlayerOnAuthLoss(options: {
       // ignore
     }
   }
-  await signOut({ callbackUrl: `/login?reason=${options.reason ?? "session"}` });
+  await signOut({ callbackUrl: signOutCallbackUrl(options.reason ?? "session") });
 }
 
 export function isAuthFailureStatus(status: number) {

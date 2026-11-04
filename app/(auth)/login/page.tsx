@@ -21,6 +21,7 @@ import { FormSection } from "@/components/sat";
 import { loginSchema, type LoginInput } from "@/contracts/auth";
 import { LegalLinks } from "@/components/legal/legal-page";
 import { Alert, InlineError } from "@/components/sat/alert";
+import { SESSION_IDLE_MINUTES } from "@/lib/session-policy";
 
 function isLocalCallbackUrl(value: string) {
   return value.startsWith("/") && !value.startsWith("//");
@@ -52,7 +53,7 @@ export default function LoginPage() {
   const reason = params.get("reason");
   const reasonMessage =
     reason === "idle"
-      ? "You were signed out after 10 minutes without activity. Your answers were saved — sign in to continue."
+      ? `You were signed out after ${SESSION_IDLE_MINUTES} minutes without activity. Your answers were saved — sign in to continue.`
       : reason === "session"
         ? "Please sign in again."
         : "";
