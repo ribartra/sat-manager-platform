@@ -301,7 +301,37 @@ const checks = [
   {
     file: "lib/auth.ts",
     requires: ["maxAge: SESSION_MAX_AGE_SECONDS", "loadSessionState", "state.sessionVersion", "!state.active", "return null"],
-    label: "JWT sessions expire in 7 days and end on deactivation, role change or password change",
+    label: "JWT sessions expire 30 min after the last renewal and end on deactivation, role change or password change",
+  },
+  {
+    file: "lib/session-policy.ts",
+    requires: ["SESSION_IDLE_MINUTES = 30", "SESSION_MAX_AGE_SECONDS = SESSION_IDLE_MINUTES * 60", "/api/student-view/exit?next="],
+    label: "Inactivity sign-out: 30 minutes, same limit in the browser and the session cookie; ends Student view",
+  },
+  {
+    file: "hooks/use-session-guards.ts",
+    requires: ["SESSION_IDLE_MS", "LAST_ACTIVITY_KEY", "readSharedActivity()", "rememberResumePage();", "rememberSessionUser(userId)"],
+    label: "Idle guard counts activity in every tab before signing out",
+  },
+  {
+    file: "app/(auth)/login/page.tsx",
+    requires: ["takeResumePage(session?.user?.id)", "callbackFitsRole(resume, role)", "callbackFitsRole(callbackUrl, role)"],
+    label: "After an automatic sign-out: back to the previous page only for the same account",
+  },
+  {
+    file: "lib/session-policy.ts",
+    requires: ["saved.userId !== userId", "store?.removeItem(RESUME_KEY)", "RESUME_MAX_AGE_MS"],
+    label: "Resume record: per user, used once, expires; never in the URL",
+  },
+  {
+    file: "app/(teacher)/teacher/import/page.tsx",
+    requires: ["openQuickImports(session.user)", "Imports in progress", "Continue that import"],
+    label: "Import with AI step 1 lists imports in progress and warns before a second one of the same target",
+  },
+  {
+    file: "components/session-provider.tsx",
+    requires: ["refetchInterval={SESSION_REFRESH_SECONDS}"],
+    label: "An open tab renews the 30-minute session cookie",
   },
   {
     file: "app/api/media/questions/[...path]/route.ts",

@@ -2,27 +2,69 @@
 
 import { useEffect, useRef } from "react";
 import { signOut, useSession } from "next-auth/react";
+import { rememberResumePage, rememberSessionUser, SESSION_IDLE_MS, signOutCallbackUrl } from "@/lib/session-policy";
 
-const IDLE_MS = 10 * 60 * 1000;
 const MOVE_THROTTLE_MS = 1000;
 const HEALTH_MS = 45_000;
+/** Last activity in any tab of the app (localStorage is shared by every tab of the origin). */
+const LAST_ACTIVITY_KEY = "sat:lastActivity";
 
 function endSession(reason: "idle" | "session") {
-  void signOut({ callbackUrl: `/login?reason=${reason}` });
+  rememberResumePage();
+  void signOut({ callbackUrl: signOutCallbackUrl(reason) });
 }
 
-/** Idle 10m (reset on activity) + periodic session health check. */
+function readSharedActivity(): number {
+  try {
+    return Number(window.localStorage.getItem(LAST_ACTIVITY_KEY)) || 0;
+  } catch {
+    return 0;
+  }
+}
+
+function writeSharedActivity(at: number) {
+  try {
+    window.localStorage.setItem(LAST_ACTIVITY_KEY, String(at));
+  } catch {
+    // Storage blocked (private window): this tab's own timer still works.
+  }
+}
+
+/**
+ * Idle sign-out after 30 minutes without activity in ANY tab (lib/session-policy.ts), plus a periodic
+ * session health check. Activity in another tab postpones this tab's sign-out.
+ */
 export function useSessionGuards() {
-  const { status } = useSession();
+  const { status, data } = useSession();
+  const userId = data?.user?.id;
   const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastMove = useRef(0);
+  const lastLocal = useRef(0);
+
+  // Who is signed in here: an automatic sign-out reopens the page only for this same account.
+  useEffect(() => {
+    if (status === "authenticated" && userId) rememberSessionUser(userId);
+  }, [status, userId]);
 
   useEffect(() => {
     if (status !== "authenticated") return;
 
-    const resetIdle = () => {
+    const schedule = (delay: number) => {
       if (idleTimer.current) clearTimeout(idleTimer.current);
-      idleTimer.current = setTimeout(() => endSession("idle"), IDLE_MS);
+      idleTimer.current = setTimeout(check, Math.max(1000, delay));
+    };
+    // When this tab's timer fires, the latest activity of all tabs decides.
+    function check() {
+      const last = Math.max(lastLocal.current, readSharedActivity());
+      const left = last + SESSION_IDLE_MS - Date.now();
+      if (left <= 0) endSession("idle");
+      else schedule(left);
+    }
+    const resetIdle = () => {
+      const now = Date.now();
+      lastLocal.current = now;
+      writeSharedActivity(now);
+      schedule(SESSION_IDLE_MS);
     };
 
     const onActivity = () => resetIdle();

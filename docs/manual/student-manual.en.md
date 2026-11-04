@@ -47,7 +47,7 @@ You then reach the sign-in page with a notice that your account is ready.
 
 ![Password recovery](img/common-forgot-password.png)
 
-> For security, you are signed out after **10 minutes without activity**. Your answers are kept: sign in again and continue where you left off.
+> For security, you are signed out after **30 minutes without activity** (in any open tab of the platform). Your answers are kept: sign in again and continue where you left off.
 
 ## 3. The Home page
 

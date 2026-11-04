@@ -7,8 +7,8 @@ import { markUserActive } from "@/lib/activity";
 import { clearFailures, clientIpFromHeaders, isRateLimited, recordFailure } from "@/lib/rate-limit";
 import { writeAudit } from "@/lib/audit";
 import { loadSessionState } from "@/lib/session-state";
+import { SESSION_MAX_AGE_SECONDS } from "@/lib/session-policy";
 
-const SESSION_MAX_AGE_SECONDS = 7 * 24 * 60 * 60;
 const LOGIN_WINDOW_MS = 15 * 60 * 1000;
 const LOGIN_FAILURES_PER_ACCOUNT = 10;
 const LOGIN_FAILURES_PER_IP = 30;
@@ -30,6 +30,7 @@ if (
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  // 30 minutes after the last renewal (lib/session-policy.ts): an open tab renews it, inactivity ends it.
   session: { strategy: "jwt", maxAge: SESSION_MAX_AGE_SECONDS },
   pages: {
     signIn: "/login",

@@ -80,7 +80,9 @@ export function TestNumberAccordion({
           );
         }
         return (
-          <details key={group.number ?? "other"} open={open} className="group overflow-hidden rounded-[var(--sat-radius)] border border-[var(--sat-border)] bg-white">
+          // suppressHydrationWarning: a native <details> the user opens before hydration (a slow first
+          // load) has `open` in the DOM; that is the user's choice, not a mismatch to report.
+          <details key={group.number ?? "other"} open={open} suppressHydrationWarning className="group overflow-hidden rounded-[var(--sat-radius)] border border-[var(--sat-border)] bg-white">
             <summary
               className={cn(
                 "flex cursor-pointer list-none flex-wrap items-center gap-x-3 gap-y-1 hover:bg-[var(--sat-primary-soft)] [&::-webkit-details-marker]:hidden",

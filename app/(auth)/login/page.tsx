@@ -21,18 +21,29 @@ import { FormSection } from "@/components/sat";
 import { loginSchema, type LoginInput } from "@/contracts/auth";
 import { LegalLinks } from "@/components/legal/legal-page";
 import { Alert, InlineError } from "@/components/sat/alert";
+import { SESSION_IDLE_MINUTES, takeResumePage } from "@/lib/session-policy";
 
 function isLocalCallbackUrl(value: string) {
   return value.startsWith("/") && !value.startsWith("//");
 }
 
-async function resolvePostLoginUrl(callbackUrl: string) {
-  if (callbackUrl && callbackUrl !== "/" && isLocalCallbackUrl(callbackUrl)) return callbackUrl;
+/** The portals a role may land on after signing in (a shared computer: another user's page is skipped). */
+function callbackFitsRole(url: string, role: string | undefined) {
+  if (url.startsWith("/teacher") || url.startsWith("/admin") || url.startsWith("/notifications")) return role === "TEACHER" || role === "ADMIN";
+  if (url.startsWith("/student")) return role === "STUDENT";
+  if (url.startsWith("/parent")) return role === "PARENT";
+  return true;
+}
 
+async function resolvePostLoginUrl(callbackUrl: string) {
   const sessionRes = await fetch("/api/auth/session");
   if (!sessionRes.ok) return "/";
   const session = await sessionRes.json();
   const role = session?.user?.role;
+  // After an automatic sign-out: back to the page this SAME account was on (another account: its Home).
+  const resume = takeResumePage(session?.user?.id);
+  if (resume && callbackFitsRole(resume, role)) return resume;
+  if (callbackUrl && callbackUrl !== "/" && isLocalCallbackUrl(callbackUrl) && callbackFitsRole(callbackUrl, role)) return callbackUrl;
   if (role === "TEACHER" || role === "ADMIN") return "/teacher";
   if (role === "PARENT") return "/parent";
   return "/student";
@@ -52,7 +63,7 @@ export default function LoginPage() {
   const reason = params.get("reason");
   const reasonMessage =
     reason === "idle"
-      ? "You were signed out after 10 minutes without activity. Your answers were saved — sign in to continue."
+      ? `You were signed out after ${SESSION_IDLE_MINUTES} minutes without activity. Your answers were saved — sign in to continue.`
       : reason === "session"
         ? "Please sign in again."
         : "";
