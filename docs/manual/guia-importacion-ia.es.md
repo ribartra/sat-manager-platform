@@ -328,6 +328,10 @@ Para refinar:
    
    ![M2 · Q25 guardada y marcada REVIEWED; la sección R&W queda complete](img/ai-t9-18-marked-reviewed.png)
 
+   Cuando no queda nada por revisar, las dos secciones aparecen como **complete** (0 review · 0 attention) y las preguntas que ya están en el Draft se ven como **REVIEWED · PROMOTED**:
+   
+   ![Review de TEST 9 con Test 9 · R&W y Test 9 · Math en complete; M1 · Q1 REVIEWED y PROMOTED](img/ai-t9-24-review-complete.png)
+
 > Haz estas correcciones **antes de crear el Draft** (o, en un Test, antes de añadir el módulo al Draft). Después, los recortes de figuras siguen pasando al Draft, pero los textos y respuestas se corrigen en el editor de la pregunta (sección 9).
 
 Solo entran al Draft las preguntas **Ready** o **Reviewed**. Si quedan otras, la plataforma pregunta si quieres seguir solo con las listas: **Create partial Draft** (o **Add the ready ones**). Las demás se quedan en la importación para agregarlas después.
@@ -356,10 +360,12 @@ Ese `figures-crops.zip` se sube con **Upload images (zip)**: cada recorte va a s
 El Draft no lo ven los alumnos. Para publicarlo:
 
 1. **Primero las preguntas.** En el **Question Bank** (o desde el editor del set o Test) cambia las preguntas del Draft a **Published**. Un set o Test solo se publica con preguntas publicadas.
-2. **Después el set o Test.** Ábrelo, pulsa **Options → Status** y elige **Published**.
+2. **Después el set o Test.** Ábrelo, pulsa **Options → Status** y elige **Published**. En un Test también puedes hacerlo en su editor (**Options → Edit**): en **Test settings**, cambia **Draft** a **Published** y pulsa **Save test** al final.
 3. **Regla de los Tests:** cada módulo debe tener exactamente **27 / 27 / 22 / 22** preguntas (R&W 1, R&W 2, Math 1, Math 2), sin repetidas entre módulos y cada una en su sección. Mientras falten, el editor avisa "currently has N/27…".
 
-[CAPTURA PENDIENTE: cambiar el estado del set importado a Published]
+![Editor de Innovator Test 9: el estado en Test settings (Draft, Published, Archived) y, arriba, el recuadro Images & source files](img/ai-t9-25-test-editor-status.png)
+
+![Final del editor: las preguntas de Math con su figura (“1 image”), Images / crop en cada una y Save test](img/ai-t9-26-test-editor-figures.png)
 
 Una vez publicado, el set ocupa su nivel en **Practice** (el **+ Hard** de la fuente desaparece) o el **TEST 9** muestra su versión en lugar de **—**, y se puede asignar.
 
@@ -439,7 +445,7 @@ En el editor de un set o Test **importado** aparece el recuadro **Images & sourc
 - el prompt de imágenes;
 - la subida del zip de imágenes (igual que en la sección 7).
 
-Cada pregunta tiene además **Images / crop**, para recortar su figura del PDF.
+Cada pregunta tiene además **Images / crop**, para recortar su figura del PDF. El recuadro aparece arriba del editor (ver la captura de la sección 8), y las preguntas con figura muestran su miniatura y “1 image”.
 
 ![Editor de TEST 9: cada pregunta con Images / crop; Math Module 1 todavía con 14/22 preguntas (Draft parcial)](img/ai-t9-22-test-editor-images.png)
 
