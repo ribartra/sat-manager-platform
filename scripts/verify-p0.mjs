@@ -662,6 +662,16 @@ const checks = [
     label: "Resultado de practice: la pregunta actual (texto, opciones e imagenes)",
   },
   {
+    file: "lib/math-text.ts",
+    requires: ["export function textFormatState", "1. The selection itself carries the markers", "2. Inside a formatted run", "the run closes before the selection and reopens after it"],
+    label: "Bold/Underline toggle like a word processor (remove when already formatted, split a run, word under caret)",
+  },
+  {
+    file: "components/text-format-toolbar.tsx",
+    requires: ["aria-pressed={active.bold}", "aria-pressed={active.underline}", "selectionchange", 'key !== "b" && key !== "u"'],
+    label: "Format toolbar: pressed state follows the caret; Ctrl/Cmd+B and +U",
+  },
+  {
     file: "lib/quick-import.ts",
     requires: ['the last column, \"notes\", is optional', "notes: OPTIONAL. Every note sends the question to a person for review", "write it as ++text++"],
     forbids: ["(use *word*)"],
