@@ -62,6 +62,7 @@ export default async function AiImportFileReviewPage({ params, searchParams }: P
   if (!batch || !file) redirect("/admin/import/ai");
   // "Import with AI" target (breadcrumb + stepper) when this batch comes from it.
   const quickTarget = batch.importMode === "AI_CSV" ? parseTarget(batch.targetJson) : null;
+  const quick = batch.importMode === "AI_CSV";
 
   // Extracted Test grouping + crop siblings first — candidates for FPT/PS often
   // live on the answer/explanation file while images live on the question file.
@@ -175,10 +176,14 @@ export default async function AiImportFileReviewPage({ params, searchParams }: P
   const estimatedSeconds = Math.ceil(estimatedPages * secondsPerPage);
 
   return (
-    <PageShell className="grid grid-cols-1 gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
-      <div className="min-w-0 lg:sticky lg:top-4 lg:self-start">
-        <ExtractedTestRail rows={setRows} batchId={batchId} currentFileId={file.id} />
-      </div>
+    // Import with AI (one Test or set): no Extracted Tests rail — its sections switch from the summary
+    // card — so the question list + editor take the full width. AI Import (OCR, many tests) keeps the rail.
+    <PageShell className={quick ? "grid grid-cols-1 gap-6" : "grid grid-cols-1 gap-6 lg:grid-cols-[260px_minmax(0,1fr)]"}>
+      {!quick && (
+        <div className="min-w-0 lg:sticky lg:top-4 lg:self-start">
+          <ExtractedTestRail rows={setRows} batchId={batchId} currentFileId={file.id} collapsible={false} />
+        </div>
+      )}
 
       <div className="min-w-0 space-y-6">
       <div className="mb-0">
@@ -227,7 +232,30 @@ export default async function AiImportFileReviewPage({ params, searchParams }: P
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="min-w-0">
               <p className="text-xs uppercase text-gray-400">Extracted Test</p>
-              <p className="truncate text-base font-semibold text-gray-900" title={extractedTest.title}>{extractedTest.title}</p>
+              {quick && setRows.length > 1 ? (
+                // The import's sections (Test 9 · R&W / Test 9 · Math): what the rail did, in one row.
+                <nav aria-label="Sections of this import" className="mt-1 flex flex-wrap gap-1.5">
+                  {setRows.map((row) => {
+                    const active = row.fileIds.includes(file.id);
+                    const pending = row.needsReview + row.attention;
+                    return (
+                      <Link
+                        key={row.key}
+                        href={`/admin/import/ai/${batchId}/files/${row.primaryFileId}`}
+                        aria-current={active ? "page" : undefined}
+                        className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1 text-sm font-semibold ${active ? "border-blue-300 bg-blue-50 text-blue-800" : "border-gray-200 text-gray-700 hover:bg-gray-50"}`}
+                      >
+                        {row.title}
+                        <span className={`text-xs font-normal ${pending > 0 ? "text-rose-600" : "text-emerald-600"}`}>
+                          {pending > 0 ? `${pending} to review` : "complete"}
+                        </span>
+                      </Link>
+                    );
+                  })}
+                </nav>
+              ) : (
+                <p className="truncate text-base font-semibold text-gray-900" title={extractedTest.title}>{extractedTest.title}</p>
+              )}
             </div>
             <div className="flex flex-col items-end gap-1">
               <span className="flex h-2 w-40 overflow-hidden rounded-full bg-gray-100" title={`${extractedTest.complete} complete · ${extractedTest.attention} attention · ${extractedTest.needsReview} review`}>
@@ -288,6 +316,7 @@ export default async function AiImportFileReviewPage({ params, searchParams }: P
       )}
 
       <FileReviewClient
+        quick={quick}
         batchId={batchId}
         file={{
           id: file.id,

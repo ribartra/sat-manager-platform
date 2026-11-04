@@ -313,9 +313,9 @@ OUTPUT: produce a downloadable file named "import.csv" (send it as a file I can 
 
 CSV FORMAT (strict):
 - UTF-8, comma-separated, RFC 4180. Wrap EVERY field in double quotes; write a literal double quote as "". Line breaks inside a field are allowed inside the quotes.
-- First line is this exact header:
+- First line is this exact header (the last column, "notes", is optional: leave it empty when there is nothing to review):
 ${QUICK_IMPORT_COLUMNS.join(",")}
-- One row per question, in the order they appear. Never merge or split questions. Do not skip any question, even if it is hard to read — mark it in "notes".
+- One row per question, in the order they appear. Never merge or split questions. Do not skip any question, even if it is hard to read — say what is unreadable in "notes".
 
 COLUMNS:
 - number: the question number as printed (integer).
@@ -329,13 +329,19 @@ COLUMNS:
 - explanation: the full rationale from the answer explanations, if provided; otherwise empty. Do not invent explanations.
 - figure: NONE, STEM, STIMULUS or OPTIONS — where a graph, diagram, geometric figure or image appears that cannot be written as text or a table.
 - figurePage: the PDF page number (1 = first page of the file) where that figure is; empty if figure is NONE.
-- notes: anything you were unsure about (illegible text, missing answer, ambiguous choice). Empty if all is clear.
+- notes: OPTIONAL. Every note sends the question to a person for review, so write one ONLY when someone must check or fix something:
+  - text you could not read or that is cut off in the PDF;
+  - an answer that is missing, or that you are not sure of;
+  - an ambiguous or duplicated answer choice;
+  - an explanation that contradicts the answer key;
+  - a figure whose content the question needs and that you could not describe or crop.
+  Leave it EMPTY for anything that only describes formatting or how you wrote something: bold or underlined text, headings, layout, marks from a screenshot (strike-throughs, highlights, navigation), equivalent answers you added, or "content is complete".
 
 MATH AND FORMATTING (the platform renders KaTeX):
 - Every mathematical expression goes in LaTeX: inline $...$ (e.g. $\\frac{3}{4}x + 2 = 11$, $x^{2}$, $\\sqrt{5}$, $\\pi r^{2}$, $\\le$, $\\ne$). A formula alone on its own line may use $$...$$.
 - A literal dollar sign (money) is written \\$ (e.g. \\$12.50). Never leave a $ unbalanced.
 - Tables: Markdown pipe tables with a header row, e.g. | x | y |, then |---|---|, then | 1 | 3 |.
-- Keep italics/underlines only if they matter for the question (use *word*); otherwise plain text.
+- Underlined text that the question refers to ("the underlined portion"): write it as ++text++. Bold that matters: **text**. Italics that matter: *text*. Otherwise plain text. These are the platform's own marks: do not mention them in "notes".
 - Do not add text that is not in the PDF. Keep the original wording, punctuation and spelling.
 
 QUALITY CHECK before you answer: the number of rows equals the number of questions in ${moduleInfo ? `${moduleInfo.name} (${moduleInfo.expected})` : "the PDF"}; every MC row has 4 choices and a letter answer; every NUMERIC row has a value; LaTeX braces and $ are balanced; the header is exactly as above.

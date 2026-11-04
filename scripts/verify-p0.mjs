@@ -662,6 +662,22 @@ const checks = [
     label: "Resultado de practice: la pregunta actual (texto, opciones e imagenes)",
   },
   {
+    file: "lib/quick-import.ts",
+    requires: ['the last column, \"notes\", is optional', "notes: OPTIONAL. Every note sends the question to a person for review", "write it as ++text++"],
+    forbids: ["(use *word*)"],
+    label: "Import with AI prompt: notes optional, only for real review; platform underline/bold marks",
+  },
+  {
+    file: "app/admin/import/ai/[batchId]/files/[fileId]/review-client.tsx",
+    requires: ["reviewReasons(draft.warningsJson", 'title="Needs review"', "AI note", "quick ?"],
+    label: "Review: the AI note and checks in a Needs review box at the top; quick import uses the full width",
+  },
+  {
+    file: "app/admin/import/ai/[batchId]/files/[fileId]/page.tsx",
+    requires: ["{!quick && (", "collapsible={false}", 'aria-label="Sections of this import"'],
+    label: "Review page: no Extracted Tests rail (nor hide button) in Import with AI; sections in the summary card",
+  },
+  {
     file: "lib/attempt-regrade.ts",
     requires: ["regradeQuestions", "ATTEMPT_REGRADED", "latestRegrade", 'status: "SUBMITTED"', "if (answerUpdates.length === 0) return null;", "gradeFullTestModules"],
     forbids: ["notify", "unlock"],

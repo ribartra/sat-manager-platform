@@ -175,6 +175,17 @@ function parseWarnings(value: string | null, correctAnswer?: string | null) {
   return reconcileWarningsJson(value, { correctAnswer }).list;
 }
 
+const AI_NOTE_PREFIX = "AI note: ";
+
+/** Review reasons of a candidate: the AI's own notes (from its "notes" column) and the system's checks. */
+function reviewReasons(value: string | null, correctAnswer?: string | null) {
+  const warnings = parseWarnings(value, correctAnswer).filter((note) => !isIngestWarningInfo(note));
+  return {
+    aiNotes: warnings.filter((note) => note.startsWith(AI_NOTE_PREFIX)).map((note) => note.slice(AI_NOTE_PREFIX.length)),
+    checks: warnings.filter((note) => !note.startsWith(AI_NOTE_PREFIX)),
+  };
+}
+
 function imageSrc(image: Pick<ImageArtifact, "fileUrl" | "base64Data" | "mimeType">) {
   if (image.fileUrl) return image.fileUrl;
   if (!image.base64Data) return null;
@@ -496,6 +507,7 @@ export function FileReviewClient({
   assignTargets = [],
   cropImageSource = null,
   candidateScope = null,
+  quick = false,
 }: {
   batchId: string;
   file: SourceFile;
@@ -512,6 +524,8 @@ export function FileReviewClient({
   assignTargets?: { questionId: string; label: string }[];
   cropImageSource?: { imageSourceFileId: string; pageNumbers: number[] } | null;
   candidateScope?: { kind: "extracted-test"; title: string; hostFiles: string | null } | null;
+  /** Import with AI (one Test or set): no FILE card, the question list + editor take the full width. */
+  quick?: boolean;
 }) {
   const router = useRouter();
   const [galleryAssign, setGalleryAssign] = useState<{ imageId: string; questionId: string } | null>(null);
@@ -815,8 +829,10 @@ export function FileReviewClient({
   }
 
   return (
-    <div className="grid grid-cols-1 gap-6 xl:grid-cols-[260px_minmax(0,1fr)]">
-      <aside className="space-y-4">
+    <div className={quick ? "grid grid-cols-1 gap-5 lg:grid-cols-[240px_minmax(0,1fr)]" : "grid grid-cols-1 gap-6 xl:grid-cols-[260px_minmax(0,1fr)]"}>
+      {/* Quick import: the list follows the editor while scrolling (sticky, viewport height). */}
+      <aside className={quick ? "space-y-4 lg:sticky lg:top-4 lg:self-start" : "space-y-4"}>
+        {!quick && (
         <Card padding="md">
           <p className="text-xs uppercase text-gray-400">File</p>
           <p className="mt-1 text-sm font-medium text-gray-900">{file.contentType}</p>
@@ -826,6 +842,7 @@ export function FileReviewClient({
           </div>
           <CopyableTruncatedText value={file.relativePath} className="mt-3 max-w-full text-xs text-gray-500" />
         </Card>
+        )}
         <Card padding="none" className="overflow-hidden">
           <div className="border-b border-gray-100 px-3 py-2 text-xs font-medium uppercase text-gray-500">
             Questions{candidates.length > 0 ? ` · ${candidates.length}` : ""}
@@ -880,7 +897,7 @@ export function FileReviewClient({
               Only pending
             </label>
           </div>
-          <div className="max-h-[620px] overflow-auto">
+          <div className={quick ? "max-h-[calc(var(--app-vh)-14rem)] overflow-auto" : "max-h-[620px] overflow-auto"}>
             {sidebarCandidates.map((candidate) => {
               const status = statusById.get(candidate.id);
               const cLinks = linksByCandidate.get(candidate.id) ?? [];
@@ -905,6 +922,12 @@ export function FileReviewClient({
                   {cls.notes.length > 0 && candidate.status !== "REJECTED" && (
                     <span className="mt-1 block text-[11px] leading-4 text-amber-700">{cls.notes.slice(0, 2).join(" · ")}</span>
                   )}
+                  {candidate.status === "NEEDS_REVIEW" && (() => {
+                    const firstAiNote = reviewReasons(candidate.warningsJson, candidate.correctAnswer).aiNotes[0];
+                    return firstAiNote ? (
+                      <span className="mt-1 block truncate text-[11px] leading-4 text-amber-800" title={firstAiNote}>AI: {firstAiNote}</span>
+                    ) : null;
+                  })()}
                 </button>
               );
             })}
@@ -968,6 +991,28 @@ export function FileReviewClient({
                   : message ?? "No pending changes."}
               </p>
             </div>
+
+            {/* Why this question needs a look: the AI's notes first, then the system's checks. */}
+            {draft.status !== "REVIEWED" && draft.status !== "REJECTED" && (() => {
+              const { aiNotes, checks } = reviewReasons(draft.warningsJson, draft.correctAnswer);
+              if (aiNotes.length === 0 && checks.length === 0) return null;
+              return (
+                <Alert tone="warning" title="Needs review">
+                  <ul className="mt-1 space-y-1" data-review-reasons="">
+                    {aiNotes.map((note, index) => (
+                      <li key={`ai-${index}`}>
+                        <span className="mr-1.5 rounded bg-amber-200/70 px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-amber-900">AI note</span>
+                        {note}
+                      </li>
+                    ))}
+                    {checks.map((note, index) => (
+                      <li key={`check-${index}`}>{note}</li>
+                    ))}
+                  </ul>
+                  <p className="mt-2 text-xs">Fix what is needed below, then <strong>Mark reviewed</strong>.</p>
+                </Alert>
+              );
+            })()}
 
             {openIncidents.length > 0 && (
               <Section title="Open checks" subtitle={String(openIncidents.length)} defaultOpen={openIncidents.length > 0 && pendingStatuses.length === 0}>
@@ -1044,16 +1089,9 @@ export function FileReviewClient({
                   </label>
                 </div>
                 {(() => {
-                  const notes = parseWarnings(draft.warningsJson, draft.correctAnswer);
-                  if (notes.length === 0) return null;
-                  const warnings = notes.filter((note) => !isIngestWarningInfo(note));
-                  const info = notes.filter((note) => isIngestWarningInfo(note));
-                  return (
-                    <div className="space-y-1 text-sm">
-                      {warnings.length > 0 && <p className="text-amber-700">{warnings.join(" ")}</p>}
-                      {info.length > 0 && <p className="text-gray-500">{info.join(" ")}</p>}
-                    </div>
-                  );
+                  // Review reasons are in the "Needs review" box above; only informational notes stay here.
+                  const info = parseWarnings(draft.warningsJson, draft.correctAnswer).filter((note) => isIngestWarningInfo(note));
+                  return info.length > 0 ? <p className="text-sm text-gray-500">{info.join(" ")}</p> : null;
                 })()}
               </div>
             </Section>
