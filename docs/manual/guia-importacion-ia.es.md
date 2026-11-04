@@ -129,15 +129,15 @@ Ejemplo: *Advanced Math › Nonlinear Functions › Hard*, fuente College Board.
 
 2. Abre tu IA, adjunta **los dos PDF** del paso 1, pega el prompt y envíalo.
    
-   [CAPTURA PENDIENTE: chat de la IA con los dos PDF adjuntos y el prompt pegado]
+   Es igual que en un Test: ver la captura del chat en la sección 5, paso 2.
 
 3. La IA devuelve un archivo **import.csv**. Descárgalo. Si solo muestra texto, pídele "send it as a downloadable file".
    
-   [CAPTURA PENDIENTE: la IA entregando import.csv]
+   Ver la respuesta de la IA en la sección 5, paso 2.
 
 4. En la plataforma, en **Upload the CSV**, elige el archivo. Verás una **vista previa**: filas, cuántas se pueden importar, cuántas están listas y cuáles tienen errores o avisos (sección 6).
    
-   [CAPTURA PENDIENTE: vista previa del CSV del set]
+   La vista previa es la misma que la de un módulo de Test (sección 5, paso 2).
 
 5. Si está bien, pulsa **Import N questions**. Si no, pulsa **Cancel**, pide a la IA que corrija el CSV y súbelo otra vez. Hasta crear el Draft puedes cambiarlo con **Replace with a new CSV**.
 
@@ -146,8 +146,7 @@ Ejemplo: *Advanced Math › Nonlinear Functions › Hard*, fuente College Board.
 1. Refina las preguntas en **Open Review (edit and crop)** (sección 7).
 
 2. Pulsa **Create Draft Practice Set**. Se crea el set *Advanced Math - Nonlinear Functions - HARD* en **Draft** y se abre su editor.
-   
-   [CAPTURA PENDIENTE: el Draft del set recién creado]
+
 
 3. Publícalo (sección 8).
 
@@ -173,11 +172,17 @@ Ejemplo: **TEST 9**, fuente Innovator. El Test se crea una vez y se llena **un m
 
 ![Paso 1 de un Test: dos bandejas y la clave común](img/ai-step1-test.png)
 
+En la importación real de TEST 9 (Innovator), el paso 1 quedó así:
+
+![TEST 9, paso 1: R&W y Math con un PDF de Módulo 1 + 2 cada uno, sus explicaciones en Word y la clave común](img/ai-t9-01-test-step1.png)
+
 ### Paso 2 — Un módulo a la vez
 
 El paso 2 muestra **4 tarjetas**, una por módulo. Cada tarjeta dice cuántas preguntas debe tener, cómo va (**Not loaded**, **27/27 loaded · 27 ready**, **In the Draft**) y, en **Give the AI**, **exactamente qué archivos darle a la IA**: el de preguntas de ese módulo, las respuestas y explicaciones de su sección, y la clave común.
 
 ![Paso 2: una tarjeta por módulo](img/ai-step2-modules.png)
+
+![TEST 9, paso 2 recién empezado: las 4 tarjetas en Not loaded, cada una con sus archivos y su Copy prompt](img/ai-t9-02-step2-modules.png)
 
 Para **cada módulo**, en este orden: R&W 1 → R&W 2 → Math 1 → Math 2:
 
@@ -187,21 +192,35 @@ Para **cada módulo**, en este orden: R&W 1 → R&W 2 → Math 1 → Math 2:
 
 2. Abre **una conversación nueva** en tu IA. Adjunta **los archivos de "Give the AI"** de la tarjeta, pega el prompt y envíalo.
    
-   ![Chat de la IA con el PDF de R&W, los Word de explicaciones y clave, y el prompt de RW1 pegado](img/ai-test-chat-rw1.png)
+   ![Chat nuevo en Claude: la clave, el prompt de RW1 pegado, el PDF de R&W y las explicaciones de R&W adjuntos, antes de enviar](img/ai-t9-03-ai-chat-rw1.png)
 
 3. Descarga el **import.csv** que devuelve.
    
-   ![La IA entrega import.csv (27 filas) y explica sus notas](img/ai-test-csv-rw1.png)
+   ![La IA entrega import.csv (27 filas, todas MC), explica las notas de Q6, Q11 y Q25, y el CSV se ve a la derecha](img/ai-t9-04-ai-csv-rw1.png)
+
+   > En esta prueba la IA marcó el subrayado con `*…*` y lo anotó en notes; el prompt actual pide `++texto++` y deja notes solo para lo que hay que revisar.
 
 4. En la tarjeta del módulo, en **Upload the CSV**, elige el archivo y revisa la vista previa. **Fíjate en el número de preguntas.** Si no coincide (por ejemplo 21 de 22), la vista previa avisa: "This module should have 22 questions and the CSV brings 21". Pide a la IA que revise qué pregunta saltó o si mezcló módulos.
    
-   ![Vista previa del CSV de RW1: 27 filas, 27 se pueden importar](img/ai-test-preview-rw1.png)
+   ![Vista previa de RW1: 27 filas, 27 se pueden importar, 23 listas sin cambios; Import 27 questions](img/ai-t9-05-preview-rw1.png)
 
-5. Pulsa **Import N questions**. La tarjeta pasa a **27/27 loaded**.
+5. Pulsa **Import N questions**. La tarjeta pasa a **27/27 loaded**. Si la vista previa marca una figura (“Figure in stimulus (page 1): crop it…”), igual se importa: la figura se agrega después (sección 7).
+   
+   ![RW2 importado (aviso arriba a la derecha); en las vistas previas de MATH1 y MATH2 aparecen las figuras por recortar](img/ai-t9-08-imported-figure-warning.png)
 
 6. Sigue con el siguiente módulo.
+   
+   ![RW1 y RW2 con su CSV en vista previa, 27 de 27 cada uno](img/ai-t9-06-preview-rw1-rw2.png)
+   
+   ![Los cuatro módulos con su CSV en vista previa (27, 27, 22 y 22 filas)](img/ai-t9-07-preview-4-modules.png)
+
+   Con los cuatro cargados, el paso 2 muestra el total:
+   
+   ![Paso 2 con las 4 tarjetas cargadas: 98 preguntas](img/ai-t9-11-step2-98-loaded.png)
 
 > **Rehacer un módulo:** mientras el módulo no esté en el Draft, sube otro CSV con **Replace with a new CSV**. Solo se reemplaza **ese** módulo; los demás no se tocan.
+
+![RW1 ya cargado: Replace with a new CSV con la vista previa del CSV nuevo](img/ai-t9-13-replace-csv.png)
 
 > **Una conversación por módulo:** pedirle a la IA un módulo a la vez evita respuestas cortadas y mezclas entre módulos. Si tu IA lo permite, puedes seguir en la misma conversación con el prompt del módulo siguiente.
 
@@ -211,11 +230,11 @@ Para **cada módulo**, en este orden: R&W 1 → R&W 2 → Math 1 → Math 2:
 
 2. Cuando tengas módulos listos, pulsa **Create Draft Test**. Se crea **TEST 9** en Draft con los módulos cargados hasta ese momento.
    
-   ![Paso 3 con los 4 módulos cargados y Create Draft Test](img/ai-test-step3-loaded.png)
+   ![Los 4 módulos cargados y el paso 3: Review Reading and Writing, Review Math y Create Draft Test](img/ai-t9-09-step3-loaded.png)
 
 3. ¿Quedaron preguntas fuera del Draft (por revisar) o cargaste más módulos después? Vuelve a la importación y, en el paso 3, pulsa **Add N questions to the Draft**. Se agregan a su módulo dentro del mismo TEST 9, sin repetir lo que ya estaba. Si todavía quedan preguntas por revisar, te pregunta si agregar solo las listas.
    
-   ![Paso 3 después de un Draft parcial: Add 16 questions to the Draft y Open the Draft](img/ai-test-add-to-draft.png)
+   ![Después de un Draft parcial: Add 16 questions to the Draft, Open the Draft y las filas In the Draft](img/ai-t9-23-partial-draft-add.png)
 
    Para volver a la importación tienes tres caminos: **Import with AI › Imports in progress** ("Draft created · N questions not in it yet" › **Continue**), el aviso de **Tests** y el aviso **Created with Import with AI** en la página del Test (**Continue the import**). Aparecen mientras el Test sea Draft y le falten preguntas.
 
@@ -285,17 +304,29 @@ El paso 3 lista las preguntas cargadas (en un Test, con su módulo: `RW1 · 3`, 
 - **Reviewed**: la marcaste como revisada.
 - **In the Draft**: ya está en el Draft.
 
+![Paso 3: las filas Needs review muestran la nota de la IA debajo de la pregunta (RW1 · 6 y 7)](img/ai-t9-10-step3-needs-review.png)
+
+![Una fila con figura: “Figure in stimulus (page 7): crop it from the PDF in Review”](img/ai-t9-12-step3-figure-row.png)
+
 Para refinar:
 
-1. Pulsa **Open Review (edit and crop)**. En un Test, el **Review** del archivo de esa pregunta. También puedes pulsar el texto de una pregunta en la tabla.
+1. Pulsa **Open Review (edit and crop)**. En un Test, el **Review** del archivo de esa pregunta. También puedes pulsar el texto de una pregunta en la tabla. Arriba, el recuadro **Needs review** dice por qué hay que mirarla: la nota de la IA (**AI NOTE**) y los avisos de la plataforma. A la izquierda, las preguntas; arriba, el cambio entre secciones (Test 9 · R&W / Test 9 · Math).
+   
+   ![Review de M1 · Q11: Needs review con la nota de la IA (texto cortado en el PDF) y la figura de la página 7 por recortar](img/ai-t9-14-review-ai-note.png)
 
-2. Corrige el texto, las opciones, la respuesta o la explicación.
+2. Corrige el texto, las opciones, la respuesta o la explicación. **Bold** y **Underline** funcionan como en un procesador de textos: con texto seleccionado lo marcan y, al pulsar otra vez, lo desmarcan (también Ctrl+B y Ctrl+U). Los cambios quedan en **Unsaved** hasta que pulsas **Save changes**.
+   
+   ![Editando la opción C de M2 · Q11: Unsaved y Save changes](img/ai-t9-15-review-edit-option.png)
 
 3. Si tiene figura: **Crop** sobre la página del PDF y asígnala a la pregunta, al pasaje o a una opción. La columna `figurePage` del CSV dice en qué página está. Al asignarla, el aviso "Figure in …: crop it" desaparece y, si era lo único pendiente, la pregunta queda **Ready** sola.
 
 4. Marca la pregunta como **Reviewed**.
    
-   ![Crop page region: la página 26 del PDF con el gráfico seleccionado para la pregunta](img/ai-review-crop.png)
+   ![Crop page region: página 26, destino Stem (image), el gráfico seleccionado; Assign crop](img/ai-t9-16-crop-page-region.png)
+   
+   ![Después de Assign crop: el gráfico en el espacio Stem de M2 · Q12](img/ai-t9-17-images-after-assign.png)
+   
+   ![M2 · Q25 guardada y marcada REVIEWED; la sección R&W queda complete](img/ai-t9-18-marked-reviewed.png)
 
 > Haz estas correcciones **antes de crear el Draft** (o, en un Test, antes de añadir el módulo al Draft). Después, los recortes de figuras siguen pasando al Draft, pero los textos y respuestas se corrigen en el editor de la pregunta (sección 9).
 
@@ -310,7 +341,15 @@ Solo entran al Draft las preguntas **Ready** o **Reviewed**. Si quedan otras, la
 
 > **Calidad:** si el PDF es una captura de pantalla, la figura sale con la resolución de esa captura; no se amplía porque eso inventa detalle. Las figuras dibujadas en el PDF (vectoriales) salen nítidas a cualquier tamaño.
 
-[CAPTURA PENDIENTE: panel "Reprocess with AI" con el zip de imágenes subido]
+Ejemplo real con un asistente de código en la terminal (Claude Code), con el zip y el prompt descargados en una carpeta:
+
+![Claude Code en la carpeta con el zip de artefactos y PROMPT-images.md: “Ayúdame extrayendo @import-artifacts-….zip usa @PROMPT-images.md”](img/ai-t9-19-claude-code-request.png)
+
+![El asistente arma su plan: ubicar las figuras en las páginas y devolver un crops.json](img/ai-t9-20-claude-code-plan.png)
+
+![Resultado: figures-crops.zip con un crops.json de 20 recortes, la lista por módulo y los detalles a revisar (opciones de MATH2 Q4 en la página 13, una opción cortada en el PDF)](img/ai-t9-21-claude-code-crops-zip.png)
+
+Ese `figures-crops.zip` se sube con **Upload images (zip)**: cada recorte va a su pregunta, recortado por la plataforma desde el PDF.
 
 ## 8. Publicar
 
@@ -402,7 +441,7 @@ En el editor de un set o Test **importado** aparece el recuadro **Images & sourc
 
 Cada pregunta tiene además **Images / crop**, para recortar su figura del PDF.
 
-[CAPTURA PENDIENTE: recuadro "Images & source files" en el editor de un set importado]
+![Editor de TEST 9: cada pregunta con Images / crop; Math Module 1 todavía con 14/22 preguntas (Draft parcial)](img/ai-t9-22-test-editor-images.png)
 
 ### "Someone else changed this since you opened it"
 
