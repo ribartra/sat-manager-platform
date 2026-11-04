@@ -77,9 +77,10 @@ export function ImportMediaPanel({
   return (
     <div className="space-y-3 text-sm text-gray-700">
       <p>
-        Download the zip (original PDF, every page as an image, the questions and the prompts), give it to your AI with <b>PROMPT-images.md</b> and ask for a zip of
-        images named <code>Q3_STEM.png</code>, <code>Q5_A.png</code>
-        {isTest ? <> (Tests: <code>RW1_Q3_STEM.png</code>, <code>MATH2_Q12_A.png</code>)</> : null}. Upload it here: each image goes to its question.
+        Download the zip (original PDF, every page as an image, the questions and the prompts) and give it to your AI with <b>PROMPT-images.md</b>. Best
+        quality: ask it for <code>crops.json</code> (where each figure is), and the platform cuts every figure from the original PDF itself — sharp at any size. It may
+        also return images named <code>Q3_STEM.png</code>, <code>Q5_A.png</code>
+        {isTest ? <> (Tests: <code>RW1_Q3_STEM.png</code>, <code>MATH2_Q12_A.png</code>)</> : null}. Upload its zip here: each figure goes to its question.
       </p>
       <div className="flex flex-wrap items-center gap-2">
         <Button asChild variant="secondary">

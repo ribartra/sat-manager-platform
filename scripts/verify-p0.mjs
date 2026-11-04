@@ -662,6 +662,16 @@ const checks = [
     label: "Resultado de practice: la pregunta actual (texto, opciones e imagenes)",
   },
   {
+    file: "lib/quick-import.ts",
+    requires: ["RECOMMENDED — crops.json", "pages.json", "Never upscale beyond the source pixels", "Render them FROM THE PDF in original/"],
+    label: "Image prompt: crops.json (platform cuts from the PDF) or PNGs rendered from the PDF at full quality, never upscaled",
+  },
+  {
+    file: "ingest_service/app/main.py",
+    requires: ["def render_pdf_region_hq(", "FIGURE_TARGET_LONG_SIDE = 1920", '"raster"', 'crops.json first: rendered by the platform from the PDF', '"pages.json"', "ARTIFACT_PAGE_DPI = 200"],
+    label: "Figures: rendered from the PDF (vector ≥1920 px, screenshots at native resolution), crops.json upload, pages.json in the artifacts zip",
+  },
+  {
     file: "lib/math-text.ts",
     requires: ["export function textFormatState", "1. The selection itself carries the markers", "2. Inside a formatted run", "the run closes before the selection and reopens after it"],
     label: "Bold/Underline toggle like a word processor (remove when already formatted, split a run, word under caret)",

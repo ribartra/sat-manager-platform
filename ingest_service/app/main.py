@@ -831,6 +831,55 @@ def decode_base64_image(value: str | None) -> tuple[bytes | None, str]:
         return None, extension
 
 
+# Figures recovered for questions: as sharp as the source allows. Vector content (text, lines,
+# charts drawn in the PDF) is re-rendered so the long side reaches FIGURE_TARGET_LONG_SIDE px; a
+# region that is an embedded raster (a screenshot) is rendered at that image's own resolution —
+# never upscaled beyond its pixels (upscaling invents detail).
+FIGURE_TARGET_LONG_SIDE = 1920
+FIGURE_MIN_DPI = 150
+FIGURE_MAX_DPI = 600
+
+
+def figure_dpi(page: Any, x0: float, top: float, x1: float, bottom: float) -> tuple[int, str]:
+    """DPI to render a region of a PDF page, and why ("vector" or "raster")."""
+    width_pts, height_pts = max(1.0, x1 - x0), max(1.0, bottom - top)
+    area = width_pts * height_pts
+    for image in page.images or []:
+        ix0, itop, ix1, ibottom = float(image["x0"]), float(image["top"]), float(image["x1"]), float(image["bottom"])
+        overlap_w = max(0.0, min(x1, ix1) - max(x0, ix0))
+        overlap_h = max(0.0, min(bottom, ibottom) - max(top, itop))
+        src = image.get("srcsize") or (0, 0)
+        if overlap_w * overlap_h >= 0.6 * area and src[0] and (ix1 - ix0) > 0:
+            native = float(src[0]) / ((ix1 - ix0) / 72.0)
+            return int(max(FIGURE_MIN_DPI, min(FIGURE_MAX_DPI, round(native)))), "raster"
+    wanted = 72.0 * FIGURE_TARGET_LONG_SIDE / max(width_pts, height_pts)
+    return int(max(200, min(FIGURE_MAX_DPI, round(wanted)))), "vector"
+
+
+def trim_white_margins(image: "Image.Image", pad: int = 6) -> "Image.Image":
+    """Crop surrounding white (or near-white) margins, keeping a small padding."""
+    gray = image.convert("L").point(lambda v: 0 if v > 245 else 255)
+    box = gray.getbbox()
+    if not box:
+        return image
+    left, upper, right, lower = box
+    return image.crop((max(0, left - pad), max(0, upper - pad), min(image.width, right + pad), min(image.height, lower + pad)))
+
+
+def render_pdf_region_hq(page: Any, x0: float, top: float, x1: float, bottom: float, trim: bool = True) -> tuple[bytes, int, int, dict[str, Any]]:
+    """PNG of a PDF page region at figure quality (see figure_dpi). Returns (png, width, height, info)."""
+    pw, ph = float(page.width), float(page.height)
+    x0, top = max(0.0, min(x0, pw)), max(0.0, min(top, ph))
+    x1, bottom = max(x0 + 1.0, min(x1, pw)), max(top + 1.0, min(bottom, ph))
+    dpi, kind = figure_dpi(page, x0, top, x1, bottom)
+    image = page.crop((x0, top, x1, bottom)).to_image(resolution=dpi).original.convert("RGB")
+    if trim:
+        image = trim_white_margins(image)
+    output = BytesIO()
+    image.save(output, format="PNG", optimize=True)
+    return output.getvalue(), image.width, image.height, {"dpi": dpi, "kind": kind, "points": {"x0": x0, "top": top, "x1": x1, "bottom": bottom}}
+
+
 def crop_pdf_image(path: Path, page_number: int, bbox: dict[str, Any]) -> tuple[bytes | None, int | None, int | None]:
     with _PDF_RENDER_LOCK:
         try:
@@ -885,10 +934,9 @@ def crop_pdf_region_normalized(
                 y1 = clamp(bbox_norm.get("y1", 1)) * ph
                 if x1 - x0 < 1.0 or y1 - y0 < 1.0:
                     return None, None, None, None
-                cropped = page.crop((x0, y0, x1, y1)).to_image(resolution=180).original.convert("RGB")
-                output = BytesIO()
-                cropped.save(output, format="JPEG", quality=90, optimize=True)
-                return output.getvalue(), cropped.width, cropped.height, {"x0": x0, "top": y0, "x1": x1, "bottom": y1}
+                # Figure quality (vector ≥1920 px long side, raster at its native resolution), PNG.
+                png, width, height, _info = render_pdf_region_hq(page, x0, y0, x1, y1, trim=False)
+                return png, width, height, {"x0": x0, "top": y0, "x1": x1, "bottom": y1}
         except Exception:
             return None, None, None, None
 
@@ -1029,7 +1077,8 @@ def crop_candidate_region(
             )
             raise HTTPException(status_code=400, detail="Could not render the selected region.")
         image_id = new_id("img")
-        file_url, content_hash = save_ingest_image(candidate["batchId"], image_id, image_bytes, "jpg")
+        crop_is_png = image_bytes[:8] == b"\x89PNG\r\n\x1a\n"
+        file_url, content_hash = save_ingest_image(candidate["batchId"], image_id, image_bytes, "png" if crop_is_png else "jpg")
         # Verify the file actually landed on disk before claiming success.
         saved_path = resolve_asset_disk_path(file_url)
         if not saved_path or not saved_path.exists() or saved_path.stat().st_size < 32:
@@ -1063,9 +1112,9 @@ def crop_candidate_region(
             """
             INSERT INTO IngestImageArtifact
               (id, batchId, sourceFileId, pageArtifactId, pageNumber, imageIndex, imageId, origin, bboxJson, mimeType, fileUrl, width, height, contentHash, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'MANUAL_CROP', ?, 'image/jpeg', ?, ?, ?, ?, 'AVAILABLE')
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'MANUAL_CROP', ?, ?, ?, ?, ?, ?, 'AVAILABLE')
             """,
-            (image_id, candidate["batchId"], artifact_source_id, page_artifact_id, page_number, next_index, image_id, bbox_json, file_url, w_px, h_px, content_hash),
+            (image_id, candidate["batchId"], artifact_source_id, page_artifact_id, page_number, next_index, image_id, bbox_json, "image/png" if crop_is_png else "image/jpeg", file_url, w_px, h_px, content_hash),
         )
         result: dict[str, Any] = {"candidateId": candidate_id, "imageArtifactId": image_id, "fileUrl": file_url, "pageNumber": page_number, "mode": mode}
         if mode == "ASSIGN":
@@ -1091,7 +1140,7 @@ def crop_candidate_region(
         else:  # OCR
             # Release the write lock before calling Mistral (it can take minutes): the web app shares this SQLite file.
             db.commit()
-            text, payload = run_mistral_ocr_image(base64.b64encode(image_bytes).decode("utf-8"), "image/jpeg")
+            text, payload = run_mistral_ocr_image(base64.b64encode(image_bytes).decode("utf-8"), "image/png" if crop_is_png else "image/jpeg")
             result["text"] = text
             if payload.get("warning"):
                 result["warning"] = payload["warning"]
@@ -5983,6 +6032,8 @@ def crop_candidate_region_endpoint(candidate_id: str, payload: dict[str, Any]) -
 
 QUICK_IMAGE_NAME = re.compile(r"^(?:(rw1|rw2|math1|math2)[_\- ]+)?q0*(\d+)[_\- ]+(stem|stimulus|[abcd])(?:[_\- ]*\d+)?\.(png|jpe?g|webp)$", re.IGNORECASE)
 QUICK_MODULES = {"RW1": ("RW", "1"), "RW2": ("RW", "2"), "MATH1": ("MATH", "1"), "MATH2": ("MATH", "2")}
+ARTIFACT_PAGE_DPI = 200
+QUICK_SLOT_NAME = re.compile(r"^(?:(rw1|rw2|math1|math2)[_\- ]+)?q0*(\d+)[_\- ]+(stem|stimulus|[abcd])$", re.IGNORECASE)
 
 
 @app.post("/batches/{batch_id}/quick-prepare")
@@ -6028,6 +6079,7 @@ def quick_artifacts_zip(batch_id: str, payload: dict[str, Any]) -> Response:
     image-recovery prompt), for reprocessing with an external AI."""
     extra_files = payload.get("files") if isinstance(payload.get("files"), dict) else {}
     output = BytesIO()
+    pages_index: list[dict[str, Any]] = []
     with conn() as db:
         sources = db.execute("SELECT id, path, relativePath FROM IngestSourceFile WHERE batchId = ?", (batch_id,)).fetchall()
     if not sources:
@@ -6043,10 +6095,32 @@ def quick_artifacts_zip(batch_id: str, payload: dict[str, Any]) -> Response:
             with _PDF_RENDER_LOCK:
                 with pdfplumber.open(path) as pdf:
                     for number, page in enumerate(pdf.pages, start=1):
-                        image = page.to_image(resolution=150).original.convert("RGB")
+                        # Page previews to FIND figures (not to cut them): crops are re-rendered from the PDF.
+                        image = page.to_image(resolution=ARTIFACT_PAGE_DPI).original.convert("RGB")
                         buffer = BytesIO()
                         image.save(buffer, format="PNG", optimize=True)
-                        archive.writestr(f"pages/{Path(safe_upload_filename(path.name)).stem}-page-{number:03d}.png", buffer.getvalue())
+                        png_name = f"pages/{Path(safe_upload_filename(path.name)).stem}-page-{number:03d}.png"
+                        archive.writestr(png_name, buffer.getvalue())
+                        pages_index.append({
+                            "file": safe_upload_filename(path.name),
+                            "page": number,
+                            "png": png_name,
+                            "dpi": ARTIFACT_PAGE_DPI,
+                            "pngWidth": image.width,
+                            "pngHeight": image.height,
+                            "widthPts": round(float(page.width), 2),
+                            "heightPts": round(float(page.height), 2),
+                            # Embedded pictures (screenshots): their box in points and native pixel size.
+                            "embeddedImages": [
+                                {
+                                    "x0": round(float(im["x0"]), 2), "top": round(float(im["top"]), 2),
+                                    "x1": round(float(im["x1"]), 2), "bottom": round(float(im["bottom"]), 2),
+                                    "pixels": list(im.get("srcsize") or []),
+                                }
+                                for im in (page.images or [])
+                            ],
+                        })
+        archive.writestr("pages.json", json.dumps({"coordinates": "PDF points (1/72 in), origin top-left; png px = points * dpi / 72", "pages": pages_index}, indent=1))
         for name, content in extra_files.items():
             if isinstance(name, str) and isinstance(content, str) and re.fullmatch(r"[A-Za-z0-9._-]{1,80}", name):
                 archive.writestr(name, content)
@@ -6059,9 +6133,13 @@ def quick_artifacts_zip(batch_id: str, payload: dict[str, Any]) -> Response:
 
 @app.post("/batches/{batch_id}/image-zip")
 async def quick_image_zip(batch_id: str, file: UploadFile = File(...), candidateIds: str | None = Form(None)) -> dict[str, Any]:
-    """Images recovered by an external AI, named Q{n}_{STEM|STIMULUS|A|B|C|D}.png (Tests: RW1_Q{n}_…,
-    RW2_, MATH1_, MATH2_): each one is saved as an image artifact and linked to that question's slot
-    (replacing the slot's previous link)."""
+    """Images recovered by an external AI, each linked to its question's slot (replacing the slot's
+    previous link). Two ways, both in one zip:
+    - PNG/JPG files named Q{n}_{STEM|STIMULUS|A|B|C|D}.png (Tests: RW1_Q{n}_…, RW2_, MATH1_, MATH2_);
+    - crops.json: [{"slot": "MATH1_Q7_STEM", "file": "<pdf in original/>", "page": 3,
+      "bbox": {"x0":…, "top":…, "x1":…, "bottom":…}}] in PDF points (pages.json of the artifacts zip),
+      or "bboxNorm" in 0–1. The platform renders each box from the original PDF at figure quality
+      (render_pdf_region_hq): the sharpest result, whatever the AI's own image tools are."""
     data = await file.read()
     if len(data) > MAX_UPLOAD_BYTES:
         raise HTTPException(status_code=413, detail="ZIP exceeds the 256 MB limit.")
@@ -6084,49 +6162,32 @@ async def quick_image_zip(batch_id: str, file: UploadFile = File(...), candidate
         by_number: dict[int, list[Any]] = {}
         for row in rows:
             by_number.setdefault(row["questionNumber"], []).append(row)
-        for info in archive.infolist():
-            if info.is_dir():
-                continue
-            name = Path(info.filename).name
-            match = QUICK_IMAGE_NAME.match(name)
-            if not match:
-                skipped.append(f"{name}: name must be Q<number>_<STEM|STIMULUS|A|B|C|D>.png")
-                continue
-            module, number, slot = (match.group(1) or "").upper(), int(match.group(2)), match.group(3).upper()
+        sources = db.execute("SELECT id, path FROM IngestSourceFile WHERE batchId = ?", (batch_id,)).fetchall()
+        source_by_name = {safe_upload_filename(Path(row["path"]).name): row for row in sources}
+        source_by_id = {row["id"]: row for row in sources}
+
+        def find_candidate(label: str, module: str, number: int):
             if module:
-                candidate = by_module.get((*QUICK_MODULES[module], number))
-            else:
-                matches = by_number.get(number, [])
-                candidate = matches[0] if len(matches) == 1 else None
-                if len(matches) > 1:
-                    skipped.append(f"{name}: question {number} exists in several modules; prefix the name with RW1_, RW2_, MATH1_ or MATH2_")
-                    continue
-            if not candidate:
-                skipped.append(f"{name}: no question {number}{' in ' + module if module else ''} in this import")
-                continue
-            raw = archive.read(info)
-            try:
-                with Image.open(BytesIO(raw)) as im:
-                    width, height = im.width, im.height
-                    buffer = BytesIO()
-                    im.convert("RGB").save(buffer, format="PNG", optimize=True)
-                    png = buffer.getvalue()
-            except Exception:
-                skipped.append(f"{name}: not a readable image")
-                continue
+                return by_module.get((*QUICK_MODULES[module], number)), None
+            matches = by_number.get(number, [])
+            if len(matches) > 1:
+                return None, f"{label}: question {number} exists in several modules; prefix it with RW1_, RW2_, MATH1_ or MATH2_"
+            return (matches[0] if matches else None), None
+
+        def link_image(label: str, candidate: Any, number: int, slot: str, png: bytes, width: int, height: int, origin: str, bbox: dict[str, Any] | None, source_file_id: str):
             image_id = new_id("img")
             file_url, content_hash = save_ingest_image(batch_id, image_id, png, "png")
             next_index = db.execute(
-                "SELECT COALESCE(MAX(imageIndex), -1) + 1 FROM IngestImageArtifact WHERE sourceFileId = ? AND pageNumber = 0 AND origin = 'AI_ZIP'",
-                (candidate["sourceFileId"],),
+                "SELECT COALESCE(MAX(imageIndex), -1) + 1 FROM IngestImageArtifact WHERE sourceFileId = ? AND pageNumber = 0 AND origin = ?",
+                (source_file_id, origin),
             ).fetchone()[0]
             db.execute(
                 """
                 INSERT INTO IngestImageArtifact
                   (id, batchId, sourceFileId, pageArtifactId, pageNumber, imageIndex, imageId, origin, bboxJson, mimeType, fileUrl, width, height, contentHash, status)
-                VALUES (?, ?, ?, NULL, 0, ?, ?, 'AI_ZIP', NULL, 'image/png', ?, ?, ?, ?, 'AVAILABLE')
+                VALUES (?, ?, ?, NULL, 0, ?, ?, ?, ?, 'image/png', ?, ?, ?, ?, 'AVAILABLE')
                 """,
-                (image_id, batch_id, candidate["sourceFileId"], next_index, image_id, file_url, width, height, content_hash),
+                (image_id, batch_id, source_file_id, next_index, image_id, origin, json.dumps(bbox) if bbox else None, file_url, width, height, content_hash),
             )
             target_type = slot if slot in {"STEM", "STIMULUS"} else "OPTION"
             option_label = slot if target_type == "OPTION" else None
@@ -6142,6 +6203,94 @@ async def quick_image_zip(batch_id: str, file: UploadFile = File(...), candidate
                 """,
                 (new_id("imglink"), batch_id, candidate["id"], image_id, target_type, option_label, now_iso(), now_iso()),
             )
-            linked.append({"question": number, "slot": slot, "imageArtifactId": image_id, "candidateId": candidate["id"], "targetType": target_type, "optionLabel": option_label})
+            linked.append({"question": number, "slot": slot, "imageArtifactId": image_id, "candidateId": candidate["id"], "targetType": target_type, "optionLabel": option_label, "width": width, "height": height})
+
+        done_slots: set[tuple[str, str]] = set()
+
+        # 1. crops.json first: rendered by the platform from the PDF (the sharpest way).
+        crops_info = next((info for info in archive.infolist() if Path(info.filename).name.lower() == "crops.json"), None)
+        if crops_info:
+            try:
+                crops = json.loads(archive.read(crops_info).decode("utf-8"))
+                crops = crops.get("crops", []) if isinstance(crops, dict) else crops
+                if not isinstance(crops, list):
+                    raise ValueError("crops.json must be a list")
+            except Exception:
+                skipped.append("crops.json: not valid JSON (a list of {slot, file, page, bbox})")
+                crops = []
+            for index, crop in enumerate(crops, start=1):
+                label = f"crops.json #{index}"
+                if not isinstance(crop, dict):
+                    skipped.append(f"{label}: not an object")
+                    continue
+                match = QUICK_SLOT_NAME.match(str(crop.get("slot") or "").strip())
+                if not match:
+                    skipped.append(f"{label}: slot must look like Q7_STEM, RW1_Q3_A or MATH2_Q12_STIMULUS")
+                    continue
+                module, number, slot = (match.group(1) or "").upper(), int(match.group(2)), match.group(3).upper()
+                candidate, problem = find_candidate(label, module, number)
+                if problem or not candidate:
+                    skipped.append(problem or f"{label}: no question {number}{' in ' + module if module else ''} in this import")
+                    continue
+                source = source_by_name.get(safe_upload_filename(str(crop.get("file") or ""))) if crop.get("file") else source_by_id.get(candidate["sourceFileId"])
+                path = resolve_existing_source_path(source["path"]) if source else None
+                if not path or not path.exists() or path.suffix.lower() != ".pdf":
+                    skipped.append(f"{label}: file must be one of the PDFs in original/ ({', '.join(sorted(n for n in source_by_name if n.lower().endswith('.pdf')))})")
+                    continue
+                try:
+                    page_number = int(crop.get("page"))
+                    with _PDF_RENDER_LOCK:
+                        with pdfplumber.open(path) as pdf:
+                            if page_number < 1 or page_number > len(pdf.pages):
+                                raise ValueError(f"page {page_number} is outside 1–{len(pdf.pages)}")
+                            page = pdf.pages[page_number - 1]
+                            if isinstance(crop.get("bboxNorm"), dict):
+                                n = crop["bboxNorm"]
+                                box = (float(n["x0"]) * float(page.width), float(n["top"] if "top" in n else n["y0"]) * float(page.height),
+                                       float(n["x1"]) * float(page.width), float(n["bottom"] if "bottom" in n else n["y1"]) * float(page.height))
+                            else:
+                                bb = crop.get("bbox") or {}
+                                box = (float(bb["x0"]), float(bb["top"]), float(bb["x1"]), float(bb["bottom"]))
+                            if box[2] - box[0] < 4 or box[3] - box[1] < 4:
+                                raise ValueError("the box is too small")
+                            png, width, height, info = render_pdf_region_hq(page, *box)
+                except Exception as exc:
+                    skipped.append(f"{label} ({crop.get('slot')}): {exc if isinstance(exc, ValueError) else 'could not render the box (check page and bbox in PDF points)'}")
+                    continue
+                link_image(label, candidate, number, slot, png, width, height, "AI_CROP", {"page": page_number, **info}, source["id"])
+                done_slots.add((candidate["id"], slot))
+
+        # 2. Image files (a slot already cropped from crops.json keeps that, sharper, version).
+        for info in archive.infolist():
+            if info.is_dir():
+                continue
+            name = Path(info.filename).name
+            if name.lower() == "crops.json":
+                continue
+            match = QUICK_IMAGE_NAME.match(name)
+            if not match:
+                skipped.append(f"{name}: name must be Q<number>_<STEM|STIMULUS|A|B|C|D>.png (or use crops.json)")
+                continue
+            module, number, slot = (match.group(1) or "").upper(), int(match.group(2)), match.group(3).upper()
+            candidate, problem = find_candidate(name, module, number)
+            if problem or not candidate:
+                skipped.append(problem or f"{name}: no question {number}{' in ' + module if module else ''} in this import")
+                continue
+            if (candidate["id"], slot) in done_slots:
+                skipped.append(f"{name}: already cropped from crops.json (kept that one)")
+                continue
+            raw = archive.read(info)
+            try:
+                with Image.open(BytesIO(raw)) as im:
+                    width, height = im.width, im.height
+                    buffer = BytesIO()
+                    im.convert("RGB").save(buffer, format="PNG", optimize=True)
+                    png = buffer.getvalue()
+            except Exception:
+                skipped.append(f"{name}: not a readable image")
+                continue
+            link_image(name, candidate, number, slot, png, width, height, "AI_ZIP", None, candidate["sourceFileId"])
+            if max(width, height) < 800:
+                skipped.append(f"{name}: linked, but small ({width}×{height} px): crops.json gives the full-quality figure")
         db.commit()
     return {"linked": linked, "skipped": skipped}
