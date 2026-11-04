@@ -4,7 +4,7 @@ import {
   AttemptStatusBadge,
   Breadcrumbs,
   Delta,
-  InvalidatedNotice,
+  InvalidatedNotice, RegradedNotice,
   PageHeader,
   PageShell,
   SectionHeader,
@@ -26,11 +26,10 @@ import { PAGE_TITLE_CLASS } from "@/components/sat/page-shell";
 import { AttemptHeaderActions } from "../../attempt-header-actions";
 import { TryNavigator } from "@/components/sat/try-navigator";
 import { practiceSetTitle } from "@/lib/attempt-groups";
-import { parseSnapshot, PracticeSetSnapshot, QuestionSnapshot } from "@/lib/attempt-snapshots";
+import { parseSnapshot, PracticeSetSnapshot } from "@/lib/attempt-snapshots";
 import { auth } from "@/lib/auth";
 import { teacherProgramEnrollmentScope } from "@/lib/program-scope";
 import { summarizeAllQuestionAnswers } from "@/lib/weighted-score";
-import { liveImagesOf } from "@/lib/question-media";
 import { buildProgressHref, progressFiltersFromParams } from "@/lib/progress-filters";
 import { historyHref } from "@/lib/history-params";
 
@@ -39,6 +38,7 @@ interface PageProps {
   searchParams: Promise<{ area?: string; topic?: string; difficulty?: string; from?: string; to?: string }>;
 }
 
+import { latestRegrade } from "@/lib/attempt-regrade";
 export default async function TeacherAttemptDetailPage({ params, searchParams }: PageProps) {
   const { studentId, attemptId } = await params;
   const filters = progressFiltersFromParams(await searchParams);
@@ -56,7 +56,7 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
     },
     include: {
       student: true,
-      answers: { include: { question: { include: { topic: true } } } },
+      answers: { include: { question: { include: { options: { orderBy: { label: "asc" } }, topic: true } } } },
       assignment: { include: { practiceSet: { include: { source: { select: { name: true } }, topic: { include: { domain: true } } } } } },
       pauses: true,
     },
@@ -115,15 +115,11 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
     .map((questionId) => {
       const item = liveQuestionsById.get(questionId);
       const ans = answersByQuestion.get(questionId);
-      // Historic attempts render the question as it was when answered (questionSnapshot).
-      const snapshot = parseSnapshot<QuestionSnapshot>(ans?.questionSnapshot);
-      const question = snapshot ?? item?.question;
+      // The current question, also when it was removed from the set later (the answer still points to it).
+      const question = item?.question ?? ans?.question;
       if (!question) return null;
-      // Text and options as answered (snapshot); images from the live bank question (only referenced).
-      const media = liveImagesOf(item?.question, snapshot?.options?.length ? snapshot.options : item?.question.options ?? []);
-      const options = media.options;
       const state: "ok" | "bad" | "blank" = !ans?.answer ? "blank" : ans.isCorrect ? "ok" : "bad";
-      return { questionId, ans, question: { ...question, imageUrl: media.imageUrl }, options, state, topicName: snapshot?.topic?.name ?? item?.question.topic.name ?? "—" };
+      return { questionId, ans, question, options: question.options, state, topicName: question.topic.name ?? "—" };
     })
     .filter((x): x is NonNullable<typeof x> => x !== null);
   const counts = {
@@ -151,6 +147,7 @@ export default async function TeacherAttemptDetailPage({ params, searchParams }:
         ]}
       />
       {attempt.status === "INVALIDATED" ? <InvalidatedNotice audience="teacher" /> : null}
+      <RegradedNotice regrade={await latestRegrade(attempt.id)} />
 
       {/* Header: title on the left, actions top right (same slot and style as the student profile). */}
       <PageHeader

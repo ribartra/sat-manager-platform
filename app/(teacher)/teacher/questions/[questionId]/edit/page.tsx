@@ -8,6 +8,7 @@ import { getFeatureSetting } from "@/lib/app-settings";
 import { academicTopicWhere, buildTaxonomyTree, taxonomyPathLabel } from "@/lib/taxonomy";
 import { domainSectionLabel, resolvePracticeArea, tabFromPracticeArea } from "@/lib/practice-area";
 import { questionCrumbs } from "@/lib/question-crumbs";
+import { questionAnswerCount } from "@/lib/question-usage";
 
 interface PageProps {
   params: Promise<{ questionId: string }>;
@@ -16,7 +17,7 @@ interface PageProps {
 export default async function EditQuestionPage({ params }: PageProps) {
   const { questionId } = await params;
 
-  const [question, topics, taxonomyNodes, showGraphOption] = await Promise.all([
+  const [question, topics, taxonomyNodes, showGraphOption, answeredCount] = await Promise.all([
     prisma.question.findFirst({
       // Only the bank of a program the teacher teaches.
       where: { id: questionId, ...(await currentContentScope()) },
@@ -33,6 +34,7 @@ export default async function EditQuestionPage({ params }: PageProps) {
     }),
     prisma.taxonomyNode.findMany({ where: { active: true }, orderBy: [{ sortOrder: "asc" }, { label: "asc" }] }),
     getFeatureSetting("QUESTION_GRAPH_VISUALIZATION"),
+    questionAnswerCount(questionId),
   ]);
   const { byId } = buildTaxonomyTree(taxonomyNodes);
 
@@ -48,6 +50,7 @@ export default async function EditQuestionPage({ params }: PageProps) {
       <QuestionEditor
         returnHref={crumbs.questionsHref}
         showGraphOption={showGraphOption}
+        answeredCount={answeredCount}
         initial={{
           id: question.id,
           updatedAt: question.updatedAt.toISOString(),

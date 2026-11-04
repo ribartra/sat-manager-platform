@@ -1,6 +1,6 @@
 import { Alert } from "./alert";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { humanizeCode } from "@/lib/domain-meta";
 
 /**
@@ -37,6 +37,17 @@ export function InvalidatedNotice({ audience }: { audience: "student" | "teacher
       {audience === "student"
         ? "Your teacher set this result aside. You can still review it, but it doesn't count toward your scores."
         : "It stays in the history for reference, but it doesn't count toward scores or reports."}
+    </Alert>
+  );
+}
+
+/** Shown on a results page when an answer key fix graded the attempt again (lib/attempt-regrade.ts). */
+export function RegradedNotice({ regrade }: { regrade: { at: Date; before: string; after: string } | null }) {
+  if (!regrade) return null;
+  return (
+    <Alert tone="note" role="note" title={`Graded again on ${formatDate(regrade.at)}`} className="mb-6">
+      The correct answer of a question was fixed, so this result was updated
+      {regrade.before && regrade.after ? ` (it was ${regrade.before}; now ${regrade.after})` : ""}.
     </Alert>
   );
 }

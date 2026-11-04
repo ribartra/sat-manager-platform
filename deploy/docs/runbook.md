@@ -43,7 +43,8 @@ resumen del run. Desplegar es siempre `make release`.
 
 El entrypoint del contenedor **no arranca si `prisma migrate deploy` falla**, de modo que una
 migración rota termina en rollback automático en lugar de servir código nuevo sobre un esquema
-viejo. Después de la migración corre `scripts/backfill-fpt-snapshots.mjs` (idempotente).
+viejo. Después de la migración aplica los data patches; si aplicó alguno, la app vuelve a calificar
+los intentos entregados al arrancar (`instrumentation.ts`, por si un patch cambió claves).
 
 ### Cambios de datos
 

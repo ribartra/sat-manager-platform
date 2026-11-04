@@ -3,7 +3,6 @@
 // Taxonomy note: the Topic table is the SKILL level (Section → Domain → Skill).
 import { assignmentContextWhere, isAssignmentContext, type AssignmentContext, type ContextView } from "@/lib/assignment-context";
 import prisma from "@/lib/prisma";
-import { Prisma } from "@/app/generated/prisma/client";
 import { snapshotModulesOf } from "@/lib/full-test-snapshot";
 import { scorePercent } from "@/lib/utils";
 import { difficultyLabel } from "@/lib/domain-meta";
@@ -174,35 +173,6 @@ const OPEN_STATUSES = ["PENDING", "IN_PROGRESS", "OVERDUE"];
 /** Question fields the practice report needs (skill, level); never the text. */
 const REPORT_QUESTION = { topicId: true, difficulty: true, topic: { select: { name: true, domainId: true } } } as const;
 
-type SnapshotTaxonomy = { topic?: { id?: string; name?: string }; difficulty?: string };
-
-/**
- * Skill and level each answer had when it was taken (its questionSnapshot), read in SQL with
- * json_extract instead of loading every snapshot. Keyed "attemptId:questionId".
- */
-async function answerSnapshotTaxonomy(attemptIds: readonly string[]): Promise<Map<string, SnapshotTaxonomy>> {
-  const result = new Map<string, SnapshotTaxonomy>();
-  const ids = [...new Set(attemptIds)];
-  for (let start = 0; start < ids.length; start += 500) {
-    const chunk = ids.slice(start, start + 500);
-    const rows = await prisma.$queryRaw<Array<{ attemptId: string; questionId: string; topicId: string | null; topicName: string | null; difficulty: string | null }>>(Prisma.sql`
-      SELECT "attemptId", "questionId",
-             json_extract("questionSnapshot", '$.topic.id') AS "topicId",
-             json_extract("questionSnapshot", '$.topic.name') AS "topicName",
-             json_extract("questionSnapshot", '$.difficulty') AS "difficulty"
-      FROM "AttemptAnswer"
-      WHERE "attemptId" IN (${Prisma.join(chunk)}) AND json_valid("questionSnapshot")
-    `);
-    for (const row of rows) {
-      result.set(`${row.attemptId}:${row.questionId}`, {
-        topic: row.topicId || row.topicName ? { id: row.topicId ?? undefined, name: row.topicName ?? undefined } : undefined,
-        difficulty: row.difficulty ?? undefined,
-      });
-    }
-  }
-  return result;
-}
-
 export async function loadPracticeReport(studentId: string, practiceArea: PracticeAreaCode, filters: ReportFilters): Promise<PracticeReport> {
   const topicId = filters.topic ?? "";
   const difficulty = filters.difficulty ?? "";
@@ -218,8 +188,7 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
         ...dateFilter,
         assignment: { ...contextFilter, practiceSet: { topic: { domain: { practiceArea } } } },
       },
-      // Only what the report reads: no question text and no answer snapshots (each answer's
-      // questionSnapshot is ~2 KB; its skill and level come from answerSnapshotTaxonomy).
+      // Only what the report reads: no question text (skill and level come from REPORT_QUESTION).
       select: {
         id: true,
         status: true,
@@ -274,12 +243,10 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
       select: { totalScore: true, submittedAt: true, test: { select: { name: true } } },
     }),
   ]);
-  const snapshotTaxonomy = await answerSnapshotTaxonomy(historyAttempts.map((attempt) => attempt.id));
-  // Current skill name/domain by id: attempts keep a snapshot of the old names, but a renamed or
-  // moved skill must be reported under its current name and domain (one row, not two).
+  // Current skill name/domain by id: a renamed or moved skill is reported under its current name and domain.
   const currentTopic = new Map(areaTopics.map((topic) => [topic.id, topic]));
 
-  // Question rows use the attempt snapshot (what the student actually saw), filtered by skill/difficulty.
+  // Question rows use the current question's skill and level, filtered by skill/difficulty.
   const rowsForAttempt = (attempt: (typeof historyAttempts)[number]) => {
     const answersByQuestion = new Map(attempt.answers.map((answer) => [answer.questionId, answer]));
     const setQuestions = attempt.assignment?.practiceSet.questions ?? [];
@@ -288,15 +255,14 @@ export async function loadPracticeReport(studentId: string, practiceArea: Practi
       : attempt.answers.map((answer) => ({ question: answer.question, answer }));
     return sources
       .map(({ question, answer }) => {
-        const snapshot = answer ? snapshotTaxonomy.get(`${attempt.id}:${answer.questionId}`) : undefined;
-        const topicId = snapshot?.topic?.id ?? question.topicId;
+        const topicId = question.topicId;
         const current = currentTopic.get(topicId);
         return {
           topicId,
-          topicName: current?.name ?? snapshot?.topic?.name ?? question.topic.name,
+          topicName: current?.name ?? question.topic.name,
           domainId: current?.domainId ?? question.topic.domainId,
           domainName: current?.domain.name ?? "",
-          difficulty: snapshot?.difficulty ?? question.difficulty,
+          difficulty: question.difficulty,
           answer: answer?.answer ?? null,
           isCorrect: answer?.isCorrect === true,
           timeSeconds: answer?.timeSpent ?? 0,

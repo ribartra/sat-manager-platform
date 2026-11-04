@@ -1,4 +1,4 @@
-import { Delta, InvalidatedNotice, PageHeader, PageShell, SectionHeader, VoidableValue } from "@/components/sat";
+import { Delta, InvalidatedNotice, RegradedNotice, PageHeader, PageShell, SectionHeader, VoidableValue } from "@/components/sat";
 import { ContextTag } from "@/components/sat/context-tag";
 import { PAGE_TITLE_CLASS } from "@/components/sat/page-shell";
 import { HEADER_ACTION_CLASS, HeaderActions } from "@/components/sat/header-actions";
@@ -15,7 +15,7 @@ import { scoreBandTextClass } from "@/lib/score-band";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { RotateCcw } from "lucide-react";
-import { parseSnapshot, PracticeSetSnapshot, QuestionSnapshot } from "@/lib/attempt-snapshots";
+import { parseSnapshot, PracticeSetSnapshot } from "@/lib/attempt-snapshots";
 import { difficultyBadgeVariant, difficultyLabel, explanationsInPlayerLabel } from "@/lib/domain-meta";
 import { isAnsweredAnswer, summarizeAllQuestionAnswers } from "@/lib/weighted-score";
 import { Alert } from "@/components/sat/alert";
@@ -27,13 +27,13 @@ import { AnswerGrid, AnswerGridLegend } from "@/components/sat/test-ui";
 import { tabFromPracticeArea, type PracticeAreaCode } from "@/lib/practice-area";
 import { loadStudentPractice, sortPracticeSets } from "@/lib/student-practice";
 import { relativeDay } from "@/lib/utils";
-import { liveImagesOf } from "@/lib/question-media";
 
 interface PageProps {
   params: Promise<{ attemptId: string }>;
   searchParams: Promise<{ area?: string; topic?: string; difficulty?: string; from?: string; to?: string; new?: string }>;
 }
 
+import { latestRegrade } from "@/lib/attempt-regrade";
 export default async function ResultsPage({ params, searchParams }: PageProps) {
   const { attemptId } = await params;
   // The student shown: the signed-in student, or the teacher's Student view (nothing is saved as the student).
@@ -150,6 +150,7 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
       {query.new === "1" ? <Alert tone="success" className="mb-4">Practice submitted. Here are your results.</Alert> : null}
 
       {attempt.status === "INVALIDATED" ? <InvalidatedNotice audience="student" /> : null}
+      <RegradedNotice regrade={await latestRegrade(attempt.id)} />
       {/* Header: title on the left, actions top right (same slot and style for every role). */}
       <PageHeader
         eyebrow={
@@ -297,20 +298,17 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
           <div className="space-y-4">
             {orderedAnswers.map(({ ans, number }) => {
               if (!ans) return null;
-              // Historic attempts render the question as it was when answered (questionSnapshot).
-              const snapshot = parseSnapshot<QuestionSnapshot>(ans.questionSnapshot);
-              const question = snapshot ?? ans.question;
-              // Text and options as answered (snapshot); images from the live bank question (only referenced).
-              const media = liveImagesOf(ans.question, snapshot?.options?.length ? snapshot.options : ans.question.options);
-              const options = media.options;
-              const topicName = snapshot?.topic?.name ?? ans.question.topic.name;
+              // The current question (a fixed answer key re-grades the attempt, lib/attempt-regrade.ts).
+              const question = ans.question;
+              const options = question.options;
+              const topicName = question.topic.name;
               const state = !ans.answer ? "blank" : ans.isCorrect ? "ok" : "bad";
               return (
                 <div key={ans.id} data-q-state={canRevealSolutions ? state : state === "blank" ? "blank" : "answered"}>
                   <ReviewQuestionCard
                     id={`q-${number}`}
                     number={number}
-                    question={{ ...question, options, imageUrl: media.imageUrl }}
+                    question={{ ...question, options }}
                     answer={ans.answer}
                     isCorrect={Boolean(ans.isCorrect)}
                     timeSpent={ans.timeSpent}

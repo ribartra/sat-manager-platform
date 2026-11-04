@@ -10,6 +10,7 @@ import {
 } from "@/lib/full-test-modules";
 import { stripCollegeBoardMetaHeaders, stripIngestImagePlaceholders } from "@/lib/ingest-text-sanitize";
 import { cleanupOfficialQuestionPlaceholders } from "@/lib/ingest-image-cleanup";
+import { regradeQuestions } from "@/lib/attempt-regrade";
 
 type TopicWithRelations = {
   id: string;
@@ -216,7 +217,10 @@ export async function propagateAssignedImageToOfficial(args: {
   } else {
     await prisma.questionOption.create({ data: { questionId, label: optionLabel!, text: "", imageUrl: publicUrl } });
   }
+  const before = await prisma.question.findUnique({ where: { id: questionId }, select: { type: true } });
   await prisma.question.update({ where: { id: questionId }, data: { type: "MC" } });
+  // Attempts store only answers: a question that just became MC re-grades its submitted attempts.
+  if (before && before.type !== "MC") await regradeQuestions([questionId], { reason: "option image attached" });
   return { propagated: true, target: `OPTION ${optionLabel}`, imageUrl: publicUrl };
 }
 

@@ -59,6 +59,7 @@ const ledgerKey = (name) => `DATA_PATCH:${name}`;
 const readLedger = db.prepare("SELECT value FROM AppSetting WHERE key = ?");
 const writeLedger = db.prepare('INSERT INTO AppSetting ("key", "value", "updatedAt") VALUES (?, ?, ?)');
 const totalChanges = db.prepare("SELECT total_changes() AS n");
+const REGRADE_PENDING_KEY = "REGRADE_PENDING";
 const now = () => new Date().toISOString().replace("Z", "+00:00");
 
 const applied = new Map();
@@ -135,4 +136,10 @@ for (const patch of pending) {
   }
 }
 if (mode === "apply" && db.pragma("quick_check", { simple: true }) !== "ok") fail("quick_check failed after applying patches");
+// A patch may have changed answer keys: the app re-grades submitted attempts on its next start
+// (instrumentation.ts → lib/attempt-regrade.ts) and then clears this flag.
+if (mode === "apply") {
+  db.prepare('INSERT INTO AppSetting ("key", "value", "updatedAt") VALUES (?, ?, ?) ON CONFLICT("key") DO UPDATE SET "value" = excluded."value", "updatedAt" = excluded."updatedAt"')
+    .run(REGRADE_PENDING_KEY, JSON.stringify({ patches: pending.map((patch) => patch.name) }), now());
+}
 log(mode === "dry" ? `${pending.length} pending patch(es) checked` : `${pending.length} patch(es) applied`);

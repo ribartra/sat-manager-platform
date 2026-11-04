@@ -127,6 +127,7 @@ export function QuestionEditor({
   sourceContext,
   showGraphOption = false,
   returnHref = "/teacher/questions",
+  answeredCount = 0,
 }: {
   topics: TopicInfo[];
   initial?: QuestionData;
@@ -135,6 +136,8 @@ export function QuestionEditor({
   returnHref?: string;
   /** Admin feature flag: QUESTION_GRAPH_VISUALIZATION */
   showGraphOption?: boolean;
+  /** Times students answered this question (lib/question-usage.ts): fixes reach their attempts. */
+  answeredCount?: number;
 }) {
   const router = useRouter();
   // Subskill is hidden in the editor (unused in the source taxonomy); keep any
@@ -303,6 +306,13 @@ export function QuestionEditor({
               Duplicate
             </Button>
           </div>
+        ) : null}
+        {answeredCount > 0 ? (
+          <Alert tone="warning" title={`Students answered this question ${answeredCount} ${answeredCount === 1 ? "time" : "times"}`}>
+            Their tries always show the current question: fixing the text, images or explanation updates them, and a new
+            correct answer grades them again. Keep the same type and keep each choice on its letter. To make a different
+            question or reorder the choices, use Duplicate.
+          </Alert>
         ) : null}
         <FormSection title="Classification">
           <FormField

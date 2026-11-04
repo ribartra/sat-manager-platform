@@ -40,8 +40,48 @@ export type FullTestSaveBody = ReviewMetaInput & {
   timeSpentByQuestion?: unknown;
 };
 
+type GradableModule = Awaited<ReturnType<typeof fullTestModulesForAttempt>>[number];
+
+/**
+ * Pure grading of a Test: each question against the current answer key, and the raw counts per
+ * section (pretest items excluded when `excludePretest`). Shared by submit and by re-grading after a
+ * key fix (lib/attempt-regrade.ts).
+ */
+export function gradeFullTestModules(modules: GradableModule[], answers: Record<string, string>, excludePretest: boolean) {
+  let rwCorrect = 0;
+  let rwTotal = 0;
+  let mathCorrect = 0;
+  let mathTotal = 0;
+  const graded: { questionId: string; moduleId: string; answer: string; isCorrect: boolean }[] = [];
+  for (const testModule of modules) {
+    for (const item of testModule.questions) {
+      const answer = (answers?.[item.questionId] ?? "") as string;
+      const isCorrect = isAnswerCorrect(answer, item.question.correctAnswer, resolveQuestionType(item.question.type, item.question.options));
+      const countsTowardScore = !excludePretest || !item.isPretest;
+      if (countsTowardScore) {
+        if (testModule.section === "MATH") {
+          mathTotal += 1;
+          if (isCorrect) mathCorrect += 1;
+        } else {
+          rwTotal += 1;
+          if (isCorrect) rwCorrect += 1;
+        }
+      }
+      graded.push({ questionId: item.questionId, moduleId: testModule.id, answer, isCorrect });
+    }
+  }
+  return { graded, raw: { rwCorrect, rwTotal, mathCorrect, mathTotal } };
+}
+
+/** Section scores (200–800 each) from the raw counts. */
+export async function fullTestScores(raw: { rwCorrect: number; rwTotal: number; mathCorrect: number; mathTotal: number }) {
+  const rwScore = await scaledScore("RW", raw.rwCorrect, raw.rwTotal);
+  const mathScore = await scaledScore("MATH", raw.mathCorrect, raw.mathTotal);
+  return { rwScore, mathScore, totalScore: rwScore + mathScore };
+}
+
 async function attemptModules(attempt: AttemptRow) {
-  // Grade/render the exam this attempt started with (RNF-17 snapshot), not the live exam.
+  // The exam structure this attempt started with (RNF-17), with the current question content.
   return fullTestModulesForAttempt(attempt);
 }
 
@@ -179,37 +219,11 @@ export async function finalizeFullTestAttempt(input: {
   for (const id of lockedQuestionIds) allowedIds.delete(id);
   const { byQuestion: reviewMeta, markedIds } = reviewMetaByQuestion(body, allowedIds);
 
-  let rwCorrect = 0;
-  let rwTotal = 0;
-  let mathCorrect = 0;
-  let mathTotal = 0;
-  const graded: { questionId: string; moduleId: string; answer: string; isCorrect: boolean; isLocked: boolean }[] = [];
-  for (const testModule of modules) {
-    for (const item of testModule.questions) {
-      const answer = (answers?.[item.questionId] ?? "") as string;
-      const isCorrect = isAnswerCorrect(
-        answer,
-        item.question.correctAnswer,
-        resolveQuestionType(item.question.type, item.question.options),
-      );
-      const countsTowardScore = !excludePretest || !item.isPretest;
-      if (countsTowardScore) {
-        if (testModule.section === "MATH") {
-          mathTotal += 1;
-          if (isCorrect) mathCorrect += 1;
-        } else {
-          rwTotal += 1;
-          if (isCorrect) rwCorrect += 1;
-        }
-      }
-      graded.push({ questionId: item.questionId, moduleId: testModule.id, answer, isCorrect, isLocked: lockedQuestionIds.has(item.questionId) });
-    }
-  }
+  const { graded: gradedRows, raw } = gradeFullTestModules(modules, answers, excludePretest);
+  const graded = gradedRows.map((row) => ({ ...row, isLocked: lockedQuestionIds.has(row.questionId) }));
 
-  const rwScore = await scaledScore("RW", rwCorrect, rwTotal);
-  const mathScore = await scaledScore("MATH", mathCorrect, mathTotal);
-  const scores = { rwScore, mathScore, totalScore: rwScore + mathScore };
-  const raw = { rwCorrect, rwTotal, mathCorrect, mathTotal };
+  const scores = await fullTestScores(raw);
+  const { rwScore, mathScore } = scores;
   const submittedAt = new Date();
 
   // One transaction: every graded answer + the IN_PROGRESS → SUBMITTED transition. Only the request

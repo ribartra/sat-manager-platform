@@ -3,7 +3,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { SECTION_TEXT } from "@/components/sat/test-ui";
 import { notFound } from "next/navigation";
-import { AttemptStatusBadge, InvalidatedNotice, PageHeader, PageShell, TestResultSentence } from "@/components/sat";
+import { AttemptStatusBadge, InvalidatedNotice, RegradedNotice, PageHeader, PageShell, TestResultSentence } from "@/components/sat";
 import { PAGE_TITLE_CLASS } from "@/components/sat/page-shell";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -38,6 +38,7 @@ interface PageProps {
  * students retake Tests on their own). Every try of the Test is listed in the profile and History.
  * An open attempt shows only the modules the student already submitted.
  */
+import { latestRegrade } from "@/lib/attempt-regrade";
 export default async function TeacherFullTestAttemptPage({ params, searchParams }: PageProps) {
   const { studentId, attemptId } = await params;
   const filters = progressFiltersFromParams(await searchParams);
@@ -116,6 +117,7 @@ export default async function TeacherFullTestAttemptPage({ params, searchParams 
         ]}
       />
       {attempt.status === "INVALIDATED" ? <InvalidatedNotice audience="teacher" /> : null}
+      <RegradedNotice regrade={await latestRegrade(attempt.id)} />
 
       {/* Header: same structure as a practice attempt (chips, title, tries, item line, info line). */}
       <PageHeader
