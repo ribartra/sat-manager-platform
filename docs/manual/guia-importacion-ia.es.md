@@ -7,8 +7,6 @@ Esta guía explica cómo cargar **contenido nuevo** con ayuda de una IA externa 
 
 También explica cómo **refinar** lo cargado y **mantener** después los sets, Tests y preguntas.
 
-> Los pasos que se hacen en la IA externa, o que dependen de su resultado, se marcan con **[CAPTURA PENDIENTE: …]**. Ahí falta añadir la captura real cuando se haga la primera importación.
-
 ## Contenido
 
 1. [Quién puede importar y qué se necesita](#1-quién-puede-importar-y-qué-se-necesita)
@@ -45,9 +43,9 @@ En el paso 1 **cada archivo va en una casilla**. Lo que la plataforma sabe de ca
 
 Normalmente tienes **un PDF de preguntas** del nivel y **un archivo de respuestas y explicaciones** de ese mismo nivel.
 
-| Archivo (ejemplo) | Qué contiene | Casilla del paso 1 |
-|---|---|---|
-| `NON LINEAR FUNCTIONS HARD.pdf` | Las preguntas del nivel Hard | **Questions PDF** |
+| Archivo (ejemplo)                | Qué contiene                            | Casilla del paso 1         |
+| -------------------------------- | --------------------------------------- | -------------------------- |
+| `NON LINEAR FUNCTIONS HARD.pdf`  | Las preguntas del nivel Hard            | **Questions PDF**          |
 | `ANS NON LINEAR FUNCT HARD .pdf` | Respuestas y explicaciones de ese nivel | **Answers / explanations** |
 
 ### Test
@@ -61,24 +59,24 @@ Cada bandeja tiene además su casilla **Answers / explanations**, para las respu
 
 Ejemplo, TEST 9:
 
-| Archivo | Qué contiene | Dónde va |
-|---|---|---|
-| `TEST 9 RW MOD 1, 2, REV PDF.pdf` | R&W, Módulo 1 y Módulo 2 | Bandeja **Reading and Writing** · **One file, Module 1 + 2** |
-| `Test9_RW_Answer_Explanations FINAL.docx` | Explicaciones de R&W | Bandeja **Reading and Writing** · **Answers / explanations** |
-| `TEST 9 MATH MOD 1, 2B.pdf` | Math, Módulo 1 y Módulo 2 (2B "harder") | Bandeja **Math** · **One file, Module 1 + 2** |
-| `Test9_Math ANS Explanations.docx` | Explicaciones de Math | Bandeja **Math** · **Answers / explanations** |
-| `Test 9 Ans Key.docx` | Clave de los 4 módulos | **Answer key for the whole Test** |
+| Archivo                                   | Qué contiene                            | Dónde va                                                     |
+| ----------------------------------------- | --------------------------------------- | ------------------------------------------------------------ |
+| `TEST 9 RW MOD 1, 2, REV PDF.pdf`         | R&W, Módulo 1 y Módulo 2                | Bandeja **Reading and Writing** · **One file, Module 1 + 2** |
+| `Test9_RW_Answer_Explanations FINAL.docx` | Explicaciones de R&W                    | Bandeja **Reading and Writing** · **Answers / explanations** |
+| `TEST 9 MATH MOD 1, 2B.pdf`               | Math, Módulo 1 y Módulo 2 (2B "harder") | Bandeja **Math** · **One file, Module 1 + 2**                |
+| `Test9_Math ANS Explanations.docx`        | Explicaciones de Math                   | Bandeja **Math** · **Answers / explanations**                |
+| `Test 9 Ans Key.docx`                     | Clave de los 4 módulos                  | **Answer key for the whole Test**                            |
 
 Si una sección viene **en un archivo por módulo** (por ejemplo `Math Module 1.pdf` y `Math Module 2.pdf`), elige **One file per module** en esa bandeja y pon cada archivo en su casilla.
 
 Un Test de la plataforma tiene **4 módulos** con un número fijo de preguntas:
 
-| Módulo | Preguntas |
-|---|---|
-| Reading and Writing, Module 1 (RW1) | 27 |
-| Reading and Writing, Module 2 (RW2) | 27 |
-| Math, Module 1 (MATH1) | 22 |
-| Math, Module 2 (MATH2) | 22 |
+| Módulo                              | Preguntas |
+| ----------------------------------- | --------- |
+| Reading and Writing, Module 1 (RW1) | 27        |
+| Reading and Writing, Module 2 (RW2) | 27        |
+| Math, Module 1 (MATH1)              | 22        |
+| Math, Module 2 (MATH2)              | 22        |
 
 **Casos especiales:**
 
@@ -128,16 +126,17 @@ Ejemplo: *Advanced Math › Nonlinear Functions › Hard*, fuente College Board.
 ### Paso 2 — AI file
 
 1. Pulsa **Copy prompt**. El prompt ya dice la sección, el dominio, la habilidad y el nivel. Con **See the prompt** puedes leerlo.
-2. Abre tu IA, adjunta **los dos PDF** del paso 1, pega el prompt y envíalo.
 
+2. Abre tu IA, adjunta **los dos PDF** del paso 1, pega el prompt y envíalo.
+   
    [CAPTURA PENDIENTE: chat de la IA con los dos PDF adjuntos y el prompt pegado]
 
 3. La IA devuelve un archivo **import.csv**. Descárgalo. Si solo muestra texto, pídele "send it as a downloadable file".
-
+   
    [CAPTURA PENDIENTE: la IA entregando import.csv]
 
 4. En la plataforma, en **Upload the CSV**, elige el archivo. Verás una **vista previa**: filas, cuántas se pueden importar, cuántas están listas y cuáles tienen errores o avisos (sección 6).
-
+   
    [CAPTURA PENDIENTE: vista previa del CSV del set]
 
 5. Si está bien, pulsa **Import N questions**. Si no, pulsa **Cancel**, pide a la IA que corrija el CSV y súbelo otra vez. Hasta crear el Draft puedes cambiarlo con **Replace with a new CSV**.
@@ -145,8 +144,9 @@ Ejemplo: *Advanced Math › Nonlinear Functions › Hard*, fuente College Board.
 ### Paso 3 — Review & Draft
 
 1. Refina las preguntas en **Open Review (edit and crop)** (sección 7).
-2. Pulsa **Create Draft Practice Set**. Se crea el set *Advanced Math - Nonlinear Functions - HARD* en **Draft** y se abre su editor.
 
+2. Pulsa **Create Draft Practice Set**. Se crea el set *Advanced Math - Nonlinear Functions - HARD* en **Draft** y se abre su editor.
+   
    [CAPTURA PENDIENTE: el Draft del set recién creado]
 
 3. Publícalo (sección 8).
@@ -161,8 +161,11 @@ Ejemplo: **TEST 9**, fuente Innovator. El Test se crea una vez y se llena **un m
 2. **Test number**: `9`. **Test name** se llena solo con "TEST 9" (es lo que ven los alumnos).
 3. **Source**: Innovator.
 4. Bandeja **Reading and Writing**:
+   
    - en **Questions come as** deja **One file, Module 1 + 2**;
+   
    - en **Questions (Module 1 + 2)**, el PDF de R&W;
+   
    - en **Answers / explanations**, las explicaciones de R&W.
 5. Bandeja **Math**: lo mismo con el PDF de Math y sus explicaciones. Si Math viniera en dos archivos, elige **One file per module** y usa **Module 1 questions** y **Module 2 questions**.
 6. En **Answer key for the whole Test**, la clave de respuestas única (`Test 9 Ans Key.docx`).
@@ -179,22 +182,23 @@ El paso 2 muestra **4 tarjetas**, una por módulo. Cada tarjeta dice cuántas pr
 Para **cada módulo**, en este orden: R&W 1 → R&W 2 → Math 1 → Math 2:
 
 1. Pulsa **Copy prompt (RW1)** (o el del módulo). El prompt le dice a la IA **qué módulo** sacar del PDF, cuántas preguntas debe tener y que ignore el otro módulo.
-
+   
    ![El prompt de un módulo](img/ai-step2-prompt.png)
 
 2. Abre **una conversación nueva** en tu IA. Adjunta **los archivos de "Give the AI"** de la tarjeta, pega el prompt y envíalo.
-
-   [CAPTURA PENDIENTE: chat de la IA con el PDF de R&W, los Word y el prompt de RW1]
+   
+   ![Chat de la IA con el PDF de R&W, los Word de explicaciones y clave, y el prompt de RW1 pegado](img/ai-test-chat-rw1.png)
 
 3. Descarga el **import.csv** que devuelve.
-
-   [CAPTURA PENDIENTE: la IA entregando el import.csv de RW1]
+   
+   ![La IA entrega import.csv (27 filas) y explica sus notas](img/ai-test-csv-rw1.png)
 
 4. En la tarjeta del módulo, en **Upload the CSV**, elige el archivo y revisa la vista previa. **Fíjate en el número de preguntas.** Si no coincide (por ejemplo 21 de 22), la vista previa avisa: "This module should have 22 questions and the CSV brings 21". Pide a la IA que revise qué pregunta saltó o si mezcló módulos.
-
-   [CAPTURA PENDIENTE: vista previa del CSV de RW1 con 27 filas]
+   
+   ![Vista previa del CSV de RW1: 27 filas, 27 se pueden importar](img/ai-test-preview-rw1.png)
 
 5. Pulsa **Import N questions**. La tarjeta pasa a **27/27 loaded**.
+
 6. Sigue con el siguiente módulo.
 
 > **Rehacer un módulo:** mientras el módulo no esté en el Draft, sube otro CSV con **Replace with a new CSV**. Solo se reemplaza **ese** módulo; los demás no se tocan.
@@ -204,14 +208,21 @@ Para **cada módulo**, en este orden: R&W 1 → R&W 2 → Math 1 → Math 2:
 ### Paso 3 — Refinar y armar el Draft del Test
 
 1. Refina cada módulo (sección 7). Hay un botón de revisión por archivo de preguntas: **Review Reading and Writing** y **Review Math** (o **Review Math · Module 1** y **· Module 2** si Math vino en dos archivos). Cada uno abre su PDF, para recortar las figuras de ahí.
+
 2. Cuando tengas módulos listos, pulsa **Create Draft Test**. Se crea **TEST 9** en Draft con los módulos cargados hasta ese momento.
+   
+   ![Paso 3 con los 4 módulos cargados y Create Draft Test](img/ai-test-step3-loaded.png)
 
-   [CAPTURA PENDIENTE: paso 3 del Test con los módulos cargados]
+3. ¿Quedaron preguntas fuera del Draft (por revisar) o cargaste más módulos después? Vuelve a la importación y, en el paso 3, pulsa **Add N questions to the Draft**. Se agregan a su módulo dentro del mismo TEST 9, sin repetir lo que ya estaba. Si todavía quedan preguntas por revisar, te pregunta si agregar solo las listas.
+   
+   ![Paso 3 después de un Draft parcial: Add 16 questions to the Draft y Open the Draft](img/ai-test-add-to-draft.png)
 
-3. ¿Cargaste más módulos después? Vuelve a la importación (paso 2, el módulo siguiente) y, en el paso 3, pulsa **Add N questions to the Draft**. Se agregan a su módulo dentro del mismo TEST 9, sin repetir lo que ya estaba.
+   Para volver a la importación tienes tres caminos: **Import with AI › Imports in progress** ("Draft created · N questions not in it yet" › **Continue**), el aviso de **Tests** y el aviso **Created with Import with AI** en la página del Test (**Continue the import**). Aparecen mientras el Test sea Draft y le falten preguntas.
+
 4. Cuando el Draft tenga los 4 módulos completos (27 / 27 / 22 / 22), publícalo (sección 8).
 
 > **Refina antes de llevar un módulo al Draft.** Un módulo que ya está en el Draft no acepta otro CSV. Después:
+> 
 > - los **recortes de figuras** en **Review** siguen pasando a sus preguntas del Draft;
 > - los **textos, opciones y respuestas** se corrigen en el editor de la pregunta (desde el editor del Test o el **Question Bank**);
 > - el **orden** o **quitar** preguntas se hace en el editor del Test.
@@ -226,20 +237,20 @@ El prompt ya le explica todo esto a la IA. Esta sección sirve para revisar o co
 number,module,domain,skill,difficulty,type,stimulus,stem,optionA,optionB,optionC,optionD,correctAnswer,explanation,figure,figurePage,notes
 ```
 
-| Columna | Qué lleva |
-|---|---|
-| `number` | Número de la pregunta tal como aparece en el PDF. En un Test empieza en 1 en cada módulo. |
-| `module` | Vacío: el módulo lo da la tarjeta donde subes el CSV. |
-| `domain`, `skill`, `difficulty` | Practice Set: los valores elegidos en el paso 1. En Tests van vacíos. |
-| `type` | `MC` (4 opciones) o `NUMERIC` (respuesta escrita). |
-| `stimulus` | El texto, pasaje o tabla al que se refiere la pregunta. Vacío si no hay. |
-| `stem` | La pregunta en sí, sin las opciones. |
-| `optionA` … `optionD` | El texto de cada opción, sin la letra. Vacío en `NUMERIC`. |
-| `correctAnswer` | `MC`: una letra A–D. `NUMERIC`: el valor (`7/2` o `3.5`); varias respuestas válidas separadas por `\|`, por ejemplo `7/2\|3.5`. |
-| `explanation` | La explicación de los archivos de respuestas. Vacía si no hay (no se inventa). |
-| `figure` | Dónde hay una figura que no se puede escribir como texto: `NONE`, `STEM`, `STIMULUS` u `OPTIONS`. |
-| `figurePage` | Página del PDF donde está la figura (1 = primera). |
-| `notes` | Dudas de la IA (texto ilegible, respuesta faltante…). |
+| Columna                         | Qué lleva                                                                                                                       |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `number`                        | Número de la pregunta tal como aparece en el PDF. En un Test empieza en 1 en cada módulo.                                       |
+| `module`                        | Vacío: el módulo lo da la tarjeta donde subes el CSV.                                                                           |
+| `domain`, `skill`, `difficulty` | Practice Set: los valores elegidos en el paso 1. En Tests van vacíos.                                                           |
+| `type`                          | `MC` (4 opciones) o `NUMERIC` (respuesta escrita).                                                                              |
+| `stimulus`                      | El texto, pasaje o tabla al que se refiere la pregunta. Vacío si no hay.                                                        |
+| `stem`                          | La pregunta en sí, sin las opciones.                                                                                            |
+| `optionA` … `optionD`           | El texto de cada opción, sin la letra. Vacío en `NUMERIC`.                                                                      |
+| `correctAnswer`                 | `MC`: una letra A–D. `NUMERIC`: el valor (`7/2` o `3.5`); varias respuestas válidas separadas por `\|`, por ejemplo `7/2\|3.5`. |
+| `explanation`                   | La explicación de los archivos de respuestas. Vacía si no hay (no se inventa).                                                  |
+| `figure`                        | Dónde hay una figura que no se puede escribir como texto: `NONE`, `STEM`, `STIMULUS` u `OPTIONS`.                               |
+| `figurePage`                    | Página del PDF donde está la figura (1 = primera).                                                                              |
+| `notes`                         | Opcional. Solo lo que una persona debe revisar (texto ilegible o cortado, respuesta faltante o dudosa…). Vacío si todo está bien. |
 
 **Matemáticas y formato:**
 
@@ -277,11 +288,14 @@ El paso 3 lista las preguntas cargadas (en un Test, con su módulo: `RW1 · 3`, 
 Para refinar:
 
 1. Pulsa **Open Review (edit and crop)**. En un Test, el **Review** del archivo de esa pregunta. También puedes pulsar el texto de una pregunta en la tabla.
-2. Corrige el texto, las opciones, la respuesta o la explicación.
-3. Si tiene figura: **Crop** sobre la página del PDF y asígnala a la pregunta, al pasaje o a una opción. La columna `figurePage` del CSV dice en qué página está.
-4. Marca la pregunta como **Reviewed**.
 
-   [CAPTURA PENDIENTE: Review con el recorte de una figura del PDF]
+2. Corrige el texto, las opciones, la respuesta o la explicación.
+
+3. Si tiene figura: **Crop** sobre la página del PDF y asígnala a la pregunta, al pasaje o a una opción. La columna `figurePage` del CSV dice en qué página está. Al asignarla, el aviso "Figure in …: crop it" desaparece y, si era lo único pendiente, la pregunta queda **Ready** sola.
+
+4. Marca la pregunta como **Reviewed**.
+   
+   ![Crop page region: la página 26 del PDF con el gráfico seleccionado para la pregunta](img/ai-review-crop.png)
 
 > Haz estas correcciones **antes de crear el Draft** (o, en un Test, antes de añadir el módulo al Draft). Después, los recortes de figuras siguen pasando al Draft, pero los textos y respuestas se corrigen en el editor de la pregunta (sección 9).
 
@@ -289,10 +303,12 @@ Solo entran al Draft las preguntas **Ready** o **Reviewed**. Si quedan otras, la
 
 **Muchas figuras: Reprocess with AI (artifacts and images).** En el paso 2 puedes pedirle a la IA que recorte las figuras por ti:
 
-1. Descarga el zip (PDF original, cada página como imagen, las preguntas y los prompts).
-2. Pulsa **Copy image prompt** y dáselo a la IA junto con el zip.
-3. La IA devuelve un zip de imágenes con nombres como `Q3_STEM.png` o `Q5_A.png` (en Tests: `RW1_Q3_STEM.png`, `MATH2_Q12_A.png`).
-4. Súbelo con **Upload images (zip)**: cada imagen va a su pregunta.
+1. Descarga el zip con **Download artifacts (zip)**: trae el PDF original, cada página como imagen (para ubicar las figuras), un `pages.json` con las medidas de cada página y las preguntas.
+2. Baja el prompt con **Download PROMPT-images.md** (o **Copy image prompt**) y dáselo a la IA junto con el zip. Funciona mejor con un asistente que pueda ver imágenes y ejecutar código (por ejemplo, un asistente de código en la terminal).
+3. La IA devuelve un zip. La forma recomendada es un `crops.json` que solo dice **dónde** está cada figura (pregunta, página y recuadro): la plataforma recorta cada una desde el PDF original, en la mejor calidad que el PDF permite. También puede devolver imágenes con nombres como `Q3_STEM.png` o `Q5_A.png` (en Tests: `RW1_Q3_STEM.png`, `MATH2_Q12_A.png`).
+4. Súbelo con **Upload images (zip)**: cada figura va a su pregunta. Las preguntas que solo esperaban su figura quedan **Ready** y entran al Draft con **Add N questions to the Draft**.
+
+> **Calidad:** si el PDF es una captura de pantalla, la figura sale con la resolución de esa captura; no se amplía porque eso inventa detalle. Las figuras dibujadas en el PDF (vectoriales) salen nítidas a cualquier tamaño.
 
 [CAPTURA PENDIENTE: panel "Reprocess with AI" con el zip de imágenes subido]
 
@@ -347,7 +363,7 @@ Usa `$…$` para las matemáticas, igual que en el CSV.
 
 ![Editor de una pregunta](img/maint-question-editor.png)
 
-> Corregir una pregunta **no cambia los resultados anteriores**: cada intento guarda una copia de las preguntas tal como estaban al entregarlo.
+> Corregir una pregunta **también corrige los intentos**: los resultados muestran siempre la pregunta actual. Si cambias la respuesta correcta, los intentos ya entregados se recalculan solos (correcta/incorrecta y puntaje).
 
 ### Estados
 
