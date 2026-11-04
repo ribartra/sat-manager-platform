@@ -90,3 +90,4 @@ scratchpad/
 
 # Local recordings (meetings, demos) stay out of the repo.
 /*.m4a
+docs/manual/word/
