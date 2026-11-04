@@ -143,6 +143,8 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
             items={[
               ...gaps.filter((gap) => pageTests.has(gap.key)).map(({ sourceId, ...gap }) => ({
                 ...gap,
+                // An import in progress for this TEST N: open, so "Continue TEST N import" is in sight.
+                open: canImport && Boolean(openImportFor(sourceId, gap.number)),
                 node: (
                   <div className="flex flex-wrap items-center gap-3 rounded-[10px] border border-dashed border-gray-300 bg-white px-4 py-2.5 text-sm text-[var(--sat-muted)]">
                     <span title={`${gap.sourceName} has no TEST ${gap.number} yet`}>—</span>
