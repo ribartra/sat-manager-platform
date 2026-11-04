@@ -22,6 +22,7 @@ import { difficultyLabel } from "@/lib/domain-meta";
 import { practiceAreaLabel, type PracticeAreaCode } from "@/lib/practice-area";
 import { QuickImportWorkspace, type ModuleCardInfo, type QuickQuestionRow } from "./quick-import-workspace";
 import { ImportSteps } from "@/components/sat/import-steps";
+import { imagePromptFor } from "@/lib/import-media.server";
 
 /**
  * "Import with AI", steps 2 and 3: copy the prompt, upload the CSV the AI made (and, to reprocess,
@@ -169,6 +170,7 @@ export default async function QuickImportBatchPage({ params }: { params: Promise
         rows={rows}
         reviewLinks={reviewLinks}
         draftHref={artifact ? (artifact.artifactType === "PRACTICE_SET" ? `/teacher/practice-sets/${artifact.artifactId}?edit` : `/teacher/tests/${artifact.artifactId}?edit`) : null}
+        imagePrompt={imagePromptFor(candidates.filter((c) => c.status !== "REJECTED"))}
       />
     </PageShell>
   );

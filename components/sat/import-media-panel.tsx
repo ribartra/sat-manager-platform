@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Copy, Download, Upload } from "lucide-react";
+import { Check, Copy, Download, FileText, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { InlineError } from "@/components/sat/alert";
 import { apiFetch, errorMessage } from "@/lib/api-client";
@@ -50,6 +50,19 @@ export function ImportMediaPanel({
     }
   }
 
+  // The image prompt as a file, to attach it to the AI chat next to the zip.
+  function downloadPrompt() {
+    if (!imagePrompt) return;
+    const url = URL.createObjectURL(new Blob([imagePrompt], { type: "text/markdown;charset=utf-8" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "PROMPT-images.md";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
   async function copy() {
     if (!imagePrompt) return;
     try {
@@ -75,9 +88,14 @@ export function ImportMediaPanel({
           </a>
         </Button>
         {imagePrompt ? (
-          <Button type="button" variant="secondary" onClick={copy}>
-            {copied ? <Check size={14} /> : <Copy size={14} />} {copied ? "Prompt copied" : "Copy image prompt"}
-          </Button>
+          <>
+            <Button type="button" variant="secondary" onClick={downloadPrompt}>
+              <FileText size={14} /> Download PROMPT-images.md
+            </Button>
+            <Button type="button" variant="secondary" onClick={copy}>
+              {copied ? <Check size={14} /> : <Copy size={14} />} {copied ? "Prompt copied" : "Copy image prompt"}
+            </Button>
+          </>
         ) : null}
         <label
           className={cn(

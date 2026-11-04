@@ -80,6 +80,7 @@ export function QuickImportWorkspace({
   rows,
   reviewLinks,
   draftHref,
+  imagePrompt,
 }: {
   batchId: string;
   kind: "PRACTICE_SET" | "FULL_PRACTICE_TEST";
@@ -89,6 +90,8 @@ export function QuickImportWorkspace({
   rows: QuickQuestionRow[];
   reviewLinks: Array<{ label: string; href: string }>;
   draftHref: string | null;
+  /** The prompt for the images (also PROMPT-images.md in the artifacts zip). */
+  imagePrompt?: string;
 }) {
   const router = useRouter();
   const confirm = useConfirm();
@@ -192,6 +195,7 @@ export function QuickImportWorkspace({
               artifactsHref={`/api/import/quick/${batchId}/artifacts`}
               imagesUrl={`/api/import/quick/${batchId}/images`}
               isTest={kind === "FULL_PRACTICE_TEST"}
+              imagePrompt={rows.length ? imagePrompt : undefined}
               disabledReason={rows.length ? null : "Load the CSV first."}
             />
           </div>
