@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { signOut, useSession } from "next-auth/react";
-import { SESSION_IDLE_MS, signOutCallbackUrl } from "@/lib/session-policy";
+import { rememberResumePage, rememberSessionUser, SESSION_IDLE_MS, signOutCallbackUrl } from "@/lib/session-policy";
 
 const MOVE_THROTTLE_MS = 1000;
 const HEALTH_MS = 45_000;
@@ -10,6 +10,7 @@ const HEALTH_MS = 45_000;
 const LAST_ACTIVITY_KEY = "sat:lastActivity";
 
 function endSession(reason: "idle" | "session") {
+  rememberResumePage();
   void signOut({ callbackUrl: signOutCallbackUrl(reason) });
 }
 
@@ -34,10 +35,16 @@ function writeSharedActivity(at: number) {
  * session health check. Activity in another tab postpones this tab's sign-out.
  */
 export function useSessionGuards() {
-  const { status } = useSession();
+  const { status, data } = useSession();
+  const userId = data?.user?.id;
   const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastMove = useRef(0);
   const lastLocal = useRef(0);
+
+  // Who is signed in here: an automatic sign-out reopens the page only for this same account.
+  useEffect(() => {
+    if (status === "authenticated" && userId) rememberSessionUser(userId);
+  }, [status, userId]);
 
   useEffect(() => {
     if (status !== "authenticated") return;

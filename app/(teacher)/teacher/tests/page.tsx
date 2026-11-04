@@ -18,6 +18,7 @@ import { TestActionsMenu } from "./test-actions-menu-client";
 import { HEADER_ACTION_CLASS, HEADER_SHORTCUT_CLASS, HeaderActions } from "@/components/sat/header-actions";
 import { suggestionValues } from "@/lib/search-suggestions";
 import { ACTIVE_SOURCE_WHERE } from "@/lib/content-source";
+import { openQuickImports } from "@/lib/quick-import.server";
 
 interface PageProps {
   searchParams: Promise<{ view?: string; page?: string; q?: string }>;
@@ -32,7 +33,12 @@ interface PageProps {
 export default async function TeacherTestsPage({ searchParams }: PageProps) {
   const session = await auth();
   // Admin and master teacher import Tests with AI; a Tests source without a TEST N offers "+ Import TEST N".
-  const canImport = Boolean(await requireContentImporter());
+  const importer = await requireContentImporter();
+  const canImport = Boolean(importer);
+  // A TEST N already being imported (saved, no Draft yet): its gap offers "Continue TEST N", not a new import.
+  const openImports = importer ? await openQuickImports(importer.user) : [];
+  const openImportFor = (sourceId: string, number: number) =>
+    openImports.find((item) => item.kind === "FULL_PRACTICE_TEST" && item.sourceId === sourceId && item.testNumber === number);
   const now = new Date();
   const query = await searchParams;
   // The students × tests matrix was replaced by the per-test page (mockup); old links land here.
@@ -140,7 +146,15 @@ export default async function TeacherTestsPage({ searchParams }: PageProps) {
                 node: (
                   <div className="flex flex-wrap items-center gap-3 rounded-[10px] border border-dashed border-gray-300 bg-white px-4 py-2.5 text-sm text-[var(--sat-muted)]">
                     <span title={`${gap.sourceName} has no TEST ${gap.number} yet`}>—</span>
-                    {canImport ? (
+                    {canImport && openImportFor(sourceId, gap.number) ? (
+                      <Link
+                        href={openImportFor(sourceId, gap.number)!.href}
+                        title={`${gap.sourceName} TEST ${gap.number} import started: continue it`}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--sat-primary)] bg-[var(--sat-primary-soft)] px-2.5 py-[5px] text-xs font-semibold text-[var(--sat-primary)] hover:underline"
+                      >
+                        Continue TEST {gap.number} import
+                      </Link>
+                    ) : canImport ? (
                       <Link
                         href={`/teacher/import?${new URLSearchParams({ kind: "FULL_PRACTICE_TEST", source: sourceId, number: String(gap.number) }).toString()}`}
                         title={`Import ${gap.sourceName} TEST ${gap.number} with AI`}

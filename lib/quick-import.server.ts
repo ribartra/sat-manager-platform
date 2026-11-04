@@ -26,3 +26,62 @@ export async function loadQuickBatch(batchId: string, user: { id: string; role: 
   };
   return { batch, target, files, questionFile, moduleFile };
 }
+
+export type OpenQuickImport = {
+  id: string;
+  href: string;
+  createdAt: Date;
+  kind: "PRACTICE_SET" | "FULL_PRACTICE_TEST";
+  /** "Innovator · TEST 9" or "Linear Equations in Two Variables · Easy" (with the source). */
+  label: string;
+  sourceId: string | null;
+  testNumber: number | null;
+  topicId: string | null;
+  difficulty: string | null;
+  questionsLoaded: number;
+};
+
+/**
+ * "Import with AI" runs still open: created by this user (admin: anyone) and with no Draft yet (the
+ * promotion artifact `quick:<batchId>`). Everything is saved as it goes, so an import interrupted by a
+ * sign-out is continued from here (Step 1, the Tests "TEST N" gap) instead of starting a second one.
+ */
+export async function openQuickImports(user: { id: string; role: string }): Promise<OpenQuickImport[]> {
+  const batches = await prisma.ingestBatch.findMany({
+    where: { importMode: QUICK_IMPORT_MODE, ...(user.role === "ADMIN" ? {} : { createdById: user.id }) },
+    select: { id: true, createdAt: true, sourceId: true, targetJson: true },
+    orderBy: { createdAt: "desc" },
+    take: 50,
+  });
+  if (batches.length === 0) return [];
+  const ids = batches.map((batch) => batch.id);
+  const [promoted, loaded, sources] = await Promise.all([
+    prisma.ingestPromotionArtifact.findMany({ where: { groupKey: { in: ids.map((id) => `quick:${id}`) } }, select: { batchId: true } }),
+    prisma.ingestQuestionCandidate.groupBy({ by: ["batchId"], where: { batchId: { in: ids }, status: { not: "REJECTED" } }, _count: { _all: true } }),
+    prisma.source.findMany({ where: { id: { in: batches.flatMap((batch) => (batch.sourceId ? [batch.sourceId] : [])) } }, select: { id: true, name: true } }),
+  ]);
+  const done = new Set(promoted.map((row) => row.batchId));
+  const loadedBy = new Map(loaded.map((row) => [row.batchId, row._count._all]));
+  const sourceName = new Map(sources.map((source) => [source.id, source.name]));
+  const level = (difficulty: string) => difficulty.charAt(0) + difficulty.slice(1).toLowerCase();
+  return batches.flatMap((batch) => {
+    const target = parseTarget(batch.targetJson);
+    if (!target || done.has(batch.id)) return [];
+    const source = batch.sourceId ? sourceName.get(batch.sourceId) ?? null : null;
+    const what = target.kind === "FULL_PRACTICE_TEST"
+      ? target.testNumber ? `TEST ${target.testNumber}` : target.testName
+      : `${target.topicName} · ${level(target.difficulty)}`;
+    return [{
+      id: batch.id,
+      href: `/teacher/import/${batch.id}`,
+      createdAt: batch.createdAt,
+      kind: target.kind,
+      label: source ? `${source} · ${what}` : what,
+      sourceId: batch.sourceId,
+      testNumber: target.kind === "FULL_PRACTICE_TEST" ? target.testNumber ?? null : null,
+      topicId: target.kind === "PRACTICE_SET" ? target.topicId : null,
+      difficulty: target.kind === "PRACTICE_SET" ? target.difficulty : null,
+      questionsLoaded: loadedBy.get(batch.id) ?? 0,
+    }];
+  });
+}

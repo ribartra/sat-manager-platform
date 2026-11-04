@@ -310,8 +310,23 @@ const checks = [
   },
   {
     file: "hooks/use-session-guards.ts",
-    requires: ["SESSION_IDLE_MS", "LAST_ACTIVITY_KEY", "readSharedActivity()", "signOutCallbackUrl(reason)"],
+    requires: ["SESSION_IDLE_MS", "LAST_ACTIVITY_KEY", "readSharedActivity()", "rememberResumePage();", "rememberSessionUser(userId)"],
     label: "Idle guard counts activity in every tab before signing out",
+  },
+  {
+    file: "app/(auth)/login/page.tsx",
+    requires: ["takeResumePage(session?.user?.id)", "callbackFitsRole(resume, role)", "callbackFitsRole(callbackUrl, role)"],
+    label: "After an automatic sign-out: back to the previous page only for the same account",
+  },
+  {
+    file: "lib/session-policy.ts",
+    requires: ["saved.userId !== userId", "store?.removeItem(RESUME_KEY)", "RESUME_MAX_AGE_MS"],
+    label: "Resume record: per user, used once, expires; never in the URL",
+  },
+  {
+    file: "app/(teacher)/teacher/import/page.tsx",
+    requires: ["openQuickImports(session.user)", "Imports in progress", "Continue that import"],
+    label: "Import with AI step 1 lists imports in progress and warns before a second one of the same target",
   },
   {
     file: "components/session-provider.tsx",
