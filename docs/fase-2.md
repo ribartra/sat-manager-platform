@@ -5,6 +5,7 @@ Documento de trabajo interno. Reúne lo que queda para después de la Fase 1, qu
 > catálogo → asignación → resolución → resultados → importación
 
 Los tres bloques principales son:
+
 - la evolución del rendimiento en el tiempo;
 - la marca;
 - la personalización.
@@ -12,6 +13,7 @@ Los tres bloques principales son:
 Al final están otros puntos detectados en el trabajo reciente.
 
 Cada punto sigue el mismo esquema:
+
 1. **Hoy:** lo que existe en la plataforma.
 2. **Propuesta:** lo que se haría.
 3. **Por decidir:** lo que tiene que definir el equipo antes de construir.
@@ -99,17 +101,20 @@ Pospuesto como **SAT-035** en `SAT_Platform_TODO_2026-10-26.md` §7 y en `consid
 ### Propuesta
 
 **Por programa o institución** (P1, después de la marca):
+
 - logo, nombre visible y colores dentro de los tokens (acento y primario), para no romper el contraste;
 - remitente y "responder a" de los correos, firma y enlaces legales propios;
 - subdominio propio (opcional, P2);
 - una pantalla de admin para editarlo, con vista previa.
 
 **Por profesor** (P2):
+
 - firma en los correos;
 - valores por defecto al asignar: modo de feedback, explicaciones, días hasta la fecha límite y contexto;
 - filtros recordados.
 
 **Por alumno** (P2):
+
 - idioma de la interfaz, ES o EN (los manuales ya existen en ambos);
 - accesibilidad: tamaño de letra, alto contraste, tipografía para dislexia, menos animaciones;
 - tema oscuro;
@@ -119,6 +124,7 @@ Pospuesto como **SAT-035** en `SAT_Platform_TODO_2026-10-26.md` §7 y en `consid
 **Por padre** (P2): frecuencia e idioma del informe.
 
 **Lo que NO se personaliza:**
+
 - la forma de calcular puntajes;
 - la estructura de un Test (módulos, tiempos y 27/27/22/22);
 - las reglas de desbloqueo;
