@@ -1501,7 +1501,7 @@ const checks = [
   },
   {
     file: "lib/quick-import.ts",
-    requires: ["QUICK_IMPORT_COLUMNS", "$...$", "\\$", "pipe tables", "import.csv", "Q<number>_STEM.png", "unbalancedDollars"],
+    requires: ["QUICK_IMPORT_COLUMNS", "$...$", "\\$", "pipe tables", "import.csv", "Q<number>_STEM → the figure of the question", "unbalancedDollars"],
     label: "Import with AI: prompt detallado (columnas CSV, LaTeX, tablas, archivo descargable) y prompt de imagenes",
   },
   {
