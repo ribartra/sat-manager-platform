@@ -94,3 +94,13 @@ Ingestion **never writes directly to official questions.** Documents land in `In
 - Copy `.env.example` → `.env`. Key vars: `DATABASE_URL`, `AUTH_SECRET`, `SECRET_ENCRYPTION_KEY`, `INTERNAL_INGEST_TOKEN`, `AI_INGEST_SERVICE_URL`, `CORS_ALLOWED_ORIGINS`, `MISTRAL_*`, `EMAIL_*` (Brevo SMTP via nodemailer), `NEXT_PUBLIC_CALCULATOR_*`/`NEXT_PUBLIC_DESMOS_*` (embedded calculators).
 - Seed demo logins (`prisma/seed.ts`): `admin@sat.com` / `admin123`, `teacher…` / `teacher123`, `student1@sat.com` etc. / `student123`. Includes users in PENDING/REJECTED states to exercise validation flows.
 - DB backup/restore: `npm run db:backup` / `npm run db:restore` (→ `./backups`).
+
+## Environment readiness (required)
+Before reviewing or changing this project, inspect the complete tool inventory in
+`docs/operacion/README.md` and run the relevant doctor profile. Report missing
+tools, incompatible versions, stopped services and credential failures separately.
+Provide exact installation and verification commands for the user's OS; do not install
+system tools automatically. Never print access tokens or secret values. A missing tool
+is not proof of an application defect. Windows operator commands use PowerShell 7; VM
+scripts remain Bash. Consult deployed TAG, incident timestamps and logs before proposing
+a production fix. Never apply Terraform plans containing destroy/replace actions.

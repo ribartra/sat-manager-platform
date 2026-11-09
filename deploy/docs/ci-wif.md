@@ -3,6 +3,8 @@
 El workflow `.github/workflows/build-images.yml` construye las imágenes en Cloud Build sin llaves
 JSON. Usa un token OIDC de GitHub que solo vale para `ribartra/sat-manager-platform`.
 
+Flujo completo, comprobaciones y limitaciones: [guía de CI/CD](../../docs/operacion/ci-cd.md).
+
 ## Qué crea Terraform (`modules/ci`)
 
 - **Pool `github` y proveedor `github-actions`**, con la condición

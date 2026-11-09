@@ -127,3 +127,7 @@ Para montar desde cero en otro proyecto:
 - `terraform.tfvars`.
 
 Los secretos solo viven en Secret Manager.
+
+Guía de preparación Windows/Linux y operación completa: [operación multiplataforma](../docs/operacion/README.md)
+
+[CI/CD: flujo actual, configuración y limitaciones](../docs/operacion/ci-cd.md)

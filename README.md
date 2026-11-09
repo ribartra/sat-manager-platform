@@ -706,3 +706,7 @@ Full Practice Tests:
 - `Integracion-calculadora-desmos.md`: integración de calculadora.
 - `usos-desmos-latex.md`: notas de LaTeX/Desmos.
 - `sugerencias-gcp-bucket.md`: recomendación para almacenamiento externo.
+
+Guía de preparación Windows/Linux y operación completa: [docs/operacion/README.md](docs/operacion/README.md)
+
+[Índice general de documentación](docs/README.md)
